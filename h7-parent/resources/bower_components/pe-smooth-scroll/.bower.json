@@ -1,0 +1,14 @@
+{
+  "name": "pe-smooth-scroll",
+  "homepage": "https://github.com/phil-evans/pe-smooth-scroll",
+  "_release": "3f962515ce",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "3f962515cef14ad1084050017004801345b07fbd"
+  },
+  "_source": "https://github.com/phil-evans/pe-smooth-scroll.git",
+  "_target": "*",
+  "_originalSource": "phil-evans/pe-smooth-scroll",
+  "_direct": true
+}

@@ -1,0 +1,17 @@
+.single-case-study {
+  .page-section {
+    &:before {
+      content: '';
+      display: block;
+      width: 33.3333%;
+      height: 10px;
+      background-color: $primary;
+    }
+    
+    &.first-section {
+      &:before {
+        display: none;
+      }
+    }
+  }
+}

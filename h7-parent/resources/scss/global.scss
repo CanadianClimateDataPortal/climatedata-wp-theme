@@ -1,0 +1,204 @@
+@import 'setup';
+
+//
+// CONVERT BOURBON VARS TO BOOTSTRAP
+//
+
+$base-font-family: $font-family-base !default;
+$base-font-color: $body-color;
+$action-color: $primary;
+
+$heading-font-family: $headings-font-family !default;
+
+//
+// BOOTSTRAP OVERRIDES
+//
+
+.dropdown-menu {
+  font-size: 1.4em;
+  
+  .dropdown-header {
+    font-size: 0.8em;
+  }
+}
+
+.dropdown-select-replace {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+}
+
+//
+// HELPERS
+//
+
+$icon-margin: 15px;
+
+// TAGS
+
+$h4-font-family: $font-family-sans-serif;
+$h5-font-family: $font-family-sans-serif;
+$h6-font-family: $font-family-sans-serif;
+
+@import 'helpers/tags';
+
+// CLASSES
+
+@import 'helpers/classes';
+
+// FONTS
+
+@import 'fonts';
+
+//
+// TEMPLATE
+//
+
+$admin-bar-height: 32px;
+$alert-height: 70px;
+$header-height: 90px;
+$filter-height: 60px;
+
+// HEADER
+
+@import 'template/header';
+
+// FOOTER
+
+@import 'template/footer';
+
+// HERO
+
+@import 'template/hero';
+
+//
+// STRUCTURE
+//
+
+@import 'structure';
+
+//
+// BLOCKS
+//
+
+@import 'blocks';
+
+//
+// LAYOUTS
+//
+
+@import 'layouts/archive';
+
+//
+// COMPONENTS
+//
+
+// ANIMSITION
+
+@import '../bower_components/animsition/dist/css/animsition.min.css';
+
+.spinner {
+  @include full-size(fixed);
+  top: calc(100% + 100px);
+  opacity: 0;
+  transition: top 0s ease 0.25s, opacity 0.25s ease 0s;
+  z-index: 2000;
+  
+  &:after {
+    content: '';
+    display: block;
+    @include centering(true);
+    top: calc(100% + 100px);
+    width: 72px;
+    height: 72px;
+    transition: 0.25s ease-in-out;
+  }
+}
+
+body {
+  &.spinner-on {
+    .spinner {
+      top: 0;
+      opacity: 1;
+      transition: top 0s ease 0s, opacity 0.25s ease 0s;
+      
+      &:after {
+        top: 50%;
+      }
+    }
+  }
+}
+
+// AUTOCOMPLETE
+
+.ui-autocomplete {
+	position: absolute;
+	top: 0;
+	left: 0;
+	cursor: default;
+	z-index: 1040;
+}
+
+.ui-menu {
+	display: block;
+	padding: 0;
+	margin: 15px 0 0 0;
+	list-style: none;
+	outline: 0;
+	background-color: $white;
+	font-size: 1em;
+	line-height: 1.4;
+  
+  .ui-menu {
+  	position: absolute;
+  }
+  
+  .ui-menu-item {
+  	margin: 0;
+  	padding: 8px;
+  	cursor: pointer;
+  }
+  
+  .ui-menu-item-wrapper {
+  	position: relative;
+  	padding: 3px 1em 3px .4em;
+  }
+  
+  .ui-menu-divider {
+  	margin: 5px 0;
+  	height: 0;
+  	font-size: 0;
+  	line-height: 0;
+  	border-width: 1px 0 0 0;
+  }
+  
+  .ui-state-focus {
+    background-color: $light;
+  }
+  
+  .ui-state-active {
+  }
+}
+
+// FONTAWESOME
+
+@import '../vendor/fontawesome/scss/fontawesome';
+@import '../vendor/fontawesome/scss/solid';
+
+// SOCIAL WIDGETS
+
+//@import '../bower_components/pe-social-widget/social-widget';
+
+// SUPERMENU
+
+@import '../bower_components/pe-supermenu/supermenu';
+
+// OVERLAY
+
+$overlay-bg: transparent;
+
+@import '../bower_components/pe-overlay/overlay';
+
+// SLICK
+
+@import '../bower_components/slick-carousel/slick/slick';

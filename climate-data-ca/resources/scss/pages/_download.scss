@@ -1,0 +1,133 @@
+//
+// TABS
+//
+
+#download-tabs {
+  padding: 0;
+}
+
+//
+// FORM
+//
+
+.download-map-container {
+  position: relative;
+  height: 0;
+  margin-top: 30px;
+  padding-bottom: 33.3333%;
+}
+
+.download-map {
+  @include full-size;
+}
+
+//
+// STATIONS
+//
+
+.station-select-title {
+  font-weight: bold;
+}
+
+.station-select-location {
+  font-weight: bold;
+}
+
+.station-select-term {
+  font-weight: bold;
+}
+
+.station-select-province {
+  font-weight: bold;
+}
+
+.select2-container--bootstrap4.select2-container--focus .select2-selection {
+  border-color: #ced4da;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+//
+// VARIABLE
+//
+
+#var-download {
+  .form-layout-row {
+    margin-bottom: 100px;
+  }
+}
+
+#download-filename {
+  height: auto;
+  padding: 0.5em 1em;
+  border-radius: 50px 0 0 50px;
+}
+
+//
+// PROCESS
+//
+
+.form-process {
+  label {
+    font-size: 1.4em;
+  }
+  
+  .input-group {
+    .form-control {
+      border-radius: 50px 0 0 50px;
+    }
+    
+    & > .input-group-prepend {
+      & > .btn {
+        border-radius: 50px 0 0 50px;
+      }
+    }
+
+    & > .input-group-append {
+      & > .btn {
+        border-radius: 0 50px 50px 0;
+      }
+    }
+  }
+}
+
+#daily-captcha-wrap {
+  label {
+    
+  }
+}
+
+#download-process {
+  line-height: 1.8em;
+}
+
+#daily-process-wrap,
+#format-label-netcdf {
+  display: none;
+}
+
+#station-process-wrap {
+  .form-control {
+    border-radius: 50px 0 0 50px;
+  }
+}
+
+//
+// HEAT WAVE ANALYSIS
+//
+
+#heat-wave-form {
+  .form-inline {
+    .form-control {
+      max-width: 80px;
+      margin: 0.2em;
+      font-size: 1em;
+    }
+  }
+}
+
+#heat-wave-email {
+  height: auto;
+  padding: 0.5em 1em;
+  border-radius: 50px 0 0 50px;
+}

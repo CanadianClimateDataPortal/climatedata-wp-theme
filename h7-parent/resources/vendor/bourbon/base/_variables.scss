@@ -1,0 +1,94 @@
+// Breakpoints
+$medium-screen: 600px !default;
+$large-screen: 900px !default;
+
+// Typography
+
+@import '../../fonts';
+
+$brand-font-primary: 'CCC-Sans', $font-stack-system;
+$sans: 'Roboto', $font-stack-system;
+$condensed: 'Roboto Condensed', $font-stack-system;
+
+$base-font-family: $sans;
+$heading-font-family: $brand-font-primary;
+
+// Font Sizes
+$base-font-size: 10px !default;
+
+// Line height
+$base-line-height: 2 !default;
+$heading-line-height: 1.4 !default;
+
+// Other Sizes
+$base-border-radius: 3px !default;
+$base-spacing: $base-line-height * 1em !default;
+$small-spacing: $base-spacing / 2 !default;
+$base-z-index: 0 !default;
+
+// Colors
+$blue: #00a !default;
+$dark-gray: #333 !default;
+$medium-gray: #999 !default;
+$light-gray: #ddd !default;
+
+$white: #fff;
+$black: #000;
+
+$grey1: #f6f6fb;
+$grey2: #e5e5ee;
+
+// Font Colors
+$base-font-color: $dark-gray !default;
+$action-color: $blue !default;
+
+// Border
+$base-border-color: $light-gray !default;
+$base-border: 1px solid $base-border-color !default;
+
+// Background Colors
+$base-background-color: $white !default;
+$secondary-background-color: tint($base-border-color, 75%) !default;
+
+// Forms
+$form-box-shadow: none !default;
+$form-box-shadow-focus: $form-box-shadow, 0 0 5px adjust-color($action-color, $lightness: -5%, $alpha: -0.3) !default;
+
+// Animations
+$base-duration: 150ms !default;
+$base-timing: ease !default;
+
+// Grids
+$neat-grid: (
+  columns: 12,
+  gutter: 0px,
+) !default;
+
+// Breakpoints
+$break-retina: (
+  media: "(-webkit-min-device-pixel-ratio: 1.25) and (min-resolution: 120dpi)",
+);
+
+$break-wide: (
+  media: "(min-width: 1200px)",
+);
+
+$break-1200: (
+  media: "(max-width: 1200px)",
+);
+
+$break-1000: (
+  media: "(max-width: 1000px)",
+);
+
+$break-800: (
+  media: "(max-width: 800px)",
+);
+
+$break-600: (
+  media: "(max-width: 600px)",
+);
+
+$break-420: (
+  media: "(max-width: 420px)",
+);

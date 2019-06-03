@@ -1,0 +1,194 @@
+{
+  "SDII": {
+    "title": "",
+    "desc": "simple daily intensity index",
+    "units": " Days",
+    "decimals": 1
+  },
+  "cddcold_18": {
+    "title": "Cooling Degree Days",
+    "desc": "cooling degree days base 18°C",
+    "units": " Degree Days",
+    "decimals": 1
+  },
+  "frost_days": {
+    "title": "Frost Days",
+    "desc": "days with tmin < 0°C",
+    "units": " Days",
+    "decimals": 1
+  },
+  "gddgrow_10": {
+    "title": "Growing Degree Days",
+    "desc": "growing degree days base 10°C",
+    "units": " Degree Days",
+    "decimals": 1
+  },
+  "gddgrow_5": {
+    "title": "Growing Degree Days",
+    "desc": "growing degree days base 5°C",
+    "units": " Degree Days",
+    "decimals": 1
+  },
+  "gsl_5": {
+    "title": "",
+    "desc": "Northern Hemisphere growing season : The number of days between the first occurrence of at least\nsix consecutive days with mean daily temperature over 5℃ and\nthe first occurrence of at least six consecutive days with\nmean daily temperature below 5℃ after July 1st",
+    "units": " Days",
+    "decimals": 1
+  },
+  "hddheat_17": {
+    "title": "Heating Degree Days",
+    "desc": "heating degree days base 17°C",
+    "units": " Degree Days",
+    "decimals": 1
+  },
+  "heat_wave_frequency_Tmin20_Tmax30": {
+    "title": "Heat Wave Frequency",
+    "desc": "Number of events per year of 3 consecutive days when Tmin > 20°C and Tmax > 30°C",
+    "units": " Events",
+    "decimals": 1
+  },
+  "heat_wave_max_length_Tmin20_Tmax30": {
+    "title": "Heat Wave Max Length",
+    "desc": "Longest heat wave event (3 consecutive days when Tmin > 20°C and Tmax > 30°C) found in a given period.",
+    "units": " Events",
+    "decimals": 1
+  },
+  "ice_days": {
+    "title": "Ice Days",
+    "desc": "Days with tmax < 0°C",
+    "units": " Days",
+    "decimals": 1
+  },
+  "prcptot": {
+    "title": "Total Precipitation",
+    "desc": "total precip",
+    "units": "mm",
+    "decimals": 0
+  },
+  "r10mm": {
+    "title": "Wet days > 10mm",
+    "desc": "wetdays > 10mm",
+    "units": " Days",
+    "decimals": 0
+  },
+  "r1mm": {
+    "title": "Wet days > 1mm",
+    "desc": "wetdays > 1mm",
+    "units": " Days",
+    "decimals": 0
+  },
+  "r20mm": {
+    "title": "Wet days > 20mm",
+    "desc": "wetdays > 20mm",
+    "units": " Days",
+    "decimals": 0
+  },
+  "rx1day": {
+    "title": "",
+    "desc": "max 1 day precip amount",
+    "units": "mm",
+    "decimals": 0
+  },
+  "tg_mean": {
+    "title": "Mean Temperature",
+    "desc": "mean temperature",
+    "units": "kelvin",
+    "decimals": 1
+  },
+  "tn_max": {
+    "title": "Daily Maximum of Minimum Temperature",
+    "desc": "max of daily tmin",
+    "units": "kelvin",
+    "decimals": 1
+  },
+  "tn_mean": {
+    "title": "Daily Mean of Minimum Temperature",
+    "desc": "mean of daily tmin",
+    "units": "kelvin",
+    "decimals": 1
+  },
+  "tn_min": {
+    "title": "Minimum of Daily Minimum Temperature",
+    "desc": "min of daily tmin",
+    "units": "kelvin",
+    "decimals": 1
+  },
+  "tnlt_-15": {
+    "title": "Number of days with minimum temperature below -15°C,",
+    "desc": "Number of days with minimum temperature below -15°C,",
+    "units": " Days",
+    "decimals": 1
+  },
+  "tnlt_-25": {
+    "title": "Number of days with minimum temperature below -25°C",
+    "desc": "Number of days with minimum temperature below -25°C",
+    "units": " Days",
+    "decimals": 1
+  },
+  "tr_18": {
+    "title": "Tropical Nights (Days with Tmin > 18°C)",
+    "desc": "tropical nights (days with tmin > 18°C)",
+    "units": " Days",
+    "decimals": 1
+  },
+  "tr_20": {
+    "title": "Tropical Nights (Days with Tmin > 20°C)",
+    "desc": "tropical nights (days with tmin > 20°C)",
+    "units": " Days",
+    "decimals": 1
+  },
+  "tr_22": {
+    "title": "Tropical Nights (Days with Tmin > 22°C)",
+    "desc": "tropical nights (days with tmin > 22°C)",
+    "units": " Days",
+    "decimals": 1
+  },
+  "tx_max": {
+    "title": "Max of Daily Tmax",
+    "desc": "max of daily tmax",
+    "units": "kelvin",
+    "decimals": 1
+  },
+  "tx_mean": {
+    "title": "Mean of Daily Tmax",
+    "desc": "mean of daily tmax",
+    "units": "kelvin",
+    "decimals": 1
+  },
+  "tx_min": {
+    "title": "Min of Daily Tmax",
+    "desc": "min of daily tmax",
+    "units": "kelvin",
+    "decimals": 1
+  },
+  "txgt_25": {
+    "title": "Days with tmax > 25 (summer days)",
+    "desc": "days with tmax > 25 (summer days)",
+    "units": " Days",
+    "decimals": 1
+  },
+  "txgt_27": {
+    "title": "Days with tmax > 27°C",
+    "desc": "days with tmax > 27°C",
+    "units": " Days",
+    "decimals": 1
+  },
+  "txgt_29": {
+    "title": "Days with tmax > 29°C",
+    "desc": "days with tmax > 29°C",
+    "units": " Days",
+    "decimals": 1
+  },
+  "txgt_30": {
+    "title": "Days with tmax > 30°C",
+    "desc": "days with tmax > 30°C",
+    "units": " Days",
+    "decimals": 1
+  },
+  "txgt_32": {
+    "title": "Days with tmax > 32°C",
+    "desc": "days with tmax > 32°C",
+    "units": " Days",
+    "decimals": 1
+  }
+}

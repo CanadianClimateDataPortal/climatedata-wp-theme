@@ -1,0 +1,72 @@
+.supermenu-wrap {
+  position: absolute;
+  top: -150vh;
+  width: 100%;
+  //opacity: 0;
+  transition: top 0.4s ease, opacity 0.4s ease;
+  z-index: 2;
+  
+  &.initialized {
+    
+  }
+  
+}
+
+.supermenu {
+  position: relative;
+  
+  &.show {
+    .supermenu-carousel {
+      opacity: 1;
+      transition: opacity 0.25s ease 0.5s;
+    }
+  }
+}
+
+body {
+  &.supermenu-disabled {
+    .supermenu-active {
+      color: $gray-300;
+    }
+  }
+  
+  &.supermenu-open {
+    .supermenu-wrap {
+      top: 100%;
+      opacity: 1;
+    }
+    
+    &.supermenu-disabled {
+      .supermenu-wrap {
+        top: -100vh;
+        opacity: 0;
+      }
+    }
+  }
+}
+
+.supermenu-carousel {
+  z-index: 1;
+  
+  &.sliding {
+    .supermenu-slide {
+      opacity: 0.25;
+    }
+  }
+}
+
+.supermenu-slide {
+  padding: 100px 0;
+  outline: none;
+  transition: opacity 0.25s;
+}
+
+// controls
+
+.supermenu-carousel-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.4em;
+  z-index: 5;
+}

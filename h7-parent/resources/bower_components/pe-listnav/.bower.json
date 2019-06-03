@@ -1,0 +1,53 @@
+{
+  "name": "pe-listnav",
+  "version": "3.0.1",
+  "dependencies": {
+    "jquery": ">=3.0.0"
+  },
+  "homepage": "http://github.com/phil-evans/pe-listnav",
+  "authors": [
+    {
+      "name": "Eric Steinborn",
+      "url": "http://ericsteinborn.com",
+      "email": "esteinborn@gmail.com"
+    }
+  ],
+  "description": "Add a slick \"letter-based\" navigation bar to all of your lists. Click a letter to quickly filter the list to items that match that letter.",
+  "main": "jquery-listnav.js",
+  "keywords": [
+    "listnav",
+    "list",
+    "ul",
+    "li",
+    "sort",
+    "navigation",
+    "filter"
+  ],
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/mit-license.php"
+    },
+    {
+      "type": "GPL",
+      "url": "http://www.gnu.org/licenses/gpl.html"
+    }
+  ],
+  "ignore": [
+    "**/.*",
+    "demo",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "_release": "3.0.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "3.0.1",
+    "commit": "220600b7d04ddb3aa65de5451feeee2a675e5cc2"
+  },
+  "_source": "https://github.com/phil-evans/pe-listnav.git",
+  "_target": "3.0.1",
+  "_originalSource": "https://github.com/phil-evans/pe-listnav.git",
+  "_direct": true
+}

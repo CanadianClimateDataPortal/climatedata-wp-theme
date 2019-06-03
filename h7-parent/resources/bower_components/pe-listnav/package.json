@@ -1,0 +1,34 @@
+{
+  "name": "jquery-listnav",
+  "title": "jQuery ListNav",
+  "version": "3.0.0",
+  "author": "Eric Steinborn",
+  "description": "Add a slick \"letter-based\" navigation bar to all of your lists. Click a letter to quicky filter the list to items that match that letter. Updated for better compatibility with future jQuery versions.",
+  "demo": "http://esteinborn.github.io/jquery-listnav",
+  "main": "jquery-listnav.min.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/esteinborn/jquery-listnav"
+  },
+  "devDependencies": {
+    "grunt": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-sass": "*",
+    "grunt-contrib-copy": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-cssmin": "*",
+    "grunt-contrib-csslint": "*",
+    "matchdep": "*"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/mit-license.php"
+    },
+    {
+      "type": "GPL",
+      "url": "http://www.gnu.org/licenses/gpl.html"
+    }
+  ]
+}

@@ -1,0 +1,312 @@
+//
+// BROWSER UPGRADES
+//
+
+@mixin box-sizing {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  
+  &:before, &:after {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+}
+
+@mixin smoothing {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+//
+// EFFECTS
+//
+
+@mixin blur($value) {
+  filter: blur($value);
+  -webkit-filter: blur($value);
+}
+
+//
+// HELPERS
+//
+
+// BACKGROUND
+// $attachment: scroll/fixed
+
+@mixin bg($attachment: scroll) {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: $attachment;
+  
+  // disable fixed position 
+  // for large screens with high pixel density
+  
+  @media	only screen and (min-width: 2000px) and (-webkit-min-device-pixel-ratio: 1.3),
+  	only screen and (min-width: 2000px) and (-o-min-device-pixel-ratio: 13/10),
+  	only screen and (min-width: 2000px) and (min-resolution: 120dpi)
+  	{
+    background-attachment: scroll;
+    background-size: 100% auto;
+  }
+}
+
+// FULL SIZE ELEMENT
+// $position: absolute or fixed
+
+@mixin full-size($position: absolute) {
+  position: $position;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+// ELEMENT CENTERING
+// $horizontal: true/false
+
+@mixin centering($horizontal: false) {
+  position: absolute;
+  top: 50%;
+  
+  @if $horizontal == true {
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+  } @else {
+    transform: translateY(-50%);
+  }
+}
+
+// TEXT TREATMENT
+
+@mixin all-caps($font-weight: 0) {
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  
+  @if $font-weight != 0 {
+    font-weight: $font-weight;
+  }
+}
+
+@mixin no-text {
+  font-size: 0;
+  line-height: 0;
+  text-indent: -9999px;
+}
+
+@mixin undo-no-text {
+  font-size: 14px;
+  line-height: 24px;
+  text-indent: 0px;
+}
+
+@mixin text-border($size: 0.5em, $border-color: $action-color, $padding: 0 0.1em) {
+  text-decoration: none;
+  padding: $padding;
+  box-shadow: inset 0 -#{$size} 0 $border-color;
+}
+
+//
+// ELEMENTS
+//
+
+// BUTTON
+
+@mixin button-style($size: medium, $style: transparent) {
+  display: inline-block;
+  padding: $btn-padding-top $btn-padding-right $btn-padding-bottom $btn-padding-left;
+  background-color: $btn-bg;
+  color: $btn-color;
+  font-family: $btn-font;
+  font-size: $btn-font-size;
+  transition: 0.25s;
+  
+  @if $size == small {
+    padding: ($btn-padding-top * 0.75) ($btn-padding-right * 0.75) ($btn-padding-bottom * 0.75) ($btn-padding-left * 0.75);
+    font-size: $btn-font-size * 0.8;
+    line-height: 1;
+  }
+  
+  &:hover {
+    background-color: $btn-hover-bg;
+    color: $btn-hover-color;
+  }
+  
+  &.reversed {
+    background-color: $btn-reversed-bg;
+    color: $btn-reversed-color;
+    
+    &:hover {
+      background-color: $btn-reversed-hover-bg;
+      color: $btn-reversed-hover-color;
+    }
+  }
+}
+
+/*
+@mixin button($size: medium, $style: transparent) {
+  display: inline-block;
+  font-family: $button-font-family;
+  @include all-caps;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: $button-letter-spacing;
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: $base-border-radius;
+  transition: $base-duration;
+  
+  &:hover {
+    text-decoration: none;
+  }
+  
+  // sizes
+  
+  @if $size == large {
+    padding: 20px 36px;
+    font-size: $base-font-size * 2;
+  } @else if $size == small {
+    padding: 12px;
+    font-size: $base-font-size * 1.2;
+    line-height: 1;
+  } @else {
+    padding: 15px 30px;
+    font-size: $base-font-size * 1.6;
+  }
+  
+  // backgrounds
+  
+  @if $style == transparent {
+    background-color: transparent;
+  } @else if $style == normal {
+    background-color: $action-color;
+    color: $white;
+    
+    &:hover {
+      background-color: $white;
+      color: $action-color;
+    }
+  } @else if $style == reversed {
+    background-color: $white;
+    color: $action-color;
+    
+    &:hover {
+      background-color: $action-color;
+      color: $white;
+    }
+  }
+}
+*/
+
+$icomoon-font-family: '' !default;
+
+@mixin icon {
+  display: inline-block;
+  font-family: $icomoon-font-family !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@mixin add-icon($icon) {
+  
+  &:before {
+    content: $icon;
+    display: inline-block;
+    @include icon;
+  }
+  
+}
+
+$icon-margin: 10px !default;
+
+@mixin add-fa-icon($icon, $style: solid, $position: before) {
+  
+  @if ( $position == before ) {
+  
+    &:before {
+      @include fa-icon;
+      content: fa-content($icon);
+      margin-right: $icon-margin;
+      
+      @if ( $style == solid ) {
+        @extend .fas;
+      } @else if ( $style == regular ) {
+        @extend .far;
+      }
+    }
+  
+  } @else if ( $position == after ) {
+    
+    &:after {
+      @include fa-icon;
+      content: fa-content($icon);
+      margin-left: $icon-margin;
+      
+      @if ( $style == solid ) {
+        @extend .fas;
+      } @else if ( $style == regular ) {
+        @extend .far;
+      }
+    }
+    
+  }
+  
+}
+
+// BUBBLE
+// $position: which side of the box to attach the bubble to
+// $size: px value
+// $color: color value
+
+@mixin bubble($position: top, $size: 10px, $color: #fff) {
+  &:before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border: $size solid transparent;
+    transform: translateX(-50%);
+    z-index: 10;
+    
+    @if $position == top {
+      top: (-($size * 2));
+      bottom: auto;
+      border-bottom-color: $color;
+    } @else {
+      top: auto;
+      bottom: (-($size * 2));
+      border-top-color: $color;
+    }
+  }
+}
+
+//
+// GRID
+//
+
+@mixin grid-reset {
+  width: auto;
+  float: none;
+  margin-left: 0;
+}
+
+@mixin nested-column($x: 12, $y: 12) {
+  @include make-col-ready();
+  width: #{(($x / $y) * 100) + '%'};
+}
+
+@mixin nested-offset($x: 12, $y: 12) {
+  margin-left: #{(($x / $y) * 100) + '%'};
+}

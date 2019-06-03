@@ -1,0 +1,29 @@
+.single-case-study {
+  #hero {
+    h1 {
+      font-size: 5em;
+    }
+    
+    p {
+      font-size: 2em;
+    }
+  }
+  
+  .page-section {
+    &:before {
+      content: '';
+      display: block;
+      position: relative;
+      width: 33.3333%;
+      height: 10px;
+      background-color: $primary;
+      z-index: 2;
+    }
+    
+    &.first-section {
+      &:before {
+        display: none;
+      }
+    }
+  }
+}

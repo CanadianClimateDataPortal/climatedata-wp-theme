@@ -1,0 +1,21 @@
+.map {
+  position: relative;
+  height: 0;
+  padding: 0 0 40% 0;
+  z-index: 1;
+}
+
+.map-filters {
+  
+  .select2-container {
+    .select2-selection--single {
+      padding: 0;
+    }
+  }
+  
+}
+
+.map-sliders {
+  position: relative;
+  z-index: 2;
+}

@@ -10,7 +10,7 @@
     // options
     
     var defaults = {
-      hosturl: 'http://data.climatedata.ca:8080',
+      hosturl: '//data.climatedata.ca',
       variables: null,
       rcp: 'rcp85',
       maps: {
@@ -90,11 +90,6 @@
       
       // data URL
       
-/*
-      if (client_ip === '72.137.170.138') {
-        plugin_settings.hosturl = 'http://192.168.0.52:8080';
-      }
-*/
       
       // set initial variable
       

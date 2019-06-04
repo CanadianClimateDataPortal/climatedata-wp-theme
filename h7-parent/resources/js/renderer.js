@@ -130,7 +130,7 @@
           range85Series = [];
             
           $.getJSON(
-              'http://data.climatedata.ca/get_values.php?lat=' + lat + '&lon=' + lon + '&var=' + variable + '&month=' + month,
+              '//data.climatedata.ca/get_values.php?lat=' + lat + '&lon=' + lon + '&var=' + variable + '&month=' + month,
               function (data) {
 
                   if (varDetails.units.value === 'kelvin') {

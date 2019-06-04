@@ -243,7 +243,7 @@ var chart_labels, legend_labels;
       var redirect_url = '/explore/location/';
       
       if (current_lang == 'fr') {
-        redirect_url = '/fr/explorer/emplacement/';
+        redirect_url = '/explorer/emplacement/';
       }
     
       window.location.href = redirect_url + '?loc=' + e.params.data.id;

@@ -132,10 +132,6 @@
           
           var ajax_url = site_url;
           
-          if ($('body').hasClass('lang-fr')) {
-            ajax_url += 'fr/';
-          }
-          
           ajax_url += 'variable/' + variable;
                     
           $.ajax({

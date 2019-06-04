@@ -72,9 +72,25 @@
       }*/
 
     ?>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-141104740-1"></script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<?php
+   // FR language
+if ( defined( 'ICL_LANGUAGE_CODE' ) && 'fr' == ICL_LANGUAGE_CODE ) {
+?>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-141104740-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'UA-141104740-2');
+    </script>
 
+<?php }
+else {
+?>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-141104740-1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -82,5 +98,9 @@
 
       gtag('config', 'UA-141104740-1');
     </script>
+
+<?php
+}
+?>
   </body>
 </html>

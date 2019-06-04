@@ -2,3 +2,5 @@
 climate-data-ca/resources/app/idf/
 topo.json
 twentynineteen
+db.php
+error_log

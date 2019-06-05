@@ -45,7 +45,6 @@
 
     <script type="text/javascript">
 
-      var client_ip = '<?php echo $_SERVER['REMOTE_ADDR']; ?>';
       var base_href = '<?php echo $GLOBALS['vars']['site_url']; ?>';
 
     </script>

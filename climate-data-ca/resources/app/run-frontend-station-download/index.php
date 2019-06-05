@@ -227,15 +227,7 @@
         });
         var hosturl;
 
-        <?php
-
-        $client_ip = $_SERVER['REMOTE_ADDR'];
-
-        if ($client_ip === '72.137.170.138') { ?>
-        hosturl = "http://192.168.0.52:8080";
-        <?php } else { ?>
-        hosturl = "http://data.habitatseven.com:8080";
-        <?php } ?>
+        hosturl = "http://data.climatedata.ca";
 
 
         map.createPane('basemap');

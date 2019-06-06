@@ -225,6 +225,7 @@
     // data URLs
     
     var hosturl = data_url;// + ':8080'; // data.climatedata.ca:8080";
+    var canadaBounds = L.latLngBounds(L.latLng(41,-141),L.latLng(83.50,-52.1));
     // var hosturl = data_url + ':8080'; // data.climatedata.ca:8080";
     
     // grid line/fill options
@@ -596,6 +597,7 @@ maxWidth: "auto"
               }
           }
       },
+      bounds: canadaBounds,
       maxZoom: 12,
       minZoom: 7,
       pane: 'grid'
@@ -796,6 +798,7 @@ maxWidth: "auto"
         transparent: true,
         pane: 'raster',
         VERSION: '1.3.0',
+        bounds: canadaBounds,
         layers: 'CDC:' + query['var'] + '-ys-rcp26-p50-ann-10year'
     }).addTo(map1);
     
@@ -883,6 +886,7 @@ maxWidth: "auto"
         opacity: 1,
         pane: 'raster',
         'VERSION': '1.3.0',
+        bounds: canadaBounds,
         layers: 'CDC:' + query['var'] + '-ys-rcp26-p50-ann-10year'
     };
 

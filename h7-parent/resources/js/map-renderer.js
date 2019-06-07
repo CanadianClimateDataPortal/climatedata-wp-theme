@@ -10,7 +10,7 @@
     // options
     
     var defaults = {
-      hosturl: 'http://data.climatedata.ca:8080',
+      hosturl: '//data.climatedata.ca',
       variables: null,
       rcp: 'rcp85',
       maps: {
@@ -48,17 +48,12 @@
               line_width: '0.2',
               line_width_active: '1',
               fill_color_hover: '#fff'
-            },
-            geojson: {
-              path: ''
             }
           },
-          colormap: '',
           query: {
             variable: null,
             decade: 1980,
-            mora: 'ann',
-            sector: null
+            mora: 'ann'
           }
         }
       },
@@ -95,11 +90,6 @@
       
       // data URL
       
-/*
-      if (client_ip === '72.137.170.138') {
-        plugin_settings.hosturl = 'http://192.168.0.52:8080';
-      }
-*/
       
       // set initial variable
       
@@ -218,81 +208,6 @@
               
           }).addTo(plugin_settings.maps.main.object);
           
-        } else if (pane_data.type == 'geojson') {
-          
-          plugin_settings.maps.main.query.sector = 1712;
-          
-          $.getJSON(plugin_settings.hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&layer=CDC:health_sectors&style=" + plugin_settings.maps.main.query.variable + "_health_ann&format=application/json").then(function (data) {
-  
-            plugin_settings.maps.main.colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
-            plugin_settings.maps.main.colormap = plugin_settings.maps.main.colormap.reverse();
-            
-            console.log('creating sector layer');
-  
-            plugin_settings.maps.main.layers.geojson.path = site_url + 'data/run-frontend-health/' + "annual_choro_values.php?var=" + plugin_settings.maps.main.query.variable + "&rcp=" + plugin_settings.rcp;
-            
-            console.log(plugin_settings.maps.main.layers.geojson.path);
-            
-            $.getJSON(plugin_settings.maps.main.layers.geojson.path).then(function (data) {
-            
-                plugin_settings.maps.main.layers.geojson.values = data;
-    
-                console.log("choroValues");
-                console.log(plugin_settings.maps.main.layers.geojson.values);
-                
-                var tooltipValue;
-    
-                plugin_settings.maps.main.layers.geojson.choropleth = L.geoJSON(healthSectorsGeoJson, {
-                    smoothFactor: 0,
-                    name: 'geojson',
-                    pane: 'sector',
-                    onEachFeature: function (feature, layer) {
-                      
-                      if (typeof feature !== 'undefined') {
-                      
-                        layer.setStyle({
-                            fillColor: plugin_instance._get_color(plugin_settings.maps.main.layers.geojson.values[plugin_settings.maps.main.query.decade][parseInt(feature.properties.PR_HRUID)], plugin_settings.maps.main.colormap),
-                            weight: 0.5,
-                            opacity: 1,
-                            color: 'white',
-                            fillOpacity: 1
-                        });
-                        layer.on('mouseover', function () {
-    
-                            tooltipValue = plugin_settings.maps.main.layers.geojson.values[plugin_settings.maps.main.query.decade][parseInt(this.feature.properties.PR_HRUID)];
-                            //fixedTooltipValue = (tooltipValue - subtractValue).toFixed(varDetails['decimals']) + "" + chartUnit;
-                            this.setStyle({
-                                fillColor: plugin_instance._get_color(plugin_settings.maps.main.layers.geojson.values[plugin_settings.maps.main.query.decade][parseInt(this.feature.properties.PR_HRUID)], plugin_settings.maps.main.colormap),
-                                weight: 2,
-                                opacity: 1,
-                                color: 'white',
-                                fillOpacity: 1
-                            });
-                            layer.bindTooltip(layer.feature.properties.ENG_LABEL, {sticky: true}).openTooltip(layer.latlng);
-                        });
-                        layer.on('mouseout', function () {
-                            this.setStyle({
-                                fillColor: plugin_instance._get_color(plugin_settings.maps.main.layers.geojson.values[plugin_settings.maps.main.query.decade][parseInt(feature.properties.PR_HRUID)], plugin_settings.maps.main.colormap),
-                                weight: 0.5,
-                                opacity: 1,
-                                color: 'white',
-                                fillOpacity: 1
-                            });
-                        });
-                        
-                      }
-                      
-                    }
-                }).addTo(plugin_settings.maps.main.object);
-                
-            });
-            
-          }).fail(function (err) {
-            console.log(err)
-          });
-          
-          
-          
         }
         
       }
@@ -352,16 +267,7 @@
           hide_from_to: true,
           prettify_enabled: false,
           onChange: function (data) {
-            
-            if (plugin_settings.maps.main.query.sector == '') {
-              
-              plugin_settings.maps.main.panes[plugin_settings.maps.main.layers.target]['layer'].setOpacity(data.from / 100);
-              
-            } else {
-              
-              plugin_item.find('.leaflet-sector-pane').css('opacity', data.from / 100);
-              
-            }
+            plugin_settings.maps.main.panes[plugin_settings.maps.main.layers.target]['layer'].setOpacity(data.from / 100);
           }
         });
         
@@ -495,7 +401,7 @@
         
       }
       
-      //console.log(plugin_settings.maps.main.controls.legend);
+      console.log(plugin_settings.maps.main.controls.legend);
       
       var leftLegend = plugin_settings.maps.main.controls.legend;
       var map1 = plugin_settings.maps.main.object;
@@ -560,18 +466,22 @@
       
       $.getJSON(plugin_settings.hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&layer=CDC:" + layer + "&format=application/json")
         .then(function (data) {
+          
+            let colormap = '';
 
             labels = [];
             
+                        
+            
             plugin_settings.maps.main.controls.legend.onAdd = function (map1) {
                 let div = L.DomUtil.create('div', 'info legend legendTable');
-                plugin_settings.maps.main.colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
+                colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
                 let unitValue;
                 let unitColor;
 
-                plugin_settings.maps.main.colormap = plugin_settings.maps.main.colormap.reverse();
+                colormap = colormap.reverse();
                 
-                labels = plugin_instance._legend_markup(legendTitle, plugin_settings.maps.main.colormap);
+                labels = plugin_instance._legend_markup(legendTitle, colormap);
                     
                 div.innerHTML = labels.join('');
                 return div;
@@ -615,85 +525,15 @@
       
       var settings = $.extend(true, defaults, fn_options);
       
-      if (plugin_settings.maps.main.query.sector == '') {
+      plugin_settings.maps.main.panes[plugin_settings.maps.main.layers.target]['layer'].setParams({
+        format: 'image/png',
+        transparent: true,
+        opacity: 0.8,
+        TIME: plugin_settings.maps.main.query.decade + '-01-00T00:00:00Z/' + (plugin_settings.maps.main.query.decade + 10) + '-01-01T00:00:00Z',
+        VERSION: '1.3.0',
+        layers: 'CDC:' + plugin_settings.maps.main.query.variable + '-ys-' + plugin_settings.rcp + '-p50-ann-10year'
+      });
       
-        plugin_settings.maps.main.panes[plugin_settings.maps.main.layers.target]['layer'].setParams({
-          format: 'image/png',
-          transparent: true,
-          opacity: 0.8,
-          TIME: plugin_settings.maps.main.query.decade + '-01-00T00:00:00Z/' + (plugin_settings.maps.main.query.decade + 10) + '-01-01T00:00:00Z',
-          VERSION: '1.3.0',
-          layers: 'CDC:' + plugin_settings.maps.main.query.variable + '-ys-' + plugin_settings.rcp + '-p50-ann-10year'
-        });
-        
-      } else {
-            
-        if (plugin_settings.maps.main.object.hasLayer(plugin_settings.maps.main.layers.geojson.choropleth)) {
-          //console.log('remove existing choroLayer');
-          plugin_settings.maps.main.object.removeLayer(plugin_settings.maps.main.layers.geojson.choropleth);
-        }
-        
-        var tooltipValue;
-
-        plugin_settings.maps.main.layers.geojson.choropleth = L.geoJSON(healthSectorsGeoJson, {
-            smoothFactor: 0,
-            name: 'geojson',
-            pane: 'sector',
-            onEachFeature: function (feature, layer) {
-              
-              if (typeof feature !== 'undefined') {
-              
-                layer.setStyle({
-                    fillColor: plugin_instance._get_color(plugin_settings.maps.main.layers.geojson.values[plugin_settings.maps.main.query.decade][parseInt(feature.properties.PR_HRUID)], plugin_settings.maps.main.colormap),
-                    weight: 0.5,
-                    opacity: 1,
-                    color: 'white',
-                    fillOpacity: 1
-                });
-                layer.on('mouseover', function () {
-
-                    tooltipValue = plugin_settings.maps.main.layers.geojson.values[plugin_settings.maps.main.query.decade][parseInt(this.feature.properties.PR_HRUID)];
-                    //fixedTooltipValue = (tooltipValue - subtractValue).toFixed(varDetails['decimals']) + "" + chartUnit;
-                    this.setStyle({
-                        fillColor: plugin_instance._get_color(plugin_settings.maps.main.layers.geojson.values[plugin_settings.maps.main.query.decade][parseInt(this.feature.properties.PR_HRUID)], plugin_settings.maps.main.colormap),
-                        weight: 2,
-                        opacity: 1,
-                        color: 'white',
-                        fillOpacity: 1
-                    });
-                    layer.bindTooltip(layer.feature.properties.ENG_LABEL, {sticky: true}).openTooltip(layer.latlng);
-                });
-                layer.on('mouseout', function () {
-                    this.setStyle({
-                        fillColor: plugin_instance._get_color(plugin_settings.maps.main.layers.geojson.values[plugin_settings.maps.main.query.decade][parseInt(feature.properties.PR_HRUID)], plugin_settings.maps.main.colormap),
-                        weight: 0.5,
-                        opacity: 1,
-                        color: 'white',
-                        fillOpacity: 1
-                    });
-                });
-                
-              }
-              
-            }
-        }).addTo(plugin_settings.maps.main.object);
-        
-      }
-      
-    },
-    
-    _get_color: function(d, colormap) {
-
-        for (let i = 0; i < colormap.length; i++) {
-            
-            unitValue = parseInt(colormap[i].quantity);
-            unitColor = colormap[i].color;
-            
-            if (d > unitValue) {
-                return unitColor
-            }
-        }
-        
     }
     
   }

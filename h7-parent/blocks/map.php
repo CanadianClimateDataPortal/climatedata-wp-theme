@@ -11,6 +11,8 @@
   
   wp_enqueue_script ( 'map-renderer' );
   wp_enqueue_script ( 'renderer' );
+    
+  wp_enqueue_script ( 'health-sectors' );
   
   // variable names
   
@@ -43,6 +45,46 @@
     $rcp = 'rcp26';
   }
   
+  // layer type
+  
+  $panes = array();
+  
+  if ( get_sub_field ( 'sector' ) != '' ) {
+    
+    // sector panes
+    
+    $panes = array (
+      "sector" => array (
+        "type" => "geojson",
+        "style" => array (
+          "zIndex" => 403
+        )
+      )
+    );
+    
+  } else {
+    
+    // raster panes
+    
+    $panes = array (
+      "raster" => array (
+        "type" => "wms",
+        "style" => array (
+          "zIndex" => 400,
+          "pointerEvents" => "none"
+        )
+      ),
+      "grid" => array (
+        "type" => "protobuf",
+        "style" => array (
+          "zIndex" => 500,
+          "pointerEvents" => "none"
+        )
+      )
+    );
+    
+  }
+  
 ?>
 
 <script type="text/javascript">
@@ -52,22 +94,7 @@
 <div id="<?php echo $block_ID; ?>-container" class="renderable map-container" 
   data-map-variables='<?php echo $map_vars; ?>'
   data-map-rcp='<?php echo $rcp; ?>'
-  data-map-panes='{
-    "raster": {
-      "type": "wms",
-      "style": {
-        "zIndex": 400,
-        "pointerEvents": "none"
-      }
-    },
-    "grid": {
-      "type": "protobuf",
-      "style": {
-        "zIndex": 500,
-        "pointerEvents": "none"
-      }
-    }
-  }'
+  data-map-panes='<?php echo json_encode ( $panes ); ?>'
 >
   <div id="<?php echo $block_ID; ?>-map" class="map"></div>
   

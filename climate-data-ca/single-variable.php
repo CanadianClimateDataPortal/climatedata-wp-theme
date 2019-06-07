@@ -13,6 +13,12 @@
     }
 
     $var_url = get_permalink ( $var_page->ID );
+    
+    if ( isset ( $_GET['sector'] ) ) {
+
+      $var_url = get_permalink ( filtered_ID_by_path ( 'explore/sector/human-health/map' ) );
+
+    }
 
     //
     // WHAT'S HAPPENING RIGHT NOW?
@@ -381,12 +387,6 @@
 <?php
 
     } else {
-
-      if ( isset ( $_GET['sector'] ) ) {
-
-        $var_url = get_permalink ( filtered_ID_by_path ( 'explore/sector/human-health/map' ) );
-
-      }
 
       // 4. redirect to variables page with this variable ID selected
 

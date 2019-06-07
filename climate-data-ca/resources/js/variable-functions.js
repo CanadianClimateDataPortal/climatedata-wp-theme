@@ -17,6 +17,7 @@
     //
     
     var idf_layer, station_layer, highlight, highlight2;
+    var has_mapRight = false;
     
     //
     // QUERY OBJECT
@@ -224,9 +225,14 @@
     
     // data URLs
     
-    var hosturl = data_url;// + ':8080'; // data.climatedata.ca:8080";
+    var hosturl = geoserver_url + ':8080'; // data.climatedata.ca:8080";
     var canadaBounds = L.latLngBounds(L.latLng(41,-141),L.latLng(83.50,-52.1));
-    // var hosturl = data_url + ':8080'; // data.climatedata.ca:8080";
+    
+/*
+    if (client_ip === '72.137.170.138') {
+      hosturl = "http://192.168.0.52:8080";
+    }
+*/
     
     // grid line/fill options
     
@@ -237,6 +243,18 @@
     var gridline_width_active = '1';
     
     var gridfill_color_hover = '#fff';
+    
+    // UTILITIES
+    
+    function invalidate_maps() {
+      
+      map1.invalidateSize();
+              
+      if (has_mapRight == true) {
+        mapRight.invalidateSize();
+      }
+      
+    }
     
     //
     // MAIN / LEFT MAP
@@ -488,6 +506,14 @@ maxWidth: "auto"
     //
     // GRID LAYER
     //
+      
+    var clearGridHighlight = function () {
+        if (highlightGridFeature) {
+            gridLayer.resetFeatureStyle(highlightGridFeature);
+            gridLayerRight.resetFeatureStyle(highlightGridFeature);
+        }
+        highlightGridFeature = null;
+    };
     
     // grid hover functions
     
@@ -561,8 +587,11 @@ maxWidth: "auto"
       };
       
       gridLayer.setFeatureStyle(highlightGridFeature, highlight_properties);
-      gridLayerRight.setFeatureStyle(highlightGridFeatureRightLayer, highlight_properties);
-  
+      
+      if (has_mapRight == true) {
+        gridLayerRight.setFeatureStyle(highlightGridFeatureRightLayer, highlight_properties);
+      }
+      
       // open the chart
       
       genChart(e.latlng.lat, e.latlng.lng, var_value, mora_value);
@@ -570,10 +599,6 @@ maxWidth: "auto"
       L.DomEvent.stop(e);
       
     }
-    
-    //
-    // GRID LAYER
-    //
     
     // options
     
@@ -601,7 +626,6 @@ maxWidth: "auto"
       maxZoom: 12,
       minZoom: 7,
       pane: 'grid'
-      
     };
     
     // create
@@ -634,6 +658,8 @@ maxWidth: "auto"
     
     var choroLayer = null,
         choroValues = [];
+        
+    var current_sector = [];
 
     function getColor(d, colormap) {
 
@@ -682,52 +708,8 @@ maxWidth: "auto"
                 pane: 'sector',
                 onEachFeature: function (feature, layer) {
                   
-                    layer.setStyle({
-                        fillColor: getColor(choroValues[year][parseInt(feature.properties.PR_HRUID)], colormap),
-                        weight: 0.5,
-                        opacity: 1,
-                        color: 'white',
-                        fillOpacity: 1
-                    });
-                    layer.on('mouseover', function () {
-
-                        tooltipValue = choroValues[year][parseInt(this.feature.properties.PR_HRUID)];
-                        //fixedTooltipValue = (tooltipValue - subtractValue).toFixed(varDetails['decimals']) + "" + chartUnit;
-                        this.setStyle({
-                            fillColor: getColor(choroValues[year][parseInt(this.feature.properties.PR_HRUID)], colormap),
-                            weight: 2,
-                            opacity: 1,
-                            color: 'white',
-                            fillOpacity: 1
-                        });
-                        layer.bindTooltip(layer.feature.properties.ENG_LABEL, {sticky: true}).openTooltip(layer.latlng);
-                    });
-                    layer.on('mouseout', function () {
-                        this.setStyle({
-                            fillColor: getColor(choroValues[year][parseInt(feature.properties.PR_HRUID)], colormap),
-                            weight: 0.5,
-                            opacity: 1,
-                            color: 'white',
-                            fillOpacity: 1
-                        });
-                    });
-                    layer.on('click', function (e) {
-
-                        hruid = parseInt(feature.properties.PR_HRUID);
-
-                        //$("#chartSidebar").modal("show");
-
-                        var_value = $("#var").val();
-                        mora_value = $("#mora").val();
-
-                        region_label = layer.feature.properties.ENG_LABEL;
-
-                        genSectorChart(hruid, var_value, mora_value, region_label);
-
-
-                    });
+                  if (typeof feature !== 'undefined') {
                   
-/*
                     layer.setStyle({
                         fillColor: getColor(choroValues[year][parseInt(feature.properties.PR_HRUID)], colormap),
                         weight: 0.5,
@@ -758,20 +740,22 @@ maxWidth: "auto"
                         });
                     });
                     layer.on('click', function (e) {
-
-                        hruid = parseInt(feature.properties.PR_HRUID);
-
-                        //$("#chartSidebar").modal("show");
+                      
+                      console.log('click');
+                      
+                        current_sector['hruid'] = parseInt(feature.properties.PR_HRUID);
+                        current_sector['label'] = layer.feature.properties.ENG_LABEL;
 
                         var_value = $("#var").val();
                         mora_value = $("#mora").val();
-                        
-                        region_label = layer.feature.properties.ENG_LABEL;
 
-                        genSectorChart(hruid, var_value, mora_value, region_label);
+                        genSectorChart(current_sector['hruid'], var_value, mora_value, current_sector['label']);
+
 
                     });
-*/
+                    
+                  }
+                  
                 }
             }).addTo(map1);
             
@@ -804,7 +788,7 @@ maxWidth: "auto"
     
     leftLayer.setOpacity(10);
     
-    map1.invalidateSize();
+    invalidate_maps();
     
     // get map bounds
     
@@ -814,90 +798,88 @@ maxWidth: "auto"
     // RIGHT MAP
     //
     
-    mapRight = L.map("mapRight", {
-        zoomControl: false,
-        maxZoom: 12,
-        minZoom: 3,
-        center: [query['coords'].split(',')[0], query['coords'].split(',')[1]],
-        zoom: query['coords'].split(',')[2]
-    });
+    var mapRight, gridLayerRight, rightLayer;
     
-    
-    mapRight.createPane('basemap');
-    mapRight.getPane('basemap').style.zIndex = 399;
-    mapRight.getPane('basemap').style.pointerEvents = 'none';
-    
-    mapRight.createPane('labels');
-    mapRight.getPane('labels').style.zIndex = 402;
-    mapRight.getPane('labels').style.pointerEvents = 'none';
-    
-    mapRight.createPane('grid');
-    mapRight.getPane('grid').style.zIndex = 403;
-    mapRight.getPane('grid').style.pointerEvents = 'none';
-    
-    console.log('create raster pane');
-    
-    mapRight.createPane('raster');
-    mapRight.getPane('raster').style.zIndex = 400;
-    mapRight.getPane('raster').style.pointerEvents = 'none';
-    
-    L.tileLayer('//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png', {
-        attribution: '',
-        subdomains: 'abcd',
-        pane: 'basemap',
-        maxZoom: 12,
-        minZoom: 3,
-    }).addTo(mapRight);
-    
-    
-    var clearGridHighlight = function () {
-        if (highlightGridFeature) {
-            gridLayer.resetFeatureStyle(highlightGridFeature);
-            gridLayerRight.resetFeatureStyle(highlightGridFeature);
-        }
-        highlightGridFeature = null;
-    };
-    
-    var gridLayerRight = L.vectorGrid.protobuf(
-      hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf", 
-      gridLayer_options
-    ).on('click', function (e) {
+    if ($('#mapRight').length) {
       
-      grid_click(e);
-        
-    }).on('mouseover', function (e) {
+      has_mapRight = true;
+    
+      mapRight = L.map("mapRight", {
+          zoomControl: false,
+          maxZoom: 12,
+          minZoom: 3,
+          center: [query['coords'].split(',')[0], query['coords'].split(',')[1]],
+          zoom: query['coords'].split(',')[2]
+      });
       
-      grid_hover(e);
+      
+      mapRight.createPane('basemap');
+      mapRight.getPane('basemap').style.zIndex = 399;
+      mapRight.getPane('basemap').style.pointerEvents = 'none';
+      
+      mapRight.createPane('labels');
+      mapRight.getPane('labels').style.zIndex = 402;
+      mapRight.getPane('labels').style.pointerEvents = 'none';
+      
+      mapRight.createPane('grid');
+      mapRight.getPane('grid').style.zIndex = 403;
+      mapRight.getPane('grid').style.pointerEvents = 'none';
+      
+      console.log('create raster pane');
+      
+      mapRight.createPane('raster');
+      mapRight.getPane('raster').style.zIndex = 400;
+      mapRight.getPane('raster').style.pointerEvents = 'none';
+      
+      L.tileLayer('//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png', {
+          attribution: '',
+          subdomains: 'abcd',
+          pane: 'basemap',
+          maxZoom: 12,
+          minZoom: 3,
+      }).addTo(mapRight);
+      
+      
+      var gridLayerRight = L.vectorGrid.protobuf(
+        hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf", 
+        gridLayer_options
+      ).on('click', function (e) {
         
-    }).addTo(mapRight);
+        grid_click(e);
+          
+      }).on('mouseover', function (e) {
+        
+        grid_hover(e);
+          
+      }).addTo(mapRight);
+      
+      
+      L.tileLayer('//{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png', {
+          pane: 'labels'
+      }).addTo(mapRight);
+      
+      var_value = $("#var").val();
+      
+      console.log('create right layer');
+      
+      wmsOptions = {
+          format: 'image/png',
+          transparent: true,
+          opacity: 1,
+          pane: 'raster',
+          'VERSION': '1.3.0',
+          bounds: canadaBounds,
+          layers: 'CDC:' + query['var'] + '-ys-rcp26-p50-ann-10year'
+      };
+  
+      rightLayer = L.tileLayer.wms(hosturl + '/geoserver/ows?', wmsOptions).addTo(mapRight);
+      
+      invalidate_maps();
+  
+      map1.sync(mapRight);
+      mapRight.sync(map1);
     
-    
-    L.tileLayer('//{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png', {
-        pane: 'labels'
-    }).addTo(mapRight);
-    
-    var_value = $("#var").val();
-    
-    console.log('create right layer');
-    
-    wmsOptions = {
-        format: 'image/png',
-        transparent: true,
-        opacity: 1,
-        pane: 'raster',
-        'VERSION': '1.3.0',
-        bounds: canadaBounds,
-        layers: 'CDC:' + query['var'] + '-ys-rcp26-p50-ann-10year'
-    };
-
-    rightLayer = L.tileLayer.wms(hosturl + '/geoserver/CDC/ows?', wmsOptions).addTo(mapRight);
-    
-    //$("#mapRight").width($(window).width());
-    mapRight.invalidateSize();
-    //$("#mapRightcontainer").hide();
-
-    map1.sync(mapRight);
-    mapRight.sync(map1);
+    }
     
     //
     //
@@ -1453,6 +1435,8 @@ maxWidth: "auto"
         chartData['rcp45'] = [];
         chartData['rcp85'] = [];
         
+        console.log('sector chart');
+        
         $(document).overlay('show', {
           href: base_href + 'variable/' + query['var'] + '/',
           data: {
@@ -1462,11 +1446,6 @@ maxWidth: "auto"
           content: 'sector',
           position: 'right',
           callback: function(varDetails) {
-            
-            
-            
-            
-            
             
             var valuePath = site_url + 'data/run-frontend-health/';
             
@@ -1488,8 +1467,6 @@ maxWidth: "auto"
                     chartUnit = varDetails['units']['label'];
                 }
 
-                console.log(data);
-
                 for (var key in data) {
                     year = parseInt(key);
                     dateObj = Date.UTC(year, 0, 1);
@@ -1506,7 +1483,6 @@ maxWidth: "auto"
                         midHistSeries.push([dateObj, parseFloat(chartData['rcp26'][year]['p50'] - subtractValue)]);
                     }
                 }
-
 
                 chartDecimals = varDetails['decimals'];
 
@@ -1552,7 +1528,10 @@ maxWidth: "auto"
                         split: false,
                         valueSuffix: chartUnit
                     },
-                    series: []
+                    series: [],
+                    exporting: {
+                      enabled: false
+                    }
                 });
 
 
@@ -1715,6 +1694,41 @@ maxWidth: "auto"
                     });
 
                 });
+                
+                $('.chart-export-data').click(function (e) {
+                  e.preventDefault();
+                  
+                  var dl_type = '';
+                  
+                  switch ($(this).attr('data-type')) {
+                    case 'csv' : 
+                      //chart.downloadCSV();
+                      
+                      window.open("data:text/csv;charset=utf-8," + escape(chart.getCSV()));
+                      
+                      break;
+                  }
+                  
+                });
+                
+                $('.chart-export-img').click(function (e) {
+                  e.preventDefault();
+                  
+                  var dl_type = '';
+                  
+                  switch ($(this).attr('data-type')) {
+                    case 'png' : 
+                      dl_type = 'image/png';
+                      break;
+                    case 'pdf' :
+                      dl_type = 'application/pdf';
+                      break;
+                  }
+                  
+                  chart.exportChart({
+                    type: dl_type
+                  });
+                }); 
                 
             });
             
@@ -1897,6 +1911,8 @@ maxWidth: "auto"
     }
     
     function generateSectorLegend(layer, legendTitle) {
+      
+      console.log(hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&layer=CDC:health_sectors&style=" + layer + "&format=application/json");
   
         $.getJSON(hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&layer=CDC:health_sectors&style=" + layer + "&format=application/json")
             .then(function (data) {
@@ -1953,7 +1969,10 @@ maxWidth: "auto"
     
     function sliderChange(value) {      
       leftLayer.setOpacity(value / 100);
-      rightLayer.setOpacity(value / 100);
+      
+      if (has_mapRight == true) {
+        rightLayer.setOpacity(value / 100);
+      }
       
       $('.leaflet-sector-pane').css('opacity', value / 100);
     }
@@ -1988,10 +2007,12 @@ maxWidth: "auto"
             // show variable layer
             
             map1.addLayer(gridLayer);
-            mapRight.addLayer(gridLayerRight);
-            
             map1.addLayer(leftLayer);
-            map1.addLayer(rightLayer);
+            
+            if (has_mapRight == true) {
+              mapRight.addLayer(gridLayerRight);
+              map1.addLayer(rightLayer);
+            }
             
             // show sliders
             
@@ -2002,8 +2023,7 @@ maxWidth: "auto"
             if ($('#rcp').val().indexOf("vs") !== -1) {
             
               $('body').addClass('map-compare');
-              map1.invalidateSize();
-              mapRight.invalidateSize();
+              invalidate_maps();
               
             }
             
@@ -2035,10 +2055,12 @@ maxWidth: "auto"
             // hide variable layer
             
             map1.removeLayer(gridLayer);
-            mapRight.removeLayer(gridLayerRight);
-            
             map1.removeLayer(leftLayer);
-            map1.removeLayer(rightLayer);
+            
+            if (has_mapRight == true) {
+              mapRight.removeLayer(gridLayerRight);
+              map1.removeLayer(rightLayer);
+            }
             
             // hide sliders
             
@@ -2047,8 +2069,8 @@ maxWidth: "auto"
             // turn off right map
             
             $('body').removeClass('map-compare');
-            map1.invalidateSize();
-            mapRight.invalidateSize();
+            
+            invalidate_maps();
             
           }
         
@@ -2507,7 +2529,11 @@ maxWidth: "auto"
         console.log(var_value);
         console.log($('#var').val());
         
-        if (query['var-group'] != 'station-data') {
+        if (query['sector'] != '') {
+          
+          genSectorChart(current_sector['hruid'], var_value, mora_value, current_sector['label']);
+          
+        } else if (query['var-group'] != 'station-data') {
           
           console.log('the selected variable is not station data');
           
@@ -2645,8 +2671,8 @@ maxWidth: "auto"
         if (rcp_value.indexOf("vs") !== -1) {
             
           $('body').addClass('map-compare');
-          map1.invalidateSize();
-          mapRight.invalidateSize();
+          
+          invalidate_maps();
           
           console.log('set left layer');
 
@@ -2662,15 +2688,17 @@ maxWidth: "auto"
           
           console.log('set right layer');
           
-          rightLayer.setParams({
-              format: 'image/png',
-              transparent: true,
-              opacity: 1,
-              pane: 'raster',
-              'TIME': decade_value + '-01-00T00:00:00Z/' + (decade_value + 10) + '-01-01T00:00:00Z',
-              'VERSION': '1.3.0',
-              layers: 'CDC:' + rightLayerName
-          });
+          if (has_mapRight == true) {
+            rightLayer.setParams({
+                format: 'image/png',
+                transparent: true,
+                opacity: 1,
+                pane: 'raster',
+                'TIME': decade_value + '-01-00T00:00:00Z/' + (decade_value + 10) + '-01-01T00:00:00Z',
+                'VERSION': '1.3.0',
+                layers: 'CDC:' + rightLayerName
+            });
+          }
           
           // also generate the right legend
           
@@ -2680,8 +2708,8 @@ maxWidth: "auto"
         } else {
         
           $('body').removeClass('map-compare');
-          map1.invalidateSize();
-          mapRight.invalidateSize();
+          
+          invalidate_maps();
 
           leftLayer.setParams({
               format: 'image/png',

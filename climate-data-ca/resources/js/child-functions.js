@@ -4,6 +4,7 @@
 
 const k_to_c = 273.15;
 const data_url = '//data.climatedata.ca';
+const geoserver_url = '//data.climatedata.ca';
 
 //
 // GLOBAL VARS
@@ -79,13 +80,13 @@ var chart_labels, legend_labels;
       
       var form_data = the_form.serialize();
       
-      console.log(form_data);
+      //console.log(form_data);
       
       $.ajax({
         url: child_theme_dir + 'resources/ajax/form-submit.php',
         data: form_data,
         success: function(data) {
-          console.log(data);
+          //console.log(data);
 
           if (data == 'success') {
             
@@ -291,11 +292,11 @@ var chart_labels, legend_labels;
         link_class: 'px-3 py-3 all-caps'
       });
       
-      console.log('listnav');
+      //console.log('listnav');
 		}
 		
 	  
-    console.log('end of child-functions');
+    //console.log('end of child-functions');
     
   });
 })(jQuery);

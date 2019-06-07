@@ -14,8 +14,13 @@
     // MAP
     //
     
-    //var hosturl = data_url + ':8080'; // "data.climatedata.ca:8080";
-    var hosturl = data_url; // "data.climatedata.ca:8080";
+    var hosturl = geoserver_url + ':8080'; // "data.climatedata.ca:8080";
+    
+/*
+    if (client_ip === '72.137.170.138') {
+      hosturl = "http://192.168.0.52:8080";
+    }
+*/
     
     var map1 = L.map('location-map', {
       zoomControl: false,
@@ -71,7 +76,7 @@
       pane: 'grid',
     }).on('click', function (e) {
     
-      console.log('hover', e.layer.properties.gid);
+      //console.log('hover', e.layer.properties.gid);
       
       if (highlightGridFeature) {
           pbfLayer.resetFeatureStyle(highlightGridFeature);
@@ -434,7 +439,7 @@
         
         var location_data = JSON.parse(data);
         
-        console.log(location_data);
+        //console.log(location_data);
         
         $('#location-hero-default').hide();
         $('#location-hero-data').show();
@@ -477,7 +482,7 @@
       offset_top: sticky_offset + $('#main-header').outerHeight()
     });
     
-    console.log('end of location-functions');
+    //console.log('end of location-functions');
     
   });
 })(jQuery);

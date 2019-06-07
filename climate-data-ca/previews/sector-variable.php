@@ -1,5 +1,5 @@
 <div class="row">
-  <h4 class="col-10 offset-1 col-lg-5 offset-lg-3 text-primary"><a href="<?php echo $item['permalink']; ?>?sector=health" class="overlay-toggle" data-overlay-content="interstitial"><?php echo $item['title']; ?></a></h4>
+  <h4 class="col-10 offset-1 col-lg-5 offset-lg-3 text-primary"><a href="<?php echo $item['permalink']; ?>?sector=<?php echo filtered_ID_by_path ( 'explore/sector/human-health/map' ); ?>" class="overlay-toggle" data-overlay-content="interstitial"><?php echo $item['title']; ?></a></h4>
 </div>
 
 <div class="row">
@@ -20,13 +20,12 @@
   </div>
 
   <div class="col-10 offset-1 col-md-6 offset-md-0 col-lg-5">
-    <h5 class="text-primary"><?php printf ( __ ( 'Why is this variable relevant to %s?', 'cdc' ), get_the_title ( $sector_ID ) ); ?></h5>
     <?php echo apply_filters ( 'the_content', $item['content'] ); ?>
   </div>
 
   <div class="col-10 offset-1 col-md-6 offset-md-4 col-lg-2 offset-lg-1 text-center text-md-left text-lg-center">
 
-    <p><a href="<?php echo $item['permalink']; ?>?sector=health" class="result-permalink btn rounded-pill btn-outline-primary overlay-toggle all-caps" data-overlay-content="interstitial"><?php _e ( 'View Data', 'cdc' ); ?> <i class="fas fa-long-arrow-alt-right"></i></a></p>
+    <p><a href="<?php echo $item['permalink']; ?>?sector=<?php echo filtered_ID_by_path ( 'explore/sector/human-health/map' ); ?>" class="result-permalink btn rounded-pill btn-outline-primary overlay-toggle all-caps" data-overlay-content="interstitial"><?php _e ( 'View Data', 'cdc' ); ?> <i class="fas fa-long-arrow-alt-right"></i></a></p>
 
     <?php
 

@@ -53,11 +53,30 @@
   
   <div id="map1"></div>
   
+  <?php
+    
+    $show_right = false;
+    
+    while ( have_rows ( 'variable_filters' ) ) {
+      the_row();
+      
+      if ( get_row_layout() == 'rcp' && get_sub_field ( 'compare' ) == 1 ) {
+        $show_right = true;
+        break;
+      }
+    }  
+    
+    if ( $show_right == true ) {
+    
+  ?>
+  
   <div id="mapRightcontainer">
     <div id="mapRight"></div>
   </div>
   
   <?php
+    
+    }
     
     if ( have_rows ( 'variable_sliders' ) ) {
       

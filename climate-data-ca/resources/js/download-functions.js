@@ -6,8 +6,13 @@
     // GLOBAL VARS
     //
     
-    // var hosturl = data_url + ':8080'; // data.climatedata.ca:8080
-    var hosturl = data_url; // data.climatedata.ca:8080
+    var hosturl = geoserver_url + ':8080'; // data.climatedata.ca:8080
+    
+/*
+    if (client_ip === '72.137.170.138') {
+      hosturl = "http://192.168.0.52:8080";
+    }
+*/
     
     var maps = {};
     
@@ -271,7 +276,7 @@
           
           var ajax_url = base_href.replace('fr/', '');
           
-          console.log(ajax_url);
+          //console.log(ajax_url);
           
           $.ajax({
             url: ajax_url + '/site/assets/themes/climate-data-ca/resources/ajax/get-place-by-coords.php',
@@ -281,7 +286,7 @@
               lon: e.latlng.lng
             },
             success: function(data) {
-              console.log(data);
+              //console.log(data);
               
               if (data.hasOwnProperty('geo_name')) {
                 
@@ -553,7 +558,7 @@
           
           if ($('input[name="download-format"]:checked').val() == 'json') {
             
-            console.log('get data', data_url + '/download_csv.php?lat=' + $('#download-lat').val() + '&lon=' + $('#download-lon').val() + '&var=' + $('#download-variable').val());
+            //console.log('get data', data_url + '/download_csv.php?lat=' + $('#download-lat').val() + '&lon=' + $('#download-lon').val() + '&var=' + $('#download-variable').val());
             
             var json_data;
             
@@ -562,7 +567,7 @@
             $.ajax({
               url: data_url + '/download_csv.php?lat=' + $('#download-lat').val() + '&lon=' + $('#download-lon').val() + '&var=' + $('#download-variable').val(),
               success: function (data) {
-                console.log('success');
+                //console.log('success');
                 
                 json_data = JSON.parse(data);
 
@@ -747,7 +752,7 @@
     
     $('#download-process').click(function(e) {
       
-      console.log('submit');
+      //console.log('submit');
       
       if ($('input[name="download-format"]:checked').val() == 'csv') {
         $(this).attr('href', 'data:text/csv;charset=utf-8,' + escape(chart.getCSV()));
@@ -785,7 +790,7 @@
         url: child_theme_dir + 'resources/ajax/download-form.php',
         data: form_data,
         success: function(data) {
-          console.log(data);
+          //console.log(data);
 
           if (data == 'success') {
             
@@ -826,7 +831,7 @@
                   }]
               }),
               success: function (data) {
-                  console.log(data);
+                  //console.log(data);
                   
                   if (data.status == 'accepted') {
                     

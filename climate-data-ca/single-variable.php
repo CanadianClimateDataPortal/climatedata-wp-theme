@@ -83,11 +83,11 @@
                 </label>
 
                 <label class="btn btn-outline-light text-left">
-                  <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="rcp45"> <?php _e ( 'Lower Emissions', 'cdc' ); ?><br>(RCP 4.5)
+                  <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="rcp45"> <?php _e ( 'Moderate Emissions', 'cdc' ); ?><br>(RCP 4.5)
                 </label>
 
                 <label class="btn btn-outline-light text-left">
-                  <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="rcp26"> <?php _e ( 'Lowest Emissions', 'cdc' ); ?><br>(RCP 2.6)
+                  <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="rcp26"> <?php _e ( 'Low Emissions', 'cdc' ); ?><br>(RCP 2.6)
                 </label>
               </div>
 

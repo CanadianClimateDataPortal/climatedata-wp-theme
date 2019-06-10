@@ -225,14 +225,8 @@
     
     // data URLs
     
-    var hosturl = geoserver_url + ':8080'; // data.climatedata.ca:8080";
+    var hosturl = geoserver_url;
     var canadaBounds = L.latLngBounds(L.latLng(41,-141),L.latLng(83.50,-52.1));
-    
-/*
-    if (client_ip === '72.137.170.138') {
-      hosturl = "http://192.168.0.52:8080";
-    }
-*/
     
     // grid line/fill options
     

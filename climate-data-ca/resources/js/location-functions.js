@@ -14,13 +14,7 @@
     // MAP
     //
     
-    var hosturl = geoserver_url + ':8080'; // "data.climatedata.ca:8080";
-    
-/*
-    if (client_ip === '72.137.170.138') {
-      hosturl = "http://192.168.0.52:8080";
-    }
-*/
+    var hosturl = geoserver_url;
     
     var map1 = L.map('location-map', {
       zoomControl: false,

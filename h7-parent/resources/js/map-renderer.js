@@ -95,12 +95,6 @@
       
       // data URL
       
-/*
-      if (client_ip === '72.137.170.138') {
-        plugin_settings.hosturl = 'http://192.168.0.52:8080';
-      }
-*/
-      
       // set initial variable
       
       plugin_settings.maps.main.query.variable = plugin_settings.variables[0];

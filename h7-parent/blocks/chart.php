@@ -27,8 +27,8 @@
   data-chart-variable="<?php echo get_field ( 'var_name', $chart_var ); ?>"
   data-chart-lat="<?php echo $chart_lat; ?>"
   data-chart-lon="<?php echo $chart_lon; ?>"
-  data-chart-month="<?php echo get_sub_field ( 'month' ); ?>"
-  data-chart-units='<?php echo '{ "label": "' . $chart_units['label'] . '", "value": "' . $chart_units['value'] . '"}'; ?>'
+  data-chart-month="<?php _e ( get_sub_field ( 'month' ), 'cdc' ); ?>"
+  data-chart-units='<?php echo '{ "label": "' . __ ( $chart_units['label'], 'cdc' ) . '", "value": "' . __ ( $chart_units['value'], 'cdc' ) . '"}'; ?>'
   data-chart-decimals="<?php echo get_field ( 'decimals', $chart_var ); ?>"
 >
   

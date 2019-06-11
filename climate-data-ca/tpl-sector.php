@@ -53,11 +53,11 @@
       <header class="section-head container-fluid">
         <div class="row">
           <div class="col-10 offset-1 col-md-8 offset-md-2 text-center text-lg-left">
-            <h4 class="text-muted">Overview</h4>
+            <h4 class="text-muted"><?php _e ( 'Overview', 'cdc' ); ?></h4>
           </div>
                   
           <div class="col-10 offset-1 col-md-8 offset-md-2 col-lg-5">
-            <p>Explore the following sub-sectors for Human Health to review case studies, access pertinent data-sets, and apply them to maps.</p>
+            <p><?php _e ( 'Explore the following sub-sectors for Human Health to review case studies, access pertinent data-sets, and apply them to maps.', 'cdc' ); ?></p>
           </div>
             
         </div>

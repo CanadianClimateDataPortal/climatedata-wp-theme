@@ -54,11 +54,11 @@
       <header class="section-head container-fluid">
         <div class="row">
           <div class="col-10 offset-1 col-md-8 offset-md-2 text-center text-lg-left">
-            <h4 class="text-muted">Case Studies</h4>
+            <h4 class="text-muted"><?php _e ( 'Case Studies', 'cdc' ); ?></h4>
           </div>
                   
           <div class="col-10 offset-1 col-md-8 offset-md-2 col-lg-5">
-            <p>Explore case studies to learn about how data was used to impact climate related decisions in specific contexts.</p>
+            <p><?php _e ( 'Explore case studies to learn about how data was used to impact climate related decisions in specific contexts.', 'cdc' ); ?></p>
           </div>
             
         </div>

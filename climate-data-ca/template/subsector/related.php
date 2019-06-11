@@ -26,7 +26,7 @@
         </div>
                 
         <div class="col-10 offset-1 col-md-8 offset-md-2 col-lg-5">
-          <p>Explore variables to learn about how data was used to impact climate related decisions in specific contexts.</p>
+          <p><?php _e ( 'Explore variables to learn about how data was used to impact climate related decisions in specific contexts.', 'cdc' ); ?></p>
         </div>
           
       </div>

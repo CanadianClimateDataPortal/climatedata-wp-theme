@@ -279,7 +279,7 @@
     map1.getPane('grid').style.pointerEvents = 'all';
 
     map1.createPane('labels');
-    map1.getPane('labels').style.zIndex = 402;
+    map1.getPane('labels').style.zIndex = 450;
     map1.getPane('labels').style.pointerEvents = 'none';
     
     // stations

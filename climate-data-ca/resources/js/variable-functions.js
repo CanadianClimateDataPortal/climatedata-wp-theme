@@ -774,6 +774,7 @@ maxWidth: "auto"
         format: 'image/png',
         opacity: 1,
         transparent: true,
+        tiled: true,
         pane: 'raster',
         VERSION: '1.3.0',
         bounds: canadaBounds,
@@ -859,6 +860,7 @@ maxWidth: "auto"
       wmsOptions = {
           format: 'image/png',
           transparent: true,
+          tiled: true,
           opacity: 1,
           pane: 'raster',
           'VERSION': '1.3.0',

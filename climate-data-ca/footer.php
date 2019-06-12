@@ -46,7 +46,7 @@
     <script type="text/javascript">
 
       var base_href = '<?php echo $GLOBALS['vars']['site_url']; ?>';
-
+      var L_DISABLE_3D = true; 
     </script>
 
     <?php

@@ -2007,7 +2007,7 @@ maxWidth: "auto"
             
             if (has_mapRight == true) {
               mapRight.addLayer(gridLayerRight);
-              map1.addLayer(rightLayer);
+              mapRight.addLayer(rightLayer);
             }
             
             // show sliders

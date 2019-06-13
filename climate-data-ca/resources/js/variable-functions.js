@@ -1949,11 +1949,28 @@ maxWidth: "auto"
   
     }
     
+    mora_value = $("#mora").val();
+    var_value = $("#var").val();
+    
     if (query['sector'] != '') {
-      generateSectorLegend('tx_max_ann', 'Annual');
+      
+      if (mora_value === 'ann') {
+          legendmsorys = 'ann';
+      } else {
+          legendmsorys = "mon";
+      }
+      
+      legendLayer = var_value + "_health_" + legendmsorys;
+      
+      console.log('generate sector legend');
+      generateSectorLegend(legendLayer, '');
+      
     } else {
+      
+      console.log('generate left legend');
       generateLeftLegend();
-    }
+      
+    }    
     
     //
     //

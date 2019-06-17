@@ -99,7 +99,7 @@
       
       <div id="var-filter-sector" class="filter-block col-2">
         <select class="custom-select custom-select-lg select2 form-control" name="sector" id="sector">
-          <option value="" <?php echo ( $filters['sector']['val'] == '' ) ? 'selected' : ''; ?>>None</option>
+          <option value="" <?php echo ( $filters['sector']['val'] == '' ) ? 'selected' : ''; ?>><?php echo ( get_sub_field ( 'label' ) != '' ) ? get_sub_field ( 'label' ) : 'None' ; ?></option>
           
           <?php
             

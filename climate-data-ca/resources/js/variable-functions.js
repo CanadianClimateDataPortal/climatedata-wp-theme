@@ -17,7 +17,9 @@
     //
     
     var idf_layer, station_layer, highlight, highlight2;
-    var has_mapRight = false;
+    
+    var has_mapRight = false,
+        grid_initialized = false;
     
     //
     // QUERY OBJECT
@@ -513,20 +515,11 @@ maxWidth: "auto"
     
     function grid_hover(e) {
       
+      grid_initialized = true;
+      
       //e.layer.bindTooltip(e.layer.properties.gid.toString() + " acres").openTooltip(e.latlng);
       
       // set the highlight
-      
-      if (highlightGridFeature) {
-        gridLayer.resetFeatureStyle(highlightGridFeature);
-      }
-      
-      if (highlightGridFeatureRightLayer) {
-        gridLayerRight.resetFeatureStyle(highlightGridFeatureRightLayer);
-      }
-      
-      highlightGridFeature = e.layer.properties.gid;
-      highlightGridFeatureRightLayer = e.layer.properties.gid;
       
       highlight_properties = {
         weight: 0,
@@ -537,14 +530,31 @@ maxWidth: "auto"
         fillOpacity: 0.25
       };
       
+      if (highlightGridFeature) {
+        gridLayer.resetFeatureStyle(highlightGridFeature);
+      }
+      
+      highlightGridFeature = e.layer.properties.gid;
+      
       gridLayer.setFeatureStyle(highlightGridFeature, highlight_properties);
-      gridLayerRight.setFeatureStyle(highlightGridFeatureRightLayer, highlight_properties);
+      
+      if (has_mapRight) {
+        
+        gridLayerRight.resetFeatureStyle(highlightGridFeatureRightLayer);
+        
+        highlightGridFeatureRightLayer = e.layer.properties.gid;
+        
+        gridLayerRight.setFeatureStyle(highlightGridFeatureRightLayer, highlight_properties);
+        
+      }
       
     }
     
     // grid click
     
     function grid_click(e) {
+      
+      grid_initialized = true;
       
       var_value = $("#var").val();
       mora_value = $("#mora").val();
@@ -560,17 +570,6 @@ maxWidth: "auto"
       
       // set the highlight
       
-      if (highlightGridFeature) {
-        gridLayer.resetFeatureStyle(highlightGridFeature);
-      }
-  
-      if (highlightGridFeatureRightLayer) {
-        gridLayerRight.resetFeatureStyle(highlightGridFeatureRightLayer);
-      }
-      
-      highlightGridFeature = e.layer.properties.gid;
-      highlightGridFeatureRightLayer = e.layer.properties.gid;
-      
       var highlight_properties = {
         weight: 1,
         color: gridline_color_active,
@@ -580,10 +579,21 @@ maxWidth: "auto"
         fillOpacity: 0
       };
       
+      if (highlightGridFeature) {
+        gridLayer.resetFeatureStyle(highlightGridFeature);
+      }
+      
+      highlightGridFeature = e.layer.properties.gid;
       gridLayer.setFeatureStyle(highlightGridFeature, highlight_properties);
       
       if (has_mapRight == true) {
+        
+        gridLayerRight.resetFeatureStyle(highlightGridFeatureRightLayer);
+        
+        highlightGridFeatureRightLayer = e.layer.properties.gid;
+        
         gridLayerRight.setFeatureStyle(highlightGridFeatureRightLayer, highlight_properties);
+        
       }
       
       // open the chart
@@ -628,13 +638,9 @@ maxWidth: "auto"
       hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
       gridLayer_options
     ).on('click', function (e) {
-      
-      grid_click(e)
-      
+      grid_click(e);
     }).on('mouseover', function (e) {
-      
       grid_hover(e);
-        
     });
     
     // add to map
@@ -900,7 +906,7 @@ maxWidth: "auto"
         mid85Series = [];
         range85Series = [];
         
-        console.log(lat, lon, variable, month);
+        //console.log(lat, lon, variable, month);
         //console.log(base_href + 'variable/' + $('#var').val());
         //console.log('get_values.php?lat=' + lat + '&lon=' + lon + '&var=' + variable + '&month=' + month);
         
@@ -920,7 +926,7 @@ maxWidth: "auto"
                 data_url + '/get_values.php?lat=' + lat + '&lon=' + lon + '&var=' + variable + '&month=' + month,
                 function (data) {
                   
-                    console.log(varDetails);
+                    //console.log(varDetails);
 
                     if (varDetails.units.value === 'kelvin') {
                         subtractValue = k_to_c;
@@ -1949,29 +1955,6 @@ maxWidth: "auto"
   
     }
     
-    mora_value = $("#mora").val();
-    var_value = $("#var").val();
-    
-    if (query['sector'] != '') {
-      
-      if (mora_value === 'ann') {
-          legendmsorys = 'ann';
-      } else {
-          legendmsorys = "mon";
-      }
-      
-      legendLayer = var_value + "_health_" + legendmsorys;
-      
-      console.log('generate sector legend');
-      generateSectorLegend(legendLayer, '');
-      
-    } else {
-      
-      console.log('generate left legend');
-      generateLeftLegend();
-      
-    }    
-    
     //
     //
     // UX BEHAVIOURS
@@ -2022,9 +2005,41 @@ maxWidth: "auto"
             map1.addLayer(gridLayer);
             map1.addLayer(leftLayer);
             
+            // set grid click/hover functions if they haven't already been
+            // i.e. if the sector filter exists but its value is ""
+            
+            gridLayer.on('click', function (e) {
+              
+              if (grid_initialized == false) {
+                grid_click(e);
+              }
+              
+            }).on('mouseover', function (e) {
+              
+              if (grid_initialized == false) {
+                grid_hover(e);
+              }
+              
+            });
+            
             if (has_mapRight == true) {
               mapRight.addLayer(gridLayerRight);
               mapRight.addLayer(rightLayer);
+              
+              gridLayerRight.on('click', function (e) {
+                
+                if (grid_initialized == false) {
+                  grid_click(e);
+                }
+                
+              }).on('mouseover', function (e) {
+                
+                if (grid_initialized == false) {
+                  grid_hover(e);
+                }
+                
+              });
+              
             }
             
             // show sliders
@@ -2824,6 +2839,31 @@ maxWidth: "auto"
     // evaluate query
     
     eval_query_obj();
+    
+    // generate initial legends
+    
+    mora_value = $("#mora").val();
+    var_value = $("#var").val();
+    
+    if (query['sector'] != '') {
+      
+      if (mora_value === 'ann') {
+          legendmsorys = 'ann';
+      } else {
+          legendmsorys = "mon";
+      }
+      
+      legendLayer = var_value + "_health_" + legendmsorys;
+      
+      console.log('generate sector legend');
+      generateSectorLegend(legendLayer, '');
+      
+    } else {
+      
+      console.log('generate left legend');
+      generateLeftLegend();
+      
+    }
     
     // hide spinner
     

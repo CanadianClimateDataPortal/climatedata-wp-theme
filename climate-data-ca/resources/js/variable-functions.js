@@ -2819,7 +2819,7 @@ maxWidth: "auto"
     
     // initial layer opacity
     
-    sliderChange(parseInt($('#opacity-slider-container1').attr('data-default')));
+    sliderChange(parseInt($('#opacity-slider-container').attr('data-default')));
     
     // evaluate query
     

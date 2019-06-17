@@ -35,7 +35,7 @@
         ?>
         
         <li class="breadcrumb-item"><a href="<?php echo the_permalink(); ?>"><?php the_title(); ?></a></li>
-        <li class="breadcrumb-item active">Case Study</li>
+        <li class="breadcrumb-item active"><?php _e('Case Study', 'cdc'); ?></li>
       </ol>
     </nav>
       

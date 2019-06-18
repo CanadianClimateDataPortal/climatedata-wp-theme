@@ -29,6 +29,11 @@ var chart_labels, legend_labels;
       rcp_45_range: 'RCP 4.5 Range',
       rcp_85_median: 'RCP 8.5 Median',
       rcp_85_range: 'RCP 8.5 Range',
+      temperature: 'Temperature',
+      precipitation: 'Precipitation',
+      daily_avg_temp: 'Daily Average Temperature',
+      daily_max_temp: 'Daily Maximum Temperature',
+      daily_min_temp: 'Daily Minimum Temperature',
       click_to_zoom: 'Click and drag in the plot area to zoom in'
     };
     
@@ -43,6 +48,11 @@ var chart_labels, legend_labels;
         rcp_45_range: 'RCP 4.5 portée',
         rcp_85_median: 'RCP 8.5 médiane',
         rcp_85_range: 'RCP 8.5 portée',
+        temperature: 'Température',
+        precipitation: 'Précipitation',
+        daily_avg_temp: 'Température quotidienne moyenne',
+        daily_max_temp: 'Température quotidienne maximale',
+        daily_min_temp: 'Température quotidienne minimale',
         click_to_zoom: 'Cliquer et faire glisser dans la zone du tracé pour agrandir'
       };
       

@@ -1216,24 +1216,23 @@ maxWidth: "auto"
             'https://geo.weather.gc.ca/geomet/features/collections/climate-normals/items?f=json&STN_ID=' + STN_ID + '&NORMAL_ID=1&sortby=MONTH', 
             function (data) {
   
-              console.log(data);
-  
-              var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  
-              timeSeries = [];
+              var chartUnit = " °C",
+                  chart_title = 'Climate normals 1981–2010',
+                  months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                  timeSeries = [];
+                  
+              if (current_lang == 'fr') {
+                
+                chart_title = 'Normales et moyennes climatiques de 1981–2010';
+                months = ['Janv.', 'Févr.', 'Mars', 'Avr.', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'];
+                
+              }
   
               $.each(data.features, function (k, v) {
                   if (k < 12) {
                       timeSeries.push([months[k], v.properties.VALUE]);
                   }
               });
-  
-              var chartUnit = " °C",
-                  chart_title = 'Climate normals 1981–2010';
-                  
-              if ($('body').hasClass('lang-fr')) {
-                chart_title = 'Normales et moyennes climatiques de 1981–2010';
-              }
   
               var chart = Highcharts.chart('chart-placeholder', {
                   chart: {
@@ -1244,19 +1243,19 @@ maxWidth: "auto"
                   },
   
                   xAxis: {
-                      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                      categories: months
                   },
   
                   yAxis: [{
                       lineWidth: 1,
                       title: {
-                          text: 'Temperature (°C)'
+                          text: chart_labels.temperature + ' (°C)'
                       }
                   }, {
                       lineWidth: 1,
                       opposite: true,
                       title: {
-                          text: 'Precipitation (mm)'
+                          text: chart_labels.precipitation + ' (mm)'
                       }
                   }],
                   plotOptions: {
@@ -1320,7 +1319,7 @@ maxWidth: "auto"
                       }
                   });
                   chart.addSeries({
-                      name: 'Daily Average Temperature (°C)',
+                      name: chart_labels.daily_avg_temp + ' (°C)',
                       data: timeSeries,
                       zIndex: 4,
                       showInNavigator: true,
@@ -1341,7 +1340,7 @@ maxWidth: "auto"
                           }
                       });
                       chart.addSeries({
-                          name: 'Daily Maximum Temperature (°C)',
+                          name: chart_labels.daily_max_temp + ' (°C)',
                           data: timeSeries,
                           zIndex: 3,
                           showInNavigator: true,
@@ -1362,7 +1361,7 @@ maxWidth: "auto"
                               }
                           });
                           chart.addSeries({
-                              name: 'Daily Minimum Temperature (°C)',
+                              name: chart_labels.daily_min_temp + ' (°C)',
                               data: timeSeries,
                               zIndex: 2,
                               showInNavigator: true,
@@ -1383,7 +1382,7 @@ maxWidth: "auto"
                                   }
                               });
                               chart.addSeries({
-                                  name: 'Precipitation (mm)',
+                                  name: chart_labels.precipitation + ' (mm)',
                                   data: timeSeries,
                                   zIndex: 1,
                                   type: 'column',
@@ -1418,6 +1417,7 @@ maxWidth: "auto"
     // SECTOR
     
     function genSectorChart(hruid, variable, month, region_label) {
+      
         timerStart = Date.now();
 
         midHistSeries = [];
@@ -1440,7 +1440,7 @@ maxWidth: "auto"
         console.log('sector chart');
         
         $(document).overlay('show', {
-          href: base_href + 'variable/' + query['var'] + '/',
+          href: base_href + 'variable/' + variable + '/',
           data: {
             sector: query['sector'],
             region: region_label
@@ -2552,10 +2552,7 @@ maxWidth: "auto"
       
       if ($('body').hasClass('overlay-position-right')) {
         
-        console.log('the chart overlay is open');
-        
-        console.log(var_value);
-        console.log($('#var').val());
+        //console.log('the chart overlay is open');
         
         if (query['sector'] != '') {
           
@@ -2563,7 +2560,7 @@ maxWidth: "auto"
           
         } else if (query['var-group'] != 'station-data') {
           
-          console.log('the selected variable is not station data');
+          //console.log('the selected variable is not station data');
           
           genChart(query['coords'].split(',')[0], query['coords'].split(',')[1], var_value, mora_value);
           

@@ -16,11 +16,12 @@ if ($securimage->check($_GET['captcha_code']) == false) {
   $form_data = $_GET;
   
   //$to = get_option ( 'admin_email' );
-  $to = 'phil@makeitoperativ.com';
+  $to = 'support@climatedata.ca';
   $subject = get_bloginfo ( 'title' ) . ': Feedback form submission';
   
   $headers = array ( 
-    'Content-Type: text/html; charset=UTF-8'
+    'Content-Type: text/html; charset=UTF-8',
+    "From: {$form_data['fullname']} <{$form_data['email']}>"
   );
   
   $body = '<h2>You’ve received a new form submission.</h2>';
@@ -39,8 +40,13 @@ if ($securimage->check($_GET['captcha_code']) == false) {
   
   $body .= '<p style="font-size: 80%">This message was sent at ' . current_time ('H:i:s' ) . ' on ' . current_time ( 'F j, Y' ) . '</p>';
   
-  wp_mail ( $to, $subject, $body, $headers );
+  $result = wp_mail ( $to, $subject, $body, $headers );
   
-  echo 'success';
+  if($result) {
+    echo 'success';
+  }
+  else {
+    echo 'failed';
+  }
 
 }

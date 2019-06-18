@@ -127,6 +127,7 @@
   <section id="feedback-data" class="page-section tab">
     
     <form id="feedback-data-form" class="feedback-form needs-validation" novalidate>
+      <input type="hidden" name="feedback-type" value="data">
       <div class="form-layout-row row align-items-center">
         <p class="form-label-wrap col-3 offset-1">
           <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">1</span>

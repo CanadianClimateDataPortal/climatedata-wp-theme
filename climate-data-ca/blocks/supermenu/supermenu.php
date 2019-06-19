@@ -139,7 +139,7 @@
           <header class="row">
             <div class="col-10 offset-1 col-md-6 col-lg-3 offset-lg-3 d-flex align-items-center text-muted mb-3 mb-md-0">
               <span class="cdc-icon icon-var-other"></span>
-              <h5>Sectors</h5>
+              <h5><?php _e('Sectors','cdc'); ?></h5>
             </div>
             
             <div class="col-10 offset-1 col-md-4 col-lg-3 text-center">

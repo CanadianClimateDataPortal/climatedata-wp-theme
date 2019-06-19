@@ -16,29 +16,29 @@ if ($securimage->check($_GET['captcha_code']) == false) {
   $form_data = $_GET;
   
   //$to = get_option ( 'admin_email' );
-  $to = 'support@climatedata.ca';
-  $subject = get_bloginfo ( 'title' ) . ': Feedback form submission';
+  $to = "support+{$form_data['feedback-type']}@climatedata.ca";
+  $subject = get_bloginfo ( 'title' ) . __(': Feedback form submission','cdc-feedback');
   
   $headers = array ( 
     'Content-Type: text/html; charset=UTF-8',
     "From: {$form_data['fullname']} <{$form_data['email']}>"
   );
   
-  $body = '<h2>You’ve received a new form submission.</h2>';
+//  $body = '<h2>You’ve received a new form submission.</h2>';
   
-  $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Name</span><span style="display: inline-block; vertical-align: top;">' . $form_data['fullname'] . '</span></p>';
+  $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __('Name','cdc-feedback') . '</span><span style="display: inline-block; vertical-align: top;">' . $form_data['fullname'] . '</span></p>';
   
-  $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Email</span><span style="display: inline-block; vertical-align: top;"><a href="mailto:' . $form_data['email'] . '">' . $form_data['email'] . '</a></span></p>';
+  $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __('Email','cdc-feedback') . '</span><span style="display: inline-block; vertical-align: top;"><a href="mailto:' . $form_data['email'] . '">' . $form_data['email'] . '</a></span></p>';
   
-  $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Organization</span><span style="display: inline-block; vertical-align: top;">' . $form_data['organization'] . '</span></p>';
+  $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __('Organization','cdc-feedback') . '</span><span style="display: inline-block; vertical-align: top;">' . $form_data['organization'] . '</span></p>';
   
   $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Type</span><span style="display: inline-block; vertical-align: top;">' . $form_data['feedback-type'] . '</span></p>';
   
   $body .= '<p style="font-weight: bold;">Message</p><p><pre>' . $form_data['feedback'] . '</pre></p>';
   
-  $body .= '<hr>';
+//  $body .= '<hr>';
   
-  $body .= '<p style="font-size: 80%">This message was sent at ' . current_time ('H:i:s' ) . ' on ' . current_time ( 'F j, Y' ) . '</p>';
+//  $body .= '<p style="font-size: 80%">This message was sent at ' . current_time ('H:i:s' ) . ' on ' . current_time ( 'F j, Y' ) . '</p>';
   
   $result = wp_mail ( $to, $subject, $body, $headers );
   

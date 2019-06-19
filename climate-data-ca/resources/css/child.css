@@ -6306,6 +6306,10 @@ body.overlay-open[data-overlay-content="video"] #main-header-nav .overlay-close 
 .lang-fr .page-tour-content:before {
   content: 'Comment utiliser cette page'; }
 
+.page-id-1712 .select2-results__options [id*="frost_days"],
+.page-id-1712 .select2-results__options [id*="ice_days"] {
+  display: none; }
+
 @media (max-width: 1199.98px) {
   #main-header,
   #main-header-nav {

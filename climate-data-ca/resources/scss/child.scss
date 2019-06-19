@@ -1187,6 +1187,19 @@ body.overlay-open[data-overlay-content="video"] {
 }
 
 //
+// HACKS
+//
+
+.page-id-1712 {
+  .select2-results__options {
+    [id*="frost_days"],
+    [id*="ice_days"] {
+      display: none;
+    }
+  }
+}
+
+//
 // RESPONSIVE
 //
 

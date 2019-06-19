@@ -1188,7 +1188,7 @@
       
       console.log('populate', dl_URL);
       
-      var new_url = 'https://geo.weather.gc.ca/geomet/features/collections/climate-daily/items?f=json&time=' + dl_URL.start + ' 00:00:00/' + dl_URL.end + ' 00:00:00&STN_ID=' + dl_URL['s'] + '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' + dl_URL.format + '&limit=' + dl_URL.limit + '&offset=' + dl_URL.offset;
+      var new_url = 'https://geo.weather.gc.ca/geomet/features/collections/climate-daily/items?time=' + dl_URL.start + ' 00:00:00/' + dl_URL.end + ' 00:00:00&STN_ID=' + dl_URL['s'] + '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' + dl_URL.format + '&limit=' + dl_URL.limit + '&offset=' + dl_URL.offset;
       
       $('#station-process').attr('href', new_url);
       

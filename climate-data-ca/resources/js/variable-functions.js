@@ -2902,7 +2902,7 @@ maxWidth: "auto"
     $(document).on('overlay_hide', function() {
       console.log('the overlay was closed');
       
-      if (!$('body').hasClass('idf-selected')) {
+      if (!$('body').hasClass('stations-on')) {
         $('#rcp').prop('disabled', false);
       }
     });

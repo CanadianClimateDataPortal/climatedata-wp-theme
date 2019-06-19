@@ -160,11 +160,7 @@ var sticky_offset = 0,
     
     $('.animsition')
       .on('animsition.inEnd', function(){
-        
-        if (!$('body').hasClass('has-query')) {
-          $('body').removeClass('spinner-on');
-        }
-        
+        $('body').removeClass('spinner-on');
       })
       .on('animsition.outStart', function(){
         $('body').addClass('spinner-on');

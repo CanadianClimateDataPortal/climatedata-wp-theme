@@ -136,12 +136,6 @@
       <div class="supermenu-slide" data-href="<?php echo $GLOBALS['vars']['site_url']; ?>sector/" data-slug="<?php echo get_the_slug ( filtered_ID_by_path ( 'explore/sector' ) ); ?>">
         <div class="container-fluid">
           
-          <?php
-            
-            if ( current_user_can ( 'administrator' ) ) {
-              
-          ?>
-              
           <header class="row">
             <div class="col-10 offset-1 col-md-6 col-lg-3 offset-lg-3 d-flex align-items-center text-muted mb-3 mb-md-0">
               <span class="cdc-icon icon-var-other"></span>
@@ -244,27 +238,7 @@
           
           <?php
               
-              wp_reset_postdata();
-              
-            } else {
-            
-          ?>
-              
-          <div class="row">
-            <div class="col-6 offset-2">
-              <h4 class="text-info"><?php _e ( 'Coming soon', 'cdc' ); ?></h4>
-              <p><?php _e ( 'Climate data by sectors is coming soon.', 'cdc' ); ?></p>
-            </div>
-          </div>
-          
-          <div class="row">
-            <div class="col-6 offset-2">
-            </div>
-          </div>
-          
-          <?php
-            
-            }
+            wp_reset_postdata();
             
           ?>
           

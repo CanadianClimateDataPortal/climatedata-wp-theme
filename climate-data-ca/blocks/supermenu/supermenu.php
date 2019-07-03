@@ -146,7 +146,7 @@
             </div>
           </header>
           
-          <div class="row d-none d-lg-flex">
+          <div class="row">
             <?php
               
               $current_ID = get_the_ID();
@@ -175,7 +175,7 @@
             
             ?>
               
-            <div class="col-6 col-lg-2 px-5 px-lg-0 <?php echo ( $sector_column == 1 ) ? 'offset-lg-3' : ''; ?>">
+            <div class="col-10 col-sm-6 col-lg-2 px-5 px-lg-0 <?php echo ( $sector_column == 1 ) ? 'offset-lg-3' : ''; ?>">
               
               <h6><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h6>
               

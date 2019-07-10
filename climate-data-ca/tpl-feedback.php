@@ -110,7 +110,7 @@
         </div>
         
         <div class="form-input form-textarea col-7 col-md-5 col-lg-4 offset-4 d-flex">
-          <label for="captcha_code" class="w-50"><?php _e ( 'Enter the characters shown here', 'cdc' ); ?>: <img id="captcha" src="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>/resources/php/securimage/securimage_show.php" alt="CAPTCHA Image" /></label>
+          <label for="captcha_code" class="w-50"><?php _e ( 'Enter the characters shown here', 'cdc' ); ?>: <img id="captcha" src="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>/resources/php/securimage/securimage_show.php?namespace=support" alt="CAPTCHA Image" /></label>
           <input type="text" name="captcha_code" id="captcha_code" class="form-control w-50" placeholder="XXXXX" size="4" maxlength="4" data-placement="bottom" title="<?php _e ( 'Non-valid entered characters. Please try again.', 'cdc' ); ?>" />
         </div>
       </div>
@@ -172,7 +172,7 @@
         </div>
         
         <div class="form-input form-textarea col-7 col-md-5 col-lg-4 offset-4 d-flex">
-          <label for="captcha_code" class="w-50"><?php _e ( 'Enter the characters shown here', 'cdc' ); ?>: <img id="captcha" src="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>/resources/php/securimage/securimage_show.php" alt="CAPTCHA Image" /></label>
+          <label for="captcha_code" class="w-50"><?php _e ( 'Enter the characters shown here', 'cdc' ); ?>: <img id="captcha" src="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>/resources/php/securimage/securimage_show.php?namespace=data" alt="CAPTCHA Image" /></label>
           <input type="text" name="captcha_code" id="captcha_code" class="form-control w-50" placeholder="XXXX" size="4" maxlength="4" data-placement="bottom" title="<?php _e ( 'Non-valid entered characters. Please try again.', 'cdc' ); ?>" />
         </div>
       </div>

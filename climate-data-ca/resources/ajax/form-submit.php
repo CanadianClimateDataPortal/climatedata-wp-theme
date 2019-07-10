@@ -7,6 +7,21 @@ include_once ( locate_template ( 'resources/php/securimage/securimage.php' ) );
 
 $securimage = new Securimage();
 
+switch ($_GET['feedback-type']) {
+  case "general":
+  case "bug":
+  case "demo":
+    $securimage->setNamespace('support');
+    break;
+  case "data":
+    $securimage->setNamespace('data');
+    break;
+  
+  default:
+    die;
+}
+
+
 if ($securimage->check($_GET['captcha_code']) == false) {
   
   echo "captcha failed";

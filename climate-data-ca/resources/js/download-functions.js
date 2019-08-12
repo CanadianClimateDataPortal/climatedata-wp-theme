@@ -33,38 +33,38 @@
     var daily_vars = [];
     
     $('#download-variable optgroup').each(function() {
-      
-      var new_group = {
-        label: $(this).attr('label'),
-        options: []
-      };
-      
-      $(this).find('option').each(function() {
-      
-        var new_object = {
-          value: $(this).attr('value'),
-          text: $(this).text()
-        };
-        
-        if ($(this).hasClass('daily')) {
-          
-          daily_vars.push(new_object);
-          
-        }
-        
-        new_group['options'].push(new_object);
-        
-      });
-      
-      all_vars.push(new_group);
-      
-    });
-    
-    // location formatter
-    
-    function formatLocationSearch (item) {
+	      
+	      var new_group = {
+		label: $(this).attr('label'),
+		options: []
+	      };
+	      
+	      $(this).find('option').each(function() {
+	      
+		var new_object = {
+		  value: $(this).attr('value'),
+		  text: $(this).text()
+		};
+		
+		if ($(this).hasClass('daily')) {
+		  
+		  daily_vars.push(new_object);
+		  
+		}
+		
+		new_group['options'].push(new_object);
+		
+	      });
+	      
+	      all_vars.push(new_group);
+	      
+	    });
+	    
+	    // location formatter
+	    
+	    function formatLocationSearch (item) {
 
-        if (!item.id) {
+		if (!item.id) {
             return item.text;
         }
         var $item = $(
@@ -885,7 +885,7 @@
                   
                   //console.log(existingData);
                   
-                  if (existingData != null && existingData.includes(feature.ID.toString())) {
+                  if (existingData != null && existingData.includes(feature.properties.STN_ID.toString())) {
                     markerColor = '#F00';
                     console.log('existing');
                   }
@@ -915,7 +915,7 @@
               var existingData = $("#station-select").select2("val");
               
               // clicked ID
-              var clicked_ID = e.layer.feature.ID.toString();
+              var clicked_ID = e.layer.feature.properties.STN_ID.toString();
               
               // default colour
               markerColor = '#F00';
@@ -1079,7 +1079,7 @@
         marker_id = parseFloat(e.params.data.id);
         pointsLayer.eachLayer(function (layer) {
             //console.log(layer);
-            if (layer.feature.ID === marker_id) {
+            if (layer.feature.properties.STN_ID === marker_id) {
                 layer.setStyle({
                     // Stroke properties
                     color: '#BBB',
@@ -1100,7 +1100,7 @@
         marker_id = parseInt(e.params.data.id);
         pointsLayer.eachLayer(function (layer) {
             //console.log(layer);
-            if (layer.feature.ID === marker_id) {
+            if (layer.feature.properties.STN_ID === marker_id) {
                 layer.setStyle({
                     // Stroke properties
                     color: '#F00',

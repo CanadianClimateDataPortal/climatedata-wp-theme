@@ -181,8 +181,13 @@
         if (!item.id) {
             return item.text;
         }
+        if (item.location == 'null') {
+          show_comma = '';
+        } else {
+          show_comma = ', ';
+        }
         var $item = $(
-            '<span><div class="geo-select-title">' + item.text + ' (' + item.term + ')</div>' + item.location + ', ' + item.province + '</sup></span>'
+            '<span><div class="geo-select-title">' + item.text + ' (' + item.term + ')</div>' + item.location + show_comma + item.province + '</sup></span>'
         );
         return $item;
     }

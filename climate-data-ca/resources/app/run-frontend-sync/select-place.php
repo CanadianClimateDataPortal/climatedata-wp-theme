@@ -21,10 +21,6 @@ $search_columns = array
 
 $table = "populated_areas";
 
-if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == "donneesclimatiques.ca" ) {
-    $table = "populated_areas_fr";
-}
-
 $joins = "";
 
 $get_sSearch = isset($_GET['q']) ? $_GET['q'] : '';

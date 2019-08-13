@@ -13,16 +13,29 @@ function distance($lat1, $lon1, $lat2, $lon2) {
 
 if ( ( isset ( $_GET['lat'] ) && !empty ( $_GET['lat'] ) ) && ( isset ( $_GET['lon'] ) && !empty ( $_GET['lon'] ) ) ) {
   
-  $columns = array (
-    "geo_id",
-    "geo_name",
-    "generic_term",
-    "location",
-    "province",
-    "lat",
-    "lon"
-  );
+  if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == "donneesclimatiques.ca" ) {
+    $columns = array (
+      "id_code",
+      "geo_name",
+      "gen_term_fr as gen_term",
+      "location",
+      "province_fr as province",
+      "lat",
+      "lon"
+    );
   
+  }
+  else {
+    $columns = array (
+      "id_code",
+      "geo_name",
+      "gen_term",
+      "location",
+      "province",
+      "lat",
+      "lon"
+    );
+  }  
   require_once "../app/db.php";
   global $con;
   
@@ -30,14 +43,14 @@ if ( ( isset ( $_GET['lat'] ) && !empty ( $_GET['lat'] ) ) && ( isset ( $_GET['l
   $range = 0.1;
   
   $main_query = mysqli_query ( $GLOBALS['vars']['con'], 
-    "SELECT * 
-    FROM populated_areas 
+    "SELECT " . implode(",", $columns) . "
+    FROM all_areas
     WHERE lat BETWEEN " . ( round ( $_GET['lat'], 2 ) - $range ) . " AND " . ( round ( $_GET['lat'], 2 ) + $range ) . "
     AND lon BETWEEN " . ( round ( $_GET['lon'], 2 ) - $range ) . " AND " . ( round ( $_GET['lon'], 2 ) + $range ) . "
-    AND NOT (generic_term = 'Railway Point')
-    AND NOT (generic_term = 'Railway Junction')
-    AND NOT (generic_term = 'Urban Community')
-    AND NOT (generic_term = 'Administrative Sector')
+    AND NOT (gen_term = 'Railway Point')
+    AND NOT (gen_term = 'Railway Junction')
+    AND NOT (gen_term = 'Urban Community')
+    AND NOT (gen_term = 'Administrative Sector')
     LIMIT 0,50" )
     or die ( mysqli_error($GLOBALS['vars']['con'] ) );
   

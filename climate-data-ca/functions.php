@@ -244,19 +244,38 @@ function get_location_by_ID ( $loc ) {
   
   if ( isset ( $loc ) && !empty ( $loc ) ) {
     
+    
+    # remove possible bad stuff
+    $loc = preg_replace("/[^a-zA-Z0-9]+/", "", $loc);
+    
+
+    
+    if ( defined( 'ICL_LANGUAGE_CODE' ) && 'fr' == ICL_LANGUAGE_CODE ) {
     $columns = array (
-      "geo_id",
+      "id_code as geo_id",
       "geo_name",
-      "generic_term",
+      "gen_term_fr as generic_term",
+      "location",
+      "province_fr as province",
+      "lat",
+      "lon"
+    );
+	} else {
+          $columns = array (
+      "id_code as geo_id",
+      "geo_name",
+      "gen_term as generic_term",
       "location",
       "province",
       "lat",
       "lon"
     );
+    }
+    
     
     require_once locate_template ( 'resources/app/db.php' );
     
-    $main_query = mysqli_query ( $GLOBALS['vars']['con'], "SELECT " . implode(", ", $columns) . " FROM populated_areas WHERE geo_id LIKE " . $loc . " LIMIT 0,1" )
+    $main_query = mysqli_query ( $GLOBALS['vars']['con'], "SELECT " . implode(", ", $columns) . " FROM all_areas WHERE id_code = '" . $loc . "'" )
       or die ( mysqli_error($GLOBALS['vars']['con'] ) );
     
     $row = mysqli_fetch_assoc ( $main_query );
@@ -290,15 +309,28 @@ function get_location_by_coords ( $lat, $lon ) {
   
   if ( ( isset ( $lat ) && !empty ( $lat ) ) && ( isset ( $lon ) && !empty ( $lon ) ) ) {
     
+    
+  if ( defined( 'ICL_LANGUAGE_CODE' ) && 'fr' == ICL_LANGUAGE_CODE ) {
     $columns = array (
-      "geo_id",
+      "id_code as geo_id",
       "geo_name",
-      "generic_term",
+      "gen_term_fr as generic_term",
+      "location",
+      "province_fr as province",
+      "lat",
+      "lon"
+    );
+	} else {
+          $columns = array (
+      "id_code as geo_id",
+      "geo_name",
+      "gen_term as generic_term",
       "location",
       "province",
       "lat",
       "lon"
     );
+    }
     
     require_once locate_template ( 'resources/app/db.php' );
     
@@ -306,14 +338,14 @@ function get_location_by_coords ( $lat, $lon ) {
     $range = 0.1;
     
     $main_query = mysqli_query ( $GLOBALS['vars']['con'], 
-      "SELECT * 
-      FROM populated_areas 
+      "SELECT " . implode(",", $columns) . " 
+      FROM all_areas 
       WHERE lat BETWEEN " . ( round ( $lat, 2 ) - $range ) . " AND " . ( round ( $lat, 2 ) + $range ) . "
       AND lon BETWEEN " . ( round ( $lon, 2 ) - $range ) . " AND " . ( round ( $lon, 2 ) + $range ) . "
-      AND NOT (generic_term = 'Railway Point')
-      AND NOT (generic_term = 'Railway Junction')
-      AND NOT (generic_term = 'Urban Community')
-      AND NOT (generic_term = 'Administrative Sector')
+      AND NOT (gen_term = 'Railway Point')
+      AND NOT (gen_term = 'Railway Junction')
+      AND NOT (gen_term = 'Urban Community')
+      AND NOT (gen_term = 'Administrative Sector')
       LIMIT 0,50" )
       or die ( mysqli_error($GLOBALS['vars']['con'] ) );
     

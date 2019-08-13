@@ -250,21 +250,21 @@ function get_location_by_ID ( $loc ) {
     
 
     
-    if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == "donneesclimatiques.ca" ) {
-          $columns = array (
-      "id_code",
+    if ( defined( 'ICL_LANGUAGE_CODE' ) && 'fr' == ICL_LANGUAGE_CODE ) {
+    $columns = array (
+      "id_code as geo_id",
       "geo_name",
-      "gen_term_fr",
+      "gen_term_fr as generic_term",
       "location",
-      "province_fr",
+      "province_fr as province",
       "lat",
       "lon"
     );
 	} else {
           $columns = array (
-      "id_code",
+      "id_code as geo_id",
       "geo_name",
-      "gen_term",
+      "gen_term as generic_term",
       "location",
       "province",
       "lat",
@@ -275,7 +275,7 @@ function get_location_by_ID ( $loc ) {
     
     require_once locate_template ( 'resources/app/db.php' );
     
-    $main_query = mysqli_query ( $GLOBALS['vars']['con'], "SELECT " . implode(", ", $columns) . " FROM all_areas WHERE id_code = " . $loc . "" )
+    $main_query = mysqli_query ( $GLOBALS['vars']['con'], "SELECT " . implode(", ", $columns) . " FROM all_areas WHERE id_code = '" . $loc . "'" )
       or die ( mysqli_error($GLOBALS['vars']['con'] ) );
     
     $row = mysqli_fetch_assoc ( $main_query );
@@ -310,21 +310,21 @@ function get_location_by_coords ( $lat, $lon ) {
   if ( ( isset ( $lat ) && !empty ( $lat ) ) && ( isset ( $lon ) && !empty ( $lon ) ) ) {
     
     
-    if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == "donneesclimatiques.ca" ) {
-          $columns = array (
-      "id_code",
+  if ( defined( 'ICL_LANGUAGE_CODE' ) && 'fr' == ICL_LANGUAGE_CODE ) {
+    $columns = array (
+      "id_code as geo_id",
       "geo_name",
-      "gen_term_fr",
+      "gen_term_fr as generic_term",
       "location",
-      "province_fr",
+      "province_fr as province",
       "lat",
       "lon"
     );
 	} else {
           $columns = array (
-      "id_code",
+      "id_code as geo_id",
       "geo_name",
-      "gen_term",
+      "gen_term as generic_term",
       "location",
       "province",
       "lat",
@@ -338,7 +338,7 @@ function get_location_by_coords ( $lat, $lon ) {
     $range = 0.1;
     
     $main_query = mysqli_query ( $GLOBALS['vars']['con'], 
-      "SELECT * 
+      "SELECT " . implode(",", $columns) . " 
       FROM all_areas 
       WHERE lat BETWEEN " . ( round ( $lat, 2 ) - $range ) . " AND " . ( round ( $lat, 2 ) + $range ) . "
       AND lon BETWEEN " . ( round ( $lon, 2 ) - $range ) . " AND " . ( round ( $lon, 2 ) + $range ) . "

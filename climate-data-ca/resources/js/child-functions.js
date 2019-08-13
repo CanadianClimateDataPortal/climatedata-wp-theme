@@ -219,8 +219,9 @@ var chart_labels, legend_labels;
         if (!item.id) {
             return item.text;
         }
-        if (item.location == 'null') {
+        if (item.location === null) {
           show_comma = '';
+          item.location ='';
         } else {
           show_comma = ', ';
         }

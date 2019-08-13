@@ -1,37 +1,59 @@
 <?php
 require_once "db.php";
 global $con;
+
+$get_sSearch = isset($_GET['q']) ? $_GET['q'] : '';
+$get_lang = isset($_GET['lang']) ? $_GET['lang'] : 'en';
+$post_draw = isset($_POST['draw']) ? $_POST['draw'] : '';
+
+if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == "donneesclimatiques.ca" ) {
+    $get_lang = 'fr';
+}
+
+
 // the columns to be filtered, ordered and returned
 // must be in the same order as displayed in the table
-$columns = array
-(
-    "geo_id",
-    "geo_name",
-    "generic_term",
-    "location",
-    "province",
-    "lat",
-    "lon"
-);
+if ($get_lang == 'en'){
+    $columns = array
+    (
+        "id_code",
+        "geo_name",
+        "gen_term",
+        "location",
+        "province",
+        "lat",
+        "lon"
+    );
+} else {
+    $columns = array
+    (
+        "id_code",
+        "geo_name",
+        "gen_term_fr",
+        "location",
+        "province_fr",
+        "lat",
+        "lon"
+    );
+}
+
 
 $search_columns = array
 (
     "geo_name"
 );
 
-$table = "populated_areas";
+$table = "all_areas";
 
 $joins = "";
 
-$get_sSearch = isset($_GET['q']) ? $_GET['q'] : '';
-$post_draw = isset($_POST['draw']) ? $_POST['draw'] : '';
 
 $get_sSearch = str_replace('`','\'',$get_sSearch);
 // filtering
-$sql_where = "WHERE geo_id > 0";
+$sql_where = "";
 if ($get_sSearch != "")
 {
-    $sql_where = "WHERE geo_id > 0 AND ";
+    $sql_where = "WHERE ";
     foreach ($search_columns as $column)
     {
         $sql_where .= $column . " LIKE '" . mysqli_real_escape_string($con,$get_sSearch ) . "%' OR ";
@@ -52,11 +74,13 @@ if ( isset( $_GET['iSortCol_0'] ) )
 }
 
 // paging
-$sql_limit = 1000;
+$sql_limit = 10;
 if (isset($sql_limit))
 {
     $sql_limit = "LIMIT 0,".$sql_limit;
 }
+
+//echo "SELECT SQL_CALC_FOUND_ROWS " . implode(", ", $columns) . " FROM {$table} {$joins} {$sql_where} {$sql_order} {$sql_limit}";
 $main_query = mysqli_query($con,"SELECT SQL_CALC_FOUND_ROWS " . implode(", ", $columns) . " FROM {$table} {$joins} {$sql_where} {$sql_order} {$sql_limit}")
 or die(mysqli_error($con));
 
@@ -70,7 +94,7 @@ $row = mysqli_fetch_array($filtered_rows_query);
 $response['recordsFiltered'] = $row[0];
 
 // get the number of rows in total
-$total_query = mysqli_query($con,"SELECT COUNT(geo_id) FROM {$table}")
+$total_query = mysqli_query($con,"SELECT COUNT(id) FROM {$table}")
 or die(mysqli_error($con));
 $row = mysqli_fetch_array($total_query);
 $response['recordsTotal'] = $row[0];

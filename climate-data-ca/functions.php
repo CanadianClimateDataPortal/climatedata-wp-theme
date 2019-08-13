@@ -423,68 +423,35 @@ function get_location_by_coords ( $lat, $lon ) {
 
 // GET PROVINCE ABBREVIATION
 
-function short_province ( $province ) {
-  
-  if ( strpos ( strtolower ( $province ), 'newf' ) !== false || strpos ( strtolower ( $province ), 'labr' ) !== false ) {
-    
-    $abbreviation = 'NL';
-    
-  } elseif ( strpos ( strtolower ( $province ), 'prince' ) !== false ) {
-    
-    $abbreviation = 'PE';
-    
-  } elseif ( strpos ( strtolower ( $province ), 'nova' ) !== false ) {
-    
-    $abbreviation = 'NS';
-    
-  } elseif ( strpos ( strtolower ( $province ), 'brunswick' ) !== false ) {
-    
-    $abbreviation = 'NB';
-    
-  } elseif ( strpos ( strtolower ( $province ), 'qu' ) !== false ) {
-    
-    $abbreviation = 'QC';
-    
-  } elseif ( strpos ( strtolower ( $province ), 'onta' ) !== false ) {
-    
-    $abbreviation = 'ON';
-    
-  } elseif ( strpos ( strtolower ( $province ), 'manit' ) !== false ) {
-    
-    $abbreviation = 'MB';
-    
-  } elseif ( strpos ( strtolower ( $province ), 'sask' ) !== false ) {
-    
-    $abbreviation = 'SK';
-    
-  } elseif ( strpos ( strtolower ( $province ), 'alberta' ) !== false ) {
-    
-    $abbreviation = 'AB';
-    
-  } elseif ( strpos ( strtolower ( $province ), 'british' ) !== false ) {
-    
-    $abbreviation = 'BC';
-    
-  } elseif ( strpos ( strtolower ( $province ), 'yukon' ) !== false ) {
-    
-    $abbreviation = 'YT';
-    
-  } elseif ( strpos ( strtolower ( $province ), 'north' ) !== false ) {
-    
-    $abbreviation = 'NT';
-    
-  } elseif ( strpos ( strtolower ( $province ), 'nunavut' ) !== false ) {
-    
-    $abbreviation = 'NU';
-    
+function short_province ($province) {
+  $provinces = array(
+    "British Columbia" => "BC",
+    "Colombie-Britannique" => "BC",
+    "Yukon" => "YT",
+    "Northwest Territories" => "NT",
+    "Territoires du Nord-Ouest" => "NT",
+    "Alberta" => "AB",
+    "Newfoundland and Labrador" => "NL",
+    "Terre-Neuve-et-Labrador" => "NL",
+    "Saskatchewan" => "SK",
+    "Ontario" => "ON",
+    "Manitoba" => "MB",
+    "Nova Scotia" => "NS",
+    "Nouvelle-Écosse" => "NS",
+    "Quebec" => "QC",
+    "Québec" => "QC",
+    "New Brunswick" => "NB",
+    "Nouveau-Brunswick" => "NB",
+    "Prince Edward Island" => "PE",
+    "Île-du-Prince-Édouard" => "PE",
+    "Nunavut" => "NU");
+
+  if (array_key_exists($province, $provinces)) {
+    return $provinces[$province];
   } else {
-    
-    $abbreviation = $province;
-    
+    return $province;
   }
-  
-  return $abbreviation;
-  
+
 }
 
 

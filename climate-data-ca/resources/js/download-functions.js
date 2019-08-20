@@ -307,11 +307,7 @@
               content: 'location'
             },
             success: function(data) {
-
               varDetails = JSON.parse($(data).find('#callback-data').html())
-
-              console.log(varDetails)
-
             },
             complete: function() {
 
@@ -563,6 +559,11 @@
           checkform();
 
       }).addTo(maps['variable']);
+
+      $('#var-download .select2').on('select2:select', function(e) {
+        clearHighlight()
+        checkform()
+      })
 
     }
 

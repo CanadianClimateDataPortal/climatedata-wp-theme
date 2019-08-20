@@ -302,7 +302,7 @@
           // get the variable details
 
           $.ajax({
-            url: ajax_url + '/variable/' + $('#download-variable').val() + '/',
+            url: ajax_url + 'variable/' + $('#download-variable').val() + '/',
             data: {
               content: 'location'
             },

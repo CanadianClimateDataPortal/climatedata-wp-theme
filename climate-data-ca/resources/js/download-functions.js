@@ -191,32 +191,6 @@
 
       create_map('variable');
 
-/*
-      maps['variable'] = L.map("download-map", {
-        maxZoom: 12,
-        minZoom: 3
-      }).setView([62.51231793838694,-98.5693359375], 4);
-
-      maps['variable'].createPane('basemap');
-      maps['variable'].getPane('basemap').style.zIndex = 399;
-      maps['variable'].getPane('basemap').style.pointerEvents = 'none';
-
-      maps['variable'].createPane('grid');
-      maps['variable'].getPane('grid').style.zIndex = 500;
-      maps['variable'].getPane('grid').style.pointerEvents = 'all';
-
-      maps['variable'].createPane('labels');
-      maps['variable'].getPane('labels').style.zIndex = 402;
-      maps['variable'].getPane('labels').style.pointerEvents = 'none';
-
-      L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png', {
-          attribution: '',
-          subdomains: 'abcd',
-          pane: 'basemap',
-          maxZoom: 12
-      }).addTo(maps['variable']);
-*/
-
       var highlight;
 
       var clearHighlight = function () {
@@ -563,6 +537,9 @@
       $('#var-download .select2').on('select2:select', function(e) {
         clearHighlight()
         checkform()
+
+        $('#download-lat').val('');
+        $('#download-lon').val('');
       })
 
     }

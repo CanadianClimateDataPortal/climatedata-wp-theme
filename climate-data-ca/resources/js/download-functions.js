@@ -553,7 +553,7 @@
               );
 
             }
-          )
+          })
 
           // console.log(var_value);
           //console.log(mora_value);

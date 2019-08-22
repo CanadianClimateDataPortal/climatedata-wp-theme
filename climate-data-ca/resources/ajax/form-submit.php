@@ -31,7 +31,7 @@ if ($securimage->check($_GET['captcha_code']) == false) {
   $form_data = $_GET;
   
   //$to = get_option ( 'admin_email' );
-  $to = "support+{$form_data['feedback-type']}@climatedata.ca";
+  $to = "support-backup+{$form_data['feedback-type']}@climatedata.ca";
   $subject = get_bloginfo ( 'title' ) . __(': Feedback form submission','cdc-feedback');
   
   $headers = array ( 
@@ -56,6 +56,7 @@ if ($securimage->check($_GET['captcha_code']) == false) {
 //  $body .= '<p style="font-size: 80%">This message was sent at ' . current_time ('H:i:s' ) . ' on ' . current_time ( 'F j, Y' ) . '</p>';
   
   $result = wp_mail ( $to, $subject, $body, $headers );
+  $result = wp_mail ( "info.cccs-ccsc@canada.ca", $subject, $body, $headers );
   
   if($result) {
     echo 'success';

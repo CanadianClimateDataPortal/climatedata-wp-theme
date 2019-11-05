@@ -41,7 +41,7 @@
         console.log('initializing renderer');
       }
       
-      if (typeof Highcharts !== 'undefined') {  
+      if (typeof Highcharts !== 'undefined' && plugin_settings.chart_options != null) {  
         Highcharts.setOptions(plugin_settings.chart_options);
       }
       

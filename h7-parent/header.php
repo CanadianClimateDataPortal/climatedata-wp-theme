@@ -88,6 +88,7 @@
     ?>
     
     <link rel="icon" type="image/png" href="<?php echo wp_get_attachment_image_url( get_field ( 'favicon', 'option' ), 'thumbnail' ); ?>">
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
     
     <?php
       
@@ -179,6 +180,7 @@
       }
       
     ?>
+
 
   </head>
   

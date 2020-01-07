@@ -6,7 +6,7 @@ $get_sSearch = isset($_GET['q']) ? $_GET['q'] : '';
 $get_lang = isset($_GET['lang']) ? $_GET['lang'] : 'en';
 $post_draw = isset($_POST['draw']) ? $_POST['draw'] : '';
 
-if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == "donneesclimatiques.ca" ) {
+if (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] == "donneesclimatiques.ca" || $_SERVER['HTTP_HOST'] == "donneesclimatiques.crim.ca" )) {
     $get_lang = 'fr';
 }
 

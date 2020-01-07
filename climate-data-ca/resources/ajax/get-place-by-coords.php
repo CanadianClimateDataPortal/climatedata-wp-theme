@@ -13,7 +13,7 @@ function distance($lat1, $lon1, $lat2, $lon2) {
 
 if ( ( isset ( $_GET['lat'] ) && !empty ( $_GET['lat'] ) ) && ( isset ( $_GET['lon'] ) && !empty ( $_GET['lon'] ) ) ) {
   
-  if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == "donneesclimatiques.ca" ) {
+  if (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] == "donneesclimatiques.ca" || $_SERVER['HTTP_HOST'] == "donneesclimatiques.crim.ca" )) {
     $columns = array (
       "id_code",
       "geo_name",

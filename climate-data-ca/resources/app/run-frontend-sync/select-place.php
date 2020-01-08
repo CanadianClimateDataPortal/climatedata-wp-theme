@@ -94,7 +94,7 @@ $row = mysqli_fetch_array($filtered_rows_query);
 $response['recordsFiltered'] = $row[0];
 
 // get the number of rows in total
-$total_query = mysqli_query($con,"SELECT COUNT(id) FROM {$table}")
+$total_query = mysqli_query($con,"SELECT COUNT(*) FROM {$table}")
 or die(mysqli_error($con));
 $row = mysqli_fetch_array($total_query);
 $response['recordsTotal'] = $row[0];

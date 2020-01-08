@@ -44,33 +44,17 @@ if ( ( isset ( $_GET['lat'] ) && !empty ( $_GET['lat'] ) ) && ( isset ( $_GET['l
   
   $main_query = mysqli_query ( $GLOBALS['vars']['con'], 
     "SELECT " . implode(",", $columns) . "
+    , DISTANCE_BETWEEN({$_GET['lat']}, {$_GET['lon']}, lat, lon) as distance
     FROM all_areas
     WHERE lat BETWEEN " . ( round ( $_GET['lat'], 2 ) - $range ) . " AND " . ( round ( $_GET['lat'], 2 ) + $range ) . "
     AND lon BETWEEN " . ( round ( $_GET['lon'], 2 ) - $range ) . " AND " . ( round ( $_GET['lon'], 2 ) + $range ) . "
-    AND NOT (gen_term = 'Railway Point')
-    AND NOT (gen_term = 'Railway Junction')
-    AND NOT (gen_term = 'Urban Community')
-    AND NOT (gen_term = 'Administrative Sector')
-    LIMIT 0,50" )
+    AND gen_term NOT IN  ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector')
+    ORDER BY DISTANCE
+    LIMIT 1" )
     or die ( mysqli_error($GLOBALS['vars']['con'] ) );
   
   if ( $main_query->num_rows > 0 ) {
-    
-    $selected_place = array();
-    
-    $shortest_distance = 100;
-  
-    while ($row = mysqli_fetch_assoc ( $main_query ) ) {
-      
-      $distance = distance( $row['lat'], $row['lon'], $_GET['lat'], $_GET['lon'] );
-      
-      if ( distance( $row['lat'], $row['lon'], $_GET['lat'], $_GET['lon'] ) < $shortest_distance ) {
-        $selected_place = $row;
-        $selected_place['distance'] = $distance;
-        $shortest_distance = $distance;
-      }
-      
-    }
+    $selected_place = mysqli_fetch_assoc ( $main_query);
     
     echo json_encode ( $selected_place );
     

@@ -71,31 +71,35 @@
       }*/
 
     ?>
-<!-- Global site tag (gtag.js) - Google Analytics -->
 <?php
-   // FR language
-if ( defined( 'ICL_LANGUAGE_CODE' ) && 'fr' == ICL_LANGUAGE_CODE ) {
+
+if (isset($_SERVER['HTTP_HOST'])) {
+  switch ($_SERVER['HTTP_HOST']) {
+    case "climatedata.ca":
+      $UA="UA-141104740-1";
+      break;
+    case "donneesclimatiques.ca":
+      $UA="UA-141104740-2";
+      break;
+    case "climatedata.crim.ca":
+      $UA="UA-141104740-3";
+      break;
+    default:
+      $UA="";
+  }
+}
+
+if (!empty($UA)) {
 ?>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-141104740-2"></script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo $UA;?>"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
     
-      gtag('config', 'UA-141104740-2');
-    </script>
-
-<?php }
-else {
-?>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-141104740-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-141104740-1');
+      gtag('config', '<?php echo $UA;?>');
     </script>
 
 <?php

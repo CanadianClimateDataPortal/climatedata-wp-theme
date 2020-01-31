@@ -13,7 +13,7 @@
     }
 
     $var_url = get_permalink ( $var_page->ID );
-    
+
     if ( isset ( $_GET['sector'] ) ) {
 
       $var_url = get_permalink ( filtered_ID_by_path ( 'explore/sector/human-health/map' ) );
@@ -182,7 +182,54 @@
 
     ?>
   </div>
-  <div class="col-12 col-sm-6 col-lg sidebar-block"><h5>&nbsp;<?php //_e ( 'Data in practice', 'cdc' ); ?></h5></div>
+
+  <div class="col-12 col-sm-6 col-lg sidebar-block">
+    <div class="p-5">
+      <?php
+
+        $related_vars = get_field ( 'related_vars' );
+
+        if ( !empty ( $related_vars ) ) {
+
+      ?>
+
+      <h6 class="pb-4 all-caps"><?php _e ( 'Related Variables', 'cdc' ); ?></h6>
+
+      <ul class="list-group related-vars">
+        <?php
+
+          foreach ( $related_vars as $related ) {
+
+            $var_type = get_the_terms ( get_the_ID(), 'var-type' );
+
+        ?>
+
+        <li class="list-group-item related-var-item">
+          <?php
+
+            if ( !empty ( $var_type ) ) {
+              echo '<span class="all-caps">' . $var_type[0]->name . '</span>';
+            }
+
+          ?>
+
+          <a href="<?php echo get_permalink ( $related ); ?>" class="overlay-toggle" data-overlay-content="interstitial"><?php echo get_the_title ( $related );  ?></a>
+        </li>
+
+        <?php
+
+          }
+
+        ?>
+      </ul>
+
+      <?php
+
+        }
+
+      ?>
+    </div>
+  </div>
 </aside>
 
 <?php
@@ -216,54 +263,72 @@
 
     <h2 class="overlay-title text-primary"><?php echo $location_name; ?></h2>
 
-    <div class="navbar chart-navbar d-flex">
-      <div class="nav-item">
-        <h6 class="px-0"><span class="cdc-icon icon-location"></span> <?php echo $_GET['lat'] . ', ' . $_GET['lon']; ?></h6>
-      </div>
-
-      <div class="nav-item d-flex align-items-center">
-        <h6><span class="cdc-icon icon-download-data"></span> <?php _e ( 'Download data', 'cdc' ); ?></h6>
-
-        <div class="btn-group btn-group-sm" role="group">
-          <a href="#" class="chart-export-data btn btn-sm btn-outline-secondary" data-type="csv">CSV</a>
-        </div>
-      </div>
-
-      <div class="nav-item d-flex align-items-center">
-        <h6><span class="cdc-icon icon-download-img"></span> <?php _e ( 'Download image', 'cdc' ); ?></h6>
-
-        <div class="btn-group btn-group-sm" role="group">
-          <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary " data-type="png">PNG</a>
-          <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary" data-type="pdf">PDF</a>
-        </div>
-      </div>
-    </div>
-
     <div class="overlay-content-row">
       <div class="overlay-content-chart">
+        <div class="navbar chart-navbar d-flex">
+          <div class="nav-item d-flex align-items-center mr-5">
+            <a href="#" class="btn btn-sm btn-outline-secondary page-tour-trigger" data-tour="chart-tour"><span class="fas fa-question icon rounded-circle icon mr-3"></span>How to read this</a>
+          </div>
+
+          <div class="nav-item d-flex align-items-center mr-5">
+            <h6><span class="cdc-icon icon-download-data"></span> <?php _e ( 'Download data', 'cdc' ); ?></h6>
+
+            <div class="btn-group btn-group-sm" role="group">
+              <a href="#" class="chart-export-data btn btn-sm btn-outline-secondary" data-type="csv">CSV</a>
+            </div>
+          </div>
+
+          <div class="nav-item d-flex align-items-center">
+            <h6><span class="cdc-icon icon-download-img"></span> <?php _e ( 'Download image', 'cdc' ); ?></h6>
+
+            <div class="btn-group btn-group-sm" role="group">
+              <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary " data-type="png">PNG</a>
+              <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary" data-type="pdf">PDF</a>
+            </div>
+          </div>
+        </div>
+
         <div id="chart-placeholder"></div>
       </div>
     </div>
+
+    <?php
+
+      $chart_tour = array (
+        array (
+          "text" => "<p>Test</p>",
+          "position" => array (
+            "my" => "left center",
+            "at" => "right+20 center",
+            "of" => ".chart-export-data",
+            "bubble" => "left center"
+          )
+        )
+      );
+
+    ?>
+
+    <div class="page-tour" id="chart-tour" data-steps='<?php echo json_encode ( $chart_tour ); ?>'></div>
+
+    <?php
+
+      $units = get_field ( 'units' );
+
+    ?>
+
+    <div id="callback-data"><?php
+
+      echo json_encode ( array (
+        'title' => get_field ( 'var_title' ),
+        'units' => array (
+          'label' => __ ( $units['label'], 'cdc' ),
+          'value' => __ ( $units['value'], 'cdc' )
+        ),
+        'decimals' => get_field ( 'decimals' )
+      ) );
+
+    ?></div>
   </div>
-
-  <?php
-
-    $units = get_field ( 'units' );
-
-  ?>
-
-  <div id="callback-data"><?php
-
-    echo json_encode ( array (
-      'title' => get_field ( 'var_title' ),
-      'units' => array (
-        'label' => __ ( $units['label'], 'cdc' ),
-        'value' => __ ( $units['value'], 'cdc' )
-      ),
-      'decimals' => get_field ( 'decimals' )
-    ) );
-
-  ?></div>
 </div>
 
 <?php

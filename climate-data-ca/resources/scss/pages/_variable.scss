@@ -470,8 +470,12 @@ body.stations-on {
   }
   
   .navbar {
-    @include nested-column(7, 9);
-    @include nested-offset(1, 9);
+    position: absolute;
+    top: 25px;
+    right: 40px;
+    z-index: 2;
+    //@include nested-column(7, 9);
+    //@include nested-offset(1, 9);
   }
   
   .overlay-content-chart {

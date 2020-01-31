@@ -1,5 +1,5 @@
 // page tour
-// v1.0
+// v1.1
 
 (function ($) {
   
@@ -16,6 +16,7 @@
       open: false,
       current: 1,
       debug: false,
+      tour_id: null,
       labels: {
         start_over: 'Start Over',
         next: 'Next',
@@ -43,7 +44,7 @@
       var plugin_elements = plugin_settings.elements;
       
       if (plugin_settings.debug == true) {
-        console.log('page tour init');
+        console.log('page tour init', plugin_item);
       }
       
       //
@@ -68,6 +69,8 @@
         
         
       }
+      
+      plugin_settings.tour_id = plugin_item.attr('id')
       
       //
       // ELEMENTS
@@ -150,9 +153,19 @@
         
         if (plugin_settings.debug == true) {
           console.log('show tour btn clicked');
+          console.log($(this).attr('data-tour'), plugin_item.attr('id'))
         }
         
-        plugin_instance.show_tour();
+        
+        if (
+          typeof $(this).attr('data-tour') != 'undefined' && 
+          $(this).attr('data-tour') == plugin_item.attr('id')
+        ) {
+          
+          console.log('tour', plugin_item.attr('id'))
+          plugin_instance.show_tour()
+          
+        }
         
       });
       

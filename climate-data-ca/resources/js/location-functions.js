@@ -1,21 +1,21 @@
 (function($) {
-  
+
   $(function() {
-    
+
 // Highcharts.getOptions().exporting.buttons.contextButton.menuItems = ;
-    
+
     var current_location = {
       id: $('#location-content').attr('data-location'),
       lat: $('#location-content').attr('data-lat'),
       lon: $('#location-content').attr('data-lon'),
     };
-    
+
     //
     // MAP
     //
-    
-    var hosturl = geoserver_url;
-    
+
+    var hosturl = geoserver_url
+
     var map1 = L.map('location-map', {
       zoomControl: false,
       zoom: 11,
@@ -25,7 +25,7 @@
       doubleClickZoom: false,
       scrollWheelZoom: false
     });
-    
+
     map1.createPane('basemap');
     map1.getPane('basemap').style.zIndex = 399;
     map1.getPane('basemap').style.pointerEvents = 'none';
@@ -40,11 +40,11 @@
         subdomains: 'abcd',
         pane: 'basemap'
     }).addTo(map1);
-    
+
     var highlightGridFeature;
-    
+
     var pbfLayer = L.vectorGrid.protobuf(hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf", {
-  
+
       rendererFactory: L.canvas.tile,
 
       attribution: '',
@@ -69,15 +69,15 @@
       },
       pane: 'grid',
     }).on('click', function (e) {
-    
+
       //console.log('hover', e.layer.properties.gid);
-      
+
       if (highlightGridFeature) {
           pbfLayer.resetFeatureStyle(highlightGridFeature);
       }
-      
+
       highlightGridFeature = e.layer.properties.gid;
-      
+
       pbfLayer.setFeatureStyle(highlightGridFeature, {
           weight: 0,
           color: '#FFF',
@@ -86,13 +86,13 @@
           fill: true,
           fillOpacity: 0.25
       });
-        
+
     }).addTo(map1);
-    
+
     var marker = L.marker([current_location.lat, current_location.lon]).addTo(map1);
-    
+
     //highlight = current_location.id;
-    
+
 /*
     pbfLayer.setFeatureStyle(highlight, {
         weight: 1,
@@ -103,36 +103,55 @@
         fillOpacity: 0
     });
 */
-    
+
     //
     // CHARTS
     //
-    
+
     var chart_objects = {};
-    
+
+    function update_query(select, val) {
+
+      if (window.location.search != '') {
+        var current_search = window.location.search.substr(1).split('&')
+
+        current_search.forEach(function(entry) {
+          var split_entry = entry.split('=')
+          current_query[split_entry[0]] = split_entry[1]
+        });
+
+        current_query[select] = val
+
+        console.log(window.location)
+
+        history.replaceState({}, $('title').text(), window.location.href.split('?')[0] + '?' + $.param(current_query))
+      }
+
+    }
+
     function load_var_by_location(variable, container) {
-      
+
       chart_objects[container.attr('id')] = {
         container: container,
         variable: variable,
         varDetails: null,
         chartDecimals: null
       }
-      
+
       //console.log('load var', variable);
-      
+
       $('body').addClass('spinner-on');
-      
+
       container.animate({
         opacity: 0.1
       }, {
         duration: 250,
         complete: function() {
-          
+
           var ajax_url = site_url;
-          
+
           ajax_url += 'variable/' + variable;
-                    
+
           $.ajax({
             url: ajax_url,
             data: {
@@ -140,38 +159,38 @@
               loc: current_location.id
             },
             success: function(data) {
-              
+
               if ($(data).filter('#callback-data').length) {
                 chart_objects[container.attr('id')]['varDetails'] = JSON.parse($(data).filter('#callback-data').html());
               }
-              
+
               container.html(data);
-              
+
               var json_url = data_url + '/get_values.php?lat=' + current_location.lat + '&lon=' + current_location.lon + '&var=' + variable + '&month=ann';
-              
+
               //console.log('load chart JSON from ' + 'get_values.php?lat=' + current_location.lat + '&lon=' + current_location.lon + '&var=' + variable + '&month=ann');
-              
+
               $.ajax({
                 url: json_url,
                 dataType: 'json',
                 success: function (data) {
-                  
+
                   midHistSeries = [];
                   rangeHistSeries = [];
-                  
+
                   mid26Series = [];
                   range26Series = [];
-                  
+
                   mid45Series = [];
                   range45Series = [];
-                  
+
                   mid85Series = [];
                   range85Series = [];
-                  
+
                   //console.log(data);
-                  
-                  //console.log(variable + ' json success, render to #' + variable + '-chart'); 
-                  
+
+                  //console.log(variable + ' json success, render to #' + variable + '-chart');
+
                   if (chart_objects[container.attr('id')]['varDetails']['units']['value'] === 'kelvin') {
                     subtractValue = k_to_c;
                     chart_objects[container.attr('id')]['chartUnit'] = "°C";
@@ -179,36 +198,36 @@
                     subtractValue = 0;
                     chart_objects[container.attr('id')]['chartUnit'] = chart_objects[container.attr('id')]['varDetails']['units']['label'];
                   }
-                  
+
                   //console.log(varDetails);
-                      
+
                   chart_objects[container.attr('id')]['chartDecimals'] = chart_objects[container.attr('id')]['varDetails']['decimals'];
-    
+
                   for (var i = 0; i < data.length; i++) {
-                      
+
                       data[i][0] = parseFloat((data[i][0] - subtractValue).toFixed(2));
                       data[i][1] = parseFloat((data[i][1] - subtractValue).toFixed(2));
                       data[i][2] = parseFloat((data[i][2] - subtractValue).toFixed(2));
-  
+
                       data[i][3] = parseFloat((data[i][3] - subtractValue).toFixed(2));
                       data[i][4] = parseFloat((data[i][4] - subtractValue).toFixed(2));
                       data[i][5] = parseFloat((data[i][5] - subtractValue).toFixed(2));
-  
+
                       data[i][6] = parseFloat((data[i][6] - subtractValue).toFixed(2));
                       data[i][7] = parseFloat((data[i][7] - subtractValue).toFixed(2));
                       data[i][8] = parseFloat((data[i][8] - subtractValue).toFixed(2));
-  
+
                       data[i][9] = parseFloat((data[i][0]).toFixed(2));
                       data[i][10] = parseFloat((data[i][1]).toFixed(2));
                       data[i][11] = parseFloat((data[i][2]).toFixed(2));
-                      
+
                       if (i < 56) {
                           rangeHistSeries.push([Date.UTC(1950 + i, 0, 1), data[i][9], data[i][11]]);
                           midHistSeries.push([Date.UTC(1950 + i, 0, 1), data[i][10]]);
                       }
                       // had to add limiter since annual values spit out a null set at the end.
                       if (i > 54 && i < 150) {
-    
+
                           range26Series.push([Date.UTC(1950 + i, 0, 1), data[i][0], data[i][2]]);
                           mid26Series.push([Date.UTC(1950 + i, 0, 1), data[i][1]]);
                           range45Series.push([Date.UTC(1950 + i, 0, 1), data[i][3], data[i][5]]);
@@ -217,7 +236,7 @@
                           mid85Series.push([Date.UTC(1950 + i, 0, 1), data[i][7]]);
                       }
                   }
-                  
+
                   var chart = Highcharts.stockChart({
                       chart: {
                         renderTo: $('body').find('#' + variable + '-chart')[0],
@@ -229,16 +248,16 @@
                               fontFamily: 'CDCSans'
                           }
                       },
-    
+
                       xAxis: {
                           type: 'datetime'
                       },
-    
+
                       yAxis: {
                           title: {
                             text: chart_objects[container.attr('id')]['varDetails']['title']
                           },
-                          
+
                           labels: {
                               formatter: function () {
                                   return this.axis.defaultLabelFormatter.call(this) + ' ' + chart_objects[container.attr('id')]['chartUnit'];
@@ -264,7 +283,7 @@
                               visibility: 'hidden'
                           }
                       },
-    
+
                       tooltip: {
                           crosshairs: true,
                           shared: true,
@@ -272,10 +291,10 @@
                           valueDecimals: chart_objects[container.attr('id')]['chartDecimals'],
                           valueSuffix: ' ' + chart_objects[container.attr('id')]['chartUnit']
                       },
-                      
+
                       exporting: {
                         enabled: true,
-                        
+
                         buttons: {
                           contextButton: {
                             menuItems: ['printChart',
@@ -288,16 +307,16 @@
                             {
                               text: chart_globals.lang.downloadCSV,
                               onclick: function () {
-                                
+
                                 window.location.href = "data:text/csv;charset=utf-8," + escape(this.getCSV());
-                                
+
                               }
                             },
                             'downloadXLS']
                           }
                         }
                       },
-                      
+
                       series: [{
                           name: chart_labels.historical,
                           data: midHistSeries,
@@ -399,17 +418,17 @@
                               enabled: false
                           }
                       }]
-                      
+
                   });
-          
+
                 },
                 complete: function() {
                   $('body').removeClass('spinner-on');
                 }
               });
-              
+
               //$('body').removeClass('spinner-on');
-              
+
             },
             complete: function() {
               container.animate({
@@ -417,66 +436,70 @@
               }, 250);
             }
           });
-          
-          
-          
+
+
+
         }
       });
-      
+
     }
-    
+
     // INITIAL LOAD
-    
+
     $.ajax({
       url: data_url + '/get_location_values_allyears.php?lat=' + current_location.lat + '&lon=' + current_location.lon + '&time=2100-01-01',
       success: function(data) {
-        
+
         var location_data = JSON.parse(data);
-        
+
         //console.log(location_data);
-        
+
         $('#location-hero-default').hide();
         $('#location-hero-data').show();
-        
+
         $('#location-val-1').text(location_data.anusplin_1950_temp);
         $('#location-val-2').text(location_data.anusplin_2005_temp);
         $('#location-val-3').text(location_data.bcc_2020_temp);
         $('#location-val-4').text(location_data.bcc_2050_temp);
         $('#location-val-5').text(location_data.bcc_2090_temp);
-        
+
         $('#location-val-6').text(location_data.anusplin_1980_precip);
         $('#location-val-7').text(location_data.bcc_2020_precip);
         $('#location-val-8').text(location_data.bcc_2050_precip);
         $('#location-val-9').text(location_data.bcc_2090_precip);
-        
+
       }
     });
-    
+
     $('.location-data-select').each(function() {
-      
+
       var first_var = $(this).find(':selected');
-      
+
       //console.log('initial load', first_var.val());
-      
+
+      update_query($(this).attr('name'), first_var.val())
+
       load_var_by_location(first_var.val(), $(this).closest('.var-type').find('.var-data-placeholder'));
-      
+
     });
-    
+
     // ON CHANGE VAR
-    
+
     $('.location-data-select').on('select2:select', function(e) {
-      
+
+      update_query($(this).attr('name'), $(this).val())
+
       load_var_by_location($(this).val(), $(this).closest('.var-type').find('.var-data-placeholder'));
-      
+
     });
-    
+
     // STICKY KIT
-    
+
     $('#location-tag-wrap').stick_in_parent({
       offset_top: sticky_offset + $('#main-header').outerHeight()
     });
-    
+
     //console.log('end of location-functions');
-    
+
   });
 })(jQuery);

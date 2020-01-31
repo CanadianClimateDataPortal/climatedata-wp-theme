@@ -232,6 +232,67 @@
 
       var pbfLayer = L.vectorGrid.protobuf(pbfURL, vectorTileOptions).on('click', function (e) {
 
+        //
+        // NEW
+        //
+
+        if (highlightGridFeature) {
+            pbfLayer.resetFeatureStyle(highlightGridFeature);
+        }
+
+        highlightGridFeature = e.layer.properties.gid;
+
+        selectedPoints[highlightGridFeature] = e.latlng;
+
+        var selectedExists = selectedGrids.includes(highlightGridFeature);
+
+        if (selectedExists === false) {
+            selectedGrids.push(highlightGridFeature);
+            pbfLayer.setFeatureStyle(highlightGridFeature, {
+                weight: 1,
+                color: '#F00',
+                opacity: 1,
+                fill: true,
+                radius: 4,
+                fillOpacity: 0.1
+            });
+        } else {
+            for (var i = selectedGrids.length - 1; i >= 0; i--) {
+                if (selectedGrids[i] === highlightGridFeature) {
+                    selectedGrids.splice(i, 1);
+                }
+            }
+
+            for (var i = selectedPoints.length - 1; i >= 0; i--) {
+
+                if (selectedPoints[highlightGridFeature]) {
+                    selectedPoints.splice(i, 1);
+                }
+            }
+            pbfLayer.setFeatureStyle(highlightGridFeature, {
+                weight: 0.1,
+                color: '#000',
+                opacity: 1,
+                fill: true,
+                radius: 4,
+                fillOpacity: 0
+            });
+        }
+
+
+        var_value = 'tx_max'; //$("#var").val();
+        mora_value = $("#download-dataset").val();
+
+        genData(e.latlng.lat, e.latlng.lng, var_value, mora_value,selectedPoints);
+
+        L.DomEvent.stop(e);
+
+
+        //
+        // OLD
+        //
+
+/*
           clearHighlight();
 
           highlight = e.layer.properties.gid;
@@ -530,6 +591,8 @@
 
           L.DomEvent.stop(e);
 
+          */
+
           checkform();
 
       }).addTo(maps['variable']);
@@ -541,6 +604,130 @@
         $('#download-lat').val('');
         $('#download-lon').val('');
       })
+
+    }
+
+
+    //
+    //
+    // NEW MONTHLY DOWNLOAD FUNCTION
+    //
+    //
+    //
+
+    function genData(lat, lon, variable, month,selectedPoints) {
+
+        document.getElementById("output").innerHTML = '';
+
+        outputData = [];
+
+        outputData.push(",DATE", "LATITUDE", "LONGITUDE", "RCP 2.6 MIN", "RCP 2.6 MEAN", "RCP 2.6 MAX", "RCP 4.5 MIN", "RCP 4.5 MEAN", "RCP 4.5 MAX", "RCP 8.5 MIN", "RCP 8.5 MEAN", "RCP 8.5 MAX","\n");
+
+
+
+        midHistSeries = [];
+        rangeHistSeries = [];
+
+        mid26Series = [];
+        range26Series = [];
+
+        mid45Series = [];
+        range45Series = [];
+
+        mid85Series = [];
+        range85Series = [];
+
+
+
+        selectedPoints.forEach(function(entry) {
+            lat = entry.lat;
+            lon = entry.lng;
+
+            $.getJSON(
+                'https://data.climatedata.ca/get_values.php?lat=' + lat + '&lon=' + lon + '&var=' + variable + '&month=' + month,
+                function (data) {
+
+
+                    dLen = data.length;
+
+                    if (month === 'jan') {
+                        monthNum = "01";
+                    } else if (month === 'feb') {
+                        monthNum = "02";
+                    } else if (month === 'mar') {
+                        monthNum = "03";
+                    } else if (month === 'apr') {
+                        monthNum = "04";
+                    } else if (month === 'may') {
+                        monthNum = "05";
+                    } else if (month === 'jun') {
+                        monthNum = "06";
+                    } else if (month === 'jul') {
+                        monthNum = "07";
+                    } else if (month === 'aug') {
+                        monthNum = "08";
+                    } else if (month === 'sep') {
+                        monthNum = "09";
+                    } else if (month === 'oct') {
+                        monthNum = "10";
+                    } else if (month === 'nov') {
+                        monthNum = "11";
+                    } else if (month === 'dec') {
+                        monthNum = "12";
+                    } else {
+                        monthNum = 0
+                    }
+
+
+                    for (var i = 0; i < data.length; i++) {
+
+                        decimals = 2;
+
+                        if (data[i][0]) { data0 = (data[i][0] - 273.5).toFixed(decimals); } else { data0 = null }
+                        if (data[i][1]) { data1 = (data[i][1] - 273.5).toFixed(decimals); } else { data1 = null }
+                        if (data[i][2]) { data2 = (data[i][2] - 273.5).toFixed(decimals); } else { data2 = null }
+                        if (data[i][3]) { data3 = (data[i][3] - 273.5).toFixed(decimals); } else { data3 = null }
+                        if (data[i][4]) { data4 = (data[i][4] - 273.5).toFixed(decimals); } else { data4 = null }
+                        if (data[i][5]) { data5 = (data[i][5] - 273.5).toFixed(decimals); } else { data5 = null }
+                        if (data[i][6]) { data6 = (data[i][6] - 273.5).toFixed(decimals); } else { data6 = null }
+                        if (data[i][7]) { data7 = (data[i][7] - 273.5).toFixed(decimals); } else { data7 = null }
+                        if (data[i][8]) { data8 = (data[i][8] - 273.5).toFixed(decimals); } else { data8 = null }
+                        if (data[i][9]) { data9 = (data[i][9] - 273.5).toFixed(decimals); } else { data9 = null }
+                        if (data[i][10]) { data10 = (data[i][10] - 273.5).toFixed(decimals); } else { data10 = null }
+                        if (data[i][11]) { data11 = (data[i][11] - 273.5).toFixed(decimals); } else { data11 = null }
+
+                        year = 1950 + i;
+                        if (i < 56) {
+
+                            outputData.push(year + "-" + monthNum + "-01", lat, lon, data0, data1, data2, data3, data4, data5, data6, data7, data8,"\n");
+
+                        }
+                        // had to add limiter since annual values spit out a null set at the end.
+                        if (i > 54 && i < 150) {
+
+
+
+                            outputData.push(year + "-" + monthNum + "-01", lat, lon, data0, data1, data2, data3, data4, data5, data6, data7, data8,"\n");
+
+                        }
+                    }
+
+                    console.log(outputData);
+
+                    var x = outputData.toString();
+
+                    console.log(x);
+                    document.getElementById("output").innerHTML += x;
+
+                }
+            );
+
+
+
+
+        });
+
+
 
     }
 
@@ -1359,50 +1546,6 @@
     }
 
     // FORM VALIDATION
-
-    function check_email(email_val) {
-
-      var is_valid = false;
-
-      if (typeof email_val !== 'undefined' && email_val != 'undefined' && email_val != '') {
-
-        if (email_val.indexOf('@') !== -1 && email_val.indexOf('.') !== -1) {
-
-          if (email_val.indexOf('@') !== 0) {
-
-            var after_at = email_val.substring(email_val.indexOf('@'));
-
-            if (after_at.indexOf('.') !== -1) {
-
-              var after_dot = after_at.substring(after_at.indexOf('.'));
-
-              if (after_dot.length > 1) {
-
-                is_valid = true;
-
-              } else {
-                //console.log('no chars after .');
-              }
-
-            } else {
-              //console.log('no . after @');
-            }
-
-          } else {
-            //console.log('no chars before @');
-          }
-
-        } else {
-          //console.log('doesn\'t contains @ and .');
-        }
-
-      } else {
-        //console.log('blank');
-      }
-
-      return is_valid;
-
-    }
 
     function check_heat_form() {
 

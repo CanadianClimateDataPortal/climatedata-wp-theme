@@ -8,7 +8,23 @@
     <div class="form-select col-10 offset-1 col-sm-4 offset-sm-0 mb-3 mb-sm-0">
       <select class="custom-select custom-select-md select2 form-control input-large" name="download-dataset" id="download-dataset" data-container-css-class="big-menu btn btn-lg btn-outline-primary rounded-pill" data-dropdown-css-class="big-menu-dropdown">
         <option value="annual" selected><?php _e ( 'BCCAQv2 (annual)', 'cdc' ); ?></option>
+        
         <option value="daily"><?php _e ( 'BCCAQv2 (daily)', 'cdc' ); ?></option>
+        
+        <optgroup label="<?php _e ( 'Monthly', 'cdc' ); ?>">
+          <option value="jan"><?php _e ( 'January', 'cdc' ); ?></option>
+          <option value="feb"><?php _e ( 'February', 'cdc' ); ?></option>
+          <option value="mar"><?php _e ( 'March', 'cdc' ); ?></option>
+          <option value="apr"><?php _e ( 'April', 'cdc' ); ?></option>
+          <option value="may"><?php _e ( 'May', 'cdc' ); ?></option>
+          <option value="jun"><?php _e ( 'June', 'cdc' ); ?></option>
+          <option value="jul"><?php _e ( 'July', 'cdc' ); ?></option>
+          <option value="aug"><?php _e ( 'August', 'cdc' ); ?></option>
+          <option value="sep"><?php _e ( 'September', 'cdc' ); ?></option>
+          <option value="oct"><?php _e ( 'October', 'cdc' ); ?></option>
+          <option value="nov"><?php _e ( 'November', 'cdc' ); ?></option>
+          <option value="dec"><?php _e ( 'December', 'cdc' ); ?></option>
+        </optgroup>
       </select>
     </div>
     

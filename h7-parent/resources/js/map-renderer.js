@@ -10,7 +10,7 @@
     // options
     
     var defaults = {
-      hosturl: '//data.climatedata.ca',
+      hosturl: DATA_URL,
       variables: null,
       rcp: 'rcp85',
       maps: {

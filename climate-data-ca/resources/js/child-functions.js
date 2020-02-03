@@ -3,8 +3,8 @@
 //
 
 const k_to_c = 273.15;
-const data_url = '//data.climatedata.ca';
-const geoserver_url = '//data.climatedata.ca';
+const data_url = DATA_URL;
+const geoserver_url = DATA_URL;
 
 //
 // GLOBAL VARS

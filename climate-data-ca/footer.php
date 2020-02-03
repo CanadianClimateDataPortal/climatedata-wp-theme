@@ -1,12 +1,35 @@
     <?php
 
-      if ( get_field ( 'page_feedback' ) == 1 ) {
+if ( get_field ( 'page_feedback' ) == 1 ) {
 
-        include ( locate_template ( 'template/footer/contact-form.php' ) );
+  include ( locate_template ( 'template/footer/contact-form.php' ) );
 
-      }
+}
 
-      $footer_logo = get_field ( 'footer_logo', 'option' );
+$footer_logo = get_field ( 'footer_logo', 'option' );
+
+if (isset($_SERVER['HTTP_HOST'])) {
+  switch ($_SERVER['HTTP_HOST']) {
+    case "climatedata.ca":
+      $UA="UA-141104740-1";
+      break;
+    case "donneesclimatiques.ca":
+      $UA="UA-141104740-2";
+      break;
+    case "climatedata.crim.ca":
+      $UA="UA-141104740-3";
+      $DATAURL="//dataclimatedata.crim.ca";
+      break;
+    case "donneesclimatiques.crim.ca":
+      $UA="";
+      $DATAURL="//dataclimatedata.crim.ca";
+      break;
+    default:
+      $UA="";
+      $DATAURL="//data.climatedata.ca";
+  }
+}
+
 
     ?>
 
@@ -162,6 +185,7 @@
 
       var base_href = '<?php echo $GLOBALS['vars']['site_url']; ?>';
       var L_DISABLE_3D = true;
+      var DATA_URL = '<?php echo $DATAURL;?>';
     </script>
 
     <?php
@@ -170,22 +194,6 @@
 
     ?>
 <?php
-
-if (isset($_SERVER['HTTP_HOST'])) {
-  switch ($_SERVER['HTTP_HOST']) {
-    case "climatedata.ca":
-      $UA="UA-141104740-1";
-      break;
-    case "donneesclimatiques.ca":
-      $UA="UA-141104740-2";
-      break;
-    case "climatedata.crim.ca":
-      $UA="UA-141104740-3";
-      break;
-    default:
-      $UA="";
-  }
-}
 
 if (!empty($UA)) {
 ?>

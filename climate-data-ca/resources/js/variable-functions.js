@@ -682,7 +682,7 @@ maxWidth: "auto"
 
         console.log('creating sector layer');
 
-        choroPath = site_url + 'data/run-frontend-health/';
+        choroPath = child_theme_dir + 'resources/app/run-frontend-health/';
 
         if (frequency === 'ann') {
             choroPath += "annual_choro_values.php?var=" + variable + "&rcp=" + rcp
@@ -1455,7 +1455,7 @@ maxWidth: "auto"
           position: 'right',
           callback: function(varDetails) {
 
-            var valuePath = site_url + 'data/run-frontend-health/';
+            var valuePath = child_theme_dir + 'resources/app/run-frontend-health/';
 
             if (month === 'ann') {
                 valuePath += "generateAnnualChartDatawHistAllYears.php?hruid=" + hruid + "&var=" + variable

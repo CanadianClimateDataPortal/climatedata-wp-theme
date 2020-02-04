@@ -223,7 +223,7 @@
             
             console.log('creating sector layer');
   
-            plugin_settings.maps.main.layers.geojson.path = site_url + 'data/run-frontend-health/' + "annual_choro_values.php?var=" + plugin_settings.maps.main.query.variable + "&rcp=" + plugin_settings.rcp;
+            plugin_settings.maps.main.layers.geojson.path = child_theme_dir + 'resources/app/run-frontend-health/' + "annual_choro_values.php?var=" + plugin_settings.maps.main.query.variable + "&rcp=" + plugin_settings.rcp;
             
             console.log(plugin_settings.maps.main.layers.geojson.path);
             

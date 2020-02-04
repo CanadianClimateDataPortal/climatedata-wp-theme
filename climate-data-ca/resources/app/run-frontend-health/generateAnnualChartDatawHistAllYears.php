@@ -1,5 +1,7 @@
 <?php
 
+require_once "config.php";
+global $csvpath;
 
 $get_rcp = isset($_GET['rcp']) ? $_GET['rcp'] : 'rcp45';
 $get_var = isset($_GET['var']) ? $_GET['var'] : 'tx_max';
@@ -8,7 +10,7 @@ $get_hruid = isset($_GET['hruid']) ? $_GET['hruid'] : '';
 
 $get_month = isset($_GET['month']) ? $_GET['month'] : '';
 
-foreach (glob("/home/cccapi/public_html/csvs/BCCAQv2/".$get_var."/".$get_rcp."/YS/*_AllYears_Ensemble_percentiles.csv") as $filename) {
+foreach (glob($csvpath."/BCCAQv2/".$get_var."/".$get_rcp."/YS/*_AllYears_Ensemble_percentiles.csv") as $filename) {
     $Data = str_getcsv($filename, "\n"); //parse the rows
     $newcsv[] = array_map('str_getcsv', file($filename));
 }

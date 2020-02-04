@@ -790,7 +790,7 @@ maxWidth: "auto"
         pane: 'raster',
         VERSION: '1.3.0',
         bounds: canadaBounds,
-        layers: 'CDC:' + query['var'] + '-ys-rcp26-p50-ann-10year'
+        layers: 'CDC:' + query['var'] + '-ys-rcp26-p50-ann-30year'
     }).addTo(map1);
 
     leftLayer.setOpacity(10);
@@ -877,7 +877,7 @@ maxWidth: "auto"
           pane: 'raster',
           'VERSION': '1.3.0',
           bounds: canadaBounds,
-          layers: 'CDC:' + query['var'] + '-ys-rcp26-p50-ann-10year'
+          layers: 'CDC:' + query['var'] + '-ys-rcp26-p50-ann-30year'
       };
 
       rightLayer = L.tileLayer.wms(hosturl + '/geoserver/ows?', wmsOptions).addTo(mapRight);
@@ -1853,9 +1853,9 @@ maxWidth: "auto"
           right_rcp_value = 'rcp45';
       }
 
-      singleLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-10year';
-      leftLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-10year';
-      rightLayerName = var_value + '-' + msorys + '-' + right_rcp_value + '-p50' + msorysmonth + '-10year';
+      singleLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year';
+      leftLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year';
+      rightLayerName = var_value + '-' + msorys + '-' + right_rcp_value + '-p50' + msorysmonth + '-30year';
 
       var layer = leftLayerName;
       var legendTitle = mora_text_value;
@@ -2695,7 +2695,7 @@ maxWidth: "auto"
 
         }
 
-        singleLayerName = var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-10year';
+        singleLayerName = var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year';
 
         // if a compare scenario was selected
 

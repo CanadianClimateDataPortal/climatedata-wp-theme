@@ -176,7 +176,7 @@
             pane: 'raster',
             VERSION: '1.3.0',
             TIME: plugin_settings.maps.main.query.decade + '-01-00T00:00:00Z/' + (plugin_settings.maps.main.query.decade + 10) + '-01-01T00:00:00Z',
-            layers: 'CDC:' + plugin_settings.maps.main.query.variable + '-ys-' + plugin_settings.rcp + '-p50-ann-10year'
+            layers: 'CDC:' + plugin_settings.maps.main.query.variable + '-ys-' + plugin_settings.rcp + '-p50-ann-30year'
           }).addTo(plugin_settings.maps.main.object);
           
         } else if (pane_data.type == 'protobuf') {
@@ -542,9 +542,9 @@
           right_rcp_value = 'rcp45';
       }
 
-      singleLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-10year';
-      leftLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-10year';
-      rightLayerName = var_value + '-' + msorys + '-' + right_rcp_value + '-p50' + msorysmonth + '-10year';
+      singleLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year';
+      leftLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year';
+      rightLayerName = var_value + '-' + msorys + '-' + right_rcp_value + '-p50' + msorysmonth + '-30year';
       
       var layer = leftLayerName;
       var legendTitle = mora_text_value;
@@ -617,7 +617,7 @@
           opacity: 0.8,
           TIME: plugin_settings.maps.main.query.decade + '-01-00T00:00:00Z/' + (plugin_settings.maps.main.query.decade + 10) + '-01-01T00:00:00Z',
           VERSION: '1.3.0',
-          layers: 'CDC:' + plugin_settings.maps.main.query.variable + '-ys-' + plugin_settings.rcp + '-p50-ann-10year'
+          layers: 'CDC:' + plugin_settings.maps.main.query.variable + '-ys-' + plugin_settings.rcp + '-p50-ann-30year'
         });
         
       } else {

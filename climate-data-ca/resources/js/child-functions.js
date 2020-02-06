@@ -186,7 +186,7 @@ var chart_labels, legend_labels;
     //
 
     chart_labels = {
-      observation: 'Historical',
+      observation: 'Observed',
       historical: 'Modeled Historical',
       historical_range: 'Historical Range',
       rcp_26_median: 'RCP 2.6 Median',
@@ -206,8 +206,8 @@ var chart_labels, legend_labels;
     if ($('body').hasClass('lang-fr')) {
 
       chart_labels = {
-        observation: 'Historique',
-        historical: 'Historique Modelé',
+        observation: 'Observé',
+        historical: 'Historique Modélisé',
         historical_range: 'Répartition historique',
         rcp_26_median: 'RCP 2.6 médiane',
         rcp_26_range: 'RCP 2.6 portée',

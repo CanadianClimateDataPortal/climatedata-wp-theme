@@ -15,9 +15,9 @@
       open: false,
       current: null,
       position: 'top',
+      bg: '0,0,0,0.6',
       opacity: 0.6,
-      restore_supermenu: false,
-      debug: false,
+      debug: true,
       elements: {
       }
     };
@@ -38,7 +38,7 @@
       var plugin_elements = plugin_settings.elements;
 
       if (plugin_settings.debug == true) {
-        console.log('overlay');
+        // console.log('overlay');
       }
 
       //
@@ -52,6 +52,36 @@
       //plugin_elements.position = $('<div id="overlay" class="overlay-position"></div>').appendTo('body');
       plugin_elements.wrap = $('<div class="overlay-wrap container-fluid"></div>').appendTo('body');
       //plugin_elements.container = $('<div class="overlay row" data-position="' + plugin_settings.position + '"></div>');
+
+      // hide content that is linked to with an 'inline' attribute
+
+      $('body').find('.overlay-toggle[href^="#"]').each(function() {
+        var target_div = $(this).attr('href')
+        $(target_div).hide()
+      })
+
+      // convert classes to data attributes
+
+      $('body').find('.overlay-toggle[class*="overlay-"]').each(function() {
+
+        var split_class = $(this).attr('class').split(' ')
+
+        for (var key in split_class) {
+
+          if (
+            split_class[key] != 'overlay-toggle' &&
+            split_class[key].indexOf('overlay-') !== -1
+          ) {
+
+            atts = split_class[key].split('-').slice(1)
+
+            $(this).attr('data-overlay-' + atts[0], atts[1])
+
+          }
+
+        }
+
+      })
 
       //
       // ACTIONS
@@ -67,16 +97,28 @@
 
         // if the clicked link is already open
 
-        if (plugin_settings.open == true && plugin_settings.current.href == link_href && plugin_settings.current.content == overlay_content) {
-          show_overlay = false;
+        if (
+          plugin_settings.open == true &&
+          plugin_settings.current.href == link_href &&
+          plugin_settings.current.content == overlay_content
+        ) {
+
+          show_overlay = false
+
         }
 
         if (show_overlay == true) {
 
-          var overlay_position = 'top';
+          var show_options = {
+            href: link_href,
+            content: overlay_content,
+            position: 'top',
+            title: $(this).attr('data-overlay-title'),
+            caption: $(this).attr('data-overlay-caption')
+          }
 
           if (typeof $(this).attr('data-overlay-position') !== 'undefined') {
-            overlay_position = $(this).attr('data-overlay-position');
+            show_options.position = $(this).attr('data-overlay-position');
           }
 
           if (typeof $(this).attr('data-overlay-opacity') !== 'undefined') {
@@ -85,15 +127,23 @@
             plugin_settings.opacity = 0.6;
           }
 
+          if (typeof $(this).attr('data-overlay-bg') !== 'undefined') {
+            plugin_settings.bg = $(this).attr('data-overlay-bg');
+          } else {
+            plugin_settings.bg = '0,0,0,0.6'
+          }
+
           if (plugin_settings.debug == true) {
             console.log('overlay', link_href, overlay_content);
           }
 
-          plugin_instance.show({
-            href: link_href,
-            content: overlay_content,
-            position: overlay_position
-          });
+          if (typeof $(this).attr('data-overlay-ajax-target') !== 'undefined' && $(this).attr('data-overlay-ajax-target') != '') {
+
+            show_options.ajax_target = $(this).attr('data-overlay-ajax-target')
+
+          }
+
+          plugin_instance.show(show_options)
 
         }
 
@@ -116,7 +166,7 @@
       });
 
       if (plugin_settings.debug == true) {
-        console.log('overlay initialized');
+        console.log('overlay', 'initialized');
       }
 
     },
@@ -157,9 +207,9 @@
       plugin_settings.open = false;
       plugin_settings.current = null;
 
-      $('#supermenu').supermenu('enable');
+      // $('#supermenu').supermenu('enable');
 
-      $(document).trigger('overlay_hide');
+      $(document).trigger('overlay_hide')
 
     },
 
@@ -172,15 +222,35 @@
 
       // options
 
-      var defaults = {
+      var settings = $.extend(true, {
         href: null,
         data: null,
         content: null,
         position: plugin_settings.position,
+        ajax_target: null,
         callback: null
+      }, fn_options);
+
+      // adjust content
+
+      if (settings.href.charAt(0) == '#') {
+        settings.content = 'inline'
+      }
+
+      // ajax stuff
+
+      var ajax_data = {
+        content: settings.content
       };
 
-      var settings = $.extend(true, defaults, fn_options);
+      ajax_data = $.extend(ajax_data, settings.data);
+
+      // containers
+
+      var new_container, new_content
+
+      // if the overlay is already open,
+      // hide it and delay showing the new overlay
 
       var show_timeout = 0;
 
@@ -189,38 +259,117 @@
         show_timeout = 400;
       }
 
-      var ajax_data = {
-        content: settings.content
-      };
+      // plugin_elements.wrap.css('background-color', 'rgba(0,0,0,' + plugin_settings.opacity + ')');
 
-      ajax_data = $.extend(ajax_data, settings.data);
-
-      plugin_elements.wrap.css('background-color', 'rgba(0,0,0,' + plugin_settings.opacity + ')');
+      plugin_elements.wrap.css('background-color', 'rgba(' + plugin_settings.bg + ')');
 
       setTimeout(function() {
 
+        // open the overlay
+
         console.log('show');
 
-        if (settings.href.charAt(0) == '#') {
+        new_container = $('<div class="overlay row" data-content="' + settings.content + '" data-position="' + settings.position + '">').appendTo(plugin_elements.wrap);
+
+        //$('<div class="overlay-close"><i class="fas fa-times"></i></div>').insertBefore(new_container);
+
+        //
+        // CONTENT TYPES
+        //
+
+        if (settings.content == 'image') {
+
+          // add the image to the container
+
+          new_content = $('<div class="overlay-image"><img src="' + settings.href + '"></div>').appendTo(new_container);
+
+          if (settings.title || settings.caption) {
+
+            var caption_markup = '<div class="overlay-caption">'
+
+            if (settings.title) {
+              caption_markup += '<h5 class="overlay-caption-title">' + settings.title + '</h5>'
+            }
+
+            if (settings.caption) {
+              caption_markup += '<p class="overlay-caption-text">' + settings.caption + '</p>'
+            }
+
+            caption_markup += '</div>'
+
+            $(caption_markup).insertAfter(new_content)
+
+          }
+
+          // add body classes
+
+          setTimeout(function() {
+            $('body').addClass('overlay-open').removeClass('spinner-on');
+            $('body').addClass('overlay-position-' + settings.position);
+            $('body').attr('data-overlay-content', settings.content);
+          }, 1);
+
+        } else if (settings.content == 'inline') {
+          
+          new_container.addClass('bg-white')
+          
+          $('<div class="overlay-close bg-primary text-white"><i class="fas fa-times"></i></div>').insertBefore(new_container);
+
+          // inline content
 
           if (plugin_settings.debug == true) {
             console.log('inline');
           }
 
+          // find the div
+
+          if ($(settings.href).length) {
+
+            new_content = $('<div class="overlay-content col-12">').appendTo(new_container)
+
+            var inline_html = $(settings.href).clone().appendTo(new_content)
+            inline_html.show()
+
+          }
+
+          // add body classes
+
+          setTimeout(function() {
+            $('body').addClass('overlay-open').removeClass('spinner-on')
+            $('body').addClass('overlay-position-' + settings.position)
+            $('body').attr('data-overlay-content', settings.content)
+            $(document).trigger('overlay_show')
+          }, 1);
+
         } else {
+
+          // ajax
+
+          console.log('ajax');
 
           $('body').addClass('spinner-on');
 
-          var ajax_html = '';
+          var ajax_html = ''
 
           $.ajax({
             url: settings.href,
             data: ajax_data,
-            success: function(data) {
+            success: function(data, textStatus, jqXHR) {
 
-              ajax_html = data;
+              ajax_html = $(data)
 
-              var new_container = $('<div class="overlay row" data-position="' + settings.position + '">' + data + '</div>').appendTo(plugin_elements.wrap);
+              if (
+                settings.ajax_target != null &&
+                $(ajax_html).find(settings.ajax_target).length
+              ) {
+                ajax_html = $(ajax_html).find(settings.ajax_target)
+              }
+
+              if (plugin_settings.debug == true) {
+                console.log(settings.ajax_target)
+              }
+
+              ajax_html.appendTo(new_container)
 
               if (settings.position == 'right') {
                 $('<div class="overlay-close bg-primary text-white"><i class="fas fa-times"></i></div>').insertBefore(new_container);
@@ -239,17 +388,22 @@
                 callback_data = JSON.parse($(ajax_html).find('#callback-data').html());
               }
 
-              $('#supermenu').supermenu('disable');
+              if (typeof(settings.callback) == 'function') {
+                settings.callback(callback_data);
+              }
+
+              // $('#supermenu').supermenu('disable');
+
+              // add body classes
 
               setTimeout(function() {
                 $('body').addClass('overlay-open').removeClass('spinner-on');
                 $('body').addClass('overlay-position-' + settings.position);
                 $('body').attr('data-overlay-content', settings.content);
-              }, 1);
 
-              if (typeof(settings.callback) == 'function') {
-                settings.callback(callback_data);
-              }
+                $(document).trigger('overlay_show')
+
+              }, 1);
 
             }
           });
@@ -264,16 +418,6 @@
         };
 
       }, show_timeout);
-
-    },
-
-    _get_slide_index: function(link_href) {
-
-      var plugin_instance = this;
-      var plugin_item = this.item;
-      var plugin_settings = plugin_instance.options;
-
-      return plugin_item.find('[data-slug="' + link_href + '"]').index('.overlay-slide');
 
     },
 

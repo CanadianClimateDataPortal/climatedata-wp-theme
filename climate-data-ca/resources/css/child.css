@@ -4502,6 +4502,24 @@ body.supermenu-open #header-primary {
   display: flex;
   align-items: center; }
 
+#home-logos {
+  background-color: #fff; }
+  @media (min-width: 768px) {
+    #home-logos {
+      padding: 0 100px; } }
+  #home-logos .section-container {
+    padding: 10px 0; }
+  #home-logos .subsection {
+    padding: 0; }
+    #home-logos .subsection > .row {
+      align-items: center; }
+  #home-logos .block {
+    margin-bottom: 0; }
+  #home-logos .image {
+    margin-bottom: 0 !important; }
+  #home-logos h4 {
+    display: none; }
+
 #home-resources-carousel {
   overflow: hidden; }
 
@@ -4946,12 +4964,10 @@ body.stations-on #variable-content .leaflet-top.leaflet-right {
     margin-right: 0;
     margin-left: 0; }
   .variable-data-overlay .navbar {
-    position: relative;
-    width: 100%;
-    padding-right: 0px;
-    padding-left: 0px;
-    width: 77.7777777778%;
-    margin-left: 11.1111111111%; }
+    position: absolute;
+    top: 25px;
+    right: 40px;
+    z-index: 2; }
   .variable-data-overlay .overlay-content-chart {
     padding: 20px 40px;
     background-color: #f2f2f2; }
@@ -5274,20 +5290,18 @@ body.stations-on #variable-content .leaflet-top.leaflet-right {
   max-width: 100%;
   margin: auto; }
 
-.chart-navbar {
-  margin-bottom: 30px; }
-  .chart-navbar .nav-item h6 {
-    margin: 0;
-    padding-right: 1em;
-    font-size: 1.2em;
-    line-height: 1.5;
-    text-transform: uppercase; }
-  .chart-navbar .nav-item .cdc-icon {
-    margin-right: 5px;
-    font-size: 1.5em;
-    color: #6c757d; }
-  .chart-navbar .nav-item a {
-    font-size: 1.2em; }
+.chart-navbar .nav-item h6 {
+  margin: 0;
+  padding-right: 1em;
+  font-size: 1.2em;
+  line-height: 1.5;
+  text-transform: uppercase; }
+.chart-navbar .nav-item .cdc-icon {
+  margin-right: 5px;
+  font-size: 1.5em;
+  color: #6c757d; }
+.chart-navbar .nav-item a {
+  font-size: 1.2em; }
 
 .overlay-content-chart {
   position: relative;
@@ -5466,6 +5480,11 @@ body.stations-on #variable-content .leaflet-top.leaflet-right {
 #var-overlay-resource .bg-3 .card-bg {
   margin: 0 7%;
   padding-bottom: 55%; }
+
+.related-var-item span {
+  display: block;
+  margin-bottom: 0.5em;
+  font-size: 1rem; }
 
 body.overlay-open.overlay-position-top #var-filter {
   display: none; }

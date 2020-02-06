@@ -1,5 +1,8 @@
 <?php
 
+require_once "config.php";
+global $csvpath;
+
 
 $get_rcp = isset($_GET['rcp']) ? $_GET['rcp'] : 'rcp45';
 $get_var = isset($_GET['var']) ? $_GET['var'] : 'tx_max';
@@ -19,7 +22,7 @@ if ($get_month == 'oct') { $qmonth = "10October"; }
 if ($get_month == 'nov') { $qmonth = "11November"; }
 if ($get_month == 'dec') { $qmonth = "12December"; }
 
-foreach (glob("/home/cccapi/public_html/csvs/BCCAQv2/".$get_var."/".$get_rcp."/MS/*10y_Means_p50_".$qmonth.".csv") as $filename) {
+foreach (glob($csvpath."/BCCAQv2/".$get_var."/".$get_rcp."/MS/*10y_Means_p50_".$qmonth.".csv") as $filename) {
     $Data = str_getcsv($filename, "\n"); //parse the rows
     $newcsv[] = array_map('str_getcsv', file($filename));
 }

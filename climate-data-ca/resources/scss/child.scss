@@ -338,6 +338,38 @@ body {
   }
 }
 
+#home-logos {
+  background-color: $white;
+  
+  @include media-breakpoint-up(md) {
+    padding: 0 100px;
+  }
+  
+  .section-container {
+    padding: 10px 0;
+  }
+  
+  .subsection {
+    padding: 0;
+    
+    & > .row {
+      align-items: center;
+    }
+  }
+  
+  .block {
+    margin-bottom: 0;
+  }
+  
+  .image {
+    margin-bottom: 0 !important;
+  }
+  
+  h4 {
+    display: none;
+  }
+}
+
 #home-resources-carousel {
   overflow: hidden;
 }
@@ -747,6 +779,14 @@ body {
       margin: 0 7%;
       padding-bottom: 55%;
     }
+  }
+}
+
+.related-var-item {
+  span {
+    display: block;
+    margin-bottom: 0.5em;
+    font-size: 1rem;
   }
 }
 

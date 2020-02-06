@@ -115,6 +115,8 @@
       if (window.location.search != '') {
         var current_search = window.location.search.substr(1).split('&')
 
+        var current_query = {}
+
         current_search.forEach(function(entry) {
           var split_entry = entry.split('=')
           current_query[split_entry[0]] = split_entry[1]

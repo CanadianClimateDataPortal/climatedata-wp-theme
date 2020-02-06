@@ -177,6 +177,7 @@
                 dataType: 'json',
                 success: function (data) {
                       
+                  chart_objects[container.attr('id')]['chartUnit'] = chart_objects[container.attr('id')]['varDetails']['units']['value'] === 'kelvin' ? "°C" : chart_objects[container.attr('id')]['varDetails']['units']['label'];
                   chart_objects[container.attr('id')]['chartDecimals'] = chart_objects[container.attr('id')]['varDetails']['decimals'];
                   
                   var chart = Highcharts.stockChart({

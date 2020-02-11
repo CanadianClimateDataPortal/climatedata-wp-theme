@@ -12,9 +12,11 @@ if (isset($_SERVER['HTTP_HOST'])) {
   switch ($_SERVER['HTTP_HOST']) {
     case "climatedata.ca":
       $UA="UA-141104740-1";
+      $DATAURL="//data.climatedata.ca";
       break;
     case "donneesclimatiques.ca":
       $UA="UA-141104740-2";
+      $DATAURL="//data.climatedata.ca";
       break;
     case "climatedata.crim.ca":
       $UA="UA-141104740-3";

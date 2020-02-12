@@ -140,7 +140,7 @@ if (isset($_SERVER['HTTP_HOST'])) {
             </p>
 
             <div class="form-text col-6">
-              <label for="name" class="form-label all-caps"><?php _e ( 'Your name', 'cdc' ); ?></label>
+              <label for="name" class="form-label all-caps"><?php _e ( 'Full name', 'cdc' ); ?></label>
               <input type="text" name="name" id="name" class="form-control form-control-lg rounded-pill">
             </div>
           </div>

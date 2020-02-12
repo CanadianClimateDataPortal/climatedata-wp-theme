@@ -38,7 +38,7 @@ if ($securimage->check($_GET['terms-captcha_code']) == false) {
   $body .= '<p style="font-size: 80%">This message was sent at ' . current_time ('H:i:s' ) . ' on ' . current_time ( 'F j, Y' ) . '</p>';
   
   wp_mail ( $to, $subject, $body, $headers );
-  // wp_mail ( "info.cccs-ccsc@canada.ca", $subject, $body, $headers );
+  wp_mail ( "info.cccs-ccsc@canada.ca", $subject, $body, $headers );
   
   $response['message'] = 'success';
   

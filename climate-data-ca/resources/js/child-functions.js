@@ -164,11 +164,11 @@ var chart_labels, legend_labels;
 
                 captcha.removeClass('border-secondary')
 
-                form_response.html('<div class="alert alert-primary col-6 offset-4 p-5" role="alert"><h5>Success!</h5><p class="mb-0"><a href="' + response.url + '" target="_blank">Click here to download the presentation</a>.</p></div>').slideDown(250);
+                form_response.html('<div class="alert alert-primary col-6 offset-4 p-5" role="alert"><h5>' + response.message1 + '</h5><p class="mb-0"><a href="' + response.url + '" target="_blank">' + response.message2 + '</a>.</p></div>').slideDown(250);
 
               } else if (response.message == 'captcha failed') {
 
-                form_response.html('<div class="alert alert-danger col-6 offset-4" role="alert"><p class="mb-0">CAPTCHA validation failed. Please try again.</p></div>').slideDown(250);
+                form_response.html('<div class="alert alert-danger col-6 offset-4" role="alert"><p class="mb-0">' + response.message1 + '</p></div>').slideDown(250);
 
                 captcha.addClass('border border-secondary')
 

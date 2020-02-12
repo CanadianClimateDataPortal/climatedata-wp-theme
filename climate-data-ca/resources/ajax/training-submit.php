@@ -16,6 +16,7 @@ if ($_GET['email']!='') {
   if ($securimage->check($_GET['terms-captcha_code']) == false) {
     
     $response['message'] = 'captcha failed';
+    $response['message1'] = __('CAPTCHA validation failed. Please try again.','cdc');
     
   } else {
   
@@ -38,28 +39,25 @@ if ($_GET['email']!='') {
     
     $body .= '<p style="font-size: 80%">This message was sent at ' . current_time ('H:i:s' ) . ' on ' . current_time ( 'F j, Y' ) . '</p>';
   
-  // on staging installation, we don't send the e-mail to cccs
-  if (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] == "climatedata.ca" || $_SERVER['HTTP_HOST'] == "donneesclimatiques.ca")) {
-    wp_mail ( $to, $subject, $body, $headers );
-    wp_mail ( "info.cccs-ccsc@canada.ca", $subject, $body, $headers );
-  } else {
-    wp_mail ( "support-backup+training@climatedata.ca", "STAGING: $subject", $body, $headers);
-  }
-    
+    // on staging installation, we don't send the e-mail to cccs
+    if (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] == "climatedata.ca" || $_SERVER['HTTP_HOST'] == "donneesclimatiques.ca")) {
+      wp_mail ( $to, $subject, $body, $headers );
+      wp_mail ( "info.cccs-ccsc@canada.ca", $subject, $body, $headers );
+    } else {
+      wp_mail ( "support-backup+training@climatedata.ca", "STAGING: $subject", $body, $headers);
+    }
+
     $response['message'] = 'success';
-    
-    // find the attached PPT
-    
-    // $post_attachments = get_attached_media ( '', $_GET['page_ID'] );
-    
-    $response['url'] = wp_get_attachment_url ( get_field ( 'training_presentation', $_GET['page_ID'] ) );
-    
   }
 } else {
     $response['message'] = 'success';
-    $response['url'] = wp_get_attachment_url ( get_field ( 'training_presentation', $_GET['page_ID'] ) );
 }
 
 
+if ($response['message'] == 'success') {
+    $response['message1'] = __('Success!','cdc');
+    $response['message2'] = __('Click here to download the presentation','cdc');
+    $response['url'] = wp_get_attachment_url ( get_field ( 'training_presentation', $_GET['page_ID'] ) );
+}
   
 echo json_encode ( $response, JSON_PRETTY_PRINT );

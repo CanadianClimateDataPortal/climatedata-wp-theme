@@ -16,7 +16,7 @@ if ($_GET['email']!='') {
   if ($securimage->check($_GET['terms-captcha_code']) == false) {
     
     $response['message'] = 'captcha failed';
-    $response['message1'] = __('CAPTCHA validation failed. Please try again.','cdc');
+    $response['message1'] = __('Non-valid entered characters. Please try again.','cdc');
     
   } else {
   

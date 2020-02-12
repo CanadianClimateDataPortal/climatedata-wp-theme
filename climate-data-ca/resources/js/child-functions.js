@@ -76,27 +76,28 @@ var chart_labels, legend_labels;
       })
 
       // name
-
-      if (dl_form.find('#name').val() == '') {
-//         console.log('name is empty')
-        is_valid = false
+      if (dl_form.find('#name').val() != '' || dl_form.find('#email').val() != '') {
+	      if (dl_form.find('#name').val() == '') {
+	//         console.log('name is empty')
+	        is_valid = false
+	      }
+	
+	      // email
+	
+	      if (check_email(dl_form.find('#email').val()) != true ) {
+	//         console.log('email not valid')
+	        is_valid = false
+	      }
+	
+	      // captcha
+	
+	      if (dl_form.find('#terms-captcha_code').val() == '' ) {
+	//         console.log('captcha empty')
+	        is_valid = false
+	      }
       }
 
-      // email
-
-      if (check_email(dl_form.find('#email').val()) != true ) {
-//         console.log('email not valid')
-        is_valid = false
-      }
-
-      // captcha
-
-      if (dl_form.find('#terms-captcha_code').val() == '' ) {
-//         console.log('captcha empty')
-        is_valid = false
-      }
-
-      console.log('valid', is_valid)
+      //console.log('valid', is_valid)
 
       return is_valid
 

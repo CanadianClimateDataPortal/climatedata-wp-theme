@@ -900,17 +900,6 @@ maxWidth: "auto"
     function genChart(lat, lon, variable, month) {
         timerStart = Date.now();
 
-        midHistSeries = [];
-        rangeHistSeries = [];
-
-        mid26Series = [];
-        range26Series = [];
-
-        mid45Series = [];
-        range45Series = [];
-
-        mid85Series = [];
-        range85Series = [];
 
         //console.log(lat, lon, variable, month);
         //console.log(base_href + 'variable/' + $('#var').val());
@@ -929,85 +918,13 @@ maxWidth: "auto"
             $('#rcp').prop('disabled', true);
 
             $.getJSON(
-                data_url + '/get_values.php?lat=' + lat + '&lon=' + lon + '&var=' + variable + '&month=' + month,
+                data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
                 function (data) {
 
                     //console.log(varDetails);
 
-                    if (varDetails.units.value === 'kelvin') {
-                        subtractValue = k_to_c;
-                        chartUnit = "°C";
-                    } else {
-                        subtractValue = 0;
-                        chartUnit = varDetails.units.label;
-                    }
-
-                    if (month === 'jan'){
-                        monthNum = 0;
-                    } else if (month === 'feb'){
-                        monthNum = 1;
-                    } else if (month === 'mar'){
-                        monthNum = 2;
-                    } else if (month === 'apr'){
-                        monthNum = 3;
-                    } else if (month === 'may'){
-                        monthNum = 4;
-                    } else if (month === 'jun'){
-                        monthNum = 5;
-                    } else if (month === 'jul'){
-                        monthNum = 6;
-                    } else if (month === 'aug'){
-                        monthNum = 7;
-                    } else if (month === 'sep'){
-                        monthNum = 8;
-                    } else if (month === 'oct'){
-                        monthNum = 9;
-                    } else if (month === 'nov'){
-                        monthNum = 10;
-                    } else if (month === 'dec'){
-                        monthNum = 11;
-                    } else {
-                        monthNum = 0
-                    }
-
-                    for (var i = 0; i < data.length; i++) {
-
-                        chartDecimals = varDetails['decimals'];
-
-                        data[i][0] = parseFloat((data[i][0] - subtractValue).toFixed(2));
-                        data[i][1] = parseFloat((data[i][1] - subtractValue).toFixed(2));
-                        data[i][2] = parseFloat((data[i][2] - subtractValue).toFixed(2));
-
-                        data[i][3] = parseFloat((data[i][3] - subtractValue).toFixed(2));
-                        data[i][4] = parseFloat((data[i][4] - subtractValue).toFixed(2));
-                        data[i][5] = parseFloat((data[i][5] - subtractValue).toFixed(2));
-
-                        data[i][6] = parseFloat((data[i][6] - subtractValue).toFixed(2));
-                        data[i][7] = parseFloat((data[i][7] - subtractValue).toFixed(2));
-                        data[i][8] = parseFloat((data[i][8] - subtractValue).toFixed(2));
-
-                        data[i][9] = parseFloat((data[i][0]).toFixed(2));
-                        data[i][10] = parseFloat((data[i][1]).toFixed(2));
-                        data[i][11] = parseFloat((data[i][2]).toFixed(2));
-
-                        if (i < 56) {
-                            rangeHistSeries.push([Date.UTC(1950 + i, monthNum, 1), data[i][9], data[i][11]]);
-                            midHistSeries.push([Date.UTC(1950 + i, monthNum, 1), data[i][10]]);
-                        }
-                        // had to add limiter since annual values spit out a null set at the end.
-                        if (i > 54 && i < 150) {
-
-                            range26Series.push([Date.UTC(1950 + i, monthNum, 1), data[i][0], data[i][2]]);
-                            mid26Series.push([Date.UTC(1950 + i, monthNum, 1), data[i][1]]);
-                            range45Series.push([Date.UTC(1950 + i, monthNum, 1), data[i][3], data[i][5]]);
-                            mid45Series.push([Date.UTC(1950 + i, monthNum, 1), data[i][4]]);
-                            range85Series.push([Date.UTC(1950 + i, monthNum, 1), data[i][6], data[i][8]]);
-                            mid85Series.push([Date.UTC(1950 + i, monthNum, 1), data[i][7]]);
-
-
-                        }
-                    }
-
+                    chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
+                    chartDecimals = varDetails['decimals'];
 
                     var chart = Highcharts.stockChart('chart-placeholder', {
 
@@ -1052,8 +969,20 @@ maxWidth: "auto"
                         },
 
                         series: [{
+                            name: chart_labels.observation,
+                            data: data['observations'],
+                            zIndex: 1,
+                            showInNavigator: true,
+                            color: '#F47D23',
+                            marker: {
+                              fillColor: '#F47D23',
+                              lineWidth: 0,
+                              radius: 0,
+                              lineColor: '#F47D23'
+                            }
+                          }, {
                             name: chart_labels.historical,
-                            data: midHistSeries,
+                            data: data['modeled_historical_median'],
                             zIndex: 1,
                             showInNavigator: true,
                             color: '#000000',
@@ -1065,7 +994,7 @@ maxWidth: "auto"
                             }
                         }, {
                             name: chart_labels.historical_range,
-                            data: rangeHistSeries,
+                            data: data['modeled_historical_range'],
                             type: 'arearange',
                             lineWidth: 0,
                             linkedTo: ':previous',
@@ -1078,7 +1007,7 @@ maxWidth: "auto"
                             },
                         }, {
                             name: chart_labels.rcp_26_median,
-                            data: mid26Series,
+                            data: data['rcp26_median'],
                             zIndex: 1,
                             showInNavigator: true,
                             color: '#00F',
@@ -1090,7 +1019,7 @@ maxWidth: "auto"
                             }
                         }, {
                             name: chart_labels.rcp_26_range,
-                            data: range26Series,
+                            data: data['rcp26_range'],
                             type: 'arearange',
                             lineWidth: 0,
                             linkedTo: ':previous',
@@ -1103,7 +1032,7 @@ maxWidth: "auto"
                             },
                         }, {
                             name: chart_labels.rcp_45_median,
-                            data: mid45Series,
+                            data: data['rcp45_median'],
                             zIndex: 1,
                             showInNavigator: true,
                             color: '#00640c',
@@ -1115,7 +1044,7 @@ maxWidth: "auto"
                             }
                         }, {
                             name: chart_labels.rcp_45_range,
-                            data: range45Series,
+                            data: data['rcp45_range'],
                             type: 'arearange',
                             lineWidth: 0,
                             linkedTo: ':previous',
@@ -1128,7 +1057,7 @@ maxWidth: "auto"
                             }
                         }, {
                             name: chart_labels.rcp_85_median,
-                            data: mid85Series,
+                            data: data['rcp85_median'],
                             zIndex: 1,
                             showInNavigator: true,
                             color: '#F00',
@@ -1140,7 +1069,7 @@ maxWidth: "auto"
                             }
                         }, {
                             name: chart_labels.rcp_85_range,
-                            data: range85Series,
+                            data: data['rcp85_range'],
                             type: 'arearange',
                             lineWidth: 0,
                             linkedTo: ':previous',

@@ -265,12 +265,12 @@
                         data: data['observations'],
                         zIndex: 1,
                         showInNavigator: true,
-                        color: '#FFE135',
+                        color: '#F47D23',
                         marker: {
-                          fillColor: '#FFE135',
+                          fillColor: '#F47D23',
                           lineWidth: 0,
                           radius: 0,
-                          lineColor: '#FFE135'
+                          lineColor: '#F47D23'
                         }
                       }, {
                           name: chart_labels.historical,

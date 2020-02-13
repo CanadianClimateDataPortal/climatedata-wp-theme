@@ -12,9 +12,11 @@ if (isset($_SERVER['HTTP_HOST'])) {
   switch ($_SERVER['HTTP_HOST']) {
     case "climatedata.ca":
       $UA="UA-141104740-1";
+      $DATAURL="//data.climatedata.ca";
       break;
     case "donneesclimatiques.ca":
       $UA="UA-141104740-2";
+      $DATAURL="//data.climatedata.ca";
       break;
     case "climatedata.crim.ca":
       $UA="UA-141104740-3";
@@ -134,11 +136,13 @@ if (isset($_SERVER['HTTP_HOST'])) {
           <div class="form-layout-row row">
             <p class="form-label-wrap col-3 offset-1">
               <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">2</span>
-              <label for="download-dataset" class="form-label"><?php _e ( 'Your information', 'cdc' ); ?></label>
+              <label for="download-dataset" class="form-label"><?php _e ( 'Your information (optional)', 'cdc' ); ?></label>
             </p>
 
             <div class="form-text col-6">
-              <label for="name" class="form-label all-caps"><?php _e ( 'Your name', 'cdc' ); ?></label>
+              <p><?php _e ( 'We are asking for your contact information to inform you when new versions are released and to request feedback. We are continuously seeking to improve these training materials and value your input. If you have any feedback or questions please contact the <a href="https://climate-change.canada.ca/support-desk">Climate Services Support Desk</a>.' ,'cdc' ); ?></p>
+
+              <label for="name" class="form-label all-caps"><?php _e ( 'Full name', 'cdc' ); ?></label>
               <input type="text" name="name" id="name" class="form-control form-control-lg rounded-pill">
             </div>
           </div>

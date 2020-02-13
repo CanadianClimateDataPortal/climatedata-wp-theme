@@ -139,41 +139,41 @@ var chart_labels, legend_labels;
         submit_btn.click(function(e) {
           e.preventDefault()
 
-          form_response.slideUp(250, function() {
+          form_response.slideUp(125, function() {
             $(this).empty()
-          })
+            
+            var form_data = dl_form.serialize()
 
-          var form_data = dl_form.serialize()
-
-          $.ajax({
-            url: child_theme_dir + 'resources/ajax/training-submit.php',
-            data: form_data,
-            success: function(data) {
-              console.log(data)
-
-              dl_form.find('#terms-captcha_code').val('')
-
-              captcha_url = dl_form.find('#terms-captcha').attr('src')
-
-    //           dl_form.find('#terms-captcha').attr('src', '')
-              dl_form.find('#terms-captcha').attr('src', captcha_url)
-
-              var response = JSON.parse(data)
-
-              if (response.message == 'success') {
-
-                captcha.removeClass('border-secondary')
-
-                form_response.html('<div class="alert alert-primary col-6 offset-4 p-5" role="alert"><h5>' + response.message1 + '</h5><p class="mb-0"><a href="' + response.url + '" target="_blank">' + response.message2 + '</a>.</p></div>').slideDown(250);
-
-              } else if (response.message == 'captcha failed') {
-
-                form_response.html('<div class="alert alert-danger col-6 offset-4" role="alert"><p class="mb-0">' + response.message1 + '</p></div>').slideDown(250);
-
-                captcha.addClass('border border-secondary')
-
+            $.ajax({
+              url: child_theme_dir + 'resources/ajax/training-submit.php',
+              data: form_data,
+              success: function(data) {
+                console.log(data)
+  
+                dl_form.find('#terms-captcha_code').val('')
+  
+                captcha_url = dl_form.find('#terms-captcha').attr('src')
+  
+      //           dl_form.find('#terms-captcha').attr('src', '')
+                dl_form.find('#terms-captcha').attr('src', captcha_url)
+  
+                var response = JSON.parse(data)
+  
+                if (response.message == 'success') {
+  
+                  captcha.removeClass('border-secondary')
+  
+                  form_response.html('<div class="alert alert-primary col-6 offset-4 p-5" role="alert"><h5>' + response.message1 + '</h5><p class="mb-0"><a href="' + response.url + '" target="_blank">' + response.message2 + '</a>.</p></div>').slideDown(250);
+  
+                } else if (response.message == 'captcha failed') {
+  
+                  form_response.html('<div class="alert alert-danger col-6 offset-4" role="alert"><p class="mb-0">' + response.message1 + '</p></div>').slideDown(250);
+  
+                  captcha.addClass('border border-secondary')
+  
+                }
               }
-            }
+            })
           })
 
         })

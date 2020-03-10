@@ -118,7 +118,7 @@
   
   <div id="download-filetype" class="form-layout-row row align-items-center">
     <p class="form-label-wrap col-10 col-sm-3 offset-1 mb-3 mb-sm-0">
-      <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">3</span>
+      <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">4</span>
       <label for="format" class="form-label"><?php _e ( 'Select a data format', 'cdc' ); ?></label>
     </p>
     

@@ -49,6 +49,22 @@
       </p>
     </div>
   </div>
+
+  <div id="heatwave-filetype" class="form-layout-row row align-items-center">
+    <p class="form-label-wrap col-10 col-sm-3 offset-1 mb-3 mb-sm-0"></p>
+    
+    <div class="form-select col-10 offset-1 col-sm-4 offset-sm-0">
+      <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+        <label class="btn btn-outline-primary active">
+          <input type="radio" name="heatwave-download-format" autocomplete="off" value="csv" checked> CSV
+        </label>
+        
+        <label class="btn btn-outline-primary">
+          <input type="radio" name="heatwave-download-format" autocomplete="off" value="netcdf"> NetCDF
+        </label>
+      </div>
+    </div>
+  </div>
   
   <div id="heat-wave-process-wrap">
     <div class="form-layout-row form-process">

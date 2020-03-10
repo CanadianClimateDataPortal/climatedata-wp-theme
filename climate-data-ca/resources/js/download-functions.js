@@ -1564,7 +1564,7 @@
                         },
                         {
                             "id": "output_format",
-                            "data": "netcdf"  // (netcdf, csv) defaults to netcdf, csv is not yet implemented. You'll get an empty csv.
+                            "data": $('input[name="heatwave-download-format"]:checked').val()
                         },
                     ],
                     "response": "document",

@@ -974,6 +974,7 @@ maxWidth: "auto"
                             zIndex: 1,
                             showInNavigator: true,
                             color: '#F47D23',
+                            visible: false,
                             marker: {
                               fillColor: '#F47D23',
                               lineWidth: 0,

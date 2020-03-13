@@ -92,7 +92,7 @@
         </div>
         
         <div class="col-8-of-8 p-4">
-          <p class="form-label-wrap mt-3"><strong><?php _e ( 'Note:', 'cdc' ); ?></strong> <?php _e ( 'This is an experimental functionality. This data requires 30 to 90 minutes of processing time. All data will be delivered in a NetCDF file via an email notification once the processing is complete. Don’t forget to check your spam folder.', 'cdc' ); ?></p>
+          <p class="form-label-wrap mt-3"><strong><?php _e ( 'Note:', 'cdc' ); ?></strong> <?php _e ( 'This is an experimental functionality. This data requires 30 to 90 minutes of processing time. All data will be delivered via an email notification once the processing is complete. Don’t forget to check your spam folder.', 'cdc' ); ?></p>
         </div>
         
       </div>

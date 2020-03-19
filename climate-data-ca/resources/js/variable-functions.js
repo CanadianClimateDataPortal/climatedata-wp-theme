@@ -62,7 +62,7 @@
     if ($('#decade').length) {
       query['decade'] = $('#decade').val();
     } else {
-      query['decade'] = '1980s';
+      query['decade'] = '1971-2000';
     }
 
     if ($('#sector').length) {
@@ -131,7 +131,7 @@
           decade_slider_options.from = z;
         }
 
-        decade_slider_options['values'].push(i + 's');
+        decade_slider_options['values'].push(i+1 + '-' + (i+30));
 
         z += 1;
 
@@ -148,10 +148,10 @@
         values: decade_slider_options.values,
 
         onChange: function (data) {
+	  newval = (data.from_value.split("-")[0] -1 ) + "s";
+          $('#decade').val(newval).trigger('change');
 
-          $('#decade').val(data.from_value).trigger('change');
-
-          update_param('decade', data.from_value);
+          update_param('decade', newval);
 
           console.log('done updating decade, update query string now');
           update_query_string();
@@ -1879,7 +1879,7 @@ maxWidth: "auto"
                 mora_value = $("#mora").val();
                 mora_text_value = $("#mora option:selected").text();
                 rcp_value = $("#rcp").val();
-                decade_value = parseInt($("#decade").val());
+                decade_value = parseInt($("#decade").val()) +1;
 
                 genChoro(decade_value, var_value, rcp_value, mora_value, colormap);
 
@@ -2642,7 +2642,7 @@ maxWidth: "auto"
               transparent: true,
               opacity: 1,
               pane: 'raster',
-              'TIME': decade_value + '-01-00T00:00:00Z/' + (decade_value + 10) + '-01-01T00:00:00Z',
+              'TIME': decade_value + '-01-00T00:00:00Z',
               'VERSION': '1.3.0',
               layers: 'CDC:' + leftLayerName
           });
@@ -2655,7 +2655,7 @@ maxWidth: "auto"
                 transparent: true,
                 opacity: 1,
                 pane: 'raster',
-                'TIME': decade_value + '-01-00T00:00:00Z/' + (decade_value + 10) + '-01-01T00:00:00Z',
+                'TIME': decade_value + '-01-00T00:00:00Z',
                 'VERSION': '1.3.0',
                 layers: 'CDC:' + rightLayerName
             });
@@ -2676,7 +2676,7 @@ maxWidth: "auto"
               format: 'image/png',
               transparent: true,
               opacity: 1,
-              'TIME': decade_value + '-01-00T00:00:00Z/' + (decade_value + 10) + '-01-01T00:00:00Z',
+              'TIME': decade_value + '-01-00T00:00:00Z',
               'VERSION': '1.3.0',
               layers: 'CDC:' + singleLayerName
           });

@@ -1,52 +1,52 @@
 <?php
-  
+
   /*
-    
+
     Template Name: Download
-    
+
   */
-  
+
   //
   // ENQUEUE
   //
-  
+
   function tpl_enqueue() {
-    
+
     wp_enqueue_script ( 'download-functions' );
-    
+
     wp_enqueue_script ( 'highcharts-highstock' );
     wp_enqueue_script ( 'highcharts-more' );
     wp_enqueue_script ( 'highcharts-exporting' );
     wp_enqueue_script ( 'highcharts-export-data' );
-    
+
     wp_enqueue_script ( 'leaflet' );
-    
+
     wp_enqueue_script ( 'vector-grid' );
     wp_enqueue_script ( 'sync' );
     wp_enqueue_script ( 'nearest' );
-    
+
     wp_enqueue_script ( 'jquery-ui-core' );
     wp_enqueue_script ( 'jquery-ui-widget' );
     wp_enqueue_script ( 'jquery-effects-core' );
     wp_enqueue_script ( 'jquery-ui-tabs' );
-    
+
     wp_enqueue_script ( 'moment', 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js', null, null, true );
     wp_enqueue_script ( 'tempusdominus', 'https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js', array ( 'jquery' ), null, true );
-    
+
     wp_enqueue_style ( 'tempusdominus', 'https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css', null, null, 'all' );
-    
+
   }
-  
+
   add_action ( 'wp_enqueue_scripts', 'tpl_enqueue' );
-  
+
   //
   // TEMPLATE
   //
 
   get_header();
-  
+
   if ( have_posts() ) : while ( have_posts() ) : the_post();
-  
+
     $get_start_date = isset($_GET['start_date']) ? $_GET['start_date'] : '';
     $get_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
     $get_selected_stations = isset($_GET['s']) ? $_GET['s'] : '';
@@ -54,65 +54,65 @@
     $get_limit = isset($_GET['limit']) ? $_GET['limit'] : 150000;
     $get_offset = isset($_GET['offset']) ? $_GET['offset'] : 0;
     $get_generated = isset($_GET['generated']) ? $_GET['generated'] : '';
-  
+
     if ($get_generated == 1 && !$get_selected_stations) {
       $station_error = '<span class="badge badge-danger">Please choose at least one station</span>';
     } else {
       $station_error = null;
     }
-  
+
     if ( is_array ( $get_selected_stations ) ) {
-      
+
       $station_choice = implode(',', $get_selected_stations);
       $station_count = count($get_selected_stations);
       $station_choice_pipes = implode('|', $get_selected_stations);
-      
+
     }
-  
+
 ?>
 
 <main id="download-content">
-  
+
   <?php
-    
+
     include ( locate_template ( 'template/hero/hero.php' ) );
-    
+
   ?>
-  
+
   <nav class="navbar navbar-expand navbar-light bg-light">
-    
+
     <ul class="navbar-nav tabs-nav w-100 justify-content-center">
       <li class="nav-item"><a href="#var-download" class="nav-link px-4 py-5 all-caps"><?php _e ( 'Variable Data', 'cdc' ); ?></a></li>
       <li class="nav-item"><a href="#station-download" class="nav-link px-4 py-5 all-caps"><?php _e ( 'Station Data', 'cdc' ); ?></a></li>
       <li class="nav-item"><a href="#heat-wave-analysis" class="nav-link px-4 py-5 all-caps"><?php _e ( 'Heat Wave Analysis', 'cdc' ); ?></a></li>
     </ul>
-    
+
   </nav>
-  
+
   <section id="var-download" class="page-section tab">
     <?php
-      
+
       include ( locate_template ( 'template/download/variable.php' ) );
-      
+
     ?>
   </section>
-  
+
   <section id="station-download" class="page-section tab">
     <?php
-      
+
       include ( locate_template ( 'template/download/station-data.php' ) );
-      
+
     ?>
   </section>
-  
+
   <section id="heat-wave-analysis" class="page-section tab">
     <?php
-      
+
       include ( locate_template ( 'template/download/heat-wave.php' ) );
-      
+
     ?>
   </section>
-  
+
 </main>
 
 <div id="dummy-chart" style="position: absolute; left: -9999px; top: -9999px; width: 500px; height: 500px;"></div>
@@ -127,16 +127,16 @@
         </button>
       </div>
       <div class="modal-body">
-        <p><?php _e ( 'Your request has been submitted. The processed data will be sent your email address shortly.', 'cdc' ); ?></p>
+        <p><?php _e ( 'Your request has been submitted. The processed data will be sent to your email address shortly.', 'cdc' ); ?></p>
       </div>
     </div>
   </div>
 </div>
 
 <?php
-  
+
   endwhile; endif;
-  
+
   get_footer();
-  
+
 ?>

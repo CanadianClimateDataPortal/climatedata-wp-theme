@@ -19,6 +19,8 @@
     var gridline_width = '0.2';
     var gridline_width_active = '1';
 
+    var ajax_url = base_href.replace('fr/', '');
+
     //
     // VENDOR
     //
@@ -187,17 +189,21 @@
     subtractValue = 0
     varDetails = {}
 
+    selectedGrids = []
+    selectedPoints = []
+    latlons = []
+
     function var_init() {
 
       create_map('variable');
 
-      var highlight;
+      var highlightGridFeature;
 
       var clearHighlight = function () {
-          if (highlight) {
-              pbfLayer.resetFeatureStyle(highlight);
+          if (highlightGridFeature) {
+              pbfLayer.resetFeatureStyle(highlightGridFeature);
           }
-          highlight = null;
+          highlightGridFeature = null;
       };
 
       var vectorTileOptions = {
@@ -232,314 +238,84 @@
 
       var pbfLayer = L.vectorGrid.protobuf(pbfURL, vectorTileOptions).on('click', function (e) {
 
-          clearHighlight();
+        highlightGridFeature = e.layer.properties.gid;
 
-          highlight = e.layer.properties.gid;
+        selectedPoints[highlightGridFeature] = e.latlng;
 
-          pbfLayer.setFeatureStyle(highlight, {
-              weight: 1,
-              color: gridline_color_active,
-              opacity: 1,
-              fill: true,
-              radius: 4,
-              fillOpacity: 0
-          });
+        var selectedExists = selectedGrids.includes(highlightGridFeature);
 
-          var_value = $("#var").val();
-          mora_value = $("#mora").val();
+//         console.log(selectedGrids, highlightGridFeature, selectedExists)
 
-          $('#download-lat').val(e.latlng.lat);
-          $('#download-lon').val(e.latlng.lng);
+        if (selectedExists === false) {
 
-          var ajax_url = base_href.replace('fr/', '');
+            selectedGrids.push(highlightGridFeature);
 
-          //console.log(ajax_url);
+            pbfLayer.setFeatureStyle(highlightGridFeature, {
+                weight: 1,
+                color: '#F00',
+                opacity: 1,
+                fill: true,
+                radius: 4,
+                fillOpacity: 0.1
+            });
 
-          $.ajax({
-            url: ajax_url + '/site/assets/themes/climate-data-ca/resources/ajax/get-place-by-coords.php',
-            dataType: 'json',
-            data: {
-              lat: e.latlng.lat,
-              lon: e.latlng.lng
-            },
-            success: function(data) {
-              //console.log(data);
+        } else {
 
-              if (data.hasOwnProperty('geo_name')) {
-
-                $('#download-location').parent().find('.select2-selection__rendered').text(data['geo_name'] + ', ' + data['province']);
-
-              }
+            for (var i = selectedGrids.length - 1; i >= 0; i--) {
+                if (selectedGrids[i] === highlightGridFeature) {
+                    selectedGrids.splice(i, 1);
+                }
             }
-          });
 
-          // get the variable details
+            for (var i = selectedPoints.length - 1; i >= 0; i--) {
 
-          $.ajax({
-            url: ajax_url + 'variable/' + $('#download-variable').val() + '/',
-            data: {
-              content: 'location'
-            },
-            success: function(data) {
-              varDetails = JSON.parse($(data).find('#callback-data').html())
-            },
-            complete: function() {
-
-              // genChart
-
-              timerStart = Date.now();
-
-              midHistSeries = [];
-              rangeHistSeries = [];
-
-              mid26Series = [];
-              range26Series = [];
-
-              mid45Series = [];
-              range45Series = [];
-
-              mid85Series = [];
-              range85Series = [];
-
-              //console.log('get_values.php?lat=' + e.latlng.lat + '&lon=' + e.latlng.lng + '&var=' + $('#download-variable').val() + '&month=ann');
-
-              $.getJSON(
-                  data_url + '/get_values.php?lat=' + e.latlng.lat + '&lon=' + e.latlng.lng + '&var=' + $('#download-variable').val() + '&month=ann',
-                  function (data) {
-
-                      if (varDetails.units.value === 'kelvin') {
-                          subtractValue = k_to_c;
-                          chartUnit = "°C";
-                      } else {
-                          subtractValue = 0;
-                          chartUnit = varDetails.units.label;
-                      }
-
-                      seconds = (Date.now() - timerStart) * 0.001;
-                      //$('#loadtime').html(" <strong style=color:blue>Loaded in " + seconds + " seconds</strong>");
-
-                      dLen = data.length;
-
-                      for (var i = 0; i < data.length; i++) {
-
-                          data[i][0] = parseFloat((data[i][0] - subtractValue).toFixed(2));
-                          data[i][1] = parseFloat((data[i][1] - subtractValue).toFixed(2));
-                          data[i][2] = parseFloat((data[i][2] - subtractValue).toFixed(2));
-
-                          data[i][3] = parseFloat((data[i][3] - subtractValue).toFixed(2));
-                          data[i][4] = parseFloat((data[i][4] - subtractValue).toFixed(2));
-                          data[i][5] = parseFloat((data[i][5] - subtractValue).toFixed(2));
-
-                          data[i][6] = parseFloat((data[i][6] - subtractValue).toFixed(2));
-                          data[i][7] = parseFloat((data[i][7] - subtractValue).toFixed(2));
-                          data[i][8] = parseFloat((data[i][8] - subtractValue).toFixed(2));
-
-                          data[i][9] = parseFloat((data[i][0]).toFixed(2));
-                          data[i][10] = parseFloat((data[i][1]).toFixed(2));
-                          data[i][11] = parseFloat((data[i][2]).toFixed(2));
-
-                          if (i < 56) {
-                              rangeHistSeries.push([Date.UTC(1950 + i, 0, 1), data[i][9], data[i][11]]);
-                              midHistSeries.push([Date.UTC(1950 + i, 0, 1), data[i][10]]);
-                          }
-                          // had to add limiter since annual values spit out a null set at the end.
-                          if (i > 54 && i < 150) {
-
-                              range26Series.push([Date.UTC(1950 + i, 0, 1), data[i][0], data[i][2]]);
-                              mid26Series.push([Date.UTC(1950 + i, 0, 1), data[i][1]]);
-                              range45Series.push([Date.UTC(1950 + i, 0, 1), data[i][3], data[i][5]]);
-                              mid45Series.push([Date.UTC(1950 + i, 0, 1), data[i][4]]);
-                              range85Series.push([Date.UTC(1950 + i, 0, 1), data[i][6], data[i][8]]);
-                              mid85Series.push([Date.UTC(1950 + i, 0, 1), data[i][7]]);
-                          }
-                      }
-
-                      chart = Highcharts.stockChart('dummy-chart', {
-                          chart: {
-                              height: '700px',
-                              zoomType: 'x',
-                              animation: false,
-                              backgroundColor: 'transparent',
-                              style: {
-                                  fontFamily: 'CDCSans'
-                              }
-                          },
-                          title: {
-                              align: 'left',
-                              style: {
-                                fontWeight: 600
-                              },
-                              text: 'Max Temperature (°C)'
-                          },
-                          subtitle: {
-                              align: 'left',
-                              text: document.ontouchstart === undefined ?
-                                  'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
-                          },
-
-                          xAxis: {
-                              type: 'datetime'
-                          },
-
-                          yAxis: {
-                              title: {
-                                  text: 'Max Temperature (°C)'
-                              }
-                          },
-                          legend: {
-                              enabled: true,
-                              align: 'right',
-                              verticalAlign: 'top',
-                              itemStyle: {
-                                  textTransform: 'uppercase',
-                                  color: '#727c9a'
-                              }
-                          },
-                           rangeSelector: {
-                              inputEnabled: false,
-                              buttonTheme: {
-                                  visibility: 'hidden'
-                              },
-                              labelStyle: {
-                                  visibility: 'hidden'
-                              }
-                          },
-
-                          tooltip: {
-                              crosshairs: true,
-                              shared: true,
-                              split: false,
-                              valueSuffix: '°C'
-                          },
-
-                          exporting: {
-                            filename: 'ClimateData.ca Export'
-                          },
-
-                          series: [{
-                              name: chart_labels.historical,
-                              data: midHistSeries,
-                              zIndex: 1,
-                              showInNavigator: true,
-                              color: '#000000',
-                              marker: {
-                                  fillColor: '#000000',
-                                  lineWidth: 0,
-                                  radius: 0,
-                                  lineColor: '#000000'
-                              }
-                          }, {
-                              name: chart_labels.historical_range,
-                              data: rangeHistSeries,
-                              type: 'arearange',
-                              lineWidth: 0,
-                              linkedTo: ':previous',
-                              color: '#000000',
-                              fillOpacity: 0.2,
-                              zIndex: 0,
-                              marker: {
-                                  radius: 0,
-                                  enabled: false
-                              },
-                          }, {
-                              name: chart_labels.rcp_26_median,
-                              data: mid26Series,
-                              zIndex: 1,
-                              showInNavigator: true,
-                              color: '#00F',
-                              marker: {
-                                  fillColor: '#00F',
-                                  lineWidth: 0,
-                                  radius: 0,
-                                  lineColor: '#00F'
-                              }
-                          }, {
-                              name: chart_labels.rcp_26_range,
-                              data: range26Series,
-                              type: 'arearange',
-                              lineWidth: 0,
-                              linkedTo: ':previous',
-                              color: '#00F',
-                              fillOpacity: 0.2,
-                              zIndex: 0,
-                              marker: {
-                                  radius: 0,
-                                  enabled: false
-                              },
-                          }, {
-                              name: chart_labels.rcp_45_median,
-                              data: mid45Series,
-                              zIndex: 1,
-                              showInNavigator: true,
-                              color: '#00640c',
-                              marker: {
-                                  fillColor: '#00640c',
-                                  lineWidth: 0,
-                                  radius: 0,
-                                  lineColor: '#00640c'
-                              }
-                          }, {
-                              name: chart_labels.rcp_45_range,
-                              data: range45Series,
-                              type: 'arearange',
-                              lineWidth: 0,
-                              linkedTo: ':previous',
-                              color: '#00640c',
-                              fillOpacity: 0.2,
-                              zIndex: 0,
-                              marker: {
-                                  radius: 0,
-                                  enabled: false
-                              }
-                          }, {
-                              name: chart_labels.rcp_85_median,
-                              data: mid85Series,
-                              zIndex: 1,
-                              showInNavigator: true,
-                              color: '#F00',
-                              marker: {
-                                  fillColor: '#F00',
-                                  lineWidth: 0,
-                                  radius: 0,
-                                  lineColor: '#F00'
-                              }
-                          }, {
-                              name: chart_labels.rcp_85_range,
-                              data: range85Series,
-                              type: 'arearange',
-                              lineWidth: 0,
-                              linkedTo: ':previous',
-                              color: '#F00',
-                              fillOpacity: 0.2,
-                              zIndex: 0,
-                              marker: {
-                                  radius: 0,
-                                  enabled: false
-                              }
-                          }]
-                      });
-
-                  }
-              );
-
+                if (selectedPoints[highlightGridFeature]) {
+                    selectedPoints.splice(i, 1);
+                }
             }
-          })
 
-          // console.log(var_value);
-          //console.log(mora_value);
+            pbfLayer.setFeatureStyle(highlightGridFeature, {
+                weight: 0.1,
+                color: gridline_color,
+                opacity: 1,
+                fill: true,
+                radius: 4,
+                fillOpacity: 0
+            });
 
-          L.DomEvent.stop(e);
+        }
 
-          checkform();
+        //console.log(selectedGrids)
 
-      }).addTo(maps['variable']);
+        var points_to_process = selectedGrids.length
 
-      $('#var-download .select2').on('select2:select', function(e) {
-        clearHighlight()
+        var_value = $("#download-variable").val(); //'tx_max'; //$("#var").val();
+        mora_value = $("#download-dataset").val();
+
+        if (mora_value == 'annual') {
+          mora_value = 'ann'
+        }
+
+        if (selectedGrids.length > 0) {
+          $('#download-location').parent().find('.select2-selection__rendered').text(selectedGrids.length + ' selected')
+        } else {
+          $('#download-location').parent().find('.select2-selection__rendered').text('Search for a City/Town')
+        }
+
+        var current_coords = $('#download-coords').val()
+
+        current_coords += '|' + e.latlng.lat + ',' + e.latlng.lng + ',' + highlightGridFeature
+
+        $('#download-coords').val(current_coords)
+
+        L.DomEvent.stop(e);
+
         checkform()
 
-        $('#download-lat').val('');
-        $('#download-lon').val('');
+      }).addTo(maps['variable'])
+
+      $('#var-download .select2').on('select2:select', function(e) {
+        checkform()
       })
 
     }
@@ -552,81 +328,277 @@
 
       //console.log('checking form');
 
+      $('#download-result').slideUp(125)
+
       var form_valid = false;
 
-      if ($('#download-dataset').val() == 'annual') {
+      if ($('#download-dataset').val() == 'daily') {
 
-        if ($('#download-filename').hasClass('valid') && $('#download-lat').val() != '' && $('#download-lon').val() != '') {
+        // DAILY DATA
+
+        if (
+          $('body').validate_email($('#daily-email').val()) == true &&
+          $('#daily-captcha_code').val() != '' &&
+          $('#download-coords').val() != ''
+        ) {
+
+          $('#daily-process').removeClass('disabled');
+
+        } else {
+
+          $('#daily-process').addClass('disabled');
+
+        }
+
+      } else {
+
+        console.log('monthly')
+
+        // MONTHLY OR ANNUAL
+
+        // if a filename is entered and the hidden lat/lon inputs have values
+
+        if (
+          $('#download-filename').hasClass('valid') &&
+          $('#download-coords').val() != ''
+        ) {
           form_valid = true;
         }
 
         if (form_valid == true) {
 
-          $('#download-process').attr('download', $('#download-filename').val() + '.' + $('input[name="download-format"]:checked').val());
-
-          if ($('input[name="download-format"]:checked').val() == 'json') {
-
-            //console.log('get data', data_url + '/download_csv.php?lat=' + $('#download-lat').val() + '&lon=' + $('#download-lon').val() + '&var=' + $('#download-variable').val());
-
-            var json_data;
-
-            $('body').addClass('spinner-on');
-
-            $.ajax({
-              url: data_url + '/download_csv.php?lat=' + $('#download-lat').val() + '&lon=' + $('#download-lon').val() + '&var=' + $('#download-variable').val(),
-              success: function (data) {
-                //console.log('success');
-
-                json_data = JSON.parse(data);
-
-                data_obj = json_data[1]['data'];
-
-                i = 0;
-                z = 0;
-
-                for (var year in data_obj) {
-
-                  for (var val in data_obj[year]) {
-
-                    if (data_obj[year][val] !== null) {
-                      data_obj[year][val] = parseFloat((data_obj[year][val] - subtractValue).toFixed(2));
-                    }
-
-                    z += 1;
-
-                  }
-
-                  i += 1;
-
-                }
-
-                json_data[1]['data'] = data_obj;
-
-                $('#download-process').attr('href', "data:application/json," + encodeURIComponent(JSON.stringify(json_data))).removeClass('disabled');
-
-                $('body').removeClass('spinner-on');
-
-              }
-            });
-
-          } else {
-
-            $('#download-process').removeClass('disabled');
-
-          }
+//           console.log('form is valid')
+          $('#download-process').removeClass('disabled');
 
         } else {
           $('#download-process').addClass('disabled');
           //$('#download-process').prop('disabled', true);
         }
 
-      } else if ($('#download-dataset').val() == 'daily') {
+      }
 
-        if (check_email($('#daily-email').val()) == true && $('#daily-captcha_code').val() != '' && $('#download-lat').val() != '' && $('#download-lon').val() != '') {
-          $('#daily-process').removeClass('disabled');
-        } else {
-          $('#daily-process').addClass('disabled');
-        }
+    }
+
+    function process_download() {
+
+      var output_JSON = []
+
+      var output_CSV = "DATE, LATITUDE, LONGITUDE, RCP 2.6 MIN, RCP 2.6 MEAN, RCP 2.6 MAX, RCP 4.5 MIN, RCP 4.5 MEAN, RCP 4.5 MAX, RCP 8.5 MIN, RCP 8.5 MEAN, RCP 8.5 MAX\n"
+
+      var split_coords = $('#download-coords').val().split('|')
+
+      // remove first element which is empty because the first character is always '|'
+      split_coords.shift()
+
+      var coords_to_process = selectedGrids.length
+
+      $('body').addClass('spinner-on');
+
+      if ($('input[name="download-format"]:checked').val() == 'csv') {
+
+        // get the variable details
+
+        $.ajax({
+          url: ajax_url + 'variable/' + $('#download-variable').val() + '/',
+          data: {
+            content: 'location'
+          },
+          success: function(data) {
+            console.log('success')
+            varDetails = JSON.parse($(data).find('#callback-data').html())
+          },
+          complete: function() {
+
+              month = $("#download-dataset").val();
+
+              if (month == 'annual') {
+                month = 'ann'
+              }
+
+              selectedPoints.forEach(function(entry) {
+
+                  $.getJSON(
+                      'https://data.climatedata.ca/get_values.php?lat=' + entry.lat + '&lon=' + entry.lng + '&var=' + $('#download-variable').val() + '&month=' + month,
+                      function (data) {
+
+                          midHistSeries = [];
+                          rangeHistSeries = [];
+
+                          mid26Series = [];
+                          range26Series = [];
+
+                          mid45Series = [];
+                          range45Series = [];
+
+                          mid85Series = [];
+                          range85Series = [];
+
+                          dLen = data.length;
+
+                          if (month === 'ann' || month === 'jan') {
+                              monthNum = "01";
+                          } else if (month === 'feb') {
+                              monthNum = "02";
+                          } else if (month === 'mar') {
+                              monthNum = "03";
+                          } else if (month === 'apr') {
+                              monthNum = "04";
+                          } else if (month === 'may') {
+                              monthNum = "05";
+                          } else if (month === 'jun') {
+                              monthNum = "06";
+                          } else if (month === 'jul') {
+                              monthNum = "07";
+                          } else if (month === 'aug') {
+                              monthNum = "08";
+                          } else if (month === 'sep') {
+                              monthNum = "09";
+                          } else if (month === 'oct') {
+                              monthNum = "10";
+                          } else if (month === 'nov') {
+                              monthNum = "11";
+                          } else if (month === 'dec') {
+                              monthNum = "12";
+                          } else {
+                              monthNum = 0
+                          }
+
+                          if (varDetails.units.value === 'kelvin') {
+                              subtractValue = k_to_c;
+                              chartUnit = "°C";
+                          } else {
+                              subtractValue = 0;
+                              chartUnit = varDetails.units.label;
+                          }
+
+                        console.log('making CSV')
+
+                        for (var i = 0; i < data.length; i++) {
+
+                            decimals = 2;
+
+                            if (data[i][0]) { data0 = (data[i][0] - subtractValue).toFixed(decimals); } else { data0 = null }
+                            if (data[i][1]) { data1 = (data[i][1] - subtractValue).toFixed(decimals); } else { data1 = null }
+                            if (data[i][2]) { data2 = (data[i][2] - subtractValue).toFixed(decimals); } else { data2 = null }
+                            if (data[i][3]) { data3 = (data[i][3] - subtractValue).toFixed(decimals); } else { data3 = null }
+                            if (data[i][4]) { data4 = (data[i][4] - subtractValue).toFixed(decimals); } else { data4 = null }
+                            if (data[i][5]) { data5 = (data[i][5] - subtractValue).toFixed(decimals); } else { data5 = null }
+                            if (data[i][6]) { data6 = (data[i][6] - subtractValue).toFixed(decimals); } else { data6 = null }
+                            if (data[i][7]) { data7 = (data[i][7] - subtractValue).toFixed(decimals); } else { data7 = null }
+                            if (data[i][8]) { data8 = (data[i][8] - subtractValue).toFixed(decimals); } else { data8 = null }
+                            if (data[i][9]) { data9 = (data[i][9] - subtractValue).toFixed(decimals); } else { data9 = null }
+                            if (data[i][10]) { data10 = (data[i][10] - subtractValue).toFixed(decimals); } else { data10 = null }
+                            if (data[i][11]) { data11 = (data[i][11] - subtractValue).toFixed(decimals); } else { data11 = null }
+
+                            year = 1950 + i;
+                            if (i < 56) {
+
+                                output_CSV += year + "-" + monthNum + "-01," + entry.lat + ',' + entry.lng + ',' + data0 + ',' + data1 + ',' + data2 + ',' + data3 + ',' + data4 + ',' + data5 + ',' + data6 + ',' + data7 + ',' + data8 + ',' + "\n"
+
+                            }
+                            // had to add limiter since annual values spit out a null set at the end.
+                            if (i > 54 && i < 150) {
+
+                                output_CSV += year + "-" + monthNum + "-01," + entry.lat + ',' + entry.lng + ',' + data0 + ',' + data1 + ',' + data2 + ',' + data3 + ',' + data4 + ',' + data5 + ',' + data6 + ',' + data7 + ',' + data8 + ',' + "\n"
+
+                            }
+                        }
+
+                        if (coords_to_process == 1) {
+
+                          //console.log(output_CSV)
+
+                          $('#download-result a').attr('href', 'data:text/csv;charset=utf-8,' + escape(output_CSV));
+                          $('#download-result a').attr('download', $('#download-filename').val() + '.csv');
+                          $('#download-result').slideDown(250)
+
+                          $('body').removeClass('spinner-on');
+
+                        } else {
+                          coords_to_process -= 1
+                        }
+
+                        chart = null
+                        $('#dummy-chart').empty()
+
+                      }
+                  );
+
+              }); // selectedPoints.forEach
+
+          }
+
+        }) // varDetails ajax
+
+      } else if ($('input[name="download-format"]:checked').val() == 'json') {
+
+        $('body').addClass('spinner-on');
+
+        var json_data = []
+
+        split_coords.forEach(function(entry) {
+
+          var this_coord = entry.split(',') // [0] lat [1] lon [2] id
+
+          console.log('get data', data_url + '/download_csv.php?lat=' + this_coord[0] + '&lon=' + this_coord[0] + '&var=' + $('#download-variable').val());
+
+          $.ajax({
+            url: data_url + '/download_csv.php?lat=' + this_coord[0] + '&lon=' + this_coord[1] + '&var=' + $('#download-variable').val(),
+            success: function (data) {
+              console.log('success');
+
+              json_data = JSON.parse(data);
+
+              data_obj = json_data[1]['data'];
+
+              i = 0;
+              z = 0;
+
+              for (var year in data_obj) {
+                for (var val in data_obj[year]) {
+
+                  if (data_obj[year][val] !== null) {
+                    data_obj[year][val] = parseFloat((data_obj[year][val] - subtractValue).toFixed(2));
+                  }
+
+                  z += 1;
+
+                }
+
+                i += 1;
+
+              }
+
+              // add the returned data
+              json_data[1]['data'] = data_obj
+
+              // add the coord ID
+              json_data[0]['id'] = this_coord[2]
+
+              // push to the output array
+              output_JSON.push(json_data)
+
+              // if this is the last entry,
+              // update the output JSON and hide the spinner
+
+              if (coords_to_process == 1) {
+
+                $('#download-result a').attr('href', "data:application/json," + encodeURIComponent(JSON.stringify(output_JSON))).removeClass('disabled');
+
+                $('#download-result a').attr('download', $('#download-filename').val() + '.json');
+                $('#download-result').slideDown(250)
+
+                $('body').removeClass('spinner-on');
+
+              } else {
+                coords_to_process -= 1
+              }
+
+            }
+          });
+
+
+        })
 
       }
 
@@ -758,17 +730,24 @@
       e.preventDefault();
     });
 
+    //
+    // SUBMISSION FOR 'ANNUAL' OR 'MONTHLY' DATASETS
+    //
+
     $('#download-process').click(function(e) {
-
-      //console.log('submit');
-
-      if ($('input[name="download-format"]:checked').val() == 'csv') {
-        $(this).attr('href', 'data:text/csv;charset=utf-8,' + escape(chart.getCSV()));
-      }
-
+      e.preventDefault()
+      process_download()
     });
 
-    checkform();
+    $('#download-result a').click(function(e) {
+      console.log('download')
+    })
+
+    checkform()
+
+    //
+    // SUBMISSION FOR 'DAILY' DATASET
+    //
 
     $('#daily-process').click(function(e) {
 
@@ -802,7 +781,35 @@
 
           if (data == 'success') {
 
-            $('#daily-captcha_code').removeClass('border-secondary').tooltip('dispose');
+            $('#daily-captcha_code').removeClass('border-secondary').tooltip('dispose')
+
+            var split_coords = $('#download-coords').val().split('|'),
+                lat_vals = '',
+                lon_vals = ''
+
+            // remove first element which is empty because the first character is always '|'
+            split_coords.shift()
+
+            for (i = 0; i < split_coords.length; i += 1) {
+
+              var this_coord = split_coords[i].split(',')
+
+              if (lat_vals != '') {
+                lat_vals += ','
+              }
+
+              lat_vals += this_coord[0]
+
+              if (lon_vals != '') {
+                lon_vals += ','
+              }
+
+              lon_vals += this_coord[1]
+
+            }
+
+            //console.log('lat', lat_vals)
+            //console.log('lon', lon_vals)
 
             var request = $.ajax({
               url: 'https://pavics.climatedata.ca/providers/finch/processes/subset_ensemble_BCCAQv2/jobs',
@@ -812,31 +819,31 @@
                   'Content-Type': 'application/json'
               },
               data: JSON.stringify({
-                  "inputs": [
-                      {
-                        "id": "variable",
-                        "data": var_name,
-                      },
-                      {
-                        "id": "lat0",
-                        "data": $('#download-lat').val()
-                      },
-                      {
-                        "id": "lon0",
-                        "data": $('#download-lon').val()
-                      },
-                      {
-                        "id": "output_format",
-                        "data": $('input[name="download-format"]:checked').val()
-                      },
-                  ],
-                  "response": "document",
-                  "notification_email": $('#daily-email').val(),
-                  "mode": "auto",
-                  "outputs": [{
-                      "transmissionMode": "reference",
-                      "id": "output"
-                  }]
+                "inputs": [
+                  {
+                    "id": "variable",
+                    "data": var_name,
+                  },
+                  {
+                    "id": "lat0",
+                    "data": lat_vals
+                  },
+                  {
+                    "id": "lon0",
+                    "data": lon_vals
+                  },
+                  {
+                    "id": "output_format",
+                    "data": $('input[name="download-format"]:checked').val()
+                  },
+                ],
+                "response": "document",
+                "notification_email": $('#daily-email').val(),
+                "mode": "auto",
+                "outputs": [{
+                  "transmissionMode": "reference",
+                  "id": "output"
+                }]
               }),
               success: function (data) {
                   //console.log(data);
@@ -847,12 +854,17 @@
 
                   }
 
+              },
+              complete: function() {
+
+                $('#daily-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php')
+                $('#daily-captcha_code').val('')
+
               }
             });
 
             request.fail(function(a, b) {
-              console.log(a);
-              console.log(b);
+              console.log(a, b)
             });
 
           } else if (data == 'captcha failed') {
@@ -863,9 +875,7 @@
         }
       });
 
-
-
-    });
+    })
 
     //
     // STATION
@@ -1330,8 +1340,6 @@
 
           var ajax_url = base_href.replace('fr/', '');
 
-          console.log(ajax_url);
-
           $.ajax({
             url: ajax_url + '/site/assets/themes/climate-data-ca/resources/ajax/get-place-by-coords.php',
             dataType: 'json',
@@ -1359,50 +1367,6 @@
     }
 
     // FORM VALIDATION
-
-    function check_email(email_val) {
-
-      var is_valid = false;
-
-      if (typeof email_val !== 'undefined' && email_val != 'undefined' && email_val != '') {
-
-        if (email_val.indexOf('@') !== -1 && email_val.indexOf('.') !== -1) {
-
-          if (email_val.indexOf('@') !== 0) {
-
-            var after_at = email_val.substring(email_val.indexOf('@'));
-
-            if (after_at.indexOf('.') !== -1) {
-
-              var after_dot = after_at.substring(after_at.indexOf('.'));
-
-              if (after_dot.length > 1) {
-
-                is_valid = true;
-
-              } else {
-                //console.log('no chars after .');
-              }
-
-            } else {
-              //console.log('no . after @');
-            }
-
-          } else {
-            //console.log('no chars before @');
-          }
-
-        } else {
-          //console.log('doesn\'t contains @ and .');
-        }
-
-      } else {
-        //console.log('blank');
-      }
-
-      return is_valid;
-
-    }
 
     function check_heat_form() {
 
@@ -1440,7 +1404,7 @@
 
       //console.log(input_val.indexOf('@'), input_val.indexOf('.'));
 
-      if (check_email(email_val) == true) {
+      if ($('body').validate_email(email_val) == true) {
         heat_wave_email_valid = true;
       }
 

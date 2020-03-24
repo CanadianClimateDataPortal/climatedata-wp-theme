@@ -16,6 +16,34 @@ var chart_labels, legend_labels;
 
   $(function() {
 
+    $.fn.validate_email = function(email_val) {
+
+      var is_valid = false
+
+      if (typeof email_val !== 'undefined' && email_val != 'undefined' && email_val != '') {
+        if (email_val.indexOf('@') !== -1 && email_val.indexOf('.') !== -1) {
+          if (email_val.indexOf('@') !== 0) {
+
+            var after_at = email_val.substring(email_val.indexOf('@'));
+
+            if (after_at.indexOf('.') !== -1) {
+
+              var after_dot = after_at.substring(after_at.indexOf('.'));
+
+              if (after_dot.length > 1) {
+                is_valid = true;
+              }
+
+            }
+
+          }
+        }
+      }
+
+      return is_valid;
+
+    }
+
     // form validation
 
     function check_email(email_val) {
@@ -75,26 +103,26 @@ var chart_labels, legend_labels;
         }
       })
 
-      // name
       if (dl_form.find('#name').val() != '' || dl_form.find('#email').val() != '') {
-	      if (dl_form.find('#name').val() == '') {
-	//         console.log('name is empty')
+
+        // name
+
+        if (dl_form.find('#name').val() == '') {
 	        is_valid = false
 	      }
-	
+
 	      // email
-	
+
 	      if (check_email(dl_form.find('#email').val()) != true ) {
-	//         console.log('email not valid')
 	        is_valid = false
 	      }
-	
+
 	      // captcha
-	
+
 	      if (dl_form.find('#terms-captcha_code').val() == '' ) {
-	//         console.log('captcha empty')
 	        is_valid = false
 	      }
+
       }
 
       //console.log('valid', is_valid)
@@ -141,7 +169,7 @@ var chart_labels, legend_labels;
 
           form_response.slideUp(125, function() {
             $(this).empty()
-            
+
             var form_data = dl_form.serialize()
 
             $.ajax({
@@ -149,31 +177,32 @@ var chart_labels, legend_labels;
               data: form_data,
               success: function(data) {
                 console.log(data)
-  
+
                 dl_form.find('#terms-captcha_code').val('')
-  
+
                 captcha_url = dl_form.find('#terms-captcha').attr('src')
-  
+
       //           dl_form.find('#terms-captcha').attr('src', '')
                 dl_form.find('#terms-captcha').attr('src', captcha_url)
-  
+
                 var response = JSON.parse(data)
-  
+
                 if (response.message == 'success') {
-  
+
                   captcha.removeClass('border-secondary')
-  
+
                   form_response.html('<div class="alert alert-primary col-6 offset-4 p-5" role="alert"><h5>' + response.message1 + '</h5><p class="mb-0"><a href="' + response.url + '" target="_blank">' + response.message2 + '</a>.</p></div>').slideDown(250);
-  
+
                 } else if (response.message == 'captcha failed') {
-  
+
                   form_response.html('<div class="alert alert-danger col-6 offset-4" role="alert"><p class="mb-0">' + response.message1 + '</p></div>').slideDown(250);
-  
+
                   captcha.addClass('border border-secondary')
-  
+
                 }
               }
             })
+
           })
 
         })

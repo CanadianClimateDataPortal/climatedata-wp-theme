@@ -138,6 +138,14 @@ h1, h2, h3, h4, h5, h6,
     .nav-item {
       margin-right: 12px;
     }
+    
+    .divider {
+      width: 1px;
+      height: 100%;
+      margin-right: 8px;
+      border-left: 1px solid transparentize($secondary, 0.5);
+      text-indent: -9999px;
+    }
   }
   
   .secondary-nav {
@@ -438,6 +446,10 @@ body {
 // DOWNLOAD
 
 @import 'pages/download';
+
+// ANALYZE
+
+@import 'pages/analyze';
 
 // CASE STUDY
 

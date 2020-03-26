@@ -2,7 +2,21 @@
 
   $(function() {
 
-// Highcharts.getOptions().exporting.buttons.contextButton.menuItems = ;
+    // PAGE TOUR
+    
+    var tour_options = {
+      debug: true,
+      default_open: false
+    }
+
+	  if (current_lang == 'fr') {
+  	  tour_options.labels = {
+    	  start_over: 'Recommencer',
+    	  next: 'Suivant',
+    	  close: 'Quitter',
+    	  dont_show: 'Ne plus montrer'
+  	  }
+	  }
 
     var current_location = {
       id: $('#location-content').attr('data-location'),
@@ -124,7 +138,7 @@
 
         current_query[select] = val
 
-        console.log(window.location)
+        //console.log(window.location)
 
         history.replaceState({}, $('title').text(), window.location.href.split('?')[0] + '?' + $.param(current_query))
       }
@@ -132,6 +146,11 @@
     }
 
     function load_var_by_location(variable, container) {
+      
+      if ($('body').hasClass('page-tour-open')) {
+        $('#page-tour').page_tour('hide_tour')
+        $('#page-tour').page_tour('destroy')
+      }
 
       chart_objects[container.attr('id')] = {
         container: container,
@@ -247,7 +266,7 @@
                           animation: false,
                           backgroundColor: 'transparent',
                           style: {
-                              fontFamily: 'CDCSans'
+                            fontFamily: 'CDCSans'
                           }
                       },
 
@@ -500,6 +519,51 @@
     $('#location-tag-wrap').stick_in_parent({
       offset_top: sticky_offset + $('#main-header').outerHeight()
     });
+    
+    $('body').on('click', '.chart-tour-trigger', function(e) {
+      e.preventDefault()
+      
+      var this_ID = $(this).attr('data-container')
+      var chart_pos = $('#' + this_ID).offset()
+      
+      var scroll_to = chart_pos.top - ($('#main-header').outerHeight() + 20)
+      
+      $('body').addClass('spinner-on')
+      
+      $('body, html').animate({
+        scrollTop: scroll_to
+      }, {
+        duration: 1000,
+        complete: function() {
+          
+          $('body').css('overflow', 'hidden')
+          
+          var new_options = JSON.parse($('#page-tour').attr('data-steps'))
+          
+          for (var key in new_options) {
+            new_options[key].position.of = '#' + this_ID
+          }
+          
+          $('#page-tour').attr('data-steps', JSON.stringify(new_options))
+    
+          setTimeout(function() {
+            
+            $('#page-tour').page_tour(new_options).page_tour('show_tour')
+            
+            $('body').removeClass('spinner-on')
+            
+          }, 1000)
+          
+        }
+      })
+      
+      
+    })
+    
+    $('body').on('click', '.page-tour-close', function(e) {
+      $('body').css('overflow', '')
+      $('#page-tour').page_tour('destroy')
+    })
 
     //console.log('end of location-functions');
 

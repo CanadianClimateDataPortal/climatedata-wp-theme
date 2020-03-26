@@ -20,6 +20,12 @@
     wp_enqueue_script ( 'leaflet' );
 
     wp_enqueue_script ( 'vector-grid' );
+    
+    // page tour
+  
+    wp_enqueue_script ( 'jquery-ui-core' );
+    wp_enqueue_script ( 'jquery-ui-position' );
+    wp_enqueue_script ( 'page-tour' );
 
     wp_enqueue_script ( 'location-functions' );
 
@@ -62,7 +68,12 @@
   </div>
 </section>
 
-<main id="location-content" data-location="<?php echo $_GET['loc']; ?>" data-lat="<?php echo $GLOBALS['vars']['current_data']['location_data']['lat']; ?>" data-lon="<?php echo $GLOBALS['vars']['current_data']['location_data']['lon']; ?>">
+<main 
+  id="location-content" 
+  data-location="<?php echo $_GET['loc']; ?>" 
+  data-lat="<?php echo $GLOBALS['vars']['current_data']['location_data']['lat']; ?>" 
+  data-lon="<?php echo $GLOBALS['vars']['current_data']['location_data']['lon']; ?>"
+>
 
   <section id="location-data" class="page-section">
     <div id="location-tag-wrap" class="d-none d-lg-block">
@@ -145,7 +156,6 @@
 
               <option value="<?php the_field ( 'var_name' ); ?>" <?php echo ( $selected == true ) ? 'selected' : ''; ?>><?php the_title(); ?></option>
 
-
               <?php
 
                   $var_num++;
@@ -157,7 +167,7 @@
             </select>
           </div>
         </div>
-
+        
         <div id="<?php echo $var_type->slug; ?>-chart" class="var-data-placeholder">
           <div class="col-10 offset-1 text-center">
             <?php _e ( 'Loading', 'cdc' ); ?> …
@@ -182,6 +192,8 @@
     </div>
   </section>
 </main>
+
+<div class="page-tour" id="page-tour" data-steps='<?php echo json_encode ( get_field ( 'tour' ) ); ?>'></div>
 
 <?php
 

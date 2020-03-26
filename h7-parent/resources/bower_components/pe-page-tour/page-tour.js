@@ -148,7 +148,9 @@
         plugin_instance.hide_tour();
       });
       
-      $('.page-tour-trigger').click(function(e) {
+      // TRIGGER
+      
+      $('body').on('click', '.page-tour-trigger', function(e) {
         e.preventDefault();
         
         if (plugin_settings.debug == true) {
@@ -169,6 +171,16 @@
         
       });
       
+      // ESC TO CLOSE
+      
+      $('body').on('keypress', function(e) {
+        
+        if (e.which == 27 && $('body').hasClass('page-tour-open')) {
+          $('body').find('.page-tour-close').trigger('click')
+        }
+        
+      })
+        
     },
     
     show_tour: function(fn_options) {
@@ -348,7 +360,12 @@
         
       }
       
-    }  
+    },
+    
+    destroy: function() {
+      this.item.removeData()
+      this.item.empty()
+    }
     
   }
 

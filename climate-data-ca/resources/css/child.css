@@ -4617,7 +4617,8 @@ body.supermenu-open #header-primary {
 #location-tag-wrap {
   position: absolute;
   top: 0;
-  left: 0; }
+  left: 0;
+  transition: opacity 0.25s; }
 
 #location-tag {
   display: flex;
@@ -4662,6 +4663,44 @@ body.supermenu-open #header-primary {
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eef0f5', endColorstr='#ffffff',GradientType=0 ); }
   .var-type:first-of-type {
     background: transparent; }
+
+.var-chart {
+  position: relative;
+  height: 700px; }
+
+#page-location .page-tour {
+  width: 400px; }
+#page-location .page-tour-content {
+  max-height: 250px;
+  overflow: auto; }
+#page-location .var-chart-container {
+  position: relative;
+  transition: background-color 0.25s; }
+  #page-location .var-chart-container .chart-tour-trigger {
+    position: absolute;
+    left: 0;
+    top: 10px;
+    z-index: 10; }
+#page-location .var-chart {
+  transition: box-shadow 0.25s, background-color 0.25s; }
+#page-location.page-tour-open .var-chart-container {
+  background-color: #ddd; }
+  #page-location.page-tour-open .var-chart-container .chart-tour-trigger {
+    opacity: 0;
+    pointer-events: none;
+    cursor: default; }
+#page-location.page-tour-open .var-chart {
+  background-color: #fff;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3); }
+#page-location.page-tour-open #location-tag-wrap,
+#page-location.page-tour-open .var-btn {
+  opacity: 0.25;
+  pointer-events: none;
+  cursor: default; }
+  #page-location.page-tour-open #location-tag-wrap *,
+  #page-location.page-tour-open .var-btn * {
+    pointer-events: none;
+    cursor: default; }
 
 #main-header-nav .filter-navbar .filter-block:nth-of-type(even) {
   background-color: rgba(255, 255, 255, 0.1); }
@@ -5891,7 +5930,7 @@ body.overlay-open[data-overlay-content="video"] #main-header-nav .overlay-close 
   border-bottom-color: rgba(255, 255, 255, 0.9); }
 .page-tour[data-bubble="top right"]:after {
   top: -10px;
-  left: -10px;
+  right: -10px;
   transform: rotate(135deg);
   border-bottom-color: rgba(255, 255, 255, 0.9); }
 .page-tour[data-bubble="bottom left"]:after {

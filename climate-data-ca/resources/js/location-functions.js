@@ -285,11 +285,7 @@
                         zIndex: 1,
                         showInNavigator: true,
                         color: '#F47D23',
-                        visible: false,
-                        events: {
-                            show: function () {
-                                $('#page-tour').page_tour('show_tour')
-                              }},
+			visible: false,
                         marker: {
                           fillColor: '#F47D23',
                           lineWidth: 0,
@@ -524,23 +520,6 @@
     })
 
     //console.log('end of location-functions');
-    // PAGE TOUR
-
-    var tour_options = {default_open: false};
-
-    if (current_lang == 'fr') {
-        tour_options = {
-            default_open: false,
-            labels: {
-            start_over: 'Recommencer',
-            next: 'Suivant',
-            close: 'Quitter',
-            dont_show: 'Ne plus montrer'
-            }
-        }
-    }
-
-    $('#page-tour').page_tour(tour_options);
 
   });
 })(jQuery);

@@ -28,7 +28,7 @@
     wp_enqueue_script ( 'page-tour' );
 
     wp_enqueue_script ( 'location-functions' );
-    wp_enqueue_script ( 'page-tour' );
+
   }
 
   add_action ( 'wp_enqueue_scripts', 'tpl_enqueue' );
@@ -196,16 +196,6 @@
 <div class="page-tour" id="page-tour" data-steps='<?php echo json_encode ( get_field ( 'tour' ) ); ?>'></div>
 
 <?php
-
-    if ( have_rows ( 'tour' ) ) {
-
-?>
-
-<div class="page-tour" id="page-tour" data-steps='<?php echo json_encode ( get_field ( 'tour' ) ); ?>'></div>
-
-<?php
-
-    }
 
   endwhile; endif;
 

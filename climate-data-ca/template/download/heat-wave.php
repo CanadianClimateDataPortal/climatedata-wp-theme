@@ -49,6 +49,22 @@
       </p>
     </div>
   </div>
+
+  <div id="heatwave-filetype" class="form-layout-row row align-items-center">
+    <p class="form-label-wrap col-10 col-sm-3 offset-1 mb-3 mb-sm-0"></p>
+    
+    <div class="form-select col-10 offset-1 col-sm-4 offset-sm-0">
+      <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+        <label class="btn btn-outline-primary active">
+          <input type="radio" name="heatwave-download-format" autocomplete="off" value="csv" checked> CSV
+        </label>
+        
+        <label class="btn btn-outline-primary">
+          <input type="radio" name="heatwave-download-format" autocomplete="off" value="netcdf"> NetCDF
+        </label>
+      </div>
+    </div>
+  </div>
   
   <div id="heat-wave-process-wrap">
     <div class="form-layout-row form-process">
@@ -76,7 +92,7 @@
         </div>
         
         <div class="col-8-of-8 p-4">
-          <p class="form-label-wrap mt-3"><strong><?php _e ( 'Note:', 'cdc' ); ?></strong> <?php _e ( 'This is an experimental functionality. This data requires 30 to 90 minutes of processing time. All data will be delivered in a NetCDF file via an email notification once the processing is complete. Don’t forget to check your spam folder.', 'cdc' ); ?></p>
+          <p class="form-label-wrap mt-3"><strong><?php _e ( 'Note:', 'cdc' ); ?></strong> <?php _e ( 'This is an experimental functionality. This data requires 30 to 90 minutes of processing time. All data will be delivered via an email notification once the processing is complete. Don’t forget to check your spam folder.', 'cdc' ); ?></p>
         </div>
         
       </div>

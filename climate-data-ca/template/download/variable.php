@@ -135,7 +135,7 @@
 
   <div id="download-filetype" class="form-layout-row row align-items-center">
     <p class="form-label-wrap col-10 col-sm-3 offset-1 mb-3 mb-sm-0">
-      <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">3</span>
+      <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">4</span>
       <label for="format" class="form-label"><?php _e ( 'Select a data format', 'cdc' ); ?></label>
     </p>
 
@@ -168,7 +168,7 @@
     </div>
 
     <div id="download-result" class="col-10 offset-1 col-sm-6 offset-sm-3 mt-3 p-4 bg-light" style="display: none;">
-      <p class="form-label-wrap"><?php _e ( 'Processed successfully.', 'cdc' ); ?> <a href="" target="_blank"><?php _e ( 'Click here to download your data' ), 'cdc' ); ?></a>.</p>
+      <p class="form-label-wrap"><?php _e ( 'Processed successfully.', 'cdc' ); ?> <a href="" target="_blank"><?php _e ( 'Click here to download your data', 'cdc' ); ?></a>.</p>
     </div>
   </div>
 

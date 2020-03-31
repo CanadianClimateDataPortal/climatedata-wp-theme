@@ -24,7 +24,6 @@ if ($get_month == 'nov') { $qmonth = "11November"; }
 if ($get_month == 'dec') { $qmonth = "12December"; }
 
 foreach (glob($csvpath . "/BCCAQv2/".$get_var."/".$get_rcp."/MS/*AllYears_Ensemble_percentiles_".$qmonth.".csv") as $filename) {
-    $Data = str_getcsv($filename, "\n"); //parse the rows
     $newcsv[] = array_map('str_getcsv', file($filename));
 }
 

@@ -13,7 +13,7 @@
     ?>
     
     <div class="filter-container slider-container col-7 offset-1">
-      <h6><?php _e ( 'Decade', 'cdc' ); ?></h6>
+      <h6><?php _e ( 'Time period', 'cdc' ); ?></h6>
       
       <div id="range-slider-container" class="decade-slider-container" data-min="<?php the_sub_field ( 'min' ); ?>" data-max="<?php the_sub_field ( 'max' ); ?>" data-default="<?php the_sub_field ( 'default' ); ?>">
         <input id="range-slider" class="decade-slider">

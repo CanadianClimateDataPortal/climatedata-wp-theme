@@ -280,9 +280,10 @@
                           },
 
                           labels: {
-                              formatter: function () {
-                                  return this.axis.defaultLabelFormatter.call(this) + ' ' + chart_objects[container.attr('id')]['chartUnit'];
-                              }
+                            align: 'left',
+                            formatter: function () {
+                              return this.axis.defaultLabelFormatter.call(this) + ' ' + chart_objects[container.attr('id')]['chartUnit'];
+                            }
                           }
                       },
                       legend: {

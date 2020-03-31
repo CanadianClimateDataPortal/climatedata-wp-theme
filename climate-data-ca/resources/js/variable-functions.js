@@ -1030,9 +1030,10 @@ maxWidth: "auto"
                             },
 
                             labels: {
-                                formatter: function () {
-                                    return this.axis.defaultLabelFormatter.call(this) + chartUnit;
-                                }
+                              align: 'left',
+                              formatter: function () {
+                                return this.axis.defaultLabelFormatter.call(this) + chartUnit;
+                              }
                             }
                         },
 

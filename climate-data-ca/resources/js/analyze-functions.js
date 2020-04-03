@@ -43,7 +43,7 @@
     
     var form_obj = $.extend(true, {}, default_obj)
     
-    var submit_url_pre = 'https://finch.crim.ca/providers/finch/processes/ensemble_grid_point_',
+    var submit_url_pre = 'https://pavics.climatedata.ca/providers/finch/processes/ensemble_grid_point_',
         submit_url_var = '',
         submit_url_post = '/jobs'
     

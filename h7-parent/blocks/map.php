@@ -37,6 +37,28 @@
   
   $map_vars .= ']';
   
+  // center
+  
+  $init_lat = '';
+  $init_lng = '';
+  $init_zoom = '';
+  
+  if ( have_rows ( 'center' ) ) {
+    while ( have_rows ( 'center' ) ) {
+      the_row();
+      
+      if ( get_sub_field ( 'lat' ) != '' && get_sub_field ( 'lng' ) != '' ) {
+        $init_lat = get_sub_field ( 'lat' );
+        $init_lng = get_sub_field ( 'lng' );
+      }
+      
+      if ( get_sub_field ( 'zoom' ) != '' ) {
+        $init_zoom = get_sub_field ( 'zoom' );
+      }
+      
+    }
+  }
+  
   // RCP
   
   $rcp = get_sub_field ( 'scenario' );
@@ -45,16 +67,25 @@
     $rcp = 'rcp26';
   }
   
+  if ( strpos ( $rcp, 'vs' ) !== false ) {
+    $map_compare = true;
+  } else {
+    $map_compare = false;
+  }
+  
   // layer type
   
   $panes = array();
   
-  if ( get_sub_field ( 'sector' ) != '' ) {
+  if ( 
+    get_sub_field ( 'sector' ) != '' &&
+    get_sub_field ( 'sector' ) != 'none'
+  ) {
     
     // sector panes
     
     $panes = array (
-      "sector" => array (
+      "data" => array (
         "type" => "geojson",
         "style" => array (
           "zIndex" => 403
@@ -67,17 +98,10 @@
     // raster panes
     
     $panes = array (
-      "raster" => array (
+      "data" => array (
         "type" => "wms",
         "style" => array (
           "zIndex" => 400,
-          "pointerEvents" => "none"
-        )
-      ),
-      "grid" => array (
-        "type" => "protobuf",
-        "style" => array (
-          "zIndex" => 500,
           "pointerEvents" => "none"
         )
       )
@@ -87,18 +111,55 @@
   
 ?>
 
-<script type="text/javascript">
-  
-</script>
-
-<div id="<?php echo $block_ID; ?>-container" class="renderable map-container" 
+<div id="<?php echo $block_ID; ?>-container" class="renderable map-object <?php echo ( $map_compare == true ) ? 'compare' : ''; ?>" 
   data-map-variables='<?php echo $map_vars; ?>'
+  data-map-lat="<?php echo $init_lat; ?>"
+  data-map-lng="<?php echo $init_lng; ?>"
+  data-map-zoom="<?php echo $init_zoom; ?>"
   data-map-rcp='<?php echo $rcp; ?>'
   data-map-panes='<?php echo json_encode ( $panes ); ?>'
 >
-  <div id="<?php echo $block_ID; ?>-map" class="map"></div>
+  <?php
+    
+    if ( $map_compare == true ) {
+            
+      $rcp = str_replace ( 'rcp', '', $rcp );
+      $rcp = explode ( 'vs', $rcp );
+    
+  ?>
   
-  <div id="<?php echo $block_ID; ?>-filters" class="map-filters d-lg-flex flex-lg-wrap" data-layer="raster">
+  <div class="d-flex">
+    <div class="w-50"><p class="d-inline-block bg-white py-2 px-3 mb-0">RCP <?php echo ( (int) $rcp[0] ) / 10; ?></p></div>
+    <div class="w-50"><p class="d-inline-block bg-white py-2 px-3 mb-0">RCP <?php echo ( (int) $rcp[1] ) / 10; ?></p></div>
+  </div>
+    
+  <?php
+    
+    }
+    
+  ?>
+
+  <div id="<?php echo $block_ID; ?>-map-container" class="map-container">
+    <div id="<?php echo $block_ID; ?>-map" class="map map-full"></div>
+    
+    <?php
+      
+      if ( $map_compare == true ) {
+      
+    ?>
+    
+    <div id="<?php echo $block_ID; ?>-map-right-container" class="map-right-container">
+      <div id="<?php echo $block_ID; ?>-map-right" class="map map-right"></div>
+    </div>
+    
+    <?php
+      
+      }
+      
+    ?>
+  </div>
+  
+  <div id="<?php echo $block_ID; ?>-filters" class="map-filters d-lg-flex flex-lg-wrap" data-layer="data">
     <?php
       
       if ( count ( $var_IDs ) > 1 ) {

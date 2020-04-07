@@ -16,7 +16,7 @@
     //
     //
 
-    var idf_layer, station_layer, highlight, highlight2;
+    var idf_layer, station_layer, highlight, highlight2, currentSector, currentSectorGeoJson;
 
     var has_mapRight = false,
         grid_initialized = false;
@@ -678,17 +678,11 @@ maxWidth: "auto"
         }
     }
 
-    function genChoro(year, variable, rcp, frequency, colormap) {
+    function genChoro(sector, year, variable, rcp, frequency, colormap) {
 
         console.log('creating sector layer');
-
-        choroPath = child_theme_dir + 'resources/app/run-frontend-health/';
-
-        if (frequency === 'ann') {
-            choroPath += "annual_choro_values.php?var=" + variable + "&rcp=" + rcp
-        } else {
-            choroPath += "monthly_choro_values.php?month=" + frequency + "&var=" + variable + "&rcp=" + rcp
-        }
+//  get-choro-values/<partition>/<var>/<model>/<month>/
+        choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency + '/?period=' + year;
 
         console.log(choroPath);
 
@@ -708,16 +702,15 @@ maxWidth: "auto"
 
             var tooltipValue;
 
-            choroLayer = L.geoJSON(healthSectorsGeoJson, {
+            choroLayer = L.geoJSON(currentSectorGeoJson, {
                 smoothFactor: 0,
                 name: 'geojson',
                 pane: 'sector',
                 onEachFeature: function (feature, layer) {
 
                   if (typeof feature !== 'undefined') {
-
                     layer.setStyle({
-                        fillColor: getColor(choroValues[year][parseInt(feature.properties.PR_HRUID)], colormap),
+                        fillColor: getColor(choroValues[feature.properties.id], colormap),
                         weight: 0.5,
                         opacity: 1,
                         color: 'white',
@@ -725,20 +718,20 @@ maxWidth: "auto"
                     });
                     layer.on('mouseover', function () {
 
-                        tooltipValue = choroValues[year][parseInt(this.feature.properties.PR_HRUID)];
+                        tooltipValue = choroValues[this.feature.properties.id];
                         //fixedTooltipValue = (tooltipValue - subtractValue).toFixed(varDetails['decimals']) + "" + chartUnit;
                         this.setStyle({
-                            fillColor: getColor(choroValues[year][parseInt(this.feature.properties.PR_HRUID)], colormap),
+                            fillColor: getColor(choroValues[this.feature.properties.id], colormap),
                             weight: 2,
                             opacity: 1,
                             color: 'white',
                             fillOpacity: 1
                         });
-                        layer.bindTooltip(layer.feature.properties.ENG_LABEL, {sticky: true}).openTooltip(layer.latlng);
+                        layer.bindTooltip(layer.feature.properties.label, {sticky: true}).openTooltip(layer.latlng);
                     });
                     layer.on('mouseout', function () {
                         this.setStyle({
-                            fillColor: getColor(choroValues[year][parseInt(feature.properties.PR_HRUID)], colormap),
+                            fillColor: getColor(choroValues[feature.properties.id], colormap),
                             weight: 0.5,
                             opacity: 1,
                             color: 'white',
@@ -749,13 +742,13 @@ maxWidth: "auto"
 
                       console.log('click');
 
-                        current_sector['hruid'] = parseInt(feature.properties.PR_HRUID);
-                        current_sector['label'] = layer.feature.properties.ENG_LABEL;
+                        current_sector['id'] = feature.properties.id;
+                        current_sector['label'] = layer.feature.properties.label;
 
                         var_value = $("#var").val();
                         mora_value = $("#mora").val();
 
-                        genSectorChart(current_sector['hruid'], var_value, mora_value, current_sector['label']);
+                        genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
 
 
                     });
@@ -1353,26 +1346,9 @@ maxWidth: "auto"
 
     // SECTOR
 
-    function genSectorChart(hruid, variable, month, region_label) {
+    function genSectorChart(id, variable, month, region_label) {
 
         timerStart = Date.now();
-
-        midHistSeries = [];
-        rangeHistSeries = [];
-
-        mid26Series = [];
-        range26Series = [];
-
-        mid45Series = [];
-        range45Series = [];
-
-        mid85Series = [];
-        range85Series = [];
-
-        chartData = [];
-        chartData['rcp26'] = [];
-        chartData['rcp45'] = [];
-        chartData['rcp85'] = [];
 
         console.log('sector chart');
 
@@ -1386,44 +1362,12 @@ maxWidth: "auto"
           position: 'right',
           callback: function(varDetails) {
 
-            var valuePath = child_theme_dir + 'resources/app/run-frontend-health/';
+            var valuePath = hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id + '/' + variable + '/' + month;
 
-            if (month === 'ann') {
-                valuePath += "generateAnnualChartDatawHistAllYears.php?hruid=" + hruid + "&var=" + variable
-            } else {
-                valuePath += "generateMonthlyChartDatawHistAllYears.php?hruid=" + hruid + "&var=" + variable + "&month=" + month
-            }
-
-            $.getJSON(valuePath + "&rcp=rcp26").then(function (data) {
-                console.log('rcp 2.6 data');
-
-                // if the unit = kelvin in variables.json - convert to celcius
-                if (varDetails['units']['value'] === 'kelvin') {
-                    subtractValue = k_to_c;
-                    chartUnit = "°C";
-                } else {
-                    subtractValue = 0;
-                    chartUnit = varDetails['units']['label'];
-                }
-
-                for (var key in data) {
-                    year = parseInt(key);
-                    dateObj = Date.UTC(year, 0, 1);
-                    chartData['rcp26'][year] = data[year][hruid];
-
-                    if (key >= 2010) {
-                        range26Series.push([dateObj, parseFloat(chartData['rcp26'][year]['p10'] - subtractValue), parseFloat(chartData['rcp26'][year]['p90'] - subtractValue)]);
-                        mid26Series.push([dateObj, parseFloat(chartData['rcp26'][year]['p50'] - subtractValue)]);
-                    }
-
-
-                    if (key <= 2010) {
-                        rangeHistSeries.push([dateObj, parseFloat(chartData['rcp26'][year]['p10'] - subtractValue), parseFloat(chartData['rcp26'][year]['p90'] - subtractValue)]);
-                        midHistSeries.push([dateObj, parseFloat(chartData['rcp26'][year]['p50'] - subtractValue)]);
-                    }
-                }
+            $.getJSON(valuePath).then(function (data) {
 
                 chartDecimals = varDetails['decimals'];
+                chartUnit = (varDetails['units']['value'] === 'kelvin')?"°C":varDetails['units']['label'];
 
                 var chart = Highcharts.stockChart('chart-placeholder', {
                     chart: {
@@ -1475,8 +1419,22 @@ maxWidth: "auto"
 
 
                 chart.addSeries({
-                    name: 'Historical',
-                    data: midHistSeries,
+                    name: chart_labels.observation,
+                    data: data['observations'],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#F47D23',
+                    visible: false,
+                    marker: {
+                        fillColor: '#F47D23',
+                        lineWidth: 0,
+                        radius: 0,
+                        lineColor: '#F47D23'
+                    }
+                });
+                chart.addSeries({
+                    name: chart_labels.historical,
+                    data: data['modeled_historical_median'],
                     zIndex: 1,
                     showInNavigator: true,
                     color: '#000000',
@@ -1489,8 +1447,8 @@ maxWidth: "auto"
                 });
 
                 chart.addSeries({
-                    name: 'Historical Range',
-                    data: rangeHistSeries,
+                    name: chart_labels.historical_range,
+                    data: data['modeled_historical_range'],
                     type: 'arearange',
                     lineWidth: 0,
                     linkedTo: ':previous',
@@ -1505,8 +1463,8 @@ maxWidth: "auto"
 
 
                 chart.addSeries({
-                    name: 'RCP 2.6',
-                    data: mid26Series,
+                    name: chart_labels.rcp_26_median,
+                    data: data['rcp26_median'],
                     zIndex: 1,
                     showInNavigator: true,
                     color: '#00F',
@@ -1518,8 +1476,8 @@ maxWidth: "auto"
                     }
                 });
                 chart.addSeries({
-                    name: 'RCP 2.6 Range',
-                    data: range26Series,
+                    name: chart_labels.rcp_26_range,
+                    data: data['rcp26_range'],
                     type: 'arearange',
                     lineWidth: 0,
                     linkedTo: ':previous',
@@ -1532,107 +1490,74 @@ maxWidth: "auto"
                     },
                 });
 
-                $.getJSON(valuePath + "&rcp=rcp45").then(function (data) {
-                    console.log('rcp 4.5 data');
 
-
-                    for (var key in data) {
-                        year = parseInt(key);
-
-                        dateObj = Date.UTC(year, 0, 1);
-                        chartData['rcp45'][year] = data[year][hruid];
-
-                        if (key >= 2010) {
-                            range45Series.push([dateObj, parseFloat(chartData['rcp45'][year]['p10'] - subtractValue), parseFloat(chartData['rcp45'][year]['p90'] - subtractValue)]);
-                            mid45Series.push([dateObj, parseFloat(chartData['rcp45'][year]['p50'] - subtractValue)]);
-                        }
-                    }
-
-
-                    chart.addSeries({
-                        name: 'RCP 4.5',
-                        data: mid45Series,
-                        zIndex: 1,
-                        showInNavigator: true,
-                        color: '#00640c',
-                        marker: {
-                            fillColor: '#00640c',
-                            lineWidth: 0,
-                            radius: 0,
-                            lineColor: '#00640c'
-                        }
-                    });
-
-                    chart.addSeries({
-                        name: 'RCP 4.5 Range',
-                        data: range45Series,
-                        type: 'arearange',
+                chart.addSeries({
+                    name: chart_labels.rcp_45_median,
+                    data: data['rcp45_median'],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#00640c',
+                    marker: {
+                        fillColor: '#00640c',
                         lineWidth: 0,
-                        linkedTo: ':previous',
-                        color: '#00640c',
-                        fillOpacity: 0.2,
-                        zIndex: 0,
-                        marker: {
-                            radius: 0,
-                            enabled: false
-                        }
-                    });
-
-                    $.getJSON(valuePath + "&rcp=rcp85").then(function (data) {
-                        console.log('rcp 8.5 data');
-                        for (var key in data) {
-                            year = parseInt(key);
-
-                            dateObj = Date.UTC(year, 0, 1);
-                            chartData['rcp85'][year] = data[year][hruid];
-                            if (key >= 2010) {
-                                range85Series.push([dateObj, parseFloat(chartData['rcp85'][year]['p10'] - subtractValue), parseFloat(chartData['rcp85'][year]['p90'] - subtractValue)]);
-                                mid85Series.push([dateObj, parseFloat(chartData['rcp85'][year]['p50'] - subtractValue)]);
-                            }
-                        }
-
-
-                        chart.addSeries(
-                            {
-                                name: 'RCP 8.5',
-                                data: mid85Series,
-                                zIndex: 1,
-                                showInNavigator: true,
-                                color: '#F00',
-                                marker: {
-                                    fillColor: '#F00',
-                                    lineWidth: 0,
-                                    radius: 0,
-                                    lineColor: '#F00'
-                                }
-                            }
-                        );
-
-                        chart.addSeries(
-                            {
-                                name: 'RCP 8.5 Range',
-                                data: range85Series,
-                                type: 'arearange',
-                                lineWidth: 0,
-                                linkedTo: ':previous',
-                                color: '#F00',
-                                fillOpacity: 0.2,
-                                zIndex: 0,
-                                marker: {
-                                    radius: 0,
-                                    enabled: false
-                                }
-                            }
-                        );
-
-
-                        seconds = (Date.now() - timerStart) * 0.001;
-                        $('#loadtime').html(" <strong style=color:blue>Loaded in " + seconds + " seconds</strong>");
-
-
-                    });
-
+                        radius: 0,
+                        lineColor: '#00640c'
+                    }
                 });
+
+                chart.addSeries({
+                    name: chart_labels.rcp_45_range,
+                    data: data['rcp45_range'],
+                    type: 'arearange',
+                    lineWidth: 0,
+                    linkedTo: ':previous',
+                    color: '#00640c',
+                    fillOpacity: 0.2,
+                    zIndex: 0,
+                    marker: {
+                        radius: 0,
+                        enabled: false
+                    }
+                });
+
+
+               chart.addSeries(
+                   {
+                       name: chart_labels.rcp_85_median,
+                       data: data['rcp85_median'],
+                       zIndex: 1,
+                       showInNavigator: true,
+                       color: '#F00',
+                       marker: {
+                           fillColor: '#F00',
+                           lineWidth: 0,
+                           radius: 0,
+                           lineColor: '#F00'
+                       }
+                   }
+               );
+
+               chart.addSeries(
+                   {
+                       name: chart_labels.rcp_85_range,
+                       data: data['rcp85_range'],
+                       type: 'arearange',
+                       lineWidth: 0,
+                       linkedTo: ':previous',
+                       color: '#F00',
+                       fillOpacity: 0.2,
+                       zIndex: 0,
+                       marker: {
+                           radius: 0,
+                           enabled: false
+                       }
+                   }
+               );
+
+
+               seconds = (Date.now() - timerStart) * 0.001;
+               $('#loadtime').html(" <strong style=color:blue>Loaded in " + seconds + " seconds</strong>");
+
 
                 $('.chart-export-data').click(function (e) {
                   e.preventDefault();
@@ -1881,8 +1806,19 @@ maxWidth: "auto"
                 mora_text_value = $("#mora option:selected").text();
                 rcp_value = $("#rcp").val();
                 decade_value = parseInt($("#decade").val()) +1;
+                sector_value = $("#sector").val();
 
-                genChoro(decade_value, var_value, rcp_value, mora_value, colormap);
+                if (currentSector != sector_value) {
+                  $.getJSON(child_theme_dir + 'resources/sectors-json/' + sector_value + '.json').then( function (data) {
+                   //data.features = data.features.slice(0,1000);
+                   currentSectorGeoJson = data;
+                   currentSector = sector_value;
+                   console.log('generate sector legend');
+                   genChoro(sector_value, decade_value, var_value, rcp_value, mora_value, colormap);
+                 });}
+                else {
+                  genChoro(sector_value, decade_value, var_value, rcp_value, mora_value, colormap);
+                }
 
 
             })
@@ -2493,7 +2429,7 @@ maxWidth: "auto"
 
         if (query['sector'] != '') {
 
-          genSectorChart(current_sector['hruid'], var_value, mora_value, current_sector['label']);
+          genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
 
         } else if (query['var-group'] != 'station-data') {
 
@@ -2778,7 +2714,7 @@ maxWidth: "auto"
 
     mora_value = $("#mora").val();
     var_value = $("#var").val();
-
+    console.log('querysector:' + query['sector']);
     if (query['sector'] != '') {
 
       if (mora_value === 'ann') {
@@ -2786,11 +2722,10 @@ maxWidth: "auto"
       } else {
           legendmsorys = "mon";
       }
-
       legendLayer = var_value + "_health_" + legendmsorys;
-
       console.log('generate sector legend');
       generateSectorLegend(legendLayer, '');
+
 
     } else {
 

@@ -116,8 +116,6 @@ function child_theme_enqueue() {
   wp_register_script ( 'archive-functions', $child_js_dir . 'archive-functions.js', array ( 'jquery', 'child-functions' ), NULL, true );
   wp_register_script ( 'case-study-functions', $child_js_dir . 'case-study-functions.js', array ( 'jquery', 'child-functions', 'map-renderer', 'renderer' ), NULL, true );
 
-  wp_register_script ( 'health-sectors', $child_theme_dir . 'resources/app/run-frontend-health/health-sectors.js', array ( 'jquery', 'child-functions' ), NULL, true );
-
   // VENDOR
 
   wp_register_script ( 'js-cookie', $bower_dir . 'js-cookie/src/js.cookie.js', NULL, true );

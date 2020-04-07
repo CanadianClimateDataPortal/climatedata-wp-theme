@@ -84,10 +84,13 @@
                 foreach ( $sector_query as $sector_page ) {
 
                   if ( get_post_meta ( $sector_page->ID, '_wp_page_template' )[0] == 'tpl-variable.php' ) {
+                    $sector_page->slug = get_post(icl_object_id(get_post($sector_page->post_parent)->ID, 'post', FALSE, 'en'))->post_name;
                     $sector_pages[] = $sector_page;
+                    
+	
 
                     if ( $sector_page->ID == get_the_ID() ) {
-                      $filters['sector']['val'] = $sector_page->ID;
+                      $filters['sector']['val'] = $sector_page->slug;
                     }
 
                   }
@@ -107,7 +110,7 @@
 
           ?>
 
-          <option value="<?php echo $map_page->ID; ?>" <?php echo ( $map_page->ID == $filters['sector']['val'] ) ? 'selected' : ''; ?>><?php echo get_the_title ( $map_page->post_parent ); ?></option>
+          <option value="<?php echo $map_page->slug; ?>" <?php echo ( $map_page->slug == $filters['sector']['val'] ) ? 'selected' : ''; ?>><?php echo get_the_title ( $map_page->post_parent ); ?></option>
 
           <?php
 

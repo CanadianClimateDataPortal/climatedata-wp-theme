@@ -181,6 +181,11 @@
 
       }
     });
+    
+    $('#map-overlay .btn').click(function(e) {
+      e.preventDefault()
+      $('#map-overlay').fadeOut()
+    })
 
     //
     // VARIABLE
@@ -383,7 +388,7 @@
 
       var output_JSON = []
 
-      var output_CSV = "DATE, LATITUDE, LONGITUDE, RCP 2.6 MIN, RCP 2.6 MEAN, RCP 2.6 MAX, RCP 4.5 MIN, RCP 4.5 MEAN, RCP 4.5 MAX, RCP 8.5 MIN, RCP 8.5 MEAN, RCP 8.5 MAX\n"
+      var output_CSV = "Date, Latitude, Longitude, RCP 2.6 Range (low), RCP 2.6 Median, RCP 2.6 Range (high), RCP 4.5 Range (low), RCP 4.5 Median, RCP 4.5 Range (high), RCP 8.5 Range (low), RCP 8.5 Median, RCP 8.5 Range (high)\n"
 
       var split_coords = $('#download-coords').val().split('|')
 

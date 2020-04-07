@@ -19,6 +19,7 @@
 
 .download-map {
   @include full-size;
+  z-index: 1;
 }
 
 //

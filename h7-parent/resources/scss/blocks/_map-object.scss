@@ -1,21 +1,50 @@
-.map {
-  position: relative;
-  height: 0;
-  padding: 0 0 40% 0;
-  z-index: 1;
-}
-
-.map-filters {
+.map-object {
+  .map {
+    @include full-size;
+  }
   
-  .select2-container {
-    .select2-selection--single {
-      padding: 0;
+  .map-full {
+    z-index: 1;
+  }
+  
+  .map-container {
+    position: relative;
+    height: 0;
+    padding: 0 0 40% 0;
+  }
+  
+  .map-right-container {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    z-index: 2;
+  }
+
+  &.compare {
+    .map-full {
+      width: 50%;
+    }
+    
+    .map-right-container {
+      display: block;
     }
   }
   
-}
-
-.map-sliders {
-  position: relative;
-  z-index: 2;
+  .map-filters {
+    
+    .select2-container {
+      .select2-selection--single {
+        padding: 0;
+      }
+    }
+    
+  }
+  
+  .map-sliders {
+    position: relative;
+    z-index: 2;
+  }
 }

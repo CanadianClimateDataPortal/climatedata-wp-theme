@@ -76,21 +76,41 @@
         
         console.log(container.attr('id'));
         
-        if (container.hasClass('map-container')) {
+        if (container.hasClass('map-object')) {
           
           //
           // MAP
           //
           
-          container.map_renderer({
+          var map_settings = {
             variables: JSON.parse(container.attr('data-map-variables')),
             rcp: container.attr('data-map-rcp'),
             maps: {
               main: {
-                id: container.find('.map').attr('id')
+                id: container.find('.map-full').attr('id')
+              },
+              right: {
+                id: container.find('.map-right').attr('id')
               }
             }
-          });
+          }
+          
+          if (
+            (container.attr('data-map-lat') != '' && container.attr('data-map-lng') != '') || 
+            container.attr('data-map-zoom') != ''
+          ) {
+            map_settings.map_settings = {}
+          }
+          
+          if (container.attr('data-map-lat') != '' && container.attr('data-map-lng') != '') {
+            map_settings.map_settings.center = [container.attr('data-map-lat'), container.attr('data-map-lng')]
+          }
+          
+          if (container.attr('data-map-zoom') != '') {
+            map_settings.map_settings.zoom = container.attr('data-map-zoom')
+          }
+          
+          container.map_renderer(map_settings)
           
         } else if (container.hasClass('chart-container')) {
           

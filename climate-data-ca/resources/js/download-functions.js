@@ -302,9 +302,9 @@
         }
 
         if (selectedGrids.length > 0) {
-          $('#download-location').parent().find('.select2-selection__rendered').text(selectedGrids.length + ' selected')
+          $('#download-location').parent().find('.select2-selection__rendered').text(selectedGrids.length + ' ' + l10n_labels.selected)
         } else {
-          $('#download-location').parent().find('.select2-selection__rendered').text('Search for a City/Town')
+          $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
         }
 
         var current_coords = $('#download-coords').val()

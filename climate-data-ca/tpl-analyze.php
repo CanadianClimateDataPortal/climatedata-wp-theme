@@ -349,34 +349,27 @@
 
                       ?>
 
-                      <div class="field type-checkbox">
-                        <div class="form-check input-row select-all">
+                      <div class="field validate-input type-radio d-flex flex-wrap">
+                        <p class="input-label w-100"><?php _e ( 'Representative Concentration Pathways (RCPs)', 'cdc' ); ?></p>
+                        
+                        <div class="input-row form-check w-25">
                           <div class="input-item">
-                            <input class="form-check-input" type="checkbox" name="" id="analyze-rcp-all" value="rcp">
-                            <label class="form-check-label" for="analyze-rcp-all">Representative Concentration Pathways (RCPs)</label>
+                            <input class="form-check-input add-to-object" type="radio" name="rcp" id="analyze-rcp-85" value="rcp85" checked>
+                            <label class="form-check-label" for="analyze-rcp-85">8.5</label>
                           </div>
                         </div>
-
-                        <div class="tree d-flex flex-wrap">
-                          <div class="input-row form-check w-25">
-                            <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="rcp" id="analyze-rcp-85" value="rcp85" checked>
-                              <label class="form-check-label" for="analyze-rcp-85">8.5</label>
-                            </div>
+                        
+                        <div class="input-row form-check w-25">
+                          <div class="input-item">
+                            <input class="form-check-input add-to-object" type="radio" name="rcp" id="analyze-rcp-45" value="rcp45">
+                            <label class="form-check-label" for="analyze-rcp-45">4.5</label>
                           </div>
-
-                          <div class="input-row form-check w-25">
-                            <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="rcp" id="analyze-rcp-45" value="rcp45">
-                              <label class="form-check-label" for="analyze-rcp-45">4.5</label>
-                            </div>
-                          </div>
-
-                          <div class="input-row form-check w-25">
-                            <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="rcp" id="analyze-rcp-26" value="rcp26">
-                              <label class="form-check-label" for="analyze-rcp-26">2.6</label>
-                            </div>
+                        </div>
+                        
+                        <div class="input-row form-check w-25">
+                          <div class="input-item">
+                            <input class="form-check-input add-to-object" type="radio" name="rcp" id="analyze-rcp-26" value="rcp26">
+                            <label class="form-check-label" for="analyze-rcp-26">2.6</label>
                           </div>
                         </div>
                       </div>

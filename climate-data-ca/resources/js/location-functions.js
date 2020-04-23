@@ -4,19 +4,7 @@
 
     // PAGE TOUR
     
-    var tour_options = {
-      debug: true,
-      default_open: false
-    }
 
-	  if (current_lang == 'fr') {
-  	  tour_options.labels = {
-    	  start_over: 'Recommencer',
-    	  next: 'Suivant',
-    	  close: 'Quitter',
-    	  dont_show: 'Ne plus montrer'
-  	  }
-	  }
 
     var current_location = {
       id: $('#location-content').attr('data-location'),
@@ -498,6 +486,14 @@
           for (var key in new_options) {
             new_options[key].position.of = '#' + this_ID
           }
+      	  if (current_lang == 'fr') {
+        	  new_options.labels = {
+          	  start_over: 'Recommencer',
+          	  next: 'Suivant',
+          	  close: 'Quitter',
+          	  dont_show: 'Ne plus montrer'
+        	  }
+      	  }
           
           $('#page-tour').attr('data-steps', JSON.stringify(new_options))
     

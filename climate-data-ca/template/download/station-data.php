@@ -9,7 +9,7 @@
     </p>
 
     <div class="form-input form-select col-7">
-      <select class="custom-select custom-select-md select2 form-control input-large validate" name="s[]" multiple="multiple" id="station-select" data-container-css-class="big-menu btn btn-lg border-primary rounded-pill" data-dropdown-css-class="big-menu-dropdown" data-placeholder="<?php _e ( 'Select station(s)','cdc' ); ?>">
+      <select class="custom-select custom-select-md select2 form-control input-large validate" name="s[]" multiple="multiple" id="station-select" data-container-css-class="big-menu btn btn-lg border-primary" data-dropdown-css-class="big-menu-dropdown" data-placeholder="<?php _e ( 'Select station(s)','cdc' ); ?>">
         <?php
 
           include ( locate_template ( 'resources/app/db.php' ) );

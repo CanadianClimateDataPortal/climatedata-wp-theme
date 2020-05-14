@@ -5401,6 +5401,8 @@ body.stations-on #variable-content .leaflet-top.leaflet-right {
       padding-left: 0; }
     #analyze-breadcrumb .step.on {
       opacity: 1; }
+  #analyze-breadcrumb #clear-grids {
+    color: #79e1e4; }
 
 #detail-close {
   float: right;

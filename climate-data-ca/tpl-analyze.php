@@ -478,7 +478,7 @@
                   </div>
 
                   <div class="crumb">
-                    <h6>Location <i class="fas fa-exclamation-circle ml-3 text-warning validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Zoom in to the map to select at least one grid coordinate.', 'cdc' ); ?>"></i></h6>
+                    <h6>Location <i id="clear-grids" class="fas fa-undo-alt ml-3" style="display: none;" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Clear', 'cdc' ); ?>"></i><i class="fas fa-exclamation-circle ml-3 text-warning validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Zoom in to the map to select at least one grid coordinate.', 'cdc' ); ?>"></i></h6>
                     <p class="value"></p>
                   </div>
                 </div>

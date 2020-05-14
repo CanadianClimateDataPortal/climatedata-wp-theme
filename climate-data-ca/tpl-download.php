@@ -84,6 +84,7 @@
     <ul class="navbar-nav tabs-nav w-100 justify-content-center">
       <li class="nav-item"><a href="#var-download" class="nav-link px-4 py-5 all-caps"><?php _e ( 'Variable Data', 'cdc' ); ?></a></li>
       <li class="nav-item"><a href="#station-download" class="nav-link px-4 py-5 all-caps"><?php _e ( 'Station Data', 'cdc' ); ?></a></li>
+      <li class="nav-item"><a href="#idf-download" class="nav-link px-4 py-5 all-caps"><?php _e ( 'IDF Curves', 'cdc' ); ?></a></li>
     </ul>
 
   </nav>
@@ -100,6 +101,14 @@
     <?php
 
       include ( locate_template ( 'template/download/station-data.php' ) );
+
+    ?>
+  </section>
+
+  <section id="idf-download" class="page-section tab">
+    <?php
+
+      include ( locate_template ( 'template/download/idf.php' ) );
 
     ?>
   </section>

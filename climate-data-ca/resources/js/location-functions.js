@@ -422,15 +422,15 @@
         $('#location-hero-data').show();
 
         $('#location-val-1').text(location_data.anusplin_1950_temp);
-        $('#location-val-2').text(location_data.anusplin_2005_temp);
+        $('#location-val-2').text(location_data.anusplin_1980_temp);
         $('#location-val-3').text(location_data.bcc_2020_temp);
         $('#location-val-4').text(location_data.bcc_2050_temp);
-        $('#location-val-5').text(location_data.bcc_2090_temp);
+        $('#location-val-5').text(location_data.bcc_2070_temp);
 
-        $('#location-val-6').text(location_data.anusplin_1980_precip);
+        $('#location-val-6').text(location_data.anusplin_1950_precip);
         $('#location-val-7').text(location_data.bcc_2020_precip);
         $('#location-val-8').text(location_data.bcc_2050_precip);
-        $('#location-val-9').text(location_data.bcc_2090_precip);
+        $('#location-val-9').text(location_data.bcc_2070_precip);
 
       }
     });

@@ -2782,11 +2782,17 @@ maxWidth: "auto"
       if ($('body').find('#chart-tour').length) {
 
         console.log('found', $('body').find('#chart-tour'))
+        var tour_options_chart = { default_open: false }
+        if (current_lang == 'fr') {
+          tour_options_chart.labels = {
+              start_over: 'Recommencer',
+              next: 'Suivant',
+              close: 'Quitter',
+              dont_show: 'Ne plus montrer'
+            }
+        }
 
-        $('body').find('#chart-tour').page_tour({
-          debug: true,
-      	  default_open: false
-    	  })
+        $('body').find('#chart-tour').page_tour(tour_options_chart)
 
   	  }
 

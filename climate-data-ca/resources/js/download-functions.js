@@ -34,52 +34,56 @@
     var all_vars = [];
     var daily_vars = [];
 
-    $('#download-variable optgroup').each(function() {
+		$('#download-variable optgroup').each(function() {
 
-	      var new_group = {
-		label: $(this).attr('label'),
-		options: []
-	      };
+			var new_group = {
+				label: $(this).attr('label'),
+				options: []
+			};
 
-	      $(this).find('option').each(function() {
+			$(this).find('option').each(function() {
 
-		var new_object = {
-		  value: $(this).attr('value'),
-		  text: $(this).text()
-		};
+				var new_object = {
+					value: $(this).attr('value'),
+					text: $(this).text()
+				};
 
-		if ($(this).hasClass('daily')) {
+				if ($(this).hasClass('daily')) {
 
-		  daily_vars.push(new_object);
+					daily_vars.push(new_object);
+
+				}
+
+				new_group['options'].push(new_object);
+
+			});
+
+			all_vars.push(new_group);
+
+		});
+
+		// location formatter
+
+		function formatLocationSearch (item) {
+
+			if (!item.id) {
+				return item.text;
+			}
+
+			if (item.location === null) {
+				show_comma = '';
+				item.location = '';
+			} else {
+				show_comma = ', ';
+			}
+
+			var $item = $(
+				'<span><div class="geo-select-title">' + item.text + ' (' + item.term + ')</div>' + item.location + show_comma + item.province + '</sup></span>'
+			);
+
+			return $item;
 
 		}
-
-		new_group['options'].push(new_object);
-
-	      });
-
-	      all_vars.push(new_group);
-
-	    });
-
-	    // location formatter
-
-	    function formatLocationSearch (item) {
-
-		if (!item.id) {
-            return item.text;
-        }
-        if (item.location === null) {
-          show_comma = '';
-          item.location = '';
-        } else {
-          show_comma = ', ';
-        }
-        var $item = $(
-            '<span><div class="geo-select-title">' + item.text + ' (' + item.term + ')</div>' + item.location + show_comma + item.province + '</sup></span>'
-        );
-        return $item;
-    }
 
     $('.download-location').select2({
       language: current_lang,
@@ -144,6 +148,12 @@
             station_init();
           }
 
+        } else if (ui.panel.attr('id') == 'idf-download') {
+
+          if (typeof maps['idf'] == 'undefined') {
+            idf_init()
+          }
+
         } else if (ui.panel.attr('id') == 'heat-wave-analysis') {
 
           if (typeof maps['heatwave'] == 'undefined') {
@@ -169,6 +179,12 @@
             station_init();
           }
 
+        } else if (ui.newPanel.attr('id') == 'idf-download') {
+
+          if (typeof maps['idf'] == 'undefined') {
+            idf_init()
+          }
+
         } else if (ui.newPanel.attr('id') == 'heat-wave-analysis') {
 
           if (typeof maps['heatwave'] == 'undefined') {
@@ -181,7 +197,7 @@
 
       }
     });
-    
+
     $('#map-overlay .btn').click(function(e) {
       e.preventDefault()
       $('#map-overlay').fadeOut()
@@ -239,7 +255,7 @@
           pane: 'grid',
       };
 
-      var pbfURL = hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf";
+			var pbfURL = hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf";
 
       var pbfLayer = L.vectorGrid.protobuf(pbfURL, vectorTileOptions).on('click', function (e) {
 
@@ -247,46 +263,46 @@
 
         selectedPoints[highlightGridFeature] = e.latlng;
 
-        var selectedExists = selectedGrids.includes(highlightGridFeature);
-
-//         console.log(selectedGrids, highlightGridFeature, selectedExists)
+				var selectedExists = selectedGrids.includes(highlightGridFeature);
 
         if (selectedExists === false) {
 
-            selectedGrids.push(highlightGridFeature);
+          selectedGrids.push(highlightGridFeature);
 
-            pbfLayer.setFeatureStyle(highlightGridFeature, {
-                weight: 1,
-                color: '#F00',
-                opacity: 1,
-                fill: true,
-                radius: 4,
-                fillOpacity: 0.1
-            });
+          pbfLayer.setFeatureStyle(highlightGridFeature, {
+            weight: 1,
+            color: '#F00',
+            opacity: 1,
+            fill: true,
+            radius: 4,
+            fillOpacity: 0.1
+          });
 
         } else {
 
-            for (var i = selectedGrids.length - 1; i >= 0; i--) {
-                if (selectedGrids[i] === highlightGridFeature) {
-                    selectedGrids.splice(i, 1);
-                }
+          for (var i = selectedGrids.length - 1; i >= 0; i--) {
+
+            if (selectedGrids[i] === highlightGridFeature) {
+              selectedGrids.splice(i, 1);
             }
+          }
 
-            for (var i = selectedPoints.length - 1; i >= 0; i--) {
+          for (var key in selectedPoints) {
+            //console.log(key, selectedPoints[key])
 
-                if (selectedPoints[highlightGridFeature]) {
-                    selectedPoints.splice(i, 1);
-                }
+            if (key == highlightGridFeature) {
+              delete selectedPoints[key]
             }
+          }
 
-            pbfLayer.setFeatureStyle(highlightGridFeature, {
-                weight: 0.1,
-                color: gridline_color,
-                opacity: 1,
-                fill: true,
-                radius: 4,
-                fillOpacity: 0
-            });
+          pbfLayer.setFeatureStyle(highlightGridFeature, {
+              weight: 0.1,
+              color: gridline_color,
+              opacity: 1,
+              fill: true,
+              radius: 4,
+              fillOpacity: 0
+          });
 
         }
 
@@ -302,18 +318,20 @@
         }
 
         if (selectedGrids.length > 0) {
-          $('#download-location').parent().find('.select2-selection__rendered').text(selectedGrids.length + ' selected')
+          $('#download-location').parent().find('.select2-selection__rendered').text(selectedGrids.length + ' ' + l10n_labels.selected)
         } else {
-          $('#download-location').parent().find('.select2-selection__rendered').text('Search for a City/Town')
+          $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
         }
 
-        var current_coords = $('#download-coords').val()
+        var current_coords = ''
 
-        current_coords += '|' + e.latlng.lat + ',' + e.latlng.lng + ',' + highlightGridFeature
+        selectedGrids.forEach(function(grid_id) {
+          current_coords += '|' + selectedPoints[grid_id].lat + ',' + selectedPoints[grid_id].lng + ',' + grid_id
+        })
 
         $('#download-coords').val(current_coords)
 
-        L.DomEvent.stop(e);
+        L.DomEvent.stop(e)
 
         checkform()
 
@@ -357,7 +375,7 @@
 
       } else {
 
-        console.log('monthly')
+        // console.log('monthly')
 
         // MONTHLY OR ANNUAL
 
@@ -371,24 +389,34 @@
         }
 
         if (form_valid == true) {
-
-//           console.log('form is valid')
           $('#download-process').removeClass('disabled');
-
         } else {
           $('#download-process').addClass('disabled');
-          //$('#download-process').prop('disabled', true);
         }
 
       }
 
     }
 
-    function process_download() {
+    //
+    // FORM PROCESSING
+    //
+
+    var output_CSV = "Date, Latitude, Longitude, RCP 2.6 Range (low), RCP 2.6 Median, RCP 2.6 Range (high), RCP 4.5 Range (low), RCP 4.5 Median, RCP 4.5 Range (high), RCP 8.5 Range (low), RCP 8.5 Median, RCP 8.5 Range (high)\n"
+
+    var urls = []
+
+		function process_download() {
 
       var output_JSON = []
 
-      var output_CSV = "Date, Latitude, Longitude, RCP 2.6 Range (low), RCP 2.6 Median, RCP 2.6 Range (high), RCP 4.5 Range (low), RCP 4.5 Median, RCP 4.5 Range (high), RCP 8.5 Range (low), RCP 8.5 Median, RCP 8.5 Range (high)\n"
+      var selected_var = $('#download-variable').val()
+
+      month = $("#download-dataset").val();
+
+      if (month == 'annual') {
+        month = 'ann'
+      }
 
       var split_coords = $('#download-coords').val().split('|')
 
@@ -397,11 +425,154 @@
 
       var coords_to_process = selectedGrids.length
 
-      $('body').addClass('spinner-on');
+      var grids_to_process = $('#download-coords').val().split('|')
+
+      grids_to_process.shift()
+
+      function ajaxRequest() {
+
+        if (grids_to_process.length > 0) {
+
+          this_grid = grids_to_process.pop().split(',')
+
+          dl_fraction.find('span').html(selectedGrids.length - grids_to_process.length)
+
+          dl_progress.css('width', (((selectedGrids.length - grids_to_process.length) / selectedGrids.length) * 100) + '%')
+
+          //console.log('processing ' + this_grid + ' - ' + 'https://data.climatedata.ca/get_values.php?lat=' + this_grid[0] + '&lon=' + this_grid[1] + '&var=' + selected_var + '&month=' + month)
+
+          $.ajax({
+            method: 'GET',
+            url: 'https://data.climatedata.ca/get_values.php?lat=' + this_grid[0] + '&lon=' + this_grid[1] + '&var=' + selected_var + '&month=' + month,
+            dataType: 'json',
+            success: function(data) {
+
+              midHistSeries = [];
+              rangeHistSeries = [];
+
+              mid26Series = [];
+              range26Series = [];
+
+              mid45Series = [];
+              range45Series = [];
+
+              mid85Series = [];
+              range85Series = [];
+
+              dLen = data.length;
+
+              if (month === 'ann' || month === 'jan') {
+                monthNum = "01";
+              } else if (month === 'feb') {
+                monthNum = "02";
+              } else if (month === 'mar') {
+                monthNum = "03";
+              } else if (month === 'apr') {
+                monthNum = "04";
+              } else if (month === 'may') {
+                monthNum = "05";
+              } else if (month === 'jun') {
+                monthNum = "06";
+              } else if (month === 'jul') {
+                monthNum = "07";
+              } else if (month === 'aug') {
+                monthNum = "08";
+              } else if (month === 'sep') {
+                monthNum = "09";
+              } else if (month === 'oct') {
+                monthNum = "10";
+              } else if (month === 'nov') {
+                monthNum = "11";
+              } else if (month === 'dec') {
+                monthNum = "12";
+              } else {
+                monthNum = 0
+              }
+
+              if (varDetails.units.value === 'kelvin') {
+                subtractValue = k_to_c;
+                chartUnit = "°C";
+              } else {
+                subtractValue = 0;
+                chartUnit = varDetails.units.label;
+              }
+
+              console.log('making CSV')
+
+              for (var i = 0; i < data.length; i++) {
+
+                decimals = 2;
+
+                if (data[i][0]) { data0 = (data[i][0] - subtractValue).toFixed(decimals); } else { data0 = null }
+                if (data[i][1]) { data1 = (data[i][1] - subtractValue).toFixed(decimals); } else { data1 = null }
+                if (data[i][2]) { data2 = (data[i][2] - subtractValue).toFixed(decimals); } else { data2 = null }
+                if (data[i][3]) { data3 = (data[i][3] - subtractValue).toFixed(decimals); } else { data3 = null }
+                if (data[i][4]) { data4 = (data[i][4] - subtractValue).toFixed(decimals); } else { data4 = null }
+                if (data[i][5]) { data5 = (data[i][5] - subtractValue).toFixed(decimals); } else { data5 = null }
+                if (data[i][6]) { data6 = (data[i][6] - subtractValue).toFixed(decimals); } else { data6 = null }
+                if (data[i][7]) { data7 = (data[i][7] - subtractValue).toFixed(decimals); } else { data7 = null }
+                if (data[i][8]) { data8 = (data[i][8] - subtractValue).toFixed(decimals); } else { data8 = null }
+                if (data[i][9]) { data9 = (data[i][9] - subtractValue).toFixed(decimals); } else { data9 = null }
+                if (data[i][10]) { data10 = (data[i][10] - subtractValue).toFixed(decimals); } else { data10 = null }
+                if (data[i][11]) { data11 = (data[i][11] - subtractValue).toFixed(decimals); } else { data11 = null }
+
+                year = 1950 + i;
+                if (i < 56) {
+
+                  output_CSV += year + "-" + monthNum + "-01," + this_grid[0] + ',' + this_grid[1] + ',' + data0 + ',' + data1 + ',' + data2 + ',' + data3 + ',' + data4 + ',' + data5 + ',' + data6 + ',' + data7 + ',' + data8 + ',' + "\n"
+
+                }
+
+                // had to add limiter since annual values spit out a null set at the end.
+                if (i > 54 && i < 150) {
+
+                  output_CSV += year + "-" + monthNum + "-01," + this_grid[0] + ',' + this_grid[1] + ',' + data0 + ',' + data1 + ',' + data2 + ',' + data3 + ',' + data4 + ',' + data5 + ',' + data6 + ',' + data7 + ',' + data8 + ',' + "\n"
+
+                }
+              }
+
+              if (coords_to_process == 1) {
+
+                $('body').removeClass('spinner-on')
+
+                dl_fraction.remove()
+                dl_progress.remove()
+
+                //console.log(output_CSV)
+
+                $('#download-result a').attr('href', 'data:text/csv;charset=utf-8,' + escape(output_CSV));
+                $('#download-result a').attr('download', $('#download-filename').val() + '.csv');
+                $('#download-result').slideDown(250)
+
+              } else {
+                coords_to_process -= 1
+              }
+
+              chart = null
+              $('#dummy-chart').empty()
+
+            },
+            complete: function() {
+
+              ajaxRequest()
+
+            }
+          })
+
+        }
+      }
 
       if ($('input[name="download-format"]:checked').val() == 'csv') {
 
         // get the variable details
+
+        $('body').addClass('spinner-on')
+
+        var dl_status = 0
+
+        var dl_fraction = $('<p id="dl-fraction" style="position: absolute; left: 30%; bottom: 30%; width: 40%; padding-bottom: 1em; text-align: center;"><span>' + dl_status + '</span> / ' + grids_to_process.length + '</p>').appendTo($('.spinner'))
+
+        var dl_progress = $('<div class="dl-progress" style="position: absolute; left: 0; bottom: 0; width: 0; height: 4px; background: red;">').appendTo(dl_fraction)
 
         $.ajax({
           url: ajax_url + 'variable/' + $('#download-variable').val() + '/',
@@ -414,122 +585,8 @@
           },
           complete: function() {
 
-              month = $("#download-dataset").val();
-
-              if (month == 'annual') {
-                month = 'ann'
-              }
-
-              selectedPoints.forEach(function(entry) {
-
-                  $.getJSON(
-                      'https://data.climatedata.ca/get_values.php?lat=' + entry.lat + '&lon=' + entry.lng + '&var=' + $('#download-variable').val() + '&month=' + month,
-                      function (data) {
-
-                          midHistSeries = [];
-                          rangeHistSeries = [];
-
-                          mid26Series = [];
-                          range26Series = [];
-
-                          mid45Series = [];
-                          range45Series = [];
-
-                          mid85Series = [];
-                          range85Series = [];
-
-                          dLen = data.length;
-
-                          if (month === 'ann' || month === 'jan') {
-                              monthNum = "01";
-                          } else if (month === 'feb') {
-                              monthNum = "02";
-                          } else if (month === 'mar') {
-                              monthNum = "03";
-                          } else if (month === 'apr') {
-                              monthNum = "04";
-                          } else if (month === 'may') {
-                              monthNum = "05";
-                          } else if (month === 'jun') {
-                              monthNum = "06";
-                          } else if (month === 'jul') {
-                              monthNum = "07";
-                          } else if (month === 'aug') {
-                              monthNum = "08";
-                          } else if (month === 'sep') {
-                              monthNum = "09";
-                          } else if (month === 'oct') {
-                              monthNum = "10";
-                          } else if (month === 'nov') {
-                              monthNum = "11";
-                          } else if (month === 'dec') {
-                              monthNum = "12";
-                          } else {
-                              monthNum = 0
-                          }
-
-                          if (varDetails.units.value === 'kelvin') {
-                              subtractValue = k_to_c;
-                              chartUnit = "°C";
-                          } else {
-                              subtractValue = 0;
-                              chartUnit = varDetails.units.label;
-                          }
-
-                        console.log('making CSV')
-
-                        for (var i = 0; i < data.length; i++) {
-
-                            decimals = 2;
-
-                            if (data[i][0]) { data0 = (data[i][0] - subtractValue).toFixed(decimals); } else { data0 = null }
-                            if (data[i][1]) { data1 = (data[i][1] - subtractValue).toFixed(decimals); } else { data1 = null }
-                            if (data[i][2]) { data2 = (data[i][2] - subtractValue).toFixed(decimals); } else { data2 = null }
-                            if (data[i][3]) { data3 = (data[i][3] - subtractValue).toFixed(decimals); } else { data3 = null }
-                            if (data[i][4]) { data4 = (data[i][4] - subtractValue).toFixed(decimals); } else { data4 = null }
-                            if (data[i][5]) { data5 = (data[i][5] - subtractValue).toFixed(decimals); } else { data5 = null }
-                            if (data[i][6]) { data6 = (data[i][6] - subtractValue).toFixed(decimals); } else { data6 = null }
-                            if (data[i][7]) { data7 = (data[i][7] - subtractValue).toFixed(decimals); } else { data7 = null }
-                            if (data[i][8]) { data8 = (data[i][8] - subtractValue).toFixed(decimals); } else { data8 = null }
-                            if (data[i][9]) { data9 = (data[i][9] - subtractValue).toFixed(decimals); } else { data9 = null }
-                            if (data[i][10]) { data10 = (data[i][10] - subtractValue).toFixed(decimals); } else { data10 = null }
-                            if (data[i][11]) { data11 = (data[i][11] - subtractValue).toFixed(decimals); } else { data11 = null }
-
-                            year = 1950 + i;
-                            if (i < 56) {
-
-                                output_CSV += year + "-" + monthNum + "-01," + entry.lat + ',' + entry.lng + ',' + data0 + ',' + data1 + ',' + data2 + ',' + data3 + ',' + data4 + ',' + data5 + ',' + data6 + ',' + data7 + ',' + data8 + ',' + "\n"
-
-                            }
-                            // had to add limiter since annual values spit out a null set at the end.
-                            if (i > 54 && i < 150) {
-
-                                output_CSV += year + "-" + monthNum + "-01," + entry.lat + ',' + entry.lng + ',' + data0 + ',' + data1 + ',' + data2 + ',' + data3 + ',' + data4 + ',' + data5 + ',' + data6 + ',' + data7 + ',' + data8 + ',' + "\n"
-
-                            }
-                        }
-
-                        if (coords_to_process == 1) {
-
-                          //console.log(output_CSV)
-
-                          $('#download-result a').attr('href', 'data:text/csv;charset=utf-8,' + escape(output_CSV));
-                          $('#download-result a').attr('download', $('#download-filename').val() + '.csv');
-                          $('#download-result').slideDown(250)
-
-                          $('body').removeClass('spinner-on');
-
-                        } else {
-                          coords_to_process -= 1
-                        }
-
-                        chart = null
-                        $('#dummy-chart').empty()
-
-                      }
-                  );
-
-              }); // selectedPoints.forEach
+            //console.log(grids_to_process)
+            ajaxRequest()
 
           }
 
@@ -1224,6 +1281,229 @@
     }
 
     //
+    // IDF CURVES
+    //
+
+    function popup_markup(properties) {
+
+      var popup_headings = [
+        'Name',
+        'Elevation',
+        'Downloads (will open in a new window)'
+      ];
+
+      if (current_lang == 'fr') {
+        popup_headings = [
+          'Nom',
+          'Altitude',
+          'Téléchargement (Une nouvelle fenêtre s’ouvrira)'
+        ];
+      }
+
+      return '<div class="idf-popup-row">' +
+          '<h6>' + popup_headings[0] + '</h6>' +
+          '<h5 class="idfTitle">' + properties.Name + '</h5>' +
+        '</div>' +
+        '<div class="idf-popup-row">' +
+          '<h6>' + popup_headings[1] + '</h6>' +
+          '<h5 class="idfElev">' + properties.Elevation_ + '</h5>' +
+        '</div>' +
+        '<h6>' + popup_headings[2] + '</h6>' +
+        '<ul class="idfBody list-unstyled"></ul>';
+
+    }
+
+    var idf_layer
+
+    var popup_headings = [
+      'Name',
+      'Elevation',
+      'Downloads (will open in a new window)'
+    ];
+
+    if (current_lang == 'fr') {
+      popup_headings = [
+        'Nom',
+        'Altitude',
+        'Téléchargement (Une nouvelle fenêtre s’ouvrira)'
+      ];
+    }
+
+    var popup_labels = [
+      "Short Duration Rainfall Intensity−Duration−Frequency Data",
+      "Quantile",
+      "Return Level",
+      "Trend"
+    ];
+
+    if (current_lang == 'fr') {
+      popup_labels = [
+        "Données sur l’intensité, la durée et la fréquence des chutes de pluie de courte durée",
+        "Quantile",
+        "Niveau de retour",
+        "Tendance",
+      ];
+    }
+
+    function idf_init() {
+
+      create_map('idf')
+
+      $.getJSON(child_theme_dir + 'resources/app/run-frontend-sync/assets/json/idf_curves.json', function (data) {
+
+        //console.log(data);
+
+        idf_layer = L.geoJson(data, {
+          onEachFeature: function (feature, layer) {
+
+            $('<option value="' + feature.properties.ID + '">' + feature.properties.Name + '</option>').appendTo('#idf-select')
+
+          },
+          pointToLayer: function (feature, latlng) {
+
+            return L.circleMarker(latlng, {
+              pane: 'idf',
+              color: '#fff',
+              opacity: 1,
+              weight: 2,
+              fillColor: '#3869f6',
+              fillOpacity: 1,
+              radius: 5
+            })
+
+          }
+
+        }).on('mouseover', function (e) {
+
+          e.layer.bindTooltip(e.layer.feature.properties.Name).openTooltip(e.latlng)
+
+        }).on('click', function (e) {
+
+          $('#idf-select').val(e.layer.feature.properties.ID).trigger('change')
+
+        })
+
+        // sort options
+
+        var arr = $('#idf-select option').map(function(_, o) { return { t: $(o).text(), v: o.value }; }).get()
+
+        arr.sort(function(o1, o2) { return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0; })
+
+        $('#idf-select option').each(function(i, o) {
+          o.value = arr[i].v
+          $(o).text(arr[i].t)
+        })
+
+        // add to map
+
+        idf_layer.addTo(maps['idf'])
+
+      })
+
+    }
+
+    $('#idf-select').on('change', function (e) {
+
+      //marker_id = e.params.data.id
+      marker_id = $(this).val()
+
+      $('#idf-links ul').empty()
+      $('#download-idf-station').slideDown()
+
+      // find the feature in the IDF layer
+
+      idf_layer.eachLayer(function (layer) {
+
+        //console.log('checking ' + layer.feature.properties.ID)
+
+        if (layer.feature.properties.ID === marker_id) {
+
+          console.log(layer)
+
+          layer.setStyle({
+            fillColor: '#F00'
+          })
+
+          var current_view = maps['idf'].getZoom()
+
+          if (current_view < 7) {
+            current_view = 7
+          }
+
+          maps['idf'].setView([layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0]], current_view)
+
+          $.getJSON(child_theme_dir + 'resources/app/run-frontend-sync/search_idfs.php?idf=' + layer.feature.properties.ID, function (data) {
+
+            $('#idf-station-name h5').text(layer.feature.properties.Name)
+            $('#idf-station-elevation h5').text(layer.feature.properties.Elevation_)
+
+            /*$('#idf-links').html('<div class="idf-popup-row">' +
+                '<h6>' + popup_headings[0] + '</h6>' +
+                '<h5 class="idfTitle">' + layer.feature.properties.Name + '</h5>' +
+              '</div>' +
+              '<div class="idf-popup-row">' +
+                '<h6>' + popup_headings[1] + '</h6>' +
+                '<h5 class="idfElev">' + layer.feature.properties.Elevation_ + '</h5>' +
+              '</div>' +
+              '<h6>' + popup_headings[2] + '</h6>' +
+              '<ul class="idfBody list-unstyled"></ul>');*/
+
+            $.each(data, function(k,v) {
+              linktext = v;
+
+              if (v.includes("_A.pdf", 0) === true) {
+                linktext = popup_labels[0] + " (PDF)";
+              } else if (v.includes("_A.png", 0) === true) {
+                linktext = popup_labels[0] + " (PNG)";
+              } else if (v.includes(".txt", 0) === true) {
+                linktext = popup_labels[0] + " (TXT)";
+              } else if (v.includes("_qq.pdf", 0) === true) {
+                linktext = popup_labels[1] + " (PDF)";
+              } else if (v.includes("_qq.png", 0) === true) {
+                linktext = popup_labels[1] + " (PNG)";
+              } else if (v.includes("_r.pdf", 0) === true) {
+                linktext = popup_labels[2] + " (PDF)";
+              } else if (v.includes("_r.png", 0) === true) {
+                linktext = popup_labels[2] + " (PNG)";
+              } else if (v.includes("_t.pdf", 0) === true) {
+                linktext = popup_labels[3] + " (PDF)";
+              } else if (v.includes("_t.png", 0) === true) {
+                linktext = popup_labels[3] + " (PNG)";
+              } else if (v.includes(".pdf", 0) === true) {
+                linktext = popup_labels[0] + " (PDF)";
+              } else if (v.includes(".png", 0) === true) {
+                linktext = popup_labels[0] + " (PNG)";
+              }
+
+              $('#idf-links ul').append('<li><a href="' + v + '" target="_blank">' + linktext + '</a></li>');
+
+            })
+
+          })
+
+        } else {
+
+          layer.setStyle({
+            fillColor: '#3869f6'
+          })
+
+        }
+      })
+
+      setTimeout ( function() {
+
+        $(document).smooth_scroll({
+        	id: $('#download-idf-station'),
+        	speed: 1000,
+        	ease: 'swing',
+        	offset: 100
+        })
+
+      }, 500)
+
+    })
+
+    //
     // HEAT WAVE
     //
 
@@ -1259,7 +1539,7 @@
           pane: 'labels'
       }).addTo(maps[map_var]);
 
-      if (map_var == 'station') {
+      if (map_var == 'station' || map_var == 'idf') {
 
         maps[map_var].createPane('idf');
         maps[map_var].getPane('idf').style.zIndex = 600;
@@ -1320,7 +1600,7 @@
           pane: 'grid',
       };
 
-      var pbfURL = hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf";
+			var pbfURL = hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf";
 
       var pbfLayer = L.vectorGrid.protobuf(pbfURL, vectorTileOptions).on('click', function (e) {
 

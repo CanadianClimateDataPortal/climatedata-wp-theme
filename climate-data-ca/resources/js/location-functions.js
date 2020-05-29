@@ -4,19 +4,7 @@
 
     // PAGE TOUR
     
-    var tour_options = {
-      debug: true,
-      default_open: false
-    }
 
-	  if (current_lang == 'fr') {
-  	  tour_options.labels = {
-    	  start_over: 'Recommencer',
-    	  next: 'Suivant',
-    	  close: 'Quitter',
-    	  dont_show: 'Ne plus montrer'
-  	  }
-	  }
 
     var current_location = {
       id: $('#location-content').attr('data-location'),
@@ -434,15 +422,15 @@
         $('#location-hero-data').show();
 
         $('#location-val-1').text(location_data.anusplin_1950_temp);
-        $('#location-val-2').text(location_data.anusplin_2005_temp);
+        $('#location-val-2').text(location_data.anusplin_1980_temp);
         $('#location-val-3').text(location_data.bcc_2020_temp);
         $('#location-val-4').text(location_data.bcc_2050_temp);
-        $('#location-val-5').text(location_data.bcc_2090_temp);
+        $('#location-val-5').text(location_data.bcc_2070_temp);
 
-        $('#location-val-6').text(location_data.anusplin_1980_precip);
+        $('#location-val-6').text(location_data.anusplin_1950_precip);
         $('#location-val-7').text(location_data.bcc_2020_precip);
         $('#location-val-8').text(location_data.bcc_2050_precip);
-        $('#location-val-9').text(location_data.bcc_2090_precip);
+        $('#location-val-9').text(location_data.bcc_2070_precip);
 
       }
     });
@@ -498,6 +486,14 @@
           for (var key in new_options) {
             new_options[key].position.of = '#' + this_ID
           }
+      	  if (current_lang == 'fr') {
+        	  new_options.labels = {
+          	  start_over: 'Recommencer',
+          	  next: 'Suivant',
+          	  close: 'Quitter',
+          	  dont_show: 'Ne plus montrer'
+        	  }
+      	  }
           
           $('#page-tour').attr('data-steps', JSON.stringify(new_options))
     

@@ -10,7 +10,7 @@ const geoserver_url = DATA_URL;
 // GLOBAL VARS
 //
 
-var chart_labels, legend_labels;
+var chart_labels, legend_labels, l10n_labels;
 
 (function($) {
 
@@ -233,6 +233,11 @@ var chart_labels, legend_labels;
       click_to_zoom: 'Click and drag in the plot area to zoom in'
     };
 
+    l10n_labels = {
+      search_city: 'Search for a City/Town',
+      selected: 'selected'
+    };
+
     if ($('body').hasClass('lang-fr')) {
 
       chart_labels = {
@@ -251,6 +256,11 @@ var chart_labels, legend_labels;
         daily_max_temp: 'Température quotidienne maximale',
         daily_min_temp: 'Température quotidienne minimale',
         click_to_zoom: 'Cliquer et faire glisser dans la zone du tracé pour agrandir'
+      };
+
+      l10n_labels = {
+        search_city: 'Cherchez une ville ou un village',
+        selected: 'sélectionés'
       };
 
       if (typeof Highcharts !== 'undefined') {

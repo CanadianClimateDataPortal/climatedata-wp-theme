@@ -14,7 +14,7 @@ $h2-font-size: 5em !default;
 $h3-font-size: 4em !default;
 $h4-font-size: 3em !default;
 $h5-font-size: 2em !default;
-$h6-font-size: 1.6em !default;
+$h6-font-size: 1.9em !default;
 
 $h1-font-weight: $heading-font-weight !default;
 $h2-font-weight: $heading-font-weight !default;
@@ -81,11 +81,11 @@ h6 {
 
 p {
   margin: 0 0 24px 0;
-  font-size: 1.6em;
+  font-size: 1.9em;
 }
 
 ul, ol {
-  font-size: 1.6em;  
+  font-size: 1.9em;  
   padding-left: 40px;
   
   ul, ol {

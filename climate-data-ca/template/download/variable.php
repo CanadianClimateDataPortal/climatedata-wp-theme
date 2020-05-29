@@ -126,12 +126,12 @@
 
     </div>
 
-    <p class="form-help col-10 col-sm-2 offset-1"><?php _e ( 'Zoom into the map to select a grid point.', 'cdc' ); ?></p>
+    <p class="form-help col-10 col-sm-2 offset-1"><?php _e ( 'Zoom in to the map to select at least one grid coordinate.', 'cdc' ); ?></p>
 
     <div id="download-map-variable-container" class="col-10 offset-1 col-lg-8 offset-lg-2 download-map-container">
       <div id="map-overlay">
         <div id="map-overlay-content">
-          <h4><?php _e ( 'Zoom in to activate selectable areas on the map', 'cdc' ); ?></h4>
+          <h4><?php _e ( 'Zoom in to the map to select at least one grid coordinate.', 'cdc' ); ?></h4>
           <span class="btn btn-outline-secondary rounded-pill"><?php _e ( 'Dismiss', 'cdc' ); ?></span>
         </div>
       </div>

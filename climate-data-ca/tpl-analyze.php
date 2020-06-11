@@ -75,7 +75,7 @@
                 <div class="accordion-head" data-step="1">
                   <h5 class="d-flex align-items-center justify-content-between all-caps">
                     <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">1</span>
-                    <span class="flex-grow-1">Choose a dataset</span>
+                    <span class="flex-grow-1"><?php _e ( 'Choose a dataset', 'cdc' ); ?></span>
                     <i class="fas fa-caret-down"></i>
                   </h5>
                 </div>
@@ -98,7 +98,7 @@
                 <div class="accordion-head" data-step="2">
                   <h5 class="d-flex align-items-center justify-content-between all-caps">
                     <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">2</span>
-                    <span class="flex-grow-1">Select locations</span>
+                    <span class="flex-grow-1"><?php _e ( 'Select locations', 'cdc' ); ?></span>
                     <i class="fas fa-caret-down"></i>
                   </h5>
                 </div>
@@ -109,7 +109,7 @@
                       <div class="input-row form-check">
                         <div class="input-item">
                           <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-grid" value="grid">
-                          <label class="form-check-label" for="analyze-location-grid">Grids</label>
+                          <label class="form-check-label" for="analyze-location-grid"><?php _e ( 'Grids', 'cdc' ); ?></label>
                         </div>
 
                         <!--<span class="tooltip-icon"><i class="fas fa-question"></i></span>-->
@@ -118,7 +118,7 @@
                       <div class="input-row form-check">
                         <div class="input-item">
                           <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-grid" value="grid" disabled>
-                          <label class="form-check-label" for="analyze-location-grid">Other location types coming soon</label>
+                          <label class="form-check-label" for="analyze-location-grid"><?php _e ( 'Other location types coming soon', 'cdc' ); ?></label>
                         </div>
                       </div>
                     </div>
@@ -128,7 +128,7 @@
                 <div class="accordion-head" data-step="3">
                   <h5 class="d-flex align-items-center justify-content-between all-caps">
                     <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">3</span>
-                    <span class="flex-grow-1">Customize variables</span>
+                    <span class="flex-grow-1"><?php _e ( 'Customize variables', 'cdc' ); ?></span>
                     <i class="fas fa-caret-down"></i>
                   </h5>
                 </div>
@@ -199,7 +199,7 @@
                 <div class="accordion-head" data-step="4">
                   <h5 class="d-flex align-items-center justify-content-between all-caps">
                     <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">4</span>
-                    <span class="flex-grow-1">Choose a timeframe</span>
+                    <span class="flex-grow-1"><?php _e ( 'Choose a timeframe', 'cdc' ); ?></span>
                     <i class="fas fa-caret-down"></i>
                   </h5>
                 </div>
@@ -209,7 +209,7 @@
                     <div class="validate-input type-select">
                       <div class="input-row mb-4">
                         <div class="input-item">
-                          <label class="form-check-label" for="analyze-timeframe-start">Start Year</label>
+                          <label class="form-check-label" for="analyze-timeframe-start"><?php _e ( 'Start Year', 'cdc' ); ?></label>
                           <!--<span class="tooltip-icon"><i class="fas fa-question"></i></span>-->
                         </div>
 
@@ -227,7 +227,7 @@
 
                       <div class="input-row">
                         <div class="input-item">
-                          <label class="form-check-label" for="analyze-timeframe-end">End Year</label>
+                          <label class="form-check-label" for="analyze-timeframe-end"><?php _e ( 'End Year', 'cdc' ); ?></label>
                           <!--<span class="tooltip-icon"><i class="fas fa-question"></i></span>-->
                         </div>
 
@@ -252,7 +252,7 @@
                 <div class="accordion-head" data-step="5">
                   <h5 class="d-flex align-items-center justify-content-between all-caps">
                     <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">5</span>
-                    <span class="flex-grow-1">Advanced</span>
+                    <span class="flex-grow-1"><?php _e ( 'Advanced', 'cdc' ); ?></span>
                     <i class="fas fa-caret-down"></i>
                   </h5>
                 </div>
@@ -378,7 +378,7 @@
                         <div class="form-check input-row select-all">
                           <div class="input-item">
                             <input class="form-check-input" type="checkbox" name="" id="analyze-model-all" value="all">
-                            <label class="form-check-label" for="analyze-model-all">Percentiles</label>
+                            <label class="form-check-label" for="analyze-model-all"><?php _e ( 'Percentiles', 'cdc' ); ?></label>
                           </div>
                         </div>
 
@@ -467,7 +467,7 @@
               <div id="analyze-breadcrumb" class="d-flex">
                 <div class="step" data-step="1">
                   <div class="crumb">
-                    <h6>Dataset</h6>
+                    <h6><?php _e ( 'Dataset', 'cdc' ); ?></h6>
                     <p class="value"></p>
                   </div>
                 </div>
@@ -478,7 +478,7 @@
                   </div>
 
                   <div class="crumb">
-                    <h6>Location <i id="clear-grids" class="fas fa-undo-alt ml-3" style="display: none;" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Clear', 'cdc' ); ?>"></i><i class="fas fa-exclamation-circle ml-3 text-warning validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Zoom in to the map to select at least one grid coordinate.', 'cdc' ); ?>"></i></h6>
+                    <h6><?php _e ( 'Location', 'cdc' ); ?> <i id="clear-grids" class="fas fa-undo-alt ml-3" style="display: none;" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Clear', 'cdc' ); ?>"></i><i class="fas fa-exclamation-circle ml-3 text-warning validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Zoom in to the map to select at least one grid coordinate.', 'cdc' ); ?>"></i></h6>
                     <p class="value"></p>
                   </div>
                 </div>
@@ -489,7 +489,7 @@
                   </div>
 
                   <div class="crumb">
-                    <h6>Variable(s) <i class="fas fa-exclamation-circle ml-3 text-warning validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Make sure a value is entered for each variable threshold.', 'cdc' ); ?>"></i></h6>
+                    <h6><?php _e ( 'Variable(s)', 'cdc' ); ?> <i class="fas fa-exclamation-circle ml-3 text-warning validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Make sure a value is entered for each variable threshold.', 'cdc' ); ?>"></i></h6>
                     <p class="value"></p>
                   </div>
                 </div>
@@ -500,7 +500,7 @@
                   </div>
 
                   <div class="crumb">
-                    <h6>Timeframe</h6>
+                    <h6><?php _e ( 'Timeframe', 'cdc' ); ?></h6>
                     <p class="value"></p>
                   </div>
                 </div>
@@ -511,7 +511,7 @@
                   </div>
 
                   <div class="crumb">
-                    <h6>Options</h6>
+                    <h6><?php _e ( 'Options', 'cdc' ); ?></h6>
                     <p class="value"></p>
                   </div>
                 </div>
@@ -541,10 +541,26 @@
 
               <div id="map-overlay">
 
-                <div id="map-overlay-content">
-                  <h4>Choose a dataset and process to visualize data on map</h4>
-                  <p>Start by selecting a dataset from the menu on the left.</p>
-                  <span class="btn btn-outline-secondary rounded-pill hidden">Dismiss</span>
+                <div id="map-overlay-content" data-steps='<?php
+                  
+                  echo json_encode ( array (
+                    array (
+                      'head' => __ ( 'Choose a dataset', 'cdc' ),
+                      'text' => __ ( 'Start by selecting a dataset from the menu on the left.', 'cdc' )
+                    ), array (
+                      'head' => __ ( 'Select a location type', 'cdc' ),
+                      'text' => __ ( 'Next, click “Selection Locations” to choose the summary location type', 'cdc' )
+                    ), array (
+                      'head' => __ ( 'Select a location', 'cdc' ),
+                      'text' => __ ( 'Zoom in to activate selectable areas on the map', 'cdc' )
+                    )
+                    
+                  ) ); 
+                  
+                ?>'>
+                  <h4><?php _e ( 'Choose a dataset', 'cdc' ); ?></h4>
+                  <p><?php _e ( 'Start by selecting a dataset from the menu on the left.', 'cdc' ); ?></p>
+                  <span class="btn btn-outline-secondary rounded-pill hidden"><?php _e ( 'Click to continue', 'cdc' ); ?></span>
                 </div>
 
               </div>
@@ -580,7 +596,7 @@
               </div>
 
               <div class="col-8-of-8 p-4">
-                <p class="form-label-wrap mt-3"><strong><?php _e ( 'Note:', 'cdc' ); ?></strong> <?php _e ( 'This is an experimental functionality. This data requires 30 to 90 minutes of processing time. All data will be delivered in a NetCDF file via an email notification once the processing is complete. Don’t forget to check your spam folder.', 'cdc' ); ?></p>
+                <p class="form-label-wrap mt-3"><strong><?php _e ( 'Note:', 'cdc' ); ?></strong> <?php _e ( 'Data processing starts when you click on ‘Send Request.’ It may take 30 to 90 minutes to complete, depending on available resources. You will be notified by email when your request has been processed and the data are available. Don’t forget to check your spam folder.', 'cdc' ); ?></p>
               </div>
 
             </div>

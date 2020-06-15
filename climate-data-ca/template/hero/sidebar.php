@@ -12,6 +12,7 @@
       <li><a href="<?php echo get_permalink ( filtered_ID_by_path ( 'explore/location' ) ); ?>" class="supermenu-toggle"><?php _e ( 'Explore by Location', 'cdc' ); ?></a></li>
       <li><a href="<?php echo get_permalink ( filtered_ID_by_path ( 'explore/variable' ) ); ?>" class="supermenu-toggle"><?php _e ( 'Explore by Variable', 'cdc' ); ?></a></li>
       <li><a href="<?php echo get_permalink ( filtered_ID_by_path ( 'explore/sector' ) ); ?>" class="supermenu-toggle"><?php _e ( 'Explore by Sector', 'cdc' ); ?></a></li>
+      <li><a href="<?php echo get_permalink ( filtered_ID_by_path ( 'analyze' ) ); ?>"><?php _e ( 'Analyze', 'cdc' ); ?></a></li>
       <li><a href="<?php echo get_permalink ( filtered_ID_by_path ( 'download' ) ); ?>"><?php _e ( 'Download', 'cdc' ); ?></a></li>
     </ul>
   </div>

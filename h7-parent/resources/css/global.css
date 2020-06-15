@@ -11014,13 +11014,13 @@ body.has-alert #main-header {
   position: absolute;
   transition: top 0.4s; }
 body.has-alert .first-section {
-  padding-top: 230px; }
+  padding-top: 70px; }
 body.has-alert.alert-closing #main-header {
   top: 0; }
 body.has-alert.alert-closed #main-header {
   position: fixed; }
 body.has-alert.alert-closing .first-section, body.has-alert.alert-closed .first-section {
-  padding-top: 160px; }
+  padding-top: 0; }
 
 .type-subsection {
   padding-top: 100px;

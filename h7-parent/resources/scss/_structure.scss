@@ -102,7 +102,7 @@ body {
     }
     
     .first-section {
-      padding-top: #{$first-section-padding-top + $alert-height};
+      padding-top: $alert-height;
     }
     
     &.alert-closing {
@@ -120,7 +120,7 @@ body {
     &.alert-closing,
     &.alert-closed {
       .first-section {
-        padding-top: $first-section-padding-top;
+        padding-top: 0;
       }
     }
   }

@@ -193,14 +193,14 @@
                 
       ?>
       
-      <div id="alert" class="container-fluid alert header-alert bg-dark text-white">
+      <div id="alert" class="container-fluid alert header-alert bg-primary text-white">
         <div class="row align-items-center">
           <div class="col-10 col-md-9 offset-md-2 pl-3 pl-md-0">
             <a href="<?php echo $alert['permalink']; ?>"><?php echo $alert['title']; ?></a>
           </div>
           
           <div class="col text-center alert-close">
-            <i class="fas fa-times rounded-circle btn btn-outline-secondary"></i>
+            <i class="fas fa-times rounded-circle btn btn-outline-light"></i>
           </div>
         </div>
       </div>

@@ -123,7 +123,18 @@ var sticky_offset = 0,
         filename: 'ClimateData.ca Export',
         scale: 2,
         sourceWidth: 1600,
-        sourceHeight: 800
+        sourceHeight: 800,
+        chartOptions: {
+          navigator: {
+            enabled: false
+          },
+          scrollbar: {
+            enabled: false
+          },
+          legend: {
+            itemDistance: 50
+          }
+        }
       },
       
       lang: {

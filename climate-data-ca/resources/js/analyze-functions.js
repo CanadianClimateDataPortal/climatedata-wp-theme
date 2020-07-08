@@ -5,6 +5,10 @@
     //
     // GLOBAL VARS
     //
+    
+    // overlay text
+    
+    var overlay_text = JSON.parse($('#map-overlay-content').attr('data-steps'))
 
     // form stuff
 
@@ -86,8 +90,9 @@
         } else if (ui.newPanel.attr('data-step') == '2') {
 
           // swap text
-
-          $('#map-overlay-content p').html('Zoom in to activate selectable areas on the map.')
+          
+          $('#map-overlay-content h4').html(overlay_text[2]['head'])
+          $('#map-overlay-content p').html(overlay_text[2]['text'])
 
           // show 'dismiss' btn
 
@@ -124,7 +129,8 @@
 
 
     $('.accordion-content[data-step="1"] .input-item').on('click', function(e) {
-      $('#map-overlay-content p').html('Next, click ‘Select Locations.’')
+      $('#map-overlay-content h4').html(overlay_text[1]['head'])
+      $('#map-overlay-content p').html(overlay_text[1]['text'])
     })
 
     $('#map-overlay .btn').click(function(e) {

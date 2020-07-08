@@ -120,7 +120,10 @@ var sticky_offset = 0,
       },
       
       exporting: {
-        filename: 'ClimateData.ca Export'
+        filename: 'ClimateData.ca Export',
+        scale: 2,
+        sourceWidth: 1600,
+        sourceHeight: 800
       },
       
       lang: {

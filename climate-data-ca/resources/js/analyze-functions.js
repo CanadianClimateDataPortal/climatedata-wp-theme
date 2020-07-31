@@ -47,8 +47,7 @@
 
     var form_obj = $.extend(true, {}, default_obj)
 
-    var submit_url_pre = 'https://pavics.climatedata.ca/providers/finch/processes/ensemble_grid_point_',
-        submit_url_var = '',
+    var submit_url_var = '',
         submit_url_post = '/jobs'
 
     // map stuff
@@ -515,7 +514,7 @@
 
         form_obj['notification_email'] = $('#analyze-email').val()
 
-        console.log(submit_url_pre + submit_url_var + submit_url_post)
+        console.log(submit_url_var + submit_url_post)
 
         console.log(form_obj)
 
@@ -541,13 +540,14 @@
         var submit_data = {
           'analyze-captcha_code': $('#analyze-captcha_code').val(),
           'request_data': form_obj,
-          'submit_url': submit_url_pre + submit_url_var + submit_url_post
+          'submit_url': submit_url_var + submit_url_post
         }
 
         // check captcha
 
         $.ajax({
           url: child_theme_dir + 'resources/ajax/analyze-form.php',
+          method: "POST",
           data: submit_data,
           success: function(data) {
 

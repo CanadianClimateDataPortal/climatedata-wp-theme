@@ -22,7 +22,6 @@
     wp_enqueue_script ( 'sync' );
     wp_enqueue_script ( 'nearest' );
 
-    wp_enqueue_script ( 'health-sectors' );
     wp_enqueue_script ( 'variable-functions' );
 
     // page tour

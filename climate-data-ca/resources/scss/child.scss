@@ -1251,6 +1251,15 @@ body.overlay-open[data-overlay-content="video"] {
   }
 }
 
+.page-id-2268 {
+  .select2-results__options {
+    [id*="frost_days"],
+    [id*="ice_days"] {
+      display: none;
+    }
+  }
+}
+
 //
 // RESPONSIVE
 //

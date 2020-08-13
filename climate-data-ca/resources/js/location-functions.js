@@ -255,14 +255,7 @@
                             'downloadPDF',
                             'downloadSVG',
                             'separator',
-                            {
-                              text: chart_globals.lang.downloadCSV,
-                              onclick: function () {
-
-                                window.location.href = "data:text/csv;charset=utf-8," + escape(this.getCSV());
-
-                              }
-                            },
+                            'downloadCSV',
                             'downloadXLS']
                           }
                         }

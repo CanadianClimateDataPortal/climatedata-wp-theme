@@ -1087,12 +1087,7 @@ maxWidth: "auto"
 
                       switch ($(this).attr('data-type')) {
                         case 'csv' :
-                          //chart.downloadCSV();
-
-                          //window.open("data:text/csv;charset=utf-8," + escape(chart.getCSV()));
-
-                          window.location.href = "data:text/csv;charset=utf-8," + escape(chart.getCSV());
-
+                          chart.downloadCSV();
                           break;
                       }
 

@@ -1,2 +1,2062 @@
-"use strict";function __$strToBlobUri(t,e,r){try{return window.URL.createObjectURL(new Blob([Uint8Array.from(t.split("").map(function(t){return t.charCodeAt(0)}))],{type:e}))}catch(i){return"data:"+e+(r?";base64,":",")+t}}function Pbf(t){this.buf=ArrayBuffer.isView&&ArrayBuffer.isView(t)?t:new Uint8Array(t||0),this.pos=0,this.type=0,this.length=this.buf.length}function readVarintRemainder(t,e,r){var i,n,o=r.buf;if(n=o[r.pos++],i=(112&n)>>4,n<128)return toNum(t,i,e);if(n=o[r.pos++],i|=(127&n)<<3,n<128)return toNum(t,i,e);if(n=o[r.pos++],i|=(127&n)<<10,n<128)return toNum(t,i,e);if(n=o[r.pos++],i|=(127&n)<<17,n<128)return toNum(t,i,e);if(n=o[r.pos++],i|=(127&n)<<24,n<128)return toNum(t,i,e);if(n=o[r.pos++],i|=(1&n)<<31,n<128)return toNum(t,i,e);throw new Error("Expected varint not more than 10 bytes")}function readPackedEnd(t){return t.type===Pbf.Bytes?t.readVarint()+t.pos:t.pos+1}function toNum(t,e,r){return r?4294967296*e+(t>>>0):4294967296*(e>>>0)+(t>>>0)}function writeBigVarint(t,e){var r,i;if(t>=0?(r=t%4294967296|0,i=t/4294967296|0):(r=~(-t%4294967296),i=~(-t/4294967296),4294967295^r?r=r+1|0:(r=0,i=i+1|0)),t>=0x10000000000000000||t<-0x10000000000000000)throw new Error("Given varint doesn't fit into 10 bytes");e.realloc(10),writeBigVarintLow(r,i,e),writeBigVarintHigh(i,e)}function writeBigVarintLow(t,e,r){r.buf[r.pos++]=127&t|128,t>>>=7,r.buf[r.pos++]=127&t|128,t>>>=7,r.buf[r.pos++]=127&t|128,t>>>=7,r.buf[r.pos++]=127&t|128,t>>>=7,r.buf[r.pos]=127&t}function writeBigVarintHigh(t,e){var r=(7&t)<<4;e.buf[e.pos++]|=r|((t>>>=3)?128:0),t&&(e.buf[e.pos++]=127&t|((t>>>=7)?128:0),t&&(e.buf[e.pos++]=127&t|((t>>>=7)?128:0),t&&(e.buf[e.pos++]=127&t|((t>>>=7)?128:0),t&&(e.buf[e.pos++]=127&t|((t>>>=7)?128:0),t&&(e.buf[e.pos++]=127&t)))))}function makeRoomForExtraLength(t,e,r){var i=e<=16383?1:e<=2097151?2:e<=268435455?3:Math.ceil(Math.log(e)/(7*Math.LN2));r.realloc(i);for(var n=r.pos-1;n>=t;n--)r.buf[n+i]=r.buf[n]}function writePackedVarint(t,e){for(var r=0;r<t.length;r++)e.writeVarint(t[r])}function writePackedSVarint(t,e){for(var r=0;r<t.length;r++)e.writeSVarint(t[r])}function writePackedFloat(t,e){for(var r=0;r<t.length;r++)e.writeFloat(t[r])}function writePackedDouble(t,e){for(var r=0;r<t.length;r++)e.writeDouble(t[r])}function writePackedBoolean(t,e){for(var r=0;r<t.length;r++)e.writeBoolean(t[r])}function writePackedFixed32(t,e){for(var r=0;r<t.length;r++)e.writeFixed32(t[r])}function writePackedSFixed32(t,e){for(var r=0;r<t.length;r++)e.writeSFixed32(t[r])}function writePackedFixed64(t,e){for(var r=0;r<t.length;r++)e.writeFixed64(t[r])}function writePackedSFixed64(t,e){for(var r=0;r<t.length;r++)e.writeSFixed64(t[r])}function readUInt32(t,e){return(t[e]|t[e+1]<<8|t[e+2]<<16)+16777216*t[e+3]}function writeInt32(t,e,r){t[r]=e,t[r+1]=e>>>8,t[r+2]=e>>>16,t[r+3]=e>>>24}function readInt32(t,e){return(t[e]|t[e+1]<<8|t[e+2]<<16)+(t[e+3]<<24)}function readUtf8(t,e,r){for(var i="",n=e;n<r;){var o=t[n],s=null,a=o>239?4:o>223?3:o>191?2:1;if(n+a>r)break;var u,h,l;1===a?o<128&&(s=o):2===a?128==(192&(u=t[n+1]))&&(s=(31&o)<<6|63&u)<=127&&(s=null):3===a?(u=t[n+1],h=t[n+2],128==(192&u)&&128==(192&h)&&((s=(15&o)<<12|(63&u)<<6|63&h)<=2047||s>=55296&&s<=57343)&&(s=null)):4===a&&(u=t[n+1],h=t[n+2],l=t[n+3],128==(192&u)&&128==(192&h)&&128==(192&l)&&((s=(15&o)<<18|(63&u)<<12|(63&h)<<6|63&l)<=65535||s>=1114112)&&(s=null)),null===s?(s=65533,a=1):s>65535&&(s-=65536,i+=String.fromCharCode(s>>>10&1023|55296),s=56320|1023&s),i+=String.fromCharCode(s),n+=a}return i}function writeUtf8(t,e,r){for(var i,n,o=0;o<e.length;o++){if((i=e.charCodeAt(o))>55295&&i<57344){if(!n){i>56319||o+1===e.length?(t[r++]=239,t[r++]=191,t[r++]=189):n=i;continue}if(i<56320){t[r++]=239,t[r++]=191,t[r++]=189,n=i;continue}i=n-55296<<10|i-56320|65536,n=null}else n&&(t[r++]=239,t[r++]=191,t[r++]=189,n=null);i<128?t[r++]=i:(i<2048?t[r++]=i>>6|192:(i<65536?t[r++]=i>>12|224:(t[r++]=i>>18|240,t[r++]=i>>12&63|128),t[r++]=i>>6&63|128),t[r++]=63&i|128)}return r}function Point$1(t,e){this.x=t,this.y=e}function VectorTileFeature$2(t,e,r,i,n){this.properties={},this.extent=r,this.type=0,this._pbf=t,this._geometry=-1,this._keys=i,this._values=n,t.readFields(readFeature,this,e)}function readFeature(t,e,r){1==t?e.id=r.readVarint():2==t?readTag(r,e):3==t?e.type=r.readVarint():4==t&&(e._geometry=r.pos)}function readTag(t,e){for(var r=t.readVarint()+t.pos;t.pos<r;){var i=e._keys[t.readVarint()],n=e._values[t.readVarint()];e.properties[i]=n}}function classifyRings(t){var e=t.length;if(e<=1)return[t];for(var r,i,n=[],o=0;o<e;o++){var s=signedArea(t[o]);0!==s&&(void 0===i&&(i=s<0),i===s<0?(r&&n.push(r),r=[t[o]]):r.push(t[o]))}return r&&n.push(r),n}function signedArea(t){for(var e,r,i=0,n=0,o=t.length,s=o-1;n<o;s=n++)e=t[n],r=t[s],i+=(r.x-e.x)*(e.y+r.y);return i}function VectorTileLayer$2(t,e){this.version=1,this.name=null,this.extent=4096,this.length=0,this._pbf=t,this._keys=[],this._values=[],this._features=[],t.readFields(readLayer,this,e),this.length=this._features.length}function readLayer(t,e,r){15===t?e.version=r.readVarint():1===t?e.name=r.readString():5===t?e.extent=r.readVarint():2===t?e._features.push(r.pos):3===t?e._keys.push(r.readString()):4===t&&e._values.push(readValueMessage(r))}function readValueMessage(t){for(var e=null,r=t.readVarint()+t.pos;t.pos<r;){var i=t.readVarint()>>3;e=1===i?t.readString():2===i?t.readFloat():3===i?t.readDouble():4===i?t.readVarint64():5===i?t.readVarint():6===i?t.readSVarint():7===i?t.readBoolean():null}return e}function VectorTile$1(t,e){this.layers=t.readFields(readTile,{},e)}function readTile(t,e,r){if(3===t){var i=new VectorTileLayer$1(r,r.readVarint()+r.pos);i.length&&(e[i.name]=i)}}!function(t){function e(t){if("string"!=typeof t&&(t=String(t)),/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(t))throw new TypeError("Invalid character in header field name");return t.toLowerCase()}function r(t){return"string"!=typeof t&&(t=String(t)),t}function i(t){var e={next:function(){var e=t.shift();return{done:void 0===e,value:e}}};return v.iterable&&(e[Symbol.iterator]=function(){return e}),e}function n(t){this.map={},t instanceof n?t.forEach(function(t,e){this.append(e,t)},this):Array.isArray(t)?t.forEach(function(t){this.append(t[0],t[1])},this):t&&Object.getOwnPropertyNames(t).forEach(function(e){this.append(e,t[e])},this)}function o(t){if(t.bodyUsed)return Promise.reject(new TypeError("Already read"));t.bodyUsed=!0}function s(t){return new Promise(function(e,r){t.onload=function(){e(t.result)},t.onerror=function(){r(t.error)}})}function a(t){var e=new FileReader,r=s(e);return e.readAsArrayBuffer(t),r}function u(t){var e=new FileReader,r=s(e);return e.readAsText(t),r}function h(t){for(var e=new Uint8Array(t),r=new Array(e.length),i=0;i<e.length;i++)r[i]=String.fromCharCode(e[i]);return r.join("")}function l(t){if(t.slice)return t.slice(0);var e=new Uint8Array(t.byteLength);return e.set(new Uint8Array(t)),e.buffer}function c(){return this.bodyUsed=!1,this._initBody=function(t){if(this._bodyInit=t,t)if("string"==typeof t)this._bodyText=t;else if(v.blob&&Blob.prototype.isPrototypeOf(t))this._bodyBlob=t;else if(v.formData&&FormData.prototype.isPrototypeOf(t))this._bodyFormData=t;else if(v.searchParams&&URLSearchParams.prototype.isPrototypeOf(t))this._bodyText=t.toString();else if(v.arrayBuffer&&v.blob&&b(t))this._bodyArrayBuffer=l(t.buffer),this._bodyInit=new Blob([this._bodyArrayBuffer]);else{if(!v.arrayBuffer||!ArrayBuffer.prototype.isPrototypeOf(t)&&!w(t))throw new Error("unsupported BodyInit type");this._bodyArrayBuffer=l(t)}else this._bodyText="";this.headers.get("content-type")||("string"==typeof t?this.headers.set("content-type","text/plain;charset=UTF-8"):this._bodyBlob&&this._bodyBlob.type?this.headers.set("content-type",this._bodyBlob.type):v.searchParams&&URLSearchParams.prototype.isPrototypeOf(t)&&this.headers.set("content-type","application/x-www-form-urlencoded;charset=UTF-8"))},v.blob&&(this.blob=function(){var t=o(this);if(t)return t;if(this._bodyBlob)return Promise.resolve(this._bodyBlob);if(this._bodyArrayBuffer)return Promise.resolve(new Blob([this._bodyArrayBuffer]));if(this._bodyFormData)throw new Error("could not read FormData body as blob");return Promise.resolve(new Blob([this._bodyText]))},this.arrayBuffer=function(){return this._bodyArrayBuffer?o(this)||Promise.resolve(this._bodyArrayBuffer):this.blob().then(a)}),this.text=function(){var t=o(this);if(t)return t;if(this._bodyBlob)return u(this._bodyBlob);if(this._bodyArrayBuffer)return Promise.resolve(h(this._bodyArrayBuffer));if(this._bodyFormData)throw new Error("could not read FormData body as text");return Promise.resolve(this._bodyText)},v.formData&&(this.formData=function(){return this.text().then(d)}),this.json=function(){return this.text().then(JSON.parse)},this}function f(t){var e=t.toUpperCase();return _.indexOf(e)>-1?e:t}function p(t,e){e=e||{};var r=e.body;if(t instanceof p){if(t.bodyUsed)throw new TypeError("Already read");this.url=t.url,this.credentials=t.credentials,e.headers||(this.headers=new n(t.headers)),this.method=t.method,this.mode=t.mode,r||null==t._bodyInit||(r=t._bodyInit,t.bodyUsed=!0)}else this.url=String(t);if(this.credentials=e.credentials||this.credentials||"omit",!e.headers&&this.headers||(this.headers=new n(e.headers)),this.method=f(e.method||this.method||"GET"),this.mode=e.mode||this.mode||null,this.referrer=null,("GET"===this.method||"HEAD"===this.method)&&r)throw new TypeError("Body not allowed for GET or HEAD requests");this._initBody(r)}function d(t){var e=new FormData;return t.trim().split("&").forEach(function(t){if(t){var r=t.split("="),i=r.shift().replace(/\+/g," "),n=r.join("=").replace(/\+/g," ");e.append(decodeURIComponent(i),decodeURIComponent(n))}}),e}function y(t){var e=new n;return t.split(/\r?\n/).forEach(function(t){var r=t.split(":"),i=r.shift().trim();if(i){var n=r.join(":").trim();e.append(i,n)}}),e}function m(t,e){e||(e={}),this.type="default",this.status="status"in e?e.status:200,this.ok=this.status>=200&&this.status<300,this.statusText="statusText"in e?e.statusText:"OK",this.headers=new n(e.headers),this.url=e.url||"",this._initBody(t)}if(!t.fetch){var v={searchParams:"URLSearchParams"in t,iterable:"Symbol"in t&&"iterator"in Symbol,blob:"FileReader"in t&&"Blob"in t&&function(){try{return new Blob,!0}catch(t){return!1}}(),formData:"FormData"in t,arrayBuffer:"ArrayBuffer"in t};if(v.arrayBuffer)var g=["[object Int8Array]","[object Uint8Array]","[object Uint8ClampedArray]","[object Int16Array]","[object Uint16Array]","[object Int32Array]","[object Uint32Array]","[object Float32Array]","[object Float64Array]"],b=function(t){return t&&DataView.prototype.isPrototypeOf(t)},w=ArrayBuffer.isView||function(t){return t&&g.indexOf(Object.prototype.toString.call(t))>-1};n.prototype.append=function(t,i){t=e(t),i=r(i);var n=this.map[t];this.map[t]=n?n+","+i:i},n.prototype.delete=function(t){delete this.map[e(t)]},n.prototype.get=function(t){return t=e(t),this.has(t)?this.map[t]:null},n.prototype.has=function(t){return this.map.hasOwnProperty(e(t))},n.prototype.set=function(t,i){this.map[e(t)]=r(i)},n.prototype.forEach=function(t,e){var r=this;for(var i in this.map)r.map.hasOwnProperty(i)&&t.call(e,r.map[i],i,r)},n.prototype.keys=function(){var t=[];return this.forEach(function(e,r){t.push(r)}),i(t)},n.prototype.values=function(){var t=[];return this.forEach(function(e){t.push(e)}),i(t)},n.prototype.entries=function(){var t=[];return this.forEach(function(e,r){t.push([r,e])}),i(t)},v.iterable&&(n.prototype[Symbol.iterator]=n.prototype.entries);var _=["DELETE","GET","HEAD","OPTIONS","POST","PUT"];p.prototype.clone=function(){return new p(this,{body:this._bodyInit})},c.call(p.prototype),c.call(m.prototype),m.prototype.clone=function(){return new m(this._bodyInit,{status:this.status,statusText:this.statusText,headers:new n(this.headers),url:this.url})},m.error=function(){var t=new m(null,{status:0,statusText:""});return t.type="error",t};var x=[301,302,303,307,308];m.redirect=function(t,e){if(-1===x.indexOf(e))throw new RangeError("Invalid status code");return new m(null,{status:e,headers:{location:t}})},t.Headers=n,t.Request=p,t.Response=m,t.fetch=function(t,e){return new Promise(function(r,i){var n=new p(t,e),o=new XMLHttpRequest;o.onload=function(){var t={status:o.status,statusText:o.statusText,headers:y(o.getAllResponseHeaders()||"")};t.url="responseURL"in o?o.responseURL:t.headers.get("X-Request-URL");var e="response"in o?o.response:o.responseText;r(new m(e,t))},o.onerror=function(){i(new TypeError("Network request failed"))},o.ontimeout=function(){i(new TypeError("Network request failed"))},o.open(n.method,n.url,!0),"include"===n.credentials&&(o.withCredentials=!0),"responseType"in o&&v.blob&&(o.responseType="blob"),n.headers.forEach(function(t,e){o.setRequestHeader(e,t)}),o.send(void 0===n._bodyInit?null:n._bodyInit)})},t.fetch.polyfill=!0}}("undefined"!=typeof self?self:void 0);var read=function(t,e,r,i,n){var o,s,a=8*n-i-1,u=(1<<a)-1,h=u>>1,l=-7,c=r?n-1:0,f=r?-1:1,p=t[e+c];for(c+=f,o=p&(1<<-l)-1,p>>=-l,l+=a;l>0;o=256*o+t[e+c],c+=f,l-=8);for(s=o&(1<<-l)-1,o>>=-l,l+=i;l>0;s=256*s+t[e+c],c+=f,l-=8);if(0===o)o=1-h;else{if(o===u)return s?NaN:1/0*(p?-1:1);s+=Math.pow(2,i),o-=h}return(p?-1:1)*s*Math.pow(2,o-i)},write=function(t,e,r,i,n,o){var s,a,u,h=8*o-n-1,l=(1<<h)-1,c=l>>1,f=23===n?Math.pow(2,-24)-Math.pow(2,-77):0,p=i?0:o-1,d=i?1:-1,y=e<0||0===e&&1/e<0?1:0;for(e=Math.abs(e),isNaN(e)||e===1/0?(a=isNaN(e)?1:0,s=l):(s=Math.floor(Math.log(e)/Math.LN2),e*(u=Math.pow(2,-s))<1&&(s--,u*=2),e+=s+c>=1?f/u:f*Math.pow(2,1-c),e*u>=2&&(s++,u/=2),s+c>=l?(a=0,s=l):s+c>=1?(a=(e*u-1)*Math.pow(2,n),s+=c):(a=e*Math.pow(2,c-1)*Math.pow(2,n),s=0));n>=8;t[r+p]=255&a,p+=d,a/=256,n-=8);for(s=s<<n|a,h+=n;h>0;t[r+p]=255&s,p+=d,s/=256,h-=8);t[r+p-d]|=128*y},index$1={read:read,write:write},index=Pbf,ieee754=index$1;Pbf.Varint=0,Pbf.Fixed64=1,Pbf.Bytes=2,Pbf.Fixed32=5;var SHIFT_LEFT_32=4294967296,SHIFT_RIGHT_32=1/SHIFT_LEFT_32;Pbf.prototype={destroy:function(){this.buf=null},readFields:function(t,e,r){var i=this;for(r=r||this.length;this.pos<r;){var n=i.readVarint(),o=n>>3,s=i.pos;i.type=7&n,t(o,e,i),i.pos===s&&i.skip(n)}return e},readMessage:function(t,e){return this.readFields(t,e,this.readVarint()+this.pos)},readFixed32:function(){var t=readUInt32(this.buf,this.pos);return this.pos+=4,t},readSFixed32:function(){var t=readInt32(this.buf,this.pos);return this.pos+=4,t},readFixed64:function(){var t=readUInt32(this.buf,this.pos)+readUInt32(this.buf,this.pos+4)*SHIFT_LEFT_32;return this.pos+=8,t},readSFixed64:function(){var t=readUInt32(this.buf,this.pos)+readInt32(this.buf,this.pos+4)*SHIFT_LEFT_32;return this.pos+=8,t},readFloat:function(){var t=ieee754.read(this.buf,this.pos,!0,23,4);return this.pos+=4,t},readDouble:function(){var t=ieee754.read(this.buf,this.pos,!0,52,8);return this.pos+=8,t},readVarint:function(t){var e,r,i=this.buf;return r=i[this.pos++],e=127&r,r<128?e:(r=i[this.pos++],e|=(127&r)<<7,r<128?e:(r=i[this.pos++],e|=(127&r)<<14,r<128?e:(r=i[this.pos++],e|=(127&r)<<21,r<128?e:(r=i[this.pos],e|=(15&r)<<28,readVarintRemainder(e,t,this)))))},readVarint64:function(){return this.readVarint(!0)},readSVarint:function(){var t=this.readVarint();return t%2==1?(t+1)/-2:t/2},readBoolean:function(){return Boolean(this.readVarint())},readString:function(){var t=this.readVarint()+this.pos,e=readUtf8(this.buf,this.pos,t);return this.pos=t,e},readBytes:function(){var t=this.readVarint()+this.pos,e=this.buf.subarray(this.pos,t);return this.pos=t,e},readPackedVarint:function(t,e){var r=this,i=readPackedEnd(this);for(t=t||[];this.pos<i;)t.push(r.readVarint(e));return t},readPackedSVarint:function(t){var e=this,r=readPackedEnd(this);for(t=t||[];this.pos<r;)t.push(e.readSVarint());return t},readPackedBoolean:function(t){var e=this,r=readPackedEnd(this);for(t=t||[];this.pos<r;)t.push(e.readBoolean());return t},readPackedFloat:function(t){var e=this,r=readPackedEnd(this);for(t=t||[];this.pos<r;)t.push(e.readFloat());return t},readPackedDouble:function(t){var e=this,r=readPackedEnd(this);for(t=t||[];this.pos<r;)t.push(e.readDouble());return t},readPackedFixed32:function(t){var e=this,r=readPackedEnd(this);for(t=t||[];this.pos<r;)t.push(e.readFixed32());return t},readPackedSFixed32:function(t){var e=this,r=readPackedEnd(this);for(t=t||[];this.pos<r;)t.push(e.readSFixed32());return t},readPackedFixed64:function(t){var e=this,r=readPackedEnd(this);for(t=t||[];this.pos<r;)t.push(e.readFixed64());return t},readPackedSFixed64:function(t){var e=this,r=readPackedEnd(this);for(t=t||[];this.pos<r;)t.push(e.readSFixed64());return t},skip:function(t){var e=7&t;if(e===Pbf.Varint)for(;this.buf[this.pos++]>127;);else if(e===Pbf.Bytes)this.pos=this.readVarint()+this.pos;else if(e===Pbf.Fixed32)this.pos+=4;else{if(e!==Pbf.Fixed64)throw new Error("Unimplemented type: "+e);this.pos+=8}},writeTag:function(t,e){this.writeVarint(t<<3|e)},realloc:function(t){for(var e=this.length||16;e<this.pos+t;)e*=2;if(e!==this.length){var r=new Uint8Array(e);r.set(this.buf),this.buf=r,this.length=e}},finish:function(){return this.length=this.pos,this.pos=0,this.buf.subarray(0,this.length)},writeFixed32:function(t){this.realloc(4),writeInt32(this.buf,t,this.pos),this.pos+=4},writeSFixed32:function(t){this.realloc(4),writeInt32(this.buf,t,this.pos),this.pos+=4},writeFixed64:function(t){this.realloc(8),writeInt32(this.buf,-1&t,this.pos),writeInt32(this.buf,Math.floor(t*SHIFT_RIGHT_32),this.pos+4),this.pos+=8},writeSFixed64:function(t){this.realloc(8),writeInt32(this.buf,-1&t,this.pos),writeInt32(this.buf,Math.floor(t*SHIFT_RIGHT_32),this.pos+4),this.pos+=8},writeVarint:function(t){if((t=+t||0)>268435455||t<0)return void writeBigVarint(t,this);this.realloc(4),this.buf[this.pos++]=127&t|(t>127?128:0),t<=127||(this.buf[this.pos++]=127&(t>>>=7)|(t>127?128:0),t<=127||(this.buf[this.pos++]=127&(t>>>=7)|(t>127?128:0),t<=127||(this.buf[this.pos++]=t>>>7&127)))},writeSVarint:function(t){this.writeVarint(t<0?2*-t-1:2*t)},writeBoolean:function(t){this.writeVarint(Boolean(t))},writeString:function(t){t=String(t),this.realloc(4*t.length),this.pos++;var e=this.pos;this.pos=writeUtf8(this.buf,t,this.pos);var r=this.pos-e;r>=128&&makeRoomForExtraLength(e,r,this),this.pos=e-1,this.writeVarint(r),this.pos+=r},writeFloat:function(t){this.realloc(4),ieee754.write(this.buf,t,this.pos,!0,23,4),this.pos+=4},writeDouble:function(t){this.realloc(8),ieee754.write(this.buf,t,this.pos,!0,52,8),this.pos+=8},writeBytes:function(t){var e=this,r=t.length;this.writeVarint(r),this.realloc(r);for(var i=0;i<r;i++)e.buf[e.pos++]=t[i]},writeRawMessage:function(t,e){this.pos++;var r=this.pos;t(e,this);var i=this.pos-r;i>=128&&makeRoomForExtraLength(r,i,this),this.pos=r-1,this.writeVarint(i),this.pos+=i},writeMessage:function(t,e,r){this.writeTag(t,Pbf.Bytes),this.writeRawMessage(e,r)},writePackedVarint:function(t,e){this.writeMessage(t,writePackedVarint,e)},writePackedSVarint:function(t,e){this.writeMessage(t,writePackedSVarint,e)},writePackedBoolean:function(t,e){this.writeMessage(t,writePackedBoolean,e)},writePackedFloat:function(t,e){this.writeMessage(t,writePackedFloat,e)},writePackedDouble:function(t,e){this.writeMessage(t,writePackedDouble,e)},writePackedFixed32:function(t,e){this.writeMessage(t,writePackedFixed32,e)},writePackedSFixed32:function(t,e){this.writeMessage(t,writePackedSFixed32,e)},writePackedFixed64:function(t,e){this.writeMessage(t,writePackedFixed64,e)},writePackedSFixed64:function(t,e){this.writeMessage(t,writePackedSFixed64,e)},writeBytesField:function(t,e){this.writeTag(t,Pbf.Bytes),this.writeBytes(e)},writeFixed32Field:function(t,e){this.writeTag(t,Pbf.Fixed32),this.writeFixed32(e)},writeSFixed32Field:function(t,e){this.writeTag(t,Pbf.Fixed32),this.writeSFixed32(e)},writeFixed64Field:function(t,e){this.writeTag(t,Pbf.Fixed64),this.writeFixed64(e)},writeSFixed64Field:function(t,e){this.writeTag(t,Pbf.Fixed64),this.writeSFixed64(e)},writeVarintField:function(t,e){this.writeTag(t,Pbf.Varint),this.writeVarint(e)},writeSVarintField:function(t,e){this.writeTag(t,Pbf.Varint),this.writeSVarint(e)},writeStringField:function(t,e){this.writeTag(t,Pbf.Bytes),this.writeString(e)},writeFloatField:function(t,e){this.writeTag(t,Pbf.Fixed32),this.writeFloat(e)},writeDoubleField:function(t,e){this.writeTag(t,Pbf.Fixed64),this.writeDouble(e)},writeBooleanField:function(t,e){this.writeVarintField(t,Boolean(e))}};var index$5=Point$1;Point$1.prototype={clone:function(){return new Point$1(this.x,this.y)},add:function(t){return this.clone()._add(t)},sub:function(t){return this.clone()._sub(t)},mult:function(t){return this.clone()._mult(t)},div:function(t){return this.clone()._div(t)},rotate:function(t){return this.clone()._rotate(t)},matMult:function(t){return this.clone()._matMult(t)},unit:function(){return this.clone()._unit()},perp:function(){return this.clone()._perp()},round:function(){return this.clone()._round()},mag:function(){return Math.sqrt(this.x*this.x+this.y*this.y)},equals:function(t){return this.x===t.x&&this.y===t.y},dist:function(t){return Math.sqrt(this.distSqr(t))},distSqr:function(t){var e=t.x-this.x,r=t.y-this.y;return e*e+r*r},angle:function(){return Math.atan2(this.y,this.x)},angleTo:function(t){return Math.atan2(this.y-t.y,this.x-t.x)},angleWith:function(t){return this.angleWithSep(t.x,t.y)},angleWithSep:function(t,e){return Math.atan2(this.x*e-this.y*t,this.x*t+this.y*e)},_matMult:function(t){var e=t[0]*this.x+t[1]*this.y,r=t[2]*this.x+t[3]*this.y;return this.x=e,this.y=r,this},_add:function(t){return this.x+=t.x,this.y+=t.y,this},_sub:function(t){return this.x-=t.x,this.y-=t.y,this},_mult:function(t){return this.x*=t,this.y*=t,this},_div:function(t){return this.x/=t,this.y/=t,this},_unit:function(){return this._div(this.mag()),this},_perp:function(){var t=this.y;return this.y=this.x,this.x=-t,this},_rotate:function(t){var e=Math.cos(t),r=Math.sin(t),i=e*this.x-r*this.y,n=r*this.x+e*this.y;return this.x=i,this.y=n,this},_round:function(){return this.x=Math.round(this.x),this.y=Math.round(this.y),this}},Point$1.convert=function(t){return t instanceof Point$1?t:Array.isArray(t)?new Point$1(t[0],t[1]):t};var Point=index$5,vectortilefeature=VectorTileFeature$2;VectorTileFeature$2.types=["Unknown","Point","LineString","Polygon"],VectorTileFeature$2.prototype.loadGeometry=function(){var t=this._pbf;t.pos=this._geometry;for(var e,r=t.readVarint()+t.pos,i=1,n=0,o=0,s=0,a=[];t.pos<r;){if(!n){var u=t.readVarint();i=7&u,n=u>>3}if(n--,1===i||2===i)o+=t.readSVarint(),s+=t.readSVarint(),1===i&&(e&&a.push(e),e=[]),e.push(new Point(o,s));else{if(7!==i)throw new Error("unknown command "+i);e&&e.push(e[0].clone())}}return e&&a.push(e),a},VectorTileFeature$2.prototype.bbox=function(){var t=this._pbf;t.pos=this._geometry;for(var e=t.readVarint()+t.pos,r=1,i=0,n=0,o=0,s=1/0,a=-1/0,u=1/0,h=-1/0;t.pos<e;){if(!i){var l=t.readVarint();r=7&l,i=l>>3}if(i--,1===r||2===r)n+=t.readSVarint(),o+=t.readSVarint(),n<s&&(s=n),n>a&&(a=n),o<u&&(u=o),o>h&&(h=o);else if(7!==r)throw new Error("unknown command "+r)}return[s,u,a,h]},VectorTileFeature$2.prototype.toGeoJSON=function(t,e,r){function i(t){for(var e=0;e<t.length;e++){var r=t[e],i=180-360*(r.y+u)/s;t[e]=[360*(r.x+a)/s-180,360/Math.PI*Math.atan(Math.exp(i*Math.PI/180))-90]}}var n,o,s=this.extent*Math.pow(2,r),a=this.extent*t,u=this.extent*e,h=this.loadGeometry(),l=VectorTileFeature$2.types[this.type];switch(this.type){case 1:var c=[];for(n=0;n<h.length;n++)c[n]=h[n][0];h=c,i(h);break;case 2:for(n=0;n<h.length;n++)i(h[n]);break;case 3:for(h=classifyRings(h),n=0;n<h.length;n++)for(o=0;o<h[n].length;o++)i(h[n][o])}1===h.length?h=h[0]:l="Multi"+l;var f={type:"Feature",geometry:{type:l,coordinates:h},properties:this.properties};return"id"in this&&(f.id=this.id),f};var VectorTileFeature$1=vectortilefeature,vectortilelayer=VectorTileLayer$2;VectorTileLayer$2.prototype.feature=function(t){if(t<0||t>=this._features.length)throw new Error("feature index out of bounds");this._pbf.pos=this._features[t];var e=this._pbf.readVarint()+this._pbf.pos;return new VectorTileFeature$1(this._pbf,e,this.extent,this._keys,this._values)};var VectorTileLayer$1=vectortilelayer,vectortile=VectorTile$1,VectorTile=vectortile;L.SVG.Tile=L.SVG.extend({initialize:function(t,e,r){L.SVG.prototype.initialize.call(this,r),this._tileCoord=t,this._size=e,this._initContainer(),this._container.setAttribute("width",this._size.x),this._container.setAttribute("height",this._size.y),this._container.setAttribute("viewBox",[0,0,this._size.x,this._size.y].join(" ")),this._layers={}},getCoord:function(){return this._tileCoord},getContainer:function(){return this._container},onAdd:L.Util.falseFn,addTo:function(t){if(this._map=t,this.options.interactive)for(var e in this._layers){var r=this._layers[e];r._path.style.pointerEvents="auto",this._map._targets[L.stamp(r._path)]=r}},removeFrom:function(t){if(this.options.interactive)for(var e in this._layers){var r=this._layers[e];delete this._map._targets[L.stamp(r._path)]}delete this._map},_initContainer:function(){L.SVG.prototype._initContainer.call(this);L.SVG.create("rect")},_addPath:function(t){this._rootGroup.appendChild(t._path),this._layers[L.stamp(t)]=t},_updateIcon:function(t){var e=t._path=L.SVG.create("image"),r=t.options.icon,i=r.options,n=L.point(i.iconSize),o=i.iconAnchor||n&&n.divideBy(2,!0),s=t._point.subtract(o);e.setAttribute("x",s.x),e.setAttribute("y",s.y),e.setAttribute("width",n.x+"px"),e.setAttribute("height",n.y+"px"),e.setAttribute("href",i.iconUrl)}}),L.svg.tile=function(t,e,r){return new L.SVG.Tile(t,e,r)};var Symbolizer=L.Class.extend({render:function(t,e){this._renderer=t,this.options=e,t._initPath(this),t._updateStyle(this)},updateStyle:function(t,e){this.options=e,t._updateStyle(this)},_getPixelBounds:function(){for(var t=this._parts,e=L.bounds([]),r=0;r<t.length;r++)for(var i=t[r],n=0;n<i.length;n++)e.extend(i[n]);var o=this._clickTolerance(),s=new L.Point(o,o);return e.min._subtract(s),e.max._add(s),e},_clickTolerance:L.Path.prototype._clickTolerance}),PolyBase={_makeFeatureParts:function(t,e){var r,i=t.geometry;this._parts=[];for(var n=0;n<i.length;n++){for(var o=i[n],s=[],a=0;a<o.length;a++)r=o[a],s.push(L.point(r).scaleBy(e));this._parts.push(s)}},makeInteractive:function(){this._pxBounds=this._getPixelBounds()}},PointSymbolizer=L.CircleMarker.extend({includes:Symbolizer.prototype,statics:{iconCache:{}},initialize:function(t,e){this.properties=t.properties,this._makeFeatureParts(t,e)},render:function(t,e){Symbolizer.prototype.render.call(this,t,e),this._radius=e.radius||L.CircleMarker.prototype.options.radius,this._updatePath()},_makeFeatureParts:function(t,e){var r=t.geometry[0];"object"==typeof r[0]&&"x"in r[0]?(this._point=L.point(r[0]).scaleBy(e),this._empty=L.Util.falseFn):(this._point=L.point(r).scaleBy(e),this._empty=L.Util.falseFn)},makeInteractive:function(){this._updateBounds()},updateStyle:function(t,e){return this._radius=e.radius||this._radius,this._updateBounds(),Symbolizer.prototype.updateStyle.call(this,t,e)},_updateBounds:function(){var t=this.options.icon;if(t){var e=L.point(t.options.iconSize),r=t.options.iconAnchor||e&&e.divideBy(2,!0),i=this._point.subtract(r);this._pxBounds=new L.Bounds(i,i.add(t.options.iconSize))}else L.CircleMarker.prototype._updateBounds.call(this)},_updatePath:function(){this.options.icon?this._renderer._updateIcon(this):L.CircleMarker.prototype._updatePath.call(this)},_getImage:function(){if(this.options.icon){var t=this.options.icon.options.iconUrl,e=PointSymbolizer.iconCache[t];if(!e){var r=this.options.icon;e=PointSymbolizer.iconCache[t]=r.createIcon()}return e}return null},_containsPoint:function(t){return this.options.icon?this._pxBounds.contains(t):L.CircleMarker.prototype._containsPoint.call(this,t)}}),LineSymbolizer=L.Polyline.extend({includes:[Symbolizer.prototype,PolyBase],initialize:function(t,e){this.properties=t.properties,this._makeFeatureParts(t,e)},render:function(t,e){e.fill=!1,Symbolizer.prototype.render.call(this,t,e),this._updatePath()},updateStyle:function(t,e){e.fill=!1,Symbolizer.prototype.updateStyle.call(this,t,e)}}),FillSymbolizer=L.Polygon.extend({includes:[Symbolizer.prototype,PolyBase],initialize:function(t,e){this.properties=t.properties,this._makeFeatureParts(t,e)},render:function(t,e){Symbolizer.prototype.render.call(this,t,e),this._updatePath()}});L.VectorGrid=L.GridLayer.extend({options:{rendererFactory:L.svg.tile,vectorTileLayerStyles:{},interactive:!1},initialize:function(t){L.setOptions(this,t),L.GridLayer.prototype.initialize.apply(this,arguments),this.options.getFeatureId&&(this._vectorTiles={},this._overriddenStyles={},this.on("tileunload",function(t){var e=this._tileCoordsToKey(t.coords),r=this._vectorTiles[e];r&&this._map&&r.removeFrom(this._map),delete this._vectorTiles[e]},this)),this._dataLayerNames={}},createTile:function(t,e){var r=this.options.getFeatureId,i=this.getTileSize(),n=this.options.rendererFactory(t,i,this.options),o=this._getVectorTilePromise(t);return r&&(this._vectorTiles[this._tileCoordsToKey(t)]=n,n._features={}),o.then(function(i){for(var o in i.layers){this._dataLayerNames[o]=!0;for(var s=i.layers[o],a=this.getTileSize().divideBy(s.extent),u=this.options.vectorTileLayerStyles[o]||L.Path.prototype.options,h=0;h<s.features.length;h++){var l,c=s.features[h],f=u;if(r){l=this.options.getFeatureId(c);var p=this._overriddenStyles[l];p&&(f=p[o]?p[o]:p)}if(f instanceof Function&&(f=f(c.properties,t.z)),f instanceof Array||(f=[f]),f.length){for(var d=this._createLayer(c,a),y=0;y<f.length;y++){var m=L.extend({},L.Path.prototype.options,f[y]);d.render(n,m),n._addPath(d)}this.options.interactive&&d.makeInteractive(),r&&(n._features[l]={layerName:o,feature:d})}}}null!=this._map&&n.addTo(this._map),L.Util.requestAnimFrame(e.bind(t,null,null))}.bind(this)),n.getContainer()},setFeatureStyle:function(t,e){this._overriddenStyles[t]=e;for(var r in this._vectorTiles){var i=this._vectorTiles[r],n=i._features,o=n[t];if(o){var s=o.feature,a=e;e[o.layerName]&&(a=e[o.layerName]),this._updateStyles(s,i,a)}}return this},resetFeatureStyle:function(t){delete this._overriddenStyles[t];for(var e in this._vectorTiles){var r=this._vectorTiles[e],i=r._features,n=i[t];if(n){var o=n.feature,s=this.options.vectorTileLayerStyles[n.layerName]||L.Path.prototype.options;this._updateStyles(o,r,s)}}return this},getDataLayerNames:function(){return Object.keys(this._dataLayerNames)},_updateStyles:function(t,e,r){(r=r instanceof Function?r(t.properties,e.getCoord().z):r)instanceof Array||(r=[r]);for(var i=0;i<r.length;i++){var n=L.extend({},L.Path.prototype.options,r[i]);t.updateStyle(e,n)}},_createLayer:function(t,e,r){var i;switch(t.type){case 1:i=new PointSymbolizer(t,e);break;case 2:i=new LineSymbolizer(t,e);break;case 3:i=new FillSymbolizer(t,e)}return this.options.interactive&&i.addEventParent(this),i}}),L.vectorGrid=function(t){return new L.VectorGrid(t)},L.VectorGrid.Protobuf=L.VectorGrid.extend({options:{subdomains:"abc",fetchOptions:{}},initialize:function(t,e){this._url=t,L.VectorGrid.prototype.initialize.call(this,e)},setUrl:function(t,e){return this._url=t,e||this.redraw(),this},_getSubdomain:L.TileLayer.prototype._getSubdomain,_getVectorTilePromise:function(t){var e={s:this._getSubdomain(t),x:t.x,y:t.y,z:t.z};if(this._map&&!this._map.options.crs.infinite){var r=this._globalTileRange.max.y-t.y;this.options.tms&&(e.y=r),e["-y"]=r}var i=L.Util.template(this._url,L.extend(e,this.options));return fetch(i,this.options.fetchOptions).then(function(t){return t.ok?t.blob().then(function(t){var e=new FileReader;return new Promise(function(r){e.addEventListener("loadend",function(){var t=new index(e.result);return r(new VectorTile(t))}),e.readAsArrayBuffer(t)})}):{layers:[]}}).then(function(t){for(var e in t.layers){for(var r=[],i=0;i<t.layers[e].length;i++){var n=t.layers[e].feature(i);n.geometry=n.loadGeometry(),r.push(n)}t.layers[e].features=r}return t})}}),L.vectorGrid.protobuf=function(t,e){return new L.VectorGrid.Protobuf(t,e)}
-;var workerCode=__$strToBlobUri('"use strict";function simplify$1(e,t){var r,n,o,i,a=t*t,s=e.length,l=0,u=s-1,c=[];for(e[l][2]=1,e[u][2]=1;u;){for(n=0,r=l+1;r<u;r++)(o=getSqSegDist(e[r],e[l],e[u]))>n&&(i=r,n=o);n>a?(e[i][2]=n,c.push(l),c.push(i),l=i):(u=c.pop(),l=c.pop())}}function getSqSegDist(e,t,r){var n=t[0],o=t[1],i=r[0],a=r[1],s=e[0],l=e[1],u=i-n,c=a-o;if(0!==u||0!==c){var f=((s-n)*u+(l-o)*c)/(u*u+c*c);f>1?(n=i,o=a):f>0&&(n+=u*f,o+=c*f)}return u=s-n,c=l-o,u*u+c*c}function convert$1(e,t){var r=[];if("FeatureCollection"===e.type)for(var n=0;n<e.features.length;n++)convertFeature(r,e.features[n],t);else"Feature"===e.type?convertFeature(r,e,t):convertFeature(r,{geometry:e},t);return r}function convertFeature(e,t,r){if(null!==t.geometry){var n,o,i,a,s=t.geometry,l=s.type,u=s.coordinates,c=t.properties;if("Point"===l)e.push(create(c,1,[projectPoint(u)]));else if("MultiPoint"===l)e.push(create(c,1,project(u)));else if("LineString"===l)e.push(create(c,2,[project(u,r)]));else if("MultiLineString"===l||"Polygon"===l){for(i=[],n=0;n<u.length;n++)a=project(u[n],r),"Polygon"===l&&(a.outer=0===n),i.push(a);e.push(create(c,"Polygon"===l?3:2,i))}else if("MultiPolygon"===l){for(i=[],n=0;n<u.length;n++)for(o=0;o<u[n].length;o++)a=project(u[n][o],r),a.outer=0===o,i.push(a);e.push(create(c,3,i))}else{if("GeometryCollection"!==l)throw new Error("Input data is not a valid GeoJSON object.");for(n=0;n<s.geometries.length;n++)convertFeature(e,{geometry:s.geometries[n],properties:c},r)}}}function create(e,t,r){var n={geometry:r,type:t,tags:e||null,min:[2,1],max:[-1,0]};return calcBBox(n),n}function project(e,t){for(var r=[],n=0;n<e.length;n++)r.push(projectPoint(e[n]));return t&&(simplify(r,t),calcSize(r)),r}function projectPoint(e){var t=Math.sin(e[1]*Math.PI/180),r=e[0]/360+.5,n=.5-.25*Math.log((1+t)/(1-t))/Math.PI;return n=n<0?0:n>1?1:n,[r,n,0]}function calcSize(e){for(var t,r,n=0,o=0,i=0;i<e.length-1;i++)t=r||e[i],r=e[i+1],n+=t[0]*r[1]-r[0]*t[1],o+=Math.abs(r[0]-t[0])+Math.abs(r[1]-t[1]);e.area=Math.abs(n/2),e.dist=o}function calcBBox(e){var t=e.geometry,r=e.min,n=e.max;if(1===e.type)calcRingBBox(r,n,t);else for(var o=0;o<t.length;o++)calcRingBBox(r,n,t[o]);return e}function calcRingBBox(e,t,r){for(var n,o=0;o<r.length;o++)n=r[o],e[0]=Math.min(n[0],e[0]),t[0]=Math.max(n[0],t[0]),e[1]=Math.min(n[1],e[1]),t[1]=Math.max(n[1],t[1])}function transformTile(e,t){if(e.transformed)return e;var r,n,o,i=e.z2,a=e.x,s=e.y;for(r=0;r<e.features.length;r++){var l=e.features[r],u=l.geometry;if(1===l.type)for(n=0;n<u.length;n++)u[n]=transformPoint(u[n],t,i,a,s);else for(n=0;n<u.length;n++){var c=u[n];for(o=0;o<c.length;o++)c[o]=transformPoint(c[o],t,i,a,s)}}return e.transformed=!0,e}function transformPoint(e,t,r,n,o){return[Math.round(t*(e[0]*r-n)),Math.round(t*(e[1]*r-o))]}function clip$1(e,t,r,n,o,i,a,s){if(r/=t,n/=t,a>=r&&s<=n)return e;if(a>n||s<r)return null;for(var l=[],u=0;u<e.length;u++){var c,f,p=e[u],h=p.geometry,m=p.type;if(c=p.min[o],f=p.max[o],c>=r&&f<=n)l.push(p);else if(!(c>n||f<r)){var g=1===m?clipPoints(h,r,n,o):clipGeometry(h,r,n,o,i,3===m);g.length&&l.push({geometry:g,type:m,tags:e[u].tags||null,min:p.min,max:p.max})}}return l.length?l:null}function clipPoints(e,t,r,n){for(var o=[],i=0;i<e.length;i++){var a=e[i],s=a[n];s>=t&&s<=r&&o.push(a)}return o}function clipGeometry(e,t,r,n,o,i){for(var a=[],s=0;s<e.length;s++){var l,u,c,f=0,p=0,h=null,m=e[s],g=m.area,d=m.dist,v=m.outer,y=m.length,x=[];for(u=0;u<y-1;u++)l=h||m[u],h=m[u+1],f=p||l[n],p=h[n],f<t?p>r?(x.push(o(l,h,t),o(l,h,r)),i||(x=newSlice(a,x,g,d,v))):p>=t&&x.push(o(l,h,t)):f>r?p<t?(x.push(o(l,h,r),o(l,h,t)),i||(x=newSlice(a,x,g,d,v))):p<=r&&x.push(o(l,h,r)):(x.push(l),p<t?(x.push(o(l,h,t)),i||(x=newSlice(a,x,g,d,v))):p>r&&(x.push(o(l,h,r)),i||(x=newSlice(a,x,g,d,v))));l=m[y-1],f=l[n],f>=t&&f<=r&&x.push(l),c=x[x.length-1],i&&c&&(x[0][0]!==c[0]||x[0][1]!==c[1])&&x.push(x[0]),newSlice(a,x,g,d,v)}return a}function newSlice(e,t,r,n,o){return t.length&&(t.area=r,t.dist=n,void 0!==o&&(t.outer=o),e.push(t)),[]}function wrap$1(e,t,r){var n=e,o=clip$2(e,1,-1-t,t,0,r,-1,2),i=clip$2(e,1,1-t,2+t,0,r,-1,2);return(o||i)&&(n=clip$2(e,1,-t,1+t,0,r,-1,2),o&&(n=shiftFeatureCoords(o,1).concat(n)),i&&(n=n.concat(shiftFeatureCoords(i,-1)))),n}function shiftFeatureCoords(e,t){for(var r=[],n=0;n<e.length;n++){var o,i=e[n],a=i.type;if(1===a)o=shiftCoords(i.geometry,t);else{o=[];for(var s=0;s<i.geometry.length;s++)o.push(shiftCoords(i.geometry[s],t))}r.push({geometry:o,type:a,tags:i.tags,min:[i.min[0]+t,i.min[1]],max:[i.max[0]+t,i.max[1]]})}return r}function shiftCoords(e,t){var r=[];r.area=e.area,r.dist=e.dist;for(var n=0;n<e.length;n++)r.push([e[n][0]+t,e[n][1],e[n][2]]);return r}function createTile$1(e,t,r,n,o,i){for(var a={features:[],numPoints:0,numSimplified:0,numFeatures:0,source:null,x:r,y:n,z2:t,transformed:!1,min:[2,1],max:[-1,0]},s=0;s<e.length;s++){a.numFeatures++,addFeature(a,e[s],o,i);var l=e[s].min,u=e[s].max;l[0]<a.min[0]&&(a.min[0]=l[0]),l[1]<a.min[1]&&(a.min[1]=l[1]),u[0]>a.max[0]&&(a.max[0]=u[0]),u[1]>a.max[1]&&(a.max[1]=u[1])}return a}function addFeature(e,t,r,n){var o,i,a,s,l=t.geometry,u=t.type,c=[],f=r*r;if(1===u)for(o=0;o<l.length;o++)c.push(l[o]),e.numPoints++,e.numSimplified++;else for(o=0;o<l.length;o++)if(a=l[o],n||!(2===u&&a.dist<r||3===u&&a.area<f)){var p=[];for(i=0;i<a.length;i++)s=a[i],(n||s[2]>f)&&(p.push(s),e.numSimplified++),e.numPoints++;3===u&&rewind(p,a.outer),c.push(p)}else e.numPoints+=a.length;c.length&&e.features.push({geometry:c,type:u,tags:t.tags||null})}function rewind(e,t){signedArea(e)<0===t&&e.reverse()}function signedArea(e){for(var t,r,n=0,o=0,i=e.length,a=i-1;o<i;a=o++)t=e[o],r=e[a],n+=(r[0]-t[0])*(t[1]+r[1]);return n}function geojsonvt(e,t){return new GeoJSONVT(e,t)}function GeoJSONVT(e,t){t=this.options=extend(Object.create(this.options),t);var r=t.debug;r&&console.time("preprocess data");var n=1<<t.maxZoom,o=convert(e,t.tolerance/(n*t.extent));this.tiles={},this.tileCoords=[],r&&(console.timeEnd("preprocess data"),console.log("index: maxZoom: %d, maxPoints: %d",t.indexMaxZoom,t.indexMaxPoints),console.time("generate tiles"),this.stats={},this.total=0),o=wrap(o,t.buffer/t.extent,intersectX),o.length&&this.splitTile(o,0,0,0),r&&(o.length&&console.log("features: %d, points: %d",this.tiles[0].numFeatures,this.tiles[0].numPoints),console.timeEnd("generate tiles"),console.log("tiles generated:",this.total,JSON.stringify(this.stats)))}function toID(e,t,r){return 32*((1<<e)*r+t)+e}function intersectX(e,t,r){return[r,(r-e[0])*(t[1]-e[1])/(t[0]-e[0])+e[1],1]}function intersectY(e,t,r){return[(r-e[1])*(t[0]-e[0])/(t[1]-e[1])+e[0],r,1]}function extend(e,t){for(var r in t)e[r]=t[r];return e}function isClippedSquare(e,t,r){var n=e.source;if(1!==n.length)return!1;var o=n[0];if(3!==o.type||o.geometry.length>1)return!1;var i=o.geometry[0].length;if(5!==i)return!1;for(var a=0;a<i;a++){var s=transform.point(o.geometry[0][a],t,e.z2,e.x,e.y);if(s[0]!==-r&&s[0]!==t+r||s[1]!==-r&&s[1]!==t+r)return!1}return!0}function feature$1(e,t){var r=t.id,n=t.bbox,o=null==t.properties?{}:t.properties,i=object(e,t);return null==r&&null==n?{type:"Feature",properties:o,geometry:i}:null==n?{type:"Feature",id:r,properties:o,geometry:i}:{type:"Feature",id:r,bbox:n,properties:o,geometry:i}}function object(e,t){function r(e,t){t.length&&t.pop();for(var r=u[e<0?~e:e],n=0,o=r.length;n<o;++n)t.push(l(r[n].slice(),n));e<0&&reverse(t,o)}function n(e){return l(e.slice())}function o(e){for(var t=[],n=0,o=e.length;n<o;++n)r(e[n],t);return t.length<2&&t.push(t[0].slice()),t}function i(e){for(var t=o(e);t.length<4;)t.push(t[0].slice());return t}function a(e){return e.map(i)}function s(e){var t,r=e.type;switch(r){case"GeometryCollection":return{type:r,geometries:e.geometries.map(s)};case"Point":t=n(e.coordinates);break;case"MultiPoint":t=e.coordinates.map(n);break;case"LineString":t=o(e.arcs);break;case"MultiLineString":t=e.arcs.map(o);break;case"Polygon":t=a(e.arcs);break;case"MultiPolygon":t=e.arcs.map(a);break;default:return null}return{type:r,coordinates:t}}var l=transform$3(e),u=e.arcs;return s(t)}function extractArcs(e,t,r){function n(e){var t=e<0?~e:e;(c[t]||(c[t]=[])).push({i:e,g:l})}function o(e){e.forEach(n)}function i(e){e.forEach(o)}function a(e){e.forEach(i)}function s(e){switch(l=e,e.type){case"GeometryCollection":e.geometries.forEach(s);break;case"LineString":o(e.arcs);break;case"MultiLineString":case"Polygon":i(e.arcs);break;case"MultiPolygon":a(e.arcs)}}var l,u=[],c=[];return s(t),c.forEach(null==r?function(e){u.push(e[0].i)}:function(e){r(e[0].g,e[e.length-1].g)&&u.push(e[0].i)}),u}function planarRingArea(e){for(var t,r=-1,n=e.length,o=e[n-1],i=0;++r<n;)t=o,o=e[r],i+=t[0]*o[1]-t[1]*o[0];return Math.abs(i)}var simplify_1=simplify$1,convert_1=convert$1,simplify=simplify_1,tile=transformTile,point=transformPoint,transform$1={tile:tile,point:point},clip_1=clip$1,clip$2=clip_1,wrap_1=wrap$1,tile$1=createTile$1,index=geojsonvt,convert=convert_1,transform=transform$1,clip=clip_1,wrap=wrap_1,createTile=tile$1;GeoJSONVT.prototype.options={maxZoom:14,indexMaxZoom:5,indexMaxPoints:1e5,solidChildren:!1,tolerance:3,extent:4096,buffer:64,debug:0},GeoJSONVT.prototype.splitTile=function(e,t,r,n,o,i,a){for(var s=this,l=[e,t,r,n],u=this.options,c=u.debug,f=null;l.length;){n=l.pop(),r=l.pop(),t=l.pop(),e=l.pop();var p=1<<t,h=toID(t,r,n),m=s.tiles[h],g=t===u.maxZoom?0:u.tolerance/(p*u.extent);if(!m&&(c>1&&console.time("creation"),m=s.tiles[h]=createTile(e,p,r,n,g,t===u.maxZoom),s.tileCoords.push({z:t,x:r,y:n}),c)){c>1&&(console.log("tile z%d-%d-%d (features: %d, points: %d, simplified: %d)",t,r,n,m.numFeatures,m.numPoints,m.numSimplified),console.timeEnd("creation"));var d="z"+t;s.stats[d]=(s.stats[d]||0)+1,s.total++}if(m.source=e,o){if(t===u.maxZoom||t===o)continue;var v=1<<o-t;if(r!==Math.floor(i/v)||n!==Math.floor(a/v))continue}else if(t===u.indexMaxZoom||m.numPoints<=u.indexMaxPoints)continue;if(u.solidChildren||!isClippedSquare(m,u.extent,u.buffer)){m.source=null,c>1&&console.time("clipping");var y,x,b,M,P,S,w=.5*u.buffer/u.extent,$=.5-w,C=.5+w,F=1+w;y=x=b=M=null,P=clip(e,p,r-w,r+C,0,intersectX,m.min[0],m.max[0]),S=clip(e,p,r+$,r+F,0,intersectX,m.min[0],m.max[0]),P&&(y=clip(P,p,n-w,n+C,1,intersectY,m.min[1],m.max[1]),x=clip(P,p,n+$,n+F,1,intersectY,m.min[1],m.max[1])),S&&(b=clip(S,p,n-w,n+C,1,intersectY,m.min[1],m.max[1]),M=clip(S,p,n+$,n+F,1,intersectY,m.min[1],m.max[1])),c>1&&console.timeEnd("clipping"),y&&l.push(y,t+1,2*r,2*n),x&&l.push(x,t+1,2*r,2*n+1),b&&l.push(b,t+1,2*r+1,2*n),M&&l.push(M,t+1,2*r+1,2*n+1)}else o&&(f=t)}return f},GeoJSONVT.prototype.getTile=function(e,t,r){var n=this,o=this.options,i=o.extent,a=o.debug,s=1<<e;t=(t%s+s)%s;var l=toID(e,t,r);if(this.tiles[l])return transform.tile(this.tiles[l],i);a>1&&console.log("drilling down to z%d-%d-%d",e,t,r);for(var u,c=e,f=t,p=r;!u&&c>0;)c--,f=Math.floor(f/2),p=Math.floor(p/2),u=n.tiles[toID(c,f,p)];if(!u||!u.source)return null;if(a>1&&console.log("found parent tile z%d-%d-%d",c,f,p),isClippedSquare(u,i,o.buffer))return transform.tile(u,i);a>1&&console.time("drilling down");var h=this.splitTile(u.source,c,f,p,e,t,r);if(a>1&&console.timeEnd("drilling down"),null!==h){var m=1<<e-h;l=toID(h,Math.floor(t/m),Math.floor(r/m))}return this.tiles[l]?transform.tile(this.tiles[l],i):null};var identity=function(e){return e},transform$3=function(e){if(null==(t=e.transform))return identity;var t,r,n,o=t.scale[0],i=t.scale[1],a=t.translate[0],s=t.translate[1];return function(e,t){return t||(r=n=0),e[0]=(r+=e[0])*o+a,e[1]=(n+=e[1])*i+s,e}},bbox=function(e){function t(e){s[0]=e[0],s[1]=e[1],a(s),s[0]<l&&(l=s[0]),s[0]>c&&(c=s[0]),s[1]<u&&(u=s[1]),s[1]>f&&(f=s[1])}function r(e){switch(e.type){case"GeometryCollection":e.geometries.forEach(r);break;case"Point":t(e.coordinates);break;case"MultiPoint":e.coordinates.forEach(t)}}var n=e.bbox;if(!n){var o,i,a=transform$3(e),s=new Array(2),l=1/0,u=l,c=-l,f=-l;e.arcs.forEach(function(e){for(var t=-1,r=e.length;++t<r;)o=e[t],s[0]=o[0],s[1]=o[1],a(s,t),s[0]<l&&(l=s[0]),s[0]>c&&(c=s[0]),s[1]<u&&(u=s[1]),s[1]>f&&(f=s[1])});for(i in e.objects)r(e.objects[i]);n=e.bbox=[l,u,c,f]}return n},reverse=function(e,t){for(var r,n=e.length,o=n-t;o<--n;)r=e[o],e[o++]=e[n],e[n]=r},feature=function(e,t){return"GeometryCollection"===t.type?{type:"FeatureCollection",features:t.geometries.map(function(t){return feature$1(e,t)})}:feature$1(e,t)},stitch=function(e,t){function r(t){var r,n=e.arcs[t<0?~t:t],o=n[0];return e.transform?(r=[0,0],n.forEach(function(e){r[0]+=e[0],r[1]+=e[1]})):r=n[n.length-1],t<0?[r,o]:[o,r]}function n(e,t){for(var r in e){var n=e[r];delete t[n.start],delete n.start,delete n.end,n.forEach(function(e){o[e<0?~e:e]=1}),s.push(n)}}var o={},i={},a={},s=[],l=-1;return t.forEach(function(r,n){var o,i=e.arcs[r<0?~r:r];i.length<3&&!i[1][0]&&!i[1][1]&&(o=t[++l],t[l]=r,t[n]=o)}),t.forEach(function(e){var t,n,o=r(e),s=o[0],l=o[1];if(t=a[s])if(delete a[t.end],t.push(e),t.end=l,n=i[l]){delete i[n.start];var u=n===t?t:t.concat(n);i[u.start=t.start]=a[u.end=n.end]=u}else i[t.start]=a[t.end]=t;else if(t=i[l])if(delete i[t.start],t.unshift(e),t.start=s,n=a[s]){delete a[n.end];var c=n===t?t:n.concat(t);i[c.start=n.start]=a[c.end=t.end]=c}else i[t.start]=a[t.end]=t;else t=[e],i[t.start=s]=a[t.end=l]=t}),n(a,i),n(i,a),t.forEach(function(e){o[e<0?~e:e]||s.push([e])}),s},bisect=function(e,t){for(var r=0,n=e.length;r<n;){var o=r+n>>>1;e[o]<t?r=o+1:n=o}return r},slicers={},options;onmessage=function(e){if("slice"===e.data[0]){var t=e.data[1];if(options=e.data[2],t.type&&"Topology"===t.type)for(var r in t.objects)slicers[r]=index(feature(t,t.objects[r]),options);else slicers[options.vectorTileLayerName]=index(t,options)}else if("get"===e.data[0]){var n=e.data[1],o={};for(var r in slicers){var i=slicers[r].getTile(n.z,n.x,n.y);if(i){var a={features:[],extent:options.extent,name:options.vectorTileLayerName,length:i.features.length};for(var s in i.features){var l={geometry:i.features[s].geometry,properties:i.features[s].tags,type:i.features[s].type};a.features.push(l)}o[r]=a}}postMessage({layers:o,coords:n})}};\n',"text/plain; charset=us-ascii",!1);L.VectorGrid.Slicer=L.VectorGrid.extend({options:{vectorTileLayerName:"sliced",extent:4096,maxZoom:14},initialize:function(t,e){L.VectorGrid.prototype.initialize.call(this,e);var e={};for(var r in this.options)"rendererFactory"!==r&&"vectorTileLayerStyles"!==r&&"function"!=typeof this.options[r]&&(e[r]=this.options[r]);this._worker=new Worker(workerCode),this._worker.postMessage(["slice",t,e])},_getVectorTilePromise:function(t){var e=this,r=new Promise(function(r){e._worker.addEventListener("message",function i(n){n.data.coords&&n.data.coords.x===t.x&&n.data.coords.y===t.y&&n.data.coords.z===t.z&&(r(n.data),e._worker.removeEventListener("message",i))})});return this._worker.postMessage(["get",t]),r}}),L.vectorGrid.slicer=function(t,e){return new L.VectorGrid.Slicer(t,e)},L.Canvas.Tile=L.Canvas.extend({initialize:function(t,e,r){L.Canvas.prototype.initialize.call(this,r),this._tileCoord=t,this._size=e,this._initContainer(),this._container.setAttribute("width",this._size.x),this._container.setAttribute("height",this._size.y),this._layers={},this._drawnLayers={},this._drawing=!0,r.interactive&&(this._container.style.pointerEvents="auto")},getCoord:function(){return this._tileCoord},getContainer:function(){return this._container},getOffset:function(){return this._tileCoord.scaleBy(this._size).subtract(this._map.getPixelOrigin())},onAdd:L.Util.falseFn,addTo:function(t){this._map=t},removeFrom:function(t){delete this._map},_onClick:function(t){var e,r,i=this._map.mouseEventToLayerPoint(t).subtract(this.getOffset());for(var n in this._layers)e=this._layers[n],e.options.interactive&&e._containsPoint(i)&&!this._map._draggableMoved(e)&&(r=e);r&&(L.DomEvent.fakeStop(t),this._fireEvent([r],t))},_onMouseMove:function(t){if(this._map&&!this._map.dragging.moving()&&!this._map._animatingZoom){var e=this._map.mouseEventToLayerPoint(t).subtract(this.getOffset());this._handleMouseHover(t,e)}},_updateIcon:function(t){if(this._drawing){var e=t.options.icon,r=e.options,i=L.point(r.iconSize),n=r.iconAnchor||i&&i.divideBy(2,!0),o=t._point.subtract(n),s=this._ctx,a=t._getImage();a.complete?s.drawImage(a,o.x,o.y,i.x,i.y):L.DomEvent.on(a,"load",function(){s.drawImage(a,o.x,o.y,i.x,i.y)}),this._drawnLayers[t._leaflet_id]=t}}}),L.canvas.tile=function(t,e,r){return new L.Canvas.Tile(t,e,r)};
+'use strict';
+
+function __$strToBlobUri(str, mime, isBinary) {try {return window.URL.createObjectURL(new Blob([Uint8Array.from(str.split('').map(function(c) {return c.charCodeAt(0)}))], {type: mime}));} catch (e) {return "data:" + mime + (isBinary ? ";base64," : ",") + str;}}
+L.SVG.Tile = L.SVG.extend({
+
+	initialize: function (tileCoord, tileSize, options) {
+		L.SVG.prototype.initialize.call(this, options);
+		this._tileCoord = tileCoord;
+		this._size = tileSize;
+
+		this._initContainer();
+		this._container.setAttribute('width', this._size.x);
+		this._container.setAttribute('height', this._size.y);
+		this._container.setAttribute('viewBox', [0, 0, this._size.x, this._size.y].join(' '));
+
+		this._layers = {};
+	},
+
+	getCoord: function() {
+		return this._tileCoord;
+	},
+
+	getContainer: function() {
+		return this._container;
+	},
+
+	onAdd: L.Util.falseFn,
+
+	addTo: function(map) {
+		this._map = map;
+		if (this.options.interactive) {
+			for (var i in this._layers) {
+				var layer = this._layers[i];
+				// By default, Leaflet tiles do not have pointer events.
+				layer._path.style.pointerEvents = 'auto';
+				this._map._targets[L.stamp(layer._path)] = layer;
+			}
+		}
+	},
+
+	removeFrom: function (map) {
+		if (this.options.interactive) {
+			for (var i in this._layers) {
+				var layer = this._layers[i];
+				delete this._map._targets[L.stamp(layer._path)];
+			}
+		}
+		delete this._map;
+	},
+
+	_initContainer: function() {
+		L.SVG.prototype._initContainer.call(this);
+		var rect =  L.SVG.create('rect');
+	},
+
+	/// TODO: Modify _initPath to include an extra parameter, a group name
+	/// to order symbolizers by z-index
+
+	_addPath: function (layer) {
+		this._rootGroup.appendChild(layer._path);
+		this._layers[L.stamp(layer)] = layer;
+	},
+
+	_updateIcon: function (layer) {
+		var path = layer._path = L.SVG.create('image'),
+		    icon = layer.options.icon,
+		    options = icon.options,
+		    size = L.point(options.iconSize),
+		    anchor = options.iconAnchor ||
+		        	 size && size.divideBy(2, true),
+		    p = layer._point.subtract(anchor);
+		path.setAttribute('x', p.x);
+		path.setAttribute('y', p.y);
+		path.setAttribute('width', size.x + 'px');
+		path.setAttribute('height', size.y + 'px');
+		path.setAttribute('href', options.iconUrl);
+	}
+});
+
+
+L.svg.tile = function(tileCoord, tileSize, opts){
+	return new L.SVG.Tile(tileCoord, tileSize, opts);
+};
+
+// 🍂class Symbolizer
+// 🍂inherits Class
+// The abstract Symbolizer class is mostly equivalent in concept to a `L.Path` - it's an interface for
+// polylines, polygons and circles. But instead of representing leaflet Layers,
+// it represents things that have to be drawn inside a vector tile.
+
+// A vector tile *data layer* might have zero, one, or more *symbolizer definitions*
+// A vector tile *feature* might have zero, one, or more *symbolizers*.
+// The actual symbolizers applied will depend on filters and the symbolizer functions.
+
+var Symbolizer = L.Class.extend({
+	// 🍂method initialize(feature: GeoJSON, pxPerExtent: Number)
+	// Initializes a new Line Symbolizer given a GeoJSON feature and the
+	// pixel-to-coordinate-units ratio. Internal use only.
+
+	// 🍂method render(renderer, style)
+	// Renders this symbolizer in the given tiled renderer, with the given
+	// `L.Path` options.  Internal use only.
+	render: function(renderer, style) {
+		this._renderer = renderer;
+		this.options = style;
+		renderer._initPath(this);
+		renderer._updateStyle(this);
+	},
+
+	// 🍂method render(renderer, style)
+	// Updates the `L.Path` options used to style this symbolizer, and re-renders it.
+	// Internal use only.
+	updateStyle: function(renderer, style) {
+		this.options = style;
+		renderer._updateStyle(this);
+	},
+
+	_getPixelBounds: function() {
+		var parts = this._parts;
+		var bounds = L.bounds([]);
+		for (var i = 0; i < parts.length; i++) {
+			var part = parts[i];
+			for (var j = 0; j < part.length; j++) {
+				bounds.extend(part[j]);
+			}
+		}
+
+		var w = this._clickTolerance(),
+		    p = new L.Point(w, w);
+
+		bounds.min._subtract(p);
+		bounds.max._add(p);
+
+		return bounds;
+	},
+	_clickTolerance: L.Path.prototype._clickTolerance,
+});
+
+// Contains mixins which are common to the Line Symbolizer and the Fill Symbolizer.
+
+var PolyBase = {
+	_makeFeatureParts: function(feat, pxPerExtent) {
+		var rings = feat.geometry;
+		var coord;
+
+		this._parts = [];
+		for (var i = 0; i < rings.length; i++) {
+			var ring = rings[i];
+			var part = [];
+			for (var j = 0; j < ring.length; j++) {
+				coord = ring[j];
+				// Protobuf vector tiles return {x: , y:}
+				// Geojson-vt returns [,]
+				part.push(L.point(coord).scaleBy(pxPerExtent));
+			}
+			this._parts.push(part);
+		}
+	},
+
+	makeInteractive: function() {
+		this._pxBounds = this._getPixelBounds();
+	}
+};
+
+// 🍂class PointSymbolizer
+// 🍂inherits CircleMarker
+// A symbolizer for points.
+
+var PointSymbolizer = L.CircleMarker.extend({
+	includes: Symbolizer.prototype,
+
+	statics: {
+		iconCache: {}
+	},
+
+	initialize: function(feature, pxPerExtent) {
+		this.properties = feature.properties;
+		this._makeFeatureParts(feature, pxPerExtent);
+	},
+
+	render: function(renderer, style) {
+		Symbolizer.prototype.render.call(this, renderer, style);
+		this._radius = style.radius || L.CircleMarker.prototype.options.radius;
+		this._updatePath();
+	},
+
+	_makeFeatureParts: function(feat, pxPerExtent) {
+		var coord = feat.geometry[0];
+		if (typeof coord[0] === 'object' && 'x' in coord[0]) {
+			// Protobuf vector tiles return [{x: , y:}]
+			this._point = L.point(coord[0]).scaleBy(pxPerExtent);
+			this._empty = L.Util.falseFn;
+		} else {
+			// Geojson-vt returns [,]
+			this._point = L.point(coord).scaleBy(pxPerExtent);
+			this._empty = L.Util.falseFn;
+		}
+	},
+
+	makeInteractive: function() {
+		this._updateBounds();
+	},
+
+	updateStyle: function(renderer, style) {
+		this._radius = style.radius || this._radius;
+		this._updateBounds();
+		return Symbolizer.prototype.updateStyle.call(this, renderer, style);
+	},
+
+	_updateBounds: function() {
+		var icon = this.options.icon;
+		if (icon) {
+			var size = L.point(icon.options.iconSize),
+			    anchor = icon.options.iconAnchor ||
+			             size && size.divideBy(2, true),
+			    p = this._point.subtract(anchor);
+			this._pxBounds = new L.Bounds(p, p.add(icon.options.iconSize));
+		} else {
+			L.CircleMarker.prototype._updateBounds.call(this);
+		}
+	},
+
+	_updatePath: function() {
+		if (this.options.icon) {
+			this._renderer._updateIcon(this);
+		} else {
+			L.CircleMarker.prototype._updatePath.call(this);
+		}
+	},
+
+	_getImage: function () {
+		if (this.options.icon) {
+			var url = this.options.icon.options.iconUrl,
+			    img = PointSymbolizer.iconCache[url];
+			if (!img) {
+				var icon = this.options.icon;
+				img = PointSymbolizer.iconCache[url] = icon.createIcon();
+			}
+			return img;
+		} else {
+			return null;
+		}
+
+	},
+
+	_containsPoint: function(p) {
+		var icon = this.options.icon;
+		if (icon) {
+			return this._pxBounds.contains(p);
+		} else {
+			return L.CircleMarker.prototype._containsPoint.call(this, p);
+		}
+	}
+});
+
+// 🍂class LineSymbolizer
+// 🍂inherits Polyline
+// A symbolizer for lines. Can be applied to line and polygon features.
+
+var LineSymbolizer = L.Polyline.extend({
+	includes: [Symbolizer.prototype, PolyBase],
+
+	initialize: function(feature, pxPerExtent) {
+		this.properties = feature.properties;
+		this._makeFeatureParts(feature, pxPerExtent);
+	},
+
+	render: function(renderer, style) {
+		style.fill = false;
+		Symbolizer.prototype.render.call(this, renderer, style);
+		this._updatePath();
+	},
+
+	updateStyle: function(renderer, style) {
+		style.fill = false;
+		Symbolizer.prototype.updateStyle.call(this, renderer, style);
+	},
+});
+
+// 🍂class FillSymbolizer
+// 🍂inherits Polyline
+// A symbolizer for filled areas. Applies only to polygon features.
+
+var FillSymbolizer = L.Polygon.extend({
+	includes: [Symbolizer.prototype, PolyBase],
+
+	initialize: function(feature, pxPerExtent) {
+		this.properties = feature.properties;
+		this._makeFeatureParts(feature, pxPerExtent);
+	},
+
+	render: function(renderer, style) {
+		Symbolizer.prototype.render.call(this, renderer, style);
+		this._updatePath();
+	}
+});
+
+/* 🍂class VectorGrid
+ * 🍂inherits GridLayer
+ *
+ * A `VectorGrid` is a generic, abstract class for displaying tiled vector data.
+ * it provides facilities for symbolizing and rendering the data in the vector
+ * tiles, but lacks the functionality to fetch the vector tiles from wherever
+ * they are.
+ *
+ * Extends Leaflet's `L.GridLayer`.
+ */
+
+L.VectorGrid = L.GridLayer.extend({
+
+	options: {
+		// 🍂option rendererFactory = L.svg.tile
+		// A factory method which will be used to instantiate the per-tile renderers.
+		rendererFactory: L.svg.tile,
+
+		// 🍂option vectorTileLayerStyles: Object = {}
+		// A data structure holding initial symbolizer definitions for the vector features.
+		vectorTileLayerStyles: {},
+
+		// 🍂option interactive: Boolean = false
+		// Whether this `VectorGrid` fires `Interactive Layer` events.
+		interactive: false,
+
+		// 🍂option getFeatureId: Function = undefined
+		// A function that, given a vector feature, returns an unique identifier for it, e.g.
+		// `function(feat) { return feat.properties.uniqueIdField; }`.
+		// Must be defined for `setFeatureStyle` to work.
+	},
+
+	initialize: function(options) {
+		L.setOptions(this, options);
+		L.GridLayer.prototype.initialize.apply(this, arguments);
+		if (this.options.getFeatureId) {
+			this._vectorTiles = {};
+			this._overriddenStyles = {};
+			this.on('tileunload', function(e) {
+				var key = this._tileCoordsToKey(e.coords),
+				    tile = this._vectorTiles[key];
+
+				if (tile && this._map) {
+					tile.removeFrom(this._map);
+				}
+				delete this._vectorTiles[key];
+			}, this);
+		}
+		this._dataLayerNames = {};
+	},
+
+	createTile: function(coords, done) {
+		var storeFeatures = this.options.getFeatureId;
+
+		var tileSize = this.getTileSize();
+		var renderer = this.options.rendererFactory(coords, tileSize, this.options);
+
+		var vectorTilePromise = this._getVectorTilePromise(coords);
+
+		if (storeFeatures) {
+			this._vectorTiles[this._tileCoordsToKey(coords)] = renderer;
+			renderer._features = {};
+		}
+
+		vectorTilePromise.then( function renderTile(vectorTile) {
+			for (var layerName in vectorTile.layers) {
+				this._dataLayerNames[layerName] = true;
+				var layer = vectorTile.layers[layerName];
+
+				var pxPerExtent = this.getTileSize().divideBy(layer.extent);
+
+				var layerStyle = this.options.vectorTileLayerStyles[ layerName ] ||
+				L.Path.prototype.options;
+
+				for (var i = 0; i < layer.features.length; i++) {
+					var feat = layer.features[i];
+					var id;
+
+					var styleOptions = layerStyle;
+					if (storeFeatures) {
+						id = this.options.getFeatureId(feat);
+						var styleOverride = this._overriddenStyles[id];
+						if (styleOverride) {
+							if (styleOverride[layerName]) {
+								styleOptions = styleOverride[layerName];
+							} else {
+								styleOptions = styleOverride;
+							}
+						}
+					}
+
+					if (styleOptions instanceof Function) {
+						styleOptions = styleOptions(feat.properties, coords.z);
+					}
+
+					if (!(styleOptions instanceof Array)) {
+						styleOptions = [styleOptions];
+					}
+
+					if (!styleOptions.length) {
+						continue;
+					}
+
+					var featureLayer = this._createLayer(feat, pxPerExtent);
+
+					for (var j = 0; j < styleOptions.length; j++) {
+						var style = L.extend({}, L.Path.prototype.options, styleOptions[j]);
+						featureLayer.render(renderer, style);
+						renderer._addPath(featureLayer);
+					}
+
+					if (this.options.interactive) {
+						featureLayer.makeInteractive();
+					}
+
+					if (storeFeatures) {
+						renderer._features[id] = {
+							layerName: layerName,
+							feature: featureLayer
+						};
+					}
+				}
+
+			}
+			if (this._map != null) {
+				renderer.addTo(this._map);
+			}
+			L.Util.requestAnimFrame(done.bind(coords, null, null));
+		}.bind(this));
+
+		return renderer.getContainer();
+	},
+
+	// 🍂method setFeatureStyle(id: Number, layerStyle: L.Path Options): this
+	// Given the unique ID for a vector features (as per the `getFeatureId` option),
+	// re-symbolizes that feature across all tiles it appears in.
+	setFeatureStyle: function(id, layerStyle) {
+		this._overriddenStyles[id] = layerStyle;
+
+		for (var tileKey in this._vectorTiles) {
+			var tile = this._vectorTiles[tileKey];
+			var features = tile._features;
+			var data = features[id];
+			if (data) {
+				var feat = data.feature;
+
+				var styleOptions = layerStyle;
+				if (layerStyle[data.layerName]) {
+					styleOptions = layerStyle[data.layerName];
+				}
+
+				this._updateStyles(feat, tile, styleOptions);
+			}
+		}
+		return this;
+	},
+
+	// 🍂method setFeatureStyle(id: Number): this
+	// Reverts the effects of a previous `setFeatureStyle` call.
+	resetFeatureStyle: function(id) {
+		delete this._overriddenStyles[id];
+
+		for (var tileKey in this._vectorTiles) {
+			var tile = this._vectorTiles[tileKey];
+			var features = tile._features;
+			var data = features[id];
+			if (data) {
+				var feat = data.feature;
+				var styleOptions = this.options.vectorTileLayerStyles[ data.layerName ] ||
+				L.Path.prototype.options;
+				this._updateStyles(feat, tile, styleOptions);
+			}
+		}
+		return this;
+	},
+
+	// 🍂method getDataLayerNames(): Array
+	// Returns an array of strings, with all the known names of data layers in
+	// the vector tiles displayed. Useful for introspection.
+	getDataLayerNames: function() {
+		return Object.keys(this._dataLayerNames);
+	},
+
+	_updateStyles: function(feat, renderer, styleOptions) {
+		styleOptions = (styleOptions instanceof Function) ?
+			styleOptions(feat.properties, renderer.getCoord().z) :
+			styleOptions;
+
+		if (!(styleOptions instanceof Array)) {
+			styleOptions = [styleOptions];
+		}
+
+		for (var j = 0; j < styleOptions.length; j++) {
+			var style = L.extend({}, L.Path.prototype.options, styleOptions[j]);
+			feat.updateStyle(renderer, style);
+		}
+	},
+
+	_createLayer: function(feat, pxPerExtent, layerStyle) {
+		var layer;
+		switch (feat.type) {
+		case 1:
+			layer = new PointSymbolizer(feat, pxPerExtent);
+			break;
+		case 2:
+			layer = new LineSymbolizer(feat, pxPerExtent);
+			break;
+		case 3:
+			layer = new FillSymbolizer(feat, pxPerExtent);
+			break;
+		}
+
+		if (this.options.interactive) {
+			layer.addEventParent(this);
+		}
+
+		return layer;
+	},
+});
+
+/*
+ * 🍂section Extension methods
+ *
+ * Classes inheriting from `VectorGrid` **must** define the `_getVectorTilePromise` private method.
+ *
+ * 🍂method getVectorTilePromise(coords: Object): Promise
+ * Given a `coords` object in the form of `{x: Number, y: Number, z: Number}`,
+ * this function must return a `Promise` for a vector tile.
+ *
+ */
+L.vectorGrid = function (options) {
+	return new L.VectorGrid(options);
+};
+
+var read = function (buffer, offset, isLE, mLen, nBytes) {
+  var e, m;
+  var eLen = nBytes * 8 - mLen - 1;
+  var eMax = (1 << eLen) - 1;
+  var eBias = eMax >> 1;
+  var nBits = -7;
+  var i = isLE ? (nBytes - 1) : 0;
+  var d = isLE ? -1 : 1;
+  var s = buffer[offset + i];
+
+  i += d;
+
+  e = s & ((1 << (-nBits)) - 1);
+  s >>= (-nBits);
+  nBits += eLen;
+  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+  m = e & ((1 << (-nBits)) - 1);
+  e >>= (-nBits);
+  nBits += mLen;
+  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+  if (e === 0) {
+    e = 1 - eBias;
+  } else if (e === eMax) {
+    return m ? NaN : ((s ? -1 : 1) * Infinity)
+  } else {
+    m = m + Math.pow(2, mLen);
+    e = e - eBias;
+  }
+  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
+};
+
+var write = function (buffer, value, offset, isLE, mLen, nBytes) {
+  var e, m, c;
+  var eLen = nBytes * 8 - mLen - 1;
+  var eMax = (1 << eLen) - 1;
+  var eBias = eMax >> 1;
+  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0);
+  var i = isLE ? 0 : (nBytes - 1);
+  var d = isLE ? 1 : -1;
+  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0;
+
+  value = Math.abs(value);
+
+  if (isNaN(value) || value === Infinity) {
+    m = isNaN(value) ? 1 : 0;
+    e = eMax;
+  } else {
+    e = Math.floor(Math.log(value) / Math.LN2);
+    if (value * (c = Math.pow(2, -e)) < 1) {
+      e--;
+      c *= 2;
+    }
+    if (e + eBias >= 1) {
+      value += rt / c;
+    } else {
+      value += rt * Math.pow(2, 1 - eBias);
+    }
+    if (value * c >= 2) {
+      e++;
+      c /= 2;
+    }
+
+    if (e + eBias >= eMax) {
+      m = 0;
+      e = eMax;
+    } else if (e + eBias >= 1) {
+      m = (value * c - 1) * Math.pow(2, mLen);
+      e = e + eBias;
+    } else {
+      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
+      e = 0;
+    }
+  }
+
+  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
+
+  e = (e << mLen) | m;
+  eLen += mLen;
+  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
+
+  buffer[offset + i - d] |= s * 128;
+};
+
+var index$1 = {
+	read: read,
+	write: write
+};
+
+var index = Pbf;
+
+var ieee754 = index$1;
+
+function Pbf(buf) {
+    this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
+    this.pos = 0;
+    this.type = 0;
+    this.length = this.buf.length;
+}
+
+Pbf.Varint  = 0; // varint: int32, int64, uint32, uint64, sint32, sint64, bool, enum
+Pbf.Fixed64 = 1; // 64-bit: double, fixed64, sfixed64
+Pbf.Bytes   = 2; // length-delimited: string, bytes, embedded messages, packed repeated fields
+Pbf.Fixed32 = 5; // 32-bit: float, fixed32, sfixed32
+
+var SHIFT_LEFT_32 = (1 << 16) * (1 << 16);
+var SHIFT_RIGHT_32 = 1 / SHIFT_LEFT_32;
+
+Pbf.prototype = {
+
+    destroy: function() {
+        this.buf = null;
+    },
+
+    // === READING =================================================================
+
+    readFields: function(readField, result, end) {
+        var this$1 = this;
+
+        end = end || this.length;
+
+        while (this.pos < end) {
+            var val = this$1.readVarint(),
+                tag = val >> 3,
+                startPos = this$1.pos;
+
+            this$1.type = val & 0x7;
+            readField(tag, result, this$1);
+
+            if (this$1.pos === startPos) { this$1.skip(val); }
+        }
+        return result;
+    },
+
+    readMessage: function(readField, result) {
+        return this.readFields(readField, result, this.readVarint() + this.pos);
+    },
+
+    readFixed32: function() {
+        var val = readUInt32(this.buf, this.pos);
+        this.pos += 4;
+        return val;
+    },
+
+    readSFixed32: function() {
+        var val = readInt32(this.buf, this.pos);
+        this.pos += 4;
+        return val;
+    },
+
+    // 64-bit int handling is based on github.com/dpw/node-buffer-more-ints (MIT-licensed)
+
+    readFixed64: function() {
+        var val = readUInt32(this.buf, this.pos) + readUInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;
+        this.pos += 8;
+        return val;
+    },
+
+    readSFixed64: function() {
+        var val = readUInt32(this.buf, this.pos) + readInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;
+        this.pos += 8;
+        return val;
+    },
+
+    readFloat: function() {
+        var val = ieee754.read(this.buf, this.pos, true, 23, 4);
+        this.pos += 4;
+        return val;
+    },
+
+    readDouble: function() {
+        var val = ieee754.read(this.buf, this.pos, true, 52, 8);
+        this.pos += 8;
+        return val;
+    },
+
+    readVarint: function(isSigned) {
+        var buf = this.buf,
+            val, b;
+
+        b = buf[this.pos++]; val  =  b & 0x7f;        if (b < 0x80) { return val; }
+        b = buf[this.pos++]; val |= (b & 0x7f) << 7;  if (b < 0x80) { return val; }
+        b = buf[this.pos++]; val |= (b & 0x7f) << 14; if (b < 0x80) { return val; }
+        b = buf[this.pos++]; val |= (b & 0x7f) << 21; if (b < 0x80) { return val; }
+        b = buf[this.pos];   val |= (b & 0x0f) << 28;
+
+        return readVarintRemainder(val, isSigned, this);
+    },
+
+    readVarint64: function() { // for compatibility with v2.0.1
+        return this.readVarint(true);
+    },
+
+    readSVarint: function() {
+        var num = this.readVarint();
+        return num % 2 === 1 ? (num + 1) / -2 : num / 2; // zigzag encoding
+    },
+
+    readBoolean: function() {
+        return Boolean(this.readVarint());
+    },
+
+    readString: function() {
+        var end = this.readVarint() + this.pos,
+            str = readUtf8(this.buf, this.pos, end);
+        this.pos = end;
+        return str;
+    },
+
+    readBytes: function() {
+        var end = this.readVarint() + this.pos,
+            buffer = this.buf.subarray(this.pos, end);
+        this.pos = end;
+        return buffer;
+    },
+
+    // verbose for performance reasons; doesn't affect gzipped size
+
+    readPackedVarint: function(arr, isSigned) {
+        var this$1 = this;
+
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) { arr.push(this$1.readVarint(isSigned)); }
+        return arr;
+    },
+    readPackedSVarint: function(arr) {
+        var this$1 = this;
+
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) { arr.push(this$1.readSVarint()); }
+        return arr;
+    },
+    readPackedBoolean: function(arr) {
+        var this$1 = this;
+
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) { arr.push(this$1.readBoolean()); }
+        return arr;
+    },
+    readPackedFloat: function(arr) {
+        var this$1 = this;
+
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) { arr.push(this$1.readFloat()); }
+        return arr;
+    },
+    readPackedDouble: function(arr) {
+        var this$1 = this;
+
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) { arr.push(this$1.readDouble()); }
+        return arr;
+    },
+    readPackedFixed32: function(arr) {
+        var this$1 = this;
+
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) { arr.push(this$1.readFixed32()); }
+        return arr;
+    },
+    readPackedSFixed32: function(arr) {
+        var this$1 = this;
+
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) { arr.push(this$1.readSFixed32()); }
+        return arr;
+    },
+    readPackedFixed64: function(arr) {
+        var this$1 = this;
+
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) { arr.push(this$1.readFixed64()); }
+        return arr;
+    },
+    readPackedSFixed64: function(arr) {
+        var this$1 = this;
+
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) { arr.push(this$1.readSFixed64()); }
+        return arr;
+    },
+
+    skip: function(val) {
+        var type = val & 0x7;
+        if (type === Pbf.Varint) { while (this.buf[this.pos++] > 0x7f) {} }
+        else if (type === Pbf.Bytes) { this.pos = this.readVarint() + this.pos; }
+        else if (type === Pbf.Fixed32) { this.pos += 4; }
+        else if (type === Pbf.Fixed64) { this.pos += 8; }
+        else { throw new Error('Unimplemented type: ' + type); }
+    },
+
+    // === WRITING =================================================================
+
+    writeTag: function(tag, type) {
+        this.writeVarint((tag << 3) | type);
+    },
+
+    realloc: function(min) {
+        var length = this.length || 16;
+
+        while (length < this.pos + min) { length *= 2; }
+
+        if (length !== this.length) {
+            var buf = new Uint8Array(length);
+            buf.set(this.buf);
+            this.buf = buf;
+            this.length = length;
+        }
+    },
+
+    finish: function() {
+        this.length = this.pos;
+        this.pos = 0;
+        return this.buf.subarray(0, this.length);
+    },
+
+    writeFixed32: function(val) {
+        this.realloc(4);
+        writeInt32(this.buf, val, this.pos);
+        this.pos += 4;
+    },
+
+    writeSFixed32: function(val) {
+        this.realloc(4);
+        writeInt32(this.buf, val, this.pos);
+        this.pos += 4;
+    },
+
+    writeFixed64: function(val) {
+        this.realloc(8);
+        writeInt32(this.buf, val & -1, this.pos);
+        writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);
+        this.pos += 8;
+    },
+
+    writeSFixed64: function(val) {
+        this.realloc(8);
+        writeInt32(this.buf, val & -1, this.pos);
+        writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);
+        this.pos += 8;
+    },
+
+    writeVarint: function(val) {
+        val = +val || 0;
+
+        if (val > 0xfffffff || val < 0) {
+            writeBigVarint(val, this);
+            return;
+        }
+
+        this.realloc(4);
+
+        this.buf[this.pos++] =           val & 0x7f  | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) { return; }
+        this.buf[this.pos++] = ((val >>>= 7) & 0x7f) | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) { return; }
+        this.buf[this.pos++] = ((val >>>= 7) & 0x7f) | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) { return; }
+        this.buf[this.pos++] =   (val >>> 7) & 0x7f;
+    },
+
+    writeSVarint: function(val) {
+        this.writeVarint(val < 0 ? -val * 2 - 1 : val * 2);
+    },
+
+    writeBoolean: function(val) {
+        this.writeVarint(Boolean(val));
+    },
+
+    writeString: function(str) {
+        str = String(str);
+        this.realloc(str.length * 4);
+
+        this.pos++; // reserve 1 byte for short string length
+
+        var startPos = this.pos;
+        // write the string directly to the buffer and see how much was written
+        this.pos = writeUtf8(this.buf, str, this.pos);
+        var len = this.pos - startPos;
+
+        if (len >= 0x80) { makeRoomForExtraLength(startPos, len, this); }
+
+        // finally, write the message length in the reserved place and restore the position
+        this.pos = startPos - 1;
+        this.writeVarint(len);
+        this.pos += len;
+    },
+
+    writeFloat: function(val) {
+        this.realloc(4);
+        ieee754.write(this.buf, val, this.pos, true, 23, 4);
+        this.pos += 4;
+    },
+
+    writeDouble: function(val) {
+        this.realloc(8);
+        ieee754.write(this.buf, val, this.pos, true, 52, 8);
+        this.pos += 8;
+    },
+
+    writeBytes: function(buffer) {
+        var this$1 = this;
+
+        var len = buffer.length;
+        this.writeVarint(len);
+        this.realloc(len);
+        for (var i = 0; i < len; i++) { this$1.buf[this$1.pos++] = buffer[i]; }
+    },
+
+    writeRawMessage: function(fn, obj) {
+        this.pos++; // reserve 1 byte for short message length
+
+        // write the message directly to the buffer and see how much was written
+        var startPos = this.pos;
+        fn(obj, this);
+        var len = this.pos - startPos;
+
+        if (len >= 0x80) { makeRoomForExtraLength(startPos, len, this); }
+
+        // finally, write the message length in the reserved place and restore the position
+        this.pos = startPos - 1;
+        this.writeVarint(len);
+        this.pos += len;
+    },
+
+    writeMessage: function(tag, fn, obj) {
+        this.writeTag(tag, Pbf.Bytes);
+        this.writeRawMessage(fn, obj);
+    },
+
+    writePackedVarint:   function(tag, arr) { this.writeMessage(tag, writePackedVarint, arr);   },
+    writePackedSVarint:  function(tag, arr) { this.writeMessage(tag, writePackedSVarint, arr);  },
+    writePackedBoolean:  function(tag, arr) { this.writeMessage(tag, writePackedBoolean, arr);  },
+    writePackedFloat:    function(tag, arr) { this.writeMessage(tag, writePackedFloat, arr);    },
+    writePackedDouble:   function(tag, arr) { this.writeMessage(tag, writePackedDouble, arr);   },
+    writePackedFixed32:  function(tag, arr) { this.writeMessage(tag, writePackedFixed32, arr);  },
+    writePackedSFixed32: function(tag, arr) { this.writeMessage(tag, writePackedSFixed32, arr); },
+    writePackedFixed64:  function(tag, arr) { this.writeMessage(tag, writePackedFixed64, arr);  },
+    writePackedSFixed64: function(tag, arr) { this.writeMessage(tag, writePackedSFixed64, arr); },
+
+    writeBytesField: function(tag, buffer) {
+        this.writeTag(tag, Pbf.Bytes);
+        this.writeBytes(buffer);
+    },
+    writeFixed32Field: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed32);
+        this.writeFixed32(val);
+    },
+    writeSFixed32Field: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed32);
+        this.writeSFixed32(val);
+    },
+    writeFixed64Field: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed64);
+        this.writeFixed64(val);
+    },
+    writeSFixed64Field: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed64);
+        this.writeSFixed64(val);
+    },
+    writeVarintField: function(tag, val) {
+        this.writeTag(tag, Pbf.Varint);
+        this.writeVarint(val);
+    },
+    writeSVarintField: function(tag, val) {
+        this.writeTag(tag, Pbf.Varint);
+        this.writeSVarint(val);
+    },
+    writeStringField: function(tag, str) {
+        this.writeTag(tag, Pbf.Bytes);
+        this.writeString(str);
+    },
+    writeFloatField: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed32);
+        this.writeFloat(val);
+    },
+    writeDoubleField: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed64);
+        this.writeDouble(val);
+    },
+    writeBooleanField: function(tag, val) {
+        this.writeVarintField(tag, Boolean(val));
+    }
+};
+
+function readVarintRemainder(l, s, p) {
+    var buf = p.buf,
+        h, b;
+
+    b = buf[p.pos++]; h  = (b & 0x70) >> 4;  if (b < 0x80) { return toNum(l, h, s); }
+    b = buf[p.pos++]; h |= (b & 0x7f) << 3;  if (b < 0x80) { return toNum(l, h, s); }
+    b = buf[p.pos++]; h |= (b & 0x7f) << 10; if (b < 0x80) { return toNum(l, h, s); }
+    b = buf[p.pos++]; h |= (b & 0x7f) << 17; if (b < 0x80) { return toNum(l, h, s); }
+    b = buf[p.pos++]; h |= (b & 0x7f) << 24; if (b < 0x80) { return toNum(l, h, s); }
+    b = buf[p.pos++]; h |= (b & 0x01) << 31; if (b < 0x80) { return toNum(l, h, s); }
+
+    throw new Error('Expected varint not more than 10 bytes');
+}
+
+function readPackedEnd(pbf) {
+    return pbf.type === Pbf.Bytes ?
+        pbf.readVarint() + pbf.pos : pbf.pos + 1;
+}
+
+function toNum(low, high, isSigned) {
+    if (isSigned) {
+        return high * 0x100000000 + (low >>> 0);
+    }
+
+    return ((high >>> 0) * 0x100000000) + (low >>> 0);
+}
+
+function writeBigVarint(val, pbf) {
+    var low, high;
+
+    if (val >= 0) {
+        low  = (val % 0x100000000) | 0;
+        high = (val / 0x100000000) | 0;
+    } else {
+        low  = ~(-val % 0x100000000);
+        high = ~(-val / 0x100000000);
+
+        if (low ^ 0xffffffff) {
+            low = (low + 1) | 0;
+        } else {
+            low = 0;
+            high = (high + 1) | 0;
+        }
+    }
+
+    if (val >= 0x10000000000000000 || val < -0x10000000000000000) {
+        throw new Error('Given varint doesn\'t fit into 10 bytes');
+    }
+
+    pbf.realloc(10);
+
+    writeBigVarintLow(low, high, pbf);
+    writeBigVarintHigh(high, pbf);
+}
+
+function writeBigVarintLow(low, high, pbf) {
+    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
+    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
+    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
+    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
+    pbf.buf[pbf.pos]   = low & 0x7f;
+}
+
+function writeBigVarintHigh(high, pbf) {
+    var lsb = (high & 0x07) << 4;
+
+    pbf.buf[pbf.pos++] |= lsb         | ((high >>>= 3) ? 0x80 : 0); if (!high) { return; }
+    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) { return; }
+    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) { return; }
+    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) { return; }
+    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) { return; }
+    pbf.buf[pbf.pos++]  = high & 0x7f;
+}
+
+function makeRoomForExtraLength(startPos, len, pbf) {
+    var extraLen =
+        len <= 0x3fff ? 1 :
+        len <= 0x1fffff ? 2 :
+        len <= 0xfffffff ? 3 : Math.ceil(Math.log(len) / (Math.LN2 * 7));
+
+    // if 1 byte isn't enough for encoding message length, shift the data to the right
+    pbf.realloc(extraLen);
+    for (var i = pbf.pos - 1; i >= startPos; i--) { pbf.buf[i + extraLen] = pbf.buf[i]; }
+}
+
+function writePackedVarint(arr, pbf)   { for (var i = 0; i < arr.length; i++) { pbf.writeVarint(arr[i]); }   }
+function writePackedSVarint(arr, pbf)  { for (var i = 0; i < arr.length; i++) { pbf.writeSVarint(arr[i]); }  }
+function writePackedFloat(arr, pbf)    { for (var i = 0; i < arr.length; i++) { pbf.writeFloat(arr[i]); }    }
+function writePackedDouble(arr, pbf)   { for (var i = 0; i < arr.length; i++) { pbf.writeDouble(arr[i]); }   }
+function writePackedBoolean(arr, pbf)  { for (var i = 0; i < arr.length; i++) { pbf.writeBoolean(arr[i]); }  }
+function writePackedFixed32(arr, pbf)  { for (var i = 0; i < arr.length; i++) { pbf.writeFixed32(arr[i]); }  }
+function writePackedSFixed32(arr, pbf) { for (var i = 0; i < arr.length; i++) { pbf.writeSFixed32(arr[i]); } }
+function writePackedFixed64(arr, pbf)  { for (var i = 0; i < arr.length; i++) { pbf.writeFixed64(arr[i]); }  }
+function writePackedSFixed64(arr, pbf) { for (var i = 0; i < arr.length; i++) { pbf.writeSFixed64(arr[i]); } }
+
+// Buffer code below from https://github.com/feross/buffer, MIT-licensed
+
+function readUInt32(buf, pos) {
+    return ((buf[pos]) |
+        (buf[pos + 1] << 8) |
+        (buf[pos + 2] << 16)) +
+        (buf[pos + 3] * 0x1000000);
+}
+
+function writeInt32(buf, val, pos) {
+    buf[pos] = val;
+    buf[pos + 1] = (val >>> 8);
+    buf[pos + 2] = (val >>> 16);
+    buf[pos + 3] = (val >>> 24);
+}
+
+function readInt32(buf, pos) {
+    return ((buf[pos]) |
+        (buf[pos + 1] << 8) |
+        (buf[pos + 2] << 16)) +
+        (buf[pos + 3] << 24);
+}
+
+function readUtf8(buf, pos, end) {
+    var str = '';
+    var i = pos;
+
+    while (i < end) {
+        var b0 = buf[i];
+        var c = null; // codepoint
+        var bytesPerSequence =
+            b0 > 0xEF ? 4 :
+            b0 > 0xDF ? 3 :
+            b0 > 0xBF ? 2 : 1;
+
+        if (i + bytesPerSequence > end) { break; }
+
+        var b1, b2, b3;
+
+        if (bytesPerSequence === 1) {
+            if (b0 < 0x80) {
+                c = b0;
+            }
+        } else if (bytesPerSequence === 2) {
+            b1 = buf[i + 1];
+            if ((b1 & 0xC0) === 0x80) {
+                c = (b0 & 0x1F) << 0x6 | (b1 & 0x3F);
+                if (c <= 0x7F) {
+                    c = null;
+                }
+            }
+        } else if (bytesPerSequence === 3) {
+            b1 = buf[i + 1];
+            b2 = buf[i + 2];
+            if ((b1 & 0xC0) === 0x80 && (b2 & 0xC0) === 0x80) {
+                c = (b0 & 0xF) << 0xC | (b1 & 0x3F) << 0x6 | (b2 & 0x3F);
+                if (c <= 0x7FF || (c >= 0xD800 && c <= 0xDFFF)) {
+                    c = null;
+                }
+            }
+        } else if (bytesPerSequence === 4) {
+            b1 = buf[i + 1];
+            b2 = buf[i + 2];
+            b3 = buf[i + 3];
+            if ((b1 & 0xC0) === 0x80 && (b2 & 0xC0) === 0x80 && (b3 & 0xC0) === 0x80) {
+                c = (b0 & 0xF) << 0x12 | (b1 & 0x3F) << 0xC | (b2 & 0x3F) << 0x6 | (b3 & 0x3F);
+                if (c <= 0xFFFF || c >= 0x110000) {
+                    c = null;
+                }
+            }
+        }
+
+        if (c === null) {
+            c = 0xFFFD;
+            bytesPerSequence = 1;
+
+        } else if (c > 0xFFFF) {
+            c -= 0x10000;
+            str += String.fromCharCode(c >>> 10 & 0x3FF | 0xD800);
+            c = 0xDC00 | c & 0x3FF;
+        }
+
+        str += String.fromCharCode(c);
+        i += bytesPerSequence;
+    }
+
+    return str;
+}
+
+function writeUtf8(buf, str, pos) {
+    for (var i = 0, c, lead; i < str.length; i++) {
+        c = str.charCodeAt(i); // code point
+
+        if (c > 0xD7FF && c < 0xE000) {
+            if (lead) {
+                if (c < 0xDC00) {
+                    buf[pos++] = 0xEF;
+                    buf[pos++] = 0xBF;
+                    buf[pos++] = 0xBD;
+                    lead = c;
+                    continue;
+                } else {
+                    c = lead - 0xD800 << 10 | c - 0xDC00 | 0x10000;
+                    lead = null;
+                }
+            } else {
+                if (c > 0xDBFF || (i + 1 === str.length)) {
+                    buf[pos++] = 0xEF;
+                    buf[pos++] = 0xBF;
+                    buf[pos++] = 0xBD;
+                } else {
+                    lead = c;
+                }
+                continue;
+            }
+        } else if (lead) {
+            buf[pos++] = 0xEF;
+            buf[pos++] = 0xBF;
+            buf[pos++] = 0xBD;
+            lead = null;
+        }
+
+        if (c < 0x80) {
+            buf[pos++] = c;
+        } else {
+            if (c < 0x800) {
+                buf[pos++] = c >> 0x6 | 0xC0;
+            } else {
+                if (c < 0x10000) {
+                    buf[pos++] = c >> 0xC | 0xE0;
+                } else {
+                    buf[pos++] = c >> 0x12 | 0xF0;
+                    buf[pos++] = c >> 0xC & 0x3F | 0x80;
+                }
+                buf[pos++] = c >> 0x6 & 0x3F | 0x80;
+            }
+            buf[pos++] = c & 0x3F | 0x80;
+        }
+    }
+    return pos;
+}
+
+var index$5 = Point$1;
+
+function Point$1(x, y) {
+    this.x = x;
+    this.y = y;
+}
+
+Point$1.prototype = {
+    clone: function() { return new Point$1(this.x, this.y); },
+
+    add:     function(p) { return this.clone()._add(p);     },
+    sub:     function(p) { return this.clone()._sub(p);     },
+    mult:    function(k) { return this.clone()._mult(k);    },
+    div:     function(k) { return this.clone()._div(k);     },
+    rotate:  function(a) { return this.clone()._rotate(a);  },
+    matMult: function(m) { return this.clone()._matMult(m); },
+    unit:    function() { return this.clone()._unit(); },
+    perp:    function() { return this.clone()._perp(); },
+    round:   function() { return this.clone()._round(); },
+
+    mag: function() {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    },
+
+    equals: function(p) {
+        return this.x === p.x &&
+               this.y === p.y;
+    },
+
+    dist: function(p) {
+        return Math.sqrt(this.distSqr(p));
+    },
+
+    distSqr: function(p) {
+        var dx = p.x - this.x,
+            dy = p.y - this.y;
+        return dx * dx + dy * dy;
+    },
+
+    angle: function() {
+        return Math.atan2(this.y, this.x);
+    },
+
+    angleTo: function(b) {
+        return Math.atan2(this.y - b.y, this.x - b.x);
+    },
+
+    angleWith: function(b) {
+        return this.angleWithSep(b.x, b.y);
+    },
+
+    // Find the angle of the two vectors, solving the formula for the cross product a x b = |a||b|sin(θ) for θ.
+    angleWithSep: function(x, y) {
+        return Math.atan2(
+            this.x * y - this.y * x,
+            this.x * x + this.y * y);
+    },
+
+    _matMult: function(m) {
+        var x = m[0] * this.x + m[1] * this.y,
+            y = m[2] * this.x + m[3] * this.y;
+        this.x = x;
+        this.y = y;
+        return this;
+    },
+
+    _add: function(p) {
+        this.x += p.x;
+        this.y += p.y;
+        return this;
+    },
+
+    _sub: function(p) {
+        this.x -= p.x;
+        this.y -= p.y;
+        return this;
+    },
+
+    _mult: function(k) {
+        this.x *= k;
+        this.y *= k;
+        return this;
+    },
+
+    _div: function(k) {
+        this.x /= k;
+        this.y /= k;
+        return this;
+    },
+
+    _unit: function() {
+        this._div(this.mag());
+        return this;
+    },
+
+    _perp: function() {
+        var y = this.y;
+        this.y = this.x;
+        this.x = -y;
+        return this;
+    },
+
+    _rotate: function(angle) {
+        var cos = Math.cos(angle),
+            sin = Math.sin(angle),
+            x = cos * this.x - sin * this.y,
+            y = sin * this.x + cos * this.y;
+        this.x = x;
+        this.y = y;
+        return this;
+    },
+
+    _round: function() {
+        this.x = Math.round(this.x);
+        this.y = Math.round(this.y);
+        return this;
+    }
+};
+
+// constructs Point from an array if necessary
+Point$1.convert = function (a) {
+    if (a instanceof Point$1) {
+        return a;
+    }
+    if (Array.isArray(a)) {
+        return new Point$1(a[0], a[1]);
+    }
+    return a;
+};
+
+var Point = index$5;
+
+var vectortilefeature = VectorTileFeature$2;
+
+function VectorTileFeature$2(pbf, end, extent, keys, values) {
+    // Public
+    this.properties = {};
+    this.extent = extent;
+    this.type = 0;
+
+    // Private
+    this._pbf = pbf;
+    this._geometry = -1;
+    this._keys = keys;
+    this._values = values;
+
+    pbf.readFields(readFeature, this, end);
+}
+
+function readFeature(tag, feature, pbf) {
+    if (tag == 1) { feature.id = pbf.readVarint(); }
+    else if (tag == 2) { readTag(pbf, feature); }
+    else if (tag == 3) { feature.type = pbf.readVarint(); }
+    else if (tag == 4) { feature._geometry = pbf.pos; }
+}
+
+function readTag(pbf, feature) {
+    var end = pbf.readVarint() + pbf.pos;
+
+    while (pbf.pos < end) {
+        var key = feature._keys[pbf.readVarint()],
+            value = feature._values[pbf.readVarint()];
+        feature.properties[key] = value;
+    }
+}
+
+VectorTileFeature$2.types = ['Unknown', 'Point', 'LineString', 'Polygon'];
+
+VectorTileFeature$2.prototype.loadGeometry = function() {
+    var pbf = this._pbf;
+    pbf.pos = this._geometry;
+
+    var end = pbf.readVarint() + pbf.pos,
+        cmd = 1,
+        length = 0,
+        x = 0,
+        y = 0,
+        lines = [],
+        line;
+
+    while (pbf.pos < end) {
+        if (!length) {
+            var cmdLen = pbf.readVarint();
+            cmd = cmdLen & 0x7;
+            length = cmdLen >> 3;
+        }
+
+        length--;
+
+        if (cmd === 1 || cmd === 2) {
+            x += pbf.readSVarint();
+            y += pbf.readSVarint();
+
+            if (cmd === 1) { // moveTo
+                if (line) { lines.push(line); }
+                line = [];
+            }
+
+            line.push(new Point(x, y));
+
+        } else if (cmd === 7) {
+
+            // Workaround for https://github.com/mapbox/mapnik-vector-tile/issues/90
+            if (line) {
+                line.push(line[0].clone()); // closePolygon
+            }
+
+        } else {
+            throw new Error('unknown command ' + cmd);
+        }
+    }
+
+    if (line) { lines.push(line); }
+
+    return lines;
+};
+
+VectorTileFeature$2.prototype.bbox = function() {
+    var pbf = this._pbf;
+    pbf.pos = this._geometry;
+
+    var end = pbf.readVarint() + pbf.pos,
+        cmd = 1,
+        length = 0,
+        x = 0,
+        y = 0,
+        x1 = Infinity,
+        x2 = -Infinity,
+        y1 = Infinity,
+        y2 = -Infinity;
+
+    while (pbf.pos < end) {
+        if (!length) {
+            var cmdLen = pbf.readVarint();
+            cmd = cmdLen & 0x7;
+            length = cmdLen >> 3;
+        }
+
+        length--;
+
+        if (cmd === 1 || cmd === 2) {
+            x += pbf.readSVarint();
+            y += pbf.readSVarint();
+            if (x < x1) { x1 = x; }
+            if (x > x2) { x2 = x; }
+            if (y < y1) { y1 = y; }
+            if (y > y2) { y2 = y; }
+
+        } else if (cmd !== 7) {
+            throw new Error('unknown command ' + cmd);
+        }
+    }
+
+    return [x1, y1, x2, y2];
+};
+
+VectorTileFeature$2.prototype.toGeoJSON = function(x, y, z) {
+    var size = this.extent * Math.pow(2, z),
+        x0 = this.extent * x,
+        y0 = this.extent * y,
+        coords = this.loadGeometry(),
+        type = VectorTileFeature$2.types[this.type],
+        i, j;
+
+    function project(line) {
+        for (var j = 0; j < line.length; j++) {
+            var p = line[j], y2 = 180 - (p.y + y0) * 360 / size;
+            line[j] = [
+                (p.x + x0) * 360 / size - 180,
+                360 / Math.PI * Math.atan(Math.exp(y2 * Math.PI / 180)) - 90
+            ];
+        }
+    }
+
+    switch (this.type) {
+    case 1:
+        var points = [];
+        for (i = 0; i < coords.length; i++) {
+            points[i] = coords[i][0];
+        }
+        coords = points;
+        project(coords);
+        break;
+
+    case 2:
+        for (i = 0; i < coords.length; i++) {
+            project(coords[i]);
+        }
+        break;
+
+    case 3:
+        coords = classifyRings(coords);
+        for (i = 0; i < coords.length; i++) {
+            for (j = 0; j < coords[i].length; j++) {
+                project(coords[i][j]);
+            }
+        }
+        break;
+    }
+
+    if (coords.length === 1) {
+        coords = coords[0];
+    } else {
+        type = 'Multi' + type;
+    }
+
+    var result = {
+        type: "Feature",
+        geometry: {
+            type: type,
+            coordinates: coords
+        },
+        properties: this.properties
+    };
+
+    if ('id' in this) {
+        result.id = this.id;
+    }
+
+    return result;
+};
+
+// classifies an array of rings into polygons with outer rings and holes
+
+function classifyRings(rings) {
+    var len = rings.length;
+
+    if (len <= 1) { return [rings]; }
+
+    var polygons = [],
+        polygon,
+        ccw;
+
+    for (var i = 0; i < len; i++) {
+        var area = signedArea(rings[i]);
+        if (area === 0) { continue; }
+
+        if (ccw === undefined) { ccw = area < 0; }
+
+        if (ccw === area < 0) {
+            if (polygon) { polygons.push(polygon); }
+            polygon = [rings[i]];
+
+        } else {
+            polygon.push(rings[i]);
+        }
+    }
+    if (polygon) { polygons.push(polygon); }
+
+    return polygons;
+}
+
+function signedArea(ring) {
+    var sum = 0;
+    for (var i = 0, len = ring.length, j = len - 1, p1, p2; i < len; j = i++) {
+        p1 = ring[i];
+        p2 = ring[j];
+        sum += (p2.x - p1.x) * (p1.y + p2.y);
+    }
+    return sum;
+}
+
+var VectorTileFeature$1 = vectortilefeature;
+
+var vectortilelayer = VectorTileLayer$2;
+
+function VectorTileLayer$2(pbf, end) {
+    // Public
+    this.version = 1;
+    this.name = null;
+    this.extent = 4096;
+    this.length = 0;
+
+    // Private
+    this._pbf = pbf;
+    this._keys = [];
+    this._values = [];
+    this._features = [];
+
+    pbf.readFields(readLayer, this, end);
+
+    this.length = this._features.length;
+}
+
+function readLayer(tag, layer, pbf) {
+    if (tag === 15) { layer.version = pbf.readVarint(); }
+    else if (tag === 1) { layer.name = pbf.readString(); }
+    else if (tag === 5) { layer.extent = pbf.readVarint(); }
+    else if (tag === 2) { layer._features.push(pbf.pos); }
+    else if (tag === 3) { layer._keys.push(pbf.readString()); }
+    else if (tag === 4) { layer._values.push(readValueMessage(pbf)); }
+}
+
+function readValueMessage(pbf) {
+    var value = null,
+        end = pbf.readVarint() + pbf.pos;
+
+    while (pbf.pos < end) {
+        var tag = pbf.readVarint() >> 3;
+
+        value = tag === 1 ? pbf.readString() :
+            tag === 2 ? pbf.readFloat() :
+            tag === 3 ? pbf.readDouble() :
+            tag === 4 ? pbf.readVarint64() :
+            tag === 5 ? pbf.readVarint() :
+            tag === 6 ? pbf.readSVarint() :
+            tag === 7 ? pbf.readBoolean() : null;
+    }
+
+    return value;
+}
+
+// return feature `i` from this layer as a `VectorTileFeature`
+VectorTileLayer$2.prototype.feature = function(i) {
+    if (i < 0 || i >= this._features.length) { throw new Error('feature index out of bounds'); }
+
+    this._pbf.pos = this._features[i];
+
+    var end = this._pbf.readVarint() + this._pbf.pos;
+    return new VectorTileFeature$1(this._pbf, end, this.extent, this._keys, this._values);
+};
+
+var VectorTileLayer$1 = vectortilelayer;
+
+var vectortile = VectorTile$1;
+
+function VectorTile$1(pbf, end) {
+    this.layers = pbf.readFields(readTile, {}, end);
+}
+
+function readTile(tag, layers, pbf) {
+    if (tag === 3) {
+        var layer = new VectorTileLayer$1(pbf, pbf.readVarint() + pbf.pos);
+        if (layer.length) { layers[layer.name] = layer; }
+    }
+}
+
+var VectorTile = vectortile;
+
+/*
+ * 🍂class VectorGrid.Protobuf
+ * 🍂extends VectorGrid
+ *
+ * A `VectorGrid` for vector tiles fetched from the internet.
+ * Tiles are supposed to be protobufs (AKA "protobuffer" or "Protocol Buffers"),
+ * containing data which complies with the
+ * [MapBox Vector Tile Specification](https://github.com/mapbox/vector-tile-spec/tree/master/2.1).
+ *
+ * This is the format used by:
+ * - Mapbox Vector Tiles
+ * - Mapzen Vector Tiles
+ * - ESRI Vector Tiles
+ * - [OpenMapTiles hosted Vector Tiles](https://openmaptiles.com/hosting/)
+ *
+ * 🍂example
+ *
+ * You must initialize a `VectorGrid.Protobuf` with a URL template, just like in
+ * `L.TileLayer`s. The difference is that the template must point to vector tiles
+ * (usually `.pbf` or `.mvt`) instead of raster (`.png` or `.jpg`) tiles, and that
+ * you should define the styling for all the features.
+ *
+ * <br><br>
+ *
+ * For OpenMapTiles, with a key from [https://openmaptiles.org/docs/host/use-cdn/](https://openmaptiles.org/docs/host/use-cdn/),
+ * initialization looks like this:
+ *
+ * ```
+ * L.vectorGrid.protobuf("https://free-{s}.tilehosting.com/data/v3/{z}/{x}/{y}.pbf.pict?key={key}", {
+ * 	vectorTileLayerStyles: { ... },
+ * 	subdomains: "0123",
+ * 	key: 'abcdefghi01234567890',
+ * 	maxNativeZoom: 14
+ * }).addTo(map);
+ * ```
+ *
+ * And for Mapbox vector tiles, it looks like this:
+ *
+ * ```
+ * L.vectorGrid.protobuf("https://{s}.tiles.mapbox.com/v4/mapbox.mapbox-streets-v6/{z}/{x}/{y}.vector.pbf?access_token={token}", {
+ * 	vectorTileLayerStyles: { ... },
+ * 	subdomains: "abcd",
+ * 	token: "pk.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRTS.TUVWXTZ0123456789abcde"
+ * }).addTo(map);
+ * ```
+ */
+L.VectorGrid.Protobuf = L.VectorGrid.extend({
+
+	options: {
+		// 🍂section
+		// As with `L.TileLayer`, the URL template might contain a reference to
+		// any option (see the example above and note the `{key}` or `token` in the URL
+		// template, and the corresponding option).
+		//
+		// 🍂option subdomains: String = 'abc'
+		// Akin to the `subdomains` option for `L.TileLayer`.
+		subdomains: 'abc',	// Like L.TileLayer
+		//
+		// 🍂option fetchOptions: Object = {}
+		// options passed to `fetch`, e.g. {credentials: 'same-origin'} to send cookie for the current domain
+		fetchOptions: {}
+	},
+
+	initialize: function(url, options) {
+		// Inherits options from geojson-vt!
+// 		this._slicer = geojsonvt(geojson, options);
+		this._url = url;
+		L.VectorGrid.prototype.initialize.call(this, options);
+	},
+
+	// 🍂method setUrl(url: String, noRedraw?: Boolean): this
+	// Updates the layer's URL template and redraws it (unless `noRedraw` is set to `true`).
+	setUrl: function(url, noRedraw) {
+		this._url = url;
+
+		if (!noRedraw) {
+			this.redraw();
+		}
+
+		return this;
+	},
+
+	_getSubdomain: L.TileLayer.prototype._getSubdomain,
+
+	_getVectorTilePromise: function(coords) {
+		var data = {
+			s: this._getSubdomain(coords),
+			x: coords.x,
+			y: coords.y,
+			z: coords.z
+// 			z: this._getZoomForUrl()	/// TODO: Maybe replicate TileLayer's maxNativeZoom
+		};
+		if (this._map && !this._map.options.crs.infinite) {
+			var invertedY = this._globalTileRange.max.y - coords.y;
+			if (this.options.tms) { // Should this option be available in Leaflet.VectorGrid?
+				data['y'] = invertedY;
+			}
+			data['-y'] = invertedY;
+		}
+
+		var tileUrl = L.Util.template(this._url, L.extend(data, this.options));
+
+		return fetch(tileUrl, this.options.fetchOptions).then(function(response){
+
+			if (!response.ok) {
+				return {layers:[]};
+			}
+
+			return response.blob().then( function (blob) {
+// 				console.log(blob);
+
+				var reader = new FileReader();
+				return new Promise(function(resolve){
+					reader.addEventListener("loadend", function() {
+						// reader.result contains the contents of blob as a typed array
+
+						// blob.type === 'application/x-protobuf'
+						var pbf = new index( reader.result );
+// 						console.log(pbf);
+						return resolve(new VectorTile( pbf ));
+
+					});
+					reader.readAsArrayBuffer(blob);
+				});
+			});
+		}).then(function(json){
+
+// 			console.log('Vector tile:', json.layers);
+// 			console.log('Vector tile water:', json.layers.water);	// Instance of VectorTileLayer
+
+			// Normalize feature getters into actual instanced features
+			for (var layerName in json.layers) {
+				var feats = [];
+
+				for (var i=0; i<json.layers[layerName].length; i++) {
+					var feat = json.layers[layerName].feature(i);
+					feat.geometry = feat.loadGeometry();
+					feats.push(feat);
+				}
+
+				json.layers[layerName].features = feats;
+			}
+
+			return json;
+		});
+	}
+});
+
+
+// 🍂factory L.vectorGrid.protobuf(url: String, options)
+// Instantiates a new protobuf VectorGrid with the given URL template and options
+L.vectorGrid.protobuf = function (url, options) {
+	return new L.VectorGrid.Protobuf(url, options);
+};
+
+var workerCode = __$strToBlobUri("'use strict';\n\nvar simplify_1 = simplify$1;\n\n// calculate simplification data using optimized Douglas-Peucker algorithm\n\nfunction simplify$1(points, tolerance) {\n\n    var sqTolerance = tolerance * tolerance,\n        len = points.length,\n        first = 0,\n        last = len - 1,\n        stack = [],\n        i, maxSqDist, sqDist, index;\n\n    // always retain the endpoints (1 is the max value)\n    points[first][2] = 1;\n    points[last][2] = 1;\n\n    // avoid recursion by using a stack\n    while (last) {\n\n        maxSqDist = 0;\n\n        for (i = first + 1; i < last; i++) {\n            sqDist = getSqSegDist(points[i], points[first], points[last]);\n\n            if (sqDist > maxSqDist) {\n                index = i;\n                maxSqDist = sqDist;\n            }\n        }\n\n        if (maxSqDist > sqTolerance) {\n            points[index][2] = maxSqDist; // save the point importance in squared pixels as a z coordinate\n            stack.push(first);\n            stack.push(index);\n            first = index;\n\n        } else {\n            last = stack.pop();\n            first = stack.pop();\n        }\n    }\n}\n\n// square distance from a point to a segment\nfunction getSqSegDist(p, a, b) {\n\n    var x = a[0], y = a[1],\n        bx = b[0], by = b[1],\n        px = p[0], py = p[1],\n        dx = bx - x,\n        dy = by - y;\n\n    if (dx !== 0 || dy !== 0) {\n\n        var t = ((px - x) * dx + (py - y) * dy) / (dx * dx + dy * dy);\n\n        if (t > 1) {\n            x = bx;\n            y = by;\n\n        } else if (t > 0) {\n            x += dx * t;\n            y += dy * t;\n        }\n    }\n\n    dx = px - x;\n    dy = py - y;\n\n    return dx * dx + dy * dy;\n}\n\nvar convert_1 = convert$1;\n\nvar simplify = simplify_1;\n\n// converts GeoJSON feature into an intermediate projected JSON vector format with simplification data\n\nfunction convert$1(data, tolerance) {\n    var features = [];\n\n    if (data.type === 'FeatureCollection') {\n        for (var i = 0; i < data.features.length; i++) {\n            convertFeature(features, data.features[i], tolerance);\n        }\n    } else if (data.type === 'Feature') {\n        convertFeature(features, data, tolerance);\n\n    } else {\n        // single geometry or a geometry collection\n        convertFeature(features, {geometry: data}, tolerance);\n    }\n    return features;\n}\n\nfunction convertFeature(features, feature, tolerance) {\n    if (feature.geometry === null) {\n        // ignore features with null geometry\n        return;\n    }\n\n    var geom = feature.geometry,\n        type = geom.type,\n        coords = geom.coordinates,\n        tags = feature.properties,\n        i, j, rings, projectedRing;\n\n    if (type === 'Point') {\n        features.push(create(tags, 1, [projectPoint(coords)]));\n\n    } else if (type === 'MultiPoint') {\n        features.push(create(tags, 1, project(coords)));\n\n    } else if (type === 'LineString') {\n        features.push(create(tags, 2, [project(coords, tolerance)]));\n\n    } else if (type === 'MultiLineString' || type === 'Polygon') {\n        rings = [];\n        for (i = 0; i < coords.length; i++) {\n            projectedRing = project(coords[i], tolerance);\n            if (type === 'Polygon') { projectedRing.outer = (i === 0); }\n            rings.push(projectedRing);\n        }\n        features.push(create(tags, type === 'Polygon' ? 3 : 2, rings));\n\n    } else if (type === 'MultiPolygon') {\n        rings = [];\n        for (i = 0; i < coords.length; i++) {\n            for (j = 0; j < coords[i].length; j++) {\n                projectedRing = project(coords[i][j], tolerance);\n                projectedRing.outer = (j === 0);\n                rings.push(projectedRing);\n            }\n        }\n        features.push(create(tags, 3, rings));\n\n    } else if (type === 'GeometryCollection') {\n        for (i = 0; i < geom.geometries.length; i++) {\n            convertFeature(features, {\n                geometry: geom.geometries[i],\n                properties: tags\n            }, tolerance);\n        }\n\n    } else {\n        throw new Error('Input data is not a valid GeoJSON object.');\n    }\n}\n\nfunction create(tags, type, geometry) {\n    var feature = {\n        geometry: geometry,\n        type: type,\n        tags: tags || null,\n        min: [2, 1], // initial bbox values;\n        max: [-1, 0]  // note that coords are usually in [0..1] range\n    };\n    calcBBox(feature);\n    return feature;\n}\n\nfunction project(lonlats, tolerance) {\n    var projected = [];\n    for (var i = 0; i < lonlats.length; i++) {\n        projected.push(projectPoint(lonlats[i]));\n    }\n    if (tolerance) {\n        simplify(projected, tolerance);\n        calcSize(projected);\n    }\n    return projected;\n}\n\nfunction projectPoint(p) {\n    var sin = Math.sin(p[1] * Math.PI / 180),\n        x = (p[0] / 360 + 0.5),\n        y = (0.5 - 0.25 * Math.log((1 + sin) / (1 - sin)) / Math.PI);\n\n    y = y < 0 ? 0 :\n        y > 1 ? 1 : y;\n\n    return [x, y, 0];\n}\n\n// calculate area and length of the poly\nfunction calcSize(points) {\n    var area = 0,\n        dist = 0;\n\n    for (var i = 0, a, b; i < points.length - 1; i++) {\n        a = b || points[i];\n        b = points[i + 1];\n\n        area += a[0] * b[1] - b[0] * a[1];\n\n        // use Manhattan distance instead of Euclidian one to avoid expensive square root computation\n        dist += Math.abs(b[0] - a[0]) + Math.abs(b[1] - a[1]);\n    }\n    points.area = Math.abs(area / 2);\n    points.dist = dist;\n}\n\n// calculate the feature bounding box for faster clipping later\nfunction calcBBox(feature) {\n    var geometry = feature.geometry,\n        min = feature.min,\n        max = feature.max;\n\n    if (feature.type === 1) { calcRingBBox(min, max, geometry); }\n    else { for (var i = 0; i < geometry.length; i++) { calcRingBBox(min, max, geometry[i]); } }\n\n    return feature;\n}\n\nfunction calcRingBBox(min, max, points) {\n    for (var i = 0, p; i < points.length; i++) {\n        p = points[i];\n        min[0] = Math.min(p[0], min[0]);\n        max[0] = Math.max(p[0], max[0]);\n        min[1] = Math.min(p[1], min[1]);\n        max[1] = Math.max(p[1], max[1]);\n    }\n}\n\nvar tile = transformTile;\nvar point = transformPoint;\n\n// Transforms the coordinates of each feature in the given tile from\n// mercator-projected space into (extent x extent) tile space.\nfunction transformTile(tile, extent) {\n    if (tile.transformed) { return tile; }\n\n    var z2 = tile.z2,\n        tx = tile.x,\n        ty = tile.y,\n        i, j, k;\n\n    for (i = 0; i < tile.features.length; i++) {\n        var feature = tile.features[i],\n            geom = feature.geometry,\n            type = feature.type;\n\n        if (type === 1) {\n            for (j = 0; j < geom.length; j++) { geom[j] = transformPoint(geom[j], extent, z2, tx, ty); }\n\n        } else {\n            for (j = 0; j < geom.length; j++) {\n                var ring = geom[j];\n                for (k = 0; k < ring.length; k++) { ring[k] = transformPoint(ring[k], extent, z2, tx, ty); }\n            }\n        }\n    }\n\n    tile.transformed = true;\n\n    return tile;\n}\n\nfunction transformPoint(p, extent, z2, tx, ty) {\n    var x = Math.round(extent * (p[0] * z2 - tx)),\n        y = Math.round(extent * (p[1] * z2 - ty));\n    return [x, y];\n}\n\nvar transform$1 = {\n	tile: tile,\n	point: point\n};\n\nvar clip_1 = clip$1;\n\n/* clip features between two axis-parallel lines:\n *     |        |\n *  ___|___     |     /\n * /   |   \____|____/\n *     |        |\n */\n\nfunction clip$1(features, scale, k1, k2, axis, intersect, minAll, maxAll) {\n\n    k1 /= scale;\n    k2 /= scale;\n\n    if (minAll >= k1 && maxAll <= k2) { return features; } // trivial accept\n    else if (minAll > k2 || maxAll < k1) { return null; } // trivial reject\n\n    var clipped = [];\n\n    for (var i = 0; i < features.length; i++) {\n\n        var feature = features[i],\n            geometry = feature.geometry,\n            type = feature.type,\n            min, max;\n\n        min = feature.min[axis];\n        max = feature.max[axis];\n\n        if (min >= k1 && max <= k2) { // trivial accept\n            clipped.push(feature);\n            continue;\n        } else if (min > k2 || max < k1) { continue; } // trivial reject\n\n        var slices = type === 1 ?\n                clipPoints(geometry, k1, k2, axis) :\n                clipGeometry(geometry, k1, k2, axis, intersect, type === 3);\n\n        if (slices.length) {\n            // if a feature got clipped, it will likely get clipped on the next zoom level as well,\n            // so there's no need to recalculate bboxes\n            clipped.push({\n                geometry: slices,\n                type: type,\n                tags: features[i].tags || null,\n                min: feature.min,\n                max: feature.max\n            });\n        }\n    }\n\n    return clipped.length ? clipped : null;\n}\n\nfunction clipPoints(geometry, k1, k2, axis) {\n    var slice = [];\n\n    for (var i = 0; i < geometry.length; i++) {\n        var a = geometry[i],\n            ak = a[axis];\n\n        if (ak >= k1 && ak <= k2) { slice.push(a); }\n    }\n    return slice;\n}\n\nfunction clipGeometry(geometry, k1, k2, axis, intersect, closed) {\n\n    var slices = [];\n\n    for (var i = 0; i < geometry.length; i++) {\n\n        var ak = 0,\n            bk = 0,\n            b = null,\n            points = geometry[i],\n            area = points.area,\n            dist = points.dist,\n            outer = points.outer,\n            len = points.length,\n            a, j, last;\n\n        var slice = [];\n\n        for (j = 0; j < len - 1; j++) {\n            a = b || points[j];\n            b = points[j + 1];\n            ak = bk || a[axis];\n            bk = b[axis];\n\n            if (ak < k1) {\n\n                if ((bk > k2)) { // ---|-----|-->\n                    slice.push(intersect(a, b, k1), intersect(a, b, k2));\n                    if (!closed) { slice = newSlice(slices, slice, area, dist, outer); }\n\n                } else if (bk >= k1) { slice.push(intersect(a, b, k1)); } // ---|-->  |\n\n            } else if (ak > k2) {\n\n                if ((bk < k1)) { // <--|-----|---\n                    slice.push(intersect(a, b, k2), intersect(a, b, k1));\n                    if (!closed) { slice = newSlice(slices, slice, area, dist, outer); }\n\n                } else if (bk <= k2) { slice.push(intersect(a, b, k2)); } // |  <--|---\n\n            } else {\n\n                slice.push(a);\n\n                if (bk < k1) { // <--|---  |\n                    slice.push(intersect(a, b, k1));\n                    if (!closed) { slice = newSlice(slices, slice, area, dist, outer); }\n\n                } else if (bk > k2) { // |  ---|-->\n                    slice.push(intersect(a, b, k2));\n                    if (!closed) { slice = newSlice(slices, slice, area, dist, outer); }\n                }\n                // | --> |\n            }\n        }\n\n        // add the last point\n        a = points[len - 1];\n        ak = a[axis];\n        if (ak >= k1 && ak <= k2) { slice.push(a); }\n\n        // close the polygon if its endpoints are not the same after clipping\n\n        last = slice[slice.length - 1];\n        if (closed && last && (slice[0][0] !== last[0] || slice[0][1] !== last[1])) { slice.push(slice[0]); }\n\n        // add the final slice\n        newSlice(slices, slice, area, dist, outer);\n    }\n\n    return slices;\n}\n\nfunction newSlice(slices, slice, area, dist, outer) {\n    if (slice.length) {\n        // we don't recalculate the area/length of the unclipped geometry because the case where it goes\n        // below the visibility threshold as a result of clipping is rare, so we avoid doing unnecessary work\n        slice.area = area;\n        slice.dist = dist;\n        if (outer !== undefined) { slice.outer = outer; }\n\n        slices.push(slice);\n    }\n    return [];\n}\n\nvar clip$2 = clip_1;\n\nvar wrap_1 = wrap$1;\n\nfunction wrap$1(features, buffer, intersectX) {\n    var merged = features,\n        left  = clip$2(features, 1, -1 - buffer, buffer,     0, intersectX, -1, 2), // left world copy\n        right = clip$2(features, 1,  1 - buffer, 2 + buffer, 0, intersectX, -1, 2); // right world copy\n\n    if (left || right) {\n        merged = clip$2(features, 1, -buffer, 1 + buffer, 0, intersectX, -1, 2); // center world copy\n\n        if (left) { merged = shiftFeatureCoords(left, 1).concat(merged); } // merge left into center\n        if (right) { merged = merged.concat(shiftFeatureCoords(right, -1)); } // merge right into center\n    }\n\n    return merged;\n}\n\nfunction shiftFeatureCoords(features, offset) {\n    var newFeatures = [];\n\n    for (var i = 0; i < features.length; i++) {\n        var feature = features[i],\n            type = feature.type;\n\n        var newGeometry;\n\n        if (type === 1) {\n            newGeometry = shiftCoords(feature.geometry, offset);\n        } else {\n            newGeometry = [];\n            for (var j = 0; j < feature.geometry.length; j++) {\n                newGeometry.push(shiftCoords(feature.geometry[j], offset));\n            }\n        }\n\n        newFeatures.push({\n            geometry: newGeometry,\n            type: type,\n            tags: feature.tags,\n            min: [feature.min[0] + offset, feature.min[1]],\n            max: [feature.max[0] + offset, feature.max[1]]\n        });\n    }\n\n    return newFeatures;\n}\n\nfunction shiftCoords(points, offset) {\n    var newPoints = [];\n    newPoints.area = points.area;\n    newPoints.dist = points.dist;\n\n    for (var i = 0; i < points.length; i++) {\n        newPoints.push([points[i][0] + offset, points[i][1], points[i][2]]);\n    }\n    return newPoints;\n}\n\nvar tile$1 = createTile$1;\n\nfunction createTile$1(features, z2, tx, ty, tolerance, noSimplify) {\n    var tile = {\n        features: [],\n        numPoints: 0,\n        numSimplified: 0,\n        numFeatures: 0,\n        source: null,\n        x: tx,\n        y: ty,\n        z2: z2,\n        transformed: false,\n        min: [2, 1],\n        max: [-1, 0]\n    };\n    for (var i = 0; i < features.length; i++) {\n        tile.numFeatures++;\n        addFeature(tile, features[i], tolerance, noSimplify);\n\n        var min = features[i].min,\n            max = features[i].max;\n\n        if (min[0] < tile.min[0]) { tile.min[0] = min[0]; }\n        if (min[1] < tile.min[1]) { tile.min[1] = min[1]; }\n        if (max[0] > tile.max[0]) { tile.max[0] = max[0]; }\n        if (max[1] > tile.max[1]) { tile.max[1] = max[1]; }\n    }\n    return tile;\n}\n\nfunction addFeature(tile, feature, tolerance, noSimplify) {\n\n    var geom = feature.geometry,\n        type = feature.type,\n        simplified = [],\n        sqTolerance = tolerance * tolerance,\n        i, j, ring, p;\n\n    if (type === 1) {\n        for (i = 0; i < geom.length; i++) {\n            simplified.push(geom[i]);\n            tile.numPoints++;\n            tile.numSimplified++;\n        }\n\n    } else {\n\n        // simplify and transform projected coordinates for tile geometry\n        for (i = 0; i < geom.length; i++) {\n            ring = geom[i];\n\n            // filter out tiny polylines & polygons\n            if (!noSimplify && ((type === 2 && ring.dist < tolerance) ||\n                                (type === 3 && ring.area < sqTolerance))) {\n                tile.numPoints += ring.length;\n                continue;\n            }\n\n            var simplifiedRing = [];\n\n            for (j = 0; j < ring.length; j++) {\n                p = ring[j];\n                // keep points with importance > tolerance\n                if (noSimplify || p[2] > sqTolerance) {\n                    simplifiedRing.push(p);\n                    tile.numSimplified++;\n                }\n                tile.numPoints++;\n            }\n\n            if (type === 3) { rewind(simplifiedRing, ring.outer); }\n\n            simplified.push(simplifiedRing);\n        }\n    }\n\n    if (simplified.length) {\n        tile.features.push({\n            geometry: simplified,\n            type: type,\n            tags: feature.tags || null\n        });\n    }\n}\n\nfunction rewind(ring, clockwise) {\n    var area = signedArea(ring);\n    if (area < 0 === clockwise) { ring.reverse(); }\n}\n\nfunction signedArea(ring) {\n    var sum = 0;\n    for (var i = 0, len = ring.length, j = len - 1, p1, p2; i < len; j = i++) {\n        p1 = ring[i];\n        p2 = ring[j];\n        sum += (p2[0] - p1[0]) * (p1[1] + p2[1]);\n    }\n    return sum;\n}\n\nvar index = geojsonvt;\n\nvar convert = convert_1;\nvar transform = transform$1;\nvar clip = clip_1;\nvar wrap = wrap_1;\nvar createTile = tile$1;     // final simplified tile generation\n\n\nfunction geojsonvt(data, options) {\n    return new GeoJSONVT(data, options);\n}\n\nfunction GeoJSONVT(data, options) {\n    options = this.options = extend(Object.create(this.options), options);\n\n    var debug = options.debug;\n\n    if (debug) { console.time('preprocess data'); }\n\n    var z2 = 1 << options.maxZoom, // 2^z\n        features = convert(data, options.tolerance / (z2 * options.extent));\n\n    this.tiles = {};\n    this.tileCoords = [];\n\n    if (debug) {\n        console.timeEnd('preprocess data');\n        console.log('index: maxZoom: %d, maxPoints: %d', options.indexMaxZoom, options.indexMaxPoints);\n        console.time('generate tiles');\n        this.stats = {};\n        this.total = 0;\n    }\n\n    features = wrap(features, options.buffer / options.extent, intersectX);\n\n    // start slicing from the top tile down\n    if (features.length) { this.splitTile(features, 0, 0, 0); }\n\n    if (debug) {\n        if (features.length) { console.log('features: %d, points: %d', this.tiles[0].numFeatures, this.tiles[0].numPoints); }\n        console.timeEnd('generate tiles');\n        console.log('tiles generated:', this.total, JSON.stringify(this.stats));\n    }\n}\n\nGeoJSONVT.prototype.options = {\n    maxZoom: 14,            // max zoom to preserve detail on\n    indexMaxZoom: 5,        // max zoom in the tile index\n    indexMaxPoints: 100000, // max number of points per tile in the tile index\n    solidChildren: false,   // whether to tile solid square tiles further\n    tolerance: 3,           // simplification tolerance (higher means simpler)\n    extent: 4096,           // tile extent\n    buffer: 64,             // tile buffer on each side\n    debug: 0                // logging level (0, 1 or 2)\n};\n\nGeoJSONVT.prototype.splitTile = function (features, z, x, y, cz, cx, cy) {\n    var this$1 = this;\n\n\n    var stack = [features, z, x, y],\n        options = this.options,\n        debug = options.debug,\n        solid = null;\n\n    // avoid recursion by using a processing queue\n    while (stack.length) {\n        y = stack.pop();\n        x = stack.pop();\n        z = stack.pop();\n        features = stack.pop();\n\n        var z2 = 1 << z,\n            id = toID(z, x, y),\n            tile = this$1.tiles[id],\n            tileTolerance = z === options.maxZoom ? 0 : options.tolerance / (z2 * options.extent);\n\n        if (!tile) {\n            if (debug > 1) { console.time('creation'); }\n\n            tile = this$1.tiles[id] = createTile(features, z2, x, y, tileTolerance, z === options.maxZoom);\n            this$1.tileCoords.push({z: z, x: x, y: y});\n\n            if (debug) {\n                if (debug > 1) {\n                    console.log('tile z%d-%d-%d (features: %d, points: %d, simplified: %d)',\n                        z, x, y, tile.numFeatures, tile.numPoints, tile.numSimplified);\n                    console.timeEnd('creation');\n                }\n                var key = 'z' + z;\n                this$1.stats[key] = (this$1.stats[key] || 0) + 1;\n                this$1.total++;\n            }\n        }\n\n        // save reference to original geometry in tile so that we can drill down later if we stop now\n        tile.source = features;\n\n        // if it's the first-pass tiling\n        if (!cz) {\n            // stop tiling if we reached max zoom, or if the tile is too simple\n            if (z === options.indexMaxZoom || tile.numPoints <= options.indexMaxPoints) { continue; }\n\n        // if a drilldown to a specific tile\n        } else {\n            // stop tiling if we reached base zoom or our target tile zoom\n            if (z === options.maxZoom || z === cz) { continue; }\n\n            // stop tiling if it's not an ancestor of the target tile\n            var m = 1 << (cz - z);\n            if (x !== Math.floor(cx / m) || y !== Math.floor(cy / m)) { continue; }\n        }\n\n        // stop tiling if the tile is solid clipped square\n        if (!options.solidChildren && isClippedSquare(tile, options.extent, options.buffer)) {\n            if (cz) { solid = z; } // and remember the zoom if we're drilling down\n            continue;\n        }\n\n        // if we slice further down, no need to keep source geometry\n        tile.source = null;\n\n        if (debug > 1) { console.time('clipping'); }\n\n        // values we'll use for clipping\n        var k1 = 0.5 * options.buffer / options.extent,\n            k2 = 0.5 - k1,\n            k3 = 0.5 + k1,\n            k4 = 1 + k1,\n            tl, bl, tr, br, left, right;\n\n        tl = bl = tr = br = null;\n\n        left  = clip(features, z2, x - k1, x + k3, 0, intersectX, tile.min[0], tile.max[0]);\n        right = clip(features, z2, x + k2, x + k4, 0, intersectX, tile.min[0], tile.max[0]);\n\n        if (left) {\n            tl = clip(left, z2, y - k1, y + k3, 1, intersectY, tile.min[1], tile.max[1]);\n            bl = clip(left, z2, y + k2, y + k4, 1, intersectY, tile.min[1], tile.max[1]);\n        }\n\n        if (right) {\n            tr = clip(right, z2, y - k1, y + k3, 1, intersectY, tile.min[1], tile.max[1]);\n            br = clip(right, z2, y + k2, y + k4, 1, intersectY, tile.min[1], tile.max[1]);\n        }\n\n        if (debug > 1) { console.timeEnd('clipping'); }\n\n        if (tl) { stack.push(tl, z + 1, x * 2,     y * 2); }\n        if (bl) { stack.push(bl, z + 1, x * 2,     y * 2 + 1); }\n        if (tr) { stack.push(tr, z + 1, x * 2 + 1, y * 2); }\n        if (br) { stack.push(br, z + 1, x * 2 + 1, y * 2 + 1); }\n    }\n\n    return solid;\n};\n\nGeoJSONVT.prototype.getTile = function (z, x, y) {\n    var this$1 = this;\n\n    var options = this.options,\n        extent = options.extent,\n        debug = options.debug;\n\n    var z2 = 1 << z;\n    x = ((x % z2) + z2) % z2; // wrap tile x coordinate\n\n    var id = toID(z, x, y);\n    if (this.tiles[id]) { return transform.tile(this.tiles[id], extent); }\n\n    if (debug > 1) { console.log('drilling down to z%d-%d-%d', z, x, y); }\n\n    var z0 = z,\n        x0 = x,\n        y0 = y,\n        parent;\n\n    while (!parent && z0 > 0) {\n        z0--;\n        x0 = Math.floor(x0 / 2);\n        y0 = Math.floor(y0 / 2);\n        parent = this$1.tiles[toID(z0, x0, y0)];\n    }\n\n    if (!parent || !parent.source) { return null; }\n\n    // if we found a parent tile containing the original geometry, we can drill down from it\n    if (debug > 1) { console.log('found parent tile z%d-%d-%d', z0, x0, y0); }\n\n    // it parent tile is a solid clipped square, return it instead since it's identical\n    if (isClippedSquare(parent, extent, options.buffer)) { return transform.tile(parent, extent); }\n\n    if (debug > 1) { console.time('drilling down'); }\n    var solid = this.splitTile(parent.source, z0, x0, y0, z, x, y);\n    if (debug > 1) { console.timeEnd('drilling down'); }\n\n    // one of the parent tiles was a solid clipped square\n    if (solid !== null) {\n        var m = 1 << (z - solid);\n        id = toID(solid, Math.floor(x / m), Math.floor(y / m));\n    }\n\n    return this.tiles[id] ? transform.tile(this.tiles[id], extent) : null;\n};\n\nfunction toID(z, x, y) {\n    return (((1 << z) * y + x) * 32) + z;\n}\n\nfunction intersectX(a, b, x) {\n    return [x, (x - a[0]) * (b[1] - a[1]) / (b[0] - a[0]) + a[1], 1];\n}\nfunction intersectY(a, b, y) {\n    return [(y - a[1]) * (b[0] - a[0]) / (b[1] - a[1]) + a[0], y, 1];\n}\n\nfunction extend(dest, src) {\n    for (var i in src) { dest[i] = src[i]; }\n    return dest;\n}\n\n// checks whether a tile is a whole-area fill after clipping; if it is, there's no sense slicing it further\nfunction isClippedSquare(tile, extent, buffer) {\n\n    var features = tile.source;\n    if (features.length !== 1) { return false; }\n\n    var feature = features[0];\n    if (feature.type !== 3 || feature.geometry.length > 1) { return false; }\n\n    var len = feature.geometry[0].length;\n    if (len !== 5) { return false; }\n\n    for (var i = 0; i < len; i++) {\n        var p = transform.point(feature.geometry[0][i], extent, tile.z2, tile.x, tile.y);\n        if ((p[0] !== -buffer && p[0] !== extent + buffer) ||\n            (p[1] !== -buffer && p[1] !== extent + buffer)) { return false; }\n    }\n\n    return true;\n}\n\nvar identity = function(x) {\n  return x;\n};\n\nvar transform$3 = function(topology) {\n  if ((transform = topology.transform) == null) { return identity; }\n  var transform,\n      x0,\n      y0,\n      kx = transform.scale[0],\n      ky = transform.scale[1],\n      dx = transform.translate[0],\n      dy = transform.translate[1];\n  return function(point, i) {\n    if (!i) { x0 = y0 = 0; }\n    point[0] = (x0 += point[0]) * kx + dx;\n    point[1] = (y0 += point[1]) * ky + dy;\n    return point;\n  };\n};\n\nvar bbox = function(topology) {\n  var bbox = topology.bbox;\n\n  function bboxPoint(p0) {\n    p1[0] = p0[0], p1[1] = p0[1], t(p1);\n    if (p1[0] < x0) { x0 = p1[0]; }\n    if (p1[0] > x1) { x1 = p1[0]; }\n    if (p1[1] < y0) { y0 = p1[1]; }\n    if (p1[1] > y1) { y1 = p1[1]; }\n  }\n\n  function bboxGeometry(o) {\n    switch (o.type) {\n      case \"GeometryCollection\": o.geometries.forEach(bboxGeometry); break;\n      case \"Point\": bboxPoint(o.coordinates); break;\n      case \"MultiPoint\": o.coordinates.forEach(bboxPoint); break;\n    }\n  }\n\n  if (!bbox) {\n    var t = transform$3(topology), p0, p1 = new Array(2), name,\n        x0 = Infinity, y0 = x0, x1 = -x0, y1 = -x0;\n\n    topology.arcs.forEach(function(arc) {\n      var i = -1, n = arc.length;\n      while (++i < n) {\n        p0 = arc[i], p1[0] = p0[0], p1[1] = p0[1], t(p1, i);\n        if (p1[0] < x0) { x0 = p1[0]; }\n        if (p1[0] > x1) { x1 = p1[0]; }\n        if (p1[1] < y0) { y0 = p1[1]; }\n        if (p1[1] > y1) { y1 = p1[1]; }\n      }\n    });\n\n    for (name in topology.objects) {\n      bboxGeometry(topology.objects[name]);\n    }\n\n    bbox = topology.bbox = [x0, y0, x1, y1];\n  }\n\n  return bbox;\n};\n\nvar reverse = function(array, n) {\n  var t, j = array.length, i = j - n;\n  while (i < --j) { t = array[i], array[i++] = array[j], array[j] = t; }\n};\n\nvar feature = function(topology, o) {\n  return o.type === \"GeometryCollection\"\n      ? {type: \"FeatureCollection\", features: o.geometries.map(function(o) { return feature$1(topology, o); })}\n      : feature$1(topology, o);\n};\n\nfunction feature$1(topology, o) {\n  var id = o.id,\n      bbox = o.bbox,\n      properties = o.properties == null ? {} : o.properties,\n      geometry = object(topology, o);\n  return id == null && bbox == null ? {type: \"Feature\", properties: properties, geometry: geometry}\n      : bbox == null ? {type: \"Feature\", id: id, properties: properties, geometry: geometry}\n      : {type: \"Feature\", id: id, bbox: bbox, properties: properties, geometry: geometry};\n}\n\nfunction object(topology, o) {\n  var transformPoint = transform$3(topology),\n      arcs = topology.arcs;\n\n  function arc(i, points) {\n    if (points.length) { points.pop(); }\n    for (var a = arcs[i < 0 ? ~i : i], k = 0, n = a.length; k < n; ++k) {\n      points.push(transformPoint(a[k].slice(), k));\n    }\n    if (i < 0) { reverse(points, n); }\n  }\n\n  function point(p) {\n    return transformPoint(p.slice());\n  }\n\n  function line(arcs) {\n    var points = [];\n    for (var i = 0, n = arcs.length; i < n; ++i) { arc(arcs[i], points); }\n    if (points.length < 2) { points.push(points[0].slice()); }\n    return points;\n  }\n\n  function ring(arcs) {\n    var points = line(arcs);\n    while (points.length < 4) { points.push(points[0].slice()); }\n    return points;\n  }\n\n  function polygon(arcs) {\n    return arcs.map(ring);\n  }\n\n  function geometry(o) {\n    var type = o.type, coordinates;\n    switch (type) {\n      case \"GeometryCollection\": return {type: type, geometries: o.geometries.map(geometry)};\n      case \"Point\": coordinates = point(o.coordinates); break;\n      case \"MultiPoint\": coordinates = o.coordinates.map(point); break;\n      case \"LineString\": coordinates = line(o.arcs); break;\n      case \"MultiLineString\": coordinates = o.arcs.map(line); break;\n      case \"Polygon\": coordinates = polygon(o.arcs); break;\n      case \"MultiPolygon\": coordinates = o.arcs.map(polygon); break;\n      default: return null;\n    }\n    return {type: type, coordinates: coordinates};\n  }\n\n  return geometry(o);\n}\n\nvar stitch = function(topology, arcs) {\n  var stitchedArcs = {},\n      fragmentByStart = {},\n      fragmentByEnd = {},\n      fragments = [],\n      emptyIndex = -1;\n\n  // Stitch empty arcs first, since they may be subsumed by other arcs.\n  arcs.forEach(function(i, j) {\n    var arc = topology.arcs[i < 0 ? ~i : i], t;\n    if (arc.length < 3 && !arc[1][0] && !arc[1][1]) {\n      t = arcs[++emptyIndex], arcs[emptyIndex] = i, arcs[j] = t;\n    }\n  });\n\n  arcs.forEach(function(i) {\n    var e = ends(i),\n        start = e[0],\n        end = e[1],\n        f, g;\n\n    if (f = fragmentByEnd[start]) {\n      delete fragmentByEnd[f.end];\n      f.push(i);\n      f.end = end;\n      if (g = fragmentByStart[end]) {\n        delete fragmentByStart[g.start];\n        var fg = g === f ? f : f.concat(g);\n        fragmentByStart[fg.start = f.start] = fragmentByEnd[fg.end = g.end] = fg;\n      } else {\n        fragmentByStart[f.start] = fragmentByEnd[f.end] = f;\n      }\n    } else if (f = fragmentByStart[end]) {\n      delete fragmentByStart[f.start];\n      f.unshift(i);\n      f.start = start;\n      if (g = fragmentByEnd[start]) {\n        delete fragmentByEnd[g.end];\n        var gf = g === f ? f : g.concat(f);\n        fragmentByStart[gf.start = g.start] = fragmentByEnd[gf.end = f.end] = gf;\n      } else {\n        fragmentByStart[f.start] = fragmentByEnd[f.end] = f;\n      }\n    } else {\n      f = [i];\n      fragmentByStart[f.start = start] = fragmentByEnd[f.end = end] = f;\n    }\n  });\n\n  function ends(i) {\n    var arc = topology.arcs[i < 0 ? ~i : i], p0 = arc[0], p1;\n    if (topology.transform) { p1 = [0, 0], arc.forEach(function(dp) { p1[0] += dp[0], p1[1] += dp[1]; }); }\n    else { p1 = arc[arc.length - 1]; }\n    return i < 0 ? [p1, p0] : [p0, p1];\n  }\n\n  function flush(fragmentByEnd, fragmentByStart) {\n    for (var k in fragmentByEnd) {\n      var f = fragmentByEnd[k];\n      delete fragmentByStart[f.start];\n      delete f.start;\n      delete f.end;\n      f.forEach(function(i) { stitchedArcs[i < 0 ? ~i : i] = 1; });\n      fragments.push(f);\n    }\n  }\n\n  flush(fragmentByEnd, fragmentByStart);\n  flush(fragmentByStart, fragmentByEnd);\n  arcs.forEach(function(i) { if (!stitchedArcs[i < 0 ? ~i : i]) { fragments.push([i]); } });\n\n  return fragments;\n};\n\nfunction extractArcs(topology, object$$1, filter) {\n  var arcs = [],\n      geomsByArc = [],\n      geom;\n\n  function extract0(i) {\n    var j = i < 0 ? ~i : i;\n    (geomsByArc[j] || (geomsByArc[j] = [])).push({i: i, g: geom});\n  }\n\n  function extract1(arcs) {\n    arcs.forEach(extract0);\n  }\n\n  function extract2(arcs) {\n    arcs.forEach(extract1);\n  }\n\n  function extract3(arcs) {\n    arcs.forEach(extract2);\n  }\n\n  function geometry(o) {\n    switch (geom = o, o.type) {\n      case \"GeometryCollection\": o.geometries.forEach(geometry); break;\n      case \"LineString\": extract1(o.arcs); break;\n      case \"MultiLineString\": case \"Polygon\": extract2(o.arcs); break;\n      case \"MultiPolygon\": extract3(o.arcs); break;\n    }\n  }\n\n  geometry(object$$1);\n\n  geomsByArc.forEach(filter == null\n      ? function(geoms) { arcs.push(geoms[0].i); }\n      : function(geoms) { if (filter(geoms[0].g, geoms[geoms.length - 1].g)) { arcs.push(geoms[0].i); } });\n\n  return arcs;\n}\n\nfunction planarRingArea(ring) {\n  var i = -1, n = ring.length, a, b = ring[n - 1], area = 0;\n  while (++i < n) { a = b, b = ring[i], area += a[0] * b[1] - a[1] * b[0]; }\n  return Math.abs(area); // Note: doubled area!\n}\n\nvar bisect = function(a, x) {\n  var lo = 0, hi = a.length;\n  while (lo < hi) {\n    var mid = lo + hi >>> 1;\n    if (a[mid] < x) { lo = mid + 1; }\n    else { hi = mid; }\n  }\n  return lo;\n};\n\nvar slicers = {};\nvar options;\n\nonmessage = function (e) {\n	if (e.data[0] === 'slice') {\n		// Given a blob of GeoJSON and some topojson/geojson-vt options, do the slicing.\n		var geojson = e.data[1];\n		options     = e.data[2];\n\n		if (geojson.type && geojson.type === 'Topology') {\n			for (var layerName in geojson.objects) {\n				slicers[layerName] = index(\n					feature(geojson, geojson.objects[layerName])\n				, options);\n			}\n		} else {\n			slicers[options.vectorTileLayerName] = index(geojson, options);\n		}\n\n	} else if (e.data[0] === 'get') {\n		// Gets the vector tile for the given coordinates, sends it back as a message\n		var coords = e.data[1];\n\n		var tileLayers = {};\n		for (var layerName in slicers) {\n			var slicedTileLayer = slicers[layerName].getTile(coords.z, coords.x, coords.y);\n\n			if (slicedTileLayer) {\n				var vectorTileLayer = {\n					features: [],\n					extent: options.extent,\n					name: options.vectorTileLayerName,\n					length: slicedTileLayer.features.length\n				};\n\n				for (var i in slicedTileLayer.features) {\n					var feat = {\n						geometry: slicedTileLayer.features[i].geometry,\n						properties: slicedTileLayer.features[i].tags,\n						type: slicedTileLayer.features[i].type	// 1 = point, 2 = line, 3 = polygon\n					};\n					vectorTileLayer.features.push(feat);\n				}\n				tileLayers[layerName] = vectorTileLayer;\n			}\n		}\n		postMessage({ layers: tileLayers, coords: coords });\n	}\n};\n//# sourceMap" + "pingURL=slicerWebWorker.js.worker.map\n", "text/plain; charset=us-ascii", false);
+
+// The geojson/topojson is sliced into tiles via a web worker.
+// This import statement depends on rollup-file-as-blob, so that the
+// variable 'workerCode' is a blob URL.
+
+/*
+ * 🍂class VectorGrid.Slicer
+ * 🍂extends VectorGrid
+ *
+ * A `VectorGrid` for slicing up big GeoJSON or TopoJSON documents in vector
+ * tiles, leveraging [`geojson-vt`](https://github.com/mapbox/geojson-vt).
+ *
+ * 🍂example
+ *
+ * ```
+ * var geoJsonDocument = {
+ * 	type: 'FeatureCollection',
+ * 	features: [ ... ]
+ * };
+ *
+ * L.vectorGrid.slicer(geoJsonDocument, {
+ * 	vectorTileLayerStyles: {
+ * 		sliced: { ... }
+ * 	}
+ * }).addTo(map);
+ *
+ * ```
+ *
+ * `VectorGrid.Slicer` can also handle [TopoJSON](https://github.com/mbostock/topojson) transparently:
+ * ```js
+ * var layer = L.vectorGrid.slicer(topojson, options);
+ * ```
+ *
+ * The TopoJSON format [implicitly groups features into "objects"](https://github.com/mbostock/topojson-specification/blob/master/README.md#215-objects).
+ * These will be transformed into vector tile layer names when styling (the
+ * `vectorTileLayerName` option is ignored when using TopoJSON).
+ *
+ */
+
+L.VectorGrid.Slicer = L.VectorGrid.extend({
+
+	options: {
+		// 🍂section
+		// Additionally to these options, `VectorGrid.Slicer` can take in any
+		// of the [`geojson-vt` options](https://github.com/mapbox/geojson-vt#options).
+
+		// 🍂option vectorTileLayerName: String = 'sliced'
+		// Vector tiles contain a set of *data layers*, and those data layers
+		// contain features. Thus, the slicer creates one data layer, with
+		// the name given in this option. This is important for symbolizing the data.
+		vectorTileLayerName: 'sliced',
+
+		extent: 4096,	// Default for geojson-vt
+		maxZoom: 14  	// Default for geojson-vt
+	},
+
+	initialize: function(geojson, options) {
+		L.VectorGrid.prototype.initialize.call(this, options);
+
+		// Create a shallow copy of this.options, excluding things that might
+		// be functions - we only care about topojson/geojsonvt options
+		var options = {};
+		for (var i in this.options) {
+			if (i !== 'rendererFactory' &&
+				i !== 'vectorTileLayerStyles' &&
+				typeof (this.options[i]) !== 'function'
+			) {
+				options[i] = this.options[i];
+			}
+		}
+
+// 		this._worker = new Worker(window.URL.createObjectURL(new Blob([workerCode])));
+		this._worker = new Worker(workerCode);
+
+		// Send initial data to worker.
+		this._worker.postMessage(['slice', geojson, options]);
+
+	},
+
+
+	_getVectorTilePromise: function(coords) {
+
+		var _this = this;
+
+		var p = new Promise( function waitForWorker(res) {
+			_this._worker.addEventListener('message', function recv(m) {
+				if (m.data.coords &&
+				    m.data.coords.x === coords.x &&
+				    m.data.coords.y === coords.y &&
+				    m.data.coords.z === coords.z ) {
+
+					res(m.data);
+					_this._worker.removeEventListener('message', recv);
+				}
+			});
+		});
+
+		this._worker.postMessage(['get', coords]);
+
+		return p;
+	},
+
+});
+
+
+L.vectorGrid.slicer = function (geojson, options) {
+	return new L.VectorGrid.Slicer(geojson, options);
+};
+
+L.Canvas.Tile = L.Canvas.extend({
+
+	initialize: function (tileCoord, tileSize, options) {
+		L.Canvas.prototype.initialize.call(this, options);
+		this._tileCoord = tileCoord;
+		this._size = tileSize;
+
+		this._initContainer();
+		this._container.setAttribute('width', this._size.x);
+		this._container.setAttribute('height', this._size.y);
+		this._layers = {};
+		this._drawnLayers = {};
+		this._drawing = true;
+
+		if (options.interactive) {
+			// By default, Leaflet tiles do not have pointer events
+			this._container.style.pointerEvents = 'auto';
+		}
+	},
+
+	getCoord: function() {
+		return this._tileCoord;
+	},
+
+	getContainer: function() {
+		return this._container;
+	},
+
+	getOffset: function() {
+		return this._tileCoord.scaleBy(this._size).subtract(this._map.getPixelOrigin());
+	},
+
+	onAdd: L.Util.falseFn,
+
+	addTo: function(map) {
+		this._map = map;
+	},
+
+	removeFrom: function (map) {
+		delete this._map;
+	},
+
+	_onClick: function (e) {
+		var point = this._map.mouseEventToLayerPoint(e).subtract(this.getOffset()), layer, clickedLayer;
+
+		for (var id in this._layers) {
+			layer = this._layers[id];
+			if (layer.options.interactive && layer._containsPoint(point) && !this._map._draggableMoved(layer)) {
+				clickedLayer = layer;
+			}
+		}
+		if (clickedLayer)  {
+			L.DomEvent.fakeStop(e);
+			this._fireEvent([clickedLayer], e);
+		}
+	},
+
+	_onMouseMove: function (e) {
+		if (!this._map || this._map.dragging.moving() || this._map._animatingZoom) { return; }
+
+		var point = this._map.mouseEventToLayerPoint(e).subtract(this.getOffset());
+		this._handleMouseHover(e, point);
+	},
+
+	/// TODO: Modify _initPath to include an extra parameter, a group name
+	/// to order symbolizers by z-index
+
+	_updateIcon: function (layer) {
+		if (!this._drawing) { return; }
+
+		var icon = layer.options.icon,
+		    options = icon.options,
+		    size = L.point(options.iconSize),
+		    anchor = options.iconAnchor ||
+		        	 size && size.divideBy(2, true),
+		    p = layer._point.subtract(anchor),
+		    ctx = this._ctx,
+		    img = layer._getImage();
+
+		if (img.complete) {
+			ctx.drawImage(img, p.x, p.y, size.x, size.y);
+		} else {
+			L.DomEvent.on(img, 'load', function() {
+				ctx.drawImage(img, p.x, p.y, size.x, size.y);
+			});
+		}
+
+		this._drawnLayers[layer._leaflet_id] = layer;
+	}
+});
+
+
+L.canvas.tile = function(tileCoord, tileSize, opts){
+	return new L.Canvas.Tile(tileCoord, tileSize, opts);
+};
+
+// Aux file to bundle everything together
+//# sourceMappingURL=Leaflet.VectorGrid.js.map

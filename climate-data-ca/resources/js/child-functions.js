@@ -235,7 +235,9 @@ var chart_labels, legend_labels, l10n_labels;
 
     l10n_labels = {
       search_city: 'Search for a City/Town',
-      selected: 'selected'
+      selected: 'selected',
+      label_field: 'label_en'
+      
     };
 
     if ($('body').hasClass('lang-fr')) {
@@ -260,7 +262,8 @@ var chart_labels, legend_labels, l10n_labels;
 
       l10n_labels = {
         search_city: 'Cherchez une ville ou un village',
-        selected: 'sélectionés'
+        selected: 'sélectionés',
+        label_field: 'label_fr'
       };
 
       if (typeof Highcharts !== 'undefined') {

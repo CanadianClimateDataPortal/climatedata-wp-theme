@@ -16,7 +16,7 @@
     //
     //
 
-    var idf_layer, station_layer, highlight, highlight2, currentSector, currentSectorGeoJson;
+    var idf_layer, station_layer, highlight, highlight2, currentSector, colormap;
 
     var has_mapRight = false,
         grid_initialized = false;
@@ -667,7 +667,7 @@ maxWidth: "auto"
 
     var current_sector = [];
 
-    function getColor(d, colormap) {
+    function getColor(d) {
 
         for (let i = 0; i < colormap.length; i++) {
             unitValue = parseInt(colormap[i].quantity);
@@ -678,91 +678,84 @@ maxWidth: "auto"
         }
     }
 
-    function genChoro(sector, year, variable, rcp, frequency, colormap) {
+    function genChoro(sector, year, variable, rcp, frequency) {
 
-        console.log('creating sector layer');
-//  get-choro-values/<partition>/<var>/<model>/<month>/
         choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency + '/?period=' + year;
-
-        console.log(choroPath);
 
         $.getJSON(choroPath).then(function (data) {
 
-          //console.log(data);
-
-            if (map1.hasLayer(choroLayer)) {
-              console.log('remove existing choroLayer');
-              map1.removeLayer(choroLayer);
-            }
-
             choroValues = data;
 
-            //console.log("choroValues");
-            //console.log(choroValues);
-
-            var tooltipValue;
-
-            choroLayer = L.geoJSON(currentSectorGeoJson, {
-                smoothFactor: 0,
-                name: 'geojson',
-                pane: 'sector',
-                onEachFeature: function (feature, layer) {
-
-                  if (typeof feature !== 'undefined') {
-                    layer.setStyle({
-                        fillColor: getColor(choroValues[feature.properties.id], colormap),
-                        weight: 0.5,
-                        opacity: 1,
-                        color: 'white',
-                        fillOpacity: 1
-                    });
-                    layer.on('mouseover', function () {
-
-                        tooltipValue = choroValues[this.feature.properties.id];
-                        //fixedTooltipValue = (tooltipValue - subtractValue).toFixed(varDetails['decimals']) + "" + chartUnit;
-                        this.setStyle({
-                            fillColor: getColor(choroValues[this.feature.properties.id], colormap),
-                            weight: 2,
-                            opacity: 1,
-                            color: 'white',
-                            fillOpacity: 1
-                        });
-                        layer.bindTooltip(layer.feature.properties.label, {sticky: true}).openTooltip(layer.latlng);
-                    });
-                    layer.on('mouseout', function () {
-                        this.setStyle({
-                            fillColor: getColor(choroValues[feature.properties.id], colormap),
+            if (map1.hasLayer(choroLayer)) {
+                for (let i  = 0; i < choroValues.length; i++)
+                choroLayer.resetFeatureStyle(i);
+            }
+            else {
+                var layerStyles = {};
+                layerStyles[currentSector]= function (properties, zoom) {
+                        return {
                             weight: 0.5,
-                            opacity: 1,
                             color: 'white',
+                            fillColor: getColor(choroValues[properties.id]),
+                            opacity: 1,
+                            fill: true,
+                            radius: 4,
+                            fillOpacity: 1
+                        }
+                    };
+
+                choroLayer = L.vectorGrid.protobuf(
+                    hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf",
+                    {
+                        rendererFactory: L.canvas.tile,
+                        interactive: true,
+                        getFeatureId: function (f) {
+                            return f.properties.id;
+                        },
+                        name: 'geojson',
+                        pane: 'sector',
+                        maxNativeZoom: 12,
+                        bounds: canadaBounds,
+                        maxZoom: 12,
+                        minZoom: 3,
+                        vectorTileLayerStyles: layerStyles
+                    }
+                ).on('mouseover', function (e) {
+                    choroLayer.setFeatureStyle(
+                        e.layer.properties.id,
+                        {
+                            color: 'white',
+                            fillColor: getColor(choroValues[e.layer.properties.id]),
+                            weight: 1.5,
+                            fill: true,
+                            radius: 4,
+                            opacity: 1,
                             fillOpacity: 1
                         });
-                    });
-                    layer.on('click', function (e) {
+                    choroLayer.bindTooltip(e.layer.properties[l10n_labels.label_field], {sticky: true}).openTooltip(e.latlng);
+                    }
+                ).on('mouseout', function (e) {
+                    choroLayer.resetFeatureStyle ( e.layer.properties.id);
+                    }
+                ).on('click', function (e) {
+                    console.log('click');
 
-                      console.log('click');
+                    current_sector['id'] = e.layer.properties.id;
+                    current_sector['label'] = e.layer.properties[l10n_labels.label_field];
 
-                        current_sector['id'] = feature.properties.id;
-                        current_sector['label'] = layer.feature.properties.label;
+                    var_value = $("#var").val();
+                    mora_value = $("#mora").val();
 
-                        var_value = $("#var").val();
-                        mora_value = $("#mora").val();
+                    genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
+                }).addTo(map1);
+            }
+    })};
 
-                        genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
-
-
-                    });
-
-                  }
-
-                }
-            }).addTo(map1);
-
-        });
-
-    }
-
-
+    map1.on('zoom', function (e) {
+        if (typeof choroLayer !== 'undefined' && choroLayer !== null) {
+            choroLayer.unbindTooltip();
+        }
+    });
     //
     // CITY LABELS
     //
@@ -1779,7 +1772,7 @@ maxWidth: "auto"
                 labels = [];
                 leftLegend.onAdd = function (map) {
                     let div = L.DomUtil.create('div', 'info legend legendTable');
-                    let colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
+                    colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
                     let unitValue;
                     let unitColor;
 
@@ -1804,16 +1797,14 @@ maxWidth: "auto"
                 sector_value = $("#sector").val();
 
                 if (currentSector != sector_value) {
-                  $.getJSON(child_theme_dir + 'resources/sectors-json/' + sector_value + '.json').then( function (data) {
-                   //data.features = data.features.slice(0,1000);
-                   currentSectorGeoJson = data;
-                   currentSector = sector_value;
+                    currentSector = sector_value;
+                    if (map1.hasLayer(choroLayer)) {
+                      console.log('remove existing choroLayer');
+                      map1.removeLayer(choroLayer);
+                    }
                    console.log('generate sector legend');
-                   genChoro(sector_value, decade_value, var_value, rcp_value, mora_value, colormap);
-                 });}
-                else {
-                  genChoro(sector_value, decade_value, var_value, rcp_value, mora_value, colormap);
-                }
+                 }
+                 genChoro(sector_value, decade_value, var_value, rcp_value, mora_value);
 
 
             })

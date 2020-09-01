@@ -402,13 +402,14 @@
     // FORM PROCESSING
     //
 
-    var output_CSV = "Date, Latitude, Longitude, RCP 2.6 Range (low), RCP 2.6 Median, RCP 2.6 Range (high), RCP 4.5 Range (low), RCP 4.5 Median, RCP 4.5 Range (high), RCP 8.5 Range (low), RCP 8.5 Median, RCP 8.5 Range (high)\n"
-
+    var output_CSV_header = "Date, Latitude, Longitude, RCP 2.6 Range (low), RCP 2.6 Median, RCP 2.6 Range (high), RCP 4.5 Range (low), RCP 4.5 Median, RCP 4.5 Range (high), RCP 8.5 Range (low), RCP 8.5 Median, RCP 8.5 Range (high)\n";
+    var output_CSV;
     var urls = []
 
-		function process_download() {
+    function process_download() {
 
       var output_JSON = []
+      output_CSV = output_CSV_header;
 
       var selected_var = $('#download-variable').val()
 
@@ -491,42 +492,22 @@
 
               if (varDetails.units.value === 'kelvin') {
                 subtractValue = k_to_c;
-                chartUnit = "°C";
               } else {
                 subtractValue = 0;
-                chartUnit = varDetails.units.label;
               }
 
               console.log('making CSV')
 
               for (var i = 0; i < data.length; i++) {
-
-                decimals = 2;
-
-                if (data[i][0]) { data0 = (data[i][0] - subtractValue).toFixed(decimals); } else { data0 = null }
-                if (data[i][1]) { data1 = (data[i][1] - subtractValue).toFixed(decimals); } else { data1 = null }
-                if (data[i][2]) { data2 = (data[i][2] - subtractValue).toFixed(decimals); } else { data2 = null }
-                if (data[i][3]) { data3 = (data[i][3] - subtractValue).toFixed(decimals); } else { data3 = null }
-                if (data[i][4]) { data4 = (data[i][4] - subtractValue).toFixed(decimals); } else { data4 = null }
-                if (data[i][5]) { data5 = (data[i][5] - subtractValue).toFixed(decimals); } else { data5 = null }
-                if (data[i][6]) { data6 = (data[i][6] - subtractValue).toFixed(decimals); } else { data6 = null }
-                if (data[i][7]) { data7 = (data[i][7] - subtractValue).toFixed(decimals); } else { data7 = null }
-                if (data[i][8]) { data8 = (data[i][8] - subtractValue).toFixed(decimals); } else { data8 = null }
-                if (data[i][9]) { data9 = (data[i][9] - subtractValue).toFixed(decimals); } else { data9 = null }
-                if (data[i][10]) { data10 = (data[i][10] - subtractValue).toFixed(decimals); } else { data10 = null }
-                if (data[i][11]) { data11 = (data[i][11] - subtractValue).toFixed(decimals); } else { data11 = null }
-
-                year = 1950 + i;
-                if (i < 56) {
-
-                  output_CSV += year + "-" + monthNum + "-01," + this_grid[0] + ',' + this_grid[1] + ',' + data0 + ',' + data1 + ',' + data2 + ',' + data3 + ',' + data4 + ',' + data5 + ',' + data6 + ',' + data7 + ',' + data8 + ',' + "\n"
-
-                }
-
                 // had to add limiter since annual values spit out a null set at the end.
-                if (i > 54 && i < 150) {
-
-                  output_CSV += year + "-" + monthNum + "-01," + this_grid[0] + ',' + this_grid[1] + ',' + data0 + ',' + data1 + ',' + data2 + ',' + data3 + ',' + data4 + ',' + data5 + ',' + data6 + ',' + data7 + ',' + data8 + ',' + "\n"
+                if (i < 150) {
+                    year = 1950 + i;
+                    output_CSV += year + "-" + monthNum + "-01," + this_grid[0] + ',' + this_grid[1];
+                    for (var j = 0; j < 9; j++) {
+                        output_CSV += ',';
+                        output_CSV += (typeof data[i][j] === 'undefined' || data[i][j] === null)?'':(data[i][j] - subtractValue).toFixed(2);
+                    }
+                    output_CSV+="\n";
 
                 }
               }

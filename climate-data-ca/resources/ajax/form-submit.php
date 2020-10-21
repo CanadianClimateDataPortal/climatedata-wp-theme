@@ -34,10 +34,15 @@ if ($securimage->check($_GET['captcha_code']) == false) {
   $to = "support-backup+{$form_data['feedback-type']}@climatedata.ca";
   $subject = get_bloginfo ( 'title' ) . __(': Feedback form submission','cdc-feedback');
   
-  $headers = array ( 
-    'Content-Type: text/html; charset=UTF-8',
-    "From: {$form_data['fullname']} <{$form_data['email']}>"
-  );
+  $headers = array ('Content-Type: text/html; charset=UTF-8');
+
+
+  if (strpos ($form_data['email'],"@canada.ca")) {
+    $headers[] = "From: {$form_data['fullname']} <portal@climatedata.ca>";
+  } else {
+    $headers[]= "From: {$form_data['fullname']} <{$form_data['email']}>";
+   
+  }
   
 //  $body = '<h2>You’ve received a new form submission.</h2>';
   

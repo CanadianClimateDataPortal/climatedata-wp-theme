@@ -151,7 +151,7 @@ function posttype_resource() {
 		'label'                 => __( 'Training Resource', 'cdc-post-types' ),
 		'description'           => __( 'Post Type Description', 'cdc-post-types' ),
 		'labels'                => $labels,
-		'supports'              => array( 'title', 'thumbnail', 'revisions' ),
+		'supports'              => array( 'title', 'thumbnail', 'revisions', 'excerpt' ),
 		'hierarchical'          => false,
 		'public'                => true,
 		'show_ui'               => true,

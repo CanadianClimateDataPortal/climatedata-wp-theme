@@ -59,6 +59,10 @@ h1, h2, h3, h4, h5, h6,
   }
 }
 
+// BOOTSTRAP
+
+// breadcrumb
+
 .breadcrumb {
   font-size: 1.8em;
   font-weight: 500;
@@ -78,6 +82,15 @@ h1, h2, h3, h4, h5, h6,
       margin-right: 10px;
       color: $purple-light2;
     }
+  }
+}
+
+// cards
+
+.card {
+  .card-overlay {
+    @include full-size;
+    z-index: 10;
   }
 }
 
@@ -133,7 +146,7 @@ h1, h2, h3, h4, h5, h6,
   }
   
   .primary-nav {
-    font-size: 1.2em;
+    font-size: 1em;
     
     .nav-item {
       margin-right: 12px;
@@ -146,6 +159,10 @@ h1, h2, h3, h4, h5, h6,
       border-left: 1px solid transparentize($secondary, 0.5);
       text-indent: -9999px;
     }
+  }
+  
+  .code {
+    pointer-events: none;
   }
   
   .secondary-nav {
@@ -456,6 +473,8 @@ body {
 @import 'pages/case-study';
 
 // TRAINING
+
+@import 'pages/training';
 
 #training-video-overlay {
   .overlay-title {
@@ -807,6 +826,12 @@ body {
 body.overlay-open.overlay-position-top {
   #var-filter {
     display: none;
+  }
+  
+  #header-primary {
+    .code {
+      pointer-events: all;
+    }
   }
 }
 
@@ -1175,12 +1200,16 @@ body.overlay-open[data-overlay-content="video"] {
 // UI TABS
 
 .tabs-nav {
+  .nav-link {
+    cursor: pointer;
+  }
+  
   .ui-state-active {
     position: relative;
     color: $primary;
     @include bubble(bottom, 10px, $primary);
     
-    a {
+    .nav-link {
       color: $primary !important;
     }
     

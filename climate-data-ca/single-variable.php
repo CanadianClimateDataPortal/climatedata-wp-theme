@@ -151,7 +151,14 @@
       $random_resource = new WP_Query ( array (
         'post_type' => 'resource',
         'posts_per_page' => 1,
-        'orderby' => 'rand'
+        'orderby' => 'rand',
+        'tax_query' => array (
+          array (
+            'taxonomy' => 'resource-category',
+            'field' => 'slug',
+            'terms' => 'how-to'
+          )
+        )
       ) );
 
       if ( $random_resource->have_posts() ) : while ( $random_resource->have_posts() ) : $random_resource->the_post();

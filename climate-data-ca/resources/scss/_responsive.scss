@@ -5,6 +5,14 @@
   }
 }
 
+@media (min-width: 1280px) {
+  #header-primary {
+    .primary-nav {
+      font-size: 1.2em;
+    }
+  }
+}
+
 @include media-breakpoint-down(md) {
   h1 {
     font-size: $h1-font-size * 0.8;

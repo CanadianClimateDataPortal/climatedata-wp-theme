@@ -22,7 +22,7 @@
 
 <?php
   
-  } elseif ( is_page ( 'training' ) ) {
+  } elseif ( is_page ( 'learn' ) || is_page ( 'apprendre' ) ) {
     
 ?>
 

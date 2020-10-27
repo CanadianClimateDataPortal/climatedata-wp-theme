@@ -170,7 +170,7 @@ function child_theme_enqueue() {
 
   }
   
-  if ( is_page ( 'learn' ) || is_singular ( 'resource' ) ) {
+  if ( is_page ( 'learn' ) || is_page ( 'apprendre' ) || is_singular ( 'resource' ) ) {
     
     wp_enqueue_script ( 'training-functions' );
     

@@ -9,7 +9,7 @@
 <div id="hero-asset-type-<?php echo get_field ( 'asset_type' ); ?>" class="<?php echo $hero_content_class; ?>">
   <?php
     
-    $training_page = filtered_ID_by_path ( 'training' );
+    $training_page = filtered_ID_by_path ( 'learn' );
       
   ?>
   

@@ -142,7 +142,16 @@
           ?>
         
         
-          <h2 class="text-primary"><?php _e ( 'Summary', 'cdc' ); ?></h2>
+          <h2 class="text-primary"><?php 
+            
+            if ( get_field ( 'asset_summaryhead' ) != '' ) {
+              echo get_field ( 'asset_summaryhead' );
+            } else {
+              _e ( 'Summary', 'cdc' ); 
+            }
+
+            
+          ?></h2>
         </div>      
                 
         <div class="col-10 offset-1 col-md-8 col-lg-5">

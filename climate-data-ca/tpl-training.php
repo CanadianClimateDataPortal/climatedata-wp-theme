@@ -44,7 +44,7 @@
     <nav id="training-filter" class="navbar navbar-expand navbar-light bg-light">
       
       <ul class="navbar-nav tabs-nav w-100 flex-column flex-sm-row align-items-center justify-content-center">
-        <li class="nav-item"><span class="nav-link disabled p-4 all-caps"><?php _e ( 'Filter', 'cdc' ); ?></a></li>
+        <li class="nav-item"><span class="nav-link disabled p-4 all-caps"><?php _e ( 'Filter:', 'cdc' ); ?></a></li>
         <li class="nav-item"><span class="nav-link p-4 all-caps" data-type="video"><?php _e ( 'Video', 'cdc' ); ?></a></li>
         <li class="nav-item"><span class="nav-link p-4 all-caps" data-type="interactive"><?php _e ( 'Interactive', 'cdc' ); ?></a></li>
         <li class="nav-item"><span class="nav-link p-4 all-caps" data-type="article"><?php _e ( 'Article', 'cdc' ); ?></a></li>
@@ -119,7 +119,7 @@
                   <div class="bg" style="background-image: url(<?php echo get_the_post_thumbnail_url ( get_the_ID(), 'large' ); ?>);"></div>
                   
                   <div class="card-body p-5 mb-5">
-                    <h5 class="card-title"><?php the_title(); ?></h5>
+                    <h4 class="card-title mb-5"><?php the_title(); ?></h4>
                     <p class="card-text"><?php
                       
                       echo custom_excerpt ( get_the_ID(), 50 );

@@ -597,7 +597,7 @@ body {
     &.type-resource {
       &:hover {
         .card {
-          box-shadow: 0 10px 60px transparentize($dark, 0.75);
+          //box-shadow: 0 10px 60px transparentize($dark, 0.75);
         }
       }
     }
@@ -674,48 +674,85 @@ body {
   }
   
   &.type-resource {
+    height: 380px;
+    
     .card {
       overflow: hidden;
       border: none;
-      box-shadow: 0 10px 60px transparentize($dark, 1);
+      //box-shadow: 0 10px 60px transparentize($dark, 1);
       transition: box-shadow 0.4s;
       
       &.bg-light {
         h5 {
           color: $primary;
         }
+        
+        .card-bg {
+          opacity: 0.1;
+        }
+      }
+      
+      &.bg-dark {
+        .card-title {
+          a {
+            color: $white;
+          }
+        }
       }
     }
     
-    h5 {
-      margin: 0.6em 0 1.4em 0;
-    }
-    
     .btn {
+/*
       position: absolute;
       bottom: 20px;
       left: 50%;
       padding: 0.5em 1.5em;
       background-color: transparentize($primary, 0.25);
       transform: translateX(-50%);
+*/
       @include all-caps;
       z-index: 4;
     }
     
+    .card-title {
+      font-size: 2.4rem;
+    }
+    
     .card-body {
       position: relative;
-      height: 375px;
+      z-index: 2;
+      
+      p {
+        font-size: 1.6rem;
+      }
     }
     
     .card-thumb {
       position: relative;
-      height: 300px;
     }
     
     .card-label {
       display: none;
     }
     
+    .card-footer {
+      position: relative;
+      background-color: transparent;
+      z-index: 4;
+      
+      h6 {
+        font-size: 1.2rem;
+      }
+    }
+    
+    .card-bg {
+      @include full-size;
+      @include bg;
+      opacity: 0.3;
+      z-index: 1;
+    }
+    
+/*
     .card-bg {
       position: relative;
       @include bg;
@@ -727,6 +764,7 @@ body {
       transition: box-shadow 0.4s;
       z-index: 1;
     }
+*/
     
     .bg-1 {
       .card-bg {
@@ -787,8 +825,9 @@ body {
     transform: translateX(-50%);
   }
   
-  .card-body {
-    height: 100%;
+  .card-body,
+  .card-footer {
+    padding-left: 5rem!important;
   }
   
   .bg-1 {

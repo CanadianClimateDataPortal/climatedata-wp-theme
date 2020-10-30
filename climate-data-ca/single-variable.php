@@ -151,21 +151,14 @@
       $random_resource = new WP_Query ( array (
         'post_type' => 'resource',
         'posts_per_page' => 1,
-        'orderby' => 'rand',
-        'tax_query' => array (
-          array (
-            'taxonomy' => 'resource-category',
-            'field' => 'slug',
-            'terms' => 'how-to'
-          )
-        )
+        'orderby' => 'rand'
       ) );
 
       if ( $random_resource->have_posts() ) : while ( $random_resource->have_posts() ) : $random_resource->the_post();
 
         $item = array (
           'id' => get_the_ID(),
-          'title' => get_field ( 'var_title' ),
+          'title' => get_the_title(),
           'permalink' => get_permalink(),
           'post_type' => get_post_type()
         );

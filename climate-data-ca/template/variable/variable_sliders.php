@@ -3,9 +3,6 @@
 
         <?php
 
-
-
-
         while (have_rows('variable_sliders')) {
             the_row();
 
@@ -13,13 +10,11 @@
 
                 case 'decade' :
 
-
                     ?>
 
                     <div class="filter-container slider-container col-7 offset-1">
                         <h6><?php _e('Time period', 'cdc'); ?></h6>
-
-                        <div id="range-slider-container" class="decade-slider-container" data-min="<?php echo get_field('time_slider_min_value',$post_id); ?>" data-max="<?php echo get_field('time_slider_max_value',$post_id); ?>" data-default="<?php echo get_field('time_slider_default_value',$post_id); ?>" data-interval="<?php echo get_field('time_slider_interval',$post_id); ?>">
+                        <div id="range-slider-container" class="decade-slider-container" data-min="<?php the_field('time_slider_min_value'); ?>" data-max="<?php the_sub_field('time_slider_max_value'); ?>" data-default="<?php the_sub_field('time_slider_default_value'); ?>">
                             <input id="range-slider" class="decade-slider">
                         </div>
                     </div>

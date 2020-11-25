@@ -2,6 +2,9 @@
 
 $query_string = $_GET;
 
+error_reporting(E_ALL);
+ini_set('display_errors', 'On');
+
 $filters = array(
     'coords' => array('hidden' => true, 'val' => '62.5325943454858,-98.525390625,4'),
     'geo-select' => array('hidden' => true, 'val' => ''),

@@ -236,7 +236,12 @@ var chart_labels, legend_labels, l10n_labels;
     l10n_labels = {
       search_city: 'Search for a City/Town',
       selected: 'selected',
-      label_field: 'label_en'
+      label_field: 'label_en',
+      temperature: 'temperature',
+      precipitation: 'precipitation',
+      other_variables: 'other variables',
+      station_data: 'station data',
+      
       
     };
 
@@ -263,7 +268,11 @@ var chart_labels, legend_labels, l10n_labels;
       l10n_labels = {
         search_city: 'Cherchez une ville ou un village',
         selected: 'sélectionés',
-        label_field: 'label_fr'
+        label_field: 'label_fr',
+        temperature: 'température',
+        precipitation: 'précipitation',
+        other_variables: 'autres',
+        station_data: 'données des stations',        
       };
 
       if (typeof Highcharts !== 'undefined') {

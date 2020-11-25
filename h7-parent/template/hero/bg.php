@@ -3,7 +3,7 @@
   $bg_URL = '';
   
   if ( has_post_thumbnail () ) {
-    $bg_URL = get_the_post_thumbnail_url( get_the_ID(), 'bg' );
+    $bg_URL = get_the_post_thumbnail_url ( get_the_ID(), 'bg' );
   }
   
   if ( have_rows ( $hero_fields['background'][0], $hero_fields['background'][1] ) ) {

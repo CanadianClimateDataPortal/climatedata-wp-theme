@@ -1109,6 +1109,7 @@
 
         $('#start_date').on('change.datetimepicker', function () {
             update_URL('start', $('#station-start').val());
+            check_station_form();
         });
 
         $('#end_date').datetimepicker({
@@ -1118,6 +1119,7 @@
 
         $('#end_date').on('change.datetimepicker', function () {
             update_URL('end', $('#station-end').val());
+            check_station_form();
         });
 
         $("#station-select").select2({

@@ -96,10 +96,21 @@ function child_theme_enqueue()
     wp_register_script('location-functions', $child_js_dir . 'location-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('variable-functions', $child_js_dir . 'variable-functions.js', array('jquery', 'child-functions'), NULL, true);
 
+<<<<<<< HEAD
     wp_register_script('analyze-functions', $child_js_dir . 'analyze-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('download-functions', $child_js_dir . 'download-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('archive-functions', $child_js_dir . 'archive-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('case-study-functions', $child_js_dir . 'case-study-functions.js', array('jquery', 'child-functions', 'map-renderer', 'renderer'), NULL, true);
+=======
+  wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'jquery', 'global-functions' ), NULL, true );
+  wp_register_script ( 'location-functions', $child_js_dir . 'location-functions.js', array ( 'jquery', 'child-functions' ), NULL, true );
+  wp_register_script ( 'variable-functions', $child_js_dir . 'variable-functions.js', array ( 'jquery', 'child-functions' ), NULL, true );
+  wp_register_script ( 'analyze-functions', $child_js_dir . 'analyze-functions.js', array ( 'jquery', 'child-functions' ), NULL, true );
+  wp_register_script ( 'download-functions', $child_js_dir . 'download-functions.js', array ( 'jquery', 'child-functions' ), NULL, true );
+  wp_register_script ( 'archive-functions', $child_js_dir . 'archive-functions.js', array ( 'jquery', 'child-functions' ), NULL, true );
+  wp_register_script ( 'case-study-functions', $child_js_dir . 'case-study-functions.js', array ( 'jquery', 'child-functions', 'map-renderer', 'renderer' ), NULL, true );
+  wp_register_script ( 'training-functions', $child_js_dir . 'training-functions.js', array ( 'jquery', 'child-functions' ), NULL, true );
+>>>>>>> f6582715b6511602bc18bd59299e7b281840bdeb
 
     // VENDOR
 
@@ -148,11 +159,27 @@ function child_theme_enqueue()
 
     }
 
+<<<<<<< HEAD
     if (is_singular('case-study')) {
+=======
+  if ( is_singular ( 'case-study' ) || is_singular ( 'resource' ) ) {
+>>>>>>> f6582715b6511602bc18bd59299e7b281840bdeb
 
         wp_enqueue_script('case-study-functions');
 
+<<<<<<< HEAD
     }
+=======
+  }
+  
+  if ( is_page ( 'learn' ) || is_page ( 'apprendre' ) || is_singular ( 'resource' ) ) {
+    
+    wp_enqueue_script ( 'training-functions' );
+    
+    //wp_enqueue_script ( 'isotope', 'https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js', null, null, true );
+    
+  }
+>>>>>>> f6582715b6511602bc18bd59299e7b281840bdeb
 
 }
 

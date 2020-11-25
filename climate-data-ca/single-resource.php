@@ -101,8 +101,85 @@
 <?php
     
     } else {
+            
+      if ( !has_term ( array ( 'how-to', 'key-concepts' ), 'resource-category' ) ) {
       
-      the_title();
+        get_header();
+    
+        //
+        // HERO
+        //
+      
+        $hero_templates['content'] = 'resource-hero-content';
+        $hero_templates['bg'] = 'post-thumb';
+      
+        include ( locate_template ( 'template/hero/hero.php' ) );
+        
+?>
+
+<section id="resource-summary" class="page-section has-head">
+    
+  <div class="section-container">
+    
+    <header class="section-head container-fluid">
+      <div class="row">
+        <div class="col-10 offset-1 text-center text-lg-left">
+          <?php
+            
+            if ( get_field ( 'asset_type' ) == 'video' && get_field ( 'asset_time' ) != '' ) {
+      
+          ?>
+          
+          <div id="hero-asset-time" class="asset-time summary-time d-flex align-items-center">
+            <h6 class="mb-0 all-caps"><?php _e ( 'Time to completion', 'cdc' ); ?></h6>
+            <span class="border border-primary text-primary rounded-pill ml-4 py-2 px-4"><?php echo get_field ( 'asset_time' ); ?> min</span>
+          </div>
+
+          <?php
+    
+            }
+            
+          ?>
+        
+        
+          <h2 class="text-primary"><?php 
+            
+            if ( get_field ( 'asset_summaryhead' ) != '' ) {
+              echo get_field ( 'asset_summaryhead' );
+            } else {
+              _e ( 'Summary', 'cdc' ); 
+            }
+
+            
+          ?></h2>
+        </div>      
+                
+        <div class="col-10 offset-1 col-md-8 col-lg-5">
+          <?php
+            
+            the_field ( 'asset_summary' );
+            
+          ?>
+        </div>
+                  
+      </div>
+    </header>
+    
+  </div>
+    
+</section>
+
+<?php
+        
+        //
+        // SECTIONS LOOP
+        //
+        
+        include ( locate_template ( 'template/loop/sections.php' ) );
+        
+        get_footer();
+      
+      }
       
     }
     

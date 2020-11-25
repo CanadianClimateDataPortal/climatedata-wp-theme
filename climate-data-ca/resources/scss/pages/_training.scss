@@ -1,0 +1,141 @@
+//
+// TRAINING PAGE
+//
+
+#training-filter {
+  &.is_stuck {
+    z-index: 10;
+  }
+}
+
+.training-asset {
+  transition: 0.25s;
+  
+  .bg,
+  .card-body,
+  .card-footer {
+    transition: 0.25s;
+  }
+    
+  .bg {
+    opacity: 0.5;
+  }
+  
+  .card-body {
+    position: relative;
+    min-height: 300px;
+    z-index: 2;
+  }
+  
+  .card-footer {
+    position: relative;
+    z-index: 3;
+    
+    h6 {
+      font-size: 1.2rem;
+    }
+  }
+  
+  &:hover {
+    .bg {
+      opacity: 0.6;
+    }
+    
+    .card-title {
+      text-decoration: underline;
+    }
+  }
+  
+  &.disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+    pointer-events: none;
+    
+    * {
+      pointer-events: none;
+    }
+    
+    .bg,
+    .card-body,
+    .card-footer {
+      opacity: 0.1;
+    }
+    
+    .card-overlay {
+      display: none;
+    }
+  }
+
+}
+
+//
+// SINGLE RESOURCE
+//
+
+.single-resource {
+  #hero {
+    z-index: 2;
+    
+    .section-container {
+      padding-top: 160px;
+    }
+  }
+  
+  #hero-asset-type-video {
+    h1 {
+      font-size: 4em;
+    }
+  }
+  
+  #asset-video {
+    position: relative;
+    height: 0;
+    padding-bottom: 56.25%;
+    margin-bottom: -220px;
+    background-color: $black;
+    
+    iframe {
+      @include full-size;
+    }
+  }
+  
+  .asset-time {
+    h6 {
+      font-size: 1.2rem;
+    }
+    
+    .rounded-pill {
+      font-size: 1.4rem;
+    }
+    
+    &.summary-time {
+      margin-bottom: 8em;
+    }
+  }
+  
+  .page-section {
+    &:before {
+      content: '';
+      display: block;
+      position: relative;
+      width: 33.3333%;
+      height: 10px;
+      background-color: $primary;
+      z-index: 2;
+    }
+    
+    &.first-section {
+      &:before {
+        display: none;
+      }
+    }
+  }
+  
+  #resource-summary {
+    z-index: 1;
+    
+    .section-container {
+      padding-top: 120px;
+    }
+  }
+}

@@ -146,7 +146,7 @@ if (have_posts()) : while (have_posts()) : the_post();
 
                 if ($random_resource->have_posts()) : while ($random_resource->have_posts()) : $random_resource->the_post();
 
-                    $item = array('id' => get_the_ID(), 'title' => get_field('var_title'), 'permalink' => get_permalink(), 'post_type' => get_post_type());
+                    $item = array('id' => get_the_ID(), 'title' => get_the_title(), 'permalink' => get_permalink(), 'post_type' => get_post_type());
 
                     ?>
 

@@ -68,11 +68,11 @@ if (isset($_SERVER['HTTP_HOST'])) {
 
     <?php
 
-      if ( is_page ( 'Training' ) || is_page ( 'Formation' ) ) {
+      if ( is_page ( 'learn' ) || is_page ( 'apprendre' ) ) {
 
     ?>
 
-    <div id="download-form">
+    <div id="download-form" style="display: none;">
       <div class="container-fluid">
 
         <div class="row">

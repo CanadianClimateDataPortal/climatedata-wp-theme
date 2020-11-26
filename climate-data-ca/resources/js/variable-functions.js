@@ -2539,7 +2539,7 @@
 
             sectorSelected = $('#sector').val();
 
-            if (sectorSelected && (window.location.href.indexOf("explore/variable") > 0)) {
+            if (sectorSelected && ((window.location.href.indexOf("explore/variable") > 0) || (window.location.href.indexOf("explorer/variable") > 0))) {
                 if (sectorSelected === 'health') {
                     sectorSelected = "health/map";
                 } else if (sectorSelected === 'census') {
@@ -2550,7 +2550,7 @@
                 window.location.replace("/explore/sector/" + sectorSelected);
             }
 
-            if (!sectorSelected && (window.location.href.indexOf("explore/sector") > 0)) {
+            if (!sectorSelected && ((window.location.href.indexOf("explore/sector") > 0) || (window.location.href.indexOf("explorer/secteur") > 0))) {
                 sectorSelected = "/variable/tx_max/";
                 window.location.replace(sectorSelected);
             }
@@ -2649,14 +2649,14 @@
 
                     legendLayer = var_value + "_health_" + legendmsorys;
 
-                    if (window.location.href.indexOf("explore/sector") > -1) {
+                    if (window.location.href.indexOf("explore/sector") > -1 || window.location.href.indexOf("explorer/secteur") > -1)  {
                         generateSectorLegend(var_value + "_health_" + legendmsorys, '');
                     } else {
                         //window.location.replace("/explore/sector/watershed/data-by-watershed/");
                     }
                 } else {
                     // is user on sector page?
-                    if (window.location.href.indexOf("explore/sector") > -1) {
+                    if (window.location.href.indexOf("explore/sector") > -1 || window.location.href.indexOf("explorer/secteur") > -1) {
                         //window.location.replace("/variable/tx_max");
                     } else {
                         generateLeftLegend();

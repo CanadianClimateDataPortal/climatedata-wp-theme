@@ -142,7 +142,7 @@
 
                 while ( $vars_by_type->have_posts() ) :
                   $vars_by_type->the_post();
-
+                  if ( get_field( 'var_name' ) != 'spei_3m' && get_field( 'var_name' ) != 'slr') { // we exclude specificly spei_3m / slr
                   $selected = false;
 
                   if (
@@ -159,6 +159,7 @@
               <?php
 
                   $var_num++;
+                  }
 
                 endwhile;
 

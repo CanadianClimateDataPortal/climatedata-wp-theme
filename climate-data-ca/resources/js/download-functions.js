@@ -577,65 +577,30 @@
             currentVar = $("#download-variable").val();
             $('#download-variable').empty();
             buildVarDropdown(e.currentTarget.value,currentVar);
-            // if (e.currentTarget.value === 'daily') {
-            //
-            //     // swap fields for daily downloads
-            //
-            //     // options
-            //
-            //     for (var var_index in daily_vars) {
-            //         $('<option value="' + daily_vars[var_index]['value'] + '">' + daily_vars[var_index]['text'] + '</option>').appendTo('#download-variable');
-            //     }
-            //
-            //     // refresh captcha
-            //
-            //     $('#daily-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php');
-            //
-            //     // netCDF option
-            //
-            //     $('#format-label-netcdf').show();
-            //     $('#format-label-json').hide();
-            //
-            //     // email field
-            //
-            //     $('#annual-process-wrap').hide();
-            //     $('#daily-process-wrap').show();
-            //
-            // } else {
-            //
-            //     // swap fields for annual downloads
-            //
-            //     // options
-            //
-            //     for (var group_index in all_vars) {
-            //
-            //         var optgroup = $('<optgroup label="' + all_vars[group_index]['label'] + '">').appendTo('#download-variable');
-            //
-            //         for (var var_index in all_vars[group_index]['options']) {
-            //             $('<option value="' + all_vars[group_index]['options'][var_index]['value'] + '">' + all_vars[group_index]['options'][var_index]['text'] + '</option>').appendTo(optgroup);
-            //         }
-            //
-            //     }
-            //
-            //     // json option
-            //
-            //     $('#format-label-netcdf').hide();
-            //     $('#format-label-json').show();
-            //
-            //     // email field
-            //
-            //     $('#annual-process-wrap').show();
-            //     $('#daily-process-wrap').hide();
-            //
-            // }
-            //
-            // $('#format-btn-group label').removeClass('active');
-            // $('#format-btn-group input').prop('checked', false);
-            //
-            // $('#format-label-csv').addClass('active');
-            // $('#format-label-csv input').prop('checked', true);
-            //
+            
+            if (e.currentTarget.value == 'daily') {
 
+                // refresh captcha
+                $('#daily-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php');
+                
+                // netCDF option
+                $('#format-label-netcdf').show();
+                $('#format-label-json').hide();
+                
+                // email field
+                $('#annual-process-wrap').hide();
+                $('#daily-process-wrap').show();
+
+            } else {
+
+                // json option
+                $('#format-label-netcdf').hide();
+                $('#format-label-json').show();
+                
+                // email field
+                $('#annual-process-wrap').show();
+                $('#daily-process-wrap').hide();
+            }  
         });
 
         $('#daily-captcha_code').on('input', function (e) {

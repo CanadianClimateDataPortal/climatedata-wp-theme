@@ -10,7 +10,7 @@
 
         var maps = {};
 
-        var var_map, station_map, heatwave_map;
+        var var_map, station_map;
 
         var chart;
 
@@ -156,14 +156,7 @@
                         idf_init()
                     }
 
-                } else if (ui.panel.attr('id') === 'heat-wave-analysis') {
-
-                    if (typeof maps['heatwave'] == 'undefined') {
-                        heatwave_init();
-                    }
-
-                }
-
+                } 
             },
             activate: function (e, ui) {
 
@@ -187,15 +180,7 @@
                         idf_init()
                     }
 
-                } else if (ui.newPanel.attr('id') === 'heat-wave-analysis') {
-
-                    if (typeof maps['heatwave'] == 'undefined') {
-                        heatwave_init();
-                    }
-
-                    $('#heatwave-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php');
-
-                }
+                } 
 
             }
         });
@@ -378,13 +363,7 @@
 
                 var points_to_process = selectedGrids.length
 
-                var_value = $("#download-variable").val(); //'tx_max'; //$("#var").val();
-                mora_value = $("#download-dataset").val();
-
-                if (mora_value === 'annual') {
-                    mora_value = 'ann'
-                }
-
+ 
                 if (selectedGrids.length > 0) {
                     $('#download-location').parent().find('.select2-selection__rendered').text(selectedGrids.length + ' ' + l10n_labels.selected)
                 } else {
@@ -466,14 +445,8 @@
         // FORM PROCESSING
         //
 
-        var output_CSV_header = "Date, Latitude, Longitude, RCP 2.6 Range (low), RCP 2.6 Median, RCP 2.6 Range (high), RCP 4.5 Range (low), RCP 4.5 Median, RCP 4.5 Range (high), RCP 8.5 Range (low), RCP 8.5 Median, RCP 8.5 Range (high)\n";
-        var output_CSV;
-        var urls = []
 
         function process_download() {
-
-            var output_JSON = []
-            output_CSV = output_CSV_header;
 
             var selected_var = $('#download-variable').val()
 
@@ -483,227 +456,37 @@
                 month = 'ann'
             }
 
-            var split_coords = $('#download-coords').val().split('|')
-
-            // remove first element which is empty because the first character is always '|'
-            split_coords.shift()
-
-            var coords_to_process = selectedGrids.length
-
-            var grids_to_process = $('#download-coords').val().split('|')
-
-            grids_to_process.shift()
-
-            function ajaxRequest() {
-
-                if (grids_to_process.length > 0) {
-
-                    this_grid = grids_to_process.pop().split(',')
-
-                    dl_fraction.find('span').html(selectedGrids.length - grids_to_process.length)
-
-                    dl_progress.css('width', (((selectedGrids.length - grids_to_process.length) / selectedGrids.length) * 100) + '%')
-
-                    $.ajax({
-                        method: 'GET',
-                        url: data_url + '/get_values.php?lat=' + this_grid[0] + '&lon=' + this_grid[1] + '&var=' + selected_var + '&month=' + month,
-                        dataType: 'json',
-                        success: function (data) {
-
-                            midHistSeries = [];
-                            rangeHistSeries = [];
-
-                            mid26Series = [];
-                            range26Series = [];
-
-                            mid45Series = [];
-                            range45Series = [];
-
-                            mid85Series = [];
-                            range85Series = [];
-
-                            dLen = data.length;
-
-                            if (month === 'ann' || month === 'jan') {
-                                monthNum = "01";
-                            } else if (month === 'feb') {
-                                monthNum = "02";
-                            } else if (month === 'mar') {
-                                monthNum = "03";
-                            } else if (month === 'apr') {
-                                monthNum = "04";
-                            } else if (month === 'may') {
-                                monthNum = "05";
-                            } else if (month === 'jun') {
-                                monthNum = "06";
-                            } else if (month === 'jul') {
-                                monthNum = "07";
-                            } else if (month === 'aug') {
-                                monthNum = "08";
-                            } else if (month === 'sep') {
-                                monthNum = "09";
-                            } else if (month === 'oct') {
-                                monthNum = "10";
-                            } else if (month === 'nov') {
-                                monthNum = "11";
-                            } else if (month === 'dec') {
-                                monthNum = "12";
-                            } else {
-                                monthNum = 0
-                            }
-
-                            if (varDetails.units.value === 'kelvin') {
-                                subtractValue = k_to_c;
-                            } else {
-                                subtractValue = 0;
-                            }
-
-
-                            for (var i = 0; i < data.length; i++) {
-                                // had to add limiter since annual values spit out a null set at the end.
-                                if (i < 150) {
-                                    year = 1950 + i;
-                                    output_CSV += year + "-" + monthNum + "-01," + this_grid[0] + ',' + this_grid[1];
-                                    for (var j = 0; j < 9; j++) {
-                                        output_CSV += ',';
-                                        output_CSV += (typeof data[i][j] === 'undefined' || data[i][j] === null) ? '' : (data[i][j] - subtractValue).toFixed(2);
-                                    }
-                                    output_CSV += "\n";
-
-                                }
-                            }
-
-                            if (coords_to_process == 1) {
-
-                                $('body').removeClass('spinner-on')
-
-                                dl_fraction.remove()
-                                dl_progress.remove()
-
-
-                                $('#download-result a').attr('href', 'data:text/csv;charset=utf-8,' + escape(output_CSV));
-                                $('#download-result a').attr('download', $('#download-filename').val() + '.csv');
-                                $('#download-result').slideDown(250)
-
-                            } else {
-                                coords_to_process -= 1
-                            }
-
-                            chart = null
-                            $('#dummy-chart').empty()
-
-                        },
-                        complete: function () {
-
-                            ajaxRequest()
-
-                        }
-                    })
-
-                }
+            points = []
+            for (var i =0 ; i < selectedGrids.length; i++) {
+                point = selectedPoints[selectedGrids[i]];
+                points.push([point.lat, point.lng]);
             }
-
-            if ($('input[name="download-format"]:checked').val() == 'csv') {
-
-                // get the variable details
-
-                $('body').addClass('spinner-on')
-
-                var dl_status = 0
-
-                var dl_fraction = $('<p id="dl-fraction" style="position: absolute; left: 30%; bottom: 30%; width: 40%; padding-bottom: 1em; text-align: center;"><span>' + dl_status + '</span> / ' + grids_to_process.length + '</p>').appendTo($('.spinner'))
-
-                var dl_progress = $('<div class="dl-progress" style="position: absolute; left: 0; bottom: 0; width: 0; height: 4px; background: red;">').appendTo(dl_fraction)
-
-                $.ajax({
-                    url: ajax_url + 'variable/' + $('#download-variable').val() + '/',
-                    data: {
-                        content: 'location'
-                    },
-                    success: function (data) {
-                        varDetails = JSON.parse($(data).find('#callback-data').html())
-                    },
-                    complete: function () {
-
-                        ajaxRequest()
-
+            
+            format = $('input[name="download-format"]:checked').val();
+            
+            request_args= {var: selected_var,
+                           month: month,
+                           format: format,
+                           points:points};
+            
+            $.ajax({
+                method: 'POST',
+                url: data_url + '/download',
+                contentType: 'application/json',
+                data: JSON.stringify(request_args),
+                success: function (result) {
+                    if (format == 'csv') {
+                        $('#download-result a').attr('href', 'data:text/csv;charset=utf-8,' + escape(result));
                     }
-
-                }) // varDetails ajax
-
-            } else if ($('input[name="download-format"]:checked').val() == 'json') {
-
-                $('body').addClass('spinner-on');
-
-                var json_data = []
-
-                split_coords.forEach(function (entry) {
-
-                    var this_coord = entry.split(',') // [0] lat [1] lon [2] id
-
-                    $.ajax({
-                        url: data_url + '/download_csv.php?lat=' + this_coord[0] + '&lon=' + this_coord[1] + '&var=' + $('#download-variable').val(),
-                        success: function (data) {
-
-                            json_data = JSON.parse(data);
-
-                            data_obj = json_data[1]['data'];
-
-                            i = 0;
-                            z = 0;
-
-                            for (var year in data_obj) {
-                                for (var val in data_obj[year]) {
-
-                                    if (data_obj[year][val] !== null) {
-                                        data_obj[year][val] = parseFloat((data_obj[year][val] - subtractValue).toFixed(2));
-                                    }
-
-                                    z += 1;
-
-                                }
-
-                                i += 1;
-
-                            }
-
-                            // add the returned data
-                            json_data[1]['data'] = data_obj
-
-                            // add the coord ID
-                            json_data[0]['id'] = this_coord[2]
-
-                            // push to the output array
-                            output_JSON.push(json_data)
-
-                            // if this is the last entry,
-                            // update the output JSON and hide the spinner
-
-                            if (coords_to_process == 1) {
-
-                                $('#download-result a').attr('href', "data:application/json," + encodeURIComponent(JSON.stringify(output_JSON))).removeClass('disabled');
-
-                                $('#download-result a').attr('download', $('#download-filename').val() + '.json');
-                                $('#download-result').slideDown(250)
-
-                                $('body').removeClass('spinner-on');
-
-                            } else {
-                                coords_to_process -= 1
-                            }
-
-                        }
-                    });
-
-
-                })
-
-            }
+                    if (format == 'json') {
+                        $('#download-result a').attr('href', "data:application/json," + encodeURIComponent(JSON.stringify(result)));
+                    }
+                    $('#download-result a').attr('download', $('#download-filename').val() + '.' + format);
+                    $('#download-result').slideDown(250)
+                   
+            }});
 
         }
-
-        // daily/annual
-
 
 
         function buildVarDropdown(frequency,currentVar) {
@@ -1634,10 +1417,6 @@
 
         })
 
-        //
-        // HEAT WAVE
-        //
-
         function create_map(map_var) {
 
 
@@ -1680,294 +1459,6 @@
             }
 
         }
-
-        function grid_click(map_var) {
-
-
-        }
-
-        // function heatwave_init() {
-        //
-        //
-        //     create_map('heatwave');
-        //
-        //     var highlight;
-        //
-        //     var clearHighlight = function () {
-        //         if (highlight) {
-        //             pbfLayer.resetFeatureStyle(highlight);
-        //         }
-        //         highlight = null;
-        //     };
-        //
-        //     var vectorTileOptions = {
-        //
-        //         rendererFactory: L.canvas.tile,
-        //
-        //         attribution: '',
-        //         interactive: true,
-        //         getFeatureId: function (f) {
-        //             return f.properties.gid;
-        //         },
-        //
-        //         maxNativeZoom: 12,
-        //         vectorTileLayerStyles: {
-        //             'canadagrid': function (properties, zoom) {
-        //                 return {
-        //                     weight: 0.1,
-        //                     color: gridline_color,
-        //                     opacity: 1,
-        //                     fill: true,
-        //                     radius: 4,
-        //                     fillOpacity: 0
-        //                 }
-        //             }
-        //         },
-        //         maxZoom: 12,
-        //         minZoom: 7,
-        //         pane: 'grid',
-        //     };
-        //
-        //     var pbfURL = hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf";
-        //
-        //     var pbfLayer = L.vectorGrid.protobuf(pbfURL, vectorTileOptions).on('click', function (e) {
-        //
-        //         clearHighlight();
-        //
-        //         highlight = e.layer.properties.gid;
-        //
-        //         pbfLayer.setFeatureStyle(highlight, {
-        //             weight: 1,
-        //             color: gridline_color_active,
-        //             opacity: 1,
-        //             fill: true,
-        //             radius: 4,
-        //             fillOpacity: 0
-        //         });
-        //
-        //         var_value = $("#var").val();
-        //         mora_value = $("#mora").val();
-        //
-        //         $('#heatwave-lat').val(e.latlng.lat);
-        //         $('#heatwave-lon').val(e.latlng.lng);
-        //
-        //         var ajax_url = base_href.replace('fr/', '');
-        //
-        //         $.ajax({
-        //             url: ajax_url + '/site/assets/themes/climate-data-ca/resources/ajax/get-place-by-coords.php',
-        //             dataType: 'json',
-        //             data: {
-        //                 lat: e.latlng.lat,
-        //                 lon: e.latlng.lng
-        //             },
-        //             success: function (data) {
-        //
-        //                 if (data.hasOwnProperty('geo_name')) {
-        //
-        //                     $('#heat-wave-location').parent().find('.select2-selection__rendered').text(data['geo_name'] + ', ' + data['province']);
-        //
-        //                 }
-        //             }
-        //         });
-        //
-        //         L.DomEvent.stop(e);
-        //
-        //         check_heat_form();
-        //
-        //     }).addTo(maps['heatwave']);
-        //
-        // }
-        //
-        // // FORM VALIDATION
-        //
-        // function check_heat_form() {
-        //
-        //     var heat_wave_valid = true;
-        //     var heat_wave_email_valid = false;
-        //
-        //
-        //     if ($('#heatwave-captcha_code').val() == '') {
-        //         heat_wave_valid = false;
-        //     }
-        //
-        //     if ($('#heatwave-lat').val() == '' || $('#heatwave-lon').val() == 0) {
-        //         heat_wave_valid = false;
-        //     }
-        //
-        //     if ($('#heat-wave-days').val() == '' || $('#heat-wave-days').val() == 0 || $('#heat-wave-days').val() == '0') {
-        //         heat_wave_valid = false;
-        //     }
-        //
-        //     if ($('#heat-wave-min').val() == '' || $('#heat-wave-max').val() == '') {
-        //         heat_wave_valid = false;
-        //     }
-        //
-        //     if (parseInt($('#heat-wave-min').val()) >= parseInt($('#heat-wave-max').val())) {
-        //         heat_wave_valid = false;
-        //     }
-        //
-        //     var email_val = $('#heat-wave-email').val();
-        //
-        //
-        //     if ($('body').validate_email(email_val) == true) {
-        //         heat_wave_email_valid = true;
-        //     }
-        //
-        //     if (heat_wave_valid == true && heat_wave_email_valid == true) {
-        //         $('#heat-wave-process').removeClass('disabled');
-        //     } else {
-        //         $('#heat-wave-process').addClass('disabled');
-        //     }
-        //
-        // }
-        //
-        // $('#heat-wave-form .heat-wave-control').on('change', function (e) {
-        //
-        //     var input_val = $(this).val();
-        //     var cleaned_val = parseInt(input_val.replace(/\D/g, ''));
-        //
-        //     if (isNaN(cleaned_val)) {
-        //         cleaned_val = 0;
-        //     }
-        //
-        //
-        //     $(this).val(cleaned_val);
-        //
-        //     if ($(this).attr('id') == 'heat-wave-min') {
-        //
-        //         // if changing the min value
-        //
-        //         // current max value
-        //         current_max = parseInt($('#heat-wave-max').val());
-        //
-        //         // if max is not set or is less than the input value
-        //         if (isNaN(current_max) || current_max == '' || current_max <= cleaned_val) {
-        //
-        //             // max = input value + 1
-        //             $('#heat-wave-max').val(cleaned_val + 1);
-        //
-        //         }
-        //
-        //     } else if ($(this).attr('id') == 'heat-wave-max') {
-        //
-        //         // if changing the max value
-        //
-        //         // current min value
-        //         current_min = parseInt($('#heat-wave-min').val());
-        //
-        //         // if min is not set or is more than the input value
-        //         if (isNaN(current_min) || current_min == '' || current_min >= cleaned_val) {
-        //
-        //             // max = current min + 1
-        //             $('#heat-wave-max').val(current_min + 1);
-        //
-        //         }
-        //
-        //     }
-        //
-        //     check_heat_form();
-        //
-        // });
-        //
-        // $('#heatwave-captcha_code').on('input', function (e) {
-        //     check_heat_form();
-        // });
-        //
-        // $('#heat-wave-email').on('input', function (e) {
-        //     check_heat_form();
-        // });
-        //
-        // $('#heat-wave-form').submit(function (e) {
-        //     e.preventDefault();
-        // });
-        //
-        // $('#heat-wave-process').click(function (e) {
-        //
-        //     e.preventDefault();
-        //
-        //     var form_data = $('#heat-wave-form').serialize();
-        //
-        //     $.ajax({
-        //         url: child_theme_dir + 'resources/ajax/download-form.php',
-        //         data: form_data,
-        //         success: function (data) {
-        //
-        //             if (data == 'success') {
-        //
-        //                 $('#heatwave-captcha_code').removeClass('border-secondary').tooltip('dispose');
-        //
-        //                 var request = $.ajax({
-        //                     url: 'https://pavics.climatedata.ca/providers/finch/processes/BCCAQv2_heat_wave_frequency_gridpoint/jobs',
-        //                     method: 'POST',
-        //                     crossDomain: true,
-        //                     headers: {
-        //                         'Content-Type': 'application/json'
-        //                     },
-        //                     data: JSON.stringify({
-        //                         "inputs": [
-        //                             {
-        //                                 "id": "lat",
-        //                                 "data": $('#heatwave-lat').val()
-        //                             },
-        //                             {
-        //                                 "id": "lon",
-        //                                 "data": $('#heatwave-lon').val()
-        //                             },
-        //                             {
-        //                                 "id": "freq",
-        //                                 "data": "YS"
-        //                             },
-        //                             {
-        //                                 "id": "thresh_tasmin",
-        //                                 "data": parseInt($('#heat-wave-min').val()) + ' degC'
-        //                             },
-        //                             {
-        //                                 "id": "thresh_tasmax",
-        //                                 "data": parseInt($('#heat-wave-max').val()) + ' degC'
-        //                             },
-        //                             {
-        //                                 "id": "window",
-        //                                 "data": String($('#heat-wave-days').val())
-        //                             },
-        //                             {
-        //                                 "id": "output_format",
-        //                                 "data": $('input[name="heatwave-download-format"]:checked').val()
-        //                             },
-        //                         ],
-        //                         "response": "document",
-        //                         "notification_email": $('#heat-wave-email').val(),
-        //                         "mode": "auto",
-        //                         "outputs": [{
-        //                             "transmissionMode": "reference",
-        //                             "id": "output"
-        //                         }]
-        //                     }),
-        //                     success: function (data) {
-        //
-        //
-        //                         if (data.status == 'accepted') {
-        //
-        //                             $('#success-modal').modal('show');
-        //
-        //                         }
-        //
-        //                     }
-        //                 });
-        //
-        //                 request.fail(function (a, b) {
-        //
-        //                 });
-        //
-        //             } else if (data == 'captcha failed') {
-        //
-        //                 $('#heatwave-captcha_code').addClass('border-secondary').tooltip('show');
-        //
-        //             }
-        //
-        //         }
-        //     });
-        //
-        // });
 
         // run default builder on load
         $('#download-dataset').val('annual').trigger('select2:select');

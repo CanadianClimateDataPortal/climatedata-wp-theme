@@ -2511,7 +2511,6 @@
 
         $('#decade').change(function (e) {
             //console.log('decade changed');
-            generateLeftLegend();
             changeLayers();
         });
 

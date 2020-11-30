@@ -1,28 +1,38 @@
+test
+
 <form id="download-form" class="needs-validation" novalidate>
     <div class="form-layout-row row align-items-center">
         <p class="form-label-wrap col-10 col-sm-3 offset-1 mb-3 mb-sm-0">
-            <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">1</span> <label for="download-dataset" class="form-label"><?php _e('Select a dataset', 'cdc'); ?></label>
+            <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">1</span>
+            <label for="download-dataset" class="form-label"><?php _e('Select a frequency', 'cdc'); ?></label>
         </p>
 
         <div class="form-select col-10 offset-1 col-sm-4 offset-sm-0 mb-3 mb-sm-0">
             <select class="custom-select custom-select-md select2 form-control input-large" name="download-dataset" id="download-dataset" data-container-css-class="big-menu btn btn-lg btn-outline-primary rounded-pill" data-dropdown-css-class="big-menu-dropdown">
-                <option value="annual" selected><?php _e('BCCAQv2 (annual)', 'cdc'); ?></option>
+                <option value="annual" data-timestep="annual" selected><?php _e('Annual', 'cdc'); ?></option>
 
-                <option value="daily"><?php _e('BCCAQv2 (daily)', 'cdc'); ?></option>
+                <option value="daily" data-timestep="daily"><?php _e('Daily', 'cdc'); ?></option>
+                <option value="2qsapr" data-timestep="2qsapr"><?php _e('April to September', 'cdc'); ?></option>
 
                 <optgroup label="<?php _e('Monthly', 'cdc'); ?>">
-                    <option value="jan"><?php _e('January', 'cdc'); ?></option>
-                    <option value="feb"><?php _e('February', 'cdc'); ?></option>
-                    <option value="mar"><?php _e('March', 'cdc'); ?></option>
-                    <option value="apr"><?php _e('April', 'cdc'); ?></option>
-                    <option value="may"><?php _e('May', 'cdc'); ?></option>
-                    <option value="jun"><?php _e('June', 'cdc'); ?></option>
-                    <option value="jul"><?php _e('July', 'cdc'); ?></option>
-                    <option value="aug"><?php _e('August', 'cdc'); ?></option>
-                    <option value="sep"><?php _e('September', 'cdc'); ?></option>
-                    <option value="oct"><?php _e('October', 'cdc'); ?></option>
-                    <option value="nov"><?php _e('November', 'cdc'); ?></option>
-                    <option value="dec"><?php _e('December', 'cdc'); ?></option>
+                    <option value="jan" data-timestep="monthly"><?php _e('January', 'cdc'); ?></option>
+                    <option value="feb" data-timestep="monthly"><?php _e('February', 'cdc'); ?></option>
+                    <option value="mar" data-timestep="monthly"><?php _e('March', 'cdc'); ?></option>
+                    <option value="apr" data-timestep="monthly"><?php _e('April', 'cdc'); ?></option>
+                    <option value="may" data-timestep="monthly"><?php _e('May', 'cdc'); ?></option>
+                    <option value="jun" data-timestep="monthly"><?php _e('June', 'cdc'); ?></option>
+                    <option value="jul" data-timestep="monthly"><?php _e('July', 'cdc'); ?></option>
+                    <option value="aug" data-timestep="monthly"><?php _e('August', 'cdc'); ?></option>
+                    <option value="sep" data-timestep="monthly"><?php _e('September', 'cdc'); ?></option>
+                    <option value="oct" data-timestep="monthly"><?php _e('October', 'cdc'); ?></option>
+                    <option value="nov" data-timestep="monthly"><?php _e('November', 'cdc'); ?></option>
+                    <option value="dec" data-timestep="monthly"><?php _e('December', 'cdc'); ?></option>
+                </optgroup>
+                <optgroup label="<?php _e('Seasonal', 'cdc'); ?>">
+                    <option value="spring" data-timestep="qsdec"><?php _e('Spring', 'cdc'); ?></option>
+                    <option value="summer" data-timestep="qsdec"><?php _e('Summer', 'cdc'); ?></option>
+                    <option value="fall" data-timestep="qsdec"><?php _e('Fall', 'cdc'); ?></option>
+                    <option value="winter" data-timestep="qsdec"><?php _e('Winter', 'cdc'); ?></option>
                 </optgroup>
             </select>
         </div>
@@ -121,16 +131,16 @@
             </div>
 
             <div id="download-map-variable" class="download-map"></div>
-<!--
-            <div style="position:absolute;right:0;width:200px;z-index:1000">
-                <select id="gridselect" class="custom-select custom-select-md select2 form-control input-large select2-hidden-accessible">
-                    <option>Gridded Data</option>
-                    <option>Census subdivisions</option>
-                    <option>Health</option>
-                    <option>Watershed</option>
-                </select>
-            </div>
--->            
+            <!--
+                        <div style="position:absolute;right:0;width:200px;z-index:1000">
+                            <select id="gridselect" class="custom-select custom-select-md select2 form-control input-large select2-hidden-accessible">
+                                <option>Gridded Data</option>
+                                <option>Census subdivisions</option>
+                                <option>Health</option>
+                                <option>Watershed</option>
+                            </select>
+                        </div>
+            -->
         </div>
     </div>
 

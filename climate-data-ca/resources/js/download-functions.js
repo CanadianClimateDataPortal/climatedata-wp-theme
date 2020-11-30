@@ -228,9 +228,9 @@
                 }
                 highlightGridFeature = null;
             };
-
-
+            console.log('adding canadagrid default');
             addGrid('canadagrid');
+
 
             $('#var-download .select2').on('select2:select', function (e) {
                 checkform()
@@ -254,8 +254,8 @@
                     vectorTileLayerStyles: {
                         'slrgrid': function (properties, zoom) {
                             return {
-                                weight: 0.1,
-                                color: '#0000FF',
+                                weight: 0.2,
+                                color: '#89cff0',
                                 opacity: 1,
                                 fill: true,
                                 radius: 4,
@@ -267,7 +267,7 @@
                     minZoom: 7,
                     pane: 'grid',
                 };
-            } else {
+            } else if (gridName === 'canadagrid') {
                 var vectorTileOptions = {
                     rendererFactory: L.canvas.tile,
                     attribution: '',
@@ -292,6 +292,31 @@
                     minZoom: 7,
                     pane: 'grid',
                 };
+            } else {
+                var vectorTileOptions = {
+                    rendererFactory: L.canvas.tile,
+                    attribution: '',
+                    interactive: true,
+                    getFeatureId: function (f) {
+                        return f.properties.gid;
+                    },
+                    maxNativeZoom: 12,
+                    vectorTileLayerStyles: {
+                        'canadagrid1deg': function (properties, zoom) {
+                            return {
+                                weight: 0.1,
+                                color: gridline_color,
+                                opacity: 1,
+                                fill: true,
+                                radius: 4,
+                                fillOpacity: 0
+                            }
+                        }
+                    },
+                    maxZoom: 12,
+                    minZoom: 7,
+                    pane: 'grid',
+                };
             }
 
             var pbfURL = hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + gridName + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf";
@@ -300,7 +325,7 @@
 
 
 
-            var pbfLayer = L.vectorGrid.protobuf(pbfURL, vectorTileOptions).on('click', function (e) {
+            pbfLayer = L.vectorGrid.protobuf(pbfURL, vectorTileOptions).on('click', function (e) {
 
                 highlightGridFeature = e.layer.properties.gid;
 
@@ -481,7 +506,7 @@
 
                     $.ajax({
                         method: 'GET',
-                        url: 'https://data.climatedata.ca/get_values.php?lat=' + this_grid[0] + '&lon=' + this_grid[1] + '&var=' + selected_var + '&month=' + month,
+                        url: data_url + '/get_values.php?lat=' + this_grid[0] + '&lon=' + this_grid[1] + '&var=' + selected_var + '&month=' + month,
                         dataType: 'json',
                         success: function (data) {
 
@@ -679,69 +704,154 @@
 
         // daily/annual
 
-        $('#download-dataset').on('select2:select', function (e) {
 
-            $('#download-variable').empty();
 
-            if (e.currentTarget.value === 'daily') {
+        function buildVarDropdown(frequency,currentVar) {
+            $.ajax({
+                url: '/wp-json/acf/v3/variable/?per_page=10000&orderby=menu_order&order=asc',
+                dataType: 'json',
+                success: function (data) {
 
-                // swap fields for daily downloads
+                    varData = [];
 
-                // options
+                    currentOptGroup = '';
+                    $.each(data, function (k, v) {
+                        $.each(v, function (sk, sv) {
+                            selectedVar = sv.var_name === currentVar;
 
-                for (var var_index in daily_vars) {
-                    $('<option value="' + daily_vars[var_index]['value'] + '">' + daily_vars[var_index]['text'] + '</option>').appendTo('#download-variable');
-                }
+                            // if (!rawsectorSelected) {
+                            //     sectorSelected = 'gridded_data';
+                            // }
 
-                // refresh captcha
+                            varData[sv.var_name] = sv;
 
-                $('#daily-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php');
+                            selectedTimeStepCategory = $('#download-dataset').find(':selected').data('timestep');
 
-                // netCDF option
 
-                $('#format-label-netcdf').show();
-                $('#format-label-json').hide();
+                            if ($.inArray(selectedTimeStepCategory, sv.timestep) !== -1) {
 
-                // email field
+                                if (sv.variable_type != 'station_data') {
 
-                $('#annual-process-wrap').hide();
-                $('#daily-process-wrap').show();
+                                    if (sv.var_name) {
+                                        if (currentOptGroup !== sv.variable_type) {
 
-            } else {
+                                            if (sv.variable_type === 'station_data') {
+                                                optgroupSlug = 'station-data';
+                                            } else if (sv.variable_type === 'other_variables') {
+                                                optgroupSlug = 'other';
+                                            } else if (sv.variable_type === 'precipitation') {
+                                                optgroupSlug = 'precipitation';
+                                            } else if (sv.variable_type === 'temperature') {
+                                                optgroupSlug = 'temperature';
+                                            }
 
-                // swap fields for annual downloads
+                                            $('#download-variable').append("<optgroup id=optgroup_" + sv.variable_type + " label='" + l10n_labels[sv.variable_type] + "' data-slug='" + optgroupSlug + "'>");
+                                            currentOptGroup = sv.variable_type;
+                                        }
 
-                // options
 
-                for (var group_index in all_vars) {
+                                        varnewOption = new Option(sv.var_title, sv.var_name, false, selectedVar);
+                                        $('#optgroup_' + sv.variable_type).append(varnewOption);
+                                    }
+                                }
 
-                    var optgroup = $('<optgroup label="' + all_vars[group_index]['label'] + '">').appendTo('#download-variable');
+                            }
 
-                    for (var var_index in all_vars[group_index]['options']) {
-                        $('<option value="' + all_vars[group_index]['options'][var_index]['value'] + '">' + all_vars[group_index]['options'][var_index]['text'] + '</option>').appendTo(optgroup);
+
+
+                        });
+                    });
+
+
+                },
+                error: function () {
+
+                },
+                complete: function () {
+
+
+
+                    if ($("#download-variable option[value='" + currentVar + "']").length > 0) {
+                        $('#download-variable').val(currentVar);
+                        $('#download-variable').trigger('change');
+                        $('#download-variable').val(currentVar).trigger('select2:select');
+                    } else {
+                        $('#download-variable option:eq(0)').prop('selected',true);
+
+                        $('#download-variable').trigger('change');
+                        currentVar = $('#download-variable').val();
+                        $('#download-variable').val(currentVar).trigger('select2:select');
                     }
 
                 }
+            })
+        }
 
-                // json option
 
-                $('#format-label-netcdf').hide();
-                $('#format-label-json').show();
+        $('#download-dataset').on('select2:select', function (e) {
 
-                // email field
-
-                $('#annual-process-wrap').show();
-                $('#daily-process-wrap').hide();
-
-            }
-            1
-            $('#format-btn-group label').removeClass('active');
-            $('#format-btn-group input').prop('checked', false);
-
-            $('#format-label-csv').addClass('active');
-            $('#format-label-csv input').prop('checked', true);
-
-            $('#download-variable').select2();
+            console.log('frequency changed');
+            currentVar = $("#download-variable").val();
+            $('#download-variable').empty();
+            buildVarDropdown(e.currentTarget.value,currentVar);
+            // if (e.currentTarget.value === 'daily') {
+            //
+            //     // swap fields for daily downloads
+            //
+            //     // options
+            //
+            //     for (var var_index in daily_vars) {
+            //         $('<option value="' + daily_vars[var_index]['value'] + '">' + daily_vars[var_index]['text'] + '</option>').appendTo('#download-variable');
+            //     }
+            //
+            //     // refresh captcha
+            //
+            //     $('#daily-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php');
+            //
+            //     // netCDF option
+            //
+            //     $('#format-label-netcdf').show();
+            //     $('#format-label-json').hide();
+            //
+            //     // email field
+            //
+            //     $('#annual-process-wrap').hide();
+            //     $('#daily-process-wrap').show();
+            //
+            // } else {
+            //
+            //     // swap fields for annual downloads
+            //
+            //     // options
+            //
+            //     for (var group_index in all_vars) {
+            //
+            //         var optgroup = $('<optgroup label="' + all_vars[group_index]['label'] + '">').appendTo('#download-variable');
+            //
+            //         for (var var_index in all_vars[group_index]['options']) {
+            //             $('<option value="' + all_vars[group_index]['options'][var_index]['value'] + '">' + all_vars[group_index]['options'][var_index]['text'] + '</option>').appendTo(optgroup);
+            //         }
+            //
+            //     }
+            //
+            //     // json option
+            //
+            //     $('#format-label-netcdf').hide();
+            //     $('#format-label-json').show();
+            //
+            //     // email field
+            //
+            //     $('#annual-process-wrap').show();
+            //     $('#daily-process-wrap').hide();
+            //
+            // }
+            //
+            // $('#format-btn-group label').removeClass('active');
+            // $('#format-btn-group input').prop('checked', false);
+            //
+            // $('#format-label-csv').addClass('active');
+            // $('#format-label-csv input').prop('checked', true);
+            //
 
         });
 
@@ -757,28 +867,30 @@
 
         $('#download-variable').on('select2:select', function (e) {
 
-            if (e.target.value === 'slr') {
-                gridName = 'slrgrid';
-            } else {
+            console.log('download variable chosen');
 
-                gridName = 'canadagrid';
+            curValData = varData[e.target.value];
+
+            if (curValData === undefined) {
+                $('#download-variable').val(1).trigger('change.select2');
             }
 
-            maps['variable'].eachLayer( function(layer) {
-                if ( layer.myTag  &&  layer.myTag === 'gridlayer') {
-                    if (layer.gridType !== gridName){
-                        maps['variable'].removeLayer(layer);
-                        addGrid(gridName);
+            // maps['variable'].eachLayer( function(layer) {
+            //     if ( layer.myTag  &&  layer.myTag === 'gridlayer') {
+            if (pbfLayer.gridType !== curValData.grid){
+                maps['variable'].removeLayer(pbfLayer);
+                console.log("Adding Grid:" + curValData.grid);
+                addGrid(curValData.grid);
 
-                        selectedGrids = [];
-                        $('#download-coords').val('');
-                        $('#download-location').val('');
-                        $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
+                selectedGrids = [];
+                $('#download-coords').val('');
+                $('#download-location').val('');
+                $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
 
 
-                    }
-                }
-            });
+            }
+            //     }
+            // });
 
 
 
@@ -1857,7 +1969,8 @@
         //
         // });
 
-
+        // run default builder on load
+        $('#download-dataset').val('annual').trigger('select2:select');
 
     });
 })(jQuery);

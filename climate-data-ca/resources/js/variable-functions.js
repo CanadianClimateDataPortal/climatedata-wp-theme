@@ -55,7 +55,7 @@
         }
 
         if ($('#decade').length) {
-            query['decade'] = $('#decade').val();
+            query['decade'] = $('#range-slider-container').attr('data-default') + 's';
         } else {
             query['decade'] = '1971-2000';
         }

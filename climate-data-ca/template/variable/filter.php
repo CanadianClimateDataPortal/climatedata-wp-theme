@@ -71,24 +71,28 @@ if (get_the_ID() == filtered_ID_by_path('explore/variable')) {
 
                             ?>
 
-                            <div id="var-filter-sector" class="filter-block col-2">
-                                <select class="custom-select custom-select-lg select2 form-control" name="sector" id="sector">
-                                    <option value="" <?php echo ($filters['sector']['val'] == '') ? 'selected' : ''; ?>><?php echo (get_sub_field('label') != '') ? get_sub_field('label') : 'None'; ?></option>
+<!--                            <div id="var-filter-sector" class="filter-block col-2">-->
+<!--                                <select class="custom-select custom-select-lg select2 form-control" name="sector" id="sector">-->
+<!--                                    <option value="" -->
+                            <?php //echo ($filters['sector']['val'] == '') ? 'selected' : ''; ?>
+
+                            <?php //echo (get_sub_field('label') != '') ? get_sub_field('label') : 'None'; ?>
+<!--                            </option>-->
                                     <?php
 
-                                    foreach ($sector_pages as $map_page) {
+//                                    foreach ($sector_pages as $map_page) {
 
                                         ?>
 
-                                        <option value="<?php echo $map_page->slug; ?>" <?php echo ($map_page->slug == $filters['sector']['val']) ? 'selected' : ''; ?>><?php echo get_the_title($map_page->post_parent); ?></option>
+<!--                                        <option value="<?php //echo $map_page->slug; ?>" <?php //echo ($map_page->slug == $filters['sector']['val']) ? 'selected' : ''; ?><?php //echo get_the_title($map_page->post_parent); ?></option>-->
 
                                         <?php
 
-                                    }
+//                                    }
 
                                     ?>
-                                </select>
-                            </div>
+<!--                                </select>-->
+<!--                            </div>-->
 
                             <?php
 
@@ -220,7 +224,16 @@ if (get_the_ID() == filtered_ID_by_path('explore/variable')) {
 
                         $filters['rcp']['hidden'] = false;
 
-                        $scenarios = array(array('value' => 'rcp26', 'label' => 'RCP 2.6', 'compare' => false), array('value' => 'rcp26vs45', 'label' => 'RCP 2.6 vs RCP 4.5', 'compare' => true), array('value' => 'rcp26vs85', 'label' => 'RCP 2.6 vs RCP 8.5', 'compare' => true), array('value' => 'rcp45', 'label' => 'RCP 4.5', 'compare' => false), array('value' => 'rcp45vs26', 'label' => 'RCP 4.5 vs RCP 2.6', 'compare' => true), array('value' => 'rcp45vs85', 'label' => 'RCP 4.5 vs RCP 8.5', 'compare' => true), array('value' => 'rcp85', 'label' => 'RCP 8.5', 'compare' => false), array('value' => 'rcp85vs26', 'label' => 'RCP 8.5 vs RCP 2.6', 'compare' => true), array('value' => 'rcp85vs45', 'label' => 'RCP 8.5 vs RCP 4.5', 'compare' => true));
+                        $scenarios = array(
+                            array('value' => 'rcp26', 'label' => 'RCP 2.6', 'compare' => false),
+                            array('value' => 'rcp26vs45', 'label' => 'RCP 2.6 vs RCP 4.5', 'compare' => true),
+                            array('value' => 'rcp26vs85', 'label' => 'RCP 2.6 vs RCP 8.5', 'compare' => true),
+                            array('value' => 'rcp45', 'label' => 'RCP 4.5', 'compare' => false),
+                            array('value' => 'rcp45vs26', 'label' => 'RCP 4.5 vs RCP 2.6', 'compare' => true),
+                            array('value' => 'rcp45vs85', 'label' => 'RCP 4.5 vs RCP 8.5', 'compare' => true),
+                            array('value' => 'rcp85', 'label' => 'RCP 8.5', 'compare' => false),
+                            array('value' => 'rcp85vs26', 'label' => 'RCP 8.5 vs RCP 2.6', 'compare' => true),
+                            array('value' => 'rcp85vs45', 'label' => 'RCP 8.5 vs RCP 4.5', 'compare' => true));
 
                         ?>
 
@@ -335,3 +348,10 @@ if (get_the_ID() == filtered_ID_by_path('explore/variable')) {
 
     </div>
 </nav>
+
+<select class="custom-select" id="sector" name="sector" style="width:200px;margin:10px;font-size:2em;height:45px">
+    <option value="" selected>gridded_data</option>
+    <option value="census">census</option>
+    <option value="health">health</option>
+    <option value="watershed">watershed</option>
+</select>

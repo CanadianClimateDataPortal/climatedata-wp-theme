@@ -319,46 +319,48 @@ if (have_posts()) : while (have_posts()) : the_post();
 
                 <h2 class="overlay-title text-primary"><?php echo $location_name; ?></h2>
 
-                <div class="navbar chart-navbar d-flex">
-                    <div class="nav-item">
-                        &nbsp;
-                    </div>
-
-                    <div class="nav-item d-flex align-items-center">
-                        <h6><span class="cdc-icon icon-download-data"></span> <?php _e('Download data', 'cdc'); ?></h6>
-
-                        <div class="btn-group btn-group-sm" role="group">
-                            <a href="#" class="chart-export-data btn btn-sm btn-outline-secondary" data-type="csv">CSV</a>
-                        </div>
-                    </div>
-
-                    <div class="nav-item d-flex align-items-center">
-                        <h6><span class="cdc-icon icon-download-img"></span> <?php _e('Download image', 'cdc'); ?></h6>
-
-                        <div class="btn-group btn-group-sm" role="group">
-                            <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary " data-type="png">PNG</a> <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary" data-type="pdf">PDF</a>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="overlay-content-row">
                     <div class="overlay-content-chart">
-                        <div id="chart-placeholder"></div>
+                        <div class="navbar chart-navbar d-flex">
+                            <div class="nav-item d-flex align-items-center mr-5">
+                                <a href="#" class="btn btn-sm btn-outline-secondary page-tour-trigger" data-tour="chart-tour"><span class="fas fa-question icon rounded-circle icon mr-3"></span><?php _e('How to read this', 'cdc'); ?></a>
+                            </div>
+
+                            <div class="nav-item d-flex align-items-center mr-5">
+                                <h6><span class="cdc-icon icon-download-data"></span> <?php _e('Download data', 'cdc'); ?></h6>
+
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="#" class="chart-export-data btn btn-sm btn-outline-secondary" data-type="csv">CSV</a>
+                                </div>
+                            </div>
+
+                            <div class="nav-item d-flex align-items-center">
+                                <h6><span class="cdc-icon icon-download-img"></span> <?php _e('Download image', 'cdc'); ?></h6>
+
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary " data-type="png">PNG</a> <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary" data-type="pdf">PDF</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="chart-placeholder" class="var-chart"></div>
                     </div>
                 </div>
-            </div>
 
-            <?php
+                <div class="page-tour" id="chart-tour" data-steps='<?php echo $chart_tour; ?>'></div>
 
-            $units = get_field('units');
+                <?php
 
-            ?>
+                $units = get_field('units');
+
+                ?>
 
             <div id="callback-data"><?php
 
                 echo json_encode(array('title' => get_field('var_title'), 'units' => array('label' => __($units['label'], 'cdc'), 'value' => __($units['value'], 'cdc')), 'decimals' => get_field('decimals')));
 
                 ?></div>
+            </div>
         </div>
 
         <?php

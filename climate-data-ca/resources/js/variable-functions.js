@@ -628,7 +628,6 @@
 
         function loadClimateNormals() {
 
-
             $.getJSON('https://geo.weather.gc.ca/geomet/features/collections/climate-stations/items?f=json&limit=10000', function (data) {
 
                 station_layer = L.geoJson(data, {
@@ -667,7 +666,10 @@
 
                 });
 
-                if (query['var'] == 'weather-stations') {
+
+            }).done(function() {
+                if (query['var'] === 'weather-stations') {
+                    console.log("add weather stations layer on getjson done");
                     station_layer.addTo(map1);
                 }
             });
@@ -899,6 +901,7 @@
 
             choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency + '/?period=' + year;
 
+
             $.getJSON(choroPath).then(function (data) {
 
                 choroValues = data;
@@ -1015,13 +1018,238 @@
         // CHART STUFF
         //
         //
+        function disPlayChartData(data, varDetails) {        
+            chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
+            chartDecimals = varDetails['decimals'];
+            switch (varDetails.units.value) {
+                case 'doy':
+                    formatter = function () {return new Date(1546300800000+1000*60*60*24*this.value).toLocaleDateString(current_lang, { month:'long', day:'numeric'})};
+                    pointFormatter = function (format) { 
+                    if (this.series.type == 'line') {
+                        return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name+ ': <b>'
+                            + new Date(1546300800000+1000*60*60*24*this.y).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
+                            + '</b><br/>';
+                    } else {                                    
+                        return '<span style="color:' + this.series.color + '">●</span>' + this.series.name + ': <b>' 
+                            + new Date(1546300800000+1000*60*60*24*this.low).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
+                            + '</b> - <b>' 
+                            + new Date(1546300800000+1000*60*60*24*this.high).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
+                            + '</b><br/>';
+                    }};
+                    break;
+                default:
+                    formatter = function () {return this.axis.defaultLabelFormatter.call(this) + chartUnit;};
+                    pointFormatter = undefined;
+            }       
+            
+            chartSeries = [];
+            if (data['observations'].length > 0) 
+                chartSeries.push({
+                        name: chart_labels.observation,
+                        data: data['observations'],
+                        zIndex: 1,
+                        showInNavigator: true,
+                        color: '#F47D23',
+                        visible: false,
+                        marker: {
+                            fillColor: '#F47D23',
+                            lineWidth: 0,
+                            radius: 0,
+                            lineColor: '#F47D23'
+                }});
+            if (data['modeled_historical_median'].length > 0)                                     
+                chartSeries.push({
+                    name: chart_labels.historical,
+                        data: data['modeled_historical_median'],
+                        zIndex: 1,
+                        showInNavigator: true,
+                        color: '#000000',
+                        marker: {
+                            fillColor: '#000000',
+                            lineWidth: 0,
+                            radius: 0,
+                            lineColor: '#000000'
+                }});
+            if (data['modeled_historical_range'].length > 0)                                     
+                chartSeries.push({
+                        name: chart_labels.historical_range,
+                        data: data['modeled_historical_range'],
+                        type: 'arearange',
+                        lineWidth: 0,
+                        linkedTo: ':previous',
+                        color: '#000000',
+                        fillOpacity: 0.2,
+                        zIndex: 0,
+                        marker: {
+                            radius: 0,
+                            enabled: false
+                }});
+            if (data['rcp26_median'].length > 0)                                     
+                chartSeries.push({
+                        name: chart_labels.rcp_26_median,
+                        data: data['rcp26_median'],
+                        zIndex: 1,
+                        showInNavigator: true,
+                        color: '#00F',
+                        marker: {
+                            fillColor: '#00F',
+                            lineWidth: 0,
+                            radius: 0,
+                            lineColor: '#00F'
+                }});
+            if (data['rcp26_range'].length > 0)                                     
+                chartSeries.push({
+                        name: chart_labels.rcp_26_range,
+                        data: data['rcp26_range'],
+                        type: 'arearange',
+                        lineWidth: 0,
+                        linkedTo: ':previous',
+                        color: '#00F',
+                        fillOpacity: 0.2,
+                        zIndex: 0,
+                        marker: {
+                            radius: 0,
+                            enabled: false
+                }});
+            if (data['rcp45_median'].length > 0)                                     
+                chartSeries.push({
+                        name: chart_labels.rcp_45_median,
+                        data: data['rcp45_median'],
+                        zIndex: 1,
+                        showInNavigator: true,
+                        color: '#00640c',
+                        marker: {
+                            fillColor: '#00640c',
+                            lineWidth: 0,
+                            radius: 0,
+                            lineColor: '#00640c'
+                }});
+            if (data['rcp45_range'].length > 0)                                     
+                chartSeries.push({
+                        name: chart_labels.rcp_45_range,
+                        data: data['rcp45_range'],
+                        type: 'arearange',
+                        lineWidth: 0,
+                        linkedTo: ':previous',
+                        color: '#00640c',
+                        fillOpacity: 0.2,
+                        zIndex: 0,
+                        marker: {
+                            radius: 0,
+                            enabled: false
+                }});
+            if (data['rcp85_median'].length > 0)                                     
+                chartSeries.push({
+                        name: chart_labels.rcp_85_median,
+                        data: data['rcp85_median'],
+                        zIndex: 1,
+                        showInNavigator: true,
+                        color: '#F00',
+                        marker: {
+                            fillColor: '#F00',
+                            lineWidth: 0,
+                            radius: 0,
+                            lineColor: '#F00'
+                }});
+            if (data['rcp85_range'].length > 0)                                     
+                chartSeries.push({
+                        name: chart_labels.rcp_85_range,
+                        data: data['rcp85_range'],
+                        type: 'arearange',
+                        lineWidth: 0,
+                        linkedTo: ':previous',
+                        color: '#F00',
+                        fillOpacity: 0.2,
+                        zIndex: 0,
+                        marker: {
+                            radius: 0,
+                            enabled: false
+                }});
+           
+
+            var chart = Highcharts.stockChart('chart-placeholder', {
+
+                title: {
+                    text: varDetails['title']
+                },
+                subtitle: {
+                    align: 'left',
+                    text: document.ontouchstart === undefined ?
+                        chart_labels.click_to_zoom : 'Pinch the chart to zoom in'
+                },
+
+                xAxis: {
+                    type: 'datetime'
+                },
+
+                yAxis: {
+                    title: {
+                        text: varDetails['title']
+                    },
+
+                    labels: {
+                        align: 'left',
+                        formatter: formatter
+                    }
+                },
+
+                legend: {
+                    enabled: true
+                },
+
+                tooltip: {
+                    pointFormatter: pointFormatter,
+                    valueDecimals: chartDecimals,
+                    valueSuffix: ' ' + chartUnit
+                },
+
+                navigation: {
+                    buttonOptions: {
+                        enabled: false
+                    }
+                },
+
+                series: chartSeries
+            });
+
+
+            $('.chart-export-data').click(function (e) {
+                e.preventDefault();
+
+                var dl_type = '';
+
+                switch ($(this).attr('data-type')) {
+                    case 'csv' :
+                        chart.downloadCSV();
+                        break;
+                }
+
+            });
+
+            $('.chart-export-img').click(function (e) {
+                e.preventDefault();
+
+                var dl_type = '';
+
+                switch ($(this).attr('data-type')) {
+                    case 'png' :
+                        dl_type = 'image/png';
+                        break;
+                    case 'pdf' :
+                        dl_type = 'application/pdf';
+                        break;
+                }
+
+                chart.exportChart({
+                    type: dl_type
+                });
+            });
+
+
+        }        
 
         // LAYER CHART
-
         function genChart(lat, lon, variable, month) {
-            timerStart = Date.now();
-
-
             $(document).overlay('show', {
                 href: base_href + 'variable/' + $('#var').val() + '/',
                 data: {
@@ -1037,212 +1265,39 @@
                     $.getJSON(
                         data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
                         function (data) {
+                            disPlayChartData(data,varDetails);
 
 
-                            chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
-                            chartDecimals = varDetails['decimals'];
+                        });
 
-                            var chart = Highcharts.stockChart('chart-placeholder', {
+                }
+            });
+        };
 
-                                title: {
-                                    text: varDetails['title']
-                                },
-                                subtitle: {
-                                    align: 'left',
-                                    text: document.ontouchstart === undefined ?
-                                        chart_labels.click_to_zoom : 'Pinch the chart to zoom in'
-                                },
+        // SECTOR CHART
+        function genSectorChart(id, variable, month, region_label) {
+            $(document).overlay('show', {
+                href: base_href + 'variable/' + variable + '/',
+                data: {
+                    sector: query['sector'],
+                    region: region_label
+                },
+                content: 'sector',
+                position: 'right',
+                callback: function (varDetails) {
+                    $('#rcp').prop('disabled', true);
+                    var valuePath = hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id + '/' + variable + '/' + month;
 
-                                xAxis: {
-                                    type: 'datetime'
-                                },
+                    $.getJSON(valuePath).then(function (data) {
+                        disPlayChartData(data,varDetails);
+                        });
 
-                                yAxis: {
-                                    title: {
-                                        text: varDetails['title']
-                                    },
-
-                                    labels: {
-                                        align: 'left',
-                                        formatter: function () {
-                                            return this.axis.defaultLabelFormatter.call(this) + chartUnit;
-                                        }
-                                    }
-                                },
-
-                                legend: {
-                                    enabled: true
-                                },
-
-                                tooltip: {
-                                    valueDecimals: chartDecimals,
-                                    valueSuffix: ' ' + chartUnit
-                                },
-
-                                navigation: {
-                                    buttonOptions: {
-                                        enabled: false
-                                    }
-                                },
-
-                                series: [{
-                                    name: chart_labels.observation,
-                                    data: data['observations'],
-                                    zIndex: 1,
-                                    showInNavigator: true,
-                                    color: '#F47D23',
-                                    visible: false,
-                                    marker: {
-                                        fillColor: '#F47D23',
-                                        lineWidth: 0,
-                                        radius: 0,
-                                        lineColor: '#F47D23'
-                                    }
-                                }, {
-                                    name: chart_labels.historical,
-                                    data: data['modeled_historical_median'],
-                                    zIndex: 1,
-                                    showInNavigator: true,
-                                    color: '#000000',
-                                    marker: {
-                                        fillColor: '#000000',
-                                        lineWidth: 0,
-                                        radius: 0,
-                                        lineColor: '#000000'
-                                    }
-                                }, {
-                                    name: chart_labels.historical_range,
-                                    data: data['modeled_historical_range'],
-                                    type: 'arearange',
-                                    lineWidth: 0,
-                                    linkedTo: ':previous',
-                                    color: '#000000',
-                                    fillOpacity: 0.2,
-                                    zIndex: 0,
-                                    marker: {
-                                        radius: 0,
-                                        enabled: false
-                                    },
-                                }, {
-                                    name: chart_labels.rcp_26_median,
-                                    data: data['rcp26_median'],
-                                    zIndex: 1,
-                                    showInNavigator: true,
-                                    color: '#00F',
-                                    marker: {
-                                        fillColor: '#00F',
-                                        lineWidth: 0,
-                                        radius: 0,
-                                        lineColor: '#00F'
-                                    }
-                                }, {
-                                    name: chart_labels.rcp_26_range,
-                                    data: data['rcp26_range'],
-                                    type: 'arearange',
-                                    lineWidth: 0,
-                                    linkedTo: ':previous',
-                                    color: '#00F',
-                                    fillOpacity: 0.2,
-                                    zIndex: 0,
-                                    marker: {
-                                        radius: 0,
-                                        enabled: false
-                                    },
-                                }, {
-                                    name: chart_labels.rcp_45_median,
-                                    data: data['rcp45_median'],
-                                    zIndex: 1,
-                                    showInNavigator: true,
-                                    color: '#00640c',
-                                    marker: {
-                                        fillColor: '#00640c',
-                                        lineWidth: 0,
-                                        radius: 0,
-                                        lineColor: '#00640c'
-                                    }
-                                }, {
-                                    name: chart_labels.rcp_45_range,
-                                    data: data['rcp45_range'],
-                                    type: 'arearange',
-                                    lineWidth: 0,
-                                    linkedTo: ':previous',
-                                    color: '#00640c',
-                                    fillOpacity: 0.2,
-                                    zIndex: 0,
-                                    marker: {
-                                        radius: 0,
-                                        enabled: false
-                                    }
-                                }, {
-                                    name: chart_labels.rcp_85_median,
-                                    data: data['rcp85_median'],
-                                    zIndex: 1,
-                                    showInNavigator: true,
-                                    color: '#F00',
-                                    marker: {
-                                        fillColor: '#F00',
-                                        lineWidth: 0,
-                                        radius: 0,
-                                        lineColor: '#F00'
-                                    }
-                                }, {
-                                    name: chart_labels.rcp_85_range,
-                                    data: data['rcp85_range'],
-                                    type: 'arearange',
-                                    lineWidth: 0,
-                                    linkedTo: ':previous',
-                                    color: '#F00',
-                                    fillOpacity: 0.2,
-                                    zIndex: 0,
-                                    marker: {
-                                        radius: 0,
-                                        enabled: false
-                                    }
-                                }]
-                            });
-
-
-                            $('.chart-export-data').click(function (e) {
-                                e.preventDefault();
-
-                                var dl_type = '';
-
-                                switch ($(this).attr('data-type')) {
-                                    case 'csv' :
-                                        chart.downloadCSV();
-                                        break;
-                                }
-
-                            });
-
-                            $('.chart-export-img').click(function (e) {
-                                e.preventDefault();
-
-                                var dl_type = '';
-
-                                switch ($(this).attr('data-type')) {
-                                    case 'png' :
-                                        dl_type = 'image/png';
-                                        break;
-                                    case 'pdf' :
-                                        dl_type = 'application/pdf';
-                                        break;
-                                }
-
-                                chart.exportChart({
-                                    type: dl_type
-                                });
-                            });
-
-
-                        }
-                    );
 
                 }
             });
 
+        };
 
-        }
 
         // STATION CHART
 
@@ -1454,263 +1509,6 @@
                             });
 
                         });
-
-
-                }
-            });
-
-        };
-
-        // SECTOR
-
-        function genSectorChart(id, variable, month, region_label) {
-
-            timerStart = Date.now();
-
-
-            $(document).overlay('show', {
-                href: base_href + 'variable/' + variable + '/',
-                data: {
-                    sector: query['sector'],
-                    region: region_label
-                },
-                content: 'sector',
-                position: 'right',
-                callback: function (varDetails) {
-
-                    var valuePath = hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id + '/' + variable + '/' + month;
-
-                    $.getJSON(valuePath).then(function (data) {
-
-                        chartDecimals = varDetails['decimals'];
-                        chartUnit = (varDetails['units']['value'] === 'kelvin') ? "°C" : varDetails['units']['label'];
-
-                        var chart = Highcharts.stockChart('chart-placeholder', {
-                            chart: {
-                                height: '700px',
-                                zoomType: 'x',
-                                animation: false
-                            },
-                            title: {
-                                text: varDetails['title']
-                            },
-                            subtitle: {
-                                text: document.ontouchstart === undefined ?
-                                    'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
-                            },
-
-                            xAxis: {
-                                categories: [1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090]
-                            },
-
-                            yAxis: {
-                                title: {
-                                    text: varDetails['title']
-                                },
-
-
-                                labels: {
-                                    formatter: function () {
-                                        return this.axis.defaultLabelFormatter.call(this) + chartUnit;
-                                    }
-                                }
-
-                            },
-                            legend: {
-                                enabled: true
-                            },
-
-                            tooltip: {
-                                valueDecimals: chartDecimals,
-                                crosshairs: true,
-                                shared: true,
-                                split: false,
-                                valueSuffix: chartUnit
-                            },
-                            series: [],
-                            exporting: {
-                                enabled: false
-                            }
-                        });
-
-
-                        chart.addSeries({
-                            name: chart_labels.observation,
-                            data: data['observations'],
-                            zIndex: 1,
-                            showInNavigator: true,
-                            color: '#F47D23',
-                            visible: false,
-                            marker: {
-                                fillColor: '#F47D23',
-                                lineWidth: 0,
-                                radius: 0,
-                                lineColor: '#F47D23'
-                            }
-                        });
-                        chart.addSeries({
-                            name: chart_labels.historical,
-                            data: data['modeled_historical_median'],
-                            zIndex: 1,
-                            showInNavigator: true,
-                            color: '#000000',
-                            marker: {
-                                fillColor: '#000000',
-                                lineWidth: 0,
-                                radius: 0,
-                                lineColor: '#000000'
-                            }
-                        });
-
-                        chart.addSeries({
-                            name: chart_labels.historical_range,
-                            data: data['modeled_historical_range'],
-                            type: 'arearange',
-                            lineWidth: 0,
-                            linkedTo: ':previous',
-                            color: '#000000',
-                            fillOpacity: 0.2,
-                            zIndex: 0,
-                            marker: {
-                                radius: 0,
-                                enabled: false
-                            },
-                        });
-
-
-                        chart.addSeries({
-                            name: chart_labels.rcp_26_median,
-                            data: data['rcp26_median'],
-                            zIndex: 1,
-                            showInNavigator: true,
-                            color: '#00F',
-                            marker: {
-                                fillColor: '#00F',
-                                lineWidth: 0,
-                                radius: 0,
-                                lineColor: '#00F'
-                            }
-                        });
-                        chart.addSeries({
-                            name: chart_labels.rcp_26_range,
-                            data: data['rcp26_range'],
-                            type: 'arearange',
-                            lineWidth: 0,
-                            linkedTo: ':previous',
-                            color: '#00F',
-                            fillOpacity: 0.2,
-                            zIndex: 0,
-                            marker: {
-                                radius: 0,
-                                enabled: false
-                            },
-                        });
-
-
-                        chart.addSeries({
-                            name: chart_labels.rcp_45_median,
-                            data: data['rcp45_median'],
-                            zIndex: 1,
-                            showInNavigator: true,
-                            color: '#00640c',
-                            marker: {
-                                fillColor: '#00640c',
-                                lineWidth: 0,
-                                radius: 0,
-                                lineColor: '#00640c'
-                            }
-                        });
-
-                        chart.addSeries({
-                            name: chart_labels.rcp_45_range,
-                            data: data['rcp45_range'],
-                            type: 'arearange',
-                            lineWidth: 0,
-                            linkedTo: ':previous',
-                            color: '#00640c',
-                            fillOpacity: 0.2,
-                            zIndex: 0,
-                            marker: {
-                                radius: 0,
-                                enabled: false
-                            }
-                        });
-
-
-                        chart.addSeries(
-                            {
-                                name: chart_labels.rcp_85_median,
-                                data: data['rcp85_median'],
-                                zIndex: 1,
-                                showInNavigator: true,
-                                color: '#F00',
-                                marker: {
-                                    fillColor: '#F00',
-                                    lineWidth: 0,
-                                    radius: 0,
-                                    lineColor: '#F00'
-                                }
-                            }
-                        );
-
-                        chart.addSeries(
-                            {
-                                name: chart_labels.rcp_85_range,
-                                data: data['rcp85_range'],
-                                type: 'arearange',
-                                lineWidth: 0,
-                                linkedTo: ':previous',
-                                color: '#F00',
-                                fillOpacity: 0.2,
-                                zIndex: 0,
-                                marker: {
-                                    radius: 0,
-                                    enabled: false
-                                }
-                            }
-                        );
-
-
-                        seconds = (Date.now() - timerStart) * 0.001;
-                        $('#loadtime').html(" <strong style=color:blue>Loaded in " + seconds + " seconds</strong>");
-
-
-                        $('.chart-export-data').click(function (e) {
-                            e.preventDefault();
-
-                            var dl_type = '';
-
-                            switch ($(this).attr('data-type')) {
-                                case 'csv' :
-                                    //chart.downloadCSV();
-
-                                    window.open("data:text/csv;charset=utf-8," + escape(chart.getCSV()));
-
-                                    break;
-                            }
-
-                        });
-
-                        $('.chart-export-img').click(function (e) {
-                            e.preventDefault();
-
-                            var dl_type = '';
-
-                            switch ($(this).attr('data-type')) {
-                                case 'png' :
-                                    dl_type = 'image/png';
-                                    break;
-                                case 'pdf' :
-                                    dl_type = 'application/pdf';
-                                    break;
-                            }
-
-                            chart.exportChart({
-                                type: dl_type
-                            });
-                        });
-
-                    });
 
 
                 }
@@ -1973,7 +1771,10 @@
             $('.leaflet-sector-pane').css('opacity', value / 100);
         }
 
+        loadClimateNormals();
+
         function layer_swap(fn_options) {
+
 
             var defaults = {
                 layer: null,
@@ -1983,7 +1784,7 @@
             var settings = $.extend(true, defaults, fn_options);
 
 
-            if (settings.action == 'on') {
+            if (settings.action === 'on') {
                 $('body').addClass(settings.layer + '-on');
             } else {
                 $('body').removeClass(settings.layer + '-on');
@@ -1993,7 +1794,7 @@
 
                 case 'variable' :
 
-                    if (settings.action == 'on') {
+                    if (settings.action === 'on') {
 
                         // set global var & body class
 
@@ -2113,19 +1914,25 @@
 
                         // add station layer
 
+                        console.log('settings.station');
+                        console.log(settings.station);
+
                         if (settings.station === 'idf') {
+
+
 
                             if (typeof idf_layer !== 'undefined') {
                                 map1.addLayer(idf_layer);
                             }
 
                             if (typeof station_layer !== 'undefined') {
+                                console.log("REMOVE STATION LAYER")
                                 map1.removeLayer(station_layer).closePopup();
                             }
 
                         } else if (settings.station === 'weather-stations') {
 
-                            loadClimateNormals();
+
 
                             if (typeof station_layer !== 'undefined') {
                                 map1.addLayer(station_layer);
@@ -2182,6 +1989,7 @@
                     break;
 
                 case 'sector' :
+
 
                     if (settings.action == 'on') {
 
@@ -2240,7 +2048,7 @@
 
         }
 
-        1
+
 
         //
         //
@@ -2501,10 +2309,9 @@
             var select2Val = $(this).val();
             // console.log('var change triggered');
             moraval = $('#mora').val();
+
+            update_param('var', select2Val);
             buildFilterMenu();
-
-
-
             generateLeftLegend();
             changeLayers();
         });
@@ -2516,7 +2323,9 @@
 
 
         $('#mora').change(function (e) {
-            //console.log('time drop changed');
+            console.log("MORA CHANGED");
+            update_param('mora', $(this).val());
+            update_query_string();
             generateLeftLegend();
             changeLayers();
         });
@@ -2534,28 +2343,31 @@
 
         $('#sector').change(function (e) {
 
-            //console.log('sector changed');
 
             sectorSelected = $('#sector').val();
 
-            if (sectorSelected && ((window.location.href.indexOf("explore/variable") > 0) || (window.location.href.indexOf("explorer/variable") > 0))) {
-                if (sectorSelected === 'health') {
-                    sectorSelected = "health/map";
-                } else if (sectorSelected === 'census') {
-                    sectorSelected = "census/map";
-                } else if (sectorSelected === 'watershed') {
-                    sectorSelected = "watershed/data-by-watershed/";
-                }
-                window.location.replace("/explore/sector/" + sectorSelected);
-            }
 
-            if (!sectorSelected && ((window.location.href.indexOf("explore/sector") > 0) || (window.location.href.indexOf("explorer/secteur") > 0))) {
-                sectorSelected = "/variable/tx_max/";
-                window.location.replace(sectorSelected);
-            }
 
+            // if (sectorSelected && ((window.location.href.indexOf("explore/variable") > 0) || (window.location.href.indexOf("explorer/variable") > 0))) {
+            //     if (sectorSelected === 'health') {
+            //         sectorSelected = "health/map";
+            //     } else if (sectorSelected === 'census') {
+            //         sectorSelected = "census/map";
+            //     } else if (sectorSelected === 'watershed') {
+            //         sectorSelected = "watershed/data-by-watershed/";
+            //     }
+            //     window.location.replace("/explore/sector/" + sectorSelected);
+            // }
+            //
+            // if (!sectorSelected && ((window.location.href.indexOf("explore/sector") > 0) || (window.location.href.indexOf("explorer/secteur") > 0))) {
+            //     sectorSelected = "/variable/tx_max/";
+            //     window.location.replace(sectorSelected);
+            // }
+
+
+            update_param('sector', sectorSelected);
+            update_query_string();
             buildFilterMenu();
-            changeLayers();
 
 
         });
@@ -2563,10 +2375,10 @@
 
         function changeLayers() {
 
-            // console.log('changeLayers');
 
             rcp_value = $("#rcp").val();
-            decade_value = $("#decade").val();
+            // decade_value = $("#decade").val();
+            decade_value = parseInt($("#decade").val());
             mora_value = $("#mora").val();
 
             if (query['var-group'] === 'station-data') {
@@ -2582,22 +2394,22 @@
 
                 // not station data so make sure it's turned off
 
-                if (station_on == true) {
+
+
+                if (station_on === true) {
                     layer_swap({
                         layer: 'stations',
                         action: 'off'
                     });
                 }
 
-                if (query['sector'] != '') {
+                if (query['sector'] !== '') {
 
-                    // console.log('sector is set');
 
                     // activate sector
 
-                    if (sector_on == false) {
+                    if (sector_on === false) {
 
-                        // console.log('sector is not turned on');
 
                         layer_swap({
                             layer: 'sector'
@@ -2613,7 +2425,7 @@
 
                     // not sector so make sure it's turned off
 
-                    if (sector_on == true) {
+                    if (sector_on === true) {
                         layer_swap({
                             layer: 'sector',
                             action: 'off'
@@ -2633,9 +2445,11 @@
 
                 // always generate/re-generate the left legend
 
+                msorys = 'ys';
+                msorysmonth = '-ann';
+                legendmsorys = 'ann';
 
                 if (query['sector'] !== '') {
-
                     if (mora_value === 'ann') {
                         msorys = 'ys';
                         msorysmonth = '-ann';
@@ -2645,21 +2459,10 @@
                         msorysmonth = '-' + mora_value;
                         legendmsorys = "mon";
                     }
-
                     legendLayer = var_value + "_health_" + legendmsorys;
-
-                    if (window.location.href.indexOf("explore/sector") > -1 || window.location.href.indexOf("explorer/secteur") > -1)  {
-                        generateSectorLegend(var_value + "_health_" + legendmsorys, '');
-                    } else {
-                        //window.location.replace("/explore/sector/watershed/data-by-watershed/");
-                    }
+                    generateSectorLegend(var_value + "_health_" + legendmsorys, '');
                 } else {
-                    // is user on sector page?
-                    if (window.location.href.indexOf("explore/sector") > -1 || window.location.href.indexOf("explorer/secteur") > -1) {
-                        //window.location.replace("/variable/tx_max");
-                    } else {
-                        generateLeftLegend();
-                    }
+                    generateLeftLegend();
                 }
 
 
@@ -2674,7 +2477,6 @@
 
                     invalidate_maps();
 
-                    // console.log('set left layer');
 
                     leftLayer.setParams({
                         format: 'image/png',
@@ -2686,7 +2488,6 @@
                         layers: 'CDC:' + leftLayerName
                     });
 
-                    // console.log('set right layer');
 
                     if (has_mapRight === true) {
                         rightLayer.setParams({
@@ -2702,7 +2503,6 @@
 
                     // also generate the right legend
 
-                    // console.log('generate right legend');
                     //generateRightLegend(rightLayerName, mora_text_value);
 
                 } else {
@@ -2730,16 +2530,23 @@
                 url: '/wp-json/acf/v3/variable/?per_page=10000&orderby=menu_order&order=asc',
                 dataType: 'json',
                 success: function (data) {
-                    //console.log('buildFilterMenu');
 
                     queryVar = getQueryVariable('var');
 
                     varID = $('#var').val();
-                    rawsectorSelected = $('#sector').val();
+                    rawsectorSelected = getQueryVariable('sector');
+
+                    if (!rawsectorSelected) {
+                        rawsectorSelected = 'gridded_data';
+                    }
+
+
                     $('#var').empty();
                     currentOptGroup = '';
+
                     $.each(data, function (k, v) {
                         $.each(v, function (sk, sv) {
+
 
                             if (sv.var_name === varID) {
                                 selectedVar = true;
@@ -2748,12 +2555,7 @@
                             }
 
 
-                            if (!rawsectorSelected) {
-                                sectorSelected = 'gridded_data';
-                            }
-
-                            if ($.inArray(sectorSelected, sv.availability) !== -1) {
-
+                            if ($.inArray(rawsectorSelected, sv.availability) !== -1) {
 
                                 if (sv.var_name) {
                                     if (currentOptGroup !== sv.variable_type) {
@@ -2794,6 +2596,32 @@
                             // }
 
                             if (sv.var_name === varID) {
+                                selectedSector = getQueryVariable('sector');
+                                if (!selectedSector) {
+                                    selectedSector = 'gridded_data';
+                                }
+
+                                $('#sector').empty();
+                                $.each(sv.availability, function (k, v) {
+
+
+                                    if (selectedSector === v) {
+                                        defaultSelectedSector = true;
+                                    } else {
+                                        defaultSelectedSector = false;
+                                    }
+
+                                    if (v === 'gridded_data'){
+                                        var newOption = new Option(v, '', defaultSelectedSector, defaultSelectedSector);
+                                    } else {
+                                        var newOption = new Option(v, v, defaultSelectedSector, defaultSelectedSector);
+                                    }
+
+
+
+                                    $('#sector').append(newOption);
+                                });
+
 
                                 var_value = $("#var").val();
                                 dec_value = $("#decade").val();
@@ -2812,9 +2640,6 @@
 
                                 for (i = tsmin; i <= tsmax; i += 10) {
 
-                                //    console.log(i);
-                                //    console.log(parseInt(dec_value));
-                                //    console.log(tsdef);
                                     updated_slider_values.push(i + 1 + '-' + (i + tsint));
 
 
@@ -2843,7 +2668,7 @@
                                 //console.log('slider updated');
                                 //console.log(sv.time_slider_min_value,sv.time_slider_max_value,sv.time_slider_default_value,sv.time_slider_max_value,sv.time_slider_interval);
 
-                                if ((sectorSelected === 'gridded_data') && $.inArray('gridded_data', sv.availability) !== -1) {
+                                if ((selectedSector === 'gridded_data') && $.inArray('gridded_data', sv.availability) !== -1) {
 
                                     if (sv.var_name === 'slr') {
                                         replaceGrid(sv.grid, slrgridLayer_options, map1);
@@ -2857,6 +2682,48 @@
                                 acfTimeStep = v.acf.timestep;
 
                                 $('#mora').empty();
+                                $('#rcp').empty();
+
+                                if (selectedSector === 'gridded_data') {
+                                    rcpDropGroup = '<option value="rcp26">RCP 2.6</option> ' +
+                                        '<option value="rcp26vs45">RCP 2.6 vs RCP 4.5</option> ' +
+                                        '<option value="rcp26vs85">RCP 2.6 vs RCP 8.5</option> ' +
+                                        '<option value="rcp45">RCP 4.5</option> ' +
+                                        '<option value="rcp45vs26">RCP 4.5 vs RCP 2.6</option> ' +
+                                        '<option value="rcp45vs85">RCP 4.5 vs RCP 8.5</option> ' +
+                                        '<option value="rcp85">RCP 8.5</option> ' +
+                                        '<option value="rcp85vs26">RCP 8.5 vs RCP 2.6</option> ' +
+                                        '<option value="rcp85vs45">RCP 8.5 vs RCP 4.5</option>';
+                                } else {
+                                    rcpDropGroup = '<option value="rcp26">RCP 2.6</option> ' +
+                                        '<option value="rcp45">RCP 4.5</option> ' +
+                                        '<option value="rcp85">RCP 8.5</option>';
+                                }
+
+
+                                $('#rcp').append(rcpDropGroup);
+
+                                getRCPvar = getQueryVariable('rcp');
+
+                                // check to see if comparing exists on sector load
+                                if (getRCPvar.length > 5 && selectedSector !== 'gridded_data') {
+                                    // since comparison value is comparing, get new default from first 5 chars
+                                    firstRCP = getRCPvar.slice(0,5);
+                                    // set default to best option available from compare value.
+                                    $('#rcp option[value='+firstRCP+']').attr('selected','selected');
+                                    // update url with new default
+                                    update_param('rcp', firstRCP);
+                                    // remove compare since no longer comparing
+                                    $('body').removeClass('map-compare');
+                                    // tell leaflet about changes
+                                    invalidate_maps();
+                                } else {
+                                    // update selected value of newly generated rcp list
+                                    $('#rcp option[value='+getRCPvar+']').attr('selected','selected');
+                                }
+
+
+                                // doo the timesets
 
                                 if (acfTimeStep.includes("annual")) {
                                     // if ($('#mora').find("option[value='2qsapr']").length) {
@@ -2875,7 +2742,7 @@
                                     if (moraval === 'ann') {
 
                                         //$("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                                        $("#mora").val(moraval).prop('selected', true);
+                                        //$("#mora").val(moraval).prop('selected', true);
                                     }
                                 }
 
@@ -2976,15 +2843,27 @@
                                     // }
                                 }
 
+                                if (!acfTimeStep.includes("annual") && moraval === 'ann') {
+                                    $('#mora option:eq(0)').prop('selected',true).trigger('change.select2');
+                                    update_param('mora', 'jan');
+                                    update_query_string();
+                                }
 
-                                update_param('mora', moraval);
+                                //
+                                // update_param('mora', moraval);
+                                // update_query_string();
+
                                 moraval = getQueryVariable('mora')
 
+                                // $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
                                 var_value = $("#var").val();
                                 mora_value = $("#mora").val();
                                 mora_text_value = $("#mora option:selected").text();
                                 rcp_value = $("#rcp").val();
                                 decade_value = parseInt($("#decade").val());
+
+
+
 
 
                             }
@@ -3084,10 +2963,13 @@
                 },
                 complete: function () {
 
-                    update_param('var', $('#var option:selected').val());
-                    update_query_string();
-                    generateLeftLegend();
+                    // update_param('var', $('#var option:selected').val());
+                    // update_query_string();
+                    // generateLeftLegend();
                     changeLayers();
+
+
+
                 }
             })
         }
@@ -3202,7 +3084,6 @@
         // POP STATE
 
         window.onpopstate = function () {
-
 
             // convert the current query string to an object
             query_str_to_obj();

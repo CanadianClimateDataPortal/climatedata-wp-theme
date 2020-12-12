@@ -349,8 +349,8 @@ if (get_the_ID() == filtered_ID_by_path('explore/variable')) {
     </div>
 </nav>
 
-<select class="custom-select" id="sector" name="sector" style="width:200px;margin:10px;font-size:2em;height:45px">
-    <option value="" selected>gridded_data</option>
+<select class="custom-select" id="sector" name="sector" style="width:300px;margin:10px;font-size:2em;height:45px">
+    <option value="" selected><? _e('Gridded data', cdc); ?></option>
     <option value="census">census</option>
     <option value="health">health</option>
     <option value="watershed">watershed</option>

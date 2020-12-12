@@ -84,18 +84,14 @@
     
     while ( have_posts() ) : the_post();
     
-      $archive_items[] = array (
+      $item = array (
         'id' => get_the_ID(),
         'title' => get_the_title(),
         'permalink' => get_permalink(),
         'post_type' => get_post_type(),
         'content' => get_the_content()
       );
-  
-    endwhile; 
-    
-    foreach ( $archive_items as $item ) {
-    
+
   ?>
   
   <div class="result">
@@ -107,10 +103,10 @@
   </div>
   
   <?php
-    
-    }
-    
-  ?>
+    endwhile; 
+    ?>  
+ 
+
   
 <!--
   <div class="pagination row">

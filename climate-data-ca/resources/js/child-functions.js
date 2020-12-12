@@ -241,7 +241,10 @@ var chart_labels, legend_labels, l10n_labels;
       precipitation: 'precipitation',
       other_variables: 'other variables',
       station_data: 'station data',
-      
+      gridded_data: 'Gridded data',
+      census: 'Census subdivisions',
+      health: 'Health regions',
+      watershed: 'Watersheds'      
       
     };
 
@@ -272,7 +275,11 @@ var chart_labels, legend_labels, l10n_labels;
         temperature: 'température',
         precipitation: 'précipitation',
         other_variables: 'autres',
-        station_data: 'données des stations',        
+        station_data: 'données des stations',
+        gridded_data: 'Données mailées',
+        census: 'Subdivisions de recensement',
+        health: 'Régions socio-sanitaire',
+        watershed: 'Bassins versants'
       };
 
       if (typeof Highcharts !== 'undefined') {

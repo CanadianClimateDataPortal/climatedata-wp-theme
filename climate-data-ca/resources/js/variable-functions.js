@@ -731,6 +731,8 @@
 
         function grid_click(e) {
 
+console.log('grid clicked');
+
             grid_initialized = true;
 
             var_value = $("#var").val();
@@ -774,7 +776,7 @@
             }
 
             // open the chart
-
+            current_coords=[e.latlng.lat, e.latlng.lng];
             genChart(e.latlng.lat, e.latlng.lng, var_value, mora_value);
 
             L.DomEvent.stop(e);
@@ -885,6 +887,7 @@
             choroValues = [];
 
         var current_sector = [];
+        var current_coords = [];
 
         function getColor(d) {
 
@@ -2323,11 +2326,25 @@
 
 
         $('#mora').change(function (e) {
+
+            mora_value = $(this).val();
+            var_value = $('#var').val();
+
             console.log("MORA CHANGED");
             update_param('mora', $(this).val());
             update_query_string();
             generateLeftLegend();
             changeLayers();
+
+            if ($('body').hasClass('overlay-position-right')) {
+                if (query['sector'] !== '') {
+                    genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
+                } else if (query['var-group'] !== 'station-data') {
+                    genChart(current_coords[0], current_coords[1], var_value, mora_value);
+                } else {
+                    $(document).overlay('hide');
+                }
+            }
         });
 
 
@@ -2612,9 +2629,9 @@
                                     }
 
                                     if (v === 'gridded_data'){
-                                        var newOption = new Option(v, '', defaultSelectedSector, defaultSelectedSector);
+                                        var newOption = new Option(l10n_labels[v], '', defaultSelectedSector, defaultSelectedSector);
                                     } else {
-                                        var newOption = new Option(v, v, defaultSelectedSector, defaultSelectedSector);
+                                        var newOption = new Option(l10n_labels[v], v, defaultSelectedSector, defaultSelectedSector);
                                     }
 
 
@@ -2919,7 +2936,7 @@
                         } else if (query['var-group'] != 'station-data') {
 
 
-                            genChart(query['coords'].split(',')[0], query['coords'].split(',')[1], var_value, mora_value);
+                            genChart(current_coords[0], current_coords[1], var_value, mora_value);
 
                         } else {
 

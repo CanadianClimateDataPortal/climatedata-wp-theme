@@ -71,19 +71,6 @@ if (have_posts()) : while (have_posts()) : the_post();
                         <div class="overlay-content-text">
                             <div class="overlay-scenarios">
                                 <form class="form-inline" action="<?php echo $var_url; ?>">
-                                    <?php
-
-                                    if (isset ($_GET['sector'])) {
-
-                                        ?>
-
-                                        <input type="hidden" name="sector" value="<?php echo $_GET['sector']; ?>">
-
-                                        <?php
-
-                                    }
-
-                                    ?>
                                     <input type="hidden" name="var" value="<?php the_field('var_name'); ?>">
 
                                     <div class="d-lg-flex justify-content-around align-items-center w-100">

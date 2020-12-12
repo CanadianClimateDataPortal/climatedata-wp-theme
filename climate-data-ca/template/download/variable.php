@@ -1,5 +1,3 @@
-test
-
 <form id="download-form" class="needs-validation" novalidate>
     <div class="form-layout-row row align-items-center">
         <p class="form-label-wrap col-10 col-sm-3 offset-1 mb-3 mb-sm-0">

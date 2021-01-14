@@ -37,6 +37,20 @@
   
   $map_vars .= ']';
   
+  // timesteps
+  
+  $timesteps = array();
+  
+  foreach ( $var_IDs as $var_ID ) {
+    $timesteps[] = get_field ( 'timestep', $var_ID );
+  }
+  
+  $times = array();
+  
+  foreach ( get_sub_field ( 'time' ) as $time ) {
+    $times[] = $time['value'];
+  }
+  
   // center
   
   $init_lat = '';
@@ -117,6 +131,8 @@
   data-map-lng="<?php echo $init_lng; ?>"
   data-map-zoom="<?php echo $init_zoom; ?>"
   data-map-rcp='<?php echo $rcp; ?>'
+  data-map-time='<?php echo json_encode ( $times ); ?>'
+  data-map-timesteps='<?php echo json_encode ( $timesteps ); ?>'
   data-map-panes='<?php echo json_encode ( $panes ); ?>'
 >
   <?php
@@ -170,14 +186,48 @@
       
       <h6><?php _e ( 'Variable', 'cdc' ); ?></h6>
       
-      <select id="<?php echo $block_ID; ?>-var-select" data-container-css-class="btn rounded-pill" data-dropdown-css-class="big-menu-dropdown">
+      <select id="<?php echo $block_ID; ?>-var-select" class="filter-var" data-container-css-class="btn rounded-pill" data-dropdown-css-class="big-menu-dropdown">
         <?php 
           
           foreach ( $var_IDs as $var_ID ) {
           
         ?>
         
-        <option value="<?php the_field ( 'var_name', $var_ID ); ?>" data-timestep="<?php echo get_field ( 'timestep', $var_ID ); ?>"><?php echo get_the_title ( $var_ID ); ?></option>
+        <option value="<?php the_field ( 'var_name', $var_ID ); ?>"><?php echo get_the_title ( $var_ID ); ?></option>
+        
+        <?php
+          
+          }
+          
+        ?>
+      </select>
+      
+    </div>
+    
+    <?php
+      
+      }
+      
+    ?>
+    
+    <?php
+      
+      if ( count ( get_sub_field ( 'time' ) ) > 1 ) {
+        
+    ?>
+    
+    <div id="<?php echo $block_ID; ?>-time" class="filter-container col-12 col-lg-4">
+      
+      <h6><?php _e ( 'Time', 'cdc' ); ?></h6>
+      
+      <select id="<?php echo $block_ID; ?>-time-select" class="filter-time" data-container-css-class="btn rounded-pill" data-dropdown-css-class="big-menu-dropdown">
+        <?php 
+          
+          foreach ( get_sub_field ( 'time' ) as $time ) {
+          
+        ?>
+        
+        <option value="<?php echo $time['value']; ?>"><?php echo $time['label']; ?></option>
         
         <?php
           

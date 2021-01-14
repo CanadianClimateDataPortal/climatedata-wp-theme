@@ -158,6 +158,18 @@
         
       }
       
+      // set initial time
+      
+      if (JSON.parse(plugin_item.attr('data-map-time'))[0] !== 'ann') {
+        plugin_settings.maps.main.query.mora = JSON.parse(plugin_item.attr('data-map-time'))[0]
+        plugin_settings.maps.main.query.msys = 'ms'
+        
+        if (plugin_settings.compare == true) {
+          plugin_settings.maps.right.query.mora = JSON.parse(plugin_item.attr('data-map-time'))[0]
+          plugin_settings.maps.right.query.msys = 'ms'
+        }
+      }
+      
       //
       // BUILD MAIN MAP
       //
@@ -194,23 +206,47 @@
       
       plugin_item.find('.map-filters select').change(function(e) {
         
-        plugin_settings.maps.main.query.variable = $(this).val()
+        if ($(this).hasClass('filter-var')) {
         
-        if ( $(this).find(':selected').attr('data-timestep') == 'monthly' ) {
-          plugin_settings.maps.main.query.mora = 'jan'
-          plugin_settings.maps.main.query.msys = 'ms'
-        } else {
-          plugin_settings.maps.main.query.mora = 'ann'
-          plugin_settings.maps.main.query.msys = 'ys'
+          plugin_settings.maps.main.query.variable = $(this).val()
+          
+          if (plugin_settings.compare == true) {
+            plugin_settings.maps.right.query.variable = $(this).val()
+          }
+          
+          plugin_instance.update_layer({
+            change_var: true
+          })
+          
+        } else if ($(this).hasClass('filter-time')) {
+          
+          var new_time = $(this).val()
+          
+          if (new_time == 'ann' ) {
+            plugin_settings.maps.main.query.mora = 'ann'
+            plugin_settings.maps.main.query.msys = 'ys'
+            
+            if (plugin_settings.compare == true) {
+              plugin_settings.maps.right.query.mora = 'ann'
+              plugin_settings.maps.right.query.msys = 'ys'
+            }
+            
+          } else {
+            plugin_settings.maps.main.query.mora = new_time
+            plugin_settings.maps.main.query.msys = 'ms'
+            
+            if (plugin_settings.compare == true) {
+              plugin_settings.maps.right.query.mora = new_time
+              plugin_settings.maps.right.query.msys = 'ms'
+            }
+            
+          }
+          
+          console.log('update now', plugin_settings.maps.main.query)
+          
+          plugin_instance.update_layer()
+          
         }
-        
-        if (plugin_settings.compare == true) {
-          plugin_settings.maps.right.query.variable = $(this).val()
-        }
-        
-        plugin_instance.update_layer({
-          change_var: true
-        })
         
       })
       
@@ -793,6 +829,8 @@
       var plugin_settings   = plugin_instance.options
       var plugin_elements   = plugin_settings.elements
       
+      console.log('CDC:' + this_map.query.variable + '-' + this_map.query.msys + '-' + this_map.query.rcp + '-p50-' + plugin_settings.maps.main.query.mora + '-30year')
+      
       if (this_map.object.hasLayer(this_map.panes.data.layer)) {
         
         this_map.object.invalidateSize()
@@ -804,7 +842,7 @@
           pane: 'data',
           VERSION: '1.3.0',
           TIME: this_map.query.decade + '-01-00T00:00:00Z/' + (this_map.query.decade + 30) + '-01-01T00:00:00Z',
-          layers: 'CDC:' + this_map.query.variable + '-' + plugin_settings.maps.main.query.msys + '-' + this_map.query.rcp + '-p50-' + plugin_settings.maps.main.query.mora + '-30year'
+          layers: 'CDC:' + this_map.query.variable + '-' + this_map.query.msys + '-' + this_map.query.rcp + '-p50-' + plugin_settings.maps.main.query.mora + '-30year'
         })
         
       } else {
@@ -816,7 +854,7 @@
           pane: 'data',
           VERSION: '1.3.0',
           TIME: this_map.query.decade + '-01-00T00:00:00Z/' + (this_map.query.decade + 30) + '-01-01T00:00:00Z',
-          layers: 'CDC:' + this_map.query.variable + '-' + plugin_settings.maps.main.query.msys + '-' + this_map.query.rcp + '-p50-' + plugin_settings.maps.main.query.mora + '-30year'
+          layers: 'CDC:' + this_map.query.variable + '-' + this_map.query.msys + '-' + this_map.query.rcp + '-p50-' + this_map.query.mora + '-30year'
         }).addTo(this_map.object)
         
         this_map.object.invalidateSize()

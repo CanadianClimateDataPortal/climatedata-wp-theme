@@ -42,7 +42,11 @@
   $timesteps = array();
   
   foreach ( $var_IDs as $var_ID ) {
-    $timesteps[] = get_field ( 'timestep', $var_ID );
+    if ( !empty ( get_field ( 'timestep', $var_ID ) ) ) {
+      $timesteps[] = get_field ( 'timestep', $var_ID );
+    } else {
+      $timesteps[] = 'annual';
+    }
   }
   
   $times = array();
@@ -50,6 +54,8 @@
   foreach ( get_sub_field ( 'time' ) as $time ) {
     $times[] = $time['value'];
   }
+  
+  if ( empty ( $times ) ) $times = array ( 'ann' );
   
   // center
   

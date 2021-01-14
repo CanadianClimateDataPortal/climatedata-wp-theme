@@ -1,7 +1,9 @@
+
+
 // map renderer
 // v1.0
 
-(function ($) {
+;(function ($) {
 
   // custom select class
 
@@ -68,6 +70,7 @@
             variable: null,
             decade: 1980,
             mora: 'ann',
+            msys: 'ys',
             sector: null,
             rcp: 'rcp85'
           }
@@ -86,6 +89,7 @@
             variable: null,
             decade: 1980,
             mora: 'ann',
+            msys: 'ys',
             sector: null,
             rcp: 'rcp85'
           }
@@ -192,6 +196,14 @@
         
         plugin_settings.maps.main.query.variable = $(this).val()
         
+        if ( $(this).find(':selected').attr('data-timestep') == 'monthly' ) {
+          plugin_settings.maps.main.query.mora = 'jan'
+          plugin_settings.maps.main.query.msys = 'ms'
+        } else {
+          plugin_settings.maps.main.query.mora = 'ann'
+          plugin_settings.maps.main.query.msys = 'ys'
+        }
+        
         if (plugin_settings.compare == true) {
           plugin_settings.maps.right.query.variable = $(this).val()
         }
@@ -259,30 +271,30 @@
             hide_min_max: true,
             prettify_enabled: false,
             values: [
-                1950,
-                1960,
-                1970,
-                1980,
-                1990,
-                2000,
-                2010,
-                2020,
-                2030,
-                2040,
-                2050,
-                2060,
-                2070,
-                2080,
-                2090
+              "1951-1980",
+              "1961-1990",
+              "1971-2000",
+              "1981-2010",
+              "1991-2020",
+              "2001-2030",
+              "2011-2040",
+              "2021-2050",
+              "2031-2060",
+              "2041-2070",
+              "2051-2080",
+              "2061-2090",
+              "2071-2100"
             ],
     
             onChange: function (data) {
               
-              plugin_settings.maps.main.query.decade = data.from_value
+              //plugin_settings.maps.main.query.decade = data.from_value
+              plugin_settings.maps.main.query.decade = data.from_value.split("-")[0]
+              
               plugin_settings.maps.main.object.invalidateSize()
               
               if (plugin_settings.compare == true) {
-                plugin_settings.maps.right.query.decade = data.from_value
+                plugin_settings.maps.right.query.decade = data.from_value.split("-")[0]
                 plugin_settings.maps.right.object.invalidateSize()
               }
               
@@ -791,8 +803,8 @@
           transparent: true,
           pane: 'data',
           VERSION: '1.3.0',
-          TIME: this_map.query.decade + '-01-00T00:00:00Z/' + (this_map.query.decade + 10) + '-01-01T00:00:00Z',
-          layers: 'CDC:' + this_map.query.variable + '-ys-' + this_map.query.rcp + '-p50-ann-30year'
+          TIME: this_map.query.decade + '-01-00T00:00:00Z/' + (this_map.query.decade + 30) + '-01-01T00:00:00Z',
+          layers: 'CDC:' + this_map.query.variable + '-' + plugin_settings.maps.main.query.msys + '-' + this_map.query.rcp + '-p50-' + plugin_settings.maps.main.query.mora + '-30year'
         })
         
       } else {
@@ -803,8 +815,8 @@
           transparent: true,
           pane: 'data',
           VERSION: '1.3.0',
-          TIME: this_map.query.decade + '-01-00T00:00:00Z/' + (this_map.query.decade + 10) + '-01-01T00:00:00Z',
-          layers: 'CDC:' + this_map.query.variable + '-ys-' + this_map.query.rcp + '-p50-ann-30year'
+          TIME: this_map.query.decade + '-01-00T00:00:00Z/' + (this_map.query.decade + 30) + '-01-01T00:00:00Z',
+          layers: 'CDC:' + this_map.query.variable + '-' + plugin_settings.maps.main.query.msys + '-' + this_map.query.rcp + '-p50-' + plugin_settings.maps.main.query.mora + '-30year'
         }).addTo(this_map.object)
         
         this_map.object.invalidateSize()

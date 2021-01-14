@@ -177,7 +177,7 @@
           
         ?>
         
-        <option value="<?php the_field ( 'var_name', $var_ID ); ?>"><?php echo get_the_title ( $var_ID ); ?></option>
+        <option value="<?php the_field ( 'var_name', $var_ID ); ?>" data-timestep="<?php echo get_field ( 'timestep', $var_ID ); ?>"><?php echo get_the_title ( $var_ID ); ?></option>
         
         <?php
           

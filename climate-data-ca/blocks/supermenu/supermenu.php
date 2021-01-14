@@ -233,6 +233,20 @@
               endwhile; endif;
               
             ?>
+            
+            <div id="ag-cases" class="col-10 col-sm-6 col-lg-2 px-5 px-lg-0">
+              
+              <h6><?php _e ( 'Agriculture' ); ?></h6>
+              
+              <?php
+                
+                wp_nav_menu ( array (
+                  'menu' => 'Agriculture Case Studies'
+                ) );
+                
+              ?>
+              
+            </div>
           
           </div>
           

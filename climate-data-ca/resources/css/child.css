@@ -4791,6 +4791,9 @@ body.supermenu-open #header-primary {
   #var-filter-view select {
     font-size: 1.4rem; }
 
+body.overlay-open #var-filter-view {
+  display: none; }
+
 #variable-content {
   position: relative;
   height: 100vh; }

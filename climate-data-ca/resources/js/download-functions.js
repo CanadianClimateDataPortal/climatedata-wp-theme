@@ -464,28 +464,95 @@
             
             format = $('input[name="download-format"]:checked').val();
             
-            request_args= {var: selected_var,
-                           month: month,
-                           format: format,
-                           points:points};
-            
-            $.ajax({
-                method: 'POST',
-                url: data_url + '/download',
-                contentType: 'application/json',
-                data: JSON.stringify(request_args),
-                success: function (result) {
-                    if (format == 'csv') {
-                        $('#download-result a').attr('href', 'data:text/csv;charset=utf-8,' + escape(result));
-                    }
-                    if (format == 'json') {
-                        $('#download-result a').attr('href', "data:application/json," + encodeURIComponent(JSON.stringify(result)));
-                    }
-                    $('#download-result a').attr('download', $('#download-filename').val() + '.' + format);
-                    $('#download-result').slideDown(250)
-                   
-            }});
+            if (selected_var !== 'all') {
+                request_args= {var: selected_var,
+                               month: month,
+                               format: format,
+                               points:points};
+                
+                $.ajax({
+                    method: 'POST',
+                    url: data_url + '/download',
+                    contentType: 'application/json',
+                    data: JSON.stringify(request_args),
+                    success: function (result) {
+                        if (format == 'csv') {
+                            $('#download-result a').attr('href', 'data:text/csv;charset=utf-8,' + escape(result));
+                        }
+                        if (format == 'json') {
+                            $('#download-result a').attr('href', "data:application/json," + encodeURIComponent(JSON.stringify(result)));
+                        }
+                        $('#download-result a').attr('download', $('#download-filename').val() + '.' + format);
+                        $('#download-result').slideDown(250)
+                       
+                }});
+            } else {
+                // call download for all matching variables and build a zip file
+                selectedTimeStepCategory = $('#download-dataset').find(':selected').data('timestep');
+                varToProcess=[];
 
+
+                
+                for (k in varData) {
+                    if (k !== 'all' && varData[k].grid === 'canadagrid' && $.inArray(selectedTimeStepCategory, varData[k].timestep) !== -1) {
+                          varToProcess.push(k);
+                      }
+                }
+
+                $('body').addClass('spinner-on');
+                var dl_status = 0;
+                var dl_fraction = $('<p id="dl-fraction" style="position: absolute; left: 30%; bottom: 30%; width: 40%; padding-bottom: 1em; text-align: center;"><span>' + dl_status + '</span> / ' + varToProcess.length + '</p>').appendTo($('.spinner'));
+                var dl_progress = $('<div class="dl-progress" style="position: absolute; left: 0; bottom: 0; width: 0; height: 4px; background: red;">').appendTo(dl_fraction);
+                var i=0;
+                var zip = new JSZip();             
+                
+                function download_all() {
+                    if (i < varToProcess.length) {
+                        request_args= {var: varToProcess[i],
+                                       month: month,
+                                       format: format,
+                                       points:points};
+                        $.ajax({
+                            method: 'POST',
+                            url: data_url + '/download',
+                            contentType: 'application/json',
+                            data: JSON.stringify(request_args),
+                            success: function (result) {
+                                if (format == 'csv') {
+                                    zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.csv',result);
+                                }
+                                if (format == 'json') {
+                                    zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.json',JSON.stringify(result));
+                                }
+                                
+                                
+                                dl_fraction.find('span').html(i);
+                                dl_progress.css('width', (i / varToProcess.length * 100) + '%');
+                                if (i == varToProcess.length -1) { // last one
+                                    $('body').removeClass('spinner-on');
+                                    dl_fraction.remove();
+                                    dl_progress.remove();
+                                    zip.generateAsync({type:"blob"})
+                                    .then(function(content) {
+                                        saveAs(content, $('#download-filename').val()+".zip");
+                                                                   
+                                    });     
+                                }
+                            },
+                            complete: function () {
+                                i++;
+                                download_all();
+                            }});    
+                    }
+
+                    
+                }
+                download_all();
+                
+
+            }
+            
+            
         }
 
 
@@ -501,10 +568,6 @@
                     $.each(data, function (k, v) {
                         $.each(v, function (sk, sv) {
                             selectedVar = sv.var_name === currentVar;
-
-                            // if (!rawsectorSelected) {
-                            //     sectorSelected = 'gridded_data';
-                            // }
 
                             varData[sv.var_name] = sv;
 
@@ -544,16 +607,15 @@
 
                         });
                     });
-
-
-                },
+                if (selectedTimeStepCategory !== 'daily' && $('#download-dataset').val() != 'all' ) {
+                    $('#download-variable').append("<optgroup id=optgroup_misc label='" + l10n_labels['misc'] + "'>");
+                    $('#optgroup_misc').append(new Option(l10n_labels['allbccaq'],'all', false, false));
+                    varData['all'] = {'grid':'canadagrid'};
+                }},
                 error: function () {
 
                 },
                 complete: function () {
-
-
-
                     if ($("#download-variable option[value='" + currentVar + "']").length > 0) {
                         $('#download-variable').val(currentVar);
                         $('#download-variable').trigger('change');

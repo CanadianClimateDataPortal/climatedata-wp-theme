@@ -13,6 +13,7 @@
                 <option value="2qsapr" data-timestep="2qsapr"><?php _e('April to September', 'cdc'); ?></option>
 
                 <optgroup label="<?php _e('Monthly', 'cdc'); ?>">
+                    <option value="all" data-timestep="monthly"><?php _e('All months', 'cdc'); ?></option>
                     <option value="jan" data-timestep="monthly"><?php _e('January', 'cdc'); ?></option>
                     <option value="feb" data-timestep="monthly"><?php _e('February', 'cdc'); ?></option>
                     <option value="mar" data-timestep="monthly"><?php _e('March', 'cdc'); ?></option>

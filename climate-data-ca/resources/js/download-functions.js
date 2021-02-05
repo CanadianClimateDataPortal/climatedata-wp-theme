@@ -156,7 +156,14 @@
                         idf_init()
                     }
 
-                } 
+                } else if (ui.panel.attr('id') === 'ahccd-download') {
+
+                    if (typeof maps['ahccd'] == 'undefined') {
+                        ahccd_init()
+                    }
+
+                }
+                
             },
             activate: function (e, ui) {
 
@@ -180,7 +187,13 @@
                         idf_init()
                     }
 
-                } 
+                } else if (ui.newPanel.attr('id') === 'ahccd-download') {
+
+                    if (typeof maps['ahccd'] == 'undefined') {
+                        ahccd_init();
+                    }
+
+                }
 
             }
         });
@@ -1443,6 +1456,70 @@
             }, 500)
 
         })
+        
+        
+        function ahccd_init() {
+
+            create_map('ahccd');
+            
+            triangle = L.divIcon({className: "leaflet-div-triangle"});
+
+            $.getJSON(child_theme_dir + 'resources/app/ahccd/ahccd.json', function (data) {
+
+
+                ahccd_layer = L.geoJson(data, {
+                    onEachFeature: function (feature, layer) {
+
+                        $('<option value="' + feature.properties.ID + '">' + feature.properties.Name + '</option>').appendTo('#ahccd-select')
+
+                    },
+                    pointToLayer: function (feature, latlng) {
+
+                        return new L.Marker(latlng, {
+                            icon: triangle
+                           // pane: 'idf',
+                           // color: '#fff',
+                           // opacity: 1,
+                           // weight: 2,
+                           // fillColor: '#3869f6',
+                           // fillOpacity: 1,
+                           // radius: 5
+                        })
+
+                    }
+
+                }).on('mouseover', function (e) {
+
+                    e.layer.bindTooltip(e.layer.feature.properties.Name).openTooltip(e.latlng)
+
+                }).on('click', function (e) {
+
+                    $('#ahccd-select').val(e.layer.feature.properties.ID).trigger('change')
+
+                })
+
+                // sort options
+
+                var arr = $('#ahccd-select option').map(function (_, o) {
+                    return {t: $(o).text(), v: o.value};
+                }).get()
+
+                arr.sort(function (o1, o2) {
+                    return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0;
+                })
+
+                $('#ahccd-select option').each(function (i, o) {
+                    o.value = arr[i].v
+                    $(o).text(arr[i].t)
+                })
+
+                // add to map
+
+                ahccd_layer.addTo(maps['ahccd'])
+
+            })
+
+        }        
 
         function create_map(map_var) {
 
@@ -1475,7 +1552,7 @@
                 pane: 'labels'
             }).addTo(maps[map_var]);
 
-            if (map_var == 'station' || map_var == 'idf') {
+            if (map_var == 'station' || map_var == 'idf' || map_var == 'ahccd') {
 
                 maps[map_var].createPane('idf');
                 maps[map_var].getPane('idf').style.zIndex = 600;

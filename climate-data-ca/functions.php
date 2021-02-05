@@ -109,10 +109,10 @@ function child_theme_enqueue()
 
     // highcharts
 
-    wp_register_script('highcharts-highstock', 'https://code.highcharts.com/stock/highstock.js', NULL, NULL, true);
-    wp_register_script('highcharts-more', 'https://code.highcharts.com/stock/highcharts-more.js', array('highcharts-highstock'), NULL, true);
-    wp_register_script('highcharts-exporting', 'https://code.highcharts.com/stock/modules/exporting.js', array('highcharts-highstock'), NULL, true);
-    wp_register_script('highcharts-export-data', 'https://code.highcharts.com/stock/modules/export-data.js', array('highcharts-highstock'), NULL, true);
+    wp_register_script('highcharts-highstock', 'https://code.highcharts.com/stock/8.2/highstock.js', NULL, NULL, true);
+    wp_register_script('highcharts-more', 'https://code.highcharts.com/stock/8.2/highcharts-more.js', array('highcharts-highstock'), NULL, true);
+    wp_register_script('highcharts-exporting', 'https://code.highcharts.com/stock/8.2/modules/exporting.js', array('highcharts-highstock'), NULL, true);
+    wp_register_script('highcharts-export-data', 'https://code.highcharts.com/stock/8.2/modules/export-data.js', array('highcharts-highstock'), NULL, true);
 
     // select2
 

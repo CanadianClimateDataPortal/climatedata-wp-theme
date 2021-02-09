@@ -1462,7 +1462,39 @@
 
             create_map('ahccd');
             
-            triangle = L.divIcon({className: "leaflet-div-triangle"});
+            ahccd_icons={
+                P: L.icon({
+                        iconUrl: child_theme_dir + 'resources/app/ahccd/triangle-grey.png',
+                        iconSize: [15,15],
+                        iconAnchor: [7,7]
+                }),
+                Pr: L.icon({
+                        iconUrl: child_theme_dir + 'resources/app/ahccd/triangle-red.png',
+                        iconSize: [15,15],
+                        iconAnchor: [7,7]
+                }),                
+                T:  L.icon({
+                        iconUrl: child_theme_dir + 'resources/app/ahccd/square-grey.png',
+                        iconSize: [15,15],
+                        iconAnchor: [7,7]
+                }),
+                Tr:  L.icon({
+                        iconUrl: child_theme_dir + 'resources/app/ahccd/square-red.png',
+                        iconSize: [15,15],
+                        iconAnchor: [7,7]
+                }),                
+                B:  L.icon({
+                        iconUrl: child_theme_dir + 'resources/app/ahccd/circle-grey.png',
+                        iconSize: [15,15],
+                        iconAnchor: [7,7]
+                }),
+                Br: L.icon({
+                        iconUrl: child_theme_dir + 'resources/app/ahccd/circle-red.png',
+                        iconSize: [15,15],
+                        iconAnchor: [7,7]
+                })
+            }
+
 
             $.getJSON(child_theme_dir + 'resources/app/ahccd/ahccd.json', function (data) {
 
@@ -1474,27 +1506,35 @@
 
                     },
                     pointToLayer: function (feature, latlng) {
-
                         return new L.Marker(latlng, {
-                            icon: triangle
-                           // pane: 'idf',
-                           // color: '#fff',
-                           // opacity: 1,
-                           // weight: 2,
-                           // fillColor: '#3869f6',
-                           // fillOpacity: 1,
-                           // radius: 5
+                            icon: ahccd_icons[feature.properties.type]
                         })
 
                     }
 
                 }).on('mouseover', function (e) {
-
-                    e.layer.bindTooltip(e.layer.feature.properties.Name).openTooltip(e.latlng)
-
+                    e.layer.bindTooltip(e.layer.feature.properties.Name).openTooltip(e.latlng);
                 }).on('click', function (e) {
 
-                    $('#ahccd-select').val(e.layer.feature.properties.ID).trigger('change')
+                    // get current station select value
+                    var selection = $("#ahccd-select").val() || [];
+
+                    var clicked_ID = e.layer.feature.properties.ID;
+                    
+                    // search if clicked feature is already selected
+                    idx = selection.indexOf(clicked_ID);
+                    
+                    if (idx != -1) {
+                        selection.splice(index, 1);
+                        $('#ahccd-select').val(selection).change();
+                        icon = ahccd_icons[e.layer.feature.properties.type];
+                    } else {
+                        selection.push(clicked_ID);
+                        $('#ahccd-select').val(selection).change();
+                        icon = ahccd_icons[e.layer.feature.properties.type + 'r'];
+                    }
+                                     
+                    e.layer.setIcon(icon);
 
                 })
 
@@ -1517,9 +1557,42 @@
 
                 ahccd_layer.addTo(maps['ahccd'])
 
-            })
+            });
+            
+            // trigger when a tag is removed from multiple station selector input
+            $('#ahccd-select').on('select2:unselect', function (e) {
+                ahccd_layer.eachLayer(function (layer) {
+                    if (layer.feature.properties.ID === e.params.data.id) {
+                        layer.setIcon(ahccd_icons[layer.feature.properties.type]);
+                    }
+                });
+            });
 
-        }        
+            // trigger when a tag is added to multiple station selector input
+            $('#ahccd-select').on('select2:select', function (e) {
+                ahccd_layer.eachLayer(function (layer) {
+                    if (layer.feature.properties.ID === e.params.data.id) {
+                        layer.setIcon(ahccd_icons[layer.feature.properties.type +'r']);
+                    }
+                });
+            });   
+
+        $('#ahccd-download-form :input').change(function () {
+            // sync & activate process button
+            var selection = $("#ahccd-select").val() || [];
+            if (selection.length > 0) {
+                var format = $('input[name="ahccd-download-format"]:checked').val();
+                url = data_url + '/download-ahccd?format=' + format + '&stations=' + selection.join(',');
+                $('#ahccd-process').attr('href', url);
+                $('#ahccd-process').removeClass('disabled');
+                $('#ahccd-download-status').text(l10n_labels['readytoprocess']);
+            } else {
+                $('#ahccd-process').addClass('disabled');
+                $('#ahccd-download-status').text(l10n_labels['selectstation']);
+            }
+        });            
+
+        }
 
         function create_map(map_var) {
 

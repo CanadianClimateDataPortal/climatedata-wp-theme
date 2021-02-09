@@ -18,29 +18,36 @@
     </div>
   </div>
   
-  
-  <div id="download-ahccd-station" class="form-layout-row row" style="display: none;">
-    <div class="form-input form-select col-7 offset-3 p-5 bg-light">
-      <div class="d-flex mb-5 pb-3 border-bottom">
-        <div id="ahccd-station-name" class="w-50">
-          <h6><?php _e ( 'Station', 'cdc' ); ?></h6>
-          <h5></h5>
+  <div id="ahccd-download-filetype" class="form-layout-row row align-items-center">
+    <p class="form-label-wrap col-10 col-sm-3 offset-1 mb-3 mb-sm-0">
+        <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">2</span> <label for="format" class="form-label"><?php _e('Select a data format', 'cdc'); ?></label>
+    </p>
+
+    <div class="form-select col-10 offset-1 col-sm-4 offset-sm-0">
+        <div id="format-btn-group" class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+            <label id="ahccd-format-label-csv" class="btn btn-outline-primary active"> <input type="radio" name="ahccd-download-format" id="ahccd-download-format-csv" autocomplete="off" value="csv" checked> CSV </label>
+
+            <label id="ahccd-format-label-netcdf" class="btn btn-outline-primary"> <input type="radio" name="ahccd-download-format" id="ahccd-download-format-netcdf" autocomplete="off" value="netcdf"> NetCDF </label>
         </div>
-        
-        <div id="ahccd-station-elevation" class="w-50">
-          <h6><?php _e ( 'Elevation', 'cdc' ); ?></h6>
-          <h5></h5>
-        </div>
-      </div>
-      
-      <h6><?php _e ( 'Downloads', 'cdc' ); ?></h6>
-      
-      <div id="ahccd-links">
-        <ul></ul>
-      </div>
     </div>
-  </div>
+</div>      
   
+  <div id="ahccd-process-wrap" class="form-layout-row row align-items-center form-process">
+    <div class="col-10 offset-1 col-sm-6 offset-sm-3 input-group input-group-lg">
+
+      <div id="ahccd-download-status" class="form-control text-center"><?php _e ( 'Select at least one station to download data.', 'cdc' ); ?></div>
+
+      <div class="input-group-append">
+        <a class="btn btn-secondary text-white all-caps download-process-btn disabled" id="ahccd-process" target="_blank"><?php _e ( 'Process', 'cdc' ); ?> <i class="far fa-arrow-alt-circle-down"></i></a>
+      </div>
+
+
+    </div>
+
+      <div id="result"></div>
+
+  </div>  
+ 
   
 
 </form>

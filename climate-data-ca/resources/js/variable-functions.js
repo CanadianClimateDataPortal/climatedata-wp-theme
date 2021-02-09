@@ -4,7 +4,7 @@
 
         has_mapRight = false;
         var hosturl = geoserver_url;
-        var canadaBounds = L.latLngBounds(L.latLng(41, -141), L.latLng(83.50, -52.1));
+        var canadaBounds = L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.60, -49.9));
 
 
         varID = parseInt($('#varPostID').val());
@@ -813,23 +813,7 @@ console.log('grid clicked');
                         radius: 4,
                         fillOpacity: 0
                     }
-                }
-            },
-            bounds: canadaBounds,
-            maxZoom: 12,
-            minZoom: 7,
-            pane: 'grid'
-        };
-
-        var slrgridLayer_options = {
-
-            rendererFactory: L.canvas.tile,
-            interactive: true,
-            getFeatureId: function (f) {
-                return f.properties.gid;
-            },
-            maxNativeZoom: 12,
-            vectorTileLayerStyles: {
+                },
                 'slrgrid': function (properties, zoom) {
                     return {
                         weight: 0.1,
@@ -839,8 +823,9 @@ console.log('grid clicked');
                         radius: 4,
                         fillOpacity: 0
                     }
-                }
+                }                
             },
+            bounds: canadaBounds,
             maxZoom: 12,
             minZoom: 7,
             pane: 'grid'
@@ -852,7 +837,7 @@ console.log('grid clicked');
 
         if (var_value === 'slr') {
             gridname = 'slrgrid'
-            gridoptions = slrgridLayer_options;
+            gridoptions = gridLayer_options;
         } else if (var_value === 'spei_12m' || var_value === 'spei_3m') {
             gridname = 'canadagrid1deg'
             gridoptions = gridLayer_options;
@@ -2704,8 +2689,8 @@ console.log('grid clicked');
                                 if ((selectedSector === 'gridded_data') && $.inArray('gridded_data', sv.availability) !== -1) {
 
                                     if (sv.var_name === 'slr') {
-                                        replaceGrid(sv.grid, slrgridLayer_options, map1);
-                                        replaceGrid(sv.grid, slrgridLayer_options, mapRight);
+                                        replaceGrid(sv.grid, gridLayer_options, map1);
+                                        replaceGrid(sv.grid, gridLayer_options, mapRight);
                                     } else {
                                         replaceGrid(sv.grid, gridLayer_options, map1);
                                         replaceGrid(sv.grid, gridLayer_options, mapRight);

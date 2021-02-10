@@ -465,6 +465,7 @@
             format = $('input[name="download-format"]:checked').val();
             
             if (selected_var !== 'all') {
+                $('body').addClass('spinner-on');
                 request_args= {var: selected_var,
                                month: month,
                                format: format,
@@ -483,7 +484,8 @@
                             $('#download-result a').attr('href', "data:application/json," + encodeURIComponent(JSON.stringify(result)));
                         }
                         $('#download-result a').attr('download', $('#download-filename').val() + '.' + format);
-                        $('#download-result').slideDown(250)
+                        $('#download-result').slideDown(250);
+                        $('body').removeClass('spinner-on');
                        
                 }});
             } else {

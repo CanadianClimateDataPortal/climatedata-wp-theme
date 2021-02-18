@@ -2467,15 +2467,31 @@ console.log('grid clicked');
                 legendmsorys = 'ann';
 
                 if (query['sector'] !== '') {
-                    if (mora_value === 'ann') {
-                        msorys = 'ys';
-                        msorysmonth = '-ann';
-                        legendmsorys = 'ann';
-                    } else {
-                        msorys = 'ms';
-                        msorysmonth = '-' + mora_value;
-                        legendmsorys = "mon";
-                    }
+                    switch(mora_value) {
+                        case 'ann':
+                            msorys = 'ys';
+                            msorysmonth = '-ann';                        
+                            legendmsorys = 'ann';
+                            break;
+                        case 'spring':
+                        case 'summer':
+                        case 'fall':
+                        case 'winter':
+                            msorys = 'qsdec';
+                            msorysmonth = '-' + mora_value;                        
+                            legendmsorys = 'qsdec';
+                            break;
+                        case '2qsapr':
+                            msorys = '2qsapr';
+                            msorysmonth = '-' + mora_value;                          
+                            legendmsorys = '2qsapr';
+                            break;
+                        default:
+                            msorys = 'ms';
+                            msorysmonth = '-' + mora_value;                        
+                            legendmsorys = 'mon';
+                    }                    
+
                     legendLayer = var_value + "_health_" + legendmsorys;
                     generateSectorLegend(var_value + "_health_" + legendmsorys, '');
                 } else {
@@ -3078,12 +3094,23 @@ console.log('grid clicked');
         mora_value = $("#mora").val();
         var_value = $("#var").val();
         if (query['sector'] != '') {
-
-            if (mora_value === 'ann') {
-                legendmsorys = 'ann';
-            } else {
-                legendmsorys = "mon";
+            switch(mora_value) {
+                case 'ann':
+                    legendmsorys = 'ann';
+                    break;
+                case 'spring':
+                case 'summer':
+                case 'fall':
+                case 'winter':
+                    legendmsorys = 'qsdec';
+                    break;
+                case '2qsapr':
+                    legendmsorys = '2qsapr';
+                    break;
+                default:
+                    legendmsorys = 'mon';
             }
+            
             legendLayer = var_value + "_health_" + legendmsorys;
             generateSectorLegend(legendLayer, '');
 

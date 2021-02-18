@@ -109,10 +109,10 @@ function child_theme_enqueue()
 
     // highcharts
 
-    wp_register_script('highcharts-highstock', 'https://code.highcharts.com/stock/highstock.js', NULL, NULL, true);
-    wp_register_script('highcharts-more', 'https://code.highcharts.com/stock/highcharts-more.js', array('highcharts-highstock'), NULL, true);
-    wp_register_script('highcharts-exporting', 'https://code.highcharts.com/stock/modules/exporting.js', array('highcharts-highstock'), NULL, true);
-    wp_register_script('highcharts-export-data', 'https://code.highcharts.com/stock/modules/export-data.js', array('highcharts-highstock'), NULL, true);
+    wp_register_script('highcharts-highstock', 'https://code.highcharts.com/stock/8.2/highstock.js', NULL, NULL, true);
+    wp_register_script('highcharts-more', 'https://code.highcharts.com/stock/8.2/highcharts-more.js', array('highcharts-highstock'), NULL, true);
+    wp_register_script('highcharts-exporting', 'https://code.highcharts.com/stock/8.2/modules/exporting.js', array('highcharts-highstock'), NULL, true);
+    wp_register_script('highcharts-export-data', 'https://code.highcharts.com/stock/8.2/modules/export-data.js', array('highcharts-highstock'), NULL, true);
 
     // select2
 
@@ -122,6 +122,8 @@ function child_theme_enqueue()
     // app dependencies
 
     wp_register_script('leaflet', $bower_dir . 'leaflet/dist/leaflet.js', NULL, NULL, true);
+    wp_register_script('jszip', $bower_dir . 'jszip/dist/jszip.min.js', NULL, NULL, true);    
+    wp_register_script('FileSaver', $bower_dir . 'FileSaver/dist/FileSaver.min.js', NULL, NULL, true);    
     wp_register_script('ion-slider', $bower_dir . 'ion.rangeSlider/js/ion.rangeSlider.min.js', NULL, NULL, true);
     wp_register_script('vector-grid', $child_js_dir . 'vector-grid.js', NULL, NULL, true);
     //wp_register_script ( 'zoom', $child_js_dir . 'zoom.js', NULL, NULL, true );

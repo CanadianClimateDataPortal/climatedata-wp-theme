@@ -21,7 +21,9 @@ function tpl_enqueue()
     wp_enqueue_script('highcharts-export-data');
 
     wp_enqueue_script('leaflet');
-
+    wp_enqueue_script('jszip');
+    wp_enqueue_script('FileSaver');
+    
     wp_enqueue_script('vector-grid');
     wp_enqueue_script('sync');
     wp_enqueue_script('nearest');

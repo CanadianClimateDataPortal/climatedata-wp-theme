@@ -156,9 +156,11 @@
                         idf_init()
                     }
 
-                } 
+                }
             },
             activate: function (e, ui) {
+
+							history.replaceState(null, null, '#' + ui.newPanel.attr('id'))
 
                 if (ui.newPanel.attr('id') === 'var-download') {
 
@@ -180,7 +182,7 @@
                         idf_init()
                     }
 
-                } 
+                }
 
             }
         });
@@ -363,7 +365,7 @@
 
                 var points_to_process = selectedGrids.length
 
- 
+
                 if (selectedGrids.length > 0) {
                     $('#download-location').parent().find('.select2-selection__rendered').text(selectedGrids.length + ' ' + l10n_labels.selected)
                 } else {
@@ -461,14 +463,14 @@
                 point = selectedPoints[selectedGrids[i]];
                 points.push([point.lat, point.lng]);
             }
-            
+
             format = $('input[name="download-format"]:checked').val();
-            
+
             request_args= {var: selected_var,
                            month: month,
                            format: format,
                            points:points};
-            
+
             $.ajax({
                 method: 'POST',
                 url: data_url + '/download',
@@ -483,7 +485,7 @@
                     }
                     $('#download-result a').attr('download', $('#download-filename').val() + '.' + format);
                     $('#download-result').slideDown(250)
-                   
+
             }});
 
         }
@@ -577,16 +579,16 @@
             currentVar = $("#download-variable").val();
             $('#download-variable').empty();
             buildVarDropdown(e.currentTarget.value,currentVar);
-            
+
             if (e.currentTarget.value == 'daily') {
 
                 // refresh captcha
                 $('#daily-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php');
-                
+
                 // netCDF option
                 $('#format-label-netcdf').show();
                 $('#format-label-json').hide();
-                
+
                 // email field
                 $('#annual-process-wrap').hide();
                 $('#daily-process-wrap').show();
@@ -596,11 +598,11 @@
                 // json option
                 $('#format-label-netcdf').hide();
                 $('#format-label-json').show();
-                
+
                 // email field
                 $('#annual-process-wrap').show();
                 $('#daily-process-wrap').hide();
-            }  
+            }
         });
 
         $('#daily-captcha_code').on('input', function (e) {

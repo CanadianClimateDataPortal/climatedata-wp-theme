@@ -1030,6 +1030,7 @@ body.overlay-open[data-overlay-content="video"] {
       }
       
       a {
+        
         &.current-item {
 
         }
@@ -1059,6 +1060,12 @@ body.overlay-open[data-overlay-content="video"] {
         color: $secondary;
       }
     }
+  }
+}
+
+#ag-cases {
+  a {
+    color: $text-muted;
   }
 }
 
@@ -1325,6 +1332,173 @@ body.overlay-open[data-overlay-content="video"] {
     [id*="ice_days"] {
       display: none;
     }
+  }
+}
+
+//
+// TIMELINE
+//
+
+#timeline {
+  
+  .tl-container {
+  	position: relative;
+  	min-height: 100vh;
+  	overflow: hidden;
+  }
+  
+  .tl-section {
+    &.headings-primary {
+      h1, h2, h3, h4, h5, h6 {
+        color: $primary;
+      }
+    }
+    
+    &.headings-secondary {
+      h1, h2, h3, h4, h5, h6 {
+        color: $secondary;
+      }
+    }
+    
+    &.headings-white {
+      h1, h2, h3, h4, h5, h6 {
+        color: $white;
+      }
+    }
+    
+    &.headings-dark {
+      h1, h2, h3, h4, h5, h6 {
+        color: $dark;
+      }
+    }
+    
+    &.links-primary {
+      a {
+        color: $primary;
+      }
+    }
+    
+    &.links-secondary {
+      a {
+        color: $secondary;
+      }
+    }
+    
+    &.links-white {
+      a {
+        color: $white;
+      }
+    }
+    
+    &.links-dark {
+      a {
+        color: $dark;
+      }
+    }
+  }
+  
+  .element {
+  	position: absolute;
+  }
+  
+  .type-video {
+  	@include full-size;
+  	overflow: hidden;
+  
+  	video {
+  		position: absolute;
+  		top: 50%;
+  		left: 50%;
+  		width: calc(100% * 16 / 9);
+  		height: 100%;
+  		max-width: none;
+  		max-height: none;
+  		transform: translate(-50%, -50%);
+  	}
+  }
+  
+  @media (min-aspect-ratio: 16/9) {
+  	.type-video {
+  		video {
+  			width: 100%;
+  			height: calc(100% / 16 * 9);
+  		}
+  	}
+  }
+  
+  @media (max-width: 767px) {
+  	.type-video {
+    	video {
+    		display: none;
+      }
+  	}
+  }
+  
+  /*
+  [data-position-x="0"] { left: 0; }
+  [data-position-x="5"] { left: 5%; }
+  [data-position-x="10"] { left: 10%; }
+  [data-position-x="25"] { left: 25%; }
+  [data-position-x="33"] { left: 33%; }
+  [data-position-x="50"] { left: 50%; }
+  [data-position-x="66"] { left: 66%; }
+  [data-position-x="75"] { left: 75%; }
+  [data-position-x="90"] { right: 10%; }
+  [data-position-x="95"] { right: 5%; }
+  [data-position-x="100"] { right: 0; }
+  
+  [data-position-y="0"] { top: 130px; }
+  [data-position-y="5"] { top: calc(130px + ((100vh - 130px) * 0.05)); }
+  [data-position-y="10"] { top: calc(130px + ((100vh - 130px) * 0.1)); }
+  [data-position-y="25"] { top: calc(130px + ((100vh - 130px) * 0.25)); }
+  [data-position-y="33"] { top: calc(130px + ((100vh - 130px) * 0.33)); }
+  [data-position-y="50"] { top: calc(130px + ((100vh - 130px) * 0.5)); }
+  [data-position-y="75"] { bottom: calc((100vh - 130px) * 0.25); }
+  [data-position-y="66"] { bottom: calc((100vh - 130px) * 0.33); }
+  [data-position-y="90"] { bottom: calc((100vh - 130px) * 0.1); }
+  [data-position-y="95"] { bottom: calc((100vh - 130px) * 0.05); }
+  [data-position-y="100"] { bottom: 0; }
+  */
+  
+  [data-position-z="1"] { z-index: 1; }
+  [data-position-z="2"] { z-index: 2; }
+  [data-position-z="3"] { z-index: 3; }
+  [data-position-z="4"] { z-index: 4; }
+  [data-position-z="5"] { z-index: 5; }
+  [data-position-z="6"] { z-index: 6; }
+  [data-position-z="7"] { z-index: 7; }
+  [data-position-z="8"] { z-index: 8; }
+  [data-position-z="9"] { z-index: 9; }
+  [data-position-z="10"] { z-index: 10; }
+  
+  [data-size-x="auto"] { max-width: 50%; }
+  [data-size-x="25"] { width: 25% !important; }
+  [data-size-x="33"] { width: 33% !important; }
+  [data-size-x="50"] { width: 50% !important; }
+  [data-size-x="66"] { width: 66% !important; }
+  [data-size-x="75"] { width: 75% !important; }
+  [data-size-x="100"] { width: 100% !important; }
+  
+  [data-size-y="25"] { height: 25% !important; }
+  [data-size-y="50"] { height: 50% !important; }
+  [data-size-y="75"] { height: 75% !important; }
+  [data-size-y="100"] { height: 100% !important; }
+  
+  [data-size-x="100"][data-size-y="100"] {
+  	left: 0;
+  	top: 0;
+  }
+  
+  [data-size-x="50"][data-position-x="center"] {
+  	left: 25%;
+  }
+  
+  [data-size-x="25"][data-position-x="center"] {
+  	left: 37.5%;
+  }
+  
+  [data-size-x="75"][data-position-x="center"] {
+  	left: 12.5%;
   }
 }
 

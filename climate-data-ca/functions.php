@@ -168,22 +168,6 @@ function child_theme_enqueue()
 add_action('wp_enqueue_scripts', 'child_theme_enqueue');
 
 //
-// ADMIN JS
-//
-
-function admin_js() {
-
-
-  wp_register_script ( 'timeline-admin', get_stylesheet_directory_uri() . '/resources/js/admin-timeline.js', array ( 'jquery', 'jquery-ui-autocomplete' ), NULL, true );
-
-  wp_enqueue_script ( 'timeline-admin' );
-
-}
-
-add_action ( 'admin_enqueue_scripts', 'admin_js' );
-
-
-//
 // WPML
 //
 

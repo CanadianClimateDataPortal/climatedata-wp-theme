@@ -152,18 +152,35 @@ function child_theme_enqueue()
 
         wp_enqueue_script('case-study-functions');
   }
-  
+
   if ( is_page ( 'learn' ) || is_page ( 'apprendre' ) || is_singular ( 'resource' ) ) {
-    
+
     wp_enqueue_script ( 'training-functions' );
-    
+
     //wp_enqueue_script ( 'isotope', 'https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js', null, null, true );
-    
+
   }
 
 }
 
 add_action('wp_enqueue_scripts', 'child_theme_enqueue');
+
+//
+// ADMIN JS
+//
+
+function admin_js() {
+
+
+  wp_register_script ( 'timeline-admin', get_stylesheet_directory_uri() . '/resources/js/admin-timeline.js', array ( 'jquery', 'jquery-ui-autocomplete' ), NULL, true );
+
+  wp_enqueue_script ( 'timeline-admin' );
+
+}
+
+add_action ( 'admin_enqueue_scripts', 'admin_js' );
+
+
 
 //
 // WPML

@@ -1647,7 +1647,7 @@ console.log('grid clicked');
             rightLayerName = var_value + '-' + msorys + '-' + right_rcp_value + '-p50' + msorysmonth + '-30year';
 
 
-            smoraval = getQueryVariable('mora')
+            moraval = getQueryVariable('mora');
 
 
             var layer = leftLayerName;

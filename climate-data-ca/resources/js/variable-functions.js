@@ -1253,7 +1253,6 @@ console.log('grid clicked');
 
         // LAYER CHART
         function genChart(lat, lon, variable, month) {
-            $('#var-filter-view').hide();
             $(document).overlay('show', {
                 href: base_href + 'variable/' + $('#var').val() + '/',
                 data: {
@@ -1280,7 +1279,6 @@ console.log('grid clicked');
 
         // SECTOR CHART
         function genSectorChart(id, variable, month, region_label) {
-            $('#var-filter-view').hide();
             $(document).overlay('show', {
                 href: base_href + 'variable/' + variable + '/',
                 data: {
@@ -3163,6 +3161,7 @@ console.log('grid clicked');
         });
 
         $(document).on('overlay_show', function () {
+            $('#var-filter-view').hide();
 
             if ($('body').find('#chart-tour').length) {
 

@@ -23,6 +23,10 @@ if (isset($_SERVER['HTTP_HOST'])) {
       $DATAURL="//dataclimatedata.crim.ca";
       break;
     case "donneesclimatiques.crim.ca":
+    case "climatedata2.crim.ca":
+    case "donneesclimatiques2.crim.ca":
+    case "climatedata3.crim.ca":
+    case "donneesclimatiques3.crim.ca":
       $UA="";
       $DATAURL="//dataclimatedata.crim.ca";
       break;

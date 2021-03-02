@@ -8768,6 +8768,16 @@ body.overlay-open[data-overlay-content=video] #main-header-nav .overlay-close {
 #timeline .element {
   position: absolute;
 }
+#timeline .type-img {
+  overflow: hidden;
+}
+#timeline .type-img img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  transform: translate(-50%, -50%);
+}
 #timeline .type-video {
   position: absolute;
   top: 0;

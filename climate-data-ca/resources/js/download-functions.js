@@ -308,9 +308,6 @@
             var pbfURL = hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + gridName + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf";
 
 
-
-
-
             pbfLayer = L.vectorGrid.protobuf(pbfURL, vectorTileOptions).on('click', function (e) {
 
                 highlightGridFeature = e.layer.properties.gid;
@@ -359,7 +356,6 @@
                     });
 
                 }
-
 
 
                 var points_to_process = selectedGrids.length
@@ -458,7 +454,7 @@
             }
 
             points = []
-            for (var i =0 ; i < selectedGrids.length; i++) {
+            for (var i = 0; i < selectedGrids.length; i++) {
                 point = selectedPoints[selectedGrids[i]];
                 points.push([point.lat, point.lng]);
             }
@@ -467,11 +463,13 @@
 
             if (selected_var !== 'all') {
                 $('body').addClass('spinner-on');
-                request_args= {var: selected_var,
-                               month: month,
-                               format: format,
-                               points:points};
-                
+                request_args = {
+                    var: selected_var,
+                    month: month,
+                    format: format,
+                    points: points
+                };
+
                 $.ajax({
                     method: 'POST',
                     url: data_url + '/download',
@@ -487,34 +485,36 @@
                         $('#download-result a').attr('download', $('#download-filename').val() + '.' + format);
                         $('#download-result').slideDown(250);
                         $('body').removeClass('spinner-on');
-                       
-                }});
+
+                    }
+                });
             } else {
                 // call download for all matching variables and build a zip file
                 selectedTimeStepCategory = $('#download-dataset').find(':selected').data('timestep');
-                varToProcess=[];
+                varToProcess = [];
 
 
-                
                 for (k in varData) {
                     if (k !== 'all' && varData[k].grid === 'canadagrid' && $.inArray(selectedTimeStepCategory, varData[k].timestep) !== -1) {
-                          varToProcess.push(k);
-                      }
+                        varToProcess.push(k);
+                    }
                 }
 
                 $('body').addClass('spinner-on');
                 var dl_status = 0;
                 var dl_fraction = $('<p id="dl-fraction" style="position: absolute; left: 30%; bottom: 30%; width: 40%; padding-bottom: 1em; text-align: center;"><span>' + dl_status + '</span> / ' + varToProcess.length + '</p>').appendTo($('.spinner'));
                 var dl_progress = $('<div class="dl-progress" style="position: absolute; left: 0; bottom: 0; width: 0; height: 4px; background: red;">').appendTo(dl_fraction);
-                var i=0;
-                var zip = new JSZip();             
-                
+                var i = 0;
+                var zip = new JSZip();
+
                 function download_all() {
                     if (i < varToProcess.length) {
-                        request_args= {var: varToProcess[i],
-                                       month: month,
-                                       format: format,
-                                       points:points};
+                        request_args = {
+                            var: varToProcess[i],
+                            month: month,
+                            format: format,
+                            points: points
+                        };
                         $.ajax({
                             method: 'POST',
                             url: data_url + '/download',
@@ -522,43 +522,45 @@
                             data: JSON.stringify(request_args),
                             success: function (result) {
                                 if (format == 'csv') {
-                                    zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.csv',result);
+                                    zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.csv', result);
                                 }
                                 if (format == 'json') {
-                                    zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.json',JSON.stringify(result));
+                                    zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.json', JSON.stringify(result));
                                 }
-                                
-                                
+
+
                                 dl_fraction.find('span').html(i);
                                 dl_progress.css('width', (i / varToProcess.length * 100) + '%');
-                                if (i == varToProcess.length -1) { // last one
+                                if (i == varToProcess.length - 1) { // last one
                                     $('body').removeClass('spinner-on');
                                     dl_fraction.remove();
                                     dl_progress.remove();
-                                    zip.generateAsync({type:"blob"})
-                                    .then(function(content) {
-                                        saveAs(content, $('#download-filename').val()+".zip");
-                                                                   
-                                    });     
+                                    zip.generateAsync({type: "blob"})
+                                        .then(function (content) {
+                                            saveAs(content, $('#download-filename').val() + ".zip");
+
+                                        });
                                 }
                             },
                             complete: function () {
                                 i++;
                                 download_all();
-                            }});    
+                            }
+                        });
                     }
 
                 }
+
                 download_all();
-                
+
 
             }
-            
-            
+
+
         }
 
 
-        function buildVarDropdown(frequency,currentVar) {
+        function buildVarDropdown(frequency, currentVar) {
             $.ajax({
                 url: '/wp-json/acf/v3/variable/?per_page=10000&orderby=menu_order&order=asc',
                 dataType: 'json',
@@ -578,7 +580,7 @@
 
                             if ($.inArray(selectedTimeStepCategory, sv.timestep) !== -1) {
 
-                                if (sv.variable_type != 'station_data') {
+                                if (sv.variable_type !== 'station_data') {
 
                                     if (sv.var_name) {
                                         if (currentOptGroup !== sv.variable_type) {
@@ -606,14 +608,14 @@
                             }
 
 
-
                         });
                     });
-                if (selectedTimeStepCategory !== 'daily' && $('#download-dataset').val() != 'all' ) {
-                    $('#download-variable').append("<optgroup id=optgroup_misc label='" + l10n_labels['misc'] + "'>");
-                    $('#optgroup_misc').append(new Option(l10n_labels['allbccaq'],'all', false, false));
-                    varData['all'] = {'grid':'canadagrid'};
-                }},
+                    if (selectedTimeStepCategory !== 'daily' && $('#download-dataset').val() != 'all') {
+                        $('#download-variable').append("<optgroup id=optgroup_misc label='" + l10n_labels['misc'] + "'>");
+                        $('#optgroup_misc').append(new Option(l10n_labels['allbccaq'], 'all', false, false));
+                        varData['all'] = {'grid': 'canadagrid'};
+                    }
+                },
                 error: function () {
 
                 },
@@ -623,7 +625,7 @@
                         $('#download-variable').trigger('change');
                         $('#download-variable').val(currentVar).trigger('select2:select');
                     } else {
-                        $('#download-variable option:eq(0)').prop('selected',true);
+                        $('#download-variable option:eq(0)').prop('selected', true);
 
                         $('#download-variable').trigger('change');
                         currentVar = $('#download-variable').val();
@@ -640,7 +642,8 @@
             console.log('frequency changed');
             currentVar = $("#download-variable").val();
             $('#download-variable').empty();
-            buildVarDropdown(e.currentTarget.value,currentVar);
+
+            buildVarDropdown(e.currentTarget.value, currentVar);
 
             if (e.currentTarget.value == 'daily') {
 
@@ -689,7 +692,7 @@
 
             // maps['variable'].eachLayer( function(layer) {
             //     if ( layer.myTag  &&  layer.myTag === 'gridlayer') {
-            if (pbfLayer.gridType !== curValData.grid){
+            if (pbfLayer.gridType !== curValData.grid) {
                 maps['variable'].removeLayer(pbfLayer);
                 console.log("Adding Grid:" + curValData.grid);
                 addGrid(curValData.grid);
@@ -703,7 +706,6 @@
             }
             //     }
             // });
-
 
 
         });
@@ -915,92 +917,83 @@
         };
 
         var markerMap = [];
+        stationFromAPI = [];
         var pointsLayer;
 
         function station_init() {
 
             create_map('station');
 
-            $.getJSON('https://geo.weather.gc.ca/geomet/features/collections/climate-stations/items?f=json&limit=10000', function (data) {
+            // $.getJSON('https://geo.weather.gc.ca/geomet/features/collections/climate-stations/items?f=json&limit=10000', function (data) {
+            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE', function (data) {
+
+
+                // var len = data.features.length;
+
+                // for (var i = 0; i< len; i++) {
+                //
+                //     stationOption = data.features[i].properties;
+                //
+                //     // console.log(stationOption);
+                //
+                //     // console.log(data.features[i]);
+                //     stationFromAPI += '<option value="' + stationOption.STN_ID + '">' + stationOption.STATION_NAME + '</option>';
+                //
+                //
+                // }
+                // $('#station-select').append(stationFromAPI);
+                // $('#station-select').select2();
+
+                var markers = L.markerClusterGroup();
+
+                var geojsonMarkerOptions = {
+                    // Stroke properties
+                    color: '#3d68f6',
+                    opacity: 1,
+                    weight: 2,
+                    pane: 'idf',
+                    // Fill properties
+                    fillColor: '#3d68f6',
+                    fillOpacity: 1,
+                    radius: 5
+                };
 
                 pointsLayer = L.geoJson(data, {
+                    // onEachFeature: function (feature, layer) {
+                    //     layer.bindPopup(feature.properties.address);
+                    // }
                     pointToLayer: function (feature, latlng) {
-
-                        var markerColor = '#BBB';
-                        var existingData = $("#station-select").select2("val");
-
-
-                        if (existingData != null && existingData.includes(feature.properties.STN_ID.toString())) {
-                            markerColor = '#F00';
-                        }
-
-                        var marker = L.circleMarker(latlng, {
-                            // Stroke properties
-                            color: markerColor,
-                            opacity: 1,
-                            weight: 2,
-                            pane: 'idf',
-                            // Fill properties
-                            fillColor: markerColor,
-                            fillOpacity: 1,
-                            radius: 5
-                        });
-
-                        markerMap[feature.id] = marker;
-
-                        return marker;
-
+                        return L.circleMarker(latlng, geojsonMarkerOptions);
                     }
+
+
+
                 }).on('mouseover', function (e) {
                     e.layer.bindTooltip(e.layer.feature.properties.STATION_NAME + ' ' + e.layer.feature.properties.STN_ID).openTooltip(e.latlng);
                 }).on('click', function (e) {
-
                     // get current station select value
                     var existingData = $("#station-select").select2("val");
-
                     // clicked ID
                     var clicked_ID = e.layer.feature.properties.STN_ID.toString();
-
                     // default colour
                     markerColor = '#F00';
-
                     if (existingData != null) {
-
-
                         if (existingData.includes(clicked_ID)) {
-
-
                             var $select = $('#station-select');
-
                             index = existingData.indexOf(clicked_ID);
-
                             if (index > -1) {
                                 existingData.splice(index, 1);
                             }
-
-
                             $('#station-select').val(existingData).change();
-
-                            markerColor = '#BBB';
-
+                            markerColor = '#3d68f6';
                         } else {
-
-
                             existingData.push(clicked_ID);
-
                             $('#station-select').val(existingData).change();
-
                         }
-
                     } else {
-
-
                         existingData = [clicked_ID];
-
                         $('#station-select').val(existingData).change();
-
                     }
-
                     e.layer.setStyle({
                         // Stroke properties
                         color: markerColor,
@@ -1012,9 +1005,114 @@
                         fillOpacity: 1,
                         radius: 5
                     });
+                });
 
-                }).addTo(maps['station']);
+                markers.addLayer(pointsLayer);
+
+                maps['station'].addLayer(markers);
+                // maps['station'].fitBounds(markers.getBounds());
+
+                // pointsLayer = L.geoJson(data, {
+                //     pointToLayer: function (feature, latlng) {
+                //
+                //         var markerColor = '#BBB';
+                //         var existingData = $("#station-select").select2("val");
+                //
+                //         // console.log(feature.properties);
+                //
+                //         if (existingData != null && existingData.includes(feature.properties.STN_ID.toString())) {
+                //             markerColor = '#F00';
+                //         }
+                //
+                //         // var marker = L.circleMarker(latlng, {
+                //         //     // Stroke properties
+                //         //     color: markerColor,
+                //         //     opacity: 1,
+                //         //     weight: 2,
+                //         //     pane: 'idf',
+                //         //     // Fill properties
+                //         //     fillColor: markerColor,
+                //         //     fillOpacity: 1,
+                //         //     radius: 5
+                //         // });
+                //
+                //          var title = feature.properties.STATION_NAME.toString();
+                //         var marker = L.marker(latlng, { title: title });
+                //         marker.bindPopup(title);
+                //         markers.addLayer(marker);
+                //
+                //         // markerMap[feature.id] = marker;
+                //
+                //         return marker;
+                //
+                //     }
+                // }).on('mouseover', function (e) {
+                //     e.layer.bindTooltip(e.layer.feature.properties.STATION_NAME + ' ' + e.layer.feature.properties.STN_ID).openTooltip(e.latlng);
+                // }).on('click', function (e) {
+                //
+                //     // get current station select value
+                //     var existingData = $("#station-select").select2("val");
+                //
+                //     // clicked ID
+                //     var clicked_ID = e.layer.feature.properties.STN_ID.toString();
+                //
+                //     // default colour
+                //     markerColor = '#F00';
+                //
+                //     if (existingData != null) {
+                //
+                //
+                //         if (existingData.includes(clicked_ID)) {
+                //
+                //
+                //             var $select = $('#station-select');
+                //
+                //             index = existingData.indexOf(clicked_ID);
+                //
+                //             if (index > -1) {
+                //                 existingData.splice(index, 1);
+                //             }
+                //
+                //
+                //             $('#station-select').val(existingData).change();
+                //
+                //             markerColor = '#BBB';
+                //
+                //         } else {
+                //
+                //
+                //             existingData.push(clicked_ID);
+                //
+                //             $('#station-select').val(existingData).change();
+                //
+                //         }
+                //
+                //     } else {
+                //
+                //
+                //         existingData = [clicked_ID];
+                //
+                //         $('#station-select').val(existingData).change();
+                //
+                //     }
+                //
+                //     e.layer.setStyle({
+                //         // Stroke properties
+                //         color: markerColor,
+                //         opacity: 1,
+                //         weight: 2,
+                //         pane: 'idf',
+                //         // Fill properties
+                //         fillColor: markerColor,
+                //         fillOpacity: 1,
+                //         radius: 5
+                //     });
+                //
+                // }).addTo(maps['station']);
+
+
             });
+
 
             function formatGeoSelect(item) {
 
@@ -1027,7 +1125,7 @@
         }
 
         $('#start_date').datetimepicker({
-            format: 'Y-MM-DD',
+            format: 'YYYY-MM-DD',
             viewMode: 'years'
         });
 
@@ -1037,7 +1135,7 @@
         });
 
         $('#end_date').datetimepicker({
-            format: 'Y-MM-DD',
+            format: 'YYYY-MM-DD',
             viewMode: 'years'
         });
 
@@ -1120,12 +1218,12 @@
                 if (layer.feature.properties.STN_ID === marker_id) {
                     layer.setStyle({
                         // Stroke properties
-                        color: '#BBB',
+                        color: '#3d68f6',
                         opacity: 1,
                         weight: 2,
                         pane: 'idf',
                         // Fill properties
-                        fillColor: '#BBB',
+                        fillColor: '#3d68f6',
                         fillOpacity: 1,
                         radius: 5
                     })
@@ -1216,7 +1314,7 @@
         function populate_URL() {
 
 
-            var new_url = 'https://geo.weather.gc.ca/geomet/features/collections/climate-daily/items?time=' + dl_URL.start + ' 00:00:00/' + dl_URL.end + ' 00:00:00&STN_ID=' + dl_URL['s'] + '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' + dl_URL.format + '&limit=' + dl_URL.limit + '&offset=' + dl_URL.offset;
+            var new_url = 'https://api.weather.gc.ca/collections/climate-daily/items?datetime=' + dl_URL.start + ' 00:00:00/' + dl_URL.end + ' 00:00:00&STN_ID=' + dl_URL['s'] + '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' + dl_URL.format + '&limit=' + dl_URL.limit + '&startindex=' + dl_URL.offset;
 
             $('#station-process').attr('href', new_url);
 
@@ -1445,6 +1543,143 @@
             }, 500)
 
         })
+
+
+        function ahccd_init() {
+
+            create_map('ahccd');
+
+            ahccd_icons = {
+                P: L.icon({
+                    iconUrl: child_theme_dir + 'resources/app/ahccd/triangle-grey.png',
+                    iconSize: [15, 15],
+                    iconAnchor: [7, 7]
+                }),
+                Pr: L.icon({
+                    iconUrl: child_theme_dir + 'resources/app/ahccd/triangle-red.png',
+                    iconSize: [15, 15],
+                    iconAnchor: [7, 7]
+                }),
+                T: L.icon({
+                    iconUrl: child_theme_dir + 'resources/app/ahccd/square-grey.png',
+                    iconSize: [15, 15],
+                    iconAnchor: [7, 7]
+                }),
+                Tr: L.icon({
+                    iconUrl: child_theme_dir + 'resources/app/ahccd/square-red.png',
+                    iconSize: [15, 15],
+                    iconAnchor: [7, 7]
+                }),
+                B: L.icon({
+                    iconUrl: child_theme_dir + 'resources/app/ahccd/circle-grey.png',
+                    iconSize: [15, 15],
+                    iconAnchor: [7, 7]
+                }),
+                Br: L.icon({
+                    iconUrl: child_theme_dir + 'resources/app/ahccd/circle-red.png',
+                    iconSize: [15, 15],
+                    iconAnchor: [7, 7]
+                })
+            }
+
+
+            $.getJSON(child_theme_dir + 'resources/app/ahccd/ahccd.json', function (data) {
+
+
+                ahccd_layer = L.geoJson(data, {
+                    onEachFeature: function (feature, layer) {
+
+                        $('<option value="' + feature.properties.ID + '">' + feature.properties.Name + '</option>').appendTo('#ahccd-select')
+
+                    },
+                    pointToLayer: function (feature, latlng) {
+                        return new L.Marker(latlng, {
+                            icon: ahccd_icons[feature.properties.type]
+                        })
+
+                    }
+
+                }).on('mouseover', function (e) {
+                    e.layer.bindTooltip(e.layer.feature.properties.Name).openTooltip(e.latlng);
+                }).on('click', function (e) {
+
+                    // get current station select value
+                    var selection = $("#ahccd-select").val() || [];
+
+                    var clicked_ID = e.layer.feature.properties.ID;
+
+                    // search if clicked feature is already selected
+                    idx = selection.indexOf(clicked_ID);
+
+                    if (idx != -1) {
+                        selection.splice(index, 1);
+                        $('#ahccd-select').val(selection).change();
+                        icon = ahccd_icons[e.layer.feature.properties.type];
+                    } else {
+                        selection.push(clicked_ID);
+                        $('#ahccd-select').val(selection).change();
+                        icon = ahccd_icons[e.layer.feature.properties.type + 'r'];
+                    }
+
+                    e.layer.setIcon(icon);
+
+                })
+
+                // sort options
+
+                var arr = $('#ahccd-select option').map(function (_, o) {
+                    return {t: $(o).text(), v: o.value};
+                }).get()
+
+                arr.sort(function (o1, o2) {
+                    return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0;
+                })
+
+                $('#ahccd-select option').each(function (i, o) {
+                    o.value = arr[i].v
+                    $(o).text(arr[i].t)
+                })
+
+                // add to map
+
+                ahccd_layer.addTo(maps['ahccd'])
+
+            });
+
+            // trigger when a tag is removed from multiple station selector input
+            $('#ahccd-select').on('select2:unselect', function (e) {
+                ahccd_layer.eachLayer(function (layer) {
+                    if (layer.feature.properties.ID === e.params.data.id) {
+                        layer.setIcon(ahccd_icons[layer.feature.properties.type]);
+                    }
+                });
+            });
+
+            // trigger when a tag is added to multiple station selector input
+            $('#ahccd-select').on('select2:select', function (e) {
+                ahccd_layer.eachLayer(function (layer) {
+                    if (layer.feature.properties.ID === e.params.data.id) {
+                        layer.setIcon(ahccd_icons[layer.feature.properties.type + 'r']);
+                    }
+                });
+            });
+
+            $('#ahccd-download-form :input').change(function () {
+                // sync & activate process button
+                var selection = $("#ahccd-select").val() || [];
+                if (selection.length > 0) {
+                    var format = $('input[name="ahccd-download-format"]:checked').val();
+                    url = data_url + '/download-ahccd?format=' + format + '&stations=' + selection.join(',');
+                    $('#ahccd-process').attr('href', url);
+                    $('#ahccd-process').removeClass('disabled');
+                    $('#ahccd-download-status').text(l10n_labels['readytoprocess']);
+                } else {
+                    $('#ahccd-process').addClass('disabled');
+                    $('#ahccd-download-status').text(l10n_labels['selectstation']);
+                }
+            });
+
+        }
 
         function create_map(map_var) {
 

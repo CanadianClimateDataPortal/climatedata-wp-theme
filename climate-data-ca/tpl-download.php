@@ -21,6 +21,7 @@ function tpl_enqueue()
     wp_enqueue_script('highcharts-export-data');
 
     wp_enqueue_script('leaflet');
+    wp_enqueue_script('leaflet-cluster');
     wp_enqueue_script('jszip');
     wp_enqueue_script('FileSaver');
     
@@ -74,6 +75,10 @@ if (have_posts()) : while (have_posts()) : the_post();
 
     ?>
 
+<style>
+    .bootstrap-datetimepicker-widget {
+        font-size:10px; }
+</style>
     <main id="download-content">
 
         <?php

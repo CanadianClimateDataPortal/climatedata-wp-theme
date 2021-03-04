@@ -248,8 +248,12 @@ var chart_labels, legend_labels, l10n_labels;
       gridded_data: 'Gridded data',
       census: 'Census subdivisions',
       health: 'Health regions',
-      watershed: 'Watersheds'      
-      
+      watershed: 'Watersheds',
+      ahccdLegend: 'Legend',
+      ahccdLegendSquare: 'Temperature',
+      ahccdLegendTriangle: 'Precipitation',
+      ahccdLegendCircle: 'Both'
+
     };
 
     if ($('body').hasClass('lang-fr')) {
@@ -287,7 +291,11 @@ var chart_labels, legend_labels, l10n_labels;
         gridded_data: 'Données mailées',
         census: 'Subdivisions de recensement',
         health: 'Régions socio-sanitaire',
-        watershed: 'Bassins versants'
+        watershed: 'Bassins versants',
+        ahccdLegend: 'Légende',
+        ahccdLegendSquare: 'Température',
+        ahccdLegendTriangle: 'Précipitation',
+        ahccdLegendCircle: 'Tous les deux'
       };
 
       if (typeof Highcharts !== 'undefined') {

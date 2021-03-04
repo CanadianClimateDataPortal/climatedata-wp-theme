@@ -349,7 +349,7 @@ if (get_the_ID() == filtered_ID_by_path('explore/variable')) {
     </div>
 </nav>
 
-<div id="var-filter-view" class="col-3 offset-2 p-4 d-flex align-items-center">
+<div id="var-filter-view" class="col-3 offset-2 p-4 align-items-center">
   <label for="sector" class="mr-3"><?php _e ( 'View by:', 'cdc' ); ?></label>
   
   <select class="custom-select" id="sector" name="sector">

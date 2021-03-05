@@ -122,7 +122,9 @@ function child_theme_enqueue()
     // app dependencies
 
     wp_register_script('leaflet', $bower_dir . 'leaflet/dist/leaflet.js', NULL, NULL, true);
-    wp_register_script('jszip', $bower_dir . 'jszip/dist/jszip.min.js', NULL, NULL, true);    
+    wp_register_script('leaflet-cluster', $child_js_dir . 'leaflet-cluster.js', NULL, NULL, true);
+
+    wp_register_script('jszip', $bower_dir . 'jszip/dist/jszip.min.js', NULL, NULL, true);
     wp_register_script('FileSaver', $bower_dir . 'FileSaver/dist/FileSaver.min.js', NULL, NULL, true);    
     wp_register_script('ion-slider', $bower_dir . 'ion.rangeSlider/js/ion.rangeSlider.min.js', NULL, NULL, true);
     wp_register_script('vector-grid', $child_js_dir . 'vector-grid.js', NULL, NULL, true);
@@ -154,18 +156,35 @@ function child_theme_enqueue()
 
         wp_enqueue_script('case-study-functions');
   }
-  
+
   if ( is_page ( 'learn' ) || is_page ( 'apprendre' ) || is_singular ( 'resource' ) ) {
-    
+
     wp_enqueue_script ( 'training-functions' );
-    
+
     //wp_enqueue_script ( 'isotope', 'https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js', null, null, true );
-    
+
   }
 
 }
 
 add_action('wp_enqueue_scripts', 'child_theme_enqueue');
+
+//
+// ADMIN JS
+//
+
+function admin_js() {
+
+
+  wp_register_script ( 'timeline-admin', get_stylesheet_directory_uri() . '/resources/js/admin-timeline.js', array ( 'jquery', 'jquery-ui-autocomplete' ), NULL, true );
+
+  wp_enqueue_script ( 'timeline-admin' );
+
+}
+
+add_action ( 'admin_enqueue_scripts', 'admin_js' );
+
+
 
 //
 // WPML

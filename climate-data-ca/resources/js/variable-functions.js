@@ -627,53 +627,31 @@
         map1.getPane('stations').style.pointerEvents = 'all';
 
         function loadClimateNormals() {
-
-            $.getJSON('https://geo.weather.gc.ca/geomet/features/collections/climate-stations/items?f=json&limit=10000', function (data) {
-
+            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y', function (data) {
                 station_layer = L.geoJson(data, {
                     pointToLayer: function (feature, latlng) {
-
-                        if (feature.properties.HAS_NORMALS_DATA === 'Y') {
-                            markerColor = '#e50e40';
-
-                            return L.circleMarker(latlng, {
-                                // Stroke properties
-                                color: '#fff',
-                                opacity: 1,
-                                weight: 2,
-
-                                pane: 'stations',
-                                // Fill properties
-                                fillColor: markerColor,
-                                fillOpacity: 1,
-
-                                radius: 5
-                            });
-
-                        } else {
-                            markerColor = '#555';
-                        }
-
+                        markerColor = '#e50e40';
+                        return L.circleMarker(latlng, {
+                            // Stroke properties
+                            color: '#fff',
+                            opacity: 1,
+                            weight: 2,
+                            pane: 'stations',
+                            fillColor: markerColor,
+                            fillOpacity: 1,
+                            radius: 5
+                        });
                     }
                 }).on('mouseover', function (e) {
-
                     e.layer.bindTooltip(e.layer.feature.properties.STATION_NAME).openTooltip(e.latlng);
-
                 }).on('click', function (e) {
-
-                    genStationChart(e.layer.feature.properties.STN_ID, e.layer.feature.properties.STATION_NAME, e.layer.feature.properties.LATITUDE, e.layer.feature.properties.LONGITUDE);
-
-
+                    genStationChart(e.layer.feature.properties.STN_ID, e.layer.feature.properties.STATION_NAME, e.latlng['lat'], e.latlng['lng']);
                 });
-
-
             }).done(function() {
                 if (query['var'] === 'weather-stations') {
-                    console.log("add weather stations layer on getjson done");
                     station_layer.addTo(map1);
                 }
             });
-
         }
 
         //
@@ -1318,7 +1296,7 @@ console.log('grid clicked');
                 callback: function (varDetails) {
 
                     $.getJSON(
-                        'https://geo.weather.gc.ca/geomet/features/collections/climate-normals/items?f=json&STN_ID=' + STN_ID + '&NORMAL_ID=1&sortby=MONTH',
+                        'https://api.weather.gc.ca/collections/climate-normals/items?f=json&STN_ID=' + STN_ID + '&NORMAL_ID=1&sortby=MONTH',
                         function (data) {
 
                             var chartUnit = " °C",
@@ -1416,7 +1394,7 @@ console.log('grid clicked');
                             // 56 Precipitation (mm)
                             // 8 Daily Minimum (degree C)
 
-                            $.getJSON('https://geo.weather.gc.ca/geomet/features/collections/climate-normals/items?f=json&STN_ID=' + STN_ID + '&NORMAL_ID=1&sortby=MONTH', function (data) {
+                            $.getJSON('https://api.weather.gc.ca/collections/climate-normals/items?f=json&STN_ID=' + STN_ID + '&NORMAL_ID=1&sortby=MONTH', function (data) {
                                 timeSeries = [];
                                 $.each(data.features, function (k, v) {
                                     if (k < 12) {
@@ -1437,7 +1415,7 @@ console.log('grid clicked');
                                     }
                                 });
 
-                                $.getJSON('https://geo.weather.gc.ca/geomet/features/collections/climate-normals/items?f=json&STN_ID=' + STN_ID + '&NORMAL_ID=5&sortby=MONTH', function (data) {
+                                $.getJSON('https://api.weather.gc.ca/collections/climate-normals/items?f=json&STN_ID=' + STN_ID + '&NORMAL_ID=5&sortby=MONTH', function (data) {
                                     timeSeries = [];
                                     $.each(data.features, function (k, v) {
                                         if (k < 12) {
@@ -1458,7 +1436,7 @@ console.log('grid clicked');
                                         }
                                     });
 
-                                    $.getJSON('https://geo.weather.gc.ca/geomet/features/collections/climate-normals/items?f=json&STN_ID=' + STN_ID + '&NORMAL_ID=8&sortby=MONTH', function (data) {
+                                    $.getJSON('https://api.weather.gc.ca/collections/climate-normals/items?f=json&STN_ID=' + STN_ID + '&NORMAL_ID=8&sortby=MONTH', function (data) {
                                         timeSeries = [];
                                         $.each(data.features, function (k, v) {
                                             if (k < 12) {
@@ -1479,7 +1457,7 @@ console.log('grid clicked');
                                             }
                                         });
 
-                                        $.getJSON('https://geo.weather.gc.ca/geomet/features/collections/climate-normals/items?f=json&STN_ID=' + STN_ID + '&NORMAL_ID=56&sortby=MONTH', function (data) {
+                                        $.getJSON('https://api.weather.gc.ca/collections/climate-normals/items?f=json&STN_ID=' + STN_ID + '&NORMAL_ID=56&sortby=MONTH', function (data) {
                                             timeSeries = [];
                                             $.each(data.features, function (k, v) {
                                                 if (k < 12) {
@@ -1647,7 +1625,7 @@ console.log('grid clicked');
             rightLayerName = var_value + '-' + msorys + '-' + right_rcp_value + '-p50' + msorysmonth + '-30year';
 
 
-            smoraval = getQueryVariable('mora')
+            moraval = getQueryVariable('mora');
 
 
             var layer = leftLayerName;
@@ -3154,13 +3132,14 @@ console.log('grid clicked');
         //
 
         $(document).on('overlay_hide', function () {
-
+            $('#var-filter-view').show();
             if (!$('body').hasClass('stations-on')) {
                 $('#rcp').prop('disabled', false);
             }
         });
 
         $(document).on('overlay_show', function () {
+            $('#var-filter-view').hide();
 
             if ($('body').find('#chart-tour').length) {
 

@@ -8712,10 +8712,6 @@ body.overlay-open[data-overlay-content=video] #main-header-nav .overlay-close {
   width: auto !important;
 }
 
-
-
-
-
 .lang-fr #header-primary .primary-nav {
   font-size: 1.1em;
 }
@@ -8803,7 +8799,7 @@ body.overlay-open[data-overlay-content=video] #main-header-nav .overlay-close {
 @media (min-aspect-ratio: 16/9) {
   #timeline .type-video video {
     width: 100%;
-    height: calc(100% / 16 * 9);
+    height: auto;
   }
 }
 @media (max-width: 767px) {

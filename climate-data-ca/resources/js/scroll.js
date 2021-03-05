@@ -12,29 +12,6 @@
 		  el.addEventListener(event, onceFn, opts);
 		  return onceFn;
 		}
-    
-/*
-    if ($('.video-background').length) {
-      
-      var videos = []
-      
-      $('.video-background').each(function() {
-        
-        
-        
-      })
-      
-      
-  		var video = document.querySelector(".video-background");
-  		let src = video.currentSrc || video.src;
-  		// console.log(video, src);
-  
-  		once(document.documentElement, "touchstart", function (e) {
-  		  video.play();
-  		  video.pause();
-  		});
-		}
-*/
 
 		// $('.element').css('opacity', 0)
 
@@ -141,52 +118,48 @@
 			// add timeline events
 
 			tl_array.forEach(function(el) {
-  			
+
   			var this_from, this_to
-  			
+
   			if (!$(id_pre + el.id).hasClass('entered')) {
     			$(id_pre + el.id).css('opacity', 0).addClass('entered')
-    			
+
     			if ($(id_pre + el.id).hasClass('type-video')) {
-  
-						console.log('video', el)
-						
+
 						var video = document.querySelector(id_pre + el.id + '-video');
-						
-						//console.log(video)
-						
-						video.onloadedmetadata = function() {
-              //console.log('metadata loaded!');
-              console.log(this.duration);//this refers to myVideo
-              
+
+						video.oncanplaythrough = function() {
+
+							console.log(id_pre + el.id + '-video loaded, add to timeline')
+
               tl.fromTo( video, { currentTime: 0 }, { duration: el.duration, currentTime: video.duration || 1 }, el.position )
             };
-            
+
           }
   			}
- 
+
 				//console.log(el)
-				
+
 				if (el.effect == 'manual' ) {
-  				
+
   				this_to = {
 						...el.properties,
 						...{ duration: el.duration }
 					}
-  				
+
   				tl.fromTo( id_pre + el.id, this_from, this_to, el.position )
-  				
+
 				} else {
-  				
+
 					this_to = {
 						...tweens[el.effect].to,
 						...{ duration: el.duration }
 					}
-					
+
 					//console.log(el, this_to)
-  				
+
   				tl.fromTo( id_pre + el.id, tweens[el.effect].from, this_to, el.position )
-  				
+
 				}
 
 /*
@@ -204,19 +177,19 @@
 					if (el.content == 'video') {
 
 						console.log('video', el)
-						
+
 						var video = document.querySelector(id_pre + el.id + '-video');
-						
+
 						//console.log(video)
-						
+
 						video.onloadedmetadata = function() {
               //console.log('metadata loaded!');
               //console.log(this.duration);//this refers to myVideo
-              
+
               tl.fromTo( video, { currentTime: 0 }, { duration: el.duration, currentTime: video.duration || 1 }, el.position )
             };
 
-						
+
 
 						// once(video, "loadedmetadata", () => {
 						// 	console.log('yup', video.duration)
@@ -232,7 +205,7 @@
 				} else if (el.type == 'tween') {
 
 					// var this_effect = tl_effects.exit[el.effect]
-					
+
 					var this_to = {}
 
 					if ( el.effect == 'manual') {
@@ -241,7 +214,7 @@
 							...el.properties,
 							...{ duration: el.duration }
 						}
-						
+
 						if (el.delay != '0') {
     					this_to.delay = parseInt(el.delay)
     				}
@@ -256,7 +229,7 @@
 							...tweens[el.effect].to,
 							...{ duration: el.duration }
 						}
-						
+
 						if (el.delay != '0') {
     					this_to.delay = parseInt(el.delay)
     				}

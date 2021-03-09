@@ -105,7 +105,7 @@
     <div class="form-layout-row row">
         <div class="offset-3">
             <p>
-                <?php _e('Hourly data for some stations and variables can be found on the <a href="https://climate.weather.gc.ca/historical_data/search_historic_data_e.html" target="_blank">Gouvernment of Canada Historical Climate Data</a> website.','cdc'); ?>
+                <?php _e('Hourly data for some stations and variables can be found on the <a href="https://climate.weather.gc.ca/historical_data/search_historic_data_e.html" target="_blank">Government of Canada Historical Climate Data</a> website.','cdc'); ?>
                 <br>
                 <?php _e('More station data from British Columbia can be found on the <a href="https://www.pacificclimate.org/data/bc-station-data" target="_blank">Pacific Climate Impacts Consortium</a> website.','cdc'); ?>
             </p>

@@ -263,7 +263,7 @@ if (have_posts()) : while (have_posts()) : the_post();
                               </div>
 
                               <div id="chart-placeholder" class="var-chart" style="height: 400px;"></div>
-                              <div><p><?php _e('Additionnal Climate Normals elements/variables are available from the <a target="_blank" href="https://climate-change.canada.ca/climate-data/#/climate-normals">Canadian Centre for Climate Services</a> and the <a target="_blank" href="https://climate.weather.gc.ca/climate_normals/index_e.html">Government of Canada Historical Climate Data</a> websites.', 'cdc'); ?>
+                              <div><p><?php _e('Additional Climate Normals variables are available from the <a target="_blank" href="https://climate-change.canada.ca/climate-data/#/climate-normals">Canadian Centre for Climate Services</a> and the <a target="_blank" href="https://climate.weather.gc.ca/climate_normals/index_e.html">Government of Canada Historical Climate Data</a> websites.', 'cdc'); ?>
                                   </p>
                               </div>
                           </div>

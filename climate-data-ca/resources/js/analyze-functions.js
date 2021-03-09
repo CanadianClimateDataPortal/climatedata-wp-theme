@@ -21,7 +21,7 @@
       'dataset_name': '',
       'rcp' : '',
       'models': '',
-      'freq': 'YS',
+      'freq': '',
       'output_format': ''
     }
 

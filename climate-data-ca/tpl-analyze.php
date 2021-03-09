@@ -165,6 +165,12 @@
                                       'max' => get_sub_field ( 'max' )
                                     );
 
+                                  } elseif ( get_row_layout() == 'select') {
+                                      $new_block = array (
+                                          'id' => get_sub_field ( 'id' ),
+                                          'values' => get_sub_field ( 'values' ),
+                                          'labels' => get_sub_field ( 'labels' )
+                                      );
                                   }
 
                                   $new_block['type'] = get_row_layout();

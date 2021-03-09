@@ -460,6 +460,22 @@
 
             new_html += '>'
 
+          } else if (this_input['type'] == 'select') {
+              new_html += '<select ';
+              new_html += 'class="form-control border-white mx-2 text-white" ';
+              new_html += 'style="background-color: rgba(56, 105, 246, 0.5);" ';
+              new_html += 'name="' + this_input['id'] + '" ';
+              new_html += '>';
+
+              labels = this_input['labels'].split('|');
+              $.each(this_input['values'].split('|'), function (idx,v) {
+                new_html += '<option ';
+                new_html += 'value="' + v + '">';
+                new_html += labels[idx];
+                new_html += '</option>';
+              });
+
+              new_html += '</select>';
           }
 
         }

@@ -524,8 +524,8 @@
                 },
                 /*
                  * When each feature is load{
-    maxWidth: "auto"
-    }ed from the GeoJSON this
+                 maxWidth: "auto"
+                 }ed from the GeoJSON this
                  * function is called. Here we create a cicle marker
                  * for the feature and style the circle marker.
                  */
@@ -709,7 +709,7 @@
 
         function grid_click(e) {
 
-console.log('grid clicked');
+            console.log('grid clicked');
 
             grid_initialized = true;
 
@@ -999,154 +999,154 @@ console.log('grid clicked');
         // CHART STUFF
         //
         //
-        function disPlayChartData(data, varDetails) {        
+        function disPlayChartData(data, varDetails) {
             chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
             chartDecimals = varDetails['decimals'];
             switch (varDetails.units.value) {
                 case 'doy':
                     formatter = function () {return new Date(1546300800000+1000*60*60*24*this.value).toLocaleDateString(current_lang, { month:'long', day:'numeric'})};
-                    pointFormatter = function (format) { 
-                    if (this.series.type == 'line') {
-                        return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name+ ': <b>'
-                            + new Date(1546300800000+1000*60*60*24*this.y).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
-                            + '</b><br/>';
-                    } else {                                    
-                        return '<span style="color:' + this.series.color + '">●</span>' + this.series.name + ': <b>' 
-                            + new Date(1546300800000+1000*60*60*24*this.low).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
-                            + '</b> - <b>' 
-                            + new Date(1546300800000+1000*60*60*24*this.high).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
-                            + '</b><br/>';
-                    }};
+                    pointFormatter = function (format) {
+                        if (this.series.type == 'line') {
+                            return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name+ ': <b>'
+                                + new Date(1546300800000+1000*60*60*24*this.y).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
+                                + '</b><br/>';
+                        } else {
+                            return '<span style="color:' + this.series.color + '">●</span>' + this.series.name + ': <b>'
+                                + new Date(1546300800000+1000*60*60*24*this.low).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
+                                + '</b> - <b>'
+                                + new Date(1546300800000+1000*60*60*24*this.high).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
+                                + '</b><br/>';
+                        }};
                     break;
                 default:
                     formatter = function () {return this.axis.defaultLabelFormatter.call(this) + chartUnit;};
                     pointFormatter = undefined;
-            }       
-            
+            }
+
             chartSeries = [];
-            if (data['observations'].length > 0) 
+            if (data['observations'].length > 0)
                 chartSeries.push({
-                        name: chart_labels.observation,
-                        data: data['observations'],
-                        zIndex: 1,
-                        showInNavigator: true,
-                        color: '#F47D23',
-                        visible: false,
-                        marker: {
-                            fillColor: '#F47D23',
-                            lineWidth: 0,
-                            radius: 0,
-                            lineColor: '#F47D23'
-                }});
-            if (data['modeled_historical_median'].length > 0)                                     
+                    name: chart_labels.observation,
+                    data: data['observations'],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#F47D23',
+                    visible: false,
+                    marker: {
+                        fillColor: '#F47D23',
+                        lineWidth: 0,
+                        radius: 0,
+                        lineColor: '#F47D23'
+                    }});
+            if (data['modeled_historical_median'].length > 0)
                 chartSeries.push({
                     name: chart_labels.historical,
-                        data: data['modeled_historical_median'],
-                        zIndex: 1,
-                        showInNavigator: true,
-                        color: '#000000',
-                        marker: {
-                            fillColor: '#000000',
-                            lineWidth: 0,
-                            radius: 0,
-                            lineColor: '#000000'
-                }});
-            if (data['modeled_historical_range'].length > 0)                                     
-                chartSeries.push({
-                        name: chart_labels.historical_range,
-                        data: data['modeled_historical_range'],
-                        type: 'arearange',
+                    data: data['modeled_historical_median'],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#000000',
+                    marker: {
+                        fillColor: '#000000',
                         lineWidth: 0,
-                        linkedTo: ':previous',
-                        color: '#000000',
-                        fillOpacity: 0.2,
-                        zIndex: 0,
-                        marker: {
-                            radius: 0,
-                            enabled: false
-                }});
-            if (data['rcp26_median'].length > 0)                                     
+                        radius: 0,
+                        lineColor: '#000000'
+                    }});
+            if (data['modeled_historical_range'].length > 0)
                 chartSeries.push({
-                        name: chart_labels.rcp_26_median,
-                        data: data['rcp26_median'],
-                        zIndex: 1,
-                        showInNavigator: true,
-                        color: '#00F',
-                        marker: {
-                            fillColor: '#00F',
-                            lineWidth: 0,
-                            radius: 0,
-                            lineColor: '#00F'
-                }});
-            if (data['rcp26_range'].length > 0)                                     
+                    name: chart_labels.historical_range,
+                    data: data['modeled_historical_range'],
+                    type: 'arearange',
+                    lineWidth: 0,
+                    linkedTo: ':previous',
+                    color: '#000000',
+                    fillOpacity: 0.2,
+                    zIndex: 0,
+                    marker: {
+                        radius: 0,
+                        enabled: false
+                    }});
+            if (data['rcp26_median'].length > 0)
                 chartSeries.push({
-                        name: chart_labels.rcp_26_range,
-                        data: data['rcp26_range'],
-                        type: 'arearange',
+                    name: chart_labels.rcp_26_median,
+                    data: data['rcp26_median'],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#00F',
+                    marker: {
+                        fillColor: '#00F',
                         lineWidth: 0,
-                        linkedTo: ':previous',
-                        color: '#00F',
-                        fillOpacity: 0.2,
-                        zIndex: 0,
-                        marker: {
-                            radius: 0,
-                            enabled: false
-                }});
-            if (data['rcp45_median'].length > 0)                                     
+                        radius: 0,
+                        lineColor: '#00F'
+                    }});
+            if (data['rcp26_range'].length > 0)
                 chartSeries.push({
-                        name: chart_labels.rcp_45_median,
-                        data: data['rcp45_median'],
-                        zIndex: 1,
-                        showInNavigator: true,
-                        color: '#00640c',
-                        marker: {
-                            fillColor: '#00640c',
-                            lineWidth: 0,
-                            radius: 0,
-                            lineColor: '#00640c'
-                }});
-            if (data['rcp45_range'].length > 0)                                     
+                    name: chart_labels.rcp_26_range,
+                    data: data['rcp26_range'],
+                    type: 'arearange',
+                    lineWidth: 0,
+                    linkedTo: ':previous',
+                    color: '#00F',
+                    fillOpacity: 0.2,
+                    zIndex: 0,
+                    marker: {
+                        radius: 0,
+                        enabled: false
+                    }});
+            if (data['rcp45_median'].length > 0)
                 chartSeries.push({
-                        name: chart_labels.rcp_45_range,
-                        data: data['rcp45_range'],
-                        type: 'arearange',
+                    name: chart_labels.rcp_45_median,
+                    data: data['rcp45_median'],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#00640c',
+                    marker: {
+                        fillColor: '#00640c',
                         lineWidth: 0,
-                        linkedTo: ':previous',
-                        color: '#00640c',
-                        fillOpacity: 0.2,
-                        zIndex: 0,
-                        marker: {
-                            radius: 0,
-                            enabled: false
-                }});
-            if (data['rcp85_median'].length > 0)                                     
+                        radius: 0,
+                        lineColor: '#00640c'
+                    }});
+            if (data['rcp45_range'].length > 0)
                 chartSeries.push({
-                        name: chart_labels.rcp_85_median,
-                        data: data['rcp85_median'],
-                        zIndex: 1,
-                        showInNavigator: true,
-                        color: '#F00',
-                        marker: {
-                            fillColor: '#F00',
-                            lineWidth: 0,
-                            radius: 0,
-                            lineColor: '#F00'
-                }});
-            if (data['rcp85_range'].length > 0)                                     
+                    name: chart_labels.rcp_45_range,
+                    data: data['rcp45_range'],
+                    type: 'arearange',
+                    lineWidth: 0,
+                    linkedTo: ':previous',
+                    color: '#00640c',
+                    fillOpacity: 0.2,
+                    zIndex: 0,
+                    marker: {
+                        radius: 0,
+                        enabled: false
+                    }});
+            if (data['rcp85_median'].length > 0)
                 chartSeries.push({
-                        name: chart_labels.rcp_85_range,
-                        data: data['rcp85_range'],
-                        type: 'arearange',
+                    name: chart_labels.rcp_85_median,
+                    data: data['rcp85_median'],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#F00',
+                    marker: {
+                        fillColor: '#F00',
                         lineWidth: 0,
-                        linkedTo: ':previous',
-                        color: '#F00',
-                        fillOpacity: 0.2,
-                        zIndex: 0,
-                        marker: {
-                            radius: 0,
-                            enabled: false
-                }});
-           
+                        radius: 0,
+                        lineColor: '#F00'
+                    }});
+            if (data['rcp85_range'].length > 0)
+                chartSeries.push({
+                    name: chart_labels.rcp_85_range,
+                    data: data['rcp85_range'],
+                    type: 'arearange',
+                    lineWidth: 0,
+                    linkedTo: ':previous',
+                    color: '#F00',
+                    fillOpacity: 0.2,
+                    zIndex: 0,
+                    marker: {
+                        radius: 0,
+                        enabled: false
+                    }});
+
 
             var chart = Highcharts.stockChart('chart-placeholder', {
 
@@ -1227,7 +1227,7 @@ console.log('grid clicked');
             });
 
 
-        }        
+        }
 
         // LAYER CHART
         function genChart(lat, lon, variable, month) {
@@ -1271,7 +1271,7 @@ console.log('grid clicked');
 
                     $.getJSON(valuePath).then(function (data) {
                         disPlayChartData(data,varDetails);
-                        });
+                    });
 
 
                 }
@@ -2164,11 +2164,11 @@ console.log('grid clicked');
                             }
 
                             /*
-                              if (station_on == true) {
-                                toggle_stations('off');
-                                toggle_sector('off');
-                              }
-                            */
+                             if (station_on == true) {
+                             toggle_stations('off');
+                             toggle_sector('off');
+                             }
+                             */
 
                         } else if (key === 'decade') {
 
@@ -2191,20 +2191,20 @@ console.log('grid clicked');
                             if (current_zoom !== query_zoom || current_center.lat !== query_center[0] || current_center.lng !== query_center[1]) {
 
                                 /*
-                                                if (current_zoom != query_zoom) {
-                                                  console.log('zoom is not equal');
-                                                }
+                                 if (current_zoom != query_zoom) {
+                                 console.log('zoom is not equal');
+                                 }
 
-                                                if (current_center.lat != query_center[0]) {
-                                                  console.log('lat is not equal');
-                                                  //console.log(current_center.lat, query_center[0]);
-                                                }
+                                 if (current_center.lat != query_center[0]) {
+                                 console.log('lat is not equal');
+                                 //console.log(current_center.lat, query_center[0]);
+                                 }
 
-                                                if (current_center.lng != query_center[1]) {
-                                                  console.log('lng is not equal');
-                                                  //console.log(current_center.lng, query_center[1]);
-                                                }
-                                */
+                                 if (current_center.lng != query_center[1]) {
+                                 console.log('lng is not equal');
+                                 //console.log(current_center.lng, query_center[1]);
+                                 }
+                                 */
 
                                 // console.log('set view', query[key].split(',')[0], query[key].split(',')[1], query[key].split(',')[2]);
                                 map1.setView([query[key].split(',')[0], query[key].split(',')[1]], query[key].split(',')[2], {animate: false});
@@ -2448,7 +2448,7 @@ console.log('grid clicked');
                     switch(mora_value) {
                         case 'ann':
                             msorys = 'ys';
-                            msorysmonth = '-ann';                        
+                            msorysmonth = '-ann';
                             legendmsorys = 'ann';
                             break;
                         case 'spring':
@@ -2456,19 +2456,19 @@ console.log('grid clicked');
                         case 'fall':
                         case 'winter':
                             msorys = 'qsdec';
-                            msorysmonth = '-' + mora_value;                        
+                            msorysmonth = '-' + mora_value;
                             legendmsorys = 'qsdec';
                             break;
                         case '2qsapr':
                             msorys = '2qsapr';
-                            msorysmonth = '-' + mora_value;                          
+                            msorysmonth = '-' + mora_value;
                             legendmsorys = '2qsapr';
                             break;
                         default:
                             msorys = 'ms';
-                            msorysmonth = '-' + mora_value;                        
+                            msorysmonth = '-' + mora_value;
                             legendmsorys = 'mon';
-                    }                    
+                    }
 
                     legendLayer = var_value + "_health_" + legendmsorys;
                     generateSectorLegend(var_value + "_health_" + legendmsorys, '');
@@ -3088,7 +3088,7 @@ console.log('grid clicked');
                 default:
                     legendmsorys = 'mon';
             }
-            
+
             legendLayer = var_value + "_health_" + legendmsorys;
             generateSectorLegend(legendLayer, '');
 

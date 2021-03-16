@@ -1,6 +1,5 @@
 <form action="./" method="get" name="idf-download-form" id="idf-download-form">
-  <input type="hidden" name="limit" id="limit" value="150000">
-  <input type="hidden" name="offset" id="offset" value="0">
+
       
   <div class="form-layout-row row">
     <p class="form-label-wrap col-2 offset-1">

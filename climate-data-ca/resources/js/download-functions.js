@@ -156,6 +156,12 @@
                         idf_init()
                     }
 
+                } else if (ui.panel.attr('id') === 'ahccd-download') {
+
+                    if (typeof maps['ahccd'] == 'undefined') {
+                        ahccd_init()
+                    }
+
                 }
             },
             activate: function (e, ui) {
@@ -179,6 +185,12 @@
 
                     if (typeof maps['idf'] == 'undefined') {
                         idf_init()
+                    }
+
+                } else if (ui.newPanel.attr('id') === 'ahccd-download') {
+
+                    if (typeof maps['ahccd'] == 'undefined') {
+                        ahccd_init();
                     }
 
                 }
@@ -463,13 +475,11 @@
 
             if (selected_var !== 'all') {
                 $('body').addClass('spinner-on');
-                request_args = {
-                    var: selected_var,
-                    month: month,
-                    format: format,
-                    points: points
-                };
-
+                request_args= {var: selected_var,
+                               month: month,
+                               format: format,
+                               points:points};
+                
                 $.ajax({
                     method: 'POST',
                     url: data_url + '/download',
@@ -486,8 +496,7 @@
                         $('#download-result').slideDown(250);
                         $('body').removeClass('spinner-on');
 
-                    }
-                });
+                }});
             } else {
                 // call download for all matching variables and build a zip file
                 selectedTimeStepCategory = $('#download-dataset').find(':selected').data('timestep');
@@ -1543,6 +1552,143 @@
             }, 500)
 
         })
+        
+        
+        function ahccd_init() {
+
+            create_map('ahccd');
+            
+            ahccd_icons={
+                P: L.icon({
+                        iconUrl: child_theme_dir + 'resources/app/ahccd/triangle-grey.png',
+                        iconSize: [15,15],
+                        iconAnchor: [7,7]
+                }),
+                Pr: L.icon({
+                        iconUrl: child_theme_dir + 'resources/app/ahccd/triangle-red.png',
+                        iconSize: [15,15],
+                        iconAnchor: [7,7]
+                }),                
+                T:  L.icon({
+                        iconUrl: child_theme_dir + 'resources/app/ahccd/square-grey.png',
+                        iconSize: [15,15],
+                        iconAnchor: [7,7]
+                }),
+                Tr:  L.icon({
+                        iconUrl: child_theme_dir + 'resources/app/ahccd/square-red.png',
+                        iconSize: [15,15],
+                        iconAnchor: [7,7]
+                }),                
+                B:  L.icon({
+                        iconUrl: child_theme_dir + 'resources/app/ahccd/circle-grey.png',
+                        iconSize: [15,15],
+                        iconAnchor: [7,7]
+                }),
+                Br: L.icon({
+                        iconUrl: child_theme_dir + 'resources/app/ahccd/circle-red.png',
+                        iconSize: [15,15],
+                        iconAnchor: [7,7]
+                })
+            }
+
+
+            $.getJSON(child_theme_dir + 'resources/app/ahccd/ahccd.json', function (data) {
+
+
+                ahccd_layer = L.geoJson(data, {
+                    onEachFeature: function (feature, layer) {
+
+                        $('<option value="' + feature.properties.ID + '">' + feature.properties.Name + '</option>').appendTo('#ahccd-select')
+
+                    },
+                    pointToLayer: function (feature, latlng) {
+                        return new L.Marker(latlng, {
+                            icon: ahccd_icons[feature.properties.type]
+                        })
+
+                    }
+
+                }).on('mouseover', function (e) {
+                    e.layer.bindTooltip(e.layer.feature.properties.Name).openTooltip(e.latlng);
+                }).on('click', function (e) {
+
+                    // get current station select value
+                    var selection = $("#ahccd-select").val() || [];
+
+                    var clicked_ID = e.layer.feature.properties.ID;
+                    
+                    // search if clicked feature is already selected
+                    idx = selection.indexOf(clicked_ID);
+                    
+                    if (idx != -1) {
+                        selection.splice(index, 1);
+                        $('#ahccd-select').val(selection).change();
+                        icon = ahccd_icons[e.layer.feature.properties.type];
+                    } else {
+                        selection.push(clicked_ID);
+                        $('#ahccd-select').val(selection).change();
+                        icon = ahccd_icons[e.layer.feature.properties.type + 'r'];
+                    }
+                                     
+                    e.layer.setIcon(icon);
+
+                })
+
+                // sort options
+
+                var arr = $('#ahccd-select option').map(function (_, o) {
+                    return {t: $(o).text(), v: o.value};
+                }).get()
+
+                arr.sort(function (o1, o2) {
+                    return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0;
+                })
+
+                $('#ahccd-select option').each(function (i, o) {
+                    o.value = arr[i].v
+                    $(o).text(arr[i].t)
+                })
+
+                // add to map
+
+                ahccd_layer.addTo(maps['ahccd'])
+
+            });
+            
+            // trigger when a tag is removed from multiple station selector input
+            $('#ahccd-select').on('select2:unselect', function (e) {
+                ahccd_layer.eachLayer(function (layer) {
+                    if (layer.feature.properties.ID === e.params.data.id) {
+                        layer.setIcon(ahccd_icons[layer.feature.properties.type]);
+                    }
+                });
+            });
+
+            // trigger when a tag is added to multiple station selector input
+            $('#ahccd-select').on('select2:select', function (e) {
+                ahccd_layer.eachLayer(function (layer) {
+                    if (layer.feature.properties.ID === e.params.data.id) {
+                        layer.setIcon(ahccd_icons[layer.feature.properties.type +'r']);
+                    }
+                });
+            });   
+
+        $('#ahccd-download-form :input').change(function () {
+            // sync & activate process button
+            var selection = $("#ahccd-select").val() || [];
+            if (selection.length > 0) {
+                var format = $('input[name="ahccd-download-format"]:checked').val();
+                url = data_url + '/download-ahccd?format=' + format + '&stations=' + selection.join(',');
+                $('#ahccd-process').attr('href', url);
+                $('#ahccd-process').removeClass('disabled');
+                $('#ahccd-download-status').text(l10n_labels['readytoprocess']);
+            } else {
+                $('#ahccd-process').addClass('disabled');
+                $('#ahccd-download-status').text(l10n_labels['selectstation']);
+            }
+        });            
+
+        }
 
 
         function ahccd_init() {
@@ -1712,7 +1858,7 @@
                 pane: 'labels'
             }).addTo(maps[map_var]);
 
-            if (map_var == 'station' || map_var == 'idf') {
+            if (map_var == 'station' || map_var == 'idf' || map_var == 'ahccd') {
 
                 maps[map_var].createPane('idf');
                 maps[map_var].getPane('idf').style.zIndex = 600;

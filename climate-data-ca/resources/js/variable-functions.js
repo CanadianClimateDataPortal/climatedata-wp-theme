@@ -2876,7 +2876,7 @@
                                 var newOption = new Option('Avril à Septembre', '2qsapr', false, false);
                             } else {
                                 var newOption = new Option('April to September', '2qsapr', false, false);
-                            }<
+                            }
 
 
                             if (moraval === '2qsapr') {

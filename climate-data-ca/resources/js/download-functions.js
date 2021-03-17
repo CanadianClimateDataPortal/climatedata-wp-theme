@@ -967,7 +967,6 @@
                     }
 
 
-
                 }).on('mouseover', function (e) {
                     e.layer.bindTooltip(e.layer.feature.properties.STATION_NAME + ' ' + e.layer.feature.properties.STN_ID).openTooltip(e.latlng);
                 }).on('click', function (e) {
@@ -1252,22 +1251,22 @@
         });
 
         /*
-            $('#station-download-form').submit(function(e) {
-              e.preventDefault();
+         $('#station-download-form').submit(function(e) {
+         e.preventDefault();
 
-              var process_url = $('#result').text();
+         var process_url = $('#result').text();
 
 
-              $.ajax({
-                url: process_url,
-                success: function(data) {
-                },
-                complete: function() {
-                }
-              });
+         $.ajax({
+         url: process_url,
+         success: function(data) {
+         },
+         complete: function() {
+         }
+         });
 
-            });
-        */
+         });
+         */
 
         function check_station_form() {
 
@@ -1479,15 +1478,15 @@
                         $('#idf-station-elevation h5').text(layer.feature.properties.Elevation_)
 
                         /*$('#idf-links').html('<div class="idf-popup-row">' +
-                            '<h6>' + popup_headings[0] + '</h6>' +
-                            '<h5 class="idfTitle">' + layer.feature.properties.Name + '</h5>' +
-                          '</div>' +
-                          '<div class="idf-popup-row">' +
-                            '<h6>' + popup_headings[1] + '</h6>' +
-                            '<h5 class="idfElev">' + layer.feature.properties.Elevation_ + '</h5>' +
-                          '</div>' +
-                          '<h6>' + popup_headings[2] + '</h6>' +
-                          '<ul class="idfBody list-unstyled"></ul>');*/
+                         '<h6>' + popup_headings[0] + '</h6>' +
+                         '<h5 class="idfTitle">' + layer.feature.properties.Name + '</h5>' +
+                         '</div>' +
+                         '<div class="idf-popup-row">' +
+                         '<h6>' + popup_headings[1] + '</h6>' +
+                         '<h5 class="idfElev">' + layer.feature.properties.Elevation_ + '</h5>' +
+                         '</div>' +
+                         '<h6>' + popup_headings[2] + '</h6>' +
+                         '<ul class="idfBody list-unstyled"></ul>');*/
 
                         $.each(data, function (k, v) {
                             linktext = v;

@@ -30,6 +30,12 @@
               </select>
             </div>
           </div>
+            <br>
+            <div class="col-10 offset-1 col-lg-4 offset-lg-4 d-flex align-items-center text-secondary">
+                <p><?php _e('* Each location provided here corresponds to a point location in Canada. 
+                The data displayed is for the ~10 km x 6 km grid cell within which the selected location lies. 
+                Accordingly, the data does not necessarily reflect the exact point that you select, particularly in areas with varying microclimates.','cdc'); ?></p>
+            </div>
         </div>
       </div>
       

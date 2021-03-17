@@ -4,16 +4,45 @@
 
 		gsap.registerPlugin(ScrollTrigger)
 
-		function once(el, event, fn, opts) {
-		  var onceFn = function (e) {
-		    el.removeEventListener(event, onceFn);
-		    fn.apply(this, arguments);
-		  };
-		  el.addEventListener(event, onceFn, opts);
-		  return onceFn;
+		function request(method, url) {
+
+			$('body').addClass('spinner-on')
+
+			// console.log('request')
+
+		    return new Promise(function (resolve, reject) {
+		        var xhr = new XMLHttpRequest()
+		        xhr.open(method, url)
+		        xhr.onload = resolve
+		        xhr.onerror = reject
+		        xhr.send()
+		    });
 		}
 
-		// $('.element').css('opacity', 0)
+		function once(el, event, fn, opts) {
+
+		  var onceFn = function (e) {
+		    el.removeEventListener(event, onceFn)
+		    fn.apply(this, arguments)
+		  }
+
+		  el.addEventListener(event, onceFn, opts)
+			
+		  return onceFn
+
+		}
+
+		function video_trigger(element_id) {
+
+			console.log(element_id)
+
+			var this_vid = document.querySelector(element_id)
+
+			this_vid.pause()
+			this_vid.currentTime = 0
+			this_vid.play()
+
+		}
 
 		var tweens = {
 			'fade-in': {
@@ -85,179 +114,160 @@
 			}
 		}
 
-		gsap.utils.toArray(".tl-container").forEach((panel, i) => {
+		var videos_to_load = 0
 
-			var this_container = $(panel)
+		var video_URLs = []
 
-			var id_pre = '#' + this_container.attr('id') + '-element-'
+		if ($('video').length) {
 
-			var container_height = $(window).innerHeight() * this_container.find('.element').length
+			videos_to_load = $('video').length
 
-			// console.log(this_container.find('.element').length, container_height)
+			console.log('videos to load', videos_to_load)
 
-			var tl = gsap.timeline({
-				scrollTrigger: {
-					defaults: {
-						duration: 1
-					},
-					trigger: panel,
-					start: 'top top',
-					end: () => '+=' + container_height,
-					scrub: true,
-					pin: true,
-					toggleActions: "play none reverse none",
-					invalidateOnRefresh: true,
-					// markers: true
-				}
-			})
+			$('body').addClass('spinner-on')
 
-			var tl_array = JSON.parse(this_container.attr('data-timeline'))
+			$('video').each(function() {
 
-			// console.log(tl_array)
+				var this_vid = $(this),
+						video_ID = $(this).attr('id'),
+						video = document.getElementById(video_ID)
 
-			// add timeline events
+				var url = $(this).attr('src'),
+						mime = $(this).attr('data-mime')
 
-			tl_array.forEach(function(el) {
+				// console.log('loading', url)
 
-  			var this_from, this_to
+				request('GET', url)
+			    .then(function (e) {
+						// console.log('done')
 
-  			if (!$(id_pre + el.id).hasClass('entered')) {
-    			$(id_pre + el.id).css('opacity', 0).addClass('entered')
-
-    			if ($(id_pre + el.id).hasClass('type-video')) {
-
-						var video = document.querySelector(id_pre + el.id + '-video');
-
-						video.oncanplaythrough = function() {
-
-							console.log(id_pre + el.id + '-video loaded, add to timeline')
-
-              tl.fromTo( video, { currentTime: 0 }, { duration: el.duration, currentTime: video.duration || 1 }, el.position )
-            };
-
-          }
-  			}
-
-				//console.log(el)
-
-				if (el.effect == 'manual' ) {
-
-  				this_to = {
-						...el.properties,
-						...{ duration: el.duration }
-					}
-
-  				tl.fromTo( id_pre + el.id, this_from, this_to, el.position )
-
-				} else {
-
-					this_to = {
-						...tweens[el.effect].to,
-						...{ duration: el.duration }
-					}
-
-					//console.log(el, this_to)
-
-  				tl.fromTo( id_pre + el.id, tweens[el.effect].from, this_to, el.position )
-
-				}
-
-/*
-				if (el.type == 'enter') {
-
-					var this_to = {
-						...tl_effects.enter[el.effect].to,
-						...{ duration: el.duration }
-					}
-
-					//console.log(el, this_to)
-
-					tl.fromTo( id_pre + el.id, tl_effects.enter[el.effect].from, this_to, el.position )
-
-					if (el.content == 'video') {
-
-						console.log('video', el)
-
-						var video = document.querySelector(id_pre + el.id + '-video');
-
-						//console.log(video)
-
-						video.onloadedmetadata = function() {
-              //console.log('metadata loaded!');
-              //console.log(this.duration);//this refers to myVideo
-
-              tl.fromTo( video, { currentTime: 0 }, { duration: el.duration, currentTime: video.duration || 1 }, el.position )
-            };
-
-
-
-						// once(video, "loadedmetadata", () => {
-						// 	console.log('yup', video.duration)
-						//   tl.fromTo( video, { currentTime: 0 }, { currentTime: video.duration || 1 } )
+						// var blob = new Blob([e.target.response], {
+						// 	type: mime
 						// })
 
-					} else {
+				    // video.src = url //URL.createObjectURL(blob)
+						video2 = document.getElementById(video_ID)
 
+						console.log(video2.duration)
 
+						this_vid.attr('data-duration', video2.duration)
 
-					}
+						videos_to_load -= 1
 
-				} else if (el.type == 'tween') {
+						console.log('videos left', videos_to_load)
 
-					// var this_effect = tl_effects.exit[el.effect]
-
-					var this_to = {}
-
-					if ( el.effect == 'manual') {
-
-						this_to = {
-							...el.properties,
-							...{ duration: el.duration }
+						if (videos_to_load == 0) {
+							console.log('all videos loaded')
+							$(document).trigger('videos_loaded')
 						}
 
-						if (el.delay != '0') {
-    					this_to.delay = parseInt(el.delay)
-    				}
+			    }, function (e) {
+			        // handle errors
+			    })
 
-						console.log(this_to)
+			})
 
-						tl.to( id_pre + el.id, this_to )
+		} else {
+
+			$(document).trigger('videos_loaded')
+
+		}
+
+		$(document).on('videos_loaded', function() {
+
+			console.log('begin timeline')
+
+			// $('.element').css('opacity', 0)
+
+			gsap.utils.toArray(".tl-container").forEach((panel, i) => {
+
+				var this_container = $(panel)
+
+				var id_pre = '#' + this_container.attr('id') + '-element-'
+
+				var container_height = $(window).innerHeight() * this_container.find('.element').length
+
+				// console.log(this_container.find('.element').length, container_height)
+
+				var tl = gsap.timeline({
+					scrollTrigger: {
+						defaults: {
+							duration: 1
+						},
+						trigger: panel,
+						start: 'top top',
+						end: () => '+=' + container_height,
+						scrub: true,
+						pin: true,
+						toggleActions: "play none reverse none",
+						invalidateOnRefresh: true,
+						// markers: true
+					}
+				})
+
+				var tl_array = JSON.parse(this_container.attr('data-timeline'))
+
+				// console.log(tl_array)
+
+				// add timeline events
+
+				tl_array.forEach(function(el) {
+
+	  			var this_from, this_to
+
+	  			if (!$(id_pre + el.id).hasClass('entered')) {
+	    			$(id_pre + el.id).css('opacity', 0).addClass('entered')
+	  			}
+
+					if (el.effect == 'manual' ) {
+
+	  				this_to = {
+							...el.properties,
+							...{
+								duration: el.duration,
+								onStart: function() {
+
+									if ($(id_pre + el.id).hasClass('type-video')) {
+
+										video_trigger(id_pre + el.id + '-video')
+
+									}
+
+								}
+							}
+						}
+
+	  				tl.fromTo( id_pre + el.id, this_from, this_to, el.position )
 
 					} else {
 
 						this_to = {
 							...tweens[el.effect].to,
-							...{ duration: el.duration }
+							...{
+								duration: el.duration,
+								onStart: function() {
+
+									if ($(id_pre + el.id).hasClass('type-video')) {
+
+										video_trigger(id_pre + el.id + '-video')
+
+									}
+
+								}
+							}
 						}
 
-						if (el.delay != '0') {
-    					this_to.delay = parseInt(el.delay)
-    				}
-
-						// console.log(this_to)
-
-						tl.to( id_pre + el.id, this_to, el.position )
+	  				tl.fromTo( id_pre + el.id, tweens[el.effect].from, this_to, el.position )
 
 					}
 
-				} else if (el.type == 'exit') {
+				})
 
-					var this_effect = tl_effects.exit[el.effect]
+				console.log(tl)
 
-					if (el.delay != '0') {
-						this_effect = {
-							...tl_effects.exit[el.effect],
-							...{ delay: parseInt(el.delay) }
-						}
-					}
-
-					tl.to( id_pre + el.id, this_effect )
-				}
-*/
+				$('body').removeClass('spinner-on')
 
 			})
-
-			console.log(tl)
 
 		})
 

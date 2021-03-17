@@ -50,37 +50,19 @@ $joins = "";
 
 $get_sSearch = str_replace('`','\'',$get_sSearch);
 // filtering
-$sql_where = "";
-if ($get_sSearch != "")
-{
-    $sql_where = "WHERE ";
-    foreach ($search_columns as $column)
-    {
-        $sql_where .= $column . " LIKE '" . mysqli_real_escape_string($con,$get_sSearch ) . "%' OR ";
-    }
-    $sql_where = substr($sql_where, 0, -3);
-}
+$sql_where = "where gen_term not in ('Administrative Region', 'Province', 'Territory') and geo_name like '" . mysqli_real_escape_string($con,$get_sSearch ) . "%'" ;
+
 
 // ordering
-$sql_order = "";
-if ( isset( $_GET['iSortCol_0'] ) )
-{
-    $sql_order = "ORDER BY  ";
-    for ( $i = 0; $i < mysqli_real_escape_string($con,$_GET['iSortingCols'] ); $i++ )
-    {
-        $sql_order .= $columns[$_GET['iSortCol_' . $i]] . " " . mysqli_real_escape_string($con,$_GET['sSortDir_' . $i] ) . ", ";
-    }
-    $sql_order = substr_replace( $sql_order, "", -2 );
+$sql_order = "order by scale desc";
+
+$sql_limit="";
+// paging if query string is shorter than 5
+if (strlen($get_sSearch) < 5) {
+    $sql_limit = "LIMIT 0,10";
 }
 
-// paging
-$sql_limit = 10;
-if (isset($sql_limit))
-{
-    $sql_limit = "LIMIT 0,".$sql_limit;
-}
-
-//echo "SELECT SQL_CALC_FOUND_ROWS " . implode(", ", $columns) . " FROM {$table} {$joins} {$sql_where} {$sql_order} {$sql_limit}";
+// die("SELECT SQL_CALC_FOUND_ROWS " . implode(", ", $columns) . " FROM {$table} {$joins} {$sql_where} {$sql_order} {$sql_limit}");
 $main_query = mysqli_query($con,"SELECT SQL_CALC_FOUND_ROWS " . implode(", ", $columns) . " FROM {$table} {$joins} {$sql_where} {$sql_order} {$sql_limit}")
 or die(mysqli_error($con));
 

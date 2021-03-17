@@ -199,7 +199,9 @@
 
 							} elseif ( $element['type'] == 'video' ) {
 
-								echo '<video id="section-' . $section_num . '-element-' . $id . '-video" src="' . wp_get_attachment_url ( $element['content'] ) . '" playsinline="true" webkit-playsinline="true" preload="auto" muted="muted" class="video-background"></video>';
+								$video_info = file_info ( $element['content'] );
+
+								echo '<video id="section-' . $section_num . '-element-' . $id . '-video" data-mime="' . $video_info['mime'] . '" src="' . wp_get_attachment_url ( $element['content'] ) . '" playsinline="true" webkit-playsinline="true" preload="auto" muted="muted" class="video-background" loop></video>';
 
 							} elseif ( $element['type'] == 'text' ) {
 

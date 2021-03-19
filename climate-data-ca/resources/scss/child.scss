@@ -1062,6 +1062,17 @@ body.overlay-open[data-overlay-content="video"] {
   }
 }
 
+#location-search-container {
+	margin-bottom: 10em;
+}
+
+#location-search-instruction {
+	p {
+		font-size: 1.4em;
+		text-indent: -0.8em;
+	}
+}
+
 #ag-cases {
   a {
     color: $text-muted;

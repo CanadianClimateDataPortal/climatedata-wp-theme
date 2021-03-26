@@ -49,7 +49,7 @@
             rendererFactory: L.canvas.tile,
 
             attribution: '',
-            interactive: true,
+            interactive: false,
             getFeatureId: function (f) {
                 return f.properties.gid;
             },
@@ -91,6 +91,28 @@
         }).addTo(map1);
 
         var marker = L.marker([current_location.lat, current_location.lon]).addTo(map1);
+
+        // highlight gridcell
+        $.ajax({
+            url: hosturl + "/geoserver/CDC/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo" +
+            "&QUERY_LAYERS=CDC%3Acanadagrid&LAYERS=CDC%3Acanadagrid&INFO_FORMAT=application%2Fjson" +
+            "&FEATURE_COUNT=50&X=50&Y=50&SRS=EPSG%3A4326&WIDTH=101&HEIGHT=101&BBOX=" +
+            current_location.lon + "%2C" + current_location.lat + "%2C" +
+            (parseFloat(current_location.lon) + 0.0001) + "%2C" + (parseFloat(current_location.lat) + 0.00001),
+            dataType: 'json',
+            success: function (data) {
+                id = data.features[0].properties.gid;
+                pbfLayer.setFeatureStyle(id, {
+                    weight: 5,
+                    color: '#f00',
+                    opacity: 1,
+                    fill: true,
+                    radius: 4,
+                    fillOpacity: 0
+                });
+            }
+        });
+
 
         //highlight = current_location.id;
 

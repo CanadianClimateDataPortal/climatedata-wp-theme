@@ -103,12 +103,12 @@
             success: function (data) {
                 id = data.features[0].properties.gid;
                 pbfLayer.setFeatureStyle(id, {
-                    weight: 5,
+                    weight: 1.5,
                     color: '#f00',
                     opacity: 1,
                     fill: true,
                     radius: 4,
-                    fillOpacity: 0
+                    fillOpacity: 0.3
                 });
             }
         });

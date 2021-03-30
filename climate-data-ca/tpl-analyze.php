@@ -165,6 +165,12 @@
                                       'max' => get_sub_field ( 'max' )
                                     );
 
+                                  } elseif ( get_row_layout() == 'select') {
+                                      $new_block = array (
+                                          'id' => get_sub_field ( 'id' ),
+                                          'values' => get_sub_field ( 'values' ),
+                                          'labels' => get_sub_field ( 'labels' )
+                                      );
                                   }
 
                                   $new_block['type'] = get_row_layout();
@@ -434,6 +440,35 @@
                         </div>
                       </div>
 
+                        <div class="field validate-input type-radio d-flex flex-wrap">
+                            <p class="input-label w-100"><?php _e ( 'Resampling frequency', 'cdc' ); ?></p>
+
+                            <div class="input-row form-check w-25">
+                                <div class="input-item">
+                                    <input class="form-check-input add-to-object" type="radio" name="freq" id="analyze-freq-ys" value="YS" checked>
+                                    <label class="form-check-label" for="analyze-freq-ys"><?php _e('Annual', 'cdc');?></label>
+                                </div>
+                            </div>
+
+                            <div class="input-row form-check w-25">
+                                <div class="input-item">
+                                    <input class="form-check-input add-to-object" type="radio" name="freq" id="analyze-freq-ms" value="MS">
+                                    <label class="form-check-label" for="analyze-freq-ms"><?php _e('Monthly', 'cdc'); ?></label>
+                                </div>
+                            </div>
+                            <div class="input-row form-check w-25">
+                                <div class="input-item">
+                                    <input class="form-check-input add-to-object" type="radio" name="freq" id="analyze-freq-qsdec" value="QS-DEC">
+                                    <label class="form-check-label" for="analyze-freq-qsdec"><?php _e('Seasonal', 'cdc'); ?></label>
+                                </div>
+                            </div>
+                            <div class="input-row form-check w-25">
+                                <div class="input-item">
+                                    <input class="form-check-input add-to-object" type="radio" name="freq" id="analyze-freq-asjul" value="AS-JUL">
+                                    <label class="form-check-label" for="analyze-freq-asjul"><?php _e('Annual (July to June)', 'cdc'); ?></label>
+                                </div>
+                            </div>
+                        </div>
                       <div class="field validate-input type-radio d-flex flex-wrap">
                         <p class="input-label w-100"><?php _e ( 'Output Format', 'cdc' ); ?></p>
 

@@ -1093,14 +1093,9 @@
 
                 form_thresholds[this_name] = $(this).val()
 
-                if (
-                    $(this).val() != '' &&
-                    $(this).attr('data-units') != ''
-                ) {
-                    form_thresholds[this_name] += ' ' + $(this).attr('data-units')
+                if ($(this).val() != '' && $(this).attr('data-units') !== undefined && $(this).attr('data-units') != '') {
+                    form_thresholds[this_name] += ' ' + $(this).attr('data-units');
                 }
-
-
             })
 
             // cycle through the object and check for empty values

@@ -1294,7 +1294,7 @@ console.log('grid clicked');
                 content: 'location',
                 position: 'right',
                 callback: function (varDetails) {
-
+                    $('.overlay-title').text(station_name);
                     $.getJSON(
                         'https://api.weather.gc.ca/collections/climate-normals/items?f=json&STN_ID=' + STN_ID + '&NORMAL_ID=1&sortby=MONTH',
                         function (data) {
@@ -1361,10 +1361,7 @@ console.log('grid clicked');
 
                                 switch ($(this).attr('data-type')) {
                                     case 'csv' :
-                                        //chart.downloadCSV();
-
-                                        window.open("data:text/csv;charset=utf-8," + escape(chart.getCSV()));
-
+                                        chart.downloadCSV();
                                         break;
                                 }
 

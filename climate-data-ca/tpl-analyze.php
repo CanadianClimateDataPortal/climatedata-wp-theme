@@ -441,7 +441,7 @@
                       </div>
 
                         <div class="field validate-input type-radio d-flex flex-wrap">
-                            <p class="input-label w-100"><?php _e ( 'Resampling frequency', 'cdc' ); ?></p>
+                            <p class="input-label w-100"><?php _e ( 'Temporal Frequency', 'cdc' ); ?></p>
 
                             <div class="input-row form-check w-25">
                                 <div class="input-item">

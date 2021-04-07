@@ -6,6 +6,10 @@
 
 ?>
 
+<div id="timeline-overlay">
+	<h5>Please rotate your device.</h5>
+</div>
+
 <div id="timeline">
 
 	<?php

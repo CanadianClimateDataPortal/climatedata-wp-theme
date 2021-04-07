@@ -8745,10 +8745,40 @@ body.overlay-open[data-overlay-content=video] #main-header-nav .overlay-close {
   display: none;
 }
 
+#timeline-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  z-index: 100;
+}
+
+@media (max-width: 750px) and (max-aspect-ratio: 1/1) {
+  body.has-timeline {
+    overflow: hidden;
+  }
+
+  #timeline-overlay {
+    display: block;
+  }
+}
+@media (max-width: 750px) {
+  #timeline {
+    position: relative;
+    z-index: 1100;
+  }
+}
 #timeline .tl-container {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
+}
+#timeline .tl-section h1, #timeline .tl-section h2, #timeline .tl-section h3, #timeline .tl-section h4, #timeline .tl-section h5, #timeline .tl-section h6 {
+  margin-bottom: 0;
 }
 #timeline .tl-section.headings-primary h1, #timeline .tl-section.headings-primary h2, #timeline .tl-section.headings-primary h3, #timeline .tl-section.headings-primary h4, #timeline .tl-section.headings-primary h5, #timeline .tl-section.headings-primary h6 {
   color: #3869f6;
@@ -8877,7 +8907,7 @@ body.overlay-open[data-overlay-content=video] #main-header-nav .overlay-close {
   height: 75% !important;
 }
 #timeline [data-size-y="100"] {
-  height: 100% !important;
+  height: 100%;
 }
 #timeline [data-size-x="100"][data-size-y="100"] {
   left: 0;
@@ -8893,6 +8923,66 @@ body.overlay-open[data-overlay-content=video] #main-header-nav .overlay-close {
   left: 12.5%;
 }
 
+@media (max-width: 1000px) {
+  #timeline h1 {
+    font-size: 5em;
+  }
+  #timeline h2 {
+    font-size: 4.4em;
+  }
+  #timeline h3 {
+    font-size: 2.8em;
+  }
+  #timeline h4 {
+    font-size: 2.2em;
+  }
+  #timeline h5 {
+    font-size: 1.6em;
+  }
+  #timeline h6 {
+    font-size: 1.2em;
+  }
+}
+@media (max-width: 850px) {
+  #timeline h1 {
+    font-size: 3.8em;
+  }
+  #timeline h2 {
+    font-size: 3.4em;
+  }
+  #timeline h3 {
+    font-size: 2.6em;
+  }
+  #timeline h4 {
+    font-size: 2em;
+  }
+  #timeline h5 {
+    font-size: 1.4em;
+  }
+  #timeline h6 {
+    font-size: 1.1em;
+  }
+}
+@media (max-width: 750px) {
+  #timeline h1 {
+    font-size: 3em;
+  }
+  #timeline h2 {
+    font-size: 2.6em;
+  }
+  #timeline h3 {
+    font-size: 2.2em;
+  }
+  #timeline h4 {
+    font-size: 1.8em;
+  }
+  #timeline h5 {
+    font-size: 1.4em;
+  }
+  #timeline h6 {
+    font-size: 1em;
+  }
+}
 @media (max-width: 1199.98px) {
   #main-header,
 #main-header-nav {

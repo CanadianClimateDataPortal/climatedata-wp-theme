@@ -15,24 +15,22 @@ if (current_user_can('administrator')) {
   if ( is_page_template ( 'tpl-variable.php' ) ) {
     echo 'var<hr>';
   }
-  
+
   if ( is_page_template ( 'tpl-variable.php' ) && !isset ( $query_string['var'] ) ) {
-    
-    echo 'HEY<hr>';
-    
+
     $first_var = get_posts ( array (
       'post_type' => 'variable',
       'posts_per_page' => 1,
       'orderby' => 'menu_order',
       'order' => 'asc'
     ) );
-    
+
     if ( !empty ( $first_var ) ) {
       $query_string['var'] = get_field ( 'var_name', $first_var[0]->ID );
     }
-    
-    
-    
+
+
+
   }
 */
 
@@ -97,7 +95,7 @@ if (current_user_can('administrator')) {
     wp_head();
 
     $body_ID = 'page';
-    $body_class = array('animsition', 'spinner-on');
+    $body_class = array ( 'animsition', 'spinner-on' );
 
     if (is_front_page()) {
 
@@ -155,6 +153,13 @@ if (current_user_can('administrator')) {
         wp_reset_postdata();
 
     }
+
+		//
+
+		// $body_class = do_action ( 'example_action', $body_class );
+
+
+		$body_class = apply_filters ( 'custom_body_classes', $body_class );
 
     ?>
 

@@ -778,6 +778,28 @@
                         page: params.page
                     };
                 },
+                transport: function (params, success, failure) {
+                    var $request = $.ajax(params);
+
+                    var llcheck = new RegExp('^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$');
+
+                    term = params.data.q;
+
+
+                    if (llcheck.test(term)) {
+                        $request.fail(failure);
+                        // $('.select2-results__option').text('custom');
+                        $('.select2-results__options').empty();
+                        $('.select2-results__options').append('<li style="padding:10px"><strong>Custom Lat/Lon Detected:</strong><br>Map has panned to validated coordinates.</li>');
+                        var term_segs = term.split(',');
+                        var term_lat = term_segs[0];
+                        var term_lon = term_segs[1];
+                        analyze_map.panTo([term_lat, term_lon]);
+                    } else {
+                        $request.then(success);
+                        return $request;
+                    }
+                },
                 processResults: function (data, page) {
                     // parse the results into the format expected by Select2.
                     // since we are using custom formatting functions we do not need to

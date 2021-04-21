@@ -22,6 +22,7 @@
             'rcp': '',
             'models': '',
             'freq': '',
+            'data_validation': 'warn',
             'output_format': ''
         }
 

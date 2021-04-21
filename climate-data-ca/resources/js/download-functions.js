@@ -880,6 +880,10 @@
                                         "data": lon_vals
                                     },
                                     {
+                                        "id": "data_validation",
+                                        "data": "warn"
+                                    },
+                                    {
                                         "id": "output_format",
                                         "data": $('input[name="download-format"]:checked').val()
                                     },

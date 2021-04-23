@@ -6,8 +6,9 @@
 
 ?>
 
-<div id="timeline-overlay">
-	<h5>Please rotate your device.</h5>
+<div id="timeline-overlay" class="px-5">
+	<a href="<?php echo $GLOBALS['vars']['site_url']; ?>"><img src="<?php echo $GLOBALS['vars']['site_url']; ?>/site/assets/uploads/2019/02/logo-climate-data-ca-1.png" alt="Logo"></a>
+	<h5><?php _e ( 'Please rotate your device to landscape orientation to view this content.' ); ?></h5>
 </div>
 
 <div id="timeline">
@@ -67,6 +68,14 @@
 							'z_index' => ( get_sub_field ( 'z_index' ) != '' ) ? get_sub_field ( 'z_index' ) : 1
 						);
 
+						if ( $new_element['position']['anchor1'] == 'top' || $new_element['position']['anchor2'] == 'top' ) {
+							$new_element['class'][] = 'anchor-top';
+						}
+
+						if ( $new_element['position']['anchor1'] == 'bottom' || $new_element['position']['anchor2'] == 'bottom' ) {
+							$new_element['class'][] = 'anchor-bottom';
+						}
+
 						if ( get_sub_field ( 'content' ) == 'img' ) {
 							$new_element['content'] = get_sub_field ( 'image' );
 						} elseif ( get_sub_field ( 'content' ) == 'video' ) {
@@ -109,10 +118,13 @@
 
 									if ( $new_pos['value1'] != '' ) {
 
+										$new_pos['value1'] .= '%';
+
 										if ( $new_pos['anchor1'] == 'top' ) {
-											$new_pos['value1'] = 'calc(130px + ((100vh - 130px) * ' . ( (int) $new_pos['value1'] / 100 ) . '))';
+											// $new_pos['value1'] .= '%';
+											// $new_pos['value1'] = 'calc(130px + ((100vh - 130px) * ' . ( (int) $new_pos['value1'] / 100 ) . '))';
 										} else {
-											$new_pos['value1'] .= '%';
+											// $new_pos['value1'] .= '%';
 										}
 
 										$new_tween['properties']['css'][$new_pos['anchor1']] = $new_pos['value1'];
@@ -120,11 +132,14 @@
 
 									if ( $new_pos['value2'] != '' ) {
 
-										if ( $new_pos['anchor2'] == 'top' ) {
-											$new_pos['value2'] = 'calc(130px + ((100vh - 130px) * ' . ( (int) $new_pos['value2'] / 100 ) . '))';
-										} else {
-											$new_pos['value2'] .= '%';
-										}
+										$new_pos['value2'] .= '%';
+
+										// if ( $new_pos['anchor2'] == 'top' ) {
+										// 	//$new_pos['value2'] = 'calc(130px + ((100vh - 130px) * ' . ( (int) $new_pos['value2'] / 100 ) . '))';
+										// 	$new_pos['value2'] .= '%';
+										// } else {
+										// 	$new_pos['value2'] .= '%';
+										// }
 
 										$new_tween['properties']['css'][$new_pos['anchor2']] = $new_pos['value2'];
 									}
@@ -173,7 +188,8 @@
 							if ( $element['position']['value1'] != '' && $element['position']['value1'] != '0' ) {
 
 								if ( $element['position']['anchor1'] == 'top' ) {
-									$element['position']['value1'] = 'calc(130px + ((100vh - 130px) * ' . ( (int) $element['position']['value1'] / 100 ) . '))';
+									// $element['position']['value1'] = 'calc(130px + ((100vh - 130px) * ' . ( (int) $element['position']['value1'] / 100 ) . '))';
+									$element['position']['value1'] .= '%';
 								} else {
 									$element['position']['value1'] .= '%';
 								}
@@ -184,7 +200,8 @@
 							if ( $element['position']['value2'] != '' && $element['position']['value2'] != '0' ) {
 
 								if ( $element['position']['anchor2'] == 'top' ) {
-									$element['position']['value2'] = 'calc(130px + ((100vh - 130px) * ' . ( (int) $element['position']['value2'] / 100 ) . '))';
+									// $element['position']['value2'] = 'calc(130px + ((100vh - 130px) * ' . ( (int) $element['position']['value2'] / 100 ) . '))';
+									$element['position']['value2'] .= '%';
 								} else {
 									$element['position']['value2'] .= '%';
 								}

@@ -1352,9 +1352,22 @@ body.overlay-open[data-overlay-content="video"] {
 #timeline-overlay {
 	@include full-size(fixed);
 	display: none;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
 	background-color: transparentize($black, 0.2);
+	text-align: center;
 	color: $white;
-	z-index: 100;
+	z-index: 5000;
+
+	a {
+		display: block;
+		margin-bottom: 2rem;
+	}
+
+	img {
+		max-width: 60px;
+	}
 }
 
 @media ( max-width: 750px ) and ( max-aspect-ratio: 1/1 ) {
@@ -1363,7 +1376,7 @@ body.overlay-open[data-overlay-content="video"] {
 	}
 
 	#timeline-overlay {
-		display: block;
+		display: flex;
 	}
 }
 
@@ -1495,6 +1508,16 @@ body.overlay-open[data-overlay-content="video"] {
       }
   	}
   }
+
+	@media (min-width: 850px) {
+		.anchor-top {
+			margin-top: 65px;
+		}
+
+		.anchor-bottom {
+			margin-bottom: -65px;
+		}
+	}
 
   [data-position-z="1"] { z-index: 1; }
   [data-position-z="2"] { z-index: 2; }

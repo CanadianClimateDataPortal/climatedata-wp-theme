@@ -2,6 +2,8 @@
 
   $(function() {
 
+		var tl
+
 		gsap.registerPlugin(ScrollTrigger)
 
 		function request(method, url) {
@@ -10,13 +12,13 @@
 
 			// console.log('request')
 
-		    return new Promise(function (resolve, reject) {
-		        var xhr = new XMLHttpRequest()
-		        xhr.open(method, url)
-		        xhr.onload = resolve
-		        xhr.onerror = reject
-		        xhr.send()
-		    });
+	    return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest()
+        xhr.open(method, url)
+        xhr.onload = resolve
+        xhr.onerror = reject
+        xhr.send()
+	    });
 		}
 
 		function once(el, event, fn, opts) {
@@ -192,7 +194,7 @@
 
 				// console.log(this_container.find('.element').length, container_height)
 
-				var tl = gsap.timeline({
+				tl = gsap.timeline({
 					scrollTrigger: {
 						defaults: {
 							duration: 1
@@ -271,6 +273,16 @@
 				$('body').removeClass('spinner-on')
 
 			})
+
+		})
+
+		$(window).resize(function() {
+
+			if ($(window).outerWidth() < 800 && $(window).outerWidth() > $(window).outerHeight()) {
+
+		    tl.scrollTrigger.refresh()
+
+			}
 
 		})
 

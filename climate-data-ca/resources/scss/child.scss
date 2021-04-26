@@ -1408,7 +1408,7 @@ body.overlay-open[data-overlay-content="video"] {
 
   .tl-section {
     h1, h2, h3, h4, h5, h6 {
-			margin-bottom: 0;
+			margin-bottom: 0.5em;
 		}
 
     &.headings-primary {
@@ -1519,6 +1519,26 @@ body.overlay-open[data-overlay-content="video"] {
 		}
 	}
 
+	@media (min-width: 1000px) {
+		.anchor-top {
+			margin-top: 90px;
+		}
+
+		.anchor-bottom {
+			margin-bottom: -90px;
+		}
+	}
+
+	@media (min-width: 1200px) {
+		.anchor-top {
+			margin-top: 120px;
+		}
+
+		.anchor-bottom {
+			margin-bottom: -120px;
+		}
+	}
+
   [data-position-z="1"] { z-index: 1; }
   [data-position-z="2"] { z-index: 2; }
   [data-position-z="3"] { z-index: 3; }
@@ -1572,6 +1592,7 @@ body.overlay-open[data-overlay-content="video"] {
 		h4 { font-size: 2.2em; }
 		h5 { font-size: 1.6em; }
 		h6 { font-size: 1.2em; }
+		p { font-size: 1.2em; }
 	}
 
 }
@@ -1585,6 +1606,7 @@ body.overlay-open[data-overlay-content="video"] {
 		h4 { font-size: 2em; }
 		h5 { font-size: 1.4em; }
 		h6 { font-size: 1.1em; }
+		p { font-size: 1.1em; }
 	}
 
 }
@@ -1593,11 +1615,12 @@ body.overlay-open[data-overlay-content="video"] {
 
 	#timeline {
 		h1 { font-size: 3em; }
-		h2 { font-size: 2.6em; }
-		h3 { font-size: 2.2em; }
-		h4 { font-size: 1.8em; }
-		h5 { font-size: 1.4em; }
+		h2 { font-size: 2.4em; }
+		h3 { font-size: 2em; }
+		h4 { font-size: 1.6em; }
+		h5 { font-size: 1.3em; }
 		h6 { font-size: 1em; }
+		p { font-size: 1em; }
 	}
 
 }

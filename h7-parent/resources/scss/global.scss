@@ -16,7 +16,7 @@ $heading-font-family: $headings-font-family !default;
 
 .dropdown-menu {
   font-size: 1.4em;
-  
+
   .dropdown-header {
     font-size: 0.8em;
   }
@@ -103,7 +103,7 @@ $filter-height: 60px;
   opacity: 0;
   transition: top 0s ease 0.25s, opacity 0.25s ease 0s;
   z-index: 2000;
-  
+
   &:after {
     content: '';
     display: block;
@@ -121,7 +121,7 @@ body {
       top: 0;
       opacity: 1;
       transition: top 0s ease 0s, opacity 0.25s ease 0s;
-      
+
       &:after {
         top: 50%;
       }
@@ -148,22 +148,22 @@ body {
 	background-color: $white;
 	font-size: 1em;
 	line-height: 1.4;
-  
+
   .ui-menu {
   	position: absolute;
   }
-  
+
   .ui-menu-item {
   	margin: 0;
   	padding: 8px;
   	cursor: pointer;
   }
-  
+
   .ui-menu-item-wrapper {
   	position: relative;
   	padding: 3px 1em 3px .4em;
   }
-  
+
   .ui-menu-divider {
   	margin: 5px 0;
   	height: 0;
@@ -171,11 +171,11 @@ body {
   	line-height: 0;
   	border-width: 1px 0 0 0;
   }
-  
+
   .ui-state-focus {
     background-color: $light;
   }
-  
+
   .ui-state-active {
   }
 }

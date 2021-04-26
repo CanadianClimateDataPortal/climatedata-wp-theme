@@ -277,13 +277,13 @@
 		})
 
 		$(window).resize(function() {
-
 			if ($(window).outerWidth() < 800 && $(window).outerWidth() > $(window).outerHeight()) {
 
-		    tl.scrollTrigger.refresh()
+				setTimeout(function() {
+					tl.scrollTrigger.refresh()
+				}, 100)
 
 			}
-
 		})
 
 	});

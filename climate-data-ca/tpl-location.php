@@ -62,7 +62,7 @@
           <p><?php printf ( __( 'For the 1951-1980 period, the annual average temperature was %s ºC; for 1981-2010 it was %s ºC. Under a high emissions scenario, annual average temperatures are projected to be %s ºC for the 2021-2050 period, %s ºC for the 2051-2080 period and %s ºC for the last 30 years of this century.', 'cdc' ), '<strong id="location-val-1"></strong>', '<strong id="location-val-2"></strong>', '<strong id="location-val-3"></strong>', '<strong id="location-val-4"></strong>', '<strong id="location-val-5"></strong>' ); ?></p>
 
           <p><?php printf ( __( 'Average annual precipitation for the 1951-1980 period was %s mm. Under a high emissions scenario, this is projected to be %s%% higher for the 2021-2050 period, %s%% higher for the 2051-2080 period and %s%% higher for the last 30 years of this century.', 'cdc' ), '<strong id="location-val-6"></strong>', '<strong id="location-val-7"></strong>', '<strong id="location-val-8"></strong>', '<strong id="location-val-9"></strong>' ); ?></p>
-            <p><?php printf( __('* These values reflect those of the ~10 km x 6 km grid cell that %s lies within and does not necessarily reflect the exact point that you select, particularly in areas with varying microclimates . ','cdc'), $GLOBALS['vars']['current_data']['location_data']['geo_name'] ); ?></p>
+            <p><?php printf( __('* These values reflect those of the ~10 km x 6 km grid cell that %s lies within and do not necessarily reflect the exact point that you select, particularly in areas with varying microclimates . ','cdc'), $GLOBALS['vars']['current_data']['location_data']['geo_name'] ); ?></p>
         </div>
       </div>
     </div>

@@ -27,7 +27,7 @@
 		  }
 
 		  el.addEventListener(event, onceFn, opts)
-			
+
 		  return onceFn
 
 		}
@@ -169,7 +169,10 @@
 
 		} else {
 
-			$(document).trigger('videos_loaded')
+			setTimeout(function() {
+				$(document).trigger('videos_loaded')
+			}, 100)
+			// $(document).trigger('videos_loaded')
 
 		}
 

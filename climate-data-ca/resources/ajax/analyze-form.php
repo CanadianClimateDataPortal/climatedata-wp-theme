@@ -8,6 +8,7 @@ include_once ( locate_template ( 'resources/php/securimage/securimage.php' ) );
 $securimage = new Securimage();
 
 $submit_url_pre = 'https://pavics.climatedata.ca/providers/finch/processes/ensemble_grid_point_';
+// $submit_url_pre = 'https://finch.crim.ca/providers/finch/processes/ensemble_grid_point_';
 
 if ( isset ( $_POST['analyze-captcha_code'] ) ) {
 

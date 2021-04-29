@@ -125,7 +125,7 @@ function child_theme_enqueue()
     wp_register_script('leaflet-cluster', $child_js_dir . 'leaflet-cluster.js', NULL, NULL, true);
 
     wp_register_script('jszip', $bower_dir . 'jszip/dist/jszip.min.js', NULL, NULL, true);
-    wp_register_script('FileSaver', $bower_dir . 'FileSaver/dist/FileSaver.min.js', NULL, NULL, true);    
+    wp_register_script('FileSaver', $bower_dir . 'FileSaver/dist/FileSaver.min.js', NULL, NULL, true);
     wp_register_script('ion-slider', $bower_dir . 'ion.rangeSlider/js/ion.rangeSlider.min.js', NULL, NULL, true);
     wp_register_script('vector-grid', $child_js_dir . 'vector-grid.js', NULL, NULL, true);
     //wp_register_script ( 'zoom', $child_js_dir . 'zoom.js', NULL, NULL, true );
@@ -454,8 +454,7 @@ function set_case_study_parent_id()
 }
 
 // Save the meta data
-function save_case_study_parent_id($post_id)
-{
+function save_case_study_parent_id($post_id) {
 
     global $post;
 
@@ -475,3 +474,27 @@ function save_case_study_parent_id($post_id)
 }
 
 add_action("save_post", "save_case_study_parent_id");
+
+//
+// custom body classes
+//
+
+add_filter ( 'custom_body_classes', function ( $classes ) {
+
+	if ( ! is_array ( $classes ) ) {
+		$classes = array();
+	}
+
+	if ( is_singular ( 'resource' ) ) {
+
+		if ( get_field ( 'asset_type' ) == 'interactive' ) {
+
+			$classes[] = 'has-timeline';
+
+		}
+
+	}
+
+	return $classes;
+
+}, 100 );

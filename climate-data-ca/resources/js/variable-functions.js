@@ -44,10 +44,18 @@
 
         var query = {};
 
+
         if ($('#coords').length) {
             query['coords'] = $('#coords').val();
         } else {
             query['coords'] = '62.5325943454858,-98.525390625,4';
+        }
+
+        aord_value = $('input[name="absolute_delta_switch"]:checked').val();
+        if (aord_value === 'd') {
+            query['delta'] = "true";
+        } else {
+            query['delta'] = "";
         }
 
         if ($('#geo-select').length) {
@@ -235,8 +243,6 @@
         }
 
         function replaceGrid(gridname, gridstyle) {
-
-
             if (map1.hasLayer(gridLayer)) {
                 map1.removeLayer(gridLayer);
             }
@@ -1762,6 +1768,7 @@
                     if (current_lang == 'fr') {
                         unitValue = unitValue.replace('Degree Days', 'Degrés-jours');
                         unitValue = unitValue.replace('Days', 'Jours');
+                        unitValue = unitValue.replace(' to ', ' à ');
                     }
                     style = 'background:' + unitColor;
 
@@ -1819,6 +1826,10 @@
         // LEFT LEGEND
 
         function generateLeftLegend() {
+
+            $('#toggle-switch-container').show();
+
+            aord_value = $('input[name="absolute_delta_switch"]:checked').val();
 
             var_value = $("#var").val();
             mora_value = $("#mora").val();
@@ -1885,9 +1896,16 @@
                 right_rcp_value = 'rcp45';
             }
 
-            singleLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year';
-            leftLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year';
-            rightLayerName = var_value + '-' + msorys + '-' + right_rcp_value + '-p50' + msorysmonth + '-30year';
+            if (aord_value === 'd') {
+                aord_layer_value = "-delta7100";
+            } else {
+                aord_layer_value = "";
+            }
+
+
+            singleLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+            leftLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+            rightLayerName = var_value + '-' + msorys + '-' + right_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
 
 
             moraval = getQueryVariable('mora');
@@ -1953,8 +1971,26 @@
 
         function generateSectorLegend(layer, legendTitle) {
 
+            // console.log('generateSectorLegend');
+            // console.log();
+            // console.log(layer);
+
+            aord_value = $('input[name="absolute_delta_switch"]:checked').val();
+
+            if (aord_value === 'd') {
+                sectorLegendLayer = layer + "-delta7100";
+            } else {
+                sectorLegendLayer = layer;
+            }
+
+            if (query['sector'] !== 'census') {
+                // $('#toggle-switch-container').hide();
+            } else {
+                // $('#toggle-switch-container').show();
+            }
+
             $.getJSON(hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic" +
-                "&layer=CDC:" + layer + "&format=application/json")
+                "&layer=CDC:" + sectorLegendLayer + "&format=application/json")
                 .then(function (data) {
 
                     // labels = [];
@@ -2557,13 +2593,25 @@
             changeLayers('#decade >> change');
         });
 
+        $('input[type=radio][name=absolute_delta_switch]').change(function() {
+            // console.log('absolute/delta switched');
+            aord_value = $('input[name="absolute_delta_switch"]:checked').val();
+            if (aord_value === 'd') {
+                query['delta'] = "true";
+            } else {
+                query['delta'] = "";
+            }
+            update_query_string();
+            changeLayers();
+        });
+
 
         $('#mora').change(function (e) {
 
             mora_value = $(this).val();
             var_value = $('#var').val();
 
-            console.log("MORA CHANGED");
+            // console.log("MORA CHANGED");
             update_param('mora', $(this).val());
             update_query_string();
             generateLeftLegend();
@@ -2626,7 +2674,9 @@
         function changeLayers(fromFct) {
             console.error(" function changeLayers >> fromFct:" + fromFct)// TODO: DELETE
 
-
+            aord_value = $('input[name="absolute_delta_switch"]:checked').val();
+            // console.log('aord_value');
+            // console.log(aord_value);
             rcp_value = $("#rcp").val();
             // decade_value = $("#decade").val();
             decade_value = parseInt($("#decade").val());
@@ -2747,7 +2797,16 @@
                 }
 
 
-                singleLayerName = var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year';
+                if (aord_value === 'd') {
+                    aord_layer_value = "-delta7100";
+                } else {
+                    aord_layer_value = "";
+                }
+
+                singleLayerName = var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+
+                // console.log('singleLayerName');
+                // console.log(singleLayerName);
 
 
                 // if a compare scenario was selected
@@ -3370,7 +3429,36 @@
             // console.log('var changed triggered manually');
         }
 
+        // $(function () {
+            // $('[data-toggle="popover"]').popover({
+            //     html: true,
+            //     template: '<div class="popover absolute_or_delta_popover" role="tooltip">'
+            // });
 
+            var popoverTemplate = ['<div class="popover aordpop">',
+                '<div class="arrow"></div>',
+                '<div class="popover-content"><div id=aordpoptitle>DELTA WITH 1971-2000</div>Deltas are the difference between the future value and the reference period (or baseline) value of a climate variable, as simulated by a climate model. The reference period used here is 1971-2000.',
+                '</div>',
+                '</div>'].join('');
+
+            var absolute_or_deltas_help_content = "<span id=aordpoptitle>DELTA WITH 1971-2000</a><br>Deltas are the difference between the future value and the reference period (or baseline) value of a climate variable, as simulated by a climate model .The reference period used here is 1971-2000.";
+
+
+            $('#absolute_or_deltas_help').popover({
+                // trigger: 'click',
+                content: absolute_or_deltas_help_content,
+                template: popoverTemplate,
+                placement: "bottom",
+                html: true
+            });
+
+        // })
+
+        $('html').on('click', function(e) {
+            if (typeof $(e.target).data('original-title') == 'undefined') {
+                $('[data-original-title]').popover('hide');
+            }
+        });
 
     });
 })(jQuery);

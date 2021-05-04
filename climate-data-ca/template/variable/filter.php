@@ -349,6 +349,22 @@ if (get_the_ID() == filtered_ID_by_path('explore/variable')) {
     </div>
 </nav>
 
+<?php
+$get_delta = filter_input(INPUT_GET, 'delta', FILTER_SANITIZE_URL);
+?>
+
+<div class="toggle-switch-container" id="toggle-switch-container">
+    <div class="toggle-switch switch-vertical"id="absolute_or_deltas">
+        <input id="toggle-a" type="radio" value="a" name="absolute_delta_switch"<?php if ($get_delta == "false" || !$get_delta) { echo ' checked="checked"'; } ?> />
+        <label for="toggle-a">Absolute </label>
+        <input id="toggle-b" type="radio" value="d" name="absolute_delta_switch"<?php if ($get_delta == "true") { echo ' checked="checked"'; } ?> />
+        <label for="toggle-b" style="margin-top:3px">Delta</label><div class="text-dark fas fa-question-circle" id="absolute_or_deltas_help"></div>
+        <span class="toggle-outside">
+        <span class="toggle-inside"></span>
+      </span>
+    </div>
+</div>
+
 <div id="var-filter-view" class="col-3 offset-2 p-4 align-items-center">
   <label for="sector" class="mr-3"><?php _e ( 'View by:', 'cdc' ); ?></label>
   <select class="custom-select variable-download-data-view_by" id="sector" name="sector">

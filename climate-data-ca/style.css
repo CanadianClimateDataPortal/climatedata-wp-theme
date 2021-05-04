@@ -7,4 +7,133 @@ Template: h7-parent
 Version: 1.0
 Text Domain: 
 */
+
 @import url(resources/css/child.css);
+
+.toggle-switch-container {
+    margin-top:10px;
+    align-content: center;
+    padding: 2px;
+    position:absolute;
+}
+
+.toggle-switch {
+    margin: 0;
+}
+
+.toggle-switch {
+    position: relative;
+    background-color: #FFF;
+    width: 0px;
+    height: 35px;
+    margin-left: 27px;
+}
+
+.toggle-switch input {
+    position: absolute;
+    top: 0;
+    z-index: 2;
+    opacity: 0;
+    cursor: pointer;
+    height: 100%;
+    width: 15px;
+    right: 0;
+    margin: 0;
+}
+
+.toggle-switch input:checked {
+    z-index: 1;
+}
+
+.toggle-switch input:checked + label {
+    opacity: 1;
+    cursor: default;
+}
+
+.toggle-switch input:not(:checked) + label:hover {
+    opacity: 0.5;
+}
+
+.toggle-switch label {
+    color: #212529;
+    opacity: 0.33;
+    cursor: pointer;
+    transition: opacity 0.3s ease-in-out;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 11px;
+    line-height: 15px;
+    display: block;
+    width: 75px;
+    height: 50%;
+    margin: 0;
+    text-align: left;
+    padding-left: 12px;
+}
+
+.toggle-switch .toggle-outside {
+    height: 100%;
+    border-radius: 17px;
+    padding: 7.4px;
+}
+
+.toggle-switch .toggle-inside {
+    border-radius: 50%;
+    background: #3869f6;
+    border: 1px solid #3869f6;
+    cursor: grab;
+    position: absolute;
+    transition: all 0.3s ease-in-out;
+}
+
+
+.toggle-switch .toggle-outside {
+    background: #FFF;
+    position: absolute;
+    height: 100%;
+    right: 0;
+    top: 0;
+}
+
+.toggle-switch .toggle-inside {
+    height: 8.5px;
+    left: 3px;
+    top: 3px;
+    width: 8.5px;
+}
+
+.toggle-switch input:checked ~ .toggle-outside .toggle-inside {
+    top: 3px;
+}
+
+.toggle-switch input ~ input:checked ~ .toggle-outside .toggle-inside {
+    top: 23px;
+}
+
+#absolute_or_deltas_help {
+    position:absolute;
+    top: 17px;
+    margin-top: 5.5px;
+    cursor:pointer;
+    left: 50px;
+}
+
+.aordpop {
+    padding:10px;
+    font-weight:100;
+    font-size: 1.4em;
+    margin-bottom: 0.8em;
+
+    border: 1px solid rgba(255, 255, 255, 1);
+    border-radius: 0;
+
+}
+
+#aordpoptitle {
+    display: block;
+    margin-bottom: 0.8em;
+    font-size: 1.2eem;
+    color: #e50e40;
+    text-transform: uppercase;
+}

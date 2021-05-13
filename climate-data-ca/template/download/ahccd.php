@@ -1,5 +1,23 @@
+<div class="col-9 offset-1">
+<?php
+
+$args = array(
+    'name'        => 'ahccd',
+    'post_type'   => 'page',
+    'post_status' => 'publish',
+    'numberposts' => 1
+);
+$my_posts = get_posts($args);
+$post = get_post( $my_posts[0]->ID );
+$content = $post->post_content;
+$content = apply_filters('the_content', $content);
+$content = str_replace(']]>', ']]&gt;', $content);
+echo $content;
+?>
+</div>
+<br><br>
 <form action="./" method="get" name="ahccd-download-form" id="ahccd-download-form">
-      
+
   <div class="form-layout-row row">
     <p class="form-label-wrap col-2 offset-1">
       <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">1</span>
@@ -18,9 +36,9 @@
     </div>
   </div>
     <div class="col-10 offset-1 col-lg-7 offset-lg-3" style="display: inline-flex;position: absolute;padding: 11px;margin-top: -42px;"><?php _e ( 'Legend', 'cdc' ); ?>:
-        <img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/square-grey.png" style="padding:0 10px 0 10px;"><?php _e ( 'Temperature', 'cdc' ); ?>
-        <img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/triangle-grey.png" style="padding:0 10px 0 10px;"><?php _e ( 'Precipitation', 'cdc' ); ?>
-        <img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/circle-grey.png" style="padding:0 10px 0 10px;"><?php _e ( 'Both', 'cdc' ); ?>
+        <img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/square-blue.png" style="padding:0 10px 0 10px;"><?php _e ( 'Temperature', 'cdc' ); ?>
+        <img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/triangle-blue.png" style="padding:0 10px 0 10px;"><?php _e ( 'Precipitation', 'cdc' ); ?>
+        <img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/circle-blue.png" style="padding:0 10px 0 10px;"><?php _e ( 'Both', 'cdc' ); ?>
     </div>
     <br><br><br>
     

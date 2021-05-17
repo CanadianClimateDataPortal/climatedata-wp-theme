@@ -31,16 +31,20 @@ echo $content;
     </div>
     
    
-    <div id="download-map-ahccd-container" class="col-10 offset-1 col-lg-7 offset-lg-3 download-map-container">
-      <div id="download-map-ahccd" class="download-map"></div>
+    <div id="download-map-ahccd-container" class="col-10 offset-1 col-lg-8 offset-lg-3 download-map-container">
+      <div id="download-map-ahccd" class="col-lg-9 float-left download-map"></div>
+        <div class="col-3 col-lg-3 float-right" style="padding:10px">
+            <h5><?php _e ( 'Legend', 'cdc' ); ?></h5>
+            <div class="row"><input type="checkbox" checked name="ahccd_filter_temp" value="T"><img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/square-blue.png" style="padding:0 10px 0 10px;"><?php _e ( 'Temperature', 'cdc' ); ?></div> <br>
+            <div class="row"><input type="checkbox" checked name="ahccd_filter_pr" value="P"><img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/triangle-blue.png" style="padding:0 10px 0 10px;"><?php _e ( 'Precipitation', 'cdc' ); ?></div><br>
+            <div class="row"><input type="checkbox" checked name="ahccd_filter_both" value="B"><img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/circle-blue.png" style="padding:0 10px 0 10px;"><?php _e ( 'Both', 'cdc' ); ?></div>
+        </div>
     </div>
+
   </div>
-    <div class="col-10 offset-1 col-lg-7 offset-lg-3" style="display: inline-flex;position: absolute;padding: 11px;margin-top: -42px;"><?php _e ( 'Legend', 'cdc' ); ?>:
-        <img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/square-blue.png" style="padding:0 10px 0 10px;"><?php _e ( 'Temperature', 'cdc' ); ?>
-        <img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/triangle-blue.png" style="padding:0 10px 0 10px;"><?php _e ( 'Precipitation', 'cdc' ); ?>
-        <img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/circle-blue.png" style="padding:0 10px 0 10px;"><?php _e ( 'Both', 'cdc' ); ?>
-    </div>
-    <br><br><br>
+
+
+
     
     <div id="ahccd-download-filetype" class="form-layout-row row align-items-center">
     <p class="form-label-wrap col-10 col-sm-3 offset-1 mb-3 mb-sm-0">

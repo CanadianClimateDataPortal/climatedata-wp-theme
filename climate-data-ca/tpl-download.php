@@ -22,6 +22,7 @@ function tpl_enqueue()
 
     wp_enqueue_script('leaflet');
     wp_enqueue_script('leaflet-cluster');
+    wp_enqueue_script('leaflet-cluster-subgroup');
     wp_enqueue_script('jszip');
     wp_enqueue_script('FileSaver');
     

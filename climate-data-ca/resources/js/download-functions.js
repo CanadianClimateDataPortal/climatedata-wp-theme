@@ -1591,25 +1591,33 @@
                 })
             };
 
-
+            let ahccd_layerGroups=[];
             $.getJSON(child_theme_dir + 'resources/app/ahccd/ahccd.json', function (data) {
 
+                let ahccd_layer_cluster = L.markerClusterGroup();
 
                 ahccd_layer = L.geoJson(data, {
                     onEachFeature: function (feature, layer) {
-                        if (feature.properties.type != 'asdfP') {
-                            $('<option value="' + feature.properties.ID + '">' + feature.properties.Name + '</option>').appendTo('#ahccd-select');
+                        $('<option value="' + feature.properties.ID + '">' + feature.properties.Name + '</option>').appendTo('#ahccd-select');
+                        //does layerGroup already exist? if not create it and add to map
+                        var lg = ahccd_layerGroups[feature.properties.type];
+
+                        if (lg === undefined) {
+                            lg = new L.featureGroup.subGroup(ahccd_layer_cluster);
+                            //add the layer to the map
+                            lg.addTo(maps['ahccd']);
+                            //store layer
+                            ahccd_layerGroups[feature.properties.type] = lg;
                         }
 
+                        //add the feature to the layer
+                        lg.addLayer(layer);
                     },
                     pointToLayer: function (feature, latlng) {
-                        if (feature.properties.type != 'asdfP') {
-                            return new L.Marker(latlng, {
+                        return new L.Marker(latlng, {
                                 icon: ahccd_icons[feature.properties.type]
                             });
                         }
-
-                    }
 
                 }).on('mouseover', function (e) {
                     e.layer.bindTooltip(e.layer.feature.properties.Name).openTooltip(e.latlng);
@@ -1635,27 +1643,24 @@
 
                     e.layer.setIcon(icon);
 
-                })
+                });
 
                 // sort options
 
-                var arr = $('#ahccd-select option').map(function (_, o) {
+                let arr = $('#ahccd-select option').map(function (_, o) {
                     return {t: $(o).text(), v: o.value};
-                }).get()
+                }).get();
 
                 arr.sort(function (o1, o2) {
                     return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0;
-                })
+                });
 
                 $('#ahccd-select option').each(function (i, o) {
                     o.value = arr[i].v
                     $(o).text(arr[i].t)
-                })
+                });
 
                 // add to map
-                var ahccd_layer_cluster = L.markerClusterGroup();
-
-                ahccd_layer.addTo(ahccd_layer_cluster);
                 ahccd_layer_cluster.addTo(maps['ahccd']);
 
             });
@@ -1690,6 +1695,14 @@
                 } else {
                     $('#ahccd-process').addClass('disabled');
                     $('#ahccd-download-status').text(l10n_labels['selectstation']);
+                }
+            });
+
+            $('#ahccd-download-form :checkbox').change(function () {
+                if ($(this).is(':checked')) {
+                    maps['ahccd'].addLayer(ahccd_layerGroups[$(this).val()]);
+                } else {
+                    maps['ahccd'].removeLayer(ahccd_layerGroups[$(this).val()]);
                 }
             });
 

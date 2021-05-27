@@ -6,13 +6,6 @@
 
 */
 
-if (!empty ($GLOBALS['vars']['current_data']) &&
-    $GLOBALS['vars']['current_data']['type'] == 'variable' &&
-$GLOBALS['vars']['current_data']['var_name'] == 'slr') {
-    wp_redirect(get_permalink( get_page_by_path( 'explore/variable/slr' )));
-    exit;
-}
-
 function tpl_enqueue()
 {
 
@@ -30,7 +23,7 @@ function tpl_enqueue()
     wp_enqueue_script('sync');
     wp_enqueue_script('nearest');
 
-    wp_enqueue_script('variable-functions');
+    wp_enqueue_script('slr-functions');
 
     // page tour
 
@@ -47,6 +40,14 @@ add_action('wp_enqueue_scripts', 'tpl_enqueue');
 //
 
 get_header();
+
+
+?>
+
+
+
+<?php
+
 
 if (have_posts()) : while (have_posts()) : the_post();
 
@@ -74,7 +75,7 @@ if (have_posts()) : while (have_posts()) : the_post();
 
         <?php
 
-        $show_right = false;
+        $show_right = true;
 
         while (have_rows('variable_filters')) {
             the_row();
@@ -96,14 +97,23 @@ if (have_posts()) : while (have_posts()) : the_post();
             <?php
 
         }
+?>
+        <div class="map-filters container-fluid">
+        <div id="var-sliders" class="map-sliders row align-items-end">
 
-//        if (have_rows('variable_sliders')) {
 
-            include(locate_template('template/variable/sliders.php'));
+                    <div class="filter-container slider-container col-7 offset-1">
+                        <h6>Time period</h6>
 
-//        }
+                        <div id="range-slider-container" class="decade-slider-container" data-default="2100">
+                            <input id="range-slider" class="decade-slider">
+                        </div>
+                    </div>
 
-        ?>
+
+        </div>
+        </div>
+
 
         <div id="map-controls">
             <span id="zoom-in" class="zoom">+</span> <span id="zoom-out" class="zoom">-</span>

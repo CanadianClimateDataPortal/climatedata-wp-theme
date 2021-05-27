@@ -21,7 +21,9 @@
                 success: function (data) {
                     varData = new Map();
                     $.each(data, function (k, v) {
-                        varData.set(v.acf.var_name, v.acf);
+                        if (v.acf.var_name != 'slr') {
+                            varData.set(v.acf.var_name, v.acf);
+                        }
                     });
                     callback(varData);
                 }
@@ -1245,6 +1247,11 @@
                         enabled: false
                     }
                 },
+                exporting: {
+                    csv: {
+                        dateFormat: '%Y-%m-%d'
+                    }
+                },
 
                 series: chartSeries
             });
@@ -1406,8 +1413,12 @@
                                     valueSuffix: chartUnit
                                 },
                                 exporting: {
-                                    enabled: false
+                                    enabled: false,
+                                    csv: {
+                                        dateFormat: '%Y-%m-%d'
+                                    }
                                 }
+
                             });
 
                             $('.chart-export-data').click(function (e) {

@@ -389,6 +389,78 @@ if (have_posts()) : while (have_posts()) : the_post();
 
         <?php
 
+    } elseif (isset ($_GET['content']) && $_GET['content'] == 'slr-location') {
+
+        // 2. ajax request for variable data by location
+        //    (a grid square was clicked on variable map)
+
+        ?>
+
+        <div id="var-by-location" class="overlay-content-wrap variable-data-overlay col-12">
+            <div class="overlay-content container-fluid">
+                <?php
+
+                $selected_place = get_location_by_coords($_GET['lat'], $_GET['lon'],true);
+
+                if (is_array($selected_place)) {
+                    $location_name = $selected_place['geo_name'] . ', ' . short_province($selected_place['province']);
+                } else {
+
+                    if (isset ($_GET['station_name'])) {
+                        $location_name = $_GET['station_name'];
+                    } else {
+                        $location_name = 'Point: ' .  round($_GET['lat'],2) . "," .  round($_GET['lon'],2);
+                    }
+
+                }
+
+                ?>
+
+                <h2 class="overlay-title text-primary"><?php echo $location_name; ?></h2>
+
+                <div class="overlay-content-row">
+                    <div class="overlay-content-chart">
+                        <div class="navbar chart-navbar d-flex">
+
+                            <div class="nav-item d-flex align-items-center mr-5">
+                                <h6><span class="cdc-icon icon-download-data"></span> <?php _e('Download data', 'cdc'); ?></h6>
+
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="#" class="chart-export-data btn btn-sm btn-outline-secondary" data-type="csv">CSV</a>
+                                </div>
+                            </div>
+
+                            <div class="nav-item d-flex align-items-center">
+                                <h6><span class="cdc-icon icon-download-img"></span> <?php _e('Download image', 'cdc'); ?></h6>
+
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary " data-type="png">PNG</a> <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary" data-type="pdf">PDF</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="chart-placeholder" class="var-chart"></div>
+                    </div>
+                </div>
+
+                <div class="page-tour" id="chart-tour" data-steps='<?php echo $chart_tour; ?>'></div>
+
+                <?php
+
+                $units = get_field('units');
+
+                ?>
+
+                <div id="callback-data"><?php
+
+                    echo json_encode(array('title' => get_field('var_title'), 'units' => array('label' => __($units['label'], 'cdc'), 'value' => __($units['value'], 'cdc')), 'decimals' => get_field('decimals')));
+
+                    ?></div>
+            </div>
+        </div>
+
+    <?php
+
     } elseif (isset ($_GET['content']) && $_GET['content'] == 'sector') {
 
         // 2. ajax request for variable data by location

@@ -9,7 +9,12 @@
 if (!empty ($GLOBALS['vars']['current_data']) &&
     $GLOBALS['vars']['current_data']['type'] == 'variable' &&
 $GLOBALS['vars']['current_data']['var_name'] == 'slr') {
-    wp_redirect(get_permalink( get_page_by_path( 'explore/variable/slr' )));
+    if (isset ( $_GET['rcp'])){
+        $query='?rcp=' . $_GET['rcp'] . '-p50';
+    } else {
+        $query='';
+    }
+    wp_redirect(get_permalink( get_page_by_path( 'explore/variable/slr' )) . $query );
     exit;
 }
 

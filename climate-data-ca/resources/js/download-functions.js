@@ -1,6 +1,7 @@
 (function ($) {
 
     $(function () {
+        console.log(" file > download-function.js ");
 
         //
         // GLOBAL VARS
@@ -54,11 +55,14 @@
 
                 }
 
+                console.log(" function > #download-variable optgroup > new_object.value: " + new_object.value);
+                console.log(" function > #download-variable optgroup > new_object.text: " + new_object.text);
                 new_group['options'].push(new_object);
 
             });
 
             all_vars.push(new_group);
+            console.log(" function > #download-variable optgroup > all_vars: " + all_vars);
 
         });
 
@@ -154,8 +158,8 @@
         //
 
         $('#download-content').tabs({
-            hide: {effect: 'fadeOut', duration: 250},
-            show: {effect: 'fadeIn', duration: 250},
+            hide: { effect: 'fadeOut', duration: 250 },
+            show: { effect: 'fadeIn', duration: 250 },
             create: function (e, ui) {
 
                 $('body').removeClass('spinner-on');
@@ -557,7 +561,7 @@
                                     $('body').removeClass('spinner-on');
                                     dl_fraction.remove();
                                     dl_progress.remove();
-                                    zip.generateAsync({type: "blob"})
+                                    zip.generateAsync({ type: "blob" })
                                         .then(function (content) {
                                             saveAs(content, $('#download-filename').val() + ".zip");
 
@@ -635,7 +639,7 @@
                     if (selectedTimeStepCategory !== 'daily' && $('#download-dataset').val() != 'all') {
                         $('#download-variable').append("<optgroup id=optgroup_misc label='" + l10n_labels['misc'] + "'>");
                         $('#optgroup_misc').append(new Option(l10n_labels['allbccaq'], 'all', false, false));
-                        varData['all'] = {'grid': 'canadagrid'};
+                        varData['all'] = { 'grid': 'canadagrid' };
                     }
                 },
                 error: function () {
@@ -661,8 +665,8 @@
 
         $('#download-dataset').on('select2:select', function (e) {
 
-            console.log('frequency changed');
             currentVar = $("#download-variable").val();
+            console.log('frequency changed >> currentVar: ' + currentVar);
             $('#download-variable').empty();
 
             buildVarDropdown(e.currentTarget.value, currentVar);
@@ -709,6 +713,8 @@
             curValData = varData[e.target.value];
 
             if (curValData === undefined) {
+                console.log('download variable chosen > curValData === undefined');
+
                 $('#download-variable').val(1).trigger('change.select2');
             }
 
@@ -734,6 +740,8 @@
 
 
         $('#download-location').on('select2:select', function (e) {
+            console.log('download location chosen');
+
 
             if ($(this).val() != '') {
                 $(this).addClass('valid');
@@ -748,6 +756,8 @@
         // format
 
         $('#download-filetype input').on('change', function () {
+            console.log('download location chosen');
+
 
             checkform();
 
@@ -808,15 +818,15 @@
 
             switch ($('#download-variable').val()) {
 
-                case 'tn_mean' :
+                case 'tn_mean':
                     var_name = 'tasmin';
                     break;
 
-                case 'tx_mean' :
+                case 'tx_mean':
                     var_name = 'tasmax';
                     break;
 
-                case 'prcptot' :
+                case 'prcptot':
                     var_name = 'pr';
                     break;
 
@@ -1210,7 +1220,7 @@
 
             switch ($(this).attr('id')) {
 
-                case 'station-select' :
+                case 'station-select':
                     param = 's';
 
                     if ($(this).val() !== null) {
@@ -1221,11 +1231,11 @@
 
                     break;
 
-                case 'station-start' :
+                case 'station-start':
                     param = 'start';
                     break;
 
-                case 'station-end' :
+                case 'station-end':
                     param = 'end';
                     break;
 
@@ -1450,7 +1460,7 @@
                 // sort options
 
                 var arr = $('#idf-select option').map(function (_, o) {
-                    return {t: $(o).text(), v: o.value};
+                    return { t: $(o).text(), v: o.value };
                 }).get()
 
                 arr.sort(function (o1, o2) {
@@ -1653,7 +1663,7 @@
                 // sort options
 
                 var arr = $('#ahccd-select option').map(function (_, o) {
-                    return {t: $(o).text(), v: o.value};
+                    return { t: $(o).text(), v: o.value };
                 }).get()
 
                 arr.sort(function (o1, o2) {

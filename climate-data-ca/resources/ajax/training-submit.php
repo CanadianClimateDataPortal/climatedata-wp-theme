@@ -55,8 +55,10 @@ if ($_GET['email']!='') {
 
 
 if ($response['message'] == 'success') {
+    // console.log("SUCCESS ! Click here to download the presentation");
     $response['message1'] = __('Success!','cdc');
-    $response['message2'] = __('Click here to download the presentation','cdc');
+    $response['message2'] = __('Click here to download the presentation @mroy','cdc');
+    $response['GA4'] = __('Download_Introducing-climate-information-for-decision-making_v1.1','cdc');
     $response['url'] = wp_get_attachment_url ( get_field ( 'training_presentation', $_GET['page_ID'] ) );
 }
   

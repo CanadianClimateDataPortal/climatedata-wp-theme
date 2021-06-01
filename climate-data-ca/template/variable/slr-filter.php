@@ -33,20 +33,20 @@
             </div>
             <div id="" class="filter-block col-2">
                 <select class="custom-select custom-select-lg select2 form-control input-xlarge" name="rcp" id="rcp">
+                    <option value="rcp85plus65-p50"><?php _e('RCP 8.5 enhanced scenario'); ?></option>
 
-                    <option value="rcp26-p05">RCP 2.6 <?php _e('lower (5th percentile)','cdc'); ?></option>
-                    <option value="rcp26-p50">RCP 2.6 <?php _e('median (50th percentile)','cdc'); ?></option>
-                    <option value="rcp26-p95">RCP 2.6 <?php _e('upper (95th percentile)', 'cdc'); ?></option>
+                    <option value="rcp85-p05">RCP 8.5 <?php _e('lower (5th percentile)','cdc'); ?></option>
+                    <option value="rcp85-p50">RCP 8.5 <?php _e('median (50th percentile)','cdc'); ?></option>
+                    <option value="rcp85-p95">RCP 8.5 <?php _e('upper (95th percentile)', 'cdc'); ?></option>
 
                     <option value="rcp45-p05">RCP 4.5 <?php _e('lower (5th percentile)','cdc'); ?></option>
                     <option value="rcp45-p50">RCP 4.5 <?php _e('median (50th percentile)','cdc'); ?></option>
                     <option value="rcp45-p95">RCP 4.5 <?php _e('upper (95th percentile)', 'cdc'); ?></option>
 
-                    <option value="rcp85-p05">RCP 8.5 <?php _e('lower (5th percentile)','cdc'); ?></option>
-                    <option value="rcp85-p50">RCP 8.5 <?php _e('median (50th percentile)','cdc'); ?></option>
-                    <option value="rcp85-p95">RCP 8.5<?php _e('upper (95th percentile)', 'cdc'); ?></option>
+                    <option value="rcp26-p05">RCP 2.6 <?php _e('lower (5th percentile)','cdc'); ?></option>
+                    <option value="rcp26-p50">RCP 2.6 <?php _e('median (50th percentile)','cdc'); ?></option>
+                    <option value="rcp26-p95">RCP 2.6 <?php _e('upper (95th percentile)', 'cdc'); ?></option>
 
-                    <option value="rcp85plus65-p50"><?php _e('RCP 8.5 enhanced scenario'); ?></option>
                 </select>
             </div>
 
@@ -54,19 +54,19 @@
             <div id="" class="filter-block col-2">
                 <select class="custom-select custom-select-lg select2 form-control input-xlarge" name="rightrcp" id="rightrcp">
                     <option value="disabled"><?php _e('Add a map to compare','cdc'); ?></option>
-                    <option value="rcp26-p05">RCP 2.6 <?php _e('lower (5th percentile)','cdc'); ?></option>
-                    <option value="rcp26-p50">RCP 2.6 <?php _e('median (50th percentile)','cdc'); ?></option>
-                    <option value="rcp26-p95">RCP 2.6 <?php _e('upper (95th percentile)', 'cdc'); ?></option>
+                    <option value="rcp85plus65-p50"><?php _e('RCP 8.5 enhanced scenario'); ?></option>
+
+                    <option value="rcp85-p05">RCP 8.5 <?php _e('lower (5th percentile)','cdc'); ?></option>
+                    <option value="rcp85-p50">RCP 8.5 <?php _e('median (50th percentile)','cdc'); ?></option>
+                    <option value="rcp85-p95">RCP 8.5 <?php _e('upper (95th percentile)', 'cdc'); ?></option>
 
                     <option value="rcp45-p05">RCP 4.5 <?php _e('lower (5th percentile)','cdc'); ?></option>
                     <option value="rcp45-p50">RCP 4.5 <?php _e('median (50th percentile)','cdc'); ?></option>
                     <option value="rcp45-p95">RCP 4.5 <?php _e('upper (95th percentile)', 'cdc'); ?></option>
 
-                    <option value="rcp85-p05">RCP 8.5 <?php _e('lower (5th percentile)','cdc'); ?></option>
-                    <option value="rcp85-p50">RCP 8.5 <?php _e('median (50th percentile)','cdc'); ?></option>
-                    <option value="rcp85-p95">RCP 8.5<?php _e('upper (95th percentile)', 'cdc'); ?></option>
-
-                    <option value="rcp85plus65-p50"><?php _e('RCP 8.5 enhanced scenario'); ?></option>
+                    <option value="rcp26-p05">RCP 2.6 <?php _e('lower (5th percentile)','cdc'); ?></option>
+                    <option value="rcp26-p50">RCP 2.6 <?php _e('median (50th percentile)','cdc'); ?></option>
+                    <option value="rcp26-p95">RCP 2.6 <?php _e('upper (95th percentile)', 'cdc'); ?></option>
                 </select>
             </div>
 

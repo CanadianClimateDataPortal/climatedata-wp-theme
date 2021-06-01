@@ -560,8 +560,8 @@
             vectorTileLayerStyles: {
                 'landmass': function (properties, zoom) {
                     return {
-                        weight: 0.5,
-                        color: '#f2e8e8',
+                        weight: 0.1,
+                        color: '#686968',
                         fillColor: '#fafaf8',
                         opacity: 1,
                         fill: true,
@@ -767,6 +767,8 @@
                 },
 
                 xAxis: {
+                    ordinal:false,
+                    min: Date.UTC(2000, 1, 1),
                     type: 'datetime'
                 },
 
@@ -1424,6 +1426,7 @@
                         transparent: true,
                         opacity: 1,
                         pane: 'raster',
+                        styles: 'slr-' + rcp_value,
                         'TIME': decade_value + '-01-00T00:00:00Z',
                         'VERSION': '1.3.0',
                         layers: 'CDC:' + 'slr-ys-' + right_rcp_value + '-ann-30year'

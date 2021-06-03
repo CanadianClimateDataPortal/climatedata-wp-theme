@@ -7,12 +7,15 @@ $args = array(
     'post_status' => 'publish',
     'numberposts' => 1
 );
+
+// render content from ACF first section (header + footer)
 $my_posts = get_posts($args);
-$post = get_post( $my_posts[0]->ID );
-$content = $post->post_content;
-$content = apply_filters('the_content', $content);
-$content = str_replace(']]>', ']]&gt;', $content);
-echo $content;
+$postid = $my_posts[0]->ID ;
+
+$fields= get_fields($postid);
+
+print $fields[sections][0][section_head][body];
+
 ?>
 </div>
 <br><br>
@@ -79,3 +82,8 @@ echo $content;
   
 
 </form>
+<div class="col-9 offset-1">
+    <?php
+    print $fields[sections][0][section_footer];
+    ?>
+</div>

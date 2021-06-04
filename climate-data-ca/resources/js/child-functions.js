@@ -244,8 +244,8 @@ var chart_labels, legend_labels, l10n_labels;
       gridded_data: 'Gridded data',
       census: 'Census subdivisions',
       health: 'Health regions',
-      watershed: 'Watersheds'      
-      
+      watershed: 'Watersheds'
+
     };
 
     if ($('body').hasClass('lang-fr')) {
@@ -427,6 +427,12 @@ var chart_labels, legend_labels, l10n_labels;
       }
 
     });
+
+		// close supermenu if a smooth-scroll link is clicked inside it
+
+		$('#supermenu .smooth-scroll').click(function() {
+			$('#supermenu').supermenu('hide')
+		})
 
 	  //
 	  // VENDOR

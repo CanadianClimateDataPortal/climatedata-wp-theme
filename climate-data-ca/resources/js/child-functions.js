@@ -251,7 +251,6 @@ var chart_labels, legend_labels, l10n_labels;
       ahccdLegendSquare: 'Temperature',
       ahccdLegendTriangle: 'Precipitation',
       ahccdLegendCircle: 'Both'
-
     };
 
     if ($('body').hasClass('lang-fr')) {
@@ -439,6 +438,12 @@ var chart_labels, legend_labels, l10n_labels;
       }
 
     });
+
+		// close supermenu if a smooth-scroll link is clicked inside it
+
+		$('#supermenu .smooth-scroll').click(function() {
+			$('#supermenu').supermenu('hide')
+		})
 
 	  //
 	  // VENDOR

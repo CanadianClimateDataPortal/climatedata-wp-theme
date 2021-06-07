@@ -179,57 +179,30 @@
 
                 while ( $sector_query->have_posts() ) : $sector_query->the_post();
 
+
+								$link_href = '';
+								$link_class = 'text-muted';
+
+								if ( $current_ID == get_the_ID() ) {
+									$link_class .= ' smooth-scroll';
+								} else {
+									$link_href = get_permalink();
+								}
+
             ?>
 
             <div class="col-10 col-sm-6 col-lg-2 px-5 px-lg-0 <?php echo ( $sector_column == 1 ) ? 'offset-lg-3' : ''; ?>">
 
               <h6><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h6>
 
-              <?php
-
-                  $subsectors = get_pages ( array (
-                    'posts_per_page' => -1,
-                    'child_of' => get_the_ID(),
-                    'sort_column' => 'menu_order',
-                    'order' => 'asc'
-                  ) );
-
-                  if ( !empty ( $subsectors ) ) {
-
-              ?>
 
               <ul>
-
-                <?php
-
-                    foreach ( $subsectors as $subsector ) {
-
-                      $sector_class = array ( );
-
-                      if ( $subsector->ID == $current_ID ) {
-                        $sector_class[] = 'current-item';
-                        $sector_class[] = 'text-dark';
-                      } else {
-                        $sector_class[] = 'text-muted';
-                      }
-
-                ?>
-
-                <li><a href="<?php echo get_permalink( $subsector->ID ); ?>" class="<?php echo implode ( ' ', $sector_class ); ?>"><?php echo get_the_title ( $subsector->ID ); ?></a></li>
-
-                <?php
-
-                    }
-
-                ?>
-
+								<li><a href="<?php echo $link_href; ?>#sector-context" class="<?php echo $link_class; ?>"><?php _e ( 'Context', 'cdc' ); ?></a></li>
+					      <li><a href="<?php echo $link_href; ?>#sector-cases" class="<?php echo $link_class; ?>"><?php _e ( 'Case Studies', 'cdc' ); ?></a></li>
+					      <li><a href="<?php echo $link_href; ?>#sector-analogous" class="<?php echo $link_class; ?>"><?php _e ( 'Analogous Sections', 'cdc' ); ?></a></li>
+					      <li><a href="<?php echo $link_href; ?>#sector-vars" class="<?php echo $link_class; ?>"><?php _e ( 'Relevant Variables', 'cdc' ); ?></a></li>
+					      <li><a href="<?php echo $link_href; ?>#sector-related" class="<?php echo $link_class; ?>"><?php _e ( 'Related Content', 'cdc' ); ?></a></li>
               </ul>
-
-              <?php
-
-                  }
-
-              ?>
             </div>
 
             <?php
@@ -239,21 +212,6 @@
               endwhile; endif;
 
             ?>
-
-            <div id="ag-cases" class="col-10 col-sm-6 col-lg-2 px-5 px-lg-0">
-
-              <h6><?php _e ( 'Agriculture' ); ?></h6>
-
-              <?php
-
-                wp_nav_menu ( array (
-                  'menu' => 'Agriculture Case Studies'
-                ) );
-
-              ?>
-
-            </div>
-
           </div>
 
           <?php

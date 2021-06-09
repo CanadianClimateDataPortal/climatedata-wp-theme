@@ -6813,6 +6813,127 @@ body.stations-on #variable-content .leaflet-top.leaflet-right {
   padding-bottom: 40px;
 }
 
+#sector-context-img {
+  min-height: 50vh;
+}
+#sector-context-img a {
+  position: absolute;
+  bottom: 3rem;
+  right: 3rem;
+  z-index: 2;
+}
+
+#sector-cases-grid .type-case-study .card-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: scroll;
+  opacity: 0.3;
+  z-index: 1;
+}
+@media only screen and (min-width: 2000px) and (-webkit-min-device-pixel-ratio: 1.3), only screen and (min-width: 2000px) and (-o-min-device-pixel-ratio: 13/10), only screen and (min-width: 2000px) and (min-resolution: 120dpi) {
+  #sector-cases-grid .type-case-study .card-bg {
+    background-attachment: scroll;
+    background-size: 100% auto;
+  }
+}
+#sector-cases-grid .type-case-study .card-body {
+  position: relative;
+  z-index: 2;
+}
+#sector-cases-grid .type-case-study .card-footer {
+  position: relative;
+  z-index: 3;
+}
+#sector-cases-grid .card-keywords h6 {
+  font-size: 1.2rem;
+}
+#sector-cases-grid .card-keywords p {
+  font-size: 1.2rem;
+}
+
+.analogous-title {
+  position: relative;
+  z-index: 2;
+}
+.analogous-title h2 {
+  font-family: "CDCSans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.analogous-btn {
+  position: relative;
+  z-index: 2;
+}
+
+@media (min-width: 768px) {
+  #sector-related .subsection > .row {
+    overflow: hidden;
+  }
+}
+
+#sector-related-content {
+  position: relative;
+}
+
+#sector-related-slick {
+  height: 50vh;
+}
+@media (min-width: 992px) {
+  #sector-related-slick {
+    margin-right: -8.33333vw;
+  }
+}
+#sector-related-slick .slick-list {
+  height: 100%;
+}
+#sector-related-slick .slick-track {
+  height: 100%;
+}
+#sector-related-slick .slick-slide {
+  position: relative;
+}
+#sector-related-slick .slide-inner {
+  position: relative;
+}
+#sector-related-slick .slide-content {
+  position: relative;
+  z-index: 2;
+}
+
+#sector-related-next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  padding: 2rem;
+  background: #f2f2f2;
+  font-size: 3rem;
+  cursor: pointer;
+}
+@media (min-width: 768px) {
+  #sector-related-next {
+    top: 0;
+    height: 100%;
+    width: 25vw;
+    padding: 0;
+    padding-left: 16.66667vw;
+    background: linear-gradient(90deg, rgba(242, 242, 242, 0) 0%, #f2f2f2 66%);
+  }
+}
+#sector-related-next i {
+  transition: 0.25s;
+}
+#sector-related-next:hover i {
+  color: #e50e40;
+}
+
 #download-tabs {
   padding: 0;
 }

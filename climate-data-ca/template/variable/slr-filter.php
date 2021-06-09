@@ -29,11 +29,11 @@
 
                     <option value="slr"><?php echo get_the_title() ?></option>
                 </select>
-                <a href="https://climatedata.crim.ca/variable/slr/" data-overlay-content="interstitial" class="text-white dropdown-label overlay-toggle fas fa-info icon rounded-circle"></a>
+                <a href="<?php echo $GLOBALS['vars']['site_url'] ?>variable/slr/" data-overlay-content="interstitial" class="text-white dropdown-label overlay-toggle fas fa-info icon rounded-circle"></a>
             </div>
-            <div id="" class="filter-block col-2">
+            <div id="" class="filter-block col-3">
                 <select class="custom-select custom-select-lg select2 form-control input-xlarge" name="rcp" id="rcp">
-                    <option value="rcp85plus65-p50"><?php _e('RCP 8.5 enhanced scenario'); ?></option>
+                    <option value="rcp85plus65-p50"><?php _e('RCP 8.5 enhanced scenario','cdc'); ?></option>
 
                     <option value="rcp85-p05">RCP 8.5 <?php _e('lower (5th percentile)','cdc'); ?></option>
                     <option value="rcp85-p50">RCP 8.5 <?php _e('median (50th percentile)','cdc'); ?></option>
@@ -51,10 +51,10 @@
             </div>
 
 
-            <div id="" class="filter-block col-2">
+            <div id="" class="filter-block col-3">
                 <select class="custom-select custom-select-lg select2 form-control input-xlarge" name="rightrcp" id="rightrcp">
                     <option value="disabled"><?php _e('Add a map to compare','cdc'); ?></option>
-                    <option value="rcp85plus65-p50"><?php _e('RCP 8.5 enhanced scenario'); ?></option>
+                    <option value="rcp85plus65-p50"><?php _e('RCP 8.5 enhanced scenario','cdc'); ?></option>
 
                     <option value="rcp85-p05">RCP 8.5 <?php _e('lower (5th percentile)','cdc'); ?></option>
                     <option value="rcp85-p50">RCP 8.5 <?php _e('median (50th percentile)','cdc'); ?></option>

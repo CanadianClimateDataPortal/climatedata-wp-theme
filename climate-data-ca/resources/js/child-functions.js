@@ -267,7 +267,7 @@ var chart_labels, legend_labels, l10n_labels;
         rcp_45_range: 'RCP 4.5 portée',
         rcp_85_median: 'RCP 8.5 médiane',
         rcp_85_range: 'RCP 8.5 portée',
-        rcp_85_enhanced: 'RCP 8.5 Enhanced Scenario **TR**',
+        rcp_85_enhanced: 'RCP 8.5 scénario renforcé',
         temperature: 'Température',
         precipitation: 'Précipitation',
         daily_avg_temp: 'Température quotidienne moyenne',

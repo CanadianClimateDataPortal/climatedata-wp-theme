@@ -857,7 +857,7 @@
                         break;
                 }
 
-                chart.exportChart({
+                chart.exportChartLocal({
                     type: dl_type
                 });
             });

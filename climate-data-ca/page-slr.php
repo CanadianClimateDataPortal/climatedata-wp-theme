@@ -12,6 +12,7 @@ function tpl_enqueue()
     wp_enqueue_script('highcharts-highstock');
     wp_enqueue_script('highcharts-more');
     wp_enqueue_script('highcharts-exporting');
+    wp_enqueue_script('highcharts-offline-exporting');
     wp_enqueue_script('highcharts-export-data');
 
     wp_enqueue_script('leaflet');

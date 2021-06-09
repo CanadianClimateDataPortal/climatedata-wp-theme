@@ -180,7 +180,7 @@ var sticky_offset = 0,
         $('body').addClass('spinner-on');
       })
       .animsition({
-        linkElement: 'a:not([target="_blank"]):not([href^="#"]):not([href^="blob"]):not(.supermenu-toggle):not(.overlay-toggle), .animsition-link',
+        linkElement: 'a:not([target="_blank"]):not([href^="#"]):not([href^="blob"]):not([href^="data"]):not(.supermenu-toggle):not(.overlay-toggle), .animsition-link',
         inDuration: 500,
         outDuration: 250,
         loading: false

@@ -9,23 +9,25 @@
 
 
         var varData;
+
         function getVarData(callback) {
             if (varData !== undefined) {
                 callback(varData);
             } else {
-            $.ajax({
-                url: '/wp-json/acf/v3/variable/?per_page=10000&orderby=menu_order&order=asc',
-                dataType: 'json',
-                success: function (data) {
-                    varData = new Map();
-                    $.each(data, function (k, v) {
-                        if (v.acf.var_name != 'slr') {   // exclude sea-level from filter menu since it's on another page
-                            varData.set(v.acf.var_name, v.acf);
-                        }
-                    });
-                    callback(varData);
-                }
-            });}
+                $.ajax({
+                    url: '/wp-json/acf/v3/variable/?per_page=10000&orderby=menu_order&order=asc',
+                    dataType: 'json',
+                    success: function (data) {
+                        varData = new Map();
+                        $.each(data, function (k, v) {
+                            if (v.acf.var_name != 'slr') {   // exclude sea-level from filter menu since it's on another page
+                                varData.set(v.acf.var_name, v.acf);
+                            }
+                        });
+                        callback(varData);
+                    }
+                });
+            }
         }
 
         varID = parseInt($('#varPostID').val());

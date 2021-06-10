@@ -281,8 +281,17 @@ body.map-compare {
 
 .legendLabel {
   display: block;
-  text-align: center;
-  margin: 10px 0;
+  text-align: right;
+  margin: 0px 0;
+  position: absolute;
+  right: 26px;
+}
+.max {
+  bottom: -9px;
+}
+
+.min {
+  top: -9px;
 }
 
 $legend-off-height: 100%;

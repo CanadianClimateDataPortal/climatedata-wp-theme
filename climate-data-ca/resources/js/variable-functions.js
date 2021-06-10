@@ -859,12 +859,11 @@
         function getColor(d) {
 
             for (let i = 0; i < colormap.length; i++) {
-                unitValue = parseInt(colormap[i].quantity);
-                unitColor = colormap[i].color;
-                if (d > unitValue) {
-                    return unitColor
+                if (d > colormap[i].quantity) {
+                    return colormap[i].color;
                 }
             }
+            return colormap[colormap.length-1].color;
         }
 
         function genChoro(sector, year, variable, rcp, frequency) {
@@ -1278,6 +1277,8 @@
 
         function genStationChart(STN_ID, station_name, lat, lon) {
 
+
+
             $(document).overlay('show', {
                 href: base_href + 'variable/' + $('#var').val() + '/',
                 data: {
@@ -1288,7 +1289,7 @@
                 content: 'location',
                 position: 'right',
                 callback: function (varDetails) {
-
+                    $('.overlay-title').text(station_name);
                     $.getJSON(
                         'https://api.weather.gc.ca/collections/climate-normals/items?f=json&STN_ID=' + STN_ID + '&NORMAL_ID=1&sortby=MONTH',
                         function (data) {
@@ -1359,10 +1360,7 @@
 
                                 switch ($(this).attr('data-type')) {
                                     case 'csv' :
-                                        //chart.downloadCSV();
-
-                                        window.open("data:text/csv;charset=utf-8," + escape(chart.getCSV()));
-
+                                        chart.downloadCSV();
                                         break;
                                 }
 
@@ -1514,7 +1512,7 @@
                 first_label = first_label.replace('Days', 'Jours');
             }
 
-            labels.push('<span class="legendLabel max">' + first_label + '</span>');
+           // labels.push('<span class="legendLabel max">' + first_label + '</span>');
 
             labels.push('<div class="legendRows">');
 
@@ -1530,21 +1528,54 @@
                         unitValue = unitValue.replace('Degree Days', 'Degrés-jours');
                         unitValue = unitValue.replace('Days', 'Jours');
                     }
+                    style='background:' + unitColor;
 
-                    labels.push(
-                        '<div class="legendRow">' +
-                        '<div class="legendColor" style="background:' + unitColor + '"></div>' +
-                        '<div class="legendUnit">' + unitValue + '</div>' +
-                        '</div>'
-                    );
+                    t="";
+                    if (i==0) {
+                        style="; border-bottom: 10px solid " + unitColor +
+                            "; border-left: 8px solid transparent" +
+                            "; border-right: 8px solid transparent";
+                        t='<span class="legendLabel max">' + first_label + '</span>';
 
-                    min_label = unitValue;
+                        labels.push(
+                            '<div class="legendRow">' +
+                            '<span class="legendLabel max">' + unitValue + '</span>' +
+                            '<div class="legendColor" style="border-bottom: 10px solid ' + unitColor +
+                            '; border-left: 8px solid transparent; border-right: 8px solid transparent"></div>' +
+                            '<span class="legendUnit">&gt; ' + unitValue + '</span>' +
+                            '</div>'
+                        );
+                    }
+                    else if (i==colormap.length -1) {
+                        labels.push(
+                            '<div class="legendRow">' +
+                            '<span class="legendLabel min">' + unitValue + '</span>' +
+                            '<div class="legendColor" style="border-top: 10px solid ' + unitColor +
+                            '; border-left: 8px solid transparent; border-right: 8px solid transparent"></div>' +
+                            '<span class="legendUnit">&lt; ' + unitValue + '</span>' +
+                            '</div>');
+                    } else {
+                        labels.push(
+                            '<div class="legendRow">' +
+                            '<div class="legendColor" style="' + style + '"></div>' +
+                            '<div class="legendUnit">' + unitValue + '</div>' +
+                            '</div>');
+                    }
+
+                } else {
+                    if (i==colormap.length -1) {
+                        labels.push(
+                            '<div class="legendRow">' +
+                            '<span class="legendLabel ">0</span>' +
+                            '<div class="legendColor" style="background:' + unitColor +'"></div>' +
+                            '<span class="legendUnit">0</span>' +
+                            '</div>');
+                    }
                 }
             }
 
             labels.push('</div><!-- .legendRows -->');
 
-            labels.push('<span class="legendLabel min">' + min_label + '</span>');
 
             return labels;
 
@@ -1650,7 +1681,7 @@
 
                     };
 
-                    leftLegend.addTo(map1);
+                        leftLegend.addTo(map1);
 
                     if ($('#rcp').val().indexOf("vs") !== -1) {
                         generateRightLegend(layer, legendTitle, data);
@@ -1686,7 +1717,8 @@
 
         function generateSectorLegend(layer, legendTitle) {
 
-            $.getJSON(hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&layer=CDC:canadagrid&style=" + layer + "&format=application/json")
+            $.getJSON(hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic" +
+                "&layer=CDC:" + layer + "&format=application/json")
                 .then(function (data) {
 
                     labels = [];
@@ -1708,6 +1740,7 @@
                     leftLegend.addTo(map1);
 
                     colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
+                    colormap = colormap.map(function (c){c.quantity = parseFloat(c.quantity); return c;});
 
                     var_value = $("#var").val();
                     mora_value = $("#mora").val();
@@ -2469,7 +2502,7 @@
                     }
 
                     legendLayer = var_value + "_health_" + legendmsorys;
-                    generateSectorLegend(var_value + "_health_" + legendmsorys, '');
+                    generateSectorLegend(var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year','');
                 } else {
                     generateLeftLegend();
                 }
@@ -2985,26 +3018,26 @@
 
         mora_value = $("#mora").val();
         var_value = $("#var").val();
+        rcp_value = $("#rcp").val();
         if (query['sector'] != '') {
             switch(mora_value) {
                 case 'ann':
-                    legendmsorys = 'ann';
+                    msorys = 'ys';
                     break;
                 case 'spring':
                 case 'summer':
                 case 'fall':
                 case 'winter':
-                    legendmsorys = 'qsdec';
+                    msorys = 'qsdec';
                     break;
                 case '2qsapr':
-                    legendmsorys = '2qsapr';
+                    msorys = '2qsapr';
                     break;
                 default:
-                    legendmsorys = 'mon';
+                    msorys = 'ms';
             }
 
-            legendLayer = var_value + "_health_" + legendmsorys;
-            generateSectorLegend(legendLayer, '');
+            generateSectorLegend(var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year','');
 
 
         } else {

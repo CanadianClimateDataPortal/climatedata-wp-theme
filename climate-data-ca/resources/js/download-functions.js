@@ -98,6 +98,28 @@
                         page: params.page
                     };
                 },
+                transport: function (params, success, failure) {
+                    var $request = $.ajax(params);
+
+                    var llcheck = new RegExp('^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$');
+
+                    term = params.data.q;
+
+
+                    if (llcheck.test(term)) {
+                        $request.fail(failure);
+                        // $('.select2-results__option').text('custom');
+                        $('.select2-results__options').empty();
+                        $('.select2-results__options').append('<li style="padding:10px"><strong>Custom Lat/Lon Detected:</strong><br>Map has panned to validated coordinates.</li>');
+                        var term_segs = term.split(',');
+                        var term_lat = term_segs[0];
+                        var term_lon = term_segs[1];
+                        maps['variable'].panTo([term_lat, term_lon]);
+                    } else {
+                        $request.then(success);
+                        return $request;
+                    }
+                },
                 processResults: function (data, page) {
                     return {
                         results: data.items
@@ -858,6 +880,10 @@
                                         "data": lon_vals
                                     },
                                     {
+                                        "id": "data_validation",
+                                        "data": "warn"
+                                    },
+                                    {
                                         "id": "output_format",
                                         "data": $('input[name="download-format"]:checked').val()
                                     },
@@ -965,7 +991,6 @@
                     pointToLayer: function (feature, latlng) {
                         return L.circleMarker(latlng, geojsonMarkerOptions);
                     }
-
 
 
                 }).on('mouseover', function (e) {
@@ -1252,22 +1277,22 @@
         });
 
         /*
-            $('#station-download-form').submit(function(e) {
-              e.preventDefault();
+         $('#station-download-form').submit(function(e) {
+         e.preventDefault();
 
-              var process_url = $('#result').text();
+         var process_url = $('#result').text();
 
 
-              $.ajax({
-                url: process_url,
-                success: function(data) {
-                },
-                complete: function() {
-                }
-              });
+         $.ajax({
+         url: process_url,
+         success: function(data) {
+         },
+         complete: function() {
+         }
+         });
 
-            });
-        */
+         });
+         */
 
         function check_station_form() {
 
@@ -1479,15 +1504,15 @@
                         $('#idf-station-elevation h5').text(layer.feature.properties.Elevation_)
 
                         /*$('#idf-links').html('<div class="idf-popup-row">' +
-                            '<h6>' + popup_headings[0] + '</h6>' +
-                            '<h5 class="idfTitle">' + layer.feature.properties.Name + '</h5>' +
-                          '</div>' +
-                          '<div class="idf-popup-row">' +
-                            '<h6>' + popup_headings[1] + '</h6>' +
-                            '<h5 class="idfElev">' + layer.feature.properties.Elevation_ + '</h5>' +
-                          '</div>' +
-                          '<h6>' + popup_headings[2] + '</h6>' +
-                          '<ul class="idfBody list-unstyled"></ul>');*/
+                         '<h6>' + popup_headings[0] + '</h6>' +
+                         '<h5 class="idfTitle">' + layer.feature.properties.Name + '</h5>' +
+                         '</div>' +
+                         '<div class="idf-popup-row">' +
+                         '<h6>' + popup_headings[1] + '</h6>' +
+                         '<h5 class="idfElev">' + layer.feature.properties.Elevation_ + '</h5>' +
+                         '</div>' +
+                         '<h6>' + popup_headings[2] + '</h6>' +
+                         '<ul class="idfBody list-unstyled"></ul>');*/
 
                         $.each(data, function (k, v) {
                             linktext = v;

@@ -150,13 +150,11 @@
 				    // video.src = url //URL.createObjectURL(blob)
 						video2 = document.getElementById(video_ID)
 
-						console.log(video2.duration)
-
 						this_vid.attr('data-duration', video2.duration)
 
 						videos_to_load -= 1
 
-						console.log('videos left', videos_to_load)
+						// console.log('videos left', videos_to_load)
 
 						if (videos_to_load == 0) {
 							console.log('all videos loaded')
@@ -220,50 +218,55 @@
 
 	  			var this_from, this_to
 
-	  			if (!$(id_pre + el.id).hasClass('entered')) {
-	    			$(id_pre + el.id).css('opacity', 0).addClass('entered')
-	  			}
+					if ($(id_pre + el.id).length) {
 
-					if (el.effect == 'manual' ) {
+		  			if (!$(id_pre + el.id).hasClass('entered')) {
+		    			$(id_pre + el.id).css('opacity', 0).addClass('entered')
+		  			}
 
-	  				this_to = {
-							...el.properties,
-							...{
-								duration: el.duration,
-								onStart: function() {
+						if (el.effect == 'manual' ) {
 
-									if ($(id_pre + el.id).hasClass('type-video')) {
+		  				this_to = {
+								...el.properties,
+								...{
+									duration: el.duration,
+									onStart: function() {
 
-										video_trigger(id_pre + el.id + '-video')
+										if ($(id_pre + el.id).hasClass('type-video')) {
+
+											video_trigger(id_pre + el.id + '-video')
+
+										}
 
 									}
-
 								}
 							}
+
+		  				tl.fromTo( id_pre + el.id, this_from, this_to, el.position )
+
+						} else {
+
+							this_to = {
+								...tweens[el.effect].to,
+								...{
+									duration: el.duration,
+									onStart: function() {
+
+										if ($(id_pre + el.id).hasClass('type-video')) {
+
+											video_trigger(id_pre + el.id + '-video')
+
+										}
+
+									}
+								}
+							}
+
+		  				tl.fromTo( id_pre + el.id, tweens[el.effect].from, this_to, el.position )
+
 						}
-
-	  				tl.fromTo( id_pre + el.id, this_from, this_to, el.position )
-
 					} else {
-
-						this_to = {
-							...tweens[el.effect].to,
-							...{
-								duration: el.duration,
-								onStart: function() {
-
-									if ($(id_pre + el.id).hasClass('type-video')) {
-
-										video_trigger(id_pre + el.id + '-video')
-
-									}
-
-								}
-							}
-						}
-
-	  				tl.fromTo( id_pre + el.id, tweens[el.effect].from, this_to, el.position )
-
+						console.log('⚠ ' + id_pre + el.id + ' does not exist')
 					}
 
 				})

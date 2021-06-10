@@ -3,8 +3,6 @@
     $(function () {
         // GLOBAL vars
 
-        var landmassLayerLeft, landmassLayerRight;
-
         has_mapRight = false;
         var hosturl = geoserver_url;
         var canadaBounds = L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.60, -49.9));
@@ -21,7 +19,7 @@
                 success: function (data) {
                     varData = new Map();
                     $.each(data, function (k, v) {
-                        if (v.acf.var_name != 'slr') {
+                        if (v.acf.var_name != 'slr') {   // exclude sea-level from filter menu since it's on another page
                             varData.set(v.acf.var_name, v.acf);
                         }
                     });
@@ -117,10 +115,6 @@
         map1.getPane('grid').style.zIndex = 500;
         map1.getPane('grid').style.pointerEvents = 'all';
 
-        map1.createPane('landmass');
-        map1.getPane('landmass').style.zIndex = 510;
-        map1.getPane('landmass').style.pointerEvents = 'none';
-
         map1.createPane('labels');
         map1.getPane('labels').style.zIndex = 550;
         map1.getPane('labels').style.pointerEvents = 'none';
@@ -169,10 +163,6 @@
             mapRight.createPane('grid');
             mapRight.getPane('grid').style.zIndex = 500;
             mapRight.getPane('grid').style.pointerEvents = 'none';
-
-            mapRight.createPane('landmass');
-            mapRight.getPane('landmass').style.zIndex = 510;
-            mapRight.getPane('landmass').style.pointerEvents = 'none';
 
             mapRight.createPane('labels');
             mapRight.getPane('labels').style.zIndex = 550;
@@ -269,55 +259,6 @@
                 }).addTo(mapRight);
             }
 
-            // add landmass layer if gridname is slrgrid, otherwise remove if there
-            if(gridname === 'slrgrid'){
-                landmassLayer_options = {
-                    rendererFactory: L.canvas.tile,
-                    interactive: false,
-                    maxNativeZoom: 12,
-                    vectorTileLayerStyles: {
-                        'landmass': function (properties, zoom) {
-                            return {
-                                weight: 0.5,
-                                color: '#f2e8e8',
-                                fillColor: '#fafaf8',
-                                opacity: 1,
-                                fill: true,
-                                radius: 4,
-                                fillOpacity: 1
-                            }
-                        }
-                    },
-                    bounds: L.latLngBounds(L.latLng(24, -180), L.latLng(83.50, -52.1)),
-                    maxZoom: 12,
-                    minZoom: 3,
-                    pane: 'landmass'
-                };
-                landmassLayerLeft= L.vectorGrid.protobuf(
-                    hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:landmass@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
-                    landmassLayer_options
-                ).addTo(map1);
-                landmassLayerLeft.on('click', function (e){
-                   console.log("asdf");
-                });
-                if ($('#mapRight').length) {
-                    landmassLayerRight= L.vectorGrid.protobuf(
-                        hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:landmass@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
-                        landmassLayer_options
-                    ).addTo(mapRight);
-                }
-
-            }
-            else {
-                if (map1.hasLayer(landmassLayerLeft)){
-                    map1.removeLayer(landmassLayerLeft);
-                }
-                if ($('#mapRight').length && mapRight.hasLayer(landmassLayerRight)) {
-                    mapRight.removeLayer(landmassLayerRight);
-                }
-
-
-            }
         }
 
 
@@ -873,17 +814,7 @@
                         radius: 4,
                         fillOpacity: 0
                     }
-                },
-                'slrgrid': function (properties, zoom) {
-                    return {
-                        weight: 0.1,
-                        color: '#89cff0',
-                        opacity: 1,
-                        fill: true,
-                        radius: 4,
-                        fillOpacity: 0
-                    }
-                }                
+                }
             },
             bounds: canadaBounds,
             maxZoom: 12,

@@ -266,6 +266,9 @@
 
                                         exporting: {
                                             enabled: true,
+                                            csv: {
+                                                dateFormat: '%Y-%m-%d'
+                                            },
 
                                             buttons: {
                                                 contextButton: {

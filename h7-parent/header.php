@@ -255,6 +255,8 @@ if (current_user_can('administrator')) {
 
             }
 
+        } elseif ($GLOBALS['vars']['current_slug'] == 'slr') {
+            include(locate_template('template/variable/slr-filter.php'));
         }
 
         //

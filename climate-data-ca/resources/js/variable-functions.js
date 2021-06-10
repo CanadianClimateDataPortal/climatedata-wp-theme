@@ -1,11 +1,34 @@
 (function ($) {
 
     $(function () {
+        // GLOBAL vars
 
         has_mapRight = false;
         var hosturl = geoserver_url;
         var canadaBounds = L.latLngBounds(L.latLng(41, -141), L.latLng(83.50, -52.1));
 
+
+        var varData;
+
+        function getVarData(callback) {
+            if (varData !== undefined) {
+                callback(varData);
+            } else {
+                $.ajax({
+                    url: '/wp-json/acf/v3/variable/?per_page=10000&orderby=menu_order&order=asc',
+                    dataType: 'json',
+                    success: function (data) {
+                        varData = new Map();
+                        $.each(data, function (k, v) {
+                            if (v.acf.var_name != 'slr') {   // exclude sea-level from filter menu since it's on another page
+                                varData.set(v.acf.var_name, v.acf);
+                            }
+                        });
+                        callback(varData);
+                    }
+                });
+            }
+        }
 
         varID = parseInt($('#varPostID').val());
         acfData = [];
@@ -95,7 +118,7 @@
         map1.getPane('grid').style.pointerEvents = 'all';
 
         map1.createPane('labels');
-        map1.getPane('labels').style.zIndex = 450;
+        map1.getPane('labels').style.zIndex = 550;
         map1.getPane('labels').style.pointerEvents = 'none';
 
         // stations
@@ -135,18 +158,19 @@
             mapRight.getPane('basemap').style.zIndex = 399;
             mapRight.getPane('basemap').style.pointerEvents = 'none';
 
-            mapRight.createPane('labels');
-            mapRight.getPane('labels').style.zIndex = 402;
-            mapRight.getPane('labels').style.pointerEvents = 'none';
-
-            mapRight.createPane('grid');
-            mapRight.getPane('grid').style.zIndex = 403;
-            mapRight.getPane('grid').style.pointerEvents = 'none';
-
-
             mapRight.createPane('raster');
             mapRight.getPane('raster').style.zIndex = 400;
             mapRight.getPane('raster').style.pointerEvents = 'none';
+
+            mapRight.createPane('grid');
+            mapRight.getPane('grid').style.zIndex = 500;
+            mapRight.getPane('grid').style.pointerEvents = 'none';
+
+            mapRight.createPane('labels');
+            mapRight.getPane('labels').style.zIndex = 550;
+            mapRight.getPane('labels').style.pointerEvents = 'none';
+
+
 
             L.tileLayer('//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png', {
                 attribution: '',
@@ -206,7 +230,7 @@
             return (false);
         }
 
-        function replaceGrid(gridname, gridstyle, mapcontainer) {
+        function replaceGrid(gridname, gridstyle) {
 
 
             if (map1.hasLayer(gridLayer)) {
@@ -236,6 +260,7 @@
                     grid_hover(e);
                 }).addTo(mapRight);
             }
+
         }
 
 
@@ -524,8 +549,8 @@
                 },
                 /*
                  * When each feature is load{
-    maxWidth: "auto"
-    }ed from the GeoJSON this
+                 maxWidth: "auto"
+                 }ed from the GeoJSON this
                  * function is called. Here we create a cicle marker
                  * for the feature and style the circle marker.
                  */
@@ -709,7 +734,7 @@
 
         function grid_click(e) {
 
-console.log('grid clicked');
+            console.log('grid clicked');
 
             grid_initialized = true;
 
@@ -799,49 +824,14 @@ console.log('grid clicked');
             pane: 'grid'
         };
 
-        var slrgridLayer_options = {
-
-            rendererFactory: L.canvas.tile,
-            interactive: true,
-            getFeatureId: function (f) {
-                return f.properties.gid;
-            },
-            maxNativeZoom: 12,
-            vectorTileLayerStyles: {
-                'slrgrid': function (properties, zoom) {
-                    return {
-                        weight: 0.1,
-                        color: '#89cff0',
-                        opacity: 1,
-                        fill: true,
-                        radius: 4,
-                        fillOpacity: 0
-                    }
-                }
-            },
-            maxZoom: 12,
-            minZoom: 7,
-            pane: 'grid'
-        };
-
         // create
 
         var_value = $("#var").val();
 
-        if (var_value === 'slr') {
-            gridname = 'slrgrid'
-            gridoptions = slrgridLayer_options;
-        } else if (var_value === 'spei_12m' || var_value === 'spei_3m') {
-            gridname = 'canadagrid1deg'
-            gridoptions = gridLayer_options;
-        } else {
-            gridname = 'canadagrid'
-            gridoptions = gridLayer_options;
-        }
-
-        var gridLayer = L.vectorGrid.protobuf(
-            hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + gridname + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
-            gridoptions
+        var gridLayer;
+        gridLayer = L.vectorGrid.protobuf(
+            hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + 'canadagrid' + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+            gridLayer_options
         ).on('click', function (e) {
             grid_click(e);
         }).on('mouseover', function (e) {
@@ -853,6 +843,7 @@ console.log('grid clicked');
         if (query['var-group'] != 'station-data' && query['sector'] == '') {
             gridLayer.addTo(map1);
         }
+
 
         //
         // SECTOR LAYER
@@ -998,154 +989,154 @@ console.log('grid clicked');
         // CHART STUFF
         //
         //
-        function disPlayChartData(data, varDetails) {        
+        function disPlayChartData(data, varDetails) {
             chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
             chartDecimals = varDetails['decimals'];
             switch (varDetails.units.value) {
                 case 'doy':
                     formatter = function () {return new Date(1546300800000+1000*60*60*24*this.value).toLocaleDateString(current_lang, { month:'long', day:'numeric'})};
-                    pointFormatter = function (format) { 
-                    if (this.series.type == 'line') {
-                        return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name+ ': <b>'
-                            + new Date(1546300800000+1000*60*60*24*this.y).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
-                            + '</b><br/>';
-                    } else {                                    
-                        return '<span style="color:' + this.series.color + '">●</span>' + this.series.name + ': <b>' 
-                            + new Date(1546300800000+1000*60*60*24*this.low).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
-                            + '</b> - <b>' 
-                            + new Date(1546300800000+1000*60*60*24*this.high).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
-                            + '</b><br/>';
-                    }};
+                    pointFormatter = function (format) {
+                        if (this.series.type == 'line') {
+                            return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name+ ': <b>'
+                                + new Date(1546300800000+1000*60*60*24*this.y).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
+                                + '</b><br/>';
+                        } else {
+                            return '<span style="color:' + this.series.color + '">●</span>' + this.series.name + ': <b>'
+                                + new Date(1546300800000+1000*60*60*24*this.low).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
+                                + '</b> - <b>'
+                                + new Date(1546300800000+1000*60*60*24*this.high).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
+                                + '</b><br/>';
+                        }};
                     break;
                 default:
                     formatter = function () {return this.axis.defaultLabelFormatter.call(this) + chartUnit;};
                     pointFormatter = undefined;
-            }       
-            
+            }
+
             chartSeries = [];
-            if (data['observations'].length > 0) 
+            if (data['observations'].length > 0)
                 chartSeries.push({
-                        name: chart_labels.observation,
-                        data: data['observations'],
-                        zIndex: 1,
-                        showInNavigator: true,
-                        color: '#F47D23',
-                        visible: false,
-                        marker: {
-                            fillColor: '#F47D23',
-                            lineWidth: 0,
-                            radius: 0,
-                            lineColor: '#F47D23'
-                }});
-            if (data['modeled_historical_median'].length > 0)                                     
+                    name: chart_labels.observation,
+                    data: data['observations'],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#F47D23',
+                    visible: false,
+                    marker: {
+                        fillColor: '#F47D23',
+                        lineWidth: 0,
+                        radius: 0,
+                        lineColor: '#F47D23'
+                    }});
+            if (data['modeled_historical_median'].length > 0)
                 chartSeries.push({
                     name: chart_labels.historical,
-                        data: data['modeled_historical_median'],
-                        zIndex: 1,
-                        showInNavigator: true,
-                        color: '#000000',
-                        marker: {
-                            fillColor: '#000000',
-                            lineWidth: 0,
-                            radius: 0,
-                            lineColor: '#000000'
-                }});
-            if (data['modeled_historical_range'].length > 0)                                     
-                chartSeries.push({
-                        name: chart_labels.historical_range,
-                        data: data['modeled_historical_range'],
-                        type: 'arearange',
+                    data: data['modeled_historical_median'],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#000000',
+                    marker: {
+                        fillColor: '#000000',
                         lineWidth: 0,
-                        linkedTo: ':previous',
-                        color: '#000000',
-                        fillOpacity: 0.2,
-                        zIndex: 0,
-                        marker: {
-                            radius: 0,
-                            enabled: false
-                }});
-            if (data['rcp26_median'].length > 0)                                     
+                        radius: 0,
+                        lineColor: '#000000'
+                    }});
+            if (data['modeled_historical_range'].length > 0)
                 chartSeries.push({
-                        name: chart_labels.rcp_26_median,
-                        data: data['rcp26_median'],
-                        zIndex: 1,
-                        showInNavigator: true,
-                        color: '#00F',
-                        marker: {
-                            fillColor: '#00F',
-                            lineWidth: 0,
-                            radius: 0,
-                            lineColor: '#00F'
-                }});
-            if (data['rcp26_range'].length > 0)                                     
+                    name: chart_labels.historical_range,
+                    data: data['modeled_historical_range'],
+                    type: 'arearange',
+                    lineWidth: 0,
+                    linkedTo: ':previous',
+                    color: '#000000',
+                    fillOpacity: 0.2,
+                    zIndex: 0,
+                    marker: {
+                        radius: 0,
+                        enabled: false
+                    }});
+            if (data['rcp26_median'].length > 0)
                 chartSeries.push({
-                        name: chart_labels.rcp_26_range,
-                        data: data['rcp26_range'],
-                        type: 'arearange',
+                    name: chart_labels.rcp_26_median,
+                    data: data['rcp26_median'],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#00F',
+                    marker: {
+                        fillColor: '#00F',
                         lineWidth: 0,
-                        linkedTo: ':previous',
-                        color: '#00F',
-                        fillOpacity: 0.2,
-                        zIndex: 0,
-                        marker: {
-                            radius: 0,
-                            enabled: false
-                }});
-            if (data['rcp45_median'].length > 0)                                     
+                        radius: 0,
+                        lineColor: '#00F'
+                    }});
+            if (data['rcp26_range'].length > 0)
                 chartSeries.push({
-                        name: chart_labels.rcp_45_median,
-                        data: data['rcp45_median'],
-                        zIndex: 1,
-                        showInNavigator: true,
-                        color: '#00640c',
-                        marker: {
-                            fillColor: '#00640c',
-                            lineWidth: 0,
-                            radius: 0,
-                            lineColor: '#00640c'
-                }});
-            if (data['rcp45_range'].length > 0)                                     
+                    name: chart_labels.rcp_26_range,
+                    data: data['rcp26_range'],
+                    type: 'arearange',
+                    lineWidth: 0,
+                    linkedTo: ':previous',
+                    color: '#00F',
+                    fillOpacity: 0.2,
+                    zIndex: 0,
+                    marker: {
+                        radius: 0,
+                        enabled: false
+                    }});
+            if (data['rcp45_median'].length > 0)
                 chartSeries.push({
-                        name: chart_labels.rcp_45_range,
-                        data: data['rcp45_range'],
-                        type: 'arearange',
+                    name: chart_labels.rcp_45_median,
+                    data: data['rcp45_median'],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#00640c',
+                    marker: {
+                        fillColor: '#00640c',
                         lineWidth: 0,
-                        linkedTo: ':previous',
-                        color: '#00640c',
-                        fillOpacity: 0.2,
-                        zIndex: 0,
-                        marker: {
-                            radius: 0,
-                            enabled: false
-                }});
-            if (data['rcp85_median'].length > 0)                                     
+                        radius: 0,
+                        lineColor: '#00640c'
+                    }});
+            if (data['rcp45_range'].length > 0)
                 chartSeries.push({
-                        name: chart_labels.rcp_85_median,
-                        data: data['rcp85_median'],
-                        zIndex: 1,
-                        showInNavigator: true,
-                        color: '#F00',
-                        marker: {
-                            fillColor: '#F00',
-                            lineWidth: 0,
-                            radius: 0,
-                            lineColor: '#F00'
-                }});
-            if (data['rcp85_range'].length > 0)                                     
+                    name: chart_labels.rcp_45_range,
+                    data: data['rcp45_range'],
+                    type: 'arearange',
+                    lineWidth: 0,
+                    linkedTo: ':previous',
+                    color: '#00640c',
+                    fillOpacity: 0.2,
+                    zIndex: 0,
+                    marker: {
+                        radius: 0,
+                        enabled: false
+                    }});
+            if (data['rcp85_median'].length > 0)
                 chartSeries.push({
-                        name: chart_labels.rcp_85_range,
-                        data: data['rcp85_range'],
-                        type: 'arearange',
+                    name: chart_labels.rcp_85_median,
+                    data: data['rcp85_median'],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#F00',
+                    marker: {
+                        fillColor: '#F00',
                         lineWidth: 0,
-                        linkedTo: ':previous',
-                        color: '#F00',
-                        fillOpacity: 0.2,
-                        zIndex: 0,
-                        marker: {
-                            radius: 0,
-                            enabled: false
-                }});
-           
+                        radius: 0,
+                        lineColor: '#F00'
+                    }});
+            if (data['rcp85_range'].length > 0)
+                chartSeries.push({
+                    name: chart_labels.rcp_85_range,
+                    data: data['rcp85_range'],
+                    type: 'arearange',
+                    lineWidth: 0,
+                    linkedTo: ':previous',
+                    color: '#F00',
+                    fillOpacity: 0.2,
+                    zIndex: 0,
+                    marker: {
+                        radius: 0,
+                        enabled: false
+                    }});
+
 
             var chart = Highcharts.stockChart('chart-placeholder', {
 
@@ -1188,6 +1179,11 @@ console.log('grid clicked');
                         enabled: false
                     }
                 },
+                exporting: {
+                    csv: {
+                        dateFormat: '%Y-%m-%d'
+                    }
+                },
 
                 series: chartSeries
             });
@@ -1226,7 +1222,7 @@ console.log('grid clicked');
             });
 
 
-        }        
+        }
 
         // LAYER CHART
         function genChart(lat, lon, variable, month) {
@@ -1270,7 +1266,7 @@ console.log('grid clicked');
 
                     $.getJSON(valuePath).then(function (data) {
                         disPlayChartData(data,varDetails);
-                        });
+                    });
 
 
                 }
@@ -1351,8 +1347,12 @@ console.log('grid clicked');
                                     valueSuffix: chartUnit
                                 },
                                 exporting: {
-                                    enabled: false
+                                    enabled: false,
+                                    csv: {
+                                        dateFormat: '%Y-%m-%d'
+                                    }
                                 }
+
                             });
 
                             $('.chart-export-data').click(function (e) {
@@ -2197,11 +2197,11 @@ console.log('grid clicked');
                             }
 
                             /*
-                              if (station_on == true) {
-                                toggle_stations('off');
-                                toggle_sector('off');
-                              }
-                            */
+                             if (station_on == true) {
+                             toggle_stations('off');
+                             toggle_sector('off');
+                             }
+                             */
 
                         } else if (key === 'decade') {
 
@@ -2224,20 +2224,20 @@ console.log('grid clicked');
                             if (current_zoom !== query_zoom || current_center.lat !== query_center[0] || current_center.lng !== query_center[1]) {
 
                                 /*
-                                                if (current_zoom != query_zoom) {
-                                                  console.log('zoom is not equal');
-                                                }
+                                 if (current_zoom != query_zoom) {
+                                 console.log('zoom is not equal');
+                                 }
 
-                                                if (current_center.lat != query_center[0]) {
-                                                  console.log('lat is not equal');
-                                                  //console.log(current_center.lat, query_center[0]);
-                                                }
+                                 if (current_center.lat != query_center[0]) {
+                                 console.log('lat is not equal');
+                                 //console.log(current_center.lat, query_center[0]);
+                                 }
 
-                                                if (current_center.lng != query_center[1]) {
-                                                  console.log('lng is not equal');
-                                                  //console.log(current_center.lng, query_center[1]);
-                                                }
-                                */
+                                 if (current_center.lng != query_center[1]) {
+                                 console.log('lng is not equal');
+                                 //console.log(current_center.lng, query_center[1]);
+                                 }
+                                 */
 
                                 // console.log('set view', query[key].split(',')[0], query[key].split(',')[1], query[key].split(',')[2]);
                                 map1.setView([query[key].split(',')[0], query[key].split(',')[1]], query[key].split(',')[2], {animate: false});
@@ -2481,7 +2481,7 @@ console.log('grid clicked');
                     switch(mora_value) {
                         case 'ann':
                             msorys = 'ys';
-                            msorysmonth = '-ann';                        
+                            msorysmonth = '-ann';
                             legendmsorys = 'ann';
                             break;
                         case 'spring':
@@ -2489,19 +2489,19 @@ console.log('grid clicked');
                         case 'fall':
                         case 'winter':
                             msorys = 'qsdec';
-                            msorysmonth = '-' + mora_value;                        
+                            msorysmonth = '-' + mora_value;
                             legendmsorys = 'qsdec';
                             break;
                         case '2qsapr':
                             msorys = '2qsapr';
-                            msorysmonth = '-' + mora_value;                          
+                            msorysmonth = '-' + mora_value;
                             legendmsorys = '2qsapr';
                             break;
                         default:
                             msorys = 'ms';
-                            msorysmonth = '-' + mora_value;                        
+                            msorysmonth = '-' + mora_value;
                             legendmsorys = 'mon';
-                    }                    
+                    }
 
                     legendLayer = var_value + "_health_" + legendmsorys;
                     generateSectorLegend(var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year','');
@@ -2569,454 +2569,370 @@ console.log('grid clicked');
             }
         }
 
+
+
+
         function buildFilterMenu() {
-            $.ajax({
-                url: '/wp-json/acf/v3/variable/?per_page=10000&orderby=menu_order&order=asc',
-                dataType: 'json',
-                success: function (data) {
+            getVarData(function(data) {
+                queryVar = getQueryVariable('var');
 
-                    queryVar = getQueryVariable('var');
+                varID = $('#var').val();
+                rawsectorSelected = getQueryVariable('sector');
 
-                    varID = $('#var').val();
-                    rawsectorSelected = getQueryVariable('sector');
+                if (!rawsectorSelected) {
+                    rawsectorSelected = 'gridded_data';
+                }
 
-                    if (!rawsectorSelected) {
-                        rawsectorSelected = 'gridded_data';
-                    }
 
+                $('#var').empty();
+                currentOptGroup = '';
 
-                    $('#var').empty();
-                    currentOptGroup = '';
+                data.forEach(function (sv, var_name) {
 
-                    $.each(data, function (k, v) {
-                        $.each(v, function (sk, sv) {
-
-
-                            if (sv.var_name === varID) {
-                                selectedVar = true;
-                            } else {
-                                selectedVar = false;
-                            }
-
-
-                            if ($.inArray(rawsectorSelected, sv.availability) !== -1) {
-
-                                if (sv.var_name) {
-                                    if (currentOptGroup !== sv.variable_type) {
-
-                                        if (sv.variable_type === 'station_data') {
-                                            optgroupSlug = 'station-data';
-                                        } else if (sv.variable_type === 'other_variables') {
-                                            optgroupSlug = 'other';
-                                        } else if (sv.variable_type === 'precipitation') {
-                                            optgroupSlug = 'precipitation';
-                                        } else if (sv.variable_type === 'temperature') {
-                                            optgroupSlug = 'temperature';
-                                        }
-
-                                        $('#var').append("<optgroup id=optgroup_" + sv.variable_type + " label='" + l10n_labels[sv.variable_type] + "' data-slug='" + optgroupSlug + "'>");
-                                        currentOptGroup = sv.variable_type;
-                                    }
-
-
-                                    varnewOption = new Option(sv.var_title, sv.var_name, false, selectedVar);
-                                    $('#optgroup_' + sv.variable_type).append(varnewOption);
-                                }
-
-                            }
-
-
-                            //
-                            // if (sv.var_type === 'temperature') {
-                            //
-                            //     if (current_lang === 'fr') {
-                            //         var newOption = new Option('Annuel', 'ann', false, false);
-                            //     } else {
-                            //         var newOption = new Option('Annual', 'ann', false, false);
-                            //     }
-                            //
-                            //     $('#mora').append(newOption);
-                            //
-                            // }
-
-                            if (sv.var_name === varID) {
-                                selectedSector = getQueryVariable('sector');
-                                if (!selectedSector) {
-                                    selectedSector = 'gridded_data';
-                                }
-
-                                $('#sector').empty();
-                                $.each(sv.availability, function (k, v) {
-
-
-                                    if (selectedSector === v) {
-                                        defaultSelectedSector = true;
-                                    } else {
-                                        defaultSelectedSector = false;
-                                    }
-
-                                    if (v === 'gridded_data'){
-                                        var newOption = new Option(l10n_labels[v], '', defaultSelectedSector, defaultSelectedSector);
-                                    } else {
-                                        var newOption = new Option(l10n_labels[v], v, defaultSelectedSector, defaultSelectedSector);
-                                    }
-
-
-
-                                    $('#sector').append(newOption);
-                                });
-
-
-                                var_value = $("#var").val();
-                                dec_value = $("#decade").val();
-
-                                updated_slider_values = [];
-
-                                //console.log('sv.time_slider_max_value');
-                                //console.log(sv);
-
-                                tsmax = parseInt(sv.time_slider_max_value);
-                                tsmin = parseInt(sv.time_slider_min_value);
-                                tsdef = parseInt(sv.time_slider_default_value);
-                                tsint = parseInt(sv.time_slider_interval);
-
-                                z = 0;
-
-                                for (i = tsmin; i <= tsmax; i += 10) {
-
-                                    updated_slider_values.push(i + 1 + '-' + (i + tsint));
-
-
-                                    if (i === parseInt(dec_value)) {
-                                        newfrom = z;
-                                    }
-                                    z += 1;
-                                }
-
-                                //console.log("newfrom");
-                                //console.log(newfrom);
-                                //console.log(updated_slider_values);
-
-
-                                rs_instance.update({
-                                    values: updated_slider_values,
-                                    min: tsmin,
-                                    max: tsmax,
-                                    from: newfrom,
-                                    to: tsmax,
-                                    step: tsint,
-                                });
-
-                                var $rs = $("#range-slider");
-
-                                //console.log('slider updated');
-                                //console.log(sv.time_slider_min_value,sv.time_slider_max_value,sv.time_slider_default_value,sv.time_slider_max_value,sv.time_slider_interval);
-
-                                if ((selectedSector === 'gridded_data') && $.inArray('gridded_data', sv.availability) !== -1) {
-
-                                    if (sv.var_name === 'slr') {
-                                        replaceGrid(sv.grid, slrgridLayer_options, map1);
-                                        replaceGrid(sv.grid, slrgridLayer_options, mapRight);
-                                    } else {
-                                        replaceGrid(sv.grid, gridLayer_options, map1);
-                                        replaceGrid(sv.grid, gridLayer_options, mapRight);
-                                    }
-                                }
-
-                                acfTimeStep = v.acf.timestep;
-
-                                $('#mora').empty();
-                                $('#rcp').empty();
-
-                                if (selectedSector === 'gridded_data') {
-                                    rcpDropGroup = '<option value="rcp26">RCP 2.6</option> ' +
-                                        '<option value="rcp26vs45">RCP 2.6 vs RCP 4.5</option> ' +
-                                        '<option value="rcp26vs85">RCP 2.6 vs RCP 8.5</option> ' +
-                                        '<option value="rcp45">RCP 4.5</option> ' +
-                                        '<option value="rcp45vs26">RCP 4.5 vs RCP 2.6</option> ' +
-                                        '<option value="rcp45vs85">RCP 4.5 vs RCP 8.5</option> ' +
-                                        '<option value="rcp85">RCP 8.5</option> ' +
-                                        '<option value="rcp85vs26">RCP 8.5 vs RCP 2.6</option> ' +
-                                        '<option value="rcp85vs45">RCP 8.5 vs RCP 4.5</option>';
-                                } else {
-                                    rcpDropGroup = '<option value="rcp26">RCP 2.6</option> ' +
-                                        '<option value="rcp45">RCP 4.5</option> ' +
-                                        '<option value="rcp85">RCP 8.5</option>';
-                                }
-
-
-                                $('#rcp').append(rcpDropGroup);
-
-                                getRCPvar = getQueryVariable('rcp');
-
-                                // check to see if comparing exists on sector load
-                                if (getRCPvar.length > 5 && selectedSector !== 'gridded_data') {
-                                    // since comparison value is comparing, get new default from first 5 chars
-                                    firstRCP = getRCPvar.slice(0,5);
-                                    // set default to best option available from compare value.
-                                    $('#rcp option[value='+firstRCP+']').attr('selected','selected');
-                                    // update url with new default
-                                    update_param('rcp', firstRCP);
-                                    // remove compare since no longer comparing
-                                    $('body').removeClass('map-compare');
-                                    // tell leaflet about changes
-                                    invalidate_maps();
-                                } else {
-                                    // update selected value of newly generated rcp list
-                                    $('#rcp option[value='+getRCPvar+']').attr('selected','selected');
-                                }
-
-
-                                // doo the timesets
-
-                                if (acfTimeStep.includes("annual")) {
-                                    // if ($('#mora').find("option[value='2qsapr']").length) {
-                                    //     console.log('Quarterly Already Exist');
-                                    // } else {
-                                    // Create a DOM Option and pre-select by default
-
-                                    if (current_lang === 'fr') {
-                                        var newOption = new Option('Annuel', 'ann', false, false);
-                                    } else {
-                                        var newOption = new Option('Annual', 'ann', false, false);
-                                    }
-
-                                    $('#mora').append(newOption);
-                                    // }
-                                    if (moraval === 'ann') {
-
-                                        //$("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                                        //$("#mora").val(moraval).prop('selected', true);
-                                    }
-                                }
-
-                                if (acfTimeStep.includes("monthly")) {
-
-                                    if (current_lang === 'fr') {
-
-                                        var moptgroup = "<optgroup label='Mensuel'>";
-                                        moptgroup += "<option value='jan'>Janv.</option>";
-                                        moptgroup += "<option value='feb'>Févr.</option>";
-                                        moptgroup += "<option value='mar'>Mars</option>";
-                                        moptgroup += "<option value='apr'>Avr.</option>";
-                                        moptgroup += "<option value='may'>Mai</option>";
-                                        moptgroup += "<option value='jun'>Juin</option>";
-                                        moptgroup += "<option value='jul'>Juil.</option>";
-                                        moptgroup += "<option value='aug'>Août</option>";
-                                        moptgroup += "<option value='sep'>Sept.</option>";
-                                        moptgroup += "<option value='oct'>Oct.</option>";
-                                        moptgroup += "<option value='nov'>Nov.</option>";
-                                        moptgroup += "<option value='dec'>Déc.</option>";
-                                        moptgroup += "</optgroup>";
-                                        $('#mora').append(moptgroup);
-
-                                    } else {
-                                        var moptgroup = "<optgroup label='Monthly'>";
-                                        moptgroup += "<option value='jan'>January</option>";
-                                        moptgroup += "<option value='feb'>February</option>";
-                                        moptgroup += "<option value='mar'>March</option>";
-                                        moptgroup += "<option value='apr'>April</option>";
-                                        moptgroup += "<option value='may'>May</option>";
-                                        moptgroup += "<option value='jun'>June</option>";
-                                        moptgroup += "<option value='jul'>July</option>";
-                                        moptgroup += "<option value='aug'>August</option>";
-                                        moptgroup += "<option value='sep'>September</option>";
-                                        moptgroup += "<option value='oct'>October</option>";
-                                        moptgroup += "<option value='nov'>November</option>";
-                                        moptgroup += "<option value='dec'>December</option>";
-                                        moptgroup += "</optgroup>";
-                                        $('#mora').append(moptgroup);
-
-                                    }
-
-                                    var months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
-                                    if (months.includes(moraval)) {
-                                        // $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                                        $("#mora").val(moraval).prop('selected', true);
-                                    }
-
-                                }
-
-                                if (acfTimeStep.includes("qsdec")) {
-
-                                    if (current_lang === 'fr') {
-                                        var soptgroup = "<optgroup label='Saisonnier'>";
-                                        soptgroup += "<option value='spring'>Printemps</option>";
-                                        soptgroup += "<option value='summer'>Été</option>";
-                                        soptgroup += "<option value='fall'>Automne</option>";
-                                        soptgroup += "<option value='winter'>Hiver</option>";
-                                        soptgroup += "</optgroup>";
-                                    } else {
-                                        var soptgroup = "<optgroup label='Seasonal'>";
-                                        soptgroup += "<option value='spring'>Spring</option>";
-                                        soptgroup += "<option value='summer'>Summer</option>";
-                                        soptgroup += "<option value='fall'>Fall</option>";
-                                        soptgroup += "<option value='winter'>Winter</option>";
-                                        soptgroup += "</optgroup>";
-                                    }
-
-
-                                    $('#mora').append(soptgroup);
-
-                                    var seasons = ["spring", "summer", "fall", "winter"];
-                                    if (seasons.includes(moraval)) {
-                                        $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                                    }
-
-                                }
-
-                                if (acfTimeStep.includes("2qsapr")) {
-                                    // if ($('#mora').find("option[value='2qsapr']").length) {
-                                    //     console.log('Quarterly Already Exist');
-                                    // } else {
-                                    // Create a DOM Option and pre-select by default
-
-
-                                    if (current_lang === 'fr') {
-                                        var newOption = new Option('Avril à Septembre', '2qsapr', false, false);
-                                    } else {
-                                        var newOption = new Option('April to September', '2qsapr', false, false);
-                                    }
-
-
-                                    if (moraval === '2qsapr') {
-                                        $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                                    }
-
-                                    $('#mora').append(newOption);
-                                    // }
-                                }
-
-                                if (!acfTimeStep.includes("annual") && moraval === 'ann') {
-                                    $('#mora option:eq(0)').prop('selected',true).trigger('change.select2');
-                                    update_param('mora', 'jan');
-                                    update_query_string();
-                                }
-
-                                //
-                                // update_param('mora', moraval);
-                                // update_query_string();
-
-                                moraval = getQueryVariable('mora')
-
-                                // $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                                var_value = $("#var").val();
-                                mora_value = $("#mora").val();
-                                mora_text_value = $("#mora option:selected").text();
-                                rcp_value = $("#rcp").val();
-                                decade_value = parseInt($("#decade").val());
-
-
-
-
-
-                            }
-                        });
-                    });
-
-
-// buildDropdownfromVarID(var_value);
-
-
-                    queryVal = getQueryVariable('val');
-                    var varExists = false;
-                    $('#var option').each(function () {
-                        if (this.value === queryVal) {
-                            varExists = true;
-                            return false;
-                        }
-                    });
-
-                    if (varExists) {
-                        $('#var').val(queryVal);
-                        varval = queryVal;
+                    if (sv.var_name === varID) {
+                        selectedVar = true;
                     } else {
-                        varval = $('#var').val();
+                        selectedVar = false;
                     }
 
-                    //
-                    // if (select2ID !== 'geo-select') {
-                    //
-                    //     if (select2ID) {
-                    //         if (select2ID === 'var') {
-                    //             update_param(select2ID, varval);
-                    //             generateLeftLegend();
-                    //             changeLayers();
-                    //         } else {
-                    //             update_param(select2ID, select2Val);
-                    //         }
-                    //     }
-                    //
-                    // }
 
-                    query['var-group'] = $('#var option:selected').parent('optgroup').attr('data-slug');
+                    if ($.inArray(rawsectorSelected, sv.availability) !== -1) {
 
-                    // IF THE CHART OVERLAY IS OPEN
+                        if (sv.var_name) {
+                            if (currentOptGroup !== sv.variable_type) {
 
-                    if ($('body').hasClass('overlay-position-right')) {
+                                if (sv.variable_type === 'station_data') {
+                                    optgroupSlug = 'station-data';
+                                } else if (sv.variable_type === 'other_variables') {
+                                    optgroupSlug = 'other';
+                                } else if (sv.variable_type === 'precipitation') {
+                                    optgroupSlug = 'precipitation';
+                                } else if (sv.variable_type === 'temperature') {
+                                    optgroupSlug = 'temperature';
+                                }
 
-
-                        if (query['sector'] != '') {
-
-                            genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
-
-                        } else if (query['var-group'] != 'station-data') {
+                                $('#var').append("<optgroup id=optgroup_" + sv.variable_type + " label='" + l10n_labels[sv.variable_type] + "' data-slug='" + optgroupSlug + "'>");
+                                currentOptGroup = sv.variable_type;
+                            }
 
 
-                            genChart(current_coords[0], current_coords[1], var_value, mora_value);
-
-                        } else {
-
-                            $(document).overlay('hide');
-
+                            varnewOption = new Option(sv.var_title, sv.var_name, false, selectedVar);
+                            $('#optgroup_' + sv.variable_type).append(varnewOption);
                         }
 
                     }
 
-                    // ADJUST FOR SPECIFIC FILTERS
+                    if (sv.var_name === varID) {
+                        selectedSector = getQueryVariable('sector');
+                        if (!selectedSector) {
+                            selectedSector = 'gridded_data';
+                        }
 
-                    // if geo-select
-
-
-                    // if (var_value.indexOf('heat_wave') !== -1) {
-                    //
-                    //     if ($('#mora').val() != 'ann') {
-                    //         $('#mora').val('ann').trigger('change');
-                    //         mora_value = 'ann';
-                    //     }
-                    //
-                    //     $('#mora').prop('disabled', true);
-                    //
-                    // } else {
-                    //
-                    //     $('#mora').prop('disabled', false);
-                    //
-                    // }
-
-                    // LAYER VISIBILITY
+                        $('#sector').empty();
+                        $.each(sv.availability, function (k, v) {
 
 
-                    if (history_action === 'push') {
-                        update_query_string();
+                            if (selectedSector === v) {
+                                defaultSelectedSector = true;
+                            } else {
+                                defaultSelectedSector = false;
+                            }
+
+                            if (v === 'gridded_data'){
+                                var newOption = new Option(l10n_labels[v], '', defaultSelectedSector, defaultSelectedSector);
+                            } else {
+                                var newOption = new Option(l10n_labels[v], v, defaultSelectedSector, defaultSelectedSector);
+                            }
+
+
+
+                            $('#sector').append(newOption);
+                        });
+
+
+                        var_value = $("#var").val();
+                        dec_value = $("#decade").val();
+
+                        updated_slider_values = [];
+
+                        //console.log('sv.time_slider_max_value');
+                        //console.log(sv);
+
+                        tsmax = parseInt(sv.time_slider_max_value);
+                        tsmin = parseInt(sv.time_slider_min_value);
+                        tsdef = parseInt(sv.time_slider_default_value);
+                        tsint = parseInt(sv.time_slider_interval);
+
+                        z = 0;
+
+                        for (i = tsmin; i <= tsmax; i += 10) {
+
+                            updated_slider_values.push(i + 1 + '-' + (i + tsint));
+
+
+                            if (i === parseInt(dec_value)) {
+                                newfrom = z;
+                            }
+                            z += 1;
+                        }
+
+                        //console.log("newfrom");
+                        //console.log(newfrom);
+                        //console.log(updated_slider_values);
+
+
+                        rs_instance.update({
+                            values: updated_slider_values,
+                            min: tsmin,
+                            max: tsmax,
+                            from: newfrom,
+                            to: tsmax,
+                            step: tsint,
+                        });
+
+                        var $rs = $("#range-slider");
+
+                        //console.log('slider updated');
+                        //console.log(sv.time_slider_min_value,sv.time_slider_max_value,sv.time_slider_default_value,sv.time_slider_max_value,sv.time_slider_interval);
+
+                        if ((selectedSector === 'gridded_data') && $.inArray('gridded_data', sv.availability) !== -1) {
+                            replaceGrid(sv.grid, gridLayer_options);
+                        }
+
+                        acfTimeStep = sv.timestep;
+
+                        $('#mora').empty();
+                        $('#rcp').empty();
+
+                        if (selectedSector === 'gridded_data') {
+                            rcpDropGroup = '<option value="rcp26">RCP 2.6</option> ' +
+                                '<option value="rcp26vs45">RCP 2.6 vs RCP 4.5</option> ' +
+                                '<option value="rcp26vs85">RCP 2.6 vs RCP 8.5</option> ' +
+                                '<option value="rcp45">RCP 4.5</option> ' +
+                                '<option value="rcp45vs26">RCP 4.5 vs RCP 2.6</option> ' +
+                                '<option value="rcp45vs85">RCP 4.5 vs RCP 8.5</option> ' +
+                                '<option value="rcp85">RCP 8.5</option> ' +
+                                '<option value="rcp85vs26">RCP 8.5 vs RCP 2.6</option> ' +
+                                '<option value="rcp85vs45">RCP 8.5 vs RCP 4.5</option>';
+                        } else {
+                            rcpDropGroup = '<option value="rcp26">RCP 2.6</option> ' +
+                                '<option value="rcp45">RCP 4.5</option> ' +
+                                '<option value="rcp85">RCP 8.5</option>';
+                        }
+
+
+                        $('#rcp').append(rcpDropGroup);
+
+                        getRCPvar = getQueryVariable('rcp');
+
+                        // check to see if comparing exists on sector load
+                        if (getRCPvar.length > 5 && selectedSector !== 'gridded_data') {
+                            // since comparison value is comparing, get new default from first 5 chars
+                            firstRCP = getRCPvar.slice(0,5);
+                            // set default to best option available from compare value.
+                            $('#rcp option[value='+firstRCP+']').attr('selected','selected');
+                            // update url with new default
+                            update_param('rcp', firstRCP);
+                            // remove compare since no longer comparing
+                            $('body').removeClass('map-compare');
+                            // tell leaflet about changes
+                            invalidate_maps();
+                        } else {
+                            // update selected value of newly generated rcp list
+                            $('#rcp option[value='+getRCPvar+']').attr('selected','selected');
+                        }
+
+
+                        // doo the timesets
+
+                        if (acfTimeStep.includes("annual")) {
+                            // if ($('#mora').find("option[value='2qsapr']").length) {
+                            //     console.log('Quarterly Already Exist');
+                            // } else {
+                            // Create a DOM Option and pre-select by default
+
+                            if (current_lang === 'fr') {
+                                var newOption = new Option('Annuel', 'ann', false, false);
+                            } else {
+                                var newOption = new Option('Annual', 'ann', false, false);
+                            }
+
+                            $('#mora').append(newOption);
+                            // }
+                            if (moraval === 'ann') {
+
+                                //$("#mora").val(moraval).prop('selected', true).trigger('change.select2');
+                                //$("#mora").val(moraval).prop('selected', true);
+                            }
+                        }
+
+                        if (acfTimeStep.includes("monthly")) {
+
+                            if (current_lang === 'fr') {
+
+                                var moptgroup = "<optgroup label='Mensuel'>";
+                                moptgroup += "<option value='jan'>Janv.</option>";
+                                moptgroup += "<option value='feb'>Févr.</option>";
+                                moptgroup += "<option value='mar'>Mars</option>";
+                                moptgroup += "<option value='apr'>Avr.</option>";
+                                moptgroup += "<option value='may'>Mai</option>";
+                                moptgroup += "<option value='jun'>Juin</option>";
+                                moptgroup += "<option value='jul'>Juil.</option>";
+                                moptgroup += "<option value='aug'>Août</option>";
+                                moptgroup += "<option value='sep'>Sept.</option>";
+                                moptgroup += "<option value='oct'>Oct.</option>";
+                                moptgroup += "<option value='nov'>Nov.</option>";
+                                moptgroup += "<option value='dec'>Déc.</option>";
+                                moptgroup += "</optgroup>";
+                                $('#mora').append(moptgroup);
+
+                            } else {
+                                var moptgroup = "<optgroup label='Monthly'>";
+                                moptgroup += "<option value='jan'>January</option>";
+                                moptgroup += "<option value='feb'>February</option>";
+                                moptgroup += "<option value='mar'>March</option>";
+                                moptgroup += "<option value='apr'>April</option>";
+                                moptgroup += "<option value='may'>May</option>";
+                                moptgroup += "<option value='jun'>June</option>";
+                                moptgroup += "<option value='jul'>July</option>";
+                                moptgroup += "<option value='aug'>August</option>";
+                                moptgroup += "<option value='sep'>September</option>";
+                                moptgroup += "<option value='oct'>October</option>";
+                                moptgroup += "<option value='nov'>November</option>";
+                                moptgroup += "<option value='dec'>December</option>";
+                                moptgroup += "</optgroup>";
+                                $('#mora').append(moptgroup);
+
+                            }
+
+                            var months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+                            if (months.includes(moraval)) {
+                                // $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
+                                $("#mora").val(moraval).prop('selected', true);
+                            }
+
+                        }
+
+                        if (acfTimeStep.includes("qsdec")) {
+
+                            if (current_lang === 'fr') {
+                                var soptgroup = "<optgroup label='Saisonnier'>";
+                                soptgroup += "<option value='spring'>Printemps</option>";
+                                soptgroup += "<option value='summer'>Été</option>";
+                                soptgroup += "<option value='fall'>Automne</option>";
+                                soptgroup += "<option value='winter'>Hiver</option>";
+                                soptgroup += "</optgroup>";
+                            } else {
+                                var soptgroup = "<optgroup label='Seasonal'>";
+                                soptgroup += "<option value='spring'>Spring</option>";
+                                soptgroup += "<option value='summer'>Summer</option>";
+                                soptgroup += "<option value='fall'>Fall</option>";
+                                soptgroup += "<option value='winter'>Winter</option>";
+                                soptgroup += "</optgroup>";
+                            }
+
+
+                            $('#mora').append(soptgroup);
+
+                            var seasons = ["spring", "summer", "fall", "winter"];
+                            if (seasons.includes(moraval)) {
+                                $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
+                            }
+
+                        }
+
+                        if (acfTimeStep.includes("2qsapr")) {
+                            // if ($('#mora').find("option[value='2qsapr']").length) {
+                            //     console.log('Quarterly Already Exist');
+                            // } else {
+                            // Create a DOM Option and pre-select by default
+
+
+                            if (current_lang === 'fr') {
+                                var newOption = new Option('Avril à Septembre', '2qsapr', false, false);
+                            } else {
+                                var newOption = new Option('April to September', '2qsapr', false, false);
+                            }
+
+
+                            if (moraval === '2qsapr') {
+                                $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
+                            }
+
+                            $('#mora').append(newOption);
+                            // }
+                        }
+
+                        if (!acfTimeStep.includes("annual") && moraval === 'ann') {
+                            $('#mora option:eq(0)').prop('selected',true).trigger('change.select2');
+                            update_param('mora', 'jan');
+                            update_query_string();
+                        }
+
+                        //
+                        // update_param('mora', moraval);
+                        // update_query_string();
+
+                        moraval = getQueryVariable('mora')
+
+                        // $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
+                        var_value = $("#var").val();
+                        mora_value = $("#mora").val();
+                        mora_text_value = $("#mora option:selected").text();
+                        rcp_value = $("#rcp").val();
+                        decade_value = parseInt($("#decade").val());
                     }
+                });
+            });
 
 
-                },
-                error: function () {
+            queryVal = getQueryVariable('val');
+            var varExists = false;
+            $('#var option').each(function () {
+                if (this.value === queryVal) {
+                    varExists = true;
+                    return false;
+                }
+            });
 
-                },
-                complete: function () {
+            if (varExists) {
+                $('#var').val(queryVal);
+                varval = queryVal;
+            } else {
+                varval = $('#var').val();
+            }
 
-                    // update_param('var', $('#var option:selected').val());
-                    // update_query_string();
-                    // generateLeftLegend();
-                    changeLayers();
+            query['var-group'] = $('#var option:selected').parent('optgroup').attr('data-slug');
+
+            // IF THE CHART OVERLAY IS OPEN
+
+            if ($('body').hasClass('overlay-position-right')) {
 
 
+                if (query['sector'] != '') {
+
+                    genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
+
+                } else if (query['var-group'] != 'station-data') {
+
+
+                    genChart(current_coords[0], current_coords[1], var_value, mora_value);
+
+                } else {
+
+                    $(document).overlay('hide');
 
                 }
-            })
-        }
+
+            }
+
+
+            if (history_action === 'push') {
+                update_query_string();
+            }
+            changeLayers();
+
+        }  // buildFilterMenu()
 
         // MAP EVENTS
 

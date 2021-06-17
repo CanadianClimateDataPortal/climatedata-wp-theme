@@ -37,7 +37,7 @@
 
                     <option value="rcp85-p05">RCP 8.5 <?php _e('lower (5th percentile)','cdc'); ?></option>
                     <option value="rcp85-p50">RCP 8.5 <?php _e('median (50th percentile)','cdc'); ?></option>
-                    <option value="rcp85-p95">RCP 8.5 <?php _e('upper (95th percentile)', 'cdc'); ?></option>
+                    <option selected value="rcp85-p95">RCP 8.5 <?php _e('upper (95th percentile)', 'cdc'); ?></option>
 
                     <option value="rcp45-p05">RCP 4.5 <?php _e('lower (5th percentile)','cdc'); ?></option>
                     <option value="rcp45-p50">RCP 4.5 <?php _e('median (50th percentile)','cdc'); ?></option>

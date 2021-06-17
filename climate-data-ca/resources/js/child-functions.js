@@ -556,7 +556,9 @@ var chart_labels, legend_labels, l10n_labels;
       //console.log('listnav');
 		}
 
-
+      if(typeof $.fn.renderer !== 'undefined' && $('.renderable').length) {
+          $(document).renderer();
+      }
     //console.log('end of child-functions');
 
   });

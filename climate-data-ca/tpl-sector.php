@@ -196,7 +196,7 @@
       <header class="section-head container-fluid">
         <div class="row">
           <div class="col-10 offset-1 col-md-5">
-            <h4 class="text-secondary"><?php _e ( 'Analogous Sections', 'cdc' ); ?></h4>
+            <h4 class="text-secondary"><?php _e ( 'Sector Resources', 'cdc' ); ?></h4>
           </div>
         </div>
       </header>

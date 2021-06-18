@@ -57,7 +57,7 @@ if (have_posts()) : while (have_posts()) : the_post();
                     $var_type = $var_type[0]->slug;
                 }
 
-                if ($var_type != 'station-data') {
+                if ($var_type != 'station-data' && get_field('var_name') != 'slr') {
 
                     ?>
 
@@ -566,6 +566,107 @@ if (have_posts()) : while (have_posts()) : the_post();
             ?></div>
 
         <?php
+
+    } elseif (isset ($_GET['info'])) {
+        get_header();
+        // Direct variable info page
+            ?>
+            <div> </div>
+            <div id="var-interstitial" class="bg-primary text-white" style="padding:160px 0">
+                <div class="container-fluid">
+                    <h2 class="overlay-title"><?php echo get_the_title(); ?></h2>
+
+                    <div class="overlay-content-row">
+                        <div class="overlay-content-heading d-flex align-items-center justify-content-end">
+                            <h6 class="vertical-label"><span>Variable</span></h6>
+                        </div>
+
+                        <div class="overlay-content-text">
+                            <?php the_content(); ?>
+                        </div>
+                    </div>
+
+                    <?php
+
+                    $var_type = get_the_terms(get_the_ID(), 'var-type');
+
+                    if (!empty ($var_type)) {
+                        $var_type = $var_type[0]->slug;
+                    }
+
+                    if ($var_type != 'station-data' && get_field('var_name') != 'slr') {
+
+                        ?>
+
+                        <h5 class="overlay-title text-center all-caps"><?php _e('Select a scenario below to continue', 'cdc'); ?></h5>
+
+                        <div class="overlay-content-row">
+                            <div class="overlay-content-heading d-flex align-items-center justify-content-end">
+                                <h6 class="vertical-label"><span><?php _e('Scenario', 'cdc'); ?></span></h6>
+                            </div>
+
+                            <div class="overlay-content-text">
+                                <div class="overlay-scenarios">
+                                    <form class="form-inline" action="<?php echo $var_url; ?>">
+                                        <input type="hidden" name="var" value="<?php the_field('var_name'); ?>">
+
+                                        <div class="d-lg-flex justify-content-around align-items-center w-100">
+                                            <div class="btn-group btn-group-toggle mb-5 mb-lg-0" data-toggle="buttons">
+                                                <label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="rcp85" checked> <?php _e('High Emissions', 'cdc'); ?><br>(RCP 8.5) </label>
+
+                                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="rcp45"> <?php _e('Moderate Emissions', 'cdc'); ?><br>(RCP 4.5) </label>
+
+                                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="rcp26"> <?php _e('Low Emissions', 'cdc'); ?><br>(RCP 2.6) </label>
+                                            </div>
+
+                                            <div class="d-flex justify-content-center d-lg-block" role="group" aria-label="">
+                                                <button type="submit" class="btn btn-secondary border-white rounded-pill all-caps"><?php _e('Explore', 'cdc'); ?></button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <?php
+
+                    } else {
+
+                        ?>
+
+                        <div class="overlay-content-row">
+                            <div class="overlay-content-heading d-flex align-items-center justify-content-end">
+                                <h6 class="vertical-label"><span>&nbsp;</span></h6>
+                            </div>
+
+                            <div class="overlay-content-text">
+                                <div class="overlay-scenarios">
+                                    <form class="form-inline" action="<?php echo $var_url; ?>">
+                                        <input type="hidden" name="var" value="<?php the_field('var_name'); ?>">
+
+                                        <div class="d-flex justify-content-around align-items-center w-100">
+                                            <div class="" role="group" aria-label="">
+                                                <button type="submit" class="btn btn-secondary border-white rounded-pill all-caps"><?php _e('Explore', 'cdc'); ?></button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <?php
+
+                    }
+
+                    ?>
+                </div>
+            </div>
+
+            <?php
+
+
+
+        get_footer();
 
     } else {
 

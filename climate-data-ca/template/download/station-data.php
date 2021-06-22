@@ -93,7 +93,10 @@
 
       <div class="input-group-append">
         <a class="btn btn-secondary text-white all-caps download-process-btn disabled" id="station-process" target="_blank"><?php _e ( 'Process', 'cdc' ); ?> <i class="far fa-arrow-alt-circle-down"></i></a>
-<!--             <button type="submit" class="btn btn-secondary all-caps download-process-btn" id="station-process" disabled>Process <i class="far fa-arrow-alt-circle-down"></i></button> -->
+        <!-- <button type="submit" class="btn btn-secondary all-caps download-process-btn" id="station-process" disabled>Process <i class="far fa-arrow-alt-circle-down"></i></button> -->
+
+        <!-- For Google tag manger. Only work if this child is the last (ex: {{Click Element}}.parentElement.children[children.length - 1]) -->
+        <a id="station-process-data" target="_blank"><?php _e ( '', 'cdc' ); ?></a>
       </div>
     </div>
 

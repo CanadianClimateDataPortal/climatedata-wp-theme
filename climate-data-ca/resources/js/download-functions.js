@@ -154,8 +154,8 @@
         //
 
         $('#download-content').tabs({
-            hide: {effect: 'fadeOut', duration: 250},
-            show: {effect: 'fadeIn', duration: 250},
+            hide: { effect: 'fadeOut', duration: 250 },
+            show: { effect: 'fadeIn', duration: 250 },
             create: function (e, ui) {
 
                 $('body').removeClass('spinner-on');
@@ -557,7 +557,7 @@
                                     $('body').removeClass('spinner-on');
                                     dl_fraction.remove();
                                     dl_progress.remove();
-                                    zip.generateAsync({type: "blob"})
+                                    zip.generateAsync({ type: "blob" })
                                         .then(function (content) {
                                             saveAs(content, $('#download-filename').val() + ".zip");
 
@@ -635,7 +635,7 @@
                     if (selectedTimeStepCategory !== 'daily' && $('#download-dataset').val() != 'all') {
                         $('#download-variable').append("<optgroup id=optgroup_misc label='" + l10n_labels['misc'] + "'>");
                         $('#optgroup_misc').append(new Option(l10n_labels['allbccaq'], 'all', false, false));
-                        varData['all'] = {'grid': 'canadagrid'};
+                        varData['all'] = { 'grid': 'canadagrid' };
                     }
                 },
                 error: function () {
@@ -660,7 +660,6 @@
 
 
         $('#download-dataset').on('select2:select', function (e) {
-
             console.log('frequency changed');
             currentVar = $("#download-variable").val();
             $('#download-variable').empty();
@@ -808,15 +807,15 @@
 
             switch ($('#download-variable').val()) {
 
-                case 'tn_mean' :
+                case 'tn_mean':
                     var_name = 'tasmin';
                     break;
 
-                case 'tx_mean' :
+                case 'tx_mean':
                     var_name = 'tasmax';
                     break;
 
-                case 'prcptot' :
+                case 'prcptot':
                     var_name = 'pr';
                     break;
 
@@ -945,10 +944,12 @@
         var markerMap = [];
         stationFromAPI = [];
         var pointsLayer;
+        var selected_stattions = {};
 
         function station_init() {
 
             create_map('station');
+            document.getElementById('station-process-data').style.display = "none";
 
             // $.getJSON('https://geo.weather.gc.ca/geomet/features/collections/climate-stations/items?f=json&limit=10000', function (data) {
             $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE', function (data) {
@@ -985,9 +986,6 @@
                 };
 
                 pointsLayer = L.geoJson(data, {
-                    // onEachFeature: function (feature, layer) {
-                    //     layer.bindPopup(feature.properties.address);
-                    // }
                     pointToLayer: function (feature, latlng) {
                         return L.circleMarker(latlng, geojsonMarkerOptions);
                     }
@@ -1000,6 +998,12 @@
                     var existingData = $("#station-select").select2("val");
                     // clicked ID
                     var clicked_ID = e.layer.feature.properties.STN_ID.toString();
+                    if (selected_stattions[clicked_ID] !== undefined) {
+                        delete selected_stattions[clicked_ID];
+                    } else {
+                        selected_stattions[clicked_ID] = e.layer.feature.properties.STATION_NAME
+                    }
+
                     // default colour
                     markerColor = '#F00';
                     if (existingData != null) {
@@ -1019,6 +1023,7 @@
                         existingData = [clicked_ID];
                         $('#station-select').val(existingData).change();
                     }
+
                     e.layer.setStyle({
                         // Stroke properties
                         color: markerColor,
@@ -1210,7 +1215,7 @@
 
             switch ($(this).attr('id')) {
 
-                case 'station-select' :
+                case 'station-select':
                     param = 's';
 
                     if ($(this).val() !== null) {
@@ -1221,11 +1226,11 @@
 
                     break;
 
-                case 'station-start' :
+                case 'station-start':
                     param = 'start';
                     break;
 
-                case 'station-end' :
+                case 'station-end':
                     param = 'end';
                     break;
 
@@ -1241,6 +1246,8 @@
             marker_id = parseFloat(e.params.data.id);
             pointsLayer.eachLayer(function (layer) {
                 if (layer.feature.properties.STN_ID === marker_id) {
+                    delete selected_stattions[marker_id];
+                    check_station_form();
                     layer.setStyle({
                         // Stroke properties
                         color: '#3d68f6',
@@ -1261,6 +1268,8 @@
             marker_id = parseInt(e.params.data.id);
             pointsLayer.eachLayer(function (layer) {
                 if (layer.feature.properties.STN_ID === marker_id) {
+                    selected_stattions[marker_id] = layer.feature.properties.STATION_NAME;
+                    check_station_form();
                     layer.setStyle({
                         // Stroke properties
                         color: '#F00',
@@ -1328,21 +1337,42 @@
                 populate_URL();
             }
 
-            $('#station-download-status').text(station_status);
+            if (selected_stattions == undefined || Object.keys(selected_stattions).length == 0) {
+                populate_URL(0); // update only #station-download-data
+            }
 
+            $('#station-download-status').text(station_status);
         }
 
         function update_URL(name, val) {
             dl_URL[name] = val;
         }
 
-        function populate_URL() {
+        function populate_URL(ga4_event = 1) {
+            // GA4_event
 
+            if (ga4_event == 1) {
+                var new_url = 'https://api.weather.gc.ca/collections/climate-daily/items?datetime=' + dl_URL.start + ' 00:00:00/' + dl_URL.end + ' 00:00:00&STN_ID=' + dl_URL['s'] + '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' + dl_URL.format + '&limit=' + dl_URL.limit + '&startindex=' + dl_URL.offset;
+                $('#station-process').attr('href', new_url);
+            }
 
-            var new_url = 'https://api.weather.gc.ca/collections/climate-daily/items?datetime=' + dl_URL.start + ' 00:00:00/' + dl_URL.end + ' 00:00:00&STN_ID=' + dl_URL['s'] + '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' + dl_URL.format + '&limit=' + dl_URL.limit + '&startindex=' + dl_URL.offset;
+            // GA4_event 
+            // Create class value with selected stations
+            // ex: class="42 -- DUNCAN & 1593 -- RUSSELL CREEK ; 1614 -- TWO PETE CREEK ; ..."
+            var class_info = "";
+            for (const key in selected_stattions) {
+                class_info += key + " -- " + selected_stattions[key] + " ; ";
+            }
+            if (Object.keys(selected_stattions).length > 0) {
+                class_info = class_info.substring(0, class_info.length - 3);
+            }
 
-            $('#station-process').attr('href', new_url);
-
+            if (Object.keys(selected_stattions).length == 0) {
+                class_info = " ";
+            }
+            // Create <a id="station-process-data" class=" station id -- station name & ..."> for Google Analytics
+            $('#station-process-data').attr('class', class_info);
+            document.getElementById('station-process-data').style.display = "none";
         }
 
         //
@@ -1450,7 +1480,7 @@
                 // sort options
 
                 var arr = $('#idf-select option').map(function (_, o) {
-                    return {t: $(o).text(), v: o.value};
+                    return { t: $(o).text(), v: o.value };
                 }).get()
 
                 arr.sort(function (o1, o2) {
@@ -1653,7 +1683,7 @@
                 // sort options
 
                 var arr = $('#ahccd-select option').map(function (_, o) {
-                    return {t: $(o).text(), v: o.value};
+                    return { t: $(o).text(), v: o.value };
                 }).get()
 
                 arr.sort(function (o1, o2) {

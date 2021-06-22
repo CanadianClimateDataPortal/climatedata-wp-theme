@@ -499,8 +499,8 @@
         // object
 
 
-        var leftLegend = L.control({position: 'topright'});
-        var rightLegend = L.control({position: 'topright'});
+        var leftLegend = L.control({ position: 'topright' });
+        var rightLegend = L.control({ position: 'topright' });
 
         var idfLayer;
 
@@ -672,7 +672,7 @@
                 }).on('click', function (e) {
                     genStationChart(e.layer.feature.properties.STN_ID, e.layer.feature.properties.STATION_NAME, e.latlng['lat'], e.latlng['lng']);
                 });
-            }).done(function() {
+            }).done(function () {
                 if (query['var'] === 'weather-stations') {
                     station_layer.addTo(map1);
                 }
@@ -747,8 +747,8 @@
 
             var offset = (map1.getSize().x * 0.5) - 100;
 
-            map1.panTo([e.latlng.lat, e.latlng.lng], {animate: false}); // pan to center
-            map1.panBy(new L.Point(offset, 0), {animate: false}); // pan by offset
+            map1.panTo([e.latlng.lat, e.latlng.lng], { animate: false }); // pan to center
+            map1.panBy(new L.Point(offset, 0), { animate: false }); // pan by offset
 
             // set the highlight
 
@@ -779,7 +779,7 @@
             }
 
             // open the chart
-            current_coords=[e.latlng.lat, e.latlng.lng];
+            current_coords = [e.latlng.lat, e.latlng.lng];
             genChart(e.latlng.lat, e.latlng.lng, var_value, mora_value);
 
             L.DomEvent.stop(e);
@@ -911,22 +911,22 @@
                             vectorTileLayerStyles: layerStyles
                         }
                     ).on('mouseover', function (e) {
-                            choroLayer.setFeatureStyle(
-                                e.layer.properties.id,
-                                {
-                                    color: 'white',
-                                    fillColor: getColor(choroValues[e.layer.properties.id]),
-                                    weight: 1.5,
-                                    fill: true,
-                                    radius: 4,
-                                    opacity: 1,
-                                    fillOpacity: 1
-                                });
-                            choroLayer.bindTooltip(e.layer.properties[l10n_labels.label_field], {sticky: true}).openTooltip(e.latlng);
-                        }
+                        choroLayer.setFeatureStyle(
+                            e.layer.properties.id,
+                            {
+                                color: 'white',
+                                fillColor: getColor(choroValues[e.layer.properties.id]),
+                                weight: 1.5,
+                                fill: true,
+                                radius: 4,
+                                opacity: 1,
+                                fillOpacity: 1
+                            });
+                        choroLayer.bindTooltip(e.layer.properties[l10n_labels.label_field], { sticky: true }).openTooltip(e.latlng);
+                    }
                     ).on('mouseout', function (e) {
-                            choroLayer.resetFeatureStyle(e.layer.properties.id);
-                        }
+                        choroLayer.resetFeatureStyle(e.layer.properties.id);
+                    }
                     ).on('click', function (e) {
 
                         current_sector['id'] = e.layer.properties.id;
@@ -994,6 +994,7 @@
             chartDecimals = varDetails['decimals'];
             switch (varDetails.units.value) {
                 case 'doy':
+<<<<<<< HEAD
                     formatter = function () {return new Date(1546300800000+1000*60*60*24*this.value).toLocaleDateString(current_lang, { month:'long', day:'numeric'})};
                     pointFormatter = function (format) {
                         if (this.series.type == 'line') {
@@ -1007,9 +1008,25 @@
                                 + new Date(1546300800000+1000*60*60*24*this.high).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
                                 + '</b><br/>';
                         }};
+=======
+                    formatter = function () { return new Date(1546300800000 + 1000 * 60 * 60 * 24 * this.value).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' }) };
+                    pointFormatter = function (format) {
+                        if (this.series.type == 'line') {
+                            return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name + ': <b>'
+                                + new Date(1546300800000 + 1000 * 60 * 60 * 24 * this.y).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
+                                + '</b><br/>';
+                        } else {
+                            return '<span style="color:' + this.series.color + '">●</span>' + this.series.name + ': <b>'
+                                + new Date(1546300800000 + 1000 * 60 * 60 * 24 * this.low).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
+                                + '</b> - <b>'
+                                + new Date(1546300800000 + 1000 * 60 * 60 * 24 * this.high).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
+                                + '</b><br/>';
+                        }
+                    };
+>>>>>>> all Play-video events and first 2 download events
                     break;
                 default:
-                    formatter = function () {return this.axis.defaultLabelFormatter.call(this) + chartUnit;};
+                    formatter = function () { return this.axis.defaultLabelFormatter.call(this) + chartUnit; };
                     pointFormatter = undefined;
             }
 
@@ -1027,7 +1044,12 @@
                         lineWidth: 0,
                         radius: 0,
                         lineColor: '#F47D23'
+<<<<<<< HEAD
                     }});
+=======
+                    }
+                });
+>>>>>>> all Play-video events and first 2 download events
             if (data['modeled_historical_median'].length > 0)
                 chartSeries.push({
                     name: chart_labels.historical,
@@ -1040,7 +1062,12 @@
                         lineWidth: 0,
                         radius: 0,
                         lineColor: '#000000'
+<<<<<<< HEAD
                     }});
+=======
+                    }
+                });
+>>>>>>> all Play-video events and first 2 download events
             if (data['modeled_historical_range'].length > 0)
                 chartSeries.push({
                     name: chart_labels.historical_range,
@@ -1054,7 +1081,12 @@
                     marker: {
                         radius: 0,
                         enabled: false
+<<<<<<< HEAD
                     }});
+=======
+                    }
+                });
+>>>>>>> all Play-video events and first 2 download events
             if (data['rcp26_median'].length > 0)
                 chartSeries.push({
                     name: chart_labels.rcp_26_median,
@@ -1067,7 +1099,12 @@
                         lineWidth: 0,
                         radius: 0,
                         lineColor: '#00F'
+<<<<<<< HEAD
                     }});
+=======
+                    }
+                });
+>>>>>>> all Play-video events and first 2 download events
             if (data['rcp26_range'].length > 0)
                 chartSeries.push({
                     name: chart_labels.rcp_26_range,
@@ -1081,7 +1118,12 @@
                     marker: {
                         radius: 0,
                         enabled: false
+<<<<<<< HEAD
                     }});
+=======
+                    }
+                });
+>>>>>>> all Play-video events and first 2 download events
             if (data['rcp45_median'].length > 0)
                 chartSeries.push({
                     name: chart_labels.rcp_45_median,
@@ -1094,7 +1136,12 @@
                         lineWidth: 0,
                         radius: 0,
                         lineColor: '#00640c'
+<<<<<<< HEAD
                     }});
+=======
+                    }
+                });
+>>>>>>> all Play-video events and first 2 download events
             if (data['rcp45_range'].length > 0)
                 chartSeries.push({
                     name: chart_labels.rcp_45_range,
@@ -1108,7 +1155,12 @@
                     marker: {
                         radius: 0,
                         enabled: false
+<<<<<<< HEAD
                     }});
+=======
+                    }
+                });
+>>>>>>> all Play-video events and first 2 download events
             if (data['rcp85_median'].length > 0)
                 chartSeries.push({
                     name: chart_labels.rcp_85_median,
@@ -1121,7 +1173,12 @@
                         lineWidth: 0,
                         radius: 0,
                         lineColor: '#F00'
+<<<<<<< HEAD
                     }});
+=======
+                    }
+                });
+>>>>>>> all Play-video events and first 2 download events
             if (data['rcp85_range'].length > 0)
                 chartSeries.push({
                     name: chart_labels.rcp_85_range,
@@ -1135,7 +1192,12 @@
                     marker: {
                         radius: 0,
                         enabled: false
+<<<<<<< HEAD
                     }});
+=======
+                    }
+                });
+>>>>>>> all Play-video events and first 2 download events
 
 
             var chart = Highcharts.stockChart('chart-placeholder', {
@@ -1195,7 +1257,7 @@
                 var dl_type = '';
 
                 switch ($(this).attr('data-type')) {
-                    case 'csv' :
+                    case 'csv':
                         chart.downloadCSV();
                         break;
                 }
@@ -1208,10 +1270,10 @@
                 var dl_type = '';
 
                 switch ($(this).attr('data-type')) {
-                    case 'png' :
+                    case 'png':
                         dl_type = 'image/png';
                         break;
-                    case 'pdf' :
+                    case 'pdf':
                         dl_type = 'application/pdf';
                         break;
                 }
@@ -1241,7 +1303,7 @@
                     $.getJSON(
                         data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
                         function (data) {
-                            disPlayChartData(data,varDetails);
+                            disPlayChartData(data, varDetails);
 
 
                         });
@@ -1265,7 +1327,11 @@
                     var valuePath = hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id + '/' + variable + '/' + month;
 
                     $.getJSON(valuePath).then(function (data) {
+<<<<<<< HEAD
                         disPlayChartData(data,varDetails);
+=======
+                        disPlayChartData(data, varDetails);
+>>>>>>> all Play-video events and first 2 download events
                     });
 
 
@@ -1361,7 +1427,7 @@
                                 var dl_type = '';
 
                                 switch ($(this).attr('data-type')) {
-                                    case 'csv' :
+                                    case 'csv':
                                         chart.downloadCSV();
                                         break;
                                 }
@@ -1374,10 +1440,10 @@
                                 var dl_type = '';
 
                                 switch ($(this).attr('data-type')) {
-                                    case 'png' :
+                                    case 'png':
                                         dl_type = 'image/png';
                                         break;
-                                    case 'pdf' :
+                                    case 'pdf':
                                         dl_type = 'application/pdf';
                                         break;
                                 }
@@ -1806,7 +1872,7 @@
 
             switch (settings.layer) {
 
-                case 'variable' :
+                case 'variable':
 
                     if (settings.action === 'on') {
 
@@ -1917,7 +1983,7 @@
 
                     break;
 
-                case 'stations' :
+                case 'stations':
 
                     if (settings.action === 'on') {
 
@@ -2002,7 +2068,7 @@
 
                     break;
 
-                case 'sector' :
+                case 'sector':
 
 
                     if (settings.action == 'on') {
@@ -2052,11 +2118,11 @@
                     }
 
                     // re-initialize select2 with new disabled/enabled options
-//           $('#var').select2();
+                    //           $('#var').select2();
 
                     break;
 
-                default :
+                default:
 
             }
 
@@ -2240,7 +2306,7 @@
                                  */
 
                                 // console.log('set view', query[key].split(',')[0], query[key].split(',')[1], query[key].split(',')[2]);
-                                map1.setView([query[key].split(',')[0], query[key].split(',')[1]], query[key].split(',')[2], {animate: false});
+                                map1.setView([query[key].split(',')[0], query[key].split(',')[1]], query[key].split(',')[2], { animate: false });
 
                             }
 
@@ -2478,7 +2544,7 @@
                 legendmsorys = 'ann';
 
                 if (query['sector'] !== '') {
-                    switch(mora_value) {
+                    switch (mora_value) {
                         case 'ann':
                             msorys = 'ys';
                             msorysmonth = '-ann';
@@ -2616,9 +2682,57 @@
                             }
 
 
+<<<<<<< HEAD
                             varnewOption = new Option(sv.var_title, sv.var_name, false, selectedVar);
                             $('#optgroup_' + sv.variable_type).append(varnewOption);
                         }
+=======
+                            //
+                            // if (sv.var_type === 'temperature') {
+                            //
+                            //     if (current_lang === 'fr') {
+                            //         var newOption = new Option('Annuel', 'ann', false, false);
+                            //     } else {
+                            //         var newOption = new Option('Annual', 'ann', false, false);
+                            //     }
+                            //
+                            //     $('#mora').append(newOption);
+                            //
+                            // }
+
+                            if (sv.var_name === varID) {
+                                selectedSector = getQueryVariable('sector');
+                                if (!selectedSector) {
+                                    selectedSector = 'gridded_data';
+                                }
+
+                                $('#sector').empty();
+                                $.each(sv.availability, function (k, v) {
+
+
+                                    if (selectedSector === v) {
+                                        defaultSelectedSector = true;
+                                    } else {
+                                        defaultSelectedSector = false;
+                                    }
+
+                                    if (v === 'gridded_data') {
+                                        var newOption = new Option(l10n_labels[v], '', defaultSelectedSector, defaultSelectedSector);
+                                    } else {
+                                        var newOption = new Option(l10n_labels[v], v, defaultSelectedSector, defaultSelectedSector);
+                                    }
+
+
+
+                                    $('#sector').append(newOption);
+                                });
+
+
+                                var_value = $("#var").val();
+                                dec_value = $("#decade").val();
+
+                                updated_slider_values = [];
+>>>>>>> all Play-video events and first 2 download events
 
                     }
 
@@ -2667,7 +2781,30 @@
 
                         for (i = tsmin; i <= tsmax; i += 10) {
 
+<<<<<<< HEAD
                             updated_slider_values.push(i + 1 + '-' + (i + tsint));
+=======
+                                $('#rcp').append(rcpDropGroup);
+
+                                getRCPvar = getQueryVariable('rcp');
+
+                                // check to see if comparing exists on sector load
+                                if (getRCPvar.length > 5 && selectedSector !== 'gridded_data') {
+                                    // since comparison value is comparing, get new default from first 5 chars
+                                    firstRCP = getRCPvar.slice(0, 5);
+                                    // set default to best option available from compare value.
+                                    $('#rcp option[value=' + firstRCP + ']').attr('selected', 'selected');
+                                    // update url with new default
+                                    update_param('rcp', firstRCP);
+                                    // remove compare since no longer comparing
+                                    $('body').removeClass('map-compare');
+                                    // tell leaflet about changes
+                                    invalidate_maps();
+                                } else {
+                                    // update selected value of newly generated rcp list
+                                    $('#rcp option[value=' + getRCPvar + ']').attr('selected', 'selected');
+                                }
+>>>>>>> all Play-video events and first 2 download events
 
 
                             if (i === parseInt(dec_value)) {
@@ -2786,6 +2923,7 @@
                                 moptgroup += "</optgroup>";
                                 $('#mora').append(moptgroup);
 
+<<<<<<< HEAD
                             } else {
                                 var moptgroup = "<optgroup label='Monthly'>";
                                 moptgroup += "<option value='jan'>January</option>";
@@ -2802,6 +2940,17 @@
                                 moptgroup += "<option value='dec'>December</option>";
                                 moptgroup += "</optgroup>";
                                 $('#mora').append(moptgroup);
+=======
+                                if (!acfTimeStep.includes("annual") && moraval === 'ann') {
+                                    $('#mora option:eq(0)').prop('selected', true).trigger('change.select2');
+                                    update_param('mora', 'jan');
+                                    update_query_string();
+                                }
+
+                                //
+                                // update_param('mora', moraval);
+                                // update_query_string();
+>>>>>>> all Play-video events and first 2 download events
 
                             }
 
@@ -2832,7 +2981,11 @@
                             }
 
 
+<<<<<<< HEAD
                             $('#mora').append(soptgroup);
+=======
+                    // buildDropdownfromVarID(var_value);
+>>>>>>> all Play-video events and first 2 download events
 
                             var seasons = ["spring", "summer", "fall", "winter"];
                             if (seasons.includes(moraval)) {
@@ -3022,7 +3175,7 @@
         var_value = $("#var").val();
         rcp_value = $("#rcp").val();
         if (query['sector'] != '') {
-            switch(mora_value) {
+            switch (mora_value) {
                 case 'ann':
                     msorys = 'ys';
                     break;
@@ -3039,7 +3192,12 @@
                     msorys = 'ms';
             }
 
+<<<<<<< HEAD
             generateSectorLegend(var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year','');
+=======
+            legendLayer = var_value + "_health_" + legendmsorys;
+            generateSectorLegend(legendLayer, '');
+>>>>>>> all Play-video events and first 2 download events
 
 
         } else {
@@ -3092,7 +3250,7 @@
 
             if ($('body').find('#chart-tour').length) {
 
-                var tour_options_chart = {default_open: false}
+                var tour_options_chart = { default_open: false }
                 if (current_lang == 'fr') {
                     tour_options_chart.labels = {
                         start_over: 'Recommencer',

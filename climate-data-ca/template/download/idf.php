@@ -34,7 +34,7 @@
       </div>
       
       <h6><?php _e ( 'Downloads', 'cdc' ); ?></h6>
-      
+      <!-- download list -->
       <div id="idf-links">
         <ul></ul>
       </div>

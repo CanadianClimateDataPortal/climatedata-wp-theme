@@ -62,7 +62,7 @@ Text Domain:
     text-decoration: none;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    font-size: 11px;
+    font-size: 17px;
     line-height: 15px;
     display: block;
     width: 75px;
@@ -87,7 +87,9 @@ Text Domain:
     transition: all 0.3s ease-in-out;
 }
 
-
+.toggle-switch .disabled {
+    background: gray;
+}
 .toggle-switch .toggle-outside {
     background: #FFF;
     position: absolute;
@@ -113,10 +115,9 @@ Text Domain:
 
 #absolute_or_deltas_help {
     position:absolute;
-    top: 17px;
-    margin-top: 5.5px;
+    margin-left: -5px;
+    margin-top: 2px;
     cursor:pointer;
-    left: 50px;
 }
 
 .aordpop {

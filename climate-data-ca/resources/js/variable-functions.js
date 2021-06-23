@@ -1251,13 +1251,13 @@
                 callback: function (varDetails) {
 
                     $('#rcp').prop('disabled', true);
+                    let delta=aord_value == 'd'? 'true':'false';
 
                     $.getJSON(
-                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
+                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month
+                        + '?delta7100=' + delta,
                         function (data) {
                             disPlayChartData(data,varDetails);
-
-
                         });
 
                 }
@@ -1276,9 +1276,10 @@
                 position: 'right',
                 callback: function (varDetails) {
                     $('#rcp').prop('disabled', true);
-                    var valuePath = hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id + '/' + variable + '/' + month;
+                    let delta=aord_value == 'd'? 'true':'false';
 
-                    $.getJSON(valuePath).then(function (data) {
+                    $.getJSON(hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id
+                        + '/' + variable + '/' + month + '?delta7100=' + delta).then(function (data) {
                         disPlayChartData(data,varDetails);
                     });
 
@@ -2460,10 +2461,7 @@
         function changeLayers() {
 
             aord_value = $('input[name="absolute_delta_switch"]:checked').val();
-            // console.log('aord_value');
-            // console.log(aord_value);
             rcp_value = $("#rcp").val();
-            // decade_value = $("#decade").val();
             decade_value = parseInt($("#decade").val());
             mora_value = $("#mora").val();
 
@@ -2950,6 +2948,18 @@
                         decade_value = parseInt($("#decade").val());
                     }
                 });
+
+                // enable or disable delta toggle depending on if variable has delta values
+                if ( data.get(var_value).hasdelta !== undefined && data.get(var_value).hasdelta == false) {
+                    $('input[name="absolute_delta_switch"][value=a]').click();
+                    $('input[name="absolute_delta_switch"]').attr("disabled", true);
+                    $('.toggle-inside').addClass('disabled');
+                } else {
+                    $('input[name="absolute_delta_switch"]').attr("disabled", false);
+                    $('.toggle-inside').removeClass('disabled');
+
+                }
+
             });
 
 
@@ -3199,30 +3209,18 @@
             // console.log('var changed triggered manually');
         }
 
-        // $(function () {
-            // $('[data-toggle="popover"]').popover({
-            //     html: true,
-            //     template: '<div class="popover absolute_or_delta_popover" role="tooltip">'
-            // });
-
-            var popoverTemplate = ['<div class="popover aordpop">',
-                '<div class="arrow"></div>',
-                '<div class="popover-content"><div id=aordpoptitle>DELTA WITH 1971-2000</div>Deltas are the difference between the future value and the reference period (or baseline) value of a climate variable, as simulated by a climate model. The reference period used here is 1971-2000.',
-                '</div>',
-                '</div>'].join('');
-
-            var absolute_or_deltas_help_content = "<span id=aordpoptitle>DELTA WITH 1971-2000</a><br>Deltas are the difference between the future value and the reference period (or baseline) value of a climate variable, as simulated by a climate model .The reference period used here is 1971-2000.";
+        var popoverTemplate = ['<div class="popover aordpop">',
+            '<div class="arrow"></div>',
+            '<div class="popover-body">',
+            '</div>',
+            '</div>'].join('');
 
 
-            $('#absolute_or_deltas_help').popover({
-                // trigger: 'click',
-                content: absolute_or_deltas_help_content,
-                template: popoverTemplate,
-                placement: "bottom",
-                html: true
-            });
-
-        // })
+        $('#absolute_or_deltas_help').popover({
+            template: popoverTemplate,
+            placement: "bottom",
+            html: true
+        });
 
         $('html').on('click', function(e) {
             if (typeof $(e.target).data('original-title') == 'undefined') {

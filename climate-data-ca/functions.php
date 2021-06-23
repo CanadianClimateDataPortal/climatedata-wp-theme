@@ -95,6 +95,7 @@ function child_theme_enqueue()
     wp_register_script('child-functions', $child_js_dir . 'child-functions.js', array('jquery', 'global-functions'), NULL, true);
     wp_register_script('location-functions', $child_js_dir . 'location-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('variable-functions', $child_js_dir . 'variable-functions.js', array('jquery', 'child-functions'), NULL, true);
+    wp_register_script('slr-functions', $child_js_dir . 'slr-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('analyze-functions', $child_js_dir . 'analyze-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('download-functions', $child_js_dir . 'download-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('archive-functions', $child_js_dir . 'archive-functions.js', array('jquery', 'child-functions'), NULL, true);
@@ -112,7 +113,8 @@ function child_theme_enqueue()
     wp_register_script('highcharts-highstock', 'https://code.highcharts.com/stock/8.2/highstock.js', NULL, NULL, true);
     wp_register_script('highcharts-more', 'https://code.highcharts.com/stock/8.2/highcharts-more.js', array('highcharts-highstock'), NULL, true);
     wp_register_script('highcharts-exporting', 'https://code.highcharts.com/stock/8.2/modules/exporting.js', array('highcharts-highstock'), NULL, true);
-    wp_register_script('highcharts-export-data', 'https://code.highcharts.com/stock/8.2/modules/export-data.js', array('highcharts-highstock'), NULL, true);
+    wp_register_script('highcharts-export-data', 'https://code.highcharts.com/stock/8.2/modules/export-data.js', array('highcharts-exporting'), NULL, true);
+    wp_register_script('highcharts-offline-exporting', 'https://code.highcharts.com/stock/8.2/modules/offline-exporting.js', array('highcharts-exporting'), NULL, true);
 
     // select2
 
@@ -300,19 +302,25 @@ function distance($lat1, $lon1, $lat2, $lon2)
 
 }
 
-function get_location_by_coords($lat, $lon)
+function get_location_by_coords($lat, $lon, $sealevel=false)
 {
 
     if ((isset ($lat) && !empty ($lat)) && (isset ($lon) && !empty ($lon))) {
 
         if (defined('ICL_LANGUAGE_CODE') && 'fr' == ICL_LANGUAGE_CODE) {
 
-            $columns = array("id_code as geo_id", "geo_name", "gen_term_fr as generic_term", "location", "province_fr as province", "lat", "lon");
+            $columns = array("all_areas.id_code as geo_id", "geo_name", "gen_term_fr as generic_term", "location", "province_fr as province", "lat", "lon");
 
         } else {
 
-            $columns = array("id_code as geo_id", "geo_name", "gen_term as generic_term", "location", "province", "lat", "lon");
+            $columns = array("all_areas.id_code as geo_id", "geo_name", "gen_term as generic_term", "location", "province", "lat", "lon");
 
+        }
+
+        if ($sealevel){
+            $join="JOIN all_areas_sealevel ON (all_areas.id_code=all_areas_sealevel.id_code)";
+        } else {
+            $join="";
         }
 
         require_once locate_template('resources/app/db.php');
@@ -323,6 +331,7 @@ function get_location_by_coords($lat, $lon)
         $main_query = mysqli_query($GLOBALS['vars']['con'], "SELECT " . implode(",", $columns) . "
       , DISTANCE_BETWEEN($lat, $lon, lat,lon) as distance
       FROM all_areas
+      $join
       WHERE lat BETWEEN " . (round($lat, 2) - $range) . " AND " . (round($lat, 2) + $range) . "
       AND lon BETWEEN " . (round($lon, 2) - $range) . " AND " . (round($lon, 2) + $range) . "
       AND gen_term NOT IN ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector')

@@ -441,21 +441,15 @@ var chart_labels, legend_labels, l10n_labels;
 
     });
 
-<<<<<<< HEAD
-		// close supermenu if a smooth-scroll link is clicked inside it
+    // close supermenu if a smooth-scroll link is clicked inside it
 
-		$('#supermenu .smooth-scroll').click(function() {
-			$('#supermenu').supermenu('hide')
-		})
+    $('#supermenu .smooth-scroll').click(function () {
+      $('#supermenu').supermenu('hide')
+    })
 
-	  //
-	  // VENDOR
-	  //
-=======
     //
     // VENDOR
     //
->>>>>>> all Play-video events and first 2 download events
 
     // SELECT2
 
@@ -562,9 +556,9 @@ var chart_labels, legend_labels, l10n_labels;
       //console.log('listnav');
     }
 
-      if(typeof $.fn.renderer !== 'undefined' && $('.renderable').length) {
-          $(document).renderer();
-      }
+    if (typeof $.fn.renderer !== 'undefined' && $('.renderable').length) {
+      $(document).renderer();
+    }
     //console.log('end of child-functions');
 
   });

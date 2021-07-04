@@ -28,7 +28,7 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
                 break;
             case "climatedata3.crim.ca":
                 $UA = "G-Y16JHP4Z3M";
-                $GTMNGR = "GTM-NJ7L4NR";
+                $GTMNGR = "GTM-NJ7L4NR"; // STAGE3 DEV
                 $DATAURL = "//dataclimatedata.crim.ca";
                 break;
             case "donneesclimatiques.crim.ca":

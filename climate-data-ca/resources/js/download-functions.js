@@ -340,11 +340,15 @@
             }
 
             var pbfURL = hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + gridName + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf";
+            console.log(" L.vectorGrid.protobuf >> hosturl: " + hosturl); // TODO: delete
+            console.log(" L.vectorGrid.protobuf >> gridName: " + gridName); // TODO: delete
 
 
             pbfLayer = L.vectorGrid.protobuf(pbfURL, vectorTileOptions).on('click', function (e) {
 
                 highlightGridFeature = e.layer.properties.gid;
+                console.log(" L.vectorGrid.protobuf >> highlightGridFeature: " + highlightGridFeature); // TODO: delete
+
 
 
                 selectedPoints[highlightGridFeature] = e.latlng;
@@ -394,6 +398,10 @@
 
                 var points_to_process = selectedGrids.length
 
+                console.log(" #download-location >> grid.ln: " + selectedGrids.length + ' ' + l10n_labels.selected); // TODO: delete
+                console.log(" #download-location >> l10n_labels.search_city: " + l10n_labels.search_city); // TODO: delete
+                var city_selected = $('#download-location').parent().find('.select2-selection__rendered').attr('title');
+                console.log(" #download-location >> city_selected: " + city_selected); // TODO: delete
 
                 if (selectedGrids.length > 0) {
                     $('#download-location').parent().find('.select2-selection__rendered').text(selectedGrids.length + ' ' + l10n_labels.selected)
@@ -425,6 +433,7 @@
         //
 
         function checkform() {
+            console.log(" function checkform() >>  ");// TODO: delete
 
             $('#download-result').slideUp(125)
 
@@ -433,6 +442,8 @@
             if ($('#download-dataset').val() === 'daily') {
 
                 // DAILY DATA
+                console.log(" function checkform() >>  DAILY DATA");// TODO: delete
+
 
                 if (
                     $('body').validate_email($('#daily-email').val()) === true &&
@@ -452,6 +463,8 @@
 
 
                 // MONTHLY OR ANNUAL
+                console.log(" function checkform() >>  MONTHLY OR ANNUAL");// TODO: delete
+
 
                 // if a filename is entered and the hidden lat/lon inputs have values
 
@@ -460,6 +473,7 @@
                     $('#download-coords').val() !== ''
                 ) {
                     form_valid = true;
+                    console.log(" function checkform() >>  MONTHLY OR ANNUAL >> form_valid: " + form_valid); // TODO: delete
                 }
 
                 if (form_valid === true) {
@@ -476,24 +490,134 @@
         // FORM PROCESSING
         //
 
+        // function create_class_value_with_selected_stations() {
+        //     // GA4_event
+        //     // ex: class="42 -- DUNCAN & 1593 -- RUSSELL CREEK ; 1614 -- TWO PETE CREEK ; ..."
+
+        //     var class_info = "";
+        //     for (const key in selected_stations) {
+        //         class_info += key + " -- " + selected_stations[key] + " ; ";
+        //     }
+
+        //     // Remove last char: ;
+        //     if (Object.keys(selected_stations).length > 0) {
+        //         class_info = class_info.substring(0, class_info.length - 3);
+        //     }
+
+        //     if (Object.keys(selected_stations).length == 0) {
+        //         class_info = " ";
+        //     }
+        //     // Create <a id="station-process-data" class=" station id -- station name & ..."> for Google Analytics
+        //     $('#station-process-data').attr('class', class_info);
+        //     document.getElementById('station-process-data').style.display = "none";
+        // }
+        var variable_data_types = {
+            // Download_Variable-Data_BCCAQv2 ...
+            'tx_max': 'Hottest-Day',
+            'tg_mean': 'Mean-Temperature',
+            'tn_mean': 'Minimum-Temperature',
+            'tnlt_-15': 'Days-with-Tmin_LesserThan_-15C',
+            'tnlt_-25': 'Days-with-Tmin_LesserThan_-25C',
+            'txgt_25': 'Days-with-Tmax_GreaterThan_25C',
+            'txgt_27': 'Days-with-Tmax_GreaterThan_27C',
+            'txgt_29': 'Days-with-Tmax_GreaterThan_29C',
+            'txgt_30': 'Days-with-Tmax_GreaterThan_30C',
+            'txgt_32': 'Days-with-Tmax_GreaterThan_32C',
+            'tx_mean': 'Maximum-Temperature',
+            'tn_min': 'Coldest-Day',
+            'rx1day': 'Maximum-1-Day-Total-Precipitation',
+            'r1mm': 'Wet-Days_GreaterThan_1mm',
+            'r10mm': 'Wet-Days_GreaterThan_10mm',
+            'r20mm': 'Wet-Days_GreaterThan_20mm',
+            'prcptot': 'Total-Precipitation',
+            'frost_days': 'Frost-Days',
+            'cddcold_18': 'Cooling-Degree-Days',
+            'gddgrow_10': 'Growing-Degree-Days-10C',
+            'gddgrow_5': 'Growing-Degree-Days-5C',
+            'gddgrow_0': 'Cumulative-degree-days-above-0C',
+            'hddheat_18': 'Heating-degree-days',
+            'ice_days': 'Ice-Days',
+            'tr_18': 'Tropical-Nights-Days-with-Tmin_GreaterThan_18C',
+            'tr_20': 'Tropical-Nights-Days-with-Tmin_GreaterThan_20C',
+            'tr_22': 'Tropical-Nights-Days-with-Tmin_GreaterThan_22C',
+        };
+
+        var points_info = "";
+        var datalayer_event_name = "";
+        var variable_data_format = "";
+
+        function get_GA4_event_name_for_variable_data_BCCAQv2() {
+
+            var event_type = $('#download-variable').val();
+            console.log(" function get_GA4_event_name_for_variable_data_BCCAQv2() >> event_type: " + event_type); // TODO: delete
+
+            var var_name = "";
+            if (variable_data_types[event_type]) {
+                var_name = "Download_Variable-Data_BCCAQv2_" + variable_data_types[event_type] + "_Frequency_Location_Format";
+            } else {
+                throw new Error('Invalid GA4 event name (Download_Variable-Data_BCCAQv2): ' + event_type);
+            }
+            return var_name;
+        }
+
+        function set_datalayer_for_variable_data_BCCAQv2(BCCAQv2_datalayer_event_name, BCCAQv2_points_info, BCCAQv2_format) {
+            console.log(" function set_datalayer_for_variable_data_BCCAQv2(...) >> BCCAQv2_datalayer_event_name: " + BCCAQv2_datalayer_event_name); // TODO: delete
+            console.log(" function set_datalayer_for_variable_data_BCCAQv2(...) >> BCCAQv2_points_info: " + BCCAQv2_points_info); // TODO: delete
+
+            // dataLayer.push({ ecommerce: null });  // Clear the previous ecommerce object.
+            dataLayer.push({
+                'event': BCCAQv2_datalayer_event_name,
+                'variable_data_event_type': BCCAQv2_datalayer_event_name,
+                'variable_data_location': BCCAQv2_points_info,
+                'variable_data_format': BCCAQv2_format
+                // 'eventCallback': function () {
+                //     document.location = productObj.url
+                // }
+            });
+        }
+
+        $('.download_variable_data_bccaqv2').click(function (e) {
+            e.preventDefault()
+            console.log(" class=download_variable_data_bccaqv2 >> BCCAQv2_datalayer_event_name: " + datalayer_event_name);// TODO: delete
+            console.log(" class=download_variable_data_bccaqv2 >> points_info: " + points_info);// TODO: delete
+            console.log(" class=download_variable_data_bccaqv2 >> variable_data_format: " + variable_data_format);// TODO: delete
+            set_datalayer_for_variable_data_BCCAQv2(datalayer_event_name, points_info, format);
+        });
 
         function process_download() {
+            console.log(" function process_download() ... "); // TODO: delete
 
-            var selected_var = $('#download-variable').val()
+            var selected_var = $('#download-variable').val();
+            datalayer_event_name = get_GA4_event_name_for_variable_data_BCCAQv2();
 
             month = $("#download-dataset").val();
-
             if (month === 'annual') {
                 month = 'ann'
             }
-
             points = []
             for (var i = 0; i < selectedGrids.length; i++) {
                 point = selectedPoints[selectedGrids[i]];
+                console.log(" function process_download() >> selectedGrids[i]: " + selectedGrids[i]); // TODO: delete
+                console.log(" function process_download() >> point.lat: " + point.lat); // TODO: delete
+                console.log(" function process_download() >> point.lng: " + point.lng); // TODO: delete
+
+                points_info += "GridID: " + selectedGrids[i] + ", Lat: " + point.lat + ", Lng: " + point.lng + " ; ";
                 points.push([point.lat, point.lng]);
             }
 
+            // Remove last 3 char: ;
+            if (selectedGrids.length > 0) {
+                points_info = points_info.substring(0, points_info.length - 3);
+            }
+
             format = $('input[name="download-format"]:checked').val();
+            variable_data_format = format;
+            console.log(" function process_download() >> selected_var: " + selected_var); // TODO: delete
+            console.log(" function process_download() >> datalayer_event_name: " + datalayer_event_name); // TODO: delete
+            console.log(" function process_download() >> month: " + month); // TODO: delete
+            console.log(" function process_download() >> format: " + format); // TODO: delete
+            console.log(" function process_download() >> points: " + points); // TODO: delete
+
 
             if (selected_var !== 'all') {
                 $('body').addClass('spinner-on');
@@ -510,6 +634,8 @@
                     contentType: 'application/json',
                     data: JSON.stringify(request_args),
                     success: function (result) {
+                        console.log(" function process_download() >> succes >>>>>>> "); // TODO: delete
+
                         if (format == 'csv') {
                             $('#download-result a').attr('href', 'data:text/csv;charset=utf-8,' + escape(result));
                         }
@@ -523,10 +649,11 @@
                     }
                 });
             } else {
+                console.log(" function process_download() >> call download for all matching variables and build a zip file"); // TODO: delete
+
                 // call download for all matching variables and build a zip file
                 selectedTimeStepCategory = $('#download-dataset').find(':selected').data('timestep');
                 varToProcess = [];
-
 
                 for (k in varData) {
                     if (k !== 'all' && varData[k].grid === 'canadagrid' && $.inArray(selectedTimeStepCategory, varData[k].timestep) !== -1) {
@@ -555,6 +682,8 @@
                             contentType: 'application/json',
                             data: JSON.stringify(request_args),
                             success: function (result) {
+                                console.log(" function download_all() >> success: " + result); // TODO: delete
+
                                 if (format == 'csv') {
                                     zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.csv', result);
                                 }
@@ -586,8 +715,6 @@
                 }
 
                 download_all();
-
-
             }
 
 
@@ -733,9 +860,9 @@
                 selectedGrids = [];
                 $('#download-coords').val('');
                 $('#download-location').val('');
+
+                console.log(" #download-location onn select2:select >> l10n_labels.search_city: " + l10n_labels.search_city); // TODO: delete
                 $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
-
-
             }
             //     }
             // });
@@ -798,6 +925,8 @@
 
         $('#download-process').click(function (e) {
             e.preventDefault()
+            console.log(" ownload-process >> click >>  call process_download()");// TODO: delete
+
             process_download()
         });
 
@@ -812,6 +941,8 @@
         //
 
         $('#daily-process').click(function (e) {
+            console.log(" #daily-process >> click "); // TODO: delete
+
 
             e.preventDefault();
 
@@ -956,12 +1087,12 @@
         var markerMap = [];
         stationFromAPI = [];
         var pointsLayer;
-        var selected_stattions = {};
+        var selected_stations = {};
 
         function station_init() {
 
             create_map('station');
-            document.getElementById('station-process-data').style.display = "none";
+            $('#station-process-data').removeAttr("style").hide();
 
             // $.getJSON('https://geo.weather.gc.ca/geomet/features/collections/climate-stations/items?f=json&limit=10000', function (data) {
             $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE', function (data) {
@@ -1010,10 +1141,10 @@
                     var existingData = $("#station-select").select2("val");
                     // clicked ID
                     var clicked_ID = e.layer.feature.properties.STN_ID.toString();
-                    if (selected_stattions[clicked_ID] !== undefined) {
-                        delete selected_stattions[clicked_ID];
+                    if (selected_stations[clicked_ID] !== undefined) {
+                        delete selected_stations[clicked_ID];
                     } else {
-                        selected_stattions[clicked_ID] = e.layer.feature.properties.STATION_NAME
+                        selected_stations[clicked_ID] = e.layer.feature.properties.STATION_NAME
                     }
 
                     // default colour
@@ -1258,7 +1389,7 @@
             marker_id = parseFloat(e.params.data.id);
             pointsLayer.eachLayer(function (layer) {
                 if (layer.feature.properties.STN_ID === marker_id) {
-                    delete selected_stattions[marker_id];
+                    delete selected_stations[marker_id];
                     check_station_form();
                     layer.setStyle({
                         // Stroke properties
@@ -1280,7 +1411,7 @@
             marker_id = parseInt(e.params.data.id);
             pointsLayer.eachLayer(function (layer) {
                 if (layer.feature.properties.STN_ID === marker_id) {
-                    selected_stattions[marker_id] = layer.feature.properties.STATION_NAME;
+                    selected_stations[marker_id] = layer.feature.properties.STATION_NAME;
                     check_station_form();
                     layer.setStyle({
                         // Stroke properties
@@ -1349,7 +1480,7 @@
                 populate_URL();
             }
 
-            if (selected_stattions == undefined || Object.keys(selected_stattions).length == 0) {
+            if (selected_stations == undefined || Object.keys(selected_stations).length == 0) {
                 populate_URL(0); // update only #station-download-data
             }
 
@@ -1360,30 +1491,35 @@
             dl_URL[name] = val;
         }
 
-        function populate_URL(ga4_event = 1) {
 
-            if (ga4_event == 1) {
-                var new_url = 'https://api.weather.gc.ca/collections/climate-daily/items?datetime=' + dl_URL.start + ' 00:00:00/' + dl_URL.end + ' 00:00:00&STN_ID=' + dl_URL['s'] + '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' + dl_URL.format + '&limit=' + dl_URL.limit + '&startindex=' + dl_URL.offset;
-                $('#station-process').attr('href', new_url);
-            }
-
+        function create_class_value_with_selected_stations() {
             // GA4_event
-            // Create class value with selected stations
             // ex: class="42 -- DUNCAN & 1593 -- RUSSELL CREEK ; 1614 -- TWO PETE CREEK ; ..."
+
             var class_info = "";
-            for (const key in selected_stattions) {
-                class_info += key + " -- " + selected_stattions[key] + " ; ";
+            for (const key in selected_stations) {
+                class_info += key + " -- " + selected_stations[key] + " ; ";
             }
-            if (Object.keys(selected_stattions).length > 0) {
+
+            // Remove last char: ;
+            if (Object.keys(selected_stations).length > 0) {
                 class_info = class_info.substring(0, class_info.length - 3);
             }
 
-            if (Object.keys(selected_stattions).length == 0) {
+            if (Object.keys(selected_stations).length == 0) {
                 class_info = " ";
             }
             // Create <a id="station-process-data" class=" station id -- station name & ..."> for Google Analytics
             $('#station-process-data').attr('class', class_info);
-            document.getElementById('station-process-data').style.display = "none";
+            $('#station-process-data').removeAttr("style").hide();
+        }
+
+        function populate_URL(ga4_event = 1) {
+            if (ga4_event == 1) {
+                var new_url = 'https://api.weather.gc.ca/collections/climate-daily/items?datetime=' + dl_URL.start + ' 00:00:00/' + dl_URL.end + ' 00:00:00&STN_ID=' + dl_URL['s'] + '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' + dl_URL.format + '&limit=' + dl_URL.limit + '&startindex=' + dl_URL.offset;
+                $('#station-process').attr('href', new_url);
+            }
+            create_class_value_with_selected_stations();
         }
 
         //
@@ -1511,12 +1647,54 @@
 
         }
 
+
+        function set_datalayer_for_download_IDFCurves(idf_curves_datalayer_event_name, file) {
+            console.log(" function set_datalayer_for_download_IDFCurves(...) >> idf_curves_datalayer_event_name: " + idf_curves_datalayer_event_name); // TODO: delete
+            console.log(" function set_datalayer_for_download_IDFCurves(...) >> file: " + file); // TODO: delete
+
+            // ex: Download_IDF-Curves_Short Duration Rainfall Intensity−Duration−Frequency Data (PDF) -->  Download_IDF-Curves_Short_Duration_Rainfall_Intensity−Duration−Frequency_Data_PDF
+            idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll(' ', '_');
+            idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll('(', '');
+            idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll(')', '');
+
+            dataLayer.push({
+                'event': idf_curves_datalayer_event_name,
+                'download-idf-curves-file': file,
+            });
+        }
+
+
+        //ynamically created
+        $(document).on('click', '.download-idf-curves', function (e) {
+            console.log(" class=download-idf-curves ------------------------>");// TODO: delete
+
+            // e.preventDefault();
+            var idf_curves_href = $(this).attr('href');
+            var last_index_found = idf_curves_href.lastIndexOf("/");
+            idf_curves_href = idf_curves_href.substring(last_index_found + 1, idf_curves_href.length);
+
+            var idf_curves_text = $(this).text().trim();
+            // // var n = idf_curves_text.lastIndexOf("(");
+            // // var m = idf_curves_text.lastIndexOf(")");
+            // // idf_curves_text = idf_curves_text.substring(n + 1, m);
+
+            console.log(" class=download-idf-curves >> idf_curves_href: " + idf_curves_href);// TODO: delete
+            console.log(" class=download-idf-curves >> idf_curves_text: " + idf_curves_text);// TODO: delete
+
+            set_datalayer_for_download_IDFCurves("Download_IDF-Curves_" + idf_curves_text, idf_curves_href);
+        });
+
+
+
+
         $('#idf-select').on('change', function (e) {
 
             //marker_id = e.params.data.id
             marker_id = $(this).val()
 
             $('#idf-links ul').empty()
+            console.log(" (download-functions.js) #idf-links ul empty ---------------------> "); // TODO: delete
+
             $('#download-idf-station').slideDown()
 
             // find the feature in the IDF layer
@@ -1540,6 +1718,10 @@
                     maps['idf'].setView([layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0]], current_view)
 
                     $.getJSON(child_theme_dir + 'resources/app/run-frontend-sync/search_idfs.php?idf=' + layer.feature.properties.ID, function (data) {
+
+                        console.log(" (download-functions.js) #idf-station-name h5: " + layer.feature.properties.Name); // TODO: delete
+                        console.log(" (download-functions.js) #idf-station-elevation h5: " + layer.feature.properties.Elevation_); // TODO: delete
+
 
                         $('#idf-station-name h5').text(layer.feature.properties.Name)
                         $('#idf-station-elevation h5').text(layer.feature.properties.Elevation_)
@@ -1582,14 +1764,13 @@
                                 linktext = popup_labels[0] + " (PNG)";
                             }
 
-                            $('#idf-links ul').append('<li><a href="' + v + '" target="_blank">' + linktext + '</a></li>');
-
+                            console.log(" (download-functions.js) #idf-links ul >> href: " + v + " linktext: " + linktext); // TODO: delete
+                            $('#idf-links ul').append('<li><a class="download-idf-curves" href="' + v + '" target="_blank">' + linktext + '</a></li>');
                         })
 
                     })
 
                 } else {
-
                     layer.setStyle({
                         fillColor: '#3869f6'
                     })
@@ -1607,7 +1788,6 @@
                 })
 
             }, 500)
-
         })
 
 

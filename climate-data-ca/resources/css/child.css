@@ -8949,6 +8949,9 @@ body.overlay-open[data-overlay-content=video] #main-header-nav .overlay-close {
 #timeline .element {
   position: absolute;
 }
+#timeline .type-img {
+  overflow: hidden;
+}
 #timeline .type-img img {
   position: absolute;
   left: 50%;

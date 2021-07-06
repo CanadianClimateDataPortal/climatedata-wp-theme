@@ -355,38 +355,30 @@
 
                       ?>
 
-											<div class="field type-checkbox">
-                        <div class="form-check input-row select-all">
+                      <div class="field validate-input type-radio d-flex flex-wrap">
+                        <p class="input-label w-100"><?php _e ( 'Representative Concentration Pathways (RCPs)', 'cdc' ); ?></p>
+                        
+                        <div class="input-row form-check w-25">
                           <div class="input-item">
-                            <input class="form-check-input" type="checkbox" name="" id="analyze-rcp-all" value="all">
-
-                            <label class="form-check-label" for="analyze-rcp-all"><?php _e ( 'Representative Concentration Pathways (RCPs)', 'cdc' ); ?></label>
+                            <input class="form-check-input add-to-object" type="radio" name="rcp" id="analyze-rcp-85" value="rcp85" checked>
+                            <label class="form-check-label" for="analyze-rcp-85">8.5</label>
                           </div>
                         </div>
-
-                        <div class="tree d-flex flex-wrap">
-                          <div class="input-row form-check w-25">
-                            <div class="input-item">
-															<input class="form-check-input add-to-object" type="checkbox" name="rcp" id="analyze-rcp-85" value="rcp85" checked>
-                              <label class="form-check-label" for="analyze-rcp-85">8.5</label>
-                            </div>
+                        
+                        <div class="input-row form-check w-25">
+                          <div class="input-item">
+                            <input class="form-check-input add-to-object" type="radio" name="rcp" id="analyze-rcp-45" value="rcp45">
+                            <label class="form-check-label" for="analyze-rcp-45">4.5</label>
                           </div>
-
-													<div class="input-row form-check w-25">
-                            <div class="input-item">
-															<input class="form-check-input add-to-object" type="checkbox" name="rcp" id="analyze-rcp-45" value="rcp45">
-                              <label class="form-check-label" for="analyze-rcp-45">4.5</label>
-                            </div>
+                        </div>
+                        
+                        <div class="input-row form-check w-25">
+                          <div class="input-item">
+                            <input class="form-check-input add-to-object" type="radio" name="rcp" id="analyze-rcp-26" value="rcp26">
+                            <label class="form-check-label" for="analyze-rcp-26">2.6</label>
                           </div>
-
-													<div class="input-row form-check w-25">
-                            <div class="input-item">
-															<input class="form-check-input add-to-object" type="checkbox" name="rcp" id="analyze-rcp-26" value="rcp26">
-                              <label class="form-check-label" for="analyze-rcp-85">2.6</label>
-                            </div>
-                          </div>
-												</div>
-											</div>
+                        </div>
+                      </div>
 
                       <div class="field type-checkbox">
                         <div class="form-check input-row select-all">
@@ -451,26 +443,26 @@
                         <div class="field validate-input type-radio d-flex flex-wrap">
                             <p class="input-label w-100"><?php _e ( 'Temporal Frequency', 'cdc' ); ?></p>
 
-                            <div class="input-row form-check w-50">
+                            <div class="input-row form-check w-25">
                                 <div class="input-item">
                                     <input class="form-check-input add-to-object" type="radio" name="freq" id="analyze-freq-ys" value="YS" checked>
                                     <label class="form-check-label" for="analyze-freq-ys"><?php _e('Annual', 'cdc');?></label>
                                 </div>
                             </div>
 
-                            <div class="input-row form-check w-50">
+                            <div class="input-row form-check w-25">
                                 <div class="input-item">
                                     <input class="form-check-input add-to-object" type="radio" name="freq" id="analyze-freq-ms" value="MS">
                                     <label class="form-check-label" for="analyze-freq-ms"><?php _e('Monthly', 'cdc'); ?></label>
                                 </div>
                             </div>
-                            <div class="input-row form-check w-50">
+                            <div class="input-row form-check w-25">
                                 <div class="input-item">
                                     <input class="form-check-input add-to-object" type="radio" name="freq" id="analyze-freq-qsdec" value="QS-DEC">
                                     <label class="form-check-label" for="analyze-freq-qsdec"><?php _e('Seasonal', 'cdc'); ?></label>
                                 </div>
                             </div>
-                            <div class="input-row form-check w-50">
+                            <div class="input-row form-check w-25">
                                 <div class="input-item">
                                     <input class="form-check-input add-to-object" type="radio" name="freq" id="analyze-freq-asjul" value="AS-JUL">
                                     <label class="form-check-label" for="analyze-freq-asjul"><?php _e('Annual (July to June)', 'cdc'); ?></label>
@@ -585,7 +577,7 @@
               <div id="map-overlay">
 
                 <div id="map-overlay-content" data-steps='<?php
-
+                  
                   echo json_encode ( array (
                     array (
                       'head' => __ ( 'Choose a dataset', 'cdc' ),
@@ -597,9 +589,9 @@
                       'head' => __ ( 'Select a location', 'cdc' ),
                       'text' => __ ( 'Zoom in to activate selectable areas on the map', 'cdc' )
                     )
-
-                  ) );
-
+                    
+                  ) ); 
+                  
                 ?>'>
                   <h4><?php _e ( 'Choose a dataset', 'cdc' ); ?></h4>
                   <p><?php _e ( 'Start by selecting a dataset from the menu on the left.', 'cdc' ); ?></p>

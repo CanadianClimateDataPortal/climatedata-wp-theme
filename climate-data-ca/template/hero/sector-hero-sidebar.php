@@ -5,7 +5,7 @@
     <ul>
       <li><a href="#sector-context" class="smooth-scroll"><?php _e ( 'Context', 'cdc' ); ?></a></li>
       <li><a href="#sector-cases" class="smooth-scroll"><?php _e ( 'Case Studies', 'cdc' ); ?></a></li>
-      <li><a href="#sector-analogous" class="smooth-scroll"><?php _e ( 'Analogous Sections', 'cdc' ); ?></a></li>
+      <li><a href="#sector-analogous" class="smooth-scroll"><?php _e ( 'Sector Resources', 'cdc' ); ?></a></li>
       <li><a href="#sector-vars" class="smooth-scroll"><?php _e ( 'Relevant Variables', 'cdc' ); ?></a></li>
       <li><a href="#sector-related" class="smooth-scroll"><?php _e ( 'Related Content', 'cdc' ); ?></a></li>
     </ul>

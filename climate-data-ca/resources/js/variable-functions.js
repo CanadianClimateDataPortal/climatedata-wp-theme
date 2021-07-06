@@ -45,10 +45,18 @@
 
         var query = {};
 
+
         if ($('#coords').length) {
             query['coords'] = $('#coords').val();
         } else {
             query['coords'] = '62.5325943454858,-98.525390625,4';
+        }
+
+        aord_value = $('input[name="absolute_delta_switch"]:checked').val();
+        if (aord_value === 'd') {
+            query['delta'] = "true";
+        } else {
+            query['delta'] = "";
         }
 
         if ($('#geo-select').length) {
@@ -231,8 +239,6 @@
         }
 
         function replaceGrid(gridname, gridstyle) {
-
-
             if (map1.hasLayer(gridLayer)) {
                 map1.removeLayer(gridLayer);
             }
@@ -734,7 +740,6 @@
 
         function grid_click(e) {
 
-            console.log('grid clicked');
 
             grid_initialized = true;
 
@@ -860,17 +865,26 @@
 
         function getColor(d) {
 
-            for (let i = 0; i < colormap.length; i++) {
-                if (d > colormap[i].quantity) {
+            for (let i = colormap.length -1 ; i > 0; i--) {
+                if (d < colormap[i].quantity) {
                     return colormap[i].color;
                 }
             }
-            return colormap[colormap.length-1].color;
+            // fallback case in case style/legend is wrong
+            return colormap[0].color;
         }
 
         function genChoro(sector, year, variable, rcp, frequency) {
 
-            choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency + '/?period=' + year;
+            aord_value = $('input[name="absolute_delta_switch"]:checked').val();
+
+            if (aord_value === 'd') {
+                aordChoroPath = "&delta7100=true"
+            } else {
+                aordChoroPath = "";
+            }
+
+            choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency + '/?period=' + year + aordChoroPath;
 
 
             $.getJSON(choroPath).then(function (data) {
@@ -1237,13 +1251,13 @@
                 callback: function (varDetails) {
 
                     $('#rcp').prop('disabled', true);
+                    let delta=aord_value == 'd'? 'true':'false';
 
                     $.getJSON(
-                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
+                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month
+                        + '?delta7100=' + delta,
                         function (data) {
                             disPlayChartData(data,varDetails);
-
-
                         });
 
                 }
@@ -1262,9 +1276,10 @@
                 position: 'right',
                 callback: function (varDetails) {
                     $('#rcp').prop('disabled', true);
-                    var valuePath = hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id + '/' + variable + '/' + month;
+                    let delta=aord_value == 'd'? 'true':'false';
 
-                    $.getJSON(valuePath).then(function (data) {
+                    $.getJSON(hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id
+                        + '/' + variable + '/' + month + '?delta7100=' + delta).then(function (data) {
                         disPlayChartData(data,varDetails);
                     });
 
@@ -1529,6 +1544,7 @@
                     if (current_lang == 'fr') {
                         unitValue = unitValue.replace('Degree Days', 'Degrés-jours');
                         unitValue = unitValue.replace('Days', 'Jours');
+                        unitValue = unitValue.replace(' to ', ' à ');
                     }
                     style='background:' + unitColor;
 
@@ -1586,6 +1602,10 @@
         // LEFT LEGEND
 
         function generateLeftLegend() {
+
+            $('#toggle-switch-container').show();
+
+            aord_value = $('input[name="absolute_delta_switch"]:checked').val();
 
             var_value = $("#var").val();
             mora_value = $("#mora").val();
@@ -1651,9 +1671,16 @@
                 right_rcp_value = 'rcp45';
             }
 
-            singleLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year';
-            leftLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year';
-            rightLayerName = var_value + '-' + msorys + '-' + right_rcp_value + '-p50' + msorysmonth + '-30year';
+            if (aord_value === 'd') {
+                aord_layer_value = "-delta7100";
+            } else {
+                aord_layer_value = "";
+            }
+
+
+            singleLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+            leftLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+            rightLayerName = var_value + '-' + msorys + '-' + right_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
 
 
             moraval = getQueryVariable('mora');
@@ -1719,8 +1746,26 @@
 
         function generateSectorLegend(layer, legendTitle) {
 
+            // console.log('generateSectorLegend');
+            // console.log();
+            // console.log(layer);
+
+            aord_value = $('input[name="absolute_delta_switch"]:checked').val();
+
+            if (aord_value === 'd') {
+                sectorLegendLayer = layer + "-delta7100";
+            } else {
+                sectorLegendLayer = layer;
+            }
+
+            if (query['sector'] !== 'census') {
+                // $('#toggle-switch-container').hide();
+            } else {
+                // $('#toggle-switch-container').show();
+            }
+
             $.getJSON(hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic" +
-                "&layer=CDC:" + layer + "&format=application/json")
+                "&layer=CDC:" + sectorLegendLayer + "&format=application/json")
                 .then(function (data) {
 
                     labels = [];
@@ -1928,8 +1973,8 @@
 
                         // add station layer
 
-                        console.log('settings.station');
-                        console.log(settings.station);
+                        // console.log('settings.station');
+                        // console.log(settings.station);
 
                         if (settings.station === 'idf') {
 
@@ -1940,7 +1985,7 @@
                             }
 
                             if (typeof station_layer !== 'undefined') {
-                                console.log("REMOVE STATION LAYER")
+                                // console.log("REMOVE STATION LAYER")
                                 map1.removeLayer(station_layer).closePopup();
                             }
 
@@ -2335,13 +2380,25 @@
             changeLayers();
         });
 
+        $('input[type=radio][name=absolute_delta_switch]').change(function() {
+            // console.log('absolute/delta switched');
+            aord_value = $('input[name="absolute_delta_switch"]:checked').val();
+            if (aord_value === 'd') {
+                query['delta'] = "true";
+            } else {
+                query['delta'] = "";
+            }
+            update_query_string();
+            changeLayers();
+        });
+
 
         $('#mora').change(function (e) {
 
             mora_value = $(this).val();
             var_value = $('#var').val();
 
-            console.log("MORA CHANGED");
+            // console.log("MORA CHANGED");
             update_param('mora', $(this).val());
             update_query_string();
             generateLeftLegend();
@@ -2403,9 +2460,8 @@
 
         function changeLayers() {
 
-
+            aord_value = $('input[name="absolute_delta_switch"]:checked').val();
             rcp_value = $("#rcp").val();
-            // decade_value = $("#decade").val();
             decade_value = parseInt($("#decade").val());
             mora_value = $("#mora").val();
 
@@ -2510,7 +2566,16 @@
                 }
 
 
-                singleLayerName = var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year';
+                if (aord_value === 'd') {
+                    aord_layer_value = "-delta7100";
+                } else {
+                    aord_layer_value = "";
+                }
+
+                singleLayerName = var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+
+                // console.log('singleLayerName');
+                // console.log(singleLayerName);
 
 
                 // if a compare scenario was selected
@@ -2884,6 +2949,18 @@
                         decade_value = parseInt($("#decade").val());
                     }
                 });
+
+                // enable or disable delta toggle depending on if variable has delta values
+                if ( data.get(var_value).hasdelta !== undefined && data.get(var_value).hasdelta == false) {
+                    $('input[name="absolute_delta_switch"][value=a]').click();
+                    $('input[name="absolute_delta_switch"]').attr("disabled", true);
+                    $('.toggle-inside').addClass('disabled');
+                } else {
+                    $('input[name="absolute_delta_switch"]').attr("disabled", false);
+                    $('.toggle-inside').removeClass('disabled');
+
+                }
+
             });
 
 
@@ -3133,7 +3210,24 @@
             // console.log('var changed triggered manually');
         }
 
+        var popoverTemplate = ['<div class="popover aordpop">',
+            '<div class="arrow"></div>',
+            '<div class="popover-body">',
+            '</div>',
+            '</div>'].join('');
 
+
+        $('#absolute_or_deltas_help').popover({
+            template: popoverTemplate,
+            placement: "bottom",
+            html: true
+        });
+
+        $('html').on('click', function(e) {
+            if (typeof $(e.target).data('original-title') == 'undefined') {
+                $('[data-original-title]').popover('hide');
+            }
+        });
 
     });
 })(jQuery);

@@ -7,7 +7,7 @@ const data_url = DATA_URL;
 const geoserver_url = DATA_URL;
 
 //
-// GLOBAL VARS
+// GLOBAL VARS 
 //
 
 var chart_labels, legend_labels, l10n_labels;
@@ -142,7 +142,7 @@ var chart_labels, legend_labels, l10n_labels;
 
     $(document).on('overlay_show', function () {
 
-      console.log('overlay show')
+      console.log('overlay show')// TODO: delete
       $('#supermenu').supermenu('disable')
 
       if ($('.overlay').find('#download-terms-form').length) {

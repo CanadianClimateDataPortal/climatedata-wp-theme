@@ -7,7 +7,6 @@
         var hosturl = geoserver_url;
         var canadaBounds = L.latLngBounds(L.latLng(41, -141), L.latLng(83.50, -52.1));
 
-
         var varData;
 
         function getVarData(callback) {
@@ -103,8 +102,8 @@
             zoom: query['coords'].split(',')[2]
         });
 
-        // layers
 
+        // layers
         map1.createPane('basemap');
         map1.getPane('basemap').style.zIndex = 399;
         map1.getPane('basemap').style.pointerEvents = 'none';
@@ -588,6 +587,39 @@
 
         });
 
+
+        function set_datalayer_for_variable_download_IDFCurves(idf_curves_datalayer_event_name, file) {
+            console.log(" function set_datalayer_for_variable_download_IDFCurves(...) >> idf_curves_datalayer_event_name: " + idf_curves_datalayer_event_name); // TODO: delete
+            console.log(" function set_datalayer_for_variable_download_IDFCurves(...) >> file: " + file); // TODO: delete
+
+            // ex: Download_IDF-Curves_Short Duration Rainfall Intensity−Duration−Frequency Data (PDF) -->  Download_IDF-Curves_Short_Duration_Rainfall_Intensity−Duration−Frequency_Data_PDF
+            idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll(' ', '_');
+            idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll('(', '');
+            idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll(')', '');
+
+            dataLayer.push({
+                'event': idf_curves_datalayer_event_name,
+                'variable-download-idf-curves-file': file,
+            });
+        }
+
+        //Dynamically created
+        $(document).on('click', '.variable-download-idf-curves', function (e) {
+            console.log(" class=variable-download-idf-curves ------------------------>");// TODO: delete
+
+            // e.preventDefault();
+            var idf_curves_href = $(this).attr('href');
+            var last_index_found = idf_curves_href.lastIndexOf("/");
+            idf_curves_href = idf_curves_href.substring(last_index_found + 1, idf_curves_href.length);
+
+            var idf_curves_text = $(this).text().trim();
+
+            console.log(" class=variable-download-idf-curves >> idf_curves_href: " + idf_curves_href);// TODO: delete
+            console.log(" class=variable-download-idf-curves >> idf_curves_text: " + idf_curves_text);// TODO: delete
+
+            set_datalayer_for_variable_download_IDFCurves("Variable_Download_IDF-Curves_" + idf_curves_text, idf_curves_href);
+        });
+
         function getIDFLinks(idf) {
 
             var popup_labels = [
@@ -637,7 +669,7 @@
                         linktext = popup_labels[0] + " (PNG)";
                     }
 
-                    $('.idfBody').append('<li><a href="' + v + '" target="_blank">' + linktext + '</a></li>');
+                    $('.idfBody').append('<li><a class="variable-download-idf-curves" href="' + v + '" target="_blank">' + linktext + '</a></li>');
                 });
             });
         };
@@ -989,7 +1021,169 @@
         // CHART STUFF
         //
         //
+
+        var frMonthDict = { // TODO: valiadate the keys 
+            'janv.': 'Janvier',
+            'févr.': 'Février',
+            'mars': 'Mars',
+            'avr.': 'Avril',
+            'mai.': 'Mai',
+            'juin.': 'Juin',
+            'juil.': 'Juillet',
+            'août.': 'Août',
+            'sept.': 'Septembre',
+            'oct.': 'Octobre',
+            'nov.': 'Novembre',
+            'déc.': 'Décembre',
+        };
+
+        var engMonthDict = {
+            'jan': 'January',
+            'feb': 'February',
+            'mar': 'March',
+            'apr': 'April',
+            'may': 'May',
+            'jun': 'June',
+            'jul': 'July',
+            'aug': 'August',
+            'sep': 'September',
+            'oct': 'October',
+            'nov': 'November',
+            'dec': 'December',
+            'ann': 'Annual'
+        };
+
+        function getRealMonthName(keySelected, isEng = true) {
+            console.log(" function getRealMonth(keySelected, isEng) >> keySelected: " + keySelected); // TODO: delete
+
+            var tempDict = engMonthDict;
+            if (!isEng) {
+                tempDict = frMonthDict;
+            }
+
+            var retVal = ""
+            if (tempDict[keySelected]) {
+                retVal = tempDict[keySelected];
+            } else {
+                throw new Error('Can not get the month with this key (' + (isEng ? 'english' : 'french') + '): ' + keySelected);
+            }
+            return retVal;
+        }
+
+        var variableDownloadDataTypes = {
+            // GA4_event: Variable_Download-Data_*
+            'tx_max': 'Hottest-Day',
+            'tg_mean': 'Mean-Temperature',
+            'tn_mean': 'Minimum-Temperature',
+            'tnlt_-15': 'Days-with-Tmin_LesserThan_-15C',
+            'tnlt_-25': 'Days-with-Tmin_LesserThan_-25C',
+            'txgt_25': 'Days-with-Tmax_GreaterThan_25C',
+            'txgt_27': 'Days-with-Tmax_GreaterThan_27C',
+            'txgt_29': 'Days-with-Tmax_GreaterThan_29C',
+            'txgt_30': 'Days-with-Tmax_GreaterThan_30C',
+            'txgt_32': 'Days-with-Tmax_GreaterThan_32C',
+            'tx_mean': 'Maximum-Temperature',
+            'tn_min': 'Coldest-Day',
+            'rx1day': 'Maximum-1-Day-Total-Precipitation',
+            'r1mm': 'Wet-Days_GreaterThan_1mm',
+            'r10mm': 'Wet-Days_GreaterThan_10mm',
+            'r20mm': 'Wet-Days_GreaterThan_20mm',
+            'prcptot': 'Total-Precipitation',
+            'frost_days': 'Frost-Days',
+            'cddcold_18': 'Cooling-Degree-Days',
+            'gddgrow_10': 'Growing-Degree-Days-10C',
+            'gddgrow_5': 'Growing-Degree-Days-5C',
+            'gddgrow_0': 'Cumulative-degree-days-above-0C',
+            'hddheat_18': 'Heating-degree-days',
+            'ice_days': 'Ice-Days',
+            'tr_18': 'Tropical-Nights-Days-with-Tmin_GreaterThan_18C',
+            'tr_20': 'Tropical-Nights-Days-with-Tmin_GreaterThan_20C',
+            'tr_22': 'Tropical-Nights-Days-with-Tmin_GreaterThan_22C',
+            'spei_3m': 'SPEI(3-months)',
+            'spei_12m': 'SPEI(12-months)',
+            'weather-stations': 'MSC-Climate-Normals',
+        };
+
+        function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
+
+            console.log(" function getGA4EventNameForVariableDownloadData(keySelected) >> keySelected: " + keySelected); // TODO: delete
+
+            var varName = "";
+            if (variableDownloadDataTypes[keySelected]) {
+                var eventType = '';
+                if (chartDataFormat.includes('csv')) {
+                    eventType = "Variable_Download-Data_";
+                } else if (chartDataFormat.includes('pdf') || chartDataFormat.includes('png')) {
+                    eventType = "Variable_Download-Image_";
+                } else {
+                    throw new Error('Invalid GA4 event file format (csv, pdf, png): ' + chartDataFormat);
+                }
+                varName = eventType + variableDownloadDataTypes[keySelected];
+            } else {
+                throw new Error('Invalid GA4 event name (Variable_Download-Data_*): ' + keySelected);
+            }
+            return varName;
+        }
+
+        function setDataLayerForChartData(chartDataFormat, chartData) {
+            console.log(" function setDataLayerForChartData(chartDataFormat) >> chartDataFormat.length: " + chartDataFormat.length); // TODO: delete
+
+            if (!chartDataFormat.length) {
+                return;
+            }
+            var eventName = getGA4EventNameForVariableDownloadData(chartDataFormat, query['var']);
+
+            var overlayTitle = $('.overlay-title').text();
+            console.log(" function setDataLayerForChartData(chartDataFormat) >> eventName: " + eventName); // TODO: delete
+            console.log(" function setDataLayerForChartData(chartDataFormat) >> query['mora']: " + query['mora']); // TODO: delete
+            console.log(" function setDataLayerForChartData(chartDataFormat) >> query['rcp']: " + query['rcp']); // TODO: delete
+            console.log(" function setDataLayerForChartData(chartDataFormat) >> chartSeries.visible: " + chartData.series[0].visible); // TODO: delete
+            console.log(" function setDataLayerForChartData(chartDataFormat) >> overlayTitle: " + overlayTitle); // TODO: delete
+            console.log(" function setDataLayerForChartData(chartDataFormat) >> chart.download... " + chartDataFormat); // TODO: delete
+
+            // Exlude: Navigator 5
+            var addStr = "";
+            for (let index = 0; index < chartData.series.length; index++) {
+                var chartDataName = chartData.series[index].name;
+                if (chartData.series[index].visible && !chartDataName.includes('Navigator 5')) {
+                    addStr += chartData.series[index].name + ", ";
+                }
+            }
+
+            // Remove last 2 char: ; 
+            if (addStr.length > 0) {
+                addStr = addStr.substring(0, addStr.length - 2);
+            }
+
+            // ex: Watersheds
+            var variableDownloadDataVewBy = $('.variable-download-data-view_by').find(":selected").text();
+            // ex: Région de la Montérégie, rcp26, January
+            var chartDataSettings = overlayTitle + "; " + query['rcp'] + "; " + getRealMonthName(query['mora']);
+            console.log(" function setDataLayerForChartData(chartDataFormat) >> chartData.series[*].name: " + addStr); // TODO: delete
+            console.log(" function setDataLayerForChartData(chartDataFormat) >> chartDataSettings: " + chartDataSettings); // TODO: delete
+            console.log(" function setDataLayerForChartData(chartDataFormat) >> variableDownloadDataVewBy: " + variableDownloadDataVewBy); // TODO: delete
+
+            // variable - functions.js: 1026  function setDataLayerForChartData(chartDataFormat) >> query['mora']: jan
+            // variable - functions.js: 1027  function setDataLayerForChartData(chartDataFormat) >> query['rcp']: rcp26
+            // variable - functions.js: 1028  function setDataLayerForChartData(chartDataFormat) >> chartSeries.title: tx_max
+            // variable - functions.js: 1029  function setDataLayerForChartData(chartDataFormat) >> chartSeries.name: Gridded Historical Data
+            // variable - functions.js: 1030  function setDataLayerForChartData(chartDataFormat) >> chartSeries.visible: false
+            // variable - functions.js: 1031  function setDataLayerForChartData(chartDataFormat) >> overlayTitle: Région de la Montérégie
+            // variable - functions.js: 1032  function setDataLayerForChartData(chartDataFormat) >> chart.download...csv
+
+            dataLayer.push({
+                'event': eventName,
+                'chart_data_event_type': eventName,
+                'chart_data_settings': chartDataSettings,
+                'chart_data_columns': addStr,
+                'chart_data_format': chartDataFormat,
+                'chart_data_view_by': variableDownloadDataVewBy
+            });
+        }
+
+        var chartSeries = [];
         function disPlayChartData(data, varDetails) {
+
             chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
             chartDecimals = varDetails['decimals'];
             switch (varDetails.units.value) {
@@ -1014,8 +1208,13 @@
                     pointFormatter = undefined;
             }
 
+
+
             chartSeries = [];
-            if (data['observations'].length > 0)
+            if (data['observations'].length > 0) {
+                console.log(" (observation) function disPlayChartData(data, varDetails)  >> chart_labels.observation: " + chart_labels.observation); // TODO: delete
+                console.log(" (observation) function disPlayChartData(data, varDetails)  >> data[observations]: " + data['observations']); // TODO: delete
+
                 chartSeries.push({
                     name: chart_labels.observation,
                     data: data['observations'],
@@ -1030,7 +1229,12 @@
                         lineColor: '#F47D23'
                     }
                 });
-            if (data['modeled_historical_median'].length > 0)
+            }
+
+            if (data['modeled_historical_median'].length > 0) {
+                console.log(" (historical) function disPlayChartData(data, varDetails)  >> chart_labels.observation: " + chart_labels.historical); // TODO: delete
+                console.log(" (historical) function disPlayChartData(data, varDetails)  >> data[observations]: " + data['modeled_historical_median']); // TODO: delete
+
                 chartSeries.push({
                     name: chart_labels.historical,
                     data: data['modeled_historical_median'],
@@ -1044,6 +1248,8 @@
                         lineColor: '#000000'
                     }
                 });
+            }
+
             if (data['modeled_historical_range'].length > 0)
                 chartSeries.push({
                     name: chart_labels.historical_range,
@@ -1199,6 +1405,7 @@
             });
 
 
+
             $('.chart-export-data').click(function (e) {
                 e.preventDefault();
 
@@ -1206,6 +1413,8 @@
 
                 switch ($(this).attr('data-type')) {
                     case 'csv':
+                        console.log(" (01) .chart-export-data >> CLICK   >> chart.downloadCSV()"); // TODO: delete
+                        setDataLayerForChartData('csv', chart);
                         chart.downloadCSV();
                         break;
                 }
@@ -1214,17 +1423,21 @@
 
             $('.chart-export-img').click(function (e) {
                 e.preventDefault();
-
                 var dl_type = '';
+                var fileFormat = '';
 
                 switch ($(this).attr('data-type')) {
                     case 'png':
                         dl_type = 'image/png';
+                        fileFormat = 'png'
                         break;
                     case 'pdf':
                         dl_type = 'application/pdf';
+                        fileFormat = 'pdf'
                         break;
                 }
+
+                setDataLayerForChartData(fileFormat, chart);
 
                 chart.exportChart({
                     type: dl_type
@@ -1288,6 +1501,12 @@
         // STATION CHART
 
         function genStationChart(STN_ID, station_name, lat, lon) {
+
+
+            var overlayTitle = $('.overlay-title').text(station_name);
+            console.log("  function genStationChart(STN_ID, station_name, lat, lon) >> CLICK   >> .overlay-title: " + overlayTitle); // TODO: delete
+            console.log("  function genStationChart(STN_ID, station_name, lat, lon) >> CLICK   >> lat: " + lat); // TODO: delete
+            console.log("  function genStationChart(STN_ID, station_name, lat, lon) >> CLICK   >> lon: " + lon); // TODO: delete
 
 
 
@@ -1372,6 +1591,8 @@
 
                                 switch ($(this).attr('data-type')) {
                                     case 'csv':
+                                        setDataLayerForChartData('csv', chart);
+                                        console.log(" (02) .chart-export-data >> CLICK   >> chart.downloadCSV()"); // TODO: delete
                                         chart.downloadCSV();
                                         break;
                                 }
@@ -1380,18 +1601,21 @@
 
                             $('.chart-export-img').click(function (e) {
                                 e.preventDefault();
-
                                 var dl_type = '';
+                                var fileFormat = '';
 
                                 switch ($(this).attr('data-type')) {
                                     case 'png':
                                         dl_type = 'image/png';
+                                        fileFormat = 'png';
                                         break;
                                     case 'pdf':
                                         dl_type = 'application/pdf';
+                                        fileFormat = 'pdf';
                                         break;
                                 }
 
+                                setDataLayerForChartData(fileFormat, chart);
                                 chart.exportChart({
                                     type: dl_type
                                 });
@@ -3000,6 +3224,7 @@
         // OVERLAY
 
         $('#page-variable .overlay-close').click(function () {
+            console.log(" #page-variable .overlay-close >> clearGridHighlight()"); // TODO: delete
             clearGridHighlight();
         });
 

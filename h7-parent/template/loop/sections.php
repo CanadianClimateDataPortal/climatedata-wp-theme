@@ -36,13 +36,22 @@
               if ( get_sub_field ( 'style' ) != '' ) {
                 $head_class[] = 'text-' . get_sub_field ( 'style' );
               }
-              
+            
               $head_text = get_sub_field ( 'text' );
               
             }
           }
-          
-          $head_body = get_sub_field ( 'body' );
+
+          // Google Analytics: Track when person uses Canada's Changing Climate Report hyperlink to go to resource
+          $select = get_sub_field_object('body');          
+          $add_id = $select['value'];
+          if (strpos($add_id, '<a') !== false && strpos(strtolower($add_id), strtolower('Canada’s Changing Climate Report')) !== false) {
+            // add a id="*" to the hyperlink
+            $index = strpos($add_id, '<a');
+            $head_body = substr($add_id, 0, $index + 2)." id='click-on-canadas-changing-climate-report-hyperlink' ".substr($add_id, $index + 2 );
+          } else{
+            $head_body = $select['value'];
+          }
           
           if ( $head_text != '' || $head_body != '' ) {
             $section_class[] = 'has-head';
@@ -161,7 +170,7 @@
       <div class="row">
         <div class="col-10 offset-1 text-center text-lg-left">
           <?php
-            
+          
             echo '<' . $head_tag . ' class="' . implode ( ' ', $head_class ) . '">' . $head_text . '</' . $head_tag . '>';
             
           ?>

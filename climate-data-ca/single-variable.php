@@ -491,9 +491,10 @@ if (have_posts()) : while (have_posts()) : the_post();
 
                             <div class="nav-item d-flex align-items-center mr-5">
                                 <h6><span class="cdc-icon icon-download-data"></span> <?php _e('Download data', 'cdc'); ?></h6>
-
+ 
                                 <div class="btn-group btn-group-sm" role="group">
-                                    <a href="#" class="chart-export-data btn btn-sm btn-outline-secondary" data-type="csv">CSV</a>
+                                    <!-- GA4_event -->
+                                    <a href="#" class="chart-export-data btn btn-sm btn-outline-secondary" id="variable-download-data-grid" data-type="csv">CSV</a>
                                 </div>
                             </div>
 

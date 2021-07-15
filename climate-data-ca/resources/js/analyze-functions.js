@@ -403,7 +403,7 @@
 
             if (!$(this).hasClass('selected')) {
 
-//         input_id = $(this).find('input').
+                //         input_id = $(this).find('input').
 
                 var var_content = JSON.parse($(this).closest('.input-variable').attr('data-content'))
 
@@ -496,9 +496,82 @@
             validate_inputs()
         })
 
-        $('body').on('input', '#analyze-captcha_code, #analyze-email', function () {
+        $('body').on('input', '#_code, #analyze-email', function () {
             validate_submit()
         })
+
+
+        var analyze_bccaqv2_dict = {
+            "wetdays": "Wet Days",
+            "sdii": "Average Wet Day Precipitation Intensity",
+            "cwd": "Maximum Consecutive Wet Days",
+            "cdd": "Maximum Consecutive Dry Days",
+            "tx_tn_days_above": "Days above Tmax and Tmin",
+            "tx_days_above": "Days above Tmax",
+            "tropical_nights": "Days above Tmin",
+            "tn_days_below": "Days below Tmin",
+            "cooling_degree_days": "Degree Days Above a Threshold",
+            "heating_degree_days": "Degree Days Below a Threshold",
+            "heat_wave_index": "Heat Wave",
+            "heat_wave_total_length": "Heat Wave Total Duration",
+            "heat_wave_frequency": "Heat Wave Frequency",
+            "dlyfrzthw": "Days with a Freeze-Thaw Cycle",
+            "cold_spell_days": "Cold Spell Days"
+        }
+
+        var datalayer_parameters = {
+            // All events
+            "lat": "latitude",
+            "lon": "longitute",
+            "start_date": "start date",
+            "end_date": "end date",
+            "ensemble_percentiles": "ensemble percentiles",
+            "dataset_name": "dataset name",
+            "models": "models",
+            "freq": "frequence",
+            "rcp": "rcp",
+            "data_validation": "data validation",
+            "output_format": "output format",
+            // Some events
+            "window": "window",
+            "tresh": "tresh",
+            "thresh": "thresh",
+            "thresh_tasmin": "threshold tasmin",
+            "thresh_tasmax": "threshold tasmin"
+        }
+
+        // GA4_event Analyze_BCCAQv2_*
+        function set_datalayer_for_analyze_bccaqv2(form_obj_inputs, customize_variables) {
+            var analyze_bccaqv2_parameters = "";
+            $.each(form_obj_inputs, function (index, value) {
+                if (datalayer_parameters[value.id]) {
+                    analyze_bccaqv2_parameters += datalayer_parameters[value.id] + ": " + value.data + ";  ";
+                } else {
+                    throw new Error('Can not get Analyze_BCCAQv2_* dataLayer parameters key: ' + value.id);
+                }
+            });
+
+            if (!analyze_bccaqv2_dict[customize_variables]) {
+                throw new Error('Can not get Analyze_BCCAQv2_* dataLayer event name: ' + customize_variables);
+            }
+
+            console.log("  function set_datalayer_for_analyze_bccaqv2(...) >> analyze_bccaqv2_parameters:\n" + analyze_bccaqv2_parameters)
+            console.log(" function set_datalayer_for_analyze_bccaqv2(...) >> analyze_bccaqv2_event_type: " + analyze_bccaqv2_dict[customize_variables]); // TODO: delete
+
+            analyze_bccaqv2_dict[customize_variables] = analyze_bccaqv2_dict[customize_variables].replaceAll(' ', '-');
+            event_type = "Analyze_BCCAQv2_" + analyze_bccaqv2_dict[customize_variables];
+
+            // ex: Download_IDF-Curves_Short Duration Rainfall Intensity−Duration−Frequency Data (PDF) -->  Download_IDF-Curves_Short_Duration_Rainfall_Intensity−Duration−Frequency_Data_PDF
+            // idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll(' ', '_');
+            // idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll('(', '');
+            // idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll(')', '');
+
+            dataLayer.push({
+                'event': event_type,
+                'analyze_bccaqv2_event_type': event_type,
+                'analyze_bccaqv2_parameters': analyze_bccaqv2_parameters,
+            });
+        }
 
         $('#analyze-process').click(function (e) {
             if (!$(this).hasClass('disabled')) {
@@ -506,7 +579,6 @@
                 form_obj = $.extend(true, {}, default_obj)
 
                 // build the final input object to send to the API
-
                 // form_inputs
 
                 for (var key in form_inputs) {
@@ -517,7 +589,6 @@
                 }
 
                 // form_thresholds
-
                 for (var key in form_thresholds) {
                     form_obj['inputs'].push({
                         'id': key,
@@ -526,37 +597,37 @@
                 }
 
                 // email
-
                 form_obj['notification_email'] = $('#analyze-email').val()
 
-                console.log(submit_url_var + submit_url_post)
+                // console.log("submit_url_var + submit_url_post: " + submit_url_var + submit_url_post)
 
-                console.log(form_obj)
+                set_datalayer_for_analyze_bccaqv2(form_obj['inputs'], submit_url_var);
+                // $.each(form_obj['inputs'], function (index, value) {
+                //     console.log(index + " form_obj['inputs']: " + value.id + " ; " + value.data)
 
-                /*
-                 $.ajax({
-                 url: submit_url_pre + submit_url_var + submit_url_post,
-                 method: 'POST',
-                 dataType: 'json',
-                 crossDomain: true,
-                 headers: {
-                 'Content-Type': 'application/json'
-                 },
-                 data: form_obj,
-                 success: function(data) {
-                 console.log(data)
-
-                 $('#success-modal').modal('show');
-
-                 }
-                 })
-                 */
+                // });
 
                 var submit_data = {
                     'analyze-captcha_code': $('#analyze-captcha_code').val(),
                     'request_data': form_obj,
                     'submit_url': submit_url_var + submit_url_post
                 }
+
+
+                // console.log(" class=variable-download-idf-curves ------------------------>");// TODO: delete
+
+                // // e.preventDefault();
+                // var idf_curves_href = $(this).attr('href');
+                // var last_index_found = idf_curves_href.lastIndexOf("/");
+                // idf_curves_href = idf_curves_href.substring(last_index_found + 1, idf_curves_href.length);
+
+                // var idf_curves_text = $(this).text().trim();
+
+                // console.log(" class=variable-download-idf-curves >> idf_curves_href: " + idf_curves_href);// TODO: delete
+                // console.log(" class=variable-download-idf-curves >> idf_curves_text: " + idf_curves_text);// TODO: delete
+
+                // set_datalayer_for_analyze_bccaqv2("Variable_Download_IDF-Curves_" + idf_curves_text, idf_curves_href);
+
 
                 // check captcha
 
@@ -957,7 +1028,7 @@
 
                     $('#analyze-breadcrumb .step[data-step="' + current_step + '"]').nextAll('.step').removeClass('on')
 
-//           console.log(i, $(this))
+                    //           console.log(i, $(this))
 
                     if (i != valid_steps.length) {
                         for (z = i; z >= valid_steps.length; z += 1) {
@@ -1051,19 +1122,19 @@
                 //console.log('checking ' + this_name, this_type, this_val)
 
                 switch (this_type) {
-                    case 'radio' :
+                    case 'radio':
                         if ($(this).prop('checked') == true) {
                             this_has_val = true
                         }
                         break
 
-                    case 'checkbox' :
+                    case 'checkbox':
                         if ($(this).prop('checked') == true) {
                             this_has_val = true
                         }
                         break
 
-                    default :
+                    default:
                         if ($(this).val() != '') {
                             this_has_val = true
                         }
@@ -1169,8 +1240,10 @@
                 $('#analyze-captcha_code').val() == '' ||
                 $('body').validate_email($('#analyze-email').val()) != true
             ) {
+                console.log(" $('#analyze-process').addClass('disabled')");// TODO: delete
                 $('#analyze-process').addClass('disabled')
             } else {
+                console.log(" $('#analyze-process').removeClass('disabled')");// TODO: delete
                 $('#analyze-process').removeClass('disabled')
             }
 

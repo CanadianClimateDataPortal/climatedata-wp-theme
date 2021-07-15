@@ -511,7 +511,7 @@
         //     $('#station-process-data').attr('class', class_info);
         //     document.getElementById('station-process-data').style.display = "none";
         // }
-        var variable_data_types = {
+        var variableDataTypes = {
             // Download_Variable-Data_BCCAQv2 ...
             'tx_max': 'Hottest-Day',
             'tg_mean': 'Mean-Temperature',
@@ -542,87 +542,86 @@
             'tr_22': 'Tropical-Nights-Days-with-Tmin_GreaterThan_22C',
         };
 
-        var points_info = "";
-        var datalayer_event_name = "";
-        var variable_data_format = "";
+        var pointsInfo = "";
+        var dataLayerEventName = "";
+        var variableDataFormat = "";
+        function getGA4EventNameForVariableDataBCCAQv2() {
 
-        function get_GA4_event_name_for_variable_data_BCCAQv2() {
+            var eventType = $('#download-variable').val();
+            console.log(" function getGA4EventNameForVariableDataBCCAQv2() >> eventType: " + eventType); // TODO: delete
 
-            var event_type = $('#download-variable').val();
-            console.log(" function get_GA4_event_name_for_variable_data_BCCAQv2() >> event_type: " + event_type); // TODO: delete
-
-            var var_name = "";
-            if (variable_data_types[event_type]) {
-                var_name = "Download_Variable-Data_BCCAQv2_" + variable_data_types[event_type] + "_Frequency_Location_Format";
+            var varName = "";
+            if (variableDataTypes[eventType]) {
+                varName = "Download_Variable-Data_BCCAQv2_" + variableDataTypes[eventType] + "_Frequency_Location_Format";
             } else {
-                throw new Error('Invalid GA4 event name (Download_Variable-Data_BCCAQv2): ' + event_type);
+                throw new Error('Invalid GA4 event name (Download_Variable-Data_BCCAQv2): ' + eventType);
             }
-            return var_name;
+            return varName;
         }
 
-        function set_datalayer_for_variable_data_BCCAQv2(BCCAQv2_datalayer_event_name, BCCAQv2_points_info, BCCAQv2_format) {
-            console.log(" function set_datalayer_for_variable_data_BCCAQv2(...) >> BCCAQv2_datalayer_event_name: " + BCCAQv2_datalayer_event_name); // TODO: delete
-            console.log(" function set_datalayer_for_variable_data_BCCAQv2(...) >> BCCAQv2_points_info: " + BCCAQv2_points_info); // TODO: delete
+        function setDataLayerForVariableDataBCCAQv2(BCCAQv2DataLayerEventName, BCCAQv2PointsInfo, BCCAQv2FileFormat) {
+            console.log(" function setDataLayerForVariableDataBCCAQv2(...) >> BCCAQv2DataLayerEventName: " + BCCAQv2DataLayerEventName); // TODO: delete
+            console.log(" function setDataLayerForVariableDataBCCAQv2(...) >> BCCAQv2PointsInfo: " + BCCAQv2PointsInfo); // TODO: delete
 
             // dataLayer.push({ ecommerce: null });  // Clear the previous ecommerce object.
             dataLayer.push({
-                'event': BCCAQv2_datalayer_event_name,
-                'variable_data_event_type': BCCAQv2_datalayer_event_name,
-                'variable_data_location': BCCAQv2_points_info,
-                'variable_data_format': BCCAQv2_format
+                'event': BCCAQv2DataLayerEventName,
+                'variable_data_event_type': BCCAQv2DataLayerEventName,
+                'variable_data_location': BCCAQv2PointsInfo,
+                'variable_data_format': BCCAQv2FileFormat
                 // 'eventCallback': function () {
                 //     document.location = productObj.url
                 // }
             });
         }
-
+        var format = null;
         $('.download_variable_data_bccaqv2').click(function (e) {
-            e.preventDefault()
-            console.log(" class=download_variable_data_bccaqv2 >> BCCAQv2_datalayer_event_name: " + datalayer_event_name);// TODO: delete
-            console.log(" class=download_variable_data_bccaqv2 >> points_info: " + points_info);// TODO: delete
-            console.log(" class=download_variable_data_bccaqv2 >> variable_data_format: " + variable_data_format);// TODO: delete
-            set_datalayer_for_variable_data_BCCAQv2(datalayer_event_name, points_info, format);
+            console.log(" class=download_variable_data_bccaqv2 >> BCCAQv2DataLayerEventName: " + dataLayerEventName);// TODO: delete
+            console.log(" class=download_variable_data_bccaqv2 >> pointsInfo: " + pointsInfo);// TODO: delete
+            console.log(" class=download_variable_data_bccaqv2 >> variableDataFormat: " + variableDataFormat);// TODO: delete
+            setDataLayerForVariableDataBCCAQv2(dataLayerEventName, pointsInfo, format);
         });
 
         function process_download() {
             console.log(" function process_download() ... "); // TODO: delete
 
-            var selected_var = $('#download-variable').val();
-            datalayer_event_name = get_GA4_event_name_for_variable_data_BCCAQv2();
+            var selectedVar = $('#download-variable').val();
+            dataLayerEventName = getGA4EventNameForVariableDataBCCAQv2();
 
             month = $("#download-dataset").val();
             if (month === 'annual') {
                 month = 'ann'
             }
-            points = []
+            points = [];
+            pointsInfo = '';
             for (var i = 0; i < selectedGrids.length; i++) {
                 point = selectedPoints[selectedGrids[i]];
                 console.log(" function process_download() >> selectedGrids[i]: " + selectedGrids[i]); // TODO: delete
                 console.log(" function process_download() >> point.lat: " + point.lat); // TODO: delete
                 console.log(" function process_download() >> point.lng: " + point.lng); // TODO: delete
 
-                points_info += "GridID: " + selectedGrids[i] + ", Lat: " + point.lat + ", Lng: " + point.lng + " ; ";
+                pointsInfo += "GridID: " + selectedGrids[i] + ", Lat: " + point.lat + ", Lng: " + point.lng + " ; ";
                 points.push([point.lat, point.lng]);
             }
 
             // Remove last 3 char: ;
             if (selectedGrids.length > 0) {
-                points_info = points_info.substring(0, points_info.length - 3);
+                pointsInfo = pointsInfo.substring(0, pointsInfo.length - 3);
             }
 
             format = $('input[name="download-format"]:checked').val();
-            variable_data_format = format;
-            console.log(" function process_download() >> selected_var: " + selected_var); // TODO: delete
-            console.log(" function process_download() >> datalayer_event_name: " + datalayer_event_name); // TODO: delete
+            variableDataFormat = format;
+            console.log(" function process_download() >> selectedVar: " + selectedVar); // TODO: delete
+            console.log(" function process_download() >> dataLayerEventName: " + dataLayerEventName); // TODO: delete
             console.log(" function process_download() >> month: " + month); // TODO: delete
             console.log(" function process_download() >> format: " + format); // TODO: delete
             console.log(" function process_download() >> points: " + points); // TODO: delete
 
 
-            if (selected_var !== 'all') {
+            if (selectedVar !== 'all') {
                 $('body').addClass('spinner-on');
                 request_args = {
-                    var: selected_var,
+                    var: selectedVar,
                     month: month,
                     format: format,
                     points: points
@@ -1492,35 +1491,75 @@
         }
 
 
-        function create_class_value_with_selected_stations() {
+        var selected_stations_to_str = '';
+        function get_selected_stations() {
             // GA4_event
             // ex: class="42 -- DUNCAN & 1593 -- RUSSELL CREEK ; 1614 -- TWO PETE CREEK ; ..."
 
-            var class_info = "";
+            var ret_val = "";
             for (const key in selected_stations) {
-                class_info += key + " -- " + selected_stations[key] + " ; ";
+                ret_val += key + " -- " + selected_stations[key] + " ; ";
             }
 
             // Remove last char: ;
             if (Object.keys(selected_stations).length > 0) {
-                class_info = class_info.substring(0, class_info.length - 3);
+                ret_val = ret_val.substring(0, ret_val.length - 3);
             }
 
             if (Object.keys(selected_stations).length == 0) {
-                class_info = " ";
+                ret_val = " ";
             }
+
+            return ret_val;
             // Create <a id="station-process-data" class=" station id -- station name & ..."> for Google Analytics
-            $('#station-process-data').attr('class', class_info);
-            $('#station-process-data').removeAttr("style").hide();
+            // $('#station-process-data').attr('class', class_info);
+            // $('#station-process-data').removeAttr("style").hide();
         }
+
+        function set_datalayer_for_download_station_data(download_station_data_list, download_station_file_extension) {
+            console.log(" function set_datalayer_for_download_station_data(...) >> download_station_data_event_name: Download_Station-Data"); // TODO: delete
+            console.log(" function set_datalayer_for_download_station_data(...) >> download_station_data_list: " + download_station_data_list); // TODO: delete
+            console.log(" function set_datalayer_for_download_station_data(...) >> download_station_file_extension: " + download_station_file_extension); // TODO: delete
+
+            dataLayer.push({
+                'event': 'Download_Station-Data',
+                'download_station_data_event': 'Download_Station-Data',
+                'download_station_data_list': download_station_data_list,
+                'download_station_file_extension': download_station_file_extension
+            });
+        }
+
+        $('#station-process').click(function (e) {
+            var csvFormatClassName = $("#csvFormat").parent().attr("class");
+            var geoFormatClassName = $("#geoFormat").parent().attr("class");
+
+            console.log(" #station-process >> csvFormatClassName : " + csvFormatClassName);// TODO: delete
+            console.log(" #station-process >> geoFormatClassName : " + geoFormatClassName);// TODO: delete
+
+
+            var selected_stations_file_extension = 'CSV';
+            if (geoFormatClassName.includes("active")) {
+                selected_stations_file_extension = 'GeoJSON';
+                if (csvFormatClassName.includes("active")) {
+                    throw new Error('ERROR: GA4_event (Download_Station-Data) file format, both (CSV, GeoJSON) are selected');
+                }
+            }
+
+            console.log(" #station-process >> selected_stations_to_str: " + selected_stations_to_str);// TODO: delete
+            console.log(" #station-process >> selected_stations_file_extension: " + selected_stations_file_extension);// TODO: delete
+
+            // selected_stations_file_extension get text from class="csvFormat" or class="geoFomrat"
+            set_datalayer_for_download_station_data(selected_stations_to_str, selected_stations_file_extension);
+        });
 
         function populate_URL(ga4_event = 1) {
             if (ga4_event == 1) {
                 var new_url = 'https://api.weather.gc.ca/collections/climate-daily/items?datetime=' + dl_URL.start + ' 00:00:00/' + dl_URL.end + ' 00:00:00&STN_ID=' + dl_URL['s'] + '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' + dl_URL.format + '&limit=' + dl_URL.limit + '&startindex=' + dl_URL.offset;
                 $('#station-process').attr('href', new_url);
             }
-            create_class_value_with_selected_stations();
+            selected_stations_to_str = get_selected_stations();
         }
+
 
         //
         // IDF CURVES
@@ -1647,7 +1686,6 @@
 
         }
 
-
         function set_datalayer_for_download_IDFCurves(idf_curves_datalayer_event_name, file) {
             console.log(" function set_datalayer_for_download_IDFCurves(...) >> idf_curves_datalayer_event_name: " + idf_curves_datalayer_event_name); // TODO: delete
             console.log(" function set_datalayer_for_download_IDFCurves(...) >> file: " + file); // TODO: delete
@@ -1663,8 +1701,7 @@
             });
         }
 
-
-        //ynamically created
+        //Dynamically created
         $(document).on('click', '.download-idf-curves', function (e) {
             console.log(" class=download-idf-curves ------------------------>");// TODO: delete
 
@@ -1674,18 +1711,12 @@
             idf_curves_href = idf_curves_href.substring(last_index_found + 1, idf_curves_href.length);
 
             var idf_curves_text = $(this).text().trim();
-            // // var n = idf_curves_text.lastIndexOf("(");
-            // // var m = idf_curves_text.lastIndexOf(")");
-            // // idf_curves_text = idf_curves_text.substring(n + 1, m);
 
             console.log(" class=download-idf-curves >> idf_curves_href: " + idf_curves_href);// TODO: delete
             console.log(" class=download-idf-curves >> idf_curves_text: " + idf_curves_text);// TODO: delete
 
             set_datalayer_for_download_IDFCurves("Download_IDF-Curves_" + idf_curves_text, idf_curves_href);
         });
-
-
-
 
         $('#idf-select').on('change', function (e) {
 

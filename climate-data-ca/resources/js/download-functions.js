@@ -1724,6 +1724,8 @@
             marker_id = $(this).val()
 
             $('#idf-links ul').empty()
+            console.log(" (download-functions.js) #idf-links ul empty ---------------------> "); // TODO: delete
+
             $('#download-idf-station').slideDown()
 
             // find the feature in the IDF layer
@@ -1747,6 +1749,10 @@
                     maps['idf'].setView([layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0]], current_view)
 
                     $.getJSON(child_theme_dir + 'resources/app/run-frontend-sync/search_idfs.php?idf=' + layer.feature.properties.ID, function (data) {
+
+                        console.log(" (download-functions.js) #idf-station-name h5: " + layer.feature.properties.Name); // TODO: delete
+                        console.log(" (download-functions.js) #idf-station-elevation h5: " + layer.feature.properties.Elevation_); // TODO: delete
+
 
                         $('#idf-station-name h5').text(layer.feature.properties.Name)
                         $('#idf-station-elevation h5').text(layer.feature.properties.Elevation_)
@@ -1789,14 +1795,13 @@
                                 linktext = popup_labels[0] + " (PNG)";
                             }
 
-                            $('#idf-links ul').append('<li><a href="' + v + '" target="_blank">' + linktext + '</a></li>');
-
+                            console.log(" (download-functions.js) #idf-links ul >> href: " + v + " linktext: " + linktext); // TODO: delete
+                            $('#idf-links ul').append('<li><a class="download-idf-curves" href="' + v + '" target="_blank">' + linktext + '</a></li>');
                         })
 
                     })
 
                 } else {
-
                     layer.setStyle({
                         fillColor: '#3869f6'
                     })
@@ -1814,7 +1819,6 @@
                 })
 
             }, 500)
-
         })
 
 

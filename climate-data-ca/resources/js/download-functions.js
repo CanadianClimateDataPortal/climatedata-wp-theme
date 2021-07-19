@@ -340,17 +340,9 @@
             }
 
             var pbfURL = hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + gridName + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf";
-            console.log(" L.vectorGrid.protobuf >> hosturl: " + hosturl); // TODO: delete
-            console.log(" L.vectorGrid.protobuf >> gridName: " + gridName); // TODO: delete
-
-
             pbfLayer = L.vectorGrid.protobuf(pbfURL, vectorTileOptions).on('click', function (e) {
 
                 highlightGridFeature = e.layer.properties.gid;
-                console.log(" L.vectorGrid.protobuf >> highlightGridFeature: " + highlightGridFeature); // TODO: delete
-
-
-
                 selectedPoints[highlightGridFeature] = e.latlng;
 
                 var selectedExists = selectedGrids.includes(highlightGridFeature);
@@ -398,11 +390,6 @@
 
                 var points_to_process = selectedGrids.length
 
-                console.log(" #download-location >> grid.ln: " + selectedGrids.length + ' ' + l10n_labels.selected); // TODO: delete
-                console.log(" #download-location >> l10n_labels.search_city: " + l10n_labels.search_city); // TODO: delete
-                var city_selected = $('#download-location').parent().find('.select2-selection__rendered').attr('title');
-                console.log(" #download-location >> city_selected: " + city_selected); // TODO: delete
-
                 if (selectedGrids.length > 0) {
                     $('#download-location').parent().find('.select2-selection__rendered').text(selectedGrids.length + ' ' + l10n_labels.selected)
                 } else {
@@ -433,47 +420,29 @@
         //
 
         function checkform() {
-            console.log(" function checkform() >>  ");// TODO: delete
-
             $('#download-result').slideUp(125)
 
             var form_valid = false;
 
             if ($('#download-dataset').val() === 'daily') {
-
                 // DAILY DATA
-                console.log(" function checkform() >>  DAILY DATA");// TODO: delete
-
-
                 if (
                     $('body').validate_email($('#daily-email').val()) === true &&
                     $('#daily-captcha_code').val() !== '' &&
                     $('#download-coords').val() !== ''
                 ) {
-
                     $('#daily-process').removeClass('disabled');
-
                 } else {
-
                     $('#daily-process').addClass('disabled');
-
                 }
-
             } else {
-
-
                 // MONTHLY OR ANNUAL
-                console.log(" function checkform() >>  MONTHLY OR ANNUAL");// TODO: delete
-
-
                 // if a filename is entered and the hidden lat/lon inputs have values
-
                 if (
                     $('#download-filename').hasClass('valid') &&
                     $('#download-coords').val() !== ''
                 ) {
                     form_valid = true;
-                    console.log(" function checkform() >>  MONTHLY OR ANNUAL >> form_valid: " + form_valid); // TODO: delete
                 }
 
                 if (form_valid === true) {
@@ -481,9 +450,7 @@
                 } else {
                     $('#download-process').addClass('disabled');
                 }
-
             }
-
         }
 
         //
@@ -548,8 +515,6 @@
         function getGA4EventNameForVariableDataBCCAQv2() {
 
             var eventType = $('#download-variable').val();
-            console.log(" function getGA4EventNameForVariableDataBCCAQv2() >> eventType: " + eventType); // TODO: delete
-
             var varName = "";
             if (variableDataTypes[eventType]) {
                 varName = "Download_Variable-Data_BCCAQv2_" + variableDataTypes[eventType] + "_Frequency_Location_Format";
@@ -560,31 +525,19 @@
         }
 
         function setDataLayerForVariableDataBCCAQv2(BCCAQv2DataLayerEventName, BCCAQv2PointsInfo, BCCAQv2FileFormat) {
-            console.log(" function setDataLayerForVariableDataBCCAQv2(...) >> BCCAQv2DataLayerEventName: " + BCCAQv2DataLayerEventName); // TODO: delete
-            console.log(" function setDataLayerForVariableDataBCCAQv2(...) >> BCCAQv2PointsInfo: " + BCCAQv2PointsInfo); // TODO: delete
-
-            // dataLayer.push({ ecommerce: null });  // Clear the previous ecommerce object.
             dataLayer.push({
                 'event': BCCAQv2DataLayerEventName,
                 'variable_data_event_type': BCCAQv2DataLayerEventName,
                 'variable_data_location': BCCAQv2PointsInfo,
                 'variable_data_format': BCCAQv2FileFormat
-                // 'eventCallback': function () {
-                //     document.location = productObj.url
-                // }
             });
         }
         var format = null;
         $('.download_variable_data_bccaqv2').click(function (e) {
-            console.log(" class=download_variable_data_bccaqv2 >> BCCAQv2DataLayerEventName: " + dataLayerEventName);// TODO: delete
-            console.log(" class=download_variable_data_bccaqv2 >> pointsInfo: " + pointsInfo);// TODO: delete
-            console.log(" class=download_variable_data_bccaqv2 >> variableDataFormat: " + variableDataFormat);// TODO: delete
             setDataLayerForVariableDataBCCAQv2(dataLayerEventName, pointsInfo, format);
         });
 
         function process_download() {
-            console.log(" function process_download() ... "); // TODO: delete
-
             var selectedVar = $('#download-variable').val();
             dataLayerEventName = getGA4EventNameForVariableDataBCCAQv2();
 
@@ -596,10 +549,6 @@
             pointsInfo = '';
             for (var i = 0; i < selectedGrids.length; i++) {
                 point = selectedPoints[selectedGrids[i]];
-                console.log(" function process_download() >> selectedGrids[i]: " + selectedGrids[i]); // TODO: delete
-                console.log(" function process_download() >> point.lat: " + point.lat); // TODO: delete
-                console.log(" function process_download() >> point.lng: " + point.lng); // TODO: delete
-
                 pointsInfo += "GridID: " + selectedGrids[i] + ", Lat: " + point.lat + ", Lng: " + point.lng + " ; ";
                 points.push([point.lat, point.lng]);
             }
@@ -611,13 +560,6 @@
 
             format = $('input[name="download-format"]:checked').val();
             variableDataFormat = format;
-            console.log(" function process_download() >> selectedVar: " + selectedVar); // TODO: delete
-            console.log(" function process_download() >> dataLayerEventName: " + dataLayerEventName); // TODO: delete
-            console.log(" function process_download() >> month: " + month); // TODO: delete
-            console.log(" function process_download() >> format: " + format); // TODO: delete
-            console.log(" function process_download() >> points: " + points); // TODO: delete
-
-
             if (selectedVar !== 'all') {
                 $('body').addClass('spinner-on');
                 request_args = {
@@ -633,8 +575,6 @@
                     contentType: 'application/json',
                     data: JSON.stringify(request_args),
                     success: function (result) {
-                        console.log(" function process_download() >> succes >>>>>>> "); // TODO: delete
-
                         if (format == 'csv') {
                             $('#download-result a').attr('href', 'data:text/csv;charset=utf-8,' + escape(result));
                         }
@@ -648,8 +588,6 @@
                     }
                 });
             } else {
-                console.log(" function process_download() >> call download for all matching variables and build a zip file"); // TODO: delete
-
                 // call download for all matching variables and build a zip file
                 selectedTimeStepCategory = $('#download-dataset').find(':selected').data('timestep');
                 varToProcess = [];
@@ -681,8 +619,6 @@
                             contentType: 'application/json',
                             data: JSON.stringify(request_args),
                             success: function (result) {
-                                console.log(" function download_all() >> success: " + result); // TODO: delete
-
                                 if (format == 'csv') {
                                     zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.csv', result);
                                 }
@@ -848,10 +784,7 @@
             if (curValData === undefined) {
                 $('#download-variable').val(1).trigger('change.select2');
             }
-
-            // maps['variable'].eachLayer( function(layer) {
-            //     if ( layer.myTag  &&  layer.myTag === 'gridlayer') {
-            if (typeof pbfLayer !== 'undefined' && pbfLayer.gridType !== curValData.grid) {
+            if (pbfLayer.gridType !== curValData.grid) {
                 maps['variable'].removeLayer(pbfLayer);
                 console.log("Adding Grid:" + curValData.grid);
                 addGrid(curValData.grid);
@@ -859,14 +792,8 @@
                 selectedGrids = [];
                 $('#download-coords').val('');
                 $('#download-location').val('');
-
-                console.log(" #download-location onn select2:select >> l10n_labels.search_city: " + l10n_labels.search_city); // TODO: delete
                 $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
             }
-            //     }
-            // });
-
-
         });
 
 
@@ -924,8 +851,6 @@
 
         $('#download-process').click(function (e) {
             e.preventDefault()
-            console.log(" ownload-process >> click >>  call process_download()");// TODO: delete
-
             process_download()
         });
 
@@ -940,9 +865,6 @@
         //
 
         $('#daily-process').click(function (e) {
-            console.log(" #daily-process >> click "); // TODO: delete
-
-
             e.preventDefault();
 
             var var_name = '';
@@ -1517,10 +1439,6 @@
         }
 
         function set_datalayer_for_download_station_data(download_station_data_list, download_station_file_extension) {
-            console.log(" function set_datalayer_for_download_station_data(...) >> download_station_data_event_name: Download_Station-Data"); // TODO: delete
-            console.log(" function set_datalayer_for_download_station_data(...) >> download_station_data_list: " + download_station_data_list); // TODO: delete
-            console.log(" function set_datalayer_for_download_station_data(...) >> download_station_file_extension: " + download_station_file_extension); // TODO: delete
-
             dataLayer.push({
                 'event': 'Download_Station-Data',
                 'download_station_data_event': 'Download_Station-Data',
@@ -1532,11 +1450,6 @@
         $('#station-process').click(function (e) {
             var csvFormatClassName = $("#csvFormat").parent().attr("class");
             var geoFormatClassName = $("#geoFormat").parent().attr("class");
-
-            console.log(" #station-process >> csvFormatClassName : " + csvFormatClassName);// TODO: delete
-            console.log(" #station-process >> geoFormatClassName : " + geoFormatClassName);// TODO: delete
-
-
             var selected_stations_file_extension = 'CSV';
             if (geoFormatClassName.includes("active")) {
                 selected_stations_file_extension = 'GeoJSON';
@@ -1544,10 +1457,6 @@
                     throw new Error('ERROR: GA4_event (Download_Station-Data) file format, both (CSV, GeoJSON) are selected');
                 }
             }
-
-            console.log(" #station-process >> selected_stations_to_str: " + selected_stations_to_str);// TODO: delete
-            console.log(" #station-process >> selected_stations_file_extension: " + selected_stations_file_extension);// TODO: delete
-
             // selected_stations_file_extension get text from class="csvFormat" or class="geoFomrat"
             set_datalayer_for_download_station_data(selected_stations_to_str, selected_stations_file_extension);
         });
@@ -1687,9 +1596,6 @@
         }
 
         function set_datalayer_for_download_IDFCurves(idf_curves_datalayer_event_name, file) {
-            console.log(" function set_datalayer_for_download_IDFCurves(...) >> idf_curves_datalayer_event_name: " + idf_curves_datalayer_event_name); // TODO: delete
-            console.log(" function set_datalayer_for_download_IDFCurves(...) >> file: " + file); // TODO: delete
-
             // ex: Download_IDF-Curves_Short Duration Rainfall Intensity−Duration−Frequency Data (PDF) -->  Download_IDF-Curves_Short_Duration_Rainfall_Intensity−Duration−Frequency_Data_PDF
             idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll(' ', '_');
             idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll('(', '');
@@ -1703,33 +1609,21 @@
 
         //Dynamically created
         $(document).on('click', '.download-idf-curves', function (e) {
-            console.log(" class=download-idf-curves ------------------------>");// TODO: delete
-
             // e.preventDefault();
             var idf_curves_href = $(this).attr('href');
             var last_index_found = idf_curves_href.lastIndexOf("/");
             idf_curves_href = idf_curves_href.substring(last_index_found + 1, idf_curves_href.length);
-
             var idf_curves_text = $(this).text().trim();
-
-            console.log(" class=download-idf-curves >> idf_curves_href: " + idf_curves_href);// TODO: delete
-            console.log(" class=download-idf-curves >> idf_curves_text: " + idf_curves_text);// TODO: delete
-
             set_datalayer_for_download_IDFCurves("Download_IDF-Curves_" + idf_curves_text, idf_curves_href);
         });
 
         $('#idf-select').on('change', function (e) {
-
-            //marker_id = e.params.data.id
             marker_id = $(this).val()
 
             $('#idf-links ul').empty()
-            console.log(" (download-functions.js) #idf-links ul empty ---------------------> "); // TODO: delete
-
             $('#download-idf-station').slideDown()
 
             // find the feature in the IDF layer
-
             idf_layer.eachLayer(function (layer) {
 
 
@@ -1749,25 +1643,8 @@
                     maps['idf'].setView([layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0]], current_view)
 
                     $.getJSON(child_theme_dir + 'resources/app/run-frontend-sync/search_idfs.php?idf=' + layer.feature.properties.ID, function (data) {
-
-                        console.log(" (download-functions.js) #idf-station-name h5: " + layer.feature.properties.Name); // TODO: delete
-                        console.log(" (download-functions.js) #idf-station-elevation h5: " + layer.feature.properties.Elevation_); // TODO: delete
-
-
                         $('#idf-station-name h5').text(layer.feature.properties.Name)
                         $('#idf-station-elevation h5').text(layer.feature.properties.Elevation_)
-
-                        /*$('#idf-links').html('<div class="idf-popup-row">' +
-                         '<h6>' + popup_headings[0] + '</h6>' +
-                         '<h5 class="idfTitle">' + layer.feature.properties.Name + '</h5>' +
-                         '</div>' +
-                         '<div class="idf-popup-row">' +
-                         '<h6>' + popup_headings[1] + '</h6>' +
-                         '<h5 class="idfElev">' + layer.feature.properties.Elevation_ + '</h5>' +
-                         '</div>' +
-                         '<h6>' + popup_headings[2] + '</h6>' +
-                         '<ul class="idfBody list-unstyled"></ul>');*/
-
                         $.each(data, function (k, v) {
                             linktext = v;
 
@@ -1795,7 +1672,6 @@
                                 linktext = popup_labels[0] + " (PNG)";
                             }
 
-                            console.log(" (download-functions.js) #idf-links ul >> href: " + v + " linktext: " + linktext); // TODO: delete
                             $('#idf-links ul').append('<li><a class="download-idf-curves" href="' + v + '" target="_blank">' + linktext + '</a></li>');
                         })
 

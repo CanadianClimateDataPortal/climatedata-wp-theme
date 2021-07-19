@@ -142,7 +142,6 @@ var chart_labels, legend_labels, l10n_labels;
 
     $(document).on('overlay_show', function () {
 
-      console.log('overlay show')// TODO: delete
       $('#supermenu').supermenu('disable')
 
       if ($('.overlay').find('#download-terms-form').length) {

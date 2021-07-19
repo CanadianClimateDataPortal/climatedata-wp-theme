@@ -589,9 +589,6 @@
 
 
         function set_datalayer_for_variable_download_IDFCurves(idf_curves_datalayer_event_name, file) {
-            console.log(" function set_datalayer_for_variable_download_IDFCurves(...) >> idf_curves_datalayer_event_name: " + idf_curves_datalayer_event_name); // TODO: delete
-            console.log(" function set_datalayer_for_variable_download_IDFCurves(...) >> file: " + file); // TODO: delete
-
             // ex: Download_IDF-Curves_Short Duration Rainfall Intensity−Duration−Frequency Data (PDF) -->  Download_IDF-Curves_Short_Duration_Rainfall_Intensity−Duration−Frequency_Data_PDF
             idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll(' ', '_');
             idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll('(', '');
@@ -605,18 +602,12 @@
 
         //Dynamically created
         $(document).on('click', '.variable-download-idf-curves', function (e) {
-            console.log(" class=variable-download-idf-curves ------------------------>");// TODO: delete
-
             // e.preventDefault();
             var idf_curves_href = $(this).attr('href');
             var last_index_found = idf_curves_href.lastIndexOf("/");
             idf_curves_href = idf_curves_href.substring(last_index_found + 1, idf_curves_href.length);
 
             var idf_curves_text = $(this).text().trim();
-
-            console.log(" class=variable-download-idf-curves >> idf_curves_href: " + idf_curves_href);// TODO: delete
-            console.log(" class=variable-download-idf-curves >> idf_curves_text: " + idf_curves_text);// TODO: delete
-
             set_datalayer_for_variable_download_IDFCurves("Variable_Download_IDF-Curves_" + idf_curves_text, idf_curves_href);
         });
 
@@ -1055,8 +1046,6 @@
         };
 
         function getRealMonthName(keySelected, isEng = true) {
-            console.log(" function getRealMonth(keySelected, isEng) >> keySelected: " + keySelected); // TODO: delete
-
             var tempDict = engMonthDict;
             if (!isEng) {
                 tempDict = frMonthDict;
@@ -1106,9 +1095,6 @@
         };
 
         function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
-
-            console.log(" function getGA4EventNameForVariableDownloadData(keySelected) >> keySelected: " + keySelected); // TODO: delete
-
             var varName = "";
             if (variableDownloadDataTypes[keySelected]) {
                 var eventType = '';
@@ -1127,20 +1113,11 @@
         }
 
         function setDataLayerForChartData(chartDataFormat, chartData) {
-            console.log(" function setDataLayerForChartData(chartDataFormat) >> chartDataFormat.length: " + chartDataFormat.length); // TODO: delete
-
             if (!chartDataFormat.length) {
                 return;
             }
             var eventName = getGA4EventNameForVariableDownloadData(chartDataFormat, query['var']);
-
             var overlayTitle = $('.overlay-title').text();
-            console.log(" function setDataLayerForChartData(chartDataFormat) >> eventName: " + eventName); // TODO: delete
-            console.log(" function setDataLayerForChartData(chartDataFormat) >> query['mora']: " + query['mora']); // TODO: delete
-            console.log(" function setDataLayerForChartData(chartDataFormat) >> query['rcp']: " + query['rcp']); // TODO: delete
-            console.log(" function setDataLayerForChartData(chartDataFormat) >> chartSeries.visible: " + chartData.series[0].visible); // TODO: delete
-            console.log(" function setDataLayerForChartData(chartDataFormat) >> overlayTitle: " + overlayTitle); // TODO: delete
-            console.log(" function setDataLayerForChartData(chartDataFormat) >> chart.download... " + chartDataFormat); // TODO: delete
 
             // Exlude: Navigator 5
             var addStr = "";
@@ -1160,18 +1137,6 @@
             var variableDownloadDataVewBy = $('.variable-download-data-view_by').find(":selected").text();
             // ex: Région de la Montérégie, rcp26, January
             var chartDataSettings = overlayTitle + "; " + query['rcp'] + "; " + getRealMonthName(query['mora']);
-            console.log(" function setDataLayerForChartData(chartDataFormat) >> chartData.series[*].name: " + addStr); // TODO: delete
-            console.log(" function setDataLayerForChartData(chartDataFormat) >> chartDataSettings: " + chartDataSettings); // TODO: delete
-            console.log(" function setDataLayerForChartData(chartDataFormat) >> variableDownloadDataVewBy: " + variableDownloadDataVewBy); // TODO: delete
-
-            // variable - functions.js: 1026  function setDataLayerForChartData(chartDataFormat) >> query['mora']: jan
-            // variable - functions.js: 1027  function setDataLayerForChartData(chartDataFormat) >> query['rcp']: rcp26
-            // variable - functions.js: 1028  function setDataLayerForChartData(chartDataFormat) >> chartSeries.title: tx_max
-            // variable - functions.js: 1029  function setDataLayerForChartData(chartDataFormat) >> chartSeries.name: Gridded Historical Data
-            // variable - functions.js: 1030  function setDataLayerForChartData(chartDataFormat) >> chartSeries.visible: false
-            // variable - functions.js: 1031  function setDataLayerForChartData(chartDataFormat) >> overlayTitle: Région de la Montérégie
-            // variable - functions.js: 1032  function setDataLayerForChartData(chartDataFormat) >> chart.download...csv
-
             dataLayer.push({
                 'event': eventName,
                 'chart_data_event_type': eventName,
@@ -1213,9 +1178,6 @@
 
             chartSeries = [];
             if (data['observations'].length > 0) {
-                console.log(" (observation) function disPlayChartData(data, varDetails)  >> chart_labels.observation: " + chart_labels.observation); // TODO: delete
-                console.log(" (observation) function disPlayChartData(data, varDetails)  >> data[observations]: " + data['observations']); // TODO: delete
-
                 chartSeries.push({
                     name: chart_labels.observation,
                     data: data['observations'],
@@ -1233,9 +1195,6 @@
             }
 
             if (data['modeled_historical_median'].length > 0) {
-                console.log(" (historical) function disPlayChartData(data, varDetails)  >> chart_labels.observation: " + chart_labels.historical); // TODO: delete
-                console.log(" (historical) function disPlayChartData(data, varDetails)  >> data[observations]: " + data['modeled_historical_median']); // TODO: delete
-
                 chartSeries.push({
                     name: chart_labels.historical,
                     data: data['modeled_historical_median'],
@@ -1414,7 +1373,6 @@
 
                 switch ($(this).attr('data-type')) {
                     case 'csv':
-                        console.log(" (01) .chart-export-data >> CLICK   >> chart.downloadCSV()"); // TODO: delete
                         setDataLayerForChartData('csv', chart);
                         chart.downloadCSV();
                         break;
@@ -1505,12 +1463,6 @@
 
 
             var overlayTitle = $('.overlay-title').text(station_name);
-            console.log("  function genStationChart(STN_ID, station_name, lat, lon) >> CLICK   >> .overlay-title: " + overlayTitle); // TODO: delete
-            console.log("  function genStationChart(STN_ID, station_name, lat, lon) >> CLICK   >> lat: " + lat); // TODO: delete
-            console.log("  function genStationChart(STN_ID, station_name, lat, lon) >> CLICK   >> lon: " + lon); // TODO: delete
-
-
-
             $(document).overlay('show', {
                 href: base_href + 'variable/' + $('#var').val() + '/',
                 data: {
@@ -1593,7 +1545,6 @@
                                 switch ($(this).attr('data-type')) {
                                     case 'csv':
                                         setDataLayerForChartData('csv', chart);
-                                        console.log(" (02) .chart-export-data >> CLICK   >> chart.downloadCSV()"); // TODO: delete
                                         chart.downloadCSV();
                                         break;
                                 }
@@ -3306,7 +3257,6 @@
         // OVERLAY
 
         $('#page-variable .overlay-close').click(function () {
-            console.log(" #page-variable .overlay-close >> clearGridHighlight()"); // TODO: delete
             clearGridHighlight();
         });
 

@@ -555,16 +555,8 @@
                 throw new Error('Can not get Analyze_BCCAQv2_* dataLayer event name: ' + customize_variables);
             }
 
-            console.log("  function set_datalayer_for_analyze_bccaqv2(...) >> analyze_bccaqv2_parameters:\n" + analyze_bccaqv2_parameters)
-            console.log(" function set_datalayer_for_analyze_bccaqv2(...) >> analyze_bccaqv2_event_type: " + analyze_bccaqv2_dict[customize_variables]); // TODO: delete
-
             analyze_bccaqv2_dict[customize_variables] = analyze_bccaqv2_dict[customize_variables].replaceAll(' ', '-');
             event_type = "Analyze_BCCAQv2_" + analyze_bccaqv2_dict[customize_variables];
-
-            // ex: Download_IDF-Curves_Short Duration Rainfall Intensity−Duration−Frequency Data (PDF) -->  Download_IDF-Curves_Short_Duration_Rainfall_Intensity−Duration−Frequency_Data_PDF
-            // idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll(' ', '_');
-            // idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll('(', '');
-            // idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll(')', '');
 
             dataLayer.push({
                 'event': event_type,
@@ -613,24 +605,7 @@
                     'submit_url': submit_url_var + submit_url_post
                 }
 
-
-                // console.log(" class=variable-download-idf-curves ------------------------>");// TODO: delete
-
-                // // e.preventDefault();
-                // var idf_curves_href = $(this).attr('href');
-                // var last_index_found = idf_curves_href.lastIndexOf("/");
-                // idf_curves_href = idf_curves_href.substring(last_index_found + 1, idf_curves_href.length);
-
-                // var idf_curves_text = $(this).text().trim();
-
-                // console.log(" class=variable-download-idf-curves >> idf_curves_href: " + idf_curves_href);// TODO: delete
-                // console.log(" class=variable-download-idf-curves >> idf_curves_text: " + idf_curves_text);// TODO: delete
-
-                // set_datalayer_for_analyze_bccaqv2("Variable_Download_IDF-Curves_" + idf_curves_text, idf_curves_href);
-
-
                 // check captcha
-
                 $.ajax({
                     url: child_theme_dir + 'resources/ajax/analyze-form.php',
                     method: "POST",
@@ -1240,10 +1215,8 @@
                 $('#analyze-captcha_code').val() == '' ||
                 $('body').validate_email($('#analyze-email').val()) != true
             ) {
-                console.log(" $('#analyze-process').addClass('disabled')");// TODO: delete
                 $('#analyze-process').addClass('disabled')
             } else {
-                console.log(" $('#analyze-process').removeClass('disabled')");// TODO: delete
                 $('#analyze-process').removeClass('disabled')
             }
 

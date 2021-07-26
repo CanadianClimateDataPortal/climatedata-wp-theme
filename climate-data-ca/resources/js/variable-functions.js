@@ -1027,6 +1027,7 @@
             'oct.': 'Octobre',
             'nov.': 'Novembre',
             'déc.': 'Décembre',
+            'ann.': 'Annuel',
         };
 
         var engMonthDict = {
@@ -1046,6 +1047,7 @@
         };
 
         function getRealMonthName(keySelected, isEng = true) {
+            keySelected = keySelected.toLowerCase();
             var tempDict = engMonthDict;
             if (!isEng) {
                 tempDict = frMonthDict;
@@ -1096,6 +1098,7 @@
 
         function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
             var varName = "";
+            keySelected = keySelected.toLowerCase();
             if (variableDownloadDataTypes[keySelected]) {
                 var eventType = '';
                 if (chartDataFormat.includes('csv')) {
@@ -1119,7 +1122,7 @@
             var eventName = getGA4EventNameForVariableDownloadData(chartDataFormat, query['var']);
             var overlayTitle = $('.overlay-title').text();
 
-            // Exlude: Navigator 5
+            // Exclude: Navigator 5
             var addStr = "";
             for (let index = 0; index < chartData.series.length; index++) {
                 var chartDataName = chartData.series[index].name;

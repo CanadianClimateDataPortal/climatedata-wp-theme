@@ -190,8 +190,13 @@ var chart_labels, legend_labels, l10n_labels;
 
                   captcha.removeClass('border-secondary')
 
-                  // GA4_event: Download_Introducing-climate-information-for-decision-making_v1.1
-                  form_response.html('<div class="alert alert-primary col-6 offset-4 p-5" role="alert"><h5>' + response.message1 + '</h5><p class="mb-0"><a class="' + response.GA4_event + '" href="' + response.url + '" target="_blank">' + response.message2 + '</a>.</p></div>').slideDown(250);
+                  dataLayer.push({
+                    'event': 'Download_Introducing-climate-information-for-decision-making_v1.1',
+                    'event_name': 'Download_Introducing-climate-information-for-decision-making_v1.1',
+                    'url': response.url
+                  });
+
+                  form_response.html('<div class="alert alert-primary col-6 offset-4 p-5" role="alert"><h5>' + response.message1 + '</h5><p class="mb-0"><a href="' + response.url + '" target="_blank">' + response.message2 + '</a>.</p></div>').slideDown(250);
 
                 } else if (response.message == 'captcha failed') {
 

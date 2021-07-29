@@ -53,11 +53,10 @@ if ($_GET['email']!='') {
     $response['message'] = 'success';
 }
 
-
+// GA4_event
 if ($response['message'] == 'success') {
     $response['message1'] = __('Success!','cdc');
     $response['message2'] = __('Click here to download the presentation','cdc');
-    $response['GA4_event'] = __('Download_Introducing-climate-information-for-decision-making_v1.1','cdc');
     $response['url'] = wp_get_attachment_url ( get_field ( 'training_presentation', $_GET['page_ID'] ) );
 }
   

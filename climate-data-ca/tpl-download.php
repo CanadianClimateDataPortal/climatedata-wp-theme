@@ -189,6 +189,27 @@ if (have_posts()) : while (have_posts()) : the_post();
         <section id="ahccd-download" class="page-section tab">
             <?php
 
+            if ( have_rows ( 'download_tabs' ) ) {
+                while ( have_rows ( 'download_tabs' ) ) {
+                    the_row();
+
+                    if ( get_sub_field ( 'ahccd' ) != '' ) {
+
+                        ?>
+
+                        <div class="row mb-5">
+                            <div class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3 p-5 bg-light">
+                                <?php the_sub_field ( 'ahccd' ); ?>
+                            </div>
+                        </div>
+
+                        <?php
+
+                    }
+
+                }
+            }
+
             include(locate_template('template/download/ahccd.php'));
 
             ?>

@@ -1,24 +1,3 @@
-<div class="col-9 offset-1">
-<?php
-
-$args = array(
-    'name'        => 'ahccd',
-    'post_type'   => 'page',
-    'post_status' => 'publish',
-    'numberposts' => 1
-);
-
-// render content from ACF first section (header + footer)
-$my_posts = get_posts($args);
-$postid = $my_posts[0]->ID ;
-
-$fields= get_fields($postid);
-
-print $fields[sections][0][section_head][body];
-
-?>
-</div>
-<br><br>
 <form action="./" method="get" name="ahccd-download-form" id="ahccd-download-form">
 
   <div class="form-layout-row row">
@@ -82,8 +61,3 @@ print $fields[sections][0][section_head][body];
   
 
 </form>
-<div class="col-9 offset-1">
-    <?php
-    print $fields[sections][0][section_footer];
-    ?>
-</div>

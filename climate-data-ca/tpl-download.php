@@ -25,7 +25,7 @@ function tpl_enqueue()
     wp_enqueue_script('leaflet-cluster-subgroup');
     wp_enqueue_script('jszip');
     wp_enqueue_script('FileSaver');
-    
+
     wp_enqueue_script('vector-grid');
     wp_enqueue_script('sync');
     wp_enqueue_script('nearest');
@@ -100,27 +100,90 @@ if (have_posts()) : while (have_posts()) : the_post();
         </nav>
 
         <section id="var-download" class="page-section tab">
-            <?php
+					<?php
+
+						if ( have_rows ( 'download_tabs' ) ) {
+							while ( have_rows ( 'download_tabs' ) ) {
+								the_row();
+
+								if ( get_sub_field ( 'variable' ) != '' ) {
+
+					?>
+
+					<div class="row mb-5">
+						<div class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3 p-5 bg-light">
+							<?php the_sub_field ( 'variable' ); ?>
+						</div>
+					</div>
+
+					<?php
+
+								}
+
+							}
+						}
 
             include(locate_template('template/download/variable.php'));
 
-            ?>
+          ?>
         </section>
 
         <section id="station-download" class="page-section tab">
-            <?php
+          <?php
+
+						if ( have_rows ( 'download_tabs' ) ) {
+							while ( have_rows ( 'download_tabs' ) ) {
+								the_row();
+
+								if ( get_sub_field ( 'station' ) != '' ) {
+
+					?>
+
+					<div class="row mb-5">
+						<div class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3 p-5 bg-light">
+							<?php the_sub_field ( 'station' ); ?>
+						</div>
+					</div>
+
+					<?php
+
+								}
+
+							}
+						}
 
             include(locate_template('template/download/station-data.php'));
 
-            ?>
+          ?>
         </section>
 
         <section id="idf-download" class="page-section tab">
-            <?php
+          <?php
+
+						if ( have_rows ( 'download_tabs' ) ) {
+							while ( have_rows ( 'download_tabs' ) ) {
+								the_row();
+
+								if ( get_sub_field ( 'idf' ) != '' ) {
+
+					?>
+
+					<div class="row mb-5">
+						<div class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3 p-5 bg-light">
+							<?php the_sub_field ( 'idf' ); ?>
+						</div>
+					</div>
+
+					<?php
+
+								}
+
+							}
+						}
 
             include(locate_template('template/download/idf.php'));
 
-            ?>
+          ?>
         </section>
         
         <section id="ahccd-download" class="page-section tab">

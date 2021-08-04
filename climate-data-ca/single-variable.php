@@ -57,7 +57,7 @@ if (have_posts()) : while (have_posts()) : the_post();
                     $var_type = $var_type[0]->slug;
                 }
 
-                if ($var_type != 'station-data') {
+                if ($var_type != 'station-data' && get_field('var_name') != 'slr') {
 
                     ?>
 
@@ -129,11 +129,38 @@ if (have_posts()) : while (have_posts()) : the_post();
             <div class="col-12 col-sm-6 col-lg sidebar-block">
                 <?php
 
-                $random_resource = new WP_Query (array('post_type' => 'resource', 'posts_per_page' => 1, 'orderby' => 'rand'));
+                $random_resource = new WP_Query ( array (
+									'post_type' => 'resource',
+									'posts_per_page' => 1,
+									'orderby' => 'rand',
+									'tax_query' => array (
+										'relation' => 'OR',
+										array (
+											'taxonomy' => 'resource-category',
+											'field' => 'slug',
+											'terms' => 'module-1'
+										),
+										array (
+											'taxonomy' => 'resource-category',
+											'field' => 'slug',
+											'terms' => 'module-2'
+										),
+										array (
+											'taxonomy' => 'resource-category',
+											'field' => 'slug',
+											'terms' => 'module-3'
+										)
+									)
+								) );
 
                 if ($random_resource->have_posts()) : while ($random_resource->have_posts()) : $random_resource->the_post();
 
-                    $item = array('id' => get_the_ID(), 'title' => get_the_title(), 'permalink' => get_permalink(), 'post_type' => get_post_type());
+                    $item = array (
+											'id' => get_the_ID(),
+											'title' => get_the_title(),
+											'permalink' => get_permalink(),
+											'post_type' => get_post_type()
+										);
 
                     ?>
 
@@ -362,6 +389,78 @@ if (have_posts()) : while (have_posts()) : the_post();
 
         <?php
 
+    } elseif (isset ($_GET['content']) && $_GET['content'] == 'slr-location') {
+
+        // 2. ajax request for variable data by location
+        //    (a grid square was clicked on variable map)
+
+        ?>
+
+        <div id="var-by-location" class="overlay-content-wrap variable-data-overlay col-12">
+            <div class="overlay-content container-fluid">
+                <?php
+
+                $selected_place = get_location_by_coords($_GET['lat'], $_GET['lon'],true);
+
+                if (is_array($selected_place)) {
+                    $location_name = $selected_place['geo_name'] . ', ' . short_province($selected_place['province']);
+                } else {
+
+                    if (isset ($_GET['station_name'])) {
+                        $location_name = $_GET['station_name'];
+                    } else {
+                        $location_name = 'Point: ' .  round($_GET['lat'],2) . "," .  round($_GET['lon'],2);
+                    }
+
+                }
+
+                ?>
+
+                <h2 class="overlay-title text-primary"><?php echo $location_name; ?></h2>
+
+                <div class="overlay-content-row">
+                    <div class="overlay-content-chart">
+                        <div class="navbar chart-navbar d-flex">
+
+                            <div class="nav-item d-flex align-items-center mr-5">
+                                <h6><span class="cdc-icon icon-download-data"></span> <?php _e('Download data', 'cdc'); ?></h6>
+
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="#" class="chart-export-data btn btn-sm btn-outline-secondary" data-type="csv">CSV</a>
+                                </div>
+                            </div>
+
+                            <div class="nav-item d-flex align-items-center">
+                                <h6><span class="cdc-icon icon-download-img"></span> <?php _e('Download image', 'cdc'); ?></h6>
+
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary " data-type="png">PNG</a> <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary" data-type="pdf">PDF</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="chart-placeholder" class="var-chart"></div>
+                    </div>
+                </div>
+
+                <div class="page-tour" id="chart-tour" data-steps='<?php echo $chart_tour; ?>'></div>
+
+                <?php
+
+                $units = get_field('units');
+
+                ?>
+
+                <div id="callback-data"><?php
+
+                    echo json_encode(array('title' => get_field('var_title'), 'units' => array('label' => __($units['label'], 'cdc'), 'value' => __($units['value'], 'cdc')), 'decimals' => get_field('decimals')));
+
+                    ?></div>
+            </div>
+        </div>
+
+    <?php
+
     } elseif (isset ($_GET['content']) && $_GET['content'] == 'sector') {
 
         // 2. ajax request for variable data by location
@@ -467,6 +566,107 @@ if (have_posts()) : while (have_posts()) : the_post();
             ?></div>
 
         <?php
+
+    } elseif (isset ($_GET['info'])) {
+        get_header();
+        // Direct variable info page
+            ?>
+            <div> </div>
+            <div id="var-interstitial" class="bg-primary text-white" style="padding:160px 0">
+                <div class="container-fluid">
+                    <h2 class="overlay-title"><?php echo get_the_title(); ?></h2>
+
+                    <div class="overlay-content-row">
+                        <div class="overlay-content-heading d-flex align-items-center justify-content-end">
+                            <h6 class="vertical-label"><span>Variable</span></h6>
+                        </div>
+
+                        <div class="overlay-content-text">
+                            <?php the_content(); ?>
+                        </div>
+                    </div>
+
+                    <?php
+
+                    $var_type = get_the_terms(get_the_ID(), 'var-type');
+
+                    if (!empty ($var_type)) {
+                        $var_type = $var_type[0]->slug;
+                    }
+
+                    if ($var_type != 'station-data' && get_field('var_name') != 'slr') {
+
+                        ?>
+
+                        <h5 class="overlay-title text-center all-caps"><?php _e('Select a scenario below to continue', 'cdc'); ?></h5>
+
+                        <div class="overlay-content-row">
+                            <div class="overlay-content-heading d-flex align-items-center justify-content-end">
+                                <h6 class="vertical-label"><span><?php _e('Scenario', 'cdc'); ?></span></h6>
+                            </div>
+
+                            <div class="overlay-content-text">
+                                <div class="overlay-scenarios">
+                                    <form class="form-inline" action="<?php echo $var_url; ?>">
+                                        <input type="hidden" name="var" value="<?php the_field('var_name'); ?>">
+
+                                        <div class="d-lg-flex justify-content-around align-items-center w-100">
+                                            <div class="btn-group btn-group-toggle mb-5 mb-lg-0" data-toggle="buttons">
+                                                <label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="rcp85" checked> <?php _e('High Emissions', 'cdc'); ?><br>(RCP 8.5) </label>
+
+                                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="rcp45"> <?php _e('Moderate Emissions', 'cdc'); ?><br>(RCP 4.5) </label>
+
+                                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="rcp26"> <?php _e('Low Emissions', 'cdc'); ?><br>(RCP 2.6) </label>
+                                            </div>
+
+                                            <div class="d-flex justify-content-center d-lg-block" role="group" aria-label="">
+                                                <button type="submit" class="btn btn-secondary border-white rounded-pill all-caps"><?php _e('Explore', 'cdc'); ?></button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <?php
+
+                    } else {
+
+                        ?>
+
+                        <div class="overlay-content-row">
+                            <div class="overlay-content-heading d-flex align-items-center justify-content-end">
+                                <h6 class="vertical-label"><span>&nbsp;</span></h6>
+                            </div>
+
+                            <div class="overlay-content-text">
+                                <div class="overlay-scenarios">
+                                    <form class="form-inline" action="<?php echo $var_url; ?>">
+                                        <input type="hidden" name="var" value="<?php the_field('var_name'); ?>">
+
+                                        <div class="d-flex justify-content-around align-items-center w-100">
+                                            <div class="" role="group" aria-label="">
+                                                <button type="submit" class="btn btn-secondary border-white rounded-pill all-caps"><?php _e('Explore', 'cdc'); ?></button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <?php
+
+                    }
+
+                    ?>
+                </div>
+            </div>
+
+            <?php
+
+
+
+        get_footer();
 
     } else {
 

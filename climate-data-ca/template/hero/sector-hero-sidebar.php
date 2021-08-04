@@ -1,42 +1,14 @@
 <aside class="col-10 offset-1 col-sm-8 offset-sm-2 col-lg-3 offset-lg-1 hero-menu-wrap">
   <div class="hero-menu">
-    <h6><?php _e ( 'Explore Sub-Sectors', 'cdc' ); ?></h6>
-    
-    <?php
-      
-      $subsectors = get_pages ( array (
-        'posts_per_page' => -1,
-        'child_of' => get_the_ID(),
-        'sort_column' => 'menu_order',
-        'order' => 'asc'
-      ) );
-      
-      if ( !empty ( $subsectors ) ) { 
-      
-    ?>
-    
+    <h6><?php _e ( 'Jump to:', 'cdc' ); ?></h6>
+
     <ul>
-      
-      <?php
-      
-        foreach ( $subsectors as $subsector ) {
-      
-      ?>
-      
-      <li><a href="#subsector-<?php echo get_the_slug ( $subsector->ID ); ?>" class="smooth-scroll"><?php echo get_the_title ( $subsector->ID ); ?></a></li>
-      
-      <?php
-        
-        }
-        
-      ?>
-      
+      <li><a href="#sector-context" class="smooth-scroll"><?php _e ( 'Context', 'cdc' ); ?></a></li>
+      <li><a href="#sector-cases" class="smooth-scroll"><?php _e ( 'Case Studies', 'cdc' ); ?></a></li>
+      <li><a href="#sector-analogous" class="smooth-scroll"><?php _e ( 'Sector Resources', 'cdc' ); ?></a></li>
+      <li><a href="#sector-vars" class="smooth-scroll"><?php _e ( 'Relevant Variables', 'cdc' ); ?></a></li>
+      <li><a href="#sector-related" class="smooth-scroll"><?php _e ( 'Related Content', 'cdc' ); ?></a></li>
     </ul>
-    
-    <?php
-      
-      }
-      
-    ?>
+
   </div>
 </aside>

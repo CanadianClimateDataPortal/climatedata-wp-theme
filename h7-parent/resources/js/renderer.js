@@ -125,294 +125,247 @@
           
           var units = JSON.parse(container.attr('data-chart-units'));
           
-          //console.log(units.label);
-          //console.log(units.value);
-          
           var varDetails = {
             units: units,
             decimals: container.attr('data-chart-decimals')
           };
           
-          //console.log(varDetails);
-          
-          timerStart = Date.now();
-  
-          midHistSeries = [];
-          rangeHistSeries = [];
-  
-          mid26Series = [];
-          range26Series = [];
-  
-          mid45Series = [];
-          range45Series = [];
-  
-          mid85Series = [];
-          range85Series = [];
-            
-          $.getJSON(
-              DATA_URL + '/get_values.php?lat=' + lat + '&lon=' + lon + '&var=' + variable + '&month=' + month,
-              function (data) {
 
-                  if (varDetails.units.value === 'kelvin') {
-                      subtractValue = k_to_c;
-                      chartUnit = " °C";
-                  } else {
-                      subtractValue = 0;
-                      chartUnit = ' ' + varDetails.units.label;
-                  }
-                  
-                  if (month === 'jan'){
-                      monthNum = 0;
-                  } else if (month === 'feb'){
-                      monthNum = 1;
-                  } else if (month === 'mar'){
-                      monthNum = 2;
-                  } else if (month === 'apr'){
-                      monthNum = 3;
-                  } else if (month === 'may'){
-                      monthNum = 4;
-                  } else if (month === 'jun'){
-                      monthNum = 5;
-                  } else if (month === 'jul'){
-                      monthNum = 6;
-                  } else if (month === 'aug'){
-                      monthNum = 7;
-                  } else if (month === 'sep'){
-                      monthNum = 8;
-                  } else if (month === 'oct'){
-                      monthNum = 9;
-                  } else if (month === 'nov'){
-                      monthNum = 10;
-                  } else if (month === 'dec'){
-                      monthNum = 11;
-                  } else {
-                      monthNum = 0
-                  }
   
-                  for (var i = 0; i < data.length; i++) {
-                    
-                      chartDecimals = varDetails['decimals'];
-  
-                      data[i][0] = parseFloat((data[i][0] - subtractValue).toFixed(2));
-                      data[i][1] = parseFloat((data[i][1] - subtractValue).toFixed(2));
-                      data[i][2] = parseFloat((data[i][2] - subtractValue).toFixed(2));
-  
-                      data[i][3] = parseFloat((data[i][3] - subtractValue).toFixed(2));
-                      data[i][4] = parseFloat((data[i][4] - subtractValue).toFixed(2));
-                      data[i][5] = parseFloat((data[i][5] - subtractValue).toFixed(2));
-  
-                      data[i][6] = parseFloat((data[i][6] - subtractValue).toFixed(2));
-                      data[i][7] = parseFloat((data[i][7] - subtractValue).toFixed(2));
-                      data[i][8] = parseFloat((data[i][8] - subtractValue).toFixed(2));
-  
-                      data[i][9] = parseFloat((data[i][0]).toFixed(2));
-                      data[i][10] = parseFloat((data[i][1]).toFixed(2));
-                      data[i][11] = parseFloat((data[i][2]).toFixed(2));
-  
-                      if (i < 56) {
-                          rangeHistSeries.push([Date.UTC(1950 + i, monthNum, 1), data[i][9], data[i][11]]);
-                          midHistSeries.push([Date.UTC(1950 + i, monthNum, 1), data[i][10]])
-                      }
-                      // had to add limiter since annual values spit out a null set at the end.
-                      if (i > 54 && i < 150) {
-  
-                          range26Series.push([Date.UTC(1950 + i, monthNum, 1), data[i][0], data[i][2]]);
-                          mid26Series.push([Date.UTC(1950 + i, monthNum, 1), data[i][1]]);
-                          range45Series.push([Date.UTC(1950 + i, monthNum, 1), data[i][3], data[i][5]]);
-                          mid45Series.push([Date.UTC(1950 + i, monthNum, 1), data[i][4]]);
-                          range85Series.push([Date.UTC(1950 + i, monthNum, 1), data[i][6], data[i][8]]);
-                          mid85Series.push([Date.UTC(1950 + i, monthNum, 1), data[i][7]]);
-                      }
-                  }
-  
-  
-                  var chart = Highcharts.stockChart(container.find('.chart-placeholder')[0], {
-                      
-/*
-                      title: {
-                          text: varDetails['title']
-                      },
-*/
-                      subtitle: {
-                          align: 'left',
-                          text: document.ontouchstart === undefined ?
-                              chart_labels.click_to_zoom : 'Pinch the chart to zoom in'
-                      },
-  
-                      xAxis: {
-                          type: 'datetime'
-                      },
-  
-                      yAxis: {
-                          title: {
-                              text: varDetails['title']
-                          },
-                          
-                          labels: {
-                              formatter: function () {
-                                  return this.axis.defaultLabelFormatter.call(this) + chartUnit;
-                              }
-                          }
-                      },
-                      
-                      legend: {
-                        enabled: true
-                      },
-  
-                      tooltip: {
-                        valueDecimals: chartDecimals,
-                        valueSuffix: chartUnit
-                      },
-                      
-                      navigation: {
-                        buttonOptions: {
-                          enabled: false
-                        }
-                      },
-                      
-                      series: [{
-                          name: chart_labels.historical,
-                          data: midHistSeries,
-                          zIndex: 1,
-                          showInNavigator: true,
-                          color: '#000000',
-                          marker: {
-                              fillColor: '#000000',
-                              lineWidth: 0,
-                              radius: 0,
-                              lineColor: '#000000'
-                          }
-                      }, {
-                          name: chart_labels.historical_range,
-                          data: rangeHistSeries,
-                          type: 'arearange',
-                          lineWidth: 0,
-                          linkedTo: ':previous',
-                          color: '#000000',
-                          fillOpacity: 0.2,
-                          zIndex: 0,
-                          marker: {
-                              radius: 0,
-                              enabled: false
-                          },
-                      }, {
-                          name: chart_labels.rcp_26_median,
-                          data: mid26Series,
-                          zIndex: 1,
-                          showInNavigator: true,
-                          color: '#00F',
-                          marker: {
-                              fillColor: '#00F',
-                              lineWidth: 0,
-                              radius: 0,
-                              lineColor: '#00F'
-                          }
-                      }, {
-                          name: chart_labels.rcp_26_range,
-                          data: range26Series,
-                          type: 'arearange',
-                          lineWidth: 0,
-                          linkedTo: ':previous',
-                          color: '#00F',
-                          fillOpacity: 0.2,
-                          zIndex: 0,
-                          marker: {
-                              radius: 0,
-                              enabled: false
-                          },
-                      }, {
-                          name: chart_labels.rcp_45_median,
-                          data: mid45Series,
-                          zIndex: 1,
-                          showInNavigator: true,
-                          color: '#00640c',
-                          marker: {
-                              fillColor: '#00640c',
-                              lineWidth: 0,
-                              radius: 0,
-                              lineColor: '#00640c'
-                          }
-                      }, {
-                          name: chart_labels.rcp_45_range,
-                          data: range45Series,
-                          type: 'arearange',
-                          lineWidth: 0,
-                          linkedTo: ':previous',
-                          color: '#00640c',
-                          fillOpacity: 0.2,
-                          zIndex: 0,
-                          marker: {
-                              radius: 0,
-                              enabled: false
-                          }
-                      }, {
-                          name: chart_labels.rcp_85_median,
-                          data: mid85Series,
-                          zIndex: 1,
-                          showInNavigator: true,
-                          color: '#F00',
-                          marker: {
-                              fillColor: '#F00',
-                              lineWidth: 0,
-                              radius: 0,
-                              lineColor: '#F00'
-                          }
-                      }, {
-                          name: chart_labels.rcp_85_range,
-                          data: range85Series,
-                          type: 'arearange',
-                          lineWidth: 0,
-                          linkedTo: ':previous',
-                          color: '#F00',
-                          fillOpacity: 0.2,
-                          zIndex: 0,
-                          marker: {
-                              radius: 0,
-                              enabled: false
-                          }
-                      }]
-                  });
-                  
-                  //console.log(chart);
-                  
-                  $('.chart-export-data').click(function (e) {
-                    e.preventDefault();
-                    
-                    var dl_type = '';
-                    
-                    switch ($(this).attr('data-type')) {
-                      case 'csv' : 
-                        //chart.downloadCSV();
-                        
-                        window.open("data:text/csv;charset=utf-8," + escape(chart.getCSV()));
-                        
-                        break;
+
+
+            $.getJSON(DATA_URL + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
+                function (data) {
+
+                    chartUnit = varDetails.units.value === 'kelvin' ? '°C' : ' ' + varDetails.units.label;
+                    chartDecimals = varDetails['decimals'];
+
+                    switch (varDetails.units.value) {
+                        case 'doy':
+                            formatter = function () {return new Date(1546300800000+1000*60*60*24*this.value).toLocaleDateString(current_lang, { month:'long', day:'numeric'})};
+                            pointFormatter = function (format) {
+                                if (this.series.type == 'line') {
+                                    return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name+ ': <b>'
+                                        + new Date(1546300800000+1000*60*60*24*this.y).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
+                                        + '</b><br/>';
+                                } else {
+                                    return '<span style="color:' + this.series.color + '">●</span>' + this.series.name + ': <b>'
+                                        + new Date(1546300800000+1000*60*60*24*this.low).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
+                                        + '</b> - <b>'
+                                        + new Date(1546300800000+1000*60*60*24*this.high).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
+                                        + '</b><br/>';
+                                }};
+                            break;
+                        default:
+                            formatter = function () {return this.axis.defaultLabelFormatter.call(this) + chartUnit;};
+                            pointFormatter = undefined;
                     }
-                    
-                  });
-                  
-                  $('.chart-export-img').click(function (e) {
-                    e.preventDefault();
-                    
-                    var dl_type = '';
-                    
-                    switch ($(this).attr('data-type')) {
-                      case 'png' : 
-                        dl_type = 'image/png';
-                        break;
-                      case 'pdf' :
-                        dl_type = 'application/pdf';
-                        break;
-                    }
-                    
-                    chart.exportChart({
-                      type: dl_type
+
+                    chartSeries = [];
+                    if (data['observations'].length > 0)
+                        chartSeries.push({
+                            name: chart_labels.observation,
+                            data: data['observations'],
+                            zIndex: 1,
+                            showInNavigator: true,
+                            color: '#F47D23',
+                            visible: false,
+                            marker: {
+                                fillColor: '#F47D23',
+                                lineWidth: 0,
+                                radius: 0,
+                                lineColor: '#F47D23'
+                            }});
+                    if (data['modeled_historical_median'].length > 0)
+                        chartSeries.push({
+                            name: chart_labels.historical,
+                            data: data['modeled_historical_median'],
+                            zIndex: 1,
+                            showInNavigator: true,
+                            color: '#000000',
+                            marker: {
+                                fillColor: '#000000',
+                                lineWidth: 0,
+                                radius: 0,
+                                lineColor: '#000000'
+                            }});
+                    if (data['modeled_historical_range'].length > 0)
+                        chartSeries.push({
+                            name: chart_labels.historical_range,
+                            data: data['modeled_historical_range'],
+                            type: 'arearange',
+                            lineWidth: 0,
+                            linkedTo: ':previous',
+                            color: '#000000',
+                            fillOpacity: 0.2,
+                            zIndex: 0,
+                            marker: {
+                                radius: 0,
+                                enabled: false
+                            }});
+                    if (data['rcp26_median'].length > 0)
+                        chartSeries.push({
+                            name: chart_labels.rcp_26_median,
+                            data: data['rcp26_median'],
+                            zIndex: 1,
+                            showInNavigator: true,
+                            color: '#00F',
+                            marker: {
+                                fillColor: '#00F',
+                                lineWidth: 0,
+                                radius: 0,
+                                lineColor: '#00F'
+                            }});
+                    if (data['rcp26_range'].length > 0)
+                        chartSeries.push({
+                            name: chart_labels.rcp_26_range,
+                            data: data['rcp26_range'],
+                            type: 'arearange',
+                            lineWidth: 0,
+                            linkedTo: ':previous',
+                            color: '#00F',
+                            fillOpacity: 0.2,
+                            zIndex: 0,
+                            marker: {
+                                radius: 0,
+                                enabled: false
+                            }});
+                    if (data['rcp45_median'].length > 0)
+                        chartSeries.push({
+                            name: chart_labels.rcp_45_median,
+                            data: data['rcp45_median'],
+                            zIndex: 1,
+                            showInNavigator: true,
+                            color: '#00640c',
+                            marker: {
+                                fillColor: '#00640c',
+                                lineWidth: 0,
+                                radius: 0,
+                                lineColor: '#00640c'
+                            }});
+                    if (data['rcp45_range'].length > 0)
+                        chartSeries.push({
+                            name: chart_labels.rcp_45_range,
+                            data: data['rcp45_range'],
+                            type: 'arearange',
+                            lineWidth: 0,
+                            linkedTo: ':previous',
+                            color: '#00640c',
+                            fillOpacity: 0.2,
+                            zIndex: 0,
+                            marker: {
+                                radius: 0,
+                                enabled: false
+                            }});
+                    if (data['rcp85_median'].length > 0)
+                        chartSeries.push({
+                            name: chart_labels.rcp_85_median,
+                            data: data['rcp85_median'],
+                            zIndex: 1,
+                            showInNavigator: true,
+                            color: '#F00',
+                            marker: {
+                                fillColor: '#F00',
+                                lineWidth: 0,
+                                radius: 0,
+                                lineColor: '#F00'
+                            }});
+                    if (data['rcp85_range'].length > 0)
+                        chartSeries.push({
+                            name: chart_labels.rcp_85_range,
+                            data: data['rcp85_range'],
+                            type: 'arearange',
+                            lineWidth: 0,
+                            linkedTo: ':previous',
+                            color: '#F00',
+                            fillOpacity: 0.2,
+                            zIndex: 0,
+                            marker: {
+                                radius: 0,
+                                enabled: false
+                            }});
+                    var chart = Highcharts.stockChart(container.find('.chart-placeholder')[0], {
+                        subtitle: {
+                            align: 'left',
+                            text: document.ontouchstart === undefined ?
+                                chart_labels.click_to_zoom : 'Pinch the chart to zoom in'
+                        },
+
+                        xAxis: {
+                            type: 'datetime'
+                        },
+
+                        yAxis: {
+                            title: {
+                                text: varDetails['title']
+                            },
+
+                            labels: {
+                                align: 'left',
+                                formatter: formatter
+                            }
+                        },
+
+                        legend: {
+                            enabled: true
+                        },
+
+                        tooltip: {
+                            pointFormatter: pointFormatter,
+                            valueDecimals: chartDecimals,
+                            valueSuffix: ' ' + chartUnit
+                        },
+
+
+                        navigation: {
+                            buttonOptions: {
+                                enabled: false
+                            }
+                        },
+                        exporting: {
+                            csv: {
+                                dateFormat: '%Y-%m-%d'
+                            }
+                        },
+
+                        series: chartSeries
                     });
-                  });            
-      
-                
-              }
-          );
+
+                    $('.chart-export-data').click(function (e) {
+                        e.preventDefault();
+
+                        var dl_type = '';
+
+                        switch ($(this).attr('data-type')) {
+                            case 'csv' :
+                                chart.downloadCSV();
+                                break;
+                        }
+
+                    });
+
+                    $('.chart-export-img').click(function (e) {
+                        e.preventDefault();
+
+                        var dl_type = '';
+
+                        switch ($(this).attr('data-type')) {
+                            case 'png' :
+                                dl_type = 'image/png';
+                                break;
+                            case 'pdf' :
+                                dl_type = 'application/pdf';
+                                break;
+                        }
+
+                        chart.exportChart({
+                            type: dl_type
+                        });
+                    });
+
+
+                }
+            );
           
         }
                 

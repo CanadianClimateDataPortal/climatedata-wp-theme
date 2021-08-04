@@ -225,6 +225,7 @@ var chart_labels, legend_labels, l10n_labels;
       rcp_45_range: 'RCP 4.5 Range',
       rcp_85_median: 'RCP 8.5 Median',
       rcp_85_range: 'RCP 8.5 Range',
+      rcp_85_enhanced: 'RCP 8.5 Enhanced Scenario',
       temperature: 'Temperature',
       precipitation: 'Precipitation',
       daily_avg_temp: 'Daily Average Temperature',
@@ -253,7 +254,6 @@ var chart_labels, legend_labels, l10n_labels;
       ahccdLegendSquare: 'Temperature',
       ahccdLegendTriangle: 'Precipitation',
       ahccdLegendCircle: 'Both'
-
     };
 
     if ($('body').hasClass('lang-fr')) {
@@ -268,6 +268,7 @@ var chart_labels, legend_labels, l10n_labels;
         rcp_45_range: 'RCP 4.5 portée',
         rcp_85_median: 'RCP 8.5 médiane',
         rcp_85_range: 'RCP 8.5 portée',
+        rcp_85_enhanced: 'RCP 8.5 scénario renforcé',
         temperature: 'Température',
         precipitation: 'Précipitation',
         daily_avg_temp: 'Température quotidienne moyenne',
@@ -288,9 +289,9 @@ var chart_labels, legend_labels, l10n_labels;
         readytoprocess: 'Prêt à traiter.',        
         misc: 'Divers',        
         allbccaq: 'Toutes les variables BCCAQv2',
-        gridded_data: 'Données mailées',
+        gridded_data: 'Données maillées',
         census: 'Subdivisions de recensement',
-        health: 'Régions socio-sanitaire',
+        health: 'Régions socio-sanitaires',
         watershed: 'Bassins versants',
         ahccdLegend: 'Légende',
         ahccdLegendSquare: 'Température',
@@ -444,6 +445,12 @@ var chart_labels, legend_labels, l10n_labels;
 
     });
 
+		// close supermenu if a smooth-scroll link is clicked inside it
+
+		$('#supermenu .smooth-scroll').click(function() {
+			$('#supermenu').supermenu('hide')
+		})
+
 	  //
 	  // VENDOR
 	  //
@@ -553,7 +560,9 @@ var chart_labels, legend_labels, l10n_labels;
       //console.log('listnav');
 		}
 
-
+      if(typeof $.fn.renderer !== 'undefined' && $('.renderable').length) {
+          $(document).renderer();
+      }
     //console.log('end of child-functions');
 
   });

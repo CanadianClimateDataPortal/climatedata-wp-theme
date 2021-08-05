@@ -17,9 +17,9 @@
       <div id="download-map-ahccd" class="col-lg-9 float-left download-map"></div>
         <div class="col-3 col-lg-3 float-right" style="padding:10px">
             <h5><?php _e ( 'Legend', 'cdc' ); ?></h5>
-            <div class="row"><input type="checkbox" checked name="ahccd_filter_temp" value="T"><img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/square-blue.png" style="padding:0 10px 0 10px;"><?php _e ( 'Temperature', 'cdc' ); ?></div> <br>
-            <div class="row"><input type="checkbox" checked name="ahccd_filter_pr" value="P"><img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/triangle-blue.png" style="padding:0 10px 0 10px;"><?php _e ( 'Precipitation', 'cdc' ); ?></div><br>
-            <div class="row"><input type="checkbox" checked name="ahccd_filter_both" value="B"><img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/circle-blue.png" style="padding:0 10px 0 10px;"><?php _e ( 'Both', 'cdc' ); ?></div>
+            <div class="row"><input type="checkbox" checked name="ahccd_filter_temp" value="T"><span><img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/square-blue.png" style="padding:0 10px 0 10px;"></span><span style="font-size: 1.5em"><?php _e ( 'Temperature', 'cdc' ); ?></span></div> <br>
+            <div class="row"><input type="checkbox" checked name="ahccd_filter_pr" value="P"><span><img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/triangle-blue.png" style="padding:0 10px 0 10px;"></span><span style="font-size: 1.5em"><?php _e ( 'Precipitation', 'cdc' ); ?></span></div><br>
+            <div class="row"><input type="checkbox" checked name="ahccd_filter_both" value="B"><span><img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/circle-blue.png" style="padding:0 10px 0 10px;"></span><span style="font-size: 1.5em"><?php _e ( 'Both', 'cdc' ); ?></span></div>
         </div>
     </div>
 

@@ -5,7 +5,7 @@
 
         has_mapRight = false;
         var hosturl = geoserver_url;
-        var canadaBounds = L.latLngBounds(L.latLng(41, -141), L.latLng(83.50, -52.1));
+        var canadaBounds = L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.60, -49.9));
 
 
         var varData;
@@ -816,6 +816,7 @@
                         radius: 4,
                         fillOpacity: 0
                     }
+
                 }
             },
             bounds: canadaBounds,

@@ -178,6 +178,12 @@
                         idf_init()
                     }
 
+                } else if (ui.panel.attr('id') === 'ahccd-download') {
+
+                    if (typeof maps['ahccd'] == 'undefined') {
+                        ahccd_init()
+                    }
+
                 }
             },
             activate: function (e, ui) {
@@ -201,6 +207,12 @@
 
                     if (typeof maps['idf'] == 'undefined') {
                         idf_init()
+                    }
+
+                } else if (ui.newPanel.attr('id') === 'ahccd-download') {
+
+                    if (typeof maps['ahccd'] == 'undefined') {
+                        ahccd_init();
                     }
 
                 }
@@ -485,13 +497,11 @@
 
             if (selected_var !== 'all') {
                 $('body').addClass('spinner-on');
-                request_args = {
-                    var: selected_var,
-                    month: month,
-                    format: format,
-                    points: points
-                };
-
+                request_args= {var: selected_var,
+                               month: month,
+                               format: format,
+                               points:points};
+                
                 $.ajax({
                     method: 'POST',
                     url: data_url + '/download',
@@ -508,8 +518,7 @@
                         $('#download-result').slideDown(250);
                         $('body').removeClass('spinner-on');
 
-                    }
-                });
+                }});
             } else {
                 // call download for all matching variables and build a zip file
                 selectedTimeStepCategory = $('#download-dataset').find(':selected').data('timestep');
@@ -714,7 +723,7 @@
 
             // maps['variable'].eachLayer( function(layer) {
             //     if ( layer.myTag  &&  layer.myTag === 'gridlayer') {
-            if (pbfLayer.gridType !== curValData.grid) {
+            if (typeof pbfLayer !== 'undefined' && pbfLayer.gridType !== curValData.grid) {
                 maps['variable'].removeLayer(pbfLayer);
                 console.log("Adding Grid:" + curValData.grid);
                 addGrid(curValData.grid);
@@ -1576,7 +1585,7 @@
 
             ahccd_icons = {
                 P: L.icon({
-                    iconUrl: child_theme_dir + 'resources/app/ahccd/triangle-grey.png',
+                    iconUrl: child_theme_dir + 'resources/app/ahccd/triangle-blue.png',
                     iconSize: [15, 15],
                     iconAnchor: [7, 7]
                 }),
@@ -1586,7 +1595,7 @@
                     iconAnchor: [7, 7]
                 }),
                 T: L.icon({
-                    iconUrl: child_theme_dir + 'resources/app/ahccd/square-grey.png',
+                    iconUrl: child_theme_dir + 'resources/app/ahccd/square-blue.png',
                     iconSize: [15, 15],
                     iconAnchor: [7, 7]
                 }),
@@ -1596,7 +1605,7 @@
                     iconAnchor: [7, 7]
                 }),
                 B: L.icon({
-                    iconUrl: child_theme_dir + 'resources/app/ahccd/circle-grey.png',
+                    iconUrl: child_theme_dir + 'resources/app/ahccd/circle-blue.png',
                     iconSize: [15, 15],
                     iconAnchor: [7, 7]
                 }),
@@ -1605,24 +1614,35 @@
                     iconSize: [15, 15],
                     iconAnchor: [7, 7]
                 })
-            }
+            };
 
-
+            let ahccd_layerGroups=[];
             $.getJSON(child_theme_dir + 'resources/app/ahccd/ahccd.json', function (data) {
 
+                let ahccd_layer_cluster = L.markerClusterGroup();
 
                 ahccd_layer = L.geoJson(data, {
                     onEachFeature: function (feature, layer) {
+                        $('<option value="' + feature.properties.ID + '">' + feature.properties.Name + '</option>').appendTo('#ahccd-select');
+                        //does layerGroup already exist? if not create it and add to map
+                        var lg = ahccd_layerGroups[feature.properties.type];
 
-                        $('<option value="' + feature.properties.ID + '">' + feature.properties.Name + '</option>').appendTo('#ahccd-select')
+                        if (lg === undefined) {
+                            lg = new L.featureGroup.subGroup(ahccd_layer_cluster);
+                            //add the layer to the map
+                            lg.addTo(maps['ahccd']);
+                            //store layer
+                            ahccd_layerGroups[feature.properties.type] = lg;
+                        }
 
+                        //add the feature to the layer
+                        lg.addLayer(layer);
                     },
                     pointToLayer: function (feature, latlng) {
                         return new L.Marker(latlng, {
-                            icon: ahccd_icons[feature.properties.type]
-                        })
-
-                    }
+                                icon: ahccd_icons[feature.properties.type]
+                            });
+                        }
 
                 }).on('mouseover', function (e) {
                     e.layer.bindTooltip(e.layer.feature.properties.Name).openTooltip(e.latlng);
@@ -1648,26 +1668,25 @@
 
                     e.layer.setIcon(icon);
 
-                })
+                });
 
                 // sort options
 
-                var arr = $('#ahccd-select option').map(function (_, o) {
+                let arr = $('#ahccd-select option').map(function (_, o) {
                     return {t: $(o).text(), v: o.value};
-                }).get()
+                }).get();
 
                 arr.sort(function (o1, o2) {
                     return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0;
-                })
+                });
 
                 $('#ahccd-select option').each(function (i, o) {
                     o.value = arr[i].v
                     $(o).text(arr[i].t)
-                })
+                });
 
                 // add to map
-
-                ahccd_layer.addTo(maps['ahccd'])
+                ahccd_layer_cluster.addTo(maps['ahccd']);
 
             });
 
@@ -1704,6 +1723,14 @@
                 }
             });
 
+            $('#ahccd-download-form :checkbox').change(function () {
+                if ($(this).is(':checked')) {
+                    maps['ahccd'].addLayer(ahccd_layerGroups[$(this).val()]);
+                } else {
+                    maps['ahccd'].removeLayer(ahccd_layerGroups[$(this).val()]);
+                }
+            });
+
         }
 
         function create_map(map_var) {
@@ -1737,7 +1764,7 @@
                 pane: 'labels'
             }).addTo(maps[map_var]);
 
-            if (map_var == 'station' || map_var == 'idf') {
+            if (map_var == 'station' || map_var == 'idf' || map_var == 'ahccd') {
 
                 maps[map_var].createPane('idf');
                 maps[map_var].getPane('idf').style.zIndex = 600;

@@ -37,7 +37,7 @@ function posttype_variable() {
 		'label'                 => __( 'Variable', 'cdc-post-types' ),
 		'description'           => __( 'ClimateData.ca provides high-resolution climate data to help decision makers build a more resilient Canada.', 'cdc-post-types' ),
 		'labels'                => $labels,
-		'supports'              => array( 'title', 'editor', 'page-attributes', 'thumbnail' ),
+		'supports'              => array( 'title', 'editor', 'page-attributes', 'thumbnail', 'revisions' ),
 		'hierarchical'          => true,
 		'public'                => true,
 		'show_ui'               => true,

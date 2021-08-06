@@ -28,6 +28,9 @@
           },
           complete: function() {
             $('body').removeClass('spinner-on');
+            if (typeof collapse_init !== 'undefined' && $('.collapseomatic').length) {
+              collapse_init();
+            }
           }
         });
       }

@@ -370,6 +370,9 @@
               }
 
               ajax_html.appendTo(new_container)
+              if (typeof collapse_init !== 'undefined' && $('.collapseomatic').length) {
+                collapse_init();
+              }
 
               if (settings.position == 'right') {
                 $('<div class="overlay-close bg-primary text-white"><i class="fas fa-times"></i></div>').insertBefore(new_container);

@@ -383,6 +383,17 @@ if (function_exists('acf_add_options_page')) {
 
 }
 
+// Add sup/sub to MCE editor
+function my_mce_buttons_2( $buttons ) { 
+  /**
+   * Add in a core button that's disabled by default
+   */
+  $buttons[] = 'superscript';
+  $buttons[] = 'subscript';
+
+  return $buttons;
+}
+add_filter( 'mce_buttons_2', 'my_mce_buttons_2' );
 
 //
 

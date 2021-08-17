@@ -580,7 +580,7 @@
 
     _legend_markup: function(legendTitle, colormap) {
 
-      var labels = []
+      var labels = [];
 
       labels.push('<h6 class="legendTitle">' + legendTitle +'</h6>');
 
@@ -591,37 +591,68 @@
         first_label = first_label.replace('Days', 'Jours');
       }
 
-      labels.push('<span class="legendLabel max">' + first_label + '</span>');
 
       labels.push('<div class="legendRows">');
 
-      var min_label = '';
+        for (let i = 0; i < colormap.length; i++) {
+            unitValue = colormap[i].label;
+            unitColor = colormap[i].color;
 
-      for (let i = 0; i < colormap.length; i++) {
-        unitValue = colormap[i].label;
-        unitColor = colormap[i].color;
+            if (unitValue !== 'NaN') {
 
-        if (unitValue !== 'NaN') {
+                if (current_lang == 'fr') {
+                    unitValue = unitValue.replace('Degree Days', 'Degrés-jours');
+                    unitValue = unitValue.replace('Days', 'Jours');
+                    unitValue = unitValue.replace(' to ', ' à ');
+                }
+                style='background:' + unitColor;
 
-          if (current_lang == 'fr') {
-            unitValue = unitValue.replace('Degree Days', 'Degrés-jours');
-            unitValue = unitValue.replace('Days', 'Jours');
-          }
+                t="";
+                if (i==0) {
+                    style="; border-bottom: 10px solid " + unitColor +
+                        "; border-left: 8px solid transparent" +
+                        "; border-right: 8px solid transparent";
+                    t='<span class="legendLabel max">' + first_label + '</span>';
 
-          labels.push(
-            '<div class="legendRow">' +
-              '<div class="legendColor" style="background:' + unitColor + '"></div>' +
-              '<div class="legendUnit">' + unitValue + '</div>' +
-            '</div>'
-          );
+                    labels.push(
+                        '<div class="legendRow">' +
+                        '<span class="legendLabel max">' + unitValue + '</span>' +
+                        '<div class="legendColor" style="border-bottom: 10px solid ' + unitColor +
+                        '; border-left: 8px solid transparent; border-right: 8px solid transparent"></div>' +
+                        '<span class="legendUnit">&gt; ' + unitValue + '</span>' +
+                        '</div>'
+                    );
+                }
+                else if (i==colormap.length -1) {
+                    labels.push(
+                        '<div class="legendRow">' +
+                        '<span class="legendLabel min">' + unitValue + '</span>' +
+                        '<div class="legendColor" style="border-top: 10px solid ' + unitColor +
+                        '; border-left: 8px solid transparent; border-right: 8px solid transparent"></div>' +
+                        '<span class="legendUnit">&lt; ' + unitValue + '</span>' +
+                        '</div>');
+                } else {
+                    labels.push(
+                        '<div class="legendRow">' +
+                        '<div class="legendColor" style="' + style + '"></div>' +
+                        '<div class="legendUnit">' + unitValue + '</div>' +
+                        '</div>');
+                }
 
-          min_label = unitValue;
+            } else {
+                if (i==colormap.length -1) {
+                    labels.push(
+                        '<div class="legendRow">' +
+                        '<span class="legendLabel ">0</span>' +
+                        '<div class="legendColor" style="background:' + unitColor +'"></div>' +
+                        '<span class="legendUnit">0</span>' +
+                        '</div>');
+                }
+            }
         }
-      }
 
       labels.push('</div><!-- .legendRows -->');
 
-      labels.push('<span class="legendLabel min">' + min_label + '</span>');
 
       return labels;
 

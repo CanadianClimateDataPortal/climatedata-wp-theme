@@ -1023,7 +1023,7 @@
                         }};
                     break;
                 default:
-                    formatter = function () {return this.axis.defaultLabelFormatter.call(this) + chartUnit;};
+                    formatter = function () {return this.axis.defaultLabelFormatter.call(this) + ' ' + chartUnit;};
                     pointFormatter = undefined;
             }
 

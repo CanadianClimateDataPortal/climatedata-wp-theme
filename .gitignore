@@ -4,6 +4,7 @@ topo.json
 twentynineteen
 twentytwenty
 db.php
+local_config.php
 error_log
 .ftpconfig
 .idea

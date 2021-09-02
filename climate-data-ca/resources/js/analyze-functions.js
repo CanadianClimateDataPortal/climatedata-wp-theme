@@ -536,7 +536,7 @@
         // GA4_event Analyze_BCCAQv2_*
         function set_datalayer_for_analyze_bccaqv2(form_obj_inputs, customize_variables) {
             var analyze_bccaqv2_parameters = "";
-            customize_variables = customize_variables.toLowerCase();
+            customize_variables = ustomize_variables.toLowerCase();
 
             $.each(form_obj_inputs, function (index, value) {
                 var value_id = value.id.toLowerCase();

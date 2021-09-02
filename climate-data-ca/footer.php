@@ -8,21 +8,21 @@ if ( get_field ( 'page_feedback' ) == 1 ) {
 
 $footer_logo = get_field ( 'footer_logo', 'option' );
 
-    // TODO: GA4_event: set the right values for $GTMNGR. GTM-NJ7L4NR == climatedata3.crim.ca #GA4_event
+    // TODO: GA4_event: set the right values for $GTMNGR. GTM-NJ7L4NR == climatedata3.crim.ca
     if (isset($_SERVER['HTTP_HOST'])) {
         switch ($_SERVER['HTTP_HOST']) {
             case "climatedata.ca":
-                $UA = "UA-141104740-1";
+                $UA = "G-3330ZYEQPW";
                 $GTMNGR = "GTM-MDBWW78";
                 $DATAURL = "//data.climatedata.ca";
                 break;
-            case "donneesclimatiques.ca":
-                $UA = "UA-141104740-2";
+            case "donneesclimatiques.ca": // TODO: test values below
+                $UA = "G-VG3YFKG9GD";
                 $GTMNGR = "GTM-PNG5X95";
                 $DATAURL = "//data.climatedata.ca";
                 break;
-            case "climatedata.crim.ca":
-                $UA = "UA-141104740-3";
+            case "climatedata.crim.ca": // TODO: test values below
+                $UA = "G-HEG297WJ74";
                 $GTMNGR = "GTM-NQ7XTD5";
                 $DATAURL = "//dataclimatedata.crim.ca";
                 break;

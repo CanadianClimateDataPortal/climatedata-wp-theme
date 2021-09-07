@@ -12,17 +12,17 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
     if (isset($_SERVER['HTTP_HOST'])) {
         switch ($_SERVER['HTTP_HOST']) {
             case "climatedata.ca":
-                $UA = "G-3330ZYEQPW";
+                $UA = "UA-141104740-1";
                 $GTMNGR = "GTM-MDBWW78"; 
                 $DATAURL = "//data.climatedata.ca";
                 break;
             case "donneesclimatiques.ca": // TODO: test values below
-                $UA = "G-VG3YFKG9GD";
+                $UA = "UA-141104740-2";
                 $GTMNGR = "GTM-PNG5X95"; 
                 $DATAURL = "//data.climatedata.ca";
                 break;
             case "climatedata.crim.ca": // TODO: test values below
-                $UA = "G-HEG297WJ74";
+                $UA = "UA-141104740-3";
                 $GTMNGR = "GTM-NQ7XTD5"; 
                 $DATAURL = "//dataclimatedata.crim.ca";
                 break;

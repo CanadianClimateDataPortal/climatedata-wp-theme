@@ -8,36 +8,6 @@ if ( get_field ( 'page_feedback' ) == 1 ) {
 
 $footer_logo = get_field ( 'footer_logo', 'option' );
 
-    if (isset($_SERVER['HTTP_HOST'])) {
-        switch ($_SERVER['HTTP_HOST']) {
-            case "climatedata.ca":
-                $UA = "UA-141104740-1";
-                $DATAURL = "//data.climatedata.ca";
-                break;
-            case "donneesclimatiques.ca":
-                $UA = "UA-141104740-2";
-                $DATAURL = "//data.climatedata.ca";
-                break;
-            case "climatedata.crim.ca":
-                $UA = "UA-141104740-3";
-                $DATAURL = "//dataclimatedata.crim.ca";
-                break;
-            case "climatedata3.crim.ca":
-                $UA = "G-Y16JHP4Z3M";
-                $DATAURL = "//dataclimatedata.crim.ca";
-                break;
-            case "donneesclimatiques.crim.ca":
-            case "climatedata2.crim.ca":
-            case "donneesclimatiques2.crim.ca":
-            case "donneesclimatiques3.crim.ca":
-                $UA = "";
-                $DATAURL = "//dataclimatedata.crim.ca";
-                break;
-            default:
-                $UA = "";
-                $DATAURL = "//data.climatedata.ca";
-        }
-    }
 
 
     ?>
@@ -196,7 +166,7 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
 
       var base_href = '<?php echo $GLOBALS['vars']['site_url']; ?>';
       var L_DISABLE_3D = true;
-      var DATA_URL = '<?php echo $DATAURL;?>';
+      var DATA_URL = '<?php echo $GLOBALS['vars']['data_url']; ?>';
     </script>
 
     <?php
@@ -205,6 +175,8 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
 
     ?>
 <?php
+
+$UA = ($GLOBALS['vars']['current_lang'] == 'fr')? $GLOBALS['vars']['analytics_ua_fr']:$GLOBALS['vars']['analytics_ua_en'];
 
 if (!empty($UA)) {
 ?>

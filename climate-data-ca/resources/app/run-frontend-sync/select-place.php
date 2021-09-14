@@ -6,7 +6,13 @@ $get_sSearch = isset($_GET['q']) ? $_GET['q'] : '';
 $get_lang = isset($_GET['lang']) ? $_GET['lang'] : 'en';
 $post_draw = isset($_POST['draw']) ? $_POST['draw'] : '';
 
-if (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] == "donneesclimatiques.ca" || $_SERVER['HTTP_HOST'] == "donneesclimatiques.crim.ca" )) {
+
+// This script is not integrated with Wordpress... hard to have a better way to know in which language we are
+if (isset($_SERVER['HTTP_HOST'])
+    && ($_SERVER['HTTP_HOST'] == "donneesclimatiques.ca"
+        || $_SERVER['HTTP_HOST'] == "donneesclimatiques.crim.ca"
+        || $_SERVER['HTTP_HOST'] == "dev-fr.climatedata.ca")
+) {
     $get_lang = 'fr';
 }
 

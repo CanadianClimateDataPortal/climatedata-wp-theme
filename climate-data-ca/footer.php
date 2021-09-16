@@ -8,43 +8,6 @@ if ( get_field ( 'page_feedback' ) == 1 ) {
 
 $footer_logo = get_field ( 'footer_logo', 'option' );
 
-    // TODO: GA4_event: set the right values for $GTMNGR. GTM-NJ7L4NR == climatedata3.crim.ca
-    if (isset($_SERVER['HTTP_HOST'])) {
-        switch ($_SERVER['HTTP_HOST']) {
-            case "climatedata.ca":
-                $UA = "UA-141104740-1";
-                $GTMNGR = "GTM-MDBWW78"; 
-                $DATAURL = "//data.climatedata.ca";
-                break;
-            case "donneesclimatiques.ca": // TODO: test values below
-                $UA = "UA-141104740-2";
-                $GTMNGR = "GTM-PNG5X95"; 
-                $DATAURL = "//data.climatedata.ca";
-                break;
-            case "climatedata.crim.ca": // TODO: test values below
-                $UA = "UA-141104740-3";
-                $GTMNGR = "GTM-NQ7XTD5"; 
-                $DATAURL = "//dataclimatedata.crim.ca";
-                break;
-            case "climatedata3.crim.ca":
-                $UA = "G-Y16JHP4Z3M";
-                $GTMNGR = "GTM-NJ7L4NR"; // STAGE3 DEV
-                $DATAURL = "//dataclimatedata.crim.ca";
-                break;
-            case "donneesclimatiques.crim.ca":
-            case "climatedata2.crim.ca":
-            case "donneesclimatiques2.crim.ca":
-            case "donneesclimatiques3.crim.ca":
-                $UA = "";
-                $GTMNGR = "GTM-NJ7L4NR";
-                $DATAURL = "//dataclimatedata.crim.ca";
-                break;
-            default:
-                $UA = "";
-                $GTMNGR = "GTM-NJ7L4NR";
-                $DATAURL = "//data.climatedata.ca";
-        }
-    }
 
 
     ?>
@@ -203,7 +166,7 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
 
       var base_href = '<?php echo $GLOBALS['vars']['site_url']; ?>';
       var L_DISABLE_3D = true;
-      var DATA_URL = '<?php echo $DATAURL;?>';
+      var DATA_URL = '<?php echo $GLOBALS['vars']['data_url']; ?>';
     </script>
 
     <?php
@@ -212,6 +175,9 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
 
     ?>
 <?php
+
+$UA = ($GLOBALS['vars']['current_lang'] == 'fr')? $GLOBALS['vars']['analytics_ua_fr']:$GLOBALS['vars']['analytics_ua_en'];
+$GTMNGR = $GLOBALS['vars']['googletag_id'];
 
 if (!empty($UA)) {
 ?>

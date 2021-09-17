@@ -167,6 +167,7 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
       var base_href = '<?php echo $GLOBALS['vars']['site_url']; ?>';
       var L_DISABLE_3D = true;
       var DATA_URL = '<?php echo $GLOBALS['vars']['data_url']; ?>';
+      var PAVICS_URL = '<?php echo $GLOBALS['vars']['pavics_url']; ?>';
     </script>
 
     <?php
@@ -177,7 +178,7 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
 <?php
 
 $UA = ($GLOBALS['vars']['current_lang'] == 'fr')? $GLOBALS['vars']['analytics_ua_fr']:$GLOBALS['vars']['analytics_ua_en'];
-
+$GA_CROSS_DOMAIN = $GLOBALS['vars']['ga_cross_domain'];
 if (!empty($UA)) {
 ?>
 
@@ -186,6 +187,11 @@ if (!empty($UA)) {
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+<?php
+      if (!empty($GA_CROSS_DOMAIN)) {
+          echo "      gtag('set', 'linker', {'domains': $GA_CROSS_DOMAIN});\n";
+      }
+?>
       gtag('js', new Date());
 
       gtag('config', '<?php echo $UA;?>');

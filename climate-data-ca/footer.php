@@ -178,6 +178,7 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
 
 $UA = ($GLOBALS['vars']['current_lang'] == 'fr')? $GLOBALS['vars']['analytics_ua_fr']:$GLOBALS['vars']['analytics_ua_en'];
 $GTMNGR = $GLOBALS['vars']['googletag_id'];
+$GA_CROSS_DOMAIN = $GLOBALS['vars']['ga_cross_domain'];
 
 if (!empty($UA)) {
 ?>
@@ -187,6 +188,11 @@ if (!empty($UA)) {
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+<?php
+      if (!empty($GA_CROSS_DOMAIN)) {
+          echo "      gtag('set', 'linker', {'domains': $GA_CROSS_DOMAIN});\n";
+      }
+?>
       gtag('js', new Date());
 
       gtag('config', '<?php echo $UA;?>');

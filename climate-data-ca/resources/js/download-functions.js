@@ -922,7 +922,7 @@
                         }
 
                         var request = $.ajax({
-                            url: 'https://pavics.climatedata.ca/providers/finch/processes/subset_ensemble_BCCAQv2/jobs',
+                            url: PAVICS_URL + '/providers/finch/processes/subset_ensemble_BCCAQv2/jobs',
                             method: 'POST',
                             crossDomain: true,
                             headers: {

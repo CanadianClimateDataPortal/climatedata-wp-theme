@@ -8,6 +8,43 @@ if ( get_field ( 'page_feedback' ) == 1 ) {
 
 $footer_logo = get_field ( 'footer_logo', 'option' );
 
+    // TODO: GA4_event: set the right values for $GTMNGR. GTM-NJ7L4NR == climatedata3.crim.ca
+    if (isset($_SERVER['HTTP_HOST'])) {
+        switch ($_SERVER['HTTP_HOST']) {
+            case "climatedata.ca":
+                $UA = "UA-141104740-1";
+                $GTMNGR = "GTM-MDBWW78";
+                $DATAURL = "//data.climatedata.ca";
+                break;
+            case "donneesclimatiques.ca": // TODO: test values below
+                $UA = "UA-141104740-2";
+                $GTMNGR = "GTM-PNG5X95";
+                $DATAURL = "//data.climatedata.ca";
+                break;
+            case "climatedata.crim.ca": // TODO: test values below
+                $UA = "UA-141104740-3";
+                $GTMNGR = "GTM-NQ7XTD5";
+                $DATAURL = "//dataclimatedata.crim.ca";
+                break;
+            case "climatedata3.crim.ca":
+                $UA = "G-Y16JHP4Z3M";
+                $GTMNGR = "GTM-NJ7L4NR"; // STAGE3 DEV
+                $DATAURL = "//dataclimatedata.crim.ca";
+                break;
+            case "donneesclimatiques.crim.ca":
+            case "climatedata2.crim.ca":
+            case "donneesclimatiques2.crim.ca":
+            case "donneesclimatiques3.crim.ca":
+                $UA = "";
+                $GTMNGR = "GTM-NJ7L4NR";
+                $DATAURL = "//dataclimatedata.crim.ca";
+                break;
+            default:
+                $UA = "";
+                $GTMNGR = "GTM-NJ7L4NR";
+                $DATAURL = "//data.climatedata.ca";
+        }
+    }
 
 
     ?>
@@ -167,6 +204,7 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
       var base_href = '<?php echo $GLOBALS['vars']['site_url']; ?>';
       var L_DISABLE_3D = true;
       var DATA_URL = '<?php echo $GLOBALS['vars']['data_url']; ?>';
+      var PAVICS_URL = '<?php echo $GLOBALS['vars']['pavics_url']; ?>';
     </script>
 
     <?php
@@ -204,12 +242,12 @@ if (!empty($UA)) {
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','<?php echo $GTMNGR;?>');</script>  
+    })(window,document,'script','dataLayer','<?php echo $GTMNGR;?>');</script>
     <!-- End Google Tag Manager -->
 
     <!-- TODO: Additionally, paste this code immediately after the opening <body> tag: -->
     <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id='<?php echo $GTMNGR;?>'" 
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id='<?php echo $GTMNGR;?>'"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
 

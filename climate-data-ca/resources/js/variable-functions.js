@@ -1173,7 +1173,7 @@
                     };
                     break;
                 default:
-                    formatter = function () { return this.axis.defaultLabelFormatter.call(this) + chartUnit; };
+                    formatter = function () { return this.axis.defaultLabelFormatter.call(this) + ' ' + chartUnit; };
                     pointFormatter = undefined;
             }
 
@@ -2762,7 +2762,7 @@
 
 
         function buildFilterMenu() {
-            getVarData(function (data) {
+            getVarData(function(data) {
                 queryVar = getQueryVariable('var');
 
                 varID = $('#var').val();
@@ -2809,350 +2809,269 @@
                             $('#optgroup_' + sv.variable_type).append(varnewOption);
                         }
 
+                    }
+
+                    if (sv.var_name === varID) {
+                        selectedSector = getQueryVariable('sector');
+                        if (!selectedSector) {
+                            selectedSector = 'gridded_data';
+                        }
+
+                        $('#sector').empty();
+                        $.each(sv.availability, function (k, v) {
 
 
-                        if (sv.var_name === varID) {
-                            selectedSector = getQueryVariable('sector');
-                            if (!selectedSector) {
-                                selectedSector = 'gridded_data';
-                            }
-
-                            $('#sector').empty();
-                            $.each(sv.availability, function (k, v) {
-
-
-                                if (selectedSector === v) {
-                                    defaultSelectedSector = true;
-                                } else {
-                                    defaultSelectedSector = false;
-                                }
-
-                                if (v === 'gridded_data') {
-                                    var newOption = new Option(l10n_labels[v], '', defaultSelectedSector, defaultSelectedSector);
-                                } else {
-                                    var newOption = new Option(l10n_labels[v], v, defaultSelectedSector, defaultSelectedSector);
-                                }
-
-
-
-                                $('#sector').append(newOption);
-                            });
-
-
-                            var_value = $("#var").val();
-                            dec_value = $("#decade").val();
-
-                            updated_slider_values = [];
-
-                            //console.log('sv.time_slider_max_value');
-                            //console.log(sv);
-
-                            tsmax = parseInt(sv.time_slider_max_value);
-                            tsmin = parseInt(sv.time_slider_min_value);
-                            tsdef = parseInt(sv.time_slider_default_value);
-                            tsint = parseInt(sv.time_slider_interval);
-
-                            z = 0;
-
-                            for (i = tsmin; i <= tsmax; i += 10) {
-
-                                $('#rcp').append(rcpDropGroup);
-
-                                getRCPvar = getQueryVariable('rcp');
-
-                                // check to see if comparing exists on sector load
-                                if (getRCPvar.length > 5 && selectedSector !== 'gridded_data') {
-                                    // since comparison value is comparing, get new default from first 5 chars
-                                    firstRCP = getRCPvar.slice(0, 5);
-                                    // set default to best option available from compare value.
-                                    $('#rcp option[value=' + firstRCP + ']').attr('selected', 'selected');
-                                    // update url with new default
-                                    update_param('rcp', firstRCP);
-                                    // remove compare since no longer comparing
-                                    $('body').removeClass('map-compare');
-                                    // tell leaflet about changes
-                                    invalidate_maps();
-                                } else {
-                                    // update selected value of newly generated rcp list
-                                    $('#rcp option[value=' + getRCPvar + ']').attr('selected', 'selected');
-                                }
-
-
-                                if (i === parseInt(dec_value)) {
-                                    newfrom = z;
-                                }
-                                z += 1;
-                            }
-
-                            //console.log("newfrom");
-                            //console.log(newfrom);
-                            //console.log(updated_slider_values);
-
-
-                            rs_instance.update({
-                                values: updated_slider_values,
-                                min: tsmin,
-                                max: tsmax,
-                                from: newfrom,
-                                to: tsmax,
-                                step: tsint,
-                            });
-
-                            var $rs = $("#range-slider");
-
-                            //console.log('slider updated');
-                            //console.log(sv.time_slider_min_value,sv.time_slider_max_value,sv.time_slider_default_value,sv.time_slider_max_value,sv.time_slider_interval);
-
-                            if ((selectedSector === 'gridded_data') && $.inArray('gridded_data', sv.availability) !== -1) {
-                                replaceGrid(sv.grid, gridLayer_options);
-                            }
-
-                            acfTimeStep = sv.timestep;
-
-                            $('#mora').empty();
-                            $('#rcp').empty();
-
-                            if (selectedSector === 'gridded_data') {
-                                rcpDropGroup = '<option value="rcp26">RCP 2.6</option> ' +
-                                    '<option value="rcp26vs45">RCP 2.6 vs RCP 4.5</option> ' +
-                                    '<option value="rcp26vs85">RCP 2.6 vs RCP 8.5</option> ' +
-                                    '<option value="rcp45">RCP 4.5</option> ' +
-                                    '<option value="rcp45vs26">RCP 4.5 vs RCP 2.6</option> ' +
-                                    '<option value="rcp45vs85">RCP 4.5 vs RCP 8.5</option> ' +
-                                    '<option value="rcp85">RCP 8.5</option> ' +
-                                    '<option value="rcp85vs26">RCP 8.5 vs RCP 2.6</option> ' +
-                                    '<option value="rcp85vs45">RCP 8.5 vs RCP 4.5</option>';
+                            if (selectedSector === v) {
+                                defaultSelectedSector = true;
                             } else {
-                                rcpDropGroup = '<option value="rcp26">RCP 2.6</option> ' +
-                                    '<option value="rcp45">RCP 4.5</option> ' +
-                                    '<option value="rcp85">RCP 8.5</option>';
+                                defaultSelectedSector = false;
                             }
 
+                            if (v === 'gridded_data'){
+                                var newOption = new Option(l10n_labels[v], '', defaultSelectedSector, defaultSelectedSector);
+                            } else {
+                                var newOption = new Option(l10n_labels[v], v, defaultSelectedSector, defaultSelectedSector);
+                            }
+
+
+
+                            $('#sector').append(newOption);
+                        });
+
+
+                        var_value = $("#var").val();
+                        dec_value = $("#decade").val();
+
+                        updated_slider_values = [];
+
+                        //console.log('sv.time_slider_max_value');
+                        //console.log(sv);
+
+                        tsmax = parseInt(sv.time_slider_max_value);
+                        tsmin = parseInt(sv.time_slider_min_value);
+                        tsdef = parseInt(sv.time_slider_default_value);
+                        tsint = parseInt(sv.time_slider_interval);
+
+                        z = 0;
+
+                        for (i = tsmin; i <= tsmax; i += 10) {
 
                             updated_slider_values.push(i + 1 + '-' + (i + tsint));
 
 
-                            // doo the timesets
+                            if (i === parseInt(dec_value)) {
+                                newfrom = z;
+                            }
+                            z += 1;
+                        }
 
-                            if (acfTimeStep.includes("annual")) {
-                                // if ($('#mora').find("option[value='2qsapr']").length) {
-                                //     console.log('Quarterly Already Exist');
-                                // } else {
-                                // Create a DOM Option and pre-select by default
+                        //console.log("newfrom");
+                        //console.log(newfrom);
+                        //console.log(updated_slider_values);
 
-                                if (current_lang === 'fr') {
-                                    var newOption = new Option('Annuel', 'ann', false, false);
-                                } else {
-                                    var newOption = new Option('Annual', 'ann', false, false);
-                                }
 
-                                $('#mora').append(newOption);
-                                // }
-                                if (moraval === 'ann') {
+                        rs_instance.update({
+                            values: updated_slider_values,
+                            min: tsmin,
+                            max: tsmax,
+                            from: newfrom,
+                            to: tsmax,
+                            step: tsint,
+                        });
 
-                                    //$("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                                    //$("#mora").val(moraval).prop('selected', true);
-                                }
+                        var $rs = $("#range-slider");
+
+                        //console.log('slider updated');
+                        //console.log(sv.time_slider_min_value,sv.time_slider_max_value,sv.time_slider_default_value,sv.time_slider_max_value,sv.time_slider_interval);
+
+                        if ((selectedSector === 'gridded_data') && $.inArray('gridded_data', sv.availability) !== -1) {
+                            replaceGrid(sv.grid, gridLayer_options);
+                        }
+
+                        acfTimeStep = sv.timestep;
+
+                        $('#mora').empty();
+                        $('#rcp').empty();
+
+                        if (selectedSector === 'gridded_data') {
+                            rcpDropGroup = '<option value="rcp26">RCP 2.6</option> ' +
+                                '<option value="rcp26vs45">RCP 2.6 vs RCP 4.5</option> ' +
+                                '<option value="rcp26vs85">RCP 2.6 vs RCP 8.5</option> ' +
+                                '<option value="rcp45">RCP 4.5</option> ' +
+                                '<option value="rcp45vs26">RCP 4.5 vs RCP 2.6</option> ' +
+                                '<option value="rcp45vs85">RCP 4.5 vs RCP 8.5</option> ' +
+                                '<option value="rcp85">RCP 8.5</option> ' +
+                                '<option value="rcp85vs26">RCP 8.5 vs RCP 2.6</option> ' +
+                                '<option value="rcp85vs45">RCP 8.5 vs RCP 4.5</option>';
+                        } else {
+                            rcpDropGroup = '<option value="rcp26">RCP 2.6</option> ' +
+                                '<option value="rcp45">RCP 4.5</option> ' +
+                                '<option value="rcp85">RCP 8.5</option>';
+                        }
+
+
+                        $('#rcp').append(rcpDropGroup);
+
+                        getRCPvar = getQueryVariable('rcp');
+
+                        // check to see if comparing exists on sector load
+                        if (getRCPvar.length > 5 && selectedSector !== 'gridded_data') {
+                            // since comparison value is comparing, get new default from first 5 chars
+                            firstRCP = getRCPvar.slice(0,5);
+                            // set default to best option available from compare value.
+                            $('#rcp option[value='+firstRCP+']').attr('selected','selected');
+                            // update url with new default
+                            update_param('rcp', firstRCP);
+                            // remove compare since no longer comparing
+                            $('body').removeClass('map-compare');
+                            // tell leaflet about changes
+                            invalidate_maps();
+                        } else {
+                            // update selected value of newly generated rcp list
+                            $('#rcp option[value='+getRCPvar+']').attr('selected','selected');
+                        }
+
+
+                        // doo the timesets
+
+                        if (acfTimeStep.includes("annual")) {
+                            // if ($('#mora').find("option[value='2qsapr']").length) {
+                            //     console.log('Quarterly Already Exist');
+                            // } else {
+                            // Create a DOM Option and pre-select by default
+
+                            if (current_lang === 'fr') {
+                                var newOption = new Option('Annuel', 'ann', false, false);
+                            } else {
+                                var newOption = new Option('Annual', 'ann', false, false);
                             }
 
-                            if (acfTimeStep.includes("monthly")) {
+                            $('#mora').append(newOption);
+                            // }
+                            if (moraval === 'ann') {
 
-                                if (current_lang === 'fr') {
+                                //$("#mora").val(moraval).prop('selected', true).trigger('change.select2');
+                                //$("#mora").val(moraval).prop('selected', true);
+                            }
+                        }
 
-                                    var moptgroup = "<optgroup label='Mensuel'>";
-                                    moptgroup += "<option value='jan'>Janv.</option>";
-                                    moptgroup += "<option value='feb'>Févr.</option>";
-                                    moptgroup += "<option value='mar'>Mars</option>";
-                                    moptgroup += "<option value='apr'>Avr.</option>";
-                                    moptgroup += "<option value='may'>Mai</option>";
-                                    moptgroup += "<option value='jun'>Juin</option>";
-                                    moptgroup += "<option value='jul'>Juil.</option>";
-                                    moptgroup += "<option value='aug'>Août</option>";
-                                    moptgroup += "<option value='sep'>Sept.</option>";
-                                    moptgroup += "<option value='oct'>Oct.</option>";
-                                    moptgroup += "<option value='nov'>Nov.</option>";
-                                    moptgroup += "<option value='dec'>Déc.</option>";
-                                    moptgroup += "</optgroup>";
-                                    $('#mora').append(moptgroup);
+                        if (acfTimeStep.includes("monthly")) {
 
-                                    if (!acfTimeStep.includes("annual") && moraval === 'ann') {
-                                        $('#mora option:eq(0)').prop('selected', true).trigger('change.select2');
-                                        update_param('mora', 'jan');
-                                        update_query_string();
-                                    }
+                            if (current_lang === 'fr') {
 
-                                    //
-                                    // update_param('mora', moraval);
-                                    // update_query_string();
+                                var moptgroup = "<optgroup label='Mensuel'>";
+                                moptgroup += "<option value='jan'>Janv.</option>";
+                                moptgroup += "<option value='feb'>Févr.</option>";
+                                moptgroup += "<option value='mar'>Mars</option>";
+                                moptgroup += "<option value='apr'>Avr.</option>";
+                                moptgroup += "<option value='may'>Mai</option>";
+                                moptgroup += "<option value='jun'>Juin</option>";
+                                moptgroup += "<option value='jul'>Juil.</option>";
+                                moptgroup += "<option value='aug'>Août</option>";
+                                moptgroup += "<option value='sep'>Sept.</option>";
+                                moptgroup += "<option value='oct'>Oct.</option>";
+                                moptgroup += "<option value='nov'>Nov.</option>";
+                                moptgroup += "<option value='dec'>Déc.</option>";
+                                moptgroup += "</optgroup>";
+                                $('#mora').append(moptgroup);
 
-                                }
-
-                                var months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
-                                if (months.includes(moraval)) {
-                                    // $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                                    $("#mora").val(moraval).prop('selected', true);
-                                }
+                            } else {
+                                var moptgroup = "<optgroup label='Monthly'>";
+                                moptgroup += "<option value='jan'>January</option>";
+                                moptgroup += "<option value='feb'>February</option>";
+                                moptgroup += "<option value='mar'>March</option>";
+                                moptgroup += "<option value='apr'>April</option>";
+                                moptgroup += "<option value='may'>May</option>";
+                                moptgroup += "<option value='jun'>June</option>";
+                                moptgroup += "<option value='jul'>July</option>";
+                                moptgroup += "<option value='aug'>August</option>";
+                                moptgroup += "<option value='sep'>September</option>";
+                                moptgroup += "<option value='oct'>October</option>";
+                                moptgroup += "<option value='nov'>November</option>";
+                                moptgroup += "<option value='dec'>December</option>";
+                                moptgroup += "</optgroup>";
+                                $('#mora').append(moptgroup);
 
                             }
 
-                            if (acfTimeStep.includes("qsdec")) {
-
-                                // check to see if comparing exists on sector load
-                                if (getRCPvar.length > 5 && selectedSector !== 'gridded_data') {
-                                    // since comparison value is comparing, get new default from first 5 chars
-                                    firstRCP = getRCPvar.slice(0, 5);
-                                    // set default to best option available from compare value.
-                                    $('#rcp option[value=' + firstRCP + ']').attr('selected', 'selected');
-                                    // update url with new default
-                                    update_param('rcp', firstRCP);
-                                    // remove compare since no longer comparing
-                                    $('body').removeClass('map-compare');
-                                    // tell leaflet about changes
-                                    invalidate_maps();
-                                } else {
-                                    // update selected value of newly generated rcp list
-                                    $('#rcp option[value=' + getRCPvar + ']').attr('selected', 'selected');
-                                }
-
-
-                                // buildDropdownfromVarID(var_value);
-
-                                var seasons = ["spring", "summer", "fall", "winter"];
-                                if (seasons.includes(moraval)) {
-                                    $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                                }
-
-                            }
-
-                            if (acfTimeStep.includes("2qsapr")) {
-                                // if ($('#mora').find("option[value='2qsapr']").length) {
-                                //     console.log('Quarterly Already Exist');
-                                // } else {
-                                // Create a DOM Option and pre-select by default
-
-
-                                if (acfTimeStep.includes("monthly")) {
-
-                                    if (current_lang === 'fr') {
-
-                                        var moptgroup = "<optgroup label='Mensuel'>";
-                                        moptgroup += "<option value='jan'>Janv.</option>";
-                                        moptgroup += "<option value='feb'>Févr.</option>";
-                                        moptgroup += "<option value='mar'>Mars</option>";
-                                        moptgroup += "<option value='apr'>Avr.</option>";
-                                        moptgroup += "<option value='may'>Mai</option>";
-                                        moptgroup += "<option value='jun'>Juin</option>";
-                                        moptgroup += "<option value='jul'>Juil.</option>";
-                                        moptgroup += "<option value='aug'>Août</option>";
-                                        moptgroup += "<option value='sep'>Sept.</option>";
-                                        moptgroup += "<option value='oct'>Oct.</option>";
-                                        moptgroup += "<option value='nov'>Nov.</option>";
-                                        moptgroup += "<option value='dec'>Déc.</option>";
-                                        moptgroup += "</optgroup>";
-                                        $('#mora').append(moptgroup);
-
-                                    } else {
-                                        var moptgroup = "<optgroup label='Monthly'>";
-                                        moptgroup += "<option value='jan'>January</option>";
-                                        moptgroup += "<option value='feb'>February</option>";
-                                        moptgroup += "<option value='mar'>March</option>";
-                                        moptgroup += "<option value='apr'>April</option>";
-                                        moptgroup += "<option value='may'>May</option>";
-                                        moptgroup += "<option value='jun'>June</option>";
-                                        moptgroup += "<option value='jul'>July</option>";
-                                        moptgroup += "<option value='aug'>August</option>";
-                                        moptgroup += "<option value='sep'>September</option>";
-                                        moptgroup += "<option value='oct'>October</option>";
-                                        moptgroup += "<option value='nov'>November</option>";
-                                        moptgroup += "<option value='dec'>December</option>";
-                                        moptgroup += "</optgroup>";
-                                        $('#mora').append(moptgroup);
-
-                                        moraval = getQueryVariable('mora')
-
-                                        // $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                                        $("#mora").val(moraval).prop('selected', true);
-                                    }
-
-                                }
-
-                                if (acfTimeStep.includes("qsdec")) {
-
-                                    if (current_lang === 'fr') {
-                                        var soptgroup = "<optgroup label='Saisonnier'>";
-                                        soptgroup += "<option value='spring'>Printemps</option>";
-                                        soptgroup += "<option value='summer'>Été</option>";
-                                        soptgroup += "<option value='fall'>Automne</option>";
-                                        soptgroup += "<option value='winter'>Hiver</option>";
-                                        soptgroup += "</optgroup>";
-                                    } else {
-                                        var soptgroup = "<optgroup label='Seasonal'>";
-                                        soptgroup += "<option value='spring'>Spring</option>";
-                                        soptgroup += "<option value='summer'>Summer</option>";
-                                        soptgroup += "<option value='fall'>Fall</option>";
-                                        soptgroup += "<option value='winter'>Winter</option>";
-                                        soptgroup += "</optgroup>";
-                                    }
-
-
-                                    $('#mora').append(soptgroup);
-
-                                    var seasons = ["spring", "summer", "fall", "winter"];
-                                    if (seasons.includes(moraval)) {
-                                        $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                                    }
-
-                                }
-
-                                if (acfTimeStep.includes("2qsapr")) {
-                                    // if ($('#mora').find("option[value='2qsapr']").length) {
-                                    //     console.log('Quarterly Already Exist');
-                                    // } else {
-                                    // Create a DOM Option and pre-select by default
-
-
-                                    if (current_lang === 'fr') {
-                                        var newOption = new Option('Avril à Septembre', '2qsapr', false, false);
-                                    } else {
-                                        var newOption = new Option('April to September', '2qsapr', false, false);
-                                    }
-
-
-                                    if (moraval === '2qsapr') {
-                                        $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                                    }
-
-                                    $('#mora').append(newOption);
-                                    // }
-                                }
-
-                                if (!acfTimeStep.includes("annual") && moraval === 'ann') {
-                                    $('#mora option:eq(0)').prop('selected', true).trigger('change.select2');
-                                    update_param('mora', 'jan');
-                                    update_query_string();
-                                }
-
-                                //
-                                // update_param('mora', moraval);
-                                // update_query_string();
-
-                                moraval = getQueryVariable('mora')
-
+                            var months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+                            if (months.includes(moraval)) {
                                 // $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                                var_value = $("#var").val();
-                                mora_value = $("#mora").val();
-                                mora_text_value = $("#mora option:selected").text();
-                                rcp_value = $("#rcp").val();
-                                decade_value = parseInt($("#decade").val());
+                                $("#mora").val(moraval).prop('selected', true);
                             }
-
-
-
 
                         }
+
+                        if (acfTimeStep.includes("qsdec")) {
+
+                            if (current_lang === 'fr') {
+                                var soptgroup = "<optgroup label='Saisonnier'>";
+                                soptgroup += "<option value='spring'>Printemps</option>";
+                                soptgroup += "<option value='summer'>Été</option>";
+                                soptgroup += "<option value='fall'>Automne</option>";
+                                soptgroup += "<option value='winter'>Hiver</option>";
+                                soptgroup += "</optgroup>";
+                            } else {
+                                var soptgroup = "<optgroup label='Seasonal'>";
+                                soptgroup += "<option value='spring'>Spring</option>";
+                                soptgroup += "<option value='summer'>Summer</option>";
+                                soptgroup += "<option value='fall'>Fall</option>";
+                                soptgroup += "<option value='winter'>Winter</option>";
+                                soptgroup += "</optgroup>";
+                            }
+
+
+                            $('#mora').append(soptgroup);
+
+                            var seasons = ["spring", "summer", "fall", "winter"];
+                            if (seasons.includes(moraval)) {
+                                $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
+                            }
+
+                        }
+
+                        if (acfTimeStep.includes("2qsapr")) {
+                            // if ($('#mora').find("option[value='2qsapr']").length) {
+                            //     console.log('Quarterly Already Exist');
+                            // } else {
+                            // Create a DOM Option and pre-select by default
+
+
+                            if (current_lang === 'fr') {
+                                var newOption = new Option('Avril à Septembre', '2qsapr', false, false);
+                            } else {
+                                var newOption = new Option('April to September', '2qsapr', false, false);
+                            }
+
+
+                            if (moraval === '2qsapr') {
+                                $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
+                            }
+
+                            $('#mora').append(newOption);
+                            // }
+                        }
+
+                        if (!acfTimeStep.includes("annual") && moraval === 'ann') {
+                            $('#mora option:eq(0)').prop('selected',true).trigger('change.select2');
+                            update_param('mora', 'jan');
+                            update_query_string();
+                        }
+
+                        //
+                        // update_param('mora', moraval);
+                        // update_query_string();
+
+                        moraval = getQueryVariable('mora')
+
+                        // $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
+                        var_value = $("#var").val();
+                        mora_value = $("#mora").val();
+                        mora_text_value = $("#mora option:selected").text();
+                        rcp_value = $("#rcp").val();
+                        decade_value = parseInt($("#decade").val());
                     }
                 });
-
             });
 
 
@@ -3202,7 +3121,7 @@
             }
             changeLayers();
 
-        };  // buildFilterMenu()
+        }  // buildFilterMenu()
 
         // MAP EVENTS
 

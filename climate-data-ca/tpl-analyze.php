@@ -171,6 +171,12 @@
                                           'values' => get_sub_field ( 'values' ),
                                           'labels' => get_sub_field ( 'labels' )
                                       );
+                                  } elseif ( get_row_layout() == 'mm_dd') {
+                                      $new_block = array (
+                                          'id' => get_sub_field ( 'id' ),
+                                          'optional' => get_sub_field ( 'optional' ),
+                                          'units' => get_sub_field ( 'units' )
+                                      );
                                   }
 
                                   $new_block['type'] = get_row_layout();

@@ -475,6 +475,18 @@
                         });
 
                         new_html += '</select>';
+                    } else if (this_input['type'] == 'mm_dd') {
+
+                        new_html += '<input ';
+                        new_html += 'type="text" ';
+                        new_html += 'class="form-control bg-transparent border-white mx-2 text-white" ';
+                        new_html += 'size="4" ';
+                        new_html += 'autocomplete="off" ';
+                        new_html += 'data-units="' + this_input['units'] + '" ';
+                        new_html += 'data-optional="' + this_input['optional'] + '" ';
+                        new_html += 'name="' + this_input['id'] + '" ';
+                        new_html += '>'
+
                     }
 
                 }
@@ -1112,14 +1124,17 @@
 
             $('#analyze-detail').find(':input').each(function () {
 
-                var this_name = $(this).attr('name')
+                var this_name = $(this).attr('name');
+                if ($(this).attr('data-optional') == undefined ||
+                    $(this).attr('data-optional') == true || $(this).val() != '') {
 
-                form_thresholds[this_name] = $(this).val()
+                    form_thresholds[this_name] = $(this).val();
 
-                if ($(this).val() != '' && $(this).attr('data-units') !== undefined && $(this).attr('data-units') != '') {
-                    form_thresholds[this_name] += ' ' + $(this).attr('data-units');
+                    if ($(this).val() != '' && $(this).attr('data-units') !== undefined && $(this).attr('data-units') != '') {
+                        form_thresholds[this_name] += ' ' + $(this).attr('data-units');
+                    }
                 }
-            })
+            });
 
             // cycle through the object and check for empty values
 
@@ -1127,7 +1142,6 @@
                 if (form_thresholds[key] == '') {
                     is_valid = false
                     thresholds_have_val = false
-                    console.log(key)
                 }
             }
 

@@ -516,15 +516,16 @@
 
             var eventType = $('#download-variable').val();
             var varName = "";
-            try { } catch (ex) {
-                alert('Audio error: ' + ex);
+            try {
+                if (variableDataTypes[eventType]) {
+                    varName = "Download_Variable-Data_BCCAQv2_" + variableDataTypes[eventType] + "_Frequency_Location_Format";
+                } else {
+                    throw ('Invalid GA4 event name (Download_Variable-Data_BCCAQv2): ' + eventType);
+                }
+            } catch (err) {
+                console.error(err);
             }
 
-            if (variableDataTypes[eventType]) {
-                varName = "Download_Variable-Data_BCCAQv2_" + variableDataTypes[eventType] + "_Frequency_Location_Format";
-            } else {
-                throw new Error('Invalid GA4 event name (Download_Variable-Data_BCCAQv2): ' + eventType);
-            }
             return varName;
         }
 
@@ -1455,8 +1456,12 @@
             var selected_stations_file_extension = 'CSV';
             if (geoFormatClassName.includes("active")) {
                 selected_stations_file_extension = 'GeoJSON';
-                if (csvFormatClassName.includes("active")) {
-                    throw new Error('ERROR: GA4_event (Download_Station-Data) file format, both (CSV, GeoJSON) are selected');
+                try {
+                    if (csvFormatClassName.includes("active")) {
+                        throw ('GA4_event (Download_Station-Data) file format, both (CSV, GeoJSON) are selected');
+                    }
+                } catch (err) {
+                    console.error(err);
                 }
             }
             // selected_stations_file_extension get text from class="csvFormat" or class="geoFomrat"

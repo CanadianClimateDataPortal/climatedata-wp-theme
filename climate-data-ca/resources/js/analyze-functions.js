@@ -540,17 +540,22 @@
 
             $.each(form_obj_inputs, function (index, value) {
                 var value_id = value.id.toLowerCase();
+                try {
+                    if (datalayer_parameters[value_id]) {
+                        analyze_bccaqv2_parameters += datalayer_parameters[value_id] + ": " + value.data + ";  ";
+                    } else {
+                        throw ('Can not get Analyze_BCCAQv2_* dataLayer parameters key: ' + value_id);
+                    }
 
-                if (datalayer_parameters[value_id]) {
-                    analyze_bccaqv2_parameters += datalayer_parameters[value_id] + ": " + value.data + ";  ";
-                } else {
-                    throw new Error('Can not get Analyze_BCCAQv2_* dataLayer parameters key: ' + value_id);
+                    if (!analyze_bccaqv2_dict[customize_variables]) {
+                        throw ('Can not get Analyze_BCCAQv2_* dataLayer event name: ' + customize_variables);
+                    }
+                } catch (err) {
+                    console.error(err);
                 }
             });
 
-            if (!analyze_bccaqv2_dict[customize_variables]) {
-                throw new Error('Can not get Analyze_BCCAQv2_* dataLayer event name: ' + customize_variables);
-            }
+
 
             analyze_bccaqv2_dict[customize_variables] = analyze_bccaqv2_dict[customize_variables].replaceAll(' ', '-');
             event_type = "Analyze_BCCAQv2_" + analyze_bccaqv2_dict[customize_variables];

@@ -1014,7 +1014,7 @@
         //
         //
 
-        var frMonthDict = { // TODO: valiadate the keys 
+        var frMonthDict = { // TODO: valiadate the keys
             'janv.': 'Janvier',
             'févr.': 'Février',
             'mars': 'Mars',
@@ -1053,13 +1053,18 @@
                 tempDict = frMonthDict;
             }
 
-            var retVal = ""
-            if (tempDict[keySelected]) {
-                retVal = tempDict[keySelected];
-            } else {
-                throw new Error('Can not get the month with this key (' + (isEng ? 'english' : 'french') + '): ' + keySelected);
+            var realMonthName = ""
+            try {
+                if (tempDict[keySelected]) {
+                    realMonthName = tempDict[keySelected];
+                } else {
+                    throw ('Can not get the month with this key (' + (isEng ? 'english' : 'french') + '): ' + keySelected);
+                }
+            } catch (err) {
+                console.error(err);
             }
-            return retVal;
+
+            return realMonthName;
         }
 
         var variableDownloadDataTypes = {
@@ -1099,19 +1104,24 @@
         function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
             var varName = "";
             keySelected = keySelected.toLowerCase();
-            if (variableDownloadDataTypes[keySelected]) {
-                var eventType = '';
-                if (chartDataFormat.includes('csv')) {
-                    eventType = "Variable_Download-Data_";
-                } else if (chartDataFormat.includes('pdf') || chartDataFormat.includes('png')) {
-                    eventType = "Variable_Download-Image_";
+            try {
+                if (variableDownloadDataTypes[keySelected]) {
+                    var eventType = '';
+                    if (chartDataFormat.includes('csv')) {
+                        eventType = "Variable_Download-Data_";
+                    } else if (chartDataFormat.includes('pdf') || chartDataFormat.includes('png')) {
+                        eventType = "Variable_Download-Image_";
+                    } else {
+                        throw ('Invalid GA4 event file format (csv, pdf, png): ' + chartDataFormat);
+                    }
+                    varName = eventType + variableDownloadDataTypes[keySelected];
                 } else {
-                    throw new Error('Invalid GA4 event file format (csv, pdf, png): ' + chartDataFormat);
+                    throw ('Invalid GA4 event name (Variable_Download-Data_*): ' + keySelected);
                 }
-                varName = eventType + variableDownloadDataTypes[keySelected];
-            } else {
-                throw new Error('Invalid GA4 event name (Variable_Download-Data_*): ' + keySelected);
+            } catch (err) {
+                console.error(err);
             }
+
             return varName;
         }
 
@@ -1131,7 +1141,7 @@
                 }
             }
 
-            // Remove last 2 char: ; 
+            // Remove last 2 char: ;
             if (addStr.length > 0) {
                 addStr = addStr.substring(0, addStr.length - 2);
             }
@@ -2762,7 +2772,7 @@
 
 
         function buildFilterMenu() {
-            getVarData(function(data) {
+            getVarData(function (data) {
                 queryVar = getQueryVariable('var');
 
                 varID = $('#var').val();
@@ -2827,7 +2837,7 @@
                                 defaultSelectedSector = false;
                             }
 
-                            if (v === 'gridded_data'){
+                            if (v === 'gridded_data') {
                                 var newOption = new Option(l10n_labels[v], '', defaultSelectedSector, defaultSelectedSector);
                             } else {
                                 var newOption = new Option(l10n_labels[v], v, defaultSelectedSector, defaultSelectedSector);
@@ -2917,9 +2927,9 @@
                         // check to see if comparing exists on sector load
                         if (getRCPvar.length > 5 && selectedSector !== 'gridded_data') {
                             // since comparison value is comparing, get new default from first 5 chars
-                            firstRCP = getRCPvar.slice(0,5);
+                            firstRCP = getRCPvar.slice(0, 5);
                             // set default to best option available from compare value.
-                            $('#rcp option[value='+firstRCP+']').attr('selected','selected');
+                            $('#rcp option[value=' + firstRCP + ']').attr('selected', 'selected');
                             // update url with new default
                             update_param('rcp', firstRCP);
                             // remove compare since no longer comparing
@@ -2928,7 +2938,7 @@
                             invalidate_maps();
                         } else {
                             // update selected value of newly generated rcp list
-                            $('#rcp option[value='+getRCPvar+']').attr('selected','selected');
+                            $('#rcp option[value=' + getRCPvar + ']').attr('selected', 'selected');
                         }
 
 
@@ -3053,7 +3063,7 @@
                         }
 
                         if (!acfTimeStep.includes("annual") && moraval === 'ann') {
-                            $('#mora option:eq(0)').prop('selected',true).trigger('change.select2');
+                            $('#mora option:eq(0)').prop('selected', true).trigger('change.select2');
                             update_param('mora', 'jan');
                             update_query_string();
                         }

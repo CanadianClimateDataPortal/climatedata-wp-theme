@@ -405,7 +405,28 @@
 
 //         input_id = $(this).find('input').
 
-                var var_content = JSON.parse($(this).closest('.input-variable').attr('data-content'))
+                let var_content = JSON.parse($(this).closest('.input-variable').attr('data-content'));
+                let var_frequencies = $(this).closest('.input-variable').attr('data-frequencies');
+
+                if (var_frequencies != '') {
+                    const frequencies = var_frequencies.split('|');
+                    $('input[name=freq]').each(function(i) {
+                       if (var_frequencies.includes($(this).val())) {
+                           $(this).attr('disabled', false);
+                        } else {
+                           let input_row = $(this).closest('.input-row');
+                           input_row.removeClass('checked');
+                           $(this).prop('checked', false);
+                           input_row.find('.form-icon').removeClass().addClass(radio_icon_off);
+                           $(this).attr('disabled', true);
+                       }
+                    });
+                } else {
+                    $('input[name=freq]').each(function(i) {
+                        $(this).attr('disabled', false);
+                    });
+                }
+
 
                 var new_html = ''
 

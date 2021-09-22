@@ -188,7 +188,7 @@
 
                         ?>
 
-                        <div class="input-row form-check input-variable" data-content='<?php echo json_encode ( $var_description ); ?>'>
+                        <div class="input-row form-check input-variable" data-frequencies='<?php the_sub_field ('frequencies'); ?>' data-content='<?php echo json_encode ( $var_description ); ?>'>
                           <div class="input-item">
                             <input class="form-check-input" type="radio" name="analyze-var" id="analyze-var-<?php the_sub_field ( 'var' ); ?>" value="<?php the_sub_field ( 'var' ); ?>">
                             <label class="form-check-label" for="analyze-var-<?php the_sub_field ( 'var' ); ?>"><?php the_sub_field ( 'name' ); ?></label>

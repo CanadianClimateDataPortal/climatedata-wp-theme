@@ -1793,9 +1793,9 @@
 
                 // sort options
 
-                var arr = $('#ahccd-select option').map(function (_, o) {
+                let arr = $('#ahccd-select option').map(function (_, o) {
                     return { t: $(o).text(), v: o.value };
-                }).get()
+                }).get();
 
                 arr.sort(function (o1, o2) {
                     return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0;

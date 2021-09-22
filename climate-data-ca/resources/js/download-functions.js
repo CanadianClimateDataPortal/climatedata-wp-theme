@@ -516,6 +516,10 @@
 
             var eventType = $('#download-variable').val();
             var varName = "";
+            try { } catch (ex) {
+                alert('Audio error: ' + ex);
+            }
+
             if (variableDataTypes[eventType]) {
                 varName = "Download_Variable-Data_BCCAQv2_" + variableDataTypes[eventType] + "_Frequency_Location_Format";
             } else {
@@ -784,7 +788,7 @@
             if (curValData === undefined) {
                 $('#download-variable').val(1).trigger('change.select2');
             }
-            if (pbfLayer.gridType !== curValData.grid) {
+            if (typeof pbfLayer !== 'undefined' && pbfLayer.gridType !== curValData.grid) {
                 maps['variable'].removeLayer(pbfLayer);
                 console.log("Adding Grid:" + curValData.grid);
                 addGrid(curValData.grid);
@@ -1065,7 +1069,7 @@
                     if (selected_stations[clicked_ID] !== undefined) {
                         delete selected_stations[clicked_ID];
                     } else {
-                        selected_stations[clicked_ID] = e.layer.feature.properties.STATION_NAME
+                        selected_stations[clicked_ID] = e.layer.feature.properties.STATION_NAME;
                     }
 
                     // default colour
@@ -1311,7 +1315,6 @@
             pointsLayer.eachLayer(function (layer) {
                 if (layer.feature.properties.STN_ID === marker_id) {
                     delete selected_stations[marker_id];
-                    check_station_form();
                     layer.setStyle({
                         // Stroke properties
                         color: '#3d68f6',
@@ -1333,7 +1336,6 @@
             pointsLayer.eachLayer(function (layer) {
                 if (layer.feature.properties.STN_ID === marker_id) {
                     selected_stations[marker_id] = layer.feature.properties.STATION_NAME;
-                    check_station_form();
                     layer.setStyle({
                         // Stroke properties
                         color: '#F00',
@@ -1418,21 +1420,21 @@
             // GA4_event
             // ex: class="42 -- DUNCAN & 1593 -- RUSSELL CREEK ; 1614 -- TWO PETE CREEK ; ..."
 
-            var ret_val = "";
+            var selected_stations = "";
             for (const key in selected_stations) {
-                ret_val += key + " -- " + selected_stations[key] + " ; ";
+                selected_stations += key + " -- " + selected_stations[key] + " ; ";
             }
 
             // Remove last char: ;
             if (Object.keys(selected_stations).length > 0) {
-                ret_val = ret_val.substring(0, ret_val.length - 3);
+                selected_stations = selected_stations.substring(0, selected_stations.length - 3);
             }
 
             if (Object.keys(selected_stations).length == 0) {
-                ret_val = " ";
+                selected_stations = " ";
             }
 
-            return ret_val;
+            return selected_stations;
             // Create <a id="station-process-data" class=" station id -- station name & ..."> for Google Analytics
             // $('#station-process-data').attr('class', class_info);
             // $('#station-process-data').removeAttr("style").hide();

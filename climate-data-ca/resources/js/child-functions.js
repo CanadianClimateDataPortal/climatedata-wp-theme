@@ -289,6 +289,8 @@ var chart_labels, legend_labels, l10n_labels;
         precipitation: 'précipitation',
         other_variables: 'autres',
         station_data: 'données des stations',
+        selectstation: 'Sélectionner au moins une station pour télécharger les données.',
+        readytoprocess: 'Prêt à traiter.',
         misc: 'Divers',
         allbccaq: 'Toutes les variables BCCAQv2',
         gridded_data: 'Données maillées',

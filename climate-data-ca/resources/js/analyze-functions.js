@@ -549,18 +549,18 @@
                 if (!analyze_bccaqv2_dict[customize_variables]) {
                     throw ('Can not get Analyze_BCCAQv2_* dataLayer event name: ' + customize_variables);
                 }
+
+                analyze_bccaqv2_dict[customize_variables] = analyze_bccaqv2_dict[customize_variables].replaceAll(' ', '-');
+                event_type = "Analyze_BCCAQv2_" + analyze_bccaqv2_dict[customize_variables];
+
+                dataLayer.push({
+                    'event': event_type,
+                    'analyze_bccaqv2_event_type': event_type,
+                    'analyze_bccaqv2_parameters': analyze_bccaqv2_parameters,
+                });
             } catch (err) {
                 console.error(err);
             }
-
-            analyze_bccaqv2_dict[customize_variables] = analyze_bccaqv2_dict[customize_variables].replaceAll(' ', '-');
-            event_type = "Analyze_BCCAQv2_" + analyze_bccaqv2_dict[customize_variables];
-
-            dataLayer.push({
-                'event': event_type,
-                'analyze_bccaqv2_event_type': event_type,
-                'analyze_bccaqv2_parameters': analyze_bccaqv2_parameters,
-            });
         }
 
         $('#analyze-process').click(function (e) {

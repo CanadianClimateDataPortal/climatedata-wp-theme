@@ -1014,20 +1014,20 @@
         //
         //
 
-        var frMonthDict = { // TODO: valiadate the keys
-            'janv.': 'Janvier',
-            'févr.': 'Février',
-            'mars': 'Mars',
-            'avr.': 'Avril',
-            'mai.': 'Mai',
-            'juin.': 'Juin',
-            'juil.': 'Juillet',
-            'août.': 'Août',
-            'sept.': 'Septembre',
-            'oct.': 'Octobre',
-            'nov.': 'Novembre',
-            'déc.': 'Décembre',
-            'ann.': 'Annuel',
+        var frMonthDict = {
+            'jan': 'Janvier',
+            'feb': 'Février',
+            'mar': 'Mars',
+            'apr': 'Avril',
+            'may': 'Mai',
+            'jun': 'Juin',
+            'jul': 'Juillet',
+            'aug': 'Août',
+            'sep': 'Septembre',
+            'oct': 'Octobre',
+            'nov': 'Novembre',
+            'dec': 'Décembre',
+            'ann': 'Annuel'
         };
 
         var engMonthDict = {
@@ -1046,19 +1046,19 @@
             'ann': 'Annual'
         };
 
-        function getRealMonthName(keySelected, isEng = true) {
+        function getRealMonthName(keySelected) {
             keySelected = keySelected.toLowerCase();
             var tempDict = engMonthDict;
-            if (!isEng) {
+            if ($('body').hasClass('lang-fr')) {
                 tempDict = frMonthDict;
             }
 
-            var realMonthName = ""
+            var realMonthName = "";
             try {
                 if (tempDict[keySelected]) {
                     realMonthName = tempDict[keySelected];
                 } else {
-                    throw ('Can not get the month with this key (' + (isEng ? 'english' : 'french') + '): ' + keySelected);
+                    throw ('Can not get the month with this key: ' + keySelected);
                 }
             } catch (err) {
                 console.error(err);

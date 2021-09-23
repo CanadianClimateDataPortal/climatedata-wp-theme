@@ -8,45 +8,6 @@ if ( get_field ( 'page_feedback' ) == 1 ) {
 
 $footer_logo = get_field ( 'footer_logo', 'option' );
 
-    // TODO: GA4_event: set the right values for $GTMNGR. GTM-NJ7L4NR == climatedata3.crim.ca
-    if (isset($_SERVER['HTTP_HOST'])) {
-        switch ($_SERVER['HTTP_HOST']) {
-            case "climatedata.ca":
-                $UA = "UA-141104740-1";
-                $GTMNGR = "GTM-MDBWW78";
-                $DATAURL = "//data.climatedata.ca";
-                break;
-            case "donneesclimatiques.ca": // TODO: test values below
-                $UA = "UA-141104740-2";
-                $GTMNGR = "GTM-PNG5X95";
-                $DATAURL = "//data.climatedata.ca";
-                break;
-            case "climatedata.crim.ca": // TODO: test values below
-                $UA = "UA-141104740-3";
-                $GTMNGR = "GTM-NQ7XTD5";
-                $DATAURL = "//dataclimatedata.crim.ca";
-                break;
-            case "climatedata3.crim.ca":
-                $UA = "G-Y16JHP4Z3M";
-                $GTMNGR = "GTM-NJ7L4NR"; // STAGE3 DEV
-                $DATAURL = "//dataclimatedata.crim.ca";
-                break;
-            case "donneesclimatiques.crim.ca":
-            case "climatedata2.crim.ca":
-            case "donneesclimatiques2.crim.ca":
-            case "donneesclimatiques3.crim.ca":
-                $UA = "";
-                $GTMNGR = "GTM-NJ7L4NR";
-                $DATAURL = "//dataclimatedata.crim.ca";
-                break;
-            default:
-                $UA = "";
-                $GTMNGR = "GTM-NJ7L4NR";
-                $DATAURL = "//data.climatedata.ca";
-        }
-    }
-
-
     ?>
 
     <footer id="main-footer">
@@ -214,6 +175,7 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
     ?>
 <?php
 
+
 $UA = ($GLOBALS['vars']['current_lang'] == 'fr')? $GLOBALS['vars']['analytics_ua_fr']:$GLOBALS['vars']['analytics_ua_en'];
 $GTMNGR = $GLOBALS['vars']['googletag_id'];
 $GA_CROSS_DOMAIN = $GLOBALS['vars']['ga_cross_domain'];
@@ -236,7 +198,6 @@ if (!empty($UA)) {
       gtag('config', '<?php echo $UA;?>');
     </script>
 
-    <!-- Paste this code as high in the <head> of the page as possible #GA4_event -->
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -245,7 +206,6 @@ if (!empty($UA)) {
     })(window,document,'script','dataLayer','<?php echo $GTMNGR;?>');</script>
     <!-- End Google Tag Manager -->
 
-    <!-- TODO: Additionally, paste this code immediately after the opening <body> tag: -->
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id='<?php echo $GTMNGR;?>'"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>

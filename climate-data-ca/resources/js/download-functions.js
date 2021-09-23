@@ -457,27 +457,6 @@
         // FORM PROCESSING
         //
 
-        // function create_class_value_with_selected_stations() {
-        //     // GA4_event
-        //     // ex: class="42 -- DUNCAN & 1593 -- RUSSELL CREEK ; 1614 -- TWO PETE CREEK ; ..."
-
-        //     var class_info = "";
-        //     for (const key in selected_stations) {
-        //         class_info += key + " -- " + selected_stations[key] + " ; ";
-        //     }
-
-        //     // Remove last char: ;
-        //     if (Object.keys(selected_stations).length > 0) {
-        //         class_info = class_info.substring(0, class_info.length - 3);
-        //     }
-
-        //     if (Object.keys(selected_stations).length == 0) {
-        //         class_info = " ";
-        //     }
-        //     // Create <a id="station-process-data" class=" station id -- station name & ..."> for Google Analytics
-        //     $('#station-process-data').attr('class', class_info);
-        //     document.getElementById('station-process-data').style.display = "none";
-        // }
         var variableDataTypes = {
             // Download_Variable-Data_BCCAQv2 ...
             'tx_max': 'Hottest-Day',
@@ -513,12 +492,13 @@
         var dataLayerEventName = "";
         var variableDataFormat = "";
         function getGA4EventNameForVariableDataBCCAQv2() {
+            var gA4EventNameForVariableDataBCCAQv2 = "";
 
-            var eventType = $('#download-variable').val();
-            var varName = "";
             try {
+                var eventType = $('#download-variable').val();
+
                 if (variableDataTypes[eventType]) {
-                    varName = "Download_Variable-Data_BCCAQv2_" + variableDataTypes[eventType] + "_Frequency_Location_Format";
+                    gA4EventNameForVariableDataBCCAQv2 = "Download_Variable-Data_BCCAQv2_" + variableDataTypes[eventType] + "_Frequency_Location_Format";
                 } else {
                     throw ('Invalid GA4 event name (Download_Variable-Data_BCCAQv2): ' + eventType);
                 }
@@ -526,7 +506,7 @@
                 console.error(err);
             }
 
-            return varName;
+            return gA4EventNameForVariableDataBCCAQv2;
         }
 
         function setDataLayerForVariableDataBCCAQv2(BCCAQv2DataLayerEventName, BCCAQv2PointsInfo, BCCAQv2FileFormat) {
@@ -1418,7 +1398,6 @@
 
         var selected_stations_to_str = '';
         function get_selected_stations() {
-            // GA4_event
             // ex: class="42 -- DUNCAN & 1593 -- RUSSELL CREEK ; 1614 -- TWO PETE CREEK ; ..."
 
             var selected_stations = "";

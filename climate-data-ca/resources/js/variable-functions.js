@@ -1068,7 +1068,7 @@
         }
 
         var variableDownloadDataTypes = {
-            // GA4_event: Variable_Download-Data_*
+            // Variable_Download-Data_*
             'tx_max': 'Hottest-Day',
             'tg_mean': 'Mean-Temperature',
             'tn_mean': 'Minimum-Temperature',
@@ -1102,7 +1102,7 @@
         };
 
         function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
-            var varName = "";
+            var gA4EventNameForVariableDownloadData = "";
             keySelected = keySelected.toLowerCase();
             try {
                 if (variableDownloadDataTypes[keySelected]) {
@@ -1114,7 +1114,7 @@
                     } else {
                         throw ('Invalid GA4 event file format (csv, pdf, png): ' + chartDataFormat);
                     }
-                    varName = eventType + variableDownloadDataTypes[keySelected];
+                    gA4EventNameForVariableDownloadData = eventType + variableDownloadDataTypes[keySelected];
                 } else {
                     throw ('Invalid GA4 event name (Variable_Download-Data_*): ' + keySelected);
                 }
@@ -1122,7 +1122,7 @@
                 console.error(err);
             }
 
-            return varName;
+            return gA4EventNameForVariableDownloadData;
         }
 
         function setDataLayerForChartData(chartDataFormat, chartData) {

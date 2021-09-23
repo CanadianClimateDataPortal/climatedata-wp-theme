@@ -7,7 +7,7 @@ const data_url = DATA_URL;
 const geoserver_url = DATA_URL;
 
 //
-// GLOBAL VARS 
+// GLOBAL VARS
 //
 
 var chart_labels, legend_labels, l10n_labels;
@@ -246,6 +246,8 @@ var chart_labels, legend_labels, l10n_labels;
       precipitation: 'precipitation',
       other_variables: 'other variables',
       station_data: 'station data',
+      selectstation: 'Select at least one station to download data.',
+      readytoprocess: 'Ready to process.',
       misc: 'Miscellaneous',
       allbccaq: 'All BCCAQv2 variables',
       gridded_data: 'Gridded data',

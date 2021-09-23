@@ -351,7 +351,6 @@ if (get_the_ID() == filtered_ID_by_path('explore/variable')) {
 
 <div id="var-filter-view" class="col-3 offset-2 p-4 align-items-center">
   <label for="sector" class="mr-3"><?php _e ( 'View by:', 'cdc' ); ?></label>
-  <!-- GA4_event -->
   <select class="custom-select variable-download-data-view_by" id="sector" name="sector">
     <option value="" selected>Gridded data</option>
     <option value="census">census</option>

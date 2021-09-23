@@ -488,7 +488,7 @@
             validate_inputs()
         })
 
-        $('body').on('input', '#_code, #analyze-email', function () {
+        $('body').on('input', '#analyze-captcha_code, #analyze-email', function () {
             validate_submit()
         })
 
@@ -527,35 +527,31 @@
             "output_format": "output format",
             // For some events
             "window": "window",
-            "tresh": "tresh", // TODO: typo to fix ?
             "thresh": "thresh",
             "thresh_tasmin": "threshold tasmin",
             "thresh_tasmax": "threshold tasmin"
         }
 
-        // GA4_event Analyze_BCCAQv2_*
         function set_datalayer_for_analyze_bccaqv2(form_obj_inputs, customize_variables) {
             var analyze_bccaqv2_parameters = "";
             customize_variables = customize_variables.toLowerCase();
+            try {
+                $.each(form_obj_inputs, function (index, value) {
+                    var value_id = value.id.toLowerCase();
 
-            $.each(form_obj_inputs, function (index, value) {
-                var value_id = value.id.toLowerCase();
-                try {
                     if (datalayer_parameters[value_id]) {
                         analyze_bccaqv2_parameters += datalayer_parameters[value_id] + ": " + value.data + ";  ";
                     } else {
                         throw ('Can not get Analyze_BCCAQv2_* dataLayer parameters key: ' + value_id);
                     }
+                });
 
-                    if (!analyze_bccaqv2_dict[customize_variables]) {
-                        throw ('Can not get Analyze_BCCAQv2_* dataLayer event name: ' + customize_variables);
-                    }
-                } catch (err) {
-                    console.error(err);
+                if (!analyze_bccaqv2_dict[customize_variables]) {
+                    throw ('Can not get Analyze_BCCAQv2_* dataLayer event name: ' + customize_variables);
                 }
-            });
-
-
+            } catch (err) {
+                console.error(err);
+            }
 
             analyze_bccaqv2_dict[customize_variables] = analyze_bccaqv2_dict[customize_variables].replaceAll(' ', '-');
             event_type = "Analyze_BCCAQv2_" + analyze_bccaqv2_dict[customize_variables];
@@ -593,13 +589,7 @@
                 // email
                 form_obj['notification_email'] = $('#analyze-email').val()
 
-                // console.log("submit_url_var + submit_url_post: " + submit_url_var + submit_url_post)
-
                 set_datalayer_for_analyze_bccaqv2(form_obj['inputs'], submit_url_var);
-                // $.each(form_obj['inputs'], function (index, value) {
-                //     console.log(index + " form_obj['inputs']: " + value.id + " ; " + value.data)
-
-                // });
 
                 var submit_data = {
                     'analyze-captcha_code': $('#analyze-captcha_code').val(),

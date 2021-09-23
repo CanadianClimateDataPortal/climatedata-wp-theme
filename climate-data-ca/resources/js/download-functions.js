@@ -1400,21 +1400,21 @@
         function get_selected_stations() {
             // ex: class="42 -- DUNCAN & 1593 -- RUSSELL CREEK ; 1614 -- TWO PETE CREEK ; ..."
 
-            var selected_stations = "";
+            var ret_selected_stations = "";
             for (const key in selected_stations) {
-                selected_stations += key + " -- " + selected_stations[key] + " ; ";
+                ret_selected_stations += key + " -- " + selected_stations[key] + " ; ";
             }
 
             // Remove last char: ;
             if (Object.keys(selected_stations).length > 0) {
-                selected_stations = selected_stations.substring(0, selected_stations.length - 3);
+                ret_selected_stations = ret_selected_stations.substring(0, ret_selected_stations.length - 3);
             }
 
             if (Object.keys(selected_stations).length == 0) {
-                selected_stations = " ";
+                ret_selected_stations = " ";
             }
 
-            return selected_stations;
+            return ret_selected_stations;
             // Create <a id="station-process-data" class=" station id -- station name & ..."> for Google Analytics
             // $('#station-process-data').attr('class', class_info);
             // $('#station-process-data').removeAttr("style").hide();

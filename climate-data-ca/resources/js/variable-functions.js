@@ -5,8 +5,7 @@
 
         has_mapRight = false;
         var hosturl = geoserver_url;
-        var canadaBounds = L.latLngBounds(L.latLng(41, -141), L.latLng(83.50, -52.1));
-
+        var canadaBounds = L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.60, -49.9));
 
         var varData;
 
@@ -111,8 +110,8 @@
             zoom: query['coords'].split(',')[2]
         });
 
-        // layers
 
+        // layers
         map1.createPane('basemap');
         map1.getPane('basemap').style.zIndex = 399;
         map1.getPane('basemap').style.pointerEvents = 'none';
@@ -505,8 +504,8 @@
         // object
 
 
-        var leftLegend = L.control({position: 'topright'});
-        var rightLegend = L.control({position: 'topright'});
+        var leftLegend = L.control({ position: 'topright' });
+        var rightLegend = L.control({ position: 'topright' });
 
         var idfLayer;
 
@@ -594,6 +593,30 @@
 
         });
 
+
+        function set_datalayer_for_variable_download_IDFCurves(idf_curves_datalayer_event_name, file) {
+            // ex: Download_IDF-Curves_Short Duration Rainfall Intensity−Duration−Frequency Data (PDF) -->  Download_IDF-Curves_Short_Duration_Rainfall_Intensity−Duration−Frequency_Data_PDF
+            idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll(' ', '_');
+            idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll('(', '');
+            idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll(')', '');
+
+            dataLayer.push({
+                'event': idf_curves_datalayer_event_name,
+                'variable-download-idf-curves-file': file,
+            });
+        }
+
+        //Dynamically created
+        $(document).on('click', '.variable-download-idf-curves', function (e) {
+            // e.preventDefault();
+            var idf_curves_href = $(this).attr('href');
+            var last_index_found = idf_curves_href.lastIndexOf("/");
+            idf_curves_href = idf_curves_href.substring(last_index_found + 1, idf_curves_href.length);
+
+            var idf_curves_text = $(this).text().trim();
+            set_datalayer_for_variable_download_IDFCurves("Variable_Download_IDF-Curves_" + idf_curves_text, idf_curves_href);
+        });
+
         function getIDFLinks(idf) {
 
             var popup_labels = [
@@ -643,7 +666,7 @@
                         linktext = popup_labels[0] + " (PNG)";
                     }
 
-                    $('.idfBody').append('<li><a href="' + v + '" target="_blank">' + linktext + '</a></li>');
+                    $('.idfBody').append('<li><a class="variable-download-idf-curves" href="' + v + '" target="_blank">' + linktext + '</a></li>');
                 });
             });
         };
@@ -678,7 +701,7 @@
                 }).on('click', function (e) {
                     genStationChart(e.layer.feature.properties.STN_ID, e.layer.feature.properties.STATION_NAME, e.latlng['lat'], e.latlng['lng']);
                 });
-            }).done(function() {
+            }).done(function () {
                 if (query['var'] === 'weather-stations') {
                     station_layer.addTo(map1);
                 }
@@ -752,8 +775,8 @@
 
             var offset = (map1.getSize().x * 0.5) - 100;
 
-            map1.panTo([e.latlng.lat, e.latlng.lng], {animate: false}); // pan to center
-            map1.panBy(new L.Point(offset, 0), {animate: false}); // pan by offset
+            map1.panTo([e.latlng.lat, e.latlng.lng], { animate: false }); // pan to center
+            map1.panBy(new L.Point(offset, 0), { animate: false }); // pan by offset
 
             // set the highlight
 
@@ -784,7 +807,7 @@
             }
 
             // open the chart
-            current_coords=[e.latlng.lat, e.latlng.lng];
+            current_coords = [e.latlng.lat, e.latlng.lng];
             genChart(e.latlng.lat, e.latlng.lng, var_value, mora_value);
 
             L.DomEvent.stop(e);
@@ -821,6 +844,7 @@
                         radius: 4,
                         fillOpacity: 0
                     }
+
                 }
             },
             bounds: canadaBounds,
@@ -925,22 +949,22 @@
                             vectorTileLayerStyles: layerStyles
                         }
                     ).on('mouseover', function (e) {
-                            choroLayer.setFeatureStyle(
-                                e.layer.properties.id,
-                                {
-                                    color: 'white',
-                                    fillColor: getColor(choroValues[e.layer.properties.id]),
-                                    weight: 1.5,
-                                    fill: true,
-                                    radius: 4,
-                                    opacity: 1,
-                                    fillOpacity: 1
-                                });
-                            choroLayer.bindTooltip(e.layer.properties[l10n_labels.label_field], {sticky: true}).openTooltip(e.latlng);
-                        }
+                        choroLayer.setFeatureStyle(
+                            e.layer.properties.id,
+                            {
+                                color: 'white',
+                                fillColor: getColor(choroValues[e.layer.properties.id]),
+                                weight: 1.5,
+                                fill: true,
+                                radius: 4,
+                                opacity: 1,
+                                fillOpacity: 1
+                            });
+                        choroLayer.bindTooltip(e.layer.properties[l10n_labels.label_field], { sticky: true }).openTooltip(e.latlng);
+                    }
                     ).on('mouseout', function (e) {
-                            choroLayer.resetFeatureStyle(e.layer.properties.id);
-                        }
+                        choroLayer.resetFeatureStyle(e.layer.properties.id);
+                    }
                     ).on('click', function (e) {
 
                         current_sector['id'] = e.layer.properties.id;
@@ -1003,32 +1027,184 @@
         // CHART STUFF
         //
         //
+
+        var frMonthDict = {
+            'jan': 'Janvier',
+            'feb': 'Février',
+            'mar': 'Mars',
+            'apr': 'Avril',
+            'may': 'Mai',
+            'jun': 'Juin',
+            'jul': 'Juillet',
+            'aug': 'Août',
+            'sep': 'Septembre',
+            'oct': 'Octobre',
+            'nov': 'Novembre',
+            'dec': 'Décembre',
+            'ann': 'Annuel'
+        };
+
+        var engMonthDict = {
+            'jan': 'January',
+            'feb': 'February',
+            'mar': 'March',
+            'apr': 'April',
+            'may': 'May',
+            'jun': 'June',
+            'jul': 'July',
+            'aug': 'August',
+            'sep': 'September',
+            'oct': 'October',
+            'nov': 'November',
+            'dec': 'December',
+            'ann': 'Annual'
+        };
+
+        function getRealMonthName(keySelected) {
+            keySelected = keySelected.toLowerCase();
+            var tempDict = engMonthDict;
+            if ($('body').hasClass('lang-fr')) {
+                tempDict = frMonthDict;
+            }
+
+            var realMonthName = "";
+            try {
+                if (tempDict[keySelected]) {
+                    realMonthName = tempDict[keySelected];
+                } else {
+                    throw ('Can not get the month with this key: ' + keySelected);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+
+            return realMonthName;
+        }
+
+        var variableDownloadDataTypes = {
+            // Variable_Download-Data_*
+            'tx_max': 'Hottest-Day',
+            'tg_mean': 'Mean-Temperature',
+            'tn_mean': 'Minimum-Temperature',
+            'tnlt_-15': 'Days-with-Tmin_LesserThan_-15C',
+            'tnlt_-25': 'Days-with-Tmin_LesserThan_-25C',
+            'txgt_25': 'Days-with-Tmax_GreaterThan_25C',
+            'txgt_27': 'Days-with-Tmax_GreaterThan_27C',
+            'txgt_29': 'Days-with-Tmax_GreaterThan_29C',
+            'txgt_30': 'Days-with-Tmax_GreaterThan_30C',
+            'txgt_32': 'Days-with-Tmax_GreaterThan_32C',
+            'tx_mean': 'Maximum-Temperature',
+            'tn_min': 'Coldest-Day',
+            'rx1day': 'Maximum-1-Day-Total-Precipitation',
+            'r1mm': 'Wet-Days_GreaterThan_1mm',
+            'r10mm': 'Wet-Days_GreaterThan_10mm',
+            'r20mm': 'Wet-Days_GreaterThan_20mm',
+            'prcptot': 'Total-Precipitation',
+            'frost_days': 'Frost-Days',
+            'cddcold_18': 'Cooling-Degree-Days',
+            'gddgrow_10': 'Growing-Degree-Days-10C',
+            'gddgrow_5': 'Growing-Degree-Days-5C',
+            'gddgrow_0': 'Cumulative-degree-days-above-0C',
+            'hddheat_18': 'Heating-degree-days',
+            'ice_days': 'Ice-Days',
+            'tr_18': 'Tropical-Nights-Days-with-Tmin_GreaterThan_18C',
+            'tr_20': 'Tropical-Nights-Days-with-Tmin_GreaterThan_20C',
+            'tr_22': 'Tropical-Nights-Days-with-Tmin_GreaterThan_22C',
+            'spei_3m': 'SPEI(3-months)',
+            'spei_12m': 'SPEI(12-months)',
+            'weather-stations': 'MSC-Climate-Normals',
+        };
+
+        function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
+            var gA4EventNameForVariableDownloadData = "";
+            keySelected = keySelected.toLowerCase();
+            try {
+                if (variableDownloadDataTypes[keySelected]) {
+                    var eventType = '';
+                    if (chartDataFormat.includes('csv')) {
+                        eventType = "Variable_Download-Data_";
+                    } else if (chartDataFormat.includes('pdf') || chartDataFormat.includes('png')) {
+                        eventType = "Variable_Download-Image_";
+                    } else {
+                        throw ('Invalid GA4 event file format (csv, pdf, png): ' + chartDataFormat);
+                    }
+                    gA4EventNameForVariableDownloadData = eventType + variableDownloadDataTypes[keySelected];
+                } else {
+                    throw ('Invalid GA4 event name (Variable_Download-Data_*): ' + keySelected);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+
+            return gA4EventNameForVariableDownloadData;
+        }
+
+        function setDataLayerForChartData(chartDataFormat, chartData) {
+            if (!chartDataFormat.length) {
+                return;
+            }
+            var eventName = getGA4EventNameForVariableDownloadData(chartDataFormat, query['var']);
+            var overlayTitle = $('.overlay-title').text();
+
+            // Exclude: Navigator 5
+            var addStr = "";
+            for (let index = 0; index < chartData.series.length; index++) {
+                var chartDataName = chartData.series[index].name;
+                if (chartData.series[index].visible && !chartDataName.includes('Navigator 5')) {
+                    addStr += chartData.series[index].name + ", ";
+                }
+            }
+
+            // Remove last 2 char: ;
+            if (addStr.length > 0) {
+                addStr = addStr.substring(0, addStr.length - 2);
+            }
+
+            // ex: Watersheds
+            var variableDownloadDataVewBy = $('.variable-download-data-view_by').find(":selected").text();
+            // ex: Région de la Montérégie, rcp26, January
+            var chartDataSettings = overlayTitle + "; " + query['rcp'] + "; " + getRealMonthName(query['mora']);
+            dataLayer.push({
+                'event': eventName,
+                'chart_data_event_type': eventName,
+                'chart_data_settings': chartDataSettings,
+                'chart_data_columns': addStr,
+                'chart_data_format': chartDataFormat,
+                'chart_data_view_by': variableDownloadDataVewBy
+            });
+        }
+
+        var chartSeries = [];
         function disPlayChartData(data, varDetails) {
+
             chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
             chartDecimals = varDetails['decimals'];
             switch (varDetails.units.value) {
                 case 'doy':
-                    formatter = function () {return new Date(1546300800000+1000*60*60*24*this.value).toLocaleDateString(current_lang, { month:'long', day:'numeric'})};
+                    formatter = function () { return new Date(1546300800000 + 1000 * 60 * 60 * 24 * this.value).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' }) };
                     pointFormatter = function (format) {
                         if (this.series.type == 'line') {
-                            return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name+ ': <b>'
-                                + new Date(1546300800000+1000*60*60*24*this.y).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
+                            return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name + ': <b>'
+                                + new Date(1546300800000 + 1000 * 60 * 60 * 24 * this.y).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
                                 + '</b><br/>';
                         } else {
                             return '<span style="color:' + this.series.color + '">●</span>' + this.series.name + ': <b>'
-                                + new Date(1546300800000+1000*60*60*24*this.low).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
+                                + new Date(1546300800000 + 1000 * 60 * 60 * 24 * this.low).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
                                 + '</b> - <b>'
-                                + new Date(1546300800000+1000*60*60*24*this.high).toLocaleDateString(current_lang, { month:'long', day:'numeric'})
+                                + new Date(1546300800000 + 1000 * 60 * 60 * 24 * this.high).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
                                 + '</b><br/>';
-                        }};
+                        }
+                    };
                     break;
                 default:
-                    formatter = function () {return this.axis.defaultLabelFormatter.call(this) + chartUnit;};
+                    formatter = function () { return this.axis.defaultLabelFormatter.call(this) + ' ' + chartUnit; };
                     pointFormatter = undefined;
             }
 
+
+
             chartSeries = [];
-            if (data['observations'].length > 0)
+            if (data['observations'].length > 0) {
                 chartSeries.push({
                     name: chart_labels.observation,
                     data: data['observations'],
@@ -1041,8 +1217,11 @@
                         lineWidth: 0,
                         radius: 0,
                         lineColor: '#F47D23'
-                    }});
-            if (data['modeled_historical_median'].length > 0)
+                    }
+                });
+            }
+
+            if (data['modeled_historical_median'].length > 0) {
                 chartSeries.push({
                     name: chart_labels.historical,
                     data: data['modeled_historical_median'],
@@ -1054,7 +1233,10 @@
                         lineWidth: 0,
                         radius: 0,
                         lineColor: '#000000'
-                    }});
+                    }
+                });
+            }
+
             if (data['modeled_historical_range'].length > 0)
                 chartSeries.push({
                     name: chart_labels.historical_range,
@@ -1068,7 +1250,8 @@
                     marker: {
                         radius: 0,
                         enabled: false
-                    }});
+                    }
+                });
             if (data['rcp26_median'].length > 0)
                 chartSeries.push({
                     name: chart_labels.rcp_26_median,
@@ -1081,7 +1264,8 @@
                         lineWidth: 0,
                         radius: 0,
                         lineColor: '#00F'
-                    }});
+                    }
+                });
             if (data['rcp26_range'].length > 0)
                 chartSeries.push({
                     name: chart_labels.rcp_26_range,
@@ -1095,7 +1279,8 @@
                     marker: {
                         radius: 0,
                         enabled: false
-                    }});
+                    }
+                });
             if (data['rcp45_median'].length > 0)
                 chartSeries.push({
                     name: chart_labels.rcp_45_median,
@@ -1108,7 +1293,8 @@
                         lineWidth: 0,
                         radius: 0,
                         lineColor: '#00640c'
-                    }});
+                    }
+                });
             if (data['rcp45_range'].length > 0)
                 chartSeries.push({
                     name: chart_labels.rcp_45_range,
@@ -1122,7 +1308,8 @@
                     marker: {
                         radius: 0,
                         enabled: false
-                    }});
+                    }
+                });
             if (data['rcp85_median'].length > 0)
                 chartSeries.push({
                     name: chart_labels.rcp_85_median,
@@ -1135,7 +1322,8 @@
                         lineWidth: 0,
                         radius: 0,
                         lineColor: '#F00'
-                    }});
+                    }
+                });
             if (data['rcp85_range'].length > 0)
                 chartSeries.push({
                     name: chart_labels.rcp_85_range,
@@ -1149,7 +1337,8 @@
                     marker: {
                         radius: 0,
                         enabled: false
-                    }});
+                    }
+                });
 
 
             var chart = Highcharts.stockChart('chart-placeholder', {
@@ -1203,13 +1392,15 @@
             });
 
 
+
             $('.chart-export-data').click(function (e) {
                 e.preventDefault();
 
                 var dl_type = '';
 
                 switch ($(this).attr('data-type')) {
-                    case 'csv' :
+                    case 'csv':
+                        setDataLayerForChartData('csv', chart);
                         chart.downloadCSV();
                         break;
                 }
@@ -1218,17 +1409,21 @@
 
             $('.chart-export-img').click(function (e) {
                 e.preventDefault();
-
                 var dl_type = '';
+                var fileFormat = '';
 
                 switch ($(this).attr('data-type')) {
-                    case 'png' :
+                    case 'png':
                         dl_type = 'image/png';
+                        fileFormat = 'png'
                         break;
-                    case 'pdf' :
+                    case 'pdf':
                         dl_type = 'application/pdf';
+                        fileFormat = 'pdf'
                         break;
                 }
+
+                setDataLayerForChartData(fileFormat, chart);
 
                 chart.exportChart({
                     type: dl_type
@@ -1257,7 +1452,7 @@
                         data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month
                         + '?delta7100=' + delta,
                         function (data) {
-                            disPlayChartData(data,varDetails);
+                            disPlayChartData(data, varDetails);
                         });
 
                 }
@@ -1295,7 +1490,7 @@
         function genStationChart(STN_ID, station_name, lat, lon) {
 
 
-
+            var overlayTitle = $('.overlay-title').text(station_name);
             $(document).overlay('show', {
                 href: base_href + 'variable/' + $('#var').val() + '/',
                 data: {
@@ -1376,7 +1571,8 @@
                                 var dl_type = '';
 
                                 switch ($(this).attr('data-type')) {
-                                    case 'csv' :
+                                    case 'csv':
+                                        setDataLayerForChartData('csv', chart);
                                         chart.downloadCSV();
                                         break;
                                 }
@@ -1385,18 +1581,21 @@
 
                             $('.chart-export-img').click(function (e) {
                                 e.preventDefault();
-
                                 var dl_type = '';
+                                var fileFormat = '';
 
                                 switch ($(this).attr('data-type')) {
-                                    case 'png' :
+                                    case 'png':
                                         dl_type = 'image/png';
+                                        fileFormat = 'png';
                                         break;
-                                    case 'pdf' :
+                                    case 'pdf':
                                         dl_type = 'application/pdf';
+                                        fileFormat = 'pdf';
                                         break;
                                 }
 
+                                setDataLayerForChartData(fileFormat, chart);
                                 chart.exportChart({
                                     type: dl_type
                                 });
@@ -1529,7 +1728,7 @@
                 first_label = first_label.replace('Days', 'Jours');
             }
 
-           // labels.push('<span class="legendLabel max">' + first_label + '</span>');
+            // labels.push('<span class="legendLabel max">' + first_label + '</span>');
 
             labels.push('<div class="legendRows">');
 
@@ -1546,14 +1745,14 @@
                         unitValue = unitValue.replace('Days', 'Jours');
                         unitValue = unitValue.replace(' to ', ' à ');
                     }
-                    style='background:' + unitColor;
+                    style = 'background:' + unitColor;
 
-                    t="";
-                    if (i==0) {
-                        style="; border-bottom: 10px solid " + unitColor +
+                    t = "";
+                    if (i == 0) {
+                        style = "; border-bottom: 10px solid " + unitColor +
                             "; border-left: 8px solid transparent" +
                             "; border-right: 8px solid transparent";
-                        t='<span class="legendLabel max">' + first_label + '</span>';
+                        t = '<span class="legendLabel max">' + first_label + '</span>';
 
                         labels.push(
                             '<div class="legendRow">' +
@@ -1564,7 +1763,7 @@
                             '</div>'
                         );
                     }
-                    else if (i==colormap.length -1) {
+                    else if (i == colormap.length - 1) {
                         labels.push(
                             '<div class="legendRow">' +
                             '<span class="legendLabel min">' + unitValue + '</span>' +
@@ -1581,11 +1780,11 @@
                     }
 
                 } else {
-                    if (i==colormap.length -1) {
+                    if (i == colormap.length - 1) {
                         labels.push(
                             '<div class="legendRow">' +
                             '<span class="legendLabel ">0</span>' +
-                            '<div class="legendColor" style="background:' + unitColor +'"></div>' +
+                            '<div class="legendColor" style="background:' + unitColor + '"></div>' +
                             '<span class="legendUnit">0</span>' +
                             '</div>');
                     }
@@ -1710,7 +1909,7 @@
 
                     };
 
-                        leftLegend.addTo(map1);
+                    leftLegend.addTo(map1);
 
                     if ($('#rcp').val().indexOf("vs") !== -1) {
                         generateRightLegend(layer, legendTitle, data);
@@ -1787,7 +1986,7 @@
                     leftLegend.addTo(map1);
 
                     colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
-                    colormap = colormap.map(function (c){c.quantity = parseFloat(c.quantity); return c;});
+                    colormap = colormap.map(function (c) { c.quantity = parseFloat(c.quantity); return c; });
 
                     var_value = $("#var").val();
                     mora_value = $("#mora").val();
@@ -1851,7 +2050,7 @@
 
             switch (settings.layer) {
 
-                case 'variable' :
+                case 'variable':
 
                     if (settings.action === 'on') {
 
@@ -1962,7 +2161,7 @@
 
                     break;
 
-                case 'stations' :
+                case 'stations':
 
                     if (settings.action === 'on') {
 
@@ -2047,7 +2246,7 @@
 
                     break;
 
-                case 'sector' :
+                case 'sector':
 
 
                     if (settings.action == 'on') {
@@ -2097,11 +2296,11 @@
                     }
 
                     // re-initialize select2 with new disabled/enabled options
-//           $('#var').select2();
+                    //           $('#var').select2();
 
                     break;
 
-                default :
+                default:
 
             }
 
@@ -2285,7 +2484,7 @@
                                  */
 
                                 // console.log('set view', query[key].split(',')[0], query[key].split(',')[1], query[key].split(',')[2]);
-                                map1.setView([query[key].split(',')[0], query[key].split(',')[1]], query[key].split(',')[2], {animate: false});
+                                map1.setView([query[key].split(',')[0], query[key].split(',')[1]], query[key].split(',')[2], { animate: false });
 
                             }
 
@@ -2534,7 +2733,7 @@
                 legendmsorys = 'ann';
 
                 if (query['sector'] !== '') {
-                    switch(mora_value) {
+                    switch (mora_value) {
                         case 'ann':
                             msorys = 'ys';
                             msorysmonth = '-ann';
@@ -2560,7 +2759,7 @@
                     }
 
                     legendLayer = var_value + "_health_" + legendmsorys;
-                    generateSectorLegend(var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year','');
+                    generateSectorLegend(var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year', '');
                 } else {
                     generateLeftLegend();
                 }
@@ -2638,7 +2837,7 @@
 
 
         function buildFilterMenu() {
-            getVarData(function(data) {
+            getVarData(function (data) {
                 queryVar = getQueryVariable('var');
 
                 varID = $('#var').val();
@@ -2703,7 +2902,7 @@
                                 defaultSelectedSector = false;
                             }
 
-                            if (v === 'gridded_data'){
+                            if (v === 'gridded_data') {
                                 var newOption = new Option(l10n_labels[v], '', defaultSelectedSector, defaultSelectedSector);
                             } else {
                                 var newOption = new Option(l10n_labels[v], v, defaultSelectedSector, defaultSelectedSector);
@@ -2793,9 +2992,9 @@
                         // check to see if comparing exists on sector load
                         if (getRCPvar.length > 5 && selectedSector !== 'gridded_data') {
                             // since comparison value is comparing, get new default from first 5 chars
-                            firstRCP = getRCPvar.slice(0,5);
+                            firstRCP = getRCPvar.slice(0, 5);
                             // set default to best option available from compare value.
-                            $('#rcp option[value='+firstRCP+']').attr('selected','selected');
+                            $('#rcp option[value=' + firstRCP + ']').attr('selected', 'selected');
                             // update url with new default
                             update_param('rcp', firstRCP);
                             // remove compare since no longer comparing
@@ -2804,7 +3003,7 @@
                             invalidate_maps();
                         } else {
                             // update selected value of newly generated rcp list
-                            $('#rcp option[value='+getRCPvar+']').attr('selected','selected');
+                            $('#rcp option[value=' + getRCPvar + ']').attr('selected', 'selected');
                         }
 
 
@@ -2929,7 +3128,7 @@
                         }
 
                         if (!acfTimeStep.includes("annual") && moraval === 'ann') {
-                            $('#mora option:eq(0)').prop('selected',true).trigger('change.select2');
+                            $('#mora option:eq(0)').prop('selected', true).trigger('change.select2');
                             update_param('mora', 'jan');
                             update_query_string();
                         }
@@ -3099,7 +3298,7 @@
         var_value = $("#var").val();
         rcp_value = $("#rcp").val();
         if (query['sector'] != '') {
-            switch(mora_value) {
+            switch (mora_value) {
                 case 'ann':
                     msorys = 'ys';
                     break;
@@ -3116,7 +3315,7 @@
                     msorys = 'ms';
             }
 
-            generateSectorLegend(var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year','');
+            generateSectorLegend(var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year', '');
 
 
         } else {
@@ -3169,7 +3368,7 @@
 
             if ($('body').find('#chart-tour').length) {
 
-                var tour_options_chart = {default_open: false}
+                var tour_options_chart = { default_open: false }
                 if (current_lang == 'fr') {
                     tour_options_chart.labels = {
                         start_over: 'Recommencer',

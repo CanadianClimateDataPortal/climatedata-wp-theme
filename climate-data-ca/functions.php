@@ -68,6 +68,13 @@ function child_global_vars()
 
 add_action('wp', 'child_global_vars');
 
+// process any deployment specific configuration
+if (stream_resolve_include_path('local_config.php')) {
+    include_once 'local_config.php';
+} else {
+    include_once 'default_config.php';
+}
+
 //
 // ENQUEUE
 //
@@ -125,6 +132,7 @@ function child_theme_enqueue()
 
     wp_register_script('leaflet', $bower_dir . 'leaflet/dist/leaflet.js', NULL, NULL, true);
     wp_register_script('leaflet-cluster', $child_js_dir . 'leaflet-cluster.js', NULL, NULL, true);
+    wp_register_script('leaflet-cluster-subgroup', $child_js_dir . 'leaflet.featuregroup.subgroup.js', NULL, NULL, true);
 
     wp_register_script('jszip', $bower_dir . 'jszip/dist/jszip.min.js', NULL, NULL, true);
     wp_register_script('FileSaver', $bower_dir . 'FileSaver/dist/FileSaver.min.js', NULL, NULL, true);
@@ -382,6 +390,17 @@ if (function_exists('acf_add_options_page')) {
 
 }
 
+// Add sup/sub to MCE editor
+function my_mce_buttons_2( $buttons ) { 
+  /**
+   * Add in a core button that's disabled by default
+   */
+  $buttons[] = 'superscript';
+  $buttons[] = 'subscript';
+
+  return $buttons;
+}
+add_filter( 'mce_buttons_2', 'my_mce_buttons_2' );
 
 //
 

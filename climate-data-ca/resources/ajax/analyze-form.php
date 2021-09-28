@@ -2,13 +2,13 @@
 
 $parse_uri = explode( 'assets', $_SERVER['SCRIPT_FILENAME'] );
 require_once( $parse_uri[0] . 'wp-load.php' );
+wp();
 
 include_once ( locate_template ( 'resources/php/securimage/securimage.php' ) );
 
 $securimage = new Securimage();
 
-$submit_url_pre = 'https://pavics.climatedata.ca/providers/finch/processes/ensemble_grid_point_';
-// $submit_url_pre = 'https://finch.crim.ca/providers/finch/processes/ensemble_grid_point_';
+$submit_url_pre = $GLOBALS['vars']['pavics_url'] . '/providers/finch/processes/ensemble_grid_point_';
 
 if ( isset ( $_POST['analyze-captcha_code'] ) ) {
 

@@ -8,38 +8,6 @@ if ( get_field ( 'page_feedback' ) == 1 ) {
 
 $footer_logo = get_field ( 'footer_logo', 'option' );
 
-    if (isset($_SERVER['HTTP_HOST'])) {
-        switch ($_SERVER['HTTP_HOST']) {
-            case "climatedata.ca":
-                $UA = "UA-141104740-1";
-                $DATAURL = "//data.climatedata.ca";
-                break;
-            case "donneesclimatiques.ca":
-                $UA = "UA-141104740-2";
-                $DATAURL = "//data.climatedata.ca";
-                break;
-            case "climatedata.crim.ca":
-                $UA = "UA-141104740-3";
-                $DATAURL = "//dataclimatedata.crim.ca";
-                break;
-            case "climatedata3.crim.ca":
-                $UA = "G-Y16JHP4Z3M";
-                $DATAURL = "//dataclimatedata.crim.ca";
-                break;
-            case "donneesclimatiques.crim.ca":
-            case "climatedata2.crim.ca":
-            case "donneesclimatiques2.crim.ca":
-            case "donneesclimatiques3.crim.ca":
-                $UA = "";
-                $DATAURL = "//dataclimatedata.crim.ca";
-                break;
-            default:
-                $UA = "";
-                $DATAURL = "//data.climatedata.ca";
-        }
-    }
-
-
     ?>
 
     <footer id="main-footer">
@@ -196,7 +164,8 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
 
       var base_href = '<?php echo $GLOBALS['vars']['site_url']; ?>';
       var L_DISABLE_3D = true;
-      var DATA_URL = '<?php echo $DATAURL;?>';
+      var DATA_URL = '<?php echo $GLOBALS['vars']['data_url']; ?>';
+      var PAVICS_URL = '<?php echo $GLOBALS['vars']['pavics_url']; ?>';
     </script>
 
     <?php
@@ -206,6 +175,11 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
     ?>
 <?php
 
+
+$UA = ($GLOBALS['vars']['current_lang'] == 'fr')? $GLOBALS['vars']['analytics_ua_fr']:$GLOBALS['vars']['analytics_ua_en'];
+$GTMNGR = $GLOBALS['vars']['googletag_id'];
+$GA_CROSS_DOMAIN = $GLOBALS['vars']['ga_cross_domain'];
+
 if (!empty($UA)) {
 ?>
 
@@ -214,10 +188,28 @@ if (!empty($UA)) {
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+<?php
+      if (!empty($GA_CROSS_DOMAIN)) {
+          echo "      gtag('set', 'linker', {'domains': $GA_CROSS_DOMAIN});\n";
+      }
+?>
       gtag('js', new Date());
 
       gtag('config', '<?php echo $UA;?>');
     </script>
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','<?php echo $GTMNGR;?>');</script>
+    <!-- End Google Tag Manager -->
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id='<?php echo $GTMNGR;?>'"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
 
 <?php
 }

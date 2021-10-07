@@ -500,8 +500,9 @@
 
                         new_html += '<input ';
                         new_html += 'type="text" ';
+                        new_html += 'placeholder="MM-DD" ';
                         new_html += 'class="form-control bg-transparent border-white mx-2 text-white" ';
-                        new_html += 'size="4" ';
+                        new_html += 'size="5" ';
                         new_html += 'autocomplete="off" ';
                         new_html += 'data-units="' + this_input['units'] + '" ';
                         new_html += 'data-optional="' + this_input['optional'] + '" ';

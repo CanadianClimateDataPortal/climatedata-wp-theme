@@ -1,3 +1,6 @@
+2021-10-07.01
+  * Added MM-DD optional input control to analyze page
+
 2021-08-05.01
   * Added AHCCD download, close CLIM-39
 

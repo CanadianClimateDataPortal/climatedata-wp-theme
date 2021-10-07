@@ -169,9 +169,8 @@
             </div>
 
         </div>
-
         <div id="download-result" class="col-10 offset-1 col-sm-6 offset-sm-3 mt-3 p-4 bg-light" style="display: none;">
-            <p class="form-label-wrap"><?php _e('Processed successfully.', 'cdc'); ?> <a href="" target="_blank"><?php _e('Click here to download your data', 'cdc'); ?></a>.</p>
+            <p class="form-label-wrap"><?php _e('Processed successfully.', 'cdc'); ?> <a class="download_variable_data_bccaqv2" href="" target="_blank"><?php _e('Click here to download your data', 'cdc'); ?></a>.</p>
         </div>
     </div>
 

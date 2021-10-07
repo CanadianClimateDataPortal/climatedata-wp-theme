@@ -409,9 +409,9 @@
                 let var_frequencies = $(this).closest('.input-variable').attr('data-frequencies');
 
                 if (var_frequencies != '') {
-                    const frequencies = var_frequencies.split('|');
+                    let frequencies = var_frequencies.split('|');
                     $('input[name=freq]').each(function(i) {
-                       if (var_frequencies.includes($(this).val())) {
+                       if (frequencies.includes($(this).val())) {
                            $(this).attr('disabled', false);
                         } else {
                            let input_row = $(this).closest('.input-row');

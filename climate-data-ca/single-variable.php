@@ -366,6 +366,16 @@ if (have_posts()) : while (have_posts()) : the_post();
                                 </div>
                             </div>
                         </div>
+                        <div class="chart-delta d-flex">
+                            <p >Select to show:</p>
+                            <input type="radio" id="chatoption1" name="chartoption" value="annual" checked>
+                            <label for="chatoption1"><?php _e('Annual values', 'cdc'); ?></label><br>
+                            <input type="radio" id="chartoption2" name="chartoption" value="30y">
+                            <label for="chartoption2"><?php _e('30 year averages', 'cdc'); ?></label><br>
+                            <input type="radio" id="chartoption3" name="chartoption" value="delta">
+                            <label for="chartoption3"><?php _e('30 year changes', 'cdc'); ?></label>
+
+                        </div>
 
                         <div id="chart-placeholder" class="var-chart"></div>
                     </div>

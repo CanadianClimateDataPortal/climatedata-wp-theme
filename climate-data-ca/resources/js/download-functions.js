@@ -154,8 +154,8 @@
         //
 
         $('#download-content').tabs({
-            hide: {effect: 'fadeOut', duration: 250},
-            show: {effect: 'fadeIn', duration: 250},
+            hide: { effect: 'fadeOut', duration: 250 },
+            show: { effect: 'fadeIn', duration: 250 },
             create: function (e, ui) {
 
                 $('body').removeClass('spinner-on');
@@ -340,13 +340,9 @@
             }
 
             var pbfURL = hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + gridName + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf";
-
-
             pbfLayer = L.vectorGrid.protobuf(pbfURL, vectorTileOptions).on('click', function (e) {
 
                 highlightGridFeature = e.layer.properties.gid;
-
-
                 selectedPoints[highlightGridFeature] = e.latlng;
 
                 var selectedExists = selectedGrids.includes(highlightGridFeature);
@@ -394,7 +390,6 @@
 
                 var points_to_process = selectedGrids.length
 
-
                 if (selectedGrids.length > 0) {
                     $('#download-location').parent().find('.select2-selection__rendered').text(selectedGrids.length + ' ' + l10n_labels.selected)
                 } else {
@@ -425,36 +420,24 @@
         //
 
         function checkform() {
-
             $('#download-result').slideUp(125)
 
             var form_valid = false;
 
             if ($('#download-dataset').val() === 'daily') {
-
                 // DAILY DATA
-
                 if (
                     $('body').validate_email($('#daily-email').val()) === true &&
                     $('#daily-captcha_code').val() !== '' &&
                     $('#download-coords').val() !== ''
                 ) {
-
                     $('#daily-process').removeClass('disabled');
-
                 } else {
-
                     $('#daily-process').addClass('disabled');
-
                 }
-
             } else {
-
-
                 // MONTHLY OR ANNUAL
-
                 // if a filename is entered and the hidden lat/lon inputs have values
-
                 if (
                     $('#download-filename').hasClass('valid') &&
                     $('#download-coords').val() !== ''
@@ -467,41 +450,110 @@
                 } else {
                     $('#download-process').addClass('disabled');
                 }
-
             }
-
         }
 
         //
         // FORM PROCESSING
         //
 
+        var variableDataTypes = {
+            // Download_Variable-Data_BCCAQv2 ...
+            'tx_max': 'Hottest-Day',
+            'tg_mean': 'Mean-Temperature',
+            'tn_mean': 'Minimum-Temperature',
+            'tnlt_-15': 'Days-with-Tmin_LesserThan_-15C',
+            'tnlt_-25': 'Days-with-Tmin_LesserThan_-25C',
+            'txgt_25': 'Days-with-Tmax_GreaterThan_25C',
+            'txgt_27': 'Days-with-Tmax_GreaterThan_27C',
+            'txgt_29': 'Days-with-Tmax_GreaterThan_29C',
+            'txgt_30': 'Days-with-Tmax_GreaterThan_30C',
+            'txgt_32': 'Days-with-Tmax_GreaterThan_32C',
+            'tx_mean': 'Maximum-Temperature',
+            'tn_min': 'Coldest-Day',
+            'rx1day': 'Maximum-1-Day-Total-Precipitation',
+            'r1mm': 'Wet-Days_GreaterThan_1mm',
+            'r10mm': 'Wet-Days_GreaterThan_10mm',
+            'r20mm': 'Wet-Days_GreaterThan_20mm',
+            'prcptot': 'Total-Precipitation',
+            'frost_days': 'Frost-Days',
+            'cddcold_18': 'Cooling-Degree-Days',
+            'gddgrow_10': 'Growing-Degree-Days-10C',
+            'gddgrow_5': 'Growing-Degree-Days-5C',
+            'gddgrow_0': 'Cumulative-degree-days-above-0C',
+            'hddheat_18': 'Heating-degree-days',
+            'ice_days': 'Ice-Days',
+            'tr_18': 'Tropical-Nights-Days-with-Tmin_GreaterThan_18C',
+            'tr_20': 'Tropical-Nights-Days-with-Tmin_GreaterThan_20C',
+            'tr_22': 'Tropical-Nights-Days-with-Tmin_GreaterThan_22C',
+        };
+
+        var pointsInfo = "";
+        var dataLayerEventName = "";
+        var variableDataFormat = "";
+        function getGA4EventNameForVariableDataBCCAQv2() {
+            var gA4EventNameForVariableDataBCCAQv2 = "";
+
+            try {
+                var eventType = $('#download-variable').val();
+
+                if (variableDataTypes[eventType]) {
+                    gA4EventNameForVariableDataBCCAQv2 = "Download_Variable-Data_BCCAQv2_" + variableDataTypes[eventType] + "_Frequency_Location_Format";
+                } else {
+                    throw ('Invalid GA4 event name (Download_Variable-Data_BCCAQv2): ' + eventType);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+
+            return gA4EventNameForVariableDataBCCAQv2;
+        }
+
+        function setDataLayerForVariableDataBCCAQv2(BCCAQv2DataLayerEventName, BCCAQv2PointsInfo, BCCAQv2FileFormat) {
+            dataLayer.push({
+                'event': BCCAQv2DataLayerEventName,
+                'variable_data_event_type': BCCAQv2DataLayerEventName,
+                'variable_data_location': BCCAQv2PointsInfo,
+                'variable_data_format': BCCAQv2FileFormat
+            });
+        }
+        var format = null;
+        $('.download_variable_data_bccaqv2').click(function (e) {
+            setDataLayerForVariableDataBCCAQv2(dataLayerEventName, pointsInfo, format);
+        });
 
         function process_download() {
-
-            var selected_var = $('#download-variable').val()
+            var selectedVar = $('#download-variable').val();
+            dataLayerEventName = getGA4EventNameForVariableDataBCCAQv2();
 
             month = $("#download-dataset").val();
-
             if (month === 'annual') {
                 month = 'ann'
             }
-
-            points = []
+            points = [];
+            pointsInfo = '';
             for (var i = 0; i < selectedGrids.length; i++) {
                 point = selectedPoints[selectedGrids[i]];
+                pointsInfo += "GridID: " + selectedGrids[i] + ", Lat: " + point.lat + ", Lng: " + point.lng + " ; ";
                 points.push([point.lat, point.lng]);
             }
 
-            format = $('input[name="download-format"]:checked').val();
+            // Remove last 3 char: ;
+            if (selectedGrids.length > 0) {
+                pointsInfo = pointsInfo.substring(0, pointsInfo.length - 3);
+            }
 
-            if (selected_var !== 'all') {
+            format = $('input[name="download-format"]:checked').val();
+            variableDataFormat = format;
+            if (selectedVar !== 'all') {
                 $('body').addClass('spinner-on');
-                request_args= {var: selected_var,
-                               month: month,
-                               format: format,
-                               points:points};
-                
+                request_args = {
+                    var: selectedVar,
+                    month: month,
+                    format: format,
+                    points: points
+                };
+
                 $.ajax({
                     method: 'POST',
                     url: data_url + '/download',
@@ -518,12 +570,12 @@
                         $('#download-result').slideDown(250);
                         $('body').removeClass('spinner-on');
 
-                }});
+                    }
+                });
             } else {
                 // call download for all matching variables and build a zip file
                 selectedTimeStepCategory = $('#download-dataset').find(':selected').data('timestep');
                 varToProcess = [];
-
 
                 for (k in varData) {
                     if (k !== 'all' && varData[k].grid === 'canadagrid' && $.inArray(selectedTimeStepCategory, varData[k].timestep) !== -1) {
@@ -566,7 +618,7 @@
                                     $('body').removeClass('spinner-on');
                                     dl_fraction.remove();
                                     dl_progress.remove();
-                                    zip.generateAsync({type: "blob"})
+                                    zip.generateAsync({ type: "blob" })
                                         .then(function (content) {
                                             saveAs(content, $('#download-filename').val() + ".zip");
 
@@ -583,8 +635,6 @@
                 }
 
                 download_all();
-
-
             }
 
 
@@ -644,7 +694,7 @@
                     if (selectedTimeStepCategory !== 'daily' && $('#download-dataset').val() != 'all') {
                         $('#download-variable').append("<optgroup id=optgroup_misc label='" + l10n_labels['misc'] + "'>");
                         $('#optgroup_misc').append(new Option(l10n_labels['allbccaq'], 'all', false, false));
-                        varData['all'] = {'grid': 'canadagrid'};
+                        varData['all'] = { 'grid': 'canadagrid' };
                     }
                 },
                 error: function () {
@@ -669,7 +719,6 @@
 
 
         $('#download-dataset').on('select2:select', function (e) {
-
             console.log('frequency changed');
             currentVar = $("#download-variable").val();
             $('#download-variable').empty();
@@ -720,9 +769,6 @@
             if (curValData === undefined) {
                 $('#download-variable').val(1).trigger('change.select2');
             }
-
-            // maps['variable'].eachLayer( function(layer) {
-            //     if ( layer.myTag  &&  layer.myTag === 'gridlayer') {
             if (typeof pbfLayer !== 'undefined' && pbfLayer.gridType !== curValData.grid) {
                 maps['variable'].removeLayer(pbfLayer);
                 console.log("Adding Grid:" + curValData.grid);
@@ -732,13 +778,7 @@
                 $('#download-coords').val('');
                 $('#download-location').val('');
                 $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
-
-
             }
-            //     }
-            // });
-
-
         });
 
 
@@ -810,22 +850,21 @@
         //
 
         $('#daily-process').click(function (e) {
-
             e.preventDefault();
 
             var var_name = '';
 
             switch ($('#download-variable').val()) {
 
-                case 'tn_mean' :
+                case 'tn_mean':
                     var_name = 'tasmin';
                     break;
 
-                case 'tx_mean' :
+                case 'tx_mean':
                     var_name = 'tasmax';
                     break;
 
-                case 'prcptot' :
+                case 'prcptot':
                     var_name = 'pr';
                     break;
 
@@ -954,10 +993,12 @@
         var markerMap = [];
         stationFromAPI = [];
         var pointsLayer;
+        var selected_stations = {};
 
         function station_init() {
 
             create_map('station');
+            $('#station-process-data').removeAttr("style").hide();
 
             // $.getJSON('https://geo.weather.gc.ca/geomet/features/collections/climate-stations/items?f=json&limit=10000', function (data) {
             $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE', function (data) {
@@ -994,9 +1035,6 @@
                 };
 
                 pointsLayer = L.geoJson(data, {
-                    // onEachFeature: function (feature, layer) {
-                    //     layer.bindPopup(feature.properties.address);
-                    // }
                     pointToLayer: function (feature, latlng) {
                         return L.circleMarker(latlng, geojsonMarkerOptions);
                     }
@@ -1009,6 +1047,12 @@
                     var existingData = $("#station-select").select2("val");
                     // clicked ID
                     var clicked_ID = e.layer.feature.properties.STN_ID.toString();
+                    if (selected_stations[clicked_ID] !== undefined) {
+                        delete selected_stations[clicked_ID];
+                    } else {
+                        selected_stations[clicked_ID] = e.layer.feature.properties.STATION_NAME;
+                    }
+
                     // default colour
                     markerColor = '#F00';
                     if (existingData != null) {
@@ -1028,6 +1072,7 @@
                         existingData = [clicked_ID];
                         $('#station-select').val(existingData).change();
                     }
+
                     e.layer.setStyle({
                         // Stroke properties
                         color: markerColor,
@@ -1219,7 +1264,7 @@
 
             switch ($(this).attr('id')) {
 
-                case 'station-select' :
+                case 'station-select':
                     param = 's';
 
                     if ($(this).val() !== null) {
@@ -1230,11 +1275,11 @@
 
                     break;
 
-                case 'station-start' :
+                case 'station-start':
                     param = 'start';
                     break;
 
-                case 'station-end' :
+                case 'station-end':
                     param = 'end';
                     break;
 
@@ -1250,6 +1295,7 @@
             marker_id = parseFloat(e.params.data.id);
             pointsLayer.eachLayer(function (layer) {
                 if (layer.feature.properties.STN_ID === marker_id) {
+                    delete selected_stations[marker_id];
                     layer.setStyle({
                         // Stroke properties
                         color: '#3d68f6',
@@ -1270,6 +1316,7 @@
             marker_id = parseInt(e.params.data.id);
             pointsLayer.eachLayer(function (layer) {
                 if (layer.feature.properties.STN_ID === marker_id) {
+                    selected_stations[marker_id] = layer.feature.properties.STATION_NAME;
                     layer.setStyle({
                         // Stroke properties
                         color: '#F00',
@@ -1337,22 +1384,77 @@
                 populate_URL();
             }
 
-            $('#station-download-status').text(station_status);
+            if (selected_stations == undefined || Object.keys(selected_stations).length == 0) {
+                populate_URL(0); // update only #station-download-data
+            }
 
+            $('#station-download-status').text(station_status);
         }
 
         function update_URL(name, val) {
             dl_URL[name] = val;
         }
 
-        function populate_URL() {
 
+        var selected_stations_to_str = '';
+        function get_selected_stations() {
+            // ex: class="42 -- DUNCAN & 1593 -- RUSSELL CREEK ; 1614 -- TWO PETE CREEK ; ..."
 
-            var new_url = 'https://api.weather.gc.ca/collections/climate-daily/items?datetime=' + dl_URL.start + ' 00:00:00/' + dl_URL.end + ' 00:00:00&STN_ID=' + dl_URL['s'] + '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' + dl_URL.format + '&limit=' + dl_URL.limit + '&startindex=' + dl_URL.offset;
+            var ret_selected_stations = "";
+            for (const key in selected_stations) {
+                ret_selected_stations += key + " -- " + selected_stations[key] + " ; ";
+            }
 
-            $('#station-process').attr('href', new_url);
+            // Remove last char: ;
+            if (Object.keys(selected_stations).length > 0) {
+                ret_selected_stations = ret_selected_stations.substring(0, ret_selected_stations.length - 3);
+            }
 
+            if (Object.keys(selected_stations).length == 0) {
+                ret_selected_stations = " ";
+            }
+
+            return ret_selected_stations;
+            // Create <a id="station-process-data" class=" station id -- station name & ..."> for Google Analytics
+            // $('#station-process-data').attr('class', class_info);
+            // $('#station-process-data').removeAttr("style").hide();
         }
+
+        function set_datalayer_for_download_station_data(download_station_data_list, download_station_file_extension) {
+            dataLayer.push({
+                'event': 'Download_Station-Data',
+                'download_station_data_event': 'Download_Station-Data',
+                'download_station_data_list': download_station_data_list,
+                'download_station_file_extension': download_station_file_extension
+            });
+        }
+
+        $('#station-process').click(function (e) {
+            var csvFormatClassName = $("#csvFormat").parent().attr("class");
+            var geoFormatClassName = $("#geoFormat").parent().attr("class");
+            var selected_stations_file_extension = 'CSV';
+            if (geoFormatClassName.includes("active")) {
+                selected_stations_file_extension = 'GeoJSON';
+                try {
+                    if (csvFormatClassName.includes("active")) {
+                        throw ('GA4_event (Download_Station-Data) file format, both (CSV, GeoJSON) are selected');
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+            // selected_stations_file_extension get text from class="csvFormat" or class="geoFomrat"
+            set_datalayer_for_download_station_data(selected_stations_to_str, selected_stations_file_extension);
+        });
+
+        function populate_URL(ga4_event = 1) {
+            if (ga4_event == 1) {
+                var new_url = 'https://api.weather.gc.ca/collections/climate-daily/items?datetime=' + dl_URL.start + ' 00:00:00/' + dl_URL.end + ' 00:00:00&STN_ID=' + dl_URL['s'] + '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' + dl_URL.format + '&limit=' + dl_URL.limit + '&startindex=' + dl_URL.offset;
+                $('#station-process').attr('href', new_url);
+            }
+            selected_stations_to_str = get_selected_stations();
+        }
+
 
         //
         // IDF CURVES
@@ -1459,7 +1561,7 @@
                 // sort options
 
                 var arr = $('#idf-select option').map(function (_, o) {
-                    return {t: $(o).text(), v: o.value};
+                    return { t: $(o).text(), v: o.value };
                 }).get()
 
                 arr.sort(function (o1, o2) {
@@ -1479,16 +1581,35 @@
 
         }
 
-        $('#idf-select').on('change', function (e) {
+        function set_datalayer_for_download_IDFCurves(idf_curves_datalayer_event_name, file) {
+            // ex: Download_IDF-Curves_Short Duration Rainfall Intensity−Duration−Frequency Data (PDF) -->  Download_IDF-Curves_Short_Duration_Rainfall_Intensity−Duration−Frequency_Data_PDF
+            idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll(' ', '_');
+            idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll('(', '');
+            idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll(')', '');
 
-            //marker_id = e.params.data.id
+            dataLayer.push({
+                'event': idf_curves_datalayer_event_name,
+                'download-idf-curves-file': file,
+            });
+        }
+
+        //Dynamically created
+        $(document).on('click', '.download-idf-curves', function (e) {
+            // e.preventDefault();
+            var idf_curves_href = $(this).attr('href');
+            var last_index_found = idf_curves_href.lastIndexOf("/");
+            idf_curves_href = idf_curves_href.substring(last_index_found + 1, idf_curves_href.length);
+            var idf_curves_text = $(this).text().trim();
+            set_datalayer_for_download_IDFCurves("Download_IDF-Curves_" + idf_curves_text, idf_curves_href);
+        });
+
+        $('#idf-select').on('change', function (e) {
             marker_id = $(this).val()
 
             $('#idf-links ul').empty()
             $('#download-idf-station').slideDown()
 
             // find the feature in the IDF layer
-
             idf_layer.eachLayer(function (layer) {
 
 
@@ -1508,21 +1629,8 @@
                     maps['idf'].setView([layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0]], current_view)
 
                     $.getJSON(child_theme_dir + 'resources/app/run-frontend-sync/search_idfs.php?idf=' + layer.feature.properties.ID, function (data) {
-
                         $('#idf-station-name h5').text(layer.feature.properties.Name)
                         $('#idf-station-elevation h5').text(layer.feature.properties.Elevation_)
-
-                        /*$('#idf-links').html('<div class="idf-popup-row">' +
-                         '<h6>' + popup_headings[0] + '</h6>' +
-                         '<h5 class="idfTitle">' + layer.feature.properties.Name + '</h5>' +
-                         '</div>' +
-                         '<div class="idf-popup-row">' +
-                         '<h6>' + popup_headings[1] + '</h6>' +
-                         '<h5 class="idfElev">' + layer.feature.properties.Elevation_ + '</h5>' +
-                         '</div>' +
-                         '<h6>' + popup_headings[2] + '</h6>' +
-                         '<ul class="idfBody list-unstyled"></ul>');*/
-
                         $.each(data, function (k, v) {
                             linktext = v;
 
@@ -1550,14 +1658,12 @@
                                 linktext = popup_labels[0] + " (PNG)";
                             }
 
-                            $('#idf-links ul').append('<li><a href="' + v + '" target="_blank">' + linktext + '</a></li>');
-
+                            $('#idf-links ul').append('<li><a class="download-idf-curves" href="' + v + '" target="_blank">' + linktext + '</a></li>');
                         })
 
                     })
 
                 } else {
-
                     layer.setStyle({
                         fillColor: '#3869f6'
                     })
@@ -1575,7 +1681,6 @@
                 })
 
             }, 500)
-
         })
 
 
@@ -1616,7 +1721,7 @@
                 })
             };
 
-            let ahccd_layerGroups=[];
+            let ahccd_layerGroups = [];
             $.getJSON(child_theme_dir + 'resources/app/ahccd/ahccd.json', function (data) {
 
                 let ahccd_layer_cluster = L.markerClusterGroup();
@@ -1640,9 +1745,9 @@
                     },
                     pointToLayer: function (feature, latlng) {
                         return new L.Marker(latlng, {
-                                icon: ahccd_icons[feature.properties.type]
-                            });
-                        }
+                            icon: ahccd_icons[feature.properties.type]
+                        });
+                    }
 
                 }).on('mouseover', function (e) {
                     e.layer.bindTooltip(e.layer.feature.properties.Name).openTooltip(e.latlng);
@@ -1673,7 +1778,7 @@
                 // sort options
 
                 let arr = $('#ahccd-select option').map(function (_, o) {
-                    return {t: $(o).text(), v: o.value};
+                    return { t: $(o).text(), v: o.value };
                 }).get();
 
                 arr.sort(function (o1, o2) {

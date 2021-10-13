@@ -12,11 +12,11 @@ const geoserver_url = DATA_URL;
 
 var chart_labels, legend_labels, l10n_labels;
 
-(function($) {
+(function ($) {
 
-  $(function() {
+  $(function () {
 
-    $.fn.validate_email = function(email_val) {
+    $.fn.validate_email = function (email_val) {
 
       var is_valid = false
 
@@ -96,9 +96,9 @@ var chart_labels, legend_labels, l10n_labels;
 
       // checkboxes
 
-      dl_form.find('input[type="checkbox"]').each(function() {
+      dl_form.find('input[type="checkbox"]').each(function () {
         if ($(this).prop('checked') != true) {
-//           console.log($(this).attr('name') + ' not checked')
+          //           console.log($(this).attr('name') + ' not checked')
           is_valid = false
         }
       })
@@ -108,20 +108,20 @@ var chart_labels, legend_labels, l10n_labels;
         // name
 
         if (dl_form.find('#name').val() == '') {
-	        is_valid = false
-	      }
+          is_valid = false
+        }
 
-	      // email
+        // email
 
-	      if (check_email(dl_form.find('#email').val()) != true ) {
-	        is_valid = false
-	      }
+        if (check_email(dl_form.find('#email').val()) != true) {
+          is_valid = false
+        }
 
-	      // captcha
+        // captcha
 
-	      if (dl_form.find('#terms-captcha_code').val() == '' ) {
-	        is_valid = false
-	      }
+        if (dl_form.find('#terms-captcha_code').val() == '') {
+          is_valid = false
+        }
 
       }
 
@@ -131,30 +131,29 @@ var chart_labels, legend_labels, l10n_labels;
 
     }
 
-	  // overlay events
+    // overlay events
 
-	  $(document).on('overlay_hide', function() {
+    $(document).on('overlay_hide', function () {
 
-  	  console.log('overlay hide')
+      console.log('overlay hide')
       $('#supermenu').supermenu('enable')
 
     });
 
-    $(document).on('overlay_show', function() {
+    $(document).on('overlay_show', function () {
 
-  	  console.log('overlay show')
       $('#supermenu').supermenu('disable')
 
       if ($('.overlay').find('#download-terms-form').length) {
 
         var dl_form = $('.overlay').find('#download-terms-form'),
-            submit_btn = dl_form.find('#download-terms-submit'),
-            captcha = dl_form.find('#terms-captcha'),
-            form_response = dl_form.find('#download-terms-response')
+          submit_btn = dl_form.find('#download-terms-submit'),
+          captcha = dl_form.find('#terms-captcha'),
+          form_response = dl_form.find('#download-terms-response')
 
         submit_btn.prop('disabled', true)
 
-        dl_form.find(':input').on('input', function() {
+        dl_form.find(':input').on('input', function () {
 
           if (check_training_dl_form(dl_form) == true) {
             submit_btn.prop('disabled', false).removeClass('disabled')
@@ -164,10 +163,10 @@ var chart_labels, legend_labels, l10n_labels;
 
         })
 
-        submit_btn.click(function(e) {
+        submit_btn.click(function (e) {
           e.preventDefault()
 
-          form_response.slideUp(125, function() {
+          form_response.slideUp(125, function () {
             $(this).empty()
 
             var form_data = dl_form.serialize()
@@ -175,14 +174,14 @@ var chart_labels, legend_labels, l10n_labels;
             $.ajax({
               url: child_theme_dir + 'resources/ajax/training-submit.php',
               data: form_data,
-              success: function(data) {
+              success: function (data) {
                 console.log(data)
 
                 dl_form.find('#terms-captcha_code').val('')
 
                 captcha_url = dl_form.find('#terms-captcha').attr('src')
 
-      //           dl_form.find('#terms-captcha').attr('src', '')
+                //           dl_form.find('#terms-captcha').attr('src', '')
                 dl_form.find('#terms-captcha').attr('src', captcha_url)
 
                 var response = JSON.parse(data)
@@ -191,8 +190,13 @@ var chart_labels, legend_labels, l10n_labels;
 
                   captcha.removeClass('border-secondary')
 
-                  form_response.html('<div class="alert alert-primary col-6 offset-4 p-5" role="alert"><h5>' + response.message1 + '</h5><p class="mb-0"><a href="' + response.url + '" target="_blank">' + response.message2 + '</a>.</p></div>').slideDown(250);
+                  dataLayer.push({
+                    'event': 'Download_Introducing-climate-information-for-decision-making_v1.1',
+                    'event_name': 'Download_Introducing-climate-information-for-decision-making_v1.1',
+                    'url': response.url
+                  });
 
+                  form_response.html('<div class="alert alert-primary col-6 offset-4 p-5" role="alert"><h5>' + response.message1 + '</h5><p class="mb-0"><a href="' + response.url + '" target="_blank">' + response.message2 + '</a>.</p></div>').slideDown(250);
                 } else if (response.message == 'captcha failed') {
 
                   form_response.html('<div class="alert alert-danger col-6 offset-4" role="alert"><p class="mb-0">' + response.message1 + '</p></div>').slideDown(250);
@@ -244,7 +248,7 @@ var chart_labels, legend_labels, l10n_labels;
       station_data: 'station data',
       selectstation: 'Select at least one station to download data.',
       readytoprocess: 'Ready to process.',
-      misc: 'Miscellaneous',   
+      misc: 'Miscellaneous',
       allbccaq: 'All BCCAQv2 variables',
       gridded_data: 'Gridded data',
       census: 'Census subdivisions',
@@ -286,8 +290,8 @@ var chart_labels, legend_labels, l10n_labels;
         other_variables: 'autres',
         station_data: 'données des stations',
         selectstation: 'Sélectionner au moins une station pour télécharger les données.',
-        readytoprocess: 'Prêt à traiter.',        
-        misc: 'Divers',        
+        readytoprocess: 'Prêt à traiter.',
+        misc: 'Divers',
         allbccaq: 'Toutes les variables BCCAQv2',
         gridded_data: 'Données maillées',
         census: 'Subdivisions de recensement',
@@ -326,7 +330,7 @@ var chart_labels, legend_labels, l10n_labels;
     // FEEDBACK
     //
 
-    $('.feedback-form').submit(function(e) {
+    $('.feedback-form').submit(function (e) {
       e.preventDefault();
 
       var the_form = $(this);
@@ -338,7 +342,7 @@ var chart_labels, legend_labels, l10n_labels;
       $.ajax({
         url: child_theme_dir + 'resources/ajax/form-submit.php',
         data: form_data,
-        success: function(data) {
+        success: function (data) {
           //console.log(data);
 
           if (data == 'success') {
@@ -358,39 +362,39 @@ var chart_labels, legend_labels, l10n_labels;
       });
     });
 
-	  //
-	  // UX BEHAVIOURS
-	  //
+    //
+    // UX BEHAVIOURS
+    //
 
-	  // add body class on show/hide of main header
+    // add body class on show/hide of main header
 
-	  $('#header-primary-collapse').on('show.bs.collapse', function() {
+    $('#header-primary-collapse').on('show.bs.collapse', function () {
 
-  	  $('body').addClass('header-open');
+      $('body').addClass('header-open');
 
-	  });
+    });
 
-	  $('#header-primary-collapse').on('hide.bs.collapse', function() {
+    $('#header-primary-collapse').on('hide.bs.collapse', function () {
 
-  	  $('body').removeClass('header-open');
+      $('body').removeClass('header-open');
 
-	  });
+    });
 
-	  // click outside the menu to close
+    // click outside the menu to close
 
-    $(document).mouseup(function(e) {
+    $(document).mouseup(function (e) {
 
       if ($('body').hasClass('supermenu-open')) {
 
         var close_menu = true;
 
-/*
-        console.log(e.target);
-        console.log('has class supermenu-toggle', $(e.target).hasClass('supermenu-toggle'));
-        console.log('has class overlay-toggle', $(e.target).hasClass('overlay-toggle'));
-        console.log('is supermenu', $('#supermenu').is(e.target));
-        console.log('child of supermenu', $('#supermenu').has(e.target).length);
-*/
+        /*
+                console.log(e.target);
+                console.log('has class supermenu-toggle', $(e.target).hasClass('supermenu-toggle'));
+                console.log('has class overlay-toggle', $(e.target).hasClass('overlay-toggle'));
+                console.log('is supermenu', $('#supermenu').is(e.target));
+                console.log('child of supermenu', $('#supermenu').has(e.target).length);
+        */
 
         if ($(e.target).hasClass('supermenu-toggle') || $(e.target).hasClass('overlay-toggle')) {
 
@@ -445,17 +449,17 @@ var chart_labels, legend_labels, l10n_labels;
 
     });
 
-		// close supermenu if a smooth-scroll link is clicked inside it
+    // close supermenu if a smooth-scroll link is clicked inside it
 
-		$('#supermenu .smooth-scroll').click(function() {
-			$('#supermenu').supermenu('hide')
-		})
+    $('#supermenu .smooth-scroll').click(function () {
+      $('#supermenu').supermenu('hide')
+    })
 
-	  //
-	  // VENDOR
-	  //
+    //
+    // VENDOR
+    //
 
-	  // SELECT2
+    // SELECT2
 
     $('.select2').select2({
       language: current_lang,
@@ -463,21 +467,21 @@ var chart_labels, legend_labels, l10n_labels;
       minimumResultsForSearch: -1
     });
 
-    function formatLocationSearch (item) {
+    function formatLocationSearch(item) {
 
-        if (!item.id) {
-            return item.text;
-        }
-        if (item.location === null) {
-          show_comma = '';
-          item.location ='';
-        } else {
-          show_comma = ', ';
-        }
-        var $item = $(
-            '<span><div class="geo-select-title">' + item.text + ' (' + item.term + ')</div>' + item.location + show_comma + item.province + '</sup></span>'
-        );
-        return $item;
+      if (!item.id) {
+        return item.text;
+      }
+      if (item.location === null) {
+        show_comma = '';
+        item.location = '';
+      } else {
+        show_comma = ', ';
+      }
+      var $item = $(
+        '<span><div class="geo-select-title">' + item.text + ' (' + item.term + ')</div>' + item.location + show_comma + item.province + '</sup></span>'
+      );
+      return $item;
     }
 
     $('#location-search').select2({
@@ -516,7 +520,7 @@ var chart_labels, legend_labels, l10n_labels;
 
     });
 
-	  // STICKY KIT
+    // STICKY KIT
 
     if ($('body').hasClass('has-alert')) {
 
@@ -525,22 +529,22 @@ var chart_labels, legend_labels, l10n_labels;
         offset_top: sticky_offset
       });
 
-	  }
+    }
 
-	  // JQUERY UI TABS
+    // JQUERY UI TABS
 
-	  if ($('.tabs').length) {
+    if ($('.tabs').length) {
 
-  	  $('.tabs').tabs({
+      $('.tabs').tabs({
         hide: { effect: 'fadeOut', duration: 250 },
         show: { effect: 'fadeIn', duration: 250 },
       });
 
     }
 
-	  // LISTNAV
+    // LISTNAV
 
-	  if ($('#glossary').length) {
+    if ($('#glossary').length) {
 
       var listnav_alltext = 'All';
 
@@ -558,11 +562,11 @@ var chart_labels, legend_labels, l10n_labels;
       });
 
       //console.log('listnav');
-		}
+    }
 
-      if(typeof $.fn.renderer !== 'undefined' && $('.renderable').length) {
-          $(document).renderer();
-      }
+    if (typeof $.fn.renderer !== 'undefined' && $('.renderable').length) {
+      $(document).renderer();
+    }
     //console.log('end of child-functions');
 
   });

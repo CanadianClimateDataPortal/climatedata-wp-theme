@@ -368,8 +368,7 @@ $get_delta = filter_input(INPUT_GET, 'delta', FILTER_SANITIZE_URL);
 
 <div id="var-filter-view" class="col-3 offset-2 p-4 align-items-center">
   <label for="sector" class="mr-3"><?php _e ( 'View by:', 'cdc' ); ?></label>
-  
-  <select class="custom-select" id="sector" name="sector">
+  <select class="custom-select variable-download-data-view_by" id="sector" name="sector">
     <option value="" selected>Gridded data</option>
     <option value="census">census</option>
     <option value="health">health</option>

@@ -4,17 +4,17 @@
 
 #analyze-form {
   padding: 10px 0;
-  
+
   .input-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    
+
     * {
       cursor: pointer;
     }
-  
+
     .form-icon {
       margin-top: 3px;
       margin-right: 10px;
@@ -22,62 +22,62 @@
       font-size: 1.4rem;
       transition: 0.25s;
     }
-    
+
     .input-item {
       display: flex;
       flex-grow: 1;
     }
-    
+
     .form-check-label {
       border-bottom: 1px solid transparent;
       font-size: 1.4rem;
       transition: 0.25s;
     }
-    
+
     .tooltip-icon {
       display: block;
     }
-    
+
     &.disabled {
       cursor: not-allowed;
       opacity: 0.6;
-      
+
       * {
         cursor: not-allowed;
       }
-      
+
       .form-icon {
         color: $gray-500;
       }
     }
-    
+
     &.select-all {
       font-weight: bold;
-      
+
       &.checked {
         .form-check-label {
           border-bottom-color: transparent;
         }
       }
     }
-    
+
     &.checked {
       .form-icon {
         color: $secondary;
       }
-      
+
       .form-check-label {
         color: $primary;
         border-bottom: 1px solid $primary;
       }
     }
-    
+
     &.partial {
       .form-icon {
         color: $gray-500;
       }
     }
-    
+
     &:not(.disabled) {
       &:hover {
         .form-check-label {
@@ -87,22 +87,22 @@
     }
 
   }
-  
+
   .input-label {
     margin-bottom: 1rem;
     font-size: 1.4rem;
     font-weight: bold;
   }
-  
+
   .tree {
     margin-left: 20px;
   }
-  
+
   .type-select {
     .input-row {
       display: block;
     }
-    
+
     .input-item {
       justify-content: space-between;
     }
@@ -110,12 +110,12 @@
 }
 
 #analyze-steps {
-  
+
   .accordion-head {
     padding: 15px;
     cursor: pointer;
     outline: none;
-    
+
     i {
       width: 15px;
       height: 15px;
@@ -123,32 +123,32 @@
       color: $secondary;
       transition: 0.5s ease 0.2s;
     }
-    
+
     &.ui-state-disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
-    
+
     h5 {
       margin-bottom: 0;
       font-size: 1.6rem;
     }
-    
+
     &.ui-accordion-header-active {
       h5 {
         color: $primary;
       }
-      
+
       i {
         color: $gray-600;
         transform: rotateX(180deg);
       }
     }
   }
-  
+
   .accordion-content {
     position: relative;
-    
+
     .scroll-fade {
       position: absolute;
       bottom: 0;
@@ -161,11 +161,11 @@
       background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
       filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ffffff",endColorstr="#ffffff",GradientType=1);
     }
-    
+
     .form-check {
       margin-bottom: 1rem;
       padding-left: 0;
-      
+
       input {
         position: absolute;
         visibility: hidden;
@@ -177,13 +177,13 @@
       }
     }
   }
-  
+
   .accordion-content-scroll {
     max-height: 350px;
     overflow: auto;
-    
+
   }
-  
+
   .accordion-content-inner {
     margin-left: 15px;
     padding: 15px;
@@ -204,7 +204,7 @@
   transition: left 0 ease 0.25s, opacity 0.25s ease 0s;
   color: $white;
   z-index: 10;
-  
+
   &.on {
     left: 0;
     opacity: 1;
@@ -217,23 +217,43 @@
 #analyze-detail {
   display: none;
   background-color: transparentize($primary, 0.15);
-  
+
   #placeholder {
     padding: 30px 0;
-    
+
     .form-inline {
       display: inline;
       font-size: 1.8rem;
       line-height: 2;
-      
+
       .form-control {
         margin-top: -0.5rem;
       }
     }
-    
+
     input {
       max-width: 80px;
     }
+
+		input::placeholder {
+		  color: transparentize($white, 0.25);
+		}
+
+		input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+		  color: transparentize($white, 0.25);
+		}
+		
+		input::-moz-placeholder { /* Firefox 19+ */
+		  color: transparentize($white, 0.25);
+		}
+
+		input:-ms-input-placeholder { /* IE 10+ */
+		  color: transparentize($white, 0.25);
+		}
+
+		input:-moz-placeholder { /* Firefox 18- */
+		  color: transparentize($white, 0.25);
+		}
   }
 }
 
@@ -243,45 +263,45 @@
   padding-top: 15px;
   padding-bottom: 15px;
   background-color: transparentize($primary, 0.25);
-  
+
   .step {
     display: flex;
     align-items: flex-end;
     opacity: 0;
     transition: 0.2s;
     padding-left: 20px;
-    
+
     h6 {
       color: $blue-light2;
       font-size: 1.3rem;
       @include all-caps;
     }
-    
+
     .caret {
       color: #79e1e4;
       padding-right: 10px;
     }
-    
+
     .crumb {
       flex-grow: 1;
     }
-    
+
     .value {
       margin-bottom: 0;
     }
-    
+
     &:first-child {
-      
+
       .step {
         padding-left: 0;
       }
     }
-    
+
     &.on {
       opacity: 1;
     }
   }
-  
+
   #clear-grids {
     color: #79e1e4;
   }
@@ -307,26 +327,26 @@
   @include centering(true);
   max-width: 60%;
   text-align: center;
-  
+
   h4 {
     color: $primary;
     font-size: 2.4rem;
     @include all-caps;
   }
-  
+
   p {
     opacity: 1;
     transition: 0.25s;
-    
+
     &.hidden {
       opacity: 0;
     }
   }
-  
+
   .btn {
     opacity: 1;
     transition: 0.25s;
-    
+
     &.hidden {
       opacity: 0;
       pointer-events: none;
@@ -337,7 +357,7 @@
 #analyze-map-container {
   position: relative;
   min-height: 80vh;
-  
+
   #geo-select-container {
     display: none;
     position: absolute;
@@ -345,17 +365,17 @@
     right: 10px;
     min-width: 250px;
     z-index: 2;
-    
+
     .select2-selection__rendered {
       font-size: 18px;
       line-height: 40px;
     }
-    
+
     .select2-selection--single {
       height: 40px;
       border-radius: 0;
       box-shadow: 0 5px 15px transparentize($black, 0.8);
-      
+
       .select2-selection__arrow {
         height: 38px;
       }

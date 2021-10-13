@@ -359,7 +359,7 @@ $get_delta = filter_input(INPUT_GET, 'delta', FILTER_SANITIZE_URL);
         <label for="toggle-a"><?php _e('Absolute','cdc');?></label>
         <input id="toggle-b" type="radio" value="d" name="absolute_delta_switch"<?php if ($get_delta == "true") { echo ' checked="checked"'; } ?> />
         <label for="toggle-b" style="float: left">Delta</label>
-        <div class="text-dark fas fa-question-circle" id="absolute_or_deltas_help" data-content="<div id=aordpoptitle><?php _e('DELTA WITH 1971-2000','cdc');?></div><?php _e('Deltas are the difference between the future value and the reference period (or baseline) value of a climate variable, as simulated by a climate model .The reference period used here is 1971-2000."','cdc');?>"></div>
+        <div class="text-dark fas fa-question-circle" id="absolute_or_deltas_help" data-content="<div id=aordpoptitle><?php _e('DELTA WITH 1971-2000','cdc');?></div><?php _e('Deltas is the difference between the future value and the reference period (or baseline) value of a climate variable, as simulated by a climate model. The reference period used here is 1971-2000."','cdc');?>"></div>
         <span class="toggle-outside">
         <span class="toggle-inside"></span>
       </span>

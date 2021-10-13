@@ -1173,36 +1173,35 @@
             });
         }
 
-        var chartSeries = [];
         function disPlayChartData(data, varDetails) {
-
+            const firstDayOfYear = Date.UTC(2019,0,1);
             chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
             chartDecimals = varDetails['decimals'];
             switch (varDetails.units.value) {
                 case 'doy':
-                    formatter = function () { return new Date(1546300800000 + 1000 * 60 * 60 * 24 * this.value).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' }) };
-                    pointFormatter = function (format) {
+                    formatter = function () { return new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * this.value).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' }) };
+                    var pointFormatter = function (format) {
                         if (this.series.type == 'line') {
                             return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name + ': <b>'
-                                + new Date(1546300800000 + 1000 * 60 * 60 * 24 * this.y).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
+                                + new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * this.y).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
                                 + '</b><br/>';
                         } else {
                             return '<span style="color:' + this.series.color + '">●</span>' + this.series.name + ': <b>'
-                                + new Date(1546300800000 + 1000 * 60 * 60 * 24 * this.low).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
+                                + new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * this.low).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
                                 + '</b> - <b>'
-                                + new Date(1546300800000 + 1000 * 60 * 60 * 24 * this.high).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
+                                + new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * this.high).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
                                 + '</b><br/>';
                         }
                     };
                     break;
                 default:
                     formatter = function () { return this.axis.defaultLabelFormatter.call(this) + ' ' + chartUnit; };
-                    pointFormatter = undefined;
+                    var pointFormatter = undefined;
             }
 
 
 
-            chartSeries = [];
+            let chartSeries = [];
             if (data['observations'].length > 0) {
                 chartSeries.push({
                     name: chart_labels.observation,
@@ -1390,7 +1389,223 @@
                 series: chartSeries
             });
 
+            $('input[type=radio][name=chartoption]').change(function() {
+                switch ($(this).attr('value')) {
+                    case 'annual':
+                        chart.update({
+                            tooltip: {
+                                formatter: function (tooltip) {
+                                    r = tooltip.defaultFormatter.call(this, tooltip);
+                                    return r;
+                                }
 
+                            },
+                            plotOptions: {
+                                series: {
+                                    states: {
+                                        hover: {
+                                            enabled: true
+                                        },
+                                        inactive: {
+                                            enabled: true
+                                        }
+                                    }
+                                }
+                            },
+                        });
+                        chart.xAxis[0].removePlotBand('30y-plot-band');
+                        chart.xAxis[0].removePlotBand('delta-plot-band');
+
+                        break;
+                    case '30y':
+                        chart.xAxis[0].removePlotBand('30y-plot-band');
+                        chart.xAxis[0].removePlotBand('delta-plot-band');
+                        chart.update({
+                            xAxis: {
+                                crosshair: false
+                            },
+                            plotOptions: {
+                                series: {
+                                    states: {
+                                        hover: {
+                                            enabled: false
+                                        },
+                                        inactive: {
+                                            enabled: false
+                                        }
+                                    }
+                                }
+                            },
+                            tooltip: {
+
+                            formatter: function (tooltip) {
+
+                                let year = new Date(this.x).getFullYear();
+                                let decade = year - year % 10 + 1;
+                                if (decade > 2071) {
+                                    decade = 2071;
+                                }
+                                let decade_ms= Date.UTC(decade,0,1);
+                                chart.xAxis[0].removePlotBand('30y-plot-band');
+                                chart.xAxis[0].addPlotBand({
+                                    from:Date.UTC(decade,0,1),
+                                    to:Date.UTC(decade+30,0,1),
+                                    id: '30y-plot-band'
+                                });
+
+                                this.chart = tooltip.chart;
+                                this.axis = tooltip.chart.yAxis[0];
+                                let val1, val2;
+
+                                let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 30) + "</span><br/>"];
+
+                                this.value = data['30y_rcp26_median'][decade_ms][0];
+                                val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                tip.push("<span style=\"color:#00F\">●</span> " + chart_labels.rcp_26_median + " <b>"
+                                    + val1 + "</b><br/>");
+                                
+                                this.value = data['30y_rcp26_range'][decade_ms][0];
+                                val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                this.value = data['30y_rcp26_range'][decade_ms][1];
+                                val2 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                tip.push("<span style=\"color:#00F\">●</span> " + chart_labels.rcp_26_range + " <b>"
+                                    + val1 + "</b>-<b>" + val2 + "</b><br/>");
+
+
+                                this.value = data['30y_rcp45_median'][decade_ms][0];
+                                val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                tip.push("<span style=\"color:#00640c\">●</span> " + chart_labels.rcp_45_median + " <b>"
+                                    + val1 + "</b><br/>");
+
+                                this.value = data['30y_rcp45_range'][decade_ms][0];
+                                val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                this.value = data['30y_rcp45_range'][decade_ms][1];
+                                val2 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                tip.push("<span style=\"color:#00640c\">●</span> " + chart_labels.rcp_45_range + " <b>"
+                                    + val1 + "</b>-<b>" + val2 + "</b><br/>");
+
+
+                                this.value = data['30y_rcp85_median'][decade_ms][0];
+                                val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                tip.push("<span style=\"color:#F00\">●</span> " + chart_labels.rcp_85_median + " <b>"
+                                    + val1 + "</b><br/>");
+
+                                this.value = data['30y_rcp85_range'][decade_ms][0];
+                                val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                this.value = data['30y_rcp85_range'][decade_ms][1];
+                                val2 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                tip.push("<span style=\"color:#F00\">●</span> " + chart_labels.rcp_85_range + " <b>"
+                                    + val1 + "</b>-<b>" + val2 + "</b><br/>");
+
+
+                                return tip;
+                            }
+                        }});
+                        break;
+                    case 'delta':
+                        chart.xAxis[0].removePlotBand('30y-plot-band');
+                        chart.xAxis[0].removePlotBand('delta-plot-band');
+                        chart.xAxis[0].addPlotBand({
+                            from:Date.UTC(1971,0,1),
+                            to:Date.UTC(1971+30,0,1),
+                            color: 'rgba(51,63,80,0.2)',
+                            id: 'delta-plot-band'
+                        });
+
+                        chart.update({
+                            xAxis: {
+                                crosshair: false
+                            },
+                            plotOptions: {
+                                series: {
+                                    states: {
+                                        hover: {
+                                            enabled: false
+                                        },
+                                        inactive: {
+                                            enabled: false
+                                        }
+                                    }
+                                }
+                            },
+                            tooltip: {
+
+                                formatter: function (tooltip) {
+
+                                    let year = new Date(this.x).getFullYear();
+                                    let decade = year - year % 10 + 1;
+                                    if (decade > 2071) {
+                                        decade = 2071;
+                                    }
+                                    let decade_ms= Date.UTC(decade,0,1);
+                                    chart.xAxis[0].removePlotBand('30y-plot-band');
+                                    chart.xAxis[0].addPlotBand({
+                                        from:Date.UTC(decade,0,1),
+                                        to:Date.UTC(decade+30,0,1),
+                                        id: '30y-plot-band'
+                                    });
+
+                                    function numformat (num) {
+                                        let str = "";
+                                        if (num > 0) {
+                                            str += "+"
+                                        }
+                                        str += num.toFixed(chartDecimals);
+                                        switch( chartUnit) {
+                                            case "day of the year":
+                                                str += " days";
+                                                break;
+                                            default:
+                                                str += " " + chartUnit;
+                                                break;
+                                        }
+                                        return str;
+                                    }
+
+
+
+                                    this.chart = tooltip.chart;
+                                    this.axis = tooltip.chart.yAxis[0];
+                                    let val1, val2;
+
+                                    let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 30) + " Change from 1971-2000</span><br/>"];
+
+                                    val1 = numformat(data['delta7100_rcp26_median'][decade_ms][0]);
+                                    tip.push("<span style=\"color:#00F\">●</span> " + chart_labels.rcp_26_median + " <b>"
+                                        + val1 + "</b><br/>");
+
+                                    val1 = numformat(data['delta7100_rcp26_range'][decade_ms][0]);
+                                    val2 = numformat(data['delta7100_rcp26_range'][decade_ms][1]);
+                                    tip.push("<span style=\"color:#00F\">●</span> " + chart_labels.rcp_26_range + " <b>"
+                                        + val1 + "</b>-<b>" + val2 + "</b><br/>");
+
+
+                                    val1 = numformat(data['delta7100_rcp45_median'][decade_ms][0]);
+                                    tip.push("<span style=\"color:#00640c\">●</span> " + chart_labels.rcp_45_median + " <b>"
+                                        + val1 + "</b><br/>");
+
+                                    val1 = numformat(data['delta7100_rcp45_range'][decade_ms][0]);
+                                    val2 = numformat(this.value = data['delta7100_rcp45_range'][decade_ms][1]);
+                                    tip.push("<span style=\"color:#00640c\">●</span> " + chart_labels.rcp_45_range + " <b>"
+                                        + val1 + "</b>-<b>" + val2 + "</b><br/>");
+
+
+                                    val1= numformat(data['delta7100_rcp85_median'][decade_ms][0]);
+                                    tip.push("<span style=\"color:#F00\">●</span> " + chart_labels.rcp_85_median + " <b>"
+                                        + val1 + "</b><br/>");
+
+                                    val1 = numformat(data['delta7100_rcp85_range'][decade_ms][0]);
+                                    val2 = numformat(data['delta7100_rcp85_range'][decade_ms][1]);
+                                    tip.push("<span style=\"color:#F00\">●</span> " + chart_labels.rcp_85_range + " <b>"
+                                        + val1 + "</b>-<b>" + val2 + "</b><br/>");
+
+
+                                    return tip;
+                                }
+                            }});
+                        break;
+                }
+            });
 
             $('.chart-export-data').click(function (e) {
                 e.preventDefault();
@@ -1445,11 +1660,9 @@
                 callback: function (varDetails) {
 
                     $('#rcp').prop('disabled', true);
-                    let delta=aord_value == 'd'? 'true':'false';
 
                     $.getJSON(
-                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month
-                        + '?delta7100=' + delta,
+                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
                         function (data) {
                             disPlayChartData(data, varDetails);
                         });
@@ -1470,6 +1683,7 @@
                 position: 'right',
                 callback: function (varDetails) {
                     $('#rcp').prop('disabled', true);
+
                     $.getJSON(hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id
                         + '/' + variable + '/' + month).then(function (data) {
                         disPlayChartData(data,varDetails);

@@ -1,3 +1,6 @@
+2021-10-07.01
+  * Added MM-DD optional input control to analyze page
+
 2021-09-23.01
   * Event tracking with Google Analytics
 

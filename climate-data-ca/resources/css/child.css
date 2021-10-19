@@ -7198,6 +7198,25 @@ body.stations-on #variable-content .leaflet-top.leaflet-right {
 #analyze-detail #placeholder input {
   max-width: 80px;
 }
+#analyze-detail #placeholder input::placeholder {
+  color: rgba(255, 255, 255, 0.75);
+}
+#analyze-detail #placeholder input::-webkit-input-placeholder {
+  /* Chrome/Opera/Safari */
+  color: rgba(255, 255, 255, 0.75);
+}
+#analyze-detail #placeholder input::-moz-placeholder {
+  /* Firefox 19+ */
+  color: rgba(255, 255, 255, 0.75);
+}
+#analyze-detail #placeholder input:-ms-input-placeholder {
+  /* IE 10+ */
+  color: rgba(255, 255, 255, 0.75);
+}
+#analyze-detail #placeholder input:-moz-placeholder {
+  /* Firefox 18- */
+  color: rgba(255, 255, 255, 0.75);
+}
 
 #analyze-breadcrumb {
   padding-top: 15px;

@@ -1341,6 +1341,11 @@
 
 
             var chart = Highcharts.stockChart('chart-placeholder', {
+                chart: {
+                    numberFormatter: function (num) {
+                        return  Highcharts.numberFormat(num, chartDecimals);
+                    }
+                },
 
                 title: {
                     text: varDetails['title']
@@ -1450,7 +1455,7 @@
                                 chart.xAxis[0].removePlotBand('30y-plot-band');
                                 chart.xAxis[0].addPlotBand({
                                     from:Date.UTC(decade,0,1),
-                                    to:Date.UTC(decade+30,0,1),
+                                    to:Date.UTC(decade+29,11,31),
                                     id: '30y-plot-band'
                                 });
 
@@ -1458,7 +1463,7 @@
                                 this.axis = tooltip.chart.yAxis[0];
                                 let val1, val2;
 
-                                let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 30) + "</span><br/>"];
+                                let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + "</span><br/>"];
 
                                 this.value = data['30y_rcp26_median'][decade_ms][0];
                                 val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
@@ -1508,8 +1513,8 @@
                         chart.xAxis[0].removePlotBand('delta-plot-band');
                         chart.xAxis[0].addPlotBand({
                             from:Date.UTC(1971,0,1),
-                            to:Date.UTC(1971+30,0,1),
-                            color: 'rgba(51,63,80,0.2)',
+                            to:Date.UTC(2000,11,31),
+                            color: 'rgba(51,63,80,0.05)',
                             id: 'delta-plot-band'
                         });
 
@@ -1542,7 +1547,7 @@
                                     chart.xAxis[0].removePlotBand('30y-plot-band');
                                     chart.xAxis[0].addPlotBand({
                                         from:Date.UTC(decade,0,1),
-                                        to:Date.UTC(decade+30,0,1),
+                                        to:Date.UTC(decade+29,11,31),
                                         id: '30y-plot-band'
                                     });
 
@@ -1551,7 +1556,7 @@
                                         if (num > 0) {
                                             str += "+"
                                         }
-                                        str += num.toFixed(chartDecimals);
+                                        str += Highcharts.numberFormat(num, chartDecimals);
                                         switch( chartUnit) {
                                             case "day of the year":
                                                 str += " days";
@@ -1569,7 +1574,7 @@
                                     this.axis = tooltip.chart.yAxis[0];
                                     let val1, val2;
 
-                                    let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 30) + " Change from 1971-2000</span><br/>"];
+                                    let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + " Change from 1971-2000</span><br/>"];
 
                                     val1 = numformat(data['delta7100_rcp26_median'][decade_ms][0]);
                                     tip.push("<span style=\"color:#00F\">●</span> " + chart_labels.rcp_26_median + " <b>"

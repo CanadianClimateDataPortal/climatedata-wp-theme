@@ -152,7 +152,7 @@
                                   if ( get_row_layout() == 'text' ) {
 
                                     $new_block = array (
-                                      'text' => get_sub_field ( 'text' )
+                                      'text' => htmlspecialchars(get_sub_field ( 'text' ), ENT_QUOTES)
                                     );
 
                                   } elseif ( get_row_layout() == 'input' ) {

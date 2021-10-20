@@ -1173,7 +1173,7 @@
             });
         }
 
-        function disPlayChartData(data, varDetails) {
+        function disPlayChartData(data, varDetails, download_url) {
             const firstDayOfYear = Date.UTC(2019,0,1);
             chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
             chartDecimals = varDetails['decimals'];
@@ -1614,13 +1614,18 @@
 
             $('.chart-export-data').click(function (e) {
                 e.preventDefault();
-
-                var dl_type = '';
-
                 switch ($(this).attr('data-type')) {
                     case 'csv':
                         setDataLayerForChartData('csv', chart);
-                        chart.downloadCSV();
+                        switch($('input[name=chartoption]:checked').val()) {
+                            case 'annual':
+                                chart.downloadCSV();
+                                break;
+                            case '30y':
+                            case 'delta':
+                                window.location.href = download_url;
+                                break;
+                        }
                         break;
                 }
 
@@ -1665,11 +1670,11 @@
                 callback: function (varDetails) {
 
                     $('#rcp').prop('disabled', true);
-
+                    let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month;
                     $.getJSON(
                         data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
                         function (data) {
-                            disPlayChartData(data, varDetails);
+                            disPlayChartData(data, varDetails, download_url);
                         });
 
                 }
@@ -1688,10 +1693,11 @@
                 position: 'right',
                 callback: function (varDetails) {
                     $('#rcp').prop('disabled', true);
+                    let download_url = data_url + '/download-regional-30y/' + query['sector'] + '/' + id + '/' + variable + '/' + month;
 
                     $.getJSON(hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id
                         + '/' + variable + '/' + month).then(function (data) {
-                        disPlayChartData(data,varDetails);
+                        disPlayChartData(data,varDetails, download_url);
                     });
 
 

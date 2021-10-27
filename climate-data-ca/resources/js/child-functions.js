@@ -244,7 +244,7 @@ var chart_labels, legend_labels, l10n_labels;
       station_data: 'station data',
       selectstation: 'Select at least one station to download data.',
       readytoprocess: 'Ready to process.',
-      misc: 'Miscellaneous',   
+      misc: 'Miscellaneous',
       allbccaq: 'All BCCAQv2 variables',
       gridded_data: 'Gridded data',
       census: 'Census subdivisions',
@@ -286,8 +286,8 @@ var chart_labels, legend_labels, l10n_labels;
         other_variables: 'autres',
         station_data: 'données des stations',
         selectstation: 'Sélectionner au moins une station pour télécharger les données.',
-        readytoprocess: 'Prêt à traiter.',        
-        misc: 'Divers',        
+        readytoprocess: 'Prêt à traiter.',
+        misc: 'Divers',
         allbccaq: 'Toutes les variables BCCAQv2',
         gridded_data: 'Données maillées',
         census: 'Subdivisions de recensement',
@@ -325,6 +325,16 @@ var chart_labels, legend_labels, l10n_labels;
     //
     // FEEDBACK
     //
+
+		$('input.other').hide()
+
+		$('.has-other').change(function() {
+			if ($(this).find(':selected').attr('value') == 'Other') {
+				$(this).next('.other').show()
+			} else {
+				$(this).next('.other').val('').hide()
+			}
+		})
 
     $('.feedback-form').submit(function(e) {
       e.preventDefault();

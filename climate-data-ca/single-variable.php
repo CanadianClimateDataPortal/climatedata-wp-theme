@@ -345,7 +345,7 @@ if (have_posts()) : while (have_posts()) : the_post();
 
                 <div class="overlay-content-row">
                     <div class="overlay-content-chart">
-                        <div class="navbar chart-navbar d-flex mb-5">
+                        <div class="navbar chart-navbar d-flex align-items-center mb-5">
 
 							<?php
 
@@ -382,7 +382,7 @@ if (have_posts()) : while (have_posts()) : the_post();
                                 <a href="#" class="btn btn-sm btn-outline-secondary page-tour-trigger" data-tour="chart-tour"><span class="fas fa-question icon rounded-circle icon mr-3"></span><?php _e('How to read this', 'cdc'); ?></a>
                             </div>
 
-                            <div class="nav-item d-flex align-items-center mr-5">
+                            <div class="nav-item d-flex align-items-center mr-3">
                                 <h6><span class="cdc-icon icon-download-data"></span> <?php _e('Download data', 'cdc'); ?></h6>
 
                                 <div class="btn-group btn-group-sm" role="group">

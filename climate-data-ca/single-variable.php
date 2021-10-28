@@ -371,6 +371,21 @@ if (have_posts()) : while (have_posts()) : the_post();
                                 </div>
                             </div>
                         </div>
+                        <?php
+                        if (get_field('hasdelta')) {
+                            ?>
+                            <div class="chart-delta d-flex">
+                                <p>Select to show:</p>
+                                <input type="radio" id="chatoption1" name="chartoption" value="annual" checked>
+                                <label for="chatoption1"><?php _e('Annual values', 'cdc'); ?></label><br>
+                                <input type="radio" id="chartoption2" name="chartoption" value="30y">
+                                <label for="chartoption2"><?php _e('30 year averages', 'cdc'); ?></label><br>
+                                <input type="radio" id="chartoption3" name="chartoption" value="delta">
+                                <label for="chartoption3"><?php _e('30 year changes', 'cdc'); ?></label>
+                            </div>
+                            <?php
+                        }
+                        ?>
 
                         <div id="chart-placeholder" class="var-chart"></div>
                     </div>
@@ -498,7 +513,7 @@ if (have_posts()) : while (have_posts()) : the_post();
                                 <h6><span class="cdc-icon icon-download-data"></span> <?php _e('Download data', 'cdc'); ?></h6>
 
                                 <div class="btn-group btn-group-sm" role="group">
-                                    <a href="#" class="chart-export-data btn btn-sm btn-outline-secondary" data-type="csv">CSV</a>
+                                    <a href="#" class="chart-export-data btn btn-sm btn-outline-secondary" id="variable-download-data-grid" data-type="csv">CSV</a>
                                 </div>
                             </div>
 
@@ -510,7 +525,22 @@ if (have_posts()) : while (have_posts()) : the_post();
                                 </div>
                             </div>
                         </div>
+                        <?php
+                        if (get_field('hasdelta')) {
+                            ?>
+                            <div class="chart-delta d-flex">
+                                <p>Select to show:</p>
+                                <input type="radio" id="chatoption1" name="chartoption" value="annual" checked>
+                                <label for="chatoption1"><?php _e('Annual values', 'cdc'); ?></label><br>
+                                <input type="radio" id="chartoption2" name="chartoption" value="30y">
+                                <label for="chartoption2"><?php _e('30 year averages', 'cdc'); ?></label><br>
+                                <input type="radio" id="chartoption3" name="chartoption" value="delta">
+                                <label for="chartoption3"><?php _e('30 year changes', 'cdc'); ?></label>
 
+                            </div>
+                            <?php
+                        }
+                        ?>
                         <div id="chart-placeholder" class="var-chart"></div>
                     </div>
                 </div>

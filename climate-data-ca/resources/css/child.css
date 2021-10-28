@@ -6608,11 +6608,8 @@ body.stations-on #variable-content .leaflet-top.leaflet-right {
   margin-right: 0;
   margin-left: 0;
 }
-.variable-data-overlay .navbar {
-  position: absolute;
-  top: 25px;
-  right: 40px;
-  z-index: 2;
+.variable-data-overlay .chart-delta .form-check {
+  font-size: 1.25rem;
 }
 .variable-data-overlay .overlay-content-chart {
   padding: 20px 40px;

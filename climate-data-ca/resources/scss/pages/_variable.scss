@@ -501,13 +501,19 @@ body.stations-on {
   }
 
   .navbar {
-    position: absolute;
-    top: 25px;
-    right: 40px;
-    z-index: 2;
+    // position: absolute;
+    // top: 25px;
+    // right: 40px;
+    // z-index: 2;
     //@include nested-column(7, 9);
     //@include nested-offset(1, 9);
   }
+
+	.chart-delta {
+		.form-check {
+			font-size: 1.25rem;
+		}
+	}
 
   .overlay-content-chart {
     padding: 20px 40px;

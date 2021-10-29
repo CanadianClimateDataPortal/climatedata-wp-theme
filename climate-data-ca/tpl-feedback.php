@@ -96,8 +96,8 @@
           <label for="region" class="form-label"><?php _e ( 'Where are you contacting us from?', 'cdc' ); ?></label>
         </p>
 
-        <div class="form-text col-7 offset-1">
-					<select name="region" class="form-control form-control-lg text-center rounded-pill">
+        <div class="form-text col-7 offset-1 d-flex">
+					<select name="region" class="form-control form-control-lg text-center rounded-pill has-other">
 						<option>- <?php _e ( 'Select your region', 'cdc' ); ?> -</option>
 						<option><?php _e ( 'Alberta', 'cdc' ); ?></option>
 						<option><?php _e ( 'British Columbia', 'cdc' ); ?></option>
@@ -112,7 +112,11 @@
 						<option><?php _e ( 'Québec', 'cdc' ); ?></option>
 						<option><?php _e ( 'Saskwatchewan', 'cdc' ); ?></option>
 						<option><?php _e ( 'Yukon', 'cdc' ); ?></option>
+						<option><?php _e ( 'USA', 'cdc' ); ?></option>
+						<option value="Other"><?php _e ( 'Other', 'cdc' ); ?></option>
 					</select>
+
+					<input type="text" name="region-other" class="form-control form-control-lg other ml-3" placeholder="<?php _e ( 'Please specify', 'cdc' ); ?>">
         </div>
       </div>
 
@@ -137,6 +141,35 @@
 					</select>
 
 					<input type="text" name="role-other" class="form-control form-control-lg other ml-3" placeholder="<?php _e ( 'Please specify', 'cdc' ); ?>">
+        </div>
+      </div>
+
+      <div class="form-layout-row row align-items-center">
+        <p class="form-label-wrap col-7 offset-1 mb-3">
+          <label for="subject" class="form-label"><?php _e ( 'What is your inquiry related to?', 'cdc' ); ?></label>
+        </p>
+
+        <div class="form-text col-7 offset-1 d-flex">
+					<select name="subject" class="form-control form-control-lg text-center rounded-pill has-other">
+						<option>- <?php _e ( 'Select an option', 'cdc' ); ?> -</option>
+						<option>Agriculture / Food / Fishing</option>
+						<option>Conservation / Environment</option>
+						<option>Construction / Buildings</option>
+						<option>Education / Training</option>
+						<option>Energy</option>
+						<option>Finance / Insurance</option>
+						<option>Forestry</option>
+						<option>Health</option>
+						<option>Information Technology</option>
+						<option>Mining</option>
+						<option>Municipal Services / Planning</option>
+						<option>Public Safety </option>
+						<option>Tourism / Recreation</option>
+						<option>Transportation</option>
+						<option value="Other">Other</option>
+					</select>
+
+					<input type="text" name="subject-other" class="form-control form-control-lg other ml-3" placeholder="<?php _e ( 'Please specify', 'cdc' ); ?>">
         </div>
       </div>
 

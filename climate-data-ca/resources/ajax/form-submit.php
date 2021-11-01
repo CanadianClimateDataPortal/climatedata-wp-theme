@@ -2,6 +2,9 @@
 
 $parse_uri = explode( 'assets', $_SERVER['SCRIPT_FILENAME'] );
 require_once( $parse_uri[0] . 'wp-load.php' );
+wp();
+
+$to_2 = $GLOBALS['vars']['feedback_email'];
 
 include_once ( locate_template ( 'resources/php/securimage/securimage.php' ) );
 
@@ -54,9 +57,11 @@ if ($securimage->check($_GET['captcha_code']) == false) {
 
   $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Type</span><span style="display: inline-block; vertical-align: top;">' . $form_data['feedback-type'] . '</span></p>';
 
-  $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Region</span><span style="display: inline-block; vertical-align: top;">' . $form_data['region'] . '</span></p>';
+  $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Region</span><span style="display: inline-block; vertical-align: top;">' . $form_data['region'];
 
-	if ( $form_data['region'] == 'Other' && $form_data['region-other'] != '' ) $body .= ': ' . $form_data['region-other'];
+  if ( $form_data['region'] == 'Other' && $form_data['region-other'] != '' ) $body .= ': ' . $form_data['region-other'];
+
+  $body .= '</span></p>';
 
   $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Role</span><span style="display: inline-block; vertical-align: top;">' . $form_data['role'];
 
@@ -83,7 +88,7 @@ if ($securimage->check($_GET['captcha_code']) == false) {
 //  $body .= '<p style="font-size: 80%">This message was sent at ' . current_time ('H:i:s' ) . ' on ' . current_time ( 'F j, Y' ) . '</p>';
 
   $result = wp_mail ( $to, $subject, $body, $headers );
-  $result = wp_mail ( "info.cccs-ccsc@canada.ca", $subject, $body, $headers );
+  $result = wp_mail ( $to_2, $subject, $body, $headers );
 
   if($result) {
     echo 'success';

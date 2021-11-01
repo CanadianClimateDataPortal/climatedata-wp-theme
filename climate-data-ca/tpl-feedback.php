@@ -128,16 +128,16 @@
         <div class="form-text col-7 offset-1 d-flex">
 					<select name="role" class="form-control form-control-lg text-center rounded-pill has-other">
 						<option>- <?php _e ( 'Select an option', 'cdc' ); ?> -</option>
-						<option>General public</option>
-						<option>Academic / Research</option>
-						<option>Business / Industry</option>
-						<option>Government – federal</option>
-						<option>Government – Indigenous</option>
-						<option>Government – municipal</option>
-						<option>Government – provincial / territorial</option>
-						<option>Media</option>
-						<option>Not-for-profit organization</option>
-						<option value="Other">Other</option>
+						<option><?php _e ( 'General public', 'cdc' ); ?></option>
+						<option><?php _e ( 'Academic / Research', 'cdc' ); ?></option>
+						<option><?php _e ( 'Business / Industry', 'cdc' ); ?></option>
+						<option><?php _e ( 'Government – federal', 'cdc' ); ?></option>
+						<option><?php _e ( 'Government – Indigenous', 'cdc' ); ?></option>
+						<option><?php _e ( 'Government – municipal', 'cdc' ); ?></option>
+						<option><?php _e ( 'Government – provincial / territorial', 'cdc' ); ?></option>
+						<option><?php _e ( 'Media', 'cdc' ); ?></option>
+						<option><?php _e ( 'Not-for-profit organization', 'cdc' ); ?></option>
+						<option value="Other"><?php _e ( 'Other', 'cdc' ); ?></option>
 					</select>
 
 					<input type="text" name="role-other" class="form-control form-control-lg other ml-3" placeholder="<?php _e ( 'Please specify', 'cdc' ); ?>">
@@ -152,21 +152,21 @@
         <div class="form-text col-7 offset-1 d-flex">
 					<select name="subject" class="form-control form-control-lg text-center rounded-pill has-other">
 						<option>- <?php _e ( 'Select an option', 'cdc' ); ?> -</option>
-						<option>Agriculture / Food / Fishing</option>
-						<option>Conservation / Environment</option>
-						<option>Construction / Buildings</option>
-						<option>Education / Training</option>
-						<option>Energy</option>
-						<option>Finance / Insurance</option>
-						<option>Forestry</option>
-						<option>Health</option>
-						<option>Information Technology</option>
-						<option>Mining</option>
-						<option>Municipal Services / Planning</option>
-						<option>Public Safety </option>
-						<option>Tourism / Recreation</option>
-						<option>Transportation</option>
-						<option value="Other">Other</option>
+                        <option><?php _e ( 'Agriculture / Food / Fishing', 'cdc' ); ?></option>
+                        <option><?php _e ( 'Conservation / Environment', 'cdc' ); ?></option>
+                        <option><?php _e ( 'Construction / Buildings', 'cdc' ); ?></option>
+                        <option><?php _e ( 'Education / Training', 'cdc' ); ?></option>
+                        <option><?php _e ( 'Energy', 'cdc' ); ?></option>
+                        <option><?php _e ( 'Finance / Insurance', 'cdc' ); ?></option>
+                        <option><?php _e ( 'Forestry', 'cdc' ); ?></option>
+                        <option><?php _e ( 'Health', 'cdc' ); ?></option>
+                        <option><?php _e ( 'Information Technology', 'cdc' ); ?></option>
+                        <option><?php _e ( 'Mining', 'cdc' ); ?></option>
+                        <option><?php _e ( 'Municipal Services / Planning', 'cdc' ); ?></option>
+                        <option><?php _e ( 'Public Safety', 'cdc' ); ?></option>
+                        <option><?php _e ( 'Tourism / Recreation', 'cdc' ); ?></option>
+                        <option><?php _e ( 'Transportation', 'cdc' ); ?></option>
+                        <option value="Other"><?php _e ( 'Other', 'cdc' ); ?></option>
 					</select>
 
 					<input type="text" name="subject-other" class="form-control form-control-lg other ml-3" placeholder="<?php _e ( 'Please specify', 'cdc' ); ?>">
@@ -181,15 +181,15 @@
         <div class="form-text col-7 offset-1 d-flex">
 					<select name="referral" class="form-control form-control-lg text-center rounded-pill has-other">
 						<option>- <?php _e ( 'Select an option', 'cdc' ); ?> -</option>
-						<option>Search engine</option>
-						<option>Word of mouth</option>
-						<option>Services offered by the Canadian Centre for Climate Services (e.g. webinar, workshop or Support Desk)</option>
-						<option>Professional association</option>
-						<option>Organization focused on climate/adaptation</option>
-						<option>Conference</option>
-						<option>Media (e.g. social media, online, TV, print, radio)</option>
-						<option>Internet search</option>
-						<option value="Other">Other</option>
+						<option><?php _e('Search engine', 'cdc' ); ?></option>
+						<option><?php _e('Word of mouth', 'cdc' ); ?></option>
+						<option><?php _e('Services offered by the Canadian Centre for Climate Services (e.g. webinar, workshop or Support Desk)', 'cdc' ); ?></option>
+						<option><?php _e('Professional association', 'cdc' ); ?></option>
+						<option><?php _e('Organization focused on climate/adaptation', 'cdc' ); ?></option>
+						<option><?php _e('Conference', 'cdc' ); ?></option>
+						<option><?php _e('Media (e.g. social media, online, TV, print, radio)', 'cdc' ); ?></option>
+						<option><?php _e('Internet search', 'cdc' ); ?></option>
+						<option value="Other"><?php _e('Other', 'cdc' ); ?></option>
 					</select>
 
 					<input type="text" name="referral-other" class="form-control form-control-lg other ml-3" placeholder="<?php _e ( 'Please specify', 'cdc' ); ?>">

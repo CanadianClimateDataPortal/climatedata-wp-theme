@@ -198,7 +198,7 @@
 
       <div class="form-layout-row row">
         <p class="form-label-wrap col-3 offset-1">
-          <label for="download-dataset" class="form-label"><?php _e ( 'Feedback', 'cdc' ); ?></label>
+          <label for="download-dataset" class="form-label"><?php _e ( 'Describe your inquiry', 'cdc' ); ?></label>
         </p>
 
         <div class="form-radio col-7 col-md-5 col-lg-4">
@@ -216,8 +216,8 @@
           </div>
         </div>
 
-        <div class="form-input form-textarea col-7 col-md-5 col-lg-4 offset-4">
-          <textarea name="feedback" rows="6" class="form-control"></textarea>
+        <div class="form-input form-textarea col-7 offset-1">
+          <textarea name="feedback" rows="12" class="form-control"></textarea>
         </div>
 
         <div class="form-input form-textarea col-7 col-md-5 col-lg-4 offset-4 d-flex">

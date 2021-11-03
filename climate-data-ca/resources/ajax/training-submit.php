@@ -2,6 +2,9 @@
 
 $parse_uri = explode( 'assets', $_SERVER['SCRIPT_FILENAME'] );
 require_once( $parse_uri[0] . 'wp-load.php' );
+wp();
+
+$to_2 = $GLOBALS['vars']['training_email'];
 
 include_once ( locate_template ( 'resources/php/securimage/securimage.php' ) );
 
@@ -39,13 +42,8 @@ if ($_GET['email']!='') {
 
     $body .= '<p style="font-size: 80%">This message was sent at ' . current_time ('H:i:s' ) . ' on ' . current_time ( 'F j, Y' ) . '</p>';
 
-    // on staging installation, we don't send the e-mail to cccs
-    if (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] == "climatedata.ca" || $_SERVER['HTTP_HOST'] == "donneesclimatiques.ca")) {
-      wp_mail ( $to, $subject, $body, $headers );
-      wp_mail ( "info.cccs-ccsc@canada.ca", $subject, $body, $headers );
-    } else {
-      wp_mail ( "support-backup+training@climatedata.ca", "STAGING: $subject", $body, $headers);
-    }
+    wp_mail ( $to, $subject, $body, $headers );
+    wp_mail ( $to_2, $subject, $body, $headers );
 
     $response['message'] = 'success';
   }

@@ -330,7 +330,17 @@ var chart_labels, legend_labels, l10n_labels;
     // FEEDBACK
     //
 
-    $('.feedback-form').submit(function (e) {
+      $('input.other').hide();
+
+      $('.has-other').change(function () {
+          if ($(this).find(':selected').attr('value') == 'Other') {
+              $(this).next('.other').show()
+          } else {
+              $(this).next('.other').val('').hide()
+          }
+      });
+
+      $('.feedback-form').submit(function (e) {
       e.preventDefault();
 
       var the_form = $(this);

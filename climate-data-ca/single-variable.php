@@ -129,59 +129,64 @@ if (have_posts()) : while (have_posts()) : the_post();
             <div class="col-12 col-sm-6 col-lg sidebar-block">
                 <?php
 
-                $random_resource = new WP_Query ( array (
-									'post_type' => 'resource',
-									'posts_per_page' => 1,
-									'orderby' => 'rand',
-									'tax_query' => array (
-										'relation' => 'OR',
-										array (
-											'taxonomy' => 'resource-category',
-											'field' => 'slug',
-											'terms' => 'module-1'
-										),
-										array (
-											'taxonomy' => 'resource-category',
-											'field' => 'slug',
-											'terms' => 'module-2'
-										),
-										array (
-											'taxonomy' => 'resource-category',
-											'field' => 'slug',
-											'terms' => 'module-3'
-										)
-									)
-								) );
+									// $random_resource = new WP_Query ( array (
+									// 	'post_type' => 'resource',
+									// 	'posts_per_page' => 1,
+									// 	'orderby' => 'rand',
+									// 	'tax_query' => array (
+									// 		'relation' => 'OR',
+									// 		array (
+									// 			'taxonomy' => 'resource-category',
+									// 			'field' => 'slug',
+									// 			'terms' => 'module-1'
+									// 		),
+									// 		array (
+									// 			'taxonomy' => 'resource-category',
+									// 			'field' => 'slug',
+									// 			'terms' => 'module-2'
+									// 		),
+									// 		array (
+									// 			'taxonomy' => 'resource-category',
+									// 			'field' => 'slug',
+									// 			'terms' => 'module-3'
+									// 		)
+									// 	)
+									// ) );
 
-                if ($random_resource->have_posts()) : while ($random_resource->have_posts()) : $random_resource->the_post();
+	                $random_resource = new WP_Query ( array (
+										'post_type' => 'resource',
+										'p' => 4862
+									) );
 
-                    $item = array (
-											'id' => get_the_ID(),
-											'title' => get_the_title(),
-											'permalink' => get_permalink(),
-											'post_type' => get_post_type()
-										);
+	                if ($random_resource->have_posts()) : while ($random_resource->have_posts()) : $random_resource->the_post();
 
-                    ?>
+	                    $item = array (
+												'id' => get_the_ID(),
+												'title' => get_the_title(),
+												'permalink' => get_permalink(),
+												'post_type' => get_post_type()
+											);
 
-                    <div id="var-overlay-resource" class="query-item post-preview type-<?php echo $item['post_type']; ?> h-100">
+	                    ?>
 
-                        <?php
+	                    <div id="var-overlay-resource" class="query-item post-preview type-<?php echo $item['post_type']; ?> h-100">
 
-                        $bg_colour = 'light';
-                        $text_colour = 'body';
+	                        <?php
 
-                        include(locate_template('previews/resource.php'));
+	                        $bg_colour = 'light';
+	                        $text_colour = 'body';
 
-                        ?>
+	                        include(locate_template('previews/resource.php'));
 
-                    </div>
+	                        ?>
 
-                <?php
+	                    </div>
 
-                endwhile; endif;
+	                <?php
 
-                wp_reset_postdata();
+	                endwhile; endif;
+
+	                wp_reset_postdata();
 
                 ?>
             </div>

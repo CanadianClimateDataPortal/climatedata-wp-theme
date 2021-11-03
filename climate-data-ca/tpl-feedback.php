@@ -103,7 +103,7 @@
 						<option><?php _e ( 'British Columbia', 'cdc' ); ?></option>
 						<option><?php _e ( 'Manitoba', 'cdc' ); ?></option>
 						<option><?php _e ( 'New Brunswick', 'cdc' ); ?></option>
-						<option><?php _e ( 'Newfoundland and Labrado', 'cdc' ); ?></option>
+						<option><?php _e ( 'Newfoundland and Labrador', 'cdc' ); ?></option>
 						<option><?php _e ( 'Northwest Territories', 'cdc' ); ?></option>
 						<option><?php _e ( 'Nova Scotia', 'cdc' ); ?></option>
 						<option><?php _e ( 'Nunavut', 'cdc' ); ?></option>

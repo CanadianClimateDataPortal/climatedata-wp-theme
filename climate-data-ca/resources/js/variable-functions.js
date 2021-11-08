@@ -63,6 +63,7 @@
             query['var'] = 'tx_max';
             query['var-group'] = 'temperature';
         }
+        console.warn(" QUERY OBJECT >> query['var-group']: " + query['var-group'])
 
         if ($('#mora').length) {
             query['mora'] = $('#mora').val();
@@ -87,6 +88,8 @@
         } else {
             query['sector'] = '';
         }
+        console.error(" CALLBACK >> query['sector'] =: " + query['sector'])// TODO: DELETE
+                    // sector_on always False:
 
         var history_action = 'init', // global tracking variable for history action
             station_on = false, // flag for showing/hiding the stations layer,
@@ -180,6 +183,8 @@
             }).addTo(mapRight);
 
 
+            console.log(' gridLayerRight = *** hosturl' + "/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG " +'*** ' ) // TODO: DELETE
+
             gridLayerRight = L.vectorGrid.protobuf(
                 hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
                 gridLayer_options
@@ -241,6 +246,8 @@
             }
 
 
+            console.log(' function replaceGrid *** hosturl' + "/geoserver/gwc/service/tms/1.0.0/CDC: gridname == " + gridname  +'*** ' ) // TODO: DELETE
+
             gridLayer = L.vectorGrid.protobuf(
                 hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + gridname + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
                 gridstyle
@@ -250,6 +257,8 @@
                 grid_hover(e);
             }).addTo(map1);
             if ($('#mapRight').length) {
+                console.log(' function replaceGrid >> #mapRight.length *** hosturl' + "/geoserver/gwc/service/tms/1.0.0/CDC: gridname == " + gridname  +'*** ' ) // TODO: DELETE
+
                 gridLayerRight = L.vectorGrid.protobuf(
                     hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + gridname + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
                     gridstyle
@@ -717,7 +726,7 @@
         // grid hover functions
 
         function grid_hover(e) {
-
+            console.log(' function grid_hover(e) >> ridfill_color_hover: ' + gridfill_color_hover) // TODO: DELETE
             grid_initialized = true;
 
             //e.layer.bindTooltip(e.layer.properties.gid.toString() + " acres").openTooltip(e.latlng);
@@ -852,6 +861,9 @@
 
         var_value = $("#var").val();
 
+        console.log(' create *** hosturl' + "/geoserver/gwc/service/tms/1.0.0/CDC:" + 'canadagrid *** ' ) // TODO: DELETE
+
+
         var gridLayer;
         gridLayer = L.vectorGrid.protobuf(
             hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + 'canadagrid' + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
@@ -884,19 +896,27 @@
 
         function getColor(d) {
 
+            if (colormap == undefined) {
+                return;
+            }
+
             for (let i = 0; i < colormap.length; i++) {
                 if (d > colormap[i].quantity) {
+                    console.log("function getColor => colormap[i].color: " + colormap[i].color)
                     return colormap[i].color;
                 }
             }
             return colormap[colormap.length - 1].color;
         }
 
-        function genChoro(sector, year, variable, rcp, frequency) {
+        function genChoro(sector, year, variable, rcp, frequency, name) {
 
             choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency + '/?period=' + year;
+            console.log("\nfunction genChoro => choroPath: " + choroPath)// TODO: DELETE
+            console.log("function genChoro => protobuf: " + hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf")// TODO: DELETE
 
 
+            // choroValues ==  sector colors
             $.getJSON(choroPath).then(function (data) {
 
                 choroValues = data;
@@ -907,16 +927,20 @@
                 } else {
                     var layerStyles = {};
                     layerStyles[currentSector] = function (properties, zoom) {
+                        // console.log("function genChoro => layerStyles[currentSector] = function >> choroValues[properties.id]: " + choroValues[properties.id])// TODO: DELETE
+
                         return {
                             weight: 0.5,
                             color: 'white',
-                            fillColor: getColor(choroValues[properties.id]),
+                            fillColor: "#b3b3b3", //getColor(choroValues[properties.id]),
                             opacity: 1,
                             fill: true,
                             radius: 4,
                             fillOpacity: 1
                         }
                     };
+
+                    console.log("function genChoro => L.vectorGrid.protobuf >> sector: " + sector)// TODO: DELETE
 
                     choroLayer = L.vectorGrid.protobuf(
                         hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf",
@@ -935,11 +959,13 @@
                             vectorTileLayerStyles: layerStyles
                         }
                     ).on('mouseover', function (e) {
+                        // console.log("function genChoro => on('mouseover') >> e.layer.properties.id: " + e.layer.properties.id)// TODO: DELETE
+
                         choroLayer.setFeatureStyle(
                             e.layer.properties.id,
                             {
-                                color: 'white',
-                                fillColor: getColor(choroValues[e.layer.properties.id]),
+                                color: 'white', // #91538e
+                                fillColor: "#ffffff",  // == white / getColor(choroValues[e.layer.properties.id]),
                                 weight: 1.5,
                                 fill: true,
                                 radius: 4,
@@ -948,7 +974,10 @@
                             });
                         choroLayer.bindTooltip(e.layer.properties[l10n_labels.label_field], { sticky: true }).openTooltip(e.latlng);
                     }
+
                     ).on('mouseout', function (e) {
+                        // console.log("function genChoro => on('mouseout') >> choroLayer.resetFeatureStyle(e.layer.properties.id): " + e.layer.properties.id)// TODO: DELETE
+
                         choroLayer.resetFeatureStyle(e.layer.properties.id);
                     }
                     ).on('click', function (e) {
@@ -959,7 +988,12 @@
                         var_value = $("#var").val();
                         mora_value = $("#mora").val();
 
-                        genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
+                        console.log("function genChoro => on('click') >>  current_sector['id']: " + current_sector['id'])// TODO: DELETE
+                        console.log("function genChoro => on('click') >>  current_sector['label']: " + current_sector['label'])// TODO: DELETE
+                        console.log("function genChoro => on('click') >>  var_value: " + var_value)// TODO: DELETE
+                        console.log("function genChoro => on('click') >>  mora_value: " + mora_value)// TODO: DELETE
+
+                        // genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
                     }).addTo(map1);
                 }
             })
@@ -1793,6 +1827,7 @@
             decade_value = parseInt($("#decade").val());
 
             query['var-group'] = $('#var option:selected').parent('optgroup').attr('data-slug');
+            console.warn(" function generateLeftLegend >> query['var-group']: " + query['var-group'])
 
 
             if (mora_value === 'ann') {
@@ -1922,24 +1957,26 @@
                 "&layer=CDC:" + layer + "&format=application/json")
                 .then(function (data) {
 
-                    labels = [];
-                    leftLegend.onAdd = function (map) {
-                        let div = L.DomUtil.create('div', 'info legend legendTable');
-                        colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
-                        let unitValue;
-                        let unitColor;
+                    // labels = [];
+                    // leftLegend.onAdd = function (map) {
+                    //     let div = L.DomUtil.create('div', 'info legend legendTable');
+                    //     colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
+                    //     let unitValue;
+                    //     let unitColor;
 
-                        colormap = colormap.reverse();
+                    //     colormap = colormap.reverse();
 
-                        labels = legend_markup(legendTitle, colormap);
+                    //     labels = legend_markup(legendTitle, colormap);
 
-                        div.innerHTML = labels.join('');
-                        return div;
+                    //     div.innerHTML = labels.join('');
+                    //     return div;
 
-                    };
+                    // };
 
-                    leftLegend.addTo(map1);
+                    // leftLegend.addTo(map1);
 
+                    console.log(" function generateSectorLegend >> url: " + hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic" +
+                        "&layer=CDC:" + layer + "&format=application/json")
                     colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
                     colormap = colormap.map(function (c) { c.quantity = parseFloat(c.quantity); return c; });
 
@@ -1951,10 +1988,12 @@
                     sector_value = $("#sector").val();
 
 
+                    console.warn(" function generateSectorLegend >>  genChoro(sector_value: "+ sector_value)// TODO: DELETE
                     genChoro(sector_value, decade_value, var_value, rcp_value, mora_value);
                     if (currentSector !== sector_value) {
                         currentSector = sector_value;
                         if (map1.hasLayer(choroLayer)) {
+                            console.warn(" function generateSectorLegend >>  map1.removeLayer(choroLayer)")// TODO: DELETE
                             map1.removeLayer(choroLayer);
                         }
                     }
@@ -2003,252 +2042,20 @@
                 $('body').removeClass(settings.layer + '-on');
             }
 
+            console.log(' function layer_swap >> settings.layer: ' + settings.layer) // TODO: DELETE
+
             switch (settings.layer) {
 
                 case 'variable':
-
-                    if (settings.action === 'on') {
-
-                        // set global var & body class
-
-                        var_on = true;
-
-                        // show variable layer
-
-
-                        map1.addLayer(gridLayer);
-                        map1.addLayer(leftLayer);
-
-                        // set grid click/hover functions if they haven't already been
-                        // i.e. if the sector filter exists but its value is ""
-
-                        gridLayer.on('click', function (e) {
-
-                            if (grid_initialized == false) {
-                                grid_click(e);
-                            }
-
-                        }).on('mouseover', function (e) {
-
-                            if (grid_initialized == false) {
-                                grid_hover(e);
-                            }
-
-                        });
-
-                        if (has_mapRight == true) {
-                            mapRight.addLayer(gridLayerRight);
-                            mapRight.addLayer(rightLayer);
-
-                            gridLayerRight.on('click', function (e) {
-
-                                if (grid_initialized == false) {
-                                    grid_click(e);
-                                }
-
-                            }).on('mouseover', function (e) {
-
-                                if (grid_initialized == false) {
-                                    grid_hover(e);
-                                }
-
-                            });
-
-                        }
-
-                        // show sliders
-
-                        sliderChange($('#opacity-slider').data('ionRangeSlider')['old_from']);
-
-                        // turn on right map if the RCP is set to a 'compare' scenario
-
-                        if ($('#rcp').val().indexOf("vs") !== -1) {
-
-                            $('body').addClass('map-compare');
-                            invalidate_maps();
-
-                        }
-
-                        // enable filters
-
-                        $('#mora').prop('disabled', false);
-                        $('#rcp').prop('disabled', false);
-
-                        // turn off stations & sector
-
-                        layer_swap({
-                            layer: 'sector',
-                            action: 'off'
-                        });
-
-                        layer_swap({
-                            layer: 'stations',
-                            action: 'off'
-                        });
-
-                    } else {
-
-                        // set global var & body class
-
-                        var_on = false;
-
-                        // hide variable layer
-
-                        map1.removeLayer(gridLayer);
-                        map1.removeLayer(leftLayer);
-
-                        if (has_mapRight == true) {
-                            mapRight.removeLayer(gridLayerRight);
-                            map1.removeLayer(rightLayer);
-                        }
-
-                        // hide sliders
-
-                        //sliderChange(0);
-
-                        // turn off right map
-
-                        $('body').removeClass('map-compare');
-
-                        invalidate_maps();
-
-                    }
-
+                    layer_swap_variable(settings);
                     break;
 
                 case 'stations':
-
-                    if (settings.action === 'on') {
-
-
-                        // set global var & body class
-
-                        station_on = true;
-
-                        // add station layer
-
-                        console.log('settings.station');
-                        console.log(settings.station);
-
-                        if (settings.station === 'idf') {
-
-
-
-                            if (typeof idf_layer !== 'undefined') {
-                                map1.addLayer(idf_layer);
-                            }
-
-                            if (typeof station_layer !== 'undefined') {
-                                console.log("REMOVE STATION LAYER")
-                                map1.removeLayer(station_layer).closePopup();
-                            }
-
-                        } else if (settings.station === 'weather-stations') {
-
-
-
-                            if (typeof station_layer !== 'undefined') {
-                                map1.addLayer(station_layer);
-                            }
-
-                            if (typeof idf_layer !== 'undefined') {
-                                map1.removeLayer(idf_layer).closePopup();
-                            }
-
-                        }
-
-                        // disable filters
-
-                        // $('#sector').prop('disabled', true);
-
-                        $('#mora').prop('disabled', true);
-                        $('#rcp').prop('disabled', true);
-
-                        // turn off variable & sector
-
-
-                        layer_swap({
-                            layer: 'sector',
-                            action: 'off'
-                        });
-
-                        layer_swap({
-                            layer: 'variable',
-                            action: 'off'
-                        });
-
-                    } else {
-
-                        // set global var & body class
-
-                        station_on = false;
-
-                        // hide station layers
-
-                        if (typeof idf_layer !== 'undefined' && idf_layer !== null) {
-                            map1.removeLayer(idf_layer).closePopup();
-                        }
-
-                        if (typeof station_layer !== 'undefined' && station_layer !== null) {
-                            map1.removeLayer(station_layer).closePopup();
-                        }
-
-                        // enable filters
-
-                        $('#sector').prop('disabled', false);
-
-                    }
-
+                    layer_swap_stations(settings);
                     break;
 
                 case 'sector':
-
-
-                    if (settings.action == 'on') {
-
-                        // set global var & body class
-
-                        sector_on = true;
-
-                        // disable station data options
-
-                        $('#var').find('optgroup[data-slug="station-data"] option').each(function () {
-                            $(this).prop('disabled', true);
-                        });
-
-                        // turn off stations & variable
-
-                        layer_swap({
-                            layer: 'stations',
-                            action: 'off'
-                        });
-
-                        layer_swap({
-                            layer: 'variable',
-                            action: 'off'
-                        });
-
-                        //map1.addLayer(choroLayer);
-
-                    } else {
-
-                        // set global var & body class
-
-                        sector_on = false;
-
-                        // enable station data options
-
-                        $('#var').find('optgroup[data-slug="station-data"] option').each(function () {
-                            $(this).prop('disabled', false);
-                        });
-
-                        if (typeof choroLayer !== 'undefined' && choroLayer !== null) {
-                            map1.removeLayer(choroLayer);
-                        }
-
-                        //toggle_variable('on');
-
-                    }
+                    layer_swap_sector(settings);
 
                     // re-initialize select2 with new disabled/enabled options
                     //           $('#var').select2();
@@ -2262,6 +2069,218 @@
         }
 
 
+        function layer_swap_sector(settings) {
+            if (settings.action == 'on') {
+
+                // set global var & body class
+                sector_on = true;
+
+                // disable station data options
+                $('#var').find('optgroup[data-slug="station-data"] option').each(function () {
+                    $(this).prop('disabled', true);
+                });
+
+                // turn off stations & variable
+                layer_swap({
+                    layer: 'stations',
+                    action: 'off'
+                });
+
+                layer_swap({
+                    layer: 'variable',
+                    action: 'off'
+                });
+
+                //map1.addLayer(choroLayer);
+            } else {
+
+                // set global var & body class
+                sector_on = false;
+
+                // enable station data options
+                $('#var').find('optgroup[data-slug="station-data"] option').each(function () {
+                    $(this).prop('disabled', false);
+                });
+
+                if (typeof choroLayer !== 'undefined' && choroLayer !== null) {
+                    map1.removeLayer(choroLayer);
+                }
+
+                //toggle_variable('on');
+            }
+        }
+
+        function layer_swap_stations(settings) {
+            if (settings.action === 'on') {
+
+
+                // set global var & body class
+                station_on = true;
+                console.error(" function layer_swap_stations >> station_on:" + station_on)// TODO: DELETE
+
+
+                // add station layer
+                console.log('settings.station');
+                console.log(settings.station);
+
+                if (settings.station === 'idf') {
+
+
+
+                    if (typeof idf_layer !== 'undefined') {
+                        map1.addLayer(idf_layer);
+                    }
+
+                    if (typeof station_layer !== 'undefined') {
+                        console.log("REMOVE STATION LAYER");
+                        map1.removeLayer(station_layer).closePopup();
+                    }
+
+                } else if (settings.station === 'weather-stations') {
+
+
+
+                    if (typeof station_layer !== 'undefined') {
+                        map1.addLayer(station_layer);
+                    }
+
+                    if (typeof idf_layer !== 'undefined') {
+                        map1.removeLayer(idf_layer).closePopup();
+                    }
+
+                }
+
+                // disable filters
+                // $('#sector').prop('disabled', true);
+                $('#mora').prop('disabled', true);
+                $('#rcp').prop('disabled', true);
+
+                // turn off variable & sector
+                layer_swap({
+                    layer: 'sector',
+                    action: 'off'
+                });
+
+                layer_swap({
+                    layer: 'variable',
+                    action: 'off'
+                });
+
+            } else {
+
+                // set global var & body class
+                station_on = false;
+
+                // hide station layers
+                if (typeof idf_layer !== 'undefined' && idf_layer !== null) {
+                    map1.removeLayer(idf_layer).closePopup();
+                }
+
+                if (typeof station_layer !== 'undefined' && station_layer !== null) {
+                    map1.removeLayer(station_layer).closePopup();
+                }
+
+                // enable filters
+                $('#sector').prop('disabled', false);
+
+            }
+        }
+
+        function layer_swap_variable(settings) {
+            if (settings.action === 'on') {
+
+                // set global var & body class
+                var_on = true;
+
+                // show variable layer
+                map1.addLayer(gridLayer);
+                map1.addLayer(leftLayer);
+
+                // set grid click/hover functions if they haven't already been
+                // i.e. if the sector filter exists but its value is ""
+                gridLayer.on('click', function (e) {
+
+                    if (grid_initialized == false) {
+                        grid_click(e);
+                    }
+
+                }).on('mouseover', function (e) {
+
+                    if (grid_initialized == false) {
+                        grid_hover(e);
+                    }
+
+                });
+
+                if (has_mapRight == true) {
+                    mapRight.addLayer(gridLayerRight);
+                    mapRight.addLayer(rightLayer);
+
+                    gridLayerRight.on('click', function (e) {
+
+                        if (grid_initialized == false) {
+                            grid_click(e);
+                        }
+
+                    }).on('mouseover', function (e) {
+
+                        if (grid_initialized == false) {
+                            grid_hover(e);
+                        }
+
+                    });
+
+                }
+
+                // show sliders
+                sliderChange($('#opacity-slider').data('ionRangeSlider')['old_from']);
+
+                // turn on right map if the RCP is set to a 'compare' scenario
+                if ($('#rcp').val().indexOf("vs") !== -1) {
+
+                    $('body').addClass('map-compare');
+                    invalidate_maps();
+
+                }
+
+                // enable filters
+                $('#mora').prop('disabled', false);
+                $('#rcp').prop('disabled', false);
+
+                // turn off stations & sector
+                layer_swap({
+                    layer: 'sector',
+                    action: 'off'
+                });
+
+                layer_swap({
+                    layer: 'stations',
+                    action: 'off'
+                });
+
+            } else {
+
+                // set global var & body class
+                var_on = false;
+
+                // hide variable layer
+                map1.removeLayer(gridLayer);
+                map1.removeLayer(leftLayer);
+
+                if (has_mapRight == true) {
+                    mapRight.removeLayer(gridLayerRight);
+                    map1.removeLayer(rightLayer);
+                }
+
+                // hide sliders
+                //sliderChange(0);
+                // turn off right map
+                $('body').removeClass('map-compare');
+
+                invalidate_maps();
+
+            }
+        }
 
         //
         //
@@ -2346,10 +2365,12 @@
                         if (key === 'var') {
 
                             query['var-group'] = $('#var option:selected').parent('optgroup').attr('data-slug');
+                            console.warn(" function eval_query_obj >> query['var-group']: " + query['var-group'])
 
                             if (query['var-group'] === 'station-data') {
 
                                 // station data
+                                console.warn(" eval_query_obj >> layer_swap stations >> query['var']: " + query['var'])// TODO: DELETE
 
                                 layer_swap({
                                     layer: 'stations',
@@ -2378,6 +2399,8 @@
 
                                 // station data not set and
                                 // sector not set
+
+                                console.warn(" eval_query_obj >> (( station data not set and ))layer_swap stations >> query['var']: " + query['var'])// TODO: DELETE
 
                                 if (station_on == true) {
                                     layer_swap({
@@ -2526,12 +2549,12 @@
             update_param('var', select2Val);
             buildFilterMenu();
             generateLeftLegend();
-            changeLayers();
+            changeLayers('#var >> change');
         });
 
         $('#decade').change(function (e) {
             //console.log('decade changed');
-            changeLayers();
+            changeLayers('#decade >> change');
         });
 
 
@@ -2544,7 +2567,7 @@
             update_param('mora', $(this).val());
             update_query_string();
             generateLeftLegend();
-            changeLayers();
+            changeLayers('#mora >> change');
 
             if ($('body').hasClass('overlay-position-right')) {
                 if (query['sector'] !== '') {
@@ -2564,7 +2587,7 @@
             update_param('rcp', $(this).val());
             update_query_string();
             generateLeftLegend();
-            changeLayers();
+            changeLayers('#rcp >> change');
         });
 
 
@@ -2600,7 +2623,8 @@
         });
 
 
-        function changeLayers() {
+        function changeLayers(fromFct) {
+            console.error(" function changeLayers >> fromFct:" + fromFct)// TODO: DELETE
 
 
             rcp_value = $("#rcp").val();
@@ -2611,7 +2635,7 @@
             if (query['var-group'] === 'station-data') {
 
                 // activate station data
-
+                console.error(" (IF) function changeLayers >> layer_swap query['var']:" + query['var'])// TODO: DELETE
                 layer_swap({
                     layer: 'stations',
                     station: query['var']
@@ -2621,23 +2645,29 @@
 
                 // not station data so make sure it's turned off
 
+                console.warn(" (ELSE) function changeLayers >> not station data so make sure it's turned off >> station_on::: " + station_on )// TODO: DELETE
 
-
+                // Is Gridded data
                 if (station_on === true) {
+                    console.error(" (ELSE) function changeLayers >> not station data so make sure it's turned off >> station_on::: " + station_on )// TODO: DELETE
+
                     layer_swap({
                         layer: 'stations',
                         action: 'off'
                     });
                 }
+                console.log(" function changeLayers >> not station data so make sure it's turned off >> query['sector']::: " + query['sector'] )// TODO: DELETE
 
+                // Is not Gridded data
                 if (query['sector'] !== '') {
 
 
                     // activate sector
-
+                    console.log(" function changeLayers ||| ACTIVATE ||| sector_on: " + sector_on  )// TODO: DELETE
+                    // sector_on always False:
                     if (sector_on === false) {
-
-
+                        // When switch from Gridded data to (Census || Health || Watersheds)
+                        console.error(" function changeLayers ||| ACTIVATE ||| sector_on: " + sector_on  )// TODO: DELETE
                         layer_swap({
                             layer: 'sector'
                         });
@@ -2648,15 +2678,20 @@
                         });
                     }
 
+                // Gridded data
                 } else {
 
                     // not sector so make sure it's turned off
+                     console.log(" function changeLayers ||| NOT ACTIVATE ||| not sector so make sure it's turned off >> sector_on: " + sector_on )// TODO: DELETE
 
+                    // sector_on === false, when click refresh the page
                     if (sector_on === true) {
                         layer_swap({
                             layer: 'sector',
                             action: 'off'
                         });
+                    }else{
+                        console.error(" function changeLayers ||| NOT ACTIVATE ||| not sector so make sure it's turned off >> sector_on: " + sector_on )// TODO: DELETE
                     }
 
                     layer_swap({
@@ -2703,8 +2738,11 @@
                     }
 
                     legendLayer = var_value + "_health_" + legendmsorys;
+                    console.log(" (IF) generateLeftLegend query['sector']: " + query['sector']  )// TODO: DELETE
+
                     generateSectorLegend(var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year', '');
                 } else {
+                    console.log(" (ELSE) generateLeftLegend query['sector']: " + query['sector']  )// TODO: DELETE
                     generateLeftLegend();
                 }
 
@@ -3102,6 +3140,7 @@
             }
 
             query['var-group'] = $('#var option:selected').parent('optgroup').attr('data-slug');
+            console.warn(" function buildFilterMenu >> query['var-group']: " + query['var-group'])
 
             // IF THE CHART OVERLAY IS OPEN
 
@@ -3129,7 +3168,7 @@
             if (history_action === 'push') {
                 update_query_string();
             }
-            changeLayers();
+            changeLayers('fct buildLayers');
 
         }  // buildFilterMenu()
 

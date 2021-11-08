@@ -6,9 +6,36 @@
         // GLOBAL VARS
         //
 
+        const select_locations = {
+            GRIDS: "grid",
+            WATERSHED: "watershed",
+            CENSUS : "census",
+            HEALTH: "health",
+        };
+        var map_sectors = {};
+        //map_sectors[select_locations.GRIDS] = {};
+        map_sectors[select_locations.WATERSHED] = {};
+        map_sectors[select_locations.CENSUS] = {};
+        map_sectors[select_locations.HEALTH] = {};
+
+        var selectedSectors = {
+        };
+        //map_sectors[select_locations.GRIDS] = {},
+        selectedSectors[select_locations.WATERSHED] = [];
+        selectedSectors[select_locations.CENSUS] = [];
+        selectedSectors[select_locations.HEALTH] = [];
+
+        // var history_action = 'init', // global tracking variable for history action
+        var station_on = false; // flag for showing/hiding the stations layer,
+        var sector_on = false;
+        // geoselecting = false; // flag for moveend function to decide whether to update the geo-select parameter
+        var query = {};
+
+
         // overlay text
 
         var overlay_text = JSON.parse($('#map-overlay-content').attr('data-steps'))
+        var canadaBounds = L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.60, -49.9));
 
         // form stuff
 
@@ -58,7 +85,9 @@
 
         // grid line/fill options
 
-        var gridline_color = '#657092';
+        // select locations: Grids
+        var gridline_color =  '#657092'; //'#11ff00'; // == green  || '#657092' == bleu
+
         var gridline_color_hover = '#060d12';
         var gridline_color_active = '#e50e40';
         var gridline_width = '0.2';
@@ -80,9 +109,11 @@
             heightStyle: 'content',
             activate: function (e, ui) {
 
+
                 if (ui.newPanel.attr('data-step') == '1') {
 
                     if ($.isEmptyObject(map_grids)) {
+
                         $('#map-overlay').fadeIn(250)
                     }
 
@@ -103,6 +134,7 @@
                 }
             },
             beforeActivate: function (e, ui) {
+
 
                 if (
                     ui.newPanel.attr('data-step') == '3' &&
@@ -214,12 +246,13 @@
         })
 
         // radio/check click event
-
         $('.type-radio .input-item, .type-checkbox .input-item').on('click', function (e) {
             e.preventDefault()
 
             var this_item = $(this).closest('.input-row'),
                 input_parent = this_item.closest('.field')
+
+            var sector_value = this_item.find(':input').val()
 
             if (
                 !this_item.find(':input').hasClass('disabled') &&
@@ -237,6 +270,52 @@
                     this_item.addClass('checked')
                     this_item.find(':input').prop('checked', true)
                     this_item.find('.form-icon').removeClass().addClass(radio_icon_on)
+                    this_item.find(':input').val()
+
+
+                    // var isSectorGridsChecked = $('#analyze-location-grid').parent().parent().hasClass('checked')
+
+                    if(sector_value.toLowerCase().includes("health")){
+                        sector_value = "health"
+                    }else if(sector_value.toLowerCase().includes("census")){
+                        sector_value = "census"
+                    }
+                    isSector = Object.values(select_locations).indexOf(sector_value) > -1
+
+
+
+                    // Only when a Dataset is selected
+                    // if (!$('#select-locations').hasClass('ui-state-disabled')) {
+                    if ( isSector) {
+                            var_value = $("#var").val();
+                        mora_value = $("#mora").val();
+                        mora_text_value = $("#mora option:selected").text();
+                        rcp_value = $("#rcp").val();
+                        decade_value = parseInt($("#decade").val()) + 1;
+
+                        // genChoro(sector_value, decade_value, var_value, rcp_value, mora_value);
+                        // if (currentSector !== sector_value) {
+                        //     currentSector = sector_value;
+                        //     if (analyze_map.hasLayer(choroLayer)) {
+
+                        //         analyze_map.removeLayer(choroLayer);
+                        //     }
+                        // }
+
+
+                        changeLayers(sector_value, rcp_value, decade_value, mora_value,'.type-radio .input-item >>>>> ');
+
+                        if(sector_value !== 'grid'){
+                            console.warn(" --------->> call genChoro")// TODO: DELETE
+                            genChoro(sector_value, '1971', 'tx_max', 'rcp85', 'ann');
+                            if (currentSector !== sector_value) {
+                                currentSector = sector_value;
+                                if (analyze_map.hasLayer(choroLayer)) {
+                                    analyze_map.removeLayer(choroLayer);
+                                }
+                            }
+                        }
+                    }
 
                 } else if (input_parent.hasClass('type-checkbox')) {
 
@@ -246,9 +325,11 @@
 
                         // select all
 
+
                         var this_tree = this_item.next('.tree')
 
                         if (this_item.hasClass('checked')) {
+
 
                             // remove 'checked' class
                             this_item.removeClass('checked')
@@ -269,6 +350,7 @@
                             this_tree.find('.input-row').removeClass('checked')
 
                         } else {
+
 
                             // add 'checked' class
                             this_item.removeClass('partial').addClass('checked')
@@ -291,6 +373,7 @@
                         }
 
                     } else {
+
 
                         if (this_item.hasClass('checked')) {
 
@@ -346,11 +429,602 @@
                 }
 
                 validate_steps()
-                validate_inputs()
+                validate_inputs('radio/check click event')
 
             }
 
         })
+
+        function changeLayers(sector_value, rcp_value, decade_value, mora_value, fromFct) {
+
+
+            // rcp_value = $("#rcp").val();
+            // // decade_value = $("#decade").val();
+            // decade_value = parseInt($("#decade").val());
+            // mora_value = $("#mora").val();
+
+            if (false) { //query['var-group'] === 'station-data'
+            //     // activate station data
+            //     layer_swap({
+            //         layer: 'stations',
+            //         station: query['var']
+            //     });
+
+            } else {
+                if ($('#sector').length) {
+                    query['sector'] = $('#sector').val();
+                } else {
+                    query['sector'] = '';
+                }
+
+                // not station data so make sure it's turned off
+
+
+                // Is Gridded data
+                if (station_on === true) {
+
+                    layer_swap({
+                        layer: 'stations',
+                        action: 'off'
+                    });
+                }
+                // Is not Gridded data
+                if (sector_value !== 'grid') { //  query['sector'] !== ''
+
+
+                    // activate sector
+                    // sector_on always False:
+                    if (sector_on === false) {
+                        // When switch from Gridded data to (Census || Health || Watersheds)
+                        layer_swap({
+                            layer: 'sector'
+                        });
+
+                        layer_swap({
+                            layer: 'variable',
+                            action: 'off'
+                        });
+                    }
+
+                // Gridded data
+                } else {
+
+                    // not sector so make sure it's turned off
+
+                    // sector_on === false, when refresh the page
+                    if (sector_on === true) {
+                        layer_swap({
+                            layer: 'sector',
+                            action: 'off'
+                        });
+                    }else{
+                        console.error(" (02) function changeLayers ||| NOT ACTIVATE ||| not sector so make sure it's turned off >> sector_on: " + sector_on )// TODO: DELETE
+                    }
+
+                    layer_swap({
+                        layer: 'variable'
+                    });
+
+                }
+
+                //console.log("Single Layer: " + singleLayerName);
+                //console.log("Left Layer: " + leftLayerName);
+                //console.log("Right Layer: " + rightLayerName);
+                //console.log("Year: " + decade_value);
+
+                // always generate/re-generate the left legend
+
+
+
+
+
+
+            }
+        }
+
+        function layer_swap(fn_options) {
+
+
+            var defaults = {
+                layer: null,
+                action: 'on'
+            };
+
+            var settings = $.extend(true, defaults, fn_options);
+
+
+            if (settings.action === 'on') {
+                $('body').addClass(settings.layer + '-on');
+            } else {
+                $('body').removeClass(settings.layer + '-on');
+            }
+
+
+            switch (settings.layer) {
+
+                case 'variable':
+                    layer_swap_variable(settings);
+                    break;
+
+                case 'stations':
+                    layer_swap_stations(settings);
+                    break;
+
+                case 'sector':
+                    layer_swap_sector(settings);
+
+                    // re-initialize select2 with new disabled/enabled options
+                    //           $('#var').select2();
+
+                    break;
+
+                default:
+
+            }
+
+        }
+
+        function layer_swap_sector(settings) {
+
+            if (settings.action == 'on') {
+
+                // set global var & body class
+                sector_on = true;
+
+                // disable station data options
+                $('#var').find('optgroup[data-slug="station-data"] option').each(function () {
+                    $(this).prop('disabled', true);
+                });
+
+                // turn off stations & variable
+                layer_swap({
+                    layer: 'stations',
+                    action: 'off'
+                });
+
+                layer_swap({
+                    layer: 'variable',
+                    action: 'off'
+                });
+
+                //analyze_map.addLayer(choroLayer);
+            } else {
+
+                // set global var & body class
+                sector_on = false;
+
+                // enable station data options
+                $('#var').find('optgroup[data-slug="station-data"] option').each(function () {
+                    $(this).prop('disabled', false);
+                });
+
+                if (typeof choroLayer !== 'undefined' && choroLayer !== null) {
+                    analyze_map.removeLayer(choroLayer);
+                }
+
+                //toggle_variable('on');
+            }
+        }
+
+        function layer_swap_stations(settings) {
+
+            if (settings.action === 'on') {
+
+
+                // set global var & body class
+                station_on = true;
+
+
+                // add station layer
+                console.log('settings.station');
+                console.log(settings.station);
+
+                if (settings.station === 'idf') {
+
+
+
+                    if (typeof idf_layer !== 'undefined') {
+                        analyze_map.addLayer(idf_layer);
+                    }
+
+                    if (typeof station_layer !== 'undefined') {
+                        console.log("REMOVE STATION LAYER");
+                        analyze_map.removeLayer(station_layer).closePopup();
+                    }
+
+                } else if (settings.station === 'weather-stations') {
+
+
+
+                    if (typeof station_layer !== 'undefined') {
+                        analyze_map.addLayer(station_layer);
+                    }
+
+                    if (typeof idf_layer !== 'undefined') {
+                        analyze_map.removeLayer(idf_layer).closePopup();
+                    }
+
+                }
+
+                // disable filters
+                // $('#sector').prop('disabled', true);
+                $('#mora').prop('disabled', true);
+                $('#rcp').prop('disabled', true);
+
+                // turn off variable & sector
+                layer_swap({
+                    layer: 'sector',
+                    action: 'off'
+                });
+
+                layer_swap({
+                    layer: 'variable',
+                    action: 'off'
+                });
+
+            } else {
+
+                // set global var & body class
+                station_on = false;
+
+                // hide station layers
+                if (typeof idf_layer !== 'undefined' && idf_layer !== null) {
+                    analyze_map.removeLayer(idf_layer).closePopup();
+                }
+
+                if (typeof station_layer !== 'undefined' && station_layer !== null) {
+                    analyze_map.removeLayer(station_layer).closePopup();
+                }
+
+                // enable filters
+                $('#sector').prop('disabled', false);
+
+            }
+        }
+
+        function layer_swap_variable(settings) {
+
+            if (settings.action === 'on') {
+
+                // set global var & body class
+                var_on = true;
+
+                // show variable layer
+                analyze_map.addLayer(pbfLayer);
+                // analyze_map.addLayer(leftLayer);
+
+                //TODO: uncommen ?
+                // // set grid click/hover functions if they haven't already been
+                // // i.e. if the sector filter exists but its value is ""
+                // pbfLayer.on('click', function (e) {
+
+                //     if (grid_initialized == false) {
+                //         grid_click(e);
+                //     }
+
+                // }).on('mouseover', function (e) {
+
+                //     if (grid_initialized == false) {
+                //         grid_hover(e);
+                //     }
+
+                // });
+
+
+
+                // if (has_mapRight == true) {
+                //     mapRight.addLayer(gridLayerRight);
+                //     mapRight.addLayer(rightLayer);
+
+                //     gridLayerRight.on('click', function (e) {
+
+                //         if (grid_initialized == false) {
+                //             grid_click(e);
+                //         }
+
+                //     }).on('mouseover', function (e) {
+
+                //         if (grid_initialized == false) {
+                //             grid_hover(e);
+                //         }
+
+                //     });
+
+                // }
+
+                // show sliders
+                // sliderChange($('#opacity-slider').data('ionRangeSlider')['old_from']);
+
+                // // turn on right map if the RCP is set to a 'compare' scenario
+                // if ($('#rcp').val().indexOf("vs") !== -1) {
+
+                //     $('body').addClass('map-compare');
+                //     invalidate_maps();
+
+                // }
+
+                // enable filters
+                $('#mora').prop('disabled', false);
+                $('#rcp').prop('disabled', false);
+
+                // turn off stations & sector
+                layer_swap({
+                    layer: 'sector',
+                    action: 'off'
+                });
+
+                layer_swap({
+                    layer: 'stations',
+                    action: 'off'
+                });
+
+            } else {
+
+                // set global var & body class
+                var_on = false;
+
+                // hide variable layer
+                analyze_map.removeLayer(pbfLayer);
+                // analyze_map.removeLayer(leftLayer);
+
+                // if (has_mapRight == true) {
+                //     mapRight.removeLayer(gridLayerRight);
+                //     analyze_map.removeLayer(rightLayer);
+                // }
+
+                // hide sliders
+                //sliderChange(0);
+                // turn off right map
+                $('body').removeClass('map-compare');
+
+                invalidate_maps();
+
+            }
+        }
+
+        // UTILITIES
+
+        function invalidate_maps() {
+
+            analyze_map.invalidateSize();
+
+            // if (has_mapRight == true) {
+            //     mapRight.invalidateSize();
+            // }
+
+        }
+
+
+
+
+
+        var choroLayer = null,
+            choroValues = [];
+
+        var currentSector;
+        var current_sector = [];
+        var current_coords = [];
+
+        function getColor(d) {
+
+            for (let i = 0; i < colormap.length; i++) {
+                if (d > colormap[i].quantity) {
+                    return colormap[i].color;
+                }
+            }
+            return colormap[colormap.length - 1].color;
+        }
+
+        //hosturl = geoserver_url == //dataclimatedata.crim.ca
+        //,choroValues, choroLayer
+        function genChoro(sector, year, variable, rcp, frequency) {
+
+            // /sector/variable/rcp/frequency/year
+            // /watershed/tx_max/rcp45/jan/1971
+
+
+            // https://dataclimatedata.crim.ca/features/health/1.json
+            // var choroPath = hosturl + '/features/health/1.json';
+            var choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency + '/?period=' + year;
+            // var choroPath = hosturl + '/get-regional-feature/' + sector + '/' + variable + '/' + rcp + '/' + frequency + '/?period=' + year;
+
+            var sectorFeatureStyleColor = {
+                'default':{
+                    'color': 'white',
+                    'fillColor': '#ababab'
+                },
+                'mouseover':{
+                    'color': 'white',
+                    'fillColor': 'white' // light grey
+                },
+                'mouseclick':{
+                    'color': '#F00',
+                    'fillColor': '#F00' // light grey
+                },
+            };
+
+            //Display count top menu (map)
+            selectedSectors[sector] = [];
+            deselectedAllGridCell();
+            selectedGrids = [];
+
+
+            $('#analyze-breadcrumb').find('.grid-count').text(selectedSectors[sector].length);
+
+            // choroValues ==  sector colors
+            $.getJSON(choroPath).then(function (data) {
+
+                choroValues = data;
+
+
+
+                if (analyze_map.hasLayer(choroLayer)) {
+                    for (let i = 0; i < choroValues.length; i++)
+                        choroLayer.resetFeatureStyle(i);
+                }else {
+                    var layerStyles = {};
+                    layerStyles[currentSector] = function (properties, zoom) {
+                        // console.log("function genChoro => layerStyles[currentSector] = function >> choroValues[properties.id]: " + choroValues[properties.id])// TODO: DELETE
+
+                        return {
+                            weight: 0.5,
+                            color: sectorFeatureStyleColor['default']['color'], // red
+                            fillColor: sectorFeatureStyleColor['default']['fillColor'], //"#ffea00", // == yellow getColor(choroValues[properties.id]),
+                            opacity: 1,
+                            fill: true,
+                            radius: 4,
+                            fillOpacity: 1
+                        }
+                    };
+
+
+                    choroLayer = L.vectorGrid.protobuf(
+                        hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf",
+                        {
+                            rendererFactory: L.canvas.tile,
+                            interactive: true,
+                            getFeatureId: function (f) {
+                                return f.properties.id;
+                            },
+                            name: 'geojson',
+                            pane: 'sector',
+                            maxNativeZoom: 12,
+                            bounds: canadaBounds,
+                            maxZoom: 12,
+                            minZoom: 3,
+                            vectorTileLayerStyles: layerStyles
+                        }
+                    ).on('mouseover', function (e) {
+
+                        if(map_sectors[sector][e.layer.properties.id] === undefined){
+                            choroLayer.setFeatureStyle(
+                                e.layer.properties.id,
+                                {
+                                    color: sectorFeatureStyleColor['mouseover']['color'], // red
+                                    fillColor: sectorFeatureStyleColor['mouseover']['fillColor'], //"#ffea00", // == yellow getColor(choroValues[properties.id]),
+                                    weight: 1.5,
+                                    fill: true,
+                                    radius: 4,
+                                    opacity: 1,
+                                    fillOpacity: 1
+                                });
+                            choroLayer.bindTooltip(e.layer.properties[l10n_labels.label_field], { sticky: true }).openTooltip(e.latlng);
+                        }
+                    }
+                    ).on('mouseout', function (e) {
+                        console.log("function genChoro => on('mouseout') >> choroLayer.resetFeatureStyle(e.layer.properties.id): " + e.layer.properties.id)// TODO: DELETE
+
+                        if(map_sectors[sector][e.layer.properties.id] === undefined){
+                            console.log("function genChoro => on('mouseout') ((( CLEAR )))>> choroLayer.resetFeatureStyle(e.layer.properties.id): " + e.layer.properties.id)// TODO: DELETE
+                            choroLayer.resetFeatureStyle(e.layer.properties.id);
+
+                        }
+                    }
+                    ).on('click', function (e) {
+
+                        current_sector['id'] = e.layer.properties.id;
+                        current_sector['label'] = e.layer.properties[l10n_labels.label_field];
+
+                        var_value = $("#var").val();
+                        mora_value = $("#mora").val();
+
+
+                        highlightSectorById(sector, current_sector['id'], current_sector['label'] , e, choroLayer, sectorFeatureStyleColor);
+
+                    }).addTo(analyze_map);
+                }
+            })
+        };
+
+
+        function highlightSectorById(sector,id, label, protobufEvent, protobufLayer, featureStyleColor) {
+            var highlightSectorId = id // protobufEvent.layer.properties.gid;
+
+            var selectedSectorsLabels = [];
+            // selectedSectorsLabels[highlightSectorId] =;
+
+            var selectedExists = selectedSectors[sector].includes(highlightSectorId);
+
+            if (selectedExists === false) {
+                 map_sectors[sector][highlightSectorId] = highlightSectorId; //TODO: modify data structure
+
+                 selectedSectors[sector].push(highlightSectorId);
+
+                protobufLayer.setFeatureStyle(highlightSectorId, {
+                    color: featureStyleColor['mouseclick']['color'], // red
+                    fillColor: featureStyleColor['mouseclick']['fillColor'], //"#ffea00", // == yellow getColor(choroValues[properties.id]),
+                    weight: 1.5,
+                    fill: true,
+                    radius: 4,
+                    opacity: 1,
+                    fillOpacity: 1
+                    // weight: 1,
+                    // color: '#F00',
+                    // opacity: 1,
+                    // fill: true,
+                    // radius: 4,
+                    // fillOpacity: 0.1
+                });
+
+            } else {
+                console.warn("function highlightSectorById >>  ((((( DELETE )))) selectedSectors.length: " + selectedSectors[sector].length); // TODO: DELETE
+
+                 map_sectors[sector][highlightSectorId] = undefined;
+
+                // To reset selection
+                for (var i = selectedSectors[sector].length - 1; i >= 0; i--) {
+                    if (selectedSectors[sector][i] === highlightSectorId) {
+                        selectedSectors[sector].splice(i, 1);
+                    }
+                }
+
+                for (var i = selectedSectorsLabels.length - 1; i >= 0; i--) {
+                    if (selectedSectorsLabels[highlightSectorId]) {
+                        selectedSectorsLabels.splice(i, 1);
+                    }
+                }
+
+
+                protobufLayer.setFeatureStyle(highlightSectorId, {
+                    weight: 0.1,
+                    color: featureStyleColor,
+                    opacity: 1,
+                    fill: true,
+                    radius: 4,
+                    fillOpacity: 0
+                });
+
+            }
+
+            //Display count top menu (map)
+
+            $('#analyze-breadcrumb').find('.grid-count').text(selectedSectors[sector].length);
+
+            // var i = 0, lat_val = '', lon_val = '';
+
+            // for (var key in map_grids) {
+
+            //     if (i != 0) {
+            //         lat_val += ',';
+            //         lon_val += ',';
+            //     }
+
+            //     lat_val += map_grids[key]['lat'];
+            //     lon_val += map_grids[key]['lng'];
+
+            //     i++;
+
+            // }
+
+            // $('#lat').val(lat_val);
+            // $('#lon').val(lon_val);
+
+            // validate_inputs('pbfLayer = L.vectorGrid.protobuf');
+
+            L.DomEvent.stop(protobufEvent);
+        }
+
+
 
         // select
 
@@ -372,7 +1046,7 @@
             })
 
             validate_steps()
-            validate_inputs()
+            validate_inputs('#analyze-timeframe-start >> click')
 
         })
 
@@ -391,7 +1065,7 @@
             })
 
             validate_steps()
-            validate_inputs()
+            validate_inputs('#analyze-timeframe-start >> change')
 
         })
 
@@ -518,12 +1192,12 @@
 
             }
 
-            validate_inputs()
+            validate_inputs('.input-variable .input-item >> click')
 
         })
 
         $('body').on('input', '#analyze-detail :input', function () {
-            validate_inputs()
+            validate_inputs('body >> input >> #analyze-detail :input')
         })
 
         $('body').on('input', '#analyze-captcha_code, #analyze-email', function () {
@@ -610,6 +1284,7 @@
                 // form_inputs
 
                 for (var key in form_inputs) {
+
                     form_obj['inputs'].push({
                         'id': key,
                         'data': form_inputs[key]
@@ -618,6 +1293,7 @@
 
                 // form_thresholds
                 for (var key in form_thresholds) {
+
                     form_obj['inputs'].push({
                         'id': key,
                         'data': form_thresholds[key]
@@ -634,6 +1310,7 @@
                     'request_data': form_obj,
                     'submit_url': submit_url_var + submit_url_post
                 }
+
 
                 // check captcha
                 $.ajax({
@@ -694,6 +1371,22 @@
         analyze_map.getPane('labels').style.zIndex = 402
         analyze_map.getPane('labels').style.pointerEvents = 'none'
 
+        analyze_map.createPane('sector');
+        analyze_map.getPane('sector').style.zIndex = 403;
+
+        // // TODO: DELETE from climate-data-ca/resources/js/variable-functions.js
+        // analyze_map.createPane('labels');
+        // analyze_map.getPane('labels').style.zIndex = 550;
+        // analyze_map.getPane('labels').style.pointerEvents = 'none';
+
+        // //TODO: DELETE from climate-data-ca/resources/js/variable-functions.js
+        // // stations
+        // analyze_map.createPane('idf');
+        // analyze_map.getPane('idf').style.zIndex = 600;
+        // analyze_map.getPane('idf').style.pointerEvents = 'all';
+        // analyze_map.getPane('idf').style.opacity = 1;
+
+        // BASEMAP
         L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png', {
             attribution: '',
             subdomains: 'abcd',
@@ -709,7 +1402,11 @@
         selectedPoints = [];
         latlons = [];
 
-        map_grids = {}
+
+        map_grids = {};
+
+
+
 
         var highlight;
 
@@ -719,6 +1416,7 @@
             }
             highlight = null;
         };
+
 
         var vectorTileOptions = {
             rendererFactory: L.canvas.tile,
@@ -745,23 +1443,25 @@
             pane: 'grid'
         }
 
+        var selectedExists;
+
         var pbfLayer = L.vectorGrid.protobuf(hosturl + '/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf', vectorTileOptions).on('click', function (e) {
 
             highlightGridFeature = e.layer.properties.gid;
 
+
             selectedPoints[highlightGridFeature] = e.latlng;
 
-            var selectedExists = selectedGrids.includes(highlightGridFeature);
+            selectedExists = selectedGrids.includes(highlightGridFeature);
 
             if (selectedExists === false) {
-
                 map_grids[highlightGridFeature] = e.latlng
 
                 selectedGrids.push(highlightGridFeature);
 
                 pbfLayer.setFeatureStyle(highlightGridFeature, {
                     weight: 1,
-                    color: '#F00',
+                    color: '#F00', // red
                     opacity: 1,
                     fill: true,
                     radius: 4,
@@ -769,31 +1469,10 @@
                 })
 
             } else {
-
-                delete map_grids[highlightGridFeature]
-
-                for (var i = selectedGrids.length - 1; i >= 0; i--) {
-                    if (selectedGrids[i] === highlightGridFeature) {
-                        selectedGrids.splice(i, 1);
-                    }
-                }
-
-                for (var i = selectedPoints.length - 1; i >= 0; i--) {
-                    if (selectedPoints[highlightGridFeature]) {
-                        selectedPoints.splice(i, 1);
-                    }
-                }
-
-                pbfLayer.setFeatureStyle(highlightGridFeature, {
-                    weight: 0.1,
-                    color: gridline_color,
-                    opacity: 1,
-                    fill: true,
-                    radius: 4,
-                    fillOpacity: 0
-                });
-
+                deselectedGridCell(highlightGridFeature);
             }
+
+            //Display count top menu (map)
 
             $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length)
 
@@ -818,11 +1497,50 @@
             $('#lat').val(lat_val)
             $('#lon').val(lon_val)
 
-            validate_inputs()
+            validate_inputs('pbfLayer = L.vectorGrid.protobuf')
 
             L.DomEvent.stop(e)
 
+
+
         }).addTo(analyze_map)
+
+        function deselectedAllGridCell() {
+            const list = Object.entries(map_grids);
+            list.forEach((key) => {
+                console.warn(" function deselectedAllGridCell >> key:" + key);
+                deselectedGridCell(key[0]);
+             } );
+        }
+
+        function deselectedGridCell(gidSelected) {
+
+            delete map_grids[gidSelected];
+
+            // To reset selection
+            for (var i = selectedGrids.length - 1; i >= 0; i--) {
+                if (selectedGrids[i] === gidSelected) {
+                    selectedGrids.splice(i, 1);
+                }
+            }
+
+            for (var i = selectedPoints.length - 1; i >= 0; i--) {
+                if (selectedPoints[gidSelected]) {
+                    selectedPoints.splice(i, 1);
+                }
+            }
+
+            console.warn(" var pbfLayer = {...} >> gridline_color: " + gridline_color); // TODO: DELETE
+
+            pbfLayer.setFeatureStyle(gidSelected, {
+                weight: 0.1,
+                color: gridline_color,
+                opacity: 1,
+                fill: true,
+                radius: 4,
+                fillOpacity: 0
+            });
+        }
 
         // GEO-SELECT
 
@@ -936,7 +1654,7 @@
             $('#lat').val('')
             $('#lon').val('')
 
-            validate_inputs()
+            validate_inputs('#clear-grids >> click')
             validate_steps()
 
         })
@@ -1047,7 +1765,7 @@
 
             })
 
-            // console.log(valid_steps)
+            console.log("function validate_steps >> valid_steps: " + valid_steps)
 
             // step 2 - location
 
@@ -1102,7 +1820,7 @@
 
         // INPUTS
 
-        function validate_inputs() {
+        function validate_inputs(fromFct) {
 
             var is_valid = true
 
@@ -1124,7 +1842,7 @@
                     this_type = 'select'
                 }
 
-                //console.log('checking ' + this_name, this_type, this_val)
+
 
                 switch (this_type) {
                     case 'radio':
@@ -1172,7 +1890,7 @@
             for (var key in form_inputs) {
                 if (form_inputs[key] == '') {
                     is_valid = false
-                    //console.log(key)
+                    //console.log(key)// TODO:COMMENT
                 }
             }
 
@@ -1258,7 +1976,7 @@
         // init
 
         validate_steps()
-        validate_inputs()
+        validate_inputs('init')
 
         console.log('end of analyze-functions')
         console.log('- - - - -')

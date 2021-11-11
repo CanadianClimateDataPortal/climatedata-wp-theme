@@ -12,12 +12,33 @@
             CENSUS : "census",
             HEALTH: "health",
         };
+<<<<<<< Updated upstream
         var map_sectors = {};
+=======
+
+        const sectorFeatureStyleColor = {
+            'default':{
+                'color': 'white',
+                'fillColor': '#ababab'
+            },
+            'mouseover':{
+                'color': 'white',
+                'fillColor': 'white' // light grey
+            },
+            'mouseclick':{
+                'color': '#F00',
+                'fillColor': '#F00' // light grey
+            },
+        };
+
+        let map_sectors = {};
+>>>>>>> Stashed changes
         //map_sectors[select_locations.GRIDS] = {};
         map_sectors[select_locations.WATERSHED] = {};
         map_sectors[select_locations.CENSUS] = {};
         map_sectors[select_locations.HEALTH] = {};
 
+<<<<<<< Updated upstream
         var selectedSectors = {
         };
         //map_sectors[select_locations.GRIDS] = {},
@@ -30,12 +51,30 @@
         var sector_on = false;
         // geoselecting = false; // flag for moveend function to decide whether to update the geo-select parameter
         var query = {};
+=======
+        let selectedSectors = {
+        };
+        //map_sectors[select_locations.GRIDS] = undefined;
+        selectedSectors[select_locations.WATERSHED] = undefined;
+        selectedSectors[select_locations.CENSUS] = undefined;
+        selectedSectors[select_locations.HEALTH] = undefined;
+
+        // var history_action = 'init', // global tracking variable for history action
+        let station_on = false; // flag for showing/hiding the stations layer,
+        let sector_on = false;
+        // geoselecting = false; // flag for moveend function to decide whether to update the geo-select parameter
+        let query = {};
+>>>>>>> Stashed changes
 
 
         // overlay text
 
         var overlay_text = JSON.parse($('#map-overlay-content').attr('data-steps'))
+<<<<<<< Updated upstream
         var canadaBounds = L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.60, -49.9));
+=======
+        let canadaBounds = L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.60, -49.9));
+>>>>>>> Stashed changes
 
         // form stuff
 
@@ -108,11 +147,17 @@
         $('#analyze-steps').accordion({
             heightStyle: 'content',
             activate: function (e, ui) {
+                console.log('#analyze-steps activate ==> remove hidden button') // TODO: DELETE
+
 
 
                 if (ui.newPanel.attr('data-step') == '1') {
 
                     if ($.isEmptyObject(map_grids)) {
+<<<<<<< Updated upstream
+=======
+                        console.log('#analyze-steps activate ==( GRID )==> $.isEmptyObject(map_grids)') // TODO: DELETE
+>>>>>>> Stashed changes
 
                         $('#map-overlay').fadeIn(250)
                     }
@@ -134,6 +179,8 @@
                 }
             },
             beforeActivate: function (e, ui) {
+                console.log('#analyze-steps beforeActivate') // TODO: DELETE
+
 
 
                 if (
@@ -252,7 +299,12 @@
             var this_item = $(this).closest('.input-row'),
                 input_parent = this_item.closest('.field')
 
+<<<<<<< Updated upstream
             var sector_value = this_item.find(':input').val()
+=======
+            let sector_value = this_item.find(':input').val()
+            console.log('.type-radio .input-item, .type-checkbox .input-item  => sector_value: ' + sector_value) // TODO: DELETE
+>>>>>>> Stashed changes
 
             if (
                 !this_item.find(':input').hasClass('disabled') &&
@@ -262,6 +314,7 @@
                 if (input_parent.hasClass('type-radio')) {
 
                     // radio
+                    console.log('input_parent.hasClass => radio ') // TODO: DELETE
 
                     input_parent.find('.input-row').removeClass('checked')
                     input_parent.find('.input-row').find(':input').prop('checked', false)
@@ -274,13 +327,23 @@
 
 
                     // var isSectorGridsChecked = $('#analyze-location-grid').parent().parent().hasClass('checked')
+<<<<<<< Updated upstream
+=======
+                    console.warn(".type-radio  >> ui-state-disabled: "+ $('#select-locations').hasClass('ui-state-disabled'))// TODO: DELETE
+>>>>>>> Stashed changes
 
                     if(sector_value.toLowerCase().includes("health")){
                         sector_value = "health"
                     }else if(sector_value.toLowerCase().includes("census")){
                         sector_value = "census"
                     }
+<<<<<<< Updated upstream
                     isSector = Object.values(select_locations).indexOf(sector_value) > -1
+=======
+                    console.warn(".type-radio  >> sector_value: "+ sector_value)// TODO: DELETE
+                    let isSector = Object.values(select_locations).indexOf(sector_value) > -1
+                    console.warn(".type-radio  >> isSector: "+ isSector)// TODO: DELETE
+>>>>>>> Stashed changes
 
 
 
@@ -293,10 +356,18 @@
                         rcp_value = $("#rcp").val();
                         decade_value = parseInt($("#decade").val()) + 1;
 
+<<<<<<< Updated upstream
+=======
+                        // console.warn(".type-radio  >> call genChoro")// TODO: DELETE
+>>>>>>> Stashed changes
                         // genChoro(sector_value, decade_value, var_value, rcp_value, mora_value);
                         // if (currentSector !== sector_value) {
                         //     currentSector = sector_value;
                         //     if (analyze_map.hasLayer(choroLayer)) {
+<<<<<<< Updated upstream
+=======
+                        //         console.warn(".type-radio  >> analyze_map.removeLayer(choroLayer)")// TODO: DELETE
+>>>>>>> Stashed changes
 
                         //         analyze_map.removeLayer(choroLayer);
                         //     }
@@ -311,6 +382,10 @@
                             if (currentSector !== sector_value) {
                                 currentSector = sector_value;
                                 if (analyze_map.hasLayer(choroLayer)) {
+<<<<<<< Updated upstream
+=======
+                                    console.warn(" function generateSectorLegend >>  map1.removeLayer(choroLayer)")// TODO: DELETE
+>>>>>>> Stashed changes
                                     analyze_map.removeLayer(choroLayer);
                                 }
                             }
@@ -320,16 +395,23 @@
                 } else if (input_parent.hasClass('type-checkbox')) {
 
                     // checkbox
+                    console.log('input_parent.hasClass => checkbox ') // TODO: DELETE
 
                     if (this_item.hasClass('select-all')) {
 
                         // select all
+                        console.log('input_parent.hasClass => checkbox => select all ') // TODO: DELETE
+
 
 
                         var this_tree = this_item.next('.tree')
 
                         if (this_item.hasClass('checked')) {
 
+<<<<<<< Updated upstream
+=======
+                            console.log('input_parent.hasClass => checkbox => select all => checked ') // TODO: DELETE
+>>>>>>> Stashed changes
 
                             // remove 'checked' class
                             this_item.removeClass('checked')
@@ -351,6 +433,10 @@
 
                         } else {
 
+<<<<<<< Updated upstream
+=======
+                            console.log('input_parent.hasClass => checkbox => select all => unchecked ') // TODO: DELETE
+>>>>>>> Stashed changes
 
                             // add 'checked' class
                             this_item.removeClass('partial').addClass('checked')
@@ -374,6 +460,10 @@
 
                     } else {
 
+<<<<<<< Updated upstream
+=======
+                        console.log('input_parent.hasClass => checkbox => not select all ') // TODO: DELETE
+>>>>>>> Stashed changes
 
                         if (this_item.hasClass('checked')) {
 
@@ -436,6 +526,10 @@
         })
 
         function changeLayers(sector_value, rcp_value, decade_value, mora_value, fromFct) {
+<<<<<<< Updated upstream
+=======
+            console.warn(" function changeLayers >> fromFct:" + fromFct)// TODO: DELETE
+>>>>>>> Stashed changes
 
 
             // rcp_value = $("#rcp").val();
@@ -445,6 +539,10 @@
 
             if (false) { //query['var-group'] === 'station-data'
             //     // activate station data
+<<<<<<< Updated upstream
+=======
+                console.error(" (IF) function changeLayers >> layer_swap query['var']:" + query['var'])// TODO: DELETE
+>>>>>>> Stashed changes
             //     layer_swap({
             //         layer: 'stations',
             //         station: query['var']
@@ -459,23 +557,48 @@
 
                 // not station data so make sure it's turned off
 
+<<<<<<< Updated upstream
 
                 // Is Gridded data
                 if (station_on === true) {
+=======
+                console.warn(" (ELSE) function changeLayers >> not station data so make sure it's turned off >> $('#sector').length: " + $('#sector').length )// TODO: DELETE
+                console.warn(" (ELSE) function changeLayers >> not station data so make sure it's turned off >> station_on::: " + station_on )// TODO: DELETE
+
+                // Is Gridded data
+                if (station_on === true) {
+                    console.error(" (ELSE) function changeLayers >> not station data so make sure it's turned off >> station_on::: " + station_on )// TODO: DELETE
+>>>>>>> Stashed changes
 
                     layer_swap({
                         layer: 'stations',
                         action: 'off'
                     });
                 }
+<<<<<<< Updated upstream
+=======
+
+                // console.log(" function changeLayers >> not station data so make sure it's turned off >> query['sector']::: " + query['sector'] )// TODO: DELETE
+                console.log(" function changeLayers >> not station data so make sure it's turned off >> sector_value::: " + sector_value)// TODO: DELETE
+
+
+>>>>>>> Stashed changes
                 // Is not Gridded data
                 if (sector_value !== 'grid') { //  query['sector'] !== ''
 
 
                     // activate sector
+<<<<<<< Updated upstream
                     // sector_on always False:
                     if (sector_on === false) {
                         // When switch from Gridded data to (Census || Health || Watersheds)
+=======
+                    console.log(" (01) function changeLayers ||| ACTIVATE ||| sector_on: " + sector_on  )// TODO: DELETE
+                    // sector_on always False:
+                    if (sector_on === false) {
+                        // When switch from Gridded data to (Census || Health || Watersheds)
+                        console.error(" (02) function changeLayers ||| ACTIVATE ||| sector_on: " + sector_on  )// TODO: DELETE
+>>>>>>> Stashed changes
                         layer_swap({
                             layer: 'sector'
                         });
@@ -490,6 +613,10 @@
                 } else {
 
                     // not sector so make sure it's turned off
+<<<<<<< Updated upstream
+=======
+                     console.log(" (01) function changeLayers ||| NOT ACTIVATE ||| not sector so make sure it's turned off >> sector_on: " + sector_on )// TODO: DELETE
+>>>>>>> Stashed changes
 
                     // sector_on === false, when refresh the page
                     if (sector_on === true) {
@@ -539,6 +666,10 @@
                 $('body').removeClass(settings.layer + '-on');
             }
 
+<<<<<<< Updated upstream
+=======
+            console.log(' function layer_swap >> settings.layer: ' + settings.layer) // TODO: DELETE
+>>>>>>> Stashed changes
 
             switch (settings.layer) {
 
@@ -565,6 +696,10 @@
         }
 
         function layer_swap_sector(settings) {
+<<<<<<< Updated upstream
+=======
+            console.log(' function layer_swap_sector(settings) ' + settings.layer) // TODO: DELETE
+>>>>>>> Stashed changes
 
             if (settings.action == 'on') {
 
@@ -607,12 +742,20 @@
         }
 
         function layer_swap_stations(settings) {
+<<<<<<< Updated upstream
+=======
+            console.log(' function layer_swap_stations(settings) ' + settings.layer) // TODO: DELETE
+>>>>>>> Stashed changes
 
             if (settings.action === 'on') {
 
 
                 // set global var & body class
                 station_on = true;
+<<<<<<< Updated upstream
+=======
+                console.error(" function layer_swap_stations >> station_on:" + station_on)// TODO: DELETE
+>>>>>>> Stashed changes
 
 
                 // add station layer
@@ -683,6 +826,10 @@
         }
 
         function layer_swap_variable(settings) {
+<<<<<<< Updated upstream
+=======
+            console.log(' function layer_swap_variable(settings) ' + settings.layer) // TODO: DELETE
+>>>>>>> Stashed changes
 
             if (settings.action === 'on') {
 
@@ -794,8 +941,32 @@
 
         }
 
+<<<<<<< Updated upstream
 
 
+=======
+        // // update parameter
+        // var update_param = function (key, val) {
+        //     // update the query key
+        //     console.log("\nfunction update_param => key: " + key)// TODO: DELETE
+        //     console.log("function update_param => val: " + val)// TODO: DELETE
+
+        //     query[key] = val;
+        //     // input values that are not changed by mouse interactions
+        //     // i.e. they are not select menus
+        //     if (key === 'coords') {
+        //         console.log("function update_param => $('#coords').val( " + key)// TODO: DELETE
+        //         $('#coords').val(val);
+        //     }
+        // };
+
+
+        function buildFilterMenu() {
+            console.error("\nfunction buildFilterMenu ")// TODO: DELETE
+
+
+        }  // buildFilterMenu()
+>>>>>>> Stashed changes
 
 
         var choroLayer = null,
@@ -819,8 +990,11 @@
         //,choroValues, choroLayer
         function genChoro(sector, year, variable, rcp, frequency) {
 
+<<<<<<< Updated upstream
             // /sector/variable/rcp/frequency/year
             // /watershed/tx_max/rcp45/jan/1971
+=======
+>>>>>>> Stashed changes
 
 
             // https://dataclimatedata.crim.ca/features/health/1.json
@@ -828,6 +1002,7 @@
             var choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency + '/?period=' + year;
             // var choroPath = hosturl + '/get-regional-feature/' + sector + '/' + variable + '/' + rcp + '/' + frequency + '/?period=' + year;
 
+<<<<<<< Updated upstream
             var sectorFeatureStyleColor = {
                 'default':{
                     'color': 'white',
@@ -859,17 +1034,53 @@
 
 
                 if (analyze_map.hasLayer(choroLayer)) {
+=======
+            //             // /sector/variable/rcp/frequency/year
+            // // /watershed/tx_max/rcp45/jan/1971
+            // console.log("function genChoro => hosturl: " + hosturl)// TODO: DELETE
+            // console.log("function genChoro => sector: " + sector)// TODO: DELETE
+            // console.log("function genChoro => variable: " + variable)// TODO: DELETE
+            // console.log("function genChoro => rcp: " + rcp)// TODO: DELETE
+            // console.log("function genChoro => frequency: " + frequency)// TODO: DELETE
+            // console.log("function genChoro => year: " + year)// TODO: DELETE
+
+            // console.log("function genChoro => choroPath: " + choroPath)// TODO: DELETE
+            // console.log("function genChoro => choroLayer: " + choroLayer)// TODO: DELETE
+            // // console.log("function genChoro => choroValues: " + choroValues)// TODO: DELETE
+            // console.log("function genChoro => currentSector: " + currentSector)// TODO: DELETE
+            // console.log("function genChoro => sector: " + sector)// TODO: DELETE
+
+
+
+            //Display count top menu (map)
+            selectedSectors[sector] = undefined;
+            deselectedAllGridCell();
+            selectedGrids = [];
+            // choroValues ==  sector colors
+            $.getJSON(choroPath).then(function (data) {
+                choroValues = data;
+
+                if (analyze_map.hasLayer(choroLayer)) {
+                    console.warn("function genChoro =>  HAS LAYER >>>>> choroLayer: " + choroLayer)// TODO: DELETE
+>>>>>>> Stashed changes
                     for (let i = 0; i < choroValues.length; i++)
                         choroLayer.resetFeatureStyle(i);
                 }else {
                     var layerStyles = {};
                     layerStyles[currentSector] = function (properties, zoom) {
+<<<<<<< Updated upstream
                         // console.log("function genChoro => layerStyles[currentSector] = function >> choroValues[properties.id]: " + choroValues[properties.id])// TODO: DELETE
 
                         return {
                             weight: 0.5,
                             color: sectorFeatureStyleColor['default']['color'], // red
                             fillColor: sectorFeatureStyleColor['default']['fillColor'], //"#ffea00", // == yellow getColor(choroValues[properties.id]),
+=======
+                        return {
+                            weight: 0.5,
+                            color: sectorFeatureStyleColor['default']['color'],
+                            fillColor: sectorFeatureStyleColor['default']['fillColor'],
+>>>>>>> Stashed changes
                             opacity: 1,
                             fill: true,
                             radius: 4,
@@ -877,7 +1088,10 @@
                         }
                     };
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
                     choroLayer = L.vectorGrid.protobuf(
                         hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf",
                         {
@@ -895,13 +1109,21 @@
                             vectorTileLayerStyles: layerStyles
                         }
                     ).on('mouseover', function (e) {
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
                         if(map_sectors[sector][e.layer.properties.id] === undefined){
                             choroLayer.setFeatureStyle(
                                 e.layer.properties.id,
                                 {
+<<<<<<< Updated upstream
                                     color: sectorFeatureStyleColor['mouseover']['color'], // red
                                     fillColor: sectorFeatureStyleColor['mouseover']['fillColor'], //"#ffea00", // == yellow getColor(choroValues[properties.id]),
+=======
+                                    color: sectorFeatureStyleColor['mouseover']['color'],
+                                    fillColor: sectorFeatureStyleColor['mouseover']['fillColor'],
+>>>>>>> Stashed changes
                                     weight: 1.5,
                                     fill: true,
                                     radius: 4,
@@ -912,6 +1134,7 @@
                         }
                     }
                     ).on('mouseout', function (e) {
+<<<<<<< Updated upstream
                         console.log("function genChoro => on('mouseout') >> choroLayer.resetFeatureStyle(e.layer.properties.id): " + e.layer.properties.id)// TODO: DELETE
 
                         if(map_sectors[sector][e.layer.properties.id] === undefined){
@@ -922,21 +1145,40 @@
                     }
                     ).on('click', function (e) {
 
+=======
+                        if(map_sectors[sector][e.layer.properties.id] === undefined){
+                            console.log("function genChoro => on('mouseout') ((( CLEAR )))>> choroLayer.resetFeatureStyle(e.layer.properties.id): " + e.layer.properties.id)// TODO: DELETE
+                            choroLayer.resetFeatureStyle(e.layer.properties.id);
+                        }
+                    }
+                    ).on('click', function (e) {
+>>>>>>> Stashed changes
                         current_sector['id'] = e.layer.properties.id;
                         current_sector['label'] = e.layer.properties[l10n_labels.label_field];
 
                         var_value = $("#var").val();
                         mora_value = $("#mora").val();
 
+<<<<<<< Updated upstream
 
                         highlightSectorById(sector, current_sector['id'], current_sector['label'] , e, choroLayer, sectorFeatureStyleColor);
 
+=======
+                        // console.log("function genChoro => on('click') >>  sector: " + sector)// TODO: DELETE
+                        // console.log("function genChoro => on('click') >>  current_sector['id']: " + current_sector['id'])// TODO: DELETE
+                        // console.log("function genChoro => on('click') >>  current_sector['label']: " + current_sector['label'])// TODO: DELETE
+                        // console.log("function genChoro => on('click') >>  var_value: " + var_value)// TODO: DELETE
+                        // console.log("function genChoro => on('click') >>  mora_value: " + mora_value)// TODO: DELETE
+
+                        highlightSectorById(sector, current_sector['id'], current_sector['label'] , e, choroLayer);
+>>>>>>> Stashed changes
                     }).addTo(analyze_map);
                 }
             })
         };
 
 
+<<<<<<< Updated upstream
         function highlightSectorById(sector,id, label, protobufEvent, protobufLayer, featureStyleColor) {
             var highlightSectorId = id // protobufEvent.layer.properties.gid;
 
@@ -1026,6 +1268,68 @@
 
 
 
+=======
+        function highlightSectorById(sector,highlightSectorId, highlightSectorLabel, protobufEvent, protobufChoroLayer) {
+            var selectedSectorsLabels = [];
+            var selectedExists = selectedSectors[sector] === highlightSectorId;
+
+            if (selectedExists === true) {
+                deselectSector(sector, highlightSectorId, protobufChoroLayer, selectedSectorsLabels, selectedSectors);
+            } else {
+                map_sectors[sector][highlightSectorId] = highlightSectorId;
+                let old_selection = selectedSectors[sector];
+
+                // Deselect old sector
+                if(old_selection !== undefined){
+                    map_sectors[sector][old_selection] = undefined;
+                    deselectSector(sector, old_selection, protobufChoroLayer, selectedSectorsLabels, selectedSectors);
+                    protobufChoroLayer.resetFeatureStyle(old_selection);
+                }
+
+                // Highlight new sector
+                 selectedSectors[sector] = highlightSectorId;
+                 protobufChoroLayer.setFeatureStyle(highlightSectorId, {
+                    color: sectorFeatureStyleColor['mouseclick']['color'],
+                    weight: 1,
+                    fill: true,
+                    radius: 4,
+                    opacity: 1,
+                    fillOpacity: 0.1
+                });
+            }
+
+            // Display count top menu (map)
+            let lenTemp = selectedSectors[sector] !== undefined ? 1 : 0;
+            $('#analyze-breadcrumb').find('.grid-count').text(lenTemp);
+            L.DomEvent.stop(protobufEvent);
+        }
+
+        function deselectSector(sector, sectorId, protobufChoroLayer, selectedSectorsLabels, sectorToDeselect) {
+            console.warn("function highlightSectorById >>  ((((( DELETE )))) selectedSectors.length: " + sectorToDeselect[sector] !== undefined); // TODO: DELETE
+            map_sectors[sector][sectorId] = undefined;
+
+            if (sectorToDeselect[sector] === sectorId) {
+                sectorToDeselect[sector] = undefined;
+            }
+
+            for (var i = selectedSectorsLabels.length - 1; i >= 0; i--) {
+                if (selectedSectorsLabels[sectorId]) {
+                    selectedSectorsLabels.splice(i, 1);
+                }
+            }
+
+            protobufChoroLayer.setFeatureStyle(sectorId, {
+                weight: 0.1,
+                color: sectorFeatureStyleColor['default']['color'],
+                opacity: 1,
+                fill: true,
+                radius: 4,
+                fillOpacity: 0
+            });
+        }
+
+
+>>>>>>> Stashed changes
         // select
 
         var start_val = 1950
@@ -1076,32 +1380,7 @@
         $('.input-variable .input-item').click(function (e) {
 
             if (!$(this).hasClass('selected')) {
-
-//         input_id = $(this).find('input').
-
-                let var_content = JSON.parse($(this).closest('.input-variable').attr('data-content'));
-                let var_frequencies = $(this).closest('.input-variable').attr('data-frequencies');
-
-                if (var_frequencies != '') {
-                    let frequencies = var_frequencies.split('|');
-                    $('input[name=freq]').each(function(i) {
-                       if (frequencies.includes($(this).val())) {
-                           $(this).attr('disabled', false);
-                        } else {
-                           let input_row = $(this).closest('.input-row');
-                           input_row.removeClass('checked');
-                           $(this).prop('checked', false);
-                           input_row.find('.form-icon').removeClass().addClass(radio_icon_off);
-                           $(this).attr('disabled', true);
-                       }
-                    });
-                } else {
-                    $('input[name=freq]').each(function(i) {
-                        $(this).attr('disabled', false);
-                    });
-                }
-
-
+                var var_content = JSON.parse($(this).closest('.input-variable').attr('data-content'))
                 var new_html = ''
                 new_html += '<h4>' + $(this).find('label').text() + '</h4>'
                 new_html += '<div class="form-inline">'
@@ -1151,6 +1430,7 @@
                         new_html += '>'
 
                     } else if (this_input['type'] == 'select') {
+                        console.log(" style=background-color: rgba(56, 105, 246, 0.5) "   )// TODO: DELETE
                         new_html += '<select ';
                         new_html += 'class="form-control border-white mx-2 text-white" ';
                         new_html += 'style="background-color: rgba(56, 105, 246, 0.5);" ';
@@ -1166,19 +1446,6 @@
                         });
 
                         new_html += '</select>';
-                    } else if (this_input['type'] == 'mm_dd') {
-
-                        new_html += '<input ';
-                        new_html += 'type="text" ';
-                        new_html += 'placeholder="MM-DD" ';
-                        new_html += 'class="form-control bg-transparent border-white mx-2 text-white" ';
-                        new_html += 'size="5" ';
-                        new_html += 'autocomplete="off" ';
-                        new_html += 'data-units="' + this_input['units'] + '" ';
-                        new_html += 'data-optional="' + this_input['optional'] + '" ';
-                        new_html += 'name="' + this_input['id'] + '" ';
-                        new_html += '>'
-
                     }
 
                 }
@@ -1244,6 +1511,8 @@
             "thresh_tasmax": "threshold tasmin"
         }
 
+
+
         function set_datalayer_for_analyze_bccaqv2(form_obj_inputs, customize_variables) {
             var analyze_bccaqv2_parameters = "";
             customize_variables = customize_variables.toLowerCase();
@@ -1284,6 +1553,10 @@
                 // form_inputs
 
                 for (var key in form_inputs) {
+<<<<<<< Updated upstream
+=======
+                    console.log("#analyze-process click >> form_inputs[" + key + "]: " + form_inputs[key])// TODO: DELETE
+>>>>>>> Stashed changes
 
                     form_obj['inputs'].push({
                         'id': key,
@@ -1293,6 +1566,10 @@
 
                 // form_thresholds
                 for (var key in form_thresholds) {
+<<<<<<< Updated upstream
+=======
+                    console.log("#analyze-process click >> form_thresholds >> form_inputs[" + key + "]: " + form_thresholds[key])// TODO: DELETE
+>>>>>>> Stashed changes
 
                     form_obj['inputs'].push({
                         'id': key,
@@ -1311,6 +1588,11 @@
                     'submit_url': submit_url_var + submit_url_post
                 }
 
+<<<<<<< Updated upstream
+=======
+                console.log("#analyze-process click >> submit_data['analyze-captcha_code']: " + submit_data['analyze-captcha_code'])// TODO: DELETE
+                console.log("#analyze-process click >> submit_data['submit_url']: " + submit_data['submit_url'])// TODO: DELETE
+>>>>>>> Stashed changes
 
                 // check captcha
                 $.ajax({
@@ -1417,6 +1699,10 @@
             highlight = null;
         };
 
+<<<<<<< Updated upstream
+=======
+        console.warn(" vectorTileOptions >> gridline_color: " + gridline_color)// TODO: DELETE
+>>>>>>> Stashed changes
 
         var vectorTileOptions = {
             rendererFactory: L.canvas.tile,
@@ -1443,6 +1729,10 @@
             pane: 'grid'
         }
 
+<<<<<<< Updated upstream
+=======
+        console.log(" @@@ var pbfLayer = L.vectorGrid.protobuf >> gridline_color: " + gridline_color)// TODO: DELETE
+>>>>>>> Stashed changes
         var selectedExists;
 
         var pbfLayer = L.vectorGrid.protobuf(hosturl + '/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf', vectorTileOptions).on('click', function (e) {
@@ -1455,6 +1745,10 @@
             selectedExists = selectedGrids.includes(highlightGridFeature);
 
             if (selectedExists === false) {
+<<<<<<< Updated upstream
+=======
+                console.warn("@@@ var pbfLayer = L.vectorGrid.protobuf >>  selectedExists === false ")// TODO: DELETE
+>>>>>>> Stashed changes
                 map_grids[highlightGridFeature] = e.latlng
 
                 selectedGrids.push(highlightGridFeature);
@@ -1473,6 +1767,10 @@
             }
 
             //Display count top menu (map)
+<<<<<<< Updated upstream
+=======
+            console.warn(" Display count top menu (map) >> selectedGrids.length: " + selectedGrids.length); // TODO: DELETE
+>>>>>>> Stashed changes
 
             $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length)
 
@@ -1497,6 +1795,10 @@
             $('#lat').val(lat_val)
             $('#lon').val(lon_val)
 
+<<<<<<< Updated upstream
+=======
+            console.warn("@@@ var pbfLayer = L.vectorGrid.protobuf >>  validate_inputs ")// TODO: DELETE
+>>>>>>> Stashed changes
             validate_inputs('pbfLayer = L.vectorGrid.protobuf')
 
             L.DomEvent.stop(e)
@@ -1514,6 +1816,10 @@
         }
 
         function deselectedGridCell(gidSelected) {
+<<<<<<< Updated upstream
+=======
+            console.warn(" function deselectedGridCell  ((((( DESELECTED )))) gidSelected: " + gidSelected); // TODO: DELETE
+>>>>>>> Stashed changes
 
             delete map_grids[gidSelected];
 
@@ -1633,6 +1939,7 @@
 
         $('#clear-grids').click(function () {
 
+            console.warn(" #clear-grids >> click >> gridline_color: " + gridline_color)// TODO: DELETE
             map_grids = {}
 
             selectedGrids.forEach(function (i) {
@@ -1821,6 +2128,10 @@
         // INPUTS
 
         function validate_inputs(fromFct) {
+<<<<<<< Updated upstream
+=======
+            console.log(" function validate_inputs() ==============>  fromFct " + fromFct) //TODO: DELETE
+>>>>>>> Stashed changes
 
             var is_valid = true
 
@@ -1842,7 +2153,14 @@
                     this_type = 'select'
                 }
 
+<<<<<<< Updated upstream
 
+=======
+                console.log(" function validate_inputs() >>> ") //TODO: DELETE
+                // console.log(" this_name:: "+ this_name) //TODO: DELETE
+                // console.log(" this_type:: "+ this_type) //TODO: DELETE
+                // console.log(" this_val:: " + this_val) //TODO: DELETE
+>>>>>>> Stashed changes
 
                 switch (this_type) {
                     case 'radio':
@@ -1906,17 +2224,14 @@
 
             $('#analyze-detail').find(':input').each(function () {
 
-                var this_name = $(this).attr('name');
-                if ($(this).attr('data-optional') == undefined ||
-                    $(this).attr('data-optional') == true || $(this).val() != '') {
+                var this_name = $(this).attr('name')
 
-                    form_thresholds[this_name] = $(this).val();
+                form_thresholds[this_name] = $(this).val()
 
-                    if ($(this).val() != '' && $(this).attr('data-units') !== undefined && $(this).attr('data-units') != '') {
-                        form_thresholds[this_name] += ' ' + $(this).attr('data-units');
-                    }
+                if ($(this).val() != '' && $(this).attr('data-units') !== undefined && $(this).attr('data-units') != '') {
+                    form_thresholds[this_name] += ' ' + $(this).attr('data-units');
                 }
-            });
+            })
 
             // cycle through the object and check for empty values
 
@@ -1924,6 +2239,7 @@
                 if (form_thresholds[key] == '') {
                     is_valid = false
                     thresholds_have_val = false
+                    console.log(key)
                 }
             }
 

@@ -8,7 +8,7 @@ include_once ( locate_template ( 'resources/php/securimage/securimage.php' ) );
 
 $securimage = new Securimage();
 
-$submit_url_pre = $GLOBALS['vars']['pavics_url'] . '/providers/finch/processes/ensemble_polygon_';
+$submit_url_pre = $GLOBALS['vars']['pavics_url'] .  '/providers/finch/processes/ensemble_polygon_';
 
 if ( isset ( $_POST['analyze-captcha_code'] ) ) {
 

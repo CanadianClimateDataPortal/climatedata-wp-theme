@@ -70,7 +70,6 @@
 
               <input class="add-to-object" type="hidden" name="lat" id="lat" value="">
               <input class="add-to-object" type="hidden" name="lon" id="lon" value="">
-              <input class="add-to-object" type="hidden" name="shape" id="shape" value="">
 
               <div id="analyze-steps">
                 <div class="accordion-head" data-step="1">
@@ -96,7 +95,7 @@
                   </div>
                 </div>
 
-                <div class="accordion-head" id="select-locations" data-step="2">
+                <div class="accordion-head" data-step="2">
                   <h5 class="d-flex align-items-center justify-content-between all-caps">
                     <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">2</span>
                     <span class="flex-grow-1"><?php _e ( 'Select locations', 'cdc' ); ?></span>
@@ -115,27 +114,6 @@
 
                         <!--<span class="tooltip-icon"><i class="fas fa-question"></i></span>-->
                       </div>
-
-                    <div class="input-row form-check">
-                        <div class="input-item">
-                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-watershed" value="watershed">
-                          <label class="form-check-label" for="analyze-location-watershed"><?php _e ( 'Watershed', 'cdc' ); ?></label>
-                        </div>
-                    </div>
-
-                    <div class="input-row form-check">
-                        <div class="input-item">
-                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-census-division" value="census_division">
-                          <label class="form-check-label" for="analyze-location-census-division"><?php _e ( 'Census division', 'cdc' ); ?></label>
-                        </div>
-                    </div>
-
-                    <div class="input-row form-check">
-                        <div class="input-item">
-                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-health-region" value="health_region">
-                          <label class="form-check-label" for="analyze-location-health-region"><?php _e ( 'Health region', 'cdc' ); ?></label>
-                        </div>
-                    </div>
 
                       <div class="input-row form-check">
                         <div class="input-item">
@@ -385,21 +363,21 @@
 
                       <div class="field validate-input type-radio d-flex flex-wrap">
                         <p class="input-label w-100"><?php _e ( 'Representative Concentration Pathways (RCPs)', 'cdc' ); ?></p>
-
+                        
                         <div class="input-row form-check w-25">
                           <div class="input-item">
                             <input class="form-check-input add-to-object" type="radio" name="rcp" id="analyze-rcp-85" value="rcp85" checked>
                             <label class="form-check-label" for="analyze-rcp-85">8.5</label>
                           </div>
                         </div>
-
+                        
                         <div class="input-row form-check w-25">
                           <div class="input-item">
                             <input class="form-check-input add-to-object" type="radio" name="rcp" id="analyze-rcp-45" value="rcp45">
                             <label class="form-check-label" for="analyze-rcp-45">4.5</label>
                           </div>
                         </div>
-
+                        
                         <div class="input-row form-check w-25">
                           <div class="input-item">
                             <input class="form-check-input add-to-object" type="radio" name="rcp" id="analyze-rcp-26" value="rcp26">
@@ -541,9 +519,7 @@
                   </div>
 
                   <div class="crumb">
-                    <h6><?php _e ( 'Location', 'cdc' ); ?>
-                    <i id="clear-grids" class="fas fa-undo-alt ml-3" style="display: none;" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Clear', 'cdc' ); ?>"></i>
-                    <i class="fas fa-exclamation-circle ml-3 text-warning validation-tooltip select-locations-zoom" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Zoom in to the map to select at least one grid coordinate.', 'cdc' ); ?>"></i></h6>
+                    <h6><?php _e ( 'Location', 'cdc' ); ?> <i id="clear-grids" class="fas fa-undo-alt ml-3" style="display: none;" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Clear', 'cdc' ); ?>"></i><i class="fas fa-exclamation-circle ml-3 text-warning validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Zoom in to the map to select at least one grid coordinate.', 'cdc' ); ?>"></i></h6>
                     <p class="value"></p>
                   </div>
                 </div>
@@ -607,7 +583,7 @@
               <div id="map-overlay">
 
                 <div id="map-overlay-content" data-steps='<?php
-
+                  
                   echo json_encode ( array (
                     array (
                       'head' => __ ( 'Choose a dataset', 'cdc' ),
@@ -619,9 +595,9 @@
                       'head' => __ ( 'Select a location', 'cdc' ),
                       'text' => __ ( 'Zoom in to activate selectable areas on the map', 'cdc' )
                     )
-
-                  ) );
-
+                    
+                  ) ); 
+                  
                 ?>'>
                   <h4><?php _e ( 'Choose a dataset', 'cdc' ); ?></h4>
                   <p><?php _e ( 'Start by selecting a dataset from the menu on the left.', 'cdc' ); ?></p>

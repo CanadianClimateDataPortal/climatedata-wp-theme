@@ -117,8 +117,8 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
             <div class="form-text col-6">
               <p><?php _e ( 'We are asking for your contact information to inform you when new versions are released and to request feedback. We are continuously seeking to improve these training materials and value your input. If you have any feedback or questions please contact the <a href="https://climate-change.canada.ca/support-desk">Climate Services Support Desk</a>.' ,'cdc' ); ?></p>
 
-              <label for="name" class="form-label all-caps"><?php _e ( 'Full name', 'cdc' ); ?></label>
-              <input type="text" name="name" id="name" class="form-control form-control-lg rounded-pill">
+              <label for="fullname" class="form-label all-caps"><?php _e ( 'Full name', 'cdc' ); ?></label>
+              <input type="text" name="fullname" id="fullname" class="form-control form-control-lg rounded-pill">
             </div>
           </div>
 
@@ -157,6 +157,47 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
       }
 
     ?>
+
+		<div id="newsletter" style="display: none;">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-10 offset-1 col-md-6 offset-md-3">
+
+						<h2 class="text-primary"><?php the_field ( 'newsletter_title', 'option' ); ?></h2>
+
+						<p><?php the_field ( 'newsletter_text', 'option' ); ?></p>
+
+						<!-- Begin Mailchimp Signup Form -->
+						<div id="mc_embed_signup" class="mt-5">
+							<form action="https://climatedata.us1.list-manage.com/subscribe/post?u=c52e1be341cba7905716a66b4&amp;id=727cebaf22" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+						    <div id="mc_embed_signup_scroll">
+
+									<label for="mce-EMAIL" class="sr-only">Email Address</label>
+
+									<div class="input-group mc-field-group">
+										<input type="email" value="" name="EMAIL" class="required email form-control form-control-lg" id="mce-EMAIL" placeholder="Enter your email address">
+
+									  <div class="input-group-append">
+											<input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="btn btn-outline-secondary">
+									  </div>
+									</div>
+
+									<div id="mce-responses" class="clear">
+										<div class="response" id="mce-error-response" style="display:none"></div>
+										<div class="response" id="mce-success-response" style="display:none"></div>
+									</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+
+							    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_c52e1be341cba7905716a66b4_727cebaf22" tabindex="-1" value=""></div>
+						    </div>
+							</form>
+						</div>
+
+						<!--End mc_embed_signup-->
+
+					</div>
+				</div>
+			</div>
+		</div>
 
     <div class="spinner"></div>
 

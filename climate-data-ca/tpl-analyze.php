@@ -152,7 +152,7 @@
                                   if ( get_row_layout() == 'text' ) {
 
                                     $new_block = array (
-                                      'text' => get_sub_field ( 'text' )
+                                      'text' => htmlspecialchars(get_sub_field ( 'text' ), ENT_QUOTES)
                                     );
 
                                   } elseif ( get_row_layout() == 'input' ) {
@@ -171,6 +171,12 @@
                                           'values' => get_sub_field ( 'values' ),
                                           'labels' => get_sub_field ( 'labels' )
                                       );
+                                  } elseif ( get_row_layout() == 'mm_dd') {
+                                      $new_block = array (
+                                          'id' => get_sub_field ( 'id' ),
+                                          'optional' => get_sub_field ( 'optional' ),
+                                          'units' => get_sub_field ( 'units' )
+                                      );
                                   }
 
                                   $new_block['type'] = get_row_layout();
@@ -182,7 +188,7 @@
 
                         ?>
 
-                        <div class="input-row form-check input-variable" data-content='<?php echo json_encode ( $var_description ); ?>'>
+                        <div class="input-row form-check input-variable" data-frequencies='<?php the_sub_field ('frequencies'); ?>' data-content='<?php echo json_encode ( $var_description ); ?>'>
                           <div class="input-item">
                             <input class="form-check-input" type="radio" name="analyze-var" id="analyze-var-<?php the_sub_field ( 'var' ); ?>" value="<?php the_sub_field ( 'var' ); ?>">
                             <label class="form-check-label" for="analyze-var-<?php the_sub_field ( 'var' ); ?>"><?php the_sub_field ( 'name' ); ?></label>

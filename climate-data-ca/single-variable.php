@@ -359,7 +359,7 @@ if (have_posts()) : while (have_posts()) : the_post();
 							?>
 
 							<div class="chart-delta nav-item flex-grow-1 d-flex">
-								<h6>Show:</h6>
+								<h6>Options:</h6>
 
 								<div class="form-check form-check-inline custom-control custom-radio">
 									<input class="custom-control-input" type="radio" id="chatoption1" name="chartoption" value="annual" checked>
@@ -529,7 +529,7 @@ if (have_posts()) : while (have_posts()) : the_post();
                                 ?>
 
                                 <div class="chart-delta nav-item flex-grow-1 d-flex">
-                                    <h6>Show:</h6>
+                                    <h6>Options:</h6>
 
                                     <div class="form-check form-check-inline custom-control custom-radio">
                                         <input class="custom-control-input" type="radio" id="chatoption1" name="chartoption" value="annual" checked>

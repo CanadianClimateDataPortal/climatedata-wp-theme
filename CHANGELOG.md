@@ -1,3 +1,6 @@
+2021-11-16.01
+  * Added delta feature
+
 2021-10-07.01
   * Added MM-DD optional input control to analyze page
 

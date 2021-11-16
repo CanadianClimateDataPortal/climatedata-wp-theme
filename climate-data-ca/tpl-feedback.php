@@ -103,7 +103,7 @@
 						<option><?php _e ( 'British Columbia', 'cdc' ); ?></option>
 						<option><?php _e ( 'Manitoba', 'cdc' ); ?></option>
 						<option><?php _e ( 'New Brunswick', 'cdc' ); ?></option>
-						<option><?php _e ( 'Newfoundland and Labrado', 'cdc' ); ?></option>
+						<option><?php _e ( 'Newfoundland and Labrador', 'cdc' ); ?></option>
 						<option><?php _e ( 'Northwest Territories', 'cdc' ); ?></option>
 						<option><?php _e ( 'Nova Scotia', 'cdc' ); ?></option>
 						<option><?php _e ( 'Nunavut', 'cdc' ); ?></option>
@@ -181,7 +181,6 @@
         <div class="form-text col-7 offset-1 d-flex">
 					<select name="referral" class="form-control form-control-lg text-center rounded-pill has-other">
 						<option>- <?php _e ( 'Select an option', 'cdc' ); ?> -</option>
-						<option><?php _e('Search engine', 'cdc' ); ?></option>
 						<option><?php _e('Word of mouth', 'cdc' ); ?></option>
 						<option><?php _e('Services offered by the Canadian Centre for Climate Services (e.g. webinar, workshop or Support Desk)', 'cdc' ); ?></option>
 						<option><?php _e('Professional association', 'cdc' ); ?></option>

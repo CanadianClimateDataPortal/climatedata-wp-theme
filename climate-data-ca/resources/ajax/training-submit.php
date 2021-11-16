@@ -31,10 +31,10 @@ if ($_GET['email']!='') {
 
     $headers = array (
       'Content-Type: text/html; charset=UTF-8',
-      "From: {$form_data['name']} <{$form_data['email']}>"
+      "From: {$form_data['fullname']} <{$form_data['email']}>"
     );
     $body = '<p>The following invididual aggreed the terms of use and downloaded the training presentation</p>';
-    $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Name</span><span style="display: inline-block; vertical-align: top;">' . $form_data['name'] . '</span></p>';
+    $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Name</span><span style="display: inline-block; vertical-align: top;">' . $form_data['fullname'] . '</span></p>';
 
     $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Email</span><span style="display: inline-block; vertical-align: top;"><a href="mailto:' . $form_data['email'] . '">' . $form_data['email'] . '</a></span></p>';
 

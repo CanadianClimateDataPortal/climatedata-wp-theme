@@ -117,8 +117,8 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
             <div class="form-text col-6">
               <p><?php _e ( 'We are asking for your contact information to inform you when new versions are released and to request feedback. We are continuously seeking to improve these training materials and value your input. If you have any feedback or questions please contact the <a href="https://climate-change.canada.ca/support-desk">Climate Services Support Desk</a>.' ,'cdc' ); ?></p>
 
-              <label for="name" class="form-label all-caps"><?php _e ( 'Full name', 'cdc' ); ?></label>
-              <input type="text" name="name" id="name" class="form-control form-control-lg rounded-pill">
+              <label for="fullname" class="form-label all-caps"><?php _e ( 'Full name', 'cdc' ); ?></label>
+              <input type="text" name="fullname" id="fullname" class="form-control form-control-lg rounded-pill">
             </div>
           </div>
 

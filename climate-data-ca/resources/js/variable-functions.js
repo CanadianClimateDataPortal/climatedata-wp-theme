@@ -1450,7 +1450,7 @@
                                 if (decade > 2071) {
                                     decade = 2071;
                                 }
-                                let decade_ms= Date.UTC(decade,0,1);
+                                let decade_ms= Date.UTC(decade,month_number_lut[mora_value]-1,1);
                                 chart.xAxis[0].removePlotBand('30y-plot-band');
                                 chart.xAxis[0].addPlotBand({
                                     from:Date.UTC(decade,0,1),
@@ -1542,7 +1542,7 @@
                                     if (decade > 2071) {
                                         decade = 2071;
                                     }
-                                    let decade_ms= Date.UTC(decade,0,1);
+                                    let decade_ms= Date.UTC(decade,month_number_lut[mora_value]-1,1);
                                     chart.xAxis[0].removePlotBand('30y-plot-band');
                                     chart.xAxis[0].addPlotBand({
                                         from:Date.UTC(decade,0,1),
@@ -1558,7 +1558,7 @@
                                         str += Highcharts.numberFormat(num, chartDecimals);
                                         switch( chartUnit) {
                                             case "day of the year":
-                                                str += " days";
+                                                str += current_lang == 'fr' ? " jours" : " days";
                                                 break;
                                             default:
                                                 str += " " + chartUnit;
@@ -1573,7 +1573,7 @@
                                     this.axis = tooltip.chart.yAxis[0];
                                     let val1, val2;
 
-                                    let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + " Change from 1971-2000</span><br/>"];
+                                    let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + " " + chart_labels.change_from_1971_2000 + "</span><br/>"];
 
                                     val1 = numformat(data['delta7100_rcp26_median'][decade_ms][0]);
                                     tip.push("<span style=\"color:#00F\">●</span> " + chart_labels.rcp_26_median + " <b>"

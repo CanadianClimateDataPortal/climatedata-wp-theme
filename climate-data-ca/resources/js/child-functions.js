@@ -220,6 +220,7 @@ var chart_labels, legend_labels, l10n_labels;
     //
 
     chart_labels = {
+      change_from_1971_2000: 'Change from 1971-2000',
       observation: 'Gridded Historical Data',
       historical: 'Modeled Historical',
       historical_range: 'Historical Range',
@@ -263,6 +264,7 @@ var chart_labels, legend_labels, l10n_labels;
     if ($('body').hasClass('lang-fr')) {
 
       chart_labels = {
+        change_from_1971_2000: 'Changement par rapport à 1971-2000',
         observation: 'Données observées interpolées',
         historical: 'Historique modélisé',
         historical_range: 'Répartition historique',
@@ -325,6 +327,29 @@ var chart_labels, legend_labels, l10n_labels;
       }
 
     }
+
+      // Constants
+      month_number_lut = {
+          'jan': 1,
+          'feb': 2,
+          'mar': 3,
+          'apr': 4,
+          'may': 5,
+          'jun': 6,
+          'jul': 7,
+          'aug': 8,
+          'sep': 9,
+          'oct': 10,
+          'nov': 11,
+          'dec': 12,
+          'ann': 1,
+          '2qsapr': 4,
+          'winter': 12,
+          'spring': 3,
+          'summer': 6,
+          'fall': 9
+      };
+
 
     //
     // FEEDBACK

@@ -610,10 +610,20 @@
                 // form_inputs
 
                 for (var key in form_inputs) {
-                    form_obj['inputs'].push({
-                        'id': key,
-                        'data': form_inputs[key]
-                    })
+                    if (key == 'rcp') {
+                        form_inputs[key].split(',').forEach(function(component) {
+                            form_obj['inputs'].push({
+                                'id': key,
+                                'data': component
+                            })
+                            });
+                    }
+                    else {
+                        form_obj['inputs'].push({
+                            'id': key,
+                            'data': form_inputs[key]
+                        })
+                    }
                 }
 
                 // form_thresholds

@@ -1,6 +1,9 @@
 2021-11-19.02
   * Allow multiple RCP selection in analyze page
 
+2021-11-19.01
+  * Added decimals parameter support for charts csv downloads
+
 2021-11-16.01
   * Added delta feature
 

@@ -1671,9 +1671,9 @@
                 callback: function (varDetails) {
 
                     $('#rcp').prop('disabled', true);
-                    let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month;
+                    let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals;
                     $.getJSON(
-                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
+                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals,
                         function (data) {
                             displayChartData(data, varDetails, download_url);
                         });
@@ -1694,10 +1694,10 @@
                 position: 'right',
                 callback: function (varDetails) {
                     $('#rcp').prop('disabled', true);
-                    let download_url = data_url + '/download-regional-30y/' + query['sector'] + '/' + id + '/' + variable + '/' + month;
+                    let download_url = data_url + '/download-regional-30y/' + query['sector'] + '/' + id + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals;
 
                     $.getJSON(hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id
-                        + '/' + variable + '/' + month).then(function (data) {
+                        + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals).then(function (data) {
                         displayChartData(data,varDetails, download_url);
                     });
 

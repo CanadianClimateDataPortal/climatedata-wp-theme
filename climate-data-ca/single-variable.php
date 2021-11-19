@@ -350,12 +350,46 @@ if (have_posts()) : while (have_posts()) : the_post();
 
                 <div class="overlay-content-row">
                     <div class="overlay-content-chart">
-                        <div class="navbar chart-navbar d-flex">
+                        <div class="navbar chart-navbar d-flex align-items-center mb-5">
+
+
+
+							<div class="chart-delta nav-item flex-grow-1 d-flex">
+                                <?php
+
+                                if ( get_field ( 'hasdelta' ) ) {
+
+                                ?>
+								<h6>Options:</h6>
+
+								<div class="form-check form-check-inline custom-control custom-radio">
+									<input class="custom-control-input" type="radio" id="chatoption1" name="chartoption" value="annual" checked>
+									<label class="custom-control-label pl-2" for="chatoption1"><?php _e('Annual values', 'cdc'); ?></label>
+								</div>
+
+								<div class="form-check form-check-inline custom-control custom-radio">
+									<input class="custom-control-input" type="radio" id="chartoption2" name="chartoption" value="30y">
+									<label class="custom-control-label pl-2" for="chartoption2"><?php _e('30 year averages', 'cdc'); ?></label>
+								</div>
+
+								<div class="form-check form-check-inline custom-control custom-radio">
+									<input class="custom-control-input" type="radio" id="chartoption3" name="chartoption" value="delta">
+									<label class="custom-control-label pl-2" for="chartoption3"><?php _e('30 year changes', 'cdc'); ?></label>
+								</div>
+
+                                    <?php
+
+                                }
+
+                                ?>
+							</div>
+
+
                             <div class="nav-item d-flex align-items-center mr-5">
                                 <a href="#" class="btn btn-sm btn-outline-secondary page-tour-trigger" data-tour="chart-tour"><span class="fas fa-question icon rounded-circle icon mr-3"></span><?php _e('How to read this', 'cdc'); ?></a>
                             </div>
 
-                            <div class="nav-item d-flex align-items-center mr-5">
+                            <div class="nav-item d-flex align-items-center mr-3">
                                 <h6><span class="cdc-icon icon-download-data"></span> <?php _e('Download data', 'cdc'); ?></h6>
 
                                 <div class="btn-group btn-group-sm" role="group">
@@ -489,7 +523,39 @@ if (have_posts()) : while (have_posts()) : the_post();
 
                 <div class="overlay-content-row">
                     <div class="overlay-content-chart">
-                        <div class="navbar chart-navbar d-flex">
+                        <div class="navbar chart-navbar d-flex mb-5">
+
+
+                                <div class="chart-delta nav-item flex-grow-1 d-flex">
+                                    <?php
+
+                                    if ( get_field ( 'hasdelta' ) ) {
+
+                                    ?>
+                                    <h6>Options:</h6>
+
+                                    <div class="form-check form-check-inline custom-control custom-radio">
+                                        <input class="custom-control-input" type="radio" id="chatoption1" name="chartoption" value="annual" checked>
+                                        <label class="custom-control-label pl-2" for="chatoption1"><?php _e('Annual values', 'cdc'); ?></label>
+                                    </div>
+
+                                    <div class="form-check form-check-inline custom-control custom-radio">
+                                        <input class="custom-control-input" type="radio" id="chartoption2" name="chartoption" value="30y">
+                                        <label class="custom-control-label pl-2" for="chartoption2"><?php _e('30 year averages', 'cdc'); ?></label>
+                                    </div>
+
+                                    <div class="form-check form-check-inline custom-control custom-radio">
+                                        <input class="custom-control-input" type="radio" id="chartoption3" name="chartoption" value="delta">
+                                        <label class="custom-control-label pl-2" for="chartoption3"><?php _e('30 year changes', 'cdc'); ?></label>
+                                    </div>
+                                        <?php
+
+                                    }
+
+                                    ?>
+                                </div>
+
+
                             <div class="nav-item d-flex align-items-center mr-5">
                                 <a href="#" class="btn btn-sm btn-outline-secondary page-tour-trigger" data-tour="chart-tour"><span class="fas fa-question icon rounded-circle icon mr-3"></span><?php _e('How to read this', 'cdc'); ?></a>
                             </div>
@@ -510,7 +576,6 @@ if (have_posts()) : while (have_posts()) : the_post();
                                 </div>
                             </div>
                         </div>
-
                         <div id="chart-placeholder" class="var-chart"></div>
                     </div>
                 </div>

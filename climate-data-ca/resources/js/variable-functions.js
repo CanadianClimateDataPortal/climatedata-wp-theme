@@ -1173,7 +1173,7 @@
             });
         }
 
-        function disPlayChartData(data, varDetails, download_url) {
+        function displayChartData(data, varDetails, download_url) {
             const firstDayOfYear = Date.UTC(2019,0,1);
             chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
             chartDecimals = varDetails['decimals'];
@@ -1674,7 +1674,7 @@
                     $.getJSON(
                         data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
                         function (data) {
-                            disPlayChartData(data, varDetails, download_url);
+                            displayChartData(data, varDetails, download_url);
                         });
 
                 }
@@ -1697,7 +1697,7 @@
 
                     $.getJSON(hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id
                         + '/' + variable + '/' + month).then(function (data) {
-                        disPlayChartData(data,varDetails, download_url);
+                        displayChartData(data,varDetails, download_url);
                     });
 
 
@@ -2177,12 +2177,6 @@
                 sectorLegendLayer = layer + "-delta7100";
             } else {
                 sectorLegendLayer = layer;
-            }
-
-            if (query['sector'] !== 'census') {
-                // $('#toggle-switch-container').hide();
-            } else {
-                // $('#toggle-switch-container').show();
             }
 
             $.getJSON(hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic" +

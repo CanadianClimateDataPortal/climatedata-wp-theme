@@ -8,13 +8,54 @@
 
         // overlay text
 
+
+        const select_locations = {
+            GRID: "grid",
+            WATERSHED: "watershed",
+            CENSUS : "census",
+            HEALTH: "health"
+        };
+
+        const sectorFeatureStyleColor = {
+            'default':{
+                'color': 'white',
+                'fillColor': '#ababab'
+            },
+            'mouseover':{
+                'color': 'white',
+                'fillColor': 'white'
+            },
+            'mouseclick':{
+                'color': '#F00',
+                'fillColor': '#F00'
+            }
+        };
+
+        let currentSelection = undefined;
+        let map_sectors = {};
+        map_sectors[select_locations.WATERSHED] = {};
+        map_sectors[select_locations.CENSUS] = {};
+        map_sectors[select_locations.HEALTH] = {};
+
+        let selectedSectors = {
+        };
+        selectedSectors[select_locations.WATERSHED] = undefined;
+        selectedSectors[select_locations.CENSUS] = undefined;
+        selectedSectors[select_locations.HEALTH] = undefined;
+
+        let station_on = false; // flag for showing/hiding the stations layer,
+        let sector_on = false;
+        let query = {};
+
         var overlay_text = JSON.parse($('#map-overlay-content').attr('data-steps'))
+        let canadaBounds = L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.60, -49.9));
 
         // form stuff
 
         var default_inputs = {
             'lat': '',
             'lon': '',
+            'shape': '',
             'start_date': '',
             'end_date': '',
             'ensemble_percentiles': '',
@@ -221,6 +262,7 @@
             var this_item = $(this).closest('.input-row'),
                 input_parent = this_item.closest('.field')
 
+            let sector_value = this_item.find(':input').val();
             if (
                 !this_item.find(':input').hasClass('disabled') &&
                 (this_item.find(':input').attr('disabled') == '' || typeof this_item.find(':input').attr('disabled') == 'undefined')
@@ -237,6 +279,41 @@
                     this_item.addClass('checked')
                     this_item.find(':input').prop('checked', true)
                     this_item.find('.form-icon').removeClass().addClass(radio_icon_on)
+
+                    if(sector_value.toLowerCase().includes("health")){
+                        sector_value = "health";
+                        currentSelection = sector_value;
+                    }else if(sector_value.toLowerCase().includes("census")){
+                        sector_value = "census";
+                        currentSelection = sector_value;
+                    }else if(sector_value.toLowerCase().includes("watershed")){
+                        currentSelection = "watershed";
+                    }else if(sector_value.toLowerCase().includes("grid")){
+                        currentSelection = "grid";
+                    }
+
+                    let isSector = Object.values(select_locations).indexOf(sector_value) > -1;
+
+                    // Only when a Dataset is selected
+                    if ( isSector) {
+                        var_value = $("#var").val();
+                        mora_value = $("#mora").val();
+                        mora_text_value = $("#mora option:selected").text();
+                        rcp_value = $("#rcp").val();
+                        decade_value = parseInt($("#decade").val()) + 1;
+
+                        changeLayers(sector_value);
+
+                        if(sector_value !== 'grid'){
+                            genChoro(sector_value, '1971', 'tx_max', 'rcp85', 'ann');
+                            if (currentSector !== sector_value) {
+                                currentSector = sector_value;
+                                if (analyze_map.hasLayer(choroLayer)) {
+                                    analyze_map.removeLayer(choroLayer);
+                                }
+                            }
+                        }
+                    }
 
                 } else if (input_parent.hasClass('type-checkbox')) {
 
@@ -346,11 +423,385 @@
                 }
 
                 validate_steps()
-                validate_inputs()
+                validate_inputs(sector_value);
+            }
+        })
 
+        function changeLayers(sector_value) {
+            $('#lat').val("");
+            $('#lon').val("");
+            $('#shape').val('');
+
+            if ($('#sector').length) {
+                query['sector'] = $('#sector').val();
+            } else {
+                query['sector'] = '';
             }
 
-        })
+            // not station data so make sure it's turned off
+            // Is Gridded data
+            if (station_on === true) {
+                layer_swap({
+                    layer: 'stations',
+                    action: 'off'
+                });
+            }
+
+            // Is not Gridded data
+            if (sector_value !== 'grid') {
+
+                // activate sector
+                // sector_on always False:
+                if (sector_on === false) {
+                    // When switch from Gridded data to (Census || Health || Watersheds)
+                    layer_swap({
+                        layer: 'sector'
+                    });
+
+                    layer_swap({
+                        layer: 'variable',
+                        action: 'off'
+                    });
+                }
+
+            // Gridded data
+            } else {
+                // not sector so make sure it's turned off
+                // sector_on === false, when refresh the page
+                if (sector_on === true) {
+                    layer_swap({
+                        layer: 'sector',
+                        action: 'off'
+                    });
+                }
+
+                layer_swap({
+                    layer: 'variable'
+                });
+            }
+        }
+
+        function layer_swap(fn_options) {
+            var defaults = {
+                layer: null,
+                action: 'on'
+            };
+
+            var settings = $.extend(true, defaults, fn_options);
+            if (settings.action === 'on') {
+                $('body').addClass(settings.layer + '-on');
+            } else {
+                $('body').removeClass(settings.layer + '-on');
+            }
+
+            switch (settings.layer) {
+                case 'variable':
+                    layer_swap_variable(settings);
+                    break;
+                case 'stations':
+                    layer_swap_stations(settings);
+                    break;
+                case 'sector':
+                    layer_swap_sector(settings);
+                    break;
+                default:
+            }
+        }
+
+        function layer_swap_sector(settings) {
+            if (settings.action == 'on') {
+                // set global var & body class
+                sector_on = true;
+
+                // disable station data options
+                $('#var').find('optgroup[data-slug="station-data"] option').each(function () {
+                    $(this).prop('disabled', true);
+                });
+
+                // turn off stations & variable
+                layer_swap({
+                    layer: 'stations',
+                    action: 'off'
+                });
+
+                layer_swap({
+                    layer: 'variable',
+                    action: 'off'
+                });
+
+                //analyze_map.addLayer(choroLayer);
+            } else {
+                // set global var & body class
+                sector_on = false;
+
+                // enable station data options
+                $('#var').find('optgroup[data-slug="station-data"] option').each(function () {
+                    $(this).prop('disabled', false);
+                });
+
+                if (typeof choroLayer !== 'undefined' && choroLayer !== null) {
+                    analyze_map.removeLayer(choroLayer);
+                }
+            }
+        }
+
+        function layer_swap_stations(settings) {
+            if (settings.action === 'on') {
+                // set global var & body class
+                station_on = true;
+
+                // add station layer
+                console.log('settings.station');
+                console.log(settings.station);
+
+                if (settings.station === 'idf') {
+                    if (typeof idf_layer !== 'undefined') {
+                        analyze_map.addLayer(idf_layer);
+                    }
+
+                    if (typeof station_layer !== 'undefined') {
+                        console.log("REMOVE STATION LAYER");
+                        analyze_map.removeLayer(station_layer).closePopup();
+                    }
+
+                } else if (settings.station === 'weather-stations') {
+                    if (typeof station_layer !== 'undefined') {
+                        analyze_map.addLayer(station_layer);
+                    }
+
+                    if (typeof idf_layer !== 'undefined') {
+                        analyze_map.removeLayer(idf_layer).closePopup();
+                    }
+                }
+
+                $('#mora').prop('disabled', true);
+                $('#rcp').prop('disabled', true);
+
+                // turn off variable & sector
+                layer_swap({
+                    layer: 'sector',
+                    action: 'off'
+                });
+
+                layer_swap({
+                    layer: 'variable',
+                    action: 'off'
+                });
+
+            } else {
+                // set global var & body class
+                station_on = false;
+
+                // hide station layers
+                if (typeof idf_layer !== 'undefined' && idf_layer !== null) {
+                    analyze_map.removeLayer(idf_layer).closePopup();
+                }
+
+                if (typeof station_layer !== 'undefined' && station_layer !== null) {
+                    analyze_map.removeLayer(station_layer).closePopup();
+                }
+
+                // enable filters
+                $('#sector').prop('disabled', false);
+            }
+        }
+
+        function layer_swap_variable(settings) {
+            if (settings.action === 'on') {
+
+                // set global var & body class
+                var_on = true;
+
+                // show variable layer
+                analyze_map.addLayer(pbfLayer);
+
+                // enable filters
+                $('#mora').prop('disabled', false);
+                $('#rcp').prop('disabled', false);
+
+                // turn off stations & sector
+                layer_swap({
+                    layer: 'sector',
+                    action: 'off'
+                });
+
+                layer_swap({
+                    layer: 'stations',
+                    action: 'off'
+                });
+
+            } else {
+                // set global var & body class
+                var_on = false;
+
+                // hide variable layer
+                analyze_map.removeLayer(pbfLayer);
+
+                // turn off right map
+                $('body').removeClass('map-compare');
+
+                invalidate_maps();
+            }
+        }
+
+        // UTILITIES
+        function invalidate_maps() {
+            analyze_map.invalidateSize();
+        }
+
+        var choroLayer = null,
+            choroValues = [];
+
+        var currentSector;
+        var current_sector = [];
+
+        function genChoro(sector, year, variable, rcp, frequency) {
+            var choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency + '/?period=' + year;
+
+            //Display count top menu (map)
+            selectedSectors[sector] = undefined;
+            deselectedAllGridCell();
+            selectedGrids = [];
+
+            // choroValues ==  sector colors
+            $.getJSON(choroPath).then(function (data) {
+                choroValues = data;
+
+                if (analyze_map.hasLayer(choroLayer)) {
+                    for (let i = 0; i < choroValues.length; i++)
+                        choroLayer.resetFeatureStyle(i);
+                }else {
+                    var layerStyles = {};
+                    layerStyles[currentSector] = function (properties, zoom) {
+                        return {
+                            weight: 0.5,
+                            color: sectorFeatureStyleColor['default']['color'],
+                            fillColor: sectorFeatureStyleColor['default']['fillColor'],
+                            opacity: 1,
+                            fill: true,
+                            radius: 4,
+                            fillOpacity: 1
+                        }
+                    };
+
+                    choroLayer = L.vectorGrid.protobuf(
+                        hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf",
+                        {
+                            rendererFactory: L.canvas.tile,
+                            interactive: true,
+                            getFeatureId: function (f) {
+                                return f.properties.id;
+                            },
+                            name: 'geojson',
+                            pane: 'sector',
+                            maxNativeZoom: 12,
+                            bounds: canadaBounds,
+                            maxZoom: 12,
+                            minZoom: 3,
+                            vectorTileLayerStyles: layerStyles
+                        }
+                    ).on('mouseover', function (e) {
+                        if(map_sectors[sector][e.layer.properties.id] === undefined){
+                            choroLayer.setFeatureStyle(
+                                e.layer.properties.id,
+                                {
+                                    color: sectorFeatureStyleColor['mouseover']['color'],
+                                    fillColor: sectorFeatureStyleColor['mouseover']['fillColor'],
+                                    weight: 1.5,
+                                    fill: true,
+                                    radius: 4,
+                                    opacity: 1,
+                                    fillOpacity: 1
+                                });
+                            choroLayer.bindTooltip(e.layer.properties[l10n_labels.label_field], { sticky: true }).openTooltip(e.latlng);
+                        }
+                    }
+                    ).on('mouseout', function (e) {
+                        if(map_sectors[sector][e.layer.properties.id] === undefined){
+                            choroLayer.resetFeatureStyle(e.layer.properties.id);
+                        }
+                    }
+                    ).on('click', function (e) {
+                        current_sector['id'] = e.layer.properties.id;
+                        current_sector['label'] = e.layer.properties[l10n_labels.label_field];
+
+                        var_value = $("#var").val();
+                        mora_value = $("#mora").val();
+
+                        highlightSectorById(sector, current_sector['id'], e, choroLayer);
+                        validate_inputs(sector);
+
+                    }).addTo(analyze_map);
+                }
+            })
+        };
+
+
+        function highlightSectorById(sector,highlightSectorId, protobufEvent, protobufChoroLayer) {
+            $('#lat').val("");
+            $('#lon').val("");
+            $('#shape').val(current_sector['id']);
+
+            var selectedSectorsLabels = [];
+            var selectedExists = selectedSectors[sector] === highlightSectorId;
+
+            if (selectedExists === true) {
+                deselectSector(sector, highlightSectorId, protobufChoroLayer, selectedSectorsLabels, selectedSectors);
+                $('#shape').val('');
+
+            } else {
+                map_sectors[sector][highlightSectorId] = highlightSectorId;
+                let old_selection = selectedSectors[sector];
+
+                // Deselect old sector
+                if(old_selection !== undefined){
+                    map_sectors[sector][old_selection] = undefined;
+                    deselectSector(sector, old_selection, protobufChoroLayer, selectedSectorsLabels, selectedSectors);
+                    protobufChoroLayer.resetFeatureStyle(old_selection);
+                }
+
+                // Highlight new sector
+                 selectedSectors[sector] = highlightSectorId;
+                 protobufChoroLayer.setFeatureStyle(highlightSectorId, {
+                    color: sectorFeatureStyleColor['mouseclick']['color'],
+                    weight: 1,
+                    fill: true,
+                    radius: 4,
+                    opacity: 1,
+                    fillOpacity: 0.1
+                });
+            }
+
+            // Display count top menu (map)
+            let lenTemp = selectedSectors[sector] !== undefined ? 1 : 0;
+            $('#analyze-breadcrumb').find('.grid-count').text(lenTemp);
+
+            L.DomEvent.stop(protobufEvent);
+        }
+
+        function deselectSector(sector, sectorId, protobufChoroLayer, selectedSectorsLabels, sectorToDeselect) {
+            map_sectors[sector][sectorId] = undefined;
+
+            if (sectorToDeselect[sector] === sectorId) {
+                sectorToDeselect[sector] = undefined;
+            }
+
+            for (var i = selectedSectorsLabels.length - 1; i >= 0; i--) {
+                if (selectedSectorsLabels[sectorId]) {
+                    selectedSectorsLabels.splice(i, 1);
+                }
+            }
+
+            protobufChoroLayer.setFeatureStyle(sectorId, {
+                weight: 0.1,
+                color: sectorFeatureStyleColor['default']['color'],
+                opacity: 1,
+                fill: true,
+                radius: 4,
+                fillOpacity: 0
+            });
+        }
+
 
         // select
 
@@ -403,7 +854,7 @@
 
             if (!$(this).hasClass('selected')) {
 
-//         input_id = $(this).find('input').
+                //         input_id = $(this).find('input').
 
                 let var_content = JSON.parse($(this).closest('.input-variable').attr('data-content'));
                 let var_frequencies = $(this).closest('.input-variable').attr('data-frequencies');
@@ -411,15 +862,15 @@
                 if (var_frequencies != '') {
                     let frequencies = var_frequencies.split('|');
                     $('input[name=freq]').each(function(i) {
-                       if (frequencies.includes($(this).val())) {
-                           $(this).attr('disabled', false);
+                    if (frequencies.includes($(this).val())) {
+                        $(this).attr('disabled', false);
                         } else {
-                           let input_row = $(this).closest('.input-row');
-                           input_row.removeClass('checked');
-                           $(this).prop('checked', false);
-                           input_row.find('.form-icon').removeClass().addClass(radio_icon_off);
-                           $(this).attr('disabled', true);
-                       }
+                        let input_row = $(this).closest('.input-row');
+                        input_row.removeClass('checked');
+                        $(this).prop('checked', false);
+                        input_row.find('.form-icon').removeClass().addClass(radio_icon_off);
+                        $(this).attr('disabled', true);
+                    }
                     });
                 } else {
                     $('input[name=freq]').each(function(i) {
@@ -554,6 +1005,7 @@
             // For all events
             "lat": "latitude",
             "lon": "longitute",
+            "shape": "shape",
             "start_date": "start date",
             "end_date": "end date",
             "ensemble_percentiles": "ensemble percentiles",
@@ -604,76 +1056,133 @@
         $('#analyze-process').click(function (e) {
             if (!$(this).hasClass('disabled')) {
 
+                let submitUrl = child_theme_dir + 'resources/ajax/analyze-form.php'
                 form_obj = $.extend(true, {}, default_obj)
 
                 // build the final input object to send to the API
-                // form_inputs
+                let isBySector = form_inputs["shape"] != '';
+                let isByGrid = form_inputs["lat"] != '' && form_inputs["lon"] != '';
 
-                for (var key in form_inputs) {
-                    if (key == 'rcp') {
-                        form_inputs[key].split(',').forEach(function(component) {
-                            form_obj['inputs'].push({
-                                'id': key,
-                                'data': component
-                            })
-                            });
-                    }
-                    else {
-                        form_obj['inputs'].push({
-                            'id': key,
-                            'data': form_inputs[key]
-                        })
-                    }
+                if((isBySector && isByGrid) || (!isBySector && !isByGrid) ){
+                    console.error(" Can not build the final input object to send to the API. Please make to select only a sector ("+isBySector+") or grid ("+isByGrid+")");
                 }
 
-                // form_thresholds
-                for (var key in form_thresholds) {
-                    form_obj['inputs'].push({
-                        'id': key,
-                        'data': form_thresholds[key]
-                    })
-                }
+                let sectorCoord = {
+                    "s_lat": '',
+                    "s_lon": ''
+                };
 
-                // email
-                form_obj['notification_email'] = $('#analyze-email').val()
+                if(!isBySector){
+                    form_obj = createRequestData(sectorCoord, form_inputs, form_obj);
+                    submitAnalyzeProcess(submitUrl);
+                }else{
+                    // ex: https://dataclimatedata.crim.ca/partition-to-points/health/2.json
+                    getUrl = "https://dataclimatedata.crim.ca/partition-to-points/"+ currentSelection +"/"+ form_inputs["shape"] +".json"
 
-                set_datalayer_for_analyze_bccaqv2(form_obj['inputs'], submit_url_var);
-
-                var submit_data = {
-                    'analyze-captcha_code': $('#analyze-captcha_code').val(),
-                    'request_data': form_obj,
-                    'submit_url': submit_url_var + submit_url_post
-                }
-
-                // check captcha
-                $.ajax({
-                    url: child_theme_dir + 'resources/ajax/analyze-form.php',
-                    method: "POST",
-                    data: submit_data,
-                    success: function (data) {
-
-                        var response = JSON.parse(data)
-
-                        console.log(response)
-
-                        if (typeof response == 'object' && response.status == 'accepted') {
-
-                            $('#success-modal').modal('show');
-
-                        } else {
-
-                            console.log('captcha failed')
-
+                    getLutBySectorId(getUrl).then(function(dataCallback){
+                        for (var i = 0; i < dataCallback.length; i++) {
+                            if(sectorCoord["s_lat"] == ''){
+                                sectorCoord["s_lat"] = dataCallback[i][0];
+                                sectorCoord["s_lon"] = dataCallback[i][1];
+                            }else{
+                                sectorCoord["s_lat"] = sectorCoord["s_lat"] + ',' + dataCallback[i][0];
+                                sectorCoord["s_lon"] = sectorCoord["s_lon"] + ',' + dataCallback[i][1];
+                            }
                         }
-                    },
-                    complete: function () {
-                        $('#analyze-captcha_code').val('')
-                        $('#analyze-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php')
-                    }
-                })
 
+                        form_obj = createRequestData(sectorCoord, form_inputs, form_obj);
+                        submitAnalyzeProcess(submitUrl);
+                    });
+                }
             }
         })
+
+        function submitAnalyzeProcess(submitUrl) {
+            for (var key in form_thresholds) {
+                form_obj['inputs'].push({
+                    'id': key,
+                    'data': form_thresholds[key]
+                });
+            }
+
+            // email
+            form_obj['notification_email'] = $('#analyze-email').val();
+
+            set_datalayer_for_analyze_bccaqv2(form_obj['inputs'], submit_url_var);
+
+            var submit_data = {
+                'analyze-captcha_code': $('#analyze-captcha_code').val(),
+                'request_data': form_obj,
+                'submit_url': submit_url_var + submit_url_post
+            }
+
+            // check captcha
+            $.ajax({
+                url: submitUrl,
+                method: "POST",
+                data: submit_data,
+                success: function (data) {
+
+                    var response = JSON.parse(data)
+
+                    console.log(response)
+
+                    if (typeof response == 'object' && response.status == 'accepted') {
+
+                        $('#success-modal').modal('show');
+
+                    } else {
+
+                        console.log('captcha failed')
+
+                    }
+                },
+                complete: function () {
+                    $('#analyze-captcha_code').val('')
+                    $('#analyze-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php')
+                }
+            });
+        }
+
+        function getLutBySectorId(getUrl){
+            return $.getJSON(getUrl).then(function(data){
+            return data;
+            });
+        }
+
+        function createRequestData(set_sectorCoord, set_form_inputs, set_form_obj){
+            let isBySector = set_form_inputs["shape"] != '';
+
+            for (var key in set_form_inputs) {
+                if(key == "shape"){
+                    continue
+                }
+
+                if (key == 'rcp') {
+                    set_form_inputs[key].split(',').forEach(function(component) {
+                        set_form_obj['inputs'].push({
+                            'id': key,
+                            'data': component
+                        })
+                    });
+                } else{
+                    let addData = set_form_inputs[key];
+                    if(isBySector && (key == "lat" || key == "lon")){
+                        addData = set_sectorCoord["s_lat"];
+                        if(key == "lon"){
+                            addData = set_sectorCoord["s_lon"];
+                        }
+                    }
+
+                    set_form_obj['inputs'].push({
+                        'id': key,
+                        'data': addData
+                    })
+
+                }
+            }
+            return set_form_obj;
+        }
 
 
         $('#detail-close').click(function () {
@@ -703,6 +1212,9 @@
         analyze_map.createPane('labels')
         analyze_map.getPane('labels').style.zIndex = 402
         analyze_map.getPane('labels').style.pointerEvents = 'none'
+
+        analyze_map.createPane('sector');
+        analyze_map.getPane('sector').style.zIndex = 403;
 
         L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png', {
             attribution: '',
@@ -779,31 +1291,10 @@
                 })
 
             } else {
-
-                delete map_grids[highlightGridFeature]
-
-                for (var i = selectedGrids.length - 1; i >= 0; i--) {
-                    if (selectedGrids[i] === highlightGridFeature) {
-                        selectedGrids.splice(i, 1);
-                    }
-                }
-
-                for (var i = selectedPoints.length - 1; i >= 0; i--) {
-                    if (selectedPoints[highlightGridFeature]) {
-                        selectedPoints.splice(i, 1);
-                    }
-                }
-
-                pbfLayer.setFeatureStyle(highlightGridFeature, {
-                    weight: 0.1,
-                    color: gridline_color,
-                    opacity: 1,
-                    fill: true,
-                    radius: 4,
-                    fillOpacity: 0
-                });
-
+                deselectedGridCell(highlightGridFeature);
             }
+
+            //Display count top menu (map)
 
             $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length)
 
@@ -827,12 +1318,43 @@
 
             $('#lat').val(lat_val)
             $('#lon').val(lon_val)
-
+            $('#shape').val('')
             validate_inputs()
-
             L.DomEvent.stop(e)
-
         }).addTo(analyze_map)
+
+        function deselectedAllGridCell() {
+            const list = Object.entries(map_grids);
+            list.forEach((key) => {
+                deselectedGridCell(key[0]);
+             } );
+        }
+
+        function deselectedGridCell(gidSelected) {
+            delete map_grids[gidSelected];
+
+            // To reset selection
+            for (var i = selectedGrids.length - 1; i >= 0; i--) {
+                if (selectedGrids[i] === gidSelected) {
+                    selectedGrids.splice(i, 1);
+                }
+            }
+
+            for (var i = selectedPoints.length - 1; i >= 0; i--) {
+                if (selectedPoints[gidSelected]) {
+                    selectedPoints.splice(i, 1);
+                }
+            }
+
+            pbfLayer.setFeatureStyle(gidSelected, {
+                weight: 0.1,
+                color: gridline_color,
+                opacity: 1,
+                fill: true,
+                radius: 4,
+                fillOpacity: 0
+            });
+        }
 
         // GEO-SELECT
 
@@ -945,6 +1467,7 @@
 
             $('#lat').val('')
             $('#lon').val('')
+            $('#shape').val('')
 
             validate_inputs()
             validate_steps()
@@ -1112,7 +1635,7 @@
 
         // INPUTS
 
-        function validate_inputs() {
+        function validate_inputs(sectorSelect = undefined) {
 
             var is_valid = true
 
@@ -1180,6 +1703,13 @@
             // cycle through the object and check for empty values
 
             for (var key in form_inputs) {
+                let isBysector = form_inputs["shape"] != '' && ( key == "lat" || key == "lon");
+                let isByGrid = key == "shape" && form_inputs["lat"] != '' && form_inputs["lon"] != '';
+
+                if (isBysector | isByGrid){
+                    continue;
+                }
+
                 if (form_inputs[key] == '') {
                     is_valid = false
                     //console.log(key)
@@ -1226,8 +1756,10 @@
             }
 
             // make sure lat/lon has a value
-
-            if ($('#lat').val() == '' || $('#lon').val() == '') {
+            if (sectorSelect != select_locations.GRID && Object.values(select_locations).includes(sectorSelect) ){
+                $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide()
+                $('#clear-grids').hide()
+            } else if ($('#lat').val() == '' || $('#lon').val() == '') {
                 $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').show()
                 $('#clear-grids').hide()
             } else {

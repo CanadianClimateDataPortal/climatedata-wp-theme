@@ -96,7 +96,7 @@
                   </div>
                 </div>
 
-                <div class="accordion-head" id="select-locations" data-step="2">
+                <div class="accordion-head" data-step="2">
                   <h5 class="d-flex align-items-center justify-content-between all-caps">
                     <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">2</span>
                     <span class="flex-grow-1"><?php _e ( 'Select locations', 'cdc' ); ?></span>
@@ -549,7 +549,7 @@
                   </div>
 
                   <div class="crumb">
-                  <h6><?php _e ( 'Location', 'cdc' ); ?> <i id="clear-grids" class="fas fa-undo-alt ml-3" style="display: none;" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Clear', 'cdc' ); ?>"></i><i class="fas fa-exclamation-circle ml-3 text-warning validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Zoom in to the map to select at least one grid coordinate.', 'cdc' ); ?>"></i></h6>
+                    <h6><?php _e ( 'Location', 'cdc' ); ?> <i id="clear-grids" class="fas fa-undo-alt ml-3" style="display: none;" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Clear', 'cdc' ); ?>"></i><i class="fas fa-exclamation-circle ml-3 text-warning validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Zoom in to the map to select at least one grid coordinate.', 'cdc' ); ?>"></i></h6>
                     <p class="value"></p>
                   </div>
                 </div>

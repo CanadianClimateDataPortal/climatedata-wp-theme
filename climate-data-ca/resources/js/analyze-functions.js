@@ -46,6 +46,12 @@
         let sector_on = false;
         let query = {};
 
+        let choroLayer = undefined;
+        let choroValues = [];
+
+        let currentSector;
+        let current_sector = [];
+
         var overlay_text = JSON.parse($('#map-overlay-content').attr('data-steps'))
         let canadaBounds = L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.60, -49.9));
 
@@ -253,6 +259,9 @@
             e.preventDefault()
         })
 
+        $('input[name=analyze-location]').on('click', function (e) {
+            //TODO: move code from "adio/check click event" when its a sector
+        })
         // radio/check click event
 
         $('.type-radio .input-item, .type-checkbox .input-item').on('click', function (e) {
@@ -437,8 +446,6 @@
                 query['sector'] = '';
             }
 
-            // not station data so make sure it's turned off
-            // Is Gridded data
             if (station_on === true) {
                 layer_swap({
                     layer: 'stations',
@@ -446,13 +453,9 @@
                 });
             }
 
-            // Is not Gridded data
             if (sector_value !== 'grid') {
-
-                // activate sector
-                // sector_on always False:
                 if (sector_on === false) {
-                    // When switch from Gridded data to (Census || Health || Watersheds)
+                    // When we switch from Gridded data to (Census || Health || Watersheds)
                     layer_swap({
                         layer: 'sector'
                     });
@@ -463,10 +466,10 @@
                     });
                 }
 
-            // Gridded data
             } else {
-                // not sector so make sure it's turned off
-                // sector_on === false, when refresh the page
+                // Gridded data
+
+                // sector_on === false, when we refresh the page
                 if (sector_on === true) {
                     layer_swap({
                         layer: 'sector',
@@ -643,32 +646,30 @@
             }
         }
 
-        // UTILITIES
         function invalidate_maps() {
             analyze_map.invalidateSize();
         }
 
-        var choroLayer = null,
-            choroValues = [];
 
-        var currentSector;
-        var current_sector = [];
 
         function genChoro(sector, year, variable, rcp, frequency) {
             var choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency + '/?period=' + year;
 
             //Display count top menu (map)
             selectedSectors[sector] = undefined;
-            deselectedAllGridCell();
+            deselectAllGridCell();
             selectedGrids = [];
 
-            // choroValues ==  sector colors
+            // choroValues == sector colors
             $.getJSON(choroPath).then(function (data) {
                 choroValues = data;
 
                 if (analyze_map.hasLayer(choroLayer)) {
-                    for (let i = 0; i < choroValues.length; i++)
+                    for (let i = 0; i < choroValues.length; i++){
                         choroLayer.resetFeatureStyle(i);
+                    }
+
+
                 }else {
                     var layerStyles = {};
                     layerStyles[currentSector] = function (properties, zoom) {
@@ -732,7 +733,13 @@
 
                     }).addTo(analyze_map);
                 }
-            })
+            }).fail(function() { console.log("Can not get Json for " + choroPath); })
+
+            analyze_map.on('zoom', function (e) {
+                if (typeof choroLayer !== 'undefined' && choroLayer !== null) {
+                    choroLayer.unbindTooltip();
+                }
+            });
         };
 
 
@@ -1003,7 +1010,7 @@
         var datalayer_parameters = {
             // For all events
             "lat": "latitude",
-            "lon": "longitute",
+            "lon": "longitude",
             "shape": "shape",
             "start_date": "start date",
             "end_date": "end date",
@@ -1064,6 +1071,7 @@
 
                 if((isBySector && isByGrid) || (!isBySector && !isByGrid) ){
                     console.error(" Can not build the final input object to send to the API. Please make to select only a sector ("+isBySector+") or grid ("+isByGrid+")");
+                    return;
                 }
 
                 let sectorCoord = {
@@ -1072,24 +1080,24 @@
                 };
 
                 if(!isBySector){
-                    form_obj = createRequestData(sectorCoord, form_inputs, form_obj);
+                    form_obj = createAnalyzeProcessRequestData(sectorCoord, form_inputs, form_obj);
                     submitAnalyzeProcess(submitUrl);
                 }else{
                     // ex: https://dataclimatedata.crim.ca/partition-to-points/health/2.json
                     getUrl = "https://dataclimatedata.crim.ca/partition-to-points/"+ currentSelection +"/"+ form_inputs["shape"] +".json"
 
-                    getLutBySectorId(getUrl).then(function(dataCallback){
-                        for (var i = 0; i < dataCallback.length; i++) {
+                    getLutBySectorId(getUrl).then(function(lutBySectorId){
+                        for (var i = 0; i < lutBySectorId.length; i++) {
                             if(sectorCoord["s_lat"] == ''){
-                                sectorCoord["s_lat"] = dataCallback[i][0];
-                                sectorCoord["s_lon"] = dataCallback[i][1];
+                                sectorCoord["s_lat"] = lutBySectorId[i][0];
+                                sectorCoord["s_lon"] = lutBySectorId[i][1];
                             }else{
-                                sectorCoord["s_lat"] = sectorCoord["s_lat"] + ',' + dataCallback[i][0];
-                                sectorCoord["s_lon"] = sectorCoord["s_lon"] + ',' + dataCallback[i][1];
+                                sectorCoord["s_lat"] += ',' + lutBySectorId[i][0];
+                                sectorCoord["s_lon"] += ',' + lutBySectorId[i][1];
                             }
                         }
 
-                        form_obj = createRequestData(sectorCoord, form_inputs, form_obj);
+                        form_obj = createAnalyzeProcessRequestData(sectorCoord, form_inputs, form_obj);
                         submitAnalyzeProcess(submitUrl);
                     });
                 }
@@ -1149,38 +1157,40 @@
             });
         }
 
-        function createRequestData(set_sectorCoord, set_form_inputs, set_form_obj){
-            let isBySector = set_form_inputs["shape"] != '';
+        function createAnalyzeProcessRequestData(data_sectorCoord, data_form_inputs, ret_form_obj){
+            let isBySector = data_form_inputs["shape"] != '';
 
-            for (var key in set_form_inputs) {
-                if(key == "shape"){
-                    continue
-                }
+            for (var key in data_form_inputs) {
+                switch (key) {
+                    case 'shape':
+                        continue;
 
-                if (key == 'rcp') {
-                    set_form_inputs[key].split(',').forEach(function(component) {
-                        set_form_obj['inputs'].push({
-                            'id': key,
-                            'data': component
-                        })
-                    });
-                } else{
-                    let addData = set_form_inputs[key];
-                    if(isBySector && (key == "lat" || key == "lon")){
-                        addData = set_sectorCoord["s_lat"];
-                        if(key == "lon"){
-                            addData = set_sectorCoord["s_lon"];
+                    case 'rcp':
+                        data_form_inputs[key].split(',').forEach(function(component) {
+                            ret_form_obj['inputs'].push({
+                                'id': key,
+                                'data': component
+                            })
+                        });
+                        break
+
+                    default:
+                        let addData = data_form_inputs[key];
+                        if(isBySector && (key == "lat" || key == "lon")){
+                            addData = data_sectorCoord["s_lat"];
+                            if(key == "lon"){
+                                addData = data_sectorCoord["s_lon"];
+                            }
                         }
-                    }
 
-                    set_form_obj['inputs'].push({
-                        'id': key,
-                        'data': addData
-                    })
-
+                        ret_form_obj['inputs'].push({
+                            'id': key,
+                            'data': addData
+                        })
+                        break
                 }
             }
-            return set_form_obj;
+            return ret_form_obj;
         }
 
 
@@ -1213,7 +1223,7 @@
         analyze_map.getPane('labels').style.pointerEvents = 'none'
 
         analyze_map.createPane('sector');
-        analyze_map.getPane('sector').style.zIndex = 403;
+        analyze_map.getPane('sector').style.zIndex = 410;
 
         L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png', {
             attribution: '',
@@ -1322,30 +1332,30 @@
             L.DomEvent.stop(e)
         }).addTo(analyze_map)
 
-        function deselectedAllGridCell() {
+        function deselectAllGridCell() {
             const list = Object.entries(map_grids);
             list.forEach((key) => {
                 deselectedGridCell(key[0]);
              } );
         }
 
-        function deselectedGridCell(gidSelected) {
-            delete map_grids[gidSelected];
+        function deselectedGridCell(gridSelected) {
+            delete map_grids[gridSelected];
 
             // To reset selection
             for (var i = selectedGrids.length - 1; i >= 0; i--) {
-                if (selectedGrids[i] === gidSelected) {
+                if (selectedGrids[i] === gridSelected) {
                     selectedGrids.splice(i, 1);
                 }
             }
 
             for (var i = selectedPoints.length - 1; i >= 0; i--) {
-                if (selectedPoints[gidSelected]) {
+                if (selectedPoints[gridSelected]) {
                     selectedPoints.splice(i, 1);
                 }
             }
 
-            pbfLayer.setFeatureStyle(gidSelected, {
+            pbfLayer.setFeatureStyle(gridSelected, {
                 weight: 0.1,
                 color: gridline_color,
                 opacity: 1,
@@ -1702,10 +1712,10 @@
             // cycle through the object and check for empty values
 
             for (var key in form_inputs) {
-                let isBysector = form_inputs["shape"] != '' && ( key == "lat" || key == "lon");
+                let isBySector = form_inputs["shape"] != '' && ( key == "lat" || key == "lon");
                 let isByGrid = key == "shape" && form_inputs["lat"] != '' && form_inputs["lon"] != '';
 
-                if (isBysector | isByGrid){
+                if (isBySector || isByGrid){
                     continue;
                 }
 

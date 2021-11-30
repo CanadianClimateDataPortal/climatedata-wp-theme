@@ -137,12 +137,6 @@
                         </div>
                     </div>
 
-                      <div class="input-row form-check">
-                        <div class="input-item">
-                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-grid" value="grid" disabled>
-                          <label class="form-check-label" for="analyze-location-grid"><?php _e ( 'Other location types coming soon', 'cdc' ); ?></label>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>

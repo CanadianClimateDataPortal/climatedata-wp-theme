@@ -139,8 +139,9 @@
 
             }
 
-          ?>
+						if ( get_field ( 'asset_summary' ) != '' ) {
 
+          ?>
 
           <h2 class="text-primary"><?php
 
@@ -152,7 +153,19 @@
 
 
           ?></h2>
+
+					<?php
+
+						}
+
+					?>
         </div>
+
+				<?php
+
+					if ( get_field ( 'asset_summary' ) != '' ) {
+
+				?>
 
         <div class="col-10 offset-1 col-md-8 col-lg-5">
           <?php
@@ -162,6 +175,11 @@
           ?>
         </div>
 
+				<?php
+
+					}
+
+				?>
       </div>
     </header>
 

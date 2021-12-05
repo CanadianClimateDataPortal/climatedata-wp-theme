@@ -31,7 +31,8 @@ if ($_GET['email']!='') {
 
     $headers = array (
       'Content-Type: text/html; charset=UTF-8',
-      "From: {$form_data['fullname']} <{$form_data['email']}>"
+      "From: Climatedata Training Form <training@climatedata.ca>",
+      "Reply-To: {$form_data['fullname']} <{$form_data['email']}>"
     );
     $body = '<p>The following invididual aggreed the terms of use and downloaded the training presentation</p>';
     $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Name</span><span style="display: inline-block; vertical-align: top;">' . $form_data['fullname'] . '</span></p>';

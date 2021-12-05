@@ -254,6 +254,8 @@
                 grid_click(e);
             }).on('mouseover', function (e) {
                 grid_hover(e);
+            }).on('mouseout', function (e) {
+                grid_hover_cancel(e);
             }).addTo(map1);
             if ($('#mapRight').length) {
                 gridLayerRight = L.vectorGrid.protobuf(
@@ -726,7 +728,29 @@
 
             grid_initialized = true;
 
-            //e.layer.bindTooltip(e.layer.properties.gid.toString() + " acres").openTooltip(e.latlng);
+            grid_hover_cancel(e);
+            gridHoverTimeout = setTimeout(function() {
+                let values_url = data_url + "/get-delta-30y-gridded-values/" +
+                    e.latlng['lat'] + "/" + e.latlng['lng'] +
+                    "/" + var_value + "/" + rcp_value + "/" + mora_value +
+                    "?period=" + (decade_value + 1);
+
+                gridHoverAjax = $.ajax({
+                    url: values_url,
+                    dataType: "json",
+                    success: function (data) {
+                    let tip = [];
+                    val1 = data['p50']
+                    tip.push("<span style=\"color:#00F\">●</span> " + "Median" + " <b>"
+                        + val1 + "</b><br/>");
+
+                    val1 = data['p10'];
+                    val2 = data['p90'];
+                    tip.push("<span style=\"color:#00F\">●</span> " + "Range" + " <b>"
+                        + val1 + "</b>-<b>" + val2 + "</b><br/>");
+                    e.target.bindTooltip(tip.join("\n"), {sticky: true}).openTooltip(e.latlng);
+                }});
+            }, 100);
 
             // set the highlight
 
@@ -755,6 +779,22 @@
 
                 gridLayerRight.setFeatureStyle(highlightGridFeatureRightLayer, highlight_properties);
 
+            }
+
+        }
+
+        function grid_hover_cancel(e) {
+            // cancel current timeout
+            if (typeof gridHoverTimeout !== 'undefined' && gridHoverTimeout !== null) {
+                clearTimeout(gridHoverTimeout);
+                e.target.unbindTooltip();
+                gridHoverTimeout = null;
+            }
+
+            // cancel in-flight ajax call to avoid duplicated tooltips
+            if (typeof gridHoverAjax !== 'undefined' && gridHoverAjax !== null) {
+                gridHoverAjax.abort();
+                gridHoverAjax = null;
             }
 
         }
@@ -857,6 +897,7 @@
 
         var_value = $("#var").val();
 
+        var gridHoverTimeout, gridHoverAjax;
         var gridLayer;
         gridLayer = L.vectorGrid.protobuf(
             hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + 'canadagrid' + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
@@ -982,6 +1023,12 @@
         map1.on('zoom', function (e) {
             if (typeof choroLayer !== 'undefined' && choroLayer !== null) {
                 choroLayer.unbindTooltip();
+            }
+            if (typeof gridLayer !== 'undefined' && gridLayer !== null) {
+                gridLayer.unbindTooltip();
+            }
+            if (typeof gridLayerRight !== 'undefined' && gridLayerRight !== null) {
+                gridLayerRight.unbindTooltip();
             }
         });
         //

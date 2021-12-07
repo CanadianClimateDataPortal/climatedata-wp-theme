@@ -15,7 +15,7 @@
             HEALTH: "health"
         };
 
-        const sectorFeatureStyleColor = {
+        const sector_feature_style_color = {
             'default':{
                 'color': 'white',
                 'fillColor': '#ababab'
@@ -311,7 +311,7 @@
                         changeLayers(sector_value);
 
                         if(sector_value !== 'grid'){
-                            genChoro(sector_value, '1971', 'tx_max', 'rcp85', 'ann');
+                            initSectorProtobuf(sector_value, '1971', 'tx_max', 'rcp85', 'ann');
                             if (currentSector !== sector_value) {
                                 currentSector = sector_value;
                                 if (analyze_map.hasLayer(choroLayer)) {
@@ -532,89 +532,96 @@
             }
         }
 
-        function genChoro(sector, year, variable, rcp, frequency) {
-            var choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency + '/?period=' + year;
+
+        function initSectorProtobuf(sector, year, variable, rcp, frequency) {
+
 
             //Display count top menu (map)
             selectedSectors[sector] = undefined;
             deselectAllGridCell();
             selectedGrids = [];
 
-            // choroValues == sector colors
-
-            ///
-            // $.getJSON(choroPath).then(function (data) {
-
-
-                var layerStyles = {};
-                layerStyles[currentSector] = function (properties, zoom) {
-                    return {
-                        weight: 0.5,
-                        color: sectorFeatureStyleColor['default']['color'],
-                        fillColor: sectorFeatureStyleColor['default']['fillColor'],
-                        opacity: 1,
-                        fill: true,
-                        radius: 4,
-                        fillOpacity: 1
-                    }
-                };
-
-                choroLayer = L.vectorGrid.protobuf(
-                    hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf",
-                    {
-                        rendererFactory: L.canvas.tile,
-                        interactive: true,
-                        getFeatureId: function (f) {
-                            return f.properties.id;
-                        },
-                        name: 'geojson',
-                        pane: 'sector',
-                        maxNativeZoom: 12,
-                        bounds: canadaBounds,
-                        maxZoom: 12,
-                        minZoom: 3,
-                        vectorTileLayerStyles: layerStyles
-                    }
-                ).on('mouseover', function (e) {
-                    if(map_sectors[sector][e.layer.properties.id] === undefined){
-                        choroLayer.setFeatureStyle(
-                            e.layer.properties.id,
-                            {
-                                color: sectorFeatureStyleColor['mouseover']['color'],
-                                fillColor: sectorFeatureStyleColor['mouseover']['fillColor'],
-                                weight: 1.5,
+            (new Promise((resolve, reject) => {
+                try {
+                    setTimeout( function() {
+                        var layerStyles = {};
+                        layerStyles[currentSector] = function (properties, zoom) {
+                            return {
+                                weight: 0.5,
+                                color: sector_feature_style_color['default']['color'],
+                                fillColor: sector_feature_style_color['default']['fillColor'],
+                                opacity: 1,
                                 fill: true,
                                 radius: 4,
-                                opacity: 1,
                                 fillOpacity: 1
-                            });
-                        choroLayer.bindTooltip(e.layer.properties[l10n_labels.label_field], { sticky: true }).openTooltip(e.latlng);
+                            }
+                        };
+
+                        choroLayer = L.vectorGrid.protobuf(
+                            hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf",
+                            {
+                                rendererFactory: L.canvas.tile,
+                                interactive: true,
+                                getFeatureId: function (f) {
+                                    return f.properties.id;
+                                },
+                                name: 'geojson',
+                                pane: 'sector',
+                                maxNativeZoom: 12,
+                                bounds: canadaBounds,
+                                maxZoom: 12,
+                                minZoom: 3,
+                                vectorTileLayerStyles: layerStyles
+                            }
+                        ).on('mouseover', function (e) {
+                            if(map_sectors[sector][e.layer.properties.id] === undefined){
+                                choroLayer.setFeatureStyle(
+                                    e.layer.properties.id,
+                                    {
+                                        color: sector_feature_style_color['mouseover']['color'],
+                                        fillColor: sector_feature_style_color['mouseover']['fillColor'],
+                                        weight: 1.5,
+                                        fill: true,
+                                        radius: 4,
+                                        opacity: 1,
+                                        fillOpacity: 1
+                                    });
+                                choroLayer.bindTooltip(e.layer.properties[l10n_labels.label_field], { sticky: true }).openTooltip(e.latlng);
+                            }
+                        }
+                        ).on('mouseout', function (e) {
+                            if(map_sectors[sector][e.layer.properties.id] === undefined){
+                                choroLayer.resetFeatureStyle(e.layer.properties.id);
+                            }
+                        }
+                        ).on('click', function (e) {
+                            current_sector['id'] = e.layer.properties.id;
+                            current_sector['label'] = e.layer.properties[l10n_labels.label_field];
+
+                            var_value = $("#var").val();
+                            mora_value = $("#mora").val();
+
+                            highlightSectorById(sector, current_sector['id'], e, choroLayer);
+                            validate_inputs(sector);
+
+
+                        }).addTo(analyze_map);
+                        resolve("Sector protobuf initialzed!")
+                    }, 200)
+                } catch(err) {
+                    reject(`Error promise: ${err}`);
+                }
+            }))
+            .catch((reason) => {
+                console.error(`Promise error from function initSectorProtobuf: ${reason}`);
+            })
+            .finally(() => {
+                analyze_map.on('zoom', function (e) {
+                    if (typeof choroLayer !== 'undefined' && choroLayer !== null) {
+                        choroLayer.unbindTooltip();
                     }
-                }
-                ).on('mouseout', function (e) {
-                    if(map_sectors[sector][e.layer.properties.id] === undefined){
-                        choroLayer.resetFeatureStyle(e.layer.properties.id);
-                    }
-                }
-                ).on('click', function (e) {
-                    current_sector['id'] = e.layer.properties.id;
-                    current_sector['label'] = e.layer.properties[l10n_labels.label_field];
-
-                    var_value = $("#var").val();
-                    mora_value = $("#mora").val();
-
-                    highlightSectorById(sector, current_sector['id'], e, choroLayer);
-                    validate_inputs(sector);
-
-                }).addTo(analyze_map);
-
-            ///
-            // }).fail(function() { console.log("Can not get Json for " + choroPath); })
-
-            analyze_map.on('zoom', function (e) {
-                if (typeof choroLayer !== 'undefined' && choroLayer !== null) {
-                    choroLayer.unbindTooltip();
-                }
+                });
+                console.log("Sector L.vectorGrid.protobuf completed")
             });
         };
 
@@ -645,7 +652,7 @@
                 // Highlight new sector
                  selectedSectors[sector] = highlightSectorId;
                  protobufChoroLayer.setFeatureStyle(highlightSectorId, {
-                    color: sectorFeatureStyleColor['mouseclick']['color'],
+                    color: sector_feature_style_color['mouseclick']['color'],
                     weight: 1,
                     fill: true,
                     radius: 4,
@@ -676,7 +683,7 @@
 
             protobufChoroLayer.setFeatureStyle(sectorId, {
                 weight: 0.1,
-                color: sectorFeatureStyleColor['default']['color'],
+                color: sector_feature_style_color['default']['color'],
                 opacity: 1,
                 fill: true,
                 radius: 4,
@@ -959,6 +966,12 @@
                     form_obj = createAnalyzeProcessRequestData(sectorCoord, form_inputs, form_obj);
                     submitAnalyzeProcess(submitUrl);
                 }else{
+
+
+                    // $.getJSON(getUrl).then(function(data){
+                    //     return data;
+                    //     }).then(function(dataCallback){
+
                     // ex: https://dataclimatedata.crim.ca/partition-to-points/health/2.json
                     getUrl = "https://dataclimatedata.crim.ca/partition-to-points/"+ currentSelection +"/"+ form_inputs["shape"] +".json"
 

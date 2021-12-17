@@ -9,3 +9,4 @@ error_log
 .ftpconfig
 .idea
 proto/
+.DS_Store

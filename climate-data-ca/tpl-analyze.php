@@ -104,7 +104,7 @@
                   </h5>
                 </div>
 
-                <div class="accordion-content" data-step="2">
+                <div class="accordion-content select-locations" data-step="2">
                   <div class="accordion-content-inner">
                     <div class="field validate-input type-radio">
                       <div class="input-row form-check">

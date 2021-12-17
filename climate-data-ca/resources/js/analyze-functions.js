@@ -6,8 +6,6 @@
         // GLOBAL VARS
         //
 
-        // overlay text
-
         const select_locations = {
             GRID: "grid",
             WATERSHED: "watershed",
@@ -30,26 +28,13 @@
             }
         };
 
-        let currentSelection = undefined;
-        let map_sectors = {};
-        map_sectors[select_locations.WATERSHED] = {};
-        map_sectors[select_locations.CENSUS] = {};
-        map_sectors[select_locations.HEALTH] = {};
+        let locations_type = undefined;
+        let sector_select_by_id = undefined;
+        let is_sector_on = false;
 
-        let selectedSectors = {
-        };
-        selectedSectors[select_locations.WATERSHED] = undefined;
-        selectedSectors[select_locations.CENSUS] = undefined;
-        selectedSectors[select_locations.HEALTH] = undefined;
+        let analyzeLayer = undefined;
 
-        let sector_on = false;
-        let query = {};
-
-        let choroLayer = undefined;
-
-        let currentSector;
-        let current_sector = [];
-
+        // overlay text
         var overlay_text = JSON.parse($('#map-overlay-content').attr('data-steps'))
         let canadaBounds = L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.60, -49.9));
 
@@ -100,7 +85,7 @@
             zoom_on = false,
             highlightGridFeature
 
-        // grid line/fill options
+                    // grid line/fill options
 
         var gridline_color = '#657092';
         var gridline_color_hover = '#060d12';
@@ -257,9 +242,39 @@
             e.preventDefault()
         })
 
-        $('input[name=analyze-location]').on('click', function (e) {
-            //TODO: move code from "adio/check click event" when its a sector
-        })
+        function IsSelectLocations(itemInput) {
+            var isInputSelectLocation = false;
+            $('input[name=analyze-location]').each(function (i) {
+                if (itemInput == $(this).val()) {
+                    isInputSelectLocation = true;
+                }
+            });
+
+            return isInputSelectLocation;
+        }
+
+        $('.select-locations, input[name="analyze-location"]').on('click', function (e) {
+            e.preventDefault()
+            var itemInput = $('input[name="analyze-location"]:checked').val();
+
+            if (IsSelectLocations(itemInput)) {
+                ChangeLayers(itemInput);
+
+                if(itemInput != 'grid'){
+                    InitSectorProtobuf(itemInput);
+
+                    locations_type = itemInput;
+
+                    if (analyze_map.hasLayer(analyzeLayer)) {
+                        analyze_map.removeLayer(analyzeLayer);
+                    }
+                }
+            }
+            validate_steps()
+            validate_inputs(itemInput);
+        });
+
+
         // radio/check click event
 
         $('.type-radio .input-item, .type-checkbox .input-item').on('click', function (e) {
@@ -268,7 +283,6 @@
             var this_item = $(this).closest('.input-row'),
                 input_parent = this_item.closest('.field')
 
-            let sector_value = this_item.find(':input').val();
             if (
                 !this_item.find(':input').hasClass('disabled') &&
                 (this_item.find(':input').attr('disabled') == '' || typeof this_item.find(':input').attr('disabled') == 'undefined')
@@ -285,41 +299,6 @@
                     this_item.addClass('checked')
                     this_item.find(':input').prop('checked', true)
                     this_item.find('.form-icon').removeClass().addClass(radio_icon_on)
-
-                    if(sector_value.toLowerCase().includes("health")){
-                        sector_value = "health";
-                        currentSelection = sector_value;
-                    }else if(sector_value.toLowerCase().includes("census")){
-                        sector_value = "census";
-                        currentSelection = sector_value;
-                    }else if(sector_value.toLowerCase().includes("watershed")){
-                        currentSelection = "watershed";
-                    }else if(sector_value.toLowerCase().includes("grid")){
-                        currentSelection = "grid";
-                    }
-
-                    let isSector = Object.values(select_locations).indexOf(sector_value) > -1;
-
-                    // Only when a Dataset is selected
-                    if ( isSector) {
-                        var_value = $("#var").val();
-                        mora_value = $("#mora").val();
-                        mora_text_value = $("#mora option:selected").text();
-                        rcp_value = $("#rcp").val();
-                        decade_value = parseInt($("#decade").val()) + 1;
-
-                        changeLayers(sector_value);
-
-                        if(sector_value !== 'grid'){
-                            initSectorProtobuf(sector_value, '1971', 'tx_max', 'rcp85', 'ann');
-                            if (currentSector !== sector_value) {
-                                currentSector = sector_value;
-                                if (analyze_map.hasLayer(choroLayer)) {
-                                    analyze_map.removeLayer(choroLayer);
-                                }
-                            }
-                        }
-                    }
 
                 } else if (input_parent.hasClass('type-checkbox')) {
 
@@ -429,59 +408,57 @@
                 }
 
                 validate_steps()
-                validate_inputs(sector_value);
+                validate_inputs()
+
             }
+
         })
 
-        function changeLayers(sector_value) {
+
+
+        function ChangeLayers(sector_value) {
             $('#lat').val("");
             $('#lon').val("");
             $('#shape').val('');
 
-            if ($('#sector').length) {
-                query['sector'] = $('#sector').val();
-            } else {
-                query['sector'] = '';
-            }
-
             if (sector_value !== 'grid') {
-                if (sector_on === false) {
-                    // When we switch from Gridded data to (Census || Health || Watersheds)
-                    layer_swap({
+                if (is_sector_on === false) {
+                    // When we switch from Grid data to sector
+                    SwapLayerBetweenGridAndSector({
                         layer: 'sector'
                     });
 
-                    layer_swap({
+                    SwapLayerBetweenGridAndSector({
                         layer: 'grid',
                         action: 'off'
                     });
                 }
 
-            } else { // Grid data
-                // sector_on === false, when we refresh the page
-                if (sector_on === true) {
-                    layer_swap({
+            } else {
+                // Grid data
+
+                // is_sector_on === false, when we refresh the page
+                if (is_sector_on === true) {
+                    SwapLayerBetweenGridAndSector({
                         layer: 'sector',
                         action: 'off'
                     });
                 }
 
-                layer_swap({
+                SwapLayerBetweenGridAndSector({
                     layer: 'grid'
                 });
             }
         }
 
-        function layer_swap(fn_options) {
+        //
+        function SwapLayerBetweenGridAndSector(map_settings) {
             var defaults = {
                 layer: null,
                 action: 'on'
             };
 
-            var settings = $.extend(true, defaults, fn_options);
-
-            console.log(" function layer_swap(fn_options) >> settings.layer: " + settings.layer); // TODO: delete
-
+            var settings = $.extend(true, defaults, map_settings);
 
             if (settings.action === 'on') {
                 $('body').addClass(settings.layer + '-on');
@@ -491,37 +468,37 @@
 
             switch (settings.layer) {
                 case 'grid':
-                    layer_swap_grid(settings);
+                    LayerSwapGrid(settings);
                     break;
 
                 case 'sector':
-                    layer_swap_sector(settings);
+                    LayerSwapSector(settings);
                     break;
                 default:
             }
         }
 
-        function layer_swap_sector(settings) {
+        function LayerSwapSector(settings) {
             if (settings.action == 'on') {
-                sector_on = true;
+                is_sector_on = true;
 
-                layer_swap({
+                SwapLayerBetweenGridAndSector({
                     layer: 'grid',
                     action: 'off'
                 });
             } else {
-                sector_on = false;
+                is_sector_on = false;
 
-                if (typeof choroLayer !== 'undefined' && choroLayer !== null) {
-                    analyze_map.removeLayer(choroLayer);
+                if (typeof analyzeLayer !== 'undefined' && analyzeLayer !== null) {
+                    analyze_map.removeLayer(analyzeLayer);
                 }
             }
         }
 
-        function layer_swap_grid(settings) {
+        function LayerSwapGrid(settings) {
             if (settings.action === 'on') {
                 analyze_map.addLayer(pbfLayer);
-                layer_swap({
+                SwapLayerBetweenGridAndSector({
                     layer: 'sector',
                     action: 'off'
                 });
@@ -532,20 +509,16 @@
             }
         }
 
-
-        function initSectorProtobuf(sector, year, variable, rcp, frequency) {
-
-
-            //Display count top menu (map)
-            selectedSectors[sector] = undefined;
-            deselectAllGridCell();
+        function InitSectorProtobuf(sector) {
+            sector_select_by_id  = undefined;
+            DeselectAllGridCell();
             selectedGrids = [];
 
             (new Promise((resolve, reject) => {
                 try {
                     setTimeout( function() {
                         var layerStyles = {};
-                        layerStyles[currentSector] = function (properties, zoom) {
+                        layerStyles[locations_type] = function (properties, zoom) {
                             return {
                                 weight: 0.5,
                                 color: sector_feature_style_color['default']['color'],
@@ -557,7 +530,7 @@
                             }
                         };
 
-                        choroLayer = L.vectorGrid.protobuf(
+                        analyzeLayer = L.vectorGrid.protobuf(
                             hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf",
                             {
                                 rendererFactory: L.canvas.tile,
@@ -574,8 +547,8 @@
                                 vectorTileLayerStyles: layerStyles
                             }
                         ).on('mouseover', function (e) {
-                            if(map_sectors[sector][e.layer.properties.id] === undefined){
-                                choroLayer.setFeatureStyle(
+                            if(sector_select_by_id  === undefined){
+                                analyzeLayer.setFeatureStyle(
                                     e.layer.properties.id,
                                     {
                                         color: sector_feature_style_color['mouseover']['color'],
@@ -586,25 +559,19 @@
                                         opacity: 1,
                                         fillOpacity: 1
                                     });
-                                choroLayer.bindTooltip(e.layer.properties[l10n_labels.label_field], { sticky: true }).openTooltip(e.latlng);
                             }
+
+                            analyzeLayer.unbindTooltip();
+                            analyzeLayer.bindTooltip(e.layer.properties[l10n_labels.label_field], { sticky: true }).openTooltip(e.latlng);
                         }
                         ).on('mouseout', function (e) {
-                            if(map_sectors[sector][e.layer.properties.id] === undefined){
-                                choroLayer.resetFeatureStyle(e.layer.properties.id);
+                            if(sector_select_by_id  === undefined){
+                                analyzeLayer.resetFeatureStyle(e.layer.properties.id);
                             }
                         }
                         ).on('click', function (e) {
-                            current_sector['id'] = e.layer.properties.id;
-                            current_sector['label'] = e.layer.properties[l10n_labels.label_field];
-
-                            var_value = $("#var").val();
-                            mora_value = $("#mora").val();
-
-                            highlightSectorById(sector, current_sector['id'], e, choroLayer);
+                            HighlightSectorById(e.layer.properties.id, e, analyzeLayer);
                             validate_inputs(sector);
-
-
                         }).addTo(analyze_map);
                         resolve("Sector protobuf initialzed!")
                     }, 200)
@@ -613,45 +580,42 @@
                 }
             }))
             .catch((reason) => {
-                console.error(`Promise error from function initSectorProtobuf: ${reason}`);
+                console.error(`Promise error from function InitSectorProtobuf: ${reason}`);
             })
             .finally(() => {
                 analyze_map.on('zoom', function (e) {
-                    if (typeof choroLayer !== 'undefined' && choroLayer !== null) {
-                        choroLayer.unbindTooltip();
+                    if (typeof analyzeLayer !== 'undefined' && analyzeLayer !== null) {
+                        analyzeLayer.unbindTooltip();
                     }
                 });
-                console.log("Sector L.vectorGrid.protobuf completed")
             });
         };
 
 
-        function highlightSectorById(sector,highlightSectorId, protobufEvent, protobufChoroLayer) {
+        function HighlightSectorById(highlightSectorId, protobufEvent, analyzeLayer) {
             $('#lat').val("");
             $('#lon').val("");
-            $('#shape').val(current_sector['id']);
+            $('#shape').val(highlightSectorId);
 
-            var selectedSectorsLabels = [];
-            var selectedExists = selectedSectors[sector] === highlightSectorId;
+            let selectedExists = sector_select_by_id  === highlightSectorId;
 
             if (selectedExists === true) {
-                deselectSector(sector, highlightSectorId, protobufChoroLayer, selectedSectorsLabels, selectedSectors);
+                sector_select_by_id  = undefined;
+                DeselectSector(highlightSectorId, analyzeLayer);
                 $('#shape').val('');
-
             } else {
-                map_sectors[sector][highlightSectorId] = highlightSectorId;
-                let old_selection = selectedSectors[sector];
+                let old_selection = sector_select_by_id ;
 
                 // Deselect old sector
                 if(old_selection !== undefined){
-                    map_sectors[sector][old_selection] = undefined;
-                    deselectSector(sector, old_selection, protobufChoroLayer, selectedSectorsLabels, selectedSectors);
-                    protobufChoroLayer.resetFeatureStyle(old_selection);
+                    DeselectSector(old_selection, analyzeLayer);
+                    analyzeLayer.resetFeatureStyle(old_selection);
                 }
 
+                sector_select_by_id  = highlightSectorId;
+
                 // Highlight new sector
-                 selectedSectors[sector] = highlightSectorId;
-                 protobufChoroLayer.setFeatureStyle(highlightSectorId, {
+                 analyzeLayer.setFeatureStyle(highlightSectorId, {
                     color: sector_feature_style_color['mouseclick']['color'],
                     weight: 1,
                     fill: true,
@@ -662,26 +626,13 @@
             }
 
             // Display count top menu (map)
-            let lenTemp = selectedSectors[sector] !== undefined ? 1 : 0;
-            $('#analyze-breadcrumb').find('.grid-count').text(lenTemp);
+            $('#analyze-breadcrumb').find('.grid-count').text(sector_select_by_id  !== undefined ? 1 : 0);
 
             L.DomEvent.stop(protobufEvent);
         }
 
-        function deselectSector(sector, sectorId, protobufChoroLayer, selectedSectorsLabels, sectorToDeselect) {
-            map_sectors[sector][sectorId] = undefined;
-
-            if (sectorToDeselect[sector] === sectorId) {
-                sectorToDeselect[sector] = undefined;
-            }
-
-            for (var i = selectedSectorsLabels.length - 1; i >= 0; i--) {
-                if (selectedSectorsLabels[sectorId]) {
-                    selectedSectorsLabels.splice(i, 1);
-                }
-            }
-
-            protobufChoroLayer.setFeatureStyle(sectorId, {
+        function DeselectSector(sectorId, analyzeLayer) {
+            analyzeLayer.setFeatureStyle(sectorId, {
                 weight: 0.1,
                 color: sector_feature_style_color['default']['color'],
                 opacity: 1,
@@ -690,9 +641,6 @@
                 fillOpacity: 0
             });
         }
-
-
-        // select
 
         var start_val = 1950
         var end_val = 1950
@@ -945,7 +893,7 @@
         $('#analyze-process').click(function (e) {
             if (!$(this).hasClass('disabled')) {
 
-                let submitUrl = child_theme_dir + 'resources/ajax/analyze-form.php'
+                let pathToAnalyzeForm = child_theme_dir + 'resources/ajax/analyze-form.php'
                 form_obj = $.extend(true, {}, default_obj)
 
                 // build the final input object to send to the API
@@ -963,19 +911,13 @@
                 };
 
                 if(!isBySector){
-                    form_obj = createAnalyzeProcessRequestData(sectorCoord, form_inputs, form_obj);
-                    submitAnalyzeProcess(submitUrl);
+                    form_obj = CreateAnalyzeProcessRequestData(sectorCoord, form_inputs, form_obj);
+                    SubmitAnalyzeProcess(pathToAnalyzeForm);
                 }else{
-
-
-                    // $.getJSON(getUrl).then(function(data){
-                    //     return data;
-                    //     }).then(function(dataCallback){
-
                     // ex: https://dataclimatedata.crim.ca/partition-to-points/health/2.json
-                    getUrl = "https://dataclimatedata.crim.ca/partition-to-points/"+ currentSelection +"/"+ form_inputs["shape"] +".json"
+                    getUrl = "https://dataclimatedata.crim.ca/partition-to-points/"+ locations_type +"/"+ form_inputs["shape"] +".json"
 
-                    getLutBySectorId(getUrl).then(function(lutBySectorId){
+                    $.getJSON(getUrl).then(function(lutBySectorId){
                         for (var i = 0; i < lutBySectorId.length; i++) {
                             if(sectorCoord["s_lat"] == ''){
                                 sectorCoord["s_lat"] = lutBySectorId[i][0];
@@ -986,14 +928,15 @@
                             }
                         }
 
-                        form_obj = createAnalyzeProcessRequestData(sectorCoord, form_inputs, form_obj);
-                        submitAnalyzeProcess(submitUrl);
-                    });
+                        form_obj = CreateAnalyzeProcessRequestData(sectorCoord, form_inputs, form_obj);
+                        SubmitAnalyzeProcess(pathToAnalyzeForm);
+                    }).fail(function() { console.error("Can not get file " + getUrl); })
                 }
             }
         })
 
-        function submitAnalyzeProcess(submitUrl) {
+
+        function SubmitAnalyzeProcess(pathToAnalyzeForm) {
             for (var key in form_thresholds) {
                 form_obj['inputs'].push({
                     'id': key,
@@ -1009,12 +952,12 @@
             var submit_data = {
                 'analyze-captcha_code': $('#analyze-captcha_code').val(),
                 'request_data': form_obj,
-                'submit_url': submit_url_var + submit_url_post
+                'submit_url': submit_url_var + submit_url_post // ex: wetdays/jobs
             }
 
             // check captcha
             $.ajax({
-                url: submitUrl,
+                url: pathToAnalyzeForm,
                 method: "POST",
                 data: submit_data,
                 success: function (data) {
@@ -1040,13 +983,8 @@
             });
         }
 
-        function getLutBySectorId(getUrl){
-            return $.getJSON(getUrl).then(function(data){
-            return data;
-            });
-        }
 
-        function createAnalyzeProcessRequestData(data_sectorCoord, data_form_inputs, data_form_obj){
+        function CreateAnalyzeProcessRequestData(data_sectorCoord, data_form_inputs, data_form_obj){
             let isBySector = data_form_inputs["shape"] != '';
 
             for (var key in data_form_inputs) {
@@ -1081,7 +1019,6 @@
             }
             return data_form_obj;
         }
-
 
         $('#detail-close').click(function () {
             $('#analyze-detail').slideUp()
@@ -1189,10 +1126,9 @@
                 })
 
             } else {
-                deselectedGridCell(highlightGridFeature);
+                DeselectedGridCell(highlightGridFeature);
             }
 
-            //Display count top menu (map)
 
             $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length)
 
@@ -1217,18 +1153,22 @@
             $('#lat').val(lat_val)
             $('#lon').val(lon_val)
             $('#shape').val('')
+
             validate_inputs()
+
             L.DomEvent.stop(e)
+
         }).addTo(analyze_map)
 
-        function deselectAllGridCell() {
+
+        function DeselectAllGridCell() {
             const list = Object.entries(map_grids);
             list.forEach((key) => {
-                deselectedGridCell(key[0]);
+                DeselectedGridCell(key[0]);
              } );
         }
 
-        function deselectedGridCell(gridSelected) {
+        function DeselectedGridCell(gridSelected) {
             delete map_grids[gridSelected];
 
             // To reset selection
@@ -1654,7 +1594,7 @@
             }
 
             // make sure lat/lon has a value
-            if (sectorSelect != select_locations.GRID && Object.values(select_locations).includes(sectorSelect) ){
+            if (IsSelectLocations(sectorSelect) && sectorSelect !== 'grid' ){
                 $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide()
                 $('#clear-grids').hide()
             } else if ($('#lat').val() == '' || $('#lon').val() == '') {

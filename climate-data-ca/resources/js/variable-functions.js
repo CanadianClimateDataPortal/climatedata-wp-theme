@@ -257,6 +257,9 @@
             }).on('mouseout', function (e) {
                 grid_hover_cancel(e);
             }).addTo(map1);
+
+            gridLayer.rcp = left_rcp_value;
+
             if ($('#mapRight').length) {
                 gridLayerRight = L.vectorGrid.protobuf(
                     hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + gridname + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
@@ -266,6 +269,9 @@
                 }).on('mouseover', function (e) {
                     grid_hover(e);
                 }).addTo(mapRight);
+                gridLayerRight.rcp = right_rcp_value;
+                gridLayerRight.opposite = gridLayer;
+                gridLayer.opposite = gridLayerRight;
             }
 
         }
@@ -724,33 +730,73 @@
 
         // grid hover functions
 
-        function grid_hover(e) {
+        function grid_hover(e, sector="") {
 
             grid_initialized = true;
 
             grid_hover_cancel(e);
-            gridHoverTimeout = setTimeout(function() {
-                let values_url = data_url + "/get-delta-30y-gridded-values/" +
-                    e.latlng['lat'] + "/" + e.latlng['lng'] +
-                    "/" + var_value + "/" + rcp_value + "/" + mora_value +
-                    "?period=" + (decade_value + 1);
+            let rcp = e.target.rcp;
 
-                gridHoverAjax = $.ajax({
-                    url: values_url,
-                    dataType: "json",
-                    success: function (data) {
-                    let tip = [];
-                    val1 = data['p50']
-                    tip.push("<span style=\"color:#00F\">●</span> " + "Median" + " <b>"
-                        + val1 + "</b><br/>");
+            // no tooltip available for SPEI  (i.e. hasdelta == false)
+            getVarData(function (data) {
+                let varDetails = data.get(var_value);
+                if(varDetails.hasdelta != false) {
+                    gridHoverTimeout = setTimeout(function () {
+                        let decade_value = parseInt($("#decade").val()) + 1;
+                        let delta = $('input[name="absolute_delta_switch"]:checked').val() === 'd';
+                        let delta7100 = delta ? "&delta7100=true" : "";
+                        let values_url;
 
-                    val1 = data['p10'];
-                    val2 = data['p90'];
-                    tip.push("<span style=\"color:#00F\">●</span> " + "Range" + " <b>"
-                        + val1 + "</b>-<b>" + val2 + "</b><br/>");
-                    e.target.bindTooltip(tip.join("\n"), {sticky: true}).openTooltip(e.latlng);
+                        if (sector == "") { // gridded
+                            values_url = data_url + "/get-delta-30y-gridded-values/" +
+                            e.latlng['lat'] + "/" + e.latlng['lng'] +
+                            "/" + var_value + "/" + mora_value +
+                            "?period=" + decade_value +
+                            "&decimals=" + varDetails.decimals + delta7100;
+                        } else {
+                            values_url = data_url + "/get-delta-30y-regional-values/" +
+                                sector + "/" + e.layer.properties.id +
+                                "/" + var_value + "/" + mora_value +
+                                "?period=" + decade_value +
+                                "&decimals=" + varDetails.decimals + delta7100;
+                        }
+
+                        gridHoverAjax = $.ajax({
+                            url: values_url,
+                            dataType: "json",
+                            success: function (data) {
+                                let tip = [];
+                                if (sector != "") {
+                                    tip.push(e.layer.properties[l10n_labels.label_field] + "<br>");
+                                }
+                                val1 = value_formatter(data[rcp]['p50'], varDetails, delta);
+                                tip.push("<span style=\"color:#00F\">●</span> " + l10n_labels.median + " <b>"
+                                    + val1 + "</b><br/>");
+
+                                val1 = value_formatter(data[rcp]['p10'], varDetails, delta);
+                                val2 = value_formatter(data[rcp]['p90'], varDetails, delta);
+                                tip.push("<span style=\"color:#00F\">●</span> " + l10n_labels.range + " <b>"
+                                    + val1 + "</b>-<b>" + val2 + "</b><br/>");
+                                e.target.bindTooltip(tip.join("\n"), {sticky: true}).openTooltip(e.latlng);
+
+
+                                if ($('body').hasClass('map-compare')) {
+                                    rcp = e.target.opposite.rcp;
+                                    tip = [];
+                                    val1 = value_formatter(data[rcp]['p50'], varDetails, delta);
+                                    tip.push("<span style=\"color:#00F\">●</span> " + l10n_labels.median + " <b>"
+                                        + val1 + "</b><br/>");
+
+                                    val1 = value_formatter(data[rcp]['p10'], varDetails, delta);
+                                    val2 = value_formatter(data[rcp]['p90'], varDetails, delta);
+                                    tip.push("<span style=\"color:#00F\">●</span> " + l10n_labels.range + " <b>"
+                                        + val1 + "</b>-<b>" + val2 + "</b><br/>");
+                                    e.target.opposite.bindTooltip(tip.join("\n")).openTooltip(e.latlng);
+                                }
+                            }
+                        });
+                    }, 100);
                 }});
-            }, 100);
 
             // set the highlight
 
@@ -787,7 +833,9 @@
             // cancel current timeout
             if (typeof gridHoverTimeout !== 'undefined' && gridHoverTimeout !== null) {
                 clearTimeout(gridHoverTimeout);
-                e.target.unbindTooltip();
+                if (e) {
+                    e.target.unbindTooltip();
+                }
                 gridHoverTimeout = null;
             }
 
@@ -957,6 +1005,7 @@
                 choroValues = data;
 
                 if (map1.hasLayer(choroLayer)) {
+                    choroLayer.rcp = rcp;
                     for (let i = 0; i < choroValues.length; i++)
                         choroLayer.resetFeatureStyle(i);
                 } else {
@@ -1001,7 +1050,7 @@
                                 opacity: 1,
                                 fillOpacity: 1
                             });
-                        choroLayer.bindTooltip(e.layer.properties[l10n_labels.label_field], { sticky: true }).openTooltip(e.latlng);
+                        grid_hover(e, sector);
                     }
                     ).on('mouseout', function (e) {
                         choroLayer.resetFeatureStyle(e.layer.properties.id);
@@ -1016,11 +1065,14 @@
 
                         genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
                     }).addTo(map1);
+                    choroLayer.rcp = rcp;
                 }
             })
         };
 
         map1.on('zoom', function (e) {
+            grid_hover_cancel(null);
+
             if (typeof choroLayer !== 'undefined' && choroLayer !== null) {
                 choroLayer.unbindTooltip();
             }
@@ -1222,22 +1274,21 @@
         }
 
         function displayChartData(data, varDetails, download_url) {
-            const firstDayOfYear = Date.UTC(2019,0,1);
-            chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
+               chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
             chartDecimals = varDetails['decimals'];
             switch (varDetails.units.value) {
                 case 'doy':
-                    formatter = function () { return new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * this.value).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' }) };
+                    formatter = function () { return doy_formatter(this.value) };
                     var pointFormatter = function (format) {
                         if (this.series.type == 'line') {
                             return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name + ': <b>'
-                                + new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * this.y).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
+                                +  doy_formatter(this.y)
                                 + '</b><br/>';
                         } else {
                             return '<span style="color:' + this.series.color + '">●</span>' + this.series.name + ': <b>'
-                                + new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * this.low).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
+                                +  doy_formatter(this.low)
                                 + '</b> - <b>'
-                                + new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * this.high).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
+                                +  doy_formatter(this.high)
                                 + '</b><br/>';
                         }
                     };
@@ -2145,6 +2196,9 @@
             } else {
                 aord_layer_value = "";
             }
+
+            gridLayer.rcp = left_rcp_value;
+            gridLayerRight.rcp = right_rcp_value;
 
 
             singleLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
@@ -3059,7 +3113,6 @@
                         'VERSION': '1.3.0',
                         layers: 'CDC:' + leftLayerName
                     });
-
 
                     if (has_mapRight === true) {
                         rightLayer.setParams({

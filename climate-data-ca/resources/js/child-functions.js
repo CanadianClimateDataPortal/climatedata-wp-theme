@@ -12,6 +12,47 @@ const geoserver_url = DATA_URL;
 
 var chart_labels, legend_labels, l10n_labels;
 
+
+//
+// GLOBAL Functions
+//
+
+
+function doy_formatter(value) {
+    const firstDayOfYear = Date.UTC(2019, 0, 1);
+    return new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * value).toLocaleDateString(current_lang, {
+        month: 'long',
+        day: 'numeric'
+    })
+}
+
+function value_formatter(value, varDetails, delta) {
+    let unit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
+    let str = "";
+    if (delta && value > 0) {
+        str += "+"
+    }
+
+    switch( varDetails.units.value) {
+        case "doy":
+            if (delta) {
+                str += value.toFixed(varDetails.decimals);
+                str += current_lang == 'fr' ? " jours" : " days";
+            } else {
+                str += doy_formatter(value);
+            }
+
+            break;
+        default:
+            str += value.toFixed(varDetails.decimals);
+            str += " " + unit;
+            break;
+    }
+    return str;
+}
+
+
+
 (function ($) {
 
     $(function () {
@@ -207,6 +248,8 @@ var chart_labels, legend_labels, l10n_labels;
         };
 
         l10n_labels = {
+            median: 'Median',
+            range: 'Range',
             search_city: 'Search for a City/Town',
             selected: 'selected',
             label_field: 'label_en',
@@ -251,6 +294,8 @@ var chart_labels, legend_labels, l10n_labels;
             };
 
             l10n_labels = {
+                median: 'Médiane',
+                range: 'Portée',
                 search_city: 'Cherchez une ville ou un village',
                 selected: 'sélectionés',
                 label_field: 'label_fr',

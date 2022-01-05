@@ -6,6 +6,13 @@
         // GLOBAL VARS
         //
 
+        var gridline_color = '#657092';
+        var gridline_color_hover = '#060d12';
+        var gridline_color_active = '#e50e40';
+        var gridline_width = '0.2';
+        var gridline_width_active = '1';
+        var gridfill_color_hover = '#000';
+
         const select_locations = {
             GRID: "grid",
             WATERSHED: "watershed",
@@ -15,12 +22,12 @@
 
         const sector_feature_style_color = {
             'default':{
-                'color': 'white',
+                'color': gridline_color,
                 'fillColor': '#ababab'
             },
             'mouseover':{
-                'color': 'white',
-                'fillColor': 'white'
+                'color': '#e3e3e3',
+                'fillColor': '#e3e3e3'
             },
             'mouseclick':{
                 'color': '#F00',
@@ -84,16 +91,6 @@
         var hosturl = geoserver_url,
             zoom_on = false,
             highlightGridFeature
-
-                    // grid line/fill options
-
-        var gridline_color = '#657092';
-        var gridline_color_hover = '#060d12';
-        var gridline_color_active = '#e50e40';
-        var gridline_width = '0.2';
-        var gridline_width_active = '1';
-
-        var gridfill_color_hover = '#000';
 
         //
         // TOOLTIPS
@@ -516,19 +513,20 @@
 
             (new Promise((resolve, reject) => {
                 try {
+
                     setTimeout( function() {
                         var layerStyles = {};
                         layerStyles[locations_type] = function (properties, zoom) {
                             return {
-                                weight: 0.5,
+                                weight: 0.1,
                                 color: sector_feature_style_color['default']['color'],
-                                fillColor: sector_feature_style_color['default']['fillColor'],
                                 opacity: 1,
                                 fill: true,
                                 radius: 4,
-                                fillOpacity: 1
+                                fillOpacity: 0
                             }
                         };
+
 
                         analyzeLayer = L.vectorGrid.protobuf(
                             hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf",
@@ -547,9 +545,10 @@
                                 vectorTileLayerStyles: layerStyles
                             }
                         ).on('mouseover', function (e) {
-                            if(sector_select_by_id  === undefined){
+                            let event_id = e.layer.properties.id;
+                            if(sector_select_by_id  === undefined || sector_select_by_id  !== event_id){
                                 analyzeLayer.setFeatureStyle(
-                                    e.layer.properties.id,
+                                    event_id,
                                     {
                                         color: sector_feature_style_color['mouseover']['color'],
                                         fillColor: sector_feature_style_color['mouseover']['fillColor'],
@@ -557,7 +556,7 @@
                                         fill: true,
                                         radius: 4,
                                         opacity: 1,
-                                        fillOpacity: 1
+                                        fillOpacity: 0.5
                                     });
                             }
 
@@ -565,8 +564,9 @@
                             analyzeLayer.bindTooltip(e.layer.properties[l10n_labels.label_field], { sticky: true }).openTooltip(e.latlng);
                         }
                         ).on('mouseout', function (e) {
-                            if(sector_select_by_id  === undefined){
-                                analyzeLayer.resetFeatureStyle(e.layer.properties.id);
+                            let event_id = e.layer.properties.id;
+                            if(sector_select_by_id  === undefined || sector_select_by_id  !== event_id){
+                                analyzeLayer.resetFeatureStyle(event_id);
                             }
                         }
                         ).on('click', function (e) {

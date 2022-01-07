@@ -71,6 +71,7 @@
               <input class="add-to-object" type="hidden" name="lat" id="lat" value="">
               <input class="add-to-object" type="hidden" name="lon" id="lon" value="">
               <input class="add-to-object" type="hidden" name="shape" id="shape" value="">
+              <input class="add-to-object" type="hidden" name="average" id="average" value="">
 
               <div id="analyze-steps">
                 <div class="accordion-head" data-step="1">

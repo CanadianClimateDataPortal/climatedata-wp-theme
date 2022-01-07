@@ -51,6 +51,7 @@
             'lat': '',
             'lon': '',
             'shape': '',
+            'average': '',
             'start_date': '',
             'end_date': '',
             'ensemble_percentiles': '',
@@ -256,8 +257,10 @@
 
             if (IsSelectLocations(itemInput)) {
                 ChangeLayers(itemInput);
+                $('#average').val('False');
 
                 if(itemInput != 'grid'){
+                    $('#average').val('True');
                     InitSectorProtobuf(itemInput);
 
                     locations_type = itemInput;
@@ -843,6 +846,7 @@
             "lat": "latitude",
             "lon": "longitude",
             "shape": "shape",
+            'average': 'average',
             "start_date": "start date",
             "end_date": "end date",
             "ensemble_percentiles": "ensemble percentiles",
@@ -990,6 +994,13 @@
             for (var key in data_form_inputs) {
                 switch (key) {
                     case 'shape':
+                        break;
+
+                    case 'average':
+                        data_form_obj['inputs'].push({
+                            'id': key,
+                            'data': data_form_inputs[key]
+                        })
                         break;
 
                     case 'rcp':

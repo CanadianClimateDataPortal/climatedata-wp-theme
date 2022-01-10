@@ -268,6 +268,8 @@
                     grid_click(e);
                 }).on('mouseover', function (e) {
                     grid_hover(e);
+                }).on('mouseout', function (e) {
+                    grid_hover_cancel(e);
                 }).addTo(mapRight);
                 gridLayerRight.rcp = right_rcp_value;
                 gridLayerRight.opposite = gridLayer;

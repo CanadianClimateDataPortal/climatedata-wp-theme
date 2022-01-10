@@ -732,6 +732,32 @@
 
         // grid hover functions
 
+        /**
+         *
+         * @param data Data sent by climatedata-api ( get-delta-30y-gridded-values or get-delta-30y-regional-values)
+         * @param rcp RCP scenario selection (rcp26, rcp45, rcp85)
+         * @param varDetails Variable details object provided by Wordpress
+         * @param delta If true, the value is formatted as a delta
+         * @param sector Selected sector (ex: 'census'). "" if none
+         * @param event Javascript event that triggered the grid_hover
+         * @returns {string}
+         */
+        function format_grid_hover_tooltip(data, rcp, varDetails, delta, sector, event) {
+            let tip = [];
+            if (sector != "") {
+                tip.push(event.layer.properties[l10n_labels.label_field] + "<br>");
+            }
+            let val1 = value_formatter(data[rcp]['p50'], varDetails, delta);
+            tip.push("<span style=\"color:#00F\">●</span> " + l10n_labels.median + " <b>"
+                + val1 + "</b><br/>");
+
+            val1 = value_formatter(data[rcp]['p10'], varDetails, delta);
+            let val2 = value_formatter(data[rcp]['p90'], varDetails, delta);
+            tip.push("<span style=\"color:#00F\">●</span> " + l10n_labels.range + " <b>"
+                + val1 + "</b>-<b>" + val2 + "</b><br/>");
+            return tip.join("\n");
+        }
+
         function grid_hover(e, sector="") {
 
             grid_initialized = true;
@@ -767,33 +793,13 @@
                             url: values_url,
                             dataType: "json",
                             success: function (data) {
-                                let tip = [];
-                                if (sector != "") {
-                                    tip.push(e.layer.properties[l10n_labels.label_field] + "<br>");
-                                }
-                                val1 = value_formatter(data[rcp]['p50'], varDetails, delta);
-                                tip.push("<span style=\"color:#00F\">●</span> " + l10n_labels.median + " <b>"
-                                    + val1 + "</b><br/>");
-
-                                val1 = value_formatter(data[rcp]['p10'], varDetails, delta);
-                                val2 = value_formatter(data[rcp]['p90'], varDetails, delta);
-                                tip.push("<span style=\"color:#00F\">●</span> " + l10n_labels.range + " <b>"
-                                    + val1 + "</b>-<b>" + val2 + "</b><br/>");
-                                e.target.bindTooltip(tip.join("\n"), {sticky: true}).openTooltip(e.latlng);
-
+                                e.target.bindTooltip(format_grid_hover_tooltip(data, rcp, varDetails, delta, sector, e),
+                                    {sticky: true}).openTooltip(e.latlng);
 
                                 if ($('body').hasClass('map-compare')) {
                                     rcp = e.target.opposite.rcp;
-                                    tip = [];
-                                    val1 = value_formatter(data[rcp]['p50'], varDetails, delta);
-                                    tip.push("<span style=\"color:#00F\">●</span> " + l10n_labels.median + " <b>"
-                                        + val1 + "</b><br/>");
-
-                                    val1 = value_formatter(data[rcp]['p10'], varDetails, delta);
-                                    val2 = value_formatter(data[rcp]['p90'], varDetails, delta);
-                                    tip.push("<span style=\"color:#00F\">●</span> " + l10n_labels.range + " <b>"
-                                        + val1 + "</b>-<b>" + val2 + "</b><br/>");
-                                    e.target.opposite.bindTooltip(tip.join("\n")).openTooltip(e.latlng);
+                                    e.target.opposite.bindTooltip(format_grid_hover_tooltip(data, rcp, varDetails, delta, sector, e)
+                                    ).openTooltip(e.latlng);
                                 }
                             }
                         });
@@ -1659,7 +1665,7 @@
                                         str += Highcharts.numberFormat(num, chartDecimals);
                                         switch( chartUnit) {
                                             case "day of the year":
-                                                str += current_lang == 'fr' ? " jours" : " days";
+                                                str += " " + l10n_labels['days'];
                                                 break;
                                             default:
                                                 str += " " + chartUnit;

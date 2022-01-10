@@ -17,7 +17,11 @@ var chart_labels, legend_labels, l10n_labels;
 // GLOBAL Functions
 //
 
-
+/**
+ * Format the n-th day value to localized text on a non-leap year (ex: 156 -> June 9)
+ * @param value Day of the Year (starting with 0 for Jan 1st)
+ * @returns {string} The formatted value
+ */
 function doy_formatter(value) {
     const firstDayOfYear = Date.UTC(2019, 0, 1);
     return new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * value).toLocaleDateString(current_lang, {
@@ -26,6 +30,13 @@ function doy_formatter(value) {
     })
 }
 
+/**
+ * Format numerical value according to supplied parameters
+ * @param value Number to format
+ * @param varDetails Variable details object provided by Wordpress
+ * @param delta If true, the value is formatted as a delta
+ * @returns {string} The formatted value
+ */
 function value_formatter(value, varDetails, delta) {
     let unit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
     let str = "";
@@ -37,7 +48,7 @@ function value_formatter(value, varDetails, delta) {
         case "doy":
             if (delta) {
                 str += value.toFixed(varDetails.decimals);
-                str += current_lang == 'fr' ? " jours" : " days";
+                str += " " + l10n_labels['days'];
             } else {
                 str += doy_formatter(value);
             }
@@ -248,6 +259,7 @@ function value_formatter(value, varDetails, delta) {
         };
 
         l10n_labels = {
+            days: 'days',
             median: 'Median',
             range: 'Range',
             search_city: 'Search for a City/Town',
@@ -294,6 +306,7 @@ function value_formatter(value, varDetails, delta) {
             };
 
             l10n_labels = {
+                days: 'jours',
                 median: 'Médiane',
                 range: 'Portée',
                 search_city: 'Cherchez une ville ou un village',

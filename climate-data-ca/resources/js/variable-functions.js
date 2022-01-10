@@ -1619,12 +1619,13 @@
                     case 'csv':
                         setDataLayerForChartData('csv', chart);
                         switch($('input[name=chartoption]:checked').val()) {
-                            case 'annual':
-                                chart.downloadCSV();
-                                break;
                             case '30y':
                             case 'delta':
                                 window.location.href = download_url;
+                                break;
+                            case 'annual':
+                            default:
+                                chart.downloadCSV();
                                 break;
                         }
                         break;

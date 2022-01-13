@@ -254,7 +254,12 @@
                 grid_click(e);
             }).on('mouseover', function (e) {
                 grid_hover(e);
+            }).on('mouseout', function (e) {
+                grid_hover_cancel(e);
             }).addTo(map1);
+
+            gridLayer.rcp = left_rcp_value;
+
             if ($('#mapRight').length) {
                 gridLayerRight = L.vectorGrid.protobuf(
                     hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + gridname + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
@@ -263,7 +268,12 @@
                     grid_click(e);
                 }).on('mouseover', function (e) {
                     grid_hover(e);
+                }).on('mouseout', function (e) {
+                    grid_hover_cancel(e);
                 }).addTo(mapRight);
+                gridLayerRight.rcp = right_rcp_value;
+                gridLayerRight.opposite = gridLayer;
+                gridLayer.opposite = gridLayerRight;
             }
 
         }
@@ -722,11 +732,79 @@
 
         // grid hover functions
 
-        function grid_hover(e) {
+        /**
+         *
+         * @param data Data sent by climatedata-api ( get-delta-30y-gridded-values or get-delta-30y-regional-values)
+         * @param rcp RCP scenario selection (rcp26, rcp45, rcp85)
+         * @param varDetails Variable details object provided by Wordpress
+         * @param delta If true, the value is formatted as a delta
+         * @param sector Selected sector (ex: 'census'). "" if none
+         * @param event Javascript event that triggered the grid_hover
+         * @returns {string}
+         */
+        function format_grid_hover_tooltip(data, rcp, varDetails, delta, sector, event) {
+            let tip = [];
+            if (sector != "") {
+                tip.push(event.layer.properties[l10n_labels.label_field] + "<br>");
+            }
+            let val1 = value_formatter(data[rcp]['p50'], varDetails, delta);
+            tip.push("<span style=\"color:#00F\">●</span> " + l10n_labels.median + " <b>"
+                + val1 + "</b><br/>");
+
+            val1 = value_formatter(data[rcp]['p10'], varDetails, delta);
+            let val2 = value_formatter(data[rcp]['p90'], varDetails, delta);
+            tip.push("<span style=\"color:#00F\">●</span> " + l10n_labels.range + " <b>"
+                + val1 + "</b>-<b>" + val2 + "</b><br/>");
+            return tip.join("\n");
+        }
+
+        function grid_hover(e, sector="") {
 
             grid_initialized = true;
 
-            //e.layer.bindTooltip(e.layer.properties.gid.toString() + " acres").openTooltip(e.latlng);
+            grid_hover_cancel(e);
+            let rcp = e.target.rcp;
+
+            // no tooltip available for SPEI  (i.e. hasdelta == false)
+            getVarData(function (data) {
+                let varDetails = data.get(var_value);
+                if(varDetails.hasdelta != false) {
+                    gridHoverTimeout = setTimeout(function () {
+                        let decade_value = parseInt($("#decade").val()) + 1;
+                        let delta = $('input[name="absolute_delta_switch"]:checked').val() === 'd';
+                        let delta7100 = delta ? "&delta7100=true" : "";
+                        let values_url;
+
+                        if (sector == "") { // gridded
+                            values_url = data_url + "/get-delta-30y-gridded-values/" +
+                            e.latlng['lat'] + "/" + e.latlng['lng'] +
+                            "/" + var_value + "/" + mora_value +
+                            "?period=" + decade_value +
+                            "&decimals=" + varDetails.decimals + delta7100;
+                        } else {
+                            values_url = data_url + "/get-delta-30y-regional-values/" +
+                                sector + "/" + e.layer.properties.id +
+                                "/" + var_value + "/" + mora_value +
+                                "?period=" + decade_value +
+                                "&decimals=" + varDetails.decimals + delta7100;
+                        }
+
+                        gridHoverAjax = $.ajax({
+                            url: values_url,
+                            dataType: "json",
+                            success: function (data) {
+                                e.target.bindTooltip(format_grid_hover_tooltip(data, rcp, varDetails, delta, sector, e),
+                                    {sticky: true}).openTooltip(e.latlng);
+
+                                if ($('body').hasClass('map-compare')) {
+                                    rcp = e.target.opposite.rcp;
+                                    e.target.opposite.bindTooltip(format_grid_hover_tooltip(data, rcp, varDetails, delta, sector, e)
+                                    ).openTooltip(e.latlng);
+                                }
+                            }
+                        });
+                    }, 100);
+                }});
 
             // set the highlight
 
@@ -755,6 +833,24 @@
 
                 gridLayerRight.setFeatureStyle(highlightGridFeatureRightLayer, highlight_properties);
 
+            }
+
+        }
+
+        function grid_hover_cancel(e) {
+            // cancel current timeout
+            if (typeof gridHoverTimeout !== 'undefined' && gridHoverTimeout !== null) {
+                clearTimeout(gridHoverTimeout);
+                if (e) {
+                    e.target.unbindTooltip();
+                }
+                gridHoverTimeout = null;
+            }
+
+            // cancel in-flight ajax call to avoid duplicated tooltips
+            if (typeof gridHoverAjax !== 'undefined' && gridHoverAjax !== null) {
+                gridHoverAjax.abort();
+                gridHoverAjax = null;
             }
 
         }
@@ -857,6 +953,7 @@
 
         var_value = $("#var").val();
 
+        var gridHoverTimeout, gridHoverAjax;
         var gridLayer;
         gridLayer = L.vectorGrid.protobuf(
             hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + 'canadagrid' + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
@@ -916,6 +1013,7 @@
                 choroValues = data;
 
                 if (map1.hasLayer(choroLayer)) {
+                    choroLayer.rcp = rcp;
                     for (let i = 0; i < choroValues.length; i++)
                         choroLayer.resetFeatureStyle(i);
                 } else {
@@ -960,7 +1058,7 @@
                                 opacity: 1,
                                 fillOpacity: 1
                             });
-                        choroLayer.bindTooltip(e.layer.properties[l10n_labels.label_field], { sticky: true }).openTooltip(e.latlng);
+                        grid_hover(e, sector);
                     }
                     ).on('mouseout', function (e) {
                         choroLayer.resetFeatureStyle(e.layer.properties.id);
@@ -975,13 +1073,22 @@
 
                         genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
                     }).addTo(map1);
+                    choroLayer.rcp = rcp;
                 }
             })
         };
 
         map1.on('zoom', function (e) {
+            grid_hover_cancel(null);
+
             if (typeof choroLayer !== 'undefined' && choroLayer !== null) {
                 choroLayer.unbindTooltip();
+            }
+            if (typeof gridLayer !== 'undefined' && gridLayer !== null) {
+                gridLayer.unbindTooltip();
+            }
+            if (typeof gridLayerRight !== 'undefined' && gridLayerRight !== null) {
+                gridLayerRight.unbindTooltip();
             }
         });
         //
@@ -1175,22 +1282,21 @@
         }
 
         function displayChartData(data, varDetails, download_url) {
-            const firstDayOfYear = Date.UTC(2019,0,1);
-            chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
+               chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
             chartDecimals = varDetails['decimals'];
             switch (varDetails.units.value) {
                 case 'doy':
-                    formatter = function () { return new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * this.value).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' }) };
+                    formatter = function () { return doy_formatter(this.value) };
                     var pointFormatter = function (format) {
                         if (this.series.type == 'line') {
                             return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name + ': <b>'
-                                + new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * this.y).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
+                                +  doy_formatter(this.y)
                                 + '</b><br/>';
                         } else {
                             return '<span style="color:' + this.series.color + '">●</span>' + this.series.name + ': <b>'
-                                + new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * this.low).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
+                                +  doy_formatter(this.low)
                                 + '</b> - <b>'
-                                + new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * this.high).toLocaleDateString(current_lang, { month: 'long', day: 'numeric' })
+                                +  doy_formatter(this.high)
                                 + '</b><br/>';
                         }
                     };
@@ -1559,7 +1665,7 @@
                                         str += Highcharts.numberFormat(num, chartDecimals);
                                         switch( chartUnit) {
                                             case "day of the year":
-                                                str += current_lang == 'fr' ? " jours" : " days";
+                                                str += " " + l10n_labels['days'];
                                                 break;
                                             default:
                                                 str += " " + chartUnit;
@@ -2099,6 +2205,9 @@
             } else {
                 aord_layer_value = "";
             }
+
+            gridLayer.rcp = left_rcp_value;
+            gridLayerRight.rcp = right_rcp_value;
 
 
             singleLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
@@ -3013,7 +3122,6 @@
                         'VERSION': '1.3.0',
                         layers: 'CDC:' + leftLayerName
                     });
-
 
                     if (has_mapRight === true) {
                         rightLayer.setParams({

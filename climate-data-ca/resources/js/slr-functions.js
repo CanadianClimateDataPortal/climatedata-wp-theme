@@ -186,7 +186,10 @@
                 grid_click(e);
             }).on('mouseover', function (e) {
                 grid_hover(e);
+            }).on('mouseout', function (e) {
+                grid_hover_cancel(e);
             }).addTo(mapRight);
+
 
 
             L.tileLayer('//{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png', {
@@ -449,7 +452,45 @@
 
             grid_initialized = true;
 
-            //e.layer.bindTooltip(e.layer.properties.gid.toString() + " acres").openTooltip(e.latlng);
+            grid_hover_cancel(e);
+            let rcp = e.target.rcp;
+            let percentile = e.target.percentile;
+
+            gridHoverTimeout = setTimeout(function () {
+                let decade_value = parseInt($("#decade").val());
+                let values_url;
+                let varDetails = {units: {value: 'cm', label: 'cm'}, decimals:0};
+
+                values_url = data_url + "/get-slr-gridded-values/" +
+                    e.latlng['lat'] + "/" + e.latlng['lng'] +
+                    "?period=" + decade_value;
+
+                gridHoverAjax = $.ajax({
+                    url: values_url,
+                    dataType: "json",
+                    success: function (data) {
+                        let tip = [];
+                        val1 = value_formatter(data[rcp][percentile], varDetails, false);
+                        tip.push("<b>" + val1 + "</b><br/>");
+
+                        e.target.bindTooltip(tip.join("\n"), {sticky: true}).openTooltip(e.latlng);
+
+
+                        if ($('body').hasClass('map-compare')) {
+                            rcp = e.target.opposite.rcp;
+                            percentile = e.target.opposite.percentile;
+                            tip = [];
+                            val1 = value_formatter(data[rcp][percentile], varDetails, false);
+                            tip.push("<b>" + val1 + "</b><br/>");
+
+
+                            e.target.opposite.bindTooltip(tip.join("\n")).openTooltip(e.latlng);
+                        }
+                    }
+                });
+            }, 100);
+
+
 
             // set the highlight
 
@@ -481,6 +522,25 @@
             }
 
         }
+
+        function grid_hover_cancel(e) {
+            // cancel current timeout
+            if (typeof gridHoverTimeout !== 'undefined' && gridHoverTimeout !== null) {
+                clearTimeout(gridHoverTimeout);
+                if (e) {
+                    e.target.unbindTooltip();
+                }
+                gridHoverTimeout = null;
+            }
+
+            // cancel in-flight ajax call to avoid duplicated tooltips
+            if (typeof gridHoverAjax !== 'undefined' && gridHoverAjax !== null) {
+                gridHoverAjax.abort();
+                gridHoverAjax = null;
+            }
+
+        }
+
 
         // grid click
 
@@ -537,7 +597,7 @@
 
 
 
-
+        var gridHoverTimeout, gridHoverAjax;
         var gridLayer;
         gridLayer = L.vectorGrid.protobuf(
             hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + 'slrgrid' + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
@@ -546,11 +606,14 @@
             grid_click(e);
         }).on('mouseover', function (e) {
             grid_hover(e);
+        }).on('mouseout', function (e) {
+            grid_hover_cancel(e);
         });
 
         // add to map
         gridLayer.addTo(map1);
-
+        gridLayerRight.opposite = gridLayer;
+        gridLayer.opposite = gridLayerRight;
 
 
         landmassLayer_options = {
@@ -587,8 +650,9 @@
             ).addTo(mapRight);
         }
 
-
-
+        map1.on('zoom', function (e) {
+            grid_hover_cancel(null);
+        });
 
         //
         // CITY LABELS
@@ -1366,6 +1430,11 @@
         function changeLayers() {
             rcp_value = $("#rcp").val();
             right_rcp_value =  $("#rightrcp").val();
+            gridLayer.rcp = rcp_value.split("-")[0];
+            gridLayer.percentile = rcp_value.split("-")[1];
+            gridLayerRight.rcp = right_rcp_value.split("-")[0];
+            gridLayerRight.percentile = right_rcp_value.split("-")[1];
+
             // decade_value = $("#decade").val();
             decade_value = parseInt($("#decade").val());
 

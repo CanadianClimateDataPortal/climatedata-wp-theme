@@ -743,6 +743,7 @@
          * @returns {string}
          */
         function format_grid_hover_tooltip(data, rcp, varDetails, delta, sector, event) {
+            let to_label = varDetails.units.value == 'doy' ? 'to_doy': 'to';
             let tip = [];
             if (sector != "") {
                 tip.push(event.layer.properties[l10n_labels.label_field] + "<br>");
@@ -754,7 +755,7 @@
             val1 = value_formatter(data[rcp]['p10'], varDetails, delta);
             let val2 = value_formatter(data[rcp]['p90'], varDetails, delta);
             tip.push("<span style=\"color:#00F\">●</span> " + l10n_labels.range + " <b>"
-                + val1 + "</b>-<b>" + val2 + "</b><br/>");
+                + val1 + "</b> " + l10n_labels[to_label] + " <b>" + val2 + "</b><br/>");
             return tip.join("\n");
         }
 
@@ -2050,12 +2051,7 @@
 
             labels.push('<h6 class="legendTitle">' + legendTitle + '</h6>');
 
-            var first_label = colormap[0].label;
-
-            if (current_lang == 'fr') {
-                first_label = first_label.replace('Degree Days', 'Degrés-jours');
-                first_label = first_label.replace('Days', 'Jours');
-            }
+            var first_label = unit_localize(colormap[0].label);
 
             // labels.push('<span class="legendLabel max">' + first_label + '</span>');
 
@@ -2064,16 +2060,11 @@
             var min_label = '';
 
             for (let i = 0; i < colormap.length; i++) {
-                unitValue = colormap[i].label;
+                unitValue = unit_localize(colormap[i].label);
                 unitColor = colormap[i].color;
 
                 if (unitValue !== 'NaN') {
 
-                    if (current_lang == 'fr') {
-                        unitValue = unitValue.replace('Degree Days', 'Degrés-jours');
-                        unitValue = unitValue.replace('Days', 'Jours');
-                        unitValue = unitValue.replace(' to ', ' à ');
-                    }
                     style = 'background:' + unitColor;
 
                     t = "";

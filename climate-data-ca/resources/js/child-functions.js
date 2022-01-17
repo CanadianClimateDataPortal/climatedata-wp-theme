@@ -59,9 +59,24 @@ function value_formatter(value, varDetails, delta) {
             str += " " + unit;
             break;
     }
-    return str;
+    return unit_localize(str);
 }
 
+/**
+ * Localize variable units to French if necessary
+ * @param str String to localize
+ */
+function unit_localize(str) {
+    if ($('body').hasClass('lang-fr')) {
+        str = str.replace('Degree Days', 'Degrés-jours');
+        str = str.replace('degree days', 'degrés-jours');
+        str = str.replace('Days', 'Jours');
+        str = str.replace('days', 'jours');
+        str = str.replace(' to ', ' à ');
+    }
+
+    return str;
+}
 
 
 (function ($) {
@@ -259,6 +274,8 @@ function value_formatter(value, varDetails, delta) {
         };
 
         l10n_labels = {
+            to: 'to',
+            to_doy: 'to',
             days: 'days',
             median: 'Median',
             range: 'Range',
@@ -306,6 +323,8 @@ function value_formatter(value, varDetails, delta) {
             };
 
             l10n_labels = {
+                to: 'à',
+                to_doy: 'au',
                 days: 'jours',
                 median: 'Médiane',
                 range: 'Portée',

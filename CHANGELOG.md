@@ -1,3 +1,6 @@
+2022-01-20.01
+  * Added netcdf format for variable download
+
 2021-11-19.02
   * Allow multiple RCP selection in analyze page
 

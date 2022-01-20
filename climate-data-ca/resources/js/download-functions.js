@@ -554,24 +554,24 @@
                     points: points
                 };
 
-                $.ajax({
-                    method: 'POST',
-                    url: data_url + '/download',
-                    contentType: 'application/json',
-                    data: JSON.stringify(request_args),
-                    success: function (result) {
-                        if (format == 'csv') {
-                            $('#download-result a').attr('href', 'data:text/csv;charset=utf-8,' + escape(result));
-                        }
-                        if (format == 'json') {
-                            $('#download-result a').attr('href', "data:application/json," + encodeURIComponent(JSON.stringify(result)));
-                        }
-                        $('#download-result a').attr('download', $('#download-filename').val() + '.' + format);
+
+                let xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (xhttp.readyState === 4 && xhttp.status === 200) {
+                        $('#download-result a').attr('href', window.URL.createObjectURL(xhttp.response));
+                        let file_ext = '.' + (format == 'netcdf' ? 'nc' : format);
+
+                        $('#download-result a').attr('download', $('#download-filename').val() + file_ext);
+
+
                         $('#download-result').slideDown(250);
                         $('body').removeClass('spinner-on');
-
                     }
-                });
+                };
+                xhttp.open("POST", data_url + '/download');
+                xhttp.setRequestHeader("Content-Type", "application/json");
+                xhttp.responseType = 'blob';
+                xhttp.send(JSON.stringify(request_args));
             } else {
                 // call download for all matching variables and build a zip file
                 selectedTimeStepCategory = $('#download-dataset').find(':selected').data('timestep');
@@ -741,7 +741,7 @@
             } else {
 
                 // json option
-                $('#format-label-netcdf').hide();
+                $('#format-label-netcdf').show();
                 $('#format-label-json').show();
 
                 // email field

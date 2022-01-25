@@ -55,6 +55,7 @@
 }
 */
 @import '../../../h7-parent/resources/bower_components/leaflet/dist/leaflet.css';
+@import 'leaflet-geoman.css';
 @import '../../../h7-parent/resources/bower_components/ion.rangeSlider/css/ion.rangeSlider.min.css';
 @import '../../../h7-parent/resources/bower_components/select2-bootstrap4-theme/dist/select2-bootstrap4.min.css';
 :root {

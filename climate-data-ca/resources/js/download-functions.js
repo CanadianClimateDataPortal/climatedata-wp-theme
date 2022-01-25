@@ -20,6 +20,9 @@
         var gridline_width_active = '1';
 
         var ajax_url = base_href.replace('fr/', '');
+        var bbox_layer;
+
+
 
         //
         // VENDOR
@@ -225,6 +228,8 @@
             $('#map-overlay').fadeOut()
         })
 
+
+
         //
         // VARIABLE
         //
@@ -248,7 +253,6 @@
                 }
                 highlightGridFeature = null;
             };
-            console.log('adding canadagrid default');
             addGrid('canadagrid');
 
 
@@ -256,6 +260,10 @@
                 checkform()
             })
 
+            maps['variable'].on('pm:create', function (e){
+                bbox_layer = e.layer;
+                bbox_layer.pm.enable({});
+            });
         }
 
         function addGrid(gridName) {
@@ -770,14 +778,17 @@
                 $('#download-variable').val(1).trigger('change.select2');
             }
             if (typeof pbfLayer !== 'undefined' && pbfLayer.gridType !== curValData.grid) {
-                maps['variable'].removeLayer(pbfLayer);
-                console.log("Adding Grid:" + curValData.grid);
-                addGrid(curValData.grid);
 
-                selectedGrids = [];
-                $('#download-coords').val('');
-                $('#download-location').val('');
-                $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
+                if ($('input[name="download-select"]:checked').val() == 'gridded') {
+                    maps['variable'].removeLayer(pbfLayer);
+                    console.log("Adding Grid:" + curValData.grid);
+                    addGrid(curValData.grid);
+                    selectedGrids = [];
+                    $('#download-coords').val('');
+                    $('#download-location').val('');
+                    $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
+                }
+
             }
         });
 
@@ -791,6 +802,32 @@
             }
 
             checkform();
+
+        });
+
+        // selection type
+        $('#selection-type input').on('change', function () {
+            switch ($('input[name="download-select"]:checked').val()) {
+                case 'gridded':
+                    if (bbox_layer !== 'undefined') {
+                        maps['variable'].removeLayer(bbox_layer);
+                    }
+                    addGrid(curValData.grid);
+                    break;
+
+                case 'bbox':
+
+                    // TODO: duplicate to convert to function
+                    selectedGrids= [];
+                    $('#download-coords').val('');
+                    $('#download-location').val('');
+                    $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
+                    maps['variable'].removeLayer(pbfLayer);
+
+
+                    maps['variable'].pm.enableDraw('Rectangle', {});
+                    break;
+            }
 
         });
 
@@ -1003,23 +1040,6 @@
             // $.getJSON('https://geo.weather.gc.ca/geomet/features/collections/climate-stations/items?f=json&limit=10000', function (data) {
             $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE', function (data) {
 
-
-                // var len = data.features.length;
-
-                // for (var i = 0; i< len; i++) {
-                //
-                //     stationOption = data.features[i].properties;
-                //
-                //     // console.log(stationOption);
-                //
-                //     // console.log(data.features[i]);
-                //     stationFromAPI += '<option value="' + stationOption.STN_ID + '">' + stationOption.STATION_NAME + '</option>';
-                //
-                //
-                // }
-                // $('#station-select').append(stationFromAPI);
-                // $('#station-select').select2();
-
                 var markers = L.markerClusterGroup();
 
                 var geojsonMarkerOptions = {
@@ -1089,107 +1109,6 @@
                 markers.addLayer(pointsLayer);
 
                 maps['station'].addLayer(markers);
-                // maps['station'].fitBounds(markers.getBounds());
-
-                // pointsLayer = L.geoJson(data, {
-                //     pointToLayer: function (feature, latlng) {
-                //
-                //         var markerColor = '#BBB';
-                //         var existingData = $("#station-select").select2("val");
-                //
-                //         // console.log(feature.properties);
-                //
-                //         if (existingData != null && existingData.includes(feature.properties.STN_ID.toString())) {
-                //             markerColor = '#F00';
-                //         }
-                //
-                //         // var marker = L.circleMarker(latlng, {
-                //         //     // Stroke properties
-                //         //     color: markerColor,
-                //         //     opacity: 1,
-                //         //     weight: 2,
-                //         //     pane: 'idf',
-                //         //     // Fill properties
-                //         //     fillColor: markerColor,
-                //         //     fillOpacity: 1,
-                //         //     radius: 5
-                //         // });
-                //
-                //          var title = feature.properties.STATION_NAME.toString();
-                //         var marker = L.marker(latlng, { title: title });
-                //         marker.bindPopup(title);
-                //         markers.addLayer(marker);
-                //
-                //         // markerMap[feature.id] = marker;
-                //
-                //         return marker;
-                //
-                //     }
-                // }).on('mouseover', function (e) {
-                //     e.layer.bindTooltip(e.layer.feature.properties.STATION_NAME + ' ' + e.layer.feature.properties.STN_ID).openTooltip(e.latlng);
-                // }).on('click', function (e) {
-                //
-                //     // get current station select value
-                //     var existingData = $("#station-select").select2("val");
-                //
-                //     // clicked ID
-                //     var clicked_ID = e.layer.feature.properties.STN_ID.toString();
-                //
-                //     // default colour
-                //     markerColor = '#F00';
-                //
-                //     if (existingData != null) {
-                //
-                //
-                //         if (existingData.includes(clicked_ID)) {
-                //
-                //
-                //             var $select = $('#station-select');
-                //
-                //             index = existingData.indexOf(clicked_ID);
-                //
-                //             if (index > -1) {
-                //                 existingData.splice(index, 1);
-                //             }
-                //
-                //
-                //             $('#station-select').val(existingData).change();
-                //
-                //             markerColor = '#BBB';
-                //
-                //         } else {
-                //
-                //
-                //             existingData.push(clicked_ID);
-                //
-                //             $('#station-select').val(existingData).change();
-                //
-                //         }
-                //
-                //     } else {
-                //
-                //
-                //         existingData = [clicked_ID];
-                //
-                //         $('#station-select').val(existingData).change();
-                //
-                //     }
-                //
-                //     e.layer.setStyle({
-                //         // Stroke properties
-                //         color: markerColor,
-                //         opacity: 1,
-                //         weight: 2,
-                //         pane: 'idf',
-                //         // Fill properties
-                //         fillColor: markerColor,
-                //         fillOpacity: 1,
-                //         radius: 5
-                //     });
-                //
-                // }).addTo(maps['station']);
-
-
             });
 
 
@@ -1331,24 +1250,6 @@
                 }
             });
         });
-
-        /*
-         $('#station-download-form').submit(function(e) {
-         e.preventDefault();
-
-         var process_url = $('#result').text();
-
-
-         $.ajax({
-         url: process_url,
-         success: function(data) {
-         },
-         complete: function() {
-         }
-         });
-
-         });
-         */
 
         function check_station_form() {
 

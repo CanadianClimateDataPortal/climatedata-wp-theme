@@ -68,31 +68,39 @@
 
 
 
-<div class="container-fluid" id="dst-load-xhr" style='background-color:green; font-size: 12pt; height: 2000px; content: ""; width: 100%; display: table; clear: both;' >
+<div class="container-fluid" style='background-color:green; font-size: 12pt; height: 2000px; content: ""; width: 100%; display: table; clear: both;' >
       <!-- <iframe src="http://132.217.140.7/building-dst/decision-support-tool"  frameborder="0" allow="autoplay; fullscreen" title="W3Schools Free Online Web Tutorials"></iframe> -->
 
         <p id="dst-load" style="background-color:red; font-size: 12pt;">Loading...</p>
 
-        <!-- <div style="
+        <div id="dst-load-sidebar" style="
+        display: none;
         background-color:#aaa;
         float: left;
         width: 25%;
         padding: 10px;
         height: 100%;"
         >
-        <h2 style='background-color:green; font-size: 12pt;'>Column 1</h2>
-        <p>Some text..</p>
+        <form>
+        <input type="radio" id="html" name="fav_language" value="HTML">
+        <label for="html">1</label><br>
+        <input type="radio" id="css" name="fav_language" value="CSS">
+        <label for="css">2</label><br>
+        <input type="radio" id="javascript" name="fav_language" value="JavaScript">
+        <label for="javascript">3</label>
+        </form>
         </div>
-        <div style="
+        <div id="dst-load-xhr" style="
+        display: none;
         background-color:#bbb;
         float: left;
         width: 75%;
         padding: 10px;
         height: 100%;"
         >
-        <h2 style='background-color:green; font-size: 12pt;'>Column 2</h2>
-        <p>Some text..</p>
-        </div> -->
+        <h2 style='font-size: 12pt;'>col_2</h2>
+        <p>dst</p>
+        </div>
 
         <!-- <p id="dst-load" style="background-color:red; font-size: 12pt;">Loading...</p>
         <p id="dst-load2" style="background-color:red; font-size: 12pt;">Loading...</p> -->
@@ -134,6 +142,10 @@
                     // remove the loading screen
                     const container = document.getElementById('dst-load');
                     container.remove();
+
+
+                    document.getElementById('dst-load-sidebar').style.display = "block";
+                    document.getElementById('dst-load-xhr').style.display = "block";
 
                     document.getElementById('dst-load-xhr').appendChild(script);
                 };

@@ -69,61 +69,33 @@
 
 
 <div class="container-fluid" style='background-color:green; font-size: 12pt; height: 2000px; content: ""; width: 100%; display: table; clear: both;' >
-      <!-- <iframe src="http://132.217.140.7/building-dst/decision-support-tool"  frameborder="0" allow="autoplay; fullscreen" title="W3Schools Free Online Web Tutorials"></iframe> -->
-
         <p id="dst-load" style="background-color:red; font-size: 12pt;">Loading...</p>
+
 
         <div id="dst-load-sidebar" style="
         display: none;
-        background-color:#aaa;
+        background-color:pink;
         float: left;
         width: 25%;
         padding: 10px;
         height: 100%;"
         >
-        <form>
-        <input type="radio" id="html" name="fav_language" value="HTML">
-        <label for="html">1</label><br>
-        <input type="radio" id="css" name="fav_language" value="CSS">
-        <label for="css">2</label><br>
-        <input type="radio" id="javascript" name="fav_language" value="JavaScript">
-        <label for="javascript">3</label>
-        </form>
+        <div>Sidebar</div>
         </div>
+
         <div id="dst-load-xhr" style="
         display: none;
-        background-color:#bbb;
+        background-color:grey;
         float: left;
         width: 75%;
         padding: 10px;
         height: 100%;"
         >
-        <h2 style='font-size: 12pt;'>col_2</h2>
-        <p>dst</p>
+            <script id="dst-load-script" style="font-size: 5pt"></script>
         </div>
-
-        <!-- <p id="dst-load" style="background-color:red; font-size: 12pt;">Loading...</p>
-        <p id="dst-load2" style="background-color:red; font-size: 12pt;">Loading...</p> -->
-
-
-        <!-- {{ script|safe }} -->
-
-        <!-- <iframe width="100%" height="100%" src="http://localhost:5006/building-dst/decision-support-tool"></iframe> -->
-
-
-
-
-            <!-- {{ script|safe }} -->
-
-            <!-- <iframe width="100%" height="100%" src="http://localhost:5006/building-dst/decision-support-tool"></iframe> -->
 
 
         <script id="1090">
-            function uuidv4() {
-                return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-                );
-            }
 
             (function() {
                 const xhr = new XMLHttpRequest()
@@ -135,7 +107,10 @@
                 xhr.setRequestHeader("Bokeh-Session-Id", sessionId)
 
                 xhr.onload = function (event) {
-                    const script = document.createElement('script');
+                    // let script = document.createElement('script');
+                    let script = document.getElementById('dst-load-script');
+                    // bk_clearfix[0].style.fontSize = '5px'
+
                     const src = URL.createObjectURL(event.target.response);
                     script.src = src;
 
@@ -147,9 +122,11 @@
                     document.getElementById('dst-load-sidebar').style.display = "block";
                     document.getElementById('dst-load-xhr').style.display = "block";
 
-                    document.getElementById('dst-load-xhr').appendChild(script);
+                    // document.getElementById('dst-load-xhr').appendChild(script);
                 };
                 xhr.send();
+
+
             })();
         </script>
 

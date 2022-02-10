@@ -175,10 +175,10 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
 									<label for="mce-EMAIL" class="sr-only">Email Address</label>
 
 									<div class="input-group mc-field-group">
-										<input type="email" value="" name="EMAIL" class="required email form-control form-control-lg" id="mce-EMAIL" placeholder="Enter your email address">
+										<input type="email" value="" name="EMAIL" class="required email form-control form-control-lg" id="mce-EMAIL" placeholder="<?php _e('Enter your email address', 'cdc'); ?>">
 
 									  <div class="input-group-append">
-											<input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="btn btn-outline-secondary">
+											<input type="submit" value="<?php _e('Subscribe','cdc'); ?>" name="subscribe" id="mc-embedded-subscribe" class="btn btn-outline-secondary">
 									  </div>
 									</div>
 

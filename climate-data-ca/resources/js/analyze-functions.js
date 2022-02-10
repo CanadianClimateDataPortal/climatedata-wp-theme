@@ -71,6 +71,7 @@
         }
 
         var form_obj = $.extend(true, {}, default_obj)
+        var selected_feature_label = '';
 
         var submit_url_var = '',
             submit_url_post = '/jobs'
@@ -561,7 +562,8 @@
                             }
                         }
                         ).on('click', function (e) {
-                            HighlightSectorById(e.layer.properties.id, e, analyzeLayer);
+                            HighlightSectorById(e.layer.properties.id, e, analyzeLayer, e.layer.properties[l10n_labels.label_field]);
+
                             validate_inputs(sector);
                         }).addTo(analyze_map);
                         resolve("Sector protobuf initialzed!")
@@ -583,11 +585,11 @@
         };
 
 
-        function HighlightSectorById(highlightSectorId, protobufEvent, analyzeLayer) {
+        function HighlightSectorById(highlightSectorId, protobufEvent, analyzeLayer, label) {
             $('#lat').val("");
             $('#lon').val("");
             $('#shape').val(highlightSectorId);
-
+            selected_feature_label = label;
             let selectedExists = sector_select_by_id  === highlightSectorId;
 
             if (selectedExists === true) {
@@ -847,8 +849,6 @@
 
                     if (datalayer_parameters[value_id]) {
                         analyze_bccaqv2_parameters += datalayer_parameters[value_id] + ": " + value.data + ";  ";
-                    } else {
-                        throw ('Can not get Analyze_BCCAQv2_* dataLayer parameters key: ' + value_id);
                     }
                 });
 
@@ -901,6 +901,10 @@
                         sectorCoord["s_lon"]= lutBySectorId.map(x => x[1]).join(',');
 
                         form_obj = CreateAnalyzeProcessRequestData(sectorCoord, form_inputs, form_obj);
+                        form_obj['inputs'].push({
+                            'id': 'output_name',
+                            'data': submit_url_var + '_' + locations_type + '_' + selected_feature_label
+                        });
                         SubmitAnalyzeProcess(pathToAnalyzeForm);
                     }).fail(function() { console.error("Can not get file " + getUrl); })
                 }

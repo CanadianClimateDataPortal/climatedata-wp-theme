@@ -310,6 +310,15 @@
       </header>
 
 			<?php
+        
+				$related_slides = 3;
+				$blanks = 0;
+				
+				if ( count ( get_sub_field ( 'slides' ) ) == 3 )
+				  $related_slides = 2;
+				
+				if ( count ( get_sub_field ( 'slides' ) ) < 3 )
+				  $blanks = 3 - count ( get_sub_field ( 'slides' ) );
 
 				if ( have_rows ( 'slides' ) ) {
 
@@ -319,10 +328,10 @@
 
         <div class="subsection">
           <div class="row">
-
+            
 						<div id="sector-related-content" class="col-10 col-md-11 offset-1">
 							<div id="sector-related-slick" class="" data-slick='{
-								"slidesToShow": 3,
+								"slidesToShow": <?php echo $related_slides; ?>,
 								"draggable": false,
 								"prevArrow": false,
 								"nextArrow": "#sector-related-next",
@@ -419,6 +428,18 @@
 									}
 
 								?>
+								
+								<?php
+  								
+  								// blanks
+  								
+									if ( $blanks != 0 ) {
+										for ( $i = 0; $i < $blanks; $i += 1 ) {
+											echo "\n" . '<div class="pr-sm-4"></div>';
+										}
+									}
+    						  
+  						  ?>
 
 							</div>
 

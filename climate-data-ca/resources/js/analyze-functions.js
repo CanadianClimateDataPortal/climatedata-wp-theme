@@ -7,18 +7,6 @@
         //
 
         var gridline_color = '#657092';
-        var gridline_color_hover = '#060d12';
-        var gridline_color_active = '#e50e40';
-        var gridline_width = '0.2';
-        var gridline_width_active = '1';
-        var gridfill_color_hover = '#000';
-
-        const select_locations = {
-            GRID: "grid",
-            WATERSHED: "watershed",
-            CENSUS : "census",
-            HEALTH: "health"
-        };
 
         const sector_feature_style_color = {
             'default':{
@@ -83,6 +71,7 @@
         }
 
         var form_obj = $.extend(true, {}, default_obj)
+        var selected_feature_label = '';
 
         var submit_url_var = '',
             submit_url_post = '/jobs'
@@ -270,7 +259,7 @@
                     }
                 }
             }
-            validate_steps()
+            validate_steps();
             validate_inputs(itemInput);
         });
 
@@ -573,7 +562,8 @@
                             }
                         }
                         ).on('click', function (e) {
-                            HighlightSectorById(e.layer.properties.id, e, analyzeLayer);
+                            HighlightSectorById(e.layer.properties.id, e, analyzeLayer, e.layer.properties[l10n_labels.label_field]);
+
                             validate_inputs(sector);
                         }).addTo(analyze_map);
                         resolve("Sector protobuf initialzed!")
@@ -595,24 +585,22 @@
         };
 
 
-        function HighlightSectorById(highlightSectorId, protobufEvent, analyzeLayer) {
+        function HighlightSectorById(highlightSectorId, protobufEvent, analyzeLayer, label) {
             $('#lat').val("");
             $('#lon').val("");
             $('#shape').val(highlightSectorId);
-
+            selected_feature_label = label;
             let selectedExists = sector_select_by_id  === highlightSectorId;
 
             if (selectedExists === true) {
                 sector_select_by_id  = undefined;
-                DeselectSector(highlightSectorId, analyzeLayer);
+                analyzeLayer.resetFeatureStyle(highlightSectorId);
                 $('#shape').val('');
             } else {
-                let old_selection = sector_select_by_id ;
 
                 // Deselect old sector
-                if(old_selection !== undefined){
-                    DeselectSector(old_selection, analyzeLayer);
-                    analyzeLayer.resetFeatureStyle(old_selection);
+                if(sector_select_by_id !== undefined){
+                    analyzeLayer.resetFeatureStyle(sector_select_by_id);
                 }
 
                 sector_select_by_id  = highlightSectorId;
@@ -632,17 +620,6 @@
             $('#analyze-breadcrumb').find('.grid-count').text(sector_select_by_id  !== undefined ? 1 : 0);
 
             L.DomEvent.stop(protobufEvent);
-        }
-
-        function DeselectSector(sectorId, analyzeLayer) {
-            analyzeLayer.setFeatureStyle(sectorId, {
-                weight: 0.1,
-                color: sector_feature_style_color['default']['color'],
-                opacity: 1,
-                fill: true,
-                radius: 4,
-                fillOpacity: 0
-            });
         }
 
         var start_val = 1950
@@ -872,8 +849,6 @@
 
                     if (datalayer_parameters[value_id]) {
                         analyze_bccaqv2_parameters += datalayer_parameters[value_id] + ": " + value.data + ";  ";
-                    } else {
-                        throw ('Can not get Analyze_BCCAQv2_* dataLayer parameters key: ' + value_id);
                     }
                 });
 
@@ -897,7 +872,7 @@
         $('#analyze-process').click(function (e) {
             if (!$(this).hasClass('disabled')) {
 
-                let pathToAnalyzeForm = child_theme_dir + 'resources/ajax/analyze-form.php'
+                let pathToAnalyzeForm = child_theme_dir + 'resources/ajax/analyze-form.php';
                 form_obj = $.extend(true, {}, default_obj)
 
                 // build the final input object to send to the API
@@ -918,26 +893,23 @@
                     form_obj = CreateAnalyzeProcessRequestData(sectorCoord, form_inputs, form_obj);
                     SubmitAnalyzeProcess(pathToAnalyzeForm);
                 }else{
-                    // ex: https://dataclimatedata.crim.ca/partition-to-points/health/2.json
-                    getUrl = "https://dataclimatedata.crim.ca/partition-to-points/"+ locations_type +"/"+ form_inputs["shape"] +".json"
+                    // ex: https://data.climatedata.ca/partition-to-points/health/2.json
+                    let getUrl = hosturl + "/partition-to-points/"+ locations_type +"/"+ form_inputs["shape"] +".json";
 
                     $.getJSON(getUrl).then(function(lutBySectorId){
-                        for (var i = 0; i < lutBySectorId.length; i++) {
-                            if(sectorCoord["s_lat"] == ''){
-                                sectorCoord["s_lat"] = lutBySectorId[i][0];
-                                sectorCoord["s_lon"] = lutBySectorId[i][1];
-                            }else{
-                                sectorCoord["s_lat"] += ',' + lutBySectorId[i][0];
-                                sectorCoord["s_lon"] += ',' + lutBySectorId[i][1];
-                            }
-                        }
+                        sectorCoord["s_lat"]= lutBySectorId.map(x => x[0]).join(',');
+                        sectorCoord["s_lon"]= lutBySectorId.map(x => x[1]).join(',');
 
                         form_obj = CreateAnalyzeProcessRequestData(sectorCoord, form_inputs, form_obj);
+                        form_obj['inputs'].push({
+                            'id': 'output_name',
+                            'data': submit_url_var + '_' + locations_type + '_' + selected_feature_label
+                        });
                         SubmitAnalyzeProcess(pathToAnalyzeForm);
                     }).fail(function() { console.error("Can not get file " + getUrl); })
                 }
             }
-        })
+        });
 
 
         function SubmitAnalyzeProcess(pathToAnalyzeForm) {
@@ -1000,7 +972,7 @@
                         data_form_obj['inputs'].push({
                             'id': key,
                             'data': data_form_inputs[key]
-                        })
+                        });
                         break;
 
                     case 'rcp':
@@ -1024,7 +996,7 @@
                         data_form_obj['inputs'].push({
                             'id': key,
                             'data': addData
-                        })
+                        });
                         break;
                 }
             }
@@ -1195,14 +1167,7 @@
                 }
             }
 
-            pbfLayer.setFeatureStyle(gridSelected, {
-                weight: 0.1,
-                color: gridline_color,
-                opacity: 1,
-                fill: true,
-                radius: 4,
-                fillOpacity: 0
-            });
+            pbfLayer.resetFeatureStyle(gridSelected);
         }
 
         // GEO-SELECT
@@ -1606,14 +1571,14 @@
 
             // make sure lat/lon has a value
             if (IsSelectLocations(sectorSelect) && sectorSelect !== 'grid' ){
-                $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide()
-                $('#clear-grids').hide()
+                $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
+                $('#clear-grids').hide();
             } else if ($('#lat').val() == '' || $('#lon').val() == '') {
-                $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').show()
-                $('#clear-grids').hide()
+                $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').show();
+                $('#clear-grids').hide();
             } else {
-                $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide()
-                $('#clear-grids').show()
+                $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
+                $('#clear-grids').show();
             }
 
             // if everything is valid,

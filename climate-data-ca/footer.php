@@ -163,9 +163,9 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
 				<div class="row">
 					<div class="col-10 offset-1 col-md-6 offset-md-3">
 
-						<h2 class="text-primary"><?php the_field ( 'newsletter_title', 'option' ); ?></h2>
+						<h2 class="text-primary"><?php _e('ClimateData.ca Newsletter', 'cdc'); ?></h2>
 
-						<p><?php the_field ( 'newsletter_text', 'option' ); ?></p>
+						<p><?php _e('Join our newsletter for periodic updates.', 'cdc'); ?></p>
 
 						<!-- Begin Mailchimp Signup Form -->
 						<div id="mc_embed_signup" class="mt-5">

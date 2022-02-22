@@ -70,6 +70,8 @@
 
               <input class="add-to-object" type="hidden" name="lat" id="lat" value="">
               <input class="add-to-object" type="hidden" name="lon" id="lon" value="">
+              <input class="add-to-object" type="hidden" name="shape" id="shape" value="">
+              <input class="add-to-object" type="hidden" name="average" id="average" value="">
 
               <div id="analyze-steps">
                 <div class="accordion-head" data-step="1">
@@ -103,7 +105,7 @@
                   </h5>
                 </div>
 
-                <div class="accordion-content" data-step="2">
+                <div class="accordion-content select-locations" data-step="2">
                   <div class="accordion-content-inner">
                     <div class="field validate-input type-radio">
                       <div class="input-row form-check">
@@ -115,12 +117,27 @@
                         <!--<span class="tooltip-icon"><i class="fas fa-question"></i></span>-->
                       </div>
 
-                      <div class="input-row form-check">
+                    <div class="input-row form-check">
                         <div class="input-item">
-                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-grid" value="grid" disabled>
-                          <label class="form-check-label" for="analyze-location-grid"><?php _e ( 'Other location types coming soon', 'cdc' ); ?></label>
+                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-watershed" value="watershed">
+                          <label class="form-check-label" for="analyze-location-watershed"><?php _e ( 'Watershed', 'cdc' ); ?></label>
                         </div>
-                      </div>
+                    </div>
+
+                    <div class="input-row form-check">
+                        <div class="input-item">
+                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-census-division" value="census">
+                          <label class="form-check-label" for="analyze-location-census-division"><?php _e ( 'Census division', 'cdc' ); ?></label>
+                        </div>
+                    </div>
+
+                    <div class="input-row form-check">
+                        <div class="input-item">
+                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-health-region" value="health">
+                          <label class="form-check-label" for="analyze-location-health-region"><?php _e ( 'Health region', 'cdc' ); ?></label>
+                        </div>
+                    </div>
+
                     </div>
                   </div>
                 </div>

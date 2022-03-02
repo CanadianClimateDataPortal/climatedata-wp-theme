@@ -642,6 +642,11 @@
                   </div>
                 </div>
 
+								<div class="form-check form-check-inline mt-4">
+								  <input class="form-check-input" type="checkbox" value="" id="signup">
+								  <label class="form-check-label" for="signup"><?php _e ( 'Subscribe to the ClimateData.ca newsletter', 'cdc' ); ?></label>
+								</div>
+
               </div>
 
               <div class="col-8-of-8 p-4">

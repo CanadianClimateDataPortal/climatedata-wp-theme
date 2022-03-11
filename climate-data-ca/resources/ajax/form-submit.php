@@ -7,6 +7,7 @@ wp();
 $to_2 = $GLOBALS['vars']['feedback_email'];
 
 include_once ( locate_template ( 'resources/php/securimage/securimage.php' ) );
+include_once(locate_template('resources/php/mailchimp.php'));
 
 $securimage = new Securimage();
 
@@ -89,6 +90,10 @@ if ($securimage->check($_GET['captcha_code']) == false) {
   }
   else {
     echo 'failed';
+  }
+
+  if(isset( $form_data['signup']) && $form_data['signup'] == "true") {
+      mailchimp_register($form_data['email']);
   }
 
 }

@@ -12,9 +12,11 @@ function custom_global_vars()
     $vars['analytics_ua_fr'] = "G-CPGH39EQSH";
     $vars['googletag_id'] = "GTM-NJ7L4NR";
     $vars['ga_cross_domain'] = "";
-    $vars['feedback_email'] = "louis-david.perron@crim.ca";
-    $vars['training_email'] = "louis-david.perron@crim.ca";
-
+    $vars['feedback_email'] = "nullbox@climatedata.ca";
+    $vars['training_email'] = "nullbox@climatedata.ca";
+    $vars['mailchimp_api_key'] = "";
+    $vars['mailchimp_url'] = "";
+    $vars['mailchimp_list_id'] = "";
 }
 
 

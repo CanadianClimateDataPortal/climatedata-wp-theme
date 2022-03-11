@@ -641,6 +641,7 @@
 
                 var submit_data = {
                     'analyze-captcha_code': $('#analyze-captcha_code').val(),
+                    "signup":$('#signup').is(":checked"),
                     'request_data': form_obj,
                     'submit_url': submit_url_var + submit_url_post
                 }

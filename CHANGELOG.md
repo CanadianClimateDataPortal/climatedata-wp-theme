@@ -1,5 +1,8 @@
-2022-01-20.01
+2022-03-15.01
   * Added netcdf format for variable download
+
+2022-03-10.01
+  * Added mailchimp subscribe integration to analyze, download and feedback form
 
 2021-11-19.02
   * Allow multiple RCP selection in analyze page

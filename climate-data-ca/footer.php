@@ -163,9 +163,9 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
 				<div class="row">
 					<div class="col-10 offset-1 col-md-6 offset-md-3">
 
-						<h2 class="text-primary"><?php the_field ( 'newsletter_title', 'option' ); ?></h2>
+						<h2 class="text-primary"><?php _e('ClimateData.ca Newsletter', 'cdc'); ?></h2>
 
-						<p><?php the_field ( 'newsletter_text', 'option' ); ?></p>
+						<p><?php _e('Join our newsletter for periodic updates.', 'cdc'); ?></p>
 
 						<!-- Begin Mailchimp Signup Form -->
 						<div id="mc_embed_signup" class="mt-5">
@@ -175,10 +175,10 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
 									<label for="mce-EMAIL" class="sr-only">Email Address</label>
 
 									<div class="input-group mc-field-group">
-										<input type="email" value="" name="EMAIL" class="required email form-control form-control-lg" id="mce-EMAIL" placeholder="Enter your email address">
+										<input type="email" value="" name="EMAIL" class="required email form-control form-control-lg" id="mce-EMAIL" placeholder="<?php _e('Enter your email address', 'cdc'); ?>">
 
 									  <div class="input-group-append">
-											<input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="btn btn-outline-secondary">
+											<input type="submit" value="<?php _e('Subscribe','cdc'); ?>" name="subscribe" id="mc-embedded-subscribe" class="btn btn-outline-secondary">
 									  </div>
 									</div>
 
@@ -206,7 +206,6 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
       var base_href = '<?php echo $GLOBALS['vars']['site_url']; ?>';
       var L_DISABLE_3D = true;
       var DATA_URL = '<?php echo $GLOBALS['vars']['data_url']; ?>';
-      var PAVICS_URL = '<?php echo $GLOBALS['vars']['pavics_url']; ?>';
     </script>
 
     <?php

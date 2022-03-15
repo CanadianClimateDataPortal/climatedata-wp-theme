@@ -206,7 +206,6 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
       var base_href = '<?php echo $GLOBALS['vars']['site_url']; ?>';
       var L_DISABLE_3D = true;
       var DATA_URL = '<?php echo $GLOBALS['vars']['data_url']; ?>';
-      var PAVICS_URL = '<?php echo $GLOBALS['vars']['pavics_url']; ?>';
     </script>
 
     <?php

@@ -852,7 +852,7 @@
         $('#daily-process').click(function (e) {
             e.preventDefault();
 
-            var var_name = '';
+            let var_name = '';
 
             switch ($('#download-variable').val()) {
 
@@ -867,113 +867,92 @@
                 case 'prcptot':
                     var_name = 'pr';
                     break;
+            }
+
+            let split_coords = $('#download-coords').val().split('|'),
+                lat_vals = '',
+                lon_vals = '';
+
+            // remove first element which is empty because the first character is always '|'
+            split_coords.shift();
+
+            for (i = 0; i < split_coords.length; i += 1) {
+
+                let this_coord = split_coords[i].split(',');
+
+                if (lat_vals !== '') {
+                    lat_vals += ','
+                }
+
+                lat_vals += this_coord[0];
+
+                if (lon_vals !== '') {
+                    lon_vals += ','
+                }
+
+                lon_vals += this_coord[1]
 
             }
 
-            var form_data = $('#download-form').serialize();
+            var submit_data = {
+                "captcha_code":$('#daily-captcha_code').val(),
+                "signup":$('#signup').is(":checked"),
+                "submit_url": "/providers/finch/processes/subset_ensemble_BCCAQv2/jobs",
+                "request_data": {
+                    "inputs": [
+                        {
+                            "id": "variable",
+                            "data": var_name,
+                        },
+                        {
+                            "id": "lat0",
+                            "data": lat_vals
+                        },
+                        {
+                            "id": "lon0",
+                            "data": lon_vals
+                        },
+                        {
+                            "id": "data_validation",
+                            "data": "warn"
+                        },
+                        {
+                            "id": "output_format",
+                            "data": $('input[name="download-format"]:checked').val()
+                        },
+                    ],
+                    "response": "document",
+                    "notification_email": $('#daily-email').val(),
+                    "mode": "auto",
+                    "outputs": [{
+                        "transmissionMode": "reference",
+                        "id": "output"
+                    }]
+                }
+            };
 
             $.ajax({
-                url: child_theme_dir + 'resources/ajax/download-form.php',
-                data: form_data,
+                url: child_theme_dir + 'resources/ajax/finch-submit.php',
+                method: "POST",
+                data: submit_data,
                 success: function (data) {
+                    var response = JSON.parse(data);
+                    console.log(response);
+                    if (typeof response == 'object' && response.status == 'accepted') {
 
-                    if (data === 'success') {
+                        $('#daily-captcha_code').removeClass('border-secondary').tooltip('dispose');
+                        $('#success-modal').modal('show');
 
-                        $('#daily-captcha_code').removeClass('border-secondary').tooltip('dispose')
-
-                        var split_coords = $('#download-coords').val().split('|'),
-                            lat_vals = '',
-                            lon_vals = ''
-
-                        // remove first element which is empty because the first character is always '|'
-                        split_coords.shift()
-
-                        for (i = 0; i < split_coords.length; i += 1) {
-
-                            var this_coord = split_coords[i].split(',')
-
-                            if (lat_vals !== '') {
-                                lat_vals += ','
-                            }
-
-                            lat_vals += this_coord[0]
-
-                            if (lon_vals !== '') {
-                                lon_vals += ','
-                            }
-
-                            lon_vals += this_coord[1]
-
-                        }
-
-                        var request = $.ajax({
-                            url: PAVICS_URL + '/providers/finch/processes/subset_ensemble_BCCAQv2/jobs',
-                            method: 'POST',
-                            crossDomain: true,
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            data: JSON.stringify({
-                                "inputs": [
-                                    {
-                                        "id": "variable",
-                                        "data": var_name,
-                                    },
-                                    {
-                                        "id": "lat0",
-                                        "data": lat_vals
-                                    },
-                                    {
-                                        "id": "lon0",
-                                        "data": lon_vals
-                                    },
-                                    {
-                                        "id": "data_validation",
-                                        "data": "warn"
-                                    },
-                                    {
-                                        "id": "output_format",
-                                        "data": $('input[name="download-format"]:checked').val()
-                                    },
-                                ],
-                                "response": "document",
-                                "notification_email": $('#daily-email').val(),
-                                "mode": "auto",
-                                "outputs": [{
-                                    "transmissionMode": "reference",
-                                    "id": "output"
-                                }]
-                            }),
-                            success: function (data) {
-
-                                if (data.status === 'accepted') {
-
-                                    $('#success-modal').modal('show');
-
-                                }
-
-                            },
-                            complete: function () {
-
-                                $('#daily-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php')
-                                $('#daily-captcha_code').val('')
-
-                            }
-                        });
-
-                        request.fail(function (a, b) {
-                            //
-                        });
-
-                    } else if (data === 'captcha failed') {
-
+                    } else if (typeof response == 'object' && response.status == 'captcha failed') {
                         $('#daily-captcha_code').addClass('border-secondary').tooltip('show');
-
                     }
+                },
+                complete: function () {
+                    $('#daily-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php');
+                    $('#daily-captcha_code').val('');
                 }
             });
-
-        })
+        });
 
         //
         // STATION

@@ -10,3 +10,4 @@ error_log
 .idea
 proto/
 .DS_Store
+*.css.map

@@ -932,8 +932,9 @@
             }
 
             var submit_data = {
-                "daily-captcha_code":$('#daily-captcha_code').val(),
+                "captcha_code":$('#daily-captcha_code').val(),
                 "signup":$('#signup').is(":checked"),
+                "submit_url": "/providers/finch/processes/subset_ensemble_BCCAQv2/jobs",
                 "request_data": {
                     "inputs": [
                         {
@@ -968,7 +969,7 @@
             };
 
             $.ajax({
-                url: child_theme_dir + 'resources/ajax/download-form.php',
+                url: child_theme_dir + 'resources/ajax/finch-submit.php',
                 method: "POST",
                 data: submit_data,
                 success: function (data) {

@@ -81,10 +81,44 @@
         var stations_submit_url_var = '',
             stations_submit_url_post = '/jobs'
 
-        var markerMap = [];
-        stationFromAPI = [];
-        var pointsLayer;
-        var selected_stations = {};
+        var markerMap = [],
+						stationFromAPI = [],
+						ahccd_icons = {
+							P: L.icon({
+									iconUrl: child_theme_dir + 'resources/app/ahccd/triangle-blue.png',
+									iconSize: [15, 15],
+									iconAnchor: [7, 7]
+							}),
+							Pr: L.icon({
+									iconUrl: child_theme_dir + 'resources/app/ahccd/triangle-red.png',
+									iconSize: [15, 15],
+									iconAnchor: [7, 7]
+							}),
+							T: L.icon({
+									iconUrl: child_theme_dir + 'resources/app/ahccd/square-blue.png',
+									iconSize: [15, 15],
+									iconAnchor: [7, 7]
+							}),
+							Tr: L.icon({
+									iconUrl: child_theme_dir + 'resources/app/ahccd/square-red.png',
+									iconSize: [15, 15],
+									iconAnchor: [7, 7]
+							}),
+							B: L.icon({
+									iconUrl: child_theme_dir + 'resources/app/ahccd/circle-blue.png',
+									iconSize: [15, 15],
+									iconAnchor: [7, 7]
+							}),
+							Br: L.icon({
+									iconUrl: child_theme_dir + 'resources/app/ahccd/circle-red.png',
+									iconSize: [15, 15],
+									iconAnchor: [7, 7]
+							})
+						},
+						ahccd_layer,
+						ahccd_layerGroups = [],
+						selected_stations = {},
+						selected_station_type
 
         // MAPS
 
@@ -263,8 +297,52 @@
 				})
 
 				$('#analyze-stations .accordion-content[data-step="2"] .input-item').on('click', function (e) {
-						$('#analyze-stations-map-overlay-content h4').html(stations_overlay_text[2]['head'])
-						$('#analyze-stations-map-overlay-content p').html(stations_overlay_text[2]['text'])
+
+					// update map overlay
+
+					$('#analyze-stations-map-overlay-content h4').html(stations_overlay_text[2]['head'])
+					$('#analyze-stations-map-overlay-content p').html(stations_overlay_text[2]['text'])
+
+					// filter stations
+
+					var this_type = $(this).closest('.input-row').attr('data-station-type')
+
+					if (this_type !== undefined && this_type != '') {
+
+						selected_station_type = this_type
+
+						// show/hide layer groups
+
+						switch(this_type) {
+							case 'T' :
+								maps['stations'].removeLayer(ahccd_layerGroups['P'])
+								maps['stations'].addLayer(ahccd_layerGroups['T'])
+								break
+
+							case 'P' :
+								maps['stations'].removeLayer(ahccd_layerGroups['T'])
+								maps['stations'].addLayer(ahccd_layerGroups['P'])
+								break
+
+						}
+
+					}
+
+					// clear station select
+
+					$('#station-select').val(null).trigger('change')
+
+					// reset icons
+
+					selected_stations = {}
+
+					ahccd_layer.eachLayer(function (layer) {
+
+						layer.setIcon(ahccd_icons[layer.feature.properties.type])
+
+					})
+
+
 				})
 
 				//
@@ -831,95 +909,85 @@
 
 	        })
 
-					$.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE', function (data) {
+					$.getJSON(child_theme_dir + 'resources/app/ahccd/ahccd.json', function (data) {
 
-							var markers = L.markerClusterGroup();
+							let ahccd_layer_cluster = L.markerClusterGroup();
 
-							var geojsonMarkerOptions = {
-									// Stroke properties
-									color: '#3d68f6',
-									opacity: 1,
-									weight: 2,
-									pane: 'idf',
-									// Fill properties
-									fillColor: '#3d68f6',
-									fillOpacity: 1,
-									radius: 5
-							};
+							ahccd_layer = L.geoJson(data, {
+									onEachFeature: function (feature, layer) {
+											$('<option value="' + feature.properties.ID + '">' + feature.properties.Name + '</option>').appendTo('#station-select');
+											//does layerGroup already exist? if not create it and add to map
+											var lg = ahccd_layerGroups[feature.properties.type];
 
-							pointsLayer = L.geoJson(data, {
+											if (lg === undefined) {
+													lg = new L.featureGroup.subGroup(ahccd_layer_cluster);
+													//add the layer to the map
+													lg.addTo(maps['stations']);
+													//store layer
+													ahccd_layerGroups[feature.properties.type] = lg;
+											}
+
+											//add the feature to the layer
+											lg.addLayer(layer);
+									},
 									pointToLayer: function (feature, latlng) {
-											return L.circleMarker(latlng, geojsonMarkerOptions);
+											return new L.Marker(latlng, {
+													icon: ahccd_icons[feature.properties.type]
+											});
 									}
-
 
 							}).on('mouseover', function (e) {
-									e.layer.bindTooltip(e.layer.feature.properties.STATION_NAME + ' ' + e.layer.feature.properties.STN_ID).openTooltip(e.latlng);
+									e.layer.bindTooltip(e.layer.feature.properties.Name).openTooltip(e.latlng);
 							}).on('click', function (e) {
 
-									// get current station select value
-									var existingData = $("#station-select").select2("val");
-									// clicked ID
-									var clicked_ID = e.layer.feature.properties.STN_ID.toString();
+								var this_type = e.layer.feature.properties.type
 
-									if (selected_stations[clicked_ID] !== undefined) {
-											delete selected_stations[clicked_ID];
-									} else {
-											selected_stations[clicked_ID] = e.layer.feature.properties.STATION_NAME;
-									}
+								// get current station select value
+								var selection = $("#station-select").val() || [];
 
-									// default colour
-									markerColor = '#F00';
+								var clicked_ID = e.layer.feature.properties.ID;
 
-									if (existingData != null) {
+								// search if clicked feature is already selected
+								idx = selection.indexOf(clicked_ID);
 
-											if (existingData.includes(clicked_ID)) {
+								if (idx != -1) {
+										selection.splice(idx, 1);
+										$('#station-select').val(selection).change();
+										icon = ahccd_icons[this_type];
+								} else {
+										selection.push(clicked_ID);
+										$('#station-select').val(selection).change();
+										icon = ahccd_icons[this_type + 'r'];
+								}
 
-													var $select = $('#station-select');
-													index = existingData.indexOf(clicked_ID);
+								e.layer.setIcon(icon);
 
-													if (index > -1) {
-															existingData.splice(index, 1);
-													}
+								selected_stations = selection
 
-													$('#station-select').val(existingData).change();
-													markerColor = '#3d68f6';
+								validate_steps()
+								validate_inputs()
 
-											} else {
-
-													existingData.push(clicked_ID);
-													$('#station-select').val(existingData).change();
-
-											}
-									} else {
-
-											existingData = [clicked_ID];
-											$('#station-select').val(existingData).change();
-
-									}
-
-									e.layer.setStyle({
-											// Stroke properties
-											color: markerColor,
-											opacity: 1,
-											weight: 2,
-											pane: 'idf',
-											// Fill properties
-											fillColor: markerColor,
-											fillOpacity: 1,
-											radius: 5
-									});
-
-									validate_steps()
-									validate_inputs()
 							});
 
-							markers.addLayer(pointsLayer);
+							// sort options
 
-							maps['stations'].addLayer(markers);
+							let arr = $('#station-select option').map(function (_, o) {
+									return { t: $(o).text(), v: o.value };
+							}).get();
 
+							arr.sort(function (o1, o2) {
+									return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0;
+							});
 
-					});
+							$('#station-select option').each(function (i, o) {
+									o.value = arr[i].v
+									$(o).text(arr[i].t)
+							});
+
+							// add to map
+							ahccd_layer_cluster.addTo(maps['stations']);
+
+					})
 
 					validate_steps()
 					validate_inputs()
@@ -927,54 +995,42 @@
 				}
 
 				// trigger when a tag is removed from multiple station selector input
-        $('#station-select').on('select2:unselect', function (e) {
-            marker_id = parseFloat(e.params.data.id);
-            pointsLayer.eachLayer(function (layer) {
-                if (layer.feature.properties.STN_ID === marker_id) {
-                    delete selected_stations[marker_id];
-                    layer.setStyle({
-                        // Stroke properties
-                        color: '#3d68f6',
-                        opacity: 1,
-                        weight: 2,
-                        pane: 'idf',
-                        // Fill properties
-                        fillColor: '#3d68f6',
-                        fillOpacity: 1,
-                        radius: 5
-                    })
-                }
-            });
+				$('#station-select').on('select2:unselect', function (e) {
 
-						validate_steps()
-						validate_inputs()
+					ahccd_layer.eachLayer(function (layer) {
 
-        });
+						if (layer.feature.properties.ID === e.params.data.id) {
 
-        // trigger when a tag is added to multiple station selector input
-        $('#station-select').on('select2:select', function (e) {
-            marker_id = parseInt(e.params.data.id);
-            pointsLayer.eachLayer(function (layer) {
-                if (layer.feature.properties.STN_ID === marker_id) {
-                    selected_stations[marker_id] = layer.feature.properties.STATION_NAME;
-                    layer.setStyle({
-                        // Stroke properties
-                        color: '#F00',
-                        opacity: 1,
-                        weight: 2,
-                        pane: 'idf',
-                        // Fill properties
-                        fillColor: '#F00',
-                        fillOpacity: 1,
-                        radius: 5
-                    })
-                }
-            });
+							delete selected_stations[e.params.data.id]
+							layer.setIcon(ahccd_icons[layer.feature.properties.type])
 
-						validate_steps()
-						validate_inputs()
+						}
 
-        });
+					})
+
+					validate_steps()
+					validate_inputs()
+
+				})
+
+				// trigger when a tag is added to multiple station selector input
+				$('#station-select').on('select2:select', function (e) {
+
+					ahccd_layer.eachLayer(function (layer) {
+
+						if (layer.feature.properties.ID === e.params.data.id) {
+
+							selected_stations[e.params.data.id] = layer.feature.properties.Name;
+							layer.setIcon(ahccd_icons[layer.feature.properties.type + 'r'])
+
+						}
+
+					})
+
+					validate_steps()
+					validate_inputs()
+
+				})
 
 				//
 				// MISC
@@ -1779,7 +1835,6 @@
 
 						for (var key in stations_form_thresholds) {
 								if (stations_form_thresholds[key] == '') {
-									console.log(key)
 										is_valid = false
 										stations_thresholds_have_val = false
 								}
@@ -1884,17 +1939,7 @@
 
 								// stations
 
-								var stations_str = ''
-
-								for (var key in selected_stations) {
-									stations_str += key + ','
-								}
-
-								stations_str = stations_str.slice(0, -1)
-
-								stations_form_obj['inputs'].push({
-									'stations': stations_str
-								})
+								stations_form_obj['stations'] = selected_stations
 
 								// email
 								stations_form_obj['notification_email'] = $('#analyze-stations-email').val()

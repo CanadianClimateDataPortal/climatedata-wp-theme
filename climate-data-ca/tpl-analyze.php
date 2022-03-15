@@ -762,6 +762,7 @@
                         while ( have_rows ( 'analyze_vars' ) ) {
                           the_row();
 
+													$var_key = get_sub_field ( 'var' );
                           $var_description = array ();
 
                           if ( have_rows ( 'description' ) ) {
@@ -807,10 +808,11 @@
 
                     ?>
 
-                    <div class="input-row form-check input-variable" data-frequencies='<?php the_sub_field ('frequencies'); ?>' data-content='<?php echo json_encode ( $var_description ); ?>'>
+                    <div class="input-row form-check input-variable" data-frequencies='<?php the_sub_field ('frequencies'); ?>' data-content='<?php echo json_encode ( $var_description ); ?>'
+											data-station-type="<?php echo get_sub_field ( 'type' ); ?>">
                       <div class="input-item">
-                        <input class="form-check-input" type="radio" name="analyze-stations-var" id="analyze-stations-var-<?php the_sub_field ( 'var' ); ?>" value="<?php the_sub_field ( 'var' ); ?>">
-                        <label class="form-check-label" for="analyze-stations-var-<?php the_sub_field ( 'var' ); ?>"><?php the_sub_field ( 'name' ); ?></label>
+                        <input class="form-check-input" type="radio" name="analyze-stations-var" id="analyze-stations-var-<?php echo $var_key; ?>" value="<?php echo $var_key; ?>">
+                        <label class="form-check-label" for="analyze-stations-var-<?php echo $var_key; ?>"><?php the_sub_field ( 'name' ); ?></label>
                       </div>
 
                     </div>
@@ -847,18 +849,7 @@
 										data-dropdown-css-class="big-menu-dropdown"
 										data-placeholder="<?php _e ( 'Select station(s)','cdc' ); ?>"
 									>
-						        <?php
 
-						          include ( locate_template ( 'resources/app/db.php' ) );
-
-						          $query = "SELECT stn_id,station_name FROM stations";
-						          $result = mysqli_query($con, $query) or die(mysqli_error($con) . "[" . $query . "]");
-
-						          while ($row = mysqli_fetch_array($result)) {
-						            echo '<option value="' . $row['stn_id'] . '">' . $row['station_name'] . '</option>';
-						          }
-
-						        ?>
 						      </select>
 								</div>
 
@@ -1090,7 +1081,7 @@
 
             <div class="d-flex align-items-center">
               <img id="analyze-stations-captcha" src="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/php/securimage/securimage_show.php" alt="CAPTCHA Image" />
-              <input type="text" name="analyze-stations-captcha_code" id="analyze-stations-captcha_code" class="form-control ml-4" placeholder="XXXX" value="xxxx" size="4" maxlength="4" autocomplete="off" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Non-valid entered characters. Please try again.', 'cdc' ); ?>" />
+              <input type="text" name="analyze-stations-captcha_code" id="analyze-stations-captcha_code" class="form-control ml-4" placeholder="XXXX" size="4" maxlength="4" autocomplete="off" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Non-valid entered characters. Please try again.', 'cdc' ); ?>" />
             </div>
           </div>
 
@@ -1098,7 +1089,7 @@
             <label for="analyze-stations-email"><?php _e ( 'Enter your email address', 'cdc' ); ?>:</label>
 
             <div class="input-group input-group-lg">
-              <input type="email" name="analyze-stations-email" id="analyze-stations-email" class="form-control" aria-label="" placeholder="" value="dummy@dummy.ca" required>
+              <input type="email" name="analyze-stations-email" id="analyze-stations-email" class="form-control" aria-label="" placeholder="" required>
 
               <div class="input-group-append">
                 <a class="btn btn-secondary text-white all-caps download-process-btn disabled" id="analyze-stations-process" target="_blank"><?php _e ( 'Send Request', 'cdc' ); ?> <i class="far fa-arrow-alt-circle-down"></i></a>

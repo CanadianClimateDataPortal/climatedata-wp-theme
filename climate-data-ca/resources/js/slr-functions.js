@@ -39,6 +39,11 @@
             query['decade'] = '2020';
         }
 
+        if ($('#mora').length) {
+            query['mora'] = $('#mora').val();
+        } else {
+            query['mora'] = 'ann';
+        }
 
         var history_action = 'init', // global tracking variable for history action
             station_on = false, // flag for showing/hiding the stations layer,
@@ -901,6 +906,7 @@
 
                 switch ($(this).attr('data-type')) {
                     case 'csv' :
+                        setDataLayerForChartData('csv', chart);
                         chart.downloadCSV();
                         break;
                 }
@@ -911,22 +917,144 @@
                 e.preventDefault();
 
                 var dl_type = '';
+                let file_format = '';
+                let case_val = $(this).attr('data-type');
 
-                switch ($(this).attr('data-type')) {
+                switch (case_val) {
                     case 'png' :
                         dl_type = 'image/png';
+                        file_format = case_val;
                         break;
                     case 'pdf' :
                         dl_type = 'application/pdf';
+                        file_format = case_val;
                         break;
                 }
-
+                setDataLayerForChartData(file_format, chart);
                 chart.exportChartLocal({
                     type: dl_type
                 });
             });
+        }
+
+        var frMonthDict = {
+            'jan': 'Janvier',
+            'feb': 'Février',
+            'mar': 'Mars',
+            'apr': 'Avril',
+            'may': 'Mai',
+            'jun': 'Juin',
+            'jul': 'Juillet',
+            'aug': 'Août',
+            'sep': 'Septembre',
+            'oct': 'Octobre',
+            'nov': 'Novembre',
+            'dec': 'Décembre',
+            'ann': 'Annuel'
+        };
+
+        var engMonthDict = {
+            'jan': 'January',
+            'feb': 'February',
+            'mar': 'March',
+            'apr': 'April',
+            'may': 'May',
+            'jun': 'June',
+            'jul': 'July',
+            'aug': 'August',
+            'sep': 'September',
+            'oct': 'October',
+            'nov': 'November',
+            'dec': 'December',
+            'ann': 'Annual'
+        };
+
+        function getRealMonthName(keySelected) {
+            keySelected = keySelected.toLowerCase();
+            var tempDict = engMonthDict;
+            if ($('body').hasClass('lang-fr')) {
+                tempDict = frMonthDict;
+            }
+
+            var realMonthName = "";
+            try {
+                if (tempDict[keySelected]) {
+                    realMonthName = tempDict[keySelected];
+                } else {
+                    throw ('Can not get the month with this key: ' + keySelected);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+            return realMonthName;
+        }
+
+        var variableDownloadDataTypes = {
+            // Variable_Download-Data_*
+            'slr': 'Sea-Level_Change'
+        };
+
+        function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
+            var gA4EventNameForVariableDownloadData = "";
+            keySelected = keySelected.toLowerCase();
+
+            try {
+                if (variableDownloadDataTypes[keySelected]) {
+                    var eventType = '';
+                    if (chartDataFormat.includes('csv')) {
+                        eventType = "Variable_Download-Data_";
+                    } else if (chartDataFormat.includes('pdf') || chartDataFormat.includes('png')) {
+                        eventType = "Variable_Download-Image_";
+                    } else {
+                        throw ('Invalid GA4 event file format (csv, pdf, png): ' + chartDataFormat);
+                    }
+                    gA4EventNameForVariableDownloadData = eventType + variableDownloadDataTypes[keySelected];
+                } else {
+                    throw ('Invalid GA4 event name (Variable_Download-Data_*): ' + keySelected);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+
+            return gA4EventNameForVariableDownloadData;
+        }
 
 
+        function setDataLayerForChartData(chartDataFormat, chartData) {
+            if (!chartDataFormat.length) {
+                return;
+            }
+            var eventName = getGA4EventNameForVariableDownloadData(chartDataFormat, "slr");
+            var overlayTitle = $('.overlay-title').text();
+
+            // Exclude: Navigator 5
+            var addStr = "";
+            for (let index = 0; index < chartData.series.length; index++) {
+                var chartDataName = chartData.series[index].name;
+                if (chartData.series[index].visible && !chartDataName.includes('Navigator 5')) {
+                    addStr += chartData.series[index].name + ", ";
+                }
+            }
+
+            // Remove last 2 char: ;
+            if (addStr.length > 0) {
+                addStr = addStr.substring(0, addStr.length - 2);
+            }
+
+            // ex: Région de la Montérégie; rcp26; January
+            let chartDataSettings = overlayTitle + "; " + query['rcp'] + "; " + getRealMonthName(query['mora']);
+
+            console.log("download file type: " + chartDataFormat)
+            // console.log("eventName: " + eventName)
+
+            dataLayer.push({
+                'event': eventName,
+                'chart_data_event_type': eventName,
+                'chart_data_settings': chartDataSettings,
+                'chart_data_columns': addStr,
+                'chart_data_format': chartDataFormat,
+                'chart_data_view_by': ""
+            });
         }
 
         // LAYER CHART

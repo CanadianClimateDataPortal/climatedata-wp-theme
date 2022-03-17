@@ -906,7 +906,12 @@
 
                 switch ($(this).attr('data-type')) {
                     case 'csv' :
-                        setDataLayerForChartData('csv', chart);
+                        try {
+                            setDataLayerForChartData('csv', chart);
+                        } catch (e) {
+                            console.error(e);
+                        }
+
                         chart.downloadCSV();
                         break;
                 }
@@ -917,17 +922,14 @@
                 e.preventDefault();
 
                 var dl_type = '';
-                let file_format = '';
-                let case_val = $(this).attr('data-type');
+                let file_format = $(this).attr('data-type');
 
-                switch (case_val) {
+                switch (file_format) {
                     case 'png' :
                         dl_type = 'image/png';
-                        file_format = case_val;
                         break;
                     case 'pdf' :
                         dl_type = 'application/pdf';
-                        file_format = case_val;
                         break;
                 }
                 setDataLayerForChartData(file_format, chart);
@@ -938,35 +940,35 @@
         }
 
         var frMonthDict = {
-            'jan': 'Janvier',
-            'feb': 'Février',
-            'mar': 'Mars',
-            'apr': 'Avril',
-            'may': 'Mai',
-            'jun': 'Juin',
-            'jul': 'Juillet',
-            'aug': 'Août',
-            'sep': 'Septembre',
-            'oct': 'Octobre',
-            'nov': 'Novembre',
-            'dec': 'Décembre',
-            'ann': 'Annuel'
+            'jan': 'janvier',
+            'feb': 'février',
+            'mar': 'mars',
+            'apr': 'avril',
+            'may': 'mai',
+            'jun': 'juin',
+            'jul': 'juillet',
+            'aug': 'août',
+            'sep': 'septembre',
+            'oct': 'octobre',
+            'nov': 'novembre',
+            'dec': 'décembre',
+            'ann': 'annuel'
         };
 
         var engMonthDict = {
-            'jan': 'January',
-            'feb': 'February',
-            'mar': 'March',
-            'apr': 'April',
-            'may': 'May',
-            'jun': 'June',
-            'jul': 'July',
-            'aug': 'August',
-            'sep': 'September',
-            'oct': 'October',
-            'nov': 'November',
-            'dec': 'December',
-            'ann': 'Annual'
+            'jan': 'january',
+            'feb': 'february',
+            'mar': 'march',
+            'apr': 'april',
+            'may': 'may',
+            'jun': 'june',
+            'jul': 'july',
+            'aug': 'august',
+            'sep': 'september',
+            'oct': 'october',
+            'nov': 'november',
+            'dec': 'december',
+            'ann': 'annual'
         };
 
         function getRealMonthName(keySelected) {
@@ -976,15 +978,11 @@
                 tempDict = frMonthDict;
             }
 
-            var realMonthName = "";
-            try {
-                if (tempDict[keySelected]) {
-                    realMonthName = tempDict[keySelected];
-                } else {
-                    throw ('Can not get the month with this key: ' + keySelected);
-                }
-            } catch (err) {
-                console.error(err);
+            var realMonthName = "undefined";
+            if (keySelected in tempDict) {
+                // Uppercase first char
+                realMonthName = tempDict[keySelected]
+                realMonthName = realMonthName.charAt(0).toUpperCase() + realMonthName.slice(1) ;
             }
             return realMonthName;
         }
@@ -995,25 +993,19 @@
         };
 
         function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
-            var gA4EventNameForVariableDownloadData = "";
+            var gA4EventNameForVariableDownloadData = "undefined";
             keySelected = keySelected.toLowerCase();
 
-            try {
-                if (variableDownloadDataTypes[keySelected]) {
-                    var eventType = '';
-                    if (chartDataFormat.includes('csv')) {
-                        eventType = "Variable_Download-Data_";
-                    } else if (chartDataFormat.includes('pdf') || chartDataFormat.includes('png')) {
-                        eventType = "Variable_Download-Image_";
-                    } else {
-                        throw ('Invalid GA4 event file format (csv, pdf, png): ' + chartDataFormat);
-                    }
-                    gA4EventNameForVariableDownloadData = eventType + variableDownloadDataTypes[keySelected];
+            if (keySelected in variableDownloadDataTypes) {
+                var eventType = '';
+                if (chartDataFormat.includes('csv')) {
+                    eventType = "Variable_Download-Data_";
+                } else if (chartDataFormat.includes('pdf') || chartDataFormat.includes('png')) {
+                    eventType = "Variable_Download-Image_";
                 } else {
-                    throw ('Invalid GA4 event name (Variable_Download-Data_*): ' + keySelected);
+                    throw ('Invalid GA4 event file format (csv, pdf, png): ' + chartDataFormat);
                 }
-            } catch (err) {
-                console.error(err);
+                gA4EventNameForVariableDownloadData = eventType + variableDownloadDataTypes[keySelected];
             }
 
             return gA4EventNameForVariableDownloadData;
@@ -1021,17 +1013,17 @@
 
 
         function setDataLayerForChartData(chartDataFormat, chartData) {
+
             if (!chartDataFormat.length) {
-                return;
+                throw new Error('Invalid file extension: ' + chartDataFormat) ;
             }
             var eventName = getGA4EventNameForVariableDownloadData(chartDataFormat, "slr");
             var overlayTitle = $('.overlay-title').text();
 
-            // Exclude: Navigator 5
             var addStr = "";
             for (let index = 0; index < chartData.series.length; index++) {
                 var chartDataName = chartData.series[index].name;
-                if (chartData.series[index].visible && !chartDataName.includes('Navigator 5')) {
+                if (chartData.series[index].visible) {
                     addStr += chartData.series[index].name + ", ";
                 }
             }

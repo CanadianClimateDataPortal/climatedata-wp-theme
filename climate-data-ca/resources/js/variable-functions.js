@@ -1137,35 +1137,35 @@
         //
 
         var frMonthDict = {
-            'jan': 'Janvier',
-            'feb': 'Février',
-            'mar': 'Mars',
-            'apr': 'Avril',
-            'may': 'Mai',
-            'jun': 'Juin',
-            'jul': 'Juillet',
-            'aug': 'Août',
-            'sep': 'Septembre',
-            'oct': 'Octobre',
-            'nov': 'Novembre',
-            'dec': 'Décembre',
-            'ann': 'Annuel'
+            'jan': 'janvier',
+            'feb': 'février',
+            'mar': 'mars',
+            'apr': 'avril',
+            'may': 'mai',
+            'jun': 'juin',
+            'jul': 'juillet',
+            'aug': 'août',
+            'sep': 'septembre',
+            'oct': 'octobre',
+            'nov': 'novembre',
+            'dec': 'décembre',
+            'ann': 'annuel'
         };
 
         var engMonthDict = {
-            'jan': 'January',
-            'feb': 'February',
-            'mar': 'March',
-            'apr': 'April',
-            'may': 'May',
-            'jun': 'June',
-            'jul': 'July',
-            'aug': 'August',
-            'sep': 'September',
-            'oct': 'October',
-            'nov': 'November',
-            'dec': 'December',
-            'ann': 'Annual'
+            'jan': 'january',
+            'feb': 'february',
+            'mar': 'march',
+            'apr': 'april',
+            'may': 'may',
+            'jun': 'june',
+            'jul': 'july',
+            'aug': 'august',
+            'sep': 'september',
+            'oct': 'october',
+            'nov': 'november',
+            'dec': 'december',
+            'ann': 'annual'
         };
 
         function getRealMonthName(keySelected) {
@@ -1175,17 +1175,12 @@
                 tempDict = frMonthDict;
             }
 
-            var realMonthName = "";
-            try {
-                if (tempDict[keySelected]) {
-                    realMonthName = tempDict[keySelected];
-                } else {
-                    throw ('Can not get the month with this key: ' + keySelected);
-                }
-            } catch (err) {
-                console.error(err);
+            var realMonthName = "undefined";
+            if (keySelected in tempDict) {
+                // Uppercase first char
+                realMonthName = tempDict[keySelected]
+                realMonthName = realMonthName.charAt(0).toUpperCase() + realMonthName.slice(1) ;
             }
-
             return realMonthName;
         }
 
@@ -1254,11 +1249,10 @@
             var eventName = getGA4EventNameForVariableDownloadData(chartDataFormat, query['var']);
             var overlayTitle = $('.overlay-title').text();
 
-            // Exclude: Navigator 5
             var addStr = "";
             for (let index = 0; index < chartData.series.length; index++) {
                 var chartDataName = chartData.series[index].name;
-                if (chartData.series[index].visible && !chartDataName.includes('Navigator 5')) {
+                if (chartData.series[index].visible) {
                     addStr += chartData.series[index].name + ", ";
                 }
             }
@@ -1576,7 +1570,7 @@
                                 val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
                                 tip.push("<span style=\"color:#00F\">●</span> " + chart_labels.rcp_26_median + " <b>"
                                     + val1 + "</b><br/>");
-                                
+
                                 this.value = data['30y_rcp26_range'][decade_ms][0];
                                 val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
                                 this.value = data['30y_rcp26_range'][decade_ms][1];

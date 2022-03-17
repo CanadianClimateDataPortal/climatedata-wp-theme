@@ -262,7 +262,9 @@
 
             maps['variable'].on('pm:create', function (e){
                 bbox_layer = e.layer;
-                bbox_layer.pm.enable({});
+                bbox_layer.pm.enable({}); // enable edition
+                bbox_layer.on('pm:edit', handle_bbox_event);
+                handle_bbox_event(e);
             });
         }
 
@@ -423,6 +425,21 @@
 
         }
 
+        function handle_bbox_event(e) {
+            let bounds = e.layer.getBounds();
+            let sw = bounds.getSouthWest();
+            let ne = bounds.getNorthEast();
+            // approximate number of gridcell
+            let cells = Math.round((ne.lat - sw.lat) * (ne.lng - sw.lng) / grid_resolution[curValData.grid]**2);
+            let label = T("Around {0} cells selected").format(cells);
+            $('#download-location').parent().find('.select2-selection__rendered').text(label);
+
+            // TODO implement limitation here, set download-coords as empty if too big (form won't validate)
+            // store the bounds in #download-coords
+            $('#download-coords').val([sw.lat, sw.lng, ne.lat, ne.lng].join('|'));
+            checkform();
+        }
+
         //
         // FORM VALIDATION
         //
@@ -532,25 +549,36 @@
 
         function process_download() {
             var selectedVar = $('#download-variable').val();
+            let pointsdata;
             dataLayerEventName = getGA4EventNameForVariableDataBCCAQv2();
 
             month = $("#download-dataset").val();
             if (month === 'annual') {
                 month = 'ann'
             }
-            points = [];
-            pointsInfo = '';
-            for (var i = 0; i < selectedGrids.length; i++) {
-                point = selectedPoints[selectedGrids[i]];
-                pointsInfo += "GridID: " + selectedGrids[i] + ", Lat: " + point.lat + ", Lng: " + point.lng + " ; ";
-                points.push([point.lat, point.lng]);
-            }
 
-            // Remove last 3 char: ;
-            if (selectedGrids.length > 0) {
-                pointsInfo = pointsInfo.substring(0, pointsInfo.length - 3);
-            }
+            switch ($('input[name="download-select"]:checked').val()) {
+                case 'gridded':
+                    pointsdata = {'points': []};
+                    pointsInfo = '';
+                    for (var i = 0; i < selectedGrids.length; i++) {
+                        point = selectedPoints[selectedGrids[i]];
+                        pointsInfo += "GridID: " + selectedGrids[i] + ", Lat: " + point.lat + ", Lng: " + point.lng + " ; ";
+                        pointsdata.points.push([point.lat, point.lng]);
+                    }
 
+                    // Remove last 3 char: ;
+                    if (selectedGrids.length > 0) {
+                        pointsInfo = pointsInfo.substring(0, pointsInfo.length - 3);
+                    }
+                    break;
+                case 'bbox':
+                    let split_coords = $('#download-coords').val().split('|');
+                    pointsInfo = "BBox: " + split_coords.join(',');
+                    pointsdata  = {'bbox': [split_coords[0], split_coords[1],split_coords[2], split_coords[3]]};
+                    break;
+
+            }
             format = $('input[name="download-format"]:checked').val();
             variableDataFormat = format;
             if (selectedVar !== 'all') {
@@ -558,18 +586,16 @@
                 request_args = {
                     var: selectedVar,
                     month: month,
-                    format: format,
-                    points: points
+                    format: format
                 };
+                Object.assign(request_args, pointsdata);
 
 
                 let xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function () {
                     if (xhttp.readyState === 4 && xhttp.status === 200) {
                         $('#download-result a').attr('href', window.URL.createObjectURL(xhttp.response));
-                        let file_ext = '.' + (format == 'netcdf' ? 'nc' : format);
-
-                        $('#download-result a').attr('download', $('#download-filename').val() + file_ext);
+                        $('#download-result a').attr('download', $('#download-filename').val() + '.' + format);
 
 
                         $('#download-result').slideDown(250);
@@ -603,21 +629,14 @@
                         request_args = {
                             var: varToProcess[i],
                             month: month,
-                            format: format,
-                            points: points
+                            format: format
                         };
-                        $.ajax({
-                            method: 'POST',
-                            url: data_url + '/download',
-                            contentType: 'application/json',
-                            data: JSON.stringify(request_args),
-                            success: function (result) {
-                                if (format == 'csv') {
-                                    zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.csv', result);
-                                }
-                                if (format == 'json') {
-                                    zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.json', JSON.stringify(result));
-                                }
+                        Object.assign(request_args, pointsdata);
+                        let xhttp = new XMLHttpRequest();
+                        xhttp.onreadystatechange = function () {
+                            if (xhttp.readyState === 4 && xhttp.status === 200) {
+                                zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.' + format, xhttp.response);
+
 
 
                                 dl_fraction.find('span').html(i);
@@ -626,18 +645,21 @@
                                     $('body').removeClass('spinner-on');
                                     dl_fraction.remove();
                                     dl_progress.remove();
-                                    zip.generateAsync({ type: "blob" })
+                                    zip.generateAsync({type: "blob"})
                                         .then(function (content) {
                                             saveAs(content, $('#download-filename').val() + ".zip");
 
                                         });
                                 }
-                            },
-                            complete: function () {
+
                                 i++;
                                 download_all();
                             }
-                        });
+                        };
+                        xhttp.open("POST", data_url + '/download');
+                        xhttp.setRequestHeader("Content-Type", "application/json");
+                        xhttp.responseType = 'blob';
+                        xhttp.send(JSON.stringify(request_args));
                     }
 
                 }
@@ -739,7 +761,7 @@
                 $('#daily-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php');
 
                 // netCDF option
-                $('#format-label-netcdf').show();
+                $('#format-label-nc').show();
                 $('#format-label-json').hide();
 
                 // email field
@@ -749,7 +771,7 @@
             } else {
 
                 // json option
-                $('#format-label-netcdf').show();
+                $('#format-label-nc').show();
                 $('#format-label-json').show();
 
                 // email field
@@ -809,26 +831,23 @@
         $('#selection-type input').on('change', function () {
             switch ($('input[name="download-select"]:checked').val()) {
                 case 'gridded':
-                    if (bbox_layer !== 'undefined') {
+                    if (bbox_layer !== undefined) {
                         maps['variable'].removeLayer(bbox_layer);
                     }
                     addGrid(curValData.grid);
+                    maps['variable'].pm.disableDraw();
                     break;
 
                 case 'bbox':
-
-                    // TODO: duplicate to convert to function
                     selectedGrids= [];
-                    $('#download-coords').val('');
-                    $('#download-location').val('');
-                    $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
                     maps['variable'].removeLayer(pbfLayer);
-
-
                     maps['variable'].pm.enableDraw('Rectangle', {});
                     break;
             }
-
+            $('#download-location').val('');
+            $('#download-coords').val('');
+            $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
+            checkform();
         });
 
         // format
@@ -890,6 +909,7 @@
             e.preventDefault();
 
             let var_name = '';
+            let submit_url = '';
 
             switch ($('#download-variable').val()) {
 
@@ -906,48 +926,14 @@
                     break;
             }
 
-            let split_coords = $('#download-coords').val().split('|'),
-                lat_vals = '',
-                lon_vals = '';
-
-            // remove first element which is empty because the first character is always '|'
-            split_coords.shift();
-
-            for (i = 0; i < split_coords.length; i += 1) {
-
-                let this_coord = split_coords[i].split(',');
-
-                if (lat_vals !== '') {
-                    lat_vals += ','
-                }
-
-                lat_vals += this_coord[0];
-
-                if (lon_vals !== '') {
-                    lon_vals += ','
-                }
-
-                lon_vals += this_coord[1]
-
-            }
-
             var submit_data = {
                 "captcha_code":$('#daily-captcha_code').val(),
                 "signup":$('#signup').is(":checked"),
-                "submit_url": "/providers/finch/processes/subset_ensemble_BCCAQv2/jobs",
                 "request_data": {
                     "inputs": [
                         {
                             "id": "variable",
                             "data": var_name,
-                        },
-                        {
-                            "id": "lat0",
-                            "data": lat_vals
-                        },
-                        {
-                            "id": "lon0",
-                            "data": lon_vals
                         },
                         {
                             "id": "data_validation",
@@ -967,6 +953,60 @@
                     }]
                 }
             };
+            let split_coords = $('#download-coords').val().split('|');
+            switch ($('input[name="download-select"]:checked').val()) {
+                case 'gridded':
+                        let lat_vals = '', lon_vals = '';
+
+                    // remove first element which is empty because the first character is always '|'
+                    split_coords.shift();
+
+                    for (i = 0; i < split_coords.length; i += 1) {
+
+                        let this_coord = split_coords[i].split(',');
+
+                        if (lat_vals !== '') {
+                            lat_vals += ','
+                        }
+
+                        lat_vals += this_coord[0];
+
+                        if (lon_vals !== '') {
+                            lon_vals += ','
+                        }
+
+                        lon_vals += this_coord[1]
+
+                    }
+                    submit_data['request_data']['inputs'].push({
+                        "id": "lat0",
+                        "data": lat_vals
+                    }, {
+                        "id": "lon0",
+                        "data": lon_vals
+                    });
+                    submit_data['submit_url'] = "/providers/finch/processes/subset_ensemble_BCCAQv2/jobs";
+                    break;
+
+                case 'bbox':
+
+                    submit_data['request_data']['inputs'].push({
+                        "id": "lat0",
+                        "data": split_coords[0]
+                    }, {
+                        "id": "lon0",
+                        "data": split_coords[1]
+                    }, {
+                        "id": "lat1",
+                        "data": split_coords[2]
+                    }, {
+                        "id": "lon1",
+                        "data": split_coords[3]
+                    });
+
+                    submit_data['submit_url'] = "/providers/finch/processes/subset_ensemble_bbox_BCCAQv2/jobs";
+                    break;
+            }
 
             $.ajax({
                 url: child_theme_dir + 'resources/ajax/finch-submit.php',

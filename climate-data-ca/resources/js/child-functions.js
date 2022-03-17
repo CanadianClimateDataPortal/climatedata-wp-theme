@@ -12,6 +12,18 @@ const geoserver_url = DATA_URL;
 
 var chart_labels, legend_labels, l10n_labels;
 
+var l10n_table = {
+    "fr": {
+        "Around {0} cells selected" : "Environ {0} cellules sélectionnées"
+    }
+};
+
+const grid_resolution = {
+    "canadagrid": 1.0/12.0,
+    "canadagrid1deg": 1.0,
+    "slrgrid": 1.0/10.0
+};
+
 
 //
 // GLOBAL Functions
@@ -78,6 +90,38 @@ function unit_localize(str) {
     return str;
 }
 
+/**
+ * Allow usage of string formatting  e.g. "Hello {0}!".format("world") => "Hello world!"
+ * @returns {string}
+ */
+String.prototype.format = function () {
+    // store arguments in an array
+    var args = arguments;
+    // use replace to iterate over the string
+    // select the match and check if related argument is present
+    // if yes, replace the match with the argument
+    return this.replace(/{([0-9]+)}/g, function (match, index) {
+        // check if the argument is present
+        return typeof args[index] == 'undefined' ? match : args[index];
+    });
+};
+
+/**
+ * Perform a string lookup in l10n_table in current language, returns it if found, otherwise return the original string
+ * @param str String to lookup for
+ * @returns {string} The localized string
+ */
+function T(str) {
+    if (typeof  l10n_table[current_lang] == 'undefined'){
+        return str;
+    }
+    if (typeof l10n_table[current_lang][str] == 'undefined') {
+        console.warn("Missing translation in language " + current_lang + ": " + str);
+        return str;
+    } else {
+        return l10n_table[current_lang][str];
+    }
+}
 
 (function ($) {
 

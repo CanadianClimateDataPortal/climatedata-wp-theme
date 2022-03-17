@@ -575,7 +575,10 @@
                 case 'bbox':
                     let split_coords = $('#download-coords').val().split('|');
                     pointsInfo = "BBox: " + split_coords.join(',');
-                    pointsdata  = {'bbox': [split_coords[0], split_coords[1],split_coords[2], split_coords[3]]};
+                    pointsdata  = {'bbox': [parseFloat(split_coords[0]),
+                        parseFloat(split_coords[1]),
+                        parseFloat(split_coords[2]),
+                        parseFloat(split_coords[3])]};
                     break;
 
             }

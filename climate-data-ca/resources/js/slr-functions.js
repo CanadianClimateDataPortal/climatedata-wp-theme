@@ -1015,7 +1015,7 @@
         function setDataLayerForChartData(chartDataFormat, chartData) {
 
             if (!chartDataFormat.length) {
-                throw new Error('Invalid file extension: ' + chartDataFormat) ;
+                throw new Error('Value undefined or empty') ;
             }
             var eventName = getGA4EventNameForVariableDownloadData(chartDataFormat, "slr");
             var overlayTitle = $('.overlay-title').text();

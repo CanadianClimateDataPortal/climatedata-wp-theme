@@ -115,7 +115,6 @@
             </div>
         </div>
 
-        <p class="form-help col-10 col-sm-2 offset-1"><a href="<?php echo get_permalink(filtered_ID_by_path('about', $GLOBALS['vars']['current_lang'])); ?>#about-datasets"><?php _e('Learn more about variables', 'cdc'); ?></a></p>
     </div>
 
 
@@ -172,7 +171,7 @@
 
                 <label id="format-label-json" class="btn btn-outline-primary"> <input type="radio" name="download-format" id="download-format-json" autocomplete="off" value="json"> JSON </label>
 
-                <label id="format-label-netcdf" class="btn btn-outline-primary"> <input type="radio" name="download-format" id="download-format-netcdf" autocomplete="off" value="netcdf"> NetCDF </label>
+                <label id="format-label-nc" class="btn btn-outline-primary"> <input type="radio" name="download-format" id="download-format-nc" autocomplete="off" value="nc"> NetCDF </label>
             </div>
         </div>
     </div>

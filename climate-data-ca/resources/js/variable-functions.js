@@ -1153,19 +1153,19 @@
         };
 
         var engMonthDict = {
-            'jan': 'january',
-            'feb': 'february',
-            'mar': 'march',
-            'apr': 'april',
-            'may': 'may',
-            'jun': 'june',
-            'jul': 'july',
-            'aug': 'august',
-            'sep': 'september',
-            'oct': 'october',
-            'nov': 'november',
-            'dec': 'december',
-            'ann': 'annual'
+            'jan': 'January',
+            'feb': 'February',
+            'mar': 'March',
+            'apr': 'April',
+            'may': 'May',
+            'jun': 'June',
+            'jul': 'July',
+            'aug': 'August',
+            'sep': 'September',
+            'oct': 'October',
+            'nov': 'November',
+            'dec': 'December',
+            'ann': 'Annual'
         };
 
         function getRealMonthName(keySelected) {
@@ -1177,9 +1177,7 @@
 
             var realMonthName = "undefined";
             if (keySelected in tempDict) {
-                // Uppercase first char
                 realMonthName = tempDict[keySelected]
-                realMonthName = realMonthName.charAt(0).toUpperCase() + realMonthName.slice(1) ;
             }
             return realMonthName;
         }

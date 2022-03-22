@@ -980,7 +980,6 @@
 
             var realMonthName = "undefined";
             if (keySelected in tempDict) {
-                // Uppercase first char
                 realMonthName = tempDict[keySelected]
             }
             return realMonthName;

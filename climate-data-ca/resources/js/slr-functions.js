@@ -981,7 +981,7 @@
                 addStr = addStr.substring(0, addStr.length - 2);
             }
 
-            // ex: Région de la Montérégie; rcp26; January
+            // ex: Région de la Montérégie; rcp26; Annuel
             let chartDataSettings = overlayTitle + "; " + query['rcp'] + "; " + (($('body').hasClass('lang-fr')) ? 'Annuel' : 'Annual');
 
             console.log("download file type: " + chartDataFormat)

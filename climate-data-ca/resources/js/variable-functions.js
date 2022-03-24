@@ -1137,19 +1137,19 @@
         //
 
         var frMonthDict = {
-            'jan': 'janvier',
-            'feb': 'février',
-            'mar': 'mars',
-            'apr': 'avril',
-            'may': 'mai',
-            'jun': 'juin',
-            'jul': 'juillet',
-            'aug': 'août',
-            'sep': 'septembre',
-            'oct': 'octobre',
-            'nov': 'novembre',
-            'dec': 'décembre',
-            'ann': 'annuel'
+            'jan': 'Janvier',
+            'feb': 'Février',
+            'mar': 'Mars',
+            'apr': 'Avril',
+            'may': 'Mai',
+            'jun': 'Juin',
+            'jul': 'Juillet',
+            'aug': 'Août',
+            'sep': 'Septembre',
+            'oct': 'Octobre',
+            'nov': 'Novembre',
+            'dec': 'Décembre',
+            'ann': 'Annuel'
         };
 
         var engMonthDict = {

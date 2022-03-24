@@ -39,11 +39,7 @@
             query['decade'] = '2020';
         }
 
-        if ($('#mora').length) {
-            query['mora'] = $('#mora').val();
-        } else {
-            query['mora'] = 'ann';
-        }
+
 
         var history_action = 'init', // global tracking variable for history action
             station_on = false, // flag for showing/hiding the stations layer,
@@ -939,52 +935,6 @@
             });
         }
 
-        var frMonthDict = {
-            'jan': 'janvier',
-            'feb': 'février',
-            'mar': 'mars',
-            'apr': 'avril',
-            'may': 'mai',
-            'jun': 'juin',
-            'jul': 'juillet',
-            'aug': 'août',
-            'sep': 'septembre',
-            'oct': 'octobre',
-            'nov': 'novembre',
-            'dec': 'décembre',
-            'ann': 'annuel'
-        };
-
-        var engMonthDict = {
-            'jan': 'January',
-            'feb': 'February',
-            'mar': 'March',
-            'apr': 'April',
-            'may': 'May',
-            'jun': 'June',
-            'jul': 'July',
-            'aug': 'August',
-            'sep': 'September',
-            'oct': 'October',
-            'nov': 'November',
-            'dec': 'December',
-            'ann': 'Annual'
-        };
-
-        function getRealMonthName(keySelected) {
-            keySelected = keySelected.toLowerCase();
-            var tempDict = engMonthDict;
-            if ($('body').hasClass('lang-fr')) {
-                tempDict = frMonthDict;
-            }
-
-            var realMonthName = "undefined";
-            if (keySelected in tempDict) {
-                realMonthName = tempDict[keySelected]
-            }
-            return realMonthName;
-        }
-
         var variableDownloadDataTypes = {
             // Variable_Download-Data_*
             'slr': 'Sea-Level_Change'
@@ -1021,7 +971,7 @@
             var addStr = "";
             for (let index = 0; index < chartData.series.length; index++) {
                 var chartDataName = chartData.series[index].name;
-                if (chartData.series[index].visible) {
+                if (chartData.series[index].visible && charData.series[index].type != 'areaspline') {
                     addStr += chartData.series[index].name + ", ";
                 }
             }
@@ -1032,7 +982,7 @@
             }
 
             // ex: Région de la Montérégie; rcp26; January
-            let chartDataSettings = overlayTitle + "; " + query['rcp'] + "; " + getRealMonthName(query['mora']);
+            let chartDataSettings = overlayTitle + "; " + query['rcp'] + "; " + (($('body').hasClass('lang-fr')) ? 'Annuel' : 'Annual');
 
             console.log("download file type: " + chartDataFormat)
             // console.log("eventName: " + eventName)

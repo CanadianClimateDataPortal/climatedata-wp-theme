@@ -418,38 +418,27 @@
             e.preventDefault()
         })
 
-        function IsSelectLocations(itemInput) {
-            var isInputSelectLocation = false;
-            $('input[name=analyze-location]').each(function (i) {
-                if (itemInput == $(this).val()) {
-                    isInputSelectLocation = true;
-                }
-            });
-
-            return isInputSelectLocation;
-        }
-
         $('.select-locations, input[name="analyze-location"]').on('click', function (e) {
             e.preventDefault()
             var itemInput = $('input[name="analyze-location"]:checked').val();
 
-            if (IsSelectLocations(itemInput)) {
-                ChangeLayers(itemInput);
-                $('#average').val('False');
 
-                if(itemInput != 'grid'){
-                    $('#average').val('True');
-                    InitSectorProtobuf(itemInput);
+            ChangeLayers(itemInput);
+            $('#average').val('False');
 
-                    locations_type = itemInput;
+            if (itemInput != 'grid') {
+                $('#average').val('True');
+                InitSectorProtobuf(itemInput);
 
-                    if (analyze_map.hasLayer(analyzeLayer)) {
-                        analyze_map.removeLayer(analyzeLayer);
-                    }
+                locations_type = itemInput;
+
+                if (maps['analyze'].hasLayer(analyzeLayer)) {
+                    maps['analyze'].removeLayer(analyzeLayer);
                 }
             }
+
             validate_steps();
-            validate_inputs(itemInput);
+            validate_inputs();
         });
 
 
@@ -668,14 +657,14 @@
                 is_sector_on = false;
 
                 if (typeof analyzeLayer !== 'undefined' && analyzeLayer !== null) {
-                    analyze_map.removeLayer(analyzeLayer);
+                    maps['analyze'].removeLayer(analyzeLayer);
                 }
             }
         }
 
         function LayerSwapGrid(settings) {
             if (settings.action === 'on') {
-                analyze_map.addLayer(pbfLayer);
+                maps['analyze'].addLayer(pbfLayer);
                 SwapLayerBetweenGridAndSector({
                     layer: 'sector',
                     action: 'off'
@@ -683,7 +672,7 @@
             }
             else {
                 // hide grid
-                analyze_map.removeLayer(pbfLayer);
+                maps['analyze'].removeLayer(pbfLayer);
             }
         }
 
@@ -753,8 +742,8 @@
                         ).on('click', function (e) {
                             HighlightSectorById(e.layer.properties.id, e, analyzeLayer, e.layer.properties[l10n_labels.label_field]);
 
-                            validate_inputs(sector);
-                        }).addTo(analyze_map);
+                            validate_inputs();
+                        }).addTo(maps['analyze']);
                         resolve("Sector protobuf initialzed!")
                     }, 200)
                 } catch(err) {
@@ -765,7 +754,7 @@
                 console.error(`Promise error from function InitSectorProtobuf: ${reason}`);
             })
             .finally(() => {
-                analyze_map.on('zoom', function (e) {
+                maps['analyze'].on('zoom', function (e) {
                     if (typeof analyzeLayer !== 'undefined' && analyzeLayer !== null) {
                         analyzeLayer.unbindTooltip();
                     }
@@ -1127,7 +1116,7 @@
 
                     if (typeof response == 'object' && response.status == 'accepted') {
 
-                        $('#success-modal').modal('show');
+                        $('#analyze-success-modal').modal('show');
 
                     } else {
 
@@ -1646,9 +1635,15 @@
                         } else {
                             breadcrumb_val = current_accordion.find('.checked').find('.form-check-label').text();
                         }
+                        let selected_count;
 
                         if (current_step == 2) {
-                            breadcrumb_val = '<span class="grid-count">' + selectedGrids.length + '</span> ' + breadcrumb_val
+                            if ($('input[name="analyze-location"]:checked').val() == 'grid') {
+                                selected_count = selectedGrids.length;
+                            } else {
+                                selected_count = sector_select_by_id  !== undefined ? 1 : 0;
+                            }
+                            breadcrumb_val = '<span class="grid-count">' + selected_count + '</span> ' + breadcrumb_val
                         }
 
                     }
@@ -1902,8 +1897,10 @@
 
         // INPUTS
 
-        function validate_inputs(sectorSelect = undefined) {
+        function validate_inputs() {
+
             if (current_tab == 'analyze-projections') {
+                let sectorSelect = $('input[name="analyze-location"]:checked').val();
                 // PROJECTIONS
                 var is_valid = true
 
@@ -2024,15 +2021,22 @@
             }
 
             // make sure lat/lon has a value
-            if (IsSelectLocations(sectorSelect) && sectorSelect !== 'grid' ){
-                $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
-                $('#clear-grids').hide();
-            } else if ($('#lat').val() == '' || $('#lon').val() == '') {
-                $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').show();
-                $('#clear-grids').hide();
+            if (sectorSelect !== 'grid') {
+                if (sector_select_by_id !== undefined) {
+                    $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
+                    $('#clear-grids').hide();
+                } else {
+                    $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').show();
+                    $('#clear-grids').hide();
+                }
             } else {
-                $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
-                $('#clear-grids').show();
+                if ($('#lat').val() == '' || $('#lon').val() == '') {
+                    $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').show();
+                    $('#clear-grids').hide();
+                } else {
+                    $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
+                    $('#clear-grids').show();
+                }
             }
 
             // if everything is valid,

@@ -5,6 +5,7 @@ require_once( $parse_uri[0] . 'wp-load.php' );
 wp();
 
 include_once ( locate_template ( 'resources/php/securimage/securimage.php' ) );
+include_once(locate_template('resources/php/mailchimp.php'));
 
 $securimage = new Securimage();
 
@@ -18,8 +19,6 @@ if ( isset ( $_POST['analyze-captcha_code'] ) ) {
     
   } else {
     
-//     echo 'success';
-    
     $request = curl_init ( $submit_url_pre . $_POST['submit_url'] );
     
     curl_setopt ( $request, CURLOPT_CUSTOMREQUEST, 'POST' );
@@ -30,9 +29,11 @@ if ( isset ( $_POST['analyze-captcha_code'] ) ) {
     $result = curl_exec ( $request );
     
     curl_close ( $request );
-    
     print_r ( $result );
-  
+
+    if($_POST['signup'] == "true") {
+        mailchimp_register($_POST['request_data']['notification_email']);
+    }
   }
 
 }

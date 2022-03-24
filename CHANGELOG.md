@@ -1,3 +1,6 @@
+2022-03-10.01
+  * Added mailchimp subscribe integration to analyze, download and feedback form
+
 2021-11-19.02
   * Allow multiple RCP selection in analyze page
 

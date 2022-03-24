@@ -6985,7 +6985,7 @@ body.stations-on #variable-content .leaflet-top.leaflet-right {
 }
 
 .form-process label {
-  font-size: 1.4em;
+  font-size: 1.4rem;
 }
 .form-process .input-group .form-control {
   border-radius: 50px 0 0 50px;
@@ -7913,6 +7913,10 @@ body.overlay-open[data-overlay-content=video] #main-header-nav .overlay-close {
 .form-help {
   margin-bottom: 0;
   font-size: 1.4em;
+}
+
+.form-check {
+  font-size: 1.4rem;
 }
 
 #page-feedback .form-radio {

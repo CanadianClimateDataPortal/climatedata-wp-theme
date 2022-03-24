@@ -74,8 +74,7 @@
         var form_obj = $.extend(true, {}, default_obj)
         var selected_feature_label = '';
 
-        var submit_url_var = '',
-            submit_url_post = '/jobs'
+        var submit_url_var = '';
 
         // STATIONS
 
@@ -1055,7 +1054,7 @@
         $('#analyze-process').click(function (e) {
             if (!$(this).hasClass('disabled')) {
 
-                let pathToAnalyzeForm = child_theme_dir + 'resources/ajax/analyze-form.php';
+                let pathToAnalyzeForm = child_theme_dir + 'resources/ajax/finch-submit.php';
                 form_obj = $.extend(true, {}, default_obj)
 
                 // build the final input object to send to the API
@@ -1109,10 +1108,11 @@
             set_datalayer_for_analyze_bccaqv2(form_obj['inputs'], submit_url_var);
 
             var submit_data = {
-                'analyze-captcha_code': $('#analyze-captcha_code').val(),
+                'captcha_code': $('#analyze-captcha_code').val(),
+                'signup':$('#signup').is(":checked"),
                 'request_data': form_obj,
-                'submit_url': submit_url_var + submit_url_post // ex: wetdays/jobs
-            }
+                'submit_url':  '/providers/finch/processes/ensemble_grid_point_' + submit_url_var + '/jobs' // ex: wetdays/jobs
+            };
 
             // check captcha
             $.ajax({

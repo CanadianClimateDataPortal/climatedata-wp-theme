@@ -221,16 +221,6 @@
                             <label class="form-check-label" for="analyze-var-<?php the_sub_field ( 'var' ); ?>"><?php the_sub_field ( 'name' ); ?></label>
                           </div>
 
-											<?php
-
-												/*
-
-												<span data-href="<?php echo get_permalink ( $var ); ?>" class="tooltip-icon analyze-var"><i class="fas fa-question"></i></span>
-
-												*/
-
-											?>
-
                         </div>
 
                         <?php

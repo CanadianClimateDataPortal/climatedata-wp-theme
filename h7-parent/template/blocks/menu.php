@@ -147,8 +147,10 @@
         $item_class = array ( 'nav-item' );
         $link_class = array ( 'nav-link' );
         $link_atts = '';
-        
-        $link_class = array_merge ( $link_class, explode ( ' ', $item['class'] ) );
+
+        if (isset($item['class'])) {
+            $link_class = array_merge($link_class, explode(' ', $item['class']));
+        }
         
         if ( $item['type'] == 'divider' ) {
           

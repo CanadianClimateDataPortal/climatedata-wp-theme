@@ -652,7 +652,7 @@
                 <label for="analyze-captcha_code" class="d-block w-100"><?php _e ( 'Enter the characters shown here', 'cdc' ); ?>: </label>
 
                 <div class="d-flex align-items-center">
-                  <img id="analyze-captcha" src="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/php/securimage/securimage_show.php" alt="CAPTCHA Image" />
+                  <img id="analyze-captcha" src="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/php/securimage/securimage_show.php?namespace=analyze" alt="CAPTCHA Image" />
                   <input type="text" name="analyze-captcha_code" id="analyze-captcha_code" class="form-control ml-4" placeholder="XXXX" size="4" maxlength="4" autocomplete="off" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Non-valid entered characters. Please try again.', 'cdc' ); ?>" />
                 </div>
               </div>
@@ -898,26 +898,26 @@
 
 											<div class="input-row form-check w-25">
 													<div class="input-item">
-															<input class="form-check-input add-to-object" type="radio" name="missing_options" id="analyze-stations-missing-5" value="0.05" checked>
+															<input class="form-check-input add-to-object" type="radio" name="check_missing" id="analyze-stations-missing-5" value="0.05" checked>
 															<label class="form-check-label" for="analyze-stations-missing-5">5%</label>
 													</div>
 											</div>
 
 											<div class="input-row form-check w-25">
 													<div class="input-item">
-															<input class="form-check-input add-to-object" type="radio" name="missing_options" id="analyze-stations-missing-10" value="0.1">
+															<input class="form-check-input add-to-object" type="radio" name="check_missing" id="analyze-stations-missing-10" value="0.1">
 															<label class="form-check-label" for="analyze-stations-missing-10">10%</label>
 													</div>
 											</div>
 											<div class="input-row form-check w-25">
 													<div class="input-item">
-															<input class="form-check-input add-to-object" type="radio" name="missing_options" id="analyze-stations-missing-15" value="0.15">
+															<input class="form-check-input add-to-object" type="radio" name="check_missing" id="analyze-stations-missing-15" value="0.15">
 															<label class="form-check-label" for="analyze-stations-missing-15">15%</label>
 													</div>
 											</div>
 											<div class="input-row form-check w-100">
 													<div class="input-item">
-															<input class="form-check-input add-to-object" type="radio" name="missing_options" id="analyze-stations-missing-wmo" value="wmo">
+															<input class="form-check-input add-to-object" type="radio" name="check_missing" id="analyze-stations-missing-wmo" value="wmo">
 															<label class="form-check-label" for="analyze-stations-missing-wmo"><?php _e('WMO Parameters'); ?></label>
 													</div>
 											</div>
@@ -1087,7 +1087,7 @@
             <label for="analyze-stations-captcha_code" class="d-block w-100"><?php _e ( 'Enter the characters shown here', 'cdc' ); ?>: </label>
 
             <div class="d-flex align-items-center">
-              <img id="analyze-stations-captcha" src="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/php/securimage/securimage_show.php" alt="CAPTCHA Image" />
+              <img id="analyze-stations-captcha" src="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/php/securimage/securimage_show.php?namespace=analyze-stations" alt="CAPTCHA Image" />
               <input type="text" name="analyze-stations-captcha_code" id="analyze-stations-captcha_code" class="form-control ml-4" placeholder="XXXX" size="4" maxlength="4" autocomplete="off" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Non-valid entered characters. Please try again.', 'cdc' ); ?>" />
             </div>
           </div>

@@ -87,9 +87,7 @@
 
         var stations_default_inputs = {
             'freq': '',
-            'check_missing': 'pct',
-            'missing_options': '',
-            'output_format': '',
+            'check_missing': '',
             'start_date': '',
             'end_date': '',
             'output_format': ''
@@ -139,7 +137,6 @@
             },
             ahccd_layer,
             ahccd_layerGroups = [],
-            selected_stations = {},
             stations_list = [];
 
         // MAPS
@@ -194,7 +191,6 @@
 
                         analyze_init();
 
-                        $('#analyze-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php')
 
                     }
 
@@ -204,7 +200,6 @@
 
                         station_init();
 
-                        $('#analyze-stations-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php')
 
                     }
 
@@ -340,8 +335,6 @@
             $('#station-select').val(null).trigger('change');
 
             // reset icons
-
-            selected_stations = {};
 
             ahccd_layer.eachLayer(function (layer) {
 
@@ -1091,6 +1084,7 @@
 
             var submit_data = {
                 'captcha_code': $('#analyze-captcha_code').val(),
+                'namespace': 'analyze',
                 'signup':$('#analyze-signup').is(":checked"),
                 'request_data': form_obj,
                 'submit_url':  '/providers/finch/processes/ensemble_grid_point_' + submit_url_var + '/jobs' // ex: wetdays/jobs
@@ -1119,7 +1113,7 @@
                 },
                 complete: function () {
                     $('#analyze-captcha_code').val('')
-                    $('#analyze-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php')
+                    $('#analyze-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php?namespace=analyze')
                 }
             });
         }
@@ -1280,8 +1274,6 @@
 
                     e.layer.setIcon(icon);
 
-                    selected_stations = selection;
-
                     validate_steps();
                     validate_inputs();
 
@@ -1305,40 +1297,24 @@
 
         // trigger when a tag is removed from multiple station selector input
         $('#station-select').on('select2:unselect', function (e) {
-
             ahccd_layer.eachLayer(function (layer) {
-
                 if (layer.feature.properties.ID === e.params.data.id) {
-
-                    delete selected_stations[e.params.data.id];
                     layer.setIcon(ahccd_icons[layer.feature.properties.type])
-
                 }
-
             });
-
             validate_steps();
             validate_inputs()
-
         });
 
         // trigger when a tag is added to multiple station selector input
         $('#station-select').on('select2:select', function (e) {
-
             ahccd_layer.eachLayer(function (layer) {
-
                 if (layer.feature.properties.ID === e.params.data.id) {
-
-                    selected_stations[e.params.data.id] = layer.feature.properties.Name;
                     layer.setIcon(ahccd_icons[layer.feature.properties.type + 'r'])
-
                 }
-
             });
-
             validate_steps();
             validate_inputs();
-
         });
 
         //
@@ -1829,8 +1805,6 @@
                                 breadcrumb_val = $('#station-select').val().length + ' selected'
                             }
 
-                            console.log('select', is_valid, selected_stations)
-
                         }
 
                     }
@@ -2168,15 +2142,14 @@
                 // make sure at least one station is selected
 
                 // console.log('selected stations', selected_stations)
+                let selected_stations = $("#station-select").val() || [];
 
-                if ($.isEmptyObject(selected_stations)) {
+                if (selected_stations.length <= 0) {
                     is_valid = false;
                 }
 
                 // if everything is valid,
                 // show the captcha/email/submit button
-
-                console.log('validate inputs', is_valid);
 
                 if (is_valid == true) {
                     $('#analyze-stations-submit').slideDown();
@@ -2226,25 +2199,24 @@
 
                 for (var key in stations_form_inputs) {
 
-                    data = stations_form_inputs[key]
+                    let data = stations_form_inputs[key];
 
-                    if (
-                        key == 'missing_options' &&
-                        stations_form_inputs[key] != 'wmo'
-                    ) {
+                    if (key == 'check_missing' && data != 'wmo') {
+                        stations_form_obj['inputs'].push({
+                            'id': 'missing_options',
+                            'data': JSON.stringify({
+                                'pct': {
+                                    'tolerance': parseFloat(data)
+                                }
+                            })});
 
-                        data = {
-                            'pct': {
-                                'tolerance': parseFloat(stations_form_inputs[key])
-                            }
-                        }
-
+                        data = 'pct';
                     }
 
                     stations_form_obj['inputs'].push({
                         'id': key,
                         'data': data
-                    })
+                    });
 
                 }
 
@@ -2257,16 +2229,19 @@
                 }
 
                 // stations
+                let selected_stations = $("#station-select").val() || [];
 
-                stations_form_obj['stations'] = selected_stations;
 
                 // email
                 stations_form_obj['notification_email'] = $('#analyze-stations-email').val();
 
                 var submit_data = {
                     'captcha_code': $('#analyze-stations-captcha_code').val(),
+                    'namespace': 'analyze-stations',
                     'signup':$('#analyze-stations-signup').is(":checked"),
                     'request_data': stations_form_obj,
+                    'required_variables': required_variables,
+                    'stations': selected_stations.join(','),
                     'submit_url': '/providers/finch/processes/' + submit_url_var + '/jobs'
                 };
 
@@ -2286,7 +2261,7 @@
                     },
                     complete: function () {
                         $('#analyze-stations-captcha_code').val('')
-                        $('#analyze-stations-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php')
+                        $('#analyze-stations-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php?namespace=analyze-stations')
                     }
                 })
 

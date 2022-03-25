@@ -669,8 +669,8 @@
                 </div>
 
 								<div class="form-check form-check-inline mt-4">
-								  <input class="form-check-input" type="checkbox" value="" id="signup">
-								  <label class="form-check-label" for="signup"><?php _e ( 'Subscribe to the ClimateData.ca newsletter', 'cdc' ); ?></label>
+								  <input class="form-check-input" type="checkbox" value="" id="analyze-signup">
+								  <label class="form-check-label" for="analyze-signup"><?php _e ( 'Subscribe to the ClimateData.ca newsletter', 'cdc' ); ?></label>
 								</div>
 
               </div>
@@ -816,7 +816,7 @@
                     ?>
 
                     <div class="input-row form-check input-variable" data-frequencies='<?php the_sub_field ('frequencies'); ?>' data-content='<?php echo json_encode ( $var_description ); ?>'
-											data-station-type="<?php echo get_sub_field ( 'type' ); ?>">
+											data-required-variables="<?php echo get_sub_field ( 'required_variables' ); ?>">
                       <div class="input-item">
                         <input class="form-check-input" type="radio" name="analyze-stations-var" id="analyze-stations-var-<?php echo $var_key; ?>" value="<?php echo $var_key; ?>">
                         <label class="form-check-label" for="analyze-stations-var-<?php echo $var_key; ?>"><?php the_sub_field ( 'name' ); ?></label>
@@ -1104,8 +1104,8 @@
             </div>
 
 						<div class="form-check form-check-inline mt-4">
-						  <input class="form-check-input" type="checkbox" value="" id="signup">
-						  <label class="form-check-label" for="signup"><?php _e ( 'Subscribe to the ClimateData.ca newsletter', 'cdc' ); ?></label>
+						  <input class="form-check-input" type="checkbox" value="" id="analyze-stations-signup">
+						  <label class="form-check-label" for="analyze-stations-signup"><?php _e ( 'Subscribe to the ClimateData.ca newsletter', 'cdc' ); ?></label>
 						</div>
 
           </div>

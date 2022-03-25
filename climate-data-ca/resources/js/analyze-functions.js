@@ -75,6 +75,7 @@
         var selected_feature_label = '';
 
         var submit_url_var = '';
+        var required_variables=[];
 
         // STATIONS
 
@@ -100,8 +101,7 @@
 
         var stations_form_obj = $.extend(true, {}, default_obj)
 
-        var stations_submit_url_var = '',
-            stations_submit_url_post = '/jobs'
+        let pathToAnalyzeForm = child_theme_dir + 'resources/ajax/finch-submit.php';
 
         var markerMap = [],
             stationFromAPI = [],
@@ -140,7 +140,7 @@
             ahccd_layer,
             ahccd_layerGroups = [],
             selected_stations = {},
-            selected_station_type;
+            stations_list = [];
 
         // MAPS
 
@@ -318,36 +318,30 @@
 
             // filter stations
 
-            var this_type = $(this).closest('.input-row').attr('data-station-type')
+            required_variables = $(this).closest('.input-variable').attr('data-required-variables').split('|');
 
-            if (this_type !== undefined && this_type != '') {
+            if (required_variables.includes("tas") ||
+                required_variables.includes("tasmin") ||
+                required_variables.includes("tasmax")) {
+                maps['stations'].removeLayer(ahccd_layerGroups['P']);
+                maps['stations'].addLayer(ahccd_layerGroups['T']);
+                // temperature stations
+                fill_station_select('T');
 
-                selected_station_type = this_type
-
-                // show/hide layer groups
-
-                switch (this_type) {
-                    case 'T' :
-                        maps['stations'].removeLayer(ahccd_layerGroups['P'])
-                        maps['stations'].addLayer(ahccd_layerGroups['T'])
-                        break
-
-                    case 'P' :
-                        maps['stations'].removeLayer(ahccd_layerGroups['T'])
-                        maps['stations'].addLayer(ahccd_layerGroups['P'])
-                        break
-
-                }
-
+            } else {
+                // precipitation stations
+                maps['stations'].removeLayer(ahccd_layerGroups['T']);
+                maps['stations'].addLayer(ahccd_layerGroups['P']);
+                fill_station_select('P');
             }
 
             // clear station select
 
-            $('#station-select').val(null).trigger('change')
+            $('#station-select').val(null).trigger('change');
 
             // reset icons
 
-            selected_stations = {}
+            selected_stations = {};
 
             ahccd_layer.eachLayer(function (layer) {
 
@@ -1043,7 +1037,6 @@
         $('#analyze-process').click(function (e) {
             if (!$(this).hasClass('disabled')) {
 
-                let pathToAnalyzeForm = child_theme_dir + 'resources/ajax/finch-submit.php';
                 form_obj = $.extend(true, {}, default_obj)
 
                 // build the final input object to send to the API
@@ -1098,7 +1091,7 @@
 
             var submit_data = {
                 'captcha_code': $('#analyze-captcha_code').val(),
-                'signup':$('#signup').is(":checked"),
+                'signup':$('#analyze-signup').is(":checked"),
                 'request_data': form_obj,
                 'submit_url':  '/providers/finch/processes/ensemble_grid_point_' + submit_url_var + '/jobs' // ex: wetdays/jobs
             };
@@ -1179,6 +1172,16 @@
         // STATIONS
         //
 
+        function fill_station_select(type = 'T') {
+            $('#station-select').html('');  // using .empty() is very slow
+
+            stations_list.forEach(function (station) {
+                if (station.type == type || station.type == 'B') {
+                    $('<option value="' + station.ID + '">' + station.Name + '</option>').appendTo('#station-select');
+                }
+            });
+        }
+
         function station_init() {
 
             create_map('stations');
@@ -1222,12 +1225,15 @@
             });
 
             $.getJSON(child_theme_dir + 'resources/app/ahccd/ahccd.json', function (data) {
-
                 let ahccd_layer_cluster = L.markerClusterGroup();
 
                 ahccd_layer = L.geoJson(data, {
                     onEachFeature: function (feature, layer) {
-                        $('<option value="' + feature.properties.ID + '">' + feature.properties.Name + '</option>').appendTo('#station-select');
+                        stations_list.push({
+                            ID: feature.properties.ID,
+                            type: feature.properties.type,
+                            Name: feature.properties.Name
+                        });
                         //does layerGroup already exist? if not create it and add to map
                         var lg = ahccd_layerGroups[feature.properties.type];
 
@@ -1281,20 +1287,11 @@
 
                 });
 
-                // sort options
-
-                let arr = $('#station-select option').map(function (_, o) {
-                    return {t: $(o).text(), v: o.value};
-                }).get();
-
-                arr.sort(function (o1, o2) {
-                    return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0;
+                stations_list.sort(function (o1, o2) {
+                    return o1.Name > o2.Name ? 1 : o1.Name < o2.Name ? -1 : 0;
                 });
 
-                $('#station-select option').each(function (i, o) {
-                    o.value = arr[i].v;
-                    $(o).text(arr[i].t);
-                });
+                fill_station_select();
 
                 // add to map
                 ahccd_layer_cluster.addTo(maps['stations']);
@@ -2261,48 +2258,40 @@
 
                 // stations
 
-                stations_form_obj['stations'] = selected_stations
+                stations_form_obj['stations'] = selected_stations;
 
                 // email
-                stations_form_obj['notification_email'] = $('#analyze-stations-email').val()
+                stations_form_obj['notification_email'] = $('#analyze-stations-email').val();
 
                 var submit_data = {
-                    'analyze-captcha_code': $('#analyze-stations-captcha_code').val(),
+                    'captcha_code': $('#analyze-stations-captcha_code').val(),
+                    'signup':$('#analyze-stations-signup').is(":checked"),
                     'request_data': stations_form_obj,
-                    'submit_url': submit_url_var + submit_url_post
-                }
-
-                console.log('submit data', submit_data)
+                    'submit_url': '/providers/finch/processes/' + submit_url_var + '/jobs'
+                };
 
                 // check captcha
-                // $.ajax({
-                // 		url: child_theme_dir + 'resources/ajax/analyze-form.php',
-                // 		method: "POST",
-                // 		data: submit_data,
-                // 		success: function (data) {
-                //
-                // 				var response = JSON.parse(data)
-                //
-                // 				console.log(response)
-                //
-                // 				if (typeof response == 'object' && response.status == 'accepted') {
-                //
-                // 						$('#analyze-stations-success-modal').modal('show');
-                //
-                // 				} else {
-                //
-                // 						console.log('captcha failed')
-                //
-                // 				}
-                // 		},
-                // 		complete: function () {
-                // 				$('#analyze-stations-captcha_code').val('')
-                // 				$('#analyze-stations-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php')
-                // 		}
-                // })
+                $.ajax({
+                    url: pathToAnalyzeForm,
+                    method: "POST",
+                    data: submit_data,
+                    success: function (data) {
+                        var response = JSON.parse(data);
+                        console.log(response);
+                        if (typeof response == 'object' && response.status == 'accepted') {
+                            $('#analyze-stations-success-modal').modal('show');
+                        } else {
+                            console.log('captcha failed')
+                        }
+                    },
+                    complete: function () {
+                        $('#analyze-stations-captcha_code').val('')
+                        $('#analyze-stations-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php')
+                    }
+                })
 
             }
-        })
+        });
 
 
         // init

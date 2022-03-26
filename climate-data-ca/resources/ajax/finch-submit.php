@@ -26,7 +26,7 @@ if (isset ($_POST['captcha_code'])) {
         if (isset($_POST['required_variables']) && isset($_POST['stations'])) {
             $inputs=[];
             foreach ($_POST['required_variables'] as $variable) {
-                $type = strpos($variable, "tas") ? 'T':'P';
+                $type = strpos($variable, "tas") !== false ? 'T':'P';
                 $inputs[] = ['id' => $variable, 'href' => $data_url . "/download-ahccd?format=netcdf&variable_type_filter=$type&stations={$_POST['stations']}"];
             }
             $_POST['request_data']['inputs'] = array_merge($_POST['request_data']['inputs'], $inputs);

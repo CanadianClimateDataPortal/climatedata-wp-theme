@@ -701,65 +701,12 @@
 						<div class="accordion-head" data-step="1">
               <h5 class="d-flex align-items-center justify-content-between all-caps">
                 <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">1</span>
-                <span class="flex-grow-1"><?php _e ( 'Choose a timeframe', 'cdc' ); ?></span>
-                <i class="fas fa-caret-down"></i>
-              </h5>
-            </div>
-
-            <div class="accordion-content" data-step="1">
-              <div class="accordion-content-inner">
-                <div class="validate-input type-select">
-                  <div class="input-row mb-4">
-                    <div class="input-item">
-                      <label class="form-check-label" for="analyze-stations-timeframe-start"><?php _e ( 'Start Year', 'cdc' ); ?></label>
-                      <!--<span class="tooltip-icon"><i class="fas fa-question"></i></span>-->
-                    </div>
-
-                    <select name="start_date" id="analyze-stations-timeframe-start" class="timeframe-select start custom-select custom-select-lg add-to-object">
-                      <option value="">---</option>
-                      <?php
-
-                        for ( $i = 1950; $i <= 2100; $i += 5 ) {
-                          echo '<option value="' . $i . '">' . $i . '</option>';
-                        }
-
-                      ?>
-                    </select>
-                  </div>
-
-                  <div class="input-row">
-                    <div class="input-item">
-                      <label class="form-check-label" for="analyze-stations-timeframe-end"><?php _e ( 'End Year', 'cdc' ); ?></label>
-                      <!--<span class="tooltip-icon"><i class="fas fa-question"></i></span>-->
-                    </div>
-
-                    <select name="end_date" id="analyze-stations-timeframe-end" class="timeframe-select end custom-select custom-select-lg add-to-object">
-                      <option value="">---</option>
-                      <?php
-
-                        for ( $i = 1950; $i <= 2100; $i += 5 ) {
-
-                          echo '<option value="' . $i . '">' . $i . '</option>';
-
-                        }
-
-                      ?>
-                    </select>
-
-                  </div>
-                </div>
-              </div>
-            </div>
-
-						<div class="accordion-head" data-step="2">
-              <h5 class="d-flex align-items-center justify-content-between all-caps">
-                <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">2</span>
                 <span class="flex-grow-1"><?php _e ( 'Customize variables', 'cdc' ); ?></span>
                 <i class="fas fa-caret-down"></i>
               </h5>
             </div>
 
-            <div class="accordion-content" data-step="2">
+            <div class="accordion-content" data-step="1">
               <div class="accordion-content-scroll">
                 <div class="accordion-content-inner">
                   <div class="field validate-input type-radio">
@@ -835,15 +782,15 @@
               </div>
             </div>
 
-            <div class="accordion-head" data-step="3">
+            <div class="accordion-head" data-step="2">
               <h5 class="d-flex align-items-center justify-content-between all-caps">
-                <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">3</span>
+                <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">2</span>
                 <span class="flex-grow-1"><?php _e ( 'Select stations', 'cdc' ); ?></span>
                 <i class="fas fa-caret-down"></i>
               </h5>
             </div>
 
-            <div class="accordion-content" data-step="3">
+            <div class="accordion-content" data-step="2">
               <div class="accordion-content-inner">
 
 								<div class="field validate-input type-select">
@@ -880,15 +827,15 @@
               </div>
             </div>
 
-            <div class="accordion-head" data-step="4">
+            <div class="accordion-head" data-step="3">
               <h5 class="d-flex align-items-center justify-content-between all-caps">
-                <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">4</span>
+                <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">3</span>
                 <span class="flex-grow-1"><?php _e ( 'Advanced', 'cdc' ); ?></span>
                 <i class="fas fa-caret-down"></i>
               </h5>
             </div>
 
-            <div class="accordion-content" data-step="4">
+            <div class="accordion-content" data-step="3">
 
               <div class="accordion-content-scroll">
                 <div class="accordion-content-inner">
@@ -987,13 +934,6 @@
         <div id="analyze-stations-header" class="analyze-header">
           <div id="analyze-stations-breadcrumb" class="analyze-breadcrumb d-flex">
             <div class="step" data-step="1">
-              <div class="crumb">
-                <h6><?php _e ( 'Dataset', 'cdc' ); ?></h6>
-                <p class="value"></p>
-              </div>
-            </div>
-
-            <div class="step" data-step="2">
               <div class="caret">
                 <i class="fas fa-caret-right fa-2x"></i>
               </div>
@@ -1004,7 +944,7 @@
               </div>
             </div>
 
-            <div class="step" data-step="3">
+            <div class="step" data-step="2">
               <div class="caret">
                 <i class="fas fa-caret-right fa-2x"></i>
               </div>
@@ -1015,7 +955,7 @@
               </div>
             </div>
 
-            <div class="step" data-step="4">
+            <div class="step" data-step="3">
               <div class="caret">
                 <i class="fas fa-caret-right fa-2x"></i>
               </div>
@@ -1055,21 +995,18 @@
 
               echo json_encode ( array (
                 array (
-                  'head' => __ ( 'Select a timeframe', 'cdc' ),
-                  'text' => __ ( 'Start by selecting a start and end date from the menu on the left.', 'cdc' )
-                ), array (
                   'head' => __ ( 'Select a variable', 'cdc' ),
-                  'text' => __ ( 'Next, click “Customize Variable” to set the variable and thresholds', 'cdc' )
+                  'text' => __ ( 'Start by selecting a variable from the menu on the left and then set the thresholds.', 'cdc' )
                 ), array (
                   'head' => __ ( 'Select a station', 'cdc' ),
-                  'text' => __ ( 'Select one or more stations to include in your request', 'cdc' )
+                  'text' => __ ( 'Next, click on "Select Stations" to select one or more stations to include in your request', 'cdc' )
                 )
 
               ) );
 
             ?>'>
-              <h4><?php _e ( 'Select a timeframe', 'cdc' ); ?></h4>
-              <p><?php _e ( 'Start by selecting a start and end date from the menu on the left.', 'cdc' ); ?></p>
+              <h4><?php _e ( 'Select a variable', 'cdc' ); ?></h4>
+              <p><?php _e ( 'Start by selecting a variable from the menu on the left and then set the thresholds.', 'cdc' ); ?></p>
               <span class="btn btn-outline-secondary rounded-pill hidden"><?php _e ( 'Click to continue', 'cdc' ); ?></span>
             </div>
 

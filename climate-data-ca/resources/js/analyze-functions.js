@@ -88,8 +88,6 @@
         var stations_default_inputs = {
             'freq': '',
             'check_missing': '',
-            'start_date': '',
-            'end_date': '',
             'output_format': ''
         }
 
@@ -304,12 +302,12 @@
 						})
         });
 
-        $('#analyze-stations .accordion-content[data-step="2"] .input-item').on('click', function (e) {
+        $('#analyze-stations .accordion-content[data-step="1"] .input-item').on('click', function (e) {
 
             // update map overlay
 
-            $('#analyze-stations-map-overlay-content h4').html(stations_overlay_text[2]['head'])
-            $('#analyze-stations-map-overlay-content p').html(stations_overlay_text[2]['text'])
+            $('#analyze-stations-map-overlay-content h4').html(stations_overlay_text[1]['head'])
+            $('#analyze-stations-map-overlay-content p').html(stations_overlay_text[1]['text'])
 
             // filter stations
 
@@ -1182,21 +1180,10 @@
 
             $('#analyze-stations-steps').accordion({
                 heightStyle: 'content',
-                activate: function (e, ui) {
-
-                    // if (ui.newPanel.attr('data-step') == '1') {
-                    //
-                    //   if ($.isEmptyObject(map_grids)) {
-                    //     $('#analyze-map-overlay').fadeIn(250)
-                    //   }
-                    //
-                    // }
-
-                },
                 beforeActivate: function (e, ui) {
 
                     if (
-                        ui.newPanel.attr('data-step') == '2' &&
+                        ui.newPanel.attr('data-step') == '1' &&
                         ui.newPanel.find('.checked').length
                     ) {
 
@@ -1208,7 +1195,7 @@
 
                     }
 
-                    if (ui.newPanel.attr('data-step') == '3') {
+                    if (ui.newPanel.attr('data-step') == '2') {
 
                         $('#analyze-stations-map-overlay').fadeOut(250)
 
@@ -1731,7 +1718,7 @@
 
                 // STATIONS
 
-                var valid_steps = [false, false, false, false];
+                var valid_steps = [false, false, false];
 
                 $('#analyze-stations-steps .validate-input').each(function (i) {
 
@@ -1755,10 +1742,6 @@
                             } else {
                                 breadcrumb_val = current_accordion.find('.checked').find('.form-check-label').text()
                             }
-
-                            // if (current_step == 2) {
-                            // 		breadcrumb_val = '<span class="grid-count">' + selectedGrids.length + '</span> ' + breadcrumb_val
-                            // }
 
                         }
 
@@ -2134,9 +2117,9 @@
                 }
 
                 if (stations_thresholds_have_val == true) {
-                    $('#analyze-stations-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
+                    $('#analyze-stations-breadcrumb .step[data-step="1"] .validation-tooltip').hide();
                 } else {
-                    $('#analyze-stations-breadcrumb .step[data-step="2"] .validation-tooltip').show();
+                    $('#analyze-stations-breadcrumb .step[data-step="1"] .validation-tooltip').show();
                 }
 
                 // make sure at least one station is selected

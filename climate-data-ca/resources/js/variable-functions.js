@@ -1250,7 +1250,7 @@
             var addStr = "";
             for (let index = 0; index < chartData.series.length; index++) {
                 var chartDataName = chartData.series[index].name;
-                if (chartData.series[index].visible) {
+                if (chartData.series[index].visible && charData.series[index].type != 'areaspline') {
                     addStr += chartData.series[index].name + ", ";
                 }
             }

@@ -992,7 +992,7 @@
                 'chart_data_settings': chartDataSettings,
                 'chart_data_columns': addStr,
                 'chart_data_format': chartDataFormat,
-                'chart_data_view_by': ""
+                'chart_data_view_by': "Gridded data"
             });
         }
 

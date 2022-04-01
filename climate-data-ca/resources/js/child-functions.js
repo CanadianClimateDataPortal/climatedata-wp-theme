@@ -645,6 +645,45 @@ function unit_localize(str) {
             //console.log('listnav');
         }
 
+				// SHARE
+
+				if ($('#share').length) {
+
+					window.fbAsyncInit = function() {
+				    FB.init({
+				      appId            : '387199319682000',
+				      autoLogAppEvents : true,
+				      xfbml            : true,
+				      version          : 'v13.0'
+				    });
+				  };
+
+					$('#share').share_widget({
+					  site_url: '//' + window.location.hostname,
+					  theme_dir: child_theme_dir,
+					  share_url: window.location.href,
+					  title: document.title,
+					  elements: {
+					    facebook: {
+					      display: true,
+					      icon: 'fab fa-facebook mr-3'
+					    },
+					    twitter: {
+					      display: true,
+					      icon: 'fab fa-twitter mr-3',
+					      text: null,
+					      via: null
+					    },
+							linkedin: {
+								display: true,
+								icon: 'fab fa-linkedin mr-3'
+							}
+					  },
+					  callback: null // callback function
+					})
+
+				}
+
         if (typeof $.fn.renderer !== 'undefined' && $('.renderable').length) {
             $(document).renderer();
         }

@@ -1175,17 +1175,10 @@
                 tempDict = frMonthDict;
             }
 
-            var realMonthName = "";
-            try {
-                if (tempDict[keySelected]) {
-                    realMonthName = tempDict[keySelected];
-                } else {
-                    throw ('Can not get the month with this key: ' + keySelected);
-                }
-            } catch (err) {
-                console.error(err);
+            var realMonthName = "undefined";
+            if (keySelected in tempDict) {
+                realMonthName = tempDict[keySelected]
             }
-
             return realMonthName;
         }
 
@@ -1254,11 +1247,9 @@
             var eventName = getGA4EventNameForVariableDownloadData(chartDataFormat, query['var']);
             var overlayTitle = $('.overlay-title').text();
 
-            // Exclude: Navigator 5
             var addStr = "";
             for (let index = 0; index < chartData.series.length; index++) {
-                var chartDataName = chartData.series[index].name;
-                if (chartData.series[index].visible && !chartDataName.includes('Navigator 5')) {
+                if (chartData.series[index].visible && chartData.series[index].type != 'areaspline') {
                     addStr += chartData.series[index].name + ", ";
                 }
             }
@@ -1576,7 +1567,7 @@
                                 val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
                                 tip.push("<span style=\"color:#00F\">●</span> " + chart_labels.rcp_26_median + " <b>"
                                     + val1 + "</b><br/>");
-                                
+
                                 this.value = data['30y_rcp26_range'][decade_ms][0];
                                 val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
                                 this.value = data['30y_rcp26_range'][decade_ms][1];

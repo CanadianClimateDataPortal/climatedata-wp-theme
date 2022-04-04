@@ -40,6 +40,7 @@
         }
 
 
+
         var history_action = 'init', // global tracking variable for history action
             station_on = false, // flag for showing/hiding the stations layer,
             sector_on = false,
@@ -901,6 +902,12 @@
 
                 switch ($(this).attr('data-type')) {
                     case 'csv' :
+                        try {
+                            setDataLayerForChartData('csv', chart);
+                        } catch (e) {
+                            console.error(e);
+                        }
+
                         chart.downloadCSV();
                         break;
                 }
@@ -911,8 +918,9 @@
                 e.preventDefault();
 
                 var dl_type = '';
+                let file_format = $(this).attr('data-type');
 
-                switch ($(this).attr('data-type')) {
+                switch (file_format) {
                     case 'png' :
                         dl_type = 'image/png';
                         break;
@@ -920,13 +928,72 @@
                         dl_type = 'application/pdf';
                         break;
                 }
-
+                setDataLayerForChartData(file_format, chart);
                 chart.exportChartLocal({
                     type: dl_type
                 });
             });
+        }
+
+        var variableDownloadDataTypes = {
+            // Variable_Download-Data_*
+            'slr': 'Sea-Level_Change'
+        };
+
+        function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
+            var gA4EventNameForVariableDownloadData = "undefined";
+            keySelected = keySelected.toLowerCase();
+
+            if (keySelected in variableDownloadDataTypes) {
+                var eventType = '';
+                if (chartDataFormat.includes('csv')) {
+                    eventType = "Variable_Download-Data_";
+                } else if (chartDataFormat.includes('pdf') || chartDataFormat.includes('png')) {
+                    eventType = "Variable_Download-Image_";
+                } else {
+                    throw ('Invalid GA4 event file format (csv, pdf, png): ' + chartDataFormat);
+                }
+                gA4EventNameForVariableDownloadData = eventType + variableDownloadDataTypes[keySelected];
+            }
+
+            return gA4EventNameForVariableDownloadData;
+        }
 
 
+        function setDataLayerForChartData(chartDataFormat, chartData) {
+
+            if (!chartDataFormat.length) {
+                throw new Error('Value undefined or empty, please specify the file format (ex. csv, pdf, png, etc.)') ;
+            }
+            var eventName = getGA4EventNameForVariableDownloadData(chartDataFormat, "slr");
+            var overlayTitle = $('.overlay-title').text();
+
+            var addStr = "";
+            for (let index = 0; index < chartData.series.length; index++) {
+                if (chartData.series[index].visible && chartData.series[index].type != 'areaspline') {
+                    addStr += chartData.series[index].name + ", ";
+                }
+            }
+
+            // Remove last 2 char: ;
+            if (addStr.length > 0) {
+                addStr = addStr.substring(0, addStr.length - 2);
+            }
+
+            // ex: Région de la Montérégie; rcp26; Annuel
+            let chartDataSettings = overlayTitle + "; " + query['rcp'] + "; " + (($('body').hasClass('lang-fr')) ? 'Annuel' : 'Annual');
+
+            console.log("download file type: " + chartDataFormat)
+            // console.log("eventName: " + eventName)
+
+            dataLayer.push({
+                'event': eventName,
+                'chart_data_event_type': eventName,
+                'chart_data_settings': chartDataSettings,
+                'chart_data_columns': addStr,
+                'chart_data_format': chartDataFormat,
+                'chart_data_view_by': "Gridded data"
+            });
         }
 
         // LAYER CHART

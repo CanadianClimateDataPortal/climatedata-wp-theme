@@ -929,7 +929,7 @@
                         break;
                 }
                 setDataLayerForChartData(file_format, chart);
-                chart.exportChartLocal({
+                chart.exportChart({
                     type: dl_type
                 });
             });

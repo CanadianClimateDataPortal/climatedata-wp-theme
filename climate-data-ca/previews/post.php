@@ -21,7 +21,7 @@
 
   <div class="card-body">
     <h6 class="card-date"><?php echo get_the_time( 'F j, Y', $item['id'] ); ?></h6>
-    <h5 class="card-title"><a href="<?php echo $item['permalink']; ?>"><?php echo $item['title']; ?></a></h5>
+    <h5 class="card-title mb-2"><a href="<?php echo $item['permalink']; ?>"><?php echo $item['title']; ?></a></h5>
 
     <?php
 
@@ -29,7 +29,7 @@
 
 		?>
 
-		<p class="card-author mb-0"><?php the_field ( 'post_author', $item['id'] ); ?></p>
+		<p class="card-author mb-4"><?php the_field ( 'post_author', $item['id'] ); ?></p>
 
 		<?php
 

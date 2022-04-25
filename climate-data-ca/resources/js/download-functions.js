@@ -486,6 +486,8 @@
             'tr_18': 'Tropical-Nights-Days-with-Tmin_GreaterThan_18C',
             'tr_20': 'Tropical-Nights-Days-with-Tmin_GreaterThan_20C',
             'tr_22': 'Tropical-Nights-Days-with-Tmin_GreaterThan_22C',
+            'slr': 'Sea-Level_Change',
+            'all': 'All',
         };
 
         var pointsInfo = "";

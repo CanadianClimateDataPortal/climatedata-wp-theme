@@ -52,7 +52,7 @@
           <div class="hero-menu">
             <h6><?php _e ( 'Date', 'cdc' ); ?></h6>
 
-            <p class="mb-4"><?php the_time ( 'F j, Y' ); ?></p>
+            <p class="mb-4"><?php the_time ( __('F j, Y', 'cdc') ); ?></p>
 
 						<?php
 

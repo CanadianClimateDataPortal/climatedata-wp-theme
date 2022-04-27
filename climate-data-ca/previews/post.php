@@ -20,7 +20,7 @@
   ?>
 
   <div class="card-body">
-    <h6 class="card-date"><?php echo get_the_time( 'F j, Y', $item['id'] ); ?></h6>
+    <h6 class="card-date"><?php echo get_the_time( __('F j, Y', 'cdc'), $item['id'] ); ?></h6>
     <h5 class="card-title mb-2"><a href="<?php echo $item['permalink']; ?>"><?php echo $item['title']; ?></a></h5>
 
     <?php

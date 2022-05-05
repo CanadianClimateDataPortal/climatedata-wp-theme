@@ -910,14 +910,14 @@
 
                     <div class="input-row form-check w-50">
                       <div class="input-item">
-                        <input class="form-check-input add-to-object" type="radio" name="output_format" id="analyze-stations-format-csv" value="csv" checked>
-                        <label class="form-check-label" for="analyze-stations-model-csv">CSV</label>
+                        <input class="form-check-input add-to-object disabled" type="radio" name="output_format" id="analyze-stations-format-csv" value="csv">
+                        <label class="form-check-label" for="analyze-stations-model-csv">CSV <?php _e('(coming soon)', 'cdc'); ?></label>
                       </div>
                     </div>
 
                     <div class="input-row form-check w-50">
                       <div class="input-item">
-                        <input class="form-check-input add-to-object" type="radio" name="output_format" id="analyze-stations-format-netcdf" value="netcdf">
+                        <input class="form-check-input add-to-object" type="radio" name="output_format" id="analyze-stations-format-netcdf" value="netcdf" checked>
                         <label class="form-check-label" for="analyze-stations-model-netcdf">NetCDF</label>
                       </div>
                     </div>

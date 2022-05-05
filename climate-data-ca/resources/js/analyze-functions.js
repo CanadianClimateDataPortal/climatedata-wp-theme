@@ -212,6 +212,7 @@
         //
 
         $('.analyze-breadcrumb [data-toggle="tooltip"]').tooltip();
+        $('.analyze-form-inputs [data-toggle="tooltip"]').tooltip();
 
         //
         // ANALYZE

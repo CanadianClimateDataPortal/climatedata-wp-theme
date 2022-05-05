@@ -65,7 +65,7 @@
 
 		<ul class="navbar-nav tabs-nav w-100 justify-content-center">
 			<li class="nav-item"><a href="#analyze-projections" class="nav-link px-4 py-5 all-caps"><?php _e('Climate Projections', 'cdc'); ?></a></li>
-			<li class="nav-item"><a href="#analyze-stations" class="nav-link px-4 py-5 all-caps"><?php _e('Station Data', 'cdc'); ?></a></li>
+			<li class="nav-item"><a href="#analyze-stations" class="nav-link px-4 py-5 all-caps"><?php _e('Observations', 'cdc'); ?></a></li>
 		</ul>
 
 	</nav>
@@ -841,7 +841,10 @@
                 <div class="accordion-content-inner">
 
 									<div class="field validate-input type-radio d-flex flex-wrap">
-											<p class="input-label w-100"><?php _e ( 'Missing Data Options', 'cdc' ); ?></p>
+											<p class="input-label w-100"><?php _e ( 'Missing Data Options', 'cdc' ); ?>
+                                                <i class="fas fa-question-circle ml-3 validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Placeholder for explaination', 'cdc' ); ?>"></i></h6>
+                                        <p class="value"></p>
+                                            </p>
 
 											<div class="input-row form-check w-25">
 													<div class="input-item">
@@ -928,6 +931,12 @@
           </div>
 
         </form>
+          <div class="float-right" style="padding:20px">
+              <h5><?php _e ( 'Legend', 'cdc' ); ?></h5>
+              <div class="row"><span><img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/square-blue.png" style="padding:0 10px 0 10px;"></span><span style="font-size: 1.5em"><?php _e ( 'Temperature', 'cdc' ); ?></span></div> <br>
+              <div class="row"><span><img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/triangle-blue.png" style="padding:0 10px 0 10px;"></span><span style="font-size: 1.5em"><?php _e ( 'Precipitation', 'cdc' ); ?></span></div><br>
+              <div class="row"><span><img src="/site/assets/themes/climate-data-ca/resources/app/ahccd/circle-blue.png" style="padding:0 10px 0 10px;"></span><span style="font-size: 1.5em"><?php _e ( 'Both', 'cdc' ); ?></span></div>
+          </div>
       </div>
 
       <div class="col-9">

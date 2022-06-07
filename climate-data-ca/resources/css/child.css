@@ -7472,15 +7472,23 @@ body.stations-on #variable-content .leaflet-top.leaflet-right {
   padding: 10px 14px;
 }
 
-/*
-.single {
-  #hero {
-    .section-container {
-      padding: 150px 0 60px 0;
-    }
-  }
+.single #hero #post-share-wrap .social-widget-wrap .social-trigger {
+  display: none;
 }
-*/
+.single #hero #post-share-wrap .social-widget-wrap .social-widget {
+  display: flex;
+  font-size: 1.4rem;
+  position: static;
+  width: auto;
+  padding: 0;
+  background-color: transparent;
+  opacity: 1;
+}
+.single #hero #post-share-wrap .social-widget-wrap .social-widget li {
+  margin: 0;
+  margin-right: 2rem;
+}
+
 #glossary-listnav-nav .ln-letters {
   flex-direction: row;
   flex-wrap: wrap;
@@ -7791,6 +7799,9 @@ body.stations-on #variable-content .leaflet-top.leaflet-right {
 .post-preview.type-resource:hover .card-bg {
   box-shadow: 0 15px 20px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(0, 0, 0, 0.3) inset;
 }
+.post-preview.type-post .card-author {
+  font-size: 1.4rem;
+}
 
 #var-overlay-resource .card-overlay,
 #var-overlay-resource .card-label {
@@ -7913,10 +7924,6 @@ body.overlay-open[data-overlay-content=video] #main-header-nav .overlay-close {
 .form-help {
   margin-bottom: 0;
   font-size: 1.4em;
-}
-
-.form-check {
-  font-size: 1.4rem;
 }
 
 #page-feedback .form-radio {
@@ -8130,6 +8137,57 @@ body.overlay-open[data-overlay-content=video] #main-header-nav .overlay-close {
   text-transform: uppercase;
 }
 
+.social-widget-wrap {
+  position: relative;
+  font-family: "CDCSans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+.social-widget-wrap .social-trigger {
+  cursor: pointer;
+  color: #212529;
+}
+.social-widget-wrap .social-trigger .icon {
+  margin: 0 10px 0 0;
+  color: #3869f6;
+}
+.social-widget-wrap .social-widget {
+  position: absolute;
+  top: 100%;
+  right: 9999px;
+  width: 200%;
+  margin: 0;
+  padding: 10px;
+  background-color: #fff;
+  opacity: 0;
+  list-style: none;
+  color: #3869f6;
+  font-size: 1em;
+  transition: right 0s ease 0.25s, opacity 0.25s ease 0s;
+  z-index: 1;
+}
+.social-widget-wrap .social-widget li {
+  padding: 6px 0;
+}
+.social-widget-wrap .social-widget a {
+  display: block;
+  float: none;
+}
+.social-widget-wrap.open .social-widget {
+  right: 0;
+  opacity: 1;
+  transition: right 0s ease 0s, opacity 0.25s ease 0s;
+}
+
+.share-permalink-input {
+  display: none;
+}
+.share-permalink-input input {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 4px;
+  outline: none;
+}
+
 /*
 	STYLE SHEET FOR JQUERY LISTNAV PLUGIN V 3.0.0, 11/22/2017
 	For more information, visit http://esteinborn.github.com/jquery-listnav
@@ -8191,6 +8249,74 @@ body.overlay-open[data-overlay-content=video] #main-header-nav .overlay-close {
 
 .leaflet-container {
   font-family: "CDCSans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.marker-cluster-small {
+  background-color: rgba(181, 226, 140, 0.6);
+}
+
+.marker-cluster-small div {
+  background-color: rgba(110, 204, 57, 0.6);
+}
+
+.marker-cluster-medium {
+  background-color: rgba(241, 211, 87, 0.6);
+}
+
+.marker-cluster-medium div {
+  background-color: rgba(240, 194, 12, 0.6);
+}
+
+.marker-cluster-large {
+  background-color: rgba(253, 156, 115, 0.6);
+}
+
+.marker-cluster-large div {
+  background-color: rgba(241, 128, 23, 0.6);
+}
+
+/* IE 6-8 fallback colors */
+.leaflet-oldie .marker-cluster-small {
+  background-color: #b5e28c;
+}
+
+.leaflet-oldie .marker-cluster-small div {
+  background-color: #6ecc39;
+}
+
+.leaflet-oldie .marker-cluster-medium {
+  background-color: #f1d357;
+}
+
+.leaflet-oldie .marker-cluster-medium div {
+  background-color: #f0c20c;
+}
+
+.leaflet-oldie .marker-cluster-large {
+  background-color: #fd9c73;
+}
+
+.leaflet-oldie .marker-cluster-large div {
+  background-color: #f18017;
+}
+
+.marker-cluster {
+  background-clip: padding-box;
+  border-radius: 20px;
+}
+
+.marker-cluster div {
+  width: 30px;
+  height: 30px;
+  margin-left: 5px;
+  margin-top: 5px;
+  text-align: center;
+  border-radius: 15px;
+  font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.marker-cluster span {
+  line-height: 30px;
 }
 
 .irs {
@@ -8869,6 +8995,9 @@ body.overlay-open[data-overlay-content=video] #main-header-nav .overlay-close {
   z-index: 10;
 }
 
+.bootstrap-datetimepicker-widget {
+  font-size: 10px;
+}
 .bootstrap-datetimepicker-widget.dropdown-menu {
   width: auto !important;
 }

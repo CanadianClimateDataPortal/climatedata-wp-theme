@@ -140,6 +140,38 @@
         // MAPS
 
         var maps = {};
+        var pbfLayer;
+
+        selectedGrids = [];
+        selectedPoints = [];
+        latlons = [];
+
+        var map_grids = {};
+
+        var vectorTileOptions = {
+            rendererFactory: L.canvas.tile,
+            attribution: '',
+            interactive: true,
+            getFeatureId: function (f) {
+                return f.properties.gid;
+            },
+            maxNativeZoom: 12,
+            vectorTileLayerStyles: {
+                'canadagrid': function (properties, zoom) {
+                    return {
+                        weight: 0.1,
+                        color: gridline_color,
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0
+                    }
+                }
+            },
+            maxZoom: 12,
+            minZoom: 7,
+            pane: 'grid'
+        };
 
         var hosturl = geoserver_url,
             zoom_on = false,
@@ -179,7 +211,7 @@
 
             },
             activate: function (e, ui) {
-                // history.replaceState(null, null, '#' + ui.newPanel.attr('id'));
+                history.replaceState(null, null, '#' + ui.newPanel.attr('id'));
 
                 current_tab = ui.newPanel.attr('id');
 
@@ -267,6 +299,65 @@
 
             });
 
+            pbfLayer = L.vectorGrid.protobuf(hosturl + '/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf', vectorTileOptions).on('click', function (e) {
+
+                highlightGridFeature = e.layer.properties.gid;
+
+                selectedPoints[highlightGridFeature] = e.latlng;
+
+                var selectedExists = selectedGrids.includes(highlightGridFeature);
+
+                if (selectedExists === false) {
+
+                    map_grids[highlightGridFeature] = e.latlng
+
+                    selectedGrids.push(highlightGridFeature);
+
+                    pbfLayer.setFeatureStyle(highlightGridFeature, {
+                        weight: 1,
+                        color: '#F00',
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0.1
+                    })
+
+                } else {
+                    DeselectedGridCell(highlightGridFeature);
+                }
+
+
+                $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length)
+
+                var i = 0,
+                    lat_val = '',
+                    lon_val = ''
+
+                for (var key in map_grids) {
+
+                    if (i != 0) {
+                        lat_val += ','
+                        lon_val += ','
+                    }
+
+                    lat_val += map_grids[key]['lat']
+                    lon_val += map_grids[key]['lng']
+
+                    i++
+
+                }
+
+                $('#lat').val(lat_val)
+                $('#lon').val(lon_val)
+                $('#shape').val('')
+
+                validate_inputs()
+
+                L.DomEvent.stop(e)
+
+            }).addTo(maps['analyze']);
+
+
             validate_steps();
             validate_inputs();
 
@@ -304,11 +395,16 @@
         });
 
         $('#analyze-stations .accordion-content[data-step="1"] .input-item').on('click', function (e) {
+            $('#analyze-stations-map-overlay-content h4').html(stations_overlay_text[1]['head'])
+            $('#analyze-stations-map-overlay-content p').html(stations_overlay_text[1]['text'])
+        });
+
+        $('#analyze-stations .accordion-content[data-step="2"] .input-item').on('click', function (e) {
 
             // update map overlay
 
-            $('#analyze-stations-map-overlay-content h4').html(stations_overlay_text[1]['head'])
-            $('#analyze-stations-map-overlay-content p').html(stations_overlay_text[1]['text'])
+            $('#analyze-stations-map-overlay-content h4').html(stations_overlay_text[2]['head'])
+            $('#analyze-stations-map-overlay-content p').html(stations_overlay_text[2]['text'])
 
             // filter stations
 
@@ -1184,7 +1280,7 @@
                 beforeActivate: function (e, ui) {
 
                     if (
-                        ui.newPanel.attr('data-step') == '1' &&
+                        ui.newPanel.attr('data-step') == '2' &&
                         ui.newPanel.find('.checked').length
                     ) {
 
@@ -1196,7 +1292,7 @@
 
                     }
 
-                    if (ui.newPanel.attr('data-step') == '2') {
+                    if (ui.newPanel.attr('data-step') == '3') {
 
                         $('#analyze-stations-map-overlay').fadeOut(250)
 
@@ -1313,107 +1409,8 @@
             $(this).closest('.analyze-detail').slideUp()
         });
 
-        //
-        // MAP
-        //
-
-        selectedGrids = [];
-        selectedPoints = [];
-        latlons = [];
-
-        var map_grids = {};
-
-        var highlight;
-
-        var clearHighlight = function () {
-            if (highlight) {
-                pbfLayer.resetFeatureStyle(highlight);
-            }
-            highlight = null;
-        };
-
-        var vectorTileOptions = {
-            rendererFactory: L.canvas.tile,
-            attribution: '',
-            interactive: true,
-            getFeatureId: function (f) {
-                return f.properties.gid;
-            },
-            maxNativeZoom: 12,
-            vectorTileLayerStyles: {
-                'canadagrid': function (properties, zoom) {
-                    return {
-                        weight: 0.1,
-                        color: gridline_color,
-                        opacity: 1,
-                        fill: true,
-                        radius: 4,
-                        fillOpacity: 0
-                    }
-                }
-            },
-            maxZoom: 12,
-            minZoom: 7,
-            pane: 'grid'
-        }
-
-        var pbfLayer = L.vectorGrid.protobuf(hosturl + '/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf', vectorTileOptions).on('click', function (e) {
-
-            highlightGridFeature = e.layer.properties.gid;
-
-            selectedPoints[highlightGridFeature] = e.latlng;
-
-            var selectedExists = selectedGrids.includes(highlightGridFeature);
-
-            if (selectedExists === false) {
-
-                map_grids[highlightGridFeature] = e.latlng
-
-                selectedGrids.push(highlightGridFeature);
-
-                pbfLayer.setFeatureStyle(highlightGridFeature, {
-                    weight: 1,
-                    color: '#F00',
-                    opacity: 1,
-                    fill: true,
-                    radius: 4,
-                    fillOpacity: 0.1
-                })
-
-            } else {
-                DeselectedGridCell(highlightGridFeature);
-            }
 
 
-            $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length)
-
-            var i = 0,
-                lat_val = '',
-                lon_val = ''
-
-            for (var key in map_grids) {
-
-                if (i != 0) {
-                    lat_val += ','
-                    lon_val += ','
-                }
-
-                lat_val += map_grids[key]['lat']
-                lon_val += map_grids[key]['lng']
-
-                i++
-
-            }
-
-            $('#lat').val(lat_val)
-            $('#lon').val(lon_val)
-            $('#shape').val('')
-
-            validate_inputs()
-
-            L.DomEvent.stop(e)
-
-        }).addTo(maps['analyze']);
 
 
         function DeselectAllGridCell() {
@@ -1719,7 +1716,7 @@
 
                 // STATIONS
 
-                var valid_steps = [false, false, false];
+                var valid_steps = [false, false, false, false];
 
                 $('#analyze-stations-steps .validate-input').each(function (i) {
 
@@ -2118,9 +2115,9 @@
                 }
 
                 if (stations_thresholds_have_val == true) {
-                    $('#analyze-stations-breadcrumb .step[data-step="1"] .validation-tooltip').hide();
+                    $('#analyze-stations-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
                 } else {
-                    $('#analyze-stations-breadcrumb .step[data-step="1"] .validation-tooltip').show();
+                    $('#analyze-stations-breadcrumb .step[data-step="2"] .validation-tooltip').show();
                 }
 
                 // make sure at least one station is selected
@@ -2214,6 +2211,19 @@
 
                 // stations
                 let selected_stations = $("#station-select").val() || [];
+                let output_name_suffix='';
+                if (selected_stations.length == 1) {
+                    stations_list.forEach(function (station) {
+                        if (station.ID == selected_stations[0]) {
+                            output_name_suffix = '_' + station.Name;
+                        }
+                    });
+                }
+                // not implemented yet in Finch
+                //stations_form_obj['inputs'].push({
+                //    'id': 'output_name',
+                //    'data': submit_url_var + output_name_suffix
+                //});
 
 
                 // email

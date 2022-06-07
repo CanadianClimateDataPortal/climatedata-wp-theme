@@ -698,15 +698,47 @@
 
           <div id="analyze-stations-steps" class="analyze-steps">
 
-						<div class="accordion-head" data-step="1">
+              <div class="accordion-head" data-step="1">
+                  <h5 class="d-flex align-items-center justify-content-between all-caps">
+                      <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">1</span>
+                      <span class="flex-grow-1"><?php _e ( 'Choose a dataset', 'cdc' ); ?></span>
+                      <i class="fas fa-caret-down"></i>
+                  </h5>
+              </div>
+
+              <div class="accordion-content" data-step="1">
+                  <div class="accordion-content-inner">
+                      <div class="field validate-input type-radio">
+                          <div class="input-row form-check">
+                              <div class="input-item">
+                                  <input class="form-check-input disabled" type="radio" name="station_dataset_name" id="analyze-stations-dataset-regular" value="regular">
+                                  <label class="form-check-label" for="analyze-stations-regular"><?php _e('Regular station data','cdc');?> <?php _e('(coming soon)', 'cdc'); ?></label>
+                              </div>
+
+                              <!--<span class="tooltip-icon"><i class="fas fa-question"></i></span>-->
+                          </div>
+                          <div class="input-row form-check">
+                              <div class="input-item">
+                                  <input class="form-check-input" type="radio" name="station_dataset_name" id="analyze-stations-dataset-ahccd" value="ahccd" checked>
+                                  <label class="form-check-label" for="analyze-stations-regular"><?php _e('AHCCD','cdc'); ?></label>
+                              </div>
+
+                              <!--<span class="tooltip-icon"><i class="fas fa-question"></i></span>-->
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+
+						<div class="accordion-head" data-step="2">
               <h5 class="d-flex align-items-center justify-content-between all-caps">
-                <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">1</span>
+                <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">2</span>
                 <span class="flex-grow-1"><?php _e ( 'Customize variables', 'cdc' ); ?></span>
                 <i class="fas fa-caret-down"></i>
               </h5>
             </div>
 
-            <div class="accordion-content" data-step="1">
+            <div class="accordion-content" data-step="2">
               <div class="accordion-content-scroll">
                 <div class="accordion-content-inner">
                   <div class="field validate-input type-radio">
@@ -782,15 +814,15 @@
               </div>
             </div>
 
-            <div class="accordion-head" data-step="2">
+            <div class="accordion-head" data-step="3">
               <h5 class="d-flex align-items-center justify-content-between all-caps">
-                <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">2</span>
+                <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">3</span>
                 <span class="flex-grow-1"><?php _e ( 'Select stations', 'cdc' ); ?></span>
                 <i class="fas fa-caret-down"></i>
               </h5>
             </div>
 
-            <div class="accordion-content" data-step="2">
+            <div class="accordion-content" data-step="3">
               <div class="accordion-content-inner">
 
 								<div class="field validate-input type-select">
@@ -827,15 +859,15 @@
               </div>
             </div>
 
-            <div class="accordion-head" data-step="3">
+            <div class="accordion-head" data-step="4">
               <h5 class="d-flex align-items-center justify-content-between all-caps">
-                <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">3</span>
+                <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">4</span>
                 <span class="flex-grow-1"><?php _e ( 'Advanced', 'cdc' ); ?></span>
                 <i class="fas fa-caret-down"></i>
               </h5>
             </div>
 
-            <div class="accordion-content" data-step="3">
+            <div class="accordion-content" data-step="4">
 
               <div class="accordion-content-scroll">
                 <div class="accordion-content-inner">
@@ -943,7 +975,14 @@
         <div id="analyze-stations-header" class="analyze-header">
           <div id="analyze-stations-breadcrumb" class="analyze-breadcrumb d-flex">
             <div class="step" data-step="1">
-              <div class="caret">
+                <div class="crumb">
+                    <h6><?php _e ( 'Dataset', 'cdc' ); ?></h6>
+                    <p class="value"></p>
+                </div>
+            </div>
+
+              <div class="step" data-step="2">
+                  <div class="caret">
                 <i class="fas fa-caret-right fa-2x"></i>
               </div>
 
@@ -953,7 +992,7 @@
               </div>
             </div>
 
-            <div class="step" data-step="2">
+            <div class="step" data-step="3">
               <div class="caret">
                 <i class="fas fa-caret-right fa-2x"></i>
               </div>
@@ -964,7 +1003,7 @@
               </div>
             </div>
 
-            <div class="step" data-step="3">
+            <div class="step" data-step="4">
               <div class="caret">
                 <i class="fas fa-caret-right fa-2x"></i>
               </div>
@@ -1002,20 +1041,24 @@
 
             <div id="analyze-stations-map-overlay-content" class="analyze-map-overlay-content" data-steps='<?php
 
-              echo json_encode ( array (
-                array (
-                  'head' => __ ( 'Select a variable', 'cdc' ),
-                  'text' => __ ( 'Start by selecting a variable from the menu on the left and then set the thresholds.', 'cdc' )
-                ), array (
-                  'head' => __ ( 'Select a station', 'cdc' ),
-                  'text' => __ ( 'Next, click on "Select Stations" to select one or more stations to include in your request', 'cdc' )
+            echo json_encode(array(
+                array(
+                    'head' => __('Select a dataset', 'cdc'),
+                    'text' => __('Start by selecting a dataset from the menu on the left.', 'cdc')
+                ),
+                array(
+                    'head' => __('Select a variable', 'cdc'),
+                    'text' => __('Next, select a variable from the menu on the left and then set the thresholds.', 'cdc')
+                ), array(
+                    'head' => __('Select a station', 'cdc'),
+                    'text' => __('Next, click on "Select Stations" to select one or more stations to include in your request', 'cdc')
                 )
 
-              ) );
+            ));
 
             ?>'>
               <h4><?php _e ( 'Select a variable', 'cdc' ); ?></h4>
-              <p><?php _e ( 'Start by selecting a variable from the menu on the left and then set the thresholds.', 'cdc' ); ?></p>
+              <p><?php _e ( 'Start by selecting a dataset from the menu on the left.', 'cdc' ); ?></p>
               <span class="btn btn-outline-secondary rounded-pill hidden"><?php _e ( 'Click to continue', 'cdc' ); ?></span>
             </div>
 

@@ -395,11 +395,16 @@
         });
 
         $('#analyze-stations .accordion-content[data-step="1"] .input-item').on('click', function (e) {
+            $('#analyze-stations-map-overlay-content h4').html(stations_overlay_text[1]['head'])
+            $('#analyze-stations-map-overlay-content p').html(stations_overlay_text[1]['text'])
+        });
+
+        $('#analyze-stations .accordion-content[data-step="2"] .input-item').on('click', function (e) {
 
             // update map overlay
 
-            $('#analyze-stations-map-overlay-content h4').html(stations_overlay_text[1]['head'])
-            $('#analyze-stations-map-overlay-content p').html(stations_overlay_text[1]['text'])
+            $('#analyze-stations-map-overlay-content h4').html(stations_overlay_text[2]['head'])
+            $('#analyze-stations-map-overlay-content p').html(stations_overlay_text[2]['text'])
 
             // filter stations
 
@@ -1275,7 +1280,7 @@
                 beforeActivate: function (e, ui) {
 
                     if (
-                        ui.newPanel.attr('data-step') == '1' &&
+                        ui.newPanel.attr('data-step') == '2' &&
                         ui.newPanel.find('.checked').length
                     ) {
 
@@ -1287,7 +1292,7 @@
 
                     }
 
-                    if (ui.newPanel.attr('data-step') == '2') {
+                    if (ui.newPanel.attr('data-step') == '3') {
 
                         $('#analyze-stations-map-overlay').fadeOut(250)
 
@@ -1711,7 +1716,7 @@
 
                 // STATIONS
 
-                var valid_steps = [false, false, false];
+                var valid_steps = [false, false, false, false];
 
                 $('#analyze-stations-steps .validate-input').each(function (i) {
 
@@ -2110,9 +2115,9 @@
                 }
 
                 if (stations_thresholds_have_val == true) {
-                    $('#analyze-stations-breadcrumb .step[data-step="1"] .validation-tooltip').hide();
+                    $('#analyze-stations-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
                 } else {
-                    $('#analyze-stations-breadcrumb .step[data-step="1"] .validation-tooltip').show();
+                    $('#analyze-stations-breadcrumb .step[data-step="2"] .validation-tooltip').show();
                 }
 
                 // make sure at least one station is selected

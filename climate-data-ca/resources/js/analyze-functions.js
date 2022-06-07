@@ -140,6 +140,38 @@
         // MAPS
 
         var maps = {};
+        var pbfLayer;
+
+        selectedGrids = [];
+        selectedPoints = [];
+        latlons = [];
+
+        var map_grids = {};
+
+        var vectorTileOptions = {
+            rendererFactory: L.canvas.tile,
+            attribution: '',
+            interactive: true,
+            getFeatureId: function (f) {
+                return f.properties.gid;
+            },
+            maxNativeZoom: 12,
+            vectorTileLayerStyles: {
+                'canadagrid': function (properties, zoom) {
+                    return {
+                        weight: 0.1,
+                        color: gridline_color,
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0
+                    }
+                }
+            },
+            maxZoom: 12,
+            minZoom: 7,
+            pane: 'grid'
+        };
 
         var hosturl = geoserver_url,
             zoom_on = false,
@@ -266,6 +298,65 @@
                 }
 
             });
+
+            pbfLayer = L.vectorGrid.protobuf(hosturl + '/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf', vectorTileOptions).on('click', function (e) {
+
+                highlightGridFeature = e.layer.properties.gid;
+
+                selectedPoints[highlightGridFeature] = e.latlng;
+
+                var selectedExists = selectedGrids.includes(highlightGridFeature);
+
+                if (selectedExists === false) {
+
+                    map_grids[highlightGridFeature] = e.latlng
+
+                    selectedGrids.push(highlightGridFeature);
+
+                    pbfLayer.setFeatureStyle(highlightGridFeature, {
+                        weight: 1,
+                        color: '#F00',
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0.1
+                    })
+
+                } else {
+                    DeselectedGridCell(highlightGridFeature);
+                }
+
+
+                $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length)
+
+                var i = 0,
+                    lat_val = '',
+                    lon_val = ''
+
+                for (var key in map_grids) {
+
+                    if (i != 0) {
+                        lat_val += ','
+                        lon_val += ','
+                    }
+
+                    lat_val += map_grids[key]['lat']
+                    lon_val += map_grids[key]['lng']
+
+                    i++
+
+                }
+
+                $('#lat').val(lat_val)
+                $('#lon').val(lon_val)
+                $('#shape').val('')
+
+                validate_inputs()
+
+                L.DomEvent.stop(e)
+
+            }).addTo(maps['analyze']);
+
 
             validate_steps();
             validate_inputs();
@@ -1313,107 +1404,8 @@
             $(this).closest('.analyze-detail').slideUp()
         });
 
-        //
-        // MAP
-        //
-
-        selectedGrids = [];
-        selectedPoints = [];
-        latlons = [];
-
-        var map_grids = {};
-
-        var highlight;
-
-        var clearHighlight = function () {
-            if (highlight) {
-                pbfLayer.resetFeatureStyle(highlight);
-            }
-            highlight = null;
-        };
-
-        var vectorTileOptions = {
-            rendererFactory: L.canvas.tile,
-            attribution: '',
-            interactive: true,
-            getFeatureId: function (f) {
-                return f.properties.gid;
-            },
-            maxNativeZoom: 12,
-            vectorTileLayerStyles: {
-                'canadagrid': function (properties, zoom) {
-                    return {
-                        weight: 0.1,
-                        color: gridline_color,
-                        opacity: 1,
-                        fill: true,
-                        radius: 4,
-                        fillOpacity: 0
-                    }
-                }
-            },
-            maxZoom: 12,
-            minZoom: 7,
-            pane: 'grid'
-        }
-
-        var pbfLayer = L.vectorGrid.protobuf(hosturl + '/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf', vectorTileOptions).on('click', function (e) {
-
-            highlightGridFeature = e.layer.properties.gid;
-
-            selectedPoints[highlightGridFeature] = e.latlng;
-
-            var selectedExists = selectedGrids.includes(highlightGridFeature);
-
-            if (selectedExists === false) {
-
-                map_grids[highlightGridFeature] = e.latlng
-
-                selectedGrids.push(highlightGridFeature);
-
-                pbfLayer.setFeatureStyle(highlightGridFeature, {
-                    weight: 1,
-                    color: '#F00',
-                    opacity: 1,
-                    fill: true,
-                    radius: 4,
-                    fillOpacity: 0.1
-                })
-
-            } else {
-                DeselectedGridCell(highlightGridFeature);
-            }
 
 
-            $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length)
-
-            var i = 0,
-                lat_val = '',
-                lon_val = ''
-
-            for (var key in map_grids) {
-
-                if (i != 0) {
-                    lat_val += ','
-                    lon_val += ','
-                }
-
-                lat_val += map_grids[key]['lat']
-                lon_val += map_grids[key]['lng']
-
-                i++
-
-            }
-
-            $('#lat').val(lat_val)
-            $('#lon').val(lon_val)
-            $('#shape').val('')
-
-            validate_inputs()
-
-            L.DomEvent.stop(e)
-
-        }).addTo(maps['analyze']);
 
 
         function DeselectAllGridCell() {
@@ -2214,6 +2206,19 @@
 
                 // stations
                 let selected_stations = $("#station-select").val() || [];
+                let output_name_suffix='';
+                if (selected_stations.length == 1) {
+                    stations_list.forEach(function (station) {
+                        if (station.ID == selected_stations[0]) {
+                            output_name_suffix = '_' + station.Name;
+                        }
+                    });
+                }
+                // not implemented yet in Finch
+                //stations_form_obj['inputs'].push({
+                //    'id': 'output_name',
+                //    'data': submit_url_var + output_name_suffix
+                //});
 
 
                 // email

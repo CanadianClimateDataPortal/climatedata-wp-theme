@@ -179,7 +179,7 @@
 
             },
             activate: function (e, ui) {
-                // history.replaceState(null, null, '#' + ui.newPanel.attr('id'));
+                history.replaceState(null, null, '#' + ui.newPanel.attr('id'));
 
                 current_tab = ui.newPanel.attr('id');
 

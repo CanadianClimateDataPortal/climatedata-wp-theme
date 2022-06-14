@@ -19,5 +19,17 @@ foreach ($files as $file) {
     //$list[] = str_replace($dir."/", "", $file);
     $list[] = '/site/assets/themes/climate-data-ca/resources/app/' . str_replace ( '../', '', $file );
 }
+
+if (!function_exists('str_ends_with')) {
+    function str_ends_with($str, $end) {
+        return (@substr_compare($str, $end, -strlen($end))==0);
+    }
+}
+
+if (str_ends_with($list[0],".zip")) {
+    $file = array_shift($list);
+    array_push($list, $file);
+}
+
 echo json_encode($list, JSON_PRETTY_PRINT); // JSON_PRETTY_PRINT for beautifying the output
 ?>

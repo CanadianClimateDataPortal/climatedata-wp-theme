@@ -14,7 +14,12 @@ var chart_labels, legend_labels, l10n_labels;
 
 var l10n_table = {
     "fr": {
-        "Around {0} cells selected" : "Environ {0} cellules sélectionnées"
+        "Around {0} cells selected" : "Environ {0} cellules sélectionnées",
+
+        // IDF
+        "Short Duration Rainfall Intensity−Duration−Frequency Data" : "Données sur l’intensité, la durée et la fréquence des chutes de pluie de courte durée",
+        "Return Level" : "Niveau de retour",
+        "Trend" : "Tendance"
     }
 };
 
@@ -122,6 +127,53 @@ function T(str) {
         return l10n_table[current_lang][str];
     }
 }
+
+/**
+ * get IDF links for station_id and output HTML content to target
+ * @param station_id ID of the IDF station
+ * @param target jquery selector to output the resulting content
+ * @param css_class CSS class to use for links
+ */
+function getIDFLinks(station_id, target, css_class) {
+
+    var popup_labels = [
+        "Short Duration Rainfall Intensity−Duration−Frequency Data",
+        "Quantile",
+        "Return Level",
+        "Trend"
+    ];
+
+    $.getJSON(child_theme_dir + 'resources/app/run-frontend-sync/search_idfs.php?idf=' + station_id, function (data) {
+
+        $(target).empty();
+        $.each(data, function (k, v) {
+            let linktext = v;
+            let filename = v.replace(/\.[^/.]+$/, "");
+            let extension = v.split('.').pop();
+
+            if (filename.endsWith("_qq")) {
+                linktext = T("Quantile");
+            }
+            else if (filename.endsWith("_r")) {
+                linktext = T("Return Level");
+            }
+            else if (filename.endsWith("_t")) {
+                linktext = T("Trend");
+            }
+            else {
+                linktext = T("Short Duration Rainfall Intensity−Duration−Frequency Data");
+            }
+
+            linktext += " (" + extension.toUpperCase() + ')';
+
+            if (extension == "zip") {
+                linktext = T("Projections (ZIP)")
+            }
+
+            $(target).append('<li><a class="' + css_class + '" href="' + v + '" target="_blank">' + linktext + '</a></li>');
+        });
+    });
+};
 
 (function ($) {
 

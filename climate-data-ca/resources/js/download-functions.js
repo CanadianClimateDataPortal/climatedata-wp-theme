@@ -1486,22 +1486,6 @@
             ];
         }
 
-        var popup_labels = [
-            "Short Duration Rainfall Intensity−Duration−Frequency Data",
-            "Quantile",
-            "Return Level",
-            "Trend"
-        ];
-
-        if (current_lang == 'fr') {
-            popup_labels = [
-                "Données sur l’intensité, la durée et la fréquence des chutes de pluie de courte durée",
-                "Quantile",
-                "Niveau de retour",
-                "Tendance",
-            ];
-        }
-
         function idf_init() {
 
             create_map('idf')

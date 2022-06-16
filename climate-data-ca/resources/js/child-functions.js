@@ -135,14 +135,6 @@ function T(str) {
  * @param css_class CSS class to use for links
  */
 function getIDFLinks(station_id, target, css_class) {
-
-    var popup_labels = [
-        "Short Duration Rainfall Intensity−Duration−Frequency Data",
-        "Quantile",
-        "Return Level",
-        "Trend"
-    ];
-
     $.getJSON(child_theme_dir + 'resources/app/run-frontend-sync/search_idfs.php?idf=' + station_id, function (data) {
 
         $(target).empty();
@@ -167,7 +159,7 @@ function getIDFLinks(station_id, target, css_class) {
             linktext += " (" + extension.toUpperCase() + ')';
 
             if (extension == "zip") {
-                linktext = T("Projections (ZIP)")
+                linktext = T("Future-shifted data (ZIP)")
             }
 
             $(target).append('<li><a class="' + css_class + '" href="' + v + '" target="_blank">' + linktext + '</a></li>');

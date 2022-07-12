@@ -23,6 +23,9 @@
         var bbox_layer;
 
 
+        const BBOX_CELLS_LIMIT = 1000;
+
+
 
         //
         // VENDOR
@@ -351,74 +354,75 @@
 
             var pbfURL = hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + gridName + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf";
             pbfLayer = L.vectorGrid.protobuf(pbfURL, vectorTileOptions).on('click', function (e) {
+                if ($('input[name="download-select"]:checked').val() == 'gridded') {
 
-                highlightGridFeature = e.layer.properties.gid;
-                selectedPoints[highlightGridFeature] = e.latlng;
+                    highlightGridFeature = e.layer.properties.gid;
+                    selectedPoints[highlightGridFeature] = e.latlng;
 
-                var selectedExists = selectedGrids.includes(highlightGridFeature);
+                    var selectedExists = selectedGrids.includes(highlightGridFeature);
 
-                if (selectedExists === false) {
+                    if (selectedExists === false) {
 
-                    selectedGrids.push(highlightGridFeature);
+                        selectedGrids.push(highlightGridFeature);
 
-                    pbfLayer.setFeatureStyle(highlightGridFeature, {
-                        weight: 1,
-                        color: '#F00',
-                        opacity: 1,
-                        fill: true,
-                        radius: 4,
-                        fillOpacity: 0.1
-                    });
+                        pbfLayer.setFeatureStyle(highlightGridFeature, {
+                            weight: 1,
+                            color: '#F00',
+                            opacity: 1,
+                            fill: true,
+                            radius: 4,
+                            fillOpacity: 0.1
+                        });
 
-                } else {
+                    } else {
 
-                    for (var i = selectedGrids.length - 1; i >= 0; i--) {
+                        for (var i = selectedGrids.length - 1; i >= 0; i--) {
 
-                        if (selectedGrids[i] === highlightGridFeature) {
-                            selectedGrids.splice(i, 1);
+                            if (selectedGrids[i] === highlightGridFeature) {
+                                selectedGrids.splice(i, 1);
+                            }
                         }
+
+                        for (var key in selectedPoints) {
+
+                            if (key === highlightGridFeature) {
+                                delete selectedPoints[key]
+                            }
+                        }
+
+                        pbfLayer.setFeatureStyle(highlightGridFeature, {
+                            weight: 0.1,
+                            color: gridline_color,
+                            opacity: 1,
+                            fill: true,
+                            radius: 4,
+                            fillOpacity: 0
+                        });
+
                     }
 
-                    for (var key in selectedPoints) {
 
-                        if (key === highlightGridFeature) {
-                            delete selectedPoints[key]
-                        }
+                    var points_to_process = selectedGrids.length
+
+                    if (selectedGrids.length > 0) {
+                        $('#download-location').parent().find('.select2-selection__rendered').text(selectedGrids.length + ' ' + l10n_labels.selected)
+                    } else {
+                        $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
                     }
 
-                    pbfLayer.setFeatureStyle(highlightGridFeature, {
-                        weight: 0.1,
-                        color: gridline_color,
-                        opacity: 1,
-                        fill: true,
-                        radius: 4,
-                        fillOpacity: 0
-                    });
+                    var current_coords = ''
 
-                }
+                    selectedGrids.forEach(function (grid_id) {
+                        current_coords += '|' + selectedPoints[grid_id].lat + ',' + selectedPoints[grid_id].lng + ',' + grid_id
+                    })
 
+                    $('#download-coords').val(current_coords)
 
-                var points_to_process = selectedGrids.length
+                    L.DomEvent.stop(e)
 
-                if (selectedGrids.length > 0) {
-                    $('#download-location').parent().find('.select2-selection__rendered').text(selectedGrids.length + ' ' + l10n_labels.selected)
-                } else {
-                    $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
-                }
+                    // checkform()
 
-                var current_coords = ''
-
-                selectedGrids.forEach(function (grid_id) {
-                    current_coords += '|' + selectedPoints[grid_id].lat + ',' + selectedPoints[grid_id].lng + ',' + grid_id
-                })
-
-                $('#download-coords').val(current_coords)
-
-                L.DomEvent.stop(e)
-
-                // checkform()
-
-            }).addTo(maps['variable']);
+                }}).addTo(maps['variable']);
 
             pbfLayer.myTag = 'gridlayer';
             pbfLayer.gridType = gridName;
@@ -429,15 +433,38 @@
             let bounds = e.layer.getBounds();
             let sw = bounds.getSouthWest();
             let ne = bounds.getNorthEast();
+            let label;
             // approximate number of gridcell
             let cells = Math.round((ne.lat - sw.lat) * (ne.lng - sw.lng) / grid_resolution[curValData.grid]**2);
-            let label = T("Around {0} cells selected").format(cells);
-            $('#download-location').parent().find('.select2-selection__rendered').text(label);
 
-            // TODO implement limitation here, set download-coords as empty if too big (form won't validate)
-            // store the bounds in #download-coords
-            $('#download-coords').val([sw.lat, sw.lng, ne.lat, ne.lng].join('|'));
+            if (cells > BBOX_CELLS_LIMIT) {
+                label = T("Too many cells selected ({0} > {1})").format(cells, BBOX_CELLS_LIMIT);
+                $('#download-coords').val('');
+
+            } else {
+                label = T("Around {0} cells selected").format(cells);
+                // store the bounds in #download-coords
+                $('#download-coords').val([sw.lat, sw.lng, ne.lat, ne.lng].join('|'));
+            }
+            $('#download-location').parent().find('.select2-selection__rendered').text(label);
             checkform();
+        }
+
+        // Clear all selections (bbox or gridded) for variable download
+        function clear_var_selections() {
+            for (var i = 0 ; i < selectedGrids.length; i++) {
+                pbfLayer.resetFeatureStyle(selectedGrids[i]);
+            }
+            selectedGrids = [];
+            $('#download-location').val('');
+            $('#download-coords').val('');
+            $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city);
+            if (bbox_layer !== undefined) {
+                maps['variable'].removeLayer(bbox_layer);
+                maps['variable'].pm.enableDraw('Rectangle', {});
+            }
+            checkform();
+
         }
 
         //
@@ -805,17 +832,13 @@
                 $('#download-variable').val(1).trigger('change.select2');
             }
             if (typeof pbfLayer !== 'undefined' && pbfLayer.gridType !== curValData.grid) {
-
-                if ($('input[name="download-select"]:checked').val() == 'gridded') {
-                    maps['variable'].removeLayer(pbfLayer);
-                    console.log("Adding Grid:" + curValData.grid);
-                    addGrid(curValData.grid);
-                    selectedGrids = [];
-                    $('#download-coords').val('');
-                    $('#download-location').val('');
-                    $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
-                }
-
+                maps['variable'].removeLayer(pbfLayer);
+                console.log("Adding Grid:" + curValData.grid);
+                addGrid(curValData.grid);
+                selectedGrids = [];
+                $('#download-coords').val('');
+                $('#download-location').val('');
+                $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
             }
         });
 
@@ -836,23 +859,15 @@
         $('#selection-type input').on('change', function () {
             switch ($('input[name="download-select"]:checked').val()) {
                 case 'gridded':
-                    if (bbox_layer !== undefined) {
-                        maps['variable'].removeLayer(bbox_layer);
-                    }
-                    addGrid(curValData.grid);
                     maps['variable'].pm.disableDraw();
                     break;
 
                 case 'bbox':
-                    selectedGrids= [];
-                    maps['variable'].removeLayer(pbfLayer);
                     maps['variable'].pm.enableDraw('Rectangle', {});
                     break;
             }
-            $('#download-location').val('');
-            $('#download-coords').val('');
-            $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
-            checkform();
+            clear_var_selections();
+
         });
 
         // format
@@ -889,6 +904,11 @@
 
         $('#download-form').submit(function (e) {
             e.preventDefault();
+        });
+
+        $('#download-clear').click(function (e) {
+            e.preventDefault();
+            clear_var_selections();
         });
 
         //

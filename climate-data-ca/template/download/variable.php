@@ -124,7 +124,7 @@
             <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">4</span> <label for="download-location" class="form-label"><?php _e('Select a location', 'cdc'); ?></label>
         </p>
 
-        <div class="form-select col-10 offset-1 col-sm-4 offset-sm-0 mb-3 mb-sm-0">
+        <div class="form-select col-10 offset-1 col-sm-3 offset-sm-0 mb-3 mb-sm-0">
             <!-- <input type="hidden" name="download-lat" id="download-lat"> -->
             <!-- <input type="hidden" name="download-lon" id="download-lon"> -->
             <input type="hidden" name="download-coords" id="download-coords">
@@ -133,9 +133,12 @@
                 <option value=""><?php _e('Search for a City/Town', 'cdc'); ?></option>
             </select>
 
-        </div>
 
-        <p class="form-help col-10 col-sm-2 offset-1"><?php _e('Zoom in to the map to select at least one grid coordinate.', 'cdc'); ?></p>
+        </div>
+        <div class="col-10  col-sm-1 mb-3 mb-sm-0">
+        <a class="btn btn-primary text-white offset-1" id="download-clear" target="_blank"><?php _e('Clear selection', 'cdc'); ?></a>
+        </div>
+        <p class="form-help col-2 col-sm-2 offset-1"><?php _e('Zoom in to the map to select at least one grid coordinate.', 'cdc'); ?></p>
 
         <div id="download-map-variable-container" class="col-10 offset-1 col-lg-8 offset-lg-2 download-map-container">
             <div id="map-overlay">

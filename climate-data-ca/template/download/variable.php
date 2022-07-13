@@ -174,7 +174,7 @@
 
                 <label id="format-label-json" class="btn btn-outline-primary"> <input type="radio" name="download-format" id="download-format-json" autocomplete="off" value="json"> JSON </label>
 
-                <label id="format-label-nc" class="btn btn-outline-primary"> <input type="radio" name="download-format" id="download-format-nc" autocomplete="off" value="nc"> NetCDF </label>
+                <label id="format-label-netcdf" class="btn btn-outline-primary"> <input type="radio" name="download-format" id="download-format-netcdf" autocomplete="off" value="netcdf"> NetCDF </label>
             </div>
         </div>
     </div>

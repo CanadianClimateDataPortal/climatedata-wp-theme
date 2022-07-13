@@ -544,7 +544,7 @@
 
         var pointsInfo = "";
         var dataLayerEventName = "";
-        var variableDataFormat = "";
+
         function getGA4EventNameForVariableDataBCCAQv2() {
             var gA4EventNameForVariableDataBCCAQv2 = "";
 
@@ -571,6 +571,7 @@
                 'variable_data_format': BCCAQv2FileFormat
             });
         }
+
         var format = null;
         $('.download_variable_data_bccaqv2').click(function (e) {
             setDataLayerForVariableDataBCCAQv2(dataLayerEventName, pointsInfo, format);
@@ -612,7 +613,13 @@
 
             }
             format = $('input[name="download-format"]:checked').val();
-            variableDataFormat = format;
+            let format_extension = format;
+
+            if (format == 'netcdf') {
+                format_extension = 'nc';
+            }
+
+
             if (selectedVar !== 'all') {
                 $('body').addClass('spinner-on');
                 request_args = {
@@ -627,7 +634,7 @@
                 xhttp.onreadystatechange = function () {
                     if (xhttp.readyState === 4 && xhttp.status === 200) {
                         $('#download-result a').attr('href', window.URL.createObjectURL(xhttp.response));
-                        $('#download-result a').attr('download', $('#download-filename').val() + '.' + format);
+                        $('#download-result a').attr('download', $('#download-filename').val() + '.' + format_extension);
 
 
                         $('#download-result').slideDown(250);
@@ -667,7 +674,7 @@
                         let xhttp = new XMLHttpRequest();
                         xhttp.onreadystatechange = function () {
                             if (xhttp.readyState === 4 && xhttp.status === 200) {
-                                zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.' + format, xhttp.response);
+                                zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.' + format_extension, xhttp.response);
 
 
 

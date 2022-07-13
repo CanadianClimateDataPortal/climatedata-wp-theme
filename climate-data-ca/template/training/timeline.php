@@ -1,7 +1,7 @@
 <?php
 
-	wp_enqueue_script ( 'gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.3/gsap.min.js', array ( 'jquery' ), null, true );
-	wp_enqueue_script ( 'scrolltrigger', 'https://assets.codepen.io/16327/ScrollTrigger.min.js?v=32', array ( 'gsap' ), null, true );
+	wp_enqueue_script ( 'gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js', array ( 'jquery' ), null, true );
+	wp_enqueue_script ( 'scrolltrigger', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/ScrollTrigger.min.js', array ( 'gsap' ), null, true );
 	wp_enqueue_script ( 'scroll', get_stylesheet_directory_uri() . '/resources/js/scroll.js', array ( 'scrolltrigger' ), null, true );
 
 ?>

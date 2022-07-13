@@ -793,7 +793,7 @@
                 $('#daily-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php');
 
                 // netCDF option
-                $('#format-label-nc').show();
+                $('#format-label-netcdf').show();
                 $('#format-label-json').hide();
 
                 // email field
@@ -803,7 +803,7 @@
             } else {
 
                 // json option
-                $('#format-label-nc').show();
+                $('#format-label-netcdf').show();
                 $('#format-label-json').show();
 
                 // email field

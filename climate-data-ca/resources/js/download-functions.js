@@ -1015,7 +1015,7 @@
                         "id": "lon0",
                         "data": lon_vals
                     });
-                    submit_data['submit_url'] = "/providers/finch/processes/subset_ensemble_BCCAQv2/jobs";
+                    submit_data['submit_url'] = "/providers/finch/processes/subset_grid_point_dataset/jobs";
                     break;
 
                 case 'bbox':
@@ -1034,7 +1034,7 @@
                         "data": split_coords[3]
                     });
 
-                    submit_data['submit_url'] = "/providers/finch/processes/subset_ensemble_bbox_BCCAQv2/jobs";
+                    submit_data['submit_url'] = "/providers/finch/processes/subset_bbox_dataset/jobs";
                     break;
             }
 

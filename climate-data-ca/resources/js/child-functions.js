@@ -14,7 +14,9 @@ var chart_labels, legend_labels, l10n_labels;
 
 var l10n_table = {
     "fr": {
-        "Around {0} cells selected" : "Environ {0} cellules sélectionnées"
+        "With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}":
+            "Avec les paramètres actuels de fréquence et de format de donnée, le nombre maximal de points de grille par requête est de {0}",
+        "Around {0} grid boxes selected" : "Environ {0} points de grille sélectionnés"
     }
 };
 

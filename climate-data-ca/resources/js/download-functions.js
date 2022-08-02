@@ -22,10 +22,22 @@
         var ajax_url = base_href.replace('fr/', '');
         var bbox_layer;
 
-
-        const BBOX_CELLS_LIMIT = 1000;
-
-
+        // returns download limits
+        function get_download_limits(freq, format) {
+            switch (freq) {
+                case 'all':
+                    return 80;
+                case 'daily':
+                    switch (format) {
+                        case 'netcdf':
+                            return 200;
+                        case 'csv':
+                            return 20;
+                    }
+                default:
+                    return 1000;
+            }
+        }
 
         //
         // VENDOR
@@ -420,7 +432,7 @@
 
                     L.DomEvent.stop(e)
 
-                    // checkform()
+                    checkform();
 
                 }}).addTo(maps['variable']);
 
@@ -433,20 +445,13 @@
             let bounds = e.layer.getBounds();
             let sw = bounds.getSouthWest();
             let ne = bounds.getNorthEast();
-            let label;
-            // approximate number of gridcell
-            let cells = Math.round((ne.lat - sw.lat) * (ne.lng - sw.lng) / grid_resolution[curValData.grid]**2);
 
-            if (cells > BBOX_CELLS_LIMIT) {
-                label = T("Too many cells selected ({0} > {1})").format(cells, BBOX_CELLS_LIMIT);
-                $('#download-coords').val('');
+            // store the bounds in #download-coords
+            $('#download-coords').val([sw.lat, sw.lng, ne.lat, ne.lng].join('|'));
 
-            } else {
-                label = T("Around {0} cells selected").format(cells);
-                // store the bounds in #download-coords
-                $('#download-coords').val([sw.lat, sw.lng, ne.lat, ne.lng].join('|'));
-            }
-            $('#download-location').parent().find('.select2-selection__rendered').text(label);
+            let cells = count_selected_gridcells();
+
+            $('#download-location').parent().find('.select2-selection__rendered').text(T("Around {0} grid boxes selected").format(cells));
             checkform();
         }
 
@@ -461,27 +466,59 @@
             $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city);
             if (bbox_layer !== undefined) {
                 maps['variable'].removeLayer(bbox_layer);
+                bbox_layer = undefined;
                 maps['variable'].pm.enableDraw('Rectangle', {});
             }
             checkform();
 
         }
 
+        function count_selected_gridcells() {
+            let coords = $('#download-coords').val().split('|');
+
+
+            switch ($('input[name="download-select"]:checked').val()) {
+                case 'gridded':
+                    return selectedGrids.length;
+                    break;
+                case 'bbox':
+                    return Math.round((coords[2] - coords[0]) * (coords[3] - coords[1]) / grid_resolution[curValData.grid] ** 2);
+                    break;
+            }
+        }
+
+
         //
         // FORM VALIDATION
         //
-
         function checkform() {
             $('#download-result').slideUp(125)
 
-            var form_valid = false;
+            let freq = $('#download-dataset').val();
+            let format = $('input[name="download-format"]:checked').val();
 
-            if ($('#download-dataset').val() === 'daily') {
+            let limit = get_download_limits(freq, format);
+            let cells = count_selected_gridcells();
+            $('#download-limit-label').text(T('With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}').format(limit));
+
+            if (cells > limit) {
+                $('#download-limit-label').addClass('border-danger');
+                $('#download-limit-label').addClass('border');
+            } else {
+                $('#download-limit-label').removeClass('border-danger');
+                $('#download-limit-label').removeClass('border');
+
+            }
+            // approximate number of gridcell
+
+
+            if (freq === 'daily') {
                 // DAILY DATA
                 if (
                     $('body').validate_email($('#daily-email').val()) === true &&
                     $('#daily-captcha_code').val() !== '' &&
-                    $('#download-coords').val() !== ''
+                    $('#download-coords').val() !== '' &&
+                    cells <= limit
                 ) {
                     $('#daily-process').removeClass('disabled');
                 } else {
@@ -490,14 +527,9 @@
             } else {
                 // MONTHLY OR ANNUAL
                 // if a filename is entered and the hidden lat/lon inputs have values
-                if (
-                    $('#download-filename').hasClass('valid') &&
-                    $('#download-coords').val() !== ''
-                ) {
-                    form_valid = true;
-                }
-
-                if (form_valid === true) {
+                if ($('#download-filename').hasClass('valid') &&
+                    $('#download-coords').val() !== '' &&
+                    cells <= limit) {
                     $('#download-process').removeClass('disabled');
                 } else {
                     $('#download-process').addClass('disabled');
@@ -862,6 +894,8 @@
 
         // selection type
         $('#selection-type input').on('change', function () {
+            clear_var_selections();
+
             switch ($('input[name="download-select"]:checked').val()) {
                 case 'gridded':
                     maps['variable'].pm.disableDraw();
@@ -871,7 +905,6 @@
                     maps['variable'].pm.enableDraw('Rectangle', {});
                     break;
             }
-            clear_var_selections();
 
         });
 

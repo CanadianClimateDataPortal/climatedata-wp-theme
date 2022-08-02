@@ -110,8 +110,8 @@
 
         <div class="form-select col-10 offset-1 col-sm-4 offset-sm-0">
             <div id="select-btn-group" class="btn-group btn-group-toggle w-100" data-toggle="buttons">
-                <label id="select-label-gridded" class="btn btn-outline-primary active"> <input type="radio" name="download-select" id="download-select-gridded" autocomplete="off" value="gridded" checked> <?php _e('Gridded','cdc'); ?></label>
-                <label id="select-label-bbox" class="btn btn-outline-primary"> <input type="radio" name="download-select" id="download-select-bbox" autocomplete="off" value="bbox"> <?php _e('Bounding box'); ?> </label>
+                <label id="select-label-gridded" class="btn btn-outline-primary active"> <input type="radio" name="download-select" id="download-select-gridded" autocomplete="off" value="gridded" checked> <?php _e('Grid boxes','cdc'); ?></label>
+                <label id="select-label-bbox" class="btn btn-outline-primary"> <input type="radio" name="download-select" id="download-select-bbox" autocomplete="off" value="bbox"> <?php _e('Draw Custom Region'); ?> </label>
             </div>
         </div>
 
@@ -177,6 +177,7 @@
                 <label id="format-label-netcdf" class="btn btn-outline-primary"> <input type="radio" name="download-format" id="download-format-netcdf" autocomplete="off" value="netcdf"> NetCDF </label>
             </div>
         </div>
+        <p id="download-limit-label" class="form-help col-10 col-sm-2 offset-1"></p>
     </div>
 
     <div id="annual-process-wrap" class="form-layout-row row align-items-center form-process">

@@ -473,6 +473,20 @@
 
         }
 
+        // Temporary disable CSV until finch is fixed
+        function toggle_csv() {
+            if ($('input[name="download-select"]:checked').val() == 'bbox' &&
+                $('#download-dataset').val() == 'daily') {
+
+                if ($('input[name="download-format"]:checked').val() == 'csv') {
+                    $('#format-label-netcdf').trigger('click');
+                }
+                $('#format-label-csv').hide();
+            } else {
+                $('#format-label-csv').show();
+            }
+        }
+
         function count_selected_gridcells() {
             let coords = $('#download-coords').val().split('|');
 
@@ -826,6 +840,9 @@
 
             buildVarDropdown(e.currentTarget.value, currentVar);
 
+            // Temporary disable CSV until finch is fixed
+            toggle_csv();
+
             if (e.currentTarget.value == 'daily') {
 
                 // refresh captcha
@@ -897,6 +914,7 @@
         // selection type
         $('#selection-type input').on('change', function () {
             clear_var_selections();
+            toggle_csv();
 
             switch ($('input[name="download-select"]:checked').val()) {
                 case 'gridded':

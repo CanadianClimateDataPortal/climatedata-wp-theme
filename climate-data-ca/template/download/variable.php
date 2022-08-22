@@ -108,12 +108,16 @@
             <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">3</span> <label for="download-variable" class="form-label"><?php _e('Selection type', 'cdc'); ?></label>
         </p>
 
+
+
+
         <div class="form-select col-10 offset-1 col-sm-4 offset-sm-0">
             <div id="select-btn-group" class="btn-group btn-group-toggle w-100" data-toggle="buttons">
                 <label id="select-label-gridded" class="btn btn-outline-primary active"> <input type="radio" name="download-select" id="download-select-gridded" autocomplete="off" value="gridded" checked> <?php _e('Grid boxes','cdc'); ?></label>
                 <label id="select-label-bbox" class="btn btn-outline-primary"> <input type="radio" name="download-select" id="download-select-bbox" autocomplete="off" value="bbox"> <?php _e('Draw Custom Region', 'cdc'); ?> </label>
             </div>
         </div>
+        <p class="form-help col-10 col-sm-2 offset-1"><?php _e('The number of boxes that you can select depends on the data format and time frequency that you choose.', 'cdc'); ?></p>
 
     </div>
 

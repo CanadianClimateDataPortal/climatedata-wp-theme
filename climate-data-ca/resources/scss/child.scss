@@ -1155,6 +1155,7 @@ body.overlay-open[data-overlay-content="video"] {
 // leaflet
 
 @import '../../../h7-parent/resources/bower_components/leaflet/dist/leaflet.css';
+@import 'leaflet-geoman.css';
 
 .leaflet-container {
   font-family: $font-family-base;

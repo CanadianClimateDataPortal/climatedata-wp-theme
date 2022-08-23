@@ -1,3 +1,7 @@
+2022-08-22.01
+  * Added netcdf format for variable download (annual)
+  * Added bounding box selection for variable download
+
 2022-03-10.01
   * Added mailchimp subscribe integration to analyze, download and feedback form
 

@@ -22,7 +22,7 @@
         var ajax_url = base_href.replace('fr/', '');
         var bbox_layer;
 
-        // returns download limits
+        // returns the maximum number of grid cells that can be requested
         function get_download_limits(freq, format) {
             switch (freq) {
                 case 'all':
@@ -441,6 +441,10 @@
 
         }
 
+        /**
+         * Used to handle any changes to the bouding box (created and edited)
+         * @param e JS event
+         */
         function handle_bbox_event(e) {
             let bounds = e.layer.getBounds();
             let sw = bounds.getSouthWest();
@@ -625,7 +629,7 @@
 
         function process_download() {
             var selectedVar = $('#download-variable').val();
-            let pointsdata;
+            let pointsData;
             dataLayerEventName = getGA4EventNameForVariableDataBCCAQv2();
 
             month = $("#download-dataset").val();
@@ -635,15 +639,15 @@
 
             switch ($('input[name="download-select"]:checked').val()) {
                 case 'gridded':
-                    pointsdata = {'points': []};
+                    pointsData = {'points': []};
                     pointsInfo = '';
                     for (var i = 0; i < selectedGrids.length; i++) {
                         point = selectedPoints[selectedGrids[i]];
                         pointsInfo += "GridID: " + selectedGrids[i] + ", Lat: " + point.lat + ", Lng: " + point.lng + " ; ";
-                        pointsdata.points.push([point.lat, point.lng]);
+                        pointsData.points.push([point.lat, point.lng]);
                     }
 
-                    // Remove last 3 char: ;
+                    // Remove the extra " ; " at the end left by the previous loop
                     if (selectedGrids.length > 0) {
                         pointsInfo = pointsInfo.substring(0, pointsInfo.length - 3);
                     }
@@ -651,7 +655,7 @@
                 case 'bbox':
                     let split_coords = $('#download-coords').val().split('|');
                     pointsInfo = "BBox: " + split_coords.join(',');
-                    pointsdata  = {'bbox': [parseFloat(split_coords[0]),
+                    pointsData  = {'bbox': [parseFloat(split_coords[0]),
                         parseFloat(split_coords[1]),
                         parseFloat(split_coords[2]),
                         parseFloat(split_coords[3])]};
@@ -673,12 +677,12 @@
                     month: month,
                     format: format
                 };
-                Object.assign(request_args, pointsdata);
+                Object.assign(request_args, pointsData);
 
 
                 let xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function () {
-                    if (xhttp.readyState === 4 && xhttp.status === 200) {
+                    if (xhttp.readyState === XML_HTTP_REQUEST_DONE_STATE && xhttp.status === 200) {
                         $('#download-result a').attr('href', window.URL.createObjectURL(xhttp.response));
                         $('#download-result a').attr('download', $('#download-filename').val() + '.' + format_extension);
 
@@ -716,7 +720,7 @@
                             month: month,
                             format: format
                         };
-                        Object.assign(request_args, pointsdata);
+                        Object.assign(request_args, pointsData);
                         let xhttp = new XMLHttpRequest();
                         xhttp.onreadystatechange = function () {
                             if (xhttp.readyState === 4 && xhttp.status === 200) {

@@ -5,6 +5,7 @@
 const k_to_c = 273.15;
 const data_url = DATA_URL;
 const geoserver_url = DATA_URL;
+const XML_HTTP_REQUEST_DONE_STATE = 4;
 
 //
 // GLOBAL VARS

@@ -58,6 +58,14 @@
             query['delta'] = "";
         }
 
+
+        cmip_value = $('input[name="cmip_switch"]:checked').val();
+        if (cmip_value === '5') {
+            query['cmip'] = "5";
+        } else {
+            query['cmip'] = "6";
+        }
+
         if ($('#geo-select').length) {
             query['geo-select'] = $('#geo-select').val();
         } else {
@@ -1770,9 +1778,13 @@
                 callback: function (varDetails) {
 
                     $('#rcp').prop('disabled', true);
-                    let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals;
+
+                    cmip_value = $('input[name="cmip_switch"]:checked').val();
+
+                    let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=cmip' + cmip_value;
+
                     $.getJSON(
-                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals,
+                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=cmip' + cmip_value,
                         function (data) {
                             displayChartData(data, varDetails, download_url);
                         });
@@ -2117,6 +2129,7 @@
             $('#toggle-switch-container').show();
 
             aord_value = $('input[name="absolute_delta_switch"]:checked').val();
+            cmip_value = $('input[name="cmip_switch"]:checked').val();
 
             var_value = $("#var").val();
             mora_value = $("#mora").val();
@@ -2153,34 +2166,66 @@
             left_rcp_value = '';
             right_rcp_value = '';
 
-            if (rcp_value === 'rcp26vs45') {
-                left_rcp_value = 'rcp26';
-                right_rcp_value = 'rcp45';
-            } else if (rcp_value === 'rcp26vs85') {
-                left_rcp_value = 'rcp26';
-                right_rcp_value = 'rcp85';
-            } else if (rcp_value === 'rcp45vs26') {
-                left_rcp_value = 'rcp45';
-                right_rcp_value = 'rcp26';
-            } else if (rcp_value === 'rcp45vs85') {
-                left_rcp_value = 'rcp45';
-                right_rcp_value = 'rcp85';
-            } else if (rcp_value === 'rcp85vs26') {
-                left_rcp_value = 'rcp85';
-                right_rcp_value = 'rcp26';
-            } else if (rcp_value === 'rcp85vs45') {
-                left_rcp_value = 'rcp85';
-                right_rcp_value = 'rcp45';
-            } else if (rcp_value === 'rcp26') {
-                left_rcp_value = 'rcp26';
-                right_rcp_value = 'rcp45';
-            } else if (rcp_value === 'rcp45') {
-                left_rcp_value = 'rcp45';
-                right_rcp_value = 'rcp45';
-            } else if (rcp_value === 'rcp85') {
-                left_rcp_value = 'rcp85';
-                right_rcp_value = 'rcp45';
+            if (cmip_value === '6') {
+                if (rcp_value === 'rcp26vs45') {
+                    left_rcp_value = 'ssp245';
+                    right_rcp_value = 'ssp245';
+                } else if (rcp_value === 'rcp26vs85') {
+                    left_rcp_value = 'ssp126';
+                    right_rcp_value = 'ssp585';
+                } else if (rcp_value === 'rcp45vs26') {
+                    left_rcp_value = 'ssp245';
+                    right_rcp_value = 'ssp126';
+                } else if (rcp_value === 'rcp45vs85') {
+                    left_rcp_value = 'ssp245';
+                    right_rcp_value = 'ssp585';
+                } else if (rcp_value === 'rcp85vs26') {
+                    left_rcp_value = 'ssp585';
+                    right_rcp_value = 'ssp126';
+                } else if (rcp_value === 'rcp85vs45') {
+                    left_rcp_value = 'ssp585';
+                    right_rcp_value = 'ssp245';
+                } else if (rcp_value === 'rcp26') {
+                    left_rcp_value = 'ssp126';
+                    right_rcp_value = 'ssp126';
+                } else if (rcp_value === 'rcp45') {
+                    left_rcp_value = 'ssp245';
+                    right_rcp_value = 'ssp245';
+                } else if (rcp_value === 'rcp85') {
+                    left_rcp_value = 'ssp585';
+                    right_rcp_value = 'ssp585';
+                }
+            } else {
+                if (rcp_value === 'rcp26vs45') {
+                    left_rcp_value = 'rcp26';
+                    right_rcp_value = 'rcp45';
+                } else if (rcp_value === 'rcp26vs85') {
+                    left_rcp_value = 'rcp26';
+                    right_rcp_value = 'rcp85';
+                } else if (rcp_value === 'rcp45vs26') {
+                    left_rcp_value = 'rcp45';
+                    right_rcp_value = 'rcp26';
+                } else if (rcp_value === 'rcp45vs85') {
+                    left_rcp_value = 'rcp45';
+                    right_rcp_value = 'rcp85';
+                } else if (rcp_value === 'rcp85vs26') {
+                    left_rcp_value = 'rcp85';
+                    right_rcp_value = 'rcp26';
+                } else if (rcp_value === 'rcp85vs45') {
+                    left_rcp_value = 'rcp85';
+                    right_rcp_value = 'rcp45';
+                } else if (rcp_value === 'rcp26') {
+                    left_rcp_value = 'rcp26';
+                    right_rcp_value = 'rcp45';
+                } else if (rcp_value === 'rcp45') {
+                    left_rcp_value = 'rcp45';
+                    right_rcp_value = 'rcp45';
+                } else if (rcp_value === 'rcp85') {
+                    left_rcp_value = 'rcp85';
+                    right_rcp_value = 'rcp45';
+                }
             }
+
 
             if (aord_value === 'd') {
                 aord_layer_value = "-delta7100";
@@ -2191,12 +2236,18 @@
             gridLayer.rcp = left_rcp_value;
             gridLayerRight.rcp = right_rcp_value;
 
+            if (cmip_value === '6') {
+                cmip_layer_value = "cmip6-";
+            } else {
+                cmip_layer_value = "";
+            }
 
-            singleLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
-            leftLayerName = var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
-            rightLayerName = var_value + '-' + msorys + '-' + right_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+            singleLayerName = cmip_layer_value + '' + var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+            leftLayerName = cmip_layer_value + '' + var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+            rightLayerName = cmip_layer_value + '' + var_value + '-' + msorys + '-' + right_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
 
-
+            console.log(leftLayerName);
+            console.log(rightLayerName);
             moraval = getQueryVariable('mora');
 
 
@@ -2342,6 +2393,7 @@
 
         function layer_swap(fn_options) {
 
+            console.log("layer_swap");
 
             var defaults = {
                 layer: null,
@@ -2368,7 +2420,6 @@
                         var_on = true;
 
                         // show variable layer
-
 
                         map1.addLayer(gridLayer);
                         map1.addLayer(leftLayer);
@@ -2901,6 +2952,37 @@
         });
 
 
+        $('input[type=radio][name=cmip_switch]').change(function() {
+            // console.log('cmip switched');
+            cmip_value = $('input[name="cmip_switch"]:checked').val();
+            if (cmip_value === '5') {
+                query['cmip'] = "5";
+
+                chart_labels.rcp_26_median = 'RCP 2.6 Median';
+                chart_labels.rcp_26_range = 'RCP 2.6 Range';
+                chart_labels.rcp_45_median = 'RCP 4.5 Median';
+                chart_labels.rcp_45_range = 'RCP 4.5 Range';
+                chart_labels.rcp_85_median = 'RCP 8.5 Median';
+                chart_labels.rcp_85_range = 'RCP 8.5 Range';
+                chart_labels.rcp_85_enhanced = 'RCP 8.5 Enhanced Scenario';
+            } else {
+                query['cmip'] = "6";
+                chart_labels.rcp_26_median = 'SSP 2.6 Median';
+                chart_labels.rcp_26_range = 'SSP 2.6 Range';
+                chart_labels.rcp_45_median = 'SSP 4.5 Median';
+                chart_labels.rcp_45_range = 'SSP 4.5 Range';
+                chart_labels.rcp_85_median = 'SSP 8.5 Median';
+                chart_labels.rcp_85_range = 'SSP 8.5 Range';
+                chart_labels.rcp_85_enhanced = 'SSP 8.5 Enhanced Scenario';
+
+            }
+
+            update_query_string();
+            buildFilterMenu();
+            changeLayers();
+        });
+
+
         $('#mora').change(function (e) {
 
             mora_value = $(this).val();
@@ -2969,6 +3051,7 @@
         function changeLayers() {
 
             aord_value = $('input[name="absolute_delta_switch"]:checked').val();
+            cmip_value = $('input[name="cmip_switch"]:checked').val();
             rcp_value = $("#rcp").val();
             decade_value = parseInt($("#decade").val());
             mora_value = $("#mora").val();
@@ -3030,11 +3113,6 @@
 
                 }
 
-                //console.log("Single Layer: " + singleLayerName);
-                //console.log("Left Layer: " + leftLayerName);
-                //console.log("Right Layer: " + rightLayerName);
-                //console.log("Year: " + decade_value);
-
                 // always generate/re-generate the left legend
 
                 msorys = 'ys';
@@ -3067,6 +3145,8 @@
                             legendmsorys = 'mon';
                     }
 
+
+
                     legendLayer = var_value + "_health_" + legendmsorys;
                     generateSectorLegend(var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year', '');
                 } else {
@@ -3080,15 +3160,33 @@
                     aord_layer_value = "";
                 }
 
-                singleLayerName = var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
 
-                // console.log('singleLayerName');
-                // console.log(singleLayerName);
+                if (cmip_value === '6') {
+                    cmip_layer_value = "cmip6-";
+                    if (rcp_value === 'rcp26') {
+                        rcp_value = "ssp126";
+                    } else if (rcp_value === 'rcp45') {
+                        rcp_value = "ssp245";
+                    } else if (rcp_value === 'rcp85') {
+                        rcp_value = "ssp585"
+                    }
+
+                } else {
+                    cmip_layer_value = "";
+                }
+
+
+                singleLayerName = cmip_layer_value + '' + var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+
+                console.log('singleLayerName');
+                console.log(singleLayerName);
 
 
                 // if a compare scenario was selected
 
                 if (rcp_value.indexOf("vs") !== -1) {
+
+                    console.log("VS FOUND");
 
                     $('body').addClass('map-compare');
 
@@ -3145,10 +3243,35 @@
 
 
         function buildFilterMenu() {
+            cmipval = getQueryVariable('cmip');
+            // change cmip toggle depending on cmip value
+            if (cmipval === '6') {
+                $('input[name="cmip_switch"][value=6]').click();
+
+                $('#rcp').empty();
+
+                rcpDropGroup = '<option value="rcp26">SSP 2.6</option> ' +
+                    '<option value="rcp26vs45">SSP 2.6 vs SSP 4.5</option> ' +
+                    '<option value="rcp26vs85">SSP 2.6 vs SSP 8.5</option> ' +
+                    '<option value="rcp45">SSP 4.5</option> ' +
+                    '<option value="rcp45vs26">SSP 4.5 vs SSP 2.6</option> ' +
+                    '<option value="rcp45vs85">SSP 4.5 vs SSP 8.5</option> ' +
+                    '<option value="rcp85">SSP 8.5</option> ' +
+                    '<option value="rcp85vs26">SSP 8.5 vs SSP 2.6</option> ' +
+                    '<option value="rcp85vs45">SSP 8.5 vs SSP 4.5</option>';
+
+                $('#rcp').append(rcpDropGroup);
+            } else {
+                $('input[name="cmip_switch"][value=5]').click();
+            }
+
+
             getVarData(function (data) {
                 queryVar = getQueryVariable('var');
 
                 varID = $('#var').val();
+
+
                 rawsectorSelected = getQueryVariable('sector');
 
                 if (!rawsectorSelected) {
@@ -3223,6 +3346,7 @@
 
 
                         var_value = $("#var").val();
+                        cmip_value = $('input[name="cmip_switch"]:checked').val();
                         dec_value = $("#decade").val();
 
                         updated_slider_values = [];
@@ -3290,6 +3414,18 @@
                             rcpDropGroup = '<option value="rcp26">RCP 2.6</option> ' +
                                 '<option value="rcp45">RCP 4.5</option> ' +
                                 '<option value="rcp85">RCP 8.5</option>';
+                        }
+
+                        if (cmipval === '6') {
+                            rcpDropGroup = '<option value="rcp26">SSP 2.6</option> ' +
+                                '<option value="rcp26vs45">SSP 2.6 vs SSP 4.5</option> ' +
+                                '<option value="rcp26vs85">SSP 2.6 vs SSP 8.5</option> ' +
+                                '<option value="rcp45">SSP 4.5</option> ' +
+                                '<option value="rcp45vs26">SSP 4.5 vs SSP 2.6</option> ' +
+                                '<option value="rcp45vs85">SSP 4.5 vs SSP 8.5</option> ' +
+                                '<option value="rcp85">SSP 8.5</option> ' +
+                                '<option value="rcp85vs26">SSP 8.5 vs SSP 2.6</option> ' +
+                                '<option value="rcp85vs45">SSP 8.5 vs SSP 4.5</option>';
                         }
 
 
@@ -3464,8 +3600,10 @@
                 } else {
                     $('input[name="absolute_delta_switch"]').attr("disabled", false);
                     $('.toggle-inside').removeClass('disabled');
-
                 }
+
+
+
 
             });
 

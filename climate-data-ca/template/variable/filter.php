@@ -351,6 +351,7 @@ if (get_the_ID() == filtered_ID_by_path('explore/variable')) {
 
 <?php
 $get_delta = filter_input(INPUT_GET, 'delta', FILTER_SANITIZE_URL);
+$get_cmip = filter_input(INPUT_GET, 'cmip', FILTER_SANITIZE_URL);
 ?>
 
 <div class="toggle-switch-container" id="toggle-switch-container">
@@ -360,6 +361,16 @@ $get_delta = filter_input(INPUT_GET, 'delta', FILTER_SANITIZE_URL);
         <input id="toggle-b" type="radio" value="d" name="absolute_delta_switch"<?php if ($get_delta == "true") { echo ' checked="checked"'; } ?> />
         <label for="toggle-b" style="float: left">Delta</label>
         <div class="text-dark fas fa-question-circle" id="absolute_or_deltas_help" data-content="<div id=aordpoptitle><?php _e('DELTA WITH 1971-2000','cdc');?></div><?php _e('Deltas is the difference between the future value and the reference period (or baseline) value of a climate variable, as simulated by a climate model. The reference period used here is 1971-2000."','cdc');?>"></div>
+        <span class="toggle-outside">
+        <span class="toggle-inside"></span>
+      </span>
+    </div>
+
+    <div class="toggle-switch switch-vertical"id="cmip5_or_cmip6" style="margin-top:40px">
+        <input id="toggle-cmip5" type="radio" value="5" name="cmip_switch"<?php if ($get_cmip == "false" || !$get_cmip) { echo ' checked="checked"'; } ?> />
+        <label for="toggle-cmip5" style="float: left;white-space: nowrap;margin-top:3px">CMIP 5</label>
+        <input id="toggle-cmip6" type="radio" value="6" name="cmip_switch"<?php if ($get_cmip == "true") { echo ' checked="checked"'; } ?> />
+        <label for="toggle-cmip6" style="float: left;white-space: nowrap">CMIP 6</label>
         <span class="toggle-outside">
         <span class="toggle-inside"></span>
       </span>

@@ -525,6 +525,7 @@
         });
 
         function process_download() {
+
             var selectedVar = $('#download-variable').val();
             dataLayerEventName = getGA4EventNameForVariableDataBCCAQv2();
 
@@ -546,6 +547,7 @@
             }
 
             format = $('input[name="download-format"]:checked').val();
+            cmip = $('input[name="download-cmip"]:checked').val();
             variableDataFormat = format;
             if (selectedVar !== 'all') {
                 $('body').addClass('spinner-on');
@@ -553,7 +555,8 @@
                     var: selectedVar,
                     month: month,
                     format: format,
-                    points: points
+                    points: points,
+                    dataset_name: cmip
                 };
 
                 $.ajax({
@@ -562,6 +565,9 @@
                     contentType: 'application/json',
                     data: JSON.stringify(request_args),
                     success: function (result) {
+
+                        console.log(JSON.stringify(request_args));
+                        // console.log(result);
                         if (format == 'csv') {
                             $('#download-result a').attr('href', 'data:text/csv;charset=utf-8,' + escape(result));
                         }

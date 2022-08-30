@@ -628,6 +628,7 @@
         });
 
         function process_download() {
+
             var selectedVar = $('#download-variable').val();
             let pointsData;
             dataLayerEventName = getGA4EventNameForVariableDataBCCAQv2();
@@ -663,19 +664,20 @@
 
             }
             format = $('input[name="download-format"]:checked').val();
+            cmip = $('input[name="download-cmip"]:checked').val();
             let format_extension = format;
 
             if (format == 'netcdf') {
                 format_extension = 'nc';
             }
 
-
             if (selectedVar !== 'all') {
                 $('body').addClass('spinner-on');
                 request_args = {
                     var: selectedVar,
                     month: month,
-                    format: format
+                    format: format,
+                    dataset_name: cmip
                 };
                 Object.assign(request_args, pointsData);
 

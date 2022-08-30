@@ -98,9 +98,15 @@
                       <div class="input-row form-check">
                         <div class="input-item">
                           <input class="form-check-input add-to-object" type="radio" name="dataset_name" id="analyze-dataset-bccaqv2" value="bccaqv2">
-                          <label class="form-check-label" for="analyze-dataset-bccaqv2">BCCAQv2</label>
+                          <label class="form-check-label" for="analyze-dataset-bccaqv2">BCCAQv2 CMIP 5</label>
                         </div>
-
+                        <!--<span class="tooltip-icon"><i class="fas fa-question"></i></span>-->
+                      </div>
+                      <div class="input-row form-check">
+                          <div class="input-item">
+                              <input class="form-check-input add-to-object" type="radio" name="dataset_name" id="analyze-dataset-bccaqv2-cmip6" value="bccaqv2-cmip6">
+                              <label class="form-check-label" for="analyze-dataset-bccaqv2-cmip6">BCCAQv2 CMIP 6</label>
+                          </div>
                         <!--<span class="tooltip-icon"><i class="fas fa-question"></i></span>-->
                       </div>
                     </div>

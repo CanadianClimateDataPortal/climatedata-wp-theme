@@ -2246,8 +2246,6 @@
             leftLayerName = cmip_layer_value + '' + var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
             rightLayerName = cmip_layer_value + '' + var_value + '-' + msorys + '-' + right_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
 
-            console.log(leftLayerName);
-            console.log(rightLayerName);
             moraval = getQueryVariable('mora');
 
 
@@ -2392,8 +2390,6 @@
         loadClimateNormals();
 
         function layer_swap(fn_options) {
-
-            console.log("layer_swap");
 
             var defaults = {
                 layer: null,
@@ -3178,15 +3174,9 @@
 
                 singleLayerName = cmip_layer_value + '' + var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
 
-                console.log('singleLayerName');
-                console.log(singleLayerName);
-
-
                 // if a compare scenario was selected
 
                 if (rcp_value.indexOf("vs") !== -1) {
-
-                    console.log("VS FOUND");
 
                     $('body').addClass('map-compare');
 

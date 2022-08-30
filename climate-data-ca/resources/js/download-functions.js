@@ -20,6 +20,24 @@
         var gridline_width_active = '1';
 
         var ajax_url = base_href.replace('fr/', '');
+        var bbox_layer;
+
+        // returns the maximum number of grid cells that can be requested
+        function get_download_limits(freq, format) {
+            switch (freq) {
+                case 'all':
+                    return 80;
+                case 'daily':
+                    switch (format) {
+                        case 'netcdf':
+                            return 200;
+                        case 'csv':
+                            return 20;
+                    }
+                default:
+                    return 1000;
+            }
+        }
 
         //
         // VENDOR
@@ -225,6 +243,8 @@
             $('#map-overlay').fadeOut()
         })
 
+
+
         //
         // VARIABLE
         //
@@ -248,7 +268,6 @@
                 }
                 highlightGridFeature = null;
             };
-            console.log('adding canadagrid default');
             addGrid('canadagrid');
 
 
@@ -256,6 +275,12 @@
                 checkform()
             })
 
+            maps['variable'].on('pm:create', function (e){
+                bbox_layer = e.layer;
+                bbox_layer.pm.enable({}); // enable edition
+                bbox_layer.on('pm:edit', handle_bbox_event);
+                handle_bbox_event(e);
+            });
         }
 
         function addGrid(gridName) {
@@ -341,95 +366,177 @@
 
             var pbfURL = hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + gridName + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf";
             pbfLayer = L.vectorGrid.protobuf(pbfURL, vectorTileOptions).on('click', function (e) {
+                if ($('input[name="download-select"]:checked').val() == 'gridded') {
 
-                highlightGridFeature = e.layer.properties.gid;
-                selectedPoints[highlightGridFeature] = e.latlng;
+                    highlightGridFeature = e.layer.properties.gid;
+                    selectedPoints[highlightGridFeature] = e.latlng;
 
-                var selectedExists = selectedGrids.includes(highlightGridFeature);
+                    var selectedExists = selectedGrids.includes(highlightGridFeature);
 
-                if (selectedExists === false) {
+                    if (selectedExists === false) {
 
-                    selectedGrids.push(highlightGridFeature);
+                        selectedGrids.push(highlightGridFeature);
 
-                    pbfLayer.setFeatureStyle(highlightGridFeature, {
-                        weight: 1,
-                        color: '#F00',
-                        opacity: 1,
-                        fill: true,
-                        radius: 4,
-                        fillOpacity: 0.1
-                    });
+                        pbfLayer.setFeatureStyle(highlightGridFeature, {
+                            weight: 1,
+                            color: '#F00',
+                            opacity: 1,
+                            fill: true,
+                            radius: 4,
+                            fillOpacity: 0.1
+                        });
 
-                } else {
+                    } else {
 
-                    for (var i = selectedGrids.length - 1; i >= 0; i--) {
+                        for (var i = selectedGrids.length - 1; i >= 0; i--) {
 
-                        if (selectedGrids[i] === highlightGridFeature) {
-                            selectedGrids.splice(i, 1);
+                            if (selectedGrids[i] === highlightGridFeature) {
+                                selectedGrids.splice(i, 1);
+                            }
                         }
+
+                        for (var key in selectedPoints) {
+
+                            if (key === highlightGridFeature) {
+                                delete selectedPoints[key]
+                            }
+                        }
+
+                        pbfLayer.setFeatureStyle(highlightGridFeature, {
+                            weight: 0.1,
+                            color: gridline_color,
+                            opacity: 1,
+                            fill: true,
+                            radius: 4,
+                            fillOpacity: 0
+                        });
+
                     }
 
-                    for (var key in selectedPoints) {
 
-                        if (key === highlightGridFeature) {
-                            delete selectedPoints[key]
-                        }
+                    var points_to_process = selectedGrids.length
+
+                    if (selectedGrids.length > 0) {
+                        $('#download-location').parent().find('.select2-selection__rendered').text(selectedGrids.length + ' ' + l10n_labels.selected)
+                    } else {
+                        $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
                     }
 
-                    pbfLayer.setFeatureStyle(highlightGridFeature, {
-                        weight: 0.1,
-                        color: gridline_color,
-                        opacity: 1,
-                        fill: true,
-                        radius: 4,
-                        fillOpacity: 0
-                    });
+                    var current_coords = ''
 
-                }
+                    selectedGrids.forEach(function (grid_id) {
+                        current_coords += '|' + selectedPoints[grid_id].lat + ',' + selectedPoints[grid_id].lng + ',' + grid_id
+                    })
 
+                    $('#download-coords').val(current_coords)
 
-                var points_to_process = selectedGrids.length
+                    L.DomEvent.stop(e)
 
-                if (selectedGrids.length > 0) {
-                    $('#download-location').parent().find('.select2-selection__rendered').text(selectedGrids.length + ' ' + l10n_labels.selected)
-                } else {
-                    $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
-                }
+                    checkform();
 
-                var current_coords = ''
-
-                selectedGrids.forEach(function (grid_id) {
-                    current_coords += '|' + selectedPoints[grid_id].lat + ',' + selectedPoints[grid_id].lng + ',' + grid_id
-                })
-
-                $('#download-coords').val(current_coords)
-
-                L.DomEvent.stop(e)
-
-                // checkform()
-
-            }).addTo(maps['variable']);
+                }}).addTo(maps['variable']);
 
             pbfLayer.myTag = 'gridlayer';
             pbfLayer.gridType = gridName;
 
         }
 
+        /**
+         * Used to handle any changes to the bouding box (created and edited)
+         * @param e JS event
+         */
+        function handle_bbox_event(e) {
+            let bounds = e.layer.getBounds();
+            let sw = bounds.getSouthWest();
+            let ne = bounds.getNorthEast();
+
+            // store the bounds in #download-coords
+            $('#download-coords').val([sw.lat, sw.lng, ne.lat, ne.lng].join('|'));
+
+            let cells = count_selected_gridcells();
+
+            $('#download-location').parent().find('.select2-selection__rendered').text(T("Around {0} grid boxes selected").format(cells));
+            checkform();
+        }
+
+        // Clear all selections (bbox or gridded) for variable download
+        function clear_var_selections() {
+            for (var i = 0 ; i < selectedGrids.length; i++) {
+                pbfLayer.resetFeatureStyle(selectedGrids[i]);
+            }
+            selectedGrids = [];
+            $('#download-location').val('');
+            $('#download-coords').val('');
+            $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city);
+            if (bbox_layer !== undefined) {
+                maps['variable'].removeLayer(bbox_layer);
+                bbox_layer = undefined;
+                maps['variable'].pm.enableDraw('Rectangle', {});
+            }
+            checkform();
+
+        }
+
+        // Temporary disable CSV until finch is fixed
+        function toggle_csv() {
+            if ($('input[name="download-select"]:checked').val() == 'bbox' &&
+                $('#download-dataset').val() == 'daily') {
+
+                if ($('input[name="download-format"]:checked').val() == 'csv') {
+                    $('#format-label-netcdf').trigger('click');
+                }
+                $('#format-label-csv').hide();
+            } else {
+                $('#format-label-csv').show();
+            }
+        }
+
+        function count_selected_gridcells() {
+            let coords = $('#download-coords').val().split('|');
+
+
+            switch ($('input[name="download-select"]:checked').val()) {
+                case 'gridded':
+                    return selectedGrids.length;
+                    break;
+                case 'bbox':
+                    return Math.round((coords[2] - coords[0]) * (coords[3] - coords[1]) / grid_resolution[curValData.grid] ** 2);
+                    break;
+            }
+        }
+
+
         //
         // FORM VALIDATION
         //
-
         function checkform() {
             $('#download-result').slideUp(125)
 
-            var form_valid = false;
+            let freq = $('#download-dataset').val();
+            let format = $('input[name="download-format"]:checked').val();
 
-            if ($('#download-dataset').val() === 'daily') {
+            let limit = get_download_limits(freq, format);
+            let cells = count_selected_gridcells();
+            $('#download-limit-label').text(T('With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}').format(limit));
+
+            if (cells > limit) {
+                $('#download-limit-label').addClass('border-danger');
+                $('#download-limit-label').addClass('border');
+            } else {
+                $('#download-limit-label').removeClass('border-danger');
+                $('#download-limit-label').removeClass('border');
+
+            }
+            // approximate number of gridcell
+
+
+            if (freq === 'daily') {
                 // DAILY DATA
                 if (
                     $('body').validate_email($('#daily-email').val()) === true &&
                     $('#daily-captcha_code').val() !== '' &&
-                    $('#download-coords').val() !== ''
+                    $('#download-coords').val() !== '' &&
+                    cells <= limit
                 ) {
                     $('#daily-process').removeClass('disabled');
                 } else {
@@ -438,14 +545,9 @@
             } else {
                 // MONTHLY OR ANNUAL
                 // if a filename is entered and the hidden lat/lon inputs have values
-                if (
-                    $('#download-filename').hasClass('valid') &&
-                    $('#download-coords').val() !== ''
-                ) {
-                    form_valid = true;
-                }
-
-                if (form_valid === true) {
+                if ($('#download-filename').hasClass('valid') &&
+                    $('#download-coords').val() !== '' &&
+                    cells <= limit) {
                     $('#download-process').removeClass('disabled');
                 } else {
                     $('#download-process').addClass('disabled');
@@ -492,7 +594,7 @@
 
         var pointsInfo = "";
         var dataLayerEventName = "";
-        var variableDataFormat = "";
+
         function getGA4EventNameForVariableDataBCCAQv2() {
             var gA4EventNameForVariableDataBCCAQv2 = "";
 
@@ -519,6 +621,7 @@
                 'variable_data_format': BCCAQv2FileFormat
             });
         }
+
         var format = null;
         $('.download_variable_data_bccaqv2').click(function (e) {
             setDataLayerForVariableDataBCCAQv2(dataLayerEventName, pointsInfo, format);
@@ -527,59 +630,73 @@
         function process_download() {
 
             var selectedVar = $('#download-variable').val();
+            let pointsData;
             dataLayerEventName = getGA4EventNameForVariableDataBCCAQv2();
 
             month = $("#download-dataset").val();
             if (month === 'annual') {
                 month = 'ann'
             }
-            points = [];
-            pointsInfo = '';
-            for (var i = 0; i < selectedGrids.length; i++) {
-                point = selectedPoints[selectedGrids[i]];
-                pointsInfo += "GridID: " + selectedGrids[i] + ", Lat: " + point.lat + ", Lng: " + point.lng + " ; ";
-                points.push([point.lat, point.lng]);
-            }
 
-            // Remove last 3 char: ;
-            if (selectedGrids.length > 0) {
-                pointsInfo = pointsInfo.substring(0, pointsInfo.length - 3);
-            }
+            switch ($('input[name="download-select"]:checked').val()) {
+                case 'gridded':
+                    pointsData = {'points': []};
+                    pointsInfo = '';
+                    for (var i = 0; i < selectedGrids.length; i++) {
+                        point = selectedPoints[selectedGrids[i]];
+                        pointsInfo += "GridID: " + selectedGrids[i] + ", Lat: " + point.lat + ", Lng: " + point.lng + " ; ";
+                        pointsData.points.push([point.lat, point.lng]);
+                    }
 
+                    // Remove the extra " ; " at the end left by the previous loop
+                    if (selectedGrids.length > 0) {
+                        pointsInfo = pointsInfo.substring(0, pointsInfo.length - 3);
+                    }
+                    break;
+                case 'bbox':
+                    let split_coords = $('#download-coords').val().split('|');
+                    pointsInfo = "BBox: " + split_coords.join(',');
+                    pointsData  = {'bbox': [parseFloat(split_coords[0]),
+                        parseFloat(split_coords[1]),
+                        parseFloat(split_coords[2]),
+                        parseFloat(split_coords[3])]};
+                    break;
+
+            }
             format = $('input[name="download-format"]:checked').val();
             cmip = $('input[name="download-cmip"]:checked').val();
-            variableDataFormat = format;
+            let format_extension = format;
+
+            if (format == 'netcdf') {
+                format_extension = 'nc';
+            }
+
             if (selectedVar !== 'all') {
                 $('body').addClass('spinner-on');
                 request_args = {
                     var: selectedVar,
                     month: month,
                     format: format,
-                    points: points,
                     dataset_name: cmip
                 };
+                Object.assign(request_args, pointsData);
 
-                $.ajax({
-                    method: 'POST',
-                    url: data_url + '/download',
-                    contentType: 'application/json',
-                    data: JSON.stringify(request_args),
-                    success: function (result) {
 
-                        console.log(JSON.stringify(request_args));
-                        // console.log(result);
-                        if (format == 'csv') {
-                            $('#download-result a').attr('href', 'data:text/csv;charset=utf-8,' + escape(result));
-                        }
-                        if (format == 'json') {
-                            $('#download-result a').attr('href', "data:application/json," + encodeURIComponent(JSON.stringify(result)));
-                        }
-                        $('#download-result a').attr('download', $('#download-filename').val() + '.' + format);
+                let xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (xhttp.readyState === XML_HTTP_REQUEST_DONE_STATE && xhttp.status === 200) {
+                        $('#download-result a').attr('href', window.URL.createObjectURL(xhttp.response));
+                        $('#download-result a').attr('download', $('#download-filename').val() + '.' + format_extension);
+
+
                         $('#download-result').slideDown(250);
                         $('body').removeClass('spinner-on');
-
                     }
-                });
+                };
+                xhttp.open("POST", data_url + '/download');
+                xhttp.setRequestHeader("Content-Type", "application/json");
+                xhttp.responseType = 'blob';
+                xhttp.send(JSON.stringify(request_args));
             } else {
                 // call download for all matching variables and build a zip file
                 selectedTimeStepCategory = $('#download-dataset').find(':selected').data('timestep');
@@ -603,21 +720,14 @@
                         request_args = {
                             var: varToProcess[i],
                             month: month,
-                            format: format,
-                            points: points
+                            format: format
                         };
-                        $.ajax({
-                            method: 'POST',
-                            url: data_url + '/download',
-                            contentType: 'application/json',
-                            data: JSON.stringify(request_args),
-                            success: function (result) {
-                                if (format == 'csv') {
-                                    zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.csv', result);
-                                }
-                                if (format == 'json') {
-                                    zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.json', JSON.stringify(result));
-                                }
+                        Object.assign(request_args, pointsData);
+                        let xhttp = new XMLHttpRequest();
+                        xhttp.onreadystatechange = function () {
+                            if (xhttp.readyState === 4 && xhttp.status === 200) {
+                                zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.' + format_extension, xhttp.response);
+
 
 
                                 dl_fraction.find('span').html(i);
@@ -626,18 +736,21 @@
                                     $('body').removeClass('spinner-on');
                                     dl_fraction.remove();
                                     dl_progress.remove();
-                                    zip.generateAsync({ type: "blob" })
+                                    zip.generateAsync({type: "blob"})
                                         .then(function (content) {
                                             saveAs(content, $('#download-filename').val() + ".zip");
 
                                         });
                                 }
-                            },
-                            complete: function () {
+
                                 i++;
                                 download_all();
                             }
-                        });
+                        };
+                        xhttp.open("POST", data_url + '/download');
+                        xhttp.setRequestHeader("Content-Type", "application/json");
+                        xhttp.responseType = 'blob';
+                        xhttp.send(JSON.stringify(request_args));
                     }
 
                 }
@@ -733,6 +846,9 @@
 
             buildVarDropdown(e.currentTarget.value, currentVar);
 
+            // Temporary disable CSV until finch is fixed
+            toggle_csv();
+
             if (e.currentTarget.value == 'daily') {
 
                 // refresh captcha
@@ -749,7 +865,7 @@
             } else {
 
                 // json option
-                $('#format-label-netcdf').hide();
+                $('#format-label-netcdf').show();
                 $('#format-label-json').show();
 
                 // email field
@@ -781,7 +897,6 @@
                 maps['variable'].removeLayer(pbfLayer);
                 console.log("Adding Grid:" + curValData.grid);
                 addGrid(curValData.grid);
-
                 selectedGrids = [];
                 $('#download-coords').val('');
                 $('#download-location').val('');
@@ -799,6 +914,23 @@
             }
 
             checkform();
+
+        });
+
+        // selection type
+        $('#selection-type input').on('change', function () {
+            clear_var_selections();
+            toggle_csv();
+
+            switch ($('input[name="download-select"]:checked').val()) {
+                case 'gridded':
+                    maps['variable'].pm.disableDraw();
+                    break;
+
+                case 'bbox':
+                    maps['variable'].pm.enableDraw('Rectangle', {});
+                    break;
+            }
 
         });
 
@@ -838,6 +970,11 @@
             e.preventDefault();
         });
 
+        $('#download-clear').click(function (e) {
+            e.preventDefault();
+            clear_var_selections();
+        });
+
         //
         // SUBMISSION FOR 'ANNUAL' OR 'MONTHLY' DATASETS
         //
@@ -861,6 +998,7 @@
             e.preventDefault();
 
             let var_name = '';
+            let submit_url = '';
 
             switch ($('#download-variable').val()) {
 
@@ -877,48 +1015,14 @@
                     break;
             }
 
-            let split_coords = $('#download-coords').val().split('|'),
-                lat_vals = '',
-                lon_vals = '';
-
-            // remove first element which is empty because the first character is always '|'
-            split_coords.shift();
-
-            for (i = 0; i < split_coords.length; i += 1) {
-
-                let this_coord = split_coords[i].split(',');
-
-                if (lat_vals !== '') {
-                    lat_vals += ','
-                }
-
-                lat_vals += this_coord[0];
-
-                if (lon_vals !== '') {
-                    lon_vals += ','
-                }
-
-                lon_vals += this_coord[1]
-
-            }
-
             var submit_data = {
                 "captcha_code":$('#daily-captcha_code').val(),
                 "signup":$('#signup').is(":checked"),
-                "submit_url": "/providers/finch/processes/subset_ensemble_BCCAQv2/jobs",
                 "request_data": {
                     "inputs": [
                         {
                             "id": "variable",
                             "data": var_name,
-                        },
-                        {
-                            "id": "lat0",
-                            "data": lat_vals
-                        },
-                        {
-                            "id": "lon0",
-                            "data": lon_vals
                         },
                         {
                             "id": "data_validation",
@@ -938,6 +1042,60 @@
                     }]
                 }
             };
+            let split_coords = $('#download-coords').val().split('|');
+            switch ($('input[name="download-select"]:checked').val()) {
+                case 'gridded':
+                        let lat_vals = '', lon_vals = '';
+
+                    // remove first element which is empty because the first character is always '|'
+                    split_coords.shift();
+
+                    for (i = 0; i < split_coords.length; i += 1) {
+
+                        let this_coord = split_coords[i].split(',');
+
+                        if (lat_vals !== '') {
+                            lat_vals += ','
+                        }
+
+                        lat_vals += this_coord[0];
+
+                        if (lon_vals !== '') {
+                            lon_vals += ','
+                        }
+
+                        lon_vals += this_coord[1]
+
+                    }
+                    submit_data['request_data']['inputs'].push({
+                        "id": "lat0",
+                        "data": lat_vals
+                    }, {
+                        "id": "lon0",
+                        "data": lon_vals
+                    });
+                    submit_data['submit_url'] = "/providers/finch/processes/subset_grid_point_dataset/jobs";
+                    break;
+
+                case 'bbox':
+
+                    submit_data['request_data']['inputs'].push({
+                        "id": "lat0",
+                        "data": split_coords[0]
+                    }, {
+                        "id": "lon0",
+                        "data": split_coords[1]
+                    }, {
+                        "id": "lat1",
+                        "data": split_coords[2]
+                    }, {
+                        "id": "lon1",
+                        "data": split_coords[3]
+                    });
+
+                    submit_data['submit_url'] = "/providers/finch/processes/subset_bbox_dataset/jobs";
+                    break;
+            }
 
             $.ajax({
                 url: child_theme_dir + 'resources/ajax/finch-submit.php',
@@ -989,23 +1147,6 @@
 
             // $.getJSON('https://geo.weather.gc.ca/geomet/features/collections/climate-stations/items?f=json&limit=10000', function (data) {
             $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE', function (data) {
-
-
-                // var len = data.features.length;
-
-                // for (var i = 0; i< len; i++) {
-                //
-                //     stationOption = data.features[i].properties;
-                //
-                //     // console.log(stationOption);
-                //
-                //     // console.log(data.features[i]);
-                //     stationFromAPI += '<option value="' + stationOption.STN_ID + '">' + stationOption.STATION_NAME + '</option>';
-                //
-                //
-                // }
-                // $('#station-select').append(stationFromAPI);
-                // $('#station-select').select2();
 
                 var markers = L.markerClusterGroup();
 
@@ -1076,107 +1217,6 @@
                 markers.addLayer(pointsLayer);
 
                 maps['station'].addLayer(markers);
-                // maps['station'].fitBounds(markers.getBounds());
-
-                // pointsLayer = L.geoJson(data, {
-                //     pointToLayer: function (feature, latlng) {
-                //
-                //         var markerColor = '#BBB';
-                //         var existingData = $("#station-select").select2("val");
-                //
-                //         // console.log(feature.properties);
-                //
-                //         if (existingData != null && existingData.includes(feature.properties.STN_ID.toString())) {
-                //             markerColor = '#F00';
-                //         }
-                //
-                //         // var marker = L.circleMarker(latlng, {
-                //         //     // Stroke properties
-                //         //     color: markerColor,
-                //         //     opacity: 1,
-                //         //     weight: 2,
-                //         //     pane: 'idf',
-                //         //     // Fill properties
-                //         //     fillColor: markerColor,
-                //         //     fillOpacity: 1,
-                //         //     radius: 5
-                //         // });
-                //
-                //          var title = feature.properties.STATION_NAME.toString();
-                //         var marker = L.marker(latlng, { title: title });
-                //         marker.bindPopup(title);
-                //         markers.addLayer(marker);
-                //
-                //         // markerMap[feature.id] = marker;
-                //
-                //         return marker;
-                //
-                //     }
-                // }).on('mouseover', function (e) {
-                //     e.layer.bindTooltip(e.layer.feature.properties.STATION_NAME + ' ' + e.layer.feature.properties.STN_ID).openTooltip(e.latlng);
-                // }).on('click', function (e) {
-                //
-                //     // get current station select value
-                //     var existingData = $("#station-select").select2("val");
-                //
-                //     // clicked ID
-                //     var clicked_ID = e.layer.feature.properties.STN_ID.toString();
-                //
-                //     // default colour
-                //     markerColor = '#F00';
-                //
-                //     if (existingData != null) {
-                //
-                //
-                //         if (existingData.includes(clicked_ID)) {
-                //
-                //
-                //             var $select = $('#station-select');
-                //
-                //             index = existingData.indexOf(clicked_ID);
-                //
-                //             if (index > -1) {
-                //                 existingData.splice(index, 1);
-                //             }
-                //
-                //
-                //             $('#station-select').val(existingData).change();
-                //
-                //             markerColor = '#BBB';
-                //
-                //         } else {
-                //
-                //
-                //             existingData.push(clicked_ID);
-                //
-                //             $('#station-select').val(existingData).change();
-                //
-                //         }
-                //
-                //     } else {
-                //
-                //
-                //         existingData = [clicked_ID];
-                //
-                //         $('#station-select').val(existingData).change();
-                //
-                //     }
-                //
-                //     e.layer.setStyle({
-                //         // Stroke properties
-                //         color: markerColor,
-                //         opacity: 1,
-                //         weight: 2,
-                //         pane: 'idf',
-                //         // Fill properties
-                //         fillColor: markerColor,
-                //         fillOpacity: 1,
-                //         radius: 5
-                //     });
-                //
-                // }).addTo(maps['station']);
-
-
             });
 
 
@@ -1318,24 +1358,6 @@
                 }
             });
         });
-
-        /*
-         $('#station-download-form').submit(function(e) {
-         e.preventDefault();
-
-         var process_url = $('#result').text();
-
-
-         $.ajax({
-         url: process_url,
-         success: function(data) {
-         },
-         complete: function() {
-         }
-         });
-
-         });
-         */
 
         function check_station_form() {
 

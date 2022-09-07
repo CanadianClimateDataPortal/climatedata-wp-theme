@@ -217,6 +217,11 @@ function wpml_ls_filter($languages)
     return $languages;
 }
 
+// get a single key from array, or $default if missing (source: https://stackoverflow.com/questions/9555758/default-array-values-if-key-doesnt-exist)
+function arr_get($array, $key, $default = null){
+    return isset($array[$key]) ? $array[$key] : $default;
+}
+
 //
 // ARCHIVE
 //

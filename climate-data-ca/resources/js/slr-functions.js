@@ -244,7 +244,6 @@
 
 
             var $rs = $("#range-slider");
-            console.log($('#decade').val);
 
             $rs.ionRangeSlider({
                 grid: false,
@@ -653,6 +652,12 @@
 
         map1.on('zoom', function (e) {
             grid_hover_cancel(null);
+            if (typeof gridLayer !== 'undefined' && gridLayer !== null) {
+                gridLayer.unbindTooltip();
+            }
+            if (typeof gridLayerRight !== 'undefined' && gridLayerRight !== null) {
+                gridLayerRight.unbindTooltip();
+            }
         });
 
         //

@@ -5,6 +5,7 @@
 const k_to_c = 273.15;
 const data_url = DATA_URL;
 const geoserver_url = DATA_URL;
+const XML_HTTP_REQUEST_DONE_STATE = 4;
 
 //
 // GLOBAL VARS
@@ -19,7 +20,12 @@ var l10n_table = {
         // IDF
         "Short Duration Rainfall Intensity−Duration−Frequency Data" : "Données sur l’intensité, la durée et la fréquence des chutes de pluie de courte durée",
         "Return Level" : "Niveau de retour",
-        "Trend" : "Tendance"
+        "Trend" : "Tendance",
+
+        // Download
+        "With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}":
+            "Avec les paramètres actuels de fréquence et de format de donnée, le nombre maximal de points de grille par requête est de {0}",
+        "Around {0} grid boxes selected" : "Environ {0} points de grille sélectionnés"
     }
 };
 

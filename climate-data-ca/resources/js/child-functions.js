@@ -5,12 +5,27 @@
 const k_to_c = 273.15;
 const data_url = DATA_URL;
 const geoserver_url = DATA_URL;
+const XML_HTTP_REQUEST_DONE_STATE = 4;
 
 //
 // GLOBAL VARS
 //
 
 var chart_labels, legend_labels, l10n_labels;
+
+var l10n_table = {
+    "fr": {
+        "With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}":
+            "Avec les paramètres actuels de fréquence et de format de donnée, le nombre maximal de points de grille par requête est de {0}",
+        "Around {0} grid boxes selected" : "Environ {0} points de grille sélectionnés"
+    }
+};
+
+const grid_resolution = {
+    "canadagrid": 1.0/12.0,
+    "canadagrid1deg": 1.0,
+    "slrgrid": 1.0/10.0
+};
 
 
 //
@@ -78,6 +93,38 @@ function unit_localize(str) {
     return str;
 }
 
+/**
+ * Allow usage of string formatting  e.g. "Hello {0}!".format("world") => "Hello world!"
+ * @returns {string}
+ */
+String.prototype.format = function () {
+    // store arguments in an array
+    var args = arguments;
+    // use replace to iterate over the string
+    // select the match and check if related argument is present
+    // if yes, replace the match with the argument
+    return this.replace(/{([0-9]+)}/g, function (match, index) {
+        // check if the argument is present
+        return typeof args[index] == 'undefined' ? match : args[index];
+    });
+};
+
+/**
+ * Perform a string lookup in l10n_table in current language, returns it if found, otherwise return the original string
+ * @param str String to lookup for
+ * @returns {string} The localized string
+ */
+function T(str) {
+    if (typeof  l10n_table[current_lang] == 'undefined'){
+        return str;
+    }
+    if (typeof l10n_table[current_lang][str] == 'undefined') {
+        console.warn("Missing translation in language " + current_lang + ": " + str);
+        return str;
+    } else {
+        return l10n_table[current_lang][str];
+    }
+}
 
 (function ($) {
 
@@ -644,6 +691,45 @@ function unit_localize(str) {
 
             //console.log('listnav');
         }
+
+				// SHARE
+
+				if ($('#share').length) {
+
+					window.fbAsyncInit = function() {
+				    FB.init({
+				      appId            : '387199319682000',
+				      autoLogAppEvents : true,
+				      xfbml            : true,
+				      version          : 'v13.0'
+				    });
+				  };
+
+					$('#share').share_widget({
+					  site_url: '//' + window.location.hostname,
+					  theme_dir: child_theme_dir,
+					  share_url: window.location.href,
+					  title: document.title,
+					  elements: {
+					    facebook: {
+					      display: true,
+					      icon: 'fab fa-facebook mr-3'
+					    },
+					    twitter: {
+					      display: true,
+					      icon: 'fab fa-twitter mr-3',
+					      text: null,
+					      via: null
+					    },
+							linkedin: {
+								display: true,
+								icon: 'fab fa-linkedin mr-3'
+							}
+					  },
+					  callback: null // callback function
+					})
+
+				}
 
         if (typeof $.fn.renderer !== 'undefined' && $('.renderable').length) {
             $(document).renderer();

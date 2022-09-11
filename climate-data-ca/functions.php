@@ -131,8 +131,9 @@ function child_theme_enqueue()
     // app dependencies
 
     wp_register_script('leaflet', $bower_dir . 'leaflet/dist/leaflet.js', NULL, NULL, true);
-    wp_register_script('leaflet-cluster', $child_js_dir . 'leaflet-cluster.js', NULL, NULL, true);
-    wp_register_script('leaflet-cluster-subgroup', $child_js_dir . 'leaflet.featuregroup.subgroup.js', NULL, NULL, true);
+    wp_register_script('leaflet-geoman', $child_js_dir . 'leaflet-geoman.min.js', array('leaflet'), NULL, true);
+    wp_register_script('leaflet-cluster', $child_js_dir . 'leaflet-cluster.js', array('leaflet'), NULL, true);
+    wp_register_script('leaflet-cluster-subgroup', $child_js_dir . 'leaflet.featuregroup.subgroup.js', array('leaflet-cluster'), NULL, true);
 
     wp_register_script('jszip', $bower_dir . 'jszip/dist/jszip.min.js', NULL, NULL, true);
     wp_register_script('FileSaver', $bower_dir . 'FileSaver/dist/FileSaver.min.js', NULL, NULL, true);
@@ -214,6 +215,11 @@ function wpml_ls_filter($languages)
         }
     }
     return $languages;
+}
+
+// get a single key from array, or $default if missing (source: https://stackoverflow.com/questions/9555758/default-array-values-if-key-doesnt-exist)
+function arr_get($array, $key, $default = null){
+    return isset($array[$key]) ? $array[$key] : $default;
 }
 
 //

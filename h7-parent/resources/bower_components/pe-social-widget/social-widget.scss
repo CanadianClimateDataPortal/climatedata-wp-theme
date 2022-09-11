@@ -1,27 +1,27 @@
-$social-font: $base-font-family !default;
+$social-font: $font-family-base !default;
 
 $social-menu-bg: $white !default;
 $social-menu-padding: 10px !default;
 
-$social-trigger-color: $base-font-color !default;
-$social-link-color: $action-color !default;
+$social-trigger-color: $body-color !default;
+$social-link-color: $primary !default;
 
 $social-item-padding: 6px 0 !default;
 
-$social-icon-color: $action-color !default;
+$social-icon-color: $primary !default;
 $social-icon-margin: 0 10px 0 0 !default;
 
 .social-widget-wrap {
   position: relative;
   font-family: $social-font;
-  
+
   .icon {
   }
-  
+
   .social-trigger {
     cursor: pointer;
     color: $social-trigger-color;
-    
+
     .icon {
       margin: $social-icon-margin;
       color: $social-icon-color;
@@ -31,7 +31,7 @@ $social-icon-margin: 0 10px 0 0 !default;
 
     }
   }
-  
+
   .social-widget {
     position: absolute;
     top: 100%;
@@ -46,17 +46,17 @@ $social-icon-margin: 0 10px 0 0 !default;
     font-size: 1em;
     transition: right 0s ease 0.25s, opacity 0.25s ease 0s;
     z-index: 1;
-    
+
     li {
       padding: $social-item-padding;
     }
-    
+
     a {
       display: block;
       float: none;
     }
   }
-  
+
   &.open {
     .social-widget {
       right: 0;
@@ -68,7 +68,7 @@ $social-icon-margin: 0 10px 0 0 !default;
 
 .share-permalink-input {
   display: none;
-  
+
   input {
     display: block;
     width: 100%;

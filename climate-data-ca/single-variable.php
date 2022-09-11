@@ -420,7 +420,7 @@ if (have_posts()) : while (have_posts()) : the_post();
 
                 <div id="callback-data"><?php
 
-                    echo json_encode(array('title' => get_field('var_title'), 'units' => array('label' => __($units['label'], 'cdc'), 'value' => __($units['value'], 'cdc')), 'decimals' => get_field('decimals')));
+                    echo json_encode(array('title' => get_field('var_title'), 'units' => array('label' => __(arr_get($units, 'label', ''), 'cdc'), 'value' => __(arr_get($units, 'value', ''), 'cdc')), 'decimals' => get_field('decimals')));
 
                     ?></div>
             </div>

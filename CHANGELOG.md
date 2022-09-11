@@ -1,3 +1,6 @@
+2022-09-07.01
+  * Removed SASS generated CSS from repository
+
 2022-08-22.01
   * Added netcdf format for variable download (annual)
   * Added bounding box selection for variable download

@@ -27,6 +27,19 @@ const grid_resolution = {
     "slrgrid": 1.0/10.0
 };
 
+const SCENARIOS = {
+    "5": [
+        {'name': 'rcp26', 'label': 'RCP 2.6', 'chart_color': '#00F'},
+        {'name': 'rcp45', 'label': 'RCP 4.5', 'chart_color': '#00640c'},
+        {'name': 'rcp85', 'label': 'RCP 8.5', 'chart_color': '#F00'},
+    ],
+    "6": [
+        {'name': 'ssp126', 'label': 'SSP 1-2.6', 'chart_color': '#00F'},
+        {'name': 'ssp245', 'label': 'SSP 2-4.5', 'chart_color': '#00640c'},
+        {'name': 'ssp585', 'label': 'SSP 5-8.5', 'chart_color': '#F00'},
+    ]
+}
+
 
 //
 // GLOBAL Functions

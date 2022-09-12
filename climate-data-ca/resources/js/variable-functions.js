@@ -1281,29 +1281,32 @@
             });
         }
 
-        function displayChartData(data, varDetails, download_url) {
-               chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
-            chartDecimals = varDetails['decimals'];
+        function displayChartData(data, varDetails, download_url, cmip_value) {
+            let chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
+            let chartDecimals = varDetails['decimals'];
+            let scenarios = SCENARIOS[cmip_value];
+            let pointFormatter, formatter
+
             switch (varDetails.units.value) {
                 case 'doy':
                     formatter = function () { return doy_formatter(this.value) };
-                    var pointFormatter = function (format) {
+                    pointFormatter = function (format) {
                         if (this.series.type == 'line') {
                             return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name + ': <b>'
-                                +  doy_formatter(this.y)
+                                + doy_formatter(this.y)
                                 + '</b><br/>';
                         } else {
                             return '<span style="color:' + this.series.color + '">●</span>' + this.series.name + ': <b>'
-                                +  doy_formatter(this.low)
+                                + doy_formatter(this.low)
                                 + '</b> - <b>'
-                                +  doy_formatter(this.high)
+                                + doy_formatter(this.high)
                                 + '</b><br/>';
                         }
                     };
                     break;
                 default:
                     formatter = function () { return this.axis.defaultLabelFormatter.call(this) + ' ' + chartUnit; };
-                    var pointFormatter = undefined;
+                    pointFormatter = undefined;
             }
 
 
@@ -1357,94 +1360,37 @@
                         enabled: false
                     }
                 });
-            if (data['rcp26_median'].length > 0)
-                chartSeries.push({
-                    name: chart_labels.rcp_26_median,
-                    data: data['rcp26_median'],
-                    zIndex: 1,
-                    showInNavigator: true,
-                    color: '#00F',
-                    marker: {
-                        fillColor: '#00F',
+            scenarios.forEach(function (scenario) {
+                if (data['{0}_median'.format(scenario.name)].length > 0)
+                    chartSeries.push({
+                        name: T('{0} Median').format(scenario.label),
+                        data: data['{0}_median'.format(scenario.name)],
+                        zIndex: 1,
+                        showInNavigator: true,
+                        color: scenario.chart_color,
+                        marker: {
+                            fillColor: scenario.chart_color,
+                            lineWidth: 0,
+                            radius: 0,
+                            lineColor: scenario.chart_color
+                        }
+                    });
+                if (data['{0}_range'.format(scenario.name)].length > 0)
+                    chartSeries.push({
+                        name: T('{0} Range').format(scenario.label),
+                        data: data['{0}_range'.format(scenario.name)],
+                        type: 'arearange',
                         lineWidth: 0,
-                        radius: 0,
-                        lineColor: '#00F'
-                    }
-                });
-            if (data['rcp26_range'].length > 0)
-                chartSeries.push({
-                    name: chart_labels.rcp_26_range,
-                    data: data['rcp26_range'],
-                    type: 'arearange',
-                    lineWidth: 0,
-                    linkedTo: ':previous',
-                    color: '#00F',
-                    fillOpacity: 0.2,
-                    zIndex: 0,
-                    marker: {
-                        radius: 0,
-                        enabled: false
-                    }
-                });
-            if (data['rcp45_median'].length > 0)
-                chartSeries.push({
-                    name: chart_labels.rcp_45_median,
-                    data: data['rcp45_median'],
-                    zIndex: 1,
-                    showInNavigator: true,
-                    color: '#00640c',
-                    marker: {
-                        fillColor: '#00640c',
-                        lineWidth: 0,
-                        radius: 0,
-                        lineColor: '#00640c'
-                    }
-                });
-            if (data['rcp45_range'].length > 0)
-                chartSeries.push({
-                    name: chart_labels.rcp_45_range,
-                    data: data['rcp45_range'],
-                    type: 'arearange',
-                    lineWidth: 0,
-                    linkedTo: ':previous',
-                    color: '#00640c',
-                    fillOpacity: 0.2,
-                    zIndex: 0,
-                    marker: {
-                        radius: 0,
-                        enabled: false
-                    }
-                });
-            if (data['rcp85_median'].length > 0)
-                chartSeries.push({
-                    name: chart_labels.rcp_85_median,
-                    data: data['rcp85_median'],
-                    zIndex: 1,
-                    showInNavigator: true,
-                    color: '#F00',
-                    marker: {
-                        fillColor: '#F00',
-                        lineWidth: 0,
-                        radius: 0,
-                        lineColor: '#F00'
-                    }
-                });
-            if (data['rcp85_range'].length > 0)
-                chartSeries.push({
-                    name: chart_labels.rcp_85_range,
-                    data: data['rcp85_range'],
-                    type: 'arearange',
-                    lineWidth: 0,
-                    linkedTo: ':previous',
-                    color: '#F00',
-                    fillOpacity: 0.2,
-                    zIndex: 0,
-                    marker: {
-                        radius: 0,
-                        enabled: false
-                    }
-                });
-
+                        linkedTo: ':previous',
+                        color: scenario.chart_color,
+                        fillOpacity: 0.2,
+                        zIndex: 0,
+                        marker: {
+                            radius: 0,
+                            enabled: false
+                        }
+                    });
+            });
 
             var chart = Highcharts.stockChart('chart-placeholder', {
                 chart: {
@@ -1571,44 +1517,19 @@
 
                                 let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + "</span><br/>"];
 
-                                this.value = data['30y_rcp26_median'][decade_ms][0];
-                                val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                tip.push("<span style=\"color:#00F\">●</span> " + chart_labels.rcp_26_median + " <b>"
-                                    + val1 + "</b><br/>");
+                                scenarios.forEach(function (scenario) {
+                                    this.value = data['30y_{0}_median'.format(scenario.name)][decade_ms][0];
+                                    val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                    tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Median').format(scenario.label) + " <b>"
+                                        + val1 + "</b><br/>");
 
-                                this.value = data['30y_rcp26_range'][decade_ms][0];
-                                val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                this.value = data['30y_rcp26_range'][decade_ms][1];
-                                val2 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                tip.push("<span style=\"color:#00F\">●</span> " + chart_labels.rcp_26_range + " <b>"
-                                    + val1 + "</b>-<b>" + val2 + "</b><br/>");
-
-
-                                this.value = data['30y_rcp45_median'][decade_ms][0];
-                                val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                tip.push("<span style=\"color:#00640c\">●</span> " + chart_labels.rcp_45_median + " <b>"
-                                    + val1 + "</b><br/>");
-
-                                this.value = data['30y_rcp45_range'][decade_ms][0];
-                                val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                this.value = data['30y_rcp45_range'][decade_ms][1];
-                                val2 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                tip.push("<span style=\"color:#00640c\">●</span> " + chart_labels.rcp_45_range + " <b>"
-                                    + val1 + "</b>-<b>" + val2 + "</b><br/>");
-
-
-                                this.value = data['30y_rcp85_median'][decade_ms][0];
-                                val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                tip.push("<span style=\"color:#F00\">●</span> " + chart_labels.rcp_85_median + " <b>"
-                                    + val1 + "</b><br/>");
-
-                                this.value = data['30y_rcp85_range'][decade_ms][0];
-                                val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                this.value = data['30y_rcp85_range'][decade_ms][1];
-                                val2 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                tip.push("<span style=\"color:#F00\">●</span> " + chart_labels.rcp_85_range + " <b>"
-                                    + val1 + "</b>-<b>" + val2 + "</b><br/>");
-
+                                    this.value = data['30y_{0}_range'.format(scenario.name)][decade_ms][0];
+                                    val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                    this.value = data['30y_{0}_range'.format(scenario.name)][decade_ms][1];
+                                    val2 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                    tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Range').format(scenario.label) + " <b>"
+                                        + val1 + "</b>-<b>" + val2 + "</b><br/>");
+                                }, this);
 
                                 return tip;
                             }
@@ -1682,35 +1603,16 @@
 
                                     let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + " " + chart_labels.change_from_1971_2000 + "</span><br/>"];
 
-                                    val1 = numformat(data['delta7100_rcp26_median'][decade_ms][0]);
-                                    tip.push("<span style=\"color:#00F\">●</span> " + chart_labels.rcp_26_median + " <b>"
-                                        + val1 + "</b><br/>");
+                                    scenarios.forEach(function(scenario) {
+                                        val1 = numformat(data['delta7100_{0}_median'.format(scenario.name)][decade_ms][0]);
+                                        tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Median').format(scenario.label) + " <b>"
+                                            + val1 + "</b><br/>");
 
-                                    val1 = numformat(data['delta7100_rcp26_range'][decade_ms][0]);
-                                    val2 = numformat(data['delta7100_rcp26_range'][decade_ms][1]);
-                                    tip.push("<span style=\"color:#00F\">●</span> " + chart_labels.rcp_26_range + " <b>"
-                                        + val1 + "</b>-<b>" + val2 + "</b><br/>");
-
-
-                                    val1 = numformat(data['delta7100_rcp45_median'][decade_ms][0]);
-                                    tip.push("<span style=\"color:#00640c\">●</span> " + chart_labels.rcp_45_median + " <b>"
-                                        + val1 + "</b><br/>");
-
-                                    val1 = numformat(data['delta7100_rcp45_range'][decade_ms][0]);
-                                    val2 = numformat(this.value = data['delta7100_rcp45_range'][decade_ms][1]);
-                                    tip.push("<span style=\"color:#00640c\">●</span> " + chart_labels.rcp_45_range + " <b>"
-                                        + val1 + "</b>-<b>" + val2 + "</b><br/>");
-
-
-                                    val1= numformat(data['delta7100_rcp85_median'][decade_ms][0]);
-                                    tip.push("<span style=\"color:#F00\">●</span> " + chart_labels.rcp_85_median + " <b>"
-                                        + val1 + "</b><br/>");
-
-                                    val1 = numformat(data['delta7100_rcp85_range'][decade_ms][0]);
-                                    val2 = numformat(data['delta7100_rcp85_range'][decade_ms][1]);
-                                    tip.push("<span style=\"color:#F00\">●</span> " + chart_labels.rcp_85_range + " <b>"
-                                        + val1 + "</b>-<b>" + val2 + "</b><br/>");
-
+                                        val1 = numformat(data['delta7100_{0}_range'.format(scenario.name)][decade_ms][0]);
+                                        val2 = numformat(data['delta7100_{0}_range'.format(scenario.name)][decade_ms][1]);
+                                        tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Range').format(scenario.label) + " <b>"
+                                            + val1 + "</b>-<b>" + val2 + "</b><br/>");
+                                    }, this);
 
                                     return tip;
                                 }
@@ -1779,14 +1681,14 @@
 
                     $('#rcp').prop('disabled', true);
 
-                    cmip_value = $('input[name="cmip_switch"]:checked').val();
+                    let cmip_value = $('input[name="cmip_switch"]:checked').val();
 
                     let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=cmip' + cmip_value;
 
                     $.getJSON(
                         data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=cmip' + cmip_value,
                         function (data) {
-                            displayChartData(data, varDetails, download_url);
+                            displayChartData(data, varDetails, download_url, cmip_value);
                         });
 
                 }
@@ -1805,11 +1707,12 @@
                 position: 'right',
                 callback: function (varDetails) {
                     $('#rcp').prop('disabled', true);
-                    let download_url = data_url + '/download-regional-30y/' + query['sector'] + '/' + id + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals;
+                    let cmip_value = $('input[name="cmip_switch"]:checked').val();
+                    let download_url = data_url + '/download-regional-30y/' + query['sector'] + '/' + id + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=cmip' + cmip_value;
 
                     $.getJSON(hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id
                         + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals).then(function (data) {
-                        displayChartData(data,varDetails, download_url);
+                        displayChartData(data,varDetails, download_url, cmip_value);
                     });
 
 
@@ -2951,27 +2854,7 @@
         $('input[type=radio][name=cmip_switch]').change(function() {
             // console.log('cmip switched');
             cmip_value = $('input[name="cmip_switch"]:checked').val();
-            if (cmip_value === '5') {
-                query['cmip'] = "5";
-
-                chart_labels.rcp_26_median = 'RCP 2.6 Median';
-                chart_labels.rcp_26_range = 'RCP 2.6 Range';
-                chart_labels.rcp_45_median = 'RCP 4.5 Median';
-                chart_labels.rcp_45_range = 'RCP 4.5 Range';
-                chart_labels.rcp_85_median = 'RCP 8.5 Median';
-                chart_labels.rcp_85_range = 'RCP 8.5 Range';
-                chart_labels.rcp_85_enhanced = 'RCP 8.5 Enhanced Scenario';
-            } else {
-                query['cmip'] = "6";
-                chart_labels.rcp_26_median = 'SSP 2.6 Median';
-                chart_labels.rcp_26_range = 'SSP 2.6 Range';
-                chart_labels.rcp_45_median = 'SSP 4.5 Median';
-                chart_labels.rcp_45_range = 'SSP 4.5 Range';
-                chart_labels.rcp_85_median = 'SSP 8.5 Median';
-                chart_labels.rcp_85_range = 'SSP 8.5 Range';
-                chart_labels.rcp_85_enhanced = 'SSP 8.5 Enhanced Scenario';
-
-            }
+            query['cmip'] = cmip_value;
 
             update_query_string();
             buildFilterMenu();

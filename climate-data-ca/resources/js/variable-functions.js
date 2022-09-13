@@ -59,12 +59,8 @@
         }
 
 
-        cmip_value = $('input[name="cmip_switch"]:checked').val();
-        if (cmip_value === '5') {
-            query['cmip'] = "5";
-        } else {
-            query['cmip'] = "6";
-        }
+        let dataset = $('input[name="dataset_switch"]:checked').val();
+        query['dataset'] = dataset;
 
         if ($('#geo-select').length) {
             query['geo-select'] = $('#geo-select').val();
@@ -117,6 +113,54 @@
             center: [query['coords'].split(',')[0], query['coords'].split(',')[1]],
             zoom: query['coords'].split(',')[2]
         });
+
+
+        // grid line/fill options
+
+        var gridline_color = '#fff';
+        var gridline_color_hover = '#fff';
+        var gridline_color_active = '#fff';
+        var gridline_width = '0.2';
+        var gridline_width_active = '1';
+
+        var gridfill_color_hover = '#fff';
+
+
+        var gridLayer_options = {
+
+            rendererFactory: L.canvas.tile,
+            interactive: true,
+            getFeatureId: function (f) {
+                return f.properties.gid;
+            },
+            maxNativeZoom: 12,
+            vectorTileLayerStyles: {
+                'canadagrid': function (properties, zoom) {
+                    return {
+                        weight: 0.1,
+                        color: gridline_color,
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0
+                    }
+                },
+                'canadagrid1deg': function (properties, zoom) {
+                    return {
+                        weight: 0.1,
+                        color: gridline_color,
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0
+                    }
+                }
+            },
+            bounds: canadaBounds,
+            maxZoom: 12,
+            minZoom: 7,
+            pane: 'grid'
+        };
 
 
         // layers
@@ -493,15 +537,6 @@
         // data URLs
 
 
-        // grid line/fill options
-
-        var gridline_color = '#fff';
-        var gridline_color_hover = '#fff';
-        var gridline_color_active = '#fff';
-        var gridline_width = '0.2';
-        var gridline_width_active = '1';
-
-        var gridfill_color_hover = '#fff';
 
         // UTILITIES
 
@@ -730,6 +765,7 @@
                         let decade_value = parseInt($("#decade").val()) + 1;
                         let delta = $('input[name="absolute_delta_switch"]:checked').val() === 'd';
                         let delta7100 = delta ? "&delta7100=true" : "";
+                        let dataset_name = $('input[name="dataset_switch"]:checked').val();
                         let values_url;
 
                         if (sector == "") { // gridded
@@ -737,13 +773,15 @@
                             e.latlng['lat'] + "/" + e.latlng['lng'] +
                             "/" + var_value + "/" + mora_value +
                             "?period=" + decade_value +
-                            "&decimals=" + varDetails.decimals + delta7100;
+                            "&decimals=" + varDetails.decimals + delta7100 +
+                            "&dataset_name=" + dataset_name;
                         } else {
                             values_url = data_url + "/get-delta-30y-regional-values/" +
                                 sector + "/" + e.layer.properties.id +
                                 "/" + var_value + "/" + mora_value +
                                 "?period=" + decade_value +
-                                "&decimals=" + varDetails.decimals + delta7100;
+                                "&decimals=" + varDetails.decimals + delta7100 +
+                                "&dataset_name=" + dataset_name;
                         }
 
                         gridHoverAjax = $.ajax({
@@ -867,44 +905,6 @@
 
         }
 
-        // options
-
-        var gridLayer_options = {
-
-            rendererFactory: L.canvas.tile,
-            interactive: true,
-            getFeatureId: function (f) {
-                return f.properties.gid;
-            },
-            maxNativeZoom: 12,
-            vectorTileLayerStyles: {
-                'canadagrid': function (properties, zoom) {
-                    return {
-                        weight: 0.1,
-                        color: gridline_color,
-                        opacity: 1,
-                        fill: true,
-                        radius: 4,
-                        fillOpacity: 0
-                    }
-                },
-                'canadagrid1deg': function (properties, zoom) {
-                    return {
-                        weight: 0.1,
-                        color: gridline_color,
-                        opacity: 1,
-                        fill: true,
-                        radius: 4,
-                        fillOpacity: 0
-                    }
-                }
-            },
-            bounds: canadaBounds,
-            maxZoom: 12,
-            minZoom: 7,
-            pane: 'grid'
-        };
-
         // create
 
         var_value = $("#var").val();
@@ -951,7 +951,7 @@
             return colormap[0].color;
         }
 
-        function genChoro(sector, year, variable, rcp, frequency) {
+        function genChoro(dataset_name, sector, year, variable, rcp, frequency) {
 
             aord_value = $('input[name="absolute_delta_switch"]:checked').val();
 
@@ -961,7 +961,8 @@
                 aordChoroPath = "";
             }
 
-            choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency + '/?period=' + year + aordChoroPath;
+            choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency
+                + '/?period=' + year + aordChoroPath + '&dataset_name=' + dataset_name;
 
 
             $.getJSON(choroPath).then(function (data) {
@@ -1228,10 +1229,10 @@
             });
         }
 
-        function displayChartData(data, varDetails, download_url, cmip_value) {
+        function displayChartData(data, varDetails, download_url, dataset_name) {
             let chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
             let chartDecimals = varDetails['decimals'];
-            let scenarios = SCENARIOS[cmip_value];
+            let scenarios = SCENARIOS[dataset_name];
             let pointFormatter, formatter
 
             switch (varDetails.units.value) {
@@ -1628,14 +1629,14 @@
 
                     $('#rcp').prop('disabled', true);
 
-                    let cmip_value = $('input[name="cmip_switch"]:checked').val();
+                    let dataset_name = $('input[name="dataset_switch"]:checked').val();
 
-                    let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=cmip' + cmip_value;
+                    let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
 
                     $.getJSON(
-                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=cmip' + cmip_value,
+                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name,
                         function (data) {
-                            displayChartData(data, varDetails, download_url, cmip_value);
+                            displayChartData(data, varDetails, download_url, dataset_name);
                         });
 
                 }
@@ -1654,12 +1655,13 @@
                 position: 'right',
                 callback: function (varDetails) {
                     $('#rcp').prop('disabled', true);
-                    let cmip_value = $('input[name="cmip_switch"]:checked').val();
-                    let download_url = data_url + '/download-regional-30y/' + query['sector'] + '/' + id + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=cmip' + cmip_value;
+                    let dataset_name = $('input[name="dataset_switch"]:checked').val();
+                    let download_url = data_url + '/download-regional-30y/' + query['sector'] + '/' + id + '/' + variable
+                        + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
 
                     $.getJSON(hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id
-                        + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals).then(function (data) {
-                        displayChartData(data,varDetails, download_url, cmip_value);
+                        + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name).then(function (data) {
+                        displayChartData(data,varDetails, download_url, dataset_name);
                     });
 
 
@@ -1978,14 +1980,15 @@
 
             $('#toggle-switch-container').show();
 
-            aord_value = $('input[name="absolute_delta_switch"]:checked').val();
-            cmip_value = $('input[name="cmip_switch"]:checked').val();
+            let aord_value = $('input[name="absolute_delta_switch"]:checked').val();
+            let dataset_name = $('input[name="dataset_switch"]:checked').val();
 
-            var_value = $("#var").val();
-            mora_value = $("#mora").val();
-            mora_text_value = $("#mora option:selected").text();
-            rcp_value = $("#rcp").val();
-            decade_value = parseInt($("#decade").val());
+            let var_value = $("#var").val();
+            let mora_value = $("#mora").val();
+            let mora_text_value = $("#mora option:selected").text();
+            let rcp_value = $("#rcp").val();
+            let decade_value = parseInt($("#decade").val());
+            let msorys, msorysmonth;
 
             query['var-group'] = $('#var option:selected').parent('optgroup').attr('data-slug');
 
@@ -2013,69 +2016,8 @@
                 msorysmonth = '-' + mora_value;
             }
 
-            left_rcp_value = '';
-            right_rcp_value = '';
-
-            if (cmip_value === '6') {
-                if (rcp_value === 'rcp26vs45') {
-                    left_rcp_value = 'ssp245';
-                    right_rcp_value = 'ssp245';
-                } else if (rcp_value === 'rcp26vs85') {
-                    left_rcp_value = 'ssp126';
-                    right_rcp_value = 'ssp585';
-                } else if (rcp_value === 'rcp45vs26') {
-                    left_rcp_value = 'ssp245';
-                    right_rcp_value = 'ssp126';
-                } else if (rcp_value === 'rcp45vs85') {
-                    left_rcp_value = 'ssp245';
-                    right_rcp_value = 'ssp585';
-                } else if (rcp_value === 'rcp85vs26') {
-                    left_rcp_value = 'ssp585';
-                    right_rcp_value = 'ssp126';
-                } else if (rcp_value === 'rcp85vs45') {
-                    left_rcp_value = 'ssp585';
-                    right_rcp_value = 'ssp245';
-                } else if (rcp_value === 'rcp26') {
-                    left_rcp_value = 'ssp126';
-                    right_rcp_value = 'ssp126';
-                } else if (rcp_value === 'rcp45') {
-                    left_rcp_value = 'ssp245';
-                    right_rcp_value = 'ssp245';
-                } else if (rcp_value === 'rcp85') {
-                    left_rcp_value = 'ssp585';
-                    right_rcp_value = 'ssp585';
-                }
-            } else {
-                if (rcp_value === 'rcp26vs45') {
-                    left_rcp_value = 'rcp26';
-                    right_rcp_value = 'rcp45';
-                } else if (rcp_value === 'rcp26vs85') {
-                    left_rcp_value = 'rcp26';
-                    right_rcp_value = 'rcp85';
-                } else if (rcp_value === 'rcp45vs26') {
-                    left_rcp_value = 'rcp45';
-                    right_rcp_value = 'rcp26';
-                } else if (rcp_value === 'rcp45vs85') {
-                    left_rcp_value = 'rcp45';
-                    right_rcp_value = 'rcp85';
-                } else if (rcp_value === 'rcp85vs26') {
-                    left_rcp_value = 'rcp85';
-                    right_rcp_value = 'rcp26';
-                } else if (rcp_value === 'rcp85vs45') {
-                    left_rcp_value = 'rcp85';
-                    right_rcp_value = 'rcp45';
-                } else if (rcp_value === 'rcp26') {
-                    left_rcp_value = 'rcp26';
-                    right_rcp_value = 'rcp45';
-                } else if (rcp_value === 'rcp45') {
-                    left_rcp_value = 'rcp45';
-                    right_rcp_value = 'rcp45';
-                } else if (rcp_value === 'rcp85') {
-                    left_rcp_value = 'rcp85';
-                    right_rcp_value = 'rcp45';
-                }
-            }
-
+            left_rcp_value = rcp_value.split("vs")[0];
+            right_rcp_value = rcp_value.split("vs")[1];
 
             if (aord_value === 'd') {
                 aord_layer_value = "-delta7100";
@@ -2086,15 +2028,11 @@
             gridLayer.rcp = left_rcp_value;
             gridLayerRight.rcp = right_rcp_value;
 
-            if (cmip_value === '6') {
-                cmip_layer_value = "cmip6-";
-            } else {
-                cmip_layer_value = "";
-            }
+            let layer_prefix = dataset_name === 'cmip6' ? "cmip6-" : "";
 
-            singleLayerName = cmip_layer_value + '' + var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
-            leftLayerName = cmip_layer_value + '' + var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
-            rightLayerName = cmip_layer_value + '' + var_value + '-' + msorys + '-' + right_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+            singleLayerName = layer_prefix + '' + var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+            leftLayerName = layer_prefix + '' + var_value + '-' + msorys + '-' + left_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+            rightLayerName = layer_prefix + '' + var_value + '-' + msorys + '-' + right_rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
 
             moraval = getQueryVariable('mora');
 
@@ -2202,9 +2140,10 @@
                     rcp_value = $("#rcp").val();
                     decade_value = parseInt($("#decade").val()) + 1;
                     sector_value = $("#sector").val();
+                    let dataset_name = $('input[name="dataset_switch"]:checked').val();
 
 
-                    genChoro(sector_value, decade_value, var_value, rcp_value, mora_value);
+                    genChoro(dataset_name, sector_value, decade_value, var_value, rcp_value, mora_value);
                     if (currentSector !== sector_value) {
                         currentSector = sector_value;
                         if (map1.hasLayer(choroLayer)) {
@@ -2214,6 +2153,7 @@
 
                 })
                 .fail(function (err) {
+                    console.error("Failed to get data from geoserver for sector legend");
                 });
 
         }
@@ -2727,13 +2667,13 @@
 
         function update_query_string() {
             // convert the current object back to a string
-            var new_query_string = query_obj_to_str();
+            let new_query_string = query_obj_to_str();
             //console.log('new', new_query_string);
-            var new_url = window.location.protocol + '//' + window.location.hostname + window.location.pathname + '?' + new_query_string;
+            let new_url = window.location.protocol + '//' + window.location.hostname + window.location.pathname + '?' + new_query_string;
             // if the string has changed
             if (window.location.href !== new_url) {
                 //console.log(history_action);
-                var new_title = title_pre + ' — ' + $('#var :selected').text() + ' — ' + title_post;
+                let new_title = title_pre + ' — ' + $('#var :selected').text() + ' — ' + title_post;
                 $('title').text(new_title);
                 if (history_action == 'push') {
                     // console.log('----- push -----');
@@ -2798,13 +2738,13 @@
         });
 
 
-        $('input[type=radio][name=cmip_switch]').change(function() {
-            // console.log('cmip switched');
-            cmip_value = $('input[name="cmip_switch"]:checked').val();
-            query['cmip'] = cmip_value;
-
+        $('input[type=radio][name=dataset_switch]').change(function() {
+            let dataset_name = $('input[name="dataset_switch"]:checked').val();
+            query['dataset'] = dataset_name;
             update_query_string();
             buildFilterMenu();
+            query['rcp'] = $('#rcp').val();
+            update_query_string();
             changeLayers();
         });
 
@@ -2877,7 +2817,8 @@
         function changeLayers() {
 
             aord_value = $('input[name="absolute_delta_switch"]:checked').val();
-            cmip_value = $('input[name="cmip_switch"]:checked').val();
+            let dataset_name = $('input[name="dataset_switch"]:checked').val();
+            let layer_prefix = dataset_name === 'cmip6' ? "cmip6-" : "";
             rcp_value = $("#rcp").val();
             decade_value = parseInt($("#decade").val());
             mora_value = $("#mora").val();
@@ -2885,7 +2826,6 @@
             if (query['var-group'] === 'station-data') {
 
                 // activate station data
-
                 layer_swap({
                     layer: 'stations',
                     station: query['var']
@@ -2894,9 +2834,6 @@
             } else {
 
                 // not station data so make sure it's turned off
-
-
-
                 if (station_on === true) {
                     layer_swap({
                         layer: 'stations',
@@ -2906,12 +2843,8 @@
 
                 if (query['sector'] !== '') {
 
-
                     // activate sector
-
                     if (sector_on === false) {
-
-
                         layer_swap({
                             layer: 'sector'
                         });
@@ -2925,7 +2858,6 @@
                 } else {
 
                     // not sector so make sure it's turned off
-
                     if (sector_on === true) {
                         layer_swap({
                             layer: 'sector',
@@ -2974,7 +2906,7 @@
 
 
                     legendLayer = var_value + "_health_" + legendmsorys;
-                    generateSectorLegend(var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year', '');
+                    generateSectorLegend(layer_prefix + var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year', '');
                 } else {
                     generateLeftLegend();
                 }
@@ -2987,22 +2919,10 @@
                 }
 
 
-                if (cmip_value === '6') {
-                    cmip_layer_value = "cmip6-";
-                    if (rcp_value === 'rcp26') {
-                        rcp_value = "ssp126";
-                    } else if (rcp_value === 'rcp45') {
-                        rcp_value = "ssp245";
-                    } else if (rcp_value === 'rcp85') {
-                        rcp_value = "ssp585"
-                    }
-
-                } else {
-                    cmip_layer_value = "";
-                }
 
 
-                singleLayerName = cmip_layer_value + '' + var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+
+                singleLayerName = layer_prefix + '' + var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
 
                 // if a compare scenario was selected
 
@@ -3011,7 +2931,7 @@
                     $('body').addClass('map-compare');
 
                     invalidate_maps();
-
+                    // console.log("leftLayerName: " + leftLayerName);
 
                     leftLayer.setParams({
                         format: 'image/png',
@@ -3024,6 +2944,7 @@
                     });
 
                     if (has_mapRight === true) {
+                        // console.log("rightLayerName: " + rightLayerName);
                         rightLayer.setParams({
                             format: 'image/png',
                             transparent: true,
@@ -3035,15 +2956,12 @@
                         });
                     }
 
-                    // also generate the right legend
-
-                    //generateRightLegend(rightLayerName, mora_text_value);
-
                 } else {
 
                     $('body').removeClass('map-compare');
 
                     invalidate_maps();
+                    // console.log("singleLayerName: " + singleLayerName);
 
                     leftLayer.setParams({
                         format: 'image/png',
@@ -3063,31 +2981,9 @@
 
 
         function buildFilterMenu() {
-            cmipval = getQueryVariable('cmip');
-            // change cmip toggle depending on cmip value
-            if (cmipval === '6') {
-                $('input[name="cmip_switch"][value=6]').click();
-
-                $('#rcp').empty();
-
-                rcpDropGroup = '<option value="rcp26">SSP 2.6</option> ' +
-                    '<option value="rcp26vs45">SSP 2.6 vs SSP 4.5</option> ' +
-                    '<option value="rcp26vs85">SSP 2.6 vs SSP 8.5</option> ' +
-                    '<option value="rcp45">SSP 4.5</option> ' +
-                    '<option value="rcp45vs26">SSP 4.5 vs SSP 2.6</option> ' +
-                    '<option value="rcp45vs85">SSP 4.5 vs SSP 8.5</option> ' +
-                    '<option value="rcp85">SSP 8.5</option> ' +
-                    '<option value="rcp85vs26">SSP 8.5 vs SSP 2.6</option> ' +
-                    '<option value="rcp85vs45">SSP 8.5 vs SSP 4.5</option>';
-
-                $('#rcp').append(rcpDropGroup);
-            } else {
-                $('input[name="cmip_switch"][value=5]').click();
-            }
-
-
             getVarData(function (data) {
                 queryVar = getQueryVariable('var');
+
 
                 varID = $('#var').val();
 
@@ -3166,14 +3062,13 @@
 
 
                         var_value = $("#var").val();
-                        cmip_value = $('input[name="cmip_switch"]:checked').val();
+                        //let dataset_name = $('input[name="dataset_switch"]:checked').val();
+                        let dataset_name = getQueryVariable('dataset');
+                        let scenarios = SCENARIOS[dataset_name];
                         dec_value = $("#decade").val();
 
 
                         updated_slider_values = [];
-
-                        //console.log('sv.time_slider_max_value');
-                        //console.log(sv);
 
                         tsmax = parseInt(sv.time_slider_max_value);
                         tsmin = parseInt(sv.time_slider_min_value);
@@ -3193,11 +3088,6 @@
                             z += 1;
                         }
 
-                        //console.log("newfrom");
-                        //console.log(newfrom);
-                        //console.log(updated_slider_values);
-
-
                         rs_instance.update({
                             values: updated_slider_values,
                             min: tsmin,
@@ -3209,9 +3099,6 @@
 
                         var $rs = $("#range-slider");
 
-                        //console.log('slider updated');
-                        //console.log(sv.time_slider_min_value,sv.time_slider_max_value,sv.time_slider_default_value,sv.time_slider_max_value,sv.time_slider_interval);
-
                         if ((selectedSector === 'gridded_data') && $.inArray('gridded_data', sv.availability) !== -1) {
                             replaceGrid(sv.grid, gridLayer_options);
                         }
@@ -3221,43 +3108,36 @@
                         $('#mora').empty();
                         $('#rcp').empty();
 
-                        if (selectedSector === 'gridded_data') {
-                            rcpDropGroup = '<option value="rcp26">RCP 2.6</option> ' +
-                                '<option value="rcp26vs45">RCP 2.6 vs RCP 4.5</option> ' +
-                                '<option value="rcp26vs85">RCP 2.6 vs RCP 8.5</option> ' +
-                                '<option value="rcp45">RCP 4.5</option> ' +
-                                '<option value="rcp45vs26">RCP 4.5 vs RCP 2.6</option> ' +
-                                '<option value="rcp45vs85">RCP 4.5 vs RCP 8.5</option> ' +
-                                '<option value="rcp85">RCP 8.5</option> ' +
-                                '<option value="rcp85vs26">RCP 8.5 vs RCP 2.6</option> ' +
-                                '<option value="rcp85vs45">RCP 8.5 vs RCP 4.5</option>';
-                        } else {
-                            rcpDropGroup = '<option value="rcp26">RCP 2.6</option> ' +
-                                '<option value="rcp45">RCP 4.5</option> ' +
-                                '<option value="rcp85">RCP 8.5</option>';
-                        }
-
-                        if (cmipval === '6') {
-                            rcpDropGroup = '<option value="rcp26">SSP 2.6</option> ' +
-                                '<option value="rcp26vs45">SSP 2.6 vs SSP 4.5</option> ' +
-                                '<option value="rcp26vs85">SSP 2.6 vs SSP 8.5</option> ' +
-                                '<option value="rcp45">SSP 4.5</option> ' +
-                                '<option value="rcp45vs26">SSP 4.5 vs SSP 2.6</option> ' +
-                                '<option value="rcp45vs85">SSP 4.5 vs SSP 8.5</option> ' +
-                                '<option value="rcp85">SSP 8.5</option> ' +
-                                '<option value="rcp85vs26">SSP 8.5 vs SSP 2.6</option> ' +
-                                '<option value="rcp85vs45">SSP 8.5 vs SSP 4.5</option>';
-                        }
-
+                        let rcpDropGroup = "";
+                        let rcpOptions = [];
+                        scenarios.forEach(function (scenario) {
+                            rcpOptions.push(scenario.name);
+                            rcpDropGroup += '<option value="{0}">{1}</option> '.format(scenario.name, scenario.label);
+                            if (selectedSector === 'gridded_data') {
+                                scenarios.forEach(function (scenario2) {
+                                    if (scenario != scenario2) {
+                                        rcpOptions.push("{0}vs{1}".format(scenario.name, scenario2.name))
+                                        rcpDropGroup += '<option value="{0}vs{1}">{2} vs {3}</option> '.format(
+                                            scenario.name,
+                                            scenario2.name,
+                                            scenario.label,
+                                            scenario2.label);
+                                    }
+                                });
+                            }});
 
                         $('#rcp').append(rcpDropGroup);
+                        let queryRCP = getQueryVariable('rcp');
+                        if (rcpOptions.includes(queryRCP)) {
+                            $("#rcp").val(queryRCP).prop('selected', true);
+                        }
 
                         getRCPvar = getQueryVariable('rcp');
 
                         // check to see if comparing exists on sector load
-                        if (getRCPvar.length > 5 && selectedSector !== 'gridded_data') {
+                        if (getRCPvar.indexOf("vs") !== -1 && selectedSector !== 'gridded_data') {
                             // since comparison value is comparing, get new default from first 5 chars
-                            firstRCP = getRCPvar.slice(0, 5);
+                            firstRCP = getRCPvar.split('vs')[0];
                             // set default to best option available from compare value.
                             $('#rcp option[value=' + firstRCP + ']').attr('selected', 'selected');
                             // update url with new default
@@ -3556,7 +3436,6 @@
         sliderChange(parseInt($('#opacity-slider-container').attr('data-default')));
 
         // evaluate query
-
         eval_query_obj();
 
         // generate initial legends

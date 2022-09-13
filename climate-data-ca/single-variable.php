@@ -75,11 +75,11 @@ if (have_posts()) : while (have_posts()) : the_post();
 
                                     <div class="d-lg-flex justify-content-around align-items-center w-100">
                                         <div class="btn-group btn-group-toggle mb-5 mb-lg-0" data-toggle="buttons">
-                                            <label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="rcp85" checked> <?php _e('High Emissions', 'cdc'); ?><br>(RCP 8.5) </label>
+                                            <label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="ssp585" checked> <?php _e('High Emissions', 'cdc'); ?><br>(SSP 5-8.5) </label>
 
-                                            <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="rcp45"> <?php _e('Moderate Emissions', 'cdc'); ?><br>(RCP 4.5) </label>
+                                            <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="ssp245"> <?php _e('Moderate Emissions', 'cdc'); ?><br>(SSP 2-4.5) </label>
 
-                                            <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="rcp26"> <?php _e('Low Emissions', 'cdc'); ?><br>(RCP 2.6) </label>
+                                            <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="ssp126"> <?php _e('Low Emissions', 'cdc'); ?><br>(SSP 1-2.6) </label>
                                         </div>
 
                                         <div class="d-flex justify-content-center d-lg-block" role="group" aria-label="">
@@ -682,11 +682,11 @@ if (have_posts()) : while (have_posts()) : the_post();
 
                                         <div class="d-lg-flex justify-content-around align-items-center w-100">
                                             <div class="btn-group btn-group-toggle mb-5 mb-lg-0" data-toggle="buttons">
-                                                <label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="rcp85" checked> <?php _e('High Emissions', 'cdc'); ?><br>(RCP 8.5) </label>
+                                                <label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="ssp585" checked> <?php _e('High Emissions', 'cdc'); ?><br>(SSP 5-8.5) </label>
 
-                                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="rcp45"> <?php _e('Moderate Emissions', 'cdc'); ?><br>(RCP 4.5) </label>
+                                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="ssp245"> <?php _e('Moderate Emissions', 'cdc'); ?><br>(SSP 2-4.5) </label>
 
-                                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="rcp26"> <?php _e('Low Emissions', 'cdc'); ?><br>(RCP 2.6) </label>
+                                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="ssp126"> <?php _e('Low Emissions', 'cdc'); ?><br>(SSP 1-2.6) </label>
                                             </div>
 
                                             <div class="d-flex justify-content-center d-lg-block" role="group" aria-label="">

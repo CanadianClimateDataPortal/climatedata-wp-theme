@@ -226,15 +226,26 @@ if (get_the_ID() == filtered_ID_by_path('explore/variable')) {
 
                         $scenarios = array(
                             array('value' => 'rcp26', 'label' => 'RCP 2.6', 'compare' => false),
-                            array('value' => 'rcp26vs45', 'label' => 'RCP 2.6 vs RCP 4.5', 'compare' => true),
-                            array('value' => 'rcp26vs85', 'label' => 'RCP 2.6 vs RCP 8.5', 'compare' => true),
+                            array('value' => 'rcp26vsrcp45', 'label' => 'RCP 2.6 vs RCP 4.5', 'compare' => true),
+                            array('value' => 'rcp26vsrcp85', 'label' => 'RCP 2.6 vs RCP 8.5', 'compare' => true),
                             array('value' => 'rcp45', 'label' => 'RCP 4.5', 'compare' => false),
-                            array('value' => 'rcp45vs26', 'label' => 'RCP 4.5 vs RCP 2.6', 'compare' => true),
-                            array('value' => 'rcp45vs85', 'label' => 'RCP 4.5 vs RCP 8.5', 'compare' => true),
+                            array('value' => 'rcp45vsrcp26', 'label' => 'RCP 4.5 vs RCP 2.6', 'compare' => true),
+                            array('value' => 'rcp45vsrcp85', 'label' => 'RCP 4.5 vs RCP 8.5', 'compare' => true),
                             array('value' => 'rcp85', 'label' => 'RCP 8.5', 'compare' => false),
-                            array('value' => 'rcp85vs26', 'label' => 'RCP 8.5 vs RCP 2.6', 'compare' => true),
-                            array('value' => 'rcp85vs45', 'label' => 'RCP 8.5 vs RCP 4.5', 'compare' => true));
+                            array('value' => 'rcp85vsrcp26', 'label' => 'RCP 8.5 vs RCP 2.6', 'compare' => true),
+                            array('value' => 'rcp85vsrcp45', 'label' => 'RCP 8.5 vs RCP 4.5', 'compare' => true),
 
+                            // CMIP6 values must be pre-existing in the HTML, otherwise we get a bootstrapping issue
+                            // between eval_query_obj and buildFilterMenu
+                            array('value' => 'ssp126', 'label' => 'RCP 2.6', 'compare' => false),
+                            array('value' => 'ssp126vsssp245', 'label' => 'RCP 2.6 vs RCP 4.5', 'compare' => true),
+                            array('value' => 'ssp126vsssp585', 'label' => 'RCP 2.6 vs RCP 8.5', 'compare' => true),
+                            array('value' => 'ssp245', 'label' => 'RCP 4.5', 'compare' => false),
+                            array('value' => 'ssp245vsssp126', 'label' => 'RCP 4.5 vs RCP 2.6', 'compare' => true),
+                            array('value' => 'ssp245vsssp585', 'label' => 'RCP 4.5 vs RCP 8.5', 'compare' => true),
+                            array('value' => 'ssp585', 'label' => 'RCP 8.5', 'compare' => false),
+                            array('value' => 'ssp585vsssp126', 'label' => 'RCP 8.5 vs RCP 2.6', 'compare' => true),
+                            array('value' => 'ssp585vsssp245', 'label' => 'RCP 8.5 vs RCP 4.5', 'compare' => true));
                         ?>
 
                         <div id="" class="filter-block col-2">
@@ -351,11 +362,11 @@ if (get_the_ID() == filtered_ID_by_path('explore/variable')) {
 
 <?php
 $get_delta = filter_input(INPUT_GET, 'delta', FILTER_SANITIZE_URL);
-$get_cmip = filter_input(INPUT_GET, 'cmip', FILTER_SANITIZE_URL);
+$get_dataset = filter_input(INPUT_GET, 'dataset', FILTER_SANITIZE_URL);
 ?>
 
 <div class="toggle-switch-container" id="toggle-switch-container">
-    <div class="toggle-switch switch-vertical"id="absolute_or_deltas">
+    <div class="toggle-switch switch-vertical" id="absolute_or_deltas">
         <input id="toggle-a" type="radio" value="a" name="absolute_delta_switch"<?php if ($get_delta == "false" || !$get_delta) { echo ' checked="checked"'; } ?> />
         <label for="toggle-a"><?php _e('Absolute','cdc');?></label>
         <input id="toggle-b" type="radio" value="d" name="absolute_delta_switch"<?php if ($get_delta == "true") { echo ' checked="checked"'; } ?> />
@@ -366,10 +377,10 @@ $get_cmip = filter_input(INPUT_GET, 'cmip', FILTER_SANITIZE_URL);
       </span>
     </div>
 
-    <div class="toggle-switch switch-vertical"id="cmip5_or_cmip6" style="margin-top:40px">
-        <input id="toggle-cmip5" type="radio" value="5" name="cmip_switch"<?php if ($get_cmip == "false" || !$get_cmip) { echo ' checked="checked"'; } ?> />
+    <div class="toggle-switch switch-vertical" style="margin-top:40px">
+        <input id="toggle-cmip5" type="radio" value="cmip5" name="dataset_switch"<?php if (!$get_dataset || $get_dataset == "cmip5") { echo ' checked="checked"'; } ?> />
         <label for="toggle-cmip5" style="float: left;white-space: nowrap;margin-top:3px">CMIP 5</label>
-        <input id="toggle-cmip6" type="radio" value="6" name="cmip_switch"<?php if ($get_cmip == "true") { echo ' checked="checked"'; } ?> />
+        <input id="toggle-cmip6" type="radio" value="cmip6" name="dataset_switch"<?php if ($get_dataset == "cmip6") { echo ' checked="checked"'; } ?> />
         <label for="toggle-cmip6" style="float: left;white-space: nowrap">CMIP 6</label>
         <span class="toggle-outside">
         <span class="toggle-inside"></span>

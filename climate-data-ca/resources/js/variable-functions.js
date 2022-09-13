@@ -39,7 +39,8 @@
 
 
         //
-        // QUERY OBJECT
+        // Initialise query object with defaults values (either from DOM or inline)
+        // The query object will be updated later within query_str_to_obj()
         //
 
         var query = {};
@@ -82,11 +83,7 @@
             query['mora'] = 'ann';
         }
 
-        if ($('#rcp').length) {
-            query['rcp'] = $('#rcp').val();
-        } else {
-            query['rcp'] = 'rcp26';
-        }
+        query['rcp'] = SCENARIOS[dataset][0].name;
 
         if ($('#decade').length) {
             query['decade'] = $('#range-slider-container').attr('data-default') + 's';
@@ -778,7 +775,7 @@
         /**
          *
          * @param data Data sent by climatedata-api ( get-delta-30y-gridded-values or get-delta-30y-regional-values)
-         * @param rcp RCP scenario selection (rcp26, rcp45, rcp85)
+         * @param rcp RCP scenario selection
          * @param varDetails Variable details object provided by Wordpress
          * @param delta If true, the value is formatted as a delta
          * @param sector Selected sector (ex: 'census'). "" if none

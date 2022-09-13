@@ -664,7 +664,7 @@
 
             }
             format = $('input[name="download-format"]:checked').val();
-            cmip = $('input[name="download-cmip"]:checked').val();
+            let dataset_name = $('input[name="download-dataset"]:checked').val();
             let format_extension = format;
 
             if (format == 'netcdf') {
@@ -676,8 +676,8 @@
                 request_args = {
                     var: selectedVar,
                     month: month,
-                    format: format,
-                    dataset_name: cmip
+                    dataset_name: dataset_name,
+                    format: format
                 };
                 Object.assign(request_args, pointsData);
 
@@ -720,6 +720,7 @@
                         request_args = {
                             var: varToProcess[i],
                             month: month,
+                            dataset_name: dataset_name,
                             format: format
                         };
                         Object.assign(request_args, pointsData);

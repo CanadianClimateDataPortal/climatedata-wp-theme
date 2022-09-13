@@ -378,9 +378,9 @@ $get_dataset = filter_input(INPUT_GET, 'dataset', FILTER_SANITIZE_URL);
     </div>
 
     <div class="toggle-switch switch-vertical" style="margin-top:40px">
-        <input id="toggle-cmip5" type="radio" value="cmip5" name="dataset_switch"<?php if (!$get_dataset || $get_dataset == "cmip5") { echo ' checked="checked"'; } ?> />
+        <input id="toggle-cmip5" type="radio" value="cmip5" name="dataset_switch"<?php if ($get_dataset == "cmip5") { echo ' checked="checked"'; } ?> />
         <label for="toggle-cmip5" style="float: left;white-space: nowrap;margin-top:3px">CMIP 5</label>
-        <input id="toggle-cmip6" type="radio" value="cmip6" name="dataset_switch"<?php if ($get_dataset == "cmip6") { echo ' checked="checked"'; } ?> />
+        <input id="toggle-cmip6" type="radio" value="cmip6" name="dataset_switch"<?php if (!$get_dataset || $get_dataset == "cmip6") { echo ' checked="checked"'; } ?> />
         <label for="toggle-cmip6" style="float: left;white-space: nowrap">CMIP 6</label>
         <span class="toggle-outside">
         <span class="toggle-inside"></span>

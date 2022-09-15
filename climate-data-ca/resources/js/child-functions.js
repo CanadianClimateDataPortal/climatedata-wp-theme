@@ -265,7 +265,7 @@ function getIDFLinks(station_id, target, css_class) {
         });
     });
 };
-=======
+
 function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
     let gA4EventNameForVariableDownloadData = "";
     keySelected = keySelected.toLowerCase();

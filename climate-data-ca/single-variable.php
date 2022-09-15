@@ -363,18 +363,18 @@ if (have_posts()) : while (have_posts()) : the_post();
 								<h6>Options:</h6>
 
 								<div class="form-check form-check-inline custom-control custom-radio">
-									<input class="custom-control-input" type="radio" id="chatoption1" name="chartoption" value="annual" checked>
-									<label class="custom-control-label pl-2" for="chatoption1"><?php _e('Annual values', 'cdc'); ?></label>
+									<input class="custom-control-input" type="radio" id="chartoption1-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="annual" checked>
+									<label class="custom-control-label pl-2" for="chartoption1-<?php the_field('var_name'); ?>"><?php _e('Annual values', 'cdc'); ?></label>
 								</div>
 
 								<div class="form-check form-check-inline custom-control custom-radio">
-									<input class="custom-control-input" type="radio" id="chartoption2" name="chartoption" value="30y">
-									<label class="custom-control-label pl-2" for="chartoption2"><?php _e('30 year averages', 'cdc'); ?></label>
+									<input class="custom-control-input" type="radio" id="chartoption2-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="30y">
+									<label class="custom-control-label pl-2" for="chartoption2-<?php the_field('var_name'); ?>"><?php _e('30 year averages', 'cdc'); ?></label>
 								</div>
 
 								<div class="form-check form-check-inline custom-control custom-radio">
-									<input class="custom-control-input" type="radio" id="chartoption3" name="chartoption" value="delta">
-									<label class="custom-control-label pl-2" for="chartoption3"><?php _e('30 year changes', 'cdc'); ?></label>
+									<input class="custom-control-input" type="radio" id="chartoption3-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="delta">
+									<label class="custom-control-label pl-2" for="chartoption3-<?php the_field('var_name'); ?>"><?php _e('30 year changes', 'cdc'); ?></label>
 								</div>
 
                                     <?php
@@ -612,7 +612,54 @@ if (have_posts()) : while (have_posts()) : the_post();
         </div>
 
         <div class="row align-items-center var-chart-container">
-            <a href="#" class="btn btn-sm all-caps btn-outline-secondary rounded-pill chart-tour-trigger offset-1" data-tour="page-tour" data-container="<?php the_field('var_name'); ?>-chart"><?php _e('How to read this', 'cdc'); ?></a>
+
+            <div class="chart-delta nav-item flex-grow-1 d-flex">
+                <?php
+
+                if ( get_field ( 'hasdelta' ) ) {
+
+                    ?>
+                    <h6>Options:</h6>
+
+                    <div class="form-check form-check-inline custom-control custom-radio">
+                        <input class="custom-control-input" type="radio" id="chartoption1-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="annual" checked>
+                        <label class="custom-control-label pl-2" for="chartoption1-<?php the_field('var_name'); ?>"><?php _e('Annual values', 'cdc'); ?></label>
+                    </div>
+
+                    <div class="form-check form-check-inline custom-control custom-radio">
+                        <input class="custom-control-input" type="radio" id="chartoption2-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="30y">
+                        <label class="custom-control-label pl-2" for="chartoption2-<?php the_field('var_name'); ?>"><?php _e('30 year averages', 'cdc'); ?></label>
+                    </div>
+
+                    <div class="form-check form-check-inline custom-control custom-radio">
+                        <input class="custom-control-input" type="radio" id="chartoption3-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="delta">
+                        <label class="custom-control-label pl-2" for="chartoption3-<?php the_field('var_name'); ?>"><?php _e('30 year changes', 'cdc'); ?></label>
+                    </div>
+
+                    <?php
+
+                }
+
+                ?>
+            </div>
+
+            <a href="#" class="btn btn-sm all-caps btn-outline-secondary rounded-pill chart-tour-trigger offset-3" data-tour="page-tour" data-container="<?php the_field('var_name'); ?>-chart"><?php _e('How to read this', 'cdc'); ?></a>
+
+            <div class="nav-item d-flex align-items-center mr-3">
+                <h6><span class="cdc-icon icon-download-data"></span> <?php _e('Download data', 'cdc'); ?></h6>
+
+                <div class="btn-group btn-group-sm" role="group">
+                    <a href="#" class="chart-export-data btn btn-sm btn-outline-secondary" data-type="csv">CSV</a>
+                </div>
+            </div>
+
+            <div class="nav-item d-flex align-items-center">
+                <h6><span class="cdc-icon icon-download-img"></span> <?php _e('Download image', 'cdc'); ?></h6>
+
+                <div class="btn-group btn-group-sm" role="group">
+                    <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary " data-type="png">PNG</a> <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary" data-type="pdf">PDF</a>
+                </div>
+            </div>
 
             <div id="<?php the_field('var_name'); ?>-chart" class="var-chart col-10 col-lg-9 offset-1 mb-5 mb-lg-0">
                 <h6 class="text-center"><?php _e('Loading chart data', 'cdc'); ?> …</h6>

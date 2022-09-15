@@ -189,6 +189,9 @@
                             loc: current_location.id
                         },
                         success: function (data) {
+                            let varDetails = JSON.parse($(data).filter('#callback-data').html());
+                            let download_url = data_url + '/download-30y/' + current_location.lat + '/' + current_location.lon + '/' + variable + '/ann?decimals=' + varDetails.decimals ;//+ '&dataset_name=' + dataset_name;
+
 
                             if ($(data).filter('#callback-data').length) {
                                 chart_objects[container.attr('id')]['varDetails'] = JSON.parse($(data).filter('#callback-data').html());
@@ -196,15 +199,22 @@
 
                             container.html(data);
 
-                            var json_url = data_url + '/generate-charts/' + current_location.lat + '/' + current_location.lon + '/' + variable;
+                            let json_url = data_url + '/generate-charts/' + current_location.lat + '/' + current_location.lon + '/' + variable + '?decimals=' + varDetails.decimals ;//+ '&dataset_name=' + dataset_name;
 
                             //console.log('load chart JSON from ' + 'get_values.php?lat=' + current_location.lat + '&lon=' + current_location.lon + '&var=' + variable + '&month=ann');
 
                             $.ajax({
                                 url: json_url,
                                 dataType: 'json',
-                                success: function (data) {
+                                success: function (chartdata) {
 
+                                    displayChartData(chartdata, varDetails, download_url,
+                                        {
+                                            'dataset': 'cmip5',
+                                            'var': variable,
+                                            'mora': 'ann'
+                                        }, $('body').find('#' + variable + '-chart')[0]);
+                                    return;
                                     chart_objects[container.attr('id')]['chartUnit'] = chart_objects[container.attr('id')]['varDetails']['units']['value'] === 'kelvin' ? "°C" : chart_objects[container.attr('id')]['varDetails']['units']['label'];
                                     chart_objects[container.attr('id')]['chartDecimals'] = chart_objects[container.attr('id')]['varDetails']['decimals'];
 

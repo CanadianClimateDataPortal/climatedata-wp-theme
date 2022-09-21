@@ -491,13 +491,16 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
     chart.query = query;
     chart.download_url = download_url;
+    chart.varDetails = varDetails;
+
     $('input[type=radio][name=chartoption-' + query['var'] + ']').change(function() {
+        let chart = $(this).parents('.var-chart-container, .overlay-content').find('.var-chart').highcharts();
         switch ($(this).attr('value')) {
             case 'annual':
                 chart.update({
                     tooltip: {
                         formatter: function (tooltip) {
-                            r = tooltip.defaultFormatter.call(this, tooltip);
+                            let r = tooltip.defaultFormatter.call(this, tooltip);
                             return r;
                         }
 
@@ -1298,7 +1301,6 @@ function displayChartData(data, varDetails, download_url, query, container) {
                     }
                     break;
             }
-
         });
 
         $('body').on('click', '.chart-export-img', function (e) {
@@ -1323,6 +1325,26 @@ function displayChartData(data, varDetails, download_url, query, container) {
             chart.exportChart({
                 type: dl_type
             });
+        });
+
+        $('body').on('change', 'input:radio.chart-dataset', function (e) {
+            let container = $(this).parents('.var-chart-container, .overlay-content').find('.var-chart');
+            let oldchart = container.highcharts();
+            let query = oldchart.query;
+            let varDetails = oldchart.varDetails;
+            let dataset_name = e.target.value;
+
+            query.dataset = dataset_name;
+            let download_url = data_url + '/download-30y/' + query.lat + '/' + query.lon + '/' + query.var + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
+            oldchart.destroy();
+            $.getJSON(
+                data_url + '/generate-charts/' + query.lat + '/' + query.lon + '/' + query.var + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name,
+                function (data) {
+                    displayChartData(data, varDetails, download_url, query, container[0]);
+                    $('input[type=radio][name=chartoption-' + query.var + ']:checked').change();
+                });
+
+
         });
 
 

@@ -1085,11 +1085,13 @@
 
         // LAYER CHART
         function genChart(lat, lon, variable, month) {
+            let dataset_name = $('input[name="dataset_switch"]:checked').val();
             $(document).overlay('show', {
                 href: base_href + 'variable/' + $('#var').val() + '/',
                 data: {
                     lat: lat,
-                    lon: lon
+                    lon: lon,
+                    dataset_name: dataset_name
                 },
                 content: 'location',
                 position: 'right',
@@ -1097,14 +1099,21 @@
 
                     $('#rcp').prop('disabled', true);
 
-                    let dataset_name = $('input[name="dataset_switch"]:checked').val();
 
                     let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
 
                     $.getJSON(
                         data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name,
                         function (data) {
-                            displayChartData(data, varDetails, download_url, query, 'chart-placeholder');
+                            displayChartData(data, varDetails, download_url,
+                                {
+                                    'dataset': dataset_name,
+                                    'rcp': rcp_value,
+                                    'var': variable,
+                                    'mora': 'ann',
+                                    'lat': lat,
+                                    'lon': lon
+                                }, 'chart-placeholder');
                         });
 
                 }
@@ -1112,26 +1121,27 @@
         };
 
         // SECTOR CHART
-        function genSectorChart(id, variable, month, region_label) {
+        function genSectorChart(id, variable, month, region_label, dataset) {
+            let dataset_name = $('input[name="dataset_switch"]:checked').val();
             $(document).overlay('show', {
                 href: base_href + 'variable/' + variable + '/',
                 data: {
                     sector: query['sector'],
-                    region: region_label
+                    region: region_label,
+                    dataset_name: dataset_name
                 },
                 content: 'sector',
                 position: 'right',
                 callback: function (varDetails) {
                     $('#rcp').prop('disabled', true);
-                    let dataset_name = $('input[name="dataset_switch"]:checked').val();
+
                     let download_url = data_url + '/download-regional-30y/' + query['sector'] + '/' + id + '/' + variable
                         + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
 
                     $.getJSON(hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id
                         + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name).then(function (data) {
-                        displayChartData(data,varDetails, download_url, dataset_name);
+                        displayChartData(data,varDetails, download_url, query, 'chart-placeholder');
                     });
-
 
                 }
             });

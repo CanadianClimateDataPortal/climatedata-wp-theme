@@ -190,7 +190,7 @@
                         },
                         success: function (data) {
                             let varDetails = JSON.parse($(data).filter('#callback-data').html());
-                            let download_url = data_url + '/download-30y/' + current_location.lat + '/' + current_location.lon + '/' + variable + '/ann?decimals=' + varDetails.decimals ;//+ '&dataset_name=' + dataset_name;
+                            let download_url = data_url + '/download-30y/' + current_location.lat + '/' + current_location.lon + '/' + variable + '/ann?decimals=' + varDetails.decimals + '&dataset_name=cmip6';
 
 
                             if ($(data).filter('#callback-data').length) {
@@ -199,7 +199,7 @@
 
                             container.html(data);
 
-                            let json_url = data_url + '/generate-charts/' + current_location.lat + '/' + current_location.lon + '/' + variable + '?decimals=' + varDetails.decimals ;//+ '&dataset_name=' + dataset_name;
+                            let json_url = data_url + '/generate-charts/' + current_location.lat + '/' + current_location.lon + '/' + variable + '?decimals=' + varDetails.decimals + '&dataset_name=cmip6';
 
                             //console.log('load chart JSON from ' + 'get_values.php?lat=' + current_location.lat + '&lon=' + current_location.lon + '&var=' + variable + '&month=ann');
 
@@ -210,9 +210,11 @@
 
                                     displayChartData(chartdata, varDetails, download_url,
                                         {
-                                            'dataset': 'cmip5',
+                                            'dataset': 'cmip6',
                                             'var': variable,
-                                            'mora': 'ann'
+                                            'mora': 'ann',
+                                            'lat': current_location.lat,
+                                            'lon': current_location.lon,
                                         }, $('body').find('#' + variable + '-chart')[0]);
                                     return;
                                     chart_objects[container.attr('id')]['chartUnit'] = chart_objects[container.attr('id')]['varDetails']['units']['value'] === 'kelvin' ? "°C" : chart_objects[container.attr('id')]['varDetails']['units']['label'];

@@ -149,6 +149,9 @@ function doy_formatter(value) {
  */
 function value_formatter(value, varDetails, delta) {
     let unit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
+    if (unit === undefined) {
+        unit ="";
+    }
     let str = "";
     if (delta && value > 0) {
         str += "+"

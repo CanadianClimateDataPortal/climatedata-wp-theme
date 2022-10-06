@@ -2294,12 +2294,12 @@
 
         function changeLayers() {
 
-            aord_value = $('input[name="absolute_delta_switch"]:checked').val();
+            let aord_value = $('input[name="absolute_delta_switch"]:checked').val();
             let dataset_name = $('input[name="dataset_switch"]:checked').val();
             let layer_prefix = dataset_name === 'cmip6' ? "cmip6-" : "";
-            rcp_value = $("#rcp").val();
-            decade_value = parseInt($("#decade").val());
-            mora_value = $("#mora").val();
+            let rcp_value = $("#rcp").val();
+            let decade_value = parseInt($("#decade").val());
+            let mora_value = $("#mora").val();
 
             if (query['var-group'] === 'station-data') {
 
@@ -2351,39 +2351,36 @@
 
                 // always generate/re-generate the left legend
 
-                msorys = 'ys';
-                msorysmonth = '-ann';
-                legendmsorys = 'ann';
+                let msorys = 'ys';
+                let msorysmonth = '-ann';
+                let legendmsorys = 'ann';
+
+                switch (mora_value) {
+                    case 'ann':
+                        msorys = 'ys';
+                        msorysmonth = '-ann';
+                        legendmsorys = 'ann';
+                        break;
+                    case 'spring':
+                    case 'summer':
+                    case 'fall':
+                    case 'winter':
+                        msorys = 'qsdec';
+                        msorysmonth = '-' + mora_value;
+                        legendmsorys = 'qsdec';
+                        break;
+                    case '2qsapr':
+                        msorys = '2qsapr';
+                        msorysmonth = '-' + mora_value;
+                        legendmsorys = '2qsapr';
+                        break;
+                    default:
+                        msorys = 'ms';
+                        msorysmonth = '-' + mora_value;
+                        legendmsorys = 'mon';
+                }
 
                 if (query['sector'] !== '') {
-                    switch (mora_value) {
-                        case 'ann':
-                            msorys = 'ys';
-                            msorysmonth = '-ann';
-                            legendmsorys = 'ann';
-                            break;
-                        case 'spring':
-                        case 'summer':
-                        case 'fall':
-                        case 'winter':
-                            msorys = 'qsdec';
-                            msorysmonth = '-' + mora_value;
-                            legendmsorys = 'qsdec';
-                            break;
-                        case '2qsapr':
-                            msorys = '2qsapr';
-                            msorysmonth = '-' + mora_value;
-                            legendmsorys = '2qsapr';
-                            break;
-                        default:
-                            msorys = 'ms';
-                            msorysmonth = '-' + mora_value;
-                            legendmsorys = 'mon';
-                    }
-
-
-
-                    legendLayer = var_value + "_health_" + legendmsorys;
                     generateSectorLegend(layer_prefix + var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year', '');
                 } else {
                     generateLeftLegend();
@@ -2396,10 +2393,6 @@
                     aord_layer_value = "";
                 }
 
-
-
-
-
                 singleLayerName = layer_prefix + '' + var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
 
                 // if a compare scenario was selected
@@ -2409,7 +2402,7 @@
                     $('body').addClass('map-compare');
 
                     invalidate_maps();
-                    // console.log("leftLayerName: " + leftLayerName);
+                    console.log("leftLayerName: " + leftLayerName);
 
                     leftLayer.setParams({
                         format: 'image/png',
@@ -2422,7 +2415,7 @@
                     });
 
                     if (has_mapRight === true) {
-                        // console.log("rightLayerName: " + rightLayerName);
+                        console.log("rightLayerName: " + rightLayerName);
                         rightLayer.setParams({
                             format: 'image/png',
                             transparent: true,
@@ -2439,7 +2432,7 @@
                     $('body').removeClass('map-compare');
 
                     invalidate_maps();
-                    // console.log("singleLayerName: " + singleLayerName);
+                    console.log("singleLayerName: " + singleLayerName);
 
                     leftLayer.setParams({
                         format: 'image/png',

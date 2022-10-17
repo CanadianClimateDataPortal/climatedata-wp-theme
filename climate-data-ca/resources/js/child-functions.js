@@ -446,8 +446,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
         series: chartSeries
     });
-
-    chart.query = query;
+    chart.query = $.extend(true, {}, query);  // creates a deep copy of the object to avoid side-effects
     chart.download_url = download_url;
     chart.varDetails = varDetails;
 
@@ -1293,10 +1292,21 @@ function displayChartData(data, varDetails, download_url, query, container) {
             let dataset_name = e.target.value;
 
             query.dataset = dataset_name;
-            let download_url = data_url + '/download-30y/' + query.lat + '/' + query.lon + '/' + query.var + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
+            let download_url, chart_url;
+
+            if (typeof query.sector === 'undefined') {
+                download_url = data_url + '/download-30y/' + query.lat + '/' + query.lon + '/' + query.var + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
+                chart_url = data_url + '/generate-charts/' + query.lat + '/' + query.lon + '/' + query.var + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
+            } else {
+                download_url = data_url + '/download-regional-30y/' + query.sector + '/' + query.id + '/' + query.var
+                    + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
+
+                chart_url = data_url + '/generate-regional-charts/' + query.sector + '/' + query.id
+                    + '/' + query.var + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
+            }
             oldchart.destroy();
-            $.getJSON(
-                data_url + '/generate-charts/' + query.lat + '/' + query.lon + '/' + query.var + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name,
+
+            $.getJSON(chart_url,
                 function (data) {
                     displayChartData(data, varDetails, download_url, query, container[0]);
                     $('input[type=radio][name=chartoption-' + query.var + ']:checked').change();

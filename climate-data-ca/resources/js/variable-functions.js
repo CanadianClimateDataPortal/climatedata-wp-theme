@@ -1175,6 +1175,7 @@
         // SECTOR CHART
         function genSectorChart(id, variable, month, region_label, dataset) {
             let dataset_name = $('input[name="dataset_switch"]:checked').val();
+            query.id = id;
             $(document).overlay('show', {
                 href: base_href + 'variable/' + variable + '/',
                 data: {

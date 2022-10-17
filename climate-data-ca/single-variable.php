@@ -524,6 +524,8 @@ if (have_posts()) : while (have_posts()) : the_post();
                     $location_name = 'Region';
                 }
 
+                $dataset_name = arr_get($_GET, 'dataset_name', 'cmip6');
+
                 ?>
 
                 <h2 class="overlay-title text-primary"><?php echo $location_name; ?></h2>
@@ -583,6 +585,17 @@ if (have_posts()) : while (have_posts()) : the_post();
                                 </div>
                             </div>
                         </div>
+                        <div class="navbar chart-navbar d-flex align-items-center mb-5">
+                            <div class="nav-item flex-grow-1 d-flex">
+                                <div class="form-select col-10 offset-4 col-sm-4">
+                                    <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                                        <label class="btn btn-outline-primary <?php echo $dataset_name == 'cmip5'? 'active':'';?>" style="border-top-left-radius: 25px;border-bottom-left-radius: 25px;padding: 13px;"> <input type="radio" class="chart-dataset" autocomplete="off" value="cmip5" <?php echo $dataset_name == 'cmip5'? 'checked':'';?>>CMIP5</label>
+                                        <label class="btn btn-outline-primary <?php echo $dataset_name == 'cmip6'? 'active':'';?>" style="border-top-right-radius: 25px;border-bottom-right-radius: 25px;padding: 13px;"> <input type="radio" class="chart-dataset" autocomplete="off" value="cmip6" <?php echo $dataset_name == 'cmip6'? 'checked':'';?>>CMIP6</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div id="chart-placeholder" class="var-chart"></div>
                     </div>
                 </div>

@@ -156,6 +156,7 @@
 
         function load_var_by_location(variable, container) {
 
+            let dataset_name = $('input[name="location-dataset"]:checked').val();
             if ($('body').hasClass('page-tour-open')) {
                 $('#page-tour').page_tour('hide_tour')
                 $('#page-tour').page_tour('destroy')
@@ -178,9 +179,7 @@
                 duration: 250,
                 complete: function () {
 
-                    var ajax_url = site_url;
-
-                    ajax_url += 'variable/' + variable;
+                    let ajax_url = site_url + 'variable/' + variable;
 
                     $.ajax({
                         url: ajax_url,
@@ -190,7 +189,7 @@
                         },
                         success: function (data) {
                             let varDetails = JSON.parse($(data).filter('#callback-data').html());
-                            let download_url = data_url + '/download-30y/' + current_location.lat + '/' + current_location.lon + '/' + variable + '/ann?decimals=' + varDetails.decimals + '&dataset_name=cmip6';
+                            let download_url = data_url + '/download-30y/' + current_location.lat + '/' + current_location.lon + '/' + variable + '/ann?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
 
 
                             if ($(data).filter('#callback-data').length) {
@@ -199,7 +198,7 @@
 
                             container.html(data);
 
-                            let json_url = data_url + '/generate-charts/' + current_location.lat + '/' + current_location.lon + '/' + variable + '?decimals=' + varDetails.decimals + '&dataset_name=cmip6';
+                            let json_url = data_url + '/generate-charts/' + current_location.lat + '/' + current_location.lon + '/' + variable + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
 
                             //console.log('load chart JSON from ' + 'get_values.php?lat=' + current_location.lat + '&lon=' + current_location.lon + '&var=' + variable + '&month=ann');
 
@@ -210,218 +209,17 @@
 
                                     displayChartData(chartdata, varDetails, download_url,
                                         {
-                                            'dataset': 'cmip6',
+                                            'dataset': dataset_name,
                                             'var': variable,
                                             'mora': 'ann',
                                             'lat': current_location.lat,
                                             'lon': current_location.lon,
                                         }, $('body').find('#' + variable + '-chart')[0]);
-                                    return;
-                                    chart_objects[container.attr('id')]['chartUnit'] = chart_objects[container.attr('id')]['varDetails']['units']['value'] === 'kelvin' ? "°C" : chart_objects[container.attr('id')]['varDetails']['units']['label'];
-                                    chart_objects[container.attr('id')]['chartDecimals'] = chart_objects[container.attr('id')]['varDetails']['decimals'];
-
-                                    var chart = Highcharts.stockChart({
-                                        chart: {
-                                            renderTo: $('body').find('#' + variable + '-chart')[0],
-                                            height: '700px',
-                                            zoomType: 'x',
-                                            animation: false,
-                                            backgroundColor: 'transparent',
-                                            style: {
-                                                fontFamily: 'CDCSans'
-                                            }
-                                        },
-
-                                        xAxis: {
-                                            type: 'datetime'
-                                        },
-
-                                        yAxis: {
-                                            title: {
-                                                text: chart_objects[container.attr('id')]['varDetails']['title']
-                                            },
-
-                                            labels: {
-                                                align: 'left',
-                                                formatter: function () {
-                                                    return this.axis.defaultLabelFormatter.call(this) + ' ' + chart_objects[container.attr('id')]['chartUnit'];
-                                                }
-                                            }
-                                        },
-                                        legend: {
-                                            enabled: true,
-                                            align: 'right',
-                                            verticalAlign: 'top',
-                                            x: -50,
-                                            itemStyle: {
-                                                textTransform: 'uppercase',
-                                                color: '#727c9a'
-                                            }
-                                        },
-                                        rangeSelector: {
-                                            inputEnabled: false,
-                                            buttonTheme: {
-                                                visibility: 'hidden'
-                                            },
-                                            labelStyle: {
-                                                visibility: 'hidden'
-                                            }
-                                        },
-
-                                        tooltip: {
-                                            crosshairs: true,
-                                            shared: true,
-                                            split: false,
-                                            valueDecimals: chart_objects[container.attr('id')]['chartDecimals'],
-                                            valueSuffix: ' ' + chart_objects[container.attr('id')]['chartUnit']
-                                        },
-
-                                        exporting: {
-                                            enabled: true,
-                                            csv: {
-                                                dateFormat: '%Y-%m-%d'
-                                            },
-
-                                            buttons: {
-                                                contextButton: {
-                                                    menuItems: ['printChart',
-                                                        'separator',
-                                                        'downloadPNG',
-                                                        'downloadJPEG',
-                                                        'downloadPDF',
-                                                        'downloadSVG',
-                                                        'separator',
-                                                        'downloadCSV',
-                                                        'downloadXLS']
-                                                }
-                                            }
-                                        },
-
-                                        series: [{
-                                            name: chart_labels.observation,
-                                            data: data['observations'],
-                                            zIndex: 1,
-                                            showInNavigator: true,
-                                            color: '#F47D23',
-                                            visible: false,
-                                            marker: {
-                                                fillColor: '#F47D23',
-                                                lineWidth: 0,
-                                                radius: 0,
-                                                lineColor: '#F47D23'
-                                            }
-                                        }, {
-                                            name: chart_labels.historical,
-                                            data: data['modeled_historical_median'],
-                                            zIndex: 1,
-                                            showInNavigator: true,
-                                            color: '#000000',
-                                            marker: {
-                                                fillColor: '#000000',
-                                                lineWidth: 0,
-                                                radius: 0,
-                                                lineColor: '#000000'
-                                            }
-                                        }, {
-                                            name: chart_labels.historical_range,
-                                            data: data['modeled_historical_range'],
-                                            type: 'arearange',
-                                            lineWidth: 0,
-                                            linkedTo: ':previous',
-                                            color: '#000000',
-                                            fillOpacity: 0.2,
-                                            zIndex: 0,
-                                            marker: {
-                                                radius: 0,
-                                                enabled: false
-                                            },
-                                        }, {
-                                            name: chart_labels.rcp_26_median,
-                                            data: data['rcp26_median'],
-                                            zIndex: 1,
-                                            showInNavigator: true,
-                                            color: '#00F',
-                                            marker: {
-                                                fillColor: '#00F',
-                                                lineWidth: 0,
-                                                radius: 0,
-                                                lineColor: '#00F'
-                                            }
-                                        }, {
-                                            name: chart_labels.rcp_26_range,
-                                            data: data['rcp26_range'],
-                                            type: 'arearange',
-                                            lineWidth: 0,
-                                            linkedTo: ':previous',
-                                            color: '#00F',
-                                            fillOpacity: 0.2,
-                                            zIndex: 0,
-                                            marker: {
-                                                radius: 0,
-                                                enabled: false
-                                            },
-                                        }, {
-                                            name: chart_labels.rcp_45_median,
-                                            data: data['rcp45_median'],
-                                            zIndex: 1,
-                                            showInNavigator: true,
-                                            color: '#00640c',
-                                            marker: {
-                                                fillColor: '#00640c',
-                                                lineWidth: 0,
-                                                radius: 0,
-                                                lineColor: '#00640c'
-                                            }
-                                        }, {
-                                            name: chart_labels.rcp_45_range,
-                                            data: data['rcp45_range'],
-                                            type: 'arearange',
-                                            lineWidth: 0,
-                                            linkedTo: ':previous',
-                                            color: '#00640c',
-                                            fillOpacity: 0.2,
-                                            zIndex: 0,
-                                            marker: {
-                                                radius: 0,
-                                                enabled: false
-                                            }
-                                        }, {
-                                            name: chart_labels.rcp_85_median,
-                                            data: data['rcp85_median'],
-                                            zIndex: 1,
-                                            showInNavigator: true,
-                                            color: '#F00',
-                                            marker: {
-                                                fillColor: '#F00',
-                                                lineWidth: 0,
-                                                radius: 0,
-                                                lineColor: '#F00'
-                                            }
-                                        }, {
-                                            name: chart_labels.rcp_85_range,
-                                            data: data['rcp85_range'],
-                                            type: 'arearange',
-                                            lineWidth: 0,
-                                            linkedTo: ':previous',
-                                            color: '#F00',
-                                            fillOpacity: 0.2,
-                                            zIndex: 0,
-                                            marker: {
-                                                radius: 0,
-                                                enabled: false
-                                            }
-                                        }]
-
-                                    });
-
                                 },
                                 complete: function () {
                                     $('body').removeClass('spinner-on');
                                 }
                             });
-
-                            //$('body').removeClass('spinner-on');
-
                         },
                         complete: function () {
                             container.animate({
@@ -436,32 +234,30 @@
 
         }
 
+
+
+        function update_location_values() {
+            let dataset_name = $('input[name="location-dataset"]:checked').val();
+            $.ajax({
+                url: data_url + '/get-location-values/' + current_location.lat + '/' + current_location.lon + '?dataset_name=' + dataset_name,
+                success: function (data) {
+
+                    let location_data = JSON.parse(data);
+
+                    $('#location-hero-default').hide();
+                    $('#location-hero-data').show();
+
+                    $.each(location_data, function (variable, variable_data) {
+                        $.each(variable_data, function (period, value) {
+                            $('#{0}_{1}'.format(variable, period)).text(value);
+                        });
+                    });
+                }
+            });
+        }
+
         // INITIAL LOAD
-
-        $.ajax({
-            url: data_url + '/get_location_values_allyears.php?lat=' + current_location.lat + '&lon=' + current_location.lon + '&time=2100-01-01',
-            success: function (data) {
-
-                var location_data = JSON.parse(data);
-
-                //console.log(location_data);
-
-                $('#location-hero-default').hide();
-                $('#location-hero-data').show();
-
-                $('#location-val-1').text(location_data.anusplin_1950_temp);
-                $('#location-val-2').text(location_data.anusplin_1980_temp);
-                $('#location-val-3').text(location_data.bcc_2020_temp);
-                $('#location-val-4').text(location_data.bcc_2050_temp);
-                $('#location-val-5').text(location_data.bcc_2070_temp);
-
-                $('#location-val-6').text(location_data.anusplin_1950_precip);
-                $('#location-val-7').text(location_data.bcc_2020_precip);
-                $('#location-val-8').text(location_data.bcc_2050_precip);
-                $('#location-val-9').text(location_data.bcc_2070_precip);
-
-            }
-        });
+        update_location_values();
 
         $('.location-data-select').each(function () {
 
@@ -484,6 +280,20 @@
             load_var_by_location($(this).val(), $(this).closest('.var-type').find('.var-data-placeholder'));
 
         });
+
+        $('input[name="location-dataset"]').on('change', function (e) {
+            let dataset_name = e.target.value;
+            update_query('dataset_name', dataset_name);
+            update_location_values();
+
+            $('.location-data-select').each(function () {
+                let selected_var = $(this).find(':selected');
+                load_var_by_location(selected_var.val(), $(this).closest('.var-type').find('.var-data-placeholder'));
+
+            });
+
+        });
+
 
         // STICKY KIT
 

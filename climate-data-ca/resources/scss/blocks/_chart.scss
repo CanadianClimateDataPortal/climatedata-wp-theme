@@ -30,3 +30,7 @@
   @include make-col-offset(2);
   order: 3;
 }
+
+.chart-delta .custom-control-label {
+  font-size: 1.2em;
+}

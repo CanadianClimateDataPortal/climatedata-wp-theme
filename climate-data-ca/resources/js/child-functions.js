@@ -31,14 +31,44 @@ const grid_resolution = {
 
 const SCENARIOS = {
     "cmip5": [
-        {'name': 'rcp26', 'label': 'RCP 2.6', 'chart_color': '#00F'},
-        {'name': 'rcp45', 'label': 'RCP 4.5', 'chart_color': '#00640c'},
-        {'name': 'rcp85', 'label': 'RCP 8.5', 'chart_color': '#F00'},
+        {
+            'name': 'rcp26', 'label': 'RCP 2.6', 'chart_color': '#00F',
+            'correlations': {
+                'cmip6': 'ssp126'
+            }
+        },
+        {
+            'name': 'rcp45', 'label': 'RCP 4.5', 'chart_color': '#00640c',
+            'correlations': {
+                'cmip6': 'ssp245'
+            }
+        },
+        {
+            'name': 'rcp85', 'label': 'RCP 8.5', 'chart_color': '#F00',
+            'correlations': {
+                'cmip6': 'ssp585'
+            }
+        },
     ],
     "cmip6": [
-        {'name': 'ssp126', 'label': 'SSP 1-2.6', 'chart_color': '#00F'},
-        {'name': 'ssp245', 'label': 'SSP 2-4.5', 'chart_color': '#00640c'},
-        {'name': 'ssp585', 'label': 'SSP 5-8.5', 'chart_color': '#F00'},
+        {
+            'name': 'ssp126', 'label': 'SSP 1-2.6', 'chart_color': '#00F',
+            'correlations': {
+                'cmip5': 'rcp26'
+            }
+        },
+        {
+            'name': 'ssp245', 'label': 'SSP 2-4.5', 'chart_color': '#00640c',
+            'correlations': {
+                'cmip5': 'rcp45'
+            }
+        },
+        {
+            'name': 'ssp585', 'label': 'SSP 5-8.5', 'chart_color': '#F00',
+            'correlations': {
+                'cmip5': 'rcp85'
+            }
+        },
     ]
 }
 

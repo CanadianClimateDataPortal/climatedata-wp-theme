@@ -2271,11 +2271,16 @@
 
         $('input[type=radio][name=dataset_switch]').change(function() {
             let dataset_name = $('input[name="dataset_switch"]:checked').val();
+            let old_dataset = query['dataset'];
             query['dataset'] = dataset_name;
+
+            // replace all scenarios with their matching one when swapping datasets
+            let old_rcp_values = query['rcp'].split("vs");
+            old_rcp_values = old_rcp_values.map(val => SCENARIOS[old_dataset].find(e => e.name == val).correlations[dataset_name]);
+            query['rcp'] = old_rcp_values.join("vs")
             update_query_string();
             buildFilterMenu();
-            query['rcp'] = $('#rcp').val();
-            update_query_string();
+//            update_query_string();
             changeLayers();
         });
 

@@ -1799,7 +1799,6 @@
 
                         // console.log('settings.station');
                         // console.log(settings.station);
-
                         if (settings.station === 'idf') {
 
 
@@ -1846,6 +1845,7 @@
                             layer: 'variable',
                             action: 'off'
                         });
+
 
                     } else {
 
@@ -2219,11 +2219,16 @@
 
         $('input[type=radio][name=dataset_switch]').change(function() {
             let dataset_name = $('input[name="dataset_switch"]:checked').val();
+            let old_dataset = query['dataset'];
             query['dataset'] = dataset_name;
+
+            // replace all scenarios with their matching one when swapping datasets
+            let old_rcp_values = query['rcp'].split("vs");
+            old_rcp_values = old_rcp_values.map(val => SCENARIOS[old_dataset].find(e => e.name == val).correlations[dataset_name]);
+            query['rcp'] = old_rcp_values.join("vs")
             update_query_string();
             buildFilterMenu();
-            query['rcp'] = $('#rcp').val();
-            update_query_string();
+//            update_query_string();
             changeLayers();
         });
 
@@ -2295,158 +2300,177 @@
 
         function changeLayers() {
 
-            let aord_value = $('input[name="absolute_delta_switch"]:checked').val();
-            let dataset_name = $('input[name="dataset_switch"]:checked').val();
-            let layer_prefix = dataset_name === 'cmip6' ? "cmip6-" : "";
-            let rcp_value = $("#rcp").val();
-            let decade_value = parseInt($("#decade").val());
-            let mora_value = $("#mora").val();
+            getVarData(function(data) {
+                let varDetails = data.get(var_value);
+                let aord_value = $('input[name="absolute_delta_switch"]:checked').val();
+                let dataset_name = $('input[name="dataset_switch"]:checked').val();
+                let layer_prefix = dataset_name === 'cmip6' ? "cmip6-" : "";
+                let rcp_value = $("#rcp").val();
+                let decade_value = parseInt($("#decade").val());
+                let mora_value = $("#mora").val();
 
-            if (query['var-group'] === 'station-data') {
+                // enable/disable controls.
+                // Fact: all variables with hasdelta == false doesn't has CMIP5/6 selection, nor summary selection
+                if(varDetails.hasdelta !== undefined && varDetails.hasdelta == false) {
+                    $('input[name="absolute_delta_switch"]').attr("disabled", true);
+                    $('input[name="absolute_delta_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
+                    $('input[name="dataset_switch"]').attr("disabled", true);
+                    $('input[name="dataset_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
+                    $('select[name="sector"]').attr("disabled", true);
+                } else {
+                    $('input[name="absolute_delta_switch"]').attr("disabled", false);
+                    $('input[name="absolute_delta_switch"]').closest('div').find('.toggle-inside').removeClass('disabled');
+                    $('input[name="dataset_switch"]').attr("disabled", false);
+                    $('input[name="dataset_switch"]').closest('div').find('.toggle-inside').removeClass('disabled');
+                    $('select[name="sector"]').attr("disabled", false);
+                }
 
-                // activate station data
-                layer_swap({
-                    layer: 'stations',
-                    station: query['var']
-                });
+                if (query['var-group'] === 'station-data') {
 
-            } else {
-
-                // not station data so make sure it's turned off
-                if (station_on === true) {
+                    // activate station data
                     layer_swap({
                         layer: 'stations',
-                        action: 'off'
+                        station: query['var']
                     });
-                }
 
-                if (query['sector'] !== '') {
+                } else {
 
-                    // activate sector
-                    if (sector_on === false) {
+                    // not station data so make sure it's turned off
+                    if (station_on === true) {
                         layer_swap({
-                            layer: 'sector'
-                        });
-
-                        layer_swap({
-                            layer: 'variable',
+                            layer: 'stations',
                             action: 'off'
                         });
                     }
 
-                } else {
+                    if (query['sector'] !== '') {
 
-                    // not sector so make sure it's turned off
-                    if (sector_on === true) {
+                        // activate sector
+                        if (sector_on === false) {
+                            layer_swap({
+                                layer: 'sector'
+                            });
+
+                            layer_swap({
+                                layer: 'variable',
+                                action: 'off'
+                            });
+                        }
+
+                    } else {
+
+                        // not sector so make sure it's turned off
+                        if (sector_on === true) {
+                            layer_swap({
+                                layer: 'sector',
+                                action: 'off'
+                            });
+                        }
+
                         layer_swap({
-                            layer: 'sector',
-                            action: 'off'
+                            layer: 'variable'
                         });
+
                     }
 
-                    layer_swap({
-                        layer: 'variable'
-                    });
+                    // always generate/re-generate the left legend
 
-                }
+                    let msorys = 'ys';
+                    let msorysmonth = '-ann';
+                    let legendmsorys = 'ann';
 
-                // always generate/re-generate the left legend
+                    switch (mora_value) {
+                        case 'ann':
+                            msorys = 'ys';
+                            msorysmonth = '-ann';
+                            legendmsorys = 'ann';
+                            break;
+                        case 'spring':
+                        case 'summer':
+                        case 'fall':
+                        case 'winter':
+                            msorys = 'qsdec';
+                            msorysmonth = '-' + mora_value;
+                            legendmsorys = 'qsdec';
+                            break;
+                        case '2qsapr':
+                            msorys = '2qsapr';
+                            msorysmonth = '-' + mora_value;
+                            legendmsorys = '2qsapr';
+                            break;
+                        default:
+                            msorys = 'ms';
+                            msorysmonth = '-' + mora_value;
+                            legendmsorys = 'mon';
+                    }
 
-                let msorys = 'ys';
-                let msorysmonth = '-ann';
-                let legendmsorys = 'ann';
-
-                switch (mora_value) {
-                    case 'ann':
-                        msorys = 'ys';
-                        msorysmonth = '-ann';
-                        legendmsorys = 'ann';
-                        break;
-                    case 'spring':
-                    case 'summer':
-                    case 'fall':
-                    case 'winter':
-                        msorys = 'qsdec';
-                        msorysmonth = '-' + mora_value;
-                        legendmsorys = 'qsdec';
-                        break;
-                    case '2qsapr':
-                        msorys = '2qsapr';
-                        msorysmonth = '-' + mora_value;
-                        legendmsorys = '2qsapr';
-                        break;
-                    default:
-                        msorys = 'ms';
-                        msorysmonth = '-' + mora_value;
-                        legendmsorys = 'mon';
-                }
-
-                if (query['sector'] !== '') {
-                    generateSectorLegend(layer_prefix + var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year', '');
-                } else {
-                    generateLeftLegend();
-                }
+                    if (query['sector'] !== '') {
+                        generateSectorLegend(layer_prefix + var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year', '');
+                    } else {
+                        generateLeftLegend();
+                    }
 
 
-                if (aord_value === 'd') {
-                    aord_layer_value = "-delta7100";
-                } else {
-                    aord_layer_value = "";
-                }
+                    if (aord_value === 'd') {
+                        aord_layer_value = "-delta7100";
+                    } else {
+                        aord_layer_value = "";
+                    }
 
-                singleLayerName = layer_prefix + '' + var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+                    singleLayerName = layer_prefix + '' + var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
 
-                // if a compare scenario was selected
+                    // if a compare scenario was selected
 
-                if (rcp_value.indexOf("vs") !== -1) {
+                    if (rcp_value.indexOf("vs") !== -1) {
 
-                    $('body').addClass('map-compare');
+                        $('body').addClass('map-compare');
 
-                    invalidate_maps();
-                    console.log("leftLayerName: " + leftLayerName);
+                        invalidate_maps();
+                        console.log("leftLayerName: " + leftLayerName);
 
-                    leftLayer.setParams({
-                        format: 'image/png',
-                        transparent: true,
-                        opacity: 1,
-                        pane: 'raster',
-                        'TIME': decade_value + '-01-00T00:00:00Z',
-                        'VERSION': '1.3.0',
-                        layers: 'CDC:' + leftLayerName
-                    });
-
-                    if (has_mapRight === true) {
-                        console.log("rightLayerName: " + rightLayerName);
-                        rightLayer.setParams({
+                        leftLayer.setParams({
                             format: 'image/png',
                             transparent: true,
                             opacity: 1,
                             pane: 'raster',
                             'TIME': decade_value + '-01-00T00:00:00Z',
                             'VERSION': '1.3.0',
-                            layers: 'CDC:' + rightLayerName
+                            layers: 'CDC:' + leftLayerName
                         });
+
+                        if (has_mapRight === true) {
+                            console.log("rightLayerName: " + rightLayerName);
+                            rightLayer.setParams({
+                                format: 'image/png',
+                                transparent: true,
+                                opacity: 1,
+                                pane: 'raster',
+                                'TIME': decade_value + '-01-00T00:00:00Z',
+                                'VERSION': '1.3.0',
+                                layers: 'CDC:' + rightLayerName
+                            });
+                        }
+
+                    } else {
+
+                        $('body').removeClass('map-compare');
+
+                        invalidate_maps();
+                        console.log("singleLayerName: " + singleLayerName);
+
+                        leftLayer.setParams({
+                            format: 'image/png',
+                            transparent: true,
+                            opacity: 1,
+                            'TIME': decade_value + '-01-00T00:00:00Z',
+                            'VERSION': '1.3.0',
+                            layers: 'CDC:' + singleLayerName
+                        });
+
                     }
 
-                } else {
-
-                    $('body').removeClass('map-compare');
-
-                    invalidate_maps();
-                    console.log("singleLayerName: " + singleLayerName);
-
-                    leftLayer.setParams({
-                        format: 'image/png',
-                        transparent: true,
-                        opacity: 1,
-                        'TIME': decade_value + '-01-00T00:00:00Z',
-                        'VERSION': '1.3.0',
-                        layers: 'CDC:' + singleLayerName
-                    });
-
                 }
-
-            }
+            });
         }
 
 
@@ -2765,15 +2789,6 @@
                     }
                 });
 
-                // enable or disable delta toggle depending on if variable has delta values
-                if ( data.get(var_value).hasdelta !== undefined && data.get(var_value).hasdelta == false) {
-                    $('input[name="absolute_delta_switch"][value=a]').click();
-                    $('input[name="absolute_delta_switch"]').attr("disabled", true);
-                    $('.toggle-inside').addClass('disabled');
-                } else {
-                    $('input[name="absolute_delta_switch"]').attr("disabled", false);
-                    $('.toggle-inside').removeClass('disabled');
-                }
 
 
 

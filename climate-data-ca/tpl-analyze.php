@@ -499,6 +499,7 @@
                                 </div>
                             </div>
                         </div>
+												
                       <div class="field validate-input type-radio d-flex flex-wrap">
                         <p class="input-label w-100"><?php _e ( 'Output Format', 'cdc' ); ?></p>
 
@@ -517,6 +518,18 @@
                         </div>
 
                       </div>
+											
+											<div id="analyze-field-decimals">
+												<div class="field validate-input type-number d-flex flex-wrap">
+													<label class="input-label w-100"><?php _e ( 'Decimal Places', 'cdc' ); ?></label>
+												
+													<div class="input-row w-50">
+														<div class="input-item">
+															<input type="number" class="form-control add-to-object" name="decimals" id="analyze-decimals" value="2" min="0" max="10">
+														</div>
+													</div>
+												</div>
+											</div>
 
                     </div>
                   </div>

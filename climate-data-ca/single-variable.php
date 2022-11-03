@@ -359,12 +359,12 @@ if (have_posts()) : while (have_posts()) : the_post();
 								<h6>Options:</h6>
 
 								<div class="form-check form-check-inline custom-control custom-radio">
-									<input class="custom-control-input" type="radio" id="chartoption1-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="annual" checked>
+									<input class="custom-control-input" type="radio" id="chartoption1-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="annual">
 									<label class="custom-control-label pl-2" for="chartoption1-<?php the_field('var_name'); ?>"><?php _e('Annual values', 'cdc'); ?></label>
 								</div>
 
 								<div class="form-check form-check-inline custom-control custom-radio">
-									<input class="custom-control-input" type="radio" id="chartoption2-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="30y">
+									<input class="custom-control-input" type="radio" id="chartoption2-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="30y" checked>
 									<label class="custom-control-label pl-2" for="chartoption2-<?php the_field('var_name'); ?>"><?php _e('30 year averages', 'cdc'); ?></label>
 								</div>
 
@@ -544,12 +544,12 @@ if (have_posts()) : while (have_posts()) : the_post();
                                     <h6>Options:</h6>
 
                                     <div class="form-check form-check-inline custom-control custom-radio">
-                                        <input class="custom-control-input" type="radio" id="chartoption1-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="annual" checked>
+                                        <input class="custom-control-input" type="radio" id="chartoption1-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="annual">
                                         <label class="custom-control-label pl-2" for="chartoption1-<?php the_field('var_name'); ?>"><?php _e('Annual values', 'cdc'); ?></label>
                                     </div>
 
                                     <div class="form-check form-check-inline custom-control custom-radio">
-                                        <input class="custom-control-input" type="radio" id="chartoption2-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="30y">
+                                        <input class="custom-control-input" type="radio" id="chartoption2-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="30y" checked>
                                         <label class="custom-control-label pl-2" for="chartoption2-<?php the_field('var_name'); ?>"><?php _e('30 year averages', 'cdc'); ?></label>
                                     </div>
 
@@ -642,12 +642,12 @@ if (have_posts()) : while (have_posts()) : the_post();
                         <h6>Options:</h6>
 
                         <div class="form-check form-check-inline custom-control custom-radio">
-                            <input class="custom-control-input" type="radio" id="chartoption1-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="annual" checked>
+                            <input class="custom-control-input" type="radio" id="chartoption1-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="annual">
                             <label class="custom-control-label pl-2" for="chartoption1-<?php the_field('var_name'); ?>"><?php _e('Annual values', 'cdc'); ?></label>
                         </div>
 
                         <div class="form-check form-check-inline custom-control custom-radio">
-                            <input class="custom-control-input" type="radio" id="chartoption2-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="30y">
+                            <input class="custom-control-input" type="radio" id="chartoption2-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="30y" checked>
                             <label class="custom-control-label pl-2" for="chartoption2-<?php the_field('var_name'); ?>"><?php _e('30 year averages', 'cdc'); ?></label>
                         </div>
 

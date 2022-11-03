@@ -655,6 +655,8 @@ function displayChartData(data, varDetails, download_url, query, container) {
         }
     });
 
+    // 30y averages is by default, so trigger the change event on load
+    $('#chartoption2-' + query['var']).trigger('change');
 
 
 }

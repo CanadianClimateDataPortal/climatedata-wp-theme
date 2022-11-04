@@ -15,6 +15,7 @@ var chart_labels, legend_labels, l10n_labels;
 
 var l10n_table = {
     "fr": {
+        'All models': 'Tous les modèles',
         '{0} Median': '{0} médiane',
         '{0} Range': '{0} portée',
         "With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}":
@@ -29,47 +30,58 @@ const grid_resolution = {
     "slrgrid": 1.0/10.0
 };
 
-const SCENARIOS = {
-    "cmip5": [
-        {
-            'name': 'rcp26', 'label': 'RCP 2.6', 'chart_color': '#00F',
-            'correlations': {
-                'cmip6': 'ssp126'
-            }
-        },
-        {
-            'name': 'rcp45', 'label': 'RCP 4.5', 'chart_color': '#00640c',
-            'correlations': {
-                'cmip6': 'ssp245'
-            }
-        },
-        {
-            'name': 'rcp85', 'label': 'RCP 8.5', 'chart_color': '#F00',
-            'correlations': {
-                'cmip6': 'ssp585'
-            }
-        },
-    ],
-    "cmip6": [
-        {
-            'name': 'ssp126', 'label': 'SSP 1-2.6', 'chart_color': '#00F',
-            'correlations': {
-                'cmip5': 'rcp26'
-            }
-        },
-        {
-            'name': 'ssp245', 'label': 'SSP 2-4.5', 'chart_color': '#00640c',
-            'correlations': {
-                'cmip5': 'rcp45'
-            }
-        },
-        {
-            'name': 'ssp585', 'label': 'SSP 5-8.5', 'chart_color': '#F00',
-            'correlations': {
-                'cmip5': 'rcp85'
-            }
-        },
-    ]
+const DATASETS = {
+    "cmip5": {
+        'scenarios': [
+            {
+                'name': 'rcp26', 'label': 'RCP 2.6', 'chart_color': '#00F',
+                'correlations': {
+                    'cmip6': 'ssp126'
+                }
+            },
+            {
+                'name': 'rcp45', 'label': 'RCP 4.5', 'chart_color': '#00640c',
+                'correlations': {
+                    'cmip6': 'ssp245'
+                }
+            },
+            {
+                'name': 'rcp85', 'label': 'RCP 8.5', 'chart_color': '#F00',
+                'correlations': {
+                    'cmip6': 'ssp585'
+                }
+            },
+        ],
+        'finch_name' : 'candcs-u5',
+        'model_lists': [
+            {'name': 'pcic12', 'label': 'PCIC12 (Ensemble)'},
+            {'name': '24models', 'label': 'All models'}]
+    },
+    "cmip6": {
+        'scenarios': [
+            {
+                'name': 'ssp126', 'label': 'SSP 1-2.6', 'chart_color': '#00F',
+                'correlations': {
+                    'cmip5': 'rcp26'
+                }
+            },
+            {
+                'name': 'ssp245', 'label': 'SSP 2-4.5', 'chart_color': '#00640c',
+                'correlations': {
+                    'cmip5': 'rcp45'
+                }
+            },
+            {
+                'name': 'ssp585', 'label': 'SSP 5-8.5', 'chart_color': '#F00',
+                'correlations': {
+                    'cmip5': 'rcp85'
+                }
+            },
+        ],
+        'finch_name' : 'candcs-u6',
+        'model_lists': [
+            {'name': '26models', 'label': 'All models'}]
+    }
 }
 
 const variableDownloadDataTypes = {
@@ -314,7 +326,7 @@ function setDataLayerForChartData(chartDataFormat, chartData, query) {
 function displayChartData(data, varDetails, download_url, query, container) {
     let chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
     let chartDecimals = varDetails['decimals'];
-    let scenarios = SCENARIOS[query['dataset']];
+    let scenarios = DATASETS[query['dataset']].scenarios;
     let pointFormatter, formatter
 
     switch (varDetails.units.value) {

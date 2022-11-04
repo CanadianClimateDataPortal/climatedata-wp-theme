@@ -87,17 +87,15 @@
                     <div class="field validate-input type-radio">
                       <div class="input-row form-check">
                         <div class="input-item">
-                          <input class="form-check-input add-to-object" type="radio" name="dataset_name" id="analyze-dataset-bccaqv2" value="bccaqv2">
-                          <label class="form-check-label" for="analyze-dataset-bccaqv2">BCCAQv2 CMIP 5</label>
+                          <input class="form-check-input add-to-object" type="radio" name="dataset" id="analyze-dataset-cmip5" value="cmip5">
+                          <label class="form-check-label" for="analyze-dataset-cmip5">BCCAQv2 CMIP 5</label>
                         </div>
-                        <!--<span class="tooltip-icon"><i class="fas fa-question"></i></span>-->
                       </div>
                       <div class="input-row form-check">
                           <div class="input-item">
-                              <input class="form-check-input add-to-object" type="radio" name="dataset_name" id="analyze-dataset-bccaqv2-cmip6" value="bccaqv2-cmip6">
-                              <label class="form-check-label" for="analyze-dataset-bccaqv2-cmip6">BCCAQv2 CMIP 6</label>
+                              <input class="form-check-input add-to-object" type="radio" name="dataset" id="analyze-dataset-cmip6" value="cmip6">
+                              <label class="form-check-label" for="analyze-dataset-cmip6">BCCAQv2 CMIP 6</label>
                           </div>
-                        <!--<span class="tooltip-icon"><i class="fas fa-question"></i></span>-->
                       </div>
                     </div>
                   </div>
@@ -299,122 +297,21 @@
 
                       <div class="field validate-input type-radio">
                         <p class="input-label"><?php _e ( 'Models', 'cdc' ); ?></p>
-
-                        <div class="input-row form-check">
-                          <div class="input-item">
-                            <input class="form-check-input add-to-object" type="radio" name="models" id="analyze-model-PCIC12" value="PCIC12" checked>
-                            <label class="form-check-label" for="analyze-model-PCIC12">PCIC12 (Ensemble)</label>
-                          </div>
-                        </div>
-
-                        <div class="input-row form-check">
-                          <div class="input-item">
-                            <input class="form-check-input add-to-object" type="radio" name="models" id="analyze-model-24MODELS" value="24MODELS">
-                            <label class="form-check-label" for="analyze-model-24MODELS"><?php _e ( 'All models', 'cdc' ); ?></label>
-                          </div>
-                        </div>
-
+                          <div id="models-placeholder"></div>
                       </div>
 
-                          <?php
+					    <div class="field type-checkbox">
+                            <div class="form-check input-row select-all">
+                              <div class="input-item">
+                                <input class="form-check-input" type="checkbox" name="" id="analyze-scenarios-all" value="all">
 
-                            /*
+                                <label class="form-check-label" for="analyze-scenarios-all"><?php _e ( 'Scenarios', 'cdc' ); ?></label>
+                              </div>
+                            </div>
 
-                      <div class="field type-checkbox">
-                        <div class="form-check input-row select-all">
-                          <div class="input-item">
-                            <input class="form-check-input" type="checkbox" name="" id="analyze-model-all" value="all">
-                            <label class="form-check-label" for="analyze-model-all">Models</label>
-                          </div>
+                            <div id="scenarios-placeholder" class="tree d-flex flex-wrap">
+                            </div>
                         </div>
-
-                        <div class="tree d-flex flex-wrap">
-
-                          <?php
-
-                            $models = array (
-                              'PCIC12',
-                              'BNU-ESM',
-                              'CCSM4',
-                              'CESM1-CAM5',
-                              'CNRM-CM5',
-                              'CSIRO-Mk3-6-0',
-                              'CanESM2',
-                              'FGOALS-g2',
-                              'GFDL-CM3',
-                              'GFDL-ESM2G',
-                              'GFDL-ESM2M',
-                              'HadGEM2-AO',
-                              'HadGEM2-ES',
-                              'IPSL-CM5A-LR',
-                              'IPSL-CM5A-MR',
-                              'MIROC-ESM-CHEM',
-                              'MIROC-ESM',
-                              'MIROC5',
-                              'MPI-ESM-LR',
-                              'MPI-ESM-MR',
-                              'MRI-CGCM3',
-                              'NorESM1-M',
-                              'NorESM1-ME',
-                              'bcc-csm1-1-m',
-                              'bcc-csm1-1'
-                            );
-
-                            foreach ( $models as $model ) {
-
-                          ?>
-
-                          <div class="input-row form-check w-50">
-                            <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="models" id="analyze-model-<?php echo $model; ?>" value="<?php echo $model; ?>" checked>
-                              <label class="form-check-label" for="analyze-model-<?php echo $model; ?>"><?php echo $model; ?></label>
-                            </div>
-                          </div>
-
-                          <?php
-
-                            }
-
-                          ?>
-                        </div>
-                      </div>
-
-                      */
-
-                      ?>
-
-											<div class="field type-checkbox">
-                        <div class="form-check input-row select-all">
-                          <div class="input-item">
-                            <input class="form-check-input" type="checkbox" name="" id="analyze-rcp-all" value="all">
-
-                            <label class="form-check-label" for="analyze-rcp-all"><?php _e ( 'Representative Concentration Pathways (RCPs)', 'cdc' ); ?></label>
-                          </div>
-                        </div>
-
-                        <div class="tree d-flex flex-wrap">
-                          <div class="input-row form-check w-25">
-                            <div class="input-item">
-															<input class="form-check-input add-to-object" type="checkbox" name="rcp" id="analyze-rcp-85" value="rcp85" checked>
-                              <label class="form-check-label" for="analyze-rcp-85">8.5</label>
-                            </div>
-                          </div>
-
-													<div class="input-row form-check w-25">
-                            <div class="input-item">
-															<input class="form-check-input add-to-object" type="checkbox" name="rcp" id="analyze-rcp-45" value="rcp45">
-                              <label class="form-check-label" for="analyze-rcp-45">4.5</label>
-                            </div>
-                          </div>
-
-													<div class="input-row form-check w-25">
-                            <div class="input-item">
-															<input class="form-check-input add-to-object" type="checkbox" name="rcp" id="analyze-rcp-26" value="rcp26">
-                              <label class="form-check-label" for="analyze-rcp-85">2.6</label>
-                            </div>
-                          </div>
-												</div>
-											</div>
 
                       <div class="field type-checkbox">
                         <div class="form-check input-row select-all">

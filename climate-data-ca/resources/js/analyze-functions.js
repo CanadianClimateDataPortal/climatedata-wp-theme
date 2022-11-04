@@ -43,8 +43,8 @@
             'start_date': '',
             'end_date': '',
             'ensemble_percentiles': '',
-            'dataset_name': '',
-            'rcp': '',
+            'dataset': '',
+            'scenario': '',
             'models': '',
             'freq': '',
             'data_validation': 'warn',
@@ -140,7 +140,6 @@
         // OVERLAY
         //
 
-
         $('.accordion-content[data-step="1"] .input-item').on('click', function (e) {
             $('#map-overlay-content h4').html(overlay_text[1]['head'])
             $('#map-overlay-content p').html(overlay_text[1]['text'])
@@ -180,29 +179,26 @@
             selectall_icon_partial = 'form-icon fas fa-minus-square',
             selectall_icon_on = 'form-icon fas fa-check-square'
 
-        // prepend icons
+        // prepend icons to custom controls within page
+        function prepend_icons(items, all = true) {
+            items.each(function (i) {
+                if ($(this).hasClass('type-radio')) {
+                    $(this).find('.input-row label').before('<i class="' + radio_icon_off + '"></i>');
+                } else if ($(this).hasClass('type-checkbox')) {
+                    $(this).find('.input-row').each(function () {
+                        if ($(this).hasClass('select-all')) {
+                            if (all) {
+                                $(this).find('label').before('<i class="' + selectall_icon_off + '"></i>');
+                            }
+                        } else {
+                            $(this).find('label').before('<i class="' + checkbox_icon_off + '"></i>');
+                        }
+                    })
+                }
+            })
+        }
 
-        $('.field').each(function (i) {
-
-            if ($(this).hasClass('type-radio')) {
-
-                $(this).find('.input-row label').before('<i class="' + radio_icon_off + '"></i>')
-
-            } else if ($(this).hasClass('type-checkbox')) {
-
-                $(this).find('.input-row').each(function () {
-
-                    if ($(this).hasClass('select-all')) {
-                        $(this).find('label').before('<i class="' + selectall_icon_off + '"></i>')
-                    } else {
-                        $(this).find('label').before('<i class="' + checkbox_icon_off + '"></i>')
-                    }
-
-                })
-
-            }
-
-        })
+        prepend_icons($('.field'));
 
         // set disabled input classes
 
@@ -228,44 +224,32 @@
             e.preventDefault()
         })
 
-        function IsSelectLocations(itemInput) {
-            var isInputSelectLocation = false;
-            $('input[name=analyze-location]').each(function (i) {
-                if (itemInput == $(this).val()) {
-                    isInputSelectLocation = true;
+        $('input[name="analyze-location"]').on('change', function (e) {
+            let itemInput = e.target.value;
+
+            ChangeLayers(itemInput);
+
+            if(itemInput != 'grid'){
+                $('#average').val('True');
+                InitSectorProtobuf(itemInput);
+
+                locations_type = itemInput;
+
+                if (analyze_map.hasLayer(analyzeLayer)) {
+                    analyze_map.removeLayer(analyzeLayer);
                 }
-            });
-
-            return isInputSelectLocation;
-        }
-
-        $('.select-locations, input[name="analyze-location"]').on('click', function (e) {
-            e.preventDefault()
-            var itemInput = $('input[name="analyze-location"]:checked').val();
-
-            if (IsSelectLocations(itemInput)) {
-                ChangeLayers(itemInput);
+            } else {
                 $('#average').val('False');
-
-                if(itemInput != 'grid'){
-                    $('#average').val('True');
-                    InitSectorProtobuf(itemInput);
-
-                    locations_type = itemInput;
-
-                    if (analyze_map.hasLayer(analyzeLayer)) {
-                        analyze_map.removeLayer(analyzeLayer);
-                    }
-                }
             }
+
             validate_steps();
-            validate_inputs(itemInput);
+            validate_inputs();
         });
 
 
         // radio/check click event
 
-        $('.type-radio .input-item, .type-checkbox .input-item').on('click', function (e) {
+        $('body').on('click', '.type-radio .input-item, .type-checkbox .input-item', function (e) {
             e.preventDefault()
 
             var this_item = $(this).closest('.input-row'),
@@ -286,6 +270,7 @@
 
                     this_item.addClass('checked')
                     this_item.find(':input').prop('checked', true)
+                    this_item.find(':input').trigger('change');
                     this_item.find('.form-icon').removeClass().addClass(radio_icon_on)
 
                 } else if (input_parent.hasClass('type-checkbox')) {
@@ -563,7 +548,7 @@
                         ).on('click', function (e) {
                             HighlightSectorById(e.layer.properties.id, e, analyzeLayer, e.layer.properties[l10n_labels.label_field]);
 
-                            validate_inputs(sector);
+                            validate_inputs();
                         }).addTo(analyze_map);
                         resolve("Sector protobuf initialzed!")
                     }, 200)
@@ -660,7 +645,43 @@
             validate_steps()
             validate_inputs()
 
-        })
+        });
+
+        $('input[name=dataset]').change(function (e) {
+            // fill model and scenarios input since they depend on dataset selection
+            let dataset_info = DATASETS[e.target.value];
+            let new_html="";
+            // add models to form
+            dataset_info.model_lists.forEach(function(model) {
+                let to_add = '<div class="input-row form-check">' +
+                    '   <div class="input-item">\n' +
+                    '       <input class="form-check-input add-to-object" type="radio" name="models" id="analyze-model-{0}" value="{0}">\n' +
+                    '       <label class="form-check-label" for="analyze-model-{0}">{1}</label>\n' +
+                    '   </div>\n' +
+                    '</div>';
+                new_html += to_add.format(model.name, T(model.label));
+            });
+            $('#models-placeholder').html(new_html);
+            prepend_icons($('#models-placeholder').closest('.field'), false);
+            $('#models-placeholder').find('.input-item:first').trigger('click');
+
+            // add scenarios to form
+            new_html="";
+            dataset_info.scenarios.forEach(function(scenario) {
+                let to_add = '<div  class="input-row form-check w-25">' +
+                    '   <div class="input-item">\n' +
+                    '       <input class="form-check-input add-to-object" type="checkbox" name="scenario" id="analyze-scenarios-{0}" value="{0}" checked>\n' +
+                    '       <label class="form-check-label" for="analyze-scenarios-{0}">{1}</label>\n' +
+                    '   </div>\n' +
+                    '</div>';
+                new_html += to_add.format(scenario.name, T(scenario.label));
+                $('#scenarios-placeholder').html(new_html);
+                prepend_icons($('#scenarios-placeholder').closest('.field'), false);
+                $('#scenarios-placeholder').find('.input-item:first').trigger('click');
+            });
+
+
+        });
 
         //
         // TOOLTIPS
@@ -826,10 +847,10 @@
             "start_date": "start date",
             "end_date": "end date",
             "ensemble_percentiles": "ensemble percentiles",
-            "dataset_name": "dataset name",
+            "dataset": "dataset name",
             "models": "models",
             "freq": "frequence",
-            "rcp": "rcp",
+            "scenario": "scenario",
             "data_validation": "data validation",
             "output_format": "output format",
             // For some events
@@ -975,7 +996,14 @@
                         });
                         break;
 
-                    case 'rcp':
+                    case 'dataset':
+                        data_form_obj['inputs'].push({
+                            'id': 'dataset',
+                            'data': DATASETS[data_form_inputs[key]].finch_name
+                        })
+                        break;
+
+                    case 'scenario':
                         data_form_inputs[key].split(',').forEach(function(component) {
                             data_form_obj['inputs'].push({
                                 'id': key,
@@ -1418,10 +1446,6 @@
 
                         var this_label = $(this).prev('.select-all').find('.form-check-label').text()
 
-                        if (this_label == 'Representative Concentration Pathways (RCPs)') {
-                            this_label = 'RCPs'
-                        }
-
                         if ($(this).find('.checked').length == 1) {
                             this_label = this_label.slice(0, -1)
                         }
@@ -1449,7 +1473,7 @@
 
         // INPUTS
 
-        function validate_inputs(sectorSelect = undefined) {
+        function validate_inputs() {
 
             var is_valid = true
 
@@ -1569,17 +1593,24 @@
                 $('#analyze-breadcrumb .step[data-step="3"] .validation-tooltip').show()
             }
 
-            // make sure lat/lon has a value
-            if (IsSelectLocations(sectorSelect) && sectorSelect !== 'grid' ){
-                $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
-                $('#clear-grids').hide();
-            } else if ($('#lat').val() == '' || $('#lon').val() == '') {
-                $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').show();
-                $('#clear-grids').hide();
-            } else {
-                $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
-                $('#clear-grids').show();
-            }
+
+            switch($('input[name="analyze-location"]:checked').val()) {
+                case 'grid':
+                    // make sure lat/lon has a value
+                    if ($('#lat').val() == '' || $('#lon').val() == '') {
+                        $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').show();
+                        $('#clear-grids').hide();
+                    } else {
+                        $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
+                        $('#clear-grids').show();
+                    }
+                    break;
+                case undefined:
+                    $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
+                    $('#clear-grids').hide();
+                    break;
+                default:
+             }
 
             // if everything is valid,
             // show the captcha/email/submit button

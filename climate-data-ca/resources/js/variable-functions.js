@@ -83,7 +83,7 @@
             query['mora'] = 'ann';
         }
 
-        query['rcp'] = SCENARIOS[dataset][0].name;
+        query['rcp'] = DATASETS[dataset].scenarios[0].name;
 
         if ($('#decade').length) {
             query['decade'] = $('#range-slider-container').attr('data-default') + 's';
@@ -2276,7 +2276,7 @@
 
             // replace all scenarios with their matching one when swapping datasets
             let old_rcp_values = query['rcp'].split("vs");
-            old_rcp_values = old_rcp_values.map(val => SCENARIOS[old_dataset].find(e => e.name == val).correlations[dataset_name]);
+            old_rcp_values = old_rcp_values.map(val => DATASETS[old_dataset].scenarios.find(e => e.name == val).correlations[dataset_name]);
             query['rcp'] = old_rcp_values.join("vs")
             update_query_string();
             buildFilterMenu();
@@ -2612,7 +2612,7 @@
                         var_value = $("#var").val();
                         //let dataset_name = $('input[name="dataset_switch"]:checked').val();
                         let dataset_name = getQueryVariable('dataset');
-                        let scenarios = SCENARIOS[dataset_name];
+                        let scenarios = DATASETS[dataset_name].scenarios;
                         dec_value = $("#decade").val();
 
                         updated_slider_values = [];

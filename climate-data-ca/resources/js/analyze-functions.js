@@ -402,9 +402,9 @@
 
         })
 
-				$('body').on('input', '.type-number :input', function() {
-					validate_inputs()
-				})
+        $('body').on('input', '.type-number :input', function() {
+            validate_inputs();
+        });
 
         function ChangeLayers(sector_value) {
             $('#lat').val("");
@@ -1297,7 +1297,7 @@
         // ACCORDION STEPS
 
         function validate_steps() {
-					
+
             var valid_steps = [false, false, false, false]
 
             $('#analyze-steps .validate-input').each(function (i) {
@@ -1443,8 +1443,6 @@
                 } else {
                     $('#analyze-breadcrumb [data-step="5"]').removeClass('on')
                 }
-								
-								
 
             }
 
@@ -1457,12 +1455,12 @@
             var is_valid = true
 
             form_inputs = $.extend(true, {}, default_inputs)
-						
-						if ($('#analyze-format-csv').prop('checked') == true) {
-							$('#analyze-field-decimals').show()
-						} else {
-							$('#analyze-field-decimals').hide().find(':input').val(2)
-						}
+
+            if ($('#analyze-format-csv').prop('checked') == true) {
+                $('#analyze-field-decimals').show()
+            } else {
+                $('#analyze-field-decimals').hide().find(':input').val(2)
+            }
 
             // CHECK INPUTS THAT NEED TO BE ADDED
             // TO THE REQUEST OBJECT
@@ -1494,28 +1492,18 @@
                             this_has_val = true
                         }
                         break
-												
-										case 'number' :
-										
-												var this_min = parseInt($(this).attr('min')),
-														this_max = parseInt($(this).attr('max')),
-														this_val = parseInt($(this).val())
-														
-												if (
-													!isNaN(this_val) &&
-													this_val >= this_min &&
-													this_val <= this_max
-												) {
-													
-													this_has_val = true
-													
-												} else {
-													
-													is_valid = false
-													
-												}
-										
-												break
+
+                    case 'number' :
+                        let this_min = parseInt($(this).attr('min')),
+                            this_max = parseInt($(this).attr('max'));
+                        this_val = parseInt($(this).val())
+
+                        if (!isNaN(this_val) && this_val >= this_min && this_val <= this_max) {
+                            this_has_val = true;
+                        } else {
+                            is_valid = false;
+                        }
+                        break;
 
                     default:
                         if ($(this).val() != '') {
@@ -1555,7 +1543,7 @@
                     continue;
                 }
 
-                if (form_inputs[key] == '') {
+                if (form_inputs[key] === '') {
                     is_valid = false
                     //console.log(key)
                 }

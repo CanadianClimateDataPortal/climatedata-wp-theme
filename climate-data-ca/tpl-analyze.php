@@ -525,7 +525,7 @@
 												
 													<div class="input-row w-50">
 														<div class="input-item">
-															<input type="number" class="form-control add-to-object" name="decimals" id="analyze-decimals" value="0" min="0" max="10">
+															<input type="number" class="form-control add-to-object" name="csv_precision" id="analyze-decimals" value="0" min="0" max="10">
 														</div>
 													</div>
 												</div>

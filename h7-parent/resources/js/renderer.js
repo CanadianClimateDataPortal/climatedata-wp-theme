@@ -10,10 +10,11 @@
     // options
   
     var defaults = {
-      chart_dir: 'charts',
-      chart_options: null,
-      charts: {},
-      debug: true
+			chart_dir: 'charts',
+			chart_options: null,
+			has_charts: false,
+			charts: {},
+			debug: true
     };
     
     this.options = $.extend(true, defaults, options);
@@ -118,7 +119,8 @@
           // CHART
           //
           
-          var variable = container.attr('data-chart-variable'),
+          var container_ID = container.attr('id'),
+							variable = container.attr('data-chart-variable'),
               lat = container.attr('data-chart-lat'),
               lon = container.attr('data-chart-lon'),
               month = container.attr('data-chart-month');
@@ -130,15 +132,20 @@
             decimals: container.attr('data-chart-decimals')
           };
           
-
+					plugin_settings.charts[container_ID] = {
+						unit: null,
+						decimals: null,
+						series: [],
+						element: null
+					}
   
 
 
             $.getJSON(DATA_URL + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
                 function (data) {
 
-                    chartUnit = varDetails.units.value === 'kelvin' ? '°C' : ' ' + varDetails.units.label;
-                    chartDecimals = varDetails['decimals'];
+                    plugin_settings.charts[container_ID]['unit'] = varDetails.units.value === 'kelvin' ? '°C' : ' ' + varDetails.units.label;
+                    plugin_settings.charts[container_ID]['decimals'] = varDetails['decimals'];
 
                     switch (varDetails.units.value) {
                         case 'doy':
@@ -157,13 +164,12 @@
                                 }};
                             break;
                         default:
-                            formatter = function () {return this.axis.defaultLabelFormatter.call(this) + ' ' + chartUnit;};
+                            formatter = function () {return this.axis.defaultLabelFormatter.call(this) + ' ' + plugin_settings.charts[container_ID]['unit'];};
                             pointFormatter = undefined;
                     }
 
-                    chartSeries = [];
                     if (data['observations'].length > 0)
-                        chartSeries.push({
+                        plugin_settings.charts[container_ID]['series'].push({
                             name: chart_labels.observation,
                             data: data['observations'],
                             zIndex: 1,
@@ -177,7 +183,7 @@
                                 lineColor: '#F47D23'
                             }});
                     if (data['modeled_historical_median'].length > 0)
-                        chartSeries.push({
+                        plugin_settings.charts[container_ID]['series'].push({
                             name: chart_labels.historical,
                             data: data['modeled_historical_median'],
                             zIndex: 1,
@@ -190,7 +196,7 @@
                                 lineColor: '#000000'
                             }});
                     if (data['modeled_historical_range'].length > 0)
-                        chartSeries.push({
+                        plugin_settings.charts[container_ID]['series'].push({
                             name: chart_labels.historical_range,
                             data: data['modeled_historical_range'],
                             type: 'arearange',
@@ -204,7 +210,7 @@
                                 enabled: false
                             }});
                     if (data['rcp26_median'].length > 0)
-                        chartSeries.push({
+                        plugin_settings.charts[container_ID]['series'].push({
                             name: chart_labels.rcp_26_median,
                             data: data['rcp26_median'],
                             zIndex: 1,
@@ -217,7 +223,7 @@
                                 lineColor: '#00F'
                             }});
                     if (data['rcp26_range'].length > 0)
-                        chartSeries.push({
+                        plugin_settings.charts[container_ID]['series'].push({
                             name: chart_labels.rcp_26_range,
                             data: data['rcp26_range'],
                             type: 'arearange',
@@ -231,7 +237,7 @@
                                 enabled: false
                             }});
                     if (data['rcp45_median'].length > 0)
-                        chartSeries.push({
+                        plugin_settings.charts[container_ID]['series'].push({
                             name: chart_labels.rcp_45_median,
                             data: data['rcp45_median'],
                             zIndex: 1,
@@ -244,7 +250,7 @@
                                 lineColor: '#00640c'
                             }});
                     if (data['rcp45_range'].length > 0)
-                        chartSeries.push({
+                        plugin_settings.charts[container_ID]['series'].push({
                             name: chart_labels.rcp_45_range,
                             data: data['rcp45_range'],
                             type: 'arearange',
@@ -258,7 +264,7 @@
                                 enabled: false
                             }});
                     if (data['rcp85_median'].length > 0)
-                        chartSeries.push({
+                        plugin_settings.charts[container_ID]['series'].push({
                             name: chart_labels.rcp_85_median,
                             data: data['rcp85_median'],
                             zIndex: 1,
@@ -271,7 +277,7 @@
                                 lineColor: '#F00'
                             }});
                     if (data['rcp85_range'].length > 0)
-                        chartSeries.push({
+                        plugin_settings.charts[container_ID]['series'].push({
                             name: chart_labels.rcp_85_range,
                             data: data['rcp85_range'],
                             type: 'arearange',
@@ -284,7 +290,7 @@
                                 radius: 0,
                                 enabled: false
                             }});
-                    var chart = Highcharts.stockChart(container.find('.chart-placeholder')[0], {
+                    plugin_settings.charts[container_ID]['chart'] = Highcharts.stockChart(container.find('.chart-placeholder')[0], {
                         subtitle: {
                             align: 'left',
                             text: document.ontouchstart === undefined ?
@@ -312,8 +318,8 @@
 
                         tooltip: {
                             pointFormatter: pointFormatter,
-                            valueDecimals: chartDecimals,
-                            valueSuffix: ' ' + chartUnit
+                            valueDecimals: plugin_settings.charts[container_ID]['decimals'],
+                            valueSuffix: ' ' + plugin_settings.charts[container_ID]['unit']
                         },
 
 
@@ -328,40 +334,48 @@
                             }
                         },
 
-                        series: chartSeries
+                        series: plugin_settings.charts[container_ID]['series']
                     });
 
-                    $('.chart-export-data').click(function (e) {
-                        e.preventDefault();
-
-                        var dl_type = '';
-
-                        switch ($(this).attr('data-type')) {
-                            case 'csv' :
-                                chart.downloadCSV();
-                                break;
-                        }
-
-                    });
-
-                    $('.chart-export-img').click(function (e) {
-                        e.preventDefault();
-
-                        var dl_type = '';
-
-                        switch ($(this).attr('data-type')) {
-                            case 'png' :
-                                dl_type = 'image/png';
-                                break;
-                            case 'pdf' :
-                                dl_type = 'application/pdf';
-                                break;
-                        }
-
-                        chart.exportChart({
-                            type: dl_type
-                        });
-                    });
+										if (plugin_settings.has_charts == false) {
+											
+											plugin_settings.has_charts = true
+												
+											$('.chart-export-data').click(function (e) {
+                        	e.preventDefault();
+													
+													var this_container = $(this).closest('.chart-container').attr('id')
+	
+                        	switch ($(this).attr('data-type')) {
+                            	case 'csv' :
+                                	plugin_settings.charts[this_container]['chart'].downloadCSV();
+                                	break;
+                        	}
+	
+                    	});
+	
+											$('.chart-export-img').click(function (e) {
+                        	e.preventDefault();
+													
+													var this_container = $(this).closest('.chart-container').attr('id'),
+															dl_type = '';
+	
+                        	switch ($(this).attr('data-type')) {
+                            	case 'png' :
+                                	dl_type = 'image/png';
+                                	break;
+                            	case 'pdf' :
+                                	dl_type = 'application/pdf';
+                                	break;
+                        	}
+	
+                        	plugin_settings.charts[this_container]['chart'].exportChart({
+                            	type: dl_type
+                        	});
+													
+                    	});
+											
+										}
 
 
                 }

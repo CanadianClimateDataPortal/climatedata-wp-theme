@@ -1316,6 +1316,10 @@ function displayChartData(data, varDetails, download_url, query, container) {
 							linkedin: {
 								display: true,
 								icon: 'fab fa-linkedin mr-3'
+							},
+							permalink: {
+								display: true,
+								icon: 'fas fa-link mr-3'
 							}
 					  },
 					  callback: null // callback function

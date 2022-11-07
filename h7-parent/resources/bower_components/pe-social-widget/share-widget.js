@@ -108,16 +108,16 @@
       if (plugin_settings.elements.pinterest.display == true) {
         button_list += '<li><a href="http://pinterest.com/pin/create/button/?url=' + share_url + '&description=' + plugin_settings.title + '" class="share-link share-pinterest"><i class="icon ' + plugin_settings.elements.pinterest.icon + '"></i><span class="label">' + plugin_settings.elements.pinterest.label + '</span></a></li>';
       }
+			
+			if (plugin_settings.elements.linkedin.display == true) {
+			
+				button_list += '<li><a href="http://www.linkedin.com/shareArticle?mini=true&url=' + encodeURIComponent(plugin_settings.share_url) + '" class="share-link share-linkedin"><i class="icon ' + plugin_settings.elements.linkedin.icon + '"></i><span class="label">' + plugin_settings.elements.linkedin.label + '</span></a></li>';
+			
+			}
 
       if (plugin_settings.elements.permalink.display == true) {
         button_list += '<li class="share-permalink-wrap"><a href="#" class="share-link share-permalink"><i class="icon ' + plugin_settings.elements.permalink.icon + '"></i><span class="label">' + plugin_settings.elements.permalink.label + '</span></a><div class="share-permalink-input"><input type="text" value="' + share_url +'"></div></li>';
       }
-
-			if (plugin_settings.elements.linkedin.display == true) {
-
-				button_list += '<li><a href="http://www.linkedin.com/shareArticle?mini=true&url=' + encodeURIComponent(plugin_settings.share_url) + '" class="share-link share-linkedin"><i class="icon ' + plugin_settings.elements.linkedin.icon + '"></i><span class="label">' + plugin_settings.elements.linkedin.label + '</span></a></li>';
-
-			}
 
       $(button_list).insertAfter(plugin_item);
 

@@ -941,7 +941,7 @@
             dataset_info.scenarios.forEach(function(scenario) {
                 let to_add = '<div  class="input-row form-check w-25">' +
                     '   <div class="input-item">\n' +
-                    '       <input class="form-check-input add-to-object" type="checkbox" name="scenario" id="analyze-scenarios-{0}" value="{0}" checked>\n' +
+                    '       <input class="form-check-input add-to-object" type="checkbox" name="scenario" id="analyze-scenarios-{0}" value="{0}">\n' +
                     '       <label class="form-check-label" for="analyze-scenarios-{0}">{1}</label>\n' +
                     '   </div>\n' +
                     '</div>';

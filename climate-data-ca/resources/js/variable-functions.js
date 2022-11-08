@@ -2366,6 +2366,11 @@
                 if(varDetails.hasdelta !== undefined && varDetails.hasdelta == false) {
                     $('input[name="absolute_delta_switch"]').attr("disabled", true);
                     $('input[name="absolute_delta_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
+
+                    // revert back to cmip5 for variables that doesn't have cmip6 data yet
+                    if (dataset_name != 'cmip5') {
+                        $('#toggle-cmip5').trigger('click');
+                    }
                     $('input[name="dataset_switch"]').attr("disabled", true);
                     $('input[name="dataset_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
                     $('select[name="sector"]').attr("disabled", true);

@@ -1108,6 +1108,7 @@
                     }
                 }
             },
+            bounds: canadaBounds,
             maxZoom: 12,
             minZoom: 7,
             pane: 'grid'

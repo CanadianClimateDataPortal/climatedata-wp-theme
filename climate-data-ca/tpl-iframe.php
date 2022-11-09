@@ -128,7 +128,7 @@
             (function() {
                 const xhr = new XMLHttpRequest()
                 xhr.responseType = 'blob';
-                xhr.open('GET', "https://host-140-7.rdext.crim.ca/building-dst/decision-support-tool/autoload.js?bokeh-autoload-element=1090&bokeh-app-path=/decision-support-tool&bokeh-absolute-url=https://host-140-7.rdext.crim.ca/building-dst/decision-support-tool", true);
+                xhr.open('GET', "http://132.217.140.7/building-dst/decision-support-tool/autoload.js?bokeh-autoload-element=1090&bokeh-app-path=/decision-support-tool&bokeh-absolute-url=http://132.217.140.7/building-dst/decision-support-tool", true);
 
                 // we can also store it in browser's session in order to preserve websocket session after page refresh
                 const sessionId = uuidv4();

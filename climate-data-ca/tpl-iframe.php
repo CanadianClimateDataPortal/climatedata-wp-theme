@@ -143,11 +143,6 @@
                 d.setTime(d.getTime() + (exdays*24*60*60*1000));
                 let expires = "expires=" + d.toUTCString();
                 document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-
-                console.log("setCookie() >> name: " + cname); //TODO: delete
-                console.log("setCookie() >> sessionID: " + cvalue); //TODO: delete
-                console.log("setCookie() >> exdays: " + exdays); //TODO: delete
-                console.log("setCookie() >> expires: " + expires); //TODO: delete
             }
 
             function getCookie(cname) {
@@ -194,8 +189,8 @@
                 setCookie(cookie_name, sessionId, 7);
               }
 
-              console.log("sessionId: " + sessionId)
-              xhr.setRequestHeader("bokeh-session-id", sessionId)
+            //   console.log("sessionId: " + sessionId)
+              xhr.setRequestHeader("Bokeh-Session-Id", sessionId)
 
               xhr.onload = function (event) {
                 const script = document.createElement('script');

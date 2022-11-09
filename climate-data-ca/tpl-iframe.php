@@ -82,7 +82,7 @@
       <div id="analyze-form" class="col-3">
 
         <form id="analyze-form-inputs">
-          <!-- <div id="analyze-steps" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
+          <div id="analyze-steps" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
             <div class="accordion-head ui-accordion-header ui-state-default ui-accordion-header-active ui-state-active ui-corner-top ui-accordion-icons" data-step="1" role="tab" id="ui-id-1" aria-controls="ui-id-2" aria-selected="true" aria-expanded="true" tabindex="0" data-valid="false"><span class="ui-accordion-header-icon ui-icon ui-icon-triangle-1-s"></span>
               <h5 class="d-flex align-items-center justify-content-between all-caps">
                 <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">1</span>
@@ -112,7 +112,7 @@
                 </div>
               </div>
             </div>
-          </div> -->
+          </div>
 
         <div class="form-layout-row row align-items-center form-process">
             <div class="col-4 offset-1 input-group input-group-lg">

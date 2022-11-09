@@ -37,7 +37,13 @@
   ?>
 
   <nav class="navbar navbar-expand navbar-light bg-light">
-    <aside id="glossary-listnav-nav" class="collapse navbar-collapse"></aside>
+    <aside id="glossary-listnav-nav" class="collapse navbar-collapse">
+<!--
+      <ul class="navbar-nav tabs-nav w-100 justify-content-center">
+        <li class="nav-item head px-4 py-5 all-caps">Filter</li>
+      </ul>
+-->
+    </aside>
   </nav>
 
     <style>
@@ -45,15 +51,14 @@
             font-size: 12pt;
         }
 
-        #new-session{
-            margin-top: 50px;
-        }
-
         main {
             min-height: 400px;
             margin-bottom: 100px;
             clear: both;
         }
+
+
+
     </style>
 
 
@@ -72,16 +77,17 @@
 
       ?>
 
-    <?php
-    //TODO: rename glossary-* to dst and update climate-data-ca/resources/scss/child.scss
-    //TODO: rename analyze-* to dst and update climate-data-ca/resources/scss/pages/_analyze.scss
-    ?>
+
 
   <div class="container-fluid">
     <div class="row">
+
       <div id="analyze-form" class="col-3">
 
         <form id="analyze-form-inputs">
+
+
+
           <div id="analyze-steps" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
             <div class="accordion-head ui-accordion-header ui-state-default ui-accordion-header-active ui-state-active ui-corner-top ui-accordion-icons" data-step="1" role="tab" id="ui-id-1" aria-controls="ui-id-2" aria-selected="true" aria-expanded="true" tabindex="0" data-valid="false"><span class="ui-accordion-header-icon ui-icon ui-icon-triangle-1-s"></span>
               <h5 class="d-flex align-items-center justify-content-between all-caps">
@@ -97,39 +103,38 @@
 
                   <div class="input-row form-check">
                     <div class="input-item">
-                      <input class="form-check-input add-to-object" type="radio" name="dataset_name" id="dst-selection" value="building">
-                      <i class="form-icon fas fa-circle"></i><label class="form-check-label" for="dst-selection">Building</label>
+                      <input class="form-check-input add-to-object" type="radio" name="dataset_name" id="analyze-dataset-bccaqv2" value="bccaqv2">
+                      <i class="form-icon fas fa-circle"></i><label class="form-check-label" for="analyze-dataset-bccaqv2">Building</label>
                     </div>
                   </div>
 
                   <div class="input-row form-check">
                     <div class="input-item">
-                      <input class="form-check-input add-to-object" type="radio" name="dataset_name" id="dst-selection" value="agriculture">
-                      <i class="form-icon fas fa-circle"></i><label class="form-check-label" for="dst-selection">Agriculture</label>
+                      <input class="form-check-input add-to-object" type="radio" name="dataset_name" id="analyze-dataset-bccaqv2" value="bccaqv2">
+                      <i class="form-icon fas fa-circle"></i><label class="form-check-label" for="analyze-dataset-bccaqv2">Agriculture</label>
                     </div>
                   </div>
 
                 </div>
               </div>
             </div>
+
+
           </div>
 
-        <div class="form-layout-row row align-items-center form-process">
-            <div class="col-4 offset-1 input-group input-group-lg">
-                <button class="btn rounded-pill all-caps btn-outline-secondary" type="button" id="new-session"><?php _e ( 'New session', 'cdc' ); ?> </button>
-            </div>
-        </div>
-
         </form>
-
-
-
       </div>
 
       <div class="col-9">
 
-        <div id="dst-map-container" style="font-size: 12pt; height: 2000px;">
+        <div id="analyze-map-container" style="font-size: 12pt; height: 2000px;">
           <p id="dst-load">Loading...</p>
+
+
+          <!-- {{ script|safe }} -->
+
+          <!-- <iframe width="100%" height="100%" src="http://localhost:5006/building-dst/decision-support-tool"></iframe> -->
+
 
           <script id="1090">
             function uuidv4() {
@@ -138,58 +143,13 @@
               );
             }
 
-            function setCookie(cname,cvalue,exdays) {
-                const d = new Date();
-                d.setTime(d.getTime() + (exdays*24*60*60*1000));
-                let expires = "expires=" + d.toUTCString();
-                document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-            }
-
-            function getCookie(cname) {
-                let name = cname + "=";
-                let decodedCookie = decodeURIComponent(document.cookie);
-                let ca = decodedCookie.split(';');
-                for(let i = 0; i < ca.length; i++) {
-                    let c = ca[i];
-                    while (c.charAt(0) == ' ') {
-                        c = c.substring(1);
-                    }
-                    if (c.indexOf(name) == 0) {
-                        return c.substring(name.length, c.length);
-                    }
-                }
-                return "";
-            }
-
-            function eraseCookie(name) {
-                document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            }
-
-            const cookie_name = "dst-session";
-            $('#new-session').click(function (e) {
-                eraseCookie(cookie_name);
-                getDst();
-                window.location.reload(true);
-            });
-
-            function getDst() {
+            (function() {
               const xhr = new XMLHttpRequest()
               xhr.responseType = 'blob';
               xhr.open('GET', "https://dst-staging.climatedata.ca/building-dst/decision-support-tool/autoload.js?bokeh-autoload-element=1090&bokeh-app-path=/decision-support-tool&bokeh-absolute-url=https://dst-staging.climatedata.ca/building-dst/decision-support-tool", true);
 
-              // Store it in browser's session in order to preserve websocket session after page refresh
-              let current_cookie = getCookie(cookie_name);
-
-
-              let sessionId;
-              if(current_cookie != ''){
-                sessionId = current_cookie;
-              }else{
-                sessionId = uuidv4();
-                setCookie(cookie_name, sessionId, 7);
-              }
-
-            //   console.log("sessionId: " + sessionId)
+              // we can also store it in browser's session in order to preserve websocket session after page refresh
+              const sessionId = uuidv4();
               xhr.setRequestHeader("Bokeh-Session-Id", sessionId)
 
               xhr.onload = function (event) {
@@ -198,21 +158,22 @@
                 script.src = src;
 
                 // remove the loading screen
-                document.getElementById('dst-load').remove();
+                const container = document.getElementById('dst-load');
+                container.remove();
 
-                // Add decision support tool (right div)
-                document.getElementById('dst-map-container').appendChild(script);
+                document.body.appendChild(script);
               };
               xhr.send();
-            }
-
-            getDst();
-
+            })();
           </script>
+
 
         </div>
       </div>
     </div>
+
+
+
   </div>
 
 
@@ -225,6 +186,7 @@
       ?>
 
   </section>
+
 </main>
 
 <?php

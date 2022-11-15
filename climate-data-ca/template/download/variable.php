@@ -2,16 +2,14 @@
     <div class="form-layout-row row align-items-center">
         <p class="form-label-wrap col-10 col-sm-3 offset-1 mb-3 mb-sm-0">
             <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">1</span>
-            <label for="download-dataset" class="form-label"><?php _e('Select a frequency', 'cdc'); ?></label>
+            <label for="download-frequency" class="form-label"><?php _e('Select a frequency', 'cdc'); ?></label>
         </p>
 
         <div class="form-select col-10 offset-1 col-sm-4 offset-sm-0 mb-3 mb-sm-0">
-            <select class="custom-select custom-select-md select2 form-control input-large" name="download-dataset" id="download-dataset" data-container-css-class="big-menu btn btn-lg btn-outline-primary rounded-pill" data-dropdown-css-class="big-menu-dropdown">
+            <select class="custom-select custom-select-md select2 form-control input-large" name="download-frequency" id="download-frequency" data-container-css-class="big-menu btn btn-lg btn-outline-primary rounded-pill" data-dropdown-css-class="big-menu-dropdown">
                 <option value="annual" data-timestep="annual" selected><?php _e('Annual', 'cdc'); ?></option>
 
                 <option value="daily" data-timestep="daily"><?php _e('Daily', 'cdc'); ?></option>
-                <option value="2qsapr" data-timestep="2qsapr"><?php _e('April to September', 'cdc'); ?></option>
-
                 <optgroup label="<?php _e('Monthly', 'cdc'); ?>">
                     <option value="all" data-timestep="monthly"><?php _e('All months', 'cdc'); ?></option>
                     <option value="jan" data-timestep="monthly"><?php _e('January', 'cdc'); ?></option>
@@ -39,7 +37,7 @@
         <p class="form-help col-10 col-sm-2 offset-1"><a href="<?php echo get_permalink(filtered_ID_by_path('about', $GLOBALS['vars']['current_lang'])); ?>#about-datasets"><?php _e('Learn more about datasets', 'cdc'); ?></a></p>
     </div>
 
-    <div class="form-layout-row row align-items-center">
+    <div id="selection-dataset" class="form-layout-row row align-items-center">
         <p class="form-label-wrap col-10 col-sm-3 offset-1 mb-3 mb-sm-0">
             <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">2</span> <label for="dataset" class="form-label"><?php _e('Select a dataset', 'cdc'); ?></label>
         </p>

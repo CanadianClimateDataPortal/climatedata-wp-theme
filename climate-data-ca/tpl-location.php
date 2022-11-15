@@ -64,8 +64,8 @@ if ( have_posts() ) : while ( have_posts() ) : the_post();
           <p><?php printf ( __( 'For the 1971-2000 period, the annual average temperature was %s&nbsp;ºC. Under a high emissions scenario, annual average temperatures are projected to be %s&nbsp;ºC for the 2021-2050 period, %s&nbsp;ºC for the 2051-2080 period and %s&nbsp;ºC for the last 30 years of this century.', 'cdc' ), '<strong id="tg_mean_1971"></strong>', '<strong id="tg_mean_2021"></strong>', '<strong id="tg_mean_2051"></strong>', '<strong id="tg_mean_2071"></strong>' ); ?></p>
 
           <p><?php printf ( __( 'Average annual precipitation for the 1971-2000 period was %s&nbsp;mm. Under a high emissions scenario, this is projected to be %s%% higher for the 2051-2080 period and %s%% higher for the last 30 years of this century.', 'cdc' ), '<strong id="prcptot_1971"></strong>', '<strong id="prcptot_delta_2051_percent"></strong>', '<strong id="prcptot_delta_2071_percent"></strong>' ); ?></p>
-            <p><?php printf( __('* These values reflect those of the ~10 km x 6 km grid cell that %s lies within and do not necessarily reflect the exact point that you select, particularly in areas with varying microclimates.','cdc'), $GLOBALS['vars']['current_data']['location_data']['geo_name'] ); ?>
-            </p>
+          <p><?php _e('Seasonal and monthly changes in precipitation may be quite different from these annual average values. Use the Variable menu option to explore projected changes at these shorter time frequencies.', 'cdc');?></p>
+          <p><?php printf( __('* These values reflect those of the ~10 km x 6 km grid cell that %s lies within and do not necessarily reflect the exact point that you select, particularly in areas with varying microclimates.','cdc'), $GLOBALS['vars']['current_data']['location_data']['geo_name'] ); ?></p>
 
             <div class="navbar chart-navbar d-flex align-items-center mb-5">
                 <div class="nav-item flex-grow-1 d-flex">

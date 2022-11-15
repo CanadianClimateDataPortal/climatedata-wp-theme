@@ -2311,7 +2311,7 @@
 
                 // enable/disable controls.
                 // Fact: all variables with hasdelta == false doesn't has CMIP5/6 selection, nor summary selection
-                if(varDetails.hasdelta !== undefined && varDetails.hasdelta == false) {
+                if(varDetails.hasdelta !== undefined && varDetails.hasdelta === false) {
                     $('input[name="absolute_delta_switch"]').attr("disabled", true);
                     $('input[name="absolute_delta_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
 

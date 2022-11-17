@@ -19,10 +19,10 @@ $list = [];
 $dir = dirname(__FILE__); // Just to get the path to current dir
 
 $filetypes = [
-    ['dirname' => 'historical', 'label' => __('Historical Data (ZIP)')],
-    ['dirname' => 'cmip5', 'label' => __('CMIP5 (ZIP)')],
-    ['dirname' => 'cmip6', 'label' => __('CMIP6 (ZIP)')],
-    ['dirname' => 'cmip6-quickstart', 'label' => __('CMIP6 Quick Start (ZIP)')],
+    ['dirname' => 'historical', 'label' => __('Historical IDF (ZIP)')],
+    ['dirname' => 'cmip5', 'label' => __('Climate Change-Scaled IDF - CMIP5 (ZIP)')],
+    ['dirname' => 'cmip6', 'label' => __('Climate Change-Scaled IDF - CMIP6 (ZIP)')],
+    ['dirname' => 'cmip6-quickstart', 'label' => __('Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)')],
 ];
 
 

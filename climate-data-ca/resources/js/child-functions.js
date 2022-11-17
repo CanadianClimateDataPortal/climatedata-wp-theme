@@ -272,10 +272,6 @@ function T(str) {
         return l10n_table[current_lang][str];
     }
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> CLIM-234_Future_IDF
 
 /**
  * get IDF links for station_id and output HTML content to target
@@ -291,7 +287,6 @@ function getIDFLinks(station_id, target, css_class) {
         });
     });
 };
-<<<<<<< HEAD
 
 function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
     let gA4EventNameForVariableDownloadData = "";
@@ -699,8 +694,6 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
 
 }
-=======
->>>>>>> CLIM-234_Future_IDF
 
 (function ($) {
 

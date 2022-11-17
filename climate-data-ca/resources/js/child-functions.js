@@ -24,6 +24,7 @@ var l10n_table = {
         'All models': 'Tous les modèles',
         '{0} Median': '{0} médiane',
         '{0} Range': '{0} portée',
+
         "With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}":
             "Avec les paramètres actuels de fréquence et de format de donnée, le nombre maximal de points de grille par requête est de {0}",
         "Around {0} grid boxes selected" : "Environ {0} points de grille sélectionnés"
@@ -271,6 +272,10 @@ function T(str) {
         return l10n_table[current_lang][str];
     }
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> CLIM-234_Future_IDF
 
 /**
  * get IDF links for station_id and output HTML content to target
@@ -280,36 +285,13 @@ function T(str) {
  */
 function getIDFLinks(station_id, target, css_class) {
     $.getJSON(child_theme_dir + 'resources/app/run-frontend-sync/search_idfs.php?idf=' + station_id, function (data) {
-
         $(target).empty();
         $.each(data, function (k, v) {
-            let linktext = v;
-            let filename = v.replace(/\.[^/.]+$/, "");
-            let extension = v.split('.').pop();
-
-            if (filename.endsWith("_qq")) {
-                linktext = T("Quantile");
-            }
-            else if (filename.endsWith("_r")) {
-                linktext = T("Return Level");
-            }
-            else if (filename.endsWith("_t")) {
-                linktext = T("Trend");
-            }
-            else {
-                linktext = T("Short Duration Rainfall Intensity−Duration−Frequency Data");
-            }
-
-            linktext += " (" + extension.toUpperCase() + ')';
-
-            if (extension == "zip") {
-                linktext = T("Future-shifted data (ZIP)")
-            }
-
-            $(target).append('<li><a class="' + css_class + '" href="' + v + '" target="_blank">' + linktext + '</a></li>');
+            $(target).append('<li><a class="' + css_class + '" href="' + v.filename + '" target="_blank">' + v.label + '</a></li>');
         });
     });
 };
+<<<<<<< HEAD
 
 function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
     let gA4EventNameForVariableDownloadData = "";
@@ -717,6 +699,8 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
 
 }
+=======
+>>>>>>> CLIM-234_Future_IDF
 
 (function ($) {
 

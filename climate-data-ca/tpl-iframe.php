@@ -49,7 +49,7 @@
    function printErrorMessage(string $url)
    {
     $httpResponseCode = getHttpResponseCode($url);
-    $messageURL = "Sorry, this URL : <b style='color:blue;'>" . get_field("url") . "</b> is unreachable.";
+    $messageURL = "Sorry, this URL : <b style='color:blue;'>" . $url . "</b> is unreachable.";
     $messageStatusCode = "URL returned this http status code : <b style='color:red;'>" . $httpResponseCode . ".</b>";
     return "<p> $messageURL </p> <p>$messageStatusCode</p>";
    }

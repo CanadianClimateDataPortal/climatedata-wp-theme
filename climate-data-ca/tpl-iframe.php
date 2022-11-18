@@ -49,7 +49,7 @@
    function getIframe(string $url)
    {
     $httpResponseCode = getHttpResponseCode($url);
-    if ($httpResponseCode == 201) {
+    if ($httpResponseCode == 200) {
       return '<iframe src="' . $url . '" title="iframe" allow="fullscreen" ></iframe>';
     } else {
       $messageURL = "Sorry,  <b style='color:blue;'>" . $url . "</b> is unreachable.";

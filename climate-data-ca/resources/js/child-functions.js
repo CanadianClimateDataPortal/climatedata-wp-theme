@@ -126,6 +126,22 @@ function T(str) {
     }
 }
 
+
+/**
+ * get IDF links for station_id and output HTML content to target
+ * @param station_id ID of the IDF station
+ * @param target jquery selector to output the resulting content
+ * @param css_class CSS class to use for links
+ */
+function getIDFLinks(station_id, target, css_class) {
+    $.getJSON(child_theme_dir + 'resources/app/run-frontend-sync/search_idfs.php?idf=' + station_id, function (data) {
+        $(target).empty();
+        $.each(data, function (k, v) {
+            $(target).append('<li><a class="' + css_class + '" href="' + v.filename + '" target="_blank">' + v.label + '</a></li>');
+        });
+    });
+};
+
 (function ($) {
 
     $(function () {

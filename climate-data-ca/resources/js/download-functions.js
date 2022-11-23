@@ -1512,22 +1512,6 @@
             ];
         }
 
-        var popup_labels = [
-            "Short Duration Rainfall Intensity−Duration−Frequency Data",
-            "Quantile",
-            "Return Level",
-            "Trend"
-        ];
-
-        if (current_lang == 'fr') {
-            popup_labels = [
-                "Données sur l’intensité, la durée et la fréquence des chutes de pluie de courte durée",
-                "Quantile",
-                "Niveau de retour",
-                "Tendance",
-            ];
-        }
-
         function idf_init() {
 
             create_map('idf')
@@ -1633,42 +1617,10 @@
                         current_view = 7
                     }
 
-                    maps['idf'].setView([layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0]], current_view)
-
-                    $.getJSON(child_theme_dir + 'resources/app/run-frontend-sync/search_idfs.php?idf=' + layer.feature.properties.ID, function (data) {
-                        $('#idf-station-name h5').text(layer.feature.properties.Name)
-                        $('#idf-station-elevation h5').text(layer.feature.properties.Elevation_)
-                        $.each(data, function (k, v) {
-                            linktext = v;
-
-                            if (v.includes("_A.pdf", 0) === true) {
-                                linktext = popup_labels[0] + " (PDF)";
-                            } else if (v.includes("_A.png", 0) === true) {
-                                linktext = popup_labels[0] + " (PNG)";
-                            } else if (v.includes(".txt", 0) === true) {
-                                linktext = popup_labels[0] + " (TXT)";
-                            } else if (v.includes("_qq.pdf", 0) === true) {
-                                linktext = popup_labels[1] + " (PDF)";
-                            } else if (v.includes("_qq.png", 0) === true) {
-                                linktext = popup_labels[1] + " (PNG)";
-                            } else if (v.includes("_r.pdf", 0) === true) {
-                                linktext = popup_labels[2] + " (PDF)";
-                            } else if (v.includes("_r.png", 0) === true) {
-                                linktext = popup_labels[2] + " (PNG)";
-                            } else if (v.includes("_t.pdf", 0) === true) {
-                                linktext = popup_labels[3] + " (PDF)";
-                            } else if (v.includes("_t.png", 0) === true) {
-                                linktext = popup_labels[3] + " (PNG)";
-                            } else if (v.includes(".pdf", 0) === true) {
-                                linktext = popup_labels[0] + " (PDF)";
-                            } else if (v.includes(".png", 0) === true) {
-                                linktext = popup_labels[0] + " (PNG)";
-                            }
-
-                            $('#idf-links ul').append('<li><a class="download-idf-curves" href="' + v + '" target="_blank">' + linktext + '</a></li>');
-                        })
-
-                    })
+                    maps['idf'].setView([layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0]], current_view);
+                    $('#idf-station-name h5').text(layer.feature.properties.Name);
+                    $('#idf-station-elevation h5').text(layer.feature.properties.Elevation_);
+                    getIDFLinks(layer.feature.properties.ID, '#idf-links ul', 'download-idf-curves');
 
                 } else {
                     layer.setStyle({

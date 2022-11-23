@@ -4,7 +4,7 @@
   
 ?>
 
-<nav class="navbar navbar-expand-lg <?php echo get_sub_field ( 'class' ); ?>">
+<nav class="navbar navbar-expand-xl <?php echo get_sub_field ( 'class' ); ?>">
   <button class="navbar-toggler btn btn-lg btn-transparent text-secondary" type="button" data-toggle="collapse" data-target="#<?php echo $section_ID; ?>-collapse" aria-controls="<?php echo $section_ID; ?>-collapse" aria-expanded="false" aria-label="Toggle navigation">
     <i class="fas fa-bars"></i>
   </button>

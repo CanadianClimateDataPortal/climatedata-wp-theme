@@ -1,3 +1,6 @@
+2022-11-22.01
+  * Updated IDF download to use zipped files instead of individual
+
 2022-09-07.01
   * Removed SASS generated CSS from repository
 

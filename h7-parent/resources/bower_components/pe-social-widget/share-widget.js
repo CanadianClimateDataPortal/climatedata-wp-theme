@@ -40,7 +40,7 @@
 				},
         permalink: {
           display: false,
-          label: 'Copy Permalink',
+          label: 'Copy link',
           icon: 'icon-permalink'
         }
       },
@@ -109,14 +109,16 @@
         button_list += '<li><a href="http://pinterest.com/pin/create/button/?url=' + share_url + '&description=' + plugin_settings.title + '" class="share-link share-pinterest"><i class="icon ' + plugin_settings.elements.pinterest.icon + '"></i><span class="label">' + plugin_settings.elements.pinterest.label + '</span></a></li>';
       }
 
-      if (plugin_settings.elements.permalink.display == true) {
-        button_list += '<li class="share-permalink-wrap"><a href="#" class="share-link share-permalink"><i class="icon ' + plugin_settings.elements.permalink.icon + '"></i><span class="label">' + plugin_settings.elements.permalink.label + '</span></a><div class="share-permalink-input"><input type="text" value="' + share_url +'"></div></li>';
-      }
-
 			if (plugin_settings.elements.linkedin.display == true) {
 
 				button_list += '<li><a href="http://www.linkedin.com/shareArticle?mini=true&url=' + encodeURIComponent(plugin_settings.share_url) + '" class="share-link share-linkedin"><i class="icon ' + plugin_settings.elements.linkedin.icon + '"></i><span class="label">' + plugin_settings.elements.linkedin.label + '</span></a></li>';
 
+			}
+			
+			if (plugin_settings.elements.permalink.display == true) {
+				
+				button_list += '<li class="share-permalink-wrap"><a href="#" class="share-link share-permalink" data-share-url="' + share_url + '"><i class="icon ' + plugin_settings.elements.permalink.icon + '"></i><span class="label">' + plugin_settings.elements.permalink.label + '</span></a></li>';
+				
 			}
 
       $(button_list).insertAfter(plugin_item);
@@ -169,17 +171,31 @@
           });
 
     	  } else if ($(this).hasClass('share-permalink')) {
+					
+					navigator.clipboard.writeText($(this).attr('data-share-url')).then(() => {
+						
+						$(this).find('i').removeClass().addClass('fas fa-check text-success mr-3')
+						$(this).find('.label').text('Copied to clipboard')
+						
+					},() => {
+						
+						$(this).find('i').removeClass().addClass('fas fa-times text-warning mr-3')
+						$(this).find('.label').text('Error')
+						
+					})
 
-      	  var permalink_wrap = $(this).parents('.share-permalink-wrap');
-      	  var permalink_input = plugin_item.siblings('ul').find('.share-permalink-input');
+      	  // var permalink_wrap = $(this).parents('.share-permalink-wrap');
+      	  // var permalink_input = plugin_item.siblings('ul').find('.share-permalink-input');
+					
+					
 
-      	  if (permalink_wrap.hasClass('open')) {
-        	  permalink_wrap.removeClass('open');
-        	  permalink_input.slideUp(250);
-      	  } else {
-        	  permalink_wrap.addClass('open');
-        	  permalink_input.slideDown().find('input').focus().select();
-      	  }
+      	  // if (permalink_wrap.hasClass('open')) {
+        	//   permalink_wrap.removeClass('open');
+        	//   permalink_input.slideUp(250);
+      	  // } else {
+        	//   permalink_wrap.addClass('open');
+        	//   permalink_input.slideDown().find('input').focus().select();
+      	  // }
 
         } else {
 

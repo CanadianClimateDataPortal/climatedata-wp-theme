@@ -740,6 +740,10 @@ function getIDFLinks(station_id, target, css_class) {
 							linkedin: {
 								display: true,
 								icon: 'fab fa-linkedin mr-3'
+							},
+							permalink: {
+								display: true,
+								icon: 'fas fa-share-alt mr-3'
 							}
 					  },
 					  callback: null // callback function

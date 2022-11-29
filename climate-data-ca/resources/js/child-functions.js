@@ -754,7 +754,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
             // checkboxes
             dl_form.find('input[type="checkbox"]').each(function () {
                 if ($(this).prop('checked') != true) {
-                    //           console.log($(this).attr('name') + ' not checked')
+                    //       console.log($(this).attr('name') + ' not checked')
                     is_valid = false
                 }
             })
@@ -831,7 +831,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
                                 captcha_url = dl_form.find('#terms-captcha').attr('src')
 
-                                //           dl_form.find('#terms-captcha').attr('src', '')
+                                //       dl_form.find('#terms-captcha').attr('src', '')
                                 dl_form.find('#terms-captcha').attr('src', captcha_url)
 
                                 var response = JSON.parse(data)
@@ -1261,48 +1261,48 @@ function displayChartData(data, varDetails, download_url, query, container) {
             //console.log('listnav');
         }
 
-				// SHARE
+        // SHARE
 
-				if ($('#share').length) {
-
-					window.fbAsyncInit = function() {
-				    FB.init({
-				      appId            : '387199319682000',
-				      autoLogAppEvents : true,
-				      xfbml            : true,
-				      version          : 'v13.0'
-				    });
-				  };
-
-					$('#share').share_widget({
-					  site_url: '//' + window.location.hostname,
-					  theme_dir: child_theme_dir,
-					  share_url: window.location.href,
-					  title: document.title,
-					  elements: {
-					    facebook: {
-					      display: true,
-					      icon: 'fab fa-facebook mr-3'
-					    },
-					    twitter: {
-					      display: true,
-					      icon: 'fab fa-twitter mr-3',
-					      text: null,
-					      via: null
-					    },
-							linkedin: {
-								display: true,
-								icon: 'fab fa-linkedin mr-3'
-							},
-							permalink: {
-								display: true,
-								icon: 'fas fa-link mr-3'
-							}
-					  },
-					  callback: null // callback function
-					})
-
-				}
+        if ($('#share').length) {
+        
+            window.fbAsyncInit = function() {
+                FB.init({
+                    appId        : '387199319682000',
+                    autoLogAppEvents : true,
+                    xfbml        : true,
+                    version      : 'v13.0'
+                });
+            };
+            
+            $('#share').share_widget({
+                site_url: '//' + window.location.hostname,
+                theme_dir: child_theme_dir,
+                share_url: window.location.href,
+                title: document.title,
+                elements: {
+                    facebook: {
+                        display: true,
+                        icon: 'fab fa-facebook mr-3'
+                    },
+                    twitter: {
+                        display: true,
+                        icon: 'fab fa-twitter mr-3',
+                        text: null,
+                        via: null
+                    },
+                    linkedin: {
+                        display: true,
+                        icon: 'fab fa-linkedin mr-3'
+                    },
+                    permalink: {
+                        display: true,
+                        icon: 'fas fa-share-alt mr-3'
+                    }
+                },
+                callback: null // callback function
+            })
+        
+        }
 
         if (typeof $.fn.renderer !== 'undefined' && $('.renderable').length) {
             $(document).renderer();

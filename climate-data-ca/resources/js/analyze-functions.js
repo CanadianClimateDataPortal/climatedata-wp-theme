@@ -2219,11 +2219,11 @@
                         }
                     });
                 }
-                // not implemented yet in Finch
-                //stations_form_obj['inputs'].push({
-                //    'id': 'output_name',
-                //    'data': submit_url_var + output_name_suffix
-                //});
+
+                stations_form_obj['inputs'].push({
+                    'id': 'output_name',
+                    'data': submit_url_var + output_name_suffix
+                });
 
 
                 // email

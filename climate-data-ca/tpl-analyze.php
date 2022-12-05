@@ -873,8 +873,8 @@
                 <div class="accordion-content-inner">
 
 									<div class="field validate-input type-radio d-flex flex-wrap">
-											<p class="input-label w-100"><?php _e ( 'Missing Data Options', 'cdc' ); ?>
-                                                <i class="fas fa-question-circle ml-3 validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Placeholder for explaination', 'cdc' ); ?>"></i></h6>
+                                        <p class="input-label w-100"><?php _e ( 'Missing Data Options', 'cdc' ); ?>
+                                                <i class="fas fa-question-circle ml-3 validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Placeholder for explaination', 'cdc' ); ?>"></i></h6></p>
                                         <p class="value"></p>
                                             </p>
 
@@ -942,14 +942,14 @@
 
                     <div class="input-row form-check w-50">
                       <div class="input-item">
-                        <input class="form-check-input add-to-object disabled" type="radio" name="output_format" id="analyze-stations-format-csv" value="csv">
-                        <label class="form-check-label" for="analyze-stations-model-csv">CSV <?php _e('(coming soon)', 'cdc'); ?></label>
+                        <input class="form-check-input add-to-object" type="radio" name="output_format" id="analyze-stations-format-csv" value="csv" checked>
+                        <label class="form-check-label" for="analyze-stations-model-csv">CSV</label>
                       </div>
                     </div>
 
                     <div class="input-row form-check w-50">
                       <div class="input-item">
-                        <input class="form-check-input add-to-object" type="radio" name="output_format" id="analyze-stations-format-netcdf" value="netcdf" checked>
+                        <input class="form-check-input add-to-object" type="radio" name="output_format" id="analyze-stations-format-netcdf" value="netcdf">
                         <label class="form-check-label" for="analyze-stations-model-netcdf">NetCDF</label>
                       </div>
                     </div>

@@ -40,7 +40,7 @@
                 },
                 permalink: {
                     display: false,
-                    label: 'Copy link',
+                    label: T('Copy link'),
                     icon: 'icon-permalink'
                 }
             },
@@ -175,12 +175,12 @@
                     navigator.clipboard.writeText($(this).attr('data-share-url')).then(() => {
                         
                         $(this).find('i').removeClass().addClass('fas fa-check text-success mr-3')
-                        $(this).find('.label').text('Copied to clipboard')
+                        $(this).find('.label').text(T('Copied to clipboard'))
                         
                     },() => {
                         
                         $(this).find('i').removeClass().addClass('fas fa-times text-warning mr-3')
-                        $(this).find('.label').text('Error')
+                        $(this).find('.label').text(T('Error'))
                         
                     })
 

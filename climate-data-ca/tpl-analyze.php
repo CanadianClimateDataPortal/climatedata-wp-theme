@@ -431,11 +431,11 @@
                         </div>
 
                       </div>
-											
+
 											<div id="analyze-field-decimals">
 												<div class="field validate-input type-number d-flex flex-wrap">
 													<label class="input-label w-100"><?php _e ( 'Decimal Places', 'cdc' ); ?></label>
-												
+
 													<div class="input-row w-50">
 														<div class="input-item">
 															<input type="number" class="form-control add-to-object" name="csv_precision" id="analyze-decimals" value="0" min="0" max="10">
@@ -871,6 +871,17 @@
                     </div>
 
                   </div>
+                    <div id="analyze-stations-field-decimals">
+                        <div class="field validate-input type-number d-flex flex-wrap">
+                            <label class="input-label w-100"><?php _e ( 'Decimal Places', 'cdc' ); ?></label>
+
+                            <div class="input-row w-50">
+                                <div class="input-item">
+                                    <input type="number" class="form-control add-to-object" name="csv_precision" id="analyze-stations-decimals" value="0" min="0" max="10">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
               </div>

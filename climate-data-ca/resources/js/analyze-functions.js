@@ -1613,142 +1613,142 @@
 
                 // PROJECTIONS
 
-            var valid_steps = [false, false, false, false]
+                var valid_steps = [false, false, false, false]
 
-            $('#analyze-steps .validate-input').each(function (i) {
+                $('#analyze-steps .validate-input').each(function (i) {
 
-                var current_accordion = $(this).closest('.accordion-content'),
-                    current_step = parseInt(current_accordion.attr('data-step')),
-                    is_valid = false,
-                    breadcrumb_val = '';
+                    var current_accordion = $(this).closest('.accordion-content'),
+                        current_step = parseInt(current_accordion.attr('data-step')),
+                        is_valid = false,
+                        breadcrumb_val = '';
 
-                if ($(this).hasClass('type-radio') || $(this).hasClass('type-checkbox')) {
+                    if ($(this).hasClass('type-radio') || $(this).hasClass('type-checkbox')) {
 
-                    if ($(this).find('.checked').length) {
+                        if ($(this).find('.checked').length) {
+
+                            is_valid = true
+
+                            // set breadcrumb
+
+                            if (current_accordion.find('.checked').length > 1) {
+                                breadcrumb_val = current_accordion.find('.checked').length + ' selected';
+                            } else {
+                                breadcrumb_val = current_accordion.find('.checked').find('.form-check-label').text();
+                            }
+                            let selected_count;
+
+                            if (current_step == 2) {
+                                if ($('input[name="analyze-location"]:checked').val() == 'grid') {
+                                    selected_count = selectedGrids.length;
+                                } else {
+                                    selected_count = sector_select_by_id !== undefined ? 1 : 0;
+                                }
+                                breadcrumb_val = '<span class="grid-count">' + selected_count + '</span> ' + breadcrumb_val
+                            }
+
+                        }
+
+                    } else if ($(this).hasClass('type-select')) {
 
                         is_valid = true
 
                         // set breadcrumb
 
-                        if (current_accordion.find('.checked').length > 1) {
-                            breadcrumb_val = current_accordion.find('.checked').length + ' selected';
-                        } else {
-                            breadcrumb_val = current_accordion.find('.checked').find('.form-check-label').text();
-                        }
-                        let selected_count;
-
-                        if (current_step == 2) {
-                            if ($('input[name="analyze-location"]:checked').val() == 'grid') {
-                                selected_count = selectedGrids.length;
-                            } else {
-                                selected_count = sector_select_by_id  !== undefined ? 1 : 0;
+                        current_accordion.find('select').each(function (i) {
+                            if (i != 0) {
+                                breadcrumb_val += ' – ';
                             }
-                            breadcrumb_val = '<span class="grid-count">' + selected_count + '</span> ' + breadcrumb_val
+                            breadcrumb_val += $(this).val()
+                        });
+
+                        $(this).find('select').each(function () {
+                            if ($(this).val() == '') {
+                                is_valid = false;
+                                breadcrumb_val = ''
+                            }
+                        })
+                    }
+
+                    if (is_valid == true) {
+
+                        // activate next tab
+
+                        current_accordion.prev('.accordion-head').attr('data-valid', true)
+                        current_accordion.next('.accordion-head').removeClass('ui-state-disabled')
+
+                        // set text & show step
+                        $('#analyze-breadcrumb [data-step="' + current_step + '"]').addClass('on').find('.value').html(breadcrumb_val)
+
+                        // if step 3 is valid, also enable step 5
+
+                        // show the header
+                        $('#analyze-header').addClass('on')
+
+                        valid_steps[i] = true
+
+                    } else {
+
+                        $(this).closest('.accordion-content').prev('.accordion-head').attr('data-valid', false)
+                        $(this).closest('.accordion-content').nextAll('.accordion-head').addClass('ui-state-disabled')
+
+                        //
+                        $('#analyze-breadcrumb [data-step="' + current_step + '"]').removeClass('on')
+
+
+                        $('#analyze-breadcrumb .step[data-step="' + current_step + '"]').nextAll('.step').removeClass('on')
+
+                        //           console.log(i, $(this))
+
+                        if (i != valid_steps.length) {
+                            for (z = i; z >= valid_steps.length; z += 1) {
+                                valid_steps[z] = false
+                            }
                         }
+
+                        return false
 
                     }
 
-                } else if ($(this).hasClass('type-select')) {
+                });
 
-                    is_valid = true
+                // step 5 - advanced
 
-                    // set breadcrumb
+                if (
+                    valid_steps[0] == true &&
+                    valid_steps[1] == true &&
+                    valid_steps[2] == true &&
+                    valid_steps[3] == true
+                ) {
 
-                    current_accordion.find('select').each(function (i) {
-                        if (i != 0) {
-                            breadcrumb_val += ' – ';
+                    options_val = ''
+
+                    $('.accordion-content[data-step="5"] .tree').each(function (i) {
+
+                        if ($(this).find('.checked').length > 0) {
+
+                            var this_label = $(this).prev('.select-all').find('.form-check-label').text()
+
+                            if ($(this).find('.checked').length == 1) {
+                                this_label = this_label.slice(0, -1)
+                            }
+
+                            if (i != 0) {
+                                options_val += ' | '
+                            }
+
+                            options_val += $(this).find('.checked').length + ' ' + this_label
+
                         }
-                        breadcrumb_val += $(this).val()
-                    });
 
-                    $(this).find('select').each(function () {
-                        if ($(this).val() == '') {
-                            is_valid = false;
-                            breadcrumb_val = ''
-                        }
                     })
-                }
 
-                if (is_valid == true) {
-
-                    // activate next tab
-
-                    current_accordion.prev('.accordion-head').attr('data-valid', true)
-                    current_accordion.next('.accordion-head').removeClass('ui-state-disabled')
-
-                    // set text & show step
-                    $('#analyze-breadcrumb [data-step="' + current_step + '"]').addClass('on').find('.value').html(breadcrumb_val)
-
-                    // if step 3 is valid, also enable step 5
-
-                    // show the header
-                    $('#analyze-header').addClass('on')
-
-                    valid_steps[i] = true
-
-                } else {
-
-                    $(this).closest('.accordion-content').prev('.accordion-head').attr('data-valid', false)
-                    $(this).closest('.accordion-content').nextAll('.accordion-head').addClass('ui-state-disabled')
-
-                    //
-                    $('#analyze-breadcrumb [data-step="' + current_step + '"]').removeClass('on')
-
-
-                    $('#analyze-breadcrumb .step[data-step="' + current_step + '"]').nextAll('.step').removeClass('on')
-
-                    //           console.log(i, $(this))
-
-                    if (i != valid_steps.length) {
-                        for (z = i; z >= valid_steps.length; z += 1) {
-                            valid_steps[z] = false
-                        }
+                    if (options_val != '') {
+                        $('#analyze-breadcrumb [data-step="5"]').addClass('on').find('.value').text(options_val)
+                    } else {
+                        $('#analyze-breadcrumb [data-step="5"]').removeClass('on')
                     }
 
-                    return false
-
                 }
-
-            });
-
-            // step 5 - advanced
-
-            if (
-                valid_steps[0] == true &&
-                valid_steps[1] == true &&
-                valid_steps[2] == true &&
-                valid_steps[3] == true
-            ) {
-
-                options_val = ''
-
-                $('.accordion-content[data-step="5"] .tree').each(function (i) {
-
-                    if ($(this).find('.checked').length > 0) {
-
-                        var this_label = $(this).prev('.select-all').find('.form-check-label').text()
-
-                        if ($(this).find('.checked').length == 1) {
-                            this_label = this_label.slice(0, -1)
-                        }
-
-                        if (i != 0) {
-                            options_val += ' | '
-                        }
-
-                        options_val += $(this).find('.checked').length + ' ' + this_label
-
-                    }
-
-                })
-
-                if (options_val != '') {
-                    $('#analyze-breadcrumb [data-step="5"]').addClass('on').find('.value').text(options_val)
-                } else {
-                    $('#analyze-breadcrumb [data-step="5"]').removeClass('on')
-                }
-
-            }
 
             } else if (current_tab == 'analyze-stations') {
 
@@ -2065,6 +2065,12 @@
                 var is_valid = true;
 
                 stations_form_inputs = $.extend(true, {}, stations_default_inputs);
+
+                if ($('#analyze-stations-format-csv').prop('checked') == true) {
+                    $('#analyze-stations-field-decimals').show()
+                } else {
+                    $('#analyze-stations-field-decimals').hide().find(':input').val(2)
+                }
 
                 // CHECK INPUTS THAT NEED TO BE ADDED
                 // TO THE REQUEST OBJECT

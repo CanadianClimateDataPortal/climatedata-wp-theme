@@ -825,7 +825,6 @@
                             HighlightSectorById(e.layer.properties.id, e, analyzeLayer, e.layer.properties[l10n_labels.label_field]);
 
                             validate_inputs();
-
                         }).addTo(maps['analyze']);
                         resolve("Sector protobuf initialzed!")
                     }, 200)
@@ -1609,11 +1608,8 @@
 
         function validate_steps() {
 
-            // console.log('validate steps', current_tab)
-
             if (current_tab == 'analyze-projections') {
 
-                    // PROJECTIONS
 
                 var valid_steps = [false, false, false, false]
 
@@ -1643,7 +1639,7 @@
                                 if ($('input[name="analyze-location"]:checked').val() == 'grid') {
                                     selected_count = selectedGrids.length;
                                 } else {
-                                    selected_count = sector_select_by_id  !== undefined ? 1 : 0;
+                                    selected_count = sector_select_by_id !== undefined ? 1 : 0;
                                 }
                                 breadcrumb_val = '<span class="grid-count">' + selected_count + '</span> ' + breadcrumb_val
                             }
@@ -2067,6 +2063,12 @@
 
                 stations_form_inputs = $.extend(true, {}, stations_default_inputs);
 
+                if ($('#analyze-stations-format-csv').prop('checked') == true) {
+                    $('#analyze-stations-field-decimals').show()
+                } else {
+                    $('#analyze-stations-field-decimals').hide().find(':input').val(2)
+                }
+
                 // CHECK INPUTS THAT NEED TO BE ADDED
                 // TO THE REQUEST OBJECT
 
@@ -2276,11 +2278,11 @@
                         }
                     });
                 }
-                // not implemented yet in Finch
-                //stations_form_obj['inputs'].push({
-                //    'id': 'output_name',
-                //    'data': submit_url_var + output_name_suffix
-                //});
+
+                stations_form_obj['inputs'].push({
+                    'id': 'output_name',
+                    'data': submit_url_var + output_name_suffix
+                });
 
 
                 // email

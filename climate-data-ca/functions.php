@@ -107,6 +107,7 @@ function child_theme_enqueue()
     wp_register_script('archive-functions', $child_js_dir . 'archive-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('case-study-functions', $child_js_dir . 'case-study-functions.js', array('jquery', 'child-functions', 'map-renderer', 'renderer'), NULL, true);
     wp_register_script('training-functions', $child_js_dir . 'training-functions.js', array('jquery', 'child-functions' ), NULL, true);
+    wp_register_script('iframe-functions', $child_js_dir . 'iframe-functions.js', array('jquery', 'child-functions'), NULL, true);
 
     // VENDOR
 

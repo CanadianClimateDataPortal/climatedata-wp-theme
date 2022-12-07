@@ -9,8 +9,11 @@
         //     console.log($('.bk-root'));
 
         //     console.log(e.target.contentWindow.document);
-            
         // });
+
+        $(window).on("message onmessage", function(e) {
+            console.log(e.originalEvent.data);
+        });
 
 
         // function checkIframeLoaded() {

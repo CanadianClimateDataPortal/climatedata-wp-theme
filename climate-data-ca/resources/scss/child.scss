@@ -347,6 +347,27 @@ body {
   }
 }
 
+#hero-btns {
+  
+    h6 {
+      font-size: 1.2rem;
+    }
+  
+    .rounded-pill {
+      font-size: 1.4rem;
+    }
+    
+    .tts-btn {
+      cursor: pointer;
+      
+      i {
+        font-size: 1rem;
+        margin-right: 0.75rem;
+      }
+    }
+  
+}
+
 //
 // HOME
 //

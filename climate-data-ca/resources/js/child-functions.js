@@ -751,6 +751,120 @@ function getIDFLinks(station_id, target, css_class) {
             $(document).renderer();
         }
         //console.log('end of child-functions');
+        
+        //
+        // TEXT TO SPEECH
+        //
+        
+        if ($('#speak-btn').length) {
+            
+            let speech_init = false,
+                speech_loaded = false,
+                speech_started = false,
+                speech_playing = false,
+                speech_play_text = $('#speak-btn').attr('data-play-text'),
+                speech_pause_text = $('#speak-btn').attr('data-pause-text'),
+                text_to_speak = ''
+                
+            $('body').addClass('spinner-on')
+            
+            EasySpeech.init({ maxTimeout: 5000, interval: 250 })
+                .then(function() {
+                    
+                    speech_init = true
+                    
+                    $('.page-section:not(.first-section)').each(function() {
+                        
+                        text_to_speak += $(this).text()
+                        
+                    })
+                    
+                    speech_loaded = true
+                    
+                    $('body').removeClass('spinner-on')
+                    
+                    // console.log('easy-speech initialized')
+                    
+                })
+                .catch(function(e) {
+                    console.error(e)
+                    $('body').removeClass('spinner-on')
+                })
+        
+            $('#speak-btn').click(function() {
+                
+                // check for initialization
+                
+                if (
+                    speech_init == true && 
+                    speech_loaded == true
+                ) {
+                    
+                    if (speech_playing == true) {
+                        
+                        // speech is currently playing
+                        
+                        // console.log('pause')
+                        
+                        EasySpeech.pause()
+                        speech_playing = false
+                        
+                        $('#speak-btn').removeClass('active')
+                        $('#speak-btn i').removeClass('fa-pause').addClass('fa-play')
+                        $('#speak-btn span').text(speech_play_text)
+                        
+                    } else {
+                        
+                        // speech is not currently playing
+                        
+                        if (speech_started == true) {
+                            
+                            // speech has been started,
+                            // so resume
+                        
+                            // console.log('resume')
+                            
+                            EasySpeech.resume()
+                            speech_playing = true
+                            
+                        } else {
+                        
+                            // play for the first time
+                            
+                            // console.log('play')
+                            
+                            EasySpeech.speak({
+                                text: text_to_speak
+                            })
+                            
+                            speech_started = true
+                            speech_playing = true
+                            
+                            $('#restart-btn').fadeIn(150)
+                            
+                        }
+                        
+                        
+                        $('#speak-btn').addClass('active')
+                        $('#speak-btn i').removeClass('fa-play').addClass('fa-pause')
+                        $('#speak-btn span').text(speech_pause_text)
+                    }
+                    
+                }
+                 
+            })
+            
+            $('#restart-btn').click(function() {
+            
+                EasySpeech.cancel()
+                
+                EasySpeech.speak({
+                    text: text_to_speak
+                })
+            
+            })
+            
+        }
 
     });
 })(jQuery);

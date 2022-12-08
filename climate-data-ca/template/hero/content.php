@@ -28,13 +28,13 @@
 		<form action="https://climatedata.us1.list-manage.com/subscribe/post?u=c52e1be341cba7905716a66b4&amp;id=727cebaf22" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
 			<div id="mc_embed_signup_scroll">
 
-				<label for="mce-EMAIL" class="sr-only">Email Address</label>
+				<label for="mce-EMAIL" class="sr-only"><?php _e('Email Address', 'cdc'); ?></label>
 
 				<div class="input-group mc-field-group">
-					<input type="email" value="" name="EMAIL" class="required email form-control form-control-lg" id="mce-EMAIL" placeholder="Enter your email address">
+					<input type="email" value="" name="EMAIL" class="required email form-control form-control-lg" id="mce-EMAIL" placeholder="<?php _e('Enter your email address', 'cdc'); ?>">
 
 					<div class="input-group-append">
-						<input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="btn btn-secondary">
+						<input type="submit" value="<?php _e('Subscribe', 'cdc'); ?>" name="subscribe" id="mc-embedded-subscribe" class="btn btn-secondary">
 					</div>
 				</div>
 

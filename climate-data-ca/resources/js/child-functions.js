@@ -762,9 +762,11 @@ function getIDFLinks(station_id, target, css_class) {
                 speech_loaded = false,
                 speech_started = false,
                 speech_playing = false,
+                speech_options = {
+                    text: ''
+                },
                 speech_play_text = $('#speak-btn').attr('data-play-text'),
-                speech_pause_text = $('#speak-btn').attr('data-pause-text'),
-                text_to_speak = ''
+                speech_pause_text = $('#speak-btn').attr('data-pause-text')
                 
             $('body').addClass('spinner-on')
             
@@ -775,7 +777,7 @@ function getIDFLinks(station_id, target, css_class) {
                     
                     $('.page-section:not(.first-section)').each(function() {
                         
-                        text_to_speak += $(this).text()
+                        speech_options.text += $(this).text()
                         
                     })
                     
@@ -784,6 +786,24 @@ function getIDFLinks(station_id, target, css_class) {
                     $('body').removeClass('spinner-on')
                     
                     // console.log('easy-speech initialized')
+                    
+                    if (current_lang == 'fr') {
+                        
+                        let found_voice = false
+                            
+                        // grab the first available french voice
+                        
+                        EasySpeech.voices().forEach(function(voice, i) {
+                            
+                            if (found_voice == false && voice.lang.includes('fr')) {
+                                speech_options.voice = voice
+                                speech_options.rate = 0.7
+                                found_voice = true
+                            }
+                            
+                        })
+                        
+                    }
                     
                 })
                 .catch(function(e) {
@@ -833,9 +853,7 @@ function getIDFLinks(station_id, target, css_class) {
                             
                             // console.log('play')
                             
-                            EasySpeech.speak({
-                                text: text_to_speak
-                            })
+                            EasySpeech.speak(speech_options)
                             
                             speech_started = true
                             speech_playing = true
@@ -858,9 +876,7 @@ function getIDFLinks(station_id, target, css_class) {
             
                 EasySpeech.cancel()
                 
-                EasySpeech.speak({
-                    text: text_to_speak
-                })
+                EasySpeech.speak(speech_options)
             
             })
             

@@ -363,6 +363,12 @@ body {
   }
 }
 
+#mc_embed_signup {
+	@include media-breakpoint-up(lg) {
+		width: 80%;
+	}
+}
+
 #home-logos {
   background-color: $white;
 

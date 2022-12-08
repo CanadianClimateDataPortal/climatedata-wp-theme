@@ -15,6 +15,12 @@ var chart_labels, legend_labels, l10n_labels;
 
 var l10n_table = {
     "fr": {
+
+        // share widget
+        "Copied to clipboard": "Copié dans le presse-papier",
+        "Error" : "Erreur",
+        "Copy link": "Copier le lien",
+
         "With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}":
             "Avec les paramètres actuels de fréquence et de format de donnée, le nombre maximal de points de grille par requête est de {0}",
         "Around {0} grid boxes selected" : "Environ {0} points de grille sélectionnés"
@@ -708,44 +714,48 @@ function getIDFLinks(station_id, target, css_class) {
             //console.log('listnav');
         }
 
-				// SHARE
-
-				if ($('#share').length) {
-
-					window.fbAsyncInit = function() {
-				    FB.init({
-				      appId            : '387199319682000',
-				      autoLogAppEvents : true,
-				      xfbml            : true,
-				      version          : 'v13.0'
-				    });
-				  };
-
-					$('#share').share_widget({
-					  site_url: '//' + window.location.hostname,
-					  theme_dir: child_theme_dir,
-					  share_url: window.location.href,
-					  title: document.title,
-					  elements: {
-					    facebook: {
-					      display: true,
-					      icon: 'fab fa-facebook mr-3'
-					    },
-					    twitter: {
-					      display: true,
-					      icon: 'fab fa-twitter mr-3',
-					      text: null,
-					      via: null
-					    },
-							linkedin: {
-								display: true,
-								icon: 'fab fa-linkedin mr-3'
-							}
-					  },
-					  callback: null // callback function
-					})
-
-				}
+        // SHARE
+        
+        if ($('#share').length) {
+        
+            window.fbAsyncInit = function() {
+                FB.init({
+                    appId            : '387199319682000',
+                    autoLogAppEvents : true,
+                    xfbml            : true,
+                    version          : 'v13.0'
+                });
+            };
+            
+            $('#share').share_widget({
+                site_url: '//' + window.location.hostname,
+                theme_dir: child_theme_dir,
+                share_url: window.location.href,
+                title: document.title,
+                elements: {
+                    facebook: {
+                        display: true,
+                        icon: 'fab fa-facebook mr-3'
+                    },
+                    twitter: {
+                        display: true,
+                        icon: 'fab fa-twitter mr-3',
+                        text: null,
+                        via: null
+                    },
+                    linkedin: {
+                        display: true,
+                        icon: 'fab fa-linkedin mr-3'
+                    },
+                    permalink: {
+                        display: true,
+                        icon: 'fas fa-share-alt mr-3'
+                    }
+                },
+                callback: null // callback function
+            })
+        
+        }
 
         if (typeof $.fn.renderer !== 'undefined' && $('.renderable').length) {
             $(document).renderer();

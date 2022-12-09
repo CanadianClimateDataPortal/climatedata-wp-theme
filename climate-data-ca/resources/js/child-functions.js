@@ -756,128 +756,103 @@ function getIDFLinks(station_id, target, css_class) {
         // TEXT TO SPEECH
         //
         
-        if ($('#speak-btn').length) {
+        if ($('#tts-speak').length) {
             
-            let speech_init = false,
-                speech_loaded = false,
-                speech_started = false,
-                speech_playing = false,
-                speech_options = {
-                    text: ''
-                },
-                speech_play_text = $('#speak-btn').attr('data-play-text'),
-                speech_pause_text = $('#speak-btn').attr('data-pause-text')
+            // chrome bug - clear speech queue on load
+            // or it will keep playing stuff from the
+            // previous page
+            
+            window.speechSynthesis.cancel()
+            
+            var use_voice,
+                found_voice = false
+            
+            if ('speechSynthesis' in window) {
+            } else {
+                $('#hero-tts').hide()
+            }
+            
+            function loadVoices() {
                 
-            $('body').addClass('spinner-on')
+                if (use_voice == null) {
+                    
+                    speechSynthesis.getVoices().forEach(function(voice) {
+                        
+                        if (
+                            found_voice == false && 
+                            voice.lang.includes(current_lang)
+                        ) {
+                            use_voice = voice
+                            found_voice = true
+                        }
+                        
+                  })
+                  
+              }
+              
+            }
             
-            EasySpeech.init({ maxTimeout: 5000, interval: 250 })
-                .then(function() {
+            loadVoices()
+            
+            // async for chrome
+            window.speechSynthesis.onvoiceschanged = function(e) {
+              loadVoices()
+            }
+            
+            // play/pause functions
+            
+            function speak() {
+                
+                if (window.speechSynthesis.speaking) {
                     
-                    speech_init = true
+                    window.speechSynthesis.resume()
                     
+                } else {
+                    
+                    var msg = new SpeechSynthesisUtterance()
+                    
+                    msg.text = ''
+                        
                     $('.page-section:not(.first-section)').each(function() {
                         
-                        speech_options.text += $(this).text()
+                        msg.text += $(this).text()
                         
                     })
                     
-                    speech_loaded = true
+                    msg.volume = 1
+                    msg.rate = 1
+                    msg.pitch = 1
+                    msg.voice = use_voice 
                     
-                    $('body').removeClass('spinner-on')
-                    
-                    // console.log('easy-speech initialized')
+                    // adjust for FR
                     
                     if (current_lang == 'fr') {
-                        
-                        let found_voice = false
-                            
-                        // grab the first available french voice
-                        
-                        EasySpeech.voices().forEach(function(voice, i) {
-                            
-                            if (found_voice == false && voice.lang.includes('fr')) {
-                                speech_options.voice = voice
-                                speech_options.rate = 0.7
-                                found_voice = true
-                            }
-                            
-                        })
-                        
+                        msg.rate = 0.7
                     }
                     
-                })
-                .catch(function(e) {
-                    console.error(e)
-                    $('body').removeClass('spinner-on')
-                })
-        
-            $('#speak-btn').click(function() {
-                
-                // check for initialization
-                
-                if (
-                    speech_init == true && 
-                    speech_loaded == true
-                ) {
-                    
-                    if (speech_playing == true) {
-                        
-                        // speech is currently playing
-                        
-                        // console.log('pause')
-                        
-                        EasySpeech.pause()
-                        speech_playing = false
-                        
-                        $('#speak-btn').removeClass('active')
-                        $('#speak-btn i').removeClass('fa-pause').addClass('fa-play')
-                        $('#speak-btn span').text(speech_play_text)
-                        
-                    } else {
-                        
-                        // speech is not currently playing
-                        
-                        if (speech_started == true) {
-                            
-                            // speech has been started,
-                            // so resume
-                        
-                            // console.log('resume')
-                            
-                            EasySpeech.resume()
-                            speech_playing = true
-                            
-                        } else {
-                        
-                            // play for the first time
-                            
-                            // console.log('play')
-                            
-                            EasySpeech.speak(speech_options)
-                            
-                            speech_started = true
-                            speech_playing = true
-                            
-                            $('#restart-btn').fadeIn(150)
-                            
-                        }
-                        
-                        
-                        $('#speak-btn').addClass('active')
-                        $('#speak-btn i').removeClass('fa-play').addClass('fa-pause')
-                        $('#speak-btn span').text(speech_pause_text)
-                    }
+                    window.speechSynthesis.speak(msg)
                     
                 }
-                 
+                
+                $('body').removeClass('spinner-on')
+                
+                $('#tts-pause').removeClass('disabled')
+                
+            }
+            
+            function pause() {
+                window.speechSynthesis.pause()
+            }
+
+            $('#tts-speak').click(function() {
+                
+                speak()
+                
             })
             
-            $('#restart-btn').click(function() {
-            
-                EasySpeech.cancel()
-                
-                EasySpeech.speak(speech_options)
-            
+            $('#tts-pause').click(function() {
+                pause()
+                $(this).addClass('disabled')
             })
             
         }

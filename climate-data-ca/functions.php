@@ -99,7 +99,7 @@ function child_theme_enqueue()
     // SCRIPTS
     //
 
-    wp_register_script('child-functions', $child_js_dir . 'child-functions.js', array('jquery', 'global-functions', 'easy-speech-bundle'), NULL, true);
+    wp_register_script('child-functions', $child_js_dir . 'child-functions.js', array('jquery', 'global-functions'), NULL, true);
     wp_register_script('location-functions', $child_js_dir . 'location-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('variable-functions', $child_js_dir . 'variable-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('slr-functions', $child_js_dir . 'slr-functions.js', array('jquery', 'child-functions'), NULL, true);
@@ -114,8 +114,6 @@ function child_theme_enqueue()
     wp_register_script('js-cookie', $bower_dir . 'js-cookie/src/js.cookie.js', NULL, true);
     
     wp_register_script('listnav', $bower_dir . 'pe-listnav/jquery-listnav.js', NULL, NULL, true);
-    
-    wp_register_script ( 'easy-speech-bundle', $child_theme_dir . 'resources/vendor/easy-speech/docs/bundle.js', null, null, true );
 
     // highcharts
 

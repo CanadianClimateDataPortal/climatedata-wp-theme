@@ -92,19 +92,36 @@
             
         ?>
     
-        <div class="d-flex align-items-center">
+        <div id="hero-tts" class="d-flex align-items-center">
             
             <h6 class="mb-0 all-caps">Speak</h6>
             
-            <div id="speak-btn" class="tts-btn btn btn-outline-secondary rounded-pill text-white ml-4 py-2 px-4" data-play-text="<?php _e ( 'Play', 'cdc' ); ?>" data-pause-text="<?php _e ( 'Pause', 'cdc' ); ?>">
-                <i class="fas fa-play"></i>
-                <span><?php _e ( 'Play' ); ?></span>
+            <div class="btn-group ml-4" role="group">
+              <button id="tts-speak" type="button" class="tts-btn btn btn-outline-secondary">
+                  <i class="fas fa-play"></i>
+                  <span class="text-white"><?php _e ( 'Play', 'cdc' ); ?></span>
+              </button>
+              
+              <button id="tts-pause" type="button" class="tts-btn btn btn-outline-secondary disabled">
+                  <i class="fas fa-pause"></i>
+                  <span class="text-white"><?php _e ( 'Pause', 'cdc' ); ?></span>
+              </button>
             </div>
             
-            <div id="restart-btn" class="tts-btn btn btn-outline-secondary rounded-pill text-white ml-4 py-2 px-4" style="display: none;">
+            <!-- <div id="speak-btn" class="tts-btn btn btn-outline-secondary rounded-pill text-white ml-4 py-2 px-4">
+                <i class="fas fa-play"></i>
+                <span><?php _e ( 'Play', 'cdc' ); ?></span>
+            </div>
+            
+            <div id="pause-btn" class="tts-btn btn btn-outline-secondary rounded-pill text-white ml-4 py-2 px-4">
+                <i class="fas fa-play"></i>
+                <span><?php _e ( 'Pause', 'cdc' ); ?></span>
+            </div> -->
+            
+            <!-- <div id="restart-btn" class="tts-btn btn btn-outline-secondary rounded-pill text-white ml-4 py-2 px-4" style="display: none;">
                 <i class="fas fa-redo fa-flip-horizontal"></i>
                 <span><?php _e ( 'Restart', 'cdc' ); ?></span>
-            </div>
+            </div> -->
             
         </div>
         

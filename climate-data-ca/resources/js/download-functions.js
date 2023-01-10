@@ -923,10 +923,15 @@
             switch ($('input[name="download-select"]:checked').val()) {
                 case 'gridded':
                     maps['variable'].pm.disableDraw();
+                    $('.labels-gridded').show();
+                    $('.labels-bbox').hide();
                     break;
 
                 case 'bbox':
                     maps['variable'].pm.enableDraw('Rectangle', {});
+                    $('.labels-gridded').hide();
+                    $('.labels-bbox').show();
+
                     break;
             }
 

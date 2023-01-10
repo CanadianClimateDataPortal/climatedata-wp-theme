@@ -72,6 +72,13 @@ if (have_posts()) : while (have_posts()) : the_post();
                             <div class="overlay-scenarios">
                                 <form class="form-inline" action="<?php echo $var_url; ?>">
                                     <input type="hidden" name="var" value="<?php the_field('var_name'); ?>">
+                                    <?php
+                                    if (in_array(get_field('var_name'), ['spei_12m', 'spei_3m'])) {
+                                    ?>
+                                        <input type="hidden" name="mora" value="sep">
+                                    <?php
+                                    }
+                                    ?>
 
                                     <div class="d-lg-flex justify-content-around align-items-center w-100">
                                         <div class="btn-group btn-group-toggle mb-5 mb-lg-0" data-toggle="buttons">

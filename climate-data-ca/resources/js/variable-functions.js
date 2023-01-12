@@ -631,7 +631,7 @@
 
                 e.layer.bindPopup(popup_markup(e.layer.feature.properties));
 
-                e.layer.bindPopup(getIDFLinks(e.layer.feature.properties.ID), {
+                e.layer.bindPopup(getIDFLinks(e.layer.feature.properties.ID, '.idfBody', 'variable-download-idf-curves'), {
                     maxWidth: 300
                 });
 
@@ -667,59 +667,7 @@
             set_datalayer_for_variable_download_IDFCurves("Variable_Download_IDF-Curves_" + idf_curves_text, idf_curves_href);
         });
 
-        function getIDFLinks(idf) {
 
-            var popup_labels = [
-                "Short Duration Rainfall Intensity−Duration−Frequency Data",
-                "Quantile",
-                "Return Level",
-                "Trend"
-            ];
-
-            if (current_lang == 'fr') {
-                popup_labels = [
-                    "Données sur l’intensité, la durée et la fréquence des chutes de pluie de courte durée",
-                    "Quantile",
-                    "Niveau de retour",
-                    "Tendance",
-                ];
-            }
-
-            $.getJSON(child_theme_dir + 'resources/app/run-frontend-sync/search_idfs.php?idf=' + idf, function (data) {
-
-                $('.idfBody').empty();
-                $.each(data, function (k, v) {
-                    linktext = v;
-
-
-                    if (v.includes("_A.pdf", 0) === true) {
-                        linktext = popup_labels[0] + " (PDF)";
-                    } else if (v.includes("_A.png", 0) === true) {
-                        linktext = popup_labels[0] + " (PNG)";
-                    } else if (v.includes(".txt", 0) === true) {
-                        linktext = popup_labels[0] + " (TXT)";
-                    } else if (v.includes("_qq.pdf", 0) === true) {
-                        linktext = popup_labels[1] + " (PDF)";
-                    } else if (v.includes("_qq.png", 0) === true) {
-                        linktext = popup_labels[1] + " (PNG)";
-                    } else if (v.includes("_r.pdf", 0) === true) {
-                        linktext = popup_labels[2] + " (PDF)";
-                    } else if (v.includes("_r.png", 0) === true) {
-                        linktext = popup_labels[2] + " (PNG)";
-                    } else if (v.includes("_t.pdf", 0) === true) {
-                        linktext = popup_labels[3] + " (PDF)";
-                    } else if (v.includes("_t.png", 0) === true) {
-                        linktext = popup_labels[3] + " (PNG)";
-                    } else if (v.includes(".pdf", 0) === true) {
-                        linktext = popup_labels[0] + " (PDF)";
-                    } else if (v.includes(".png", 0) === true) {
-                        linktext = popup_labels[0] + " (PNG)";
-                    }
-
-                    $('.idfBody').append('<li><a class="variable-download-idf-curves" href="' + v + '" target="_blank">' + linktext + '</a></li>');
-                });
-            });
-        };
 
         //
         // WEATHER STATIONS LAYER

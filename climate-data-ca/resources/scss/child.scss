@@ -363,6 +363,12 @@ body {
   }
 }
 
+#mc_embed_signup {
+	@include media-breakpoint-up(lg) {
+		width: 80%;
+	}
+}
+
 #home-logos {
   background-color: $white;
 
@@ -521,6 +527,7 @@ body {
 
 				.social-widget {
 					display: flex;
+					flex-wrap: wrap;
 					font-size: 1.4rem;
 					position: static;
 					width: auto;

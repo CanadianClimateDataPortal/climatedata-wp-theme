@@ -18,6 +18,12 @@ var l10n_table = {
         'All models': 'Tous les modèles',
         '{0} Median': '{0} médiane',
         '{0} Range': '{0} portée',
+
+        // share widget
+        "Copied to clipboard": "Copié dans le presse-papier",
+        "Error" : "Erreur",
+        "Copy link": "Copier le lien",
+
         "With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}":
             "Avec les paramètres actuels de fréquence et de format de donnée, le nombre maximal de points de grille par requête est de {0}",
         "Around {0} grid boxes selected" : "Environ {0} points de grille sélectionnés"
@@ -673,6 +679,21 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
 }
 
+/**
+ * get IDF links for station_id and output HTML content to target
+ * @param station_id ID of the IDF station
+ * @param target jquery selector to output the resulting content
+ * @param css_class CSS class to use for links
+ */
+function getIDFLinks(station_id, target, css_class) {
+    $.getJSON(child_theme_dir + 'resources/app/run-frontend-sync/search_idfs.php?idf=' + station_id, function (data) {
+        $(target).empty();
+        $.each(data, function (k, v) {
+            $(target).append('<li><a class="' + css_class + '" href="' + v.filename + '" target="_blank">' + v.label + '</a></li>');
+        });
+    });
+};
+
 (function ($) {
 
     $(function () {
@@ -1239,44 +1260,48 @@ function displayChartData(data, varDetails, download_url, query, container) {
             //console.log('listnav');
         }
 
-				// SHARE
-
-				if ($('#share').length) {
-
-					window.fbAsyncInit = function() {
-				    FB.init({
-				      appId            : '387199319682000',
-				      autoLogAppEvents : true,
-				      xfbml            : true,
-				      version          : 'v13.0'
-				    });
-				  };
-
-					$('#share').share_widget({
-					  site_url: '//' + window.location.hostname,
-					  theme_dir: child_theme_dir,
-					  share_url: window.location.href,
-					  title: document.title,
-					  elements: {
-					    facebook: {
-					      display: true,
-					      icon: 'fab fa-facebook mr-3'
-					    },
-					    twitter: {
-					      display: true,
-					      icon: 'fab fa-twitter mr-3',
-					      text: null,
-					      via: null
-					    },
-							linkedin: {
-								display: true,
-								icon: 'fab fa-linkedin mr-3'
-							}
-					  },
-					  callback: null // callback function
-					})
-
-				}
+        // SHARE
+        
+        if ($('#share').length) {
+        
+            window.fbAsyncInit = function() {
+                FB.init({
+                    appId            : '387199319682000',
+                    autoLogAppEvents : true,
+                    xfbml            : true,
+                    version          : 'v13.0'
+                });
+            };
+            
+            $('#share').share_widget({
+                site_url: '//' + window.location.hostname,
+                theme_dir: child_theme_dir,
+                share_url: window.location.href,
+                title: document.title,
+                elements: {
+                    facebook: {
+                        display: true,
+                        icon: 'fab fa-facebook mr-3'
+                    },
+                    twitter: {
+                        display: true,
+                        icon: 'fab fa-twitter mr-3',
+                        text: null,
+                        via: null
+                    },
+                    linkedin: {
+                        display: true,
+                        icon: 'fab fa-linkedin mr-3'
+                    },
+                    permalink: {
+                        display: true,
+                        icon: 'fas fa-share-alt mr-3'
+                    }
+                },
+                callback: null // callback function
+            })
+        
+        }
 
         if (typeof $.fn.renderer !== 'undefined' && $('.renderable').length) {
             $(document).renderer();

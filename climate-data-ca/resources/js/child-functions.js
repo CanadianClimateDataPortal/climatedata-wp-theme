@@ -16,6 +16,9 @@ var chart_labels, legend_labels, l10n_labels;
 var l10n_table = {
     "fr": {
         "Around {0} cells selected" : "Environ {0} cellules sélectionnées",
+        'All models': 'Tous les modèles',
+        '{0} Median': '{0} médiane',
+        '{0} Range': '{0} portée',
 
        // share widget
         "Copied to clipboard": "Copié dans le presse-papier",
@@ -277,21 +280,6 @@ function T(str) {
         return l10n_table[current_lang][str];
     }
 }
-
-/**
- * get IDF links for station_id and output HTML content to target
- * @param station_id ID of the IDF station
- * @param target jquery selector to output the resulting content
- * @param css_class CSS class to use for links
- */
-function getIDFLinks(station_id, target, css_class) {
-    $.getJSON(child_theme_dir + 'resources/app/run-frontend-sync/search_idfs.php?idf=' + station_id, function (data) {
-        $(target).empty();
-        $.each(data, function (k, v) {
-            $(target).append('<li><a class="' + css_class + '" href="' + v.filename + '" target="_blank">' + v.label + '</a></li>');
-        });
-    });
-};
 
 function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
     let gA4EventNameForVariableDownloadData = "";
@@ -699,6 +687,21 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
 
 }
+
+/**
+ * get IDF links for station_id and output HTML content to target
+ * @param station_id ID of the IDF station
+ * @param target jquery selector to output the resulting content
+ * @param css_class CSS class to use for links
+ */
+function getIDFLinks(station_id, target, css_class) {
+    $.getJSON(child_theme_dir + 'resources/app/run-frontend-sync/search_idfs.php?idf=' + station_id, function (data) {
+        $(target).empty();
+        $.each(data, function (k, v) {
+            $(target).append('<li><a class="' + css_class + '" href="' + v.filename + '" target="_blank">' + v.label + '</a></li>');
+        });
+    });
+};
 
 (function ($) {
 

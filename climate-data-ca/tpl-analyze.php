@@ -65,7 +65,7 @@
 
 		<ul class="navbar-nav tabs-nav w-100 justify-content-center">
 			<li class="nav-item"><a href="#analyze-projections" class="nav-link px-4 py-5 all-caps"><?php _e('Climate Projections', 'cdc'); ?></a></li>
-			<li class="nav-item"><a href="#analyze-stations" class="nav-link px-4 py-5 all-caps"><?php _e('Observations', 'cdc'); ?></a></li>
+			<li class="nav-item" style="display: none;"><a href="#analyze-stations" class="nav-link px-4 py-5 all-caps"><?php _e('Observations', 'cdc'); ?></a></li>
 		</ul>
 
 	</nav>

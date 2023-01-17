@@ -125,16 +125,15 @@
 
     <div class="form-layout-row row align-items-center">
         <p class="form-label-wrap col-10 col-sm-3 offset-1 mb-3 mb-sm-0">
-            <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">4</span> <label for="download-location" class="form-label"><?php _e('Select a location', 'cdc'); ?></label>
+            <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">4</span> <label for="download-location" class="form-label labels-gridded"><?php _e('Select a location', 'cdc'); ?></label>
+            <label for="download-location" class="form-label labels-bbox initially-hidden"><?php _e('Draw Custom Region', 'cdc'); ?></label>
         </p>
 
         <div class="form-select col-10 offset-1 col-sm-3 offset-sm-0 mb-3 mb-sm-0">
-            <!-- <input type="hidden" name="download-lat" id="download-lat"> -->
-            <!-- <input type="hidden" name="download-lon" id="download-lon"> -->
             <input type="hidden" name="download-coords" id="download-coords">
 
             <select class="custom-select custom-select-lg select2 form-control-lg rounded-pill border-dark text-center download-location" name="download-location" id="download-location" data-map="variable" data-dropdown-css-class="big-menu-dropdown" required>
-                <option value=""><?php _e('Search for a City/Town', 'cdc'); ?></option>
+                <option value=""><?php _e('Search for a City/Town to zoom to', 'cdc'); ?></option>
             </select>
 
 
@@ -142,28 +141,20 @@
         <div class="col-10  col-sm-1 mb-3 mb-sm-0">
         <a class="btn btn-primary text-white offset-1" id="download-clear" target="_blank"><?php _e('Clear selection', 'cdc'); ?></a>
         </div>
-        <p class="form-help col-2 col-sm-2 offset-1"><?php _e('Zoom in to the map to select at least one grid coordinate.', 'cdc'); ?></p>
-
+        <p class="form-help col-2 col-sm-2 offset-1 labels-gridded"><?php _e('Zoom in to the map and select at least one grid box.', 'cdc'); ?></p>
+        <p class="form-help col-2 col-sm-2 offset-1 labels-bbox initially-hidden"><?php _e('Zoom in to the map and draw a custom region.', 'cdc'); ?></p>
         <div id="download-map-variable-container" class="col-10 offset-1 col-lg-8 offset-lg-2 download-map-container">
             <div id="map-overlay">
                 <div id="map-overlay-content">
-                    <h4><?php _e('Zoom in to the map to select at least one grid coordinate.', 'cdc'); ?></h4>
+                    <h4 class="labels-gridded"><?php _e('Zoom in to the map and select at least one grid box.', 'cdc'); ?></h4>
+                    <h4 class="labels-bbox initially-hidden"><?php _e('Zoom in to the map and draw a custom region.', 'cdc'); ?></h4>
                     <span class="btn btn-outline-secondary rounded-pill"><?php _e('Dismiss', 'cdc'); ?></span>
                 </div>
 
             </div>
 
             <div id="download-map-variable" class="download-map"></div>
-            <!--
-                        <div style="position:absolute;right:0;width:200px;z-index:1000">
-                            <select id="gridselect" class="custom-select custom-select-md select2 form-control input-large select2-hidden-accessible">
-                                <option>Gridded Data</option>
-                                <option>Census subdivisions</option>
-                                <option>Health</option>
-                                <option>Watershed</option>
-                            </select>
-                        </div>
-            -->
+
         </div>
     </div>
 

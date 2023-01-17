@@ -133,7 +133,7 @@
             <input type="hidden" name="download-coords" id="download-coords">
 
             <select class="custom-select custom-select-lg select2 form-control-lg rounded-pill border-dark text-center download-location" name="download-location" id="download-location" data-map="variable" data-dropdown-css-class="big-menu-dropdown" required>
-                <option value=""><?php _e('Search for a City/Town to zoom in to', 'cdc'); ?></option>
+                <option value=""><?php _e('Search for a City/Town to zoom to', 'cdc'); ?></option>
             </select>
 
 

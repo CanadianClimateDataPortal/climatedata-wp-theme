@@ -65,7 +65,7 @@
 
 		<ul class="navbar-nav tabs-nav w-100 justify-content-center">
 			<li class="nav-item"><a href="#analyze-projections" class="nav-link px-4 py-5 all-caps"><?php _e('Climate Projections', 'cdc'); ?></a></li>
-			<li class="nav-item" style="display: none;"><a href="#analyze-stations" class="nav-link px-4 py-5 all-caps"><?php _e('Observations', 'cdc'); ?></a></li>
+			<li class="nav-item"><a href="#analyze-stations" class="nav-link px-4 py-5 all-caps"><?php _e('Observations', 'cdc'); ?></a></li>
 		</ul>
 
 	</nav>
@@ -605,7 +605,7 @@
 
     <div class="row">
 
-      <div id="analyze-stations-form" class="analyze-form col-3">
+        <div id="analyze-stations-form" class="analyze-form col-3">
 
         <form id="analyze-stations-form-inputs" class="analyze-form-inputs">
 
@@ -790,7 +790,7 @@
 
 									<div class="field validate-input type-radio d-flex flex-wrap">
                                         <p class="input-label w-100"><?php _e ( 'Missing Data Options', 'cdc' ); ?>
-                                                <i class="fas fa-question-circle ml-3 validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Placeholder for explaination', 'cdc' ); ?>"></i></h6></p>
+                                        <a href="#" id="missing-data-desc-icon" data-toggle="modal" data-target="#missing-data-desc" class="text-secondary"><i class="fas fa-question-circle ml-3 validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Placeholder for explanation', 'cdc' ); ?>"></i></a></p>
                                         <p class="value"></p>
                                             </p>
 
@@ -1065,6 +1065,22 @@
       </div>
       <div class="modal-body">
         <p><?php _e ( 'Your request has been submitted. The processed data will be sent to your email address shortly.', 'cdc' ); ?></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="missing-data-desc" tabindex="-1" role="dialog" aria-labelledby="missing-data-desc-icon" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle"><?php _e ( 'Missing Value Options', 'cdc' ); ?></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <?php the_field ( 'modal_missing_data' ); ?>
       </div>
     </div>
   </div>

@@ -790,7 +790,7 @@
 
 									<div class="field validate-input type-radio d-flex flex-wrap">
                                         <p class="input-label w-100"><?php _e ( 'Missing Data Options', 'cdc' ); ?>
-                                        <a href="#" id="missing-data-desc-icon" data-toggle="modal" data-target="#missing-data-desc" class="text-secondary"><i class="fas fa-question-circle ml-3 validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Placeholder for explanation', 'cdc' ); ?>"></i></a></p>
+                                        <a href="#" id="missing-data-desc-icon" data-toggle="modal" data-target="#missing-data-desc" class="text-secondary"><i class="fas fa-question-circle ml-3 validation-tooltip" data-toggle="tooltip" data-placement="bottom" title="<?php _e ( 'Click for explanation', 'cdc' ); ?>"></i></a></p>
                                         <p class="value"></p>
                                             </p>
 

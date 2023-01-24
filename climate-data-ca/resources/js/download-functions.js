@@ -477,20 +477,6 @@
 
         }
 
-        // Temporary disable CSV until finch is fixed
-        function toggle_csv() {
-            if ($('input[name="download-select"]:checked').val() == 'bbox' &&
-                $('#download-dataset').val() == 'daily') {
-
-                if ($('input[name="download-format"]:checked').val() == 'csv') {
-                    $('#format-label-netcdf').trigger('click');
-                }
-                $('#format-label-csv').hide();
-            } else {
-                $('#format-label-csv').show();
-            }
-        }
-
         function count_selected_gridcells() {
             let coords = $('#download-coords').val().split('|');
 
@@ -512,7 +498,7 @@
         function checkform() {
             $('#download-result').slideUp(125)
 
-            let freq = $('#download-dataset').val();
+            let freq = $('#download-frequency').val();
             let format = $('input[name="download-format"]:checked').val();
 
             let limit = get_download_limits(freq, format);
@@ -628,11 +614,12 @@
         });
 
         function process_download() {
+
             var selectedVar = $('#download-variable').val();
             let pointsData;
             dataLayerEventName = getGA4EventNameForVariableDataBCCAQv2();
 
-            month = $("#download-dataset").val();
+            month = $("#download-frequency").val();
             if (month === 'annual') {
                 month = 'ann'
             }
@@ -663,18 +650,19 @@
 
             }
             format = $('input[name="download-format"]:checked').val();
+            let dataset_name = $('input[name="download-dataset"]:checked').val();
             let format_extension = format;
 
             if (format == 'netcdf') {
                 format_extension = 'nc';
             }
 
-
             if (selectedVar !== 'all') {
                 $('body').addClass('spinner-on');
                 request_args = {
                     var: selectedVar,
                     month: month,
+                    dataset_name: dataset_name,
                     format: format
                 };
                 Object.assign(request_args, pointsData);
@@ -697,7 +685,7 @@
                 xhttp.send(JSON.stringify(request_args));
             } else {
                 // call download for all matching variables and build a zip file
-                selectedTimeStepCategory = $('#download-dataset').find(':selected').data('timestep');
+                selectedTimeStepCategory = $('#download-frequency').find(':selected').data('timestep');
                 varToProcess = [];
 
                 for (k in varData) {
@@ -718,6 +706,7 @@
                         request_args = {
                             var: varToProcess[i],
                             month: month,
+                            dataset_name: dataset_name,
                             format: format
                         };
                         Object.assign(request_args, pointsData);
@@ -760,7 +749,7 @@
         }
 
 
-        function buildVarDropdown(frequency, currentVar) {
+        function buildVarDropdown(frequency, currentVar, dataset) {
             $.ajax({
                 url: '/wp-json/acf/v3/variable/?per_page=10000&orderby=menu_order&order=asc',
                 dataType: 'json',
@@ -775,10 +764,13 @@
 
                             varData[sv.var_name] = sv;
 
-                            selectedTimeStepCategory = $('#download-dataset').find(':selected').data('timestep');
+                            selectedTimeStepCategory = $('#download-frequency').find(':selected').data('timestep');
 
 
-                            if ($.inArray(selectedTimeStepCategory, sv.timestep) !== -1) {
+                            // filter out variables not available for current timestep
+                            // and filter variables withtout delta from CMIP6
+                            if ($.inArray(selectedTimeStepCategory, sv.timestep) !== -1 &&
+                                !(sv.hasdelta !== undefined && sv.hasdelta === false && dataset == 'cmip6')) {
 
                                 if (sv.variable_type !== 'station_data') {
 
@@ -810,7 +802,7 @@
 
                         });
                     });
-                    if (selectedTimeStepCategory !== 'daily' && $('#download-dataset').val() != 'all') {
+                    if (selectedTimeStepCategory !== 'daily' && $('#download-frequency').val() != 'all') {
                         $('#download-variable').append("<optgroup id=optgroup_misc label='" + l10n_labels['misc'] + "'>");
                         $('#optgroup_misc').append(new Option(l10n_labels['allbccaq'], 'all', false, false));
                         varData['all'] = { 'grid': 'canadagrid' };
@@ -837,15 +829,13 @@
         }
 
 
-        $('#download-dataset').on('select2:select', function (e) {
+        $('#download-frequency').on('select2:select', function (e) {
             console.log('frequency changed');
             currentVar = $("#download-variable").val();
+            let selectedDataset = $('input[name="download-dataset"]:checked').val();
             $('#download-variable').empty();
 
-            buildVarDropdown(e.currentTarget.value, currentVar);
-
-            // Temporary disable CSV until finch is fixed
-            toggle_csv();
+            buildVarDropdown(e.currentTarget.value, currentVar, selectedDataset);
 
             if (e.currentTarget.value == 'daily') {
 
@@ -872,6 +862,15 @@
             }
         });
 
+        $('#selection-dataset input').on('change', function (e) {
+            console.log('dataset changed');
+            let currentVar = $("#download-variable").val();
+            let frequency = $('#download-frequency').val();
+            $('#download-variable').empty();
+
+            buildVarDropdown(frequency, currentVar, e.target.value);
+        });
+
         $('#daily-captcha_code').on('input', function (e) {
             checkform();
         });
@@ -895,10 +894,7 @@
                 maps['variable'].removeLayer(pbfLayer);
                 console.log("Adding Grid:" + curValData.grid);
                 addGrid(curValData.grid);
-                selectedGrids = [];
-                $('#download-coords').val('');
-                $('#download-location').val('');
-                $('#download-location').parent().find('.select2-selection__rendered').text(l10n_labels.search_city)
+                clear_var_selections();
             }
         });
 
@@ -918,7 +914,6 @@
         // selection type
         $('#selection-type input').on('change', function () {
             clear_var_selections();
-            toggle_csv();
 
             switch ($('input[name="download-select"]:checked').val()) {
                 case 'gridded':
@@ -1002,6 +997,7 @@
 
             let var_name = '';
             let submit_url = '';
+            let dataset_name = $('input[name="download-dataset"]:checked').val();
 
             switch ($('#download-variable').val()) {
 
@@ -1035,6 +1031,10 @@
                             "id": "output_format",
                             "data": $('input[name="download-format"]:checked').val()
                         },
+                        {
+                            "id": "dataset",
+                            "data": DATASETS[dataset_name].finch_name
+                        }
                     ],
                     "response": "document",
                     "notification_email": $('#daily-email').val(),
@@ -1846,7 +1846,7 @@
         }
 
         // run default builder on load
-        $('#download-dataset').val('annual').trigger('select2:select');
+        $('#download-frequency').val('annual').trigger('select2:select');
 
     });
 })(jQuery);

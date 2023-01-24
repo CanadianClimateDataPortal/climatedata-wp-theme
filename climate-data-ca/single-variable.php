@@ -82,11 +82,11 @@ if (have_posts()) : while (have_posts()) : the_post();
 
                                     <div class="d-lg-flex justify-content-around align-items-center w-100">
                                         <div class="btn-group btn-group-toggle mb-5 mb-lg-0" data-toggle="buttons">
-                                            <label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="rcp85" checked> <?php _e('High Emissions', 'cdc'); ?><br>(RCP 8.5) </label>
+                                            <label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="ssp585" checked> <?php _e('High Emissions', 'cdc'); ?><br>(SSP 5-8.5) </label>
 
-                                            <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="rcp45"> <?php _e('Moderate Emissions', 'cdc'); ?><br>(RCP 4.5) </label>
+                                            <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="ssp245"> <?php _e('Moderate Emissions', 'cdc'); ?><br>(SSP 2-4.5) </label>
 
-                                            <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="rcp26"> <?php _e('Low Emissions', 'cdc'); ?><br>(RCP 2.6) </label>
+                                            <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="ssp126"> <?php _e('Low Emissions', 'cdc'); ?><br>(SSP 1-2.6) </label>
                                         </div>
 
                                         <div class="d-flex justify-content-center d-lg-block" role="group" aria-label="">
@@ -342,14 +342,10 @@ if (have_posts()) : while (have_posts()) : the_post();
                 if (is_array($selected_place)) {
                     $location_name = $selected_place['geo_name'] . ', ' . short_province($selected_place['province']);
                 } else {
-
-                    if (isset ($_GET['station_name'])) {
-                        $location_name = $_GET['station_name'];
-                    } else {
-                        $location_name = 'Point';
-                    }
-
+                    $location_name = 'Point';
                 }
+
+                $dataset_name = arr_get($_GET, 'dataset_name', 'cmip6');
 
                 ?>
 
@@ -370,18 +366,18 @@ if (have_posts()) : while (have_posts()) : the_post();
 								<h6>Options:</h6>
 
 								<div class="form-check form-check-inline custom-control custom-radio">
-									<input class="custom-control-input" type="radio" id="chatoption1" name="chartoption" value="annual" checked>
-									<label class="custom-control-label pl-2" for="chatoption1"><?php _e('Annual values', 'cdc'); ?></label>
+									<input class="custom-control-input" type="radio" id="chartoption1-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="annual">
+									<label class="custom-control-label pl-2" for="chartoption1-<?php the_field('var_name'); ?>"><?php _e('Annual values', 'cdc'); ?></label>
 								</div>
 
 								<div class="form-check form-check-inline custom-control custom-radio">
-									<input class="custom-control-input" type="radio" id="chartoption2" name="chartoption" value="30y">
-									<label class="custom-control-label pl-2" for="chartoption2"><?php _e('30 year averages', 'cdc'); ?></label>
+									<input class="custom-control-input" type="radio" id="chartoption2-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="30y" checked>
+									<label class="custom-control-label pl-2" for="chartoption2-<?php the_field('var_name'); ?>"><?php _e('30 year averages', 'cdc'); ?></label>
 								</div>
 
 								<div class="form-check form-check-inline custom-control custom-radio">
-									<input class="custom-control-input" type="radio" id="chartoption3" name="chartoption" value="delta">
-									<label class="custom-control-label pl-2" for="chartoption3"><?php _e('30 year changes', 'cdc'); ?></label>
+									<input class="custom-control-input" type="radio" id="chartoption3-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="delta">
+									<label class="custom-control-label pl-2" for="chartoption3-<?php the_field('var_name'); ?>"><?php _e('30 year changes', 'cdc'); ?></label>
 								</div>
 
                                     <?php
@@ -412,6 +408,17 @@ if (have_posts()) : while (have_posts()) : the_post();
                                 </div>
                             </div>
                         </div>
+                        <div class="navbar chart-navbar d-flex align-items-center mb-5">
+                            <div class="nav-item flex-grow-1 d-flex">
+                                <div class="form-select col-10 offset-4 col-sm-4">
+                                    <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                                        <label class="btn btn-outline-primary <?php echo $dataset_name == 'cmip5'? 'active':'';?>" style="border-top-left-radius: 25px;border-bottom-left-radius: 25px;padding: 13px;"> <input type="radio" class="chart-dataset" autocomplete="off" value="cmip5" <?php echo $dataset_name == 'cmip5'? 'checked':'';?>>CMIP5</label>
+                                        <label class="btn btn-outline-primary <?php echo $dataset_name == 'cmip6'? 'active':'';?>" style="border-top-right-radius: 25px;border-bottom-right-radius: 25px;padding: 13px;"> <input type="radio" class="chart-dataset" autocomplete="off" value="cmip6" <?php echo $dataset_name == 'cmip6'? 'checked':'';?>>CMIP6</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
 
                         <div id="chart-placeholder" class="var-chart"></div>
                     </div>
@@ -524,6 +531,8 @@ if (have_posts()) : while (have_posts()) : the_post();
                     $location_name = 'Region';
                 }
 
+                $dataset_name = arr_get($_GET, 'dataset_name', 'cmip6');
+
                 ?>
 
                 <h2 class="overlay-title text-primary"><?php echo $location_name; ?></h2>
@@ -542,18 +551,18 @@ if (have_posts()) : while (have_posts()) : the_post();
                                     <h6>Options:</h6>
 
                                     <div class="form-check form-check-inline custom-control custom-radio">
-                                        <input class="custom-control-input" type="radio" id="chatoption1" name="chartoption" value="annual" checked>
-                                        <label class="custom-control-label pl-2" for="chatoption1"><?php _e('Annual values', 'cdc'); ?></label>
+                                        <input class="custom-control-input" type="radio" id="chartoption1-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="annual">
+                                        <label class="custom-control-label pl-2" for="chartoption1-<?php the_field('var_name'); ?>"><?php _e('Annual values', 'cdc'); ?></label>
                                     </div>
 
                                     <div class="form-check form-check-inline custom-control custom-radio">
-                                        <input class="custom-control-input" type="radio" id="chartoption2" name="chartoption" value="30y">
-                                        <label class="custom-control-label pl-2" for="chartoption2"><?php _e('30 year averages', 'cdc'); ?></label>
+                                        <input class="custom-control-input" type="radio" id="chartoption2-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="30y" checked>
+                                        <label class="custom-control-label pl-2" for="chartoption2-<?php the_field('var_name'); ?>"><?php _e('30 year averages', 'cdc'); ?></label>
                                     </div>
 
                                     <div class="form-check form-check-inline custom-control custom-radio">
-                                        <input class="custom-control-input" type="radio" id="chartoption3" name="chartoption" value="delta">
-                                        <label class="custom-control-label pl-2" for="chartoption3"><?php _e('30 year changes', 'cdc'); ?></label>
+                                        <input class="custom-control-input" type="radio" id="chartoption3-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="delta">
+                                        <label class="custom-control-label pl-2" for="chartoption3-<?php the_field('var_name'); ?>"><?php _e('30 year changes', 'cdc'); ?></label>
                                     </div>
                                         <?php
 
@@ -583,6 +592,17 @@ if (have_posts()) : while (have_posts()) : the_post();
                                 </div>
                             </div>
                         </div>
+                        <div class="navbar chart-navbar d-flex align-items-center mb-5">
+                            <div class="nav-item flex-grow-1 d-flex">
+                                <div class="form-select col-10 offset-4 col-sm-4">
+                                    <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                                        <label class="btn btn-outline-primary <?php echo $dataset_name == 'cmip5'? 'active':'';?>" style="border-top-left-radius: 25px;border-bottom-left-radius: 25px;padding: 13px;"> <input type="radio" class="chart-dataset" autocomplete="off" value="cmip5" <?php echo $dataset_name == 'cmip5'? 'checked':'';?>>CMIP5</label>
+                                        <label class="btn btn-outline-primary <?php echo $dataset_name == 'cmip6'? 'active':'';?>" style="border-top-right-radius: 25px;border-bottom-right-radius: 25px;padding: 13px;"> <input type="radio" class="chart-dataset" autocomplete="off" value="cmip6" <?php echo $dataset_name == 'cmip6'? 'checked':'';?>>CMIP6</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div id="chart-placeholder" class="var-chart"></div>
                     </div>
                 </div>
@@ -618,14 +638,63 @@ if (have_posts()) : while (have_posts()) : the_post();
             </div>
         </div>
 
-        <div class="row align-items-center var-chart-container">
-            <a href="#" class="btn btn-sm all-caps btn-outline-secondary rounded-pill chart-tour-trigger offset-1" data-tour="page-tour" data-container="<?php the_field('var_name'); ?>-chart"><?php _e('How to read this', 'cdc'); ?></a>
+        <div class="align-items-center var-chart-container">
+            <div class="navbar col-9 offset-1 chart-navbar d-flex align-items-center mb-5">
+                <div class="chart-delta nav-item flex-grow-1 d-flex">
+                    <?php
+
+                    if ( get_field ( 'hasdelta' ) ) {
+
+                        ?>
+                        <h6>Options:</h6>
+
+                        <div class="form-check form-check-inline custom-control custom-radio">
+                            <input class="custom-control-input" type="radio" id="chartoption1-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="annual">
+                            <label class="custom-control-label pl-2" for="chartoption1-<?php the_field('var_name'); ?>"><?php _e('Annual values', 'cdc'); ?></label>
+                        </div>
+
+                        <div class="form-check form-check-inline custom-control custom-radio">
+                            <input class="custom-control-input" type="radio" id="chartoption2-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="30y" checked>
+                            <label class="custom-control-label pl-2" for="chartoption2-<?php the_field('var_name'); ?>"><?php _e('30 year averages', 'cdc'); ?></label>
+                        </div>
+
+                        <div class="form-check form-check-inline custom-control custom-radio">
+                            <input class="custom-control-input" type="radio" id="chartoption3-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="delta">
+                            <label class="custom-control-label pl-2" for="chartoption3-<?php the_field('var_name'); ?>"><?php _e('30 year changes', 'cdc'); ?></label>
+                        </div>
+
+                        <?php
+
+                    }
+
+                    ?>
+                </div>
+                <div class="nav-item d-flex align-items-center mr-5">
+                <a href="#" class="btn btn-sm all-caps btn-outline-secondary rounded-pill chart-tour-trigger offset-5" data-tour="page-tour" data-container="<?php the_field('var_name'); ?>-chart"><?php _e('How to read this', 'cdc'); ?></a>
+                </div>
+                <div class="nav-item d-flex align-items-center mr-3">
+                    <h6><span class="cdc-icon icon-download-data"></span> <?php _e('Download data', 'cdc'); ?></h6>
+
+                    <div class="btn-group btn-group-sm" role="group">
+                        <a href="#" class="chart-export-data btn btn-sm btn-outline-secondary" data-type="csv">CSV</a>
+                    </div>
+                </div>
+
+                <div class="nav-item d-flex align-items-center">
+                    <h6><span class="cdc-icon icon-download-img"></span> <?php _e('Download image', 'cdc'); ?></h6>
+
+                    <div class="btn-group btn-group-sm" role="group">
+                        <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary " data-type="png">PNG</a> <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary" data-type="pdf">PDF</a>
+                    </div>
+                </div>
+
+            </div>
 
             <div id="<?php the_field('var_name'); ?>-chart" class="var-chart col-10 col-lg-9 offset-1 mb-5 mb-lg-0">
                 <h6 class="text-center"><?php _e('Loading chart data', 'cdc'); ?> …</h6>
             </div>
 
-            <div class="var-btn col-10 offset-1 col-md-5 offset-md-5 col-lg-2 offset-lg-0 col-2 text-center text-md-left text-lg-center">
+            <div class="var-btn text-center col-11">
                 <a href="<?php echo $var_url; ?>?var=<?php the_field('var_name'); ?>&geo-select=<?php echo $GLOBALS['vars']['current_data']['location_data']['geo_id']; ?>" class="btn rounded-pill btn-outline-secondary"><?php _e('View on map', 'cdc'); ?></a>
             </div>
         </div>
@@ -695,11 +764,11 @@ if (have_posts()) : while (have_posts()) : the_post();
                                         ?>
                                         <div class="d-lg-flex justify-content-around align-items-center w-100">
                                             <div class="btn-group btn-group-toggle mb-5 mb-lg-0" data-toggle="buttons">
-                                                <label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="rcp85" checked> <?php _e('High Emissions', 'cdc'); ?><br>(RCP 8.5) </label>
+                                                <label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="ssp585" checked> <?php _e('High Emissions', 'cdc'); ?><br>(SSP 5-8.5) </label>
 
-                                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="rcp45"> <?php _e('Moderate Emissions', 'cdc'); ?><br>(RCP 4.5) </label>
+                                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="ssp245"> <?php _e('Moderate Emissions', 'cdc'); ?><br>(SSP 2-4.5) </label>
 
-                                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="rcp26"> <?php _e('Low Emissions', 'cdc'); ?><br>(RCP 2.6) </label>
+                                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="ssp126"> <?php _e('Low Emissions', 'cdc'); ?><br>(SSP 1-2.6) </label>
                                             </div>
 
                                             <div class="d-flex justify-content-center d-lg-block" role="group" aria-label="">

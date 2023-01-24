@@ -63,7 +63,6 @@ function child_global_vars()
         $vars['current_data'] = array('type' => 'sector', 'id' => $query_string['sec']);
 
     }
-
 }
 
 add_action('wp', 'child_global_vars');

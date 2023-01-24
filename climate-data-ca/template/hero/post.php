@@ -67,6 +67,32 @@
 						<?php
 
 							}
+              
+              // tags
+              
+              $post_tags = get_the_terms ( get_the_ID(), 'post_tag' );
+              
+              if ( !empty ( $post_tags ) ) {
+                
+            ?>
+            
+            <h6><?php _e ( 'Tags', 'cdc' ); ?></h6>
+            
+            <p class="mb-4"><?php
+            
+                $i = 0;
+                
+                foreach ( $post_tags as $tag ) {
+                  if ( $i != 0 ) echo ', ';
+                  echo $tag->name;
+                  $i++;
+                }
+                
+            ?></p>
+            
+            <?php
+            
+              }
 
 						?>
 

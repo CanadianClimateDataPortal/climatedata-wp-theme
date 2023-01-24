@@ -162,6 +162,20 @@ function child_theme_enqueue()
         wp_enqueue_script('archive-functions');
 
     }
+    
+    if ( is_page ( 'news' ) ) {
+      
+      wp_register_script ( 'news-functions', $child_js_dir . 'news.js', array ( 'jquery' ), false, true );
+      
+      wp_localize_script ( 'news-functions', 'ajax_data',
+        array (
+          'url' => admin_url ( 'admin-ajax.php' )
+        )
+      );
+      
+      wp_enqueue_script ( 'news-functions' );
+      
+    }
 
   if ( is_singular ( 'case-study' ) || is_singular ( 'resource' ) ) {
 
@@ -532,3 +546,92 @@ add_filter ( 'custom_body_classes', function ( $classes ) {
 	return $classes;
 
 }, 100 );
+
+//
+// ADMIN AJAX
+//
+
+function news_filter() {
+  
+  $query_page = 1;
+  $query_tags = array();
+  
+  $query_args = array (
+    'post_type' => 'post',
+    'posts_per_page' => 12
+  );
+  
+  // tax_query
+  
+  if (
+    isset ( $_GET['tags'] ) &&
+    !empty ( $_GET['tags'] )
+  ) {
+    
+    $query_args['tax_query'] = array (
+      array (
+        'taxonomy' => 'post_tag',
+        'field' => 'term_id',
+        'terms' => explode ( ',', $_GET['tags'] )
+      )
+    );
+    
+  }
+  
+  // paged
+  
+  if ( 
+    isset ( $_GET['page_num'] ) &&
+    !empty ( $_GET['page_num'] )
+  ) {
+    $query_page = $_GET['page_num'];
+  }
+  
+  $query_args['paged'] = $query_page;
+  
+  $result = array(
+    'current_page' => $query_page,
+    'max_pages' => 1,
+    'output' => ''
+  );
+  
+  $news_query = new WP_Query ( $query_args );
+  
+  if ( $news_query->have_posts() ) {
+    
+    $result['max_pages'] = $news_query->max_num_pages;
+    
+    while ( $news_query->have_posts() ) {
+      $news_query->the_post();
+      
+      $item = array (
+        'id' => get_the_ID(),
+        'title' => get_the_title(),
+        'permalink' => get_permalink(),
+        'post_type' => get_post_type(),
+        'content' => get_the_content()
+      );
+      
+      $output = '<div id="news-post-' . $item['id'] . '" class="col-12 col-sm-6 col-md-4 col-lg-3">';
+      
+      ob_start();
+      include ( locate_template ( 'previews/post.php' ) );
+      $output .= ob_get_clean();
+      
+      $output .= '</div>';
+      
+      $result['output'] .= $output;
+      
+    }
+    
+  }
+  
+  print_r ( json_encode ( $result ) );
+  
+  die();
+  
+}
+
+add_action ( 'wp_ajax_get_news_posts', 'news_filter' );
+add_action ( 'wp_ajax_nopriv_get_news_posts', 'news_filter' );
+

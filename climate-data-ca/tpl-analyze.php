@@ -816,7 +816,7 @@
 											<div class="input-row form-check w-100">
 													<div class="input-item">
 															<input class="form-check-input add-to-object" type="radio" name="check_missing" id="analyze-stations-missing-wmo" value="wmo">
-															<label class="form-check-label" for="analyze-stations-missing-wmo"><?php _e('WMO Parameters'); ?></label>
+															<label class="form-check-label" for="analyze-stations-missing-wmo"><?php _e('WMO Parameters', 'cdc'); ?></label>
 													</div>
 											</div>
 									</div>

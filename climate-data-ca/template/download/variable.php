@@ -186,7 +186,10 @@
 
     <div id="annual-process-wrap" class="form-layout-row row align-items-center form-process">
         <div class="col-10 offset-1 col-sm-6 offset-sm-3 bg-light p-5">
-            <label for="download-filename" class="troubleshooting-label pb-3 d-flex justify-content-between"><?php _e ( 'Enter a filename and click ‘Process’ to prepare your download.', 'cdc' ); ?> <a href="#download-trouble" class="text-secondary" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="download-trouble"><i class="fas fa-question-circle mr-2"></i><?php _e ( 'Having trouble?', 'cdc' ); ?></a></label>
+            <label for="download-filename" class="troubleshooting-label pb-3 d-flex justify-content-between">
+                <span><?php _e ( 'Enter a filename and click ‘Process’ to prepare your download.', 'cdc' ); ?></span>
+                <a href="#download-trouble" class="text-secondary text-nowrap" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="download-trouble"><i class="fas fa-question-circle mr-2"></i><?php _e ( 'Having trouble?', 'cdc' ); ?></a>
+            </label>
             
             <div id="download-trouble" class="collapse troubleshooting-content pt-2 pb-5">
                 <div class="p-3 border-top border-bottom">

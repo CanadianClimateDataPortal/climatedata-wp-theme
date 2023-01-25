@@ -1141,6 +1141,12 @@ body.overlay-open[data-overlay-content="video"] {
   }
 }
 
+.page-template-tpl-variable {
+  .page-tour {
+    z-index: 2000;
+  }
+}
+
 // SOCIAL WIDGETS
 
 @import '../../../h7-parent/resources/bower_components/pe-social-widget/social-widget';

@@ -15,6 +15,18 @@
   }
 
   add_action ( 'wp_enqueue_scripts', 'tpl_enqueue' );
+  
+  //
+  // QUERY
+  //
+  
+  $init_tag = null;
+  
+  if ( isset ( $_GET['t'] ) && !empty ( $_GET['t'] ) ) {
+    
+    $init_tag = (int) $_GET['t'];
+    
+  }
 
   //
   // TEMPLATE
@@ -55,7 +67,7 @@
                     
               ?>
               
-              <span class="tag-filter-item btn rounded-pill py-1 px-4 mr-2" data-tag="<?php echo $this_tag->term_id; ?>"><i class="fas fa-times mr-3"></i><?php
+              <span class="tag-filter-item btn rounded-pill py-1 px-4 mr-2 <?php echo ( $this_tag->term_id == $init_tag ) ? 'selected' : ''; ?>" data-tag="<?php echo $this_tag->term_id; ?>"><i class="fas fa-times mr-3"></i><?php
               
                 echo $this_tag->name;
                 
@@ -104,7 +116,7 @@
                     
               ?>
               
-              <div class="tag-filter-item col-12 col-sm-6 col-md-4 col-lg-3 mb-2" data-tag="<?php echo $tag->term_id; ?>"><i class="fas fa-times mr-3"></i><?php echo $tag->name; ?></div>
+              <div class="tag-filter-item col-12 col-sm-6 col-md-4 col-lg-3 mb-2 <?php echo ( $tag->term_id == $init_tag ) ? 'selected' : ''; ?>" data-tag="<?php echo $tag->term_id; ?>"><i class="fas fa-times mr-3"></i><?php echo $tag->name; ?></div>
               
               <?php
                     

@@ -9,7 +9,8 @@
 			news_data = {
 				post_container: $('#news-posts'),
 				current_page: 1,
-				max_pages: 1
+				max_pages: 1,
+				query: ''
 			}
 		
 		//
@@ -116,21 +117,6 @@
 		// FUNCTIONS
 		//
 		
-		// FILTER MENU
-		
-		function filter_menu(action = 'open') {
-			
-			if (action == 'open') {
-				
-				
-				
-			} else {
-				
-				
-				
-			}
-		}
-		
 		// AJAX
 		
 		function news_filter() {
@@ -152,8 +138,15 @@
 			
 			if (selected_tags.length > 0) {
 				$('#news-clear').removeClass('disabled')
+				
+				// update URL
+				
+				history.replaceState(null, document.title, window.location.pathname + '?t=' + selected_tags.join(','))
+				
 			} else {
 				$('#news-clear').addClass('disabled')
+				
+				history.replaceState(null, '', window.location.pathname)
 			}
 			// close filter menu
 			

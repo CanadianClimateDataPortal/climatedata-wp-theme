@@ -84,7 +84,7 @@
                 
                 foreach ( $post_tags as $tag ) {
                   if ( $i != 0 ) echo ', ';
-                  echo $tag->name;
+                  echo '<a href="' . get_permalink ( filtered_ID_by_path ( 'news', $GLOBALS['vars']['current_lang'] ) ) . '?t=' . $tag->term_id . '">' . $tag->name . '</a>';
                   $i++;
                 }
                 

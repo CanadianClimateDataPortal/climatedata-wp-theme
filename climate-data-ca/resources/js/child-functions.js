@@ -66,19 +66,19 @@ const DATASETS = {
     "cmip6": {
         'scenarios': [
             {
-                'name': 'ssp126', 'label': 'SSP 1-2.6', 'chart_color': '#00F',
+                'name': 'ssp126', 'label': 'SSP1-2.6', 'chart_color': '#00F',
                 'correlations': {
                     'cmip5': 'rcp26'
                 }
             },
             {
-                'name': 'ssp245', 'label': 'SSP 2-4.5', 'chart_color': '#00640c',
+                'name': 'ssp245', 'label': 'SSP2-4.5', 'chart_color': '#00640c',
                 'correlations': {
                     'cmip5': 'rcp45'
                 }
             },
             {
-                'name': 'ssp585', 'label': 'SSP 5-8.5', 'chart_color': '#F00',
+                'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#F00',
                 'correlations': {
                     'cmip5': 'rcp85'
                 }

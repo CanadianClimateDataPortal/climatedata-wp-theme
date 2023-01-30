@@ -612,7 +612,7 @@ function news_filter() {
         'content' => get_the_content()
       );
       
-      $output = '<div id="news-post-' . $item['id'] . '" class="col-12 col-sm-6 col-md-4 col-lg-3">';
+      $output = '<div id="news-post-' . $item['id'] . '" class="col-12 col-sm-6 col-md-4 px-2 pb-3">';
       
       ob_start();
       include ( locate_template ( 'previews/post.php' ) );

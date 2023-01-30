@@ -35,7 +35,10 @@
 		
 		// click a filter
 		
-		$('.tag-filter-item').click(function(e) {
+		$('body').on('click', '.tag-filter-item', function(e) {
+			
+			e.preventDefault()
+			e.stopPropagation()
 			
 			let this_tag = $(this).attr('data-tag')
 			
@@ -204,6 +207,14 @@
 						init = false
 						
 					}
+					
+					// select
+					
+					selected_tags.forEach(function(tag) {
+						
+						news_data.post_container.find('[data-tag="' + tag + '"]').addClass('selected')
+						
+					})
 					
 					$('body').removeClass('spinner-on')
 				},

@@ -34,6 +34,32 @@
 		<?php
 
 			}
+      
+      // tags
+        
+        $post_tags = get_the_terms ( $item['id'], 'post_tag' );
+        
+        if ( !empty ( $post_tags ) ) {
+          
+    ?>
+    
+    <h6 class="card-tags-head text-uppercase"><?php _e ( 'Tags', 'cdc' ); ?></h6>
+    
+    <p class="card-tags mb-4"><?php
+    
+        $i = 0;
+        
+        foreach ( $post_tags as $tag ) {
+          if ( $i != 0 ) echo ', ';
+          echo '<a href="' . get_permalink ( filtered_ID_by_path ( 'news', $GLOBALS['vars']['current_lang'] ) ) . '?t=' . $tag->term_id . '" class="tag-filter-item" data-tag="' . $tag->term_id . '">' . $tag->name . '</a>';
+          $i++;
+        }
+        
+    ?></p>
+    
+    <?php
+    
+      }
 
 		?>
 

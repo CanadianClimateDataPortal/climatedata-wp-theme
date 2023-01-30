@@ -92,6 +92,11 @@
 	z-index: 1;
 }
 
+#news-posts {
+	margin-left: -0.5rem;
+	margin-right: -0.5rem;
+}
+
 #news-footer {
 	font-size: 1.4rem;
 }
@@ -123,4 +128,21 @@
 .card-author {
 	font-size: 1.3rem;
 	color: $slate2;
+}
+
+.card-tags-head {
+	font-size: 1.2rem;
+}
+
+.card-tags {
+	font-size: 1.3rem;
+	color: $slate2;
+	
+	a {
+		color: $slate2;
+		
+		&.selected {
+			color: $secondary;
+		}
+	}
 }

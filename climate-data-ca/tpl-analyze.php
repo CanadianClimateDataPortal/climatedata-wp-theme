@@ -98,13 +98,13 @@
                       <div class="input-row form-check">
                         <div class="input-item">
                           <input class="form-check-input add-to-object" type="radio" name="dataset" id="analyze-dataset-cmip5" value="cmip5">
-                          <label class="form-check-label" for="analyze-dataset-cmip5">CanDCS-U5 (CMIP5)</label>
+                          <label class="form-check-label" for="analyze-dataset-cmip5">CMIP5 (CanDCS-U5)</label>
                         </div>
                       </div>
                       <div class="input-row form-check">
                           <div class="input-item">
                               <input class="form-check-input add-to-object" type="radio" name="dataset" id="analyze-dataset-cmip6" value="cmip6">
-                              <label class="form-check-label" for="analyze-dataset-cmip6">CanDCS-U6 (CMIP6)</label>
+                              <label class="form-check-label" for="analyze-dataset-cmip6">CMIP6 (CanDCS-U6)</label>
                           </div>
                       </div>
                     </div>
@@ -315,7 +315,7 @@
                               <div class="input-item">
                                 <input class="form-check-input" type="checkbox" name="" id="analyze-scenarios-all" value="all">
 
-                                <label class="form-check-label" for="analyze-scenarios-all"><?php _e ( 'Scenarios', 'cdc' ); ?></label>
+                                <label class="form-check-label" for="analyze-scenarios-all"><?php _e ( 'Emissions Scenarios', 'cdc' ); ?></label>
                               </div>
                             </div>
 

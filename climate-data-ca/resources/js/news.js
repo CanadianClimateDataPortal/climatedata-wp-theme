@@ -155,7 +155,7 @@
 			
 			$('#all-tags').collapse('hide')
 			
-			console.log('get', selected_tags, news_data.current_page)
+			// console.log('get', selected_tags, news_data.current_page)
 			
 			$.ajax({
 				url: ajax_data.url,

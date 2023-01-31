@@ -109,7 +109,7 @@ if (get_the_ID() == filtered_ID_by_path('explore/variable')) {
                         <div id="var-filter-search" class="filter-block col-2">
                             <div id="geo-select-container" class="text-center">
                                 <select class="custom-select custom-select-lg select2 form-control" name="geo-select" id="geo-select">
-                                    <option value=""><?php _e('Search for a City/Town', 'cdc'); ?></option>
+                                    <option value=""><?php _e('Search', 'cdc'); ?></option>
                                     <?php
 
                                     if (isset ($query_string['geo-select'])) {

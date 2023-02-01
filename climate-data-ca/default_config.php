@@ -17,6 +17,7 @@ function custom_global_vars()
     $vars['mailchimp_api_key'] = "";
     $vars['mailchimp_url'] = "";
     $vars['mailchimp_list_id'] = "";
+    $vars['url_encoder_salt'] = "override-me";
 }
 
 

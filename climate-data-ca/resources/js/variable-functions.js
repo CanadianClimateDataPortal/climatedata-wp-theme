@@ -2205,6 +2205,7 @@
                 } else {
                     // console.log('----- ' + history_action + ' -----');
                 }
+                $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(new_url, url_encoder_salt).encoded);
             }
             history_action = 'push';
         }
@@ -3106,6 +3107,9 @@
                 $('[data-original-title]').popover('hide');
             }
         });
+
+        // initially update screenshot button link
+        $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(window.location.href, url_encoder_salt).encoded);
 
     });
 })(jQuery);

@@ -2891,16 +2891,15 @@
                 update_query_string();
 
             }
-
-            // prevent from firing multiple times
-            map1.off('moveend', mapMoveEnd);
-            setTimeout(function () {
-                map1.on('moveend', mapMoveEnd);
-            }, 300);
-
+            e.target.mapMoveEndTimeout = null;
         }
 
-        map1.on('moveend', mapMoveEnd);
+        map1.on('moveend', function(e){
+            if (typeof e.target.mapMoveEndTimeout !== 'undefined' && e.target.mapMoveEndTimeout !== null) {
+                clearTimeout(e.target.mapMoveEndTimeout);
+            }
+            e.target.mapMoveEndTimeout = setTimeout(function() { mapMoveEnd(e)}, 300);
+        });
 
         // OVERLAY
 

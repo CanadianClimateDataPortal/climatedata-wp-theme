@@ -1110,7 +1110,7 @@
                                     'dataset': dataset_name,
                                     'rcp': rcp_value,
                                     'var': variable,
-                                    'mora': 'ann',
+                                    'mora': month,
                                     'lat': lat,
                                     'lon': lon
                                 }, 'chart-placeholder');

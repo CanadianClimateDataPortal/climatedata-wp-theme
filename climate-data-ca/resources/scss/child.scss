@@ -968,6 +968,10 @@ body.overlay-open[data-overlay-content="video"] {
 .tab {
   .alert {
     font-size: 1.4em;
+    
+    p {
+      font-size: 1em;
+    }
   }
 }
 

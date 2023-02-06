@@ -42,7 +42,7 @@ if ($securimage->check($_GET['captcha_code']) == false) {
       "From: Climatedata Feedback Form <feedback@climatedata.ca>",
       "Reply-To: {$form_data['fullname']} <{$form_data['email']}>");
 
-//  $body = '<h2>You’ve received a new form submission.</h2>';
+  $body = '';//'<h2>You’ve received a new form submission.</h2>';
 
   $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __('Name','cdc-feedback') . '</span><span style="display: inline-block; vertical-align: top;">' . $form_data['fullname'] . '</span></p>';
 

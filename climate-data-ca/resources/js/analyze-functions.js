@@ -490,6 +490,155 @@
 
             })
 
+
+            let points=[
+                {
+                    "id": 96992,
+                    "point": [
+                        63.25071092653727,
+                        -106.77230779684075
+                    ]
+                },
+                {
+                    "id": 108344,
+                    "point": [
+                        63.17147520971287,
+                        -103.64038354634928
+                    ]
+                },
+                {
+                    "id": 100649,
+                    "point": [
+                        62.32629923132977,
+                        -105.82723591774509
+                    ]
+                },
+                {
+                    "id": 95175,
+                    "point": [
+                        62.08034968913937,
+                        -107.25583294428506
+                    ]
+                },
+                {
+                    "id": 91615,
+                    "point": [
+                        62.34160465384171,
+                        -108.27782927865594
+                    ]
+                },
+                {
+                    "id": 95787,
+                    "point": [
+                        62.83731090279384,
+                        -107.12396244952753
+                    ]
+                },
+                {
+                    "id": 106077,
+                    "point": [
+                        62.90745272682937,
+                        -104.32171443592988
+                    ]
+                },
+                {
+                    "id": 107486,
+                    "point": [
+                        62.285446629246714,
+                        -103.89313532796788
+                    ]
+                },
+                {
+                    "id": 103989,
+                    "point": [
+                        61.863496546198746,
+                        -104.88216403864942
+                    ]
+                },
+                {
+                    "id": 97576,
+                    "point": [
+                        61.58764159864731,
+                        -106.59648047049737
+                    ]
+                },
+                {
+                    "id": 100636,
+                    "point": [
+                        61.245945457032555,
+                        -105.81624670984861
+                    ]
+                },
+                {
+                    "id": 108877,
+                    "point": [
+                        61.45666250242535,
+                        -103.44257780421297
+                    ]
+                },
+                {
+                    "id": 110532,
+                    "point": [
+                        62.0957802598439,
+                        -102.95905265676869
+                    ]
+                },
+                {
+                    "id": 106079,
+                    "point": [
+                        63.04723430879059,
+                        -104.32171443592988
+                    ]
+                }
+            ]
+
+            points.forEach( function(p) {
+                let highlightGridFeature = p.id;
+
+                selectedPoints[highlightGridFeature] = L.latLng(p.point[0], p.point[1]);
+                map_grids[highlightGridFeature] = L.latLng(p.point[0], p.point[1]);
+
+                selectedGrids.push(highlightGridFeature);
+
+                pbfLayer.setFeatureStyle(highlightGridFeature, {
+                    weight: 1,
+                    color: '#F00',
+                    opacity: 1,
+                    fill: true,
+                    radius: 4,
+                    fillOpacity: 0.1
+                })
+
+
+            });
+
+            $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length)
+
+            var i = 0,
+                lat_val = '',
+                lon_val = ''
+
+            for (var key in map_grids) {
+
+                if (i != 0) {
+                    lat_val += ','
+                    lon_val += ','
+                }
+
+                lat_val += map_grids[key]['lat']
+                lon_val += map_grids[key]['lng']
+
+                i++
+
+            }
+
+            $('#lat').val(lat_val)
+            $('#lon').val(lon_val)
+            $('#shape').val('')
+
+            validate_inputs()
+
+
         }, 100)
 
         // disable default behaviour

@@ -23,7 +23,14 @@ var l10n_table = {
         "Copied to clipboard": "Copié dans le presse-papier",
         "Error" : "Erreur",
         "Copy link": "Copier le lien",
-
+        
+        //  feedback form
+        'Thanks! We’ve received your inquiry.' : 'Merci! Nous avons reçu votre demande.',
+        'We are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays.' : 'Le nombre de demandes adressées à notre Centre d’aide est actuellement supérieur à la normale. Nous ferons de notre mieux pour vous répondre dès que possible, mais sachez qu’il peut y avoir des délais.',
+        'Thank you for your patience,' : 'Nous vous remercions de votre patience,',
+        'The Support Desk' : 'Le Centre d’aide',
+        'Sorry, an error occurred while sending your feedback. Please try again later.' : 'Désolé, une erreur est survenue. Veuillez réessayer plus tard.',
+        
         "With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}":
             "Avec les paramètres actuels de fréquence et de format de donnée, le nombre maximal de points de grille par requête est de {0}",
         "Around {0} grid boxes selected" : "Environ {0} points de grille sélectionnés"
@@ -1042,11 +1049,29 @@ function getIDFLinks(station_id, target, css_class) {
                     if (data == 'success') {
 
                         $('#captcha_code').removeClass('border-secondary').tooltip('hide');
+                        
+                        let success_message = '<div class="row" style="display: none;"><div class="alert alert-success col-6 offset-3" role="alert">'
+                        
+                        success_message += '<p>' + T('Thanks! We’ve received your inquiry.') + '</p>'
+                        
+                        success_message += '<p>' + T('We are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays.') + '</p>'
+                        
+                        success_message += '<p>' + T('Thank you for your patience,') + '</p>'
+                        
+                        success_message += '<p>' + T('The Support Desk') + '</p>'
+                        
+                        success_message += '</div></div>'
+                        
+                        $(success_message).insertBefore(the_form).slideDown(250)
 
-                        $('<div class="row" style="display: none;"><div class="alert alert-success col-6 offset-3" role="alert">Thanks! We’ve received your feedback.</div></div>').insertBefore(the_form).slideDown(250);
+                        the_form.slideUp(250)
 
-                        the_form.slideUp(250);
-
+                    } else if (data == 'failed') {
+                        
+                        $('<div class="row" style="display: none;"><div class="alert alert-danger col-6 offset-3" role="alert">' + T('Sorry, an error occurred while sending your feedback. Please try again later.')+ '</div></div>').insertBefore(the_form).slideDown(250)
+                        
+                        the_form.slideUp(250)
+                        
                     } else if (data == 'captcha failed') {
 
                         $('#captcha_code').addClass('border-secondary').tooltip('show');

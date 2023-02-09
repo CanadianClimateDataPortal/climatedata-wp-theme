@@ -29,7 +29,7 @@ var l10n_table = {
         'We are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays.' : 'Le nombre de demandes adressées à notre Centre d’aide est actuellement supérieur à la normale. Nous ferons de notre mieux pour vous répondre dès que possible, mais sachez qu’il peut y avoir des délais.',
         'Thank you for your patience,' : 'Nous vous remercions de votre patience,',
         'The Support Desk' : 'Le Centre d’aide',
-        'Sorry, an error occurred while sending your feedback. Please try again later.' : '',
+        'Sorry, an error occurred while sending your feedback. Please try again later.' : 'Désolé, une erreur est survenue. Veuillez réessayer plus tard.',
         
         "With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}":
             "Avec les paramètres actuels de fréquence et de format de donnée, le nombre maximal de points de grille par requête est de {0}",

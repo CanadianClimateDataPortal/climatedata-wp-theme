@@ -222,6 +222,137 @@
 
         </div>
       </div>
+      
+      <div class="supermenu-slide" data-href="<?php echo $GLOBALS['vars']['site_url']; ?>regional-partners/" data-slug="<?php echo get_the_slug ( filtered_ID_by_path ( 'explore/regional-partners' ) ); ?>">
+        <div class="container-fluid">
+      
+          <header class="row">
+            <div class="col-10 offset-1 col-md-6 col-lg-3 offset-lg-3 d-flex align-items-center text-muted mb-3 mb-md-0">
+              <span class="cdc-icon icon-var-other"></span>
+              <h5><?php _e('Regional Partners','cdc'); ?></h5>
+            </div>
+      
+            <div class="col-10 offset-1 col-md-4 col-lg-3 text-center">
+            </div>
+          </header>
+      
+          <div class="row">
+            <?php
+      
+              $current_ID = get_the_ID();
+              $region_page_ID = filtered_ID_by_path ( 'explore/regional-partners' );
+      
+              $region_query = new WP_Query ( array (
+                'post_type' => 'page',
+                'post_parent' => $region_page_ID,
+                'posts_per_page' => -1,
+                'orderby' => 'menu_order',
+                'order' => 'asc',
+                'meta_query' => array (
+                  array (
+                    'key' => '_wp_page_template',
+                    'value' => 'tpl-variable.php',
+                    'compare' => 'NOT IN'
+                  )
+                )
+              ) );
+      
+              if ( $region_query->have_posts() ) :
+      
+                $region_column = 1;
+      
+                while ( $region_query->have_posts() ) : $region_query->the_post();
+                  
+                $this_ID = get_the_ID();
+      
+                $link_href = '';
+                $link_class = 'text-muted';
+      
+                if ( $current_ID == $this_ID ) {
+                  $link_class .= ' smooth-scroll';
+                } else {
+                  $link_href = get_permalink();
+                }
+      
+            ?>
+      
+            <div class="col-10 col-sm-6 col-lg-2 px-5 px-lg-0 <?php echo ( $region_column == 1 ) ? 'offset-lg-3' : ''; ?>">
+      
+              <h6><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h6>
+      
+              <ul>
+                <?php
+                
+                  if ( have_rows ( 'region_context', $this_ID ) ) {
+                    
+                ?>
+                <li><a href="<?php echo $link_href; ?>#region-context" class="<?php echo $link_class; ?>"><?php _e ( 'Context', 'cdc' ); ?></a></li>
+                
+                <?php 
+              
+                  }
+                  
+                  if ( have_rows ( 'region_cases', $this_ID ) ) { 
+                    
+                ?>
+                
+                <li><a href="<?php echo $link_href; ?>#region-cases" class="<?php echo $link_class; ?>"><?php _e ( 'Case Studies', 'cdc' ); ?></a></li>
+                
+                <?php 
+                  
+                  } 
+                  
+                  if ( have_rows ( 'region_analogous', $this_ID ) ) {
+                  
+                ?>
+                
+                <li><a href="<?php echo $link_href; ?>#region-analogous" class="<?php echo $link_class; ?>"><?php _e ( 'Resources', 'cdc' ); ?></a></li>
+                
+                <?php
+                  
+                  }
+                
+                  if ( !empty ( get_field ( 'related_vars' ) != '' ) ) {
+                
+                ?>
+                
+                <li><a href="<?php echo $link_href; ?>#region-vars" class="<?php echo $link_class; ?>"><?php _e ( 'Relevant Variables', 'cdc' ); ?></a></li>
+                
+                <?php
+                
+                  }
+                  
+                  if ( have_rows ( 'region_related' ) ) {
+                    
+                ?>
+                
+                <li><a href="<?php echo $link_href; ?>#region-related" class="<?php echo $link_class; ?>"><?php _e ( 'Related Content', 'cdc' ); ?></a></li>
+                
+                <?php
+                
+                  }
+                  
+                ?>
+              </ul>
+            </div>
+      
+            <?php
+      
+                $region_column++;
+      
+              endwhile; endif;
+      
+            ?>
+          </div>
+      
+          <?php
+      
+            wp_reset_postdata();
+      
+          ?>
+      
+        </div>
+      </div>
 
     </div>
 

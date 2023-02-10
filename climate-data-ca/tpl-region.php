@@ -112,8 +112,10 @@
 		if ( have_rows ( 'region_cases' ) ) {
 			while ( have_rows ( 'region_cases' ) ) {
 				the_row();
+				
+				if ( !empty ( get_sub_field ( 'posts' ) ) ) {
 
-				$block_ID = 'region-cases-grid';
+					$block_ID = 'region-cases-grid';
 
 	?>
 
@@ -128,12 +130,6 @@
           </div>
         </div>
       </header>
-
-			<?php
-
-				if ( !empty ( get_sub_field ( 'posts' ) ) ) {
-
-			?>
 
 			<div class="container-fluid subsections">
 
@@ -171,16 +167,12 @@
 
 			</div>
 
-			<?php
-
-				}
-
-			?>
-
 		</div>
 	</section>
 
 	<?php
+	
+				}
 
 			}
 		}

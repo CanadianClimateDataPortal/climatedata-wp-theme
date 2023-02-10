@@ -163,7 +163,8 @@ function child_theme_enqueue()
 
     }
     
-    if ( is_page ( 'news' ) ) {
+    
+    if ( is_page_template ( 'tpl-news.php' ) ) {
       
       wp_register_script ( 'news-functions', $child_js_dir . 'news.js', array ( 'jquery' ), false, true );
       

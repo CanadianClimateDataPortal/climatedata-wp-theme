@@ -3,6 +3,8 @@
     <h6><?php _e ( 'Jump to:', 'cdc' ); ?></h6>
 
     <ul>
+      <li><a href="#region-map" class="smooth-scroll"><?php _e ( 'Map', 'cdc' ); ?></a></li>
+      
       <?php
       
         if ( have_rows ( 'region_context' ) ) {

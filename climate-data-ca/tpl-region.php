@@ -37,6 +37,26 @@
     $hero_templates['footer'] = 'region-hero-footer';
 
     include ( locate_template ( 'template/hero/hero.php' ) );
+		
+?>
+	
+	<section id="region-map" class="page-section has-head">
+	<div class="section-container">
+		<header class="section-head container-fluid">
+			<div class="row">
+				<div class="col-10 offset-1">
+					<h3 class="text-primary"><?php _e ( 'Map', 'cdc' ); ?></h3>
+				</div>
+	
+				<div class="col-10 offset-1 col-md-8 col-lg-7 col-xl-6">
+					<div id="region-map"></div>
+				</div>
+				
+			</div>
+		</header>
+	</div>
+
+<?php
 
 		//
 		// CONTEXT

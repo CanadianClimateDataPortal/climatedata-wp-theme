@@ -161,6 +161,21 @@ function child_theme_enqueue()
         wp_enqueue_script('archive-functions');
 
     }
+    
+    
+    if ( is_page_template ( 'tpl-news.php' ) ) {
+      
+      wp_register_script ( 'news-functions', $child_js_dir . 'news.js', array ( 'jquery' ), false, true );
+      
+      wp_localize_script ( 'news-functions', 'ajax_data',
+        array (
+          'url' => admin_url ( 'admin-ajax.php' )
+        )
+      );
+      
+      wp_enqueue_script ( 'news-functions' );
+      
+    }
 
   if ( is_singular ( 'case-study' ) || is_singular ( 'resource' ) ) {
 
@@ -531,3 +546,156 @@ add_filter ( 'custom_body_classes', function ( $classes ) {
 	return $classes;
 
 }, 100 );
+
+//
+// ADMIN AJAX
+//
+
+function news_filter() {
+  
+  $query_page = 1;
+  $query_tags = array();
+  
+  $query_args = array (
+    'post_type' => 'post',
+    'posts_per_page' => 12
+  );
+  
+  // tax_query
+  
+  if (
+    isset ( $_GET['tags'] ) &&
+    !empty ( $_GET['tags'] )
+  ) {
+    
+    $query_args['tax_query'] = array (
+      array (
+        'taxonomy' => 'post_tag',
+        'field' => 'term_id',
+        'terms' => explode ( ',', $_GET['tags'] )
+      )
+    );
+    
+  }
+  
+  // paged
+  
+  if ( 
+    isset ( $_GET['page_num'] ) &&
+    !empty ( $_GET['page_num'] )
+  ) {
+    $query_page = $_GET['page_num'];
+  }
+  
+  $query_args['paged'] = $query_page;
+  
+  $result = array(
+    'current_page' => $query_page,
+    'max_pages' => 1,
+    'output' => ''
+  );
+  
+  $news_query = new WP_Query ( $query_args );
+  
+  if ( $news_query->have_posts() ) {
+    
+    $result['max_pages'] = $news_query->max_num_pages;
+    
+    while ( $news_query->have_posts() ) {
+      $news_query->the_post();
+      
+      $item = array (
+        'id' => get_the_ID(),
+        'title' => get_the_title(),
+        'permalink' => get_permalink(),
+        'post_type' => get_post_type(),
+        'content' => get_the_content()
+      );
+      
+      $output = '<div id="news-post-' . $item['id'] . '" class="col-12 col-sm-6 col-md-4 px-2 pb-3">';
+      
+      ob_start();
+      include ( locate_template ( 'previews/post.php' ) );
+      $output .= ob_get_clean();
+      
+      $output .= '</div>';
+      
+      $result['output'] .= $output;
+      
+    }
+    
+  }
+  
+  print_r ( json_encode ( $result ) );
+  
+  die();
+  
+}
+
+add_action ( 'wp_ajax_get_news_posts', 'news_filter' );
+add_action ( 'wp_ajax_nopriv_get_news_posts', 'news_filter' );
+
+//
+// TAGS - SHOW AS CHECKBOXES
+// https://rudrastyh.com/wordpress/tag-metabox-like-categories.html
+//
+
+function rudr_post_tags_meta_box_remove() {
+  $id = 'tagsdiv-post_tag'; // you can find it in a page source code (Ctrl+U)
+  $post_type = 'post'; // remove only from post edit screen
+  $position = 'side';
+  remove_meta_box( $id, $post_type, $position );
+}
+add_action( 'admin_menu', 'rudr_post_tags_meta_box_remove');
+
+/*
+ * Add
+ */
+function rudr_add_new_tags_metabox(){
+  $id = 'rudrtagsdiv-post_tag'; // it should be unique
+  $heading = 'Tags'; // meta box heading
+  $callback = 'rudr_metabox_content'; // the name of the callback function
+  $post_type = 'post';
+  $position = 'side';
+  $pri = 'default'; // priority, 'default' is good for us
+  add_meta_box( $id, $heading, $callback, $post_type, $position, $pri );
+}
+add_action( 'admin_menu', 'rudr_add_new_tags_metabox');
+ 
+/*
+ * Fill
+ */
+function rudr_metabox_content($post) {  
+ 
+  // get all blog post tags as an array of objects
+  $all_tags = get_terms( array('taxonomy' => 'post_tag', 'hide_empty' => 0) ); 
+ 
+  // get all tags assigned to a post
+  $all_tags_of_post = get_the_terms( $post->ID, 'post_tag' );  
+ 
+  // create an array of post tags ids
+  $ids = array();
+  if ( $all_tags_of_post ) {
+    foreach ($all_tags_of_post as $tag ) {
+      $ids[] = $tag->term_id;
+    }
+  }
+ 
+  // HTML
+  echo '<div id="taxonomy-post_tag" class="categorydiv">';
+  echo '<input type="hidden" name="tax_input[post_tag][]" value="0" />';
+  echo '<ul>';
+  foreach( $all_tags as $tag ){
+    // unchecked by default
+    $checked = "";
+    // if an ID of a tag in the loop is in the array of assigned post tags - then check the checkbox
+    if ( in_array( $tag->term_id, $ids ) ) {
+      $checked = " checked='checked'";
+    }
+    $id = 'post_tag-' . $tag->term_id;
+    echo "<li id='{$id}'>";
+    echo "<label><input type='checkbox' name='tax_input[post_tag][]' id='in-$id'". $checked ." value='$tag->slug' /> $tag->name</label><br />";
+    echo "</li>";
+  }
+  echo '</ul></div>'; // end HTML
+}

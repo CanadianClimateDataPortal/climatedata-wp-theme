@@ -184,6 +184,67 @@
 
 			}
 		}
+		
+		//
+		// BLOG
+		//
+		
+	?>
+	
+	<section id="sector-blog" class="page-section has-head has-subsections">
+		<div class="section-container">
+			<header class="section-head container-fluid">
+				<div class="row">
+					<div class="col-10 offset-1 col-md-5">
+						<h4 class="text-secondary"><?php _e ( 'Blog Posts', 'cdc' ); ?></h4>
+					</div>
+				</div>
+			</header>
+	
+			<div class="container-fluid subsections">
+	
+				<div class="subsection">
+					<div class="row">
+	
+						<div id="sector-cases-grid" class="block type-post_grid col-10 offset-1">
+	
+							<?php
+	
+								$post_grid[$block_ID] = array (
+									'display' => array (
+										'columns' => 3,
+										'template' => 'post'
+									)
+								);
+	
+								$new_query = array (
+									'args' => array (
+										'post_type' => 'post',
+										'tax_query' => array (
+											array (
+												'taxonomy' => 'post_tag',
+												'field' => 'slug',
+												'terms' => [ get_the_slug ( get_the_ID() ) ]
+											)
+										)
+									)
+								);
+	
+								include ( locate_template ( 'blocks/post_grid.php' ) );
+	
+							?>
+	
+						</div>
+	
+					</div>
+				</div>
+	
+			</div>
+	
+		</div>
+	</section>
+	
+	<?php
 
 		//
 		// ANALOGOUS

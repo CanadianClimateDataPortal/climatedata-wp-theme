@@ -281,6 +281,8 @@
               <h6><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h6>
       
               <ul>
+                <li><a href="<?php echo $link_href; ?>#region-map" class="<?php echo $link_class; ?>"><?php _e ( 'Map', 'cdc' ); ?></a></li>
+                
                 <?php
                 
                   if ( have_rows ( 'region_context', $this_ID ) ) {

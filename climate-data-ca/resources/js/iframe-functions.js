@@ -2,7 +2,6 @@
     $(function () {
 
         const timeout_timer = document.getElementById("i_frame").getAttribute('timeout_timer')
-        // const timeoutID = null
 
         if (timeout_timer > 0) {
             // Timeout of 10 sec to healthcheck on the iframe.

@@ -31,7 +31,7 @@
   ?>
   <section id="iframe-section" class="page-section bg-white" >
     <div class="iframe-container">
-      <iframe src=<?php echo get_field("url") ?> id="i_frame" title="iframe" allow="fullscreen"></iframe>
+      <iframe src=<?php echo get_field("url") ?> id="i_frame" title="iframe" allow="fullscreen" timeout_timer=<?php echo get_field("timeout_timer") ?> ></iframe>
     </div>
   </section>
 

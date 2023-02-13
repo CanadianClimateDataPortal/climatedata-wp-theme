@@ -8,7 +8,8 @@
         if ( have_rows ( 'region_context' ) ) {
           
       ?>
-      <li><a href="#region-context" class="smooth-scroll"><?php _e ( 'Context', 'cdc' ); ?></a></li>
+      
+      <li><a href="#region-overview" class="smooth-scroll"><?php _e ( 'Overview', 'cdc' ); ?></a></li>
       
       <?php 
       

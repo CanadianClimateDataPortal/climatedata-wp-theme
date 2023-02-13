@@ -287,7 +287,7 @@
                   if ( have_rows ( 'region_context', $this_ID ) ) {
                     
                 ?>
-                <li><a href="<?php echo $link_href; ?>#region-context" class="<?php echo $link_class; ?>"><?php _e ( 'Context', 'cdc' ); ?></a></li>
+                <li><a href="<?php echo $link_href; ?>#region-overview" class="<?php echo $link_class; ?>"><?php _e ( 'Overview', 'cdc' ); ?></a></li>
                 
                 <?php 
               

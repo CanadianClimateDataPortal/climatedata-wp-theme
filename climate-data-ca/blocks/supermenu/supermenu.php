@@ -197,7 +197,7 @@
 
 
               <ul>
-								<li><a href="<?php echo $link_href; ?>#sector-context" class="<?php echo $link_class; ?>"><?php _e ( 'Context', 'cdc' ); ?></a></li>
+								<li><a href="<?php echo $link_href; ?>#sector-overview" class="<?php echo $link_class; ?>"><?php _e ( 'Overview', 'cdc' ); ?></a></li>
 					      <li><a href="<?php echo $link_href; ?>#sector-cases" class="<?php echo $link_class; ?>"><?php _e ( 'Case Studies', 'cdc' ); ?></a></li>
                 <li><a href="<?php echo $link_href; ?>#sector-blog" class="<?php echo $link_class; ?>"><?php _e ( 'Blog Posts', 'cdc' ); ?></a></li>
 					      <li><a href="<?php echo $link_href; ?>#sector-analogous" class="<?php echo $link_class; ?>"><?php _e ( 'Sector Resources', 'cdc' ); ?></a></li>

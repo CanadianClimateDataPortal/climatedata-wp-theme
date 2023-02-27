@@ -680,10 +680,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
         }
     });
 
-    if (
-        $('body').find('#toggle-b').length &&
-        $('body').find('#toggle-b').prop('checked') == true
-    ) {
+    if (query['delta'] == 'true') {
         
         // if delta
         // find the '30 year changes' radio

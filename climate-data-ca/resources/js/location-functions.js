@@ -214,6 +214,7 @@
                                             'mora': 'ann',
                                             'lat': current_location.lat,
                                             'lon': current_location.lon,
+                                            'delta': "",
                                         }, $('body').find('#' + variable + '-chart')[0]);
                                 },
                                 complete: function () {

@@ -12,3 +12,4 @@ proto/
 .DS_Store
 *.css.map
 climate-data-ca/resources/css/child.css
+.nova/

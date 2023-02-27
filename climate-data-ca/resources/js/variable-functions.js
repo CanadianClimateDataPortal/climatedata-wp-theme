@@ -1128,6 +1128,8 @@
         // LAYER CHART
         function genChart(lat, lon, variable, month) {
             let dataset_name = $('input[name="dataset_switch"]:checked').val();
+            let delta = $('input[name="absolute_delta_switch"]:checked').val() === 'd'?"true":"";
+
             $(document).overlay('show', {
                 href: base_href + 'variable/' + $('#var').val() + '/',
                 data: {
@@ -1154,7 +1156,8 @@
                                     'var': variable,
                                     'mora': month,
                                     'lat': lat,
-                                    'lon': lon
+                                    'lon': lon,
+                                    'delta': delta,
                                 }, 'chart-placeholder');
                         });
 
@@ -1163,7 +1166,7 @@
         };
 
         // SECTOR CHART
-        function genSectorChart(id, variable, month, region_label, dataset) {
+        function genSectorChart(id, variable, month, region_label) {
             let dataset_name = $('input[name="dataset_switch"]:checked').val();
             query.id = id;
             $(document).overlay('show', {
@@ -2210,7 +2213,8 @@
             history_action = 'push';
         }
 
-
+        var search_highlight
+        
         $('#geo-select').on('select2:select', function (e) {
 
             // console.log('geo-select');
@@ -2222,6 +2226,52 @@
 
             //update_param('coords', thislat + ',' + thislon + ',11');
             map1.setView([thislat, thislon], 10);
+            
+            // highlight the feature at the selected coordinates
+            
+            $.ajax({
+                url: hosturl + "/geoserver/CDC/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo" +
+                "&QUERY_LAYERS=CDC%3Acanadagrid&LAYERS=CDC%3Acanadagrid&INFO_FORMAT=application%2Fjson" +
+                "&FEATURE_COUNT=50&X=50&Y=50&SRS=EPSG%3A4326&WIDTH=101&HEIGHT=101&BBOX=" +
+                thislon + "%2C" + thislat + "%2C" +
+                (parseFloat(thislon) + 0.0001) + "%2C" + (parseFloat(thislat) + 0.00001),
+                dataType: 'json',
+                success: function (data) {
+                    
+                    if (data.features.length) {
+                        
+                        if (search_highlight) {
+                            
+                            gridLayer.resetFeatureStyle(search_highlight)
+                            
+                            if (has_mapRight == true) {
+                                gridLayerRight.resetFeatureStyle(search_highlight)
+                            }
+                            
+                        }
+                        
+                        search_highlight = data.features[0].properties.gid
+                        
+                        gridLayer.setFeatureStyle(search_highlight, {
+                            weight: 1.5,
+                            color: '#f00',
+                            opacity: 1
+                        })
+                        
+                        if (has_mapRight == true) {
+                            
+                            gridLayerRight.setFeatureStyle(search_highlight, {
+                                weight: 1.5,
+                                color: '#f00',
+                                opacity: 1
+                            })
+                            
+                        }
+                        
+                    }
+                    
+                }
+            });
 
         });
 

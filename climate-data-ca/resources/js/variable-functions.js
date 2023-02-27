@@ -1086,6 +1086,8 @@
         // LAYER CHART
         function genChart(lat, lon, variable, month) {
             let dataset_name = $('input[name="dataset_switch"]:checked').val();
+            let delta = $('input[name="absolute_delta_switch"]:checked').val() === 'd'?"true":"";
+
             $(document).overlay('show', {
                 href: base_href + 'variable/' + $('#var').val() + '/',
                 data: {
@@ -1112,7 +1114,8 @@
                                     'var': variable,
                                     'mora': month,
                                     'lat': lat,
-                                    'lon': lon
+                                    'lon': lon,
+                                    'delta': delta,
                                 }, 'chart-placeholder');
                         });
 
@@ -1121,7 +1124,7 @@
         };
 
         // SECTOR CHART
-        function genSectorChart(id, variable, month, region_label, dataset) {
+        function genSectorChart(id, variable, month, region_label) {
             let dataset_name = $('input[name="dataset_switch"]:checked').val();
             query.id = id;
             $(document).overlay('show', {

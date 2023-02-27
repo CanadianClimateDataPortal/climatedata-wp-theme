@@ -685,9 +685,20 @@ function displayChartData(data, varDetails, download_url, query, container) {
         }
     });
 
-    // 30y averages is by default, so trigger the change event on load
-    $('#chartoption2-' + query['var']).trigger('change');
-
+    if (query['delta'] == 'true') {
+        
+        // if delta
+        // find the '30 year changes' radio
+        // and trigger click
+        
+        $('body').find('#chartoption3-' + query['var']).prop('checked', true).trigger('change')
+        
+    } else {
+        
+        // 30y averages is by default, so trigger the change event on load
+        $('#chartoption2-' + query['var']).trigger('change');
+        
+    }
 
 }
 

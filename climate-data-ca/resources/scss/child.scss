@@ -108,8 +108,6 @@ h1, h2, h3, h4, h5, h6,
 // TEMPLATE
 //
 
-@import 'pages/iframe';
-
 #main-header-nav {
   .navbar-toggler {
     position: absolute;
@@ -521,6 +519,10 @@ body {
 // NEWS
 
 @import 'pages/news';
+
+// IFRAME
+
+@import 'pages/iframe';
 
 // ARCHIVE
 

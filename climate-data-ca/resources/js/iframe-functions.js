@@ -1,25 +1,25 @@
 (function ($) {
     $(function () {
 
-        const timeout_timer = document.getElementById("i_frame").getAttribute('timeout_timer')
+        let timeout_timer = $('#i_frame').data('timeout');
 
         if (timeout_timer > 0) {
             // Timeout of 10 sec to healthcheck on the iframe.
             let timeoutID = setTimeout(errorMessageIframe, timeout_timer * 1000);
 
-            // Event listener on the window wich will reveive a message from the iframe.
+            // Event listener on the window which will receive a message from the iframe.
             $(window).on("message onmessage", function(e) {
-                console.log("Message from iframe:" + e.originalEvent.data)
                 clearInterval(timeoutID);
             });
         }
 
 
-        // Function overiding the "srcDoc" attribute from the iframe to an Error Message
+        // Function replacing the iframe container with an error message
         function errorMessageIframe() {
-            console.log("Iframe Failed.")
-            let iframe = document.getElementById('i_frame');
-            iframe.srcdoc = "This iframe failed to load after "+timeout_timer+" sec. <br>Check the URL : " +iframe.src + "<br> Also make sure the iframe url application send a message onmesage.";
+            let iframe = $('#i_frame');
+            let message = iframe.data('timeoutMessage');
+            iframe.parent().addClass('bg-danger section-content');
+            iframe.parent().html('<div class="offset-1">' + message + '</div>');
         }
        
     })

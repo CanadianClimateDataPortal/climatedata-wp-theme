@@ -52,7 +52,7 @@
       <div class="container">
         <div class="row">
               
-          <div class="col-8 d-flex align-items-center py-4">
+          <div class="col-12 col-md-8 d-flex align-items-md-center py-4 px-3 px-md-0">
             <h6 class="mb-0 mr-4 text-uppercase"><?php _e ( 'Popular Tags', 'cdc' ); ?></h6>
             
             <div id="popular-tags">
@@ -67,7 +67,7 @@
                     
               ?>
               
-              <span class="tag-filter-item btn rounded-pill py-1 px-4 mr-2 <?php echo ( $this_tag->term_id == $init_tag ) ? 'selected' : ''; ?>" data-tag="<?php echo $this_tag->term_id; ?>"><i class="fas fa-times mr-3"></i><?php
+              <span class="tag-filter-item btn rounded-pill py-1 px-4 mr-2 mb-2 mb-md-0 <?php echo ( $this_tag->term_id == $init_tag ) ? 'selected' : ''; ?>" data-tag="<?php echo $this_tag->term_id; ?>"><i class="fas fa-times mr-3"></i><?php
               
                 echo $this_tag->name;
                 
@@ -82,7 +82,7 @@
             </div>
           </div>
           
-          <div id="news-header-actions" class="col-4 d-flex justify-content-end text-uppercase">
+          <div id="news-header-actions" class="col-12 col-md-4 d-flex justify-content-between justify-content-md-end text-uppercase">
           
             <a id="all-tags-btn" class="d-flex align-items-center p-4 text-uppercase" data-toggle="collapse" href="#all-tags" role="button" aria-expanded="false" aria-controls="all-tags">
               <span><?php _e ( 'All topics', 'cdc' ); ?></span>
@@ -100,9 +100,9 @@
       </div>
       
       <div id="all-tags" class="collapse">
-        <div class="bg-light py-5">
+        <div class="bg-light py-5 px-3 px-md-0">
           <div class="container">
-            <div class="row pt-5 border-top">
+            <div class="row pt-3 pt-md-5 border-top">
               <?php
               
                 $all_tags = get_terms ( array (
@@ -116,7 +116,7 @@
                     
               ?>
               
-              <div class="tag-filter-item col-12 col-sm-6 col-md-4 col-lg-3 mb-2 <?php echo ( $tag->term_id == $init_tag ) ? 'selected' : ''; ?>" data-tag="<?php echo $tag->term_id; ?>"><i class="fas fa-times mr-3"></i><?php echo $tag->name; ?></div>
+              <div class="tag-filter-item col-6 col-md-4 col-lg-3 mb-2 <?php echo ( $tag->term_id == $init_tag ) ? 'selected' : ''; ?>" data-tag="<?php echo $tag->term_id; ?>"><i class="fas fa-times mr-3"></i><?php echo $tag->name; ?></div>
               
               <?php
                     
@@ -149,7 +149,7 @@
   <div class="container">
     <div class="row">
           
-      <div id="news-pagination" class="col-9 d-flex align-items-center py-5" data-page="1">
+      <div id="news-pagination" class="col-12 d-flex align-items-center justify-content-center justify-content-md-start py-5" data-page="1">
         <span class="pagination-btn previous disabled"><i class="fas fa-caret-left mr-3"></i><?php _e ( 'Previous', 'cdc' ); ?></span>
         
         <div id="page-num" class="mx-5">

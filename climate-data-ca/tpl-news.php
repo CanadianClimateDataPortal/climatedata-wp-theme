@@ -53,7 +53,7 @@
         <div class="row">
               
           <div class="col-8 d-flex align-items-center py-4">
-            <h6 class="mb-0 mr-4 text-uppercase"><?php _e ( 'Popular Tags', 'cdc' ); ?></h6>
+            <h6 class="mb-0 mr-4 text-uppercase"><?php _e ( 'Popular topics', 'cdc' ); ?></h6>
             
             <div id="popular-tags">
               <?php

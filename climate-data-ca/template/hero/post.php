@@ -76,7 +76,7 @@
                 
             ?>
             
-            <h6><?php _e ( 'Tags', 'cdc' ); ?></h6>
+            <h6><?php _e ( 'Topics', 'cdc' ); ?></h6>
             
             <p class="mb-4"><?php
             

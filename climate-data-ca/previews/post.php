@@ -43,7 +43,7 @@
           
     ?>
     
-    <h6 class="card-tags-head text-uppercase"><?php _e ( 'Tags', 'cdc' ); ?></h6>
+    <h6 class="card-tags-head text-uppercase"><?php _e ( 'Topics', 'cdc' ); ?></h6>
     
     <p class="card-tags mb-4"><?php
     

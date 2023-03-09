@@ -2170,7 +2170,8 @@
             history_action = 'push';
         }
 
-
+        var highlighted_feature;
+        
         $('#geo-select').on('select2:select', function (e) {
 
             // console.log('geo-select');
@@ -2182,7 +2183,50 @@
 
             //update_param('coords', thislat + ',' + thislon + ',11');
             map1.setView([thislat, thislon], 10);
+            
+            // highlight the feature at the selected coordinates
+            let current_var = $("#var").val();
+            let varDetails = varData.get(current_var);
 
+            $.ajax({
+                url: hosturl + "/geoserver/CDC/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo" +
+                    "&QUERY_LAYERS=CDC%3A" + varDetails.grid + "&LAYERS=CDC%3A" + varDetails.grid +
+                    "&INFO_FORMAT=application%2Fjson" + "&FEATURE_COUNT=50&X=50&Y=50&SRS=EPSG%3A4326&" +
+                    "WIDTH=101&HEIGHT=101&BBOX=" + thislon + "%2C" + thislat + "%2C" +
+                    (parseFloat(thislon) + 0.0001) + "%2C" + (parseFloat(thislat) + 0.00001),
+                dataType: 'json',
+                success: function (data) {
+
+                    if (data.features.length) {
+
+                        if (highlighted_feature) {
+
+                            gridLayer.resetFeatureStyle(highlighted_feature)
+
+                            if (has_mapRight == true) {
+                                gridLayerRight.resetFeatureStyle(highlighted_feature)
+                            }
+
+                        }
+
+                        highlighted_feature = data.features[0].properties.gid;
+
+                        gridLayer.setFeatureStyle(highlighted_feature, {
+                            weight: 1.5,
+                            color: '#f00',
+                            opacity: 1
+                        });
+
+                        if (has_mapRight == true) {
+                            gridLayerRight.setFeatureStyle(highlighted_feature, {
+                                weight: 1.5,
+                                color: '#f00',
+                                opacity: 1
+                            });
+                        }
+                    }
+                }
+            });
         });
 
         //

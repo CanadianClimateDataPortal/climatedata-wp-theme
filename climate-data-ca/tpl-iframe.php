@@ -29,7 +29,7 @@ if (have_posts()) : while (have_posts()) : the_post();
 ?>
 <section id="iframe-section" class="page-section bg-white" >
   <div class="iframe-container">
-    <iframe src=<?php echo get_field("url") ?> id="i_frame" title="iframe" allow="fullscreen" data-timeout="<?php echo get_field("timeout_timer") ?>" data-timeout-message="<?php echo htmlspecialchars(get_field("timeout_message"));?>"></iframe>
+    <iframe data-src=<?php echo get_field("url") ?> id="i_frame" title="iframe" allow="fullscreen" data-timeout="<?php echo get_field("timeout_timer") ?>" data-timeout-message="<?php echo htmlspecialchars(get_field("timeout_message"));?>"></iframe>
   </div>
 </section>
 

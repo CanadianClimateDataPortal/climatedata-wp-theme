@@ -599,18 +599,16 @@
             return gA4EventNameForVariableDataBCCAQv2;
         }
 
-        function setDataLayerForVariableDataBCCAQv2(BCCAQv2DataLayerEventName, BCCAQv2PointsInfo, BCCAQv2FileFormat) {
-            dataLayer.push({
-                'event': BCCAQv2DataLayerEventName,
-                'variable_data_event_type': BCCAQv2DataLayerEventName,
-                'variable_data_location': BCCAQv2PointsInfo,
-                'variable_data_format': BCCAQv2FileFormat
-            });
-        }
-
         var format = null;
         $('.download_variable_data_bccaqv2').click(function (e) {
-            setDataLayerForVariableDataBCCAQv2(dataLayerEventName, pointsInfo, format);
+            let selectedDataset = $('input[name="download-dataset"]:checked').val();
+            dataLayer.push({
+                'event': dataLayerEventName,
+                'variable_data_event_type': dataLayerEventName,
+                'variable_data_location': pointsInfo,
+                'variable_data_format': format,
+                'variable_data_dataset': selectedDataset
+            });
         });
 
         function process_download() {

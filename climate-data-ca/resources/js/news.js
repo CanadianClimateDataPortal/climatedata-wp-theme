@@ -96,21 +96,21 @@
 		// SETUP
 		//
 		
-		sticky_offset += $('#main-header-nav').outerHeight()
+		// sticky_offset += $('#main-header-nav').outerHeight()
 		
-		if ($('body').hasClass('admin-bar')) {
-		  
-		  if ($(window).width() > 782) {
-			scroll_offset += 32
-		  } else {
-			scroll_offset += 46
-		  }
-		}
+		// if ($('body').hasClass('admin-bar')) {
+		//   
+		//   if ($(window).width() > 782) {
+		// 	scroll_offset += 32
+		//   } else {
+		// 	scroll_offset += 46
+		//   }
+		// }
 		
-		$('#news-header').stick_in_parent({
-		  parent: 'main',
-		  offset_top: sticky_offset
-		})
+		// $('#news-header').stick_in_parent({
+		//   parent: 'main',
+		//   offset_top: sticky_offset
+		// })
 		
 		// page load
 		

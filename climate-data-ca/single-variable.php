@@ -421,6 +421,16 @@ if (have_posts()) : while (have_posts()) : the_post();
 
 
                         <div id="chart-placeholder" class="var-chart"></div>
+                        
+                        <div class="d-flex justify-content-center align-items-center my-5 pt-5 border-top">
+                            <h6 class="mb-0 mr-3 all-caps">More tools</h6>
+                            
+                            <a href="<?php echo home_url ( 'download' ); ?>" class="btn btn-outline-secondary rounded-pill mx-3"><?php _e ( 'Download multiple grid cells', 'cdc' ); ?></a>
+                            
+                            <a href="<?php echo home_url ( 'analyze' ); ?>" class="btn btn-outline-secondary rounded-pill mx-3"><?php _e ( 'Customize variable data', 'cdc' ); ?></a>
+                            
+                        </div>
+                        
                     </div>
                 </div>
 

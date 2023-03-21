@@ -3,8 +3,8 @@
 /**
  * Enable Gutenberg on "interactive" custom post
  * 
- * @param $use_block_editor Whether the post can be edited or not.
- * @param $post The post being checked.
+ * @param $use_block_editor bool Whether the post can be edited or not.
+ * @param $post WP_Post The post being checked.
  *
  * @return bool
  */

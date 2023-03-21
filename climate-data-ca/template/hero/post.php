@@ -38,7 +38,7 @@
   <div class="section-container">
     <div class="container-fluid">
       <div class="row align-items-center">
-        <div class="col-6 offset-1">
+        <div class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-1">
           <h1><?php
 
             the_title();
@@ -48,7 +48,7 @@
           <?php the_field ( 'hero_text' ); ?>
         </div>
 
-        <aside class="col-3 offset-1 hero-menu-wrap">
+        <aside class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-3 offset-md-1 hero-menu-wrap">
           <div class="hero-menu">
             <h6><?php _e ( 'Date', 'cdc' ); ?></h6>
 

@@ -553,17 +553,63 @@
         
         $('body').on('click', '.geo-select-pan-btn', function() {
             
-            let this_zoom = map1.getZoom()
+            let thislat = parseFloat($(this).attr('data-lat')),
+                thislon = parseFloat($(this).attr('data-lon')),
+                this_zoom = map1.getZoom()
             
             if (this_zoom < 7) {
                 this_zoom = 7
             }
             
-            map1.setView([parseFloat($(this).attr('data-lat')), parseFloat($(this).attr('data-lon'))], this_zoom);
+            map1.setView([thislat, thislon], this_zoom);
             
             $('#select2-geo-select-container').text($(this).attr('data-lat') + ', ' + $(this).attr('data-lon'))
             
             $("#geo-select").select2('close')
+            
+            // highlight grid
+            
+            let varDetails = varData.get($("#var").val());
+            
+            $.ajax({
+                url: hosturl + "/geoserver/CDC/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo" +
+                    "&QUERY_LAYERS=CDC%3A" + varDetails.grid + "&LAYERS=CDC%3A" + varDetails.grid +
+                    "&INFO_FORMAT=application%2Fjson" + "&FEATURE_COUNT=50&X=50&Y=50&SRS=EPSG%3A4326&" +
+                    "WIDTH=101&HEIGHT=101&BBOX=" + thislon + "%2C" + thislat + "%2C" +
+                    (parseFloat(thislon) + 0.0001) + "%2C" + (parseFloat(thislat) + 0.00001),
+                dataType: 'json',
+                success: function (data) {
+            
+                    if (data.features.length) {
+            
+                        if (highlighted_feature) {
+            
+                            gridLayer.resetFeatureStyle(highlighted_feature)
+            
+                            if (has_mapRight == true) {
+                                gridLayerRight.resetFeatureStyle(highlighted_feature)
+                            }
+            
+                        }
+            
+                        highlighted_feature = data.features[0].properties.gid;
+            
+                        gridLayer.setFeatureStyle(highlighted_feature, {
+                            weight: 1.5,
+                            color: '#f00',
+                            opacity: 1
+                        });
+            
+                        if (has_mapRight == true) {
+                            gridLayerRight.setFeatureStyle(highlighted_feature, {
+                                weight: 1.5,
+                                color: '#f00',
+                                opacity: 1
+                            });
+                        }
+                    }
+                }
+            });
             
         })
 

@@ -516,6 +516,12 @@ body {
 
 .single {
 	#hero {
+    .section-container {
+      @include media-breakpoint-down(md) {
+        padding-bottom: 60px;
+      }
+    }
+    
 		#post-share-wrap {
 
 			.social-widget-wrap {

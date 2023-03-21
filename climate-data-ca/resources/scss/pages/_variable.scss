@@ -604,7 +604,26 @@ body.stations-on {
   font-weight:bold;
 }
 
+.geo-select-instructions {
+  font-size: 1rem;
+  
+  h6 {
+    font-size: 1.4rem;
+    color: $slate2;
+  }
+  
+  p {
+    font-size: 1.2rem;
+  }
+}
 
+#select2-geo-select-results {
+  font-size: 1.3rem;
+  
+  .geo-select-title {
+    font-size: 1.2em;
+  }
+}
 
 .irs--round .irs-grid-text {
   color: #404040;

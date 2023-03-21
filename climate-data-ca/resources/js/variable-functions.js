@@ -469,7 +469,31 @@
         }
 
         $("#geo-select").select2({
-            language: current_lang,
+            language: {
+                inputTooShort: function() {
+                    let instructions = '<div class="geo-select-instructions">'
+                    
+                        instructions += '<div class="p-2 mb-2 border-bottom">'
+                            
+                            instructions += '<h6 class="mb-1">' + T('Search communities') + '</h6>'
+                            
+                            instructions += '<p class="mb-1 text-body">' + T('Begin typing city name') + '</p>'
+                        
+                        instructions += '</div>'
+                        
+                        instructions += '<div class="p-2">'
+                        
+                            instructions += '<h6 class="mb-1">' + T('Search coordinates') + '</h6>'
+                            
+                            instructions += '<p class="mb-0 text-body">' + T('Enter latitude & longitude e.g.') + ' <code>54,-115</code></p>'
+                        
+                        instructions += '</div>'
+                    
+                    instructions += '</div>'
+                    
+                    return instructions
+                }
+            },
             ajax: {
                 url: child_theme_dir + "resources/app/run-frontend-sync/select-place.php",
                 dataType: 'json',
@@ -482,26 +506,28 @@
                     };
                 },
                 transport: function (params, success, failure) {
+                    
                     var $request = $.ajax(params);
 
                     var llcheck = new RegExp('^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$');
 
                     term = params.data.q;
 
-
                     if (llcheck.test(term)) {
                         $request.fail(failure);
                         // $('.select2-results__option').text('custom');
                         $('.select2-results__options').empty();
-                        $('.select2-results__options').append('<li style="padding:10px"><strong>Custom Lat/Lon Detected:</strong><br>Map has panned to validated coordinates.</li>');
+                        
                         var term_segs = term.split(',');
                         var term_lat = term_segs[0];
                         var term_lon = term_segs[1];
-                        map1.panTo([term_lat, term_lon]);
+                        
+                        $('.select2-results__options').append('<div class="geo-select-instructions p-4"><h6 class="mb-3">' + T('Coordinates detected') + '</h6><p class="mb-0"><span class="geo-select-pan-btn btn btn-outline-secondary btn-sm rounded-pill px-4" data-lat="' + term_lat + '" data-lon="' + term_lon + '">' + T('Set map view') + '</span></p></div>');
                     } else {
                         $request.then(success);
                         return $request;
                     }
+                    
                 },
                 processResults: function (data, page) {
                     // parse the results into the format expected by Select2.
@@ -524,6 +550,22 @@
             //templateResult: formatRepo, // omitted for brevity, see the source of this page
             //templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
         });
+        
+        $('body').on('click', '.geo-select-pan-btn', function() {
+            
+            let this_zoom = map1.getZoom()
+            
+            if (this_zoom < 7) {
+                this_zoom = 7
+            }
+            
+            map1.setView([parseFloat($(this).attr('data-lat')), parseFloat($(this).attr('data-lon'))], this_zoom);
+            
+            $('#select2-geo-select-container').text($(this).attr('data-lat') + ', ' + $(this).attr('data-lon'))
+            
+            $("#geo-select").select2('close')
+            
+        })
 
         //
         // MAP STUFF

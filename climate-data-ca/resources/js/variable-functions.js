@@ -1396,61 +1396,84 @@
             labels.push('<div class="legendRows">');
 
             var min_label = '';
+            
+            // what's the current opacity
+            let current_opacity = $('#opacity-slider').data('ionRangeSlider')['old_from'] / 100
 
             for (let i = 0; i < colormap.length; i++) {
                 unitValue = unit_localize(colormap[i].label);
                 unitColor = colormap[i].color;
+                
+                let row_class = 'legendRow'
+                
+                if (i == 0) {
+                    row_class += ' first'
+                } else if (i == colormap.length - 1) {
+                    row_class += ' last'
+                }
 
                 if (unitValue !== 'NaN') {
 
-                    style = 'background:' + unitColor;
-
                     t = "";
+                    
                     if (i == 0) {
-                        style = "; border-bottom: 10px solid " + unitColor +
-                            "; border-left: 8px solid transparent" +
-                            "; border-right: 8px solid transparent";
+                        
+                        // first row
+                            
                         t = '<span class="legendLabel max">' + first_label + '</span>';
 
                         labels.push(
-                            '<div class="legendRow">' +
+                            '<div class="' + row_class + '">' +
                             '<span class="legendLabel max">' + unitValue + '</span>' +
-                            '<div class="legendColor" style="border-bottom: 10px solid ' + unitColor +
+                            '<div class="legendColor" style="opacity: ' + current_opacity + '; border-bottom: 10px solid ' + unitColor +
                             '; border-left: 8px solid transparent; border-right: 8px solid transparent"></div>' +
                             '<span class="legendUnit">&gt; ' + unitValue + '</span>' +
                             '</div>'
                         );
-                    }
-                    else if (i == colormap.length - 1) {
+                        
+                    } else if (i == colormap.length - 1) {
+                        
                         labels.push(
-                            '<div class="legendRow">' +
+                            '<div class="' + row_class + '">' +
                             '<span class="legendLabel min">' + unitValue + '</span>' +
-                            '<div class="legendColor" style="border-top: 10px solid ' + unitColor +
+                            '<div class="legendColor" style="opacity: ' + current_opacity + '; border-top: 10px solid ' + unitColor +
                             '; border-left: 8px solid transparent; border-right: 8px solid transparent"></div>' +
                             '<span class="legendUnit">&lt; ' + unitValue + '</span>' +
-                            '</div>');
+                            '</div>'
+                        );
+                        
                     } else {
+                        
+                        // last row
+                        
                         labels.push(
-                            '<div class="legendRow">' +
-                            '<div class="legendColor" style="' + style + '"></div>' +
+                            '<div class="' + row_class + '">' +
+                            '<div class="legendColor" style="opacity: ' + current_opacity + '; background-color:' + unitColor + ';"></div>' +
                             '<div class="legendUnit">' + unitValue + '</div>' +
-                            '</div>');
+                            '</div>'
+                        );
+                        
                     }
 
                 } else {
+                    
                     if (i == colormap.length - 1) {
+                        
+                        // last row if no unit
+                        
                         labels.push(
-                            '<div class="legendRow">' +
+                            '<div class="' + row_class + ' zero">' +
                             '<span class="legendLabel ">0</span>' +
-                            '<div class="legendColor" style="background:' + unitColor + '"></div>' +
+                            '<div class="legendColor" style="opacity: ' + current_opacity + '; background-color:' + unitColor + '"></div>' +
                             '<span class="legendUnit">0</span>' +
-                            '</div>');
+                            '</div>'
+                        );
+                        
                     }
                 }
             }
 
             labels.push('</div><!-- .legendRows -->');
-
 
             return labels;
 
@@ -1656,7 +1679,9 @@
                 rightLayer.setOpacity(value / 100);
             }
 
-            $('.leaflet-sector-pane').css('opacity', value / 100);
+            $('.leaflet-sector-pane').css('opacity', value / 100)
+            $('.legend .legendColor').css('opacity', value / 100)
+            
         }
 
         loadClimateNormals();

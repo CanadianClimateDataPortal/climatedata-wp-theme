@@ -6,6 +6,8 @@
 
 .wp-block-cover {
   &.interactive-section { // Key class
+    display: flex;
+    align-items: center;
     position: relative;
     overflow: hidden;
     width: 100%;

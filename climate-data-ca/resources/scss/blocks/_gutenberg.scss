@@ -138,8 +138,11 @@ $mobile_viewport_width: 800px;
         .overlap-element { // Key class
           position: absolute;
           top: 50%;
+          left: 0;
+          right: 0;
           transform: translateY(-50%);
           margin: auto;
+          width: fit-content;
         }
 
         &.wp-block-group {

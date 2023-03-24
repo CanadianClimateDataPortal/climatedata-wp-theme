@@ -16,7 +16,7 @@
     @media only screen and (max-width: 1200px) {
       padding: calc(50px + 90px) 0 50px; // 90px is header height
     }
-    
+
     @media only screen and (max-width: 991px) {
       padding: calc(50px + 70px) 0 50px; // 70px is estimated header height
     }
@@ -102,47 +102,53 @@
     }
 
     /* Groups */
-    
+
     .wp-block-group {
-      &.is-vertical { // Row (column orientation)
+      &.is-vertical { // Stack (column orientation)
         gap: 30px;
 
         @media only screen and (max-width: 800px) {
           gap: 20px;
         }
       }
+    }
 
-      &.overlap-elements { // Key class
-        &.width-33 { // Key class
-          width: 33%;
-        }
+    /* Overlapping */
 
-        &.width-50 { // Key class
-          width: 50%;
-        }
+    .overlap-container { // Key class
+      position: relative;
+      margin: auto;
 
-        &.width-100 { // Key class
-          width: 100%;
-        }
+      &.width-33 { // Key class
+        width: 33%;
+      }
 
-        > .wp-block-group__inner-container {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
+      &.width-50 { // Key class
+        width: 50%;
+      }
 
-          > * {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            margin: 0;
-          }
+      &.width-100 { // Key class
+        width: 100%;
+      }
+
+      .overlap-element { // Key class
+        opacity: 0.5;
+        background: black;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: auto;
+      }
+
+      &.wp-block-group {
+        &.is-vertical { // Stack (column orientation)
+          gap: 0;
         }
       }
     }
 
     /* Columns */
-    
+
     .wp-block-columns {
       gap: 30px;
 
@@ -156,7 +162,7 @@
       }
 
       /* Single column */
-      
+
       .wp-block-column {
         flex-basis: 100%;
 
@@ -165,9 +171,9 @@
         }
       }
     }
-    
+
     /* Text align */
-    
+
     .has-text-align-center {
       text-align: center;
     }
@@ -181,7 +187,7 @@
     }
 
     /* General elements */
-    
+
     p {
       &:not(:last-child) {
         margin-bottom: 15px;
@@ -191,7 +197,7 @@
         margin-bottom: 0;
       }
     }
-    
+
     h1,
     h2,
     h3 {
@@ -199,25 +205,25 @@
         margin-bottom: 0;
       }
     }
-    
+
     h1 {
       &:not(:last-child) {
         margin-bottom: 30px;
       }
     }
-    
+
     h2 {
       &:not(:last-child) {
         margin-bottom: 20px;
       }
     }
-    
+
     h3 {
       &:not(:last-child) {
         margin-bottom: 15px;
       }
     }
-    
+
     a {
       color: inherit;
     }

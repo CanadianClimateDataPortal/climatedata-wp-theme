@@ -4,6 +4,9 @@
  * ----------------------------------------------
  */
 
+// Global variables
+$mobile_viewport_width: 800px;
+
 .wp-block-cover {
   &.interactive-section { // Key class
     display: flex;
@@ -21,7 +24,7 @@
       padding: calc(50px + 70px) 0 50px; // 70px is estimated header height
     }
 
-    @media only screen and (max-width: 800px) {
+    @media only screen and (max-width: $mobile_viewport_width) {
       padding: calc(40px + 60px) 0 40px; // 60px is estimated header height
     }
 
@@ -107,7 +110,7 @@
       &.is-vertical { // Stack (column orientation)
         gap: 30px;
 
-        @media only screen and (max-width: 800px) {
+        @media only screen and (max-width: $mobile_viewport_width) {
           gap: 20px;
         }
       }
@@ -116,33 +119,45 @@
     /* Overlapping */
 
     .overlap-container { // Key class
-      position: relative;
-      margin: auto;
-
-      &.width-33 { // Key class
-        width: 33%;
-      }
-
-      &.width-50 { // Key class
-        width: 50%;
-      }
-
-      &.width-100 { // Key class
-        width: 100%;
-      }
-
-      .overlap-element { // Key class
-        opacity: 0.5;
-        background: black;
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
+      @mixin overlapping {
+        position: relative;
         margin: auto;
+
+        &.width-33 { // Key class
+          width: 33%;
+        }
+
+        &.width-50 { // Key class
+          width: 50%;
+        }
+
+        &.width-100 { // Key class
+          width: 100%;
+        }
+
+        .overlap-element { // Key class
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          margin: auto;
+        }
+
+        &.wp-block-group {
+          &.is-vertical { // Stack (column orientation)
+            gap: 0;
+          }
+        }
       }
 
-      &.wp-block-group {
-        &.is-vertical { // Stack (column orientation)
-          gap: 0;
+      &.is-mobile {
+        @media (max-width: $mobile_viewport_width) {
+          @include overlapping;
+        }
+      }
+
+      &.is-desktop {
+        @media (min-width: $mobile_viewport_width + 1px) {
+          @include overlapping;
         }
       }
     }
@@ -156,7 +171,7 @@
         width: 100%;
       }
 
-      @media only screen and (max-width: 800px) {
+      @media only screen and (max-width: $mobile_viewport_width) {
         gap: 20px;
         flex-wrap: wrap;
       }
@@ -166,7 +181,7 @@
       .wp-block-column {
         flex-basis: 100%;
 
-        @media only screen and (max-width: 1024px) {
+        @media only screen and (max-width: 1024px) { // Ignore single column width
           flex-basis: 100% !important;
         }
       }

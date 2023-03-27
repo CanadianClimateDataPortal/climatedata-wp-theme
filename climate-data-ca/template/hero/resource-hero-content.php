@@ -18,23 +18,20 @@
       <li class="breadcrumb-item"><a href="<?php echo get_permalink ( $training_page ); ?>"><?php echo get_the_title ( $training_page ); ?></a></li>
       
       <?php
-        
-        $post_cat = get_the_terms ( get_the_ID(), 'resource-category' );
-        
-        $post_cat = $post_cat[0];
-          
-      ?>
-    
-      <li class="breadcrumb-item"><a href="<?php echo get_permalink ( $training_page ) . '#' . $post_cat->slug; ?>" class=""><?php 
-        
-        echo $post_cat->name; 
-        
-        if ( get_field ( 'module_title', 'resource-category_' . $post_cat->term_id ) != '' ) {
-          echo ': ' . get_field ( 'module_title', 'resource-category_' . $post_cat->term_id );
-        }
-        
-      ?></a></li>
-      
+      $post_cat = get_the_terms ( get_the_ID(), 'resource-category' );
+
+      if ( is_array( $post_cat ) ) {
+	      $post_cat = $post_cat[0]; ?>
+          <li class="breadcrumb-item"><a href="<?php echo get_permalink( $training_page ) . '#' . $post_cat->slug; ?>" class=""><?php
+			      echo $post_cat->name;
+
+			      if ( get_field( 'module_title', 'resource-category_' . $post_cat->term_id ) != '' ) {
+				      echo ': ' . get_field( 'module_title', 'resource-category_' . $post_cat->term_id );
+			      }
+			      ?></a>
+          </li>
+	      <?php
+      } ?>
     </ol>
   </nav>
   

@@ -699,3 +699,27 @@ function rudr_metabox_content($post) {
   }
   echo '</ul></div>'; // end HTML
 }
+
+/**
+ * Fix Motion.page styling conflict with WPML
+ *
+ * @return void
+ */
+function motion_page_styles() {
+	if ( ! isset( $_GET['page'] ) ) {
+		return;
+	}
+
+	if ( $_GET['page'] !== 'motionpage' ) {
+		return;
+	} ?>
+
+	<style>
+        #mp-main input[type="text"] {
+            color: #ffffff;
+        }
+	</style>
+	<?php
+}
+
+add_action( 'admin_head', 'motion_page_styles' );

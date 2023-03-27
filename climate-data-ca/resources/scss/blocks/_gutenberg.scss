@@ -214,6 +214,24 @@ $mobile_viewport_width: 800px;
       }
     }
 
+    /* Spacers */
+
+    .wp-block-spacer {
+      display: none;
+
+      &.is-mobile { // Key class
+        @media (max-width: $mobile_viewport_width) {
+          display: block;
+        }
+      }
+
+      &.is-desktop { // Key class
+        @media (min-width: $mobile_viewport_width + 1px) {
+          display: block;
+        }
+      }
+    }
+
     /* Text align */
 
     .has-text-align-center {

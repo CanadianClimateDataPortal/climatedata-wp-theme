@@ -558,6 +558,7 @@ function news_filter() {
   
   $query_args = array (
     'post_type' => 'post',
+    'post_status' => 'publish',
     'posts_per_page' => 12
   );
   

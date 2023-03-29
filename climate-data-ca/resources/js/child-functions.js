@@ -19,6 +19,13 @@ var l10n_table = {
         '{0} Median': '{0} médiane',
         '{0} Range': '{0} portée',
 
+        'Search communities': 'Recherche par ville',
+        'Begin typing city name': 'Commencer à saisir le nom d\'une ville',
+        'Search coordinates': 'Recherche par coordonnées',
+        'Enter latitude & longitude e.g.': 'Saisir la latitude et la longitude, par ex.',
+        'Coordinates detected': 'Coordonnées détectées',
+        'Set map view': 'Définir l\'affichage de la carte',
+
         // share widget
         "Copied to clipboard": "Copié dans le presse-papier",
         "Error" : "Erreur",

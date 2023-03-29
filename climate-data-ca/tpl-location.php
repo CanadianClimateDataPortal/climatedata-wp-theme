@@ -41,7 +41,44 @@
   $dataset_name = arr_get($_GET, 'dataset_name', 'cmip6');
 
 
-if ( have_posts() ) : while ( have_posts() ) : the_post();
+  if ( have_posts() ) : while ( have_posts() ) : the_post();
+    
+    if ( !isset ( $_GET['loc'] ) || empty ( $_GET['loc'] ) ) {
+      
+?>
+
+<section id="location-hero" class="page-section first-section">
+  <div class="section-container supermenu-slide">
+    <div class="container-fluid">
+      <header class="row">
+        <div class="col-10 offset-1 col-lg-4 offset-lg-4 d-flex align-items-center text-secondary">
+          <span class="cdc-icon icon-variable"></span>
+          <h5><?php _e ( 'Find data summaries in locations you care about', 'cdc' ); ?></h5>
+        </div>
+      </header>
+    
+      <div id="location-search-container" class="row align-items-center text-lg-center">
+        <label for="location-hero-search" class="col-10 offset-1 col-md-3 col-lg-2 offset-lg-2 col-form-label"><?php _e ( 'Select a location', 'cdc' ); ?></label>
+    
+        <div class="col-10 offset-1 col-md-6 offset-md-0 col-lg-4 offset-lg-0">
+          <select class="custom-select custom-select-lg select2 form-control-lg rounded-pill border-dark text-center w-100" name="location-hero-search" id="location-hero-search" data-container-css-class="big-menu btn btn-lg rounded-pill" data-dropdown-css-class="big-menu-dropdown">
+            <option value=""><?php _e ( 'Search for a City/Town', 'cdc' ); ?></option>
+          </select>
+        </div>
+      </div>
+    
+      <div id="location-search-instruction" class="col-10 offset-1 col-lg-4 offset-lg-4">
+        <p><?php _e('* Each location provided here corresponds to a point location in Canada.
+        The data displayed is for the ~10 km x 6 km grid cell within which the selected location lies.
+        Accordingly, the data does not necessarily reflect the exact point that you select, particularly in areas with varying microclimates.','cdc'); ?></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<?php
+
+    } else {
 
 ?>
 
@@ -214,6 +251,8 @@ if ( have_posts() ) : while ( have_posts() ) : the_post();
 
 <?php
 
+    }
+    
   endwhile; endif;
 
   get_footer();

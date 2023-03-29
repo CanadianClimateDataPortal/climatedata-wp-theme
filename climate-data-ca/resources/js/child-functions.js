@@ -1218,8 +1218,8 @@ function getIDFLinks(station_id, target, css_class) {
             );
             return $item;
         }
-
-        $('#location-search').select2({
+        
+        $('#location-search, #location-hero-search').select2({
             language: current_lang,
             ajax: {
                 url: child_theme_dir + "resources/app/run-frontend-sync/select-place.php",
@@ -1244,8 +1244,8 @@ function getIDFLinks(station_id, target, css_class) {
             minimumInputLength: 1,
             templateResult: formatLocationSearch
         });
-
-        $('#location-search').on('select2:select', function (e) {
+        
+        $('#location-search, #location-hero-search').on('select2:select', function (e) {
 
             var redirect_url = '/explore/location/';
 

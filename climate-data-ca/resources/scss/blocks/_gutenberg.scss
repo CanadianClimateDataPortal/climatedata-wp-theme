@@ -14,22 +14,34 @@ $mobile_viewport_width: 767px;
     position: relative;
     overflow: hidden;
     width: 100%;
-    padding: calc(80px + 90px) 0 80px; // 90px is header height
-
-    @media only screen and (max-width: 1200px) {
-      padding: calc(50px + 90px) 0 50px; // 90px is header height
-    }
-
-    @media only screen and (max-width: 991px) {
-      padding: calc(50px + 70px) 0 50px; // 70px is estimated header height
-    }
-
-    @media only screen and (max-width: $mobile_viewport_width) {
-      padding: calc(40px + 60px) 0 40px; // 60px is estimated header height
-    }
 
     &.full-height { // Key class
       min-height: 100vh;
+      padding: calc(80px + 90px) 0 80px; // 90px is header height
+
+      @media only screen and (max-width: 1200px) {
+        padding: calc(50px + 90px) 0 50px; // 90px is header height
+      }
+
+      @media only screen and (max-width: 991px) {
+        padding: calc(50px + 70px) 0 50px; // 70px is estimated header height
+      }
+
+      @media only screen and (max-width: $mobile_viewport_width) {
+        padding: calc(40px + 60px) 0 40px; // 60px is estimated header height
+      }
+    }
+    
+    &:not(.full-height) { // Key class
+      padding: 80px 0;
+
+      @media only screen and (max-width: 1200px) {
+        padding: 50px 0;
+      }
+
+      @media only screen and (max-width: $mobile_viewport_width) {
+        padding: 40px 0;
+      }
     }
 
     .wp-block-cover {

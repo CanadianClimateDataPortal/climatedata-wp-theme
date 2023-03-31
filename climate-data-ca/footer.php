@@ -199,7 +199,13 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
 			</div>
 		</div>
 
-    <div class="spinner"></div>
+    <?php
+    global $post_type;
+
+    if ( $post_type !== 'interactive' ) { ?>
+        <div class="spinner"></div>
+        <?php
+    } ?>
 
     <script type="text/javascript">
 

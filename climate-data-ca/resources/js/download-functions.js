@@ -185,11 +185,17 @@
                     }
 
                 } else if (ui.panel.attr('id') === 'station-download') {
-
+                
                     if (typeof maps['station'] == 'undefined') {
                         station_init();
                     }
-
+                
+                } else if (ui.panel.attr('id') === 'normals-download') {
+                
+                    if (typeof maps['normals'] == 'undefined') {
+                        normals_init()
+                    }
+                
                 } else if (ui.panel.attr('id') === 'idf-download') {
 
                     if (typeof maps['idf'] == 'undefined') {
@@ -216,11 +222,17 @@
                     $('#daily-captcha').attr('src', child_theme_dir + 'resources/php/securimage/securimage_show.php');
 
                 } else if (ui.newPanel.attr('id') === 'station-download') {
-
+                
                     if (typeof maps['station'] == 'undefined') {
                         station_init();
                     }
-
+                
+                } else if (ui.newPanel.attr('id') === 'normals-download') {
+                
+                    if (typeof maps['normals'] == 'undefined') {
+                        normals_init()
+                    }
+                
                 } else if (ui.newPanel.attr('id') === 'idf-download') {
 
                     if (typeof maps['idf'] == 'undefined') {
@@ -1129,7 +1141,7 @@
 
         var station_status = $('#station-download-status').text();
 
-        var dl_URL = {
+        var station_dl_obj = {
             s: [],
             start: $('#station-start').val(),
             end: $('#station-end').val(),
@@ -1381,7 +1393,7 @@
 
             });
 
-            if (dl_URL['s'].length == 0) {
+            if (station_dl_obj['s'].length == 0) {
                 form_valid = false;
 
                 station_status += 'Choose at least one weather station. ';
@@ -1393,18 +1405,18 @@
                 $('#station-process').removeClass('disabled');
                 station_status = 'Ready to process.';
 
-                populate_URL();
+                populate_station_URL();
             }
 
             if (selected_stations == undefined || Object.keys(selected_stations).length == 0) {
-                populate_URL(0); // update only #station-download-data
+                populate_station_URL(0); // update only #station-download-data
             }
 
             $('#station-download-status').text(station_status);
         }
 
         function update_URL(name, val) {
-            dl_URL[name] = val;
+            station_dl_obj[name] = val;
         }
 
 
@@ -1459,14 +1471,321 @@
             set_datalayer_for_download_station_data(selected_stations_to_str, selected_stations_file_extension);
         });
 
-        function populate_URL(ga4_event = 1) {
+        function populate_station_URL(ga4_event = 1) {
             if (ga4_event == 1) {
-                var new_url = 'https://api.weather.gc.ca/collections/climate-daily/items?datetime=' + dl_URL.start + ' 00:00:00/' + dl_URL.end + ' 00:00:00&STN_ID=' + dl_URL['s'] + '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' + dl_URL.format + '&limit=' + dl_URL.limit + '&startindex=' + dl_URL.offset;
+                var new_url = 'https://api.weather.gc.ca/collections/climate-daily/items?datetime=' + station_dl_obj.start + ' 00:00:00/' + station_dl_obj.end + ' 00:00:00&STN_ID=' + station_dl_obj['s'] + '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' + station_dl_obj.format + '&limit=' + station_dl_obj.limit + '&startindex=' + station_dl_obj.offset;
                 $('#station-process').attr('href', new_url);
             }
             selected_stations_to_str = get_selected_stations();
         }
-
+        
+        //
+        // STATION
+        //
+        
+        var normals_status = $('#normals-download-status').text();
+        
+        var normals_dl_obj = {
+            s: [],
+            limit: $('#normals-limit').val(),
+            offset: 0,
+            format: $('input[name="format"]:checked').val()
+        };
+        
+        var markerMap = [];
+        stationFromAPI = [];
+        var normals_layer;
+        var selected_normals_stations = {};
+        
+        function normals_init() {
+        
+            create_map('normals');
+            $('#normals-process-data').removeAttr("style").hide();
+            
+            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y', function (data) {
+                console.log(data)
+                
+                normals_layer = L.geoJson(data, {
+                    onEachFeature: function (feature, layer) {
+                    
+                        $('<option value="' + feature.properties.CLIMATE_IDENTIFIER + '">' + feature.properties.STATION_NAME + '</option>').appendTo('#normals-select')
+                    
+                    },
+                    pointToLayer: function (feature, latlng) {
+                        markerColor = '#e50e40';
+                        return L.circleMarker(latlng, {
+                            // Stroke properties
+                            color: '#fff',
+                            opacity: 1,
+                            weight: 2,
+                            pane: 'idf',
+                            fillColor: markerColor,
+                            fillOpacity: 1,
+                            radius: 5
+                        });
+                    }
+                }).on('mouseover', function (e) {
+                    
+                    e.layer.bindTooltip(e.layer.feature.properties.STATION_NAME).openTooltip(e.latlng);
+                    
+                }).on('click', function (e) {
+                    
+                    $('#normals-select').val(e.layer.feature.properties.CLIMATE_IDENTIFIER).trigger('change')
+                    
+                });
+                
+                // sort options
+                
+                var arr = $('#normals-select option').map(function (_, o) {
+                    return { t: $(o).text(), v: o.value };
+                }).get()
+                
+                arr.sort(function (o1, o2) {
+                    return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0;
+                })
+                
+                $('#normals-select option').each(function (i, o) {
+                    o.value = arr[i].v
+                    $(o).text(arr[i].t)
+                })
+                
+                // add to map
+                
+                normals_layer.addTo(maps['normals'])
+                
+            }).done(function () {
+                
+            });
+        
+        }
+        
+        $("#normals-select").select2({
+            language: current_lang,
+            ajax: {
+                url: child_theme_dir + "resources/app/run-frontend-station-download/search.php",
+                dataType: 'json',
+                delay: 0,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, page) {
+                    // parse the results into the format expected by Select2.
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) {
+                return markup;
+            }, // let our custom formatter work
+            width: "100%",
+            //templateResult: formatGeoSelect,
+            theme: "bootstrap4",
+            placeholderOption: 'first',
+            placeholder: $('#normals-select').attr('data-placeholder')
+        });
+        
+        $('#normals-download-form :input').change(function () {
+            $('#normals-generated_container').hide();
+        
+            var param = $(this).attr('name');
+            var new_val = $(this).val();
+        
+            switch ($(this).attr('id')) {
+        
+                case 'normals-select':
+                    param = 's';
+                    
+                    if ($(this).val() !== null) {
+                        new_val = $(this).val().join('|');
+                    } else {
+                        new_val = '';
+                    }
+        
+                    break;
+        
+                case 'normals-start':
+                    param = 'start';
+                    break;
+        
+                case 'normals-end':
+                    param = 'end';
+                    break;
+        
+            }
+        
+            update_normals_URL(param, new_val);
+        
+            check_normals_form();
+        });
+        
+        // trigger when a tag is removed from multiple station selector input
+        $('#normals-select').on('select2:unselect', function (e) {
+            marker_id = parseFloat(e.params.data.id);
+            normals_layer.eachLayer(function (layer) {
+                if (layer.feature.properties.STN_ID === marker_id) {
+                    delete selected_normals_stations[marker_id];
+                    layer.setStyle({
+                        // Stroke properties
+                        color: '#3d68f6',
+                        opacity: 1,
+                        weight: 2,
+                        pane: 'idf',
+                        // Fill properties
+                        fillColor: '#3d68f6',
+                        fillOpacity: 1,
+                        radius: 5
+                    })
+                }
+            });
+        });
+        
+        // trigger when a tag is added to multiple station selector input
+        $('#normals-select').on('select2:select', function (e) {
+            
+            marker_id = parseInt(e.params.data.id);
+            
+            normals_layer.eachLayer(function (layer) {
+                
+                if (layer.feature.properties.STN_ID === marker_id) {
+                    selected_normals_stations[marker_id] = layer.feature.properties.STATION_NAME;
+                    
+                    layer.setStyle({
+                        // Stroke properties
+                        color: '#F00',
+                        opacity: 1,
+                        weight: 2,
+                        pane: 'idf',
+                        // Fill properties
+                        fillColor: '#F00',
+                        fillOpacity: 1,
+                        radius: 5
+                    })
+                }
+                
+            });
+            
+        });
+        
+        function check_normals_form() {
+        
+            station_status = '';
+        
+            console.log(normals_dl_obj)
+            
+            var form_valid = true;
+        
+            $('#normals-download-form .validate').each(function () {
+        
+                if ($(this).val() == '') {
+                    form_valid = false;
+        
+                    station_status += $(this).closest('div').find('label').text() + ' is invalid. ';
+        
+                }
+        
+            });
+        
+            if (normals_dl_obj['s'].length == 0) {
+                form_valid = false;
+        
+                station_status += 'Choose at least one weather station. ';
+            }
+        
+            if (form_valid == false) {
+                $('#normals-process').addClass('disabled');
+            } else {
+                $('#normals-process').removeClass('disabled');
+                station_status = 'Ready to process.';
+        
+                populate_normals_URL();
+            }
+        
+            if (selected_normals_stations == undefined || Object.keys(selected_normals_stations).length == 0) {
+                populate_normals_URL(0); // update only #station-download-data
+            }
+        
+            $('#normals-download-status').text(station_status);
+        }
+        
+        function update_normals_URL(name, val) {
+            normals_dl_obj[name] = val;
+        }
+        
+        
+        var selected_normals_stations_to_str = '';
+        function get_selected_normals_stations() {
+            // ex: class="42 -- DUNCAN & 1593 -- RUSSELL CREEK ; 1614 -- TWO PETE CREEK ; ..."
+        
+            var ret_selected_normals_stations = "";
+            for (const key in selected_normals_stations) {
+                ret_selected_normals_stations += key + " -- " + selected_normals_stations[key] + " ; ";
+            }
+        
+            // Remove last char: ;
+            if (Object.keys(selected_normals_stations).length > 0) {
+                ret_selected_normals_stations = ret_selected_normals_stations.substring(0, ret_selected_normals_stations.length - 3);
+            }
+        
+            if (Object.keys(selected_normals_stations).length == 0) {
+                ret_selected_normals_stations = " ";
+            }
+        
+            return ret_selected_normals_stations;
+            // Create <a id="station-process-data" class=" station id -- station name & ..."> for Google Analytics
+            // $('#station-process-data').attr('class', class_info);
+            // $('#station-process-data').removeAttr("style").hide();
+        }
+        
+        function set_datalayer_for_download_normals(download_normals_list, download_normals_file_extension) {
+            dataLayer.push({
+                'event': 'Download_Normals',
+                'download_station_data_event': 'Download_Normals',
+                'download_station_data_list': download_normals_list,
+                'download_station_file_extension': download_normals_file_extension
+            });
+        }
+        
+        $('#normals-process').click(function (e) {
+            var csvFormatClassName = $("#normals-csvFormat").parent().attr("class");
+            var geoFormatClassName = $("#normals-geoFormat").parent().attr("class");
+            var selected_normals_stations_file_extension = 'CSV';
+            
+            if (geoFormatClassName.includes("active")) {
+                selected_normals_stations_file_extension = 'GeoJSON';
+                try {
+                    if (csvFormatClassName.includes("active")) {
+                        throw ('GA4_event (Download_Normals) file format, both (CSV, GeoJSON) are selected');
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+            
+            // selected_normals_stations_file_extension get text from class="csvFormat" or class="geoFomrat"
+            set_datalayer_for_download_normals(selected_normals_stations_to_str, selected_normals_stations_file_extension);
+        });
+        
+        function populate_normals_URL(ga4_event = 1) {
+            
+            if (ga4_event == 1) {
+                
+                let station_name = $('#normals-select [value="' + normals_dl_obj['s'] + '"]').text()
+                
+                var new_url = 'https://api.weather.gc.ca/collections/climate-normals/items?CLIMATE_IDENTIFIER=' + normals_dl_obj.s + '&sortby=MONTH&f=' + normals_dl_obj.format + '&limit=' + station_dl_obj.limit + '&startindex=' + normals_dl_obj.offset
+                
+                $('#normals-process').attr('href', new_url);
+                
+            }
+            
+            selected_normals_stations_to_str = get_selected_normals_stations();
+        }
 
         //
         // IDF CURVES
@@ -1833,7 +2152,7 @@
                 pane: 'labels'
             }).addTo(maps[map_var]);
 
-            if (map_var == 'station' || map_var == 'idf' || map_var == 'ahccd') {
+            if (map_var == 'station' || map_var == 'normals' || map_var == 'idf' || map_var == 'ahccd') {
 
                 maps[map_var].createPane('idf');
                 maps[map_var].getPane('idf').style.zIndex = 600;

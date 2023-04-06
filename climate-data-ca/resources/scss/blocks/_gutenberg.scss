@@ -31,7 +31,7 @@ $mobile_viewport_width: 767px;
         padding: calc(40px + 60px) 0 40px; // 60px is estimated header height
       }
     }
-    
+
     &:not(.full-height) { // Key class
       padding: 80px 0;
 
@@ -135,16 +135,47 @@ $mobile_viewport_width: 767px;
         position: relative;
         margin: auto;
 
-        &.width-33 { // Key class
-          width: 33%;
+        &.width-30 { // Key class
+          width: 30%;
+        }
+
+        &.width-40 { // Key class
+          width: 40%;
         }
 
         &.width-50 { // Key class
           width: 50%;
         }
 
+        &.width-60 { // Key class
+          width: 60%;
+        }
+
+        &.width-70 { // Key class
+          width: 70%;
+        }
+
+        &.width-80 { // Key class
+          width: 80%;
+        }
+
+        &.width-90 { // Key class
+          width: 90%;
+        }
+
         &.width-100 { // Key class
           width: 100%;
+        }
+
+        &.width-30,
+        &.width-40,
+        &.width-50,
+        &.width-60,
+        &.width-70,
+        &.width-80,
+        &.width-90,
+        &.width-100 {
+          flex-basis: auto;
         }
 
         .overlap-element { // Key class
@@ -154,7 +185,10 @@ $mobile_viewport_width: 767px;
           right: 0;
           transform: translateY(-50%);
           margin: auto;
-          width: fit-content;
+
+          &:not([class*="width-"]) {
+            width: fit-content;
+          }
         }
 
         &.wp-block-group {
@@ -181,10 +215,6 @@ $mobile_viewport_width: 767px;
 
     .wp-block-columns {
       gap: 30px;
-
-      &.full-width { // Key class
-        width: 100%;
-      }
 
       @media only screen and (max-width: $mobile_viewport_width) {
         gap: 20px;
@@ -240,6 +270,50 @@ $mobile_viewport_width: 767px;
       &.is-desktop { // Key class
         @media (min-width: $mobile_viewport_width + 1px) {
           display: block;
+        }
+      }
+    }
+
+    /* Images & videos */
+
+    .wp-block-image,
+    .wp-block-video {
+      @media (min-width: $mobile_viewport_width + 1px) { // Desktop only
+        &.width-30 { // Key class
+          width: 30%;
+        }
+
+        &.width-40 { // Key class
+          width: 40%;
+        }
+
+        &.width-50 { // Key class
+          width: 50%;
+        }
+
+        &.width-60 { // Key class
+          width: 60%;
+        }
+
+        &.width-70 { // Key class
+          width: 70%;
+        }
+
+        &.width-80 { // Key class
+          width: 80%;
+        }
+
+        &.width-90 { // Key class
+          width: 90%;
+        }
+
+        &.width-100 { // Key class
+          width: 100%;
+        }
+
+        > img,
+        > video {
+          width: 100%;
         }
       }
     }

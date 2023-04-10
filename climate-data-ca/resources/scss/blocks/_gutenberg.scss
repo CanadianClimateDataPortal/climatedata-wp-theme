@@ -120,10 +120,10 @@ $mobile_viewport_width: 767px;
 
     .wp-block-group {
       &.is-vertical { // Stack (column orientation)
-        gap: 30px;
+        gap: 50px;
 
         @media only screen and (max-width: $mobile_viewport_width) {
-          gap: 20px;
+          gap: 30px;
         }
       }
     }
@@ -134,49 +134,6 @@ $mobile_viewport_width: 767px;
       @mixin overlapping {
         position: relative;
         margin: auto;
-
-        &.width-30 { // Key class
-          width: 30%;
-        }
-
-        &.width-40 { // Key class
-          width: 40%;
-        }
-
-        &.width-50 { // Key class
-          width: 50%;
-        }
-
-        &.width-60 { // Key class
-          width: 60%;
-        }
-
-        &.width-70 { // Key class
-          width: 70%;
-        }
-
-        &.width-80 { // Key class
-          width: 80%;
-        }
-
-        &.width-90 { // Key class
-          width: 90%;
-        }
-
-        &.width-100 { // Key class
-          width: 100%;
-        }
-
-        &.width-30,
-        &.width-40,
-        &.width-50,
-        &.width-60,
-        &.width-70,
-        &.width-80,
-        &.width-90,
-        &.width-100 {
-          flex-basis: auto;
-        }
 
         .overlap-element { // Key class
           position: absolute;
@@ -214,10 +171,10 @@ $mobile_viewport_width: 767px;
     /* Columns */
 
     .wp-block-columns {
-      gap: 30px;
+      gap: 50px;
 
       @media only screen and (max-width: $mobile_viewport_width) {
-        gap: 20px;
+        gap: 30px;
         flex-wrap: wrap;
       }
 
@@ -311,9 +268,30 @@ $mobile_viewport_width: 767px;
           width: 100%;
         }
 
+        &.width-30,
+        &.width-40,
+        &.width-50,
+        &.width-60,
+        &.width-70,
+        &.width-80,
+        &.width-90,
+        &.width-100 {
+          > img,
+          > video {
+            width: 100%;
+          }
+        }
+      }
+
+      @media (max-width: $mobile_viewport_width) {
         > img,
         > video {
-          width: 100%;
+          display: block;
+          margin: auto;
+        }
+        
+        > video {
+          width: 75%;
         }
       }
     }
@@ -334,7 +312,12 @@ $mobile_viewport_width: 767px;
 
     /* General elements */
 
-    p {
+    p,
+    ul {
+      @media (min-width: $mobile_viewport_width + 1px) { // Desktop only
+        font-size: 24px;
+      }
+
       &:not(:last-child) {
         margin-bottom: 15px;
       }

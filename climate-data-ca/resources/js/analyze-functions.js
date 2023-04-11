@@ -1885,6 +1885,108 @@
             }
         }
 
+
+        function checkURI(){
+            
+
+            let url = document.URL
+            if (url.includes("?") === false){ return }
+
+            let url_elements = url.split("?")
+            // console.log(url)
+            let objectURL = url_elements.pop()
+            let decodedFormInputs = decodeURI(objectURL) // Returns char by char array
+            console.log("Decode:" , decodedFormInputs)
+
+            let str = ""
+            for(var i in Object.values(decodedFormInputs)){
+                str += decodedFormInputs[i]
+            }
+
+            decodedFormInputs = JSON.parse(str)
+            fill_form_inputs(decodedFormInputs)
+        }
+
+        function build_shareable_url(form_inputs) {
+            // console.log("FORM_INPUT:", form_inputs)
+            // console.log(typeof(form_inputs))
+            
+            setTimeout(function()
+            {   
+                let sharableUrl = document.URL +"?"+ encodeURI(JSON.stringify(form_inputs))
+                console.log("shareable:", sharableUrl)
+
+            }, 1000);
+            
+        }
+
+        function fill_form_inputs(decodedFormInputs){
+            // var element = $("input[name='dataset']");
+            console.log("form_input:", decodedFormInputs)
+
+            // Click on the specified dataset
+            let datasetInputs = Object.values($("input[name='dataset']"))
+            datasetInputs.find(({ value }) => value === decodedFormInputs['dataset']).click()
+
+            // Click grid
+            $("input[id='analyze-location-grid']").click()
+
+            // Click wet days
+            $("input[id='analyze-var-wetdays']").click()
+            // Insert thresh
+            setTimeout(function()
+            {   
+                $("input[name='thresh']").val(10)
+            }, 500);
+
+            // Selecting dates
+            $("select[id='analyze-timeframe-start']").val(decodedFormInputs['start_date'])
+            $("select[id='analyze-timeframe-end']").val(decodedFormInputs['end_date'])
+
+
+            // Selecting scenarios
+            let screnarioInputs = Object.values($("input[name='scenario'"))
+            let scenarios = decodedFormInputs['scenario'].split(',')
+            scenarios.forEach(scenario => {
+                screnarioInputs.find(({ value }) => value === scenario).click()
+            })
+            
+            // Ensemble Precentiles
+            let percentInputs = Object.values($("input[name='ensemble_percentiles'"))
+            let ensemblePercentiles = decodedFormInputs['ensemble_percentiles'].split(',')
+            ensemblePercentiles.forEach(percent => {
+                // setTimeout(function()
+                // {   
+                    // preventing deselecting a default settings
+                    if (["10","50","90"].includes(percent)){ return }
+                    
+                    percentInputs.find(({ value }) => value === percent).click()
+                // }, 100);
+            })
+
+
+            // Selecting Frequency
+            let frequecyInputs = Object.values($("input[name='freq'"))
+            setTimeout(function()
+            {   
+                frequecyInputs.find(({ value }) => value === decodedFormInputs['freq']).click()
+            }, 100);
+
+
+            // Selecting Output Format
+            let outpuFormatInput = Object.values($("input[name='output_format'"))
+            setTimeout(function()
+            {   
+                outpuFormatInput.find(({ value }) => value === decodedFormInputs['output_format']).click()
+                if(decodedFormInputs['output_format'] === "csv"){
+                    $("input[id='analyze-decimals']").val(decodedFormInputs["csv_precision"])
+                }
+            }, 100);
+            
+
+        }
+
+
         // INPUTS
 
         function validate_inputs() {
@@ -1895,6 +1997,13 @@
                 var is_valid = true
 
             form_inputs = $.extend(true, {}, default_inputs)
+            
+            // console.log("test")
+            console.log(form_inputs)
+            build_shareable_url(form_inputs)
+
+
+
 
             if ($('#analyze-format-csv').prop('checked') == true) {
                 $('#analyze-field-decimals').show()
@@ -2326,7 +2435,7 @@
 
 
         // init
-
+        checkURI();
         validate_steps();
         validate_inputs();
 
@@ -2375,6 +2484,7 @@
 
         }
 
+        
         console.log('end of analyze-functions')
         console.log('- - - - -')
 

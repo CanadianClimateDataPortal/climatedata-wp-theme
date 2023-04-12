@@ -1160,7 +1160,6 @@
             create_map('station');
             $('#station-process-data').removeAttr("style").hide();
 
-            // $.getJSON('https://geo.weather.gc.ca/geomet/features/collections/climate-stations/items?f=json&limit=10000', function (data) {
             $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE', function (data) {
 
                 var markers = L.markerClusterGroup();
@@ -1503,34 +1502,80 @@
             $('#normals-process-data').removeAttr("style").hide();
             
             $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y', function (data) {
-                console.log(data)
+                // console.log(data)
+                
+                var markers = L.markerClusterGroup();
                 
                 normals_layer = L.geoJson(data, {
                     onEachFeature: function (feature, layer) {
+                        
+                        console.log(feature.properties.CLIMATE_IDENTIFIER, feature.properties.STATION_NAME)
                     
                         $('<option value="' + feature.properties.CLIMATE_IDENTIFIER + '">' + feature.properties.STATION_NAME + '</option>').appendTo('#normals-select')
                     
                     },
                     pointToLayer: function (feature, latlng) {
-                        markerColor = '#e50e40';
                         return L.circleMarker(latlng, {
                             // Stroke properties
-                            color: '#fff',
+                            color: '#3d68f6',
                             opacity: 1,
                             weight: 2,
                             pane: 'idf',
-                            fillColor: markerColor,
+                            fillColor: '#3d68f6',
                             fillOpacity: 1,
                             radius: 5
                         });
                     }
+                    
                 }).on('mouseover', function (e) {
                     
                     e.layer.bindTooltip(e.layer.feature.properties.STATION_NAME).openTooltip(e.latlng);
                     
                 }).on('click', function (e) {
                     
-                    $('#normals-select').val(e.layer.feature.properties.CLIMATE_IDENTIFIER).trigger('change')
+                    // get current station select value
+                    var existingData = $("#normals-select").select2("val");
+                    // clicked ID
+                    var clicked_ID = e.layer.feature.properties.CLIMATE_IDENTIFIER.toString();
+                    if (selected_normals_stations[clicked_ID] !== undefined) {
+                        delete selected_normals_stations[clicked_ID];
+                    } else {
+                        selected_normals_stations[clicked_ID] = e.layer.feature.properties.STATION_NAME;
+                    }
+                    
+                    // default colour
+                    markerColor = '#F00';
+                    if (existingData != null) {
+                        if (existingData.includes(clicked_ID)) {
+                            var $select = $('#normals-select');
+                            index = existingData.indexOf(clicked_ID);
+                            if (index > -1) {
+                                existingData.splice(index, 1);
+                            }
+                            $('#normals-select').val(existingData).change();
+                            markerColor = '#3d68f6';
+                        } else {
+                            existingData.push(clicked_ID);
+                            $('#normals-select').val(existingData).change();
+                        }
+                    } else {
+                        existingData = [clicked_ID];
+                        $('#normals-select').val(existingData).change();
+                    }
+                    
+                    e.layer.setStyle({
+                        // Stroke properties
+                        color: markerColor,
+                        opacity: 1,
+                        weight: 2,
+                        pane: 'idf',
+                        // Fill properties
+                        fillColor: markerColor,
+                        fillOpacity: 1,
+                        radius: 5
+                    });
+                    
+                    // $('#normals-select').val(e.layer.feature.properties.CLIMATE_IDENTIFIER).trigger('change')
                     
                 });
                 
@@ -1550,8 +1595,8 @@
                 })
                 
                 // add to map
-                
-                normals_layer.addTo(maps['normals'])
+                markers.addLayer(normals_layer);
+                maps['normals'].addLayer(markers);
                 
             }).done(function () {
                 
@@ -1561,26 +1606,6 @@
         
         $("#normals-select").select2({
             language: current_lang,
-            ajax: {
-                url: child_theme_dir + "resources/app/run-frontend-station-download/search.php",
-                dataType: 'json',
-                delay: 0,
-                data: function (params) {
-                    return {
-                        q: params.term, // search term
-                        page: params.page
-                    };
-                },
-                processResults: function (data, page) {
-                    // parse the results into the format expected by Select2.
-                    // since we are using custom formatting functions we do not need to
-                    // alter the remote JSON data
-                    return {
-                        results: data
-                    };
-                },
-                cache: true
-            },
             escapeMarkup: function (markup) {
                 return markup;
             }, // let our custom formatter work

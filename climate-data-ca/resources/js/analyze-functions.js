@@ -1886,8 +1886,7 @@
         }
 
 
-        function checkURI(){
-            
+        function readURL(){
 
             let url = document.URL
             if (url.includes("?") === false){ return }
@@ -1907,14 +1906,14 @@
             fill_form_inputs(decodedFormInputs)
         }
 
-        function build_shareable_url(form_inputs) {
+        function buildShareableURL(form_inputs) {
             // console.log("FORM_INPUT:", form_inputs)
             // console.log(typeof(form_inputs))
             
             setTimeout(function()
             {   
-                let sharableUrl = document.URL +"?"+ encodeURI(JSON.stringify(form_inputs))
-                console.log("shareable:", sharableUrl)
+                let shareableURL = document.URL +"?"+ encodeURI(JSON.stringify(form_inputs))
+                console.log("Shareable URL :", shareableURL)
 
             }, 1000);
             
@@ -1999,8 +1998,7 @@
             form_inputs = $.extend(true, {}, default_inputs)
             
             // console.log("test")
-            console.log(form_inputs)
-            build_shareable_url(form_inputs)
+            buildShareableURL(form_inputs)
 
 
 
@@ -2435,7 +2433,7 @@
 
 
         // init
-        checkURI();
+        readURL();
         validate_steps();
         validate_inputs();
 

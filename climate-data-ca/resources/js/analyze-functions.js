@@ -1885,6 +1885,12 @@
             }
         }
 
+
+        function lintingTest(){
+            // export const collection = 'Design';
+
+        }
+
         // INPUTS
 
         function validate_inputs() {
@@ -1896,6 +1902,9 @@
 
             form_inputs = $.extend(true, {}, default_inputs)
 
+            lintingTest()
+            console.log("Test")    
+            
             if ($('#analyze-format-csv').prop('checked') == true) {
                 $('#analyze-field-decimals').show()
             } else {

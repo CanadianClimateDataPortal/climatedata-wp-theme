@@ -347,6 +347,8 @@
 
                 }
 
+                console.log("LAT :", lat_val)
+                console.log("LON :", lon_val)
                 $('#lat').val(lat_val)
                 $('#lon').val(lon_val)
                 $('#shape').val('')
@@ -440,6 +442,7 @@
 
 
         })
+
 
         //
         // INPUTS
@@ -1886,6 +1889,23 @@
         }
 
 
+        function buildShareableURL(form_inputs) {
+            // console.log("FORM_INPUT:", form_inputs)
+            // console.log(typeof(form_inputs))
+
+            setTimeout(function()
+            {   
+                form_inputs["compressedPoints"] = getEncodedPoints(form_inputs)
+                form_inputs['lat'] = ""
+                form_inputs['lon'] = ""
+                let shareableURL = document.URL +"?"+ encodeURI(JSON.stringify(form_inputs))
+                console.log("Shareable URL :", shareableURL)
+
+            }, 1000);
+            
+        }
+
+
         function readURL(){
 
             let url = document.URL
@@ -1893,7 +1913,7 @@
 
             let url_elements = url.split("?")
             // console.log(url)
-            let objectURL = url_elements.pop()
+            let objectURL = url_elements.pop() // get the form_input dict from url
             let decodedFormInputs = decodeURI(objectURL) // Returns char by char array
             console.log("Decode:" , decodedFormInputs)
 
@@ -1906,28 +1926,186 @@
             fill_form_inputs(decodedFormInputs)
         }
 
-        function buildShareableURL(form_inputs) {
-            // console.log("FORM_INPUT:", form_inputs)
-            // console.log(typeof(form_inputs))
-            
-            setTimeout(function()
-            {   
-                let shareableURL = document.URL +"?"+ encodeURI(JSON.stringify(form_inputs))
-                console.log("Shareable URL :", shareableURL)
 
-            }, 1000);
+        function getEncodedPoints(form_inputs) {
+            let latArray = form_inputs['lat'].split(',')
+            let lonArray = form_inputs['lon'].split(',')
+            let points = []
+
+
+            for (var i in latArray){
+                points.push([latArray[i], lonArray[i]])
+            }  
+
+            let token = encodePoints(points)
             
+            return token
         }
+
+
+        function encodePoints(points) {
+            const SAFE_CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+            const MULTIPLIER = 100;
+            const DIVIDER = 32;
+
+            var result = "";
+            var latitude = 0;
+            var longitude = 0;
+            
+            // console.log("ENCODING",points)
+
+            for (var i in points) {
+                var newLat = Math.round(points[i][0] * MULTIPLIER);
+                var newLon = Math.round(points[i][1] * MULTIPLIER);
+        
+                var dy = newLat - latitude;
+                var dx = newLon - longitude;
+        
+                latitude = newLat;
+                longitude = newLon;
+                dy = (dy << 1) ^ (dy >> 31);
+                dx = (dx << 1) ^ (dx >> 31);
+        
+                var index = ((dy + dx) * (dy + dx + 1)) / 2 + dy;
+        
+                while (index > 0) {
+                    var rem = index & 31;
+        
+                    index = (index - rem) / DIVIDER;
+        
+                    if (index > 0) {
+                        rem += DIVIDER;
+                    }
+        
+                    result += SAFE_CHARACTERS[rem];
+                }
+            }
+            return result;
+        }
+
+        function decodePoints(compressedValue) {
+            const SAFE_CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+            const MULTIPLIER = 100;
+            const DIVIDER = 32;
+
+            var latLon = [];
+            var pointsArray = [];
+            var point = [];
+            var lastLat = 0,
+                lastLon = 0;
+        
+            for (var i = 0; i < compressedValue.length; i++) {
+                var num = SAFE_CHARACTERS.indexOf(compressedValue[i]);
+        
+                if (num < DIVIDER) {
+                    point.push(num);
+                    pointsArray.push(point);
+                    point = [];
+                } else {
+                    num -= DIVIDER;
+                    point.push(num);
+                }
+            }
+        
+            for (var y in pointsArray) {
+                var result = 0;
+                var list = pointsArray[y].reverse();
+        
+                for (var x in list) {
+                    if (result == 0) {
+                        result = list[x];
+                    } else {
+                        result = result * DIVIDER + list[x];
+                    }
+                }
+        
+                var dIag = parseInt((Math.sqrt(8 * result + 5) - 1) / 2);
+        
+                var latY = result - (dIag * (dIag + 1)) / 2;
+                var lonX = dIag - latY;
+        
+                if (latY % 2 == 1) {
+                    latY = (latY + 1) * -1;
+                }
+                if (lonX % 2 == 1) {
+                    lonX = (lonX + 1) * -1;
+                }
+        
+                latY /= 2;
+                lonX /= 2;
+                var lat = latY + lastLat;
+                var lon = lonX + lastLon;
+        
+                lastLat = lat;
+                lastLon = lon;
+                lat /= MULTIPLIER;
+                lon /= MULTIPLIER;
+        
+                // latLon.push(lat, lon);
+                latLon.push({
+                    "point":[lat, lon]
+                })
+            }
+            
+
+            return latLon;
+        }
+
+        function selectMapPoints(compressedValue){
+
+            fetch("https://dataclimatedata.crim.ca/get-gids/"+compressedValue+"?gridname=canadagrid")
+                .then((response) => response.json())
+                .then((result) => {
+                    
+                    // pointsId = result
+                    let latLonArray = decodePoints(compressedValue)
+
+                    for(var i in result){
+                        latLonArray[i]['id'] = result[i]
+                    }
+                    
+                    triggerMapGrid(latLonArray)
+            })
+        }
+
+        function triggerMapGrid(points){
+            // points = [ {"id":123, "point":[lat, lon]}]
+
+            points.forEach( function(p) {
+                let highlightGridFeature = p.id;
+
+                selectedPoints[highlightGridFeature] = L.latLng(p.point[0], p.point[1]);
+                map_grids[highlightGridFeature] = L.latLng(p.point[0], p.point[1]);
+
+                selectedGrids.push(highlightGridFeature);
+
+                pbfLayer.setFeatureStyle(highlightGridFeature, {
+                    weight: 1,
+                    color: '#F00',
+                    opacity: 1,
+                    fill: true,
+                    radius: 4,
+                    fillOpacity: 0.1
+                })
+
+                // console.log("selectedGrids",selectedGrids)
+            });
+        }
+
+
 
         function fill_form_inputs(decodedFormInputs){
             // var element = $("input[name='dataset']");
             console.log("form_input:", decodedFormInputs)
+
 
             // Click on the specified dataset
             let datasetInputs = Object.values($("input[name='dataset']"))
             datasetInputs.find(({ value }) => value === decodedFormInputs['dataset']).click()
 
             // Click grid
+            $("#ui-id-5").click()
+            $("span.btn.btn-outline-secondary.rounded-pill")[0].click()
             $("input[id='analyze-location-grid']").click()
 
             // Click wet days
@@ -1982,7 +2160,7 @@
                 }
             }, 100);
             
-
+            selectMapPoints(decodedFormInputs['compressedPoints'])
         }
 
 
@@ -1999,8 +2177,6 @@
             
             // console.log("test")
             buildShareableURL(form_inputs)
-
-
 
 
             if ($('#analyze-format-csv').prop('checked') == true) {

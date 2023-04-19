@@ -52,25 +52,10 @@ get_header();
 
 if (have_posts()) : while (have_posts()) : the_post();
 
-    $post = get_post($GLOBALS['vars']['current_data']['var_name']);
-
-
-    setup_postdata($post);
-
-    if (isset ($GLOBALS['vars']['current_data']['var_name'])) {
-        $post_id = $GLOBALS['vars']['current_data']['id'];
-    }
-
-    $fields = get_field_objects( $post_id );
-
-
-
     ?>
 
 
-    <main id="variable-content" data-variable="<?php the_field('var_name'); ?>">
-
-        <input type="hidden" id="varPostID" value="<?=$post_id?>"></input>
+    <main id="variable-content">
 
         <div id="map1"></div>
 

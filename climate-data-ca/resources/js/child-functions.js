@@ -15,9 +15,37 @@ var chart_labels, legend_labels, l10n_labels;
 
 var l10n_table = {
     "fr": {
+        'All models': 'Tous les modèles',
+        '{0} Median': '{0} médiane',
+        '{0} Range': '{0} portée',
+
+        'Search communities': 'Recherche par ville',
+        'Begin typing city name': 'Commencer à saisir le nom d\'une ville',
+        'Search coordinates': 'Recherche par coordonnées',
+        'Enter latitude & longitude e.g.': 'Saisir la latitude et la longitude, par ex.',
+        'Coordinates detected': 'Coordonnées détectées',
+        'Set map view': 'Définir l\'affichage de la carte',
+
+        // share widget
+        "Copied to clipboard": "Copié dans le presse-papier",
+        "Error" : "Erreur",
+        "Copy link": "Copier le lien",
+        
+        //  feedback form
+        'Thanks! We’ve received your inquiry.' : 'Merci! Nous avons reçu votre demande.',
+        'We are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays.' : 'Le nombre de demandes adressées à notre Centre d’aide est actuellement supérieur à la normale. Nous ferons de notre mieux pour vous répondre dès que possible, mais sachez qu’il peut y avoir des délais.',
+        'Thank you for your patience,' : 'Nous vous remercions de votre patience,',
+        'The Support Desk' : 'Le Centre d’aide',
+        'Sorry, an error occurred while sending your feedback. Please try again later.' : 'Désolé, une erreur est survenue. Veuillez réessayer plus tard.',
+        
         "With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}":
             "Avec les paramètres actuels de fréquence et de format de donnée, le nombre maximal de points de grille par requête est de {0}",
-        "Around {0} grid boxes selected" : "Environ {0} points de grille sélectionnés"
+        "Around {0} grid boxes selected" : "Environ {0} points de grille sélectionnés",
+        
+        // news
+        
+        "All topics" : "Tous les sujets",
+        "Close": "Fermer"
     }
 };
 
@@ -26,6 +54,140 @@ const grid_resolution = {
     "canadagrid1deg": 1.0,
     "slrgrid": 1.0/10.0
 };
+
+const DATASETS = {
+    "cmip5": {
+        'scenarios': [
+            {
+                'name': 'rcp26', 'label': 'RCP 2.6', 'chart_color': '#00F',
+                'correlations': {
+                    'cmip6': 'ssp126'
+                }
+            },
+            {
+                'name': 'rcp45', 'label': 'RCP 4.5', 'chart_color': '#00640c',
+                'correlations': {
+                    'cmip6': 'ssp245'
+                }
+            },
+            {
+                'name': 'rcp85', 'label': 'RCP 8.5', 'chart_color': '#F00',
+                'correlations': {
+                    'cmip6': 'ssp585'
+                }
+            },
+        ],
+        'finch_name' : 'candcs-u5',
+        'model_lists': [
+            {'name': 'pcic12', 'label': 'PCIC12 (Ensemble)'},
+            {'name': '24models', 'label': 'All models'}]
+    },
+    "cmip6": {
+        'scenarios': [
+            {
+                'name': 'ssp126', 'label': 'SSP1-2.6', 'chart_color': '#00F',
+                'correlations': {
+                    'cmip5': 'rcp26'
+                }
+            },
+            {
+                'name': 'ssp245', 'label': 'SSP2-4.5', 'chart_color': '#00640c',
+                'correlations': {
+                    'cmip5': 'rcp45'
+                }
+            },
+            {
+                'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#F00',
+                'correlations': {
+                    'cmip5': 'rcp85'
+                }
+            },
+        ],
+        'finch_name' : 'candcs-u6',
+        'model_lists': [
+            {'name': '26models', 'label': 'All models'}]
+    }
+}
+
+const variableDownloadDataTypes = {
+    // Variable_Download-Data_*
+    'tx_max': 'Hottest-Day',
+    'tg_mean': 'Mean-Temperature',
+    'tn_mean': 'Minimum-Temperature',
+    'tnlt_-15': 'Days-with-Tmin_LesserThan_-15C',
+    'tnlt_-25': 'Days-with-Tmin_LesserThan_-25C',
+    'txgt_25': 'Days-with-Tmax_GreaterThan_25C',
+    'txgt_27': 'Days-with-Tmax_GreaterThan_27C',
+    'txgt_29': 'Days-with-Tmax_GreaterThan_29C',
+    'txgt_30': 'Days-with-Tmax_GreaterThan_30C',
+    'txgt_32': 'Days-with-Tmax_GreaterThan_32C',
+    'tx_mean': 'Maximum-Temperature',
+    'tn_min': 'Coldest-Day',
+    'rx1day': 'Maximum-1-Day-Total-Precipitation',
+    'r1mm': 'Wet-Days_GreaterThan_1mm',
+    'r10mm': 'Wet-Days_GreaterThan_10mm',
+    'r20mm': 'Wet-Days_GreaterThan_20mm',
+    'prcptot': 'Total-Precipitation',
+    'frost_days': 'Frost-Days',
+    'cddcold_18': 'Cooling-Degree-Days',
+    'gddgrow_10': 'Growing-Degree-Days-10C',
+    'gddgrow_5': 'Growing-Degree-Days-5C',
+    'gddgrow_0': 'Cumulative-degree-days-above-0C',
+    'hddheat_18': 'Heating-degree-days',
+    'ice_days': 'Ice-Days',
+    'tr_18': 'Tropical-Nights-Days-with-Tmin_GreaterThan_18C',
+    'tr_20': 'Tropical-Nights-Days-with-Tmin_GreaterThan_20C',
+    'tr_22': 'Tropical-Nights-Days-with-Tmin_GreaterThan_22C',
+    'spei_3m': 'SPEI(3-months)',
+    'spei_12m': 'SPEI(12-months)',
+    'weather-stations': 'MSC-Climate-Normals',
+};
+
+const frMonthDict = {
+    'jan': 'Janvier',
+    'feb': 'Février',
+    'mar': 'Mars',
+    'apr': 'Avril',
+    'may': 'Mai',
+    'jun': 'Juin',
+    'jul': 'Juillet',
+    'aug': 'Août',
+    'sep': 'Septembre',
+    'oct': 'Octobre',
+    'nov': 'Novembre',
+    'dec': 'Décembre',
+    'ann': 'Annuel'
+};
+
+const engMonthDict = {
+    'jan': 'January',
+    'feb': 'February',
+    'mar': 'March',
+    'apr': 'April',
+    'may': 'May',
+    'jun': 'June',
+    'jul': 'July',
+    'aug': 'August',
+    'sep': 'September',
+    'oct': 'October',
+    'nov': 'November',
+    'dec': 'December',
+    'ann': 'Annual'
+};
+
+function getRealMonthName(keySelected) {
+    keySelected = keySelected.toLowerCase();
+    var tempDict = engMonthDict;
+    if ($('body').hasClass('lang-fr')) {
+        tempDict = frMonthDict;
+    }
+
+    var realMonthName = "undefined";
+    if (keySelected in tempDict) {
+        realMonthName = tempDict[keySelected]
+    }
+    return realMonthName;
+}
 
 
 //
@@ -54,6 +216,9 @@ function doy_formatter(value) {
  */
 function value_formatter(value, varDetails, delta) {
     let unit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
+    if (unit === undefined) {
+        unit ="";
+    }
     let str = "";
     if (delta && value > 0) {
         str += "+"
@@ -126,6 +291,449 @@ function T(str) {
     }
 }
 
+
+function hashCode(s) {
+    return s.split("").reduce(function(a, b) {
+        a = ((a << 5) - a) + b.charCodeAt(0);
+        return a & a;
+    }, 0);
+}
+
+function encodeURL(url, salt) {
+    let hash = hashCode(url + salt );
+    let encoded = encodeURIComponent(btoa(url + '|' + hash));
+    return {
+        'encoded': encoded,
+        'hash': hash
+    };
+}
+
+
+function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
+    let gA4EventNameForVariableDownloadData = "";
+    keySelected = keySelected.toLowerCase();
+    try {
+        if (variableDownloadDataTypes[keySelected]) {
+            let eventType = '';
+            if (chartDataFormat.includes('csv')) {
+                eventType = "Variable_Download-Data_";
+            } else if (chartDataFormat.includes('pdf') || chartDataFormat.includes('png')) {
+                eventType = "Variable_Download-Image_";
+            } else {
+                throw ('Invalid GA4 event file format (csv, pdf, png): ' + chartDataFormat);
+            }
+            gA4EventNameForVariableDownloadData = eventType + variableDownloadDataTypes[keySelected];
+        } else {
+            throw ('Invalid GA4 event name (Variable_Download-Data_*): ' + keySelected);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+
+    return gA4EventNameForVariableDownloadData;
+}
+
+function setDataLayerForChartData(chartDataFormat, chartData, query) {
+    if (!chartDataFormat.length) {
+        return;
+    }
+    let eventName = getGA4EventNameForVariableDownloadData(chartDataFormat, query['var']);
+    let overlayTitle = $('.overlay-title').text();
+
+    let addStr = "";
+    for (let index = 0; index < chartData.series.length; index++) {
+        if (chartData.series[index].visible && chartData.series[index].type != 'areaspline') {
+            addStr += chartData.series[index].name + ", ";
+        }
+    }
+
+    // Remove last 2 char: ;
+    if (addStr.length > 0) {
+        addStr = addStr.substring(0, addStr.length - 2);
+    }
+
+    // ex: Watersheds
+    var variableDownloadDataVewBy = $('.variable-download-data-view_by').find(":selected").text();
+    // ex: Région de la Montérégie, rcp26, January
+    var chartDataSettings = overlayTitle + "; " + query['rcp'] + "; " + getRealMonthName(query['mora']);
+    dataLayer.push({
+        'event': eventName,
+        'chart_data_event_type': eventName,
+        'chart_data_settings': chartDataSettings,
+        'chart_data_columns': addStr,
+        'chart_data_dataset': query.dataset,
+        'chart_data_format': chartDataFormat,
+        'chart_data_view_by': variableDownloadDataVewBy
+    });
+}
+
+function displayChartData(data, varDetails, download_url, query, container) {
+    let chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
+    let chartDecimals = varDetails['decimals'];
+    let scenarios = DATASETS[query['dataset']].scenarios;
+    let pointFormatter, formatter
+
+    switch (varDetails.units.value) {
+        case 'doy':
+            formatter = function () { return doy_formatter(this.value) };
+            pointFormatter = function (format) {
+                if (this.series.type == 'line') {
+                    return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name + ': <b>'
+                        + doy_formatter(this.y)
+                        + '</b><br/>';
+                } else {
+                    return '<span style="color:' + this.series.color + '">●</span>' + this.series.name + ': <b>'
+                        + doy_formatter(this.low)
+                        + '</b> - <b>'
+                        + doy_formatter(this.high)
+                        + '</b><br/>';
+                }
+            };
+            break;
+        default:
+            formatter = function () { return this.axis.defaultLabelFormatter.call(this) + ' ' + chartUnit; };
+            pointFormatter = undefined;
+    }
+
+
+
+    let chartSeries = [];
+    if (data['observations'].length > 0) {
+        chartSeries.push({
+            name: chart_labels.observation,
+            data: data['observations'],
+            zIndex: 1,
+            showInNavigator: true,
+            color: '#F47D23',
+            visible: false,
+            marker: {
+                fillColor: '#F47D23',
+                lineWidth: 0,
+                radius: 0,
+                lineColor: '#F47D23'
+            }
+        });
+    }
+
+    if (data['modeled_historical_median'].length > 0) {
+        chartSeries.push({
+            name: chart_labels.historical,
+            data: data['modeled_historical_median'],
+            zIndex: 1,
+            showInNavigator: true,
+            color: '#000000',
+            marker: {
+                fillColor: '#000000',
+                lineWidth: 0,
+                radius: 0,
+                lineColor: '#000000'
+            }
+        });
+    }
+
+    if (data['modeled_historical_range'].length > 0)
+        chartSeries.push({
+            name: chart_labels.historical_range,
+            data: data['modeled_historical_range'],
+            type: 'arearange',
+            lineWidth: 0,
+            linkedTo: ':previous',
+            color: '#000000',
+            fillOpacity: 0.2,
+            zIndex: 0,
+            marker: {
+                radius: 0,
+                enabled: false
+            }
+        });
+    scenarios.forEach(function (scenario) {
+        if (data['{0}_median'.format(scenario.name)].length > 0)
+            chartSeries.push({
+                name: T('{0} Median').format(scenario.label),
+                data: data['{0}_median'.format(scenario.name)],
+                zIndex: 1,
+                showInNavigator: true,
+                color: scenario.chart_color,
+                marker: {
+                    fillColor: scenario.chart_color,
+                    lineWidth: 0,
+                    radius: 0,
+                    lineColor: scenario.chart_color
+                }
+            });
+        if (data['{0}_range'.format(scenario.name)].length > 0)
+            chartSeries.push({
+                name: T('{0} Range').format(scenario.label),
+                data: data['{0}_range'.format(scenario.name)],
+                type: 'arearange',
+                lineWidth: 0,
+                linkedTo: ':previous',
+                color: scenario.chart_color,
+                fillOpacity: 0.2,
+                zIndex: 0,
+                marker: {
+                    radius: 0,
+                    enabled: false
+                }
+            });
+    });
+
+    let chart = Highcharts.stockChart(container, {
+        chart: {
+            numberFormatter: function (num) {
+                return  Highcharts.numberFormat(num, chartDecimals);
+            }
+        },
+
+        title: {
+            text: varDetails['title']
+        },
+        subtitle: {
+            align: 'left',
+            text: document.ontouchstart === undefined ?
+                chart_labels.click_to_zoom : 'Pinch the chart to zoom in'
+        },
+
+        xAxis: {
+            type: 'datetime'
+        },
+
+        yAxis: {
+            title: {
+                text: varDetails['title']
+            },
+
+            labels: {
+                align: 'left',
+                formatter: formatter
+            }
+        },
+
+        legend: {
+            enabled: true
+        },
+
+        tooltip: {
+            pointFormatter: pointFormatter,
+            valueDecimals: chartDecimals,
+            valueSuffix: ' ' + chartUnit
+        },
+
+        navigation: {
+            buttonOptions: {
+                enabled: false
+            }
+        },
+        exporting: {
+            csv: {
+                dateFormat: '%Y-%m-%d'
+            }
+        },
+
+        series: chartSeries
+    });
+    chart.query = $.extend(true, {}, query);  // creates a deep copy of the object to avoid side-effects
+    chart.download_url = download_url;
+    chart.varDetails = varDetails;
+    
+    $('body').on('change', 'input[type=radio][name=chartoption-' + query['var'] + ']', function() {
+        
+        if ($(this).prop('checked') == true) {
+            
+            let chart = $(this).parents('.var-chart-container, .overlay-content').find('.var-chart').highcharts();
+            
+            switch ($(this).attr('value')) {
+                case 'annual':
+                    chart.update({
+                        tooltip: {
+                            formatter: function (tooltip) {
+                                let r = tooltip.defaultFormatter.call(this, tooltip);
+                                return r;
+                            }
+    
+                        },
+                        plotOptions: {
+                            series: {
+                                states: {
+                                    hover: {
+                                        enabled: true
+                                    },
+                                    inactive: {
+                                        enabled: true
+                                    }
+                                }
+                            }
+                        },
+                    });
+                    chart.xAxis[0].removePlotBand('30y-plot-band');
+                    chart.xAxis[0].removePlotBand('delta-plot-band');
+    
+                    break;
+                case '30y':
+                    chart.xAxis[0].removePlotBand('30y-plot-band');
+                    chart.xAxis[0].removePlotBand('delta-plot-band');
+                    chart.update({
+                        xAxis: {
+                            crosshair: false
+                        },
+                        plotOptions: {
+                            series: {
+                                states: {
+                                    hover: {
+                                        enabled: false
+                                    },
+                                    inactive: {
+                                        enabled: false
+                                    }
+                                }
+                            }
+                        },
+                        tooltip: {
+    
+                            formatter: function (tooltip) {
+    
+                                let year = new Date(this.x).getFullYear();
+                                let decade = year - year % 10 + 1;
+                                if (decade > 2071) {
+                                    decade = 2071;
+                                }
+                                let decade_ms= Date.UTC(decade,month_number_lut[query['mora']]-1,1);
+                                chart.xAxis[0].removePlotBand('30y-plot-band');
+                                chart.xAxis[0].addPlotBand({
+                                    from:Date.UTC(decade,0,1),
+                                    to:Date.UTC(decade+29,11,31),
+                                    id: '30y-plot-band'
+                                });
+    
+                                this.chart = tooltip.chart;
+                                this.axis = tooltip.chart.yAxis[0];
+                                let val1, val2;
+    
+                                let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + "</span><br/>"];
+    
+                                scenarios.forEach(function (scenario) {
+                                    this.value = data['30y_{0}_median'.format(scenario.name)][decade_ms][0];
+                                    val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                    tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Median').format(scenario.label) + " <b>"
+                                        + val1 + "</b><br/>");
+    
+                                    this.value = data['30y_{0}_range'.format(scenario.name)][decade_ms][0];
+                                    val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                    this.value = data['30y_{0}_range'.format(scenario.name)][decade_ms][1];
+                                    val2 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                    tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Range').format(scenario.label) + " <b>"
+                                        + val1 + "</b>-<b>" + val2 + "</b><br/>");
+                                }, this);
+    
+                                return tip;
+                            }
+                        }});
+                    break;
+                case 'delta':
+                    chart.xAxis[0].removePlotBand('30y-plot-band');
+                    chart.xAxis[0].removePlotBand('delta-plot-band');
+                    chart.xAxis[0].addPlotBand({
+                        from:Date.UTC(1971,0,1),
+                        to:Date.UTC(2000,11,31),
+                        color: 'rgba(51,63,80,0.05)',
+                        id: 'delta-plot-band'
+                    });
+    
+                    chart.update({
+                        xAxis: {
+                            crosshair: false
+                        },
+                        plotOptions: {
+                            series: {
+                                states: {
+                                    hover: {
+                                        enabled: false
+                                    },
+                                    inactive: {
+                                        enabled: false
+                                    }
+                                }
+                            }
+                        },
+                        tooltip: {
+    
+                            formatter: function (tooltip) {
+    
+                                let year = new Date(this.x).getFullYear();
+                                let decade = year - year % 10 + 1;
+                                if (decade > 2071) {
+                                    decade = 2071;
+                                }
+                                let decade_ms= Date.UTC(decade,month_number_lut[query['mora']]-1,1);
+                                chart.xAxis[0].removePlotBand('30y-plot-band');
+                                chart.xAxis[0].addPlotBand({
+                                    from:Date.UTC(decade,0,1),
+                                    to:Date.UTC(decade+29,11,31),
+                                    id: '30y-plot-band'
+                                });
+    
+                                function numformat (num) {
+                                    let str = "";
+                                    if (num > 0) {
+                                        str += "+"
+                                    }
+                                    str += Highcharts.numberFormat(num, chartDecimals);
+                                    switch( chartUnit) {
+                                        case "day of the year":
+                                            str += " " + l10n_labels['days'];
+                                            break;
+                                        default:
+                                            str += " " + chartUnit;
+                                            break;
+                                    }
+                                    return str;
+                                }
+    
+    
+    
+                                this.chart = tooltip.chart;
+                                this.axis = tooltip.chart.yAxis[0];
+                                let val1, val2;
+    
+                                let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + " " + chart_labels.change_from_1971_2000 + "</span><br/>"];
+    
+                                scenarios.forEach(function(scenario) {
+                                    val1 = numformat(data['delta7100_{0}_median'.format(scenario.name)][decade_ms][0]);
+                                    tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Median').format(scenario.label) + " <b>"
+                                        + val1 + "</b><br/>");
+    
+                                    val1 = numformat(data['delta7100_{0}_range'.format(scenario.name)][decade_ms][0]);
+                                    val2 = numformat(data['delta7100_{0}_range'.format(scenario.name)][decade_ms][1]);
+                                    tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Range').format(scenario.label) + " <b>"
+                                        + val1 + "</b>-<b>" + val2 + "</b><br/>");
+                                }, this);
+    
+                                return tip;
+                            }
+                        }});
+                    break;
+            }
+            
+        } // if checked
+        
+    });
+
+    if (query['delta'] == 'true') {
+        
+        // if delta
+        // find the '30 year changes' radio
+        // and trigger click
+        
+        $('body').find('#chartoption3-' + query['var']).prop('checked', true).trigger('change')
+        
+    } else {
+        
+        // 30y averages is by default, so trigger the change event on load
+        $('#chartoption2-' + query['var']).trigger('change');
+        
+    }
+
+}
 
 /**
  * get IDF links for station_id and output HTML content to target
@@ -342,7 +950,7 @@ function getIDFLinks(station_id, target, css_class) {
             days: 'days',
             median: 'Median',
             range: 'Range',
-            search_city: 'Search for a City/Town',
+            search_city: 'Search for a City/Town to zoom to',
             selected: 'selected',
             label_field: 'label_en',
             temperature: 'temperature',
@@ -391,7 +999,7 @@ function getIDFLinks(station_id, target, css_class) {
                 days: 'jours',
                 median: 'Médiane',
                 range: 'Portée',
-                search_city: 'Cherchez une ville ou un village',
+                search_city: 'Cherchez une ville ou un village pour effectuer un zoom',
                 selected: 'sélectionés',
                 label_field: 'label_fr',
                 temperature: 'température',
@@ -490,11 +1098,29 @@ function getIDFLinks(station_id, target, css_class) {
                     if (data == 'success') {
 
                         $('#captcha_code').removeClass('border-secondary').tooltip('hide');
+                        
+                        let success_message = '<div class="row" style="display: none;"><div class="alert alert-success col-6 offset-3" role="alert">'
+                        
+                        success_message += '<p>' + T('Thanks! We’ve received your inquiry.') + '</p>'
+                        
+                        success_message += '<p>' + T('We are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays.') + '</p>'
+                        
+                        success_message += '<p>' + T('Thank you for your patience,') + '</p>'
+                        
+                        success_message += '<p>' + T('The Support Desk') + '</p>'
+                        
+                        success_message += '</div></div>'
+                        
+                        $(success_message).insertBefore(the_form).slideDown(250)
 
-                        $('<div class="row" style="display: none;"><div class="alert alert-success col-6 offset-3" role="alert">Thanks! We’ve received your feedback.</div></div>').insertBefore(the_form).slideDown(250);
+                        the_form.slideUp(250)
 
-                        the_form.slideUp(250);
-
+                    } else if (data == 'failed') {
+                        
+                        $('<div class="row" style="display: none;"><div class="alert alert-danger col-6 offset-3" role="alert">' + T('Sorry, an error occurred while sending your feedback. Please try again later.')+ '</div></div>').insertBefore(the_form).slideDown(250)
+                        
+                        the_form.slideUp(250)
+                        
                     } else if (data == 'captcha failed') {
 
                         $('#captcha_code').addClass('border-secondary').tooltip('show');
@@ -625,8 +1251,8 @@ function getIDFLinks(station_id, target, css_class) {
             );
             return $item;
         }
-
-        $('#location-search').select2({
+        
+        $('#location-search, #location-hero-search').select2({
             language: current_lang,
             ajax: {
                 url: child_theme_dir + "resources/app/run-frontend-sync/select-place.php",
@@ -651,8 +1277,8 @@ function getIDFLinks(station_id, target, css_class) {
             minimumInputLength: 1,
             templateResult: formatLocationSearch
         });
-
-        $('#location-search').on('select2:select', function (e) {
+        
+        $('#location-search, #location-hero-search').on('select2:select', function (e) {
 
             var redirect_url = '/explore/location/';
 
@@ -708,50 +1334,53 @@ function getIDFLinks(station_id, target, css_class) {
             //console.log('listnav');
         }
 
-				// SHARE
-
-				if ($('#share').length) {
-
-					window.fbAsyncInit = function() {
-				    FB.init({
-				      appId            : '387199319682000',
-				      autoLogAppEvents : true,
-				      xfbml            : true,
-				      version          : 'v13.0'
-				    });
-				  };
-
-					$('#share').share_widget({
-					  site_url: '//' + window.location.hostname,
-					  theme_dir: child_theme_dir,
-					  share_url: window.location.href,
-					  title: document.title,
-					  elements: {
-					    facebook: {
-					      display: true,
-					      icon: 'fab fa-facebook mr-3'
-					    },
-					    twitter: {
-					      display: true,
-					      icon: 'fab fa-twitter mr-3',
-					      text: null,
-					      via: null
-					    },
-							linkedin: {
-								display: true,
-								icon: 'fab fa-linkedin mr-3'
-							}
-					  },
-					  callback: null // callback function
-					})
-
-				}
+        // SHARE
+        
+        if ($('#share').length) {
+        
+            window.fbAsyncInit = function() {
+                FB.init({
+                    appId            : '387199319682000',
+                    autoLogAppEvents : true,
+                    xfbml            : true,
+                    version          : 'v13.0'
+                });
+            };
+            
+            $('#share').share_widget({
+                site_url: '//' + window.location.hostname,
+                theme_dir: child_theme_dir,
+                share_url: window.location.href,
+                title: document.title,
+                elements: {
+                    facebook: {
+                        display: true,
+                        icon: 'fab fa-facebook mr-3'
+                    },
+                    twitter: {
+                        display: true,
+                        icon: 'fab fa-twitter mr-3',
+                        text: null,
+                        via: null
+                    },
+                    linkedin: {
+                        display: true,
+                        icon: 'fab fa-linkedin mr-3'
+                    },
+                    permalink: {
+                        display: true,
+                        icon: 'fas fa-share-alt mr-3'
+                    }
+                },
+                callback: null // callback function
+            })
+        
+        }
 
         if (typeof $.fn.renderer !== 'undefined' && $('.renderable').length) {
             $(document).renderer();
         }
-        //console.log('end of child-functions');
-        
+
         //
         // TEXT TO SPEECH
         //
@@ -856,6 +1485,84 @@ function getIDFLinks(station_id, target, css_class) {
             })
             
         }
+
+
+        // global handler for chart export CSV
+        $('body').on('click', '.chart-export-data', function (e) {
+            e.preventDefault();
+            let chart = $(this).parents('.var-chart-container, .overlay-content').find('.var-chart').highcharts()
+
+            switch ($(this).attr('data-type')) {
+                case 'csv':
+                    setDataLayerForChartData('csv', chart, chart.query);
+                    switch($('input[name=chartoption-'+ chart.query.var + ']:checked').val()) {
+                        case '30y':
+                        case 'delta':
+                            window.location.href = chart.download_url;
+                            break;
+                        case 'annual':
+                        default:
+                            chart.downloadCSV();
+                            break;
+                    }
+                    break;
+            }
+        });
+
+        $('body').on('click', '.chart-export-img', function (e) {
+            e.preventDefault();
+            let chart = $(this).parents('.var-chart-container, .overlay-content').find('.var-chart').highcharts()
+            var dl_type = '';
+            var fileFormat = '';
+
+            switch ($(this).attr('data-type')) {
+                case 'png':
+                    dl_type = 'image/png';
+                    fileFormat = 'png'
+                    break;
+                case 'pdf':
+                    dl_type = 'application/pdf';
+                    fileFormat = 'pdf'
+                    break;
+            }
+
+            setDataLayerForChartData(fileFormat, chart, chart.query);
+
+            chart.exportChart({
+                type: dl_type
+            });
+        });
+
+        $('body').on('change', 'input:radio.chart-dataset', function (e) {
+            let container = $(this).parents('.var-chart-container, .overlay-content').find('.var-chart');
+            let oldchart = container.highcharts();
+            let query = oldchart.query;
+            let varDetails = oldchart.varDetails;
+            let dataset_name = e.target.value;
+
+            query.dataset = dataset_name;
+            let download_url, chart_url;
+
+            if (typeof query.sector === 'undefined') {
+                download_url = data_url + '/download-30y/' + query.lat + '/' + query.lon + '/' + query.var + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
+                chart_url = data_url + '/generate-charts/' + query.lat + '/' + query.lon + '/' + query.var + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
+            } else {
+                download_url = data_url + '/download-regional-30y/' + query.sector + '/' + query.id + '/' + query.var
+                    + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
+
+                chart_url = data_url + '/generate-regional-charts/' + query.sector + '/' + query.id
+                    + '/' + query.var + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
+            }
+            oldchart.destroy();
+
+            $.getJSON(chart_url,
+                function (data) {
+                    displayChartData(data, varDetails, download_url, query, container[0]);
+                    $('input[type=radio][name=chartoption-' + query.var + ']:checked').trigger('change');
+                });
+
+
+        });
 
     });
 })(jQuery);

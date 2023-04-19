@@ -38,8 +38,47 @@
   //
 
   get_header();
+  $dataset_name = arr_get($_GET, 'dataset_name', 'cmip6');
+
 
   if ( have_posts() ) : while ( have_posts() ) : the_post();
+    
+    if ( !isset ( $_GET['loc'] ) || empty ( $_GET['loc'] ) ) {
+      
+?>
+
+<section id="location-hero" class="page-section first-section">
+  <div class="section-container supermenu-slide">
+    <div class="container-fluid">
+      <header class="row">
+        <div class="col-10 offset-1 col-lg-4 offset-lg-4 d-flex align-items-center text-secondary">
+          <span class="cdc-icon icon-variable"></span>
+          <h5><?php _e ( 'Find data summaries in locations you care about', 'cdc' ); ?></h5>
+        </div>
+      </header>
+    
+      <div id="location-search-container" class="row align-items-center text-lg-center">
+        <label for="location-hero-search" class="col-10 offset-1 col-md-3 col-lg-2 offset-lg-2 col-form-label"><?php _e ( 'Select a location', 'cdc' ); ?></label>
+    
+        <div class="col-10 offset-1 col-md-6 offset-md-0 col-lg-4 offset-lg-0">
+          <select class="custom-select custom-select-lg select2 form-control-lg rounded-pill border-dark text-center w-100" name="location-hero-search" id="location-hero-search" data-container-css-class="big-menu btn btn-lg rounded-pill" data-dropdown-css-class="big-menu-dropdown">
+            <option value=""><?php _e ( 'Search for a City/Town', 'cdc' ); ?></option>
+          </select>
+        </div>
+      </div>
+    
+      <div id="location-search-instruction" class="col-10 offset-1 col-lg-4 offset-lg-4">
+        <p><?php _e('* Each location provided here corresponds to a point location in Canada.
+        The data displayed is for the ~10 km x 6 km grid cell within which the selected location lies.
+        Accordingly, the data does not necessarily reflect the exact point that you select, particularly in areas with varying microclimates.','cdc'); ?></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<?php
+
+    } else {
 
 ?>
 
@@ -59,10 +98,23 @@
         </div>
 
         <div id="location-hero-data" style="display: none;">
-          <p><?php printf ( __( 'For the 1951-1980 period, the annual average temperature was %s ºC; for 1981-2010 it was %s ºC. Under a high emissions scenario, annual average temperatures are projected to be %s ºC for the 2021-2050 period, %s ºC for the 2051-2080 period and %s ºC for the last 30 years of this century.', 'cdc' ), '<strong id="location-val-1"></strong>', '<strong id="location-val-2"></strong>', '<strong id="location-val-3"></strong>', '<strong id="location-val-4"></strong>', '<strong id="location-val-5"></strong>' ); ?></p>
+          <p><?php printf ( __( 'For the 1971-2000 period, the annual average temperature was %s&nbsp;ºC. Under a high emissions scenario, annual average temperatures are projected to be %s&nbsp;ºC for the 2021-2050 period, %s&nbsp;ºC for the 2051-2080 period and %s&nbsp;ºC for the last 30 years of this century.', 'cdc' ), '<strong id="tg_mean_1971"></strong>', '<strong id="tg_mean_2021"></strong>', '<strong id="tg_mean_2051"></strong>', '<strong id="tg_mean_2071"></strong>' ); ?></p>
 
-          <p><?php printf ( __( 'Average annual precipitation for the 1951-1980 period was %s mm. Under a high emissions scenario, this is projected to be %s%% higher for the 2021-2050 period, %s%% higher for the 2051-2080 period and %s%% higher for the last 30 years of this century.', 'cdc' ), '<strong id="location-val-6"></strong>', '<strong id="location-val-7"></strong>', '<strong id="location-val-8"></strong>', '<strong id="location-val-9"></strong>' ); ?></p>
-            <p><?php printf( __('* These values reflect those of the ~10 km x 6 km grid cell that %s lies within and do not necessarily reflect the exact point that you select, particularly in areas with varying microclimates . ','cdc'), $GLOBALS['vars']['current_data']['location_data']['geo_name'] ); ?></p>
+          <p><?php printf ( __( 'Average annual precipitation for the 1971-2000 period was %s&nbsp;mm. Under a high emissions scenario, this is projected to be %s%% higher for the 2051-2080 period and %s%% higher for the last 30 years of this century.', 'cdc' ), '<strong id="prcptot_1971"></strong>', '<strong id="prcptot_delta_2051_percent"></strong>', '<strong id="prcptot_delta_2071_percent"></strong>' ); ?></p>
+          <p><?php _e('Seasonal and monthly changes in precipitation may be quite different from these annual average values. Use the Variable menu option to explore projected changes at these shorter time frequencies.', 'cdc');?></p>
+          <p><?php printf( __('* These values reflect those of the ~10 km x 6 km grid cell that %s lies within and do not necessarily reflect the exact point that you select, particularly in areas with varying microclimates.','cdc'), $GLOBALS['vars']['current_data']['location_data']['geo_name'] ); ?></p>
+
+            <div class="navbar chart-navbar d-flex align-items-center mb-5">
+                <div class="nav-item flex-grow-1 d-flex">
+                    <div class="form-select col-10 offset-4 col-sm-4">
+                        <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                            <label class="btn btn-outline-light <?php echo $dataset_name == 'cmip5'? 'active':'';?>" style="border-top-left-radius: 25px;border-bottom-left-radius: 25px;padding: 13px;"> <input type="radio" name="location-dataset" autocomplete="off" value="cmip5" <?php echo $dataset_name == 'cmip5'? 'checked':'';?>>CMIP5</label>
+                            <label>&nbsp;</label>
+                            <label class="btn btn-outline-light <?php echo $dataset_name == 'cmip6'? 'active':'';?>" style="border-top-right-radius: 25px;border-bottom-right-radius: 25px;padding: 13px;"> <input type="radio" name="location-dataset" autocomplete="off" value="cmip6" <?php echo $dataset_name == 'cmip6'? 'checked':'';?>>CMIP6</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
       </div>
     </div>
@@ -199,6 +251,8 @@
 
 <?php
 
+    }
+    
   endwhile; endif;
 
   get_footer();

@@ -6,7 +6,11 @@
   padding: 0;
 }
 
-//
+.initially-hidden {
+  display: none;
+}
+
+  //
 // FORM
 //
 
@@ -92,6 +96,15 @@
   }
 }
 
+#annual-process-wrap {
+  label {
+    font-size: 1.9rem;
+  }
+}
+
+.troubleshooting-content {
+}
+
 #daily-captcha-wrap {
   label {
 
@@ -131,4 +144,42 @@
   height: auto;
   padding: 0.5em 1em;
   border-radius: 50px 0 0 50px;
+}
+
+// overlay
+#map-overlay {
+  @include full-size;
+  z-index: 5;
+  background-color: transparentize($white, 0.3);
+}
+
+#map-overlay-content {
+  @include centering(true);
+  max-width: 60%;
+  text-align: center;
+
+  h4 {
+    color: $primary;
+    font-size: 2.4rem;
+    @include all-caps;
+  }
+
+  p {
+    opacity: 1;
+    transition: 0.25s;
+
+    &.hidden {
+      opacity: 0;
+    }
+  }
+
+  .btn {
+    opacity: 1;
+    transition: 0.25s;
+
+    &.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
 }

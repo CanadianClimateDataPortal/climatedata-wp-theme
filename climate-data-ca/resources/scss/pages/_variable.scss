@@ -309,20 +309,59 @@ $legend-on-height: 16px;
   flex: 1;
   position: relative;
   cursor: pointer;
-
+  
+  &:not(.first):not(.last) {
+    &:hover {
+      .legendColor {
+        transform: scaleX(1.5) scaleY(2);
+        box-shadow: 0 0 5px transparentize($black, 0.75);
+        z-index: 5;
+      }
+      
+      &:after {
+        transform: scaleX(1.5) scaleY(2);
+        z-index: 4;
+      }
+      
+      .legendUnit {
+        right: calc(100% + 10px);
+        transition: right 0s ease 0s, opacity 0.2s ease 0s;
+        opacity: 1;
+      }
+    }
+  }
+    
   &:hover {
-    .legendColor {
-      //height: $legend-on-height;
-      transform: scaleX(1.5) scaleY(2);
-      box-shadow: 0 0 5px transparentize($black, 0.75);
-      z-index: 5;
+  }
+  
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: $white;
+    transition: 0.15s;
+    z-index: -1;
+  }
+  
+  &.first:after,
+  &.last:not(.zero):after {
+    background-color: transparent;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+  }
+  
+  &.first {
+    &:after {
+      border-bottom: 10px solid $white;
     }
-
-    .legendUnit {
-      right: calc(100% + 10px);
-      transition: right 0s ease 0s, opacity 0.2s ease 0s;
-      opacity: 1;
-    }
+  }
+  
+  &.last:not(.zero):after {
+    border-top: 10px solid $white;
   }
 }
 
@@ -348,6 +387,7 @@ $legend-on-height: 16px;
   transform: translateY(-50%);
   transition: right 0s ease 0.2s, opacity 0.2s ease 0s;
   z-index: 1;
+  pointer-events: none;
 }
 
 // sliders
@@ -526,6 +566,51 @@ body.stations-on {
   display: none!important;
 }
 
+// RELATED
+
+.overlay-sidebar {
+  .related-section {
+    &:nth-of-type(even) {
+      background-color: $white;
+    }
+  }
+  
+  .related-section-head {
+    font-size: 1.2rem;
+  }
+  
+  .breadcrumb {
+    font-size: 1rem;
+    @include all-caps;
+    
+    .breadcrumb-item {
+      color: $slate2;
+    
+      a {
+        color: $slate2;
+      }
+    
+      + .breadcrumb-item {
+        padding-left: 0.5rem;
+        
+        &:before {
+          content: '•';
+          color: $slate2;
+          margin-right: 0.25rem;
+        }
+      }
+    }
+  }
+  
+  .list-group-item {
+    background-color: transparent;
+  }
+  
+  .related-item-excerpt {
+    font-size: 1.4rem;
+  }
+}
+
 // APP
 
 .leaflet-popup {
@@ -604,7 +689,26 @@ body.stations-on {
   font-weight:bold;
 }
 
+.geo-select-instructions {
+  font-size: 1rem;
+  
+  h6 {
+    font-size: 1.4rem;
+    color: $slate2;
+  }
+  
+  p {
+    font-size: 1.2rem;
+  }
+}
 
+#select2-geo-select-results {
+  font-size: 1.3rem;
+  
+  .geo-select-title {
+    font-size: 1.2em;
+  }
+}
 
 .irs--round .irs-grid-text {
   color: #404040;

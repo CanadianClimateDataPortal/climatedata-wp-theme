@@ -48,16 +48,38 @@
 
 ?>
 
-	<section id="sector-context" class="page-section has-head">
+	<section id="sector-overview" class="page-section has-head">
 		<div class="section-container">
       <header class="section-head container-fluid">
         <div class="row">
           <div class="col-10 offset-1">
-            <h3 class="text-primary"><?php _e ( 'Context', 'cdc' ); ?></h3>
+            <h3 class="text-primary"><?php _e ( 'Overview', 'cdc' ); ?></h3>
 					</div>
 
           <div class="col-10 offset-1 col-md-4">
             <?php the_sub_field ( 'text' ); ?>
+						
+						<?php
+						
+								if ( get_sub_field ( 'btn_url' ) != '' ) {
+						
+						?>
+						
+						<a href="<?php echo get_sub_field ( 'btn_url' ); ?>" class="btn btn-lg btn-outline-secondary rounded-pill all-caps"><?php
+						
+									if ( get_sub_field ( 'btn_text' ) != '' ) {
+										echo get_sub_field ( 'btn_text' );
+									} else {
+										_e ( 'Read further', 'cdc' );
+									}
+						
+						?><i class="fas fa-long-arrow-alt-right ml-2"></i></a>
+						
+						<?php
+						
+								} // if btn
+								
+								?>
           </div>
 
 					<div id="sector-context-img" class="col-10 offset-1 col-md-5 bg-dark">
@@ -70,24 +92,6 @@
 						<div class="bg opacity-40" style="background-image: url(<?php echo wp_get_attachment_image_url ( get_sub_field ( 'image' ), 'large' ) ?>);"></div>
 
 						<?php
-
-								if ( get_sub_field ( 'btn_url' ) != '' ) {
-
-						?>
-
-						<a href="<?php echo get_sub_field ( 'btn_url' ); ?>" class="btn btn-outline-light rounded-pill all-caps"><?php
-
-									if ( get_sub_field ( 'btn_text' ) != '' ) {
-										echo get_sub_field ( 'btn_text' );
-									} else {
-										_e ( 'Read further', 'cdc' );
-									}
-
-						?><i class="fas fa-long-arrow-alt-right ml-2"></i></a>
-
-						<?php
-
-								} // if btn
 
 							} // if img
 
@@ -184,7 +188,112 @@
 
 			}
 		}
+		
+		//
+		// BLOG
+		//
+		
+		$blog_query = new WP_Query ( array (
+			'post_type' => 'post',
+			'post_status' => 'publish',
+			'posts_per_page' => -1,
+			'tax_query' => array (
+				array (
+					'taxonomy' => 'post_tag',
+					'field' => 'slug',
+					'terms' => [ get_the_slug ( get_the_ID() ) ]
+				)
+			)
+		) );
+		
+		if ( $blog_query->have_posts() ) {
+			
+	?>
+	
+	<section id="sector-blog" class="page-section has-head">
+		<div class="section-container">
+			<header class="section-head container-fluid">
+				<div class="row">
+					<div class="col-10 offset-1 col-md-5">
+						<h4 class="text-secondary"><?php _e ( 'Blog Posts', 'cdc' ); ?></h4>
+					</div>
+				</div>
+			</header>
+	
+			<div class="container-fluid">
+	
+				<div class="post-carousel-wrap row">
+					<div class="post-carousel col-10 offset-1" data-slick='{
+						"slidesToShow": 4,
+						"slidesToScroll": 1,
+						"infinite": true,
+						"centerMode": false,
+						"prevArrow": false,
+						"nextArrow": "<div class=\"post-carousel-next\"><i class=\"fas fa-long-arrow-alt-right\"></i></div>",
+						"responsive": [
+							{
+								"breakpoint": 992,
+								"settings": {
+									"slidesToShow": 3
+								}
+							}, {
+								"breakpoint": 576,
+								"settings": {
+									"slidesToShow": 1
+								}
+							}
+						]
+					}'>
+						
+						<?php
+							
+							$item_num = 1;
+							
+							while ( $blog_query->have_posts() ) {
+								$blog_query->the_post();
+								
+								$item = array (
+									'id' => get_the_ID(),
+									'title' => get_the_title(),
+									'permalink' => get_permalink(),
+									'post_type' => get_post_type(),
+									'content' => get_the_content()
+								);
+								
+						?>
+						
+						<div id="" class="query-item post-preview type-<?php echo $item['post_type']; ?>">
+							
+							<?php
+								
+								include ( locate_template ( 'previews/post.php' ) );
+							
+							?>
+							
+						</div>
+						
+						<?php
+							
+								$item_num++;
+								
+							}
+							
+						?>
+						
+					</div>
+				</div>
+				
+			</div>
+	
+		</div>
+	</section>
+	
+	<?php
 
+		} // if posts
+		
+		wp_reset_postdata();
+	
 		//
 		// ANALOGOUS
 		//

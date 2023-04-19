@@ -2,7 +2,7 @@
 // STEPS
 //
 
-#analyze-form {
+.analyze-form {
   padding: 10px 0;
 
   .input-row {
@@ -109,7 +109,7 @@
   }
 }
 
-#analyze-steps {
+.analyze-steps {
 
   .accordion-head {
     padding: 15px;
@@ -195,7 +195,7 @@
 // HEADER
 //
 
-#analyze-header {
+.analyze-header {
   position: absolute;
   top: 0;
   left: -9999px;
@@ -214,11 +214,11 @@
 
 // VAR DETAIL
 
-#analyze-detail {
+.analyze-detail {
   display: none;
   background-color: transparentize($primary, 0.15);
 
-  #placeholder {
+  .placeholder {
     padding: 30px 0;
 
     .form-inline {
@@ -242,7 +242,7 @@
 		input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
 		  color: transparentize($white, 0.25);
 		}
-		
+
 		input::-moz-placeholder { /* Firefox 19+ */
 		  color: transparentize($white, 0.25);
 		}
@@ -259,7 +259,7 @@
 
 // BREADCRUMB
 
-#analyze-breadcrumb {
+.analyze-breadcrumb {
   padding-top: 15px;
   padding-bottom: 15px;
   background-color: transparentize($primary, 0.25);
@@ -307,7 +307,7 @@
   }
 }
 
-#detail-close {
+.detail-close {
   float: right;
   background-color: $white;
   color: $secondary;
@@ -317,13 +317,13 @@
 // MAP
 //
 
-#map-overlay {
+.analyze-map-overlay {
   @include full-size;
   z-index: 5;
   background-color: transparentize($white, 0.3);
 }
 
-#map-overlay-content {
+.analyze-map-overlay-content {
   @include centering(true);
   max-width: 60%;
   text-align: center;
@@ -354,11 +354,11 @@
   }
 }
 
-#analyze-map-container {
+.analyze-map-container {
   position: relative;
   min-height: 80vh;
 
-  #geo-select-container {
+  .geo-select-container {
     display: none;
     position: absolute;
     bottom: 10px;
@@ -383,11 +383,11 @@
   }
 }
 
-#analyze-map {
+.analyze-map {
   @include full-size;
   z-index: 1;
 }
 
-#analyze-submit {
+.analyze-submit {
 //   display: none;
 }

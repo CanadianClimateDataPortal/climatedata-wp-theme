@@ -5,6 +5,7 @@
   1. get current page URL
   2. get filename of current template
   3. output obfuscated email address
+  4. preformatted var dump
 
 */
 
@@ -52,4 +53,21 @@ function obfuscate($email) {
   }
   
   return $email_obfuscated;
+}
+
+//
+// 4.
+// DUMPIT
+//
+
+
+
+// PREFORMATTED VAR DUMP
+
+function dumpit ( $var ) {
+
+  echo '<pre style="font-size: 9px;">';
+  print_r($var);
+  echo '</pre>';
+  
 }

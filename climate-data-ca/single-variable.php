@@ -445,7 +445,7 @@ if (have_posts()) : while (have_posts()) : the_post();
                             </div>
                             
                             <div class="nav-item d-flex align-items-center">
-                                <h6 class="mb-0 mr-3">More</h6>
+                                <h6 class="mb-0 mr-3"><?php _e( 'More', 'cdc'); ?></h6>
                                 
                                 <div class="btn-group btn-group-sm" role="group">
                                     <a href="<?php echo home_url ( 'download' ); ?>" class="btn btn-sm btn-outline-secondary"><?php _e ( 'Download multiple grid cells', 'cdc' ); ?></a>

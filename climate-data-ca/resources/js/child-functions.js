@@ -343,6 +343,7 @@ function setDataLayerForChartData(chartDataFormat, chartData, query) {
         'chart_data_event_type': eventName,
         'chart_data_settings': chartDataSettings,
         'chart_data_columns': addStr,
+        'chart_data_dataset': query.dataset,
         'chart_data_format': chartDataFormat,
         'chart_data_view_by': variableDownloadDataVewBy
     });

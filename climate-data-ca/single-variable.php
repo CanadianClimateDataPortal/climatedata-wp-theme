@@ -215,7 +215,7 @@ if (have_posts()) : while (have_posts()) : the_post();
     ?>
     
     <div id="var-overlay-related" class="p-4">
-        <h6 class="mt-3 mb-4 pl-3 all-caps"><?php _e ( 'More Related Content', 'cdc' ); ?></h6>
+        <h6 class="mt-3 mb-4 pl-3 all-caps"><?php _e ( 'Related Content', 'cdc' ); ?></h6>
         
         <div class="list-group">
                 

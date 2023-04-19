@@ -179,15 +179,14 @@
 
                 while ( $sector_query->have_posts() ) : $sector_query->the_post();
 
-
-								$link_href = '';
-								$link_class = 'text-muted';
-
-								if ( $current_ID == get_the_ID() ) {
-									$link_class .= ' smooth-scroll';
-								} else {
-									$link_href = get_permalink();
-								}
+								  $link_href = '';
+								  $link_class = 'text-muted';
+  
+								  if ( $current_ID == get_the_ID() ) {
+									  $link_class .= ' smooth-scroll';
+								  } else {
+									  $link_href = get_permalink();
+								  }
 
             ?>
 
@@ -199,7 +198,31 @@
               <ul>
 								<li><a href="<?php echo $link_href; ?>#sector-overview" class="<?php echo $link_class; ?>"><?php _e ( 'Overview', 'cdc' ); ?></a></li>
 					      <li><a href="<?php echo $link_href; ?>#sector-cases" class="<?php echo $link_class; ?>"><?php _e ( 'Case Studies', 'cdc' ); ?></a></li>
+                
+                <?php
+                
+                  $blog_query = get_posts ( array (
+                    'post_type' => 'post',
+                    'post_status' => 'publish',
+                    'tax_query' => array (
+                      array (
+                        'taxonomy' => 'post_tag',
+                        'field' => 'slug',
+                        'terms' => [ get_the_slug () ]
+                      )
+                    )
+                  ) );
+                  
+                  if ( !empty ( $blog_query ) ) {
+                    
+                ?>
                 <li><a href="<?php echo $link_href; ?>#sector-blog" class="<?php echo $link_class; ?>"><?php _e ( 'Blog Posts', 'cdc' ); ?></a></li>
+                <?php
+                
+                  }
+                
+                ?>
+                
 					      <li><a href="<?php echo $link_href; ?>#sector-analogous" class="<?php echo $link_class; ?>"><?php _e ( 'Sector Resources', 'cdc' ); ?></a></li>
 					      <li><a href="<?php echo $link_href; ?>#sector-vars" class="<?php echo $link_class; ?>"><?php _e ( 'Relevant Variables', 'cdc' ); ?></a></li>
 					      <li><a href="<?php echo $link_href; ?>#sector-related" class="<?php echo $link_class; ?>"><?php _e ( 'Related Content', 'cdc' ); ?></a></li>

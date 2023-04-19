@@ -20,17 +20,17 @@
               <h5><?php _e ( 'Find data summaries in locations you care about', 'cdc' ); ?></h5>
             </div>
           </header>
-
+        
           <div id="location-search-container" class="row align-items-center text-lg-center">
             <label for="location-search" class="col-10 offset-1 col-md-3 col-lg-2 offset-lg-2 col-form-label"><?php _e ( 'Select a location', 'cdc' ); ?></label>
-
+        
             <div class="col-10 offset-1 col-md-6 offset-md-0 col-lg-4 offset-lg-0">
               <select class="custom-select custom-select-lg select2 form-control-lg rounded-pill border-dark text-center w-100" name="location-search" id="location-search" data-container-css-class="big-menu btn btn-lg rounded-pill" data-dropdown-css-class="big-menu-dropdown">
                 <option value=""><?php _e ( 'Search for a City/Town', 'cdc' ); ?></option>
               </select>
             </div>
           </div>
-
+        
           <div id="location-search-instruction" class="col-10 offset-1 col-lg-4 offset-lg-4">
             <p><?php _e('* Each location provided here corresponds to a point location in Canada.
             The data displayed is for the ~10 km x 6 km grid cell within which the selected location lies.

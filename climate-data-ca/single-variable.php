@@ -358,7 +358,7 @@ if (have_posts()) : while (have_posts()) : the_post();
                         <div class="navbar chart-navbar d-flex justify-content-around align-items-center mb-4 pb-4 border-bottom">
 
                             <div class="nav-item d-flex align-items-center">
-                                <h6 class="mb-0">Dataset:</h6>
+                                <h6 class="mb-0"><?php _e('Dataset', 'cdc'); ?>:</h6>
                                 
                                 <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
                                     <label class="btn btn-outline-primary rounded-pill <?php echo $dataset_name == 'cmip5' ? 'active':'';?>">

@@ -291,6 +291,24 @@ function T(str) {
     }
 }
 
+
+function hashCode(s) {
+    return s.split("").reduce(function(a, b) {
+        a = ((a << 5) - a) + b.charCodeAt(0);
+        return a & a;
+    }, 0);
+}
+
+function encodeURL(url, salt) {
+    let hash = hashCode(url + salt );
+    let encoded = encodeURIComponent(btoa(url + '|' + hash));
+    return {
+        'encoded': encoded,
+        'hash': hash
+    };
+}
+
+
 function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
     let gA4EventNameForVariableDownloadData = "";
     keySelected = keySelected.toLowerCase();

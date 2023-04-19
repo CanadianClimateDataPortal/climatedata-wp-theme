@@ -2279,6 +2279,7 @@
                 } else {
                     // console.log('----- ' + history_action + ' -----');
                 }
+                $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(new_url, url_encoder_salt).encoded);
             }
             history_action = 'push';
         }
@@ -3050,16 +3051,15 @@
                 update_query_string();
 
             }
-
-            // prevent from firing multiple times
-            map1.off('moveend', mapMoveEnd);
-            setTimeout(function () {
-                map1.on('moveend', mapMoveEnd);
-            }, 300);
-
+            e.target.mapMoveEndTimeout = null;
         }
 
-        map1.on('moveend', mapMoveEnd);
+        map1.on('moveend', function(e){
+            if (typeof e.target.mapMoveEndTimeout !== 'undefined' && e.target.mapMoveEndTimeout !== null) {
+                clearTimeout(e.target.mapMoveEndTimeout);
+            }
+            e.target.mapMoveEndTimeout = setTimeout(function() { mapMoveEnd(e)}, 300);
+        });
 
         // OVERLAY
 
@@ -3223,6 +3223,9 @@
                 $('[data-original-title]').popover('hide');
             }
         });
+
+        // initially update screenshot button link
+        $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(window.location.href, url_encoder_salt).encoded);
 
     });
 })(jQuery);

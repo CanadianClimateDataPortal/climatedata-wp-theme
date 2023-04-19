@@ -469,7 +469,31 @@
         }
 
         $("#geo-select").select2({
-            language: current_lang,
+            language: {
+                inputTooShort: function() {
+                    let instructions = '<div class="geo-select-instructions">'
+                    
+                        instructions += '<div class="p-2 mb-2 border-bottom">'
+                            
+                            instructions += '<h6 class="mb-1">' + T('Search communities') + '</h6>'
+                            
+                            instructions += '<p class="mb-1 text-body">' + T('Begin typing city name') + '</p>'
+                        
+                        instructions += '</div>'
+                        
+                        instructions += '<div class="p-2">'
+                        
+                            instructions += '<h6 class="mb-1">' + T('Search coordinates') + '</h6>'
+                            
+                            instructions += '<p class="mb-0 text-body">' + T('Enter latitude & longitude e.g.') + ' <code>54,-115</code></p>'
+                        
+                        instructions += '</div>'
+                    
+                    instructions += '</div>'
+                    
+                    return instructions
+                }
+            },
             ajax: {
                 url: child_theme_dir + "resources/app/run-frontend-sync/select-place.php",
                 dataType: 'json',
@@ -482,26 +506,28 @@
                     };
                 },
                 transport: function (params, success, failure) {
+                    
                     var $request = $.ajax(params);
 
                     var llcheck = new RegExp('^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$');
 
                     term = params.data.q;
 
-
                     if (llcheck.test(term)) {
                         $request.fail(failure);
                         // $('.select2-results__option').text('custom');
                         $('.select2-results__options').empty();
-                        $('.select2-results__options').append('<li style="padding:10px"><strong>Custom Lat/Lon Detected:</strong><br>Map has panned to validated coordinates.</li>');
+                        
                         var term_segs = term.split(',');
                         var term_lat = term_segs[0];
                         var term_lon = term_segs[1];
-                        map1.panTo([term_lat, term_lon]);
+                        
+                        $('.select2-results__options').append('<div class="geo-select-instructions p-4"><h6 class="mb-3">' + T('Coordinates detected') + '</h6><p class="mb-0"><span class="geo-select-pan-btn btn btn-outline-secondary btn-sm rounded-pill px-4" data-lat="' + term_lat + '" data-lon="' + term_lon + '">' + T('Set map view') + '</span></p></div>');
                     } else {
                         $request.then(success);
                         return $request;
                     }
+                    
                 },
                 processResults: function (data, page) {
                     // parse the results into the format expected by Select2.
@@ -524,6 +550,68 @@
             //templateResult: formatRepo, // omitted for brevity, see the source of this page
             //templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
         });
+        
+        $('body').on('click', '.geo-select-pan-btn', function() {
+            
+            let thislat = parseFloat($(this).attr('data-lat')),
+                thislon = parseFloat($(this).attr('data-lon')),
+                this_zoom = map1.getZoom()
+            
+            if (this_zoom < 7) {
+                this_zoom = 7
+            }
+            
+            map1.setView([thislat, thislon], this_zoom);
+            
+            $('#select2-geo-select-container').text($(this).attr('data-lat') + ', ' + $(this).attr('data-lon'))
+            
+            $("#geo-select").select2('close')
+            
+            // highlight grid
+            
+            let varDetails = varData.get($("#var").val());
+            
+            $.ajax({
+                url: hosturl + "/geoserver/CDC/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo" +
+                    "&QUERY_LAYERS=CDC%3A" + varDetails.grid + "&LAYERS=CDC%3A" + varDetails.grid +
+                    "&INFO_FORMAT=application%2Fjson" + "&FEATURE_COUNT=50&X=50&Y=50&SRS=EPSG%3A4326&" +
+                    "WIDTH=101&HEIGHT=101&BBOX=" + thislon + "%2C" + thislat + "%2C" +
+                    (parseFloat(thislon) + 0.0001) + "%2C" + (parseFloat(thislat) + 0.00001),
+                dataType: 'json',
+                success: function (data) {
+            
+                    if (data.features.length) {
+            
+                        if (highlighted_feature) {
+            
+                            gridLayer.resetFeatureStyle(highlighted_feature)
+            
+                            if (has_mapRight == true) {
+                                gridLayerRight.resetFeatureStyle(highlighted_feature)
+                            }
+            
+                        }
+            
+                        highlighted_feature = data.features[0].properties.gid;
+            
+                        gridLayer.setFeatureStyle(highlighted_feature, {
+                            weight: 1.5,
+                            color: '#f00',
+                            opacity: 1
+                        });
+            
+                        if (has_mapRight == true) {
+                            gridLayerRight.setFeatureStyle(highlighted_feature, {
+                                weight: 1.5,
+                                color: '#f00',
+                                opacity: 1
+                            });
+                        }
+                    }
+                }
+            });
+            
+        })
 
         //
         // MAP STUFF
@@ -1396,61 +1484,84 @@
             labels.push('<div class="legendRows">');
 
             var min_label = '';
+            
+            // what's the current opacity
+            let current_opacity = $('#opacity-slider').data('ionRangeSlider')['old_from'] / 100
 
             for (let i = 0; i < colormap.length; i++) {
                 unitValue = unit_localize(colormap[i].label);
                 unitColor = colormap[i].color;
+                
+                let row_class = 'legendRow'
+                
+                if (i == 0) {
+                    row_class += ' first'
+                } else if (i == colormap.length - 1) {
+                    row_class += ' last'
+                }
 
                 if (unitValue !== 'NaN') {
 
-                    style = 'background:' + unitColor;
-
                     t = "";
+                    
                     if (i == 0) {
-                        style = "; border-bottom: 10px solid " + unitColor +
-                            "; border-left: 8px solid transparent" +
-                            "; border-right: 8px solid transparent";
+                        
+                        // first row
+                            
                         t = '<span class="legendLabel max">' + first_label + '</span>';
 
                         labels.push(
-                            '<div class="legendRow">' +
+                            '<div class="' + row_class + '">' +
                             '<span class="legendLabel max">' + unitValue + '</span>' +
-                            '<div class="legendColor" style="border-bottom: 10px solid ' + unitColor +
+                            '<div class="legendColor" style="opacity: ' + current_opacity + '; border-bottom: 10px solid ' + unitColor +
                             '; border-left: 8px solid transparent; border-right: 8px solid transparent"></div>' +
                             '<span class="legendUnit">&gt; ' + unitValue + '</span>' +
                             '</div>'
                         );
-                    }
-                    else if (i == colormap.length - 1) {
+                        
+                    } else if (i == colormap.length - 1) {
+                        
                         labels.push(
-                            '<div class="legendRow">' +
+                            '<div class="' + row_class + '">' +
                             '<span class="legendLabel min">' + unitValue + '</span>' +
-                            '<div class="legendColor" style="border-top: 10px solid ' + unitColor +
+                            '<div class="legendColor" style="opacity: ' + current_opacity + '; border-top: 10px solid ' + unitColor +
                             '; border-left: 8px solid transparent; border-right: 8px solid transparent"></div>' +
                             '<span class="legendUnit">&lt; ' + unitValue + '</span>' +
-                            '</div>');
+                            '</div>'
+                        );
+                        
                     } else {
+                        
+                        // last row
+                        
                         labels.push(
-                            '<div class="legendRow">' +
-                            '<div class="legendColor" style="' + style + '"></div>' +
+                            '<div class="' + row_class + '">' +
+                            '<div class="legendColor" style="opacity: ' + current_opacity + '; background-color:' + unitColor + ';"></div>' +
                             '<div class="legendUnit">' + unitValue + '</div>' +
-                            '</div>');
+                            '</div>'
+                        );
+                        
                     }
 
                 } else {
+                    
                     if (i == colormap.length - 1) {
+                        
+                        // last row if no unit
+                        
                         labels.push(
-                            '<div class="legendRow">' +
+                            '<div class="' + row_class + ' zero">' +
                             '<span class="legendLabel ">0</span>' +
-                            '<div class="legendColor" style="background:' + unitColor + '"></div>' +
+                            '<div class="legendColor" style="opacity: ' + current_opacity + '; background-color:' + unitColor + '"></div>' +
                             '<span class="legendUnit">0</span>' +
-                            '</div>');
+                            '</div>'
+                        );
+                        
                     }
                 }
             }
 
             labels.push('</div><!-- .legendRows -->');
-
 
             return labels;
 
@@ -1656,7 +1767,9 @@
                 rightLayer.setOpacity(value / 100);
             }
 
-            $('.leaflet-sector-pane').css('opacity', value / 100);
+            $('.leaflet-sector-pane').css('opacity', value / 100)
+            $('.legend .legendColor').css('opacity', value / 100)
+            
         }
 
         loadClimateNormals();
@@ -2166,6 +2279,7 @@
                 } else {
                     // console.log('----- ' + history_action + ' -----');
                 }
+                $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(new_url, url_encoder_salt).encoded);
             }
             history_action = 'push';
         }
@@ -2937,16 +3051,15 @@
                 update_query_string();
 
             }
-
-            // prevent from firing multiple times
-            map1.off('moveend', mapMoveEnd);
-            setTimeout(function () {
-                map1.on('moveend', mapMoveEnd);
-            }, 300);
-
+            e.target.mapMoveEndTimeout = null;
         }
 
-        map1.on('moveend', mapMoveEnd);
+        map1.on('moveend', function(e){
+            if (typeof e.target.mapMoveEndTimeout !== 'undefined' && e.target.mapMoveEndTimeout !== null) {
+                clearTimeout(e.target.mapMoveEndTimeout);
+            }
+            e.target.mapMoveEndTimeout = setTimeout(function() { mapMoveEnd(e)}, 300);
+        });
 
         // OVERLAY
 
@@ -3110,6 +3223,9 @@
                 $('[data-original-title]').popover('hide');
             }
         });
+
+        // initially update screenshot button link
+        $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(window.location.href, url_encoder_salt).encoded);
 
     });
 })(jQuery);

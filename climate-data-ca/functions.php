@@ -108,10 +108,11 @@ function child_theme_enqueue()
     wp_register_script('case-study-functions', $child_js_dir . 'case-study-functions.js', array('jquery', 'child-functions', 'map-renderer', 'renderer'), NULL, true);
     wp_register_script('training-functions', $child_js_dir . 'training-functions.js', array('jquery', 'child-functions' ), NULL, true);
     wp_register_script('iframe-functions', $child_js_dir . 'iframe-functions.js', array('jquery', 'child-functions'), NULL, true);
-    // VENDOR
 
+    // VENDOR
+    
     wp_register_script('js-cookie', $bower_dir . 'js-cookie/src/js.cookie.js', NULL, true);
-    //wp_register_script ( 'jquery-mousewheel', $bower_dir . 'jquery-mousewheel/jquery.mousewheel.min.js', array ( 'jquery' ), NULL, true );
+    
     wp_register_script('listnav', $bower_dir . 'pe-listnav/jquery-listnav.js', NULL, NULL, true);
 
     // highcharts

@@ -19,6 +19,13 @@ var l10n_table = {
         '{0} Median': '{0} médiane',
         '{0} Range': '{0} portée',
 
+        'Search communities': 'Recherche par ville',
+        'Begin typing city name': 'Commencer à saisir le nom d\'une ville',
+        'Search coordinates': 'Recherche par coordonnées',
+        'Enter latitude & longitude e.g.': 'Saisir la latitude et la longitude, par ex.',
+        'Coordinates detected': 'Coordonnées détectées',
+        'Set map view': 'Définir l\'affichage de la carte',
+
         // share widget
         "Copied to clipboard": "Copié dans le presse-papier",
         "Error" : "Erreur",
@@ -336,6 +343,7 @@ function setDataLayerForChartData(chartDataFormat, chartData, query) {
         'chart_data_event_type': eventName,
         'chart_data_settings': chartDataSettings,
         'chart_data_columns': addStr,
+        'chart_data_dataset': query.dataset,
         'chart_data_format': chartDataFormat,
         'chart_data_view_by': variableDownloadDataVewBy
     });
@@ -1218,8 +1226,8 @@ function getIDFLinks(station_id, target, css_class) {
             );
             return $item;
         }
-
-        $('#location-search').select2({
+        
+        $('#location-search, #location-hero-search').select2({
             language: current_lang,
             ajax: {
                 url: child_theme_dir + "resources/app/run-frontend-sync/select-place.php",
@@ -1244,8 +1252,8 @@ function getIDFLinks(station_id, target, css_class) {
             minimumInputLength: 1,
             templateResult: formatLocationSearch
         });
-
-        $('#location-search').on('select2:select', function (e) {
+        
+        $('#location-search, #location-hero-search').on('select2:select', function (e) {
 
             var redirect_url = '/explore/location/';
 

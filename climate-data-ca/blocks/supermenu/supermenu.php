@@ -20,17 +20,17 @@
               <h5><?php _e ( 'Find data summaries in locations you care about', 'cdc' ); ?></h5>
             </div>
           </header>
-
+        
           <div id="location-search-container" class="row align-items-center text-lg-center">
             <label for="location-search" class="col-10 offset-1 col-md-3 col-lg-2 offset-lg-2 col-form-label"><?php _e ( 'Select a location', 'cdc' ); ?></label>
-
+        
             <div class="col-10 offset-1 col-md-6 offset-md-0 col-lg-4 offset-lg-0">
               <select class="custom-select custom-select-lg select2 form-control-lg rounded-pill border-dark text-center w-100" name="location-search" id="location-search" data-container-css-class="big-menu btn btn-lg rounded-pill" data-dropdown-css-class="big-menu-dropdown">
                 <option value=""><?php _e ( 'Search for a City/Town', 'cdc' ); ?></option>
               </select>
             </div>
           </div>
-
+        
           <div id="location-search-instruction" class="col-10 offset-1 col-lg-4 offset-lg-4">
             <p><?php _e('* Each location provided here corresponds to a point location in Canada.
             The data displayed is for the ~10 km x 6 km grid cell within which the selected location lies.
@@ -179,15 +179,14 @@
 
                 while ( $sector_query->have_posts() ) : $sector_query->the_post();
 
-
-								$link_href = '';
-								$link_class = 'text-muted';
-
-								if ( $current_ID == get_the_ID() ) {
-									$link_class .= ' smooth-scroll';
-								} else {
-									$link_href = get_permalink();
-								}
+								  $link_href = '';
+								  $link_class = 'text-muted';
+  
+								  if ( $current_ID == get_the_ID() ) {
+									  $link_class .= ' smooth-scroll';
+								  } else {
+									  $link_href = get_permalink();
+								  }
 
             ?>
 
@@ -199,7 +198,31 @@
               <ul>
 								<li><a href="<?php echo $link_href; ?>#sector-overview" class="<?php echo $link_class; ?>"><?php _e ( 'Overview', 'cdc' ); ?></a></li>
 					      <li><a href="<?php echo $link_href; ?>#sector-cases" class="<?php echo $link_class; ?>"><?php _e ( 'Case Studies', 'cdc' ); ?></a></li>
+                
+                <?php
+                
+                  $blog_query = get_posts ( array (
+                    'post_type' => 'post',
+                    'post_status' => 'publish',
+                    'tax_query' => array (
+                      array (
+                        'taxonomy' => 'post_tag',
+                        'field' => 'slug',
+                        'terms' => [ get_the_slug () ]
+                      )
+                    )
+                  ) );
+                  
+                  if ( !empty ( $blog_query ) ) {
+                    
+                ?>
                 <li><a href="<?php echo $link_href; ?>#sector-blog" class="<?php echo $link_class; ?>"><?php _e ( 'Blog Posts', 'cdc' ); ?></a></li>
+                <?php
+                
+                  }
+                
+                ?>
+                
 					      <li><a href="<?php echo $link_href; ?>#sector-analogous" class="<?php echo $link_class; ?>"><?php _e ( 'Sector Resources', 'cdc' ); ?></a></li>
 					      <li><a href="<?php echo $link_href; ?>#sector-vars" class="<?php echo $link_class; ?>"><?php _e ( 'Relevant Variables', 'cdc' ); ?></a></li>
 					      <li><a href="<?php echo $link_href; ?>#sector-related" class="<?php echo $link_class; ?>"><?php _e ( 'Related Content', 'cdc' ); ?></a></li>

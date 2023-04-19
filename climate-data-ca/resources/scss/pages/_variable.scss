@@ -566,6 +566,51 @@ body.stations-on {
   display: none!important;
 }
 
+// RELATED
+
+.overlay-sidebar {
+  .related-section {
+    &:nth-of-type(even) {
+      background-color: $white;
+    }
+  }
+  
+  .related-section-head {
+    font-size: 1.2rem;
+  }
+  
+  .breadcrumb {
+    font-size: 1rem;
+    @include all-caps;
+    
+    .breadcrumb-item {
+      color: $slate2;
+    
+      a {
+        color: $slate2;
+      }
+    
+      + .breadcrumb-item {
+        padding-left: 0.5rem;
+        
+        &:before {
+          content: '•';
+          color: $slate2;
+          margin-right: 0.25rem;
+        }
+      }
+    }
+  }
+  
+  .list-group-item {
+    background-color: transparent;
+  }
+  
+  .related-item-excerpt {
+    font-size: 1.4rem;
+  }
+}
+
 // APP
 
 .leaflet-popup {

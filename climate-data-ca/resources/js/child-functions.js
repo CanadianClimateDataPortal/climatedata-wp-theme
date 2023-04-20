@@ -1381,112 +1381,6 @@ function getIDFLinks(station_id, target, css_class) {
             $(document).renderer();
         }
 
-        //
-        // TEXT TO SPEECH
-        //
-        
-        if ($('#tts-speak').length) {
-            
-            // chrome bug - clear speech queue on load
-            // or it will keep playing stuff from the
-            // previous page
-            
-            window.speechSynthesis.cancel()
-            
-            var use_voice,
-                found_voice = false
-            
-            if ('speechSynthesis' in window) {
-            } else {
-                $('#hero-tts').hide()
-            }
-            
-            function loadVoices() {
-                
-                if (use_voice == null) {
-                    
-                    speechSynthesis.getVoices().forEach(function(voice) {
-                        
-                        if (
-                            found_voice == false && 
-                            voice.lang.includes(current_lang)
-                        ) {
-                            use_voice = voice
-                            found_voice = true
-                        }
-                        
-                  })
-                  
-              }
-              
-            }
-            
-            loadVoices()
-            
-            // async for chrome
-            window.speechSynthesis.onvoiceschanged = function(e) {
-              loadVoices()
-            }
-            
-            // play/pause functions
-            
-            function speak() {
-                
-                if (window.speechSynthesis.speaking) {
-                    
-                    window.speechSynthesis.resume()
-                    
-                } else {
-                    
-                    var msg = new SpeechSynthesisUtterance()
-                    
-                    msg.text = ''
-                        
-                    $('.page-section:not(.first-section)').each(function() {
-                        
-                        msg.text += $(this).text()
-                        
-                    })
-                    
-                    msg.volume = 1
-                    msg.rate = 1
-                    msg.pitch = 1
-                    msg.voice = use_voice 
-                    
-                    // adjust for FR
-                    
-                    if (current_lang == 'fr') {
-                        msg.rate = 0.7
-                    }
-                    
-                    window.speechSynthesis.speak(msg)
-                    
-                }
-                
-                $('body').removeClass('spinner-on')
-                
-                $('#tts-pause').removeClass('disabled')
-                
-            }
-            
-            function pause() {
-                window.speechSynthesis.pause()
-            }
-
-            $('#tts-speak').click(function() {
-                
-                speak()
-                
-            })
-            
-            $('#tts-pause').click(function() {
-                pause()
-                $(this).addClass('disabled')
-            })
-            
-        }
-
-
         // global handler for chart export CSV
         $('body').on('click', '.chart-export-data', function (e) {
             e.preventDefault();
@@ -1563,6 +1457,7 @@ function getIDFLinks(station_id, target, css_class) {
 
 
         });
+
 
     });
 })(jQuery);

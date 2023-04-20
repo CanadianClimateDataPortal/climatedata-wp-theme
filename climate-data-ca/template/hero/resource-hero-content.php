@@ -94,7 +94,7 @@
     
         <div id="hero-tts" class="d-flex align-items-center">
             
-            <h6 class="mb-0 all-caps"><?php _e ('Speak', 'cdc'); ?></h6>
+            <h6 class="mb-0 all-caps">Speak</h6>
             
             <div class="btn-group ml-4" role="group">
               <button id="tts-speak" type="button" class="tts-btn btn btn-outline-secondary">

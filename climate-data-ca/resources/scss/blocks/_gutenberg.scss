@@ -293,6 +293,14 @@ $mobile_viewport_width: 900px;
         > video {
           width: 75%;
         }
+
+        @media (orientation: landscape) {
+          > img,
+          > video {
+            width: auto;
+            height: 60vh;
+          }
+        }
       }
     }
 

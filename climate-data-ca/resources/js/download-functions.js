@@ -204,10 +204,32 @@
             thislat = e.params.data.lat;
             thislon = e.params.data.lon;
 
-            //$('#download-lat').val(thislat);
-            //$('#download-lon').val(thislon);
-
-            maps[location_map].setView([thislat, thislon], 11);
+            let this_zoom = maps['variable'].getZoom()
+            
+            if (this_zoom < 9) {
+                this_zoom = 9
+            }
+            
+            maps[location_map].setView([thislat, thislon], this_zoom)
+            
+            // highlight grid
+            
+            if (!highlighted_feature) {
+                
+                highlighted_feature = L.circleMarker([thislat, thislon], {
+                    color: '#fff',
+                    opacity: 1,
+                    weight: 2,
+                    fillColor: '#e00',
+                    fillOpacity: 1,
+                    radius: 5
+                }).addTo(maps[location_map])
+                
+            } else {
+                
+                highlighted_feature.setLatLng([thislat, thislon]); 
+                
+            }
 
         });
 

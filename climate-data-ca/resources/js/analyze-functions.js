@@ -1608,9 +1608,31 @@
             thislon = e.params.data.lon;
 
             geoselecting = true;
-
-            //update_param('coords', thislat + ',' + thislon + ',11');
-            maps['analyze'].setView([thislat, thislon], 10);
+            
+            let this_zoom = maps['analyze'].getZoom()
+            
+            if (this_zoom < 9) {
+                this_zoom = 9
+            }
+            
+            maps['analyze'].setView([thislat, thislon], this_zoom);
+            
+            // highlight grid
+            
+            if (!highlighted_feature) {
+                highlighted_feature = L.circleMarker([thislat, thislon], {
+                    color: '#fff',
+                    opacity: 1,
+                    weight: 2,
+                    fillColor: '#e00',
+                    fillOpacity: 1,
+                    radius: 5
+                }).addTo(maps['analyze'])
+            } else {
+                
+                highlighted_feature.setLatLng([thislat, thislon]); 
+                
+            }
 
         });
 

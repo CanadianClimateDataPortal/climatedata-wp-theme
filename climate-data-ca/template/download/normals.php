@@ -21,7 +21,7 @@
 
   <div class="form-layout-row row">
     <p class="form-label-wrap col-2 offset-1">
-      <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">3</span>
+      <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">2</span>
       <span class="form-label"><?php _e ( 'Settings', 'cdc' ); ?></span>
     </p>
 
@@ -64,9 +64,17 @@
     <div class="form-layout-row row">
         <div class="offset-3">
             <p>
-                <?php _e('Hourly data for some stations and variables can be found on the <a href="https://climate.weather.gc.ca/historical_data/search_historic_data_e.html" target="_blank">Government of Canada Historical Climate Data</a> website.','cdc'); ?>
-                <br>
-                <?php _e('More station data from British Columbia can be found on the <a href="https://www.pacificclimate.org/data/bc-station-data" target="_blank">Pacific Climate Impacts Consortium</a> website.','cdc'); ?>
+                <?php 
+                
+                  printf ( 
+                    __ ( 'Additional Climate Normals variables are available from the %sCanadian Centre for Climate Services%s and the %sGovernment of Canada Historical Climate Data%s websites.', 'cdc' ), 
+                    '<a href="https://climate-change.canada.ca/climate-data/#/climate-normals" target="_blank">',
+                    '</a>',
+                    '<a href="https://climate.weather.gc.ca/climate_normals/index_e.html" target="_blank">',
+                    '</a>',
+                  );
+                
+                ?>
             </p>
         </div>
     </div>

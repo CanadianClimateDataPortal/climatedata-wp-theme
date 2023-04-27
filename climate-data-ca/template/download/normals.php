@@ -62,7 +62,7 @@
   </div>
     <div><p></p></div>
     <div class="form-layout-row row">
-        <div class="offset-3">
+        <div class="col-7 offset-3">
             <p>
                 <?php 
                 

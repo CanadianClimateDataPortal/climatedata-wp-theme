@@ -1461,14 +1461,14 @@
             if (station_dl_obj['s'].length == 0) {
                 form_valid = false;
 
-                station_status += 'Choose at least one weather station. ';
+                station_status += T('Choose at least one weather station. ');
             }
 
             if (form_valid == false) {
                 $('#station-process').addClass('disabled');
             } else {
                 $('#station-process').removeClass('disabled');
-                station_status = 'Ready to process.';
+                station_status = T('Ready to process.');
 
                 populate_station_URL();
             }
@@ -1780,14 +1780,14 @@
             if (normals_dl_obj['s'].length == 0) {
                 form_valid = false;
         
-                station_status += 'Choose at least one weather station. ';
+                station_status += T('Choose at least one weather station. ');
             }
         
             if (form_valid == false) {
                 $('#normals-process').addClass('disabled');
             } else {
                 $('#normals-process').removeClass('disabled');
-                station_status = 'Ready to process.';
+                station_status = T('Ready to process.');
         
                 populate_normals_URL();
             }

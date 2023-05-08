@@ -25,6 +25,8 @@ var l10n_table = {
         'Enter latitude & longitude e.g.': 'Saisir la latitude et la longitude, par ex.',
         'Coordinates detected': 'Coordonnées détectées',
         'Set map view': 'Définir l\'affichage de la carte',
+        'Ready to process.': 'Prêt à traiter.',
+        'Choose at least one weather station. ': 'Sélectionner au moins une station.',
 
         // share widget
         "Copied to clipboard": "Copié dans le presse-papier",

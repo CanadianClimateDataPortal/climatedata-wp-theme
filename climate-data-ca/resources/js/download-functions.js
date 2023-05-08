@@ -181,6 +181,7 @@
             if (!highlighted_feature) {
                 
                 highlighted_feature = L.circleMarker([thislat, thislon], {
+                    pane: 'markers',
                     color: '#fff',
                     opacity: 1,
                     weight: 2,
@@ -204,10 +205,33 @@
             thislat = e.params.data.lat;
             thislon = e.params.data.lon;
 
-            //$('#download-lat').val(thislat);
-            //$('#download-lon').val(thislon);
-
-            maps[location_map].setView([thislat, thislon], 11);
+            let this_zoom = maps['variable'].getZoom()
+            
+            if (this_zoom < 9) {
+                this_zoom = 9
+            }
+            
+            maps[location_map].setView([thislat, thislon], this_zoom)
+            
+            // highlight grid
+            
+            if (!highlighted_feature) {
+                
+                highlighted_feature = L.circleMarker([thislat, thislon], {
+                    pane: 'markers',
+                    color: '#fff',
+                    opacity: 1,
+                    weight: 2,
+                    fillColor: '#e00',
+                    fillOpacity: 1,
+                    radius: 5
+                }).addTo(maps[location_map])
+                
+            } else {
+                
+                highlighted_feature.setLatLng([thislat, thislon]); 
+                
+            }
 
         });
 
@@ -1859,10 +1883,14 @@
             maps[map_var].createPane('grid');
             maps[map_var].getPane('grid').style.zIndex = 500;
             maps[map_var].getPane('grid').style.pointerEvents = 'all';
-
+            
             maps[map_var].createPane('labels');
             maps[map_var].getPane('labels').style.zIndex = 402;
             maps[map_var].getPane('labels').style.pointerEvents = 'none';
+            
+            maps[map_var].createPane('markers');
+            maps[map_var].getPane('markers').style.zIndex = 405;
+            maps[map_var].getPane('markers').style.pointerEvents = 'none';
 
             L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png', {
                 attribution: '',

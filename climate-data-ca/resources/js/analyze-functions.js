@@ -1585,6 +1585,7 @@
             
             if (!highlighted_feature) {
                 highlighted_feature = L.circleMarker([thislat, thislon], {
+                    pane: 'markers',
                     color: '#fff',
                     opacity: 1,
                     weight: 2,
@@ -1608,9 +1609,32 @@
             thislon = e.params.data.lon;
 
             geoselecting = true;
-
-            //update_param('coords', thislat + ',' + thislon + ',11');
-            maps['analyze'].setView([thislat, thislon], 10);
+            
+            let this_zoom = maps['analyze'].getZoom()
+            
+            if (this_zoom < 9) {
+                this_zoom = 9
+            }
+            
+            maps['analyze'].setView([thislat, thislon], this_zoom);
+            
+            // highlight grid
+            
+            if (!highlighted_feature) {
+                highlighted_feature = L.circleMarker([thislat, thislon], {
+                    pane: 'markers',
+                    color: '#fff',
+                    opacity: 1,
+                    weight: 2,
+                    fillColor: '#e00',
+                    fillOpacity: 1,
+                    radius: 5
+                }).addTo(maps['analyze'])
+            } else {
+                
+                highlighted_feature.setLatLng([thislat, thislon]); 
+                
+            }
 
         });
 
@@ -2387,10 +2411,16 @@
             maps[map_var].createPane('grid');
             maps[map_var].getPane('grid').style.zIndex = 500;
             maps[map_var].getPane('grid').style.pointerEvents = 'all';
-
+            
             maps[map_var].createPane('labels');
             maps[map_var].getPane('labels').style.zIndex = 402;
             maps[map_var].getPane('labels').style.pointerEvents = 'none';
+            
+            maps[map_var].createPane('markers');
+            maps[map_var].getPane('markers').style.zIndex = 405;
+            maps[map_var].getPane('markers').style.pointerEvents = 'none';
+            
+            
             maps[map_var].createPane('sector');
             maps[map_var].getPane('sector').style.zIndex = 410;
 

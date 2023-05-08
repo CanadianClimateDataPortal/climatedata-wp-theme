@@ -366,50 +366,59 @@ if (have_posts()) : while (have_posts()) : the_post();
 
 <?php
 
-    } elseif (isset ($_GET['content']) && $_GET['content'] == 'location') {
-
+    } elseif (isset ($_GET['content']) && in_array($_GET['content'], ['location', 'sector'])) {
         // 2. ajax request for variable data by location
-        //    (a grid square was clicked on variable map)
-
-        ?>
-
-        <div id="var-by-location" class="overlay-content-wrap variable-data-overlay col-12">
-            <div class="overlay-content container-fluid">
-                <?php
-
-                $var_name = get_field ( 'var_name' );
-
+        //
+        switch ($_GET['content']) {
+            case 'location': // a grid square was clicked on variable map
                 $selected_place = get_location_by_coords($_GET['lat'], $_GET['lon']);
-
                 if (is_array($selected_place)) {
                     $location_name = $selected_place['geo_name'] . ', ' . short_province($selected_place['province']);
                 } else {
                     $location_name = 'Point';
                 }
+                break;
+            case 'sector': // a region was clicked on variable map
+                $location_name = $_GET['region'] ?? 'Region';
+                break;
+        }
 
-                $dataset_name = arr_get($_GET, 'dataset_name', 'cmip6');
+        $var_name = get_field('var_name');
+        $dataset_name = arr_get($_GET, 'dataset_name', 'cmip6');
+        $dataset_availability = get_field('dataset_availability');
+        ?>
 
-                ?>
+        <div id="var-by-location" class="overlay-content-wrap variable-data-overlay col-12">
+            <div class="overlay-content container-fluid">
 
                 <h2 class="overlay-title text-primary"><?php echo $location_name; ?></h2>
 
                 <div class="overlay-content-row">
                     <div class="overlay-content-chart">
                         <div class="navbar chart-navbar d-flex justify-content-around align-items-center mb-4 pb-4 border-bottom">
-
                             <div class="nav-item d-flex align-items-center">
                                 <h6 class="mb-0"><?php _e('Dataset', 'cdc'); ?>:</h6>
 
                                 <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+        <?php
+        if (in_array("cmip5", $dataset_availability)) {
+            ?>
                                     <label class="btn btn-outline-primary rounded-pill <?php echo $dataset_name == 'cmip5' ? 'active':'';?>">
                                         <input type="radio" class="chart-dataset" autocomplete="off" value="cmip5" <?php echo $dataset_name == 'cmip5' ? 'checked':'';?>>
                                         CMIP5
                                     </label>
+                                    <?php
+        }
+        if (in_array("cmip6", $dataset_availability)) {
+                                    ?>
 
                                     <label class="btn btn-outline-primary rounded-pill <?php echo $dataset_name == 'cmip6' ? 'active':'';?>">
                                         <input type="radio" class="chart-dataset" autocomplete="off" value="cmip6" <?php echo $dataset_name == 'cmip6' ? 'checked':'';?>>
                                         CMIP6
                                     </label>
+            <?php
+        }
+            ?>
                                 </div>
                             </div>
 
@@ -593,122 +602,11 @@ if (have_posts()) : while (have_posts()) : the_post();
 
 <?php
 
-    } elseif (isset ($_GET['content']) && $_GET['content'] == 'sector') {
-
-        // 2. ajax request for variable data by location
-        //    (a grid square was clicked on variable map)
-
-?>
-
-<div id="var-by-sector" class="overlay-content-wrap variable-data-overlay col-12">
-    <div class="overlay-content container-fluid">
-        <?php
-
-            if (isset ($_GET['region'])) {
-                $location_name = $_GET['region'];
-            } else {
-                $location_name = 'Region';
-            }
-    
-            $dataset_name = arr_get($_GET, 'dataset_name', 'cmip6');
-
-        ?>
-
-        <h2 class="overlay-title text-primary"><?php echo $location_name; ?></h2>
-
-        <div class="overlay-content-row">
-            <div class="overlay-content-chart">
-                <div class="navbar chart-navbar d-flex mb-5">
-
-
-                    <div class="chart-delta nav-item flex-grow-1 d-flex">
-                        <?php
-
-                        if ( get_field ( 'hasdelta' ) ) {
-
-                        ?>
-                        <h6>Options:</h6>
-
-                        <div class="form-check form-check-inline custom-control custom-radio">
-                            <input class="custom-control-input" type="radio" id="chartoption1-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="annual">
-                            <label class="custom-control-label pl-2" for="chartoption1-<?php the_field('var_name'); ?>"><?php _e('Annual values', 'cdc'); ?></label>
-                        </div>
-
-                        <div class="form-check form-check-inline custom-control custom-radio">
-                            <input class="custom-control-input" type="radio" id="chartoption2-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="30y" checked>
-                            <label class="custom-control-label pl-2" for="chartoption2-<?php the_field('var_name'); ?>"><?php _e('30 year averages', 'cdc'); ?></label>
-                        </div>
-
-                        <div class="form-check form-check-inline custom-control custom-radio">
-                            <input class="custom-control-input" type="radio" id="chartoption3-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="delta">
-                            <label class="custom-control-label pl-2" for="chartoption3-<?php the_field('var_name'); ?>"><?php _e('30 year changes', 'cdc'); ?></label>
-                        </div>
-                            <?php
-
-                        }
-
-                        ?>
-                    </div>
-
-
-                    <div class="nav-item d-flex align-items-center mr-5">
-                        <a href="#" class="btn btn-sm btn-outline-secondary page-tour-trigger" data-tour="chart-tour"><span class="fas fa-question icon rounded-circle icon mr-3"></span><?php _e('How to read this', 'cdc'); ?></a>
-                    </div>
-
-                    <div class="nav-item d-flex align-items-center mr-5">
-                        <h6><span class="cdc-icon icon-download-data"></span> <?php _e('Download data', 'cdc'); ?></h6>
-
-                        <div class="btn-group btn-group-sm" role="group">
-                            <a href="#" class="chart-export-data btn btn-sm btn-outline-secondary" id="variable-download-data-grid" data-type="csv">CSV</a>
-                        </div>
-                    </div>
-
-                    <div class="nav-item d-flex align-items-center">
-                        <h6><span class="cdc-icon icon-download-img"></span> <?php _e('Download image', 'cdc'); ?></h6>
-
-                        <div class="btn-group btn-group-sm" role="group">
-                            <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary " data-type="png">PNG</a> <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary" data-type="pdf">PDF</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="navbar chart-navbar d-flex align-items-center mb-5">
-                    <div class="nav-item flex-grow-1 d-flex">
-                        <div class="form-select col-10 offset-4 col-sm-4">
-                            <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
-                                <label class="btn btn-outline-primary <?php echo $dataset_name == 'cmip5'? 'active':'';?>" style="border-top-left-radius: 25px;border-bottom-left-radius: 25px;padding: 13px;"> <input type="radio" class="chart-dataset" autocomplete="off" value="cmip5" <?php echo $dataset_name == 'cmip5'? 'checked':'';?>>CMIP5</label>
-                                <label class="btn btn-outline-primary <?php echo $dataset_name == 'cmip6'? 'active':'';?>" style="border-top-right-radius: 25px;border-bottom-right-radius: 25px;padding: 13px;"> <input type="radio" class="chart-dataset" autocomplete="off" value="cmip6" <?php echo $dataset_name == 'cmip6'? 'checked':'';?>>CMIP6</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="chart-placeholder" class="var-chart"></div>
-            </div>
-        </div>
-
-        <div class="page-tour" id="chart-tour" data-steps='<?php echo $chart_tour; ?>'></div>
-
-        <?php
-
-            $units = get_field('units');
-
-        ?>
-
-        <div id="callback-data"><?php
-
-        echo json_encode(array('title' => get_field('var_title'), 'units' => array('label' => __($units['label'], 'cdc'), 'value' => __($units['value'], 'cdc')), 'decimals' => get_field('decimals')));
-
-        ?></div>
-    </div>
-</div>
-
-<?php
-
     } elseif (isset ($_GET['content']) && $_GET['content'] == 'chart') {
 
         // 3. ajax request for variable data by location
         //    (a variable was selected on the location page)
-
+        $var_name = get_field('var_name');
 ?>
 
 <div class="row">
@@ -719,27 +617,48 @@ if (have_posts()) : while (have_posts()) : the_post();
 
 <div class="align-items-center var-chart-container">
     <div class="navbar col-9 offset-1 chart-navbar d-flex align-items-center mb-5">
-        <div class="chart-delta nav-item flex-grow-1 d-flex">
+        <div class="align-items-center chart-delta nav-item flex-grow-1 d-flex">
             <?php
 
-            if ( get_field ( 'hasdelta' ) ) {
+            if (get_field('hasdelta')) {
 
                 ?>
-                <h6>Options:</h6>
 
-                <div class="form-check form-check-inline custom-control custom-radio">
-                    <input class="custom-control-input" type="radio" id="chartoption1-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="annual">
-                    <label class="custom-control-label pl-2" for="chartoption1-<?php the_field('var_name'); ?>"><?php _e('Annual values', 'cdc'); ?></label>
-                </div>
+                <h6 class="mb-0">Options:</h6>
 
-                <div class="form-check form-check-inline custom-control custom-radio">
-                    <input class="custom-control-input" type="radio" id="chartoption2-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="30y" checked>
-                    <label class="custom-control-label pl-2" for="chartoption2-<?php the_field('var_name'); ?>"><?php _e('30 year averages', 'cdc'); ?></label>
-                </div>
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
 
-                <div class="form-check form-check-inline custom-control custom-radio">
-                    <input class="custom-control-input" type="radio" id="chartoption3-<?php the_field('var_name'); ?>" name="chartoption-<?php the_field('var_name'); ?>" value="delta">
-                    <label class="custom-control-label pl-2" for="chartoption3-<?php the_field('var_name'); ?>"><?php _e('30 year changes', 'cdc'); ?></label>
+                    <label class="btn btn-outline-primary rounded-pill">
+                        <input
+                                type="radio"
+                                name="<?php echo 'chartoption-' . $var_name; ?>"
+                                id="<?php echo 'chartoption1-' . $var_name; ?>"
+                                value="annual"
+                        >
+                        <?php _e('Annual values', 'cdc'); ?>
+                    </label>
+
+                    <label class="btn btn-outline-primary rounded-pill active">
+                        <input
+                                type="radio"
+                                name="<?php echo 'chartoption-' . $var_name; ?>"
+                                id="<?php echo 'chartoption2-' . $var_name; ?>"
+                                value="30y"
+                                checked
+                        >
+                        <?php _e('30 year averages', 'cdc'); ?>
+                    </label>
+
+                    <label class="btn btn-outline-primary rounded-pill">
+                        <input
+                                type="radio"
+                                name="<?php echo 'chartoption-' . $var_name; ?>"
+                                id="<?php echo 'chartoption3-' . $var_name; ?>"
+                                value="delta"
+                        >
+                        <?php _e('30 year changes', 'cdc'); ?>
+                    </label>
+
                 </div>
 
                 <?php

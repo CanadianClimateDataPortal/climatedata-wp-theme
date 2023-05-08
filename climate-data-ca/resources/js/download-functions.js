@@ -1502,15 +1502,11 @@
             $('#normals-process-data').removeAttr("style").hide();
             
             $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y', function (data) {
-                // console.log(data)
-                
                 var markers = L.markerClusterGroup();
                 
                 normals_layer = L.geoJson(data, {
                     onEachFeature: function (feature, layer) {
                         
-                        console.log(feature.properties.CLIMATE_IDENTIFIER, feature.properties.STATION_NAME)
-                    
                         $('<option value="' + feature.properties.CLIMATE_IDENTIFIER + '">' + feature.properties.STATION_NAME + '</option>').appendTo('#normals-select')
                     
                     },
@@ -1702,8 +1698,6 @@
         
             station_status = '';
         
-            console.log(normals_dl_obj)
-            
             var form_valid = true;
         
             $('#normals-download-form .validate').each(function () {

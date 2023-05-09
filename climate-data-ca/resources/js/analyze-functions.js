@@ -1892,30 +1892,56 @@
         function buildShareableURL(form_inputs) {
             // console.log("FORM_INPUT:", form_inputs)
             // console.log(typeof(form_inputs))
+            // form_inputs = $.extend(true, {}, default_inputs)
 
-            setTimeout(function()
+            let shareURL = setTimeout(function()
             {   
+                form_inputs['submit_url_var'] = submit_url_var
+                form_inputs['form_thresholds'] = form_thresholds
                 form_inputs["compressedPoints"] = getEncodedPoints(form_inputs)
                 form_inputs['lat'] = ""
                 form_inputs['lon'] = ""
-                let shareableURL = document.URL +"?"+ encodeURI(JSON.stringify(form_inputs))
-                console.log("Shareable URL :", shareableURL)
-
+                let encodedFormInputs = "?"+encodeURI(JSON.stringify(form_inputs))
+                let shareableURL = document.URL + encodedFormInputs
+                window.history.pushState('updateAnalyzeFormUrl', 'Title',encodedFormInputs)
+                
+                // console.log("Shareable URL :", shareableURL)
+                // window.history.replaceState('', shareableURL, shareableURL);
+                // window.history.replaceState({info: 'update url'}, 'This is a shareablea url',shareableURL);
+                updateShareableURL(shareableURL)
+                // console.log(form_inputs)
             }, 1000);
-            
         }
+
+        function updateShareableURL(new_url){
+            setTimeout(function()
+            {   
+                $("a[id='shareableURL']").attr('data-share-url',document.URL) 
+            }, 500);
+
+        }
+
+        $("a[id='shareableURL']").on( "click", function() {
+            navigator.clipboard.writeText(document.URL);
+          } );
 
 
         function readURL(){
-
+            // Checking if url contains form_inputs
             let url = document.URL
             if (url.includes("?") === false){ return }
 
-            let url_elements = url.split("?")
-            // console.log(url)
-            let objectURL = url_elements.pop() // get the form_input dict from url
-            let decodedFormInputs = decodeURI(objectURL) // Returns char by char array
-            console.log("Decode:" , decodedFormInputs)
+            let formInputFromURL = ""
+
+            // Get Form inputs from url
+            if (url.includes("#analyze-projections?") === true){
+                formInputFromURL = url.split("#analyze-projections?").pop() 
+            }else{
+                formInputFromURL = url.split("?").pop()
+            }
+
+            let decodedFormInputs = decodeURI(formInputFromURL) // Returns char by char array
+            // console.log("Decode:" , decodedFormInputs)
 
             let str = ""
             for(var i in Object.values(decodedFormInputs)){
@@ -2098,7 +2124,7 @@
             // var element = $("input[name='dataset']");
             console.log("form_input:", decodedFormInputs)
 
-
+      
             // Click on the specified dataset
             let datasetInputs = Object.values($("input[name='dataset']"))
             datasetInputs.find(({ value }) => value === decodedFormInputs['dataset']).click()
@@ -2108,12 +2134,30 @@
             $("span.btn.btn-outline-secondary.rounded-pill")[0].click()
             $("input[id='analyze-location-grid']").click()
 
-            // Click wet days
-            $("input[id='analyze-var-wetdays']").click()
-            // Insert thresh
+            // Click points on map
+            selectMapPoints(decodedFormInputs['compressedPoints'])
+
+            // Customize Variables
+            $(`input[id='analyze-var-${decodedFormInputs['submit_url_var']}']`).click()
+
+
+
+            // Insert threshholds
             setTimeout(function()
             {   
-                $("input[name='thresh']").val(10)
+                // form_thresholds
+                for (let [key, value] of Object.entries(decodedFormInputs['form_thresholds'])) {
+                    console.log("test")
+                    console.log(key, value);
+                    if(key === "op"){
+                        $(`select[name="op"]`).val(value)
+                    }
+                    else{
+                        value = value.split(" ")[0] // Parce que les valeurs contienne des unité (ex. 0 k days)
+                        $(`input[name=${key}]`).val(value)
+                    }
+                  }
+                // $("input[name='thresh']").val(10)
             }, 500);
 
             // Selecting dates
@@ -2160,7 +2204,6 @@
                 }
             }, 100);
             
-            selectMapPoints(decodedFormInputs['compressedPoints'])
         }
 
 
@@ -2175,7 +2218,6 @@
 
             form_inputs = $.extend(true, {}, default_inputs)
             
-            // console.log("test")
             buildShareableURL(form_inputs)
 
 
@@ -2483,6 +2525,7 @@
                     $('#analyze-stations-submit').slideUp();
                 }
 
+                buildShareableURL({});
                 return is_valid;
 
             }
@@ -2612,7 +2655,7 @@
         readURL();
         validate_steps();
         validate_inputs();
-
+        
         function create_map(map_var) {
 
             maps[map_var] = L.map(map_var + '-map', {

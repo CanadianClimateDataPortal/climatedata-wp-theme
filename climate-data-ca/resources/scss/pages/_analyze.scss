@@ -391,3 +391,24 @@
 .analyze-submit {
 //   display: none;
 }
+
+.copy-link {
+  padding: 15px 0 0 25px;
+
+  cursor: pointer;
+  outline: none;
+
+  i {
+    width: 15px;
+    height: 15px;
+    text-align: center;
+    color: $secondary;
+    transition: 0.5s ease 0.2s;
+  }
+
+  h5 {
+    margin-bottom: 0;
+    font-size: 1.6rem;
+  }
+
+}

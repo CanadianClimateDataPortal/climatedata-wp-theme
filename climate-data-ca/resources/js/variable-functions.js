@@ -151,6 +151,16 @@
                         radius: 4,
                         fillOpacity: 0
                     }
+                },
+                'era5landgrid': function (properties, zoom) {
+                    return {
+                        weight: 0.1,
+                        color: gridline_color,
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0
+                    }
                 }
             },
             bounds: canadaBounds,

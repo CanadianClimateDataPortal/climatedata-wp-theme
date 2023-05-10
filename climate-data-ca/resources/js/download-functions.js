@@ -356,31 +356,6 @@
                     minZoom: 7,
                     pane: 'grid',
                 };
-            } else if (gridName === 'canadagrid') {
-                var vectorTileOptions = {
-                    rendererFactory: L.canvas.tile,
-                    attribution: '',
-                    interactive: true,
-                    getFeatureId: function (f) {
-                        return f.properties.gid;
-                    },
-                    maxNativeZoom: 12,
-                    vectorTileLayerStyles: {
-                        'canadagrid': function (properties, zoom) {
-                            return {
-                                weight: 0.1,
-                                color: gridline_color,
-                                opacity: 1,
-                                fill: true,
-                                radius: 4,
-                                fillOpacity: 0
-                            }
-                        }
-                    },
-                    maxZoom: 12,
-                    minZoom: 7,
-                    pane: 'grid',
-                };
             } else {
                 var vectorTileOptions = {
                     rendererFactory: L.canvas.tile,
@@ -390,21 +365,20 @@
                         return f.properties.gid;
                     },
                     maxNativeZoom: 12,
-                    vectorTileLayerStyles: {
-                        'canadagrid1deg': function (properties, zoom) {
-                            return {
-                                weight: 0.1,
-                                color: gridline_color,
-                                opacity: 1,
-                                fill: true,
-                                radius: 4,
-                                fillOpacity: 0
-                            }
-                        }
-                    },
+                    vectorTileLayerStyles: {},
                     maxZoom: 12,
                     minZoom: 7,
                     pane: 'grid',
+                };
+                vectorTileOptions.vectorTileLayerStyles[gridName] = function (properties, zoom) {
+                    return {
+                        weight: 0.1,
+                        color: gridline_color,
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0
+                    }
                 };
             }
 

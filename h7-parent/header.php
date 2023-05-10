@@ -95,7 +95,14 @@ if (current_user_can('administrator')) {
     wp_head();
 
     $body_ID = 'page';
-    $body_class = array ( 'animsition', 'spinner-on' );
+    
+    // Prevent animation on interactive pages
+    global $post_type;
+    $post_type = get_post_type();
+
+    if ( $post_type !== 'interactive' ) {
+        $body_class = [ 'animsition', 'spinner-on' ];
+    }
 
     if (is_front_page()) {
 

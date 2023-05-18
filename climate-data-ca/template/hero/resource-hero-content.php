@@ -38,11 +38,6 @@
     </ol>
   </nav>
   
-  <?php
-    
-    
-  ?>
-  
   <h1><?php
     
     if ( $hero_fields['title'] != '' ) {
@@ -59,9 +54,8 @@
       get_field ( 'asset_type' ) == 'audio' &&
       get_field ( 'asset_audio' ) != ''
     ) {
-    
-  ?>
   
+  ?>
   
   <div id="asset-video">
     <?php echo wp_oembed_get ( get_field ( 'asset_audio' ) ); ?>

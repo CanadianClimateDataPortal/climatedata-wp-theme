@@ -54,8 +54,22 @@
   ?></h1>
   
   <?php
-    
+  
     if ( 
+      get_field ( 'asset_type' ) == 'audio' &&
+      get_field ( 'asset_audio' ) != ''
+    ) {
+    
+  ?>
+  
+  
+  <div id="asset-video">
+    <?php echo wp_oembed_get ( get_field ( 'asset_audio' ) ); ?>
+  </div>
+  
+  <?php
+  
+    } elseif ( 
       get_field ( 'asset_type' ) == 'video' &&
       get_field ( 'asset_video' ) != ''
     ) {

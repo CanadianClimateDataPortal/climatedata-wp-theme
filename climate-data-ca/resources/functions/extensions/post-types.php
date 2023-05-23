@@ -265,7 +265,7 @@ function posttype_interactive() {
 		'label'               => __( 'Interactive', 'cdc-post-types' ),
 		'description'         => __( 'ClimateData.ca interactive pages.', 'cdc-post-types' ),
 		'labels'              => $labels,
-		'supports'            => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions' ),
+		'supports'            => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions', 'author' ),
 		'hierarchical'        => true,
 		'public'              => true,
 		'show_ui'             => true,

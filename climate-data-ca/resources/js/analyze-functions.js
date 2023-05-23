@@ -347,6 +347,8 @@
 
                 }
 
+                console.log("LAT :", lat_val)
+                console.log("LON :", lon_val)
                 $('#lat').val(lat_val)
                 $('#lon').val(lon_val)
                 $('#shape').val('')
@@ -440,6 +442,7 @@
 
 
         })
+
 
         //
         // INPUTS
@@ -1951,6 +1954,325 @@
             }
         }
 
+
+        function buildShareableURL(form_inputs) {
+            // console.log("FORM_INPUT:", form_inputs)
+            // console.log(typeof(form_inputs))
+            // form_inputs = $.extend(true, {}, default_inputs)
+
+            let shareURL = setTimeout(function()
+            {   
+                form_inputs['submit_url_var'] = submit_url_var
+                form_inputs['form_thresholds'] = form_thresholds
+                form_inputs["compressedPoints"] = getEncodedPoints(form_inputs)
+                form_inputs['lat'] = ""
+                form_inputs['lon'] = ""
+                let encodedFormInputs = "?"+encodeURI(JSON.stringify(form_inputs))
+                let shareableURL = document.URL + encodedFormInputs
+                window.history.pushState('updateAnalyzeFormUrl', 'Title',encodedFormInputs)
+                
+                // console.log("Shareable URL :", shareableURL)
+                // window.history.replaceState('', shareableURL, shareableURL);
+                // window.history.replaceState({info: 'update url'}, 'This is a shareablea url',shareableURL);
+                updateShareableURL(shareableURL)
+                // console.log(form_inputs)
+            }, 1000);
+        }
+
+        function updateShareableURL(new_url){
+            setTimeout(function()
+            {   
+                $("a[id='shareableURL']").attr('data-share-url',document.URL) 
+            }, 500);
+
+        }
+
+        $("a[id='shareableURL']").on( "click", function() {
+            navigator.clipboard.writeText(document.URL);
+          } );
+
+
+        function readURL(){
+            // Checking if url contains form_inputs
+            let url = document.URL
+            if (url.includes("?") === false){ return }
+
+            let formInputFromURL = ""
+
+            // Get Form inputs from url
+            if (url.includes("#analyze-projections?") === true){
+                formInputFromURL = url.split("#analyze-projections?").pop() 
+            }else{
+                formInputFromURL = url.split("?").pop()
+            }
+
+            let decodedFormInputs = decodeURI(formInputFromURL) // Returns char by char array
+            // console.log("Decode:" , decodedFormInputs)
+
+            let str = ""
+            for(var i in Object.values(decodedFormInputs)){
+                str += decodedFormInputs[i]
+            }
+
+            decodedFormInputs = JSON.parse(str)
+            fill_form_inputs(decodedFormInputs)
+        }
+
+
+        function getEncodedPoints(form_inputs) {
+            let latArray = form_inputs['lat'].split(',')
+            let lonArray = form_inputs['lon'].split(',')
+            let points = []
+
+
+            for (var i in latArray){
+                points.push([latArray[i], lonArray[i]])
+            }  
+
+            let token = encodePoints(points)
+            
+            return token
+        }
+
+
+        function encodePoints(points) {
+            const SAFE_CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+            const MULTIPLIER = 100;
+            const DIVIDER = 32;
+
+            var result = "";
+            var latitude = 0;
+            var longitude = 0;
+            
+            // console.log("ENCODING",points)
+
+            for (var i in points) {
+                var newLat = Math.round(points[i][0] * MULTIPLIER);
+                var newLon = Math.round(points[i][1] * MULTIPLIER);
+        
+                var dy = newLat - latitude;
+                var dx = newLon - longitude;
+        
+                latitude = newLat;
+                longitude = newLon;
+                dy = (dy << 1) ^ (dy >> 31);
+                dx = (dx << 1) ^ (dx >> 31);
+        
+                var index = ((dy + dx) * (dy + dx + 1)) / 2 + dy;
+        
+                while (index > 0) {
+                    var rem = index & 31;
+        
+                    index = (index - rem) / DIVIDER;
+        
+                    if (index > 0) {
+                        rem += DIVIDER;
+                    }
+        
+                    result += SAFE_CHARACTERS[rem];
+                }
+            }
+            return result;
+        }
+
+        function decodePoints(compressedValue) {
+            const SAFE_CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+            const MULTIPLIER = 100;
+            const DIVIDER = 32;
+
+            var latLon = [];
+            var pointsArray = [];
+            var point = [];
+            var lastLat = 0,
+                lastLon = 0;
+        
+            for (var i = 0; i < compressedValue.length; i++) {
+                var num = SAFE_CHARACTERS.indexOf(compressedValue[i]);
+        
+                if (num < DIVIDER) {
+                    point.push(num);
+                    pointsArray.push(point);
+                    point = [];
+                } else {
+                    num -= DIVIDER;
+                    point.push(num);
+                }
+            }
+        
+            for (var y in pointsArray) {
+                var result = 0;
+                var list = pointsArray[y].reverse();
+        
+                for (var x in list) {
+                    if (result == 0) {
+                        result = list[x];
+                    } else {
+                        result = result * DIVIDER + list[x];
+                    }
+                }
+        
+                var dIag = parseInt((Math.sqrt(8 * result + 5) - 1) / 2);
+        
+                var latY = result - (dIag * (dIag + 1)) / 2;
+                var lonX = dIag - latY;
+        
+                if (latY % 2 == 1) {
+                    latY = (latY + 1) * -1;
+                }
+                if (lonX % 2 == 1) {
+                    lonX = (lonX + 1) * -1;
+                }
+        
+                latY /= 2;
+                lonX /= 2;
+                var lat = latY + lastLat;
+                var lon = lonX + lastLon;
+        
+                lastLat = lat;
+                lastLon = lon;
+                lat /= MULTIPLIER;
+                lon /= MULTIPLIER;
+        
+                // latLon.push(lat, lon);
+                latLon.push({
+                    "point":[lat, lon]
+                })
+            }
+            
+
+            return latLon;
+        }
+
+        function selectMapPoints(compressedValue){
+
+            fetch("https://dataclimatedata.crim.ca/get-gids/"+compressedValue+"?gridname=canadagrid")
+                .then((response) => response.json())
+                .then((result) => {
+                    
+                    // pointsId = result
+                    let latLonArray = decodePoints(compressedValue)
+
+                    for(var i in result){
+                        latLonArray[i]['id'] = result[i]
+                    }
+                    
+                    triggerMapGrid(latLonArray)
+            })
+        }
+
+        function triggerMapGrid(points){
+            // points = [ {"id":123, "point":[lat, lon]}]
+
+            points.forEach( function(p) {
+                let highlightGridFeature = p.id;
+
+                selectedPoints[highlightGridFeature] = L.latLng(p.point[0], p.point[1]);
+                map_grids[highlightGridFeature] = L.latLng(p.point[0], p.point[1]);
+
+                selectedGrids.push(highlightGridFeature);
+
+                pbfLayer.setFeatureStyle(highlightGridFeature, {
+                    weight: 1,
+                    color: '#F00',
+                    opacity: 1,
+                    fill: true,
+                    radius: 4,
+                    fillOpacity: 0.1
+                })
+
+                // console.log("selectedGrids",selectedGrids)
+            });
+        }
+
+
+
+        function fill_form_inputs(decodedFormInputs){
+            // var element = $("input[name='dataset']");
+            console.log("form_input:", decodedFormInputs)
+
+      
+            // Click on the specified dataset
+            let datasetInputs = Object.values($("input[name='dataset']"))
+            datasetInputs.find(({ value }) => value === decodedFormInputs['dataset']).click()
+
+            // Click grid
+            $("#ui-id-5").click()
+            $("span.btn.btn-outline-secondary.rounded-pill")[0].click()
+            $("input[id='analyze-location-grid']").click()
+
+            // Click points on map
+            selectMapPoints(decodedFormInputs['compressedPoints'])
+
+            // Customize Variables
+            $(`input[id='analyze-var-${decodedFormInputs['submit_url_var']}']`).click()
+
+
+
+            // Insert threshholds
+            setTimeout(function()
+            {   
+                // form_thresholds
+                for (let [key, value] of Object.entries(decodedFormInputs['form_thresholds'])) {
+                    console.log("test")
+                    console.log(key, value);
+                    if(key === "op"){
+                        $(`select[name="op"]`).val(value)
+                    }
+                    else{
+                        value = value.split(" ")[0] // Parce que les valeurs contienne des unité (ex. 0 k days)
+                        $(`input[name=${key}]`).val(value)
+                    }
+                  }
+                // $("input[name='thresh']").val(10)
+            }, 500);
+
+            // Selecting dates
+            $("select[id='analyze-timeframe-start']").val(decodedFormInputs['start_date'])
+            $("select[id='analyze-timeframe-end']").val(decodedFormInputs['end_date'])
+
+
+            // Selecting scenarios
+            let screnarioInputs = Object.values($("input[name='scenario'"))
+            let scenarios = decodedFormInputs['scenario'].split(',')
+            scenarios.forEach(scenario => {
+                screnarioInputs.find(({ value }) => value === scenario).click()
+            })
+            
+            // Ensemble Precentiles
+            let percentInputs = Object.values($("input[name='ensemble_percentiles'"))
+            let ensemblePercentiles = decodedFormInputs['ensemble_percentiles'].split(',')
+            ensemblePercentiles.forEach(percent => {
+                // setTimeout(function()
+                // {   
+                    // preventing deselecting a default settings
+                    if (["10","50","90"].includes(percent)){ return }
+                    
+                    percentInputs.find(({ value }) => value === percent).click()
+                // }, 100);
+            })
+
+
+            // Selecting Frequency
+            let frequecyInputs = Object.values($("input[name='freq'"))
+            setTimeout(function()
+            {   
+                frequecyInputs.find(({ value }) => value === decodedFormInputs['freq']).click()
+            }, 100);
+
+
+            // Selecting Output Format
+            let outpuFormatInput = Object.values($("input[name='output_format'"))
+            setTimeout(function()
+            {   
+                outpuFormatInput.find(({ value }) => value === decodedFormInputs['output_format']).click()
+                if(decodedFormInputs['output_format'] === "csv"){
+                    $("input[id='analyze-decimals']").val(decodedFormInputs["csv_precision"])
+                }
+            }, 100);
+            
+        }
+
+
         // INPUTS
 
         function validate_inputs() {
@@ -1961,6 +2283,9 @@
                 var is_valid = true
 
             form_inputs = $.extend(true, {}, default_inputs)
+            
+            buildShareableURL(form_inputs)
+
 
             if ($('#analyze-format-csv').prop('checked') == true) {
                 $('#analyze-field-decimals').show()
@@ -2266,6 +2591,7 @@
                     $('#analyze-stations-submit').slideUp();
                 }
 
+                buildShareableURL({});
                 return is_valid;
 
             }
@@ -2392,10 +2718,10 @@
 
 
         // init
-
+        readURL();
         validate_steps();
         validate_inputs();
-
+        
         function create_map(map_var) {
 
             maps[map_var] = L.map(map_var + '-map', {
@@ -2447,6 +2773,7 @@
 
         }
 
+        
         console.log('end of analyze-functions')
         console.log('- - - - -')
 

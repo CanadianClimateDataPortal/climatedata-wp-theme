@@ -11,6 +11,7 @@
   //
 
   function tpl_enqueue() {
+    wp_enqueue_script ( 'share-widget' );
 
     wp_enqueue_script ( 'analyze-functions' );
 
@@ -448,6 +449,16 @@
                   </div>
 
                 </div>
+                
+                <div class="copy-link" data-step="6">
+                  <a id="shareableURL" href="#" class="share-link share-permalink" data-share-url="">
+                    <h5>
+                      <i class="icon fas fa-share-alt mr-3"></i>
+                      <span class="label">Copier le lien</span>
+                    </h5>
+                  </a>
+                </div>
+
               </div>
 
             </form>

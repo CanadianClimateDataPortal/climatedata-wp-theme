@@ -434,7 +434,7 @@
 
 											<div id="analyze-field-decimals">
 												<div class="field validate-input type-number d-flex flex-wrap">
-													<label class="input-label w-100"><?php _e ( 'Decimal Places', 'cdc' ); ?></label>
+													<label class="input-label w-100"><?php _e ( 'Decimal Places', 'cdc' ); ?> (max 10)</label>
 
 													<div class="input-row w-50">
 														<div class="input-item">
@@ -873,7 +873,7 @@
                   </div>
                     <div id="analyze-stations-field-decimals">
                         <div class="field validate-input type-number d-flex flex-wrap">
-                            <label class="input-label w-100"><?php _e ( 'Decimal Places', 'cdc' ); ?></label>
+                            <label class="input-label w-100"><?php _e ( 'Decimal Places', 'cdc' ); ?> (max 10)</label>
 
                             <div class="input-row w-50">
                                 <div class="input-item">

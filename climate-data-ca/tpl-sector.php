@@ -193,9 +193,24 @@
 		// BLOG
 		//
 		
+		$blog_query = new WP_Query ( array (
+			'post_type' => 'post',
+			'post_status' => 'publish',
+			'posts_per_page' => -1,
+			'tax_query' => array (
+				array (
+					'taxonomy' => 'post_tag',
+					'field' => 'slug',
+					'terms' => [ get_the_slug ( get_the_ID() ) ]
+				)
+			)
+		) );
+		
+		if ( $blog_query->have_posts() ) {
+			
 	?>
 	
-	<section id="sector-blog" class="page-section has-head has-subsections">
+	<section id="sector-blog" class="page-section has-head">
 		<div class="section-container">
 			<header class="section-head container-fluid">
 				<div class="row">
@@ -205,44 +220,69 @@
 				</div>
 			</header>
 	
-			<div class="container-fluid subsections">
+			<div class="container-fluid">
 	
-				<div class="subsection">
-					<div class="row">
-	
-						<div id="sector-cases-grid" class="block type-post_grid col-10 offset-1">
-	
+				<div class="post-carousel-wrap row">
+					<div class="post-carousel col-10 offset-1" data-slick='{
+						"slidesToShow": 4,
+						"slidesToScroll": 1,
+						"infinite": true,
+						"centerMode": false,
+						"prevArrow": false,
+						"nextArrow": "<div class=\"post-carousel-next\"><i class=\"fas fa-long-arrow-alt-right\"></i></div>",
+						"responsive": [
+							{
+								"breakpoint": 992,
+								"settings": {
+									"slidesToShow": 3
+								}
+							}, {
+								"breakpoint": 576,
+								"settings": {
+									"slidesToShow": 1
+								}
+							}
+						]
+					}'>
+						
+						<?php
+							
+							$item_num = 1;
+							
+							while ( $blog_query->have_posts() ) {
+								$blog_query->the_post();
+								
+								$item = array (
+									'id' => get_the_ID(),
+									'title' => get_the_title(),
+									'permalink' => get_permalink(),
+									'post_type' => get_post_type(),
+									'content' => get_the_content()
+								);
+								
+						?>
+						
+						<div id="" class="query-item post-preview type-<?php echo $item['post_type']; ?>">
+							
 							<?php
-	
-								$post_grid[$block_ID] = array (
-									'display' => array (
-										'columns' => 3,
-										'template' => 'post'
-									)
-								);
-	
-								$new_query = array (
-									'args' => array (
-										'post_type' => 'post',
-										'tax_query' => array (
-											array (
-												'taxonomy' => 'post_tag',
-												'field' => 'slug',
-												'terms' => [ get_the_slug ( get_the_ID() ) ]
-											)
-										)
-									)
-								);
-	
-								include ( locate_template ( 'blocks/post_grid.php' ) );
-	
+								
+								include ( locate_template ( 'previews/post.php' ) );
+							
 							?>
-	
+							
 						</div>
-	
+						
+						<?php
+							
+								$item_num++;
+								
+							}
+							
+						?>
+						
 					</div>
 				</div>
-	
+				
 			</div>
 	
 		</div>
@@ -250,6 +290,10 @@
 	
 	<?php
 
+		} // if posts
+		
+		wp_reset_postdata();
+	
 		//
 		// ANALOGOUS
 		//

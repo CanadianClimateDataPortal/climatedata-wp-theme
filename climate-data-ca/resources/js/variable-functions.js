@@ -151,6 +151,16 @@
                         radius: 4,
                         fillOpacity: 0
                     }
+                },
+                'era5landgrid': function (properties, zoom) {
+                    return {
+                        weight: 0.1,
+                        color: gridline_color,
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0
+                    }
                 }
             },
             bounds: canadaBounds,
@@ -2471,24 +2481,32 @@
                 let mora_value = $("#mora").val();
 
                 // enable/disable controls.
-                // Fact: all variables with hasdelta == false doesn't has CMIP5/6 selection, nor summary selection
+                // Fact: all variables with hasdelta == false doesn't have summary selection
                 if(varDetails.hasdelta !== undefined && varDetails.hasdelta === false) {
                     $('input[name="absolute_delta_switch"]').attr("disabled", true);
                     $('input[name="absolute_delta_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
 
-                    // revert back to cmip5 for variables that doesn't have cmip6 data yet
-                    if (dataset_name != 'cmip5') {
-                        $('#toggle-cmip5').trigger('click');
-                    }
-                    $('input[name="dataset_switch"]').attr("disabled", true);
-                    $('input[name="dataset_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
                     $('select[name="sector"]').attr("disabled", true);
                 } else {
                     $('input[name="absolute_delta_switch"]').attr("disabled", false);
                     $('input[name="absolute_delta_switch"]').closest('div').find('.toggle-inside').removeClass('disabled');
-                    $('input[name="dataset_switch"]').attr("disabled", false);
-                    $('input[name="dataset_switch"]').closest('div').find('.toggle-inside').removeClass('disabled');
+
                     $('select[name="sector"]').attr("disabled", false);
+                }
+
+                // in which dataset this variable is available? Default to all if the ACF field is not yet present
+                let dataset_availability=(varDetails.dataset_availability !== undefined ? varDetails.dataset_availability : Object.keys(DATASETS));
+
+                $('input[name="dataset_switch"]').attr("disabled", false);
+                $('input[name="dataset_switch"]').closest('div').find('.toggle-inside').removeClass('disabled');
+
+                // switch to first available dataset if the currently selected one is unavailable
+                if (!dataset_availability.includes(dataset_name)) {
+                    $('#toggle-' + dataset_availability[0]).trigger('click');
+                }
+                if (dataset_availability.length < 2) {
+                    $('input[name="dataset_switch"]').attr("disabled", true);
+                    $('input[name="dataset_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
                 }
 
                 if (query['var-group'] === 'station-data') {

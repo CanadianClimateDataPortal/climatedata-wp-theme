@@ -1045,80 +1045,82 @@
             } else {
                 aordChoroPath = "";
             }
+            getVarData(function (data) {
+                let varDetails = data.get(var_value);
+                choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency
+                    + '/?period=' + year + aordChoroPath + '&dataset_name=' + dataset_name + '&decimals=' + varDetails.decimals;
 
-            choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency
-                + '/?period=' + year + aordChoroPath + '&dataset_name=' + dataset_name;
 
+                $.getJSON(choroPath).then(function (data) {
 
-            $.getJSON(choroPath).then(function (data) {
+                    choroValues = data;
 
-                choroValues = data;
-
-                if (map1.hasLayer(choroLayer)) {
-                    choroLayer.rcp = rcp;
-                    for (let i = 0; i < choroValues.length; i++)
-                        choroLayer.resetFeatureStyle(i);
-                } else {
-                    var layerStyles = {};
-                    layerStyles[currentSector] = function (properties, zoom) {
-                        return {
-                            weight: 0.5,
-                            color: 'white',
-                            fillColor: getColor(choroValues[properties.id]),
-                            opacity: 1,
-                            fill: true,
-                            radius: 4,
-                            fillOpacity: 1
-                        }
-                    };
-
-                    choroLayer = L.vectorGrid.protobuf(
-                        hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf",
-                        {
-                            rendererFactory: L.canvas.tile,
-                            interactive: true,
-                            getFeatureId: function (f) {
-                                return f.properties.id;
-                            },
-                            name: 'geojson',
-                            pane: 'sector',
-                            maxNativeZoom: 12,
-                            bounds: canadaBounds,
-                            maxZoom: 12,
-                            minZoom: 3,
-                            vectorTileLayerStyles: layerStyles
-                        }
-                    ).on('mouseover', function (e) {
-                        choroLayer.setFeatureStyle(
-                            e.layer.properties.id,
-                            {
+                    if (map1.hasLayer(choroLayer)) {
+                        choroLayer.rcp = rcp;
+                        for (let i = 0; i < choroValues.length; i++)
+                            choroLayer.resetFeatureStyle(i);
+                    } else {
+                        var layerStyles = {};
+                        layerStyles[currentSector] = function (properties, zoom) {
+                            return {
+                                weight: 0.5,
                                 color: 'white',
-                                fillColor: getColor(choroValues[e.layer.properties.id]),
-                                weight: 1.5,
+                                fillColor: getColor(choroValues[properties.id]),
+                                opacity: 1,
                                 fill: true,
                                 radius: 4,
-                                opacity: 1,
                                 fillOpacity: 1
-                            });
-                        grid_hover(e, sector);
+                            }
+                        };
+
+                        choroLayer = L.vectorGrid.protobuf(
+                            hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf",
+                            {
+                                rendererFactory: L.canvas.tile,
+                                interactive: true,
+                                getFeatureId: function (f) {
+                                    return f.properties.id;
+                                },
+                                name: 'geojson',
+                                pane: 'sector',
+                                maxNativeZoom: 12,
+                                bounds: canadaBounds,
+                                maxZoom: 12,
+                                minZoom: 3,
+                                vectorTileLayerStyles: layerStyles
+                            }
+                        ).on('mouseover', function (e) {
+                                choroLayer.setFeatureStyle(
+                                    e.layer.properties.id,
+                                    {
+                                        color: 'white',
+                                        fillColor: getColor(choroValues[e.layer.properties.id]),
+                                        weight: 1.5,
+                                        fill: true,
+                                        radius: 4,
+                                        opacity: 1,
+                                        fillOpacity: 1
+                                    });
+                                grid_hover(e, sector);
+                            }
+                        ).on('mouseout', function (e) {
+                                choroLayer.resetFeatureStyle(e.layer.properties.id);
+                            }
+                        ).on('click', function (e) {
+
+                            current_sector['id'] = e.layer.properties.id;
+                            current_sector['label'] = e.layer.properties[l10n_labels.label_field];
+
+                            var_value = $("#var").val();
+                            mora_value = $("#mora").val();
+
+                            genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
+                        }).addTo(map1);
+                        choroLayer.rcp = rcp;
                     }
-                    ).on('mouseout', function (e) {
-                        choroLayer.resetFeatureStyle(e.layer.properties.id);
-                    }
-                    ).on('click', function (e) {
-
-                        current_sector['id'] = e.layer.properties.id;
-                        current_sector['label'] = e.layer.properties[l10n_labels.label_field];
-
-                        var_value = $("#var").val();
-                        mora_value = $("#mora").val();
-
-                        genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
-                    }).addTo(map1);
-                    choroLayer.rcp = rcp;
-                }
-            })
-        };
+                })
+            });
+        }
 
         map1.on('zoom', function (e) {
             grid_hover_cancel(null);

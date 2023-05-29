@@ -845,7 +845,7 @@
             // no tooltip available for SPEI  (i.e. hasdelta == false)
             getVarData(function (data) {
                 let varDetails = data.get(var_value);
-                if(varDetails.hasdelta != false) {
+                if(varDetails.hasdelta !== false) {
                     gridHoverTimeout = setTimeout(function () {
                         let decade_value = parseInt($("#decade").val()) + 1;
                         let delta = $('input[name="absolute_delta_switch"]:checked').val() === 'd';
@@ -853,7 +853,7 @@
                         let dataset_name = $('input[name="dataset_switch"]:checked').val();
                         let values_url;
 
-                        if (sector == "") { // gridded
+                        if (sector === "") { // gridded
                             values_url = data_url + "/get-delta-30y-gridded-values/" +
                             e.latlng['lat'] + "/" + e.latlng['lng'] +
                             "/" + var_value + "/" + mora_value +
@@ -881,7 +881,19 @@
                                     e.target.opposite.bindTooltip(format_grid_hover_tooltip(data, rcp, varDetails, delta, sector, e)
                                     ).openTooltip(e.latlng);
                                 }
+                            },
+                            // jQuery throws parsererror if the JSON includes NaN. The API returns NaN when no data is available
+                            error: function (_ , status) {
+                                if (status !== 'abort') {
+                                    let tip = [];
+                                    if (sector !== "") {
+                                        tip.push(e.layer.properties[l10n_labels.label_field] + "<br>");
+                                    }
+                                    tip.push(T("No data available for this area."));
+                                    e.target.bindTooltip(tip.join("\n"), {sticky: true}).openTooltip(e.latlng);
+                                }
                             }
+
                         });
                     }, 100);
                 }});
@@ -1206,7 +1218,7 @@
                                     'lat': lat,
                                     'lon': lon,
                                     'delta': delta,
-                                }, 'chart-placeholder');
+                                }, $('#chart-placeholder')[0]);
                         });
 
                 }
@@ -1234,7 +1246,7 @@
 
                     $.getJSON(hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id
                         + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name).then(function (data) {
-                        displayChartData(data,varDetails, download_url, query, 'chart-placeholder');
+                        displayChartData(data,varDetails, download_url, query, $('#chart-placeholder')[0]);
                     });
 
                 }

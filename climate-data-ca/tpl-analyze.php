@@ -450,7 +450,7 @@
 
                 </div>
                 
-                <div class="copy-link" data-step="6">
+                <div class="copy-link">
                   <a id="shareableURL" href="#" class="share-link share-permalink" data-share-url="">
                     <h5>
                       <i class="icon fas fa-share-alt mr-3"></i>
@@ -562,7 +562,7 @@
                 ?>'>
                   <h4><?php _e ( 'Choose a dataset', 'cdc' ); ?></h4>
                   <p><?php _e ( 'Start by selecting a dataset from the menu on the left.', 'cdc' ); ?></p>
-                  <span class="btn btn-outline-secondary rounded-pill hidden"><?php _e ( 'Click to continue', 'cdc' ); ?></span>
+                  <span class="btn btn-outline-secondary rounded-pill hidden" id="btn-activate-map"><?php _e ( 'Click to continue', 'cdc' ); ?></span>
                 </div>
 
               </div>

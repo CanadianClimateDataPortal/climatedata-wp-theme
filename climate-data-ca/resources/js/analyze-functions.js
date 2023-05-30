@@ -1922,12 +1922,7 @@
             $("a[id='shareableURL']").attr('data-share-url', newUrl)
         }
 
-
-        $("a[id='shareableURL']").on("click", function () {
-            navigator.clipboard.writeText(document.URL);
-        });
-
-
+        
         function readURL() {
             console.log(data_url)
             let params = window.location.search

@@ -375,11 +375,11 @@ function displayChartData(data, varDetails, download_url, query, container) {
     let chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
     let chartDecimals = varDetails['decimals'];
     let scenarios = DATASETS[query['dataset']].scenarios;
-    let pointFormatter, formatter
+    let pointFormatter, labelFormatter;
 
     switch (varDetails.units.value) {
         case 'doy':
-            formatter = function () { return doy_formatter(this.value) };
+            labelFormatter = function () { return doy_formatter(this.value) };
             pointFormatter = function (format) {
                 if (this.series.type == 'line') {
                     return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name + ': <b>'
@@ -395,7 +395,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
             };
             break;
         default:
-            formatter = function () { return this.axis.defaultLabelFormatter.call(this) + ' ' + chartUnit; };
+            labelFormatter = function () { return this.axis.defaultLabelFormatter.call(this) + ' ' + chartUnit; };
             pointFormatter = undefined;
     }
 
@@ -512,7 +512,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
                 labels: {
                     align: 'left',
-                    formatter: formatter
+                    formatter: labelFormatter
                 }
             },
 

@@ -1468,26 +1468,9 @@ body.overlay-open[data-overlay-content="video"] {
   }
 }
 
-//
-// HACKS
-//
-
-.page-id-1712 {
-  .select2-results__options {
-    [id*="frost_days"],
-    [id*="ice_days"] {
-      display: none;
-    }
-  }
-}
-
-.page-id-2268 {
-  .select2-results__options {
-    [id*="frost_days"],
-    [id*="ice_days"] {
-      display: none;
-    }
-  }
+// Katex plugin font size override
+.katex-eq {
+  font-size: 1.9em;
 }
 
 //

@@ -392,31 +392,6 @@
                     minZoom: 7,
                     pane: 'grid',
                 };
-            } else if (gridName === 'canadagrid') {
-                var vectorTileOptions = {
-                    rendererFactory: L.canvas.tile,
-                    attribution: '',
-                    interactive: true,
-                    getFeatureId: function (f) {
-                        return f.properties.gid;
-                    },
-                    maxNativeZoom: 12,
-                    vectorTileLayerStyles: {
-                        'canadagrid': function (properties, zoom) {
-                            return {
-                                weight: 0.1,
-                                color: gridline_color,
-                                opacity: 1,
-                                fill: true,
-                                radius: 4,
-                                fillOpacity: 0
-                            }
-                        }
-                    },
-                    maxZoom: 12,
-                    minZoom: 7,
-                    pane: 'grid',
-                };
             } else {
                 var vectorTileOptions = {
                     rendererFactory: L.canvas.tile,
@@ -426,21 +401,20 @@
                         return f.properties.gid;
                     },
                     maxNativeZoom: 12,
-                    vectorTileLayerStyles: {
-                        'canadagrid1deg': function (properties, zoom) {
-                            return {
-                                weight: 0.1,
-                                color: gridline_color,
-                                opacity: 1,
-                                fill: true,
-                                radius: 4,
-                                fillOpacity: 0
-                            }
-                        }
-                    },
+                    vectorTileLayerStyles: {},
                     maxZoom: 12,
                     minZoom: 7,
                     pane: 'grid',
+                };
+                vectorTileOptions.vectorTileLayerStyles[gridName] = function (properties, zoom) {
+                    return {
+                        weight: 0.1,
+                        color: gridline_color,
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0
+                    }
                 };
             }
 
@@ -843,12 +817,13 @@
                             varData[sv.var_name] = sv;
 
                             selectedTimeStepCategory = $('#download-frequency').find(':selected').data('timestep');
+                            // in which dataset this variable is available? Default to all if the ACF field is not yet present
+                            let dataset_availability=(sv.dataset_availability !== undefined ? sv.dataset_availability : Object.keys(DATASETS));
 
 
-                            // filter out variables not available for current timestep
-                            // and filter variables withtout delta from CMIP6
+                            // filter out variables not available for selected timestep and dataset
                             if ($.inArray(selectedTimeStepCategory, sv.timestep) !== -1 &&
-                                !(sv.hasdelta !== undefined && sv.hasdelta === false && dataset == 'cmip6')) {
+                                dataset_availability.includes(dataset)) {
 
                                 if (sv.variable_type !== 'station_data') {
 

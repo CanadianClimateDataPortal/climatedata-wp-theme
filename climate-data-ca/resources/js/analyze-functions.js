@@ -356,7 +356,7 @@
 
             }).addTo(maps['analyze']);
 
-            // Check if the url contain input parametre (ex.: ?param=value&param2=value2)
+            // Check if the url contains a query string parametre (ex.: ?param=value&param2=value2)
             if(window.location.search !== '') {
                 readURL()
             }
@@ -1890,192 +1890,195 @@
 
         function buildShareableURL(form_inputs_dict) {
             // Cleaning values
-            form_inputs_dict['submit_url_var'] = submit_url_var
+            form_inputs_dict['submit_url_var'] = submit_url_var;
             // Passing by encodingURI makes it easier to read on the reception
-            form_inputs_dict['form_thresholds'] = encodeURI(JSON.stringify(form_thresholds))
+            form_inputs_dict['form_thresholds'] = encodeURI(JSON.stringify(form_thresholds));
 
             // Compressing the [lat,long] points to a compressed string
-            let latAray = form_inputs['lat'].split(',')
-            let lonArray = form_inputs['lon'].split(',')
-            form_inputs_dict["compressedPoints"] = getEncodedPoints(latAray,lonArray)
+            let latAray = form_inputs['lat'].split(',');
+            let lonArray = form_inputs['lon'].split(',');
+            form_inputs_dict["compressedPoints"] = getEncodedPoints(latAray,lonArray);
 
             // Emptying the lat & lon arrays because of the use of the compressed string to shorten the shareable url
-            form_inputs_dict['lat'] = ""
-            form_inputs_dict['lon'] = ""
-
+            delete form_inputs_dict['lat']
+            delete form_inputs_dict['lon']
+       
             // Building the shareable url
             // Convert dict to url &param=value like
-            let params = new URLSearchParams(form_inputs_dict)
+            let params = new URLSearchParams(form_inputs_dict);
 
-            let baseUrl = document.URL.split('?')[0]
+            let baseUrl = document.URL.split('?')[0];
 
-            let shareableURL = baseUrl + "?" + params
+            let shareableURL = baseUrl + "?" + params;
 
-            updateShareableURL(shareableURL)
+            updateShareableURL(shareableURL);
         }
 
         function updateShareableURL(newUrl) {
             // Update browser url
-            window.history.pushState('updateAnalyzeFormUrl', 'new_url', newUrl)
+            window.history.pushState('updateAnalyzeFormUrl', 'new_url', newUrl);
 
             // Update copy link button
-            $("a[id='shareableURL']").attr('data-share-url', newUrl)
+            $("a[id='shareableURL']").attr('data-share-url', newUrl);
         }
 
         
         function readURL() {
-            console.log(data_url)
-            let params = window.location.search
-            params = params.split('?').pop() // Remove ? at beginning
-            params = params.split('&') // Split into a key=value list
+            let params = window.location.search;
+            params = params.split('?').pop(); // Remove ? at beginning
+            params = params.split('&'); // Split into a key=value list
 
             // Parse the params list into a {key:value} dict
-            let paramsDict = {}
+            let paramsDict = {};
             for (var p of params) {
-                let keyValue = p.split('=')
-                let key = keyValue[0]
-                let value = decodeURIComponent(keyValue[1])
-                paramsDict[key] = value
+                let keyValue = p.split('=');
+                let key = keyValue[0];
+                let value = decodeURIComponent(keyValue[1]);
+                paramsDict[key] = value;
             }
 
+            
             // Parse tresholds value that have been encoded
-            paramsDict["form_thresholds"] = JSON.parse(decodeURI(paramsDict["form_thresholds"]))
+            if (paramsDict['form_thresholds'] === undefined) { 
+                return; 
+            }
+            paramsDict["form_thresholds"] = JSON.parse(decodeURI(paramsDict["form_thresholds"]));
 
-            // Passing trough a timeout because the site initialy validates other components
+            // Passing trough a timeout because the site initially validates other components
             // It needs about 500ms to be rendered and to not have event that break this loop.
             setTimeout(function () {
-                fillFromInputs(paramsDict)
+                fillAnalyzeFormFromInputs(paramsDict);
             }, 500)
         }
 
-        // Return a compressed 
-        function getEncodedPoints(latArray, lonArray) {
-            if (latArray.length !== lonArray.length){
-                throw new Error('LatArray and LonArray must have same number of elements');
-            }
+        // // Return a compressed string representing a list of points - [[lat,lon]]
+        // function getEncodedPoints(latArray, lonArray) {
+        //     if (latArray.length !== lonArray.length){
+        //         throw new Error('LatArray and LonArray must have same number of elements');
+        //     }
 
-            let points = []
-
-
-            for (var i in latArray) {
-                points.push([latArray[i], lonArray[i]])
-            }
-
-            let compressedString = compresseLatLongPointsToString(points)
-
-            return compressedString
-        }
-
-        // This method compresse a list of point to a short string 
-        // Source of the following code : https://learn.microsoft.com/en-us/bingmaps/rest-services/elevations/point-compression-algorithm
-        function compresseLatLongPointsToString(points) {
-            const SAFE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
-            const MULTIPLIER = 100;
-            const DIVIDER = 32;
-
-            var result = "";
-            var latitude = 0;
-            var longitude = 0;
-
-            // console.log("ENCODING",points)
-
-            for (var i in points) {
-                var newLat = Math.round(points[i][0] * MULTIPLIER);
-                var newLon = Math.round(points[i][1] * MULTIPLIER);
-
-                var dy = newLat - latitude;
-                var dx = newLon - longitude;
-
-                latitude = newLat;
-                longitude = newLon;
-                dy = (dy << 1) ^ (dy >> 31);
-                dx = (dx << 1) ^ (dx >> 31);
-
-                var index = ((dy + dx) * (dy + dx + 1)) / 2 + dy;
-
-                while (index > 0) {
-                    var rem = index & 31;
-
-                    index = (index - rem) / DIVIDER;
-
-                    if (index > 0) {
-                        rem += DIVIDER;
-                    }
-
-                    result += SAFE_CHARACTERS[rem];
-                }
-            }
-            return result;
-        }
-
-        // This method decompresse the short random
-        function decodePoints(compressedValue) {
-            const SAFE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
-            const MULTIPLIER = 100;
-            const DIVIDER = 32;
-
-            var latLon = [];
-            var pointsArray = [];
-            var point = [];
-            var lastLat = 0,
-                lastLon = 0;
-
-            for (var i = 0; i < compressedValue.length; i++) {
-                var num = SAFE_CHARACTERS.indexOf(compressedValue[i]);
-
-                if (num < DIVIDER) {
-                    point.push(num);
-                    pointsArray.push(point);
-                    point = [];
-                } else {
-                    num -= DIVIDER;
-                    point.push(num);
-                }
-            }
-
-            for (var y in pointsArray) {
-                var result = 0;
-                var list = pointsArray[y].reverse();
-
-                for (var x in list) {
-                    if (result == 0) {
-                        result = list[x];
-                    } else {
-                        result = result * DIVIDER + list[x];
-                    }
-                }
-
-                var dIag = parseInt((Math.sqrt(8 * result + 5) - 1) / 2);
-
-                var latY = result - (dIag * (dIag + 1)) / 2;
-                var lonX = dIag - latY;
-
-                if (latY % 2 == 1) {
-                    latY = (latY + 1) * -1;
-                }
-                if (lonX % 2 == 1) {
-                    lonX = (lonX + 1) * -1;
-                }
-
-                latY /= 2;
-                lonX /= 2;
-                var lat = latY + lastLat;
-                var lon = lonX + lastLon;
-
-                lastLat = lat;
-                lastLon = lon;
-                lat /= MULTIPLIER;
-                lon /= MULTIPLIER;
-
-                // latLon.push(lat, lon);
-                latLon.push({
-                    "point": [lat, lon]
-                })
-            }
+        //     let points = []
 
 
-            return latLon;
-        }
+        //     for (var i in latArray) {
+        //         points.push([latArray[i], lonArray[i]])
+        //     }
+
+        //     let compressedLatLongPoints = compressLatLonPointsToString(points)
+
+        //     return compressedLatLongPoints
+        // }
+
+        // // This method compresse a list of point to a short string 
+        // // Source of the following code : https://learn.microsoft.com/en-us/bingmaps/rest-services/elevations/point-compression-algorithm
+        // function compressLatLonPointsToString(points) {
+        //     const SAFE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+        //     const MULTIPLIER = 100;
+        //     const DIVIDER = 32;
+
+        //     var result = "";
+        //     var latitude = 0;
+        //     var longitude = 0;
+
+        //     // console.log("ENCODING",points)
+
+        //     for (var i in points) {
+        //         var newLat = Math.round(points[i][0] * MULTIPLIER);
+        //         var newLon = Math.round(points[i][1] * MULTIPLIER);
+
+        //         var dy = newLat - latitude;
+        //         var dx = newLon - longitude;
+
+        //         latitude = newLat;
+        //         longitude = newLon;
+        //         dy = (dy << 1) ^ (dy >> 31);
+        //         dx = (dx << 1) ^ (dx >> 31);
+
+        //         var index = ((dy + dx) * (dy + dx + 1)) / 2 + dy;
+
+        //         while (index > 0) {
+        //             var rem = index & 31;
+
+        //             index = (index - rem) / DIVIDER;
+
+        //             if (index > 0) {
+        //                 rem += DIVIDER;
+        //             }
+
+        //             result += SAFE_CHARACTERS[rem];
+        //         }
+        //     }
+        //     return result;
+        // }
+
+        // // This method decompresse the short random
+        // function decompressLatLonPointsStringToList(compressedValue) {
+        //     const SAFE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+        //     const MULTIPLIER = 100;
+        //     const DIVIDER = 32;
+
+        //     var latLon = [];
+        //     var pointsArray = [];
+        //     var point = [];
+        //     var lastLat = 0,
+        //         lastLon = 0;
+
+        //     for (var i = 0; i < compressedValue.length; i++) {
+        //         var num = SAFE_CHARACTERS.indexOf(compressedValue[i]);
+
+        //         if (num < DIVIDER) {
+        //             point.push(num);
+        //             pointsArray.push(point);
+        //             point = [];
+        //         } else {
+        //             num -= DIVIDER;
+        //             point.push(num);
+        //         }
+        //     }
+
+        //     for (var y in pointsArray) {
+        //         var result = 0;
+        //         var list = pointsArray[y].reverse();
+
+        //         for (var x in list) {
+        //             if (result == 0) {
+        //                 result = list[x];
+        //             } else {
+        //                 result = result * DIVIDER + list[x];
+        //             }
+        //         }
+
+        //         var dIag = parseInt((Math.sqrt(8 * result + 5) - 1) / 2);
+
+        //         var latY = result - (dIag * (dIag + 1)) / 2;
+        //         var lonX = dIag - latY;
+
+        //         if (latY % 2 == 1) {
+        //             latY = (latY + 1) * -1;
+        //         }
+        //         if (lonX % 2 == 1) {
+        //             lonX = (lonX + 1) * -1;
+        //         }
+
+        //         latY /= 2;
+        //         lonX /= 2;
+        //         var lat = latY + lastLat;
+        //         var lon = lonX + lastLon;
+
+        //         lastLat = lat;
+        //         lastLon = lon;
+        //         lat /= MULTIPLIER;
+        //         lon /= MULTIPLIER;
+
+        //         // latLon.push(lat, lon);
+        //         latLon.push({
+        //             "point": [lat, lon]
+        //         })
+        //     }
+
+
+        //     return latLon;
+        // }
 
         function selectMapPoints(compressedValue) {
 
@@ -2083,7 +2086,7 @@
                 .then((response) => response.json())
                 .then((result) => {
 
-                    let latLonArray = decodePoints(compressedValue)
+                    let latLonArray = decompressLatLonPointsStringToList(compressedValue)
 
                     for (var i in result) {
                         latLonArray[i]['id'] = result[i]
@@ -2118,7 +2121,7 @@
 
 
 
-        function fillFromInputs(formInputs) {
+        function fillAnalyzeFormFromInputs(formInputs) {
 
             // --- CHOOSE A DATASET ---
             let dataset = formInputs['dataset']
@@ -2140,9 +2143,9 @@
 
 
             // --- INSERT THRESHOLDS ---
-            let threshHolds = formInputs['form_thresholds']
-            for (let key in threshHolds) {
-                let value = threshHolds[key]
+            let tresholds = formInputs['form_thresholds']
+            for (let key in tresholds) {
+                let value = tresholds[key]
 
                 // If a key is an option of a select menu
                 if (key === "op") {
@@ -2179,7 +2182,7 @@
             ensemblePercentiles.forEach(percent => {
                 // Select values other then the default value "10","50","90"
                 if (["10", "50", "90"].includes(percent) == false) {
-                    $(`input[value='${percent}']`).click()
+                    $(`input[name="ensemble_percentiles"][value="${percent}"]`).click()
                 }
             })
 
@@ -2190,9 +2193,12 @@
             // Selecting Output Format
             let outputFormat = formInputs['output_format']
             $(`input[value='${outputFormat}']`).click()
+
+            // Setting the csv decimal precision value
             if (outputFormat === "csv") {
                 $("#analyze-decimals").val(formInputs["csv_precision"])
             }
+
 
             // Show submit
             $('#analyze-submit').slideDown()
@@ -2369,7 +2375,7 @@
                 $('#analyze-submit').slideUp()
             }
 
-            buildShareableURL(form_inputs)
+            buildShareableURL($.extend(true,{}, form_inputs)); 
             return is_valid;
 
             } else if (current_tab == 'analyze-stations') {
@@ -2402,7 +2408,6 @@
                         this_type = 'select'
                     }
 
-                    //console.log('checking ' + this_name, this_type, this_val)
 
                     switch (this_type) {
                         case 'radio':

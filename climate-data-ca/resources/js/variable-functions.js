@@ -7,28 +7,6 @@
         var hosturl = geoserver_url;
         var canadaBounds = L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.60, -49.9));
 
-        var varData;
-
-        function getVarData(callback) {
-            if (varData !== undefined) {
-                callback(varData);
-            } else {
-                $.ajax({
-                    url: '/wp-json/acf/v3/variable/?per_page=10000&orderby=menu_order&order=asc',
-                    dataType: 'json',
-                    success: function (data) {
-                        varData = new Map();
-                        $.each(data, function (k, v) {
-                            if (v.acf.var_name != 'slr') {   // exclude sea-level from filter menu since it's on another page
-                                varData.set(v.acf.var_name, v.acf);
-                            }
-                        });
-                        callback(varData);
-                    }
-                });
-            }
-        }
-
         varID = parseInt($('#varPostID').val());
         acfData = [];
         // if (varID > 0) {
@@ -853,60 +831,60 @@
             let rcp = e.target.rcp;
 
             // no tooltip available for SPEI  (i.e. hasdelta == false)
-            getVarData(function (data) {
-                let varDetails = data.get(var_value);
-                if(varDetails.hasdelta !== false) {
-                    gridHoverTimeout = setTimeout(function () {
-                        let decade_value = parseInt($("#decade").val()) + 1;
-                        let delta = $('input[name="absolute_delta_switch"]:checked').val() === 'd';
-                        let delta7100 = delta ? "&delta7100=true" : "";
-                        let dataset_name = $('input[name="dataset_switch"]:checked').val();
-                        let values_url;
 
-                        if (sector === "") { // gridded
-                            values_url = data_url + "/get-delta-30y-gridded-values/" +
-                            e.latlng['lat'] + "/" + e.latlng['lng'] +
+            let varDetails = varData.get(var_value);
+            if(varDetails.hasdelta !== false) {
+                gridHoverTimeout = setTimeout(function () {
+                    let decade_value = parseInt($("#decade").val()) + 1;
+                    let delta = $('input[name="absolute_delta_switch"]:checked').val() === 'd';
+                    let delta7100 = delta ? "&delta7100=true" : "";
+                    let dataset_name = $('input[name="dataset_switch"]:checked').val();
+                    let values_url;
+
+                    if (sector === "") { // gridded
+                        values_url = data_url + "/get-delta-30y-gridded-values/" +
+                        e.latlng['lat'] + "/" + e.latlng['lng'] +
+                        "/" + var_value + "/" + mora_value +
+                        "?period=" + decade_value +
+                        "&decimals=" + varDetails.decimals + delta7100 +
+                        "&dataset_name=" + dataset_name;
+                    } else {
+                        values_url = data_url + "/get-delta-30y-regional-values/" +
+                            sector + "/" + e.layer.properties.id +
                             "/" + var_value + "/" + mora_value +
                             "?period=" + decade_value +
                             "&decimals=" + varDetails.decimals + delta7100 +
                             "&dataset_name=" + dataset_name;
-                        } else {
-                            values_url = data_url + "/get-delta-30y-regional-values/" +
-                                sector + "/" + e.layer.properties.id +
-                                "/" + var_value + "/" + mora_value +
-                                "?period=" + decade_value +
-                                "&decimals=" + varDetails.decimals + delta7100 +
-                                "&dataset_name=" + dataset_name;
+                    }
+
+                    gridHoverAjax = $.ajax({
+                        url: values_url,
+                        dataType: "json",
+                        success: function (data) {
+                            e.target.bindTooltip(format_grid_hover_tooltip(data, rcp, varDetails, delta, sector, e),
+                                {sticky: true}).openTooltip(e.latlng);
+
+                            if ($('body').hasClass('map-compare')) {
+                                rcp = e.target.opposite.rcp;
+                                e.target.opposite.bindTooltip(format_grid_hover_tooltip(data, rcp, varDetails, delta, sector, e)
+                                ).openTooltip(e.latlng);
+                            }
+                        },
+                        // jQuery throws parsererror if the JSON includes NaN. The API returns NaN when no data is available
+                        error: function (_ , status) {
+                            if (status !== 'abort') {
+                                let tip = [];
+                                if (sector !== "") {
+                                    tip.push(e.layer.properties[l10n_labels.label_field] + "<br>");
+                                }
+                                tip.push(T("No data available for this area."));
+                                e.target.bindTooltip(tip.join("\n"), {sticky: true}).openTooltip(e.latlng);
+                            }
                         }
 
-                        gridHoverAjax = $.ajax({
-                            url: values_url,
-                            dataType: "json",
-                            success: function (data) {
-                                e.target.bindTooltip(format_grid_hover_tooltip(data, rcp, varDetails, delta, sector, e),
-                                    {sticky: true}).openTooltip(e.latlng);
-
-                                if ($('body').hasClass('map-compare')) {
-                                    rcp = e.target.opposite.rcp;
-                                    e.target.opposite.bindTooltip(format_grid_hover_tooltip(data, rcp, varDetails, delta, sector, e)
-                                    ).openTooltip(e.latlng);
-                                }
-                            },
-                            // jQuery throws parsererror if the JSON includes NaN. The API returns NaN when no data is available
-                            error: function (_ , status) {
-                                if (status !== 'abort') {
-                                    let tip = [];
-                                    if (sector !== "") {
-                                        tip.push(e.layer.properties[l10n_labels.label_field] + "<br>");
-                                    }
-                                    tip.push(T("No data available for this area."));
-                                    e.target.bindTooltip(tip.join("\n"), {sticky: true}).openTooltip(e.latlng);
-                                }
-                            }
-
-                        });
-                    }, 100);
-                }});
+                    });
+                }, 100);
+            }
 
             // set the highlight
 
@@ -1067,81 +1045,81 @@
             } else {
                 aordChoroPath = "";
             }
-            getVarData(function (data) {
-                let varDetails = data.get(var_value);
-                choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency
-                    + '/?period=' + year + aordChoroPath + '&dataset_name=' + dataset_name + '&decimals=' + varDetails.decimals;
+
+            let varDetails = varData.get(var_value);
+            choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency
+                + '/?period=' + year + aordChoroPath + '&dataset_name=' + dataset_name + '&decimals=' + varDetails.decimals;
 
 
-                $.getJSON(choroPath).then(function (data) {
+            $.getJSON(choroPath).then(function (data) {
 
-                    choroValues = data;
+                choroValues = data;
 
-                    if (map1.hasLayer(choroLayer)) {
-                        choroLayer.rcp = rcp;
-                        for (let i = 0; i < choroValues.length; i++)
-                            choroLayer.resetFeatureStyle(i);
-                    } else {
-                        var layerStyles = {};
-                        layerStyles[currentSector] = function (properties, zoom) {
-                            return {
-                                weight: 0.5,
-                                color: 'white',
-                                fillColor: getColor(choroValues[properties.id]),
-                                opacity: 1,
-                                fill: true,
-                                radius: 4,
-                                fillOpacity: 1
-                            }
-                        };
+                if (map1.hasLayer(choroLayer)) {
+                    choroLayer.rcp = rcp;
+                    for (let i = 0; i < choroValues.length; i++)
+                        choroLayer.resetFeatureStyle(i);
+                } else {
+                    var layerStyles = {};
+                    layerStyles[currentSector] = function (properties, zoom) {
+                        return {
+                            weight: 0.5,
+                            color: 'white',
+                            fillColor: getColor(choroValues[properties.id]),
+                            opacity: 1,
+                            fill: true,
+                            radius: 4,
+                            fillOpacity: 1
+                        }
+                    };
 
-                        choroLayer = L.vectorGrid.protobuf(
-                            hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf",
-                            {
-                                rendererFactory: L.canvas.tile,
-                                interactive: true,
-                                getFeatureId: function (f) {
-                                    return f.properties.id;
-                                },
-                                name: 'geojson',
-                                pane: 'sector',
-                                maxNativeZoom: 12,
-                                bounds: canadaBounds,
-                                maxZoom: 12,
-                                minZoom: 3,
-                                vectorTileLayerStyles: layerStyles
-                            }
-                        ).on('mouseover', function (e) {
-                                choroLayer.setFeatureStyle(
-                                    e.layer.properties.id,
-                                    {
-                                        color: 'white',
-                                        fillColor: getColor(choroValues[e.layer.properties.id]),
-                                        weight: 1.5,
-                                        fill: true,
-                                        radius: 4,
-                                        opacity: 1,
-                                        fillOpacity: 1
-                                    });
-                                grid_hover(e, sector);
-                            }
-                        ).on('mouseout', function (e) {
-                                choroLayer.resetFeatureStyle(e.layer.properties.id);
-                            }
-                        ).on('click', function (e) {
+                    choroLayer = L.vectorGrid.protobuf(
+                        hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf",
+                        {
+                            rendererFactory: L.canvas.tile,
+                            interactive: true,
+                            getFeatureId: function (f) {
+                                return f.properties.id;
+                            },
+                            name: 'geojson',
+                            pane: 'sector',
+                            maxNativeZoom: 12,
+                            bounds: canadaBounds,
+                            maxZoom: 12,
+                            minZoom: 3,
+                            vectorTileLayerStyles: layerStyles
+                        }
+                    ).on('mouseover', function (e) {
+                            choroLayer.setFeatureStyle(
+                                e.layer.properties.id,
+                                {
+                                    color: 'white',
+                                    fillColor: getColor(choroValues[e.layer.properties.id]),
+                                    weight: 1.5,
+                                    fill: true,
+                                    radius: 4,
+                                    opacity: 1,
+                                    fillOpacity: 1
+                                });
+                            grid_hover(e, sector);
+                        }
+                    ).on('mouseout', function (e) {
+                            choroLayer.resetFeatureStyle(e.layer.properties.id);
+                        }
+                    ).on('click', function (e) {
 
-                            current_sector['id'] = e.layer.properties.id;
-                            current_sector['label'] = e.layer.properties[l10n_labels.label_field];
+                        current_sector['id'] = e.layer.properties.id;
+                        current_sector['label'] = e.layer.properties[l10n_labels.label_field];
 
-                            var_value = $("#var").val();
-                            mora_value = $("#mora").val();
+                        var_value = $("#var").val();
+                        mora_value = $("#mora").val();
 
-                            genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
-                        }).addTo(map1);
-                        choroLayer.rcp = rcp;
-                    }
-                })
-            });
+                        genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
+                    }).addTo(map1);
+                    choroLayer.rcp = rcp;
+                }
+            })
+
         }
 
         map1.on('zoom', function (e) {
@@ -2485,512 +2463,505 @@
 
         function changeLayers() {
 
-            getVarData(function(data) {
-                let varDetails = data.get(var_value);
-                let aord_value = $('input[name="absolute_delta_switch"]:checked').val();
-                let dataset_name = $('input[name="dataset_switch"]:checked').val();
-                let layer_prefix = dataset_name === 'cmip6' ? "cmip6-" : "";
-                let rcp_value = $("#rcp").val();
-                let decade_value = parseInt($("#decade").val());
-                let mora_value = $("#mora").val();
+            let varDetails = varData.get(var_value);
+            let aord_value = $('input[name="absolute_delta_switch"]:checked').val();
+            let dataset_name = $('input[name="dataset_switch"]:checked').val();
+            let layer_prefix = dataset_name === 'cmip6' ? "cmip6-" : "";
+            let rcp_value = $("#rcp").val();
+            let decade_value = parseInt($("#decade").val());
+            let mora_value = $("#mora").val();
 
-                // enable/disable controls.
-                // Fact: all variables with hasdelta == false doesn't have summary selection
-                if(varDetails.hasdelta !== undefined && varDetails.hasdelta === false) {
-                    $('input[name="absolute_delta_switch"]').attr("disabled", true);
-                    $('input[name="absolute_delta_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
+            // enable/disable controls.
+            // Fact: all variables with hasdelta == false doesn't have summary selection
+            if(varDetails.hasdelta !== undefined && varDetails.hasdelta === false) {
+                $('input[name="absolute_delta_switch"]').attr("disabled", true);
+                $('input[name="absolute_delta_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
 
-                    $('select[name="sector"]').attr("disabled", true);
-                } else {
-                    $('input[name="absolute_delta_switch"]').attr("disabled", false);
-                    $('input[name="absolute_delta_switch"]').closest('div').find('.toggle-inside').removeClass('disabled');
+                $('select[name="sector"]').attr("disabled", true);
+            } else {
+                $('input[name="absolute_delta_switch"]').attr("disabled", false);
+                $('input[name="absolute_delta_switch"]').closest('div').find('.toggle-inside').removeClass('disabled');
 
-                    $('select[name="sector"]').attr("disabled", false);
-                }
+                $('select[name="sector"]').attr("disabled", false);
+            }
 
-                // in which dataset this variable is available? Default to all if the ACF field is not yet present
-                let dataset_availability=(varDetails.dataset_availability !== undefined ? varDetails.dataset_availability : Object.keys(DATASETS));
+            // in which dataset this variable is available? Default to all if the ACF field is not yet present
+            let dataset_availability=(varDetails.dataset_availability !== undefined ? varDetails.dataset_availability : Object.keys(DATASETS));
 
-                $('input[name="dataset_switch"]').attr("disabled", false);
-                $('input[name="dataset_switch"]').closest('div').find('.toggle-inside').removeClass('disabled');
+            $('input[name="dataset_switch"]').attr("disabled", false);
+            $('input[name="dataset_switch"]').closest('div').find('.toggle-inside').removeClass('disabled');
 
-                // switch to first available dataset if the currently selected one is unavailable
-                if (!dataset_availability.includes(dataset_name)) {
-                    $('#toggle-' + dataset_availability[0]).trigger('click');
-                }
-                if (dataset_availability.length < 2) {
-                    $('input[name="dataset_switch"]').attr("disabled", true);
-                    $('input[name="dataset_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
-                }
+            // switch to first available dataset if the currently selected one is unavailable
+            if (!dataset_availability.includes(dataset_name)) {
+                $('#toggle-' + dataset_availability[0]).trigger('click');
+            }
+            if (dataset_availability.length < 2) {
+                $('input[name="dataset_switch"]').attr("disabled", true);
+                $('input[name="dataset_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
+            }
 
-                if (query['var-group'] === 'station-data') {
+            if (query['var-group'] === 'station-data') {
 
-                    // activate station data
+                // activate station data
+                layer_swap({
+                    layer: 'stations',
+                    station: query['var']
+                });
+
+            } else {
+
+                // not station data so make sure it's turned off
+                if (station_on === true) {
                     layer_swap({
                         layer: 'stations',
-                        station: query['var']
+                        action: 'off'
                     });
+                }
 
-                } else {
+                if (query['sector'] !== '') {
 
-                    // not station data so make sure it's turned off
-                    if (station_on === true) {
+                    // activate sector
+                    if (sector_on === false) {
                         layer_swap({
-                            layer: 'stations',
+                            layer: 'sector'
+                        });
+
+                        layer_swap({
+                            layer: 'variable',
                             action: 'off'
                         });
                     }
 
-                    if (query['sector'] !== '') {
+                } else {
 
-                        // activate sector
-                        if (sector_on === false) {
-                            layer_swap({
-                                layer: 'sector'
-                            });
-
-                            layer_swap({
-                                layer: 'variable',
-                                action: 'off'
-                            });
-                        }
-
-                    } else {
-
-                        // not sector so make sure it's turned off
-                        if (sector_on === true) {
-                            layer_swap({
-                                layer: 'sector',
-                                action: 'off'
-                            });
-                        }
-
+                    // not sector so make sure it's turned off
+                    if (sector_on === true) {
                         layer_swap({
-                            layer: 'variable'
+                            layer: 'sector',
+                            action: 'off'
                         });
-
                     }
 
-                    // always generate/re-generate the left legend
+                    layer_swap({
+                        layer: 'variable'
+                    });
 
-                    let msorys = 'ys';
-                    let msorysmonth = '-ann';
-                    let legendmsorys = 'ann';
+                }
 
-                    switch (mora_value) {
-                        case 'ann':
-                            msorys = 'ys';
-                            msorysmonth = '-ann';
-                            legendmsorys = 'ann';
-                            break;
-                        case 'spring':
-                        case 'summer':
-                        case 'fall':
-                        case 'winter':
-                            msorys = 'qsdec';
-                            msorysmonth = '-' + mora_value;
-                            legendmsorys = 'qsdec';
-                            break;
-                        case '2qsapr':
-                            msorys = '2qsapr';
-                            msorysmonth = '-' + mora_value;
-                            legendmsorys = '2qsapr';
-                            break;
-                        default:
-                            msorys = 'ms';
-                            msorysmonth = '-' + mora_value;
-                            legendmsorys = 'mon';
-                    }
+                // always generate/re-generate the left legend
 
-                    if (query['sector'] !== '') {
-                        generateSectorLegend(layer_prefix + var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year', '');
-                    } else {
-                        generateLeftLegend();
-                    }
+                let msorys = 'ys';
+                let msorysmonth = '-ann';
+                let legendmsorys = 'ann';
+
+                switch (mora_value) {
+                    case 'ann':
+                        msorys = 'ys';
+                        msorysmonth = '-ann';
+                        legendmsorys = 'ann';
+                        break;
+                    case 'spring':
+                    case 'summer':
+                    case 'fall':
+                    case 'winter':
+                        msorys = 'qsdec';
+                        msorysmonth = '-' + mora_value;
+                        legendmsorys = 'qsdec';
+                        break;
+                    case '2qsapr':
+                        msorys = '2qsapr';
+                        msorysmonth = '-' + mora_value;
+                        legendmsorys = '2qsapr';
+                        break;
+                    default:
+                        msorys = 'ms';
+                        msorysmonth = '-' + mora_value;
+                        legendmsorys = 'mon';
+                }
+
+                if (query['sector'] !== '') {
+                    generateSectorLegend(layer_prefix + var_value + '-' + msorys + '-' + rcp_value + '-p50-' + mora_value + '-30year', '');
+                } else {
+                    generateLeftLegend();
+                }
 
 
-                    if (aord_value === 'd') {
-                        aord_layer_value = "-delta7100";
-                    } else {
-                        aord_layer_value = "";
-                    }
+                if (aord_value === 'd') {
+                    aord_layer_value = "-delta7100";
+                } else {
+                    aord_layer_value = "";
+                }
 
-                    singleLayerName = layer_prefix + '' + var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+                singleLayerName = layer_prefix + '' + var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
 
-                    // if a compare scenario was selected
+                // if a compare scenario was selected
 
-                    if (rcp_value.indexOf("vs") !== -1) {
+                if (rcp_value.indexOf("vs") !== -1) {
 
-                        $('body').addClass('map-compare');
+                    $('body').addClass('map-compare');
 
-                        invalidate_maps();
-                        console.log("leftLayerName: " + leftLayerName);
+                    invalidate_maps();
+                    console.log("leftLayerName: " + leftLayerName);
 
-                        leftLayer.setParams({
+                    leftLayer.setParams({
+                        format: 'image/png',
+                        transparent: true,
+                        opacity: 1,
+                        pane: 'raster',
+                        'TIME': decade_value + '-01-00T00:00:00Z',
+                        'VERSION': '1.3.0',
+                        layers: 'CDC:' + leftLayerName
+                    });
+
+                    if (has_mapRight === true) {
+                        console.log("rightLayerName: " + rightLayerName);
+                        rightLayer.setParams({
                             format: 'image/png',
                             transparent: true,
                             opacity: 1,
                             pane: 'raster',
                             'TIME': decade_value + '-01-00T00:00:00Z',
                             'VERSION': '1.3.0',
-                            layers: 'CDC:' + leftLayerName
+                            layers: 'CDC:' + rightLayerName
                         });
-
-                        if (has_mapRight === true) {
-                            console.log("rightLayerName: " + rightLayerName);
-                            rightLayer.setParams({
-                                format: 'image/png',
-                                transparent: true,
-                                opacity: 1,
-                                pane: 'raster',
-                                'TIME': decade_value + '-01-00T00:00:00Z',
-                                'VERSION': '1.3.0',
-                                layers: 'CDC:' + rightLayerName
-                            });
-                        }
-
-                    } else {
-
-                        $('body').removeClass('map-compare');
-
-                        invalidate_maps();
-                        console.log("singleLayerName: " + singleLayerName);
-
-                        leftLayer.setParams({
-                            format: 'image/png',
-                            transparent: true,
-                            opacity: 1,
-                            'TIME': decade_value + '-01-00T00:00:00Z',
-                            'VERSION': '1.3.0',
-                            layers: 'CDC:' + singleLayerName
-                        });
-
                     }
 
+                } else {
+
+                    $('body').removeClass('map-compare');
+
+                    invalidate_maps();
+                    console.log("singleLayerName: " + singleLayerName);
+
+                    leftLayer.setParams({
+                        format: 'image/png',
+                        transparent: true,
+                        opacity: 1,
+                        'TIME': decade_value + '-01-00T00:00:00Z',
+                        'VERSION': '1.3.0',
+                        layers: 'CDC:' + singleLayerName
+                    });
+
                 }
-            });
+
+            }
+
         }
 
 
 
 
         function buildFilterMenu() {
-            getVarData(function (data) {
-                queryVar = getQueryVariable('var');
+            queryVar = getQueryVariable('var');
 
 
-                varID = $('#var').val();
+            varID = $('#var').val();
 
 
-                rawsectorSelected = getQueryVariable('sector');
+            rawsectorSelected = getQueryVariable('sector');
 
-                if (!rawsectorSelected) {
-                    rawsectorSelected = 'gridded_data';
+            if (!rawsectorSelected) {
+                rawsectorSelected = 'gridded_data';
+            }
+
+
+            $('#var').empty();
+            currentOptGroup = '';
+
+            varData.forEach(function (sv, var_name) {
+
+                if (sv.var_name === varID) {
+                    selectedVar = true;
+                } else {
+                    selectedVar = false;
                 }
 
 
-                $('#var').empty();
-                currentOptGroup = '';
+                if ($.inArray(rawsectorSelected, sv.availability) !== -1) {
 
-                data.forEach(function (sv, var_name) {
+                    if (sv.var_name) {
+                        if (currentOptGroup !== sv.variable_type) {
 
-                    if (sv.var_name === varID) {
-                        selectedVar = true;
-                    } else {
-                        selectedVar = false;
+                            if (sv.variable_type === 'station_data') {
+                                optgroupSlug = 'station-data';
+                            } else if (sv.variable_type === 'other_variables') {
+                                optgroupSlug = 'other';
+                            } else if (sv.variable_type === 'precipitation') {
+                                optgroupSlug = 'precipitation';
+                            } else if (sv.variable_type === 'temperature') {
+                                optgroupSlug = 'temperature';
+                            }
+
+                            $('#var').append("<optgroup id=optgroup_" + sv.variable_type + " label='" + l10n_labels[sv.variable_type] + "' data-slug='" + optgroupSlug + "'>");
+                            currentOptGroup = sv.variable_type;
+                        }
+
+
+                        varnewOption = new Option(sv.var_title, sv.var_name, false, selectedVar);
+                        $('#optgroup_' + sv.variable_type).append(varnewOption);
                     }
 
+                }
 
-                    if ($.inArray(rawsectorSelected, sv.availability) !== -1) {
-
-                        if (sv.var_name) {
-                            if (currentOptGroup !== sv.variable_type) {
-
-                                if (sv.variable_type === 'station_data') {
-                                    optgroupSlug = 'station-data';
-                                } else if (sv.variable_type === 'other_variables') {
-                                    optgroupSlug = 'other';
-                                } else if (sv.variable_type === 'precipitation') {
-                                    optgroupSlug = 'precipitation';
-                                } else if (sv.variable_type === 'temperature') {
-                                    optgroupSlug = 'temperature';
-                                }
-
-                                $('#var').append("<optgroup id=optgroup_" + sv.variable_type + " label='" + l10n_labels[sv.variable_type] + "' data-slug='" + optgroupSlug + "'>");
-                                currentOptGroup = sv.variable_type;
-                            }
-
-
-                            varnewOption = new Option(sv.var_title, sv.var_name, false, selectedVar);
-                            $('#optgroup_' + sv.variable_type).append(varnewOption);
-                        }
-
+                if (sv.var_name === varID) {
+                    selectedSector = getQueryVariable('sector');
+                    if (!selectedSector) {
+                        selectedSector = 'gridded_data';
                     }
 
-                    if (sv.var_name === varID) {
-                        selectedSector = getQueryVariable('sector');
-                        if (!selectedSector) {
-                            selectedSector = 'gridded_data';
-                        }
-
-                        $('#sector').empty();
-                        $.each(sv.availability, function (k, v) {
+                    $('#sector').empty();
+                    $.each(sv.availability, function (k, v) {
 
 
-                            if (selectedSector === v) {
-                                defaultSelectedSector = true;
-                            } else {
-                                defaultSelectedSector = false;
-                            }
-
-                            if (v === 'gridded_data') {
-                                var newOption = new Option(l10n_labels[v], '', defaultSelectedSector, defaultSelectedSector);
-                            } else {
-                                var newOption = new Option(l10n_labels[v], v, defaultSelectedSector, defaultSelectedSector);
-                            }
-
-
-
-                            $('#sector').append(newOption);
-                        });
-
-
-                        var_value = $("#var").val();
-                        //let dataset_name = $('input[name="dataset_switch"]:checked').val();
-                        let dataset_name = getQueryVariable('dataset');
-                        let scenarios = DATASETS[dataset_name].scenarios;
-                        dec_value = $("#decade").val();
-
-                        updated_slider_values = [];
-
-                        tsmax = parseInt(sv.time_slider_max_value);
-                        tsmin = parseInt(sv.time_slider_min_value);
-                        tsdef = parseInt(sv.time_slider_default_value);
-                        tsint = parseInt(sv.time_slider_interval);
-
-                        z = 0;
-
-                        for (i = tsmin; i <= tsmax; i += 10) {
-
-                            updated_slider_values.push(i + 1 + '-' + (i + tsint));
-
-
-                            if (i === parseInt(dec_value)) {
-                                newfrom = z;
-                            }
-                            z += 1;
-                        }
-
-                        rs_instance.update({
-                            values: updated_slider_values,
-                            min: tsmin,
-                            max: tsmax,
-                            from: newfrom,
-                            to: tsmax,
-                            step: tsint,
-                        });
-
-                        var $rs = $("#range-slider");
-
-                        if ((selectedSector === 'gridded_data') && $.inArray('gridded_data', sv.availability) !== -1) {
-                            replaceGrid(sv.grid, gridLayer_options);
-                        }
-
-                        acfTimeStep = sv.timestep;
-
-                        $('#mora').empty();
-                        $('#rcp').empty();
-
-                        let rcpDropGroup = "";
-                        let rcpOptions = [];
-                        scenarios.forEach(function (scenario) {
-                            rcpOptions.push(scenario.name);
-                            rcpDropGroup += '<option value="{0}">{1}</option> '.format(scenario.name, scenario.label);
-                            if (selectedSector === 'gridded_data') {
-                                scenarios.forEach(function (scenario2) {
-                                    if (scenario != scenario2) {
-                                        rcpOptions.push("{0}vs{1}".format(scenario.name, scenario2.name))
-                                        rcpDropGroup += '<option value="{0}vs{1}">{2} vs {3}</option> '.format(
-                                            scenario.name,
-                                            scenario2.name,
-                                            scenario.label,
-                                            scenario2.label);
-                                    }
-                                });
-                            }});
-
-                        $('#rcp').append(rcpDropGroup);
-                        let queryRCP = getQueryVariable('rcp');
-                        if (rcpOptions.includes(queryRCP)) {
-                            $("#rcp").val(queryRCP).prop('selected', true);
-                        }
-
-                        getRCPvar = getQueryVariable('rcp');
-
-                        // check to see if comparing exists on sector load
-                        if (getRCPvar.indexOf("vs") !== -1 && selectedSector !== 'gridded_data') {
-                            // since comparison value is comparing, get new default from first 5 chars
-                            firstRCP = getRCPvar.split('vs')[0];
-                            // set default to best option available from compare value.
-                            $('#rcp option[value=' + firstRCP + ']').attr('selected', 'selected');
-                            // update url with new default
-                            update_param('rcp', firstRCP);
-                            // remove compare since no longer comparing
-                            $('body').removeClass('map-compare');
-                            // tell leaflet about changes
-                            invalidate_maps();
+                        if (selectedSector === v) {
+                            defaultSelectedSector = true;
                         } else {
-                            // update selected value of newly generated rcp list
-                            $('#rcp option[value=' + getRCPvar + ']').attr('selected', 'selected');
+                            defaultSelectedSector = false;
+                        }
+
+                        if (v === 'gridded_data') {
+                            var newOption = new Option(l10n_labels[v], '', defaultSelectedSector, defaultSelectedSector);
+                        } else {
+                            var newOption = new Option(l10n_labels[v], v, defaultSelectedSector, defaultSelectedSector);
                         }
 
 
-                        // doo the timesets
 
-                        if (acfTimeStep.includes("annual")) {
-                            // if ($('#mora').find("option[value='2qsapr']").length) {
-                            //     console.log('Quarterly Already Exist');
-                            // } else {
-                            // Create a DOM Option and pre-select by default
+                        $('#sector').append(newOption);
+                    });
 
-                            if (current_lang === 'fr') {
-                                var newOption = new Option('Annuel', 'ann', false, false);
-                            } else {
-                                var newOption = new Option('Annual', 'ann', false, false);
-                            }
 
-                            $('#mora').append(newOption);
-                            // }
-                            if (moraval === 'ann') {
+                    var_value = $("#var").val();
+                    //let dataset_name = $('input[name="dataset_switch"]:checked').val();
+                    let dataset_name = getQueryVariable('dataset');
+                    let scenarios = DATASETS[dataset_name].scenarios;
+                    dec_value = $("#decade").val();
 
-                                //$("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                                //$("#mora").val(moraval).prop('selected', true);
-                            }
+                    updated_slider_values = [];
+
+                    tsmax = parseInt(sv.time_slider_max_value);
+                    tsmin = parseInt(sv.time_slider_min_value);
+                    tsdef = parseInt(sv.time_slider_default_value);
+                    tsint = parseInt(sv.time_slider_interval);
+
+                    z = 0;
+
+                    for (i = tsmin; i <= tsmax; i += 10) {
+
+                        updated_slider_values.push(i + 1 + '-' + (i + tsint));
+
+
+                        if (i === parseInt(dec_value)) {
+                            newfrom = z;
                         }
-
-                        if (acfTimeStep.includes("monthly")) {
-
-                            if (current_lang === 'fr') {
-
-                                var moptgroup = "<optgroup label='Mensuel'>";
-                                moptgroup += "<option value='jan'>Janv.</option>";
-                                moptgroup += "<option value='feb'>Févr.</option>";
-                                moptgroup += "<option value='mar'>Mars</option>";
-                                moptgroup += "<option value='apr'>Avr.</option>";
-                                moptgroup += "<option value='may'>Mai</option>";
-                                moptgroup += "<option value='jun'>Juin</option>";
-                                moptgroup += "<option value='jul'>Juil.</option>";
-                                moptgroup += "<option value='aug'>Août</option>";
-                                moptgroup += "<option value='sep'>Sept.</option>";
-                                moptgroup += "<option value='oct'>Oct.</option>";
-                                moptgroup += "<option value='nov'>Nov.</option>";
-                                moptgroup += "<option value='dec'>Déc.</option>";
-                                moptgroup += "</optgroup>";
-                                $('#mora').append(moptgroup);
-
-                            } else {
-                                var moptgroup = "<optgroup label='Monthly'>";
-                                moptgroup += "<option value='jan'>January</option>";
-                                moptgroup += "<option value='feb'>February</option>";
-                                moptgroup += "<option value='mar'>March</option>";
-                                moptgroup += "<option value='apr'>April</option>";
-                                moptgroup += "<option value='may'>May</option>";
-                                moptgroup += "<option value='jun'>June</option>";
-                                moptgroup += "<option value='jul'>July</option>";
-                                moptgroup += "<option value='aug'>August</option>";
-                                moptgroup += "<option value='sep'>September</option>";
-                                moptgroup += "<option value='oct'>October</option>";
-                                moptgroup += "<option value='nov'>November</option>";
-                                moptgroup += "<option value='dec'>December</option>";
-                                moptgroup += "</optgroup>";
-                                $('#mora').append(moptgroup);
-
-                            }
-
-                            var months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
-                            if (months.includes(moraval)) {
-                                // $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                                $("#mora").val(moraval).prop('selected', true);
-                            }
-
-                        }
-
-                        if (acfTimeStep.includes("qsdec")) {
-
-                            if (current_lang === 'fr') {
-                                var soptgroup = "<optgroup label='Saisonnier'>";
-                                soptgroup += "<option value='spring'>Printemps</option>";
-                                soptgroup += "<option value='summer'>Été</option>";
-                                soptgroup += "<option value='fall'>Automne</option>";
-                                soptgroup += "<option value='winter'>Hiver</option>";
-                                soptgroup += "</optgroup>";
-                            } else {
-                                var soptgroup = "<optgroup label='Seasonal'>";
-                                soptgroup += "<option value='spring'>Spring</option>";
-                                soptgroup += "<option value='summer'>Summer</option>";
-                                soptgroup += "<option value='fall'>Fall</option>";
-                                soptgroup += "<option value='winter'>Winter</option>";
-                                soptgroup += "</optgroup>";
-                            }
-
-
-                            $('#mora').append(soptgroup);
-
-                            var seasons = ["spring", "summer", "fall", "winter"];
-                            if (seasons.includes(moraval)) {
-                                $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                            }
-
-                        }
-
-                        if (acfTimeStep.includes("2qsapr")) {
-                            // if ($('#mora').find("option[value='2qsapr']").length) {
-                            //     console.log('Quarterly Already Exist');
-                            // } else {
-                            // Create a DOM Option and pre-select by default
-
-
-                            if (current_lang === 'fr') {
-                                var newOption = new Option('Avril à Septembre', '2qsapr', false, false);
-                            } else {
-                                var newOption = new Option('April to September', '2qsapr', false, false);
-                            }
-
-
-                            if (moraval === '2qsapr') {
-                                $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                            }
-
-                            $('#mora').append(newOption);
-                            // }
-                        }
-
-                        if (!acfTimeStep.includes("annual") && moraval === 'ann') {
-                            $('#mora option:eq(0)').prop('selected', true).trigger('change.select2');
-                            update_param('mora', 'jan');
-                            update_query_string();
-                        }
-
-                        //
-                        // update_param('mora', moraval);
-                        // update_query_string();
-
-                        moraval = getQueryVariable('mora')
-
-                        // $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
-                        var_value = $("#var").val();
-                        mora_value = $("#mora").val();
-                        mora_text_value = $("#mora option:selected").text();
-                        rcp_value = $("#rcp").val();
-                        decade_value = parseInt($("#decade").val());
+                        z += 1;
                     }
-                });
+
+                    rs_instance.update({
+                        values: updated_slider_values,
+                        min: tsmin,
+                        max: tsmax,
+                        from: newfrom,
+                        to: tsmax,
+                        step: tsint,
+                    });
+
+                    var $rs = $("#range-slider");
+
+                    if ((selectedSector === 'gridded_data') && $.inArray('gridded_data', sv.availability) !== -1) {
+                        replaceGrid(sv.grid, gridLayer_options);
+                    }
+
+                    acfTimeStep = sv.timestep;
+
+                    $('#mora').empty();
+                    $('#rcp').empty();
+
+                    let rcpDropGroup = "";
+                    let rcpOptions = [];
+                    scenarios.forEach(function (scenario) {
+                        rcpOptions.push(scenario.name);
+                        rcpDropGroup += '<option value="{0}">{1}</option> '.format(scenario.name, scenario.label);
+                        if (selectedSector === 'gridded_data') {
+                            scenarios.forEach(function (scenario2) {
+                                if (scenario != scenario2) {
+                                    rcpOptions.push("{0}vs{1}".format(scenario.name, scenario2.name))
+                                    rcpDropGroup += '<option value="{0}vs{1}">{2} vs {3}</option> '.format(
+                                        scenario.name,
+                                        scenario2.name,
+                                        scenario.label,
+                                        scenario2.label);
+                                }
+                            });
+                        }});
+
+                    $('#rcp').append(rcpDropGroup);
+                    let queryRCP = getQueryVariable('rcp');
+                    if (rcpOptions.includes(queryRCP)) {
+                        $("#rcp").val(queryRCP).prop('selected', true);
+                    }
+
+                    getRCPvar = getQueryVariable('rcp');
+
+                    // check to see if comparing exists on sector load
+                    if (getRCPvar.indexOf("vs") !== -1 && selectedSector !== 'gridded_data') {
+                        // since comparison value is comparing, get new default from first 5 chars
+                        firstRCP = getRCPvar.split('vs')[0];
+                        // set default to best option available from compare value.
+                        $('#rcp option[value=' + firstRCP + ']').attr('selected', 'selected');
+                        // update url with new default
+                        update_param('rcp', firstRCP);
+                        // remove compare since no longer comparing
+                        $('body').removeClass('map-compare');
+                        // tell leaflet about changes
+                        invalidate_maps();
+                    } else {
+                        // update selected value of newly generated rcp list
+                        $('#rcp option[value=' + getRCPvar + ']').attr('selected', 'selected');
+                    }
 
 
+                    // doo the timesets
+
+                    if (acfTimeStep.includes("annual")) {
+                        // if ($('#mora').find("option[value='2qsapr']").length) {
+                        //     console.log('Quarterly Already Exist');
+                        // } else {
+                        // Create a DOM Option and pre-select by default
+
+                        if (current_lang === 'fr') {
+                            var newOption = new Option('Annuel', 'ann', false, false);
+                        } else {
+                            var newOption = new Option('Annual', 'ann', false, false);
+                        }
+
+                        $('#mora').append(newOption);
+                        // }
+                        if (moraval === 'ann') {
+
+                            //$("#mora").val(moraval).prop('selected', true).trigger('change.select2');
+                            //$("#mora").val(moraval).prop('selected', true);
+                        }
+                    }
+
+                    if (acfTimeStep.includes("monthly")) {
+
+                        if (current_lang === 'fr') {
+
+                            var moptgroup = "<optgroup label='Mensuel'>";
+                            moptgroup += "<option value='jan'>Janv.</option>";
+                            moptgroup += "<option value='feb'>Févr.</option>";
+                            moptgroup += "<option value='mar'>Mars</option>";
+                            moptgroup += "<option value='apr'>Avr.</option>";
+                            moptgroup += "<option value='may'>Mai</option>";
+                            moptgroup += "<option value='jun'>Juin</option>";
+                            moptgroup += "<option value='jul'>Juil.</option>";
+                            moptgroup += "<option value='aug'>Août</option>";
+                            moptgroup += "<option value='sep'>Sept.</option>";
+                            moptgroup += "<option value='oct'>Oct.</option>";
+                            moptgroup += "<option value='nov'>Nov.</option>";
+                            moptgroup += "<option value='dec'>Déc.</option>";
+                            moptgroup += "</optgroup>";
+                            $('#mora').append(moptgroup);
+
+                        } else {
+                            var moptgroup = "<optgroup label='Monthly'>";
+                            moptgroup += "<option value='jan'>January</option>";
+                            moptgroup += "<option value='feb'>February</option>";
+                            moptgroup += "<option value='mar'>March</option>";
+                            moptgroup += "<option value='apr'>April</option>";
+                            moptgroup += "<option value='may'>May</option>";
+                            moptgroup += "<option value='jun'>June</option>";
+                            moptgroup += "<option value='jul'>July</option>";
+                            moptgroup += "<option value='aug'>August</option>";
+                            moptgroup += "<option value='sep'>September</option>";
+                            moptgroup += "<option value='oct'>October</option>";
+                            moptgroup += "<option value='nov'>November</option>";
+                            moptgroup += "<option value='dec'>December</option>";
+                            moptgroup += "</optgroup>";
+                            $('#mora').append(moptgroup);
+
+                        }
+
+                        var months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+                        if (months.includes(moraval)) {
+                            // $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
+                            $("#mora").val(moraval).prop('selected', true);
+                        }
+
+                    }
+
+                    if (acfTimeStep.includes("qsdec")) {
+
+                        if (current_lang === 'fr') {
+                            var soptgroup = "<optgroup label='Saisonnier'>";
+                            soptgroup += "<option value='spring'>Printemps</option>";
+                            soptgroup += "<option value='summer'>Été</option>";
+                            soptgroup += "<option value='fall'>Automne</option>";
+                            soptgroup += "<option value='winter'>Hiver</option>";
+                            soptgroup += "</optgroup>";
+                        } else {
+                            var soptgroup = "<optgroup label='Seasonal'>";
+                            soptgroup += "<option value='spring'>Spring</option>";
+                            soptgroup += "<option value='summer'>Summer</option>";
+                            soptgroup += "<option value='fall'>Fall</option>";
+                            soptgroup += "<option value='winter'>Winter</option>";
+                            soptgroup += "</optgroup>";
+                        }
 
 
+                        $('#mora').append(soptgroup);
 
+                        var seasons = ["spring", "summer", "fall", "winter"];
+                        if (seasons.includes(moraval)) {
+                            $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
+                        }
+
+                    }
+
+                    if (acfTimeStep.includes("2qsapr")) {
+                        // if ($('#mora').find("option[value='2qsapr']").length) {
+                        //     console.log('Quarterly Already Exist');
+                        // } else {
+                        // Create a DOM Option and pre-select by default
+
+
+                        if (current_lang === 'fr') {
+                            var newOption = new Option('Avril à Septembre', '2qsapr', false, false);
+                        } else {
+                            var newOption = new Option('April to September', '2qsapr', false, false);
+                        }
+
+
+                        if (moraval === '2qsapr') {
+                            $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
+                        }
+
+                        $('#mora').append(newOption);
+                        // }
+                    }
+
+                    if (!acfTimeStep.includes("annual") && moraval === 'ann') {
+                        $('#mora option:eq(0)').prop('selected', true).trigger('change.select2');
+                        update_param('mora', 'jan');
+                        update_query_string();
+                    }
+
+                    //
+                    // update_param('mora', moraval);
+                    // update_query_string();
+
+                    moraval = getQueryVariable('mora')
+
+                    // $("#mora").val(moraval).prop('selected', true).trigger('change.select2');
+                    var_value = $("#var").val();
+                    mora_value = $("#mora").val();
+                    mora_text_value = $("#mora option:selected").text();
+                    rcp_value = $("#rcp").val();
+                    decade_value = parseInt($("#decade").val());
+                }
             });
+
 
 
             queryVal = getQueryVariable('val');

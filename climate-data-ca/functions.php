@@ -330,11 +330,12 @@ function distance($lat1, $lon1, $lat2, $lon2)
 
 }
 
-// Return a string of valid javascript that create a Map object including all ACF fields of all variables
-function render_variables_fields(){
-    $rendered_fields = '<script type="text/javascript">const varData = new Map();';
+// Return a string of valid javascript (enclosed in <script> tag) that create a Map object including all ACF fields of all variables
+function render_variables_fields()
+{
+    $rendered_variables_fields_script = '<script type="text/javascript">const varData = new Map();';
 
-    $the_query = new WP_Query(array(
+    $the_wp_query = new WP_Query(array(
             'post_type' => 'variable',
             'status' => 'publish',
             'orderby' => 'menu_order',
@@ -342,18 +343,18 @@ function render_variables_fields(){
             'posts_per_page' => -1)
     );
 
-    if ($the_query->have_posts()) {
-    while ($the_query->have_posts()) {
-            $the_query->the_post();
+    if ($the_wp_query->have_posts()) {
+        while ($the_wp_query->have_posts()) {
+            $the_wp_query->the_post();
             $var_fields = get_fields();
             $var_name = $var_fields['var_name'];
             if ($var_name != 'slr') {
-                $rendered_fields.="varData.set('$var_name', " . json_encode(get_fields()) . ");\n";
+                $rendered_variables_fields_script .= "varData.set('$var_name', " . json_encode(get_fields()) . ");\n";
             }
         }
     }
-    $rendered_fields .= '</script>';
-    return $rendered_fields;
+    $rendered_variables_fields_script .= '</script>';
+    return $rendered_variables_fields_script;
 }
 
 function get_location_by_coords($lat, $lon, $sealevel=false)

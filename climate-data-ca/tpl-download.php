@@ -51,6 +51,8 @@ add_action('wp_enqueue_scripts', 'tpl_enqueue');
 
 get_header();
 
+echo render_variables_fields();
+
 if (have_posts()) : while (have_posts()) : the_post();
 
     $get_start_date = isset($_GET['start_date']) ? $_GET['start_date'] : '';

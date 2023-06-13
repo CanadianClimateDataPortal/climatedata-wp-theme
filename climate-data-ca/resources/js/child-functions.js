@@ -34,7 +34,6 @@ var l10n_table = {
         "Copied to clipboard": "Copié dans le presse-papier",
         "Error" : "Erreur",
         "Copy link": "Copier le lien",
-        "Share this analyze form" : "Partagez ce formulaire d'analyse",
 
         //  feedback form
         'Thanks! We’ve received your inquiry.' : 'Merci! Nous avons reçu votre demande.',

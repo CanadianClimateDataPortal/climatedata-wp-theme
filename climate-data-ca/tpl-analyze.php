@@ -450,19 +450,19 @@
 
                 </div>
 
-                <div class="copy-link">
-                  <h6><?php _e('Share this analyze form', 'cdc' ); ?></h6>
-                  <div id="post-share-wrap">
-                    <div id="share"></div>
-                  </div>
-                    <a id="shareableURL" href="#" class="share-link share-permalink" data-share-url="">
-                      <h5>
-                        <i class="icon fas fa-share-alt mr-3"></i>
-                        <span class="label"> <?php _e('Copy link', 'cdc'); ?> </span>
-                      </h5>
-                    </a>
-                  </div>
+              <div class="copy-link">
+                <h6><?php _e('Share this analyze form', 'cdc' ); ?></h6>
+                <div id="post-share-wrap">
+                  <div id="share"></div>
                 </div>
+                  <a id="shareableURL" href="#" class="share-link share-permalink" data-share-url="">
+                    <h5>
+                      <i class="icon fas fa-share-alt mr-3"></i>
+                      <span class="label"> <?php _e('Copy link', 'cdc'); ?> </span>
+                    </h5>
+                  </a>
+                </div>
+              </div>
 
             </form>
           </div>

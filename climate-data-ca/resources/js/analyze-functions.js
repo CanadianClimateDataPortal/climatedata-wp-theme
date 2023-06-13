@@ -356,9 +356,9 @@
 
             }).addTo(maps['analyze']);
 
-            // Check if the url contains a query string parametre (ex.: ?param=value&param2=value2)
-            if(window.location.search !== '') {
-                readURL()
+            // Check if the url contains a query string parameter (ex.: ?param=value&param2=value2)
+            if (window.location.search !== '') {
+                readURL();
             }
             validate_steps();
             validate_inputs();
@@ -1954,24 +1954,24 @@
         }
 
 
-        function buildShareableURL(form_inputs_dict) {
+        function buildShareableURL(formInputsDict) {
             // Cleaning values
-            form_inputs_dict['submit_url_var'] = submit_url_var;
+            formInputsDict['submit_url_var'] = submit_url_var;
             // Passing by encodingURI makes it easier to read on the reception
-            form_inputs_dict['form_thresholds'] = encodeURI(JSON.stringify(form_thresholds));
+            formInputsDict['form_thresholds'] = encodeURI(JSON.stringify(form_thresholds));
 
             // Compressing the [lat,long] points to a compressed string
-            let latAray = form_inputs['lat'].split(',');
+            let latArray = form_inputs['lat'].split(',');
             let lonArray = form_inputs['lon'].split(',');
-            form_inputs_dict["compressedPoints"] = getEncodedPoints(latAray,lonArray);
+            formInputsDict["compressedPoints"] = getEncodedPoints(latArray,lonArray);
 
             // Emptying the lat & lon arrays because of the use of the compressed string to shorten the shareable url
-            delete form_inputs_dict['lat']
-            delete form_inputs_dict['lon']
+            delete formInputsDict['lat'];
+            delete formInputsDict['lon'];
        
             // Building the shareable url
             // Convert dict to url &param=value like
-            let params = new URLSearchParams(form_inputs_dict);
+            let params = new URLSearchParams(formInputsDict);
 
             let baseUrl = document.URL.split('?')[0];
 
@@ -2017,151 +2017,25 @@
             }, 500)
         }
 
-        // // Return a compressed string representing a list of points - [[lat,lon]]
-        // function getEncodedPoints(latArray, lonArray) {
-        //     if (latArray.length !== lonArray.length){
-        //         throw new Error('LatArray and LonArray must have same number of elements');
-        //     }
-
-        //     let points = []
-
-
-        //     for (var i in latArray) {
-        //         points.push([latArray[i], lonArray[i]])
-        //     }
-
-        //     let compressedLatLongPoints = compressLatLonPointsToString(points)
-
-        //     return compressedLatLongPoints
-        // }
-
-        // // This method compresse a list of point to a short string 
-        // // Source of the following code : https://learn.microsoft.com/en-us/bingmaps/rest-services/elevations/point-compression-algorithm
-        // function compressLatLonPointsToString(points) {
-        //     const SAFE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
-        //     const MULTIPLIER = 100;
-        //     const DIVIDER = 32;
-
-        //     var result = "";
-        //     var latitude = 0;
-        //     var longitude = 0;
-
-        //     // console.log("ENCODING",points)
-
-        //     for (var i in points) {
-        //         var newLat = Math.round(points[i][0] * MULTIPLIER);
-        //         var newLon = Math.round(points[i][1] * MULTIPLIER);
-
-        //         var dy = newLat - latitude;
-        //         var dx = newLon - longitude;
-
-        //         latitude = newLat;
-        //         longitude = newLon;
-        //         dy = (dy << 1) ^ (dy >> 31);
-        //         dx = (dx << 1) ^ (dx >> 31);
-
-        //         var index = ((dy + dx) * (dy + dx + 1)) / 2 + dy;
-
-        //         while (index > 0) {
-        //             var rem = index & 31;
-
-        //             index = (index - rem) / DIVIDER;
-
-        //             if (index > 0) {
-        //                 rem += DIVIDER;
-        //             }
-
-        //             result += SAFE_CHARACTERS[rem];
-        //         }
-        //     }
-        //     return result;
-        // }
-
-        // // This method decompresse the short random
-        // function decompressLatLonPointsStringToList(compressedValue) {
-        //     const SAFE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
-        //     const MULTIPLIER = 100;
-        //     const DIVIDER = 32;
-
-        //     var latLon = [];
-        //     var pointsArray = [];
-        //     var point = [];
-        //     var lastLat = 0,
-        //         lastLon = 0;
-
-        //     for (var i = 0; i < compressedValue.length; i++) {
-        //         var num = SAFE_CHARACTERS.indexOf(compressedValue[i]);
-
-        //         if (num < DIVIDER) {
-        //             point.push(num);
-        //             pointsArray.push(point);
-        //             point = [];
-        //         } else {
-        //             num -= DIVIDER;
-        //             point.push(num);
-        //         }
-        //     }
-
-        //     for (var y in pointsArray) {
-        //         var result = 0;
-        //         var list = pointsArray[y].reverse();
-
-        //         for (var x in list) {
-        //             if (result == 0) {
-        //                 result = list[x];
-        //             } else {
-        //                 result = result * DIVIDER + list[x];
-        //             }
-        //         }
-
-        //         var dIag = parseInt((Math.sqrt(8 * result + 5) - 1) / 2);
-
-        //         var latY = result - (dIag * (dIag + 1)) / 2;
-        //         var lonX = dIag - latY;
-
-        //         if (latY % 2 == 1) {
-        //             latY = (latY + 1) * -1;
-        //         }
-        //         if (lonX % 2 == 1) {
-        //             lonX = (lonX + 1) * -1;
-        //         }
-
-        //         latY /= 2;
-        //         lonX /= 2;
-        //         var lat = latY + lastLat;
-        //         var lon = lonX + lastLon;
-
-        //         lastLat = lat;
-        //         lastLon = lon;
-        //         lat /= MULTIPLIER;
-        //         lon /= MULTIPLIER;
-
-        //         // latLon.push(lat, lon);
-        //         latLon.push({
-        //             "point": [lat, lon]
-        //         })
-        //     }
-
-
-        //     return latLon;
-        // }
-
+        // Fetch points based on the compressedValue and trigger every points on the map to click the shape layer
         function selectMapPoints(compressedValue) {
+            let getGidsFromCompressedPointsURL = DATA_URL+"/get-gids/" + compressedValue + "?gridname=canadagrid";
+            fetch(getGidsFromCompressedPointsURL, {
+                method: "GET",
+                mode: "cors",
+            }).then((response) => response.json())
+              .then((result) => {
+                let latLonArray = decompressLatLonPointsStringToList(compressedValue);
 
-            fetch("https://dataclimatedata.crim.ca/get-gids/" + compressedValue + "?gridname=canadagrid")
-                .then((response) => response.json())
-                .then((result) => {
+                for (var i in result) {
+                    latLonArray[i]['id'] = result[i];
+                }
 
-                    let latLonArray = decompressLatLonPointsStringToList(compressedValue)
-
-                    for (var i in result) {
-                        latLonArray[i]['id'] = result[i]
-                    }
-
-                    triggerMapGrid(latLonArray)
-                })
+                triggerMapGrid(latLonArray);
+            })
         }
 
+        // Add points to the selected Grid on the map to highlight the grid layer
         function triggerMapGrid(points) {
             // points = [ {"id":123, "point":[lat, lon]}]
 
@@ -2180,7 +2054,7 @@
                     fill: true,
                     radius: 4,
                     fillOpacity: 0.1
-                })
+                });
             });
 
         }
@@ -2190,84 +2064,83 @@
         function fillAnalyzeFormFromInputs(formInputs) {
 
             // --- CHOOSE A DATASET ---
-            let dataset = formInputs['dataset']
-            $(`input[value='${dataset}']`).click()
+            let dataset = formInputs['dataset'];
+            $(`input[value='${dataset}']`).click();
 
 
             // --- SELECT LOCATIONS ---
-            $("#ui-id-5").click() // Accordion
-            $("#btn-activate-map").click()
-            $("#analyze-location-grid").click()
-            selectMapPoints(formInputs['compressedPoints'])
+            $("#ui-id-5").click(); // Accordion
+            $("#btn-activate-map").click();
+            $("#analyze-location-grid").click();
+            selectMapPoints(formInputs['compressedPoints']);
 
 
             // --- CUSTOMIZE VARIABLES ---
-            $("#ui-id-7").click() // Accordion
-            let custom_var = formInputs['submit_url_var']
+            $("#ui-id-7").click(); // Accordion
+            let custom_var = formInputs['submit_url_var'];
             // Must query by id rather then value otherwise break the map layer
-            $(`input[id='analyze-var-${custom_var}']`).click() 
+            $(`input[id='analyze-var-${custom_var}']`).click();
 
 
             // --- INSERT THRESHOLDS ---
-            let tresholds = formInputs['form_thresholds']
+            let tresholds = formInputs['form_thresholds'];
             for (let key in tresholds) {
-                let value = tresholds[key]
+                let value = tresholds[key];
 
                 // If a key is an option of a select menu
                 if (key === "op") {
-                    $(`select[name="op"]`).val(value)
-                }
-                else {
+                    $(`select[name="op"]`).val(value);
+                } else {
                     value = value.split(" ")[0] // Split because value contain units (ex.: 0 K days)
-                    $(`input[name=${key}]`).val(value)
+                    $(`input[name=${key}]`).val(value);
                 }
             }
 
 
             // --- CHOOSE A TIMEFRAME ---
-            $("#ui-id-9").click() // Accordion
-            $("select[id='analyze-timeframe-start']").val(formInputs['start_date'])
+            $("#ui-id-9").click(); // Accordion
+            $("select[id='analyze-timeframe-start']").val(formInputs['start_date']);
             // Adding change to trigger the event that enables the next accordion
-            $("select[id='analyze-timeframe-end']").val(formInputs['end_date']).change()
+            $("select[id='analyze-timeframe-end']").val(formInputs['end_date']).change();
 
 
             // --- ADVANCED ---
-            $("#ui-id-11").click() // Accordion
+            $("#ui-id-11").click(); // Accordion
 
             // Selecting scenarios
-            let scenarios = formInputs['scenario'].split(',')
+            let scenarios = formInputs['scenario'].split(',');
             scenarios.forEach(scenario => {
                 // Select values other then the default value "ssp126"
                 if (["ssp126"].includes(scenario) == false) {
-                    $(`input[value='${scenario}']`).click()
+                    $(`input[value='${scenario}']`).click();
                 }
             })
 
             // Ensemble Precentiles
-            let ensemblePercentiles = formInputs['ensemble_percentiles'].split(',')
+            let ensemblePercentiles = formInputs['ensemble_percentiles'].split(',');
             ensemblePercentiles.forEach(percent => {
                 // Select values other then the default value "10","50","90"
                 if (["10", "50", "90"].includes(percent) == false) {
-                    $(`input[name="ensemble_percentiles"][value="${percent}"]`).click()
+                    $(`input[name="ensemble_percentiles"][value="${percent}"]`).click();
                 }
             })
 
             // Selecting Frequency
-            let frequency = formInputs['freq']
-            $(`input[value='${frequency}']`).click()
+            let frequency = formInputs['freq'];
+            $(`input[value='${frequency}']`).click();
 
             // Selecting Output Format
-            let outputFormat = formInputs['output_format']
-            $(`input[value='${outputFormat}']`).click()
+            let outputFormat = formInputs['output_format'];
+            $(`input[value='${outputFormat}']`).click();
 
             // Setting the csv decimal precision value
             if (outputFormat === "csv") {
-                $("#analyze-decimals").val(formInputs["csv_precision"])
+                $("#analyze-decimals").val(formInputs["csv_precision"]);
             }
 
 
             // Show submit
-            $('#analyze-submit').slideDown()
+            $('#analyze-submit').slideDown();
         }
 
 

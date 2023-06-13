@@ -61,6 +61,22 @@ h1, h2, h3, h4, h5, h6,
 
 // BOOTSTRAP
 
+// button groups
+
+.btn-group {
+  & > .rounded-pill {
+    &:not(:last-child) {
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+    
+    &:not(:first-child) {
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+    }
+  }
+}
+
 // breadcrumb
 
 .breadcrumb {
@@ -1060,46 +1076,6 @@ body.overlay-open[data-overlay-content="video"] {
     z-index: 1;
   }
 
-  .supermenu-slide {
-    header {
-      margin-bottom: 40px;
-    }
-
-    h5 {
-      margin: 0;
-      @include all-caps;
-    }
-
-    h6 {
-      color: $blue-medium;
-    }
-
-    ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-
-      li {
-        margin: 0 0 0.4em 0;
-      }
-
-      a {
-        &.current-item {
-
-        }
-      }
-    }
-
-    label {
-      font-size: 1.6em;
-    }
-  }
-
-  .cdc-icon {
-    margin: 0 15px 0 0;
-    font-size: 3.2em;
-  }
-
   .supermenu-carousel-controls {
     span {
       display: inline-block;
@@ -1115,6 +1091,47 @@ body.overlay-open[data-overlay-content="video"] {
     }
   }
 }
+
+.supermenu-slide {
+  header {
+    margin-bottom: 40px;
+  }
+
+  h5 {
+    margin: 0;
+    @include all-caps;
+  }
+
+  h6 {
+    color: $blue-medium;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      margin: 0 0 0.4em 0;
+    }
+
+    a {
+      &.current-item {
+
+      }
+    }
+  }
+
+  label {
+    font-size: 1.6em;
+  }
+  
+  .cdc-icon {
+    margin: 0 15px 0 0;
+    font-size: 3.2em;
+  }
+}
+
 
 #location-search-container {
 	margin-bottom: 10em;
@@ -1451,26 +1468,10 @@ body.overlay-open[data-overlay-content="video"] {
   }
 }
 
-//
-// HACKS
-//
-
-.page-id-1712 {
-  .select2-results__options {
-    [id*="frost_days"],
-    [id*="ice_days"] {
-      display: none;
-    }
-  }
-}
-
-.page-id-2268 {
-  .select2-results__options {
-    [id*="frost_days"],
-    [id*="ice_days"] {
-      display: none;
-    }
-  }
+// Katex plugin font size override
+.katex-eq {
+  font-size: 1.9em;
+  line-height: 1.9em;
 }
 
 //

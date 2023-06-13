@@ -151,6 +151,16 @@
                         radius: 4,
                         fillOpacity: 0
                     }
+                },
+                'era5landgrid': function (properties, zoom) {
+                    return {
+                        weight: 0.1,
+                        color: gridline_color,
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0
+                    }
                 }
             },
             bounds: canadaBounds,
@@ -553,17 +563,63 @@
         
         $('body').on('click', '.geo-select-pan-btn', function() {
             
-            let this_zoom = map1.getZoom()
+            let thislat = parseFloat($(this).attr('data-lat')),
+                thislon = parseFloat($(this).attr('data-lon')),
+                this_zoom = map1.getZoom()
             
             if (this_zoom < 7) {
                 this_zoom = 7
             }
             
-            map1.setView([parseFloat($(this).attr('data-lat')), parseFloat($(this).attr('data-lon'))], this_zoom);
+            map1.setView([thislat, thislon], this_zoom);
             
             $('#select2-geo-select-container').text($(this).attr('data-lat') + ', ' + $(this).attr('data-lon'))
             
             $("#geo-select").select2('close')
+            
+            // highlight grid
+            
+            let varDetails = varData.get($("#var").val());
+            
+            $.ajax({
+                url: hosturl + "/geoserver/CDC/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo" +
+                    "&QUERY_LAYERS=CDC%3A" + varDetails.grid + "&LAYERS=CDC%3A" + varDetails.grid +
+                    "&INFO_FORMAT=application%2Fjson" + "&FEATURE_COUNT=50&X=50&Y=50&SRS=EPSG%3A4326&" +
+                    "WIDTH=101&HEIGHT=101&BBOX=" + thislon + "%2C" + thislat + "%2C" +
+                    (parseFloat(thislon) + 0.0001) + "%2C" + (parseFloat(thislat) + 0.00001),
+                dataType: 'json',
+                success: function (data) {
+            
+                    if (data.features.length) {
+            
+                        if (highlighted_feature) {
+            
+                            gridLayer.resetFeatureStyle(highlighted_feature)
+            
+                            if (has_mapRight == true) {
+                                gridLayerRight.resetFeatureStyle(highlighted_feature)
+                            }
+            
+                        }
+            
+                        highlighted_feature = data.features[0].properties.gid;
+            
+                        gridLayer.setFeatureStyle(highlighted_feature, {
+                            weight: 1.5,
+                            color: '#f00',
+                            opacity: 1
+                        });
+            
+                        if (has_mapRight == true) {
+                            gridLayerRight.setFeatureStyle(highlighted_feature, {
+                                weight: 1.5,
+                                color: '#f00',
+                                opacity: 1
+                            });
+                        }
+                    }
+                }
+            });
             
         })
 
@@ -799,7 +855,7 @@
             // no tooltip available for SPEI  (i.e. hasdelta == false)
             getVarData(function (data) {
                 let varDetails = data.get(var_value);
-                if(varDetails.hasdelta != false) {
+                if(varDetails.hasdelta !== false) {
                     gridHoverTimeout = setTimeout(function () {
                         let decade_value = parseInt($("#decade").val()) + 1;
                         let delta = $('input[name="absolute_delta_switch"]:checked').val() === 'd';
@@ -807,7 +863,7 @@
                         let dataset_name = $('input[name="dataset_switch"]:checked').val();
                         let values_url;
 
-                        if (sector == "") { // gridded
+                        if (sector === "") { // gridded
                             values_url = data_url + "/get-delta-30y-gridded-values/" +
                             e.latlng['lat'] + "/" + e.latlng['lng'] +
                             "/" + var_value + "/" + mora_value +
@@ -835,7 +891,19 @@
                                     e.target.opposite.bindTooltip(format_grid_hover_tooltip(data, rcp, varDetails, delta, sector, e)
                                     ).openTooltip(e.latlng);
                                 }
+                            },
+                            // jQuery throws parsererror if the JSON includes NaN. The API returns NaN when no data is available
+                            error: function (_ , status) {
+                                if (status !== 'abort') {
+                                    let tip = [];
+                                    if (sector !== "") {
+                                        tip.push(e.layer.properties[l10n_labels.label_field] + "<br>");
+                                    }
+                                    tip.push(T("No data available for this area."));
+                                    e.target.bindTooltip(tip.join("\n"), {sticky: true}).openTooltip(e.latlng);
+                                }
                             }
+
                         });
                     }, 100);
                 }});
@@ -999,80 +1067,82 @@
             } else {
                 aordChoroPath = "";
             }
+            getVarData(function (data) {
+                let varDetails = data.get(var_value);
+                choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency
+                    + '/?period=' + year + aordChoroPath + '&dataset_name=' + dataset_name + '&decimals=' + varDetails.decimals;
 
-            choroPath = hosturl + '/get-choro-values/' + sector + '/' + variable + '/' + rcp + '/' + frequency
-                + '/?period=' + year + aordChoroPath + '&dataset_name=' + dataset_name;
 
+                $.getJSON(choroPath).then(function (data) {
 
-            $.getJSON(choroPath).then(function (data) {
+                    choroValues = data;
 
-                choroValues = data;
-
-                if (map1.hasLayer(choroLayer)) {
-                    choroLayer.rcp = rcp;
-                    for (let i = 0; i < choroValues.length; i++)
-                        choroLayer.resetFeatureStyle(i);
-                } else {
-                    var layerStyles = {};
-                    layerStyles[currentSector] = function (properties, zoom) {
-                        return {
-                            weight: 0.5,
-                            color: 'white',
-                            fillColor: getColor(choroValues[properties.id]),
-                            opacity: 1,
-                            fill: true,
-                            radius: 4,
-                            fillOpacity: 1
-                        }
-                    };
-
-                    choroLayer = L.vectorGrid.protobuf(
-                        hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf",
-                        {
-                            rendererFactory: L.canvas.tile,
-                            interactive: true,
-                            getFeatureId: function (f) {
-                                return f.properties.id;
-                            },
-                            name: 'geojson',
-                            pane: 'sector',
-                            maxNativeZoom: 12,
-                            bounds: canadaBounds,
-                            maxZoom: 12,
-                            minZoom: 3,
-                            vectorTileLayerStyles: layerStyles
-                        }
-                    ).on('mouseover', function (e) {
-                        choroLayer.setFeatureStyle(
-                            e.layer.properties.id,
-                            {
+                    if (map1.hasLayer(choroLayer)) {
+                        choroLayer.rcp = rcp;
+                        for (let i = 0; i < choroValues.length; i++)
+                            choroLayer.resetFeatureStyle(i);
+                    } else {
+                        var layerStyles = {};
+                        layerStyles[currentSector] = function (properties, zoom) {
+                            return {
+                                weight: 0.5,
                                 color: 'white',
-                                fillColor: getColor(choroValues[e.layer.properties.id]),
-                                weight: 1.5,
+                                fillColor: getColor(choroValues[properties.id]),
+                                opacity: 1,
                                 fill: true,
                                 radius: 4,
-                                opacity: 1,
                                 fillOpacity: 1
-                            });
-                        grid_hover(e, sector);
+                            }
+                        };
+
+                        choroLayer = L.vectorGrid.protobuf(
+                            hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + sector + "/{z}/{x}/{-y}.pbf",
+                            {
+                                rendererFactory: L.canvas.tile,
+                                interactive: true,
+                                getFeatureId: function (f) {
+                                    return f.properties.id;
+                                },
+                                name: 'geojson',
+                                pane: 'sector',
+                                maxNativeZoom: 12,
+                                bounds: canadaBounds,
+                                maxZoom: 12,
+                                minZoom: 3,
+                                vectorTileLayerStyles: layerStyles
+                            }
+                        ).on('mouseover', function (e) {
+                                choroLayer.setFeatureStyle(
+                                    e.layer.properties.id,
+                                    {
+                                        color: 'white',
+                                        fillColor: getColor(choroValues[e.layer.properties.id]),
+                                        weight: 1.5,
+                                        fill: true,
+                                        radius: 4,
+                                        opacity: 1,
+                                        fillOpacity: 1
+                                    });
+                                grid_hover(e, sector);
+                            }
+                        ).on('mouseout', function (e) {
+                                choroLayer.resetFeatureStyle(e.layer.properties.id);
+                            }
+                        ).on('click', function (e) {
+
+                            current_sector['id'] = e.layer.properties.id;
+                            current_sector['label'] = e.layer.properties[l10n_labels.label_field];
+
+                            var_value = $("#var").val();
+                            mora_value = $("#mora").val();
+
+                            genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
+                        }).addTo(map1);
+                        choroLayer.rcp = rcp;
                     }
-                    ).on('mouseout', function (e) {
-                        choroLayer.resetFeatureStyle(e.layer.properties.id);
-                    }
-                    ).on('click', function (e) {
-
-                        current_sector['id'] = e.layer.properties.id;
-                        current_sector['label'] = e.layer.properties[l10n_labels.label_field];
-
-                        var_value = $("#var").val();
-                        mora_value = $("#mora").val();
-
-                        genSectorChart(current_sector['id'], var_value, mora_value, current_sector['label']);
-                    }).addTo(map1);
-                    choroLayer.rcp = rcp;
-                }
-            })
-        };
+                })
+            });
+        }
 
         map1.on('zoom', function (e) {
             grid_hover_cancel(null);
@@ -1158,7 +1228,7 @@
                                     'lat': lat,
                                     'lon': lon,
                                     'delta': delta,
-                                }, 'chart-placeholder');
+                                }, $('#chart-placeholder')[0]);
                         });
 
                 }
@@ -1186,7 +1256,7 @@
 
                     $.getJSON(hosturl + '/generate-regional-charts/' + query['sector'] + '/' + id
                         + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name).then(function (data) {
-                        displayChartData(data,varDetails, download_url, query, 'chart-placeholder');
+                        displayChartData(data,varDetails, download_url, query, $('#chart-placeholder')[0]);
                     });
 
                 }
@@ -1438,61 +1508,84 @@
             labels.push('<div class="legendRows">');
 
             var min_label = '';
+            
+            // what's the current opacity
+            let current_opacity = $('#opacity-slider').data('ionRangeSlider')['old_from'] / 100
 
             for (let i = 0; i < colormap.length; i++) {
                 unitValue = unit_localize(colormap[i].label);
                 unitColor = colormap[i].color;
+                
+                let row_class = 'legendRow'
+                
+                if (i == 0) {
+                    row_class += ' first'
+                } else if (i == colormap.length - 1) {
+                    row_class += ' last'
+                }
 
                 if (unitValue !== 'NaN') {
 
-                    style = 'background:' + unitColor;
-
                     t = "";
+                    
                     if (i == 0) {
-                        style = "; border-bottom: 10px solid " + unitColor +
-                            "; border-left: 8px solid transparent" +
-                            "; border-right: 8px solid transparent";
+                        
+                        // first row
+                            
                         t = '<span class="legendLabel max">' + first_label + '</span>';
 
                         labels.push(
-                            '<div class="legendRow">' +
+                            '<div class="' + row_class + '">' +
                             '<span class="legendLabel max">' + unitValue + '</span>' +
-                            '<div class="legendColor" style="border-bottom: 10px solid ' + unitColor +
+                            '<div class="legendColor" style="opacity: ' + current_opacity + '; border-bottom: 10px solid ' + unitColor +
                             '; border-left: 8px solid transparent; border-right: 8px solid transparent"></div>' +
                             '<span class="legendUnit">&gt; ' + unitValue + '</span>' +
                             '</div>'
                         );
-                    }
-                    else if (i == colormap.length - 1) {
+                        
+                    } else if (i == colormap.length - 1) {
+                        
                         labels.push(
-                            '<div class="legendRow">' +
+                            '<div class="' + row_class + '">' +
                             '<span class="legendLabel min">' + unitValue + '</span>' +
-                            '<div class="legendColor" style="border-top: 10px solid ' + unitColor +
+                            '<div class="legendColor" style="opacity: ' + current_opacity + '; border-top: 10px solid ' + unitColor +
                             '; border-left: 8px solid transparent; border-right: 8px solid transparent"></div>' +
                             '<span class="legendUnit">&lt; ' + unitValue + '</span>' +
-                            '</div>');
+                            '</div>'
+                        );
+                        
                     } else {
+                        
+                        // last row
+                        
                         labels.push(
-                            '<div class="legendRow">' +
-                            '<div class="legendColor" style="' + style + '"></div>' +
+                            '<div class="' + row_class + '">' +
+                            '<div class="legendColor" style="opacity: ' + current_opacity + '; background-color:' + unitColor + ';"></div>' +
                             '<div class="legendUnit">' + unitValue + '</div>' +
-                            '</div>');
+                            '</div>'
+                        );
+                        
                     }
 
                 } else {
+                    
                     if (i == colormap.length - 1) {
+                        
+                        // last row if no unit
+                        
                         labels.push(
-                            '<div class="legendRow">' +
+                            '<div class="' + row_class + ' zero">' +
                             '<span class="legendLabel ">0</span>' +
-                            '<div class="legendColor" style="background:' + unitColor + '"></div>' +
+                            '<div class="legendColor" style="opacity: ' + current_opacity + '; background-color:' + unitColor + '"></div>' +
                             '<span class="legendUnit">0</span>' +
-                            '</div>');
+                            '</div>'
+                        );
+                        
                     }
                 }
             }
 
             labels.push('</div><!-- .legendRows -->');
-
 
             return labels;
 
@@ -1698,7 +1791,9 @@
                 rightLayer.setOpacity(value / 100);
             }
 
-            $('.leaflet-sector-pane').css('opacity', value / 100);
+            $('.leaflet-sector-pane').css('opacity', value / 100)
+            $('.legend .legendColor').css('opacity', value / 100)
+            
         }
 
         loadClimateNormals();
@@ -2208,6 +2303,7 @@
                 } else {
                     // console.log('----- ' + history_action + ' -----');
                 }
+                $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(new_url, url_encoder_salt).encoded);
             }
             history_action = 'push';
         }
@@ -2399,24 +2495,32 @@
                 let mora_value = $("#mora").val();
 
                 // enable/disable controls.
-                // Fact: all variables with hasdelta == false doesn't has CMIP5/6 selection, nor summary selection
+                // Fact: all variables with hasdelta == false doesn't have summary selection
                 if(varDetails.hasdelta !== undefined && varDetails.hasdelta === false) {
                     $('input[name="absolute_delta_switch"]').attr("disabled", true);
                     $('input[name="absolute_delta_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
 
-                    // revert back to cmip5 for variables that doesn't have cmip6 data yet
-                    if (dataset_name != 'cmip5') {
-                        $('#toggle-cmip5').trigger('click');
-                    }
-                    $('input[name="dataset_switch"]').attr("disabled", true);
-                    $('input[name="dataset_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
                     $('select[name="sector"]').attr("disabled", true);
                 } else {
                     $('input[name="absolute_delta_switch"]').attr("disabled", false);
                     $('input[name="absolute_delta_switch"]').closest('div').find('.toggle-inside').removeClass('disabled');
-                    $('input[name="dataset_switch"]').attr("disabled", false);
-                    $('input[name="dataset_switch"]').closest('div').find('.toggle-inside').removeClass('disabled');
+
                     $('select[name="sector"]').attr("disabled", false);
+                }
+
+                // in which dataset this variable is available? Default to all if the ACF field is not yet present
+                let dataset_availability=(varDetails.dataset_availability !== undefined ? varDetails.dataset_availability : Object.keys(DATASETS));
+
+                $('input[name="dataset_switch"]').attr("disabled", false);
+                $('input[name="dataset_switch"]').closest('div').find('.toggle-inside').removeClass('disabled');
+
+                // switch to first available dataset if the currently selected one is unavailable
+                if (!dataset_availability.includes(dataset_name)) {
+                    $('#toggle-' + dataset_availability[0]).trigger('click');
+                }
+                if (dataset_availability.length < 2) {
+                    $('input[name="dataset_switch"]').attr("disabled", true);
+                    $('input[name="dataset_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
                 }
 
                 if (query['var-group'] === 'station-data') {
@@ -2979,16 +3083,15 @@
                 update_query_string();
 
             }
-
-            // prevent from firing multiple times
-            map1.off('moveend', mapMoveEnd);
-            setTimeout(function () {
-                map1.on('moveend', mapMoveEnd);
-            }, 300);
-
+            e.target.mapMoveEndTimeout = null;
         }
 
-        map1.on('moveend', mapMoveEnd);
+        map1.on('moveend', function(e){
+            if (typeof e.target.mapMoveEndTimeout !== 'undefined' && e.target.mapMoveEndTimeout !== null) {
+                clearTimeout(e.target.mapMoveEndTimeout);
+            }
+            e.target.mapMoveEndTimeout = setTimeout(function() { mapMoveEnd(e)}, 300);
+        });
 
         // OVERLAY
 
@@ -3152,6 +3255,9 @@
                 $('[data-original-title]').popover('hide');
             }
         });
+
+        // initially update screenshot button link
+        $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(window.location.href, url_encoder_salt).encoded);
 
     });
 })(jQuery);

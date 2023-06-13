@@ -1528,11 +1528,16 @@
                         $request.fail(failure);
                         // $('.select2-results__option').text('custom');
                         $('.select2-results__options').empty();
-                        $('.select2-results__options').append('<li style="padding:10px"><strong>Custom Lat/Lon Detected:</strong><br>Map has panned to validated coordinates.</li>');
+                        // $('.select2-results__options').append('<li style="padding:10px"><strong>Custom Lat/Lon Detected:</strong><br>Map has panned to validated coordinates.</li>');
+                        
                         var term_segs = term.split(',');
                         var term_lat = term_segs[0];
                         var term_lon = term_segs[1];
-                        maps['analyze'].panTo([term_lat, term_lon]);
+                        
+                        $('.select2-results__options').append('<div class="geo-select-instructions p-4"><h6 class="mb-3">' + T('Coordinates detected') + '</h6><p class="mb-0"><span class="geo-select-pan-btn btn btn-outline-secondary btn-sm rounded-pill px-4" data-lat="' + term_lat + '" data-lon="' + term_lon + '">' + T('Set map view') + '</span></p></div>');
+                        
+                        
+                        // maps['analyze'].panTo([term_lat, term_lon]);
                     } else {
                         $request.then(success);
                         return $request;
@@ -1559,6 +1564,44 @@
             //templateResult: formatRepo, // omitted for brevity, see the source of this page
             //templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
         });
+        
+        var highlighted_feature;
+        
+        $('body').on('click', '.geo-select-pan-btn', function() {
+            
+            let thislat = parseFloat($(this).attr('data-lat')),
+                thislon = parseFloat($(this).attr('data-lon')),
+                this_zoom = maps['analyze'].getZoom()
+            
+            if (this_zoom < 9) {
+                this_zoom = 9
+            }
+            
+            maps['analyze'].setView([thislat, thislon], this_zoom);
+            
+            $('#select2-analyze-geo-select-container').text($(this).attr('data-lat') + ', ' + $(this).attr('data-lon'))
+            
+            $("#analyze-geo-select").select2('close')
+            
+            // highlight grid
+            
+            if (!highlighted_feature) {
+                highlighted_feature = L.circleMarker([thislat, thislon], {
+                    pane: 'markers',
+                    color: '#fff',
+                    opacity: 1,
+                    weight: 2,
+                    fillColor: '#e00',
+                    fillOpacity: 1,
+                    radius: 5
+                }).addTo(maps['analyze'])
+            } else {
+                
+                highlighted_feature.setLatLng([thislat, thislon]); 
+                
+            }
+            
+        })
 
         $('#analyze-geo-select').on('select2:select', function (e) {
 
@@ -1568,9 +1611,32 @@
             thislon = e.params.data.lon;
 
             geoselecting = true;
-
-            //update_param('coords', thislat + ',' + thislon + ',11');
-            maps['analyze'].setView([thislat, thislon], 10);
+            
+            let this_zoom = maps['analyze'].getZoom()
+            
+            if (this_zoom < 9) {
+                this_zoom = 9
+            }
+            
+            maps['analyze'].setView([thislat, thislon], this_zoom);
+            
+            // highlight grid
+            
+            if (!highlighted_feature) {
+                highlighted_feature = L.circleMarker([thislat, thislon], {
+                    pane: 'markers',
+                    color: '#fff',
+                    opacity: 1,
+                    weight: 2,
+                    fillColor: '#e00',
+                    fillOpacity: 1,
+                    radius: 5
+                }).addTo(maps['analyze'])
+            } else {
+                
+                highlighted_feature.setLatLng([thislat, thislon]); 
+                
+            }
 
         });
 
@@ -2662,10 +2728,16 @@
             maps[map_var].createPane('grid');
             maps[map_var].getPane('grid').style.zIndex = 500;
             maps[map_var].getPane('grid').style.pointerEvents = 'all';
-
+            
             maps[map_var].createPane('labels');
             maps[map_var].getPane('labels').style.zIndex = 402;
             maps[map_var].getPane('labels').style.pointerEvents = 'none';
+            
+            maps[map_var].createPane('markers');
+            maps[map_var].getPane('markers').style.zIndex = 405;
+            maps[map_var].getPane('markers').style.pointerEvents = 'none';
+            
+            
             maps[map_var].createPane('sector');
             maps[map_var].getPane('sector').style.zIndex = 410;
 

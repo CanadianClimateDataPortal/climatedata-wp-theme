@@ -207,7 +207,9 @@ function theme_enqueue() {
   // REGISTER
   
   wp_deregister_script ( 'jquery' );
-  wp_register_script ( 'jquery', 'https://code.jquery.com/jquery-latest.min.js', null, false, true );
+  // wp_register_script ( 'jquery', 'https://code.jquery.com/jquery-latest.min.js', null, false, true );
+  // emergency workaround due to jquery CDN down
+  wp_register_script ( 'jquery',$bower_dir . 'jquery-latest.min.js', null, false, true );
   wp_enqueue_script ( 'jquery' );
   
   

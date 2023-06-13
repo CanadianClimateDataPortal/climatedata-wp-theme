@@ -106,7 +106,7 @@
   </div>
     <div><p></p></div>
     <div class="form-layout-row row">
-        <div class="offset-3">
+        <div class="col-7 offset-3">
             <p>
                 <?php _e('Hourly data for some stations and variables can be found on the <a href="https://climate.weather.gc.ca/historical_data/search_historic_data_e.html" target="_blank">Government of Canada Historical Climate Data</a> website.','cdc'); ?>
                 <br>

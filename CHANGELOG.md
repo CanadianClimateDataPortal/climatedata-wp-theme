@@ -1,3 +1,6 @@
+2023-05-23.01
+  * Added ACF field dataset\_availability in variable details
+
 2023-03-13.01
   * Updated IDF files to v3.30
 

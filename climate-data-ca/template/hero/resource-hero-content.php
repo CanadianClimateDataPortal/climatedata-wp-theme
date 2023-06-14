@@ -58,7 +58,7 @@
   ?>
   
   <div id="asset-video">
-    <?php echo wp_oembed_get ( get_field ( 'asset_audio' ) ); ?>
+    <?php echo get_field ( 'asset_audio' ); ?>
   </div>
   
   <?php

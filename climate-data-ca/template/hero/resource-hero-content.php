@@ -57,7 +57,7 @@
   
   ?>
   
-  <div id="asset-video">
+  <div id="asset-audio">
     <?php echo get_field ( 'asset_audio' ); ?>
   </div>
   

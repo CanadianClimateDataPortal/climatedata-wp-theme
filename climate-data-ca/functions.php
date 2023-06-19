@@ -784,3 +784,17 @@ function register_interactive_block_pattern() {
 }
 
 add_action( 'init', 'register_interactive_block_pattern' );
+
+if (!function_exists('str_ends_with')) {
+    function str_ends_with($str, $end) {
+        return (@substr_compare($str, $end, -strlen($end))==0);
+    }
+}
+
+function allow_custom_host( $allow, $host, $url ) {
+    if ( str_ends_with($host, 'climatedata.ca') || str_ends_with($host, 'donneesclimatiques.ca') || str_ends_with($host, 'crim.ca')) {
+        $allow = true;
+    }
+    return $allow;
+}
+add_filter( 'http_request_host_is_external', 'allow_custom_host', 10, 3 );

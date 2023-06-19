@@ -88,7 +88,7 @@
         <?php
           
           $module_query = new WP_Query ( array (
-            'post_type' => 'resource',
+            'post_type' => ['resource', 'interactive'],
             'posts_per_page' => -1,
             'tax_query' => array (
               array (
@@ -112,9 +112,10 @@
                   
                   $module_query->the_post();
                   
+                  $current_post_type = get_post_type();
               ?>              
 
-              <div class="training-asset col-12 col-md-6 mb-4" data-type="<?php echo get_field ( 'asset_type' ); ?>">
+                    <div class="training-asset col-12 col-md-6 mb-4" data-type="<?php echo ( $current_post_type === 'interactive' ) ? 'interactive' : get_field ( 'asset_type' ); ?>">
                 <div class="card bg-dark text-white mx-3 h-100">
                   <div class="bg" style="background-image: url(<?php echo get_the_post_thumbnail_url ( get_the_ID(), 'large' ); ?>);"></div>
                   
@@ -143,7 +144,11 @@
                             break;
                             
                           default : 
-                            $icon_class = 'fas fa-file';
+                            if ( $current_post_type === 'interactive' ) {
+                                $icon_class = 'fas fa-hand-pointer';
+                            } else {
+                                $icon_class = 'fas fa-file';    
+                            }
                           
                         }
                       

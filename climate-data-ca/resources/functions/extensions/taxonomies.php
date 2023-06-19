@@ -75,8 +75,9 @@ function taxonomy_resourcecat() {
 		'show_admin_column'          => true,
 		'show_in_nav_menus'          => true,
 		'show_tagcloud'              => true,
+		'show_in_rest'               => true,
 	);
-	register_taxonomy( 'resource-category', array( 'resource' ), $args );
+	register_taxonomy( 'resource-category', array( 'resource', 'interactive' ), $args );
 
 }
 add_action( 'init', 'taxonomy_resourcecat', 0 );

@@ -727,3 +727,60 @@ function rudr_metabox_content($post) {
   }
   echo '</ul></div>'; // end HTML
 }
+
+/**
+ * Fix Motion.page styling conflict with WPML
+ *
+ * @return void
+ */
+function motion_page_styles() {
+	if ( ! isset( $_GET['page'] ) ) {
+		return;
+	}
+
+	if ( $_GET['page'] !== 'motionpage' ) {
+		return;
+	} ?>
+
+	<style>
+        #mp-main input[type="text"] {
+            color: #ffffff;
+        }
+	</style>
+	<?php
+}
+
+add_action( 'admin_head', 'motion_page_styles' );
+
+/**
+ * Register block pattern categories for interactive CPT.
+ *
+ * @return void
+ */
+function register_interactive_block_pattern_category() {
+	register_block_pattern_category(
+		'interactive-sections',
+		[ 'label' => __( 'Interactive Sections', 'cdc-block-pattern-category' ) ]
+	);
+}
+
+add_action( 'init', 'register_interactive_block_pattern_category' );
+
+/**
+ * Register block patterns for interactive CPT.
+ *
+ * @return void
+ */
+function register_interactive_block_pattern() {
+	register_block_pattern(
+		'interactive-sections/interactive-section-2-cols',
+		[
+			'title'       => __( 'Basic interactive section with 2 columns', 'cdc-block-pattern' ),
+			'description' => __( 'A basic interactive section with 2 columns.', 'cdc-block-pattern' ),
+			'categories'  => [ 'interactive-sections' ],
+			'content'     => '<!-- wp:cover {"overlayColor":"light-green-cyan","isDark":false,"className":"interactive-section full-height"} --><div class="wp-block-cover is-light interactive-section full-height" id="section-ID"><span aria-hidden="true" class="wp-block-cover__background has-light-green-cyan-background-color has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:columns {"className":"overlap-container is-mobile"} --><div class="wp-block-columns overlap-container is-mobile"><!-- wp:column {"className":"overlap-container is-desktop"} --><div class="wp-block-column overlap-container is-desktop"><!-- wp:paragraph --><p id="section-ID-elm-ID">Text on column 1</p><!-- /wp:paragraph --></div><!-- /wp:column --><!-- wp:column {"className":"overlap-container is-desktop"} --><div class="wp-block-column overlap-container is-desktop"><!-- wp:paragraph --><p id="section-ID-elm-ID">Text on column 2</p><!-- /wp:paragraph --></div><!-- /wp:column --></div><!-- /wp:columns --></div></div><!-- /wp:cover -->'
+		]
+	);
+}
+
+add_action( 'init', 'register_interactive_block_pattern' );

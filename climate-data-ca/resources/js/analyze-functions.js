@@ -2178,8 +2178,6 @@
                     this_type = 'select'
                 }
 
-                // console.log('checking ' + this_name, this_type, this_val)
-
                 switch (this_type) {
                     case 'radio':
                         if ($(this).prop('checked') == true) {

@@ -79,20 +79,24 @@
     } else {
       
       echo apply_filters ( 'the_content', custom_excerpt ( get_the_ID(), 999 ) );
+
+    ?>
     
-      if ( get_field ( 'asset_time' ) != '' ) {
-      
-  ?>
-  
-  <div id="hero-asset-time" class="asset-time d-flex align-items-center">
-    <h6 class="mb-0 all-caps"><?php _e ( 'Time to completion', 'cdc' ); ?></h6>
-    <span class="border border-secondary text-white rounded-pill ml-4 py-2 px-4"><?php echo get_field ( 'asset_time' ); ?> min</span>
-  </div>
-  
-  <?php
-      
-      }
-    }
-  
+    <div id="hero-btns" class="d-flex align-items-center">
+        <?php
+        
+            if ( get_field ( 'asset_time' ) != '' ) {
+                
+        ?>
+        
+        <div id="hero-asset-time" class="asset-time d-flex align-items-center mr-5">
+            <h6 class="mb-0 all-caps"><?php _e ( 'Time to completion', 'cdc' ); ?></h6>
+            <span class="border border-secondary text-white rounded-pill ml-4 py-2 px-4"><?php echo get_field ( 'asset_time' ); ?> min</span>
+        </div>
+        
+        <?php
+            
+            }
+        }
   ?>
 </div>

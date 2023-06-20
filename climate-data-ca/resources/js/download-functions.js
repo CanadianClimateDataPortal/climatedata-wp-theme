@@ -912,7 +912,7 @@
 
         $('#download-variable').on('select2:select', function (e) {
 
-            curValData = e.target.value != "all"?varData.get(e.target.value):{'grid':'canadagrid'};
+            curValData = e.target.value != "all" ? varData.get(e.target.value) : {'grid': 'canadagrid'};
 
             if (curValData === undefined) {
                 $('#download-variable').val(1).trigger('change.select2');

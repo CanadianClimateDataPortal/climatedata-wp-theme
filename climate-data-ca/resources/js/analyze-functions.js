@@ -356,15 +356,7 @@
 
             }).addTo(maps['analyze']);
 
-            // Check if the url contains a query string parameter (ex.: ?param=value&param2=value2)
-            if (window.location.search !== '') {
-                let analyseFormParams = readURL();
-                // Passing trough a timeout because the site initially validates other components
-                // It needs about 500ms to be rendered and to not have event that break this loop.
-                setTimeout(function () {
-                    fillAnalyzeFormFromInputs(analyseFormParams);
-                }, 500)
-            }
+            checkForUrlParam()
             validate_steps();
             validate_inputs();
 
@@ -496,7 +488,6 @@
                 }
 
             })
-
         }, 100)
 
         // disable default behaviour
@@ -1992,6 +1983,22 @@
             // Update copy link button
             $("a[id='shareableURL']").attr('data-share-url', newUrl);
         }
+        
+        // Check if the url contains a query string parameter (ex.: ?param=value&param2=value2)
+        function checkForUrlParam(){
+            console.log("MAP LOADED")
+            if (window.location.search !== '') {
+                let analyseFormParams = readURL();
+                // Passing trough a timeout because the site initially validates other components
+                // It needs about 500ms to be rendered and to not have event that break this loop.
+                setTimeout(function () {
+                    fillAnalyzeFormFromInputs(analyseFormParams);
+                }, 500)
+
+                // fillAnalyzeFormFromInputs(analyseFormParams);
+
+            }
+        }
 
         // This function read the url to return the parameters from it as a dictionary for the analyse form
         function readURL() {
@@ -2019,7 +2026,7 @@
         }
 
         // Fetch points based on the compressedValue and trigger every points on the map to click the shape layer
-        function selectMapPoints(compressedValue) {
+        function selectMapAreasFromCompressedPoints(compressedValue) {
             let getGidsFromCompressedPointsURL = DATA_URL+"/get-gids/" + compressedValue + "?gridname=canadagrid";
             fetch(getGidsFromCompressedPointsURL, {
                 method: "GET",
@@ -2032,14 +2039,15 @@
                     latLonArray[i]['id'] = result[i];
                 }
 
-                triggerMapGrid(latLonArray);
+
+                selectMapAreasFromPointsArray(latLonArray);
             })
         }
 
         // Add points to the selected Grid on the map to highlight the grid layer
         // Points is a list of point containing "id":<int> and "point"":<[float,float]>
         // ex: --> points = [ {"id":123, "point":[lat, lon]} ]
-        function triggerMapGrid(points) {
+        function selectMapAreasFromPointsArray(points) {
             points.forEach(function (p) {
                 let highlightGridFeature = p.id;
 
@@ -2072,8 +2080,7 @@
             $("#ui-id-5").click(); // Accordion
             $("#btn-activate-map").click();
             $("#analyze-location-grid").click();
-            selectMapPoints(formInputs['compressedPoints']);
-
+            selectMapAreasFromCompressedPoints(formInputs['compressedPoints']);
 
             // --- CUSTOMIZE VARIABLES ---
             $("#ui-id-7").click(); // Accordion
@@ -2116,7 +2123,7 @@
                 }
             })
 
-            // Ensemble Precentiles
+            // Ensemble Pecentiles
             let ensemblePercentiles = formInputs['ensemble_percentiles'].split(',');
             ensemblePercentiles.forEach(percent => {
                 // Select values other then the default value "10","50","90"
@@ -2584,7 +2591,7 @@
         // init
         validate_steps();
         validate_inputs();
-        
+
         function create_map(map_var) {
 
             maps[map_var] = L.map(map_var + '-map', {

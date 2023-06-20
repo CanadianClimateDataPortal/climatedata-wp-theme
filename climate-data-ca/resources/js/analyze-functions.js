@@ -358,7 +358,12 @@
 
             // Check if the url contains a query string parameter (ex.: ?param=value&param2=value2)
             if (window.location.search !== '') {
-                readURL();
+                let analyseFormParams = readURL();
+                // Passing trough a timeout because the site initially validates other components
+                // It needs about 500ms to be rendered and to not have event that break this loop.
+                setTimeout(function () {
+                    fillAnalyzeFormFromInputs(analyseFormParams);
+                }, 500)
             }
             validate_steps();
             validate_inputs();
@@ -1988,7 +1993,7 @@
             $("a[id='shareableURL']").attr('data-share-url', newUrl);
         }
 
-        
+        // This function read the url to return the parameters from it as a dictionary for the analyse form
         function readURL() {
             let params = window.location.search;
             params = params.split('?').pop(); // Remove ? at beginning
@@ -2010,11 +2015,7 @@
             }
             paramsDict["form_thresholds"] = JSON.parse(decodeURI(paramsDict["form_thresholds"]));
 
-            // Passing trough a timeout because the site initially validates other components
-            // It needs about 500ms to be rendered and to not have event that break this loop.
-            setTimeout(function () {
-                fillAnalyzeFormFromInputs(paramsDict);
-            }, 500)
+            return paramsDict
         }
 
         // Fetch points based on the compressedValue and trigger every points on the map to click the shape layer

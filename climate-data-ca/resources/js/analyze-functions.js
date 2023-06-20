@@ -952,6 +952,15 @@
                 $('#scenarios-placeholder').find('.input-item:first').trigger('click');
             });
 
+            // humidex is a unique case, we'll hard-code it for now
+            if (e.target.value == 'humidex') {
+                $('#analyze-variables').hide();
+                $('#analyze-variables-humidex').show().find('.form-check-input')[0].click();
+            } else {
+                $('#analyze-variables-humidex').hide();
+                $('#analyze-variables').show().find('.form-check-input')[0].click();
+            }
+
 
         });
 

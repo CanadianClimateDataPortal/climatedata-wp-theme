@@ -111,6 +111,22 @@ const DATASETS = {
         'finch_name' : 'candcs-u6',
         'model_lists': [
             {'name': '26models', 'label': 'All models'}]
+    },
+    "humidex": {
+        'scenarios': [
+            {
+                'name': 'ssp126', 'label': 'SSP1-2.6', 'chart_color': '#00F'
+            },
+            {
+                'name': 'ssp245', 'label': 'SSP2-4.5', 'chart_color': '#00640c'
+            },
+            {
+                'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#F00'
+            },
+        ],
+        'finch_name': 'humidex-daily',
+        'model_lists': [
+            {'name': 'humidex_models', 'label': 'All models'}]
     }
 }
 

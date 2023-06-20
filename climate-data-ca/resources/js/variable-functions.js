@@ -2622,6 +2622,7 @@
                             pane: 'raster',
                             'TIME': decade_value + '-01-00T00:00:00Z',
                             'VERSION': '1.3.0',
+                            'styles': 'CDC:building_climate_zones',
                             layers: 'CDC:' + rightLayerName
                         });
                     }

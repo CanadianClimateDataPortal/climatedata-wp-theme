@@ -148,6 +148,17 @@
 
         var map_grids = {};
 
+        function gridStyleFunc() {
+            return {
+                weight: 0.1,
+                color: gridline_color,
+                opacity: 1,
+                fill: true,
+                radius: 4,
+                fillOpacity: 0
+            }
+        }
+
         var vectorTileOptions = {
             rendererFactory: L.canvas.tile,
             attribution: '',
@@ -156,18 +167,7 @@
                 return f.properties.gid;
             },
             maxNativeZoom: 12,
-            vectorTileLayerStyles: {
-                'canadagrid': function (properties, zoom) {
-                    return {
-                        weight: 0.1,
-                        color: gridline_color,
-                        opacity: 1,
-                        fill: true,
-                        radius: 4,
-                        fillOpacity: 0
-                    }
-                }
-            },
+            vectorTileLayerStyles: {},
             maxZoom: 12,
             minZoom: 7,
             pane: 'grid'
@@ -250,6 +250,66 @@
         // ANALYZE
         //
 
+        function createGridLayer(gridName, container) {
+            vectorTileOptions.vectorTileLayerStyles[gridName] = gridStyleFunc;
+            pbfLayer = L.vectorGrid.protobuf(hosturl + '/geoserver/gwc/service/tms/1.0.0/CDC:' + gridName + '@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf', vectorTileOptions).on('click', function (e) {
+                highlightGridFeature = e.layer.properties.gid;
+
+                selectedPoints[highlightGridFeature] = e.latlng;
+
+                var selectedExists = selectedGrids.includes(highlightGridFeature);
+
+                if (selectedExists === false) {
+
+                    map_grids[highlightGridFeature] = e.latlng
+
+                    selectedGrids.push(highlightGridFeature);
+
+                    pbfLayer.setFeatureStyle(highlightGridFeature, {
+                        weight: 1,
+                        color: '#F00',
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0.1
+                    })
+
+                } else {
+                    DeselectedGridCell(highlightGridFeature);
+                }
+
+
+                $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length)
+
+                let i = 0, lat_val = '', lon_val = '';
+
+                for (let key in map_grids) {
+
+                    if (i != 0) {
+                        lat_val += ',';
+                        lon_val += ',';
+                    }
+
+                    lat_val += map_grids[key]['lat'];
+                    lon_val += map_grids[key]['lng'];
+
+                    i++;
+
+                }
+
+                $('#lat').val(lat_val);
+                $('#lon').val(lon_val);
+                $('#shape').val('');
+
+                validate_inputs();
+
+                L.DomEvent.stop(e);
+
+            }).addTo(container);
+
+            pbfLayer.gridName = gridName;
+        }
+
         function analyze_init() {
 
             create_map('analyze');
@@ -299,65 +359,7 @@
 
             });
 
-            pbfLayer = L.vectorGrid.protobuf(hosturl + '/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf', vectorTileOptions).on('click', function (e) {
-
-                highlightGridFeature = e.layer.properties.gid;
-
-                selectedPoints[highlightGridFeature] = e.latlng;
-
-                var selectedExists = selectedGrids.includes(highlightGridFeature);
-
-                if (selectedExists === false) {
-
-                    map_grids[highlightGridFeature] = e.latlng
-
-                    selectedGrids.push(highlightGridFeature);
-
-                    pbfLayer.setFeatureStyle(highlightGridFeature, {
-                        weight: 1,
-                        color: '#F00',
-                        opacity: 1,
-                        fill: true,
-                        radius: 4,
-                        fillOpacity: 0.1
-                    })
-
-                } else {
-                    DeselectedGridCell(highlightGridFeature);
-                }
-
-
-                $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length)
-
-                var i = 0,
-                    lat_val = '',
-                    lon_val = ''
-
-                for (var key in map_grids) {
-
-                    if (i != 0) {
-                        lat_val += ','
-                        lon_val += ','
-                    }
-
-                    lat_val += map_grids[key]['lat']
-                    lon_val += map_grids[key]['lng']
-
-                    i++
-
-                }
-
-                $('#lat').val(lat_val)
-                $('#lon').val(lon_val)
-                $('#shape').val('')
-
-                validate_inputs()
-
-                L.DomEvent.stop(e)
-
-            }).addTo(maps['analyze']);
-
-
+            createGridLayer('canadagrid', maps['analyze']);
             validate_steps();
             validate_inputs();
 
@@ -955,12 +957,18 @@
             // humidex is a unique case, we'll hard-code it for now
             if (e.target.value == 'humidex') {
                 $('#analyze-variables').hide();
-                $('#analyze-variables-humidex').show().find('.form-check-input')[0].click();
+                $('#analyze-variables-humidex').show();
             } else {
                 $('#analyze-variables-humidex').hide();
-                $('#analyze-variables').show().find('.form-check-input')[0].click();
+                $('#analyze-variables').show();
             }
 
+            // swap grid if required
+            if (maps['analyze'].hasLayer(pbfLayer) && pbfLayer.gridName != dataset_info.grid) {
+                maps['analyze'].removeLayer(pbfLayer);
+                createGridLayer(dataset_info.grid, maps['analyze']);
+                clearGridSelection();
+            }
 
         });
 
@@ -1100,6 +1108,7 @@
 
         // TODO: All those strings are available within the HTML generated by wordpress, and will be localized properly. Loop over everything in class .input-variable
         var analyze_bccaqv2_dict = {
+            "hxmax_days_above": "HXMax Days Above a Threshold",
             "wetdays": "Wet Days",
             "sdii": "Average Wet Day Precipitation Intensity",
             "cwd": "Maximum Consecutive Wet Days",
@@ -1191,8 +1200,8 @@
                     form_obj = CreateAnalyzeProcessRequestData(sectorCoord, form_inputs, form_obj);
                     SubmitAnalyzeProcess(pathToAnalyzeForm);
                 }else{
-                    // ex: https://data.climatedata.ca/partition-to-points/health/2.json
-                    let getUrl = hosturl + "/partition-to-points/"+ locations_type +"/"+ form_inputs["shape"] +".json";
+                    // ex: https://data.climatedata.ca/partition-to-points/canadagrid/health/2.json
+                    let getUrl = hosturl + "/partition-to-points/"+ pbfLayer.gridName + '/' + locations_type +"/"+ form_inputs["shape"] +".json";
 
                     $.getJSON(getUrl).then(function(lutBySectorId){
                         sectorCoord["s_lat"]= lutBySectorId.map(x => x[0]).join(',');
@@ -1647,8 +1656,8 @@
 
         });
 
-        $('#clear-grids').click(function () {
 
+        function clearGridSelection() {
             map_grids = {}
 
             selectedGrids.forEach(function (i) {
@@ -1673,8 +1682,9 @@
 
             validate_steps();
             validate_inputs();
+        }
 
-        })
+        $('#clear-grids').click(clearGridSelection);
 
         //
         // VALIDATION

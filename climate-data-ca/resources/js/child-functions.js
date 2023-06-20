@@ -82,6 +82,7 @@ const DATASETS = {
                 }
             },
         ],
+        'grid': 'canadagrid',
         'finch_name' : 'candcs-u5',
         'model_lists': [
             {'name': 'pcic12', 'label': 'PCIC12 (Ensemble)'},
@@ -108,6 +109,7 @@ const DATASETS = {
                 }
             },
         ],
+        'grid': 'canadagrid',
         'finch_name' : 'candcs-u6',
         'model_lists': [
             {'name': '26models', 'label': 'All models'}]
@@ -124,6 +126,7 @@ const DATASETS = {
                 'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#F00'
             },
         ],
+        'grid': 'era5landgrid',
         'finch_name': 'humidex-daily',
         'model_lists': [
             {'name': 'humidex_models', 'label': 'All models'}]

@@ -2036,9 +2036,9 @@
         }
 
         // Add points to the selected Grid on the map to highlight the grid layer
+        // Points is a list of point containing "id":<int> and "point"":<[float,float]>
+        // ex: --> points = [ {"id":123, "point":[lat, lon]} ]
         function triggerMapGrid(points) {
-            // points = [ {"id":123, "point":[lat, lon]}]
-
             points.forEach(function (p) {
                 let highlightGridFeature = p.id;
 
@@ -2056,7 +2056,6 @@
                     fillOpacity: 0.1
                 });
             });
-
         }
 
 

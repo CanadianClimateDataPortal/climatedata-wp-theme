@@ -1977,12 +1977,12 @@
 
             let shareableURL = baseUrl + "?" + params;
 
-            updateShareableURL(shareableURL);
+            return shareableURL
         }
 
         function updateShareableURL(newUrl) {
             // Update browser url
-            window.history.pushState('updateAnalyzeFormUrl', 'new_url', newUrl);
+            window.history.pushState('updateAnalyzeFormUrl', '', newUrl);
 
             // Update copy link button
             $("a[id='shareableURL']").attr('data-share-url', newUrl);
@@ -2311,7 +2311,8 @@
                 $('#analyze-submit').slideUp()
             }
 
-            buildShareableURL($.extend(true,{}, form_inputs)); 
+            let shareableURL = buildShareableURL($.extend(true,{}, form_inputs)); 
+            updateShareableURL(shareableURL);
             return is_valid;
 
             } else if (current_tab == 'analyze-stations') {

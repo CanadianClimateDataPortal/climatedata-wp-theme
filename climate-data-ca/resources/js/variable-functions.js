@@ -1590,7 +1590,7 @@
             if (var_value == "building_climate_zones") {
                 var_value = "hddheat_18"
                 building_climate_zones = true
-                // building_climate_zones_style = "&style=CDC:building_climate_zones"
+                building_climate_zones_style = "&style=CDC:building_climate_zones"
             }
 
             query['var-group'] = $('#var option:selected').parent('optgroup').attr('data-slug');

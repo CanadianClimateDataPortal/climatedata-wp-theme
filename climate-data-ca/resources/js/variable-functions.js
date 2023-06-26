@@ -1584,6 +1584,12 @@
             let rcp_value = $("#rcp").val();
             let decade_value = parseInt($("#decade").val());
             let msorys, msorysmonth;
+            let building_climate_zones_style = ""
+
+            if (var_value == "building_climate_zones") {
+                var_value = "hddheat_18"
+                // building_climate_zones_style = "&style=CDC:building_climate_zones"
+            }
 
             query['var-group'] = $('#var option:selected').parent('optgroup').attr('data-slug');
 
@@ -1635,7 +1641,7 @@
             var layer = leftLayerName;
             var legendTitle = mora_text_value;
 
-            $.getJSON(hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&layer=CDC:" + layer + "&format=application/json")
+            $.getJSON(hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&layer=CDC:" + layer + "&format=application/json" + building_climate_zones_style)
                 .then(function (data) {
 
                     let colormap = '';
@@ -1659,10 +1665,11 @@
                     leftLegend.addTo(map1);
 
                     if ($('#rcp').val().indexOf("vs") !== -1) {
-                        $.getJSON(hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&layer=CDC:" + layer + "&format=application/json&style=CDC:building_climate_zones")
-                            .then(function (data) {
-                                generateRightLegend(layer, legendTitle, data);
-                            });
+                        // $.getJSON(hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&layer=CDC:" + layer + "&format=application/json&style=CDC:building_climate_zones")
+                        //     .then(function (data) {
+                        //         generateRightLegend(layer, legendTitle, data);
+                        //     });
+                        generateRightLegend(layer, legendTitle, data);
                     }
 
                 })
@@ -2616,6 +2623,12 @@
                         layers: 'CDC:' + leftLayerName
                     });
 
+                    if (var_value == "building_climate_zones") {
+                        leftLayer.setParams({
+                            'styles': 'CDC:building_climate_zones',
+                        });
+                    }
+
                     if (has_mapRight === true) {
                         console.log("rightLayerName: " + rightLayerName);
                         rightLayer.setParams({
@@ -2625,11 +2638,16 @@
                             pane: 'raster',
                             'TIME': decade_value + '-01-00T00:00:00Z',
                             'VERSION': '1.3.0',
-                            'styles': 'CDC:building_climate_zones',
+                            // 'styles': 'CDC:building_climate_zones',
                             layers: 'CDC:' + rightLayerName
                         });
                     }
 
+                    if (var_value == "building_climate_zones") {
+                        rightLayer.setParams({
+                            'styles': 'CDC:building_climate_zones',
+                        });
+                    }
                 } else {
 
                     $('body').removeClass('map-compare');
@@ -2645,6 +2663,13 @@
                         'VERSION': '1.3.0',
                         layers: 'CDC:' + singleLayerName
                     });
+
+                    if (var_value == "building_climate_zones") {
+                        console.log("sfsdfsf")
+                        leftLayer.setParams({
+                            'styles': 'CDC:building_climate_zones',
+                        });
+                    }
 
                 }
 

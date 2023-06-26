@@ -1585,9 +1585,11 @@
             let decade_value = parseInt($("#decade").val());
             let msorys, msorysmonth;
             let building_climate_zones_style = ""
+            let building_climate_zones = false;
 
             if (var_value == "building_climate_zones") {
                 var_value = "hddheat_18"
+                building_climate_zones = true
                 // building_climate_zones_style = "&style=CDC:building_climate_zones"
             }
 
@@ -2602,6 +2604,17 @@
                     aord_layer_value = "";
                 }
 
+                var building_climate_zones_params = {
+                    'styles': 'CDC:building_climate_zones',
+                }
+
+                var building_climate_zones = false
+
+                if (var_value == "building_climate_zones") {
+                    var_value = "hddheat_18"
+                    building_climate_zones = true
+                }
+
                 singleLayerName = layer_prefix + '' + var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
 
                 // if a compare scenario was selected
@@ -2623,12 +2636,6 @@
                         layers: 'CDC:' + leftLayerName
                     });
 
-                    if (var_value == "building_climate_zones") {
-                        leftLayer.setParams({
-                            'styles': 'CDC:building_climate_zones',
-                        });
-                    }
-
                     if (has_mapRight === true) {
                         console.log("rightLayerName: " + rightLayerName);
                         rightLayer.setParams({
@@ -2643,10 +2650,10 @@
                         });
                     }
 
-                    if (var_value == "building_climate_zones") {
-                        rightLayer.setParams({
-                            'styles': 'CDC:building_climate_zones',
-                        });
+                    if (building_climate_zones) {
+                        console.log("FFFF " + rightLayer)
+                        leftLayer.setParams(building_climate_zones_params);
+                        rightLayer.setParams(building_climate_zones_params);
                     }
                 } else {
 
@@ -2664,11 +2671,9 @@
                         layers: 'CDC:' + singleLayerName
                     });
 
-                    if (var_value == "building_climate_zones") {
+                    if (building_climate_zones) {
                         console.log("sfsdfsf")
-                        leftLayer.setParams({
-                            'styles': 'CDC:building_climate_zones',
-                        });
+                        leftLayer.setParams(building_climate_zones_params);
                     }
 
                 }

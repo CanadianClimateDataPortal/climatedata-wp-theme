@@ -1667,10 +1667,6 @@
                     leftLegend.addTo(map1);
 
                     if ($('#rcp').val().indexOf("vs") !== -1) {
-                        // $.getJSON(hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&layer=CDC:" + layer + "&format=application/json&style=CDC:building_climate_zones")
-                        //     .then(function (data) {
-                        //         generateRightLegend(layer, legendTitle, data);
-                        //     });
                         generateRightLegend(layer, legendTitle, data);
                     }
 

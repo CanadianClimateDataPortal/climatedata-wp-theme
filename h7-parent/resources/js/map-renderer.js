@@ -876,6 +876,11 @@
           layers: 'CDC:' + this_map.query.variable + '-' + this_map.query.msys + '-' + this_map.query.rcp + '-p50-' + plugin_settings.maps.main.query.mora + '-30year'
         })
 
+        if (var_value == "building_climate_zones") {
+            this_map.panes.data.layer.setParams({
+                'styles': 'CDC:building_climate_zones',
+            });
+        }
       } else {
 
         this_map.panes.data.layer = L.tileLayer.wms(plugin_settings.hosturl + '/geoserver/ows?', {

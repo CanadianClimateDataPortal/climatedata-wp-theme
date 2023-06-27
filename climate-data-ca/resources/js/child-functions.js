@@ -258,6 +258,7 @@ function unit_localize(str) {
         str = str.replace('Days', 'Jours');
         str = str.replace('days', 'jours');
         str = str.replace(' to ', ' à ');
+        str = str.replace('Climate Zone', 'Zone Climatique');
     }
 
     return str;

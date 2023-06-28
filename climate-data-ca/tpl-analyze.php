@@ -110,7 +110,7 @@
                         <div class="input-row form-check">
                             <div class="input-item">
                                 <input class="form-check-input add-to-object" type="radio" name="dataset" id="analyze-dataset-humidex" value="humidex">
-                                <label class="form-check-label" for="analyze-dataset-humidex">Humidex</label>
+                                <label class="form-check-label" for="analyze-dataset-humidex">Humidex (CMIP6)</label>
                             </div>
                         </div>
                     </div>
@@ -243,7 +243,7 @@
                       </div>
                           <div id="analyze-variables-humidex">
                               <div class="input-row form-check input-variable" data-frequencies=''
-                                   data-content='[{"text":"<?php _e('This analysis returns the number of days where HXMax is >', 'cdc'); ?>","type":"text"},{"id":"threshold","units":"","decimals":"0","min":"","max":"","type":"input"}]'>
+                                   data-content='[{"text":"<?php _e('This analysis returns the number of days with daily maximum Humidex (HXMax) >', 'cdc'); ?>","type":"text"},{"id":"threshold","units":"","decimals":"0","min":"","max":"","type":"input"}]'>
                                   <div class="input-item">
                                       <input class="form-check-input" type="radio" name="analyze-var"
                                              id="analyze-var-hxmax_days_above" value="hxmax_days_above">

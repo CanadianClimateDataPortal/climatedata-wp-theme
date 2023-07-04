@@ -1447,6 +1447,10 @@ function getIDFLinks(station_id, target, css_class) {
             query.dataset = dataset_name;
             let download_url, chart_url;
 
+            if (query.var == "building_climate_zones") {
+                query.var = "hddheat_18";
+            }
+
             if (typeof query.sector === 'undefined') {
                 download_url = data_url + '/download-30y/' + query.lat + '/' + query.lon + '/' + query.var + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
                 chart_url = data_url + '/generate-charts/' + query.lat + '/' + query.lon + '/' + query.var + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;

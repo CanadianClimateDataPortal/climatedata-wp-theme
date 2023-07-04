@@ -841,6 +841,10 @@
                     let dataset_name = $('input[name="dataset_switch"]:checked').val();
                     let values_url;
 
+                    if (var_value == "building_climate_zones") {
+                        var_value = "hddheat_18";
+                    }
+
                     if (sector === "") { // gridded
                         values_url = data_url + "/get-delta-30y-gridded-values/" +
                         e.latlng['lat'] + "/" + e.latlng['lng'] +
@@ -1193,6 +1197,10 @@
 
 
                     let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
+
+                    if (variable == "building_climate_zones") {
+                        variable = "hddheat_18";
+                    }
 
                     $.getJSON(
                         data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name,

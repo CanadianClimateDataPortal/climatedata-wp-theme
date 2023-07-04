@@ -139,6 +139,9 @@
                         element: null
                     }
 
+                    if (variable == "building_climate_zones") {
+                        variable = "hddheat_18";
+                    }
 
                     $.getJSON(DATA_URL + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
                         function (data) {

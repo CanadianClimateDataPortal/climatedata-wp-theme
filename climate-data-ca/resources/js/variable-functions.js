@@ -841,9 +841,7 @@
                     let dataset_name = $('input[name="dataset_switch"]:checked').val();
                     let values_url;
 
-                    if (var_value == "building_climate_zones") {
-                        var_value = "hddheat_18";
-                    }
+                    let var_value = var_value == "building_climate_zones" ? "hddheat_18" : var_value;
 
                     if (sector === "") { // gridded
                         values_url = data_url + "/get-delta-30y-gridded-values/" +
@@ -1198,9 +1196,7 @@
 
                     let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
 
-                    if (variable == "building_climate_zones") {
-                        variable = "hddheat_18";
-                    }
+                    let variable = variable == "building_climate_zones" ? "hddheat_18" : variable;
 
                     $.getJSON(
                         data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name,
@@ -2614,10 +2610,8 @@
 
                 var building_climate_zones = false
 
-                if (var_value == "building_climate_zones") {
-                    var_value = "hddheat_18"
-                    building_climate_zones = true
-                }
+                let var_value = var_value == "building_climate_zones" ? "hddheat_18" : var_value;
+                let building_climate_zones = var_value == "building_climate_zones";
 
                 singleLayerName = layer_prefix + '' + var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
 

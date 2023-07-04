@@ -198,9 +198,7 @@
 
                             container.html(data);
 
-                            if (variable == "building_climate_zones") {
-                                variable = "hddheat_18";
-                            }
+                            let variable = variable == "building_climate_zones" ? "hddheat_18" : variable;
 
                             let json_url = data_url + '/generate-charts/' + current_location.lat + '/' + current_location.lon + '/' + variable + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
 

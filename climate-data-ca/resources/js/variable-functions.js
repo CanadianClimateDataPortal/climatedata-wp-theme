@@ -1196,7 +1196,10 @@
 
                     let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
 
-                    variable = variable == "building_climate_zones" ? "hddheat_18" : variable;
+                    if (variable == 'building_climate_zones') {
+                        building_climate_zones = true;
+                        variable = "hddheat_18";
+                    }
 
                     $.getJSON(
                         data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name,
@@ -1210,6 +1213,7 @@
                                     'lat': lat,
                                     'lon': lon,
                                     'delta': delta,
+                                    'building_climate_zones': building_climate_zones,
                                 }, $('#chart-placeholder')[0]);
                         });
 

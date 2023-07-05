@@ -374,6 +374,7 @@ function setDataLayerForChartData(chartDataFormat, chartData, query) {
 }
 
 function displayChartData(data, varDetails, download_url, query, container) {
+    console.log(query)
     let chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
     let chartDecimals = varDetails['decimals'];
     let scenarios = DATASETS[query['dataset']].scenarios;
@@ -541,7 +542,13 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
             series: chartSeries
         });
+
         chart.query = $.extend(true, {}, query);  // creates a deep copy of the object to avoid side-effects
+
+        if (query.building_climate_zones) {
+            console.log("hello!")
+        }
+
         chart.download_url = download_url;
         chart.varDetails = varDetails;
 

@@ -1016,6 +1016,8 @@
                     $('#rcp').prop('disabled', true);
                     $('#rightrcp').prop('disabled', true);
 
+                    let variable = variable == "building_climate_zones" ? "hddheat_18" : variable;
+
                     $.getJSON(
                         data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
                         function (data) {

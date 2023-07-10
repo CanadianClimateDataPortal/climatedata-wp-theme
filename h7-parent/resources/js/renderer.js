@@ -139,6 +139,7 @@
                         element: null
                     }
 
+                    let variable = variable == "building_climate_zones" ? "hddheat_18" : variable;
 
                     $.getJSON(DATA_URL + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
                         function (data) {

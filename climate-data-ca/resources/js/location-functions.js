@@ -198,6 +198,8 @@
 
                             container.html(data);
 
+                            let variable = variable == "building_climate_zones" ? "hddheat_18" : variable;
+
                             let json_url = data_url + '/generate-charts/' + current_location.lat + '/' + current_location.lon + '/' + variable + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
 
                             //console.log('load chart JSON from ' + 'get_values.php?lat=' + current_location.lat + '&lon=' + current_location.lon + '&var=' + variable + '&month=ann');

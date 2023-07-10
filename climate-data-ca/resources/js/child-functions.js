@@ -278,6 +278,7 @@ function unit_localize(str) {
         str = str.replace('Days', 'Jours');
         str = str.replace('days', 'jours');
         str = str.replace(' to ', ' à ');
+        str = str.replace('Climate Zone', 'Zone Climatique');
     }
 
     return str;
@@ -393,6 +394,7 @@ function setDataLayerForChartData(chartDataFormat, chartData, query) {
 }
 
 function displayChartData(data, varDetails, download_url, query, container) {
+    console.log(query)
     let chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
     let chartDecimals = varDetails['decimals'];
     let scenarios = DATASETS[query['dataset']].scenarios;
@@ -560,7 +562,26 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
             series: chartSeries
         });
+
         chart.query = $.extend(true, {}, query);  // creates a deep copy of the object to avoid side-effects
+
+        if (query.building_climate_zones) {
+            var colorTransparency = 0.30;
+            
+            chart.yAxis[0].removePlotBand();
+            chart.update({
+                yAxis: {
+                    gridLineWidth: 0
+                }
+            });
+            chart.yAxis[0].addPlotBand({from:0, to:2999, color:'rgba(201, 0, 0, ' + colorTransparency.toString() + ')', label:{text:"Climate Zone 4"}});
+            chart.yAxis[0].addPlotBand({from:3000, to:3999, color:'rgba(250, 238, 2, ' + colorTransparency.toString() + ')', label:{text:"Climate Zone 5"}});
+            chart.yAxis[0].addPlotBand({from:4000, to:4999, color:'rgba(0, 201, 54, ' + colorTransparency.toString() + ')', label:{text:"Climate Zone 6"}});
+            chart.yAxis[0].addPlotBand({from:5000, to:5999, color:'rgba(0, 131, 201, ' + colorTransparency.toString() + ')', label:{text:"Climate Zone 7A"}});
+            chart.yAxis[0].addPlotBand({from:6000, to:6999, color:'rgba(20, 0, 201, ' + colorTransparency.toString() + ')', label:{text:"Climate Zone 7B"}});
+            chart.yAxis[0].addPlotBand({from:7000, to:99999, color:'rgba(127, 0, 201, ' + colorTransparency.toString() + ')', label:{text:"Climate Zone 8"}});
+        }
+
         chart.download_url = download_url;
         chart.varDetails = varDetails;
 
@@ -1465,6 +1486,10 @@ function getIDFLinks(station_id, target, css_class) {
 
             query.dataset = dataset_name;
             let download_url, chart_url;
+
+            if (query.var == "building_climate_zones") {
+                query.var = "hddheat_18";
+            }
 
             if (typeof query.sector === 'undefined') {
                 download_url = data_url + '/download-30y/' + query.lat + '/' + query.lon + '/' + query.var + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;

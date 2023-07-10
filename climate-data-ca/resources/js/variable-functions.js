@@ -841,17 +841,19 @@
                     let dataset_name = $('input[name="dataset_switch"]:checked').val();
                     let values_url;
 
+                    let layerVariableName = var_value == "building_climate_zones" ? "hddheat_18" : var_value;
+
                     if (sector === "") { // gridded
                         values_url = data_url + "/get-delta-30y-gridded-values/" +
                         e.latlng['lat'] + "/" + e.latlng['lng'] +
-                        "/" + var_value + "/" + mora_value +
+                        "/" + layerVariableName + "/" + mora_value +
                         "?period=" + decade_value +
                         "&decimals=" + varDetails.decimals + delta7100 +
                         "&dataset_name=" + dataset_name;
                     } else {
                         values_url = data_url + "/get-delta-30y-regional-values/" +
                             sector + "/" + e.layer.properties.id +
-                            "/" + var_value + "/" + mora_value +
+                            "/" + layerVariableName + "/" + mora_value +
                             "?period=" + decade_value +
                             "&decimals=" + varDetails.decimals + delta7100 +
                             "&dataset_name=" + dataset_name;
@@ -1194,6 +1196,11 @@
 
                     let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
 
+                    if (variable == 'building_climate_zones') {
+                        building_climate_zones = true;
+                        variable = "hddheat_18";
+                    }
+
                     $.getJSON(
                         data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name,
                         function (data) {
@@ -1206,6 +1213,7 @@
                                     'lat': lat,
                                     'lon': lon,
                                     'delta': delta,
+                                    'building_climate_zones': building_climate_zones,
                                 }, $('#chart-placeholder')[0]);
                         });
 
@@ -1667,10 +1675,6 @@
                     leftLegend.addTo(map1);
 
                     if ($('#rcp').val().indexOf("vs") !== -1) {
-                        // $.getJSON(hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&layer=CDC:" + layer + "&format=application/json&style=CDC:building_climate_zones")
-                        //     .then(function (data) {
-                        //         generateRightLegend(layer, legendTitle, data);
-                        //     });
                         generateRightLegend(layer, legendTitle, data);
                     }
 
@@ -2608,14 +2612,10 @@
                     'styles': 'CDC:building_climate_zones',
                 }
 
-                var building_climate_zones = false
+                let layerVariableName = var_value == "building_climate_zones" ? "hddheat_18" : var_value;
+                let building_climate_zones = var_value == "building_climate_zones";
 
-                if (var_value == "building_climate_zones") {
-                    var_value = "hddheat_18"
-                    building_climate_zones = true
-                }
-
-                singleLayerName = layer_prefix + '' + var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+                singleLayerName = layer_prefix + '' + layerVariableName + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
 
                 // if a compare scenario was selected
 

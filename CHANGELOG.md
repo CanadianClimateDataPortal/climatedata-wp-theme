@@ -1,3 +1,6 @@
+Unreleased
+  * Added Building Climate Zones variable
+
 2023-05-23.01
   * Added ACF field dataset\_availability in variable details
 

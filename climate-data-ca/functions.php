@@ -764,7 +764,7 @@ function register_interactive_block_pattern_category() {
 	);
 }
 
-// add_action( 'init', 'register_interactive_block_pattern_category' );
+add_action( 'init', 'register_interactive_block_pattern_category' );
 
 /**
  * Register block patterns for interactive CPT.
@@ -783,7 +783,7 @@ function register_interactive_block_pattern() {
 	);
 }
 
-// add_action( 'init', 'register_interactive_block_pattern' );
+add_action( 'init', 'register_interactive_block_pattern' );
 
 if (!function_exists('str_ends_with')) {
     function str_ends_with($str, $end) {

@@ -374,7 +374,6 @@ function setDataLayerForChartData(chartDataFormat, chartData, query) {
 }
 
 function displayChartData(data, varDetails, download_url, query, container) {
-    console.log(query)
     let chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
     let chartDecimals = varDetails['decimals'];
     let scenarios = DATASETS[query['dataset']].scenarios;

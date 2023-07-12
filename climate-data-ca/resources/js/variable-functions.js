@@ -1196,6 +1196,8 @@
 
                     let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
 
+                    let building_climate_zones = false;
+
                     if (variable == 'building_climate_zones') {
                         building_climate_zones = true;
                         variable = "hddheat_18";
@@ -2645,13 +2647,11 @@
                             pane: 'raster',
                             'TIME': decade_value + '-01-00T00:00:00Z',
                             'VERSION': '1.3.0',
-                            // 'styles': 'CDC:building_climate_zones',
                             layers: 'CDC:' + rightLayerName
                         });
                     }
 
                     if (building_climate_zones) {
-                        console.log("FFFF " + rightLayer)
                         leftLayer.setParams(building_climate_zones_params);
                         rightLayer.setParams(building_climate_zones_params);
                     }
@@ -2672,7 +2672,6 @@
                     });
 
                     if (building_climate_zones) {
-                        console.log("sfsdfsf")
                         leftLayer.setParams(building_climate_zones_params);
                     }
 

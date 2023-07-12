@@ -258,7 +258,7 @@ function unit_localize(str) {
         str = str.replace('Days', 'Jours');
         str = str.replace('days', 'jours');
         str = str.replace(' to ', ' à ');
-        str = str.replace('Climate Zone', 'Zone Climatique');
+        str = str.replace('Climate Zone', 'Zone climatique');
     }
 
     return str;
@@ -545,20 +545,19 @@ function displayChartData(data, varDetails, download_url, query, container) {
         chart.query = $.extend(true, {}, query);  // creates a deep copy of the object to avoid side-effects
 
         if (query.building_climate_zones) {
-            var colorTransparency = 0.30;
+            const colorTransparency = 0.30;
             
-            chart.yAxis[0].removePlotBand();
             chart.update({
                 yAxis: {
                     gridLineWidth: 0
                 }
             });
-            chart.yAxis[0].addPlotBand({from:0, to:2999, color:'rgba(201, 0, 0, ' + colorTransparency.toString() + ')', label:{text:"Climate Zone 4"}});
-            chart.yAxis[0].addPlotBand({from:3000, to:3999, color:'rgba(250, 238, 2, ' + colorTransparency.toString() + ')', label:{text:"Climate Zone 5"}});
-            chart.yAxis[0].addPlotBand({from:4000, to:4999, color:'rgba(0, 201, 54, ' + colorTransparency.toString() + ')', label:{text:"Climate Zone 6"}});
-            chart.yAxis[0].addPlotBand({from:5000, to:5999, color:'rgba(0, 131, 201, ' + colorTransparency.toString() + ')', label:{text:"Climate Zone 7A"}});
-            chart.yAxis[0].addPlotBand({from:6000, to:6999, color:'rgba(20, 0, 201, ' + colorTransparency.toString() + ')', label:{text:"Climate Zone 7B"}});
-            chart.yAxis[0].addPlotBand({from:7000, to:99999, color:'rgba(127, 0, 201, ' + colorTransparency.toString() + ')', label:{text:"Climate Zone 8"}});
+            chart.yAxis[0].addPlotBand({from:2000, to:2999, color:'rgba(201, 0, 0, ' + colorTransparency.toString() + ')', label:{text: unit_localize("Climate Zone 4")}});
+            chart.yAxis[0].addPlotBand({from:3000, to:3999, color:'rgba(250, 238, 2, ' + colorTransparency.toString() + ')', label:{text: unit_localize("Climate Zone 5")}});
+            chart.yAxis[0].addPlotBand({from:4000, to:4999, color:'rgba(0, 201, 54, ' + colorTransparency.toString() + ')', label:{text: unit_localize("Climate Zone 6")}});
+            chart.yAxis[0].addPlotBand({from:5000, to:5999, color:'rgba(0, 131, 201, ' + colorTransparency.toString() + ')', label:{text: unit_localize("Climate Zone 7A")}});
+            chart.yAxis[0].addPlotBand({from:6000, to:6999, color:'rgba(20, 0, 201, ' + colorTransparency.toString() + ')', label:{text: unit_localize("Climate Zone 7B")}});
+            chart.yAxis[0].addPlotBand({from:7000, to:99999, color:'rgba(127, 0, 201, ' + colorTransparency.toString() + ')', label:{text: unit_localize("Climate Zone 8")}});
         }
 
         chart.download_url = download_url;

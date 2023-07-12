@@ -1196,6 +1196,8 @@
 
                     let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
 
+                    let building_climate_zones = false;
+
                     if (variable == 'building_climate_zones') {
                         building_climate_zones = true;
                         variable = "hddheat_18";

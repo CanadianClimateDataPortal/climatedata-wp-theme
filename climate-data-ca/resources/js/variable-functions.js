@@ -2654,6 +2654,8 @@
                     if (building_climate_zones) {
                         leftLayer.setParams(building_climate_zones_params);
                         rightLayer.setParams(building_climate_zones_params);
+                    } else {
+                        leftLayer.setParams({"styles": ""});
                     }
                 } else {
 
@@ -2673,6 +2675,8 @@
 
                     if (building_climate_zones) {
                         leftLayer.setParams(building_climate_zones_params);
+                    } else {
+                        leftLayer.setParams({"styles": ""});
                     }
 
                 }

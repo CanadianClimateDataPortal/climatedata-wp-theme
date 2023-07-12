@@ -331,7 +331,7 @@ function distance($lat1, $lon1, $lat2, $lon2)
 }
 
 // Return a string of valid javascript (enclosed in <script> tag) that create a Map object including all ACF fields of all variables
-function render_variables_fields()
+function render_variables_fields($excludes = [])
 {
     $rendered_variables_fields_script = '<script type="text/javascript">const varData = new Map();';
 
@@ -348,7 +348,7 @@ function render_variables_fields()
             $the_wp_query->the_post();
             $var_fields = get_fields();
             $var_name = $var_fields['var_name'];
-            if ($var_name != 'slr') {
+            if (!in_array($var_name, $excludes)) {
                 $rendered_variables_fields_script .= "varData.set('$var_name', " . json_encode(get_fields()) . ");\n";
             }
         }

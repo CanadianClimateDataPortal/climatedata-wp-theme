@@ -703,6 +703,7 @@
             }
             format = $('input[name="download-format"]:checked').val();
             let dataset_name = $('input[name="download-dataset"]:checked').val();
+            let selectedDatasetType = $('input[name="download-dataset-type"]:checked').val();
             let format_extension = format;
 
             if (format == 'netcdf') {
@@ -715,6 +716,7 @@
                     var: selectedVar,
                     month: month,
                     dataset_name: dataset_name,
+                    dataset_type: selectedDatasetType,
                     format: format
                 };
                 Object.assign(request_args, pointsData);
@@ -759,6 +761,7 @@
                             var: varToProcess[i],
                             month: month,
                             dataset_name: dataset_name,
+                            dataset_type: selectedDatasetType,
                             format: format
                         };
                         Object.assign(request_args, pointsData);
@@ -804,37 +807,27 @@
         function buildVarDropdown(frequency, selectedVar, dataset) {
 
             let currentOptGroup = '';
-            let optgroupSlug;
             let selectedTimeStepCategory = $('#download-frequency').find(':selected').data('timestep');
+            let selectedDatasetType = $('input[name="download-dataset-type"]:checked').val();
+
             varData.forEach(function (varDetails) {
                 // in which dataset this variable is available? Default to all if the ACF field is not yet present
                 let dataset_availability = (varDetails.dataset_availability !== undefined ? varDetails.dataset_availability : Object.keys(DATASETS));
 
                 // filter out variables not available for selected timestep and dataset
-                if (varDetails.timestep.includes(selectedTimeStepCategory) && dataset_availability.includes(dataset)) {
+                if (varDetails.timestep.includes(selectedTimeStepCategory) &&
+                    dataset_availability.includes(dataset) &&
+                    !(selectedDatasetType == '30ygraph' && varDetails.hasdelta == false)  // all variables without delta doesn't have 30ygraph data files
+                ) {
                     if (varDetails.variable_type !== 'station_data') {
-
-                        if (varDetails.var_name) {
-                            if (currentOptGroup !== varDetails.variable_type) {
-
-                                if (varDetails.variable_type === 'station_data') {
-                                    optgroupSlug = 'station-data';
-                                } else if (varDetails.variable_type === 'other_variables') {
-                                    optgroupSlug = 'other';
-                                } else if (varDetails.variable_type === 'precipitation') {
-                                    optgroupSlug = 'precipitation';
-                                } else if (varDetails.variable_type === 'temperature') {
-                                    optgroupSlug = 'temperature';
-                                }
-
-                                $('#download-variable').append("<optgroup id=optgroup_" + varDetails.variable_type + " label='" + l10n_labels[varDetails.variable_type] + "' data-slug='" + optgroupSlug + "'>");
-                                currentOptGroup = varDetails.variable_type;
-                            }
-
-
-                            varnewOption = new Option(varDetails.var_title, varDetails.var_name, false, varDetails.var_name === selectedVar);
-                            $('#optgroup_' + varDetails.variable_type).append(varnewOption);
+                        if (currentOptGroup !== varDetails.variable_type) {
+                            $('#download-variable').append("<optgroup id=optgroup_" + varDetails.variable_type + " label='" + l10n_labels[varDetails.variable_type] + "'>");
+                            currentOptGroup = varDetails.variable_type;
                         }
+
+                        varnewOption = new Option(varDetails.var_title, varDetails.var_name, false, varDetails.var_name === selectedVar);
+                        $('#optgroup_' + varDetails.variable_type).append(varnewOption);
+
                     }
 
                 }
@@ -859,7 +852,6 @@
 
 
         $('#download-frequency').on('select2:select', function (e) {
-            console.log('frequency changed');
             currentVar = $("#download-variable").val();
             let selectedDataset = $('input[name="download-dataset"]:checked').val();
             $('#download-variable').empty();
@@ -879,6 +871,8 @@
                 $('#annual-process-wrap').hide();
                 $('#daily-process-wrap').show();
 
+                $('#average-btn-group').hide();
+
             } else {
 
                 // json option
@@ -888,16 +882,18 @@
                 // email field
                 $('#annual-process-wrap').show();
                 $('#daily-process-wrap').hide();
+
+                $('#average-btn-group').show();
             }
         });
 
-        $('#selection-dataset input').on('change', function (e) {
-            console.log('dataset changed');
+        $('#selection-dataset input, #average-btn-group input').on('change', function (e) {
             let currentVar = $("#download-variable").val();
             let frequency = $('#download-frequency').val();
+            let selectedDataset = $('input[name="download-dataset"]:checked').val();
             $('#download-variable').empty();
 
-            buildVarDropdown(frequency, currentVar, e.target.value);
+            buildVarDropdown(frequency, currentVar, selectedDataset);
         });
 
         $('#daily-captcha_code').on('input', function (e) {

@@ -198,11 +198,11 @@
 
                             container.html(data);
 
-                            let variable = variable == "building_climate_zones" ? "hddheat_18" : variable;
+                            let layerVariableName = variable == "building_climate_zones" ? "hddheat_18" : variable;
 
-                            let json_url = data_url + '/generate-charts/' + current_location.lat + '/' + current_location.lon + '/' + variable + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
+                            let json_url = data_url + '/generate-charts/' + current_location.lat + '/' + current_location.lon + '/' + layerVariableName + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
 
-                            //console.log('load chart JSON from ' + 'get_values.php?lat=' + current_location.lat + '&lon=' + current_location.lon + '&var=' + variable + '&month=ann');
+                            //console.log('load chart JSON from ' + 'get_values.php?lat=' + current_location.lat + '&lon=' + current_location.lon + '&var=' + layerVariableName + '&month=ann');
 
                             $.ajax({
                                 url: json_url,
@@ -212,12 +212,12 @@
                                     displayChartData(chartdata, varDetails, download_url,
                                         {
                                             'dataset': dataset_name,
-                                            'var': variable,
+                                            'var': layerVariableName,
                                             'mora': 'ann',
                                             'lat': current_location.lat,
                                             'lon': current_location.lon,
                                             'delta': "",
-                                        }, $('body').find('#' + variable + '-chart')[0]);
+                                        }, $('body').find('#' + layerVariableName + '-chart')[0]);
                                 },
                                 complete: function () {
                                     $('body').removeClass('spinner-on');

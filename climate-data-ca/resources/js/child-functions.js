@@ -410,6 +410,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
     let chartDecimals = varDetails['decimals'];
     let scenarios = DATASETS[query['dataset']].scenarios;
     let pointFormatter, labelFormatter;
+    let parentPlaceholder = $(container).parents('.var-chart-container, .overlay-content');
 
     switch (varDetails.units.value) {
         case 'doy':
@@ -595,8 +596,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
         chart.download_url = download_url;
         chart.varDetails = varDetails;
 
-        $('body').on('change', 'input[type=radio][name=chartoption-' + query['var'] + ']', function () {
-
+        parentPlaceholder.find('.chart-option').on('change', function() {
             if ($(this).prop('checked') == true) {
 
                 let chart = $(this).parents('.var-chart-container, .overlay-content').find('.var-chart').highcharts();
@@ -776,17 +776,11 @@ function displayChartData(data, varDetails, download_url, query, container) {
         });
 
         if (query['delta'] == 'true') {
-
-            // if delta
-            // find the '30 year changes' radio
-            // and trigger click
-
-            $('body').find('#chartoption3-' + query['var']).prop('checked', true).trigger('change')
-
+            // if delta: find the '30 year changes' radio and trigger click
+            parentPlaceholder.find('.chart-option[value="delta"]').prop('checked', true).trigger('change');
         } else {
-
             // 30y averages is by default, so trigger the change event on load
-            $('#chartoption2-' + query['var']).trigger('change');
+            parentPlaceholder.find('.chart-option[value="30y"]').trigger('change');
 
         }
     }
@@ -1441,12 +1435,13 @@ function getIDFLinks(station_id, target, css_class) {
         // global handler for chart export CSV
         $('body').on('click', '.chart-export-data', function (e) {
             e.preventDefault();
-            let chart = $(this).parents('.var-chart-container, .overlay-content').find('.var-chart').highcharts()
+            let parentPlaceholder = $(this).parents('.var-chart-container, .overlay-content');
+            let chart = parentPlaceholder.find('.var-chart').highcharts();
 
             switch ($(this).attr('data-type')) {
                 case 'csv':
                     setDataLayerForChartData('csv', chart, chart.query);
-                    switch($('input[name=chartoption-'+ chart.query.var + ']:checked').val()) {
+                    switch(parentPlaceholder.find('.chart-option:checked').val()) {
                         case '30y':
                         case 'delta':
                             window.location.href = chart.download_url;
@@ -1484,8 +1479,11 @@ function getIDFLinks(station_id, target, css_class) {
             });
         });
 
+
+
         $('body').on('change', 'input:radio.chart-dataset', function (e) {
-            let container = $(this).parents('.var-chart-container, .overlay-content').find('.var-chart');
+            let parentPlaceholder = $(this).parents('.var-chart-container, .overlay-content');
+            let container = parentPlaceholder.find('.var-chart');
             let oldchart = container.highcharts();
             let query = oldchart.query;
             let varDetails = oldchart.varDetails;
@@ -1513,7 +1511,7 @@ function getIDFLinks(station_id, target, css_class) {
             $.getJSON(chart_url,
                 function (data) {
                     displayChartData(data, varDetails, download_url, query, container[0]);
-                    $('input[type=radio][name=chartoption-' + query.var + ']:checked').trigger('change');
+                    parentPlaceholder.find('.chart-option:checked').trigger('change');
                 });
 
 

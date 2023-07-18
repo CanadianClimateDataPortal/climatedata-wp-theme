@@ -1481,7 +1481,7 @@
         //
         //
 
-        function legend_markup(legendTitle, colormap) {
+        function legend_markup(legendTitle, colormap, building_climate_zones) {
 
             labels = [];
 
@@ -1509,17 +1509,24 @@
                 } else if (i == colormap.length - 1) {
                     row_class += ' last'
                 }
+                if (building_climate_zones) {
+                    let label="";
+                    if (i == 0) {
+                        label = '<span class="legendLabel min">' + unitValue + '</span>';
+                    } else if (i == colormap.length - 1) {
+                        label = '<span class="legendLabel min">' + unitValue + '</span>';
+                    }
+                    labels.push(
+                        '<div class="legendRow">' + label +
+                        '<div class="legendColor" style="opacity: ' + current_opacity + '; background-color:' + unitColor + ';"></div>' +
+                        '<div class="legendUnit">' + unitValue + '</div>' +
+                        '</div>'
+                    );
+                } else if (unitValue !== 'NaN') {
 
-                if (unitValue !== 'NaN') {
-
-                    t = "";
-                    
                     if (i == 0) {
                         
                         // first row
-                            
-                        t = '<span class="legendLabel max">' + first_label + '</span>';
-
                         labels.push(
                             '<div class="' + row_class + '">' +
                             '<span class="legendLabel max">' + unitValue + '</span>' +
@@ -1530,7 +1537,7 @@
                         );
                         
                     } else if (i == colormap.length - 1) {
-                        
+                        // last row
                         labels.push(
                             '<div class="' + row_class + '">' +
                             '<span class="legendLabel min">' + unitValue + '</span>' +
@@ -1541,9 +1548,6 @@
                         );
                         
                     } else {
-                        
-                        // last row
-                        
                         labels.push(
                             '<div class="' + row_class + '">' +
                             '<div class="legendColor" style="opacity: ' + current_opacity + '; background-color:' + unitColor + ';"></div>' +
@@ -1657,25 +1661,25 @@
                     let colormap = '';
 
                     labels = [];
+                    colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
+                    colormap = colormap.reverse();
+
+                    labels = legend_markup(legendTitle, colormap, building_climate_zones);
+
                     leftLegend.onAdd = function (map1) {
                         let div = L.DomUtil.create('div', 'info legend legendTable');
-                        colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
-                        let unitValue;
-                        let unitColor;
-
-                        colormap = colormap.reverse();
-
-                        labels = legend_markup(legendTitle, colormap);
-
                         div.innerHTML = labels.join('');
                         return div;
-
                     };
-
                     leftLegend.addTo(map1);
 
                     if ($('#rcp').val().indexOf("vs") !== -1) {
-                        generateRightLegend(layer, legendTitle, data);
+                        rightLegend.onAdd = function (mapRight) {
+                            let div = L.DomUtil.create('div', 'info legend legendTable');
+                            div.innerHTML = labels.join('');
+                            return div;
+                        };
+                        rightLegend.addTo(mapRight);
                     }
 
                 })
@@ -1686,31 +1690,7 @@
 
         }
 
-        function generateRightLegend(layer, legendTitle, data) {
-
-            labels = [];
-            rightLegend.onAdd = function (mapRight) {
-                let div = L.DomUtil.create('div', 'info legend legendTable');
-                let colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
-                let unitValue;
-                let unitColor;
-
-                labels = legend_markup(legendTitle, colormap);
-
-                div.innerHTML = labels.join('');
-                return div;
-
-            };
-
-            rightLegend.addTo(mapRight);
-
-        }
-
         function generateSectorLegend(layer, legendTitle) {
-
-            // console.log('generateSectorLegend');
-            // console.log();
-            // console.log(layer);
 
             aord_value = $('input[name="absolute_delta_switch"]:checked').val();
 
@@ -1733,7 +1713,7 @@
 
                         colormap = colormap.reverse();
 
-                        labels = legend_markup(legendTitle, colormap);
+                        labels = legend_markup(legendTitle, colormap, false);
 
                         div.innerHTML = labels.join('');
                         return div;
@@ -2489,7 +2469,7 @@
 
             // enable/disable controls.
             // Fact: all variables with hasdelta == false doesn't have summary selection
-            if(varDetails.hasdelta !== undefined && varDetails.hasdelta === false) {
+            if((varDetails.hasdelta !== undefined && varDetails.hasdelta === false) || var_value === 'building_climate_zones') {
                 $('input[name="absolute_delta_switch"]').attr("disabled", true);
                 $('input[name="absolute_delta_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
 

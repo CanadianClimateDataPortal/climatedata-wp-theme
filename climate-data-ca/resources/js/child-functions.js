@@ -391,6 +391,19 @@ function setDataLayerForChartData(chartDataFormat, chartData, query) {
     });
 }
 
+function formatDecade(timestampMilliseconds, period){
+    let year = new Date(timestampMilliseconds).getFullYear();
+    let decade = year - year % 10 + 1;
+    if (decade > 2071) {
+        decade = 2071;
+    }
+    if (decade < 1951) {
+        decade = 1951;
+    }
+    return [decade, Date.UTC(decade, month_number_lut[period] - 1, 1)];
+
+}
+
 function displayChartData(data, varDetails, download_url, query, container) {
     let chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
     let chartDecimals = varDetails['decimals'];
@@ -619,12 +632,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
                                 formatter: function (tooltip) {
 
-                                    let year = new Date(this.x).getFullYear();
-                                    let decade = year - year % 10 + 1;
-                                    if (decade > 2071) {
-                                        decade = 2071;
-                                    }
-                                    let decade_ms = Date.UTC(decade, month_number_lut[query['mora']] - 1, 1);
+                                    let [decade, decade_ms] = formatDecade(this.x, query['mora']);
                                     chart.xAxis[0].removePlotBand('30y-plot-band');
                                     chart.xAxis[0].addPlotBand({
                                         from: Date.UTC(decade, 0, 1),
@@ -637,6 +645,13 @@ function displayChartData(data, varDetails, download_url, query, container) {
                                     let val1, val2;
 
                                     let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + "</span><br/>"];
+
+                                    if (decade_ms in data['30y_observations']) {
+                                        this.value = data['30y_observations'][decade_ms][0];
+                                        val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                        tip.push("<span style=\"color:#F47D23\">●</span> " + chart_labels.observation + " <b>"
+                                            + val1 + "</b><br/>");
+                                    }
 
                                     scenarios.forEach(function (scenario) {
                                         this.value = data['30y_{0}_median'.format(scenario.name)][decade_ms][0];
@@ -687,12 +702,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
                                 formatter: function (tooltip) {
 
-                                    let year = new Date(this.x).getFullYear();
-                                    let decade = year - year % 10 + 1;
-                                    if (decade > 2071) {
-                                        decade = 2071;
-                                    }
-                                    let decade_ms = Date.UTC(decade, month_number_lut[query['mora']] - 1, 1);
+                                    let [decade, decade_ms] = formatDecade(this.x, query['mora']);
                                     chart.xAxis[0].removePlotBand('30y-plot-band');
                                     chart.xAxis[0].addPlotBand({
                                         from: Date.UTC(decade, 0, 1),

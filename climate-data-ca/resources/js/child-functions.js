@@ -391,8 +391,8 @@ function setDataLayerForChartData(chartDataFormat, chartData, query) {
     });
 }
 
-function formatDecade(formatterContext, query){
-    let year = new Date(formatterContext.x).getFullYear();
+function formatDecade(timestampMilliseconds, period){
+    let year = new Date(timestampMilliseconds).getFullYear();
     let decade = year - year % 10 + 1;
     if (decade > 2071) {
         decade = 2071;
@@ -400,7 +400,7 @@ function formatDecade(formatterContext, query){
     if (decade < 1951) {
         decade = 1951;
     }
-    return [decade, Date.UTC(decade, month_number_lut[query['mora']] - 1, 1)];
+    return [decade, Date.UTC(decade, month_number_lut[period] - 1, 1)];
 
 }
 
@@ -632,7 +632,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
                                 formatter: function (tooltip) {
 
-                                    let [decade, decade_ms] = formatDecade(this, query);
+                                    let [decade, decade_ms] = formatDecade(this.x, query['mora']);
                                     chart.xAxis[0].removePlotBand('30y-plot-band');
                                     chart.xAxis[0].addPlotBand({
                                         from: Date.UTC(decade, 0, 1),
@@ -702,7 +702,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
                                 formatter: function (tooltip) {
 
-                                    let [decade, decade_ms] = formatDecade(this, query);
+                                    let [decade, decade_ms] = formatDecade(this.x, query['mora']);
                                     chart.xAxis[0].removePlotBand('30y-plot-band');
                                     chart.xAxis[0].addPlotBand({
                                         from: Date.UTC(decade, 0, 1),

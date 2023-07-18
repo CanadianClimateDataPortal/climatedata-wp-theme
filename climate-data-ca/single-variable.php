@@ -506,7 +506,7 @@ if (have_posts()) : while (have_posts()) : the_post();
                                 <?php
 
                                 if ( get_field ( 'hasdelta' ) ) {
-
+                                    $input_name = uniqid("chart-options-");
                                     ?>
 
                                     <h6 class="mb-0">Options:</h6>
@@ -514,33 +514,17 @@ if (have_posts()) : while (have_posts()) : the_post();
                                     <div class="btn-group btn-group-toggle" data-toggle="buttons">
 
                                         <label class="btn btn-outline-primary rounded-pill">
-                                            <input
-                                                    type="radio"
-                                                    name="<?php echo 'chartoption-' . $var_name; ?>"
-                                                    id="<?php echo 'chartoption1-' . $var_name; ?>"
-                                                    value="annual"
-                                            >
+                                            <input type="radio" class="chart-option" name="<?php echo $input_name;?>" value="annual">
                                             <?php _e('Annual values', 'cdc'); ?>
                                         </label>
 
                                         <label class="btn btn-outline-primary rounded-pill active">
-                                            <input
-                                                    type="radio"
-                                                    name="<?php echo 'chartoption-' . $var_name; ?>"
-                                                    id="<?php echo 'chartoption2-' . $var_name; ?>"
-                                                    value="30y"
-                                                    checked
-                                            >
+                                            <input type="radio" class="chart-option" name="<?php echo $input_name;?>" value="30y" checked>
                                             <?php _e('30 year averages', 'cdc'); ?>
                                         </label>
 
                                         <label class="btn btn-outline-primary rounded-pill">
-                                            <input
-                                                    type="radio"
-                                                    name="<?php echo 'chartoption-' . $var_name; ?>"
-                                                    id="<?php echo 'chartoption3-' . $var_name; ?>"
-                                                    value="delta"
-                                            >
+                                            <input type="radio" class="chart-option" name="<?php echo $input_name;?>" value="delta">
                                             <?php _e('30 year changes', 'cdc'); ?>
                                         </label>
 
@@ -701,7 +685,7 @@ if (have_posts()) : while (have_posts()) : the_post();
             <?php
 
             if (get_field('hasdelta')) {
-
+                $input_name = uniqid("chart-options-");
                 ?>
 
                 <h6 class="mb-0">Options:</h6>
@@ -709,34 +693,17 @@ if (have_posts()) : while (have_posts()) : the_post();
                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
 
                     <label class="btn btn-outline-primary rounded-pill">
-                        <input
-                                type="radio"
-                                name="<?php echo 'chartoption-' . $var_name; ?>"
-                                id="<?php echo 'chartoption1-' . $var_name; ?>"
-                                value="annual"
-                        >
+                        <input type="radio" class="chart-option" name="<?php echo $input_name;?>" value="annual">
                         <?php _e('Annual values', 'cdc'); ?>
                     </label>
 
                     <label class="btn btn-outline-primary rounded-pill active">
-                        <input
-                                type="radio"
-                                name="<?php echo 'chartoption-' . $var_name; ?>"
-                                id="<?php echo 'chartoption2-' . $var_name; ?>"
-                                value="30y"
-                                checked
-                        >
+                        <input type="radio" class="chart-option" name="<?php echo $input_name;?>" value="30y" checked>
                         <?php _e('30 year averages', 'cdc'); ?>
                     </label>
 
                     <label class="btn btn-outline-primary rounded-pill">
-                        <input
-                                type="radio"
-                                name="<?php echo 'chartoption-' . $var_name; ?>"
-                                id="<?php echo 'chartoption3-' . $var_name; ?>"
-                                value="delta"
-                        >
-                        <?php _e('30 year changes', 'cdc'); ?>
+                        <input type="radio" class="chart-option"name="<?php echo $input_name;?>" value="delta"><?php _e('30 year changes', 'cdc'); ?>
                     </label>
 
                 </div>

@@ -51,7 +51,7 @@ add_action('wp_enqueue_scripts', 'tpl_enqueue');
 
 get_header();
 
-echo render_variables_fields();
+echo render_variables_fields(["building_climate_zones"]);
 
 if (have_posts()) : while (have_posts()) : the_post();
 

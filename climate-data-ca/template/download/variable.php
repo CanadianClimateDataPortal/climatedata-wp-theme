@@ -35,10 +35,10 @@
         </div>
 
         <p class="form-help col-10 col-sm-2 offset-1"><a href="<?php echo get_permalink(filtered_ID_by_path('about', $GLOBALS['vars']['current_lang'])); ?>#about-datasets"><?php _e('Learn more about datasets', 'cdc'); ?></a></p>
-        <div class="form-select offset-4-of-9 offset-sm-0 mt-2">
+        <div class="form-select col-4 offset-4 mt-3">
             <div id="average-btn-group" class="btn-group btn-group-toggle w-100" data-toggle="buttons">
-                <label id="average-label-allyears" class="btn btn-outline-primary active"> <input type="radio" name="download-dataset-type" id="download-allyears" autocomplete="off" value="allyears" checked><?php _e('All years', 'cdc'); ?></label>
-                <label id="average-label-30yaverage" class="btn btn-outline-primary"> <input type="radio" name="download-dataset-type" id="download-30yaverage" autocomplete="off" value="30ygraph"><?php _e('30 years average', 'cdc'); ?></label>
+                <label id="average-label-allyears" class="btn btn-outline-primary"> <input type="radio" name="download-dataset-type" id="download-allyears" autocomplete="off" value="allyears"><?php _e('All years', 'cdc'); ?></label>
+                <label id="average-label-30yaverage" class="btn btn-outline-primary active"> <input type="radio" name="download-dataset-type" id="download-30yaverage" autocomplete="off" value="30ygraph" checked><?php _e('30 year averages', 'cdc'); ?></label>
             </div>
         </div>
     </div>

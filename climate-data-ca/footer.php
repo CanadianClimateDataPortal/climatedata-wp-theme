@@ -8,8 +8,8 @@ if ( get_field ( 'page_feedback' ) == 1 ) {
 
 $footer_logo = get_field ( 'footer_logo', 'option' );
 
+    if (get_page_template_slug() != 'tpl-iframe.php') {
     ?>
-
     <footer id="main-footer">
       <div class="section-container">
         <?php
@@ -42,7 +42,7 @@ $footer_logo = get_field ( 'footer_logo', 'option' );
     </footer>
 
     <?php
-
+    }
       if ( is_page ( 'learn' ) || is_page ( 'apprendre' ) ) {
 
     ?>

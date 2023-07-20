@@ -139,8 +139,9 @@
                         element: null
                     }
 
+                    let layerVariableName = variable == "building_climate_zones" ? "hddheat_18" : variable;
 
-                    $.getJSON(DATA_URL + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
+                    $.getJSON(DATA_URL + '/generate-charts/' + lat + '/' + lon + '/' + layerVariableName + '/' + month,
                         function (data) {
 
                             plugin_settings.charts[container_ID]['unit'] = varDetails.units.value === 'kelvin' ? '°C' : ' ' + varDetails.units.label;

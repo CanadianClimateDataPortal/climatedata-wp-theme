@@ -6,9 +6,14 @@ $header-height: 90px;  // same as h7-parent/resources/scss/global.scss
 
 .iframe-container {
   position: fixed;
-  width: 100%;
-  height: 100%;
+  bottom: 0px;
+  top: 90px;
+  right: 0px;
+  left: 0px;
+  background: #f2f2f2;
+  padding: 0.3%
 }
+
 
 .iframe-container iframe {
   width: 100%;
@@ -16,4 +21,5 @@ $header-height: 90px;  // same as h7-parent/resources/scss/global.scss
   border: none;
   margin: 0;
   padding: 0;
+  background: white;
 }

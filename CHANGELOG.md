@@ -1,6 +1,5 @@
-Unreleased
-
-  * 
+2023-07-12.02
+  * Added 30 years option to download page
 
 2023-07-12.01
   * Added Building Climate Zones variable

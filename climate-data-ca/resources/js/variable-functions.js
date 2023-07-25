@@ -841,17 +841,19 @@
                     let dataset_name = $('input[name="dataset_switch"]:checked').val();
                     let values_url;
 
+                    let layerVariableName = var_value == "building_climate_zones" ? "hddheat_18" : var_value;
+
                     if (sector === "") { // gridded
                         values_url = data_url + "/get-delta-30y-gridded-values/" +
                         e.latlng['lat'] + "/" + e.latlng['lng'] +
-                        "/" + var_value + "/" + mora_value +
+                        "/" + layerVariableName + "/" + mora_value +
                         "?period=" + decade_value +
                         "&decimals=" + varDetails.decimals + delta7100 +
                         "&dataset_name=" + dataset_name;
                     } else {
                         values_url = data_url + "/get-delta-30y-regional-values/" +
                             sector + "/" + e.layer.properties.id +
-                            "/" + var_value + "/" + mora_value +
+                            "/" + layerVariableName + "/" + mora_value +
                             "?period=" + decade_value +
                             "&decimals=" + varDetails.decimals + delta7100 +
                             "&dataset_name=" + dataset_name;
@@ -1191,7 +1193,12 @@
 
                     $('#rcp').prop('disabled', true);
 
+                    let building_climate_zones = false;
 
+                    if (variable == 'building_climate_zones') {
+                        building_climate_zones = true;
+                        variable = "hddheat_18";
+                    }
                     let download_url = data_url + '/download-30y/' + lat + '/' + lon + '/' + variable + '/' + month + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
 
                     $.getJSON(
@@ -1206,6 +1213,7 @@
                                     'lat': lat,
                                     'lon': lon,
                                     'delta': delta,
+                                    'building_climate_zones': building_climate_zones,
                                 }, $('#chart-placeholder')[0]);
                         });
 
@@ -1473,7 +1481,7 @@
         //
         //
 
-        function legend_markup(legendTitle, colormap) {
+        function legend_markup(legendTitle, colormap, building_climate_zones) {
 
             labels = [];
 
@@ -1501,17 +1509,24 @@
                 } else if (i == colormap.length - 1) {
                     row_class += ' last'
                 }
+                if (building_climate_zones) {
+                    let label="";
+                    if (i == 0) {
+                        label = '<span class="legendLabel min">' + unitValue + '</span>';
+                    } else if (i == colormap.length - 1) {
+                        label = '<span class="legendLabel min">' + unitValue + '</span>';
+                    }
+                    labels.push(
+                        '<div class="legendRow">' + label +
+                        '<div class="legendColor" style="opacity: ' + current_opacity + '; background-color:' + unitColor + ';"></div>' +
+                        '<div class="legendUnit">' + unitValue + '</div>' +
+                        '</div>'
+                    );
+                } else if (unitValue !== 'NaN') {
 
-                if (unitValue !== 'NaN') {
-
-                    t = "";
-                    
                     if (i == 0) {
                         
                         // first row
-                            
-                        t = '<span class="legendLabel max">' + first_label + '</span>';
-
                         labels.push(
                             '<div class="' + row_class + '">' +
                             '<span class="legendLabel max">' + unitValue + '</span>' +
@@ -1522,7 +1537,7 @@
                         );
                         
                     } else if (i == colormap.length - 1) {
-                        
+                        // last row
                         labels.push(
                             '<div class="' + row_class + '">' +
                             '<span class="legendLabel min">' + unitValue + '</span>' +
@@ -1533,9 +1548,6 @@
                         );
                         
                     } else {
-                        
-                        // last row
-                        
                         labels.push(
                             '<div class="' + row_class + '">' +
                             '<div class="legendColor" style="opacity: ' + current_opacity + '; background-color:' + unitColor + ';"></div>' +
@@ -1584,6 +1596,14 @@
             let rcp_value = $("#rcp").val();
             let decade_value = parseInt($("#decade").val());
             let msorys, msorysmonth;
+            let building_climate_zones_style = ""
+            let building_climate_zones = false;
+
+            if (var_value == "building_climate_zones") {
+                var_value = "hddheat_18"
+                building_climate_zones = true
+                building_climate_zones_style = "&style=CDC:building_climate_zones"
+            }
 
             query['var-group'] = $('#var option:selected').parent('optgroup').attr('data-slug');
 
@@ -1635,31 +1655,31 @@
             var layer = leftLayerName;
             var legendTitle = mora_text_value;
 
-            $.getJSON(hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&layer=CDC:" + layer + "&format=application/json")
+            $.getJSON(hosturl + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&layer=CDC:" + layer + "&format=application/json" + building_climate_zones_style)
                 .then(function (data) {
 
                     let colormap = '';
 
                     labels = [];
+                    colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
+                    colormap = colormap.reverse();
+
+                    labels = legend_markup(legendTitle, colormap, building_climate_zones);
+
                     leftLegend.onAdd = function (map1) {
                         let div = L.DomUtil.create('div', 'info legend legendTable');
-                        colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
-                        let unitValue;
-                        let unitColor;
-
-                        colormap = colormap.reverse();
-
-                        labels = legend_markup(legendTitle, colormap);
-
                         div.innerHTML = labels.join('');
                         return div;
-
                     };
-
                     leftLegend.addTo(map1);
 
                     if ($('#rcp').val().indexOf("vs") !== -1) {
-                        generateRightLegend(layer, legendTitle, data);
+                        rightLegend.onAdd = function (mapRight) {
+                            let div = L.DomUtil.create('div', 'info legend legendTable');
+                            div.innerHTML = labels.join('');
+                            return div;
+                        };
+                        rightLegend.addTo(mapRight);
                     }
 
                 })
@@ -1670,31 +1690,7 @@
 
         }
 
-        function generateRightLegend(layer, legendTitle, data) {
-
-            labels = [];
-            rightLegend.onAdd = function (mapRight) {
-                let div = L.DomUtil.create('div', 'info legend legendTable');
-                let colormap = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
-                let unitValue;
-                let unitColor;
-
-                labels = legend_markup(legendTitle, colormap);
-
-                div.innerHTML = labels.join('');
-                return div;
-
-            };
-
-            rightLegend.addTo(mapRight);
-
-        }
-
         function generateSectorLegend(layer, legendTitle) {
-
-            // console.log('generateSectorLegend');
-            // console.log();
-            // console.log(layer);
 
             aord_value = $('input[name="absolute_delta_switch"]:checked').val();
 
@@ -1717,7 +1713,7 @@
 
                         colormap = colormap.reverse();
 
-                        labels = legend_markup(legendTitle, colormap);
+                        labels = legend_markup(legendTitle, colormap, false);
 
                         div.innerHTML = labels.join('');
                         return div;
@@ -2473,7 +2469,7 @@
 
             // enable/disable controls.
             // Fact: all variables with hasdelta == false doesn't have summary selection
-            if(varDetails.hasdelta !== undefined && varDetails.hasdelta === false) {
+            if((varDetails.hasdelta !== undefined && varDetails.hasdelta === false) || var_value === 'building_climate_zones') {
                 $('input[name="absolute_delta_switch"]').attr("disabled", true);
                 $('input[name="absolute_delta_switch"]').closest('div').find('.toggle-inside').addClass('disabled');
 
@@ -2592,7 +2588,14 @@
                     aord_layer_value = "";
                 }
 
-                singleLayerName = layer_prefix + '' + var_value + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
+                var building_climate_zones_params = {
+                    'styles': 'CDC:building_climate_zones',
+                }
+
+                let layerVariableName = var_value == "building_climate_zones" ? "hddheat_18" : var_value;
+                let building_climate_zones = var_value == "building_climate_zones";
+
+                singleLayerName = layer_prefix + '' + layerVariableName + '-' + msorys + '-' + rcp_value + '-p50' + msorysmonth + '-30year' + aord_layer_value;
 
                 // if a compare scenario was selected
 
@@ -2626,6 +2629,12 @@
                         });
                     }
 
+                    if (building_climate_zones) {
+                        leftLayer.setParams(building_climate_zones_params);
+                        rightLayer.setParams(building_climate_zones_params);
+                    } else {
+                        leftLayer.setParams({"styles": ""});
+                    }
                 } else {
 
                     $('body').removeClass('map-compare');
@@ -2641,6 +2650,12 @@
                         'VERSION': '1.3.0',
                         layers: 'CDC:' + singleLayerName
                     });
+
+                    if (building_climate_zones) {
+                        leftLayer.setParams(building_climate_zones_params);
+                    } else {
+                        leftLayer.setParams({"styles": ""});
+                    }
 
                 }
 

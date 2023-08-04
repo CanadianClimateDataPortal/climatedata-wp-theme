@@ -62,55 +62,74 @@ const grid_resolution = {
 
 const DATASETS = {
     "cmip5": {
-        'scenarios': [
+        'ensemble_percentile':[
+            {'name': '5', 'label': '5', 'default': false},
+            {'name': '10', 'label': '10', 'default': true},
+            {'name': '25', 'label': '25', 'default': false},
+            {'name': '50', 'label': '50', 'default': true},
+            {'name': '75', 'label': '75', 'default': false},
+            {'name': '90', 'label': '90', 'default': true},
+            {'name': '95', 'label': '95', 'default': false}
+
+        ],
+        'scenario': [
             {
-                'name': 'rcp26', 'label': 'RCP 2.6', 'chart_color': '#00F',
+                'name': 'rcp26', 'label': 'RCP 2.6', 'chart_color': '#00F', 'default': true,
                 'correlations': {
                     'cmip6': 'ssp126'
                 }
             },
             {
-                'name': 'rcp45', 'label': 'RCP 4.5', 'chart_color': '#00640c',
+                'name': 'rcp45', 'label': 'RCP 4.5', 'chart_color': '#00640c', 'default': false,
                 'correlations': {
                     'cmip6': 'ssp245'
                 }
             },
             {
-                'name': 'rcp85', 'label': 'RCP 8.5', 'chart_color': '#F00',
+                'name': 'rcp85', 'label': 'RCP 8.5', 'chart_color': '#F00', 'default': false,
                 'correlations': {
                     'cmip6': 'ssp585'
                 }
             },
         ],
         'finch_name' : 'candcs-u5',
-        'model_lists': [
-            {'name': 'pcic12', 'label': 'PCIC12 (Ensemble)'},
-            {'name': '24models', 'label': 'All models'}]
+        'model': [
+            {'name': 'pcic12', 'label': 'PCIC12 (Ensemble)', 'default': false},
+            {'name': '24models', 'label': 'All models', 'default': true}]
     },
     "cmip6": {
-        'scenarios': [
+        'ensemble_percentile':[
+            {'name': '5', 'label': '5', 'default': false},
+            {'name': '10', 'label': '10', 'default': true},
+            {'name': '25', 'label': '25', 'default': false},
+            {'name': '50', 'label': '50', 'default': true},
+            {'name': '75', 'label': '75', 'default': false},
+            {'name': '90', 'label': '90', 'default': true},
+            {'name': '95', 'label': '95', 'default': false}
+        ],
+        'scenario': [
             {
-                'name': 'ssp126', 'label': 'SSP1-2.6', 'chart_color': '#00F',
+                'name': 'ssp126', 'label': 'SSP1-2.6', 'chart_color': '#00F', 'default': true,
                 'correlations': {
                     'cmip5': 'rcp26'
                 }
             },
             {
-                'name': 'ssp245', 'label': 'SSP2-4.5', 'chart_color': '#00640c',
+                'name': 'ssp245', 'label': 'SSP2-4.5', 'chart_color': '#00640c', 'default': false,
                 'correlations': {
                     'cmip5': 'rcp45'
                 }
             },
             {
-                'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#F00',
+                'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#F00', 'default': false,
                 'correlations': {
                     'cmip5': 'rcp85'
                 }
             },
         ],
         'finch_name' : 'candcs-u6',
-        'model_lists': [
-            {'name': '26models', 'label': 'All models'}]
+        'model': [
+            {'name': '26models', 'label': 'All models', 'default': true}]
     }
 }
 

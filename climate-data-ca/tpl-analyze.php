@@ -78,11 +78,29 @@
       <div id="analyze-form" class="analyze-form col-3">
 
         <form id="analyze-form-inputs" class="analyze-form-inputs">
+            <input class="add-to-object" type="hidden" name="compressedPoints" id="compressedPoints" value="">
+            <input class="add-to-object" type="hidden" name="lat" id="lat" value="">
+            <input class="add-to-object" type="hidden" name="lon" id="lon" value="">
+            <input class="add-to-object" type="hidden" name="shape" id="shape" value="">
+            <input class="add-to-object" type="hidden" name="average" id="average" value="">
 
-              <input class="add-to-object" type="hidden" name="lat" id="lat" value="">
-              <input class="add-to-object" type="hidden" name="lon" id="lon" value="">
-              <input class="add-to-object" type="hidden" name="shape" id="shape" value="">
-              <input class="add-to-object" type="hidden" name="average" id="average" value="">
+            <input class="add-to-object" type="hidden" name="zoom" id="zoom" value="4">
+            <input class="add-to-object" type="hidden" name="center" id="center" value="62.51231793838694;-98.5693359375">
+
+            <!-- Added to control url params -->
+            <input type="hidden" id="csv_precision" value="">
+            <input type="hidden" id="start_date" value="">
+            <input type="hidden" id="end_date" value="">
+
+            <input type="hidden" id="analyze-location" value="">
+            <input type="hidden" id="window" value="">
+            <input type="hidden" id="thresh" value="">
+            <input type="hidden" id="thresh_tasmin" value="">
+            <input type="hidden" id="thresh_tasmax" value="">
+            <input type="hidden" id="op" value="">
+            <input type="hidden" id="after_date" value="">
+            <input type="hidden" id="sum_thresh" value="">
+            <!-- End added -->
 
           <div id="analyze-steps" class="analyze-steps">
                 <div class="accordion-head" data-step="1">
@@ -125,7 +143,7 @@
                     <div class="field validate-input type-radio">
                       <div class="input-row form-check">
                         <div class="input-item">
-                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-grid" value="grid">
+                          <input class="form-check-input add-to-object" type="radio" name="analyze-location" id="analyze-location-grid" value="grid">
                           <label class="form-check-label" for="analyze-location-grid"><?php _e ( 'Grids', 'cdc' ); ?></label>
                         </div>
 
@@ -134,21 +152,21 @@
 
                     <div class="input-row form-check">
                         <div class="input-item">
-                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-watershed" value="watershed">
+                          <input class="form-check-input add-to-object" type="radio" name="analyze-location" id="analyze-location-watershed" value="watershed">
                           <label class="form-check-label" for="analyze-location-watershed"><?php _e ( 'Watershed', 'cdc' ); ?></label>
                         </div>
                     </div>
 
                     <div class="input-row form-check">
                         <div class="input-item">
-                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-census-division" value="census">
+                          <input class="form-check-input add-to-object" type="radio" name="analyze-location" id="analyze-location-census-division" value="census">
                           <label class="form-check-label" for="analyze-location-census-division"><?php _e ( 'Census division', 'cdc' ); ?></label>
                         </div>
                     </div>
 
                     <div class="input-row form-check">
                         <div class="input-item">
-                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-health-region" value="health">
+                          <input class="form-check-input add-to-object" type="radio" name="analyze-location" id="analyze-location-health-region" value="health">
                           <label class="form-check-label" for="analyze-location-health-region"><?php _e ( 'Health region', 'cdc' ); ?></label>
                         </div>
                     </div>
@@ -308,21 +326,21 @@
 
                       <div class="field validate-input type-radio">
                         <p class="input-label"><?php _e ( 'Models', 'cdc' ); ?></p>
-                          <div id="models-placeholder"></div>
+                          <div id="model-placeholder"></div>
                       </div>
 
 					    <div class="field type-checkbox">
                             <div class="form-check input-row select-all">
                               <div class="input-item">
                                 <input class="form-check-input" type="checkbox" name="" id="analyze-scenarios-all" value="all">
-
                                 <label class="form-check-label" for="analyze-scenarios-all"><?php _e ( 'Emissions Scenarios', 'cdc' ); ?></label>
                               </div>
                             </div>
 
-                            <div id="scenarios-placeholder" class="tree d-flex flex-wrap">
-                            </div>
+                            <div id="scenario-placeholder" class="tree d-flex flex-wrap"></div>
                         </div>
+
+
 
                       <div class="field type-checkbox">
                         <div class="form-check input-row select-all">
@@ -332,56 +350,7 @@
                           </div>
                         </div>
 
-                        <div class="tree d-flex flex-wrap">
-                          <div class="input-row form-check w-25">
-                            <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-5" value="5">
-                              <label class="form-check-label" for="analyze-percentile-5">5</label>
-                            </div>
-                          </div>
-
-                          <div class="input-row form-check w-25">
-                            <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-10" value="10" checked>
-                              <label class="form-check-label" for="analyze-percentile-10">10</label>
-                            </div>
-                          </div>
-
-                          <div class="input-row form-check w-25">
-                            <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-25" value="25">
-                              <label class="form-check-label" for="analyze-percentile-25">25</label>
-                            </div>
-                          </div>
-
-                          <div class="input-row form-check w-25">
-                            <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-50" value="50" checked>
-                              <label class="form-check-label" for="analyze-percentile-50">50</label>
-                            </div>
-                          </div>
-
-                          <div class="input-row form-check w-25">
-                            <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-75" value="75">
-                              <label class="form-check-label" for="analyze-percentile-75">75</label>
-                            </div>
-                          </div>
-
-                          <div class="input-row form-check w-25">
-                            <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-90" value="90" checked>
-                              <label class="form-check-label" for="analyze-percentile-90">90</label>
-                            </div>
-                          </div>
-
-                          <div class="input-row form-check w-25">
-                            <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-95" value="95">
-                              <label class="form-check-label" for="analyze-percentile-95">95</label>
-                            </div>
-                          </div>
-                        </div>
+                          <div id="ensemble_percentile-placeholder" class="tree d-flex flex-wrap"></div>
                       </div>
 
                         <div class="field validate-input type-radio d-flex flex-wrap">
@@ -413,7 +382,7 @@
                                 </div>
                             </div>
                         </div>
-												
+
                       <div class="field validate-input type-radio d-flex flex-wrap">
                         <p class="input-label w-100"><?php _e ( 'Output Format', 'cdc' ); ?></p>
 
@@ -622,7 +591,6 @@
         <div id="analyze-stations-form" class="analyze-form col-3">
 
         <form id="analyze-stations-form-inputs" class="analyze-form-inputs">
-
           <input class="add-to-object" type="hidden" name="lat" id="lat" value="">
           <input class="add-to-object" type="hidden" name="lon" id="lon" value="">
 

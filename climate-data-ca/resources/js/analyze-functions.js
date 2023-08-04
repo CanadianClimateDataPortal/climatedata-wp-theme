@@ -2,6 +2,8 @@
 
     $(function () {
 
+
+
         //
         // GLOBAL VARS
         //
@@ -43,13 +45,16 @@
             'average': '',
             'start_date': '',
             'end_date': '',
-            'ensemble_percentiles': '',
+            'ensemble_percentile': '',
             'dataset': '',
             'scenario': '',
-            'models': '',
+            'model': '',
             'freq': '',
             'data_validation': 'warn',
-            'output_format': ''
+            'output_format': '',
+            'compressedPoints': '',
+            'zoom': '',
+            'center': ''
         }
 
         var form_inputs = $.extend(true, {}, default_inputs)
@@ -139,16 +144,16 @@
 
         // MAPS
 
-        var maps = {};
-        var pbfLayer;
+        let maps = {};
+        let pbfLayer;
 
-        selectedGrids = [];
-        selectedPoints = [];
-        latlons = [];
+        let selectedGrids = [];
+        let selectedPoints = [];
+        //let latlons = [];
 
-        var map_grids = {};
+        let map_grids = {};
 
-        var vectorTileOptions = {
+        const vectorTileOptions = {
             rendererFactory: L.canvas.tile,
             attribution: '',
             interactive: true,
@@ -170,12 +175,13 @@
             },
             maxZoom: 12,
             minZoom: 7,
+            zoom:9,
             pane: 'grid'
         };
 
-        var hosturl = geoserver_url,
+        let hosturl = geoserver_url,
             zoom_on = false,
-            highlightGridFeature
+            highlightGridFeature;
 
 
         //
@@ -299,68 +305,124 @@
 
             });
 
-            pbfLayer = L.vectorGrid.protobuf(hosturl + '/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf', vectorTileOptions).on('click', function (e) {
-
-                highlightGridFeature = e.layer.properties.gid;
-
-                selectedPoints[highlightGridFeature] = e.latlng;
-
-                var selectedExists = selectedGrids.includes(highlightGridFeature);
-
-                if (selectedExists === false) {
-
-                    map_grids[highlightGridFeature] = e.latlng
-
-                    selectedGrids.push(highlightGridFeature);
-
-                    pbfLayer.setFeatureStyle(highlightGridFeature, {
-                        weight: 1,
-                        color: '#F00',
-                        opacity: 1,
-                        fill: true,
-                        radius: 4,
-                        fillOpacity: 0.1
-                    })
-
-                } else {
-                    DeselectedGridCell(highlightGridFeature);
-                }
-
-
-                $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length)
-
-                var i = 0,
-                    lat_val = '',
-                    lon_val = ''
-
-                for (var key in map_grids) {
-
-                    if (i != 0) {
-                        lat_val += ','
-                        lon_val += ','
-                    }
-
-                    lat_val += map_grids[key]['lat']
-                    lon_val += map_grids[key]['lng']
-
-                    i++
-
-                }
-
-                $('#lat').val(lat_val)
-                $('#lon').val(lon_val)
-                $('#shape').val('')
-                validate_inputs()
-
-                L.DomEvent.stop(e)
-
-            }).addTo(maps['analyze']);
+            initGridProtobuf();
 
             checkForUrlParam()
             validate_steps();
             validate_inputs();
 
         } // analyze_init
+
+        function initMap(map_id) {
+            $(`input[type="hidden"][id='zoom']`).val("4");
+            $(`input[type="hidden"][id='center']`).val("62.51231793838694;-98.5693359375");
+            centerMap(map_id);
+        }
+
+        function centerMap(map_id) {
+            let z = parseInt($(`input[type="hidden"][id='zoom']`).val());
+            let c = $(`input[type="hidden"][id='center']`).val().split(';');
+
+            maps[map_id].setView([parseFloat(c[0]), parseFloat(c[1])], z);
+        }
+
+        function initGridProtobuf(compressedPoints) {
+            sector_select_by_id  = undefined;
+            DeselectAllGridCell();
+            selectedGrids = [];
+
+            pbfLayer = L.vectorGrid.protobuf(hosturl + '/geoserver/gwc/service/tms/1.0.0/CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf', vectorTileOptions)
+                .on('click', function (e) {
+                    console.log(e);
+                    highlightGridFeature = e.layer.properties.gid;
+
+                    selectedPoints[highlightGridFeature] = e.latlng;
+
+                    var selectedExists = selectedGrids.includes(highlightGridFeature);
+
+                    if (selectedExists === false) {
+
+                        map_grids[highlightGridFeature] = e.latlng
+
+                        selectedGrids.push(highlightGridFeature);
+
+                        pbfLayer.setFeatureStyle(highlightGridFeature, {
+                            weight: 1,
+                            color: '#F00',
+                            opacity: 1,
+                            fill: true,
+                            radius: 4,
+                            fillOpacity: 0.1
+                        })
+
+                    } else {
+                        DeselectedGridCell(highlightGridFeature);
+                    }
+
+                    $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length);
+
+                    var i = 0,
+                        lat_val = '',
+                        lon_val = ''
+
+                    for (var key in map_grids) {
+
+                        if (i != 0) {
+                            lat_val += ','
+                            lon_val += ','
+                        }
+
+                        lat_val += map_grids[key]['lat']
+                        lon_val += map_grids[key]['lng']
+
+                        i++
+
+                    }
+
+                    $('#lat').val(lat_val)
+                    $('#lon').val(lon_val)
+                    $('#shape').val('')
+                    validate_inputs()
+
+                    L.DomEvent.stop(e)
+
+                })
+                .addTo(maps['analyze']);
+
+                if(compressedPoints != undefined) {
+                    let getGidsFromCompressedPointsURL = DATA_URL+"/get-gids/" + compressedPoints + "?gridname=canadagrid";
+                    fetch(getGidsFromCompressedPointsURL, {
+                        method: "GET",
+                        mode: "cors",
+                    }).then((response) => response.json())
+                        .then((result) => {
+                            let latLonArray = decompressLatLonPointsStringToList(compressedPoints);
+
+                            for (var i in result) {
+                                latLonArray[i]['id'] = result[i];
+                            }
+
+                            latLonArray.forEach(function (p) {
+                                selectedPoints[p.id] = L.latLng(p.point[0], p.point[1]);
+                                map_grids[p.id] = L.latLng(p.point[0], p.point[1]);
+
+                                selectedGrids.push(p.id);
+
+                                pbfLayer.setFeatureStyle(p.id, {
+                                    weight: 1,
+                                    color: '#F00',
+                                    opacity: 1,
+                                    fill: true,
+                                    radius: 4,
+                                    fillOpacity: 0.1
+                                });
+                            });
+                            $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length);
+
+                        })
+                }
+        }
+
 
         //
         // OVERLAY
@@ -454,7 +516,7 @@
 
         // prepend icons to custom controls within page
         function prepend_icons(items, all = true) {
-            items.each(function (i) {
+            items.each(function(i) {
                 if ($(this).hasClass('type-radio')) {
                     $(this).find('.input-row label').before('<i class="' + radio_icon_off + '"></i>');
                 } else if ($(this).hasClass('type-checkbox')) {
@@ -468,7 +530,7 @@
                         }
                     })
                 }
-            })
+            });
         }
 
         prepend_icons($('.field'));
@@ -502,8 +564,9 @@
             ChangeLayers(itemInput);
 
             if(itemInput != 'grid'){
+                if(form_inputs["analyze-location"] == "grid") initMap('analyze');
                 $('#average').val('True');
-                InitSectorProtobuf(itemInput);
+                InitSectorProtobuf(itemInput, -1);
 
                 locations_type = itemInput;
 
@@ -512,6 +575,7 @@
 
                 }
             } else {
+                if(form_inputs["analyze-location"] != "grid") initMap('analyze');
                 $('#average').val('False');
             }
 
@@ -724,6 +788,7 @@
                     break;
                 default:
             }
+
         }
 
         function LayerSwapSector(settings) {
@@ -734,6 +799,7 @@
                     layer: 'grid',
                     action: 'off'
                 });
+
             } else {
                 is_sector_on = false;
 
@@ -741,6 +807,7 @@
                     maps['analyze'].removeLayer(analyzeLayer);
                 }
             }
+
         }
 
         function LayerSwapGrid(settings) {
@@ -750,6 +817,7 @@
                     layer: 'sector',
                     action: 'off'
                 });
+
             }
             else {
                 // hide grid
@@ -757,7 +825,7 @@
             }
         }
 
-        function InitSectorProtobuf(sector) {
+        function InitSectorProtobuf(sector, shape) {
             sector_select_by_id  = undefined;
             DeselectAllGridCell();
             selectedGrids = [];
@@ -793,7 +861,8 @@
                                 bounds: canadaBounds,
                                 maxZoom: 12,
                                 minZoom: 3,
-                                vectorTileLayerStyles: layerStyles
+                                vectorTileLayerStyles: layerStyles,
+                                center: [50.410992, -69.371189]
                             }
                         ).on('mouseover', function (e) {
                             let event_id = e.layer.properties.id;
@@ -820,10 +889,17 @@
                                 analyzeLayer.resetFeatureStyle(event_id);
                             }
                         }
+                        ).on('load', function (e) {
+                            if(shape != -1) {
+                                HighlightSectorById(shape, e, analyzeLayer, "");
+                                validate_inputs();
+                            }
+                        }
                         ).on('click', function (e) {
                             HighlightSectorById(e.layer.properties.id, e, analyzeLayer, e.layer.properties[l10n_labels.label_field]);
 
                             validate_inputs();
+
                         }).addTo(maps['analyze']);
                         resolve("Sector protobuf initialzed!")
                     }, 200)
@@ -836,12 +912,27 @@
             })
             .finally(() => {
                 maps['analyze'].on('zoom', function (e) {
+
                     if (typeof analyzeLayer !== 'undefined' && analyzeLayer !== null) {
                         analyzeLayer.unbindTooltip();
                     }
                 });
             });
         };
+
+        maps['analyze'].on('zoomend', ({ target }) => {
+            let c = target.getCenter();
+            $(`input[type="hidden"][id='zoom']`).val(target.getZoom());
+            $(`input[type="hidden"][id='center']`).val(c['lat'] + ";" + c['lng']);
+            validate_inputs();
+        });
+
+        maps['analyze'].on('click', ({ target }) => {
+            let c = target.getCenter();
+            $(`input[type="hidden"][id='zoom']`).val(target.getZoom());
+            $(`input[type="hidden"][id='center']`).val(c['lat'] + ";" + c['lng']);
+            validate_inputs();
+        });
 
 
         function HighlightSectorById(highlightSectorId, protobufEvent, analyzeLayer, label) {
@@ -884,6 +975,9 @@
         $('.timeframe-select').on('change', function () {
 
             var this_val = $(this).val();
+            let this_name = $(this).attr("name");
+
+            $(`input[type="hidden"][id=${this_name}]`).val(this_val);
 
             if ($(this).hasClass('start')) {
 
@@ -917,39 +1011,37 @@
 
         });
 
+
+        function load_list(items, selected, name, type){
+            let new_html="";
+            if(selected.length == 0) {
+                items[name].forEach(item => {
+                    if(item.default) selected.push(item.name);
+                });
+            }
+
+            items[name].forEach(item => {
+                let to_check = selected.includes(item.name);
+
+                let to_add = '<div class="input-row form-check {4} {2}">' +
+                    '   <div class="input-item">' +
+                    '       <input class="form-check-input add-to-object" type="'+ type +'" name="'+ name +'" id="analyze-'+ name +'-{0}" value="{0}" {2}>' +
+                    '       <i class="{3}"></i><label class="form-check-label" for="analyze-'+ name +'-{0}">{1}</label>' +
+                    '   </div>' +
+                    '</div>';
+                let btn_on = type == "radio"? radio_icon_on: checkbox_icon_on;
+                let btn_off = type == "radio"? radio_icon_off: checkbox_icon_off;
+                new_html += to_add.format(item.name, T(item.label), to_check ? "checked": "", to_check? btn_on : btn_off, type == "checkbox"? "w-25": "" );
+            });
+            $('#'+name+'-placeholder').html(new_html);
+        }
+
         $('input[name=dataset]').change(function (e) {
             // fill model and scenarios input since they depend on dataset selection
             let dataset_info = DATASETS[e.target.value];
-            let new_html="";
-            // add models to form
-            dataset_info.model_lists.forEach(function(model) {
-                let to_add = '<div class="input-row form-check">' +
-                    '   <div class="input-item">\n' +
-                    '       <input class="form-check-input add-to-object" type="radio" name="models" id="analyze-model-{0}" value="{0}">\n' +
-                    '       <label class="form-check-label" for="analyze-model-{0}">{1}</label>\n' +
-                    '   </div>\n' +
-                    '</div>';
-                new_html += to_add.format(model.name, T(model.label));
-            });
-            $('#models-placeholder').html(new_html);
-            prepend_icons($('#models-placeholder').closest('.field'), false);
-            $('#models-placeholder').find('.input-item:first').trigger('click');
-
-            // add scenarios to form
-            new_html="";
-            dataset_info.scenarios.forEach(function(scenario) {
-                let to_add = '<div  class="input-row form-check w-25">' +
-                    '   <div class="input-item">\n' +
-                    '       <input class="form-check-input add-to-object" type="checkbox" name="scenario" id="analyze-scenarios-{0}" value="{0}">\n' +
-                    '       <label class="form-check-label" for="analyze-scenarios-{0}">{1}</label>\n' +
-                    '   </div>\n' +
-                    '</div>';
-                new_html += to_add.format(scenario.name, T(scenario.label));
-                $('#scenarios-placeholder').html(new_html);
-                prepend_icons($('#scenarios-placeholder').closest('.field'), false);
-                $('#scenarios-placeholder').find('.input-item:first').trigger('click');
-            });
-
+            load_list(dataset_info, [], "model", "radio");
+            load_list(dataset_info, [], "scenario", "checkbox");
+            load_list(dataset_info, [], "ensemble_percentile", "checkbox");
 
         });
 
@@ -967,15 +1059,15 @@
                 if (var_frequencies != '') {
                     let frequencies = var_frequencies.split('|');
                     $('input[name=freq]').each(function(i) {
-                    if (frequencies.includes($(this).val())) {
-                        $(this).attr('disabled', false);
+                        if (frequencies.includes($(this).val())) {
+                            $(this).attr('disabled', false);
                         } else {
-                        let input_row = $(this).closest('.input-row');
-                        input_row.removeClass('checked');
-                        $(this).prop('checked', false);
-                        input_row.find('.form-icon').removeClass().addClass(radio_icon_off);
-                        $(this).attr('disabled', true);
-                    }
+                            let input_row = $(this).closest('.input-row');
+                            input_row.removeClass('checked');
+                            $(this).prop('checked', false);
+                            input_row.find('.form-icon').removeClass().addClass(radio_icon_off);
+                            $(this).attr('disabled', true);
+                        }
                     });
                 } else {
                     $('input[name=freq]').each(function(i) {
@@ -984,50 +1076,36 @@
                 }
 
 
-                var new_html = ''
-                new_html += '<h4>' + $(this).find('label').text() + '</h4>'
-                new_html += '<div class="form-inline">'
+                let new_html = '';
+                new_html += '<h4>' + $(this).find('label').text() + '</h4>';
+                new_html += '<div class="form-inline">';
 
-                for (var key in var_content) {
-                    var this_input = var_content[key]
+                for (let key in var_content) {
+                    let this_input = var_content[key];
 
                     if (this_input['type'] == 'text') {
-                        new_html += '<span>' + this_input['text'] + '</span>'
+                        new_html += '<span>' + this_input['text'] + '</span>';
 
                     } else if (this_input['type'] == 'input') {
-                        new_html += '<input '
-                        new_html += 'type="number" '
-                        new_html += 'class="form-control bg-transparent border-white mx-2 text-white" '
-                        new_html += 'size="4" '
-                        new_html += 'autocomplete="off" '
-                        new_html += 'data-units="' + this_input['units'] + '" '
+                        new_html += '<input ';
+                        new_html += 'type="number" ';
+                        new_html += 'class="form-control bg-transparent border-white mx-2 text-white" ';
+                        new_html += 'size="4" ';
+                        new_html += 'autocomplete="off" ';
+                        new_html += 'data-units="' + this_input['units'] + '" ';
 
-                        new_html += 'name="' + this_input['id'] + '" '
+                        new_html += 'name="' + this_input['id'] + '" ';
 
                         if (this_input['min'] != '') {
-                            new_html += 'min="' + this_input['min'] + '" '
+                            new_html += 'min="' + this_input['min'] + '" ';
                         }
 
                         if (this_input['max'] != '') {
                             new_html += 'max="' + this_input['max'] + '" '
                         }
 
-                        if (
-                            this_input['decimals'] != '' &&
-                            this_input['decimals'] != '0'
-                        ) {
-
-                            new_html += 'step="0.'
-
-                            decimal_places = parseInt(this_input['decimals'])
-
-                            for (i = 1; i < decimal_places; i++) {
-                                new_html += '0'
-                            }
-
-                            new_html += '1"'
-
-
+                        if (this_input['decimals'] != '' && this_input['decimals'] != '0') {
+                            new_html += 'step="0.' + ('1').padStart(parseInt(this_input['decimals']), "0") +'"';
                         }
 
                         new_html += '>'
@@ -1114,9 +1192,9 @@
             'average': 'average',
             "start_date": "start date",
             "end_date": "end date",
-            "ensemble_percentiles": "ensemble percentiles",
+            "ensemble_percentile": "ensemble percentile",
             "dataset": "dataset name",
-            "models": "models",
+            "model": "model",
             "freq": "frequence",
             "scenario": "scenario",
             "data_validation": "data validation",
@@ -1163,8 +1241,8 @@
                 form_obj = $.extend(true, {}, default_obj)
 
                 // build the final input object to send to the API
-                let isBySector = form_inputs["shape"] != '';
-                let isByGrid = form_inputs["lat"] != '' && form_inputs["lon"] != '';
+                let isBySector = form_inputs["shape"] != '' && form_inputs["compressedPoints"] == "";
+                let isByGrid = form_inputs["shape"] == '' && form_inputs["compressedPoints"] != "";
 
                 if((isBySector && isByGrid) || (!isBySector && !isByGrid) ){
                     console.error(" Can not build the final input object to send to the API. Please make to select only a sector ("+isBySector+") or grid ("+isByGrid+")");
@@ -1176,8 +1254,12 @@
                     "s_lon": ''
                 };
 
-                if(!isBySector){
+                if(isByGrid){
                     form_obj = CreateAnalyzeProcessRequestData(sectorCoord, form_inputs, form_obj);
+                    form_obj['inputs'].push({
+                        'id': 'output_name',
+                        'data': create_file_name(form_inputs)
+                    });
                     SubmitAnalyzeProcess(pathToAnalyzeForm);
                 }else{
                     // ex: https://data.climatedata.ca/partition-to-points/health/2.json
@@ -1190,7 +1272,7 @@
                         form_obj = CreateAnalyzeProcessRequestData(sectorCoord, form_inputs, form_obj);
                         form_obj['inputs'].push({
                             'id': 'output_name',
-                            'data': submit_url_var + '_' + locations_type + '_' + selected_feature_label
+                            'data': create_file_name(form_inputs)
                         });
                         SubmitAnalyzeProcess(pathToAnalyzeForm);
                     }).fail(function() { console.error("Can not get file " + getUrl); })
@@ -1198,6 +1280,70 @@
             }
         });
 
+        function create_file_name(form_inputs) {
+            let file_name = "{0}_{1}_{2}_{3}_{4}.{5}"
+            let datset = "CanDCS-u5";
+            console.log(form_inputs);
+
+            if(form_inputs["dataset"] == "cmip6") datset = "CanDCS-u6"
+            if(form_inputs["dataset"] == "humidex") datset = "HUMIDEX"
+            let location = form_inputs["analyze-location"].charAt(0).toUpperCase() + form_inputs["analyze-location"].slice(1);
+            if(form_inputs["shape"] != "") location += "_" + form_inputs["shape"];
+            let time = "from_{0}_to_{1}".format(form_inputs["start_date"], form_inputs["end_date"]);
+            let variables = {
+                'wetdays': {'label': 'WetDays', 'vars': '_qt_<thresh>'},
+                'sdii': {'label': 'AverageWetDayPreciIntens', 'vars': '_qt_<thresh>'},
+                'cwd': {'label': 'MaxConsWetDays', 'vars': '_qt_<thresh>'},
+                'cdd': {'label': 'MaxConsDryDays', 'vars': '_qt_<thresh>'},
+                'tx_tn_days_above': {'label': 'DaysAboveTmaxAndTmin', 'vars': '_<thresh_tasmin>_to_<thresh_tasmax>'},
+                'tx_days_above': {'label': 'DaysAboveTmax', 'vars': '_<thresh>'},
+                'tropical_nights': {'label': 'DaysAboveTmin', 'vars': '_<thresh>'},
+                'tn_days_below': {'label': 'DaysBelowTmin', 'vars': '_<thresh>'},
+                'cooling_degree_days': {'label': 'DegDaysAboveThreshold', 'vars': '_<thresh>'},
+                'heating_degree_days': {'label': 'DegDaysBelowThreshold', 'vars': '_<thresh>'},
+                'degree_days_exceedance_date': {
+                    'label': 'DegDaysExceedDate',
+                    'vars': '_<sum_thresh>_days_<op>_<thresh>_from_<after_date>'
+                },
+                'heat_wave_index': {'label': 'HeatWave', 'vars': '_<window>_days_at_<thresh>'},
+                'heat_wave_total_length': {
+                    'label': 'HeatWaveTotDuration',
+                    'vars': '_<window>_days_at_<thresh_tasmin>_to_<thresh_tasmax>'
+                },
+                'heat_wave_frequency': {
+                    'label': 'HeatWaveFreq',
+                    'vars': '_<window>_days_at_<thresh_tasmin>_to_<thresh_tasmax>'
+                },
+                'dlyfrzthw': {'label': 'DaysFreezeThawCycle', 'vars': '_<thresh_tasmin>_to_<thresh_tasmax>'},
+                'cold_spell_days': {'label': 'ColdSpellDays', 'vars': '_<window>_days_at_<thresh>'}
+            };
+
+            let variable = variables[form_inputs["analyze-location"]];
+            variable = variable.label + variable.vars;
+
+            ["thresh", "thresh_tasmin", "thresh_tasmax", "window", "after_date", "sum_thresh", "op"].forEach(v => {
+                let val = $(`input[type="hidden"][id=${v}]`).val()
+                if(["thresh", "thresh_tasmin", "thresh_tasmax"].includes(v)) val = val.replaceAll("-", "neg");
+                variable = variable.replaceAll("<"+ v +">", val);
+            });
+
+            let options = form_inputs["scenario"].replaceAll(",", "-") + "_";
+            let ps = form_inputs["ensemble_percentile"].split(",");
+            for(let i=0; i< ps.length; i++) ps[i] = "p" + ps[i]
+            options += ps.join("-") + "_";
+
+            let frequencies = {
+                "YS":"Annual",
+                "MS": "Monthly",
+                "QS-DEC": "Seasonal",
+                "AS-JUL": "July2June"
+            }
+            options += frequencies[form_inputs["freq"]] + "_";
+            options += form_inputs["csv_precision"];
+
+            let ext = form_inputs["output_format"] == "csv" ? "csv": "nc";
+            return file_name.format(datset, location, time, variable, options, ext);
+        }
 
         function SubmitAnalyzeProcess(pathToAnalyzeForm) {
             for (var key in form_thresholds) {
@@ -1451,10 +1597,6 @@
             $(this).closest('.analyze-detail').slideUp()
         });
 
-
-
-
-
         function DeselectAllGridCell() {
             const list = Object.entries(map_grids);
             list.forEach((key) => {
@@ -1482,7 +1624,7 @@
         }
 
         // GEO-SELECT
-
+        //
         function formatGeoSelect(item) {
 
             if (!item.id) {
@@ -1719,7 +1861,7 @@
                         // set breadcrumb
 
                         current_accordion.find('select').each(function (i) {
-                            if (i != 0) {
+                            if (i !== 0) {
                                 breadcrumb_val += ' – ';
                             }
                             breadcrumb_val += $(this).val()
@@ -1764,7 +1906,7 @@
                         //           console.log(i, $(this))
 
                         if (i != valid_steps.length) {
-                            for (z = i; z >= valid_steps.length; z += 1) {
+                            for (let z = i; z >= valid_steps.length; z += 1) {
                                 valid_steps[z] = false
                             }
                         }
@@ -1805,7 +1947,6 @@
                         }
 
                     })
-
                     if (options_val != '') {
                         $('#analyze-breadcrumb [data-step="5"]').addClass('on').find('.value').text(options_val)
                     } else {
@@ -1814,11 +1955,11 @@
 
                 }
 
-            } else if (current_tab == 'analyze-stations') {
+            } else if (current_tab === 'analyze-stations') {
 
                 // STATIONS
 
-                var valid_steps = [false, false, false, false];
+                valid_steps = [false, false, false, false];
 
                 $('#analyze-stations-steps .validate-input').each(function (i) {
 
@@ -1956,17 +2097,22 @@
             // Passing by encodingURI makes it easier to read on the reception
             formInputsDict['form_thresholds'] = encodeURI(JSON.stringify(form_thresholds));
 
-            // Compressing the [lat,long] points to a compressed string
-            let latArray = form_inputs['lat'].split(',');
-            let lonArray = form_inputs['lon'].split(',');
-            formInputsDict["compressedPoints"] = getEncodedPoints(latArray,lonArray);
+            if(form_inputs['lat'].length > 0) {
+                // Compressing the [lat,long] points to a compressed string
+                let latArray = form_inputs['lat'].split(',');
+                let lonArray = form_inputs['lon'].split(',');
+                formInputsDict["compressedPoints"] = getEncodedPoints(latArray,lonArray);
+            }
+
+            $('#compressedPoints').val(formInputsDict["compressedPoints"]);
 
             // Emptying the lat & lon arrays because of the use of the compressed string to shorten the shareable url
             delete formInputsDict['lat'];
             delete formInputsDict['lon'];
-       
+
             // Building the shareable url
             // Convert dict to url &param=value like
+            //console.log(formInputsDict);
             let params = new URLSearchParams(formInputsDict);
 
             let baseUrl = document.URL.split('?')[0];
@@ -2003,6 +2149,7 @@
         // This function read the url to return the parameters from it as a dictionary for the analyse form
         function readURL() {
             let params = window.location.search;
+
             params = params.split('?').pop(); // Remove ? at beginning
             params = params.split('&'); // Split into a key=value list
 
@@ -2025,54 +2172,14 @@
             return paramsDict
         }
 
-        // Fetch points based on the compressedValue and trigger every points on the map to click the shape layer
-        function selectMapAreasFromCompressedPoints(compressedValue) {
-            let getGidsFromCompressedPointsURL = DATA_URL+"/get-gids/" + compressedValue + "?gridname=canadagrid";
-            fetch(getGidsFromCompressedPointsURL, {
-                method: "GET",
-                mode: "cors",
-            }).then((response) => response.json())
-              .then((result) => {
-                let latLonArray = decompressLatLonPointsStringToList(compressedValue);
-
-                for (var i in result) {
-                    latLonArray[i]['id'] = result[i];
-                }
-
-
-                selectMapAreasFromPointsArray(latLonArray);
-            })
-        }
-
-        // Add points to the selected Grid on the map to highlight the grid layer
-        // Points is a list of point containing "id":<int> and "point"":<[float,float]>
-        // ex: --> points = [ {"id":123, "point":[lat, lon]} ]
-        function selectMapAreasFromPointsArray(points) {
-            points.forEach(function (p) {
-                let highlightGridFeature = p.id;
-
-                selectedPoints[highlightGridFeature] = L.latLng(p.point[0], p.point[1]);
-                map_grids[highlightGridFeature] = L.latLng(p.point[0], p.point[1]);
-
-                selectedGrids.push(highlightGridFeature);
-
-                pbfLayer.setFeatureStyle(highlightGridFeature, {
-                    weight: 1,
-                    color: '#F00',
-                    opacity: 1,
-                    fill: true,
-                    radius: 4,
-                    fillOpacity: 0.1
-                });
-            });
-        }
-
-
-
         function fillAnalyzeFormFromInputs(formInputs) {
-
             // --- CHOOSE A DATASET ---
             let dataset = formInputs['dataset'];
+            if(dataset == '') {
+                $(`a[id='header-primary-link-4']`).click();
+                return;
+            }
+
             $(`input[value='${dataset}']`).click();
 
 
@@ -2080,7 +2187,24 @@
             $("#ui-id-5").click(); // Accordion
             $("#btn-activate-map").click();
             $("#analyze-location-grid").click();
-            selectMapAreasFromCompressedPoints(formInputs['compressedPoints']);
+            let location = formInputs['analyze-location'];
+            $(`input[type="hidden"][id="analyze-location"]`).val(location);
+            $(`input[id='analyze-location-${location}']`).click();
+
+            if(location == "grid") {
+                $('#average').val('False');
+                $('#compressedPoints').val(formInputs["compressedPoints"]);
+                initGridProtobuf(formInputs["compressedPoints"]);
+            } else {
+                $('#average').val('True');
+                $('#compressedPoints').val('');
+                InitSectorProtobuf(location, formInputs['shape']);
+            }
+
+            // set zoom after loding map
+            $(`input[type="hidden"][id="zoom"]`).val(formInputs['zoom'] == undefined? $(`input[type="hidden"][id="zoom"]`).val(): formInputs['zoom']);
+            $(`input[type="hidden"][id="center"]`).val(formInputs['center'] == undefined? $(`input[type="hidden"][id="center"]`).val(): formInputs['center']);
+
 
             // --- CUSTOMIZE VARIABLES ---
             $("#ui-id-7").click(); // Accordion
@@ -2089,7 +2213,7 @@
             $(`input[id='analyze-var-${custom_var}']`).click();
 
 
-            // --- INSERT THRESHOLDS ---
+
             let tresholds = formInputs['form_thresholds'];
             for (let key in tresholds) {
                 let value = tresholds[key];
@@ -2101,36 +2225,31 @@
                     value = value.split(" ")[0] // Split because value contain units (ex.: 0 K days)
                     $(`input[name=${key}]`).val(value);
                 }
+                $(`input[type="hidden"][id=${key}]`).val(value);
             }
-
 
             // --- CHOOSE A TIMEFRAME ---
             $("#ui-id-9").click(); // Accordion
             $("select[id='analyze-timeframe-start']").val(formInputs['start_date']);
+            $(`input[type="hidden"][id="start_date"]`).val(formInputs['start_date']);
+
             // Adding change to trigger the event that enables the next accordion
             $("select[id='analyze-timeframe-end']").val(formInputs['end_date']).change();
-
 
             // --- ADVANCED ---
             $("#ui-id-11").click(); // Accordion
 
+            // models
+            load_list(DATASETS[formInputs['dataset']], [formInputs['model']], "model", "radio");
+
             // Selecting scenarios
-            let scenarios = formInputs['scenario'].split(',');
-            scenarios.forEach(scenario => {
-                // Select values other then the default value "ssp126"
-                if (["ssp126"].includes(scenario) == false) {
-                    $(`input[value='${scenario}']`).click();
-                }
-            })
+            let scenarios = formInputs['scenario'].length > 0 ? formInputs['scenario'].split(','): [];
+            load_list(DATASETS[formInputs['dataset']], scenarios, "scenario", "checkbox");
+
 
             // Ensemble Pecentiles
-            let ensemblePercentiles = formInputs['ensemble_percentiles'].split(',');
-            ensemblePercentiles.forEach(percent => {
-                // Select values other then the default value "10","50","90"
-                if (["10", "50", "90"].includes(percent) == false) {
-                    $(`input[name="ensemble_percentiles"][value="${percent}"]`).click();
-                }
-            })
+            let ensemblePercentiles = formInputs['ensemble_percentile'].length > 0 ? formInputs['ensemble_percentile'].split(','): ["10", "50", "90"];
+            load_list(DATASETS[formInputs['dataset']], ensemblePercentiles, "ensemble_percentile", "checkbox");
 
             // Selecting Frequency
             let frequency = formInputs['freq'];
@@ -2141,15 +2260,20 @@
             $(`input[value='${outputFormat}']`).click();
 
             // Setting the csv decimal precision value
+
+            $(`input[type="hidden"][id="csv_precision"]`).val('0');
             if (outputFormat === "csv") {
                 $("#analyze-decimals").val(formInputs["csv_precision"]);
+                $(`input[type="hidden"][id="csv_precision"]`).val(formInputs['csv_precision']);
             }
 
 
+            centerMap("analyze");
+
             // Show submit
             $('#analyze-submit').slideDown();
-        }
 
+        }
 
         // INPUTS
 
@@ -2160,168 +2284,168 @@
                 // PROJECTIONS
                 var is_valid = true
 
-            form_inputs = $.extend(true, {}, default_inputs)
+                form_inputs = $.extend(true, {}, default_inputs)
 
-
-            if ($('#analyze-format-csv').prop('checked') == true) {
-                $('#analyze-field-decimals').show()
-            } else {
-                $('#analyze-field-decimals').hide().find(':input').val(2)
-            }
-
-            // CHECK INPUTS THAT NEED TO BE ADDED
-            // TO THE REQUEST OBJECT
-
-            // build the form_inputs object
-
-            $('#analyze-form-inputs .add-to-object').each(function () {
-
-                var this_name = $(this).attr('name'),
-                    this_type = $(this).attr('type'),
-                    this_has_val = false,
-                    this_val = $(this).val()
-
-                if ($(this).is('select')) {
-                    this_type = 'select'
+                if ($('#analyze-format-csv').prop('checked') == true) {
+                    $('#analyze-field-decimals').show()
+                } else {
+                    $('#analyze-field-decimals').hide().find(':input').val(2)
                 }
 
-                switch (this_type) {
-                    case 'radio':
-                        if ($(this).prop('checked') == true) {
-                            this_has_val = true
-                        }
-                        break
+                // CHECK INPUTS THAT NEED TO BE ADDED
+                // TO THE REQUEST OBJECT
 
-                    case 'checkbox':
-                        if ($(this).prop('checked') == true) {
-                            this_has_val = true
-                        }
-                        break
+                // build the form_inputs object
 
-                    case 'number' :
-                        let this_min = parseInt($(this).attr('min')),
-                            this_max = parseInt($(this).attr('max'));
-                        this_val = parseInt($(this).val())
+                $('#analyze-form-inputs .add-to-object').each(function () {
 
-                        if (!isNaN(this_val) && this_val >= this_min && this_val <= this_max) {
-                            this_has_val = true;
+                    var this_name = $(this).attr('name'),
+                        this_type = $(this).attr('type'),
+                        this_has_val = false,
+                        this_val = $(this).val()
+
+
+                    if ($(this).is('select')) {
+                        this_type = 'select'
+                    }
+
+                    //console.log(this_name + ` (${this_type}) ` + this_val);
+
+                    switch (this_type) {
+                        case 'radio':
+                            if ($(this).prop('checked') == true) {
+                                this_has_val = true
+                            }
+                            break
+
+                        case 'checkbox':
+                            if ($(this).prop('checked') == true) {
+                                this_has_val = true
+                            }
+                            break
+
+                        case 'number' :
+                            let this_min = parseInt($(this).attr('min')),
+                                this_max = parseInt($(this).attr('max'));
+                            this_val = parseInt($(this).val())
+
+                            if (!isNaN(this_val) && this_val >= this_min && this_val <= this_max) {
+                                this_has_val = true;
+                            } else {
+                                is_valid = false;
+                            }
+                            break;
+
+                        default:
+                            if ($(this).val() != '') {
+                                this_has_val = true;
+                            }
+                            break
+
+                    }
+
+                    if (this_has_val == true) {
+
+                        if (this_type == 'checkbox') {
+
+                            let tab = form_inputs[this_name].length > 0 ? form_inputs[this_name].split(",") : [];
+                            if(! tab.includes(this_val)) tab.push(this_val);
+
+                            form_inputs[this_name] = tab.join(",");
+
                         } else {
-                            is_valid = false;
+                            form_inputs[this_name] = this_val;
+                        }
+
+                    }
+
+                })
+
+
+                // cycle through the object and check for empty values
+                for (var key in form_inputs) {
+
+                    let isBySector = form_inputs["shape"] != '' && ( key == "lat" || key == "lon"|| key == "compressedPoints");
+                    let isByGrid = key == "shape" && form_inputs["lat"] != '' && form_inputs["lon"] != '';
+
+                    if (isBySector || isByGrid){
+                        continue;
+                    }
+
+                    if (form_inputs[key] === '') {
+                        is_valid = false
+                    }
+                }
+
+                // CHECK FOR EMPTY VALUES
+                // IN THE VAR DETAIL OVERLAY FORM
+
+
+                form_thresholds = $.extend(true, {}, default_thresholds)
+
+                var thresholds_have_val = true
+
+                // build the form_thresholds object
+
+                $('#analyze-detail').find(':input').each(function () {
+
+                    var this_name = $(this).attr('name');
+                    if ($(this).attr('data-optional') == undefined ||
+                        $(this).attr('data-optional') == true || $(this).val() != '') {
+
+                        form_thresholds[this_name] = $(this).val();
+
+                        if ($(this).val() != '' && $(this).attr('data-units') !== undefined && $(this).attr('data-units') != '') {
+                            form_thresholds[this_name] += ' ' + $(this).attr('data-units');
+                        }
+                    }
+                });
+
+                // cycle through the object and check for empty values
+
+                for (var key in form_thresholds) {
+                    if (form_thresholds[key] == '') {
+                        is_valid = false
+                        thresholds_have_val = false
+                    }
+                }
+
+                if (thresholds_have_val == true) {
+                    $('#analyze-breadcrumb .step[data-step="3"] .validation-tooltip').hide()
+                } else {
+                    $('#analyze-breadcrumb .step[data-step="3"] .validation-tooltip').show()
+                }
+
+
+                switch($('input[name="analyze-location"]:checked').val()) {
+                    case 'grid':
+                        // make sure lat/lon has a value
+                        if ($('#lat').val() == '' || $('#lon').val() == '') {
+                            $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').show();
+                            $('#clear-grids').hide();
+                        } else {
+                            $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
+                            $('#clear-grids').show();
                         }
                         break;
-
-                    default:
-                        if ($(this).val() != '') {
-                            this_has_val = true
-                        }
-                        break
-
-                }
-
-                if (this_has_val == true) {
-
-                    if (this_type == 'checkbox') {
-
-                        if (form_inputs[this_name] != '') {
-                            form_inputs[this_name] += ',' + this_val
-                        } else {
-                            form_inputs[this_name] = this_val
-                        }
-
-                    } else {
-
-                        form_inputs[this_name] = this_val
-                    }
-
-                }
-
-            })
-
-            // cycle through the object and check for empty values
-
-            for (var key in form_inputs) {
-                let isBySector = form_inputs["shape"] != '' && ( key == "lat" || key == "lon");
-                let isByGrid = key == "shape" && form_inputs["lat"] != '' && form_inputs["lon"] != '';
-
-                if (isBySector || isByGrid){
-                    continue;
-                }
-
-                if (form_inputs[key] === '') {
-                    is_valid = false
-                    //console.log(key)
-                }
-            }
-
-            // CHECK FOR EMPTY VALUES
-            // IN THE VAR DETAIL OVERLAY FORM
-
-
-            form_thresholds = $.extend(true, {}, default_thresholds)
-
-            var thresholds_have_val = true
-
-            // build the form_thresholds object
-
-            $('#analyze-detail').find(':input').each(function () {
-
-                var this_name = $(this).attr('name');
-                if ($(this).attr('data-optional') == undefined ||
-                    $(this).attr('data-optional') == true || $(this).val() != '') {
-
-                    form_thresholds[this_name] = $(this).val();
-
-                    if ($(this).val() != '' && $(this).attr('data-units') !== undefined && $(this).attr('data-units') != '') {
-                        form_thresholds[this_name] += ' ' + $(this).attr('data-units');
-                    }
-                }
-            });
-
-            // cycle through the object and check for empty values
-
-            for (var key in form_thresholds) {
-                if (form_thresholds[key] == '') {
-                    is_valid = false
-                    thresholds_have_val = false
-                }
-            }
-
-            if (thresholds_have_val == true) {
-                $('#analyze-breadcrumb .step[data-step="3"] .validation-tooltip').hide()
-            } else {
-                $('#analyze-breadcrumb .step[data-step="3"] .validation-tooltip').show()
-            }
-
-
-            switch($('input[name="analyze-location"]:checked').val()) {
-                case 'grid':
-                    // make sure lat/lon has a value
-                    if ($('#lat').val() == '' || $('#lon').val() == '') {
-                        $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').show();
-                        $('#clear-grids').hide();
-                    } else {
+                    case undefined:
                         $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
-                        $('#clear-grids').show();
-                    }
-                    break;
-                case undefined:
-                    $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
-                    $('#clear-grids').hide();
-                    break;
-                default:
-             }
+                        $('#clear-grids').hide();
+                        break;
+                    default:
+                 }
 
-            // if everything is valid,
-            // show the captcha/email/submit button
-            if (is_valid == true) {
-                $('#analyze-submit').slideDown()
-            } else {
-                $('#analyze-submit').slideUp()
-            }
+                // if everything is valid,
+                // show the captcha/email/submit button
+                if (is_valid == true) {
+                    $('#analyze-submit').slideDown()
+                } else {
+                    $('#analyze-submit').slideUp()
+                }
 
-            let shareableURL = buildShareableURL($.extend(true,{}, form_inputs)); 
-            updateShareableURL(shareableURL);
-            return is_valid;
+                let shareableURL = buildShareableURL($.extend(true,{}, form_inputs));
+                updateShareableURL(shareableURL);
+                return is_valid;
 
             } else if (current_tab == 'analyze-stations') {
 
@@ -2378,16 +2502,13 @@
                     if (this_has_val == true) {
 
                         if (this_type == 'checkbox') {
+                            let tab = stations_form_inputs[this_name].length > 0 ? stations_form_inputs[this_name].split(",") : [];
+                            if(! tab.includes(this_val)) tab.push(this_val);
 
-                            if (stations_form_inputs[this_name] != '') {
-                                stations_form_inputs[this_name] += ',' + this_val
-                            } else {
-                                stations_form_inputs[this_name] = this_val
-                            }
-
+                            stations_form_inputs[this_name] = tab.join(",");
                         } else {
 
-                            stations_form_inputs[this_name] = this_val
+                            stations_form_inputs[this_name] = this_val;
 
                         }
 
@@ -2402,7 +2523,6 @@
                 for (var key in stations_form_inputs) {
                     if (stations_form_inputs[key] == '') {
                         is_valid = false;
-                        console.log(key)
                     }
                 }
 
@@ -2643,7 +2763,6 @@
 
         }
 
-        
         console.log('end of analyze-functions')
         console.log('- - - - -')
 

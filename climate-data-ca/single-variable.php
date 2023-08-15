@@ -466,7 +466,7 @@ if (have_posts()) : while (have_posts()) : the_post();
         $var_name = get_field('var_name');
         $dataset_name = arr_get($_GET, 'dataset_name', 'cmip6');
         $dataset_availability = get_field('dataset_availability');
-        if (!$dataset_availability) {
+        if (is_null($dataset_availability)) {
             $dataset_availability = ['cmip5', 'cmip6'];
         }
 

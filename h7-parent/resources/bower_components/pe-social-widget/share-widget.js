@@ -82,9 +82,13 @@
             if (plugin_settings.elements.twitter.text == null) {
                 var window_title = document.title;
 
-                if (window_title.indexOf(" — ") > -1) {
-                    window_title = window_title.split(' — ')[0] + ' via ' + plugin_settings.elements.twitter.via;
-                }
+               if (window_title.indexOf(" — ") > -1) {
+                   window_title = window_title.split(' — ')[0]
+                   
+                   if (plugin_settings.elements.twitter.via != null) {
+                       window_title += ' via ' + plugin_settings.elements.twitter.via
+                   }
+               }
 
                 plugin_settings.elements.twitter.text =    window_title + ': ' + encodeURIComponent(share_url);
             } else {

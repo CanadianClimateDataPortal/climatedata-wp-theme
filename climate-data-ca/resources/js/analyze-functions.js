@@ -1,7 +1,6 @@
 (function ($) {
 
     $(function () {
-
         //
         // GLOBAL VARS
         //
@@ -43,13 +42,16 @@
             'average': '',
             'start_date': '',
             'end_date': '',
-            'ensemble_percentiles': '',
+            'ensemble_percentile': '',
             'dataset': '',
             'scenario': '',
-            'models': '',
+            'model': '',
             'freq': '',
             'data_validation': 'warn',
-            'output_format': ''
+            'output_format': '',
+            'compressedPoints': '',
+            'zoom': '',
+            'center': ''
         }
 
         var form_inputs = $.extend(true, {}, default_inputs)
@@ -139,14 +141,14 @@
 
         // MAPS
 
-        var maps = {};
-        var pbfLayer;
+        let maps = {};
+        let pbfLayer;
 
-        selectedGrids = [];
-        selectedPoints = [];
-        latlons = [];
+        let selectedGrids = [];
+        let selectedPoints = [];
+        //let latlons = [];
 
-        var map_grids = {};
+        let map_grids = {};
 
         function gridStyleFunc() {
             return {
@@ -173,9 +175,9 @@
             pane: 'grid'
         };
 
-        var hosturl = geoserver_url,
+        let hosturl = geoserver_url,
             zoom_on = false,
-            highlightGridFeature
+            highlightGridFeature;
 
 
         //
@@ -250,6 +252,19 @@
         // ANALYZE
         //
 
+        function initMap(map_id) {
+            $(`input[type="hidden"][id='zoom']`).val("4");
+            $(`input[type="hidden"][id='center']`).val("62.51;-98.57");
+            centerMap(map_id);
+        }
+
+        function centerMap(map_id) {
+            let z = parseInt($(`input[type="hidden"][id='zoom']`).val());
+            let c = $(`input[type="hidden"][id='center']`).val().split(';');
+
+            maps[map_id].setView([parseFloat(c[0]), parseFloat(c[1])], z);
+        }
+
         function createGridLayer(gridName, container) {
             vectorTileOptions.vectorTileLayerStyles[gridName] = gridStyleFunc;
             pbfLayer = L.vectorGrid.protobuf(hosturl + '/geoserver/gwc/service/tms/1.0.0/CDC:' + gridName + '@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf', vectorTileOptions).on('click', function (e) {
@@ -278,14 +293,13 @@
                     DeselectedGridCell(highlightGridFeature);
                 }
 
-
                 $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length)
 
                 let i = 0, lat_val = '', lon_val = '';
 
                 for (let key in map_grids) {
 
-                    if (i != 0) {
+                    if (i !== 0) {
                         lat_val += ',';
                         lon_val += ',';
                     }
@@ -310,6 +324,41 @@
             pbfLayer.gridName = gridName;
         }
 
+        function display_tiles(compressedPoints) {
+            if(! compressedPoints) return;
+
+            let getGidsFromCompressedPointsURL = DATA_URL+"/get-gids/" + compressedPoints + "?gridname=canadagrid";
+            fetch(getGidsFromCompressedPointsURL, {
+                method: "GET",
+                mode: "cors",
+            }).then((response) => response.json())
+                .then((result) => {
+                    let latLonArray = decompressLatLonPointsStringToList(compressedPoints);
+
+                    for (let i in result) {
+                        latLonArray[i]['id'] = result[i];
+                    }
+
+                    latLonArray.forEach(function (p) {
+                        selectedPoints[p.id] = L.latLng(p.point[0], p.point[1]);
+                        map_grids[p.id] = L.latLng(p.point[0], p.point[1]);
+
+                        selectedGrids.push(p.id);
+
+                        pbfLayer.setFeatureStyle(p.id, {
+                            weight: 1,
+                            color: '#F00',
+                            opacity: 1,
+                            fill: true,
+                            radius: 4,
+                            fillOpacity: 0.1
+                        });
+                    });
+                    $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length);
+
+                })
+        }
+
         function analyze_init() {
 
             create_map('analyze');
@@ -318,13 +367,13 @@
                 heightStyle: 'content',
                 activate: function (e, ui) {
 
-                    if (ui.newPanel.attr('data-step') == '1') {
+                    if (ui.newPanel.attr('data-step') === '1') {
 
                         if ($.isEmptyObject(map_grids)) {
                             $('#analyze-map-overlay').fadeIn(250)
                         }
 
-                    } else if (ui.newPanel.attr('data-step') == '2') {
+                    } else if (ui.newPanel.attr('data-step') === '2') {
 
                         // swap text
 
@@ -335,7 +384,7 @@
 
                         $('#analyze-map-overlay .btn').removeClass('hidden')
 
-                    } else if (ui.newPanel.attr('data-step') == '3') {
+                    } else if (ui.newPanel.attr('data-step') === '3') {
 
 
                     }
@@ -359,11 +408,11 @@
 
             });
 
+
             // Check if the url contains a query string parametre (ex.: ?param=value&param2=value2)
             if(window.location.search !== '') {
                 readURL()
             }
-
             createGridLayer('canadagrid', maps['analyze']);
             validate_steps();
             validate_inputs();
@@ -383,7 +432,7 @@
         $('#analyze-map-overlay .btn').click(function (e) {
             $('#analyze-map-overlay').fadeOut(250, function () {
 
-                if (zoom_on == false) {
+                if (! zoom_on) {
 
                     // enable map zoom
 
@@ -462,7 +511,7 @@
 
         // prepend icons to custom controls within page
         function prepend_icons(items, all = true) {
-            items.each(function (i) {
+            items.each(function(i) {
                 if ($(this).hasClass('type-radio')) {
                     $(this).find('.input-row label').before('<i class="' + radio_icon_off + '"></i>');
                 } else if ($(this).hasClass('type-checkbox')) {
@@ -476,7 +525,7 @@
                         }
                     })
                 }
-            })
+            });
         }
 
         prepend_icons($('.field'));
@@ -496,7 +545,6 @@
                 }
 
             })
-
         }, 100)
 
         // disable default behaviour
@@ -510,9 +558,10 @@
 
             ChangeLayers(itemInput);
 
-            if(itemInput != 'grid'){
+            if(itemInput !== 'grid'){
+                if(form_inputs["analyze-location"] === "grid") initMap('analyze');
                 $('#average').val('True');
-                InitSectorProtobuf(itemInput);
+                InitSectorProtobuf(itemInput, -1);
 
                 locations_type = itemInput;
 
@@ -521,6 +570,7 @@
 
                 }
             } else {
+                if(form_inputs["analyze-location"] !== "grid") initMap('analyze');
                 $('#average').val('False');
             }
 
@@ -733,6 +783,7 @@
                     break;
                 default:
             }
+
         }
 
         function LayerSwapSector(settings) {
@@ -743,6 +794,7 @@
                     layer: 'grid',
                     action: 'off'
                 });
+
             } else {
                 is_sector_on = false;
 
@@ -750,6 +802,7 @@
                     maps['analyze'].removeLayer(analyzeLayer);
                 }
             }
+
         }
 
         function LayerSwapGrid(settings) {
@@ -759,6 +812,7 @@
                     layer: 'sector',
                     action: 'off'
                 });
+
             }
             else {
                 // hide grid
@@ -766,7 +820,7 @@
             }
         }
 
-        function InitSectorProtobuf(sector) {
+        function InitSectorProtobuf(sector, shape) {
             sector_select_by_id  = undefined;
             DeselectAllGridCell();
             selectedGrids = [];
@@ -802,7 +856,8 @@
                                 bounds: canadaBounds,
                                 maxZoom: 12,
                                 minZoom: 3,
-                                vectorTileLayerStyles: layerStyles
+                                vectorTileLayerStyles: layerStyles,
+                                center: [50.410992, -69.371189]
                             }
                         ).on('mouseover', function (e) {
                             let event_id = e.layer.properties.id;
@@ -829,10 +884,17 @@
                                 analyzeLayer.resetFeatureStyle(event_id);
                             }
                         }
+                        ).on('load', function (e) {
+                            if(shape != -1) {
+                                HighlightSectorById(shape, e, analyzeLayer, "");
+                                validate_inputs();
+                            }
+                        }
                         ).on('click', function (e) {
                             HighlightSectorById(e.layer.properties.id, e, analyzeLayer, e.layer.properties[l10n_labels.label_field]);
 
                             validate_inputs();
+
                         }).addTo(maps['analyze']);
                         resolve("Sector protobuf initialzed!")
                     }, 200)
@@ -845,13 +907,24 @@
             })
             .finally(() => {
                 maps['analyze'].on('zoom', function (e) {
+
                     if (typeof analyzeLayer !== 'undefined' && analyzeLayer !== null) {
                         analyzeLayer.unbindTooltip();
                     }
                 });
             });
-        };
+        }
 
+        function setZoom(t) {
+            let c = t.getCenter();
+            $(`input[type="hidden"][id='zoom']`).val(t.getZoom());
+            $(`input[type="hidden"][id='center']`).val(c['lat'].toFixed(2) + ";" + c['lng'].toFixed(2));
+            validate_inputs();
+        }
+
+        maps['analyze'].on('zoomend', ({ target }) => {setZoom(target)});
+        maps['analyze'].on('click', ({ target }) => {setZoom(target)});
+        maps['analyze'].on('mouseup', ({ target }) => {setZoom(target)});
 
         function HighlightSectorById(highlightSectorId, protobufEvent, analyzeLayer, label) {
             $('#lat').val("");
@@ -892,7 +965,10 @@
 
         $('.timeframe-select').on('change', function () {
 
-            var this_val = $(this).val();
+            let this_val = $(this).val();
+            let this_name = $(this).attr("name");
+
+            $(`input[type="hidden"][id=${this_name}]`).val(this_val);
 
             if ($(this).hasClass('start')) {
 
@@ -926,41 +1002,41 @@
 
         });
 
+
+        function load_list(items, selected, name, type){
+            let new_html="";
+
+            if(selected.length == 0) {
+                items[name].forEach(item => {
+                    if(item.default) selected.push(item.name);
+                });
+            }
+
+            items[name].forEach(item => {
+                let to_check = selected.includes(item.name);
+
+                let to_add = '<div class="input-row form-check {4} {2}">' +
+                    '   <div class="input-item">' +
+                    '       <input class="form-check-input add-to-object" type="'+ type +'" name="'+ name +'" id="analyze-'+ name +'-{0}" value="{0}" {2}>' +
+                    '       <i class="{3}"></i><label class="form-check-label" for="analyze-'+ name +'-{0}">{1}</label>' +
+                    '   </div>' +
+                    '</div>';
+                let btn_on = type === "radio"? radio_icon_on: checkbox_icon_on;
+                let btn_off = type === "radio"? radio_icon_off: checkbox_icon_off;
+                new_html += to_add.format(item.name, T(item.label), to_check ? "checked": "", to_check? btn_on : btn_off, type === "checkbox"? "w-25": "" );
+            });
+            $('#'+name+'-placeholder').html(new_html);
+        }
+
         $('input[name=dataset]').change(function (e) {
             // fill model and scenarios input since they depend on dataset selection
             let dataset_info = DATASETS[e.target.value];
-            let new_html="";
-            // add models to form
-            dataset_info.model_lists.forEach(function(model) {
-                let to_add = '<div class="input-row form-check">' +
-                    '   <div class="input-item">\n' +
-                    '       <input class="form-check-input add-to-object" type="radio" name="models" id="analyze-model-{0}" value="{0}">\n' +
-                    '       <label class="form-check-label" for="analyze-model-{0}">{1}</label>\n' +
-                    '   </div>\n' +
-                    '</div>';
-                new_html += to_add.format(model.name, T(model.label));
-            });
-            $('#models-placeholder').html(new_html);
-            prepend_icons($('#models-placeholder').closest('.field'), false);
-            $('#models-placeholder').find('.input-item:first').trigger('click');
-
-            // add scenarios to form
-            new_html="";
-            dataset_info.scenarios.forEach(function(scenario) {
-                let to_add = '<div  class="input-row form-check w-25">' +
-                    '   <div class="input-item">\n' +
-                    '       <input class="form-check-input add-to-object" type="checkbox" name="scenario" id="analyze-scenarios-{0}" value="{0}">\n' +
-                    '       <label class="form-check-label" for="analyze-scenarios-{0}">{1}</label>\n' +
-                    '   </div>\n' +
-                    '</div>';
-                new_html += to_add.format(scenario.name, T(scenario.label));
-                $('#scenarios-placeholder').html(new_html);
-                prepend_icons($('#scenarios-placeholder').closest('.field'), false);
-                $('#scenarios-placeholder').find('.input-item:first').trigger('click');
-            });
+            load_list(dataset_info, [], "model_lists", "radio");
+            load_list(dataset_info, [], "scenario", "checkbox");
+            load_list(dataset_info, [], "ensemble_percentile", "checkbox");
 
             // humidex is a unique case, we'll hard-code it for now
-            if (e.target.value == 'humidex') {
+            if (e.target.value === 'humidex') {
                 $('#analyze-variables').hide();
                 $('#analyze-variables-humidex').show();
             } else {
@@ -969,7 +1045,7 @@
             }
 
             // swap grid if required
-            if (maps['analyze'].hasLayer(pbfLayer) && pbfLayer.gridName != dataset_info.grid) {
+            if (maps['analyze'].hasLayer(pbfLayer) && pbfLayer.gridName !== dataset_info.grid) {
                 maps['analyze'].removeLayer(pbfLayer);
                 createGridLayer(dataset_info.grid, maps['analyze']);
                 clearGridSelection();
@@ -988,18 +1064,18 @@
                 let var_content = JSON.parse($(this).closest('.input-variable').attr('data-content'));
                 let var_frequencies = $(this).closest('.input-variable').attr('data-frequencies');
 
-                if (var_frequencies != '') {
+                if (var_frequencies !== '') {
                     let frequencies = var_frequencies.split('|');
                     $('input[name=freq]').each(function(i) {
-                    if (frequencies.includes($(this).val())) {
-                        $(this).attr('disabled', false);
+                        if (frequencies.includes($(this).val())) {
+                            $(this).attr('disabled', false);
                         } else {
-                        let input_row = $(this).closest('.input-row');
-                        input_row.removeClass('checked');
-                        $(this).prop('checked', false);
-                        input_row.find('.form-icon').removeClass().addClass(radio_icon_off);
-                        $(this).attr('disabled', true);
-                    }
+                            let input_row = $(this).closest('.input-row');
+                            input_row.removeClass('checked');
+                            $(this).prop('checked', false);
+                            input_row.find('.form-icon').removeClass().addClass(radio_icon_off);
+                            $(this).attr('disabled', true);
+                        }
                     });
                 } else {
                     $('input[name=freq]').each(function(i) {
@@ -1008,55 +1084,41 @@
                 }
 
 
-                var new_html = ''
-                new_html += '<h4>' + $(this).find('label').text() + '</h4>'
-                new_html += '<div class="form-inline">'
+                let new_html = '';
+                new_html += '<h4>' + $(this).find('label').text() + '</h4>';
+                new_html += '<div class="form-inline">';
 
-                for (var key in var_content) {
-                    var this_input = var_content[key]
+                for (let key in var_content) {
+                    let this_input = var_content[key];
 
-                    if (this_input['type'] == 'text') {
-                        new_html += '<span>' + this_input['text'] + '</span>'
+                    if (this_input['type'] === 'text') {
+                        new_html += '<span>' + this_input['text'] + '</span>';
 
-                    } else if (this_input['type'] == 'input') {
-                        new_html += '<input '
-                        new_html += 'type="number" '
-                        new_html += 'class="form-control bg-transparent border-white mx-2 text-white" '
-                        new_html += 'size="4" '
-                        new_html += 'autocomplete="off" '
-                        new_html += 'data-units="' + this_input['units'] + '" '
+                    } else if (this_input['type'] === 'input') {
+                        new_html += '<input ';
+                        new_html += 'type="number" ';
+                        new_html += 'class="form-control bg-transparent border-white mx-2 text-white" ';
+                        new_html += 'size="4" ';
+                        new_html += 'autocomplete="off" ';
+                        new_html += 'data-units="' + this_input['units'] + '" ';
 
-                        new_html += 'name="' + this_input['id'] + '" '
+                        new_html += 'name="' + this_input['id'] + '" ';
 
-                        if (this_input['min'] != '') {
-                            new_html += 'min="' + this_input['min'] + '" '
+                        if (this_input['min'] !== '') {
+                            new_html += 'min="' + this_input['min'] + '" ';
                         }
 
-                        if (this_input['max'] != '') {
+                        if (this_input['max'] !== '') {
                             new_html += 'max="' + this_input['max'] + '" '
                         }
 
-                        if (
-                            this_input['decimals'] != '' &&
-                            this_input['decimals'] != '0'
-                        ) {
-
-                            new_html += 'step="0.'
-
-                            decimal_places = parseInt(this_input['decimals'])
-
-                            for (i = 1; i < decimal_places; i++) {
-                                new_html += '0'
-                            }
-
-                            new_html += '1"'
-
-
+                        if (this_input['decimals'] !== '' && this_input['decimals'] !== '0') {
+                            new_html += 'step="0.' + ('1').padStart(parseInt(this_input['decimals']), "0") +'"';
                         }
 
                         new_html += '>'
 
-                    } else if (this_input['type'] == 'select') {
+                    } else if (this_input['type'] === 'select') {
                         new_html += '<select ';
                         new_html += 'class="form-control border-white mx-2 text-white" ';
                         new_html += 'style="background-color: rgba(56, 105, 246, 0.5);" ';
@@ -1139,9 +1201,9 @@
             'average': 'average',
             "start_date": "start date",
             "end_date": "end date",
-            "ensemble_percentiles": "ensemble percentiles",
+            "ensemble_percentile": "ensemble percentile",
             "dataset": "dataset name",
-            "models": "models",
+            "model": "model",
             "freq": "frequence",
             "scenario": "scenario",
             "data_validation": "data validation",
@@ -1188,8 +1250,8 @@
                 form_obj = $.extend(true, {}, default_obj)
 
                 // build the final input object to send to the API
-                let isBySector = form_inputs["shape"] != '';
-                let isByGrid = form_inputs["lat"] != '' && form_inputs["lon"] != '';
+                let isBySector = form_inputs["shape"] != '' && form_inputs["compressedPoints"] == "";
+                let isByGrid = form_inputs["shape"] == '' && form_inputs["compressedPoints"] != "";
 
                 if((isBySector && isByGrid) || (!isBySector && !isByGrid) ){
                     console.error(" Can not build the final input object to send to the API. Please make to select only a sector ("+isBySector+") or grid ("+isByGrid+")");
@@ -1200,9 +1262,13 @@
                     "s_lat": '',
                     "s_lon": ''
                 };
+                let ext = form_inputs["output_format"] == "csv" ? "csv": "netcdf";
 
                 if(!isBySector){
                     form_obj = CreateAnalyzeProcessRequestData(sectorCoord, form_inputs, form_obj);
+                    form_obj['inputs'].push({'id': 'output_name', 'data': create_file_name(form_inputs)});
+                    form_obj['inputs'].push({'id': 'output_format ', 'data': ext});
+
                     SubmitAnalyzeProcess(pathToAnalyzeForm);
                 }else{
                     // ex: https://data.climatedata.ca/partition-to-points/canadagrid/health/2.json
@@ -1213,19 +1279,83 @@
                         sectorCoord["s_lon"]= lutBySectorId.map(x => x[1]).join(',');
 
                         form_obj = CreateAnalyzeProcessRequestData(sectorCoord, form_inputs, form_obj);
-                        form_obj['inputs'].push({
-                            'id': 'output_name',
-                            'data': submit_url_var + '_' + locations_type + '_' + selected_feature_label
-                        });
+                        form_obj['inputs'].push({'id': 'output_name', 'data': create_file_name(form_inputs)});
+                        form_obj['inputs'].push({'id': 'output_format ', 'data': ext});
                         SubmitAnalyzeProcess(pathToAnalyzeForm);
                     }).fail(function() { console.error("Can not get file " + getUrl); })
                 }
             }
         });
 
+        function create_file_name(inputs) {
+            let file_name = "{0}_{1}_{2}_{3}_{4}"
+            let datset = "CanDCS-u5";
+
+            if(inputs["dataset"] === "cmip6") datset = "CanDCS-u6"
+            if(inputs["dataset"] === "humidex") datset = "Humidex"
+            let location = inputs["analyze-location"].charAt(0).toUpperCase() + inputs["analyze-location"].slice(1);
+            if(inputs["shape"] !== "") location += inputs["shape"];
+            let time = "from-{0}-to-{1}".format(inputs["start_date"], inputs["end_date"]);
+            let variables = {
+                'wetdays': {'label': 'WetDays', 'vars': '-qt-<thresh>'},
+                'sdii': {'label': 'AverageWetDayPreciIntens', 'vars': '-qt-<thresh>'},
+                'cwd': {'label': 'MaxConsWetDays', 'vars': '-qt-<thresh>'},
+                'cdd': {'label': 'MaxConsDryDays', 'vars': '-qt-<thresh>'},
+                'tx_tn_days_above': {'label': 'DaysAboveTmaxAndTmin', 'vars': '-<thresh_tasmin>-to-<thresh_tasmax>'},
+                'tx_days_above': {'label': 'DaysAboveTmax', 'vars': '-<thresh>'},
+                'tropical_nights': {'label': 'DaysAboveTmin', 'vars': '-<thresh>'},
+                'tn_days_below': {'label': 'DaysBelowTmin', 'vars': '-<thresh>'},
+                'cooling_degree_days': {'label': 'DegDaysAboveThreshold', 'vars': '-<thresh>'},
+                'heating_degree_days': {'label': 'DegDaysBelowThreshold', 'vars': '-<thresh>'},
+                'degree_days_exceedance_date': {
+                    'label': 'DegDaysExceedDate',
+                    'vars': '-<sum_thresh>-days-<op>-<thresh>-from-<after_date>'
+                },
+                'heat_wave_index': {'label': 'HeatWave', 'vars': '-<window>-days-at-<thresh>'},
+                'heat_wave_total_length': {
+                    'label': 'HeatWaveTotDuration',
+                    'vars': '-<window>-days-at-<thresh_tasmin>-to-<thresh_tasmax>'
+                },
+                'heat_wave_frequency': {
+                    'label': 'HeatWaveFreq',
+                    'vars': '-<window>-days-at-<thresh_tasmin>-to-<thresh_tasmax>'
+                },
+                'dlyfrzthw': {'label': 'DaysFreezeThawCycle', 'vars': '-<thresh_tasmin>-to-<thresh_tasmax>'},
+                'cold_spell_days': {'label': 'ColdSpellDays', 'vars': '-<window>-days-at-<thresh>'},
+                'hxmax_days_above': {'label': 'HxmaxDaysAbove', 'vars': '-<threshold>-days'}
+            };
+
+            let variable = variables[submit_url_var];
+            variable = variable.label + variable.vars;
+
+            for (let v in form_thresholds) {
+                let val = form_thresholds[v].split(" ")[0].replaceAll(".", "dot").replaceAll(">", "gt").replaceAll("<", "lt");
+                if(["thresh", "thresh_tasmin", "thresh_tasmax"].includes(v)) val = val.replaceAll("-", "neg");
+
+                variable = variable.replaceAll("<"+ v +">", val);
+            }
+
+            let options = inputs["scenario"].replaceAll(",", "-") + "_";
+            let ps = inputs["ensemble_percentile"].split(",");
+            for(let i=0; i< ps.length; i++) ps[i] = "p" + ps[i]
+            options += ps.join("-") + "_";
+
+            let frequencies = {
+                "YS":"Annual",
+                "MS": "Monthly",
+                "QS-DEC": "Seasonal",
+                "AS-JUL": "July2June"
+            }
+
+            options += frequencies[inputs["freq"]] + "_";
+            options += inputs["output_format"] === "csv" ? inputs["csv_precision"] : "0";
+            let fn = file_name.format(datset, location, time, variable, options);
+            if(fn.length > 250) fn = fn.substring(0, 249);
+            return fn;
+        }
 
         function SubmitAnalyzeProcess(pathToAnalyzeForm) {
-            for (var key in form_thresholds) {
+            for (let key in form_thresholds) {
                 form_obj['inputs'].push({
                     'id': key,
                     'data': form_thresholds[key]
@@ -1476,10 +1606,6 @@
             $(this).closest('.analyze-detail').slideUp()
         });
 
-
-
-
-
         function DeselectAllGridCell() {
             const list = Object.entries(map_grids);
             list.forEach((key) => {
@@ -1507,7 +1633,7 @@
         }
 
         // GEO-SELECT
-
+        //
         function formatGeoSelect(item) {
 
             if (!item.id) {
@@ -1745,7 +1871,7 @@
                         // set breadcrumb
 
                         current_accordion.find('select').each(function (i) {
-                            if (i != 0) {
+                            if (i !== 0) {
                                 breadcrumb_val += ' – ';
                             }
                             breadcrumb_val += $(this).val()
@@ -1790,7 +1916,7 @@
                         //           console.log(i, $(this))
 
                         if (i != valid_steps.length) {
-                            for (z = i; z >= valid_steps.length; z += 1) {
+                            for (let z = i; z >= valid_steps.length; z += 1) {
                                 valid_steps[z] = false
                             }
                         }
@@ -1831,7 +1957,6 @@
                         }
 
                     })
-
                     if (options_val != '') {
                         $('#analyze-breadcrumb [data-step="5"]').addClass('on').find('.value').text(options_val)
                     } else {
@@ -1840,11 +1965,11 @@
 
                 }
 
-            } else if (current_tab == 'analyze-stations') {
+            } else if (current_tab === 'analyze-stations') {
 
                 // STATIONS
 
-                var valid_steps = [false, false, false, false];
+                valid_steps = [false, false, false, false];
 
                 $('#analyze-stations-steps .validate-input').each(function (i) {
 
@@ -1961,7 +2086,7 @@
                         }
 
                         if (i != valid_steps.length) {
-                            for (z = i; z >= valid_steps.length; z += 1) {
+                            for (let z = i; z >= valid_steps.length; z += 1) {
                                 valid_steps[z] = false
                             }
                         }
@@ -1987,6 +2112,8 @@
             let lonArray = form_inputs['lon'].split(',');
             form_inputs_dict["compressedPoints"] = getEncodedPoints(latAray,lonArray);
 
+            $('#compressedPoints').val(form_inputs_dict["compressedPoints"]);
+
             // Emptying the lat & lon arrays because of the use of the compressed string to shorten the shareable url
             delete form_inputs_dict['lat']
             delete form_inputs_dict['lon']
@@ -2010,9 +2137,9 @@
             $("a[id='shareableURL']").attr('data-share-url', newUrl);
         }
 
-        
-        function readURL() {
+        function parseUrl() {
             let params = window.location.search;
+
             params = params.split('?').pop(); // Remove ? at beginning
             params = params.split('&'); // Split into a key=value list
 
@@ -2025,12 +2152,17 @@
                 paramsDict[key] = value;
             }
 
-            
+
             // Parse tresholds value that have been encoded
-            if (paramsDict['form_thresholds'] === undefined) { 
-                return; 
+            if (paramsDict['form_thresholds'] === undefined) {
+                return;
             }
             paramsDict["form_thresholds"] = JSON.parse(decodeURI(paramsDict["form_thresholds"]));
+            return paramsDict;
+        }
+        
+        function readURL() {
+            let paramsDict = parseUrl();
 
             // Passing trough a timeout because the site initially validates other components
             // It needs about 500ms to be rendered and to not have event that break this loop.
@@ -2039,134 +2171,6 @@
             }, 500)
         }
 
-        // // Return a compressed string representing a list of points - [[lat,lon]]
-        // function getEncodedPoints(latArray, lonArray) {
-        //     if (latArray.length !== lonArray.length){
-        //         throw new Error('LatArray and LonArray must have same number of elements');
-        //     }
-
-        //     let points = []
-
-
-        //     for (var i in latArray) {
-        //         points.push([latArray[i], lonArray[i]])
-        //     }
-
-        //     let compressedLatLongPoints = compressLatLonPointsToString(points)
-
-        //     return compressedLatLongPoints
-        // }
-
-        // // This method compresse a list of point to a short string 
-        // // Source of the following code : https://learn.microsoft.com/en-us/bingmaps/rest-services/elevations/point-compression-algorithm
-        // function compressLatLonPointsToString(points) {
-        //     const SAFE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
-        //     const MULTIPLIER = 100;
-        //     const DIVIDER = 32;
-
-        //     var result = "";
-        //     var latitude = 0;
-        //     var longitude = 0;
-
-        //     // console.log("ENCODING",points)
-
-        //     for (var i in points) {
-        //         var newLat = Math.round(points[i][0] * MULTIPLIER);
-        //         var newLon = Math.round(points[i][1] * MULTIPLIER);
-
-        //         var dy = newLat - latitude;
-        //         var dx = newLon - longitude;
-
-        //         latitude = newLat;
-        //         longitude = newLon;
-        //         dy = (dy << 1) ^ (dy >> 31);
-        //         dx = (dx << 1) ^ (dx >> 31);
-
-        //         var index = ((dy + dx) * (dy + dx + 1)) / 2 + dy;
-
-        //         while (index > 0) {
-        //             var rem = index & 31;
-
-        //             index = (index - rem) / DIVIDER;
-
-        //             if (index > 0) {
-        //                 rem += DIVIDER;
-        //             }
-
-        //             result += SAFE_CHARACTERS[rem];
-        //         }
-        //     }
-        //     return result;
-        // }
-
-        // // This method decompresse the short random
-        // function decompressLatLonPointsStringToList(compressedValue) {
-        //     const SAFE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
-        //     const MULTIPLIER = 100;
-        //     const DIVIDER = 32;
-
-        //     var latLon = [];
-        //     var pointsArray = [];
-        //     var point = [];
-        //     var lastLat = 0,
-        //         lastLon = 0;
-
-        //     for (var i = 0; i < compressedValue.length; i++) {
-        //         var num = SAFE_CHARACTERS.indexOf(compressedValue[i]);
-
-        //         if (num < DIVIDER) {
-        //             point.push(num);
-        //             pointsArray.push(point);
-        //             point = [];
-        //         } else {
-        //             num -= DIVIDER;
-        //             point.push(num);
-        //         }
-        //     }
-
-        //     for (var y in pointsArray) {
-        //         var result = 0;
-        //         var list = pointsArray[y].reverse();
-
-        //         for (var x in list) {
-        //             if (result == 0) {
-        //                 result = list[x];
-        //             } else {
-        //                 result = result * DIVIDER + list[x];
-        //             }
-        //         }
-
-        //         var dIag = parseInt((Math.sqrt(8 * result + 5) - 1) / 2);
-
-        //         var latY = result - (dIag * (dIag + 1)) / 2;
-        //         var lonX = dIag - latY;
-
-        //         if (latY % 2 == 1) {
-        //             latY = (latY + 1) * -1;
-        //         }
-        //         if (lonX % 2 == 1) {
-        //             lonX = (lonX + 1) * -1;
-        //         }
-
-        //         latY /= 2;
-        //         lonX /= 2;
-        //         var lat = latY + lastLat;
-        //         var lon = lonX + lastLon;
-
-        //         lastLat = lat;
-        //         lastLon = lon;
-        //         lat /= MULTIPLIER;
-        //         lon /= MULTIPLIER;
-
-        //         // latLon.push(lat, lon);
-        //         latLon.push({
-        //             "point": [lat, lon]
-        //         })
-        //     }
-
-
-        //     return latLon;
-        // }
 
         function selectMapPoints(compressedValue) {
 
@@ -2204,267 +2208,287 @@
                     fillOpacity: 0.1
                 })
             });
-
         }
 
 
 
         function fillAnalyzeFormFromInputs(formInputs) {
-
+            console.log(formInputs);
             // --- CHOOSE A DATASET ---
-            let dataset = formInputs['dataset']
-            $(`input[value='${dataset}']`).click()
+            let dataset = formInputs['dataset'];
+            if(dataset == '') {
+                $(`a[id='header-primary-link-4']`).click();
+                return;
+            }
 
+            $(`input[value='${dataset}']`).click();
 
             // --- SELECT LOCATIONS ---
-            $("#ui-id-5").click() // Accordion
-            $("#btn-activate-map").click()
-            $("#analyze-location-grid").click()
-            selectMapPoints(formInputs['compressedPoints'])
+            $("#ui-id-5").click(); // Accordion
+            $("#btn-activate-map").click();
+
+            $("#analyze-location-grid").click();
+            let location = formInputs['analyze-location'];
+            $(`input[type="hidden"][id="analyze-location"]`).val(location);
+            $(`input[id='analyze-location-${location}']`).click();
+
+            if(location == "grid") {
+                $('#average').val('False');
+                $('#compressedPoints').val(formInputs["compressedPoints"]);
+                display_tiles(formInputs["compressedPoints"])
+            } else {
+                SwapLayerBetweenGridAndSector({
+                    layer: 'grid',
+                    action: 'off'
+                });
+
+                $('#average').val('True');
+                $('#compressedPoints').val('');
+                InitSectorProtobuf(location, formInputs['shape']);
+            }
+
+            // set zoom after loding map
+            $(`input[type="hidden"][id="zoom"]`).val(formInputs['zoom'] == undefined? $(`input[type="hidden"][id="zoom"]`).val(): formInputs['zoom']);
+            $(`input[type="hidden"][id="center"]`).val(formInputs['center'] == undefined? $(`input[type="hidden"][id="center"]`).val(): formInputs['center']);
 
 
             // --- CUSTOMIZE VARIABLES ---
-            $("#ui-id-7").click() // Accordion
-            let custom_var = formInputs['submit_url_var']
+            $("#ui-id-7").click(); // Accordion
+            submit_url_var = formInputs['submit_url_var'];
             // Must query by id rather then value otherwise break the map layer
-            $(`input[id='analyze-var-${custom_var}']`).click() 
+            $(`input[id='analyze-var-${submit_url_var}']`).click();
 
-
-            // --- INSERT THRESHOLDS ---
-            let tresholds = formInputs['form_thresholds']
+            let tresholds = formInputs['form_thresholds'];
             for (let key in tresholds) {
-                let value = tresholds[key]
+                let value = tresholds[key];
 
                 // If a key is an option of a select menu
                 if (key === "op") {
-                    $(`select[name="op"]`).val(value)
-                }
-                else {
+                    $(`select[name="op"]`).val(value);
+                } else {
                     value = value.split(" ")[0] // Split because value contain units (ex.: 0 K days)
-                    $(`input[name=${key}]`).val(value)
+                    $(`input[name=${key}]`).val(value);
                 }
+                $(`input[type="hidden"][id=${key}]`).val(value);
             }
 
 
             // --- CHOOSE A TIMEFRAME ---
-            $("#ui-id-9").click() // Accordion
-            $("select[id='analyze-timeframe-start']").val(formInputs['start_date'])
-            // Adding change to trigger the event that enables the next accordion
-            $("select[id='analyze-timeframe-end']").val(formInputs['end_date']).change()
+            $("#ui-id-9").click(); // Accordion
+            $("select[id='analyze-timeframe-start']").val(formInputs['start_date']);
+            $(`input[type="hidden"][id="start_date"]`).val(formInputs['start_date']);
 
+            // Adding change to trigger the event that enables the next accordion
+            $("select[id='analyze-timeframe-end']").val(formInputs['end_date']).change();
 
             // --- ADVANCED ---
-            $("#ui-id-11").click() // Accordion
+            $("#ui-id-11").click(); // Accordion
+
+            // models
+            load_list(DATASETS[formInputs['dataset']], [formInputs['model']], "model_lists", "radio");
 
             // Selecting scenarios
-            let scenarios = formInputs['scenario'].split(',')
-            scenarios.forEach(scenario => {
-                // Select values other then the default value "ssp126"
-                if (["ssp126"].includes(scenario) == false) {
-                    $(`input[value='${scenario}']`).click()
-                }
-            })
+            let scenarios = formInputs['scenario'].length > 0 ? formInputs['scenario'].split(','): [];
+            load_list(DATASETS[formInputs['dataset']], scenarios, "scenario", "checkbox");
 
-            // Ensemble Precentiles
-            let ensemblePercentiles = formInputs['ensemble_percentiles'].split(',')
-            ensemblePercentiles.forEach(percent => {
-                // Select values other then the default value "10","50","90"
-                if (["10", "50", "90"].includes(percent) == false) {
-                    $(`input[name="ensemble_percentiles"][value="${percent}"]`).click()
-                }
-            })
+
+            // Ensemble Pecentiles
+            console.log(formInputs);
+            let ensemblePercentiles = formInputs['ensemble_percentile'].length > 0 ? formInputs['ensemble_percentile'].split(','): ["10", "50", "90"];
+            load_list(DATASETS[formInputs['dataset']], ensemblePercentiles, "ensemble_percentile", "checkbox");
 
             // Selecting Frequency
-            let frequency = formInputs['freq']
-            $(`input[value='${frequency}']`).click()
+            let frequency = formInputs['freq'];
+            $(`input[value='${frequency}']`).click();
 
             // Selecting Output Format
-            let outputFormat = formInputs['output_format']
-            $(`input[value='${outputFormat}']`).click()
+            let outputFormat = formInputs['output_format'];
+            $(`input[value='${outputFormat}']`).click();
 
             // Setting the csv decimal precision value
+
+            $(`input[type="hidden"][id="csv_precision"]`).val('0');
             if (outputFormat === "csv") {
-                $("#analyze-decimals").val(formInputs["csv_precision"])
+                $("#analyze-decimals").val(formInputs["csv_precision"]);
+                $(`input[type="hidden"][id="csv_precision"]`).val(formInputs['csv_precision']);
             }
 
 
-            // Show submit
-            $('#analyze-submit').slideDown()
-        }
+            centerMap("analyze");
 
+            // Show submit
+            $('#analyze-submit').slideDown();
+
+        }
 
         // INPUTS
 
         function validate_inputs() {
 
-            if (current_tab == 'analyze-projections') {
-                let sectorSelect = $('input[name="analyze-location"]:checked').val();
+            if (current_tab === 'analyze-projections') {
                 // PROJECTIONS
-                var is_valid = true
+                let is_valid = true
 
-            form_inputs = $.extend(true, {}, default_inputs)
+                form_inputs = $.extend(true, {}, default_inputs)
 
-
-            if ($('#analyze-format-csv').prop('checked') == true) {
-                $('#analyze-field-decimals').show()
-            } else {
-                $('#analyze-field-decimals').hide().find(':input').val(2)
-            }
-
-            // CHECK INPUTS THAT NEED TO BE ADDED
-            // TO THE REQUEST OBJECT
-
-            // build the form_inputs object
-
-            $('#analyze-form-inputs .add-to-object').each(function () {
-
-                var this_name = $(this).attr('name'),
-                    this_type = $(this).attr('type'),
-                    this_has_val = false,
-                    this_val = $(this).val()
-
-                if ($(this).is('select')) {
-                    this_type = 'select'
+                if ($('#analyze-format-csv').prop('checked')) {
+                    $('#analyze-field-decimals').show()
+                } else {
+                    $('#analyze-field-decimals').hide().find(':input').val(2)
                 }
+
+                // CHECK INPUTS THAT NEED TO BE ADDED
+                // TO THE REQUEST OBJECT
+
+                // build the form_inputs object
+
+                $('#analyze-form-inputs .add-to-object').each(function () {
+
+                    let this_name = $(this).attr('name'),
+                        this_type = $(this).attr('type'),
+                        this_has_val = false,
+                        this_val = $(this).val()
+
+
+                    if ($(this).is('select')) {
+                        this_type = 'select'
+                    }
 
                 // console.log('checking ' + this_name, this_type, this_val)
 
-                switch (this_type) {
-                    case 'radio':
-                        if ($(this).prop('checked') == true) {
-                            this_has_val = true
-                        }
-                        break
+                    switch (this_type) {
+                        case 'radio':
+                            if ($(this).prop('checked')) {
+                                this_has_val = true
+                            }
+                            break
 
-                    case 'checkbox':
-                        if ($(this).prop('checked') == true) {
-                            this_has_val = true
-                        }
-                        break
+                        case 'checkbox':
+                            if ($(this).prop('checked')) {
+                                this_has_val = true
+                            }
+                            break
 
-                    case 'number' :
-                        let this_min = parseInt($(this).attr('min')),
-                            this_max = parseInt($(this).attr('max'));
-                        this_val = parseInt($(this).val())
+                        case 'number' :
+                            let this_min = parseInt($(this).attr('min')),
+                                this_max = parseInt($(this).attr('max'));
+                            this_val = parseInt($(this).val())
 
-                        if (!isNaN(this_val) && this_val >= this_min && this_val <= this_max) {
-                            this_has_val = true;
+                            if (!isNaN(this_val) && this_val >= this_min && this_val <= this_max) {
+                                this_has_val = true;
+                            } else {
+                                is_valid = false;
+                            }
+                            break;
+
+                        default:
+                            if ($(this).val() !== '') {
+                                this_has_val = true;
+                            }
+                            break
+
+                    }
+
+                    if (this_has_val) {
+
+                        if (this_type === 'checkbox') {
+
+                            let tab = form_inputs[this_name].length > 0 ? form_inputs[this_name].split(",") : [];
+                            if(! tab.includes(this_val)) tab.push(this_val);
+
+                            form_inputs[this_name] = tab.join(",");
+
                         } else {
-                            is_valid = false;
+                            form_inputs[this_name] = this_val;
+                        }
+                    }
+                })
+
+
+                // cycle through the object and check for empty values
+                for (let k in form_inputs) {
+
+                    let isBySector = form_inputs["shape"] !== '' && ( k === "lat" || k === "lon"|| k === "compressedPoints");
+                    let isByGrid = k === "shape" && form_inputs["lat"] !== '' && form_inputs["lon"] !== '';
+
+                    if (isBySector || isByGrid){
+                        continue;
+                    }
+
+                    if (form_inputs[k] === '') {
+                        is_valid = false
+                    }
+                }
+
+                // CHECK FOR EMPTY VALUES
+                // IN THE VAR DETAIL OVERLAY FORM
+
+
+                form_thresholds = $.extend(true, {}, default_thresholds)
+
+                var thresholds_have_val = true
+
+                // build the form_thresholds object
+
+                $('#analyze-detail').find(':input').each(function () {
+
+                    var this_name = $(this).attr('name');
+                    if ($(this).attr('data-optional') == undefined ||
+                        $(this).attr('data-optional') || $(this).val() !== '') {
+
+                        form_thresholds[this_name] = $(this).val();
+
+                        if ($(this).val() !== '' && $(this).attr('data-units') !== undefined && $(this).attr('data-units') !== '') {
+                            form_thresholds[this_name] += ' ' + $(this).attr('data-units');
+                        }
+                    }
+                });
+
+                // cycle through the object and check for empty values
+
+                for (var key in form_thresholds) {
+                    if (form_thresholds[key] === '') {
+                        is_valid = false
+                        thresholds_have_val = false
+                    }
+                }
+
+                if (thresholds_have_val) {
+                    $('#analyze-breadcrumb .step[data-step="3"] .validation-tooltip').hide()
+                } else {
+                    $('#analyze-breadcrumb .step[data-step="3"] .validation-tooltip').show()
+                }
+
+
+                switch($('input[name="analyze-location"]:checked').val()) {
+                    case 'grid':
+                        // make sure lat/lon has a value
+                        if ($('#lat').val() == '' || $('#lon').val() == '') {
+                            $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').show();
+                            $('#clear-grids').hide();
+                        } else {
+                            $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
+                            $('#clear-grids').show();
                         }
                         break;
-
-                    default:
-                        if ($(this).val() != '') {
-                            this_has_val = true
-                        }
-                        break
-
-                }
-
-                if (this_has_val == true) {
-
-                    if (this_type == 'checkbox') {
-
-                        if (form_inputs[this_name] != '') {
-                            form_inputs[this_name] += ',' + this_val
-                        } else {
-                            form_inputs[this_name] = this_val
-                        }
-
-                    } else {
-
-                        form_inputs[this_name] = this_val
-                    }
-
-                }
-
-            })
-
-            // cycle through the object and check for empty values
-
-            for (var key in form_inputs) {
-                let isBySector = form_inputs["shape"] != '' && ( key == "lat" || key == "lon");
-                let isByGrid = key == "shape" && form_inputs["lat"] != '' && form_inputs["lon"] != '';
-
-                if (isBySector || isByGrid){
-                    continue;
-                }
-
-                if (form_inputs[key] === '') {
-                    is_valid = false
-                    //console.log(key)
-                }
-            }
-
-            // CHECK FOR EMPTY VALUES
-            // IN THE VAR DETAIL OVERLAY FORM
-
-
-            form_thresholds = $.extend(true, {}, default_thresholds)
-
-            var thresholds_have_val = true
-
-            // build the form_thresholds object
-
-            $('#analyze-detail').find(':input').each(function () {
-
-                var this_name = $(this).attr('name');
-                if ($(this).attr('data-optional') == undefined ||
-                    $(this).attr('data-optional') == true || $(this).val() != '') {
-
-                    form_thresholds[this_name] = $(this).val();
-
-                    if ($(this).val() != '' && $(this).attr('data-units') !== undefined && $(this).attr('data-units') != '') {
-                        form_thresholds[this_name] += ' ' + $(this).attr('data-units');
-                    }
-                }
-            });
-
-            // cycle through the object and check for empty values
-
-            for (var key in form_thresholds) {
-                if (form_thresholds[key] == '') {
-                    is_valid = false
-                    thresholds_have_val = false
-                }
-            }
-
-            if (thresholds_have_val == true) {
-                $('#analyze-breadcrumb .step[data-step="3"] .validation-tooltip').hide()
-            } else {
-                $('#analyze-breadcrumb .step[data-step="3"] .validation-tooltip').show()
-            }
-
-
-            switch($('input[name="analyze-location"]:checked').val()) {
-                case 'grid':
-                    // make sure lat/lon has a value
-                    if ($('#lat').val() == '' || $('#lon').val() == '') {
-                        $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').show();
-                        $('#clear-grids').hide();
-                    } else {
+                    case undefined:
                         $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
-                        $('#clear-grids').show();
-                    }
-                    break;
-                case undefined:
-                    $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
-                    $('#clear-grids').hide();
-                    break;
-                default:
-             }
+                        $('#clear-grids').hide();
+                        break;
+                    default:
+                 }
 
-            // if everything is valid,
-            // show the captcha/email/submit button
-            if (is_valid == true) {
-                $('#analyze-submit').slideDown()
-            } else {
-                $('#analyze-submit').slideUp()
-            }
+                // if everything is valid,
+                // show the captcha/email/submit button
+                if (is_valid == true) {
+                    $('#analyze-submit').slideDown()
+                } else {
+                    $('#analyze-submit').slideUp()
+                }
 
-            buildShareableURL($.extend(true,{}, form_inputs)); 
-            return is_valid;
+                let shareableURL = buildShareableURL($.extend(true,{}, form_inputs));
+                updateShareableURL(shareableURL);
+                return is_valid;
 
             } else if (current_tab == 'analyze-stations') {
 
@@ -2521,16 +2545,13 @@
                     if (this_has_val == true) {
 
                         if (this_type == 'checkbox') {
+                            let tab = stations_form_inputs[this_name].length > 0 ? stations_form_inputs[this_name].split(",") : [];
+                            if(! tab.includes(this_val)) tab.push(this_val);
 
-                            if (stations_form_inputs[this_name] != '') {
-                                stations_form_inputs[this_name] += ',' + this_val
-                            } else {
-                                stations_form_inputs[this_name] = this_val
-                            }
-
+                            stations_form_inputs[this_name] = tab.join(",");
                         } else {
 
-                            stations_form_inputs[this_name] = this_val
+                            stations_form_inputs[this_name] = this_val;
 
                         }
 
@@ -2545,7 +2566,6 @@
                 for (var key in stations_form_inputs) {
                     if (stations_form_inputs[key] == '') {
                         is_valid = false;
-                        console.log(key)
                     }
                 }
 
@@ -2561,12 +2581,14 @@
                 $('#analyze-stations-detail').find(':input').each(function () {
 
                     var this_name = $(this).attr('name');
+                    $(`input[type="hidden"][id=${this_name}]`).val($(this).val());
+
                     if ($(this).attr('data-optional') == undefined ||
-                        $(this).attr('data-optional') == true || $(this).val() != '') {
+                        $(this).attr('data-optional') || $(this).val() != '') {
 
                         stations_form_thresholds[this_name] = $(this).val();
 
-                        if ($(this).val() != '' && $(this).attr('data-units') !== undefined && $(this).attr('data-units') != '') {
+                        if ($(this).val() !== '' && $(this).attr('data-units') !== undefined && $(this).attr('data-units') !== '') {
                             stations_form_thresholds[this_name] += ' ' + $(this).attr('data-units');
                         }
                     }
@@ -2577,13 +2599,13 @@
                 // console.log('checking thresholds', stations_form_thresholds)
 
                 for (var key in stations_form_thresholds) {
-                    if (stations_form_thresholds[key] == '') {
+                    if (stations_form_thresholds[key] === '') {
                         is_valid = false;
                         stations_thresholds_have_val = false;
                     }
                 }
 
-                if (stations_thresholds_have_val == true) {
+                if (stations_thresholds_have_val) {
                     $('#analyze-stations-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
                 } else {
                     $('#analyze-stations-breadcrumb .step[data-step="2"] .validation-tooltip').show();
@@ -2601,7 +2623,7 @@
                 // if everything is valid,
                 // show the captcha/email/submit button
 
-                if (is_valid == true) {
+                if (is_valid) {
                     $('#analyze-stations-submit').slideDown();
                 } else {
                     $('#analyze-stations-submit').slideUp();

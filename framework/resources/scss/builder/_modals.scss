@@ -1,0 +1,66 @@
+#fw-modal {
+	top: 32px;
+	height: calc(100% - 32px);
+	// --bs-modal-margin: 3rem;
+	
+	// .modal-dialog {
+	// 	height: calc(100% - var(--bs-modal-margin) * 2);
+	// }
+	// 
+	// .modal-content {
+	// 	height: 100%;
+	// }
+	
+	.accordion-body {
+		// max-height: 50vh;
+		overflow: auto;
+	}
+	
+	$display-types: list, navbar, dropdown;
+	
+	@each $type in $display-types {
+		
+		&[data-display="#{$type}"] {
+			
+				.display-group {
+					display: none;
+					
+					&.type-#{$type} {
+						display: block;
+					}
+				}
+			
+		}
+		
+	}
+	
+}
+
+//
+//
+//
+
+.modal-label-sm {
+	font-size: 0.625rem;
+	line-height: 1.2;
+	text-transform: uppercase;
+}
+
+//
+// CONTENT TYPES
+//
+
+.fw-modal {
+	.image-placeholder {
+		img {
+			width: auto;
+			height: auto;
+			max-width: 100%;
+		}
+	}
+	
+	.mce-edit-area {
+		max-height: 300px;
+	}
+}
+

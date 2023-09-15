@@ -1,0 +1,98 @@
+{
+  "name": "@lottiefiles/lottie-player",
+  "version": "2.0.1",
+  "description": "Lottie animation and Telegram Sticker player web components.",
+  "repository": "https://github.com/LottieFiles/lottie-player.git",
+  "homepage": "https://lottiefiles.com/web-player",
+  "bugs": "https://github.com/LottieFiles/lottie-player/issues",
+  "author": "Jawish Hameed <jawish@lottiefiles.com>",
+  "license": "MIT",
+  "main": "dist/lottie-player.js",
+  "module": "dist/lottie-player.mjs",
+  "types": "dist/lottie-player.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "keywords": [
+    "lottie",
+    "animation",
+    "lottiefiles",
+    "web component",
+    "component",
+    "lit-element",
+    "player",
+    "telegram sticker",
+    "tgs"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "changelog": "changeset add",
+    "changelog:check": "changeset status --since=main",
+    "dev": "tsup --watch",
+    "format": "pnpm run format:prettier",
+    "format:prettier": "prettier --loglevel=warn --no-editorconfig --write .",
+    "format:remark": "remark . --output --ignore-path .remarkignore --silently-ignore",
+    "lint": "eslint . --ext .ts,.tsx,.js",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js --fix",
+    "open": "cypress open",
+    "preinstall": "npx only-allow pnpm",
+    "release": "pnpm release:version && pnpm release:publish",
+    "release:publish": "pnpm build && changeset publish",
+    "release:tag": "changeset tag",
+    "release:version": "changeset version",
+    "test": "cypress run --component",
+    "type-check": "turbo run type-check"
+  },
+  "dependencies": {
+    "@changesets/cli": "^2.26.1",
+    "@types/pako": "^1.0.4",
+    "lit": "^2.4.1",
+    "lottie-web": "^5.12.0",
+    "pako": "^2.1.0",
+    "resize-observer-polyfill": "^1.5.1"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^16.3.0",
+    "@commitlint/config-conventional": "^16.2.4",
+    "@lottiefiles/eslint-plugin": "^3.0.0",
+    "@lottiefiles/prettier-config": "^3.0.0",
+    "cypress": "^12.13.0",
+    "cypress-ct-lit": "^0.3.2",
+    "cypress-real-events": "^1.7.4",
+    "eslint": "^7.32.0",
+    "eslint-plugin-only-warn": "^1.0.3",
+    "husky": "^8.0.2",
+    "lint-staged": "^12.5.0",
+    "prettier": "^2.8.0",
+    "ts-node": "^10.9.1",
+    "tsup": "^6.7.0",
+    "turbo": "^1.10.2",
+    "typescript": "^4.9.3",
+    "unicode-canonical-property-names-ecmascript": "^2.0.0",
+    "vite": "^4.3.9"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "browserslist": [
+    "> 3%"
+  ],
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{css,scss,md}": [
+      "prettier --write"
+    ],
+    "src/**/*.{js,jsx,ts,tsx,json}": [
+      "eslint . --ext .ts,.tsx,.js --fix"
+    ]
+  },
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "all": true
+  }
+}

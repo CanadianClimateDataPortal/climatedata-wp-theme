@@ -1,0 +1,5033 @@
+// builder
+// v2.0
+
+var result = {}
+
+;(function ($) {
+
+	function builder(item, options) {
+
+		// options
+
+		var defaults = {
+			globals: ajax_data.globals,
+			lang: ajax_data.globals.lang,
+			post_id: null,
+			page: {},
+			current_parent: $('.fw-main'),
+			status: 'init',
+			objects: {
+				page: {
+					classes: $('body').attr('class').split(' '),
+					child: 'section',
+				},
+				template: {
+					classes: ['fw-element', 'fw-template']
+				},
+				section: {
+					classes: ['fw-element', 'fw-section'],
+					child: 'container',
+				},
+				container: {
+					classes: ['fw-element', 'fw-container', 'container-fluid'],
+					child: 'row',
+				},
+				row: {
+					classes: ['fw-element', 'fw-row', 'row'],
+					child: 'column',
+				},
+				column: {
+					classes: ['fw-element', 'fw-column', 'col'],
+					child: 'block',
+				},
+				block: {
+					classes: ['fw-element', 'fw-block'],
+					parent: null
+				}
+			},
+			modal: {
+				content: null, // which modal to retrieve
+			},
+			element: {
+				item: $('<div class="fw-element">'), // DOM element to be inserted into page
+				data: {
+					type: null, // e.g. section/container/row/column/block
+					children: []
+				}
+			},
+			parent: {
+				item: null,
+				children: [],
+				data: {}
+			},
+			template_html: '',
+			template_first: '',
+			elements_to_move: [],
+			status: 'init',
+			dropdowns: {},
+			moving_in_template: false,
+			adding_to_repeater: false,
+			repeater_index: -1,
+			adding_to_array: false,
+			array_index: 0,
+			array_indexes: {},
+			array_key: null,
+			removed_settings: [],
+			uploader: null,
+			debug: true
+		}
+
+		this.options = $.extend(true, defaults, options)
+
+		this.item = $(item)
+		this.init()
+	}
+
+	builder.prototype = {
+
+		// init
+
+		init: function () {
+
+			let plugin = this,
+					options = plugin.options
+
+			//
+			// INITIALIZE
+			//
+
+			if (options.debug == true) {
+				console.log('builder', 'init')
+			}
+			
+			AOS.init({
+				disable: true
+			})
+			
+			console.log(ajax_data.globals)
+			
+			options.post_id = $('body').attr('data-key')
+			
+			// load this page's builder object
+			
+			console.log('fw', 'getting object')
+			
+			// get the page object
+			
+			$.ajax({
+				url: ajax_data.url,
+				type: 'GET',
+				data: {
+					action: 'fw_get_builder_object',
+					globals: options.globals,
+					post_id: options.post_id
+				},
+				dataType: 'json',
+				success: function(data) {
+					
+					options.page = data
+					
+					console.log('done')
+					
+					console.log('fw', 'creating elements')
+					
+					// plugin.output_loop(options.page, 1)
+					
+					console.log('page', options.page)
+					
+					$('body').attr('data-key', options.page.key)
+					
+					// activate elements
+					
+					plugin.activate()
+					
+					$(plugin.do_insert_btn(options.page, true)).insertAfter('.fw-page')
+					
+				}
+			})
+			
+			
+			let test = {
+				"settings": [
+					{
+						"spacing": [
+							{
+								"index": "0",
+								"property": "p",
+								"side": "",
+								"breakpoint": "",
+								"value": "0"
+							},
+							{
+								"index": "1",
+								"property": "m",
+								"side": "",
+								"breakpoint": "",
+								"value": "0"
+							}
+						]
+					},
+					{
+						"colors": {
+							"bg": "light",
+							"headings": "",
+							"text": ""
+						}
+					}
+				]
+			}
+			
+			// console.log(plugin.flatten(test))
+			
+			// let result = {}
+			// 
+			// test.forEach(function(input) {
+			// 	
+			// 	console.log('---')
+			// 	console.log('INPUT', input)
+			// 	
+			// 	let key = input.name.split('-')
+			// 	
+			// 	result = plugin.find_child_element(result, key, input.value)
+			// 	
+			// })
+			// 
+			// console.log('---')
+			// console.log('result')
+			// console.log(JSON.stringify(result, null, 2))
+			
+			//
+			// EVENTS
+			//
+			
+			// CLICKS
+			
+			// modal
+			
+			$('.fw-actions-item a').click(function(e) {
+				e.preventDefault()
+				
+				options.modal.content = $(this).closest('li').attr('class').split('fw-modal-content-')[1].split(' ')[0]
+				
+				console.log(options.modal.content)
+				
+				$('#fw-modal').modal('show')
+				
+			})
+			
+			// builder toggle
+			
+			$('#fw-builder-toggle').click(function() {
+				
+				if ($('body').hasClass('fw-builder')) {
+					
+					options.status = 'disabled'
+					$('body').removeClass('fw-builder')
+					$(this).find('.badge').text('Off').removeClass('text-bg-success').addClass('text-bg-warning')
+					
+				} else {
+					
+					$('body').addClass('fw-builder')
+					$(this).find('.badge').text('On').removeClass('text-bg-warning').addClass('text-bg-success')
+					options.status = 'ready'
+					
+				}
+				
+			})
+			
+			// save post
+			
+			$('#fw-save-post').click(function() {
+				
+				options.status = 'saving'
+				plugin.update_post()
+				
+			})
+			
+			// debug
+			
+			$('#output-btn').click(function() {
+				$('#output').text(JSON.stringify(options.page, null, 2))
+			})
+			
+			// click insert button
+			
+			$('body').on('click', '.fw-insert-btn', function() {
+				
+				let this_element = $(this).closest('.fw-element')
+				
+			})
+			
+			// modal ajax
+			
+			// click modal trigger
+			
+			$('body').on('click', '.fw-modal-trigger', function(e) {
+				e.preventDefault()
+				
+				// which modal template to retrieve
+				options.modal.content = $(this).attr('data-modal-content')
+				
+				options.modal.type = $(this).attr('data-type')
+				
+				// console.log('get modal', options.modal)
+				
+				// if inserting/editing a block,
+				// also set category and content properties
+				
+				if (options.modal.content.includes('/')) {
+					options.element.data.type = options.modal.content
+				}
+				
+				if (options.modal.content == 'new') {
+					
+					
+				}
+				
+				// show the modal
+				if ($('#fw-modal').hasClass('show')) {
+					plugin.modal_get_form()
+				} else {
+					$('#fw-modal').modal('show')
+				}
+				
+			})
+			
+			$('#fw-modal').on('show.bs.modal', function() {
+				plugin.modal_get_form()
+			})
+			
+			$('#fw-modal').on('hide.bs.modal', function() {
+			
+				if (tinymce.activeEditor != null) {
+					
+					console.log('remove editor')
+					
+					tinymce.activeEditor.destroy()
+					
+				}
+				
+			})
+			
+			$('#fw-modal').on('hidden.bs.modal', function() {
+				
+				$(this).find('.modal-content').html('<div class="spinner-border my-3 mx-auto"></div>')
+				
+			})
+			
+			const fw_modal = new bootstrap.Modal('#fw-modal')
+			
+			// action button
+			
+			$('body').on('click', '.fw-new-choice', function(e) {
+				
+				console.log(options.inserting)
+				
+				options.element.data.type = $(this).attr('data-modal-content')
+				
+			})
+			
+			$('body').on('click', '.fw-btn', function(e) {
+				
+				e.preventDefault()
+				
+				let this_element = $(this).closest('[data-key]'),
+						this_key = this_element.attr('data-key')
+						
+				if (!this_element.length) {
+					this_element = $('.fw-page')
+				}
+				
+				// console.log('this element', this_element)
+				
+				if ($(this).hasClass('insert-element')) {
+					
+					//
+					// INSERT
+					//
+					
+					options.status = 'inserting'
+					
+					// merge objects[type] with element.data
+					
+					// console.log(options.modal.content)
+					
+					options.element.data = {
+						...options.objects[options.modal.content]
+					}
+					
+					options.element.data.type = options.modal.content
+					
+					console.log('new element', JSON.stringify(options.element.data))
+					
+					console.log(this_element)
+					
+					options.parent.item = this_element.parent()
+					
+					// console.log(options.parent)
+					
+					options.inserting = {
+						where: 'append',
+						index: null
+					}
+					
+					if ($(this).hasClass('insert-into')) {
+						
+						// if inserting into an element
+						// the button's container element is the parent
+						options.parent.item = this_element
+						
+					}
+					
+					options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
+					
+					// index
+					
+					if (!options.parent.data.children) {
+						options.parent.data.children = []
+					}
+					
+					console.log('parent children')
+					console.log(JSON.stringify(options.parent.data.children, null, 2))
+					
+					options.inserting.index = options.parent.data.children.length
+					
+					if (
+						$(this).hasClass('insert-before') ||
+						$(this).hasClass('insert-after')
+					) {
+						
+						console.log('this_key', this_key)
+						
+						options.inserting.index = options.parent.data.children.findIndex(item => item.key === this_key)
+						
+						if ($(this).hasClass('insert-before')) {
+							
+							options.inserting.where = 'before'
+							
+						} else if ($(this).hasClass('insert-after')) {
+							
+							options.inserting.where = 'after'
+						
+						}
+						
+					}
+						
+					console.log('insert', options.inserting)
+					
+					// console.log('parent', options.parent)
+					
+					// console.log('parent data', options.modal.parent.data())
+					
+				} else if ($(this).hasClass('edit-element')) {
+					
+					//
+					// EDIT
+					//
+					
+					options.status = 'editing'
+					
+					if ($(this).attr('data-modal-content') == 'page') {
+						options.element.item = $('body')
+					} else {
+						options.element.item = this_element
+					}
+					
+					options.element.data = plugin.get_element_by_key(options.element.item.attr('data-key'))
+					
+					options.parent.item = this_element.parent()
+					
+					options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
+					
+				} else if ($(this).hasClass('delete-element')) {
+					
+					//
+					// DELETE
+					//
+					
+					options.status = 'deleting'
+					
+					if ($(this).parents('.fw-template-label').length) {
+						// console.log('deleting template')
+						
+						let this_begin = $(this).closest('.fw-template-label').prev('.fw-template-label.begin'),
+								items_to_delete = [ this_begin ]
+						
+						this_begin.nextAll().each(function() {
+							items_to_delete.push($(this))
+							
+							if ($(this).hasClass('fw-template-label end')) {
+								return false
+							}
+						})
+						
+						options.element.item = items_to_delete
+						options.parent.item = this_begin.closest('.fw-element')
+						
+						// console.log('parent item', options.parent.item)
+						
+						options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
+						
+						// console.log('parent data', options.parent.data)
+						
+						if (this_begin.attr('data-template-type') == 'include') {
+							
+							options.deleting = options.parent.data.children.findIndex(item => item.inputs.path === this_begin.attr('data-template-key'))
+							
+						} else {
+							
+							console.log(this_begin, options.parent.data)
+							
+							options.deleting = options.parent.data.children.findIndex(item => item.inputs.post_id === this_begin.attr('data-template-key'))
+							
+						}
+						
+					} else {
+						
+						options.element.item = this_element
+						options.parent.item = this_element.parent()
+						
+						options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
+						
+						options.deleting = options.parent.data.children.findIndex(item => item.key === this_key)
+						
+					}
+					
+					// console.log('element', options.element)
+					// console.log('parent', options.parent)
+					// console.log('deleting', options.deleting)
+					
+					console.log('delete index ' + options.deleting + ' from ', options.parent.data.children)
+					
+				} else if ($(this).hasClass('move-element')) {
+					
+					//
+					// MOVE
+					//
+					
+					options.status = 'moving'
+					
+					options.parent.item = this_element.parent()
+					options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
+					
+					options.element.item = this_element
+					options.element.data = plugin.get_element_by_key(options.element.item.attr('data-key'))
+						
+					let this_index = options.parent.data.children.findIndex(item => item.key === this_key),
+							new_index,
+							item_can_move = false
+					
+					// console.log('moving', this_index)
+					
+					if ($(this).hasClass('move-up')) {
+						
+						if (this_index != 0) {
+							
+							new_index = this_index - 1
+							
+							if (options.element.item.is('.fw-template-label')) {
+								
+								let items_to_move = [ options.element.item ]
+								
+								options.element.item.prevAll().each(function() {
+									items_to_move.push($(this))
+									
+									if ($(this).hasClass('fw-template-label begin'))
+										return false
+									
+								})
+								
+								console.log('move', items_to_move)
+								
+								items_to_move.reverse()
+								
+								items_to_move.forEach(function(item) {
+									plugin.move_item_up(item)
+								})
+								
+							} else {
+							
+								plugin.move_item_up(options.element.item)
+								
+							}
+							
+							item_can_move = true
+							
+						}
+						
+					} else if ($(this).hasClass('move-down')) {
+						
+						if (options.element.item.next().length) {
+						
+							new_index = this_index + 1
+							
+							if (options.element.item.is('.fw-template-label')) {
+								
+								let items_to_move = [ options.element.item ]
+								
+								options.element.item.prevAll().each(function() {
+									items_to_move.push($(this))
+									
+									if ($(this).hasClass('fw-template-label begin'))
+										return false
+									
+								})
+								
+								items_to_move.forEach(function(item) {
+									plugin.move_item_down(item)
+								})
+								
+							} else {
+							
+								plugin.move_item_down(options.element.item)
+								
+							}
+							
+							item_can_move = true
+							
+						}
+						
+					}
+					
+					if (item_can_move == true) {
+							
+						// splice array at this_index,
+						// insert element at new_index
+							
+						options.parent.data.children.splice(new_index, 0, options.parent.data.children.splice(this_index, 1)[0])
+						
+						// gather elements to move
+						plugin.set_elements_to_move(options.parent.data)
+						
+						// set keys of moving elements
+						if (options.elements_to_move != false) {
+							plugin.set_element_keys()
+						}
+						
+					} else {
+						
+						console.log('can\'t move')
+						
+					}
+					
+				}
+					
+			})
+			
+			//
+			// MODAL SUBMIT
+			// e.g. insert, edit form
+			//
+			
+			$('body').on('click', '.fw-new-post-submit', function() {
+				
+				let form_data = {}
+				
+				$(this).closest('.modal').find('form').serializeArray().forEach(function(input) {
+					
+					form_data[input.name] = input.value
+					
+				})
+				
+				console.log('new post', form_data)
+				
+				$.ajax({
+					url: ajax_data.url,
+					type: 'GET',
+					data: {
+						action: 'fw_insert_post',
+						inputs: form_data 
+					},
+					success: function(data) {
+						
+						console.log(data)
+						
+					}
+				})
+				
+			})
+			
+			$('body').on('click', '.fw-settings-submit', function() {
+				
+				let form = $(this).closest('.modal').find('form'),
+						form_data = []//form.serializeArray()
+				
+				// add unchecked checkboxes as 'false'
+				
+				form.find(':input:not(button)').each(function() {
+					
+					if (typeof $(this).attr('name') !== 'undefined') {
+						
+						// console.log($(this))
+						// console.log($(this).attr('name'), $(this).val())
+						
+						if ($(this).is('[type="checkbox"]')) {
+							
+							// on/off toggle
+							// or multi-select
+							
+							if ($(this).attr('name').includes('[]')) {
+								
+								console.log('yaaaaa')
+								
+								if ($(this).prop('checked') == true) {
+								
+									// multi-select
+									
+									form_data.push({
+										name: $(this).attr('name'),
+										value: $(this).val()
+									})
+									
+								}
+								
+							} else {
+							
+								// true/false
+								
+								form_data.push({
+									name: $(this).attr('name'),
+									value: $(this).prop('checked')
+								})
+								
+							}
+							
+						} else {
+							
+							form_data.push({
+								name: $(this).attr('name'),
+								value: $(this).val()
+							})
+						}
+						
+					}
+					
+				})
+				
+				// console.log(form_data)
+				
+				// console.log('post', JSON.stringify(options.element.data))
+				
+				// console.log(options.status)
+				
+				// ACTION
+				
+				switch (options.status) {
+					case 'inserting' :
+						
+						//
+						// INSERT
+						//
+						
+						// set up data object
+						
+						plugin.add_form_data_to_element(form_data)
+						
+						// generate a key for the new element
+						
+						if (!options.parent.data.children) {
+							options.parent.data.children = []
+						}
+						
+						// default key
+						
+						options.element.data.key = options.parent.data.key + '-1'
+						
+						if (options.parent.data.children.length > 0) {
+							
+							// if the parent already has some children
+							// add a dummy key that will be changed later
+							// when re-ordering stuff
+							
+							options.element.data.key = options.parent.data.key + '-inserting'
+						}
+						
+						// auto insert elements between
+						// parent and new element
+						
+						// options.parent.item.find('.insert-into-empty:not(.persistent').remove()
+						
+						if (options.element.data.type == 'template') {
+							
+							console.log('parent', options.parent.data.key)
+							
+							console.log('insert template', options.element.data.inputs.post_id)
+							
+							console.log('get template and then create tree under ' + options.parent.data.type + ' ' + options.parent.data.key)
+							
+							plugin.get_template(
+								options.parent, 
+								options.element
+							)
+							
+						} else {
+							
+							console.log('create tree under ' + options.parent.data.type + ' ' + options.parent.data.key)
+							
+							plugin.create_tree(options.parent, options.element)
+							
+						}
+						// } else {
+							
+							
+							// $('#output').append("1: parent item when starting auto generating\n\n")
+							// $('#output').append(options.parent.item.attr('class') + "\n\n")
+							
+							// plugin.create_tree(options.parent, options.element)
+							
+						// } 
+						
+						break
+						
+					case 'editing' :
+					
+						//
+						// EDITING
+						//
+						
+						console.log('editing', options.element)
+						
+						// item is no longer auto-generated
+						
+						if (options.element.data.autogen) {
+							delete options.element.data.autogen
+						}
+						
+						// console.log('pre')
+						// console.log(JSON.stringify(options.element.data.inputs.settings, null, 2))
+						
+						// options.element.data.inputs.settings = {}
+						
+						// set up data object
+						
+						plugin.add_form_data_to_element(form_data)
+						
+						// update footer
+						
+						plugin.add_footer(options.element.data)
+						
+						// add block content
+						
+						if (options.element.data.type.includes('block')) {
+							plugin.populate_block()
+						}
+						
+						// update attributes
+						
+						plugin.set_element_atts(options.element)
+						
+						// console.log('post')
+						// console.log(JSON.stringify(options.element.data.inputs.settings, null, 2))
+						
+						// update settings
+						
+						// if (options.element.data.inputs.settings) {
+						// 	delete options.element.data.inputs.settings
+						// }
+						
+						// if (options.element.data.inputs.settings != undefined) {
+							plugin.do_element_settings()
+						// }
+						
+						break
+				
+					case 'deleting' :
+				
+						// remove the item(s)
+						if (Array.isArray(options.element.item)) {
+							
+							options.element.item.forEach(function(item) {
+								item.remove()
+							})
+							
+						} else {
+							
+							options.element.item.remove()
+							
+						}
+						
+						// delete from the page object
+						options.parent.data.children.splice(options.deleting, 1)
+						
+						// reorder siblings
+						
+						// gather elements to move
+						plugin.set_elements_to_move(options.parent.data)
+						
+						// set keys of moving elements
+						if (options.elements_to_move != false) {
+							plugin.set_element_keys()
+						}
+						
+						if (!options.parent.data.children.length) {
+							options.parent.item.prepend(plugin.do_insert_btn(options.parent.data))
+						}
+						
+						break
+				}
+				
+				$('#fw-modal').modal('hide')
+				
+			})
+			
+			//
+			// SETTINGS
+			//
+			
+			// add setting
+			
+			$('body').on('click', '.fw-form-flex-menu .dropdown-item', function() {
+				
+				let flex_container = $(this).closest('.fw-form-flex-container')
+				
+				let flex_path = flex_container.attr('data-path') + '/' + $(this).attr('data-flex-item')
+				
+				console.log(flex_container, flex_path)
+				
+				plugin.get_flex_form(flex_container, flex_path)
+				
+			})
+			
+			// delete setting
+			
+			$('body').on('click', '.fw-form-flex-item-remove', function() {
+				
+				let this_form = $(this).closest('.fw-form-flex-row'),
+						this_container = $(this).closest('.fw-form-flex-container'),
+						setting_key = this_form.attr('data-setting')
+				
+				this_form.fadeOut(125, function() {
+					this_form.remove()
+					plugin.reindex_flex(this_container)
+				})
+				
+				// hide this setting from the dropdown
+				
+				$('#settings-form-add-items').find('[data-setting="' + setting_key + '"]').removeClass('disabled')
+				
+			})
+			
+			// repeater - add row
+			
+			$('body').on('click', '.fw-form-repeater-add-row', function(e) {
+				
+				plugin.add_repeater_row($(this).closest('.fw-form-repeater-container').find('.fw-form-repeater').first())
+				
+			})
+			
+			// repeater - delete row
+			
+			$('body').on('click', '.fw-form-repeater-delete-row', function(e) {
+				
+				let this_repeater = $(this).closest('.fw-form-repeater')
+				
+				$(this).closest('.fw-form-repeater-row').remove()
+				
+				let new_rows = this_repeater.find('.fw-form-repeater-row')
+				
+				// reorder all the rows
+				
+				console.log(this_repeater, new_rows)
+				
+				this_repeater.attr('data-rows', new_rows.length)
+				
+				$(new_rows).each(function(i) {
+					$(this).attr('data-row-index', i)
+				})
+				
+			})
+			
+			// flex - add row
+			
+			$('body').on('click', '.fw-form-flex-add-row', function(e) {
+				
+				plugin.add_flex_row($(this).closest('.fw-form-flex-container').find('.fw-form-flex').first(), 'resources/functions/builder/block/content/query/output/' + $(this).attr('data-item-content'))
+				
+				
+			})
+			
+			// conditional form elements
+			
+			$('#fw-modal').on('change', '[data-form-condition]', function() {
+				plugin.toggle_conditionals($(this))
+			})
+			
+			$('#fw-modal').on('change', '.conditional-select', function() {
+				
+				// toggle for all options in the select
+				$(this).find('option[data-form-condition]').each(function() {
+					plugin.toggle_conditionals($(this))
+				})
+				
+			})
+			
+		},
+		
+		toggle_conditionals: function(this_input) {
+			
+			// console.log('conditionals', this_input)
+			
+			let this_conditionals = this_input.attr('data-form-condition').split(','),
+					conditionals_to_show = [],
+					conditionals_to_hide = []
+				
+			if (this_input.is('option')) {
+				
+				if (this_input.prop('selected') == true) {
+					
+					conditionals_to_show = conditionals_to_show.concat(this_conditionals)
+					
+				} else {
+					
+					conditionals_to_hide = conditionals_to_hide.concat(this_conditionals)
+					
+				}
+				
+			} else if (this_input.is('[type="hidden"]')) {
+				
+				// console.log('hidden', this_input.val())
+				
+				if (this_input.val() != '') {
+					
+					conditionals_to_show = conditionals_to_show.concat(this_conditionals)
+					
+				} else {
+					
+					conditionals_to_hide = conditionals_to_hide.concat(this_conditionals)
+					
+				}
+				
+			} else if (this_input.is('[type="checkbox"]')) {
+				
+				if (this_input.prop('checked') == true) {
+					
+					conditionals_to_show = conditionals_to_show.concat(this_conditionals)
+					
+				} else {
+					
+					conditionals_to_hide = conditionals_to_hide.concat(this_conditionals)
+					
+				}
+				
+			}
+			
+			if (conditionals_to_show.length) {
+				
+				conditionals_to_show.forEach(function(conditional) {
+					
+					// console.log('show', conditional)
+					
+					$('#fw-modal').find(conditional).each(function() {
+						
+						if ($(this).is(':input')) {
+							$(this).closest('.conditional-element-container').show()
+						} else {
+							$(this).show()
+						}
+						
+					})
+					
+				})
+				
+			}
+			
+			if (conditionals_to_hide.length) {
+				
+				conditionals_to_hide.forEach(function(conditional) {
+					
+					// console.log('hide', conditional)
+					
+					conditional_el = $('#fw-modal').find(conditional)
+					
+					$('#fw-modal').find(conditional).each(function() {
+						
+						if ($(this).is(':input')) {
+							
+							if ($(this).is('[type="checkbox"]')) {
+								$(this).prop('checked', false)
+							} else {
+								$(this).val('')
+							}
+							
+							$(this).trigger('change')
+							$(this).closest('.conditional-element-container').hide()
+							
+						} else {
+							
+							$(this).hide()
+							
+						}
+							
+					})
+					
+					
+				})
+				
+			}
+				
+			
+		},
+		
+		add_repeater_row: function(repeater) {
+			
+			// console.log(repeater)
+			
+			let this_row = repeater.find('.fw-form-repeater-row').first(),
+					current_rows = parseInt(repeater.attr('data-rows')),
+					new_rows = current_rows + 1,
+					current_index = current_rows - 1,
+					new_index = current_index + 1,
+					new_row = this_row.clone()
+			
+			// console.log(this_row, new_row)
+			
+			// console.log('current rows', current_rows)
+			// console.log('new rows', new_rows)
+			// console.log('current index', current_index)
+			// console.log('new index', new_index)
+			
+			repeater.attr('data-rows', new_rows)
+			
+			new_row.find('[type="hidden"]').val(new_index)
+			
+			new_row.attr('data-row-index', new_index)
+			
+			new_row.find('.fw-form-repeater-delete-row').removeClass('disabled')
+			
+			new_row.appendTo(repeater)
+			
+		},
+		
+		add_flex_row: function(repeater, content) {
+			
+			console.log(content)
+			
+			$.ajax({
+				url: ajax_data.url,
+				type: 'GET',
+				data: {
+					action: 'fw_output_flex_row',
+					path: content
+				},
+				success: function(data) {
+					
+					// console.log(data)
+					
+					let new_row = $(data)
+					
+					new_row.appendTo(repeater)
+					
+				}	
+			})
+			
+		},
+		
+		get_template: function(parent, element) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			console.log('ajax now', element)
+			
+			$.ajax({
+				url: ajax_data.url,
+				type: 'GET',
+				data: {
+					action: 'fw_output_element_ajax',
+					globals: options.globals,
+					element: element.data
+				},
+				success: function(data) {
+					
+					console.log(data)
+					
+					// if (element.data.inputs.source == 'include') {
+					// 	
+					// 	
+					// 	
+					// } else if (element.data.inputs.source == 'post') {
+					
+						// console.log('replace', element.item)
+						
+						let template_key = element.data.inputs.post_id
+						
+						if (element.data.inputs.path != '' && element.data.inputs.path != null) {
+							template_key = element.data.inputs.path
+						}
+						
+						options.template_html = '<div class="fw-template-label begin" data-template-key="' + template_key + '"></div>' + data + '<div class="fw-template-label end" data-template-key="' + template_key + '"></div>'
+						
+						console.log($(data).first())
+						
+						options.template_first = $(data).first()
+						
+					// }
+					
+					// console.log('first', options.template_first)
+					
+					// element.item.css('border', '1px solid red').html(data)
+					
+				},
+				complete: function() {
+					
+					// the first element in the template
+					// becomes the stopping point
+					// for auto-generating in create_tree
+					
+					console.log('done getting template, create tree under ' + options.parent.data.type + ' ' + options.parent.data.key)
+					
+					// if (element.data.inputs.source == 'post') {
+						plugin.create_tree(options.parent, options.element)
+					// }
+					
+				}
+			})
+			
+		},
+		
+		create_tree: function(parent, element) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			let start_generating = false,
+					temp_parent = options.parent,
+					temp_element = null,
+					temp_key = options.parent.data.key
+			
+			let insert_index = options.inserting.index + 1
+			let insert_eq
+			
+			if (options.inserting.index != null) {
+				insert_eq = $('[data-key="' + options.parent.data.key + '"]').find('> .fw-element').eq(options.inserting.index)
+			}
+			
+			let parent_has_changed = false
+			
+			// object type to compare with elements of options.objects
+			
+			let comparing_key = element.data.type
+			
+			if (comparing_key.includes('block/')) {
+				comparing_key = 'block'
+			} else if (comparing_key == 'new') {
+				comparing_key == options.modal.type
+			}
+			
+			if (options.template_first != '' ) {
+				
+				if (options.element.data.inputs.source == 'include') {
+					
+					// the first element in the template HTML
+					// is not a .fw-element
+					// so this is an include
+					
+					options.template_first = 'include'
+					
+				} else {
+					
+					options.template_first = options.template_first.attr('class')
+					options.template_first = options.template_first.split('fw-element fw-')[1]
+					options.template_first = options.template_first.split(' ')[0]
+					
+				}
+				
+				comparing_key = options.template_first
+				options.template_first = ''
+			}
+			
+			// decide whether any elements need to be auto-generated
+			
+			if (
+				comparing_key != 'include' && 
+				options.objects[parent.data.type].child != comparing_key
+			) {
+				
+				console.log(element.data.type + ' is not a direct child of ' + parent.data.type)
+			
+				// console.log('creating tree', parent)
+				
+				// each object type
+				
+				for (var object_type in options.objects) {
+					
+					// console.log('---')
+					
+					// console.log(object_type, options.parent.data.key, start_generating)
+					
+					// skip templates
+					
+					if (object_type == 'template') {
+						
+						// console.log('skip template')
+						
+					} else {
+						
+						if (object_type == options.parent.data.type) {
+							
+							// found the object type that matches
+							// the parent that we're inserting into
+							
+							// console.log('start here', object_type)
+							start_generating = true
+							
+						} else if (start_generating == true) {
+							
+							// the last iteration flagged to start
+							// auto-generating
+							
+							// temp_element that was created last iteration
+							// becomes the new temp_parent
+							
+							if (temp_element != null) {
+								options.parent = temp_element
+								parent_has_changed = true
+							}
+							
+							// console.log('check ' + object_type)
+							
+							if (object_type != comparing_key) {
+								
+								// this type is still a parent
+								// of the element that's being inserted
+								
+								// console.log('temp key', temp_key)
+								
+								temp_key += '-1'
+								
+								// console.log('auto-generating ' + object_type + ' in ' + options.parent.data.type)
+								
+								temp_element = {
+									item: $('<div class="' + options.objects[object_type].classes.join(' ') + ' fw-auto-generated" data-key="' + temp_key + '"></div>'), // DOM element to be inserted into page
+									data: {
+										autogen: true,
+										type: object_type,
+										key: temp_key,
+										inputs: {
+											id: 'auto',
+											settings: {}
+										},
+										children: []
+									}
+								}
+								
+								// find the index of the item before the new item
+								
+								if (options.parent.data.children.length == 0) {
+									
+									// add the new item to its parent's children array
+									options.parent.data.children = [ temp_element.data ]
+									
+									temp_parent.item.find('> .insert-into-empty').remove()
+									
+								} else {
+									
+									// console.log('insert at index ' + insert_index)
+									
+									let deleted_array = options.parent.data.children.splice(insert_index, 0, temp_element.data)
+									
+									// reset keys in parent
+									
+									// gather elements to move
+									plugin.set_elements_to_move(options.parent.data)
+									
+									// set keys of moving elements
+									if (options.elements_to_move != false) {
+										plugin.set_element_keys()
+									}
+									
+									temp_key = temp_element.data.key
+									
+								}
+								
+								// console.log('adding auto element', temp_element.data.type, temp_element.data.key)
+								
+								// console.log('to parent', options.parent.data.key)
+								
+								temp_element.item.appendTo(options.parent.item)
+								
+								// console.log('new temp_key', temp_key, temp_element.data)
+								
+								plugin.setup_element(options.parent, temp_element)
+								
+								// console.log('created', temp_element)
+								// console.log('in', options.parent.data)
+								
+							} else {
+								
+								// console.log('end', object_type)
+								
+								// console.log('temp parent', temp_parent)
+								
+								start_generating = false
+								
+								// console.log('parent has changed', parent_has_changed)
+								
+								if (parent_has_changed == true) {
+									
+									// the last auto-generated element becomes the parent
+									// for the element to be inserted
+									
+									options.parent = temp_element
+									// console.log('parent post', JSON.stringify(options.parent.data))
+								}
+								
+								options.element.data.key = temp_key + '-1'
+								
+								// options.parent = temp_element
+								
+								// console.log('done adding parents')
+								
+								// console.log('page', options.page)
+								
+								// rebuild the key structure
+								// not needed here?
+								plugin.set_element_keys(options.page)
+								
+							}
+							
+						} else {
+							
+							// console.log('do nothing')
+							
+						}
+						
+					}
+					
+					// console.log('temp parent at end of iteration', temp_parent.data.key)
+				}
+				
+			}
+			
+			// insert the new element
+
+			if (options.template_html != '') {
+				
+				// HTML retrieved from template
+				options.element.item = options.template_html
+				
+				options.template_html = ''
+				
+				options.parent.item.addClass('has-template')
+				
+			} else {
+				
+				// temp element that we'll set up after
+				options.element.item = $('<div>')
+				
+			}
+			
+			plugin.insert_element()
+			
+		},
+		
+		insert_element: function() {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			console.log('putting ' + options.element.data.type + ' in ' + options.parent.data.type + ' ' + options.parent.data.key)
+			
+			console.log('inserting', options.inserting)
+			
+			// options.parent.item.append('here')
+			
+			// console.log('element', options.element)
+			// console.log('parent', JSON.stringify(options.parent.data, null, 2))
+			
+			let insert_index = options.inserting.index + 1
+			let insert_eq
+			
+			// if (options.element.data.type == 'template') {
+			// 	options.inserting.where = 'append'
+			// }
+			
+			if (!options.parent.data.children.length) {
+				console.log('parent doesn\'t have children, append item')
+				options.inserting.where = 'append'
+			}
+			
+			if (options.inserting.where != 'append' && options.inserting.index != null) {
+				
+				console.log('index', options.inserting.index)
+				console.log('children', options.parent.data.children)
+				console.log('this', options.parent.data.children[options.inserting.index])
+				
+				insert_eq = $('[data-key="' + options.parent.data.children[options.inserting.index].key + '"]')
+				
+				// insert_eq = $('[data-key="' + options.parent.data.key + '"]').find('> .fw-element').eq(options.inserting.index)
+			}
+			
+			let inserted_el
+			
+			if (typeof options.element.item == 'string') {
+				
+				// template
+				
+				inserted_el = $(options.element.item)
+				
+			} else {
+				
+				// object
+				
+				inserted_el = $(options.element.item.prop('outerHTML'))
+				
+			}
+			
+			options.element.item = inserted_el
+			
+			switch (options.inserting.where) {
+				case 'append' :
+					
+					// console.log('data', JSON.stringify(options.parent.data))
+					// console.log('parent item', options.parent.item.prop('outerHTML'))
+					// console.log('new item', options.element.item)
+					// console.log('new item', options.element.item.prop('outerHTML'))
+					
+					options.element.item.appendTo(options.parent.item)
+					
+					// options.parent.item.css('border', '1px solid #f00')
+					
+					break
+					
+				case 'before' :
+				
+					console.log('before', insert_eq)
+					insert_index = options.inserting.index
+					
+					if (insert_eq.length > 0) {
+						insert_eq = insert_eq[0]
+					}
+					
+					options.element.item.insertBefore(insert_eq)
+					
+					break
+					
+				case 'after' :
+				
+					console.log('insert', options.element.item)
+					console.log('after', insert_eq)
+					
+					if (insert_eq.length > 0) {
+						insert_eq = insert_eq[insert_eq.length - 1]
+					}
+					
+					options.element.item.insertAfter(insert_eq)
+					
+					break
+					
+			}
+			
+			// find the index of the item before the new item
+			
+			if (options.parent.data.children.length == 0) {
+				
+				// adding to an empty parent,
+				// index doesn't matter
+				
+				// add the new item to its parent's children array
+				options.parent.data.children = [ options.element.data ]
+				
+				options.parent.item.find('> .insert-into-empty:not(.persistent)').remove()
+				
+			} else {
+				
+				// 
+				console.log('insert at index ' + insert_index)
+				
+				let deleted_array = options.parent.data.children.splice(insert_index, 0, options.element.data)
+				
+				// reset keys in parent
+				
+				// gather elements to move
+				plugin.set_elements_to_move(options.parent.data)
+				
+				// set keys of moving elements
+				if (options.elements_to_move != false) {
+					plugin.set_element_keys()
+				}
+				
+			}
+			
+			// SETUP
+			
+			if (options.element.data.type !== 'template') {
+				
+				// setup inserted element
+				
+				plugin.setup_element(options.parent, options.element)
+				
+				if (!options.element.data.type.includes('block')) {
+					
+					// the new element is empty,
+					// so add an insert button
+					
+					options.element.item.prepend(plugin.do_insert_btn(options.element.data))
+					
+				}
+				
+			} else {
+				
+				// setup inserted element(s) as a template
+				
+				console.log('setup', options.parent, options.element)
+				
+				plugin.setup_template(options.parent.data.key, options.element.data)
+				
+			}
+			
+		},
+		
+		setup_element: function(parent, element) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			// console.log('ajax', options.globals, element.data)
+			
+			$.ajax({
+				url: ajax_data.url,
+				type: 'GET',
+				data: {
+					action: 'fw_setup_element_ajax',
+					globals: options.globals,
+					element: element.data
+				},
+				dataType: 'json',
+				success: function(data) {
+					
+					// console.log('setup element')
+					// console.log('setup element', data)
+					
+					element.data = {
+						...element.data,
+						...data
+					}
+					
+					console.log('merged', element.data)
+					
+					// set attributes
+					plugin.set_element_atts(element)
+					
+					// populate block
+					
+					if (element.data.type.includes('block')) {
+						
+						element.item.append('<div class="fw-element-inner">')
+						
+						if (options.element.data.type.includes('block')) {
+							plugin.populate_block()
+						}
+						
+					}
+					
+					// add footer
+					plugin.add_footer(element.data)
+					
+					// settings
+					
+					if (element.data.autogen !== true) {
+						plugin.do_element_settings()
+					}
+					
+					// reset modal data
+					plugin.reset_modal()
+					
+					
+				}
+			})
+			
+		},
+		
+		setup_template: function(key, element) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			let parent_item = $('body').find('[data-key="' + key + '"]')
+			
+			if (parent_item.length) {
+					
+				parent_item.addClass('has-template')
+				
+				console.log('setup ' + element.key, element.inputs.post_id)
+				
+				let template_key = element.inputs.post_id
+				
+				if (element.inputs.path != '' && element.inputs.path != null) {
+					template_key = element.inputs.path
+				}
+				
+				let start_label = $('body').find('.fw-template-label.begin[data-template-key="' + template_key + '"]'),
+						end_label = $('body').find('.fw-template-label.end[data-template-key="' + template_key + '"]')
+				
+				// console.log(start_label, end_label)
+				
+				start_label.html('<span class="text">Begin Template (' + template_key + ')')
+				
+				// end_label.html('<span class="text"></span>')
+				
+				plugin.add_footer(element)
+				
+			}
+			
+		},
+		
+		populate_block: function() {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			let element = options.element,
+					parent = options.parent
+			
+			// console.log('populate block', element.data)
+			
+			let block_type = element.data.type.split('/').pop()
+			
+			// console.log('block type', block_type)
+			
+			switch (block_type) {
+				case 'text' :
+				
+					if (element.data.inputs.text) {
+						
+						// console.log('new text')
+						// console.log(element.data.inputs.text[options.lang])
+						
+						// console.log('unescape')
+						// console.log(plugin.unescape(element.data.inputs.text[options.lang]))
+						
+						element.item.find('.fw-element-inner').html(plugin.unescape(element.data.inputs.text[options.lang]))
+					}
+					
+					break
+			
+				case 'image' :
+				
+					let img_urls = JSON.parse(element.data.inputs.file.url)
+				
+					element.item.find('.fw-element-inner').html('<img src="' + img_urls.full + '">')
+					
+					break
+					
+				default :
+				
+					console.log('output', element.data, options.globals)
+			
+					$.ajax({
+						url: ajax_data.url,
+						type: 'GET',
+						data: {
+							action: 'fw_output_element_ajax',
+							element: element.data,
+							globals: options.globals
+						},
+						success: function(data) {
+							
+							// console.log(data)
+							
+							let new_markup = $(plugin.unescape(data))
+							
+							element.item.find('.fw-element-inner').html(new_markup.find('.fw-element-inner').html())
+							
+							
+						}
+					})
+					
+			}
+			
+			
+		},
+		
+		activate: function(parent) {
+			
+			let plugin = this,
+					options = plugin.options
+					
+			if (!parent) {
+				parent = options.page
+			}
+			
+			// console.log('activate', parent)
+			
+			if (
+				parent.type == 'page' &&
+				!parent.children
+			) {
+				
+				// blank page
+				
+				$('.fw-element[data-key="' + parent.key + '"]').append(plugin.do_insert_btn(options.page))
+				
+			}
+			
+			// if (parent.type == 'template') {
+			// 	plugin.add_footer()
+			// }
+			
+			if (parent.children) {
+				
+				parent.children.forEach(function(child, i) {
+					
+					// console.log(child)
+					
+					// find the item
+					
+					let this_item = $('body').find('.fw-element[data-key="' + child.key + '"]')
+					
+					// console.log('activate', child)
+					
+					// if the element is empty,
+					// add an insert button
+					
+					if (!this_item.children().length) {
+						this_item.prepend(plugin.do_insert_btn(child))
+					}
+					
+					// add footer
+					
+					plugin.add_footer(child)
+					
+					if (child.type == 'template') {
+						plugin.setup_template(child.key.slice(0, -2), child)
+					}
+					
+					if (child.children) {
+						
+						// recursive
+						
+						plugin.activate(child)
+						
+					}
+					
+					// console.log(child.key, "✅")
+					
+				})
+				
+			}
+			
+			if (
+				parent.children == undefined || 
+				(
+					parent.children != undefined &&
+					!parent.children.length
+				)
+			) {
+			
+				// $('.fw-element[data-key="' + parent.key + '"]').append(plugin.do_insert_btn(options.page))
+				
+			}
+			
+		},
+		
+		do_element_settings: function() {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			console.log('do settings')
+			
+			// remove
+			
+			// console.log('removed settings', options.removed_settings)
+			
+			if (options.removed_settings.length) {
+				
+				options.removed_settings.forEach(function(key) {
+				
+					console.log('remove setting', key)
+					
+					switch (key) {
+						
+						case 'aos' :
+						
+							// options.element.item.removeAttr('data-aos')
+							// 	.removeAttr('data-aos-easing')
+							// 	.removeAttr('data-aos-offset')
+							// 	.removeAttr('data-aos-duration')
+							// 	.removeAttr('data-aos-delay')
+							// 	.removeAttr('data-aos-anchor')
+							// 	.removeAttr('data-aos-once')
+							// 	
+							// AOS.refresh()
+							
+							break
+						
+					}
+					
+				})
+				
+				options.removed_settings = []
+				
+			}
+			
+			// add
+			
+			if (options.element.data.inputs.settings != undefined) {
+				
+				options.element.data.inputs.settings.forEach(function(setting) {
+					
+					for (var key in setting) {
+						
+						let this_setting = setting[key]
+						
+						console.log('add new setting', this_setting)
+						
+						// setting contains a repeater
+						
+						if (Array.isArray(this_setting)) {
+							
+							this_setting.forEach(function(this_row) {
+							
+								console.log(this_row)
+									
+								let new_class = this_row.property + this_row.side
+								
+								if (this_row.breakpoint != '') {
+									new_class += '-' + this_row.breakpoint
+								}
+								
+								new_class += '-' + this_row.value.replace('-', 'n')
+								
+								console.log(new_class)
+								
+								options.element.item.addClass(new_class)
+								
+							})
+							
+						}
+						
+						switch (key) {
+							
+							case 'colors' :
+								
+								if (this_setting.bg != '') {
+									options.element.item.addClass('bg-' + this_setting.bg)
+								}
+								
+								if (this_setting.text != '') {
+									options.element.item.addClass('text-' + this_setting.text)
+								}
+									
+								break
+						
+							case 'background' :
+								
+								
+								let bg_el,
+										bg_urls = JSON.parse(this_setting.file.url)
+								
+								// element class
+								
+								options.element.item.addClass('has-bg')
+								
+								// set the image src
+								
+								if (options.element.item.find('> .fw-bg').length) {
+									
+									bg_el = options.element.item.find('> .fw-bg')
+									bg_el.removeClass().addClass('fw-bg')
+									
+								} else {
+									
+									bg_el = $('<div class="fw-bg">').prependTo(options.element.item)
+									
+								}
+								
+								bg_el.attr('style', 'background-image: url(' + bg_urls.full + ')')
+									.addClass('bg-position-' + this_setting.position.replace(' ', '-'))
+									.addClass('bg-attachment-' + this_setting.attachment)
+									.addClass('bg-size-' + this_setting.size)
+									.addClass('bg-opacity-' + parseFloat(this_setting.opacity) * 100)
+								
+								break
+								
+							case 'aos' :
+								
+								for (var option in this_setting) {
+									
+									console.log(option, this_setting[option])
+									
+									let this_att = 'data-aos-' + option
+									
+									if (option == 'effect') {
+										this_att = 'data-aos'
+									}
+									
+									// if (option == 'once') {
+									// 	console.log(option, this_setting[option])
+									// }
+									
+									// console.log('add ' + option + ' to', options.element.item)
+									
+									if (this_setting[option] == '') {
+										// options.element.item.removeAttr(this_att)
+									} else {
+										// options.element.item.attr(this_att, this_setting[option])
+									}
+									
+									// AOS.refresh()
+								
+								}
+								
+								break
+								
+						}
+						
+					} // each setting
+					
+				})
+				
+			} // if settings
+			
+		},
+		
+		set_element_atts: function(element) {
+			
+			let plugin = this,
+					options = plugin.options
+
+			let element_item = element.item,
+					element_data = element.data
+					
+			// console.log('update atts', element)
+			
+			let element_type = element.data.type
+			
+			if (element_type.includes('/')) {
+				element_type = element.data.type.split('/')[0]
+			}
+			
+			let element_classes = [ ...options.objects[element_type].classes ]
+			// let element_classes = [ ...element.attr('class').split(' ') ]
+			
+			switch ( element.data.type ) {
+				case 'page' :
+				
+					if (element.data.inputs.title[options.lang] != '') {
+						
+						document.title = element.data.inputs.title[options.lang]
+						
+					}
+					
+					break
+				
+				case 'container' :
+					break
+					
+				case 'row' :
+					break
+					
+				case 'column' :
+				
+					element_classes = [
+						...element_classes, 
+						...plugin.generate_column_classes(element.data.inputs.breakpoints, 'array')
+					]
+					
+					break
+					
+				case 'block' :
+				
+					// element.item.attr('data-block-cat', element.data.cat)
+					break
+					
+			}
+			
+			// ID
+			
+			if (element.data.inputs.id == 'auto') {
+				
+				if (element.data.type != 'page') {
+					element.item.attr('id', 'element-' + element.data.key)
+				}
+				
+			} else {
+				element.item.attr('id', element.data.inputs.id)
+			}
+			
+			// key
+			
+			element.item.attr('data-key', element_data.key)
+			
+			// classes
+			
+			// console.log(element_data.inputs.class)
+			
+			if (element.data.inputs.class) {
+				
+				// only update the class if the input has changed
+				
+				element_classes = [ ...element_classes, ...element.data.inputs.class]
+				element.item.attr('class', element_classes.join(' '))
+				
+			}
+			
+		},
+		
+		add_footer: function(element) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			console.log('footer', element)
+			
+			let element_type = element.type
+			
+			if (element_type.includes('/')) {
+				element_type = element.type.split('/')[0]
+			}
+			
+			// let element = options.element
+					
+			// let element_data = item.data()
+			
+			let this_item = $('body').find('[data-key="' + element.key + '"]')
+			
+			if (element.type == 'template') {
+				
+				let this_template_key = (element.inputs.source == 'post') ? element.inputs.post_id : element.inputs.path
+				
+				this_item = $('body').find('.fw-template-label.end[data-template-key="' + this_template_key + '"]')
+			}
+			
+			if (this_item.find('> .fw-element-footer').length) {
+				this_item.find('> .fw-element-footer').remove()
+			}
+					
+			// console.log('footer', element, this_item)
+			
+			let footer = $('<div class="fw-element-footer">'),
+					footer_inner = $('<div class="fw-element-footer-inner">').appendTo(footer),
+					dropdown = $('<div id="dropdown-' + this_item.attr('id') + '" class="dropdown fw-element-footer-section">').appendTo(footer_inner)
+					
+			// dropdown button
+			
+			let dropdown_btn = '<div class="dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">'
+			
+				dropdown_btn += '<ul class="element-footer-keys list-group list-group-horizontal me-2">'
+					// dropdown_btn += '<li class="list-group-item element-key">' + element.key + '</li>'
+					
+					// if (element.inputs.id != 'auto') {
+					// 	dropdown_btn += '<li class="list-group-item text-bg-secondary">#' + element.inputs.id + '</li>'
+					// }
+					
+				dropdown_btn += '</ul>'
+				
+				dropdown_btn += element_type
+			
+			dropdown_btn += '</div>'
+			
+			$(dropdown_btn).appendTo(dropdown)
+			
+			// menu
+			
+			let dropdown_menu = $('<ul class="dropdown-menu">').appendTo(dropdown)
+			
+			// edit element
+			
+			let actions_container = $('<div class="fw-footer-edit-btns row row-cols-3 px-2">').appendTo(dropdown_menu)
+			
+			$('<li class="col fw-footer-edit-link edit"><a href="#fw-modal" class="fw-modal-trigger fw-btn edit-element d-flex flex-column align-items-center justify-content-between" data-modal-content="' + element.type + '"><div><i class="far fa-pencil-alt"></i></div><span>Edit</span></a></li>').appendTo(actions_container)
+			
+			$('<li class="col fw-footer-edit-link delete"><a href="#fw-modal" class="fw-modal-trigger fw-btn delete-element d-flex flex-column align-items-center justify-content-between" data-modal-content="delete" data-type="' + element.type + '"><div><i class="far fa-trash-alt"></i></div><span>Delete</span></a></li>').appendTo(actions_container)
+			
+			$('<li class="col fw-footer-edit-link move"><div class="d-flex flex-column align-items-center justify-content-between"><div class="d-flex align-items-center"><i class="far fa-arrow-up fw-btn move-element move-up"></i><i class="far fa-arrow-down fw-btn move-element move-down"></i></div><span>Move</span></li>').appendTo(actions_container)
+			
+			dropdown_menu.append('<li><hr class="dropdown-divider"></li>')
+			
+			// move element up/down
+			
+			// let move_btns = '<button type="button" class="btn btn-outline-secondary fw-btn move-element move-up">Up</button><button type="button" class="btn btn-outline-secondary fw-btn move-element move-down">Down</button>'
+			
+			// dropdown_menu.append('<li class="pe-3 d-flex"><h6 class="dropdown-header">Move</h6><div class="btn-group btn-group-sm" role="group">' + move_btns + '</div></li>')
+			
+			// dropdown_menu.append('<li class="w-50"><a href="#" class="dropdown-item fw-btn move-element move-up">Up</a></li>')
+			// dropdown_menu.append('<li class="w-50"><a href="#" class="dropdown-item fw-btn move-element move-down">Down</a></li>')
+			
+			// new element above/below
+			
+			let new_btns = ''
+			
+			// add insert link if possible
+			
+			if (options.objects[element_type].child) {
+				
+				new_btns += '<a href="#fw-modal" class="btn btn-outline-secondary fw-modal-trigger fw-btn insert-element insert-into" data-modal-content="new" data-type="' + element_type + '">Insert</a>'
+				
+				// dropdown_menu.append('<li><a href="#fw-modal" class="fw-modal-trigger dropdown-item fw-btn insert-element insert-into" data-modal-content="new" data-type="' + element_type + '">Insert</a></li>')
+				
+			}
+			
+			new_btns += '<a href="#fw-modal" class="btn btn-outline-secondary fw-modal-trigger fw-btn insert-element insert-before" data-modal-content="new" data-type="' + element_type + '">Before</a>'
+			
+			new_btns += '<a href="#fw-modal" class="btn btn-outline-secondary fw-modal-trigger fw-btn insert-element insert-after" data-modal-content="new" data-type="' + element_type + '">After</a>'
+			
+			dropdown_menu.append('<h6 class="dropdown-header text-body">New Element</h6>')
+			dropdown_menu.append('<li class="dropdown-item"><div class="btn-group btn-group-sm" role="group">' + new_btns + '</div></li>')
+			
+			// dropdown_menu.append('<li><a href="#fw-modal" class="fw-modal-trigger dropdown-item fw-btn insert-element insert-before" data-modal-content="' + element_type + '" data-type="' + element_type + '">' + element_type.charAt(0).toUpperCase() + element_type.slice(1) + ' before</a></li>')
+			// dropdown_menu.append('<li><a href="#fw-modal" class="fw-modal-trigger dropdown-item fw-btn insert-element insert-after" data-modal-content="' + element_type + '" data-type="' + element_type + '">' + element_type.charAt(0).toUpperCase() + element_type.slice(1) + ' after</a></li>')
+			
+			// add buttons for different types
+			
+			switch (element.type) {
+				case 'column' :
+				
+					let breakpoint_btn = '<div class="footer-breakpoint fw-element-footer-section text-truncate">' + plugin.generate_column_classes(element.inputs.breakpoints) + '</div>'
+					
+					footer_inner.append(breakpoint_btn)
+					
+					break
+					
+			}
+			
+			dropdown_menu.append('<li><hr class="dropdown-divider"></li>')
+			
+			let dropdown_meta = $('<div class="fw-footer-meta px-3">').appendTo(dropdown_menu)
+			
+			let meta_items = '<span class="element-type">' + element_type.charAt(0).toUpperCase() + element_type.slice(1) + '</span><span class="badge element-key text-bg-light border ms-2">' + element.key + '</span>'
+			
+			if (element.inputs.id != 'auto') {
+				
+				meta_items += '<span class="badge element-id bg-secondary ms-2">#' + element.inputs.id + '</li>'
+				
+			}
+			
+			meta_items += '</ul>'
+			
+			dropdown_meta.html(meta_items)
+			
+			this_item.append(footer)
+			
+			plugin.add_listeners(this_item)
+			
+			// return footer
+			
+		},
+		
+		do_insert_btn: function(element, keep = false) {
+			
+			let plugin = this,
+					options = plugin.options
+					
+			// console.log('insert dropdown', element.type)
+			
+			let insert_dropdown = $('<div class="dropdown insert-into-empty"><button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown"><span class="plus">+</span>Insert</button>')
+			
+			if (keep == true) {
+				
+				insert_dropdown.addClass('persistent')
+				
+			}
+			
+			let insert_menu = $('<ul class="dropdown-menu">').appendTo(insert_dropdown)
+			
+			let insert_btns = ''
+			
+			let start_adding = false
+			
+			Object.keys(options.objects).forEach(function(key) {
+				
+				if (key == element.type) {
+					start_adding = true
+				}
+				
+				if (key == 'template') {
+					
+					insert_btns += '<li><a href="#fw-modal" class="fw-modal-trigger dropdown-item fw-btn insert-element insert-into" data-modal-content="template" data-type="template">template</a></li>'
+					
+				} else if (options.objects[key].child && start_adding == true) {
+					
+					insert_btns += '<li><a href="#fw-modal" class="fw-modal-trigger dropdown-item fw-btn insert-element insert-into" data-modal-content="' + options.objects[key].child + '" data-type="' + options.objects[key].child + '">' + options.objects[key].child + '</a></li>'
+					
+				}
+				
+			})
+			
+			insert_menu.append(insert_btns)
+			
+			return insert_dropdown
+			
+		},
+		
+		modal_get_form: function() {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			console.log('populate modal', options.modal, options.element)
+			
+			if (options.modal.content == null) {
+				
+				return false
+				
+			} else {
+				
+				$.ajax({
+					url: ajax_data.url,
+					type: 'GET',
+					data: {
+						action: 'fw_modal_settings',
+						globals: options.globals,
+						content: options.modal.content,
+					},
+					success: function(data) {
+						
+						// console.log(data)
+						
+						let modal_content = $('#fw-modal .modal-content')
+						
+						modal_content.html(data)
+						
+						let modal_body = $('#fw-modal').find('.modal-body')
+						
+						// setup repeaters
+						
+						modal_body.find('.fw-form-repeater-delete-row').first().addClass('disabled')
+						
+						// adjust settings dropdown options
+						
+						if (modal_body.find('.dropdown-toggle').length) {
+							
+							modal_body.find('.dropdown-toggle').each(function() {
+								
+								let modal_dropdown = new bootstrap.Dropdown(document.querySelector('#' + $(this).attr('id')), {
+									popperConfig: function (defaultBsPopperConfig) {
+										return { strategy: 'fixed' }
+									}
+								})
+								
+							})
+							
+						}
+						
+						//
+						// MODAL CONTENT:
+						//
+						
+						if (options.modal.content == 'new') {
+							
+							console.log('new')
+							
+							// NEW
+							
+							// if this is the new element list
+							// remove elements that come before this type
+							// i.e. if adding a column, remove row, container & section
+							
+							if (options.modal.type != 'template') {
+								this_list_item = modal_body.find('.list-group-item[data-modal-content="' + options.modal.type + '"]')
+								
+								// remove elements before
+								this_list_item.prevAll().remove()
+								
+								// if inserting, remove this too
+								if (
+									options.status == 'inserting' && 
+									options.inserting.where == 'append'
+								) {
+									this_list_item.remove()
+								}
+							}
+							
+						} else if (options.modal.content == 'block') {
+							
+							
+							
+						} else {
+						
+							// FIELD GROUP
+							
+							plugin.modal_init_form()
+						
+						}
+						
+						//
+						// STATUS:
+						//
+						
+						if (options.status == 'inserting') {
+							
+							// INSERTING
+							
+							$('#fw-modal .modal-title-action').text('New')
+							
+						} else if (options.status == 'editing') {
+							
+							// EDITING
+							
+							// options.editing.form = $('#fw-modal').find('form')
+							$('#fw-modal').find('.fw-settings-submit').text('Update')
+							
+							if (options.element.data.inputs.id != 'auto') {
+								$('#fw-modal .modal-title-content').html('<span class="badge text-bg-light me-2">#' + options.element.data.inputs.id + '</span>')
+							} else {
+								$('#fw-modal .modal-title-action').text('Edit')
+							}
+							
+							// populate fields
+							
+							// plugin.edit_form_build()
+							
+						}
+						
+						modal_body.find('[data-form-condition]').each(function() {
+							plugin.toggle_conditionals($(this))
+						})
+						
+						
+						
+					},
+					error: function() {
+						
+						$('#fw-modal .modal-content').html(''
+							+ '<div class="modal-header">'
+								+ '<h5 class="modal-title">Something went wrong</h5>'
+								+ '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'
+							+ '</div>'
+							+ '<div class="modal-body">'
+								+ '<p>You may not be logged in anymore. If you have unsaved changes, <a href="/admin/" target="_blank">login in a new tab</a> and try again.</p>'
+							+ '</div>'
+						)
+						
+					}
+				})
+				
+			}
+			
+		},
+		
+		do_uploader: function(container) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			let uploader_options = JSON.parse(container.attr('data-uploader-options')),
+					uploader_type = container.attr('data-uploader-type'),
+					upload_id_input = container.find('.uploader-file-id'),
+					upload_url_input = container.find('.uploader-file-url'),
+					upload_btn = container.find('.element-form-upload-btn'),
+					img_placeholder = container.find('.image-placeholder'),
+					placeholder_src,
+					img_url = {},
+					attachment,
+					selection
+					
+			console.log('uploader', container)
+			console.log('options', uploader_options)
+			// console.log('type', uploader_type)
+			// console.log('inputs', upload_id_input, upload_url_input)
+			// console.log('placeholder', img_placeholder)
+			
+			
+			plugin.uploader = wp.media(uploader_options).on('select', function() {
+				
+				attachment = plugin.uploader.state().get('selection').first().toJSON()
+				
+				// set hidden image ID input
+				upload_id_input.val(attachment.id).trigger('change')
+				
+				// console.log(attachment)
+				
+				// set URL and placeholder
+				
+				if (img_placeholder.length) {
+						
+					img_url.full = attachment.url
+					
+					placeholder_src = img_url.full
+					
+					if (attachment.sizes.thumbnail) {
+						img_url.thumbnail = attachment.sizes.thumbnail.url
+					}
+					
+					if (attachment.sizes.medium) {
+						img_url.medium = attachment.sizes.medium.url
+						
+						placeholder_src = img_url.medium
+					}
+					
+					if (attachment.sizes.large) {
+						img_url.thumbnail = attachment.sizes.large.url
+					}
+					
+					img_placeholder.html('<img src="' + placeholder_src + '">')
+					
+					upload_url_input.val(JSON.stringify(img_url))
+					
+					// change button text
+					upload_btn.text('Replace Image')
+					
+				} else {
+					
+					upload_url_input.val(JSON.stringify({ full: attachment.url }))
+					
+				}
+				
+				// upload_btn.addClass('disabled')
+				// remove_btn.removeClass('d-none')
+				
+			}).on('open', function() {
+			
+				if (upload_id_input.val()) {
+					
+					selection = plugin.uploader.state().get('selection')
+					attachment = wp.media.attachment(upload_id_input.val())
+					attachment.fetch()
+					selection.add( attachment ? [attachment] : [] )
+					
+				}
+				
+			})
+			
+			if (upload_id_input.val() != '') {
+				
+				console.log(upload_id_input.val())
+				
+				// element has an ID set
+				
+				if (img_placeholder.length) {
+					
+					// there's also an image placeholder
+				
+					// grab the best image size and set the placeholder
+					
+					let img_urls = JSON.parse(upload_url_input.val())
+					
+					placeholder_src = img_urls.full
+					
+					if (img_urls.medium) {
+						placeholder_src = img_urls.medium
+					}
+					
+					img_placeholder.html('<img src="' + placeholder_src + '">')
+					
+					// change button text
+					upload_btn.text('Replace image')
+					
+				} else {
+					
+					// change button text
+					upload_btn.text('Replace file')
+					
+				}
+				
+			}
+			
+			plugin.uploader.open()
+			
+		},
+		
+		modal_init_form: function() {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			let modal_body = $('#fw-modal').find('.modal-body'),
+					modal_form = $('#fw-modal').find('form')
+					
+			console.log('---')
+			console.log('init form')
+			
+			//
+			// ADD UX FEATURES
+			//
+			
+			// CONTENT TYPES:
+					
+			// block/content/text
+			
+			if (modal_body.find('.editor').length) {
+				
+				quicktags({ id: 'inputs-text-' + options.lang })
+				
+				tinymce.execCommand('mceAddEditor', false, 'inputs-text-' + options.lang)
+				
+				// console.log('destroy editor')
+				
+				// console.log(tinymce)
+				
+				// destroy the tinymce editor
+				// tinymce.execCommand('mceRemoveEditor', false, 'inputs-text-' + options.lang)
+				
+				// setTimeout(function() {
+					
+					// re-init
+					// not happy about the timeout
+					
+					console.log('init mce', 'inputs-text-' + options.lang)
+					
+					// console.log(options.element.data.inputs)
+					// console.log(options.element.data.inputs['text-' + options.lang])
+					// 
+					// if (typeof options.element.data.inputs['text-' + options.lang] != 'undefined') {
+					// 	
+					// 	console.log('yaahhh', tinymce.get('inputs-text-' + options.lang))
+					// 	
+					// 	tinymce.get('inputs-text-' + options.lang).setContent(plugin.unescape(options.element.data.inputs['text-' + options.lang]))
+					// 	
+					// }
+					
+				// }, 150)
+				
+			}
+			
+			// uploader
+			
+			modal_body.on('click', '.element-form-upload-btn', function(e) {
+				e.preventDefault()
+				
+				console.log('upload')
+				
+				plugin.do_uploader($(this).closest('.uploader-container'))
+				
+			})
+			
+					// 
+					// // uploader
+					// 
+					// if (modal_body.find('.element-form-upload-btn').length) {
+					// 	
+					// 	let upload_btn = modal_body.find('.element-form-upload-btn'),
+					// 			uploader_options = {
+					// 				title: 'Insert image',
+					// 				library: {
+					// 					type: 'image'
+					// 				},
+					// 				button: {
+					// 					text: 'Use this image'
+					// 				},
+					// 				multiple: false
+					// 			},
+					// 			upload_id_input = modal_body.find('[name="inputs-file-id"]'),
+					// 			upload_url_input = modal_body.find('[name="inputs-file-url"]'),
+					// 			img_placeholder = modal_body.find('.image-placeholder'),
+					// 			placeholder_src,
+					// 			img_url = {},
+					// 			attachment,
+					// 			selection
+					// 	
+					// 	switch (options.modal.content) {
+					// 		case 'block/content/image' :
+					// 			
+					// 			break
+					// 			
+					// 		case 'block/content/animation' :
+					// 		
+					// 			uploader_options = {
+					// 				title: 'Upload Lottie Animation',
+					// 				library: {
+					// 					type: 'application/json'
+					// 				},
+					// 				button: {
+					// 					text: 'Select'
+					// 				},
+					// 				multiple: false
+					// 			}
+					// 		
+					// 			break
+					// 		
+					// 		
+					// 		
+					// 	}
+					// 	
+					// 	plugin.uploader = wp.media(uploader_options).on('select', function() {
+					// 		
+					// 		attachment = plugin.uploader.state().get('selection').first().toJSON()
+					// 		
+					// 		// set hidden image ID input
+					// 		upload_id_input.val(attachment.id)
+					// 		
+					// 		console.log(attachment)
+					// 		
+					// 		// set URL and placeholder
+					// 		
+					// 		if (img_placeholder.length) {
+					// 				
+					// 			img_url.full = attachment.url
+					// 			
+					// 			placeholder_src = img_url.full
+					// 			
+					// 			if (attachment.sizes.thumbnail) {
+					// 				img_url.thumbnail = attachment.sizes.thumbnail.url
+					// 			}
+					// 			
+					// 			if (attachment.sizes.medium) {
+					// 				img_url.medium = attachment.sizes.medium.url
+					// 				
+					// 				placeholder_src = img_url.medium
+					// 			}
+					// 			
+					// 			if (attachment.sizes.large) {
+					// 				img_url.thumbnail = attachment.sizes.large.url
+					// 			}
+					// 			
+					// 			img_placeholder.html('<img src="' + placeholder_src + '">')
+					// 			
+					// 			upload_url_input.val(JSON.stringify(img_url))
+					// 			
+					// 			// change button text
+					// 			upload_btn.text('Replace Image')
+					// 			
+					// 		} else {
+					// 			
+					// 			upload_url_input.val(JSON.stringify({ full: attachment.url }))
+					// 			
+					// 		}
+					// 		
+					// 		// upload_btn.addClass('disabled')
+					// 		// remove_btn.removeClass('d-none')
+					// 		
+					// 	}).on('open', function() {
+					// 	
+					// 		if (upload_id_input.val()) {
+					// 			
+					// 			selection = plugin.uploader.state().get('selection')
+					// 			attachment = wp.media.attachment(upload_id_input.val())
+					// 			attachment.fetch()
+					// 			selection.add( attachment ? [attachment] : [] )
+					// 			
+					// 		}
+					// 		
+					// 	})
+					// 	
+					// 	if (upload_id_input.val() != '') {
+					// 		
+					// 		// element has an ID set
+					// 		
+					// 		if (img_placeholder.length) {
+					// 			
+					// 			// there's also an image placeholder
+					// 		
+					// 			// grab the best image size and set the placeholder
+					// 			
+					// 			let img_urls = JSON.parse(upload_url_input.val())
+					// 			
+					// 			placeholder_src = img_urls.full
+					// 			
+					// 			if (img_urls.medium) {
+					// 				placeholder_src = img_urls.medium
+					// 			}
+					// 			
+					// 			img_placeholder.html('<img src="' + placeholder_src + '">')
+					// 			
+					// 			// change button text
+					// 			upload_btn.text('Replace image')
+					// 			
+					// 		} else {
+					// 			
+					// 			// change button text
+					// 			upload_btn.text('Replace file')
+					// 			
+					// 		}
+					// 		
+					// 	}
+					// 	
+					// 	upload_btn.click(function(e) {
+					// 		e.preventDefault()
+					// 		
+					// 		plugin.uploader.open()
+					// 	
+					// 	})
+					// 	
+					// 	
+					// }
+					
+					// /image
+					
+			// 		if (options.modal.content == 'block/content/image') {
+			// 			
+			// 			let upload_btn = modal_body.find('.element-form-upload-btn'),
+			// 					remove_btn = modal_body.find('.image-remove'),
+			// 					img_placeholder = modal_body.find('.image-placeholder'),
+			// 					image_id_val = modal_body.find('[name="inputs-file-id"]'),
+			// 					image_url_val = modal_body.find('[name="inputs-file-url"]'),
+			// 					img_url = {},
+			// 					placeholder_src,
+			// 					attachment,
+			// 					selection
+			// 					
+			// 			plugin.uploader = wp.media({
+			// 				title: 'Insert image',
+			// 				library: {
+			// 					type: 'image'
+			// 				},
+			// 				button: {
+			// 					text: 'Use this image'
+			// 				},
+			// 				multiple: false
+			// 			}).on( 'select', function() {
+			// 				
+			// 				attachment = plugin.uploader.state().get('selection').first().toJSON()
+			// 				
+			// 				img_url.full = attachment.url
+			// 				
+			// 				placeholder_src = img_url.full
+			// 				
+			// 				console.log(attachment)
+			// 				
+			// 				if (attachment.sizes.thumbnail) {
+			// 					img_url.thumbnail = attachment.sizes.thumbnail.url
+			// 				}
+			// 				
+			// 				if (attachment.sizes.medium) {
+			// 					img_url.medium = attachment.sizes.medium.url
+			// 					
+			// 					placeholder_src = img_url.medium
+			// 				}
+			// 				
+			// 				if (attachment.sizes.large) {
+			// 					img_url.thumbnail = attachment.sizes.large.url
+			// 				}
+			// 				
+			// 				img_placeholder.html('<img src="' + placeholder_src + '">')
+			// 				
+			// 				// upload_btn.addClass('disabled')
+			// 				// remove_btn.removeClass('d-none')
+			// 				
+			// 				// set hidden image input
+			// 				image_id_val.val(attachment.id)
+			// 				image_url_val.val(JSON.stringify(img_url))
+			// 				
+			// 			}).on('open', function() {
+			// 			
+			// 				if (image_id_val.val()) {
+			// 					
+			// 					selection = plugin.uploader.state().get('selection')
+			// 					attachment = wp.media.attachment(image_id_val.val())
+			// 					attachment.fetch()
+			// 					selection.add( attachment ? [attachment] : [] )
+			// 					
+			// 				}
+			// 				
+			// 			})
+			// 
+			// 			if (image_url_val.val() != '') {
+			// 				console.log(image_url_val.val())
+			// 				
+			// 				let img_urls = JSON.parse(image_url_val.val())
+			// 				
+			// 				placeholder_src = img_urls.full
+			// 				
+			// 				if (attachment.sizes.medium) {
+			// 					placeholder_src = attachment.sizes.medium.url
+			// 				}
+			// 				
+			// 				img_placeholder.html('<img src="' + placeholder_src + '">')
+			// 				
+			// 			}
+			// 		
+			// 			upload_btn.click(function(e) {
+			// 				e.preventDefault()
+			// 				
+			// 				plugin.uploader.open()
+			// 			
+			// 			})
+			// 			
+			// 			// remove
+			// 			
+			// 			remove_btn.click(function(e) {
+			// 				
+			// 				e.preventDefault()
+			// 				
+			// 				// upload_btn.removeClass('disabled')
+			// 				// remove_btn.addClass('d-none')
+			// 				
+			// 				img_placeholder.empty()
+			// 				image_id_val.val('')
+			// 				image_url_val.val('')
+			// 				
+			// 			})
+			// 			
+			// 		}
+					
+					// /animation
+					
+					// if (options.modal.content == 'block/content/animation') {
+					// 	
+					// 	let upload_id_input = modal_body.find('[name="inputs-animation-id"]'),
+					// 			upload_url_input = modal_body.find('[name="inputs-animation-url"]'),
+					// 			attachment,
+					// 			selection
+					// 			
+					// 	plugin.uploader = wp.media({
+					// 		title: 'Upload Animation',
+					// 		library: {
+					// 			type: 'application/json'
+					// 		},
+					// 		button: {
+					// 			text: 'Select'
+					// 		},
+					// 		multiple: false
+					// 	}).on('select', function() {
+					// 		
+					// 		attachment = plugin.uploader.state().get('selection').first().toJSON()
+					// 		
+					// 		console.log('select', attachment)
+					// 		
+					// 		// set hidden image input
+					// 		upload_id_input.val(attachment.id)
+					// 		upload_url_input.val(attachment.url)
+					// 		
+					// 	}).on('open', function() {
+					// 	
+					// 		if (upload_id_input.val()) {
+					// 			
+					// 			selection = plugin.uploader.state().get('selection')
+					// 			attachment = wp.media.attachment(upload_id_input.val())
+					// 			attachment.fetch()
+					// 			selection.add( attachment ? [attachment] : [] )
+					// 			
+					// 		}
+					// 		
+					// 	})
+					// 	
+					// 	
+					// 	modal_body.find('.element-form-upload-btn').click(function(e) {
+					// 		e.preventDefault()
+					// 		
+					// 		plugin.uploader.open()
+					// 	
+					// 	})
+					// 	
+					// }
+					
+					// /navigation
+					
+					// /menu
+					
+					// DISPLAY MENU
+					// set the modal's data-display attribute
+					// to show/hide relevant field sets with CSS
+					
+					if ($('#fw-modal').find('.fw-display-select').length) {
+						
+						let first_display_option = $('#fw-modal').find('.fw-display-select').first().val()
+						
+						$('#fw-modal').attr('data-display', first_display_option)
+						
+					}
+					
+			
+			
+			//
+			// ADD EXISTING DATA
+			//
+			
+			if (typeof options.element.data.inputs != 'undefined') {
+			
+				let flatten_data = plugin.flatten(options.element.data.inputs)
+				
+				// console.log('form data', JSON.stringify(element_data))
+				
+				// console.log('inputs', options.element.data.inputs)
+				console.log('flat', flatten_data)
+				
+				let flex_forms = [],
+						repeater_forms = {}
+				
+				// find arrays in flattened data
+				
+				flatten_data.forEach(function(input) {
+					
+					// console.log(input.property)
+					
+					if (input.property.includes('[]')) {
+						
+						// first instance of a []
+						// is it a repeater or a flex
+						
+						if (modal_body.find('[name="inputs-' + input.property + '"]').parents('.fw-form-repeater').length) {
+							
+							if (input.property.includes('index')) {
+								
+								let prop_name = input.property.split('[]')[0]
+								
+								// console.log(input.property + ' is a repeater')
+								
+								if (repeater_forms.hasOwnProperty(input.property)) {
+									repeater_forms[input.property] += 1
+								} else {
+									repeater_forms[input.property] = 1
+								}
+								
+							}
+							
+						} else {
+							
+							if (input.property.includes('type')) {
+								
+								// console.log(input.property + ' is a flex')
+							
+								let flex_container = modal_form.find('.fw-form-flex-container[data-input="' + input.property.split('[]')[0] + '"]')
+								
+								let flex_path = flex_container.attr('data-path') + '/' + input.value
+								
+								// console.log('path', flex_path)
+								
+								flex_forms.push({
+									path: flex_path,
+									container: flex_container
+								})
+								
+							}
+							
+						}
+						
+					}
+					
+				})
+				
+				// console.log('repeaters', repeater_forms)
+					
+				if (repeater_forms != {}) {
+					
+					for (let key in repeater_forms) {
+						
+						if (repeater_forms[key] > 1) {
+							
+							// console.log('add ' + repeater_forms[key] + ' rows for inputs-' + key)
+							
+							for (i = 0; i < repeater_forms[key] - 1; i += 1) {
+								
+								// console.log(modal_form.find('[name="inputs-' + key + '"]').closest('.fw-form-repeater'))
+								
+								plugin.add_repeater_row(modal_form.find('[name="inputs-' + key + '"]').closest('.fw-form-repeater'))
+								
+							}
+							
+						}
+						
+					}
+					
+				}
+				
+				// unique
+				
+				flex_forms = [ ...new Set(flex_forms) ]
+				
+				// if flex forms exist,
+				// pull their templates before
+				// populating the fields
+				
+				if (flex_forms.length > 0) {
+				
+					// console.log('flex forms', flex_forms)
+					
+					var allAJAX = flex_forms.map(flex_form => {
+						
+						// console.log('getting ' + flex_form.path)
+						
+						return plugin.get_flex_form(flex_form.container, flex_form.path)
+						
+					})
+					
+					Promise.all(allAJAX).then(function() {
+						
+						// console.log('done getting flex forms')
+						
+						// console.log('populate now')
+						plugin.modal_populate_fields(flatten_data)
+						
+					})
+					
+				} else {
+					
+					// no flex fields to get,
+					// populate fields
+					
+					// console.log('other populate call')
+					plugin.modal_populate_fields(flatten_data)
+					
+				}
+				
+			}
+			
+			console.log('init form', 'done')
+			
+		},
+		
+		modal_populate_fields: function(flatten_data) {
+			
+			console.log('---')
+			console.log('populate fields')
+			console.log('flattened data', flatten_data)
+			
+			let plugin = this,
+					options = plugin.options
+			
+			let modal_body = $('#fw-modal').find('.modal-body'),
+					modal_form = $('#fw-modal').find('form')
+			
+			// individual inputs
+			
+			let repeater_index = -1,
+					flex_type = null
+			
+			flatten_data.forEach(function(input) {
+			// for (var key in flatten_data) {
+				
+				let this_input = modal_form.find('[name="inputs-' + input.property + '"]'),
+						this_val = input.value
+						
+				if (input.property.includes('[]')) {
+					// console.log('key', input.property)
+					// console.log('input', this_input)
+					// console.log('val', this_val)
+				}
+				
+				if (this_input.parents('.fw-form-repeater').length) {
+					
+					// console.log(input.property + ' is in a repeater row')
+					
+					if (
+						input.property.includes('[]') &&
+						input.property.includes('index')
+					) {
+						
+						repeater_index += 1
+						
+						// console.log('new index', repeater_index)
+						
+					}
+				} else {
+					
+					repeater_index = -1
+					
+				}
+			
+				if (repeater_index != -1) {
+				
+					this_input = this_input.closest('.fw-form-repeater-row[data-row-index="' + repeater_index + '"]').find('[name="inputs-' + input.property + '"]')
+					
+				}
+				
+				if (this_input.parents('.fw-form-flex-row').length) {
+					
+					// console.log(input.property + ' is in a flex row')
+					
+					if (
+						input.property.includes('[]') &&
+						input.property.includes('type')
+					) {
+						
+						flex_type = input.value
+						
+						// console.log('new type', flex_type)
+						
+					}
+					
+				} else {
+					
+					flex_type = null
+					
+				}
+				
+				if (flex_type != null) {
+					
+					this_input = modal_form.find('.fw-form-flex-row[data-item="' + flex_type + '"]').find('[name="inputs-' + input.property + '"]')
+					
+				}
+				
+				// console.log('input')
+				// console.log(this_input, this_val)
+				
+				// INDIVIDUAL INPUT FIELDS
+				
+				if (input.property == 'id') {
+					
+					// ID
+					// 
+					
+					if (this_val == 'auto') {
+						
+						this_val = ''
+						
+						if (options.element.data.type == 'page') {
+							this_input.attr('placeholder', $('body').attr('id'))
+						}
+						
+					}
+					
+				} else if (input.property == 'class' || input.property.includes('class')) {
+					
+					this_val = this_val.join(' ')
+					
+				} else if (input.property.includes('text')) {
+					
+					// this_val = plugin.unescape(this_val)
+					
+				}
+				
+				if (Array.isArray(this_val)) {
+					
+					this_input = modal_form.find('[name="inputs-' + input.property + '[]"]')
+					
+				}
+				
+				if (this_input.length) {
+					
+					if (this_input.is('select')) {
+						
+						// console.log(this_input, this_val)
+						
+						this_input.find('option').each(function() {
+							if ($(this).attr('value') == this_val) {
+								$(this).val()
+							}
+						})
+						
+					}
+					
+					if (input.property.includes('-d')) {
+						
+						// console.log('breakpoints')
+						
+						if (this_input.attr('type') == 'hidden') {
+							
+							// console.log('hidden', this_input, 'value', this_val)
+							
+							if (this_val == 'none') {
+								this_input.next().addClass('active')
+								this_input.parent().nextAll().hide()
+							} else {
+								this_input.next().removeClass('active')
+								this_input.parent().nextAll().show()
+							}
+							
+						}
+						
+					}
+					
+					// update by input type
+					
+					if (
+						this_input.is('[type="checkbox"]') && 
+						(this_val == 'true' || this_val == true)
+					) {
+						
+						// checkbox
+						
+						this_input.prop('checked', true).trigger('change')
+						
+					} else if (this_input.hasClass('wp-editor-area')) {
+						
+						let input_name = 'inputs-' + input.property,
+								unescaped_val = plugin.unescape(this_val)
+						
+						quicktags({ id: input_name })
+						
+						tinymce.execCommand('mceAddEditor', false, input_name)
+						
+						if (unescaped_val != '') {
+							setTimeout(function() {
+								// tinyMCE
+								
+								console.log('set content')
+								console.log(input_name, tinymce.get(input_name))
+								
+								tinymce.get(input_name).setContent(unescaped_val)
+								
+							}, 500)
+						}
+						
+					} else {
+					
+						// text
+						
+						this_input.val(this_val)
+						
+					}
+					
+				}
+				
+				// image placeholder
+				
+				if (this_input.hasClass('uploader-file-url')) {
+					
+					let img_urls = JSON.parse(this_val)
+					
+					this_input.siblings('.image-placeholder').html('<img src="' + img_urls.full + '">')
+					
+				}
+				
+				// range slider
+				
+				if (this_input.hasClass('form-range')) {
+			
+					this_input.prev().find('span').text(parseFloat(this_input.val()) * 100)
+					
+					this_input.on('input', function() {
+						
+						this_input.prev().find('span').text(parseFloat(this_input.val()) * 100)
+						
+					})
+					
+				}
+				
+				// toggle conditionals
+				
+				if (typeof this_input.attr('data-form-condition') != 'undefined') {
+					plugin.toggle_conditionals(this_input)
+				}
+			
+			})
+			
+			// image placeholders
+			
+			
+			
+			
+			// 
+			// // fill values
+			// 
+			// for (var input_name in this_setting) {
+			// 	
+			// 	let this_input = new_form.find('[name="inputs-settings-' + key + '-' + input_name + '"]')
+			// 	
+			// 	if (this_input.is('[type="checkbox"]')) {
+			// 		
+			// 		if (this_setting[input_name] == 'true') {
+			// 			this_input.prop('checked', true).trigger('change')
+			// 		}
+			// 		
+			// 	} else {
+			// 		
+			// 		this_input.val(this_setting[input_name]).trigger('change')
+			// 		
+			// 	}
+			// 	
+			// }
+			// 
+			// // repeater
+			// 
+			// if (new_form.find('.settings-form-repeater').length) {
+			// 		
+			// 	// console.log(key, 'has repeater')
+			// 	
+			// 	let this_repeater = $('#fw-modal').find('.settings-form-spacing .settings-form-repeater')
+			// 	
+			// 	// disable the first 'delete' button
+			// 	
+			// 	this_repeater.find('.fw-form-repeater-delete-row').first().addClass('disabled')
+			// 	
+			// 	if (this_setting.hasOwnProperty('repeater')) {
+			// 		let repeater_rows = this_setting.repeater.length
+			// 	
+			// 		// console.log(repeater_rows + ' rows')
+			// 		
+			// 		for (i = 0; i < repeater_rows; i += 1) {
+			// 			
+			// 			// console.log('row ' + i)
+			// 			
+			// 			if (i != 0) {
+			// 				
+			// 				plugin.add_repeater_row(this_repeater)
+			// 				
+			// 			}
+			// 			
+			// 			let this_row = this_repeater.find('[data-row-index="' + i + '"]')
+			// 			
+			// 			// console.log(i, this_row)
+			// 			
+			// 			for (var input_name in this_setting.repeater[i]) {
+			// 				
+			// 				let this_input = this_row.find('[name="inputs-settings-' + key + '-repeater-' + input_name + '"]')
+			// 				
+			// 				this_val = this_setting.repeater[i][input_name]
+			// 				
+			// 				// console.log('set', this_input, this_val)
+			// 				
+			// 				this_input.val(this_val).trigger('change')
+			// 				
+			// 				// console.log(input_name, this_val)
+			// 				
+			// 			}
+			// 			
+			// 		}
+			// 		
+			// 	}
+			// 	
+			// 	
+			// }
+			// 
+			// // image
+			// 
+			// if (key == 'background') {
+			// 	
+			// 	let opacity_range = new_form.find('.form-range')
+			// 	
+			// 	opacity_range.prev().find('span').text(parseFloat(opacity_range.val()) * 100)
+			// 	
+			// 	opacity_range.on('input', function() {
+			// 		
+			// 		opacity_range.prev().find('span').text(parseFloat(opacity_range.val()) * 100)
+			// 		
+			// 	})
+			// 	
+			// 	// console.log('background', new_form, this_setting)
+			// 	
+			// 	let upload_btn = new_form.find('.element-form-upload-btn'),
+			// 			remove_btn = new_form.find('.image-remove'),
+			// 			img_placeholder = new_form.find('.image-placeholder'),
+			// 			image_id_val = new_form.find('[name="inputs-settings-background-file-id"]'),
+			// 			image_url_val = new_form.find('[name="inputs-settings-background-file-url"]'),
+			// 			img_url = {},
+			// 			parse_URLs
+			// 	
+			// 	if (this_setting.file) {
+			// 		
+			// 		console.log('this ya', this_setting.file)
+			// 		
+			// 		img_url = JSON.parse(this_setting.file.url)
+			// 		
+			// 		// upload_btn.addClass('disabled')
+			// 		// remove_btn.removeClass('d-none')
+			// 		
+			// 		img_placeholder.html('<img src="' + img_url.full + '">')
+			// 		
+			// 		new_form.find('.background-options').removeClass('d-none')
+			// 		
+			// 	}
+			// 	
+			// 	plugin.uploader = wp.media({
+			// 		title: 'Insert image',
+			// 		library: {
+			// 			// uploadedTo : options.post_id,
+			// 			type: 'image'
+			// 		},
+			// 		button: {
+			// 			text: 'Use this image'
+			// 		},
+			// 		multiple: false
+			// 	}).on('select', function() {
+			// 		
+			// 		const attachment = plugin.uploader.state().get('selection').first().toJSON()
+			// 		
+			// 		img_url = {
+			// 			full: attachment.url
+			// 		}
+			// 		
+			// 		placeholder_src = img_url.full
+			// 		
+			// 		if (attachment.sizes.thumbnail) {
+			// 			img_url.thumbnail = attachment.sizes.thumbnail.url
+			// 		}
+			// 		
+			// 		if (attachment.sizes.medium) {
+			// 			img_url.medium = attachment.sizes.medium.url
+			// 			
+			// 			placeholder_src = img_url.medium
+			// 		}
+			// 		
+			// 		if (attachment.sizes.large) {
+			// 			img_url.thumbnail = attachment.sizes.large.url
+			// 		}
+			// 		
+			// 		img_placeholder.html('<img src="' + placeholder_src + '">')
+			// 		
+			// 		// upload_btn.addClass('disabled')
+			// 		// remove_btn.removeClass('d-none')
+			// 		
+			// 		// set hidden image input
+			// 		image_id_val.val(attachment.id)
+			// 		image_url_val.val(JSON.stringify({ full: attachment.url }))
+			// 		
+			// 		new_form.find('.background-options').removeClass('d-none')
+			// 		
+			// 	}).on('open', function() {
+			// 	
+			// 		if (image_id_val.val()) {
+			// 			
+			// 			const selection = plugin.uploader.state().get('selection')
+			// 			attachment = wp.media.attachment(image_id_val.val())
+			// 			attachment.fetch()
+			// 			selection.add( attachment ? [attachment] : [] )
+			// 			
+			// 		}
+			// 		
+			// 	})
+			// 	
+			// 	upload_btn.click(function(e) {
+			// 		e.preventDefault()
+			// 		
+			// 		plugin.uploader.open()
+			// 	
+			// 	})
+			// 	
+			// }
+			
+			
+			
+			
+			
+			
+			let is_hidden = false
+			
+			console.log('populate fields', 'done')
+			
+		},
+		
+		get_flex_form: function(container, path) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			let key = path.split('/')
+			
+			key = key[key.length - 1]
+			
+			// console.log('get flex', path)
+			
+			return $.ajax({
+				url: ajax_data.url,
+				type: 'GET',
+				data: {
+					action: 'fw_modal_add_setting',
+					path: path
+				},
+				success: function(data) {
+					
+					// console.log(data)
+					
+					let new_form = $(data)
+					
+					// hide this setting from the dropdown
+					
+					container.find('[data-setting="' + key + '"]').addClass('disabled')
+					
+					// add the form
+					
+					container.find('.fw-form-flex-rows').append(new_form)
+					
+					new_form.attr('data-item', key)
+					
+					// reindex flex rows
+					plugin.reindex_flex(container)
+					
+					//
+					
+					if (key == 'background') {
+						
+						// opacity range slider
+						
+						let opacity_range = new_form.find('.form-range')
+						
+						opacity_range.prev().find('span').text(parseFloat(opacity_range.val()) * 100)
+						
+						opacity_range.on('input', function() {
+							
+							opacity_range.prev().find('span').text(parseFloat(opacity_range.val()) * 100)
+							
+						})
+						
+						// 
+						// 
+						// // console.log('background', new_form, this_setting)
+						// 
+						// let upload_btn = new_form.find('.element-form-upload-btn'),
+						// 		remove_btn = new_form.find('.image-remove'),
+						// 		img_placeholder = new_form.find('.image-placeholder'),
+						// 		image_id_val = new_form.find('[name="inputs-settings-background-file-id"]'),
+						// 		image_url_val = new_form.find('[name="inputs-settings-background-file-url"]'),
+						// 		img_url = {},
+						// 		parse_URLs
+						// 
+						// if (this_setting.file) {
+						// 	
+						// 	console.log('this ya', this_setting.file)
+						// 	
+						// 	img_url = JSON.parse(this_setting.file.url)
+						// 	
+						// 	// upload_btn.addClass('disabled')
+						// 	// remove_btn.removeClass('d-none')
+						// 	
+						// 	img_placeholder.html('<img src="' + img_url.full + '">')
+						// 	
+						// 	new_form.find('.background-options').removeClass('d-none')
+						// 	
+						// }
+						
+						// uploader_options = {
+						// 	title: 'Insert image',
+						// 	library: {
+						// 		// uploadedTo : options.post_id,
+						// 		type: 'image'
+						// 	},
+						// 	button: {
+						// 		text: 'Use this image'
+						// 	},
+						// 	multiple: false
+						// }
+						
+						// plugin.uploader = wp.media(uploader_options).on('select', function() {
+						// 	
+						// 	const attachment = plugin.uploader.state().get('selection').first().toJSON()
+						// 	
+						// 	img_url = {
+						// 		full: attachment.url
+						// 	}
+						// 	
+						// 	placeholder_src = img_url.full
+						// 	
+						// 	if (attachment.sizes.thumbnail) {
+						// 		img_url.thumbnail = attachment.sizes.thumbnail.url
+						// 	}
+						// 	
+						// 	if (attachment.sizes.medium) {
+						// 		img_url.medium = attachment.sizes.medium.url
+						// 		
+						// 		placeholder_src = img_url.medium
+						// 	}
+						// 	
+						// 	if (attachment.sizes.large) {
+						// 		img_url.thumbnail = attachment.sizes.large.url
+						// 	}
+						// 	
+						// 	img_placeholder.html('<img src="' + placeholder_src + '">')
+						// 	
+						// 	// upload_btn.addClass('disabled')
+						// 	// remove_btn.removeClass('d-none')
+						// 	
+						// 	// set hidden image input
+						// 	image_id_val.val(attachment.id)
+						// 	image_url_val.val(JSON.stringify({ full: attachment.url }))
+						// 	
+						// 	new_form.find('.background-options').removeClass('d-none')
+						// 	
+						// }).on('open', function() {
+						// 
+						// 	if (image_id_val.val()) {
+						// 		
+						// 		const selection = plugin.uploader.state().get('selection')
+						// 		attachment = wp.media.attachment(image_id_val.val())
+						// 		attachment.fetch()
+						// 		selection.add( attachment ? [attachment] : [] )
+						// 		
+						// 	}
+						// 	
+						// })
+						
+						
+					
+						
+					}
+					
+					// toggle conditionals
+					// in newly added form
+					
+					// new_form.find('[data-form-condition]').each(function() {
+					// 	plugin.toggle_conditionals($(this))
+					// })
+					
+					// console.log('added ' + path)
+					
+				}
+				
+			})
+			
+		},
+		
+		reindex_flex: function(container) {
+			
+			// console.log('reindex')
+			
+			container.find('.fw-form-flex-row').each(function(i, item) {
+				$(item).attr('data-row-index', i)
+				$(item).find('[name$="index"]').val(i)
+			})
+			
+		},
+		
+		uploader_init: function(uploader_options) {
+			
+			let plugin = this,
+					options = plugin.options
+					
+			// set up options
+			
+			
+			
+			plugin.uploader = wp.media(uploader_options).on('select', function() {
+				
+				attachment = plugin.uploader.state().get('selection').first().toJSON()
+				
+				// set hidden image ID input
+				upload_id_input.val(attachment.id)
+				
+				console.log(attachment)
+				
+				// set URL and placeholder
+				
+				if (img_placeholder.length) {
+						
+					img_url.full = attachment.url
+					
+					placeholder_src = img_url.full
+					
+					if (attachment.sizes.thumbnail) {
+						img_url.thumbnail = attachment.sizes.thumbnail.url
+					}
+					
+					if (attachment.sizes.medium) {
+						img_url.medium = attachment.sizes.medium.url
+						
+						placeholder_src = img_url.medium
+					}
+					
+					if (attachment.sizes.large) {
+						img_url.thumbnail = attachment.sizes.large.url
+					}
+					
+					img_placeholder.html('<img src="' + placeholder_src + '">')
+					
+					upload_url_input.val(JSON.stringify(img_url))
+					
+					// change button text
+					upload_btn.text('Replace Image')
+					
+				} else {
+					
+					upload_url_input.val(JSON.stringify({ full: attachment.url }))
+					
+				}
+				
+				// upload_btn.addClass('disabled')
+				// remove_btn.removeClass('d-none')
+				
+			}).on('open', function() {
+			
+				if (upload_id_input.val()) {
+					
+					selection = plugin.uploader.state().get('selection')
+					attachment = wp.media.attachment(upload_id_input.val())
+					attachment.fetch()
+					selection.add( attachment ? [attachment] : [] )
+					
+				}
+				
+			})
+			
+			if (upload_id_input.val() != '') {
+				
+				// element has an ID set
+				
+				if (img_placeholder.length) {
+					
+					// there's also an image placeholder
+				
+					// grab the best image size and set the placeholder
+					
+					let img_urls = JSON.parse(upload_url_input.val())
+					
+					placeholder_src = img_urls.full
+					
+					if (img_urls.medium) {
+						placeholder_src = img_urls.medium
+					}
+					
+					img_placeholder.html('<img src="' + placeholder_src + '">')
+					
+					// change button text
+					upload_btn.text('Replace image')
+					
+				} else {
+					
+					// change button text
+					upload_btn.text('Replace file')
+					
+				}
+				
+			}
+			
+			// upload_btn.click(function(e) {
+			// 	e.preventDefault()
+			// 	
+			// 	plugin.uploader.open()
+			// 
+			// })
+		
+			
+		},
+		
+		//
+		// DATA MANIPULATION
+		//
+		
+		get_element_by_key: function(key, parent) {
+				
+			// key: the element's data-key attribute
+			// parent: where to look
+			
+			let plugin = this,
+					options = plugin.options
+				
+			let i,
+					result
+			
+			if (!parent) parent = options.page
+			
+			if (key == parent.key) {
+				
+				return parent
+				
+			} else {
+			
+				if (!parent.children) {
+					
+					console.warn('fw', parent.key + ' has no children')
+					
+					return false
+					
+				} else { 
+				
+					let array_to_search = parent.children
+					
+					for (i = 0; i < array_to_search.length; i += 1) {
+						
+						// console.log(i, parent[i].key)
+						
+						// console.log(key + ' = ' + array_to_search[i].key + '?')
+						
+						// each element in the object
+						
+						if (key == array_to_search[i].key) {
+							
+							// the element's key is the one we're looking for
+							
+							// test = array_to_search
+							
+							if (options.status == 'deleting') {
+								// options.parent.data = array_to_search
+							}
+							
+							return array_to_search[i]
+							
+						} else {
+							
+							if (array_to_search[i].children) {
+								
+								// maybe it's in the element's children
+								
+								// console.log(i, 'search in ' + parent[i].key, parent[i].children)
+								result = plugin.get_element_by_key(key, array_to_search[i])
+								
+								if (result !== false) {
+									return result
+								}
+								
+							}
+							
+						}
+						
+					}
+					
+					// console.warn('fw', 'can\'t find element ' + key)
+					
+					// no dice
+					return false
+					
+				}
+				
+			}
+			
+		},
+		
+		add_form_data_to_element: function(form_data) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			console.log('add form data', form_data)
+			
+			// grab the element that we're working with
+			let element_item = options.element.item,
+					element_data = options.element.data,
+					element_has_settings = false
+					
+			// assume all settings will be removed
+			
+			if (
+				element_data.hasOwnProperty('inputs') &&
+				element_data.inputs.hasOwnProperty('settings')
+			) {
+				
+				// add setting keys to removed_settings
+				element_data.inputs.settings.forEach(function(setting) {
+					for (let key in setting) {
+						options.removed_settings.push(key)
+					}
+				})
+				
+				// console.log('removed', options.removed_settings)
+				
+				// clear existing settings object
+				// element_data.inputs.settings = [] //{}
+				
+			}
+			
+			// destroy the existing inputs object
+			// not sure if this is a good idea
+			
+			options.element.data.inputs = {}
+			
+			form_data.forEach(function(input) {
+				
+				// console.log('--- NEW INPUT ---')
+				// console.log('data', input)
+				
+				if (input.name.includes('inputs-settings')) {
+					element_has_settings = true
+				}
+				
+				// format value
+				
+				if (input.name.includes('inputs-title')) {
+					input.value = plugin.escape(input.value)
+				}
+				
+				if (input.name == 'inputs-id' && input.value == '') {
+					input.value = 'auto'
+				}
+				
+				// split the input name into an array
+				
+				let key = input.name.split('-')
+				
+				if (key.length == 1) {
+					
+					// if the key array only has one value,
+					// that's the name of the element property
+					// to update
+					
+					element_data[key] = input.value
+					
+				} else {
+					
+					// options.adding_to_repeater = false
+					// options.adding_to_array = false
+					
+					// console.log('pre', JSON.stringify(element_data))
+					
+					element_data = plugin.find_child_element(element_data, key, input.value)
+					
+				}
+				
+				
+			})
+			
+			// console.log('element now')
+			// console.log(JSON.stringify(element_data, null, 2))
+			
+			// reset repeater flag
+			// 
+			// options.adding_to_repeater = false
+			// options.repeater_index = -1
+			
+			// reset array flag
+			
+			// options.adding_to_array = false
+			options.array_key = null
+			options.array_indexes = {}
+			
+			if (element_has_settings == true) {
+				console.log('has settings', JSON.stringify(element_data.inputs.settings))
+				
+				element_data.inputs.settings.forEach(function(setting) {
+					
+					for (var key in setting) {
+						
+						// filter settings from the submitted form
+						// from the removed_settings array
+						// i.e. keep stuff that was NOT removed
+						
+						options.removed_settings = options.removed_settings.filter(e => e !== key)
+						
+					}
+					
+				})
+				
+				console.log('settings removed', options.removed_settings)
+				
+			}
+			
+			return element_data
+			
+		},
+		
+		set_element_keys: function(parent) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			// console.log('to move', options.elements_to_move)
+			
+			options.elements_to_move.forEach(function(element) {
+				
+				// console.log('update', element.item)
+				
+				// key
+				element.item.attr('data-key', element.new)
+				
+				// footer key text
+				element.item.find('> .fw-element-footer .element-key').text(element.new)
+				
+				// id
+				if (element.id == 'auto') {
+					element.item.attr('id', 'element-' + element.new)
+				}
+				
+				// console.log('after', old_el.attr('data-key'))
+				
+			})
+			
+			options.elements_to_move = []
+			
+		},
+		
+		set_elements_to_move: function(parent) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			if (parent.children) {
+					
+				parent.children.forEach(function(child, i) {
+					
+					// console.log('child', child.key, child.inputs.text)
+					
+					// console.log('pre', JSON.stringify(child))
+					
+					let old_key = child.key
+					
+					child.key = parent.key + '-' + (i + 1)
+					
+					// console.log('new', parent.key + '-' + (i + 1))
+					// console.log('post', JSON.stringify(child))
+					
+					options.elements_to_move.push({
+						item: $('[data-key="' + old_key + '"]'),
+						id: child.inputs.id,
+						old: old_key,
+						new: child.key
+					})
+					
+					// console.log(old_key + ' > ' + child.key)
+					
+					if (child.children) {
+						plugin.set_elements_to_move(child)
+					}
+					
+				})
+				
+			}
+			
+		},
+		
+		update_post: function() {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			console.log(options.page)
+			
+			$.ajax({
+				url: ajax_data.url,
+				type: 'POST',
+				data: {
+					action: 'fw_update_post',
+					globals: options.globals,
+					post_id: options.post_id,
+					builder: options.page,
+					builder_string: JSON.stringify(options.page)
+				},
+				success: function(data) {
+					console.log(data)
+				}
+			})
+			
+		},
+		
+		//
+		// UTILITIES
+		//
+		
+		reset_modal: function() {
+			
+			this.options.modal = {
+				content: null,
+				item: null,
+				parent: null,
+				data: {
+					type: null,
+					cat: null,
+					content: null
+				}
+			}
+			
+		},
+		
+		find_child_element: function(current_parent, key, value, lang_prop = null) {
+			
+			let plugin = this,
+					options = plugin.options
+					
+			let property = key[0]
+			
+			// console.log('---')
+			// console.log('property', property)
+			// console.log('value', value)
+			// console.log('parent', JSON.stringify(current_parent))
+			
+			if (key.length == 1) {
+				
+				// only 1 key left so it's time to
+				// set the value
+				
+				if (property == 'class') {
+					value = value.split(' ')
+				}
+				
+				if (lang_prop != null) {
+					
+					value = plugin.escape(tinymce.get('inputs-' + lang_prop + '-' + options.lang).getContent())
+					
+				}
+				
+				// console.log('setting ' + property + '\'s value now')
+				
+				// console.log('pre', JSON.stringify(current_parent))
+				
+				if (Array.isArray(current_parent)) {
+					
+					// console.log('parent is array')
+					// 
+					// console.log('current key', options.array_key)
+					// console.log('current index', options.array_indexes[options.array_key])
+					
+					if (
+						current_parent[options.array_indexes[options.array_key]] &&
+						current_parent[options.array_indexes[options.array_key]][property]
+					) {
+						
+						// console.log('indexes[' + options.array_key + '][' + options.array_indexes[options.array_key] + '] already has ' + property)
+						
+						options.array_indexes[options.array_key] += 1
+						
+					}
+					
+					if (!current_parent[options.array_indexes[options.array_key]]) {
+						
+						current_parent[options.array_indexes[options.array_key]] = {}
+						
+					}
+					
+					current_parent[options.array_indexes[options.array_key]][property] = value
+					
+				} else {
+				
+					current_parent[property] = value
+					
+				}
+				
+				// console.log('post')
+				// console.log(JSON.stringify(current_parent, null, 2))
+				
+			} else {
+				
+				// multiple keys left
+				
+				let keep_prop = null
+				
+				if (key[0] == 'text') {
+					keep_prop = key[0]
+				}
+				
+				// drop the first element
+				
+				let first = key.shift()
+				
+				let parent_to_send = null
+				
+				if (property.includes('[]')) {
+					
+					// i'm an array
+					
+					property = property.replace('[]', '')
+					
+					if (Array.isArray(current_parent)) {
+						
+						// my parent is an array
+						// find out if it's empty
+						
+						// console.log('parent is array')
+						
+						// console.log(current_parent[options.array_indexes[options.array_key]])
+						
+						if (!current_parent[options.array_indexes[options.array_key]]) {
+							
+							// object that sits at the right index of the parent
+							
+							current_parent[options.array_indexes[options.array_key]] = {}
+							
+						}
+						
+						if (!current_parent[options.array_indexes[options.array_key]][property]) {
+							
+							// array that will be the new parent
+							
+							current_parent[options.array_indexes[options.array_key]][property] = []
+							
+						}
+						
+						parent_to_send = current_parent[options.array_indexes[options.array_key]][property]
+						
+					} else {
+						
+						// parent is not an array
+						
+						if (!current_parent[property]) {
+							
+							current_parent[property] = []
+							
+						}
+						
+					}
+					
+					// always
+					// set array_key to the property that
+					// the new array is being created for
+					
+					options.array_key = property
+					
+					// set the index for this property to 0
+					
+					if (!options.array_indexes[property]) {
+						
+						options.array_indexes[property] = 0
+						
+					}
+					
+				} else if (!current_parent.hasOwnProperty(property)) {
+					
+					// i'm not an array
+						
+					if (Array.isArray(current_parent)) {
+						
+						// console.log('---')
+						// console.log(JSON.stringify(current_parent, null, 2))
+						// console.log(options.array_indexes, options.array_key)
+						// console.log('current key/index', options.array_key, options.array_indexes[options.array_key])
+						
+						// console.log('what is in there', current_parent[options.array_indexes[options.array_key]])
+						
+						// console.log('keys', Object.keys(current_parent[options.array_indexes[options.array_key]]))
+						
+						// console.log('---')
+						
+						// my parent is an array
+						// find out if it's empty
+						
+						if (!current_parent[options.array_indexes[options.array_key]]) {
+							
+							// nothing exists at this index yet
+							
+							// console.log('indexes[' + options.array_key + '] is undefined')
+							
+							current_parent[options.array_indexes[options.array_key]] = {}
+							
+						} else {
+							
+							// if property doesn't exist in the current index,
+							// increment the index by 1
+							
+							if (!Object.keys(current_parent[options.array_indexes[options.array_key]]).includes(property)) {
+								options.array_indexes[options.array_key] += 1
+								
+								// console.log('next index')
+								console.log(current_parent[options.array_indexes[options.array_key]])
+							
+							}
+							
+							// does anything exist there
+							
+							
+							// check for undefined again
+							
+							if (!current_parent[options.array_indexes[options.array_key]]) {
+								current_parent[options.array_indexes[options.array_key]] = {}
+							}
+							
+						}
+						
+						// inputs-settings[]-spacing[] = new array at 0
+						// inputs-settings[]-colors = new object at 1
+						
+						// console.log('new index', options.array_indexes[options.array_key])
+						// console.log(current_parent[options.array_indexes[options.array_key]])
+								
+						// add my object at the right index
+						
+						if (!current_parent[options.array_indexes[options.array_key]][property]) {
+							current_parent[options.array_indexes[options.array_key]][property] = {}
+						}
+						
+						parent_to_send = current_parent[options.array_indexes[options.array_key]][property]
+						
+					} else {
+					
+						// add my object by my key
+						
+						current_parent[property] = {}
+						
+					}
+					
+				}
+				
+				if (parent_to_send == null) {
+					
+					parent_to_send = current_parent[property]
+					
+				}
+				
+				// console.log('indexes post', options.array_indexes)
+				
+				// console.log('this is what we made')
+				// console.log(current_parent)
+				
+				// console.log('parent being sent')
+				// console.log(JSON.stringify(parent_to_send, null, 2))
+				
+				plugin.find_child_element(parent_to_send, key, value, keep_prop)
+				
+			}
+			
+			return current_parent
+			
+		},
+		
+		/*
+		find_child_element: function(element, key, current_parent, value, lang_prop = null) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			let property = key[0]
+			
+			console.log('property', property)
+			
+			console.log('pre', JSON.stringify(current_parent))
+			
+			if (property.includes('[]')) {
+				
+				// set array index to 0
+				
+				options.array_index = 0
+				
+				// or the length of the parent
+				
+				if (typeof current_parent !== 'undefined' && current_parent.length) {
+					options.array_index = current_parent.length
+				}
+				
+				property = property.replace('[]', '')
+				options.adding_to_array = true
+				
+			}
+			
+			// what could be happening now
+			// a. current_parent[property] doesn't exist
+			// b. current_parent[property] is an empty array
+			// c. current_parent[property] is an empty object
+			// d. current_parent[property] is an array with stuff in it
+			// e. current_parent[property] is an object with stuff in it
+			
+			// console.log(element, key, current_parent, value)
+			
+			// if (typeof current_parent == 'undefined') {
+			// 	current_parent = {}
+			// }
+			
+			if (Array.isArray(current_parent)) {
+				
+				// parent is an array
+				// is it empty (b) or not (d)?
+				// does it matter?
+				
+				if (current_parent.length == 0) {
+					console.log('b', 'parent is an empty array')
+					
+					let new_obj = {}
+					
+					current_parent.push(new_obj)
+					
+				} else {
+					console.log('d', 'parent has ' + current_parent.length + ' elements')
+					
+					// current_parent[options.array_index][property] = {}
+					
+				}
+				
+				// current_parent.push({})
+				// current_parent[options.array_index] = {}
+				
+				
+				
+			}	else if (typeof current_parent == 'object') {
+				
+				// parent is an object
+				// is it empty (c) or not (e)?
+				
+				if (!current_parent.hasOwnProperty(property)) {
+					
+					// parent doesn't contain a child with this
+					// property name
+					
+					if (options.adding_to_array == true) {
+						
+						// add property as an array
+						current_parent[property] = []
+						
+					} else {
+						
+						// add as an object
+						current_parent[property] = {}
+						
+					}
+					
+				}
+				
+			}
+			
+			// did i manage to set parent[property]
+			
+			console.log('element data')
+			console.log(JSON.stringify(options.element.data, null, 2))
+			console.log('just set', current_parent[property])
+			
+			if (key.length > 1) {
+				
+				// create a new object under [property] and
+				// keep drilling
+				
+				let keep_prop = null
+				
+				if (key[0] == 'text') {
+					keep_prop = key[0]
+				}
+				
+				// drop the first element
+				let first = key.shift()
+				
+				console.log('object sending to child fn', current_parent[property])
+				
+				plugin.find_child_element(element, key, current_parent[property], value,keep_prop)
+				
+			} else {
+				
+				console.log('time to set the value')
+				
+				console.log(current_parent)
+				console.log(current_parent[property])
+				console.log(value)
+				
+				// set [property] to the value of the form input
+				
+				if (options.adding_to_array == true) {
+					// if (options.array_index == 0) {
+					// 	
+					// 	// console.log('reset array ' + property)
+					// 	
+					// 	current_parent[property] = []
+					// 	
+					// }
+					
+					current_parent[options.array_index][property] = value
+					
+				} else {
+				
+					current_parent[property] = value
+					
+				}
+				
+			}
+			
+			console.log('post', JSON.stringify(current_parent))
+			
+			// console.log(current_parent)
+			
+			return current_parent
+			
+		},*/
+		
+		/*
+		find_child_element: function(element, key, current_parent, value, lang_prop = null) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			// console.log(key, current_parent, value)
+			
+			// property to search for is 
+			// the first element of the key array 
+			// that was initially supplied to the function
+			
+			// console.log('lang prop', lang_prop)
+			// console.log('value', value)
+			// console.log('key', key)
+			
+			let property = key[0]
+			
+			let send_to_fn = {}
+			
+			if (current_parent[property]) {
+				send_to_fn = current_parent[property]
+			}
+			
+			// console.log('---')
+			console.log('i am', property)
+			console.log('my parent is', JSON.stringify(current_parent))
+			
+			if (options.adding_to_array == true) {
+				console.log('adding to array')
+			}
+			
+			if (options.adding_to_repeater == true) {
+				console.log('adding to repeater')
+			}
+			
+			// what could be happening now
+			// a. current_parent[property] doesn't exist
+			// b. current_parent[property] is an empty array
+			// c. current_parent[property] is an empty object
+			// d. current_parent[property] is an array with stuff in it
+			// e. current_parent[property] is an object with stuff in it
+
+			if (property == 'index') {
+				
+				// set repeater index to 0
+				
+				options.repeater_index = 0
+				
+				// or the length of the parent
+				
+				if (typeof current_parent !== 'undefined' && current_parent.length) {
+					options.repeater_index = current_parent.length
+				}
+				
+				// options.repeater_index += 1
+				
+				// console.log('new repeater index', options.repeater_index)
+				
+			}
+			
+			// console.log('repeater index', options.repeater_index)
+			
+			if (property == 'repeater') {
+				
+				// if property is repeater
+				// then it needs to be an array
+				// not an object
+				
+				options.adding_to_repeater = true
+				
+			}
+			
+			if (property.includes('[]')) {
+				
+				options.array_index = 0
+				
+				// or the length of the parent
+				
+				if (typeof current_parent !== 'undefined' && current_parent.length) {
+					options.array_index = current_parent.length
+				}
+				
+				options.adding_to_array = true
+				property = property.replace('[]', '')
+				
+			}
+			
+			// console.log(current_parent, property)
+		
+			if (Array.isArray(current_parent)) {
+				
+				if (current_parent.length == 0) {
+					
+					console.log('b', 'my parent is an empty array')
+					
+					let new_obj = {}
+					
+					// new_obj[property] = null
+					
+					current_parent.push(new_obj)
+				
+					send_to_fn = current_parent[options.array_index]
+				
+				} else {
+					
+					console.log('d', 'my parent is an array with objects in it')
+					
+					// console.log(current_parent[options.repeater_index])
+					
+					if (current_parent[options.repeater_index] == undefined) {
+						// console.log('create current_parent[' + options.repeater_index + ']')
+						current_parent[options.repeater_index] = {}
+						// current_parent.push({})
+					}
+					
+					// current_parent = current_parent[options.repeater_index]
+					
+				}
+				
+			} else if (!current_parent.hasOwnProperty(property)) {
+				
+				// console.log('parent is not an array')
+				// console.log('adding to repeater', options.adding_to_repeater)
+				
+				if (
+					options.adding_to_repeater == true || 
+					options.adding_to_array == true
+				) {
+					
+					// add property as an array
+					current_parent[property] = []
+					
+				} else {
+					
+					// add as an object
+					current_parent[property] = {}
+					
+				}
+				
+			}
+			
+			// console.log('current_parent now')
+			// console.log(JSON.stringify(current_parent, null, 2))
+			
+			// console.log('key', key)
+			// still more than one element to drill down
+			
+			if (key.length > 1) {
+				
+				let keep_prop = null
+				
+				if (key[0] == 'text') {
+					// console.log('keep ' + key[0])
+					keep_prop = key[0]
+				}
+				
+				// drop the first element
+				let first = key.shift()
+				
+				plugin.find_child_element(element, key, send_to_fn, value,keep_prop)
+				
+			} else {
+				
+				if (property == 'class') {
+					value = value.split(' ')
+				}
+				
+				if (lang_prop != null) {
+					
+					value = plugin.escape(tinymce.get('inputs-' + lang_prop + '-' + options.lang).getContent())
+					
+				}
+				
+				// console.log(current_parent, property, current_parent[property])
+				// console.log('current_parent pre', current_parent)
+				
+				if (options.adding_to_repeater == true) {
+					
+					// console.log('add to repeater', options.repeater_index, property)
+					
+					if (property != 'index') {
+						
+						console.log('add', property)
+						
+						current_parent[options.repeater_index][property] = value
+						
+					}
+					
+					// console.log(JSON.stringify(current_parent[options.repeater_index]))
+					
+				} else if (options.adding_to_array == true) {
+					
+					// console.log('pre', current_parent[property])
+					
+					if (options.array_index == 0) {
+						
+						// console.log('reset array ' + property)
+						
+						current_parent[property] = []
+						
+					}
+					
+					current_parent[property].push(value)
+					
+					// console.log('post', current_parent[property])
+					
+				} else {
+					
+					current_parent[property] = value
+					
+				}
+				
+				// console.log('current_parent post', current_parent)
+				
+			}
+			
+			// console.log(current_parent.settings)
+			
+			return current_parent
+			
+		},*/
+		
+		generate_column_classes: function(breakpoints, output = 'string') {
+			
+			let classes = [],
+					is_hidden = false
+					
+			// console.log(breakpoints)
+			
+			for (var breakpoint in breakpoints) {
+				for (var setting in breakpoints[breakpoint]) {
+					
+					let new_class = setting
+					
+					if ( breakpoint != 'xs' ) new_class += '-' + breakpoint
+					
+					new_class += '-'
+					
+					if (breakpoints[breakpoint][setting] != '') {
+						
+						if (setting == 'd') {
+							
+							// hide/show setting
+							
+							if (breakpoints[breakpoint][setting] == 'none') {
+								
+								// hiding at this breakpoint
+								
+								if (is_hidden == false) {
+									
+									// not already hidden
+									
+									new_class += 'none'
+									is_hidden = true
+									
+									classes.push(new_class)
+									
+								}
+								
+							} else {
+								
+								// showing at this breakpoint
+								
+								if (is_hidden == true) {
+									
+									// is already hidden
+									
+									new_class += 'block'
+									is_hidden = false
+									
+									classes.push(new_class)
+									
+								}
+								
+								
+							}
+							
+						} else {
+							
+							// other column setting
+							
+							new_class += breakpoints[breakpoint][setting]
+							
+							classes.push(new_class)
+							
+						}
+						
+					}
+					
+				}
+			}
+			
+			if (output == 'string') {
+				classes = classes.join(' ')
+			}
+			
+			return classes
+			
+		},
+		
+		escape: function(htmlStr = '') {
+			return htmlStr.replace(/&/g, "&amp;")
+				.replace(/\n/g, "")
+				.replace(/</g, "&lt;")
+				.replace(/>/g, "&gt;")
+				.replace(/"/g, "&quot;")
+				.replace(/'/g, "&#39;")
+		},
+		
+		unescape: function(htmlStr = '') {
+			
+			// console.log('unescape', htmlStr)
+			
+			htmlStr = htmlStr.replace(/&lt;/g , "<")
+			htmlStr = htmlStr.replace(/&gt;/g , ">")
+			htmlStr = htmlStr.replace(/&quot;/g , "\"")
+			htmlStr = htmlStr.replace(/&#39;/g , "\'")
+			htmlStr = htmlStr.replace(/&amp;/g , "&")
+			
+			return htmlStr
+		},
+		
+		move_item_up: function(item) {
+			
+			let plugin = this,
+					options = plugin.options,
+					go_again = false
+			
+			// console.log('moving up', item)
+			
+			$.each(item, function() {
+				
+				let prev_is_label = false
+				
+				if (item.prev().is('.fw-template-label') == true) {
+					prev_is_label = true
+				}
+				
+				item.after(item.prev())
+				
+				if (options.moving_in_template == true) {
+					
+					if (prev_is_label == false) {
+						go_again = true
+					} else {
+						options.moving_in_template = false	
+					}
+					
+				} else {
+					
+					if (prev_is_label == true) {
+						options.moving_in_template = true
+						go_again = true
+					}
+					
+				}
+				
+				if (go_again == true) {
+					plugin.move_item_up(item)
+				}
+				
+			})
+			
+		},
+		
+		move_item_down: function(item) {
+			
+			let plugin = this,
+					options = plugin.options,
+					go_again = false
+					
+			// console.log('down', options.moving_in_template)
+			
+			// console.log('moving', item)
+			
+			$.each(item, function() {
+				
+				let next_is_label = false
+				
+				if (item.next().is('.fw-template-label') == true) {
+					// console.log('next is label')
+					next_is_label = true
+				}
+				
+				item.before(item.next())
+				
+				if (options.moving_in_template == true) {
+					
+					if (next_is_label == false) {
+						go_again = true
+					} else {
+						options.moving_in_template = false	
+					}
+					
+				} else {
+					
+					if (next_is_label == true) {
+						
+						options.moving_in_template = true
+						go_again = true
+						
+					}
+					
+				}
+				
+				if (go_again == true) {
+					plugin.move_item_down(item)
+				}
+				
+				
+			})
+			
+		},
+		
+		flatten: function(obj, parent, adding_to_array = false, res = []) {
+			
+			let plugin = this
+			
+			for (let key in obj) {
+				
+				// console.log('---')
+				// console.log(parent, key, obj[key])
+				
+				let propName
+				
+				if (parent) {
+					
+					// console.log(key, typeof key)
+					
+					if (adding_to_array == true) {
+						propName = parent + '[]'
+					} else {
+						propName = parent + '-' + key
+					}
+					
+				} else {
+					propName = key
+				}
+				
+				if (Array.isArray(obj[key])) {
+					
+					// console.log(key + ' is array')
+					
+					if (obj[key].length > 0 && typeof obj[key][0] == 'object') {
+						// console.log('ya')
+						plugin.flatten(obj[key], propName, true, res)
+					} else {
+						// res[propName] = obj[key]
+						res.push({
+							property: propName,
+							value: obj[key]
+						})
+					}
+					
+				} else if (typeof obj[key] == 'object') {
+					
+					// console.log(key + ' is object')
+					
+					plugin.flatten(obj[key], propName, false, res)
+					
+				} else {
+					
+					// console.log(key + ' else')
+					
+					// res[propName] = obj[key]
+					
+					res.push({
+						property: propName,
+						value: obj[key]
+					})
+					
+				}
+			}
+			
+			// console.log(res)
+			return res
+			
+		},
+		
+		is_number: function (str) {
+			if (typeof str != "string") return false
+			
+			return !isNaN(str) && 
+						 !isNaN(parseFloat(str))
+						 
+		},
+		
+		add_listeners: function(this_item) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			if (this_item.length) {
+				
+				this_item.on('shown.bs.dropdown', function(e) {
+					
+					this_item.addClass('dropdown-open')
+					
+					e.stopPropagation()
+					// 	e.preventDefault()
+					
+				}).on('hide.bs.dropdown', function(e) {
+					
+					this_item.removeClass('dropdown-open')
+					
+				})
+				
+				// 
+				// let this_id = this_item.attr('id')
+				// 
+				// options.dropdowns[this_item.attr('data-key')] = document.getElementById(this_id)
+				// 
+				// options.dropdowns[this_item.attr('data-key')].addEventListener('shown.bs.dropdown', function (e) {
+				// 	
+				// 	console.log('opening ' + this_item.attr('data-key'))
+				// 	
+				// 	this_item.addClass('dropdown-open')
+				// 	
+				// 	// prevent event from firing in parents
+				// 	e.stopPropagation()
+				// 	e.preventDefault()
+				// 	
+				// })
+				// 
+				// options.dropdowns[this_item.attr('data-key')].addEventListener('hide.bs.dropdown', function () {
+				// 	
+				// 	console.log('closing ' + this_item.attr('data-key'))
+				// 	
+				// 	this_item.removeClass('dropdown-open')
+				// 	
+				// })
+				
+			}
+			
+		}
+
+
+	}
+
+	// jQuery plugin interface
+
+	$.fn.builder = function (opt) {
+		var args = Array.prototype.slice.call(arguments, 1)
+
+		return this.each(function () {
+
+			var item = $(this)
+			var instance = item.data('builder')
+
+			if (!instance) {
+
+				// create plugin instance if not created
+				item.data('builder', new builder(this, opt))
+
+			} else {
+
+				// otherwise check arguments for method call
+				if (typeof opt === 'string') {
+					instance[opt].apply(instance, args)
+				}
+
+			}
+		})
+	}
+	
+	$(document).builder()
+
+}(jQuery));

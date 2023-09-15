@@ -1,0 +1,139 @@
+// @import 'bootstrap';
+
+@import 'variables-global';
+
+@import '../vendor/bootstrap/scss/functions';
+@import '../vendor/bootstrap/scss/variables';
+@import '../vendor/bootstrap/scss/variables-dark';
+@import 'bootstrap/setup';
+@import 'bootstrap/extras';
+
+//
+// FRAMEWORK VARIABLES
+//
+
+@import 'variables-fw';
+
+//
+// HELPERS
+//
+
+@import 'helpers/mixins';
+@import 'helpers/tags';
+
+// classes
+
+@import 'helpers/classes';
+
+//
+// TAGS
+//
+
+.has-bg {
+	position: relative;
+}
+
+.fw-bg {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	
+	&.bg-position-top-left { background-position: left center; }
+	&.bg-position-top-center { background-position: center top; }
+	&.bg-position-top-right { background-position: right top; }
+	&.bg-position-center-left { background-position: left center; }
+	&.bg-position-center-center { background-position: center center; }
+	&.bg-position-center-right { background-position: right center; }
+	&.bg-position-bottom-left { background-position: left bottom; }
+	&.bg-position-bottom-center { background-position: center bottom; }
+	&.bg-position-bottom-right { background-position: right bottom; }
+	
+	&.bg-attachment-fixed { background-attachment: fixed; }
+	
+	&.bg-size-width { background-size: 100% auto; }
+	&.bg-size-height { background-size: auto 100%; }
+	&.bg-size-cover { background-size: cover; }
+	
+	&.bg-opacity-0 { opacity: 0; }
+	&.bg-opacity-10 { opacity: 0.1; }
+	&.bg-opacity-20 { opacity: 0.2; }
+	&.bg-opacity-30 { opacity: 0.3; }
+	&.bg-opacity-40 { opacity: 0.4; }
+	&.bg-opacity-50 { opacity: 0.5; }
+	&.bg-opacity-60 { opacity: 0.6; }
+	&.bg-opacity-70 { opacity: 0.7; }
+	&.bg-opacity-80 { opacity: 0.8; }
+	&.bg-opacity-90 { opacity: 0.9; }
+	&.bg-opacity-100 { opacity: 1; }
+	
+}
+
+.fw-block {
+	&.has-bg {
+		.fw-element-inner {
+			position: relative;
+		}
+	}	
+}
+
+.fw-element {
+	img {
+		display: block;
+		width: auto;
+		height: auto;
+		max-width: 100%;
+	}
+}
+
+//
+// CLASSES
+//
+
+.min-height-75 {
+	min-height: 75vh;
+}
+
+//
+// BLOCKS
+//
+
+// @import 'block/animation';
+@import 'block/menu';
+// @import 'block/heading';
+// @import 'block/text';
+// @import 'block/image';
+// @import 'block/video';
+// @import 'block/jumbotron';
+// @import 'block/carousel';
+// @import 'block/big-list';
+// @import 'block/query';
+// @import 'block/post-grid';
+// @import 'block/post-carousel';
+// @import 'block/terms';
+// @import 'block/tabs';
+
+//
+// VENDOR
+//
+
+@import 'vendor';
+
+//
+// WP ELEMENTS
+//
+
+.screen-reader-text, .screen-reader-text span, .ui-helper-hidden-accessible {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	-webkit-clip-path: inset(50%);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+	word-wrap: normal !important;
+}

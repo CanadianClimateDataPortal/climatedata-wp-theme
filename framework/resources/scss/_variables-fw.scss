@@ -1,0 +1,52 @@
+//
+// CLASSES
+//
+
+$full-height-height: 100vh !default;
+$bg-z-index: 1 !default;
+
+//
+// STRUCTURE
+//
+
+$admin-bar-height: 32px !default;
+
+$header-height: auto !default;
+
+$alert-height: auto !default;
+$alert-bg: $danger !default;
+$alert-text-color: $white !default;
+$alert-link-color: $alert-text-color !default;
+$alert-close-color: $alert-link-color !default;
+$alert-z-index: 1030 !default;
+
+$section-bg-alt: $light !default;
+
+$container-max-width: 1200px !default;
+
+//
+// OVERRIDE VARIABLES
+//
+
+// classes
+
+$bg-z-index: 1;
+
+//
+// STRUCTURE
+// _structure.scss
+//
+
+
+//
+// VENDOR
+//
+
+// OVERLAY
+
+$overlay-close-color: $primary;
+$overlay-close-top: 150px;
+$overlay-close-right: 2rem;
+
+
+$carousel-controls-color: $gray-500;

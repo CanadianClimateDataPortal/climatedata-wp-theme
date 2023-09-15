@@ -1,0 +1,95 @@
+// HEADINGS
+
+$headings-font-weight: 600 !default;
+
+$h1-font-family: $headings-font-family !default;
+$h2-font-family: $headings-font-family !default;
+$h3-font-family: $headings-font-family !default;
+$h4-font-family: $headings-font-family !default;
+$h5-font-family: $headings-font-family !default;
+$h6-font-family: $headings-font-family !default;
+
+$h1-font-weight: $headings-font-weight !default;
+$h2-font-weight: $headings-font-weight !default;
+$h3-font-weight: $headings-font-weight !default;
+$h4-font-weight: $headings-font-weight !default;
+$h5-font-weight: $headings-font-weight !default;
+$h6-font-weight: $headings-font-weight !default;
+
+//
+// TAGS
+//
+
+* {
+  @include box-sizing;
+}
+
+html {
+  // font-size: 10px;
+}
+
+body {
+  height: auto;
+  // font-size: $font-size-base;
+  // line-height: $line-height-base;
+  @include smoothing;
+}
+
+p {
+  // margin: 0 0 24px 0;
+  // font-size: 1.6em;
+}
+
+ul, ol {
+  // font-size: 1.6em;
+  // padding-left: 40px;
+
+  ul, ol {
+    font-size: inherit;
+  }
+}
+
+ul {
+  list-style: square;
+}
+
+ol {
+  list-style: decimal;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+hr {
+  clear: both;
+
+  &.hidden {
+    border-bottom: none;
+    border-top: none;
+    margin: 0;
+  }
+}
+
+$mark-bg: transparentize($base-font-color, 0.95) !default;
+
+mark {
+  margin: 0 0.3em;
+  padding: 0.2em 0.3em;
+  color: inherit;
+  background: $mark-bg;
+}
+
+p {
+  mark {
+    margin: 0;
+  }
+}
+
+video {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}

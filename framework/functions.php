@@ -187,7 +187,7 @@ add_filter ( 'body_class', function ( $classes ) {
 
 
 
-function fw_build_menu ( array &$elements, $parent_id = 0, $level ) {
+function fw_build_menu ( array &$elements, $parent_id = 0, $level = 1 ) {
 
 	$branch = array();
 

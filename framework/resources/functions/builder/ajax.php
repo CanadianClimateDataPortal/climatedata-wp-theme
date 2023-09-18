@@ -195,7 +195,7 @@ function fw_output_element_ajax() {
 		// dumpit ( $_GET['element'] );
 		// dumpit ( $_GET['globals'] );
 			
-		fw_output_element ( $_GET['element'], null, false, $_GET['globals'], false );
+		fw_output_element ( $_GET['element'], null, $_GET['globals'], false, false );
 		
 		$GLOBALS['fw']['autogen'] = false;
 		

@@ -170,7 +170,7 @@ function fw_output_loop ( $element, $level, $include_autogen ) {
 	
 	// dumpit ( $element );
 	
-	fw_output_element ( $element, $level, true, $GLOBALS['fw'], $include_autogen );
+	fw_output_element ( $element, $level, $GLOBALS['fw'], $include_autogen, true );
 	
 	$GLOBALS['fw']['autogen'] = false;
 	
@@ -467,7 +467,7 @@ function fw_setup_element ( $element, $globals ) {
 	
 }
 
-function fw_output_element ( $element, $level, $callbacks = true, $globals, $include_autogen ) {
+function fw_output_element ( $element, $level, $globals, $include_autogen, $callbacks = true ) {
 	
 	if ( $element == null ) {
 		return;

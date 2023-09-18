@@ -1,0 +1,33 @@
+.tab-drawer {
+  .tab-drawer-inner {
+    // position: relative;
+  }
+
+  .tab-drawer-container {
+    position: absolute;
+    top: 0;
+    left: 100%;
+
+    .tab-drawer-content {
+      position: absolute;
+      top: 0;
+      left: -9999px;
+    }
+
+    &.open {
+      .tab-drawer-content.selected {
+        left: 100%;
+      }
+
+      // & > .tab-drawer-content {
+      //   left: 0;
+      // }
+    }
+  }
+
+  &.tab-drawer-open {
+    .tab-drawer-container {
+      left: 100%;
+    }
+  }
+}

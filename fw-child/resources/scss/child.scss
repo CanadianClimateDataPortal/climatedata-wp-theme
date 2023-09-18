@@ -1,0 +1,119 @@
+@import '../../../framework/resources/scss/variables-global';
+
+//
+// REBOOT
+//
+
+// use child theme's _variables.scss to recompile bootstrap
+
+@import 'reboot-bootstrap';
+
+// override fw variables
+
+// use these variables to recompile fw
+
+@import 'reboot-fw';
+
+//
+// MIXINS
+//
+
+//
+// VARIABLES
+//
+
+//
+// FONTS
+//
+
+//
+// TAGS
+//
+
+//
+// CLASSES
+//
+
+//
+// STRUCTURE
+//
+
+//
+// COMMON
+//
+
+.control-bar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: calc(100% / 16);
+  min-height: 100vh;
+  background-color: transparentize($dark, 0.1);
+  z-index: 1000;
+
+  .tab-drawer-tabs {
+    a {
+      display: block;
+      padding: 0.5rem;
+
+      &.active {
+        background-color: $white;
+      }
+    }
+  }
+
+  .tab-drawer-content {
+    width: calc((100vw / 16) * 3);
+    min-height: 100vh;
+    background-color: $white;
+
+    .control-tab-head {
+      padding: 1rem;
+      background-color: $gray-200;
+    }
+
+    .control-tab-body {
+      padding: 1rem;
+    }
+
+    .tab-drawer-content {
+      .control-tab-head {
+        background-color: $gray-100;
+      }
+    }
+  }
+
+  .tab-drawer-content-inner {
+    min-height: 100vh;
+    overflow: auto;
+  }
+}
+
+.tab-drawer-container {
+}
+
+//
+// BOOTSTRAP COMPONENTS
+//
+
+//
+// CONTENT TYPES
+//
+
+//
+// TEMPLATE
+//
+
+@import 'template';
+
+//
+// PAGES
+//
+
+@import 'pages';
+
+//
+// VENDOR
+//
+
+@import 'vendor';

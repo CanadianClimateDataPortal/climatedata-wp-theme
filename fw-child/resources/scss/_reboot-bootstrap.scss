@@ -1,0 +1,8 @@
+// use child theme variables.scss to recompile global.scss
+
+@import "../../../framework/resources/vendor/bootstrap/scss/functions";
+@import 'variables';
+@import 'variables-dark';
+
+@import '../../../framework/resources/scss/bootstrap/setup';
+@import '../../../framework/resources/scss/bootstrap/extras';

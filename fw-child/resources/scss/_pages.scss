@@ -3,10 +3,18 @@
 //
 
 #page-map {
-  .tab-drawer-content {
-    .tab-drawer-content {
-      width: calc((100vw / 16) * 9);
+  .tab-drawer {
+    .tab-drawer {
+      // width: 50vw;
     }
+  }
+
+  #data-variable {
+    width: calc((100vw / 16) * 9);
+  }
+
+  #location-detail {
+    width: calc((100vw / 16) * 7);
   }
 }
 

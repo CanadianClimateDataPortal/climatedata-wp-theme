@@ -14,8 +14,6 @@
       map: {
         object: null,
       },
-      status: 'init',
-      drawer_state: 'closed',
       debug: true,
     };
 
@@ -48,8 +46,6 @@
 
       item.addClass('tab-drawer');
 
-      options.status = 'ready';
-
       //
       // EVENTS
       //
@@ -57,40 +53,7 @@
       // select a tab
 
       options.elements.tabs.on('click', 'a', function () {
-        options.status = 'selecting';
-
-        if (options.drawer_state == 'closed') {
-          console.log('td', 'open and select');
-
-          // open the drawer
-          plugin.open_drawer();
-
-          // select the tab
-          plugin.select_content($(this).attr('href'));
-
-          // set the link to active
-          $(this).addClass('active');
-        } else {
-          // the drawer is already open
-
-          if ($(this).hasClass('active')) {
-            // the clicked tab is active
-            console.log('td', 'close drawer');
-            plugin.close_drawer();
-          } else {
-            // the tab is not active
-            console.log('td', 'select tab');
-            plugin.select_content($(this).attr('href'));
-
-            if ($(this).closest('.tab-drawer-tabs').length) {
-              // this link is a tab
-              $(this).siblings().removeClass('active');
-              $(this).addClass('active');
-            }
-          }
-        }
-
-        options.status = 'ready';
+        plugin.select_content($(this).attr('href'));
       });
 
       // open a layered drawer
@@ -101,50 +64,19 @@
         function (e) {
           e.preventDefault();
 
-          options.status = 'selecting';
-
-          let this_drawer = $(this).closest('.tab-drawer-content'),
+          let this_drawer = $(this).closest('.tab-drawer'),
             target_id = $(this).attr('#'),
             target_content = this_drawer.find(target_id);
 
           plugin.select_content($(this).attr('href'));
-
-          options.status = 'ready';
         },
       );
 
       // close content
 
       $('body').on('click', '.tab-drawer-close', function () {
-        options.status = 'closing';
-        plugin.close_content($(this).closest('.tab-drawer-content'));
-        options.status = 'ready';
+        plugin.close_content($(this).closest('.tab-drawer'));
       });
-    },
-
-    open_drawer: function (fn_options) {
-      let plugin = this,
-        item = plugin.item,
-        options = plugin.options;
-
-      let fn_settings = $.extend(true, {}, fn_options);
-
-      options.elements.container.addClass('open');
-      options.drawer_state = 'open';
-    },
-
-    close_drawer: function (fn_options) {
-      let plugin = this,
-        item = plugin.item,
-        options = plugin.options;
-
-      let fn_settings = $.extend(true, {}, fn_options);
-
-      options.elements.container.removeClass('open');
-
-      options.elements.tabs.find('a').removeClass('active');
-
-      options.drawer_state = 'closed';
     },
 
     select_content: function (tab_id) {
@@ -163,41 +95,115 @@
       let this_content = item.find(tab_id);
 
       if (this_content.length) {
-        // is any other content open
-        // at the same level as this one
+        let this_container = this_content.closest('.tab-drawer-container');
 
-        let open_content = this_content.parent().find('> .selected');
+        // console.log('container', this_container)
 
-        if (open_content.length) {
-          plugin.close_content(open_content);
+        if (this_content.hasClass('selected')) {
+          // close this content
+
+          plugin.close_content(this_content);
+        } else {
+          // find other content at this level
+          // that is open
+          // but shouldn't be
+
+          plugin.close_content(this_content.siblings('.selected'), function () {
+            // select this content
+
+            this_content.addClass('selected');
+
+            // if a tab exists linking to this content
+            // set it to active
+
+            options.elements.tabs
+              .find('a[href="' + tab_id + '"]')
+              .addClass('active');
+
+            $('body').addClass('tab-drawer-open');
+            options.status = 'open';
+          });
         }
-
-        // open this one
-        this_content.addClass('selected');
       }
     },
 
-    close_content: function (selected_content) {
+    close_content: function (selected_content, fn_callback) {
       let plugin = this,
         item = plugin.item,
         options = plugin.options;
 
       console.log('td', 'close content', selected_content);
 
-      // remove selected class
-      selected_content.removeClass('selected');
+      // find all child content
 
-      // children too
-      selected_content
-        .find('.tab-drawer-content.selected')
-        .removeClass('selected');
+      let content_to_close = [];
 
-      if (
-        options.status == 'closing' &&
-        selected_content.parent().hasClass('tab-drawer-container')
-      ) {
-        plugin.close_drawer();
+      selected_content.find('.tab-drawer.selected').each(function () {
+        content_to_close.push($(this));
+      });
+
+      if (content_to_close.length > 1) {
+        // reverse the order of the elements
+        content_to_close.reverse();
       }
+
+      // add the given content to the end of the array
+      content_to_close.push(selected_content);
+
+      // set interval to close each drawer
+
+      const close_and_shift = async () => {
+        content_to_close[0].removeClass('selected');
+
+        options.elements.tabs
+          .find('a[href="#' + content_to_close[0].attr('id') + '"]')
+          .removeClass('active');
+
+        let first = content_to_close.shift();
+
+        return content_to_close.length == 0;
+      };
+
+      const process_interval = async (callback, ms, tries_until_error = 10) => {
+        return new Promise((resolve, reject) => {
+          const interval = setInterval(async () => {
+            if (await callback()) {
+              resolve();
+              clearInterval(interval);
+            } else if (tries_until_error <= 1) {
+              reject();
+              clearInterval(interval);
+            }
+
+            tries_until_error--;
+          }, ms);
+        });
+      };
+
+      const process_close_queue = async () => {
+        try {
+          await process_interval(close_and_shift, 200);
+        } catch (e) {
+          console.log('error');
+        }
+
+        if (typeof fn_callback == 'function') {
+          console.log('callback');
+          fn_callback();
+        }
+
+        // if no content is selected,
+        // set status to 'closed'
+
+        if (!item.find('.selected').length) {
+          options.status = 'closed';
+          $('body').removeClass('tab-drawer-open');
+        }
+
+        console.log('done');
+      };
+
+      process_close_queue();
     },
   };
 

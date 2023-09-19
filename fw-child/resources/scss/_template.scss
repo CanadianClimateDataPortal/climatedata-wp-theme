@@ -1,9 +1,21 @@
 //
+// HEADER
+//
+
+#floating-header {
+  padding: 0.5rem;
+  background-color: transparentize($dark, 0.1);
+}
+
+#header-logo-container {
+}
+
+//
 // CONTROL BAR
 //
 
 .control-bar-container {
-	min-height: 100%;
-	background-color: $dark;
-	color: $white;
+  min-height: 100%;
+  background-color: $dark;
+  color: $white;
 }

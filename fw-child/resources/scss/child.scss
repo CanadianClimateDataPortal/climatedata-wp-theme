@@ -51,6 +51,10 @@
   background-color: transparentize($dark, 0.1);
   z-index: 1000;
 
+  .tab-drawer-container {
+    z-index: -1;
+  }
+
   .tab-drawer-tabs {
     a {
       display: block;
@@ -62,10 +66,15 @@
     }
   }
 
-  .tab-drawer-content {
+  .tab-drawer {
     width: calc((100vw / 16) * 3);
     min-height: 100vh;
-    background-color: $white;
+
+    .tab-drawer-content-inner {
+      min-height: 100vh;
+      overflow: auto;
+      background-color: $gray-100;
+    }
 
     .control-tab-head {
       padding: 1rem;
@@ -76,20 +85,16 @@
       padding: 1rem;
     }
 
-    .tab-drawer-content {
+    .tab-drawer {
       .control-tab-head {
         background-color: $gray-100;
       }
+
+      .tab-drawer-content-inner {
+        background-color: $white;
+      }
     }
   }
-
-  .tab-drawer-content-inner {
-    min-height: 100vh;
-    overflow: auto;
-  }
-}
-
-.tab-drawer-container {
 }
 
 //

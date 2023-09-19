@@ -86,7 +86,11 @@ function fw_enqueue_styles() {
 	
 	// GLOBAL
 	
+	wp_register_style ( 'global-vendor', $theme_dir . 'resources/css/vendor.css', null, null, 'all' );
+	
 	wp_register_style ( 'global-style', $theme_dir . 'style.css', null, null, 'all' );
+	
+	wp_enqueue_style ( 'global-vendor' );
 	wp_enqueue_style ( 'global-style' );
 	
 	if ( current_user_can ( 'administrator' ) ) {

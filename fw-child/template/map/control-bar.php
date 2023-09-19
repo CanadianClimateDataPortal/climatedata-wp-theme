@@ -34,71 +34,13 @@
 	</div>
 	
 	<div id="tab-drawer-container" class="tab-drawer-container">
-		<div id="data" class="tab-drawer">
-			<div class="tab-drawer-content">
-				<div class="tab-drawer-content-inner">
-					<div class="control-tab-head d-flex justify-content-between">
-						<h5>Data Options</h5>
-						<span class="tab-drawer-close">&times;</span>
-					</div>
-					
-					<div class="control-tab-body">
-						<a href="#data-variable" class="tab-drawer-trigger">Variable</a>
-					</div>
-				</div>
-			</div>
-			
-			<div class="tab-drawer-container">
-				<div id="data-variable" class="tab-drawer">
-					<div class="tab-drawer-content">
-						<div class="tab-drawer-content-inner">
-							<div class="control-tab-head d-flex justify-content-between">
-								<h5>Select a new variable</h5>
-								<span class="tab-drawer-close">&times;</span>
-							</div>
-							
-							<div class="control-tab-body">
-								<ul>
-									<li><span class="tab-drawer-close">Hottest Day</span></li>
-								</ul>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+		<?php
 		
-		<div id="location" class="tab-drawer">
-			<div class="tab-drawer-content">
-				<div class="tab-drawer-content-inner">
-					<div class="control-tab-head d-flex justify-content-between">
-						<h5>Location</h5>
-						<span class="tab-drawer-close">&times;</span>
-					</div>
-					
-					<div class="control-tab-body">
-						<a href="#location-detail" class="tab-drawer-trigger">Detail</a>
-					</div>
-				</div>
-			</div>
+			include ( locate_template ( 'template/map/controls/data.php' ) );
+		
+			include ( locate_template ( 'template/map/controls/location.php' ) );
 			
-			<div class="tab-drawer-container">
-				<div id="location-detail" class="tab-drawer">
-					<div class="tab-drawer-content">
-						<div class="tab-drawer-content-inner">
-							<div class="control-tab-head d-flex justify-content-between">
-								<h5>Location Detail</h5>
-								<span class="tab-drawer-close">&times;</span>
-							</div>
-						</div>
-						
-						<div class="control-tab-body">
-							charts
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+		?>
 		
 		<div id="display" class="tab-drawer">
 			<div class="tab-drawer-content">
@@ -106,6 +48,35 @@
 					<div class="control-tab-head d-flex justify-content-between">
 						<h5>Display</h5>
 						<span class="tab-drawer-close">&times;</span>
+					</div>
+					
+					<div class="control-tab-body">
+						
+						<div id="map-control-panels" class="map-control-item">
+							
+							<div class="mb-2">
+								<div class="form-check form-switch">
+									<input class="form-check-input" type="checkbox" role="switch" id="display-panels-ssp5" value="ssp5" checked>
+									<label class="form-check-label" for="display-panels-ssp5">High emissions (SSP 5–8.5)</label>
+								</div>
+							</div>
+							
+							<div class="mb-2">
+								<div class="form-check form-switch">
+									<input class="form-check-input" type="checkbox" role="switch" id="display-panels-ssp2" value="ssp2" checked>
+									<label class="form-check-label" for="display-panels-ssp2">Medium emissions (SSP 2–4.5)</label>
+								</div>
+							</div>
+							
+							<div class="mb-2">
+								<div class="form-check form-switch">
+									<input class="form-check-input" type="checkbox" role="switch" id="display-panels-ssp1" value="ssp1" checked>
+									<label class="form-check-label" for="display-panels-ssp1">Low emissions (SSP 1–2.6)</label>
+								</div>
+							</div>
+							
+						</div>
+						
 					</div>
 				</div>
 			</div>

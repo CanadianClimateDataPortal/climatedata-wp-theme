@@ -4,7 +4,6 @@
  * Copyright 2011-2022 The Bootstrap Authors
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
-@import '../vendor/leaflet/leaflet.css';
 :root,
 [data-bs-theme=light] {
   --bs-blue: #0d6efd;
@@ -21485,7 +21484,13 @@ video {
   z-index: 1000;
 }
 .control-bar .tab-drawer-container {
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.25s ease 0.25s;
   z-index: -1;
+}
+.control-bar .tab-drawer-container:has(.tab-drawer.selected) {
+  width: 18.75vw;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 .control-bar .tab-drawer-tabs a {
   display: block;
@@ -21499,8 +21504,9 @@ video {
   min-height: 100vh;
 }
 .control-bar .tab-drawer .tab-drawer-content-inner {
-  min-height: 100vh;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   background-color: #f8f9fa;
 }
 .control-bar .tab-drawer .control-tab-head {
@@ -21508,6 +21514,8 @@ video {
   background-color: #e9ecef;
 }
 .control-bar .tab-drawer .control-tab-body {
+  flex-grow: 1;
+  overflow: auto;
   padding: 1rem;
 }
 .control-bar .tab-drawer .tab-drawer .control-tab-head {
@@ -21531,7 +21539,13 @@ video {
 #page-map #data-variable {
   width: 56.25vw;
 }
+#page-map .tab-drawer-container:has(#data-variable.selected) {
+  width: 56.25vw;
+}
 #page-map #location-detail {
+  width: 43.75vw;
+}
+#page-map .tab-drawer-container:has(#location-detail.selected) {
   width: 43.75vw;
 }
 
@@ -21540,8 +21554,49 @@ video {
   z-index: 1;
 }
 
-#map-object {
+#map-objects {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 100vw;
+  transition: width 0.2s ease 0s;
   z-index: 1;
+}
+#map-objects .map-panel {
+  position: relative;
+  flex: 1 1 33.3333%;
+  transition: 0.5s ease;
+  overflow: hidden;
+}
+#map-objects .map-panel:not(:last-child) {
+  border-right: 10px solid #fff;
+}
+#map-objects .map-panel.hidden {
+  flex: 0.000000001 0.00000001 0%;
+  border-right-width: 0px;
+}
+#map-objects .map-panel.hidden .leaflet-object {
+  opacity: 0;
+}
+#map-objects .leaflet-object {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 1;
+  transition: opacity 0.5s;
+  z-index: 1;
+}
+#map-objects .map-label {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  min-width: 5rem;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 2;
 }
 
 #map-control-footer {
@@ -21564,6 +21619,9 @@ video {
   line-height: 3rem;
 }
 
+body.tab-drawer-open #map-objects {
+  width: 75vw;
+}
 body.tab-drawer-open #map-control-footer {
   width: 75vw;
   transition: width 0.2s ease 0s;
@@ -21596,8 +21654,7 @@ body.tab-drawer-open #map-control-footer {
 }
 .tab-drawer .tab-drawer-container > .tab-drawer.selected {
   left: 0;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-  transition: left 0s ease 0s, box-shadow 0.25s ease 0.25s;
+  transition: left 0s ease 0s;
 }
 .tab-drawer .tab-drawer-container > .tab-drawer.selected > .tab-drawer-content {
   width: 100%;

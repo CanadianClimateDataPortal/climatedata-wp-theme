@@ -10,8 +10,19 @@ var result = {};
       globals: ajax_data.globals,
       lang: ajax_data.globals.lang,
       post_id: null,
-      map: {
-        object: null,
+      maps: {
+        ssp1: {
+          container: null,
+          object: null,
+        },
+        ssp2: {
+          container: null,
+          object: null,
+        },
+        ssp5: {
+          container: null,
+          object: null,
+        },
       },
       debug: true,
     };
@@ -42,41 +53,57 @@ var result = {};
       // MAP
       //
 
-      // object
+      for (let key in options.maps) {
+        // create the map
 
-      options.map.object = L.map('map-object', {
-        center: [62.51231793838694, -98.48144531250001],
-        zoomControl: false,
-        zoom: 4,
-      });
+        options.maps[key].object = L.map('map-object-' + key, {
+          center: [62.51231793838694, -98.48144531250001],
+          zoomControl: false,
+          zoom: 4,
+        });
 
-      // layers
+        options.maps[key].container = $('#map-object-' + key);
 
-      options.map.object.createPane('basemap');
-      options.map.object.getPane('basemap').style.zIndex = 399;
-      options.map.object.getPane('basemap').style.pointerEvents = 'none';
+        let this_map = options.maps[key],
+          this_object = this_map.object;
 
-      options.map.object.createPane('raster');
-      options.map.object.getPane('raster').style.zIndex = 400;
-      options.map.object.getPane('raster').style.pointerEvents = 'none';
+        // layers
 
-      options.map.object.createPane('grid');
-      options.map.object.getPane('grid').style.zIndex = 500;
-      options.map.object.getPane('grid').style.pointerEvents = 'all';
+        this_object.createPane('basemap');
+        this_object.getPane('basemap').style.zIndex = 399;
+        this_object.getPane('basemap').style.pointerEvents = 'none';
 
-      options.map.object.createPane('labels');
-      options.map.object.getPane('labels').style.zIndex = 550;
-      options.map.object.getPane('labels').style.pointerEvents = 'none';
+        this_object.createPane('raster');
+        this_object.getPane('raster').style.zIndex = 400;
+        this_object.getPane('raster').style.pointerEvents = 'none';
 
-      L.tileLayer(
-        '//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png',
-        {
-          attribution: '',
-          subdomains: 'abcd',
-          pane: 'basemap',
-          maxZoom: 12,
-        },
-      ).addTo(options.map.object);
+        this_object.createPane('grid');
+        this_object.getPane('grid').style.zIndex = 500;
+        this_object.getPane('grid').style.pointerEvents = 'all';
+
+        this_object.createPane('labels');
+        this_object.getPane('labels').style.zIndex = 550;
+        this_object.getPane('labels').style.pointerEvents = 'none';
+
+        L.tileLayer(
+          '//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png',
+          {
+            attribution: '',
+            subdomains: 'abcd',
+            pane: 'basemap',
+            maxZoom: 12,
+          },
+        ).addTo(this_object);
+      }
+
+      console.log(options.maps);
+
+      options.maps.ssp1.object.sync(options.maps.ssp2.object);
+      options.maps.ssp1.object.sync(options.maps.ssp5.object);
+      options.maps.ssp2.object.sync(options.maps.ssp1.object);
+      options.maps.ssp2.object.sync(options.maps.ssp5.object);
+      options.maps.ssp5.object.sync(options.maps.ssp1.object);
+      options.maps.ssp5.object.sync(options.maps.ssp2.object);
 
       //
       // TABS
@@ -88,23 +115,59 @@ var result = {};
       // EVENTS
       //
 
+      // MAP CONTROLS
+
       item.on('click', '.map-zoom-btn', function (e) {
-        let current_zoom = options.map.object.getZoom(),
+        let current_zoom = options.maps.ssp1.object.getZoom(),
           new_zoom = current_zoom + 1;
 
         if ($(this).hasClass('zoom-out')) {
           new_zoom = current_zoom - 1;
         }
 
-        options.map.object.setZoom(new_zoom);
+        options.maps.ssp1.object.setZoom(new_zoom);
+      });
+
+      // SIDEBAR CONTROLS
+
+      item.on('change', '#map-control-panels input', function () {
+        let this_panel = $('#map-' + $(this).val());
+
+        if ($(this).prop('checked') == true) {
+          this_panel.removeClass('hidden');
+        } else {
+          // let this_width = this_panel.outerWidth();
+
+          //           this_panel.css('width', this_panel.outerWidth() + 'px');
+          //
+          //           setTimeout(function () {
+          //             this_panel.animate(
+          //               {
+          //                 width: '0px',
+          //               },
+          //               {
+          //                 duration: 500,
+          //                 complete: function () {
+          this_panel.addClass('hidden');
+          //       },
+          //     },
+          //   );
+          // }, 1000);
+        }
+
+        setTimeout(function () {
+          plugin.invalidate_size();
+        }, 500);
       });
     },
 
-    method_fn: function (fn_options) {
+    invalidate_size: function () {
       let plugin = this,
         options = plugin.options;
 
-      let fn_settings = $.extend(true, {}, fn_options);
+      for (let key in options.maps) {
+        options.maps[key].object.invalidateSize();
+      }
     },
   };
 

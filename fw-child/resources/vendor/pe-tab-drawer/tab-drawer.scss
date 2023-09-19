@@ -38,8 +38,7 @@
     & > .tab-drawer {
       &.selected {
         left: 0;
-        box-shadow: 0 0 20px transparentize($black, 0.8);
-        transition: left 0s ease 0s, box-shadow 0.25s ease 0.25s;
+        transition: left 0s ease 0s;
 
         & > .tab-drawer-content {
           width: 100%;

@@ -43,6 +43,7 @@ function child_theme_enqueue() {
 
 	$child_theme_dir = get_stylesheet_directory_uri() . '/';
 	$child_vendor_dir = $child_theme_dir . 'resources/vendor/';
+	$child_npm_dir = $child_theme_dir . 'node_modules/';
 	$child_js_dir = $child_theme_dir . 'resources/js/';
 
 	//
@@ -53,7 +54,15 @@ function child_theme_enqueue() {
 	
 	wp_dequeue_style ( 'global-style' );
 
+	wp_enqueue_style ( 'leaflet', $child_npm_dir . 'leaflet/dist/leaflet.css', NULL, NULL, 'all' );
+
 	wp_enqueue_style ( 'child-style', $child_theme_dir . 'style.css', NULL, NULL, 'all' );
+	
+	if ( is_page ( 'map' ) ) {
+		
+		wp_enqueue_style ( 'leaflet' );
+		
+	}
 
 	//
 	// SCRIPTS
@@ -63,7 +72,7 @@ function child_theme_enqueue() {
 	
 	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array (  ), NULL, true );
 	
-	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'jquery', 'leaflet', 'tab-drawer' ), NULL, true );
+	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'jquery', 'leaflet', 'leaflet-sync', 'tab-drawer' ), NULL, true );
 
 	// localize admin url
 
@@ -76,7 +85,9 @@ function child_theme_enqueue() {
 	
 	// VENDOR
 
-	wp_register_script ( 'leaflet', $child_theme_dir . 'resources/vendor/leaflet/leaflet.js', null, null, true );
+	wp_register_script ( 'leaflet', $child_npm_dir . 'leaflet/dist/leaflet-src.js', null, null, true );
+	
+	wp_register_script ( 'leaflet-sync', $child_npm_dir . 'leaflet.sync/L.Map.Sync.js', array ( 'leaflet' ), null, true );
 	
 	// PAGE CONDITIONALS
 

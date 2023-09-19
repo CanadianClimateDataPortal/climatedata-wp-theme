@@ -10,6 +10,27 @@
 
 // override fw variables
 
+$utilities: (
+  'bg-opacity': (
+    css-var: true,
+    class: bg-opacity,
+    values: (
+      10: 0.1,
+      20: 0.2,
+      25: 0.25,
+      30: 0.3,
+      40: 0.4,
+      50: 0.5,
+      60: 0.6,
+      70: 0.7,
+      75: 0.75,
+      80: 0.8,
+      90: 0.9,
+      100: 1,
+    ),
+  ),
+);
+
 // use these variables to recompile fw
 
 @import 'reboot-fw';
@@ -52,7 +73,14 @@
   z-index: 1000;
 
   .tab-drawer-container {
+    box-shadow: 0 0 0 transparentize($black, 0.8);
+    transition: box-shadow 0.25s ease 0.25s;
     z-index: -1;
+
+    &:has(.tab-drawer.selected) {
+      width: calc((100vw / 16) * 3);
+      box-shadow: 0 0 20px transparentize($black, 0.8);
+    }
   }
 
   .tab-drawer-tabs {
@@ -71,8 +99,9 @@
     min-height: 100vh;
 
     .tab-drawer-content-inner {
-      min-height: 100vh;
-      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
       background-color: $gray-100;
     }
 
@@ -82,6 +111,8 @@
     }
 
     .control-tab-body {
+      flex-grow: 1;
+      overflow: auto;
       padding: 1rem;
     }
 

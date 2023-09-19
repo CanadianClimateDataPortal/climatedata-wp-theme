@@ -4,7 +4,6 @@
  * Copyright 2011-2022 The Bootstrap Authors
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
-@import '../vendor/aos/dist/aos.css';
 @import '../vendor/leaflet/leaflet.css';
 :root,
 [data-bs-theme=light] {
@@ -21541,6 +21540,35 @@ video {
   z-index: 1;
 }
 
+#map-object {
+  z-index: 1;
+}
+
+#map-control-footer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 93.75vw;
+  background-color: #f8f9fa;
+  transition: width 0.2s ease 0s;
+  z-index: 2;
+}
+#map-control-footer .map-zoom-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  background-color: #fff;
+  font-size: 2rem;
+  line-height: 3rem;
+}
+
+body.tab-drawer-open #map-control-footer {
+  width: 75vw;
+  transition: width 0.2s ease 0s;
+}
+
 .tab-drawer .tab-drawer-container {
   position: absolute;
   top: 0;
@@ -21560,7 +21588,7 @@ video {
 }
 .tab-drawer .tab-drawer-container .tab-drawer .tab-drawer-content-inner {
   transform: translateX(-100%);
-  transition: transform 0.2s;
+  transition: transform 0.2s ease 0s;
   overflow: auto;
 }
 .tab-drawer .tab-drawer-container .tab-drawer .tab-drawer {

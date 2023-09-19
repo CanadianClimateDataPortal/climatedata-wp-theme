@@ -27,6 +27,7 @@ var result = {};
 
     init: function () {
       let plugin = this,
+        item = plugin.item,
         options = plugin.options;
 
       //
@@ -43,10 +44,11 @@ var result = {};
 
       // object
 
-      options.map.object = L.map('map-object').setView(
-        [62.51231793838694, -98.48144531250001],
-        4,
-      );
+      options.map.object = L.map('map-object', {
+        center: [62.51231793838694, -98.48144531250001],
+        zoomControl: false,
+        zoom: 4,
+      });
 
       // layers
 
@@ -81,6 +83,21 @@ var result = {};
       //
 
       $('#control-bar').tab_drawer();
+
+      //
+      // EVENTS
+      //
+
+      item.on('click', '.map-zoom-btn', function (e) {
+        let current_zoom = options.map.object.getZoom(),
+          new_zoom = current_zoom + 1;
+
+        if ($(this).hasClass('zoom-out')) {
+          new_zoom = current_zoom - 1;
+        }
+
+        options.map.object.setZoom(new_zoom);
+      });
     },
 
     method_fn: function (fn_options) {

@@ -22,3 +22,35 @@
   position: relative;
   z-index: 1;
 }
+
+#map-object {
+  z-index: 1;
+}
+
+#map-control-footer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: calc((100vw / 16) * 15);
+  background-color: $gray-100;
+  transition: width 0.2s ease 0s;
+  z-index: 2;
+
+  .map-zoom-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    background-color: $white;
+    font-size: 2rem;
+    line-height: 3rem;
+  }
+}
+
+body.tab-drawer-open {
+  #map-control-footer {
+    width: calc((100vw / 16) * 12);
+    transition: width 0.2s ease 0s;
+  }
+}

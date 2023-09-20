@@ -12,20 +12,13 @@
   },
   "dependencies": {
     "leaflet": "^1.9.4",
-    "leaflet.sync": "^0.2.4",
-    "next": "^13.4.10",
-    "prop-types": "^15.8.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "leaflet.sync": "^0.2.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.9",
-    "babel-plugin-module-resolver": "^5.0.0",
     "eslint": "^8.45.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^5.0.0",
-    "prettier": "^3.0.0",
-    "typescript": "^5.1.6"
+    "prettier": "^3.0.0"
   }
 }

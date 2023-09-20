@@ -96,7 +96,13 @@ var result = {};
         ).addTo(this_object);
       }
 
-      console.log(options.maps);
+      let all_maps = Object.keys(options.maps);
+
+      console.log(all_maps);
+
+      for (let key in options.maps) {
+        options.maps.ssp1.object.sync(options.maps.ssp2.object);
+      }
 
       options.maps.ssp1.object.sync(options.maps.ssp2.object);
       options.maps.ssp1.object.sync(options.maps.ssp5.object);

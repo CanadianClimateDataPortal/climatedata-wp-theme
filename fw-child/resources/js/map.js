@@ -96,20 +96,12 @@ var result = {};
         ).addTo(this_object);
       }
 
-      let all_maps = Object.keys(options.maps);
-
-      console.log(all_maps);
-
       for (let key in options.maps) {
-        options.maps.ssp1.object.sync(options.maps.ssp2.object);
+        Object.keys(options.maps).forEach(function (map) {
+          if (map != key)
+            options.maps[key].object.sync(options.maps[map].object);
+        });
       }
-
-      options.maps.ssp1.object.sync(options.maps.ssp2.object);
-      options.maps.ssp1.object.sync(options.maps.ssp5.object);
-      options.maps.ssp2.object.sync(options.maps.ssp1.object);
-      options.maps.ssp2.object.sync(options.maps.ssp5.object);
-      options.maps.ssp5.object.sync(options.maps.ssp1.object);
-      options.maps.ssp5.object.sync(options.maps.ssp2.object);
 
       //
       // TABS

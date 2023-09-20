@@ -364,6 +364,86 @@ if (have_posts()) : while (have_posts()) : the_post();
     ?>
 </aside>
 
+        <?php
+
+    } elseif (isset ($_GET['station_name'])) {
+
+        // 2. ajax request for msc-climate-normals
+
+        ?>
+
+        <div id="var-by-location" class="overlay-content-wrap variable-data-overlay col-12">
+            <div class="overlay-content container-fluid">
+                <?php
+
+                $selected_place = get_location_by_coords($_GET['lat'], $_GET['lon']);
+
+                if (is_array($selected_place)) {
+                    $location_name = $selected_place['geo_name'] . ', ' . short_province($selected_place['province']);
+                } else {
+
+                    if (isset ($_GET['station_name'])) {
+                        $location_name = $_GET['station_name'];
+                    } else {
+                        $location_name = 'Point';
+                    }
+
+                }
+
+                ?>
+
+                <h2 class="overlay-title text-primary"><?php echo $location_name; ?></h2>
+
+                <div class="overlay-content-row">
+                    <div class="overlay-content-chart">
+                        <div class="navbar chart-navbar d-flex">
+                            <div class="nav-item d-flex align-items-center mr-5">
+
+                            </div>
+
+                            <div class="nav-item d-flex align-items-center mr-5">
+                                <h6><span class="cdc-icon icon-download-data"></span> <?php _e('Download data', 'cdc'); ?></h6>
+
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="#" class="chart-export-data btn btn-sm btn-outline-secondary" data-type="csv">CSV</a>
+                                </div>
+                            </div>
+
+                            <div class="nav-item d-flex align-items-center">
+                                <h6><span class="cdc-icon icon-download-img"></span> <?php _e('Download image', 'cdc'); ?></h6>
+
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary " data-type="png">PNG</a> <a href="#" class="chart-export-img btn btn-sm btn-outline-secondary" data-type="pdf">PDF</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="chart-placeholder" class="var-chart" style="height: 400px;"></div>
+
+                        <div>
+                            <p><?php _e('Additional Climate Normals variables are available from the <a target="_blank" href="https://climate-change.canada.ca/climate-data/#/climate-normals">Canadian Centre for Climate Services</a> and the <a target="_blank" href="https://climate.weather.gc.ca/climate_normals/index_e.html">Government of Canada Historical Climate Data</a> websites.', 'cdc'); ?></p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="page-tour" id="chart-tour" data-steps='<?php echo $chart_tour; ?>'></div>
+
+                <?php
+
+                $units = get_field('units');
+
+                ?>
+
+                <div id="callback-data"><?php
+
+                    echo json_encode(array('title' => get_field('var_title'), 'units' => array('label' => __($units['label'], 'cdc'), 'value' => __($units['value'], 'cdc')), 'decimals' => get_field('decimals')));
+
+                    ?></div>
+
+            </div>
+        </div>
+
 <?php
 
     } elseif (isset ($_GET['content']) && in_array($_GET['content'], ['location', 'sector'])) {
@@ -386,6 +466,10 @@ if (have_posts()) : while (have_posts()) : the_post();
         $var_name = get_field('var_name');
         $dataset_name = arr_get($_GET, 'dataset_name', 'cmip6');
         $dataset_availability = get_field('dataset_availability');
+        if (is_null($dataset_availability)) {
+            $dataset_availability = ['cmip5', 'cmip6'];
+        }
+
         ?>
 
         <div id="var-by-location" class="overlay-content-wrap variable-data-overlay col-12">
@@ -426,7 +510,7 @@ if (have_posts()) : while (have_posts()) : the_post();
                                 <?php
 
                                 if ( get_field ( 'hasdelta' ) ) {
-
+                                    $input_name = uniqid("chart-options-");
                                     ?>
 
                                     <h6 class="mb-0">Options:</h6>
@@ -434,33 +518,17 @@ if (have_posts()) : while (have_posts()) : the_post();
                                     <div class="btn-group btn-group-toggle" data-toggle="buttons">
 
                                         <label class="btn btn-outline-primary rounded-pill">
-                                            <input
-                                                    type="radio"
-                                                    name="<?php echo 'chartoption-' . $var_name; ?>"
-                                                    id="<?php echo 'chartoption1-' . $var_name; ?>"
-                                                    value="annual"
-                                            >
+                                            <input type="radio" class="chart-option" name="<?php echo $input_name;?>" value="annual">
                                             <?php _e('Annual values', 'cdc'); ?>
                                         </label>
 
                                         <label class="btn btn-outline-primary rounded-pill active">
-                                            <input
-                                                    type="radio"
-                                                    name="<?php echo 'chartoption-' . $var_name; ?>"
-                                                    id="<?php echo 'chartoption2-' . $var_name; ?>"
-                                                    value="30y"
-                                                    checked
-                                            >
+                                            <input type="radio" class="chart-option" name="<?php echo $input_name;?>" value="30y" checked>
                                             <?php _e('30 year averages', 'cdc'); ?>
                                         </label>
 
                                         <label class="btn btn-outline-primary rounded-pill">
-                                            <input
-                                                    type="radio"
-                                                    name="<?php echo 'chartoption-' . $var_name; ?>"
-                                                    id="<?php echo 'chartoption3-' . $var_name; ?>"
-                                                    value="delta"
-                                            >
+                                            <input type="radio" class="chart-option" name="<?php echo $input_name;?>" value="delta">
                                             <?php _e('30 year changes', 'cdc'); ?>
                                         </label>
 
@@ -621,7 +689,7 @@ if (have_posts()) : while (have_posts()) : the_post();
             <?php
 
             if (get_field('hasdelta')) {
-
+                $input_name = uniqid("chart-options-");
                 ?>
 
                 <h6 class="mb-0">Options:</h6>
@@ -629,34 +697,17 @@ if (have_posts()) : while (have_posts()) : the_post();
                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
 
                     <label class="btn btn-outline-primary rounded-pill">
-                        <input
-                                type="radio"
-                                name="<?php echo 'chartoption-' . $var_name; ?>"
-                                id="<?php echo 'chartoption1-' . $var_name; ?>"
-                                value="annual"
-                        >
+                        <input type="radio" class="chart-option" name="<?php echo $input_name;?>" value="annual">
                         <?php _e('Annual values', 'cdc'); ?>
                     </label>
 
                     <label class="btn btn-outline-primary rounded-pill active">
-                        <input
-                                type="radio"
-                                name="<?php echo 'chartoption-' . $var_name; ?>"
-                                id="<?php echo 'chartoption2-' . $var_name; ?>"
-                                value="30y"
-                                checked
-                        >
+                        <input type="radio" class="chart-option" name="<?php echo $input_name;?>" value="30y" checked>
                         <?php _e('30 year averages', 'cdc'); ?>
                     </label>
 
                     <label class="btn btn-outline-primary rounded-pill">
-                        <input
-                                type="radio"
-                                name="<?php echo 'chartoption-' . $var_name; ?>"
-                                id="<?php echo 'chartoption3-' . $var_name; ?>"
-                                value="delta"
-                        >
-                        <?php _e('30 year changes', 'cdc'); ?>
+                        <input type="radio" class="chart-option"name="<?php echo $input_name;?>" value="delta"><?php _e('30 year changes', 'cdc'); ?>
                     </label>
 
                 </div>

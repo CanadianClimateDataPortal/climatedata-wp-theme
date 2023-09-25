@@ -12,4 +12,11 @@ proto/
 .DS_Store
 *.css.map
 climate-data-ca/resources/css/child.css
+framework/resources/vendor/aos/
+!framework/resources/vendor/aos/dist/
+framework/resources/vendor/bootstrap/
+!framework/resources/vendor/bootstrap/scss/
+!framework/resources/vendor/bootstrap/dist/js/bootstrap.bundle.min.js
+framework/resources/vendor/font-awesome-pro/
+fw-child/node_modules/
 .nova/

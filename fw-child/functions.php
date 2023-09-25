@@ -53,6 +53,9 @@ function child_theme_enqueue() {
 	// dequeue global CSS
 	
 	wp_dequeue_style ( 'global-style' );
+	
+	wp_dequeue_style ( 'font-awesome' );
+	wp_enqueue_style ( 'font-awesome', WP_CONTENT_DIR . '/vendor/font-awesome-pro/css/all.css', null, null );
 
 	wp_enqueue_style ( 'leaflet', $child_npm_dir . 'leaflet/dist/leaflet.css', NULL, NULL, 'all' );
 

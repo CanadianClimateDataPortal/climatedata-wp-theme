@@ -39,24 +39,24 @@ if ( str_contains ( $element['inputs']['menu'], 'menu-' ) ) {
 	
 	// echo 'current: ' . get_permalink ( $globals['current_query']['ID'] ) . '<br>';
 		
-	$current_path = implode ( '/', translate_path ( $globals['current_query']['ID'], $globals['lang'] ) );
+	$current_path = implode ( '/', translate_path ( $globals['current_query']['ID'], $globals['current_lang_code'] ) );
 			
 	// 
-	// if ( $globals['lang'] != 'en' ) {
+	// if ( $globals['current_lang_code'] != 'en' ) {
 	// 	$this_path = substr ( $this_path, 3 );
 	// }
 	
-	foreach ( get_option ( 'fw_langs' ) as $code => $label ) {
+	foreach ( get_field ( 'fw_languages', 'option' ) as $lang ) {
 		
 		// echo '<br><br>';
 		
-		if ( $globals['lang'] == $code ) {
+		if ( $globals['current_lang_code'] == $lang['code'] ) {
 			
 			// if linking to the current language
 			// just spit out get_permalink()
 			// and the filtering will take care of it
 			
-			// echo '<br>-' . $code . '-<br>';
+			// echo '<br>-' . $lang['code'] . '-<br>';
 			
 			$lang_URL = get_permalink ( $globals['current_query']['ID'] );
 			
@@ -64,46 +64,37 @@ if ( str_contains ( $element['inputs']['menu'], 'menu-' ) ) {
 			
 			// changing language
 			
-			// echo '<hr>lang: ' . $globals['lang'] . ' > ' . $code . '<br>';
+			// echo '<hr>lang: ' . $globals['current_lang_code'] . ' > ' . $lang['code'] . '<br>';
 			
-			// echo 'id: ' . $globals['current_query']['ID'];
+			// dumpit ( translate_path ( $globals['current_query']['ID'], $lang['code'] ) );
 			
-			// dumpit ( translate_path ( $globals['current_query']['ID'], $code ) );
-			
-			$substr_to_remove = home_url() . '/';
-			$slug_to_replace = $current_path;
-			$translated_slug = implode ( '/', translate_path ( $globals['current_query']['ID'], $code ) );
-			
-			if ( $globals['lang'] != 'en' ) {
+			switch ( get_option ( 'options_fw_language_settings_rewrite' ) ) {
 				
-				// current lang is not english
-				// add lang/ to substring
-				
-				$substr_to_remove .= $globals['lang'] . '/';
+				case 'path' :
+					
+					$lang_URL = $GLOBALS['vars']['home_url'];
+					
+					if ( $lang['code'] != 'en' ) {
+						$lang_URL .= $lang['code'] . '/';
+					}
+					
+					break;
+					
+				case 'domain' :
+					
+					if ( $lang['code'] == 'en' ) {
+						$lang_URL = $GLOBALS['vars']['original_home_url'];
+					} else {
+						$lang_URL = '//' . $lang['domain'];
+					}
+					
+					break;
 					
 			}
-			 
-			// echo 'slug: ' . $slug_to_replace . ' > ' . $translated_slug . '<br>';
 			
-			// remove the base URL
-			$this_path = str_replace ( $substr_to_remove, '', get_permalink ( $globals['current_query']['ID'] ) );
-			
-			// replace the slugs
-			$this_path = str_replace ( $slug_to_replace, $translated_slug, $this_path );
-			
-			// echo 'path: ' . $this_path . '<br>';
-			
-			// start building the new link
-			
-			$lang_URL = home_url() . '/';
-			
-			if ( $code != 'en' ) {
-				
-				$lang_URL .= $code . '/';
-				
+			if ( !is_front_page() ) {
+				$lang_URL .= implode ( '/', translate_path ( $globals['current_query']['ID'], $lang['code'] ) );
 			}
-			
-			$lang_URL .= $this_path;
 			
 		}
 		
@@ -112,8 +103,8 @@ if ( str_contains ( $element['inputs']['menu'], 'menu-' ) ) {
 		$menu[] = array(
 			'id' => $globals['current_query']['ID'],
 			'type' => get_post_type ( $globals['current_query']['ID'] ),
-			'url' => $lang_URL,
-			'title' => $label,
+			'url' => trailingslashit ( $lang_URL ),
+			'title' => $lang['name'],
 			'classes' => array(),
 			'parent' => 0
 		);

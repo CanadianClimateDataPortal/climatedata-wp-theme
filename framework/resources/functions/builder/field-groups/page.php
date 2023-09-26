@@ -12,7 +12,7 @@
 			<?php
 			
 				$page_ID = $globals['current_query']['ID'];
-				$lang = $globals['lang'];
+				$lang = $globals['current_lang_code'];
 				
 				$body_ID = 'page-' . get_the_slug ( $globals['current_query']['ID'] );
 			

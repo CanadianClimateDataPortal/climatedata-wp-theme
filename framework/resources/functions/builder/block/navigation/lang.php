@@ -3,7 +3,7 @@
 	
 		$this_path = str_replace ( home_url() . '/', '', get_permalink ( $globals['current_query']['ID'] ) );
 		
-		if ( $globals['lang'] != 'en' ) {
+		if ( $globals['current_lang_code'] != 'en' ) {
 			$this_path = substr ( $this_path, 3 );
 		}
 		

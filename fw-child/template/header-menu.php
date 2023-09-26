@@ -11,7 +11,7 @@
 	</div>
 	<div class="offcanvas-body">
 		
-		<a href="<?php echo home_url ( 'map' ); ?>">Map</a>
+		<a href="<?php echo get_permalink ( 11321 ); ?>">Map</a>
 		
 	</div>
 </div>

@@ -7,6 +7,7 @@
 $includes = array (
 	'resources/functions/init.php',
 	'resources/functions/setup/setup.php',
+	'resources/functions/setup/language.php',
 	'resources/functions/setup/rewrite.php',
 	'resources/functions/setup/field-groups.php',
 	'resources/functions/setup/theme-options.php',
@@ -70,7 +71,7 @@ function fw_enqueue_styles() {
 	// VARS
 	//
 	
-	$theme_dir = get_bloginfo('template_directory') . '/';
+	$theme_dir = get_bloginfo ( 'template_directory' ) . '/';
 	$vendor_dir = $theme_dir . 'resources/vendor/';
 	$js_dir = $theme_dir . 'resources/js/';
 	
@@ -111,7 +112,7 @@ function fw_enqueue_scripts() {
 	$vendor_dir = $theme_dir . 'resources/vendor/';
 	$js_dir = $theme_dir . 'resources/js/';
 	
-	wp_enqueue_script ( 'jquery' );
+	// wp_enqueue_script ( 'jquery' );
 	
 	// VENDOR
 	
@@ -122,8 +123,7 @@ function fw_enqueue_scripts() {
 	// lottie
 	
 	wp_register_script ( 'lottie', 'https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.11/lottie.min.js', null, '5.7.11', true );
-	wp_register_script ( 'lottie-player', 'https://unpkg.com/@lottiefiles/lottie-player@2.0.2/dist/lottie-player.js', null, '2.0.2', true );
-	// wp_register_script ( 'lottie', 'https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js', null, '5.12.2', true );
+	wp_register_script ( 'lottie-player', $vendor_dir . 'lottie-player.js', null, '2.0.2', true );
 	
 	// aos
 	
@@ -187,8 +187,6 @@ add_filter ( 'body_class', function ( $classes ) {
 	}
 	
 } );
-
-
 
 
 function fw_build_menu ( array &$elements, $parent_id = 0, $level = 1 ) {
@@ -349,4 +347,4 @@ function my_correct_filetypes ( $data, $file, $filename, $mimes, $real_mime ) {
 
 add_filter ( 'wp_check_filetype_and_ext', 'my_correct_filetypes', 10, 5 );
 
-// fw_delete_options();
+

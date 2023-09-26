@@ -1,6 +1,6 @@
 <?php
 
-	if ( current_user_can ( 'administrator' ) ) {
+	// if ( current_user_can ( 'administrator' ) ) {
 		echo '<!--';
 		echo "\n\n";
 		echo 'vars';
@@ -12,11 +12,11 @@
 		print_r ( $GLOBALS['fw'] );
 		echo "\n";
 		echo '-->';
-	}
+	// }
 	
 ?>
 <!doctype html>
-<html lang="<?php echo $GLOBALS['fw']['lang']; ?>" class="no-js">
+<html lang="<?php echo $GLOBALS['fw']['current_lang_code']; ?>" class="no-js">
 	<head>
 		<meta charset="<?php bloginfo ( 'charset' ); ?>">
 		<meta name="viewport" content="width=device-width, initial-scale=1"> 

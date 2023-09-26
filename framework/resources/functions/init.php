@@ -29,6 +29,15 @@ function end_session() {
 // 				return html_entity_decode(preg_replace("/%u([0-9a-f]{3,4})/i", "&#x\\1;", urldecode($str)), null, 'UTF-8');
 // }
 
+function fw_init_lang_setup() {
+	
+	// dumpit ( $fw );
+	
+}
+
+// add_action ( 'after_setup_theme', 'fw_init_lang_setup' );
+
+
 function fw_global_vars() {
 	
 	global $fw;
@@ -47,22 +56,6 @@ function fw_global_vars() {
 	// the lang slug
 	
 	$fw['current_query'] = (array) $wp_query->post;
-	
-	$fw['lang'] = 'en';
-	
-	if (
-		get_query_var ( 'lang' ) !== null &&
-		get_query_var ( 'lang' ) !== ''
-	) {
-	
-		// $_SESSION['lang'] = get_query_var ( 'lang' );
-		$fw['lang'] = get_query_var ( 'lang' );
-		
-	}/* else {
-		
-		$fw['lang'] = 'en';
-		
-	}*/
 	
 	$fw['classes'] = array (
 		'page' => get_body_class(),
@@ -159,7 +152,8 @@ function theme_global_vars() {
 
 	// CURRENT SITE URL
 
-	$vars['site_url'] = get_bloginfo('url');
+	$vars['site_url'] = site_url();
+	$vars['home_url'] = home_url();
 	
 	if ( substr ( $vars['site_url'], -1) != '/' ) $vars['site_url'] .= '/';
 
@@ -252,12 +246,20 @@ function custom_theme_setup() {
 			'menu_slug'		=> 'acf-options-setup',
 			'parent_slug' => $options_parent['menu_slug'],
 		) );
-	
+		
 		acf_add_options_sub_page ( array (
 			'page_title'  => 'Default Settings',
 			'menu_title'  => 'Defaults',
 			'parent_slug' => 'theme-settings',
 		) );
+		
+		acf_add_options_sub_page ( array (
+			'page_title'  => 'Languages',
+			'menu_title'  => 'Languages',
+			'menu_slug'		=> 'acf-options-languages',
+			'parent_slug' => 'theme-settings',
+		) );
+		
 		// 
 		// acf_add_options_sub_page ( array (
 		// 	'page_title'  => 'Header',
@@ -283,7 +285,11 @@ function custom_theme_setup() {
 
 add_action ( 'after_setup_theme', 'custom_theme_setup', 0 );
 
+function my_acf_init() {
+		acf_update_setting('remove_wp_meta_box', false);
+}
 
+add_action('acf/init', 'my_acf_init');
 
 function load_custom_wp_admin_style() {
 

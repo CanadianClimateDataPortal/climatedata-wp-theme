@@ -82,6 +82,14 @@ add_action ( 'admin_head', function() {
 			$theme_ready = false;
 		}
 		
+		// set default language
+		$set_lang = fw_create_default_lang();
+		
+		if ( $set_lang !== true ) {
+			$GLOBALS['admin_notice'] .= '<li>Failed to update languages.</li>';
+			$theme_ready = false;
+		}
+		
 	}
 	
 	$GLOBALS['admin_notice'] = $notice_pre . $GLOBALS['admin_notice'] . $notice_post;
@@ -120,9 +128,7 @@ function fw_set_theme_options() {
 		
 	} else {
 		
-		//
 		// DEFAULT SETTINGS
-		//
 		
 		if ( get_option ( 'fw_section_defaults' ) == false ) {
 		
@@ -713,6 +719,68 @@ function fw_create_default_obj ( $slug ) {
 }
 
 //
+// CREATE DEFAULT LANGUAGE
+//
+
+
+function fw_create_default_lang() {
+	
+	$success = true;
+	
+	if ( !class_exists('ACF') ) {
+		
+		$success = false;
+		
+	} else {
+		
+		if ( get_option ( 'fw_langs' ) == false ) {
+			
+			// make sure the langs ACF field has a default value
+			
+			$default_lang_field = get_field ( 'fw_languages', 'option' );
+		
+			if (
+				!is_array ( $default_lang_field ) ||
+				empty ( $default_lang_field )
+			) {
+				
+				$default_lang_field = array (
+					array (
+						'name' => 'English',
+						'code' => 'en',
+						'locale' => 'en_US'
+					)
+				);
+				
+				update_field ( 'fw_languages', $default_lang_field, 'option' );
+				update_option ( 'fw_languages', $default_lang_field );
+				
+			}
+			
+			// update the theme option
+			// for the init/rewrite function
+			
+			// dumpit ( get_field ( 'fw_languages', 'option' ) );
+			
+			$option_langs = array();
+			
+			foreach ( get_field ( 'fw_languages', 'option' ) as $lang ) {
+				
+				$option_langs[$lang['code']] = $lang;
+				
+			}
+			
+			update_option ( 'fw_langs', $option_langs );
+			
+		}
+		
+	}
+	
+	return $success;
+	
+}
+
+//
 // DELETE OPTIONS
 //
 
@@ -744,6 +812,10 @@ function fw_delete_options ( $key = null ) {
 //
 
 function fw_render_status_message ( $field ) {
+	
+	//
+	// OBJECTS
+	//
 	
 	$field['message'] = '<h3>Default Objects</h3>';
 	
@@ -791,6 +863,10 @@ function fw_render_status_message ( $field ) {
 	
 	$field['message'] .= '</ul>';
 	
+	//
+	// SETTINGS
+	//
+	
 	$field['message'] .= '<h3>Settings</h3>';
 	
 	$field['message'] .= '<ul>';
@@ -798,6 +874,24 @@ function fw_render_status_message ( $field ) {
 	$field['message'] .= '<li>' . ( ( get_option ( 'fw_section_defaults' ) == true ) ? '✅' : '❌' ) . ' Set section defaults' . '</li>';
 	
 	$field['message'] .= '<li>' . ( ( get_option ( 'fw_theme_colours' ) == true ) ? '✅' : '❌' ) . ' Set theme colours' . '</li>';
+	
+	//
+	// LANGUAGES
+	//
+	
+	$field['message'] .= '<h3>Default Language</h3>';
+	
+	$field['message'] .= '<ul>';
+	
+		$field['message'] .= '<li>';
+		
+	$field['message'] .= '<li>' . ( ( get_option ( 'fw_langs' ) !== false ) ? '✅' : '❌' ) . ' Set default language' . '</li>';
+		
+		$field['message'] .= '</li>';
+		
+	$field['message'] .= '</ul>';
+
+	// ready
 	
 	get_option ( 'fw_theme_ready' );
 	
@@ -818,4 +912,4 @@ function fw_render_status_message ( $field ) {
 
 }
 
-add_filter('acf/prepare_field/key=admin_setup_status', 'fw_render_status_message');
+add_filter ( 'acf/prepare_field/key=admin_setup_status', 'fw_render_status_message' );

@@ -1,5 +1,7 @@
 <?php
 
+// delete_option ( 'fw_langs' );
+
 $types = array (
 	'section', 'container', 'column', 'block'
 );

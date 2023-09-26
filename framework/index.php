@@ -20,14 +20,24 @@
 	<div id="fw-save-post" class="fw-btn btn btn-primary">Save</div>
 </div>
 
+<?php
+
+			}
+			
+			if ( get_current_user_id() == 1 ) {
+		
+?>
+
 <div id="output-btn" class="btn btn-danger">Show/Update Object</div>
 <pre id="output" class="bg-light m-3 p-3" style="font-size: 0.625rem;"></pre>
 
 <?php
 
-			}	
+			}
+
 			
 		}
 	}
 	
 	get_footer();
+	

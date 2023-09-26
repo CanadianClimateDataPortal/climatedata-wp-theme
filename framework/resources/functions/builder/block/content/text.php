@@ -2,8 +2,8 @@
 
 $lang = 'en';
 
-if ( isset ( $globals['lang'] ) ) {
-	$lang = $globals['lang'];
+if ( isset ( $globals['current_lang_code'] ) ) {
+	$lang = $globals['current_lang_code'];
 }
 
 if (

@@ -12,7 +12,7 @@
 				<div class="col">
 					<?php
 						
-						wp_editor ( '', 'inputs-text-' . $_GET['globals']['lang'] );
+						wp_editor ( '', 'inputs-text-' . $_GET['globals']['current_lang_code'] );
 						
 					?>
 				</div>

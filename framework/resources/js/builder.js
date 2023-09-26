@@ -2071,7 +2071,7 @@ var result = {}
 			let plugin = this,
 					options = plugin.options
 			
-			console.log('footer', element)
+			// console.log('footer', element)
 			
 			let element_type = element.type
 			

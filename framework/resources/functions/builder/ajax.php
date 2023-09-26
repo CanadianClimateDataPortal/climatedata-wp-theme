@@ -47,10 +47,10 @@ function fw_update_post() {
 		
 		// other meta
 		
-		$title_to_update = wptexturize ( $_POST['builder']['inputs']['title'][$globals['lang']] );
+		$title_to_update = wptexturize ( $_POST['builder']['inputs']['title'][$globals['current_lang_code']] );
 		
 		if ( $title_to_update != '' ) {
-			if ($globals['lang'] == 'en') {
+			if ($globals['current_lang_code'] == 'en') {
 				
 				// if en, update the post title
 			
@@ -65,11 +65,11 @@ function fw_update_post() {
 				
 				// not en, update title_[lang]
 				
-				update_post_meta ( $_POST['post_id'], 'title_' . $globals['lang'], $title_to_update );
+				update_post_meta ( $_POST['post_id'], 'title_' . $globals['current_lang_code'], $title_to_update );
 		
 			}
 			
-			echo  'updated ' . $globals['lang'] . ' title' . "\n";
+			echo  'updated ' . $globals['current_lang_code'] . ' title' . "\n";
 			
 		}
 		

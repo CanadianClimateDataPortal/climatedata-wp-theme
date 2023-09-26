@@ -236,6 +236,7 @@ function fw_update_slugs_on_save ( $post_id, $post, $update ) {
 				
 				$this_title = get_post_meta ( $post_id, 'title_' . $lang['code'], true );
 				$this_slug = get_post_meta ( $post_id, 'slug_' . $lang['code'], true );
+				$this_path = get_post_meta ( $post_id, 'path_' . $lang['code'], true );
 				
 				if ( $this_title == '' ) {
 					update_post_meta ( $post_id, 'title_' . $lang['code'], $post->post_title );
@@ -243,6 +244,10 @@ function fw_update_slugs_on_save ( $post_id, $post, $update ) {
 				
 				if ( $this_slug == '' ) {
 					update_post_meta ( $post_id, 'slug_' . $lang['code'], $post->post_name );
+				}
+				
+				if ( $this_path == '' ) {
+					update_post_meta ( $post_id, 'path_' . $lang['code'], implode ( '/', translate_path ( $post_id, $lang['code'] ) ) );
 				}
 				
 			}

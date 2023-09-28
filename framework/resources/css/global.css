@@ -11608,6 +11608,11 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+.has-offcanvas {
+  max-height: 100vw;
+  overflow: auto;
+}
+
 .col-1-of-3 {
   flex-shrink: 0;
   width: 100%;

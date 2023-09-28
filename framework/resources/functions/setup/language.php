@@ -11,6 +11,16 @@ function fw_replace_lang_domain ( $str ) {
 	
 }
 
+function fw_get_rewrite_method() {
+	
+	// get the rewrite method
+	// if the user's logged in, force the 'path' method
+	// because WP login cookies don't work
+	// across domains
+	
+	return ( is_user_logged_in() ) ? 'path' : get_option ( 'options_fw_language_settings_rewrite' );
+}
+
 function fw_setup_current_lang() {
 	
 	global $wp;
@@ -18,26 +28,29 @@ function fw_setup_current_lang() {
 	global $vars;
 	
 	$all_langs = get_option ( 'fw_langs' );
+	$rewrite_method = fw_get_rewrite_method();
 	
 	$fw['current_lang_code'] = 'en';
 	$fw['current_lang_obj'] = null;
+	
+	// store the old home_url and site_url
+	
+	$vars['original_home_url'] = trailingslashit ( home_url() );
+	$vars['original_site_url'] = trailingslashit ( site_url() );
 	
 	// dumpit ( $fw );
 	
 	// how are languages getting rewritten
 	
-	// echo 'rewrite method: ' . get_option ( 'options_fw_language_settings_rewrite' );
-	
-	// echo '<br>all langs';
-	// dumpit ( $all_langs );
-	
-	switch ( get_option ( 'options_fw_language_settings_rewrite' ) ) {
+	switch ( $rewrite_method ) {
 		
 		case 'path' :
 			
 			foreach ( $all_langs as $code => $lang ) {
 					
-				if ( str_contains ( $_SERVER['REQUEST_URI'], '/' . $code ) ) {
+				// the first 3 characters of REQUEST_URI are /xx
+				
+				if ( substr ( $_SERVER['REQUEST_URI'], 0, 3 ) == '/' . $code ) {
 					$fw['current_lang_code'] = substr ( $_SERVER['REQUEST_URI'], 1, 2 );
 				}
 				
@@ -63,11 +76,6 @@ function fw_setup_current_lang() {
 					
 					// echo 'code: ' . $code . '<br>';
 					
-					// store the old home_url and site_url
-					
-					$vars['original_home_url'] = trailingslashit ( home_url() );
-					$vars['original_site_url'] = trailingslashit ( site_url() );
-					
 					// generate the new home/site URLs
 					
 					$vars['home_url'] = $_SERVER['REQUEST_SCHEME'] . '://' . $lang['domain'] . '/';
@@ -78,19 +86,23 @@ function fw_setup_current_lang() {
 					$vars['site_url'] = $url_array[0];
 					
 					// remove the first 3 elements (protocol and domain)
-					$url_array = array_splice ( $url_array, 3, count ( $url_array ) - 3 );
+					$url_array = array_splice ( $url_array, 3 );
 					
 					$vars['site_url'] .= '//' . $lang['domain'] . '/' . implode ( '/', $url_array );
 						
 					// filter any new calls to home_url and site_url
 					
-					add_filter ( 'home_url', function ( $url ) {
-						if ( !is_admin() ) return $GLOBALS['vars']['home_url'];
+					add_filter ( 'home_url', function ( $url, $path ) {
+						// echo '<br><br>home_url - ';
+						if ( !is_admin() )
+							return $GLOBALS['vars']['home_url'] . ltrim ( $path, '/' );
+							
 						return $url;
-					}, 1 );
+					}, 1, 2 );
 					
 					add_filter ( 'site_url', function ( $url ) {
-						if ( !is_admin() ) return $GLOBALS['vars']['site_url'];
+						// echo '<br><br>site_url - ';
+						if ( !is_admin() ) return trailingslashit ( $GLOBALS['vars']['site_url'] );
 						return $url;
 					}, 1 );
 					

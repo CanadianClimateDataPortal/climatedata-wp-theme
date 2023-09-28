@@ -11,7 +11,7 @@ var result = {}
 
 		var defaults = {
 			globals: ajax_data.globals,
-			lang: ajax_data.globals.lang,
+			lang: ajax_data.globals.current_lang_code,
 			post_id: null,
 			page: {},
 			current_parent: $('.fw-main'),
@@ -1305,7 +1305,7 @@ var result = {}
 										key: temp_key,
 										inputs: {
 											id: 'auto',
-											settings: {}
+											settings: []
 										},
 										children: []
 									}
@@ -3012,9 +3012,10 @@ var result = {}
 				// pull their templates before
 				// populating the fields
 				
+				console.log('flex forms', flex_forms)
+				
 				if (flex_forms.length > 0) {
 				
-					// console.log('flex forms', flex_forms)
 					
 					var allAJAX = flex_forms.map(flex_form => {
 						
@@ -3848,6 +3849,8 @@ var result = {}
 					element_has_settings = false
 					
 			// assume all settings will be removed
+			
+			console.log(JSON.stringify(element_data.inputs))
 			
 			if (
 				element_data.hasOwnProperty('inputs') &&

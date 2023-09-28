@@ -39,7 +39,7 @@ if ( str_contains ( $element['inputs']['menu'], 'menu-' ) ) {
 	
 	// echo 'current: ' . get_permalink ( $globals['current_query']['ID'] ) . '<br>';
 		
-	$current_path = implode ( '/', translate_path ( $globals['current_query']['ID'], $globals['current_lang_code'] ) );
+	// $current_path = implode ( '/', translate_path ( $globals['current_query']['ID'], $globals['current_lang_code'] ) );
 			
 	// 
 	// if ( $globals['current_lang_code'] != 'en' ) {
@@ -50,55 +50,21 @@ if ( str_contains ( $element['inputs']['menu'], 'menu-' ) ) {
 		
 		// echo '<br><br>';
 		
-		if ( $globals['current_lang_code'] == $lang['code'] ) {
-			
-			// if linking to the current language
-			// just spit out get_permalink()
-			// and the filtering will take care of it
-			
-			// echo '<br>-' . $lang['code'] . '-<br>';
-			
-			$lang_URL = get_permalink ( $globals['current_query']['ID'] );
-			
-		} else {
+		// if ( $globals['current_lang_code'] == $lang['code'] ) {
+		// 	
+		// 	// if linking to the current language
+		// 	// just spit out get_permalink()
+		// 	// and the filtering will take care of it
+		// 	
+		// 	// echo '<br>-' . $lang['code'] . '-<br>';
+		// 	
+		// 	$lang_URL = get_permalink ( $globals['current_query']['ID'] );
+		// 	
+		// } else {
 			
 			// changing language
 			
-			// echo '<hr>lang: ' . $globals['current_lang_code'] . ' > ' . $lang['code'] . '<br>';
-			
-			// dumpit ( translate_path ( $globals['current_query']['ID'], $lang['code'] ) );
-			
-			switch ( get_option ( 'options_fw_language_settings_rewrite' ) ) {
-				
-				case 'path' :
-					
-					$lang_URL = $GLOBALS['vars']['home_url'];
-					
-					if ( $lang['code'] != 'en' ) {
-						$lang_URL .= $lang['code'] . '/';
-					}
-					
-					break;
-					
-				case 'domain' :
-					
-					if ( $lang['code'] == 'en' ) {
-						$lang_URL = $GLOBALS['vars']['original_home_url'];
-					} else {
-						$lang_URL = '//' . $lang['domain'];
-					}
-					
-					break;
-					
-			}
-			
-			if ( !is_front_page() ) {
-				$lang_URL .= implode ( '/', translate_path ( $globals['current_query']['ID'], $lang['code'] ) );
-			}
-			
-		}
-		
-		// echo 'url: ' . $lang_URL;
+		$lang_URL = translate_permalink ( $GLOBALS['vars']['current_url'], $globals['current_query']['ID'], $lang['code'] );
 		
 		$menu[] = array(
 			'id' => $globals['current_query']['ID'],

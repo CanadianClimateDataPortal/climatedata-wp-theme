@@ -2,6 +2,8 @@
 
 	get_header();
 	
+	// dumpit ( $_SERVER );
+	
 	if ( have_posts() ) {
 		while ( have_posts() ) {
 			the_post();

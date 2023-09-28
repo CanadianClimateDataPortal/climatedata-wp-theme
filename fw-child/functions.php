@@ -61,7 +61,10 @@ function child_theme_enqueue() {
 
 	wp_enqueue_style ( 'child-style', $child_theme_dir . 'style.css', NULL, NULL, 'all' );
 	
-	if ( is_page ( 'map' ) ) {
+	if (
+		$GLOBALS['vars']['current_slug'] == 'map' ||
+		$GLOBALS['vars']['current_slug'] == 'carte'
+	) {
 		
 		wp_enqueue_style ( 'leaflet' );
 		
@@ -94,7 +97,10 @@ function child_theme_enqueue() {
 	
 	// PAGE CONDITIONALS
 
-	if ( is_page ( 'map' ) ) {
+	if (
+		$GLOBALS['vars']['current_slug'] == 'map' ||
+		$GLOBALS['vars']['current_slug'] == 'carte'
+	) {
 		
 		wp_enqueue_script ( 'leaflet' );
 		wp_enqueue_script ( 'map-app' );

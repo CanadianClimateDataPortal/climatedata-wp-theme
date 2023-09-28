@@ -7,7 +7,7 @@
 
 add_action ( 'after_setup_theme', 'fw_register_session', 1 );
 add_action ( 'wp_logout', 'end_session' );
-add_action ( 'wp_login', 'end_session' );
+// add_action ( 'wp_login', 'end_session' );
 add_action ( 'end_session_action', 'end_session' );
 
 function fw_register_session() {
@@ -117,7 +117,7 @@ function theme_global_vars() {
 
 	$classes['body'] = array ( 'spinner-on' );
 
-	if (is_front_page()) {
+	if ( is_front_page() ) {
 
 		$ids['body'] = 'page-home';
 
@@ -129,11 +129,11 @@ function theme_global_vars() {
 
 		$ids['body'] = 'page-archive';
 
-	} elseif ( is_home() ) {
+	} /*elseif ( is_home() ) {
 
 		$ids['body'] = 'page-posts';
 
-	} else {
+	} */else {
 		
 		$ids['body'] = get_post_type() . '-' . get_the_slug();
 
@@ -152,8 +152,9 @@ function theme_global_vars() {
 
 	// CURRENT SITE URL
 
-	$vars['site_url'] = site_url();
-	$vars['home_url'] = home_url();
+	// possible not needed anymore because of setup/language.php
+	$vars['site_url'] = trailingslashit ( site_url() );
+	$vars['home_url'] = trailingslashit ( home_url() );
 	
 	if ( substr ( $vars['site_url'], -1) != '/' ) $vars['site_url'] .= '/';
 
@@ -169,6 +170,11 @@ function theme_global_vars() {
 
 	$vars['current_url'] = current_URL();
 	$vars['current_slug'] = get_the_slug();
+	
+	if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
+		$vars['current_slug'] = get_post_meta ( get_the_ID(), 'slug_' . $GLOBALS['fw']['current_lang_code'], true );
+	}
+	
 	$vars['current_ancestors'] = get_ancestors ( get_the_ID(), get_post_type() );
 
 	//

@@ -93,11 +93,9 @@ function add_my_rewrites () {
 	
 	$all_langs = get_option ( 'fw_langs' );// get_option ( 'fw_langs' );
 	
-	$rewrite_method = get_option ( 'options_fw_language_settings_rewrite' );
-	
 	$rewrite_code = $GLOBALS['fw']['current_lang_code'];
 	
-	switch ( $rewrite_method ) {
+	switch ( fw_get_rewrite_method() ) {
 		
 		case 'path' :
 			
@@ -195,16 +193,7 @@ function add_my_rewrites () {
 						$new_query = str_replace ( '&name=', '&slug_' . $GLOBALS['fw']['current_lang_code'] . '=', $new_query );
 							
 						$new_query = str_replace ( 'pagename=', 'path_' . $GLOBALS['fw']['current_lang_code'] . '=', $new_query );
-							
-						// adjust individual rules
-						// 
-						// switch ( $rule ) {
-						// 	
-						// 	case '([0-9]{4})/([0-9]{1,2})/([^/]+)(?:/([0-9]+))?/?$' :
-						// 		break;
-						// 		
-						// }
-						// 
+						
 						$rules[$rule] = $new_query;
 						
 						// echo $query .'<br>';
@@ -217,82 +206,6 @@ function add_my_rewrites () {
 				
 			}, 1 );
 			
-			// $rewrite_code = $_SERVER['HTTP_HOST'];
-	
-			foreach ( $all_langs as $code => $lang ) {
-				
-				if ( $code != 'en' ) {
-					
-					
-					/*
-					// custom post types
-					
-					foreach ( get_post_types () as $cpt ) {
-						
-						// echo 'code is ' . $rewrite_code . '<br>';
-						// echo 'string is ' . 'index.php?lang=' . $rewrite_code . '&slug_' . $rewrite_code . '=$matches[1]' . '<br>';
-						
-						// echo $cpt . '/(.*)([^/]+)?',
-						// 'index.php?lang=' . $rewrite_code . '&slug_' . $rewrite_code . '=$matches[1]' . '<br>';
-						
-						add_rewrite_rule (
-							$cpt . '/(.*)([^/]+)?',
-							'index.php?lang=' . $rewrite_code . '&slug_' . $rewrite_code . '=$matches[1]',
-							'top'
-						);
-						
-						// var_dump ( $test );
-						
-					}
-					
-					// posts with permalink structure
-					
-					// month and name
-					
-					add_rewrite_rule (
-						'([0-9]{4})/([0-9]{1,2})/([^/]+)(?:/([0-9]+))?/?$',
-						'index.php?lang=' . $rewrite_code . '&year=$matches[1]&monthnum=$matches[2]&slug_' . $rewrite_code . '=$matches[3]&page=$matches[4]',
-						'top'
-					);
-					
-					echo 'pre<br>';
-					dumpit ( $wp_rewrite->wp_rewrite_rules() );
-					dumpit ( get_option ( 'rewrite_rules' ) );
-					echo 'post<br>';
-					dumpit ( $wp_rewrite->wp_rewrite_rules() );
-					echo '<hr>';
-					
-					// day and name
-					
-					add_rewrite_rule (
-						'([0-9]{4})/([0-9]{1,2})/([0-9]{1,2})/([^/]+)(?:/([0-9]+))?/?$',
-						'index.php?lang=' . $rewrite_code . '&year=$matches[1]&monthnum=$matches[2]&day=$matches[3]&slug_' . $rewrite_code . '=$matches[4]&page=$matches[5]',
-						'top'
-					);
-					
-					// page/post
-					
-					add_rewrite_rule (
-						'(.*)([^/]+)?',
-						'index.php?lang=' . $rewrite_code . '&path_' . $rewrite_code . '=$matches[1]',
-						'top'
-					);
-					
-					// HOME
-					
-					add_rewrite_rule (
-						'/?$',
-						'index.php?lang=' . $rewrite_code . '&page_id=' . get_option ( 'page_on_front' ),
-						'top' 
-					);*/
-					
-				}
-					
-			}
-			
-			
-			
-			
 			break;
 			
 	}
@@ -301,30 +214,11 @@ function add_my_rewrites () {
 
 // don't redirect the front page
 
-add_action( 'template_redirect', function(){
+add_action ( 'template_redirect', function() {
 	if ( is_front_page() ) {
 		remove_action ( 'template_redirect', 'redirect_canonical' );
 	}
 }, 0 );
-
-// add_action ('wp_body_open', function() {
-// 	
-// 	echo '<a href="/">/</a><br>';
-// 	echo '<a href="/sample-page/">/sample-page/</a><br>';
-// 	echo '<a href="/sample-page/child/">/sample-page/child/</a><br>';
-// 	
-// 	echo '<a href="/fr/">/fr/</a><br>';
-// 	echo '<a href="/fr/sample-page/">/fr/sample-page/</a><br>';
-// 	echo '<a href="/fr/sample-page/child/">/fr/sample-page/child/</a><br>';
-// 	
-// 	// echo 'lang: ' . get_query_var ( 'lang' );
-// 	// 
-// 	// if ( is_404() ) {
-// 	// 	echo '<br>404<br>';
-// 	// } else {
-// 	// 	echo '<br>id ' . get_the_ID();
-// 	// }
-// });
 
 // add lang to query vars
 
@@ -419,6 +313,10 @@ foreach ( [ 'post', 'page', 'attachment', 'post_type' ] as $type ) {
 	
 	add_filter ( $type . '_link', function ( $url, $post_id, ? bool $sample = null ) use ( $type ) {
 		
+		// echo 'link : ' . $url . '<br>';
+		// echo 'id : ';
+		// dumpit ( $post_id ); echo '<br>';
+		
 		return apply_filters ( 'wpse_link', $url, $post_id, $sample, $type );
 		
 	}, 9999, 3 );
@@ -443,86 +341,15 @@ function fw_rewrite_link ( $url, $post_id, $sample, $type ) {
 		$link_id = $post_id;
 	}
 	
-	// echo 'link ID: ' . $link_id . '<br>';
-	// echo 'current ID: ' . $GLOBALS['fw']['current_query']['ID'] . '<br>';
-	// 
-	// if ( $link_id == $GLOBALS['fw']['current_query']['ID'] ) {
-	// 	echo 'ya';
-	// 	echo $url;
-	// }
-	
 	// what is the language rewrite method
 	
 	if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
 		
-		switch ( get_option ( 'options_fw_language_settings_rewrite' ) ) {
-			
-			case 'path' :
-					
-				$new_URL = home_url() . '/' . $GLOBALS['fw']['current_lang_code'] . '/';
-				
-				if ( $type != 'post' && $type != 'page' ) {
-					
-					$new_URL .= $type . '/';
-					
-				}
-				
-				if ( $type == 'post' ) {
-					
-					$post_path = str_replace ( home_url(), '', $url);
-					
-					$post_path = substr ( str_replace ( '/' . $post_id->post_name, '', $post_path), 1 );
-					
-					$new_URL .= $post_path . get_post_meta ( $post_id->ID, 'slug_' . $GLOBALS['fw']['current_lang_code'], true );
-					
-				} else {
-				
-					$new_URL .= implode ( '/', translate_path ( $post_id, $GLOBALS['fw']['current_lang_code'] ) );
-					
-				}
-				
-				break;
-				
-			case 'domain' :
-				
-				$new_URL = $GLOBALS['vars']['home_url'];
-				
-				if ( $type != 'post' && $type != 'page' ) {
-					
-					$new_URL .= $type . '/';
-					
-				}
-				
-				if ( $type == 'post' ) {
-					
-					// get the path by removing the home_url from $url
-					
-					$post_path = str_replace ( $GLOBALS['vars']['original_home_url'], '', $url );
-					
-					// replace the original slug with the translated one
-					
-					$post_path = str_replace ( '/' . $post_id->post_name, '', $post_path);
-					
-					// account for permalink structure
-					
-					$new_URL .= $post_path . get_post_meta ( $post_id->ID, 'slug_' . $GLOBALS['fw']['current_lang_code'], true );
-					
-				} else {
-					
-					if ( (int) $post_id != (int) get_option ( 'page_on_front' ) ) {
-						$new_URL .= implode ( '/', translate_path ( $post_id, $GLOBALS['fw']['current_lang_code'] ) );
-					}
-					
-				}
-				
-				// echo $url . ' -> ' . trailingslashit ( $new_URL ) . '<br>';
-				
-				
-				break;
-				
-		}
+		// echo 'translate this: ' . $url .'<br>';
 		
-		$url = trailingslashit ( $new_URL );
+		$url = translate_permalink ( $url, $link_id, $GLOBALS['fw']['current_lang_code'] );
+		
+		// $url = trailingslashit ( $new_URL );
 		
 	} // if not en
 	
@@ -550,6 +377,136 @@ function translate_path ( $post_id, $lang ) {
 	}
 	
 	return $path;
+	
+}
+
+function translate_permalink ( $url, $post_id, $lang ) {
+	
+	// echo 'url: ' . $url . '<br>';
+	// echo 'id: ' . $post_id . '<br>';
+	// echo 'lang: ' . $lang . '<br>';
+		
+	$post_obj = get_post ( $post_id );
+	
+	$new_slug = $post_obj->post_name;
+	
+	if ( $lang != 'en' ) {
+		$new_slug = get_post_meta ( $post_id, 'slug_' . $lang, true );
+	}
+	
+	// todo
+	// fix this so it's an independent function
+	// use it in rewrite
+	// and menu
+	
+	// domain/prefix
+	
+	// default to the current home URL
+	$new_URL = $GLOBALS['vars']['home_url'];
+	
+	switch ( fw_get_rewrite_method() ) {
+		
+		case 'path' :
+			
+			// add the language path
+			$new_URL = $GLOBALS['vars']['original_home_url'];
+			
+			if ( $lang != 'en' ) {
+				$new_URL .= $lang . '/';
+			}
+			
+			if ( $post_obj->post_type == 'post' ) {
+				
+				$post_path = explode ( '/', untrailingslashit ( $url ) );
+				
+				$splice_index = 4;
+				
+				if (
+					$GLOBALS['fw']['current_lang_code'] == 'en' ||
+					!str_contains ( $url, '/' . $GLOBALS['fw']['current_lang_code'] . '/' )
+				) {
+					$splice_index = 3;
+				}
+			
+				
+				
+				array_pop ( $post_path );
+				
+				// dumpit ( $post_path );
+				
+				$post_path = implode ( '/',  array_splice ( $post_path, $splice_index ) );
+				
+				$new_URL .= $post_path . '/' . $new_slug;
+				
+			} else {
+				
+				if ( (int) $post_id != (int) get_option ( 'page_on_front' ) ) {
+					
+					$new_URL .= implode ( '/', translate_path ( $post_id, $lang ) );
+					
+				}
+				
+			}
+			
+			break;
+			
+		case 'domain' :
+			
+			// echo $GLOBALS['fw']['current_lang_code'] . ' > ' . $lang . '<br>';
+			
+			if ( $lang == 'en' ) {
+				
+				$new_URL = $GLOBALS['vars']['original_home_url'];
+				
+			} elseif ( $lang != $GLOBALS['fw']['current_lang_code'] ) {
+				
+				$all_langs = get_option ( 'fw_langs' );
+				
+				// dumpit ( $all_langs[$lang] );
+				
+				$new_URL = $_SERVER['REQUEST_SCHEME'] . '://' . $all_langs[$lang]['domain'] . '/';
+				
+			}
+			
+			if ( $post_obj->post_type == 'post' ) {
+				
+				
+				$post_path = explode ( '/', untrailingslashit ( $url ) );
+				
+				array_pop ( $post_path );
+				
+				$post_path = implode ( '/',  array_splice ( $post_path, 3 ) );
+				
+				// dumpit ( $post_path );
+				
+				$new_URL .= $post_path . '/' . $new_slug;
+				
+			} else {
+				
+				if ( (int) $post_id != (int) get_option ( 'page_on_front' ) ) {
+					
+					$new_URL .= implode ( '/', translate_path ( $post_id, $lang ) );
+					
+				}
+				
+				// echo '5b. ' . $new_URL;
+				
+			}
+			
+			break;
+			
+	}
+	
+	// echo '1. ' . $new_URL . '<br>';
+	
+	// dumpit ( $post_obj );
+	
+	
+	
+	// echo 'result: ' . $new_URL . '<hr>';
+	// echo '<hr>';
+	
+	return trailingslashit ( $new_URL );
 	
 }
 

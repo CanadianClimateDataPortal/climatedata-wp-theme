@@ -7,41 +7,58 @@
 		<span>Offcanvas</span>
 		<button type="button" class="fw-form-flex-item-remove btn-close" aria-label="Close"></button>
 	</div>
-	
-	<div class="card-body">
+
+	<div class="card-body p-0">
 		
-		<label>Breakpoint</label>
+		<div class="row row-cols-3">
 		
-		<?php
+		<input type="hidden" id="inputs-settings[]-offcanvas-type" name="inputs-settings[]-offcanvas-type" value="offcanvas">
 		
-			$offcanvas_breakpoints = array (
-				'xs' => 'X-Small',
-				'sm' => 'Small',
-				'md' => 'Medium',
-				'lg' => 'Large',
-				'xl' => 'X-Large',
-				'xxl' => 'XX-Large'
-			);
-			
-		?>
-		
-		<select id="inputs-settings[]-offcanvas-breakpoint" name="inputs-settings[]-offcanvas-breakpoint">
-			<?php
-			
-				foreach ( $offcanvas_breakpoints as $key => $value ) {
-					
-			?>
-			
-			<option value="<?php echo $key; ?>" <?php if ( $_GET['setting_data']['breakpoint'] == $key ) echo 'selected'; ?>><?php echo $value; ?></option>
+		<div class="col p-2">
+			<label>Breakpoint</label>
 			
 			<?php
 			
-				}
-			
+				$offcanvas_breakpoints = array (
+					'xs' => 'X-Small (Always on)',
+					'sm' => 'Small',
+					'md' => 'Medium',
+					'lg' => 'Large',
+					'xl' => 'X-Large',
+					'xxl' => 'XX-Large'
+				);
+				
 			?>
-		</select>
+			
+			<select name="inputs-settings[]-offcanvas-breakpoint" class="form-select form-select-sm">
+				<?php
+				
+					foreach ( $offcanvas_breakpoints as $key => $value ) {
+						
+				?>
+				
+				<option value="<?php echo $key; ?>" <?php if ( $_GET['setting_data']['breakpoint'] == $key ) echo 'selected'; ?>><?php echo $value; ?></option>
+				
+				<?php
+				
+					}
+				
+				?>
+			</select>
+		</div>
 		
-		<label>Button</label>
+		<div class="col p-2">
+		
+			<label>Placement</label>
+			
+			<select name="inputs-settings[]-offcanvas-placement" class="form-select form-select-sm">
+				<option value="start">Start</option>
+				<option value="end">End</option>
+				<option value="top">Top</option>
+				<option value="bottom">Bottom</option>
+			</select>
+			
+		</div>
 		
 	</div>
 </div>

@@ -377,7 +377,7 @@ function fw_setup_element ( $element, $globals ) {
 						
 						$settings['classes'][] = 'has-offcanvas';
 						
-						$settings['classes'][] = 'offcanvas-end';
+						$settings['classes'][] = 'offcanvas-' . $options['placement'];
 						
 						if ( $options['breakpoint'] != 'xs' ) {
 							$settings['classes'][] = 'offcanvas-' . $options['breakpoint'];
@@ -650,7 +650,7 @@ function fw_output_element_content ( $element, $globals ) {
 		
 		if ( isset ( $element['inputs']['settings']['offcanvas'] ) ) {
 			
-			$inner_classes[] = 'offcanvas-end';
+			$inner_classes[] = 'offcanvas-' . $element['inputs']['settings']['offcanvas']['placement'];
 			
 			$inner_classes[] = ( $element['inputs']['settings']['offcanvas']['breakpoint'] == 'xs' ) ? 'offcanvas' : 'offcanvas-' . $element['inputs']['settings']['offcanvas']['breakpoint'];
 			

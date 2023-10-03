@@ -53,55 +53,7 @@ var result = {};
       // MAP
       //
 
-      for (let key in options.maps) {
-        // create the map
-
-        options.maps[key].object = L.map('map-object-' + key, {
-          center: [62.51231793838694, -98.48144531250001],
-          zoomControl: false,
-          zoom: 4,
-        });
-
-        options.maps[key].container = $('#map-object-' + key);
-
-        let this_map = options.maps[key],
-          this_object = this_map.object;
-
-        // layers
-
-        this_object.createPane('basemap');
-        this_object.getPane('basemap').style.zIndex = 399;
-        this_object.getPane('basemap').style.pointerEvents = 'none';
-
-        this_object.createPane('raster');
-        this_object.getPane('raster').style.zIndex = 400;
-        this_object.getPane('raster').style.pointerEvents = 'none';
-
-        this_object.createPane('grid');
-        this_object.getPane('grid').style.zIndex = 500;
-        this_object.getPane('grid').style.pointerEvents = 'all';
-
-        this_object.createPane('labels');
-        this_object.getPane('labels').style.zIndex = 550;
-        this_object.getPane('labels').style.pointerEvents = 'none';
-
-        L.tileLayer(
-          '//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png',
-          {
-            attribution: '',
-            subdomains: 'abcd',
-            pane: 'basemap',
-            maxZoom: 12,
-          },
-        ).addTo(this_object);
-      }
-
-      for (let key in options.maps) {
-        Object.keys(options.maps).forEach(function (map) {
-          if (map != key)
-            options.maps[key].object.sync(options.maps[map].object);
-        });
-      }
+      options.maps = $(document).cdc_app('init_maps', options.maps);
 
       //
       // TABS

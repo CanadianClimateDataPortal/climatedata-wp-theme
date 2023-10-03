@@ -1,0 +1,151 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Climate Data 2.0\n"
+"POT-Creation-Date: 2023-10-03 11:19-0300\n"
+"PO-Revision-Date: 2023-10-03 11:21-0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.3.2\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: node_modules\n"
+"X-Poedit-SearchPathExcluded-1: resources/vendor\n"
+
+#: resources/functions/post-types.php:10
+msgid "Variables"
+msgstr ""
+
+#: resources/functions/post-types.php:11 resources/functions/post-types.php:37
+msgid "Variable"
+msgstr ""
+
+#: resources/functions/post-types.php:12
+msgid "Variable Archives"
+msgstr ""
+
+#: resources/functions/post-types.php:13
+msgid "Variable Attributes"
+msgstr ""
+
+#: resources/functions/post-types.php:14
+msgid "Parent Variable:"
+msgstr ""
+
+#: resources/functions/post-types.php:15
+msgid "All Variables"
+msgstr ""
+
+#: resources/functions/post-types.php:16
+msgid "Add New Variable"
+msgstr ""
+
+#: resources/functions/post-types.php:17
+msgid "Add New"
+msgstr ""
+
+#: resources/functions/post-types.php:18
+msgid "New Variable"
+msgstr ""
+
+#: resources/functions/post-types.php:19
+msgid "Edit Variable"
+msgstr ""
+
+#: resources/functions/post-types.php:20
+msgid "Update Variable"
+msgstr ""
+
+#: resources/functions/post-types.php:21
+msgid "View Variable"
+msgstr ""
+
+#: resources/functions/post-types.php:22
+msgid "View Variables"
+msgstr ""
+
+#: resources/functions/post-types.php:23
+msgid "Search Variable"
+msgstr ""
+
+#: resources/functions/post-types.php:24
+msgid "Not found"
+msgstr ""
+
+#: resources/functions/post-types.php:25
+msgid "Not found in Trash"
+msgstr ""
+
+#: resources/functions/post-types.php:26
+msgid "Featured Image"
+msgstr ""
+
+#: resources/functions/post-types.php:27
+msgid "Set featured image"
+msgstr ""
+
+#: resources/functions/post-types.php:28
+msgid "Remove featured image"
+msgstr ""
+
+#: resources/functions/post-types.php:29
+msgid "Use as featured image"
+msgstr ""
+
+#: resources/functions/post-types.php:30
+msgid "Insert into item"
+msgstr ""
+
+#: resources/functions/post-types.php:31
+msgid "Uploaded to this item"
+msgstr ""
+
+#: resources/functions/post-types.php:32
+msgid "Items list"
+msgstr ""
+
+#: resources/functions/post-types.php:33
+msgid "Items list navigation"
+msgstr ""
+
+#: resources/functions/post-types.php:34
+msgid "Filter items list"
+msgstr ""
+
+#: resources/functions/post-types.php:38
+msgid ""
+"ClimateData.ca provides high-resolution climate data to help decision makers "
+"build a more resilient Canada."
+msgstr ""
+
+#: template/analyze/control-bar.php:15 template/map/control-bar.php:15
+msgid "Data"
+msgstr "Données"
+
+#: template/analyze/control-bar.php:20
+msgid "Area"
+msgstr ""
+
+#: template/analyze/control-bar.php:25
+msgid "Details"
+msgstr "Détails"
+
+#: template/analyze/control-bar.php:30
+msgid "Submit"
+msgstr ""
+
+#: template/map/control-bar.php:20
+msgid "Location"
+msgstr "Emplacement"
+
+#: template/map/control-bar.php:25
+msgid "Display"
+msgstr ""
+
+#: template/map/control-bar.php:30
+msgid "Download"
+msgstr ""

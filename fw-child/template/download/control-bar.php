@@ -15,32 +15,32 @@
 			<span><?php _e ( 'Data', 'cdc' ); ?></span>
 		</a>
 		
-		<a href="#location">
+		<a href="#area">
 			<span class="cdc-icon"></span>
-			<span><?php _e ( 'Location', 'cdc' ); ?></span>
+			<span><?php _e ( 'Area', 'cdc' ); ?></span>
 		</a>
 		
-		<a href="#display">
+		<a href="#details">
 			<span class="cdc-icon"></span>
-			<span><?php _e ( 'Display', 'cdc' ); ?></span>
+			<span><?php _e ( 'Details', 'cdc' ); ?></span>
 		</a>
 		
-		<a href="#download">
+		<a href="#submit">
 			<span class="cdc-icon"></span>
-			<span><?php _e ( 'Download', 'cdc' ); ?></span>
+			<span><?php _e ( 'Submit', 'cdc' ); ?></span>
 		</a>
 	</div>
 	
 	<div id="tab-drawer-container" class="tab-drawer-container">
 		<?php
 		
-			include ( locate_template ( 'template/map/controls/data.php' ) );
+			include ( locate_template ( 'template/download/controls/data.php' ) );
 		
-			include ( locate_template ( 'template/map/controls/location.php' ) );
+			include ( locate_template ( 'template/download/controls/area.php' ) );
 			
-			include ( locate_template ( 'template/map/controls/display.php' ) );
+			include ( locate_template ( 'template/download/controls/details.php' ) );
 			
-			include ( locate_template ( 'template/map/controls/download.php' ) );
+			include ( locate_template ( 'template/download/controls/submit.php' ) );
 			
 		?>
 	</div>

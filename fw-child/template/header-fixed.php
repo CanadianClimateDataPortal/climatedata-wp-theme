@@ -5,9 +5,6 @@
 	
 		include ( locate_template ( 'template/header-logo.php' ) );
 		
-		// MENU
-		
-		include ( locate_template ( 'template/header-menu.php' ) );
-		
 	?>
+	<a href="#menu" id="menu-trigger" class="d-block p-1"><i class="fas fa-align-left text-white"></i></a>
 </div>

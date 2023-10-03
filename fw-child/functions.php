@@ -78,8 +78,12 @@ function child_theme_enqueue() {
 	
 	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array (  ), NULL, true );
 	
-	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'jquery', 'leaflet', 'leaflet-sync', 'tab-drawer' ), NULL, true );
+	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 'jquery', 'leaflet', 'leaflet-sync', 'tab-drawer' ), NULL, true );
+	
+	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'jquery', 'leaflet', 'cdc', 'leaflet-sync', 'tab-drawer' ), NULL, true );
 
+	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'jquery', 'cdc', 'leaflet', 'leaflet-sync', 'tab-drawer' ), NULL, true );
+	
 	// localize admin url
 
 	wp_localize_script ( 'child-functions', 'ajax_data',
@@ -97,13 +101,16 @@ function child_theme_enqueue() {
 	
 	// PAGE CONDITIONALS
 
-	if (
-		$GLOBALS['vars']['current_slug'] == 'map' ||
-		$GLOBALS['vars']['current_slug'] == 'carte'
-	) {
-		
-		wp_enqueue_script ( 'leaflet' );
-		wp_enqueue_script ( 'map-app' );
+	switch ( $GLOBALS['vars']['current_slug'] ) {
+		case 'map' :
+		case 'carte' :
+			wp_enqueue_script ( 'map-app' );
+			break;
+			
+		case 'download' :
+		case 'telechargement' :
+			wp_enqueue_script ( 'download-app' );
+			break;
 		
 	}
 	
@@ -135,6 +142,8 @@ foreach ( $includes as $include ) {
 // THEME SETUP
 //
 
+add_action ( 'after_setup_theme', 'fw_child_theme_support', 0 );
+
 function fw_child_theme_support() {
 
 	// DOCUMENT TITLE
@@ -151,9 +160,27 @@ function fw_child_theme_support() {
 
 	// MENUS
 
+	// LANGUAGES
+	
+	load_theme_textdomain ( 'cdc', get_stylesheet_directory() );
+
 }
 
-add_action ( 'after_setup_theme', 'fw_child_theme_support', 0 );
+add_action ( 'after_setup_theme', 'fw_load_child_theme_lang_files', 0 );
+
+function fw_load_child_theme_lang_files() {
+	
+	load_theme_textdomain ( 'cdc', get_stylesheet_directory() . '/languages' );
+	
+	$locale = get_locale();
+	$locale_file = get_stylesheet_directory() . '/languages/' . $locale . '.php';
+	
+	if ( is_readable ( $locale_file ) ) {
+		require_once ( $locale_file );
+	}
+	
+}
+
 
 //
 // TEMPLATE HOOKS

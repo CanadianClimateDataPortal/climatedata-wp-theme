@@ -1,6 +1,6 @@
 <?php
 
-// add_action( 'parse_request', 'debug_404_rewrite_dump', 100 );
+// add_action ( 'parse_request', 'debug_404_rewrite_dump', 100 );
 
 function debug_404_rewrite_dump ( &$wp ) {
 	
@@ -9,8 +9,8 @@ function debug_404_rewrite_dump ( &$wp ) {
 		global $wp;
 		global $wp_rewrite;
 		
-		// echo '<h4>rewrite rules</h4>';
-		// dumpit ( $wp_rewrite->wp_rewrite_rules(), true );
+		echo '<h4>rewrite rules</h4>';
+		dumpit ( $wp_rewrite->wp_rewrite_rules(), true );
 		
 		echo '<h4>matched rule and query</h4>';
 		dumpit ( $wp->matched_rule, true );
@@ -116,7 +116,7 @@ function add_my_rewrites () {
 						
 						add_rewrite_rule (
 							'(^' . $code . ')/' . $cpt . '/(.*)([^/]+)?',
-							'index.php?lang=$matches[1]&slug_' . $code . '=$matches[2]',
+							'index.php?lang=$matches[1]&post_type=' . $cpt . '&slug_' . $code . '=$matches[2]',
 							'top'
 						);
 						
@@ -242,6 +242,8 @@ add_filter ( 'query_vars', function ( $query_vars ) {
 
 // use slug_lang query var to adjust query
 
+add_action ( 'pre_get_posts', 'get_post_by_lang_slug' );
+
 function get_post_by_lang_slug ( $query ) {
 
 	if ( is_admin() )
@@ -258,8 +260,11 @@ function get_post_by_lang_slug ( $query ) {
 				isset ( $query->query_vars['slug_' . $code] ) &&
 				!empty ( $query->query_vars['slug_' . $code] )
 			) {
+				
+				// if ( isset ( $query->query_vars['post_type'] ) {
+					// $query->set ( 'post_type', array ( 'post', 'page' ) );
+				// }
 		
-				$query->set ( 'post_type', array ( 'post', 'page' ) );
 				
 				$query->set ( 'meta_query', array ( 
 					array (
@@ -292,9 +297,9 @@ function get_post_by_lang_slug ( $query ) {
 		
 	}
 	
+	// dumpit ( $query );
+	
 }
- 
-add_action ( 'pre_get_posts', 'get_post_by_lang_slug' );
 
 // dumpit SQL after any query
 
@@ -427,9 +432,7 @@ function translate_permalink ( $url, $post_id, $lang ) {
 				) {
 					$splice_index = 3;
 				}
-			
-				
-				
+					
 				array_pop ( $post_path );
 				
 				// dumpit ( $post_path );
@@ -438,7 +441,14 @@ function translate_permalink ( $url, $post_id, $lang ) {
 				
 				$new_URL .= $post_path . '/' . $new_slug;
 				
+			} elseif ( $post_obj->post_type != 'page' ) {
+				
+				$new_URL .=  $post_obj->post_type . '/' . implode ( '/', translate_path ( $post_id, $lang ) );
+				
 			} else {
+				
+				
+				
 				
 				if ( (int) $post_id != (int) get_option ( 'page_on_front' ) ) {
 					

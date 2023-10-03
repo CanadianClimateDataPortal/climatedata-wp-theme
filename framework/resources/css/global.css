@@ -16289,6 +16289,13 @@ video {
   max-width: 100%;
 }
 
+.fw-element img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}
+
 .all-caps {
   text-decoration: none;
   text-transform: uppercase;
@@ -16477,32 +16484,39 @@ video {
   --body: #212529;
 }
 
-.bg {
+.has-bg {
+  position: relative;
+}
+
+.fw-block.has-bg .fw-element-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.fw-bg {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-repeat: no-repeat;
-  background-size: cover;
   z-index: 1;
 }
-.bg.fixed {
+.fw-bg.fixed {
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
   background-attachment: fixed;
 }
 @media only screen and (min-width: 2000px) and (-webkit-min-device-pixel-ratio: 1.3), only screen and (min-width: 2000px) and (-o-min-device-pixel-ratio: 13/10), only screen and (min-width: 2000px) and (min-resolution: 120dpi) {
-  .bg.fixed {
+  .fw-bg.fixed {
     background-attachment: scroll;
     background-size: 100% auto;
   }
 }
-.bg.video {
+.fw-bg.video {
   overflow: hidden;
 }
-.bg.video video {
+.fw-bg.video video {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -16511,15 +16525,55 @@ video {
   transform: translate(-50%, -50%);
 }
 @media (max-width: 991.98px) {
-  .bg.video video {
+  .fw-bg.video video {
     width: auto;
     height: 100%;
     max-width: none;
   }
 }
 
-.bg-size-cover {
-  background-size: cover;
+.bg-position-top-left {
+  background-position: left center;
+}
+
+.bg-position-top-center {
+  background-position: center top;
+}
+
+.bg-position-top-right {
+  background-position: right top;
+}
+
+.bg-position-center-left {
+  background-position: left center;
+}
+
+.bg-position-center {
+  background-position: center center;
+}
+
+.bg-position-center-center {
+  background-position: center center;
+}
+
+.bg-position-center-right {
+  background-position: right center;
+}
+
+.bg-position-bottom-left {
+  background-position: left bottom;
+}
+
+.bg-position-bottom-center {
+  background-position: center bottom;
+}
+
+.bg-position-bottom-right {
+  background-position: right bottom;
+}
+
+.bg-attachment-fixed {
+  background-attachment: fixed;
 }
 
 .bg-size-width {
@@ -16530,45 +16584,52 @@ video {
   background-size: auto 100%;
 }
 
-.bg-position-top-left {
-  background-position: top left;
+.bg-size-cover {
+  background-size: cover;
 }
 
-.bg-position-top-center {
-  background-position: top center;
+.bg-opacity-0 {
+  opacity: 0;
 }
 
-.bg-position-top-right {
-  background-position: top right;
+.bg-opacity-10 {
+  opacity: 0.1;
 }
 
-.bg-position-center-left {
-  background-position: center left;
+.bg-opacity-20 {
+  opacity: 0.2;
 }
 
-.bg-position-center,
-.bg-position-center-center {
-  background-position: center;
+.bg-opacity-30 {
+  opacity: 0.3;
 }
 
-.bg-position-center-right {
-  background-position: center right;
+.bg-opacity-40 {
+  opacity: 0.4;
 }
 
-.bg-position-bottom-left {
-  background-position: bottom left;
+.bg-opacity-50 {
+  opacity: 0.5;
 }
 
-.bg-position-bottom-center {
-  background-position: bottom center;
+.bg-opacity-60 {
+  opacity: 0.6;
 }
 
-.bg-position-bottom-right {
-  background-position: bottom right;
+.bg-opacity-70 {
+  opacity: 0.7;
 }
 
-.bg-attachment-fixed {
-  background-attachment: fixed;
+.bg-opacity-80 {
+  opacity: 0.8;
+}
+
+.bg-opacity-90 {
+  opacity: 0.9;
+}
+
+.bg-opacity-100 {
+  opacity: 1;
 }
 
 @media (max-width: 800px) {
@@ -17292,103 +17353,18 @@ video {
   transition: opacity 0.25s ease 0s, left 0s ease 0s;
 }
 
-.has-bg {
-  position: relative;
-}
-
-.fw-bg {
+.screen-reader-text, .screen-reader-text span, .ui-helper-hidden-accessible {
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  -webkit-clip-path: inset(50%);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-}
-.fw-bg.bg-position-top-left {
-  background-position: left center;
-}
-.fw-bg.bg-position-top-center {
-  background-position: center top;
-}
-.fw-bg.bg-position-top-right {
-  background-position: right top;
-}
-.fw-bg.bg-position-center-left {
-  background-position: left center;
-}
-.fw-bg.bg-position-center-center {
-  background-position: center center;
-}
-.fw-bg.bg-position-center-right {
-  background-position: right center;
-}
-.fw-bg.bg-position-bottom-left {
-  background-position: left bottom;
-}
-.fw-bg.bg-position-bottom-center {
-  background-position: center bottom;
-}
-.fw-bg.bg-position-bottom-right {
-  background-position: right bottom;
-}
-.fw-bg.bg-attachment-fixed {
-  background-attachment: fixed;
-}
-.fw-bg.bg-size-width {
-  background-size: 100% auto;
-}
-.fw-bg.bg-size-height {
-  background-size: auto 100%;
-}
-.fw-bg.bg-size-cover {
-  background-size: cover;
-}
-.fw-bg.bg-opacity-0 {
-  opacity: 0;
-}
-.fw-bg.bg-opacity-10 {
-  opacity: 0.1;
-}
-.fw-bg.bg-opacity-20 {
-  opacity: 0.2;
-}
-.fw-bg.bg-opacity-30 {
-  opacity: 0.3;
-}
-.fw-bg.bg-opacity-40 {
-  opacity: 0.4;
-}
-.fw-bg.bg-opacity-50 {
-  opacity: 0.5;
-}
-.fw-bg.bg-opacity-60 {
-  opacity: 0.6;
-}
-.fw-bg.bg-opacity-70 {
-  opacity: 0.7;
-}
-.fw-bg.bg-opacity-80 {
-  opacity: 0.8;
-}
-.fw-bg.bg-opacity-90 {
-  opacity: 0.9;
-}
-.fw-bg.bg-opacity-100 {
-  opacity: 1;
-}
-
-.fw-block.has-bg .fw-element-inner {
-  position: relative;
-}
-
-.fw-element img {
-  display: block;
-  width: auto;
-  height: auto;
-  max-width: 100%;
-}
-
-.min-height-75 {
-  min-height: 75vh;
+  width: 1px;
+  word-wrap: normal !important;
 }
 
 .fw-menu-list {
@@ -17431,19 +17407,6 @@ video {
     transform: translateX(-1em);
     transition: left 0s ease 0.25s, opacity 0.25s ease 0s, transform 0.25s ease 0s;
   }
-}
-.screen-reader-text, .screen-reader-text span, .ui-helper-hidden-accessible {
-  border: 0;
-  clip: rect(1px, 1px, 1px, 1px);
-  -webkit-clip-path: inset(50%);
-  clip-path: inset(50%);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  width: 1px;
-  word-wrap: normal !important;
 }
 
 /*# sourceMappingURL=global.css.map */

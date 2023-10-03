@@ -57,11 +57,15 @@ function builder_is_active() {
 // ACTIONS
 //
 
+// element open/close functions
+
+add_action ( 'fw_before_element_open', 'fw_output_extras_before_open', 10, 1 );
+add_action ( 'fw_after_element_open', 'fw_output_extras_after_open', 10, 1 );
+add_action ( 'fw_before_element_close', 'fw_output_element_children', 10, 3 );
+
 // BEFORE OPEN 
 
 // check for settings
-
-add_action ( 'fw_before_element_open', 'fw_output_extras_before_open', 10, 1 );
 
 function fw_output_extras_before_open ( $element ) {
 	
@@ -91,12 +95,17 @@ function fw_output_extras_before_open ( $element ) {
 							$offcanvas_btn_class .= 'd-' . $options['breakpoint'] . '-none';
 						}
 					
+						if ( $options['trigger'] == 'insert' ) {
+							
+							
 ?>
 
-<button class="btn btn-primary <?php echo $offcanvas_btn_class; ?>" type="button" data-bs-toggle="offcanvas" data-bs-target="#<?php echo $offcanvas_ID; ?>" aria-controls="offcanvasTop">Open</button>
+<button class="btn btn-primary <?php echo $offcanvas_btn_class; ?>" type="button" data-bs-toggle="offcanvas" data-bs-target="#<?php echo $offcanvas_ID; ?>">Open</button>
 
 <?php
-					
+						
+						}
+						
 						break;
 					
 				}
@@ -108,7 +117,6 @@ function fw_output_extras_before_open ( $element ) {
 
 // AFTER OPEN
 
-add_action ( 'fw_after_element_open', 'fw_output_extras_after_open', 10, 1 );
 
 function fw_output_extras_after_open ( $element ) {
 	
@@ -142,6 +150,20 @@ function fw_output_extras_after_open ( $element ) {
 					
 						break;
 						
+					case 'offcanvas' :
+						
+						if ( $options['close'] == 'true' ) {
+						
+?>
+
+<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+
+<?php
+				
+						}		
+						
+						break;
+						
 				}
 				
 			}
@@ -155,7 +177,6 @@ function fw_output_extras_after_open ( $element ) {
 
 // output element children
 
-add_action ( 'fw_before_element_close', 'fw_output_element_children', 10, 3 );
 
 
 
@@ -383,6 +404,31 @@ function fw_setup_element ( $element, $globals ) {
 							$settings['classes'][] = 'offcanvas-' . $options['breakpoint'];
 						} else {
 							$settings['classes'][] = 'offcanvas';
+						}
+						
+						if (
+							$options['trigger'] == 'selector' &&
+							$options['selector'] != ''
+						) {
+							$settings['atts']['offcanvas-trigger'] = $options['selector'];
+							$settings['atts']['offcanvas-breakpoint'] = $options['selector'];
+						}
+						
+						// backdrop - default, no scroll
+						$settings['atts']['bs-scroll'] = 'false';
+						$settings['atts']['bs-backdrop'] = 'true';
+						
+						switch ( $options['backdrop'] ) {
+							case 'scroll' :
+								// backdrop with scroll
+								$settings['atts']['bs-scroll'] = 'true';
+								break;
+								
+							case 'off' :
+								// no backdrop
+								$settings['atts']['bs-scroll'] = 'true';
+								$settings['atts']['bs-backdrop'] = 'false';
+								break;		
 						}
 						
 						break;
@@ -639,7 +685,7 @@ function fw_output_element_content ( $element, $globals ) {
 	// $element = (array) $element;
 	$element['inputs'] = (array) $element['inputs'];
 	
-	$element_path = 'resources/functions/builder/' . $element['type'] . '.php';
+	$element_path = 'resources/functions/builder/front-end/' . $element['type'] . '.php';
 	
 	if ( locate_template ( $element_path ) != '' ) {
 		
@@ -707,57 +753,55 @@ add_action ( 'fw_modals', 'insert_fw_modal_container' );
 
 // save meta
 
-function my_plugin_save_post ( $post_id, $post ) {
-
+add_action ( 'save_post', function ( $post_id, $post ) {
+	
 	$parent_id = wp_is_post_revision ( $post_id );
-
+	
 	if ( $parent_id ) {
 		
+		// get the revision post object & builder field
 		$parent = get_post ( $parent_id );
-		$my_meta = get_post_meta ( $parent->id, 'builder', true );
+		$builder_field = get_post_meta ( $parent_id, 'builder', true );
 
-		// echo '<hr>';
-		// echo "\n\n" . $my_meta . "\n\n";
-		// echo '<hr>';
-
-		if ( false !== $my_meta ) {
+		if ( $builder_field != '' ) {
 			
-			add_metadata ( 'post', $post_id, 'builder', $my_meta );
+			// add the builder field to the revision
+			add_metadata ( 'post', $post_id, 'builder', $builder_field );
 			
 		}
 
 	}
 
-}
-add_action ( 'save_post', 'my_plugin_save_post', 10, 2 );
+}, 10, 2 );
 
 // restore revision
 
-function my_plugin_restore_revision ( $post_id, $revision_id ) {
+add_action ( 'wp_restore_post_revision', function ( $post_id, $revision_id ) {
 
-	$post     = get_post ( $post_id );
-	$revision = get_post ( $revision_id );
-	$my_meta  = get_metadata ( 'post', $revision->ID, 'builder', true );
+	$post = get_post ( $post_id );
+	$revision_post = get_post ( $revision_id );
+	$builder_field = get_metadata ( 'post', $revision_post->ID, 'builder', true );
 
-	if ( false !== $my_meta )
-		update_post_meta ( $post_id, 'builder', $my_meta );
-	else
+	if ( $builder_field !== false ) {
+		update_post_meta ( $post_id, 'builder', $builder_field );
+	} else {
 		delete_post_meta ( $post_id, 'builder' );
+	}
 
-}
-add_action( 'wp_restore_post_revision', 'my_plugin_restore_revision', 10, 2 );
+}, 10, 2 );
 
 // show in revision
 
-function my_plugin_revision_fields( $fields ) {
+add_filter ( '_wp_post_revision_fields', function ( $fields ) {
 
 	$fields['builder'] = 'Builder';
 	return $fields;
 
-}
-add_filter( '_wp_post_revision_fields', 'my_plugin_revision_fields' );
+} );
 
-function my_plugin_revision_field ( $value, $field ) {
+// add_filter ( '_wp_post_revision_field_builder', 'fw_revision_field', 10, 2 );
+
+function fw_revision_field ( $value, $field ) {
 
 	global $revision;
 	
@@ -766,5 +810,3 @@ function my_plugin_revision_field ( $value, $field ) {
 	return get_metadata ( 'post', $revision->ID, $field, true );
 
 }
-
-add_filter( '_wp_post_revision_field_builder', 'my_plugin_revision_field', 10, 2 );

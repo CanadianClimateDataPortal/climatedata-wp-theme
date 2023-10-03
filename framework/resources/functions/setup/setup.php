@@ -1,27 +1,5 @@
 <?php
 
-add_action ( 'admin_bar_menu', 'fw_admin_menu', 100 );
-
-function fw_admin_menu ( $admin_bar ) {
-	
-	$admin_bar->add_menu ( array (
-		'id'    => 'fw-actions',
-		'title' => 'Builder'
-	) );
-	
-	$admin_bar->add_menu ( array (
-		'id'    => 'fw-actions-item-new',
-		'parent' => 'fw-actions',
-		'title' => 'New Page',
-		'href'  => '#fw-modal',
-		'meta'  => array (
-			'class' => 'fw-actions-item fw-modal-content-new-post'
-		),
-	) );
-	
-}
-
-
 add_action ( 'switch_theme', 'fw_deactivate' );
  
 function fw_deactivate () {

@@ -19,10 +19,14 @@ if (
 	
 } else {
 	
-	echo '<div class="alert alert-warning fw-builder-alert">';
+	if ( is_user_logged_in() ) {
+		
+		echo '<div class="alert alert-warning fw-builder-alert">';
+		echo 'Text field <strong>' . $lang . '</strong> is empty';
+		echo '</div>';
+		
+	}
 	
-	echo 'Text field <strong>' . $lang . '</strong> is empty';
-	
-	echo '</div>';
+	echo htmlspecialchars_decode ( $element['inputs']['text']['en'] );
 	
 }

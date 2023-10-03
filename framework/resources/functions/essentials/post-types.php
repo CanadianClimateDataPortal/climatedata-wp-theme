@@ -42,7 +42,7 @@ function posttype_template() {
 		'supports'              => array( 'title', 'custom-fields' ),
 		'taxonomies'            => array( 'template_tag' ),
 		'hierarchical'          => false,
-		'public'                => false,
+		'public'                => true,
 		'show_ui'               => true,
 		'show_in_menu'          => true,
 		'menu_position'         => 20,

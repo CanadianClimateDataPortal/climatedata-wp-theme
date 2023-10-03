@@ -21,36 +21,33 @@ add_action ( 'wp_ajax_fw_output_loop_ajax', 'fw_output_loop_ajax' );
 
 function fw_update_post() {
 	
+	// dumpit ( $_POST );
+	
+	$success = false;
+	
 	if (
 		( isset ( $_POST['post_id'] ) && !empty ( $_POST['post_id'] ) ) &&
 		( isset ( $_POST['builder'] ) && !empty ( $_POST['builder'] ) )
 	) {
 		
-		$globals = $_POST['globals'];
+		// $globals = $_POST['globals'];
+		$lang = $_POST['globals']['current_lang_code'];
 		
 		$new_builder = json_encode ( $_POST['builder'], JSON_PRETTY_PRINT );
-			
+		
 		$revision = wp_save_post_revision ( $_POST['post_id'] );
 		
 		// update builder object
 		update_post_meta ( $_POST['post_id'], 'builder', $new_builder );
 		
-		echo 'updated id #' . $_POST['post_id'] . "\n";
-		
-		// print_r ( $_POST['builder'] );
-		
-		// echo "\n\n";
-		
-		// print_r ( $new_builder );
-		
-		// echo "\n\n";
+		// echo 'updated id #' . $_POST['post_id'] . "\n";
 		
 		// other meta
 		
-		$title_to_update = wptexturize ( $_POST['builder']['inputs']['title'][$globals['current_lang_code']] );
+		$title_to_update = wptexturize ( $_POST['builder']['inputs']['title'][$lang] );
 		
 		if ( $title_to_update != '' ) {
-			if ($globals['current_lang_code'] == 'en') {
+			if ( $lang == 'en' ) {
 				
 				// if en, update the post title
 			
@@ -65,16 +62,19 @@ function fw_update_post() {
 				
 				// not en, update title_[lang]
 				
-				update_post_meta ( $_POST['post_id'], 'title_' . $globals['current_lang_code'], $title_to_update );
+				update_post_meta ( $_POST['post_id'], 'title_' . $lang, $title_to_update );
 		
 			}
 			
-			echo  'updated ' . $globals['current_lang_code'] . ' title' . "\n";
+			// echo  'updated ' . $globals['current_lang_code'] . ' title' . "\n";
 			
 		}
 		
+		$success = true;
 		
 	}
+	
+	echo ( $success == true ) ? 'success' : '';
 	
 	wp_die();
 	
@@ -218,7 +218,7 @@ function fw_insert_post() {
 	
 	$form_data = $_GET['inputs'];
 	
-	print_r($form_data);
+	// print_r($form_data);
 	
 	$new_post_ID = wp_insert_post ( array (
 		'post_type' => $form_data['post_type'],
@@ -226,7 +226,7 @@ function fw_insert_post() {
 		'post_title' => $form_data['post_title']
 	) );
 	
-	echo 'layout: ' . $form_data['layout'];
+	// echo 'layout: ' . $form_data['layout'];
 	
 	if ( $form_data['layout'] != '' ) {
 		
@@ -241,7 +241,7 @@ function fw_insert_post() {
 		
 		$layout_obj = str_replace ( '"' . $form_data['layout'], '"' . $new_post_ID, $layout_obj );
 		
-		echo "\n\n" . $layout_obj . "\n\n";
+		// echo "\n\n" . $layout_obj . "\n\n";
 		
 		// and populate the new post with it
 		
@@ -249,7 +249,15 @@ function fw_insert_post() {
 		
 	}
 	
-	echo "\n" . 'done: ' . $new_post_ID;
+	// echo "\n" . 'done: ' . $new_post_ID;
+	
+	echo json_encode ( array ( 
+		'result' => 'success',
+		'post_type' => $form_data['post_type'],
+		'post_title' => $form_data['post_title'],
+		'post_id' => $new_post_ID,
+		'url' => get_permalink ( $new_post_ID )
+	) );
 	
 	wp_die();
 	
@@ -263,10 +271,10 @@ function fw_insert_post() {
 function fw_modal_settings() {
 	
 	$globals = $_GET['globals'];
-	
 	$element = $_GET['element'];
 
 	switch ( $_GET['content'] ) {
+		case 'save' :
 		case 'delete' :
 		case 'new-post' :
 			

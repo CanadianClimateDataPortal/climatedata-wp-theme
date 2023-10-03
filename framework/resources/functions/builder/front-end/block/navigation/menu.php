@@ -62,8 +62,6 @@ if ( str_contains ( $element['inputs']['menu'], 'menu-' ) ) {
 		// 	
 		// } else {
 			
-			// changing language
-			
 		$lang_URL = translate_permalink ( $GLOBALS['vars']['current_url'], $globals['current_query']['ID'], $lang['code'] );
 		
 		$menu[] = array(

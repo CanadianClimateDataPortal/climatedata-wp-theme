@@ -73,7 +73,21 @@ var result = {}
 			array_indexes: {},
 			array_key: null,
 			removed_settings: [],
-			uploader: null,
+			uploader: {
+				object: null,
+				options: null,
+				type: null,
+				elements: {
+					file_id: null,
+					url: null,
+					button: null,
+					placeholder: null,
+				},
+				placeholder_src: null,
+				img_url: {},
+				attachment: null,
+				selection: null
+			},
 			debug: true
 		}
 
@@ -204,12 +218,16 @@ var result = {}
 			
 			// modal
 			
-			$('.fw-actions-item a').click(function(e) {
+			$('.fw-actions-item a[href="#fw-modal"]').click(function(e) {
 				e.preventDefault()
 				
 				options.modal.content = $(this).closest('li').attr('class').split('fw-modal-content-')[1].split(' ')[0]
 				
-				console.log(options.modal.content)
+				// console.log(options.modal.content)
+				
+				if (options.modal.content == 'save') {
+					options.status = 'saving'
+				}
 				
 				$('#fw-modal').modal('show')
 				
@@ -217,7 +235,7 @@ var result = {}
 			
 			// builder toggle
 			
-			$('#fw-builder-toggle').click(function() {
+			$('#wp-admin-bar-fw-actions-item-toggle').click(function() {
 				
 				if ($('body').hasClass('fw-builder')) {
 					
@@ -237,12 +255,15 @@ var result = {}
 			
 			// save post
 			
-			$('#fw-save-post').click(function() {
-				
-				options.status = 'saving'
-				plugin.update_post()
-				
-			})
+			// $('#wp-admin-bar-fw-actions-item-save').click(function() {
+			// 	
+			// 	options.status = 'saving'
+			// 	
+			// 	
+			// 	
+			// 	plugin.update_post()
+			// 	
+			// })
 			
 			// debug
 			
@@ -321,7 +342,7 @@ var result = {}
 			
 			$('body').on('click', '.fw-new-choice', function(e) {
 				
-				console.log(options.inserting)
+				// console.log(options.inserting)
 				
 				options.element.data.type = $(this).attr('data-modal-content')
 				
@@ -364,11 +385,8 @@ var result = {}
 					
 					options.parent.item = this_element.parent()
 					
-					// console.log(options.parent)
-					
-					options.inserting = {
-						where: 'append',
-						index: null
+					if (this_element.parent().hasClass('fw-template-lavel')) {
+						options.parent.item = options.parent.item.parent()
 					}
 					
 					if ($(this).hasClass('insert-into')) {
@@ -377,6 +395,13 @@ var result = {}
 						// the button's container element is the parent
 						options.parent.item = this_element
 						
+					}
+					
+					// console.log(options.parent)
+					
+					options.inserting = {
+						where: 'append',
+						index: null
 					}
 					
 					options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
@@ -450,7 +475,10 @@ var result = {}
 					if ($(this).parents('.fw-template-label').length) {
 						// console.log('deleting template')
 						
-						let this_begin = $(this).closest('.fw-template-label').prev('.fw-template-label.begin'),
+						// console.log('closest label', $(this).closest('.fw-template-label'))
+						// console.log('begin', $(this).closest('.fw-template-label').prevAll('.fw-template-label.begin'))
+						
+						let this_begin = $(this).closest('.fw-template-label').prevAll('.fw-template-label.begin'),
 								items_to_delete = [ this_begin ]
 						
 						this_begin.nextAll().each(function() {
@@ -465,6 +493,7 @@ var result = {}
 						options.parent.item = this_begin.closest('.fw-element')
 						
 						// console.log('parent item', options.parent.item)
+						// console.log('parent item key', options.parent.item.attr('data-key'))
 						
 						options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
 						
@@ -634,6 +663,7 @@ var result = {}
 				$.ajax({
 					url: ajax_data.url,
 					type: 'GET',
+					dataType: 'json',
 					data: {
 						action: 'fw_insert_post',
 						inputs: form_data 
@@ -641,6 +671,11 @@ var result = {}
 					success: function(data) {
 						
 						console.log(data)
+						
+						$('#fw-modal .modal-body').html('<p>Created new ' + data.post_type + ' ‘' + data.post_title + '’ (<code>ID ' + data.post_id + '</code>)</p><p><a href="' + data.url + '" target="_blank">Edit <i class="fas fa-external-link ms-1"></i></a>')
+						
+						$('#fw-modal .fw-new-post-submit').remove()
+						$('#fw-modal [data-bs-dismiss]').text('Close')
 						
 					}
 				})
@@ -1853,7 +1888,17 @@ var result = {}
 							// AOS.refresh()
 							
 							break
-						
+							
+						case 'offcanvas' :
+							
+							console.log('remove offcanvas', options.element.item.attr('id'))
+							
+							$('body').find('[data-bs-target="#' + options.element.item.attr('id') + '"]').remove()
+							
+							$('#' + options.element.item.attr('id')).offcanvas('hide')
+							
+							break
+							
 					}
 					
 				})
@@ -1973,6 +2018,12 @@ var result = {}
 								
 								break
 								
+							case 'offcanvas' :
+								
+								
+							
+								break
+								
 						}
 						
 					} // each setting
@@ -2083,13 +2134,17 @@ var result = {}
 					
 			// let element_data = item.data()
 			
-			let this_item = $('body').find('[data-key="' + element.key + '"]')
+			let this_item = $('body').find('[data-key="' + element.key + '"]'),
+					this_item_ID = this_item.attr('id')
 			
 			if (element.type == 'template') {
 				
 				let this_template_key = (element.inputs.source == 'post') ? element.inputs.post_id : element.inputs.path
 				
 				this_item = $('body').find('.fw-template-label.end[data-template-key="' + this_template_key + '"]')
+				
+				this_item_ID = 'template-' + this_template_key
+				
 			}
 			
 			if (this_item.find('> .fw-element-footer').length) {
@@ -2100,7 +2155,7 @@ var result = {}
 			
 			let footer = $('<div class="fw-element-footer">'),
 					footer_inner = $('<div class="fw-element-footer-inner">').appendTo(footer),
-					dropdown = $('<div id="dropdown-' + this_item.attr('id') + '" class="dropdown fw-element-footer-section">').appendTo(footer_inner)
+					dropdown = $('<div id="dropdown-' + this_item_ID + '" class="dropdown fw-element-footer-section">').appendTo(footer_inner)
 					
 			// dropdown button
 			
@@ -2137,15 +2192,6 @@ var result = {}
 			
 			dropdown_menu.append('<li><hr class="dropdown-divider"></li>')
 			
-			// move element up/down
-			
-			// let move_btns = '<button type="button" class="btn btn-outline-secondary fw-btn move-element move-up">Up</button><button type="button" class="btn btn-outline-secondary fw-btn move-element move-down">Down</button>'
-			
-			// dropdown_menu.append('<li class="pe-3 d-flex"><h6 class="dropdown-header">Move</h6><div class="btn-group btn-group-sm" role="group">' + move_btns + '</div></li>')
-			
-			// dropdown_menu.append('<li class="w-50"><a href="#" class="dropdown-item fw-btn move-element move-up">Up</a></li>')
-			// dropdown_menu.append('<li class="w-50"><a href="#" class="dropdown-item fw-btn move-element move-down">Down</a></li>')
-			
 			// new element above/below
 			
 			let new_btns = ''
@@ -2156,8 +2202,6 @@ var result = {}
 				
 				new_btns += '<a href="#fw-modal" class="btn btn-outline-secondary fw-modal-trigger fw-btn insert-element insert-into" data-modal-content="new" data-type="' + element_type + '">Insert</a>'
 				
-				// dropdown_menu.append('<li><a href="#fw-modal" class="fw-modal-trigger dropdown-item fw-btn insert-element insert-into" data-modal-content="new" data-type="' + element_type + '">Insert</a></li>')
-				
 			}
 			
 			new_btns += '<a href="#fw-modal" class="btn btn-outline-secondary fw-modal-trigger fw-btn insert-element insert-before" data-modal-content="new" data-type="' + element_type + '">Before</a>'
@@ -2167,12 +2211,17 @@ var result = {}
 			dropdown_menu.append('<h6 class="dropdown-header text-body">New Element</h6>')
 			dropdown_menu.append('<li class="dropdown-item"><div class="btn-group btn-group-sm" role="group">' + new_btns + '</div></li>')
 			
-			// dropdown_menu.append('<li><a href="#fw-modal" class="fw-modal-trigger dropdown-item fw-btn insert-element insert-before" data-modal-content="' + element_type + '" data-type="' + element_type + '">' + element_type.charAt(0).toUpperCase() + element_type.slice(1) + ' before</a></li>')
-			// dropdown_menu.append('<li><a href="#fw-modal" class="fw-modal-trigger dropdown-item fw-btn insert-element insert-after" data-modal-content="' + element_type + '" data-type="' + element_type + '">' + element_type.charAt(0).toUpperCase() + element_type.slice(1) + ' after</a></li>')
-			
 			// add buttons for different types
 			
 			switch (element.type) {
+				case 'template' :
+					
+					if (element.inputs.source == 'post') {
+						footer_inner.append('<a href="/?p=' + element.inputs.post_id + '" class="p-1" target="_blank">Edit template <i class="fas fa-external-link ms-1"></i></a>')
+					}
+					
+					break
+					
 				case 'column' :
 				
 					let breakpoint_btn = '<div class="footer-breakpoint fw-element-footer-section text-truncate">' + plugin.generate_column_classes(element.inputs.breakpoints) + '</div>'
@@ -2348,7 +2397,11 @@ var result = {}
 						// STATUS:
 						//
 						
-						if (options.status == 'inserting') {
+						if (options.status == 'saving') {
+							
+							plugin.update_post()
+							
+						} else if (options.status == 'inserting') {
 							
 							// INSERTING
 							
@@ -2404,119 +2457,120 @@ var result = {}
 			let plugin = this,
 					options = plugin.options
 			
-			let uploader_options = JSON.parse(container.attr('data-uploader-options')),
-					uploader_type = container.attr('data-uploader-type'),
-					upload_id_input = container.find('.uploader-file-id'),
-					upload_url_input = container.find('.uploader-file-url'),
-					upload_btn = container.find('.element-form-upload-btn'),
-					img_placeholder = container.find('.image-placeholder'),
-					placeholder_src,
-					img_url = {},
-					attachment,
-					selection
-					
 			console.log('uploader', container)
-			console.log('options', uploader_options)
+			
+			let uploader = options.uploader
+			
+			uploader.options = JSON.parse(container.attr('data-uploader-options'))
+			uploader.type = container.attr('data-uploader-type')
+			uploader.elements.file_id = container.find('.uploader-file-id')
+			uploader.elements.url = container.find('.uploader-file-url')
+			uploader.elements.button = container.find('.element-form-upload-btn')
+			uploader.elements.placeholder = container.find('.image-placeholder')
+			uploader.img_url = {}
+			
+			console.log('options', uploader)
+			
 			// console.log('type', uploader_type)
 			// console.log('inputs', upload_id_input, upload_url_input)
 			// console.log('placeholder', img_placeholder)
 			
 			
-			plugin.uploader = wp.media(uploader_options).on('select', function() {
+			uploader.object = wp.media(uploader.options).on('select', function() {
 				
-				attachment = plugin.uploader.state().get('selection').first().toJSON()
+				uploader.attachment = uploader.object.state().get('selection').first().toJSON()
 				
 				// set hidden image ID input
-				upload_id_input.val(attachment.id).trigger('change')
+				uploader.elements.file_id.val(uploader.attachment.id).trigger('change')
 				
 				// console.log(attachment)
 				
 				// set URL and placeholder
 				
-				if (img_placeholder.length) {
+				if (uploader.elements.placeholder.length) {
 						
-					img_url.full = attachment.url
+					uploader.img_url.full = uploader.attachment.url
 					
-					placeholder_src = img_url.full
+					uploader.placeholder_src = uploader.img_url.full
 					
-					if (attachment.sizes.thumbnail) {
-						img_url.thumbnail = attachment.sizes.thumbnail.url
+					if (uploader.attachment.sizes.thumbnail) {
+						uploader.img_url.thumbnail = uploader.attachment.sizes.thumbnail.url
 					}
 					
-					if (attachment.sizes.medium) {
-						img_url.medium = attachment.sizes.medium.url
+					if (uploader.attachment.sizes.medium) {
+						uploader.img_url.medium = uploader.attachment.sizes.medium.url
 						
-						placeholder_src = img_url.medium
+						uploader.placeholder_src = uploader.img_url.medium
 					}
 					
-					if (attachment.sizes.large) {
-						img_url.thumbnail = attachment.sizes.large.url
+					if (uploader.attachment.sizes.large) {
+						uploader.img_url.thumbnail = uploader.attachment.sizes.large.url
 					}
 					
-					img_placeholder.html('<img src="' + placeholder_src + '">')
+					uploader.elements.placeholder.html('<img src="' + uploader.placeholder_src + '">')
 					
-					upload_url_input.val(JSON.stringify(img_url))
+					uploader.elements.url.val(JSON.stringify(uploader.img_url))
 					
 					// change button text
-					upload_btn.text('Replace Image')
+					uploader.elements.button.text('Replace Image')
 					
 				} else {
 					
-					upload_url_input.val(JSON.stringify({ full: attachment.url }))
+					uploader.elements.url.val(JSON.stringify({ full: uploader.attachment.url }))
 					
 				}
 				
-				// upload_btn.addClass('disabled')
+				// uploader.elements.button.addClass('disabled')
 				// remove_btn.removeClass('d-none')
 				
 			}).on('open', function() {
 			
-				if (upload_id_input.val()) {
+				if (uploader.elements.file_id.val()) {
 					
-					selection = plugin.uploader.state().get('selection')
-					attachment = wp.media.attachment(upload_id_input.val())
-					attachment.fetch()
-					selection.add( attachment ? [attachment] : [] )
+					selection = uploader.object.state().get('selection')
+					uploader.attachment = wp.media.attachment(uploader.elements.file_id.val())
+					uploader.attachment.fetch()
+					selection.add( uploader.attachment ? [uploader.attachment] : [] )
 					
 				}
 				
 			})
 			
-			if (upload_id_input.val() != '') {
+			if (uploader.elements.file_id.val() != '') {
 				
-				console.log(upload_id_input.val())
+				console.log(uploader.elements.file_id.val())
 				
 				// element has an ID set
 				
-				if (img_placeholder.length) {
+				if (uploader.elements.placeholder.length) {
 					
 					// there's also an image placeholder
 				
 					// grab the best image size and set the placeholder
 					
-					let img_urls = JSON.parse(upload_url_input.val())
+					let img_urls = JSON.parse(uploader.elements.url.val())
 					
-					placeholder_src = img_urls.full
+					uploader.placeholder_src = img_urls.full
 					
 					if (img_urls.medium) {
-						placeholder_src = img_urls.medium
+						uploader.placeholder_src = img_urls.medium
 					}
 					
-					img_placeholder.html('<img src="' + placeholder_src + '">')
+					uploader.elements.placeholder.html('<img src="' + uploader.placeholder_src + '">')
 					
 					// change button text
-					upload_btn.text('Replace image')
+					uploader.elements.button.text('Replace image')
 					
 				} else {
 					
 					// change button text
-					upload_btn.text('Replace file')
+					uploader.elements.button.text('Replace file')
 					
 				}
 				
 			}
 			
-			plugin.uploader.open()
+			uploader.object.open()
 			
 		},
 		
@@ -2584,6 +2638,27 @@ var result = {}
 				plugin.do_uploader($(this).closest('.uploader-container'))
 				
 			})
+			
+			if (modal_body.find('.element-form-upload-btn').length) {
+				
+				// let upload_btn = modal_body.find('.element-form-upload-btn'),
+				// 		uploader.options = {
+				// 			title: 'Insert image',
+				// 			library: {
+				// 				type: 'image'
+				// 			},
+				// 			button: {
+				// 				text: 'Use this image'
+				// 			},
+				// 			multiple: false
+				// 		},
+				// 		upload_id_input = modal_body.find('[name="inputs-file-id"]'),
+				// 		upload_url_input = modal_body.find('[name="inputs-file-url"]'),
+				// 		img_placeholder = modal_body.find('.image-placeholder'),
+				// 		placeholder_src,
+				// 		img_url = {},
+				// 		attachment,
+				// 		selection
 			
 					// 
 					// // uploader
@@ -2693,37 +2768,37 @@ var result = {}
 					// 		
 					// 	})
 					// 	
-					// 	if (upload_id_input.val() != '') {
-					// 		
-					// 		// element has an ID set
-					// 		
-					// 		if (img_placeholder.length) {
-					// 			
-					// 			// there's also an image placeholder
-					// 		
-					// 			// grab the best image size and set the placeholder
-					// 			
-					// 			let img_urls = JSON.parse(upload_url_input.val())
-					// 			
-					// 			placeholder_src = img_urls.full
-					// 			
-					// 			if (img_urls.medium) {
-					// 				placeholder_src = img_urls.medium
-					// 			}
-					// 			
-					// 			img_placeholder.html('<img src="' + placeholder_src + '">')
-					// 			
-					// 			// change button text
-					// 			upload_btn.text('Replace image')
-					// 			
-					// 		} else {
-					// 			
-					// 			// change button text
-					// 			upload_btn.text('Replace file')
-					// 			
-					// 		}
-					// 		
-					// 	}
+						// if (upload_id_input.val() != '') {
+						// 	
+						// 	// element has an ID set
+						// 	
+						// 	if (img_placeholder.length) {
+						// 		
+						// 		// there's also an image placeholder
+						// 	
+						// 		// grab the best image size and set the placeholder
+						// 		
+						// 		let img_urls = JSON.parse(upload_url_input.val())
+						// 		
+						// 		placeholder_src = img_urls.full
+						// 		
+						// 		if (img_urls.medium) {
+						// 			placeholder_src = img_urls.medium
+						// 		}
+						// 		
+						// 		img_placeholder.html('<img src="' + placeholder_src + '">')
+						// 		
+						// 		// change button text
+						// 		upload_btn.text('Replace image')
+						// 		
+						// 	} else {
+						// 		
+						// 		// change button text
+						// 		upload_btn.text('Replace file')
+						// 		
+						// 	}
+						// 	
+						// }
 					// 	
 					// 	upload_btn.click(function(e) {
 					// 		e.preventDefault()
@@ -2733,7 +2808,7 @@ var result = {}
 					// 	})
 					// 	
 					// 	
-					// }
+					}
 					
 					// /image
 					
@@ -3152,7 +3227,7 @@ var result = {}
 						
 					}
 					
-				} else if (input.property == 'class' || input.property.includes('class')) {
+				} else if (input.property == 'class') {
 					
 					this_val = this_val.join(' ')
 					
@@ -3250,7 +3325,9 @@ var result = {}
 					
 					let img_urls = JSON.parse(this_val)
 					
-					this_input.siblings('.image-placeholder').html('<img src="' + img_urls.full + '">')
+					console.log(img_urls)
+					
+					this_input.closest('.uploader-container').find('.image-placeholder').html('<img src="' + img_urls.full + '">')
 					
 				}
 				
@@ -3272,6 +3349,12 @@ var result = {}
 				
 				if (typeof this_input.attr('data-form-condition') != 'undefined') {
 					plugin.toggle_conditionals(this_input)
+				}
+				
+				if (this_input.hasClass('conditional-select')) {
+					this_input.find('[data-form-condition').each(function() {
+						plugin.toggle_conditionals($(this))
+					})
 				}
 			
 			})
@@ -3619,9 +3702,9 @@ var result = {}
 					// toggle conditionals
 					// in newly added form
 					
-					// new_form.find('[data-form-condition]').each(function() {
-					// 	plugin.toggle_conditionals($(this))
-					// })
+					new_form.find('[data-form-condition]').each(function() {
+						plugin.toggle_conditionals($(this))
+					})
 					
 					// console.log('added ' + path)
 					
@@ -3867,14 +3950,14 @@ var result = {}
 				// console.log('removed', options.removed_settings)
 				
 				// clear existing settings object
-				// element_data.inputs.settings = [] //{}
+				element_data.inputs.settings = [] //{}
 				
 			}
 			
 			// destroy the existing inputs object
 			// not sure if this is a good idea
-			
-			options.element.data.inputs = {}
+			// update: it was a bad idea - removes text from other langs
+			// options.element.data.inputs = {}
 			
 			form_data.forEach(function(input) {
 				
@@ -4036,6 +4119,8 @@ var result = {}
 			
 			console.log(options.page)
 			
+			$('#fw-modal .modal-body code').text(options.post_id)
+			
 			$.ajax({
 				url: ajax_data.url,
 				type: 'POST',
@@ -4048,6 +4133,25 @@ var result = {}
 				},
 				success: function(data) {
 					console.log(data)
+					
+					if (data == 'success') {
+						
+						$('#fw-modal .modal-body p').text('Success')
+						
+					}
+					
+					options.status = 'ready'
+					
+				},
+				error: function() {
+					
+					$('#fw-modal .modal-body p').text('Something went wrong.')
+					
+				},
+				complete: function() {
+					
+					$('#fw-modal .btn').removeClass('disabled')
+						
 				}
 			})
 			

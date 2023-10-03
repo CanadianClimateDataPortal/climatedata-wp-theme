@@ -19,6 +19,7 @@ function fw_get_rewrite_method() {
 	// across domains
 	
 	return ( is_user_logged_in() ) ? 'path' : get_option ( 'options_fw_language_settings_rewrite' );
+	
 }
 
 function fw_setup_current_lang() {

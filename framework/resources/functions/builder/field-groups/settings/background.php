@@ -18,6 +18,9 @@
 			"multiple": false
 		}'
 	>
+	
+		<input type="hidden" id="inputs-settings[]-background-type" name="inputs-settings[]-background-type" value="background">
+		
 		<div class="col-3 p-2 border-end d-flex flex-column align-items-center">
 			<div class="image-placeholder pb-2"></div>
 			

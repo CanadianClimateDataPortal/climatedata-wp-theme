@@ -1,8 +1,8 @@
 <?php
 
-	get_header();
+	// update_option ( 'fwtest', array() );
 	
-	// dumpit ( $_SERVER );
+	get_header();
 	
 	if ( have_posts() ) {
 		while ( have_posts() ) {
@@ -12,21 +12,21 @@
 			
 			fw_builder();
 			
-			if ( is_user_logged_in() && current_user_can ( 'administrator' ) ) {
+			/*if ( is_user_logged_in() && current_user_can ( 'administrator' ) ) {
 			
 	?>
 
 <div id="fw-builder-post-actions">
 	<div id="fw-page-settings" class="fw-btn fw-modal-trigger edit-element btn btn-outline-secondary" data-modal-content="page">Page Settings</div>
-	<div id="fw-builder-toggle" class="fw-btn btn btn-outline-secondary">Builder <span class="badge text-bg-success">On</span></div>
-	<div id="fw-save-post" class="fw-btn btn btn-primary">Save</div>
+	<!-- <div id="fw-builder-toggle" class="fw-btn btn btn-outline-secondary">Builder <span class="badge text-bg-success">On</span></div> -->
+	<!-- <div id="fw-save-post" class="fw-btn btn btn-primary">Save</div> -->
 </div>
 
 <?php
 
-			}
+			}*/
 			
-			if ( get_current_user_id() == 1 ) {
+			if ( current_user_can ( 'administrator' ) ) {
 		
 ?>
 

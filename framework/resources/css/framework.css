@@ -16284,6 +16284,13 @@ video {
   max-width: 100%;
 }
 
+.fw-element img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}
+
 .all-caps {
   text-decoration: none;
   text-transform: uppercase;
@@ -16472,32 +16479,39 @@ video {
   --body: #212529;
 }
 
-.bg {
+.has-bg {
+  position: relative;
+}
+
+.fw-block.has-bg .fw-element-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.fw-bg {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-repeat: no-repeat;
-  background-size: cover;
   z-index: 1;
 }
-.bg.fixed {
+.fw-bg.fixed {
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
   background-attachment: fixed;
 }
 @media only screen and (min-width: 2000px) and (-webkit-min-device-pixel-ratio: 1.3), only screen and (min-width: 2000px) and (-o-min-device-pixel-ratio: 13/10), only screen and (min-width: 2000px) and (min-resolution: 120dpi) {
-  .bg.fixed {
+  .fw-bg.fixed {
     background-attachment: scroll;
     background-size: 100% auto;
   }
 }
-.bg.video {
+.fw-bg.video {
   overflow: hidden;
 }
-.bg.video video {
+.fw-bg.video video {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -16506,15 +16520,55 @@ video {
   transform: translate(-50%, -50%);
 }
 @media (max-width: 991.98px) {
-  .bg.video video {
+  .fw-bg.video video {
     width: auto;
     height: 100%;
     max-width: none;
   }
 }
 
-.bg-size-cover {
-  background-size: cover;
+.bg-position-top-left {
+  background-position: left center;
+}
+
+.bg-position-top-center {
+  background-position: center top;
+}
+
+.bg-position-top-right {
+  background-position: right top;
+}
+
+.bg-position-center-left {
+  background-position: left center;
+}
+
+.bg-position-center {
+  background-position: center center;
+}
+
+.bg-position-center-center {
+  background-position: center center;
+}
+
+.bg-position-center-right {
+  background-position: right center;
+}
+
+.bg-position-bottom-left {
+  background-position: left bottom;
+}
+
+.bg-position-bottom-center {
+  background-position: center bottom;
+}
+
+.bg-position-bottom-right {
+  background-position: right bottom;
+}
+
+.bg-attachment-fixed {
+  background-attachment: fixed;
 }
 
 .bg-size-width {
@@ -16525,45 +16579,52 @@ video {
   background-size: auto 100%;
 }
 
-.bg-position-top-left {
-  background-position: top left;
+.bg-size-cover {
+  background-size: cover;
 }
 
-.bg-position-top-center {
-  background-position: top center;
+.bg-opacity-0 {
+  opacity: 0;
 }
 
-.bg-position-top-right {
-  background-position: top right;
+.bg-opacity-10 {
+  opacity: 0.1;
 }
 
-.bg-position-center-left {
-  background-position: center left;
+.bg-opacity-20 {
+  opacity: 0.2;
 }
 
-.bg-position-center,
-.bg-position-center-center {
-  background-position: center;
+.bg-opacity-30 {
+  opacity: 0.3;
 }
 
-.bg-position-center-right {
-  background-position: center right;
+.bg-opacity-40 {
+  opacity: 0.4;
 }
 
-.bg-position-bottom-left {
-  background-position: bottom left;
+.bg-opacity-50 {
+  opacity: 0.5;
 }
 
-.bg-position-bottom-center {
-  background-position: bottom center;
+.bg-opacity-60 {
+  opacity: 0.6;
 }
 
-.bg-position-bottom-right {
-  background-position: bottom right;
+.bg-opacity-70 {
+  opacity: 0.7;
 }
 
-.bg-attachment-fixed {
-  background-attachment: fixed;
+.bg-opacity-80 {
+  opacity: 0.8;
+}
+
+.bg-opacity-90 {
+  opacity: 0.9;
+}
+
+.bg-opacity-100 {
+  opacity: 1;
 }
 
 @media (max-width: 800px) {
@@ -17287,6 +17348,20 @@ video {
   transition: opacity 0.25s ease 0s, left 0s ease 0s;
 }
 
+.screen-reader-text, .screen-reader-text span, .ui-helper-hidden-accessible {
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  -webkit-clip-path: inset(50%);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  word-wrap: normal !important;
+}
+
 .fw-main {
   padding: 1rem;
 }
@@ -17375,6 +17450,9 @@ video {
   opacity: 1;
   border-color: #7ac;
   pointer-events: auto;
+}
+.fw-builder .fw-element.position-absolute {
+  position: relative !important;
 }
 .fw-builder .fw-template-label {
   display: flex;
@@ -17603,31 +17681,42 @@ video {
 body.admin-bar .fixed-top {
   top: 32px !important;
 }
-body.admin-bar .offcanvas-end:hover:not(.show) {
+body.admin-bar .offcanvas-end,
+body.admin-bar .offcanvas-start {
+  top: var(--wp-admin--admin-bar--height);
+  margin-bottom: 0 !important;
+}
+body.admin-bar .offcanvas-end:hover:not(.show),
+body.admin-bar .offcanvas-start:hover:not(.show) {
   position: relative;
 }
 @media (max-width: 575.98px) {
-  body.admin-bar .offcanvas-end.offcanvas-sm {
+  body.admin-bar .offcanvas-end.offcanvas-sm,
+body.admin-bar .offcanvas-start.offcanvas-sm {
     top: var(--wp-admin--admin-bar--height);
   }
 }
 @media (max-width: 767.98px) {
-  body.admin-bar .offcanvas-end.offcanvas-md {
+  body.admin-bar .offcanvas-end.offcanvas-md,
+body.admin-bar .offcanvas-start.offcanvas-md {
     top: var(--wp-admin--admin-bar--height);
   }
 }
 @media (max-width: 991.98px) {
-  body.admin-bar .offcanvas-end.offcanvas-lg {
+  body.admin-bar .offcanvas-end.offcanvas-lg,
+body.admin-bar .offcanvas-start.offcanvas-lg {
     top: var(--wp-admin--admin-bar--height);
   }
 }
 @media (max-width: 1199.98px) {
-  body.admin-bar .offcanvas-end.offcanvas-xl {
+  body.admin-bar .offcanvas-end.offcanvas-xl,
+body.admin-bar .offcanvas-start.offcanvas-xl {
     top: var(--wp-admin--admin-bar--height);
   }
 }
 @media (max-width: 1399.98px) {
-  body.admin-bar .offcanvas-end.offcanvas-xxl {
+  body.admin-bar .offcanvas-end.offcanvas-xxl,
+body.admin-bar .offcanvas-start.offcanvas-xxl {
     top: var(--wp-admin--admin-bar--height);
   }
 }
@@ -17695,6 +17784,33 @@ body.admin-bar .offcanvas-end:hover:not(.show) {
   padding: 0.5rem;
   background-color: #fff;
   z-index: 1000;
+}
+
+#wpadminbar .ab-item {
+  cursor: pointer !important;
+}
+#wpadminbar .ab-item .dashicons {
+  display: inline-block;
+  vertical-align: middle;
+  font-family: dashicons !important;
+  font-size: 18px;
+  line-height: 1;
+  color: rgba(240, 246, 252, 0.6);
+  margin-right: 6px;
+}
+#wpadminbar .ab-item:hover .dashicons {
+  color: #72aee6;
+}
+#wpadminbar .ab-item .badge {
+  padding: var(--bs-badge-padding-y) var(--bs-badge-padding-x);
+  border-radius: var(--bs-badge-border-radius);
+  font-size: 0.75rem;
+  line-height: 1;
+}
+#wpadminbar #wp-admin-bar-fw-actions-item-toggle > .ab-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 /*# sourceMappingURL=framework.css.map */

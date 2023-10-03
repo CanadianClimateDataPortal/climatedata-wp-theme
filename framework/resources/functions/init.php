@@ -57,14 +57,14 @@ function fw_global_vars() {
 	
 	$fw['current_query'] = (array) $wp_query->post;
 	
-	$fw['classes'] = array (
-		'page' => get_body_class(),
-		'section' => ['fw-element', 'fw-section'],
-		'container' => ['fw-element', 'fw-container', 'container-fluid'],
-		'row' => ['fw-element', 'fw-row', 'row'],
-		'column' => ['fw-element', 'fw-column', 'col'],
-		'block' => ['fw-element', 'fw-block'],
-	);
+	// $fw['classes'] = array (
+	// 	'page' => get_body_class(),
+	// 	'section' => ['fw-element', 'fw-section'],
+	// 	'container' => ['fw-element', 'fw-container', 'container-fluid'],
+	// 	'row' => ['fw-element', 'fw-row', 'row'],
+	// 	'column' => ['fw-element', 'fw-column', 'col'],
+	// 	'block' => ['fw-element', 'fw-block'],
+	// );
 	
 }
 
@@ -291,6 +291,95 @@ function custom_theme_setup() {
 
 add_action ( 'after_setup_theme', 'custom_theme_setup', 0 );
 
+//
+// ADMIN BAR
+//
+
+add_action ( 'admin_bar_menu', function ( $admin_bar ) {
+	
+	if ( is_admin() ) return;
+
+	$admin_bar->remove_node ( 'customize' );
+	$admin_bar->remove_node ( 'customize-background' );   
+	$admin_bar->remove_node ( 'customize-header' ); 
+	$admin_bar->remove_node ( 'customize-themes' );   
+	$admin_bar->remove_node ( 'customize-widgets' );
+
+	$edit_node = $admin_bar->get_node ( 'edit' );
+	
+	if ( !empty ( $edit_node ) ) {
+		$edit_node->title = 'Edit in Wordpress';
+		$admin_bar->add_node ( $edit_node );
+	}
+	
+	$admin_bar->add_menu ( array (
+		'id'    => 'fw-actions',
+		'title' => '<span class="dashicons dashicons-block-default"></span>Builder'
+	) );
+	
+	$admin_bar->add_menu ( array (
+		'id'    => 'fw-actions-item-toggle',
+		'parent' => 'fw-actions',
+		'title' => 'Toggle <span class="badge text-bg-success">On</span>',
+		'meta'  => array (
+			'class' => 'fw-actions-item toggle-builder'
+		),
+	) );
+	
+	$admin_bar->add_menu ( array (
+		'id'    => 'fw-actions-item-settings',
+		'parent' => 'fw-actions',
+		'title' => 'Page Settings',
+		'href'  => '#fw-modal',
+		'meta'  => array (
+			'class' => 'fw-actions-item fw-modal-content-page'
+		),
+	) );
+	
+	$admin_bar->add_menu ( array (
+		'id'    => 'fw-actions-item-save',
+		'parent' => 'fw-actions',
+		'title' => 'Save Changes',
+		'href'  => '#fw-modal',
+		'meta'  => array (
+			'class' => 'fw-actions-item fw-modal-content-save'
+		),
+	) );
+	
+	$admin_bar->add_menu ( array (
+		'id'    => 'fw-actions-item-new',
+		'parent' => 'fw-actions',
+		'title' => 'New Page',
+		'href'  => '#fw-modal',
+		'meta'  => array (
+			'class' => 'fw-actions-item fw-modal-content-new-post'
+		),
+	) );
+	
+	$admin_bar->add_menu ( array (
+		'id'    => 'fw-actions-item-langs',
+		'title' => '<span class="dashicons dashicons-translation"></span>Language',
+	) );
+	
+	foreach ( get_option ( 'fw_langs') as $code => $lang ) {
+		
+		$admin_bar->add_menu ( array (
+			'id'    => 'fw-actions-item-lang-' . $code ,
+			'parent' => 'fw-actions-item-langs',
+			'title' => $lang['name'],
+			'href'  => translate_permalink ( $GLOBALS['vars']['current_url'], $GLOBALS['fw']['current_query']['ID'], $code ),
+			'meta'  => array (
+				'class' => ''
+			),
+		) );
+		
+	}
+	
+}, 100 );
+
+
+
+//
 function my_acf_init() {
 		acf_update_setting('remove_wp_meta_box', false);
 }

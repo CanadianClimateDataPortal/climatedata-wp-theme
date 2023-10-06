@@ -1171,7 +1171,7 @@
             create_map('station');
             $('#station-process-data').removeAttr("style").hide();
 
-            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=CLIMATE_IDENTIFIER,STATION_NAME,STN_ID,LATITUDE,LONGITUDE', function (data) {
+            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE', function (data) {
 
                 var markers = L.markerClusterGroup();
 

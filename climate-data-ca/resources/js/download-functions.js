@@ -1512,7 +1512,7 @@
             create_map('normals');
             $('#normals-process-data').removeAttr("style").hide();
             
-            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y', function (data) {
+            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=CLIMATE_IDENTIFIER,STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y', function (data) {
                 var markers = L.markerClusterGroup();
                 
                 normals_layer = L.geoJson(data, {

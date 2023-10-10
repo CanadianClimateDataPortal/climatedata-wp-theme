@@ -330,6 +330,33 @@ function distance($lat1, $lon1, $lat2, $lon2)
 
 }
 
+// Return a string of valid javascript (enclosed in <script> tag) that create a Map object including all ACF fields of all variables
+function render_variables_fields($excludes = [])
+{
+    $rendered_variables_fields_script = '<script type="text/javascript">const varData = new Map();';
+
+    $the_wp_query = new WP_Query(array(
+            'post_type' => 'variable',
+            'status' => 'publish',
+            'orderby' => 'menu_order',
+            'order' => 'ASC',
+            'posts_per_page' => -1)
+    );
+
+    if ($the_wp_query->have_posts()) {
+        while ($the_wp_query->have_posts()) {
+            $the_wp_query->the_post();
+            $var_fields = get_fields();
+            $var_name = $var_fields['var_name'];
+            if (!in_array($var_name, $excludes)) {
+                $rendered_variables_fields_script .= "varData.set('$var_name', " . json_encode(get_fields()) . ");\n";
+            }
+        }
+    }
+    $rendered_variables_fields_script .= '</script>';
+    return $rendered_variables_fields_script;
+}
+
 function get_location_by_coords($lat, $lon, $sealevel=false)
 {
 
@@ -700,3 +727,74 @@ function rudr_metabox_content($post) {
   }
   echo '</ul></div>'; // end HTML
 }
+
+/**
+ * Fix Motion.page styling conflict with WPML
+ *
+ * @return void
+ */
+function motion_page_styles() {
+	if ( ! isset( $_GET['page'] ) ) {
+		return;
+	}
+
+	if ( $_GET['page'] !== 'motionpage' ) {
+		return;
+	} ?>
+
+	<style>
+        #mp-main input[type="text"] {
+            color: #ffffff;
+        }
+	</style>
+	<?php
+}
+
+add_action( 'admin_head', 'motion_page_styles' );
+
+/**
+ * Register block pattern categories for interactive CPT.
+ *
+ * @return void
+ */
+function register_interactive_block_pattern_category() {
+	register_block_pattern_category(
+		'interactive-sections',
+		[ 'label' => __( 'Interactive Sections', 'cdc-block-pattern-category' ) ]
+	);
+}
+
+add_action( 'init', 'register_interactive_block_pattern_category' );
+
+/**
+ * Register block patterns for interactive CPT.
+ *
+ * @return void
+ */
+function register_interactive_block_pattern() {
+	register_block_pattern(
+		'interactive-sections/interactive-section-2-cols',
+		[
+			'title'       => __( 'Basic interactive section with 2 columns', 'cdc-block-pattern' ),
+			'description' => __( 'A basic interactive section with 2 columns.', 'cdc-block-pattern' ),
+			'categories'  => [ 'interactive-sections' ],
+			'content'     => '<!-- wp:cover {"overlayColor":"light-green-cyan","isDark":false,"className":"interactive-section full-height"} --><div class="wp-block-cover is-light interactive-section full-height" id="section-ID"><span aria-hidden="true" class="wp-block-cover__background has-light-green-cyan-background-color has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:columns {"className":"overlap-container is-mobile"} --><div class="wp-block-columns overlap-container is-mobile"><!-- wp:column {"className":"overlap-container is-desktop"} --><div class="wp-block-column overlap-container is-desktop"><!-- wp:paragraph --><p id="section-ID-elm-ID">Text on column 1</p><!-- /wp:paragraph --></div><!-- /wp:column --><!-- wp:column {"className":"overlap-container is-desktop"} --><div class="wp-block-column overlap-container is-desktop"><!-- wp:paragraph --><p id="section-ID-elm-ID">Text on column 2</p><!-- /wp:paragraph --></div><!-- /wp:column --></div><!-- /wp:columns --></div></div><!-- /wp:cover -->'
+		]
+	);
+}
+
+add_action( 'init', 'register_interactive_block_pattern' );
+
+if (!function_exists('str_ends_with')) {
+    function str_ends_with($str, $end) {
+        return (@substr_compare($str, $end, -strlen($end))==0);
+    }
+}
+
+function allow_custom_host( $allow, $host, $url ) {
+    if ( str_ends_with($host, 'climatedata.ca') || str_ends_with($host, 'donneesclimatiques.ca') || str_ends_with($host, 'crim.ca')) {
+        $allow = true;
+    }
+    return $allow;
+}
+add_filter( 'http_request_host_is_external', 'allow_custom_host', 10, 3 );

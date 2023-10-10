@@ -703,6 +703,7 @@
             }
             format = $('input[name="download-format"]:checked').val();
             let dataset_name = $('input[name="download-dataset"]:checked').val();
+            let selectedDatasetType = $('input[name="download-dataset-type"]:checked').val();
             let format_extension = format;
 
             if (format == 'netcdf') {
@@ -715,6 +716,7 @@
                     var: selectedVar,
                     month: month,
                     dataset_name: dataset_name,
+                    dataset_type: selectedDatasetType,
                     format: format
                 };
                 Object.assign(request_args, pointsData);
@@ -740,11 +742,11 @@
                 selectedTimeStepCategory = $('#download-frequency').find(':selected').data('timestep');
                 varToProcess = [];
 
-                for (k in varData) {
-                    if (k !== 'all' && varData[k].grid === 'canadagrid' && $.inArray(selectedTimeStepCategory, varData[k].timestep) !== -1) {
+                varData.forEach(function (varDetails, k) {
+                    if (k !== 'all' && varDetails.grid === 'canadagrid' && varDetails.timestep.includes(selectedTimeStepCategory)) {
                         varToProcess.push(k);
                     }
-                }
+                });
 
                 $('body').addClass('spinner-on');
                 var dl_status = 0;
@@ -759,6 +761,7 @@
                             var: varToProcess[i],
                             month: month,
                             dataset_name: dataset_name,
+                            dataset_type: selectedDatasetType,
                             format: format
                         };
                         Object.assign(request_args, pointsData);
@@ -801,89 +804,54 @@
         }
 
 
-        function buildVarDropdown(frequency, currentVar, dataset) {
-            $.ajax({
-                url: '/wp-json/acf/v3/variable/?per_page=10000&orderby=menu_order&order=asc',
-                dataType: 'json',
-                success: function (data) {
+        function buildVarDropdown(frequency, selectedVar, dataset) {
 
-                    varData = [];
+            let currentOptGroup = '';
+            let selectedTimeStepCategory = $('#download-frequency').find(':selected').data('timestep');
+            let selectedDatasetType = $('input[name="download-dataset-type"]:checked').val();
 
-                    currentOptGroup = '';
-                    $.each(data, function (k, v) {
-                        $.each(v, function (sk, sv) {
-                            selectedVar = sv.var_name === currentVar;
+            varData.forEach(function (varDetails) {
+                // in which dataset this variable is available? Default to all if the ACF field is not yet present
+                let dataset_availability = (varDetails.dataset_availability !== undefined ? varDetails.dataset_availability : Object.keys(DATASETS));
 
-                            varData[sv.var_name] = sv;
+                // filter out variables not available for selected timestep and dataset
+                if (varDetails.timestep.includes(selectedTimeStepCategory) &&
+                    dataset_availability.includes(dataset) &&
+                    !(selectedDatasetType == '30ygraph' && varDetails.hasdelta == false)  // all variables without delta doesn't have 30ygraph data files
+                ) {
+                    if (varDetails.variable_type !== 'station_data') {
+                        if (currentOptGroup !== varDetails.variable_type) {
+                            $('#download-variable').append("<optgroup id=optgroup_" + varDetails.variable_type + " label='" + l10n_labels[varDetails.variable_type] + "'>");
+                            currentOptGroup = varDetails.variable_type;
+                        }
 
-                            selectedTimeStepCategory = $('#download-frequency').find(':selected').data('timestep');
-                            // in which dataset this variable is available? Default to all if the ACF field is not yet present
-                            let dataset_availability=(sv.dataset_availability !== undefined ? sv.dataset_availability : Object.keys(DATASETS));
+                        varnewOption = new Option(varDetails.var_title, varDetails.var_name, false, varDetails.var_name === selectedVar);
+                        $('#optgroup_' + varDetails.variable_type).append(varnewOption);
 
-
-                            // filter out variables not available for selected timestep and dataset
-                            if ($.inArray(selectedTimeStepCategory, sv.timestep) !== -1 &&
-                                dataset_availability.includes(dataset)) {
-
-                                if (sv.variable_type !== 'station_data') {
-
-                                    if (sv.var_name) {
-                                        if (currentOptGroup !== sv.variable_type) {
-
-                                            if (sv.variable_type === 'station_data') {
-                                                optgroupSlug = 'station-data';
-                                            } else if (sv.variable_type === 'other_variables') {
-                                                optgroupSlug = 'other';
-                                            } else if (sv.variable_type === 'precipitation') {
-                                                optgroupSlug = 'precipitation';
-                                            } else if (sv.variable_type === 'temperature') {
-                                                optgroupSlug = 'temperature';
-                                            }
-
-                                            $('#download-variable').append("<optgroup id=optgroup_" + sv.variable_type + " label='" + l10n_labels[sv.variable_type] + "' data-slug='" + optgroupSlug + "'>");
-                                            currentOptGroup = sv.variable_type;
-                                        }
-
-
-                                        varnewOption = new Option(sv.var_title, sv.var_name, false, selectedVar);
-                                        $('#optgroup_' + sv.variable_type).append(varnewOption);
-                                    }
-                                }
-
-                            }
-
-
-                        });
-                    });
-                    if (selectedTimeStepCategory !== 'daily' && $('#download-frequency').val() != 'all') {
-                        $('#download-variable').append("<optgroup id=optgroup_misc label='" + l10n_labels['misc'] + "'>");
-                        $('#optgroup_misc').append(new Option(l10n_labels['allbccaq'], 'all', false, false));
-                        varData['all'] = { 'grid': 'canadagrid' };
-                    }
-                },
-                error: function () {
-
-                },
-                complete: function () {
-                    if ($("#download-variable option[value='" + currentVar + "']").length > 0) {
-                        $('#download-variable').val(currentVar);
-                        $('#download-variable').trigger('change');
-                        $('#download-variable').val(currentVar).trigger('select2:select');
-                    } else {
-                        $('#download-variable option:eq(0)').prop('selected', true);
-
-                        $('#download-variable').trigger('change');
-                        currentVar = $('#download-variable').val();
-                        $('#download-variable').val(currentVar).trigger('select2:select');
                     }
 
                 }
-            })
+            });
+            if (selectedTimeStepCategory !== 'daily' && $('#download-frequency').val() != 'all') {
+                $('#download-variable').append("<optgroup id=optgroup_misc label='" + l10n_labels['misc'] + "'>");
+                $('#optgroup_misc').append(new Option(l10n_labels['allbccaq'], 'all', false, false));
+            }
+
+            if ($("#download-variable option[value='" + selectedVar + "']").length > 0) {
+                $('#download-variable').val(selectedVar);
+                $('#download-variable').trigger('change');
+                $('#download-variable').val(selectedVar).trigger('select2:select');
+            } else {
+                $('#download-variable option:eq(0)').prop('selected', true);
+
+                $('#download-variable').trigger('change');
+                selectedVar = $('#download-variable').val();
+                $('#download-variable').val(selectedVar).trigger('select2:select');
+            }
         }
 
 
         $('#download-frequency').on('select2:select', function (e) {
-            console.log('frequency changed');
             currentVar = $("#download-variable").val();
             let selectedDataset = $('input[name="download-dataset"]:checked').val();
             $('#download-variable').empty();
@@ -903,6 +871,8 @@
                 $('#annual-process-wrap').hide();
                 $('#daily-process-wrap').show();
 
+                $('#average-btn-group').hide();
+
             } else {
 
                 // json option
@@ -912,16 +882,18 @@
                 // email field
                 $('#annual-process-wrap').show();
                 $('#daily-process-wrap').hide();
+
+                $('#average-btn-group').show();
             }
         });
 
-        $('#selection-dataset input').on('change', function (e) {
-            console.log('dataset changed');
+        $('#selection-dataset input, #average-btn-group input').on('change', function (e) {
             let currentVar = $("#download-variable").val();
             let frequency = $('#download-frequency').val();
+            let selectedDataset = $('input[name="download-dataset"]:checked').val();
             $('#download-variable').empty();
 
-            buildVarDropdown(frequency, currentVar, e.target.value);
+            buildVarDropdown(frequency, currentVar, selectedDataset);
         });
 
         $('#daily-captcha_code').on('input', function (e) {
@@ -936,9 +908,7 @@
 
         $('#download-variable').on('select2:select', function (e) {
 
-            console.log('download variable chosen');
-
-            curValData = varData[e.target.value];
+            curValData = e.target.value != "all" ? varData.get(e.target.value) : {'grid': 'canadagrid'};
 
             if (curValData === undefined) {
                 $('#download-variable').val(1).trigger('change.select2');
@@ -1542,7 +1512,7 @@
             create_map('normals');
             $('#normals-process-data').removeAttr("style").hide();
             
-            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y', function (data) {
+            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=CLIMATE_IDENTIFIER,STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y', function (data) {
                 var markers = L.markerClusterGroup();
                 
                 normals_layer = L.geoJson(data, {

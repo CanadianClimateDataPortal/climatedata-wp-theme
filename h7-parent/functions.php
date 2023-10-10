@@ -1,10 +1,21 @@
 <?php
 
-function disable_gutenberg ( $is_enabled, $post_type ) {
-	return false;
-}
+/**
+ * Enable Gutenberg on "interactive" custom post
+ * 
+ * @param $use_block_editor bool Whether the post can be edited or not.
+ * @param $post WP_Post The post being checked.
+ *
+ * @return bool
+ */
+function enable_gutenberg_on_interactive_cpt( $use_block_editor, $post ) {
+   if ( 'interactive' === $post->post_type ) {
+      return true;
+   }
 
-add_filter ( 'use_block_editor_for_post_type', 'disable_gutenberg', 10, 2 );
+   return false;
+}
+add_filter( 'use_block_editor_for_post', 'enable_gutenberg_on_interactive_cpt', 10, 2 );
 
 //
 // GLOBAL VARS
@@ -207,7 +218,9 @@ function theme_enqueue() {
   // REGISTER
   
   wp_deregister_script ( 'jquery' );
-  wp_register_script ( 'jquery', 'https://code.jquery.com/jquery-latest.min.js', null, false, true );
+  // wp_register_script ( 'jquery', 'https://code.jquery.com/jquery-latest.min.js', null, false, true );
+  // emergency workaround due to jquery CDN down
+  wp_register_script ( 'jquery',$bower_dir . 'jquery-latest.min.js', null, false, true );
   wp_enqueue_script ( 'jquery' );
   
   

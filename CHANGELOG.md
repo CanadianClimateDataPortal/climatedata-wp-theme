@@ -1,3 +1,9 @@
+2023-07-12.02
+  * Added 30 years option to download page
+
+2023-07-12.01
+  * Added Building Climate Zones variable
+
 2023-05-23.01
   * Added ACF field dataset\_availability in variable details
 

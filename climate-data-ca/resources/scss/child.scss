@@ -1471,6 +1471,7 @@ body.overlay-open[data-overlay-content="video"] {
 // Katex plugin font size override
 .katex-eq {
   font-size: 1.9em;
+  line-height: 1.9em;
 }
 
 //
@@ -1478,3 +1479,11 @@ body.overlay-open[data-overlay-content="video"] {
 //
 
 @import 'responsive';
+
+/* Gutenberg styles */
+
+@import 'blocks/gutenberg';
+
+/* Interactive CPT */
+
+@import 'pages/interactive';

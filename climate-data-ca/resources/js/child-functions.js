@@ -82,6 +82,7 @@ const DATASETS = {
                 }
             },
         ],
+        'grid': 'canadagrid',
         'finch_name' : 'candcs-u5',
         'model_lists': [
             {'name': 'pcic12', 'label': 'PCIC12 (Ensemble)'},
@@ -108,9 +109,27 @@ const DATASETS = {
                 }
             },
         ],
+        'grid': 'canadagrid',
         'finch_name' : 'candcs-u6',
         'model_lists': [
             {'name': '26models', 'label': 'All models'}]
+    },
+    "humidex": {
+        'scenarios': [
+            {
+                'name': 'ssp126', 'label': 'SSP1-2.6', 'chart_color': '#00F'
+            },
+            {
+                'name': 'ssp245', 'label': 'SSP2-4.5', 'chart_color': '#00640c'
+            },
+            {
+                'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#F00'
+            },
+        ],
+        'grid': 'era5landgrid',
+        'finch_name': 'humidex-daily',
+        'model_lists': [
+            {'name': 'humidex_models', 'label': 'All models'}]
     }
 }
 
@@ -258,6 +277,7 @@ function unit_localize(str) {
         str = str.replace('Days', 'Jours');
         str = str.replace('days', 'jours');
         str = str.replace(' to ', ' à ');
+        str = str.replace('Climate Zone', 'Zone climatique');
     }
 
     return str;
@@ -372,11 +392,25 @@ function setDataLayerForChartData(chartDataFormat, chartData, query) {
     });
 }
 
+function formatDecade(timestampMilliseconds, period){
+    let year = new Date(timestampMilliseconds).getFullYear();
+    let decade = year - year % 10 + 1;
+    if (decade > 2071) {
+        decade = 2071;
+    }
+    if (decade < 1951) {
+        decade = 1951;
+    }
+    return [decade, Date.UTC(decade, month_number_lut[period] - 1, 1)];
+
+}
+
 function displayChartData(data, varDetails, download_url, query, container) {
     let chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
     let chartDecimals = varDetails['decimals'];
     let scenarios = DATASETS[query['dataset']].scenarios;
     let pointFormatter, labelFormatter;
+    let parentPlaceholder = $(container).parents('.var-chart-container, .overlay-content');
 
     switch (varDetails.units.value) {
         case 'doy':
@@ -540,12 +574,29 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
             series: chartSeries
         });
+
         chart.query = $.extend(true, {}, query);  // creates a deep copy of the object to avoid side-effects
+
+        if (query.building_climate_zones) {
+            const colorTransparency = 0.30;
+            
+            chart.update({
+                yAxis: {
+                    gridLineWidth: 0
+                }
+            });
+            chart.yAxis[0].addPlotBand({from:2000, to:2999, color:'rgba(201, 0, 0, ' + colorTransparency.toString() + ')', label:{text: unit_localize("Climate Zone 4")}});
+            chart.yAxis[0].addPlotBand({from:3000, to:3999, color:'rgba(250, 238, 2, ' + colorTransparency.toString() + ')', label:{text: unit_localize("Climate Zone 5")}});
+            chart.yAxis[0].addPlotBand({from:4000, to:4999, color:'rgba(0, 201, 54, ' + colorTransparency.toString() + ')', label:{text: unit_localize("Climate Zone 6")}});
+            chart.yAxis[0].addPlotBand({from:5000, to:5999, color:'rgba(0, 131, 201, ' + colorTransparency.toString() + ')', label:{text: unit_localize("Climate Zone 7A")}});
+            chart.yAxis[0].addPlotBand({from:6000, to:6999, color:'rgba(20, 0, 201, ' + colorTransparency.toString() + ')', label:{text: unit_localize("Climate Zone 7B")}});
+            chart.yAxis[0].addPlotBand({from:7000, to:99999, color:'rgba(127, 0, 201, ' + colorTransparency.toString() + ')', label:{text: unit_localize("Climate Zone 8")}});
+        }
+
         chart.download_url = download_url;
         chart.varDetails = varDetails;
 
-        $('body').on('change', 'input[type=radio][name=chartoption-' + query['var'] + ']', function () {
-
+        parentPlaceholder.find('.chart-option').on('change', function() {
             if ($(this).prop('checked') == true) {
 
                 let chart = $(this).parents('.var-chart-container, .overlay-content').find('.var-chart').highcharts();
@@ -600,12 +651,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
                                 formatter: function (tooltip) {
 
-                                    let year = new Date(this.x).getFullYear();
-                                    let decade = year - year % 10 + 1;
-                                    if (decade > 2071) {
-                                        decade = 2071;
-                                    }
-                                    let decade_ms = Date.UTC(decade, month_number_lut[query['mora']] - 1, 1);
+                                    let [decade, decade_ms] = formatDecade(this.x, query['mora']);
                                     chart.xAxis[0].removePlotBand('30y-plot-band');
                                     chart.xAxis[0].addPlotBand({
                                         from: Date.UTC(decade, 0, 1),
@@ -618,6 +664,13 @@ function displayChartData(data, varDetails, download_url, query, container) {
                                     let val1, val2;
 
                                     let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + "</span><br/>"];
+
+                                    if (decade_ms in data['30y_observations']) {
+                                        this.value = data['30y_observations'][decade_ms][0];
+                                        val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                        tip.push("<span style=\"color:#F47D23\">●</span> " + chart_labels.observation + " <b>"
+                                            + val1 + "</b><br/>");
+                                    }
 
                                     scenarios.forEach(function (scenario) {
                                         this.value = data['30y_{0}_median'.format(scenario.name)][decade_ms][0];
@@ -668,12 +721,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
 
                                 formatter: function (tooltip) {
 
-                                    let year = new Date(this.x).getFullYear();
-                                    let decade = year - year % 10 + 1;
-                                    if (decade > 2071) {
-                                        decade = 2071;
-                                    }
-                                    let decade_ms = Date.UTC(decade, month_number_lut[query['mora']] - 1, 1);
+                                    let [decade, decade_ms] = formatDecade(this.x, query['mora']);
                                     chart.xAxis[0].removePlotBand('30y-plot-band');
                                     chart.xAxis[0].addPlotBand({
                                         from: Date.UTC(decade, 0, 1),
@@ -728,17 +776,11 @@ function displayChartData(data, varDetails, download_url, query, container) {
         });
 
         if (query['delta'] == 'true') {
-
-            // if delta
-            // find the '30 year changes' radio
-            // and trigger click
-
-            $('body').find('#chartoption3-' + query['var']).prop('checked', true).trigger('change')
-
+            // if delta: find the '30 year changes' radio and trigger click
+            parentPlaceholder.find('.chart-option[value="delta"]').prop('checked', true).trigger('change');
         } else {
-
             // 30y averages is by default, so trigger the change event on load
-            $('#chartoption2-' + query['var']).trigger('change');
+            parentPlaceholder.find('.chart-option[value="30y"]').trigger('change');
 
         }
     }
@@ -1393,12 +1435,13 @@ function getIDFLinks(station_id, target, css_class) {
         // global handler for chart export CSV
         $('body').on('click', '.chart-export-data', function (e) {
             e.preventDefault();
-            let chart = $(this).parents('.var-chart-container, .overlay-content').find('.var-chart').highcharts()
+            let parentPlaceholder = $(this).parents('.var-chart-container, .overlay-content');
+            let chart = parentPlaceholder.find('.var-chart').highcharts();
 
             switch ($(this).attr('data-type')) {
                 case 'csv':
                     setDataLayerForChartData('csv', chart, chart.query);
-                    switch($('input[name=chartoption-'+ chart.query.var + ']:checked').val()) {
+                    switch(parentPlaceholder.find('.chart-option:checked').val()) {
                         case '30y':
                         case 'delta':
                             window.location.href = chart.download_url;
@@ -1436,8 +1479,11 @@ function getIDFLinks(station_id, target, css_class) {
             });
         });
 
+
+
         $('body').on('change', 'input:radio.chart-dataset', function (e) {
-            let container = $(this).parents('.var-chart-container, .overlay-content').find('.var-chart');
+            let parentPlaceholder = $(this).parents('.var-chart-container, .overlay-content');
+            let container = parentPlaceholder.find('.var-chart');
             let oldchart = container.highcharts();
             let query = oldchart.query;
             let varDetails = oldchart.varDetails;
@@ -1445,6 +1491,10 @@ function getIDFLinks(station_id, target, css_class) {
 
             query.dataset = dataset_name;
             let download_url, chart_url;
+
+            if (query.var == "building_climate_zones") {
+                query.var = "hddheat_18";
+            }
 
             if (typeof query.sector === 'undefined') {
                 download_url = data_url + '/download-30y/' + query.lat + '/' + query.lon + '/' + query.var + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
@@ -1461,7 +1511,7 @@ function getIDFLinks(station_id, target, css_class) {
             $.getJSON(chart_url,
                 function (data) {
                     displayChartData(data, varDetails, download_url, query, container[0]);
-                    $('input[type=radio][name=chartoption-' + query.var + ']:checked').trigger('change');
+                    parentPlaceholder.find('.chart-option:checked').trigger('change');
                 });
 
 

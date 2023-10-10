@@ -53,6 +53,8 @@ add_action('wp_enqueue_scripts', 'tpl_enqueue');
 
 get_header();
 
+echo render_variables_fields(['slr']);
+
 if (have_posts()) : while (have_posts()) : the_post();
 
     $post = get_post($GLOBALS['vars']['current_data']['var_name']);

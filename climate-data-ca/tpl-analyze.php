@@ -107,6 +107,12 @@
                               <label class="form-check-label" for="analyze-dataset-cmip6">CMIP6 (CanDCS-U6)</label>
                           </div>
                       </div>
+                        <div class="input-row form-check">
+                            <div class="input-item">
+                                <input class="form-check-input add-to-object" type="radio" name="dataset" id="analyze-dataset-humidex" value="humidex">
+                                <label class="form-check-label" for="analyze-dataset-humidex">Humidex (CMIP6)</label>
+                            </div>
+                        </div>
                     </div>
                   </div>
                 </div>
@@ -168,6 +174,7 @@
                   <div class="accordion-content-scroll">
                     <div class="accordion-content-inner">
                       <div class="field validate-input type-radio">
+                          <div id="analyze-variables">
                         <?php
 
                           if ( have_rows ( 'analyze_vars' ) ) {
@@ -233,6 +240,20 @@
                           }
 
                         ?>
+                      </div>
+                          <div id="analyze-variables-humidex">
+                              <div class="input-row form-check input-variable" data-frequencies=''
+                                   data-content='[{"text":"<?php _e('This analysis returns the number of days with daily maximum Humidex (HXMax) >', 'cdc'); ?>","type":"text"},{"id":"threshold","units":"","decimals":"0","min":"","max":"","type":"input"}]'>
+                                  <div class="input-item">
+                                      <input class="form-check-input" type="radio" name="analyze-var"
+                                             id="analyze-var-hxmax_days_above" value="hxmax_days_above">
+                                      <label class="form-check-label" for="analyze-var-hxmax_days_above"><?php _e('Days above HXMax', 'cdc');?></label>
+                                  </div>
+
+                              </div>
+
+                          </div>
+
                       </div>
                     </div>
                   </div>

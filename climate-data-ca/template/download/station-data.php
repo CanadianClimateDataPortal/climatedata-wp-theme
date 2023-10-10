@@ -18,7 +18,7 @@
           $result = mysqli_query($con, $query) or die(mysqli_error($con) . "[" . $query . "]");
 
           while ($row = mysqli_fetch_array($result)) {
-            echo '<option value="' . $row['stn_id'] . '">' . $row['station_name'] . '</option>';
+            echo '<option value="' . $row['stn_id'] . '">' . $row['station_name'] . "</option>\n";
           }
 
         ?>

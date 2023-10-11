@@ -39,6 +39,7 @@
         var default_inputs = {
             'lat': '',
             'lon': '',
+            'analyze-location': '',
             'shape': '',
             'average': '',
             'start_date': '',
@@ -50,6 +51,13 @@
             'freq': '',
             'data_validation': 'warn',
             'output_format': ''
+        }
+
+        var default_url_inputs = {
+            'analyze-location': '',
+            'analyze-var': '',
+            'zoom': '',
+            'center': ''
         }
 
         var form_inputs = $.extend(true, {}, default_inputs)
@@ -250,7 +258,7 @@
         // ANALYZE
         //
 
-        function createGridLayer(gridName, container) {
+        function createGridLayer(gridName, container, compressedPoints) {
             vectorTileOptions.vectorTileLayerStyles[gridName] = gridStyleFunc;
             pbfLayer = L.vectorGrid.protobuf(hosturl + '/geoserver/gwc/service/tms/1.0.0/CDC:' + gridName + '@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf', vectorTileOptions).on('click', function (e) {
                 highlightGridFeature = e.layer.properties.gid;
@@ -307,7 +315,128 @@
 
             }).addTo(container);
 
+            if(compressedPoints != undefined) {
+                let getGidsFromCompressedPointsURL = DATA_URL + "/get-gids/" + compressedPoints + "?gridname=canadagrid";
+                fetch(getGidsFromCompressedPointsURL, {
+                    method: "GET",
+                    mode: "cors",
+                }).then((response) => response.json())
+                    .then((result) => {
+                        let latLonArray = decompressLatLonPointsStringToList(compressedPoints);
+
+                        for (var i in result) {
+                            latLonArray[i]['id'] = result[i];
+                        }
+
+                        latLonArray.forEach(function (p) {
+                            selectedPoints[p.id] = L.latLng(p.point[0], p.point[1]);
+                            map_grids[p.id] = L.latLng(p.point[0], p.point[1]);
+
+                            selectedGrids.push(p.id);
+
+                            pbfLayer.setFeatureStyle(p.id, {
+                                weight: 1,
+                                color: '#F00',
+                                opacity: 1,
+                                fill: true,
+                                radius: 4,
+                                fillOpacity: 0.1
+                            });
+                        });
+                        $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length);
+
+                    })
+            }
+
             pbfLayer.gridName = gridName;
+        }
+
+        function loadFromURL() {
+            let params = window.location.search;
+
+            params = params.split('?').pop(); // Remove ? at beginning
+            params = params.split('&'); // Split into a key=value list
+
+            // Parse the params list into a {key:value} dict
+            let paramsDict = {};
+            for (var p of params) {
+                let keyValue = p.split('=');
+                let key = keyValue[0];
+                let value = decodeURIComponent(keyValue[1]);
+                paramsDict[key] = value;
+            }
+
+            $("#ui-id-3").click();
+            setTimeout(function () {
+                $(`input[value=${paramsDict["dataset"]}]`).click();
+                $("#ui-id-5").click();
+            }, 500);
+
+            setTimeout(function () {
+                $(`input[id='analyze-location-${paramsDict["analyze-location"]}']`).click();
+                $("#btn-activate-map").click();
+                $("#ui-id-7").click();
+            }, 500);
+
+            setTimeout(function () {
+                $(`input[id='analyze-var-${paramsDict["analyze-var"]}']`).click();
+                let vals = ["thresh", "thresh_tasmax", "thresh_tasmin", "window", "op"];
+                for(let k in vals) {
+                    let v = vals[k];
+                    if(paramsDict.hasOwnProperty(v)) {
+                        $(`input[name=${v}]`).val(paramsDict[v]);
+                    }
+                }
+                $("#ui-id-9").click();
+            }, 500);
+
+            setTimeout(function () {
+                $("select[id='analyze-timeframe-start']").val(paramsDict['start_date']).change();
+                $("select[id='analyze-timeframe-end']").val(paramsDict['end_date']).change();
+                $("#ui-id-11").click();
+            }, 500);
+
+            setTimeout(function () {
+                $(`input[id='analyze-model-${paramsDict["models"]}']`).click();
+                let ensemblePercentiles = paramsDict['ensemble_percentiles'].length > 0 ? paramsDict['ensemble_percentiles'].split(','): ["10", "50", "90"];
+                for(let i=0; i< 100; ) {
+                    let _i = "" + i;
+                    if($(`input[id='analyze-percentile-${_i}']`).length) {
+                        if ($(`input[id='analyze-percentile-${_i}']`).is(':checked')) {
+                            if (! ensemblePercentiles.includes(_i))
+                                $(`input[id='analyze-percentile-${_i}']`).click();
+                        } else {
+                            if (ensemblePercentiles.includes(_i))
+                                $(`input[id='analyze-percentile-${_i}']`).click();
+                        }
+                    }
+                    i+=5;
+                }
+
+                let scenarios = paramsDict['scenario'].split(',');
+                let dataset_info = DATASETS[paramsDict["dataset"]];
+
+                dataset_info.scenarios.forEach(function(scenario) {
+                    if($(`input[id='analyze-scenarios-${scenario.name}']`).length) {
+                        if ($(`input[id='analyze-scenarios-${scenario.name}']`).is(':checked')) {
+                            if (! scenarios.includes(scenario.name))
+                                $(`input[id='analyze-scenarios-${scenario.name}']`).click();
+                        } else {
+                            if (scenarios.includes(scenario.name))
+                                $(`input[id='analyze-scenarios-${scenario.name}']`).click();
+                        }
+                    }
+                });
+                $(`input[id='analyze-freq-${paramsDict["freq"].toLowerCase().replace("-", "")}']`).click();
+
+                $(`input[id='analyze-format-${paramsDict["output_format"]}']`).click();
+                if(paramsDict["output_format"] === "csv")
+                    $("input[id='analyze-decimals']").val(paramsDict['csv_precision']);
+
+            }, 500);
+
+
+            createGridLayer('canadagrid', maps['analyze'], paramsDict['compressedPoints']);
         }
 
         function analyze_init() {
@@ -359,9 +488,11 @@
 
             });
 
-            createGridLayer('canadagrid', maps['analyze']);
+
             validate_steps();
             validate_inputs();
+
+            loadFromURL();
 
         } // analyze_init
 
@@ -1970,178 +2101,210 @@
             }
         }
 
+        $("#shareableURL").click(function() {
+            sharedUrl = $("a[id='shareableURL']").attr('data-share-url');
+            navigator.clipboard.writeText(sharedUrl);
+            let label = $("#lnk-on").text();
+            $("#lnk-on").text($("#lnk-off").text());
+            setTimeout(function() {
+                $("#lnk-on").text(label)
+            }, 5000);
+        });
+
+
+
         // INPUTS
 
         function validate_inputs() {
+            let url_inputs = Object.assign({}, default_inputs, default_url_inputs);
 
             if (current_tab == 'analyze-projections') {
                 let sectorSelect = $('input[name="analyze-location"]:checked').val();
                 // PROJECTIONS
                 var is_valid = true
 
-            form_inputs = $.extend(true, {}, default_inputs)
+                form_inputs = $.extend(true, {}, default_inputs);
 
-            if ($('#analyze-format-csv').prop('checked') == true) {
-                $('#analyze-field-decimals').show()
-            } else {
-                $('#analyze-field-decimals').hide().find(':input').val(2)
-            }
-
-            // CHECK INPUTS THAT NEED TO BE ADDED
-            // TO THE REQUEST OBJECT
-
-            // build the form_inputs object
-
-            $('#analyze-form-inputs .add-to-object').each(function () {
-
-                var this_name = $(this).attr('name'),
-                    this_type = $(this).attr('type'),
-                    this_has_val = false,
-                    this_val = $(this).val()
-
-                if ($(this).is('select')) {
-                    this_type = 'select'
+                if ($('#analyze-format-csv').prop('checked') == true) {
+                    $('#analyze-field-decimals').show()
+                } else {
+                    $('#analyze-field-decimals').hide().find(':input').val(2)
                 }
 
-                //console.log('checking ' + this_name, this_type, this_val)
+                // CHECK INPUTS THAT NEED TO BE ADDED
+                // TO THE REQUEST OBJECT
 
-                switch (this_type) {
-                    case 'radio':
-                        if ($(this).prop('checked') == true) {
-                            this_has_val = true
-                        }
-                        break
+                // build the form_inputs object
 
-                    case 'checkbox':
-                        if ($(this).prop('checked') == true) {
-                            this_has_val = true
-                        }
-                        break
+                $('#analyze-form-inputs .add-to-object').each(function () {
 
-                    case 'number' :
-                        let this_min = parseInt($(this).attr('min')),
-                            this_max = parseInt($(this).attr('max'));
-                        this_val = parseInt($(this).val())
+                    var this_name = $(this).attr('name'),
+                        this_type = $(this).attr('type'),
+                        this_has_val = false,
+                        this_val = $(this).val()
 
-                        if (!isNaN(this_val) && this_val >= this_min && this_val <= this_max) {
-                            this_has_val = true;
-                        } else {
-                            is_valid = false;
-                        }
-                        break;
+                    if ($(this).is('select')) {
+                        this_type = 'select'
+                    }
 
-                    default:
-                        if ($(this).val() != '') {
-                            this_has_val = true
-                        }
-                        break
+                    //console.log('checking ' + this_name, this_type, this_val)
 
-                }
+                    switch (this_type) {
+                        case 'radio':
+                            if ($(this).prop('checked') == true) {
+                                this_has_val = true
+                            }
+                            break
 
-                if (this_has_val == true) {
+                        case 'checkbox':
+                            if ($(this).prop('checked') == true) {
+                                this_has_val = true
+                            }
+                            break
 
-                    if (this_type == 'checkbox') {
+                        case 'number' :
+                            let this_min = parseInt($(this).attr('min')),
+                                this_max = parseInt($(this).attr('max'));
+                            this_val = parseInt($(this).val())
 
-                        if (form_inputs[this_name] != '') {
-                            form_inputs[this_name] += ',' + this_val
+                            if (!isNaN(this_val) && this_val >= this_min && this_val <= this_max) {
+                                this_has_val = true;
+                            } else {
+                                is_valid = false;
+                            }
+                            break;
+
+                        default:
+                            if ($(this).val() != '') {
+                                this_has_val = true
+                            }
+                            break
+
+                    }
+
+                    if (this_has_val == true) {
+
+                        if (this_type == 'checkbox') {
+
+                            if (form_inputs[this_name] != '') {
+                                form_inputs[this_name] += ',' + this_val
+                                url_inputs[this_name] += ',' + this_val
+
+                            } else {
+                                form_inputs[this_name] = this_val
+                                url_inputs[this_name] = this_val
+                            }
+
                         } else {
                             form_inputs[this_name] = this_val
+                            url_inputs[this_name] = this_val
                         }
-
-                    } else {
-
-                        form_inputs[this_name] = this_val
-
                     }
 
-                }
+                })
 
-            })
+                // cycle through the object and check for empty values
 
-            // cycle through the object and check for empty values
+                for (var key in form_inputs) {
+                    let isBySector = form_inputs["shape"] != '' && ( key == "lat" || key == "lon");
+                    let isByGrid = key == "shape" && form_inputs["lat"] != '' && form_inputs["lon"] != '';
 
-            for (var key in form_inputs) {
-                let isBySector = form_inputs["shape"] != '' && ( key == "lat" || key == "lon");
-                let isByGrid = key == "shape" && form_inputs["lat"] != '' && form_inputs["lon"] != '';
+                    if (isBySector || isByGrid){
+                        continue;
+                    }
 
-                if (isBySector || isByGrid){
-                    continue;
-                }
-
-                if (form_inputs[key] === '') {
-                    is_valid = false
-                    //console.log(key)
-                }
-            }
-
-            // CHECK FOR EMPTY VALUES
-            // IN THE VAR DETAIL OVERLAY FORM
-
-
-            form_thresholds = $.extend(true, {}, default_thresholds)
-
-            var thresholds_have_val = true
-
-            // build the form_thresholds object
-
-            $('#analyze-detail').find(':input').each(function () {
-
-                var this_name = $(this).attr('name');
-                if ($(this).attr('data-optional') == undefined ||
-                    $(this).attr('data-optional') == true || $(this).val() != '') {
-
-                    form_thresholds[this_name] = $(this).val();
-
-                    if ($(this).val() != '' && $(this).attr('data-units') !== undefined && $(this).attr('data-units') != '') {
-                        form_thresholds[this_name] += ' ' + $(this).attr('data-units');
+                    if (form_inputs[key] === '') {
+                        is_valid = false
+                        //console.log(key)
                     }
                 }
-            });
 
-            // cycle through the object and check for empty values
+                // CHECK FOR EMPTY VALUES
+                // IN THE VAR DETAIL OVERLAY FORM
 
-            for (var key in form_thresholds) {
-                if (form_thresholds[key] == '') {
-                    is_valid = false
-                    thresholds_have_val = false
+                form_thresholds = $.extend(true, {}, default_thresholds)
+
+                var thresholds_have_val = true
+
+                // build the form_thresholds object
+
+                $('#analyze-detail').find(':input').each(function () {
+
+                    var this_name = $(this).attr('name');
+                    if ($(this).attr('data-optional') == undefined ||
+                        $(this).attr('data-optional') == true || $(this).val() != '') {
+
+                        form_thresholds[this_name] = $(this).val();
+                        url_inputs[this_name] = $(this).val();
+
+                        if ($(this).val() != '' && $(this).attr('data-units') !== undefined && $(this).attr('data-units') != '') {
+                            form_thresholds[this_name] += ' ' + $(this).attr('data-units');
+                        }
+                    }
+                });
+
+                // cycle through the object and check for empty values
+
+                for (var key in form_thresholds) {
+                    if (form_thresholds[key] == '') {
+                        is_valid = false
+                        thresholds_have_val = false
+                    }
                 }
-            }
 
-            if (thresholds_have_val == true) {
-                $('#analyze-breadcrumb .step[data-step="3"] .validation-tooltip').hide()
-            } else {
-                $('#analyze-breadcrumb .step[data-step="3"] .validation-tooltip').show()
-            }
+                if (thresholds_have_val == true) {
+                    $('#analyze-breadcrumb .step[data-step="3"] .validation-tooltip').hide()
+                } else {
+                    $('#analyze-breadcrumb .step[data-step="3"] .validation-tooltip').show()
+                }
 
 
-            switch($('input[name="analyze-location"]:checked').val()) {
-                case 'grid':
-                    // make sure lat/lon has a value
-                    if ($('#lat').val() == '' || $('#lon').val() == '') {
-                        $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').show();
-                        $('#clear-grids').hide();
-                    } else {
+                switch($('input[name="analyze-location"]:checked').val()) {
+                    case 'grid':
+                        // make sure lat/lon has a value
+                        if ($('#lat').val() == '' || $('#lon').val() == '') {
+                            $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').show();
+                            $('#clear-grids').hide();
+                        } else {
+                            $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
+                            $('#clear-grids').show();
+                        }
+                        break;
+                    case undefined:
                         $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
-                        $('#clear-grids').show();
+                        $('#clear-grids').hide();
+                        break;
+                    default:
+                }
+
+                // if everything is valid,
+                // show the captcha/email/submit button
+
+                if (is_valid == true) {
+                    $('#analyze-submit').slideDown();
+                    $('#copy-link').slideDown();
+                } else {
+                    $('#analyze-submit').slideUp();
+                    $('#copy-link').slideUp();
+                }
+
+                if(is_valid) {
+                    if(url_inputs['lat'].length > 0) {
+                        let latArray = url_inputs['lat'].split(',');
+                        let lonArray = url_inputs['lon'].split(',');
+                        url_inputs["compressedPoints"] = getEncodedPoints(latArray, lonArray);
+                        delete url_inputs['lat'];
+                        delete url_inputs['lon'];
                     }
-                    break;
-                case undefined:
-                    $('#analyze-breadcrumb .step[data-step="2"] .validation-tooltip').hide();
-                    $('#clear-grids').hide();
-                    break;
-                default:
-             }
 
-            // if everything is valid,
-            // show the captcha/email/submit button
+                    let shared_url = "";
+                    for (const [key, value] of Object.entries(url_inputs))
+                        shared_url += (shared_url.length === 0 ? "?" : "&") + key + "=" + value;
+                    shared_url = document.URL.split('?')[0] + shared_url;
+                    $("a[id='shareableURL']").attr('data-share-url', shared_url);
+                }
 
-            if (is_valid == true) {
-                $('#analyze-submit').slideDown()
-            } else {
-                $('#analyze-submit').slideUp()
-            }
-
-            return is_valid;
+                return is_valid;
 
             } else if (current_tab == 'analyze-stations') {
 
@@ -2223,7 +2386,7 @@
                 for (var key in stations_form_inputs) {
                     if (stations_form_inputs[key] == '') {
                         is_valid = false;
-                        console.log(key)
+                        //console.log(key)
                     }
                 }
 
@@ -2291,6 +2454,7 @@
         }
 
         //
+
 
         function validate_submit() {
 

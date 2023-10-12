@@ -83,6 +83,11 @@
               <input class="add-to-object" type="hidden" name="shape" id="shape" value="">
               <input class="add-to-object" type="hidden" name="average" id="average" value="">
 
+            <input type="hidden" id="location" value="grid">
+            <input class="add-to-object" type="hidden" id="zoom" name="zoom" value="7">
+            <input class="add-to-object" type="hidden" id="center" name="center" value="62.51231793838694;-98.5693359375">
+
+
           <div id="analyze-steps" class="analyze-steps">
                 <div class="accordion-head" data-step="1">
                   <h5 class="d-flex align-items-center justify-content-between all-caps">

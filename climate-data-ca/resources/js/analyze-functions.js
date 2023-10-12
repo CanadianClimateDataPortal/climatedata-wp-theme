@@ -258,6 +258,23 @@
         // ANALYZE
         //
 
+        function initMap(map_id) {
+            $(`input[type="hidden"][id='zoom']`).val("4");
+            $(`input[type="hidden"][id='center']`).val("62.51231793838694;-98.5693359375");
+
+            centerMap(map_id);
+        }
+
+        function centerMap(map_id) {
+
+            let z = parseInt($(`input[type="hidden"][id='zoom']`).val());
+            let c = $(`input[type="hidden"][id='center']`).val().split(';');
+
+            console.log("centering... " + z + " " + c);
+
+            maps[map_id].setView([parseFloat(c[0]), parseFloat(c[1])], z);
+        }
+
         function createGridLayer(gridName, container, compressedPoints) {
             vectorTileOptions.vectorTileLayerStyles[gridName] = gridStyleFunc;
             pbfLayer = L.vectorGrid.protobuf(hosturl + '/geoserver/gwc/service/tms/1.0.0/CDC:' + gridName + '@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf', vectorTileOptions).on('click', function (e) {
@@ -315,7 +332,7 @@
 
             }).addTo(container);
 
-            if(compressedPoints != undefined) {
+            if(compressedPoints.length > 0) {
                 let getGidsFromCompressedPointsURL = DATA_URL + "/get-gids/" + compressedPoints + "?gridname=canadagrid";
                 fetch(getGidsFromCompressedPointsURL, {
                     method: "GET",
@@ -323,12 +340,16 @@
                 }).then((response) => response.json())
                     .then((result) => {
                         let latLonArray = decompressLatLonPointsStringToList(compressedPoints);
+                        let lats = [];
+                        let lons = [];
 
                         for (var i in result) {
                             latLonArray[i]['id'] = result[i];
                         }
 
                         latLonArray.forEach(function (p) {
+                            lats.push(p.point[0]);
+                            lons.push(p.point[1]);
                             selectedPoints[p.id] = L.latLng(p.point[0], p.point[1]);
                             map_grids[p.id] = L.latLng(p.point[0], p.point[1]);
 
@@ -343,6 +364,9 @@
                                 fillOpacity: 0.1
                             });
                         });
+                        $('#lat').val(lats.join(","));
+                        $('#lon').val(lons.join(","));
+
                         $('#analyze-breadcrumb').find('.grid-count').text(selectedGrids.length);
 
                     })
@@ -356,6 +380,10 @@
 
             params = params.split('?').pop(); // Remove ? at beginning
             params = params.split('&'); // Split into a key=value list
+
+            if(params.length < 2) {
+                return;
+            }
 
             // Parse the params list into a {key:value} dict
             let paramsDict = {};
@@ -374,13 +402,40 @@
 
             setTimeout(function () {
                 $(`input[id='analyze-location-${paramsDict["analyze-location"]}']`).click();
+                $(`input[type="hidden"][id="location"]`).val(paramsDict["analyze-location"]);
                 $("#btn-activate-map").click();
+
+                //ChangeLayers(paramsDict["analyze-location"]);
+                $('#average').val(paramsDict["average"]);
+
+                if(paramsDict["analyze-location"] === 'grid') {
+                    // let latLonArray = decompressLatLonPointsStringToList(paramsDict['compressedPoints']);
+                    // let lats = [];
+                    // let lons = [];
+                    // latLonArray.forEach(function (p) {
+                    //     lats.push(p.point[0]);
+                    //     lons.push(p.point[1]);
+                    // });
+                    //
+
+                    createGridLayer('canadagrid', maps['analyze'], paramsDict['compressedPoints']);
+                } else {
+                    $('#shape').val(paramsDict["shape"]);
+                    InitSectorProtobuf(paramsDict["analyze-location"], paramsDict["shape"]);
+                }
+
+                $(`input[type="hidden"][id='zoom']`).val(paramsDict["zoom"]);
+                $(`input[type="hidden"][id='center']`).val(paramsDict["center"]);
+
+                centerMap("analyze");
+
+
                 $("#ui-id-7").click();
             }, 500);
 
             setTimeout(function () {
                 $(`input[id='analyze-var-${paramsDict["analyze-var"]}']`).click();
-                let vals = ["thresh", "thresh_tasmax", "thresh_tasmin", "window", "op"];
+                let vals = ["thresh", "thresh_tasmax", "thresh_tasmin", "window", "op", "sum_thresh", "after_date"];
                 for(let k in vals) {
                     let v = vals[k];
                     if(paramsDict.hasOwnProperty(v)) {
@@ -435,8 +490,6 @@
 
             }, 500);
 
-
-            createGridLayer('canadagrid', maps['analyze'], paramsDict['compressedPoints']);
         }
 
         function analyze_init() {
@@ -488,9 +541,25 @@
 
             });
 
+            createGridLayer('canadagrid', maps['analyze'], "");
+
+            maps['analyze'].on('zoomend', ({ target }) => {
+                let c = target.getCenter();
+                $(`input[type="hidden"][id='zoom']`).val(target.getZoom());
+                $(`input[type="hidden"][id='center']`).val(c['lat'] + ";" + c['lng']);
+                validate_inputs();
+            });
+
+            maps['analyze'].on('click', ({ target }) => {
+                let c = target.getCenter();
+                $(`input[type="hidden"][id='zoom']`).val(target.getZoom());
+                $(`input[type="hidden"][id='center']`).val(c['lat'] + ";" + c['lng']);
+                validate_inputs();
+            });
 
             validate_steps();
             validate_inputs();
+
 
             loadFromURL();
 
@@ -633,22 +702,25 @@
 
         $('input[name="analyze-location"]').on('change', function (e) {
             let itemInput = e.target.value;
-
             ChangeLayers(itemInput);
 
             if(itemInput != 'grid'){
+                if($(`input[type="hidden"][id="location"]`).val() === "grid") initMap('analyze');
                 $('#average').val('True');
-                InitSectorProtobuf(itemInput);
+                InitSectorProtobuf(itemInput, -1);
 
                 locations_type = itemInput;
 
                 if (maps['analyze'].hasLayer(analyzeLayer)) {
                     maps['analyze'].removeLayer(analyzeLayer);
-
                 }
+
             } else {
+                if($(`input[type="hidden"][id="location"]`).val() !== "grid") initMap('analyze');
                 $('#average').val('False');
             }
+
+            $(`input[type="hidden"][id="location"]`).val(itemInput);
 
             validate_steps();
             validate_inputs();
@@ -892,7 +964,7 @@
             }
         }
 
-        function InitSectorProtobuf(sector) {
+        function InitSectorProtobuf(sector, shape) {
             sector_select_by_id  = undefined;
             DeselectAllGridCell();
             selectedGrids = [];
@@ -928,8 +1000,15 @@
                                 bounds: canadaBounds,
                                 maxZoom: 12,
                                 minZoom: 3,
-                                vectorTileLayerStyles: layerStyles
+                                vectorTileLayerStyles: layerStyles,
+
                             }
+                        ).on('load', function (e) {
+                            if(shape !== -1) {
+                                HighlightSectorById(shape, e, analyzeLayer, "");
+                                validate_inputs();
+                            }
+                        }
                         ).on('mouseover', function (e) {
                             let event_id = e.layer.properties.id;
                             if(sector_select_by_id  === undefined || sector_select_by_id  !== event_id){
@@ -957,10 +1036,12 @@
                         }
                         ).on('click', function (e) {
                             HighlightSectorById(e.layer.properties.id, e, analyzeLayer, e.layer.properties[l10n_labels.label_field]);
-
                             validate_inputs();
-                        }).addTo(maps['analyze']);
-                        resolve("Sector protobuf initialzed!")
+                        }
+                        ).addTo(maps['analyze']);
+
+                        resolve("Sector protobuf initialzed!");
+
                     }, 200)
                 } catch(err) {
                     reject(`Error promise: ${err}`);
@@ -976,8 +1057,7 @@
                     }
                 });
             });
-        };
-
+        }
 
         function HighlightSectorById(highlightSectorId, protobufEvent, analyzeLayer, label) {
             $('#lat').val("");
@@ -2147,7 +2227,7 @@
                         this_type = 'select'
                     }
 
-                    //console.log('checking ' + this_name, this_type, this_val)
+
 
                     switch (this_type) {
                         case 'radio':
@@ -2215,7 +2295,6 @@
 
                     if (form_inputs[key] === '') {
                         is_valid = false
-                        //console.log(key)
                     }
                 }
 
@@ -2298,8 +2377,13 @@
                     }
 
                     let shared_url = "";
-                    for (const [key, value] of Object.entries(url_inputs))
+                    for (let [key, value] of Object.entries(url_inputs)) {
+                        value = "" + value;
+                        value = value.replace("census", "census-division");
+                        value = value.replace("health", "health-region");
                         shared_url += (shared_url.length === 0 ? "?" : "&") + key + "=" + value;
+                    }
+
                     shared_url = document.URL.split('?')[0] + shared_url;
                     $("a[id='shareableURL']").attr('data-share-url', shared_url);
                 }

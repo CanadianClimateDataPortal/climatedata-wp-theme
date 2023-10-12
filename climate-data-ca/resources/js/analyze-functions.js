@@ -261,17 +261,12 @@
         function initMap(map_id) {
             $(`input[type="hidden"][id='zoom']`).val("4");
             $(`input[type="hidden"][id='center']`).val("62.51231793838694;-98.5693359375");
-
             centerMap(map_id);
         }
 
         function centerMap(map_id) {
-
             let z = parseInt($(`input[type="hidden"][id='zoom']`).val());
             let c = $(`input[type="hidden"][id='center']`).val().split(';');
-
-            console.log("centering... " + z + " " + c);
-
             maps[map_id].setView([parseFloat(c[0]), parseFloat(c[1])], z);
         }
 
@@ -409,15 +404,6 @@
                 $('#average').val(paramsDict["average"]);
 
                 if(paramsDict["analyze-location"] === 'grid') {
-                    // let latLonArray = decompressLatLonPointsStringToList(paramsDict['compressedPoints']);
-                    // let lats = [];
-                    // let lons = [];
-                    // latLonArray.forEach(function (p) {
-                    //     lats.push(p.point[0]);
-                    //     lons.push(p.point[1]);
-                    // });
-                    //
-
                     createGridLayer('canadagrid', maps['analyze'], paramsDict['compressedPoints']);
                 } else {
                     $('#shape').val(paramsDict["shape"]);

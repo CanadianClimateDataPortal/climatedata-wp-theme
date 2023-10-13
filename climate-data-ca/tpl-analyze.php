@@ -348,7 +348,7 @@
                         <div class="form-check input-row select-all">
                           <div class="input-item">
                             <input class="form-check-input" type="checkbox" name="" id="analyze-model-all" value="all">
-                            <label class="form-check-label" for="analyze-model-all"><?php _e ( 'Percentiles (select none to obtain all models in output)', 'cdc' ); ?></label>
+                            <label class="form-check-label" for="analyze-model-all"><?php _e ( 'Percentiles (Leave unselected for distinct model output)', 'cdc' ); ?></label>
                           </div>
                         </div>
 

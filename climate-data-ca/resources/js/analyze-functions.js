@@ -688,6 +688,7 @@
 
         $('input[name="analyze-location"]').on('change', function (e) {
             let itemInput = e.target.value;
+
             ChangeLayers(itemInput);
 
             if(itemInput != 'grid'){
@@ -699,15 +700,14 @@
 
                 if (maps['analyze'].hasLayer(analyzeLayer)) {
                     maps['analyze'].removeLayer(analyzeLayer);
-                }
 
+                }
             } else {
                 if($(`input[type="hidden"][id="location"]`).val() !== "grid") initMap('analyze');
                 $('#average').val('False');
             }
 
             $(`input[type="hidden"][id="location"]`).val(itemInput);
-
             validate_steps();
             validate_inputs();
         });
@@ -987,7 +987,6 @@
                                 maxZoom: 12,
                                 minZoom: 3,
                                 vectorTileLayerStyles: layerStyles,
-
                             }
                         ).on('load', function (e) {
                             if(shape !== -1) {
@@ -1022,12 +1021,10 @@
                         }
                         ).on('click', function (e) {
                             HighlightSectorById(e.layer.properties.id, e, analyzeLayer, e.layer.properties[l10n_labels.label_field]);
+
                             validate_inputs();
-                        }
-                        ).addTo(maps['analyze']);
-
+                        }).addTo(maps['analyze']);
                         resolve("Sector protobuf initialzed!");
-
                     }, 200)
                 } catch(err) {
                     reject(`Error promise: ${err}`);
@@ -2201,6 +2198,7 @@
                 // TO THE REQUEST OBJECT
 
                 // build the form_inputs object
+                let optionalInputs = new Set();
 
                 $('#analyze-form-inputs .add-to-object').each(function () {
 
@@ -2213,7 +2211,11 @@
                         this_type = 'select'
                     }
 
+                    if ($(this).hasClass('input-optional')) {
+                        optionalInputs.add(this_name);
+                    }
 
+                    //console.log('checking ' + this_name, this_type, this_val)
 
                     switch (this_type) {
                         case 'radio':
@@ -2279,7 +2281,7 @@
                         continue;
                     }
 
-                    if (form_inputs[key] === '') {
+                    if (form_inputs[key] === '' && !optionalInputs.has(key)) {
                         is_valid = false
                     }
                 }

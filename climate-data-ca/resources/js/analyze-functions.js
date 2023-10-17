@@ -2195,8 +2195,10 @@
                 // CHECK INPUTS THAT NEED TO BE ADDED
                 // TO THE REQUEST OBJECT
 
+
                 // build the form_inputs object
                 let optionalInputs = new Set();
+
 
                 $('#analyze-form-inputs .add-to-object').each(function () {
 
@@ -2209,9 +2211,11 @@
                         this_type = 'select'
                     }
 
+
                     if ($(this).hasClass('input-optional')) {
                         optionalInputs.add(this_name);
                     }
+
 
                     //console.log('checking ' + this_name, this_type, this_val)
 
@@ -2285,6 +2289,12 @@
 
                 // CHECK FOR EMPTY VALUES
                 // IN THE VAR DETAIL OVERLAY FORM
+
+                if (form_inputs[key] === '' && !optionalInputs.has(key) ) {
+                    is_valid = false
+                }
+            }
+
 
                 form_thresholds = $.extend(true, {}, default_thresholds)
 

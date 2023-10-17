@@ -589,7 +589,7 @@
                 ?>'>
                   <h4><?php _e ( 'Choose a dataset', 'cdc' ); ?></h4>
                   <p><?php _e ( 'Start by selecting a dataset from the menu on the left.', 'cdc' ); ?></p>
-                  <span class="btn btn-outline-secondary rounded-pill hidden"><?php _e ( 'Click to continue', 'cdc' ); ?></span>
+                  <span id="btn-activate-map"  class="btn btn-outline-secondary rounded-pill hidden"><?php _e ( 'Click to continue', 'cdc' ); ?></span>
                 </div>
 
               </div>

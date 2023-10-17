@@ -56,6 +56,8 @@ var result = {};
       options.maps = $(document).cdc_app('init_maps', options.maps);
 
       //
+
+      //
       // TABS
       //
 
@@ -106,19 +108,12 @@ var result = {};
         }
 
         setTimeout(function () {
-          plugin.invalidate_size();
+          $(document).cdc_app('invalidate_size');
         }, 500);
       });
     },
 
-    invalidate_size: function () {
-      let plugin = this,
-        options = plugin.options;
-
-      for (let key in options.maps) {
-        options.maps[key].object.invalidateSize();
-      }
-    },
+    invalidate_size: function () {},
   };
 
   // jQuery plugin interface

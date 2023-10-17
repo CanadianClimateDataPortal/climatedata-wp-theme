@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "leaflet": "^1.9.4",
-    "leaflet.sync": "^0.2.4"
+    "leaflet.sync": "^0.2.4",
+    "zebra_pin": "^3.0.0"
   },
   "devDependencies": {
     "eslint": "^8.45.0",

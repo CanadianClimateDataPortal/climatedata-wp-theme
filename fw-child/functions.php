@@ -99,6 +99,8 @@ function child_theme_enqueue() {
 	
 	wp_register_script ( 'leaflet-sync', $child_npm_dir . 'leaflet.sync/L.Map.Sync.js', array ( 'leaflet' ), null, true );
 	
+	wp_register_script ( 'zebra-pin', $child_npm_dir . 'zebra_pin/dist/zebra_pin.min.js', array ( 'jquery' ), null, true );
+	
 	// PAGE CONDITIONALS
 
 	switch ( $GLOBALS['vars']['current_slug'] ) {
@@ -111,6 +113,16 @@ function child_theme_enqueue() {
 		case 'telechargement' :
 			wp_enqueue_script ( 'download-app' );
 			break;
+			
+		case 'learn' :
+			wp_enqueue_script ( 'zebra-pin' );
+			wp_enqueue_script ( 'tab-drawer' );
+			break;
+			
+		case 'news' :
+			wp_enqueue_script ( 'zebra-pin' );
+			wp_enqueue_script ( 'tab-drawer' );
+			
 		
 	}
 	

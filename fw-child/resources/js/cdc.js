@@ -112,12 +112,9 @@
         ).addTo(this_object);
       }
 
-      console.log('done adding', options.maps);
-
       if (Object.keys(options.maps).length > 1) {
         for (let key in options.maps) {
           Object.keys(options.maps).forEach(function (map) {
-            console.log('sync', map, key);
             if (map != key)
               options.maps[key].object.sync(options.maps[map].object);
           });

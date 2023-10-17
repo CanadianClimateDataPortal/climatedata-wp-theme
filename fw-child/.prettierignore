@@ -2,3 +2,5 @@ node_modules
 __generated__
 .next
 resources/vendor
+resources/scss/_variables.scss
+resources/scss/_variables-dark.scss

@@ -1,5 +1,9 @@
 <?php
 
+	//
+	// ID / CLASSES
+	//
+	
 	include ( locate_template ( 'resources/functions/builder/field-groups/settings/classes.php' ) );
 
 ?>
@@ -26,6 +30,7 @@
 				<li><span class="dropdown-item" data-flex-item="spacing">Spacing</span></li>
 				<li><span class="dropdown-item" data-flex-item="offcanvas">Offcanvas</span></li>
 				<li><span class="dropdown-item" data-flex-item="aos">Animate on Scroll</span></li>
+				<li><span class="dropdown-item" data-flex-item="attributes">Data Attributes</span></li>
 			</ul>
 		</div>
 		

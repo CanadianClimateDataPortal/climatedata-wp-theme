@@ -10,6 +10,8 @@
 	
 	<div class="card-body p-0 fw-form-repeater-container">
 		
+		<input type="hidden" id="inputs-settings[]-spacing-type" 	name="inputs-settings[]-spacing-type" value="spacing">
+		
 		<div class="row border-bottom p-2 fw-form-repeater-head settings-form-repeater-head modal-label-sm">
 			<div class="col">Property</div>
 			<div class="col">Side</div>
@@ -19,16 +21,12 @@
 		</div>
 		
 		<div class="fw-form-repeater settings-form-repeater p-2 border-bottom" data-rows="1">
-				
+			
 			<div class="fw-form-repeater-row settings-form-repeater-row row my-1" data-row-index="0">
-				
-				<input type="hidden" id="inputs-settings[]-spacing[]-type" name="inputs-settings[]-spacing[]-type" value="spacing">
-				
-				<input type="hidden" id="inputs-settings[]-spacing[]-index" name="inputs-settings[]-spacing[]-index" value="0">
 				
 				<div class="col pe-3">
 					
-					<select id="inputs-settings[]-spacing[]-property" name="inputs-settings[]-spacing[]-property" class="form-select form-select-sm">
+					<select id="inputs-settings[]-spacing-rows[]-property" name="inputs-settings[]-spacing-rows[]-property" class="form-select form-select-sm">
 						<option value="p">Padding</option>
 						<option value="m">Margin</option>
 					</select>
@@ -37,7 +35,7 @@
 				
 				<div class="col pe-3">
 					
-					<select id="inputs-settings[]-spacing[]-side" name="inputs-settings[]-spacing[]-side" class="form-select form-select-sm">
+					<select id="inputs-settings[]-spacing-rows[]-side" name="inputs-settings[]-spacing-rows[]-side" class="form-select form-select-sm">
 						<option value="">All</option>
 						<option value="x">X</option>
 						<option value="y">Y</option>
@@ -51,7 +49,7 @@
 				
 				<div class="col pe-3">
 					
-					<select id="inputs-settings[]-spacing[]-breakpoint" name="inputs-settings[]-spacing[]-breakpoint" class="form-select form-select-sm">
+					<select id="inputs-settings[]-spacing-rows[]-breakpoint" name="inputs-settings[]-spacing-rows[]-breakpoint" class="form-select form-select-sm">
 				
 						<option value="">Any</option>
 						<option value="sm">Small</option>
@@ -66,7 +64,7 @@
 				
 				<div class="col pe-3">
 					
-					<select id="inputs-settings[]-spacing[]-value" name="inputs-settings[]-spacing[]-value" class="form-select form-select-sm">
+					<select id="inputs-settings[]-spacing-rows[]-value" name="inputs-settings[]-spacing-rows[]-value" class="form-select form-select-sm">
 						<?php
 						
 							for ( $i = 15; $i >= -15; $i -= 1 ) {
@@ -86,6 +84,8 @@
 					<div class="fw-form-repeater-delete-row btn btn-sm btn-outline-danger">Delete</div>
 				</div>
 				
+				<input type="hidden" id="inputs-settings[]-spacing-rows[]-index" name="inputs-settings[]-spacing-rows[]-index" value="0">
+				
 			</div>
 			
 		</div>
@@ -93,6 +93,8 @@
 		<div class="d-flex justify-content-end p-2">
 			<div class="fw-form-repeater-add-row btn btn-sm btn-outline-primary">+ Add row</div>
 		</div>
+		
+		<input type="hidden" id="inputs-settings[]-spacing-index" name="inputs-settings[]-spacing-index" value="0">
 		
 	</div>
 </div>

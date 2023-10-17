@@ -12,6 +12,6 @@
 	
 	<div class="fw-block-type-list list-group mb-3">
 		<a href="#fw-modal" class="fw-modal-trigger list-group-item list-group-item-action" aria-current="true" data-modal-content="block/navigation/menu" data-block-cat="navigation" data-block-content="menu">Menu</a>
-		<!-- <a href="#fw-modal" class="fw-modal-trigger list-group-item list-group-item-action" aria-current="true" data-modal-content="block" data-block-cat="navigation" data-block-content="lang">Language Switcher</a> -->
+		<a href="#fw-modal" class="fw-modal-trigger list-group-item list-group-item-action" aria-current="true" data-modal-content="block/navigation/breadcrumb" data-block-cat="navigation" data-block-content="breadcrumb">Breadcrumb</a>
 	</div>
 </div>

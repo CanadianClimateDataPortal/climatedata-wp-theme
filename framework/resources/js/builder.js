@@ -1,6 +1,9 @@
 // builder
 // v2.0
 
+
+var current_i = 0
+
 var result = {}
 
 ;(function ($) {
@@ -16,6 +19,7 @@ var result = {}
 			page: {},
 			current_parent: $('.fw-main'),
 			status: 'init',
+			hierarchy: [ 'page', 'section', 'container', 'row', 'column', 'block' ],
 			objects: {
 				page: {
 					classes: $('body').attr('class').split(' '),
@@ -227,6 +231,15 @@ var result = {}
 				
 				if (options.modal.content == 'save') {
 					options.status = 'saving'
+				}
+				
+				if (options.modal.content == 'page') {
+					let this_element = $('.fw-page')
+					options.status = 'editing'
+					options.element.item = $('body')
+					options.element.data = plugin.get_element_by_key(options.element.item.attr('data-key'))
+					options.parent.item = this_element.parent()
+					options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
 				}
 				
 				$('#fw-modal').modal('show')
@@ -648,6 +661,65 @@ var result = {}
 			// e.g. insert, edit form
 			//
 			
+			// APPLY LAYOUT
+			
+			$('body').on('click', '.fw-do-layout-submit', function() {
+				
+				let source_ID = $(this).closest('.modal').find('#inputs-post_id').val()
+				
+				if (source_ID != '') {
+					
+					// get the page object first
+					
+					$.ajax({
+						url: ajax_data.url,
+						type: 'GET',
+						data: {
+							action: 'fw_get_builder_object',
+							post_id: source_ID
+						},
+						success: function(data) {
+							
+							options.page = JSON.parse(data.replaceAll(source_ID, options.globals.current_query.ID))
+							
+							console.log('new data', options.page)
+							
+							// get the output loop
+							
+							$.ajax({
+								url: ajax_data.url,
+								type: 'GET',
+								data: {
+									action: 'fw_output_loop_ajax',
+									globals: options.globals,
+									post_id: source_ID
+								},
+								success: function(data) {
+									
+									let new_html = $(data.replaceAll(source_ID, options.globals.current_query.ID))
+									
+									console.log('new html', new_html)
+									// console.log('filter', new_html.innerHTML)
+									
+									$('.fw-page').replaceWith(new_html)
+									
+									plugin.activate()
+									
+									$('#fw-modal').modal('hide')
+									
+								}
+							})
+							
+							
+						}
+					})
+					
+				}
+				
+			})
+			
+			// NEW POST
+			
 			$('body').on('click', '.fw-new-post-submit', function() {
 				
 				let form_data = {}
@@ -682,6 +754,62 @@ var result = {}
 				
 			})
 			
+			// PAGE SETTINGS
+			
+			$('body').on('click', '.fw-page-settings-submit', function() {
+				
+				let field_data = {
+					title: $('.modal').find('[name="title"]').val(),
+					slug: $('.modal').find('[name="slug"]').val()
+				}
+				
+				// console.log(field_data)
+				
+				let form_data = {
+					id: $('.modal').find('#settings-form-id').val(),
+					class: $('.modal').find('#settings-form-classes').val()
+				}
+				
+				// console.log(form_data)
+				
+				$.ajax({
+					url: ajax_data.url,
+					type: 'GET',
+					dataType: 'json',
+					data: {
+						action: 'fw_update_page_settings',
+						post_id: options.globals.current_query.ID,
+						lang: options.lang,
+						fields: field_data,
+						inputs: form_data
+					},
+					success: function(data) {
+						
+						console.log(data)
+						
+						if (data.new_slug) {
+							
+							console.log(window.location.pathname + ' > ' + data.new_slug)
+							
+							let new_slug = window.location.href.replace(data.old_slug, data.new_slug)
+							
+							history.replaceState({}, '', new_slug)
+							
+						}
+						
+						if (data.new_title) {
+							document.title = document.title.replace(data.old_title, data.new_title)
+						}
+						
+						$('#fw-modal').modal('hide')
+						
+					}
+				})
+				
+			})
+			
+			// INSERT/EDIT ELEMENT
+			
 			$('body').on('click', '.fw-settings-submit', function() {
 				
 				let form = $(this).closest('.modal').find('form'),
@@ -701,9 +829,7 @@ var result = {}
 							// on/off toggle
 							// or multi-select
 							
-							if ($(this).attr('name').includes('[]')) {
-								
-								console.log('yaaaaa')
+							if ($(this).attr('name').slice(-2) == '[]') {
 								
 								if ($(this).prop('checked') == true) {
 								
@@ -717,6 +843,8 @@ var result = {}
 								}
 								
 							} else {
+							
+								// console.log($(this), $(this).prop('checked'))
 							
 								// true/false
 								
@@ -733,17 +861,16 @@ var result = {}
 								name: $(this).attr('name'),
 								value: $(this).val()
 							})
+							
 						}
 						
 					}
 					
 				})
 				
-				// console.log(form_data)
+				console.log(form_data)
 				
-				// console.log('post', JSON.stringify(options.element.data))
-				
-				// console.log(options.status)
+				console.log(options.status)
 				
 				// ACTION
 				
@@ -865,7 +992,7 @@ var result = {}
 						// }
 						
 						break
-				
+						
 					case 'deleting' :
 				
 						// remove the item(s)
@@ -902,6 +1029,22 @@ var result = {}
 				}
 				
 				$('#fw-modal').modal('hide')
+				
+				$(document).trigger('fw_modal_submit', options.element)
+				
+				// reset options.element
+				// doesn't work here because
+				// the element gets reset before
+				// certain ajax functions finish
+				// replace with a reset_element method
+				//
+				// options.element = {
+				// 	item: $('<div class="fw-element">'),
+				// 	data: {
+				// 		type: null,
+				// 		children: []
+				// 	}
+				// }
 				
 			})
 			
@@ -1103,6 +1246,60 @@ var result = {}
 			
 		},
 		
+		check_for_repeaters: function(flatten_data) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			let modal_body = $('#fw-modal').find('.modal-body'),
+					repeater_forms = {}
+			
+			flatten_data.forEach(function(input) {
+				
+				if (
+					input.property.includes('[]-index') &&
+					modal_body.find('[name="inputs-' + input.property + '"]').parents('.fw-form-repeater').length
+				) {
+					
+					// console.log(input.property + ' is a repeater index')
+					
+					if (repeater_forms.hasOwnProperty(input.property)) {
+						repeater_forms[input.property] += 1
+					} else {
+						repeater_forms[input.property] = 1
+					}
+					
+					
+				}
+				
+			})
+			
+			console.log('repeaters', repeater_forms)
+			
+			if (repeater_forms != {}) {
+				
+				for (let key in repeater_forms) {
+					
+					if (repeater_forms[key] > 1) {
+						
+						// console.log('add ' + repeater_forms[key] + ' rows for inputs-' + key)
+						
+						for (i = 0; i < repeater_forms[key] - 1; i += 1) {
+							
+							// console.log(modal_form.find('[name="inputs-' + key + '"]').closest('.fw-form-repeater'))
+							
+							plugin.add_repeater_row(modal_body.find('[name="inputs-' + key + '"]').closest('.fw-form-repeater'))
+							
+						}
+						
+					}
+					
+				}
+				
+			}
+			
+		},
+		
 		add_repeater_row: function(repeater) {
 			
 			// console.log(repeater)
@@ -1123,7 +1320,7 @@ var result = {}
 			
 			repeater.attr('data-rows', new_rows)
 			
-			new_row.find('[type="hidden"]').val(new_index)
+			new_row.find('[name$="index"]').val(new_index)
 			
 			new_row.attr('data-row-index', new_index)
 			
@@ -1162,7 +1359,26 @@ var result = {}
 			let plugin = this,
 					options = plugin.options
 			
-			console.log('ajax now', element)
+			console.log('getting template')
+			
+			// use the parent element's type
+			// to figure out which element the template
+			// output should start with
+			
+			let template_start = null
+			
+			options.hierarchy.forEach(function(level, i) {
+				
+				if (level == parent.data.type) {
+					template_start = options.hierarchy[i + 1]
+				}
+				
+			})
+			
+			// console.log('parent')
+			// console.log(JSON.stringify(parent.data, null, 2))
+			// console.log('element')
+			// console.log(JSON.stringify(element.data, null, 2))
 			
 			$.ajax({
 				url: ajax_data.url,
@@ -1202,6 +1418,10 @@ var result = {}
 					
 					// element.item.css('border', '1px solid red').html(data)
 					
+					
+					// console.log(JSON.stringify(element.data, null, 2))
+					// console.log(JSON.stringify(options.element.data, null, 2))
+					
 				},
 				complete: function() {
 					
@@ -1211,8 +1431,11 @@ var result = {}
 					
 					console.log('done getting template, create tree under ' + options.parent.data.type + ' ' + options.parent.data.key)
 					
+					console.log(JSON.stringify(element.data, null, 2))
+					console.log(JSON.stringify(options.element.data, null, 2))
+					
 					// if (element.data.inputs.source == 'post') {
-						plugin.create_tree(options.parent, options.element)
+						plugin.create_tree(options.parent, element)
 					// }
 					
 				}
@@ -1242,7 +1465,7 @@ var result = {}
 			// object type to compare with elements of options.objects
 			
 			let comparing_key = element.data.type
-			
+						
 			if (comparing_key.includes('block/')) {
 				comparing_key = 'block'
 			} else if (comparing_key == 'new') {
@@ -1766,6 +1989,7 @@ var result = {}
 							
 							element.item.find('.fw-element-inner').html(new_markup.find('.fw-element-inner').html())
 							
+							$(document).trigger('fw_populate_block', options.element)
 							
 						}
 					})
@@ -2056,6 +2280,7 @@ var result = {}
 			switch ( element.data.type ) {
 				case 'page' :
 				
+					console.log('page')
 					if (element.data.inputs.title[options.lang] != '') {
 						
 						document.title = element.data.inputs.title[options.lang]
@@ -2306,7 +2531,7 @@ var result = {}
 			let plugin = this,
 					options = plugin.options
 			
-			console.log('populate modal', options.modal, options.element)
+			// console.log('populate modal', options.modal, options.element)
 			
 			if (options.modal.content == null) {
 				
@@ -3003,81 +3228,34 @@ var result = {}
 				let flex_forms = [],
 						repeater_forms = {}
 				
-				// find arrays in flattened data
+				// check for flex forms to complete the modal body
 				
 				flatten_data.forEach(function(input) {
+				
+					// check the property name
 					
-					// console.log(input.property)
-					
-					if (input.property.includes('[]')) {
+					if (
+						input.property.includes('[]') && 
+						input.property.includes('type')
+					) {
 						
-						// first instance of a []
-						// is it a repeater or a flex
+						// it's a flex
 						
-						if (modal_body.find('[name="inputs-' + input.property + '"]').parents('.fw-form-repeater').length) {
-							
-							if (input.property.includes('index')) {
-								
-								let prop_name = input.property.split('[]')[0]
-								
-								// console.log(input.property + ' is a repeater')
-								
-								if (repeater_forms.hasOwnProperty(input.property)) {
-									repeater_forms[input.property] += 1
-								} else {
-									repeater_forms[input.property] = 1
-								}
-								
-							}
-							
-						} else {
-							
-							if (input.property.includes('type')) {
-								
-								// console.log(input.property + ' is a flex')
-							
-								let flex_container = modal_form.find('.fw-form-flex-container[data-input="' + input.property.split('[]')[0] + '"]')
-								
-								let flex_path = flex_container.attr('data-path') + '/' + input.value
-								
-								// console.log('path', flex_path)
-								
-								flex_forms.push({
-									path: flex_path,
-									container: flex_container
-								})
-								
-							}
-							
-						}
+						let flex_container = modal_form.find('.fw-form-flex-container[data-input="' + input.property.split('[]')[0] + '"]')
+						
+						let flex_path = flex_container.attr('data-path') + '/' + input.value
+						
+						// console.log('path', flex_path)
+						
+						flex_forms.push({
+							path: flex_path,
+							container: flex_container
+						})
 						
 					}
-					
+				
 				})
 				
-				// console.log('repeaters', repeater_forms)
-					
-				if (repeater_forms != {}) {
-					
-					for (let key in repeater_forms) {
-						
-						if (repeater_forms[key] > 1) {
-							
-							// console.log('add ' + repeater_forms[key] + ' rows for inputs-' + key)
-							
-							for (i = 0; i < repeater_forms[key] - 1; i += 1) {
-								
-								// console.log(modal_form.find('[name="inputs-' + key + '"]').closest('.fw-form-repeater'))
-								
-								plugin.add_repeater_row(modal_form.find('[name="inputs-' + key + '"]').closest('.fw-form-repeater'))
-								
-							}
-							
-						}
-						
-					}
-					
-				}
 				
 				// unique
 				
@@ -3090,7 +3268,6 @@ var result = {}
 				console.log('flex forms', flex_forms)
 				
 				if (flex_forms.length > 0) {
-				
 					
 					var allAJAX = flex_forms.map(flex_form => {
 						
@@ -3102,22 +3279,44 @@ var result = {}
 					
 					Promise.all(allAJAX).then(function() {
 						
-						// console.log('done getting flex forms')
+						console.log('done getting flex forms')
 						
-						// console.log('populate now')
+						// now check for repeaters
+						plugin.check_for_repeaters(flatten_data)
+						
+						console.log('populate now')
 						plugin.modal_populate_fields(flatten_data)
 						
 					})
 					
 				} else {
 					
-					// no flex fields to get,
-					// populate fields
+					// no flex fields to get
 					
-					// console.log('other populate call')
+					// check for repeaters
+					plugin.check_for_repeaters(flatten_data)
+					
+					// populate fields
 					plugin.modal_populate_fields(flatten_data)
 					
 				}
+				
+				modal_body.find('.fw-sortable').each(function() {
+					
+					$(this).sortable({
+						placeholder: "ui-state-highlight",
+						handle: '.card-header',
+						forcePlaceholderSize: true,
+						stop: function(e, ui) {
+							
+							plugin.reindex_flex($(this).closest('.fw-form-flex-container'))
+							
+						}
+					})
+					
+					$(this).disableSelection()
+					
+				})
 				
 			}
 			
@@ -3140,18 +3339,19 @@ var result = {}
 			// individual inputs
 			
 			let repeater_index = -1,
+					flex_index = -1,
 					flex_type = null
 			
 			flatten_data.forEach(function(input) {
-			// for (var key in flatten_data) {
 				
 				let this_input = modal_form.find('[name="inputs-' + input.property + '"]'),
 						this_val = input.value
 						
-				if (input.property.includes('[]')) {
-					// console.log('key', input.property)
-					// console.log('input', this_input)
-					// console.log('val', this_val)
+				if (
+					input.property.includes('rows[]') &&
+					repeater_index == -1
+				) {
+					repeater_index = 0
 				}
 				
 				if (this_input.parents('.fw-form-repeater').length) {
@@ -3168,20 +3368,10 @@ var result = {}
 						// console.log('new index', repeater_index)
 						
 					}
-				} else {
 					
+				} else if (this_input.parents('.fw-form-flex-row').length) {
+						
 					repeater_index = -1
-					
-				}
-			
-				if (repeater_index != -1) {
-				
-					this_input = this_input.closest('.fw-form-repeater-row[data-row-index="' + repeater_index + '"]').find('[name="inputs-' + input.property + '"]')
-					
-				}
-				
-				if (this_input.parents('.fw-form-flex-row').length) {
-					
 					// console.log(input.property + ' is in a flex row')
 					
 					if (
@@ -3190,6 +3380,7 @@ var result = {}
 					) {
 						
 						flex_type = input.value
+						flex_index += 1
 						
 						// console.log('new type', flex_type)
 						
@@ -3197,16 +3388,46 @@ var result = {}
 					
 				} else {
 					
+					repeater_index = -1
 					flex_type = null
+					flex_index = -1
 					
 				}
-				
-				if (flex_type != null) {
+			
+				// console.log('type', flex_type)
+				// console.log('flex index', flex_index)
+				// console.log('repeater index', flex_index)
+			
+				if (repeater_index != -1) {
 					
-					this_input = modal_form.find('.fw-form-flex-row[data-item="' + flex_type + '"]').find('[name="inputs-' + input.property + '"]')
+					// i'm in a repeater
+					
+					if (flex_type != null) {
+						
+						// repeater in a flex
+						
+						this_input = modal_form.find('.fw-form-flex-row[data-item="' + flex_type + '"][data-row-index="' + flex_index + '"]').find('.fw-form-repeater-row[data-row-index="' + repeater_index + '"] [name="inputs-' + input.property + '"]')
+						
+					} else {
+						
+						// repeater only
+						
+						this_input = this_input.closest('.fw-form-repeater-row[data-row-index="' + repeater_index + '"]').find('[name="inputs-' + input.property + '"]')
+						
+					}
+					
+					// console.log('set', this_input, this_val)
+					
+				} else if (flex_type != null) {
+					
+					// flex only
+					
+					// console.log('flex type ' + flex_type + ' row ' + flex_index + ' ' + input.property)
+					
+					this_input = modal_form.find('.fw-form-flex-row[data-item="' + flex_type + '"][data-row-index="' + flex_index + '"]').find('[name="inputs-' + input.property + '"]')
 					
 				}
-				
+					
 				// console.log('input')
 				// console.log(this_input, this_val)
 				
@@ -3227,7 +3448,10 @@ var result = {}
 						
 					}
 					
-				} else if (input.property == 'class') {
+				} else if (
+					input.property == 'class' ||
+					input.property.includes('-class')
+				) {
 					
 					this_val = this_val.join(' ')
 					
@@ -3238,24 +3462,12 @@ var result = {}
 				}
 				
 				if (Array.isArray(this_val)) {
-					
+					// not sure why i did this
 					this_input = modal_form.find('[name="inputs-' + input.property + '[]"]')
 					
 				}
-				
-				if (this_input.length) {
 					
-					if (this_input.is('select')) {
-						
-						// console.log(this_input, this_val)
-						
-						this_input.find('option').each(function() {
-							if ($(this).attr('value') == this_val) {
-								$(this).val()
-							}
-						})
-						
-					}
+				if (this_input.length) {
 					
 					if (input.property.includes('-d')) {
 						
@@ -3311,8 +3523,10 @@ var result = {}
 						
 					} else {
 					
+						// console.log('this_input length', this_input.length)
 						// text
 						
+						// console.log(this_input, this_val)
 						this_input.val(this_val)
 						
 					}
@@ -3385,57 +3599,6 @@ var result = {}
 			// 	
 			// }
 			// 
-			// // repeater
-			// 
-			// if (new_form.find('.settings-form-repeater').length) {
-			// 		
-			// 	// console.log(key, 'has repeater')
-			// 	
-			// 	let this_repeater = $('#fw-modal').find('.settings-form-spacing .settings-form-repeater')
-			// 	
-			// 	// disable the first 'delete' button
-			// 	
-			// 	this_repeater.find('.fw-form-repeater-delete-row').first().addClass('disabled')
-			// 	
-			// 	if (this_setting.hasOwnProperty('repeater')) {
-			// 		let repeater_rows = this_setting.repeater.length
-			// 	
-			// 		// console.log(repeater_rows + ' rows')
-			// 		
-			// 		for (i = 0; i < repeater_rows; i += 1) {
-			// 			
-			// 			// console.log('row ' + i)
-			// 			
-			// 			if (i != 0) {
-			// 				
-			// 				plugin.add_repeater_row(this_repeater)
-			// 				
-			// 			}
-			// 			
-			// 			let this_row = this_repeater.find('[data-row-index="' + i + '"]')
-			// 			
-			// 			// console.log(i, this_row)
-			// 			
-			// 			for (var input_name in this_setting.repeater[i]) {
-			// 				
-			// 				let this_input = this_row.find('[name="inputs-settings-' + key + '-repeater-' + input_name + '"]')
-			// 				
-			// 				this_val = this_setting.repeater[i][input_name]
-			// 				
-			// 				// console.log('set', this_input, this_val)
-			// 				
-			// 				this_input.val(this_val).trigger('change')
-			// 				
-			// 				// console.log(input_name, this_val)
-			// 				
-			// 			}
-			// 			
-			// 		}
-			// 		
-			// 	}
-			// 	
-			// 	
-			// }
 			// 
 			// // image
 			// 
@@ -3543,10 +3706,9 @@ var result = {}
 			// 	
 			// }
 			
-			
-			
-			
-			
+			modal_body.find('.fw-form-flex-container').each(function() {
+				plugin.reindex_flex($(this))
+			})
 			
 			let is_hidden = false
 			
@@ -3568,6 +3730,7 @@ var result = {}
 			return $.ajax({
 				url: ajax_data.url,
 				type: 'GET',
+				async: false,
 				data: {
 					action: 'fw_modal_add_setting',
 					path: path
@@ -3590,6 +3753,8 @@ var result = {}
 					
 					// reindex flex rows
 					plugin.reindex_flex(container)
+					
+					// console.log('added', key)
 					
 					//
 					
@@ -3933,7 +4098,7 @@ var result = {}
 					
 			// assume all settings will be removed
 			
-			console.log(JSON.stringify(element_data.inputs))
+			// console.log(JSON.stringify(element_data.inputs))
 			
 			if (
 				element_data.hasOwnProperty('inputs') &&
@@ -3958,6 +4123,26 @@ var result = {}
 			// not sure if this is a good idea
 			// update: it was a bad idea - removes text from other langs
 			// options.element.data.inputs = {}
+			
+			// instead go through the inputs object
+			// and reset any array it finds
+			
+			// console.log('pre', JSON.stringify(options.element.data.inputs, null, 2))
+			
+			function input_recursive(obj) {
+				
+				for (let key in obj) {
+					if (Array.isArray(obj[key])) {
+						obj[key] = []
+					} else if (typeof obj[key] == 'object') {
+						input_recursive(obj[key])
+					}
+				}
+				
+				return obj
+			}
+			
+			input_recursive(options.element.data.inputs)
 			
 			form_data.forEach(function(input) {
 				
@@ -4019,7 +4204,7 @@ var result = {}
 			options.array_indexes = {}
 			
 			if (element_has_settings == true) {
-				console.log('has settings', JSON.stringify(element_data.inputs.settings))
+				// console.log('has settings', JSON.stringify(element_data.inputs.settings))
 				
 				element_data.inputs.settings.forEach(function(setting) {
 					
@@ -4239,6 +4424,14 @@ var result = {}
 					
 				}
 				
+				if (
+					property == 'index' &&
+					options.array_indexes !== undefined &&
+					options.array_indexes[options.array_key] != undefined
+				) {
+					options.array_indexes[options.array_key] += 1
+				}
+				
 				// console.log('post')
 				// console.log(JSON.stringify(current_parent, null, 2))
 				
@@ -4317,60 +4510,58 @@ var result = {}
 						
 					}
 					
-				} else if (!current_parent.hasOwnProperty(property)) {
+				} else {
 					
 					// i'm not an array
-						
+					
 					if (Array.isArray(current_parent)) {
 						
-						// console.log('---')
-						// console.log(JSON.stringify(current_parent, null, 2))
-						// console.log(options.array_indexes, options.array_key)
-						// console.log('current key/index', options.array_key, options.array_indexes[options.array_key])
-						
-						// console.log('what is in there', current_parent[options.array_indexes[options.array_key]])
-						
-						// console.log('keys', Object.keys(current_parent[options.array_indexes[options.array_key]]))
-						
-						// console.log('---')
-						
 						// my parent is an array
-						// find out if it's empty
 						
 						if (!current_parent[options.array_indexes[options.array_key]]) {
 							
 							// nothing exists at this index yet
 							
-							// console.log('indexes[' + options.array_key + '] is undefined')
+							// console.log('1a')
+							// console.log('parent[indexes[' + options.array_key + ']] is undefined')
 							
 							current_parent[options.array_indexes[options.array_key]] = {}
 							
 						} else {
 							
+							// current parent[indexes[key]] has something in it
+							
+							let current_array_val = current_parent[options.array_indexes[options.array_key]]
+							
+							// console.log('1b')
+							// console.log(JSON.stringify(current_parent[options.array_indexes[options.array_key]]))
+							
 							// if property doesn't exist in the current index,
 							// increment the index by 1
 							
-							if (!Object.keys(current_parent[options.array_indexes[options.array_key]]).includes(property)) {
+							// console.log(property, current_array_val, Object.keys(current_array_val))
+							
+							if (
+								!Object.keys(current_array_val).includes(property)
+							) {
+								
+								// the input property doesn't exist at this index
+								// of the parent array
+								
 								options.array_indexes[options.array_key] += 1
 								
-								// console.log('next index')
-								console.log(current_parent[options.array_indexes[options.array_key]])
+								// console.log('index += 1')
+								// console.log(options.array_key + ' index is now ' + options.array_indexes[options.array_key])
 							
 							}
 							
-							// does anything exist there
-							
-							
 							// check for undefined again
 							
-							if (!current_parent[options.array_indexes[options.array_key]]) {
+							if (!current_array_val) {
 								current_parent[options.array_indexes[options.array_key]] = {}
 							}
 							
 						}
-						
-						// inputs-settings[]-spacing[] = new array at 0
-						// inputs-settings[]-colors = new object at 1
 						
 						// console.log('new index', options.array_indexes[options.array_key])
 						// console.log(current_parent[options.array_indexes[options.array_key]])
@@ -4383,15 +4574,59 @@ var result = {}
 						
 						parent_to_send = current_parent[options.array_indexes[options.array_key]][property]
 						
+					} else if (!current_parent.hasOwnProperty(property)) {
+						
+						// parent is an object that doesn't contain
+						// this key
+						
+						// console.log(property + ' doesn\'t exist in ')
+						// console.log(JSON.stringify(current_parent))
+					
+						current_parent[property] = {}
+						
+					}
+					
+					// if (!current_parent.hasOwnProperty(property)) {
+				// } else {
+					
+					
+					
+					// current_parent.forEach
+					
+					/*
+						
+					if (Array.isArray(current_parent)) {
+						
+						// console.log('parent is array')
+						
+						// console.log('---')
+						console.log(options.array_indexes, options.array_key)
+						console.log('current key/index', options.array_key, options.array_indexes[options.array_key])
+						
+						// console.log('what is in there', current_parent[options.array_indexes[options.array_key]])
+						
+						// console.log('---')
+						
+						// my parent is an array
+						// find out if it's empty
+						
+						
+						
 					} else {
+						
+						console.log('2')
 					
 						// add my object by my key
 						
 						current_parent[property] = {}
 						
-					}
+					}*/
 					
-				}
+				}/* else {
+					
+					// do nothing
+					
+				}*/
 				
 				if (parent_to_send == null) {
 					

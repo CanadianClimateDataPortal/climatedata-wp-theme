@@ -26,6 +26,15 @@ var theme_dir = current_script.replace('/resources/js/' + filename, '') + '/'
       
     }
     
+    if ($('.fw-query-object').length) {
+      $('.fw-query-object').each(function() {
+        
+        console.log($(this))
+        $(this).fw_query()
+        
+      })
+    }
+    
     console.log('end global-functions.js')
 
   });

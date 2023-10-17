@@ -25,5 +25,7 @@
 			
 		</div>
 		
+		<input type="hidden" id="inputs-output[]-container-index" name="inputs-output[]-container-index" value="0">
+		
 	</div>
 </div>

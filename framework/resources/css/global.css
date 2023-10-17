@@ -17408,5 +17408,8 @@ video {
     transition: left 0s ease 0.25s, opacity 0.25s ease 0s, transform 0.25s ease 0s;
   }
 }
+.filter-item.selected {
+  color: #0d6efd;
+}
 
 /*# sourceMappingURL=global.css.map */

@@ -17770,6 +17770,10 @@ body.admin-bar .offcanvas-start.offcanvas-xxl {
   max-height: 300px;
 }
 
+.fw-form-flex-item {
+  min-height: 100px;
+}
+
 .settings-form {
   font-size: 0.875rem;
 }

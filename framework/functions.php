@@ -116,6 +116,8 @@ function fw_enqueue_scripts() {
 	
 	// VENDOR
 	
+	wp_register_script ( 'fw-query', $js_dir . 'query.js', NULL, NULL, true );
+	
 	// inview
 	
 	wp_register_script ( 'inview', $vendor_dir . 'in-view.min.js', NULL, NULL, true );
@@ -141,7 +143,7 @@ function fw_enqueue_scripts() {
 	
 	wp_register_script ( 'animation', $js_dir . 'animation-functions.js', array ( 'lottie', 'inview' ), null, true );
 	
-	wp_register_script ( 'global', $js_dir . 'global-functions.js', array ( 'jquery' ), null, true );
+	wp_register_script ( 'global', $js_dir . 'global-functions.js', array ( 'jquery', 'fw-query' ), null, true );
 	
 	wp_localize_script ( 'global', 'ajax_data',
 		array (
@@ -155,7 +157,7 @@ function fw_enqueue_scripts() {
 	// BUILDER
 	//
 	
-	wp_register_script ( 'builder', $js_dir . 'builder.js', array ( 'jquery', 'aos', 'animation', 'bootstrap-js' ), null, true );
+	wp_register_script ( 'builder', $js_dir . 'builder.js', array ( 'jquery', 'jquery-ui-core', 'jquery-ui-mouse', 'jquery-ui-sortable', 'aos', 'animation', 'bootstrap-js' ), null, true );
 	
 	wp_localize_script ( 'builder', 'ajax_data',
 		array (
@@ -175,7 +177,7 @@ function fw_enqueue_scripts() {
 	
 }
 
-add_action ( 'wp_enqueue_scripts', 'fw_enqueue_scripts' );
+add_action ( 'wp_enqueue_scripts', 'fw_enqueue_scripts', 10 );
 
 
 add_filter ( 'body_class', function ( $classes ) {

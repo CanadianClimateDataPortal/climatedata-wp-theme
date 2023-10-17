@@ -12,8 +12,6 @@
 			<?php
 			
 				$page_ID = $globals['current_query']['ID'];
-				$lang = $globals['current_lang_code'];
-				
 				$body_ID = 'page-' . get_the_slug ( $globals['current_query']['ID'] );
 			
 			?>
@@ -24,11 +22,11 @@
 					$title_placeholder = get_the_title ( $page_ID );
 					
 					if (
-						$lang != 'en' &&
-						get_post_meta ( $page_ID, 'title_' . $lang, true ) != ''
+						$globals['current_lang_code'] != 'en' &&
+						get_post_meta ( $page_ID, 'title_' . $globals['current_lang_code'], true ) != ''
 					) {
 						
-						$title_placeholder = get_post_meta ( $page_ID, 'title_' . $lang, true );
+						$title_placeholder = get_post_meta ( $page_ID, 'title_' . $globals['current_lang_code'], true );
 						
 					}
 					
@@ -36,28 +34,48 @@
 				
 				<label for="page-form-title" class="form-label">Page Title</label>
 				
-				<input type="text" id="page-form-title" name="inputs-title-<?php echo $lang; ?>" class="form-control" value="<?php echo $title_placeholder; ?>">
+				<input type="text" id="title" name="title" class="form-control" value="<?php echo $title_placeholder; ?>" placeholder="<?php echo $title_placeholder; ?>">
 				
-			
+				<?php 
 				
-				<!-- <div class="col">
+					// slug
 					
-					<label for="page-form-id" class="form-label">Body ID</label>
+					// current lang
 					
-					<div class="input-group">
-						<span class="input-group-text">#</span>
-						<input type="text" id="page-form-id" name="inputs-id" class="form-control" placeholder="<?php echo $body_ID; ?>">
-					</div>
+					$slug_prefix = site_url() . '/';
+					$current_slug = get_the_slug ( $globals['current_query']['ID'] );
+					
+					if ( $globals['current_lang_code'] != 'en' ) {
+					
+						$current_slug = get_post_meta ( $globals['current_query']['ID'], 'slug_' . $globals['current_lang_code'], true );
+						
+						if (
+							get_option ( 'options_fw_language_settings_rewrite' ) == 'domain' &&
+							$globals['current_lang_obj']['domain'] != ''
+						) {
+						
+							$slug_prefix = $globals['current_lang_obj']['domain'] . '/';
+							
+						} else {
+							
+							$slug_prefix .= $globals['current_lang_code'] . '/';
+							
+						}
+						
+					}
+					
+				?>
+				
+				<label for="page-form-title" class="form-label">Page Slug</label>
+				
+				<div class="input-group mb-3">
+					
+					<span class="input-group-text"><?php echo $slug_prefix; ?></span>
+					
+					<input type="text" class="form-control" name="slug" id="slug" value="<?php echo $current_slug; ?>">
 					
 				</div>
 				
-				<div class="col">
-					
-					<label for="page-form-classes" class="form-label">Body Classes</label>
-					
-					<input type="text" id="page-form-classes" name="inputs-class" class="form-control">
-					
-				</div> -->
 				
 			</div>
 			

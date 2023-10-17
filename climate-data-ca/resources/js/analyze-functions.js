@@ -546,9 +546,7 @@
             validate_steps();
             validate_inputs();
 
-
             loadFromURL();
-
         } // analyze_init
 
         //
@@ -2256,16 +2254,15 @@
 
                             if (form_inputs[this_name] != '') {
                                 form_inputs[this_name] += ',' + this_val
-                                url_inputs[this_name] += ',' + this_val
-
+                                url_inputs[this_name] += ',' + this_val;
                             } else {
                                 form_inputs[this_name] = this_val
-                                url_inputs[this_name] = this_val
+                                url_inputs[this_name] = this_val;
                             }
 
                         } else {
                             form_inputs[this_name] = this_val
-                            url_inputs[this_name] = this_val
+                            url_inputs[this_name] = this_val;
                         }
                     }
 
@@ -2526,7 +2523,6 @@
         }
 
         //
-
 
         function validate_submit() {
 

@@ -49,19 +49,31 @@
 
       // MAP CONTROLS
 
+      // zoom
+
       item.on('click', '.map-zoom-btn', function (e) {
-        let current_zoom = options.maps.ssp1.object.getZoom(),
+        // get the first visible map object
+
+        let first_map = null;
+
+        for (let key in options.maps) {
+          if (first_map == null && options.maps[key].container.is(':visible')) {
+            first_map = options.maps[key];
+          }
+        }
+
+        let current_zoom = first_map.object.getZoom(),
           new_zoom = current_zoom + 1;
 
         if ($(this).hasClass('zoom-out')) {
           new_zoom = current_zoom - 1;
         }
 
-        options.maps.ssp1.object.setZoom(new_zoom);
+        first_map.object.setZoom(new_zoom);
       });
     },
 
-    init_maps: function (maps) {
+    init_maps: function (maps, callback) {
       let plugin = this,
         options = plugin.options;
 
@@ -119,6 +131,20 @@
               options.maps[key].object.sync(options.maps[map].object);
           });
         }
+      }
+
+      for (let key in options.maps) {
+        options.maps[key].object.on('moveend', function (e) {
+          let new_center = options.maps[key].object.getCenter();
+
+          $('#coords-lat').val(new_center.lat);
+          $('#coords-lng').val(new_center.lng);
+          $('#coords-zoom').val(options.maps[key].object.getZoom());
+        });
+      }
+
+      if (typeof callback == 'function') {
+        callback(options.maps);
       }
 
       return options.maps;

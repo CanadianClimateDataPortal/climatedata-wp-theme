@@ -69,17 +69,6 @@ var result = {};
 
       // MAP CONTROLS
 
-      item.on('click', '.map-zoom-btn', function (e) {
-        let current_zoom = options.maps.ssp1.object.getZoom(),
-          new_zoom = current_zoom + 1;
-
-        if ($(this).hasClass('zoom-out')) {
-          new_zoom = current_zoom - 1;
-        }
-
-        options.maps.ssp1.object.setZoom(new_zoom);
-      });
-
       // SIDEBAR CONTROLS
 
       item.on('change', '#map-control-panels input', function () {
@@ -88,23 +77,7 @@ var result = {};
         if ($(this).prop('checked') == true) {
           this_panel.removeClass('hidden');
         } else {
-          // let this_width = this_panel.outerWidth();
-
-          //           this_panel.css('width', this_panel.outerWidth() + 'px');
-          //
-          //           setTimeout(function () {
-          //             this_panel.animate(
-          //               {
-          //                 width: '0px',
-          //               },
-          //               {
-          //                 duration: 500,
-          //                 complete: function () {
           this_panel.addClass('hidden');
-          //       },
-          //     },
-          //   );
-          // }, 1000);
         }
 
         setTimeout(function () {

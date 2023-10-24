@@ -59,6 +59,18 @@
 
         options.maps.ssp1.object.setZoom(new_zoom);
       });
+
+      //
+      // MISC INTERACTIONS
+      //
+
+      // toggle conditional form elements
+
+      plugin.toggle_conditionals();
+
+      $('body').on('change', '.conditional-trigger :input', function () {
+        plugin.toggle_conditionals();
+      });
     },
 
     init_maps: function (maps) {
@@ -134,6 +146,42 @@
       for (let key in options.maps) {
         options.maps[key].object.invalidateSize();
       }
+    },
+
+    toggle_conditionals: function () {
+      let plugin = this,
+        item = plugin.item,
+        options = plugin.options;
+
+      let conditionals = [];
+
+      item.find('[data-conditional]').each(function () {
+        if ($(this).is('[type="radio"]')) {
+          if ($(this).prop('checked') == true) {
+            conditionals.push({
+              items: $(this).attr('data-conditional').split(','),
+              action: 'show',
+            });
+          } else {
+            conditionals.push({
+              items: $(this).attr('data-conditional').split(','),
+              action: 'hide',
+            });
+          }
+        }
+      });
+
+      conditionals.forEach(function (conditional) {
+        conditional.items.forEach(function (item) {
+          if ($(item).length) {
+            if (conditional.action == 'show') {
+              $(item).show();
+            } else {
+              $(item).hide();
+            }
+          }
+        });
+      });
     },
   };
 

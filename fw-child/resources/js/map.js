@@ -61,6 +61,21 @@ var result = {};
 
       $('#control-bar').tab_drawer();
 
+      $('#location-tabs-container').tabs();
+
+      //
+      // UI WIDGETS
+      //
+
+      $('#display-colour-table').sortable({
+        items: '> div',
+        handle: '.display-colour-sort-handle',
+        placeholder: 'ui-state-highlight bg-white',
+        forcePlaceholderSize: true,
+      });
+
+      $('#display-colours-table').disableSelection();
+
       //
       // EVENTS
       //

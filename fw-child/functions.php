@@ -80,7 +80,7 @@ function child_theme_enqueue() {
 	
 	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 'jquery', 'leaflet', 'leaflet-sync', 'tab-drawer' ), NULL, true );
 	
-	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'jquery', 'leaflet', 'cdc', 'leaflet-sync', 'tab-drawer' ), NULL, true );
+	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'jquery', 'leaflet', 'cdc', 'leaflet-sync', 'tab-drawer', 'jquery-ui-tabs', 'jquery-ui-sortable' ), NULL, true );
 
 	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'jquery', 'cdc', 'leaflet', 'leaflet-sync', 'tab-drawer' ), NULL, true );
 	
@@ -99,6 +99,8 @@ function child_theme_enqueue() {
 	
 	wp_register_script ( 'leaflet-sync', $child_npm_dir . 'leaflet.sync/L.Map.Sync.js', array ( 'leaflet' ), null, true );
 	
+	wp_register_script ( 'zebra-pin', $child_npm_dir . 'zebra_pin/dist/zebra_pin.min.js', array ( 'jquery' ), null, true );
+	
 	// PAGE CONDITIONALS
 
 	switch ( $GLOBALS['vars']['current_slug'] ) {
@@ -111,6 +113,16 @@ function child_theme_enqueue() {
 		case 'telechargement' :
 			wp_enqueue_script ( 'download-app' );
 			break;
+			
+		case 'learn' :
+			wp_enqueue_script ( 'zebra-pin' );
+			wp_enqueue_script ( 'tab-drawer' );
+			break;
+			
+		case 'news' :
+			wp_enqueue_script ( 'zebra-pin' );
+			wp_enqueue_script ( 'tab-drawer' );
+			
 		
 	}
 	

@@ -8,7 +8,7 @@
 			
 			<div class="control-tab-body">
 				
-				<div id="map-control-aggregation" class="map-control-item">
+				<div id="map-control-aggregation" class="map-control-item conditional-trigger">
 					<h6>Change Aggregation</h6>
 					
 					<div class="form-check">
@@ -32,8 +32,13 @@
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-custom">
+						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-custom" data-conditional="#area-aggregation-shapefile">
 						<label class="form-check-label" for="area-aggregation-custom">Custom shapefile</label>
+					</div>
+					
+					<div id="area-aggregation-shapefile" class="bg-gray-200 p-2">
+						<label for="area-aggregation-shapefile-input" class="form-label"><?php _e ( 'Drop your GeoJSON file here to upload', 'cdc' ); ?></label>
+						<input class="form-control form-control-sm" id="area-aggregation-shapefile-input" type="file">
 					</div>
 					
 				</div>

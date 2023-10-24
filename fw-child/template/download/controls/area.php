@@ -9,31 +9,31 @@
 			<div class="control-tab-body">
 				
 				<div id="map-control-aggregation" class="map-control-item conditional-trigger">
-					<h6>Change Aggregation</h6>
+					<h6><?php _e ( 'Change Aggregation', 'cdc' ); ?></h6>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-grid" checked>
-						<label class="form-check-label" for="area-aggregation-grid">Gridded Data</label>
+						<label class="form-check-label" for="area-aggregation-grid"><?php _e ( 'Gridded Data', 'cdc' ); ?></label>
 					</div>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-csd">
-						<label class="form-check-label" for="area-aggregation-csd">Census Subdivisions</label>
+						<label class="form-check-label" for="area-aggregation-csd"><?php _e ( 'Census Subdivisions', 'cdc' ); ?></label>
 					</div>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-health">
-						<label class="form-check-label" for="area-aggregation-health">Health Regions</label>
+						<label class="form-check-label" for="area-aggregation-health"><?php _e ( 'Health Regions', 'cdc' ); ?></label>
 					</div>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-watershed">
-						<label class="form-check-label" for="area-aggregation-watershed">Watersheds</label>
+						<label class="form-check-label" for="area-aggregation-watershed"><?php _e ( 'Watersheds', 'cdc' ); ?></label>
 					</div>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-custom" data-conditional="#area-aggregation-shapefile">
-						<label class="form-check-label" for="area-aggregation-custom">Custom shapefile</label>
+						<label class="form-check-label" for="area-aggregation-custom"><?php _e ( 'Custom shapefile', 'cdc' ); ?></label>
 					</div>
 					
 					<div id="area-aggregation-shapefile" class="bg-gray-200 p-2">

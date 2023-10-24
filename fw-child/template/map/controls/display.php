@@ -22,37 +22,27 @@
 					</div>
 				</div>
 				
-				<div id="map-control-aggregation" class="map-control-item conditional-trigger">
+				<div id="map-control-aggregation" class="map-control-item">
 					<h6>Map Aggregation</h6>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="data-aggregation" id="data-aggregation-grid" checked>
-						<label class="form-check-label" for="data-aggregation-grid">Gridded Data</label>
+						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-grid" checked>
+						<label class="form-check-label" for="display-aggregation-grid">Gridded Data</label>
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="data-aggregation" id="data-aggregation-csd">
-						<label class="form-check-label" for="data-aggregation-csd">Census Subdivisions</label>
+						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-csd">
+						<label class="form-check-label" for="display-aggregation-csd">Census Subdivisions</label>
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="data-aggregation" id="data-aggregation-health">
-						<label class="form-check-label" for="data-aggregation-health">Health Regions</label>
+						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-health">
+						<label class="form-check-label" for="display-aggregation-health">Health Regions</label>
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="data-aggregation" id="data-aggregation-watershed">
-						<label class="form-check-label" for="data-aggregation-watershed">Watersheds</label>
-					</div>
-					
-					<div class="form-check">
-						<input class="form-check-input" type="radio" name="data-aggregation" id="data-aggregation-custom" data-conditional="#display-aggregation-shapefile">
-						<label class="form-check-label" for="data-aggregation-custom">Custom shapefile</label>
-					</div>
-					
-					<div id="display-aggregation-shapefile" class="bg-gray-200 p-2">
-						<label for="display-aggregation-shapefile-input" class="form-label"><?php _e ( 'Drop your GeoJSON file here to upload', 'cdc' ); ?></label>
-						<input class="form-control form-control-sm" id="display-aggregation-shapefile-input" type="file">
+						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-watershed">
+						<label class="form-check-label" for="display-aggregation-watershed">Watersheds</label>
 					</div>
 					
 				</div>
@@ -115,6 +105,7 @@
 						
 						<input type="radio" class="btn-check" name="display-colours-type" id="display-colours-continuous" autocomplete="off">
 						<label class="btn btn-outline-primary" for="display-colours-continuous"><?php _e ( 'Continuous', 'cdc' ); ?></label>
+						
 					</div>
 				</div>
 				

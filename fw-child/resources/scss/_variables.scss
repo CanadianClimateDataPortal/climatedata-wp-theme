@@ -408,17 +408,17 @@ $spacers: (
   2: $spacer * .5,
   3: $spacer,
   4: $spacer * 1.5,
-  5: $spacer * 3,
-  6: $spacer * 3.75,
-  7: $spacer * 4.5,
-  8: $spacer * 5.25,
-  9: $spacer * 6,
-  10: $spacer * 6.75,
-  11: $spacer * 7.5,
-  12: $spacer * 8.25,
-  13: $spacer * 9,
-  14: $spacer * 9.75,
-  15: $spacer * 10.5
+  5: $spacer * 2.25,
+  6: $spacer * 3,
+  7: $spacer * 3.75,
+  8: $spacer * 4.5,
+  9: $spacer * 5.25,
+  10: $spacer * 6,
+  11: $spacer * 6.75,
+  12: $spacer * 7.5,
+  13: $spacer * 8.25,
+  14: $spacer * 9,
+  15: $spacer * 10
   
 ) !default;
 // scss-docs-end spacer-variables-maps
@@ -457,7 +457,7 @@ $emphasis-color:            $black !default;
 //
 // Style anchor elements.
 
-$link-color:                              $primary;
+$link-color:                              $primary !default;
 $link-decoration:                         underline !default;
 $link-shade-percentage:                   20% !default;
 $link-hover-color:                        shift-color($link-color, $link-shade-percentage) !default;

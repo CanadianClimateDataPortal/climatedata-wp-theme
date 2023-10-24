@@ -1,6 +1,8 @@
 // builder
 // v2.0
 
+var key_to_add = ''
+var add_next = false
 
 var current_i = 0
 
@@ -2145,25 +2147,39 @@ var result = {}
 						
 						// setting contains a repeater
 						
-						if (Array.isArray(this_setting)) {
+						if (this_setting.rows != undefined) {
 							
-							this_setting.forEach(function(this_row) {
+							let new_class = ''
 							
-								console.log(this_row)
-									
-								let new_class = this_row.property + this_row.side
+							this_setting.rows.forEach(function(this_row) {
+							
+								// console.log(this_setting.type, this_row)
 								
-								if (this_row.breakpoint != '') {
-									new_class += '-' + this_row.breakpoint
+								switch (this_setting.type) {
+									case 'spacing' :
+									
+										new_class += this_row.property + this_row.side
+										
+										new_class += (this_row.breakpoint != '') ? '-' + this_row.breakpoint : ''
+											
+										new_class += '-' + this_row.value.replace('-', 'n')
+											+ ' '
+										
+										// console.log(new_class)
+										
+										break
+										
+									case 'attributes' :
+									
+										options.element.item.attr('data-' + this_row.name, this_row.value)
+									
+										break
+										
 								}
 								
-								new_class += '-' + this_row.value.replace('-', 'n')
-								
-								console.log(new_class)
-								
-								options.element.item.addClass(new_class)
-								
 							})
+							
+							options.element.item.addClass(new_class)
 							
 						}
 						
@@ -3737,9 +3753,11 @@ var result = {}
 				},
 				success: function(data) {
 					
-					// console.log(data)
+					console.log(data)
 					
 					let new_form = $(data)
+					
+					// console.log(new_form.html())
 					
 					// hide this setting from the dropdown
 					
@@ -3881,11 +3899,14 @@ var result = {}
 		
 		reindex_flex: function(container) {
 			
-			// console.log('reindex')
+			console.log('reindex', container)
 			
 			container.find('.fw-form-flex-row').each(function(i, item) {
+				
+				console.log($(this).attr('data-item'))
 				$(item).attr('data-row-index', i)
-				$(item).find('[name$="index"]').val(i)
+				console.log($(item).find('[name$="' + $(this).attr('data-item') + '-index"]'))
+				$(item).find('.card-body > [name$="index"]').val(i)
 			})
 			
 		},
@@ -4373,6 +4394,11 @@ var result = {}
 			// console.log('value', value)
 			// console.log('parent', JSON.stringify(current_parent))
 			
+			if (add_next == true) {
+				key_to_add = property
+				add_next = false
+			}
+			
 			if (key.length == 1) {
 				
 				// only 1 key left so it's time to
@@ -4453,6 +4479,8 @@ var result = {}
 				
 				if (property.includes('[]')) {
 					
+					add_next = true
+					
 					// i'm an array
 					
 					property = property.replace('[]', '')
@@ -4500,15 +4528,23 @@ var result = {}
 					// set array_key to the property that
 					// the new array is being created for
 					
-					options.array_key = property
+					if (property == 'rows') {
+						options.array_key = key_to_add + '-' + property
+					} else {
+						options.array_key = property
+					}
+					
+					// console.log('new key', options.array_key)
 					
 					// set the index for this property to 0
 					
-					if (!options.array_indexes[property]) {
+					if (!options.array_indexes[options.array_key]) {
 						
-						options.array_indexes[property] = 0
+						options.array_indexes[options.array_key] = 0
 						
 					}
+					
+					// console.log('indexes now', options.array_indexes)
 					
 				} else {
 					

@@ -487,9 +487,6 @@ function fw_setup_element ( $element, $globals ) {
 						
 					case 'attributes' :
 						
-						
-						// dumpit ( $options as);
-						
 						foreach ( $options['rows'] as $index => $att ) {
 							
 							$settings['atts'][$att['name']] = $att['value'];
@@ -606,7 +603,10 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 	
 	if (
 		$settings['el_type'] != 'page' && 
-		$GLOBALS['fw']['autogen'] == true
+		(
+			isset ( $globals['autogen'] ) && 
+			$globals['autogen'] == true
+		)
 	) {
 		$output_this_element = true;
 	}

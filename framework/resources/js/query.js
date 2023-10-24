@@ -56,8 +56,8 @@
 			// filter container
 			if (options.elements.filters == null) {
 				options.elements.filters = item.find('.filter')
-				console.log(item.find('.filter'))
-				console.log(options.elements.filters)
+				// console.log(item.find('.filter'))
+				// console.log(options.elements.filters)
 			}
 			
 			// [fw] element key

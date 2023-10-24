@@ -23,14 +23,14 @@
 			?>
 			
 			<div class="p-3 border-bottom">
-				<div class="row g-3 align-items-center">
-					<div class="col-3 form-settings-input element-form-input d-flex align-items-center justify-content-between">
+				<div class="row row-cols-4 g-3 align-items-center">
+					<div class="col form-settings-input element-form-input d-flex align-items-center justify-content-between">
 						<h6 class="mb-0"><?php echo $title; ?></h6>
 						<input type="hidden" name="inputs-breakpoints-<?php echo $key; ?>-d" id="breakpoints-<?php echo $key; ?>-d" value="block">
 						<span class="breakpoint-hide btn btn-outline-secondary">Hide</span>
 					</div>
 					
-					<div class="col-3 form-settings-input element-form-input">
+					<div class="col form-settings-input element-form-input">
 						
 						<div class="input-group">
 							<span class="input-group-text"><label for="inputs-breakpoints-<?php echo $key; ?>-col">Columns</label></span>
@@ -39,7 +39,7 @@
 						
 					</div>
 					
-					<div class="col-3 form-settings-input element-form-input">
+					<div class="col form-settings-input element-form-input">
 						
 						<div class="input-group">
 							<span class="input-group-text"><label for="inputs-breakpoints-<?php echo $key; ?>-offset">Offset</label></span>
@@ -48,7 +48,7 @@
 						
 					</div>
 					
-					<div class="col-3 form-settings-input element-form-input">
+					<div class="col form-settings-input element-form-input">
 						
 						<div class="input-group">
 							<span class="input-group-text"><label for="inputs-breakpoints-<?php echo $key; ?>-order">Order</label></span>

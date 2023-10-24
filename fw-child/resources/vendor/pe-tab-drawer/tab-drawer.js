@@ -109,7 +109,7 @@
 
         // console.log('container', this_container)
 
-        if (this_content.hasClass('selected')) {
+        if (this_content.hasClass('td-selected')) {
           
           // close this content
 
@@ -121,10 +121,10 @@
           // that is open
           // but shouldn't be
 
-          plugin.close_content(this_content.siblings('.selected'), false, function () {
+          plugin.close_content(this_content.siblings('.td-selected'), false, function () {
             // select this content
 
-            this_content.addClass('selected')
+            this_content.addClass('td-selected')
 
             // if a tab exists linking to this content
             // set it to active
@@ -158,7 +158,7 @@
 
       let content_to_close = []
 
-      selected_content.find('.tab-drawer.selected').each(function () {
+      selected_content.find('.tab-drawer.td-selected').each(function () {
         content_to_close.push($(this))
       })
 
@@ -173,7 +173,7 @@
       // set interval to close each drawer
 
       const close_and_shift = async () => {
-        content_to_close[0].removeClass('selected')
+        content_to_close[0].removeClass('td-selected')
 
         options.elements.tabs
           .find('a[href="#' + content_to_close[0].attr('id') + '"]')
@@ -215,7 +215,7 @@
         // if no content is selected,
         // set status to 'closed'
 
-        if (!item.find('.selected').length) {
+        if (!item.find('.td-selected').length) {
           options.status = 'closed'
           $('body').removeClass('tab-drawer-open')
         }
@@ -245,8 +245,8 @@
         $('body').find(window.location.hash).hasClass('tab-drawer')
       ) {
         plugin.select_content(window.location.hash, false)
-      } else if (item.find('.selected').length) {
-        plugin.close_content(item.find('.selected'), false)
+      } else if (item.find('.td-selected').length) {
+        plugin.close_content(item.find('.td-selected'), false)
       }
       
     },

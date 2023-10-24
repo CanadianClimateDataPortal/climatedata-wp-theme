@@ -79,7 +79,7 @@ $utilities: (
     transition: box-shadow 0.25s ease 0.25s;
     z-index: -1;
 
-    &:has(.tab-drawer.selected) {
+    &:has(.tab-drawer.td-selected) {
       width: calc((100vw / 16) * 3);
       box-shadow: 0 0 20px transparentize($black, 0.8);
     }

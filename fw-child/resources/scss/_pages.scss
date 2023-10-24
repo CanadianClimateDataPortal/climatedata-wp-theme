@@ -29,7 +29,7 @@
   }
 
   .tab-drawer-container {
-    &:has(#data-variable.selected) {
+    &:has(#data-variable.td-selected) {
       width: calc((100vw / 16) * 9);
     }
   }
@@ -39,7 +39,7 @@
   }
 
   .tab-drawer-container {
-    &:has(#location-detail.selected) {
+    &:has(#location-detail.td-selected) {
       width: calc((100vw / 16) * 7);
     }
   }

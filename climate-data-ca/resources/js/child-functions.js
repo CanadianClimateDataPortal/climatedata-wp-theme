@@ -1525,3 +1525,133 @@ function getIDFLinks(station_id, target, css_class) {
 
     });
 })(jQuery);
+
+
+// Return a compressed string representing a list of points - [[lat,lon]]
+function getEncodedPoints(latArray, lonArray) {
+    if (latArray.length !== lonArray.length) {
+        throw new Error('LatArray and LonArray must have same number of elements');
+    }
+
+    let points = []
+
+
+    for (var i in latArray) {
+        points.push([latArray[i], lonArray[i]])
+    }
+
+    let compressedLatLongPoints = compressLatLonPointsToString(points)
+
+    return compressedLatLongPoints
+}
+
+// This method compresse a list of point to a short string
+// Source of the following code : https://learn.microsoft.com/en-us/bingmaps/rest-services/elevations/point-compression-algorithm
+function compressLatLonPointsToString(points) {
+    const SAFE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+    const MULTIPLIER = 100;
+    const DIVIDER = 32;
+
+    var result = "";
+    var latitude = 0;
+    var longitude = 0;
+
+    // console.log("ENCODING",points)
+
+    for (var i in points) {
+        var newLat = Math.round(points[i][0] * MULTIPLIER);
+        var newLon = Math.round(points[i][1] * MULTIPLIER);
+
+        var dy = newLat - latitude;
+        var dx = newLon - longitude;
+
+        latitude = newLat;
+        longitude = newLon;
+        dy = (dy << 1) ^ (dy >> 31);
+        dx = (dx << 1) ^ (dx >> 31);
+
+        var index = ((dy + dx) * (dy + dx + 1)) / 2 + dy;
+
+        while (index > 0) {
+            var rem = index & 31;
+
+            index = (index - rem) / DIVIDER;
+
+            if (index > 0) {
+                rem += DIVIDER;
+            }
+
+            result += SAFE_CHARACTERS[rem];
+        }
+    }
+    return result;
+}
+
+// This method decompresse the short random
+function decompressLatLonPointsStringToList(compressedValue) {
+    const SAFE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+    const MULTIPLIER = 100;
+    const DIVIDER = 32;
+
+    var latLon = [];
+    var pointsArray = [];
+    var point = [];
+    var lastLat = 0,
+        lastLon = 0;
+
+    for (var i = 0; i < compressedValue.length; i++) {
+        var num = SAFE_CHARACTERS.indexOf(compressedValue[i]);
+
+        if (num < DIVIDER) {
+            point.push(num);
+            pointsArray.push(point);
+            point = [];
+        } else {
+            num -= DIVIDER;
+            point.push(num);
+        }
+    }
+
+    for (var y in pointsArray) {
+        var result = 0;
+        var list = pointsArray[y].reverse();
+
+        for (var x in list) {
+            if (result == 0) {
+                result = list[x];
+            } else {
+                result = result * DIVIDER + list[x];
+            }
+        }
+
+        var dIag = parseInt((Math.sqrt(8 * result + 5) - 1) / 2);
+
+        var latY = result - (dIag * (dIag + 1)) / 2;
+        var lonX = dIag - latY;
+
+        if (latY % 2 == 1) {
+            latY = (latY + 1) * -1;
+        }
+        if (lonX % 2 == 1) {
+            lonX = (lonX + 1) * -1;
+        }
+
+        latY /= 2;
+        lonX /= 2;
+        var lat = latY + lastLat;
+        var lon = lonX + lastLon;
+
+        lastLat = lat;
+        lastLon = lon;
+        lat /= MULTIPLIER;
+        lon /= MULTIPLIER;
+
+        // latLon.push(lat, lon);
+        latLon.push({
+            "point": [lat, lon]
+        })
+    }
+
+
+    return latLon;
+}

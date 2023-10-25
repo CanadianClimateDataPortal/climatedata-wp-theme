@@ -83,6 +83,11 @@
               <input class="add-to-object" type="hidden" name="shape" id="shape" value="">
               <input class="add-to-object" type="hidden" name="average" id="average" value="">
 
+            <input type="hidden" id="location" value="grid">
+            <input class="add-to-object" type="hidden" id="zoom" name="zoom" value="7">
+            <input class="add-to-object" type="hidden" id="center" name="center" value="62.51231793838694;-98.5693359375">
+
+
           <div id="analyze-steps" class="analyze-steps">
                 <div class="accordion-head" data-step="1">
                   <h5 class="d-flex align-items-center justify-content-between all-caps">
@@ -130,7 +135,7 @@
                     <div class="field validate-input type-radio">
                       <div class="input-row form-check">
                         <div class="input-item">
-                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-grid" value="grid">
+                          <input class="form-check-input add-to-object" type="radio" name="analyze-location" id="analyze-location-grid" value="grid">
                           <label class="form-check-label" for="analyze-location-grid"><?php _e ( 'Grids', 'cdc' ); ?></label>
                         </div>
 
@@ -139,21 +144,21 @@
 
                     <div class="input-row form-check">
                         <div class="input-item">
-                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-watershed" value="watershed">
+                          <input class="form-check-input add-to-object" type="radio" name="analyze-location" id="analyze-location-watershed" value="watershed">
                           <label class="form-check-label" for="analyze-location-watershed"><?php _e ( 'Watershed', 'cdc' ); ?></label>
                         </div>
                     </div>
 
                     <div class="input-row form-check">
                         <div class="input-item">
-                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-census-division" value="census">
+                          <input class="form-check-input add-to-object" type="radio" name="analyze-location" id="analyze-location-census-division" value="census">
                           <label class="form-check-label" for="analyze-location-census-division"><?php _e ( 'Census division', 'cdc' ); ?></label>
                         </div>
                     </div>
 
                     <div class="input-row form-check">
                         <div class="input-item">
-                          <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-health-region" value="health">
+                          <input class="form-check-input add-to-object" type="radio" name="analyze-location" id="analyze-location-health-region" value="health">
                           <label class="form-check-label" for="analyze-location-health-region"><?php _e ( 'Health region', 'cdc' ); ?></label>
                         </div>
                     </div>
@@ -228,7 +233,7 @@
 
                         <div class="input-row form-check input-variable" data-frequencies='<?php the_sub_field ('frequencies'); ?>' data-content='<?php echo json_encode ( $var_description ); ?>'>
                           <div class="input-item">
-                            <input class="form-check-input" type="radio" name="analyze-var" id="analyze-var-<?php the_sub_field ( 'var' ); ?>" value="<?php the_sub_field ( 'var' ); ?>">
+                            <input class="form-check-input add-to-object" type="radio" name="analyze-var" id="analyze-var-<?php the_sub_field ( 'var' ); ?>" value="<?php the_sub_field ( 'var' ); ?>">
                             <label class="form-check-label" for="analyze-var-<?php the_sub_field ( 'var' ); ?>"><?php the_sub_field ( 'name' ); ?></label>
                           </div>
 
@@ -433,7 +438,7 @@
                                 </div>
                             </div>
                         </div>
-												
+
                       <div class="field validate-input type-radio d-flex flex-wrap">
                         <p class="input-label w-100"><?php _e ( 'Output Format', 'cdc' ); ?></p>
 
@@ -469,9 +474,21 @@
                   </div>
 
                 </div>
-              </div>
 
+              </div>
+                <div class="copy-link" id="copy-link">
+                    <h6><?php _e('Share this analyze form', 'cdc' ); ?></h6>
+                    <a id="shareableURL" href="#" class="share-link share-permalink" data-share-url="">
+                        <h5>
+                            <i class="icon fas fa-share-alt mr-3"></i>
+                            <span id="lnk-on" class="label" > <?php _e('Copy link', 'cdc'); ?> </span>
+
+                        </h5>
+                    </a>
+                    <span id="lnk-off" class="label" style="visibility: hidden"> <?php _e('Copied to clipboard', 'cdc'); ?> </span>
+                </div>
             </form>
+
           </div>
 
           <div class="col-9">
@@ -572,7 +589,7 @@
                 ?>'>
                   <h4><?php _e ( 'Choose a dataset', 'cdc' ); ?></h4>
                   <p><?php _e ( 'Start by selecting a dataset from the menu on the left.', 'cdc' ); ?></p>
-                  <span class="btn btn-outline-secondary rounded-pill hidden"><?php _e ( 'Click to continue', 'cdc' ); ?></span>
+                  <span id="btn-activate-map"  class="btn btn-outline-secondary rounded-pill hidden"><?php _e ( 'Click to continue', 'cdc' ); ?></span>
                 </div>
 
               </div>

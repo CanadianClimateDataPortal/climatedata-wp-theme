@@ -814,29 +814,29 @@ var result = {}
 			
 			$('body').on('click', '.fw-settings-submit', function() {
 				
+				console.log('submit', JSON.stringify(options.element.data))
+				
 				let form = $(this).closest('.modal').find('form'),
 						form_data = []//form.serializeArray()
 				
-				// add unchecked checkboxes as 'false'
+				// each form input
 				
 				form.find(':input:not(button)').each(function() {
 					
 					if (typeof $(this).attr('name') !== 'undefined') {
 						
-						// console.log($(this))
-						// console.log($(this).attr('name'), $(this).val())
-						
 						if ($(this).is('[type="checkbox"]')) {
 							
-							// on/off toggle
-							// or multi-select
+							// checkboxes
+							// on/off toggle or multi-select
 							
 							if ($(this).attr('name').slice(-2) == '[]') {
 								
+								// if the last 2 characters are []
+								// then it's a multi-select checkbox group
+								
 								if ($(this).prop('checked') == true) {
 								
-									// multi-select
-									
 									form_data.push({
 										name: $(this).attr('name'),
 										value: $(this).val()
@@ -845,9 +845,7 @@ var result = {}
 								}
 								
 							} else {
-							
-								// console.log($(this), $(this).prop('checked'))
-							
+								
 								// true/false
 								
 								form_data.push({
@@ -872,7 +870,7 @@ var result = {}
 				
 				console.log(form_data)
 				
-				console.log(options.status)
+				// console.log(options.status)
 				
 				// ACTION
 				
@@ -913,33 +911,27 @@ var result = {}
 						
 						if (options.element.data.type == 'template') {
 							
-							console.log('parent', options.parent.data.key)
-							
-							console.log('insert template', options.element.data.inputs.post_id)
-							
-							console.log('get template and then create tree under ' + options.parent.data.type + ' ' + options.parent.data.key)
-							
-							plugin.get_template(
-								options.parent, 
-								options.element
-							)
+							// if (options.element.data.inputs.output == 'template') {
+								// inserting a template
+								
+								console.log('get template and then create tree under ' + options.parent.data.type + ' ' + options.parent.data.key)
+								
+								plugin.get_template(
+									options.parent, 
+									options.element
+								)
+							// }
 							
 						} else {
+							
+							// inserting a new element
 							
 							console.log('create tree under ' + options.parent.data.type + ' ' + options.parent.data.key)
 							
 							plugin.create_tree(options.parent, options.element)
+							plugin.insert_element()
 							
 						}
-						// } else {
-							
-							
-							// $('#output').append("1: parent item when starting auto generating\n\n")
-							// $('#output').append(options.parent.item.attr('class') + "\n\n")
-							
-							// plugin.create_tree(options.parent, options.element)
-							
-						// } 
 						
 						break
 						
@@ -1363,6 +1355,9 @@ var result = {}
 			
 			console.log('getting template')
 			
+			console.log('parent data')
+			console.log(JSON.stringify(parent.data, null, 2))
+			
 			// use the parent element's type
 			// to figure out which element the template
 			// output should start with
@@ -1377,71 +1372,249 @@ var result = {}
 				
 			})
 			
-			// console.log('parent')
-			// console.log(JSON.stringify(parent.data, null, 2))
-			// console.log('element')
-			// console.log(JSON.stringify(element.data, null, 2))
-			
-			$.ajax({
-				url: ajax_data.url,
-				type: 'GET',
-				data: {
-					action: 'fw_output_element_ajax',
-					globals: options.globals,
-					element: element.data
-				},
-				success: function(data) {
-					
-					console.log(data)
-					
-					// if (element.data.inputs.source == 'include') {
-					// 	
-					// 	
-					// 	
-					// } else if (element.data.inputs.source == 'post') {
-					
-						// console.log('replace', element.item)
+			if (element.data.inputs.output == 'copy') {
+				
+				// get the page object first
+				
+				$.ajax({
+					url: ajax_data.url,
+					type: 'GET',
+					data: {
+						action: 'fw_get_builder_object',
+						post_id: element.data.inputs.post_id
+					},
+					success: function(obj_data) {
 						
-						let template_key = element.data.inputs.post_id
+						obj_data = JSON.parse(obj_data)
 						
-						if (element.data.inputs.path != '' && element.data.inputs.path != null) {
-							template_key = element.data.inputs.path
+						// options.page = JSON.parse(obj_data.replaceAll(element.obj_data.inputs.post_id, options.globals.current_query.ID))
+						
+						// find the first non-autogen child
+						
+						function find_real_child(obj) {
+							if (obj.autogen == undefined || obj.autogen == 'false') {
+								return obj
+							} else {
+								return find_real_child(obj.children[0])
+							}
 						}
 						
-						options.template_html = '<div class="fw-template-label begin" data-template-key="' + template_key + '"></div>' + data + '<div class="fw-template-label end" data-template-key="' + template_key + '"></div>'
+						obj_data = find_real_child(obj_data.children[0])
+						
+						let insert_index = options.inserting.index
+						
+						if (options.inserting.where !== 'before') {
+							insert_index += 1
+						}
+						
+						if (
+							options.parent.data.children.length == 0 || 
+							options.parent.data.children == undefined
+						) {
+							
+							options.parent.data.children = [ obj_data ]
+							
+						} else {
+							
+							// parent.data.children has values already
+							// so we need to figure out where to
+							// put the new stuff
+							
+							let deleted_array = options.parent.data.children.splice(insert_index, 0, obj_data)
+							
+						}
+						
+						// console.log('children now')
+						// console.log(JSON.stringify(options.parent.data.children))
+						
+						// get the output loop
+						
+						$.ajax({
+							url: ajax_data.url,
+							type: 'GET',
+							data: {
+								action: 'fw_output_loop_ajax',
+								globals: options.globals,
+								post_id: element.data.inputs.post_id
+							},
+							success: function(loop_data) {
+								
+								// let new_html = $(loop_data.replaceAll(source_ID, options.globals.current_query.ID))
+								
+								// find first non-autogen element
+								let new_html = $(loop_data).find('.fw-element:not(.fw-page):not(.fw-auto-generated').first()
+								
+								let keep_parent = parent
+								
+								// console.log('keep 1')
+								// console.log(JSON.stringify(keep_parent, null, 2))
+								
+								options.template_html = new_html.prop('outerHTML')
+								
+								element.data = obj_data
+								
+								// console.log('new html', new_html.prop('outerHTML'))
+								element.item = new_html.prop('outerHTML')
+								
+								// auto-generate any required parents
+								plugin.create_tree(parent, element)
+								
+								// add the html to the tree
+								console.log(options.inserting)
+								
+								// find the reference item for
+								// the inserted element to go before/after
+								
+								let insert_eq
+								
+								if (options.inserting.index != null) {
+									insert_eq = $('[data-key="' + keep_parent.data.key + '"]').find('> .fw-element').eq(options.inserting.index)
+								}
+								
+								if (
+									options.inserting.where != 'append' && 
+									options.inserting.index != null
+								) {
+									
+									// if not appending,
+									// get the item that sits at insert_index
+									
+									// insert_eq = $('[data-key="' + keep_parent.data.children[insert_index].key + '"]')
+									
+								}
+								
+								// console.log('eq', insert_eq)
+								
+								switch (options.inserting.where) {
+									case 'append' :
+										new_html.appendTo(keep_parent.item)
+										break
+										
+									case 'before' :
+									
+										// console.log('before', insert_eq)
+										
+										if (insert_eq.length > 0) {
+											insert_eq = insert_eq[0]
+										}
+										
+										new_html.insertBefore(insert_eq)
+										
+										break
+										
+									case 'after' :
+									
+										// inserting after
+										
+										// console.log('after', insert_eq)
+										
+										if (insert_eq.length > 0) {
+											insert_eq = insert_eq[insert_eq.length - 1]
+										}
+										
+										new_html.insertAfter(insert_eq)
+										
+										break
+										
+								}
+								
+								// reindex element keys
+								plugin.set_elements_to_move(parent.data)
+								plugin.set_element_keys()
+								
+								// activate new elements
+								plugin.activate(keep_parent.data)
+								
+							}
+						})
+						
+						
+					}
+				})
+				
+				
+			} else {
+					
+				// console.log('parent')
+				// console.log(JSON.stringify(parent.data, null, 2))
+				// console.log('element')
+				// console.log(JSON.stringify(element.data, null, 2))
+				
+				$.ajax({
+					url: ajax_data.url,
+					type: 'GET',
+					data: {
+						action: 'fw_output_element_ajax',
+						globals: options.globals,
+						element: element.data
+					},
+					success: function(data) {
+						
+						console.log(data)
+						
+						// if we're copying elements
+						// we need to adjust the element data
+						
+						if (options.element.data.inputs.output == 'copy') {
+							
+							options.template_html = data
+							
+						} else {
+						
+							let template_key = element.data.inputs.post_id
+							
+							if (
+								element.data.inputs.path != '' && 
+								element.data.inputs.path != null
+							) {
+								template_key = element.data.inputs.path
+							}
+							
+							if (
+								element.data.inputs.source == 'post' && 
+								element.data.inputs.output == 'template'
+							) {
+								
+								// console.log('something here now')
+								
+								options.template_html = '<div class="fw-template-label begin" data-template-key="' + template_key + '"></div>' + data + '<div class="fw-template-label end" data-template-key="' + template_key + '"></div>'
+								
+							} else {
+							
+								options.template_html = data
+								
+							}
+							
+						}
 						
 						console.log($(data).first())
 						
 						options.template_first = $(data).first()
 						
-					// }
+						// console.log(JSON.stringify(element.data, null, 2))
+						// console.log(JSON.stringify(options.element.data, null, 2))
 					
-					// console.log('first', options.template_first)
-					
-					// element.item.css('border', '1px solid red').html(data)
-					
-					
-					// console.log(JSON.stringify(element.data, null, 2))
-					// console.log(JSON.stringify(options.element.data, null, 2))
-					
-				},
-				complete: function() {
-					
-					// the first element in the template
-					// becomes the stopping point
-					// for auto-generating in create_tree
-					
-					console.log('done getting template, create tree under ' + options.parent.data.type + ' ' + options.parent.data.key)
-					
-					console.log(JSON.stringify(element.data, null, 2))
-					console.log(JSON.stringify(options.element.data, null, 2))
-					
-					// if (element.data.inputs.source == 'post') {
-						plugin.create_tree(options.parent, element)
-					// }
-					
-				}
-			})
+					},
+					complete: function() {
+						
+						// the first element in the template
+						// becomes the stopping point
+						// for auto-generating in create_tree
+						
+						console.log('done getting template, create tree under ' + options.parent.data.type + ' ' + options.parent.data.key)
+						
+						console.log(JSON.stringify(element.data, null, 2))
+						// console.log(JSON.stringify(options.element.data, null, 2))
+						
+						// if (element.data.inputs.source == 'post') {
+							plugin.create_tree(options.parent, element)
+							plugin.insert_element()
+						// }
+						
+					}
+				})
+				
+			}
 			
 		},
 		
@@ -1455,11 +1628,22 @@ var result = {}
 					temp_element = null,
 					temp_key = options.parent.data.key
 			
+			console.log('create tree now')
+			
+			// console.log('start at parent')
+			// console.log(JSON.stringify(parent.data, null, 2))
+			// 
+			// console.log('end before element')
+			// console.log(JSON.stringify(element.data, null, 2))
+			
 			let insert_index = options.inserting.index + 1
 			let insert_eq
 			
 			if (options.inserting.index != null) {
+				
 				insert_eq = $('[data-key="' + options.parent.data.key + '"]').find('> .fw-element').eq(options.inserting.index)
+				
+				console.log('eq 1', insert_eq)
 			}
 			
 			let parent_has_changed = false
@@ -1490,6 +1674,8 @@ var result = {}
 					options.template_first = options.template_first.split('fw-element fw-')[1]
 					options.template_first = options.template_first.split(' ')[0]
 					
+					console.log('template first', options.template_first)
+					
 				}
 				
 				comparing_key = options.template_first
@@ -1500,7 +1686,8 @@ var result = {}
 			
 			if (
 				comparing_key != 'include' && 
-				options.objects[parent.data.type].child != comparing_key
+				options.objects[parent.data.type].child != comparing_key &&
+				element.data.type != parent.data.type
 			) {
 				
 				console.log(element.data.type + ' is not a direct child of ' + parent.data.type)
@@ -1510,10 +1697,6 @@ var result = {}
 				// each object type
 				
 				for (var object_type in options.objects) {
-					
-					// console.log('---')
-					
-					// console.log(object_type, options.parent.data.key, start_generating)
 					
 					// skip templates
 					
@@ -1528,7 +1711,6 @@ var result = {}
 							// found the object type that matches
 							// the parent that we're inserting into
 							
-							// console.log('start here', object_type)
 							start_generating = true
 							
 						} else if (start_generating == true) {
@@ -1608,7 +1790,7 @@ var result = {}
 								
 								// console.log('new temp_key', temp_key, temp_element.data)
 								
-								plugin.setup_element(options.parent, temp_element)
+								plugin.setup_element(temp_element)
 								
 								// console.log('created', temp_element)
 								// console.log('in', options.parent.data)
@@ -1642,7 +1824,7 @@ var result = {}
 								
 								// rebuild the key structure
 								// not needed here?
-								plugin.set_element_keys(options.page)
+								plugin.set_element_keys()
 								
 							}
 							
@@ -1660,7 +1842,7 @@ var result = {}
 			}
 			
 			// insert the new element
-
+			
 			if (options.template_html != '') {
 				
 				// HTML retrieved from template
@@ -1677,7 +1859,17 @@ var result = {}
 				
 			}
 			
-			plugin.insert_element()
+			// console.log(options.element.data)
+			// 
+			// if (
+			// 	options.element.data.type == 'template' &&
+			// 	options.element.data.inputs.output == 'copy'
+			// ) {
+			// 	console.log('do nothing')
+			// 	// nothing
+			// } else {
+			// 	plugin.insert_element()
+			// }
 			
 		},
 		
@@ -1707,7 +1899,10 @@ var result = {}
 				options.inserting.where = 'append'
 			}
 			
-			if (options.inserting.where != 'append' && options.inserting.index != null) {
+			if (
+				options.inserting.where != 'append' && 
+				options.inserting.index != null
+			) {
 				
 				console.log('index', options.inserting.index)
 				console.log('children', options.parent.data.children)
@@ -1715,22 +1910,35 @@ var result = {}
 				
 				insert_eq = $('[data-key="' + options.parent.data.children[options.inserting.index].key + '"]')
 				
+				console.log('eq 2', insert_eq)
 				// insert_eq = $('[data-key="' + options.parent.data.key + '"]').find('> .fw-element').eq(options.inserting.index)
 			}
 			
 			let inserted_el
 			
+			// console.log('item now', typeof options.element.item, options.element.item)
+			
 			if (typeof options.element.item == 'string') {
 				
-				// template
+				console.log('insert string')
+				
+				// it's a template
 				
 				inserted_el = $(options.element.item)
 				
+				// console.log('inserted element', inserted_el)
+				
 			} else {
+				
+				console.log('insert obj')
+				
+				// console.log(options.element.item)
+				// console.log(options.element.item.prop('outerHTML'))
 				
 				// object
 				
 				inserted_el = $(options.element.item.prop('outerHTML'))
+				
 				
 			}
 			
@@ -1800,6 +2008,7 @@ var result = {}
 				// reset keys in parent
 				
 				// gather elements to move
+				
 				plugin.set_elements_to_move(options.parent.data)
 				
 				// set keys of moving elements
@@ -1811,11 +2020,19 @@ var result = {}
 			
 			// SETUP
 			
-			if (options.element.data.type !== 'template') {
+			if (options.element.data.type == 'template') {
+			
+				// setup inserted element(s) as a template
+				
+				console.log('setup', options.parent, options.element)
+				
+				plugin.setup_template(options.parent.data.key, options.element.data)
+				
+			} else {
 				
 				// setup inserted element
 				
-				plugin.setup_element(options.parent, options.element)
+				plugin.setup_element(options.element)
 				
 				if (!options.element.data.type.includes('block')) {
 					
@@ -1826,19 +2043,50 @@ var result = {}
 					
 				}
 				
-			} else {
-				
-				// setup inserted element(s) as a template
-				
-				console.log('setup', options.parent, options.element)
-				
-				plugin.setup_template(options.parent.data.key, options.element.data)
-				
 			}
 			
 		},
 		
-		setup_element: function(parent, element) {
+		insert_recursive: function(element_data) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			console.log('---')
+			console.log('element', element_data)
+			
+			element_data.children.forEach(function(parent_obj) {
+				
+				console.log('inserting new child of ', element_data.key)
+				
+				console.log('parent', parent_obj)
+				
+				console.log('parent by key', element_data.key, $('body').find('[data-key="' + element_data.key + '"]'))
+				
+				// the last object
+				options.parent = {
+					item: $('body').find('[data-key="' + element_data.key + '"]'),
+					data: element_data
+				}
+				
+				options.element = {
+					item: $('<div>'),
+					data: parent_obj
+				}
+				
+				plugin.insert_element()
+					
+				if (parent_obj.children) {
+					console.log('has children')
+					console.log(JSON.stringify(parent_obj.children, null, 2))
+					plugin.insert_recursive(parent_obj)
+				}
+				
+			})
+			
+		},
+		
+		setup_element: function(element) {
 			
 			let plugin = this,
 					options = plugin.options
@@ -1864,11 +2112,11 @@ var result = {}
 						...data
 					}
 					
-					console.log('merged', element.data)
+					console.log('merged element data', element.data)
 					
 					// set attributes
 					plugin.set_element_atts(element)
-					
+			
 					// populate block
 					
 					if (element.data.type.includes('block')) {
@@ -1883,16 +2131,24 @@ var result = {}
 					
 					// add footer
 					plugin.add_footer(element.data)
-					
+			
 					// settings
 					
 					if (element.data.autogen !== true) {
 						plugin.do_element_settings()
 					}
 					
+					// do we need to insert more than 1 element
+					
+					if (element.data.children) {
+						// console.log('element data children???')
+						// console.log(JSON.stringify(element.data.children, null, 2))
+						// plugin.insert_recursive(element.data)
+						plugin.activate(element.data)
+					}
+					
 					// reset modal data
 					plugin.reset_modal()
-					
 					
 				}
 			})
@@ -2050,7 +2306,7 @@ var result = {}
 					
 					plugin.add_footer(child)
 					
-					if (child.type == 'template') {
+					if (child.type == 'template' && child.inputs.output == 'template') {
 						plugin.setup_template(child.key.slice(0, -2), child)
 					}
 					
@@ -3285,7 +3541,7 @@ var result = {}
 				
 				if (flex_forms.length > 0) {
 					
-					var allAJAX = flex_forms.map(flex_form => {
+					let allAJAX = flex_forms.map(flex_form => {
 						
 						// console.log('getting ' + flex_form.path)
 						
@@ -4150,20 +4406,20 @@ var result = {}
 			
 			// console.log('pre', JSON.stringify(options.element.data.inputs, null, 2))
 			
-			function input_recursive(obj) {
-				
-				for (let key in obj) {
-					if (Array.isArray(obj[key])) {
-						obj[key] = []
-					} else if (typeof obj[key] == 'object') {
-						input_recursive(obj[key])
-					}
-				}
-				
-				return obj
-			}
-			
-			input_recursive(options.element.data.inputs)
+			// function input_recursive(obj) {
+			// 	
+			// 	for (let key in obj) {
+			// 		if (Array.isArray(obj[key])) {
+			// 			obj[key] = []
+			// 		} else if (typeof obj[key] == 'object') {
+			// 			input_recursive(obj[key])
+			// 		}
+			// 	}
+			// 	
+			// 	return obj
+			// }
+			// 
+			// input_recursive(options.element.data.inputs)
 			
 			form_data.forEach(function(input) {
 				
@@ -4213,11 +4469,6 @@ var result = {}
 			// console.log('element now')
 			// console.log(JSON.stringify(element_data, null, 2))
 			
-			// reset repeater flag
-			// 
-			// options.adding_to_repeater = false
-			// options.repeater_index = -1
-			
 			// reset array flag
 			
 			// options.adding_to_array = false
@@ -4249,12 +4500,13 @@ var result = {}
 			
 		},
 		
-		set_element_keys: function(parent) {
+		set_element_keys: function() {
 			
 			let plugin = this,
 					options = plugin.options
 			
-			// console.log('to move', options.elements_to_move)
+			console.log('to move')
+			console.log(options.elements_to_move)
 			
 			options.elements_to_move.forEach(function(element) {
 				
@@ -4307,6 +4559,8 @@ var result = {}
 					})
 					
 					// console.log(old_key + ' > ' + child.key)
+					
+					// recursive
 					
 					if (child.children) {
 						plugin.set_elements_to_move(child)

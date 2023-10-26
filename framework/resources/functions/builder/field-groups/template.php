@@ -8,20 +8,20 @@
 	<div id="element-form-content" class="accordion-collapse collapse show" aria-labelledby="element-form-head-content" data-bs-parent="#element-form">
 		<div class="accordion-body">
 	
-			<div class="row">
+			<div class="row row-cols-3 py-3 ps-3">
 				
-				<div class="col p-3">
+				<div class="col pe-3">
 					
-					<label for="inputs-source">Template Source</label>
+					<label for="inputs-source" class="form-label">Template Source</label>
 					
 					<select class="form-select conditional-select" name="inputs-source" id="inputs-source">
-						<option value="post" data-form-condition="#inputs-post_id">Post</option>
+						<option value="post" data-form-condition="#inputs-post_id,#inputs-output">Post</option>
 						<option value="include" data-form-condition="#inputs-path">File include</option>
 					</select>
 					
 				</div>
 				
-				<div class="col-8 p-3">
+				<div class="col flex-grow-1 pe-3">
 					<div class="conditional-element-container">
 						<?php
 							
@@ -34,7 +34,7 @@
 							
 						?>
 						
-						<label for="inputs-post_id">Template Post</label>
+						<label for="inputs-post_id" class="form-label">Template Post</label>
 						
 						<select class="form-select" name="inputs-post_id" id="inputs-post_id">
 							<!-- <option selected disabled>Select a template</option> -->
@@ -65,7 +65,7 @@
 				
 					<div class="conditional-element-container">
 						
-						<label for="inputs-path">Path</label>
+						<label for="inputs-path" class="form-label">Path</label>
 						
 						<div class="input-group">
 							<span class="input-group-text">theme/template/</span>
@@ -73,6 +73,21 @@
 							<input type="text" class="form-control" name="inputs-path" id="inputs-path" value="nav.php" placeholder="subdir/filename.php">
 						</div>
 					</div>
+					
+				</div>
+				
+			</div>
+			
+			<div class="row row-cols-3 py-3 ps-3 conditional-element-container">
+				
+				<div class="col pe-3">
+					
+					<label for="inputs-output" class="form-label">Output</label>
+					
+					<select class="form-select conditional-select" name="inputs-output" id="inputs-output">
+						<option value="template">Insert as template</option>
+						<option value="copy">Copy editable elements to page</option>
+					</select>
 					
 				</div>
 				

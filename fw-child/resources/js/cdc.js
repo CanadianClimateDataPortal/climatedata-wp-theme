@@ -8,6 +8,12 @@
       lang: ajax_data.globals.lang,
       post_id: null,
       maps: {},
+      coords: {
+        lat: null,
+        lng: null,
+        zoom: null,
+      },
+      first_map: null,
       debug: true,
     };
 
@@ -113,6 +119,7 @@
         this_object.getPane('labels').style.zIndex = 550;
         this_object.getPane('labels').style.pointerEvents = 'none';
 
+        // basemap
         L.tileLayer(
           '//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png',
           {
@@ -124,6 +131,8 @@
         ).addTo(this_object);
       }
 
+      // sync if multiple maps exist
+
       if (Object.keys(options.maps).length > 1) {
         for (let key in options.maps) {
           Object.keys(options.maps).forEach(function (map) {
@@ -133,21 +142,41 @@
         }
       }
 
-      for (let key in options.maps) {
-        options.maps[key].object.on('moveend', function (e) {
-          let new_center = options.maps[key].object.getCenter();
+      // use first_map to set event handlers
+      // assumes all maps are visible on load
 
-          $('#coords-lat').val(new_center.lat);
-          $('#coords-lng').val(new_center.lng);
-          $('#coords-zoom').val(options.maps[key].object.getZoom());
-        });
-      }
+      options.first_map = Object.values(options.maps)[0];
+
+      // update coords
+
+      plugin.update_coord_inputs();
+
+      console.log('first map', options.first_map);
+
+      options.first_map.object.on('moveend', function (e) {
+        plugin.update_coord_inputs();
+      });
 
       if (typeof callback == 'function') {
         callback(options.maps);
       }
 
       return options.maps;
+    },
+
+    update_coord_inputs: function () {
+      let plugin = this,
+        item = plugin.item,
+        options = plugin.options;
+
+      options.coords.lat = options.first_map.object.getCenter().lat;
+      options.coords.lng = options.first_map.object.getCenter().lng;
+      options.coords.zoom = options.first_map.object.getZoom();
+
+      $('#coords-lat').val(options.coords.lat);
+      $('#coords-lng').val(options.coords.lng);
+      $('#coords-zoom').val(options.coords.zoom);
+      console.log('updated', options.coords);
     },
 
     invalidate_size: function () {

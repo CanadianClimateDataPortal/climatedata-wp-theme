@@ -362,11 +362,10 @@ add_action ( 'admin_bar_menu', function ( $admin_bar ) {
 
 
 //
-function my_acf_init() {
-		acf_update_setting('remove_wp_meta_box', false);
-}
 
-add_action('acf/init', 'my_acf_init');
+add_action ( 'acf/init', function() {
+	acf_update_setting ( 'remove_wp_meta_box', false );
+} );
 
 function load_custom_wp_admin_style() {
 

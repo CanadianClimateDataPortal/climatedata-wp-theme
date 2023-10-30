@@ -126,7 +126,13 @@
         <div class="col-10 offset-1 text-center text-lg-left">
           <?php
 
-            if ( get_field ( 'asset_type' ) == 'video' && get_field ( 'asset_time' ) != '' ) {
+            if ( 
+              (
+                get_field ( 'asset_type' ) == 'video' ||
+                get_field ( 'asset_type' ) == 'audio'
+              ) &&
+              get_field ( 'asset_time' ) != ''
+            ) {
 
           ?>
 

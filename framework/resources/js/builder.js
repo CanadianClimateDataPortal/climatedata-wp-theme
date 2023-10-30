@@ -63,7 +63,6 @@ var result = {}
 			},
 			parent: {
 				item: null,
-				children: [],
 				data: {}
 			},
 			template_html: '',
@@ -476,8 +475,81 @@ var result = {}
 					options.element.data = plugin.get_element_by_key(options.element.item.attr('data-key'))
 					
 					options.parent.item = this_element.parent()
-					
 					options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
+					
+					// console.log(options.element)
+					// console.log(options.parent)
+					
+				} else if ($(this).hasClass('duplicate-element')) {
+					
+					//
+					// DUPLICATE
+					//
+					
+					options.status = 'duplicating'
+					
+					this_element.removeClass('dropdown-open')
+					
+					// get the parent
+					
+					options.parent.item = this_element.parent()
+					options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
+					
+					// duplicate the data
+					
+					let stringify_data = JSON.stringify(plugin.get_element_by_key(this_element.attr('data-key')))
+					
+					options.element.data = JSON.parse(stringify_data)
+					
+					// duplicate the item
+					
+					// options.element.item.removeClass('dropdown-open')
+					
+					let new_html = this_element.prop('outerHTML').replaceAll(this_key, 'cloned')
+					
+					// convert to object
+					options.element.item = $(new_html)
+					
+					// options.element.item.attr('data-key', 'cloned')
+					
+					// remove footers
+					options.element.item.find('.fw-element-footer').remove()
+					
+					// insert the new item
+					options.element.item.insertAfter(this_element).css('border', '1px solid red')
+					
+					// console.log('element', options.element)
+					// console.log('parent', options.parent)
+					
+					// duplicate the data
+					
+					options.parent.data.children.forEach(function(child, i) {
+						
+						if (child.key == options.element.data.key) {
+							
+							// console.log('duplicate', i)
+							
+							child.key = 'cloned'
+							
+							let new_child = JSON.stringify(child)
+							
+							options.parent.data.children.splice(i + 1, 0, JSON.parse(new_child))
+						
+							return true
+							
+						}
+						
+					})
+					
+					// gather elements to move
+					plugin.set_elements_to_move(options.parent.data)
+					
+					// set keys of moving elements
+					if (options.elements_to_move != false) {
+						plugin.set_element_keys()
+					}
+					
+					plugin.activate(options.parent.data)
 					
 				} else if ($(this).hasClass('delete-element')) {
 					
@@ -488,14 +560,14 @@ var result = {}
 					options.status = 'deleting'
 					
 					if ($(this).parents('.fw-template-label').length) {
-						// console.log('deleting template')
 						
-						// console.log('closest label', $(this).closest('.fw-template-label'))
-						// console.log('begin', $(this).closest('.fw-template-label').prevAll('.fw-template-label.begin'))
+						// deleting a template
 						
+						// find beginning label
 						let this_begin = $(this).closest('.fw-template-label').prevAll('.fw-template-label.begin'),
 								items_to_delete = [ this_begin ]
 						
+						// collect items to delete
 						this_begin.nextAll().each(function() {
 							items_to_delete.push($(this))
 							
@@ -506,9 +578,6 @@ var result = {}
 						
 						options.element.item = items_to_delete
 						options.parent.item = this_begin.closest('.fw-element')
-						
-						// console.log('parent item', options.parent.item)
-						// console.log('parent item key', options.parent.item.attr('data-key'))
 						
 						options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
 						
@@ -814,7 +883,8 @@ var result = {}
 			
 			$('body').on('click', '.fw-settings-submit', function() {
 				
-				console.log('submit', JSON.stringify(options.element.data))
+				console.log('submit')
+				console.log(JSON.stringify(options.element.data))
 				
 				let form = $(this).closest('.modal').find('form'),
 						form_data = []//form.serializeArray()
@@ -949,14 +1019,11 @@ var result = {}
 							delete options.element.data.autogen
 						}
 						
-						// console.log('pre')
-						// console.log(JSON.stringify(options.element.data.inputs.settings, null, 2))
-						
-						// options.element.data.inputs.settings = {}
-						
 						// set up data object
 						
-						plugin.add_form_data_to_element(form_data)
+						let result = plugin.add_form_data_to_element(form_data)
+						
+						// console.log(result)
 						
 						// update footer
 						
@@ -972,18 +1039,8 @@ var result = {}
 						
 						plugin.set_element_atts(options.element)
 						
-						// console.log('post')
-						// console.log(JSON.stringify(options.element.data.inputs.settings, null, 2))
-						
 						// update settings
-						
-						// if (options.element.data.inputs.settings) {
-						// 	delete options.element.data.inputs.settings
-						// }
-						
-						// if (options.element.data.inputs.settings != undefined) {
-							plugin.do_element_settings()
-						// }
+						plugin.do_element_settings()
 						
 						break
 						
@@ -2047,45 +2104,6 @@ var result = {}
 			
 		},
 		
-		insert_recursive: function(element_data) {
-			
-			let plugin = this,
-					options = plugin.options
-			
-			console.log('---')
-			console.log('element', element_data)
-			
-			element_data.children.forEach(function(parent_obj) {
-				
-				console.log('inserting new child of ', element_data.key)
-				
-				console.log('parent', parent_obj)
-				
-				console.log('parent by key', element_data.key, $('body').find('[data-key="' + element_data.key + '"]'))
-				
-				// the last object
-				options.parent = {
-					item: $('body').find('[data-key="' + element_data.key + '"]'),
-					data: element_data
-				}
-				
-				options.element = {
-					item: $('<div>'),
-					data: parent_obj
-				}
-				
-				plugin.insert_element()
-					
-				if (parent_obj.children) {
-					console.log('has children')
-					console.log(JSON.stringify(parent_obj.children, null, 2))
-					plugin.insert_recursive(parent_obj)
-				}
-				
-			})
-			
-		},
-		
 		setup_element: function(element) {
 			
 			let plugin = this,
@@ -2141,9 +2159,6 @@ var result = {}
 					// do we need to insert more than 1 element
 					
 					if (element.data.children) {
-						// console.log('element data children???')
-						// console.log(JSON.stringify(element.data.children, null, 2))
-						// plugin.insert_recursive(element.data)
 						plugin.activate(element.data)
 					}
 					
@@ -2207,13 +2222,6 @@ var result = {}
 				case 'text' :
 				
 					if (element.data.inputs.text) {
-						
-						// console.log('new text')
-						// console.log(element.data.inputs.text[options.lang])
-						
-						// console.log('unescape')
-						// console.log(plugin.unescape(element.data.inputs.text[options.lang]))
-						
 						element.item.find('.fw-element-inner').html(plugin.unescape(element.data.inputs.text[options.lang]))
 					}
 					
@@ -2677,13 +2685,23 @@ var result = {}
 			
 			let dropdown_menu = $('<ul class="dropdown-menu">').appendTo(dropdown)
 			
-			// edit element
+			// action icons
 			
-			let actions_container = $('<div class="fw-footer-edit-btns row row-cols-3 px-2">').appendTo(dropdown_menu)
+			let actions_container = $('<div class="fw-footer-edit-btns row px-2">').appendTo(dropdown_menu)
+			
+			// edit
 			
 			$('<li class="col fw-footer-edit-link edit"><a href="#fw-modal" class="fw-modal-trigger fw-btn edit-element d-flex flex-column align-items-center justify-content-between" data-modal-content="' + element.type + '"><div><i class="far fa-pencil-alt"></i></div><span>Edit</span></a></li>').appendTo(actions_container)
 			
+			// duplicate
+			
+			$('<li class="col fw-footer-edit-link duplicate"><a href="#" class="fw-btn duplicate-element d-flex flex-column align-items-center justify-content-between" data-modal-content="duplicate" data-type="' + element.type + '"><div><i class="far fa-copy"></i></div><span>Duplicate</span></a></li>').appendTo(actions_container)
+			
+			// delete
+			
 			$('<li class="col fw-footer-edit-link delete"><a href="#fw-modal" class="fw-modal-trigger fw-btn delete-element d-flex flex-column align-items-center justify-content-between" data-modal-content="delete" data-type="' + element.type + '"><div><i class="far fa-trash-alt"></i></div><span>Delete</span></a></li>').appendTo(actions_container)
+			
+			// move
 			
 			$('<li class="col fw-footer-edit-link move"><div class="d-flex flex-column align-items-center justify-content-between"><div class="d-flex align-items-center"><i class="far fa-arrow-up fw-btn move-element move-up"></i><i class="far fa-arrow-down fw-btn move-element move-down"></i></div><span>Move</span></li>').appendTo(actions_container)
 			
@@ -3785,8 +3803,8 @@ var result = {}
 							setTimeout(function() {
 								// tinyMCE
 								
-								console.log('set content')
-								console.log(input_name, tinymce.get(input_name))
+								// console.log('set content')
+								// console.log(input_name, tinymce.get(input_name))
 								
 								tinymce.get(input_name).setContent(unescaped_val)
 								
@@ -3979,7 +3997,9 @@ var result = {}
 			// }
 			
 			modal_body.find('.fw-form-flex-container').each(function() {
-				plugin.reindex_flex($(this))
+				if ($(this).find('.fw-form-flex-item').length) {
+					plugin.reindex_flex($(this))
+				}
 			})
 			
 			let is_hidden = false
@@ -4341,6 +4361,10 @@ var result = {}
 								result = plugin.get_element_by_key(key, array_to_search[i])
 								
 								if (result !== false) {
+									
+									// console.log('element', key)
+									// console.log(JSON.stringify(result))
+									
 									return result
 								}
 								
@@ -4373,9 +4397,9 @@ var result = {}
 					element_data = options.element.data,
 					element_has_settings = false
 					
+			// console.log(element_item, element_data)
+					
 			// assume all settings will be removed
-			
-			// console.log(JSON.stringify(element_data.inputs))
 			
 			if (
 				element_data.hasOwnProperty('inputs') &&
@@ -4405,21 +4429,6 @@ var result = {}
 			// and reset any array it finds
 			
 			// console.log('pre', JSON.stringify(options.element.data.inputs, null, 2))
-			
-			// function input_recursive(obj) {
-			// 	
-			// 	for (let key in obj) {
-			// 		if (Array.isArray(obj[key])) {
-			// 			obj[key] = []
-			// 		} else if (typeof obj[key] == 'object') {
-			// 			input_recursive(obj[key])
-			// 		}
-			// 	}
-			// 	
-			// 	return obj
-			// }
-			// 
-			// input_recursive(options.element.data.inputs)
 			
 			form_data.forEach(function(input) {
 				
@@ -4463,7 +4472,6 @@ var result = {}
 					
 				}
 				
-				
 			})
 			
 			// console.log('element now')
@@ -4500,13 +4508,52 @@ var result = {}
 			
 		},
 		
+		set_elements_to_move: function(parent) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			if (parent.children) {
+					
+				parent.children.forEach(function(child, i) {
+					
+					// console.log('child', child.key, child.inputs.text)
+					
+					let old_key = child.key
+					
+					child.key = parent.key + '-' + (i + 1)
+					
+					// console.log('new', parent.key + '-' + (i + 1))
+					// console.log('post', JSON.stringify(child))
+					
+					options.elements_to_move.push({
+						item: $('[data-key="' + old_key + '"]').first(),
+						id: child.inputs.id,
+						old: old_key,
+						new: child.key
+					})
+					
+					// console.log(old_key + ' > ' + child.key)
+					
+					// recursive
+					
+					if (child.children) {
+						plugin.set_elements_to_move(child)
+					}
+					
+				})
+				
+			}
+			
+		},
+		
 		set_element_keys: function() {
 			
 			let plugin = this,
 					options = plugin.options
 			
-			console.log('to move')
-			console.log(options.elements_to_move)
+			// console.log('to move')
+			// console.log(options.elements_to_move)
 			
 			options.elements_to_move.forEach(function(element) {
 				
@@ -4528,47 +4575,6 @@ var result = {}
 			})
 			
 			options.elements_to_move = []
-			
-		},
-		
-		set_elements_to_move: function(parent) {
-			
-			let plugin = this,
-					options = plugin.options
-			
-			if (parent.children) {
-					
-				parent.children.forEach(function(child, i) {
-					
-					// console.log('child', child.key, child.inputs.text)
-					
-					// console.log('pre', JSON.stringify(child))
-					
-					let old_key = child.key
-					
-					child.key = parent.key + '-' + (i + 1)
-					
-					// console.log('new', parent.key + '-' + (i + 1))
-					// console.log('post', JSON.stringify(child))
-					
-					options.elements_to_move.push({
-						item: $('[data-key="' + old_key + '"]'),
-						id: child.inputs.id,
-						old: old_key,
-						new: child.key
-					})
-					
-					// console.log(old_key + ' > ' + child.key)
-					
-					// recursive
-					
-					if (child.children) {
-						plugin.set_elements_to_move(child)
-					}
-					
-				})
-				
-			}
 			
 		},
 		
@@ -4646,7 +4652,8 @@ var result = {}
 			// console.log('---')
 			// console.log('property', property)
 			// console.log('value', value)
-			// console.log('parent', JSON.stringify(current_parent))
+			// console.log('parent')
+			// console.log(JSON.stringify(current_parent))
 			
 			if (add_next == true) {
 				key_to_add = property
@@ -4702,6 +4709,9 @@ var result = {}
 				
 					current_parent[property] = value
 					
+					// console.log('set', property, value)
+					// console.log(JSON.stringify(current_parent))
+						
 				}
 				
 				if (
@@ -4812,9 +4822,6 @@ var result = {}
 							
 							// nothing exists at this index yet
 							
-							// console.log('1a')
-							// console.log('parent[indexes[' + options.array_key + ']] is undefined')
-							
 							current_parent[options.array_indexes[options.array_key]] = {}
 							
 						} else {
@@ -4823,13 +4830,8 @@ var result = {}
 							
 							let current_array_val = current_parent[options.array_indexes[options.array_key]]
 							
-							// console.log('1b')
-							// console.log(JSON.stringify(current_parent[options.array_indexes[options.array_key]]))
-							
 							// if property doesn't exist in the current index,
 							// increment the index by 1
-							
-							// console.log(property, current_array_val, Object.keys(current_array_val))
 							
 							if (
 								!Object.keys(current_array_val).includes(property)
@@ -4840,9 +4842,6 @@ var result = {}
 								
 								options.array_indexes[options.array_key] += 1
 								
-								// console.log('index += 1')
-								// console.log(options.array_key + ' index is now ' + options.array_indexes[options.array_key])
-							
 							}
 							
 							// check for undefined again
@@ -4853,9 +4852,6 @@ var result = {}
 							
 						}
 						
-						// console.log('new index', options.array_indexes[options.array_key])
-						// console.log(current_parent[options.array_indexes[options.array_key]])
-								
 						// add my object at the right index
 						
 						if (!current_parent[options.array_indexes[options.array_key]][property]) {
@@ -4869,68 +4865,17 @@ var result = {}
 						// parent is an object that doesn't contain
 						// this key
 						
-						// console.log(property + ' doesn\'t exist in ')
-						// console.log(JSON.stringify(current_parent))
-					
 						current_parent[property] = {}
 						
 					}
 					
-					// if (!current_parent.hasOwnProperty(property)) {
-				// } else {
-					
-					
-					
-					// current_parent.forEach
-					
-					/*
-						
-					if (Array.isArray(current_parent)) {
-						
-						// console.log('parent is array')
-						
-						// console.log('---')
-						console.log(options.array_indexes, options.array_key)
-						console.log('current key/index', options.array_key, options.array_indexes[options.array_key])
-						
-						// console.log('what is in there', current_parent[options.array_indexes[options.array_key]])
-						
-						// console.log('---')
-						
-						// my parent is an array
-						// find out if it's empty
-						
-						
-						
-					} else {
-						
-						console.log('2')
-					
-						// add my object by my key
-						
-						current_parent[property] = {}
-						
-					}*/
-					
-				}/* else {
-					
-					// do nothing
-					
-				}*/
+				}
 				
 				if (parent_to_send == null) {
 					
 					parent_to_send = current_parent[property]
 					
 				}
-				
-				// console.log('indexes post', options.array_indexes)
-				
-				// console.log('this is what we made')
-				// console.log(current_parent)
-				
-				// console.log('parent being sent')
-				// console.log(JSON.stringify(parent_to_send, null, 2))
 				
 				plugin.find_child_element(parent_to_send, key, value, keep_prop)
 				
@@ -4939,383 +4884,6 @@ var result = {}
 			return current_parent
 			
 		},
-		
-		/*
-		find_child_element: function(element, key, current_parent, value, lang_prop = null) {
-			
-			let plugin = this,
-					options = plugin.options
-			
-			let property = key[0]
-			
-			console.log('property', property)
-			
-			console.log('pre', JSON.stringify(current_parent))
-			
-			if (property.includes('[]')) {
-				
-				// set array index to 0
-				
-				options.array_index = 0
-				
-				// or the length of the parent
-				
-				if (typeof current_parent !== 'undefined' && current_parent.length) {
-					options.array_index = current_parent.length
-				}
-				
-				property = property.replace('[]', '')
-				options.adding_to_array = true
-				
-			}
-			
-			// what could be happening now
-			// a. current_parent[property] doesn't exist
-			// b. current_parent[property] is an empty array
-			// c. current_parent[property] is an empty object
-			// d. current_parent[property] is an array with stuff in it
-			// e. current_parent[property] is an object with stuff in it
-			
-			// console.log(element, key, current_parent, value)
-			
-			// if (typeof current_parent == 'undefined') {
-			// 	current_parent = {}
-			// }
-			
-			if (Array.isArray(current_parent)) {
-				
-				// parent is an array
-				// is it empty (b) or not (d)?
-				// does it matter?
-				
-				if (current_parent.length == 0) {
-					console.log('b', 'parent is an empty array')
-					
-					let new_obj = {}
-					
-					current_parent.push(new_obj)
-					
-				} else {
-					console.log('d', 'parent has ' + current_parent.length + ' elements')
-					
-					// current_parent[options.array_index][property] = {}
-					
-				}
-				
-				// current_parent.push({})
-				// current_parent[options.array_index] = {}
-				
-				
-				
-			}	else if (typeof current_parent == 'object') {
-				
-				// parent is an object
-				// is it empty (c) or not (e)?
-				
-				if (!current_parent.hasOwnProperty(property)) {
-					
-					// parent doesn't contain a child with this
-					// property name
-					
-					if (options.adding_to_array == true) {
-						
-						// add property as an array
-						current_parent[property] = []
-						
-					} else {
-						
-						// add as an object
-						current_parent[property] = {}
-						
-					}
-					
-				}
-				
-			}
-			
-			// did i manage to set parent[property]
-			
-			console.log('element data')
-			console.log(JSON.stringify(options.element.data, null, 2))
-			console.log('just set', current_parent[property])
-			
-			if (key.length > 1) {
-				
-				// create a new object under [property] and
-				// keep drilling
-				
-				let keep_prop = null
-				
-				if (key[0] == 'text') {
-					keep_prop = key[0]
-				}
-				
-				// drop the first element
-				let first = key.shift()
-				
-				console.log('object sending to child fn', current_parent[property])
-				
-				plugin.find_child_element(element, key, current_parent[property], value,keep_prop)
-				
-			} else {
-				
-				console.log('time to set the value')
-				
-				console.log(current_parent)
-				console.log(current_parent[property])
-				console.log(value)
-				
-				// set [property] to the value of the form input
-				
-				if (options.adding_to_array == true) {
-					// if (options.array_index == 0) {
-					// 	
-					// 	// console.log('reset array ' + property)
-					// 	
-					// 	current_parent[property] = []
-					// 	
-					// }
-					
-					current_parent[options.array_index][property] = value
-					
-				} else {
-				
-					current_parent[property] = value
-					
-				}
-				
-			}
-			
-			console.log('post', JSON.stringify(current_parent))
-			
-			// console.log(current_parent)
-			
-			return current_parent
-			
-		},*/
-		
-		/*
-		find_child_element: function(element, key, current_parent, value, lang_prop = null) {
-			
-			let plugin = this,
-					options = plugin.options
-			
-			// console.log(key, current_parent, value)
-			
-			// property to search for is 
-			// the first element of the key array 
-			// that was initially supplied to the function
-			
-			// console.log('lang prop', lang_prop)
-			// console.log('value', value)
-			// console.log('key', key)
-			
-			let property = key[0]
-			
-			let send_to_fn = {}
-			
-			if (current_parent[property]) {
-				send_to_fn = current_parent[property]
-			}
-			
-			// console.log('---')
-			console.log('i am', property)
-			console.log('my parent is', JSON.stringify(current_parent))
-			
-			if (options.adding_to_array == true) {
-				console.log('adding to array')
-			}
-			
-			if (options.adding_to_repeater == true) {
-				console.log('adding to repeater')
-			}
-			
-			// what could be happening now
-			// a. current_parent[property] doesn't exist
-			// b. current_parent[property] is an empty array
-			// c. current_parent[property] is an empty object
-			// d. current_parent[property] is an array with stuff in it
-			// e. current_parent[property] is an object with stuff in it
-
-			if (property == 'index') {
-				
-				// set repeater index to 0
-				
-				options.repeater_index = 0
-				
-				// or the length of the parent
-				
-				if (typeof current_parent !== 'undefined' && current_parent.length) {
-					options.repeater_index = current_parent.length
-				}
-				
-				// options.repeater_index += 1
-				
-				// console.log('new repeater index', options.repeater_index)
-				
-			}
-			
-			// console.log('repeater index', options.repeater_index)
-			
-			if (property == 'repeater') {
-				
-				// if property is repeater
-				// then it needs to be an array
-				// not an object
-				
-				options.adding_to_repeater = true
-				
-			}
-			
-			if (property.includes('[]')) {
-				
-				options.array_index = 0
-				
-				// or the length of the parent
-				
-				if (typeof current_parent !== 'undefined' && current_parent.length) {
-					options.array_index = current_parent.length
-				}
-				
-				options.adding_to_array = true
-				property = property.replace('[]', '')
-				
-			}
-			
-			// console.log(current_parent, property)
-		
-			if (Array.isArray(current_parent)) {
-				
-				if (current_parent.length == 0) {
-					
-					console.log('b', 'my parent is an empty array')
-					
-					let new_obj = {}
-					
-					// new_obj[property] = null
-					
-					current_parent.push(new_obj)
-				
-					send_to_fn = current_parent[options.array_index]
-				
-				} else {
-					
-					console.log('d', 'my parent is an array with objects in it')
-					
-					// console.log(current_parent[options.repeater_index])
-					
-					if (current_parent[options.repeater_index] == undefined) {
-						// console.log('create current_parent[' + options.repeater_index + ']')
-						current_parent[options.repeater_index] = {}
-						// current_parent.push({})
-					}
-					
-					// current_parent = current_parent[options.repeater_index]
-					
-				}
-				
-			} else if (!current_parent.hasOwnProperty(property)) {
-				
-				// console.log('parent is not an array')
-				// console.log('adding to repeater', options.adding_to_repeater)
-				
-				if (
-					options.adding_to_repeater == true || 
-					options.adding_to_array == true
-				) {
-					
-					// add property as an array
-					current_parent[property] = []
-					
-				} else {
-					
-					// add as an object
-					current_parent[property] = {}
-					
-				}
-				
-			}
-			
-			// console.log('current_parent now')
-			// console.log(JSON.stringify(current_parent, null, 2))
-			
-			// console.log('key', key)
-			// still more than one element to drill down
-			
-			if (key.length > 1) {
-				
-				let keep_prop = null
-				
-				if (key[0] == 'text') {
-					// console.log('keep ' + key[0])
-					keep_prop = key[0]
-				}
-				
-				// drop the first element
-				let first = key.shift()
-				
-				plugin.find_child_element(element, key, send_to_fn, value,keep_prop)
-				
-			} else {
-				
-				if (property == 'class') {
-					value = value.split(' ')
-				}
-				
-				if (lang_prop != null) {
-					
-					value = plugin.escape(tinymce.get('inputs-' + lang_prop + '-' + options.lang).getContent())
-					
-				}
-				
-				// console.log(current_parent, property, current_parent[property])
-				// console.log('current_parent pre', current_parent)
-				
-				if (options.adding_to_repeater == true) {
-					
-					// console.log('add to repeater', options.repeater_index, property)
-					
-					if (property != 'index') {
-						
-						console.log('add', property)
-						
-						current_parent[options.repeater_index][property] = value
-						
-					}
-					
-					// console.log(JSON.stringify(current_parent[options.repeater_index]))
-					
-				} else if (options.adding_to_array == true) {
-					
-					// console.log('pre', current_parent[property])
-					
-					if (options.array_index == 0) {
-						
-						// console.log('reset array ' + property)
-						
-						current_parent[property] = []
-						
-					}
-					
-					current_parent[property].push(value)
-					
-					// console.log('post', current_parent[property])
-					
-				} else {
-					
-					current_parent[property] = value
-					
-				}
-				
-				// console.log('current_parent post', current_parent)
-				
-			}
-			
-			// console.log(current_parent.settings)
-			
-			return current_parent
-			
-		},*/
 		
 		generate_column_classes: function(breakpoints, output = 'string') {
 			
@@ -5598,34 +5166,10 @@ var result = {}
 					
 				}).on('hide.bs.dropdown', function(e) {
 					
+					// console.log('hide', this_item)
 					this_item.removeClass('dropdown-open')
 					
 				})
-				
-				// 
-				// let this_id = this_item.attr('id')
-				// 
-				// options.dropdowns[this_item.attr('data-key')] = document.getElementById(this_id)
-				// 
-				// options.dropdowns[this_item.attr('data-key')].addEventListener('shown.bs.dropdown', function (e) {
-				// 	
-				// 	console.log('opening ' + this_item.attr('data-key'))
-				// 	
-				// 	this_item.addClass('dropdown-open')
-				// 	
-				// 	// prevent event from firing in parents
-				// 	e.stopPropagation()
-				// 	e.preventDefault()
-				// 	
-				// })
-				// 
-				// options.dropdowns[this_item.attr('data-key')].addEventListener('hide.bs.dropdown', function () {
-				// 	
-				// 	console.log('closing ' + this_item.attr('data-key'))
-				// 	
-				// 	this_item.removeClass('dropdown-open')
-				// 	
-				// })
 				
 			}
 			

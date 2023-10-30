@@ -26,28 +26,23 @@
 					<h6>Map Aggregation</h6>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="data-aggregation" id="data-aggregation-grid" checked>
-						<label class="form-check-label" for="data-aggregation-grid">Gridded Data</label>
+						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-grid" checked>
+						<label class="form-check-label" for="display-aggregation-grid">Gridded Data</label>
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="data-aggregation" id="data-aggregation-csd">
-						<label class="form-check-label" for="data-aggregation-csd">Census Subdivisions</label>
+						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-csd">
+						<label class="form-check-label" for="display-aggregation-csd">Census Subdivisions</label>
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="data-aggregation" id="data-aggregation-health">
-						<label class="form-check-label" for="data-aggregation-health">Health Regions</label>
+						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-health">
+						<label class="form-check-label" for="display-aggregation-health">Health Regions</label>
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="data-aggregation" id="data-aggregation-watershed">
-						<label class="form-check-label" for="data-aggregation-watershed">Watersheds</label>
-					</div>
-					
-					<div class="form-check">
-						<input class="form-check-input" type="radio" name="data-aggregation" id="data-aggregation-custom">
-						<label class="form-check-label" for="data-aggregation-custom">Custom shapefile</label>
+						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-watershed">
+						<label class="form-check-label" for="display-aggregation-watershed">Watersheds</label>
 					</div>
 					
 				</div>
@@ -55,8 +50,62 @@
 				<div id="map-control-colours" class="map-control-item">
 					<div class="d-flex justify-content-between">
 						<h6 class="flex-grow-1">Colours</h6>
-						<span class="ms-2">Add</span>
-						<span class="ms-2">Reset</span>
+						<span id="display-colours-add" class="ms-2">Add</span>
+						<span id="display-colours-reset" class="ms-2">Reset</span>
+					</div>
+					
+					<div id="display-colour-table" class="mb-3">
+						
+						<!-- row -->
+						<div class="d-flex py-2 border-bottom">
+							<div class="color-picker flex-grow-1 d-flex align-items-center">
+								<span class="rounded-circle p-1 me-2 bg-primary"></span>
+								<span class="value">#DC3545</span>
+							</div>
+							
+							<div class="d-flex">
+								<div class="display-colour-sort-handle"><i class="fas fa-sort"></i></div>
+								<div class="display-colour-remove ms-2"><i class="fas fa-times"></i></div>
+							</div>
+						</div>
+						
+						<!-- row -->
+						<div class="d-flex py-2 border-bottom">
+							<div class="color-picker flex-grow-1 d-flex align-items-center">
+								<span class="rounded-circle p-1 me-2 bg-warning"></span>
+								<span class="value">#FFC107</span>
+							</div>
+							
+							<div class="d-flex">
+								<div class="display-colour-sort-handle"><i class="fas fa-sort"></i></div>
+								<div class="display-colour-remove ms-2"><i class="fas fa-times"></i></div>
+							</div>
+						</div>
+						
+						<!-- row -->
+						<div class="d-flex py-2 border-bottom">
+							<div class="color-picker flex-grow-1 d-flex align-items-center">
+								<span class="rounded-circle p-1 me-2 bg-info"></span>
+								<span class="value">#0DCAF0</span>
+							</div>
+							
+							<div class="d-flex">
+								<div class="display-colour-sort-handle"><i class="fas fa-sort"></i></div>
+								<div class="display-colour-remove ms-2"><i class="fas fa-times"></i></div>
+							</div>
+						</div>
+						
+					</div>
+					
+					
+					<div id="display-colours-toggle" class="btn-group">
+						
+						<input type="radio" class="btn-check" name="display-colours-type" id="display-colours-discrete" autocomplete="off" checked>
+						<label class="btn btn-outline-primary" for="display-colours-discrete"><?php _e ( 'Discrete', 'cdc' ); ?></label>
+						
+						<input type="radio" class="btn-check" name="display-colours-type" id="display-colours-continuous" autocomplete="off">
+						<label class="btn btn-outline-primary" for="display-colours-continuous"><?php _e ( 'Continuous', 'cdc' ); ?></label>
+						
 					</div>
 				</div>
 				

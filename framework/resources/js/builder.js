@@ -495,45 +495,51 @@ var result = {}
 					options.parent.item = this_element.parent()
 					options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
 					
-					// duplicate the data
+					// duplicate the data by stringifying it
+					// and replacing instances of the old key with a temporary
+					// 'cloned' string
 					
-					let stringify_data = JSON.stringify(plugin.get_element_by_key(this_element.attr('data-key')))
+					let stringify_element = JSON.stringify(plugin.get_element_by_key(this_key)).replaceAll('"key":"' + this_key, '"key":"cloned')
 					
-					options.element.data = JSON.parse(stringify_data)
+					options.element.data = JSON.parse(stringify_element)
+					
+					// figure out the new key
+					// by knocking off the last character,
+					// converting it to an integer and adding 1
+					
+					let new_key = this_key.slice(0, -1) + (parseInt(this_key.slice(-1)) + 1)
 					
 					// duplicate the item
+					// get the HTML and replace the old key with 'cloned'
+					// same as above with the data
 					
-					// options.element.item.removeClass('dropdown-open')
+					let new_html = this_element.prop('outerHTML').replaceAll('data-key="' + this_key + '', 'data-key="cloned').replaceAll('id="element-' + this_key, 'id="element-cloned')
 					
-					let new_html = this_element.prop('outerHTML').replaceAll(this_key, 'cloned')
-					
-					// convert to object
+					// convert to a jquery object
 					options.element.item = $(new_html)
 					
-					// options.element.item.attr('data-key', 'cloned')
+					// remove all footers - they'll be reinserted properly
+					// when activating
 					
-					// remove footers
 					options.element.item.find('.fw-element-footer').remove()
 					
 					// insert the new item
-					options.element.item.insertAfter(this_element).css('border', '1px solid red')
 					
-					// console.log('element', options.element)
-					// console.log('parent', options.parent)
+					options.element.item.insertAfter(this_element)
 					
-					// duplicate the data
+					// splice the new element data
+					// into parent.children
 					
 					options.parent.data.children.forEach(function(child, i) {
 						
-						if (child.key == options.element.data.key) {
+						// find the key that matches
+						// the original element
+						
+						if (child.key == this_key) {
 							
-							// console.log('duplicate', i)
+							// insert after
 							
-							child.key = 'cloned'
-							
-							let new_child = JSON.stringify(child)
-							
-							options.parent.data.children.splice(i + 1, 0, JSON.parse(new_child))
+							options.parent.data.children.splice(i + 1, 0, JSON.parse(stringify_element))
 						
 							return true
 							
@@ -548,6 +554,20 @@ var result = {}
 					if (options.elements_to_move != false) {
 						plugin.set_element_keys()
 					}
+					
+					// console.log('replacing keys')
+					
+					options.element.item.find('[data-key*="cloned"]').each(function() {
+						$(this).attr('data-key', $(this).attr('data-key').replaceAll('cloned', new_key))
+					})
+					
+					// console.log('replacing IDs')
+					
+					options.element.item.find('[id^="element-cloned"]').each(function() {
+						$(this).attr('id', $(this).attr('id').replace('element-cloned', 'element-' + new_key))
+					})
+					
+					// re-activate the parent data object
 					
 					plugin.activate(options.parent.data)
 					
@@ -2274,7 +2294,7 @@ var result = {}
 				parent = options.page
 			}
 			
-			// console.log('activate', parent)
+			console.log('activate', parent)
 			
 			if (
 				parent.type == 'page' &&
@@ -2295,7 +2315,7 @@ var result = {}
 				
 				parent.children.forEach(function(child, i) {
 					
-					// console.log(child)
+					// console.log(child.key)
 					
 					// find the item
 					
@@ -2314,14 +2334,16 @@ var result = {}
 					
 					plugin.add_footer(child)
 					
-					if (child.type == 'template' && child.inputs.output == 'template') {
+					if (
+						child.type == 'template' && 
+						child.inputs.output == 'template'
+					) {
 						plugin.setup_template(child.key.slice(0, -2), child)
 					}
 					
 					if (child.children) {
 						
 						// recursive
-						
 						plugin.activate(child)
 						
 					}
@@ -4514,17 +4536,12 @@ var result = {}
 					options = plugin.options
 			
 			if (parent.children) {
-					
+				
 				parent.children.forEach(function(child, i) {
-					
-					// console.log('child', child.key, child.inputs.text)
 					
 					let old_key = child.key
 					
 					child.key = parent.key + '-' + (i + 1)
-					
-					// console.log('new', parent.key + '-' + (i + 1))
-					// console.log('post', JSON.stringify(child))
 					
 					options.elements_to_move.push({
 						item: $('[data-key="' + old_key + '"]').first(),
@@ -4532,8 +4549,6 @@ var result = {}
 						old: old_key,
 						new: child.key
 					})
-					
-					// console.log(old_key + ' > ' + child.key)
 					
 					// recursive
 					

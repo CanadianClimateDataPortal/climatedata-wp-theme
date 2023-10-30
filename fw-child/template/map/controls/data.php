@@ -13,12 +13,17 @@
 				</div>
 				
 				<div id="map-control-dataset" class="map-control-item">
-					<label for="" class="form-label h6">Dataset</label>
+					
+					<label for="data-dataset" class="form-label h6"><?php _e ( 'Dataset', 'cdc' ); ?></label>
 					
 					<div class="btn-group">
-						<span class="btn btn-primary" aria-current="page">CMIP6</span>
-						<span class="btn btn-outline-primary">CMIP5</span>
+						<input type="radio" class="btn-check" name="data-dataset" id="data-dataset-cmip6" autocomplete="off" checked>
+						<label class="btn btn-outline-primary" for="data-dataset-cmip6"><?php _e ( 'CMIP6', 'cdc' ); ?></label>
+						
+						<input type="radio" class="btn-check" name="data-dataset" id="data-dataset-cmip5" autocomplete="off">
+						<label class="btn btn-outline-primary" for="data-dataset-cmip5"><?php _e ( 'CMIP5', 'cdc' ); ?></label>
 					</div>
+					
 				</div>
 				
 				<div id="map-control-frequency" class="map-control-item">

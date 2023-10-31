@@ -37,7 +37,7 @@ function posttype_variable() {
 		'label'                 => __( 'Variable', 'cdc-post-types' ),
 		'description'           => __( 'Post Type Description', 'cdc-post-types' ),
 		'labels'                => $labels,
-		'supports'              => array( 'title', 'editor', 'page-attributes', 'thumbnail', 'revisions' ),
+		'supports'              => array( 'title', 'editor', 'custom-fields', 'page-attributes', 'thumbnail', 'revisions' ),
 		'hierarchical'          => true,
 		'public'                => true,
 		'show_ui'               => true,

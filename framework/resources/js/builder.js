@@ -1,13 +1,6 @@
 // builder
 // v2.0
 
-var key_to_add = ''
-var add_next = false
-
-var current_i = 0
-
-var result = {}
-
 ;(function ($) {
 
 	function builder(item, options) {
@@ -71,13 +64,13 @@ var result = {}
 			status: 'init',
 			dropdowns: {},
 			moving_in_template: false,
-			adding_to_repeater: false,
-			repeater_index: -1,
-			adding_to_array: false,
-			array_index: 0,
-			array_indexes: {},
-			array_key: null,
-			removed_settings: [],
+			data: {
+				key_to_add: '',
+				add_next: false,
+				array_indexes: {},
+				array_key: null,
+				removed_settings: []
+			},
 			uploader: {
 				object: null,
 				options: null,
@@ -2377,11 +2370,11 @@ var result = {}
 			
 			// remove
 			
-			// console.log('removed settings', options.removed_settings)
+			// console.log('removed settings', options.data.removed_settings)
 			
-			if (options.removed_settings.length) {
+			if (options.data.removed_settings.length) {
 				
-				options.removed_settings.forEach(function(key) {
+				options.data.removed_settings.forEach(function(key) {
 				
 					console.log('remove setting', key)
 					
@@ -2415,7 +2408,7 @@ var result = {}
 					
 				})
 				
-				options.removed_settings = []
+				options.data.removed_settings = []
 				
 			}
 			
@@ -4431,11 +4424,11 @@ var result = {}
 				// add setting keys to removed_settings
 				element_data.inputs.settings.forEach(function(setting) {
 					for (let key in setting) {
-						options.removed_settings.push(key)
+						options.data.removed_settings.push(key)
 					}
 				})
 				
-				// console.log('removed', options.removed_settings)
+				// console.log('removed', options.data.removed_settings)
 				
 				// clear existing settings object
 				element_data.inputs.settings = [] //{}
@@ -4485,9 +4478,6 @@ var result = {}
 					
 				} else {
 					
-					// options.adding_to_repeater = false
-					// options.adding_to_array = false
-					
 					// console.log('pre', JSON.stringify(element_data))
 					
 					element_data = plugin.find_child_element(element_data, key, input.value)
@@ -4501,9 +4491,8 @@ var result = {}
 			
 			// reset array flag
 			
-			// options.adding_to_array = false
-			options.array_key = null
-			options.array_indexes = {}
+			options.data.array_key = null
+			options.data.array_indexes = {}
 			
 			if (element_has_settings == true) {
 				// console.log('has settings', JSON.stringify(element_data.inputs.settings))
@@ -4516,13 +4505,13 @@ var result = {}
 						// from the removed_settings array
 						// i.e. keep stuff that was NOT removed
 						
-						options.removed_settings = options.removed_settings.filter(e => e !== key)
+						options.data.removed_settings = options.data.removed_settings.filter(e => e !== key)
 						
 					}
 					
 				})
 				
-				console.log('settings removed', options.removed_settings)
+				console.log('settings removed', options.data.removed_settings)
 				
 			}
 			
@@ -4670,9 +4659,9 @@ var result = {}
 			// console.log('parent')
 			// console.log(JSON.stringify(current_parent))
 			
-			if (add_next == true) {
-				key_to_add = property
-				add_next = false
+			if (options.data.add_next == true) {
+				options.data.key_to_add = property
+				options.data.add_next = false
 			}
 			
 			if (key.length == 1) {
@@ -4698,27 +4687,27 @@ var result = {}
 					
 					// console.log('parent is array')
 					// 
-					// console.log('current key', options.array_key)
-					// console.log('current index', options.array_indexes[options.array_key])
+					// console.log('current key', options.data.array_key)
+					// console.log('current index', options.data.array_indexes[options.data.array_key])
 					
 					if (
-						current_parent[options.array_indexes[options.array_key]] &&
-						current_parent[options.array_indexes[options.array_key]][property]
+						current_parent[options.data.array_indexes[options.data.array_key]] &&
+						current_parent[options.data.array_indexes[options.data.array_key]][property]
 					) {
 						
-						// console.log('indexes[' + options.array_key + '][' + options.array_indexes[options.array_key] + '] already has ' + property)
+						// console.log('indexes[' + options.data.array_key + '][' + options.data.array_indexes[options.data.array_key] + '] already has ' + property)
 						
-						options.array_indexes[options.array_key] += 1
-						
-					}
-					
-					if (!current_parent[options.array_indexes[options.array_key]]) {
-						
-						current_parent[options.array_indexes[options.array_key]] = {}
+						options.data.array_indexes[options.data.array_key] += 1
 						
 					}
 					
-					current_parent[options.array_indexes[options.array_key]][property] = value
+					if (!current_parent[options.data.array_indexes[options.data.array_key]]) {
+						
+						current_parent[options.data.array_indexes[options.data.array_key]] = {}
+						
+					}
+					
+					current_parent[options.data.array_indexes[options.data.array_key]][property] = value
 					
 				} else {
 				
@@ -4731,10 +4720,10 @@ var result = {}
 				
 				if (
 					property == 'index' &&
-					options.array_indexes !== undefined &&
-					options.array_indexes[options.array_key] != undefined
+					options.data.array_indexes !== undefined &&
+					options.data.array_indexes[options.data.array_key] != undefined
 				) {
-					options.array_indexes[options.array_key] += 1
+					options.data.array_indexes[options.data.array_key] += 1
 				}
 				
 				// console.log('post')
@@ -4753,12 +4742,11 @@ var result = {}
 				// drop the first element
 				
 				let first = key.shift()
-				
 				let parent_to_send = null
 				
 				if (property.includes('[]')) {
 					
-					add_next = true
+					options.data.add_next = true
 					
 					// i'm an array
 					
@@ -4771,25 +4759,25 @@ var result = {}
 						
 						// console.log('parent is array')
 						
-						// console.log(current_parent[options.array_indexes[options.array_key]])
+						// console.log(current_parent[options.data.array_indexes[options.data.array_key]])
 						
-						if (!current_parent[options.array_indexes[options.array_key]]) {
+						if (!current_parent[options.data.array_indexes[options.data.array_key]]) {
 							
 							// object that sits at the right index of the parent
 							
-							current_parent[options.array_indexes[options.array_key]] = {}
+							current_parent[options.data.array_indexes[options.data.array_key]] = {}
 							
 						}
 						
-						if (!current_parent[options.array_indexes[options.array_key]][property]) {
+						if (!current_parent[options.data.array_indexes[options.data.array_key]][property]) {
 							
 							// array that will be the new parent
 							
-							current_parent[options.array_indexes[options.array_key]][property] = []
+							current_parent[options.data.array_indexes[options.data.array_key]][property] = []
 							
 						}
 						
-						parent_to_send = current_parent[options.array_indexes[options.array_key]][property]
+						parent_to_send = current_parent[options.data.array_indexes[options.data.array_key]][property]
 						
 					} else {
 						
@@ -4808,22 +4796,22 @@ var result = {}
 					// the new array is being created for
 					
 					if (property == 'rows') {
-						options.array_key = key_to_add + '-' + property
+						options.data.array_key = options.data.key_to_add + '-' + property
 					} else {
-						options.array_key = property
+						options.data.array_key = property
 					}
 					
-					// console.log('new key', options.array_key)
+					// console.log('new key', options.data.array_key)
 					
 					// set the index for this property to 0
 					
-					if (!options.array_indexes[options.array_key]) {
+					if (!options.data.array_indexes[options.data.array_key]) {
 						
-						options.array_indexes[options.array_key] = 0
+						options.data.array_indexes[options.data.array_key] = 0
 						
 					}
 					
-					// console.log('indexes now', options.array_indexes)
+					// console.log('indexes now', options.data.array_indexes)
 					
 				} else {
 					
@@ -4833,17 +4821,17 @@ var result = {}
 						
 						// my parent is an array
 						
-						if (!current_parent[options.array_indexes[options.array_key]]) {
+						if (!current_parent[options.data.array_indexes[options.data.array_key]]) {
 							
 							// nothing exists at this index yet
 							
-							current_parent[options.array_indexes[options.array_key]] = {}
+							current_parent[options.data.array_indexes[options.data.array_key]] = {}
 							
 						} else {
 							
 							// current parent[indexes[key]] has something in it
 							
-							let current_array_val = current_parent[options.array_indexes[options.array_key]]
+							let current_array_val = current_parent[options.data.array_indexes[options.data.array_key]]
 							
 							// if property doesn't exist in the current index,
 							// increment the index by 1
@@ -4855,25 +4843,25 @@ var result = {}
 								// the input property doesn't exist at this index
 								// of the parent array
 								
-								options.array_indexes[options.array_key] += 1
+								options.data.array_indexes[options.data.array_key] += 1
 								
 							}
 							
 							// check for undefined again
 							
 							if (!current_array_val) {
-								current_parent[options.array_indexes[options.array_key]] = {}
+								current_parent[options.data.array_indexes[options.data.array_key]] = {}
 							}
 							
 						}
 						
 						// add my object at the right index
 						
-						if (!current_parent[options.array_indexes[options.array_key]][property]) {
-							current_parent[options.array_indexes[options.array_key]][property] = {}
+						if (!current_parent[options.data.array_indexes[options.data.array_key]][property]) {
+							current_parent[options.data.array_indexes[options.data.array_key]][property] = {}
 						}
 						
-						parent_to_send = current_parent[options.array_indexes[options.array_key]][property]
+						parent_to_send = current_parent[options.data.array_indexes[options.data.array_key]][property]
 						
 					} else if (!current_parent.hasOwnProperty(property)) {
 						

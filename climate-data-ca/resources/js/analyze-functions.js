@@ -1811,7 +1811,7 @@
 
                         if ($(this).find('.checked').length > 0) {
 
-                            var this_label = $(this).prev('.select-all').find('.form-check-label').text()
+                            var this_label = $(this).prev('.select-all').find('label.form-check-label').text()
 
                             if ($(this).find('.checked').length == 1) {
                                 this_label = this_label.slice(0, -1)

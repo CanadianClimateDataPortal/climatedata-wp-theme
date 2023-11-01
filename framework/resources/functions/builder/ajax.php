@@ -83,46 +83,6 @@ function fw_update_post() {
 
 add_action ( 'wp_ajax_fw_update_post', 'fw_update_post' );
 
-
-// function fw_get_post_builder_object() {
-// 	
-// 	if ( isset ( $_GET['post_id'] ) && !empty ( $_GET['post_id'] ) ) {
-// 		
-// 		print_r ( json_encode ( get_post_meta ( $_GET['post_id'], 'builder', true ) ) );
-// 		
-// 	}
-// 	
-// 	wp_die();
-// 	
-// }
-// 
-// add_action ( 'wp_ajax_fw_get_post_builder_object', 'fw_get_post_builder_object' );
-
-
-
-// function fw_create_block() {
-// 	
-// 	echo '<div class="fw-element fw-block">';
-// 	
-// 		echo '<div class="fw-block-inner"></div>';
-// 		
-// 		echo '<div class="fw-element-footer d-flex text-uppercase">';
-// 		
-// 			echo '<span class="me-2">Block</span>';
-// 			
-// 			echo '<a href="#fw-block-type-select" data-bs-toggle="modal" class="fw-btn-add-block me-2" data-key="">Add block</a>' . "\n";
-// 		
-// 		echo '</div>';
-// 	
-// 	echo '</div>';
-// 	
-// 	wp_die();
-// 	
-// }
-// 
-// add_action ( 'wp_ajax_fw_create_block', 'fw_create_block' );
-
-
 function fw_get_builder_object() {
 	
 	if ( isset ( $_GET['post_id'] ) && !empty ( $_GET['post_id'] ) ) {
@@ -137,8 +97,6 @@ function fw_get_builder_object() {
 			
 			echo '{}';
 			
-			// echo '{ "type": "page", "inputs": { "id": "auto" }, "post_id": ' . $_GET['post_id'] . ', "key": ' . $_GET['post_id'] . ', "children": [ { "type": "section", "inputs": { "id": "auto" }, "children": [], "key": "' . $_GET['post_id'] . '-1" } ] }';
-			
 		}
 		
 	}
@@ -150,35 +108,7 @@ function fw_get_builder_object() {
 add_action ( 'wp_ajax_fw_get_builder_object', 'fw_get_builder_object' );
 // add_action ( 'wp_ajax_nopriv_fw_get_builder_object', 'fw_get_builder_object' );
 
-function fw_apply_builder ( $source = null, $target = null ) {
-	
-	if ( !isset ( $source ) || $source == null ) {
-		$source = $_GET['source'];
-	}
-	
-	if ( !isset ( $target ) || $target == null ) {
-		$target = $_GET['target'];
-	}
-	
-	$builder = get_post_meta ( $source, 'builder', true );
-	$builder = str_replace ( $source, $target, $builder );
-	
-	// update_post_meta ( $target, 'builder', $builder );
-	
-	return 'success';
-	
-	wp_die();
-	
-}
-
-add_action ( 'wp_ajax_fw_apply_builder', 'fw_apply_builder' );
-
 function fw_setup_element_ajax() {
-	
-	// print_r($_GET['element']);
-	// echo "\n";
-	// print_r($_GET['globals']);
-	// echo "\n";
 	
 	echo json_encode ( fw_setup_element ( $_GET['element'], $_GET['globals'] ) );
 	

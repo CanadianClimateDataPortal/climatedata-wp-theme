@@ -9,7 +9,7 @@
 	$key = $element['inputs']['key'];
 	
 	if (
-		$element['inputs']['translate'] == true &&
+		$element['inputs']['translate'] == 'true' &&
 		$globals['current_lang_code'] != 'en'
 	) {
 		$key .= '_' . $globals['current_lang_code'];

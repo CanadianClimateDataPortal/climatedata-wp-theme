@@ -12,6 +12,8 @@ proto/
 .DS_Store
 *.css.map
 climate-data-ca/resources/css/child.css
+framework/resources/css/global.css
+framework/resources/css/framework.css
 fw-child/resources/css/child.css
 framework/resources/vendor/aos/
 !framework/resources/vendor/aos/dist/

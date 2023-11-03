@@ -46,6 +46,7 @@
       <ul class="navbar-nav tabs-nav w-100 flex-column flex-sm-row align-items-center justify-content-center">
         <li class="nav-item"><span class="nav-link disabled p-4 all-caps"><?php _e ( 'Filter:', 'cdc' ); ?></a></li>
         <li class="nav-item"><span class="nav-link p-4 all-caps" data-type="video"><?php _e ( 'Video', 'cdc' ); ?></a></li>
+        <li class="nav-item"><span class="nav-link p-4 all-caps" data-type="audio"><?php _e ( 'Audio', 'cdc' ); ?></a></li>
         <li class="nav-item"><span class="nav-link p-4 all-caps" data-type="interactive"><?php _e ( 'Interactive', 'cdc' ); ?></a></li>
         <li class="nav-item"><span class="nav-link p-4 all-caps" data-type="article"><?php _e ( 'Article', 'cdc' ); ?></a></li>
       </ul>
@@ -137,6 +138,10 @@
                         switch ( get_field ( 'asset_type' ) ) {
                           case 'video' :
                             $icon_class = 'fas fa-play';
+                            break;
+                            
+                          case 'audio' :
+                            $icon_class = 'fas fa-volume-up';
                             break;
                             
                           case 'interactive' :

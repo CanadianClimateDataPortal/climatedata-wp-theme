@@ -16,6 +16,7 @@ var chart_labels, legend_labels, l10n_labels;
 var l10n_table = {
     "fr": {
         'All models': 'Tous les modèles',
+        'Full ensemble': 'Tout l’ensemble',
         '{0} Median': '{0} médiane',
         '{0} Range': '{0} portée',
         "No data available for selected location": "Pas de données disponibles pour l'emplacement sélectionné",
@@ -86,7 +87,7 @@ const DATASETS = {
         'finch_name' : 'candcs-u5',
         'model_lists': [
             {'name': 'pcic12', 'label': 'PCIC12 (Ensemble)'},
-            {'name': '24models', 'label': 'All models'}]
+            {'name': '24models', 'label': 'Full ensemble'}]
     },
     "cmip6": {
         'scenarios': [
@@ -112,7 +113,7 @@ const DATASETS = {
         'grid': 'canadagrid',
         'finch_name' : 'candcs-u6',
         'model_lists': [
-            {'name': '26models', 'label': 'All models'}]
+            {'name': '26models', 'label': 'Full ensemble'}]
     },
     "humidex": {
         'scenarios': [
@@ -129,7 +130,7 @@ const DATASETS = {
         'grid': 'era5landgrid',
         'finch_name': 'humidex-daily',
         'model_lists': [
-            {'name': 'humidex_models', 'label': 'All models'}]
+            {'name': 'humidex_models', 'label': 'Full ensemble'}]
     }
 }
 

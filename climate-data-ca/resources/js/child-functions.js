@@ -360,37 +360,42 @@ function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
 }
 
 function setDataLayerForChartData(chartDataFormat, chartData, query) {
-    if (!chartDataFormat.length) {
-        return;
-    }
-    let eventName = getGA4EventNameForVariableDownloadData(chartDataFormat, query['var']);
-    let overlayTitle = $('.overlay-title').text();
-
-    let addStr = "";
-    for (let index = 0; index < chartData.series.length; index++) {
-        if (chartData.series[index].visible && chartData.series[index].type != 'areaspline') {
-            addStr += chartData.series[index].name + ", ";
+    try {
+        if (!chartDataFormat.length) {
+            return;
         }
+        let eventName = getGA4EventNameForVariableDownloadData(chartDataFormat, query['var']);
+        let overlayTitle = $('.overlay-title').text();
+
+        let addStr = "";
+        for (let index = 0; index < chartData.series.length; index++) {
+            if (chartData.series[index].visible && chartData.series[index].type != 'areaspline') {
+                addStr += chartData.series[index].name + ", ";
+            }
+        }
+
+        // Remove last 2 char: ;
+        if (addStr.length > 0) {
+            addStr = addStr.substring(0, addStr.length - 2);
+        }
+
+        // ex: Watersheds
+        var variableDownloadDataVewBy = $('.variable-download-data-view_by').find(":selected").text();
+        // ex: Région de la Montérégie, rcp26, January
+        var chartDataSettings = overlayTitle + "; " + query['rcp'] + "; " + getRealMonthName(query['mora']);
+        dataLayer.push({
+            'event': eventName,
+            'chart_data_event_type': eventName,
+            'chart_data_settings': chartDataSettings,
+            'chart_data_columns': addStr,
+            'chart_data_dataset': query.dataset,
+            'chart_data_format': chartDataFormat,
+            'chart_data_view_by': variableDownloadDataVewBy
+        });
+    } catch (err) {  // we ignore any Google Analytics errors to keep the site functional for the user in case of problem
+        console.error(err);
     }
 
-    // Remove last 2 char: ;
-    if (addStr.length > 0) {
-        addStr = addStr.substring(0, addStr.length - 2);
-    }
-
-    // ex: Watersheds
-    var variableDownloadDataVewBy = $('.variable-download-data-view_by').find(":selected").text();
-    // ex: Région de la Montérégie, rcp26, January
-    var chartDataSettings = overlayTitle + "; " + query['rcp'] + "; " + getRealMonthName(query['mora']);
-    dataLayer.push({
-        'event': eventName,
-        'chart_data_event_type': eventName,
-        'chart_data_settings': chartDataSettings,
-        'chart_data_columns': addStr,
-        'chart_data_dataset': query.dataset,
-        'chart_data_format': chartDataFormat,
-        'chart_data_view_by': variableDownloadDataVewBy
-    });
 }
 
 function formatDecade(timestampMilliseconds, period){

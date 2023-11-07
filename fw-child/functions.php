@@ -35,6 +35,14 @@ add_action ( 'wp', 'child_global_vars', 20 );
 // ENQUEUE
 //
 
+
+add_action ( 'wp_enqueue_scripts', function() {
+	
+	wp_dequeue_style ( 'font-awesome' );
+	wp_deregister_style ( 'font-awesome' );
+	
+}, 20 );
+
 function child_theme_enqueue() {
 	
 	$theme_dir = get_bloginfo ( 'template_directory' ) . '/';
@@ -54,8 +62,8 @@ function child_theme_enqueue() {
 	
 	wp_dequeue_style ( 'global-style' );
 	
-	wp_dequeue_style ( 'font-awesome' );
-	wp_enqueue_style ( 'font-awesome', WP_CONTENT_DIR . '/vendor/font-awesome-pro/css/all.css', null, null );
+	wp_register_style ( 'font-awesome', WP_CONTENT_DIR . '/vendor/font-awesome-pro/css/all.css', null, null );
+	wp_enqueue_style ( 'font-awesome' );
 
 	wp_enqueue_style ( 'leaflet', $child_npm_dir . 'leaflet/dist/leaflet.css', NULL, NULL, 'all' );
 

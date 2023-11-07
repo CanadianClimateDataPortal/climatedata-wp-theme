@@ -6,11 +6,9 @@
 	
 	<div class="card-body p-0">
 		
+		<input type="hidden" id="inputs-settings[]-colors-type" name="inputs-settings[]-colors-type" value="colors">
+		
 		<div class="row row-cols-4">
-			
-			<!-- <input type="hidden" id="inputs-settings[]-colors-index" name="inputs-settings[]-colors-index" value="0"> -->
-			
-			<input type="hidden" id="inputs-settings[]-colors-type" name="inputs-settings[]-colors-type" value="colors">
 				
 			<div class="col p-2">
 				<label for="inputs-settings[]-colors-bg" class="form-label modal-label-sm">Background</label>
@@ -53,5 +51,6 @@
 			
 		</div>
 		
+		<input type="hidden" id="inputs-settings[]-colors-index" name="inputs-settings[]-colors-index" value="0">
 	</div>
 </div>

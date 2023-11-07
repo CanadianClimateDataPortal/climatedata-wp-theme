@@ -63,21 +63,23 @@ $utilities: (
 // COMMON
 //
 
+// BREADCRUMB
+
+// CONTROL BAR
+
 .control-bar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: calc(100% / 16);
+  position: relative;
+  height: 100%;
   min-height: 100vh;
   background-color: transparentize($dark, 0.1);
-  z-index: 1000;
+  z-index: 10;
 
   .tab-drawer-container {
     box-shadow: 0 0 0 transparentize($black, 0.8);
     transition: box-shadow 0.25s ease 0.25s;
     z-index: -1;
 
-    &:has(.tab-drawer.selected) {
+    &:has(.tab-drawer.td-selected) {
       width: calc((100vw / 16) * 3);
       box-shadow: 0 0 20px transparentize($black, 0.8);
     }
@@ -134,6 +136,20 @@ $utilities: (
   padding: 1rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid $gray-300;
+}
+
+.tab-drawer-bumper {
+  transition: margin-left 0.25s ease;
+}
+
+.tab-drawer-open {
+  .tab-drawer-bumper {
+    margin-left: 18.75vw;
+  }
+}
+
+.filter-item.selected {
+  color: $primary;
 }
 
 //

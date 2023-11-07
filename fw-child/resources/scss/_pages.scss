@@ -1,4 +1,19 @@
 //
+// APP PAGES
+//
+
+.app-page {
+  .control-bar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: calc(100% / 16);
+    background-color: transparentize($dark, 0.1);
+    z-index: 1000;
+  }
+}
+
+//
 // MAP
 //
 
@@ -14,7 +29,7 @@
   }
 
   .tab-drawer-container {
-    &:has(#data-variable.selected) {
+    &:has(#data-variable.td-selected) {
       width: calc((100vw / 16) * 9);
     }
   }
@@ -24,7 +39,7 @@
   }
 
   .tab-drawer-container {
-    &:has(#location-detail.selected) {
+    &:has(#location-detail.td-selected) {
       width: calc((100vw / 16) * 7);
     }
   }
@@ -118,3 +133,7 @@ body.tab-drawer-open {
     transition: width 0.2s ease 0s;
   }
 }
+
+//
+// LEARN
+//

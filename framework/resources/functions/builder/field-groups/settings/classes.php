@@ -18,5 +18,24 @@
 			
 		</div>
 		
+		<?php
+		
+			if ( str_contains ( $_GET['content'], 'block' ) ) {
+			
+		?>
+		
+		<div class="col">
+			
+			<label for="settings-form-classes" class="form-label">Inner Container Classes</label>
+			<input type="text" id="settings-form-classes" name="inputs-inner_class" class="form-control">
+			
+		</div>
+		
+		
+		<?php
+		
+			}
+			
+		?>
 	</div>
 </div>

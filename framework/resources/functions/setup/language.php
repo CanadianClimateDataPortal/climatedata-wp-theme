@@ -175,7 +175,6 @@ function fw_setup_current_lang() {
 
 add_action( 'init', 'fw_setup_current_lang', 0 );
 
-
 function fw_load_lang_files() {
 	
 	load_theme_textdomain ( 'fw', get_template_directory() . '/languages' );

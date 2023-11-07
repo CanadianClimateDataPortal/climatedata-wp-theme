@@ -29,27 +29,13 @@ function end_session() {
 // 				return html_entity_decode(preg_replace("/%u([0-9a-f]{3,4})/i", "&#x\\1;", urldecode($str)), null, 'UTF-8');
 // }
 
-function fw_init_lang_setup() {
-	
-	// dumpit ( $fw );
-	
-}
-
-// add_action ( 'after_setup_theme', 'fw_init_lang_setup' );
-
 
 function fw_global_vars() {
 	
+	if ( is_admin() && !wp_doing_ajax() ) return;
+	
 	global $fw;
-	
-	// using get_option instead in rewrite.php
-	// $fw['langs'] = array ( 
-	// 	'en' => 'English',
-	// 	'fr' => 'Français'
-	// );
-	
 	global $wp_query;
-	// dumpit ( $wp_query->post );
 	
 	// $fw['current_query'] = (array) get_queried_object();
 	// this stopped working after adding pre_get_posts for
@@ -57,6 +43,8 @@ function fw_global_vars() {
 	
 	$fw['current_query'] = (array) $wp_query->post;
 	
+	$fw['current_ancestors'] = get_ancestors ( $fw['current_query']['ID'], $fw['current_query']['post_type'] );
+
 	// $fw['classes'] = array (
 	// 	'page' => get_body_class(),
 	// 	'section' => ['fw-element', 'fw-section'],
@@ -89,20 +77,6 @@ function theme_global_vars() {
 
 	global $acf_fields;
 	
-	// $counters = array (
-	// 	'section' => 1,
-	// 	'container' => 1,
-	// 	'column' => 1,
-	// 	'block' => 1
-	// );
-	// 
-	// $acf_fields = array (
-	// 	'section' => array(),
-	// 	'container' => array(),
-	// 	'column' => array(),
-	// 	'block' => array()
-	// );
-
 	//
 	// INLINE STYLES
 	//
@@ -152,7 +126,7 @@ function theme_global_vars() {
 
 	// CURRENT SITE URL
 
-	// possible not needed anymore because of setup/language.php
+	// possibly not needed anymore because of setup/language.php
 	$vars['site_url'] = trailingslashit ( site_url() );
 	$vars['home_url'] = trailingslashit ( home_url() );
 	
@@ -175,8 +149,6 @@ function theme_global_vars() {
 		$vars['current_slug'] = get_post_meta ( get_the_ID(), 'slug_' . $GLOBALS['fw']['current_lang_code'], true );
 	}
 	
-	$vars['current_ancestors'] = get_ancestors ( get_the_ID(), get_post_type() );
-
 	//
 	// HOME PAGE ID
 	//
@@ -337,6 +309,16 @@ add_action ( 'admin_bar_menu', function ( $admin_bar ) {
 	) );
 	
 	$admin_bar->add_menu ( array (
+		'id'    => 'fw-actions-item-layout',
+		'parent' => 'fw-actions',
+		'title' => 'Apply Layout',
+		'href'  => '#fw-modal',
+		'meta'  => array (
+			'class' => 'fw-actions-item fw-modal-content-do-layout'
+		),
+	) );
+	
+	$admin_bar->add_menu ( array (
 		'id'    => 'fw-actions-item-save',
 		'parent' => 'fw-actions',
 		'title' => 'Save Changes',
@@ -380,11 +362,10 @@ add_action ( 'admin_bar_menu', function ( $admin_bar ) {
 
 
 //
-function my_acf_init() {
-		acf_update_setting('remove_wp_meta_box', false);
-}
 
-add_action('acf/init', 'my_acf_init');
+add_action ( 'acf/init', function() {
+	acf_update_setting ( 'remove_wp_meta_box', false );
+} );
 
 function load_custom_wp_admin_style() {
 

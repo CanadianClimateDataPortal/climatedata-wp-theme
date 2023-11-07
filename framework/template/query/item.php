@@ -1,5 +1,5 @@
 <div class="card">
 	
-	<?php echo get_the_title ( $item ); ?>
+	<h4 class="item-title"><?php echo $item['title']; ?></h4>
 	
 </div>

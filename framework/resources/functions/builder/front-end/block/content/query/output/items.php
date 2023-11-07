@@ -1,38 +1,56 @@
 <?php
 
-	$item_template = 'template/query/item.php';
-	
 	if (
 		isset ( $options['template'] ) && 
 		$options['template'] != '' &&
 		locate_template ( 'template/query/' . $options['template'] ) != ''
 	) {
-		
-		$item_template = 'template/query/' . $options['template'];
-		
+		$options['template'] = 'template/query/' . $options['template'];
+	} else {
+		$options['template'] = 'template/query/item.php';
 	}
-	
-	// dumpit ( $element['query']->query );
-	
-	if ( $element['query']->have_posts() ) {
+
+?>
+
+<div
+	class="fw-query-items <?php echo implode ( ' ', $options['class'] ); ?>"
+	data-options='<?php echo json_encode ( $options ); ?>'
+>
+	<?php
+		/*
+		// dumpit ( $element['query']->query );
 		
-		while ( $element['query']->have_posts() ) {
-			$element['query']->the_post();
+		if ( $element['query']->have_posts() ) {
 			
-			$item = get_the_ID();
+			while ( $element['query']->have_posts() ) {
+				$element['query']->the_post();
+				
+				$item = get_the_ID();
 			
-			include ( locate_template ( $item_template ) );
+	?>
+	
+	<div class="fw-query-item <?php echo $options['item_class']; ?>">
+		<?php
+		
+			include ( locate_template ( $options['template'] ) );
+			
+		?>
+	</div>
+			
+	<?php
+		
+			}
+			
+		} else {
+			
+	?>
+	
+	<div class="alert alert-warning"><?php _e ( 'No items found.', 'fw' ); ?></div>
+	
+	<?php
 			
 		}
-		
-	} else {
-		
-?>
+	*/
+	?>
 
-<div class="alert alert-warning">No items found.</div>
-
-<?php
-		
-	}
-
-?>
+</div>

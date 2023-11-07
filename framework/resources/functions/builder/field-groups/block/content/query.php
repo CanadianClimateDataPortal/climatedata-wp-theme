@@ -12,13 +12,13 @@
 				
 				<h5>Basic</h5>
 				
-				<div class="row g-3">
-					<div class="col-6">
+				<div class="row row-cols-2 g-3">
+					<div class="col">
 						<label for="inputs-args-posts_per_page" class="form-label">Number of Items</label>
 						<input class="form-control form-control-sm" type="number" name="inputs-args-posts_per_page" id="inputs-args-posts_per_page" min="-1" max="9999" value="-1">
 					</div>
 					
-					<div class="col-6">
+					<div class="col">
 						
 						<label for="inputs-type" class="form-label">Query Type</label>
 						
@@ -29,7 +29,7 @@
 						
 					</div>
 						
-					<div class="col-12" id="query-post-types">
+					<div class="col w-100" id="query-post-types">
 						
 						<label class="form-label d-block">Post Type(s)</label>
 						
@@ -42,8 +42,8 @@
 						?>
 							
 						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="checkbox" value="<?php echo $post_type; ?>" name="inputs-args-post_type-<?php echo $post_type; ?>" id="inputs-args-post_type-<?php echo $post_type; ?>">
-							<label class="form-check-label" for="inputs-args-post_type-<?php echo $post_type; ?>">
+							<input class="form-check-input" type="checkbox" value="<?php echo $post_type; ?>" name="inputs-args-post_type-<?php echo str_replace ( '-', '*', $post_type ); ?>" id="inputs-args-post_type-<?php echo str_replace ( '-', '*', $post_type ); ?>">
+							<label class="form-check-label" for="inputs-args-post_type-<?php echo str_replace ( '-', '*', $post_type ); ?>">
 								<?php echo $post_type; ?>
 							</label>
 						</div>
@@ -58,7 +58,7 @@
 						
 					</div>
 					
-					<div class="col-6">
+					<div class="col">
 						
 						<label for="inputs-args-orderby" class="form-label">Sort By</label>
 						
@@ -73,7 +73,7 @@
 						
 					</div>
 					
-					<div class="col-6">
+					<div class="col">
 						
 						<label for="inputs-args-order" class="form-label">Sort Order</label>
 						
@@ -81,6 +81,28 @@
 							<option value="asc">Ascending</option>
 							<option value="desc">Descending</option>
 						</select>
+						
+					</div>
+				</div>
+				
+				<div class="row row-cols-2 g-3">
+					<div class="col">
+						
+						<label for="inputs-depth" class="form-label">Depth</label>
+						
+						<select class="form-select form-select-sm conditional-select" name="inputs-depth" id="inputs-depth">
+							<option value="all">All results</option>
+							<option value="top">Top-level only (no parent)</option>
+							<option value="parent" data-form-condition="#query-parent">Filter by parent</option>
+						</select>
+						
+					</div>
+					
+					<div id="query-parent" class="col">
+						
+						<label for="inputs-args-parent" class="form-label">Parent ID</label>
+						
+						<input type="number" class="form-control form-control-sm" name="inputs-args-post_parent" id="inputs-args-post_parent" min="0">
 						
 					</div>
 					
@@ -98,8 +120,6 @@
 						<div class="col">Taxonomy</div>
 						<div class="col">Field</div>
 						<div class="col">Terms</div>
-						<div class="col">Filterable</div>
-						<div class="col">Multi-Select</div>
 						<div class="col-1"></div>
 					</div>
 					
@@ -107,11 +127,9 @@
 							
 						<div class="fw-form-repeater-row row my-1" data-row-index="0">
 							
-							<input type="hidden" id="inputs-args-tax_query[]-index" name="inputs-args-tax_query[]-index" value="0">
-							
 							<div class="col pe-3">
 								
-								<select class="form-select form-select-sm" name="inputs-args-tax_query[]-taxonomy" id="inputs-args-tax_query[]-taxonomy">
+								<select class="form-select form-select-sm" name="inputs-args-tax_query-rows[]-taxonomy" id="inputs-args-tax_query-rows[]-taxonomy">
 									<?php
 									
 										foreach ( get_taxonomies ( array ( 'public' => true ), 'objects' ) as $taxonomy ) {
@@ -131,7 +149,7 @@
 							
 							<div class="col pe-3">
 								
-								<select class="form-select form-select-sm" name="inputs-args-tax_query[]-field" id="inputs-args-tax_query[]-field">
+								<select class="form-select form-select-sm" name="inputs-args-tax_query-rows[]-field" id="inputs-args-tax_query-rows[]-field">
 									<option value="slug">Slug</option>
 									<option value="term_id">ID</option>
 								</select>
@@ -140,25 +158,15 @@
 							
 							<div class="col pe-3">
 								
-								<input class="form-control form-control-sm" type="text" name="inputs-args-tax_query[]-terms" id="inputs-args-tax_query[]-terms">
-								
-							</div>
-							
-							<div class="col pe-3">
-								
-								toggle
-								
-							</div>
-							
-							<div class="col pe-3">
-								
-								toggle
+								<input class="form-control form-control-sm" type="text" name="inputs-args-tax_query-rows[]-terms" id="inputs-args-tax_query-rows[]-terms">
 								
 							</div>
 							
 							<div class="col-1 d-flex align-items-end justify-content-center">
 								<div class="fw-form-repeater-delete-row btn btn-sm btn-outline-danger">Delete</div>
 							</div>
+							
+							<input type="hidden" id="inputs-args-tax_query-rows[]-index" name="inputs-args-tax_query-rows[]-index" value="0">
 							
 						</div>
 						
@@ -207,50 +215,15 @@
 						
 						<ul id="query-builder-form-add-items" class="dropdown-menu fw-form-flex-menu" aria-labelledby="query-builder-form-add">
 							<li><span class="dropdown-item" data-flex-item="container">Container</span></li>
+							<li><span class="dropdown-item" data-flex-item="filter">Filter Item</span></li>
 							<li><span class="dropdown-item" data-flex-item="items">Items</span></li>
 						</ul>
 					</div>
 					
 				</div>
 				
-				<div class="fw-form-flex-rows row mt-3"></div>
+				<div class="fw-form-flex-rows row mt-3 fw-sortable"></div>
 			</div>
-			
-			<?php /*<div class="fw-form-flex-container">
-			
-				<div class="fw-form-flex p-2 border-bottom" data-rows="1">
-						
-					<div class="fw-form-flex-row row my-1" data-row-index="0">
-						
-						<input type="hidden" id="inputs-items-flex-index" name="inputs-items-flex-index" value="0">
-						
-						<div class="fw-form-flex-row-content"></div>
-						
-					</div>
-					
-				</div>
-				
-				<div class="d-flex justify-content-end p-2">
-					
-					<div class="dropdown">
-						<button class="btn btn-secondary dropdown-toggle" type="button" id="element-form-display-flex-add-menu" data-bs-toggle="dropdown" aria-expanded="false">
-							Add item
-						</button>
-						
-						<ul class="dropdown-menu" aria-labelledby="element-form-display-flex-add-menu">
-							<div class="dropdown-item fw-form-flex-add-row" data-item-content="container">Container</div>
-							<div class="dropdown-item fw-form-flex-add-row" data-item-content="items">Items</div>
-							<div class="dropdown-item fw-form-flex-add-row" data-item-content="filter">Filter</div>
-						</ul>
-					</div>
-					
-				</div>
-			
-			</div><?php // flex-container ?>
-			
-			*/ ?>
-			
-			
 			
 		</div>
 		

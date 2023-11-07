@@ -6,12 +6,13 @@
 
 function fw_output_loop_ajax() {
 	
-	fw_output_element ( json_decode ( get_post_meta ( $_GET['post_id'], 'builder', true ), true ), 1 );
+	// $element, $level, $globals, $include_autogen, $callbacks = true
+	
+	fw_output_element ( json_decode ( get_post_meta ( $_GET['post_id'], 'builder', true ), true ), 1, $_GET['globals'], true );
 	
 	wp_die();
 	
 }
-
 
 add_action ( 'wp_ajax_fw_output_loop_ajax', 'fw_output_loop_ajax' );
 
@@ -82,46 +83,6 @@ function fw_update_post() {
 
 add_action ( 'wp_ajax_fw_update_post', 'fw_update_post' );
 
-
-// function fw_get_post_builder_object() {
-// 	
-// 	if ( isset ( $_GET['post_id'] ) && !empty ( $_GET['post_id'] ) ) {
-// 		
-// 		print_r ( json_encode ( get_post_meta ( $_GET['post_id'], 'builder', true ) ) );
-// 		
-// 	}
-// 	
-// 	wp_die();
-// 	
-// }
-// 
-// add_action ( 'wp_ajax_fw_get_post_builder_object', 'fw_get_post_builder_object' );
-
-
-
-// function fw_create_block() {
-// 	
-// 	echo '<div class="fw-element fw-block">';
-// 	
-// 		echo '<div class="fw-block-inner"></div>';
-// 		
-// 		echo '<div class="fw-element-footer d-flex text-uppercase">';
-// 		
-// 			echo '<span class="me-2">Block</span>';
-// 			
-// 			echo '<a href="#fw-block-type-select" data-bs-toggle="modal" class="fw-btn-add-block me-2" data-key="">Add block</a>' . "\n";
-// 		
-// 		echo '</div>';
-// 	
-// 	echo '</div>';
-// 	
-// 	wp_die();
-// 	
-// }
-// 
-// add_action ( 'wp_ajax_fw_create_block', 'fw_create_block' );
-
-
 function fw_get_builder_object() {
 	
 	if ( isset ( $_GET['post_id'] ) && !empty ( $_GET['post_id'] ) ) {
@@ -136,8 +97,6 @@ function fw_get_builder_object() {
 			
 			echo '{}';
 			
-			// echo '{ "type": "page", "inputs": { "id": "auto" }, "post_id": ' . $_GET['post_id'] . ', "key": ' . $_GET['post_id'] . ', "children": [ { "type": "section", "inputs": { "id": "auto" }, "children": [], "key": "' . $_GET['post_id'] . '-1" } ] }';
-			
 		}
 		
 	}
@@ -149,13 +108,7 @@ function fw_get_builder_object() {
 add_action ( 'wp_ajax_fw_get_builder_object', 'fw_get_builder_object' );
 // add_action ( 'wp_ajax_nopriv_fw_get_builder_object', 'fw_get_builder_object' );
 
-
 function fw_setup_element_ajax() {
-	
-	// print_r($_GET['element']);
-	// echo "\n";
-	// print_r($_GET['globals']);
-	// echo "\n";
 	
 	echo json_encode ( fw_setup_element ( $_GET['element'], $_GET['globals'] ) );
 	
@@ -275,8 +228,10 @@ function fw_modal_settings() {
 
 	switch ( $_GET['content'] ) {
 		case 'save' :
+		case 'page' :
 		case 'delete' :
 		case 'new-post' :
+		case 'do-layout' :
 			
 			include ( locate_template ( 'resources/functions/builder/modals/' . $_GET['content'] . '.php' ) );
 			
@@ -407,6 +362,96 @@ function fw_get_element_classes ( $type ) {
 
 add_action ( 'wp_ajax_fw_get_element_classes', 'fw_get_element_classes' );
 
+//
+// UPDATE PAGE SETTINGS
+//
+
+function fw_update_page_settings() {
+	
+	$result = array (
+		'old_title' => get_the_title ( $_GET['post_id'] ),
+		'old_slug' => get_the_slug ( $_GET['post_id'] ),
+		'old_path' => null
+	);
+	
+	// get the existing field values
+	
+	// dumpit ( $_GET );
+	
+	// $old_title = get_the_title ( $_GET['post_id'] );
+	// $old_slug = get_the_slug ( $_GET['post_id'] );
+	// $old_path = null;
+	
+	if ( $_GET['lang'] != 'en' ) {
+		
+		$result['old_title'] = get_post_meta ( $_GET['post_id'], 'title_' . $_GET['lang'], true );
+		$result['old_slug'] = get_post_meta ( $_GET['post_id'], 'slug_' . $_GET['lang'], true );
+		$result['old_path'] = get_post_meta ( $_GET['post_id'], 'path_' . $_GET['lang'], true );
+		
+	}
+	
+	// title
+	
+	// echo "\n";	
+	// echo $old_title;
+	
+	if ( $_GET['fields']['title'] != '' && $_GET['fields']['title'] != $result['old_title'] ) {
+		// echo ' > ' . $_GET['fields']['title'];
+		
+		if ( $_GET['lang'] == 'en' ) {
+			
+			wp_update_post ( array (
+				'ID' => $_GET['post_id'],
+				'post_title' => $_GET['fields']['title']
+			) );
+			
+		} else {
+			
+			update_post_meta ( $_GET['post_id'], 'title_' . $_GET['lang'], $_GET['fields']['title'] );
+			
+		}
+		
+		$result['new_title'] = $_GET['fields']['title'];
+		
+	}
+	
+	// echo "\n";
+	// echo $old_slug;
+	
+	if ( $_GET['fields']['slug'] != '' && $_GET['fields']['slug'] != $result['old_slug'] ) {
+		
+		// echo ' > ' . $_GET['fields']['slug'];
+		// echo "\n";
+		// echo str_replace ( $old_slug, $_GET['fields']['slug'], $old_path );
+		
+		if ( $_GET['lang'] == 'en' ) {
+			
+			wp_update_post ( array ( 
+				'ID' => $_GET['post_id'],
+				'post_name' => sanitize_title ( $_GET['fields']['slug'] )
+			) );
+			
+		} else {
+			
+			update_post_meta ( $_GET['post_id'], 'slug_' . $_GET['lang'], sanitize_title ( $_GET['fields']['slug'] ) );
+			
+			update_post_meta ( $_GET['post_id'], 'path_' . $_GET['lang'], str_replace ( $result['old_slug'], sanitize_title ( $_GET['fields']['slug'] ), $result['old_path'] ) );
+			
+		}
+		
+		$result['new_slug'] = sanitize_title ( $_GET['fields']['slug'] );
+		
+		$result['new_path'] = str_replace ( $result['old_slug'], sanitize_title ( $_GET['fields']['slug'] ), $result['old_path'] );
+		
+	}
+	
+	print_r ( json_encode ( $result ) );
+	
+	wp_die();
+	
+}
+
+add_action ( 'wp_ajax_fw_update_page_settings', 'fw_update_page_settings' );
 
 //
 // FLEX FIELD ROWS
@@ -444,3 +489,81 @@ add_action ( 'wp_ajax_fw_get_element_classes', 'fw_get_element_classes' );
 // 
 // 
 // add_action ( 'wp_ajax_fw_output_flex_row', 'fw_output_flex_row' );
+
+//
+// QUERY
+//
+
+function fw_do_query() {
+	
+	$lang = 'en';
+	
+	if (
+		isset ( $_GET['options']['template'] ) && 
+		$_GET['options']['template'] != '' &&
+		locate_template ( 'template/query/' . $_GET['options']['template'] ) != ''
+	) {
+		$element_path = 'template/query/' . $_GET['options']['template'];
+	} else {
+		$element_path = 'template/query/item.php';
+	}
+	
+	$_GET['options']['template'] = $element_path;
+	
+	$result = array (
+		'found_posts' => 0,
+		'items' => array()
+	);
+	
+	if ( isset ( $_GET['globals']['current_lang_code'] ) ) {
+		$lang = $_GET['globals']['current_lang_code'];
+	}
+	
+	if ( isset ( $_GET['args'] ) ) {
+		
+		$new_query = new WP_Query ( $_GET['args'] );
+		$result['found_posts'] = $new_query->found_posts;
+		
+		if ( $new_query->have_posts() ) {
+			while ( $new_query->have_posts() ) {
+				$new_query->the_post();
+		
+				$item = array (
+					'id' => get_the_ID(),
+					'title' => get_the_title(),
+					'permalink' => get_permalink()
+				);
+				
+				if ( $lang != 'en' ) {
+					$item['title'] = get_post_meta ( get_the_ID(), 'title_' . $lang, true );
+				}
+				
+				ob_start();
+				
+				include ( locate_template ( $element_path ) );
+				
+				$item['output'] = ob_get_clean();
+				
+				$result['items'][] = $item;
+				
+		
+			}		
+			
+		} else {
+			
+			$result['items'][] = array (
+				'output' => '<div><p class="alert alert-warning">' . __ ( 'No items found.', 'fw' ) . '</p></div>'
+			);
+			
+		} // if posts
+		
+	} // if args
+	
+	echo json_encode ( $result );
+	
+	wp_die();
+	
+}
+
+add_action ( 'wp_ajax_fw_do_query', 'fw_do_query' );
+add_action ( 'wp_ajax_nopriv_fw_do_query', 'fw_do_query' );

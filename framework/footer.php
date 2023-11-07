@@ -6,6 +6,8 @@
 			
 			wp_footer();
 			
+			// dumpit ( $GLOBALS['css'] );
+			
 		?>
 		
 		<style type="text/css">

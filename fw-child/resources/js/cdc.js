@@ -8,6 +8,12 @@
       lang: ajax_data.globals.lang,
       post_id: null,
       maps: {},
+      coords: {
+        lat: null,
+        lng: null,
+        zoom: null,
+      },
+      first_map: null,
       debug: true,
     };
 
@@ -49,15 +55,27 @@
 
       // MAP CONTROLS
 
+      // zoom
+
       item.on('click', '.map-zoom-btn', function (e) {
-        let current_zoom = options.maps.ssp1.object.getZoom(),
+        // get the first visible map object
+
+        let first_map = null;
+
+        for (let key in options.maps) {
+          if (first_map == null && options.maps[key].container.is(':visible')) {
+            first_map = options.maps[key];
+          }
+        }
+
+        let current_zoom = first_map.object.getZoom(),
           new_zoom = current_zoom + 1;
 
         if ($(this).hasClass('zoom-out')) {
           new_zoom = current_zoom - 1;
         }
 
-        options.maps.ssp1.object.setZoom(new_zoom);
+        first_map.object.setZoom(new_zoom);
       });
 
       //
@@ -73,7 +91,7 @@
       });
     },
 
-    init_maps: function (maps) {
+    init_maps: function (maps, callback) {
       let plugin = this,
         options = plugin.options;
 
@@ -113,6 +131,7 @@
         this_object.getPane('labels').style.zIndex = 550;
         this_object.getPane('labels').style.pointerEvents = 'none';
 
+        // basemap
         L.tileLayer(
           '//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png',
           {
@@ -124,19 +143,52 @@
         ).addTo(this_object);
       }
 
-      console.log('done adding', options.maps);
+      // sync if multiple maps exist
 
       if (Object.keys(options.maps).length > 1) {
         for (let key in options.maps) {
           Object.keys(options.maps).forEach(function (map) {
-            console.log('sync', map, key);
             if (map != key)
               options.maps[key].object.sync(options.maps[map].object);
           });
         }
       }
 
+      // use first_map to set event handlers
+      // assumes all maps are visible on load
+
+      options.first_map = Object.values(options.maps)[0];
+
+      // update coords
+
+      plugin.update_coord_inputs();
+
+      console.log('first map', options.first_map);
+
+      options.first_map.object.on('moveend', function (e) {
+        plugin.update_coord_inputs();
+      });
+
+      if (typeof callback == 'function') {
+        callback(options.maps);
+      }
+
       return options.maps;
+    },
+
+    update_coord_inputs: function () {
+      let plugin = this,
+        item = plugin.item,
+        options = plugin.options;
+
+      options.coords.lat = options.first_map.object.getCenter().lat;
+      options.coords.lng = options.first_map.object.getCenter().lng;
+      options.coords.zoom = options.first_map.object.getZoom();
+
+      $('#coords-lat').val(options.coords.lat);
+      $('#coords-lng').val(options.coords.lng);
+      $('#coords-zoom').val(options.coords.zoom);
+      console.log('updated', options.coords);
     },
 
     invalidate_size: function () {

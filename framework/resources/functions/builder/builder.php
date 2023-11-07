@@ -186,9 +186,7 @@ function fw_output_extras_after_open ( $element ) {
 function fw_output_loop ( $element, $level, $include_autogen ) {
 	
 	if ( gettype ( $include_autogen ) == 'undefined' ) {
-		
 		$include_autogen = true;
-		
 	}
 	
 	// dumpit ( $element );
@@ -437,7 +435,17 @@ function fw_setup_element ( $element, $globals ) {
 						
 						// dumpit ( $options );
 						
-						foreach ( $options as $index => $spacing ) {
+						// remove sometime later
+						
+						$rows_array = $options;
+						
+						if ( isset ( $options['rows'] ) ) {
+							$rows_array = $options['rows'];
+						}
+						
+						// ^ remove later
+						
+						foreach ( $rows_array as $index => $spacing ) {
 							
 							$new_class = $spacing['property'] . $spacing['side'];
 							
@@ -475,6 +483,17 @@ function fw_setup_element ( $element, $globals ) {
 							}
 						}
 						
+						break;
+						
+					case 'attributes' :
+						
+						foreach ( $options['rows'] as $index => $att ) {
+							
+							$settings['atts'][$att['name']] = $att['value'];
+							
+						}
+						
+						// $settings['atts']
 						break;
 						
 					case 'colors' :
@@ -536,12 +555,19 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 	
 	// AUTO-GENERATED
 	
+	// echo "\n" . 'include autogen: ';
+	// echo ( $include_autogen == true ) ? 'y' : 'n';
+	// echo "\n";
+	
 	// flag when the template's first actual element is created
 	// if autogen = false we don't want to output auto elements
 	// BUT once a real element exists, we DO want to start outputting
 	// auto elements in the rest of the tree
 	
-	if ( $settings['autogen'] == false ) {
+	if (
+		$settings['el_type'] != 'page' &&
+		$settings['autogen'] == false
+	) {
 		$GLOBALS['fw']['autogen'] = true;
 	}
 	
@@ -556,27 +582,47 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 		$settings['el_type'] == 'page' &&
 		$include_autogen == false 
 	) {
-
+		
+		// do not include the page element
+		// when auto-generating
+		
 		$output_this_element = false;
 		
 	}
 	
 	if (
 		$settings['el_type'] != 'page' &&
-		isset ( $settings['autogen'] ) &&
-		$settings['autogen'] == true &&
+		(
+			isset ( $settings['autogen'] ) &&
+			$settings['autogen'] == true
+		) &&
 		$include_autogen == false
 	) {
-		
 		$output_this_element = false;
-		
 	}
 	
-	if ( $settings['el_type'] != 'page' && $GLOBALS['fw']['autogen'] == true ) {
+	if (
+		$settings['el_type'] != 'page' && 
+		(
+			isset ( $globals['autogen'] ) && 
+			$globals['autogen'] == true
+		)
+	) {
 		$output_this_element = true;
 	}
 	
+	// echo "\n";
+	// echo $settings['el_type'] . ' is autogen: ';
+	// echo ( $settings['autogen'] == true ) ? 'y' : 'n';
+	// echo "\n";
+	// 
+	// echo "\n";
+	// echo 'output this: ';
+	// echo ( $output_this_element == true ) ? 'y' : 'n';
+	// echo "\n";
+	
 	if ( $output_this_element == true ) {
+		
 	
 		// dumpit ( $settings );
 		
@@ -647,7 +693,7 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 			
 		} elseif ( str_contains ( $settings['el_type'], 'block' ) ) {
 			
-			echo fw_output_element_content ( $element, $globals );
+			echo fw_output_element_content ( $element, $globals, $settings );
 			
 		}
 		
@@ -671,7 +717,7 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 	
 }
 
-function fw_output_element_content ( $element, $globals ) {
+function fw_output_element_content ( $element, $globals, $settings ) {
 	
 	// if doing ajax we need to reset $GLOBALS['fw']
 	// with the data that was given by the app
@@ -692,7 +738,11 @@ function fw_output_element_content ( $element, $globals ) {
 		$inner_ID = ( $element['inputs']['id'] == 'auto' ) ? 'element-' . $element['key'] . '-inner' : $element['inputs']['id'] . '-inner';
 		
 		// open fw-element-inner
-		$inner_classes = array ( 'fw-element-inner' );
+		$inner_classes = array ( 'fw-element-inner',  );
+		
+		if ( isset ( $element['inputs']['inner_class'] ) ) {
+			$inner_classes[] = $element['inputs']['inner_class'];
+		}
 		
 		if ( isset ( $element['inputs']['settings']['offcanvas'] ) ) {
 			

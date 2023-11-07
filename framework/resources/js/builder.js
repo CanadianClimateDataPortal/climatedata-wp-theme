@@ -1,8 +1,6 @@
 // builder
 // v2.0
 
-var result = {}
-
 ;(function ($) {
 
 	function builder(item, options) {
@@ -16,6 +14,7 @@ var result = {}
 			page: {},
 			current_parent: $('.fw-main'),
 			status: 'init',
+			hierarchy: [ 'page', 'section', 'container', 'row', 'column', 'block' ],
 			objects: {
 				page: {
 					classes: $('body').attr('class').split(' '),
@@ -57,7 +56,6 @@ var result = {}
 			},
 			parent: {
 				item: null,
-				children: [],
 				data: {}
 			},
 			template_html: '',
@@ -66,13 +64,13 @@ var result = {}
 			status: 'init',
 			dropdowns: {},
 			moving_in_template: false,
-			adding_to_repeater: false,
-			repeater_index: -1,
-			adding_to_array: false,
-			array_index: 0,
-			array_indexes: {},
-			array_key: null,
-			removed_settings: [],
+			data: {
+				key_to_add: '',
+				add_next: false,
+				array_indexes: {},
+				array_key: null,
+				removed_settings: []
+			},
 			uploader: {
 				object: null,
 				options: null,
@@ -227,6 +225,15 @@ var result = {}
 				
 				if (options.modal.content == 'save') {
 					options.status = 'saving'
+				}
+				
+				if (options.modal.content == 'page') {
+					let this_element = $('.fw-page')
+					options.status = 'editing'
+					options.element.item = $('body')
+					options.element.data = plugin.get_element_by_key(options.element.item.attr('data-key'))
+					options.parent.item = this_element.parent()
+					options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
 				}
 				
 				$('#fw-modal').modal('show')
@@ -461,8 +468,101 @@ var result = {}
 					options.element.data = plugin.get_element_by_key(options.element.item.attr('data-key'))
 					
 					options.parent.item = this_element.parent()
-					
 					options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
+					
+					// console.log(options.element)
+					// console.log(options.parent)
+					
+				} else if ($(this).hasClass('duplicate-element')) {
+					
+					//
+					// DUPLICATE
+					//
+					
+					options.status = 'duplicating'
+					
+					this_element.removeClass('dropdown-open')
+					
+					// get the parent
+					
+					options.parent.item = this_element.parent()
+					options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
+					
+					// duplicate the data by stringifying it
+					// and replacing instances of the old key with a temporary
+					// 'cloned' string
+					
+					let stringify_element = JSON.stringify(plugin.get_element_by_key(this_key)).replaceAll('"key":"' + this_key, '"key":"cloned')
+					
+					options.element.data = JSON.parse(stringify_element)
+					
+					// figure out the new key
+					// by knocking off the last character,
+					// converting it to an integer and adding 1
+					
+					let new_key = this_key.slice(0, -1) + (parseInt(this_key.slice(-1)) + 1)
+					
+					// duplicate the item
+					// get the HTML and replace the old key with 'cloned'
+					// same as above with the data
+					
+					let new_html = this_element.prop('outerHTML').replaceAll('data-key="' + this_key + '', 'data-key="cloned').replaceAll('id="element-' + this_key, 'id="element-cloned')
+					
+					// convert to a jquery object
+					options.element.item = $(new_html)
+					
+					// remove all footers - they'll be reinserted properly
+					// when activating
+					
+					options.element.item.find('.fw-element-footer').remove()
+					
+					// insert the new item
+					
+					options.element.item.insertAfter(this_element)
+					
+					// splice the new element data
+					// into parent.children
+					
+					options.parent.data.children.forEach(function(child, i) {
+						
+						// find the key that matches
+						// the original element
+						
+						if (child.key == this_key) {
+							
+							// insert after
+							
+							options.parent.data.children.splice(i + 1, 0, JSON.parse(stringify_element))
+						
+							return true
+							
+						}
+						
+					})
+					
+					// gather elements to move
+					plugin.set_elements_to_move(options.parent.data)
+					
+					// set keys of moving elements
+					if (options.elements_to_move != false) {
+						plugin.set_element_keys()
+					}
+					
+					// console.log('replacing keys')
+					
+					options.element.item.find('[data-key*="cloned"]').each(function() {
+						$(this).attr('data-key', $(this).attr('data-key').replaceAll('cloned', new_key))
+					})
+					
+					// console.log('replacing IDs')
+					
+					options.element.item.find('[id^="element-cloned"]').each(function() {
+						$(this).attr('id', $(this).attr('id').replace('element-cloned', 'element-' + new_key))
+					})
+					
+					// re-activate the parent data object
+					
+					plugin.activate(options.parent.data)
 					
 				} else if ($(this).hasClass('delete-element')) {
 					
@@ -473,14 +573,14 @@ var result = {}
 					options.status = 'deleting'
 					
 					if ($(this).parents('.fw-template-label').length) {
-						// console.log('deleting template')
 						
-						// console.log('closest label', $(this).closest('.fw-template-label'))
-						// console.log('begin', $(this).closest('.fw-template-label').prevAll('.fw-template-label.begin'))
+						// deleting a template
 						
+						// find beginning label
 						let this_begin = $(this).closest('.fw-template-label').prevAll('.fw-template-label.begin'),
 								items_to_delete = [ this_begin ]
 						
+						// collect items to delete
 						this_begin.nextAll().each(function() {
 							items_to_delete.push($(this))
 							
@@ -491,9 +591,6 @@ var result = {}
 						
 						options.element.item = items_to_delete
 						options.parent.item = this_begin.closest('.fw-element')
-						
-						// console.log('parent item', options.parent.item)
-						// console.log('parent item key', options.parent.item.attr('data-key'))
 						
 						options.parent.data = plugin.get_element_by_key(options.parent.item.attr('data-key'))
 						
@@ -648,6 +745,65 @@ var result = {}
 			// e.g. insert, edit form
 			//
 			
+			// APPLY LAYOUT
+			
+			$('body').on('click', '.fw-do-layout-submit', function() {
+				
+				let source_ID = $(this).closest('.modal').find('#inputs-post_id').val()
+				
+				if (source_ID != '') {
+					
+					// get the page object first
+					
+					$.ajax({
+						url: ajax_data.url,
+						type: 'GET',
+						data: {
+							action: 'fw_get_builder_object',
+							post_id: source_ID
+						},
+						success: function(data) {
+							
+							options.page = JSON.parse(data.replaceAll(source_ID, options.globals.current_query.ID))
+							
+							console.log('new data', options.page)
+							
+							// get the output loop
+							
+							$.ajax({
+								url: ajax_data.url,
+								type: 'GET',
+								data: {
+									action: 'fw_output_loop_ajax',
+									globals: options.globals,
+									post_id: source_ID
+								},
+								success: function(data) {
+									
+									let new_html = $(data.replaceAll(source_ID, options.globals.current_query.ID))
+									
+									console.log('new html', new_html)
+									// console.log('filter', new_html.innerHTML)
+									
+									$('.fw-page').replaceWith(new_html)
+									
+									plugin.activate()
+									
+									$('#fw-modal').modal('hide')
+									
+								}
+							})
+							
+							
+						}
+					})
+					
+				}
+				
+			})
+			
+			// NEW POST
+			
 			$('body').on('click', '.fw-new-post-submit', function() {
 				
 				let form_data = {}
@@ -682,33 +838,88 @@ var result = {}
 				
 			})
 			
+			// PAGE SETTINGS
+			
+			$('body').on('click', '.fw-page-settings-submit', function() {
+				
+				let field_data = {
+					title: $('.modal').find('[name="title"]').val(),
+					slug: $('.modal').find('[name="slug"]').val()
+				}
+				
+				// console.log(field_data)
+				
+				let form_data = {
+					id: $('.modal').find('#settings-form-id').val(),
+					class: $('.modal').find('#settings-form-classes').val()
+				}
+				
+				// console.log(form_data)
+				
+				$.ajax({
+					url: ajax_data.url,
+					type: 'GET',
+					dataType: 'json',
+					data: {
+						action: 'fw_update_page_settings',
+						post_id: options.globals.current_query.ID,
+						lang: options.lang,
+						fields: field_data,
+						inputs: form_data
+					},
+					success: function(data) {
+						
+						console.log(data)
+						
+						if (data.new_slug) {
+							
+							console.log(window.location.pathname + ' > ' + data.new_slug)
+							
+							let new_slug = window.location.href.replace(data.old_slug, data.new_slug)
+							
+							history.replaceState({}, '', new_slug)
+							
+						}
+						
+						if (data.new_title) {
+							document.title = document.title.replace(data.old_title, data.new_title)
+						}
+						
+						$('#fw-modal').modal('hide')
+						
+					}
+				})
+				
+			})
+			
+			// INSERT/EDIT ELEMENT
+			
 			$('body').on('click', '.fw-settings-submit', function() {
+				
+				console.log('submit')
+				console.log(JSON.stringify(options.element.data))
 				
 				let form = $(this).closest('.modal').find('form'),
 						form_data = []//form.serializeArray()
 				
-				// add unchecked checkboxes as 'false'
+				// each form input
 				
 				form.find(':input:not(button)').each(function() {
 					
 					if (typeof $(this).attr('name') !== 'undefined') {
 						
-						// console.log($(this))
-						// console.log($(this).attr('name'), $(this).val())
-						
 						if ($(this).is('[type="checkbox"]')) {
 							
-							// on/off toggle
-							// or multi-select
+							// checkboxes
+							// on/off toggle or multi-select
 							
-							if ($(this).attr('name').includes('[]')) {
+							if ($(this).attr('name').slice(-2) == '[]') {
 								
-								console.log('yaaaaa')
+								// if the last 2 characters are []
+								// then it's a multi-select checkbox group
 								
 								if ($(this).prop('checked') == true) {
 								
-									// multi-select
-									
 									form_data.push({
 										name: $(this).attr('name'),
 										value: $(this).val()
@@ -717,7 +928,7 @@ var result = {}
 								}
 								
 							} else {
-							
+								
 								// true/false
 								
 								form_data.push({
@@ -733,15 +944,14 @@ var result = {}
 								name: $(this).attr('name'),
 								value: $(this).val()
 							})
+							
 						}
 						
 					}
 					
 				})
 				
-				// console.log(form_data)
-				
-				// console.log('post', JSON.stringify(options.element.data))
+				console.log(form_data)
 				
 				// console.log(options.status)
 				
@@ -784,33 +994,27 @@ var result = {}
 						
 						if (options.element.data.type == 'template') {
 							
-							console.log('parent', options.parent.data.key)
-							
-							console.log('insert template', options.element.data.inputs.post_id)
-							
-							console.log('get template and then create tree under ' + options.parent.data.type + ' ' + options.parent.data.key)
-							
-							plugin.get_template(
-								options.parent, 
-								options.element
-							)
+							// if (options.element.data.inputs.output == 'template') {
+								// inserting a template
+								
+								console.log('get template and then create tree under ' + options.parent.data.type + ' ' + options.parent.data.key)
+								
+								plugin.get_template(
+									options.parent, 
+									options.element
+								)
+							// }
 							
 						} else {
+							
+							// inserting a new element
 							
 							console.log('create tree under ' + options.parent.data.type + ' ' + options.parent.data.key)
 							
 							plugin.create_tree(options.parent, options.element)
+							plugin.insert_element()
 							
 						}
-						// } else {
-							
-							
-							// $('#output').append("1: parent item when starting auto generating\n\n")
-							// $('#output').append(options.parent.item.attr('class') + "\n\n")
-							
-							// plugin.create_tree(options.parent, options.element)
-							
-						// } 
 						
 						break
 						
@@ -828,14 +1032,11 @@ var result = {}
 							delete options.element.data.autogen
 						}
 						
-						// console.log('pre')
-						// console.log(JSON.stringify(options.element.data.inputs.settings, null, 2))
-						
-						// options.element.data.inputs.settings = {}
-						
 						// set up data object
 						
-						plugin.add_form_data_to_element(form_data)
+						let result = plugin.add_form_data_to_element(form_data)
+						
+						// console.log(result)
 						
 						// update footer
 						
@@ -851,21 +1052,11 @@ var result = {}
 						
 						plugin.set_element_atts(options.element)
 						
-						// console.log('post')
-						// console.log(JSON.stringify(options.element.data.inputs.settings, null, 2))
-						
 						// update settings
-						
-						// if (options.element.data.inputs.settings) {
-						// 	delete options.element.data.inputs.settings
-						// }
-						
-						// if (options.element.data.inputs.settings != undefined) {
-							plugin.do_element_settings()
-						// }
+						plugin.do_element_settings()
 						
 						break
-				
+						
 					case 'deleting' :
 				
 						// remove the item(s)
@@ -902,6 +1093,22 @@ var result = {}
 				}
 				
 				$('#fw-modal').modal('hide')
+				
+				$(document).trigger('fw_modal_submit', options.element)
+				
+				// reset options.element
+				// doesn't work here because
+				// the element gets reset before
+				// certain ajax functions finish
+				// replace with a reset_element method
+				//
+				// options.element = {
+				// 	item: $('<div class="fw-element">'),
+				// 	data: {
+				// 		type: null,
+				// 		children: []
+				// 	}
+				// }
 				
 			})
 			
@@ -1103,6 +1310,60 @@ var result = {}
 			
 		},
 		
+		check_for_repeaters: function(flatten_data) {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			let modal_body = $('#fw-modal').find('.modal-body'),
+					repeater_forms = {}
+			
+			flatten_data.forEach(function(input) {
+				
+				if (
+					input.property.includes('[]-index') &&
+					modal_body.find('[name="inputs-' + input.property + '"]').parents('.fw-form-repeater').length
+				) {
+					
+					// console.log(input.property + ' is a repeater index')
+					
+					if (repeater_forms.hasOwnProperty(input.property)) {
+						repeater_forms[input.property] += 1
+					} else {
+						repeater_forms[input.property] = 1
+					}
+					
+					
+				}
+				
+			})
+			
+			console.log('repeaters', repeater_forms)
+			
+			if (repeater_forms != {}) {
+				
+				for (let key in repeater_forms) {
+					
+					if (repeater_forms[key] > 1) {
+						
+						// console.log('add ' + repeater_forms[key] + ' rows for inputs-' + key)
+						
+						for (i = 0; i < repeater_forms[key] - 1; i += 1) {
+							
+							// console.log(modal_form.find('[name="inputs-' + key + '"]').closest('.fw-form-repeater'))
+							
+							plugin.add_repeater_row(modal_body.find('[name="inputs-' + key + '"]').closest('.fw-form-repeater'))
+							
+						}
+						
+					}
+					
+				}
+				
+			}
+			
+		},
+		
 		add_repeater_row: function(repeater) {
 			
 			// console.log(repeater)
@@ -1123,7 +1384,7 @@ var result = {}
 			
 			repeater.attr('data-rows', new_rows)
 			
-			new_row.find('[type="hidden"]').val(new_index)
+			new_row.find('[name$="index"]').val(new_index)
 			
 			new_row.attr('data-row-index', new_index)
 			
@@ -1162,61 +1423,268 @@ var result = {}
 			let plugin = this,
 					options = plugin.options
 			
-			console.log('ajax now', element)
+			console.log('getting template')
 			
-			$.ajax({
-				url: ajax_data.url,
-				type: 'GET',
-				data: {
-					action: 'fw_output_element_ajax',
-					globals: options.globals,
-					element: element.data
-				},
-				success: function(data) {
-					
-					console.log(data)
-					
-					// if (element.data.inputs.source == 'include') {
-					// 	
-					// 	
-					// 	
-					// } else if (element.data.inputs.source == 'post') {
-					
-						// console.log('replace', element.item)
+			console.log('parent data')
+			console.log(JSON.stringify(parent.data, null, 2))
+			
+			// use the parent element's type
+			// to figure out which element the template
+			// output should start with
+			
+			let template_start = null
+			
+			options.hierarchy.forEach(function(level, i) {
+				
+				if (level == parent.data.type) {
+					template_start = options.hierarchy[i + 1]
+				}
+				
+			})
+			
+			if (element.data.inputs.output == 'copy') {
+				
+				// get the page object first
+				
+				$.ajax({
+					url: ajax_data.url,
+					type: 'GET',
+					data: {
+						action: 'fw_get_builder_object',
+						post_id: element.data.inputs.post_id
+					},
+					success: function(obj_data) {
 						
-						let template_key = element.data.inputs.post_id
+						obj_data = JSON.parse(obj_data)
 						
-						if (element.data.inputs.path != '' && element.data.inputs.path != null) {
-							template_key = element.data.inputs.path
+						// options.page = JSON.parse(obj_data.replaceAll(element.obj_data.inputs.post_id, options.globals.current_query.ID))
+						
+						// find the first non-autogen child
+						
+						function find_real_child(obj) {
+							if (obj.autogen == undefined || obj.autogen == 'false') {
+								return obj
+							} else {
+								return find_real_child(obj.children[0])
+							}
 						}
 						
-						options.template_html = '<div class="fw-template-label begin" data-template-key="' + template_key + '"></div>' + data + '<div class="fw-template-label end" data-template-key="' + template_key + '"></div>'
+						obj_data = find_real_child(obj_data.children[0])
+						
+						let insert_index = options.inserting.index
+						
+						if (options.inserting.where !== 'before') {
+							insert_index += 1
+						}
+						
+						if (
+							options.parent.data.children.length == 0 || 
+							options.parent.data.children == undefined
+						) {
+							
+							options.parent.data.children = [ obj_data ]
+							
+						} else {
+							
+							// parent.data.children has values already
+							// so we need to figure out where to
+							// put the new stuff
+							
+							let deleted_array = options.parent.data.children.splice(insert_index, 0, obj_data)
+							
+						}
+						
+						// console.log('children now')
+						// console.log(JSON.stringify(options.parent.data.children))
+						
+						// get the output loop
+						
+						$.ajax({
+							url: ajax_data.url,
+							type: 'GET',
+							data: {
+								action: 'fw_output_loop_ajax',
+								globals: options.globals,
+								post_id: element.data.inputs.post_id
+							},
+							success: function(loop_data) {
+								
+								// let new_html = $(loop_data.replaceAll(source_ID, options.globals.current_query.ID))
+								
+								// find first non-autogen element
+								let new_html = $(loop_data).find('.fw-element:not(.fw-page):not(.fw-auto-generated').first()
+								
+								let keep_parent = parent
+								
+								// console.log('keep 1')
+								// console.log(JSON.stringify(keep_parent, null, 2))
+								
+								options.template_html = new_html.prop('outerHTML')
+								
+								element.data = obj_data
+								
+								// console.log('new html', new_html.prop('outerHTML'))
+								element.item = new_html.prop('outerHTML')
+								
+								// auto-generate any required parents
+								plugin.create_tree(parent, element)
+								
+								// add the html to the tree
+								console.log(options.inserting)
+								
+								// find the reference item for
+								// the inserted element to go before/after
+								
+								let insert_eq
+								
+								if (options.inserting.index != null) {
+									insert_eq = $('[data-key="' + keep_parent.data.key + '"]').find('> .fw-element').eq(options.inserting.index)
+								}
+								
+								if (
+									options.inserting.where != 'append' && 
+									options.inserting.index != null
+								) {
+									
+									// if not appending,
+									// get the item that sits at insert_index
+									
+									// insert_eq = $('[data-key="' + keep_parent.data.children[insert_index].key + '"]')
+									
+								}
+								
+								// console.log('eq', insert_eq)
+								
+								switch (options.inserting.where) {
+									case 'append' :
+										new_html.appendTo(keep_parent.item)
+										break
+										
+									case 'before' :
+									
+										// console.log('before', insert_eq)
+										
+										if (insert_eq.length > 0) {
+											insert_eq = insert_eq[0]
+										}
+										
+										new_html.insertBefore(insert_eq)
+										
+										break
+										
+									case 'after' :
+									
+										// inserting after
+										
+										// console.log('after', insert_eq)
+										
+										if (insert_eq.length > 0) {
+											insert_eq = insert_eq[insert_eq.length - 1]
+										}
+										
+										new_html.insertAfter(insert_eq)
+										
+										break
+										
+								}
+								
+								// reindex element keys
+								plugin.set_elements_to_move(parent.data)
+								plugin.set_element_keys()
+								
+								// activate new elements
+								plugin.activate(keep_parent.data)
+								
+							}
+						})
+						
+						
+					}
+				})
+				
+				
+			} else {
+					
+				// console.log('parent')
+				// console.log(JSON.stringify(parent.data, null, 2))
+				// console.log('element')
+				// console.log(JSON.stringify(element.data, null, 2))
+				
+				$.ajax({
+					url: ajax_data.url,
+					type: 'GET',
+					data: {
+						action: 'fw_output_element_ajax',
+						globals: options.globals,
+						element: element.data
+					},
+					success: function(data) {
+						
+						console.log(data)
+						
+						// if we're copying elements
+						// we need to adjust the element data
+						
+						if (options.element.data.inputs.output == 'copy') {
+							
+							options.template_html = data
+							
+						} else {
+						
+							let template_key = element.data.inputs.post_id
+							
+							if (
+								element.data.inputs.path != '' && 
+								element.data.inputs.path != null
+							) {
+								template_key = element.data.inputs.path
+							}
+							
+							if (
+								element.data.inputs.source == 'post' && 
+								element.data.inputs.output == 'template'
+							) {
+								
+								// console.log('something here now')
+								
+								options.template_html = '<div class="fw-template-label begin" data-template-key="' + template_key + '"></div>' + data + '<div class="fw-template-label end" data-template-key="' + template_key + '"></div>'
+								
+							} else {
+							
+								options.template_html = data
+								
+							}
+							
+						}
 						
 						console.log($(data).first())
 						
 						options.template_first = $(data).first()
 						
-					// }
+						// console.log(JSON.stringify(element.data, null, 2))
+						// console.log(JSON.stringify(options.element.data, null, 2))
 					
-					// console.log('first', options.template_first)
-					
-					// element.item.css('border', '1px solid red').html(data)
-					
-				},
-				complete: function() {
-					
-					// the first element in the template
-					// becomes the stopping point
-					// for auto-generating in create_tree
-					
-					console.log('done getting template, create tree under ' + options.parent.data.type + ' ' + options.parent.data.key)
-					
-					// if (element.data.inputs.source == 'post') {
-						plugin.create_tree(options.parent, options.element)
-					// }
-					
-				}
-			})
+					},
+					complete: function() {
+						
+						// the first element in the template
+						// becomes the stopping point
+						// for auto-generating in create_tree
+						
+						console.log('done getting template, create tree under ' + options.parent.data.type + ' ' + options.parent.data.key)
+						
+						console.log(JSON.stringify(element.data, null, 2))
+						// console.log(JSON.stringify(options.element.data, null, 2))
+						
+						// if (element.data.inputs.source == 'post') {
+							plugin.create_tree(options.parent, element)
+							plugin.insert_element()
+						// }
+						
+					}
+				})
+				
+			}
 			
 		},
 		
@@ -1230,11 +1698,22 @@ var result = {}
 					temp_element = null,
 					temp_key = options.parent.data.key
 			
+			console.log('create tree now')
+			
+			// console.log('start at parent')
+			// console.log(JSON.stringify(parent.data, null, 2))
+			// 
+			// console.log('end before element')
+			// console.log(JSON.stringify(element.data, null, 2))
+			
 			let insert_index = options.inserting.index + 1
 			let insert_eq
 			
 			if (options.inserting.index != null) {
+				
 				insert_eq = $('[data-key="' + options.parent.data.key + '"]').find('> .fw-element').eq(options.inserting.index)
+				
+				console.log('eq 1', insert_eq)
 			}
 			
 			let parent_has_changed = false
@@ -1242,7 +1721,7 @@ var result = {}
 			// object type to compare with elements of options.objects
 			
 			let comparing_key = element.data.type
-			
+						
 			if (comparing_key.includes('block/')) {
 				comparing_key = 'block'
 			} else if (comparing_key == 'new') {
@@ -1265,6 +1744,8 @@ var result = {}
 					options.template_first = options.template_first.split('fw-element fw-')[1]
 					options.template_first = options.template_first.split(' ')[0]
 					
+					console.log('template first', options.template_first)
+					
 				}
 				
 				comparing_key = options.template_first
@@ -1275,7 +1756,8 @@ var result = {}
 			
 			if (
 				comparing_key != 'include' && 
-				options.objects[parent.data.type].child != comparing_key
+				options.objects[parent.data.type].child != comparing_key &&
+				element.data.type != parent.data.type
 			) {
 				
 				console.log(element.data.type + ' is not a direct child of ' + parent.data.type)
@@ -1285,10 +1767,6 @@ var result = {}
 				// each object type
 				
 				for (var object_type in options.objects) {
-					
-					// console.log('---')
-					
-					// console.log(object_type, options.parent.data.key, start_generating)
 					
 					// skip templates
 					
@@ -1303,7 +1781,6 @@ var result = {}
 							// found the object type that matches
 							// the parent that we're inserting into
 							
-							// console.log('start here', object_type)
 							start_generating = true
 							
 						} else if (start_generating == true) {
@@ -1383,7 +1860,7 @@ var result = {}
 								
 								// console.log('new temp_key', temp_key, temp_element.data)
 								
-								plugin.setup_element(options.parent, temp_element)
+								plugin.setup_element(temp_element)
 								
 								// console.log('created', temp_element)
 								// console.log('in', options.parent.data)
@@ -1417,7 +1894,7 @@ var result = {}
 								
 								// rebuild the key structure
 								// not needed here?
-								plugin.set_element_keys(options.page)
+								plugin.set_element_keys()
 								
 							}
 							
@@ -1435,7 +1912,7 @@ var result = {}
 			}
 			
 			// insert the new element
-
+			
 			if (options.template_html != '') {
 				
 				// HTML retrieved from template
@@ -1452,7 +1929,17 @@ var result = {}
 				
 			}
 			
-			plugin.insert_element()
+			// console.log(options.element.data)
+			// 
+			// if (
+			// 	options.element.data.type == 'template' &&
+			// 	options.element.data.inputs.output == 'copy'
+			// ) {
+			// 	console.log('do nothing')
+			// 	// nothing
+			// } else {
+			// 	plugin.insert_element()
+			// }
 			
 		},
 		
@@ -1482,7 +1969,10 @@ var result = {}
 				options.inserting.where = 'append'
 			}
 			
-			if (options.inserting.where != 'append' && options.inserting.index != null) {
+			if (
+				options.inserting.where != 'append' && 
+				options.inserting.index != null
+			) {
 				
 				console.log('index', options.inserting.index)
 				console.log('children', options.parent.data.children)
@@ -1490,22 +1980,35 @@ var result = {}
 				
 				insert_eq = $('[data-key="' + options.parent.data.children[options.inserting.index].key + '"]')
 				
+				console.log('eq 2', insert_eq)
 				// insert_eq = $('[data-key="' + options.parent.data.key + '"]').find('> .fw-element').eq(options.inserting.index)
 			}
 			
 			let inserted_el
 			
+			// console.log('item now', typeof options.element.item, options.element.item)
+			
 			if (typeof options.element.item == 'string') {
 				
-				// template
+				console.log('insert string')
+				
+				// it's a template
 				
 				inserted_el = $(options.element.item)
 				
+				// console.log('inserted element', inserted_el)
+				
 			} else {
+				
+				console.log('insert obj')
+				
+				// console.log(options.element.item)
+				// console.log(options.element.item.prop('outerHTML'))
 				
 				// object
 				
 				inserted_el = $(options.element.item.prop('outerHTML'))
+				
 				
 			}
 			
@@ -1575,6 +2078,7 @@ var result = {}
 				// reset keys in parent
 				
 				// gather elements to move
+				
 				plugin.set_elements_to_move(options.parent.data)
 				
 				// set keys of moving elements
@@ -1586,11 +2090,19 @@ var result = {}
 			
 			// SETUP
 			
-			if (options.element.data.type !== 'template') {
+			if (options.element.data.type == 'template') {
+			
+				// setup inserted element(s) as a template
+				
+				console.log('setup', options.parent, options.element)
+				
+				plugin.setup_template(options.parent.data.key, options.element.data)
+				
+			} else {
 				
 				// setup inserted element
 				
-				plugin.setup_element(options.parent, options.element)
+				plugin.setup_element(options.element)
 				
 				if (!options.element.data.type.includes('block')) {
 					
@@ -1601,19 +2113,11 @@ var result = {}
 					
 				}
 				
-			} else {
-				
-				// setup inserted element(s) as a template
-				
-				console.log('setup', options.parent, options.element)
-				
-				plugin.setup_template(options.parent.data.key, options.element.data)
-				
 			}
 			
 		},
 		
-		setup_element: function(parent, element) {
+		setup_element: function(element) {
 			
 			let plugin = this,
 					options = plugin.options
@@ -1639,11 +2143,11 @@ var result = {}
 						...data
 					}
 					
-					console.log('merged', element.data)
+					console.log('merged element data', element.data)
 					
 					// set attributes
 					plugin.set_element_atts(element)
-					
+			
 					// populate block
 					
 					if (element.data.type.includes('block')) {
@@ -1658,16 +2162,21 @@ var result = {}
 					
 					// add footer
 					plugin.add_footer(element.data)
-					
+			
 					// settings
 					
 					if (element.data.autogen !== true) {
 						plugin.do_element_settings()
 					}
 					
+					// do we need to insert more than 1 element
+					
+					if (element.data.children) {
+						plugin.activate(element.data)
+					}
+					
 					// reset modal data
 					plugin.reset_modal()
-					
 					
 				}
 			})
@@ -1726,13 +2235,6 @@ var result = {}
 				case 'text' :
 				
 					if (element.data.inputs.text) {
-						
-						// console.log('new text')
-						// console.log(element.data.inputs.text[options.lang])
-						
-						// console.log('unescape')
-						// console.log(plugin.unescape(element.data.inputs.text[options.lang]))
-						
 						element.item.find('.fw-element-inner').html(plugin.unescape(element.data.inputs.text[options.lang]))
 					}
 					
@@ -1766,6 +2268,7 @@ var result = {}
 							
 							element.item.find('.fw-element-inner').html(new_markup.find('.fw-element-inner').html())
 							
+							$(document).trigger('fw_populate_block', options.element)
 							
 						}
 					})
@@ -1784,7 +2287,7 @@ var result = {}
 				parent = options.page
 			}
 			
-			// console.log('activate', parent)
+			console.log('activate', parent)
 			
 			if (
 				parent.type == 'page' &&
@@ -1805,7 +2308,7 @@ var result = {}
 				
 				parent.children.forEach(function(child, i) {
 					
-					// console.log(child)
+					// console.log(child.key)
 					
 					// find the item
 					
@@ -1824,14 +2327,16 @@ var result = {}
 					
 					plugin.add_footer(child)
 					
-					if (child.type == 'template') {
+					if (
+						child.type == 'template' && 
+						child.inputs.output == 'template'
+					) {
 						plugin.setup_template(child.key.slice(0, -2), child)
 					}
 					
 					if (child.children) {
 						
 						// recursive
-						
 						plugin.activate(child)
 						
 					}
@@ -1865,11 +2370,11 @@ var result = {}
 			
 			// remove
 			
-			// console.log('removed settings', options.removed_settings)
+			// console.log('removed settings', options.data.removed_settings)
 			
-			if (options.removed_settings.length) {
+			if (options.data.removed_settings.length) {
 				
-				options.removed_settings.forEach(function(key) {
+				options.data.removed_settings.forEach(function(key) {
 				
 					console.log('remove setting', key)
 					
@@ -1903,7 +2408,7 @@ var result = {}
 					
 				})
 				
-				options.removed_settings = []
+				options.data.removed_settings = []
 				
 			}
 			
@@ -1921,25 +2426,39 @@ var result = {}
 						
 						// setting contains a repeater
 						
-						if (Array.isArray(this_setting)) {
+						if (this_setting.rows != undefined) {
 							
-							this_setting.forEach(function(this_row) {
+							let new_class = ''
 							
-								console.log(this_row)
-									
-								let new_class = this_row.property + this_row.side
+							this_setting.rows.forEach(function(this_row) {
+							
+								// console.log(this_setting.type, this_row)
 								
-								if (this_row.breakpoint != '') {
-									new_class += '-' + this_row.breakpoint
+								switch (this_setting.type) {
+									case 'spacing' :
+									
+										new_class += this_row.property + this_row.side
+										
+										new_class += (this_row.breakpoint != '') ? '-' + this_row.breakpoint : ''
+											
+										new_class += '-' + this_row.value.replace('-', 'n')
+											+ ' '
+										
+										// console.log(new_class)
+										
+										break
+										
+									case 'attributes' :
+									
+										options.element.item.attr('data-' + this_row.name, this_row.value)
+									
+										break
+										
 								}
 								
-								new_class += '-' + this_row.value.replace('-', 'n')
-								
-								console.log(new_class)
-								
-								options.element.item.addClass(new_class)
-								
 							})
+							
+							options.element.item.addClass(new_class)
 							
 						}
 						
@@ -2056,6 +2575,7 @@ var result = {}
 			switch ( element.data.type ) {
 				case 'page' :
 				
+					console.log('page')
 					if (element.data.inputs.title[options.lang] != '') {
 						
 						document.title = element.data.inputs.title[options.lang]
@@ -2180,13 +2700,23 @@ var result = {}
 			
 			let dropdown_menu = $('<ul class="dropdown-menu">').appendTo(dropdown)
 			
-			// edit element
+			// action icons
 			
-			let actions_container = $('<div class="fw-footer-edit-btns row row-cols-3 px-2">').appendTo(dropdown_menu)
+			let actions_container = $('<div class="fw-footer-edit-btns row px-2">').appendTo(dropdown_menu)
+			
+			// edit
 			
 			$('<li class="col fw-footer-edit-link edit"><a href="#fw-modal" class="fw-modal-trigger fw-btn edit-element d-flex flex-column align-items-center justify-content-between" data-modal-content="' + element.type + '"><div><i class="far fa-pencil-alt"></i></div><span>Edit</span></a></li>').appendTo(actions_container)
 			
+			// duplicate
+			
+			$('<li class="col fw-footer-edit-link duplicate"><a href="#" class="fw-btn duplicate-element d-flex flex-column align-items-center justify-content-between" data-modal-content="duplicate" data-type="' + element.type + '"><div><i class="far fa-copy"></i></div><span>Duplicate</span></a></li>').appendTo(actions_container)
+			
+			// delete
+			
 			$('<li class="col fw-footer-edit-link delete"><a href="#fw-modal" class="fw-modal-trigger fw-btn delete-element d-flex flex-column align-items-center justify-content-between" data-modal-content="delete" data-type="' + element.type + '"><div><i class="far fa-trash-alt"></i></div><span>Delete</span></a></li>').appendTo(actions_container)
+			
+			// move
 			
 			$('<li class="col fw-footer-edit-link move"><div class="d-flex flex-column align-items-center justify-content-between"><div class="d-flex align-items-center"><i class="far fa-arrow-up fw-btn move-element move-up"></i><i class="far fa-arrow-down fw-btn move-element move-down"></i></div><span>Move</span></li>').appendTo(actions_container)
 			
@@ -2306,7 +2836,7 @@ var result = {}
 			let plugin = this,
 					options = plugin.options
 			
-			console.log('populate modal', options.modal, options.element)
+			// console.log('populate modal', options.modal, options.element)
 			
 			if (options.modal.content == null) {
 				
@@ -3003,81 +3533,34 @@ var result = {}
 				let flex_forms = [],
 						repeater_forms = {}
 				
-				// find arrays in flattened data
+				// check for flex forms to complete the modal body
 				
 				flatten_data.forEach(function(input) {
+				
+					// check the property name
 					
-					// console.log(input.property)
-					
-					if (input.property.includes('[]')) {
+					if (
+						input.property.includes('[]') && 
+						input.property.includes('type')
+					) {
 						
-						// first instance of a []
-						// is it a repeater or a flex
+						// it's a flex
 						
-						if (modal_body.find('[name="inputs-' + input.property + '"]').parents('.fw-form-repeater').length) {
-							
-							if (input.property.includes('index')) {
-								
-								let prop_name = input.property.split('[]')[0]
-								
-								// console.log(input.property + ' is a repeater')
-								
-								if (repeater_forms.hasOwnProperty(input.property)) {
-									repeater_forms[input.property] += 1
-								} else {
-									repeater_forms[input.property] = 1
-								}
-								
-							}
-							
-						} else {
-							
-							if (input.property.includes('type')) {
-								
-								// console.log(input.property + ' is a flex')
-							
-								let flex_container = modal_form.find('.fw-form-flex-container[data-input="' + input.property.split('[]')[0] + '"]')
-								
-								let flex_path = flex_container.attr('data-path') + '/' + input.value
-								
-								// console.log('path', flex_path)
-								
-								flex_forms.push({
-									path: flex_path,
-									container: flex_container
-								})
-								
-							}
-							
-						}
+						let flex_container = modal_form.find('.fw-form-flex-container[data-input="' + input.property.split('[]')[0] + '"]')
+						
+						let flex_path = flex_container.attr('data-path') + '/' + input.value
+						
+						// console.log('path', flex_path)
+						
+						flex_forms.push({
+							path: flex_path,
+							container: flex_container
+						})
 						
 					}
-					
+				
 				})
 				
-				// console.log('repeaters', repeater_forms)
-					
-				if (repeater_forms != {}) {
-					
-					for (let key in repeater_forms) {
-						
-						if (repeater_forms[key] > 1) {
-							
-							// console.log('add ' + repeater_forms[key] + ' rows for inputs-' + key)
-							
-							for (i = 0; i < repeater_forms[key] - 1; i += 1) {
-								
-								// console.log(modal_form.find('[name="inputs-' + key + '"]').closest('.fw-form-repeater'))
-								
-								plugin.add_repeater_row(modal_form.find('[name="inputs-' + key + '"]').closest('.fw-form-repeater'))
-								
-							}
-							
-						}
-						
-					}
-					
-				}
 				
 				// unique
 				
@@ -3090,9 +3573,8 @@ var result = {}
 				console.log('flex forms', flex_forms)
 				
 				if (flex_forms.length > 0) {
-				
 					
-					var allAJAX = flex_forms.map(flex_form => {
+					let allAJAX = flex_forms.map(flex_form => {
 						
 						// console.log('getting ' + flex_form.path)
 						
@@ -3102,22 +3584,44 @@ var result = {}
 					
 					Promise.all(allAJAX).then(function() {
 						
-						// console.log('done getting flex forms')
+						console.log('done getting flex forms')
 						
-						// console.log('populate now')
+						// now check for repeaters
+						plugin.check_for_repeaters(flatten_data)
+						
+						console.log('populate now')
 						plugin.modal_populate_fields(flatten_data)
 						
 					})
 					
 				} else {
 					
-					// no flex fields to get,
-					// populate fields
+					// no flex fields to get
 					
-					// console.log('other populate call')
+					// check for repeaters
+					plugin.check_for_repeaters(flatten_data)
+					
+					// populate fields
 					plugin.modal_populate_fields(flatten_data)
 					
 				}
+				
+				modal_body.find('.fw-sortable').each(function() {
+					
+					$(this).sortable({
+						placeholder: "ui-state-highlight",
+						handle: '.card-header',
+						forcePlaceholderSize: true,
+						stop: function(e, ui) {
+							
+							plugin.reindex_flex($(this).closest('.fw-form-flex-container'))
+							
+						}
+					})
+					
+					$(this).disableSelection()
+					
+				})
 				
 			}
 			
@@ -3140,18 +3644,19 @@ var result = {}
 			// individual inputs
 			
 			let repeater_index = -1,
+					flex_index = -1,
 					flex_type = null
 			
 			flatten_data.forEach(function(input) {
-			// for (var key in flatten_data) {
 				
 				let this_input = modal_form.find('[name="inputs-' + input.property + '"]'),
 						this_val = input.value
 						
-				if (input.property.includes('[]')) {
-					// console.log('key', input.property)
-					// console.log('input', this_input)
-					// console.log('val', this_val)
+				if (
+					input.property.includes('rows[]') &&
+					repeater_index == -1
+				) {
+					repeater_index = 0
 				}
 				
 				if (this_input.parents('.fw-form-repeater').length) {
@@ -3168,20 +3673,10 @@ var result = {}
 						// console.log('new index', repeater_index)
 						
 					}
-				} else {
 					
+				} else if (this_input.parents('.fw-form-flex-row').length) {
+						
 					repeater_index = -1
-					
-				}
-			
-				if (repeater_index != -1) {
-				
-					this_input = this_input.closest('.fw-form-repeater-row[data-row-index="' + repeater_index + '"]').find('[name="inputs-' + input.property + '"]')
-					
-				}
-				
-				if (this_input.parents('.fw-form-flex-row').length) {
-					
 					// console.log(input.property + ' is in a flex row')
 					
 					if (
@@ -3190,6 +3685,7 @@ var result = {}
 					) {
 						
 						flex_type = input.value
+						flex_index += 1
 						
 						// console.log('new type', flex_type)
 						
@@ -3197,16 +3693,46 @@ var result = {}
 					
 				} else {
 					
+					repeater_index = -1
 					flex_type = null
+					flex_index = -1
 					
 				}
-				
-				if (flex_type != null) {
+			
+				// console.log('type', flex_type)
+				// console.log('flex index', flex_index)
+				// console.log('repeater index', flex_index)
+			
+				if (repeater_index != -1) {
 					
-					this_input = modal_form.find('.fw-form-flex-row[data-item="' + flex_type + '"]').find('[name="inputs-' + input.property + '"]')
+					// i'm in a repeater
+					
+					if (flex_type != null) {
+						
+						// repeater in a flex
+						
+						this_input = modal_form.find('.fw-form-flex-row[data-item="' + flex_type + '"][data-row-index="' + flex_index + '"]').find('.fw-form-repeater-row[data-row-index="' + repeater_index + '"] [name="inputs-' + input.property + '"]')
+						
+					} else {
+						
+						// repeater only
+						
+						this_input = this_input.closest('.fw-form-repeater-row[data-row-index="' + repeater_index + '"]').find('[name="inputs-' + input.property + '"]')
+						
+					}
+					
+					// console.log('set', this_input, this_val)
+					
+				} else if (flex_type != null) {
+					
+					// flex only
+					
+					// console.log('flex type ' + flex_type + ' row ' + flex_index + ' ' + input.property)
+					
+					this_input = modal_form.find('.fw-form-flex-row[data-item="' + flex_type + '"][data-row-index="' + flex_index + '"]').find('[name="inputs-' + input.property + '"]')
 					
 				}
-				
+					
 				// console.log('input')
 				// console.log(this_input, this_val)
 				
@@ -3227,7 +3753,10 @@ var result = {}
 						
 					}
 					
-				} else if (input.property == 'class') {
+				} else if (
+					input.property == 'class' ||
+					input.property.includes('-class')
+				) {
 					
 					this_val = this_val.join(' ')
 					
@@ -3238,24 +3767,12 @@ var result = {}
 				}
 				
 				if (Array.isArray(this_val)) {
-					
+					// not sure why i did this
 					this_input = modal_form.find('[name="inputs-' + input.property + '[]"]')
 					
 				}
-				
-				if (this_input.length) {
 					
-					if (this_input.is('select')) {
-						
-						// console.log(this_input, this_val)
-						
-						this_input.find('option').each(function() {
-							if ($(this).attr('value') == this_val) {
-								$(this).val()
-							}
-						})
-						
-					}
+				if (this_input.length) {
 					
 					if (input.property.includes('-d')) {
 						
@@ -3301,8 +3818,8 @@ var result = {}
 							setTimeout(function() {
 								// tinyMCE
 								
-								console.log('set content')
-								console.log(input_name, tinymce.get(input_name))
+								// console.log('set content')
+								// console.log(input_name, tinymce.get(input_name))
 								
 								tinymce.get(input_name).setContent(unescaped_val)
 								
@@ -3311,8 +3828,10 @@ var result = {}
 						
 					} else {
 					
+						// console.log('this_input length', this_input.length)
 						// text
 						
+						// console.log(this_input, this_val)
 						this_input.val(this_val)
 						
 					}
@@ -3385,57 +3904,6 @@ var result = {}
 			// 	
 			// }
 			// 
-			// // repeater
-			// 
-			// if (new_form.find('.settings-form-repeater').length) {
-			// 		
-			// 	// console.log(key, 'has repeater')
-			// 	
-			// 	let this_repeater = $('#fw-modal').find('.settings-form-spacing .settings-form-repeater')
-			// 	
-			// 	// disable the first 'delete' button
-			// 	
-			// 	this_repeater.find('.fw-form-repeater-delete-row').first().addClass('disabled')
-			// 	
-			// 	if (this_setting.hasOwnProperty('repeater')) {
-			// 		let repeater_rows = this_setting.repeater.length
-			// 	
-			// 		// console.log(repeater_rows + ' rows')
-			// 		
-			// 		for (i = 0; i < repeater_rows; i += 1) {
-			// 			
-			// 			// console.log('row ' + i)
-			// 			
-			// 			if (i != 0) {
-			// 				
-			// 				plugin.add_repeater_row(this_repeater)
-			// 				
-			// 			}
-			// 			
-			// 			let this_row = this_repeater.find('[data-row-index="' + i + '"]')
-			// 			
-			// 			// console.log(i, this_row)
-			// 			
-			// 			for (var input_name in this_setting.repeater[i]) {
-			// 				
-			// 				let this_input = this_row.find('[name="inputs-settings-' + key + '-repeater-' + input_name + '"]')
-			// 				
-			// 				this_val = this_setting.repeater[i][input_name]
-			// 				
-			// 				// console.log('set', this_input, this_val)
-			// 				
-			// 				this_input.val(this_val).trigger('change')
-			// 				
-			// 				// console.log(input_name, this_val)
-			// 				
-			// 			}
-			// 			
-			// 		}
-			// 		
-			// 	}
-			// 	
-			// 	
-			// }
 			// 
 			// // image
 			// 
@@ -3543,10 +4011,11 @@ var result = {}
 			// 	
 			// }
 			
-			
-			
-			
-			
+			modal_body.find('.fw-form-flex-container').each(function() {
+				if ($(this).find('.fw-form-flex-item').length) {
+					plugin.reindex_flex($(this))
+				}
+			})
 			
 			let is_hidden = false
 			
@@ -3568,15 +4037,18 @@ var result = {}
 			return $.ajax({
 				url: ajax_data.url,
 				type: 'GET',
+				async: false,
 				data: {
 					action: 'fw_modal_add_setting',
 					path: path
 				},
 				success: function(data) {
 					
-					// console.log(data)
+					console.log(data)
 					
 					let new_form = $(data)
+					
+					// console.log(new_form.html())
 					
 					// hide this setting from the dropdown
 					
@@ -3590,6 +4062,8 @@ var result = {}
 					
 					// reindex flex rows
 					plugin.reindex_flex(container)
+					
+					// console.log('added', key)
 					
 					//
 					
@@ -3716,11 +4190,14 @@ var result = {}
 		
 		reindex_flex: function(container) {
 			
-			// console.log('reindex')
+			console.log('reindex', container)
 			
 			container.find('.fw-form-flex-row').each(function(i, item) {
+				
+				console.log($(this).attr('data-item'))
 				$(item).attr('data-row-index', i)
-				$(item).find('[name$="index"]').val(i)
+				console.log($(item).find('[name$="' + $(this).attr('data-item') + '-index"]'))
+				$(item).find('.card-body > [name$="index"]').val(i)
 			})
 			
 		},
@@ -3899,6 +4376,10 @@ var result = {}
 								result = plugin.get_element_by_key(key, array_to_search[i])
 								
 								if (result !== false) {
+									
+									// console.log('element', key)
+									// console.log(JSON.stringify(result))
+									
 									return result
 								}
 								
@@ -3931,9 +4412,9 @@ var result = {}
 					element_data = options.element.data,
 					element_has_settings = false
 					
+			// console.log(element_item, element_data)
+					
 			// assume all settings will be removed
-			
-			console.log(JSON.stringify(element_data.inputs))
 			
 			if (
 				element_data.hasOwnProperty('inputs') &&
@@ -3943,11 +4424,11 @@ var result = {}
 				// add setting keys to removed_settings
 				element_data.inputs.settings.forEach(function(setting) {
 					for (let key in setting) {
-						options.removed_settings.push(key)
+						options.data.removed_settings.push(key)
 					}
 				})
 				
-				// console.log('removed', options.removed_settings)
+				// console.log('removed', options.data.removed_settings)
 				
 				// clear existing settings object
 				element_data.inputs.settings = [] //{}
@@ -3958,6 +4439,11 @@ var result = {}
 			// not sure if this is a good idea
 			// update: it was a bad idea - removes text from other langs
 			// options.element.data.inputs = {}
+			
+			// instead go through the inputs object
+			// and reset any array it finds
+			
+			// console.log('pre', JSON.stringify(options.element.data.inputs, null, 2))
 			
 			form_data.forEach(function(input) {
 				
@@ -3992,34 +4478,24 @@ var result = {}
 					
 				} else {
 					
-					// options.adding_to_repeater = false
-					// options.adding_to_array = false
-					
 					// console.log('pre', JSON.stringify(element_data))
 					
 					element_data = plugin.find_child_element(element_data, key, input.value)
 					
 				}
 				
-				
 			})
 			
 			// console.log('element now')
 			// console.log(JSON.stringify(element_data, null, 2))
 			
-			// reset repeater flag
-			// 
-			// options.adding_to_repeater = false
-			// options.repeater_index = -1
-			
 			// reset array flag
 			
-			// options.adding_to_array = false
-			options.array_key = null
-			options.array_indexes = {}
+			options.data.array_key = null
+			options.data.array_indexes = {}
 			
 			if (element_has_settings == true) {
-				console.log('has settings', JSON.stringify(element_data.inputs.settings))
+				// console.log('has settings', JSON.stringify(element_data.inputs.settings))
 				
 				element_data.inputs.settings.forEach(function(setting) {
 					
@@ -4029,13 +4505,13 @@ var result = {}
 						// from the removed_settings array
 						// i.e. keep stuff that was NOT removed
 						
-						options.removed_settings = options.removed_settings.filter(e => e !== key)
+						options.data.removed_settings = options.data.removed_settings.filter(e => e !== key)
 						
 					}
 					
 				})
 				
-				console.log('settings removed', options.removed_settings)
+				console.log('settings removed', options.data.removed_settings)
 				
 			}
 			
@@ -4043,12 +4519,45 @@ var result = {}
 			
 		},
 		
-		set_element_keys: function(parent) {
+		set_elements_to_move: function(parent) {
 			
 			let plugin = this,
 					options = plugin.options
 			
-			// console.log('to move', options.elements_to_move)
+			if (parent.children) {
+				
+				parent.children.forEach(function(child, i) {
+					
+					let old_key = child.key
+					
+					child.key = parent.key + '-' + (i + 1)
+					
+					options.elements_to_move.push({
+						item: $('[data-key="' + old_key + '"]').first(),
+						id: child.inputs.id,
+						old: old_key,
+						new: child.key
+					})
+					
+					// recursive
+					
+					if (child.children) {
+						plugin.set_elements_to_move(child)
+					}
+					
+				})
+				
+			}
+			
+		},
+		
+		set_element_keys: function() {
+			
+			let plugin = this,
+					options = plugin.options
+			
+			// console.log('to move')
+			// console.log(options.elements_to_move)
 			
 			options.elements_to_move.forEach(function(element) {
 				
@@ -4070,45 +4579,6 @@ var result = {}
 			})
 			
 			options.elements_to_move = []
-			
-		},
-		
-		set_elements_to_move: function(parent) {
-			
-			let plugin = this,
-					options = plugin.options
-			
-			if (parent.children) {
-					
-				parent.children.forEach(function(child, i) {
-					
-					// console.log('child', child.key, child.inputs.text)
-					
-					// console.log('pre', JSON.stringify(child))
-					
-					let old_key = child.key
-					
-					child.key = parent.key + '-' + (i + 1)
-					
-					// console.log('new', parent.key + '-' + (i + 1))
-					// console.log('post', JSON.stringify(child))
-					
-					options.elements_to_move.push({
-						item: $('[data-key="' + old_key + '"]'),
-						id: child.inputs.id,
-						old: old_key,
-						new: child.key
-					})
-					
-					// console.log(old_key + ' > ' + child.key)
-					
-					if (child.children) {
-						plugin.set_elements_to_move(child)
-					}
-					
-				})
-				
-			}
 			
 		},
 		
@@ -4186,7 +4656,13 @@ var result = {}
 			// console.log('---')
 			// console.log('property', property)
 			// console.log('value', value)
-			// console.log('parent', JSON.stringify(current_parent))
+			// console.log('parent')
+			// console.log(JSON.stringify(current_parent))
+			
+			if (options.data.add_next == true) {
+				options.data.key_to_add = property
+				options.data.add_next = false
+			}
 			
 			if (key.length == 1) {
 				
@@ -4211,32 +4687,43 @@ var result = {}
 					
 					// console.log('parent is array')
 					// 
-					// console.log('current key', options.array_key)
-					// console.log('current index', options.array_indexes[options.array_key])
+					// console.log('current key', options.data.array_key)
+					// console.log('current index', options.data.array_indexes[options.data.array_key])
 					
 					if (
-						current_parent[options.array_indexes[options.array_key]] &&
-						current_parent[options.array_indexes[options.array_key]][property]
+						current_parent[options.data.array_indexes[options.data.array_key]] &&
+						current_parent[options.data.array_indexes[options.data.array_key]][property]
 					) {
 						
-						// console.log('indexes[' + options.array_key + '][' + options.array_indexes[options.array_key] + '] already has ' + property)
+						// console.log('indexes[' + options.data.array_key + '][' + options.data.array_indexes[options.data.array_key] + '] already has ' + property)
 						
-						options.array_indexes[options.array_key] += 1
-						
-					}
-					
-					if (!current_parent[options.array_indexes[options.array_key]]) {
-						
-						current_parent[options.array_indexes[options.array_key]] = {}
+						options.data.array_indexes[options.data.array_key] += 1
 						
 					}
 					
-					current_parent[options.array_indexes[options.array_key]][property] = value
+					if (!current_parent[options.data.array_indexes[options.data.array_key]]) {
+						
+						current_parent[options.data.array_indexes[options.data.array_key]] = {}
+						
+					}
+					
+					current_parent[options.data.array_indexes[options.data.array_key]][property] = value
 					
 				} else {
 				
 					current_parent[property] = value
 					
+					// console.log('set', property, value)
+					// console.log(JSON.stringify(current_parent))
+						
+				}
+				
+				if (
+					property == 'index' &&
+					options.data.array_indexes !== undefined &&
+					options.data.array_indexes[options.data.array_key] != undefined
+				) {
+					options.data.array_indexes[options.data.array_key] += 1
 				}
 				
 				// console.log('post')
@@ -4255,10 +4742,11 @@ var result = {}
 				// drop the first element
 				
 				let first = key.shift()
-				
 				let parent_to_send = null
 				
 				if (property.includes('[]')) {
+					
+					options.data.add_next = true
 					
 					// i'm an array
 					
@@ -4271,25 +4759,25 @@ var result = {}
 						
 						// console.log('parent is array')
 						
-						// console.log(current_parent[options.array_indexes[options.array_key]])
+						// console.log(current_parent[options.data.array_indexes[options.data.array_key]])
 						
-						if (!current_parent[options.array_indexes[options.array_key]]) {
+						if (!current_parent[options.data.array_indexes[options.data.array_key]]) {
 							
 							// object that sits at the right index of the parent
 							
-							current_parent[options.array_indexes[options.array_key]] = {}
+							current_parent[options.data.array_indexes[options.data.array_key]] = {}
 							
 						}
 						
-						if (!current_parent[options.array_indexes[options.array_key]][property]) {
+						if (!current_parent[options.data.array_indexes[options.data.array_key]][property]) {
 							
 							// array that will be the new parent
 							
-							current_parent[options.array_indexes[options.array_key]][property] = []
+							current_parent[options.data.array_indexes[options.data.array_key]][property] = []
 							
 						}
 						
-						parent_to_send = current_parent[options.array_indexes[options.array_key]][property]
+						parent_to_send = current_parent[options.data.array_indexes[options.data.array_key]][property]
 						
 					} else {
 						
@@ -4307,85 +4795,78 @@ var result = {}
 					// set array_key to the property that
 					// the new array is being created for
 					
-					options.array_key = property
+					if (property == 'rows') {
+						options.data.array_key = options.data.key_to_add + '-' + property
+					} else {
+						options.data.array_key = property
+					}
+					
+					// console.log('new key', options.data.array_key)
 					
 					// set the index for this property to 0
 					
-					if (!options.array_indexes[property]) {
+					if (!options.data.array_indexes[options.data.array_key]) {
 						
-						options.array_indexes[property] = 0
+						options.data.array_indexes[options.data.array_key] = 0
 						
 					}
 					
-				} else if (!current_parent.hasOwnProperty(property)) {
+					// console.log('indexes now', options.data.array_indexes)
+					
+				} else {
 					
 					// i'm not an array
-						
+					
 					if (Array.isArray(current_parent)) {
 						
-						// console.log('---')
-						// console.log(JSON.stringify(current_parent, null, 2))
-						// console.log(options.array_indexes, options.array_key)
-						// console.log('current key/index', options.array_key, options.array_indexes[options.array_key])
-						
-						// console.log('what is in there', current_parent[options.array_indexes[options.array_key]])
-						
-						// console.log('keys', Object.keys(current_parent[options.array_indexes[options.array_key]]))
-						
-						// console.log('---')
-						
 						// my parent is an array
-						// find out if it's empty
 						
-						if (!current_parent[options.array_indexes[options.array_key]]) {
+						if (!current_parent[options.data.array_indexes[options.data.array_key]]) {
 							
 							// nothing exists at this index yet
 							
-							// console.log('indexes[' + options.array_key + '] is undefined')
-							
-							current_parent[options.array_indexes[options.array_key]] = {}
+							current_parent[options.data.array_indexes[options.data.array_key]] = {}
 							
 						} else {
+							
+							// current parent[indexes[key]] has something in it
+							
+							let current_array_val = current_parent[options.data.array_indexes[options.data.array_key]]
 							
 							// if property doesn't exist in the current index,
 							// increment the index by 1
 							
-							if (!Object.keys(current_parent[options.array_indexes[options.array_key]]).includes(property)) {
-								options.array_indexes[options.array_key] += 1
+							if (
+								!Object.keys(current_array_val).includes(property)
+							) {
 								
-								// console.log('next index')
-								console.log(current_parent[options.array_indexes[options.array_key]])
-							
+								// the input property doesn't exist at this index
+								// of the parent array
+								
+								options.data.array_indexes[options.data.array_key] += 1
+								
 							}
-							
-							// does anything exist there
-							
 							
 							// check for undefined again
 							
-							if (!current_parent[options.array_indexes[options.array_key]]) {
-								current_parent[options.array_indexes[options.array_key]] = {}
+							if (!current_array_val) {
+								current_parent[options.data.array_indexes[options.data.array_key]] = {}
 							}
 							
 						}
 						
-						// inputs-settings[]-spacing[] = new array at 0
-						// inputs-settings[]-colors = new object at 1
-						
-						// console.log('new index', options.array_indexes[options.array_key])
-						// console.log(current_parent[options.array_indexes[options.array_key]])
-								
 						// add my object at the right index
 						
-						if (!current_parent[options.array_indexes[options.array_key]][property]) {
-							current_parent[options.array_indexes[options.array_key]][property] = {}
+						if (!current_parent[options.data.array_indexes[options.data.array_key]][property]) {
+							current_parent[options.data.array_indexes[options.data.array_key]][property] = {}
 						}
 						
-						parent_to_send = current_parent[options.array_indexes[options.array_key]][property]
+						parent_to_send = current_parent[options.data.array_indexes[options.data.array_key]][property]
 						
-					} else {
-					
-						// add my object by my key
+					} else if (!current_parent.hasOwnProperty(property)) {
+						
+						// parent is an object that doesn't contain
+						// this key
 						
 						current_parent[property] = {}
 						
@@ -4399,14 +4880,6 @@ var result = {}
 					
 				}
 				
-				// console.log('indexes post', options.array_indexes)
-				
-				// console.log('this is what we made')
-				// console.log(current_parent)
-				
-				// console.log('parent being sent')
-				// console.log(JSON.stringify(parent_to_send, null, 2))
-				
 				plugin.find_child_element(parent_to_send, key, value, keep_prop)
 				
 			}
@@ -4414,383 +4887,6 @@ var result = {}
 			return current_parent
 			
 		},
-		
-		/*
-		find_child_element: function(element, key, current_parent, value, lang_prop = null) {
-			
-			let plugin = this,
-					options = plugin.options
-			
-			let property = key[0]
-			
-			console.log('property', property)
-			
-			console.log('pre', JSON.stringify(current_parent))
-			
-			if (property.includes('[]')) {
-				
-				// set array index to 0
-				
-				options.array_index = 0
-				
-				// or the length of the parent
-				
-				if (typeof current_parent !== 'undefined' && current_parent.length) {
-					options.array_index = current_parent.length
-				}
-				
-				property = property.replace('[]', '')
-				options.adding_to_array = true
-				
-			}
-			
-			// what could be happening now
-			// a. current_parent[property] doesn't exist
-			// b. current_parent[property] is an empty array
-			// c. current_parent[property] is an empty object
-			// d. current_parent[property] is an array with stuff in it
-			// e. current_parent[property] is an object with stuff in it
-			
-			// console.log(element, key, current_parent, value)
-			
-			// if (typeof current_parent == 'undefined') {
-			// 	current_parent = {}
-			// }
-			
-			if (Array.isArray(current_parent)) {
-				
-				// parent is an array
-				// is it empty (b) or not (d)?
-				// does it matter?
-				
-				if (current_parent.length == 0) {
-					console.log('b', 'parent is an empty array')
-					
-					let new_obj = {}
-					
-					current_parent.push(new_obj)
-					
-				} else {
-					console.log('d', 'parent has ' + current_parent.length + ' elements')
-					
-					// current_parent[options.array_index][property] = {}
-					
-				}
-				
-				// current_parent.push({})
-				// current_parent[options.array_index] = {}
-				
-				
-				
-			}	else if (typeof current_parent == 'object') {
-				
-				// parent is an object
-				// is it empty (c) or not (e)?
-				
-				if (!current_parent.hasOwnProperty(property)) {
-					
-					// parent doesn't contain a child with this
-					// property name
-					
-					if (options.adding_to_array == true) {
-						
-						// add property as an array
-						current_parent[property] = []
-						
-					} else {
-						
-						// add as an object
-						current_parent[property] = {}
-						
-					}
-					
-				}
-				
-			}
-			
-			// did i manage to set parent[property]
-			
-			console.log('element data')
-			console.log(JSON.stringify(options.element.data, null, 2))
-			console.log('just set', current_parent[property])
-			
-			if (key.length > 1) {
-				
-				// create a new object under [property] and
-				// keep drilling
-				
-				let keep_prop = null
-				
-				if (key[0] == 'text') {
-					keep_prop = key[0]
-				}
-				
-				// drop the first element
-				let first = key.shift()
-				
-				console.log('object sending to child fn', current_parent[property])
-				
-				plugin.find_child_element(element, key, current_parent[property], value,keep_prop)
-				
-			} else {
-				
-				console.log('time to set the value')
-				
-				console.log(current_parent)
-				console.log(current_parent[property])
-				console.log(value)
-				
-				// set [property] to the value of the form input
-				
-				if (options.adding_to_array == true) {
-					// if (options.array_index == 0) {
-					// 	
-					// 	// console.log('reset array ' + property)
-					// 	
-					// 	current_parent[property] = []
-					// 	
-					// }
-					
-					current_parent[options.array_index][property] = value
-					
-				} else {
-				
-					current_parent[property] = value
-					
-				}
-				
-			}
-			
-			console.log('post', JSON.stringify(current_parent))
-			
-			// console.log(current_parent)
-			
-			return current_parent
-			
-		},*/
-		
-		/*
-		find_child_element: function(element, key, current_parent, value, lang_prop = null) {
-			
-			let plugin = this,
-					options = plugin.options
-			
-			// console.log(key, current_parent, value)
-			
-			// property to search for is 
-			// the first element of the key array 
-			// that was initially supplied to the function
-			
-			// console.log('lang prop', lang_prop)
-			// console.log('value', value)
-			// console.log('key', key)
-			
-			let property = key[0]
-			
-			let send_to_fn = {}
-			
-			if (current_parent[property]) {
-				send_to_fn = current_parent[property]
-			}
-			
-			// console.log('---')
-			console.log('i am', property)
-			console.log('my parent is', JSON.stringify(current_parent))
-			
-			if (options.adding_to_array == true) {
-				console.log('adding to array')
-			}
-			
-			if (options.adding_to_repeater == true) {
-				console.log('adding to repeater')
-			}
-			
-			// what could be happening now
-			// a. current_parent[property] doesn't exist
-			// b. current_parent[property] is an empty array
-			// c. current_parent[property] is an empty object
-			// d. current_parent[property] is an array with stuff in it
-			// e. current_parent[property] is an object with stuff in it
-
-			if (property == 'index') {
-				
-				// set repeater index to 0
-				
-				options.repeater_index = 0
-				
-				// or the length of the parent
-				
-				if (typeof current_parent !== 'undefined' && current_parent.length) {
-					options.repeater_index = current_parent.length
-				}
-				
-				// options.repeater_index += 1
-				
-				// console.log('new repeater index', options.repeater_index)
-				
-			}
-			
-			// console.log('repeater index', options.repeater_index)
-			
-			if (property == 'repeater') {
-				
-				// if property is repeater
-				// then it needs to be an array
-				// not an object
-				
-				options.adding_to_repeater = true
-				
-			}
-			
-			if (property.includes('[]')) {
-				
-				options.array_index = 0
-				
-				// or the length of the parent
-				
-				if (typeof current_parent !== 'undefined' && current_parent.length) {
-					options.array_index = current_parent.length
-				}
-				
-				options.adding_to_array = true
-				property = property.replace('[]', '')
-				
-			}
-			
-			// console.log(current_parent, property)
-		
-			if (Array.isArray(current_parent)) {
-				
-				if (current_parent.length == 0) {
-					
-					console.log('b', 'my parent is an empty array')
-					
-					let new_obj = {}
-					
-					// new_obj[property] = null
-					
-					current_parent.push(new_obj)
-				
-					send_to_fn = current_parent[options.array_index]
-				
-				} else {
-					
-					console.log('d', 'my parent is an array with objects in it')
-					
-					// console.log(current_parent[options.repeater_index])
-					
-					if (current_parent[options.repeater_index] == undefined) {
-						// console.log('create current_parent[' + options.repeater_index + ']')
-						current_parent[options.repeater_index] = {}
-						// current_parent.push({})
-					}
-					
-					// current_parent = current_parent[options.repeater_index]
-					
-				}
-				
-			} else if (!current_parent.hasOwnProperty(property)) {
-				
-				// console.log('parent is not an array')
-				// console.log('adding to repeater', options.adding_to_repeater)
-				
-				if (
-					options.adding_to_repeater == true || 
-					options.adding_to_array == true
-				) {
-					
-					// add property as an array
-					current_parent[property] = []
-					
-				} else {
-					
-					// add as an object
-					current_parent[property] = {}
-					
-				}
-				
-			}
-			
-			// console.log('current_parent now')
-			// console.log(JSON.stringify(current_parent, null, 2))
-			
-			// console.log('key', key)
-			// still more than one element to drill down
-			
-			if (key.length > 1) {
-				
-				let keep_prop = null
-				
-				if (key[0] == 'text') {
-					// console.log('keep ' + key[0])
-					keep_prop = key[0]
-				}
-				
-				// drop the first element
-				let first = key.shift()
-				
-				plugin.find_child_element(element, key, send_to_fn, value,keep_prop)
-				
-			} else {
-				
-				if (property == 'class') {
-					value = value.split(' ')
-				}
-				
-				if (lang_prop != null) {
-					
-					value = plugin.escape(tinymce.get('inputs-' + lang_prop + '-' + options.lang).getContent())
-					
-				}
-				
-				// console.log(current_parent, property, current_parent[property])
-				// console.log('current_parent pre', current_parent)
-				
-				if (options.adding_to_repeater == true) {
-					
-					// console.log('add to repeater', options.repeater_index, property)
-					
-					if (property != 'index') {
-						
-						console.log('add', property)
-						
-						current_parent[options.repeater_index][property] = value
-						
-					}
-					
-					// console.log(JSON.stringify(current_parent[options.repeater_index]))
-					
-				} else if (options.adding_to_array == true) {
-					
-					// console.log('pre', current_parent[property])
-					
-					if (options.array_index == 0) {
-						
-						// console.log('reset array ' + property)
-						
-						current_parent[property] = []
-						
-					}
-					
-					current_parent[property].push(value)
-					
-					// console.log('post', current_parent[property])
-					
-				} else {
-					
-					current_parent[property] = value
-					
-				}
-				
-				// console.log('current_parent post', current_parent)
-				
-			}
-			
-			// console.log(current_parent.settings)
-			
-			return current_parent
-			
-		},*/
 		
 		generate_column_classes: function(breakpoints, output = 'string') {
 			
@@ -5073,34 +5169,10 @@ var result = {}
 					
 				}).on('hide.bs.dropdown', function(e) {
 					
+					// console.log('hide', this_item)
 					this_item.removeClass('dropdown-open')
 					
 				})
-				
-				// 
-				// let this_id = this_item.attr('id')
-				// 
-				// options.dropdowns[this_item.attr('data-key')] = document.getElementById(this_id)
-				// 
-				// options.dropdowns[this_item.attr('data-key')].addEventListener('shown.bs.dropdown', function (e) {
-				// 	
-				// 	console.log('opening ' + this_item.attr('data-key'))
-				// 	
-				// 	this_item.addClass('dropdown-open')
-				// 	
-				// 	// prevent event from firing in parents
-				// 	e.stopPropagation()
-				// 	e.preventDefault()
-				// 	
-				// })
-				// 
-				// options.dropdowns[this_item.attr('data-key')].addEventListener('hide.bs.dropdown', function () {
-				// 	
-				// 	console.log('closing ' + this_item.attr('data-key'))
-				// 	
-				// 	this_item.removeClass('dropdown-open')
-				// 	
-				// })
 				
 			}
 			

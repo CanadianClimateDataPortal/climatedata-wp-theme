@@ -188,7 +188,6 @@
       $('#coords-lat').val(options.coords.lat);
       $('#coords-lng').val(options.coords.lng);
       $('#coords-zoom').val(options.coords.zoom);
-      console.log('updated', options.coords);
     },
 
     invalidate_size: function () {

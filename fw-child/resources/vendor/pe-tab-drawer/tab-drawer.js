@@ -1,276 +1,349 @@
 // tab drawer plugin
 
 ;(function ($) {
-  function tab_drawer(item, options) {
-    // options
+	function tab_drawer(item, options) {
+		// options
 
-    var defaults = {
-      globals: ajax_data.globals,
-      lang: ajax_data.globals.lang,
-      history: true,
-      elements: {
-        tabs: null,
-        container: null,
-      },
-      map: {
-        object: null,
-      },
-      debug: true,
-    }
+		var defaults = {
+			globals: ajax_data.globals,
+			lang: ajax_data.globals.lang,
+			history: {
+				enabled: true,
+				prev_path: null
+			},
+			path: [],
+			current_id: null,
+			elements: {
+				tabs: null,
+				container: null,
+			},
+			map: {
+				object: null,
+			},
+			debug: true,
+		}
 
-    this.options = $.extend(true, defaults, options)
+		this.options = $.extend(true, defaults, options)
 
-    this.item = $(item)
-    this.init()
-  }
+		this.item = $(item)
+		this.init()
+	}
 
-  tab_drawer.prototype = {
-    // init
+	tab_drawer.prototype = {
+		// init
 
-    init: function () {
-      let plugin = this,
-        item = plugin.item,
-        options = plugin.options
+		init: function () {
+			let plugin = this,
+				item = plugin.item,
+				options = plugin.options
 
-      //
-      // INITIALIZE
-      //
+			//
+			// INITIALIZE
+			//
 
-      if (options.debug == true) {
-        console.log('td', 'init')
-      }
+			if (options.debug == true) {
+				console.log('td', 'init')
+			}
 
-      // ELEMENTS
+			// ELEMENTS
 
-      options.elements.tabs = item.find('> .tab-drawer-tabs')
-      options.elements.container = item.find('> .tab-drawer-container')
+			options.elements.tabs = item.find('> .tab-drawer-tabs')
+			options.elements.container = item.find('> .tab-drawer-container')
+			
+			console.log(options.elements.tabs)
 
-      item.addClass('tab-drawer')
+			item.addClass('tab-drawer')
 
-      //
-      // EVENTS
-      //
+			//
+			// EVENTS
+			//
+			
+			// select a tab
+			
+			item.on('click', '.tab-drawer-trigger', function(e) {
+				e.preventDefault()
+				
+				plugin.update_path($(this).attr('href'))
+				
+			})
+			
+			// close content
 
-      // select a tab
+			$('body').on('click', '.tab-drawer-close', function () {
+				
+				let this_content = $(this).closest('.tab-drawer'),
+						target_content = this_content.parents('.tab-drawer').first(),
+						target_ID = null
+						
+				if (
+					target_content.length &&
+					!target_content.hasClass('tab-drawer-tabs-container')
+				) {
+					target_ID = '#' + target_content.attr('id')
+				}
+				
+				console.log('closing ' + this_content.attr('id') + ', new active is ' + target_ID)
+				
+				plugin.update_path(target_ID)
+				
+			})
+			
+			// HISTORY
+			
+			if (options.history.enabled == true) {
+				
+				// initial check for hash
+				plugin.handle_pop()
+				
+				window.addEventListener('popstate', (e) => {
+					plugin.handle_pop(e)
+				})
+				
+			}
+			
+		},
+		
+		update_path: function(target_ID, do_history = true) {
+			let plugin = this,
+				item = plugin.item,
+				options = plugin.options
+			
+			let content_to_close = []
+			
+			// reset current_id
+			options.current_id = null
+			
+			// reinit options.path with the target content first
+			options.path = []
+			
+			if (target_ID != null) {
+				
+				options.path.push(target_ID)
+			
+				// grab all the parents and add each one to the path
+				$(target_ID).parents('.tab-drawer').map(function() {
+					options.path.push('#' + $(this).attr('id'))
+				})
+				
+			}
+			
+			// reverse the path so it starts at the topmost parent
+			options.path.reverse()
+			
+			item.find('.tab-drawer.td-selected').each(function() {
+				
+				// each currently selected tab
+				
+				let this_ID = $(this).attr('id')
+				
+				if (!options.path.includes(this_ID)) {
+					// tab shouldn't be open anymore
+					content_to_close.push('#' + this_ID)
+				}
+				
+			})
+			
+			// reverse content_to_close
+			// so it starts at the last open tab
+			content_to_close.reverse()
+			
+			// console.log('to close', content_to_close)
+			// console.log('to open', options.path)
+			
+			// close and then open
+			
+			plugin.close_content(
+				content_to_close, 
+				function() {
+					plugin.select_content(do_history)
+				}
+			)
+			
+		},
+		
+		select_content: function(do_history = true) {
+			
+			let plugin = this,
+				item = plugin.item,
+				options = plugin.options
+				
+			// deactivate all links
+			
+			item.find('.tab-drawer-trigger').removeClass('active')
+				
+			options.path.forEach(function(tab_ID, i) {
+				
+				if (tab_ID.charAt(0) != '#') tab_ID = '#' + tab_ID
+				
+				// let tab_id = '#' + tab.attr('id')
+				
+				// console.log('select', i, tab_id)
+				
+				$('body').addClass('tab-drawer-open')
+				
+				// set any links to this content to active
+				
+				item.find('.tab-drawer-trigger[href="' + tab_ID + '"]').addClass('active')
+				
+				if (!$(tab_ID).hasClass('tab-drawer-tabs-container')) {
+					
+					$(tab_ID).siblings('.td-selected').removeClass('td-selected')
+					
+					// open tab content
+					
+					$(tab_ID).addClass('td-selected')
+					
+				}
+				
+				options.current_id = tab_ID
+				
+			})
+			
+			// history
+			
+			if (
+				options.history.enabled == true &&
+				do_history == true
+			) {
+				
+				let new_path = window.location.origin + window.location.pathname 
+				
+				if (options.current_id != null) {
+					new_path += options.current_id
+				}
+				
+				if (new_path != options.history.prev_path) {
+					
+					console.log('new path', new_path)
+					
+					history.pushState({}, '', new_path)
+					options.history.prev_path = new_path
+					
+				}
+				
+			}
+			
+		},
+		
+		close_content: function(content_to_close, fn_callback) {
+			
+			let plugin = this,
+				item = plugin.item,
+				options = plugin.options
+			
+			const close_and_shift = async () => {
+				
+				if (content_to_close.length == 0) {
+					return true
+				}
+					
+				// console.log('close', content_to_close[0])
+				
+				$(content_to_close[0]).removeClass('td-selected')
+				
+			
+				options.elements.tabs
+					.find('a[href="#' + $(content_to_close[0]).attr('id') + '"]')
+					.removeClass('active')
+			
+				// remove first element from content_to_close
+				content_to_close.shift()
+			
+				return content_to_close.length == 0
+			}
+			
+			const process_interval = async (callback, ms, tries_until_error = 10) => {
+				return new Promise((resolve, reject) => {
+					const interval = setInterval(async () => {
+						if (await callback()) {
+							resolve()
+							clearInterval(interval)
+						} else if (tries_until_error <= 1) {
+							reject()
+							clearInterval(interval)
+						}
+			
+						tries_until_error--
+					}, ms)
+				})
+			}
+			
+			const process_close_queue = async() => {
+				try {
+					await process_interval(close_and_shift, 200)
+				} catch (e) {
+					console.log('error')
+				}
+			
+				if (typeof fn_callback == 'function') {
+					fn_callback()
+				}
+			
+				// if no content is selected,
+				// set status to 'closed'
+				
+				if (item.find('.td-selected').length) {
+					
+					// options.current_id = '#' + item.find('.td-selected').last().attr('id')
+					
+				} else {
+					
+					options.status = 'closed'
+					$('body').removeClass('tab-drawer-open')
+					
+				}
+				
+				// console.log('done')
+			}
+			
+			process_close_queue()
+			
+		},
+		
+		handle_pop: function(e) {
+			
+			let plugin = this,
+				item = plugin.item,
+				options = plugin.options
+			
+			// console.log('pop', e)
+		
+			let new_hash = null
+			
+			if (
+				window.location.hash != '' &&
+				$('body').find(window.location.hash).length && 
+				$('body').find(window.location.hash).hasClass('tab-drawer')
+			) {
+				
+				new_hash = window.location.hash
+				
+			}
+				
+			plugin.update_path(new_hash, false)
+			
+		},
+		
+	}
 
-      options.elements.tabs.on('click', 'a', function (e) {
-        e.preventDefault()
-        
-        plugin.select_content($(this).attr('href'), true)
-      })
+	// jQuery plugin interface
 
-      // open a layered drawer
+	$.fn.tab_drawer = function (opt) {
+		var args = Array.prototype.slice.call(arguments, 1)
 
-      options.elements.container.on( 'click', '.tab-drawer-trigger', function (e) {
-        e.preventDefault()
+		return this.each(function () {
+			var item = $(this)
+			var instance = item.data('tab_drawer')
 
-        let this_drawer = $(this).closest('.tab-drawer'),
-          target_id = $(this).attr('#'),
-          target_content = this_drawer.find(target_id)
-
-        plugin.select_content($(this).attr('href'), false)
-      })
-
-      // close content
-
-      $('body').on('click', '.tab-drawer-close', function () {
-        plugin.close_content($(this).closest('.tab-drawer'), true)
-      })
-      
-      // HISTORY
-      
-      if (options.history == true) {
-        
-        window.addEventListener('popstate', (e) => {
-          plugin.handle_pop(e)
-        })
-        
-      }
-      
-    },
-
-    select_content: function (tab_id, do_history) {
-      let plugin = this,
-        item = plugin.item,
-        options = plugin.options
-
-      console.log('td', 'select ', tab_id)
-
-      if (tab_id.charAt(0) != '#') {
-        tab_id = '#' + tab_id
-      }
-
-      // find the content
-
-      let this_content = item.find(tab_id)
-
-      if (this_content.length) {
-        let this_container = this_content.closest('.tab-drawer-container')
-
-        // console.log('container', this_container)
-
-        if (this_content.hasClass('td-selected')) {
-          
-          // close this content
-
-          plugin.close_content(this_content, true)
-          
-        } else {
-          
-          // find other content at this level
-          // that is open
-          // but shouldn't be
-
-          plugin.close_content(this_content.siblings('.td-selected'), false, function () {
-            // select this content
-
-            this_content.addClass('td-selected')
-
-            // if a tab exists linking to this content
-            // set it to active
-
-            options.elements.tabs
-              .find('a[href="' + tab_id + '"]')
-              .addClass('active')
-
-            $('body').addClass('tab-drawer-open')
-            options.status = 'open'
-            
-            if (do_history == true && options.history == true) {
-              history.pushState({}, '', window.location.origin + window.location.pathname + tab_id)
-            }
-            
-          })
-          
-        }
-      }
-    },
-
-    close_content: function (selected_content, do_history, fn_callback) {
-      
-      let plugin = this,
-        item = plugin.item,
-        options = plugin.options
-
-      console.log('td', 'close content', selected_content)
-
-      // find all child content
-
-      let content_to_close = []
-
-      selected_content.find('.tab-drawer.td-selected').each(function () {
-        content_to_close.push($(this))
-      })
-
-      if (content_to_close.length > 1) {
-        // reverse the order of the elements
-        content_to_close.reverse()
-      }
-
-      // add the given content to the end of the array
-      content_to_close.push(selected_content)
-
-      // set interval to close each drawer
-
-      const close_and_shift = async () => {
-        content_to_close[0].removeClass('td-selected')
-
-        options.elements.tabs
-          .find('a[href="#' + content_to_close[0].attr('id') + '"]')
-          .removeClass('active')
-
-        let first = content_to_close.shift()
-
-        return content_to_close.length == 0
-      }
-
-      const process_interval = async (callback, ms, tries_until_error = 10) => {
-        return new Promise((resolve, reject) => {
-          const interval = setInterval(async () => {
-            if (await callback()) {
-              resolve()
-              clearInterval(interval)
-            } else if (tries_until_error <= 1) {
-              reject()
-              clearInterval(interval)
-            }
-
-            tries_until_error--
-          }, ms)
-        })
-      }
-
-      const process_close_queue = async () => {
-        try {
-          await process_interval(close_and_shift, 200)
-        } catch (e) {
-          console.log('error')
-        }
-
-        if (typeof fn_callback == 'function') {
-          console.log('callback')
-          fn_callback()
-        }
-
-        // if no content is selected,
-        // set status to 'closed'
-
-        if (!item.find('.td-selected').length) {
-          options.status = 'closed'
-          $('body').removeClass('tab-drawer-open')
-        }
-
-        if (do_history == true && options.history == true) {
-          history.pushState({}, '', window.location.origin + window.location.pathname)
-        }
-
-        console.log('done')
-      }
-
-      process_close_queue()
-      
-    },
-    
-    handle_pop: function(e) {
-      
-      let plugin = this,
-        item = plugin.item,
-        options = plugin.options
-      
-      console.log('pop', e)
-    
-      if (
-        window.location.hash != '' &&
-        $('body').find(window.location.hash).length && 
-        $('body').find(window.location.hash).hasClass('tab-drawer')
-      ) {
-        plugin.select_content(window.location.hash, false)
-      } else if (item.find('.td-selected').length) {
-        plugin.close_content(item.find('.td-selected'), false)
-      }
-      
-    },
-    
-  }
-
-  // jQuery plugin interface
-
-  $.fn.tab_drawer = function (opt) {
-    var args = Array.prototype.slice.call(arguments, 1)
-
-    return this.each(function () {
-      var item = $(this)
-      var instance = item.data('tab_drawer')
-
-      if (!instance) {
-        // create plugin instance if not created
-        item.data('tab_drawer', new tab_drawer(this, opt))
-      } else {
-        // otherwise check arguments for method call
-        if (typeof opt === 'string') {
-          instance[opt].apply(instance, args)
-        }
-      }
-    })
-  }
+			if (!instance) {
+				// create plugin instance if not created
+				item.data('tab_drawer', new tab_drawer(this, opt))
+			} else {
+				// otherwise check arguments for method call
+				if (typeof opt === 'string') {
+					instance[opt].apply(instance, args)
+				}
+			}
+		})
+	}
 })(jQuery)

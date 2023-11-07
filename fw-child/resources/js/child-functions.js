@@ -10,9 +10,11 @@
       $(document).download_app();
     }
 
-    if ($('.query-page .tab-drawer').length) {
-      $('.query-page .tab-drawer').tab_drawer({
-        history: false,
+    if ($('.query-page #control-bar').length) {
+      $('.query-page #control-bar').tab_drawer({
+        history: {
+          enabled: false,
+        },
       });
     }
 

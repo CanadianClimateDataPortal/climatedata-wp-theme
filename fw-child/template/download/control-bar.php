@@ -1,4 +1,4 @@
-<div id="control-bar" class="control-bar tab-drawer">
+<div id="control-bar" class="control-bar tab-drawer-tabs-container">
 	<?php 
 	
 		// LOGO
@@ -10,22 +10,22 @@
 	<a href="#menu" id="menu-trigger" class="d-block p-1"><i class="fas fa-align-left text-white"></i></a>
 	
 	<div id="control-bar-tabs" class="tab-drawer-tabs">
-		<a href="#data">
+		<a href="#data" class="tab-drawer-trigger">
 			<span class="cdc-icon"></span>
 			<span><?php _e ( 'Data', 'cdc' ); ?></span>
 		</a>
 		
-		<a href="#area">
+		<a href="#area" class="tab-drawer-trigger">
 			<span class="cdc-icon"></span>
 			<span><?php _e ( 'Area', 'cdc' ); ?></span>
 		</a>
 		
-		<a href="#details">
+		<a href="#details" class="tab-drawer-trigger">
 			<span class="cdc-icon"></span>
 			<span><?php _e ( 'Details', 'cdc' ); ?></span>
 		</a>
 		
-		<a href="#submit">
+		<a href="#submit" class="tab-drawer-trigger">
 			<span class="cdc-icon"></span>
 			<span><?php _e ( 'Submit', 'cdc' ); ?></span>
 		</a>

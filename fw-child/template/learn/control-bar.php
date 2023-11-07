@@ -1,13 +1,13 @@
 <div class="col-1">
-	<div id="control-bar" class="control-bar tab-drawer">
+	<div id="control-bar" class="control-bar tab-drawer-tabs-container">
 		
 		<div id="control-bar-tabs" class="tab-drawer-tabs">
-			<a href="#modules">
+			<a href="#modules" class="tab-drawer-trigger">
 				<span class="cdc-icon"></span>
 				<span><?php _e ( 'Modules', 'cdc' ); ?></span>
 			</a>
 			
-			<a href="#filters">
+			<a href="#filters" class="tab-drawer-trigger">
 				<span class="cdc-icon"></span>
 				<span><?php _e ( 'Filters', 'cdc' ); ?></span>
 			</a>

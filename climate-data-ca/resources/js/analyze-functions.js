@@ -1370,6 +1370,7 @@
         }
 
         $('#analyze-process').click(function (e) {
+            console.log(create_file_name(form_inputs));
             if (!$(this).hasClass('disabled')) {
 
                 form_obj = $.extend(true, {}, default_obj)
@@ -1417,7 +1418,6 @@
         function create_file_name(form_inputs) {
             let file_name = "{0}_{1}_{2}_{3}_{4}.{5}"
             let datset = "CanDCS-u5";
-            console.log(form_inputs);
 
             if(form_inputs["dataset"] == "cmip6") datset = "CanDCS-u6"
             if(form_inputs["dataset"] == "humidex") datset = "HUMIDEX"
@@ -1452,17 +1452,26 @@
                 'cold_spell_days': {'label': 'ColdSpellDays', 'vars': '_<window>_days_at_<thresh>'}
             };
 
-            let variable = variables[form_inputs["analyze-location"]];
+            let variable = variables[form_inputs["analyze-var"]];
             variable = variable.label + variable.vars;
 
             ["thresh", "thresh_tasmin", "thresh_tasmax", "window", "after_date", "sum_thresh", "op"].forEach(v => {
-                let val = $(`input[type="hidden"][id=${v}]`).val()
-                if(["thresh", "thresh_tasmin", "thresh_tasmax"].includes(v)) val = val.replaceAll("-", "neg");
-                variable = variable.replaceAll("<"+ v +">", val);
+                let val = "" + $(`input[name=${v}]`).val();
+                if( val != "undefined") {
+                    if(["thresh", "thresh_tasmin", "thresh_tasmax"].includes(v)) val = val.replaceAll("-", "neg");
+                    variable = variable.replaceAll("<"+ v +">", val);
+                }
             });
 
             let options = form_inputs["scenario"].replaceAll(",", "-") + "_";
-            let ps = form_inputs["ensemble_percentile"].split(",");
+
+            let ps = [];
+            $("input[id^='analyze-percentile']").each(function() {
+                if($(this).is(':checked')) {
+                    ps.push($(this).attr("value"));
+                }
+            });
+
             for(let i=0; i< ps.length; i++) ps[i] = "p" + ps[i]
             options += ps.join("-") + "_";
 
@@ -2231,6 +2240,7 @@
         }
 
         $("#shareableURL").click(function() {
+            console.log(create_file_name(form_inputs));
             sharedUrl = $("a[id='shareableURL']").attr('data-share-url');
             navigator.clipboard.writeText(sharedUrl);
             let label = $("#lnk-on").text();

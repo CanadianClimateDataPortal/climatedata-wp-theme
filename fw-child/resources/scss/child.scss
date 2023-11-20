@@ -47,9 +47,47 @@ $utilities: (
 // FONTS
 //
 
+@font-face {
+  font-family: 'CDCSerif';
+  font-weight: normal;
+  -webkit-font-variant-ligatures: no-common-ligatures;
+  -ms-font-variant-ligatures: no-common-ligatures;
+  -moz-font-variant-ligatures: no-common-ligatures;
+  -o-font-variant-ligatures: no-common-ligatures;
+  font-variant-ligatures: no-common-ligatures;
+  src: url('../fonts/CDCSerif-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'CDCSerif';
+  font-weight: bold;
+  -webkit-font-variant-ligatures: no-common-ligatures;
+  -ms-font-variant-ligatures: no-common-ligatures;
+  -moz-font-variant-ligatures: no-common-ligatures;
+  -o-font-variant-ligatures: no-common-ligatures;
+  font-variant-ligatures: no-common-ligatures;
+  src: url('../fonts/CDCSerif-Bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'CDCSans';
+  src: url('../fonts/CDCSans-Light.woff2');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'CDCSans';
+  src: url('../fonts/CDCSans-Book.woff2');
+  font-weight: 500;
+}
+
 //
 // TAGS
 //
+
+h1 {
+  font-family: $font-family-serif;
+}
 
 //
 // CLASSES

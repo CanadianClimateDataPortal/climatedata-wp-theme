@@ -4,10 +4,6 @@
 
 const geoserver_url = 'https://data.climatedata.ca';
 const canadaCenter = [62.51231793838694, -98.48144531250001];
-const canadaBounds = L.latLngBounds(
-  L.latLng(41, -141.1),
-  L.latLng(83.6, -49.9),
-);
 const scenario_names = {
   cmip5: {
     low: 'RCP 2.6',

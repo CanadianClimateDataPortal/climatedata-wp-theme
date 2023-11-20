@@ -7,6 +7,7 @@
       globals: ajax_data.globals,
       lang: ajax_data.globals.lang,
       post_id: null,
+      canadaBounds: L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.6, -49.9)),
       maps: {},
       coords: {
         lat: null,
@@ -206,7 +207,7 @@
             tiled: true,
             pane: 'raster',
             version: options.query.dataset == 'cmip6' ? '1.3.0' : '1.1.1',
-            bounds: canadaBounds,
+            bounds: options.canadaBounds,
             layers: layer_name,
             TIME: parseInt(options.query.decade) + '-01-00T00:00:00Z',
           };
@@ -276,7 +277,7 @@
               };
             },
           },
-          bounds: canadaBounds,
+          bounds: options.canadaBounds,
           maxZoom: 12,
           minZoom: 7,
           pane: 'grid',

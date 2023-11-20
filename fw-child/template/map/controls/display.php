@@ -12,12 +12,12 @@
 					<h6>Data Values</h6>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="display-values" id="display-values-absolute" checked>
+						<input class="form-check-input" type="radio" name="display-values" id="display-values-absolute" value="" checked data-query-key="delta">
 						<label class="form-check-label" for="display-values-absolute">Absolute</label>
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="display-values" id="display-values-delta">
+						<input class="form-check-input" type="radio" name="display-values" id="display-values-delta" value="true" data-query-key="delta">
 						<label class="form-check-label" for="display-values-delta">Delta vs. Baseline</label>
 					</div>
 				</div>
@@ -26,22 +26,22 @@
 					<h6>Map Aggregation</h6>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-grid" checked>
+						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-grid" value="" checked data-query-key="sector">
 						<label class="form-check-label" for="display-aggregation-grid">Gridded Data</label>
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-csd">
+						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-csd" value="census" data-query-key="sector">
 						<label class="form-check-label" for="display-aggregation-csd">Census Subdivisions</label>
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-health">
+						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-health" value="health" data-query-key="sector">
 						<label class="form-check-label" for="display-aggregation-health">Health Regions</label>
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-watershed">
+						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-watershed" value="watershed" data-query-key="sector">
 						<label class="form-check-label" for="display-aggregation-watershed">Watersheds</label>
 					</div>
 					

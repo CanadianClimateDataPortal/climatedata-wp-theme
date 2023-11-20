@@ -1,5 +1,7 @@
 // tab drawer plugin
 
+if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
+
 ;(function ($) {
 	function tab_drawer(item, options) {
 		// options
@@ -63,6 +65,7 @@
 			item.on('click', '.tab-drawer-trigger', function(e) {
 				e.preventDefault()
 				
+				pushes_since_input = 0
 				plugin.update_path($(this).attr('href'))
 				
 			})
@@ -95,7 +98,9 @@
 				// initial check for hash
 				plugin.handle_pop()
 				
-				window.addEventListener('popstate', (e) => {
+				window.addEventListener('popstate', function(e) {
+					
+					console.log('td', 'pop')
 					plugin.handle_pop(e)
 				})
 				
@@ -206,7 +211,7 @@
 				do_history == true
 			) {
 				
-				let new_path = window.location.origin + window.location.pathname 
+				let new_path = window.location.origin + window.location.pathname + window.location.search
 				
 				if (options.current_id != null) {
 					new_path += options.current_id
@@ -214,9 +219,16 @@
 				
 				if (new_path != options.history.prev_path) {
 					
-					console.log('new path', new_path)
+					// console.log('new path', new_path)
+					// console.log('td', 'push')
 					
-					history.pushState({}, '', new_path)
+					if (pushes_since_input < 1) {
+						pushes_since_input += 1
+						history.pushState({}, '', new_path)
+					} else {
+						history.replaceState({}, '', new_path)
+					}
+					
 					options.history.prev_path = new_path
 					
 				}
@@ -307,7 +319,7 @@
 				options = plugin.options
 			
 			// console.log('pop', e)
-		
+					
 			let new_hash = null
 			
 			if (

@@ -42,7 +42,7 @@
       // MAP
       //
 
-      options.maps = $(document).cdc_app('init_maps', options.maps);
+      options.maps = $(document).cdc_app('maps.init', options.maps);
 
       //
       // TABS

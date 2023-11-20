@@ -25,14 +25,16 @@
 				<div id="map-control-coords" class="map-control-item">
 					<h6>Adjust Coordinates</h6>
 					
+					<input type="hidden" name="coords" id="coords" data-query-key="coords">
+					
 					<label for="coords-lat">Latitude</label>
-					<input type="text" class="form-control" name="coords-lat" id="coords-lat">
+					<input type="text" class="form-control coord-field" name="coords-lat" id="coords-lat">
 					
 					<label for="coords-lng">Longitude</label>
-					<input type="text" class="form-control" name="coords-lng" id="coords-lng">
+					<input type="text" class="form-control coord-field" name="coords-lng" id="coords-lng">
 					
 					<label for="coords-zoom">Zoom</label>
-					<input type="text" class="form-control" name="coords-zoom" id="coords-zoom">
+					<input type="text" class="form-control coord-field" name="coords-zoom" id="coords-zoom">
 				</div>
 			</div>
 		</div>
@@ -228,96 +230,96 @@
 												</div>
 												
 												<!-- row -->
-												<div id="chart-series-ssp1" class="row row-cols-3 py-2 border-bottom">
+												<div id="chart-series-ssp126" class="row row-cols-3 py-2 border-bottom">
 													
-													<div id="chart-series-ssp1-display" class="col">
+													<div id="chart-series-ssp126-display" class="col">
 														<div class="form-check form-switch">
-															<input class="form-check-input" type="checkbox" role="switch" id="chart-series-ssp1-display-toggle" checked>
-															<label class="form-check-label" for="chart-series-ssp1-display-toggle"><?php _e ( 'SSP 1–2.6', 'cdc' ); ?></label>
+															<input class="form-check-input" type="checkbox" role="switch" id="chart-series-ssp126-display-toggle" checked>
+															<label class="form-check-label" for="chart-series-ssp126-display-toggle"><?php _e ( 'SSP 1–2.6', 'cdc' ); ?></label>
 														</div>
 													</div>
 													
-													<div id="chart-series-ssp1-colours" class="col d-flex">
-														<div id="chart-series-ssp1-colours-median" class="color-picker d-flex align-items-center me-2">
+													<div id="chart-series-ssp126-colours" class="col d-flex">
+														<div id="chart-series-ssp126-colours-median" class="color-picker d-flex align-items-center me-2">
 															<span class="rounded-circle p-2 me-2 bg-primary"></span>
 															
 															<span class="label"><?php _e ( 'Median', 'cdc' ); ?></span>
 														</div>
 														
-														<div id="chart-series-ssp1-colours-range" class="color-picker d-flex align-items-center me-2">
+														<div id="chart-series-ssp126-colours-range" class="color-picker d-flex align-items-center me-2">
 															<span class="rounded-circle p-2 me-2 bg-primary"></span>
 															
 															<span class="label"><?php _e ( 'Range', 'cdc' ); ?></span>
 														</div>
 													</div>
 													
-													<div id="chart-series-ssp1-opacity" class="col">
+													<div id="chart-series-ssp126-opacity" class="col">
 														
-														<input type="range" class="form-range" min="1" max="100" value="100" id="chart-series-ssp1-opacity-range">
+														<input type="range" class="form-range" min="1" max="100" value="100" id="chart-series-ssp126-opacity-range">
 														
 													</div>
 													
 												</div>
 												
 												<!-- row -->
-												<div id="chart-series-ssp2" class="row row-cols-3 py-2 border-bottom">
+												<div id="chart-series-ssp245" class="row row-cols-3 py-2 border-bottom">
 													
-													<div id="chart-series-ssp2-display" class="col">
+													<div id="chart-series-ssp245-display" class="col">
 														<div class="form-check form-switch">
-															<input class="form-check-input" type="checkbox" role="switch" id="chart-series-ssp2-display-toggle" checked>
-															<label class="form-check-label" for="chart-series-ssp2-display-toggle"><?php _e ( 'SSP 2–4.5', 'cdc' ); ?></label>
+															<input class="form-check-input" type="checkbox" role="switch" id="chart-series-ssp245-display-toggle" checked>
+															<label class="form-check-label" for="chart-series-ssp245-display-toggle"><?php _e ( 'SSP 2–4.5', 'cdc' ); ?></label>
 														</div>
 													</div>
 													
-													<div id="chart-series-ssp2-colours" class="col d-flex">
-														<div id="chart-series-ssp2-colours-median" class="color-picker d-flex align-items-center me-2">
+													<div id="chart-series-ssp245-colours" class="col d-flex">
+														<div id="chart-series-ssp245-colours-median" class="color-picker d-flex align-items-center me-2">
 															<span class="rounded-circle p-2 me-2 bg-primary"></span>
 															
 															<span class="label"><?php _e ( 'Median', 'cdc' ); ?></span>
 														</div>
 														
-														<div id="chart-series-ssp2-colours-range" class="color-picker d-flex align-items-center me-2">
+														<div id="chart-series-ssp245-colours-range" class="color-picker d-flex align-items-center me-2">
 															<span class="rounded-circle p-2 me-2 bg-primary"></span>
 															
 															<span class="label"><?php _e ( 'Range', 'cdc' ); ?></span>
 														</div>
 													</div>
 													
-													<div id="chart-series-ssp2-opacity" class="col">
+													<div id="chart-series-ssp245-opacity" class="col">
 														
-														<input type="range" class="form-range" min="1" max="100" value="100" id="chart-series-ssp2-opacity-range">
+														<input type="range" class="form-range" min="1" max="100" value="100" id="chart-series-ssp245-opacity-range">
 														
 													</div>
 													
 												</div>
 												
 												<!-- row -->
-												<div id="chart-series-ssp5" class="row row-cols-3 py-2 border-bottom">
+												<div id="chart-series-ssp585" class="row row-cols-3 py-2 border-bottom">
 													
-													<div id="chart-series-ssp5-display" class="col">
+													<div id="chart-series-ssp585-display" class="col">
 														<div class="form-check form-switch">
-															<input class="form-check-input" type="checkbox" role="switch" id="chart-series-ssp5-display-toggle" checked>
-															<label class="form-check-label" for="chart-series-ssp5-display-toggle"><?php _e ( 'SSP 5–8.5', 'cdc' ); ?></label>
+															<input class="form-check-input" type="checkbox" role="switch" id="chart-series-ssp585-display-toggle" checked>
+															<label class="form-check-label" for="chart-series-ssp585-display-toggle"><?php _e ( 'SSP 5–8.5', 'cdc' ); ?></label>
 														</div>
 													</div>
 													
-													<div id="chart-series-ssp5-colours" class="col d-flex">
-														<div id="chart-series-ssp5-colours-median" class="color-picker d-flex align-items-center me-2">
+													<div id="chart-series-ssp585-colours" class="col d-flex">
+														<div id="chart-series-ssp585-colours-median" class="color-picker d-flex align-items-center me-2">
 															<span class="rounded-circle p-2 me-2 bg-primary"></span>
 															
 															<span class="label"><?php _e ( 'Median', 'cdc' ); ?></span>
 														</div>
 														
-														<div id="chart-series-ssp5-colours-range" class="color-picker d-flex align-items-center me-2">
+														<div id="chart-series-ssp585-colours-range" class="color-picker d-flex align-items-center me-2">
 															<span class="rounded-circle p-2 me-2 bg-primary"></span>
 															
 															<span class="label"><?php _e ( 'Range', 'cdc' ); ?></span>
 														</div>
 													</div>
 													
-													<div id="chart-series-ssp5-opacity" class="col">
+													<div id="chart-series-ssp585-opacity" class="col">
 														
-														<input type="range" class="form-range" min="1" max="100" value="100" id="chart-series-ssp5-opacity-range">
+														<input type="range" class="form-range" min="1" max="100" value="100" id="chart-series-ssp585-opacity-range">
 														
 													</div>
 													

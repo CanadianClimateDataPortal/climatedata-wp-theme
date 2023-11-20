@@ -191,6 +191,28 @@ h1 {
 }
 
 //
+// JQUERY UI COMPONENTS
+//
+
+// decade slider
+
+$decade-slider-handle-width: 100px;
+
+#decade-slider {
+  position: relative;
+  width: 100%;
+  margin: 0 $decade-slider-handle-width * 0.5;
+}
+
+#decade-slider-handle {
+  width: $decade-slider-handle-width;
+  margin-left: $decade-slider-handle-width * -0.5;
+  background-color: $primary;
+  color: $white;
+  text-align: center;
+}
+
+//
 // BOOTSTRAP COMPONENTS
 //
 

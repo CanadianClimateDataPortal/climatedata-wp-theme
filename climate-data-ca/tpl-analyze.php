@@ -147,7 +147,7 @@
                     <div class="input-row form-check">
                         <div class="input-item">
                           <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-census-division" value="census">
-                          <label class="form-check-label" for="analyze-location-census-division"><?php _e ( 'Census division', 'cdc' ); ?></label>
+                          <label class="form-check-label" for="analyze-location-census-division"><?php _e ( 'Census subdivision', 'cdc' ); ?></label>
                         </div>
                     </div>
 

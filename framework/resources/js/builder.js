@@ -158,56 +158,6 @@
 				}
 			})
 			
-			
-			let test = {
-				"settings": [
-					{
-						"spacing": [
-							{
-								"index": "0",
-								"property": "p",
-								"side": "",
-								"breakpoint": "",
-								"value": "0"
-							},
-							{
-								"index": "1",
-								"property": "m",
-								"side": "",
-								"breakpoint": "",
-								"value": "0"
-							}
-						]
-					},
-					{
-						"colors": {
-							"bg": "light",
-							"headings": "",
-							"text": ""
-						}
-					}
-				]
-			}
-			
-			// console.log(plugin.flatten(test))
-			
-			// let result = {}
-			// 
-			// test.forEach(function(input) {
-			// 	
-			// 	console.log('---')
-			// 	console.log('INPUT', input)
-			// 	
-			// 	let key = input.name.split('-')
-			// 	
-			// 	result = plugin.find_child_element(result, key, input.value)
-			// 	
-			// })
-			// 
-			// console.log('---')
-			// console.log('result')
-			// console.log(JSON.stringify(result, null, 2))
-			
 			//
 			// EVENTS
 			//
@@ -737,7 +687,7 @@
 					}
 					
 				}
-					
+				
 			})
 			
 			//
@@ -4043,8 +3993,6 @@
 					path: path
 				},
 				success: function(data) {
-					
-					console.log(data)
 					
 					let new_form = $(data)
 					

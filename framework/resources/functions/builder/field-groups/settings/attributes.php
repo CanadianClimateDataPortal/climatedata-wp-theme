@@ -52,7 +52,6 @@
 			<div class="fw-form-repeater-add-row btn btn-sm btn-outline-primary">+ Add row</div>
 		</div>
 		
-		
 		<input type="hidden" id="inputs-settings[]-attributes-index" name="inputs-settings[]-attributes-index" value="0">
 		
 	</div>

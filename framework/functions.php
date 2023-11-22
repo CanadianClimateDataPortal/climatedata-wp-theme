@@ -131,6 +131,10 @@ function fw_enqueue_scripts() {
 	
 	wp_register_script ( 'aos', $vendor_dir . 'aos/dist/aos.js', null, null, true );
 	
+	// swiper
+	
+	wp_register_script ( 'swiper', $vendor_dir . 'swiper-11.0.4/swiper-bundle.min.js', null, null, true );
+	
 	// bootstrap
 	
 	wp_register_script ( 'bootstrap-js', $vendor_dir . 'bootstrap/dist/js/bootstrap.bundle.min.js', array( 'jquery' ), null, true );

@@ -45,6 +45,8 @@ function fw_global_vars() {
 	
 	$fw['current_ancestors'] = get_ancestors ( $fw['current_query']['ID'], $fw['current_query']['post_type'] );
 
+	$fw['elements'] = array ( 'section', 'container', 'row', 'column', 'block' );
+	
 	// $fw['classes'] = array (
 	// 	'page' => get_body_class(),
 	// 	'section' => ['fw-element', 'fw-section'],

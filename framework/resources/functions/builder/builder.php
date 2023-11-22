@@ -59,15 +59,16 @@ function builder_is_active() {
 
 // element open/close functions
 
-add_action ( 'fw_before_element_open', 'fw_output_extras_before_open', 10, 1 );
-add_action ( 'fw_after_element_open', 'fw_output_extras_after_open', 10, 1 );
-add_action ( 'fw_before_element_close', 'fw_output_element_children', 10, 3 );
+add_action ( 'fw_before_element_open', 'fw_output_extras_before_open', 10, 3 );
+add_action ( 'fw_after_element_open', 'fw_output_extras_after_open', 10, 3 );
+add_action ( 'fw_before_element_close', 'fw_output_element_children', 10, 4 );
+add_action ( 'fw_before_element_close', 'fw_output_extras_before_close', 11, 4 );
 
 // BEFORE OPEN 
 
 // check for settings
 
-function fw_output_extras_before_open ( $element ) {
+function fw_output_extras_before_open ( $element, $level, $settings ) {
 	
 	// check for settings
 	
@@ -86,7 +87,7 @@ function fw_output_extras_before_open ( $element ) {
 			foreach ( $setting_obj as $setting => $options ) {
 				
 				switch ( $setting ) {
-					
+						
 					case 'offcanvas' :
 						
 						$offcanvas_btn_class = '';
@@ -117,8 +118,7 @@ function fw_output_extras_before_open ( $element ) {
 
 // AFTER OPEN
 
-
-function fw_output_extras_after_open ( $element ) {
+function fw_output_extras_after_open ( $element, $level, $settings ) {
 	
 	// check for settings
 	
@@ -130,6 +130,12 @@ function fw_output_extras_after_open ( $element ) {
 			foreach ( $setting_obj as $setting => $options ) {
 				
 				switch ( $setting ) {
+					
+					case 'carousel' :
+						
+						echo '<div class="swiper-wrapper">';
+						
+						break;
 						
 					case 'background' :
 						
@@ -172,16 +178,49 @@ function fw_output_extras_after_open ( $element ) {
 	
 }
 
-
 // BEFORE CLOSE
 
 // output element children
 
+function fw_output_extras_before_close ( $element, $level, $settings, $include_autogen ) {
 
+	// check for settings
+	
+	if ( isset ( $element['inputs']['settings'] ) ) {
+		
+		// dumpit ( $settings );
+		
+		foreach ( $element['inputs']['settings'] as $setting_obj ) {
+			foreach ( $setting_obj as $setting => $options ) {
+				
+				switch ( $setting ) {
+					
+					case 'carousel' :
+						
+						echo '</div><!-- .swiper-wrapper -->';
+					
+						echo '<div id="' . $settings['el_id'] . '-carousel-pagination" class="swiper-pagination d-none"></div>';	
+					
+						echo '<div id="' . $settings['el_id'] . '-carousel-prev" class="swiper-button-prev d-none"></div>';
+						echo '<div id="' . $settings['el_id'] . '-carousel-next" class="swiper-button-next d-none"></div>';
+						
+						// echo '<div id="' . $settings['el_id'] . '-carousel-scrollbar" class="swiper-scrollbar"></div>';
+						
+						unset ( $GLOBALS['fw']['carousel'] );
+						
+						break;
+				}
+			}
+		}
+	}
 
+}
 
-
-
+//
+// OUTPUT LOOP
+// output recursively 
+// beginning with the given element
+//
 
 function fw_output_loop ( $element, $level, $include_autogen ) {
 	
@@ -201,7 +240,7 @@ function fw_output_loop ( $element, $level, $include_autogen ) {
 // OUTPUT ELEMENTS
 //
 
-function fw_output_element_children ( $element, $level, $include_autogen ) {
+function fw_output_element_children ( $element, $level, $settings, $include_autogen ) {
 	
 	if ( isset ( $element['children'] ) && !empty ( $element['children'] ) ) {
 		
@@ -392,6 +431,141 @@ function fw_setup_element ( $element, $globals ) {
 				
 				switch ( $setting ) {
 					
+					case 'carousel' :
+						$settings['classes'][] = 'swiper';
+						
+						// build the swiper JSON object
+						
+						$carousel = $options;
+						
+						// echo 'pre<br>';
+						// dumpit ( $carousel );
+						
+						unset ( $carousel['type'] );
+						unset ( $carousel['index'] );
+						
+						$breakpoints = array();
+						$defaults = array();
+						
+						$key_replace = [ 0, 576, 768, 992, 1200, 1400 ];
+						
+						foreach ( array ( 'slidesPerView', 'slidesPerGroup' ) as $key ) {
+							
+							$i = 0;
+							
+							// map breakpoint values to their matching key_replace arrays
+							
+							foreach ( $carousel[$key] as $breakpoint => $val ) {
+								
+								if ( $val != '' ) {
+									
+									// skip if no value
+									
+									if ( $breakpoint == 'xs' ) {
+										
+										// set the default value if 'xs'
+										
+										$defaults[$key] = (int) $val;
+										
+									} else {
+										
+										// create the array if necessary
+										
+										if ( !isset ( $breakpoints[$key_replace[$i]] ) )
+											$breakpoints[$key_replace[$i]] = array();
+										
+										// e.g. breakpoints[768][slidesPerView] = 1
+										$breakpoints[$key_replace[$i]][$key] = (int) $val;
+									}
+								}
+								
+								$i++;
+								
+							}
+							
+							if ( isset ( $defaults[$key] ) ) {
+								$carousel[$key] = $defaults[$key];
+							} else {
+								unset ( $carousel[$key] );
+							}
+						}
+						
+						$carousel['breakpoints'] = $breakpoints;
+						
+						// arrows/bullets
+						
+						if ( $carousel['pagination'] == 'true' ) {
+							$carousel['pagination'] = array (
+								'enabled' => true,
+								'el' => '#' . $settings['el_id'] . '-carousel-pagination',
+								'clickable' => true
+							);
+						} else {
+							unset ( $carousel['pagination'] );
+						}
+						
+						if ( $carousel['navigation'] == 'true' ) {
+							$carousel['navigation'] = array (
+								'enabled' => true,
+								'nextEl' => '#' . $settings['el_id'] . '-carousel-next',
+								'prevEl' => '#' . $settings['el_id'] . '-carousel-prev'
+							);
+						} else {
+							unset ( $carousel['navigation'] );
+						}
+						
+						// autoplay
+						
+						if ( $carousel['autoplay'] != '0' && $carousel['autoplay'] != 0 ) {
+							$carousel['autoplay'] = array (
+								'delay' => ( (int) $carousel['autoplay'] ) * 1000,
+								'pauseOnMouseEnter' => true
+							);
+						} else {
+							unset ( $carousel['autoplay'] );
+						}
+						
+						// switch ( $carousel['effect'] ) {
+						// 	case 'fade' :
+						// 		$carousel['coverflow']
+						// 		break;
+						// 		
+						// 	case 'cube' :
+						// 	break;
+						// 		
+						// 	case 'coverflow' :
+						// 	break;
+						// 		
+						// 	case 'flip' :
+						// 	break;
+						// 		
+						// 	default : 
+						// 		unset ( $carousel['effect'] );
+						// }
+						
+						// convert any leftover true/false strings to boolean
+						
+						foreach ( $carousel as $key => $val ) {
+							if ( $val == 'true' ) {
+								$carousel[$key] = true;
+							} elseif ( $val == 'false' ) {
+								unset ( $carousel[$key] );
+							}
+						}
+						
+						// dumpit ( $carousel );
+						
+						$settings['atts']['swiper-settings'] = json_encode ( $carousel );
+						
+						wp_enqueue_script ( 'swiper' );
+						
+						$GLOBALS['fw']['carousel'] = array (
+							'element' => $settings['el_type'],
+							'slide' => ( $settings['el_type'] == 'block' ) ? '' : $GLOBALS['fw']['elements'][array_search ( $settings['el_type'], $GLOBALS['fw']['elements'] ) + 1]
+						);
+						
+						break;
+						
 					case 'offcanvas' :
 						
 						$settings['classes'][] = 'has-offcanvas';
@@ -530,6 +704,19 @@ function fw_setup_element ( $element, $globals ) {
 		}
 	}
 	
+	
+	// other alterations
+	
+	if (
+		isset ( $GLOBALS['fw']['carousel'] ) && 
+		$GLOBALS['fw']['carousel']['slide'] == $settings['el_type']
+	) {
+		
+		$settings['classes'][] = 'swiper-slide';
+		
+	}
+	
+	
 	return $settings;
 	
 }
@@ -611,23 +798,10 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 		$output_this_element = true;
 	}
 	
-	// echo "\n";
-	// echo $settings['el_type'] . ' is autogen: ';
-	// echo ( $settings['autogen'] == true ) ? 'y' : 'n';
-	// echo "\n";
-	// 
-	// echo "\n";
-	// echo 'output this: ';
-	// echo ( $output_this_element == true ) ? 'y' : 'n';
-	// echo "\n";
-	
 	if ( $output_this_element == true ) {
 		
-	
-		// dumpit ( $settings );
-		
 		if ( $callbacks == true ) {
-			do_action ( 'fw_before_element_open', $element, $level );
+			do_action ( 'fw_before_element_open', $element, $level, $settings );
 		}
 		
 		if ( $include_autogen == false ) {
@@ -637,11 +811,13 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 		}
 		
 		if ( $settings['el_type'] != 'template' ) {
+			
+			// element output begins here
 		
 			echo '<div id="' . $settings['el_id'] . '" class="' . implode ( ' ', $settings['classes'] ) . '"';
 			
 			foreach ( $settings['atts'] as $key => $val ) {
-				echo ' data-' . $key . '="' . $val . '"';
+				echo ' data-' . $key . '=\'' . $val . '\'';
 			}
 			
 			echo '>';
@@ -649,7 +825,7 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 		}
 		
 		if ( $callbacks == true ) {
-			do_action ( 'fw_after_element_open', $element, $level );
+			do_action ( 'fw_after_element_open', $element, $level, $settings );
 		}
 		
 		if ( $settings['el_type'] == 'template' ) {
@@ -698,7 +874,7 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 		}
 		
 		if ( $callbacks == true ) {
-			do_action ( 'fw_before_element_close', $element, $level, $include_autogen );
+			do_action ( 'fw_before_element_close', $element, $level, $settings, $include_autogen );
 		}
 		
 		if ( $settings['el_type'] != 'template' ) {
@@ -708,7 +884,7 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 	} else {
 		
 		if ( $callbacks == true ) {
-			do_action ( 'fw_before_element_close', $element, $level, $include_autogen );
+			do_action ( 'fw_before_element_close', $element, $level, $settings, $include_autogen );
 		}
 		
 	}

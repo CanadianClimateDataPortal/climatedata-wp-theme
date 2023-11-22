@@ -6,6 +6,8 @@
 	
 	<div class="card-body p-0">
 		
+		<input type="hidden" id="inputs-settings[]-aos-type" name="inputs-settings[]-aos-type" value="aos">
+		
 		<div class="row row-cols-4">
 		
 			<div class="col p-2">
@@ -119,8 +121,10 @@
 		
 		</div>
 		
-		<div class="card-footer settings-form-note">
-			Note: scroll effects won’t display in builder mode.
-		</div>
+		<input type="hidden" id="inputs-settings[]-aos-index" name="inputs-settings[]-aos-index" value="0">
+	</div>
+	
+	<div class="card-footer settings-form-note">
+		Note: scroll effects won’t display in builder mode.
 	</div>
 </div>

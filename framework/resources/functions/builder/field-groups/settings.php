@@ -28,6 +28,7 @@
 				<li><span class="dropdown-item" data-flex-item="colors">Colour Scheme</span></li>
 				<li><span class="dropdown-item" data-flex-item="background">Background Image</span></li>
 				<li><span class="dropdown-item" data-flex-item="spacing">Spacing</span></li>
+				<li><span class="dropdown-item" data-flex-item="carousel">Carousel</span></li>
 				<li><span class="dropdown-item" data-flex-item="offcanvas">Offcanvas</span></li>
 				<li><span class="dropdown-item" data-flex-item="aos">Animate on Scroll</span></li>
 				<li><span class="dropdown-item" data-flex-item="attributes">Data Attributes</span></li>

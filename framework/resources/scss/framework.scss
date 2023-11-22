@@ -15,6 +15,14 @@
 @import 'variables-fw';
 
 //
+// FONTS
+//
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;600&display=swap');
+
+$fw-font: Inter;
+
+//
 // HELPERS
 //
 
@@ -284,14 +292,17 @@
 	left: 0.5rem;
 	width: auto !important;
 	max-width: 100%;
-	// opacity: 0;
-	font-size: 0.75rem;
-	// border-top: 1px solid #bbb;
-	// border-right: 1px solid #bbb;
-	color: $white;
 	pointer-events: none;
 	overflow: hidden;
 	transition: opacity 0.25s ease 0s, overflow 0s ease 0s;
+	font-family: $fw-font, $font-family-base;
+	font-size: 0.75rem;
+	font-weight: 400;
+	color: $white;
+	
+	h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
+		font-weight: 600;
+	}
 	
 	.fw-element-footer-inner {
 		display: flex;

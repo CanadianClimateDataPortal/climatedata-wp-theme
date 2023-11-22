@@ -10,9 +10,51 @@ var theme_dir = current_script.replace('/resources/js/' + filename, '') + '/'
     
     console.log('begin global-functions.js')
     
+    //
+    // VENDOR
+    //
+    
+    // AOS
+    
     if ($('[data-aos]').length) {
       AOS.init()
     }
+    
+    // SWIPER
+    
+    if ($('.swiper').length) {
+      
+      var swipers = {}
+      
+      $('.swiper').each(function() {
+        
+        let this_settings = JSON.parse($(this).attr('data-swiper-settings'))
+        // console.log($(this), this_settings)
+        
+        // show controls if options are set
+        
+        if (this_settings.hasOwnProperty('pagination')) {
+          $(this).find('.swiper-pagination').removeClass('d-none')
+        }
+        
+        if (this_settings.hasOwnProperty('navigation')) {
+          $(this).find('.swiper-button-prev, .swiper-button-next').removeClass('d-none')
+        }
+        
+        // init
+        swipers[$(this).attr('id')] = {
+          instance: new Swiper('.swiper', this_settings)
+        }
+        
+      })
+      
+      console.log(swipers)
+      
+    }
+    
+    //
+    // BOOTSTRAP
+    //
     
     if ($('body').find('[data-offcanvas-trigger]').length) {
       
@@ -34,6 +76,8 @@ var theme_dir = current_script.replace('/resources/js/' + filename, '') + '/'
         
       })
     }
+    
+    //
     
     console.log('end global-functions.js')
 

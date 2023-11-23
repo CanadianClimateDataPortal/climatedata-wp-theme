@@ -133,6 +133,7 @@ function fw_output_extras_after_open ( $element, $level, $settings ) {
 					
 					case 'carousel' :
 						
+						echo '<div id="' . $settings['el_id'] . '-carousel" class="swiper">';
 						echo '<div class="swiper-wrapper">';
 						
 						break;
@@ -205,6 +206,8 @@ function fw_output_extras_before_close ( $element, $level, $settings, $include_a
 						echo '<div id="' . $settings['el_id'] . '-carousel-next" class="swiper-button-next d-none"></div>';
 						
 						// echo '<div id="' . $settings['el_id'] . '-carousel-scrollbar" class="swiper-scrollbar"></div>';
+						
+						echo '</div><!-- .swiper -->';
 						
 						unset ( $GLOBALS['fw']['carousel'] );
 						
@@ -432,7 +435,7 @@ function fw_setup_element ( $element, $globals ) {
 				switch ( $setting ) {
 					
 					case 'carousel' :
-						$settings['classes'][] = 'swiper';
+						$settings['classes'][] = 'has-swiper';
 						
 						// build the swiper JSON object
 						
@@ -492,27 +495,63 @@ function fw_setup_element ( $element, $globals ) {
 						
 						$carousel['breakpoints'] = $breakpoints;
 						
-						// arrows/bullets
+						// bullets
 						
-						if ( $carousel['pagination'] == 'true' ) {
+						if ( $carousel['pagination'] != 'none' ) {
+							
 							$carousel['pagination'] = array (
-								'enabled' => true,
+								'type' => $carousel['pagination'],
 								'el' => '#' . $settings['el_id'] . '-carousel-pagination',
 								'clickable' => true
 							);
+							
+							if ( $carousel['pagination']['type'] == 'dynamic' ) {
+								$carousel['pagination']['type'] = 'bullets';
+								$carousel['pagination']['dynamicBullets'] = true;
+							}
+							
 						} else {
 							unset ( $carousel['pagination'] );
 						}
 						
+						// arrows
+						
 						if ( $carousel['navigation'] == 'true' ) {
+							
 							$carousel['navigation'] = array (
 								'enabled' => true,
 								'nextEl' => '#' . $settings['el_id'] . '-carousel-next',
 								'prevEl' => '#' . $settings['el_id'] . '-carousel-prev'
 							);
+							
 						} else {
 							unset ( $carousel['navigation'] );
 						}
+						
+						// other
+						
+						if (
+							( isset ( $carousel['other'] ) && isset ( $carousel['other']['rows'] ) ) &&
+							!empty ( $carousel['other']['rows'] )
+						) {
+							
+							foreach ( $carousel['other']['rows'] as $row ) {
+								
+								$new_val = $row['value'];
+								
+								if ( $row['type'] == 'integer' ) {
+									$new_val = (int) $row['value'];
+								} elseif ( $row['type'] == 'boolean') {
+									$new_val = ( $row['value'] == 'true' ) ? true : false;
+								}
+								
+								$carousel[$row['name']] = $new_val;
+								
+							}
+							
+						}
+						
+						unset ( $carousel['other'] );
 						
 						// autoplay
 						
@@ -525,23 +564,25 @@ function fw_setup_element ( $element, $globals ) {
 							unset ( $carousel['autoplay'] );
 						}
 						
-						// switch ( $carousel['effect'] ) {
-						// 	case 'fade' :
-						// 		$carousel['coverflow']
-						// 		break;
-						// 		
-						// 	case 'cube' :
-						// 	break;
-						// 		
-						// 	case 'coverflow' :
-						// 	break;
-						// 		
-						// 	case 'flip' :
-						// 	break;
-						// 		
-						// 	default : 
-						// 		unset ( $carousel['effect'] );
-						// }
+						switch ( $carousel['effect'] ) {
+							case 'fade' :
+								$carousel['fadeEffect'] = array (
+									'crossFade' => true
+								);
+								break;
+								
+							case 'cube' :
+								break;
+								
+							case 'coverflow' :
+								break;
+								
+							case 'flip' :
+								break;
+								
+							default : 
+								// unset ( $carousel['effect'] );
+						}
 						
 						// convert any leftover true/false strings to boolean
 						

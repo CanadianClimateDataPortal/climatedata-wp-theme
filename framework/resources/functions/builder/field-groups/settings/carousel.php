@@ -96,7 +96,7 @@
 			
 		</div>
 		
-		<div class="row row-cols-4 border-bottom">
+		<div class="row row-cols-3 border-bottom">
 		
 			<div class="col w-100 p-2 pb-0">
 				<h6 class="mb-0">Navigation</h6>
@@ -116,14 +116,17 @@
 				<label for="inputs-settings[]-carousel-pagination" class="form-label modal-label-sm">Pagination</label>
 				
 				<select name="inputs-settings[]-carousel-pagination" class="form-select form-select-sm">
-					<option value="true">On</option>
-					<option value="false">Off</option>
+					<option value="none">None</option>
+					<option value="bullets">Bullets</option>
+					<option value="fraction">Fraction</option>
+					<option value="progressbar">Progress Bar</option>
+					<option value="dynamic">Dynamic Bullets</option>
 				</select>
 				
 			</div>
 		</div>
 		
-		<div class="row row-cols-4">
+		<div class="row row-cols-3">
 			
 			<div class="col w-100 p-2 pb-0">
 				<h6 class="mb-0">Settings</h6>
@@ -176,6 +179,61 @@
 				</select>
 			</div>
 		</div>
+		
+		
+		<div class="fw-form-repeater-container">
+		
+			<div class="row border-bottom p-2 fw-form-repeater-head settings-form-repeater-head modal-label-sm">
+				<div class="col">Setting</div>
+				<div class="col">Value</div>
+				<div class="col">Type</div>
+				<div class="col-1"></div>
+			</div>
+			
+			<div class="fw-form-repeater settings-form-repeater p-2 border-bottom" data-rows="1">
+					
+				<div class="fw-form-repeater-row settings-form-repeater-row row my-1" data-row-index="0">
+					
+					<div class="col pe-3">
+						<input type="text" name="inputs-settings[]-carousel-other-rows[]-name" id="inputs-settings[]-carousel-other-rows[]-name" class="form-control form-control-sm">
+					</div>
+					
+					<div class="col pe-3">
+						
+						<input type="text" name="inputs-settings[]-carousel-other-rows[]-value" id="inputs-settings[]-carousel-other-rows[]-value" class="form-control form-control-sm">
+						
+					</div>
+					
+					<div class="col pe-3">
+						
+						<select name="inputs-settings[]-carousel-other-rows[]-type" id="inputs-settings[]-carousel-other-rows[]-type" class="form-select form-select-sm">
+							<option value="string">String</option>
+							<option value="integer">Integer</option>
+							<option value="boolean">Boolean</option>
+							<option value="json">JSON</option>
+						</select>
+						
+					</div>
+					
+					<div class="col-1 d-flex align-items-end justify-content-center">
+						<div class="fw-form-repeater-delete-row btn btn-sm btn-outline-danger">Delete</div>
+					</div>
+					
+					<input type="hidden" id="inputs-settings[]-carousel-other-rows[]-index" name="inputs-settings[]-carousel-other-rows[]-index" value="0">
+					
+				</div>
+				
+			</div>
+			
+			<div class="d-flex justify-content-end p-2">
+				<div class="fw-form-repeater-add-row btn btn-sm btn-outline-primary">+ Add row</div>
+			</div>
+			
+		</div>
+		
+		
+		
+		
 		
 		<input type="hidden" id="inputs-settings[]-carousel-index" name="inputs-settings[]-carousel-index" value="0">
 	</div>

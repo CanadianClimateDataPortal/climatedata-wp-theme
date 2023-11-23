@@ -22,28 +22,31 @@ var theme_dir = current_script.replace('/resources/js/' + filename, '') + '/'
     
     // SWIPER
     
-    if ($('.swiper').length) {
+    if ($('.has-swiper').length) {
       
       var swipers = {}
       
-      $('.swiper').each(function() {
+      $('.has-swiper').each(function() {
         
-        let this_settings = JSON.parse($(this).attr('data-swiper-settings'))
+        let this_swiper = $(this).find('> .swiper'),
+            this_settings = JSON.parse($(this).attr('data-swiper-settings'))
+            
         // console.log($(this), this_settings)
         
         // show controls if options are set
         
         if (this_settings.hasOwnProperty('pagination')) {
-          $(this).find('.swiper-pagination').removeClass('d-none')
+          this_swiper.find('.swiper-pagination').removeClass('d-none')
         }
         
         if (this_settings.hasOwnProperty('navigation')) {
-          $(this).find('.swiper-button-prev, .swiper-button-next').removeClass('d-none')
+          this_swiper.find('.swiper-button-prev, .swiper-button-next').removeClass('d-none')
         }
         
         // init
         swipers[$(this).attr('id')] = {
-          instance: new Swiper('.swiper', this_settings)
+          element: this_swiper,
+          instance: new Swiper('#' + this_swiper.attr('id'), this_settings)
         }
         
       })

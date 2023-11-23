@@ -501,6 +501,7 @@ function fw_setup_element ( $element, $globals ) {
 							
 							$carousel['pagination'] = array (
 								'type' => $carousel['pagination'],
+								'el' => '#' . $settings['el_id'] . '-carousel-pagination',
 								'clickable' => true
 							);
 							
@@ -565,17 +566,19 @@ function fw_setup_element ( $element, $globals ) {
 						
 						switch ( $carousel['effect'] ) {
 							case 'fade' :
-								$carousel['crossFade'] = true;
+								$carousel['fadeEffect'] = array (
+									'crossFade' => true
+								);
 								break;
 								
 							case 'cube' :
-							break;
+								break;
 								
 							case 'coverflow' :
-							break;
+								break;
 								
 							case 'flip' :
-							break;
+								break;
 								
 							default : 
 								// unset ( $carousel['effect'] );

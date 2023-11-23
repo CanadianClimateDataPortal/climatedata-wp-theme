@@ -625,3 +625,17 @@ body.admin-bar {
 		}
 	}
 }
+
+//
+// COMPONENTS
+//
+
+// SWIPER
+
+.fw-builder {
+	.swiper-pagination {
+		position: relative !important;
+		bottom: auto !important;
+		top: auto !important;
+	}
+} 

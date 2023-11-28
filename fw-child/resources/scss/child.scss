@@ -93,9 +93,46 @@ h1 {
 // CLASSES
 //
 
+.bg {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  @include full-size;
+}
+
+.font-family-serif {
+  font-family: $font-family-serif;
+}
+
+.font-weight-normal {
+  font-weight: normal;
+}
+
+.circle-number {
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  margin-right: 1.5rem;
+  background-color: $white;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 2rem;
+  line-height: 3rem;
+  font-family: $font-family-serif;
+  font-weight: bold;
+  color: $secondary;
+}
+
 //
 // STRUCTURE
 //
+
+#hero {
+  h1 {
+    font-size: 5rem;
+    font-weight: bold;
+  }
+}
 
 //
 // COMMON
@@ -124,24 +161,55 @@ h1 {
   }
 
   .tab-drawer-tabs {
+    padding-left: 0.5rem;
+
     a {
       display: block;
       padding: 0.5rem;
+      color: $white;
+      font-size: 0.75rem;
+      text-decoration: none;
+      text-align: center;
 
       &.active {
-        background-color: $white;
+        background-color: $gray-100;
+        color: $dark;
+      }
+    }
+
+    .tab-drawer-trigger {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      span {
+        display: block;
+      }
+
+      .cdc-icon {
+        margin-top: 0.5rem;
+        margin-bottom: 0.75rem;
+      }
+
+      svg {
+        max-width: 30px;
       }
     }
   }
 
   .tab-drawer {
     width: calc((100vw / 16) * 3);
+    height: 100%;
     min-height: 100vh;
+
+    .tab-drawer-content {
+      height: 100%;
+    }
 
     .tab-drawer-content-inner {
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      height: 100%;
       background-color: $gray-100;
     }
 
@@ -194,27 +262,162 @@ h1 {
 // JQUERY UI COMPONENTS
 //
 
+.ui-widget {
+  font-family: $font-family-sans-serif;
+}
+.ui-corner-all,
+.ui-corner-bottom,
+.ui-corner-right,
+.ui-corner-br {
+  border-radius: 0;
+}
+
 // decade slider
 
-$decade-slider-handle-width: 100px;
+$decade-slider-handle-width: 140px;
 
 #decade-slider {
   position: relative;
   width: 100%;
+  height: 6px;
   margin: 0 $decade-slider-handle-width * 0.5;
+  border: none;
+  background-color: $gray-400;
 }
 
 #decade-slider-handle {
+  top: -1.125rem;
   width: $decade-slider-handle-width;
+  height: 2.625rem;
   margin-left: $decade-slider-handle-width * -0.5;
-  background-color: $primary;
-  color: $white;
+  background-color: $white;
   text-align: center;
+  border: none;
+  box-shadow: 0 0.125rem 0.875rem transparentize($black, 0.85);
+  outline: none;
+
+  &.ui-state-active {
+  }
+
+  &:before,
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 0px;
+    border: 10px solid transparent;
+    border-width: 1.1875rem 0.5rem;
+  }
+
+  &:before {
+    left: -1rem;
+    border-right-color: $white;
+  }
+
+  &:after {
+    right: -1rem;
+    border-left-color: $white;
+  }
+
+  span {
+    display: block;
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    background-color: $primary;
+    color: $white;
+    font-size: 1.125rem;
+    line-height: calc(2.625rem - 4px);
+    font-weight: 500;
+    z-index: 2;
+
+    &:before,
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: 0px;
+      border: 10px solid transparent;
+      border-width: 1.1875rem 0.5rem;
+    }
+
+    &:before {
+      left: -1rem;
+      border-right-color: $primary;
+    }
+
+    &:after {
+      right: -1rem;
+      border-left-color: $primary;
+    }
+  }
 }
 
 //
 // BOOTSTRAP COMPONENTS
 //
+
+.card-img {
+  height: 0;
+  padding-bottom: 50%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  opacity: 0.2;
+  transition: 0.25s;
+}
+
+$query-card-hover-padding: 0.75rem;
+
+.query-page {
+  .fw-query-item {
+    transition: 0.25s;
+
+    .card {
+      height: 100%;
+      transition: 0.25s;
+    }
+
+    .card-body {
+      transition: 0.25s;
+    }
+
+    .card-title {
+      a {
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    &:hover {
+      .card {
+        height: calc(100% + ($query-card-hover-padding * 2));
+        margin-top: $query-card-hover-padding * -1;
+        margin-left: $query-card-hover-padding * -1;
+        margin-right: $query-card-hover-padding * -1;
+        box-shadow: 0 0.25rem 1.5rem transparentize($black, 0.9);
+      }
+
+      .card-img {
+        opacity: 0.4;
+      }
+
+      .card-body {
+        margin-left: $query-card-hover-padding;
+        margin-right: $query-card-hover-padding;
+      }
+    }
+  }
+}
 
 //
 // CONTENT TYPES

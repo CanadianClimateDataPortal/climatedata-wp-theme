@@ -10,6 +10,50 @@
     width: calc(100% / 16);
     background-color: transparentize($dark, 0.1);
     z-index: 1000;
+
+    .tab-drawer-trigger {
+      &.active {
+        // data
+        #back-side {
+          fill: $gray-600;
+        }
+
+        #front-face {
+          fill: $primary;
+        }
+
+        // location
+        #frame {
+          fill: $gray-600;
+        }
+
+        #spots {
+          fill: $primary;
+        }
+
+        // display
+        #wells-left {
+          fill: $gray-600;
+        }
+
+        #handles {
+          fill: $primary;
+        }
+
+        // download
+        #dl2 {
+          fill: #9ca5b7;
+        }
+
+        #dl3 {
+          fill: $gray-600;
+        }
+
+        #box {
+          fill: $primary;
+        }
+      }
+    }
   }
 }
 
@@ -55,7 +99,8 @@
   top: 0;
   right: 0;
   height: 100%;
-  width: 100vw;
+  width: calc(100vw + 10px);
+  // margin-right: -10px;
   transition: width 0.2s ease 0s;
   z-index: 1;
 
@@ -66,13 +111,13 @@
     transition: 0.5s ease;
     overflow: hidden;
 
-    &:not(:last-child) {
-      border-right: 10px solid $white;
-    }
+    // &:not(:last-child) {
+    border-left: 10px solid $white;
+    // }
 
     &.hidden {
       flex: 0.000000001 0.00000001 0%;
-      border-right-width: 0px;
+      border-left-width: 0px;
 
       .leaflet-object {
         opacity: 0;
@@ -115,22 +160,36 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 3rem;
-    height: 3rem;
+    width: 3.75rem;
+    height: 3.75rem;
     background-color: $white;
     font-size: 2rem;
-    line-height: 3rem;
+    line-height: 3.75rem;
   }
 }
 
 body.tab-drawer-open {
   #map-objects {
-    width: calc((100vw / 16) * 12);
+    width: calc(((100vw / 16) * 12) + 10px);
   }
 
   #map-control-footer {
     width: calc((100vw / 16) * 12);
     transition: width 0.2s ease 0s;
+  }
+}
+
+.var-query-item {
+  border-bottom: 1px solid $gray-300;
+
+  &:not(:nth-child(3n + 3)) {
+    border-right: 1px solid $gray-300;
+  }
+
+  .var-item-img {
+    position: relative;
+    height: 0;
+    padding-bottom: 40%;
   }
 }
 

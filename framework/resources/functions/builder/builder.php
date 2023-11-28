@@ -537,12 +537,16 @@ function fw_setup_element ( $element, $globals ) {
 							
 							foreach ( $carousel['other']['rows'] as $row ) {
 								
+								// each repeater row
+								
 								$new_val = $row['value'];
 								
 								if ( $row['type'] == 'integer' ) {
 									$new_val = (int) $row['value'];
 								} elseif ( $row['type'] == 'boolean') {
 									$new_val = ( $row['value'] == 'true' ) ? true : false;
+								} elseif ( $row['type'] == 'json' ) {
+									$new_val = json_decode ( $row['value'] );
 								}
 								
 								$carousel[$row['name']] = $new_val;

@@ -86,9 +86,9 @@
 			
 			options.template = $('<div class="fw-query-item">')
 			
-			// options.template.addClass(options.item_options.class.join(' '))
+			options.template.addClass(options.item_options.item_class)
 			
-			// console.log(options)
+			// console.log(options.template)
 			
 			//
 			// EVENTS

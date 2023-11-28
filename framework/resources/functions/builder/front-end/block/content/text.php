@@ -11,15 +11,19 @@ if (
 	!empty ( $element['inputs']['text'][$lang] )
 ) {
 
-	// echo htmlspecialchars_decode ( $element['inputs']['text'][$lang] );
+	// text exists in this language
 
-	$element['text'] = htmlspecialchars_decode ( $element['inputs']['text'][$lang] );
+	// convert to rich text
 	
-	echo $element['text'];
+	$element['text'] = htmlspecialchars_decode ( $element['inputs']['text'][$lang] );
 	
 } else {
 	
+	// text doesn't exist in this language
+	
 	if ( is_user_logged_in() ) {
+		
+		// show warning if logged in
 		
 		echo '<div class="alert alert-warning fw-builder-alert">';
 		echo 'Text field <strong>' . $lang . '</strong> is empty';
@@ -27,6 +31,12 @@ if (
 		
 	}
 	
-	echo htmlspecialchars_decode ( $element['inputs']['text']['en'] );
+	// show EN
+	
+	$element['text'] = htmlspecialchars_decode ( $element['inputs']['text']['en'] );
 	
 }
+
+$element['text'] = do_shortcode ( $element['text'] );
+
+echo $element['text'];

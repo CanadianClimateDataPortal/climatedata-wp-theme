@@ -40,3 +40,44 @@ function taxonomy_resourcecat() {
 
 }
 add_action( 'init', 'taxonomy_resourcecat', 0 );
+
+// topic
+
+// Register Custom Taxonomy
+function taxonomy_topic() {
+
+	$labels = array(
+		'name'                       => _x( 'Topics', 'Taxonomy General Name', 'cdc-taxonomies' ),
+		'singular_name'              => _x( 'Topic', 'Taxonomy Singular Name', 'cdc-taxonomies' ),
+		'menu_name'                  => __( 'Topics', 'cdc-taxonomies' ),
+		'all_items'                  => __( 'All Topics', 'cdc-taxonomies' ),
+		'parent_item'                => __( 'Parent Topic', 'cdc-taxonomies' ),
+		'parent_item_colon'          => __( 'Parent Topic:', 'cdc-taxonomies' ),
+		'new_item_name'              => __( 'New Topic Name', 'cdc-taxonomies' ),
+		'add_new_item'               => __( 'Add New Topic', 'cdc-taxonomies' ),
+		'edit_item'                  => __( 'Edit Topic', 'cdc-taxonomies' ),
+		'update_item'                => __( 'Update Topic', 'cdc-taxonomies' ),
+		'view_item'                  => __( 'View Topic', 'cdc-taxonomies' ),
+		'separate_items_with_commas' => __( 'Separate items with commas', 'cdc-taxonomies' ),
+		'add_or_remove_items'        => __( 'Add or remove items', 'cdc-taxonomies' ),
+		'choose_from_most_used'      => __( 'Choose from the most used', 'cdc-taxonomies' ),
+		'popular_items'              => __( 'Popular Items', 'cdc-taxonomies' ),
+		'search_items'               => __( 'Search Items', 'cdc-taxonomies' ),
+		'not_found'                  => __( 'Not Found', 'cdc-taxonomies' ),
+		'no_terms'                   => __( 'No items', 'cdc-taxonomies' ),
+		'items_list'                 => __( 'Items list', 'cdc-taxonomies' ),
+		'items_list_navigation'      => __( 'Items list navigation', 'cdc-taxonomies' ),
+	);
+	$args = array(
+		'labels'                     => $labels,
+		'hierarchical'               => false,
+		'public'                     => true,
+		'show_ui'                    => true,
+		'show_admin_column'          => true,
+		'show_in_nav_menus'          => true,
+		'show_tagcloud'              => true,
+	);
+	register_taxonomy( 'topic', array( 'resource' ), $args );
+
+}
+add_action( 'init', 'taxonomy_topic', 0 );

@@ -68,8 +68,8 @@ var pushes_since_input = 0;
     // LEARN
     //
 
-    if ($('.learn-module-grid').length) {
-      $('.learn-module-grid').each(function (i) {
+    if ($('.learn-topic-grid').length) {
+      $('.learn-topic-grid').each(function (i) {
         $(this).fw_query({
           elements: {
             filters: $('#control-bar .filter'),

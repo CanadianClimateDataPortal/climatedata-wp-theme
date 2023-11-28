@@ -164,6 +164,8 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 				}
 			)
 			
+			$(document).trigger('td_update_path')
+			
 		},
 		
 		select_content: function(do_history = true) {

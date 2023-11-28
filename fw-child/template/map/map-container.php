@@ -31,7 +31,9 @@
 					<label for="decade" class="form-label sr-only">Decade</label>
 					<input type="hidden" name="decade" id="decade" data-query-key="decade">
 					<div id="decade-slider">
-						<div id="decade-slider-handle" class="ui-slider-handle"></div>
+						<div id="decade-slider-handle" class="ui-slider-handle">
+							<span></span>
+						</div>
 					</div>
 				</div>
 				

@@ -1,10 +1,10 @@
 <div class="col-1">
 	<div id="control-bar" class="control-bar tab-drawer-tabs-container">
 		
-		<div id="control-bar-tabs" class="tab-drawer-tabs">
-			<a href="#modules" class="tab-drawer-trigger">
+		<div id="control-bar-tabs" class="tab-drawer-tabs ps-2">
+			<a href="#topics" class="tab-drawer-trigger">
 				<span class="cdc-icon"></span>
-				<span><?php _e ( 'Modules', 'cdc' ); ?></span>
+				<span><?php _e ( 'Topics', 'cdc' ); ?></span>
 			</a>
 			
 			<a href="#filters" class="tab-drawer-trigger">
@@ -15,27 +15,47 @@
 		
 		<div id="tab-drawer-container" class="tab-drawer-container">
 			
-			<div id="modules" class="tab-drawer">
+			<div id="topics" class="tab-drawer">
 				<div class="tab-drawer-content">
 					<div class="tab-drawer-content-inner">
 						<div class="control-tab-head d-flex justify-content-between">
-							<h5>Modules</h5>
+							<h5>Topics</h5>
 							<span class="tab-drawer-close">&times;</span>
 						</div>
 						
-						<div class="control-tab-body">
+						<div class="control-tab-body ps-2">
+							<?php
 							
-							<div class="p-2">
-								<a href="#module-1" class="h2">1</a>
+								$i = 1;
+								
+								foreach ( get_terms ( array (
+									'taxonomy' => 'topic'
+								) ) as $topic ) {
+							
+							?>
+							
+							<div class="position-relative p-3 border-bottom">
+								<a href="#<?php _e ( 'topic', 'cdc' ); ?>-<?php echo $i; ?>" class="stretched-link"></a>
+								
+								<h2 class="font-family-serif text-secondary"><?php echo $i; ?></h2>
+								
+								<h5><?php echo get_field ( 'title', 'topic_' . $topic->term_id ); ?></h5>
+								
+								<p><?php
+								
+									echo $topic->description;
+								
+								?></p>
+								
 							</div>
 							
-							<div class="p-2">
-								<a href="#module-2" class="h2">2</a>
-							</div>
+							<?php
 							
-							<div class="p-2">
-								<a href="#module-3" class="h2">3</a>
-							</div>
+									$i++;
+									
+								}
+								
+							?>
 							
 						</div>
 					</div>

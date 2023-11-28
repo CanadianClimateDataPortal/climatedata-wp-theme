@@ -1,4 +1,4 @@
-<div id="learn-grid" class="col row">
+<div id="" class="col row bg-gray-200">
 	<?php
 	
 		//
@@ -41,7 +41,7 @@
 			<div id="news-grid" class="py-6" data-args='<?php echo json_encode ( $module_args ); ?>'>
 				
 				<div id="" class="query-container ">
-					<div class="fw-query-items row row-cols-3" data-options='<?php echo json_encode ( $item_options ); ?>'>
+					<div class="fw-query-items row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 g-lg-6" data-options='<?php echo json_encode ( $item_options ); ?>'>
 						
 						<div class="fw-query-item"></div>
 					

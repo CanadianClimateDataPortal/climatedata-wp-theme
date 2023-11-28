@@ -940,7 +940,7 @@
 						// auto insert elements between
 						// parent and new element
 						
-						// options.parent.item.find('.insert-into-empty:not(.persistent').remove()
+						// options.parent.item.find('.fw-insert-into-empty:not(.persistent').remove()
 						
 						if (options.element.data.type == 'template') {
 							
@@ -1780,7 +1780,7 @@
 									// add the new item to its parent's children array
 									options.parent.data.children = [ temp_element.data ]
 									
-									temp_parent.item.find('> .insert-into-empty').remove()
+									temp_parent.item.find('> .fw-insert-into-empty').remove()
 									
 								} else {
 									
@@ -2016,7 +2016,7 @@
 				// add the new item to its parent's children array
 				options.parent.data.children = [ options.element.data ]
 				
-				options.parent.item.find('> .insert-into-empty:not(.persistent)').remove()
+				options.parent.item.find('> .fw-insert-into-empty:not(.persistent)').remove()
 				
 			} else {
 				
@@ -2743,7 +2743,7 @@
 					
 			// console.log('insert dropdown', element.type)
 			
-			let insert_dropdown = $('<div class="dropdown insert-into-empty"><button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown"><span class="plus">+</span>Insert</button>')
+			let insert_dropdown = $('<div class="dropdown fw-insert-into-empty"><button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown"><span class="plus">+</span>Insert</button>')
 			
 			if (keep == true) {
 				

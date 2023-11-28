@@ -1,4 +1,4 @@
-<div id="learn-grid" class="col row">
+<div id="learn-grid" class="col row bg-gray-200">
 	<?php
 	
 		//
@@ -18,27 +18,6 @@
 			'class' => array ( 'row', 'row-cols-3' ),
 			'item_class' => 'col'
 		);
-		
-		// dummy 'modules' array
-		// replace with proper get_terms function
-	
-		$modules = array (
-			array (
-				'slug' => 'module-1',
-				'id' => 16,
-				'title' => __( 'Module 1', 'cdc' ) . ' — ' . get_field ( 'module_title', 'resource-category_' . 16 )
-			),
-			array (
-				'slug' => 'module-2',
-				'id' => 17,
-				'title' => __( 'Module 2', 'cdc' ) . ' — ' . get_field ( 'module_title', 'resource-category_' . 17 )
-			),
-			array (
-				'slug' => 'module-3',
-				'id' => 24,
-				'title' => __( 'Module 3', 'cdc' ) . ' — ' . get_field ( 'module_title', 'resource-category_' . 24 )
-			)
-		);
 			
 	?>
 	
@@ -52,9 +31,11 @@
 				
 				$i = 1;
 				
-				foreach ( $modules as $module ) {
+				foreach ( get_terms ( array (
+					'taxonomy' => 'topic'
+				) ) as $topic ) {
 				
-					$module_args = array (
+					$topic_args = array (
 						'posts_per_page' => 12,
 						'post_type' => 'resource',
 						'orderby' => 'menu_order',
@@ -63,21 +44,24 @@
 						'post_status' => 'publish',
 						'tax_query' => array (
 							array (
-								'taxonomy' => 'resource-category',
+								'taxonomy' => 'topic',
 								'field' => 'slug',
-								'terms' => array ( $module['slug'] )
+								'terms' => array ( $topic->slug )
 							)
 						)
 					);
 				
 			?>
 			
-			<div id="module-<?php echo $i; ?>" class="learn-module-grid py-6" data-args='<?php echo json_encode ( $module_args ); ?>'>
+			<div id="topic-<?php echo $i; ?>" class="learn-topic-grid py-7" data-args='<?php echo json_encode ( $topic_args ); ?>'>
 				
-				<h2 class="mb-5"><?php echo $module['title']; ?></h2>
+				<h4 class="learn-topic-title mb-7 d-flex align-items-center font-weight-normal">
+					<span class="circle-number"><?php echo $i; ?></span>
+					<?php echo get_field ( 'title', 'topic_' . $topic->term_id ); ?>
+				</h4>
 				
 				<div id="" class="query-container ">
-					<div class="fw-query-items row row-cols-3" data-options='<?php echo json_encode ( $item_options ); ?>'>
+					<div class="fw-query-items row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 g-lg-6" data-options='<?php echo json_encode ( $item_options ); ?>'>
 						
 						<div class="fw-query-item"></div>
 					

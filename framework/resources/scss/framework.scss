@@ -20,7 +20,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;600&display=swap');
 
-$fw-font: Inter;
+$fw-font: Inter, $font-family-base;
 
 //
 // HELPERS
@@ -295,7 +295,7 @@ $fw-font: Inter;
 	pointer-events: none;
 	overflow: hidden;
 	transition: opacity 0.25s ease 0s, overflow 0s ease 0s;
-	font-family: $fw-font, $font-family-base;
+	font-family: $fw-font;
 	font-size: 0.75rem;
 	font-weight: 400;
 	color: $white;
@@ -442,17 +442,13 @@ $fw-font: Inter;
 // UX
 //
 
-.fw-btn {
-	&.insert-into-empty {
-	}
-}
-
-.insert-into-empty {
+.fw-insert-into-empty {
 	display: none;
 	align-items: center;
 	justify-content: center;
 	padding: 1rem;
 	background-color: #eee;
+	font-family: $fw-font;
 	
 	.btn {
 		display: flex;
@@ -482,7 +478,7 @@ $fw-font: Inter;
 }
 
 .fw-builder {
-	.insert-into-empty {
+	.fw-insert-into-empty {
 		display: flex;
 	}
 }

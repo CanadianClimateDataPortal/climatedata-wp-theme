@@ -168,7 +168,7 @@ var result = {};
 
       // decade slider
 
-      let handle = $('#decade-slider-handle');
+      let handle = $('#decade-slider-handle span');
 
       $('#decade-slider').slider({
         min: 1970,

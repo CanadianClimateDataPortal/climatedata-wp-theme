@@ -1,0 +1,12 @@
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 49.5 40.5" style="enable-background:new 0 0 49.5 40.5;" xml:space="preserve">
+<style type="text/css">
+	#dl1, #dl2, #dl3, #box{fill:#AFB5C5;}
+</style>
+<g>
+	<rect id="dl1" x="18" transform="matrix(-1 -1.197839e-10 1.197839e-10 -1 49.5 4.5)" class="st0" width="13.5" height="4.5"/>
+	<rect id="dl2" x="13.5" y="9" transform="matrix(-1 -7.187019e-11 7.187019e-11 -1 49.5 22.5)" class="st0" width="22.5" height="4.5"/>
+	<rect id="dl3" x="9" y="18" transform="matrix(-1 -5.133595e-11 5.133595e-11 -1 49.5 49.5)" class="st0" width="31.5" height="13.5"/>
+	<polygon id="box" class="st0" points="0,40.5 49.5,40.5 49.5,27 45,27 45,36 4.5,36 4.5,27 0,27 	"/>
+</g>
+</svg>

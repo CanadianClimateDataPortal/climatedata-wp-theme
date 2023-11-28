@@ -568,6 +568,13 @@ body.admin-bar {
 
 // OFFCANVAS
 
+.fw-builder {
+	.offcanvas {
+		position: static;
+		visibility: visible;
+	}
+}
+
 //
 // ACTIONS
 //
@@ -634,4 +641,4 @@ body.admin-bar {
 		bottom: auto !important;
 		top: auto !important;
 	}
-} 
+}

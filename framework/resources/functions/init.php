@@ -41,10 +41,21 @@ function fw_global_vars() {
 	// this stopped working after adding pre_get_posts for
 	// the lang slug
 	
-	$fw['current_query'] = (array) $wp_query->post;
+	// dumpit ( $wp_query );
 	
-	$fw['current_ancestors'] = get_ancestors ( $fw['current_query']['ID'], $fw['current_query']['post_type'] );
+	if ( is_archive() ) {
+		
+		$fw['current_query'] = (array) get_queried_object();
+		// $fw['current_query'] = $wp_query->tax_query;
+		
+	} else {
+	
+		$fw['current_query'] = (array) $wp_query->post;
+	
+		$fw['current_ancestors'] = get_ancestors ( $fw['current_query']['ID'], $fw['current_query']['post_type'] );
 
+	}
+	
 	$fw['elements'] = array ( 'section', 'container', 'row', 'column', 'block' );
 	
 	// $fw['classes'] = array (
@@ -240,6 +251,12 @@ function custom_theme_setup() {
 			'parent_slug' => 'theme-settings',
 		) );
 		
+		acf_add_options_page ( array (
+			'page_title' => 'Taxonomies',
+			'menu_slug' => 'taxonomies',
+			'parent_slug' => 'theme-settings',
+		) );
+		
 		// 
 		// acf_add_options_sub_page ( array (
 		// 	'page_title'  => 'Header',
@@ -345,20 +362,23 @@ add_action ( 'admin_bar_menu', function ( $admin_bar ) {
 		'title' => '<span class="dashicons dashicons-translation"></span>Language',
 	) );
 	
-	foreach ( get_option ( 'fw_langs') as $code => $lang ) {
-		
-		$admin_bar->add_menu ( array (
-			'id'    => 'fw-actions-item-lang-' . $code ,
-			'parent' => 'fw-actions-item-langs',
-			'title' => $lang['name'],
-			'href'  => translate_permalink ( $GLOBALS['vars']['current_url'], $GLOBALS['fw']['current_query']['ID'], $code ),
-			'meta'  => array (
-				'class' => ''
-			),
-		) );
+	if ( !is_archive() ) {
+			
+		foreach ( get_option ( 'fw_langs') as $code => $lang ) {
+			
+			$admin_bar->add_menu ( array (
+				'id'    => 'fw-actions-item-lang-' . $code ,
+				'parent' => 'fw-actions-item-langs',
+				'title' => $lang['name'],
+				'href'  => translate_permalink ( $GLOBALS['vars']['current_url'], $GLOBALS['fw']['current_query']['ID'], $code ),
+				'meta'  => array (
+					'class' => ''
+				),
+			) );
+			
+		}
 		
 	}
-	
 }, 100 );
 
 

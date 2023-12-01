@@ -1,5 +1,15 @@
 <?php
 
+function array_key_exists_wildcard ( $array, $search, $return = '' ) {
+	$search = str_replace( '\*', '.*?', preg_quote( $search, '/' ) );
+	$result = preg_grep( '/^' . $search . '$/i', array_keys( $array ) );
+	
+	if ( $return == 'key-value' )
+		return array_intersect_key( $array, array_flip( $result ) );
+		
+	return $result;
+}
+
 // add_action ( 'parse_request', 'debug_404_rewrite_dump', 100 );
 
 function debug_404_rewrite_dump ( &$wp ) {
@@ -12,14 +22,14 @@ function debug_404_rewrite_dump ( &$wp ) {
 		echo '<h4>rewrite rules</h4>';
 		dumpit ( $wp_rewrite->wp_rewrite_rules(), true );
 		
+		// echo '<h4>request</h4>';
+		// dumpit ( $wp->request, true );
+		
 		echo '<h4>matched rule and query</h4>';
 		dumpit ( $wp->matched_rule, true );
 		
 		echo '<h4>matched query</h4>';
 		dumpit ( $wp->matched_query, true );
-		
-		// echo '<h4>request</h4>';
-		// dumpit ( $wp->request, true );
 		
 	}
 	
@@ -81,17 +91,15 @@ function fw_init_get_langs() {
 // }, 9 );
 
 
-add_action ( 'init', 'add_my_rewrites', 10 );
+add_action ( 'init', 'fw_add_custom_rewrites', 10 );
 
-function add_my_rewrites () {
-	
-	// echo 'do rewrites<br>';
+function fw_add_custom_rewrites () {
 	
 	global $wp_rewrite;
 	
 	add_rewrite_tag ( '%lang%', '([^&]+)' );
 	
-	$all_langs = get_option ( 'fw_langs' );// get_option ( 'fw_langs' );
+	$all_langs = get_option ( 'fw_langs' );
 	
 	$rewrite_code = $GLOBALS['fw']['current_lang_code'];
 	
@@ -140,6 +148,48 @@ function add_my_rewrites () {
 						'top'
 					);
 					
+					// archive
+					
+					foreach ( get_taxonomies ( array ( 'public' => true ) ) as $taxonomy ) {
+						
+						if ( $taxonomy != 'post_format' ) {
+						
+							$tax_slug = get_option ( 'options_tax_' . $taxonomy . '_slug_' . $code );
+							
+							// taxonomy archive i.e. /fr/tax/term/
+							
+							$taxonomy_rules = array (
+								array (
+									'rule' => '(^' . $code . ')/' . $tax_slug . '/(.+?)/(feed|rdf|rss|rss2|atom)/?$',
+									'query' => 'index.php?lang=$matches[1]&archive=' . $taxonomy . '&slug_' . $code . '=$matches[2]&feed=$matches[3]'
+								),
+								array (
+									'rule' => '(^' . $code . ')/' . $tax_slug . '/(.+?)/embed/?$',
+									'query' => 'index.php?lang=$matches[1]&archive=' . $taxonomy . '&slug_' . $code . '=$matches[2]&embed=true'
+								),
+								array (
+									'rule' => '(^' . $code . ')/' . $tax_slug . '/(.+?)/page/?([0-9]{1,})/?$',
+									'query' => 'index.php?lang=$matches[1]&archive=' . $taxonomy . '&slug_' . $code . '=$matches[2]&paged=$matches[3]'
+								),
+								array (
+									'rule' => '(^' . $code . ')/' . $tax_slug . '/(.+?)/?$',
+									'query' => 'index.php?lang=$matches[1]&archive=' . $taxonomy . '&slug_' . $code . '=$matches[2]'
+								),
+							);
+							
+							foreach ( $taxonomy_rules as $tax_rule ) {
+						
+								add_rewrite_rule (
+									$tax_rule['rule'],
+									$tax_rule['query'],
+									'top'
+								);
+								
+							}
+						}
+						
+					}
+					
 					// page/post
 					
 					add_rewrite_rule (
@@ -174,9 +224,9 @@ function add_my_rewrites () {
 			// echo $GLOBALS['fw']['current_lang_code'] . '<br>';
 			// dumpit ( $_SERVER );
 			
-			$rewrite_code = $GLOBALS['fw']['current_lang_code'];
-			
 			add_filter ( 'rewrite_rules_array', function ( $rules ) {
+				
+				$rewrite_code = $GLOBALS['fw']['current_lang_code'];
 				
 				// $new_rules = $rules;
 				
@@ -188,11 +238,11 @@ function add_my_rewrites () {
 						
 						// add lang=XX
 						
-						$new_query = $query . '&lang=' . $GLOBALS['fw']['current_lang_code'];
+						$new_query = $query . '&lang=' . $rewrite_code;
 						
-						$new_query = str_replace ( '&name=', '&slug_' . $GLOBALS['fw']['current_lang_code'] . '=', $new_query );
+						$new_query = str_replace ( '&name=', '&slug_' . $rewrite_code . '=', $new_query );
 							
-						$new_query = str_replace ( 'pagename=', 'path_' . $GLOBALS['fw']['current_lang_code'] . '=', $new_query );
+						$new_query = str_replace ( 'pagename=', 'path_' . $rewrite_code . '=', $new_query );
 						
 						$rules[$rule] = $new_query;
 						
@@ -201,8 +251,46 @@ function add_my_rewrites () {
 					}
 					
 				}
-				return $rules;
 				
+				// taxonomies
+				
+				foreach ( get_taxonomies ( array ( 'public' => true ) ) as $taxonomy ) {
+					
+					// echo $taxonomy . '<br>';
+					
+					if ( $taxonomy != 'post_format' ) {
+						
+						$tax_slug = get_option ( 'options_tax_' . $taxonomy . '_slug_' . $rewrite_code );
+						
+						// taxonomy archive i.e. /tax(fr)/term(fr)/
+						
+						// find items in $rules that start with the taxonomy slug
+						
+						$default_rules = array_key_exists_wildcard ( $rules, $taxonomy . '*', 'key-value' );
+						
+						foreach ( $default_rules as $rule => $query ) {
+							
+							$new_key = str_replace ( $taxonomy . '/', $tax_slug . '/', $rule );
+							
+							$new_query = $query . '&archive=' . $taxonomy;
+							
+							// replace category_name= with slug=
+							$new_query = str_replace ( 'category_name=', 'slug_' . $rewrite_code . '=', $new_query );
+							
+							// replace tax= with slug=
+							$new_query = str_replace ( $taxonomy . '=', 'slug_' . $rewrite_code . '=', $new_query );
+							
+							// echo $new_query . '<br>';
+							
+							$rules = array ( $new_key => $new_query ) + $rules;
+							
+						}
+							
+					}
+					
+				}
+				
+				return $rules;
 				
 			}, 1 );
 			
@@ -225,9 +313,7 @@ add_action ( 'template_redirect', function() {
 add_filter ( 'query_vars', function ( $query_vars ) {
 	
 	$query_vars[] = 'lang';
-	// commented out because 2 'langs' were showing up in 
-	// dumpit ( $query_vars );
-	// and not really sure why
+	$query_vars[] = 'archive';
 	
 	foreach ( get_option ( 'fw_langs' ) as $code => $lang ) {
 		$query_vars[] = 'slug_' . $code;
@@ -254,50 +340,125 @@ function get_post_by_lang_slug ( $query ) {
 		$query->is_main_query()
 	) {
 		
+		// dumpit ( $query );
+		
 		foreach ( get_option ( 'fw_langs' ) as $code => $lang ) {
 			
-			if (
-				isset ( $query->query_vars['slug_' . $code] ) &&
-				!empty ( $query->query_vars['slug_' . $code] )
-			) {
-				
-				// if ( isset ( $query->query_vars['post_type'] ) {
-					// $query->set ( 'post_type', array ( 'post', 'page' ) );
-				// }
-		
-				
-				$query->set ( 'meta_query', array ( 
-					array (
-						'key' => 'slug_' . $code,
-						'value' => $query->query_vars['slug_' . $code],
-						'compare' => '='
-					)
-				) );
-				
-			}
+			// archive
 			
 			if (
-				isset ( $query->query_vars['path_' . $code] ) &&
-				!empty ( $query->query_vars['path_' . $code] )
+				(
+					isset ( $query->query_vars['slug_' . $code] ) &&
+					!empty ( $query->query_vars['slug_' . $code] )
+				) &&
+				(
+					isset ( $query->query_vars['archive'] ) &&
+					$query->query_vars['archive'] != ''
+				)
 			) {
-			
-				$query->set ( 'post_type', array ( 'post', 'page' ) );
 				
-				$query->set ( 'meta_query', array ( 
-					array (
-						'key' => 'path_' . $code,
-						'value' => $query->query_vars['path_' . $code],
-						'compare' => '='
-					)
+				// find the term that matches the slug
+				
+				$en_term = get_terms ( array (
+					'hide_empty' => false,
+					'meta_query' => array(
+						array (
+							'key' => 'slug_' . $code,
+							'value' => $query->query_vars['slug_' . $code],
+							'compare' => 'LIKE'
+						)
+					),
 				) );
+					
+				if ( !empty ( $en_term ) ) {
+					
+					$en_term = $en_term[0];
+					
+					$query->is_archive = true;
+					$query->is_home = false;
+					
+					if ( $query->query_vars['archive'] == 'category' ) {
+						
+						// category
+						
+						// unset ( $query->query_vars['slug_' . $code] );
+						// unset ( $query->query_vars['archive'] );
+						
+						$query->query['category_name'] = $en_term->slug;
+						$query->query_vars['category_name'] = $en_term->slug;
+						
+						$query->is_category = true;
+						
+					} elseif ( $query->query_vars['archive'] == 'post_tag' ) {
+						
+						// tag
+						
+						$query->is_tag = true;
+						
+					} else {
+						
+						// custom taxonomy
+					
+						$query->is_tax = true;
+						$query->query_vars[$query->query_vars['archive']] = $en_term->slug;
+						
+					}
+					
+					// $query->set ( 'tax_query', array (
+					// 	array (
+					// 		'taxonomy' =>  $en_term->taxonomy,
+					// 		'field' => 'slug',
+					// 		'terms' => array ( $en_term->slug )
+					// 	)
+					// ) );
+					
+				}
+			
+			} else {
+			
+				// page
+				
+				if (
+					isset ( $query->query_vars['slug_' . $code] ) &&
+					!empty ( $query->query_vars['slug_' . $code] )
+				) {
+					
+					$query->set ( 'meta_query', array ( 
+						array (
+							'key' => 'slug_' . $code,
+							'value' => $query->query_vars['slug_' . $code],
+							'compare' => '='
+						)
+					) );
+					
+				}
+				
+				if (
+					isset ( $query->query_vars['path_' . $code] ) &&
+					!empty ( $query->query_vars['path_' . $code] )
+				) {
+				
+					$query->set ( 'post_type', array ( 'post', 'page' ) );
+					
+					$query->set ( 'meta_query', array ( 
+						array (
+							'key' => 'path_' . $code,
+							'value' => $query->query_vars['path_' . $code],
+							'compare' => '='
+						)
+					) );
+					
+				}
 				
 			}
 			
 		}
 		
+		// correct here
+		// dumpit ( $query );
+		// echo '<hr>';
+		
 	}
-	
-	// dumpit ( $query );
 	
 }
 
@@ -529,12 +690,43 @@ add_filter ( 'document_title_parts', 'translate_doc_title' );
 
 function translate_doc_title ( $title_array ) {
 	
-	if (
-		$GLOBALS['fw']['current_lang_code'] != 'en' &&
-		get_post_meta ( get_the_ID(), 'title_' . $GLOBALS['fw']['current_lang_code'], true )
+	$lang = $GLOBALS['fw']['current_lang_code'];
+	
+	if ( is_archive() ) {
+		
+		$this_tax = get_taxonomy ( $GLOBALS['fw']['current_query']['taxonomy'] );
+		$tax_name = $this_tax->labels->singular_name;
+		$term_name = '';
+			
+		if ( $lang != 'en' ) {
+			
+			$tax_name = get_option ( 'options_tax_' . $GLOBALS['fw']['current_query']['taxonomy'] . '_title_single_' . $lang );
+			
+			$term_name = get_term_meta ( $GLOBALS['fw']['current_query']['term_id'], 'title_' . $lang, true );
+			
+		}
+		
+		if ( $term_name != '' ) {
+		
+			$title_array['title'] = get_term_meta ( $GLOBALS['fw']['current_query']['term_id'], 'title_' . $lang, true );
+			
+		}
+		
+		if ( $tax_name != '' ) {
+		
+			$title_array = array_slice ( $title_array, 0, 1, true ) 
+				+ array ( 'tax' => $tax_name ) 
+				+ array_slice ( $title_array, 1, true );
+				
+		}
+		
+	} elseif (
+		( is_page() || is_singular() ) &&
+		get_post_meta ( get_the_ID(), 'title_' . $lang, true ) != ''
 	) {
 		
-		$title_array['title'] = get_post_meta ( get_the_ID(), 'title_' . $GLOBALS['fw']['current_lang_code'], true );
+		$title_array['title'] = get_post_meta ( get_the_ID(), 'title_' . $lang, true );
+		
 	}
 	
 	return $title_array;

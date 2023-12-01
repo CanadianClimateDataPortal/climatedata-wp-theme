@@ -230,13 +230,12 @@
 
         // grid layer
 
-        var gridline_color = '#fff';
-        var gridline_color_hover = '#fff';
-        var gridline_color_active = '#fff';
-        var gridline_width = '0.2';
-        var gridline_width_active = '1';
-
-        var gridfill_color_hover = '#fff';
+        let gridline_color = '#fff',
+          gridline_color_hover = '#fff',
+          gridline_color_active = '#fff',
+          gridline_width = '0.2',
+          gridline_width_active = '1',
+          gridfill_color_hover = '#fff';
 
         let gridLayer_options = {
           rendererFactory: L.canvas.tile,

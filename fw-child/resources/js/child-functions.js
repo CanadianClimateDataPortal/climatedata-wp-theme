@@ -59,7 +59,7 @@ var pushes_since_input = 0;
     if ($('#news-grid').length) {
       $('#news-grid').fw_query({
         elements: {
-          filters: $('#control-bar .filter'),
+          filters: $('#control-bar .fw-query-filter'),
           sort: $('#sort-menu'),
         },
       });
@@ -73,7 +73,7 @@ var pushes_since_input = 0;
       $('.learn-topic-grid').each(function (i) {
         $(this).fw_query({
           elements: {
-            filters: $('#control-bar .filter'),
+            filters: $('#control-bar .fw-query-filter'),
             sort: $('#sort-menu'),
           },
         });

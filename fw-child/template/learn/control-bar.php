@@ -27,7 +27,7 @@
 				<div class="tab-drawer-content">
 					<div class="tab-drawer-content-inner">
 						<div class="control-tab-head d-flex justify-content-between">
-							<h5>Topics</h5>
+							<h5><?php _e ( 'Topics', 'cdc' ); ?></h5>
 							<span class="tab-drawer-close">&times;</span>
 						</div>
 						
@@ -74,20 +74,20 @@
 				<div class="tab-drawer-content">
 					<div class="tab-drawer-content-inner">
 						<div class="control-tab-head d-flex justify-content-between">
-							<h5>Filters</h5>
+							<h5><?php _e ( 'Filters', 'cdc' ); ?></h5>
 							<span class="tab-drawer-close">&times;</span>
 						</div>
 						
 						<div class="control-tab-body query-container">
 							
 							<div class="fw-query-filter " data-filter-type="meta" data-filter-multi="false">
-								<h6 class="text-primary">Content Type</h6>
+								<h6 class="text-primary"><?php _e ( 'Content Type', 'cdc' ); ?></h6>
 								
 								<ul class="list-unstyled">
-									<li class="filter-item" data-key="asset_type" data-value="video">Video</li>
-									<li class="filter-item" data-key="asset_type" data-value="audio">Audio</li>
-									<li class="filter-item" data-key="asset_type" data-value="interactive">Interactive</li>
-									<li class="filter-item" data-key="asset_type" data-value="article">Article</li>
+									<li class="filter-item" data-key="asset_type" data-value="video"><?php _e ( 'Video', 'cdc' ); ?></li>
+									<li class="filter-item" data-key="asset_type" data-value="audio"><?php _e ( 'Audio', 'cdc' ); ?></li>
+									<li class="filter-item" data-key="asset_type" data-value="interactive"><?php _e ( 'Interactive', 'cdc' ); ?></li>
+									<li class="filter-item" data-key="asset_type" data-value="article"><?php _e ( 'Article', 'cdc' ); ?></li>
 								</ul>
 							</div>
 							

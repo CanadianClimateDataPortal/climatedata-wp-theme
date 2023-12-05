@@ -1,14 +1,22 @@
 <div class="col-1">
 	<div id="control-bar" class="control-bar tab-drawer-tabs-container">
 		
-		<div id="control-bar-tabs" class="tab-drawer-tabs ps-2">
+		<div id="control-bar-tabs" class="tab-drawer-tabs pt-2">
 			<a href="#topics" class="tab-drawer-trigger">
-				<span class="cdc-icon"></span>
+				<span class="cdc-icon"><?php
+				
+					echo file_get_contents ( locate_template ( 'resources/img/icon-topic.svg' ) );
+					
+				?></span>
 				<span><?php _e ( 'Topics', 'cdc' ); ?></span>
 			</a>
 			
 			<a href="#filters" class="tab-drawer-trigger">
-				<span class="cdc-icon"></span>
+				<span class="cdc-icon"><?php
+				
+					echo file_get_contents ( locate_template ( 'resources/img/icon-display.svg' ) );
+					
+				?></span>
 				<span><?php _e ( 'Filters', 'cdc' ); ?></span>
 			</a>
 		</div>
@@ -72,7 +80,7 @@
 						
 						<div class="control-tab-body query-container">
 							
-							<div class="filter " data-filter-type="meta" data-filter-multi="false">
+							<div class="fw-query-filter " data-filter-type="meta" data-filter-multi="false">
 								<h6 class="text-primary">Content Type</h6>
 								
 								<ul class="list-unstyled">

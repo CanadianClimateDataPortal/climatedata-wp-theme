@@ -5,11 +5,8 @@ function fw_acf_fields_init() {
 	if ( function_exists ( 'acf_add_local_field_group' ) ) {
 	
 		$GLOBALS['fw_fields'] = array (
-			// 'defaults' => array(),					// default values i.e. colour choices
+			'defaults' => array(),					// default values i.e. colour choices
 			// 'common' => array(),						// common field groups i.e. settings, functions, elements
-			// 'builder_groups' => array(),		// inactive field groups to be used as clones in the builder flex i.e. heading, text
-			// 'builder_flex' => array(),			// content flex fields to be used as clones in the page builder i.e. block (content), block (navigation)
-			// 'builder' => array(),						// the main page builder field group
 			'admin' => array()							// backend & admin utilities
 		);
 		
@@ -48,7 +45,15 @@ function fw_acf_fields_init() {
 	// ADMIN
 	//
 	
+	// MISC
+	
 	include ( locate_template ( 'resources/functions/field-groups/admin.php' ) );
+	
+	// TAXONOMY
+	
+	include ( locate_template ( 'resources/functions/field-groups/taxonomy.php' ) );
+	
+	// REGISTER
 	
 	foreach ( $GLOBALS['fw_fields']['admin'] as $key => $type ) {
 	

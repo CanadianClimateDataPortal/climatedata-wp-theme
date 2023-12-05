@@ -1,8 +1,10 @@
 <?php
 
 //
-// THEME SETUP
+// OPTIONS PAGES
 //
+
+// THEME SETUP
 
 $GLOBALS['fw_fields']['admin']['status'] = array (
 	'settings' => array (
@@ -51,9 +53,7 @@ $GLOBALS['fw_fields']['admin']['status'] = array (
 	)
 );
 
-//
 // LANGUAGES
-//
 
 $GLOBALS['fw_fields']['admin']['langs'] = array (
 	'settings' => array (
@@ -244,3 +244,131 @@ $GLOBALS['fw_fields']['admin']['langs'] = array (
 		'show_in_rest' => 0,
 	) 
 );
+
+// TAXONOMY SETTINGS
+
+
+$GLOBALS['fw_fields']['admin']['taxonomy'] = array (
+	'settings' => array (
+		'title' => 'Taxonomy Settings'
+	),
+	'field_group' => array (
+		'key' => 'admin_tax',
+		'title' => 'Taxonomy Settings',
+		'fields' => array(),
+		'location' => array(
+			array(
+				array(
+					'param' => 'options_page',
+					'operator' => '==',
+					'value' => 'taxonomies',
+				),
+			),
+		),
+		'menu_order' => 0,
+		'position' => 'normal',
+		'style' => 'default',
+		'label_placement' => 'top',
+		'instruction_placement' => 'label',
+		'hide_on_screen' => '',
+		'active' => true,
+		'description' => '',
+		'show_in_rest' => 0,
+	)
+);
+	
+// dumpit ( get_taxonomies ( array ( 'public' => true ), 'objects' ) );
+
+
+foreach ( get_taxonomies ( array ( 'public' => true ), 'objects' ) as $taxonomy ) {
+	
+	array_push (
+		$GLOBALS['fw_fields']['admin']['taxonomy']['field_group']['fields'],
+		array(
+			'key' => 'admin_tax_' . $taxonomy->name . '_name',
+			'label' => '',
+			'name' => '',
+			'type' => 'message',
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'message' => '<h3>' . $taxonomy->label . '</h3>',
+			'esc_html' => 0,
+			'new_lines' => 'wpautop',
+		),
+		/*array(
+			'key' => 'admin_tax_' . $taxonomy->name . '_builder',
+			'label' => 'Use Builder on Archive',
+			'name' => 'tax_' . $taxonomy->name . '_builder',
+			'aria-label' => '',
+			'type' => 'true_false',
+			'instructions' => '',
+			'required' => 0,
+			'conditional_logic' => 0,
+			'wrapper' => array(
+				'width' => '',
+				'class' => '',
+				'id' => '',
+			),
+			'message' => '',
+			'default_value' => 0,
+			'ui' => 0,
+			'ui_on_text' => '',
+			'ui_off_text' => '',
+		)*/
+	);
+	
+	foreach ( get_option ( 'fw_langs') as $code => $lang ) {
+	
+		if ( $code != 'en' ) {
+			
+			array_push (
+				$GLOBALS['fw_fields']['admin']['taxonomy']['field_group']['fields'],
+				array(
+					'key' => 'admin_tax_' . $taxonomy->name . '_name_' . $code,
+					'label' => $lang['name'],
+					'name' => '',
+					'type' => 'message',
+					'wrapper' => array(
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					),
+					'esc_html' => 0,
+					'new_lines' => 'wpautop',
+				),
+				array(
+					'key' => 'admin_tax_' . $taxonomy->name . '_title_single_' . $code,
+					'label' => 'Title (Singular)',
+					'name' => 'tax_' . $taxonomy->name . '_title_single_' . $code,
+					'type' => 'text',
+					'wrapper' => array(
+						'width' => '33',
+					),
+				),
+				array(
+					'key' => 'admin_tax_' . $taxonomy->name . '_title_plural_' . $code,
+					'label' => 'Title (Plural)',
+					'name' => 'tax_' . $taxonomy->name . '_title_plural_' . $code,
+					'type' => 'text',
+					'wrapper' => array(
+						'width' => '33',
+					),
+				),
+				array(
+					'key' => 'admin_tax_' . $taxonomy->name . '_slug_' . $code,
+					'label' => 'Slug',
+					'name' => 'tax_' . $taxonomy->name . '_slug_' . $code,
+					'type' => 'text',
+					'wrapper' => array(
+						'width' => '33',
+					),
+				),
+			);
+			
+		}
+	}
+	
+}

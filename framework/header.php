@@ -14,6 +14,8 @@
 		echo '-->';
 	// }
 	
+	// dumpit ( get_option ( 'fw_test' ) );
+	
 ?>
 <!doctype html>
 <html lang="<?php echo $GLOBALS['fw']['current_lang_code']; ?>" class="no-js">

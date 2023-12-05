@@ -60,6 +60,7 @@ var pushes_since_input = 0;
       $('#news-grid').fw_query({
         elements: {
           filters: $('#control-bar .filter'),
+          sort: $('#sort-menu'),
         },
       });
     }
@@ -73,6 +74,7 @@ var pushes_since_input = 0;
         $(this).fw_query({
           elements: {
             filters: $('#control-bar .filter'),
+            sort: $('#sort-menu'),
           },
         });
       });

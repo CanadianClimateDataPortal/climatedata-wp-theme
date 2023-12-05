@@ -100,6 +100,7 @@ function get_dir_contents ( $dir, &$results = array() ) {
 function dumpit ( $var ) {
 
 	echo '<pre style="font-size: 9px;">';
-	print_r($var);
+	print_r ( $var );
+	// var_dump ( $var );
 	echo '</pre>';
 }

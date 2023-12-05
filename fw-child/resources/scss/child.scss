@@ -123,6 +123,61 @@ h1 {
   color: $secondary;
 }
 
+// control bar icons
+
+.tab-drawer-trigger {
+  &.active {
+    // data
+    #back-side {
+      fill: $gray-600;
+    }
+
+    #front-face {
+      fill: $primary;
+    }
+
+    // location
+    #frame {
+      fill: $gray-600;
+    }
+
+    #spots {
+      fill: $primary;
+    }
+
+    // display
+    #wells-left {
+      fill: $gray-600;
+    }
+
+    #handles {
+      fill: $primary;
+    }
+
+    // download
+    #dl2 {
+      fill: #9ca5b7;
+    }
+
+    #dl3 {
+      fill: $gray-600;
+    }
+
+    #box {
+      fill: $primary;
+    }
+
+    // topic
+    #folder {
+      fill: $gray-600;
+    }
+
+    #file {
+      fill: $primary;
+    }
+  }
+}
+
 //
 // STRUCTURE
 //

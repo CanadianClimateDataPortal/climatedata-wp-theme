@@ -1,6 +1,7 @@
 <?php
 
-acf_add_local_field_group(array(
+/*
+acf_add_local_field_group (array(
 	'key' => 'group_5dc2e789a214f',
 	'title' => 'Defaults — Layout',
 	'fields' => array(
@@ -329,6 +330,7 @@ acf_add_local_field_group(array(
 	'active' => true,
 	'description' => '',
 ));
+*/
 
 //
 // THEME COLOURS

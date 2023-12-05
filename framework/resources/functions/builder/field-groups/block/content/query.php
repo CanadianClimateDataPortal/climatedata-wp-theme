@@ -216,6 +216,7 @@
 						<ul id="query-builder-form-add-items" class="dropdown-menu fw-form-flex-menu" aria-labelledby="query-builder-form-add">
 							<li><span class="dropdown-item" data-flex-item="container">Container</span></li>
 							<li><span class="dropdown-item" data-flex-item="filter">Filter Item</span></li>
+							<li><span class="dropdown-item" data-flex-item="sort">Sort Menu</span></li>
 							<li><span class="dropdown-item" data-flex-item="items">Items</span></li>
 						</ul>
 					</div>

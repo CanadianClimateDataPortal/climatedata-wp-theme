@@ -3,7 +3,6 @@
 //
 
 #floating-header {
-  padding: 0.5rem;
   background-color: transparentize($dark, 0.1);
 }
 
@@ -18,4 +17,43 @@
   min-height: 100%;
   background-color: $dark;
   color: $white;
+}
+
+//
+// MENU OVERLAY
+//
+
+#menu {
+  a {
+    color: $gray-600;
+    text-decoration: none;
+    transition: 0.25s;
+  }
+
+  .btn-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+}
+
+#menu-header {
+  p {
+    margin-bottom: 0;
+    font-size: 1.25rem;
+  }
+}
+
+#menu-primary {
+  font-size: 1.75rem;
+
+  a {
+    &:hover {
+      color: $secondary;
+      background-color: $white;
+    }
+  }
+}
+
+#menu-secondary {
 }

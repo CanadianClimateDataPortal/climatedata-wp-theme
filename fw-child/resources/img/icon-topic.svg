@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 49.5 40.5" style="enable-background:new 0 0 49.5 40.5;" xml:space="preserve">
+<style type="text/css">
+	#folder, #file{fill:#AFB5C5;}
+</style>
+<g>
+	<path id="folder" d="M18,13.5v15.8c0,3.7-3,6.8-6.8,6.8s-6.8-3-6.8-6.8V13.5H9v15.8h4.5V13.5V9H0v20.2
+		c0,6.2,5,11.2,11.2,11.2h27c6.2,0,11.2-5,11.2-11.2V13.5H18z"/>
+	<polygon id="file" points="13.5,9 45,9 45,0 9,0 9,29.2 13.5,29.2 	"/>
+</g>
+</svg>

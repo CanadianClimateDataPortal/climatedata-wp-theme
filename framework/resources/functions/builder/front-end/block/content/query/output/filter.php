@@ -93,7 +93,7 @@
 ?>
 
 <div
-	class="filter <?php echo implode ( ' ' , $options['class'] ); ?>"
+	class="fw-query-filter <?php echo implode ( ' ' , $options['class'] ); ?>"
 	<?php
 	
 		foreach ( $filter_atts as $att => $val ) {

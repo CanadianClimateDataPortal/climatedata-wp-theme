@@ -24,7 +24,7 @@
 						
 						<div class="control-tab-body query-container">
 							
-							<div class="fw-query-filter " data-filter-type="taxonomy" data-filter-multi="false">
+							<div class="fw-query-filter p-3" data-filter-type="taxonomy" data-filter-multi="false">
 								<h6 class="text-primary"><?php _e ( 'Tag', 'fw' ); ?></h6>
 								
 								<?php

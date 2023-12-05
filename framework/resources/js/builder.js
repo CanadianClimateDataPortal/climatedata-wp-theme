@@ -4142,9 +4142,9 @@
 			
 			container.find('.fw-form-flex-row').each(function(i, item) {
 				
-				console.log($(this).attr('data-item'))
+				// console.log($(this).attr('data-item'))
 				$(item).attr('data-row-index', i)
-				console.log($(item).find('[name$="' + $(this).attr('data-item') + '-index"]'))
+				// console.log($(item).find('[name$="' + $(this).attr('data-item') + '-index"]'))
 				$(item).find('.card-body > [name$="index"]').val(i)
 			})
 			
@@ -4348,6 +4348,27 @@
 			
 		},
 		
+		reset_arrays: function(data) {
+			
+			for (let key in data) {
+				
+				console.log(key, data[key])
+				
+				if (Array.isArray(data[key])) {
+					console.log(key, typeof data)
+					data[key] = []
+				} else if (
+					typeof data[key] == 'object' &&
+					Object.keys(data[key]).length !== 0
+				) {
+					data[key] = this.reset_arrays(data[key])
+				}
+			}
+			
+			return data
+			
+		},
+		
 		add_form_data_to_element: function(form_data) {
 			
 			let plugin = this,
@@ -4391,7 +4412,13 @@
 			// instead go through the inputs object
 			// and reset any array it finds
 			
-			// console.log('pre', JSON.stringify(options.element.data.inputs, null, 2))
+			console.log('pre')
+			console.log(JSON.stringify(options.element.data.inputs, null, 4))
+			
+			element_data.inputs = plugin.reset_arrays(element_data.inputs)
+			
+			console.log('post')
+			console.log(JSON.stringify(options.element.data.inputs, null, 4))
 			
 			form_data.forEach(function(input) {
 				
@@ -4805,9 +4832,23 @@
 						
 						// add my object at the right index
 						
-						if (!current_parent[options.data.array_indexes[options.data.array_key]][property]) {
+						// indexes[key]
+						if (!options.data.array_indexes.hasOwnProperty(options.data.array_key)) {
+							options.data.array_indexes[options.data.array_key] = 0
+						}
+						
+						// parent[indexes[key]]
+						if (!current_parent.hasOwnProperty(options.data.array_indexes[options.data.array_key])) {
+							current_parent[options.data.array_indexes[options.data.array_key]] = {}
+						}
+						
+						// parent[indexes[key]][property]
+						if (!current_parent[options.data.array_indexes[options.data.array_key]].hasOwnProperty(property)) {
 							current_parent[options.data.array_indexes[options.data.array_key]][property] = {}
 						}
+						
+						// set this property as the new current_parent 
+						// for the recursive function
 						
 						parent_to_send = current_parent[options.data.array_indexes[options.data.array_key]][property]
 						

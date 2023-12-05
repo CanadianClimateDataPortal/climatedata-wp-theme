@@ -15,7 +15,8 @@
 			template: null,
 			elements: {
 				item_container: null,
-				filters: null
+				filters: null,
+				sort: null
 			},
 			tax_query: null,
 			meta_query: null,
@@ -55,10 +56,13 @@
 			
 			// filter container
 			if (options.elements.filters == null) {
-				options.elements.filters = item.find('.filter')
+				options.elements.filters = item.find('.fw-query-filter')
 				// console.log(item.find('.filter'))
 				// console.log(options.elements.filters)
 			}
+			
+			// sort container
+			options.elements.sort = item.find('.fw-query-sort')
 			
 			// [fw] element key
 			options.fw_key = item.closest('.fw-element').attr('data-key')
@@ -94,6 +98,8 @@
 			// EVENTS
 			//
 			
+			// click a filter
+			
 			if (options.elements.filters != null) {
 				options.elements.filters.on('click', '.filter-item', function(e) {
 					
@@ -105,7 +111,7 @@
 							
 						} else {
 							
-							if ($(this).closest('.filter').attr('data-filter-multi') == 'false') {
+							if ($(this).closest('.fw-query-filter').attr('data-filter-multi') == 'false') {
 								$(this).siblings().removeClass('selected')
 							}
 							
@@ -119,6 +125,19 @@
 					}
 					
 					plugin.update_filters()
+					
+				})
+			}
+			
+			if (options.elements.sort != null) {
+				options.elements.sort.on('click', 'li', function(e) {
+					
+					let sort = $(this).attr('data-sort').split('_')
+					
+					options.args.orderby = sort[0]
+					options.args.order = sort[1]
+					
+					plugin.do_query()
 					
 				})
 			}

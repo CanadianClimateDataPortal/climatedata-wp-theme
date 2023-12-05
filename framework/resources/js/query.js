@@ -57,12 +57,12 @@
 			// filter container
 			if (options.elements.filters == null) {
 				options.elements.filters = item.find('.fw-query-filter')
-				// console.log(item.find('.filter'))
-				// console.log(options.elements.filters)
 			}
 			
 			// sort container
-			options.elements.sort = item.find('.fw-query-sort')
+			if (options.elements.sort == null) {
+				options.elements.sort = item.find('.fw-query-sort')
+			}
 			
 			// [fw] element key
 			options.fw_key = item.closest('.fw-element').attr('data-key')
@@ -136,6 +136,9 @@
 					
 					options.args.orderby = sort[0]
 					options.args.order = sort[1]
+					
+					options.elements.sort.find('li').removeClass('selected')
+					$(this).addClass('selected')
 					
 					plugin.do_query()
 					

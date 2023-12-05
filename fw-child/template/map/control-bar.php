@@ -9,40 +9,40 @@
 	
 	<a href="#menu" id="menu-trigger" class="d-block p-2"><i class="fas fa-align-left text-white"></i></a>
 	
-	<div id="control-bar-tabs" class="tab-drawer-tabs w-100">
+	<div id="control-bar-tabs" class="tab-drawer-tabs w-100 pt-2">
 		<a href="#data" class="tab-drawer-trigger">
 			<span class="cdc-icon"><?php
 				
-					echo file_get_contents ( locate_template ( 'resources/img/icon-data.svg' ) );
-					
-				?></span>
+				echo file_get_contents ( locate_template ( 'resources/img/icon-data.svg' ) );
+				
+			?></span>
 			<span><?php _e ( 'Data', 'cdc' ); ?></span>
 		</a>
 		
 		<a href="#location" class="tab-drawer-trigger">
 			<span class="cdc-icon"><?php
 				
-					echo file_get_contents ( locate_template ( 'resources/img/icon-location.svg' ) );
-					
-				?></span>
+				echo file_get_contents ( locate_template ( 'resources/img/icon-location.svg' ) );
+				
+			?></span>
 			<span><?php _e ( 'Location', 'cdc' ); ?></span>
 		</a>
 		
 		<a href="#display" class="tab-drawer-trigger">
 			<span class="cdc-icon"><?php
 				
-					echo file_get_contents ( locate_template ( 'resources/img/icon-display.svg' ) );
-					
-				?></span>
+				echo file_get_contents ( locate_template ( 'resources/img/icon-display.svg' ) );
+				
+			?></span>
 			<span><?php _e ( 'Display', 'cdc' ); ?></span>
 		</a>
 		
 		<a href="#download" class="tab-drawer-trigger">
 			<span class="cdc-icon"><?php
 				
-					echo file_get_contents ( locate_template ( 'resources/img/icon-download.svg' ) );
-					
-				?></span>
+				echo file_get_contents ( locate_template ( 'resources/img/icon-download.svg' ) );
+				
+			?></span>
 			<span><?php _e ( 'Download', 'cdc' ); ?></span>
 		</a>
 	</div>

@@ -10,50 +10,6 @@
     width: calc(100% / 16);
     background-color: transparentize($dark, 0.1);
     z-index: 1000;
-
-    .tab-drawer-trigger {
-      &.active {
-        // data
-        #back-side {
-          fill: $gray-600;
-        }
-
-        #front-face {
-          fill: $primary;
-        }
-
-        // location
-        #frame {
-          fill: $gray-600;
-        }
-
-        #spots {
-          fill: $primary;
-        }
-
-        // display
-        #wells-left {
-          fill: $gray-600;
-        }
-
-        #handles {
-          fill: $primary;
-        }
-
-        // download
-        #dl2 {
-          fill: #9ca5b7;
-        }
-
-        #dl3 {
-          fill: $gray-600;
-        }
-
-        #box {
-          fill: $primary;
-        }
-      }
-    }
   }
 }
 
@@ -196,3 +152,19 @@ body.tab-drawer-open {
 //
 // LEARN
 //
+
+//
+// NEWS
+//
+
+#sort-menu {
+  li {
+    transition: 0.25s;
+    cursor: pointer;
+    color: $gray-600;
+  }
+
+  .selected {
+    color: $primary;
+  }
+}

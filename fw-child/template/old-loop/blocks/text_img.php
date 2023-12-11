@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-13 offset-2 col-lg-10">
+  <div class="col">
     <?php
     
       include ( locate_template ( 'template/old-loop/elements/heading.php' ) );
@@ -24,23 +24,23 @@
         switch ( get_sub_field ( 'position' ) ) {
           
           case 'above' : 
-            array_push ( $image_class, 'col-12', 'offset-1', 'col-lg-10', 'order-1', 'mb-3' );
-            array_push ( $text_class, 'col-12', 'offset-1', 'col-lg-10', 'order-2' );
+            array_push ( $image_class, 'col-12', 'col-lg-10', 'order-1', 'mb-3' );
+            array_push ( $text_class, 'col-12', 'col-lg-10', 'order-2' );
             break;
           
           case 'below' : 
-            array_push ( $image_class, 'col-12', 'offset-1', 'col-lg-10' );
-            array_push ( $text_class, 'col-12', 'offset-1', 'col-lg-10' );
+            array_push ( $image_class, 'col-12', 'col-lg-10' );
+            array_push ( $text_class, 'col-12', 'col-lg-10' );
             break;
           
           case 'left' : 
-            array_push ( $image_class, 'col-12', 'offset-1', 'col-md-4', 'order-1', 'mb-3', 'mb-md-0' );
-            array_push ( $text_class, 'col-12', 'offset-1', 'col-md-7', 'order-2' );
+            array_push ( $image_class, 'col-12', 'col-md-4', 'order-1', 'mb-3', 'mb-md-0' );
+            array_push ( $text_class, 'col-12', 'col-md-7', 'offset-md-1', 'order-2' );
             break;
           
           case 'right' : 
             array_push ( $image_class, 'col-12', 'offset-1', 'col-md-4' );
-            array_push ( $text_class, 'col-12', 'offset-1', 'col-md-7' );
+            array_push ( $text_class, 'col-12', 'col-md-7' );
             break;
           
         }

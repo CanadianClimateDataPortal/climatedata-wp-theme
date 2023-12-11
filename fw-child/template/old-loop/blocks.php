@@ -117,7 +117,7 @@
 									if ( $block_type == 'image' ) {
 
 										if ( empty ( $block_breakpoints ) ) {
-											$block_breakpoints = array ( 'col-12' );
+											$block_breakpoints = array ( 'col-14', 'offset-2' );
 										}
 
 									}
@@ -133,7 +133,7 @@
 									if ( $block_type == 'text_img' ) {
 
 										if ( empty ( $block_breakpoints ) ) {
-											$block_breakpoints = array ( 'col-12' );
+											$block_breakpoints = array ( 'col-14', 'offset-2' );
 										}
 
 									}
@@ -149,7 +149,7 @@
 									if ( $block_type == 'map' ) {
 
 										if ( empty ( $block_breakpoints ) ) {
-											$block_breakpoints = array ( 'col-12' );
+											$block_breakpoints = array ( 'col-14', 'offset-2' );
 										}
 
 									}

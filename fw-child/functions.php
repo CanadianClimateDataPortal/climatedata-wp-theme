@@ -25,7 +25,7 @@ function child_global_vars() {
 
 	}
 
-	$classes['body'][] = 'lang-' . apply_filters ( 'wpml_current_language', NULL );
+	// $classes['body'][] = 'lang-' . apply_filters ( 'wpml_current_language', NULL );
 
 }
 

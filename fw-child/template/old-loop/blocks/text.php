@@ -1,17 +1,7 @@
 <?php
   
-  $element_class = array ( 'text' );
+  include ( locate_template ( 'template/old-loop/elements/heading.php' ) );
   
-  if ( get_sub_field ( 'class' ) != '' ) {
-    $element_class = array_merge ( $element_class, explode ( ' ', get_sub_field ( 'class' ) ) );
-  }
+  the_sub_field ( 'body' );
   
 ?>
-
-<div class="<?php echo implode ( ' ', $element_class ); ?>">
-  <?php
-    
-    the_sub_field ( 'text' );
-    
-  ?>
-</div>

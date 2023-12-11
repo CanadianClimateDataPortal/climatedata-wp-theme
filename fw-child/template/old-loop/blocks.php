@@ -109,7 +109,7 @@
 									if ( $block_type == 'text' ) {
 
 										if ( empty ( $block_breakpoints ) ) {
-											$block_breakpoints = array ( 'col-10', 'offset-1', 'col-lg-8' );
+											$block_breakpoints = array ( 'col-14', 'offset-2', 'col-lg-10', 'col-xl-8' );
 										}
 
 									}
@@ -125,7 +125,7 @@
 									if ( $block_type == 'big_list' ) {
 
 										if ( empty ( $block_breakpoints ) ) {
-											$block_breakpoints = array ( 'col-10', 'offset-1', 'col-lg-6' );
+											$block_breakpoints = array ( 'col-14', 'offset-2', 'col-lg-9' );
 										}
 
 									}
@@ -141,7 +141,7 @@
 									if ( $block_type == 'post_grid' ) {
 
 										if ( empty ( $block_breakpoints ) ) {
-											$block_breakpoints = array ( 'col-10', 'offset-1' );
+											$block_breakpoints = array ( 'col-12', 'offset-2' );
 										}
 
 									}
@@ -157,7 +157,7 @@
 									if ( $block_type == 'chart' ) {
 
 										if ( empty ( $block_breakpoints ) ) {
-											$block_breakpoints = array ( 'col-10', 'offset-1', 'col-xl-8' );
+											$block_breakpoints = array ( 'col-13', 'offset-2', 'col-lg-10', 'col-xl-8' );
 										}
 
 									}

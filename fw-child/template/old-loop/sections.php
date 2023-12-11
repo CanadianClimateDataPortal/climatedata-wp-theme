@@ -150,7 +150,7 @@
 			}
 				
 			if ( empty ( $block_class ) ) {
-				$block_class = array ( 'col-10', 'offset-1', 'col-md-8', 'col-lg-5' );
+				$block_class = array ( 'col-13', 'offset-2', 'col-md-10', 'col-lg-8' );
 			}
 					
 			if ( $head_text != '' || $head_body != '' ) {
@@ -159,7 +159,7 @@
 		
 		<header class="section-head container-fluid">
 			<div class="row">
-				<div class="col-10 offset-1 text-center text-lg-left">
+				<div class="col-13 offset-2 text-center text-lg-left">
 					<?php
 						
 						echo '<' . $head_tag . ' class="' . implode ( ' ', $head_class ) . '">' . $head_text . '</' . $head_tag . '>';

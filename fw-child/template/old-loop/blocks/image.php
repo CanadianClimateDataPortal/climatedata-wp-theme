@@ -18,7 +18,7 @@
 ?>
 
 <div class="row">
-  <div class="col-10 offset-1">
+  <div class="col-13 offset-2">
     <h4 class="text-primary"><?php echo $img_title; ?></h4>
   </div>
 </div>
@@ -30,7 +30,7 @@
 ?>
 
 <div class="row">
-  <div class="col-10 offset-1 mb-5 image">
+  <div class="col-13 offset-2 mb-5 image">
     <img src="<?php echo $img_URL; ?>">
   </div>
 </div>
@@ -42,7 +42,7 @@
 ?>
 
 <div class="row">
-  <div class="col-10 offset-1 col-md-8 col-lg-6 image-caption">
+  <div class="col-13 offset-2 col-md-10 col-lg-8 image-caption">
     <?php
       
       if ( $img_caption != '' ) {

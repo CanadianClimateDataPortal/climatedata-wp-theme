@@ -17,12 +17,12 @@ function fw_builder() {
 	if ( $builder == '' ) {
 		
 		$builder = array (
-			"type" => "page", 
-			"inputs" => array (
-				"id" => "auto"
+			'type' => 'page', 
+			'inputs' => array (
+				'id' => 'auto'
 			),
-			"post_id" => $this_ID,
-			"key" => $this_ID
+			'post_id' => $this_ID,
+			'key' => $this_ID
 		);
 	
 		update_post_meta ( $this_ID, 'builder', json_encode ( $builder, JSON_PRETTY_PRINT ) );

@@ -153,6 +153,8 @@
 					
 					plugin.activate()
 					
+					// add the insert button at the very end
+					
 					$(plugin.do_insert_btn(options.page, true)).insertAfter('.fw-page')
 					
 				}
@@ -342,7 +344,7 @@
 					
 					options.parent.item = this_element.parent()
 					
-					if (this_element.parent().hasClass('fw-template-lavel')) {
+					if (this_element.parent().hasClass('fw-template-label')) {
 						options.parent.item = options.parent.item.parent()
 					}
 					
@@ -1930,7 +1932,7 @@
 				
 				insert_eq = $('[data-key="' + options.parent.data.children[options.inserting.index].key + '"]')
 				
-				console.log('eq 2', insert_eq)
+				// console.log('eq 2', insert_eq)
 				// insert_eq = $('[data-key="' + options.parent.data.key + '"]').find('> .fw-element').eq(options.inserting.index)
 			}
 			
@@ -4412,13 +4414,12 @@
 			// instead go through the inputs object
 			// and reset any array it finds
 			
-			console.log('pre')
-			console.log(JSON.stringify(options.element.data.inputs, null, 4))
+			if (element_data.hasOwnProperty('inputs')) {
 			
-			element_data.inputs = plugin.reset_arrays(element_data.inputs)
-			
-			console.log('post')
-			console.log(JSON.stringify(options.element.data.inputs, null, 4))
+				element_data.inputs = plugin.reset_arrays(element_data.inputs)
+				
+			} else {
+			}
 			
 			form_data.forEach(function(input) {
 				
@@ -4685,7 +4686,13 @@
 					current_parent[options.data.array_indexes[options.data.array_key]][property] = value
 					
 				} else {
-				
+					
+					if (current_parent == undefined) {
+						current_parent = []
+					}
+					
+					// console.log(current_parent)
+					
 					current_parent[property] = value
 					
 					// console.log('set', property, value)

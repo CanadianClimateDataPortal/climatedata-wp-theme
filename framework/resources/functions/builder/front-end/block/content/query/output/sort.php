@@ -47,10 +47,4 @@
 		?>
 		
 	</ul>
-	
-	<?php 
-	
-		dumpit ( $options );
-	
-	?>
 </div>

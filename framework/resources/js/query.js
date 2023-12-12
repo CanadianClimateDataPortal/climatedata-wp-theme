@@ -90,6 +90,9 @@
 			
 			options.template = $('<div class="fw-query-item">')
 			
+			// options.template = item.find('.fw-query-item').first().clone()
+			// item.find('.fw-query-item').remove()
+			
 			options.template.addClass(options.item_options.item_class)
 			
 			// console.log(options.template)
@@ -236,45 +239,56 @@
 					options = plugin.options,
 					item = plugin.item
 			
-			// console.log('options', options.item_options)
+			console.log('args', options.args)
+			console.log('options', options.item_options)
+			
+			let rest_url = ajax_data.rest_url + 'framework/v2/query'
 			
 			$.ajax({
-				url: ajax_data.url,
+				url: rest_url,
 				type: 'GET',
 				dataType: 'json',
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader('X-WP-Nonce', ajax_data.rest_nonce)
+				},
 				async: false,
 				data: {
-					action: 'fw_do_query',
 					args: options.args,
 					options: options.item_options,
-					globals: options.globals
+					lang: options.lang
 				},
 				success: function(data) {
 					
-					options.elements.item_container.empty()
-					
-					console.log('success ' + item.attr('id'))
 					console.log(data)
 					
-					if (data.items.length) {
+					if (data.success == true) {
+							
+						options.elements.item_container.empty()
 						
-						data.items.forEach(function(item, i) {
+						if (data.items.length > 0) {
 							
-							let new_item = options.template.clone()
+							data.items.forEach(function(item, i) {
+									
+								// console.log(item)
+								
+								let new_item = options.template.clone()
+								
+								new_item.html(item.output).appendTo(options.elements.item_container)
+								
+							})
 							
-							new_item.html(item.output)
+						} else {
 							
-							new_item.appendTo(options.elements.item_container)
+							options.elements.item_container.append('<p class="alert alert-warning">' + data.message + '</a>')
 							
-						})
+						}
 						
 					}
 					
-				}	
+				}
 			})
 			
 		}
-
 
 	}
 

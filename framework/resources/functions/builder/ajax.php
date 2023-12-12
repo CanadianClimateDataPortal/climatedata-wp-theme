@@ -493,7 +493,7 @@ add_action ( 'wp_ajax_fw_update_page_settings', 'fw_update_page_settings' );
 //
 // QUERY
 //
-
+/*
 function fw_do_query() {
 	
 	$lang = 'en';
@@ -567,3 +567,4 @@ function fw_do_query() {
 
 add_action ( 'wp_ajax_fw_do_query', 'fw_do_query' );
 add_action ( 'wp_ajax_nopriv_fw_do_query', 'fw_do_query' );
+*/

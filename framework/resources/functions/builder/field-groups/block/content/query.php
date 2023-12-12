@@ -14,8 +14,8 @@
 				
 				<div class="row row-cols-2 g-3">
 					<div class="col">
-						<label for="inputs-args-posts_per_page" class="form-label">Number of Items</label>
-						<input class="form-control form-control-sm" type="number" name="inputs-args-posts_per_page" id="inputs-args-posts_per_page" min="-1" max="9999" value="-1">
+						<label for="inputs-args-per_page" class="form-label">Number of Items</label>
+						<input class="form-control form-control-sm" type="number" name="inputs-args-per_page" id="inputs-args-per_page" min="-1" max="9999" value="-1">
 					</div>
 					
 					<div class="col">

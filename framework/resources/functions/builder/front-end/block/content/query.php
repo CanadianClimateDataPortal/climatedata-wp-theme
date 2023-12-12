@@ -8,7 +8,7 @@ if ( $element['inputs']['type'] == 'posts' ) {
 	
 	$args['post_status'] = 'publish';
 	
-	$args['posts_per_page'] = (int) $args['posts_per_page'];
+	$args['per_page'] = (int) $args['per_page'];
 	
 	//
 	// QUERY ADJUSTMENTS

@@ -51,6 +51,7 @@ function posttype_variable() {
 		'exclude_from_search'   => false,
 		'publicly_queryable'    => true,
 		'capability_type'       => 'page',
+		'show_in_rest'          => true
 	);
 	register_post_type( 'variable', $args );
 
@@ -107,6 +108,7 @@ function posttype_resource() {
 		'exclude_from_search'   => false,
 		'publicly_queryable'    => true,
 		'capability_type'       => 'page',
+		'show_in_rest'          => true
 	);
 	register_post_type( 'resource', $args );
 

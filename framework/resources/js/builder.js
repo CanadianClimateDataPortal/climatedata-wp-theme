@@ -1694,7 +1694,10 @@
 					
 					options.template_first = options.template_first.attr('class')
 					options.template_first = options.template_first.split('fw-element fw-')[1]
-					options.template_first = options.template_first.split(' ')[0]
+					
+					if (options.template_first.includes(' ')) {
+						options.template_first = options.template_first.split(' ')[0]
+					}
 					
 					console.log('template first', options.template_first)
 					

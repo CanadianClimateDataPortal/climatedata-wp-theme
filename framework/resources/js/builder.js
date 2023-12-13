@@ -1005,7 +1005,18 @@
 						plugin.set_element_atts(options.element)
 						
 						// update settings
-						plugin.do_element_settings()
+						plugin.do_element_settings(function() {
+							
+							console.log('element settings callback')
+							
+							console.log('empty options.element.data')
+							
+							options.element.data = {
+								type: null,
+								children: []
+							}
+							
+						})
 						
 						break
 						
@@ -2316,7 +2327,7 @@
 			
 		},
 		
-		do_element_settings: function() {
+		do_element_settings: function(callback) {
 			
 			let plugin = this,
 					options = plugin.options
@@ -2505,6 +2516,10 @@
 				})
 				
 			} // if settings
+			
+			if (typeof callback == 'function') {
+				callback()
+			}
 			
 		},
 		
@@ -4143,7 +4158,7 @@
 		
 		reindex_flex: function(container) {
 			
-			console.log('reindex', container)
+			// console.log('reindex', container)
 			
 			container.find('.fw-form-flex-row').each(function(i, item) {
 				

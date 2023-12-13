@@ -74,11 +74,12 @@
 			// any initial tax/meta query args
 			// should be kept and merged with filter args
 			
-			if (options.args.tax_query) {
+			console.log(options.args)
+			if (options.args.hasOwnProperty('tax_query')) {
 				options.tax_query = options.args.tax_query
 			}
 			
-			if (options.args.meta_query) {
+			if (options.args.hasOwnProperty('meta_query')) {
 				options.meta_query = options.args.meta_query
 			}
 			

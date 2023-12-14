@@ -153,9 +153,10 @@ add_action ( 'wp_enqueue_scripts', 'child_theme_enqueue', 50 );
 //
 
 $includes = array (
+	'resources/functions/builder/field-groups.php',
 	'resources/functions/taxonomies.php',
 	'resources/functions/post-types.php',
-	'resources/functions/shortcodes.php'
+	'resources/functions/shortcodes.php',
 );
 
 foreach ( $includes as $include ) {

@@ -780,7 +780,7 @@
 						
 						console.log(data)
 						
-						$('#fw-modal .modal-body').html('<p>Created new ' + data.post_type + ' ‘' + data.post_title + '’ (<code>ID ' + data.post_id + '</code>)</p><p><a href="' + data.url + '" target="_blank">Edit <i class="fas fa-external-link ms-1"></i></a>')
+						$('#fw-modal .modal-body').html('<div class="p-3"><p>Created new ' + data.post_type + ' ‘' + data.post_title + '’ (<code>ID ' + data.post_id + '</code>)</p><p><a href="' + data.url + '" target="_blank">Edit <i class="fas fa-external-link ms-1"></i></a></div>')
 						
 						$('#fw-modal .fw-new-post-submit').remove()
 						$('#fw-modal [data-bs-dismiss]').text('Close')

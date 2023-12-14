@@ -101,7 +101,7 @@ function posttype_layout() {
 		'labels'                => $labels,
 		'supports'              => array( 'title', 'thumbnail', 'custom-fields', 'page-attributes' ),
 		'hierarchical'          => false,
-		'public'                => false,
+		'public'                => true,
 		'show_ui'               => true,
 		'show_in_menu'          => true,
 		'menu_position'         => 21,
@@ -111,7 +111,7 @@ function posttype_layout() {
 		'can_export'            => true,
 		'has_archive'           => true,
 		'exclude_from_search'   => false,
-		'publicly_queryable'    => true,
+		'publicly_queryable'    => false,
 		'capability_type'       => 'page',
 	);
 	register_post_type( 'fw-layout', $args );

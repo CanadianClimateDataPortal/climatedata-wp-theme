@@ -41,3 +41,48 @@ function taxonomy_templatetag() {
 
 }
 add_action( 'init', 'taxonomy_templatetag', 0 );
+
+//
+// LAYOUT TYPE
+//
+
+// Register Custom Taxonomy
+function taxonomy_layouttype() {
+
+	$labels = array(
+		'name'                       => _x( 'Types', 'Taxonomy General Name', 'fw-taxonomies' ),
+		'singular_name'              => _x( 'Type', 'Taxonomy Singular Name', 'fw-taxonomies' ),
+		'menu_name'                  => __( 'Types', 'fw-taxonomies' ),
+		'all_items'                  => __( 'All Types', 'fw-taxonomies' ),
+		'parent_item'                => __( 'Parent Type', 'fw-taxonomies' ),
+		'parent_item_colon'          => __( 'Parent Type:', 'fw-taxonomies' ),
+		'new_item_name'              => __( 'New Type Name', 'fw-taxonomies' ),
+		'add_new_item'               => __( 'Add New Type', 'fw-taxonomies' ),
+		'edit_item'                  => __( 'Edit Type', 'fw-taxonomies' ),
+		'update_item'                => __( 'Update Type', 'fw-taxonomies' ),
+		'view_item'                  => __( 'View Type', 'fw-taxonomies' ),
+		'separate_items_with_commas' => __( 'Separate items with commas', 'fw-taxonomies' ),
+		'add_or_remove_items'        => __( 'Add or remove items', 'fw-taxonomies' ),
+		'choose_from_most_used'      => __( 'Choose from the most used', 'fw-taxonomies' ),
+		'popular_items'              => __( 'Popular Items', 'fw-taxonomies' ),
+		'search_items'               => __( 'Search Items', 'fw-taxonomies' ),
+		'not_found'                  => __( 'Not Found', 'fw-taxonomies' ),
+		'no_terms'                   => __( 'No items', 'fw-taxonomies' ),
+		'items_list'                 => __( 'Items list', 'fw-taxonomies' ),
+		'items_list_navigation'      => __( 'Items list navigation', 'fw-taxonomies' ),
+	);
+	$args = array(
+		'labels'                     => $labels,
+		'hierarchical'               => false,
+		'public'                     => false,
+		'show_ui'                    => true,
+		'show_admin_column'          => true,
+		'show_in_nav_menus'          => false,
+		'show_tagcloud'              => false,
+		'show_in_rest'               => false,
+		'default_term'               => array ( 'name' => 'General', 'slug' => 'general' )
+	);
+	register_taxonomy( 'layout-type', array( 'fw-layout' ), $args );
+
+}
+add_action( 'init', 'taxonomy_layouttype', 0 );

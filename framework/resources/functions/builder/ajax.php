@@ -179,6 +179,25 @@ function fw_insert_post() {
 		'post_title' => $form_data['post_title']
 	) );
 	
+	$meta_fields = array();
+	
+	foreach ( $form_data as $key => $val ) {
+		
+		if ( str_contains ( $key, 'post_meta-' ) ) {
+			$new_key = str_replace ( 'post_meta-', '', $key );
+			$meta_fields[$new_key] = $val;
+		}
+		
+	}
+	
+	if ( !empty ( $meta_fields ) ) {
+		foreach ( $meta_fields as $key => $val ) {
+			
+			update_post_meta ( $new_post_ID, $key, $val );
+			
+		}
+	}
+	
 	// echo 'layout: ' . $form_data['layout'];
 	
 	if ( $form_data['layout'] != '' ) {
@@ -209,6 +228,7 @@ function fw_insert_post() {
 		'post_type' => $form_data['post_type'],
 		'post_title' => $form_data['post_title'],
 		'post_id' => $new_post_ID,
+		'post_meta' => $meta_fields,
 		'url' => get_permalink ( $new_post_ID )
 	) );
 	
@@ -300,6 +320,12 @@ function fw_modal_settings() {
 				</div>
 			</div>
 		</div>
+		
+		<?php
+		
+			do_action ( 'fw_modal_accordion_items', $_GET['content'] );
+			
+		?>
 		
 	</form>
 </div>

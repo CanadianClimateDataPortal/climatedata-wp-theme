@@ -1,6 +1,9 @@
 <?php
 
 // resource category
+/*
+
+replaced with 'topic'
 
 function taxonomy_resourcecat() {
 
@@ -40,6 +43,7 @@ function taxonomy_resourcecat() {
 
 }
 add_action( 'init', 'taxonomy_resourcecat', 0 );
+*/
 
 // topic
 

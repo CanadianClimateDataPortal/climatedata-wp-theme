@@ -704,7 +704,7 @@
             format = $('input[name="download-format"]:checked').val();
             let dataset_name = $('input[name="download-dataset"]:checked').val();
             let selectedDatasetType = $('input[name="download-dataset-type"]:checked').val();
-            let format_extension = format;
+            let format_extension = 'zip';
 
             if (format == 'netcdf') {
                 format_extension = 'nc';
@@ -717,6 +717,7 @@
                     month: month,
                     dataset_name: dataset_name,
                     dataset_type: selectedDatasetType,
+                    zipped: true,
                     format: format
                 };
                 Object.assign(request_args, pointsData);
@@ -2131,7 +2132,7 @@
                 var selection = $("#ahccd-select").val() || [];
                 if (selection.length > 0) {
                     var format = $('input[name="ahccd-download-format"]:checked').val();
-                    url = data_url + '/download-ahccd?format=' + format + '&stations=' + selection.join(',');
+                    url = data_url + '/download-ahccd?format=' + format + '&zipped=true&stations=' + selection.join(',');
                     $('#ahccd-process').attr('href', url);
                     $('#ahccd-process').removeClass('disabled');
                     $('#ahccd-download-status').text(l10n_labels['readytoprocess']);

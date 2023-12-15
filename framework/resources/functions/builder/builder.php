@@ -997,28 +997,6 @@ function fw_output_element_content ( $element, $globals, $settings ) {
 }
 
 //
-// UX
-//
-
-function insert_fw_modal_container() {
-
-?>
-
-<div class="modal fade fw-modal" id="fw-modal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-	<div class="modal-dialog modal-lg">
-		<div class="modal-content">
-			<div class="spinner-border my-3 mx-auto"></div>
-		</div>
-	</div>
-</div>
-
-<?php
-	
-}
-
-add_action ( 'fw_modals', 'insert_fw_modal_container' );
-
-//
 // ACTIONS
 //
 

@@ -354,7 +354,7 @@ add_action ( 'admin_bar_menu', function ( $admin_bar ) {
 		'title' => 'New Page',
 		'href'  => '#fw-modal',
 		'meta'  => array (
-			'class' => 'fw-actions-item fw-modal-content-new-post'
+			'class' => 'fw-actions-item fw-modal-content-post'
 		),
 	) );
 	

@@ -32,6 +32,7 @@ $includes = array (
 	'resources/functions/extensions/post-types.php',
 	'resources/functions/extensions/shortcodes.php',
 	'resources/functions/builder/builder.php',
+	'resources/functions/builder/modal.php',
 	'resources/functions/builder/ajax.php',
 	'resources/functions/builder/rest.php',
 	'elements/carousel/setup.php'

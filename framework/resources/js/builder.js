@@ -179,6 +179,14 @@
 					options.status = 'saving'
 				}
 				
+				// new post modal
+				
+				if (options.modal.content == 'post') {
+					options.status = 'new_post'
+				}
+				
+				// adjust options for page settings modal
+				
 				if (options.modal.content == 'page') {
 					let this_element = $('.fw-page')
 					options.status = 'editing'
@@ -852,7 +860,8 @@
 				console.log(JSON.stringify(options.element.data))
 				
 				let form = $(this).closest('.modal').find('form'),
-						form_data = []//form.serializeArray()
+						form_data = [],
+						close_on_submit = true
 				
 				// each form input
 				
@@ -905,11 +914,39 @@
 				
 				console.log(form_data)
 				
-				// console.log(options.status)
-				
 				// ACTION
 				
 				switch (options.status) {
+					case 'new_post' :
+					
+						//
+						// NEW POST
+						//
+						
+						close_on_submit = false
+						
+						$.ajax({
+							url: ajax_data.url,
+							type: 'GET',
+							dataType: 'json',
+							data: {
+								action: 'fw_insert_post',
+								inputs: form_data 
+							},
+							success: function(data) {
+								
+								console.log(data)
+								
+								$('#fw-modal .modal-body').html('<div class="p-3"><p>Created new ' + data.post_type + ' ‘' + data.post_title + '’ (<code>ID ' + data.post_id + '</code>)</p><p><a href="' + data.url + '" target="_blank">Edit <i class="fas fa-external-link ms-1"></i></a></div>')
+								
+								$('#fw-modal .fw-settings-submit').remove()
+								$('#fw-modal [data-bs-dismiss]').text('Close')
+								
+							}
+						})
+					
+						break
+						
 					case 'inserting' :
 						
 						//
@@ -1055,7 +1092,9 @@
 						break
 				}
 				
-				$('#fw-modal').modal('hide')
+				if (close_on_submit == true) {
+					$('#fw-modal').modal('hide')
+				}
 				
 				$(document).trigger('fw_modal_submit', options.element)
 				
@@ -1143,14 +1182,14 @@
 			})
 			
 			// flex - add row
-			
+			/*
 			$('body').on('click', '.fw-form-flex-add-row', function(e) {
 				
 				plugin.add_flex_row($(this).closest('.fw-form-flex-container').find('.fw-form-flex').first(), 'resources/functions/builder/block/content/query/output/' + $(this).attr('data-item-content'))
 				
 				
 			})
-			
+			*/
 			// conditional form elements
 			
 			$('#fw-modal').on('change', '[data-form-condition]', function() {

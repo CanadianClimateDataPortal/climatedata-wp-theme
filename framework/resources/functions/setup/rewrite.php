@@ -681,7 +681,6 @@ function translate_permalink ( $url, $post_id, $lang ) {
 	
 }
 
-
 //
 // TITLES
 //
@@ -733,7 +732,7 @@ function translate_doc_title ( $title_array ) {
 	
 }
 
-add_filter('the_title', 'translate_post_title', 10, 2);
+add_filter ( 'the_title', 'translate_post_title', 10, 2 );
 
 function translate_post_title ( $title, $id ) {
 	

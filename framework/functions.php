@@ -32,7 +32,9 @@ $includes = array (
 	'resources/functions/extensions/post-types.php',
 	'resources/functions/extensions/shortcodes.php',
 	'resources/functions/builder/builder.php',
+	'resources/functions/builder/modal.php',
 	'resources/functions/builder/ajax.php',
+	'resources/functions/builder/rest.php',
 	'elements/carousel/setup.php'
 );
 
@@ -151,7 +153,10 @@ function fw_enqueue_scripts() {
 	
 	wp_localize_script ( 'global', 'ajax_data',
 		array (
-			'url' => admin_url ( 'admin-ajax.php' )
+			'rest_url' => rest_url(),
+			'rest_nonce' => wp_create_nonce ( 'wp_rest' ),
+			'url' => admin_url ( 'admin-ajax.php' ),
+			'globals' => $GLOBALS['fw']
 		)
 	);
 	
@@ -163,12 +168,12 @@ function fw_enqueue_scripts() {
 	
 	wp_register_script ( 'builder', $js_dir . 'builder.js', array ( 'jquery', 'jquery-ui-core', 'jquery-ui-mouse', 'jquery-ui-sortable', 'aos', 'animation', 'bootstrap-js' ), null, true );
 	
-	wp_localize_script ( 'builder', 'ajax_data',
-		array (
-			'url' => admin_url ( 'admin-ajax.php' ),
-			'globals' => $GLOBALS['fw']
-		)
-	);
+	// wp_localize_script ( 'builder', 'ajax_data',
+	// 	array (
+	// 		'url' => admin_url ( 'admin-ajax.php' ),
+	// 		'globals' => $GLOBALS['fw']
+	// 	)
+	// );
 	
 	if ( current_user_can ( 'administrator' ) ) {
 		wp_enqueue_editor();

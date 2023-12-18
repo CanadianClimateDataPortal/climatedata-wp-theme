@@ -1,5 +1,6 @@
 <?php
 
+
 //
 // GLOBALS
 //
@@ -37,6 +38,9 @@ add_action ( 'wp', 'child_global_vars', 20 );
 
 
 add_action ( 'wp_enqueue_scripts', function() {
+	
+	// deregister font-awesome from parent theme
+	// to use /site/assets/font-awesome instead
 	
 	wp_dequeue_style ( 'font-awesome' );
 	wp_deregister_style ( 'font-awesome' );
@@ -93,13 +97,13 @@ function child_theme_enqueue() {
 	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'jquery', 'cdc', 'leaflet', 'leaflet-sync', 'tab-drawer' ), NULL, true );
 	
 	// localize admin url
-
-	wp_localize_script ( 'child-functions', 'ajax_data',
-		array (
-			'url' => admin_url ( 'admin-ajax.php' ),
-			'globals' => $GLOBALS['fw']
-		)
-	);
+		
+	// wp_localize_script ( 'child-functions', 'ajax_data',
+	// 	array (
+	// 		'url' => admin_url ( 'admin-ajax.php' ),
+	// 		'globals' => $GLOBALS['fw']
+	// 	)
+	// );
 	
 	// VENDOR
 
@@ -125,11 +129,13 @@ function child_theme_enqueue() {
 			break;
 			
 		case 'learn' :
+		case 'apprendre' :
 			wp_enqueue_script ( 'zebra-pin' );
 			wp_enqueue_script ( 'tab-drawer' );
 			break;
 			
 		case 'news' :
+		case 'nouvelles' :
 			wp_enqueue_script ( 'zebra-pin' );
 			wp_enqueue_script ( 'tab-drawer' );
 			
@@ -147,9 +153,10 @@ add_action ( 'wp_enqueue_scripts', 'child_theme_enqueue', 50 );
 //
 
 $includes = array (
+	'resources/functions/builder/field-groups.php',
 	'resources/functions/taxonomies.php',
 	'resources/functions/post-types.php',
-	'resources/functions/shortcodes.php'
+	'resources/functions/shortcodes.php',
 );
 
 foreach ( $includes as $include ) {

@@ -169,15 +169,32 @@ add_action ( 'wp_ajax_fw_insert_post', 'fw_insert_post' );
 
 function fw_insert_post() {
 	
-	$form_data = $_GET['inputs'];
-	
-	// print_r($form_data);
+	$form_data = array_column ( $_GET['inputs'], 'value', 'name' );
 	
 	$new_post_ID = wp_insert_post ( array (
 		'post_type' => $form_data['post_type'],
 		'post_status' => $form_data['post_status'],
 		'post_title' => $form_data['post_title']
 	) );
+	
+	$meta_fields = array();
+	
+	foreach ( $form_data as $key => $val ) {
+		
+		if ( str_contains ( $key, 'post_meta-' ) ) {
+			$new_key = str_replace ( 'post_meta-', '', $key );
+			$meta_fields[$new_key] = $val;
+		}
+		
+	}
+	
+	if ( !empty ( $meta_fields ) ) {
+		foreach ( $meta_fields as $key => $val ) {
+			
+			update_post_meta ( $new_post_ID, $key, $val );
+			
+		}
+	}
 	
 	// echo 'layout: ' . $form_data['layout'];
 	
@@ -209,6 +226,7 @@ function fw_insert_post() {
 		'post_type' => $form_data['post_type'],
 		'post_title' => $form_data['post_title'],
 		'post_id' => $new_post_ID,
+		'post_meta' => $meta_fields,
 		'url' => get_permalink ( $new_post_ID )
 	) );
 	
@@ -216,137 +234,6 @@ function fw_insert_post() {
 	
 }
 
-
-//
-// SETTINGS MODALS
-//
-
-function fw_modal_settings() {
-	
-	$globals = $_GET['globals'];
-	$element = $_GET['element'];
-
-	switch ( $_GET['content'] ) {
-		case 'save' :
-		case 'page' :
-		case 'delete' :
-		case 'new-post' :
-		case 'do-layout' :
-			
-			include ( locate_template ( 'resources/functions/builder/modals/' . $_GET['content'] . '.php' ) );
-			
-			break;
-			
-		default :
-			
-			$modal_content = $_GET['content'];
-			
-			if ( str_contains ( $modal_content, '/' ) ) {
-				$modal_content = explode ( '/', $modal_content );
-				$modal_content = $modal_content[0];
-			}
-	
-?>
-	
-<div class="modal-header">
-	<h4 class="modal-title">
-		<span class="modal-title-action"></span>
-		<span class="modal-title-content"><?php echo $modal_content; ?></span>
-	</h4>
-	
-	<div>
-		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-		
-		<?php
-		
-			if ( $_GET['content'] != 'block' ) {
-		
-		?>
-		
-		<button type="button" class="btn btn-primary fw-settings-submit">Add</button>
-		
-		<?php
-		
-			}
-		
-		?>
-		
-	</div>
-</div>
-
-<div class="modal-body p-0">
-	
-	<form class="accordion accordion-flush" id="element-form">
-		<?php
-		
-			include ( locate_template ( 'resources/functions/builder/field-groups/' . $_GET['content'] . '.php' ) );
-			
-		?>
-		
-		<div class="accordion-item">
-			<h2 class="accordion-header" id="element-form-head-settings">
-				<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#element-form-settings" aria-expanded="false" aria-controls="element-form-settings">
-					Settings
-				</button>
-			</h2>
-			
-			<div id="element-form-settings" class="accordion-collapse collapse" aria-labelledby="element-form-head" data-bs-parent="#element-form">
-				<div class="accordion-body container-fluid">
-					<?php
-					
-						include ( locate_template ( 'resources/functions/builder/field-groups/settings.php' ) );
-						
-					?>
-				</div>
-			</div>
-		</div>
-		
-	</form>
-</div>
-
-<?php
-
-	}
-	
-	wp_die();
-	
-}
-
-add_action ( 'wp_ajax_fw_modal_settings', 'fw_modal_settings' );
-
-function fw_modal_add_setting() {
-	
-	// dumpit ( $_GET['setting_data'] );
-	
-	if ( isset ( $_GET['path'] ) ) {
-		
-		$full_path = 'resources/functions/builder/field-groups/' . $_GET['path'] . '.php';
-		
-		// echo $full_path . '.php';
-		
-		if ( locate_template ( $full_path ) != '' ) {
-			
-			echo '<div class="fw-form-flex-row" data-item="' . $_GET['path'] . '" data-row-index="0">';
-			
-			include ( locate_template ( $full_path ) );
-			
-			echo '</div>';
-			
-		} else {
-			
-			echo 'huh';
-			
-		}
-		
-	}
-	
-	// include ( locate_template ( 'resources/functions/builder/' . $_GET['setting'] . '.php' ) );
-	
-	wp_die();
-	
-}
-
-add_action ( 'wp_ajax_fw_modal_add_setting', 'fw_modal_add_setting' );
 
 //
 // UTILITIES
@@ -493,7 +380,7 @@ add_action ( 'wp_ajax_fw_update_page_settings', 'fw_update_page_settings' );
 //
 // QUERY
 //
-
+/*
 function fw_do_query() {
 	
 	$lang = 'en';
@@ -567,3 +454,4 @@ function fw_do_query() {
 
 add_action ( 'wp_ajax_fw_do_query', 'fw_do_query' );
 add_action ( 'wp_ajax_nopriv_fw_do_query', 'fw_do_query' );
+*/

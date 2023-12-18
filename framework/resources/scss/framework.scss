@@ -569,7 +569,7 @@ body.admin-bar {
 // OFFCANVAS
 
 .fw-builder {
-	.offcanvas {
+	.fw-element.offcanvas:not(.fw-template-element) {
 		position: static;
 		visibility: visible;
 	}

@@ -1,6 +1,9 @@
 <?php
 
 // resource category
+/*
+
+replaced with 'topic'
 
 function taxonomy_resourcecat() {
 
@@ -40,6 +43,7 @@ function taxonomy_resourcecat() {
 
 }
 add_action( 'init', 'taxonomy_resourcecat', 0 );
+*/
 
 // topic
 
@@ -76,6 +80,7 @@ function taxonomy_topic() {
 		'show_admin_column'          => true,
 		'show_in_nav_menus'          => true,
 		'show_tagcloud'              => true,
+		'show_in_rest'               => true
 	);
 	register_taxonomy( 'topic', array( 'resource' ), $args );
 

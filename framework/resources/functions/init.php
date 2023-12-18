@@ -300,6 +300,7 @@ add_action ( 'admin_bar_menu', function ( $admin_bar ) {
 	
 	if ( !empty ( $edit_node ) ) {
 		$edit_node->title = 'Edit in Wordpress';
+		$edit_node->meta = array ( 'target' => '_blank' );
 		$admin_bar->add_node ( $edit_node );
 	}
 	
@@ -353,7 +354,7 @@ add_action ( 'admin_bar_menu', function ( $admin_bar ) {
 		'title' => 'New Page',
 		'href'  => '#fw-modal',
 		'meta'  => array (
-			'class' => 'fw-actions-item fw-modal-content-new-post'
+			'class' => 'fw-actions-item fw-modal-content-post'
 		),
 	) );
 	

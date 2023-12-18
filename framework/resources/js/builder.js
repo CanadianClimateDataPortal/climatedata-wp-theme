@@ -179,6 +179,14 @@
 					options.status = 'saving'
 				}
 				
+				// new post modal
+				
+				if (options.modal.content == 'post') {
+					options.status = 'new_post'
+				}
+				
+				// adjust options for page settings modal
+				
 				if (options.modal.content == 'page') {
 					let this_element = $('.fw-page')
 					options.status = 'editing'
@@ -780,7 +788,7 @@
 						
 						console.log(data)
 						
-						$('#fw-modal .modal-body').html('<p>Created new ' + data.post_type + ' ‘' + data.post_title + '’ (<code>ID ' + data.post_id + '</code>)</p><p><a href="' + data.url + '" target="_blank">Edit <i class="fas fa-external-link ms-1"></i></a>')
+						$('#fw-modal .modal-body').html('<div class="p-3"><p>Created new ' + data.post_type + ' ‘' + data.post_title + '’ (<code>ID ' + data.post_id + '</code>)</p><p><a href="' + data.url + '" target="_blank">Edit <i class="fas fa-external-link ms-1"></i></a></div>')
 						
 						$('#fw-modal .fw-new-post-submit').remove()
 						$('#fw-modal [data-bs-dismiss]').text('Close')
@@ -852,7 +860,8 @@
 				console.log(JSON.stringify(options.element.data))
 				
 				let form = $(this).closest('.modal').find('form'),
-						form_data = []//form.serializeArray()
+						form_data = [],
+						close_on_submit = true
 				
 				// each form input
 				
@@ -905,11 +914,39 @@
 				
 				console.log(form_data)
 				
-				// console.log(options.status)
-				
 				// ACTION
 				
 				switch (options.status) {
+					case 'new_post' :
+					
+						//
+						// NEW POST
+						//
+						
+						close_on_submit = false
+						
+						$.ajax({
+							url: ajax_data.url,
+							type: 'GET',
+							dataType: 'json',
+							data: {
+								action: 'fw_insert_post',
+								inputs: form_data 
+							},
+							success: function(data) {
+								
+								console.log(data)
+								
+								$('#fw-modal .modal-body').html('<div class="p-3"><p>Created new ' + data.post_type + ' ‘' + data.post_title + '’ (<code>ID ' + data.post_id + '</code>)</p><p><a href="' + data.url + '" target="_blank">Edit <i class="fas fa-external-link ms-1"></i></a></div>')
+								
+								$('#fw-modal .fw-settings-submit').remove()
+								$('#fw-modal [data-bs-dismiss]').text('Close')
+								
+							}
+						})
+					
+						break
+						
 					case 'inserting' :
 						
 						//
@@ -1005,7 +1042,18 @@
 						plugin.set_element_atts(options.element)
 						
 						// update settings
-						plugin.do_element_settings()
+						plugin.do_element_settings(function() {
+							
+							console.log('element settings callback')
+							
+							console.log('empty options.element.data')
+							
+							options.element.data = {
+								type: null,
+								children: []
+							}
+							
+						})
 						
 						break
 						
@@ -1044,7 +1092,9 @@
 						break
 				}
 				
-				$('#fw-modal').modal('hide')
+				if (close_on_submit == true) {
+					$('#fw-modal').modal('hide')
+				}
 				
 				$(document).trigger('fw_modal_submit', options.element)
 				
@@ -1132,14 +1182,14 @@
 			})
 			
 			// flex - add row
-			
+			/*
 			$('body').on('click', '.fw-form-flex-add-row', function(e) {
 				
 				plugin.add_flex_row($(this).closest('.fw-form-flex-container').find('.fw-form-flex').first(), 'resources/functions/builder/block/content/query/output/' + $(this).attr('data-item-content'))
 				
 				
 			})
-			
+			*/
 			// conditional form elements
 			
 			$('#fw-modal').on('change', '[data-form-condition]', function() {
@@ -1694,7 +1744,10 @@
 					
 					options.template_first = options.template_first.attr('class')
 					options.template_first = options.template_first.split('fw-element fw-')[1]
-					options.template_first = options.template_first.split(' ')[0]
+					
+					if (options.template_first.includes(' ')) {
+						options.template_first = options.template_first.split(' ')[0]
+					}
 					
 					console.log('template first', options.template_first)
 					
@@ -2313,7 +2366,7 @@
 			
 		},
 		
-		do_element_settings: function() {
+		do_element_settings: function(callback) {
 			
 			let plugin = this,
 					options = plugin.options
@@ -2502,6 +2555,10 @@
 				})
 				
 			} // if settings
+			
+			if (typeof callback == 'function') {
+				callback()
+			}
 			
 		},
 		
@@ -2957,96 +3014,118 @@
 			// console.log('inputs', upload_id_input, upload_url_input)
 			// console.log('placeholder', img_placeholder)
 			
-			
-			uploader.object = wp.media(uploader.options).on('select', function() {
+			uploader.object = wp.media(uploader.options)
+				.on('select', function() {
 				
-				uploader.attachment = uploader.object.state().get('selection').first().toJSON()
-				
-				// set hidden image ID input
-				uploader.elements.file_id.val(uploader.attachment.id).trigger('change')
-				
-				// console.log(attachment)
-				
-				// set URL and placeholder
-				
-				if (uploader.elements.placeholder.length) {
-						
+					uploader.attachment = uploader.object.state().get('selection').first().toJSON()
+					
+					// set hidden file ID input
+					uploader.elements.file_id.val(uploader.attachment.id).trigger('change')
+					
+					console.log(uploader.attachment)
+					
 					uploader.img_url.full = uploader.attachment.url
 					
-					uploader.placeholder_src = uploader.img_url.full
+					if (uploader.type == 'image') {
 					
-					if (uploader.attachment.sizes.thumbnail) {
-						uploader.img_url.thumbnail = uploader.attachment.sizes.thumbnail.url
-					}
-					
-					if (uploader.attachment.sizes.medium) {
-						uploader.img_url.medium = uploader.attachment.sizes.medium.url
+						// set URL and placeholder
 						
-						uploader.placeholder_src = uploader.img_url.medium
+						if (uploader.elements.placeholder.length) {
+								
+							uploader.placeholder_src = uploader.img_url.full
+							
+							if (uploader.attachment.sizes.thumbnail) {
+								uploader.img_url.thumbnail = uploader.attachment.sizes.thumbnail.url
+							}
+							
+							if (uploader.attachment.sizes.medium) {
+								uploader.img_url.medium = uploader.attachment.sizes.medium.url
+								
+								uploader.placeholder_src = uploader.img_url.medium
+							}
+							
+							if (uploader.attachment.sizes.large) {
+								uploader.img_url.thumbnail = uploader.attachment.sizes.large.url
+							}
+							
+							uploader.elements.placeholder.html('<img src="' + uploader.placeholder_src + '">')
+							
+							
+							// change button text
+							uploader.elements.button.text('Replace Image')
+							
+						}
+						
+						// uploader.elements.button.addClass('disabled')
+						// remove_btn.removeClass('d-none')
+						
+					} else if (uploader.type == 'video') {
+						
+						// change button text
+						uploader.elements.button.text('Replace Video')
+						
+						// filename in placeholder
+						uploader.elements.placeholder.text(uploader.attachment.filename)
+						
 					}
-					
-					if (uploader.attachment.sizes.large) {
-						uploader.img_url.thumbnail = uploader.attachment.sizes.large.url
-					}
-					
-					uploader.elements.placeholder.html('<img src="' + uploader.placeholder_src + '">')
 					
 					uploader.elements.url.val(JSON.stringify(uploader.img_url))
 					
-					// change button text
-					uploader.elements.button.text('Replace Image')
-					
-				} else {
-					
-					uploader.elements.url.val(JSON.stringify({ full: uploader.attachment.url }))
+				})
+				.on('open', function() {
+				
+					if (uploader.elements.file_id.val()) {
+						
+						selection = uploader.object.state().get('selection')
+						uploader.attachment = wp.media.attachment(uploader.elements.file_id.val())
+						uploader.attachment.fetch()
+						selection.add( uploader.attachment ? [uploader.attachment] : [] )
+						
+					}
 					
 				}
-				
-				// uploader.elements.button.addClass('disabled')
-				// remove_btn.removeClass('d-none')
-				
-			}).on('open', function() {
-			
-				if (uploader.elements.file_id.val()) {
-					
-					selection = uploader.object.state().get('selection')
-					uploader.attachment = wp.media.attachment(uploader.elements.file_id.val())
-					uploader.attachment.fetch()
-					selection.add( uploader.attachment ? [uploader.attachment] : [] )
-					
-				}
-				
-			})
+			)
 			
 			if (uploader.elements.file_id.val() != '') {
 				
-				console.log(uploader.elements.file_id.val())
-				
 				// element has an ID set
 				
-				if (uploader.elements.placeholder.length) {
-					
-					// there's also an image placeholder
+				console.log('existing ID', uploader.elements.file_id.val())
 				
-					// grab the best image size and set the placeholder
+				console.log(uploader)
+				
+				if (uploader.type == 'image') {
 					
-					let img_urls = JSON.parse(uploader.elements.url.val())
+					if (uploader.elements.placeholder.length) {
+						
+						// there's also an image placeholder
 					
-					uploader.placeholder_src = img_urls.full
-					
-					if (img_urls.medium) {
-						uploader.placeholder_src = img_urls.medium
+						// grab the best image size and set the placeholder
+						
+						let img_urls = JSON.parse(uploader.elements.url.val())
+						
+						uploader.placeholder_src = img_urls.full
+						
+						if (img_urls.medium) {
+							uploader.placeholder_src = img_urls.medium
+						}
+						
+						uploader.elements.placeholder.html('<img src="' + uploader.placeholder_src + '">')
+						
+						// change button text
+						uploader.elements.button.text('Replace Image')
+						
+					} else {
+						
+						// change button text
+						uploader.elements.button.text('Replace File')
+						
 					}
 					
-					uploader.elements.placeholder.html('<img src="' + uploader.placeholder_src + '">')
+				} else if (uploader.type == 'video') {
 					
-					// change button text
-					uploader.elements.button.text('Replace image')
-					
-				} else {
-					
-					// change button text
-					uploader.elements.button.text('Replace file')
+					uploader.elements.placeholder.text(uploader.attachment.filename)
+					uploader.elements.button.text('Replace Video')
 					
 				}
 				
@@ -3794,11 +3873,18 @@
 				
 				if (this_input.hasClass('uploader-file-url')) {
 					
-					let img_urls = JSON.parse(this_val)
+					let this_container = this_input.closest('.uploader-container'),
+							img_urls = JSON.parse(this_val)
 					
 					console.log(img_urls)
 					
-					this_input.closest('.uploader-container').find('.image-placeholder').html('<img src="' + img_urls.full + '">')
+					if (this_container.attr('data-uploader-type') == 'image') {
+					
+						this_container.find('.image-placeholder').html('<img src="' + img_urls.full + '">')
+						
+					} else if (this_container.attr('data-uploader-type') == 'video') {
+						this_container.find('.image-placeholder').text(img_urls.full.split('/').slice(-1))
+					}
 					
 				}
 				
@@ -4140,7 +4226,7 @@
 		
 		reindex_flex: function(container) {
 			
-			console.log('reindex', container)
+			// console.log('reindex', container)
 			
 			container.find('.fw-form-flex-row').each(function(i, item) {
 				
@@ -4158,8 +4244,6 @@
 					options = plugin.options
 					
 			// set up options
-			
-			
 			
 			plugin.uploader = wp.media(uploader_options).on('select', function() {
 				
@@ -4242,12 +4326,12 @@
 					img_placeholder.html('<img src="' + placeholder_src + '">')
 					
 					// change button text
-					upload_btn.text('Replace image')
+					upload_btn.text('Replace Image')
 					
 				} else {
 					
 					// change button text
-					upload_btn.text('Replace file')
+					upload_btn.text('Replace File')
 					
 				}
 				
@@ -4433,6 +4517,10 @@
 				// format value
 				
 				if (input.name.includes('inputs-title')) {
+					input.value = plugin.escape(input.value)
+				}
+				
+				if (input.name.includes('code')) {
 					input.value = plugin.escape(input.value)
 				}
 				

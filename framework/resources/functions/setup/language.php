@@ -1,5 +1,7 @@
 <?php
 
+
+
 function fw_replace_lang_domain ( $str ) {
 	
 	$new_str = $str;
@@ -38,8 +40,6 @@ function fw_setup_current_lang() {
 	
 	$vars['original_home_url'] = trailingslashit ( home_url() );
 	$vars['original_site_url'] = trailingslashit ( site_url() );
-	
-	// dumpit ( $fw );
 	
 	// how are languages getting rewritten
 	
@@ -80,7 +80,12 @@ function fw_setup_current_lang() {
 					// generate the new home/site URLs
 					
 					$vars['home_url'] = $_SERVER['REQUEST_SCHEME'] . '://' . $lang['domain'] . '/';
-				
+					
+					// override the original_site_URL defined incorrectly
+					// with the WP_SITEURL constant in wp-config.php
+					
+					$vars['original_site_url'] = str_replace ( $vars['home_url'], $vars['original_home_url'], $vars['original_site_url'] );
+					
 					$url_array = explode ( '/', $GLOBALS['vars']['original_site_url'] );
 					
 					// grab the protocol
@@ -102,53 +107,20 @@ function fw_setup_current_lang() {
 					}, 1, 2 );
 					
 					add_filter ( 'site_url', function ( $url ) {
-						// echo '<br><br>site_url - ';
+						// echo '<br>site_url - ';
 						if ( !is_admin() ) return trailingslashit ( $GLOBALS['vars']['site_url'] );
 						return $url;
+					}, 1 );
+					
+					add_filter ( 'admin_url', function ( $url ) {
+						// echo '<br><br>admin_url - ';
+						return $GLOBALS['vars']['original_site_url'] . 'wp-admin/';
 					}, 1 );
 					
 					add_filter ( 'content_url', 'fw_replace_lang_domain', 1, 2 );
 					add_filter ( 'script_loader_tag', 'fw_replace_lang_domain', 1 );
 					add_filter ( 'rest_url', 'fw_replace_lang_domain', 1 );
 					
-					// add_filter ( 'content_url', function($str) {
-					// 	
-					// 	echo 'content url - ';
-					// 	
-					// 	$str = fw_replace_lang_domain($str);
-					// 	
-					// 	return $str;
-					// 	
-					// }, 1, 2 );
-					
-					// add_filter ( 'script_loader_tag', function( $src ) {
-					// 	
-					// 	echo 'script_loader_tag - ';
-					// 	echo '<br>';
-					// 	
-					// 	// dumpit ( $tag );
-					// 	// dumpit ( $handle );
-					// 	dumpit ( $src );
-					// 	// var_dump ( $str );
-					// 	
-					// 	echo '<br>';
-					// 	
-					// 	$str = fw_replace_lang_domain($src);
-					// 	
-					// 	return $src;
-					// 	
-					// }, 1 );
-					
-					
-					// add_filter ( 'rest_url', function($str) {
-					// 	
-					// 	echo 'rest_url - ';
-					// 	
-					// 	$str = fw_replace_lang_domain($str);
-					// 	
-					// 	return $str;
-					// 	
-					// }, 1 );
 					
 				} else {
 					// echo 'uh oh';

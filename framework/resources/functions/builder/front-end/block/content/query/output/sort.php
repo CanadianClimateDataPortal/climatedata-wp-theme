@@ -4,7 +4,7 @@
 	<ul class="fw-query-sort <?php echo $options['list_class']; ?>">
 		<?php
 		
-			if ( $options['title_asc'] == true ) {
+			if ( $options['title_asc'] == 'true' ) {
 				
 		?>
 		
@@ -14,7 +14,7 @@
 				
 			}
 		
-			if ( $options['title_desc'] == true ) {
+			if ( $options['title_desc'] == 'true' ) {
 				
 		?>
 		
@@ -24,7 +24,7 @@
 				
 			}
 			
-			if ( $options['date_desc'] == true ) {
+			if ( $options['date_desc'] == 'true' ) {
 				
 		?>
 		
@@ -34,7 +34,7 @@
 					
 			}
 		
-			if ( $options['date_asc'] == true ) {
+			if ( $options['date_asc'] == 'true' ) {
 				
 		?>
 		

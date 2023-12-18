@@ -3014,96 +3014,118 @@
 			// console.log('inputs', upload_id_input, upload_url_input)
 			// console.log('placeholder', img_placeholder)
 			
-			
-			uploader.object = wp.media(uploader.options).on('select', function() {
+			uploader.object = wp.media(uploader.options)
+				.on('select', function() {
 				
-				uploader.attachment = uploader.object.state().get('selection').first().toJSON()
-				
-				// set hidden image ID input
-				uploader.elements.file_id.val(uploader.attachment.id).trigger('change')
-				
-				// console.log(attachment)
-				
-				// set URL and placeholder
-				
-				if (uploader.elements.placeholder.length) {
-						
+					uploader.attachment = uploader.object.state().get('selection').first().toJSON()
+					
+					// set hidden file ID input
+					uploader.elements.file_id.val(uploader.attachment.id).trigger('change')
+					
+					console.log(uploader.attachment)
+					
 					uploader.img_url.full = uploader.attachment.url
 					
-					uploader.placeholder_src = uploader.img_url.full
+					if (uploader.type == 'image') {
 					
-					if (uploader.attachment.sizes.thumbnail) {
-						uploader.img_url.thumbnail = uploader.attachment.sizes.thumbnail.url
-					}
-					
-					if (uploader.attachment.sizes.medium) {
-						uploader.img_url.medium = uploader.attachment.sizes.medium.url
+						// set URL and placeholder
 						
-						uploader.placeholder_src = uploader.img_url.medium
+						if (uploader.elements.placeholder.length) {
+								
+							uploader.placeholder_src = uploader.img_url.full
+							
+							if (uploader.attachment.sizes.thumbnail) {
+								uploader.img_url.thumbnail = uploader.attachment.sizes.thumbnail.url
+							}
+							
+							if (uploader.attachment.sizes.medium) {
+								uploader.img_url.medium = uploader.attachment.sizes.medium.url
+								
+								uploader.placeholder_src = uploader.img_url.medium
+							}
+							
+							if (uploader.attachment.sizes.large) {
+								uploader.img_url.thumbnail = uploader.attachment.sizes.large.url
+							}
+							
+							uploader.elements.placeholder.html('<img src="' + uploader.placeholder_src + '">')
+							
+							
+							// change button text
+							uploader.elements.button.text('Replace Image')
+							
+						}
+						
+						// uploader.elements.button.addClass('disabled')
+						// remove_btn.removeClass('d-none')
+						
+					} else if (uploader.type == 'video') {
+						
+						// change button text
+						uploader.elements.button.text('Replace Video')
+						
+						// filename in placeholder
+						uploader.elements.placeholder.text(uploader.attachment.filename)
+						
 					}
-					
-					if (uploader.attachment.sizes.large) {
-						uploader.img_url.thumbnail = uploader.attachment.sizes.large.url
-					}
-					
-					uploader.elements.placeholder.html('<img src="' + uploader.placeholder_src + '">')
 					
 					uploader.elements.url.val(JSON.stringify(uploader.img_url))
 					
-					// change button text
-					uploader.elements.button.text('Replace Image')
-					
-				} else {
-					
-					uploader.elements.url.val(JSON.stringify({ full: uploader.attachment.url }))
+				})
+				.on('open', function() {
+				
+					if (uploader.elements.file_id.val()) {
+						
+						selection = uploader.object.state().get('selection')
+						uploader.attachment = wp.media.attachment(uploader.elements.file_id.val())
+						uploader.attachment.fetch()
+						selection.add( uploader.attachment ? [uploader.attachment] : [] )
+						
+					}
 					
 				}
-				
-				// uploader.elements.button.addClass('disabled')
-				// remove_btn.removeClass('d-none')
-				
-			}).on('open', function() {
-			
-				if (uploader.elements.file_id.val()) {
-					
-					selection = uploader.object.state().get('selection')
-					uploader.attachment = wp.media.attachment(uploader.elements.file_id.val())
-					uploader.attachment.fetch()
-					selection.add( uploader.attachment ? [uploader.attachment] : [] )
-					
-				}
-				
-			})
+			)
 			
 			if (uploader.elements.file_id.val() != '') {
 				
-				console.log(uploader.elements.file_id.val())
-				
 				// element has an ID set
 				
-				if (uploader.elements.placeholder.length) {
-					
-					// there's also an image placeholder
+				console.log('existing ID', uploader.elements.file_id.val())
 				
-					// grab the best image size and set the placeholder
+				console.log(uploader)
+				
+				if (uploader.type == 'image') {
 					
-					let img_urls = JSON.parse(uploader.elements.url.val())
+					if (uploader.elements.placeholder.length) {
+						
+						// there's also an image placeholder
 					
-					uploader.placeholder_src = img_urls.full
-					
-					if (img_urls.medium) {
-						uploader.placeholder_src = img_urls.medium
+						// grab the best image size and set the placeholder
+						
+						let img_urls = JSON.parse(uploader.elements.url.val())
+						
+						uploader.placeholder_src = img_urls.full
+						
+						if (img_urls.medium) {
+							uploader.placeholder_src = img_urls.medium
+						}
+						
+						uploader.elements.placeholder.html('<img src="' + uploader.placeholder_src + '">')
+						
+						// change button text
+						uploader.elements.button.text('Replace Image')
+						
+					} else {
+						
+						// change button text
+						uploader.elements.button.text('Replace File')
+						
 					}
 					
-					uploader.elements.placeholder.html('<img src="' + uploader.placeholder_src + '">')
+				} else if (uploader.type == 'video') {
 					
-					// change button text
-					uploader.elements.button.text('Replace image')
-					
-				} else {
-					
-					// change button text
-					uploader.elements.button.text('Replace file')
+					uploader.elements.placeholder.text(uploader.attachment.filename)
+					uploader.elements.button.text('Replace Video')
 					
 				}
 				
@@ -3851,11 +3873,18 @@
 				
 				if (this_input.hasClass('uploader-file-url')) {
 					
-					let img_urls = JSON.parse(this_val)
+					let this_container = this_input.closest('.uploader-container'),
+							img_urls = JSON.parse(this_val)
 					
 					console.log(img_urls)
 					
-					this_input.closest('.uploader-container').find('.image-placeholder').html('<img src="' + img_urls.full + '">')
+					if (this_container.attr('data-uploader-type') == 'image') {
+					
+						this_container.find('.image-placeholder').html('<img src="' + img_urls.full + '">')
+						
+					} else if (this_container.attr('data-uploader-type') == 'video') {
+						this_container.find('.image-placeholder').text(img_urls.full.split('/').slice(-1))
+					}
 					
 				}
 				
@@ -4216,8 +4245,6 @@
 					
 			// set up options
 			
-			
-			
 			plugin.uploader = wp.media(uploader_options).on('select', function() {
 				
 				attachment = plugin.uploader.state().get('selection').first().toJSON()
@@ -4299,12 +4326,12 @@
 					img_placeholder.html('<img src="' + placeholder_src + '">')
 					
 					// change button text
-					upload_btn.text('Replace image')
+					upload_btn.text('Replace Image')
 					
 				} else {
 					
 					// change button text
-					upload_btn.text('Replace file')
+					upload_btn.text('Replace File')
 					
 				}
 				
@@ -4490,6 +4517,10 @@
 				// format value
 				
 				if (input.name.includes('inputs-title')) {
+					input.value = plugin.escape(input.value)
+				}
+				
+				if (input.name.includes('code')) {
 					input.value = plugin.escape(input.value)
 				}
 				

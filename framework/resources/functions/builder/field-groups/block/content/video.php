@@ -24,7 +24,7 @@
 				
 				<div class="col" id="source-url">
 					<label for="inputs-url" class="form-label">Video URL</label>
-					<input class="form-control" type="text" name="inputs-url" id="inputs-url">
+					<input class="form-control" type="text" name="inputs-url-<?php echo $_GET['globals']['current_lang_code']; ?>" id="inputs-url-<?php $_GET['globals']['current_lang_code']; ?>">
 				</div>
 				
 			</div>
@@ -75,7 +75,7 @@
 								
 								<div class="col pe-3">
 									
-									<select class="form-select form-select-sm" name="inputs-upload-rows[]-type" id="inputs-upload-rows[]-type">
+									<select class="form-select form-select-sm" name="inputs-upload-rows[]-encoding" id="inputs-upload-rows[]-encoding">
 										<option value="mp4">MP4</option>
 										<option value="webm">WebM</option>
 										<option value="ogg">Ogg</option>
@@ -131,7 +131,7 @@
 			<div class="row row-cols-1 g-3" id="source-embed">
 				<div class="col">
 					<label for="inputs-embed" class="form-label">Embed Code</label>
-					<textarea class="form-control form-control-sm font-monospace" rows="6" name="inputs-code" id="inputs-code"></textarea>
+					<textarea class="form-control form-control-sm font-monospace" rows="6" name="inputs-code-<?php $_GET['globals']['current_lang_code']; ?>" id="inputs-code-<?php $_GET['globals']['current_lang_code']; ?>"></textarea>
 				</div>
 			</div>
 			

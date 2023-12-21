@@ -1,4 +1,22 @@
 //
+// HOME
+//
+
+#home {
+  #features {
+    h2 {
+      font-size: 4rem;
+      font-family: $font-family-serif;
+      color: $primary;
+    }
+
+    h5 {
+      @include all-caps;
+    }
+  }
+}
+
+//
 // APP PAGES
 //
 

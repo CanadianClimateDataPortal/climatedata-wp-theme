@@ -10,6 +10,29 @@
 }
 
 //
+// FOOTER
+//
+
+#footer-copyright {
+  font-size: 0.75rem;
+
+  p {
+    margin-bottom: 0;
+  }
+}
+
+#footer-socials {
+  a {
+    color: $gray-600;
+    text-decoration: none;
+
+    i {
+      margin-right: 0.75rem;
+    }
+  }
+}
+
+//
 // CONTROL BAR
 //
 

@@ -153,9 +153,6 @@ var result = {};
       // UI WIDGETS
       //
 
-      // location detail tabs
-      $('#location-tabs-container').tabs();
-
       // sortable colour table
       $('#display-colour-table').sortable({
         items: '> div',

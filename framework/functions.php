@@ -199,7 +199,6 @@ add_filter ( 'body_class', function ( $classes ) {
 	
 } );
 
-
 function fw_build_menu ( array &$elements, $parent_id = 0, $level = 1 ) {
 
 	$branch = array();
@@ -207,31 +206,30 @@ function fw_build_menu ( array &$elements, $parent_id = 0, $level = 1 ) {
 	$i = 0;
 
 	foreach ( $elements as &$element ) {
-
-		// if ( $element['type'] != 'wpml_ls_menu_item' ) {
-
-			// echo 'item: ';
-
-			if ( $element['parent'] == $parent_id ) {
-
-				if ( is_int ( $element['id'] ) ) {
-
-					$children = fw_build_menu ( $elements, $element['id'], $level + 1 );
-
-					if ( $children ) {
-						$element['children'] = $children;
-					}
-
+		
+		if ( $element['parent'] == $parent_id ) {
+			
+			// element's parent matches the function's parent
+		
+			if ( is_int ( $element['id'] ) ) {
+			
+				$children = fw_build_menu ( $elements, $element['id'], $level + 1 );
+				
+				if ( $children ) {
+					$element['children'] = $children;
 				}
-
-				$branch[] = $element;
-
-				unset ( $elements[$i] );
-
+				
 			}
-
-			$i++;
-
+			
+			// add the element to this level in the array
+			
+			$branch[] = $element;
+			
+			unset ( $elements[$i] );
+			
+		}
+		
+		$i++;
 
 	}
 

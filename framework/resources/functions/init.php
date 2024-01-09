@@ -58,6 +58,8 @@ function fw_global_vars() {
 	
 	$fw['elements'] = array ( 'section', 'container', 'row', 'column', 'block' );
 	
+	$fw['autogen'] = true;
+	
 	// $fw['classes'] = array (
 	// 	'page' => get_body_class(),
 	// 	'section' => ['fw-element', 'fw-section'],

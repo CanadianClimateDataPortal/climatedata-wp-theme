@@ -1,12 +1,12 @@
 <?php
 
+$menu = array();
+
 // 1. CREATE MENU ITEMS
 
 if ( str_contains ( $element['inputs']['menu'], 'menu-' ) ) {
 	
-	//
 	// WP MENU
-	//
 	
 	$nav_items = wp_get_nav_menu_items ( str_replace ( 'menu-', '', $element['inputs']['menu'] ) );
 	
@@ -27,6 +27,58 @@ if ( str_contains ( $element['inputs']['menu'], 'menu-' ) ) {
 	
 	$menu = fw_build_menu ( $menu_items, 0, 1 );
 	
+} elseif ( $element['inputs']['menu'] == 'hierarchy' ) {
+
+	// HIERARCHY
+	
+	$menu_items = array();
+	
+	// get top parent
+
+	$top_parent = get_top_parent ( $globals['current_query']['ID'] );
+	$build_menu_top = $top_parent;
+	
+	if ( $element['inputs']['hierarchy']['parent'] == 'true' ) {
+		
+		$menu_items[] = array (
+			'id' => $top_parent,
+			'type' => get_post_type ( $top_parent ),
+			'url' => get_permalink ( $top_parent ),
+			'title' => get_the_title ( $top_parent ),
+			'parent' => 0
+		);
+		
+		$build_menu_top = 0;
+		
+		
+	}
+	
+	// get children
+	
+	$all_children = get_page_children ( $top_parent, get_pages ( array (
+		'post_type' => 'page',
+		'post_status' => array ( 'publish' ),
+		'sort_column' => 'menu_order',
+		'sort_order' => 'asc'
+	) ) );
+	
+	if ( !empty ( $all_children ) ) {
+		
+		foreach ( $all_children as $item ) {
+			
+			$menu_items[] = array (
+				'id' => $item->ID,
+				'type' => $item->post_type,
+				'url' => get_permalink ( $item->ID ),
+				'title' => get_the_title ( $item->ID ),
+				'parent' => $item->post_parent
+			);
+		}
+		
+		$menu = fw_build_menu ( $menu_items, $build_menu_top, 1 );
+		
+	}
+	
 } elseif ( $element['inputs']['menu'] == 'manual' ) {
 	
 	echo 'manual';
@@ -37,31 +89,8 @@ if ( str_contains ( $element['inputs']['menu'], 'menu-' ) ) {
 	// LANG SWITCHER
 	//
 	
-	// echo 'current: ' . get_permalink ( $globals['current_query']['ID'] ) . '<br>';
-		
-	// $current_path = implode ( '/', translate_path ( $globals['current_query']['ID'], $globals['current_lang_code'] ) );
-			
-	// 
-	// if ( $globals['current_lang_code'] != 'en' ) {
-	// 	$this_path = substr ( $this_path, 3 );
-	// }
-	
 	foreach ( get_field ( 'fw_languages', 'option' ) as $lang ) {
 		
-		// echo '<br><br>';
-		
-		// if ( $globals['current_lang_code'] == $lang['code'] ) {
-		// 	
-		// 	// if linking to the current language
-		// 	// just spit out get_permalink()
-		// 	// and the filtering will take care of it
-		// 	
-		// 	// echo '<br>-' . $lang['code'] . '-<br>';
-		// 	
-		// 	$lang_URL = get_permalink ( $globals['current_query']['ID'] );
-		// 	
-		// } else {
-			
 		$lang_URL = translate_permalink ( $GLOBALS['vars']['current_url'], $globals['current_query']['ID'], $lang['code'] );
 		
 		$menu[] = array(
@@ -85,13 +114,20 @@ if ( str_contains ( $element['inputs']['menu'], 'menu-' ) ) {
 	
 	<?php
 	
-		// dumpit ( $element['inputs']['classes'] );
-		
 		switch ( $element['inputs']['display']['name'] ) {
 				
-			case 'list' : 
+			case 'nested' : 
 				
-				// $element['inputs']['classes']['menu'] .= 'fw';
+				$element['inputs']['classes']['menu'] .= 'fw-menu-nested';
+				$element['inputs']['classes']['item'] .= ' fw-menu-item';
+				
+				fw_menu_output ( $menu, 1, 'list', $element['inputs']['classes'] );
+				
+				break;
+				
+			case 'hover' : 
+				
+				$element['inputs']['classes']['menu'] .= ' fw-menu-hover';
 				$element['inputs']['classes']['item'] .= ' fw-menu-item';
 				
 				fw_menu_output ( $menu, 1, 'list', $element['inputs']['classes'] );

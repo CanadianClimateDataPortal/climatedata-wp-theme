@@ -184,7 +184,7 @@ h1 {
 
 #hero {
   h1 {
-    font-size: 5rem;
+    @include font-size(5rem);
     font-weight: bold;
   }
 }
@@ -471,6 +471,27 @@ $query-card-hover-padding: 0.75rem;
         margin-right: $query-card-hover-padding;
       }
     }
+  }
+}
+
+// ACCORDION
+
+.accordion-button {
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .p,
+  .h1,
+  .h2,
+  .h3,
+  .h4,
+  .h5,
+  .h6 {
+    margin-bottom: 0;
   }
 }
 

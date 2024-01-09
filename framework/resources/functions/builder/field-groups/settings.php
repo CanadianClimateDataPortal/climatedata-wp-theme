@@ -25,13 +25,54 @@
 			</button>
 			
 			<ul id="settings-form-add-items" class="dropdown-menu fw-form-flex-menu" aria-labelledby="settings-form-add">
-				<li><span class="dropdown-item" data-flex-item="colors">Colour Scheme</span></li>
-				<li><span class="dropdown-item" data-flex-item="background">Background Image</span></li>
-				<li><span class="dropdown-item" data-flex-item="spacing">Spacing</span></li>
-				<li><span class="dropdown-item" data-flex-item="carousel">Carousel</span></li>
-				<li><span class="dropdown-item" data-flex-item="offcanvas">Offcanvas</span></li>
-				<li><span class="dropdown-item" data-flex-item="aos">Animate on Scroll</span></li>
-				<li><span class="dropdown-item" data-flex-item="attributes">Data Attributes</span></li>
+				<?php
+				
+					$settings_items = array (
+						array (
+							'key' => 'colors',
+							'name' => 'Colour Scheme'
+						),
+						array (
+							'key' => 'background',
+							'name' => 'Background Image'
+						),
+						array (
+							'key' => 'spacing',
+							'name' => 'Spacing'
+						),
+						array (
+							'key' => 'carousel',
+							'name' => 'Carousel'
+						),
+						array (
+							'key' => 'offcanvas',
+							'name' => 'Offcanvas'
+						),
+						array (
+							'key' => 'accordion',
+							'name' => 'Accordion'
+						),
+						array (
+							'key' => 'aos',
+							'name' => 'Animate on Scroll'
+						),
+						array (
+							'key' => 'attributes',
+							'name' => 'Data Attributes'
+						)
+					);
+					
+					foreach ( $settings_items as $item ) {
+					
+				?>
+				
+				<li><span class="dropdown-item" data-flex-item="<?php echo $item['key']; ?>"><?php echo $item['name']; ?></span></li>
+				
+				<?php
+				
+					}
+			
+				?>
 			</ul>
 		</div>
 		

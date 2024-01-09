@@ -379,8 +379,8 @@
 						options.parent.data.children = []
 					}
 					
-					console.log('parent children')
-					console.log(JSON.stringify(options.parent.data.children, null, 2))
+					// console.log('parent children')
+					// console.log(JSON.stringify(options.parent.data.children, null, 2))
 					
 					options.inserting.index = options.parent.data.children.length
 					
@@ -1709,14 +1709,7 @@
 			// console.log(JSON.stringify(element.data, null, 2))
 			
 			let insert_index = options.inserting.index + 1
-			let insert_eq
-			
-			if (options.inserting.index != null) {
-				
-				insert_eq = $('[data-key="' + options.parent.data.key + '"]').find('> .fw-element').eq(options.inserting.index)
-				
-				console.log('eq 1', insert_eq)
-			}
+			let insert_eq = null
 			
 			let parent_has_changed = false
 			
@@ -1732,15 +1725,19 @@
 			
 			if (options.template_first != '' ) {
 				
+				// template_first exists
+				// so we're insert template elements
+				
 				if (options.element.data.inputs.source == 'include') {
 					
-					// the first element in the template HTML
-					// is not a .fw-element
-					// so this is an include
+					// this is an include
 					
 					options.template_first = 'include'
 					
 				} else {
+					
+					// clunky: grab the first element
+					// in the template and see what type it is
 					
 					options.template_first = options.template_first.attr('class')
 					options.template_first = options.template_first.split('fw-element fw-')[1]
@@ -1789,6 +1786,23 @@
 							start_generating = true
 							
 						} else if (start_generating == true) {
+							
+							if (insert_eq == null) {
+								
+								console.log('insert at index' + insert_index)
+								
+								if (options.inserting.index != null) {
+									
+									insert_eq = $('.fw-element[data-key="' + options.parent.data.key + '"]').find('> .fw-element').eq(options.inserting.index)
+									
+									console.log('eq 1', insert_eq)
+								}
+								
+							} else {
+							
+								insert_eq = null
+								
+							}
 							
 							// the last iteration flagged to start
 							// auto-generating
@@ -1857,11 +1871,18 @@
 									
 								}
 								
-								// console.log('adding auto element', temp_element.data.type, temp_element.data.key)
+								console.log('adding auto element', temp_element.data.type, temp_element.data.key)
 								
-								// console.log('to parent', options.parent.data.key)
+								console.log('to parent', options.parent.data.key)
+								 
+								console.log('at index', insert_eq)
 								
-								temp_element.item.appendTo(options.parent.item)
+								if (insert_eq == null) {
+									temp_element.item.appendTo(options.parent.item)
+								} else {
+									temp_element.item.insertAfter(insert_eq)
+									insert_eq = null
+								}
 								
 								// console.log('new temp_key', temp_key, temp_element.data)
 								
@@ -3537,14 +3558,14 @@
 					// DISPLAY MENU
 					// set the modal's data-display attribute
 					// to show/hide relevant field sets with CSS
-					
-					if ($('#fw-modal').find('.fw-display-select').length) {
-						
-						let first_display_option = $('#fw-modal').find('.fw-display-select').first().val()
-						
-						$('#fw-modal').attr('data-display', first_display_option)
-						
-					}
+					// 
+					// if ($('#fw-modal').find('.fw-display-select').length) {
+					// 	
+					// 	let first_display_option = $('#fw-modal').find('.fw-display-select').first().val()
+					// 	
+					// 	$('#fw-modal').attr('data-display', first_display_option)
+					// 	
+					// }
 					
 			
 			

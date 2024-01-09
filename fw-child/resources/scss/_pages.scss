@@ -192,7 +192,7 @@ body.tab-drawer-open {
 .single-post {
   #hero {
     h1 {
-      font-size: 3rem;
+      @include font-size(3rem);
     }
   }
 }

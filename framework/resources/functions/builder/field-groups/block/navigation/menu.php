@@ -19,44 +19,62 @@ $menus = wp_get_nav_menus();
 				<div class="col">
 					<label for="inputs-menu" class="form-label">Menu Type</label>
 					
-					<select name="inputs-menu" class="form-select">
+					<select name="inputs-menu" class="form-select conditional-select">
 					
 						<option value="" disabled selected>Select a menu</option>
-						
-						<?php
-						
-							if ( ! empty( $menus ) ) {
-								foreach ( $menus as $choice ) {
-									$field['choices'][ $choice->menu_id ] = $choice->term_id;
-									$field['choices'][ $choice->name ] = $choice->name;
 					
-									echo '<option value="menu-' . $field['choices'][ $choice->menu_id ] . '" ' . selected ( $field_value, $field['choices'][ $choice->menu_id ], false ) . ' >WordPress Menu: ' . $field['choices'][ $choice->name ] . '</option>';
-									
-								}
-							}
-							
-						?>
-						
-						<option value="manual">Add Items Manually</option>
 						<option value="lang">Language Switcher</option>
+						<option value="hierarchy" data-form-condition="#menu-hierarchy">Current Section Hierarchy</option>
+						<option value="manual" data-condition="#menu-manual">Add Items Manually</option>
+						
+						<optgroup label="Wordpress Menus">
+							<?php
+							
+								if ( ! empty ( $menus ) ) {
+									foreach ( $menus as $choice ) {
+										$field['choices'][ $choice->menu_id ] = $choice->term_id;
+										$field['choices'][ $choice->name ] = $choice->name;
+						
+										echo '<option value="menu-' . $field['choices'][ $choice->menu_id ] . '" ' . selected ( $field_value, $field['choices'][ $choice->menu_id ], false ) . ' >' . $field['choices'][ $choice->name ] . '</option>';
+										
+									}
+								}
+								
+							?>
+						</optgroup>
 						
 					</select>
 				</div>
+			</div>
 			
+			<div id="menu-hierarchy" class="row row-cols-1 g-3 mb-3">
+				<div class="col">
+					<p class="form-label">Section Hierarchy</p>
+
+					<div class="card p-3">
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" value="true" name="inputs-hierarchy-parent" id="inputs-hierarchy-parent">
+							<label class="form-check-label" for="inputs-hierarchy-parent">Include Top Parent</label>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row row-cols-2 g-3 mb-3">
 				<div class="col">
 					<label for="inputs-display-name" class="form-label">Display</label>
 					
-					<select name="inputs-display-name" class="form-select fw-display-select">
+					<select name="inputs-display-name" class="form-select conditional-select">
 					
-						<option value="list">List</option>
-						<option value="dropdown">Dropdown</option>
+						<option value="nested" data-form-condition="#display-list">Nested List</option>
+						<option value="hover" data-form-condition="#display-list">List with hover dropdowns</option>
+						<option value="dropdown" data-form-condition="#display-dropdown">Dropdown Menu</option>
 						
 					</select>
 				</div>
 				
 			</div>
 		
-			
 			<?php
 			
 				$types = array (
@@ -88,7 +106,7 @@ $menus = wp_get_nav_menus();
 					
 			?>
 			
-			<div class="display-group type-<?php echo $type; ?> mb-3">
+			<div id="display-<?php echo $type; ?>" class="display-group type-<?php echo $type; ?> mb-3">
 				<p class="form-label"><?php echo $type_array['name']; ?></p>
 				
 				<div class="card p-3">

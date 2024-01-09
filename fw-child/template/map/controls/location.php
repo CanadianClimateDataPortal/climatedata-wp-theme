@@ -78,9 +78,9 @@
 						
 						<!-- tabs -->
 						
-						<div id="location-tabs-container">
+						<div id="location-tabs-container" class="ms-3 pb-3">
 							
-							<ul class="nav nav-tabs" id="location-tabs" role="tablist">
+							<ul class="nav nav-tabs ps-3" id="location-tabs" role="tablist">
 								<li class="nav-item" role="presentation">
 									<button class="nav-link active" id="location-time-series-tab" data-bs-toggle="tab" data-bs-target="#location-time-series-pane" type="button" role="tab" aria-controls="location-time-series-pane" aria-selected="true"><?php _e ( 'Time Series', 'cdc' ); ?></button>
 								</li>
@@ -94,7 +94,8 @@
 							
 							<div class="tab-content" id="location-panes">
 								<!-- tab 1: time series -->
-								<div class="tab-pane fade show active" id="location-time-series-pane" role="tabpanel" aria-labelledby="location-time-series-tab" tabindex="0">.
+									
+								<div class="tab-pane fade show active" id="location-time-series-pane" role="tabpanel" aria-labelledby="location-time-series-tab" tabindex="0">
 									
 									<!-- wrapper for chart -->
 									<div class="location-chart-container mb-3">

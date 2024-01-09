@@ -6,7 +6,7 @@
 		
 		case 'code' :
 		
-			if ( $element['inputs']['code'] != '' ) {
+			if ( $element['inputs']['code'][$globals['current_lang_code']] != '' ) {
 				echo html_entity_decode ( $element['inputs']['code'][$globals['current_lang_code']] );
 			} else {
 				$message = 'Edit this block to add a video embed code.';
@@ -16,7 +16,7 @@
 			
 		case 'url' :
 			
-			if ( $element['inputs']['url'] != '' ) {
+			if ( $element['inputs']['url'][$globals['current_lang_code']] != '' ) {
 				echo apply_filters ( 'the_content', $element['inputs']['url'][$globals['current_lang_code']] );
 			} else {
 				$message = 'Edit this block to add a video URL.';

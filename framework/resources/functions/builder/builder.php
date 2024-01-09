@@ -33,13 +33,7 @@ function fw_builder() {
 		
 	}
 	
-	// update_post_meta ( get_the_ID(), 'builder', $builder );
-
-	// dumpit ( $builder );
-	
-	//
-	// OUTPUT
-	//
+	// BEGIN INITIAL OUTPUT LOOP
 	
 	fw_output_loop ( $builder, 1, true );
 	
@@ -108,7 +102,7 @@ function fw_output_extras_before_open ( $element, $level, $settings ) {
 						}
 						
 						break;
-					
+						
 				}
 			}
 		}
@@ -687,7 +681,15 @@ function fw_setup_element ( $element, $globals ) {
 						// $settings['background'] = $options['background'];
 						
 						break;
+					
+					case 'accordion' :
 						
+						$settings['classes'][] = 'accordion';
+						
+						$settings['atts']['accordion-heading'] = $options['heading'];
+						
+						break;
+					
 					case 'aos' :
 						
 						wp_enqueue_script ( 'aos' );
@@ -776,8 +778,8 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 		dumpit ( $element );
 	}
 	
-	// echo "\n\n\n" . 'var dump element' . "\n\n";
-	// var_dump ( $element );
+	// echo "<pre>\n\n\n" . 'var dump element' . "\n\n</pre>";
+	// dumpit ( $element );
 	
 	$settings = fw_setup_element ( $element, $globals );
 	
@@ -786,10 +788,6 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 	$output_this_element = true;
 	
 	// AUTO-GENERATED
-	
-	// echo "\n" . 'include autogen: ';
-	// echo ( $include_autogen == true ) ? 'y' : 'n';
-	// echo "\n";
 	
 	// flag when the template's first actual element is created
 	// if autogen = false we don't want to output auto elements
@@ -803,24 +801,40 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 		$GLOBALS['fw']['autogen'] = true;
 	}
 	
+	
+	// echo '<br>' . 'global autogen: ';
+	// echo ( $GLOBALS['fw']['autogen'] == true ) ? 'y' : 'n';
+	// echo '<br>';
+	
+	// set include_autogen to whatever the global is
+	// $include_autogen = $GLOBALS['fw']['autogen'];
+	
 	// skip the 'page' element
 	// if inserting a template
 	
-	if ( $settings['el_type'] == 'template' ) {
-		$include_autogen = false;
-	}
+	// if ( $settings['el_type'] == 'template' ) {
+	// 	$include_autogen = false;
+	// }
+	
+	// echo '<br>' . 'include autogen: ';
+	// echo ( $include_autogen == true ) ? 'y' : 'n';
+	// echo '<br>';
 	
 	if (
 		$settings['el_type'] == 'page' &&
 		$include_autogen == false 
 	) {
 		
-		// do not include the page element
+		// never include the page element
 		// when auto-generating
 		
 		$output_this_element = false;
 		
 	}
+	
+	// not outputting the page element
+	// element settings[autogen] is true
+	// include_autogen is false
 	
 	if (
 		$settings['el_type'] != 'page' &&
@@ -830,8 +844,12 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 		) &&
 		$include_autogen == false
 	) {
+		
 		$output_this_element = false;
+		
 	}
+	
+	// is the global autogen override turned on
 	
 	if (
 		$settings['el_type'] != 'page' && 
@@ -840,8 +858,16 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 			$globals['autogen'] == true
 		)
 	) {
+		
 		$output_this_element = true;
+		
 	}
+	
+	// echo 'output ' . $settings['el_type'] . ': ';
+	// echo ( $output_this_element == true ) ? 'y' : 'n';
+	// echo '<br>';
+	
+	// if we have decided to output this element
 	
 	if ( $output_this_element == true ) {
 		
@@ -849,10 +875,10 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 			do_action ( 'fw_before_element_open', $element, $level, $settings );
 		}
 		
+		// is this a template element
+		
 		if ( $include_autogen == false ) {
-			
 			$settings['classes'][] = 'fw-template-element';
-			
 		}
 		
 		if ( $settings['el_type'] != 'template' ) {
@@ -902,7 +928,9 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 			} elseif ( $element['inputs']['post_id'] != null ) {
 			
 				$template_builder = json_decode ( get_post_meta ( $element['inputs']['post_id'], 'builder', true ), true );
+				// echo 'ya';
 				
+				$GLOBALS['fw']['autogen'] = false;
 				fw_output_loop ( $template_builder, 1, false );
 				
 			}

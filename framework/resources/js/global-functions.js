@@ -71,6 +71,31 @@ var theme_dir = current_script.replace('/resources/js/' + filename, '') + '/'
       
     }
     
+    $('body').find('.accordion').each(function() {
+      
+      let this_ID = $(this).attr('id'),
+          this_heading = $(this).attr('data-accordion-heading')
+      
+      $(this).find(this_heading).each(function(i) {
+        
+        let this_section_ID = this_ID + '-section-' + (i + 1)
+        
+        $(this).addClass('accordion-header')
+        
+        $(this).find('> .fw-element-inner').addClass('accordion-button collapsed').attr('data-bs-toggle', 'collapse').attr('data-bs-target', '#' + this_section_ID)
+        
+        $(this).nextUntil(this_heading).andSelf().wrapAll('<div class="accordion-item">')
+        
+        $(this).nextUntil(this_heading).wrapAll('<div id="' + this_section_ID + '" class="accordion-collapse collapse" data-bs-parent="#' + this_ID + '"><div class="accordion-body">')
+        
+      })
+      
+    })
+    
+    //
+    // QUERY
+    //
+    
     if ($('.fw-query-object').length) {
       $('.fw-query-object').each(function() {
         

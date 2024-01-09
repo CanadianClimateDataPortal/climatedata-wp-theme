@@ -121,7 +121,7 @@ function taxonomy_techlevel() {
 		'show_in_nav_menus'          => true,
 		'show_tagcloud'              => true,
 	);
-	register_taxonomy( 'tech-level', array( 'resource' ), $args );
+	register_taxonomy( 'tech_level', array( 'resource' ), $args );
 
 }
 add_action( 'init', 'taxonomy_techlevel', 0 );

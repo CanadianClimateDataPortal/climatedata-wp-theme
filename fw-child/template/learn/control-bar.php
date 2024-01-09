@@ -80,7 +80,7 @@
 						
 						<div class="control-tab-body query-container">
 							
-							<div class="fw-query-filter " data-filter-type="meta" data-filter-multi="false">
+							<div class="fw-query-filter p-3" data-filter-type="meta" data-filter-multi="false">
 								<h6 class="text-primary"><?php _e ( 'Content Type', 'cdc' ); ?></h6>
 								
 								<ul class="list-unstyled">
@@ -89,6 +89,42 @@
 									<li class="filter-item" data-key="asset_type" data-value="interactive"><?php _e ( 'Interactive', 'cdc' ); ?></li>
 									<li class="filter-item" data-key="asset_type" data-value="article"><?php _e ( 'Article', 'cdc' ); ?></li>
 								</ul>
+							</div>
+							
+							<div class="fw-query-filter p-3" data-filter-type="taxonomy" data-filter-multi="false">
+								<h6 class="text-primary"><?php _e ( 'Technical Level', 'fw' ); ?></h6>
+								
+								<?php
+								
+									$all_tags = get_terms ( array ( 
+										'taxonomy' => 'tech_level',
+										'hide_empty' => true
+									) );
+								
+									if ( !empty ( $all_tags ) ) {
+									
+								?>
+								
+								<ul class="list-unstyled">
+									<?php
+									
+										foreach ( $all_tags as $tag ) {
+											
+									?>
+									
+									<li class="filter-item" data-key="tech_level" data-value="<?php echo $tag->slug; ?>"><?php echo $tag->name; ?></li>
+									
+									<?php
+									
+										}
+								
+									?>
+								</ul>
+								<?php
+								
+									}
+							
+								?>
 							</div>
 							
 						</div>

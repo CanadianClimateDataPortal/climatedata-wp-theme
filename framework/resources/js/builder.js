@@ -379,8 +379,8 @@
 						options.parent.data.children = []
 					}
 					
-					console.log('parent children')
-					console.log(JSON.stringify(options.parent.data.children, null, 2))
+					// console.log('parent children')
+					// console.log(JSON.stringify(options.parent.data.children, null, 2))
 					
 					options.inserting.index = options.parent.data.children.length
 					

@@ -57,7 +57,9 @@ if ( str_contains ( $element['inputs']['menu'], 'menu-' ) ) {
 	
 	$all_children = get_page_children ( $top_parent, get_pages ( array (
 		'post_type' => 'page',
-		'post_status' => array ( 'publish' )
+		'post_status' => array ( 'publish' ),
+		'sort_column' => 'menu_order',
+		'sort_order' => 'asc'
 	) ) );
 	
 	if ( !empty ( $all_children ) ) {

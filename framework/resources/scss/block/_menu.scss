@@ -1,4 +1,10 @@
 .fw-menu-list {
+	list-style: none;
+	padding: 0;
+	
+	a {
+		display: block;
+	}
 }
 
 .fw-menu {
@@ -8,16 +14,13 @@
 }
 
 .fw-menu-nested {
-	
+	.fw-menu-list {
+		padding-left: 0.75rem;
+		font-size: 0.75em;
+	}
 }
 
 .fw-menu-hover {
-	list-style: none;
-	padding: 0;
-	
-	a {
-		display: block;
-	}
 
 	.fw-menu-item {
 		position: relative;

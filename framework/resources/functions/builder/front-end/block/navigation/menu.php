@@ -118,7 +118,7 @@ if ( str_contains ( $element['inputs']['menu'], 'menu-' ) ) {
 				
 			case 'nested' : 
 				
-				$element['inputs']['classes']['menu'] .= 'fw-menu-nested';
+				$element['inputs']['classes']['menu'] .= ' fw-menu-nested';
 				$element['inputs']['classes']['item'] .= ' fw-menu-item';
 				
 				fw_menu_output ( $menu, 1, 'list', $element['inputs']['classes'] );
@@ -136,9 +136,9 @@ if ( str_contains ( $element['inputs']['menu'], 'menu-' ) ) {
 			
 			case 'dropdown' : 
 				
-				$element['inputs']['classes']['menu'] .= 'dropdown-menu';
-				$element['inputs']['classes']['item'] .= 'd-inline';
-				$element['inputs']['classes']['link'] .= 'dropdown-item';
+				$element['inputs']['classes']['menu'] .= ' dropdown-menu';
+				$element['inputs']['classes']['item'] .= ' d-inline';
+				$element['inputs']['classes']['link'] .= ' dropdown-item';
 				
 	?>
 	

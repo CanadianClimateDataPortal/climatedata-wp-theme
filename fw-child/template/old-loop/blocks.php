@@ -109,7 +109,7 @@
 									if ( $block_type == 'text' ) {
 
 										if ( empty ( $block_breakpoints ) ) {
-											$block_breakpoints = array ( 'col-14', 'offset-2', 'col-lg-10', 'col-xl-8' );
+											$block_breakpoints = array ( 'col-13', 'offset-2', 'col-lg-10', 'col-xl-8', 'py-4' );
 										}
 
 									}
@@ -117,7 +117,7 @@
 									if ( $block_type == 'image' ) {
 
 										if ( empty ( $block_breakpoints ) ) {
-											$block_breakpoints = array ( 'col-14', 'offset-2' );
+											$block_breakpoints = array ( 'col-13', 'offset-2', 'py-4' );
 										}
 
 									}
@@ -125,7 +125,7 @@
 									if ( $block_type == 'big_list' ) {
 
 										if ( empty ( $block_breakpoints ) ) {
-											$block_breakpoints = array ( 'col-14', 'offset-2', 'col-lg-9' );
+											$block_breakpoints = array ( 'col-13', 'offset-2', 'col-lg-9', 'py-4' );
 										}
 
 									}
@@ -133,7 +133,7 @@
 									if ( $block_type == 'text_img' ) {
 
 										if ( empty ( $block_breakpoints ) ) {
-											$block_breakpoints = array ( 'col-14', 'offset-2' );
+											$block_breakpoints = array ( 'col-13', 'offset-2', 'py-4' );
 										}
 
 									}
@@ -141,7 +141,7 @@
 									if ( $block_type == 'post_grid' ) {
 
 										if ( empty ( $block_breakpoints ) ) {
-											$block_breakpoints = array ( 'col-12', 'offset-2' );
+											$block_breakpoints = array ( 'col-12', 'offset-2', 'py-4' );
 										}
 
 									}
@@ -149,7 +149,7 @@
 									if ( $block_type == 'map' ) {
 
 										if ( empty ( $block_breakpoints ) ) {
-											$block_breakpoints = array ( 'col-14', 'offset-2' );
+											$block_breakpoints = array ( 'col-13', 'offset-2', 'py-4' );
 										}
 
 									}
@@ -157,7 +157,7 @@
 									if ( $block_type == 'chart' ) {
 
 										if ( empty ( $block_breakpoints ) ) {
-											$block_breakpoints = array ( 'col-13', 'offset-2', 'col-lg-10', 'col-xl-8' );
+											$block_breakpoints = array ( 'col-13', 'offset-2', 'col-lg-10', 'col-xl-8', 'py-4' );
 										}
 
 									}

@@ -1427,8 +1427,8 @@
 			
 			console.log('getting template')
 			
-			console.log('parent data')
-			console.log(JSON.stringify(parent.data, null, 2))
+			// console.log('parent data')
+			// console.log(JSON.stringify(parent.data, null, 2))
 			
 			// use the parent element's type
 			// to figure out which element the template

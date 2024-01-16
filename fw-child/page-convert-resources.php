@@ -86,10 +86,36 @@ if ( current_user_can ( 'administrator' ) ) {
 							"key" => $en_ID . "-1",
 						],
 						[
-							"autogen" => "true",
 							"type" => "section",
 							"key" => $en_ID . "-2",
-							"inputs" => ["id" => "auto"],
+							"inputs" => [
+								"id" => "auto",
+								"class" => [""],
+								"settings" => [
+									[
+										"spacing" => [
+											"type" => "spacing",
+											"rows" => [
+												[
+													"property" => "p",
+													"side" => "y",
+													"breakpoint" => "",
+													"value" => "4",
+													"index" => "0",
+												],
+												[
+													"property" => "p",
+													"side" => "y",
+													"breakpoint" => "md",
+													"value" => "6",
+													"index" => "1",
+												],
+											],
+											"index" => "0",
+										],
+									],
+								],
+							],
 							"children" => [
 								[
 									"classes" => [
@@ -102,6 +128,30 @@ if ( current_user_can ( 'administrator' ) ) {
 									"inputs" => [
 										"id" => "resource-video-container",
 										"class" => [""],
+										"settings" => [
+											[
+												"spacing" => [
+													"type" => "spacing",
+													"rows" => [
+														[
+															"property" => "m",
+															"side" => "t",
+															"breakpoint" => "",
+															"value" => "-6",
+															"index" => "0",
+														],
+														[
+															"property" => "m",
+															"side" => "b",
+															"breakpoint" => "",
+															"value" => "6",
+															"index" => "1",
+														],
+													],
+													"index" => "0",
+												],
+											],
+										],
 									],
 									"key" => $en_ID . "-2-1",
 									"children" => [

@@ -489,7 +489,11 @@ function get_post_by_lang_slug ( $query ) {
 					// CPT SINGLE
 					
 					$query->set ( 'post_type', array ( $query->query_vars['cpt'] ) );
-				
+					
+					$query->is_home = false;
+					$query->is_single = true;
+					$query->is_singular = true;
+					
 				}
 				
 			}

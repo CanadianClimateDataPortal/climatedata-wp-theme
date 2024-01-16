@@ -67,714 +67,670 @@ if ( current_user_can ( 'administrator' ) ) {
 				// 3. insert 'video' builder layout
 				
 				$builder = [
-						"type" => "page",
-						"inputs" => ["id" => "auto"],
-						"post_id" => $en_ID,
-						"key" => $en_ID,
-						"children" => [
+					"type" => "page",
+					"inputs" => ["id" => "auto"],
+					"post_id" => $en_ID,
+					"key" => $en_ID,
+					"children" => [
+						[
+							"classes" => ["fw-element", "fw-template"],
+							"type" => "template",
+							"inputs" => [
+								"source" => "post",
+								"post_id" => "11445",
+								"path" => "",
+								"output" => "template",
+								"id" => "auto",
+								"class" => [""],
+							],
+							"key" => $en_ID . "-1",
+						],
+						[
+							"autogen" => "true",
+							"type" => "section",
+							"key" => $en_ID . "-2",
+							"inputs" => ["id" => "auto"],
+							"children" => [
 								[
-										"classes" => ["fw-element", "fw-template"],
-										"type" => "template",
-										"inputs" => [
-												"source" => "post",
-												"post_id" => "11445",
-												"path" => "",
-												"output" => "template",
-												"id" => "auto",
-												"class" => [""],
+									"classes" => [
+										"fw-element",
+										"fw-container",
+										"container-fluid",
+									],
+									"child" => "row",
+									"type" => "container",
+									"inputs" => [
+										"id" => "resource-video-container",
+										"class" => [""],
+									],
+									"key" => $en_ID . "-2-1",
+									"children" => [
+										[
+											"autogen" => "true",
+											"type" => "row",
+											"key" => $en_ID . "-2-1-1",
+											"inputs" => ["id" => "auto"],
+											"children" => [
+												[
+													"classes" => [
+														"fw-element",
+														"fw-column",
+														"col",
+													],
+													"child" => "block",
+													"type" => "column",
+													"inputs" => [
+														"breakpoints" => [
+															"xs" => [
+																"d" => "block",
+																"col" => "12",
+																"offset" => "2",
+																"order" => "",
+															],
+															"sm" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"md" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"lg" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"xl" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"xxl" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+														],
+														"id" => "auto",
+														"class" => [""],
+													],
+													"key" => $en_ID . "-2-1-1-1",
+													"children" => [
+														[
+															"classes" => [
+																"fw-element",
+																"fw-block",
+															],
+															"parent" => "",
+															"type" => "block/content/video",
+															"inputs" => [
+																"source" => "url",
+																"url" => [
+																	"en" => 'https://vimeo.com/' . get_field ( 'asset_video', $en_ID ),
+																	"fr" => 'https://vimeo.com/' . get_field ( 'asset_video', $fr_ID )
+																],
+																"upload" => [
+																	"rows" => [
+																		[
+																			"file" => [
+																				"id" => "",
+																				"url" => "",
+																			],
+																			"encoding" => "mp4",
+																			"index" => "0",
+																		],
+																	],
+																	"atts" => [
+																		"loop" => "false",
+																		"autoplay" => "false",
+																		"muted" => "false",
+																		"controls" => "false",
+																	],
+																],
+																"code" => [
+																	"en" => "",
+																	"fr" => ""
+																],
+																"id" => "resource-video",
+																"class" => [""],
+																"inner_class" => "",
+															],
+															"key" => $en_ID . "-2-1-1-1-1",
+														],
+													],
+												],
+											],
 										],
-										"key" => $en_ID . "-1",
+									],
 								],
 								[
-										"type" => "section",
-										"key" => $en_ID . "-2",
-										"inputs" => [
-												"id" => "auto",
+									"classes" => [
+										"fw-element",
+										"fw-container",
+										"container-fluid",
+									],
+									"child" => "row",
+									"type" => "container",
+									"inputs" => ["id" => "auto", "class" => [""]],
+									"key" => $en_ID . "-2-2",
+									"children" => [
+										[
+											"type" => "row",
+											"key" => $en_ID . "-2-2-1",
+											"inputs" => [
+												"id" => "resource-format",
 												"class" => [""],
 												"settings" => [
+													[
+														"spacing" => [
+															"type" => "spacing",
+															"rows" => [
+																[
+																	"property" => "p",
+																	"side" => "y",
+																	"breakpoint" => "",
+																	"value" => "2",
+																	"index" => "0",
+																],
+															],
+															"index" => "0",
+														],
+													],
+												],
+											],
+											"children" => [
+												[
+													"type" => "column",
+													"inputs" => [
+														"breakpoints" => [
+															"xs" => [
+																"d" => "block",
+																"col" => "12",
+																"offset" => "2",
+																"order" => "",
+															],
+															"sm" => [
+																"d" => "block",
+																"col" => "3",
+																"offset" => "",
+																"order" => "",
+															],
+															"md" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"lg" => [
+																"d" => "block",
+																"col" => "2",
+																"offset" => "",
+																"order" => "",
+															],
+															"xl" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"xxl" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+														],
+														"id" => "auto",
+														"class" => [""],
+													],
+													"key" => $en_ID . "-2-2-1-1",
+													"children" => [
 														[
-																"spacing" => [
-																		"type" => "spacing",
-																		"rows" => [
-																				[
-																						"property" => "p",
-																						"side" => "y",
-																						"breakpoint" => "",
-																						"value" => "4",
-																						"index" => "0",
-																				],
-																				[
-																						"property" => "p",
-																						"side" => "y",
-																						"breakpoint" => "md",
-																						"value" => "6",
-																						"index" => "1",
-																				],
-																		],
-																		"index" => "0",
-																],
-														],
-												],
-										],
-										"children" => [
-												[
-														"classes" => [
+															"classes" => [
 																"fw-element",
-																"fw-container",
-																"container-fluid",
-														],
-														"child" => "row",
-														"type" => "container",
-														"inputs" => [
-																"id" => "resource-video-container",
+																"fw-block",
+															],
+															"parent" => "",
+															"type" => "block/content/text",
+															"inputs" => [
+																"text" => [
+																	"en" => "&lt;h6&gt;Format&lt;/h6&gt;",
+																	"fr" => "&lt;h6&gt;Format&lt;/h6&gt;",
+																],
+																"id" => "auto",
 																"class" => [""],
-																"settings" => [
-																		[
-																				"spacing" => [
-																						"type" => "spacing",
-																						"rows" => [
-																								[
-																										"property" => "m",
-																										"side" => "t",
-																										"breakpoint" => "",
-																										"value" => "-6",
-																										"index" => "0",
-																								],
-																								[
-																										"property" => "m",
-																										"side" => "b",
-																										"breakpoint" => "",
-																										"value" => "6",
-																										"index" => "1",
-																								],
-																						],
-																						"index" => "0",
-																				],
-																		],
-																],
+																"inner_class" => "",
+															],
+															"key" => $en_ID . "-2-2-1-1-1",
 														],
-														"key" => $en_ID . "-2-1",
-														"children" => [
-																[
-																		"autogen" => "true",
-																		"type" => "row",
-																		"key" => $en_ID . "-2-1-1",
-																		"inputs" => ["id" => "auto"],
-																		"children" => [
-																				[
-																						"classes" => [
-																								"fw-element",
-																								"fw-column",
-																								"col",
-																						],
-																						"child" => "block",
-																						"type" => "column",
-																						"inputs" => [
-																								"breakpoints" => [
-																										"xs" => [
-																												"d" => "block",
-																												"col" => "12",
-																												"offset" => "2",
-																												"order" => "",
-																										],
-																										"sm" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"md" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"lg" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"xl" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"xxl" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																								],
-																								"id" => "auto",
-																								"class" => [""],
-																						],
-																						"key" => $en_ID . "-2-1-1-1",
-																						"children" => [
-																								[
-																										"classes" => [
-																												"fw-element",
-																												"fw-block",
-																										],
-																										"parent" => "",
-																										"type" => "block/content/video",
-																										"inputs" => [
-																												"source" => "url",
-																												"url" => ["en" => ""],
-																												"upload" => [
-																														"rows" => [
-																																[
-																																		"file" => [
-																																				"id" => "",
-																																				"url" => "",
-																																		],
-																																		"encoding" => "mp4",
-																																		"index" => "0",
-																																],
-																														],
-																														"atts" => [
-																																"loop" => "false",
-																																"autoplay" => "false",
-																																"muted" => "false",
-																																"controls" => "false",
-																														],
-																												],
-																												"code" => ["", [""]],
-																												"id" => "resource-video",
-																												"class" => [""],
-																												"inner_class" => "",
-																										],
-																										"key" => $en_ID . "-2-1-1-1-1",
-																								],
-																						],
-																				],
-																		],
-																],
-														],
+													],
 												],
 												[
-														"classes" => [
+													"type" => "column",
+													"inputs" => [
+														"breakpoints" => [
+															"xs" => [
+																"d" => "block",
+																"col" => "12",
+																"offset" => "2",
+																"order" => "",
+															],
+															"sm" => [
+																"d" => "block",
+																"col" => "8",
+																"offset" => "1",
+																"order" => "",
+															],
+															"md" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"lg" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"xl" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"xxl" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+														],
+														"id" => "auto",
+														"class" => [""],
+													],
+													"key" => $en_ID . "-2-2-1-2",
+													"children" => [
+														[
+															"classes" => [
 																"fw-element",
-																"fw-container",
-																"container-fluid",
+																"fw-block",
+															],
+															"parent" => "",
+															"type" => "block/content/text",
+															"inputs" => [
+																"text" => [
+																	"en" => "&lt;p&gt;Video&lt;/p&gt;",
+																	"fr" => "&lt;p&gt;Vidéo&lt;/p&gt;",
+																],
+																"id" => "auto",
+																"class" => [""],
+																"inner_class" => "",
+															],
+															"key" => $en_ID . "-2-2-1-2-1",
 														],
-														"child" => "row",
-														"type" => "container",
-														"inputs" => ["id" => "auto", "class" => [""]],
-														"key" => $en_ID . "-2-2",
-														"children" => [
-																[
-																		"type" => "row",
-																		"key" => $en_ID . "-2-2-1",
-																		"inputs" => [
-																				"id" => "resource-format",
-																				"class" => [""],
-																				"settings" => [
-																						[
-																								"spacing" => [
-																										"type" => "spacing",
-																										"rows" => [
-																												[
-																														"property" => "p",
-																														"side" => "y",
-																														"breakpoint" => "",
-																														"value" => "2",
-																														"index" => "0",
-																												],
-																										],
-																										"index" => "0",
-																								],
-																						],
-																				],
-																		],
-																		"children" => [
-																				[
-																						"type" => "column",
-																						"inputs" => [
-																								"breakpoints" => [
-																										"xs" => [
-																												"d" => "block",
-																												"col" => "12",
-																												"offset" => "2",
-																												"order" => "",
-																										],
-																										"sm" => [
-																												"d" => "block",
-																												"col" => "3",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"md" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"lg" => [
-																												"d" => "block",
-																												"col" => "2",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"xl" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"xxl" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																								],
-																								"id" => "auto",
-																								"class" => [""],
-																						],
-																						"key" => $en_ID . "-2-2-1-1",
-																						"children" => [
-																								[
-																										"classes" => [
-																												"fw-element",
-																												"fw-block",
-																										],
-																										"parent" => "",
-																										"type" => "block/content/text",
-																										"inputs" => [
-																												"text" => [
-																														"en" =>
-																																"&lt;h6&gt;Format&lt;/h6&gt;",
-																												],
-																												"id" => "auto",
-																												"class" => [""],
-																												"inner_class" => "",
-																										],
-																										"key" => $en_ID . "-2-2-1-1-1",
-																								],
-																						],
-																				],
-																				[
-																						"type" => "column",
-																						"inputs" => [
-																								"breakpoints" => [
-																										"xs" => [
-																												"d" => "block",
-																												"col" => "12",
-																												"offset" => "2",
-																												"order" => "",
-																										],
-																										"sm" => [
-																												"d" => "block",
-																												"col" => "8",
-																												"offset" => "1",
-																												"order" => "",
-																										],
-																										"md" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"lg" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"xl" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"xxl" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																								],
-																								"id" => "auto",
-																								"class" => [""],
-																						],
-																						"key" => $en_ID . "-2-2-1-2",
-																						"children" => [
-																								[
-																										"classes" => [
-																												"fw-element",
-																												"fw-block",
-																										],
-																										"parent" => "",
-																										"type" => "block/content/text",
-																										"inputs" => [
-																												"text" => [
-																														"en" =>
-																																"&lt;p&gt;Video&lt;/p&gt;",
-																												],
-																												"id" => "auto",
-																												"class" => [""],
-																												"inner_class" => "",
-																										],
-																										"key" => $en_ID . "-2-2-1-2-1",
-																								],
-																						],
-																				],
-																		],
-																],
-																[
-																		"type" => "row",
-																		"key" => $en_ID . "-2-2-2",
-																		"inputs" => [
-																				"id" => "resource-time",
-																				"class" => [""],
-																				"settings" => [
-																						[
-																								"spacing" => [
-																										"type" => "spacing",
-																										"rows" => [
-																												[
-																														"property" => "p",
-																														"side" => "y",
-																														"breakpoint" => "",
-																														"value" => "2",
-																														"index" => "0",
-																												],
-																										],
-																										"index" => "0",
-																								],
-																						],
-																				],
-																		],
-																		"children" => [
-																				[
-																						"type" => "column",
-																						"inputs" => [
-																								"breakpoints" => [
-																										"xs" => [
-																												"d" => "block",
-																												"col" => "12",
-																												"offset" => "2",
-																												"order" => "",
-																										],
-																										"sm" => [
-																												"d" => "block",
-																												"col" => "3",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"md" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"lg" => [
-																												"d" => "block",
-																												"col" => "2",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"xl" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"xxl" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																								],
-																								"id" => "auto",
-																								"class" => [""],
-																						],
-																						"key" => $en_ID . "-2-2-2-1",
-																						"children" => [
-																								[
-																										"classes" => [
-																												"fw-element",
-																												"fw-block",
-																										],
-																										"parent" => "",
-																										"type" => "block/content/text",
-																										"inputs" => [
-																												"text" => [
-																														"en" =>
-																																"&lt;h6&gt;Time to completion&lt;/h6&gt;",
-																												],
-																												"id" => "auto",
-																												"class" => [""],
-																												"inner_class" => "",
-																										],
-																										"key" => $en_ID . "-2-2-2-1-1",
-																								],
-																						],
-																				],
-																				[
-																						"type" => "column",
-																						"inputs" => [
-																								"breakpoints" => [
-																										"xs" => [
-																												"d" => "block",
-																												"col" => "12",
-																												"offset" => "2",
-																												"order" => "",
-																										],
-																										"sm" => [
-																												"d" => "block",
-																												"col" => "8",
-																												"offset" => "1",
-																												"order" => "",
-																										],
-																										"md" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"lg" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"xl" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"xxl" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																								],
-																								"id" => "auto",
-																								"class" => [""],
-																						],
-																						"key" => $en_ID . "-2-2-2-2",
-																						"children" => [
-																								[
-																										"classes" => [
-																												"fw-element",
-																												"fw-block",
-																										],
-																										"parent" => "",
-																										"type" => "block/content/field",
-																										"inputs" => [
-																												"key" => "asset_time",
-																												"translate" => "false",
-																												"display" => "p",
-																												"content" => "false",
-																												"prepend" => "",
-																												"append" => " minutes",
-																												"post_id" => "",
-																												"id" => "auto",
-																												"class" => [""],
-																												"inner_class" => "",
-																										],
-																										"key" => $en_ID . "-2-2-2-2-1",
-																								],
-																						],
-																				],
-																		],
-																],
-																[
-																		"type" => "row",
-																		"key" => $en_ID . "-2-2-3",
-																		"inputs" => [
-																				"id" => "resource-summary",
-																				"class" => [""],
-																				"settings" => [
-																						[
-																								"spacing" => [
-																										"type" => "spacing",
-																										"rows" => [
-																												[
-																														"property" => "p",
-																														"side" => "y",
-																														"breakpoint" => "",
-																														"value" => "2",
-																														"index" => "0",
-																												],
-																										],
-																										"index" => "0",
-																								],
-																						],
-																				],
-																		],
-																		"children" => [
-																				[
-																						"type" => "column",
-																						"inputs" => [
-																								"breakpoints" => [
-																										"xs" => [
-																												"d" => "block",
-																												"col" => "12",
-																												"offset" => "2",
-																												"order" => "",
-																										],
-																										"sm" => [
-																												"d" => "block",
-																												"col" => "3",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"md" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"lg" => [
-																												"d" => "block",
-																												"col" => "2",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"xl" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"xxl" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																								],
-																								"id" => "auto",
-																								"class" => [""],
-																						],
-																						"key" => $en_ID . "-2-2-3-1",
-																						"children" => [
-																								[
-																										"classes" => [
-																												"fw-element",
-																												"fw-block",
-																										],
-																										"parent" => "",
-																										"type" => "block/content/text",
-																										"inputs" => [
-																												"text" => [
-																													"en" => "&lt;h6&gt;" . get_field ( 'asset_summaryhead', $en_ID ) . "&lt;/h6&gt;",
-																													"fr" => "&lt;h6&gt;" . get_field ( 'asset_summaryhead', $fr_ID ) . "&lt;/h6&gt;",
-																												],
-																												"id" => "auto",
-																												"class" => [""],
-																												"inner_class" => "",
-																										],
-																										"key" => $en_ID . "-2-2-3-1-1",
-																								],
-																						],
-																				],
-																				[
-																						"type" => "column",
-																						"inputs" => [
-																								"breakpoints" => [
-																										"xs" => [
-																												"d" => "block",
-																												"col" => "12",
-																												"offset" => "2",
-																												"order" => "",
-																										],
-																										"sm" => [
-																												"d" => "block",
-																												"col" => "8",
-																												"offset" => "1",
-																												"order" => "",
-																										],
-																										"md" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"lg" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"xl" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																										"xxl" => [
-																												"d" => "block",
-																												"col" => "",
-																												"offset" => "",
-																												"order" => "",
-																										],
-																								],
-																								"id" => "auto",
-																								"class" => [""],
-																						],
-																						"key" => $en_ID . "-2-2-3-2",
-																						"children" => [
-																								[
-																										"classes" => [
-																												"fw-element",
-																												"fw-block",
-																										],
-																										"parent" => "",
-																										"type" => "block/content/text",
-																										"inputs" => [
-																												"text" => [
-																													"en" => $en_text,
-																													"fr" => $fr_text
-																												],
-																												"id" => "auto",
-																												"class" => [""],
-																												"inner_class" => "",
-																										],
-																										"key" => $en_ID . "-2-2-3-2-1",
-																								],
-																						],
-																				],
-																		],
-																],
-														],
+													],
 												],
+											],
 										],
-								],
-								[
-										"type" => "template",
-										"inputs" => [
-												"source" => "post",
-												"post_id" => "11447",
-												"path" => "",
-												"output" => "template",
-												"id" => "auto",
+										[
+											"type" => "row",
+											"key" => $en_ID . "-2-2-2",
+											"inputs" => [
+												"id" => "resource-time",
 												"class" => [""],
+												"settings" => [
+													[
+														"spacing" => [
+															"type" => "spacing",
+															"rows" => [
+																[
+																	"property" => "p",
+																	"side" => "y",
+																	"breakpoint" => "",
+																	"value" => "2",
+																	"index" => "0",
+																],
+															],
+															"index" => "0",
+														],
+													],
+												],
+											],
+											"children" => [
+												[
+													"type" => "column",
+													"inputs" => [
+														"breakpoints" => [
+															"xs" => [
+																"d" => "block",
+																"col" => "12",
+																"offset" => "2",
+																"order" => "",
+															],
+															"sm" => [
+																"d" => "block",
+																"col" => "3",
+																"offset" => "",
+																"order" => "",
+															],
+															"md" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"lg" => [
+																"d" => "block",
+																"col" => "2",
+																"offset" => "",
+																"order" => "",
+															],
+															"xl" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"xxl" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+														],
+														"id" => "auto",
+														"class" => [""],
+													],
+													"key" => $en_ID . "-2-2-2-1",
+													"children" => [
+														[
+															"classes" => [
+																"fw-element",
+																"fw-block",
+															],
+															"parent" => "",
+															"type" => "block/content/text",
+															"inputs" => [
+																"text" => [
+																	"en" => "&lt;h6&gt;Time to completion&lt;/h6&gt;",
+																	"fr" => "&lt;h6&gt;Temps de réalisation&lt;/h6&gt;",
+																],
+																"id" => "auto",
+																"class" => [""],
+																"inner_class" => "",
+															],
+															"key" => $en_ID . "-2-2-2-1-1",
+														],
+													],
+												],
+												[
+													"type" => "column",
+													"inputs" => [
+														"breakpoints" => [
+															"xs" => [
+																"d" => "block",
+																"col" => "12",
+																"offset" => "2",
+																"order" => "",
+															],
+															"sm" => [
+																"d" => "block",
+																"col" => "8",
+																"offset" => "1",
+																"order" => "",
+															],
+															"md" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"lg" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"xl" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"xxl" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+														],
+														"id" => "auto",
+														"class" => [""],
+													],
+													"key" => $en_ID . "-2-2-2-2",
+													"children" => [
+														[
+															"classes" => [
+																"fw-element",
+																"fw-block",
+															],
+															"parent" => "",
+															"type" => "block/content/field",
+															"inputs" => [
+																"key" => "asset_time",
+																"translate" => "false",
+																"display" => "p",
+																"content" => "false",
+																"prepend" => "",
+																"append" => " minutes",
+																"post_id" => "",
+																"id" => "auto",
+																"class" => [""],
+																"inner_class" => "",
+															],
+															"key" => $en_ID . "-2-2-2-2-1",
+														],
+													],
+												],
+											],
 										],
-										"key" => $en_ID . "-3",
-								],
-								[
-										"classes" => ["fw-element", "fw-template"],
-										"type" => "template",
-										"inputs" => [
-												"source" => "post",
-												"post_id" => "11315",
-												"path" => "",
-												"output" => "template",
-												"id" => "auto",
+										[
+											"type" => "row",
+											"key" => $en_ID . "-2-2-3",
+											"inputs" => [
+												"id" => "resource-summary",
 												"class" => [""],
+												"settings" => [
+													[
+														"spacing" => [
+															"type" => "spacing",
+															"rows" => [
+																[
+																	"property" => "p",
+																	"side" => "y",
+																	"breakpoint" => "",
+																	"value" => "2",
+																	"index" => "0",
+																],
+															],
+															"index" => "0",
+														],
+													],
+												],
+											],
+											"children" => [
+												[
+													"type" => "column",
+													"inputs" => [
+														"breakpoints" => [
+															"xs" => [
+																"d" => "block",
+																"col" => "12",
+																"offset" => "2",
+																"order" => "",
+															],
+															"sm" => [
+																"d" => "block",
+																"col" => "3",
+																"offset" => "",
+																"order" => "",
+															],
+															"md" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"lg" => [
+																"d" => "block",
+																"col" => "2",
+																"offset" => "",
+																"order" => "",
+															],
+															"xl" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"xxl" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+														],
+														"id" => "auto",
+														"class" => [""],
+													],
+													"key" => $en_ID . "-2-2-3-1",
+													"children" => [
+														[
+															"classes" => [
+																"fw-element",
+																"fw-block",
+															],
+															"parent" => "",
+															"type" => "block/content/text",
+															"inputs" => [
+																"text" => [
+																	"en" => "&lt;h6&gt;" . get_field ( 'asset_summaryhead', $en_ID ) . "&lt;/h6&gt;",
+																	"fr" => "&lt;h6&gt;" . get_field ( 'asset_summaryhead', $fr_ID ) . "&lt;/h6&gt;",
+																],
+																"id" => "auto",
+																"class" => [""],
+																"inner_class" => "",
+															],
+															"key" => $en_ID . "-2-2-3-1-1",
+														],
+													],
+												],
+												[
+													"type" => "column",
+													"inputs" => [
+														"breakpoints" => [
+															"xs" => [
+																"d" => "block",
+																"col" => "12",
+																"offset" => "2",
+																"order" => "",
+															],
+															"sm" => [
+																"d" => "block",
+																"col" => "8",
+																"offset" => "1",
+																"order" => "",
+															],
+															"md" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"lg" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"xl" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+															"xxl" => [
+																"d" => "block",
+																"col" => "",
+																"offset" => "",
+																"order" => "",
+															],
+														],
+														"id" => "auto",
+														"class" => [""],
+													],
+													"key" => $en_ID . "-2-2-3-2",
+													"children" => [
+														[
+															"classes" => [
+																"fw-element",
+																"fw-block",
+															],
+															"parent" => "",
+															"type" => "block/content/text",
+															"inputs" => [
+																"text" => [
+																	"en" => $en_text,
+																	"fr" => $fr_text
+																],
+																"id" => "auto",
+																"class" => [""],
+																"inner_class" => "",
+															],
+															"key" => $en_ID . "-2-2-3-2-1",
+														],
+													],
+												],
+											],
 										],
-										"key" => $en_ID . "-4",
+									],
 								],
+							],
 						],
+						[
+							"type" => "template",
+							"inputs" => [
+								"source" => "post",
+								"post_id" => "11447",
+								"path" => "",
+								"output" => "template",
+								"id" => "auto",
+								"class" => [""],
+							],
+							"key" => $en_ID . "-3",
+						],
+						[
+							"classes" => ["fw-element", "fw-template"],
+							"type" => "template",
+							"inputs" => [
+								"source" => "post",
+								"post_id" => "11315",
+								"path" => "",
+								"output" => "template",
+								"id" => "auto",
+								"class" => [""],
+							],
+							"key" => $en_ID . "-4",
+						],
+					],
 				];
 		
 				update_post_meta ( $en_ID, 'builder', json_encode ( $builder, JSON_PRETTY_PRINT ) );

@@ -36,7 +36,7 @@ function fw_query_builder() {
 		
 		while ( $new_query->have_posts() ) {
 			$new_query->the_post();
-	
+			
 			$item = array (
 				'id' => get_the_ID(),
 				'title' => get_the_title(),
@@ -45,6 +45,8 @@ function fw_query_builder() {
 			
 			if ( $_GET['lang'] != 'en' ) {
 				$item['title'] = get_post_meta ( get_the_ID(), 'title_' . $_GET['lang'], true );
+				$item['permalink'] = translate_permalink ( get_permalink(), get_the_ID(), 'fr' );
+				
 			}
 			
 			ob_start();

@@ -124,7 +124,7 @@ function fw_add_custom_rewrites () {
 						
 						add_rewrite_rule (
 							'(^' . $code . ')/' . $cpt . '/(.*)([^/]+)?',
-							'index.php?lang=$matches[1]&post_type=' . $cpt . '&slug_' . $code . '=$matches[2]',
+							'index.php?lang=$matches[1]&cpt=' . $cpt . '&slug_' . $code . '=$matches[2]',
 							'top'
 						);
 						
@@ -236,18 +236,47 @@ function fw_add_custom_rewrites () {
 					
 					foreach ( $rules as $rule => $query ) {
 						
+						$add_rule = false;
+						
 						// add lang=XX
 						
 						$new_query = $query . '&lang=' . $rewrite_code;
 						
-						$new_query = str_replace ( '&name=', '&slug_' . $rewrite_code . '=', $new_query );
+						// 
+						
+						foreach ( get_post_types ( array ( 'public' => true, '_builtin' => false ) ) as $cpt ) {
 							
-						$new_query = str_replace ( 'pagename=', 'path_' . $rewrite_code . '=', $new_query );
+							if ( $add_rule == false ) {
+								
+								// if the path includes 'cpt=', 
+								// change it to 'post_type=cpt&slug_XX='
+								
+								if ( str_contains ( $query, $cpt . '=' ) ) {
+									
+									$new_query = str_replace ( $cpt . '=', 'cpt=' . $cpt . '&slug_' . $rewrite_code . '=', $new_query );
+									
+									$add_rule = true;
+									
+								}
+								
+							}
+								
+						}
 						
-						$rules[$rule] = $new_query;
+						if ( $add_rule == false ) {
 						
-						// echo $query .'<br>';
-						// dumpit ( $rule );
+							$new_query = str_replace ( '&name=', '&slug_' . $rewrite_code . '=', $new_query );
+								
+							$new_query = str_replace ( 'pagename=', 'path_' . $rewrite_code . '=', $new_query );
+							
+							$add_rule = true;
+							
+						}
+						
+						if ( $add_rule == true ) {
+							$rules[$rule] = $new_query;
+						}
+						
 					}
 					
 				}
@@ -314,6 +343,7 @@ add_filter ( 'query_vars', function ( $query_vars ) {
 	
 	$query_vars[] = 'lang';
 	$query_vars[] = 'archive';
+	$query_vars[] = 'cpt';
 	
 	foreach ( get_option ( 'fw_langs' ) as $code => $lang ) {
 		$query_vars[] = 'slug_' . $code;
@@ -344,84 +374,15 @@ function get_post_by_lang_slug ( $query ) {
 		
 		foreach ( get_option ( 'fw_langs' ) as $code => $lang ) {
 			
-			// archive
+			if ( $code != 'en' ) {
 			
-			if (
-				(
-					isset ( $query->query_vars['slug_' . $code] ) &&
-					!empty ( $query->query_vars['slug_' . $code] )
-				) &&
-				(
-					isset ( $query->query_vars['archive'] ) &&
-					$query->query_vars['archive'] != ''
-				)
-			) {
-				
-				// find the term that matches the slug
-				
-				$en_term = get_terms ( array (
-					'hide_empty' => false,
-					'meta_query' => array(
-						array (
-							'key' => 'slug_' . $code,
-							'value' => $query->query_vars['slug_' . $code],
-							'compare' => 'LIKE'
-						)
-					),
-				) );
-					
-				if ( !empty ( $en_term ) ) {
-					
-					$en_term = $en_term[0];
-					
-					$query->is_archive = true;
-					$query->is_home = false;
-					
-					if ( $query->query_vars['archive'] == 'category' ) {
-						
-						// category
-						
-						// unset ( $query->query_vars['slug_' . $code] );
-						// unset ( $query->query_vars['archive'] );
-						
-						$query->query['category_name'] = $en_term->slug;
-						$query->query_vars['category_name'] = $en_term->slug;
-						
-						$query->is_category = true;
-						
-					} elseif ( $query->query_vars['archive'] == 'post_tag' ) {
-						
-						// tag
-						
-						$query->is_tag = true;
-						
-					} else {
-						
-						// custom taxonomy
-					
-						$query->is_tax = true;
-						$query->query_vars[$query->query_vars['archive']] = $en_term->slug;
-						
-					}
-					
-					// $query->set ( 'tax_query', array (
-					// 	array (
-					// 		'taxonomy' =>  $en_term->taxonomy,
-					// 		'field' => 'slug',
-					// 		'terms' => array ( $en_term->slug )
-					// 	)
-					// ) );
-					
-				}
-			
-			} else {
-			
-				// page
+				$has_slug = false;
 				
 				if (
 					isset ( $query->query_vars['slug_' . $code] ) &&
 					!empty ( $query->query_vars['slug_' . $code] )
 				) {
+					$has_slug = true;
 					
 					$query->set ( 'meta_query', array ( 
 						array (
@@ -431,14 +392,16 @@ function get_post_by_lang_slug ( $query ) {
 						)
 					) );
 					
+					$query->set ( 'post_type', array ( 'post', 'page' ) );
+					
 				}
+				
+				$has_path = false;
 				
 				if (
 					isset ( $query->query_vars['path_' . $code] ) &&
 					!empty ( $query->query_vars['path_' . $code] )
 				) {
-				
-					$query->set ( 'post_type', array ( 'post', 'page' ) );
 					
 					$query->set ( 'meta_query', array ( 
 						array (
@@ -448,11 +411,90 @@ function get_post_by_lang_slug ( $query ) {
 						)
 					) );
 					
+					$query->set ( 'post_type', array ( 'post', 'page' ) );
+					
+					$has_path = true;
+				}
+					
+				if (
+					$has_slug == true &
+					(
+						isset ( $query->query_vars['archive'] ) &&
+						$query->query_vars['archive'] != ''
+					)
+				) {
+				
+					// TAXONOMY ARCHIVE
+					
+					// find the term that matches the slug
+					
+					$en_term = get_terms ( array (
+						'hide_empty' => false,
+						'meta_query' => array(
+							array (
+								'key' => 'slug_' . $code,
+								'value' => $query->query_vars['slug_' . $code],
+								'compare' => 'LIKE'
+							)
+						),
+					) );
+						
+					if ( !empty ( $en_term ) ) {
+						
+						$en_term = $en_term[0];
+						
+						$query->is_archive = true;
+						$query->is_home = false;
+						
+						if ( $query->query_vars['archive'] == 'category' ) {
+							
+							// category
+							
+							// unset ( $query->query_vars['slug_' . $code] );
+							// unset ( $query->query_vars['archive'] );
+							
+							$query->query['category_name'] = $en_term->slug;
+							$query->query_vars['category_name'] = $en_term->slug;
+							
+							$query->is_category = true;
+							
+						} elseif ( $query->query_vars['archive'] == 'post_tag' ) {
+							
+							// tag
+							
+							$query->is_tag = true;
+							
+						} else {
+							
+							// custom taxonomy
+						
+							$query->is_tax = true;
+							$query->query_vars[$query->query_vars['archive']] = $en_term->slug;
+							
+						}
+						
+					}
+				
+				} elseif (
+					(
+						$has_slug == true ||
+						$has_path == true
+					) &&
+					(
+						isset ( $query->query_vars['cpt'] ) &&
+						!empty ( $query->query_vars['cpt'] )
+					)
+				) {
+					
+					// CPT SINGLE
+					
+					$query->set ( 'post_type', array ( $query->query_vars['cpt'] ) );
+				
 				}
 				
 			}
 			
-		}
+		} // foreach lang
 		
 		// correct here
 		// dumpit ( $query );
@@ -529,6 +571,16 @@ function translate_path ( $post_id, $lang ) {
 		$post_id = $post_id->ID;
 	}
 	
+	if ( 
+		(
+			get_post_type ( $post_id ) != 'post' &&
+			get_post_type ( $post_id ) != 'page'
+		) && 
+		in_array ( get_post_type ( $post_id ), array_keys ( get_post_types () ) )
+	) {
+		$path[] = get_post_type ( $post_id );
+	}
+	
 	// parents
 	if ( has_post_parent ( $post_id ) ) {
 		$path = translate_path ( wp_get_post_parent_id ( $post_id ), $lang );
@@ -537,10 +589,10 @@ function translate_path ( $post_id, $lang ) {
 	if ( $lang == 'en' ) {
 		$path[] = get_the_slug ( $post_id );
 	} else {
-		// echo 'ya ' . get_post_meta ( $post_id, 'slug_' . $lang, true );
-		
-		$path[] = get_post_meta ( $post_id, 'slug_' . $lang, true );
+		$path[] = get_post_meta ( $post_id, 'slug_' . $lang, true );	
 	}
+	
+	// dumpit ( $path );
 	
 	return $path;
 	
@@ -604,12 +656,9 @@ function translate_permalink ( $url, $post_id, $lang ) {
 				
 			} elseif ( $post_obj->post_type != 'page' ) {
 				
-				$new_URL .=  $post_obj->post_type . '/' . implode ( '/', translate_path ( $post_id, $lang ) );
+				$new_URL .= implode ( '/', translate_path ( $post_id, $lang ) );
 				
 			} else {
-				
-				
-				
 				
 				if ( (int) $post_id != (int) get_option ( 'page_on_front' ) ) {
 					
@@ -641,14 +690,11 @@ function translate_permalink ( $url, $post_id, $lang ) {
 			
 			if ( $post_obj->post_type == 'post' ) {
 				
-				
 				$post_path = explode ( '/', untrailingslashit ( $url ) );
 				
 				array_pop ( $post_path );
 				
 				$post_path = implode ( '/',  array_splice ( $post_path, 3 ) );
-				
-				// dumpit ( $post_path );
 				
 				$new_URL .= $post_path . '/' . $new_slug;
 				

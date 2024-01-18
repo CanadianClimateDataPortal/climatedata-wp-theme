@@ -783,7 +783,7 @@ if ( current_user_can ( 'administrator' ) ) {
 					],
 				];
 		
-				update_post_meta ( $en_ID, 'builder', json_encode ( $builder, JSON_PRETTY_PRINT ) );
+				update_post_meta ( $en_ID, 'builder', json_encode ( $builder, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) );
 				
 				echo 'updated builder layout<br>';
 				

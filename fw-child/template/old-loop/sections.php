@@ -150,7 +150,7 @@
 			}
 				
 			if ( empty ( $block_class ) ) {
-				$block_class = array ( 'col-13', 'offset-2', 'col-md-10', 'col-lg-8' );
+				$block_class = array ( 'col-13', 'offset-2', 'col-md-12', 'col-lg-9', 'col-xl-8' );
 			}
 					
 			if ( $head_text != '' || $head_body != '' ) {
@@ -173,7 +173,7 @@
 						
 				?>
 				
-				<div class="<?php echo implode ( ' ', $block_class ); ?>">
+				<div class="<?php echo implode ( ' ', $block_class ); ?> mb-3 mb-md-4">
 					<?php echo $head_body; ?>
 				</div>
 				

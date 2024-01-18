@@ -39,6 +39,103 @@ $utilities: (
 // MIXINS
 //
 
+// add nested column & offset classes for 13-16
+
+//
+// NESTED COLUMNS
+//
+
+// mixins
+
+// @mixin nested-column($x: 12, $y: 12) {
+//   @include make-col-ready();
+//   @include make-col($x, $y);
+//   width: #{((calc($x / $y)) * 100) + '%'};
+// }
+// 
+// @mixin nested-offset($x: 12, $y: 12) {
+//   margin-left: #{((calc($x / $y)) * 100) + '%'};
+// }
+
+// standard widths
+
+@for $z from 12 through 15 {
+
+  $current-max: $z - 1;
+
+  @for $y from 1 through $current-max {
+
+    .col-#{$y}-of-#{$z} { @include nested-column($y, $z) }
+    .offset-#{$y}-of-#{$z} { @include nested-offset($y, $z) }
+
+  }
+
+}
+
+// breakpoints
+
+$cdc-grid-breakpoints: 'xs', 'sm', 'md', 'lg', 'xl', 'xxl';
+$cdc-grid-breakpoint-sizes: 0, 576, 768, 992, 1200, 1400;
+
+@for $i from 1 through length($cdc-grid-breakpoints) {
+
+  $current-breakpoint: nth($cdc-grid-breakpoints, $i);
+  $current-breakpoint-size: nth($cdc-grid-breakpoint-sizes, $i);
+
+  @media (min-width: #{$current-breakpoint-size}px) {
+
+    @for $z from 12 through 15 {
+
+      $current-max: $z - 1;
+
+      @for $y from 0 through $current-max {
+
+        .col-#{$current-breakpoint}-#{$y}-of-#{$z} { @include nested-column($y, $z) }
+        .offset-#{$current-breakpoint}-#{$y}-of-#{$z} { @include nested-offset($y, $z) }
+
+      }
+
+    }
+
+  }
+
+}
+
+//
+// NEGATIVE OFFSETS
+//
+
+// standard
+
+@for $z from 12 through 15 {
+
+  .offset-n#{$z} {
+    margin-left: #{( calc($z / 12) * -100 ) + '%'};
+  }
+
+}
+
+// breakpoints
+
+@for $i from 1 through length($cdc-grid-breakpoints) {
+
+  $current-breakpoint: nth($cdc-grid-breakpoints, $i);
+  $current-breakpoint-size: nth($cdc-grid-breakpoint-sizes, $i);
+
+  @media (min-width: #{$current-breakpoint-size}px) {
+
+    @for $z from 12 through 15 {
+
+      .offset-#{$current-breakpoint}-n#{$z} {
+        margin-left: #{( calc($z / 12) * -100 ) + '%'};
+      }
+
+    }
+
+  }
+
+}
+
 //
 // VARIABLES
 //
@@ -189,6 +286,8 @@ h1 {
 //
 
 #hero {
+  color: $white;
+  
   h1 {
     @include font-size(5rem);
     font-weight: bold;

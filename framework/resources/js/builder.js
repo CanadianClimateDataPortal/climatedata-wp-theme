@@ -2703,7 +2703,7 @@
 					
 			// console.log('footer', element, this_item)
 			
-			let footer = $('<div class="fw-element-footer">'),
+			let footer = $('<div class="fw-element-footer" data-bs-theme="light">'),
 					footer_inner = $('<div class="fw-element-footer-inner">').appendTo(footer),
 					dropdown = $('<div id="dropdown-' + this_item_ID + '" class="dropdown fw-element-footer-section">').appendTo(footer_inner)
 					

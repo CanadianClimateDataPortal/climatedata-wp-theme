@@ -47,3 +47,9 @@
 }
 
 ?>
+
+<div class="mb-2">
+	<h6 class="all-caps text-gray-300"><?php _e ( 'Share this post', 'cdc' ); ?></h6>
+	
+	share
+</div>

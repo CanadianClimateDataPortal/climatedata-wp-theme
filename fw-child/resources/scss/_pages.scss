@@ -195,4 +195,16 @@ body.tab-drawer-open {
       @include font-size(3rem);
     }
   }
+  
+  // adjust style for old loop
+  
+  h1, h2, h3 {
+    font-family: $font-family-serif;
+    font-weight: bold;
+    
+    &.text-body {
+      color: $gray-600 !important;
+    }
+  }
+  
 }

@@ -24,23 +24,23 @@
         switch ( get_sub_field ( 'position' ) ) {
           
           case 'above' : 
-            array_push ( $image_class, 'col-12', 'col-lg-10', 'order-1', 'mb-3' );
-            array_push ( $text_class, 'col-12', 'col-lg-10', 'order-2' );
+            array_push ( $image_class, 'col-16', 'col-md-12-of-13', 'col-lg-9-of-13', 'col-xl-8-of-13', 'order-1', 'mb-3' );
+            array_push ( $text_class, 'col-16', 'col-md-12-of-13', 'col-lg-9-of-13', 'col-xl-8-of-13', 'order-2' );
             break;
           
           case 'below' : 
-            array_push ( $image_class, 'col-12', 'col-lg-10' );
-            array_push ( $text_class, 'col-12', 'col-lg-10' );
+            array_push ( $image_class, 'col-16', 'col-md-12-of-13', 'col-lg-9-of-13', 'col-xl-8-of-13' );
+            array_push ( $text_class, 'col-16', 'col-md-12-of-13', 'col-lg-9-of-13', 'col-xl-8-of-13' );
             break;
           
           case 'left' : 
-            array_push ( $image_class, 'col-12', 'col-md-4', 'order-1', 'mb-3', 'mb-md-0' );
-            array_push ( $text_class, 'col-12', 'col-md-7', 'offset-md-1', 'order-2' );
+            array_push ( $image_class, 'col-16', 'col-md-4-of-13', 'order-1', 'mb-3', 'mb-md-0' );
+            array_push ( $text_class, 'col-16', 'col-md-8-of-13', 'offset-md-1-of-13', 'col-lg-7-of-13', 'col-xl-6-of-13', 'order-2' );
             break;
           
           case 'right' : 
-            array_push ( $image_class, 'col-12', 'offset-1', 'col-md-4' );
-            array_push ( $text_class, 'col-12', 'col-md-7' );
+            array_push ( $image_class, 'col-16', 'offset-md-1-of-13', 'col-md-4-of-13' );
+            array_push ( $text_class, 'col-16', 'col-md-8-of-13', 'col-lg-7-of-13', 'col-xl-6-of-13' );
             break;
           
         }

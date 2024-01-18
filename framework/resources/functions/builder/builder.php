@@ -257,16 +257,28 @@ function fw_setup_element ( $element, $globals ) {
 	
 	$settings = array (
 		'el_type' => $element['type'],
-		'autogen' => false
+		'autogen' => false,
+		'classes' => array ( 'fw-element' )
 	);
-	
-	if ( str_contains ( $settings['el_type'], '/' ) ) {
-		$settings['el_type'] = explode ( '/', $settings['el_type'] )[0];
-	}
 	
 	// classes array
 	
-	$settings['classes'] = array ( 'fw-element', 'fw-' . $settings['el_type'] );
+	if ( str_contains ( $settings['el_type'], '/' ) ) {
+		
+		// it's a block
+		
+		// explode the 'block/xxx/yyy' string
+		$settings['el_type'] = explode ( '/', $settings['el_type'] );
+		
+		// last part becomes a 'block-type-zzz' class
+		$settings['classes'][] = 'fw-block-type-' . end ( $settings['el_type'] );
+		
+		// first becomes the new settings[el_type]
+		$settings['el_type'] = $settings['el_type'][0];
+		
+	}
+	
+	$settings['classes'][] = 'fw-' . $settings['el_type'];
 	
 	if ( isset ( $element['autogen'] ) ) {
 		
@@ -987,7 +999,7 @@ function fw_output_element_content ( $element, $globals, $settings ) {
 		$inner_ID = ( $element['inputs']['id'] == 'auto' ) ? 'element-' . $element['key'] . '-inner' : $element['inputs']['id'] . '-inner';
 		
 		// open fw-element-inner
-		$inner_classes = array ( 'fw-element-inner',  );
+		$inner_classes = array ( 'fw-element-inner' );
 		
 		if ( isset ( $element['inputs']['inner_class'] ) ) {
 			$inner_classes[] = $element['inputs']['inner_class'];

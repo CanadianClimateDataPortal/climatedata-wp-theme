@@ -23,7 +23,7 @@ $menus = wp_get_nav_menus();
 					
 						<option value="" disabled selected>Select a menu</option>
 					
-						<option value="lang">Language Switcher</option>
+						<option value="lang" data-form-condition="#menu-lang">Language Switcher</option>
 						<option value="hierarchy" data-form-condition="#menu-hierarchy">Current Section Hierarchy</option>
 						<option value="manual" data-condition="#menu-manual">Add Items Manually</option>
 						
@@ -44,6 +44,22 @@ $menus = wp_get_nav_menus();
 						</optgroup>
 						
 					</select>
+				</div>
+			</div>
+			
+			<div id="menu-lang" class="row row-cols-1 g-3 mb-3">
+				<div class="col">
+					<p class="form-label">Language Switcher</p>
+			
+					<div class="card p-3">
+						<label for="inputs-display-lang" class="form-label">Link Text</label>
+						
+						<select name="inputs-display-lang" class="form-select form-select-sm">
+							<option value="name">Language name i.e. English</option>
+							<option value="code">Language code i.e. EN</option>
+						</select>
+						
+					</div>
 				</div>
 			</div>
 			

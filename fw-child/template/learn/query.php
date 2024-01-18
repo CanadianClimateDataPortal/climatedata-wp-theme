@@ -64,7 +64,11 @@
 				
 				<h4 class="learn-topic-title mb-7 d-flex align-items-center font-weight-normal">
 					<span class="circle-number"><?php echo $i; ?></span>
-					<?php echo get_field ( 'title', 'topic_' . $topic->term_id ); ?>
+					<?php
+					
+						echo fw_get_field ( 'title', 'topic_' . $topic->term_id );
+						
+					?>
 				</h4>
 				
 				<div id="" class="query-container ">

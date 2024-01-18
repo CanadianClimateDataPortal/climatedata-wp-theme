@@ -64,35 +64,35 @@ $fw-font: Inter, $font-family-base;
 			}
 			
 			.fw-element:not(.fw-template-element) {
-				padding: 1.75rem;
+				padding: .5rem;
 				
 				.fw-element-footer {
 					z-index: 2;
 				}
 				
 				.fw-element:not(.fw-template-element) {
-					padding: 1.5rem;
+					padding: .5rem;
 					
 					.fw-element-footer {
 						z-index: 3;
 					}
 					
 					.fw-element:not(.fw-template-element) {
-						padding: 1.25rem;
+						padding: .5rem;
 						
 						.fw-element-footer {
 							z-index: 4;
 						}
 						
 						.fw-element:not(.fw-template-element) {
-							padding: 1rem;
+							padding: .5rem;
 							
 							.fw-element-footer {
 								z-index: 5;
 							}
 							
 							.fw-element:not(.fw-template-element) {
-								padding: 0.75rem;
+								padding: 0.5rem;
 								
 								.fw-element-footer {
 									z-index: 6;

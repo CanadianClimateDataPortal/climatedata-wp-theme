@@ -93,11 +93,20 @@ if ( str_contains ( $element['inputs']['menu'], 'menu-' ) ) {
 		
 		$lang_URL = translate_permalink ( $GLOBALS['vars']['current_url'], $globals['current_query']['ID'], $lang['code'] );
 		
+		$lang_title = $lang['name'];
+		
+		if (
+			isset ( $element['inputs']['display']['lang'] ) &&
+			$element['inputs']['display']['lang'] == 'code'
+		) {
+			$lang_title = $lang['code'];
+		}
+		
 		$menu[] = array(
 			'id' => $globals['current_query']['ID'],
 			'type' => get_post_type ( $globals['current_query']['ID'] ),
 			'url' => trailingslashit ( $lang_URL ),
-			'title' => $lang['name'],
+			'title' => $lang_title,
 			'classes' => array(),
 			'parent' => 0
 		);

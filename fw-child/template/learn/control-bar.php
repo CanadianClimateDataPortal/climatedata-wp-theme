@@ -79,9 +79,9 @@
 						</div>
 						
 						<div class="control-tab-body query-container">
-							
+								
 							<div class="fw-query-filter p-3" data-filter-type="meta" data-filter-multi="false">
-								<h6 class="text-primary"><?php _e ( 'Content Type', 'cdc' ); ?></h6>
+								<h5 class="text-primary"><?php _e ( 'Content Type', 'cdc' ); ?></h5>
 								
 								<ul class="list-unstyled">
 									<li class="filter-item" data-key="asset_type" data-value="video"><?php _e ( 'Video', 'cdc' ); ?></li>
@@ -91,14 +91,28 @@
 								</ul>
 							</div>
 							
+							<?php
+							
+								foreach ( array ( 'sector', 'region', 'tech_level' ) as $filter_tax ) {
+									
+									$tax_obj = get_taxonomy ( $filter_tax );
+									
+									$this_heading = $tax_obj->labels->singular_name;
+									
+									if ( get_field ( 'tax_' . $filter_tax . '_title_single_' . $GLOBALS['fw']['current_lang_code'], 'option' ) != '' ) {
+										$this_heading = get_field ( 'tax_' . $filter_tax . '_title_single_' . $GLOBALS['fw']['current_lang_code'], 'option' );
+									}
+									
+							?>
+							
 							<div class="fw-query-filter p-3" data-filter-type="taxonomy" data-filter-multi="false">
-								<h6 class="text-primary"><?php _e ( 'Technical Level', 'fw' ); ?></h6>
+								<h5 class="text-primary"><?php echo $this_heading; ?></h5>
 								
 								<?php
 								
-									$all_tags = get_terms ( array ( 
-										'taxonomy' => 'tech_level',
-										'hide_empty' => true
+									$all_tags = get_terms ( array (
+										'taxonomy' => $filter_tax,
+										'hide_empty' => false
 									) );
 								
 									if ( !empty ( $all_tags ) ) {
@@ -126,6 +140,12 @@
 							
 								?>
 							</div>
+							
+							<?php
+							
+								}
+						
+							?>
 							
 						</div>
 					</div>

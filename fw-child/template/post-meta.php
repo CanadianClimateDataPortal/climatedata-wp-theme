@@ -1,4 +1,4 @@
-<div class="mb-2">
+<div class="news-meta-item mb-3 mb-lg-4">
 	<h6 class="all-caps text-gray-300"><?php _e ( 'Date', 'cdc' ); ?></h6>
 	
 	<?php 
@@ -8,7 +8,7 @@
 	?>
 </div>
 
-<div class="mb-2">
+<div class="news-meta-item mb-3 mb-lg-4">
 	<h6 class="all-caps text-gray-300"><?php _e ( 'Author', 'cdc' ); ?></h6>
 	
 	<?php
@@ -26,7 +26,7 @@
 		
 ?>
 
-<div class="mb-2">
+<div class="news-meta-item mb-3 mb-lg-4">
 	<h6 class="all-caps text-gray-300"><?php _e ( 'Topics', 'cdc' ); ?></h6>
 	
 	<p><?php
@@ -48,7 +48,7 @@
 
 ?>
 
-<div class="mb-2">
+<div class="news-meta-item mb-3 mb-lg-4">
 	<h6 class="all-caps text-gray-300"><?php _e ( 'Share this post', 'cdc' ); ?></h6>
 	
 	share

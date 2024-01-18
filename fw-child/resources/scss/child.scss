@@ -192,6 +192,14 @@ h1 {
   font-family: $font-family-serif;
 }
 
+p {
+  a {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
 //
 // CLASSES
 //

@@ -245,4 +245,18 @@ function fw_update_slugs_on_save ( $post_id, $post, $update ) {
 
 add_action ( 'save_post', 'fw_update_slugs_on_save', 10, 3 );
 
+// translate field
 
+function fw_get_field ( $field, $post_id ) {
+
+	if (
+		isset ( $GLOBALS['fw']['current_lang_code'] )	&&
+		$GLOBALS['fw']['current_lang_code'] != 'en'
+	) {
+		
+		$field .= '_' . $GLOBALS['fw']['current_lang_code'];
+	}
+	
+	return get_field ( $field, $post_id );
+
+}

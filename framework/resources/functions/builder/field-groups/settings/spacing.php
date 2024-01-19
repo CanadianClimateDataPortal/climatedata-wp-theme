@@ -68,11 +68,13 @@
 						<?php
 						
 							for ( $i = 15; $i >= -15; $i -= 1 ) {
-								echo '<option value="' . $i . '"';
-								
-								if ( $i == 0 ) echo ' selected';
-								
-								echo '>' . $i . '</option>';
+								echo ( '<option value="' )
+									. ( ( $i < 0 ) ? 'n' : '' )
+									. ( abs ( $i ) . '"' )
+									. ( ( $i == 0 ) ? ' selected' : '' )
+									. '>'
+									. $i 
+									. '</option>';
 							}
 							
 						?>

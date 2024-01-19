@@ -146,7 +146,7 @@ if ( current_user_can ( 'administrator' ) ) {
 																	"property" => "m",
 																	"side" => "t",
 																	"breakpoint" => "",
-																	"value" => "-6",
+																	"value" => "n6",
 																	"index" => "0",
 																],
 																[
@@ -256,7 +256,6 @@ if ( current_user_can ( 'administrator' ) ) {
 																		"code" => [
 																			"en" => "",
 																			"fr" => ""
-																		],
 																		"id" => "resource-video",
 																		"class" => [""],
 																		"inner_class" => "",
@@ -360,8 +359,8 @@ if ( current_user_can ( 'administrator' ) ) {
 																	"type" => "block/content/text",
 																	"inputs" => [
 																		"text" => [
-																			"en" => "&lt;h6&gt;Format&lt;/h6&gt;",
-																			"fr" => "&lt;h6&gt;Format&lt;/h6&gt;",
+																			"en" => "&lt;h5&gt;Format&lt;/h5&gt;",
+																			"fr" => "&lt;h5&gt;Format&lt;/h5&gt;",
 																		],
 																		"id" => "auto",
 																		"class" => [""],
@@ -427,7 +426,7 @@ if ( current_user_can ( 'administrator' ) ) {
 																	"inputs" => [
 																		"text" => [
 																			"en" => "&lt;p&gt;Video&lt;/p&gt;",
-																			"fr" => "&lt;p&gt;Vidéo&lt;/p&gt;",
+																			"fr" => "&lt;p&gt;Vid&amp;eacute;o&lt;/p&gt;",
 																		],
 																		"id" => "auto",
 																		"class" => [""],
@@ -519,8 +518,10 @@ if ( current_user_can ( 'administrator' ) ) {
 																	"type" => "block/content/text",
 																	"inputs" => [
 																		"text" => [
-																			"en" => "&lt;h6&gt;Time to completion&lt;/h6&gt;",
-																			"fr" => "&lt;h6&gt;Temps de réalisation&lt;/h6&gt;",
+																			"en" =>
+																				"&lt;h5&gt;Time to completion&lt;/h5&gt;",
+																			"fr" =>
+																				"&lt;p&gt;Temps de r&amp;eacute;alisation&lt;/p&gt;",
 																		],
 																		"id" => "auto",
 																		"class" => [""],
@@ -681,8 +682,8 @@ if ( current_user_can ( 'administrator' ) ) {
 																	"type" => "block/content/text",
 																	"inputs" => [
 																		"text" => [
-																			"en" => "&lt;h6&gt;" . get_field ( 'asset_summaryhead', $en_ID ) . "&lt;/h6&gt;",
-																			"fr" => "&lt;h6&gt;" . get_field ( 'asset_summaryhead', $fr_ID ) . "&lt;/h6&gt;",
+																			"en" => "&lt;h5&gt;" . get_field ( 'asset_summaryhead', $en_ID ) . "&lt;/h5&gt;",
+																			"fr" => "&lt;h5&gt;" . get_field ( 'asset_summaryhead', $fr_ID ) . "&lt;/h5&gt;",
 																		],
 																		"id" => "auto",
 																		"class" => [""],

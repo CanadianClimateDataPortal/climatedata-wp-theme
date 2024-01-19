@@ -263,13 +263,13 @@
 					console.log(data)
 					
 					if (data.success == true) {
-							
+						
 						options.elements.item_container.empty()
 						
 						if (data.items.length > 0) {
 							
 							data.items.forEach(function(item, i) {
-									
+								
 								// console.log(item)
 								
 								let new_item = options.template.clone()

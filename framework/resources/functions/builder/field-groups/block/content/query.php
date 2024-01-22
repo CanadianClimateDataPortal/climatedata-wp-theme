@@ -217,7 +217,8 @@
 							<li><span class="dropdown-item" data-flex-item="container">Container</span></li>
 							<li><span class="dropdown-item" data-flex-item="filter">Filter Item</span></li>
 							<li><span class="dropdown-item" data-flex-item="sort">Sort Menu</span></li>
-							<li><span class="dropdown-item" data-flex-item="items">Items</span></li>
+							<li><span class="dropdown-item" data-flex-item="items">Query Items</span></li>
+							<li><span class="dropdown-item" data-flex-item="pagination">Pagination</span></li>
 						</ul>
 					</div>
 					

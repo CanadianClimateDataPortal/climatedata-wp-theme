@@ -24,6 +24,8 @@ function fw_query_builder() {
 	$result = array (
 		'success' => false,
 		'found_posts' => 0,
+		'current_page' => 0,
+		'max_pages' => 0,
 		'items' => array()
 	);
 	
@@ -33,6 +35,7 @@ function fw_query_builder() {
 		
 		$result['success'] = true;
 		$result['found_posts'] = $new_query->found_posts;
+		$result['max_pages'] = $new_query->max_num_pages;
 		
 		while ( $new_query->have_posts() ) {
 			$new_query->the_post();

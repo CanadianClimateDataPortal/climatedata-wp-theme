@@ -155,7 +155,7 @@
 					
 					// add the insert button at the very end
 					
-					$(plugin.do_insert_btn(options.page, true)).insertAfter('.fw-page')
+					$(plugin.do_insert_btn(options.page, true)).appendTo('.fw-page')
 					
 				}
 			})
@@ -912,7 +912,7 @@
 					
 				})
 				
-				console.log(form_data)
+				// console.log(form_data)
 				
 				// ACTION
 				
@@ -1046,11 +1046,18 @@
 							
 							console.log('element settings callback')
 							
-							console.log('empty options.element.data')
-							
-							options.element.data = {
-								type: null,
-								children: []
+							if (!options.element.data.type.includes('block')) {
+								console.log('empty options.element.data')
+								
+								// if not a block,
+								// empty element.data now
+								// if it is a block, 
+								// do it at the end of populate_block
+								
+								options.element.data = {
+									type: null,
+									children: []
+								}
 							}
 							
 						})
@@ -1700,16 +1707,29 @@
 					temp_element = null,
 					temp_key = options.parent.data.key
 			
-			console.log('create tree now')
+			// console.log('create tree now')
 			
-			// console.log('start at parent')
-			// console.log(JSON.stringify(parent.data, null, 2))
-			// 
-			// console.log('end before element')
-			// console.log(JSON.stringify(element.data, null, 2))
+			// find the right spot to begin the tree
 			
-			let insert_index = options.inserting.index + 1
-			let insert_eq = null
+			let insert_index = options.inserting.index
+			
+			// console.log('inserting', options.inserting)
+			
+			// console.log('elements in parent', options.parent.item.find('> .fw-element'))
+			
+			let insert_eq = options.parent.item.find('> .fw-element').eq(insert_index)
+			
+			// console.log('calculated insert index', insert_index)
+			
+			if (insert_eq.hasClass('fw-template-element')) {
+				if (options.inserting.where == 'after') {
+					insert_eq = insert_eq.nextAll().filter('.fw-template-label').first()
+				} else if (options.inserting.where == 'before') {
+					insert_eq = insert_eq.prevAll().filter('.fw-template-label').first()
+				}
+			}
+			
+			// console.log('tree begins before/after', insert_eq)
 			
 			let parent_has_changed = false
 			
@@ -1762,9 +1782,7 @@
 				element.data.type != parent.data.type
 			) {
 				
-				console.log(element.data.type + ' is not a direct child of ' + parent.data.type)
-			
-				// console.log('creating tree', parent)
+				// console.log(element.data.type + ' is not a direct child of ' + parent.data.type)
 				
 				// each object type
 				
@@ -1787,26 +1805,6 @@
 							
 						} else if (start_generating == true) {
 							
-							if (insert_eq == null) {
-								
-								console.log('insert at index' + insert_index)
-								
-								if (options.inserting.index != null) {
-									
-									insert_eq = $('.fw-element[data-key="' + options.parent.data.key + '"]').find('> .fw-element').eq(options.inserting.index)
-									
-									console.log('eq 1', insert_eq)
-								}
-								
-							} else {
-							
-								insert_eq = null
-								
-							}
-							
-							// the last iteration flagged to start
-							// auto-generating
-							
 							// temp_element that was created last iteration
 							// becomes the new temp_parent
 							
@@ -1815,18 +1813,36 @@
 								parent_has_changed = true
 							}
 							
-							// console.log('check ' + object_type)
+							// the last iteration flagged to start
+							// auto-generating
+							
+							let insert_parent = $('.fw-element[data-key="' + options.parent.data.key + '"]')
+							
+							// console.log('current parent', insert_parent)
+							// console.log('insert eq', insert_eq)
 							
 							if (object_type != comparing_key) {
 								
 								// this type is still a parent
 								// of the element that's being inserted
 								
-								// console.log('temp key', temp_key)
+								// create the key for the temp element
 								
-								temp_key += '-1'
+								if (options.inserting.where == 'after') {
+									// add 2 to the index
+									// one to resolve 0-base indexes with 1-base keys
+									// another one because it'll be the next element in the object
+									temp_key += '-' + (insert_index + 2)
+								} else if (options.inserting.where == 'before') {
+									// add 1 to the index
+									// because it's replacing the previous element in that spot
+									temp_key += '-' + (insert_index + 1)
+								} else {
+									// append -1
+									temp_key += '-1'
+								}
 								
-								// console.log('auto-generating ' + object_type + ' in ' + options.parent.data.type)
+								console.log('auto-generating temp_element ' + object_type + ' ' + temp_key + ' in ' + options.parent.data.type )
 								
 								temp_element = {
 									item: $('<div class="' + options.objects[object_type].classes.join(' ') + ' fw-auto-generated" data-key="' + temp_key + '"></div>'), // DOM element to be inserted into page
@@ -1853,13 +1869,21 @@
 									
 								} else {
 									
-									// console.log('insert at index ' + insert_index)
+									let obj_index = insert_index
 									
-									let deleted_array = options.parent.data.children.splice(insert_index, 0, temp_element.data)
+									if (options.inserting.where !== 'before') {
+										obj_index += 1
+									}
+									
+									console.log('adding temp_element to parent.data at ' + obj_index)
+									
+									let deleted_array = options.parent.data.children.splice(obj_index, 0, temp_element.data)
 									
 									// reset keys in parent
 									
 									// gather elements to move
+									// console.log('reset keys now')
+									// console.log(JSON.stringify(options.parent.data, null, 2))
 									plugin.set_elements_to_move(options.parent.data)
 									
 									// set keys of moving elements
@@ -1871,35 +1895,51 @@
 									
 								}
 								
-								console.log('adding auto element', temp_element.data.type, temp_element.data.key)
+								console.log('creating autogen element ' + temp_element.data.type + ' with key ' + temp_element.data.key + ' to parent ' + options.parent.data.key)
 								
-								console.log('to parent', options.parent.data.key)
-								 
-								console.log('at index', insert_eq)
-								
-								if (insert_eq == null) {
-									temp_element.item.appendTo(options.parent.item)
-								} else {
-									temp_element.item.insertAfter(insert_eq)
-									insert_eq = null
+								switch (options.inserting.where) {
+									case 'before' :
+										temp_element.item.insertBefore(insert_eq)
+										insert_eq = null
+										break
+										
+									case 'after' :
+										temp_element.item.insertAfter(insert_eq)
+										insert_eq = null
+										break
+										
+									case 'append' :
+										temp_element.item.appendTo(options.parent.item)
+										break
 								}
 								
 								// console.log('new temp_key', temp_key, temp_element.data)
 								
 								plugin.setup_element(temp_element)
 								
+								if (options.parent.item.hasClass('fw-page')) {
+									options.parent.item.find('> .fw-insert-into-empty.persistent').appendTo(options.parent.item)
+								}
+								
 								// console.log('created', temp_element)
 								// console.log('in', options.parent.data)
 								
+								// reset insert_index to 0
+								// because if the next element is auto-generated
+								// it will be the first thing inserted into this element
+								
+								insert_index = null
+								
+								options.inserting = {
+									where: 'append',
+									index: 0
+								}
+								
 							} else {
 								
-								// console.log('end', object_type)
-								
-								// console.log('temp parent', temp_parent)
+								// done adding parents
 								
 								start_generating = false
-								
-								// console.log('parent has changed', parent_has_changed)
 								
 								if (parent_has_changed == true) {
 									
@@ -1907,16 +1947,9 @@
 									// for the element to be inserted
 									
 									options.parent = temp_element
-									// console.log('parent post', JSON.stringify(options.parent.data))
 								}
 								
 								options.element.data.key = temp_key + '-1'
-								
-								// options.parent = temp_element
-								
-								// console.log('done adding parents')
-								
-								// console.log('page', options.page)
 								
 								// rebuild the key structure
 								// not needed here?
@@ -1954,18 +1987,6 @@
 				options.element.item = $('<div>')
 				
 			}
-			
-			// console.log(options.element.data)
-			// 
-			// if (
-			// 	options.element.data.type == 'template' &&
-			// 	options.element.data.inputs.output == 'copy'
-			// ) {
-			// 	console.log('do nothing')
-			// 	// nothing
-			// } else {
-			// 	plugin.insert_element()
-			// }
 			
 		},
 		
@@ -2016,7 +2037,7 @@
 			
 			if (typeof options.element.item == 'string') {
 				
-				console.log('insert string')
+				// console.log('insert string')
 				
 				// it's a template
 				
@@ -2026,7 +2047,7 @@
 				
 			} else {
 				
-				console.log('insert obj')
+				// console.log('insert obj')
 				
 				// console.log(options.element.item)
 				// console.log(options.element.item.prop('outerHTML'))
@@ -2051,6 +2072,10 @@
 					options.element.item.appendTo(options.parent.item)
 					
 					// options.parent.item.css('border', '1px solid #f00')
+					
+					if (options.parent.item.hasClass('fw-page')) {
+						options.parent.item.find('> .fw-insert-into-empty.persistent').appendTo(options.parent.item)
+					}
 					
 					break
 					
@@ -2169,7 +2194,7 @@
 						...data
 					}
 					
-					console.log('merged element data', element.data)
+					// console.log('merged element data', element.data)
 					
 					// set attributes
 					plugin.set_element_atts(element)
@@ -2294,7 +2319,15 @@
 							
 							element.item.find('.fw-element-inner').html(new_markup.find('.fw-element-inner').html())
 							
-							$(document).trigger('fw_populate_block', options.element)
+							console.log('trigger')
+							console.log(JSON.stringify(element, null, 2))
+							$(document).trigger('fw_populate_block', element)
+							
+							console.log('empty options.element.data after populating block')
+							options.element.data = {
+								type: null,
+								children: []
+							}
 							
 						}
 					})
@@ -2313,7 +2346,7 @@
 				parent = options.page
 			}
 			
-			console.log('activate', parent)
+			// console.log('activate', parent)
 			
 			if (
 				parent.type == 'page' &&
@@ -4617,11 +4650,17 @@
 					
 					child.key = parent.key + '-' + (i + 1)
 					
-					options.elements_to_move.push({
-						item: $('[data-key="' + old_key + '"]').first(),
-						id: child.inputs.id,
-						old: old_key,
-						new: child.key
+					// console.log('element to move', old_key, $('[data-key="' + old_key + '"]').first())
+					
+					$('[data-key="' + old_key + '"]').each(function() {
+					
+						options.elements_to_move.push({
+							item: $(this),
+							id: child.inputs.id,
+							old: old_key,
+							new: child.key
+						})
+						
 					})
 					
 					// recursive

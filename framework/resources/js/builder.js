@@ -1092,7 +1092,10 @@
 							plugin.set_element_keys()
 						}
 						
-						if (!options.parent.data.children.length) {
+						if (
+							!options.parent.data.children.length &&
+							!options.parent.item.hasClass('fw-page')
+						) {
 							options.parent.item.prepend(plugin.do_insert_btn(options.parent.data))
 						}
 						
@@ -1826,20 +1829,21 @@
 								// this type is still a parent
 								// of the element that's being inserted
 								
+								console.log(options.inserting)
+								
 								// create the key for the temp element
 								
 								if (options.inserting.where == 'after') {
+									
 									// add 2 to the index
 									// one to resolve 0-base indexes with 1-base keys
 									// another one because it'll be the next element in the object
 									temp_key += '-' + (insert_index + 2)
-								} else if (options.inserting.where == 'before') {
-									// add 1 to the index
-									// because it's replacing the previous element in that spot
-									temp_key += '-' + (insert_index + 1)
+									
 								} else {
-									// append -1
-									temp_key += '-1'
+									// add 1 to the index
+									temp_key += '-' + (insert_index + 1)
+									
 								}
 								
 								console.log('auto-generating temp_element ' + object_type + ' ' + temp_key + ' in ' + options.parent.data.type )
@@ -1865,7 +1869,7 @@
 									// add the new item to its parent's children array
 									options.parent.data.children = [ temp_element.data ]
 									
-									temp_parent.item.find('> .fw-insert-into-empty').remove()
+									temp_parent.item.find('> .fw-insert-into-empty:not(.persistent)').remove()
 									
 								} else {
 									
@@ -2348,16 +2352,16 @@
 			
 			// console.log('activate', parent)
 			
-			if (
-				parent.type == 'page' &&
-				!parent.children
-			) {
-				
-				// blank page
-				
-				$('.fw-element[data-key="' + parent.key + '"]').append(plugin.do_insert_btn(options.page))
-				
-			}
+			// if (
+			// 	parent.type == 'page' &&
+			// 	!parent.children
+			// ) {
+			// 	
+			// 	// blank page
+			// 	
+			// 	$('.fw-element[data-key="' + parent.key + '"]').append(plugin.do_insert_btn(options.page))
+			// 	
+			// }
 			
 			// if (parent.type == 'template') {
 			// 	plugin.add_footer()

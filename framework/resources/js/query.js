@@ -346,11 +346,11 @@
 								
 							})
 							
-						} else {
-							
-							options.elements.item_container.append('<p class="alert alert-warning">' + data.message + '</a>')
-							
 						}
+						
+					} else {
+						
+						options.elements.item_container.html('<p class="alert alert-warning">' + data.message + '</a>')
 						
 					}
 					

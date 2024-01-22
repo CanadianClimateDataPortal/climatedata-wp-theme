@@ -54,9 +54,13 @@
 			
 		case 'meta' :
 			
-			// only works if it's an ACF field
-			// $meta_obj = acf_get_field ( $options['meta'] );
-			// dumpit ( $meta_obj );
+			$is_acf_field = false;
+			
+			$meta_obj = acf_get_field ( $options['meta'] );
+			
+			if ( $meta_obj != '' ) {
+				$is_acf_field = true;
+			}
 			
 			// get all posts and collect their meta values
 			
@@ -73,19 +77,36 @@
 				'compare' => '!='
 			) );
 			
-			$meta_val_query = get_posts ( $meta_val_args );
-			
-			if ( !empty ( $meta_val_query ) ) {
-				foreach ( $meta_val_query as $post_with_meta ) {
+			if ( $is_acf_field == true && isset ( $meta_obj['choices'] ) ) {
+				
+				foreach ( $meta_obj['choices'] as $val => $label ) {
 					
-					$filter_items[] = array (
+					$filter_items[$val] = array (
 						'key' => $options['meta'],
-						'value' => get_post_meta ( $post_with_meta->ID, $options['meta'], true ),
-						'label' => get_post_meta ( $post_with_meta->ID, $options['meta'], true )
+						'value' => $val,
+						'label' => $label
 					);
 					
 				}
+				
+			} else {
+			
+				$meta_val_query = get_posts ( $meta_val_args );
+				
+				if ( !empty ( $meta_val_query ) ) {
+					foreach ( $meta_val_query as $post_with_meta ) {
+						
+						$filter_items[get_post_meta ( $post_with_meta->ID, $options['meta'], true )] = array (
+							'key' => $options['meta'],
+							'value' => get_post_meta ( $post_with_meta->ID, $options['meta'], true ),
+							'label' => get_post_meta ( $post_with_meta->ID, $options['meta'], true )
+						);
+						
+					}
+				}
+				
 			}
+					
 			
 			break;
 	}
@@ -102,7 +123,10 @@
 		
 	?>>
 	
-	<h6 class="<?php echo $options['heading_class']; ?>"><?php 
+	<h6
+		class="<?php echo $options['heading_class']; ?>"
+		<?php if ( str_contains ( $options['heading_class'], 'dropdown' ) ) echo 'data-bs-toggle="dropdown"'; ?>
+	><?php 
 	
 		switch ( $options['by'] ) {
 			case 'post_type' :
@@ -124,11 +148,19 @@
 	<ul class="<?php echo $options['list_class']; ?>">
 		<?php
 		
+			if ( !isset ( $options['item_class'] ) ) {
+				$options['item_class'] = '';
+			}
+			
+			if ( str_contains ( $options['heading_class'], 'dropdown' ) ) {
+				$options['item_class'] .= ' dropdown-item';
+			}
+		
 			foreach ( $filter_items as $item ) {
 			
 		?>
 		
-		<li class="filter-item" data-key="<?php echo $item['key']; ?>" data-value="<?php echo $item['value']; ?>"><?php echo $item['label']; ?></li>
+		<li class="filter-item <?php echo $options['item_class']; ?>" data-key="<?php echo $item['key']; ?>" data-value="<?php echo $item['value']; ?>"><?php echo $item['label']; ?></li>
 		
 		<?php
 		

@@ -3,3 +3,13 @@
 		color: $primary;
 	}
 }
+
+.fw-query-pagination-numbers {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	
+	span {
+		margin: 0 0.125rem;
+	}
+}

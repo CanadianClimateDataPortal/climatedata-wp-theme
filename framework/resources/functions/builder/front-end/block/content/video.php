@@ -16,7 +16,10 @@
 			
 		case 'url' :
 			
-			if ( $element['inputs']['url'][$globals['current_lang_code']] != '' ) {
+			if (
+				isset ( $element['inputs']['url'][$globals['current_lang_code']] ) &&
+				$element['inputs']['url'][$globals['current_lang_code']] != ''
+			) {
 				echo apply_filters ( 'the_content', $element['inputs']['url'][$globals['current_lang_code']] );
 			} else {
 				$message = 'Edit this block to add a video URL.';

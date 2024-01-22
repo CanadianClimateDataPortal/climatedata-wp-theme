@@ -47,11 +47,15 @@
 								
 								<h2 class="font-family-serif text-secondary"><?php echo $i; ?></h2>
 								
-								<h5><?php echo get_field ( 'title', 'topic_' . $topic->term_id ); ?></h5>
+								<h5><?php echo fw_get_field ( 'title', 'topic_' . $topic->term_id ); ?></h5>
 								
 								<p><?php
 								
-									echo $topic->description;
+									if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
+										echo get_field ( 'description_fr', 'topic_' . $topic->term_id );
+									} else {
+										echo $topic->description;
+									}
 								
 								?></p>
 								

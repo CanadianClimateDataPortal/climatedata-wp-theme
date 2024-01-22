@@ -357,6 +357,8 @@ add_filter ( 'query_vars', function ( $query_vars ) {
 } );
 
 // use slug_lang query var to adjust query
+// there's probably a better way to do all of this,
+// someday
 
 add_action ( 'pre_get_posts', 'get_post_by_lang_slug' );
 
@@ -377,11 +379,13 @@ function get_post_by_lang_slug ( $query ) {
 			if ( $code != 'en' ) {
 			
 				$has_slug = false;
+				$has_path = false;
 				
 				if (
 					isset ( $query->query_vars['slug_' . $code] ) &&
 					!empty ( $query->query_vars['slug_' . $code] )
 				) {
+					
 					$has_slug = true;
 					
 					$query->set ( 'meta_query', array ( 
@@ -395,8 +399,6 @@ function get_post_by_lang_slug ( $query ) {
 					$query->set ( 'post_type', array ( 'post', 'page' ) );
 					
 				}
-				
-				$has_path = false;
 				
 				if (
 					isset ( $query->query_vars['path_' . $code] ) &&
@@ -476,23 +478,32 @@ function get_post_by_lang_slug ( $query ) {
 					}
 				
 				} elseif (
-					(
-						$has_slug == true ||
-						$has_path == true
-					) &&
-					(
-						isset ( $query->query_vars['cpt'] ) &&
-						!empty ( $query->query_vars['cpt'] )
-					)
+					$has_slug == true ||
+					$has_path == true
 				) {
 					
-					// CPT SINGLE
-					
-					$query->set ( 'post_type', array ( $query->query_vars['cpt'] ) );
-					
+					// tell the query what this isn't
 					$query->is_home = false;
+					$query->is_archive = false;
+					$query->is_date = false;
+					$query->is_year = false;
+					$query->is_month = false;
+					$query->is_day = false;
+					
+					// tell it what it is
 					$query->is_single = true;
 					$query->is_singular = true;
+					
+					if (
+						isset ( $query->query_vars['cpt'] ) &&
+						!empty ( $query->query_vars['cpt'] )
+					) {
+					
+						// CPT SINGLE
+						
+						$query->set ( 'post_type', array ( $query->query_vars['cpt'] ) );
+						
+					}
 					
 				}
 				

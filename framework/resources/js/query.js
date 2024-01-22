@@ -16,10 +16,12 @@
 			elements: {
 				item_container: null,
 				filters: null,
-				sort: null
+				sort: null,
+				pagination: null
 			},
 			tax_query: null,
 			meta_query: null,
+			max_pages: 0,
 			debug: true
 		}
 
@@ -64,12 +66,25 @@
 				options.elements.sort = item.find('.fw-query-sort')
 			}
 			
+			// pagination
+			if (options.elements.pagination == null) {
+				options.elements.pagination = item.find('.fw-query-pagination')
+			}
+			
 			// [fw] element key
 			options.fw_key = item.closest('.fw-element').attr('data-key')
 			
 			// query args
+			console.log(item)
+			console.log(item.attr('data-args'))
+			
 			options.args = JSON.parse(item.attr('data-args'))
 			// item.removeAttr('data-args')
+			
+			// force page number
+			if (!options.args.hasOwnProperty('paged')) {
+				options.args.paged = 1
+			}
 			
 			// any initial tax/meta query args
 			// should be kept and merged with filter args
@@ -133,6 +148,8 @@
 				})
 			}
 			
+			// sort item
+			
 			if (options.elements.sort != null) {
 				options.elements.sort.on('click', 'li', function(e) {
 					
@@ -149,9 +166,40 @@
 				})
 			}
 			
+			// pagination
+			
+			if (options.elements.pagination != null) {
+				
+				options.elements.pagination.on('click', '.fw-query-pagination-btn', function(e) {
+					
+					let new_page = options.args.paged
+					
+					if ($(this).hasClass('next')) {
+						if (options.max_pages > options.args.paged) {
+							// page number can still go higher
+							new_page += 1
+						}
+					}
+					
+					if ($(this).hasClass('previous')) {
+						if (options.args.paged > 1) {
+							new_page -= 1
+						}
+					}
+					
+					if (new_page != options.args.paged) {
+						console.log('go to page ' + options.args.paged)
+						options.args.paged = new_page
+						plugin.do_query()
+					}
+					
+				})
+				
+			}
+			
 			$(document).on('fw_populate_block', function(event, element) {
-				// console.log('submit', event, element)
-				// console.log('event here', event, element.data.key, options.fw_key)
+				console.log('submit', event, element)
+				console.log('event here', event, element.data.key, options.fw_key)
 				
 				if (element.data.key == options.fw_key) {
 					
@@ -263,13 +311,33 @@
 					console.log(data)
 					
 					if (data.success == true) {
-							
+						
 						options.elements.item_container.empty()
 						
 						if (data.items.length > 0) {
 							
+							// set page number and max pages
+							
+							options.max_pages = data.max_pages
+							
+							options.elements.pagination.find('.number-label-current').text(options.args.paged)
+							
+							options.elements.pagination.find('.number-label-max').text(options.max_pages)
+							
+							if (options.args.paged == 1) {
+								item.find('.fw-query-pagination-btn.previous').addClass('disabled')
+							} else {
+								item.find('.fw-query-pagination-btn.previous').removeClass('disabled')
+							}
+							
+							if (options.args.paged == options.max_pages) {
+								item.find('.fw-query-pagination-btn.next').addClass('disabled')
+							} else {
+								item.find('.fw-query-pagination-btn.next').removeClass('disabled')
+							}
+							
 							data.items.forEach(function(item, i) {
-									
+								
 								// console.log(item)
 								
 								let new_item = options.template.clone()

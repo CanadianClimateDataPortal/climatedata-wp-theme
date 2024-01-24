@@ -52,7 +52,7 @@ $utilities: (
 //   @include make-col($x, $y);
 //   width: #{((calc($x / $y)) * 100) + '%'};
 // }
-// 
+//
 // @mixin nested-offset($x: 12, $y: 12) {
 //   margin-left: #{((calc($x / $y)) * 100) + '%'};
 // }
@@ -60,16 +60,16 @@ $utilities: (
 // standard widths
 
 @for $z from 12 through 15 {
-
   $current-max: $z - 1;
 
   @for $y from 1 through $current-max {
-
-    .col-#{$y}-of-#{$z} { @include nested-column($y, $z) }
-    .offset-#{$y}-of-#{$z} { @include nested-offset($y, $z) }
-
+    .col-#{$y}-of-#{$z} {
+      @include nested-column($y, $z);
+    }
+    .offset-#{$y}-of-#{$z} {
+      @include nested-offset($y, $z);
+    }
   }
-
 }
 
 // breakpoints
@@ -78,27 +78,23 @@ $cdc-grid-breakpoints: 'xs', 'sm', 'md', 'lg', 'xl', 'xxl';
 $cdc-grid-breakpoint-sizes: 0, 576, 768, 992, 1200, 1400;
 
 @for $i from 1 through length($cdc-grid-breakpoints) {
-
   $current-breakpoint: nth($cdc-grid-breakpoints, $i);
   $current-breakpoint-size: nth($cdc-grid-breakpoint-sizes, $i);
 
   @media (min-width: #{$current-breakpoint-size}px) {
-
     @for $z from 12 through 15 {
-
       $current-max: $z - 1;
 
       @for $y from 0 through $current-max {
-
-        .col-#{$current-breakpoint}-#{$y}-of-#{$z} { @include nested-column($y, $z) }
-        .offset-#{$current-breakpoint}-#{$y}-of-#{$z} { @include nested-offset($y, $z) }
-
+        .col-#{$current-breakpoint}-#{$y}-of-#{$z} {
+          @include nested-column($y, $z);
+        }
+        .offset-#{$current-breakpoint}-#{$y}-of-#{$z} {
+          @include nested-offset($y, $z);
+        }
       }
-
     }
-
   }
-
 }
 
 //
@@ -108,32 +104,24 @@ $cdc-grid-breakpoint-sizes: 0, 576, 768, 992, 1200, 1400;
 // standard
 
 @for $z from 12 through 15 {
-
   .offset-n#{$z} {
-    margin-left: #{( calc($z / 12) * -100 ) + '%'};
+    margin-left: #{(calc($z / 12) * -100) + '%'};
   }
-
 }
 
 // breakpoints
 
 @for $i from 1 through length($cdc-grid-breakpoints) {
-
   $current-breakpoint: nth($cdc-grid-breakpoints, $i);
   $current-breakpoint-size: nth($cdc-grid-breakpoint-sizes, $i);
 
   @media (min-width: #{$current-breakpoint-size}px) {
-
     @for $z from 12 through 15 {
-
       .offset-#{$current-breakpoint}-n#{$z} {
-        margin-left: #{( calc($z / 12) * -100 ) + '%'};
+        margin-left: #{(calc($z / 12) * -100) + '%'};
       }
-
     }
-
   }
-
 }
 
 //
@@ -203,6 +191,15 @@ p {
 //
 // CLASSES
 //
+
+.btn {
+  @include all-caps;
+
+  .btn-icon {
+    margin-right: 0.5rem;
+    opacity: 0.8;
+  }
+}
 
 .bg {
   background-repeat: no-repeat;
@@ -289,13 +286,54 @@ p {
   }
 }
 
+// controls
+
+.opacity-slider-well {
+  background-color: $gray-300;
+  transition: 0.25s;
+  box-shadow: 0 0 0.05rem transparentize($black, 1);
+
+  &:hover {
+    background-color: $white;
+    box-shadow: 0 0.1rem 0.5rem transparentize($black, 0.85);
+
+    .ui-slider-handle {
+      background-color: $primary;
+      color: $white;
+    }
+  }
+}
+
+$opacity-slider-height: 1.875rem;
+$opacity-slider-handle-width: 2.75rem;
+
+.opacity-slider {
+  height: $opacity-slider-height;
+  margin: 0 calc($opacity-slider-handle-width / 2);
+
+  .ui-slider-handle {
+    top: 0;
+    width: $opacity-slider-handle-width;
+    height: $opacity-slider-height;
+    margin-left: calc($opacity-slider-handle-width * -0.5);
+    background-color: $gray-500;
+    color: $gray-200;
+    font-size: 0.875rem;
+    line-height: $opacity-slider-height;
+    text-align: center;
+    transition:
+      background-color 0.25s,
+      color 0.25s;
+  }
+}
+
 //
 // STRUCTURE
 //
 
 #hero {
   color: $white;
-  
+
   h1 {
     @include font-size(5rem);
     font-weight: bold;
@@ -424,6 +462,10 @@ p {
 
 .filter-item.selected {
   color: $primary;
+
+  .dropdown-item {
+    color: $primary;
+  }
 }
 
 //

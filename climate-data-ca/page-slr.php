@@ -135,7 +135,12 @@ if (have_posts()) : while (have_posts()) : the_post();
 
         <?php
 
-    }
+    } else {
+?>
+       <div class="page-tour" style="display:none;"></div>
+<?php
+     }
+
 
     //
     // SECTIONS LOOP

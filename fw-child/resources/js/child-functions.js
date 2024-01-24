@@ -2,7 +2,9 @@
 // GLOBAL CONSTANTS
 //
 
-const geoserver_url = 'https://data.climatedata.ca';
+// const geoserver_url = 'https://data.climatedata.ca';
+const geoserver_url = 'https://dataclimatedata.crim.ca';
+
 const canadaCenter = [62.51231793838694, -98.48144531250001];
 const scenario_names = {
   cmip5: {
@@ -17,7 +19,14 @@ const scenario_names = {
   },
 };
 
+// throttling for history state pushes
 var pushes_since_input = 0;
+
+// fix for 'fakeStop is not a function'
+
+L.DomEvent.fakeStop = function () {
+  return true;
+};
 
 (function ($) {
   $(function () {

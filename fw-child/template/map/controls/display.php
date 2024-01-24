@@ -9,7 +9,7 @@
 			<div class="control-tab-body">
 				
 				<div id="map-control-values" class="map-control-item">
-					<h6>Data Values</h6>
+					<h6 class="all-caps text-secondary">Data Values</h6>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="display-values" id="display-values-absolute" value="" checked data-query-key="delta">
@@ -23,7 +23,7 @@
 				</div>
 				
 				<div id="map-control-aggregation" class="map-control-item">
-					<h6>Map Aggregation</h6>
+					<h6 class="all-caps text-secondary">Map Aggregation</h6>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-grid" value="" checked data-query-key="sector">
@@ -48,78 +48,73 @@
 				</div>
 				
 				<div id="map-control-colours" class="map-control-item">
-					<div class="d-flex justify-content-between">
-						<h6 class="flex-grow-1">Colours</h6>
-						<span id="display-colours-add" class="ms-2">Add</span>
-						<span id="display-colours-reset" class="ms-2">Reset</span>
-					</div>
+					<h6 class="all-caps text-secondary">Colours</h6>
 					
-					<div id="display-colour-table" class="mb-3">
-						
-						<!-- row -->
-						<div class="d-flex py-2 border-bottom">
-							<div class="color-picker flex-grow-1 d-flex align-items-center">
-								<span class="rounded-circle p-1 me-2 bg-primary"></span>
-								<span class="value">#DC3545</span>
-							</div>
-							
-							<div class="d-flex">
-								<div class="display-colour-sort-handle"><i class="fas fa-sort"></i></div>
-								<div class="display-colour-remove ms-2"><i class="fas fa-times"></i></div>
-							</div>
+					<input type="hidden" name="display-scheme" id="display-scheme" value="kejDjr" data-query-key="scheme">
+					
+					<div id="display-scheme-select" class="dropdown mb-3">
+						<div class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+							<span class="gradient" style="background: linear-gradient(90deg, #22C1C3, #FDBB2D);"></span>
+							<span class="sr-only">Selected Scheme Name</span>
 						</div>
 						
-						<!-- row -->
-						<div class="d-flex py-2 border-bottom">
-							<div class="color-picker flex-grow-1 d-flex align-items-center">
-								<span class="rounded-circle p-1 me-2 bg-warning"></span>
-								<span class="value">#FFC107</span>
-							</div>
+						<ul class="dropdown-menu w-100 p-0">
+							<li><button class="dropdown-item active default" data-scheme-id="scheme1">
+								<span class="gradient" style="background: linear-gradient(90deg, #22C1C3, #FDBB2D);"></span>
+								<span class="small all-caps"><?php _e ( 'Default', 'cdc' ); ?></span>
+							</button></li>
+								
+							<li><button class="dropdown-item" data-scheme-id="scheme2">
+								<span class="gradient" style="background: linear-gradient(90deg, #2F4A1F, #D4FD2D);"></span>
+								<span class="sr-only">Scheme Name</span>
+							</button></li>
 							
-							<div class="d-flex">
-								<div class="display-colour-sort-handle"><i class="fas fa-sort"></i></div>
-								<div class="display-colour-remove ms-2"><i class="fas fa-times"></i></div>
-							</div>
-						</div>
-						
-						<!-- row -->
-						<div class="d-flex py-2 border-bottom">
-							<div class="color-picker flex-grow-1 d-flex align-items-center">
-								<span class="rounded-circle p-1 me-2 bg-info"></span>
-								<span class="value">#0DCAF0</span>
-							</div>
-							
-							<div class="d-flex">
-								<div class="display-colour-sort-handle"><i class="fas fa-sort"></i></div>
-								<div class="display-colour-remove ms-2"><i class="fas fa-times"></i></div>
-							</div>
-						</div>
+							<li><button class="dropdown-item" data-scheme-id="scheme3">
+								<span class="gradient" style="background: linear-gradient(90deg, #3F5EFB, #FC466B);"></span>
+								<span class="sr-only">Scheme Name</span>
+							</button></li>
+						</ul>
 						
 					</div>
 					
-					
-					<div id="display-colours-toggle" class="btn-group">
+					<div id="display-colours-toggle" class="btn-group w-100">
 						
 						<input type="radio" class="btn-check" name="display-colours-type" id="display-colours-discrete" autocomplete="off" checked>
-						<label class="btn btn-outline-primary" for="display-colours-discrete"><?php _e ( 'Discrete', 'cdc' ); ?></label>
+						<label class="btn disabled btn-outline-gray-400" for="display-colours-discrete"><?php _e ( 'Discrete', 'cdc' ); ?></label>
 						
 						<input type="radio" class="btn-check" name="display-colours-type" id="display-colours-continuous" autocomplete="off">
-						<label class="btn btn-outline-primary" for="display-colours-continuous"><?php _e ( 'Continuous', 'cdc' ); ?></label>
+						<label class="btn disabled btn-outline-gray-400" for="display-colours-continuous"><?php _e ( 'Continuous', 'cdc' ); ?></label>
 						
 					</div>
 				</div>
 				
-				<div id="map-control-opacity" class="map-control-item">
-					<h6>Layer Opacity</h6>
+				<div id="map-control-opacity" class="map-control-item all-caps">
+					<h6 class="text-secondary mb-3">Layer Opacity</h6>
 					
-					<label for="display-opacity-data" class="form-label">Data</label>
-					<input type="range" class="form-range" min="0" max="100" value="100" id="display-opacity-data">
+					<h6 class="text-gray-600">Data</h6>
 					
-					<label for="display-opacity-labels" class="form-label">Labels</label>
-					<input type="range" class="form-range" min="0" max="100" value="100" id="display-opacity-labels">
+					<div class="opacity-slider-well mb-4">
+						<div id="data-opacity-slider" class="opacity-slider" data-pane="raster">
+							<div id="data-opacity-handle" class="ui-slider-handle">100</div>
+						</div>
+					</div>
 					
-					<label for="display-opacity-pins" class="form-label">Pins</label>
-					<input type="range" class="form-range" min="0" max="100" value="100" id="display-opacity-pins">
+					<h6 class="text-gray-600">Labels</h6>
+					
+					<div class="opacity-slider-well mb-4">
+						<div id="labels-opacity-slider" class="opacity-slider" data-pane="labels">
+							<div id="labels-opacity-handle" class="ui-slider-handle">100</div>
+						</div>
+					</div>
+					
+					<h6 class="text-gray-600">Pins</h6>
+					
+					<div class="opacity-slider-well">
+						<div id="pins-opacity-slider" class="opacity-slider" data-pane="marker">
+							<div id="pins-opacity-handle" class="ui-slider-handle">100</div>
+						</div>
+					</div>
+					
 				</div>					
 				
 			</div>

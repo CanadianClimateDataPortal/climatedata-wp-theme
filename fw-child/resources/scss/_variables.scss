@@ -320,7 +320,8 @@ $theme-colors: (
   "dark":       $dark,
   "gray-200":   $gray-200,
   "gray-300":   $gray-300,
-  "gray-400":   $gray-400
+  "gray-400":   $gray-400,
+  "gray-600":   $gray-600
 ) !default;
 // scss-docs-end theme-colors-map
 
@@ -669,7 +670,7 @@ $display-line-height: $headings-line-height !default;
 $lead-font-size:              $font-size-base * 1.25 !default;
 $lead-font-weight:            300 !default;
 
-$small-font-size:             .875em !default;
+$small-font-size:             0.75em;
 
 $sub-sup-font-size:           .75em !default;
 
@@ -816,7 +817,7 @@ $btn-font-size-lg:            $input-btn-font-size-lg !default;
 
 $btn-border-width:            $input-btn-border-width !default;
 
-$btn-font-weight:             $font-weight-normal !default;
+$btn-font-weight:             500;
 $btn-box-shadow:              inset 0 1px 0 rgba($white, .15), 0 1px 1px rgba($black, .075) !default;
 $btn-focus-width:             $input-btn-focus-width !default;
 $btn-focus-box-shadow:        $input-btn-focus-box-shadow !default;

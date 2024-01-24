@@ -8,6 +8,87 @@
       lang: ajax_data.globals.lang,
       post_id: null,
       canadaBounds: L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.6, -49.9)),
+      grid: {
+        highlighted: [],
+        markers: {},
+        styles: {
+          line: {
+            default: {
+              color: '#fff',
+              weight: 0.2,
+              opacity: 0.6,
+            },
+            hover: {
+              color: '#fff',
+              weight: 0.2,
+              opacity: 0.8,
+            },
+            active: {
+              color: '#fff',
+              weight: 1,
+              opacity: 1,
+            },
+          },
+          fill: {
+            default: {
+              color: '#fff',
+              opacity: 0,
+            },
+            hover: {
+              color: '#fff',
+              opacity: 0.2,
+            },
+            active: {
+              color: '#fff',
+              opacity: 0.6,
+            },
+          },
+        },
+        leaflet: {
+          rendererFactory: L.canvas.tile,
+          interactive: true,
+          getFeatureId: function (f) {
+            return f.properties.gid;
+          },
+          maxNativeZoom: 12,
+          vectorTileLayerStyles: {
+            canadagrid: function (properties, zoom) {
+              return {
+                weight: defaults.grid.styles.line.default.weight,
+                color: defaults.grid.styles.line.default.color,
+                opacity: defaults.grid.styles.line.default.opacity,
+                fill: true,
+                radius: 4,
+                fillOpacity: defaults.grid.styles.fill.default.opacity,
+              };
+            },
+            canadagrid1deg: function (properties, zoom) {
+              return {
+                weight: defaults.grid.styles.line.default.weight,
+                color: defaults.grid.styles.line.default.color,
+                opacity: defaults.grid.styles.line.default.opacity,
+                fill: true,
+                radius: 4,
+                fillOpacity: defaults.grid.styles.fill.default.opacity,
+              };
+            },
+            era5landgrid: function (properties, zoom) {
+              return {
+                weight: defaults.grid.styles.line.default.weight,
+                color: defaults.grid.styles.line.default.color,
+                opacity: defaults.grid.styles.line.default.opacity,
+                fill: true,
+                radius: 4,
+                fillOpacity: defaults.grid.styles.fill.default.opacity,
+              };
+            },
+          },
+          bounds: L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.6, -49.9)),
+          maxZoom: 12,
+          minZoom: 7,
+          pane: 'grid',
+        },
+      },
       maps: {},
       coords: {
         lat: null,
@@ -149,6 +230,15 @@
               maxZoom: 12,
             },
           ).addTo(this_object);
+
+          // labels
+
+          L.tileLayer(
+            '//{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png',
+            {
+              pane: 'labels',
+            },
+          ).addTo(this_object);
         }
 
         // sync if multiple maps exist
@@ -169,19 +259,74 @@
         return options.maps;
       },
 
-      get_layer: function () {
+      get_grid_layer: function (fn_options) {
+        let plugin = !this.item ? this.data('cdc_app') : this,
+          item = plugin.item,
+          options = plugin.options;
+
+        console.log('cdc', 'get grid layer');
+
+        // grid layer
+
+        for (let key in options.maps) {
+          let grid_layer = L.vectorGrid.protobuf(
+            geoserver_url +
+              '/geoserver/gwc/service/tms/1.0.0/CDC:' +
+              'canadagrid' +
+              '@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf',
+            options.grid.leaflet,
+          );
+
+          grid_layer
+            .on('mouseover', function (e) {
+              // reset highlighted
+              options.grid.highlighted.forEach(function (feature) {
+                grid_layer.resetFeatureStyle(feature);
+              });
+
+              // update highlighted grid
+              options.grid.highlighted = [e.layer.properties.gid];
+
+              grid_layer.setFeatureStyle(options.grid.highlighted, {
+                weight: options.grid.styles.line.hover.weight,
+                color: options.grid.styles.line.hover.color,
+                opacity: options.grid.styles.line.hover.opacity,
+                fillColor: options.grid.styles.fill.hover.color,
+                fill: true,
+                fillOpacity: options.grid.styles.fill.hover.opacity,
+              });
+            })
+            .on('mouseout', function (e) {})
+            .on('click', function (e) {
+              console.log('clicked grid');
+
+              // pan map to clicked coords
+              // var offset = (map1.getSize().x * 0.5) - 100;
+              //
+              // map1.panTo([e.latlng.lat, e.latlng.lng], { animate: false }); // pan to center
+              // map1.panBy(new L.Point(offset, 0), { animate: false }); // pan by offset
+
+              // add marker
+
+              plugin.maps.add_marker.apply(item, [e.latlng.lat, e.latlng.lng]);
+
+              // load location details
+
+              $('#control-bar').tab_drawer('update_path', '#location-detail');
+
+              $('#location-detail .control-tab-head h5').text(
+                e.latlng.lat + ', ' + e.latlng.lng,
+              );
+            })
+            .addTo(options.maps[key].object);
+        }
+      },
+
+      get_data_layer: function (fn_options) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           options = plugin.options;
 
-        console.log('cdc', 'get layer');
-
-        let map_objects = [];
-
-        for (let key in options.maps) {
-          map_objects.push(options.maps[key].object);
-        }
-
-        // raster
+        console.log('cdc', 'get data layer');
 
         for (let key in options.maps) {
           let layer_name =
@@ -227,72 +372,6 @@
 
           // console.log(options.maps[key].object);
         }
-
-        // grid layer
-
-        let gridline_color = '#fff',
-          gridline_color_hover = '#fff',
-          gridline_color_active = '#fff',
-          gridline_width = '0.2',
-          gridline_width_active = '1',
-          gridfill_color_hover = '#fff';
-
-        let gridLayer_options = {
-          rendererFactory: L.canvas.tile,
-          interactive: true,
-          getFeatureId: function (f) {
-            return f.properties.gid;
-          },
-          maxNativeZoom: 12,
-          vectorTileLayerStyles: {
-            canadagrid: function (properties, zoom) {
-              return {
-                weight: 0.1,
-                color: gridline_color,
-                opacity: 1,
-                fill: true,
-                radius: 4,
-                fillOpacity: 0,
-              };
-            },
-            canadagrid1deg: function (properties, zoom) {
-              return {
-                weight: 0.1,
-                color: gridline_color,
-                opacity: 1,
-                fill: true,
-                radius: 4,
-                fillOpacity: 0,
-              };
-            },
-            era5landgrid: function (properties, zoom) {
-              return {
-                weight: 0.1,
-                color: gridline_color,
-                opacity: 1,
-                fill: true,
-                radius: 4,
-                fillOpacity: 0,
-              };
-            },
-          },
-          bounds: options.canadaBounds,
-          maxZoom: 12,
-          minZoom: 7,
-          pane: 'grid',
-        };
-
-        gridLayer = L.vectorGrid.protobuf(
-          geoserver_url +
-            '/geoserver/gwc/service/tms/1.0.0/CDC:' +
-            'canadagrid' +
-            '@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf',
-          gridLayer_options,
-        );
-
-        for (let key in options.maps) {
-          // gridLayer.addTo(options.maps[key].object);
-        }
       },
 
       invalidate_size: function () {
@@ -302,6 +381,46 @@
         for (let key in options.maps) {
           options.maps[key].object.invalidateSize();
         }
+      },
+
+      add_marker: function (lat, lng) {
+        let plugin = !this.item ? this.data('cdc_app') : this,
+          item = plugin.item,
+          options = plugin.options;
+
+        let popped = false;
+
+        for (let key in options.maps) {
+          let new_marker = new L.Marker([lat, lng]),
+            popped_marker = null;
+
+          if (options.grid.markers[key] == undefined) {
+            options.grid.markers[key] = [];
+          }
+
+          // add new marker to beginning of array
+          options.grid.markers[key].unshift(new_marker);
+
+          if (options.grid.markers[key].length > 5) {
+            // pop the last if there are more than 5
+            popped_marker = options.grid.markers[key].pop();
+            popped = true;
+
+            options.maps[key].object.removeLayer(popped_marker);
+          }
+
+          new_marker.addTo(options.maps[key].object);
+        }
+
+        if (popped == true) {
+          // remove last from recents
+          item.find('#recent-locations .list-group-item').last().remove();
+        }
+
+        // add location to recents
+        item
+          .find('#recent-locations')
+          .prepend('<li class="list-group-item">' + lat + ', ' + lng + '</li>');
       },
     },
 
@@ -418,7 +537,7 @@
           options = plugin.options,
           item = plugin.item;
 
-        // console.log('update_value');
+        console.log('cdc', 'update_value');
 
         // check for necessary parameters
 
@@ -428,7 +547,7 @@
           fn_options.hasOwnProperty('key') &&
           fn_options.hasOwnProperty('val')
         ) {
-          // console.log('updating query val', fn_options);
+          console.log('updating query val', fn_options);
 
           if (Array.isArray(options.query[fn_options.key])) {
             // the existing query value is an array
@@ -497,7 +616,8 @@
 
         let new_url = plugin.query.obj_to_url.apply(item, [do_history]);
 
-        plugin.maps.get_layer.apply(item);
+        plugin.maps.get_data_layer.apply(item);
+        plugin.maps.get_grid_layer.apply(item);
 
         if (typeof callback == 'function') {
           callback();
@@ -507,25 +627,32 @@
       },
     },
 
-    //     update_coord_inputs: function () {
-    //       let plugin = this,
-    //         item = plugin.item,
-    //         options = plugin.options;
-    //
-    //       options.coords.lat = options.first_map.object.getCenter().lat;
-    //       options.coords.lng = options.first_map.object.getCenter().lng;
-    //       options.coords.zoom = options.first_map.object.getZoom();
-    //
-    //       options.query.coords = [
-    //         options.coords.lat,
-    //         options.coords.lng,
-    //         options.coords.zoom,
-    //       ];
-    //
-    //       $('#coords-lat').val(options.coords.lat);
-    //       $('#coords-lng').val(options.coords.lng);
-    //       $('#coords-zoom').val(options.coords.zoom);
-    //     },
+    get_var_data: function (var_name, callback = null) {
+      let plugin = this,
+        item = plugin.item,
+        options = plugin.options;
+
+      let var_data;
+
+      console.log('get var');
+
+      $.ajax({
+        url: ajax_data.rest_url + 'wp/v2/variable',
+        type: 'GET',
+        dataType: 'json',
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader('X-WP-Nonce', ajax_data.rest_nonce);
+        },
+        data: {
+          var: var_name,
+        },
+        success: function (data) {
+          if (typeof callback == 'function') {
+            callback(data);
+          }
+        },
+      });
+    },
 
     toggle_conditionals: function () {
       let plugin = this,

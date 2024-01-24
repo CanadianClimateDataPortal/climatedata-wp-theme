@@ -28,6 +28,27 @@
     width: calc(100% / 16);
     background-color: transparentize($dark, 0.1);
     z-index: 1000;
+
+    p {
+      font-size: 0.875rem;
+    }
+
+    .btn {
+      font-size: 0.875rem;
+    }
+
+    .btn-check + .btn-outline-gray-400 {
+      color: $gray-600;
+    }
+
+    .btn-check:checked + .btn,
+    :not(.btn-check) + .btn:active,
+    .btn:first-child:active,
+    .btn.active,
+    .btn.show {
+      background-color: $primary;
+      color: $white;
+    }
   }
 }
 
@@ -153,17 +174,74 @@ body.tab-drawer-open {
   }
 }
 
-.var-query-item {
-  border-bottom: 1px solid $gray-300;
+#var-select-query {
+  .fw-query-item {
+    border-bottom: 1px solid $gray-300;
 
-  &:not(:nth-child(3n + 3)) {
-    border-right: 1px solid $gray-300;
+    &:not(:nth-child(3n + 3)) {
+      border-right: 1px solid $gray-300;
+    }
+
+    .var-item-img {
+      position: relative;
+      height: 0;
+      padding-bottom: 40%;
+    }
+  }
+}
+
+#display-scheme-select {
+  box-shadow: 0 0 0.05rem transparentize($black, 1);
+
+  .dropdown-toggle {
+    height: 2.5rem;
+    border: 1px solid $gray-300;
+    transition: 0.25s;
+
+    &.show {
+      background-color: $white;
+      border-color: $dropdown-border-color;
+      box-shadow: 0 0.1rem 0.5rem transparentize($black, 0.85);
+    }
   }
 
-  .var-item-img {
+  .dropdown-menu {
+    box-shadow: 0 0.1rem 0.5rem transparentize($black, 0.85);
+  }
+
+  .dropdown-item {
+    height: 2.5rem;
+
+    &:hover {
+      background-color: $gray-300;
+    }
+
+    &.active,
+    &:active {
+      background-color: $gray-500;
+    }
+  }
+
+  li {
     position: relative;
-    height: 0;
-    padding-bottom: 40%;
+
+    span {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: $white;
+    }
+  }
+
+  .gradient {
+    position: absolute;
+    top: 0.25rem;
+    left: 0.25rem;
+    width: calc(100% - 0.5rem);
+    height: calc(100% - 0.5rem);
+    transform: none;
+    background: $gray-600;
   }
 }
 
@@ -195,16 +273,17 @@ body.tab-drawer-open {
       @include font-size(3rem);
     }
   }
-  
+
   // adjust style for old loop
-  
-  h1, h2, h3 {
+
+  h1,
+  h2,
+  h3 {
     font-family: $font-family-serif;
     font-weight: bold;
-    
+
     &.text-body {
       color: $gray-600 !important;
     }
   }
-  
 }

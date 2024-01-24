@@ -8,30 +8,35 @@
 			
 			<div class="control-tab-body">
 				
-				<div id="map-control-variable" class="map-control-item">
-					<a href="#data-variable" class="tab-drawer-trigger">Variable</a>
+				<div id="map-control-variable" class="map-control-item pe-0">
+					<h6 class="all-caps text-secondary"><?php _e ( 'Variable', 'cdc' ); ?></h6>
+					
+					<input type="hidden" name="data-var" id="data-var" value="" data-query-key="var">
+					
+					<a href="#data-variable" class="tab-drawer-trigger var-name d-block bg-white text-body p-3"></a>
 				</div>
 				
 				<div id="map-control-dataset" class="map-control-item">
 					
-					<label for="data-dataset" class="form-label h6"><?php _e ( 'Dataset', 'cdc' ); ?></label>
+					<label for="data-dataset" class="form-label d-block h6 all-caps text-secondary"><?php _e ( 'Dataset', 'cdc' ); ?></label>
 					
 					<div class="btn-group">
 						<input type="radio" class="btn-check" name="data-dataset" id="data-dataset-cmip6" value="cmip6" autocomplete="off" data-query-key="dataset" checked>
-						<label class="btn btn-outline-primary" for="data-dataset-cmip6"><?php _e ( 'CMIP6', 'cdc' ); ?></label>
+						<label class="btn btn-outline-gray-400" for="data-dataset-cmip6"><?php _e ( 'CMIP6', 'cdc' ); ?></label>
 						
 						<input type="radio" class="btn-check" name="data-dataset" id="data-dataset-cmip5" value="cmip5" autocomplete="off" data-query-key="dataset">
-						<label class="btn btn-outline-primary" for="data-dataset-cmip5"><?php _e ( 'CMIP5', 'cdc' ); ?></label>
+						<label class="btn btn-outline-gray-400" for="data-dataset-cmip5"><?php _e ( 'CMIP5', 'cdc' ); ?></label>
 					</div>
 					
 				</div>
 				
 				<div id="map-control-frequency" class="map-control-item">
-					<label for="data-frequency" class="form-label">Frequency</label>
+					<label for="data-frequency" class="form-label d-block h6 all-caps text-secondary">Frequency</label>
 					
 					<select class="form-select" name="data-frequency" data-query-key="frequency">
-						<option value="ann"><?php _e ( 'Annual', 'cdc' ); ?></option>
-						<optgroup label="<?php _e ( 'Monthly', 'cdc' ); ?>">
+						<option value="ann" data-field="ann"><?php _e ( 'Annual', 'cdc' ); ?></option>
+						<option value="daily" data-field="daily"><?php _e ( 'Daily', 'cdc' ); ?></option>
+						<optgroup label="<?php _e ( 'Monthly', 'cdc' ); ?>" data-field="monthly">
 							<option value="jan"><?php _e ( 'January', 'cdc' ); ?></option>
 							<option value="feb"><?php _e ( 'February', 'cdc' ); ?></option>
 							<option value="mar"><?php _e ( 'March', 'cdc' ); ?></option>
@@ -44,6 +49,13 @@
 							<option value="oct"><?php _e ( 'October', 'cdc' ); ?></option>
 							<option value="nov"><?php _e ( 'November', 'cdc' ); ?></option>
 							<option value="dec"><?php _e ( 'December', 'cdc' ); ?></option>
+						</optgroup>
+						
+						<optgroup label="<?php _e ( 'Seasonal', 'cdc' ); ?>" data-field="qsdec">
+							<option value="spring"><?php _e ( 'Spring', 'cdc' ); ?></option>
+							<option value="summer"><?php _e ( 'Summer', 'cdc' ); ?></option>
+							<option value="fall"><?php _e ( 'Fall', 'cdc' ); ?></option>
+							<option value="winter"><?php _e ( 'Winter', 'cdc' ); ?></option>
 						</optgroup>
 					</select>
 				</div>

@@ -9,21 +9,24 @@
 			<div class="control-tab-body">
 				
 				<div id="map-control-search" class="map-control-item">
-					<label for="area-search" class="h6">Search</label>
+					<label for="area-search"  class="h6 all-caps text-secondary">Search</label>
 					
 					<input type="text" class="form-control" name="area-search" placeholder="City, landmark or postal code">
 					<a href="#location-detail" class="tab-drawer-trigger">Detail</a>
 				</div>
 				
 				<div id="map-control-recent" class="map-control-item">
-					<div class="d-flex justify-content-between">
-						<h6>Recent Locations</h6>
-						<h6>Clear</h6>
+					<div class="d-flex justify-content-between mb-3">
+						<h6 class="all-caps text-secondary mb-0">Recent Locations</h6>
+						<h6 class="all-caps text-gray-600 mb-0">Clear</h6>
+					</div>
+					
+					<div id="recent-locations" class="list-group list-group-flush">
 					</div>
 				</div>
 					
 				<div id="map-control-coords" class="map-control-item">
-					<h6>Adjust Coordinates</h6>
+					<h6 class="all-caps text-secondary">Adjust Coordinates</h6>
 					
 					<input type="hidden" name="coords" id="coords" data-query-key="coords">
 					

@@ -4,6 +4,8 @@
 		
 			// do_action ( 'fw_global_css' );
 			
+			do_action ( 'fw_before_footer' );
+			
 			wp_footer();
 			
 			// dumpit ( $GLOBALS['css'] );

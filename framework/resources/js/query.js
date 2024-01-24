@@ -75,8 +75,8 @@
 			options.fw_key = item.closest('.fw-element').attr('data-key')
 			
 			// query args
-			console.log(item)
-			console.log(item.attr('data-args'))
+			// console.log(item)
+			// console.log(item.attr('data-args'))
 			
 			options.args = JSON.parse(item.attr('data-args'))
 			// item.removeAttr('data-args')
@@ -89,7 +89,6 @@
 			// any initial tax/meta query args
 			// should be kept and merged with filter args
 			
-			console.log(options.args)
 			if (options.args.hasOwnProperty('tax_query')) {
 				options.tax_query = options.args.tax_query
 			}
@@ -139,6 +138,7 @@
 						}
 						
 						// don't propagate click to other plugins using the same filter items
+						// bug - bootstrap dropdown won't close
 						e.stopPropagation()
 					
 					}
@@ -276,7 +276,7 @@
 				
 			})
 			
-			console.log('new args', options.args)
+			// console.log('new args', options.args)
 			
 			plugin.do_query()
 			
@@ -288,8 +288,8 @@
 					options = plugin.options,
 					item = plugin.item
 			
-			console.log('args', options.args)
-			console.log('options', options.item_options)
+			// console.log('args', options.args)
+			// console.log('options', options.item_options)
 			
 			let rest_url = ajax_data.rest_url + 'framework/v2/query'
 			

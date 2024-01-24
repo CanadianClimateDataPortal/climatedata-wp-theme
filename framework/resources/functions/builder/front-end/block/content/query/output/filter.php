@@ -35,18 +35,26 @@
 		
 		case 'taxonomy' :
 			
-			$tax_obj = get_taxonomy ( $options['taxonomy'] );
-			
-			foreach ( get_terms ( array (
-				'taxonomy' => $options['taxonomy'],
-				'hide_empty' => true
-			) ) as $term ) {
+			if ( taxonomy_exists ( $options['taxonomy'] ) ) {
 				
-				$filter_items[] = array (
-					'key' => $options['taxonomy'],
-					'value' => $term->slug,
-					'label' => $term->name
-				);
+				$tax_obj = get_taxonomy ( $options['taxonomy'] );
+			
+				foreach ( get_terms ( array (
+					'taxonomy' => $options['taxonomy'],
+					'hide_empty' => true
+				) ) as $term ) {
+					
+					$filter_items[] = array (
+						'key' => $options['taxonomy'],
+						'value' => $term->slug,
+						'label' => $term->name
+					);
+					
+				}
+				
+			} elseif ( current_user_can ( 'administrator' ) ) {
+				
+				echo '<p class="alert alert-warning">Taxonomy <code>' . $options['taxonomy'] . '</code> doesn’t exist.</p>';
 				
 			}
 			
@@ -134,7 +142,9 @@
 				break;
 			
 			case 'taxonomy' :
-				echo $tax_obj->label;
+				if ( taxonomy_exists ( $options['taxonomy'] ) ) {
+					echo $tax_obj->label;
+				}
 				break;
 				
 			case 'meta' :

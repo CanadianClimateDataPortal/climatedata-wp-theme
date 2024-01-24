@@ -24,9 +24,11 @@ var pushes_since_input = 0;
 
 // fix for 'fakeStop is not a function'
 
-L.DomEvent.fakeStop = function () {
-  return true;
-};
+if (typeof L !== 'undefined') {
+  L.DomEvent.fakeStop = function () {
+    return true;
+  };
+}
 
 (function ($) {
   $(function () {

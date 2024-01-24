@@ -157,6 +157,7 @@ $includes = array (
 	'resources/functions/taxonomies.php',
 	'resources/functions/post-types.php',
 	'resources/functions/shortcodes.php',
+	'resources/functions/rest.php',
 );
 
 foreach ( $includes as $include ) {
@@ -233,6 +234,16 @@ function add_favicon() {
 
 // add_action( 'wp_head', 'add_favicon' );
 
+add_action ( 'fw_before_footer', function() {
+	
+?>
+
+<script type="text/javascript">var L_DISABLE_3D = true;</script>
+
+<?php
+
+} );
+
 //
 // ADMIN STUFF
 //
@@ -250,17 +261,13 @@ function remove_comments_admin_menu() {
 }
 
 function remove_comments_post_type_support() {
-
 	remove_post_type_support ( 'post', 'comments' );
 	remove_post_type_support ( 'page', 'comments' );
-
 }
 
 function remove_comments_admin_bar() {
-
 	global $wp_admin_bar;
 	$wp_admin_bar->remove_menu ( 'comments' );
-
 }
 
 add_action ( 'init', 'remove_default_editor' );

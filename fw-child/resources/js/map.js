@@ -38,11 +38,14 @@ var result = {};
         scenarios: ['medium'],
         decade: 2040,
         sector: '',
+        scheme: 'scheme1',
       },
       query_str: {
         prev: '',
         current: '',
       },
+      var_data: null,
+      frequency: {},
       debug: true,
     };
 
@@ -70,6 +73,8 @@ var result = {};
       let plugin = this,
         item = plugin.item,
         options = plugin.options;
+
+      options.lang = options.globals.current_lang_code;
 
       //
       // INITIALIZE
@@ -141,6 +146,10 @@ var result = {};
         });
       }
 
+      //
+      // EVENTS
+      //
+
       item.on('update_input', function (event, item, status) {
         if (item) {
           // reset history push counter
@@ -153,17 +162,9 @@ var result = {};
       // UI WIDGETS
       //
 
-      // sortable colour table
-      $('#display-colour-table').sortable({
-        items: '> div',
-        handle: '.display-colour-sort-handle',
-        placeholder: 'ui-state-highlight bg-white',
-        forcePlaceholderSize: true,
-      });
+      // SLIDERS
 
-      $('#display-colours-table').disableSelection();
-
-      // decade slider
+      // decade
 
       let handle = $('#decade-slider-handle span');
 
@@ -193,6 +194,34 @@ var result = {};
         },
       });
 
+      // opacity
+
+      $('.opacity-slider').slider({
+        min: 0,
+        max: 100,
+        value: 100,
+        step: 1,
+        create: function () {},
+        slide: function (e, ui) {
+          $(this).find('.ui-slider-handle').text(ui.value);
+
+          item
+            .find(
+              '.leaflet-pane.leaflet-' + $(this).attr('data-pane') + '-pane',
+            )
+            .css('opacity', ui.value / 100);
+        },
+        change: function (e, ui) {
+          $(this).find('.ui-slider-handle').text(ui.value);
+
+          item
+            .find(
+              '.leaflet-pane.leaflet-' + $(this).attr('data-pane') + '-pane',
+            )
+            .css('opacity', ui.value / 100);
+        },
+      });
+
       //
       // QUERY OBJECT
       //
@@ -216,6 +245,55 @@ var result = {};
       $('#control-bar').tab_drawer();
 
       //
+      // MISC UX
+      //
+
+      // re-populate frequency select
+
+      item
+        .find('select[data-query-key="frequency"]')
+        .children()
+        .each(function () {
+          let opt_key = $(this).attr('data-field');
+
+          if ($(this).is('option')) {
+            options.frequency[opt_key] = {
+              value: $(this).attr('value'),
+              field: $(this).attr('data-field'),
+              label: $(this).text(),
+            };
+          } else if ($(this).is('optgroup')) {
+            let new_group = [];
+
+            options.frequency[opt_key] = {
+              group: $(this).attr('label'),
+              options: [],
+            };
+
+            $(this)
+              .children()
+              .each(function () {
+                options.frequency[opt_key].options.push({
+                  value: $(this).attr('value'),
+                  field: $(this).attr('data-field'),
+                  label: $(this).text(),
+                });
+              });
+          }
+        });
+
+      // colour selector
+
+      item.on('click', '#display-scheme-select .dropdown-item', function () {
+        // update hidden input
+        $('[data-query-key="scheme"]')
+          .val($(this).attr('data-scheme-id'))
+          .trigger('change');
+
+        plugin.update_scheme();
+      });
+
+      //
       // EVENTS
       //
 
@@ -233,6 +311,7 @@ var result = {};
           options.status = 'input';
         }
 
+        console.log('HEEYYYYY');
         $(document).trigger('update_input', [$(this)]);
       });
 
@@ -296,9 +375,12 @@ var result = {};
 
       // custom UX behaviours by input key
 
-      // console.log('input change', input, this_key, this_val);
+      console.log('input change', input, this_key, this_val);
 
       switch (this_key) {
+        case 'var':
+          plugin.update_var(this_val);
+          break;
         case 'scenarios':
           // ssp1/2/5 switches
 
@@ -446,7 +528,9 @@ var result = {};
           // query option is a single value
           // check out what type of input goes with it
 
-          if (this_input.is('[type="hidden"]')) {
+          if (key == 'var') {
+            plugin.update_var(options.query[key]);
+          } else if (this_input.is('[type="hidden"]')) {
             // hidden input
             // likely controlled by some other UX element
 
@@ -454,10 +538,13 @@ var result = {};
 
             if (
               key == 'decade' &&
-              typeof $('#decade-slider').data('uiSlider') != 'undefined'
+              typeof item.find('#decade-slider').data('uiSlider') != 'undefined'
             ) {
               // update UI slider
-              $('#decade-slider').slider('value', options.query[key]);
+              item.find('#decade-slider').slider('value', options.query[key]);
+            } else if (key == 'scheme') {
+              // update colour scheme dropdown
+              plugin.update_scheme();
             }
           } else if (this_input.is('[type="radio"]')) {
             // radio
@@ -521,6 +608,124 @@ var result = {};
           },
         );
       }
+    },
+
+    update_var: function (var_name) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      $(document).cdc_app('get_var_data', var_name, function (data) {
+        options.var_data = data[0];
+
+        // console.log(options.var_data);
+
+        let new_var_name =
+          options.lang != 'en'
+            ? options.var_data.meta.title_fr
+            : options.var_data.title.rendered;
+
+        item.find('.tab-drawer-trigger.var-name').text(new_var_name);
+
+        item.find('#location-detail .variable-name').text(new_var_name);
+
+        plugin.update_frequency();
+      });
+    },
+
+    update_frequency: function (var_name) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let frequency_select = item.find('select[data-query-key="frequency"]');
+
+      frequency_select.empty();
+
+      // console.log('variable timesteps', options.var_data.acf.timestep);
+
+      options.var_data.acf.timestep.forEach(function (option) {
+        let this_option = options.frequency[option];
+
+        if (this_option.hasOwnProperty('group')) {
+          let new_optgroup = $(
+            '<optgroup label="' + this_option.group + '">',
+          ).appendTo(frequency_select);
+
+          this_option.options.forEach(function (item) {
+            new_optgroup.append(
+              '<option value="' +
+                item.value +
+                '" data-field="' +
+                item.field +
+                '">' +
+                item.label +
+                '</option>',
+            );
+          });
+        } else {
+          frequency_select.append(
+            '<option value="' +
+              this_option.value +
+              '" data-field="' +
+              this_option.field +
+              '">' +
+              this_option.label +
+              '</option>',
+          );
+        }
+      });
+
+      // console.log('available', options.var_data.acf.timestep);
+      // console.log('selected', options.query.frequency);
+
+      if (!options.var_data.acf.timestep.includes(options.query.frequency)) {
+        // console.log('select first', frequency_select.find('option').first());
+
+        frequency_select
+          .val(frequency_select.find('option').first().attr('value'))
+          .trigger('change');
+      }
+    },
+
+    update_scheme: function () {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      console.log('select', options.query.scheme);
+
+      // reset active
+
+      let selected_item = item.find(
+          '#display-scheme-select .dropdown-item[data-scheme-id="' +
+            options.query.scheme +
+            '"]',
+        ),
+        discrete_btns = selected_item
+          .closest('.map-control-item')
+          .find('#display-colours-toggle .btn');
+
+      selected_item
+        .closest('.dropdown-menu')
+        .find('.dropdown-item')
+        .removeClass('active');
+
+      selected_item.addClass('active');
+
+      // enable/disable discrete/continuous
+
+      if (selected_item.hasClass('default')) {
+        discrete_btns.addClass('disabled');
+      } else {
+        discrete_btns.removeClass('disabled');
+      }
+
+      // copy item style to toggle
+      selected_item
+        .closest('.dropdown')
+        .find('.dropdown-toggle .gradient')
+        .attr('style', selected_item.find('.gradient').attr('style'));
     },
   };
 

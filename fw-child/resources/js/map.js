@@ -699,7 +699,7 @@ var result = {};
       $.each(colours, function (idx, colour) {
         let rect = document.createElementNS(svgNS, 'rect');
         rect.setAttribute('height', '100%');
-        rect.setAttribute('width', interval + '%');
+        rect.setAttribute('width', (interval + 1) + '%');
         rect.setAttribute('x', (interval * idx) + '%');
         rect.setAttribute('fill', colour);
         $(element).find('svg').append(rect);

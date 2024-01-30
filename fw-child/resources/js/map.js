@@ -381,6 +381,9 @@ var result = {};
         case 'var':
           plugin.update_var(this_val);
           break;
+        case 'frequency':
+          plugin.update_default_scheme();
+          break;
         case 'scenarios':
           // ssp1/2/5 switches
 
@@ -682,13 +685,12 @@ var result = {};
       if (!options.var_data.acf.timestep.includes(options.query.frequency)) {
         // console.log('select first', frequency_select.find('option').first());
 
-        frequency_select
-          .val(frequency_select.find('option').first().attr('value'))
-          .trigger('change');
+        frequency_select.val(frequency_select.find('option').first().attr('value'));
       }
+      frequency_select.trigger('change');
     },
 
-    draw_colour_scheme: function(element) {
+    redraw_colour_scheme: function(element) {
       let plugin = this,
           options = plugin.options,
           item = plugin.item;
@@ -705,6 +707,24 @@ var result = {};
         $(element).find('svg').append(rect);
       });
     },
+
+    // fetch colours of default scheme from Geoserver and update the data of the default
+    // one in the dropdown
+    update_default_scheme: function () {
+      let plugin = this,
+          options = plugin.options,
+          item = plugin.item;
+
+      $.getJSON(geoserver_url + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic" +
+          "&format=application/json&layer=" + this.options.maps.high.layer_name).then(function(data) {
+
+        let colour_map = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
+
+        item.find('#display-scheme-select .dropdown-item[data-scheme-id="default"]')
+            .data('scheme-colours', colour_map.map(e => e.color));
+        plugin.update_scheme();
+      });
+      },
 
     update_scheme: function () {
       let plugin = this,
@@ -746,7 +766,7 @@ var result = {};
 
       // redraw the schemes
       item.find('#display-scheme-select .scheme-dropdown').each(function() {
-        plugin.draw_colour_scheme(this);
+        plugin.redraw_colour_scheme(this);
       })
 
     },

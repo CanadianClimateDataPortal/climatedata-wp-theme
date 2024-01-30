@@ -358,6 +358,7 @@
           };
 
           // console.log(key, layer_name);
+          options.maps[key].layer_name = layer_name;
 
           if (
             options.maps[key].layers.raster &&

@@ -59,7 +59,7 @@
 						</div>
 						
 						<ul class="dropdown-menu w-100 p-0">
-							<li><button class="dropdown-item scheme-dropdown active default" data-scheme-id="default" data-scheme-colours='["#fff7fb","#ece7f2","#d0d1e6","#a6bddb","#74a9cf","#3690c0","#0570b0","#045a8d","#023858"]'>
+							<li><button class="dropdown-item scheme-dropdown active default" data-scheme-id="default" data-scheme-colours='[]'>
 								<span class="gradient"><svg width="100%" height="100%"></svg></span>
 								<span class="small all-caps"><?php _e ( 'Default', 'cdc' ); ?></span>
 							</button></li>

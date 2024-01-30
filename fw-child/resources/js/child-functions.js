@@ -30,6 +30,11 @@ if (typeof L !== 'undefined') {
   };
 }
 
+// make $ available in devtools
+const $ = jQuery;
+
+const svgNS = "http://www.w3.org/2000/svg";
+
 (function ($) {
   $(function () {
     if ($('body').attr('id') == 'page-map') {

@@ -53,24 +53,24 @@
 					<input type="hidden" name="display-scheme" id="display-scheme" value="kejDjr" data-query-key="scheme">
 					
 					<div id="display-scheme-select" class="dropdown mb-3">
-						<div class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-							<span class="gradient" style="background: linear-gradient(90deg, #22C1C3, #FDBB2D);"></span>
+						<div class="dropdown-toggle scheme-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+							<span class="gradient"><svg width="100%" height="100%"></svg></span>
 							<span class="sr-only">Selected Scheme Name</span>
 						</div>
 						
 						<ul class="dropdown-menu w-100 p-0">
-							<li><button class="dropdown-item active default" data-scheme-id="scheme1">
-								<span class="gradient" style="background: linear-gradient(90deg, #22C1C3, #FDBB2D);"></span>
+							<li><button class="dropdown-item scheme-dropdown active default" data-scheme-id="default" data-scheme-colours='["#fff7fb","#ece7f2","#d0d1e6","#a6bddb","#74a9cf","#3690c0","#0570b0","#045a8d","#023858"]'>
+								<span class="gradient"><svg width="100%" height="100%"></svg></span>
 								<span class="small all-caps"><?php _e ( 'Default', 'cdc' ); ?></span>
 							</button></li>
 								
-							<li><button class="dropdown-item" data-scheme-id="scheme2">
-								<span class="gradient" style="background: linear-gradient(90deg, #2F4A1F, #D4FD2D);"></span>
-								<span class="sr-only">Scheme Name</span>
+							<li><button class="dropdown-item scheme-dropdown" data-scheme-id="RevYlGnBu" data-scheme-colours='["#081d58","#253494","#225ea8","#1d91c0","#41b6c4","#7fcdbb","#c7e9b4","#edf8b1","#ffffd9"]'>
+								<span class="gradient"><svg width="100%" height="100%"></svg></span>
+								<span class="sr-only">RevYlGnBu</span>
 							</button></li>
 							
-							<li><button class="dropdown-item" data-scheme-id="scheme3">
-								<span class="gradient" style="background: linear-gradient(90deg, #3F5EFB, #FC466B);"></span>
+							<li><button class="dropdown-item scheme-dropdown" data-scheme-id="YlOrRd" data-scheme-colours='["#ffffcc","#ffeda0","#fed976","#feb24c","#fd8d3c","#fc4e2a","#e31a1c","#bd0026","#800026"]'>
+								<span class="gradient""><svg width="100%" height="100%"></svg></span>
 								<span class="sr-only">Scheme Name</span>
 							</button></li>
 						</ul>

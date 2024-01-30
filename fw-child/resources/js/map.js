@@ -688,6 +688,24 @@ var result = {};
       }
     },
 
+    draw_colour_scheme: function(element) {
+      let plugin = this,
+          options = plugin.options,
+          item = plugin.item;
+
+      $(element).find('svg').empty();
+      let colours = $(element).data('scheme-colours');
+      let interval = (100 / colours.length);
+      $.each(colours, function (idx, colour) {
+        let rect = document.createElementNS(svgNS, 'rect');
+        rect.setAttribute('height', '100%');
+        rect.setAttribute('width', interval + '%');
+        rect.setAttribute('x', (interval * idx) + '%');
+        rect.setAttribute('fill', colour);
+        $(element).find('svg').append(rect);
+      });
+    },
+
     update_scheme: function () {
       let plugin = this,
         options = plugin.options,
@@ -721,11 +739,16 @@ var result = {};
         discrete_btns.removeClass('disabled');
       }
 
-      // copy item style to toggle
+      // copy item data to toggle
       selected_item
         .closest('.dropdown')
-        .find('.dropdown-toggle .gradient')
-        .attr('style', selected_item.find('.gradient').attr('style'));
+        .find('.dropdown-toggle').data(selected_item.data());
+
+      // redraw the schemes
+      item.find('#display-scheme-select .scheme-dropdown').each(function() {
+        plugin.draw_colour_scheme(this);
+      })
+
     },
   };
 

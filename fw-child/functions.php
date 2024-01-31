@@ -89,10 +89,12 @@ function child_theme_enqueue() {
 	wp_register_script ( 'tab-drawer', $child_vendor_dir . 'pe-tab-drawer/tab-drawer.js', array ( 'jquery' ), NULL, true );
 	
 	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array (  ), NULL, true );
-	
+
+    wp_register_script ( 'constants', $child_js_dir . 'constants.js', array (  ), NULL, true );
+
 	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 'jquery', 'leaflet', 'leaflet-vectorgrid', 'leaflet-sync', 'tab-drawer' ), NULL, true );
 	
-	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'jquery', 'leaflet', 'cdc', 'leaflet-sync', 'tab-drawer', 'jquery-ui-tabs', 'jquery-ui-sortable', 'jquery-ui-slider' ), NULL, true );
+	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'jquery', 'leaflet', 'cdc', 'constants', 'leaflet-sync', 'tab-drawer', 'jquery-ui-tabs', 'jquery-ui-sortable', 'jquery-ui-slider' ), NULL, true );
 
 	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'jquery', 'cdc', 'leaflet', 'leaflet-sync', 'tab-drawer' ), NULL, true );
 	

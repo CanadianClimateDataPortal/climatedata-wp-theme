@@ -336,7 +336,7 @@
               : '') +
             options.query.var +
             '-' +
-            (options.query.frequency == 'ann' ? 'ys' : 'ms') +
+            frequencyLUT[options.query.frequency] +
             '-' +
             scenario_names[options.query.dataset][key]
               .replace(/[\W_]+/g, '')

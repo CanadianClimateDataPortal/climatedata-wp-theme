@@ -71,7 +71,7 @@
 							
 							<li><button class="dropdown-item scheme-dropdown" data-scheme-id="YlOrRd" data-scheme-colours='["#ffffcc","#ffeda0","#fed976","#feb24c","#fd8d3c","#fc4e2a","#e31a1c","#bd0026","#800026"]'>
 								<span class="gradient""><svg width="100%" height="100%"></svg></span>
-								<span class="sr-only">Scheme Name</span>
+								<span class="sr-only">YlOrRd</span>
 							</button></li>
 						</ul>
 						

@@ -19,6 +19,26 @@ const scenario_names = {
   },
 };
 
+const frequencyLUT = {
+  'ann': 'ys',
+  'jan': 'ms',
+  'feb': 'ms',
+  'mar': 'ms',
+  'apr': 'ms',
+  'may': 'ms',
+  'jun': 'ms',
+  'jul': 'ms',
+  'aug': 'ms',
+  'sep': 'ms',
+  'oct': 'ms',
+  'nov': 'ms',
+  'dec': 'ms',
+  'spring': 'qsdec',
+  'summer': 'qsdec',
+  'fall': 'qsdec',
+  'winter': 'qsdec'
+}
+
 // throttling for history state pushes
 var pushes_since_input = 0;
 

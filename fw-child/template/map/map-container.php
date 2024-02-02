@@ -43,3 +43,5 @@
 		</div>
 	</div>
 </div>
+
+<div id="status" style="position: fixed; top: 1rem; right: 1rem; background: white; padding: 0.5rem; z-index:9999;"></div>

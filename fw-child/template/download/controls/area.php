@@ -2,14 +2,14 @@
 	<div class="tab-drawer-content">
 		<div class="tab-drawer-content-inner">
 			<div class="control-tab-head d-flex justify-content-between">
-				<h5>Area of Analysis</h5>
+				<h5><?php _e ( 'Area of Analysis', 'cdc' ); ?></h5>
 				<span class="tab-drawer-close">&times;</span>
 			</div>
 			
 			<div class="control-tab-body">
 				
 				<div id="map-control-aggregation" class="map-control-item conditional-trigger">
-					<h6><?php _e ( 'Change Aggregation', 'cdc' ); ?></h6>
+					<h6 class="all-caps text-secondary"><?php _e ( 'Change Aggregation', 'cdc' ); ?></h6>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-grid" checked>
@@ -44,22 +44,24 @@
 				</div>
 				
 				<div id="map-control-search" class="map-control-item">
-					<label for="area-search" class="h6">Search &amp; Zoom</label>
+					<label for="area-search" class="h6 all-caps text-secondary">Search &amp; Zoom</label>
 					
 					<input type="text" class="form-control" name="area-search" placeholder="City, landmark or postal code">
 				</div>
 				
 				<div id="map-control-coords" class="map-control-item">
-					<h6>Change Coordinates</h6>
+					<h6 class="all-caps text-secondary">Change Coordinates</h6>
+					
+					<input type="hidden" name="coords" id="coords" data-query-key="coords">
 					
 					<label for="coords-lat">Latitude</label>
-					<input type="text" class="form-control" name="coords-lat" id="coords-lat">
+					<input type="text" class="form-control coord-field" name="coords-lat" id="coords-lat">
 					
 					<label for="coords-lng">Longitude</label>
-					<input type="text" class="form-control" name="coords-lng" id="coords-lng">
+					<input type="text" class="form-control coord-field" name="coords-lng" id="coords-lng">
 					
 					<label for="coords-zoom">Zoom</label>
-					<input type="text" class="form-control" name="coords-zoom" id="coords-zoom">
+					<input type="text" class="form-control coord-field" name="coords-zoom" id="coords-zoom">
 				</div>
 				
 			</div>

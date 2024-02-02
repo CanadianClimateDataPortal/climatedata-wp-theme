@@ -1338,8 +1338,6 @@
 
         // more to this to add later
         let labelFormatter = function () {
-          console.log('labelFormatter in update', this);
-
           return (
             this.axis.defaultLabelFormatter.call(this) +
             ' ' +
@@ -1562,7 +1560,7 @@
                               str += ' ' + l10n_labels['days'];
                               break;
                             default:
-                              str += ' ' + chartUnit;
+                              str += ' ' + options.chart.unit;
                               break;
                           }
                           return str;

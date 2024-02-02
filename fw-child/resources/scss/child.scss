@@ -192,6 +192,12 @@ p {
 // CLASSES
 //
 
+.form-check-input[type='radio'] {
+  width: 0.625rem;
+  height: 0.625rem;
+  margin-top: 0.4375em;
+}
+
 .btn {
   @include all-caps;
 
@@ -288,7 +294,7 @@ p {
 
 // controls
 
-.opacity-slider-well {
+.map-control-slider-well {
   background-color: $gray-300;
   transition: 0.25s;
   box-shadow: 0 0 0.05rem transparentize($black, 1);
@@ -304,22 +310,22 @@ p {
   }
 }
 
-$opacity-slider-height: 1.875rem;
-$opacity-slider-handle-width: 2.75rem;
+$control-slider-height: 1.875rem;
+$control-slider-handle-width: 2.75rem;
 
-.opacity-slider {
-  height: $opacity-slider-height;
-  margin: 0 calc($opacity-slider-handle-width / 2);
+.map-control-slider {
+  height: $control-slider-height;
+  margin: 0 calc($control-slider-handle-width / 2);
 
   .ui-slider-handle {
     top: 0;
-    width: $opacity-slider-handle-width;
-    height: $opacity-slider-height;
-    margin-left: calc($opacity-slider-handle-width * -0.5);
+    width: $control-slider-handle-width;
+    height: $control-slider-height;
+    margin-left: calc($control-slider-handle-width * -0.5);
     background-color: $gray-500;
     color: $gray-200;
     font-size: 0.875rem;
-    line-height: $opacity-slider-height;
+    line-height: $control-slider-height;
     text-align: center;
     transition:
       background-color 0.25s,
@@ -440,6 +446,12 @@ $opacity-slider-handle-width: 2.75rem;
       }
     }
   }
+}
+
+.tab-drawer-close {
+  font-size: 2rem;
+  line-height: 1rem;
+  cursor: pointer;
 }
 
 .map-control-item {

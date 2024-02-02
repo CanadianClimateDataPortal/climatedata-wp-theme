@@ -6,7 +6,7 @@
 	
 	<div class="var-item-text p-3">
 		<h5><?php echo get_the_title ( $item['id'] ); ?></h5>
-		<a href="#data" class="tab-drawer-trigger var-select" data-query-key="var" data-query-val="<?php echo get_post_meta ( $item['id'], 'var_name', true ); ?>"><?php _e ( 'View on map', 'cdc' ); ?></a>
+		<a href="#data" class="tab-drawer-trigger var-select" data-var-id="<?php echo $item['id']; ?>"><?php _e ( 'View on map', 'cdc' ); ?></a>
 		<a href="<?php echo home_url ( 'download' ); ?>" class=""><?php _e ( 'Download', 'cdc' ); ?></a>
 	</div>
 	

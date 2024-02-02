@@ -85,35 +85,59 @@ function child_theme_enqueue() {
 	//
 	// SCRIPTS
 	//
-
-	wp_register_script ( 'tab-drawer', $child_vendor_dir . 'pe-tab-drawer/tab-drawer.js', array ( 'jquery' ), NULL, true );
-	
-	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array (  ), NULL, true );
-	
-	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 'jquery', 'leaflet', 'leaflet-vectorgrid', 'leaflet-sync', 'tab-drawer' ), NULL, true );
-	
-	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'jquery', 'leaflet', 'cdc', 'leaflet-sync', 'tab-drawer', 'jquery-ui-tabs', 'jquery-ui-sortable', 'jquery-ui-slider' ), NULL, true );
-
-	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'jquery', 'cdc', 'leaflet', 'leaflet-sync', 'tab-drawer' ), NULL, true );
-	
-	// localize admin url
-		
-	// wp_localize_script ( 'child-functions', 'ajax_data',
-	// 	array (
-	// 		'url' => admin_url ( 'admin-ajax.php' ),
-	// 		'globals' => $GLOBALS['fw']
-	// 	)
-	// );
 	
 	// VENDOR
+	
+	// tab drawer
+	
+	wp_register_script ( 'tab-drawer', $child_vendor_dir . 'pe-tab-drawer/tab-drawer.js', array ( 'jquery' ), NULL, true );
 
+	// leaflet
+	
 	wp_register_script ( 'leaflet', $child_npm_dir . 'leaflet/dist/leaflet-src.js', null, null, true );
 	
 	wp_register_script ( 'leaflet-sync', $child_npm_dir . 'leaflet.sync/L.Map.Sync.js', array ( 'leaflet' ), null, true );
 	
 	wp_register_script ( 'leaflet-vectorgrid', $child_npm_dir . 'leaflet.vectorgrid/dist/Leaflet.VectorGrid.bundled.min.js', array ( 'leaflet' ), null, true );
 	
+	// highcharts
+	
+	wp_register_script ( 'highcharts-highstock', 'https://code.highcharts.com/stock/highstock.js', NULL, NULL, true );
+	wp_register_script ( 'highcharts-more', 'https://code.highcharts.com/stock/highcharts-more.js', array ( 'highcharts-highstock' ), NULL, true );
+	wp_register_script ( 'highcharts-exporting', 'https://code.highcharts.com/stock/modules/exporting.js', array ( 'highcharts-highstock' ), NULL, true );
+	wp_register_script ( 'highcharts-export-data', 'https://code.highcharts.com/stock/modules/export-data.js', array ( 'highcharts-exporting' ), NULL, true );
+	wp_register_script ( 'highcharts-offline-exporting', 'https://code.highcharts.com/stock/modules/offline-exporting.js', array ( 'highcharts-exporting' ), NULL, true );
+	
 	wp_register_script ( 'zebra-pin', $child_npm_dir . 'zebra_pin/dist/zebra_pin.min.js', array ( 'jquery' ), null, true );
+	
+	//
+	
+	wp_register_script ( 'utilities', $child_js_dir . 'utilities.js', array ( 'jquery' ), NULL, true );
+	
+	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 'utilities',  'jquery', 'leaflet', 'leaflet-vectorgrid', 'leaflet-sync', 'tab-drawer', 'highcharts-highstock', 'highcharts-more', 'highcharts-exporting', 'highcharts-export-data', 'highcharts-offline-exporting' ), NULL, true );
+	
+	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'cdc', 'jquery-ui-slider' ), NULL, true );
+	
+	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'cdc', 'jquery-ui-slider' ), NULL, true );
+	
+	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'utilities', 'cdc', 'map-app' ), NULL, true );
+	
+	// localize admin url
+	
+	$units = array (
+		'celcius' => 'º C',
+		'kelvin' => 'K',
+		'mm' => 'mm',
+		'cm' => 'cm',
+		'm' => 'm',
+		'days' => __ ( 'days', 'cdc' ),
+		'doy' => __ ( 'day of the year', 'cdc' ),
+		'degree-days' => __ ( 'degree days', 'cdc' ),
+		'number of periods' => __ ( 'number of periods', 'cdc' ),
+		'events' => __ ( 'events', 'cdc' )
+	);
+	
+	wp_localize_script ( 'utilities', 'unit_strings', $units );
 	
 	// PAGE CONDITIONALS
 
@@ -138,11 +162,12 @@ function child_theme_enqueue() {
 		case 'nouvelles' :
 			wp_enqueue_script ( 'zebra-pin' );
 			wp_enqueue_script ( 'tab-drawer' );
-			
+			break;
 		
 	}
 	
 	wp_enqueue_script ( 'child-functions' );
+	
 
 }
 
@@ -274,3 +299,27 @@ add_action ( 'init', 'remove_default_editor' );
 add_action ( 'init', 'remove_comments_post_type_support', 100 );
 add_action ( 'admin_menu', 'remove_comments_admin_menu' );
 add_action ( 'wp_before_admin_bar_render', 'remove_comments_admin_bar' );
+
+//
+// MISC
+// find a good home for these
+//
+
+function cdc_get_random_var() {
+	
+	$result = get_posts ( array (
+		'post_type' => 'variable',
+		'posts_per_page' => 1,
+		'orderby' => 'rand',
+		'post_status' => 'publish'
+	) );
+	
+	if ( !empty ( $result ) ) {
+		echo $result[0]->ID;
+	}
+	
+	wp_die();
+}
+
+add_action ( 'wp_ajax_cdc_get_random_var', 'cdc_get_random_var' );
+add_action ( 'wp_ajax_nopriv_cdc_get_random_var', 'cdc_get_random_var' );

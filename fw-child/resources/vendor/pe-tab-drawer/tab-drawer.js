@@ -8,7 +8,7 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 
 		var defaults = {
 			globals: ajax_data.globals,
-			lang: ajax_data.globals.lang,
+			lang: 'en',
 			history: {
 				enabled: true,
 				prev_path: null
@@ -24,7 +24,7 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 			},
 			debug: true,
 		}
-
+		
 		this.options = $.extend(true, defaults, options)
 
 		this.item = $(item)
@@ -38,6 +38,8 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 			let plugin = this,
 				item = plugin.item,
 				options = plugin.options
+			
+			options.lang = options.globals.current_lang_code
 
 			//
 			// INITIALIZE
@@ -46,13 +48,11 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 			if (options.debug == true) {
 				console.log('td', 'init')
 			}
-
+			
 			// ELEMENTS
 
 			options.elements.tabs = item.find('> .tab-drawer-tabs')
 			options.elements.container = item.find('> .tab-drawer-container')
-			
-			console.log(options.elements.tabs)
 
 			item.addClass('tab-drawer')
 
@@ -85,7 +85,9 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 					target_ID = '#' + target_content.attr('id')
 				}
 				
-				console.log('closing ' + this_content.attr('id') + ', new active is ' + target_ID)
+				if (options.debug == true) {
+					console.log('closing ' + this_content.attr('id') + ', new active is ' + target_ID)
+				}
 				
 				plugin.update_path(target_ID)
 				
@@ -99,8 +101,10 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 				plugin.handle_pop()
 				
 				window.addEventListener('popstate', function(e) {
+					if (options.debug == true) {
+						console.log('td', 'pop')
+					}
 					
-					console.log('td', 'pop')
 					plugin.handle_pop(e)
 				})
 				
@@ -114,6 +118,10 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 				options = plugin.options
 			
 			let content_to_close = []
+			
+			if (options.history.enabled == false) {
+				do_history = false
+			}
 			
 			// reset current_id
 			options.current_id = null
@@ -173,7 +181,7 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 			let plugin = this,
 				item = plugin.item,
 				options = plugin.options
-				
+			
 			// deactivate all links
 			
 			item.find('.tab-drawer-trigger').removeClass('active')
@@ -212,6 +220,8 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 				options.history.enabled == true &&
 				do_history == true
 			) {
+				
+				// console.log('push')
 				
 				let new_path = window.location.origin + window.location.pathname + window.location.search
 				
@@ -286,7 +296,9 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 				try {
 					await process_interval(close_and_shift, 200)
 				} catch (e) {
-					console.log('error')
+					if (options.debug == true) {
+						console.log('error')
+					}
 				}
 			
 				if (typeof fn_callback == 'function') {

@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Climate Data 2.0\n"
-"POT-Creation-Date: 2024-01-16 10:55-0400\n"
-"PO-Revision-Date: 2024-01-16 11:17-0400\n"
+"POT-Creation-Date: 2024-02-02 09:46-0400\n"
+"PO-Revision-Date: 2024-02-02 09:48-0400\n"
 "Last-Translator: Phil Evans <phil@habitatseven.com>\n"
 "Language-Team: \n"
 "Language: fr_CA\n"
@@ -16,268 +16,424 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: node_modules\n"
 "X-Poedit-SearchPathExcluded-1: resources/vendor\n"
 
-#: resources/functions/post-types.php:10
+#: functions.php:107
+msgid "days"
+msgstr "jours"
+
+#: functions.php:108
+msgid "day of the year"
+msgstr "jours de l’année"
+
+#: functions.php:109
+msgid "degree days"
+msgstr ""
+
+#: functions.php:110
+msgid "number of periods"
+msgstr ""
+
+#: functions.php:111
+msgid "events"
+msgstr ""
+
+#: resources/functions/post-types.php:14
 msgid "Variables"
 msgstr ""
 
-#: resources/functions/post-types.php:11 resources/functions/post-types.php:37
+#: resources/functions/post-types.php:15 resources/functions/post-types.php:50
+#: template/download/controls/data.php:11 template/map/controls/data.php:12
 #: template/old-loop/blocks/map.php:193
 msgid "Variable"
 msgstr ""
 
-#: resources/functions/post-types.php:12
+#: resources/functions/post-types.php:16
 msgid "Variable Archives"
 msgstr ""
 
-#: resources/functions/post-types.php:13
+#: resources/functions/post-types.php:17
 msgid "Variable Attributes"
 msgstr ""
 
-#: resources/functions/post-types.php:14
+#: resources/functions/post-types.php:18
 msgid "Parent Variable:"
 msgstr ""
 
-#: resources/functions/post-types.php:15
+#: resources/functions/post-types.php:19
 msgid "All Variables"
 msgstr ""
 
-#: resources/functions/post-types.php:16
+#: resources/functions/post-types.php:20
 msgid "Add New Variable"
 msgstr ""
 
-#: resources/functions/post-types.php:17 resources/functions/post-types.php:75
+#: resources/functions/post-types.php:21 resources/functions/post-types.php:102
 msgid "Add New"
 msgstr ""
 
-#: resources/functions/post-types.php:18
+#: resources/functions/post-types.php:22
 msgid "New Variable"
 msgstr ""
 
-#: resources/functions/post-types.php:19
+#: resources/functions/post-types.php:23
 msgid "Edit Variable"
 msgstr ""
 
-#: resources/functions/post-types.php:20
+#: resources/functions/post-types.php:24
 msgid "Update Variable"
 msgstr ""
 
-#: resources/functions/post-types.php:21
+#: resources/functions/post-types.php:25
 msgid "View Variable"
 msgstr ""
 
-#: resources/functions/post-types.php:22
+#: resources/functions/post-types.php:26
 msgid "View Variables"
 msgstr ""
 
-#: resources/functions/post-types.php:23
+#: resources/functions/post-types.php:27
 msgid "Search Variable"
 msgstr ""
 
-#: resources/functions/post-types.php:24 resources/functions/post-types.php:82
+#: resources/functions/post-types.php:28 resources/functions/post-types.php:109
 msgid "Not found"
 msgstr ""
 
-#: resources/functions/post-types.php:25 resources/functions/post-types.php:83
+#: resources/functions/post-types.php:29 resources/functions/post-types.php:110
 msgid "Not found in Trash"
 msgstr ""
 
-#: resources/functions/post-types.php:26 resources/functions/post-types.php:84
+#: resources/functions/post-types.php:30 resources/functions/post-types.php:111
 msgid "Featured Image"
 msgstr ""
 
-#: resources/functions/post-types.php:27 resources/functions/post-types.php:85
+#: resources/functions/post-types.php:31 resources/functions/post-types.php:112
 msgid "Set featured image"
 msgstr ""
 
-#: resources/functions/post-types.php:28 resources/functions/post-types.php:86
+#: resources/functions/post-types.php:33 resources/functions/post-types.php:114
 msgid "Remove featured image"
 msgstr ""
 
-#: resources/functions/post-types.php:29 resources/functions/post-types.php:87
+#: resources/functions/post-types.php:36 resources/functions/post-types.php:117
 msgid "Use as featured image"
 msgstr ""
 
-#: resources/functions/post-types.php:30 resources/functions/post-types.php:88
+#: resources/functions/post-types.php:37 resources/functions/post-types.php:118
 msgid "Insert into item"
 msgstr ""
 
-#: resources/functions/post-types.php:31 resources/functions/post-types.php:89
+#: resources/functions/post-types.php:39 resources/functions/post-types.php:120
 msgid "Uploaded to this item"
 msgstr ""
 
-#: resources/functions/post-types.php:32 resources/functions/post-types.php:90
-#: resources/functions/taxonomies.php:71 resources/functions/taxonomies.php:112
+#: resources/functions/post-types.php:42 resources/functions/post-types.php:123
+#: resources/functions/taxonomies.php:81 resources/functions/taxonomies.php:138
+#: resources/functions/taxonomies.php:191
+#: resources/functions/taxonomies.php:244
+#: resources/functions/taxonomies.php:287
 msgid "Items list"
 msgstr ""
 
-#: resources/functions/post-types.php:33 resources/functions/post-types.php:91
-#: resources/functions/taxonomies.php:72 resources/functions/taxonomies.php:113
+#: resources/functions/post-types.php:44 resources/functions/post-types.php:125
+#: resources/functions/taxonomies.php:83 resources/functions/taxonomies.php:140
+#: resources/functions/taxonomies.php:193
+#: resources/functions/taxonomies.php:246
+#: resources/functions/taxonomies.php:288
 msgid "Items list navigation"
 msgstr ""
 
-#: resources/functions/post-types.php:34 resources/functions/post-types.php:92
+#: resources/functions/post-types.php:47 resources/functions/post-types.php:128
 msgid "Filter items list"
 msgstr ""
 
-#: resources/functions/post-types.php:38 resources/functions/post-types.php:96
+#: resources/functions/post-types.php:51 resources/functions/post-types.php:132
 msgid "Post Type Description"
 msgstr ""
 
-#: resources/functions/post-types.php:68
+#: resources/functions/post-types.php:95
 msgid "Training Resources"
 msgstr "Ressources"
 
-#: resources/functions/post-types.php:69
+#: resources/functions/post-types.php:96
 msgid "Resource"
 msgstr ""
 
-#: resources/functions/post-types.php:70
+#: resources/functions/post-types.php:97
 msgid "Resource Archives"
 msgstr ""
 
-#: resources/functions/post-types.php:71
+#: resources/functions/post-types.php:98
 msgid "Resource Attributes"
 msgstr ""
 
-#: resources/functions/post-types.php:72
+#: resources/functions/post-types.php:99
 msgid "Parent Resource:"
 msgstr ""
 
-#: resources/functions/post-types.php:73
+#: resources/functions/post-types.php:100
 msgid "All Resources"
 msgstr ""
 
-#: resources/functions/post-types.php:74
+#: resources/functions/post-types.php:101
 msgid "Add New Resource"
 msgstr ""
 
-#: resources/functions/post-types.php:76
+#: resources/functions/post-types.php:103
 msgid "New Resource"
 msgstr ""
 
-#: resources/functions/post-types.php:77
+#: resources/functions/post-types.php:104
 msgid "Edit Resource"
 msgstr ""
 
-#: resources/functions/post-types.php:78
+#: resources/functions/post-types.php:105
 msgid "Update Resource"
 msgstr ""
 
-#: resources/functions/post-types.php:79
+#: resources/functions/post-types.php:106
 msgid "View Resource"
 msgstr ""
 
-#: resources/functions/post-types.php:80
+#: resources/functions/post-types.php:107
 msgid "View Resources"
 msgstr ""
 
-#: resources/functions/post-types.php:81
+#: resources/functions/post-types.php:108
 msgid "Search Resource"
 msgstr ""
 
-#: resources/functions/post-types.php:95
+#: resources/functions/post-types.php:131
 msgid "Training Resource"
 msgstr "Ressource"
 
-#: resources/functions/taxonomies.php:55 template/learn/control-bar.php:11
-#: template/learn/control-bar.php:30
+#: resources/functions/taxonomies.php:59 template/learn/control-bar.php:11
+#: template/learn/control-bar.php:30 template/post-meta.php:30
 msgid "Topics"
 msgstr ""
 
-#: resources/functions/taxonomies.php:56
+#: resources/functions/taxonomies.php:60
 msgid "All Topics"
 msgstr ""
 
-#: resources/functions/taxonomies.php:57
+#: resources/functions/taxonomies.php:61
 msgid "Parent Topic"
 msgstr ""
 
-#: resources/functions/taxonomies.php:58
+#: resources/functions/taxonomies.php:62
 msgid "Parent Topic:"
 msgstr ""
 
-#: resources/functions/taxonomies.php:59
+#: resources/functions/taxonomies.php:63
 msgid "New Topic Name"
 msgstr ""
 
-#: resources/functions/taxonomies.php:60
+#: resources/functions/taxonomies.php:64
 msgid "Add New Topic"
 msgstr ""
 
-#: resources/functions/taxonomies.php:61
+#: resources/functions/taxonomies.php:65
 msgid "Edit Topic"
 msgstr ""
 
-#: resources/functions/taxonomies.php:62
+#: resources/functions/taxonomies.php:66
 msgid "Update Topic"
 msgstr ""
 
-#: resources/functions/taxonomies.php:63
+#: resources/functions/taxonomies.php:67
 msgid "View Topic"
 msgstr ""
 
-#: resources/functions/taxonomies.php:64 resources/functions/taxonomies.php:105
+#: resources/functions/taxonomies.php:69 resources/functions/taxonomies.php:126
+#: resources/functions/taxonomies.php:179
+#: resources/functions/taxonomies.php:232
+#: resources/functions/taxonomies.php:280
 msgid "Separate items with commas"
 msgstr ""
 
-#: resources/functions/taxonomies.php:65 resources/functions/taxonomies.php:106
+#: resources/functions/taxonomies.php:72 resources/functions/taxonomies.php:129
+#: resources/functions/taxonomies.php:182
+#: resources/functions/taxonomies.php:235
+#: resources/functions/taxonomies.php:281
 msgid "Add or remove items"
 msgstr ""
 
-#: resources/functions/taxonomies.php:66 resources/functions/taxonomies.php:107
+#: resources/functions/taxonomies.php:74 resources/functions/taxonomies.php:131
+#: resources/functions/taxonomies.php:184
+#: resources/functions/taxonomies.php:237
+#: resources/functions/taxonomies.php:282
 msgid "Choose from the most used"
 msgstr ""
 
-#: resources/functions/taxonomies.php:67 resources/functions/taxonomies.php:108
+#: resources/functions/taxonomies.php:77 resources/functions/taxonomies.php:134
+#: resources/functions/taxonomies.php:187
+#: resources/functions/taxonomies.php:240
+#: resources/functions/taxonomies.php:283
 msgid "Popular Items"
 msgstr ""
 
-#: resources/functions/taxonomies.php:68 resources/functions/taxonomies.php:109
+#: resources/functions/taxonomies.php:78 resources/functions/taxonomies.php:135
+#: resources/functions/taxonomies.php:188
+#: resources/functions/taxonomies.php:241
+#: resources/functions/taxonomies.php:284
 msgid "Search Items"
 msgstr ""
 
-#: resources/functions/taxonomies.php:69 resources/functions/taxonomies.php:110
+#: resources/functions/taxonomies.php:79 resources/functions/taxonomies.php:136
+#: resources/functions/taxonomies.php:189
+#: resources/functions/taxonomies.php:242
+#: resources/functions/taxonomies.php:285
 msgid "Not Found"
 msgstr ""
 
-#: resources/functions/taxonomies.php:70 resources/functions/taxonomies.php:111
+#: resources/functions/taxonomies.php:80 resources/functions/taxonomies.php:137
+#: resources/functions/taxonomies.php:190
+#: resources/functions/taxonomies.php:243
+#: resources/functions/taxonomies.php:286
 msgid "No items"
 msgstr ""
 
-#: resources/functions/taxonomies.php:96
+#: resources/functions/taxonomies.php:116
 msgid "Technical Levels"
 msgstr ""
 
-#: resources/functions/taxonomies.php:97
+#: resources/functions/taxonomies.php:117
 msgid "All Levels"
 msgstr ""
 
-#: resources/functions/taxonomies.php:98
+#: resources/functions/taxonomies.php:118
 msgid "Parent Level"
 msgstr ""
 
-#: resources/functions/taxonomies.php:99
+#: resources/functions/taxonomies.php:119
 msgid "Parent Level:"
 msgstr ""
 
-#: resources/functions/taxonomies.php:100
+#: resources/functions/taxonomies.php:120
 msgid "New Level Name"
 msgstr ""
 
-#: resources/functions/taxonomies.php:101
+#: resources/functions/taxonomies.php:121
 msgid "Add New Level"
 msgstr ""
 
-#: resources/functions/taxonomies.php:102
+#: resources/functions/taxonomies.php:122
 msgid "Edit Level"
 msgstr ""
 
-#: resources/functions/taxonomies.php:103
+#: resources/functions/taxonomies.php:123
 msgid "Update Level"
 msgstr ""
 
-#: resources/functions/taxonomies.php:104
+#: resources/functions/taxonomies.php:124
 msgid "View Level"
+msgstr ""
+
+#: resources/functions/taxonomies.php:169
+msgid "Sectors"
+msgstr ""
+
+#: resources/functions/taxonomies.php:170
+msgid "All Sectors"
+msgstr ""
+
+#: resources/functions/taxonomies.php:171
+msgid "Parent Sector"
+msgstr ""
+
+#: resources/functions/taxonomies.php:172
+msgid "Parent Sector:"
+msgstr ""
+
+#: resources/functions/taxonomies.php:173
+msgid "New Sector Name"
+msgstr ""
+
+#: resources/functions/taxonomies.php:174
+msgid "Add New Sector"
+msgstr ""
+
+#: resources/functions/taxonomies.php:175
+msgid "Edit Sector"
+msgstr ""
+
+#: resources/functions/taxonomies.php:176
+msgid "Update Sector"
+msgstr ""
+
+#: resources/functions/taxonomies.php:177
+msgid "View Sector"
+msgstr ""
+
+#: resources/functions/taxonomies.php:222
+msgid "Regions"
+msgstr ""
+
+#: resources/functions/taxonomies.php:223
+msgid "All Regions"
+msgstr ""
+
+#: resources/functions/taxonomies.php:224
+msgid "Parent Region"
+msgstr ""
+
+#: resources/functions/taxonomies.php:225
+msgid "Parent Region:"
+msgstr ""
+
+#: resources/functions/taxonomies.php:226
+msgid "New Region Name"
+msgstr ""
+
+#: resources/functions/taxonomies.php:227
+msgid "Add New Region"
+msgstr ""
+
+#: resources/functions/taxonomies.php:228
+msgid "Edit Region"
+msgstr ""
+
+#: resources/functions/taxonomies.php:229
+msgid "Update Region"
+msgstr ""
+
+#: resources/functions/taxonomies.php:230
+msgid "View Region"
+msgstr ""
+
+#: resources/functions/taxonomies.php:271
+msgid "Variable Types"
+msgstr ""
+
+#: resources/functions/taxonomies.php:272
+msgid "All Types"
+msgstr ""
+
+#: resources/functions/taxonomies.php:273
+msgid "Parent Type"
+msgstr ""
+
+#: resources/functions/taxonomies.php:274
+msgid "Parent Type:"
+msgstr ""
+
+#: resources/functions/taxonomies.php:275
+msgid "New Type Name"
+msgstr ""
+
+#: resources/functions/taxonomies.php:276
+msgid "Add New Type"
+msgstr ""
+
+#: resources/functions/taxonomies.php:277
+msgid "Edit Type"
+msgstr ""
+
+#: resources/functions/taxonomies.php:278
+msgid "Update Type"
+msgstr ""
+
+#: resources/functions/taxonomies.php:279
+msgid "View Type"
 msgstr ""
 
 #: template/download/control-bar.php:19 template/map/control-bar.php:19
@@ -295,6 +451,10 @@ msgstr "Détails"
 #: template/download/control-bar.php:46
 msgid "Submit"
 msgstr "Soumettre"
+
+#: template/download/controls/area.php:5
+msgid "Area of Analysis"
+msgstr ""
 
 #: template/download/controls/area.php:12
 msgid "Change Aggregation"
@@ -316,15 +476,55 @@ msgstr ""
 msgid "Watersheds"
 msgstr ""
 
-#: template/download/controls/area.php:36 template/map/controls/download.php:40
+#: template/download/controls/area.php:36 template/map/controls/download.php:54
 msgid "Custom shapefile"
 msgstr ""
 
-#: template/download/controls/area.php:40 template/map/controls/download.php:44
+#: template/download/controls/area.php:40 template/map/controls/download.php:58
 msgid "Drop your GeoJSON file here to upload"
 msgstr ""
 
-#: template/learn/control-bar.php:20 template/learn/control-bar.php:77
+#: template/download/controls/data-variable.php:5
+#: template/map/controls/data-variable.php:5
+msgid "Select a new variable"
+msgstr ""
+
+#: template/download/controls/data-variable.php:100
+#: template/map/controls/data-variable.php:100
+msgid "Clear"
+msgstr ""
+
+#: template/download/controls/data-variable.php:120
+#: template/map/controls/data-variable.php:120
+msgid "Previous"
+msgstr ""
+
+#: template/download/controls/data-variable.php:122
+#: template/map/controls/data-variable.php:122
+msgid "Next"
+msgstr ""
+
+#: template/download/controls/data.php:5 template/map/controls/data.php:5
+msgid "Data Options"
+msgstr ""
+
+#: template/download/controls/data.php:15 template/map/controls/data.php:17
+msgid "Click to select a variable"
+msgstr ""
+
+#: template/download/controls/data.php:18 template/map/controls/data.php:20
+msgid "Thresholds"
+msgstr ""
+
+#: template/download/controls/data.php:24
+msgid "Presets"
+msgstr ""
+
+#: template/download/controls/data.php:42
+msgid "Custom"
+msgstr ""
+
+#: template/learn/control-bar.php:20 template/learn/control-bar.php:81
 #: template/news/control-bar.php:11 template/news/control-bar.php:21
 msgid "Filters"
 msgstr ""
@@ -333,28 +533,24 @@ msgstr ""
 msgid "topic"
 msgstr ""
 
-#: template/learn/control-bar.php:84
+#: template/learn/control-bar.php:88
 msgid "Content Type"
 msgstr ""
 
-#: template/learn/control-bar.php:87
+#: template/learn/control-bar.php:91
 msgid "Video"
 msgstr ""
 
-#: template/learn/control-bar.php:88
+#: template/learn/control-bar.php:92
 msgid "Audio"
 msgstr ""
 
-#: template/learn/control-bar.php:89
+#: template/learn/control-bar.php:93
 msgid "Interactive"
 msgstr ""
 
-#: template/learn/control-bar.php:90
+#: template/learn/control-bar.php:94
 msgid "Article"
-msgstr ""
-
-#: template/learn/control-bar.php:95
-msgid "Technical Level"
 msgstr ""
 
 #: template/learn/query.php:29
@@ -381,246 +577,301 @@ msgstr "Emplacement"
 msgid "Display"
 msgstr ""
 
-#: template/map/control-bar.php:46 template/map/controls/data-variable.php:53
+#: template/map/control-bar.php:46 template/query/map-var-item.php:10
 msgid "Download"
 msgstr "Téléchargement"
 
-#: template/map/controls/data-variable.php:5
-msgid "Select a new variable"
-msgstr ""
-
-#: template/map/controls/data-variable.php:52
-msgid "View on map"
-msgstr ""
-
-#: template/map/controls/data.php:17
+#: template/map/controls/data.php:34
 #, fuzzy
 #| msgid "Data"
 msgid "Dataset"
 msgstr "Données"
 
-#: template/map/controls/data.php:21
+#: template/map/controls/data.php:38
 msgid "CMIP6"
 msgstr ""
 
-#: template/map/controls/data.php:24
+#: template/map/controls/data.php:41
 msgid "CMIP5"
 msgstr ""
 
-#: template/map/controls/data.php:33
+#: template/map/controls/data.php:50
 msgid "Annual"
 msgstr ""
 
-#: template/map/controls/data.php:34
+#: template/map/controls/data.php:51
+msgid "Daily"
+msgstr ""
+
+#: template/map/controls/data.php:52
 msgid "Monthly"
 msgstr ""
 
-#: template/map/controls/data.php:35
+#: template/map/controls/data.php:53
 msgid "January"
 msgstr "Janvier"
 
-#: template/map/controls/data.php:36
+#: template/map/controls/data.php:54
 msgid "February"
 msgstr "Février"
 
-#: template/map/controls/data.php:37
+#: template/map/controls/data.php:55
 msgid "March"
 msgstr "Mars"
 
-#: template/map/controls/data.php:38
+#: template/map/controls/data.php:56
 msgid "April"
 msgstr ""
 
-#: template/map/controls/data.php:39
+#: template/map/controls/data.php:57
 msgid "May"
 msgstr "Mai"
 
-#: template/map/controls/data.php:40
+#: template/map/controls/data.php:58
 msgid "June"
 msgstr "Juin"
 
-#: template/map/controls/data.php:41
+#: template/map/controls/data.php:59
 msgid "July"
 msgstr "Juillet"
 
-#: template/map/controls/data.php:42
+#: template/map/controls/data.php:60
 msgid "August"
 msgstr ""
 
-#: template/map/controls/data.php:43
+#: template/map/controls/data.php:61
 msgid "September"
 msgstr "Septembre"
 
-#: template/map/controls/data.php:44
+#: template/map/controls/data.php:62
 msgid "October"
 msgstr "Octobre"
 
-#: template/map/controls/data.php:45
+#: template/map/controls/data.php:63
 msgid "November"
 msgstr "Novembre"
 
-#: template/map/controls/data.php:46
+#: template/map/controls/data.php:64
 msgid "December"
 msgstr "Décembre"
 
-#: template/map/controls/display.php:104
+#: template/map/controls/data.php:67
+msgid "Seasonal"
+msgstr ""
+
+#: template/map/controls/data.php:68
+msgid "Spring"
+msgstr ""
+
+#: template/map/controls/data.php:69
+msgid "Summer"
+msgstr ""
+
+#: template/map/controls/data.php:70
+msgid "Fall"
+msgstr ""
+
+#: template/map/controls/data.php:71
+msgid "Winter"
+msgstr ""
+
+#: template/map/controls/display.php:64
+msgid "Default"
+msgstr ""
+
+#: template/map/controls/display.php:83
 msgid "Discrete"
 msgstr ""
 
-#: template/map/controls/display.php:107
+#: template/map/controls/display.php:86
 msgid "Continuous"
 msgstr ""
 
 #: template/map/controls/download.php:11
-msgid "Share URL"
+msgid "Export Image"
 msgstr ""
 
 #: template/map/controls/download.php:14
-msgid "Copy a shareable URL containing the current map view and parameters"
+msgid "Position the map as needed and export as a PNG image"
 msgstr ""
 
 #: template/map/controls/download.php:18
-msgid "Copy link to this map"
+msgid "Save map as image"
 msgstr ""
 
 #: template/map/controls/download.php:23
-msgid "Export Data"
+msgid "Share URL"
 msgstr ""
 
 #: template/map/controls/download.php:26
+msgid "Copy a shareable URL containing the current map view and parameters"
+msgstr ""
+
+#: template/map/controls/download.php:30
+msgid "Copy link to this map"
+msgstr ""
+
+#: template/map/controls/download.php:35
+msgid "Export Data"
+msgstr ""
+
+#: template/map/controls/download.php:40
 #, fuzzy
 #| msgid "Data"
 msgid "Data Area"
 msgstr "Données"
 
-#: template/map/controls/download.php:30
+#: template/map/controls/download.php:44
 msgid "Select regions"
 msgstr ""
 
-#: template/map/controls/download.php:35
+#: template/map/controls/download.php:49
 msgid "Draw custom region"
 msgstr ""
 
-#: template/map/controls/location.php:53
+#: template/map/controls/download.php:64
+msgid "Export Format"
+msgstr ""
+
+#: template/map/controls/download.php:68
+msgid "CSV"
+msgstr ""
+
+#: template/map/controls/download.php:71
+msgid "JSON"
+msgstr ""
+
+#: template/map/controls/download.php:74
+msgid "NetCDF"
+msgstr ""
+
+#: template/map/controls/download.php:78
+#, fuzzy
+#| msgid "Download"
+msgid "Process & Download"
+msgstr "Téléchargement"
+
+#: template/map/controls/location-detail.php:10
 msgid "Hottest Day"
 msgstr ""
 
-#: template/map/controls/location.php:67
+#: template/map/controls/location-detail.php:24
 msgid "Relative to Baseline"
 msgstr ""
 
-#: template/map/controls/location.php:74
+#: template/map/controls/location-detail.php:31
 msgid "higher"
 msgstr ""
 
-#: template/map/controls/location.php:85
+#: template/map/controls/location-detail.php:42
 msgid "Time Series"
 msgstr ""
 
-#: template/map/controls/location.php:88
+#: template/map/controls/location-detail.php:45
 msgid "Table Builder"
 msgstr ""
 
-#: template/map/controls/location.php:91
+#: template/map/controls/location-detail.php:48
 msgid "Frequency Plot"
 msgstr ""
 
-#: template/map/controls/location.php:108
+#: template/map/controls/location-detail.php:65
 msgid "Chart Options"
 msgstr ""
 
-#: template/map/controls/location.php:112
+#: template/map/controls/location-detail.php:69
 msgid "Export"
 msgstr ""
 
-#: template/map/controls/location.php:130
+#: template/map/controls/location-detail.php:87
 msgid "Values"
 msgstr ""
 
-#: template/map/controls/location.php:137
+#: template/map/controls/location-detail.php:94
 msgid "Change how values are displayed when hovering over the plot area."
 msgstr ""
 
-#: template/map/controls/location.php:141
+#: template/map/controls/location-detail.php:98
 msgid "Annual Values"
 msgstr ""
 
-#: template/map/controls/location.php:143
+#: template/map/controls/location-detail.php:100
 msgid "Precise values per year"
 msgstr ""
 
-#: template/map/controls/location.php:147
+#: template/map/controls/location-detail.php:104
 msgid "30 year averages"
 msgstr ""
 
-#: template/map/controls/location.php:149
+#: template/map/controls/location-detail.php:106
 msgid "Average values over the previous 30-year period"
 msgstr ""
 
-#: template/map/controls/location.php:153
+#: template/map/controls/location-detail.php:110
 msgid "30 year changes"
 msgstr ""
 
-#: template/map/controls/location.php:155
+#: template/map/controls/location-detail.php:112
 msgid "Values that indicate the change from the 1971-2000 reference period"
 msgstr ""
 
-#: template/map/controls/location.php:167
+#: template/map/controls/location-detail.php:124
 msgid "Series"
 msgstr ""
 
-#: template/map/controls/location.php:176
+#: template/map/controls/location-detail.php:133
 msgid "Series Name"
 msgstr ""
 
-#: template/map/controls/location.php:177
+#: template/map/controls/location-detail.php:134
 msgid "Colours"
 msgstr ""
 
-#: template/map/controls/location.php:178 template/old-loop/blocks/map.php:264
+#: template/map/controls/location-detail.php:135
+#: template/old-loop/blocks/map.php:264
 msgid "Opacity"
 msgstr ""
 
-#: template/map/controls/location.php:187
+#: template/map/controls/location-detail.php:144
 msgid "Observations"
 msgstr ""
 
-#: template/map/controls/location.php:195
-#: template/map/controls/location.php:221
-#: template/map/controls/location.php:253
-#: template/map/controls/location.php:285
-#: template/map/controls/location.php:317
+#: template/map/controls/location-detail.php:152
+#: template/map/controls/location-detail.php:178
+#: template/map/controls/location-detail.php:210
+#: template/map/controls/location-detail.php:242
+#: template/map/controls/location-detail.php:274
 msgid "Median"
 msgstr ""
 
-#: template/map/controls/location.php:213
+#: template/map/controls/location-detail.php:170
 msgid "Modeled Historical"
 msgstr ""
 
-#: template/map/controls/location.php:227
-#: template/map/controls/location.php:259
-#: template/map/controls/location.php:291
-#: template/map/controls/location.php:323
+#: template/map/controls/location-detail.php:184
+#: template/map/controls/location-detail.php:216
+#: template/map/controls/location-detail.php:248
+#: template/map/controls/location-detail.php:280
 msgid "Range"
 msgstr ""
 
-#: template/map/controls/location.php:245
+#: template/map/controls/location-detail.php:202
 msgid "SSP 1–2.6"
 msgstr ""
 
-#: template/map/controls/location.php:277
+#: template/map/controls/location-detail.php:234
 msgid "SSP 2–4.5"
 msgstr ""
 
-#: template/map/controls/location.php:309
+#: template/map/controls/location-detail.php:266
 msgid "SSP 5–8.5"
 msgstr ""
 
-#: template/map/controls/location.php:342
+#: template/map/controls/location-detail.php:299
 msgid "Axes"
 msgstr ""
 
-#: template/map/controls/location.php:356
+#: template/map/controls/location-detail.php:313
 msgid "Labels"
 msgstr ""
 
@@ -652,10 +903,22 @@ msgstr ""
 msgid "Learn More"
 msgstr ""
 
-#: template/post-meta.php:1
+#: template/post-meta.php:2
 msgid "Date"
 msgstr ""
 
-#: template/post-meta.php:9
+#: template/post-meta.php:12
 msgid "Author"
 msgstr "Auteur"
+
+#: template/post-meta.php:52
+msgid "Share this post"
+msgstr ""
+
+#: template/query/download-var-item.php:9
+msgid "Select variable"
+msgstr ""
+
+#: template/query/map-var-item.php:9
+msgid "View on map"
+msgstr ""

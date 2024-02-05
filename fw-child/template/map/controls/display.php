@@ -26,7 +26,7 @@
 					<h6 class="all-caps text-secondary">Map Aggregation</h6>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-grid" value="" checked data-query-key="sector">
+						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-grid" value="canadagrid" checked data-query-key="sector">
 						<label class="form-check-label" for="display-aggregation-grid">Gridded Data</label>
 					</div>
 					
@@ -153,24 +153,24 @@
 					
 					<h6 class="text-gray-600">Data</h6>
 					
-					<div class="opacity-slider-well mb-4">
-						<div id="data-opacity-slider" class="opacity-slider" data-pane="raster">
+					<div class="map-control-slider-well mb-4">
+						<div id="display-data-slider" class="map-control-slider opacity-slider" data-pane="raster">
 							<div id="data-opacity-handle" class="ui-slider-handle">100</div>
 						</div>
 					</div>
 					
 					<h6 class="text-gray-600">Labels</h6>
 					
-					<div class="opacity-slider-well mb-4">
-						<div id="labels-opacity-slider" class="opacity-slider" data-pane="labels">
+					<div class="map-control-slider-well mb-4">
+						<div id="display-labels-slider" class="map-control-slider opacity-slider" data-pane="labels">
 							<div id="labels-opacity-handle" class="ui-slider-handle">100</div>
 						</div>
 					</div>
 					
 					<h6 class="text-gray-600">Pins</h6>
 					
-					<div class="opacity-slider-well">
-						<div id="pins-opacity-slider" class="opacity-slider" data-pane="marker">
+					<div class="map-control-slider-well">
+						<div id="display-pins-slider" class="map-control-slider opacity-slider" data-pane="marker">
 							<div id="pins-opacity-handle" class="ui-slider-handle">100</div>
 						</div>
 					</div>

@@ -1,47 +1,3 @@
-//
-// GLOBAL CONSTANTS
-//
-
-// const geoserver_url = 'https://data.climatedata.ca';
-const geoserver_url = 'https://dataclimatedata.crim.ca';
-
-const canadaCenter = [62.51231793838694, -98.48144531250001];
-const scenario_names = {
-  cmip5: {
-    low: 'RCP 2.6',
-    medium: 'RCP 4.5',
-    high: 'RCP 8.5',
-  },
-  cmip6: {
-    low: 'SSP 1–2.6',
-    medium: 'SSP 2–4.5',
-    high: 'SSP 5–8.5',
-  },
-};
-
-const frequencyLUT = {
-  'ann': 'ys',
-  'jan': 'ms',
-  'feb': 'ms',
-  'mar': 'ms',
-  'apr': 'ms',
-  'may': 'ms',
-  'jun': 'ms',
-  'jul': 'ms',
-  'aug': 'ms',
-  'sep': 'ms',
-  'oct': 'ms',
-  'nov': 'ms',
-  'dec': 'ms',
-  'spring': 'qsdec',
-  'summer': 'qsdec',
-  'fall': 'qsdec',
-  'winter': 'qsdec'
-}
-
-// throttling for history state pushes
-var pushes_since_input = 0;
-
 // fix for 'fakeStop is not a function'
 
 if (typeof L !== 'undefined') {
@@ -52,8 +8,6 @@ if (typeof L !== 'undefined') {
 
 // make $ available in devtools
 const $ = jQuery;
-
-const svgNS = "http://www.w3.org/2000/svg";
 
 (function ($) {
   $(function () {
@@ -114,26 +68,6 @@ const svgNS = "http://www.w3.org/2000/svg";
           },
         });
       });
-
-      //       $('.learn-module-grid').each(function (i) {
-      //         if (i == 0) {
-      //           $(this).fw_query({
-      //             elements: {
-      //               filters: $('#control-bar .filter'),
-      //             },
-      //           });
-      //         } else {
-      //           $(this).fw_query();
-      //         }
-      //       });
-      //
-      //       $('#control-bar .filter-item').click(function () {
-      //         // sync filtering with each module query
-      //
-      //         $('.learn-module-grid:not(#module-1)').each(function () {
-      //           $(this).fw_query('update_filters');
-      //         });
-      //       });
     }
   });
 })(jQuery);

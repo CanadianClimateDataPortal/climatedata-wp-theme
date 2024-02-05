@@ -11,6 +11,8 @@ register_meta ( 'post', 'title_fr', array (
 	'show_in_rest' => true
 ) );
 
+// get variable data
+
 function cdc_get_var ( $args, $request ) {
 	
 	if ( isset ( $request['var'] ) ) {

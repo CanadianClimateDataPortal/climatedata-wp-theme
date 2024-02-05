@@ -823,7 +823,12 @@ var result = {};
         <Opacity>1.0</Opacity><ColorMap type="${colormap_type}">`
 
       for (let i = 0; i < scheme_length; i++) {
-        sld_body += `<ColorMapEntry color="${colours[i]}" quantity="${low + (i*step)}"/>`;
+        if (discrete && i == scheme_length -1) {
+          // we need a virtually high value for highest bucket, otherwise it will be blank
+          sld_body += `<ColorMapEntry color="${colours[i]}" quantity="${(high + 1) * (high + 1)}"/>`;
+        } else {
+          sld_body += `<ColorMapEntry color="${colours[i]}" quantity="${low + (i * step)}"/>`;
+        }
       }
 
       sld_body += '</ColorMap></RasterSymbolizer></Rule></FeatureTypeStyle></UserStyle></NamedLayer></StyledLayerDescriptor>';

@@ -109,6 +109,7 @@
       chart: {
         object: null,
         series: null,
+        legend: null,
         query: null,
         unit: null,
         download_url: null,
@@ -1090,9 +1091,9 @@
       render: function (fn_options) {
         // recreation of v1 displayChartData()
 
-        let plugin = this,
-          item = plugin.item,
-          options = plugin.options;
+        let plugin = !this.item ? this.data('cdc_app') : this;
+        let options = plugin.options,
+          item = plugin.item;
 
         let settings = $.extend(
           true,
@@ -1133,7 +1134,7 @@
           '/' +
           options.chart.query.frequency +
           '?decimals=' +
-          settings.var_data.decimals +
+          settings.var_data.acf.decimals +
           '&dataset_name=' +
           options.chart.query.dataset;
 
@@ -1152,10 +1153,59 @@
         // reset the series array
         options.chart.series = [];
 
+        if (settings.data.observations.length > 0) {
+          options.chart.series.push({
+            name: chart_labels.observation,
+            data: settings.data.observations,
+            zIndex: 1,
+            showInNavigator: true,
+            color: '#F47D23',
+            visible: false,
+            marker: {
+              fillColor: '#F47D23',
+              lineWidth: 0,
+              radius: 0,
+              lineColor: '#F47D23',
+            },
+          });
+        }
+
+        if (settings.data.modeled_historical_median.length > 0) {
+          options.chart.series.push({
+            name: chart_labels.historical,
+            data: settings.data.modeled_historical_median,
+            zIndex: 1,
+            showInNavigator: true,
+            color: '#000000',
+            marker: {
+              fillColor: '#000000',
+              lineWidth: 0,
+              radius: 0,
+              lineColor: '#000000',
+            },
+          });
+        }
+
+        if (settings.data.modeled_historical_range.length > 0)
+          options.chart.series.push({
+            name: chart_labels.historical_range,
+            data: settings.data.modeled_historical_range,
+            type: 'arearange',
+            lineWidth: 0,
+            linkedTo: ':previous',
+            color: '#000000',
+            fillOpacity: 0.2,
+            zIndex: 0,
+            marker: {
+              radius: 0,
+              enabled: false,
+            },
+          });
+
         scenarios.forEach(function (scenario) {
           if (settings.data['{0}_median'.format(scenario.name)].length > 0) {
             options.chart.series.push({
-              name: scenario.label, //T('{0} Median').format(scenario.label),
+              name: T('{0} Median').format(scenario.label),
               data: settings.data['{0}_median'.format(scenario.name)],
               zIndex: 1,
               showInNavigator: true,
@@ -1171,7 +1221,7 @@
 
           if (settings.data['{0}_range'.format(scenario.name)].length > 0) {
             options.chart.series.push({
-              name: scenario.label, //T('{0} Range').format(scenario.label),
+              name: T('{0} Range').format(scenario.label),
               data: settings.data['{0}_range'.format(scenario.name)],
               type: 'arearange',
               lineWidth: 0,
@@ -1206,27 +1256,21 @@
               },
             },
             title: {
-              text:
-                options.lang != 'en'
-                  ? settings.var_data.meta['title_' + options.lang]
-                  : settings.var_data.title.rendered,
+              text: '',
             },
             subtitle: {
               align: 'left',
-              text:
+              text: '' /*
                 document.ontouchstart === undefined
                   ? chart_labels.click_to_zoom
-                  : 'Pinch the chart to zoom in',
+                  : 'Pinch the chart to zoom in',*/,
             },
             xAxis: {
               type: 'datetime',
             },
             yAxis: {
               title: {
-                text:
-                  options.lang != 'en'
-                    ? settings.var_data.meta['title_' + options.lang]
-                    : settings.var_data.title.rendered,
+                text: '',
               },
               labels: {
                 align: 'left',
@@ -1234,7 +1278,10 @@
               },
             },
             legend: {
-              enabled: true,
+              enabled: false,
+            },
+            rangeSelector: {
+              enabled: false,
             },
             tooltip: {
               pointFormatter: pointFormatter,
@@ -1249,6 +1296,23 @@
             exporting: {
               csv: {
                 dateFormat: '%Y-%m-%d',
+              },
+              chartOptions: {
+                title: {
+                  text:
+                    options.lang != 'en'
+                      ? settings.var_data.meta['title_' + options.lang]
+                      : settings.var_data.title.rendered,
+                },
+                yAxis: {
+                  title:
+                    options.lang != 'en'
+                      ? settings.var_data.meta['title_' + options.lang]
+                      : settings.var_data.title.rendered,
+                },
+                legend: {
+                  enabled: true,
+                },
               },
             },
             series: options.chart.series,
@@ -1301,13 +1365,74 @@
               label: { text: unit_localize('Climate Zone 8') },
             });
           }
+
+          plugin.charts.do_legend.apply(item, []);
         }
       },
 
+      do_legend: function () {
+        let plugin = !this.item ? this.data('cdc_app') : this;
+        let options = plugin.options,
+          item = plugin.item;
+
+        options.chart.legend = item.find('#chart-series-items');
+
+        // clone the row markup
+        let legend_item = options.chart.legend.find('.row').clone();
+        legend_item = legend_item[0];
+
+        let row_markup = legend_item.outerHTML;
+
+        options.chart.series.forEach(function (series, i) {
+          // console.log('new row', series);
+
+          let new_row = $(row_markup.replaceAll('row-X', 'row-' + i));
+
+          if (series.visible == false) {
+            new_row.find('[type="checkbox"]').prop('checked', false);
+          }
+
+          new_row
+            .addClass('cloned')
+            .attr('data-series', i)
+            .removeAttr('style')
+            .appendTo(options.chart.legend)
+            .find('.form-check-label')
+            .text(series.name);
+        });
+
+        // opacity range slider
+        options.chart.legend.on('input', '[type="range"]', function () {
+          let this_series_i = parseInt(
+            $(this).closest('.row').attr('data-series'),
+          );
+
+          options.chart.object.series[this_series_i].update({
+            opacity: parseInt($(this).val()) / 100,
+          });
+        });
+
+        // visibility
+
+        options.chart.legend.on('change', '[type="checkbox"]', function () {
+          let this_series_i = parseInt(
+            $(this).closest('.row').attr('data-series'),
+          );
+
+          options.chart.object.series[this_series_i].update({
+            visible: $(this).prop('checked') == true ? true : false,
+          });
+        });
+
+        // for later: to set series states
+        // when hovering/clicking a custom legend item
+        // chart.series[0].setState('hover')
+      },
+
       update_data: function (fn_options) {
-        let plugin = this,
-          item = plugin.item,
-          options = plugin.options;
+        let plugin = !this.item ? this.data('cdc_app') : this;
+        let options = plugin.options,
+          item = plugin.item;
 
         let settings = $.extend(
           true,
@@ -1322,19 +1447,17 @@
         );
 
         // more to this to add later
-        let labelFormatter = function () {
+        function labelFormatter(a, b) {
           return (
             this.axis.defaultLabelFormatter.call(this) +
             ' ' +
             options.chart.unit
           );
-        };
-
-        console.log(options.chart.query);
+        }
 
         let scenarios = DATASETS[options.chart.query.dataset].scenarios;
 
-        console.log('update', settings);
+        // console.log('update', settings);
 
         // remove existing bands
         options.chart.object.xAxis[0].removePlotBand('30y-plot-band');
@@ -1343,13 +1466,14 @@
         if (settings.input.key != null && settings.input.value != null) {
           switch (settings.input.key) {
             case 'values':
-              console.log('vals');
+              // console.log('vals');
 
               switch (settings.input.value) {
                 case 'annual':
                   options.chart.object.update({
                     tooltip: {
                       formatter: function (tooltip) {
+                        // console.log(tooltip.defaultFormatter);
                         return tooltip.defaultFormatter.call(this, tooltip);
                       },
                     },
@@ -1387,14 +1511,18 @@
                     },
                     tooltip: {
                       formatter: function (tooltip) {
-                        // console.log(tooltip);
+                        // console.log(tooltip.defaultFormatter);
+
+                        // remove existing plot band every time
+                        options.chart.object.xAxis[0].removePlotBand(
+                          '30y-plot-band',
+                        );
+
                         let [decade, decade_ms] = formatDecade(
                           this.x,
                           options.chart.query.frequency,
                         );
-                        options.chart.object.xAxis[0].removePlotBand(
-                          '30y-plot-band',
-                        );
+
                         options.chart.object.xAxis[0].addPlotBand({
                           from: Date.UTC(decade, 0, 1),
                           to: Date.UTC(decade + 29, 11, 31),
@@ -1420,8 +1548,10 @@
                             options.chart.data['30y_observations'][
                               decade_ms
                             ][0];
+
                           val1 =
                             tooltip.chart.yAxis[0].labelFormatter.call(this);
+
                           tip.push(
                             '<span style="color:#F47D23">●</span> ' +
                               chart_labels.observation +
@@ -1437,39 +1567,37 @@
                               '30y_{0}_median'.format(scenario.name)
                             ][decade_ms][0];
 
-                          console.log(tooltip);
-                          // val1 = tooltip.chart.yAxis[0].axis.defaultLabelFormatter.call(this) +
-                          //   ' ' +
-                          //   options.chart.unit;
-
-                          // val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                          val1 = tooltip.defaultFormatter.call(this, tooltip);
+                          // tooltip.chart.yAxis[0].labelFormatter.call(this);
 
                           tip.push(
                             '<span style="color:{0}">●</span> '.format(
                               scenario.chart_color,
                             ) +
-                              // T('{0} Median').format(scenario.label) +
-                              '{0} Median'.format(scenario.label) +
+                              T('{0} Median').format(scenario.label) +
                               ' <b>' +
-                              // val1 +
+                              val1 +
                               '</b><br/>',
                           );
-                          /*
+
                           this.value =
                             options.chart.data[
                               '30y_{0}_range'.format(scenario.name)
                             ][decade_ms][0];
 
-                          val1 =
-                            tooltip.chart.yAxis[0].labelFormatter.call(this);
+                          val1 = tooltip.defaultFormatter.call(this, tooltip);
+                          // val1 =
+                          // tooltip.chart.yAxis[0].labelFormatter.call(this);
 
                           this.value =
                             options.chart.data[
                               '30y_{0}_range'.format(scenario.name)
                             ][decade_ms][1];
 
-                          val2 =
-                            tooltip.chart.yAxis[0].labelFormatter.call(this);
+                          val2 = tooltip.defaultFormatter.call(this, tooltip);
+                          // val2 =
+                          // tooltip.chart.yAxis[0].labelFormatter.call(this);
+
                           tip.push(
                             '<span style="color:{0}">●</span> '.format(
                               scenario.chart_color,
@@ -1480,7 +1608,7 @@
                               '</b>-<b>' +
                               val2 +
                               '</b><br/>',
-                          );*/
+                          );
                         }, this);
 
                         return tip;
@@ -1492,6 +1620,9 @@
 
                 case 'delta':
                   // add 1970-2000 band
+
+                  console.log(options.chart.object.xAxis[0]);
+
                   options.chart.object.xAxis[0].addPlotBand({
                     from: Date.UTC(1971, 0, 1),
                     to: Date.UTC(2000, 11, 31),
@@ -1540,7 +1671,7 @@
                             num,
                             settings.var_data.decimals,
                           );
-                          switch (chartUnit) {
+                          switch (UNITS[settings.var_data.acf.units]) {
                             case 'day of the year':
                               str += ' ' + l10n_labels['days'];
                               break;
@@ -1571,6 +1702,7 @@
                               'delta7100_{0}_median'.format(scenario.name)
                             ][decade_ms][0],
                           );
+
                           tip.push(
                             '<span style="color:{0}">●</span> '.format(
                               scenario.chart_color,
@@ -1586,11 +1718,13 @@
                               'delta7100_{0}_range'.format(scenario.name)
                             ][decade_ms][0],
                           );
+
                           val2 = numformat(
                             options.chart.data[
                               'delta7100_{0}_range'.format(scenario.name)
                             ][decade_ms][1],
                           );
+
                           tip.push(
                             '<span style="color:{0}">●</span> '.format(
                               scenario.chart_color,
@@ -1616,12 +1750,39 @@
           }
         }
       },
+
+      do_export: function (dl_type) {
+        let plugin = !this.item ? this.data('cdc_app') : this;
+        let options = plugin.options,
+          item = plugin.item;
+
+        switch (dl_type) {
+          case 'print':
+            options.chart.object.print();
+            break;
+
+          case 'csv':
+            if (
+              item.find('[data-chart-key="values"]:checked').val() == 'annual'
+            ) {
+              options.chart.object.downloadCSV();
+            } else {
+              window.location.href = options.chart.download_url;
+            }
+            break;
+
+          default:
+            options.chart.object.exportChart({
+              type: dl_type,
+            });
+        }
+      },
     },
 
     get_var_data: function (var_id, callback = null) {
-      let plugin = this,
-        item = plugin.item,
-        options = plugin.options;
+      let plugin = !this.item ? this.data('cdc_app') : this;
+      let options = plugin.options,
+        item = plugin.item;
 
       let var_data;
 
@@ -1663,9 +1824,9 @@
     },
 
     toggle_conditionals: function () {
-      let plugin = this,
-        item = plugin.item,
-        options = plugin.options;
+      let plugin = !this.item ? this.data('cdc_app') : this;
+      let options = plugin.options,
+        item = plugin.item;
 
       let conditionals = [];
 

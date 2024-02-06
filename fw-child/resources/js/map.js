@@ -458,6 +458,8 @@ var result = {};
           success: function (data) {
             console.log('chart data', data);
 
+            item.find('#chart-series-items .cloned').remove();
+
             $(document).cdc_app('charts.render', {
               data: data,
               query: options.query,
@@ -492,6 +494,15 @@ var result = {};
           },
           var_data: options.var_data,
         });
+      });
+
+      // chart print/export
+
+      item.on('click', '.export-btn', function () {
+        $(document).cdc_app(
+          'charts.do_export',
+          $(this).attr('data-export-type'),
+        );
       });
 
       //

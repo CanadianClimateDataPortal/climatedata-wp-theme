@@ -117,6 +117,81 @@ const DATASETS = {
   },
 };
 
+l10n_labels = {
+  to: 'to',
+  to_doy: 'to',
+  days: 'days',
+  median: 'Median',
+  range: 'Range',
+  search_city: 'Search for a City/Town to zoom to',
+  selected: 'selected',
+  label_field: 'label_en',
+  temperature: 'temperature',
+  precipitation: 'precipitation',
+  other_variables: 'other variables',
+  station_data: 'station data',
+  selectstation: 'Select at least one station to download data.',
+  readytoprocess: 'Ready to process.',
+  misc: 'Miscellaneous',
+  allbccaq: 'All BCCAQv2 variables',
+  gridded_data: 'Gridded data',
+  census: 'Census subdivisions',
+  health: 'Health regions',
+  watershed: 'Watersheds',
+  ahccdLegend: 'Legend',
+  ahccdLegendSquare: 'Temperature',
+  ahccdLegendTriangle: 'Precipitation',
+  ahccdLegendCircle: 'Both',
+};
+
+var l10n_table = {
+  fr: {
+    'All models': 'Tous les modèles',
+    '{0} Median': '{0} médiane',
+    '{0} Range': '{0} portée',
+    'No data available for selected location':
+      "Pas de données disponibles pour l'emplacement sélectionné",
+    'No data available for this area.':
+      'Pas de données disponibles pour cette zone.',
+
+    'Search communities': 'Recherche par ville',
+    'Begin typing city name': "Commencer à saisir le nom d'une ville",
+    'Search coordinates': 'Recherche par coordonnées',
+    'Enter latitude & longitude e.g.':
+      'Saisir la latitude et la longitude, par ex.',
+    'Coordinates detected': 'Coordonnées détectées',
+    'Set map view': "Définir l'affichage de la carte",
+    'Ready to process.': 'Prêt à traiter.',
+    'Choose at least one weather station. ':
+      'Sélectionner au moins une station.',
+
+    // share widget
+    'Copied to clipboard': 'Copié dans le presse-papier',
+    Error: 'Erreur',
+    'Copy link': 'Copier le lien',
+
+    //  feedback form
+    'Thanks! We’ve received your inquiry.':
+      'Merci! Nous avons reçu votre demande.',
+    'We are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays.':
+      'Le nombre de demandes adressées à notre Centre d’aide est actuellement supérieur à la normale. Nous ferons de notre mieux pour vous répondre dès que possible, mais sachez qu’il peut y avoir des délais.',
+    'Thank you for your patience,': 'Nous vous remercions de votre patience,',
+    'The Support Desk': 'Le Centre d’aide',
+    'Sorry, an error occurred while sending your feedback. Please try again later.':
+      'Désolé, une erreur est survenue. Veuillez réessayer plus tard.',
+
+    'With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}':
+      'Avec les paramètres actuels de fréquence et de format de donnée, le nombre maximal de points de grille par requête est de {0}',
+    'Around {0} grid boxes selected':
+      'Environ {0} points de grille sélectionnés',
+
+    // news
+
+    'All topics': 'Tous les sujets',
+    Close: 'Fermer',
+  },
+};
+
 // throttling for history state pushes
 var pushes_since_input = 0;
 
@@ -221,4 +296,28 @@ const period_frequency_lut = {
   'summer': 'qsdec',
   'fall': 'qsdec',
   'winter': 'qsdec'
+}
+
+/**
+ * Perform a string lookup in l10n_table in current language, returns it if found, otherwise return the original string
+ * @param str String to lookup for
+ * @returns {string} The localized string
+ */
+function T(str) {
+  let lang = 'en';
+
+  if (ajax_data.globals.current_lang_code != undefined) {
+    lang = ajax_data.globals.current_lang_code;
+  }
+
+  if (typeof l10n_table[lang] == 'undefined') {
+    return str;
+  }
+
+  if (typeof l10n_table[lang][str] == 'undefined') {
+    console.warn('Missing translation in language ' + lang + ': ' + str);
+    return str;
+  } else {
+    return l10n_table[lang][str];
+  }
 }

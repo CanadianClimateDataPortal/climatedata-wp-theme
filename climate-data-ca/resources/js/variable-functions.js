@@ -3245,5 +3245,12 @@
         // initially update screenshot button link
         $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(window.location.href, url_encoder_salt).encoded);
 
+        $.fn.prepare_raster = function(){
+          $('#main-header').remove();
+          $('#var-sliders').remove();
+          $('#map-controls').remove();
+          $('.page-tour').remove();
+        };
+
     });
 })(jQuery);

@@ -358,6 +358,11 @@
         })
 
         //console.log('end of location-functions');
+        $.fn.prepare_raster = function(){
+            $('#main-header').remove();
+            $('.chart-tour-trigger').remove();
+        };
+
 
     });
 })(jQuery);

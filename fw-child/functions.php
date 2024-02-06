@@ -107,6 +107,7 @@ function child_theme_enqueue() {
 	wp_register_script ( 'highcharts-exporting', 'https://code.highcharts.com/stock/modules/exporting.js', array ( 'highcharts-highstock' ), NULL, true );
 	wp_register_script ( 'highcharts-export-data', 'https://code.highcharts.com/stock/modules/export-data.js', array ( 'highcharts-exporting' ), NULL, true );
 	wp_register_script ( 'highcharts-offline-exporting', 'https://code.highcharts.com/stock/modules/offline-exporting.js', array ( 'highcharts-exporting' ), NULL, true );
+	wp_register_script ( 'highcharts-accessibility', 'https://code.highcharts.com/modules/accessibility.js', array ( 'highcharts-highstock' ), NULL, true );
 	
 	wp_register_script ( 'zebra-pin', $child_npm_dir . 'zebra_pin/dist/zebra_pin.min.js', array ( 'jquery' ), null, true );
 	
@@ -323,3 +324,61 @@ function cdc_get_random_var() {
 
 add_action ( 'wp_ajax_cdc_get_random_var', 'cdc_get_random_var' );
 add_action ( 'wp_ajax_nopriv_cdc_get_random_var', 'cdc_get_random_var' );
+
+function cdc_get_location_by_coords () {
+	
+	if (
+		( isset ($_GET['lat'] ) && !empty ( $_GET['lat'] ) ) &&
+		( isset ($_GET['lng'] ) && !empty ( $_GET['lng'] ) )
+	) {
+		
+		$lat = $_GET['lat'];
+		$lng = $_GET['lng'];
+		
+		echo $lat . ', ' . $lng;
+		
+		/*
+		// add _fr if needed
+		$term_append = ( $_GET['lang'] == 'fr' ) ? '_fr' : '';
+		
+		$columns = array (
+			"all_areas.id_code as geo_id", 
+			"geo_name", 
+			"gen_term" . $term_append . " as generic_term", 
+			"location", 
+			"province" . $term_append . " as province", 
+			"lat", 
+			"lon"
+		);
+
+		$join = "";
+		
+		if ( $_GET['sealevel'] ) {
+			$join = "JOIN all_areas_sealevel ON (all_areas.id_code=all_areas_sealevel.id_code)";
+		}
+
+		require_once locate_template('resources/app/db.php');
+
+		// range of coordinates to search between
+		$range = 0.1;
+		
+		$main_query = mysqli_query($GLOBALS['vars']['con'], "SELECT " . implode(",", $columns) . ", DISTANCE_BETWEEN($lat, $lng, lat,lon) as distance FROM all_areas $join WHERE lat BETWEEN " . (round($lat, 2) - $range) . " AND " . (round($lat, 2) + $range) . " AND lon BETWEEN " . (round($lng, 2) - $range) . " AND " . (round($lng, 2) + $range) . " AND gen_term NOT IN ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector') ORDER BY DISTANCE LIMIT 1") or die (mysqli_error($GLOBALS['vars']['con']));
+
+		if ($main_query->num_rows > 0) {
+			$selected_place = mysqli_fetch_assoc ( $main_query );
+			return $selected_place;
+		} else {
+			return 'Point';
+		}
+
+	} else {
+		return 'Point';
+	}
+	*/
+	
+	wp_die();
+
+}
+
+add_action ( 'wp_ajax_cdc_get_location_by_coords', 'cdc_get_location_by_coords' );
+add_action ( 'wp_ajax_nopriv_cdc_get_location_by_coords', 'cdc_get_location_by_coords' );

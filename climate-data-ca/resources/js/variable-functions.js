@@ -3250,6 +3250,7 @@
           $('#var-sliders').remove();
           $('#map-controls').remove();
           $('.page-tour').remove();
+          $('body').addClass('to-raster');
         };
 
     });

@@ -370,11 +370,11 @@ function cdc_get_location_by_coords () {
 		} else {
 			return 'Point';
 		}
-
+*/
 	} else {
 		return 'Point';
 	}
-	*/
+	
 	
 	wp_die();
 

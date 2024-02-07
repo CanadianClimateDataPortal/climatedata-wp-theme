@@ -114,6 +114,10 @@
         unit: null,
         download_url: null,
       },
+      icons: {
+        default: null,
+        small: null,
+      },
       debug: true,
     };
 
@@ -144,6 +148,29 @@
       //
       // MAP
       //
+
+      options.icons.default = L.icon({
+        iconUrl: '/site/assets/themes/fw-child/resources/img/marker-icon.png',
+        shadowUrl:
+          '/site/assets/themes/fw-child/resources/img/marker-shadow.png',
+        iconSize: [32, 40],
+        shadowSize: [32, 40],
+        iconAnchor: [10, 40],
+        shadowAnchor: [10, 40],
+        popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
+      });
+
+      options.icons.small = L.icon({
+        iconUrl:
+          '/site/assets/themes/fw-child/resources/img/marker-sm-icon.png',
+        shadowUrl:
+          '/site/assets/themes/fw-child/resources/img/marker-sm-shadow.png',
+        iconSize: [16, 20],
+        shadowSize: [16, 20],
+        iconAnchor: [5, 20],
+        shadowAnchor: [5, 20],
+        popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
+      });
 
       //
       // TABS
@@ -329,12 +356,18 @@
                 TIME: parseInt(query.decade) + '-01-00T00:00:00Z',
               };
 
+              //
+
               if (
                 this_map.layers.raster &&
                 this_map.object.hasLayer(this_map.layers.raster)
               ) {
-                // update existing
-                this_map.layers.raster.setParams(params);
+                // if any map parameters have changed
+                if (!_.isEqual(map.layers.raster.cdc_params, params)) {
+                  // update existing
+                  this_map.layers.raster.setParams(params);
+                  this_map.layers.raster.cdc_params = $.extend({}, params);
+                }
               } else {
                 // create layer
                 this_map.layers.raster = L.tileLayer
@@ -849,44 +882,118 @@
         }
       },
 
-      add_marker: function (lat, lng) {
+      add_marker: function (location) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           item = plugin.item,
           options = plugin.options;
 
-        let popped = false;
+        let recent_list = item.find('#recent-locations'),
+          popped = false;
 
-        for (let key in options.maps) {
-          let new_marker = new L.Marker([lat, lng]),
-            popped_marker = null;
+        console.log('add marker', location.coords.join(','), location);
 
-          if (options.grid.markers[key] == undefined) {
-            options.grid.markers[key] = [];
+        // remove any existing 'active' class
+        recent_list.find('.list-group-item').removeClass('active');
+
+        if (
+          recent_list.find('[data-coords="' + location.coords.join(',') + '"]')
+            .length
+        ) {
+          // marker already exists
+
+          // select the item
+
+          let recent_item = recent_list.find(
+            '[data-coords="' + location.coords.join(',') + '"]',
+          );
+
+          let marker_index = parseInt($(recent_item).attr('data-index'));
+
+          let this_marker = options.grid.markers['low'][marker_index];
+
+          recent_item.addClass('active');
+
+          // swap markers
+
+          console.log('looking for index ' + marker_index);
+
+          for (let key in options.maps) {
+            console.log(' in ' + key);
+
+            options.grid.markers[key].forEach(function (marker, i) {
+              console.log(i);
+
+              if (i == marker_index) {
+                console.log('yes');
+                marker.setIcon(options.icons.default);
+              } else {
+                console.log('no');
+                marker.setIcon(options.icons.small);
+              }
+            });
+          }
+        } else {
+          // marker doesn't exist, add a new one
+
+          for (let key in options.maps) {
+            let new_marker = new L.Marker(location.coords, {
+                icon: options.icons.default,
+              }),
+              popped_marker = null;
+
+            if (options.grid.markers[key] == undefined) {
+              options.grid.markers[key] = [];
+            }
+
+            // add new marker to beginning of array
+            options.grid.markers[key].unshift(new_marker);
+
+            if (options.grid.markers[key].length > 5) {
+              // pop the last if there are more than 5
+              popped_marker = options.grid.markers[key].pop();
+              popped = true;
+
+              options.maps[key].object.removeLayer(popped_marker);
+            }
+
+            new_marker
+              .on('click', function (e) {
+                $(document).trigger('click_marker', [e]);
+              })
+              .addTo(options.maps[key].object);
           }
 
-          // add new marker to beginning of array
-          options.grid.markers[key].unshift(new_marker);
-
-          if (options.grid.markers[key].length > 5) {
-            // pop the last if there are more than 5
-            popped_marker = options.grid.markers[key].pop();
-            popped = true;
-
-            options.maps[key].object.removeLayer(popped_marker);
+          if (popped == true) {
+            // remove last from recents
+            recent_list.find('.list-group-item').last().remove();
           }
 
-          new_marker.addTo(options.maps[key].object);
-        }
+          // add location to recents
 
-        if (popped == true) {
-          // remove last from recents
-          item.find('#recent-locations .list-group-item').last().remove();
-        }
+          recent_list.prepend(
+            '<button class="list-group-item list-group-item-action active" data-location="' +
+              location.geo_id +
+              '" data-coords="' +
+              location.coords.join(',') +
+              '">' +
+              location.title +
+              '</button>',
+          );
 
-        // add location to recents
-        item
-          .find('#recent-locations')
-          .prepend('<li class="list-group-item">' + lat + ', ' + lng + '</li>');
+          recent_list.find('.list-group-item').each(function (i) {
+            $(this).attr('data-index', i);
+          });
+
+          // swap markers
+
+          for (let key in options.maps) {
+            options.grid.markers[key].forEach(function (marker, i) {
+              if (i != 0) {
+                marker.setIcon(options.icons.small);
+              }
+            });
+          }
+        }
       },
     },
 
@@ -1814,13 +1921,12 @@
         success: function (data) {
           // console.log('wp-json var data', data);
 
+          let var_title =
+            options.lang != 'en' ? data.meta.title_fr : data.title.rendered;
+
           // update the control button
 
-          item
-            .find('.tab-drawer-trigger.var-name')
-            .text(
-              options.lang != 'en' ? data.meta.title_fr : data.title.rendered,
-            );
+          item.find('.tab-drawer-trigger.var-name').text(var_title);
 
           if (typeof data.acf.var_names != 'undefined') {
             if (data.acf.var_names.length == 1) {
@@ -1830,6 +1936,10 @@
               item.find('#var-thresholds').show();
             }
           }
+
+          // update var name in #location-detail
+
+          item.find('#location-detail .variable-name').text(var_title);
 
           if (typeof callback == 'function') {
             callback(data);

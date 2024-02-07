@@ -1,13 +1,13 @@
 <div id="location-detail" class="tab-drawer">
 	<div class="tab-drawer-content">
 		<div class="tab-drawer-content-inner">
-			<div class="control-tab-head d-flex justify-content-between">
-				<h5>Location Detail</h5>
+			<div class="control-tab-head d-flex align-items-center justify-content-between">
+				<h5 class="mb-0">Location Detail</h5>
 				<span class="tab-drawer-close">&times;</span>
 			</div>
 			
 			<div class="control-tab-body">
-				<h4 class="variable-name p-3"><?php _e ( 'Hottest Day', 'cdc' ); ?></h4>
+				<h4 class="variable-name p-3"></h4>
 				
 				<!-- summary -->
 				<div id="location-summary" class="row p-3">

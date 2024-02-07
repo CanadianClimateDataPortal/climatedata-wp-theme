@@ -159,11 +159,7 @@
       // TABS
       //
 
-      $('#control-bar').tab_drawer({
-        history: {
-          enabled: false,
-        },
-      });
+      $('#control-bar').tab_drawer();
 
       //
       // JQUERY UI WIDGETS

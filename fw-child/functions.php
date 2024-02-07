@@ -115,7 +115,7 @@ function child_theme_enqueue() {
 	
 	wp_register_script ( 'utilities', $child_js_dir . 'utilities.js', array ( 'jquery' ), NULL, true );
 	
-	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 'utilities',  'jquery', 'leaflet', 'leaflet-vectorgrid', 'leaflet-sync', 'tab-drawer', 'highcharts-highstock', 'highcharts-more', 'highcharts-exporting', 'highcharts-export-data', 'highcharts-offline-exporting' ), NULL, true );
+	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 'utilities',  'jquery', 'leaflet', 'leaflet-vectorgrid', 'leaflet-sync', 'tab-drawer', 'highcharts-highstock', 'highcharts-more', 'highcharts-exporting', 'highcharts-export-data', 'highcharts-offline-exporting', 'highcharts-accessibility' ), NULL, true );
 	
 	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'cdc', 'jquery-ui-slider' ), NULL, true );
 	
@@ -328,16 +328,15 @@ add_action ( 'wp_ajax_nopriv_cdc_get_random_var', 'cdc_get_random_var' );
 function cdc_get_location_by_coords () {
 	
 	if (
-		( isset ($_GET['lat'] ) && !empty ( $_GET['lat'] ) ) &&
-		( isset ($_GET['lng'] ) && !empty ( $_GET['lng'] ) )
+		( isset ( $_GET['lat'] ) && !empty ( $_GET['lat'] ) ) &&
+		( isset ( $_GET['lng'] ) && !empty ( $_GET['lng'] ) )
 	) {
 		
-		$lat = $_GET['lat'];
-		$lng = $_GET['lng'];
+		require_once locate_template ( 'resources/app/db.php' );
 		
-		echo $lat . ', ' . $lng;
+		$lat = floatval ( $_GET['lat'] );
+		$lng = floatval ( $_GET['lng'] );
 		
-		/*
 		// add _fr if needed
 		$term_append = ( $_GET['lang'] == 'fr' ) ? '_fr' : '';
 		
@@ -346,35 +345,129 @@ function cdc_get_location_by_coords () {
 			"geo_name", 
 			"gen_term" . $term_append . " as generic_term", 
 			"location", 
-			"province" . $term_append . " as province", 
+			"province" . $term_append, 
 			"lat", 
 			"lon"
 		);
-
+		
+		// $columns = implode ( ",", $columns );
 		$join = "";
 		
-		if ( $_GET['sealevel'] ) {
+		if ( $_GET['sealevel'] == 'true' ) {
 			$join = "JOIN all_areas_sealevel ON (all_areas.id_code=all_areas_sealevel.id_code)";
 		}
 
-		require_once locate_template('resources/app/db.php');
-
-		// range of coordinates to search between
-		$range = 0.1;
+		$ranges = [ 0.05, 0.1, 0.2 ];
+		$preferred_terms = [ 'Community' ];
+		$found_community = false;
 		
-		$main_query = mysqli_query($GLOBALS['vars']['con'], "SELECT " . implode(",", $columns) . ", DISTANCE_BETWEEN($lat, $lng, lat,lon) as distance FROM all_areas $join WHERE lat BETWEEN " . (round($lat, 2) - $range) . " AND " . (round($lat, 2) + $range) . " AND lon BETWEEN " . (round($lng, 2) - $range) . " AND " . (round($lng, 2) + $range) . " AND gen_term NOT IN ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector') ORDER BY DISTANCE LIMIT 1") or die (mysqli_error($GLOBALS['vars']['con']));
-
-		if ($main_query->num_rows > 0) {
-			$selected_place = mysqli_fetch_assoc ( $main_query );
-			return $selected_place;
-		} else {
-			return 'Point';
+		// gradually increase the range until we find a community
+		
+		foreach ( $ranges as $range ) {
+			
+			if ( $found_community == false ) {
+				$main_query = mysqli_query($GLOBALS['vars']['con'], "SELECT " . implode(",", $columns) . "
+				, DISTANCE_BETWEEN($lat, $lng, lat,lon) as distance
+				FROM all_areas
+				$join
+				WHERE lat BETWEEN " . (round($lat, 2) - $range) . " AND " . (round($lat, 2) + $range) . "
+				AND lon BETWEEN " . (round($lng, 2) - $range) . " AND " . (round($lng, 2) + $range) . "
+				AND gen_term NOT IN ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector')
+				ORDER BY DISTANCE
+				LIMIT 50") or die (mysqli_error($GLOBALS['vars']['con']));
+				
+				if ($main_query->num_rows > 0) {
+					
+					while ( $row = mysqli_fetch_assoc ( $main_query ) ) {
+						
+						if ( in_array ( $row['generic_term'], $preferred_terms ) ) {
+							$result = $row;
+							
+							// might be good to know
+							// what range is the community in from the click
+							$result['range'] = $range;
+							
+							// send back the original coords
+							$result['coords'] = [ $lat, $lng ];
+							
+							// lon -> lng
+							$result['lng'] = $result['lon'];
+							
+							// province abbreviation
+							$result['province_short'] = short_province ( $result['province'] );
+							
+							// nice name
+							$result['title'] = $result['geo_name'] . ', ' . $result['province_short'];
+							
+							$found_community = true;
+							
+							break;
+						}
+					}
+					
+				}
+				
+			}
+			
 		}
-*/
+		
+		if ( $found_community == true ) {
+			
+			// found a community in range
+			echo json_encode ( $result );
+			
+		} else {
+			
+			// no preferred results, grab the nearest one
+
+			// range of coordinates to search between
+			$range = 0.1;
+			
+			$main_query = mysqli_query($GLOBALS['vars']['con'], "SELECT " . implode(",", $columns) . "
+			, DISTANCE_BETWEEN($lat, $lng, lat,lon) as distance
+			FROM all_areas
+			$join
+			WHERE lat BETWEEN " . (round($lat, 2) - $range) . " AND " . (round($lat, 2) + $range) . "
+			AND lon BETWEEN " . (round($lng, 2) - $range) . " AND " . (round($lng, 2) + $range) . "
+			AND gen_term NOT IN ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector')
+			ORDER BY DISTANCE
+			LIMIT 1") or die (mysqli_error($GLOBALS['vars']['con']));
+			
+			if ($main_query->num_rows > 0) {
+				
+				$result = mysqli_fetch_assoc ( $main_query );
+				
+				$result['coords'] = [ $lat, $lng ];
+				$result['lng'] = $result['lon'];
+				$result['province_short'] = short_province ( $result['province'] );
+				$result['title'] = $result['geo_name'] . ', ' . $result['province_short'];
+				
+				echo json_encode ( $result );
+				
+			} else {
+				
+				echo json_encode ( array (
+					'lat' => $lat,
+					'lng' => $lng,
+					'geo_name' => __ ( 'Point', 'cdc' ),
+					'title' => __ ( 'Point', 'cdc' ) . ' (' . $lat . ', ' . $lng . ')'
+				) );
+				
+			}
+			
+		}
+		
 	} else {
-		return 'Point';
+		
+		echo json_encode ( array (
+			'lat' => $lat,
+			'lng' => $lng,
+			'geo_id' => '',
+			'geo_name' => __ ( 'Point', 'cdc' ),
+			'title' => __ ( 'Point', 'cdc' ) . ' (' . $lat . ', ' . $lng . ')'
+		) );
+		
 	}
-	
 	
 	wp_die();
 
@@ -382,3 +475,37 @@ function cdc_get_location_by_coords () {
 
 add_action ( 'wp_ajax_cdc_get_location_by_coords', 'cdc_get_location_by_coords' );
 add_action ( 'wp_ajax_nopriv_cdc_get_location_by_coords', 'cdc_get_location_by_coords' );
+
+// GET PROVINCE ABBREVIATION
+
+function short_province ( $province ) {
+		$provinces = array (
+			"British Columbia" => "BC",
+			"Colombie-Britannique" => "BC",
+			"Yukon" => "YT",
+			"Northwest Territories" => "NT",
+			"Territoires du Nord-Ouest" => "NT",
+			"Alberta" => "AB",
+			"Newfoundland and Labrador" => "NL",
+			"Terre-Neuve-et-Labrador" => "NL",
+			"Saskatchewan" => "SK",
+			"Ontario" => "ON",
+			"Manitoba" => "MB",
+			"Nova Scotia" => "NS",
+			"Nouvelle-Écosse" => "NS",
+			"Quebec" => "QC",
+			"Québec" => "QC",
+			"New Brunswick" => "NB",
+			"Nouveau-Brunswick" => "NB",
+			"Prince Edward Island" => "PE",
+			"Île-du-Prince-Édouard" => "PE",
+			"Nunavut" => "NU"
+		);
+
+		if ( array_key_exists ( $province, $provinces ) ) {
+			return $provinces[$province];
+		} else {
+			return $province;
+		}
+
+}

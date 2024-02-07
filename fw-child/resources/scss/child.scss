@@ -426,12 +426,15 @@ $control-slider-handle-width: 2.75rem;
     }
 
     .control-tab-head {
-      padding: 1rem;
+      flex: 0 0 calc(6.25vw - 1rem);
+      min-height: 3rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
       background-color: $gray-200;
     }
 
     .control-tab-body {
-      flex-grow: 1;
+      // flex-grow: 1;
       overflow: auto;
       // padding: 1rem;
     }

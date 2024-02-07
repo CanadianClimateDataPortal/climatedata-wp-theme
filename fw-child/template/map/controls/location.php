@@ -1,8 +1,8 @@
 <div id="location" class="tab-drawer">
 	<div class="tab-drawer-content">
 		<div class="tab-drawer-content-inner">
-			<div class="control-tab-head d-flex justify-content-between">
-				<h5>Location</h5>
+			<div class="control-tab-head d-flex align-items-center justify-content-between">
+				<h5 class="mb-0">Location</h5>
 				<span class="tab-drawer-close">&times;</span>
 			</div>
 			
@@ -11,7 +11,9 @@
 				<div id="map-control-search" class="map-control-item">
 					<label for="area-search"  class="h6 all-caps text-secondary">Search</label>
 					
-					<input type="text" class="form-control" name="area-search" placeholder="City, landmark or postal code">
+					<input type="hidden" name="area-location" id="area-location" data-query-key="location">
+					
+					<input type="text" class="form-control" name="area-search" id="area-search" placeholder="City, landmark or postal code">
 					<a href="#location-detail" class="tab-drawer-trigger">Detail</a>
 				</div>
 				

@@ -421,54 +421,36 @@ var result = {};
       item.on('select_map_item', function (e, click_event) {
         console.log('grid click', click_event);
 
-        // add marker
-
-        $(document).cdc_app(
-          'maps.add_marker',
-          click_event.latlng.lat,
-          click_event.latlng.lng,
-        );
-
         // load location details
 
-        $('#control-bar').tab_drawer('update_path', '#location-detail');
+        plugin.open_location(click_event.latlng);
+      });
 
-        item
-          .find('#location-detail .control-tab-head h5')
-          .text(click_event.latlng.lat + ', ' + click_event.latlng.lng);
+      // click marker
 
-        // console.log(options.var_data);
-
-        $.ajax({
-          url:
-            geoserver_url +
-            '/generate-charts/' +
+      item.on('click_marker', function (e, click_event) {
+        let list_item = item.find(
+          '#recent-locations [data-coords="' +
             click_event.latlng.lat +
-            '/' +
+            ',' +
             click_event.latlng.lng +
-            '/' +
-            options.query.var +
-            '/' +
-            options.query.frequency +
-            '?decimals=' +
-            options.var_data.acf.decimals +
-            '&dataset_name=' +
-            options.query.dataset,
-          dataType: 'json',
-          success: function (data) {
-            console.log('chart data', data);
+            '"]',
+        );
 
-            item.find('#chart-series-items .cloned').remove();
+        console.log('clicked a marker', click_event, list_item);
 
-            $(document).cdc_app('charts.render', {
-              data: data,
-              query: options.query,
-              var_data: options.var_data,
-              coords: click_event.latlng,
-              download_url: null,
-              container: item.find('#location-chart-container')[0],
-            });
-          },
+        list_item.trigger('click');
+      });
+
+      // click item in 'recent locations'
+
+      item.on('click', '#recent-locations .list-group-item', function () {
+        let item_coords = $(this).attr('data-coords').split(',');
+
+        plugin.open_location({
+          lat: item_coords[0],
+          lng: item_coords[1],
+          marker_index: $(this).attr('data-index'),
         });
       });
 
@@ -1119,6 +1101,84 @@ var result = {};
         .closest('.dropdown')
         .find('.dropdown-toggle .gradient')
         .attr('style', selected_item.find('.gradient').attr('style'));
+    },
+
+    open_location: function (coords) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      $.ajax({
+        url: ajax_data.url,
+        dataType: 'json',
+        data: {
+          action: 'cdc_get_location_by_coords',
+          lang: options.lang,
+          lat: coords.lat,
+          lng: coords.lng,
+          sealevel: false,
+        },
+        success: function (data) {
+          console.log('LOCATION');
+          console.log(data);
+
+          // add marker
+
+          $(document).cdc_app('maps.add_marker', data);
+
+          // search field value
+          if (data.geo_name != 'Point') {
+            item.find('#area-search').val(data.title);
+          }
+
+          // hidden input
+          item
+            .find('[data-query-key="location"]')
+            .val(data.geo_id)
+            .trigger('change');
+
+          // tab headings
+          item.find('#location-detail .control-tab-head h5').text(data.title);
+        },
+      }).then(function () {
+        console.log('load location now');
+
+        $('#control-bar').tab_drawer('update_path', '#location-detail');
+
+        // console.log(options.var_data);
+
+        $.ajax({
+          url:
+            geoserver_url +
+            '/generate-charts/' +
+            coords.lat +
+            '/' +
+            coords.lng +
+            '/' +
+            options.query.var +
+            '/' +
+            options.query.frequency +
+            '?decimals=' +
+            options.var_data.acf.decimals +
+            '&dataset_name=' +
+            options.query.dataset,
+          dataType: 'json',
+          success: function (data) {
+            console.log('chart data', data);
+
+            item.find('#chart-series-items .cloned').remove();
+
+            $(document).cdc_app('charts.render', {
+              data: data,
+              query: options.query,
+              var_data: options.var_data,
+              coords: coords,
+              download_url: null,
+              container: item.find('#location-chart-container')[0],
+            });
+          },
+        });
+      });
     },
   };
 

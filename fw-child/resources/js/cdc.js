@@ -260,7 +260,7 @@
           this_object.getPane('raster').style.pointerEvents = 'none';
 
           this_object.createPane('grid');
-          this_object.getPane('grid').style.zIndex = 500;
+          this_object.getPane('grid').style.zIndex = 499;
           this_object.getPane('grid').style.pointerEvents = 'all';
 
           this_object.createPane('labels');
@@ -362,8 +362,12 @@
                 this_map.layers.raster &&
                 this_map.object.hasLayer(this_map.layers.raster)
               ) {
+                if (!this_map.layers.raster.hasOwnProperty('cdc_params')) {
+                  this_map.layers.raster.cdc_params = {};
+                }
+
                 // if any map parameters have changed
-                if (!_.isEqual(map.layers.raster.cdc_params, params)) {
+                if (!_.isEqual(this_map.layers.raster.cdc_params, params)) {
                   // update existing
                   this_map.layers.raster.setParams(params);
                   this_map.layers.raster.cdc_params = $.extend({}, params);
@@ -457,10 +461,10 @@
             plugin.maps.do_legend.apply(item, [
               query,
               function () {
-                for (let key in options.maps) {
-                  let this_map = options.maps[key];
+                Object.keys(options.maps).forEach(function (key) {
+                  console.log('key', key);
 
-                  // console.log(key, scenario_names[query.dataset][key]);
+                  let this_map = options.maps[key];
 
                   let choro_path =
                     geoserver_url +
@@ -482,43 +486,39 @@
                     '&decimals=' +
                     var_data.acf.decimals;
 
+                  console.log('get data');
+
                   $.ajax({
                     url: choro_path,
                     dataType: 'json',
                     async: false,
                     success: function (data) {
                       options.choro.data[key] = data;
+                      console.log('done');
                     },
                   });
-                }
 
-                console.log('choro data', options.choro.data);
-
-                for (let key in options.maps) {
-                  let this_map = options.maps[key];
-
-                  console.log('---');
-                  console.log('map ' + key);
-
+                  // remove raster layer
                   if (
                     options.maps[key].layers.raster &&
                     options.maps[key].object.hasLayer(
                       options.maps[key].layers.raster,
                     )
                   ) {
-                    console.log('raster layer exists');
+                    // console.log('raster layer exists');
                     options.maps[key].object.removeLayer(
                       this_map.layers.raster,
                     );
                     options.maps[key].object.removeLayer(this_map.layers.grid);
                   }
 
+                  // are we swapping between sectors
                   if (options.current_sector != query.sector) {
-                    console.log('new sector');
+                    console.log('change sector');
 
                     // sector has changed, remove the layer entirely
-                    options.current_sector = query.sector;
 
+                    // remove the old layer
                     options.maps[key].object.removeLayer(
                       options.maps[key].layers.grid,
                     );
@@ -530,12 +530,6 @@
                       options.maps[key].layers.grid,
                     )
                   ) {
-                    console.log(
-                      'has layer, reset ' +
-                        options.choro.data[key].length +
-                        ' features',
-                    );
-
                     // same sector, but the grid layer already exists,
                     // so reset each feature
 
@@ -620,8 +614,54 @@
 
                       .addTo(options.maps[key].object);
                   }
+                });
 
-                  options.current_sector = query.sector;
+                // update current
+                options.current_sector = query.sector;
+
+                /*
+                for (let key in options.maps) {
+                  let this_map = options.maps[key];
+
+                  // console.log(key, scenario_names[query.dataset][key]);
+
+                  let choro_path =
+                    geoserver_url +
+                    '/get-choro-values/' +
+                    query.sector +
+                    '/' +
+                    query.var +
+                    '/' +
+                    scenario_names[query.dataset][key]
+                      .replace(/[\W_]+/g, '')
+                      .toLowerCase() +
+                    '/' +
+                    query.frequency +
+                    '/?period=' +
+                    (parseInt(query.decade) + 1) +
+                    (query.delta == 'true' ? '&delta7100=true' : '') +
+                    '&dataset_name=' +
+                    query.dataset +
+                    '&decimals=' +
+                    var_data.acf.decimals;
+
+                  $.ajax({
+                    url: choro_path,
+                    dataType: 'json',
+                    async: false,
+                    success: function (data) {
+                      options.choro.data[key] = data;
+                    },
+                  });
+                }*/
+
+                // console.log('choro data', options.choro.data);
+
+                for (let key in options.maps) {
+                  let this_map = options.maps[key];
+
+                  // console.log('---');
+                  // console.log('map ' + key);
                 }
               },
             ]);
@@ -882,7 +922,7 @@
         }
       },
 
-      add_marker: function (location) {
+      add_marker: function (location, callback = null) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           item = plugin.item,
           options = plugin.options;
@@ -993,6 +1033,22 @@
               }
             });
           }
+
+          // pan
+          // doesn't work as-is, come back later
+          // let offset = options.maps['low'].object.getSize().x * 0.75;
+          //
+          // console.log('offset', offset);
+          //
+          // options.maps['low'].object
+          //   .panTo(location.coords, { animate: false })
+          //   .panBy(new L.Point(offset, 0), {
+          //     animate: false,
+          //   });
+
+          if (typeof callback == 'function') {
+            callback(data);
+          }
         }
       },
     },
@@ -1088,8 +1144,8 @@
             query.scenarios = [query.scenarios];
           }
 
-          console.log('merged query');
-          console.log(JSON.stringify(query, null, 4));
+          // console.log('merged query');
+          // console.log(JSON.stringify(query, null, 4));
         }
 
         // set cdc_app's options.query too
@@ -1919,7 +1975,7 @@
           xhr.setRequestHeader('X-WP-Nonce', ajax_data.rest_nonce);
         },
         success: function (data) {
-          // console.log('wp-json var data', data);
+          console.log('wp-json var data', data);
 
           let var_title =
             options.lang != 'en' ? data.meta.title_fr : data.title.rendered;

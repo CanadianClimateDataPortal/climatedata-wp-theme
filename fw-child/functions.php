@@ -88,6 +88,10 @@ function child_theme_enqueue() {
 	
 	// VENDOR
 	
+	// lodash
+	
+	wp_register_script ( 'lodash-full', $child_vendor_dir . 'lodash.js', NULL, NULL, true );
+	
 	// tab drawer
 	
 	wp_register_script ( 'tab-drawer', $child_vendor_dir . 'pe-tab-drawer/tab-drawer.js', array ( 'jquery' ), NULL, true );
@@ -115,7 +119,7 @@ function child_theme_enqueue() {
 	
 	wp_register_script ( 'utilities', $child_js_dir . 'utilities.js', array ( 'jquery' ), NULL, true );
 	
-	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 'utilities',  'jquery', 'leaflet', 'leaflet-vectorgrid', 'leaflet-sync', 'tab-drawer', 'highcharts-highstock', 'highcharts-more', 'highcharts-exporting', 'highcharts-export-data', 'highcharts-offline-exporting', 'highcharts-accessibility' ), NULL, true );
+	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 'utilities', 'lodash-full', 'jquery', 'leaflet', 'leaflet-vectorgrid', 'leaflet-sync', 'tab-drawer', 'highcharts-highstock', 'highcharts-more', 'highcharts-exporting', 'highcharts-export-data', 'highcharts-offline-exporting', 'highcharts-accessibility' ), NULL, true );
 	
 	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'cdc', 'jquery-ui-slider' ), NULL, true );
 	
@@ -358,7 +362,7 @@ function cdc_get_location_by_coords () {
 		}
 
 		$ranges = [ 0.05, 0.1, 0.2 ];
-		$preferred_terms = [ 'Community' ];
+		$preferred_terms = [ 'Community', 'Metropolitan Area' ];
 		$found_community = false;
 		
 		// gradually increase the range until we find a community

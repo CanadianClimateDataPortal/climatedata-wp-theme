@@ -332,6 +332,20 @@
               // raster
               let this_map = options.maps[key];
 
+              this_map.layer_name =
+                  'CDC:' +
+                  (query.dataset == 'cmip6' ? query.dataset + '-' : '') +
+                  query.var +
+                  '-' +
+                  period_frequency_lut[query.frequency] +
+                  '-' +
+                  scenario_names[query.dataset][key]
+                    .replace(/[\W_]+/g, '')
+                    .toLowerCase() +
+                  '-p50-' +
+                  query.frequency +
+                  '-30year';
+
               let params = {
                 format: 'image/png',
                 opacity: 1,
@@ -340,19 +354,7 @@
                 pane: 'raster',
                 version: query.dataset == 'cmip6' ? '1.3.0' : '1.1.1',
                 bounds: options.canadaBounds,
-                layers:
-                  'CDC:' +
-                  (query.dataset == 'cmip6' ? query.dataset + '-' : '') +
-                  query.var +
-                  '-' +
-                  (query.frequency == 'ann' ? 'ys' : 'ms') +
-                  '-' +
-                  scenario_names[query.dataset][key]
-                    .replace(/[\W_]+/g, '')
-                    .toLowerCase() +
-                  '-p50-' +
-                  query.frequency +
-                  '-30year',
+                layers: this_map.layer_name,
                 TIME: parseInt(query.decade) + '-01-00T00:00:00Z',
               };
 
@@ -675,24 +677,7 @@
 
         // sample result: cmip6-HXmax30-ys-ssp585-p50-ann-30year
 
-        let msorys;
-
-        switch (query.frequency) {
-          case 'ann':
-            msorys = 'ys';
-            break;
-          case 'spring':
-          case 'summer':
-          case 'fall':
-          case 'winter':
-            msorys = 'qsdec';
-            break;
-          case '2qsapr':
-            msorys = '2qsapr';
-            break;
-          default:
-            msorys = 'ms';
-        }
+        let msorys = period_frequency_lut[query.frequency];
 
         options.layer_name =
           (query.dataset == 'cmip6' ? 'cmip6-' : '') +

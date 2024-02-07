@@ -5,6 +5,9 @@
 // const geoserver_url = 'https://data.climatedata.ca';
 const geoserver_url = 'https://dataclimatedata.crim.ca';
 
+const svgNS = "http://www.w3.org/2000/svg";
+
+
 const canadaCenter = [62.51231793838694, -98.48144531250001];
 const scenario_names = {
   cmip5: {
@@ -273,6 +276,26 @@ month_number_lut = {
   summer: 6,
   fall: 9,
 };
+
+const period_frequency_lut = {
+  'ann': 'ys',
+  'jan': 'ms',
+  'feb': 'ms',
+  'mar': 'ms',
+  'apr': 'ms',
+  'may': 'ms',
+  'jun': 'ms',
+  'jul': 'ms',
+  'aug': 'ms',
+  'sep': 'ms',
+  'oct': 'ms',
+  'nov': 'ms',
+  'dec': 'ms',
+  'spring': 'qsdec',
+  'summer': 'qsdec',
+  'fall': 'qsdec',
+  'winter': 'qsdec'
+}
 
 /**
  * Perform a string lookup in l10n_table in current language, returns it if found, otherwise return the original string

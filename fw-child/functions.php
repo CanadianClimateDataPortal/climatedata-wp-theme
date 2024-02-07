@@ -119,9 +119,11 @@ function child_theme_enqueue() {
 	
 	wp_register_script ( 'utilities', $child_js_dir . 'utilities.js', array ( 'jquery' ), NULL, true );
 	
-	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 'utilities', 'lodash-full', 'jquery', 'leaflet', 'leaflet-vectorgrid', 'leaflet-sync', 'tab-drawer', 'highcharts-highstock', 'highcharts-more', 'highcharts-exporting', 'highcharts-export-data', 'highcharts-offline-exporting', 'highcharts-accessibility' ), NULL, true );
+  wp_register_script ( 'data', $child_js_dir . 'data.js', array (  ), NULL, true );
+
+	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 'utilities', 'data', 'lodash-full', 'jquery', 'leaflet', 'leaflet-vectorgrid', 'leaflet-sync', 'tab-drawer', 'highcharts-highstock', 'highcharts-more', 'highcharts-exporting', 'highcharts-export-data', 'highcharts-offline-exporting', 'highcharts-accessibility' ), NULL, true );
 	
-	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'cdc', 'jquery-ui-slider' ), NULL, true );
+	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'cdc', 'data', 'jquery-ui-slider' ), NULL, true );
 	
 	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'cdc', 'jquery-ui-slider' ), NULL, true );
 	

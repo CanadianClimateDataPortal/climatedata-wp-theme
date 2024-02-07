@@ -47,7 +47,7 @@ var result = {};
         scenarios: ['medium'],
         decade: 2040,
         sector: 'canadagrid',
-        scheme: 'scheme1',
+        scheme: 'default',
       },
       query_str: {
         prev: '',
@@ -607,6 +607,9 @@ var result = {};
         case 'var_id':
           plugin.update_var(this_val, status);
           break;
+        case 'frequency':
+          plugin.update_default_scheme();
+          break;
         case 'scenarios':
           // ssp1/2/5 switches
 
@@ -1103,10 +1106,45 @@ var result = {};
       if (!options.var_data.acf.timestep.includes(options.query.frequency)) {
         // console.log('select first', frequency_select.find('option').first());
 
-        frequency_select
-          .val(frequency_select.find('option').first().attr('value'))
-          .trigger('change');
+        frequency_select.val(frequency_select.find('option').first().attr('value'));
       }
+      frequency_select.trigger('change');
+    },
+
+    redraw_colour_scheme: function(element) {
+      let plugin = this,
+          options = plugin.options,
+          item = plugin.item;
+
+      $(element).find('svg').empty();
+      let colours = $(element).data('scheme-colours');
+      let interval = (100 / colours.length);
+      $.each(colours, function (idx, colour) {
+        let rect = document.createElementNS(svgNS, 'rect');
+        rect.setAttribute('height', '100%');
+        rect.setAttribute('width', (interval + 1) + '%');
+        rect.setAttribute('x', (interval * idx) + '%');
+        rect.setAttribute('fill', colour);
+        $(element).find('svg').append(rect);
+      });
+    },
+
+    // fetch colours of default scheme from Geoserver and update the data of the default
+    // one in the dropdown
+    update_default_scheme: function () {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      $.getJSON(geoserver_url + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic" +
+        "&format=application/json&layer=" + options.maps.high.layer_name).then(function (data) {
+
+        let colour_map = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
+
+        item.find('#display-scheme-select .dropdown-item[data-scheme-id="default"]')
+          .data('scheme-colours', colour_map.map(e => e.color));
+        plugin.update_scheme();
+      });
     },
 
     update_scheme: function () {
@@ -1120,8 +1158,8 @@ var result = {};
 
       let selected_item = item.find(
           '#display-scheme-select .dropdown-item[data-scheme-id="' +
-            options.query.scheme +
-            '"]',
+          options.query.scheme +
+          '"]',
         ),
         discrete_btns = selected_item
           .closest('.map-control-item')
@@ -1142,11 +1180,81 @@ var result = {};
         discrete_btns.removeClass('disabled');
       }
 
-      // copy item style to toggle
+      // copy item data to toggle
       selected_item
         .closest('.dropdown')
-        .find('.dropdown-toggle .gradient')
-        .attr('style', selected_item.find('.gradient').attr('style'));
+        .find('.dropdown-toggle').data(selected_item.data());
+
+      // redraw the schemes
+      item.find('#display-scheme-select .scheme-dropdown').each(function () {
+        plugin.redraw_colour_scheme(this);
+      });
+
+      // update map layers
+      $.each(options.maps, function(k, map) {
+        let raster_layer = map.layers.raster;
+        if (raster_layer != null) {
+          if (selected_item.hasClass('default')) {
+            raster_layer.setParams({
+              styles: "",
+              tiled: true,
+            });
+          } else {
+            raster_layer.setParams({
+              tiled: false,
+              sld_body: plugin.generate_sld(map.layer_name,
+                selected_item.data('scheme-colours'),
+                variables_data[options.query.var][period_frequency_lut[options.query.frequency]],
+                selected_item.data('scheme-type'),
+                false) // TODO
+            });
+          }
+        }
+      });
+
+
+    },
+
+    generate_sld: function(layer_name, colours, variable_data, type, discrete) {
+      let colormap_type = discrete ? 'intervals' : 'ramp';
+      let low = variable_data.low;
+      let high = variable_data.high;
+      let kelvin_convert = 0;
+      let scheme_length = colours.length;
+
+      // if we have a diverging ramp, we center the legend at zero
+      if (type == 'diverging') {
+        high = Math.max(Math.abs(low), Math.abs(high));
+        low = high * -1;
+      }
+
+      // temperature data files are in Kelvin
+      if (variable_data.unit == 'K') {
+        low += 273.15
+        high += 273.15
+      }
+
+      let step = (high - low) / scheme_length;
+
+        let sld_body = `<?xml version="1.0" encoding="UTF-8"?>
+        <StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"
+        xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd">
+        <NamedLayer><Name>${layer_name}</Name><UserStyle><IsDefault>1</IsDefault><FeatureTypeStyle><Rule><RasterSymbolizer>
+        <Opacity>1.0</Opacity><ColorMap type="${colormap_type}">`
+
+      for (let i = 0; i < scheme_length; i++) {
+        if (discrete && i == scheme_length -1) {
+          // we need a virtually high value for highest bucket, otherwise it will be blank
+          sld_body += `<ColorMapEntry color="${colours[i]}" quantity="${(high + 1) * (high + 1)}"/>`;
+        } else {
+          sld_body += `<ColorMapEntry color="${colours[i]}" quantity="${low + (i * step)}"/>`;
+        }
+      }
+
+      sld_body += '</ColorMap></RasterSymbolizer></Rule></FeatureTypeStyle></UserStyle></NamedLayer></StyledLayerDescriptor>';
+      return sld_body;
+
     },
 
     open_location: function (coords) {

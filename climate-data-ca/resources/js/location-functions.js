@@ -358,6 +358,12 @@
         })
 
         //console.log('end of location-functions');
+        $.fn.prepare_raster = function(){
+            $('#main-header').remove();
+            $('.chart-tour-trigger').remove();
+            $('.var-chart').first().addClass('to-raster');
+        };
+
 
     });
 })(jQuery);

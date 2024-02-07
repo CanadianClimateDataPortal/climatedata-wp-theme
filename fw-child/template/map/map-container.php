@@ -25,7 +25,7 @@
 			</div>
 			
 			<div id="map-control-time" class="flex-grow-1 d-flex align-items-center px-3">
-				<div class="">1970</div>
+				<div id="decade-slider-min">1970</div>
 				
 				<div class="flex-grow-1 d-flex">
 					<label for="decade" class="form-label sr-only">Decade</label>
@@ -37,7 +37,7 @@
 					</div>
 				</div>
 				
-				<div class="">2100</div>
+				<div id="decade-slider-max">2100</div>
 			</div>
 			
 		</div>

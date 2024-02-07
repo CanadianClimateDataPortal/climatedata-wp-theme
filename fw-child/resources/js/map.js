@@ -258,15 +258,16 @@ var result = {};
       // decade
 
       options.elements.decade_slider = $('#decade-slider').slider({
-        min: 1970,
+        min: 1950,
         max: 2100,
         step: 10,
+        animate: true,
         create: function () {
           let val = $(this).slider('value');
 
           $(this)
             .find('.ui-slider-handle span')
-            .text(val + '–' + (val + 10));
+            .text(val + 1 + '–' + (val + 30));
 
           $('[data-query-key="decade"]').val(val).trigger('change');
         },
@@ -276,7 +277,7 @@ var result = {};
 
           $(this)
             .find('.ui-slider-handle span')
-            .text(ui.value + '–' + (ui.value + 10));
+            .text(ui.value + 1 + '–' + (ui.value + 30));
 
           let clone_query = { ...options.query };
 
@@ -299,7 +300,7 @@ var result = {};
           // so this input change will fire the history push
           $(this)
             .find('.ui-slider-handle span')
-            .text(ui.value + '–' + (ui.value + 10));
+            .text(ui.value + 1 + '–' + (ui.value + 30));
 
           $('[data-query-key="decade"]').val(ui.value).trigger('change');
         },
@@ -913,6 +914,51 @@ var result = {};
 
             // setup slider and custom inputs
 
+            // decade min/max
+
+            options.elements.decade_slider.slider(
+              'option',
+              'min',
+              options.var_data.acf.time_slider_min_value,
+            );
+
+            options.elements.decade_slider.slider(
+              'option',
+              'max',
+              options.var_data.acf.time_slider_max_value,
+            );
+
+            // slider min/max labels
+
+            item
+              .find('#decade-slider-min')
+              .text(options.var_data.acf.time_slider_min_value);
+            item
+              .find('#decade-slider-max')
+              .text(options.var_data.acf.time_slider_max_value + 30);
+
+            // validate slider value
+
+            if (
+              options.elements.decade_slider.slider('value') >
+              options.var_data.acf.time_slider_max_value
+            ) {
+              options.elements.decade_slider.slider(
+                'value',
+                options.var_data.acf.time_slider_max_value,
+              );
+            }
+
+            if (
+              options.elements.decade_slider.slider('value') <
+              options.var_data.acf.time_slider_min_value
+            ) {
+              options.elements.decade_slider.slider(
+                'value',
+                options.var_data.acf.time_slider_min_value,
+              );
+            }
+
             if (options.var_data.acf.var_names.length > 1) {
               // multiple vars
 
@@ -1124,7 +1170,7 @@ var result = {};
 
           // add marker
 
-          $(document).cdc_app('maps.add_marker', data);
+          $(document).cdc_app('maps.add_marker', data, function () {});
 
           // search field value
           if (data.geo_name != 'Point') {

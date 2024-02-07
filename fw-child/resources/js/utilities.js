@@ -19,10 +19,9 @@ const scenario_names = {
   },
 };
 
-var units = null;
+let units = null;
 if (unit_strings) units = unit_strings;
 const UNITS = units;
-console.log('UNITS', UNITS);
 
 const DATASETS = {
   cmip5: {

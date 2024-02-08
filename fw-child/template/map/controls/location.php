@@ -14,7 +14,7 @@
 					<input type="hidden" name="area-location" id="area-location" data-query-key="location">
 					
 					<input type="text" class="form-control" name="area-search" id="area-search" placeholder="City, landmark or postal code">
-					<a href="#location-detail" class="tab-drawer-trigger">Detail</a>
+					
 				</div>
 				
 				<div id="map-control-recent" class="map-control-item">

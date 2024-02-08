@@ -6,6 +6,9 @@ if (typeof L !== 'undefined') {
   };
 }
 
+// make $ available in devtools
+const $ = jQuery;
+
 (function ($) {
   $(function () {
     if ($('body').attr('id') == 'page-map') {

@@ -386,6 +386,13 @@ body.tab-drawer-open {
   }
 }
 
+#recent-locations {
+  --bs-list-group-bg: transparent;
+  --bs-list-group-active-bg: #{$white};
+  --bs-list-group-active-border-color: #{$gray-400};
+  --bs-list-group-active-color: #{$body-color};
+}
+
 //
 // DOWNLOAD
 //

@@ -114,6 +114,10 @@
         unit: null,
         download_url: null,
       },
+      icons: {
+        default: null,
+        small: null,
+      },
       debug: true,
     };
 
@@ -144,6 +148,29 @@
       //
       // MAP
       //
+
+      options.icons.default = L.icon({
+        iconUrl: '/site/assets/themes/fw-child/resources/img/marker-icon.png',
+        shadowUrl:
+          '/site/assets/themes/fw-child/resources/img/marker-shadow.png',
+        iconSize: [32, 40],
+        shadowSize: [32, 40],
+        iconAnchor: [10, 40],
+        shadowAnchor: [10, 40],
+        popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
+      });
+
+      options.icons.small = L.icon({
+        iconUrl:
+          '/site/assets/themes/fw-child/resources/img/marker-sm-icon.png',
+        shadowUrl:
+          '/site/assets/themes/fw-child/resources/img/marker-sm-shadow.png',
+        iconSize: [16, 20],
+        shadowSize: [16, 20],
+        iconAnchor: [5, 20],
+        shadowAnchor: [5, 20],
+        popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
+      });
 
       //
       // TABS
@@ -233,7 +260,7 @@
           this_object.getPane('raster').style.pointerEvents = 'none';
 
           this_object.createPane('grid');
-          this_object.getPane('grid').style.zIndex = 500;
+          this_object.getPane('grid').style.zIndex = 499;
           this_object.getPane('grid').style.pointerEvents = 'all';
 
           this_object.createPane('labels');
@@ -305,6 +332,20 @@
               // raster
               let this_map = options.maps[key];
 
+              this_map.layer_name =
+                'CDC:' +
+                (query.dataset == 'cmip6' ? query.dataset + '-' : '') +
+                query.var +
+                '-' +
+                period_frequency_lut[query.frequency] +
+                '-' +
+                scenario_names[query.dataset][key]
+                  .replace(/[\W_]+/g, '')
+                  .toLowerCase() +
+                '-p50-' +
+                query.frequency +
+                '-30year';
+
               let params = {
                 format: 'image/png',
                 opacity: 1,
@@ -313,28 +354,26 @@
                 pane: 'raster',
                 version: query.dataset == 'cmip6' ? '1.3.0' : '1.1.1',
                 bounds: options.canadaBounds,
-                layers:
-                  'CDC:' +
-                  (query.dataset == 'cmip6' ? query.dataset + '-' : '') +
-                  query.var +
-                  '-' +
-                  (query.frequency == 'ann' ? 'ys' : 'ms') +
-                  '-' +
-                  scenario_names[query.dataset][key]
-                    .replace(/[\W_]+/g, '')
-                    .toLowerCase() +
-                  '-p50-' +
-                  query.frequency +
-                  '-30year',
+                layers: this_map.layer_name,
                 TIME: parseInt(query.decade) + '-01-00T00:00:00Z',
               };
+
+              //
 
               if (
                 this_map.layers.raster &&
                 this_map.object.hasLayer(this_map.layers.raster)
               ) {
-                // update existing
-                this_map.layers.raster.setParams(params);
+                if (!this_map.layers.raster.hasOwnProperty('cdc_params')) {
+                  this_map.layers.raster.cdc_params = {};
+                }
+
+                // if any map parameters have changed
+                if (!_.isEqual(this_map.layers.raster.cdc_params, params)) {
+                  // update existing
+                  this_map.layers.raster.setParams(params);
+                  this_map.layers.raster.cdc_params = $.extend({}, params);
+                }
               } else {
                 // create layer
                 this_map.layers.raster = L.tileLayer
@@ -362,12 +401,12 @@
                 // grid layer does exist
                 // and needs to be removed
 
-                console.log('remove choro');
+                // console.log('remove choro');
                 this_map.object.removeLayer(this_map.layers.grid);
               }
 
               if (do_grid == true) {
-                console.log('new grid layer');
+                // console.log('new grid layer');
                 let new_layer = L.vectorGrid.protobuf(
                   geoserver_url +
                     '/geoserver/gwc/service/tms/1.0.0/CDC:' +
@@ -416,18 +455,13 @@
           default:
             // choropleth
 
-            console.log('CHORO TIME');
-
-            // console.log('query sector', query.sector);
-            // console.log('current sector', options.current_sector);
-
             plugin.maps.do_legend.apply(item, [
               query,
               function () {
-                for (let key in options.maps) {
-                  let this_map = options.maps[key];
+                Object.keys(options.maps).forEach(function (key) {
+                  // console.log('key', key);
 
-                  // console.log(key, scenario_names[query.dataset][key]);
+                  let this_map = options.maps[key];
 
                   let choro_path =
                     geoserver_url +
@@ -449,43 +483,39 @@
                     '&decimals=' +
                     var_data.acf.decimals;
 
+                  // console.log('get choro data');
+
                   $.ajax({
                     url: choro_path,
                     dataType: 'json',
                     async: false,
                     success: function (data) {
                       options.choro.data[key] = data;
+                      // console.log('done');
                     },
                   });
-                }
 
-                console.log('choro data', options.choro.data);
-
-                for (let key in options.maps) {
-                  let this_map = options.maps[key];
-
-                  console.log('---');
-                  console.log('map ' + key);
-
+                  // remove raster layer
                   if (
                     options.maps[key].layers.raster &&
                     options.maps[key].object.hasLayer(
                       options.maps[key].layers.raster,
                     )
                   ) {
-                    console.log('raster layer exists');
+                    // console.log('raster layer exists');
                     options.maps[key].object.removeLayer(
                       this_map.layers.raster,
                     );
                     options.maps[key].object.removeLayer(this_map.layers.grid);
                   }
 
+                  // are we swapping between sectors
                   if (options.current_sector != query.sector) {
-                    console.log('new sector');
+                    console.log('change sector');
 
                     // sector has changed, remove the layer entirely
-                    options.current_sector = query.sector;
 
+                    // remove the old layer
                     options.maps[key].object.removeLayer(
                       options.maps[key].layers.grid,
                     );
@@ -497,12 +527,6 @@
                       options.maps[key].layers.grid,
                     )
                   ) {
-                    console.log(
-                      'has layer, reset ' +
-                        options.choro.data[key].length +
-                        ' features',
-                    );
-
                     // same sector, but the grid layer already exists,
                     // so reset each feature
 
@@ -587,9 +611,10 @@
 
                       .addTo(options.maps[key].object);
                   }
+                });
 
-                  options.current_sector = query.sector;
-                }
+                // update current
+                options.current_sector = query.sector;
               },
             ]);
         }
@@ -602,24 +627,7 @@
 
         // sample result: cmip6-HXmax30-ys-ssp585-p50-ann-30year
 
-        let msorys;
-
-        switch (query.frequency) {
-          case 'ann':
-            msorys = 'ys';
-            break;
-          case 'spring':
-          case 'summer':
-          case 'fall':
-          case 'winter':
-            msorys = 'qsdec';
-            break;
-          case '2qsapr':
-            msorys = '2qsapr';
-            break;
-          default:
-            msorys = 'ms';
-        }
+        let msorys = period_frequency_lut[query.frequency];
 
         options.layer_name =
           (query.dataset == 'cmip6' ? 'cmip6-' : '') +
@@ -849,44 +857,126 @@
         }
       },
 
-      add_marker: function (lat, lng) {
+      add_marker: function (location, callback = null) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           item = plugin.item,
           options = plugin.options;
 
-        let popped = false;
+        let recent_list = item.find('#recent-locations'),
+          popped = false;
 
-        for (let key in options.maps) {
-          let new_marker = new L.Marker([lat, lng]),
-            popped_marker = null;
+        console.log('add marker', location.coords.join(','), location);
 
-          if (options.grid.markers[key] == undefined) {
-            options.grid.markers[key] = [];
+        // remove any existing 'active' class
+        recent_list.find('.list-group-item').removeClass('active');
+
+        if (
+          recent_list.find('[data-coords="' + location.coords.join(',') + '"]')
+            .length
+        ) {
+          // marker already exists
+
+          // select the item
+
+          let recent_item = recent_list.find(
+            '[data-coords="' + location.coords.join(',') + '"]',
+          );
+
+          let marker_index = parseInt($(recent_item).attr('data-index'));
+
+          let this_marker = options.grid.markers['low'][marker_index];
+
+          recent_item.addClass('active');
+
+          // swap markers
+
+          for (let key in options.maps) {
+            options.grid.markers[key].forEach(function (marker, i) {
+              if (i == marker_index) {
+                marker.setIcon(options.icons.default);
+              } else {
+                marker.setIcon(options.icons.small);
+              }
+            });
+          }
+        } else {
+          // marker doesn't exist, add a new one
+
+          for (let key in options.maps) {
+            let new_marker = new L.Marker(location.coords, {
+                icon: options.icons.default,
+              }),
+              popped_marker = null;
+
+            if (options.grid.markers[key] == undefined) {
+              options.grid.markers[key] = [];
+            }
+
+            // add new marker to beginning of array
+            options.grid.markers[key].unshift(new_marker);
+
+            if (options.grid.markers[key].length > 5) {
+              // pop the last if there are more than 5
+              popped_marker = options.grid.markers[key].pop();
+              popped = true;
+
+              options.maps[key].object.removeLayer(popped_marker);
+            }
+
+            new_marker
+              .on('click', function (e) {
+                $(document).trigger('click_marker', [e]);
+              })
+              .addTo(options.maps[key].object);
           }
 
-          // add new marker to beginning of array
-          options.grid.markers[key].unshift(new_marker);
-
-          if (options.grid.markers[key].length > 5) {
-            // pop the last if there are more than 5
-            popped_marker = options.grid.markers[key].pop();
-            popped = true;
-
-            options.maps[key].object.removeLayer(popped_marker);
+          if (popped == true) {
+            // remove last from recents
+            recent_list.find('.list-group-item').last().remove();
           }
 
-          new_marker.addTo(options.maps[key].object);
-        }
+          // add location to recents
 
-        if (popped == true) {
-          // remove last from recents
-          item.find('#recent-locations .list-group-item').last().remove();
-        }
+          recent_list.prepend(
+            '<button class="list-group-item list-group-item-action active" data-location="' +
+              location.geo_id +
+              '" data-coords="' +
+              location.coords.join(',') +
+              '">' +
+              location.title +
+              '</button>',
+          );
 
-        // add location to recents
-        item
-          .find('#recent-locations')
-          .prepend('<li class="list-group-item">' + lat + ', ' + lng + '</li>');
+          recent_list.find('.list-group-item').each(function (i) {
+            $(this).attr('data-index', i);
+          });
+
+          // swap markers
+
+          for (let key in options.maps) {
+            options.grid.markers[key].forEach(function (marker, i) {
+              if (i != 0) {
+                marker.setIcon(options.icons.small);
+              }
+            });
+          }
+
+          // pan
+          // doesn't work as-is, come back later
+          // let offset = options.maps['low'].object.getSize().x * 0.75;
+          //
+          // console.log('offset', offset);
+          //
+          // options.maps['low'].object
+          //   .panTo(location.coords, { animate: false })
+          //   .panBy(new L.Point(offset, 0), {
+          //     animate: false,
+          //   });
+
+          if (typeof callback == 'function') {
+            callback(data);
+          }
+        }
       },
     },
 
@@ -981,8 +1071,8 @@
             query.scenarios = [query.scenarios];
           }
 
-          console.log('merged query');
-          console.log(JSON.stringify(query, null, 4));
+          // console.log('merged query');
+          // console.log(JSON.stringify(query, null, 4));
         }
 
         // set cdc_app's options.query too
@@ -1812,15 +1902,14 @@
           xhr.setRequestHeader('X-WP-Nonce', ajax_data.rest_nonce);
         },
         success: function (data) {
-          // console.log('wp-json var data', data);
+          console.log('wp-json var data', data);
+
+          let var_title =
+            options.lang != 'en' ? data.meta.title_fr : data.title.rendered;
 
           // update the control button
 
-          item
-            .find('.tab-drawer-trigger.var-name')
-            .text(
-              options.lang != 'en' ? data.meta.title_fr : data.title.rendered,
-            );
+          item.find('.tab-drawer-trigger.var-name').text(var_title);
 
           if (typeof data.acf.var_names != 'undefined') {
             if (data.acf.var_names.length == 1) {
@@ -1830,6 +1919,10 @@
               item.find('#var-thresholds').show();
             }
           }
+
+          // update var name in #location-detail
+
+          item.find('#location-detail .variable-name').text(var_title);
 
           if (typeof callback == 'function') {
             callback(data);

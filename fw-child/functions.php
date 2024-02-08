@@ -331,6 +331,8 @@ function cdc_get_random_var() {
 add_action ( 'wp_ajax_cdc_get_random_var', 'cdc_get_random_var' );
 add_action ( 'wp_ajax_nopriv_cdc_get_random_var', 'cdc_get_random_var' );
 
+// get location by lat/lng
+
 function cdc_get_location_by_coords () {
 	
 	if (
@@ -481,6 +483,53 @@ function cdc_get_location_by_coords () {
 
 add_action ( 'wp_ajax_cdc_get_location_by_coords', 'cdc_get_location_by_coords' );
 add_action ( 'wp_ajax_nopriv_cdc_get_location_by_coords', 'cdc_get_location_by_coords' );
+
+// get location by ID
+
+function cdc_get_location_by_id () {
+
+	if ( isset ( $_GET['loc'] ) && !empty ( $_GET['loc'] )) {
+
+		// remove possible bad stuff
+		$loc = preg_replace ( "/[^a-zA-Z0-9]+/", "", $_GET['loc'] );
+		
+		$term_append = ( $_GET['lang'] == 'fr' ) ? '_fr' : '';
+		
+		$columns = array (
+			"id_code as geo_id",
+			"geo_name",
+			"gen_term" . $term_append . " as generic_term",
+			"location",
+			"province" . $term_append . " as province",
+			"lat",
+			"lon"
+		);
+
+		require_once locate_template ( 'resources/app/db.php' );
+
+		$main_query = mysqli_query ( $GLOBALS['vars']['con'], "SELECT " . implode ( ", ", $columns ) . " FROM all_areas WHERE id_code = '" . $loc . "'" ) or die ( mysqli_error ( $GLOBALS['vars']['con'] ) );
+
+		$row = mysqli_fetch_assoc ( $main_query );
+
+		$row['coords'] = [ floatval ( $row['lat'] ), floatval ( $row['lon'] ) ];
+		$row['lng'] = floatval ( $row['lon'] );
+		$row['province_short'] = short_province ( $row['province'] );
+		$row['title'] = $row['geo_name'] . ', ' . $row['province_short'];
+		
+		echo json_encode ( $row );
+	
+	} else {
+	
+		echo '[]';
+
+	}
+	
+	wp_die();
+
+}
+
+add_action ( 'wp_ajax_cdc_get_location_by_id', 'cdc_get_location_by_id' );
+add_action ( 'wp_ajax_nopriv_cdc_get_location_by_id', 'cdc_get_location_by_id' );
 
 // GET PROVINCE ABBREVIATION
 

@@ -139,10 +139,10 @@
 					
 					<div id="display-colours-toggle" class="btn-group w-100">
 						
-						<input type="radio" class="btn-check" name="display-colours-type" id="display-colours-discrete" autocomplete="off" checked>
+						<input type="radio" class="btn-check" name="display-colours-type" id="display-colours-discrete" autocomplete="off" data-query-key="scheme_type" value="discrete" checked>
 						<label class="btn disabled btn-outline-gray-400" for="display-colours-discrete"><?php _e ( 'Discrete', 'cdc' ); ?></label>
 						
-						<input type="radio" class="btn-check" name="display-colours-type" id="display-colours-continuous" autocomplete="off">
+						<input type="radio" class="btn-check" name="display-colours-type" id="display-colours-continuous" autocomplete="off" data-query-key="scheme_type" value="continuous">
 						<label class="btn disabled btn-outline-gray-400" for="display-colours-continuous"><?php _e ( 'Continuous', 'cdc' ); ?></label>
 						
 					</div>

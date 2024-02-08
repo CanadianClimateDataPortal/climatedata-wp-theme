@@ -48,6 +48,7 @@ var result = {};
         decade: 2040,
         sector: 'canadagrid',
         scheme: 'default',
+        scheme_type: 'discrete',
       },
       query_str: {
         prev: '',
@@ -172,6 +173,7 @@ var result = {};
           console.log('map', 'get var data');
 
           // ajax call in get_var_data is also async: false
+          console.log("get_var_data because it's the initial load");
           $(document).cdc_app(
             'get_var_data',
             options.query.var_id,
@@ -424,7 +426,7 @@ var result = {};
 
         // load location details
 
-        plugin.open_location(click_event.latlng);
+        plugin.set_location(click_event.latlng);
       });
 
       // click marker
@@ -448,7 +450,7 @@ var result = {};
       item.on('click', '#recent-locations .list-group-item', function () {
         let item_coords = $(this).attr('data-coords').split(',');
 
-        plugin.open_location({
+        plugin.set_location({
           lat: item_coords[0],
           lng: item_coords[1],
           marker_index: $(this).attr('data-index'),
@@ -808,6 +810,33 @@ var result = {};
               // update colour scheme dropdown
               plugin.update_scheme();
             }
+
+            // location
+            if (key == 'location') {
+              console.log('get location ' + options.query[key]);
+
+              $.ajax({
+                url: ajax_data.url,
+                dataType: 'json',
+                data: {
+                  action: 'cdc_get_location_by_id',
+                  lang: options.lang,
+                  loc: options.query[key],
+                },
+                success: function (data) {
+                  let open_location = false;
+
+                  if (window.location.hash == '#location-detail') {
+                    open_location = true;
+                  }
+
+                  plugin.set_location(
+                    { lat: data.lat, lng: data.lng },
+                    open_location,
+                  );
+                },
+              });
+            }
           } else if (this_input.is('[type="radio"]')) {
             // radio
 
@@ -893,14 +922,20 @@ var result = {};
 
       console.log('updating ' + var_id + ', ' + status);
 
-      if (var_id != null) {
+      let hidden_input = item.find('[data-query-key="var"]');
+
+      if (
+        options.var_data.hasOwnProperty('id') &&
+        options.var_data.id == var_id
+      ) {
+        // do nothing
+      } else if (var_id != null) {
+        console.log('get_var_data because var_id changed');
         $(document).cdc_app('get_var_data', var_id, function (data) {
           // console.log('get var data', data);
 
           // update var_data
           options.var_data = data;
-
-          let hidden_input = item.find('[data-query-key="var"]');
 
           if (typeof options.var_data.acf.var_names != 'undefined') {
             if (status != 'init' && status != 'eval') {
@@ -914,146 +949,144 @@ var result = {};
             if (status == 'input') {
               hidden_input.trigger('change');
             }
-
-            // setup slider and custom inputs
-
-            // decade min/max
-
-            options.elements.decade_slider.slider(
-              'option',
-              'min',
-              options.var_data.acf.time_slider_min_value,
-            );
-
-            options.elements.decade_slider.slider(
-              'option',
-              'max',
-              options.var_data.acf.time_slider_max_value,
-            );
-
-            // slider min/max labels
-
-            item
-              .find('#decade-slider-min')
-              .text(options.var_data.acf.time_slider_min_value);
-            item
-              .find('#decade-slider-max')
-              .text(options.var_data.acf.time_slider_max_value + 30);
-
-            // validate slider value
-
-            if (
-              options.elements.decade_slider.slider('value') >
-              options.var_data.acf.time_slider_max_value
-            ) {
-              options.elements.decade_slider.slider(
-                'value',
-                options.var_data.acf.time_slider_max_value,
-              );
-            }
-
-            if (
-              options.elements.decade_slider.slider('value') <
-              options.var_data.acf.time_slider_min_value
-            ) {
-              options.elements.decade_slider.slider(
-                'value',
-                options.var_data.acf.time_slider_min_value,
-              );
-            }
-
-            if (options.var_data.acf.var_names.length > 1) {
-              // multiple vars
-
-              if (options.elements.threshold_slider != null) {
-                options.elements.threshold_slider
-                  .off('slide')
-                  .off('change')
-                  .off('stop');
-
-                options.elements.threshold_slider.slider('destroy');
-              }
-
-              options.elements.threshold_slider = item
-                .find('#threshold-slider')
-                .slider({
-                  min: 0,
-                  max: options.var_data.acf.var_names.length - 1,
-                  step: 1,
-                  create: function () {
-                    // console.log('threshold slider', 'create');
-                  },
-                  slide: function (e, ui) {
-                    // update the hidden input/query
-
-                    options.status = 'slide';
-
-                    $(this)
-                      .find('.ui-slider-handle')
-                      .text(options.var_data.acf.var_names[ui.value].label);
-
-                    let clone_query = { ...options.query };
-
-                    clone_query.decade = ui.value;
-
-                    options.query_str.current = $(document).cdc_app(
-                      'query.eval',
-                      {
-                        query: clone_query,
-                        do_history: 'none',
-                        callback: function () {
-                          $(document).cdc_app(
-                            'maps.get_layer',
-                            clone_query,
-                            options.var_data,
-                          );
-                        },
-                      },
-                    );
-                  },
-                  change: function (e, ui) {
-                    hidden_input
-                      .val(options.var_data.acf.var_names[ui.value].variable)
-                      .trigger('change');
-                  },
-                  stop: function (e, ui) {
-                    // if (status != 'init') {
-                    options.status = 'input';
-                    // }
-                  },
-                });
-
-              // find out which index of the var_names array
-              // is the field's value
-
-              console.log('find ' + options.query.var + ' in var_data');
-
-              options.var_data.acf.var_names.forEach(function (var_name, i) {
-                if (Object.values(var_name).includes(options.query.var)) {
-                  console.log(i, var_name);
-
-                  options.elements.threshold_slider.slider(
-                    'option',
-                    'value',
-                    i,
-                  );
-
-                  // set handle text
-                  options.elements.threshold_slider
-                    .find('.ui-slider-handle')
-                    .text(options.var_data.acf.var_names[i].label);
-                }
-              });
-            }
-
-            // TODO
-            // plugin.update_frequency();
-
-            if (typeof callback == 'function') {
-              callback(data);
-            }
           }
         });
+      }
+
+      // always do this stuff
+      console.log(options.var_data);
+
+      if (typeof options.var_data.acf.var_names != 'undefined') {
+        // setup slider and custom inputs
+
+        // decade min/max
+
+        options.elements.decade_slider.slider(
+          'option',
+          'min',
+          options.var_data.acf.time_slider_min_value,
+        );
+
+        options.elements.decade_slider.slider(
+          'option',
+          'max',
+          options.var_data.acf.time_slider_max_value,
+        );
+
+        // slider min/max labels
+
+        item
+          .find('#decade-slider-min')
+          .text(options.var_data.acf.time_slider_min_value);
+        item
+          .find('#decade-slider-max')
+          .text(options.var_data.acf.time_slider_max_value + 30);
+
+        // validate slider value
+
+        if (
+          options.elements.decade_slider.slider('value') >
+          options.var_data.acf.time_slider_max_value
+        ) {
+          options.elements.decade_slider.slider(
+            'value',
+            options.var_data.acf.time_slider_max_value,
+          );
+        }
+
+        if (
+          options.elements.decade_slider.slider('value') <
+          options.var_data.acf.time_slider_min_value
+        ) {
+          options.elements.decade_slider.slider(
+            'value',
+            options.var_data.acf.time_slider_min_value,
+          );
+        }
+
+        if (options.var_data.acf.var_names.length > 1) {
+          // multiple vars
+
+          if (options.elements.threshold_slider != null) {
+            options.elements.threshold_slider
+              .off('slide')
+              .off('change')
+              .off('stop');
+
+            options.elements.threshold_slider.slider('destroy');
+          }
+
+          options.elements.threshold_slider = item
+            .find('#threshold-slider')
+            .slider({
+              min: 0,
+              max: options.var_data.acf.var_names.length - 1,
+              step: 1,
+              create: function () {
+                // console.log('threshold slider', 'create');
+              },
+              slide: function (e, ui) {
+                // update the hidden input/query
+
+                options.status = 'slide';
+
+                $(this)
+                  .find('.ui-slider-handle')
+                  .text(options.var_data.acf.var_names[ui.value].label);
+
+                let clone_query = { ...options.query };
+
+                clone_query.decade = ui.value;
+
+                options.query_str.current = $(document).cdc_app('query.eval', {
+                  query: clone_query,
+                  do_history: 'none',
+                  callback: function () {
+                    $(document).cdc_app(
+                      'maps.get_layer',
+                      clone_query,
+                      options.var_data,
+                    );
+                  },
+                });
+              },
+              change: function (e, ui) {
+                hidden_input
+                  .val(options.var_data.acf.var_names[ui.value].variable)
+                  .trigger('change');
+              },
+              stop: function (e, ui) {
+                // if (status != 'init') {
+                options.status = 'input';
+                // }
+              },
+            });
+
+          // find out which index of the var_names array
+          // is the field's value
+
+          console.log('find ' + options.query.var + ' in var_data');
+
+          options.var_data.acf.var_names.forEach(function (var_name, i) {
+            if (Object.values(var_name).includes(options.query.var)) {
+              console.log(i, var_name);
+
+              options.elements.threshold_slider.slider('option', 'value', i);
+
+              // set handle text
+              options.elements.threshold_slider
+                .find('.ui-slider-handle')
+                .text(options.var_data.acf.var_names[i].label);
+            }
+          });
+        }
+
+        // TODO
+        // plugin.update_frequency();
+
+        if (typeof callback == 'function') {
+          callback(data);
+        }
       }
     },
 
@@ -1106,27 +1139,32 @@ var result = {};
       if (!options.var_data.acf.timestep.includes(options.query.frequency)) {
         // console.log('select first', frequency_select.find('option').first());
 
-        frequency_select.val(frequency_select.find('option').first().attr('value'));
+        frequency_select.val(
+          frequency_select.find('option').first().attr('value'),
+        );
       }
       frequency_select.trigger('change');
     },
 
-    redraw_colour_scheme: function(element) {
+    redraw_colour_scheme: function (element) {
       let plugin = this,
-          options = plugin.options,
-          item = plugin.item;
+        options = plugin.options,
+        item = plugin.item;
 
       $(element).find('svg').empty();
       let colours = $(element).data('scheme-colours');
-      let interval = (100 / colours.length);
-      $.each(colours, function (idx, colour) {
-        let rect = document.createElementNS(svgNS, 'rect');
-        rect.setAttribute('height', '100%');
-        rect.setAttribute('width', (interval + 1) + '%');
-        rect.setAttribute('x', (interval * idx) + '%');
-        rect.setAttribute('fill', colour);
-        $(element).find('svg').append(rect);
-      });
+
+      if (colours != undefined) {
+        let interval = 100 / colours.length;
+        $.each(colours, function (idx, colour) {
+          let rect = document.createElementNS(svgNS, 'rect');
+          rect.setAttribute('height', '100%');
+          rect.setAttribute('width', interval + 1 + '%');
+          rect.setAttribute('x', interval * idx + '%');
+          rect.setAttribute('fill', colour);
+          $(element).find('svg').append(rect);
+        });
+      }
     },
 
     // fetch colours of default scheme from Geoserver and update the data of the default
@@ -1136,13 +1174,23 @@ var result = {};
         options = plugin.options,
         item = plugin.item;
 
-      $.getJSON(geoserver_url + "/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic" +
-        "&format=application/json&layer=" + options.maps.high.layer_name).then(function (data) {
+      $.getJSON(
+        geoserver_url +
+          '/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic' +
+          '&format=application/json&layer=' +
+          options.maps.high.layer_name,
+      ).then(function (data) {
+        let colour_map =
+          data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
 
-        let colour_map = data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
-
-        item.find('#display-scheme-select .dropdown-item[data-scheme-id="default"]')
-          .data('scheme-colours', colour_map.map(e => e.color));
+        item
+          .find(
+            '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
+          )
+          .data(
+            'scheme-colours',
+            colour_map.map((e) => e.color),
+          );
         plugin.update_scheme();
       });
     },
@@ -1158,8 +1206,8 @@ var result = {};
 
       let selected_item = item.find(
           '#display-scheme-select .dropdown-item[data-scheme-id="' +
-          options.query.scheme +
-          '"]',
+            options.query.scheme +
+            '"]',
         ),
         discrete_btns = selected_item
           .closest('.map-control-item')
@@ -1183,7 +1231,8 @@ var result = {};
       // copy item data to toggle
       selected_item
         .closest('.dropdown')
-        .find('.dropdown-toggle').data(selected_item.data());
+        .find('.dropdown-toggle')
+        .data(selected_item.data());
 
       // redraw the schemes
       item.find('#display-scheme-select .scheme-dropdown').each(function () {
@@ -1191,31 +1240,39 @@ var result = {};
       });
 
       // update map layers
-      $.each(options.maps, function(k, map) {
+      $.each(options.maps, function (k, map) {
         let raster_layer = map.layers.raster;
         if (raster_layer != null) {
           if (selected_item.hasClass('default')) {
             raster_layer.setParams({
-              styles: "",
+              styles: '',
               tiled: true,
             });
           } else {
             raster_layer.setParams({
               tiled: false,
-              sld_body: plugin.generate_sld(map.layer_name,
+              sld_body: plugin.generate_sld(
+                map.layer_name,
                 selected_item.data('scheme-colours'),
-                variables_data[options.query.var][period_frequency_lut[options.query.frequency]],
+                variables_data[options.query.var][
+                  period_frequency_lut[options.query.frequency]
+                ],
                 selected_item.data('scheme-type'),
-                false) // TODO
+                false,
+              ), // TODO
             });
           }
         }
       });
-
-
     },
 
-    generate_sld: function(layer_name, colours, variable_data, type, discrete) {
+    generate_sld: function (
+      layer_name,
+      colours,
+      variable_data,
+      type,
+      discrete,
+    ) {
       let colormap_type = discrete ? 'intervals' : 'ramp';
       let low = variable_data.low;
       let high = variable_data.high;
@@ -1230,34 +1287,34 @@ var result = {};
 
       // temperature data files are in Kelvin
       if (variable_data.unit == 'K') {
-        low += 273.15
-        high += 273.15
+        low += 273.15;
+        high += 273.15;
       }
 
       let step = (high - low) / scheme_length;
 
-        let sld_body = `<?xml version="1.0" encoding="UTF-8"?>
+      let sld_body = `<?xml version="1.0" encoding="UTF-8"?>
         <StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"
         xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd">
         <NamedLayer><Name>${layer_name}</Name><UserStyle><IsDefault>1</IsDefault><FeatureTypeStyle><Rule><RasterSymbolizer>
-        <Opacity>1.0</Opacity><ColorMap type="${colormap_type}">`
+        <Opacity>1.0</Opacity><ColorMap type="${colormap_type}">`;
 
       for (let i = 0; i < scheme_length; i++) {
-        if (discrete && i == scheme_length -1) {
+        if (discrete && i == scheme_length - 1) {
           // we need a virtually high value for highest bucket, otherwise it will be blank
           sld_body += `<ColorMapEntry color="${colours[i]}" quantity="${(high + 1) * (high + 1)}"/>`;
         } else {
-          sld_body += `<ColorMapEntry color="${colours[i]}" quantity="${low + (i * step)}"/>`;
+          sld_body += `<ColorMapEntry color="${colours[i]}" quantity="${low + i * step}"/>`;
         }
       }
 
-      sld_body += '</ColorMap></RasterSymbolizer></Rule></FeatureTypeStyle></UserStyle></NamedLayer></StyledLayerDescriptor>';
+      sld_body +=
+        '</ColorMap></RasterSymbolizer></Rule></FeatureTypeStyle></UserStyle></NamedLayer></StyledLayerDescriptor>';
       return sld_body;
-
     },
 
-    open_location: function (coords) {
+    set_location: function (coords, open_tab = true) {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
@@ -1295,43 +1352,47 @@ var result = {};
           item.find('#location-detail .control-tab-head h5').text(data.title);
         },
       }).then(function () {
-        console.log('load location now');
+        if (open_tab == true) {
+          console.log('load location now');
 
-        $('#control-bar').tab_drawer('update_path', '#location-detail');
+          if (window.location.hash != '#location-detail') {
+            $('#control-bar').tab_drawer('update_path', '#location-detail');
+          }
 
-        // console.log(options.var_data);
+          // console.log(options.var_data);
 
-        $.ajax({
-          url:
-            geoserver_url +
-            '/generate-charts/' +
-            coords.lat +
-            '/' +
-            coords.lng +
-            '/' +
-            options.query.var +
-            '/' +
-            options.query.frequency +
-            '?decimals=' +
-            options.var_data.acf.decimals +
-            '&dataset_name=' +
-            options.query.dataset,
-          dataType: 'json',
-          success: function (data) {
-            console.log('chart data', data);
+          $.ajax({
+            url:
+              geoserver_url +
+              '/generate-charts/' +
+              coords.lat +
+              '/' +
+              coords.lng +
+              '/' +
+              options.query.var +
+              '/' +
+              options.query.frequency +
+              '?decimals=' +
+              options.var_data.acf.decimals +
+              '&dataset_name=' +
+              options.query.dataset,
+            dataType: 'json',
+            success: function (data) {
+              console.log('chart data', data);
 
-            item.find('#chart-series-items .cloned').remove();
+              item.find('#chart-series-items .cloned').remove();
 
-            $(document).cdc_app('charts.render', {
-              data: data,
-              query: options.query,
-              var_data: options.var_data,
-              coords: coords,
-              download_url: null,
-              container: item.find('#location-chart-container')[0],
-            });
-          },
-        });
+              $(document).cdc_app('charts.render', {
+                data: data,
+                query: options.query,
+                var_data: options.var_data,
+                coords: coords,
+                download_url: null,
+                container: item.find('#location-chart-container')[0],
+              });
+            },
+          });
+        }
       });
     },
   };

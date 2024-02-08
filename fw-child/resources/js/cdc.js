@@ -333,18 +333,18 @@
               let this_map = options.maps[key];
 
               this_map.layer_name =
-                  'CDC:' +
-                  (query.dataset == 'cmip6' ? query.dataset + '-' : '') +
-                  query.var +
-                  '-' +
-                  period_frequency_lut[query.frequency] +
-                  '-' +
-                  scenario_names[query.dataset][key]
-                    .replace(/[\W_]+/g, '')
-                    .toLowerCase() +
-                  '-p50-' +
-                  query.frequency +
-                  '-30year';
+                'CDC:' +
+                (query.dataset == 'cmip6' ? query.dataset + '-' : '') +
+                query.var +
+                '-' +
+                period_frequency_lut[query.frequency] +
+                '-' +
+                scenario_names[query.dataset][key]
+                  .replace(/[\W_]+/g, '')
+                  .toLowerCase() +
+                '-p50-' +
+                query.frequency +
+                '-30year';
 
               let params = {
                 format: 'image/png',
@@ -401,12 +401,12 @@
                 // grid layer does exist
                 // and needs to be removed
 
-                console.log('remove choro');
+                // console.log('remove choro');
                 this_map.object.removeLayer(this_map.layers.grid);
               }
 
               if (do_grid == true) {
-                console.log('new grid layer');
+                // console.log('new grid layer');
                 let new_layer = L.vectorGrid.protobuf(
                   geoserver_url +
                     '/geoserver/gwc/service/tms/1.0.0/CDC:' +
@@ -455,16 +455,11 @@
           default:
             // choropleth
 
-            console.log('CHORO TIME');
-
-            // console.log('query sector', query.sector);
-            // console.log('current sector', options.current_sector);
-
             plugin.maps.do_legend.apply(item, [
               query,
               function () {
                 Object.keys(options.maps).forEach(function (key) {
-                  console.log('key', key);
+                  // console.log('key', key);
 
                   let this_map = options.maps[key];
 
@@ -488,7 +483,7 @@
                     '&decimals=' +
                     var_data.acf.decimals;
 
-                  console.log('get data');
+                  // console.log('get choro data');
 
                   $.ajax({
                     url: choro_path,
@@ -496,7 +491,7 @@
                     async: false,
                     success: function (data) {
                       options.choro.data[key] = data;
-                      console.log('done');
+                      // console.log('done');
                     },
                   });
 
@@ -620,51 +615,6 @@
 
                 // update current
                 options.current_sector = query.sector;
-
-                /*
-                for (let key in options.maps) {
-                  let this_map = options.maps[key];
-
-                  // console.log(key, scenario_names[query.dataset][key]);
-
-                  let choro_path =
-                    geoserver_url +
-                    '/get-choro-values/' +
-                    query.sector +
-                    '/' +
-                    query.var +
-                    '/' +
-                    scenario_names[query.dataset][key]
-                      .replace(/[\W_]+/g, '')
-                      .toLowerCase() +
-                    '/' +
-                    query.frequency +
-                    '/?period=' +
-                    (parseInt(query.decade) + 1) +
-                    (query.delta == 'true' ? '&delta7100=true' : '') +
-                    '&dataset_name=' +
-                    query.dataset +
-                    '&decimals=' +
-                    var_data.acf.decimals;
-
-                  $.ajax({
-                    url: choro_path,
-                    dataType: 'json',
-                    async: false,
-                    success: function (data) {
-                      options.choro.data[key] = data;
-                    },
-                  });
-                }*/
-
-                // console.log('choro data', options.choro.data);
-
-                for (let key in options.maps) {
-                  let this_map = options.maps[key];
-
-                  // console.log('---');
-                  // console.log('map ' + key);
-                }
               },
             ]);
         }
@@ -940,19 +890,11 @@
 
           // swap markers
 
-          console.log('looking for index ' + marker_index);
-
           for (let key in options.maps) {
-            console.log(' in ' + key);
-
             options.grid.markers[key].forEach(function (marker, i) {
-              console.log(i);
-
               if (i == marker_index) {
-                console.log('yes');
                 marker.setIcon(options.icons.default);
               } else {
-                console.log('no');
                 marker.setIcon(options.icons.small);
               }
             });

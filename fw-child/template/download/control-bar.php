@@ -11,39 +11,67 @@
 	
 	<div id="control-bar-tabs" class="tab-drawer-tabs w-100">
 		<a href="#data" class="tab-drawer-trigger">
-			<span class="cdc-icon"><?php
+			<span class="cdc-icon">
+				<?php
 				
 					echo file_get_contents ( locate_template ( 'resources/img/icon-data.svg' ) );
 					
-				?></span>
-			<span><?php _e ( 'Data', 'cdc' ); ?></span>
+				?>
+				<span class="alert-icon"></span>
+			</span>
+			
+			<span>
+				<span class="badge rounded-pill me-1">1</span>
+				<?php _e ( 'Data', 'cdc' ); ?>
+			</span>
 		</a>
 		
 		<a href="#area" class="tab-drawer-trigger">
-			<span class="cdc-icon"><?php
+			<span class="cdc-icon">
+				<?php
 				
 					echo file_get_contents ( locate_template ( 'resources/img/icon-location.svg' ) );
 					
-				?></span>
-			<span><?php _e ( 'Area', 'cdc' ); ?></span>
+				?>
+				<span class="alert-icon"></span>
+			</span>
+				
+			<span>
+				<span class="badge rounded-pill me-1">2</span>
+				<?php _e ( 'Area', 'cdc' ); ?>
+			</span>
 		</a>
 		
 		<a href="#details" class="tab-drawer-trigger">
-			<span class="cdc-icon"><?php
+			<span class="cdc-icon">
+				<?php
 				
 					echo file_get_contents ( locate_template ( 'resources/img/icon-display.svg' ) );
 					
-				?></span>
-			<span><?php _e ( 'Details', 'cdc' ); ?></span>
+				?>
+				<span class="alert-icon"></span>
+			</span>
+			
+			<span>
+				<span class="badge rounded-pill me-1">3</span>
+				<?php _e ( 'Details', 'cdc' ); ?>
+			</span>
 		</a>
 		
 		<a href="#submit" class="tab-drawer-trigger">
-			<span class="cdc-icon"><?php
+			<span class="cdc-icon">
+				<?php
 				
 					echo file_get_contents ( locate_template ( 'resources/img/icon-download.svg' ) );
 					
-				?></span>
-			<span><?php _e ( 'Submit', 'cdc' ); ?></span>
+				?>
+				<span class="alert-icon"></span>
+			</span>
+			
+			<span>
+				<span class="badge rounded-pill me-1">4</span>
+				<?php _e ( 'Submit', 'cdc' ); ?>
+			</span>
 		</a>
 	</div>
 	

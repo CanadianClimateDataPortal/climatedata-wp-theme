@@ -564,3 +564,33 @@ function short_province ( $province ) {
 		}
 
 }
+
+
+function cdc_var_types_field () {
+
+	register_rest_field ( 'variable',
+		'var_types',
+		array (
+			'get_callback' => 'cdc_list_var_types',
+			'update_callback' => null,
+			'schema' => null,
+		)
+	);
+	
+}
+
+add_action ( 'rest_api_init', 'cdc_var_types_field' );
+
+function cdc_list_var_types ( $object, $field_name, $request ) {
+
+	$term_list = array();
+
+	$terms = get_the_terms ( $object['id'], 'var-type' );
+
+	foreach ($terms as $term) {
+		$term_list[] = $term->name;
+	}
+
+	return $term_list;
+	
+}

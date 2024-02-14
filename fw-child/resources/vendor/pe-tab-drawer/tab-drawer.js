@@ -22,7 +22,7 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 			map: {
 				object: null,
 			},
-			debug: true,
+			debug: false,
 		}
 		
 		this.options = $.extend(true, defaults, options)
@@ -124,6 +124,7 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 			}
 			
 			// reset current_id
+			options.prev_id = options.current_id
 			options.current_id = null
 			
 			// reinit options.path with the target content first
@@ -171,8 +172,6 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 					plugin.select_content(do_history)
 				}
 			)
-			
-			$(document).trigger('td_update_path')
 			
 		},
 		
@@ -246,6 +245,8 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 				}
 				
 			}
+			
+			$(document).trigger('td_update_path', [options.prev_id, options.current_id])
 			
 		},
 		

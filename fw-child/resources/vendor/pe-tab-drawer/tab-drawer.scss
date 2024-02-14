@@ -1,3 +1,5 @@
+$td-slide-transition-duration: 0.25s !default;
+
 .tab-drawer-container {
   position: absolute;
   top: 0;
@@ -12,7 +14,7 @@
       position: absolute;
       top: 0;
       left: -9999px;
-      transition: left 0s ease 0.2s;
+      transition: left 0s ease $td-slide-transition-duration;
       z-index: -1;
 
       .tab-drawer-content {
@@ -22,7 +24,7 @@
 
       .tab-drawer-content-inner {
         transform: translateX(-100%);
-        transition: transform 0.2s ease 0s;
+        transition: transform $td-slide-transition-duration ease 0s;
         overflow: auto;
       }
 

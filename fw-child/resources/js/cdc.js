@@ -267,6 +267,10 @@
           this_object.getPane('labels').style.zIndex = 550;
           this_object.getPane('labels').style.pointerEvents = 'none';
 
+          this_object.createPane('stations');
+          this_object.getPane('stations').style.zIndex = 600;
+          this_object.getPane('stations').style.pointerEvents = 'all';
+
           // basemap
           L.tileLayer(
             '//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png',
@@ -286,6 +290,16 @@
               pane: 'labels',
             },
           ).addTo(this_object);
+
+          // stations
+          $.ajax({
+            url: 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y',
+            dataType: 'json',
+            async: false,
+            success: function (data) {
+              options.station_data = data;
+            },
+          });
 
           options.maps[key].legend = L.control({ position: 'topright' });
         }
@@ -313,143 +327,253 @@
           item = plugin.item,
           options = plugin.options;
 
+        console.log('---');
+        console.log('get layer');
+
         switch (query.sector) {
           case 'canadagrid':
-            // get grid and raster
+          case 'canadagrid1deg':
+          case 'era5landgrid':
+            console.log('RASTER');
 
-            // are we switching to raster from another sector
+            plugin.maps.do_legend.apply(item, [
+              query,
+              var_data,
+              function () {
+                // get grid and raster
 
-            let do_grid = false;
+                // are we switching to raster from another sector
 
-            if (query.sector != options.current_sector) {
-              // switching sectors so later
-              // we'll need to replace the grid layer
-              console.log(options.current_sector + ' > ' + query.sector);
-              do_grid = true;
-            }
+                let do_grid = false;
 
-            for (let key in options.maps) {
-              // raster
+                if (query.sector != options.current_sector) {
+                  // switching sectors so later
+                  // we'll need to replace the grid layer
+                  console.log(options.current_sector + ' > ' + query.sector);
+                  do_grid = true;
+                }
+
+                for (let key in options.maps) {
+                  // raster
+                  let this_map = options.maps[key];
+
+                  // remove stations layer
+                  if (
+                    this_map.layers.stations &&
+                    this_map.object.hasLayer(this_map.layers.stations)
+                  ) {
+                    this_map.object.removeLayer(this_map.layers.stations);
+                    this_map.object.removeLayer(this_map.layers.stations);
+                  }
+
+                  query.frequency = query.frequency
+                    .toLowerCase()
+                    .replaceAll('-', '');
+
+                  // ys/ms/qsdec
+
+                  let frequency_code = query.frequency;
+
+                  if (period_frequency_lut.hasOwnProperty(query.frequency)) {
+                    frequency_code = period_frequency_lut[query.frequency];
+                  }
+
+                  // ann/spring/summer/
+
+                  let frequency_name = query.frequency;
+
+                  // if (query.frequency == 'ys') {
+                  //   frequency_name = 'ann';
+                  // } else if (query.frequency == 'ms') {
+                  //   frequency_name = 'jan';
+                  // } else {
+                  //   frequency_name = 'summer';
+                  // }
+
+                  this_map.layer_name =
+                    'CDC:' +
+                    (query.dataset == 'cmip6' ? query.dataset + '-' : '') +
+                    query.var +
+                    '-' +
+                    frequency_code +
+                    '-' +
+                    scenario_names[query.dataset][key]
+                      .replace(/[\W_]+/g, '')
+                      .toLowerCase() +
+                    '-p50-' +
+                    frequency_name +
+                    '-30year' +
+                    (query.delta == 'true' ? '-delta7100' : '');
+
+                  // console.log(this_map.layer_name);
+
+                  let params = {
+                    format: 'image/png',
+                    opacity: 1,
+                    transparent: true,
+                    tiled: true,
+                    pane: 'raster',
+                    version: query.dataset == 'cmip6' ? '1.3.0' : '1.1.1',
+                    bounds: options.canadaBounds,
+                    layers: this_map.layer_name,
+                    TIME: parseInt(query.decade) + '-01-00T00:00:00Z',
+                  };
+
+                  if (var_data.slug == 'building_climate_zones') {
+                    params.styles = 'CDC:building_climate_zones';
+                  }
+
+                  //
+
+                  if (
+                    this_map.layers.raster &&
+                    this_map.object.hasLayer(this_map.layers.raster)
+                  ) {
+                    if (!this_map.layers.raster.hasOwnProperty('cdc_params')) {
+                      this_map.layers.raster.cdc_params = {};
+                    }
+
+                    // if any map parameters have changed
+                    if (!_.isEqual(this_map.layers.raster.cdc_params, params)) {
+                      // update existing
+                      this_map.layers.raster.setParams(params);
+                      this_map.layers.raster.cdc_params = $.extend({}, params);
+                    }
+                  } else {
+                    // create layer
+                    this_map.layers.raster = L.tileLayer
+                      .wms(geoserver_url + '/geoserver/ows?', params)
+                      .addTo(this_map.object);
+                  }
+
+                  // grid
+
+                  if (
+                    this_map.layers.grid == undefined ||
+                    !this_map.object.hasLayer(this_map.layers.grid)
+                  ) {
+                    // grid layer doesn't exist
+                    do_grid = true;
+                  }
+
+                  if (
+                    this_map.layers.grid != undefined &&
+                    this_map.object.hasLayer(this_map.layers.grid) &&
+                    do_grid == true
+                  ) {
+                    // grid layer does exist
+                    // and needs to be removed
+
+                    // console.log('remove choro');
+                    this_map.object.removeLayer(this_map.layers.grid);
+                  }
+
+                  if (do_grid == true) {
+                    // console.log('new grid layer');
+                    let new_layer = L.vectorGrid.protobuf(
+                      geoserver_url +
+                        '/geoserver/gwc/service/tms/1.0.0/CDC:' +
+                        query.sector +
+                        '@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf',
+                      options.grid.leaflet,
+                    );
+
+                    new_layer
+                      .on('mouseover', function (e) {
+                        // reset highlighted
+                        options.grid.highlighted.forEach(function (feature) {
+                          new_layer.resetFeatureStyle(feature);
+                        });
+
+                        // update highlighted grid
+                        options.grid.highlighted = [e.layer.properties.gid];
+
+                        new_layer.setFeatureStyle(options.grid.highlighted, {
+                          weight: options.grid.styles.line.hover.weight,
+                          color: options.grid.styles.line.hover.color,
+                          opacity: options.grid.styles.line.hover.opacity,
+                          fillColor: options.grid.styles.fill.hover.color,
+                          fill: true,
+                          fillOpacity: options.grid.styles.fill.hover.opacity,
+                        });
+                      })
+                      .on('mouseout', function (e) {})
+                      .on('click', function (e) {
+                        // pan map to clicked coords
+                        // var offset = (map1.getSize().x * 0.5) - 100;
+                        //
+                        // map1.panTo([e.latlng.lat, e.latlng.lng], { animate: false }); // pan to center
+                        // map1.panBy(new L.Point(offset, 0), { animate: false }); // pan by offset
+
+                        $(document).trigger('select_map_item', [e]);
+                      });
+
+                    this_map.layers.grid = new_layer.addTo(this_map.object);
+                  }
+
+                  options.current_sector = query.sector;
+                }
+              },
+            ]);
+
+            break;
+          case 'station':
+            console.log('ADD STATIONS');
+
+            Object.keys(options.maps).forEach(function (key) {
               let this_map = options.maps[key];
 
-              this_map.layer_name =
-                'CDC:' +
-                (query.dataset == 'cmip6' ? query.dataset + '-' : '') +
-                query.var +
-                '-' +
-                period_frequency_lut[query.frequency] +
-                '-' +
-                scenario_names[query.dataset][key]
-                  .replace(/[\W_]+/g, '')
-                  .toLowerCase() +
-                '-p50-' +
-                query.frequency +
-                '-30year';
-
-              let params = {
-                format: 'image/png',
-                opacity: 1,
-                transparent: true,
-                tiled: true,
-                pane: 'raster',
-                version: query.dataset == 'cmip6' ? '1.3.0' : '1.1.1',
-                bounds: options.canadaBounds,
-                layers: this_map.layer_name,
-                TIME: parseInt(query.decade) + '-01-00T00:00:00Z',
-              };
-
-              //
-
+              // remove raster layer
               if (
                 this_map.layers.raster &&
                 this_map.object.hasLayer(this_map.layers.raster)
               ) {
-                if (!this_map.layers.raster.hasOwnProperty('cdc_params')) {
-                  this_map.layers.raster.cdc_params = {};
-                }
-
-                // if any map parameters have changed
-                if (!_.isEqual(this_map.layers.raster.cdc_params, params)) {
-                  // update existing
-                  this_map.layers.raster.setParams(params);
-                  this_map.layers.raster.cdc_params = $.extend({}, params);
-                }
-              } else {
-                // create layer
-                this_map.layers.raster = L.tileLayer
-                  .wms(geoserver_url + '/geoserver/ows?', params)
-                  .addTo(this_map.object);
-              }
-
-              // console.log(options.maps[key].object);
-
-              // grid
-
-              if (
-                this_map.layers.grid == undefined ||
-                !this_map.object.hasLayer(this_map.layers.grid)
-              ) {
-                // grid layer doesn't exist
-                do_grid = true;
-              }
-
-              if (
-                this_map.layers.grid != undefined &&
-                this_map.object.hasLayer(this_map.layers.grid) &&
-                do_grid == true
-              ) {
-                // grid layer does exist
-                // and needs to be removed
-
-                // console.log('remove choro');
+                // console.log('raster layer exists');
+                this_map.object.removeLayer(this_map.layers.raster);
                 this_map.object.removeLayer(this_map.layers.grid);
               }
 
-              if (do_grid == true) {
-                // console.log('new grid layer');
-                let new_layer = L.vectorGrid.protobuf(
-                  geoserver_url +
-                    '/geoserver/gwc/service/tms/1.0.0/CDC:' +
-                    query.sector +
-                    '@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf',
-                  options.grid.leaflet,
-                );
-
-                new_layer
-                  .on('mouseover', function (e) {
-                    // reset highlighted
-                    options.grid.highlighted.forEach(function (feature) {
-                      new_layer.resetFeatureStyle(feature);
-                    });
-
-                    // update highlighted grid
-                    options.grid.highlighted = [e.layer.properties.gid];
-
-                    new_layer.setFeatureStyle(options.grid.highlighted, {
-                      weight: options.grid.styles.line.hover.weight,
-                      color: options.grid.styles.line.hover.color,
-                      opacity: options.grid.styles.line.hover.opacity,
-                      fillColor: options.grid.styles.fill.hover.color,
-                      fill: true,
-                      fillOpacity: options.grid.styles.fill.hover.opacity,
-                    });
-                  })
-                  .on('mouseout', function (e) {})
-                  .on('click', function (e) {
-                    // pan map to clicked coords
-                    // var offset = (map1.getSize().x * 0.5) - 100;
-                    //
-                    // map1.panTo([e.latlng.lat, e.latlng.lng], { animate: false }); // pan to center
-                    // map1.panBy(new L.Point(offset, 0), { animate: false }); // pan by offset
-
-                    $(document).trigger('select_map_item', [e]);
-                  });
-
-                this_map.layers.grid = new_layer.addTo(this_map.object);
+              // remove grid layer
+              if (
+                this_map.layers.grid &&
+                this_map.object.hasLayer(this_map.layers.grid)
+              ) {
+                // console.log('raster layer exists');
+                this_map.object.removeLayer(this_map.layers.grid);
+                this_map.object.removeLayer(this_map.layers.grid);
               }
 
-              options.current_sector = query.sector;
-            }
+              if (
+                this_map.layers.stations == undefined ||
+                !this_map.object.hasLayer(this_map.layers.stations)
+              ) {
+                console.log(key + " map doesn't have stations");
+                this_map.layers.stations = L.geoJson(options.station_data, {
+                  pointToLayer: function (feature, latlng) {
+                    markerColor = '#e50e40';
+                    return L.circleMarker(latlng, {
+                      color: '#fff',
+                      opacity: 1,
+                      weight: 2,
+                      pane: 'stations',
+                      fillColor: '#f00',
+                      fillOpacity: 1,
+                      radius: 5,
+                    });
+                  },
+                })
+                  .on('mouseover', function (e) {
+                    e.layer
+                      .bindTooltip(e.layer.feature.properties.STATION_NAME)
+                      .openTooltip(e.latlng);
+                  })
+                  .on('click', function (e) {});
+
+                console.log(this_map.layers.stations);
+
+                this_map.layers.stations.addTo(this_map.object);
+              }
+            });
 
             break;
           default:
@@ -457,6 +581,7 @@
 
             plugin.maps.do_legend.apply(item, [
               query,
+              var_data,
               function () {
                 Object.keys(options.maps).forEach(function (key) {
                   // console.log('key', key);
@@ -507,6 +632,15 @@
                       this_map.layers.raster,
                     );
                     options.maps[key].object.removeLayer(this_map.layers.grid);
+                  }
+
+                  // remove stations layer
+                  if (
+                    this_map.layers.stations &&
+                    this_map.object.hasLayer(this_map.layers.stations)
+                  ) {
+                    this_map.object.removeLayer(this_map.layers.stations);
+                    this_map.object.removeLayer(this_map.layers.stations);
                   }
 
                   // are we swapping between sectors
@@ -620,7 +754,7 @@
         }
       },
 
-      do_legend: function (query, callback = null) {
+      do_legend: function (query, var_data, callback = null) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           item = plugin.item,
           options = plugin.options;
@@ -639,18 +773,23 @@
           '-p50-' +
           query.frequency +
           '-30year' +
-          (query.delta == 'true' ? '&delta7100=true' : '');
+          (query.delta == 'true' ? '-delta7100' : '');
 
         console.log('layer name', options.layer_name);
 
-        $.getJSON(
+        let request_url =
           geoserver_url +
-            '/geoserver/wms?service=WMS&version=1.1.0' +
-            '&request=GetLegendGraphic' +
-            '&format=application/json' +
-            '&layer=CDC:' +
-            options.layer_name,
-        )
+          '/geoserver/wms?service=WMS&version=1.1.0' +
+          '&request=GetLegendGraphic' +
+          '&format=application/json' +
+          '&layer=CDC:' +
+          options.layer_name;
+
+        if (var_data.slug == 'building_climate_zones') {
+          request_url += '&style=CDC:building_climate_zones';
+        }
+
+        $.getJSON(request_url)
           .then(function (data) {
             // console.log('legend data', data);
 
@@ -1067,8 +1206,11 @@
           // force scenarios to be an array
 
           if (typeof query.scenarios == 'string') {
-            // console.log('scenarios is a string');
             query.scenarios = [query.scenarios];
+          }
+
+          if (typeof query.percentiles == 'string') {
+            query.percentiles = [query.percentiles];
           }
 
           // console.log('merged query');

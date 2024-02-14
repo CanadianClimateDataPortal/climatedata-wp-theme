@@ -1,7 +1,5 @@
 // map functions
 
-var result = {};
-
 (function ($) {
   function map_app(item, options) {
     // options
@@ -72,7 +70,7 @@ var result = {};
     // mora (frequency): ann, jan...dec, spring, summer, fall, winter
     // rcp (scenarios): low, medium, high
     // decade: 2040
-    // sector: canadagrid, census, health, watershed
+    // sector: canadagrid, era5landgrid, census, health, watershed
 
     this.options = $.extend(true, defaults, options);
 
@@ -173,7 +171,7 @@ var result = {};
           console.log('map', 'get var data');
 
           // ajax call in get_var_data is also async: false
-          console.log("get_var_data because it's the initial load");
+
           $(document).cdc_app(
             'get_var_data',
             options.query.var_id,
@@ -228,6 +226,7 @@ var result = {};
               // get map layer
 
               console.log('init get_layer now');
+
               $(document).cdc_app(
                 'maps.get_layer',
                 options.query,
@@ -325,6 +324,44 @@ var result = {};
           plugin._opacity_slider_change($(this), e, ui);
         },
       });
+
+      // FREQUENCY
+
+      // re-populate frequency select
+
+      item
+        .find('select[data-query-key="frequency"]')
+        .children()
+        .each(function () {
+          let opt_key = $(this).attr('data-field');
+
+          if ($(this).is('option')) {
+            options.frequency[opt_key] = {
+              value: $(this).attr('value'),
+              field: $(this).attr('data-field'),
+              label: $(this).text(),
+            };
+          } else if ($(this).is('optgroup')) {
+            let new_group = [];
+
+            options.frequency[opt_key] = {
+              group: $(this).attr('label'),
+              options: [],
+            };
+
+            $(this)
+              .children()
+              .each(function () {
+                options.frequency[opt_key].options.push({
+                  value: $(this).attr('value'),
+                  field: $(this).attr('data-field'),
+                  label: $(this).text(),
+                });
+              });
+          }
+        });
+
+      // console.log('frequency', options.frequency);
     },
 
     _opacity_slider_change: function (slider, e, ui) {
@@ -346,7 +383,11 @@ var result = {};
       // grid layer defaults to 1
       item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
 
-      if (this_pane == 'raster' && options.query.sector != 'canadagrid') {
+      if (
+        this_pane == 'raster' &&
+        options.query.sector != 'canadagrid' &&
+        options.query.sector != 'era5landgrid'
+      ) {
         // if this is the 'data' slider, and
         // we're looking at a sector layer
         // adjust the grid pane
@@ -653,7 +694,7 @@ var result = {};
         case 'sector':
           item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
 
-          if (this_val != 'canadagrid') {
+          if (this_val != 'canadagrid' && this_val != 'era5landgrid') {
             item
               .find('.leaflet-pane.leaflet-grid-pane')
               .css('opacity', $('#display-data-slider').slider('value') / 100);
@@ -918,6 +959,8 @@ var result = {};
         options = plugin.options,
         item = plugin.item;
 
+      let fields;
+
       if (status == null) status = options.status;
 
       console.log('updating ' + var_id + ', ' + status);
@@ -956,55 +999,83 @@ var result = {};
       // always do this stuff
       console.log(options.var_data);
 
-      if (typeof options.var_data.acf.var_names != 'undefined') {
-        // setup slider and custom inputs
+      // ADJUST CONTROLS BY VAR SETTINGS
 
+      // fields var
+      fields = options.var_data.acf;
+
+      console.log('fields');
+      console.log(fields);
+
+      // dataset availability
+      item.find('#map-control-dataset .btn-check').prop('disabled', false);
+
+      item.find('#map-control-dataset .btn-check').each(function () {
+        if (!fields.dataset_availability.includes($(this).val())) {
+          $(this).prop('disabled', true);
+
+          if ($(this).prop('checked') == true) {
+            $(this).prop('checked', false);
+          }
+        }
+      });
+
+      if (!item.find('#map-control-dataset :checked').length) {
+        // nothing is checked
+        // find the first enabled input and check it
+
+        item
+          .find('#map-control-dataset .btn-check:not([disabled])')
+          .first()
+          .prop('checked', true)
+          .trigger('change');
+      }
+
+      // decade & threshold slider
+
+      if (typeof fields.var_names != 'undefined') {
         // decade min/max
 
         options.elements.decade_slider.slider(
           'option',
           'min',
-          options.var_data.acf.time_slider_min_value,
+          fields.time_slider_min_value,
         );
 
         options.elements.decade_slider.slider(
           'option',
           'max',
-          options.var_data.acf.time_slider_max_value,
+          fields.time_slider_max_value,
         );
 
         // slider min/max labels
 
-        item
-          .find('#decade-slider-min')
-          .text(options.var_data.acf.time_slider_min_value);
-        item
-          .find('#decade-slider-max')
-          .text(options.var_data.acf.time_slider_max_value + 30);
+        item.find('#decade-slider-min').text(fields.time_slider_min_value);
+        item.find('#decade-slider-max').text(fields.time_slider_max_value + 30);
 
         // validate slider value
 
         if (
           options.elements.decade_slider.slider('value') >
-          options.var_data.acf.time_slider_max_value
+          fields.time_slider_max_value
         ) {
           options.elements.decade_slider.slider(
             'value',
-            options.var_data.acf.time_slider_max_value,
+            fields.time_slider_max_value,
           );
         }
 
         if (
           options.elements.decade_slider.slider('value') <
-          options.var_data.acf.time_slider_min_value
+          fields.time_slider_min_value
         ) {
           options.elements.decade_slider.slider(
             'value',
-            options.var_data.acf.time_slider_min_value,
+            fields.time_slider_min_value,
           );
         }
 
-        if (options.var_data.acf.var_names.length > 1) {
+        if (fields.var_names.length > 1) {
           // multiple vars
 
           if (options.elements.threshold_slider != null) {
@@ -1020,7 +1091,7 @@ var result = {};
             .find('#threshold-slider')
             .slider({
               min: 0,
-              max: options.var_data.acf.var_names.length - 1,
+              max: fields.var_names.length - 1,
               step: 1,
               create: function () {
                 // console.log('threshold slider', 'create');
@@ -1032,11 +1103,11 @@ var result = {};
 
                 $(this)
                   .find('.ui-slider-handle')
-                  .text(options.var_data.acf.var_names[ui.value].label);
+                  .text(fields.var_names[ui.value].label);
 
                 let clone_query = { ...options.query };
 
-                clone_query.decade = ui.value;
+                clone_query.var = fields.var_names[ui.value].variable;
 
                 options.query_str.current = $(document).cdc_app('query.eval', {
                   query: clone_query,
@@ -1052,7 +1123,7 @@ var result = {};
               },
               change: function (e, ui) {
                 hidden_input
-                  .val(options.var_data.acf.var_names[ui.value].variable)
+                  .val(fields.var_names[ui.value].variable)
                   .trigger('change');
               },
               stop: function (e, ui) {
@@ -1065,24 +1136,57 @@ var result = {};
           // find out which index of the var_names array
           // is the field's value
 
-          console.log('find ' + options.query.var + ' in var_data');
+          // console.log('find ' + options.query.var + ' in var_data');
 
-          options.var_data.acf.var_names.forEach(function (var_name, i) {
+          fields.var_names.forEach(function (var_name, i) {
             if (Object.values(var_name).includes(options.query.var)) {
-              console.log(i, var_name);
+              // console.log(i, var_name);
 
               options.elements.threshold_slider.slider('option', 'value', i);
 
               // set handle text
               options.elements.threshold_slider
                 .find('.ui-slider-handle')
-                .text(options.var_data.acf.var_names[i].label);
+                .text(fields.var_names[i].label);
             }
           });
         }
 
-        // TODO
-        // plugin.update_frequency();
+        // update frequency select
+        plugin.update_frequency();
+
+        // set 'sector' parameter to stations
+        // if the var has that term
+        if (options.var_data.var_types.includes('Station Data')) {
+          options.query.sector = 'station';
+        } else {
+          options.query.sector = item
+            .find('[data-query-key="sector"]:checked')
+            .val();
+        }
+
+        // ADJUST CONTROLS FOR INDIVIDUAL VARS
+
+        // building climate zones
+
+        if (options.var_data.slug == 'building_climate_zones') {
+          item
+            .find('#display-aggregation-grid')
+            .prop('checked', true)
+            .trigger('change');
+
+          item
+            .find(
+              '#map-control-aggregation .form-check-input:not(#display-aggregation-grid)',
+            )
+            .prop('disabled', true);
+        } else {
+          item
+            .find(
+              '#map-control-aggregation .form-check-input:not(#display-aggregation-grid)',
+            )
+            .prop('disabled', false);
+        }
 
         if (typeof callback == 'function') {
           callback(data);
@@ -1097,53 +1201,64 @@ var result = {};
 
       let frequency_select = item.find('select[data-query-key="frequency"]');
 
+      // empty the existing select
       frequency_select.empty();
 
-      // console.log('variable timesteps', options.var_data.acf.timestep);
+      console.log('variable timesteps', options.var_data.acf.timestep);
 
-      options.var_data.acf.timestep.forEach(function (option) {
-        let this_option = options.frequency[option];
+      if (!options.var_data.acf.timestep.length) {
+        // no timesteps
+        frequency_select.prop('disabled', true);
+      } else {
+        frequency_select.prop('disabled', false);
 
-        if (this_option.hasOwnProperty('group')) {
-          let new_optgroup = $(
-            '<optgroup label="' + this_option.group + '">',
-          ).appendTo(frequency_select);
+        options.var_data.acf.timestep.forEach(function (option) {
+          if (options.frequency.hasOwnProperty(option)) {
+            let this_option = options.frequency[option];
 
-          this_option.options.forEach(function (item) {
-            new_optgroup.append(
-              '<option value="' +
-                item.value +
-                '" data-field="' +
-                item.field +
-                '">' +
-                item.label +
-                '</option>',
-            );
-          });
-        } else {
-          frequency_select.append(
-            '<option value="' +
-              this_option.value +
-              '" data-field="' +
-              this_option.field +
-              '">' +
-              this_option.label +
-              '</option>',
+            if (this_option.hasOwnProperty('group')) {
+              let new_optgroup = $(
+                '<optgroup label="' + this_option.group + '">',
+              ).appendTo(frequency_select);
+
+              this_option.options.forEach(function (item) {
+                new_optgroup.append(
+                  '<option value="' +
+                    item.value +
+                    '" data-field="' +
+                    item.field +
+                    '">' +
+                    item.label +
+                    '</option>',
+                );
+              });
+            } else {
+              frequency_select.append(
+                '<option value="' +
+                  this_option.value +
+                  '" data-field="' +
+                  this_option.field +
+                  '">' +
+                  this_option.label +
+                  '</option>',
+              );
+            }
+          }
+        });
+
+        // console.log('available', options.var_data.acf.timestep);
+        // console.log('selected', options.query.frequency);
+
+        if (!options.var_data.acf.timestep.includes(options.query.frequency)) {
+          // console.log('select first', frequency_select.find('option').first());
+
+          frequency_select.val(
+            frequency_select.find('option').first().attr('value'),
           );
         }
-      });
 
-      // console.log('available', options.var_data.acf.timestep);
-      // console.log('selected', options.query.frequency);
-
-      if (!options.var_data.acf.timestep.includes(options.query.frequency)) {
-        // console.log('select first', frequency_select.find('option').first());
-
-        frequency_select.val(
-          frequency_select.find('option').first().attr('value'),
-        );
+        frequency_select.trigger('change');
       }
-      frequency_select.trigger('change');
     },
 
     redraw_colour_scheme: function (element) {

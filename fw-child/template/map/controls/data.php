@@ -48,7 +48,6 @@
 					
 					<select class="form-select" name="data-frequency" data-query-key="frequency">
 						<option value="ann" data-field="ann"><?php _e ( 'Annual', 'cdc' ); ?></option>
-						<option value="daily" data-field="daily"><?php _e ( 'Daily', 'cdc' ); ?></option>
 						<optgroup label="<?php _e ( 'Monthly', 'cdc' ); ?>" data-field="monthly">
 							<option value="jan"><?php _e ( 'January', 'cdc' ); ?></option>
 							<option value="feb"><?php _e ( 'February', 'cdc' ); ?></option>
@@ -75,6 +74,8 @@
 				
 				<div id="map-control-panels" class="map-control-item">
 					
+					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Scenarios', 'cdc' ); ?></h6>
+				
 					<div class="mb-2">
 						<div class="form-check form-switch">
 							<input class="form-check-input" type="checkbox" role="switch" name="data-scenarios" id="data-scenarios-high" value="high" data-query-key="scenarios">

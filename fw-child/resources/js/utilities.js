@@ -187,6 +187,21 @@ var l10n_table = {
 
     'All topics': 'Tous les sujets',
     Close: 'Fermer',
+
+    // Custom shapefile
+    'Please specify a shapefile': 'Veuillez spécifier un fichier shapefile',
+    'You must select at least one region on the map': 'Vous devez sélectionner au moins une région sur la carte',
+    'The total selected area is too large, please reduce your selection': 'L\'aire totale des régions sélectionnées est trop grosse, veuillez réduire votre sélection',
+    'Processing your file...': 'Traitement de votre fichier...',
+    'Please select at least one region': 'Veuillez sélectionner au moins une région',
+    'An error occurred': 'Une erreur s\'est produite',
+    'Could not process your shapefile': 'Votre fichier shapefile ne peut pas être correctement traité',
+    'Your shapefile must be a ZIP containing at least a .shp file and a .prj file': 'Votre fichier shapefile doit être un ZIP qui contient au moins un fichier .shp et un fichier .prj',
+    'This file is not a valid ZIP file': 'Ce fichier n\'est pas un fichier ZIP valide',
+    'No valid shapefile was found in your ZIP file': 'Aucun fichier shapefile n\' été trouvé dans votre fichier ZIP',
+    'An error occurred while processing your file': 'Une erreur s\'est produite lors du traitement de votre fichier',
+    'Only polygon layers are allowed': 'Seuls les polygones sont permis dans votre fichier',
+
   },
 };
 

@@ -180,6 +180,20 @@
         },
       );
 
+      const customShapeFileField = new CustomShapeFile(
+          item.find('#area-aggregation-shapefile-input').first(),
+          item.find('#area-aggregation-shapefile-message').first(),
+          options.maps,
+      );
+
+      item.find('input[name=area-aggregation]').on('change', function() {
+        if (this.value === 'custom') {
+          customShapeFileField.show_shapes();
+        } else {
+          customShapeFileField.hide_shapes();
+        }
+      });
+
       //
       // EVENTS
       //

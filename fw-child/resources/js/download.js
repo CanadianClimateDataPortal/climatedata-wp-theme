@@ -709,7 +709,11 @@
           query: options.query,
           do_history: do_history,
           callback: function () {
-            if (options.query.var != null) {
+            if (
+              options.query.var != null &&
+              options.query.var != 'null' &&
+              options.var_data != null
+            ) {
               console.log('get layer');
               $(document).cdc_app(
                 'maps.get_layer',

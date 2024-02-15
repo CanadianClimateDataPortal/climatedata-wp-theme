@@ -27,7 +27,7 @@
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-csd" value="" data-query-key="census">
+						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-csd" value="" data-query-key="sector">
 						<label class="form-check-label" for="area-aggregation-csd"><?php _e ( 'Census Subdivisions', 'cdc' ); ?></label>
 					</div>
 					
@@ -42,7 +42,7 @@
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="area-aggregation" value="custom" id="area-aggregation-custom" data-conditional="#area-aggregation-shapefile">
+						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-custom" value="custom" data-query-key="sector" data-conditional="#area-aggregation-shapefile">
 						<label class="form-check-label" for="area-aggregation-custom"><?php _e ( 'Custom shapefile', 'cdc' ); ?></label>
 					</div>
 					

@@ -137,7 +137,7 @@ function child_theme_enqueue() {
     wp_register_script ( 'topojson', $child_npm_dir . 'topojson/dist/topojson.min.js', null, null, true );
     wp_register_script ( 'turf', $child_npm_dir . '@turf/turf/turf.min.js', null, null, true );
 
-    wp_register_script ( 'shape-file-upload', $child_js_dir . 'shape-file-upload.js', array ( 'jquery', 'jszip', 'mapshaper', 'topojson', 'turf' ), null, true );
+    wp_register_script ( 'shapefile-upload', $child_js_dir . 'shapefile-upload.js', array ( 'jquery', 'jszip', 'mapshaper', 'topojson', 'turf' ), null, true );
 	
 	// localize admin url
 	
@@ -167,7 +167,7 @@ function child_theme_enqueue() {
 		case 'download' :
 		case 'telechargement' :
 			wp_enqueue_script ( 'download-app' );
-			wp_enqueue_script ( 'shape-file-upload' );
+			wp_enqueue_script ( 'shapefile-upload' );
 			break;
 			
 		case 'learn' :

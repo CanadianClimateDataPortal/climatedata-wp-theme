@@ -56,6 +56,7 @@
         end_slider: null,
         threshold_accordion: null,
         threshold_slider: null,
+        shapefile_upload: null,
       },
       debug: true,
     };
@@ -180,19 +181,6 @@
         },
       );
 
-      const customShapeFileField = new CustomShapeFile(
-          item.find('#area-aggregation-shapefile-input').first(),
-          item.find('#area-aggregation-shapefile-message').first(),
-          options.maps,
-      );
-
-      item.find('input[name=area-aggregation]').on('change', function() {
-        if (this.value === 'custom') {
-          customShapeFileField.show_shapes();
-        } else {
-          customShapeFileField.hide_shapes();
-        }
-      });
 
       //
       // EVENTS
@@ -349,6 +337,13 @@
           }
         },
       );
+
+      // Custom shapefile component
+      options.elements.shapefile_upload = item.find('#area-aggregation-shapefile-input').first()
+          .shapefile_upload({
+            message_container: '#area-aggregation-shapefile-message',
+            maps: options.maps,
+          });
     },
 
     init_events: function () {
@@ -574,9 +569,27 @@
         }
       });
 
+      // Show/hide the user custom shapefile when the "Custom shapefile" radio button is selected/deselected
+      item.find('input[name=area-aggregation]').on('change', function() {
+        if (this.value === 'custom') {
+          options.elements.shapefile_upload.shapefile_upload('show');
+        } else {
+          options.elements.shapefile_upload.shapefile_upload('hide');
+        }
+      });
+
       // SUBMIT
 
-      item.on('click', '#submit', function () {
+      item.on('click', '#submit', function (event) {
+        // Validate the custom shapefile (if selected)
+        if (options.query.sector === 'custom') {
+          const shapefile_upload_valid = options.elements.shapefile_upload.shapefile_upload('validate');
+          if (!shapefile_upload_valid) {
+            return;
+          }
+          console.log(options.elements.shapefile_upload.shapefile_upload('selected_shapes_json'));
+        }
+
         console.log(JSON.stringify(options.query, null, 4));
         let submit_output = $('<div id="submit-modal">').appendTo('body');
 

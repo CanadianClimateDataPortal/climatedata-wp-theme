@@ -157,3 +157,62 @@ function posttype_resource()
 }
 
 add_action('init', 'posttype_resource', 0);
+
+// interactives
+
+function posttype_interactive() {
+
+    $labels = array(
+        'name'                  => _x( 'Interactive', 'Post Type General Name', 'cdc-post-types' ),
+        'singular_name'         => _x( 'Interactive', 'Post Type Singular Name', 'cdc-post-types' ),
+        'menu_name'             => __( 'Interactive', 'cdc-post-types' ),
+        'name_admin_bar'        => __( 'Interactive', 'cdc-post-types' ),
+        'archives'              => __( 'Interactive Archives', 'cdc-post-types' ),
+        'attributes'            => __( 'Interactive Attributes', 'cdc-post-types' ),
+        'parent_item_colon'     => __( 'Parent Interactive:', 'cdc-post-types' ),
+        'all_items'             => __( 'All Interactive', 'cdc-post-types' ),
+        'add_new_item'          => __( 'Add New Interactive', 'cdc-post-types' ),
+        'add_new'               => __( 'Add New', 'cdc-post-types' ),
+        'new_item'              => __( 'New Interactive', 'cdc-post-types' ),
+        'edit_item'             => __( 'Edit Interactive', 'cdc-post-types' ),
+        'update_item'           => __( 'Update Interactive', 'cdc-post-types' ),
+        'view_item'             => __( 'View Interactive', 'cdc-post-types' ),
+        'view_items'            => __( 'View Interactive', 'cdc-post-types' ),
+        'search_items'          => __( 'Search Interactive', 'cdc-post-types' ),
+        'not_found'             => __( 'Not found', 'cdc-post-types' ),
+        'not_found_in_trash'    => __( 'Not found in Trash', 'cdc-post-types' ),
+        'featured_image'        => __( 'Featured Image', 'cdc-post-types' ),
+        'set_featured_image'    => __( 'Set featured image', 'cdc-post-types' ),
+        'remove_featured_image' => __( 'Remove featured image', 'cdc-post-types' ),
+        'use_featured_image'    => __( 'Use as featured image', 'cdc-post-types' ),
+        'insert_into_item'      => __( 'Insert into item', 'cdc-post-types' ),
+        'uploaded_to_this_item' => __( 'Uploaded to this item', 'cdc-post-types' ),
+        'items_list'            => __( 'Items list', 'cdc-post-types' ),
+        'items_list_navigation' => __( 'Items list navigation', 'cdc-post-types' ),
+        'filter_items_list'     => __( 'Filter items list', 'cdc-post-types' ),
+    );
+    $args   = array(
+        'label'               => __( 'Interactive', 'cdc-post-types' ),
+        'description'         => __( 'ClimateData.ca interactive pages.', 'cdc-post-types' ),
+        'labels'              => $labels,
+        'supports'            => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions', 'author' ),
+        'hierarchical'        => true,
+        'public'              => true,
+        'show_ui'             => true,
+        'show_in_menu'        => true,
+        'menu_position'       => 20,
+        'menu_icon'           => 'dashicons-images-alt',
+        'show_in_admin_bar'   => true,
+        'show_in_nav_menus'   => true,
+        'can_export'          => true,
+        'has_archive'         => true,
+        'exclude_from_search' => false,
+        'publicly_queryable'  => true,
+        'capability_type'     => 'page',
+        'show_in_rest'        => true,
+    );
+    register_post_type( 'interactive', $args );
+
+}
+
+add_action( 'init', 'posttype_interactive', 0 );

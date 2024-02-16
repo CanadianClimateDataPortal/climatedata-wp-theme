@@ -165,7 +165,7 @@ function posttype_interactive() {
     $labels = array(
         'name'                  => _x( 'Interactive', 'Post Type General Name', 'cdc-post-types' ),
         'singular_name'         => _x( 'Interactive', 'Post Type Singular Name', 'cdc-post-types' ),
-        'menu_name'             => __( 'Interactive', 'cdc-post-types' ),
+        'menu_name'             => __( 'Interactives', 'cdc-post-types' ),
         'name_admin_bar'        => __( 'Interactive', 'cdc-post-types' ),
         'archives'              => __( 'Interactive Archives', 'cdc-post-types' ),
         'attributes'            => __( 'Interactive Attributes', 'cdc-post-types' ),
@@ -200,7 +200,7 @@ function posttype_interactive() {
         'public'              => true,
         'show_ui'             => true,
         'show_in_menu'        => true,
-        'menu_position'       => 20,
+        'menu_position'       => 24,
         'menu_icon'           => 'dashicons-images-alt',
         'show_in_admin_bar'   => true,
         'show_in_nav_menus'   => true,

@@ -73,6 +73,11 @@ function child_theme_enqueue() {
 
 	wp_enqueue_style ( 'child-style', $child_theme_dir . 'style.css', NULL, NULL, 'all' );
 	
+	if ( is_singular ( 'interactive' ) ) {
+		wp_enqueue_style ( 'wp-block-library' );
+		// wp_enqueue_style ( 'global-styles' );
+	}
+	
 	if (
 		$GLOBALS['vars']['current_slug'] == 'map' ||
 		$GLOBALS['vars']['current_slug'] == 'carte'
@@ -340,7 +345,8 @@ function cdc_get_location_by_coords () {
 		( isset ( $_GET['lng'] ) && !empty ( $_GET['lng'] ) )
 	) {
 		
-		require_once locate_template ( 'resources/app/db.php' );
+		if ( locate_template ( 'resources/app/db.php' ) != '' )
+			require_once locate_template ( 'resources/app/db.php' );
 		
 		$lat = floatval ( $_GET['lat'] );
 		$lng = floatval ( $_GET['lng'] );

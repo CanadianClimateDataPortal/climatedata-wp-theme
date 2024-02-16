@@ -3,7 +3,7 @@
  * Gutenberg Styles
  * ----------------------------------------------
  */
-
+ 
 // Global variables
 $mobile_viewport_width: 900px;
 
@@ -373,16 +373,6 @@ $mobile_viewport_width: 900px;
       font-weight: 600;
       margin-top: 20px;
       text-align: center;
-    }
-  }
-}
-
-/* Page Styling */
-
-.single-interactive {
-  h1 {
-    @include media-breakpoint-down(md) {
-      font-size: $h1-font-size * 0.7;
     }
   }
 }

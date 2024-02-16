@@ -71,11 +71,15 @@ function child_theme_enqueue() {
 
 	wp_enqueue_style ( 'leaflet', $child_npm_dir . 'leaflet/dist/leaflet.css', NULL, NULL, 'all' );
 
+	wp_register_style ( 'gutenberg', $child_theme_dir . 'resources/css/gutenberg.css', null, null );
 	wp_enqueue_style ( 'child-style', $child_theme_dir . 'style.css', NULL, NULL, 'all' );
 	
-	if ( is_singular ( 'interactive' ) ) {
+	if (
+		is_singular ( 'interactive' ) ||
+		is_singular ( 'resource' )
+	) {
 		wp_enqueue_style ( 'wp-block-library' );
-		// wp_enqueue_style ( 'global-styles' );
+		wp_enqueue_style ( 'gutenberg' );
 	}
 	
 	if (

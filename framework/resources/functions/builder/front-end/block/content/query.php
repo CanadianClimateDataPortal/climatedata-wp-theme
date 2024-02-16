@@ -77,6 +77,11 @@ if ( $element['inputs']['type'] == 'posts' ) {
 	
 	// dumpit ( $args );
 	
+	// random seed
+	
+	if ( $args['orderby'] == 'rand' )
+		$args['orderby'] = 'RAND(' . mt_rand ( 100000, 999999 ) . ')';
+	
 	// run the query
 	
 	$element['query'] = new WP_Query ( $args );

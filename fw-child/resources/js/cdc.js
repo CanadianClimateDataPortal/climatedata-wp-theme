@@ -103,6 +103,9 @@
       },
       first_map: null,
       current_sector: 'canadagrid',
+      hooks: {
+        'maps.get_layer': Array(1000)
+      },
       legend: {
         colormap: null,
       },
@@ -226,6 +229,10 @@
       // console.log(this.options[opt_name]);
     },
 
+    add_hook: function (hook_name, priority, obj, hook_function) {
+      this.options.hooks[hook_name][priority] = {obj: obj, fn: hook_function};
+    },
+
     maps: {
       init: function (maps, callback) {
         let plugin = !this.item ? this.data('cdc_app') : this,
@@ -322,6 +329,30 @@
         return options.maps;
       },
 
+      // returns Geoserver layer name
+      // sample result: CDC:cmip6-HXmax30-ys-ssp585-p50-ann-30year
+      get_layer_name: function(query, scenario='high') {
+        const dataset_details = DATASETS[query.dataset];
+        let frequency_code = query.frequency;
+
+        if (period_frequency_lut.hasOwnProperty(query.frequency)) {
+          frequency_code = period_frequency_lut[query.frequency];
+        }
+
+        return 'CDC:' + dataset_details.layer_prefix +
+        query.var +
+        '-' +
+        frequency_code +
+        '-' +
+        scenario_names[query.dataset][scenario]
+          .replace(/[\W_]+/g, '')
+          .toLowerCase() +
+        '-p50-' +
+        query.frequency +
+        '-30year' +
+        (query.delta == 'true' ? '-delta7100' : '');
+      },
+
       get_layer: function (query, var_data) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           item = plugin.item,
@@ -372,11 +403,7 @@
 
                   // ys/ms/qsdec
 
-                  let frequency_code = query.frequency;
 
-                  if (period_frequency_lut.hasOwnProperty(query.frequency)) {
-                    frequency_code = period_frequency_lut[query.frequency];
-                  }
 
                   // ann/spring/summer/
 
@@ -390,31 +417,15 @@
                   //   frequency_name = 'summer';
                   // }
 
-                  this_map.layer_name =
-                    'CDC:' +
-                    (query.dataset == 'cmip6' ? query.dataset + '-' : '') +
-                    query.var +
-                    '-' +
-                    frequency_code +
-                    '-' +
-                    scenario_names[query.dataset][key]
-                      .replace(/[\W_]+/g, '')
-                      .toLowerCase() +
-                    '-p50-' +
-                    frequency_name +
-                    '-30year' +
-                    (query.delta == 'true' ? '-delta7100' : '');
+                  this_map.layer_name = plugin.maps.get_layer_name(query, key);
 
                   // console.log(this_map.layer_name);
 
                   let params = {
                     format: 'image/png',
-                    opacity: 1,
                     transparent: true,
                     tiled: true,
-                    pane: 'raster',
                     version: query.dataset == 'cmip6' ? '1.3.0' : '1.1.1',
-                    bounds: options.canadaBounds,
                     layers: this_map.layer_name,
                     TIME: parseInt(query.decade) + '-01-00T00:00:00Z',
                   };
@@ -423,27 +434,36 @@
                     params.styles = 'CDC:building_climate_zones';
                   }
 
-                  //
+                  // apply hooks
+                  options.hooks['maps.get_layer'].forEach(function (hook) {
+                    hook.obj[hook.fn](query, params);
+                    }
+                  )
 
                   if (
                     this_map.layers.raster &&
                     this_map.object.hasLayer(this_map.layers.raster)
                   ) {
-                    if (!this_map.layers.raster.hasOwnProperty('cdc_params')) {
-                      this_map.layers.raster.cdc_params = {};
-                    }
-
                     // if any map parameters have changed
                     if (!_.isEqual(this_map.layers.raster.cdc_params, params)) {
                       // update existing
                       this_map.layers.raster.setParams(params);
-                      this_map.layers.raster.cdc_params = $.extend({}, params);
+                      this_map.layers.raster.cdc_params = _.cloneDeep(params);
                     }
                   } else {
                     // create layer
+                    let saved_params = _.cloneDeep(params);
+
+                    // those three parameters must be specified at creation only
+                    // otherwise, a bug in leaflet leaks them to the WMS requests
+                    params.opacity = 1;
+                    params.pane = 'raster';
+                    params.bounds = options.canadaBounds;
+
                     this_map.layers.raster = L.tileLayer
                       .wms(geoserver_url + '/geoserver/ows?', params)
                       .addTo(this_map.object);
+                    this_map.layers.raster.cdc_params = saved_params;
                   }
 
                   // grid
@@ -759,31 +779,16 @@
           item = plugin.item,
           options = plugin.options;
 
-        // sample result: cmip6-HXmax30-ys-ssp585-p50-ann-30year
+        let layer_name = plugin.maps.get_layer_name(query);
 
-        let msorys = period_frequency_lut[query.frequency];
-
-        options.layer_name =
-          (query.dataset == 'cmip6' ? 'cmip6-' : '') +
-          query.var +
-          '-' +
-          msorys +
-          '-' +
-          (query.dataset == 'cmip6' ? 'ssp126' : 'rcp26') +
-          '-p50-' +
-          query.frequency +
-          '-30year' +
-          (query.delta == 'true' ? '-delta7100' : '');
-
-        console.log('layer name', options.layer_name);
+        console.log('layer name', layer_name);
 
         let request_url =
           geoserver_url +
           '/geoserver/wms?service=WMS&version=1.1.0' +
           '&request=GetLegendGraphic' +
           '&format=application/json' +
-          '&layer=CDC:' +
-          options.layer_name;
+          '&layer=' + layer_name;
 
         if (var_data.slug == 'building_climate_zones') {
           request_url += '&style=CDC:building_climate_zones';

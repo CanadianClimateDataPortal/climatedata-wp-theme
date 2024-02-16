@@ -71,7 +71,16 @@ function child_theme_enqueue() {
 
 	wp_enqueue_style ( 'leaflet', $child_npm_dir . 'leaflet/dist/leaflet.css', NULL, NULL, 'all' );
 
+	wp_register_style ( 'gutenberg', $child_theme_dir . 'resources/css/gutenberg.css', null, null );
 	wp_enqueue_style ( 'child-style', $child_theme_dir . 'style.css', NULL, NULL, 'all' );
+	
+	if (
+		is_singular ( 'interactive' ) ||
+		is_singular ( 'resource' )
+	) {
+		wp_enqueue_style ( 'wp-block-library' );
+		wp_enqueue_style ( 'gutenberg' );
+	}
 	
 	if (
 		$GLOBALS['vars']['current_slug'] == 'map' ||
@@ -340,7 +349,8 @@ function cdc_get_location_by_coords () {
 		( isset ( $_GET['lng'] ) && !empty ( $_GET['lng'] ) )
 	) {
 		
-		require_once locate_template ( 'resources/app/db.php' );
+		if ( locate_template ( 'resources/app/db.php' ) != '' )
+			require_once locate_template ( 'resources/app/db.php' );
 		
 		$lat = floatval ( $_GET['lat'] );
 		$lng = floatval ( $_GET['lng'] );

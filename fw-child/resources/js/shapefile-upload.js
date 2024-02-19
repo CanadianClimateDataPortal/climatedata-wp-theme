@@ -325,18 +325,22 @@
   /**
    * Class controlling the "custom shapes" map layer.
    *
-   * Allow to add custom shapes to a map, and allow the user to select shapes. Contain methods to retrieve information
-   * about the selected shapes.
+   * Allow to add custom shapes to Leaflet maps, and allow the user to select shapes. Contain methods to retrieve
+   * information about the selected shapes.
    *
-   * @param {object} maps - Maps where to show the shapes. As defined in `CustomShapeFile`.
+   * The class can manage multiple maps. All maps are synchronised: calling `add_topo_json()` will add the shapes to all
+   * the maps, and de/selecting a shape in one map will de/select it in the other maps.
+   *
+   * @param {object} maps - Maps where to show the shapes. Same object as defined in `CustomShapeFile`.
    * @constructor
    */
   function MapShapesLayer(maps) {
-    this.map = maps.medium.object;
+    this.maps = maps;
     this.selected_regions = [];
-    this.geo_json = this.init_geo_json();
+    this.shape_layers = {}
     this.geo_json_output = null;
     this.visible = false;
+    this.create_shape_layers();
   }
 
   /**
@@ -360,28 +364,88 @@
   }
 
   MapShapesLayer.prototype = {
+
     /**
-     * Remove all shapes from the map.
+     * Remove all shapes from the maps.
      */
     clear: function() {
       this.selected_regions = [];
-      this.geo_json.clearLayers();
+      for (let map_name in this.maps) {
+        this.shape_layers[map_name].clearLayers();
+      }
     },
 
     /**
-     * Hide the custom shapes added to the map.
+     * Hide the custom shapes added to the maps.
      */
     hide: function() {
       this.visible = false;
-      this.geo_json.removeFrom(this.map);
+      for (let map_name in this.maps) {
+        this.shape_layers[map_name].removeFrom(this.maps[map_name].object);
+      }
     },
 
     /**
-     * Show the custom shapes added to the map.
+     * Show the custom shapes added to the maps.
      */
     show: function() {
       this.visible = true;
-      this.geo_json.addTo(this.map);
+      for (let map_name in this.maps) {
+        const layer = this.shape_layers[map_name];
+        layer.addTo(this.maps[map_name].object);
+      }
+    },
+
+    /**
+     * For each of the maps, create a GeoJSON layer to hold the custom shapefile shapes.
+     *
+     * The layers are saved in `this.shape_layers`.
+     */
+    create_shape_layers: function() {
+      for (let map_name in this.maps) {
+        const layer = new L.TopoJSON(null, {
+          style: function () {
+            return MapShapesLayer.SHAPE_STYLES.normal;
+          }
+        });
+
+        layer.on('click', (e) => this.handle_region_click(e));
+
+        this.shape_layers[map_name] = layer;
+      }
+    },
+
+    /**
+     * Handle a click on a shape on any of the maps to de/select this shape and update its style accordingly.
+     *
+     * The shape's style will also be updated on all the other maps.
+     *
+     * @param event - Click event object sent by Leaflet
+     */
+    handle_region_click: function(event) {
+      const shape = event.layer;
+      const region_index = shape['feature']['properties']['regionIndex'];
+      const region_is_deselected = this.selected_regions.includes(region_index);
+
+      // Update the internal list of selected regions
+      if (region_is_deselected) {
+        this.selected_regions = this.selected_regions.filter(e => e !== region_index);
+      } else {
+        this.selected_regions.push(region_index);
+      }
+
+      // Update the styles of the maps shapes. For performance reasons, only the selected/deselected shape will have
+      // its style updated (instead of updating the style of all the shapes).
+      for (let map_name in this.maps) {
+        this.shape_layers[map_name].eachLayer((current_shape) => {
+          const current_index = current_shape['feature']['properties']['regionIndex'];
+
+          if (current_index === region_index) {
+            current_shape.setStyle(MapShapesLayer.SHAPE_STYLES[region_is_deselected ? 'normal' : 'selected']);
+            return;
+          }
+        });
+      }
     },
 
     /**
@@ -418,15 +482,26 @@
     },
 
     /**
-     * Add to the map the shapes described in a TopoJSON object.
+     * Add to the maps the shapes described in a TopoJSON object.
      *
      * @param {object} topo_json_data
      */
     add_topo_json: function (topo_json_data) {
       this.clear();
-      this.geo_json.addData(topo_json_data);
-      const bounds = this.geo_json.getBounds();
-      this.map.fitBounds(bounds);
+
+      for (let map_name in this.maps) {
+        const layer = this.shape_layers[map_name];
+        layer.addData(topo_json_data);
+
+        // Fit the bounds of the map, but only if the map is visible
+        const bounds = layer.getBounds();
+        const map_container = this.maps[map_name].container;
+        const map_is_visible = map_container.is(':visible') && map_container.width() > 0 && map_container.height() > 0
+
+        if (map_is_visible) {
+          this.maps[map_name].object.fitBounds(bounds);
+        }
+      }
 
       if (topo_json_data.type === 'Topology') {
         for (let key in topo_json_data.objects) {
@@ -435,35 +510,6 @@
           }
         }
       }
-    },
-
-    /**
-     * Create and return the GeoJSON layer that will contain the custom shapes.
-     *
-     * @returns {*}
-     */
-    init_geo_json: function() {
-      const geo_json = new L.TopoJSON(null, {
-        style: function () {
-          return MapShapesLayer.SHAPE_STYLES.normal;
-        }
-      });
-
-      geo_json.on('click', (e) => {
-        const feature = e.layer;
-
-        const region_index = feature['feature']['properties']['regionIndex'];
-
-        if (this.selected_regions.includes(region_index)) {
-          feature.setStyle(MapShapesLayer.SHAPE_STYLES.normal);
-          this.selected_regions = this.selected_regions.filter(e => e !== region_index);
-        } else {
-          feature.setStyle(MapShapesLayer.SHAPE_STYLES.selected);
-          this.selected_regions.push(region_index);
-        }
-      });
-
-      return geo_json;
     },
   }
 

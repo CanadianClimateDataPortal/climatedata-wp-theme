@@ -44,6 +44,7 @@
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-custom" value="custom" data-query-key="sector" data-conditional="#area-aggregation-shapefile">
 						<label class="form-check-label" for="area-aggregation-custom"><?php _e ( 'Custom shapefile', 'cdc' ); ?></label>
+                        <a tabindex="0" role="button" id="area-aggregation-custom-tooltip" class="text-secondary">ⓘ</a>
 					</div>
 					
 					<div id="area-aggregation-shapefile" class="bg-gray-200 p-3">

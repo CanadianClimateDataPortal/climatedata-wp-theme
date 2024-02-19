@@ -569,6 +569,10 @@
         }
       });
 
+      //
+      // CUSTOM SHAPEFILE
+      //
+
       // Show/hide the user custom shapefile when the "Custom shapefile" radio button is selected/deselected
       item.find('input[name=area-aggregation]').on('change', function() {
         if (this.value === 'custom') {
@@ -578,7 +582,16 @@
         }
       });
 
+      // Show information with the "more info" button.
+      item.find('#area-aggregation-custom-tooltip').popover({
+        trigger: 'hover',
+        html: true,
+        content: T('A shapefile is a ZIP file containing at least the <em>.shp</em> and <em>.prj</em> files. It must contain only closed polygons and must be entirely contained inside the canadian territory.'),
+      });
+
+      //
       // SUBMIT
+      //
 
       item.on('click', '#submit', function (event) {
         // Validate the custom shapefile (if selected)

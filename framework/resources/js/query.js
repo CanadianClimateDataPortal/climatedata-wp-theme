@@ -276,6 +276,9 @@
 				
 			})
 			
+			// always set the page back to 1
+			options.args.paged = 1
+			
 			// console.log('new args', options.args)
 			
 			plugin.do_query()

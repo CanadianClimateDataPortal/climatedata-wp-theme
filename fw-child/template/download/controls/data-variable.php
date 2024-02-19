@@ -10,11 +10,11 @@
 				
 				<div id="var-select-query" class="fw-query-object"
 					data-args='{
-						"posts_per_page":15,
+						"posts_per_page": 15,
 						"post_type": [ "variable" ],
-						"orderby":"rand",
-						"order":"asc",
-						"post_status":"publish"
+						"orderby": "RAND(<?php echo mt_rand ( 100000, 999999 ); ?>)",
+						"order": "asc",
+						"post_status": "publish"
 					}'
 				>
 					

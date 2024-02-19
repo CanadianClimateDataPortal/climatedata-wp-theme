@@ -171,6 +171,7 @@ function child_theme_enqueue() {
 		case 'map' :
 		case 'carte' :
 			wp_enqueue_script ( 'map-app' );
+            wp_enqueue_script ( 'shapefile-upload' );
 			break;
 			
 		case 'download' :

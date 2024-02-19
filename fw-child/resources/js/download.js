@@ -586,7 +586,9 @@
       item.find('#area-aggregation-custom-tooltip').popover({
         trigger: 'hover',
         html: true,
-        content: T('A shapefile is a ZIP file containing at least the <em>.shp</em> and <em>.prj</em> files. It must contain only closed polygons and must be entirely contained inside the canadian territory.'),
+        content: T('A shapefile is a ZIP file containing at least the <em>.shp</em> and <em>.prj</em> files. ' +
+          'It must contain only closed polygons and must be entirely contained inside the canadian territory. Once ' +
+          'your shapefile is uploaded, click all the regions for which you want data.'),
       });
 
       //

@@ -361,6 +361,13 @@
           }
         });
 
+      // Custom shapefile component
+      options.elements.shapefile_upload = item.find('#download-area-shapefile-input').first()
+        .shapefile_upload({
+          message_container: '#download-area-shapefile-message',
+          maps: options.maps,
+        });
+
       // console.log('frequency', options.frequency);
     },
 
@@ -623,6 +630,28 @@
         console.log('POP');
         options.status = 'eval';
         plugin.handle_pop(e);
+      });
+
+      //
+      // CUSTOM SHAPEFILE
+      //
+
+      // Show/hide the user custom shapefile when the "Custom shapefile" radio button is selected/deselected
+      item.find('input[name=download-area]').on('change', function() {
+        if (this.value === 'custom') {
+          options.elements.shapefile_upload.shapefile_upload('show');
+        } else {
+          options.elements.shapefile_upload.shapefile_upload('hide');
+        }
+      });
+
+      // Show information with the "more info" button.
+      item.find('#download-area-custom-tooltip').popover({
+        trigger: 'hover',
+        html: true,
+        content: T('A shapefile is a ZIP file containing at least the <em>.shp</em> and <em>.prj</em> files. ' +
+          'It must contain only closed polygons and must be entirely contained inside the canadian territory. Once ' +
+          'your shapefile is uploaded, click all the regions for which you want data.'),
       });
     },
 

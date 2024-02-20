@@ -271,6 +271,10 @@
           this_object.getPane('stations').style.zIndex = 600;
           this_object.getPane('stations').style.pointerEvents = 'all';
 
+          this_object.createPane('custom_shapefile');
+          this_object.getPane('custom_shapefile').style.zIndex = 700;
+          this_object.getPane('custom_shapefile').style.pointerEvents = 'all';
+
           // basemap
           L.tileLayer(
             '//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png',

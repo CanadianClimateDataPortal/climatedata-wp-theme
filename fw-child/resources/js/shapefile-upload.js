@@ -354,7 +354,7 @@
       opacity: 1,
       weight: 1,
       fillColor: '#35495d',
-      fillOpacity: 0.8,
+      fillOpacity: 0.5,
     },
     selected: {
       opacity: 1,
@@ -406,7 +406,8 @@
         const layer = new L.TopoJSON(null, {
           style: function () {
             return MapShapesLayer.SHAPE_STYLES.normal;
-          }
+          },
+          pane: 'custom_shapefile',
         });
 
         layer.on('click', (e) => this.handle_region_click(e));

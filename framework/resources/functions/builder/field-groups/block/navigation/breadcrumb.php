@@ -17,59 +17,72 @@ $menus = wp_get_nav_menus();
 	
 			<div class="p-3 border-bottom">
 				
-				<h6>Top-level Item</h6>
+				<h6>Static Parents</h6>
 				
-				<div class="row row-cols-3">
+				<div class="fw-form-repeater-container">
 					
-					<div class="col pe-3">
-						<label for="inputs-include-top_label" class="form-label">Label</label>
-						
-						<input type="text" class="form-control" placeholder="Leave blank to use page title" name="inputs-include-top_label-<?php echo $_GET['globals']['current_lang_code']; ?>">
+					<div class="row border-bottom p-2 fw-form-repeater-head modal-label-sm">
+						<div class="col">Label</div>
+						<div class="col">Page</div>
+						<div class="col-1"></div>
 					</div>
 					
-					<div class="col pe-3">
-						<label for="inputs-include-top" class="form-label">Page</label>
-						
-						<select name="inputs-include-top" id="inputs-include-top" class="form-select conditional-select">
-							<option value="none">None</option>
-							<option value="home" selected>Home Page</option>
-							<option value="posts">Posts Page</option>
-							<option value="other" data-form-condition="#include-other-page">Other</option>
-						</select>
-					</div>
-					
-					<div class="col" id="include-other-page">
-						
-						<label for="inputs-include-top_other" class="form-label">Other</label>
-						
-						<?php
-						
-							$top_query = get_posts ( array (
-								'posts_per_page' => -1,
-								'post_type' => 'page',
-								'post_parent' => 0,
-							));
+					<div class="fw-form-repeater p-2 border-bottom" data-key="static" data-rows="1">
 							
-						?>
-						
-						<select class="form-select" name="inputs-include-top_other" id="inputs-include-top_other">
-							<?php
+						<div class="fw-form-repeater-row row my-1" data-row-index="0">
 							
-								foreach ( $top_query as $parent_page ) {
+							<div class="col pe-3">
+								
+								<input type="text" class="form-control" placeholder="Leave blank to use page title" name="inputs-static-rows[]-text-<?php echo $_GET['globals']['current_lang_code']; ?>" id="inputs-static-rows[]-text-<?php echo $_GET['globals']['current_lang_code']; ?>">
+								
+							</div>
+							
+							<div class="col pe-3">
+							
+								<?php
+								
+									$top_query = get_posts ( array (
+										'posts_per_page' => -1,
+										'post_type' => 'page',
+										'post_parent' => 0,
+									));
 									
-							?>
+								?>
+								
+								<select class="form-select" name="inputs-static-rows[]-page" id="inputs-static-rows[]-page">
+									<?php
+									
+										foreach ( $top_query as $parent_page ) {
+											
+									?>
+									
+									<option value="<?php echo $parent_page->ID; ?>"><?php echo $parent_page->post_title; ?></option>
+									
+									<?php
+									
+										}
+								
+									?>
+								</select>
+								
+							</div>
 							
-							<option value="<?php echo $parent_page->ID; ?>"><?php echo $parent_page->post_title; ?></option>
+							<div class="col-1 d-flex align-items-end justify-content-center">
+								<div class="fw-form-repeater-delete-row btn btn-sm btn-outline-danger">Delete</div>
+							</div>
 							
-							<?php
+							<input type="hidden" id="inputs-static-rows[]-index" name="inputs-static-rows[]-index" value="0">
 							
-								}
-						
-							?>
-						</select>
+						</div>
 						
 					</div>
+					
+					<div class="d-flex justify-content-end p-2">
+						<div class="fw-form-repeater-add-row btn btn-sm btn-outline-primary">+ Add row</div>
+					</div>
+					
 				</div>
+				
 			</div>
 			
 			<div class="p-3 border-bottom">

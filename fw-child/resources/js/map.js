@@ -1345,9 +1345,8 @@
         layer_params.sld_body = plugin.generate_sld(
           layer_params.layers,
           selected_item.data('scheme-colours'),
-          variables_data[query.var][
-            period_frequency_lut[query.frequency]
-            ],
+          variables_data[query.var][period_frequency_lut[query.frequency]],
+          query.delta == 'true',
           selected_item.data('scheme-type'),
           query.scheme_type == 'discrete',
         );
@@ -1402,13 +1401,14 @@
       layer_name,
       colours,
       variable_data,
+      delta,
       type,
       discrete,
     ) {
+      let absolute_or_delta = delta ? 'delta' : 'absolute';
       let colormap_type = discrete ? 'intervals' : 'ramp';
-      let low = variable_data.low;
-      let high = variable_data.high;
-      let kelvin_convert = 0;
+      let low = variable_data[absolute_or_delta].low;
+      let high = variable_data[absolute_or_delta].high;
       let scheme_length = colours.length;
 
       // if we have a diverging ramp, we center the legend at zero
@@ -1418,7 +1418,7 @@
       }
 
       // temperature data files are in Kelvin
-      if (variable_data.unit == 'K') {
+      if (variable_data.unit == 'K' && !delta) {
         low += 273.15;
         high += 273.15;
       }

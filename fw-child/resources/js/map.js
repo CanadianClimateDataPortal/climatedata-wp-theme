@@ -661,6 +661,7 @@
       switch (this_key) {
         case 'var_id':
           plugin.update_var(this_val, status);
+          plugin.update_default_scheme();
           break;
         case 'frequency':
           plugin.update_default_scheme();

@@ -13,8 +13,19 @@
 	<ol class="breadcrumb">
 		<?php
 		
-			// home page
+			// static parents
 		
+			foreach ( $element['inputs']['static']['rows'] as $static_parent ) {
+				
+		?>
+		
+		<li class="breadcrumb-item"><a href="<?php echo translate_permalink ( get_permalink ( $static_parent['page'] ), $static_parent['page'], $globals['current_lang_code'] ); ?>"><?php echo $static_parent['text'][$globals['current_lang_code']]; ?></a>
+		
+		<?php
+				
+			}
+				
+			/*
 			switch ( $element['inputs']['include']['top'] ) {
 				case 'home' :
 					$top_ID = get_option ( 'page_on_front' );
@@ -53,7 +64,7 @@
 		
 		<?php
 		
-			}
+			}*/
 		
 			// posts page
 		

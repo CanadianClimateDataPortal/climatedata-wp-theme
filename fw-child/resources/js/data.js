@@ -1,67 +1,178 @@
 const variables_data = {
-  "cdd": {"ys": {"low": 10.0, "high": 100.0, "unit": " Days"}},
-  "cddcold_18": {"ys": {"low": 0.0, "high": 800.0, "unit": " Degree Days"}},
-  "dlyfrzthw_tx0_tn-1": {"ys": {"low": 8.0, "high": 100.0, "unit": " Days"}},
-  "frost_days": {"ys": {"low": 20.0, "high": 400.0, "unit": " Days"}},
-  "gddgrow_0": {
-    "ms": {"low": 0.0, "high": 700.0, "unit": " Degree Days"},
-    "ys": {"low": 20.0, "high": 5000.0, "unit": " Degree Days"}
+  "HXmax30": {
+    "ys": {"absolute": {"low": 0.0, "high": 100.0}, "delta": {"low": -10.0, "high": 70.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.0, "high": 20.0}, "delta": {"low": -3.0, "high": 20.0}, "unit": "days"},
+    "qs-dec": {"absolute": {"low": 0.0, "high": 70.0}, "delta": {"low": -7.0, "high": 40.0}, "unit": "days"}
   },
-  "gddgrow_5": {"ys": {"low": 0.5, "high": 3000.0, "unit": " Degree Days"}},
-  "hddheat_18": {"ys": {"low": 3000.0, "high": 20000.0, "unit": " Degree Days"}},
-  "ice_days": {"ys": {"low": 1.0, "high": 300.0, "unit": " Days"}},
-  "nr_cdd": {"ms": {"low": 0.2, "high": 2.0, "unit": " periods"}, "ys": {"low": 5.0, "high": 20.0, "unit": " periods"}},
+  "HXmax35": {
+    "ys": {"absolute": {"low": 0.0, "high": 60.0}, "delta": {"low": -5.0, "high": 50.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.0, "high": 10.0}, "delta": {"low": -1.0, "high": 10.0}, "unit": "days"},
+    "qs-dec": {"absolute": {"low": 0.0, "high": 40.0}, "delta": {"low": -2.0, "high": 30.0}, "unit": "days"}
+  },
+  "HXmax40": {
+    "ys": {"absolute": {"low": 0.0, "high": 30.0}, "delta": {"low": -1.0, "high": 20.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.0, "high": 4.0}, "delta": {"low": 0.0, "high": 4.0}, "unit": "days"},
+    "qs-dec": {"absolute": {"low": 0.0, "high": 10.0}, "delta": {"low": 0.0, "high": 10.0}, "unit": "days"}
+  },
+  "cdd": {"ys": {"absolute": {"low": 10.0, "high": 100.0}, "delta": {"low": -40.0, "high": 9.0}, "unit": "days"}},
+  "cddcold_18": {
+    "ys": {
+      "absolute": {"low": 0.0, "high": 800.0},
+      "delta": {"low": -80.0, "high": 600.0},
+      "unit": "degree_days"
+    }
+  },
+  "dlyfrzthw_tx0_tn-1": {
+    "ys": {
+      "absolute": {"low": 8.0, "high": 100.0},
+      "delta": {"low": -40.0, "high": 8.0},
+      "unit": "days"
+    }
+  },
+  "first_fall_frost": {
+    "ys": {
+      "absolute": {"low": 200.0, "high": 300.0},
+      "delta": {"low": -10.0, "high": 60.0},
+      "unit": ""
+    }
+  },
+  "frost_days": {
+    "ys": {
+      "absolute": {"low": 20.0, "high": 400.0},
+      "delta": {"low": -80.0, "high": 10.0},
+      "unit": "days"
+    }
+  },
+  "frost_free_season": {
+    "ys": {
+      "absolute": {"low": 2.0, "high": 300.0},
+      "delta": {"low": -20.0, "high": 90.0},
+      "unit": "days"
+    }
+  },
+  "gddgrow_0": {
+    "ys": {
+      "absolute": {"low": 20.0, "high": 5000.0},
+      "delta": {"low": -300.0, "high": 2000.0},
+      "unit": "K days"
+    }, "ms": {"absolute": {"low": 0.0, "high": 700.0}, "delta": {"low": -40.0, "high": 200.0}, "unit": "K days"}
+  },
+  "gddgrow_5": {
+    "ys": {
+      "absolute": {"low": 0.5, "high": 3000.0},
+      "delta": {"low": -200.0, "high": 1000.0},
+      "unit": "degree_days"
+    }
+  },
+  "hddheat_18": {
+    "ys": {
+      "absolute": {"low": 3000.0, "high": 20000.0},
+      "delta": {"low": -4000.0, "high": 700.0},
+      "unit": "degree_days"
+    }
+  },
+  "ice_days": {"ys": {"absolute": {"low": 1.0, "high": 300.0}, "delta": {"low": -60.0, "high": 10.0}, "unit": "days"}},
+  "last_spring_frost": {
+    "ys": {
+      "absolute": {"low": 60.0, "high": 200.0},
+      "delta": {"low": -40.0, "high": 9.0},
+      "unit": ""
+    }
+  },
+  "nr_cdd": {
+    "ys": {"absolute": {"low": 5.0, "high": 20.0}, "delta": {"low": -4.0, "high": 3.0}, "unit": ""},
+    "ms": {"absolute": {"low": 0.2, "high": 2.0}, "delta": {"low": -0.7, "high": 0.3}, "unit": ""}
+  },
   "prcptot": {
-    "ms": {"low": 6.0, "high": 300.0, "unit": " mm/day"},
-    "qs-dec": {"low": 20.0, "high": 900.0, "unit": " mm/day"},
-    "ys": {"low": 60.0, "high": 3000.0, "unit": " mm"}
+    "ys": {"absolute": {"low": 60.0, "high": 3000.0}, "delta": {"low": -40.0, "high": 200.0}, "unit": "mm"},
+    "ms": {"absolute": {"low": 6.0, "high": 300.0}, "delta": {"low": -10.0, "high": 30.0}, "unit": "mm day-1"},
+    "qs-dec": {"absolute": {"low": 20.0, "high": 900.0}, "delta": {"low": -20.0, "high": 70.0}, "unit": "mm day-1"}
   },
   "r10mm": {
-    "ms": {"low": 0.0, "high": 6.0, "unit": " Days"},
-    "qs-dec": {"low": 0.0, "high": 20.0, "unit": " Days"},
-    "ys": {"low": 0.1, "high": 100.0, "unit": " Days"}
+    "ys": {"absolute": {"low": 0.1, "high": 100.0}, "delta": {"low": -2.0, "high": 9.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.0, "high": 6.0}, "delta": {"low": -0.2, "high": 0.6}, "unit": "days"},
+    "qs-dec": {"absolute": {"low": 0.0, "high": 20.0}, "delta": {"low": -0.3, "high": 2.0}, "unit": "days"}
   },
   "r1mm": {
-    "ms": {"low": 0.7, "high": 20.0, "unit": " Days"},
-    "qs-dec": {"low": 2.0, "high": 70.0, "unit": " Days"},
-    "ys": {"low": 20.0, "high": 200.0, "unit": " Days"}
+    "ys": {"absolute": {"low": 20.0, "high": 200.0}, "delta": {"low": -7.0, "high": 40.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.7, "high": 20.0}, "delta": {"low": -2.0, "high": 6.0}, "unit": "days"},
+    "qs-dec": {"absolute": {"low": 2.0, "high": 70.0}, "delta": {"low": -4.0, "high": 20.0}, "unit": "days"}
   },
   "r20mm": {
-    "ms": {"low": 0.0, "high": 6.0, "unit": " Days"},
-    "qs-dec": {"low": 0.0, "high": 20.0, "unit": " Days"},
-    "ys": {"low": 0.0, "high": 50.0, "unit": " Days"}
+    "ys": {"absolute": {"low": 0.0, "high": 50.0}, "delta": {"low": -0.8, "high": 5.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.0, "high": 6.0}, "delta": {"low": -0.2, "high": 0.6}, "unit": "days"},
+    "qs-dec": {"absolute": {"low": 0.0, "high": 20.0}, "delta": {"low": -0.3, "high": 2.0}, "unit": "days"}
   },
   "rx1day": {
-    "ms": {"low": 1.0, "high": 50.0, "unit": " mm"},
-    "qs-dec": {"low": 2.0, "high": 70.0, "unit": " mm/day"},
-    "ys": {"low": 7.0, "high": 90.0, "unit": " mm/day"}
+    "ys": {"absolute": {"low": 7.0, "high": 90.0}, "delta": {"low": -3.0, "high": 10.0}, "unit": "mm day-1"},
+    "ms": {"absolute": {"low": 1.0, "high": 50.0}, "delta": {"low": -2.0, "high": 6.0}, "unit": "mm"},
+    "qs-dec": {"absolute": {"low": 2.0, "high": 70.0}, "delta": {"low": -2.0, "high": 8.0}, "unit": "mm/day"}
   },
-  "rx5day": {"ms": {"low": 3.0, "high": 100.0, "unit": " mm"}, "ys": {"low": 10.0, "high": 200.0, "unit": " mm"}},
+  "rx5day": {
+    "ys": {"absolute": {"low": 10.0, "high": 200.0}, "delta": {"low": -4.0, "high": 20.0}, "unit": "mm"},
+    "ms": {"absolute": {"low": 3.0, "high": 100.0}, "delta": {"low": -4.0, "high": 10.0}, "unit": "mm"}
+  },
   "tg_mean": {
-    "ms": {"low": -40.0, "high": 40.0, "unit": "K"},
-    "qs-dec": {"low": -40.0, "high": 40.0, "unit": "K"},
-    "ys": {"low": -20.0, "high": 20.0, "unit": "K"}
+    "ys": {"absolute": {"low": -20.0, "high": 10.0}, "delta": {"low": -2.0, "high": 10.0}, "unit": "K"},
+    "ms": {"absolute": {"low": -40.0, "high": 20.0}, "delta": {"low": -3.0, "high": 20.0}, "unit": "K"},
+    "qs-dec": {"absolute": {"low": -40.0, "high": 20.0}, "delta": {"low": -3.0, "high": 10.0}, "unit": "K"}
   },
   "tn_mean": {
-    "ms": {"low": -40.0, "high": 40.0, "unit": "K"},
-    "qs-dec": {"low": -40.0, "high": 40.0, "unit": "K"},
-    "ys": {"low": -30.0, "high": 30.0, "unit": "K"}
+    "ys": {"absolute": {"low": -30.0, "high": 8.0}, "delta": {"low": -2.0, "high": 10.0}, "unit": "K"},
+    "ms": {"absolute": {"low": -40.0, "high": 20.0}, "delta": {"low": -3.0, "high": 20.0}, "unit": "K"},
+    "qs-dec": {"absolute": {"low": -40.0, "high": 20.0}, "delta": {"low": -3.0, "high": 20.0}, "unit": "K"}
   },
-  "tn_min": {"ms": {"low": -50.0, "high": 50.0, "unit": "K"}, "ys": {"low": -60.0, "high": -5.0, "unit": "K"}},
-  "tnlt_-15": {"ms": {"low": 0.0, "high": 30.0, "unit": " Days"}, "ys": {"low": 0.0, "high": 300.0, "unit": " Days"}},
-  "tnlt_-25": {"ms": {"low": 0.0, "high": 30.0, "unit": " Days"}, "ys": {"low": 0.0, "high": 200.0, "unit": " Days"}},
-  "tr_18": {"ms": {"low": 0.0, "high": 10.0, "unit": " Days"}, "ys": {"low": 0.0, "high": 60.0, "unit": " Days"}},
-  "tr_20": {"ms": {"low": 0.0, "high": 8.0, "unit": " Days"}, "ys": {"low": 0.0, "high": 40.0, "unit": " Days"}},
-  "tr_22": {"ms": {"low": 0.0, "high": 3.0, "unit": " Days"}, "ys": {"low": 0.0, "high": 20.0, "unit": " Days"}},
-  "tx_max": {"ms": {"low": -40.0, "high": 40.0, "unit": "K"}, "ys": {"low": 0.0, "high": 40.0, "unit": "K"}},
+  "tn_min": {
+    "ys": {"absolute": {"low": -60.0, "high": -5.0}, "delta": {"low": -2.0, "high": 20.0}, "unit": "K"},
+    "ms": {"absolute": {"low": -50.0, "high": 10.0}, "delta": {"low": -3.0, "high": 20.0}, "unit": "K"}
+  },
+  "tnlt_-15": {
+    "ys": {"absolute": {"low": 0.0, "high": 300.0}, "delta": {"low": -100.0, "high": 10.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.0, "high": 30.0}, "delta": {"low": -20.0, "high": 5.0}, "unit": "days"}
+  },
+  "tnlt_-25": {
+    "ys": {"absolute": {"low": 0.0, "high": 200.0}, "delta": {"low": -100.0, "high": 20.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.0, "high": 30.0}, "delta": {"low": -20.0, "high": 5.0}, "unit": "days"}
+  },
+  "tr_18": {
+    "ys": {"absolute": {"low": 0.0, "high": 60.0}, "delta": {"low": -5.0, "high": 50.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.0, "high": 10.0}, "delta": {"low": -0.9, "high": 10.0}, "unit": "days"}
+  },
+  "tr_20": {
+    "ys": {"absolute": {"low": 0.0, "high": 40.0}, "delta": {"low": -2.0, "high": 30.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.0, "high": 8.0}, "delta": {"low": -0.3, "high": 7.0}, "unit": "days"}
+  },
+  "tr_22": {
+    "ys": {"absolute": {"low": 0.0, "high": 20.0}, "delta": {"low": -0.4, "high": 20.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.0, "high": 3.0}, "delta": {"low": -0.03, "high": 3.0}, "unit": "days"}
+  },
+  "tx_max": {
+    "ys": {"absolute": {"low": 6.0, "high": 40.0}, "delta": {"low": -1.0, "high": 8.0}, "unit": "K"},
+    "ms": {"absolute": {"low": -20.0, "high": 40.0}, "delta": {"low": -2.0, "high": 10.0}, "unit": "K"}
+  },
   "tx_mean": {
-    "ms": {"low": -40.0, "high": 40.0, "unit": "K"},
-    "qs-dec": {"low": -30.0, "high": 30.0, "unit": "K"},
-    "ys": {"low": -20.0, "high": 20.0, "unit": "K"}
+    "ys": {"absolute": {"low": -20.0, "high": 20.0}, "delta": {"low": -2.0, "high": 10.0}, "unit": "K"},
+    "ms": {"absolute": {"low": -40.0, "high": 30.0}, "delta": {"low": -3.0, "high": 10.0}, "unit": "K"},
+    "qs-dec": {"absolute": {"low": -30.0, "high": 30.0}, "delta": {"low": -2.0, "high": 10.0}, "unit": "K"}
   },
-  "txgt_25": {"ms": {"low": 0.0, "high": 30.0, "unit": " Days"}, "ys": {"low": 0.0, "high": 100.0, "unit": " Days"}},
-  "txgt_27": {"ms": {"low": 0.0, "high": 20.0, "unit": " Days"}, "ys": {"low": 0.0, "high": 100.0, "unit": " Days"}},
-  "txgt_29": {"ms": {"low": 0.0, "high": 20.0, "unit": " Days"}, "ys": {"low": 0.0, "high": 80.0, "unit": " Days"}},
-  "txgt_30": {"ms": {"low": 0.0, "high": 20.0, "unit": " Days"}, "ys": {"low": 0.0, "high": 70.0, "unit": " Days"}},
-  "txgt_32": {"ms": {"low": 0.0, "high": 10.0, "unit": " Days"}, "ys": {"low": 0.0, "high": 50.0, "unit": " Days"}}
+  "txgt_25": {
+    "ys": {"absolute": {"low": 0.0, "high": 100.0}, "delta": {"low": -10.0, "high": 70.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.0, "high": 30.0}, "delta": {"low": -3.0, "high": 10.0}, "unit": "days"}
+  },
+  "txgt_27": {
+    "ys": {"absolute": {"low": 0.0, "high": 100.0}, "delta": {"low": -10.0, "high": 60.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.0, "high": 20.0}, "delta": {"low": -3.0, "high": 20.0}, "unit": "days"}
+  },
+  "txgt_29": {
+    "ys": {"absolute": {"low": 0.0, "high": 80.0}, "delta": {"low": -10.0, "high": 60.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.0, "high": 20.0}, "delta": {"low": -2.0, "high": 10.0}, "unit": "days"}
+  },
+  "txgt_30": {
+    "ys": {"absolute": {"low": 0.0, "high": 70.0}, "delta": {"low": -8.0, "high": 50.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.0, "high": 20.0}, "delta": {"low": -1.0, "high": 10.0}, "unit": "days"}
+  },
+  "txgt_32": {
+    "ys": {"absolute": {"low": 0.0, "high": 50.0}, "delta": {"low": -5.0, "high": 40.0}, "unit": "days"},
+    "ms": {"absolute": {"low": 0.0, "high": 10.0}, "delta": {"low": -0.7, "high": 9.0}, "unit": "days"}
+  }
 }

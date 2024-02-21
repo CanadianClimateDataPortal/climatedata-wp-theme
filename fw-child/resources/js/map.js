@@ -362,6 +362,18 @@
         });
 
       // console.log('frequency', options.frequency);
+
+      // load defautl color scheme
+      plugin.update_default_scheme();
+
+
+      $(document).cdc_app(
+        'add_hook',
+        'maps.get_layer',
+        500,
+        plugin,
+        'apply_scheme',
+      );
     },
 
     _opacity_slider_change: function (slider, e, ui) {
@@ -649,6 +661,7 @@
       switch (this_key) {
         case 'var_id':
           plugin.update_var(this_val, status);
+          plugin.update_default_scheme();
           break;
         case 'frequency':
           plugin.update_default_scheme();
@@ -1289,11 +1302,12 @@
         options = plugin.options,
         item = plugin.item;
 
+      let layer_name = $(document).cdc_app('maps.get_layer_name', options.query);
       $.getJSON(
         geoserver_url +
           '/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic' +
           '&format=application/json&layer=' +
-          options.maps.high.layer_name,
+          layer_name,
       ).then(function (data) {
         let colour_map =
           data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
@@ -1310,15 +1324,43 @@
       });
     },
 
+    // Hook that update leaflet params object depending on selected scheme
+    apply_scheme: function (query, layer_params) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+
+      let selected_item = item.find(
+        '#display-scheme-select .dropdown-item[data-scheme-id="' +
+        query.scheme +
+        '"]',
+      );
+
+      if (query.scheme == 'default') {
+        layer_params.styles = '';
+        layer_params.tiled = true;
+        layer_params.sld_boty = '';
+      } else {
+        layer_params.tiled = false;
+        layer_params.sld_body = plugin.generate_sld(
+          layer_params.layers,
+          selected_item.data('scheme-colours'),
+          variables_data[query.var][period_frequency_lut[query.frequency]],
+          query.delta == 'true',
+          selected_item.data('scheme-type'),
+          query.scheme_type == 'discrete',
+        );
+      }
+    },
+
+    // handle colour scheme change
     update_scheme: function () {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
 
-      console.log('select', options.query.scheme);
-
       // reset active
-
       let selected_item = item.find(
           '#display-scheme-select .dropdown-item[data-scheme-id="' +
             options.query.scheme +
@@ -1354,44 +1396,20 @@
         plugin.redraw_colour_scheme(this);
       });
 
-      // update map layers
-      $.each(options.maps, function (k, map) {
-        let raster_layer = map.layers.raster;
-        if (raster_layer != null) {
-          if (selected_item.hasClass('default')) {
-            raster_layer.setParams({
-              styles: '',
-              tiled: true,
-            });
-          } else {
-            raster_layer.setParams({
-              tiled: false,
-              sld_body: plugin.generate_sld(
-                map.layer_name,
-                selected_item.data('scheme-colours'),
-                variables_data[options.query.var][
-                  period_frequency_lut[options.query.frequency]
-                ],
-                selected_item.data('scheme-type'),
-                false,
-              ), // TODO
-            });
-          }
-        }
-      });
     },
 
     generate_sld: function (
       layer_name,
       colours,
       variable_data,
+      delta,
       type,
       discrete,
     ) {
+      let absolute_or_delta = delta ? 'delta' : 'absolute';
       let colormap_type = discrete ? 'intervals' : 'ramp';
-      let low = variable_data.low;
-      let high = variable_data.high;
-      let kelvin_convert = 0;
+      let low = variable_data[absolute_or_delta].low;
+      let high = variable_data[absolute_or_delta].high;
       let scheme_length = colours.length;
 
       // if we have a diverging ramp, we center the legend at zero
@@ -1401,7 +1419,7 @@
       }
 
       // temperature data files are in Kelvin
-      if (variable_data.unit == 'K') {
+      if (variable_data.unit == 'K' && !delta) {
         low += 273.15;
         high += 273.15;
       }

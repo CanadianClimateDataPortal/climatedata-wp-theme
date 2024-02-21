@@ -65,10 +65,8 @@
 			dropdowns: {},
 			moving_in_template: false,
 			data: {
-				key_to_add: '',
-				add_next: false,
 				array_indexes: {},
-				array_key: null,
+				array_key: '',
 				removed_settings: []
 			},
 			uploader: {
@@ -2205,13 +2203,15 @@
 			
 					// populate block
 					
+					// console.log(element.data.type, options.element.data.type)
+					
 					if (element.data.type.includes('block')) {
 						
 						element.item.append('<div class="fw-element-inner">')
 						
-						if (options.element.data.type.includes('block')) {
+						// if (options.element.data.type.includes('block')) {
 							plugin.populate_block()
-						}
+						// }
 						
 					}
 					
@@ -2305,6 +2305,8 @@
 					
 				default :
 				
+					// console.log(JSON.stringify(element.data, null, 4))
+				
 					console.log('output', element.data, options.globals)
 			
 					$.ajax({
@@ -2323,8 +2325,8 @@
 							
 							element.item.find('.fw-element-inner').html(new_markup.find('.fw-element-inner').html())
 							
-							console.log('trigger')
-							console.log(JSON.stringify(element, null, 2))
+							// console.log('trigger')
+							// console.log(JSON.stringify(element, null, 2))
 							$(document).trigger('fw_populate_block', element)
 							
 							console.log('empty options.element.data after populating block')
@@ -4563,6 +4565,8 @@
 			} else {
 			}
 			
+			options.data.array_key = ''
+			
 			form_data.forEach(function(input) {
 				
 				// console.log('--- NEW INPUT ---')
@@ -4602,7 +4606,8 @@
 					
 					// console.log('pre', JSON.stringify(element_data))
 					
-					element_data = plugin.find_child_element(element_data, key, input.value)
+					// current_parent, key, value, lang_prop = null, array_key = '', original_key = ''
+					element_data = plugin.find_child_element(element_data, key, input.value, null, options.data.array_key, input.name)
 					
 				}
 				
@@ -4613,7 +4618,7 @@
 			
 			// reset array flag
 			
-			options.data.array_key = null
+			// options.data.array_key = null
 			options.data.array_indexes = {}
 			
 			if (element_has_settings == true) {
@@ -4774,7 +4779,7 @@
 			
 		},
 		
-		find_child_element: function(current_parent, key, value, lang_prop = null) {
+		find_child_element: function(current_parent, key, value, lang_prop = null, array_key, original_key = '') {
 			
 			let plugin = this,
 					options = plugin.options
@@ -4783,16 +4788,19 @@
 			
 			// console.log('---')
 			// console.log('property', property)
-			// console.log('value', value)
+			// console.log('original key', original_key)
+			
+			if (key == 'en') {
+			}
+		
 			// console.log('parent')
 			// console.log(JSON.stringify(current_parent))
 			
-			if (options.data.add_next == true) {
-				options.data.key_to_add = property
-				options.data.add_next = false
-			}
+			// console.log('array key', options.data.array_key)
 			
 			if (key.length == 1) {
+				
+				// PROP IS VALUE
 				
 				// only 1 key left so it's time to
 				// set the value
@@ -4801,10 +4809,13 @@
 					value = value.split(' ')
 				}
 				
-				if (lang_prop != null) {
-					
+				if (
+					lang_prop != null &&
+					tinymce.get('inputs-' + lang_prop + '-' + options.lang) != null
+				) {
+				
 					value = plugin.escape(tinymce.get('inputs-' + lang_prop + '-' + options.lang).getContent())
-					
+				
 				}
 				
 				// console.log('setting ' + property + '\'s value now')
@@ -4813,9 +4824,16 @@
 				
 				if (Array.isArray(current_parent)) {
 					
+					// PROP IS VALUE
+					// PARENT IS ARRAY
+					
 					// console.log('parent is array')
-					// 
-					// console.log('current key', options.data.array_key)
+					
+					options.data.array_key = original_key.split(property)[0].slice(0, -1)
+					
+					// console.log('array key', options.data.array_key)
+					// console.log('indexes')
+					// console.log(JSON.stringify(options.data.array_indexes))
 					// console.log('current index', options.data.array_indexes[options.data.array_key])
 					
 					if (
@@ -4823,7 +4841,9 @@
 						current_parent[options.data.array_indexes[options.data.array_key]][property]
 					) {
 						
-						// console.log('indexes[' + options.data.array_key + '][' + options.data.array_indexes[options.data.array_key] + '] already has ' + property)
+						// this index exists AND
+						// has the propery in it
+						// so index should go up 1
 						
 						options.data.array_indexes[options.data.array_key] += 1
 						
@@ -4857,7 +4877,11 @@
 					options.data.array_indexes !== undefined &&
 					options.data.array_indexes[options.data.array_key] != undefined
 				) {
+					// console.log('indexes[' + options.data.array_key + '] += 1')
+					
+					// indexes[key] + 1
 					options.data.array_indexes[options.data.array_key] += 1
+					
 				}
 				
 				// console.log('post')
@@ -4880,7 +4904,11 @@
 				
 				if (property.includes('[]')) {
 					
-					options.data.add_next = true
+					// PROP IS ARRAY
+					
+					options.data.array_key = original_key.split(property)[0] + property
+					
+					// console.log('array key', options.data.array_key)
 					
 					// i'm an array
 					
@@ -4888,7 +4916,10 @@
 					
 					if (Array.isArray(current_parent)) {
 						
-						// my parent is an array
+						// PROP IS ARRAY
+						// PARENT IS ARRAY
+						
+						// my parent is also an array
 						// find out if it's empty
 						
 						// console.log('parent is array')
@@ -4915,6 +4946,9 @@
 						
 					} else {
 						
+						// PROP IS ARRAY
+						// PARENT IS OBJECT
+						
 						// parent is not an array
 						
 						if (!current_parent[property]) {
@@ -4925,18 +4959,6 @@
 						
 					}
 					
-					// always
-					// set array_key to the property that
-					// the new array is being created for
-					
-					if (property == 'rows') {
-						options.data.array_key = options.data.key_to_add + '-' + property
-					} else {
-						options.data.array_key = property
-					}
-					
-					// console.log('new key', options.data.array_key)
-					
 					// set the index for this property to 0
 					
 					if (!options.data.array_indexes[options.data.array_key]) {
@@ -4945,17 +4967,29 @@
 						
 					}
 					
-					// console.log('indexes now', options.data.array_indexes)
+					// console.log('indexes now', JSON.stringify(options.data.array_indexes))
 					
 				} else {
+					
+					// PROP IS OBJECT
 					
 					// i'm not an array
 					
 					if (Array.isArray(current_parent)) {
 						
+						// PROP IS OBJECT
+						// PARENT IS ARRAY
+						
+						// console.log(property, 'parent is array')
+						// console.log('array_key', options.data.array_key)
+						// console.log('index', options.data.array_indexes[options.data.array_key])
+						// console.log('parent val', current_parent[options.data.array_indexes[options.data.array_key]])
+						
 						// my parent is an array
 						
 						if (!current_parent[options.data.array_indexes[options.data.array_key]]) {
+							
+							// console.log('new obj at this index')
 							
 							// nothing exists at this index yet
 							
@@ -5013,6 +5047,9 @@
 						
 					} else if (!current_parent.hasOwnProperty(property)) {
 						
+						// PROP IS OBJECT
+						// PARENT IS OBJECT
+						
 						// parent is an object that doesn't contain
 						// this key
 						
@@ -5023,14 +5060,15 @@
 				}
 				
 				if (parent_to_send == null) {
-					
 					parent_to_send = current_parent[property]
-					
 				}
 				
-				plugin.find_child_element(parent_to_send, key, value, keep_prop)
+				plugin.find_child_element(parent_to_send, key, value, keep_prop, options.data.array_key, original_key)
 				
 			}
+			
+			// console.log('return')
+			// console.log(JSON.stringify(current_parent, null, 4))
 			
 			return current_parent
 			

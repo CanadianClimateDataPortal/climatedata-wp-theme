@@ -22,7 +22,7 @@ const scenario_names = {
 };
 
 let units = null;
-if (unit_strings) units = unit_strings;
+if (typeof unit_strings !== 'undefined') units = unit_strings;
 const UNITS = units;
 
 const DATASETS = {
@@ -320,4 +320,189 @@ function T(str) {
   } else {
     return l10n_table[lang][str];
   }
+}
+
+function create_file_name(query) {
+  const file_name_parts = [];
+  let dataset = 'CanDCS-u5';
+
+  // dataset
+  switch (query.dataset) {
+    case 'cmip6':
+      dataset = 'CanDCS-u6';
+      break;
+    case 'humidex':
+      dataset = 'HUMIDEX';
+      break;
+  }
+
+  file_name_parts.push(dataset);
+
+  // ---
+
+  let location = (query.sector || 'canadagrid');
+  location = location.charAt(0).toUpperCase() + location.slice(1);
+
+  // TODO: missing here the id of the selected location
+  //  Original code:
+  //    if (form_inputs['shape'] != '') location += '_' + form_inputs['shape'];
+
+  file_name_parts.push(location);
+
+  // ---
+
+  if (query.start_date) {
+    file_name_parts.push('from_' + query.start_date);
+  }
+
+  if (query.end_date) {
+    file_name_parts.push('to_' + query.end_date);
+  }
+
+  // ---
+
+  let variable = null;
+
+  // TODO: create the `variable` based on the selected variable and the custom value
+  // const variables = {
+  //   wetdays: { label: 'WetDays', vars: '_qt_<thresh>' },
+  //   sdii: { label: 'AverageWetDayPreciIntens', vars: '_qt_<thresh>' },
+  //   cwd: { label: 'MaxConsWetDays', vars: '_qt_<thresh>' },
+  //   cdd: { label: 'MaxConsDryDays', vars: '_qt_<thresh>' },
+  //   tx_tn_days_above: {
+  //     label: 'DaysAboveTmaxAndTmin',
+  //     vars: '_<thresh_tasmin>_to_<thresh_tasmax>',
+  //   },
+  //   tx_days_above: { label: 'DaysAboveTmax', vars: '_<thresh>' },
+  //   tropical_nights: { label: 'DaysAboveTmin', vars: '_<thresh>' },
+  //   tn_days_below: { label: 'DaysBelowTmin', vars: '_<thresh>' },
+  //   cooling_degree_days: {
+  //     label: 'DegDaysAboveThreshold',
+  //     vars: '_<thresh>',
+  //   },
+  //   heating_degree_days: {
+  //     label: 'DegDaysBelowThreshold',
+  //     vars: '_<thresh>',
+  //   },
+  //   degree_days_exceedance_date: {
+  //     label: 'DegDaysExceedDate',
+  //     vars: '_<sum_thresh>_days_<op>_<thresh>_from_<after_date>',
+  //   },
+  //   heat_wave_index: {
+  //     label: 'HeatWave',
+  //     vars: '_<window>_days_at_<thresh>',
+  //   },
+  //   heat_wave_total_length: {
+  //     label: 'HeatWaveTotDuration',
+  //     vars: '_<window>_days_at_<thresh_tasmin>_to_<thresh_tasmax>',
+  //   },
+  //   heat_wave_frequency: {
+  //     label: 'HeatWaveFreq',
+  //     vars: '_<window>_days_at_<thresh_tasmin>_to_<thresh_tasmax>',
+  //   },
+  //   dlyfrzthw: {
+  //     label: 'DaysFreezeThawCycle',
+  //     vars: '_<thresh_tasmin>_to_<thresh_tasmax>',
+  //   },
+  //   cold_spell_days: {
+  //     label: 'ColdSpellDays',
+  //     vars: '_<window>_days_at_<thresh>',
+  //   },
+  //
+  //   ////
+  //
+  //   building_climate_zones: {},
+  //   cdd: {},
+  //   cddcold_18: {},
+  //   'dlyfrzthw_tx0_tn-1': {},
+  //   first_fall_frost: {},
+  //   frost_days: {},
+  //   frost_free_season: {},
+  //   gddgrow_0: {},
+  //   gddgrow_5: {},
+  //   hddheat_18: {},
+  //   HXmax30: {},
+  //   HXmax35: {},
+  //   HXmax40: {},
+  //   ice_days: {},
+  //   idf: {},
+  //   last_spring_frost: {},
+  //   nr_cdd: {},
+  //   prcptot: {},
+  //   r10mm: {},
+  //   r1mm: {},
+  //   r20mm: {},
+  //   rx1day: {},
+  //   rx5day: {},
+  //   slr: {},
+  //   spei_12m: {},
+  //   spei_3m: {},
+  //   tg_mean: {},
+  //   tn_mean: {},
+  //   tn_min: {},
+  //   'tnlt_-25': {},
+  //   tr_18: {},
+  //   tr_20: {},
+  //   tr_22: {},
+  //   tx_max: {},
+  //   tx_mean: {},
+  //   txgt_25: {},
+  //   txgt_27: {},
+  //   txgt_29: {},
+  //   txgt_30: {},
+  //   txgt_32: {},
+  //   'weather-stations': {},
+  // };
+
+  // let variable = variables[form_inputs['analyze-location']];
+  // variable = variable.label + variable.vars;
+  //
+  // [
+  //   'thresh',
+  //   'thresh_tasmin',
+  //   'thresh_tasmax',
+  //   'window',
+  //   'after_date',
+  //   'sum_thresh',
+  //   'op',
+  // ].forEach((v) => {
+  //   let val = $(`input[type="hidden"][id=${v}]`).val();
+  //   if (['thresh', 'thresh_tasmin', 'thresh_tasmax'].includes(v))
+  //     val = val.replaceAll('-', 'neg');
+  //   variable = variable.replaceAll('<' + v + '>', val);
+  // });
+
+  if (variable != null) {
+    file_name_parts.push(variable);
+  }
+
+  // ---
+
+  const scenario_name_mapping = {
+    low: 'ssp126',
+    medium: 'ssp245',
+    high: 'ssp585',
+  };
+
+  if (query.scenarios) {
+    const scenarios = query.scenarios.map(name => scenario_name_mapping[name]);
+    file_name_parts.push(scenarios.join('-'));
+  }
+
+  if (query.percentiles) {
+    const percentiles = query.percentiles.map(value => 'p' + value);
+    file_name_parts.push(percentiles.join('-'));
+  }
+
+  if (query.frequency) {
+    file_name_parts.push(query.frequency);
+  }
+
+  if (query.decimals != null) {
+    file_name_parts.push(query.decimals);
+  }
+
+  const extension = query.format === 'csv' ? '.csv' : '.nc';
+
+  return file_name_parts.join('_') + extension;
 }

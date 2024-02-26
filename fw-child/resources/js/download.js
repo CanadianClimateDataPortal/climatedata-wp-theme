@@ -562,9 +562,10 @@
 
       // SUBMIT
 
-      item.on('click', '#submit', function () {
+      item.on('click', 'button#submit', function () {
         console.log(JSON.stringify(options.query, null, 4));
         let submit_output = $('<div id="submit-modal">').appendTo('body');
+        const file_name = create_file_name(options.query);
 
         const submit_modal = new bootstrap.Modal(submit_output);
 
@@ -1142,114 +1143,6 @@
         item.find('[data-display="threshold"]').hide();
         item.find('[data-display="single"]').show();
       }
-    },
-
-    create_file_name: function (form_inputs) {
-      let plugin = this,
-        options = plugin.options,
-        item = plugin.item;
-
-      let file_name = '{0}_{1}_{2}_{3}_{4}.{5}';
-      let dataset = 'CanDCS-u5';
-      console.log(form_inputs);
-
-      // dataset
-      if (form_inputs['dataset'] == 'cmip6') dataset = 'CanDCS-u6';
-      if (form_inputs['dataset'] == 'humidex') dataset = 'HUMIDEX';
-
-      // location
-      let location =
-        form_inputs['analyze-location'].charAt(0).toUpperCase() +
-        form_inputs['analyze-location'].slice(1);
-      if (form_inputs['shape'] != '') location += '_' + form_inputs['shape'];
-
-      // time
-      let time = 'from_{0}_to_{1}'.format(
-        form_inputs['start_date'],
-        form_inputs['end_date'],
-      );
-
-      // variables
-      let variables = {
-        wetdays: { label: 'WetDays', vars: '_qt_<thresh>' },
-        sdii: { label: 'AverageWetDayPreciIntens', vars: '_qt_<thresh>' },
-        cwd: { label: 'MaxConsWetDays', vars: '_qt_<thresh>' },
-        cdd: { label: 'MaxConsDryDays', vars: '_qt_<thresh>' },
-        tx_tn_days_above: {
-          label: 'DaysAboveTmaxAndTmin',
-          vars: '_<thresh_tasmin>_to_<thresh_tasmax>',
-        },
-        tx_days_above: { label: 'DaysAboveTmax', vars: '_<thresh>' },
-        tropical_nights: { label: 'DaysAboveTmin', vars: '_<thresh>' },
-        tn_days_below: { label: 'DaysBelowTmin', vars: '_<thresh>' },
-        cooling_degree_days: {
-          label: 'DegDaysAboveThreshold',
-          vars: '_<thresh>',
-        },
-        heating_degree_days: {
-          label: 'DegDaysBelowThreshold',
-          vars: '_<thresh>',
-        },
-        degree_days_exceedance_date: {
-          label: 'DegDaysExceedDate',
-          vars: '_<sum_thresh>_days_<op>_<thresh>_from_<after_date>',
-        },
-        heat_wave_index: {
-          label: 'HeatWave',
-          vars: '_<window>_days_at_<thresh>',
-        },
-        heat_wave_total_length: {
-          label: 'HeatWaveTotDuration',
-          vars: '_<window>_days_at_<thresh_tasmin>_to_<thresh_tasmax>',
-        },
-        heat_wave_frequency: {
-          label: 'HeatWaveFreq',
-          vars: '_<window>_days_at_<thresh_tasmin>_to_<thresh_tasmax>',
-        },
-        dlyfrzthw: {
-          label: 'DaysFreezeThawCycle',
-          vars: '_<thresh_tasmin>_to_<thresh_tasmax>',
-        },
-        cold_spell_days: {
-          label: 'ColdSpellDays',
-          vars: '_<window>_days_at_<thresh>',
-        },
-      };
-
-      //       let variable = variables[form_inputs['analyze-location']];
-      //       variable = variable.label + variable.vars;
-      //
-      //       [
-      //         'thresh',
-      //         'thresh_tasmin',
-      //         'thresh_tasmax',
-      //         'window',
-      //         'after_date',
-      //         'sum_thresh',
-      //         'op',
-      //       ].forEach((v) => {
-      //         let val = $(`input[type="hidden"][id=${v}]`).val();
-      //         if (['thresh', 'thresh_tasmin', 'thresh_tasmax'].includes(v))
-      //           val = val.replaceAll('-', 'neg');
-      //         variable = variable.replaceAll('<' + v + '>', val);
-      //       });
-      //
-      //       let options = form_inputs['scenario'].replaceAll(',', '-') + '_';
-      //       let ps = form_inputs['ensemble_percentile'].split(',');
-      //       for (let i = 0; i < ps.length; i++) ps[i] = 'p' + ps[i];
-      //       options += ps.join('-') + '_';
-      //
-      //       let frequencies = {
-      //         YS: 'Annual',
-      //         MS: 'Monthly',
-      //         'QS-DEC': 'Seasonal',
-      //         'AS-JUL': 'July2June',
-      //       };
-      //       options += frequencies[form_inputs['freq']] + '_';
-      //       options += form_inputs['csv_precision'];
-      //
-      //       let ext = form_inputs['output_format'] == 'csv' ? 'csv' : 'nc';
-      //       return file_name.format(dataset, location, time, variable, options, ext);
     },
   };
 

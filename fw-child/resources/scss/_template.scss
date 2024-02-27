@@ -68,10 +68,11 @@
 }
 
 #menu-primary {
-  font-size: 1.75rem;
+  @include font-size(1.5rem);
 
   a {
-    &:hover {
+    &:hover,
+    &.active {
       color: $secondary;
       background-color: $white;
     }
@@ -79,4 +80,97 @@
 }
 
 #menu-secondary {
+}
+
+#menu-langs {
+  .current-nav-link {
+    color: $primary;
+  }
+}
+
+// VARIABLES
+
+#browse-vars {
+  width: 25vw;
+  height: 100%;
+  min-height: 100vh;
+  
+  .btn {
+    &:hover {
+      color: $white;
+    }
+  }
+  
+  .tab-drawer-content {
+    height: 100%;
+  }
+  
+  .tab-drawer-content-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: $gray-100;
+  }
+  
+  li {
+    transition: 0.25s;
+    
+    &:hover {
+      background-color: $light;
+      
+      .var-links {
+        height: 1rem;
+        opacity: 1;
+        
+        a {
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+  
+  .var-title {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1.125rem;
+    
+    a {
+      &:hover {
+        color: $secondary;
+      }
+    }
+  }
+  
+  .var-links {
+    height: 0;
+    overflow: hidden;
+    @include all-caps;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: $font-weight-medium;
+    opacity: 0;
+    transition: 0.25s;
+    
+    a {
+      color: $secondary;
+      transform: translateY(-100%);
+      
+      &:not(:first-child) {
+        &:before {
+          content: '•';
+          margin: 0 0.375em;
+          color: $body-color;
+        }
+      }
+    }
+  }
+}
+
+#popular-vars {
+  padding-bottom: 1rem;
+  transition: 0.25s;
+  
+  &:hover {
+    padding-bottom: 0;
+  }
 }

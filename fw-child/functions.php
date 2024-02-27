@@ -136,7 +136,7 @@ function child_theme_enqueue() {
 	
 	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'cdc', 'jquery-ui-slider' ), NULL, true );
 	
-	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'utilities', 'cdc', 'map-app' ), NULL, true );
+	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'tab-drawer', 'utilities', 'cdc', 'map-app' ), NULL, true );
 	
 	// localize admin url
 	
@@ -171,13 +171,13 @@ function child_theme_enqueue() {
 		case 'learn' :
 		case 'apprendre' :
 			wp_enqueue_script ( 'zebra-pin' );
-			wp_enqueue_script ( 'tab-drawer' );
+			// wp_enqueue_script ( 'tab-drawer' );
 			break;
 			
 		case 'news' :
 		case 'nouvelles' :
 			wp_enqueue_script ( 'zebra-pin' );
-			wp_enqueue_script ( 'tab-drawer' );
+			// wp_enqueue_script ( 'tab-drawer' );
 			break;
 		
 	}
@@ -275,6 +275,11 @@ function add_favicon() {
 
 // add_action( 'wp_head', 'add_favicon' );
 
+//
+// GLOBAL JS VAR
+// disable 3D transform in leaflet
+//
+
 add_action ( 'fw_before_footer', function() {
 	
 ?>
@@ -282,6 +287,16 @@ add_action ( 'fw_before_footer', function() {
 <script type="text/javascript">var L_DISABLE_3D = true;</script>
 
 <?php
+
+} );
+
+//
+// VARIABLES OFFCANVAS
+//
+
+add_action ( 'fw_before_footer', function() {
+
+	include ( locate_template ( 'template/menu-overlay.php' ) );
 
 } );
 

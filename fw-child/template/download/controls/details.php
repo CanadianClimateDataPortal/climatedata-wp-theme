@@ -7,7 +7,7 @@
 					<h5><?php _e ( 'Additional Details', 'cdc' ); ?></h5>
 					<p class="mb-0"><?php _e ( 'Adjust the controls below to customize your analysis.', 'cdc' ); ?></p>
 				</div>
-				<span class="tab-drawer-close">&times;</span>
+				<span class="tab-drawer-close btn-close"></span>
 			</div>
 			
 			<div class="control-tab-body">

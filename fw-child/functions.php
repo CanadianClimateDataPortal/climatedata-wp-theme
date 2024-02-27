@@ -90,6 +90,12 @@ function child_theme_enqueue() {
 		wp_enqueue_style ( 'leaflet' );
 		
 	}
+	
+	if ( is_front_page() ) {
+		
+		wp_enqueue_style ( 'home', $child_theme_dir . 'resources/css/home.css', NULL, NULL, 'all' );
+		
+	}
 
 	//
 	// SCRIPTS
@@ -156,6 +162,12 @@ function child_theme_enqueue() {
 	wp_localize_script ( 'utilities', 'unit_strings', $units );
 	
 	// PAGE CONDITIONALS
+	
+	if ( is_front_page() ) {
+		
+		wp_enqueue_script ( 'webflow', $child_vendor_dir . 'climatedata-scroll.webflow/js/webflow.js', array ( 'jquery' ), null, true );
+		
+	}
 
 	switch ( $GLOBALS['vars']['current_slug'] ) {
 		case 'map' :
@@ -274,6 +286,26 @@ function add_favicon() {
 }
 
 // add_action( 'wp_head', 'add_favicon' );
+
+add_action ( 'wp_head', function() {
+	
+	if ( is_front_page() ) {
+		
+?>
+
+<script type="text/javascript">
+	! function(o, c) {
+		var n = c.documentElement,
+			t = " w-mod-";
+		n.className += t + "js", ("ontouchstart" in o || o.DocumentTouch && c instanceof DocumentTouch) && (n.className += t + "touch")
+	}(window, document);
+</script>
+
+<?php
+
+	}	
+	
+} );
 
 add_action ( 'fw_before_footer', function() {
 	

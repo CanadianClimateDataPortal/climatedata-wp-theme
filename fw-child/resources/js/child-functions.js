@@ -11,6 +11,10 @@ const $ = jQuery;
 
 (function ($) {
   $(function () {
+    //
+    // APPS
+    //
+
     if ($('body').attr('id') == 'page-map') {
       $(document).cdc_app();
       $(document).map_app();
@@ -20,6 +24,29 @@ const $ = jQuery;
       $(document).cdc_app();
       $(document).download_app();
     }
+
+    //
+    // BOOTSTRAP COMPONENTS
+    //
+
+    $('#menu-tabs').tab_drawer({
+      history: {
+        enabled: false,
+      },
+      debug: true,
+    });
+
+    // $('body').find('[href="#browse-vars"').attr('data-bs-toggle', 'offcanvas')
+
+    // const vars_offcanvas = document.querySelector('#browse-vars')
+    //
+    // <a class="btn btn-primary" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">
+    //   Link with href
+    // </a>
+
+    //
+    // VENDOR
+    //
 
     if ($('.query-page #control-bar').length) {
       $('.query-page #control-bar').tab_drawer({

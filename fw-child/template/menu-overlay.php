@@ -127,11 +127,45 @@
 					</div>
 					
 					<div id="menu-langs" class="fw-menu pe-3">
-	
-						<ul class="fw-menu-list menu-level-1 d-flex fw-menu-nested">
-							<li class="current-nav-item ms-3 fw-menu-item"><a href="https://climatedata2.crim.ca/" class="current-nav-link ">English</a></li>
-							<li class="ms-3 fw-menu-item"><a href="https://donneesclimatiques2.crim.ca/" class="">Français</a></li>
-						</ul>
+						
+						<?php
+						
+							$menu = array();
+							
+							foreach ( get_field ( 'fw_languages', 'option' ) as $lang ) {
+							
+								$lang_URL = translate_permalink ( $GLOBALS['vars']['current_url'], $GLOBALS['fw']['current_query']['ID'], $lang['code'] );
+								
+								$lang_title = $lang['name'];
+								
+								if (
+									isset ( $element['inputs']['display']['lang'] ) &&
+									$element['inputs']['display']['lang'] == 'code'
+								) {
+									$lang_title = $lang['code'];
+								}
+								
+								$menu[] = array(
+									'id' => $globals['current_query']['ID'],
+									'type' => get_post_type ( $globals['current_query']['ID'] ),
+									'url' => trailingslashit ( $lang_URL ),
+									'title' => $lang_title,
+									'classes' => array(),
+									'parent' => 0
+								);
+								
+							}
+							
+							$element['inputs']['classes']['menu'] .= ' fw-menu-nested';
+							$element['inputs']['classes']['item'] .= ' fw-menu-item';
+							
+							fw_menu_output ( $menu, 1, 'list', array (
+								'menu' => 'd-flex',
+								'item' => 'ms-3',
+								'link' => ''
+							) );
+							
+						?>
 					
 					</div>
 				</div>

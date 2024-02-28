@@ -2,10 +2,22 @@
 // HOME
 //
 
+#hero-bgs-carousel {
+  -webkit-mask-image: -webkit-gradient(
+    linear,
+    left 20%,
+    left 70%,
+    from(rgba(0, 0, 0, 1)),
+    to(rgba(0, 0, 0, 0))
+  );
+}
+
 #page-home {
   #floating-header {
     background-color: transparent;
   }
+
+  // features & lottie
 
   #features {
     position: relative;
@@ -52,28 +64,29 @@
     margin-bottom: 25vh;
   }
 
+  // learning zone
+
   #resources {
     position: relative;
-    // margin-top: 50vh;
     z-index: 10;
   }
 
   #resources-text {
     position: sticky;
     top: 25vh;
-    // height: 100vh;
     margin-bottom: 25vh;
   }
-}
 
-#hero-bgs-carousel {
-  -webkit-mask-image: -webkit-gradient(
-    linear,
-    left 20%,
-    left 70%,
-    from(rgba(0, 0, 0, 1)),
-    to(rgba(0, 0, 0, 0))
-  );
+  #resources-query {
+    [data-aos] {
+      filter: blur(20px);
+      transition-property: opacity, transform, filter;
+
+      &.aos-animate {
+        filter: blur(0);
+      }
+    }
+  }
 }
 
 //

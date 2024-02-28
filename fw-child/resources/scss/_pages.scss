@@ -2,16 +2,89 @@
 // HOME
 //
 
+#hero-bgs-carousel {
+  -webkit-mask-image: -webkit-gradient(
+    linear,
+    left 20%,
+    left 70%,
+    from(rgba(0, 0, 0, 1)),
+    to(rgba(0, 0, 0, 0))
+  );
+}
+
 #page-home {
+  #floating-header {
+    background-color: transparent;
+  }
+
+  // features & lottie
+
   #features {
+    position: relative;
+
     h2 {
       font-size: 4rem;
       font-family: $font-family-serif;
-      color: $primary;
+      color: $secondary;
     }
 
     h5 {
       @include all-caps;
+    }
+  }
+
+  $lottie-timeline-height: 400vh;
+
+  #home-lottie-wrap {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: calc((100% / 16) * 7);
+    height: 100%;
+  }
+
+  .lottie {
+    position: absolute;
+    top: 0;
+    right: 1rem;
+    width: 5px;
+    height: 375vh;
+    z-index: 1;
+  }
+
+  .lottie-container {
+    position: sticky;
+    top: 10vh;
+    // left: 50%;
+    width: 100%;
+    height: auto;
+  }
+
+  #scroll-content {
+    margin-bottom: 25vh;
+  }
+
+  // learning zone
+
+  #resources {
+    position: relative;
+    z-index: 10;
+  }
+
+  #resources-text {
+    position: sticky;
+    top: 25vh;
+    margin-bottom: 25vh;
+  }
+
+  #resources-query {
+    [data-aos] {
+      filter: blur(20px);
+      transition-property: opacity, transform, filter;
+
+      &.aos-animate {
+        filter: blur(0);
+      }
     }
   }
 }

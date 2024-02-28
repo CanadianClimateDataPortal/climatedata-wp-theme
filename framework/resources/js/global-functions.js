@@ -99,7 +99,7 @@ var theme_dir = current_script.replace('/resources/js/' + filename, '') + '/'
     if ($('.fw-query-object').length) {
       
       $(document).on('fw_query_success', function (e, item) {
-        if (item.find('[data-aos')) {
+        if (item.find('[data-aos') && typeof AOS != 'undefined') {
           AOS.refreshHard()
         }
       })

@@ -14,9 +14,9 @@ function fw_query_builder() {
 	if (
 		isset ( $_GET['options']['template'] ) && 
 		$_GET['options']['template'] != '' &&
-		locate_template ( 'template/query/' . $_GET['options']['template'] ) != ''
+		locate_template ( $_GET['options']['template'] ) != ''
 	) {
-		$element_path = 'template/query/' . $_GET['options']['template'];
+		$element_path = $_GET['options']['template'];
 	} else {
 		$element_path = 'template/query/item.php';
 	}
@@ -29,6 +29,7 @@ function fw_query_builder() {
 	
 	if ( $new_query->have_posts() ) {
 		
+		$result['options'] = $_GET['options'];
 		$result['success'] = true;
 		$result['found_posts'] = $new_query->found_posts;
 		$result['max_pages'] = $new_query->max_num_pages;

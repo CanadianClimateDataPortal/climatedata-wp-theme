@@ -5,6 +5,10 @@
 // const geoserver_url = 'https://data.climatedata.ca';
 const geoserver_url = 'https://dataclimatedata.crim.ca';
 
+// Salt used to encode the URL when calling the screenshot feature of the API.
+// Not a security salt, only an encoding salt.
+const url_encoder_salt = 'override-me';
+
 const svgNS = 'http://www.w3.org/2000/svg';
 
 const canadaCenter = [62.51231793838694, -98.48144531250001];
@@ -320,4 +324,33 @@ function T(str) {
   } else {
     return l10n_table[lang][str];
   }
+}
+
+/**
+ * Hash a string.
+ *
+ * @param {string} s - String to hash.
+ * @returns {number}
+ */
+function hashCode(s) {
+  return s.split("").reduce(function(a, b) {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0);
+}
+
+/**
+ * Encode a URL using a salt.
+ *
+ * @param {string} url - URL to encode.
+ * @param {string} salt - Salt to for the encoding.
+ * @returns {{encoded: string, hash: number}} - Object containing the encoded string and its calculated hash.
+ */
+function encodeURL(url, salt) {
+  const hash = hashCode(url + salt);
+  const encoded = encodeURIComponent(btoa(url + '|' + hash));
+  return {
+    'encoded': encoded,
+    'hash': hash
+  };
 }

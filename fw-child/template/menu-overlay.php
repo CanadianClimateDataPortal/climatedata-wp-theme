@@ -71,10 +71,41 @@
 			<div id="menu-secondary" class="fw-block-type-menu fw-block">
 				<div id="menu-secondary-inner" class=" ">
 					
-					<div class="fw-menu">
-	
-						<ul class="fw-menu-list menu-level-1 ps-3 fw-menu-nested"><li class="ps-3 mb-2 fw-menu-item"><a href="https://climatedata2.crim.ca/news/" class="">News</a></li><li class="ps-3 mb-2 fw-menu-item"><a href="https://climatedata2.crim.ca/about/" class="">About</a></li><li class="ps-3 mb-2 fw-menu-item"><a href="https://climatedata2.crim.ca/glossary/" class="">Glossary</a></li></ul>
+					<?php 
 					
+						$nav_items = wp_get_nav_menu_items ( 'Secondary Navigation' );
+						
+						// dumpit ( $nav_items );
+						
+						$menu_items = array();
+						
+						foreach ( $nav_items as &$item ) {
+						
+							$menu_items[] = array (
+								'id' => $item->ID,
+								'type' => $item->type,
+								'url' => $item->url,
+								'title' => $item->title,
+								'classes' => $item->classes,
+								'parent' => $item->menu_item_parent
+							);
+						
+						}
+						
+						$menu = fw_build_menu ( $menu_items, 0, 1 );
+						
+					?>
+					
+					<div class="fw-menu">
+						<?php
+						
+							fw_menu_output ( $menu, 1, 'list', array (
+								'menu' => 'ps-3',
+								'item' => 'ps-3 mb-2',
+								'link' => ''
+							) );
+							
+						?>
 					</div>
 				
 				</div>

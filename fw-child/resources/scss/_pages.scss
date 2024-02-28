@@ -2,6 +2,14 @@
 // HOME
 //
 
+#home-nav {
+  @include font-size(1.25rem);
+
+  p {
+    margin-bottom: 0;
+  }
+}
+
 #hero-bgs-carousel {
   -webkit-mask-image: -webkit-gradient(
     linear,

@@ -90,12 +90,6 @@ function child_theme_enqueue() {
 		wp_enqueue_style ( 'leaflet' );
 		
 	}
-	
-	if ( is_front_page() ) {
-		
-		wp_enqueue_style ( 'home', $child_theme_dir . 'resources/css/home.css', NULL, NULL, 'all' );
-		
-	}
 
 	//
 	// SCRIPTS
@@ -165,7 +159,12 @@ function child_theme_enqueue() {
 	
 	if ( is_front_page() ) {
 		
-		wp_enqueue_script ( 'webflow', $child_vendor_dir . 'climatedata-scroll.webflow/js/webflow.js', array ( 'jquery' ), null, true );
+		// wp_dequeue_script ( 'jquery' );
+		wp_deregister_script ( 'jquery' );
+		
+		wp_enqueue_script ( 'jquery', 'https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=65dbbfa49f6b400b385a0b1d', null, null, true );
+		
+		wp_enqueue_script ( 'webflow', $child_vendor_dir . 'climatedata-scroll.webflow/webflow.js', array ( 'jquery' ), null, true );
 		
 	}
 
@@ -297,6 +296,10 @@ add_action ( 'wp_head', function() {
 	! function(o, c) {
 		var n = c.documentElement,
 			t = " w-mod-";
+			
+		n.setAttribute('data-wf-page', '65dbbfa49f6b400b385a0b23')
+		n.setAttribute('data-wf-site', '65dbbfa49f6b400b385a0b1d')
+			
 		n.className += t + "js", ("ontouchstart" in o || o.DocumentTouch && c instanceof DocumentTouch) && (n.className += t + "touch")
 	}(window, document);
 </script>

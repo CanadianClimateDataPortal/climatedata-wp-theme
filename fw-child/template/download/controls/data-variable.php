@@ -105,7 +105,7 @@
 						<div class="fw-query-items row row-cols-3"
 							data-options='{
 								"type":"items",
-								"template":"download-var-item.php",
+								"template":"template/query/download-var-item.php",
 								"id":"",
 								"class":["row","row-cols-3"],
 								"item_class":"col",

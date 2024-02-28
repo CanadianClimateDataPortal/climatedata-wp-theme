@@ -7,8 +7,8 @@
 
 			<label for="mce-EMAIL" class="sr-only">Email Address</label>
 
-			<div class="input-group mc-field-group border pe-3">
-				<input type="email" value="" name="EMAIL" class="required email form-control" id="mce-EMAIL" placeholder="<?php _e ( 'Your email address', 'cdc' ); ?>">
+			<div class="input-group mc-field-group border">
+				<input type="email" value="" name="EMAIL" class="required email form-control border-0" id="mce-EMAIL" placeholder="<?php _e ( 'Your email address', 'cdc' ); ?>">
 
 				<button type="submit" name="subscribe" id="mc-embedded-subscribe" class="btn btn-gray-400"><i class="fas fa-caret-right"></i></button>
 			</div>

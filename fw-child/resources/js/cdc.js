@@ -106,9 +106,7 @@
       hooks: {
         'maps.get_layer': Array(1000)
       },
-      legend: {
-        colormap: null,
-      },
+      legend: {},
       chart: {
         object: null,
         series: null,
@@ -234,13 +232,14 @@
     },
 
     maps: {
-      init: function (maps, callback) {
+      init: function (maps, legend, callback) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           options = plugin.options;
 
         // console.log('cdc', 'init maps', maps);
 
         options.maps = maps;
+        options.legend = legend;
 
         for (let key in options.maps) {
           // create the map
@@ -436,7 +435,7 @@
 
                   // apply hooks
                   options.hooks['maps.get_layer'].forEach(function (hook) {
-                    hook.obj[hook.fn](query, params);
+                    hook.fn.apply(hook.obj, [query, params]);
                     }
                   )
 
@@ -446,7 +445,8 @@
                   ) {
                     // if any map parameters have changed
                     if (!_.isEqual(this_map.layers.raster.cdc_params, params)) {
-                      // update existing
+                      // Delete all parameters from layer before updating (see https://github.com/Leaflet/Leaflet/issues/3441)
+                      delete(this_map.layers.raster.wmsParams.parameter);
                       this_map.layers.raster.setParams(params);
                       this_map.layers.raster.cdc_params = _.cloneDeep(params);
                     }
@@ -779,67 +779,67 @@
           item = plugin.item,
           options = plugin.options;
 
-        let layer_name = plugin.maps.get_layer_name(query);
+        const legend_item_height = 25,
+          legend_item_width = 25,
+          legend_width = 200,
+          legend_tick_width = 4;
 
-        console.log('layer name', layer_name);
+        /*
+        let labels = plugin.maps.legend_markup.apply(item, [
+          '',
+          options.legend.colormap,
+          false,
+        ]);
+        */
 
-        let request_url =
-          geoserver_url +
-          '/geoserver/wms?service=WMS&version=1.1.0' +
-          '&request=GetLegendGraphic' +
-          '&format=application/json' +
-          '&layer=' + layer_name;
+        const colours = options.legend.colormap.colours,
+          quantities = options.legend.colormap.quantities,
+          labels = options.legend.colormap.labels;
 
-        if (var_data.slug == 'building_climate_zones') {
-          request_url += '&style=CDC:building_climate_zones';
+
+        for (let key in options.maps) {
+          options.maps[key].legend.onAdd = function (map) {
+            let div = L.DomUtil.create('div', 'info legend legendTable');
+
+
+            let svg = `<svg width="${legend_width}" height="${legend_item_height * colours.length}">`;
+            svg += `<g transform="translate(${legend_width - legend_item_width},0)">`;
+            if (query.scheme_type == 'discrete') {
+              for (let i = 0; i < colours.length; i++) {
+                svg += `<rect width="${legend_item_width}" height="${legend_item_height + 1}" y="${legend_item_height * i}" fill="${colours[i]}"/>`;
+              }
+            } else {
+              svg += `<defs><linearGradient id="legendGradient" gradientTransform="rotate(90)">`;
+              for (let i = 0; i < colours.length; i++) {
+                svg += `<stop offset="${i / colours.length * 100 }%" stop-color="${colours[i]}"/>`;
+              }
+              svg += `</linearGradient> </defs>`;
+              svg += `<rect width="${legend_item_width}" height="${legend_item_height * colours.length}" fill="url(#legendGradient)" />`
+            }
+            svg += `</g><g transform="translate(${legend_width - legend_item_width - legend_tick_width},0)">`;
+            for (let i = 0; i < colours.length - 1; i++) {
+              svg += `
+                  <g opacity="1" transform="translate(0,${legend_item_height * (i + 1)})">
+                    <line stroke="currentColor" x2="4"/>
+                    <text fill="currentColor" dominant-baseline="middle" text-anchor="end" x="-5">${labels[i]}</text>
+                  </g>`
+
+            }
+
+            svg += "</g>";
+            svg += '</svg>';
+            div.innerHTML = svg;
+            return div;
+          };
+
+          options.maps[key].legend.addTo(options.maps[key].object);
         }
 
-        $.getJSON(request_url)
-          .then(function (data) {
-            // console.log('legend data', data);
+        if (typeof callback == 'function') {
+          callback();
+        }
 
-            options.legend.colormap =
-              data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
 
-            options.legend.colormap = options.legend.colormap.reverse();
-
-            let labels = plugin.maps.legend_markup.apply(item, [
-              '',
-              options.legend.colormap,
-              false,
-            ]);
-
-            for (let key in options.maps) {
-              options.maps[key].legend.onAdd = function (map) {
-                let div = L.DomUtil.create('div', 'info legend legendTable'),
-                  unitValue,
-                  unitColor;
-
-                div.innerHTML = labels.join('');
-
-                // console.log('markup', div);
-                return div;
-              };
-
-              options.maps[key].legend.addTo(options.maps[key].object);
-
-              options.legend.colormap = options.legend.colormap.map(
-                function (c) {
-                  c.quantity = parseFloat(c.quantity);
-                  return c;
-                },
-              );
-            }
-
-            if (typeof callback == 'function') {
-              callback();
-            }
-          })
-          .fail(function (err) {
-            console.error(
-              'Failed to get data from geoserver for sector legend',
-            );
-          });
       },
 
       legend_markup: function (

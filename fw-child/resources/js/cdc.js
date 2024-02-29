@@ -248,6 +248,8 @@
             center: [canadaCenter[0], canadaCenter[1]],
             zoomControl: false,
             zoom: 4,
+            minZoom: 3,
+            maxZoom: 11,
           });
 
           options.maps[key].container = $('#map-object-' + key);

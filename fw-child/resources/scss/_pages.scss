@@ -2,6 +2,14 @@
 // HOME
 //
 
+#home-nav {
+  @include font-size(1.25rem);
+
+  p {
+    margin-bottom: 0;
+  }
+}
+
 #hero-bgs-carousel {
   -webkit-mask-image: -webkit-gradient(
     linear,
@@ -15,6 +23,14 @@
 #page-home {
   #floating-header {
     background-color: transparent;
+  }
+
+  #header-primary {
+    @include font-size(1.25rem);
+  }
+
+  #header-lang {
+    font-weight: $font-weight-bold;
   }
 
   // features & lottie

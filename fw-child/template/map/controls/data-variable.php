@@ -104,7 +104,7 @@
 						<div class="fw-query-items row row-cols-3"
 							data-options='{
 								"type":"items",
-								"template":"map-var-item.php",
+								"template":"template/query/map-var-item.php",
 								"id":"",
 								"class":["row","row-cols-3"],
 								"item_class":"col",

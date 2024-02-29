@@ -1601,7 +1601,7 @@ $figure-caption-color:              var(--#{$prefix}secondary-color) !default;
 // Breadcrumbs
 
 // scss-docs-start breadcrumb-variables
-$breadcrumb-font-size:              null !default;
+$breadcrumb-font-size:              1.25rem;
 $breadcrumb-padding-y:              0 !default;
 $breadcrumb-padding-x:              0 !default;
 $breadcrumb-item-padding-x:         .5rem !default;

@@ -13,6 +13,17 @@
 #header-logo-container {
 }
 
+#header-social-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  a {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+}
+
 //
 // FOOTER
 //

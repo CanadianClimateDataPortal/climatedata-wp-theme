@@ -18,9 +18,13 @@
   align-items: center;
   justify-content: center;
 
+  p {
+    margin-bottom: 0;
+  }
+
   a {
-    margin-left: 1rem;
-    margin-right: 1rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
   }
 }
 

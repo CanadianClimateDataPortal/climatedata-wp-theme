@@ -7,6 +7,7 @@
 }
 
 #header-menu-icon {
+  font-size: 1.25rem;
   color: $white;
 }
 
@@ -18,9 +19,19 @@
   align-items: center;
   justify-content: center;
 
+  p {
+    margin-bottom: 0;
+  }
+
   a {
-    margin-left: 1rem;
-    margin-right: 1rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+}
+
+#header-lang {
+  .current-nav-item {
+    color: $primary;
   }
 }
 

@@ -39,8 +39,7 @@
         colormap: {
           colours: [],
           quantities: [],
-          labels: [],
-        }
+        },
       },
       query: {
         coords: [62.51231793838694, -98.48144531250001, 4],
@@ -371,7 +370,12 @@
       // console.log('frequency', options.frequency);
 
       // load default color scheme
-      plugin.update_default_scheme();
+      plugin.update_default_scheme(function () {
+        $(document).cdc_app('maps.get_layer',
+          options.query,
+          options.var_data
+        );
+      });
 
 
       $(document).cdc_app(
@@ -762,10 +766,18 @@
           case 'var_id':
           case 'frequency':
           case 'delta':
-            plugin.update_default_scheme();
+            plugin.update_default_scheme(function () {
+              $(document).cdc_app('maps.get_layer',  // todo: not ideal, may generates a flicker of the map layer
+                options.query,
+                options.var_data
+              );
+            });
             break;
           case 'scheme':
             plugin.update_scheme();
+            break;
+          case 'scheme_type':
+            options.legend.colormap.scheme_type = options.query.scheme_type;
             break;
         }
 
@@ -1310,7 +1322,7 @@
 
     // fetch colours of default scheme from Geoserver and update the data of the default
     // one in the dropdown
-    update_default_scheme: function () {
+    update_default_scheme: function (callback) {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
@@ -1329,9 +1341,11 @@
         let default_scheme_element = item.find('#display-scheme-select .dropdown-item[data-scheme-id="default"]');
         default_scheme_element.data('scheme-colours', colour_map.map(e => e.color));
         default_scheme_element.data('scheme-quantities', colour_map.map(e => parseFloat(e.quantity)));
-        default_scheme_element.data('scheme-labels', colour_map.map(e => e.label));
-
         plugin.update_scheme();
+      }).always(function() {
+        if (typeof callback == 'function') {
+          callback();
+        }
       });
     },
 
@@ -1418,11 +1432,10 @@
 
       options.legend.colormap.colours = colours;
       options.legend.colormap.quantities = [];
-      options.legend.colormap.labels = [];
+      options.legend.colormap.scheme_type = query.scheme_type;
 
       if (options.query.scheme === 'default') {
         options.legend.colormap.quantities = selected_scheme_item.data('scheme-quantities');
-        options.legend.colormap.labels = selected_scheme_item.data('scheme-labels');
       } else {
         let variable_data = variables_data[query.var][period_frequency_lut[query.frequency]]
         let absolute_or_delta = query.delta === 'true' ? 'delta' : 'absolute';
@@ -1430,20 +1443,17 @@
         let low = variable_data[absolute_or_delta].low;
         let high = variable_data[absolute_or_delta].high;
         let scheme_length = colours.length;
-        let kelvin_convert = 0;
-
 
         // if we have a diverging ramp, we center the legend at zero
-        if (selected_scheme_item.data('scheme-type') === 'diverging') {
+        if (selected_scheme_item.data('scheme-type') === 'divergent') {
           high = Math.max(Math.abs(low), Math.abs(high));
           low = high * -1;
         }
 
-        // temperature data files are in Kelvin, but in °C in variable_data
+        // temperature raster data files are in Kelvin, but in °C in variable_data
         if (variable_data.unit === 'K' && query.delta !== 'true') {
           low += 273.15;
           high += 273.15;
-          kelvin_convert = 273.15;
         }
 
         let step = (high - low) / scheme_length;
@@ -1451,7 +1461,6 @@
         for (let i = 0; i < scheme_length - 1; i++) {
           quantity = low + i * step;
           options.legend.colormap.quantities.push(quantity);
-          options.legend.colormap.labels.push(quantity - kelvin_convert);
         }
         // we need a virtually high value for highest bucket
         options.legend.colormap.quantities.push((high + 1) * (high + 1));

@@ -447,7 +447,8 @@
                   ) {
                     // if any map parameters have changed
                     if (!_.isEqual(this_map.layers.raster.cdc_params, params)) {
-                      // Delete all parameters from layer before updating (see https://github.com/Leaflet/Leaflet/issues/3441)
+                      // delete all parameters from layer before updating
+                      // see: https://github.com/Leaflet/Leaflet/issues/3441
                       delete(this_map.layers.raster.wmsParams.parameter);
                       this_map.layers.raster.setParams(params);
                       this_map.layers.raster.cdc_params = _.cloneDeep(params);
@@ -686,6 +687,7 @@
                     // same sector, but the grid layer already exists,
                     // so reset each feature
 
+                    // todo: performance issue: resetFeatureStyle is called often when not required (ex: pan/zoom)
                     for (let i = 0; i < options.choro.data[key].length; i++) {
                       options.maps[key].layers.grid.resetFeatureStyle(i);
                     }
@@ -786,18 +788,50 @@
           legend_width = 200,
           legend_tick_width = 4;
 
-        /*
-        let labels = plugin.maps.legend_markup.apply(item, [
-          '',
-          options.legend.colormap,
-          false,
-        ]);
-        */
+
+        // todo move this function if required elsewhere
+        /**
+         * Format numerical value according to supplied parameters
+         * @param value Number to format
+         * @param var_acf Variable details object provided by Wordpress
+         * @param delta If true, the value is formatted as a delta
+         * @returns {string} The formatted value
+         */
+        function value_formatter(value, var_acf, delta) {
+          let unit = var_acf.units;
+          if (unit === 'kelvin') {
+            unit = "°C";
+            value = delta ? value : value - 273.15;
+          }
+
+          if (unit === undefined) {
+            unit = "";
+          }
+          let str = "";
+          if (delta && value > 0) {
+            str += "+"
+          }
+
+          switch (var_acf.units) {
+            case "doy":
+              if (delta) {
+                str += value.toFixed(var_acf.decimals);
+                str += " " + l10n_labels['days'];
+              } else {
+                str += doy_formatter(value, options.lang);
+              }
+
+              break;
+            default:
+              str += value.toFixed(var_acf.decimals);
+              str += " " + unit;
+              break;
+          }
+          return unit_localize(str);
+        }
 
         const colours = options.legend.colormap.colours,
-          quantities = options.legend.colormap.quantities,
-          labels = options.legend.colormap.labels;
-
+          quantities = options.legend.colormap.quantities;
 
         for (let key in options.maps) {
           options.maps[key].legend.onAdd = function (map) {
@@ -820,11 +854,11 @@
             }
             svg += `</g><g transform="translate(${legend_width - legend_item_width - legend_tick_width},0)">`;
             for (let i = 0; i < colours.length - 1; i++) {
-              svg += `
-                  <g opacity="1" transform="translate(0,${legend_item_height * (i + 1)})">
+              svg += `<g opacity="1" transform="translate(0,${legend_item_height * (i + 1)})">
                     <line stroke="currentColor" x2="4"/>
-                    <text fill="currentColor" dominant-baseline="middle" text-anchor="end" x="-5">${labels[i]}</text>
-                  </g>`
+                    <text fill="currentColor" dominant-baseline="middle" text-anchor="end" x="-5">
+                    ${value_formatter(quantities[i], var_data.acf, query.delta === "true")}
+                    </text></g>`
 
             }
 
@@ -844,154 +878,28 @@
 
       },
 
-      legend_markup: function (
-        legendTitle = 'legend',
-        colormap,
-        building_climate_zones,
-      ) {
-        let plugin = !this.item ? this.data('cdc_app') : this,
-          item = plugin.item,
-          options = plugin.options;
-
-        labels = [];
-
-        labels.push('<h6 class="legendTitle">' + legendTitle + '</h6>');
-
-        var first_label = unit_localize(colormap[0].label, options.lang);
-
-        // labels.push('<span class="legendLabel max">' + first_label + '</span>');
-
-        labels.push('<div class="legendRows">');
-
-        var min_label = '';
-
-        // what's the current opacity
-        let current_opacity = 0.8;
-        // $('#opacity-slider').data('ionRangeSlider')['old_from'] / 100;
-
-        for (let i = 0; i < colormap.length; i++) {
-          unitValue = unit_localize(colormap[i].label, options.lang);
-          unitColor = colormap[i].color;
-
-          let row_class = 'legendRow';
-
-          if (i == 0) {
-            row_class += ' first';
-          } else if (i == colormap.length - 1) {
-            row_class += ' last';
-          }
-          if (building_climate_zones) {
-            let label = '';
-            if (i == 0) {
-              label = '<span class="legendLabel min">' + unitValue + '</span>';
-            } else if (i == colormap.length - 1) {
-              label = '<span class="legendLabel min">' + unitValue + '</span>';
-            }
-            labels.push(
-              '<div class="legendRow">' +
-                label +
-                '<div class="legendColor" style="opacity: ' +
-                current_opacity +
-                '; background-color:' +
-                unitColor +
-                ';"></div>' +
-                '<div class="legendUnit">' +
-                unitValue +
-                '</div>' +
-                '</div>',
-            );
-          } else if (unitValue !== 'NaN') {
-            if (i == 0) {
-              // first row
-              labels.push(
-                '<div class="' +
-                  row_class +
-                  '">' +
-                  '<span class="legendLabel max">' +
-                  unitValue +
-                  '</span>' +
-                  '<div class="legendColor" style="opacity: ' +
-                  current_opacity +
-                  '; border-bottom: 10px solid ' +
-                  unitColor +
-                  '; border-left: 8px solid transparent; border-right: 8px solid transparent"></div>' +
-                  '<span class="legendUnit">&gt; ' +
-                  unitValue +
-                  '</span>' +
-                  '</div>',
-              );
-            } else if (i == colormap.length - 1) {
-              // last row
-              labels.push(
-                '<div class="' +
-                  row_class +
-                  '">' +
-                  '<span class="legendLabel min">' +
-                  unitValue +
-                  '</span>' +
-                  '<div class="legendColor" style="opacity: ' +
-                  current_opacity +
-                  '; border-top: 10px solid ' +
-                  unitColor +
-                  '; border-left: 8px solid transparent; border-right: 8px solid transparent"></div>' +
-                  '<span class="legendUnit">&lt; ' +
-                  unitValue +
-                  '</span>' +
-                  '</div>',
-              );
-            } else {
-              labels.push(
-                '<div class="' +
-                  row_class +
-                  '">' +
-                  '<div class="legendColor" style="opacity: ' +
-                  current_opacity +
-                  '; background-color:' +
-                  unitColor +
-                  ';"></div>' +
-                  '<div class="legendUnit">' +
-                  unitValue +
-                  '</div>' +
-                  '</div>',
-              );
-            }
-          } else {
-            if (i == colormap.length - 1) {
-              // last row if no unit
-
-              labels.push(
-                '<div class="' +
-                  row_class +
-                  ' zero">' +
-                  '<span class="legendLabel ">0</span>' +
-                  '<div class="legendColor" style="opacity: ' +
-                  current_opacity +
-                  '; background-color:' +
-                  unitColor +
-                  '"></div>' +
-                  '<span class="legendUnit">0</span>' +
-                  '</div>',
-              );
-            }
-          }
-        }
-
-        labels.push('</div><!-- .legendRows -->');
-
-        return labels;
-      },
-
       get_color: function (d) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           options = plugin.options;
 
-        for (let i = options.legend.colormap.length - 1; i > 0; i--) {
-          if (d < options.legend.colormap[i].quantity) {
-            return options.legend.colormap[i].color;
+        let prev_colour = options.legend.colormap.colours[0],
+          prev_value = options.legend.colormap.quantities[0];
+
+        for (let i = 0; i < options.legend.colormap.colours.length; i++) {
+          if (d < options.legend.colormap.quantities[i]) {
+            if (options.legend.colormap.scheme_type === 'discrete') {
+              return options.legend.colormap.colours[i];
+            } else {
+              return interpolate(prev_colour,
+                options.legend.colormap.colours[i],
+                (d - prev_value)/(options.legend.colormap.quantities[i] - prev_value))
+            }
           }
+          prev_colour = options.legend.colormap.colours[i];
+          prev_value = options.legend.colormap.quantities[i];
         }
         // fallback case in case style/legend is wrong
-        return options.legend.colormap[0].color;
+        return "rgba(0,0,0,0)";
       },
 
       invalidate_size: function () {

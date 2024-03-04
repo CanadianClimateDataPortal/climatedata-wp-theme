@@ -7,7 +7,7 @@
 					<h5><?php _e ( 'Data Options', 'cdc' ); ?></h5>
 					<p class="mb-0"><?php _e ( 'Select a variable and dataset to begin building your request.', 'cdc' ); ?></p>
 				</div>
-				<span class="tab-drawer-close">&times;</span>
+				<span class="tab-drawer-close btn-close"></span>
 			</div>
 			
 			<div class="control-tab-body">

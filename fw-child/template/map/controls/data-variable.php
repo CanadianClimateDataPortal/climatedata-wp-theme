@@ -3,7 +3,7 @@
 		<div class="tab-drawer-content-inner">
 			<div class="control-tab-head d-flex align-items-center justify-content-between">
 				<h5 class="mb-0"><?php _e ( 'Select a new variable', 'cdc' ); ?></h5>
-				<span class="tab-drawer-close">&times;</span>
+				<span class="tab-drawer-close btn-close"></span>
 			</div>
 			
 			<div class="control-tab-body">
@@ -80,7 +80,6 @@
 									}
 									
 								?>
-								
 							</ul>
 						
 						</div>
@@ -105,7 +104,7 @@
 						<div class="fw-query-items row row-cols-3"
 							data-options='{
 								"type":"items",
-								"template":"map-var-item.php",
+								"template":"template/query/map-var-item.php",
 								"id":"",
 								"class":["row","row-cols-3"],
 								"item_class":"col",

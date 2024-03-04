@@ -97,6 +97,13 @@ var theme_dir = current_script.replace('/resources/js/' + filename, '') + '/'
     //
     
     if ($('.fw-query-object').length) {
+      
+      $(document).on('fw_query_success', function (e, item) {
+        if (item.find('[data-aos') && typeof AOS != 'undefined') {
+          AOS.refreshHard()
+        }
+      })
+      
       $('.fw-query-object').each(function() {
         
         console.log($(this))

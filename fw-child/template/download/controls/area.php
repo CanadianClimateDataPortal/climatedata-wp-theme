@@ -7,7 +7,7 @@
 					<h5><?php _e ( 'Area of Analysis', 'cdc' ); ?></h5>
 					<p class="mb-0"><?php _e ( 'Use the map to select regions to add to your request.', 'cdc' ); ?></p>
 				</div>
-				<span class="tab-drawer-close">&times;</span>
+				<span class="tab-drawer-close btn-close"></span>
 			</div>
 			
 			<div class="control-tab-body">

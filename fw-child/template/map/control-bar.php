@@ -7,7 +7,7 @@
 		
 	?>
 	
-	<a href="#menu" id="menu-trigger" class="d-block p-2"><i class="fas fa-align-left text-white"></i></a>
+	<a href="#menu" id="menu-trigger" data-bs-toggle="offcanvas" class="d-flex justify-content-center p-2"><i class="fas fa-align-left text-white"></i></a>
 	
 	<div id="control-bar-tabs" class="tab-drawer-tabs w-100 pt-2">
 		<a href="#data" class="tab-drawer-trigger">

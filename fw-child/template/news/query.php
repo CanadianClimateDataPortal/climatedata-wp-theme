@@ -13,7 +13,7 @@
 		
 		$item_options = array (
 			'type' => 'items',
-			'template' => 'news-item.php',
+			'template' => 'template/query/news-item.php',
 			'id' => '',
 			'class' => array ( 'row', 'row-cols-3' ),
 			'item_class' => 'col'

@@ -53,6 +53,7 @@ const DATASETS = {
         },
       },
     ],
+    layer_prefix: '',
     grid: 'canadagrid',
     finch_name: 'candcs-u5',
     model_lists: [
@@ -87,6 +88,7 @@ const DATASETS = {
         },
       },
     ],
+    layer_prefix: 'cmip6-',
     grid: 'canadagrid',
     finch_name: 'candcs-u6',
     model_lists: [{ name: '26models', label: 'All models' }],

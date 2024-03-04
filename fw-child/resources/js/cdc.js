@@ -882,24 +882,22 @@
         let plugin = !this.item ? this.data('cdc_app') : this,
           options = plugin.options;
 
-        let prev_colour = options.legend.colormap.colours[0],
-          prev_value = options.legend.colormap.quantities[0];
-
-        for (let i = 0; i < options.legend.colormap.colours.length; i++) {
-          if (d < options.legend.colormap.quantities[i]) {
+        let i = indexOfGT(options.legend.colormap.quantities, d);
+        switch (i) {
+          case -1:
+            // fallback case in case style/legend is wrong
+            return "rgba(0,0,0,0)";
+          case 0:
+            return options.legend.colormap.colours[0];
+          default:
             if (options.legend.colormap.scheme_type === 'discrete') {
-              return options.legend.colormap.colours[i];
+              return  options.legend.colormap.colours[i];
             } else {
-              return interpolate(prev_colour,
+              return interpolate(options.legend.colormap.colours[i-1],
                 options.legend.colormap.colours[i],
-                (d - prev_value)/(options.legend.colormap.quantities[i] - prev_value))
+                (d - options.legend.colormap.quantities[i-1])/(options.legend.colormap.quantities[i] - options.legend.colormap.quantities[i-1]))
             }
-          }
-          prev_colour = options.legend.colormap.colours[i];
-          prev_value = options.legend.colormap.quantities[i];
         }
-        // fallback case in case style/legend is wrong
-        return "rgba(0,0,0,0)";
       },
 
       invalidate_size: function () {

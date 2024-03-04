@@ -355,3 +355,31 @@ function interpolate(color1, color2, percent) {
   // Convert the interpolated RGB values back to a hex color
   return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
+
+// source https://www.geeksforgeeks.org/first-strictly-greater-element-in-a-sorted-array-in-java/
+// Returns the index of the first element that is strictly greater than given target
+function indexOfGT(arr, target)
+{
+  let start = 0, end = arr.length - 1;
+  let ans = -1;
+
+  while (start <= end)
+  {
+    let mid = Math.floor((start + end) / 2);
+
+    // Move to right side if target is
+    // greater.
+    if (arr[mid] <= target)
+    {
+      start = mid + 1;
+    }
+
+    // Move left side.
+    else
+    {
+      ans = mid;
+      end = mid - 1;
+    }
+  }
+  return ans;
+}

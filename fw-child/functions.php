@@ -138,15 +138,15 @@ function child_theme_enqueue() {
 	
 	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'tab-drawer', 'utilities', 'cdc', 'map-app' ), NULL, true );
 
-    // Scripts for the "custom shapefile upload" logic (in the "download" section).
+	// Scripts for the "custom shapefile upload" logic (in the "download" section).
 
-    wp_register_script ( 'jszip', $child_npm_dir . 'jszip/dist/jszip.min.js', null, null, true );
-    wp_register_script ( 'mapshaper_modules', $child_npm_dir . 'mapshaper/www/modules.js', null, null, true );
-    wp_register_script ( 'mapshaper', $child_npm_dir . 'mapshaper/www/mapshaper.js', array ( 'mapshaper_modules' ), null, true );
-    wp_register_script ( 'topojson', $child_npm_dir . 'topojson/dist/topojson.min.js', null, null, true );
-    wp_register_script ( 'turf', $child_npm_dir . '@turf/turf/turf.min.js', null, null, true );
+	wp_register_script ( 'jszip', $child_npm_dir . 'jszip/dist/jszip.min.js', null, null, true );
+	wp_register_script ( 'mapshaper_modules', $child_npm_dir . 'mapshaper/www/modules.js', null, null, true );
+	wp_register_script ( 'mapshaper', $child_npm_dir . 'mapshaper/www/mapshaper.js', array ( 'mapshaper_modules' ), null, true );
+	wp_register_script ( 'topojson', $child_npm_dir . 'topojson/dist/topojson.min.js', null, null, true );
+	wp_register_script ( 'turf', $child_npm_dir . '@turf/turf/turf.min.js', null, null, true );
 
-    wp_register_script ( 'shapefile-upload', $child_js_dir . 'shapefile-upload.js', array ( 'jquery', 'jszip', 'mapshaper', 'topojson', 'turf' ), null, true );
+	wp_register_script ( 'shapefile-upload', $child_js_dir . 'shapefile-upload.js', array ( 'jquery', 'jszip', 'mapshaper', 'topojson', 'turf' ), null, true );
 	
 	// localize admin url
 	
@@ -166,23 +166,23 @@ function child_theme_enqueue() {
 	wp_localize_script ( 'utilities', 'unit_strings', $units );
 	
 	// PAGE CONDITIONALS
-
+	
 	if ( is_front_page() ) {
-
+		
 		// wp_dequeue_script ( 'jquery' );
 		wp_deregister_script ( 'jquery' );
-
+		
 		wp_enqueue_script ( 'jquery', 'https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=65dbbfa49f6b400b385a0b1d', null, null, true );
-
+		
 		wp_enqueue_script ( 'webflow', $child_vendor_dir . 'climatedata-scroll.webflow/webflow.js', array ( 'jquery' ), null, true );
-
+		
 	}
 
 	switch ( $GLOBALS['vars']['current_slug'] ) {
 		case 'map' :
 		case 'carte' :
 			wp_enqueue_script ( 'map-app' );
-            wp_enqueue_script ( 'shapefile-upload' );
+			wp_enqueue_script ( 'shapefile-upload' );
 			break;
 			
 		case 'download' :
@@ -299,27 +299,27 @@ function add_favicon() {
 // add_action( 'wp_head', 'add_favicon' );
 
 add_action ( 'wp_head', function() {
-
+	
 	if ( is_front_page() ) {
-
+		
 ?>
 
 <script type="text/javascript">
 	! function(o, c) {
 		var n = c.documentElement,
 			t = " w-mod-";
-
+			
 		n.setAttribute('data-wf-page', '65dbbfa49f6b400b385a0b23')
 		n.setAttribute('data-wf-site', '65dbbfa49f6b400b385a0b1d')
-
+			
 		n.className += t + "js", ("ontouchstart" in o || o.DocumentTouch && c instanceof DocumentTouch) && (n.className += t + "touch")
 	}(window, document);
 </script>
 
 <?php
 
-	}
-
+	}	
+	
 } );
 
 //
@@ -412,48 +412,48 @@ function cdc_get_location_by_coords () {
 	) {
 		
 		if ( locate_template ( 'resources/app/db.php' ) == '' ) {
-
+			
 			echo json_encode ( array (
 				'message' => 'Unable to connect to db'
 			) );
-
+			
 		} else {
-
+			
 			echo 'ya';
 			/*
 			require_once locate_template ( 'resources/app/db.php' );
 		
 			$lat = floatval ( $_GET['lat'] );
 			$lng = floatval ( $_GET['lng'] );
-
+			
 			// add _fr if needed
 			$term_append = ( $_GET['lang'] == 'fr' ) ? '_fr' : '';
-
+			
 			$columns = array (
-				"all_areas.id_code as geo_id",
-				"geo_name",
-				"gen_term" . $term_append . " as generic_term",
-				"location",
-				"province" . $term_append,
-				"lat",
+				"all_areas.id_code as geo_id", 
+				"geo_name", 
+				"gen_term" . $term_append . " as generic_term", 
+				"location", 
+				"province" . $term_append, 
+				"lat", 
 				"lon"
 			);
-
+			
 			// $columns = implode ( ",", $columns );
 			$join = "";
-
+			
 			if ( $_GET['sealevel'] == 'true' ) {
 				$join = "JOIN all_areas_sealevel ON (all_areas.id_code=all_areas_sealevel.id_code)";
 			}
-
+	
 			$ranges = [ 0.05, 0.1, 0.2 ];
 			$preferred_terms = [ 'Community', 'Metropolitan Area' ];
 			$found_community = false;
-
+			
 			// gradually increase the range until we find a community
-
+			
 			foreach ( $ranges as $range ) {
-
+				
 				if ( $found_community == false ) {
 					$main_query = mysqli_query($GLOBALS['vars']['con'], "SELECT " . implode(",", $columns) . "
 					, DISTANCE_BETWEEN($lat, $lng, lat,lon) as distance
@@ -464,54 +464,54 @@ function cdc_get_location_by_coords () {
 					AND gen_term NOT IN ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector')
 					ORDER BY DISTANCE
 					LIMIT 50") or die (mysqli_error($GLOBALS['vars']['con']));
-
+					
 					if ($main_query->num_rows > 0) {
-
+						
 						while ( $row = mysqli_fetch_assoc ( $main_query ) ) {
-
+							
 							if ( in_array ( $row['generic_term'], $preferred_terms ) ) {
 								$result = $row;
-
+								
 								// might be good to know
 								// what range is the community in from the click
 								$result['range'] = $range;
-
+								
 								// send back the original coords
 								$result['coords'] = [ $lat, $lng ];
-
+								
 								// lon -> lng
 								$result['lng'] = $result['lon'];
-
+								
 								// province abbreviation
 								$result['province_short'] = short_province ( $result['province'] );
-
+								
 								// nice name
 								$result['title'] = $result['geo_name'] . ', ' . $result['province_short'];
-
+								
 								$found_community = true;
-
+								
 								break;
 							}
 						}
-
+						
 					}
-
+					
 				}
-
+				
 			}
-
+			
 			if ( $found_community == true ) {
-
+				
 				// found a community in range
 				echo json_encode ( $result );
-
+				
 			} else {
-
+				
 				// no preferred results, grab the nearest one
-
+	
 				// range of coordinates to search between
 				$range = 0.1;
-
+				
 				$main_query = mysqli_query($GLOBALS['vars']['con'], "SELECT " . implode(",", $columns) . "
 				, DISTANCE_BETWEEN($lat, $lng, lat,lon) as distance
 				FROM all_areas
@@ -521,33 +521,33 @@ function cdc_get_location_by_coords () {
 				AND gen_term NOT IN ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector')
 				ORDER BY DISTANCE
 				LIMIT 1") or die (mysqli_error($GLOBALS['vars']['con']));
-
+				
 				if ($main_query->num_rows > 0) {
-
+					
 					$result = mysqli_fetch_assoc ( $main_query );
-
+					
 					$result['coords'] = [ $lat, $lng ];
 					$result['lng'] = $result['lon'];
 					$result['province_short'] = short_province ( $result['province'] );
 					$result['title'] = $result['geo_name'] . ', ' . $result['province_short'];
-
+					
 					echo json_encode ( $result );
-
+					
 				} else {
-
+					
 					echo json_encode ( array (
 						'lat' => $lat,
 						'lng' => $lng,
 						'geo_name' => __ ( 'Point', 'cdc' ),
 						'title' => __ ( 'Point', 'cdc' ) . ' (' . $lat . ', ' . $lng . ')'
 					) );
-
+					
 				}
-
+				
 			}
-
+			
 		} else {
-
+			
 			echo json_encode ( array (
 				'lat' => $lat,
 				'lng' => $lng,
@@ -555,8 +555,8 @@ function cdc_get_location_by_coords () {
 				'geo_name' => __ ( 'Point', 'cdc' ),
 				'title' => __ ( 'Point', 'cdc' ) . ' (' . $lat . ', ' . $lng . ')'
 			) );
-
-	*/
+			
+	*/	
 		}
 	}
 	

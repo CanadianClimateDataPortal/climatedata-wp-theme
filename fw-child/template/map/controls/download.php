@@ -52,13 +52,13 @@
 						<div class="form-check">
 							<input class="form-check-input" type="radio" name="download-area" id="download-area-custom" value="custom" data-conditional="#download-area-shapefile">
 							<label class="form-check-label" for="download-area-custom"><?php _e ( 'Custom shapefile', 'cdc' ); ?></label>
-                            <a tabindex="0" role="button" id="download-area-custom-tooltip" class="text-secondary">ⓘ</a>
+							<a tabindex="0" role="button" id="download-area-custom-tooltip" class="text-secondary">ⓘ</a>
 						</div>
 						
 						<div id="download-area-shapefile" class="bg-gray-200 p-2">
 							<label for="download-area-shapefile-input" class="form-label"><?php _e ( 'Drop your GeoJSON file here to upload', 'cdc' ); ?></label>
 							<input class="form-control form-control-sm" id="download-area-shapefile-input" type="file">
-                            <div id="download-area-shapefile-message" class="mt-2"></div>
+							<div id="download-area-shapefile-message" class="mt-2"></div>
 						</div>
 					</div>
 					

@@ -44,13 +44,13 @@
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-custom" value="custom" data-query-key="sector" data-conditional="#area-aggregation-shapefile">
 						<label class="form-check-label" for="area-aggregation-custom"><?php _e ( 'Custom shapefile', 'cdc' ); ?></label>
-                        <a tabindex="0" role="button" id="area-aggregation-custom-tooltip" class="text-secondary">ⓘ</a>
+						<a tabindex="0" role="button" id="area-aggregation-custom-tooltip" class="text-secondary">ⓘ</a>
 					</div>
 					
 					<div id="area-aggregation-shapefile" class="bg-gray-200 p-3">
 						<label for="area-aggregation-shapefile-input" class="form-label"><?php _e ( 'Drop your GeoJSON file here to upload', 'cdc' ); ?></label>
 						<input class="form-control form-control-sm" id="area-aggregation-shapefile-input" type="file">
-                        <div id="area-aggregation-shapefile-message" class="mt-2"></div>
+						<div id="area-aggregation-shapefile-message" class="mt-2"></div>
 					</div>
 					
 				</div>

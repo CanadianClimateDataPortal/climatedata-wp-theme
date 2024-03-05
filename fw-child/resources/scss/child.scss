@@ -544,9 +544,15 @@ $control-slider-handle-width: 2.75rem;
 // JQUERY UI COMPONENTS
 //
 
+.ui-datepicker {
+  z-index: 1000 !important;
+  background-color: $white;
+}
+
 .ui-widget {
   font-family: $font-family-sans-serif;
 }
+
 .ui-corner-all,
 .ui-corner-bottom,
 .ui-corner-right,

@@ -35,6 +35,12 @@
           },
         },
       },
+      legend: {
+        colormap: {
+          colours: [],
+          quantities: [],
+        },
+      },
       query: {
         coords: [62.51231793838694, -98.48144531250001, 4],
         delta: '',
@@ -252,7 +258,11 @@
 
       // MAPS
 
-      options.maps = $(document).cdc_app('maps.init', options.maps);
+      options.maps = $(document).cdc_app(
+        'maps.init',
+        options.maps,
+        options.legend,
+      );
 
       // SLIDERS
 
@@ -363,16 +373,17 @@
 
       // console.log('frequency', options.frequency);
 
-      // load defautl color scheme
-      plugin.update_default_scheme();
-
+      // load default color scheme
+      plugin.update_default_scheme(function () {
+        $(document).cdc_app('maps.get_layer', options.query, options.var_data);
+      });
 
       $(document).cdc_app(
         'add_hook',
         'maps.get_layer',
         500,
         plugin,
-        'apply_scheme',
+        plugin.apply_scheme,
       );
     },
 
@@ -472,9 +483,31 @@
         });
       }
 
+      //
+
+      item.on('map_item_mouseout', function (e, click_event) {
+        // TO FIX
+        /*// reset highlighted
+        options.grid.highlighted.forEach(function (feature) {
+          new_layer.resetFeatureStyle(feature);
+        });
+
+        // update highlighted grid
+        options.grid.highlighted = [e.layer.properties.gid];
+
+        new_layer.setFeatureStyle(options.grid.highlighted, {
+          weight: options.grid.styles.line.hover.weight,
+          color: options.grid.styles.line.hover.color,
+          opacity: options.grid.styles.line.hover.opacity,
+          fillColor: options.grid.styles.fill.hover.color,
+          fill: true,
+          fillOpacity: options.grid.styles.fill.hover.opacity,
+        });*/
+      });
+
       // click grid item
 
-      item.on('select_map_item', function (e, click_event) {
+      item.on('map_item_select', function (e, click_event) {
         console.log('grid click', click_event);
 
         // load location details
@@ -625,8 +658,6 @@
         $('[data-query-key="scheme"]')
           .val($(this).attr('data-scheme-id'))
           .trigger('change');
-
-        plugin.update_scheme();
       });
 
       // HISTORY
@@ -661,10 +692,6 @@
       switch (this_key) {
         case 'var_id':
           plugin.update_var(this_val, status);
-          plugin.update_default_scheme();
-          break;
-        case 'frequency':
-          plugin.update_default_scheme();
           break;
         case 'scenarios':
           // ssp1/2/5 switches
@@ -755,6 +782,27 @@
           key: this_key,
           val: this_val,
         });
+
+        // perform triggers based in input key, but with updated query object
+        switch (this_key) {
+          case 'var_id':
+          case 'frequency':
+          case 'delta':
+            plugin.update_default_scheme(function () {
+              $(document).cdc_app(
+                'maps.get_layer', // todo: not ideal, may generates a flicker of the map layer
+                options.query,
+                options.var_data,
+              );
+            });
+            break;
+          case 'scheme':
+            plugin.update_scheme();
+            break;
+          case 'scheme_type':
+            options.legend.colormap.scheme_type = options.query.scheme_type;
+            break;
+        }
 
         // run the query
 
@@ -1297,31 +1345,44 @@
 
     // fetch colours of default scheme from Geoserver and update the data of the default
     // one in the dropdown
-    update_default_scheme: function () {
+    update_default_scheme: function (callback) {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
 
-      let layer_name = $(document).cdc_app('maps.get_layer_name', options.query);
+      // todo: implement behaviour for building_climate_zones
+      let layer_name = $(document).cdc_app(
+        'maps.get_layer_name',
+        options.query,
+      );
       $.getJSON(
         geoserver_url +
           '/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic' +
           '&format=application/json&layer=' +
           layer_name,
-      ).then(function (data) {
-        let colour_map =
-          data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
+      )
+        .then(function (data) {
+          let colour_map =
+            data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
 
-        item
-          .find(
+          let default_scheme_element = item.find(
             '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
-          )
-          .data(
+          );
+          default_scheme_element.data(
             'scheme-colours',
             colour_map.map((e) => e.color),
           );
-        plugin.update_scheme();
-      });
+          default_scheme_element.data(
+            'scheme-quantities',
+            colour_map.map((e) => parseFloat(e.quantity)),
+          );
+          plugin.update_scheme();
+        })
+        .always(function () {
+          if (typeof callback == 'function') {
+            callback();
+          }
+        });
     },
 
     // Hook that update leaflet params object depending on selected scheme
@@ -1330,26 +1391,21 @@
         options = plugin.options,
         item = plugin.item;
 
-
       let selected_item = item.find(
         '#display-scheme-select .dropdown-item[data-scheme-id="' +
-        query.scheme +
-        '"]',
+          query.scheme +
+          '"]',
       );
 
-      if (query.scheme == 'default') {
-        layer_params.styles = '';
+      if (query.scheme === 'default') {
+        delete layer_params.styles;
         layer_params.tiled = true;
-        layer_params.sld_boty = '';
+        delete layer_params.sld_body;
       } else {
         layer_params.tiled = false;
         layer_params.sld_body = plugin.generate_sld(
           layer_params.layers,
-          selected_item.data('scheme-colours'),
-          variables_data[query.var][period_frequency_lut[query.frequency]],
-          query.delta == 'true',
-          selected_item.data('scheme-type'),
-          query.scheme_type == 'discrete',
+          query.scheme_type === 'discrete',
         );
       }
     },
@@ -1396,35 +1452,65 @@
         plugin.redraw_colour_scheme(this);
       });
 
+      plugin.generate_ramp(selected_item);
     },
 
-    generate_sld: function (
-      layer_name,
-      colours,
-      variable_data,
-      delta,
-      type,
-      discrete,
-    ) {
-      let absolute_or_delta = delta ? 'delta' : 'absolute';
+    // generate ramp colours and keypoints, used by SLD or choro, and legend
+    generate_ramp: function (selected_scheme_item) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let colours = selected_scheme_item.data('scheme-colours');
+      let query = options.query;
+      let quantity;
+
+      options.legend.colormap.colours = colours;
+      options.legend.colormap.quantities = [];
+      options.legend.colormap.scheme_type = query.scheme_type;
+
+      if (options.query.scheme === 'default') {
+        options.legend.colormap.quantities =
+          selected_scheme_item.data('scheme-quantities');
+      } else {
+        let variable_data =
+          variables_data[query.var][period_frequency_lut[query.frequency]];
+        let absolute_or_delta = query.delta === 'true' ? 'delta' : 'absolute';
+
+        let low = variable_data[absolute_or_delta].low;
+        let high = variable_data[absolute_or_delta].high;
+        let scheme_length = colours.length;
+
+        // if we have a diverging ramp, we center the legend at zero
+        if (selected_scheme_item.data('scheme-type') === 'divergent') {
+          high = Math.max(Math.abs(low), Math.abs(high));
+          low = high * -1;
+        }
+
+        // temperature raster data files are in Kelvin, but in °C in variable_data
+        if (variable_data.unit === 'K' && query.delta !== 'true') {
+          low += 273.15;
+          high += 273.15;
+        }
+
+        let step = (high - low) / scheme_length;
+
+        for (let i = 0; i < scheme_length - 1; i++) {
+          quantity = low + i * step;
+          options.legend.colormap.quantities.push(quantity);
+        }
+        // we need a virtually high value for highest bucket
+        options.legend.colormap.quantities.push((high + 1) * (high + 1));
+      }
+    },
+
+    generate_sld: function (layer_name, discrete) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let colormap = options.legend.colormap;
       let colormap_type = discrete ? 'intervals' : 'ramp';
-      let low = variable_data[absolute_or_delta].low;
-      let high = variable_data[absolute_or_delta].high;
-      let scheme_length = colours.length;
-
-      // if we have a diverging ramp, we center the legend at zero
-      if (type == 'diverging') {
-        high = Math.max(Math.abs(low), Math.abs(high));
-        low = high * -1;
-      }
-
-      // temperature data files are in Kelvin
-      if (variable_data.unit == 'K' && !delta) {
-        low += 273.15;
-        high += 273.15;
-      }
-
-      let step = (high - low) / scheme_length;
 
       let sld_body = `<?xml version="1.0" encoding="UTF-8"?>
         <StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"
@@ -1433,13 +1519,8 @@
         <NamedLayer><Name>${layer_name}</Name><UserStyle><IsDefault>1</IsDefault><FeatureTypeStyle><Rule><RasterSymbolizer>
         <Opacity>1.0</Opacity><ColorMap type="${colormap_type}">`;
 
-      for (let i = 0; i < scheme_length; i++) {
-        if (discrete && i == scheme_length - 1) {
-          // we need a virtually high value for highest bucket, otherwise it will be blank
-          sld_body += `<ColorMapEntry color="${colours[i]}" quantity="${(high + 1) * (high + 1)}"/>`;
-        } else {
-          sld_body += `<ColorMapEntry color="${colours[i]}" quantity="${low + i * step}"/>`;
-        }
+      for (let i = 0; i < colormap.colours.length; i++) {
+        sld_body += `<ColorMapEntry color="${colormap.colours[i]}" quantity="${colormap.quantities[i]}"/>`;
       }
 
       sld_body +=

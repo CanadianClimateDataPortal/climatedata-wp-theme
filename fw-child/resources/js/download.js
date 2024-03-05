@@ -26,6 +26,13 @@
           layers: {},
         },
       },
+      legend: {
+        colormap: {
+          colours: [],
+          quantities: [],
+        },
+      },
+      current_selections: [],
       query: {
         coords: [62.51231793838694, -98.48144531250001, 4],
         delta: '',
@@ -39,23 +46,35 @@
         sector: 'canadagrid',
         scheme: 'default',
         scheme_type: 'discrete',
-        start_date: 1950,
-        end_date: 1955,
+        start_year: 1950,
+        end_year: 1955,
+        start_date:
+          new Date().getFullYear() - 30 + new Date().toJSON().substr(4, 6),
+        end_date: new Date().toJSON().slice(0, 10),
         format: 'csv',
         input_type: 'preset',
         inputs: [],
+        station: [],
       },
       query_str: {
         prev: '',
         current: '',
       },
       var_data: null,
-      has_thresholds: false,
+      var_flags: {
+        single: false,
+        inputs: false,
+        threshold: false,
+        station: false,
+      },
+      request_type: 'single',
       elements: {
         start_slider: null,
         end_slider: null,
         threshold_accordion: null,
         threshold_slider: null,
+        start_picker: null,
+        end_picker: null,
       },
       debug: true,
     };
@@ -138,7 +157,7 @@
 
           // 6. update controls with initial query data
 
-          console.log('download', 'refresh inputs');
+          console.log('download', 'refresh inputs', options.status);
 
           plugin.refresh_inputs(options.query, options.status);
 
@@ -174,31 +193,8 @@
               options.status = 'ready';
             },
           });
-          // } else {
-          //   options.status = 'ready';
-          // }
         },
       );
-
-      //
-      // EVENTS
-      //
-
-      //
-      // RUN INITIAL QUERY
-      //
-
-      //       console.log('download', 'init', 'eval');
-      //
-      //       $(document).cdc_app('maps.get_grid_layer');
-
-      // options.query_str.current = $(document).cdc_app(
-      //   'query.eval',
-      //   'replace',
-      //   function () {
-      //     options.status = 'ready';
-      //   },
-      // );
     },
 
     init_components: function () {
@@ -208,7 +204,11 @@
 
       // MAPS
 
-      options.maps = $(document).cdc_app('maps.init', options.maps);
+      options.maps = $(document).cdc_app(
+        'maps.init',
+        options.maps,
+        options.legend,
+      );
 
       // JQUERY UI WIDGETS
 
@@ -220,8 +220,8 @@
           step: 1,
         });
 
-      let start_hidden = item.find('[data-query-key="start_date"]'),
-        end_hidden = item.find('[data-query-key="end_date"]');
+      let start_hidden = item.find('[data-query-key="start_year"]'),
+        end_hidden = item.find('[data-query-key="end_year"]');
 
       options.elements.start_slider = item
         .find('#details-time-slider-start')
@@ -295,6 +295,82 @@
         },
       });
 
+      // datepicker
+
+      item.find('.ui-datepicker-calendar a').click(function (e) {
+        e.preventDefault();
+      });
+
+      let datepicker_options = {
+        dateFormat: 'yy-mm-dd',
+        changeMonth: true,
+        changeYear: true,
+        yearRange: '1840:2030',
+        numberOfMonths: 1,
+        classes: {
+          'ui-datepicker-div': 'shadow',
+          'ui-datepicker-month': 'custom-select',
+        },
+      };
+
+      options.elements.start_picker = $('#details-datepicker-start')
+        .datepicker(datepicker_options)
+        .on('change', function (e) {
+          console.log($(this));
+          $(document).trigger('update_input', [$(this), 'input']);
+
+          options.elements.end_picker.datepicker(
+            'option',
+            'minDate',
+            options.elements.start_picker.datepicker('getDate'),
+          );
+        });
+
+      options.elements.end_picker = $('#details-datepicker-end')
+        .datepicker(datepicker_options)
+        .on('change', function (e) {
+          $(document).trigger('update_input', [$(this), 'input']);
+
+          options.elements.start_picker.datepicker(
+            'option',
+            'maxDate',
+            options.elements.end_picker.datepicker('getDate'),
+          );
+        });
+
+      // SELECT2
+
+      $('#station-select').select2({
+        language: options.lang,
+        ajax: {
+          url: ajax_data.url,
+          dataType: 'json',
+          delay: 0,
+          data: function (params) {
+            return {
+              action: 'cdc_station_search',
+              q: params.term, // search term
+              page: params.page,
+            };
+          },
+          processResults: function (data, page) {
+            // parse the results into the format expected by Select2.
+            // since we are using custom formatting functions we do not
+            // need to alter the remote JSON data
+            return {
+              results: data,
+            };
+          },
+          cache: true,
+        },
+        escapeMarkup: function (markup) {
+          return markup;
+        }, // let our custom formatter work
+        width: '100%',
+        placeholderOption: 'first',
+        placeholder: $('#station-select').attr('data-placeholder'),
+      });
+
       // BOOTSTRAP COMPONENTS
 
       options.elements.threshold_accordion = document.getElementById(
@@ -314,21 +390,9 @@
             // hide the data layer - it's not applicable to a
             // custom threshold query
             item.find('.leaflet-raster-pane').hide();
-
-            // options.query.inputs = [];
-
-            // item
-            //   .find('#threshold-custom .accordion-body :input')
-            //   .each(function () {
-            //     options.query.inputs.push($(this).val());
-            //   });
           } else {
             // preset:
             // populate options.query.inputs with the slider value
-
-            // options.query.inputs = [
-            //   options.elements.threshold_slider.slider('value'),
-            // ];
 
             // show the data layer
             item.find('.leaflet-raster-pane').show();
@@ -400,6 +464,86 @@
         });
       }
 
+      item.on('map_item_mouseover', function (e, click_event) {
+        let this_gid = click_event.layer.properties.gid;
+
+        if (
+          !options.current_selections.length ||
+          (options.current_selections.length &&
+            !options.current_selections.includes(this_gid))
+        ) {
+          for (let key in options.maps) {
+            options.maps[key].layers.grid.setFeatureStyle(this_gid, {
+              color: '#444',
+              weight: 1,
+              opacity: 1,
+            });
+          }
+        }
+      });
+
+      item.on('map_item_mouseout', function (e, click_event) {
+        let this_gid = click_event.layer.properties.gid;
+
+        if (
+          !options.current_selections.length ||
+          (options.current_selections.length &&
+            !options.current_selections.includes(this_gid))
+        ) {
+          for (let key in options.maps) {
+            options.maps[key].layers.grid.resetFeatureStyle(this_gid);
+          }
+        }
+      });
+
+      item.on('map_item_select', function (e, click_event) {
+        let this_gid = click_event.layer.properties.gid;
+
+        options.current_selections = [];
+
+        item
+          .find('#area-selections')
+          .val()
+          .split(',')
+          .forEach(function (selection) {
+            if (selection != '')
+              options.current_selections.push(parseInt(selection));
+          });
+
+        // console.log('current', current_selections);
+
+        if (options.current_selections.includes(this_gid)) {
+          // deselect
+
+          for (var i = options.current_selections.length - 1; i >= 0; i--) {
+            if (options.current_selections[i] === this_gid) {
+              options.current_selections.splice(i, 1);
+            }
+          }
+
+          for (let key in options.maps) {
+            options.maps[key].layers.grid.resetFeatureStyle(this_gid);
+          }
+        } else {
+          // select
+
+          options.current_selections.push(this_gid);
+
+          for (let key in options.maps) {
+            options.maps[key].layers.grid.setFeatureStyle(this_gid, {
+              color: '#f00',
+              weight: 1,
+              opacity: 1,
+            });
+          }
+        }
+
+        item
+          .find('#area-selections')
+          .val(options.current_selections.join(','))
+          .trigger('change');
+      });
+
       //
       // SIDEBAR CONTROLS
       //
@@ -445,6 +589,7 @@
       item.on('change', ':input[data-query-key]', function () {
         console.log(
           'change input',
+          $(this),
           options.query[$(this).attr('data-query-key')] +
             ' -> ' +
             $(this).val(),
@@ -488,87 +633,25 @@
       item.on('td_update_path', function (event, prev_id, new_id) {
         // console.log('validate', prev_id + ' > ' + new_id);
 
-        let prev_tab = $(prev_id),
-          new_tab = $(new_id);
+        let prev_tab = item.find(prev_id),
+          new_tab = item.find(new_id);
 
         if (prev_id == new_id) {
           // console.log("tab didn't change");
         } else if (new_tab.closest(prev_tab).length) {
           // console.log('tab is a child');
         } else {
-          let invalid_messages = [],
-            tab_items = item.find('#control-bar-tabs'),
-            tab_alert = $(prev_id).find('.invalid-alert'),
-            msg_list = tab_alert.find('ul');
-
-          tab_items.find('[href="' + new_id + '"]').removeClass('invalid');
-
-          msg_list.empty();
-
-          // each validate-able input in this tab
-
-          $(prev_id)
-            .find('[data-validate]')
-            .each(function () {
-              // check for blank value
-              // console.log($(this), $(this).val());
-              if ($(this).val() == '' || $(this).val() == 'null') {
-                tab_items.find('[href="' + prev_id + '"]').addClass('invalid');
-                invalid_messages.push($(this).attr('data-validate'));
-              }
-            });
-
-          // custom validation by tab
-
-          if (prev_id == '#data') {
-            let open_accordion = prev_tab.find('.accordion-collapse.show');
-
-            // which input accordion is shown
-            options.query.input_type = open_accordion.attr('id').split('-')[1];
-
-            if (options.query.input_type == 'custom') {
-              open_accordion.find(':input').each(function () {
-                if ($(this).val() == '' || $(this).val() == 'null') {
-                  tab_items
-                    .find('[href="' + prev_id + '"]')
-                    .addClass('invalid');
-
-                  invalid_messages.push('All custom inputs are required.');
-
-                  return false;
-                }
-              });
-            }
-          }
-
-          // console.log(invalid_messages);
-
-          if (invalid_messages.length) {
-            // append messages
-            invalid_messages.forEach(function (msg) {
-              msg_list.append('<li> ' + msg + '</li>');
-            });
-
-            // show the alert
-            tab_alert.show();
-          } else {
-            // no invalid messages
-            tab_items.find('[href="' + prev_id + '"]').removeClass('invalid');
-            // hide the alert
-            tab_alert.hide();
-          }
+          plugin.validate_tab(prev_id, new_id);
         }
       });
 
       // SUBMIT
 
-      item.on('click', '#submit', function () {
+      item.on('click', '#submit-btn', function () {
+        console.log('SUBMIT DATA');
         console.log(JSON.stringify(options.query, null, 4));
-        let submit_output = $('<div id="submit-modal">').appendTo('body');
 
-        const submit_modal = new bootstrap.Modal(submit_output);
-
-        // submit_modal.modal('show');
+        plugin.process();
       });
 
       // HISTORY
@@ -600,7 +683,7 @@
 
       // custom UX behaviours by input key
 
-      console.log('input change', input, this_key, this_val);
+      // console.log('input change', input, this_key, this_val);
 
       switch (this_key) {
         case 'var_id':
@@ -722,11 +805,15 @@
               );
             }
 
-            options.status = 'ready';
+            if (status != 'init') {
+              options.status = 'ready';
+            }
           },
         });
       } else {
-        options.status = 'ready';
+        if (status != 'init') {
+          options.status = 'ready';
+        }
       }
     },
 
@@ -745,7 +832,7 @@
 
         // find input(s) that matches this key
         let this_input = item.find('[data-query-key="' + key + '"]');
-        console.log('refresh', key, this_input.val(), options.query[key]);
+        // console.log('refresh', key, this_input.val(), options.query[key]);
 
         if (Array.isArray(options.query[key])) {
           // query option is an array
@@ -769,6 +856,10 @@
                 // but the box is not checked
                 $(this).prop('checked', true);
                 do_update = true;
+              } else if ($(this).hasClass('select2')) {
+                // console.log('update select');
+                // console.log('status', options.status);
+                $(this).val(options.query[key]).trigger('change');
               }
 
               if (do_update == true) {
@@ -786,7 +877,7 @@
 
             this_input.val(options.query[key]);
 
-            if (key == 'start_date') {
+            if (key == 'start_year') {
               options.elements.start_slider.slider(
                 'value',
                 parseInt(options.query[key]),
@@ -819,7 +910,7 @@
             );
 
             if (this_radio.prop('checked') != true) {
-              console.log('radio', item.find('[data-query-key="' + key + '"]'));
+              // console.log('radio', item.find('[data-query-key="' + key + '"]'));
               this_radio.prop('checked', true);
               $(document).trigger('update_input', [$(this_radio), 'eval']);
             }
@@ -889,7 +980,10 @@
 
       if (status == null) status = options.status;
 
-      options.has_thresholds = false;
+      options.var_flags.single = false;
+      options.var_flags.inputs = false;
+      options.var_flags.threshold = false;
+      options.var_flags.station = false;
 
       console.log('updating ' + var_id + ', ' + var_name + ', ' + status);
 
@@ -907,9 +1001,9 @@
           // var data is already set,
           // and the ID is the same as
           // the one that was sent to the function
-          console.log('skip get_var_data');
+          // console.log('skip get_var_data');
         } else {
-          console.log('get_var_data because var_id changed');
+          // console.log('get_var_data because var_id changed');
           $(document).cdc_app('get_var_data', var_id, function (data) {
             // console.log('get var data', data);
 
@@ -935,22 +1029,26 @@
             // TODO
             // plugin.update_frequency();
 
-            if (options.var_data.var_types.includes('Station Data')) {
-              console.log('station station station station ');
-              options.query.sector = 'station';
-            } else {
-              console.log('NOT STATIONNNNN');
-              options.query.sector = item
-                .find('[data-query-key="sector"]:checked')
-                .val();
-            }
-
-            console.log('sector: ' + options.query.sector);
+            // console.log('sector: ' + options.query.sector);
 
             if (typeof callback == 'function') {
               callback(data);
             }
           });
+        }
+
+        // set var_flags
+        // for conditional showing/hiding of controls
+
+        if (options.var_data.var_types.includes('Station Data')) {
+          // console.log('var is station data');
+          options.query.sector = 'station';
+          options.var_flags.station = true;
+        } else {
+          // console.log('var is NOT station data');
+          options.query.sector = item
+            .find('[data-query-key="sector"]:checked')
+            .val();
         }
 
         // always do this stuff
@@ -1019,7 +1117,7 @@
           }
 
           if (options.var_data.acf.var_names.length > 1) {
-            options.has_thresholds = true;
+            options.var_flags.threshold = true;
 
             // multiple vars
 
@@ -1110,15 +1208,29 @@
             item
               .find('#threshold-preset-head .accordion-button')
               .prop('disabled', false);
-          } else {
-            item
-              .find('#threshold-custom-head .accordion-button')
-              .trigger('click');
+          }
+
+          // does the variable have input fields
+          if (options.var_data.acf.thresholds !== null) {
+            options.var_flags.inputs = true;
+          }
+
+          if (
+            options.var_flags.inputs == false &&
+            options.var_flags.threshold == false
+          ) {
+            options.var_flags.single = true;
 
             item
               .find('#threshold-preset-head .accordion-button')
               .addClass('disabled')
               .prop('disabled', true);
+
+            if (!item.find('#threshold-custom').hasClass('show')) {
+              item
+                .find('#threshold-custom-head .accordion-button')
+                .trigger('click');
+            }
           }
         }
 
@@ -1134,13 +1246,270 @@
       let items_to_hide = [],
         items_to_show = [];
 
-      if (options.has_thresholds == true) {
-        // show all data-display="threshold"
-        item.find('[data-display="threshold"]').show();
-        item.find('[data-display="single"]').hide();
+      // SHOW / HIDE CONTROLS
+
+      // each flag
+      for (let key in options.var_flags) {
+        // console.log('check', key, options.var_flags[key]);
+
+        // find items with this condition
+        item.find('[data-display*="' + key + '"]').each(function () {
+          // find its 0/1 value
+          let split_attr = $(this)
+            .attr('data-display')
+            .split(key)[1]
+            .substr(1, 1);
+
+          // console.log($(this));
+          // console.log(key + ' has to be ' + split_attr);
+
+          if (options.var_flags[key] == true) {
+            split_attr == '1' ? $(this).show() : $(this).hide();
+
+            // if (split_attr == '1') {
+            //   console.log('show');
+            //   $(this).show();
+            // } else {
+            //   console.log('hide');
+            //   $(this).hide();
+            // }
+          } else {
+            // flag is false, condition is 0
+            split_attr == '0' ? $(this).show() : $(this).hide();
+          }
+        });
+      }
+
+      // UPDATE CONTROL SETTINGS
+
+      if (options.var_flags.threshold == true) {
+        // console.log('select threshold accordion');
+
+        if (item.find('#threshold-preset-btn').hasClass('collapsed')) {
+          item.find('#threshold-preset-btn').trigger('click');
+        }
+      } else if (options.var_flags.inputs == true) {
+        // no thresholds, but
+        // does have inputs
+      }
+
+      // console.log('---');
+    },
+
+    validate_tab: function (prev_id, new_id) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let prev_tab = item.find(prev_id),
+        new_tab = item.find(new_id);
+
+      console.log('validating tab');
+
+      let invalid_messages = [],
+        tab_items = item.find('#control-bar-tabs'),
+        tab_alert = $(prev_id).find('.invalid-alert'),
+        msg_list = tab_alert.find('ul');
+
+      tab_items.find('[href="' + new_id + '"]').removeClass('invalid');
+
+      msg_list.empty();
+
+      // each validate-able input in this tab
+
+      $(prev_id)
+        .find('[data-validate]:visible')
+        .each(function () {
+          console.log('check', $(this));
+          // check for blank value
+          // console.log($(this), $(this).val());
+          if ($(this).val() == '' || $(this).val() == 'null') {
+            tab_items.find('[href="' + prev_id + '"]').addClass('invalid');
+            invalid_messages.push($(this).attr('data-validate'));
+          }
+        });
+
+      // custom validation by tab
+
+      if (prev_id == '#data') {
+        let open_accordion = prev_tab.find('.accordion-collapse.show');
+
+        // which input accordion is shown
+        options.query.input_type = open_accordion.attr('id').split('-')[1];
+
+        if (options.query.input_type == 'custom') {
+          open_accordion.find(':input').each(function () {
+            if ($(this).val() == '' || $(this).val() == 'null') {
+              tab_items.find('[href="' + prev_id + '"]').addClass('invalid');
+
+              invalid_messages.push('All custom inputs are required.');
+
+              return false;
+            }
+          });
+        }
+      } else if (prev_id == '#area') {
+        if (options.var_flags.station == true) {
+        }
+      }
+
+      // console.log(invalid_messages);
+
+      if (invalid_messages.length) {
+        // append messages
+        invalid_messages.forEach(function (msg) {
+          msg_list.append('<li> ' + msg + '</li>');
+        });
+
+        // show the alert
+        tab_alert.show();
       } else {
-        item.find('[data-display="threshold"]').hide();
-        item.find('[data-display="single"]').show();
+        // no invalid messages
+        tab_items.find('[href="' + prev_id + '"]').removeClass('invalid');
+        // hide the alert
+        tab_alert.hide();
+      }
+
+      if (new_id == '#submit') {
+        plugin.validate_request();
+      }
+    },
+
+    validate_request: function () {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      options.query.is_valid = true;
+      options.query.inputs = [];
+
+      console.log('validating request');
+      console.log(JSON.stringify(options.query, null, 4));
+
+      // what kind of request is it
+
+      console.log('flags', options.var_flags);
+
+      if (options.var_flags.threshold == true) {
+        options.request_type = 'threshold';
+      }
+
+      console.log(item.find('#var-thresholds .collapse.show'));
+
+      if (
+        options.var_flags.inputs == true &&
+        item.find('#var-thresholds .collapse.show').attr('id') ==
+          'threshold-custom'
+      ) {
+        options.request_type = 'inputs';
+      }
+
+      if (options.var_flags.station == true) {
+        options.request_type = 'station';
+      }
+
+      console.log('request type', options.request_type);
+
+      switch (options.request_type) {
+        case 'station':
+          // station data
+
+          // check start/end dates
+
+          if (
+            options.start_date == '' ||
+            options.end_date == '' ||
+            parseInt(options.query.start_date) >
+              parseInt(options.query.end_date)
+          ) {
+            options.query.is_valid = false;
+          }
+
+          // check for station selection
+
+          if (options.query.station.length < 1) {
+            options.query.is_valid = false;
+          }
+
+          if (options.query.is_valid == true) {
+            // create the weather.gc.ca API link URL
+
+            let station_url =
+              'https://api.weather.gc.ca/collections/climate-daily/items' +
+              '?datetime=' +
+              options.query.start_date +
+              '%2000:00:00/' +
+              options.query.end_date +
+              '%2000:00:00' +
+              '&STN_ID=' +
+              options.query.station.join('|') +
+              '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' +
+              options.query.format +
+              '&limit=150000&startindex=0';
+
+            console.log('GC URL', station_url);
+
+            item
+              .find('#station-submit-btn')
+              .attr('href', station_url)
+              .removeClass('disabled');
+          }
+
+          break;
+
+        case 'threshold':
+          // preset threshold
+
+          console.log(
+            'var',
+            options.query.var,
+            options.query.var.replace(/\D/g, ''),
+          );
+
+          item.find('#threshold-custom :input').each(function () {
+            options.query.inputs.push({
+              name: $(this).attr('name'),
+              value: options.query.var.replace(/\D/g, ''),
+              units: $(this).attr('data-units'),
+            });
+          });
+
+          break;
+
+        case 'inputs':
+          // custom inputs
+
+          item.find('#threshold-custom :input').each(function () {
+            options.query.inputs.push({
+              name: $(this).attr('name'),
+              value: $(this).val(),
+              units: $(this).attr('data-units'),
+            });
+          });
+
+          break;
+      }
+
+      console.log('validated query');
+      console.log(JSON.stringify(options.query, null, 4));
+    },
+
+    process: function () {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      switch (options.request_type) {
+        case 'station':
+          console.log('gc URL');
+
+          break;
+
+        case 'threshold':
+        case 'inputs':
+          console.log('create file name');
+          console.log(options.query);
+          break;
       }
     },
 

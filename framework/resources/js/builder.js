@@ -202,6 +202,8 @@
 			
 			$('#wp-admin-bar-fw-actions-item-toggle').click(function() {
 				
+				console.log(item.find('.swiper'))
+				
 				if ($('body').hasClass('fw-builder')) {
 					
 					options.status = 'disabled'

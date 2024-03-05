@@ -321,3 +321,65 @@ function T(str) {
     return l10n_table[lang][str];
   }
 }
+
+/**
+ * Format the n-th day value to localized text on a non-leap year (ex: 156 -> June 9)
+ * @param value Day of the Year (starting with 0 for Jan 1st)
+ * @returns {string} The formatted value
+ */
+function doy_formatter(value, language) {
+  const firstDayOfYear = Date.UTC(2019, 0, 1);
+  return new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * value).toLocaleDateString(language, {
+    month: 'long',
+    day: 'numeric'
+  })
+}
+
+
+// source: https://stackoverflow.com/a/76126221
+function interpolate(color1, color2, percent) {
+  // Convert the hex colors to RGB values
+  const r1 = parseInt(color1.substring(1, 3), 16);
+  const g1 = parseInt(color1.substring(3, 5), 16);
+  const b1 = parseInt(color1.substring(5, 7), 16);
+
+  const r2 = parseInt(color2.substring(1, 3), 16);
+  const g2 = parseInt(color2.substring(3, 5), 16);
+  const b2 = parseInt(color2.substring(5, 7), 16);
+
+  // Interpolate the RGB values
+  const r = Math.round(r1 + (r2 - r1) * percent);
+  const g = Math.round(g1 + (g2 - g1) * percent);
+  const b = Math.round(b1 + (b2 - b1) * percent);
+
+  // Convert the interpolated RGB values back to a hex color
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+// source https://www.geeksforgeeks.org/first-strictly-greater-element-in-a-sorted-array-in-java/
+// Returns the index of the first element that is strictly greater than given target
+function indexOfGT(arr, target)
+{
+  let start = 0, end = arr.length - 1;
+  let ans = -1;
+
+  while (start <= end)
+  {
+    let mid = Math.floor((start + end) / 2);
+
+    // Move to right side if target is
+    // greater.
+    if (arr[mid] <= target)
+    {
+      start = mid + 1;
+    }
+
+    // Move left side.
+    else
+    {
+      ans = mid;
+      end = mid - 1;
+    }
+  }
+  return ans;
+}

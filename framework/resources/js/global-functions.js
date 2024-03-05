@@ -30,7 +30,14 @@ var theme_dir = current_script.replace('/resources/js/' + filename, '') + '/'
         
         let this_swiper = $(this).find('> .swiper'),
             this_settings = JSON.parse($(this).attr('data-swiper-settings'))
-            
+        
+        if (
+          $('body').hasClass('fw-builder') && 
+          this_settings.hasOwnProperty('autoplay')
+        ) {
+          this_settings.autoplay.enabled = false
+        }
+        
         // console.log($(this), this_settings)
         
         // show controls if options are set

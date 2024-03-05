@@ -66,10 +66,20 @@ function child_theme_enqueue() {
 	
 	wp_dequeue_style ( 'global-style' );
 	
+	// VENDOR
+	
+	// font awesome
+	
 	wp_register_style ( 'font-awesome', WP_CONTENT_URL . '/vendor/font-awesome-pro/css/all.css', null, null );
 	wp_enqueue_style ( 'font-awesome' );
 
+	// leaflet
+	
 	wp_enqueue_style ( 'leaflet', $child_npm_dir . 'leaflet/dist/leaflet.css', NULL, NULL, 'all' );
+	
+	// select2
+	
+	wp_register_style ( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', null, null );
 
 	wp_register_style ( 'gutenberg', $child_theme_dir . 'resources/css/gutenberg.css', null, null );
 	wp_enqueue_style ( 'child-style', $child_theme_dir . 'style.css', NULL, NULL, 'all' );
@@ -84,10 +94,13 @@ function child_theme_enqueue() {
 	
 	if (
 		$GLOBALS['vars']['current_slug'] == 'map' ||
-		$GLOBALS['vars']['current_slug'] == 'carte'
+		$GLOBALS['vars']['current_slug'] == 'carte' ||
+		$GLOBALS['vars']['current_slug'] == 'download' ||
+		$GLOBALS['vars']['current_slug'] == 'telechargement'
 	) {
 		
 		wp_enqueue_style ( 'leaflet' );
+		wp_enqueue_style ( 'select2' );
 		
 	}
 
@@ -122,9 +135,15 @@ function child_theme_enqueue() {
 	wp_register_script ( 'highcharts-offline-exporting', 'https://code.highcharts.com/stock/modules/offline-exporting.js', array ( 'highcharts-exporting' ), NULL, true );
 	wp_register_script ( 'highcharts-accessibility', 'https://code.highcharts.com/modules/accessibility.js', array ( 'highcharts-highstock' ), NULL, true );
 	
+	// zebra pin
+	
 	wp_register_script ( 'zebra-pin', $child_npm_dir . 'zebra_pin/dist/zebra_pin.min.js', array ( 'jquery' ), null, true );
 	
-	//
+	// select2
+	
+	wp_register_script ( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', array ( 'jquery' ), null, true );
+	
+	// utilities/constants
 	
 	wp_register_script ( 'utilities', $child_js_dir . 'utilities.js', array ( 'jquery' ), NULL, true );
 	
@@ -134,7 +153,7 @@ function child_theme_enqueue() {
 	
 	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'cdc', 'data', 'jquery-ui-slider' ), NULL, true );
 	
-	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'cdc', 'jquery-ui-slider' ), NULL, true );
+	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'cdc', 'jquery-ui-slider', 'jquery-ui-datepicker', 'select2' ), NULL, true );
 	
 	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'tab-drawer', 'utilities', 'cdc', 'map-app' ), NULL, true );
 	
@@ -389,6 +408,62 @@ function cdc_get_random_var() {
 
 add_action ( 'wp_ajax_cdc_get_random_var', 'cdc_get_random_var' );
 add_action ( 'wp_ajax_nopriv_cdc_get_random_var', 'cdc_get_random_var' );
+
+// station search
+
+function cdc_station_search() {
+
+	if ( locate_template ( 'resources/app/db.php' ) != '' )
+		require_once locate_template ( 'resources/app/db.php' );
+
+	$q = isset($_GET['q']) ? $_GET['q'] : '';
+
+	$sql = "SELECT station_name,stn_id,lat,lon FROM stations WHERE station_name LIKE '".$q."%' or stn_id LIKE '%".$q."%' and has_normals = 'Y'";
+
+	$result = $GLOBALS['vars']['con']->query($sql);
+
+	$json = [];
+
+	while ( $row = $result->fetch_assoc() ) {
+		$json[] = [
+			'id' => $row['stn_id'],
+			'text' => $row['station_name'],
+			'lat' => $row['lat'],
+			'lon' => $row['lon']
+		];
+	}
+
+	echo json_encode ( $json );
+
+	if ( wp_doing_ajax() ) 
+		wp_die();
+
+}
+
+add_action ( 'wp_ajax_cdc_station_search', 'cdc_station_search' );
+add_action ( 'wp_ajax_nopriv_cdc_station_search', 'cdc_station_search' );
+
+// station list
+
+function cdc_station_list() {
+
+	if ( locate_template ( 'resources/app/db.php' ) != '' )
+		require_once locate_template ( 'resources/app/db.php' );
+
+	$query = "SELECT stn_id,station_name FROM stations";
+	$result = mysqli_query ( $GLOBALS['vars']['con'], $query ) or die ( mysqli_error ( $GLOBALS['vars']['con'] ) . "[" . $query . "]");
+
+	while ( $row = mysqli_fetch_array ( $result ) ) {
+		echo '<option value="' . $row['stn_id'] . '">' . $row['station_name'] . "</option>\n";
+	}
+
+	if ( wp_doing_ajax() ) 
+		wp_die();
+
+}
+
+add_action ( 'wp_ajax_cdc_station_list', 'cdc_station_list' );
+add_action ( 'wp_ajax_nopriv_cdc_station_list', 'cdc_station_list' );
 
 // get location by lat/lng
 

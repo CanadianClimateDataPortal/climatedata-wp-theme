@@ -18,7 +18,29 @@
 					</div>
 				</div>
 				
-				<div id="map-control-aggregation" class="map-control-item conditional-trigger">
+				<div id="map-control-stations" class="map-control-item conditional-trigger" data-display="station:1" style="display: none;">
+					<h6 class="all-caps text-secondary"><?php _e ( 'Select Stations', 'cdc' ); ?></h6>
+					
+					<select 
+						class="custom-select custom-select-md select2 form-control input-large" 
+						name="station-select" 
+						id="station-select" 
+						multiple="multiple" 
+						data-placeholder="<?php _e ( 'Select station(s)','cdc' ); ?>"
+						data-container-css-class="big-menu btn btn-lg border-primary" 
+						data-dropdown-css-class="big-menu-dropdown" 
+						data-query-key="station" 
+						data-validate="<?php _e ( 'Select at least one station', 'cdc' ); ?>"
+					>
+						<?php
+					
+							cdc_station_list();
+					
+						?>
+					</select>
+				</div>
+					
+				<div id="map-control-aggregation" class="map-control-item conditional-trigger" data-display="station:0">
 					<h6 class="all-caps text-secondary"><?php _e ( 'Change Aggregation', 'cdc' ); ?></h6>
 					
 					<div class="form-check">

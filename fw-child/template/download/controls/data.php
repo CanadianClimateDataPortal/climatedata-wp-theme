@@ -26,13 +26,13 @@
 					
 					<a href="#data-variable" class="tab-drawer-trigger var-name d-block bg-white text-body p-3 mb-3"><?php _e ( 'Click to select a variable', 'cdc' ); ?></a>
 					
-					<div id="var-thresholds" class="me-3" style="display: none;">
+					<div id="var-thresholds" class="me-3" style="display: none;" data-display="station:0">
 						<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Thresholds', 'cdc' ); ?></h6>
 						
 						<div class="accordion accordion-flush" id="var-threshold-accordion">
-							<div class="accordion-item" data-display="threshold">
+							<div class="accordion-item" data-display="threshold:1">
 								<h6 class="accordion-header" id="threshold-preset-head">
-									<button class="accordion-button all-caps text-gray-600 mb-0" type="button" data-bs-toggle="collapse" data-bs-target="#threshold-preset" aria-expanded="true" aria-controls="threshold-preset">
+									<button id="threshold-preset-btn" class="accordion-button all-caps text-gray-600 mb-0" type="button" data-bs-toggle="collapse" data-bs-target="#threshold-preset" aria-expanded="true" aria-controls="threshold-preset">
 										<?php _e ( 'Presets', 'cdc' ); ?>
 									</button>
 								</h6>
@@ -66,7 +66,7 @@
 					
 				</div>
 				
-				<div id="map-control-dataset" class="map-control-item">
+				<div id="map-control-dataset" class="map-control-item" data-display="station:0">
 					<h6 class="all-caps text-secondary mb-3">Dataset</h6>
 					
 					<div class="form-check">
@@ -79,7 +79,7 @@
 						<label class="form-check-label" for="data-dataset-cmip5">CMIP5 (CanDCS-U5)</label>
 					</div>
 					
-					<div class="form-check" data-display="threshold">
+					<div class="form-check" data-display="threshold:1">
 						<input class="form-check-input" type="radio" name="data-dataset" id="data-dataset-humidex">
 						<label class="form-check-label" for="data-dataset-humidex">Humidex (CMIP6)</label>
 					</div>

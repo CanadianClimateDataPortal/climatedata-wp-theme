@@ -104,7 +104,7 @@
       first_map: null,
       current_sector: 'canadagrid',
       hooks: {
-        'maps.get_layer': Array(1000)
+        'maps.get_layer': Array(1000),
       },
       legend: {
         colormap: null,
@@ -230,7 +230,7 @@
     },
 
     add_hook: function (hook_name, priority, obj, hook_function) {
-      this.options.hooks[hook_name][priority] = {obj: obj, fn: hook_function};
+      this.options.hooks[hook_name][priority] = { obj: obj, fn: hook_function };
     },
 
     maps: {
@@ -333,7 +333,7 @@
 
       // returns Geoserver layer name
       // sample result: CDC:cmip6-HXmax30-ys-ssp585-p50-ann-30year
-      get_layer_name: function(query, scenario='high') {
+      get_layer_name: function (query, scenario = 'high') {
         const dataset_details = DATASETS[query.dataset];
         let frequency_code = query.frequency;
 
@@ -341,18 +341,21 @@
           frequency_code = period_frequency_lut[query.frequency];
         }
 
-        return 'CDC:' + dataset_details.layer_prefix +
-        query.var +
-        '-' +
-        frequency_code +
-        '-' +
-        scenario_names[query.dataset][scenario]
-          .replace(/[\W_]+/g, '')
-          .toLowerCase() +
-        '-p50-' +
-        query.frequency +
-        '-30year' +
-        (query.delta == 'true' ? '-delta7100' : '');
+        return (
+          'CDC:' +
+          dataset_details.layer_prefix +
+          query.var +
+          '-' +
+          frequency_code +
+          '-' +
+          scenario_names[query.dataset][scenario]
+            .replace(/[\W_]+/g, '')
+            .toLowerCase() +
+          '-p50-' +
+          query.frequency +
+          '-30year' +
+          (query.delta == 'true' ? '-delta7100' : '')
+        );
       },
 
       get_layer: function (query, var_data) {
@@ -405,8 +408,6 @@
 
                   // ys/ms/qsdec
 
-
-
                   // ann/spring/summer/
 
                   let frequency_name = query.frequency;
@@ -439,8 +440,7 @@
                   // apply hooks
                   options.hooks['maps.get_layer'].forEach(function (hook) {
                     hook.obj[hook.fn](query, params);
-                    }
-                  )
+                  });
 
                   if (
                     this_map.layers.raster &&
@@ -569,7 +569,7 @@
                 this_map.layers.stations == undefined ||
                 !this_map.object.hasLayer(this_map.layers.stations)
               ) {
-                console.log(key + " map doesn't have stations");
+                // console.log(key + " map doesn't have stations");
                 this_map.layers.stations = L.geoJson(options.station_data, {
                   pointToLayer: function (feature, latlng) {
                     markerColor = '#e50e40';
@@ -591,7 +591,7 @@
                   })
                   .on('click', function (e) {});
 
-                console.log(this_map.layers.stations);
+                // console.log(this_map.layers.stations);
 
                 this_map.layers.stations.addTo(this_map.object);
               }
@@ -790,7 +790,8 @@
           '/geoserver/wms?service=WMS&version=1.1.0' +
           '&request=GetLegendGraphic' +
           '&format=application/json' +
-          '&layer=' + layer_name;
+          '&layer=' +
+          layer_name;
 
         if (var_data.slug == 'building_climate_zones') {
           request_url += '&style=CDC:building_climate_zones';
@@ -1212,13 +1213,11 @@
 
           // force scenarios to be an array
 
-          if (typeof query.scenarios == 'string') {
-            query.scenarios = [query.scenarios];
-          }
-
-          if (typeof query.percentiles == 'string') {
-            query.percentiles = [query.percentiles];
-          }
+          ['scenarios', 'percentiles', 'station'].forEach(function (key) {
+            if (typeof query[key] == 'string') {
+              query[key] = [query[key]];
+            }
+          });
 
           // console.log('merged query');
           // console.log(JSON.stringify(query, null, 4));
@@ -1292,6 +1291,11 @@
                 .each(function () {
                   query[fn_options.key].push($(this).val());
                 });
+            } else if (fn_options.item.is('select')) {
+              // console.log('update select');
+              // console.log(fn_options);
+
+              query[fn_options.key] = fn_options.val;
             } else if (fn_options.key == 'coords') {
               query[fn_options.key] = fn_options.val.split(',');
             }

@@ -38,7 +38,7 @@ var theme_dir = current_script.replace('/resources/js/' + filename, '') + '/'
           this_settings.autoplay.enabled = false
         }
         
-        console.log($(this), this_settings)
+        // console.log($(this), this_settings)
         
         // show controls if options are set
         

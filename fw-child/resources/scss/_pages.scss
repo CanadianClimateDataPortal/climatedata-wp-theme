@@ -654,3 +654,49 @@ body.tab-drawer-open {
     }
   }
 }
+
+//
+// GLOSSARY
+//
+
+#glossary-list {
+  background-color: $gray-100;
+
+  .letter {
+    background-color: $gray-200;
+
+    h2 {
+      position: sticky;
+      top: 120px;
+      padding-top: 2rem;
+      text-align: center;
+      font-size: 4rem;
+      font-weight: $font-weight-bold;
+    }
+  }
+
+  .term-list {
+    .row {
+      border-bottom: 1px solid $border-color;
+      transition: 0.25s;
+
+      &:hover {
+        background-color: $white;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  dt {
+    font-size: 1.25rem;
+    color: $gray-600;
+  }
+
+  dd {
+    padding-top: 0.375rem;
+    font-size: 0.875rem;
+  }
+}

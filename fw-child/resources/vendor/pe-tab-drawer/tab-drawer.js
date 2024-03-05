@@ -351,14 +351,25 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 			
 		},
 		
+		get_tabs: function() {
+			
+			let plugin = this,
+				item = plugin.item,
+				options = plugin.options
+				
+			return options.elements.tabs
+			
+		}
+		
 	}
 
 	// jQuery plugin interface
 
 	$.fn.tab_drawer = function (opt) {
-		var args = Array.prototype.slice.call(arguments, 1)
+		var args = Array.prototype.slice.call(arguments, 1),
+			result = true
 
-		return this.each(function () {
+		this.each(function () {
 			var item = $(this)
 			var instance = item.data('tab_drawer')
 
@@ -368,9 +379,11 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 			} else {
 				// otherwise check arguments for method call
 				if (typeof opt === 'string') {
-					instance[opt].apply(instance, args)
+					result = instance[opt].apply(instance, args)
 				}
 			}
 		})
+		
+		return result
 	}
 })(jQuery)

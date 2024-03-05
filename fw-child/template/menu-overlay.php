@@ -113,11 +113,13 @@
 			
 			<div id="menu-footer" class="ps-3 py-3 bg-gray-200">
 					
-				<?php
-				
-					include ( locate_template ( 'template/newsletter-signup.php' ) );
+				<div class="ms-3 pb-3 mb-3 border-bottom border-gray-400">
+					<?php
 					
-				?>
+						include ( locate_template ( 'template/newsletter-signup.php' ) );
+						
+					?>
+				</div>
 
 				<div id="" class="d-flex justify-content-between px-3">
 					<div>

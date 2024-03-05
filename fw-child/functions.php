@@ -402,15 +402,18 @@ function cdc_get_location_by_coords () {
 		if ( locate_template ( 'resources/app/db.php' ) == '' ) {
 			
 			echo json_encode ( array (
-				'message' => 'Unable to connect to db'
+				'lat' => $lat,
+				'lng' => $lng,
+				'coords' => [ $lat, $lng ],
+				'geo_id' => '',
+				'geo_name' => __ ( 'Point', 'cdc' ),
+				'title' => __ ( 'Point', 'cdc' ) . ' (' . $lat . ', ' . $lng . ')'
 			) );
 			
 		} else {
 			
-			echo 'ya';
-			/*
 			require_once locate_template ( 'resources/app/db.php' );
-		
+			
 			$lat = floatval ( $_GET['lat'] );
 			$lng = floatval ( $_GET['lng'] );
 			
@@ -451,7 +454,7 @@ function cdc_get_location_by_coords () {
 					AND lon BETWEEN " . (round($lng, 2) - $range) . " AND " . (round($lng, 2) + $range) . "
 					AND gen_term NOT IN ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector')
 					ORDER BY DISTANCE
-					LIMIT 50") or die (mysqli_error($GLOBALS['vars']['con']));
+					LIMIT 50");// or die (mysqli_error($GLOBALS['vars']['con']));
 					
 					if ($main_query->num_rows > 0) {
 						
@@ -508,7 +511,7 @@ function cdc_get_location_by_coords () {
 				AND lon BETWEEN " . (round($lng, 2) - $range) . " AND " . (round($lng, 2) + $range) . "
 				AND gen_term NOT IN ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector')
 				ORDER BY DISTANCE
-				LIMIT 1") or die (mysqli_error($GLOBALS['vars']['con']));
+				LIMIT 1");// or die (mysqli_error($GLOBALS['vars']['con']));
 				
 				if ($main_query->num_rows > 0) {
 					
@@ -526,6 +529,7 @@ function cdc_get_location_by_coords () {
 					echo json_encode ( array (
 						'lat' => $lat,
 						'lng' => $lng,
+						'coords' => [ $lat, $lng ],
 						'geo_name' => __ ( 'Point', 'cdc' ),
 						'title' => __ ( 'Point', 'cdc' ) . ' (' . $lat . ', ' . $lng . ')'
 					) );
@@ -534,19 +538,9 @@ function cdc_get_location_by_coords () {
 				
 			}
 			
-		} else {
-			
-			echo json_encode ( array (
-				'lat' => $lat,
-				'lng' => $lng,
-				'geo_id' => '',
-				'geo_name' => __ ( 'Point', 'cdc' ),
-				'title' => __ ( 'Point', 'cdc' ) . ' (' . $lat . ', ' . $lng . ')'
-			) );
-			
-	*/	
-		}
-	}
+		} // if db.php
+	
+	} // if $_GET
 	
 	wp_die();
 

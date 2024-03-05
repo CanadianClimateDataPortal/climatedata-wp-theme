@@ -7,6 +7,7 @@
 }
 
 #header-menu-icon {
+  font-size: 1.25rem;
   color: $white;
 }
 
@@ -17,6 +18,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
+  p {
+    margin-bottom: 0;
+  }
 
   a {
     margin-left: 0.5rem;

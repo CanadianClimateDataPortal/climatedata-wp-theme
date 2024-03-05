@@ -503,24 +503,11 @@
 
                     new_layer
                       .on('mouseover', function (e) {
-                        // reset highlighted
-                        options.grid.highlighted.forEach(function (feature) {
-                          new_layer.resetFeatureStyle(feature);
-                        });
-
-                        // update highlighted grid
-                        options.grid.highlighted = [e.layer.properties.gid];
-
-                        new_layer.setFeatureStyle(options.grid.highlighted, {
-                          weight: options.grid.styles.line.hover.weight,
-                          color: options.grid.styles.line.hover.color,
-                          opacity: options.grid.styles.line.hover.opacity,
-                          fillColor: options.grid.styles.fill.hover.color,
-                          fill: true,
-                          fillOpacity: options.grid.styles.fill.hover.opacity,
-                        });
+                        $(document).trigger('map_item_mouseover', [e]);
                       })
-                      .on('mouseout', function (e) {})
+                      .on('mouseout', function (e) {
+                        $(document).trigger('map_item_mouseout', [e]);
+                      })
                       .on('click', function (e) {
                         // pan map to clicked coords
                         // var offset = (map1.getSize().x * 0.5) - 100;
@@ -528,7 +515,7 @@
                         // map1.panTo([e.latlng.lat, e.latlng.lng], { animate: false }); // pan to center
                         // map1.panBy(new L.Point(offset, 0), { animate: false }); // pan by offset
 
-                        $(document).trigger('select_map_item', [e]);
+                        $(document).trigger('map_item_select', [e]);
                       });
 
                     this_map.layers.grid = new_layer.addTo(this_map.object);
@@ -764,7 +751,7 @@
                           .closeTooltip();
                       })
                       .on('click', function (e) {
-                        $(document).trigger('select_map_item', e);
+                        $(document).trigger('map_item_select', e);
                       })
 
                       .addTo(options.maps[key].object);

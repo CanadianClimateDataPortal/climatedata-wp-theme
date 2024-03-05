@@ -258,7 +258,11 @@
 
       // MAPS
 
-      options.maps = $(document).cdc_app('maps.init', options.maps, options.legend);
+      options.maps = $(document).cdc_app(
+        'maps.init',
+        options.maps,
+        options.legend,
+      );
 
       // SLIDERS
 
@@ -371,12 +375,8 @@
 
       // load default color scheme
       plugin.update_default_scheme(function () {
-        $(document).cdc_app('maps.get_layer',
-          options.query,
-          options.var_data
-        );
+        $(document).cdc_app('maps.get_layer', options.query, options.var_data);
       });
-
 
       $(document).cdc_app(
         'add_hook',
@@ -483,9 +483,31 @@
         });
       }
 
+      //
+
+      item.on('map_item_mouseout', function (e, click_event) {
+        // TO FIX
+        /*// reset highlighted
+        options.grid.highlighted.forEach(function (feature) {
+          new_layer.resetFeatureStyle(feature);
+        });
+
+        // update highlighted grid
+        options.grid.highlighted = [e.layer.properties.gid];
+
+        new_layer.setFeatureStyle(options.grid.highlighted, {
+          weight: options.grid.styles.line.hover.weight,
+          color: options.grid.styles.line.hover.color,
+          opacity: options.grid.styles.line.hover.opacity,
+          fillColor: options.grid.styles.fill.hover.color,
+          fill: true,
+          fillOpacity: options.grid.styles.fill.hover.opacity,
+        });*/
+      });
+
       // click grid item
 
-      item.on('select_map_item', function (e, click_event) {
+      item.on('map_item_select', function (e, click_event) {
         console.log('grid click', click_event);
 
         // load location details
@@ -767,9 +789,10 @@
           case 'frequency':
           case 'delta':
             plugin.update_default_scheme(function () {
-              $(document).cdc_app('maps.get_layer',  // todo: not ideal, may generates a flicker of the map layer
+              $(document).cdc_app(
+                'maps.get_layer', // todo: not ideal, may generates a flicker of the map layer
                 options.query,
-                options.var_data
+                options.var_data,
               );
             });
             break;
@@ -1328,25 +1351,38 @@
         item = plugin.item;
 
       // todo: implement behaviour for building_climate_zones
-      let layer_name = $(document).cdc_app('maps.get_layer_name', options.query);
+      let layer_name = $(document).cdc_app(
+        'maps.get_layer_name',
+        options.query,
+      );
       $.getJSON(
         geoserver_url +
           '/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic' +
           '&format=application/json&layer=' +
           layer_name,
-      ).then(function (data) {
-        let colour_map =
-          data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
+      )
+        .then(function (data) {
+          let colour_map =
+            data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
 
-        let default_scheme_element = item.find('#display-scheme-select .dropdown-item[data-scheme-id="default"]');
-        default_scheme_element.data('scheme-colours', colour_map.map(e => e.color));
-        default_scheme_element.data('scheme-quantities', colour_map.map(e => parseFloat(e.quantity)));
-        plugin.update_scheme();
-      }).always(function() {
-        if (typeof callback == 'function') {
-          callback();
-        }
-      });
+          let default_scheme_element = item.find(
+            '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
+          );
+          default_scheme_element.data(
+            'scheme-colours',
+            colour_map.map((e) => e.color),
+          );
+          default_scheme_element.data(
+            'scheme-quantities',
+            colour_map.map((e) => parseFloat(e.quantity)),
+          );
+          plugin.update_scheme();
+        })
+        .always(function () {
+          if (typeof callback == 'function') {
+            callback();
+          }
+        });
     },
 
     // Hook that update leaflet params object depending on selected scheme
@@ -1355,22 +1391,21 @@
         options = plugin.options,
         item = plugin.item;
 
-
       let selected_item = item.find(
         '#display-scheme-select .dropdown-item[data-scheme-id="' +
-        query.scheme +
-        '"]',
+          query.scheme +
+          '"]',
       );
 
       if (query.scheme === 'default') {
-        delete(layer_params.styles);
+        delete layer_params.styles;
         layer_params.tiled = true;
-        delete(layer_params.sld_body);
+        delete layer_params.sld_body;
       } else {
         layer_params.tiled = false;
         layer_params.sld_body = plugin.generate_sld(
           layer_params.layers,
-           query.scheme_type === 'discrete',
+          query.scheme_type === 'discrete',
         );
       }
     },
@@ -1435,9 +1470,11 @@
       options.legend.colormap.scheme_type = query.scheme_type;
 
       if (options.query.scheme === 'default') {
-        options.legend.colormap.quantities = selected_scheme_item.data('scheme-quantities');
+        options.legend.colormap.quantities =
+          selected_scheme_item.data('scheme-quantities');
       } else {
-        let variable_data = variables_data[query.var][period_frequency_lut[query.frequency]]
+        let variable_data =
+          variables_data[query.var][period_frequency_lut[query.frequency]];
         let absolute_or_delta = query.delta === 'true' ? 'delta' : 'absolute';
 
         let low = variable_data[absolute_or_delta].low;
@@ -1464,15 +1501,10 @@
         }
         // we need a virtually high value for highest bucket
         options.legend.colormap.quantities.push((high + 1) * (high + 1));
-
       }
-
     },
 
-    generate_sld: function (
-      layer_name,
-      discrete,
-    ) {
+    generate_sld: function (layer_name, discrete) {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
@@ -1486,7 +1518,6 @@
         xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd">
         <NamedLayer><Name>${layer_name}</Name><UserStyle><IsDefault>1</IsDefault><FeatureTypeStyle><Rule><RasterSymbolizer>
         <Opacity>1.0</Opacity><ColorMap type="${colormap_type}">`;
-
 
       for (let i = 0; i < colormap.colours.length; i++) {
         sld_body += `<ColorMapEntry color="${colormap.colours[i]}" quantity="${colormap.quantities[i]}"/>`;

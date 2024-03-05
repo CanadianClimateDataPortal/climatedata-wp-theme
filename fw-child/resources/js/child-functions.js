@@ -21,7 +21,44 @@ const $ = jQuery;
     }
 
     if ($('body').attr('id') == 'page-download') {
-      $(document).cdc_app();
+      $(document).cdc_app({
+        grid: {
+          styles: {
+            line: {
+              default: {
+                color: '#777',
+                weight: 0.2,
+                opacity: 0.6,
+              },
+              hover: {
+                color: '#999',
+                weight: 0.4,
+                opacity: 0.8,
+              },
+              active: {
+                color: '#f00',
+                weight: 1,
+                opacity: 1,
+              },
+            },
+            fill: {
+              default: {
+                color: '#fff',
+                opacity: 0,
+              },
+              hover: {
+                color: '#fff',
+                opacity: 0.2,
+              },
+              active: {
+                color: '#fff',
+                opacity: 0.6,
+              },
+            },
+          },
+        },
+      });
+
       $(document).download_app();
     }
 

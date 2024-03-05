@@ -26,6 +26,13 @@
           layers: {},
         },
       },
+      legend: {
+        colormap: {
+          colours: [],
+          quantities: [],
+        },
+      },
+      current_selections: [],
       query: {
         coords: [62.51231793838694, -98.48144531250001, 4],
         delta: '',
@@ -197,7 +204,11 @@
 
       // MAPS
 
-      options.maps = $(document).cdc_app('maps.init', options.maps);
+      options.maps = $(document).cdc_app(
+        'maps.init',
+        options.maps,
+        options.legend,
+      );
 
       // JQUERY UI WIDGETS
 
@@ -452,6 +463,86 @@
           );
         });
       }
+
+      item.on('map_item_mouseover', function (e, click_event) {
+        let this_gid = click_event.layer.properties.gid;
+
+        if (
+          !options.current_selections.length ||
+          (options.current_selections.length &&
+            !options.current_selections.includes(this_gid))
+        ) {
+          for (let key in options.maps) {
+            options.maps[key].layers.grid.setFeatureStyle(this_gid, {
+              color: '#444',
+              weight: 1,
+              opacity: 1,
+            });
+          }
+        }
+      });
+
+      item.on('map_item_mouseout', function (e, click_event) {
+        let this_gid = click_event.layer.properties.gid;
+
+        if (
+          !options.current_selections.length ||
+          (options.current_selections.length &&
+            !options.current_selections.includes(this_gid))
+        ) {
+          for (let key in options.maps) {
+            options.maps[key].layers.grid.resetFeatureStyle(this_gid);
+          }
+        }
+      });
+
+      item.on('map_item_select', function (e, click_event) {
+        let this_gid = click_event.layer.properties.gid;
+
+        options.current_selections = [];
+
+        item
+          .find('#area-selections')
+          .val()
+          .split(',')
+          .forEach(function (selection) {
+            if (selection != '')
+              options.current_selections.push(parseInt(selection));
+          });
+
+        // console.log('current', current_selections);
+
+        if (options.current_selections.includes(this_gid)) {
+          // deselect
+
+          for (var i = options.current_selections.length - 1; i >= 0; i--) {
+            if (options.current_selections[i] === this_gid) {
+              options.current_selections.splice(i, 1);
+            }
+          }
+
+          for (let key in options.maps) {
+            options.maps[key].layers.grid.resetFeatureStyle(this_gid);
+          }
+        } else {
+          // select
+
+          options.current_selections.push(this_gid);
+
+          for (let key in options.maps) {
+            options.maps[key].layers.grid.setFeatureStyle(this_gid, {
+              color: '#f00',
+              weight: 1,
+              opacity: 1,
+            });
+          }
+        }
+
+        item
+          .find('#area-selections')
+          .val(options.current_selections.join(','))
+          .trigger('change');
+      });
 
       //
       // SIDEBAR CONTROLS

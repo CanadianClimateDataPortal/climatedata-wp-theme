@@ -30,7 +30,9 @@
 }
 
 #header-lang {
-  .current-nav-item {
+  font-size: 0.875rem;
+
+  .current-nav-link {
     color: $primary;
   }
 }

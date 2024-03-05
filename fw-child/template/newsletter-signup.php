@@ -1,5 +1,5 @@
 <!-- Begin Mailchimp Signup Form -->
-<div id="mc_embed_signup" class="ms-3 pb-3 mb-3 border-bottom border-gray-400">
+<div id="mc_embed_signup" class="">
 	<h6 class="all-caps text-body mb-3"><?php _e ( 'Join the newsletter', 'cdc' ); ?></h6>
 
 	<form action="https://climatedata.us1.list-manage.com/subscribe/post?u=c52e1be341cba7905716a66b4&amp;id=727cebaf22" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate pe-3" target="_blank" novalidate>

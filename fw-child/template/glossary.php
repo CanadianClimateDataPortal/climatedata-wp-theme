@@ -9,61 +9,6 @@
 		'order' => 'asc'
 	) );
 	
-	
-	// convert FR
-	
-	if ( isset ( $_GET['convert'] ) && $_GET['convert'] == '1' ) {
-		
-		if ( !defined ( 'ICL_LANGUAGE_CODE' ) ) {
-			
-			echo '<p>WPML not active</p>';
-			
-		} else {
-			
-			if ( $glossary_query->have_posts() ) {
-				
-				while ( $glossary_query->have_posts() ) {
-					$glossary_query->the_post();
-					
-					
-					echo get_the_title() . '<br>';
-					
-					$en_ID = get_the_ID();
-					$fr_ID = apply_filters ( 'wpml_object_id', get_the_ID(), 'definition', false, 'fr' );
-					
-					// content -> field
-					
-					update_field ( 'glossary_definition', get_the_content(), $en_ID );
-					
-					// echo 'en: ' . $en_ID . '<br>';
-					// echo 'fr: ' . $fr_ID . '<br>';
-					
-					if ( $fr_ID != '' ) {
-						
-						// get fr post
-						
-						$fr_post = get_post ( $fr_ID );
-						
-						update_field ( 'glossary_term_fr', get_the_title ( $fr_ID ), $en_ID );
-						
-						update_field ( 'glossary_definition_fr', $fr_post->post_content, $en_ID );
-						
-						wp_update_post ( array (
-							'ID' => $fr_ID,
-							'post_status' => 'draft'
-						) );
-						
-					}
-					
-				}
-			}
-			
-	
-		}
-	}
-	
-	
-	
 	if ( $glossary_query->have_posts() ) {
 		
 		$current_letter = '';
@@ -118,7 +63,7 @@
 				
 		?>
 		
-		<div class="row py-4 align-items-start">
+		<div id="def-<?php echo $term['id']; ?>" class="row py-4 align-items-start">
 		
 			<dt class="col-4-of-15 offset-1-of-15 pe-3">
 				<?php echo $term['term']; ?>

@@ -67,7 +67,7 @@ function shortcode_btn ( $atts, $content ) {
 		'btn'
 	);
 	
-	return '<a href="' . $atts['href'] . '" id="' . $atts['id'] . '" class="btn ' . $atts['class'] . '"></a>';
+	return '<a href="' . $atts['href'] . '" id="' . $atts['id'] . '" class="btn ' . $atts['class'] . '">' . $content . '</a>';
 	
 }
 

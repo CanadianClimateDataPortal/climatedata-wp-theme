@@ -677,7 +677,8 @@
                   } else {
                     console.log('no existing layer');
 
-                    options.grid.leaflet.vectorTileLayerStyles[query.sector] =
+                    let vectorTileLayerStyles = {};
+                    vectorTileLayerStyles[query.sector] =
                       function (properties, zoom) {
                         return {
                           weight: 0.2,
@@ -710,8 +711,7 @@
                           bounds: options.canadaBounds,
                           maxZoom: 12,
                           minZoom: 3,
-                          vectorTileLayerStyles:
-                            options.grid.leaflet.vectorTileLayerStyles,
+                          vectorTileLayerStyles:vectorTileLayerStyles,
                         },
                       )
                       .on('mouseover', function (e) {

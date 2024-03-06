@@ -100,7 +100,8 @@
 		init: function () {
 
 			let plugin = this,
-					options = plugin.options
+					options = plugin.options,
+					item = plugin.item
 
 			//
 			// INITIALIZE
@@ -202,19 +203,44 @@
 			
 			$('#wp-admin-bar-fw-actions-item-toggle').click(function() {
 				
-				console.log(item.find('.swiper'))
-				
 				if ($('body').hasClass('fw-builder')) {
 					
 					options.status = 'disabled'
 					$('body').removeClass('fw-builder')
 					$(this).find('.badge').text('Off').removeClass('text-bg-success').addClass('text-bg-warning')
 					
+					if (Object.keys(swipers).length) {
+						console.log('init swipers')
+						
+						for (let key in swipers) {
+							
+							console.log(swipers[key].element)
+							
+							swipers[key].element.addClass('swiper')
+							swipers[key].element.children().first().addClass('swiper-wrapper')
+							
+							swipers[key].instance = new Swiper('#' + swipers[key].element.attr('id'), swipers[key].settings)
+							
+							
+						}
+					}
+					
 				} else {
 					
 					$('body').addClass('fw-builder')
 					$(this).find('.badge').text('On').removeClass('text-bg-warning').addClass('text-bg-success')
 					options.status = 'ready'
+					
+					if (Object.keys(swipers).length) {
+						console.log('destroy swipers')
+						
+						for (let key in swipers) {
+							swipers[key].instance.destroy(true, true)
+							
+							swipers[key].element.removeClass('swiper')
+							swipers[key].element.find('.swiper-wrapper').removeClass('swiper-wrapper')
+						}
+					}
 					
 				}
 				

@@ -1,3 +1,5 @@
+var swipers = {}
+
 document.documentElement.classList.remove('no-js');
 
 var current_script = document.currentScript.src
@@ -23,8 +25,6 @@ var theme_dir = current_script.replace('/resources/js/' + filename, '') + '/'
     // SWIPER
     
     if ($('.has-swiper').length) {
-      
-      var swipers = {}
       
       $('.has-swiper').each(function() {
         
@@ -53,7 +53,14 @@ var theme_dir = current_script.replace('/resources/js/' + filename, '') + '/'
         // init
         swipers[$(this).attr('id')] = {
           element: this_swiper,
-          instance: new Swiper('#' + this_swiper.attr('id'), this_settings)
+          settings: this_settings,
+        }
+        
+        if (!$('body').hasClass('fw-builder')) {
+          swipers[$(this).attr('id')].instance = new Swiper('#' + this_swiper.attr('id'), this_settings)
+        } else {
+          $(this).find('.swiper').removeClass('swiper')
+          $(this).find('.swiper-wrapper').removeClass('swiper-wrapper')
         }
         
       })

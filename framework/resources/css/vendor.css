@@ -1,6 +1,7 @@
 @import '../vendor/aos/dist/aos.css';
 @import '../vendor/swiper-11.0.4/swiper-bundle.min.css';
 .fw-row.has-swiper {
+  display: block !important;
   max-width: 100vw;
 }
 

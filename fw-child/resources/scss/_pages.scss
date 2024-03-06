@@ -20,6 +20,29 @@
   );
 }
 
+#hero-text {
+  h1 {
+    @include font-size(4.375rem);
+  }
+}
+
+#hero-text-carousel-pagination {
+  --swiper-pagination-bullet-horizontal-gap: 0.5rem;
+  position: relative;
+  top: auto;
+  bottom: auto;
+  left: auto;
+  right: auto;
+  width: calc((100vw / 16) * 2);
+  margin-left: calc((100vw / 16) * 8);
+}
+
+#hero-eccc {
+  p {
+    font-size: 0.625rem;
+  }
+}
+
 #page-home {
   #floating-header {
     background-color: transparent;

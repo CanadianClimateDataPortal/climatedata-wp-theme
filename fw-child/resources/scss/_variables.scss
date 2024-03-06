@@ -77,7 +77,7 @@ $color-contrast-light:     $white !default;
 
 // fusv-disable
 $blue-100: tint-color($blue, 80%) !default;
-$blue-200: tint-color($blue, 60%) !default;
+$blue-200: tint-color($blue, 70%) !default;
 $blue-300: tint-color($blue, 40%) !default;
 $blue-400: tint-color($blue, 20%) !default;
 $blue-500: $blue !default;
@@ -811,8 +811,8 @@ $btn-padding-y-sm:            $input-btn-padding-y-sm !default;
 $btn-padding-x-sm:            $input-btn-padding-x-sm !default;
 $btn-font-size-sm:            $input-btn-font-size-sm !default;
 
-$btn-padding-y-lg:            1rem;
-$btn-padding-x-lg:            $input-btn-padding-x-lg !default;
+$btn-padding-y-lg:            0.75rem;
+$btn-padding-x-lg:            2rem;
 $btn-font-size-lg:            1rem;
 
 $btn-border-width:            $input-btn-border-width !default;

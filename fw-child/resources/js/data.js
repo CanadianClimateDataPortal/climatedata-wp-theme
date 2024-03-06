@@ -176,3 +176,17 @@ const variables_data = {
     "ms": {"absolute": {"low": 0.0, "high": 10.0}, "delta": {"low": -0.7, "high": 9.0}, "unit": "days"}
   }
 }
+
+const special_variables = {
+  building_climate_zones: {
+    layers_replace: ['building_climate_zones', 'hddheat_18'],
+    styles: 'CDC:building_climate_zones',
+    colormap: {
+      colours: ['#C90000', '#FAEE02', '#00C936', '#0083C9', '#1400C9', '#7F00C9'],
+      quantities: [3000, 4000, 5000, 6000, 7000, 99999999],
+      labels: ['Climate Zone 4', 'Climate Zone 5', 'Climate Zone 6', 'Climate Zone 7A', 'Climate Zone 7B', 'Climate Zone 8'],
+      scheme_type: 'discrete',
+      categorical: true
+    }
+  }
+}

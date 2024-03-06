@@ -109,6 +109,135 @@
 // APP PAGES
 //
 
+// BREADCRUMB
+
+#map-breadcrumb {
+  position: absolute;
+  top: 0;
+  left: calc(100vw / 16);
+  padding-top: 1.5rem;
+  padding-left: 1.5rem;
+  transition: left 0.25s ease 0s;
+  z-index: 100;
+}
+
+#breadcrumb-overlay-trigger {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-left: 1rem;
+  padding-top: 0.25rem;
+  background-color: $white;
+  border-radius: 50%;
+  font-family: $font-family-serif;
+  font-size: 0.875rem;
+  font-weight: $font-weight-bold;
+  line-height: 1rem;
+  text-align: center;
+  color: $primary;
+  cursor: pointer;
+  transition: 0.25s;
+
+  &:hover {
+    background-color: $gray-200;
+  }
+
+  &:before {
+    content: 'i';
+  }
+}
+
+body.offcanvas-open {
+  #map-breadcrumb {
+    color: $white;
+
+    .breadcrumb {
+      --bs-breadcrumb-divider-color: #{transparentize($white, 0.5)};
+    }
+  }
+
+  &[data-offcanvas-active='info'] {
+    #breadcrumb-overlay-trigger {
+      background-color: $primary;
+      color: $white;
+
+      &:before {
+        font-family: $font-family-base;
+        font-size: 1.25rem;
+        line-height: 0.875rem;
+        content: '\00d7';
+      }
+    }
+  }
+}
+
+// OVERLAYS
+
+.map-page-overlay {
+  --bs-offcanvas-zindex: 99;
+  --bs-offcanvas-padding-x: 0;
+  --bs-offcanvas-padding-y: 0;
+  --bs-offcanvas-color: #{$white};
+  --bs-offcanvas-bg: #{transparentize($secondary, 0.1)};
+  padding-top: 4.5rem;
+  left: calc(100vw / 16) !important;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  bottom: auto;
+  // height: auto;
+
+  .offcanvas-body {
+    // --bs-offcanvas-padding-x: 1.5rem;
+  }
+}
+
+#info {
+  --bs-offcanvas-height: auto;
+  width: calc((100vw / 16) * 11);
+}
+
+#info-relevant-tabs {
+  .btn {
+    background-color: transparentize($dark, 0.8);
+    border: none;
+
+    &.active {
+      background-color: $primary;
+    }
+  }
+}
+
+#help {
+  --bs-offcanvas-height: auto;
+  width: calc((100vw / 16) * 7);
+
+  p {
+    font-size: 1.25rem;
+  }
+}
+
+$overlay-check-bg: rgba($blue-600, 0.99);
+$overlay-switch-bg: rgba($gray-400, 0.99);
+
+.map-overlay-btns {
+  .btn {
+    background-color: $blue-600;
+  }
+
+  .form-check-input {
+    --bs-form-check-bg: #{$overlay-check-bg};
+    --bs-form-switch-bg: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$overlay-switch-bg}'/></svg>");
+
+    &:checked {
+    }
+  }
+}
+
+body.tab-drawer-open {
+  .map-page-overlay {
+    left: calc((100vw / 16) * 4) !important;
+  }
+}
+
 #status {
   position: fixed;
   top: 1rem;
@@ -354,6 +483,11 @@ $legend-on-height: 16px;
 .map-container {
   position: relative;
   z-index: 1;
+
+  .offcanvas-backdrop {
+    opacity: 0;
+    z-index: 98;
+  }
 }
 
 #map-objects {
@@ -432,6 +566,11 @@ $legend-on-height: 16px;
 }
 
 body.tab-drawer-open {
+  #map-breadcrumb {
+    left: calc((100vw / 16) * 4);
+    transition: left 0.25s ease 0s;
+  }
+
   #map-objects {
     width: calc(((100vw / 16) * 12) + 10px);
   }

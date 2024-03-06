@@ -1,4 +1,11 @@
 <div class="map-container min-height-100">
+	<div id="map-breadcrumb">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><?php _e ( 'Climate Data Canada', 'cdc' ); ?></li>
+			<li class="breadcrumb-item"><?php _e ( 'Map', 'cdc' ); ?></li>
+		</ol>
+	</div>
+	
 	<div id="map-objects" class="d-flex">
 		<div id="map-low" class="map-panel hidden">
 			<div id="map-object-low" class="leaflet-object"></div>

@@ -10,26 +10,26 @@
 
 // override fw variables
 
-$utilities: (
-  'bg-opacity': (
-    css-var: true,
-    class: bg-opacity,
-    values: (
-      10: 0.1,
-      20: 0.2,
-      25: 0.25,
-      30: 0.3,
-      40: 0.4,
-      50: 0.5,
-      60: 0.6,
-      70: 0.7,
-      75: 0.75,
-      80: 0.8,
-      90: 0.9,
-      100: 1,
-    ),
-  ),
-);
+// $utilities: (
+//   'bg-opacity': (
+//     css-var: true,
+//     class: bg-opacity,
+//     values: (
+//       10: 0.1,
+//       20: 0.2,
+//       25: 0.25,
+//       30: 0.3,
+//       40: 0.4,
+//       50: 0.5,
+//       60: 0.6,
+//       70: 0.7,
+//       75: 0.75,
+//       80: 0.8,
+//       90: 0.9,
+//       100: 1,
+//     ),
+//   ),
+// );
 
 // use these variables to recompile fw
 
@@ -406,42 +406,71 @@ $control-slider-handle-width: 2.75rem;
     }
   }
 
+  #control-bar-secondary {
+    a {
+      &:hover {
+        background-color: $gray-700;
+        transition: 0.25s;
+      }
+    }
+  }
+
+  .control-bar-tab-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    color: $white;
+    font-size: 0.75rem;
+    text-decoration: none;
+    text-align: center;
+    transition: 0.25s;
+
+    &:hover {
+      background-color: $gray-700;
+    }
+
+    &.active {
+      background-color: $gray-100;
+      color: $dark;
+      transition: none;
+
+      .badge {
+        background: $gray-400;
+        color: $dark;
+      }
+    }
+
+    .cdc-icon {
+      position: relative;
+      margin-top: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    svg {
+      width: 30px;
+    }
+  }
+
+  .control-bar-text-link {
+    display: block;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    color: $white;
+    border-top: 1px solid $gray-700;
+  }
+
   .tab-drawer-tabs {
     padding-left: 0.5rem;
 
     a {
-      display: block;
-      padding: 0.5rem;
-      color: $white;
-      font-size: 0.75rem;
-      text-decoration: none;
-      text-align: center;
-
-      &.active {
-        background-color: $gray-100;
-        color: $dark;
-
-        .badge {
-          background: $gray-400;
-          color: $dark;
-        }
-      }
+      // display: block;
     }
 
     .tab-drawer-trigger {
-      display: flex;
-      align-items: center;
-      flex-direction: column;
-      justify-content: space-between;
-
       .badge {
         background-color: $dark;
-      }
-
-      .cdc-icon {
-        position: relative;
-        margin-top: 0.5rem;
-        margin-bottom: 0.75rem;
       }
 
       .alert-icon {
@@ -456,11 +485,6 @@ $control-slider-handle-width: 2.75rem;
         .alert-icon {
           display: block;
         }
-      }
-
-      svg {
-        width: 30px;
-        // max-width: 30px;
       }
     }
   }

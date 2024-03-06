@@ -734,3 +734,14 @@ function cdc_list_var_types ( $object, $field_name, $request ) {
 	return $term_list;
 	
 }
+
+add_filter ( 'acf/rest/format_value_for_rest/name=var_description', 'cdc_format_wysiwyg_in_rest', 10, 5);
+add_filter ( 'acf/rest/format_value_for_rest/name=var_tech_description_fr', 'cdc_format_wysiwyg_in_rest', 10, 5);
+add_filter ( 'acf/rest/format_value_for_rest/name=var_description', 'cdc_format_wysiwyg_in_rest', 10, 5);
+add_filter ( 'acf/rest/format_value_for_rest/name=var_tech_description_fr', 'cdc_format_wysiwyg_in_rest', 10, 5);
+
+function cdc_format_wysiwyg_in_rest ($value_formatted, $post_id, $field, $value, $format) {
+	
+	return apply_filters ( 'the_content', $value_formatted );
+	
+}

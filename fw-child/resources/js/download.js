@@ -373,6 +373,28 @@
 
       // BOOTSTRAP COMPONENTS
 
+      // overlays
+
+      let offcanvas_els = {
+        help: document.getElementById('help'),
+      };
+
+      for (let key in offcanvas_els) {
+        offcanvas_els[key].addEventListener('hide.bs.offcanvas', function (e) {
+          $('body')
+            .removeClass('offcanvas-open')
+            .removeAttr('data-offcanvas-active');
+        });
+
+        offcanvas_els[key].addEventListener('show.bs.offcanvas', function (e) {
+          $('body')
+            .addClass('offcanvas-open')
+            .attr('data-offcanvas-active', key);
+        });
+      }
+
+      // threshold accordion
+
       options.elements.threshold_accordion = document.getElementById(
         'var-threshold-accordion',
       );
@@ -1232,6 +1254,27 @@
                 .trigger('click');
             }
           }
+
+          // set breadcrumb & overlay content
+
+          item
+            .find('#breadcrumb-variable')
+            .text(
+              options.lang != 'en'
+                ? options.var_data.meta.title_fr
+                : options.var_data.title.rendered,
+            )
+            .show();
+
+          // let desc_key =
+          //     'var_description' + (options.lang != 'en' ? '_fr' : ''),
+          //   tech_key =
+          //     'var_tech_description' + (options.lang != 'en' ? '_fr' : '');
+
+          // item.find('#info-description').html(options.var_data.acf[desc_key]);
+          // item
+          //   .find('#info-tech-description')
+          //   .html(options.var_data.acf[tech_key]);
         }
 
         plugin.set_controls();

@@ -1351,7 +1351,9 @@
         options = plugin.options,
         item = plugin.item;
 
-
+      let default_scheme_element = item.find(
+        '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
+      );
 
       if (special_variables.hasOwnProperty(options.var_data.slug)) {
         default_scheme_element.data('scheme-colours', special_variables[options.var_data.slug].colormap.colours);
@@ -1378,9 +1380,7 @@
             let colour_map =
               data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
 
-            let default_scheme_element = item.find(
-              '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
-            );
+
             default_scheme_element.data(
               'scheme-colours',
               colour_map.map((e) => e.color),

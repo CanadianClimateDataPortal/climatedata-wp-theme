@@ -373,6 +373,27 @@
 
       // console.log('frequency', options.frequency);
 
+      // OFFCANVAS
+
+      let offcanvas_els = {
+        help: document.getElementById('help'),
+        info: document.getElementById('info'),
+      };
+
+      for (let key in offcanvas_els) {
+        offcanvas_els[key].addEventListener('hide.bs.offcanvas', function (e) {
+          $('body')
+            .removeClass('offcanvas-open')
+            .removeAttr('data-offcanvas-active');
+        });
+
+        offcanvas_els[key].addEventListener('show.bs.offcanvas', function (e) {
+          $('body')
+            .addClass('offcanvas-open')
+            .attr('data-offcanvas-active', key);
+        });
+      }
+
       // load default color scheme
       plugin.update_default_scheme(function () {
         $(document).cdc_app('maps.get_layer', options.query, options.var_data);
@@ -1034,7 +1055,7 @@
       ) {
         // do nothing
       } else if (var_id != null) {
-        console.log('get_var_data because var_id changed');
+        // console.log('get_var_data because var_id changed');
         $(document).cdc_app('get_var_data', var_id, function (data) {
           // console.log('get var data', data);
 
@@ -1058,15 +1079,15 @@
       }
 
       // always do this stuff
-      console.log(options.var_data);
+      // console.log(options.var_data);
 
       // ADJUST CONTROLS BY VAR SETTINGS
 
       // fields var
       fields = options.var_data.acf;
 
-      console.log('fields');
-      console.log(fields);
+      // console.log('fields');
+      // console.log(fields);
 
       // dataset availability
       item.find('#map-control-dataset .btn-check').prop('disabled', false);
@@ -1212,6 +1233,25 @@
             }
           });
         }
+
+        // set breadcrumb & overlay content
+
+        item
+          .find('#breadcrumb-variable')
+          .text(
+            options.lang != 'en'
+              ? options.var_data.meta.title_fr
+              : options.var_data.title.rendered,
+          );
+
+        let desc_key = 'var_description' + (options.lang != 'en' ? '_fr' : ''),
+          tech_key =
+            'var_tech_description' + (options.lang != 'en' ? '_fr' : '');
+
+        item.find('#info-description').html(options.var_data.acf[desc_key]);
+        item
+          .find('#info-tech-description')
+          .html(options.var_data.acf[tech_key]);
 
         // update frequency select
         plugin.update_frequency();

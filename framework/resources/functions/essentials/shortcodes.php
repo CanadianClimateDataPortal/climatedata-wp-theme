@@ -44,8 +44,31 @@ add_shortcode ( 'i', 'shortcode_icon' );
 // OBFUSCATE
 //
 
-function shortcode_obfuscate ( $atts , $content = null ) {
+function shortcode_obfuscate ( $atts, $content = null ) {
 	return obfuscate ( $content );
 }
 
 add_shortcode ( 'obfuscate', 'shortcode_obfuscate' );
+
+//
+// BOOTSTRAP BUTTON
+//
+
+function shortcode_btn ( $atts, $content ) {
+	
+	$atts = shortcode_atts (
+		array(
+			'href' => '#',
+			'target' => '',
+			'id' => '',
+			'class' => '',
+		),
+		$atts,
+		'btn'
+	);
+	
+	return '<a href="' . $atts['href'] . '" id="' . $atts['id'] . '" class="btn ' . $atts['class'] . '"></a>';
+	
+}
+
+add_shortcode ( 'btn', 'shortcode_btn' );

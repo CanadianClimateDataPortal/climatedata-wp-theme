@@ -427,6 +427,10 @@ $control-slider-handle-width: 2.75rem;
     text-align: center;
     transition: 0.25s;
 
+    .badge {
+      background-color: $dark;
+    }
+
     &:hover {
       background-color: $gray-700;
     }
@@ -469,10 +473,6 @@ $control-slider-handle-width: 2.75rem;
     }
 
     .tab-drawer-trigger {
-      .badge {
-        background-color: $dark;
-      }
-
       .alert-icon {
         display: none;
         position: absolute;

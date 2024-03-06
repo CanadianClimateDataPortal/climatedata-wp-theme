@@ -5,7 +5,6 @@
 			<li class="breadcrumb-item"><?php _e ( 'Map', 'cdc' ); ?></li>
 			<li id="breadcrumb-variable" class="breadcrumb-item"></li>
 			<li id="breadcrumb-overlay-trigger" class="" data-bs-toggle="offcanvas" data-bs-target="#info"></li>
-
 		</ol>
 	</div>
 	

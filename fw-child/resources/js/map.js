@@ -375,8 +375,6 @@
 
       // OFFCANVAS
 
-      // help
-
       let offcanvas_els = {
         help: document.getElementById('help'),
         info: document.getElementById('info'),

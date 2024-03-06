@@ -190,6 +190,20 @@ body.offcanvas-open {
   }
 }
 
+#page-map.tab-drawer-open {
+  #map-breadcrumb,
+  .map-page-overlay {
+    left: calc((100vw / 16) * 4) !important;
+  }
+}
+
+#page-download.tab-drawer-open {
+  #map-breadcrumb,
+  .map-page-overlay {
+    left: calc((100vw / 16) * 5) !important;
+  }
+}
+
 #info {
   --bs-offcanvas-height: auto;
   width: calc((100vw / 16) * 11);
@@ -229,12 +243,6 @@ $overlay-switch-bg: rgba($gray-400, 0.99);
 
     &:checked {
     }
-  }
-}
-
-body.tab-drawer-open {
-  .map-page-overlay {
-    left: calc((100vw / 16) * 4) !important;
   }
 }
 
@@ -567,7 +575,6 @@ $legend-on-height: 16px;
 
 body.tab-drawer-open {
   #map-breadcrumb {
-    left: calc((100vw / 16) * 4);
     transition: left 0.25s ease 0s;
   }
 

@@ -118,6 +118,7 @@
   padding-top: 1.5rem;
   padding-left: 1.5rem;
   transition: left 0.25s ease 0s;
+  text-shadow: 0 1px transparentize($white, 0.2);
   z-index: 100;
 }
 
@@ -149,6 +150,7 @@
 body.offcanvas-open {
   #map-breadcrumb {
     color: $white;
+    text-shadow: 0 1px transparentize($blue-700, 0.2);
 
     .breadcrumb {
       --bs-breadcrumb-divider-color: #{transparentize($white, 0.5)};

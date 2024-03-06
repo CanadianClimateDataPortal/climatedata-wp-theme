@@ -266,7 +266,6 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 				
 				$(content_to_close[0]).removeClass('td-selected')
 				
-			
 				options.elements.tabs
 					.find('a[href="#' + $(content_to_close[0]).attr('id') + '"]')
 					.removeClass('active')

@@ -1320,54 +1320,61 @@
         // reset the series array
         options.chart.series = [];
 
-        if (settings.data.observations.length > 0) {
-          options.chart.series.push({
-            name: chart_labels.observation,
-            data: settings.data.observations,
-            zIndex: 1,
-            showInNavigator: true,
-            color: '#F47D23',
-            visible: false,
-            marker: {
-              fillColor: '#F47D23',
-              lineWidth: 0,
-              radius: 0,
-              lineColor: '#F47D23',
-            },
-          });
+        if (settings.data.hasOwnProperty('observations')) {
+          if (settings.data.observations.length > 0) {
+            options.chart.series.push({
+              name: chart_labels.observation,
+              data: settings.data.observations,
+              zIndex: 1,
+              showInNavigator: true,
+              color: '#F47D23',
+              visible: false,
+              marker: {
+                fillColor: '#F47D23',
+                lineWidth: 0,
+                radius: 0,
+                lineColor: '#F47D23',
+              },
+            });
+          }
         }
 
-        if (settings.data.modeled_historical_median.length > 0) {
-          options.chart.series.push({
-            name: chart_labels.historical,
-            data: settings.data.modeled_historical_median,
-            zIndex: 1,
-            showInNavigator: true,
-            color: '#000000',
-            marker: {
-              fillColor: '#000000',
-              lineWidth: 0,
-              radius: 0,
-              lineColor: '#000000',
-            },
-          });
+        if (settings.data.hasOwnProperty('modeled_historical_median')) {
+          if (settings.data.modeled_historical_median.length > 0) {
+            options.chart.series.push({
+              name: chart_labels.historical,
+              data: settings.data.modeled_historical_median,
+              zIndex: 1,
+              showInNavigator: true,
+              color: '#000000',
+              marker: {
+                fillColor: '#000000',
+                lineWidth: 0,
+                radius: 0,
+                lineColor: '#000000',
+              },
+            });
+          }
         }
 
-        if (settings.data.modeled_historical_range.length > 0)
-          options.chart.series.push({
-            name: chart_labels.historical_range,
-            data: settings.data.modeled_historical_range,
-            type: 'arearange',
-            lineWidth: 0,
-            linkedTo: ':previous',
-            color: '#000000',
-            fillOpacity: 0.2,
-            zIndex: 0,
-            marker: {
-              radius: 0,
-              enabled: false,
-            },
-          });
+        if (settings.data.hasOwnProperty('modeled_historical_range')) {
+          if (settings.data.modeled_historical_range.length > 0) {
+            options.chart.series.push({
+              name: chart_labels.historical_range,
+              data: settings.data.modeled_historical_range,
+              type: 'arearange',
+              lineWidth: 0,
+              linkedTo: ':previous',
+              color: '#000000',
+              fillOpacity: 0.2,
+              zIndex: 0,
+              marker: {
+                radius: 0,
+                enabled: false,
+              },
+            });
+          }
+        }
 
         scenarios.forEach(function (scenario) {
           if (settings.data['{0}_median'.format(scenario.name)].length > 0) {

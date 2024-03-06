@@ -73,13 +73,15 @@ const $ = jQuery;
       debug: true,
     });
 
-    // $('body').find('[href="#browse-vars"').attr('data-bs-toggle', 'offcanvas')
+    // get the menu instance
+    // so we can create a close event
 
-    // const vars_offcanvas = document.querySelector('#browse-vars')
-    //
-    // <a class="btn btn-primary" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">
-    //   Link with href
-    // </a>
+    const menu_offcanvas = document.getElementById('menu');
+
+    menu_offcanvas.addEventListener('hide.bs.offcanvas', function (e) {
+      $('#menu-tabs a[href="#browse-vars"]').removeClass('active');
+      $('#menu-tabs').tab_drawer('close_content', ['#browse-vars']);
+    });
 
     //
     // VENDOR

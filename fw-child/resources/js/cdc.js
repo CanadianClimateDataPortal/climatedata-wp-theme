@@ -777,7 +777,7 @@
           categorical = options.legend.colormap.categorical,
           label_offset = categorical ? legend_item_height / 2 : 0;
 
-          // todo move this function if required elsewhere
+        // todo move this function if required elsewhere
         /**
          * Format numerical value according to supplied parameters
          * @param value Number to format

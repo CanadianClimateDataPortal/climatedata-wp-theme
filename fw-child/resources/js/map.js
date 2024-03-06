@@ -1237,6 +1237,11 @@
             .prop('checked', true)
             .trigger('change');
 
+          item.find('[data-query-key="scheme"]')
+            .val('default')
+            .trigger('change');
+          item.find('#display-scheme-select .dropdown-toggle').prop('disabled', true);
+
           item
             .find(
               '#map-control-aggregation .form-check-input:not(#display-aggregation-grid)',
@@ -1248,6 +1253,7 @@
               '#map-control-aggregation .form-check-input:not(#display-aggregation-grid)',
             )
             .prop('disabled', false);
+          item.find('#display-scheme-select .dropdown-toggle').prop('disabled', false);
         }
 
         if (typeof callback == 'function') {
@@ -1356,16 +1362,15 @@
       );
 
       if (special_variables.hasOwnProperty(options.var_data.slug)) {
-        default_scheme_element.data('scheme-colours', special_variables[options.var_data.slug].colormap.colours);
-        default_scheme_element.data('scheme-quantities', special_variables[options.var_data.slug].colormap.quantities);
+        const special_var = special_variables[options.var_data.slug];
+        default_scheme_element.data('scheme-colours', special_var.colormap.colours);
+        default_scheme_element.data('scheme-quantities', special_var.colormap.quantities);
         plugin.update_scheme();
 
-        if (typeof callback == 'function') {
+        if (typeof callback === 'function') {
           callback();
         }
       } else {
-
-        // todo: implement behaviour for building_climate_zones
         let layer_name = $(document).cdc_app(
           'maps.get_layer_name',
           options.query,
@@ -1406,7 +1411,7 @@
         item = plugin.item;
 
       if (special_variables.hasOwnProperty(options.var_data.slug)) {
-        let special_var = special_variables[options.var_data.slug];
+        const special_var = special_variables[options.var_data.slug];
         layer_params.tiled = false;
         delete layer_params.sld_body;
         layer_params.layers = layer_params.layers.replace(...special_var.layers_replace);

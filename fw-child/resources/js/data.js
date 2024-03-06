@@ -1,3 +1,4 @@
+// constants containing required data for all variables, especially used for legend and custom color ramps
 const variables_data = {
   "HXmax30": {
     "ys": {"absolute": {"low": 0.0, "high": 100.0}, "delta": {"low": -10.0, "high": 70.0}, "unit": "days"},
@@ -177,6 +178,8 @@ const variables_data = {
   }
 }
 
+// Specific variables that use very custom color ramps
+// Example, building_climate_zones is actually hddheat_18 with a special categorized legend
 const special_variables = {
   building_climate_zones: {
     layers_replace: ['building_climate_zones', 'hddheat_18'],

@@ -82,6 +82,7 @@
   }
 
   #header-lang {
+    font-size: 0.875rem;
     font-weight: $font-weight-bold;
   }
 
@@ -897,6 +898,37 @@ body.tab-drawer-open {
 
   dd {
     padding-top: 0.375rem;
+    font-size: 0.875rem;
+  }
+}
+
+//
+// FEEDBACK
+//
+
+#feedback-accordion {
+  --bs-accordion-active-bg: #{$gray-300};
+  --bs-accordion-btn-color: #{$secondary};
+  --bs-accordion-active-color: #{$primary};
+
+  .accordion-button {
+    cursor: pointer;
+
+    &:after {
+      margin-right: calc((100vw / 16) * 4);
+    }
+  }
+}
+
+.feedback-form {
+  .alert-header {
+    margin-bottom: 0.5rem;
+  }
+
+  .alert-messages {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    background-color: $gray-300;
     font-size: 0.875rem;
   }
 }

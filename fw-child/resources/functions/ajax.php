@@ -330,8 +330,6 @@ function cdc_submit_feedback_form() {
 			$form_data[$input['name']] = $input['value'];
 		}
 		
-		// $to_2 = $GLOBALS['vars']['feedback_email'];
-		
 		// init captcha
 		
 		include_once ( locate_template ( 'resources/php/securimage/securimage.php' ) );
@@ -446,8 +444,8 @@ function cdc_submit_feedback_form() {
 		
 			// send mail
 			
-			$wp_mail1 = true;//wp_mail ( $to, $subject, $body, $headers );
-			$wp_mail2 = true;//wp_mail ( $to_2, $subject, $body, $headers );
+			$wp_mail1 = wp_mail ( $to, $subject, $body, $headers );
+			$wp_mail2 = wp_mail ( $GLOBALS['vars']['feedback_email'], $subject, $body, $headers );
 		
 			if ( $wp_mail1 && $wp_mail2 ) {
 				

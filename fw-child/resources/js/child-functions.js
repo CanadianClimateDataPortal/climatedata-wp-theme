@@ -84,6 +84,30 @@ const $ = jQuery;
     });
 
     //
+
+    if ($('body').attr('id') == 'page-feedback') {
+      const feedback_accordion = document.getElementById('feedback-accordion');
+
+      //  replace state on accordion change
+
+      feedback_accordion.addEventListener('show.bs.collapse', (e) => {
+        history.replaceState(
+          {},
+          '',
+          window.location.href.split('#')[0] + '#' + $(e.target).attr('id'),
+        );
+      });
+
+      // open tab on load
+
+      if (window.location.hash !== null && window.location.hash !== '') {
+        bootstrap.Collapse.getOrCreateInstance(
+          document.querySelector(window.location.hash),
+        ).toggle();
+      }
+    }
+
+    //
     // VENDOR
     //
 
@@ -135,5 +159,68 @@ const $ = jQuery;
         });
       });
     }
+
+    //
+    // FORMS
+    //
+
+    $('.form-control.other').hide();
+
+    $('.form-select.has-other').on('change', function () {
+      if ($(this).val() == 'Other') {
+        $(this).parent().find('.other').show();
+      } else {
+        $(this).parent().find('.other').val('').hide();
+      }
+    });
+
+    $('.feedback-form').submit(function (e) {
+      e.preventDefault();
+
+      let the_form = $(this),
+        alert_container = $(this).find('.alert-container'),
+        alert_header = alert_container.find('.alert-header'),
+        alert_messages = alert_container.find('.alert-messages');
+
+      alert_header.empty().removeClass().addClass('alert-header');
+      alert_messages.empty();
+
+      the_form.find('border-danger').removeClass('border-danger');
+
+      $.ajax({
+        url: ajax_data.url,
+        data: {
+          action: 'cdc_submit_feedback_form',
+          form: the_form.serializeArray(),
+        },
+        dataType: 'json',
+        success: function (data) {
+          console.log(data);
+
+          alert_header.text(data.header);
+
+          data.messages.forEach(function (msg) {
+            alert_messages.append('<li>' + msg + '</li>');
+          });
+
+          if (data.invalid.length) {
+            alert_header.addClass('alert alert-warning');
+
+            data.invalid.forEach(function (input) {
+              the_form.find('[name="' + input + '"]').addClass('border-danger');
+            });
+          }
+
+          if (data.mail == 'success') {
+            alert_header.addClass('alert alert-success');
+            the_form.find('.submit-btn').addClass('disabled');
+          } else {
+            alert_header.addClass('alert alert-warning');
+          }
+
+          alert_container.show();
+        },
+      });
+    });
   });
 })(jQuery);

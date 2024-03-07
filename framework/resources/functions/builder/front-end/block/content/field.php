@@ -18,22 +18,26 @@
 	$field_output = get_post_meta ( $field_ID, $key, true );
 	
 	if ( $element['inputs']['content'] == true ) {
-		$field_output = wptexturize ( $field_output );
+		if ( $element['inputs']['display'] == 'none' ) {
+			$field_output = apply_filters ( 'the_content', $field_output );
+		} else {
+			$field_output = wptexturize ( $field_output );
+		}
 	}
 
 	if ( $field_output != '' ) {
+		
+		if ( $element['inputs']['display'] != 'none' ) {
+			echo '<' . $element['inputs']['display'] . '>';
+		}
 
-?>
-
-<<?php echo $element['inputs']['display']; ?>><?php
-
-	echo $element['inputs']['prepend'];
-	echo $field_output;
-	echo $element['inputs']['append'];
-	
-?></<?php echo $element['inputs']['display']; ?>>
-
-<?php
+		echo $element['inputs']['prepend'];
+		echo $field_output;
+		echo $element['inputs']['append'];
+		
+		if ( $element['inputs']['display'] != 'none' ) {
+			echo '</' . $element['inputs']['display'] . '>';
+		}
 
 	} elseif ( is_user_logged_in() ) {
 		

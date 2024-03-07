@@ -23,9 +23,10 @@
 				
 				<div class="col">
 					
-					<label for="inputs-display" class="form-label">Display As</label>
+					<label for="inputs-display" class="form-label">Wrap in Tag</label>
 					
 					<select class="form-select form-select-sm" name="inputs-display" id="inputs-display">
+						<option value="none">None</option>
 						<option value="p">Paragraph</option>
 						<option value="h1">Heading 1</option>
 						<option value="h2">Heading 2</option>

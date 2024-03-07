@@ -41,6 +41,7 @@
           quantities: [],
           labels: null, // placeholder for special labels
         },
+        opacity: 1,
       },
       query: {
         coords: [62.51231793838694, -98.48144531250001, 4],
@@ -418,12 +419,17 @@
       slider.find('.ui-slider-handle').text(ui.value);
 
       let this_pane = slider.attr('data-pane');
+      options.legend.opacity = ui.value / 100;
 
       // always set the given pane opacity
       // so it's consistent if we switch sectors
       item
         .find('.leaflet-pane.leaflet-' + this_pane + '-pane')
-        .css('opacity', ui.value / 100);
+        .css('opacity', options.legend.opacity);
+
+      // link legend's opacity
+      item.find('.legend').find('.legendbox').css('fill-opacity', options.legend.opacity);
+
 
       // grid layer defaults to 1
       item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
@@ -438,7 +444,7 @@
         // adjust the grid pane
         item
           .find('.leaflet-pane.leaflet-grid-pane')
-          .css('opacity', ui.value / 100);
+          .css('opacity', options.legend.opacity);
       }
     },
 

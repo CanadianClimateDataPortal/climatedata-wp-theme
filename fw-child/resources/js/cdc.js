@@ -775,6 +775,7 @@
           quantities = options.legend.colormap.quantities,
           labels = options.legend.colormap.labels,
           categorical = options.legend.colormap.categorical,
+          opacity = options.legend.opacity,
           label_offset = categorical ? legend_item_height / 2 : 0;
 
         // todo move this function if required elsewhere
@@ -830,9 +831,8 @@
             },0)">`;
             if (query.scheme_type == 'discrete') {
               for (let i = 0; i < colours.length; i++) {
-                svg += `<rect width="${legend_item_width}" height="${
-                  legend_item_height + 1
-                }" y="${legend_item_height * i}" fill="${colours[i]}"/>`;
+                svg += `<rect class="legendbox" width="${legend_item_width}" height="${legend_item_height}"
+                    y="${legend_item_height * i}" fill="${colours[i]}" style="fill-opacity: ${opacity}"/>`;
               }
             } else {
               svg += `<defs><linearGradient id="legendGradient" gradientTransform="rotate(90)">`;
@@ -842,9 +842,9 @@
                 }%" stop-color="${colours[i]}"/>`;
               }
               svg += `</linearGradient> </defs>`;
-              svg += `<rect width="${legend_item_width}" height="${
+              svg += `<rect class="legendbox" width="${legend_item_width}" height="${
                 legend_item_height * colours.length
-              }" fill="url(#legendGradient)" />`;
+              }" fill="url(#legendGradient)" style="fill-opacity: ${opacity}" />`;
             }
             svg += `</g><g transform="translate(${
               legend_width - legend_item_width - legend_tick_width

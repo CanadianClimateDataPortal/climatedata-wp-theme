@@ -39,7 +39,9 @@
         colormap: {
           colours: [],
           quantities: [],
+          labels: null, // placeholder for special labels
         },
+        opacity: 1,
       },
       query: {
         coords: [62.51231793838694, -98.48144531250001, 4],
@@ -417,12 +419,17 @@
       slider.find('.ui-slider-handle').text(ui.value);
 
       let this_pane = slider.attr('data-pane');
+      options.legend.opacity = ui.value / 100;
 
       // always set the given pane opacity
       // so it's consistent if we switch sectors
       item
         .find('.leaflet-pane.leaflet-' + this_pane + '-pane')
-        .css('opacity', ui.value / 100);
+        .css('opacity', options.legend.opacity);
+
+      // link legend's opacity
+      item.find('.legend').find('.legendbox').css('fill-opacity', options.legend.opacity);
+
 
       // grid layer defaults to 1
       item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
@@ -437,7 +444,7 @@
         // adjust the grid pane
         item
           .find('.leaflet-pane.leaflet-grid-pane')
-          .css('opacity', ui.value / 100);
+          .css('opacity', options.legend.opacity);
       }
     },
 
@@ -1276,6 +1283,11 @@
             .prop('checked', true)
             .trigger('change');
 
+          item.find('[data-query-key="scheme"]')
+            .val('default')
+            .trigger('change');
+          item.find('#display-scheme-select .dropdown-toggle').prop('disabled', true);
+
           item
             .find(
               '#map-control-aggregation .form-check-input:not(#display-aggregation-grid)',
@@ -1287,6 +1299,7 @@
               '#map-control-aggregation .form-check-input:not(#display-aggregation-grid)',
             )
             .prop('disabled', false);
+          item.find('#display-scheme-select .dropdown-toggle').prop('disabled', false);
         }
 
         if (typeof callback == 'function') {
@@ -1390,39 +1403,51 @@
         options = plugin.options,
         item = plugin.item;
 
-      // todo: implement behaviour for building_climate_zones
-      let layer_name = $(document).cdc_app(
-        'maps.get_layer_name',
-        options.query,
+      let default_scheme_element = item.find(
+        '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
       );
-      $.getJSON(
-        geoserver_url +
+
+      if (special_variables.hasOwnProperty(options.var_data.slug)) {
+        const special_var = special_variables[options.var_data.slug];
+        default_scheme_element.data('scheme-colours', special_var.colormap.colours);
+        default_scheme_element.data('scheme-quantities', special_var.colormap.quantities);
+        plugin.update_scheme();
+
+        if (typeof callback === 'function') {
+          callback();
+        }
+      } else {
+        let layer_name = $(document).cdc_app(
+          'maps.get_layer_name',
+          options.query,
+        );
+        $.getJSON(
+          geoserver_url +
           '/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic' +
           '&format=application/json&layer=' +
           layer_name,
-      )
-        .then(function (data) {
-          let colour_map =
-            data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
+        )
+          .then(function (data) {
+            let colour_map =
+              data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
 
-          let default_scheme_element = item.find(
-            '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
-          );
-          default_scheme_element.data(
-            'scheme-colours',
-            colour_map.map((e) => e.color),
-          );
-          default_scheme_element.data(
-            'scheme-quantities',
-            colour_map.map((e) => parseFloat(e.quantity)),
-          );
-          plugin.update_scheme();
-        })
-        .always(function () {
-          if (typeof callback == 'function') {
-            callback();
-          }
-        });
+
+            default_scheme_element.data(
+              'scheme-colours',
+              colour_map.map((e) => e.color),
+            );
+            default_scheme_element.data(
+              'scheme-quantities',
+              colour_map.map((e) => parseFloat(e.quantity)),
+            );
+            plugin.update_scheme();
+          })
+          .always(function () {
+            if (typeof callback == 'function') {
+              callback();
+            }
+          });
+      }
     },
 
     // Hook that update leaflet params object depending on selected scheme
@@ -1430,6 +1455,15 @@
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
+
+      if (special_variables.hasOwnProperty(options.var_data.slug)) {
+        const special_var = special_variables[options.var_data.slug];
+        layer_params.tiled = false;
+        delete layer_params.sld_body;
+        layer_params.layers = layer_params.layers.replace(...special_var.layers_replace);
+        layer_params.styles = special_var.styles;
+        return;
+      }
 
       let selected_item = item.find(
         '#display-scheme-select .dropdown-item[data-scheme-id="' +
@@ -1505,42 +1539,48 @@
       let query = options.query;
       let quantity;
 
-      options.legend.colormap.colours = colours;
-      options.legend.colormap.quantities = [];
-      options.legend.colormap.scheme_type = query.scheme_type;
-
-      if (options.query.scheme === 'default') {
-        options.legend.colormap.quantities =
-          selected_scheme_item.data('scheme-quantities');
+      if (special_variables.hasOwnProperty(options.var_data.slug)) {
+        $.extend(options.legend.colormap, special_variables[options.var_data.slug].colormap);
       } else {
-        let variable_data =
-          variables_data[query.var][period_frequency_lut[query.frequency]];
-        let absolute_or_delta = query.delta === 'true' ? 'delta' : 'absolute';
+        options.legend.colormap.colours = colours;
+        options.legend.colormap.quantities = [];
+        options.legend.colormap.labels = null;
+        options.legend.colormap.scheme_type = query.scheme_type;
+        options.legend.colormap.categorical = false;
 
-        let low = variable_data[absolute_or_delta].low;
-        let high = variable_data[absolute_or_delta].high;
-        let scheme_length = colours.length;
+        if (options.query.scheme === 'default') {
+          options.legend.colormap.quantities =
+            selected_scheme_item.data('scheme-quantities');
+        } else {
+          let variable_data =
+            variables_data[query.var][period_frequency_lut[query.frequency]];
+          let absolute_or_delta = query.delta === 'true' ? 'delta' : 'absolute';
 
-        // if we have a diverging ramp, we center the legend at zero
-        if (selected_scheme_item.data('scheme-type') === 'divergent') {
-          high = Math.max(Math.abs(low), Math.abs(high));
-          low = high * -1;
+          let low = variable_data[absolute_or_delta].low;
+          let high = variable_data[absolute_or_delta].high;
+          let scheme_length = colours.length;
+
+          // if we have a diverging ramp, we center the legend at zero
+          if (selected_scheme_item.data('scheme-type') === 'divergent') {
+            high = Math.max(Math.abs(low), Math.abs(high));
+            low = high * -1;
+          }
+
+          // temperature raster data files are in Kelvin, but in °C in variable_data
+          if (variable_data.unit === 'K' && query.delta !== 'true') {
+            low += 273.15;
+            high += 273.15;
+          }
+
+          let step = (high - low) / scheme_length;
+
+          for (let i = 0; i < scheme_length - 1; i++) {
+            quantity = low + i * step;
+            options.legend.colormap.quantities.push(quantity);
+          }
+          // we need a virtually high value for highest bucket
+          options.legend.colormap.quantities.push((high + 1) * (high + 1));
         }
-
-        // temperature raster data files are in Kelvin, but in °C in variable_data
-        if (variable_data.unit === 'K' && query.delta !== 'true') {
-          low += 273.15;
-          high += 273.15;
-        }
-
-        let step = (high - low) / scheme_length;
-
-        for (let i = 0; i < scheme_length - 1; i++) {
-          quantity = low + i * step;
-          options.legend.colormap.quantities.push(quantity);
-        }
-        // we need a virtually high value for highest bucket
-        options.legend.colormap.quantities.push((high + 1) * (high + 1));
       }
     },
 

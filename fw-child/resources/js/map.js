@@ -401,6 +401,21 @@
         $(document).cdc_app('maps.get_layer', options.query, options.var_data);
       });
 
+      item.on('fw_query_success', function (e, query_item) {
+        let query_items = query_item.find('.fw-query-items');
+
+        if (query_items.data('flex_drawer') == undefined) {
+          query_items.flex_drawer({
+            item_selector: '.fw-query-item',
+          });
+        } else {
+          // reinit if plugin is already loaded
+          query_items.flex_drawer('init_items');
+        }
+      });
+
+      item.find('#var-select-query').fw_query();
+
       $(document).cdc_app(
         'add_hook',
         'maps.get_layer',
@@ -428,8 +443,10 @@
         .css('opacity', options.legend.opacity);
 
       // link legend's opacity
-      item.find('.legend').find('.legendbox').css('fill-opacity', options.legend.opacity);
-
+      item
+        .find('.legend')
+        .find('.legendbox')
+        .css('fill-opacity', options.legend.opacity);
 
       // grid layer defaults to 1
       item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
@@ -627,6 +644,18 @@
           .val($(this).attr('data-var-id'))
           .trigger('change');
       });
+
+      // click a variable item description
+      //
+      //       item.on('click', '.var-description', function (e) {
+      //         e.preventDefault();
+      //
+      //         let this_item = $(this).closest('.fw-query-item'),
+      //           this_id = $(this).attr('data-var-id'),
+      //           item_order = parseInt(this_item.css('order'));
+      //
+      //
+      //       });
 
       // click a link element with a query key
 
@@ -1283,10 +1312,13 @@
             .prop('checked', true)
             .trigger('change');
 
-          item.find('[data-query-key="scheme"]')
+          item
+            .find('[data-query-key="scheme"]')
             .val('default')
             .trigger('change');
-          item.find('#display-scheme-select .dropdown-toggle').prop('disabled', true);
+          item
+            .find('#display-scheme-select .dropdown-toggle')
+            .prop('disabled', true);
 
           item
             .find(
@@ -1299,7 +1331,9 @@
               '#map-control-aggregation .form-check-input:not(#display-aggregation-grid)',
             )
             .prop('disabled', false);
-          item.find('#display-scheme-select .dropdown-toggle').prop('disabled', false);
+          item
+            .find('#display-scheme-select .dropdown-toggle')
+            .prop('disabled', false);
         }
 
         if (typeof callback == 'function') {
@@ -1409,8 +1443,14 @@
 
       if (special_variables.hasOwnProperty(options.var_data.slug)) {
         const special_var = special_variables[options.var_data.slug];
-        default_scheme_element.data('scheme-colours', special_var.colormap.colours);
-        default_scheme_element.data('scheme-quantities', special_var.colormap.quantities);
+        default_scheme_element.data(
+          'scheme-colours',
+          special_var.colormap.colours,
+        );
+        default_scheme_element.data(
+          'scheme-quantities',
+          special_var.colormap.quantities,
+        );
         plugin.update_scheme();
 
         if (typeof callback === 'function') {
@@ -1423,14 +1463,13 @@
         );
         $.getJSON(
           geoserver_url +
-          '/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic' +
-          '&format=application/json&layer=' +
-          layer_name,
+            '/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic' +
+            '&format=application/json&layer=' +
+            layer_name,
         )
           .then(function (data) {
             let colour_map =
               data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
-
 
             default_scheme_element.data(
               'scheme-colours',
@@ -1460,7 +1499,9 @@
         const special_var = special_variables[options.var_data.slug];
         layer_params.tiled = false;
         delete layer_params.sld_body;
-        layer_params.layers = layer_params.layers.replace(...special_var.layers_replace);
+        layer_params.layers = layer_params.layers.replace(
+          ...special_var.layers_replace,
+        );
         layer_params.styles = special_var.styles;
         return;
       }
@@ -1540,7 +1581,10 @@
       let quantity;
 
       if (special_variables.hasOwnProperty(options.var_data.slug)) {
-        $.extend(options.legend.colormap, special_variables[options.var_data.slug].colormap);
+        $.extend(
+          options.legend.colormap,
+          special_variables[options.var_data.slug].colormap,
+        );
       } else {
         options.legend.colormap.colours = colours;
         options.legend.colormap.quantities = [];

@@ -645,6 +645,7 @@ body.tab-drawer-open {
 
 #var-select-query {
   .fw-query-item {
+    position: relative;
     border-bottom: 1px solid $gray-300;
 
     &:not(:nth-child(3n + 3)) {
@@ -652,10 +653,61 @@ body.tab-drawer-open {
     }
 
     .var-item-img {
+      display: block;
       position: relative;
       height: 0;
       padding-bottom: 40%;
     }
+
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border: 0rem solid transparent;
+      border-bottom-color: $secondary;
+      transform: translateX(-50%);
+      transition: 0.25s;
+    }
+
+    &.fd-open {
+      &:after {
+        border-width: 0.75rem;
+      }
+    }
+  }
+
+  .var-item-links {
+    font-size: 0.75rem;
+
+    a {
+      display: inline-block;
+      padding: 0.125rem 0.25rem;
+      @include all-caps;
+      color: $secondary;
+      font-weight: $font-weight-bold;
+      transition: 0.25s;
+
+      &:hover {
+        background-color: $light;
+      }
+
+      &.fd-selected {
+        color: $primary;
+        background-color: $gray-300;
+      }
+    }
+  }
+
+  .fd-drawer {
+    flex: 0 0 100%;
+    width: 100%;
+    padding: 2rem;
+    background-color: $secondary;
+    color: $white;
   }
 }
 

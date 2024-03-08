@@ -221,7 +221,6 @@
 							
 							swipers[key].instance = new Swiper('#' + swipers[key].element.attr('id'), swipers[key].settings)
 							
-							
 						}
 					}
 					
@@ -985,7 +984,7 @@
 						
 						// generate a key for the new element
 						
-						if (!options.parent.data.children) {
+						if (options.parent.data.children == undefined) {
 							options.parent.data.children = []
 						}
 						
@@ -1495,41 +1494,42 @@
 						
 						obj_data = JSON.parse(obj_data)
 						
-						// options.page = JSON.parse(obj_data.replaceAll(element.obj_data.inputs.post_id, options.globals.current_query.ID))
+						let template_parent = null
 						
-						// find the first non-autogen child
+						function check_obj(children, parent) {
+							children.forEach(function(child) {
+								if (template_parent == null) {
+									
+									// if this child is not auto-generated
+									if (
+										typeof child.autogen == 'undefined' || 
+										child.autogen == false || 
+										child.autogen == 'false'
+									) {
+										template_parent = parent
+									} else {
+										if (child.children != undefined)
+											check_obj(child.children, child)
+									}	
+								}
+							})
+						} 
 						
-						function find_real_child(obj) {
-							if (obj.autogen == undefined || obj.autogen == 'false') {
-								return obj
-							} else {
-								return find_real_child(obj.children[0])
-							}
+						check_obj(obj_data.children, obj_data)
+						
+						console.log(template_parent)
+						
+						if (template_parent != null) {
+							obj_data = template_parent.children
 						}
 						
-						obj_data = find_real_child(obj_data.children[0])
+						// console.log('obj_data')
+						// console.log(JSON.stringify(obj_data, null, 4))
 						
 						let insert_index = options.inserting.index
 						
 						if (options.inserting.where !== 'before') {
 							insert_index += 1
-						}
-						
-						if (
-							options.parent.data.children.length == 0 || 
-							options.parent.data.children == undefined
-						) {
-							
-							options.parent.data.children = [ obj_data ]
-							
-						} else {
-							
-							// parent.data.children has values already
-							// so we need to figure out where to
-							// put the new stuff
-							
-							let deleted_array = options.parent.data.children.splice(insert_index, 0, obj_data)
-							
 						}
 						
 						// console.log('children now')
@@ -1550,22 +1550,53 @@
 								// let new_html = $(loop_data.replaceAll(source_ID, options.globals.current_query.ID))
 								
 								// find first non-autogen element
-								let new_html = $(loop_data).find('.fw-element:not(.fw-page):not(.fw-auto-generated').first()
+								let new_html = $(loop_data).find('.fw-element:not(.fw-page):not(.fw-auto-generated').first().prop('outerHTML') + $(loop_data).find('.fw-element:not(.fw-page):not(.fw-auto-generated').first().nextAll().prop('outerHTML')
+								
+								// console.log('new_html')
+								// console.log(new_html)
 								
 								let keep_parent = parent
 								
 								// console.log('keep 1')
 								// console.log(JSON.stringify(keep_parent, null, 2))
 								
-								options.template_html = new_html.prop('outerHTML')
+								options.template_html = new_html//.prop('outerHTML')
 								
 								element.data = obj_data
 								
 								// console.log('new html', new_html.prop('outerHTML'))
-								element.item = new_html.prop('outerHTML')
+								element.item = $(new_html)//.prop('outerHTML')
 								
 								// auto-generate any required parents
-								plugin.create_tree(parent, element)
+								let auto_els = plugin.create_tree(parent, element)
+								
+								if (auto_els.length) {
+									keep_parent = options.parent
+								}
+								
+								// if we created autogen elements,
+								// the parent was updated by create_tree
+								
+								if (
+									options.parent.data.children.length == 0 || 
+									options.parent.data.children == undefined
+								) {
+									
+									if (Array.isArray(obj_data)) {
+										options.parent.data.children = obj_data
+									} else {
+										options.parent.data.children = [ obj_data ]
+									}
+									
+								} else {
+									
+									// parent.data.children has values already
+									// so we need to figure out where to
+									// put the new stuff
+									
+									let deleted_array = options.parent.data.children.splice(insert_index, 0, ...obj_data)
+									
+								}
 								
 								// add the html to the tree
 								console.log(options.inserting)
@@ -1591,11 +1622,14 @@
 									
 								}
 								
-								// console.log('eq', insert_eq)
+								console.log('new item')
+								console.log(element.item)
+								
+								console.log('eq', insert_eq)
 								
 								switch (options.inserting.where) {
 									case 'append' :
-										new_html.appendTo(keep_parent.item)
+										$(new_html).appendTo(keep_parent.item)
 										break
 										
 									case 'before' :
@@ -1606,7 +1640,7 @@
 											insert_eq = insert_eq[0]
 										}
 										
-										new_html.insertBefore(insert_eq)
+										$(new_html).insertBefore(insert_eq)
 										
 										break
 										
@@ -1620,7 +1654,7 @@
 											insert_eq = insert_eq[insert_eq.length - 1]
 										}
 										
-										new_html.insertAfter(insert_eq)
+										$(new_html).insertAfter(insert_eq)
 										
 										break
 										
@@ -1631,6 +1665,9 @@
 								plugin.set_element_keys()
 								
 								// activate new elements
+								console.log('activate new')
+								console.log(keep_parent)
+								
 								plugin.activate(keep_parent.data)
 								
 							}
@@ -1737,6 +1774,10 @@
 					temp_key = options.parent.data.key
 			
 			// console.log('create tree now')
+			// console.log(parent)
+			// console.log(element)
+			
+			let created_elements = []
 			
 			// find the right spot to begin the tree
 			
@@ -1764,7 +1805,15 @@
 			
 			// object type to compare with elements of options.objects
 			
-			let comparing_key = element.data.type
+			let comparing_key
+			
+			if (Array.isArray(element.data)) {
+				comparing_key = element.data[0].type
+			} else {
+				comparing_key = element.data.type
+			}
+			
+			console.log('comparing key', comparing_key)
 						
 			if (comparing_key.includes('block/')) {
 				comparing_key = 'block'
@@ -1872,7 +1921,9 @@
 									
 								}
 								
-								console.log('auto-generating temp_element ' + object_type + ' ' + temp_key + ' in ' + options.parent.data.type )
+								created_elements.push(temp_key)
+								
+								// console.log('auto-generating temp_element ' + object_type + ' ' + temp_key + ' in ' + options.parent.data.type )
 								
 								temp_element = {
 									item: $('<div class="' + options.objects[object_type].classes.join(' ') + ' fw-auto-generated" data-key="' + temp_key + '"></div>'), // DOM element to be inserted into page
@@ -1995,7 +2046,7 @@
 						
 					}
 					
-					// console.log('temp parent at end of iteration', temp_parent.data.key)
+					console.log('parent at end of iteration', options.parent.data.key)
 				}
 				
 			}
@@ -2017,6 +2068,8 @@
 				options.element.item = $('<div>')
 				
 			}
+			
+			return created_elements
 			
 		},
 		
@@ -2324,10 +2377,14 @@
 					break
 			
 				case 'image' :
-				
-					let img_urls = JSON.parse(element.data.inputs.file.url)
-				
-					element.item.find('.fw-element-inner').html('<img src="' + img_urls.full + '">')
+					
+					if (element.data.inputs.file.url != '') {
+						let img_urls = JSON.parse(element.data.inputs.file.url)
+					
+						element.item.find('.fw-element-inner').html('<img src="' + img_urls.full + '">')
+					} else {
+						console.warn('fw', 'element ' + element.data.key, 'no image selected')
+					}
 					
 					break
 					
@@ -2382,26 +2439,11 @@
 			
 			// console.log('activate', parent)
 			
-			// if (
-			// 	parent.type == 'page' &&
-			// 	!parent.children
-			// ) {
-			// 	
-			// 	// blank page
-			// 	
-			// 	$('.fw-element[data-key="' + parent.key + '"]').append(plugin.do_insert_btn(options.page))
-			// 	
-			// }
-			
-			// if (parent.type == 'template') {
-			// 	plugin.add_footer()
-			// }
-			
 			if (parent.children) {
 				
 				parent.children.forEach(function(child, i) {
 					
-					// console.log(child.key)
+					// console.log('activate', child)
 					
 					// find the item
 					
@@ -3962,16 +4004,24 @@
 				if (this_input.hasClass('uploader-file-url')) {
 					
 					let this_container = this_input.closest('.uploader-container'),
-							img_urls = JSON.parse(this_val)
+							img_urls = null
+							
+					if (this_val != '') {
+						img_urls = JSON.parse(this_val)
+					}
 					
 					console.log(img_urls)
 					
-					if (this_container.attr('data-uploader-type') == 'image') {
-					
-						this_container.find('.image-placeholder').html('<img src="' + img_urls.full + '">')
+					if (img_urls != null && img_urls.hasOwnProperty('full')) {
 						
-					} else if (this_container.attr('data-uploader-type') == 'video') {
-						this_container.find('.image-placeholder').text(img_urls.full.split('/').slice(-1))
+						if (this_container.attr('data-uploader-type') == 'image') {
+						
+							this_container.find('.image-placeholder').html('<img src="' + img_urls.full + '">')
+							
+						} else if (this_container.attr('data-uploader-type') == 'video') {
+							this_container.find('.image-placeholder').text(img_urls.full.split('/').slice(-1))
+						}
+						
 					}
 					
 				}

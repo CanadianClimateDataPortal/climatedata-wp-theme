@@ -421,6 +421,21 @@
           }
         },
       );
+
+      item.on('fw_query_success', function (e, query_item) {
+        let query_items = query_item.find('.fw-query-items');
+
+        if (query_items.data('flex_drawer') == undefined) {
+          query_items.flex_drawer({
+            item_selector: '.fw-query-item',
+          });
+        } else {
+          // reinit if plugin is already loaded
+          query_items.flex_drawer('init_items');
+        }
+      });
+
+      item.find('#var-select-query').fw_query();
     },
 
     init_events: function () {

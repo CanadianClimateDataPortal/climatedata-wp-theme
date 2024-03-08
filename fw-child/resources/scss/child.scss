@@ -683,7 +683,7 @@ $decade-slider-handle-width: 140px;
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  opacity: 0.2;
+  opacity: 0.6;
   transition: 0.25s;
 }
 
@@ -722,7 +722,7 @@ $query-card-hover-padding: 0.75rem;
       }
 
       .card-img {
-        opacity: 0.4;
+        opacity: 1;
       }
 
       .card-body {

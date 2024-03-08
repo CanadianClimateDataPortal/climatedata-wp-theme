@@ -442,16 +442,24 @@
                     this_map.object.hasLayer(this_map.layers.raster)
                   ) {
                     // if any map parameters have changed
-                    if (!_.isEqual(this_map.layers.raster.cdc_params, params)) {
+                    if (
+                      !window.lodash.isEqual(
+                        this_map.layers.raster.cdc_params,
+                        params,
+                      )
+                    ) {
                       // delete all parameters from layer before updating
                       // see: https://github.com/Leaflet/Leaflet/issues/3441
                       delete this_map.layers.raster.wmsParams.parameter;
                       this_map.layers.raster.setParams(params);
-                      this_map.layers.raster.cdc_params = _.cloneDeep(params);
+
+                      this_map.layers.raster.cdc_params =
+                        window.lodash.cloneDeep(params);
                     }
                   } else {
                     // create layer
-                    let saved_params = _.cloneDeep(params);
+
+                    let saved_params = window.lodash.cloneDeep(params);
 
                     // those three parameters must be specified at creation only
                     // otherwise, a bug in leaflet leaks them to the WMS requests
@@ -678,20 +686,22 @@
                     console.log('no existing layer');
 
                     let vectorTileLayerStyles = {};
-                    vectorTileLayerStyles[query.sector] =
-                      function (properties, zoom) {
-                        return {
-                          weight: 0.2,
-                          color: 'white',
-                          fillColor: plugin.maps.get_color.apply(item, [
-                            options.choro.data[key][properties.id],
-                          ]),
-                          opacity: 0.5,
-                          fill: true,
-                          radius: 4,
-                          fillOpacity: 1,
-                        };
+                    vectorTileLayerStyles[query.sector] = function (
+                      properties,
+                      zoom,
+                    ) {
+                      return {
+                        weight: 0.2,
+                        color: 'white',
+                        fillColor: plugin.maps.get_color.apply(item, [
+                          options.choro.data[key][properties.id],
+                        ]),
+                        opacity: 0.5,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 1,
                       };
+                    };
 
                     options.maps[key].layers.grid = L.vectorGrid
                       .protobuf(
@@ -711,7 +721,7 @@
                           bounds: options.canadaBounds,
                           maxZoom: 12,
                           minZoom: 3,
-                          vectorTileLayerStyles:vectorTileLayerStyles,
+                          vectorTileLayerStyles: vectorTileLayerStyles,
                         },
                       )
                       .on('mouseover', function (e) {
@@ -855,7 +865,11 @@
               if (labels) {
                 label = unit_localize(labels[i], options.lang);
               } else {
-                label = value_formatter(quantities[i], var_data.acf, query.delta === 'true')
+                label = value_formatter(
+                  quantities[i],
+                  var_data.acf,
+                  query.delta === 'true',
+                );
               }
 
               svg += `<g opacity="1" transform="translate(0,${

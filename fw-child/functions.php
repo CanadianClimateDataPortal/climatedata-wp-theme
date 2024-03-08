@@ -125,6 +125,10 @@ function child_theme_enqueue() {
 	// tab drawer
 	
 	wp_register_script ( 'tab-drawer', $child_vendor_dir . 'pe-tab-drawer/tab-drawer.js', array ( 'jquery' ), NULL, true );
+	
+	// flex drawer
+	
+	wp_register_script ( 'flex-drawer', $child_vendor_dir . 'pe-flex-drawer/flex-drawer.js', array ( 'jquery' ), NULL, true );
 
 	// leaflet
 	
@@ -159,9 +163,9 @@ function child_theme_enqueue() {
 
 	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 'utilities', 'data', 'lodash-full', 'jquery', 'leaflet', 'leaflet-vectorgrid', 'leaflet-sync', 'tab-drawer', 'highcharts-highstock', 'highcharts-more', 'highcharts-exporting', 'highcharts-export-data', 'highcharts-offline-exporting', 'highcharts-accessibility' ), NULL, true );
 	
-	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'cdc', 'data', 'jquery-ui-slider' ), NULL, true );
+	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'cdc', 'data', 'jquery-ui-slider', 'flex-drawer' ), NULL, true );
 	
-	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'cdc', 'jquery-ui-slider', 'jquery-ui-datepicker', 'select2' ), NULL, true );
+	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'cdc', 'jquery-ui-slider', 'jquery-ui-datepicker', 'select2', 'flex-drawer' ), NULL, true );
 	
 	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'tab-drawer', 'utilities', 'cdc', 'map-app' ), NULL, true );
 	

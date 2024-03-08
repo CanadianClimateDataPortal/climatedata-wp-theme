@@ -381,6 +381,8 @@ function get_post_by_lang_slug ( $query ) {
 				$has_slug = false;
 				$has_path = false;
 				
+				$query->set ( 'post_status', array ( 'publish', 'draft', 'private', 'inherit' ) );
+				
 				if (
 					isset ( $query->query_vars['slug_' . $code] ) &&
 					!empty ( $query->query_vars['slug_' . $code] )

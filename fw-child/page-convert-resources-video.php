@@ -75,8 +75,7 @@ if ( current_user_can ( 'administrator' ) ) {
 							
 						// 3. insert 'video' builder layout
 						
-						<?php
-						$arrayVar = [
+						$builder = [
 							"type" => "page",
 							"inputs" => ["id" => "auto"],
 							"post_id" => $en_ID,

@@ -75,7 +75,8 @@ if ( current_user_can ( 'administrator' ) ) {
 							
 						// 3. insert 'video' builder layout
 						
-						$builder = [
+						<?php
+						$arrayVar = [
 							"type" => "page",
 							"inputs" => ["id" => "auto"],
 							"post_id" => $en_ID,
@@ -107,17 +108,17 @@ if ( current_user_can ( 'administrator' ) ) {
 													"rows" => [
 														[
 															"property" => "p",
-															"side" => "y",
+															"side" => "b",
 															"breakpoint" => "",
 															"value" => "4",
 															"index" => "0",
 														],
 														[
 															"property" => "p",
-															"side" => "y",
+															"side" => "b",
 															"breakpoint" => "md",
 															"value" => "6",
-															"index" => "1",
+															"index" => "0",
 														],
 													],
 													"index" => "0",
@@ -153,7 +154,7 @@ if ( current_user_can ( 'administrator' ) ) {
 																	"property" => "m",
 																	"side" => "b",
 																	"breakpoint" => "",
-																	"value" => "6",
+																	"value" => "4",
 																	"index" => "1",
 																],
 															],
@@ -253,9 +254,7 @@ if ( current_user_can ( 'administrator' ) ) {
 																				"controls" => "false",
 																			],
 																		],
-																		"code" => [
-																			"en" => "",
-																			"fr" => ""
+																		"code" => ["", [""]],
 																		"id" => "resource-video",
 																		"class" => [""],
 																		"inner_class" => "",
@@ -359,8 +358,10 @@ if ( current_user_can ( 'administrator' ) ) {
 																	"type" => "block/content/text",
 																	"inputs" => [
 																		"text" => [
-																			"en" => "&lt;h5&gt;Format&lt;/h5&gt;",
-																			"fr" => "&lt;h5&gt;Format&lt;/h5&gt;",
+																			"en" =>
+																				"&lt;h5&gt;Format&lt;/h5&gt;",
+																			"fr" =>
+																				"&lt;h5&gt;Format&lt;/h5&gt;",
 																		],
 																		"id" => "auto",
 																		"class" => [""],
@@ -425,8 +426,10 @@ if ( current_user_can ( 'administrator' ) ) {
 																	"type" => "block/content/text",
 																	"inputs" => [
 																		"text" => [
-																			"en" => "&lt;p&gt;Video&lt;/p&gt;",
-																			"fr" => "&lt;p&gt;Vid&amp;eacute;o&lt;/p&gt;",
+																			"en" =>
+																				"&lt;p&gt;Video&lt;/p&gt;",
+																			"fr" =>
+																				"&lt;p&gt;Vid&amp;eacute;o&lt;/p&gt;",
 																		],
 																		"id" => "auto",
 																		"class" => [""],
@@ -521,7 +524,7 @@ if ( current_user_can ( 'administrator' ) ) {
 																			"en" =>
 																				"&lt;h5&gt;Time to completion&lt;/h5&gt;",
 																			"fr" =>
-																				"&lt;p&gt;Temps de r&amp;eacute;alisation&lt;/p&gt;",
+																				"&lt;h5&gt;Temps de r&amp;eacute;alisation&lt;/h5&gt;",
 																		],
 																		"id" => "auto",
 																		"class" => [""],
@@ -682,8 +685,10 @@ if ( current_user_can ( 'administrator' ) ) {
 																	"type" => "block/content/text",
 																	"inputs" => [
 																		"text" => [
-																			"en" => "&lt;h5&gt;" . get_field ( 'asset_summaryhead', $en_ID ) . "&lt;/h5&gt;",
-																			"fr" => "&lt;h5&gt;" . get_field ( 'asset_summaryhead', $fr_ID ) . "&lt;/h5&gt;",
+																			"en" =>
+																				"&lt;h5&gt;Transcript&lt;/h5&gt;",
+																			"fr" =>
+																				"&lt;h5&gt;Transcription&lt;/h5&gt;",
 																		],
 																		"id" => "auto",
 																		"class" => [""],
@@ -746,10 +751,11 @@ if ( current_user_can ( 'administrator' ) ) {
 																	],
 																	"parent" => "",
 																	"type" => "block/content/text",
+																	
 																	"inputs" => [
 																		"text" => [
-																			"en" => $en_text,
-																			"fr" => $fr_text
+																			"en" => "&lt;h5&gt;" . get_field ( 'asset_summaryhead', $en_ID ) . "&lt;/h5&gt;",
+																			"fr" => "&lt;h5&gt;" . get_field ( 'asset_summaryhead', $fr_ID ) . "&lt;/h5&gt;",
 																		],
 																		"id" => "auto",
 																		"class" => [""],

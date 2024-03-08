@@ -684,10 +684,8 @@ if ( current_user_can ( 'administrator' ) ) {
 																	"type" => "block/content/text",
 																	"inputs" => [
 																		"text" => [
-																			"en" =>
-																				"&lt;h5&gt;Transcript&lt;/h5&gt;",
-																			"fr" =>
-																				"&lt;h5&gt;Transcription&lt;/h5&gt;",
+																			"en" => "&lt;h5&gt;" . get_field ( 'asset_summaryhead', $en_ID ) . "&lt;/h5&gt;",
+																			"fr" => "&lt;h5&gt;" . get_field ( 'asset_summaryhead', $fr_ID ) . "&lt;/h5&gt;",
 																		],
 																		"id" => "auto",
 																		"class" => [""],
@@ -753,8 +751,8 @@ if ( current_user_can ( 'administrator' ) ) {
 																	
 																	"inputs" => [
 																		"text" => [
-																			"en" => "&lt;h5&gt;" . get_field ( 'asset_summaryhead', $en_ID ) . "&lt;/h5&gt;",
-																			"fr" => "&lt;h5&gt;" . get_field ( 'asset_summaryhead', $fr_ID ) . "&lt;/h5&gt;",
+																			"en" => get_field ( 'asset_summary', $en_ID ),
+																			"fr" => get_field ( 'asset_summary', $fr_ID ),
 																		],
 																		"id" => "auto",
 																		"class" => [""],

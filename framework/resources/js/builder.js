@@ -984,7 +984,7 @@
 						
 						// generate a key for the new element
 						
-						if (!options.parent.data.children) {
+						if (options.parent.data.children == undefined) {
 							options.parent.data.children = []
 						}
 						
@@ -2377,10 +2377,14 @@
 					break
 			
 				case 'image' :
-				
-					let img_urls = JSON.parse(element.data.inputs.file.url)
-				
-					element.item.find('.fw-element-inner').html('<img src="' + img_urls.full + '">')
+					
+					if (element.data.inputs.file.url != '') {
+						let img_urls = JSON.parse(element.data.inputs.file.url)
+					
+						element.item.find('.fw-element-inner').html('<img src="' + img_urls.full + '">')
+					} else {
+						console.warn('fw', 'element ' + element.data.key, 'no image selected')
+					}
 					
 					break
 					
@@ -4000,16 +4004,24 @@
 				if (this_input.hasClass('uploader-file-url')) {
 					
 					let this_container = this_input.closest('.uploader-container'),
-							img_urls = JSON.parse(this_val)
+							img_urls = null
+							
+					if (this_val != '') {
+						img_urls = JSON.parse(this_val)
+					}
 					
 					console.log(img_urls)
 					
-					if (this_container.attr('data-uploader-type') == 'image') {
-					
-						this_container.find('.image-placeholder').html('<img src="' + img_urls.full + '">')
+					if (img_urls != null && img_urls.hasOwnProperty('full')) {
 						
-					} else if (this_container.attr('data-uploader-type') == 'video') {
-						this_container.find('.image-placeholder').text(img_urls.full.split('/').slice(-1))
+						if (this_container.attr('data-uploader-type') == 'image') {
+						
+							this_container.find('.image-placeholder').html('<img src="' + img_urls.full + '">')
+							
+						} else if (this_container.attr('data-uploader-type') == 'video') {
+							this_container.find('.image-placeholder').text(img_urls.full.split('/').slice(-1))
+						}
+						
 					}
 					
 				}

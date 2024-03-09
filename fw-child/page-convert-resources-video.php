@@ -751,8 +751,8 @@ if ( current_user_can ( 'administrator' ) ) {
 																	
 																	"inputs" => [
 																		"text" => [
-																			"en" => get_field ( 'asset_summary', $en_ID ),
-																			"fr" => get_field ( 'asset_summary', $fr_ID ),
+																			"en" => $en_text,
+																			"fr" => $fr_text,
 																		],
 																		"id" => "auto",
 																		"class" => [""],

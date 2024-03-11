@@ -15,7 +15,7 @@
 				echo ( $i != 0 ) ? ', ' : '';
 				
 				if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
-					echo get_field ( 'title_fr', 'topic_' . $topic->term_id );
+					echo get_field ( 'term_fr', 'topic_' . $topic->term_id );
 				} else {
 					echo $topic->name;
 				}

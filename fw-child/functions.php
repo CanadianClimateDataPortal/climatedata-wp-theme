@@ -130,6 +130,8 @@ function child_theme_enqueue() {
 	
 	wp_register_script ( 'flex-drawer', $child_vendor_dir . 'pe-flex-drawer/flex-drawer.js', array ( 'jquery' ), NULL, true );
 
+	wp_register_script ( 'share-widget', $child_vendor_dir . 'pe-social-widget/share-widget.js', array ( 'jquery' ), NULL, true );
+	
 	// leaflet
 	
 	wp_register_script ( 'leaflet', $child_npm_dir . 'leaflet/dist/leaflet-src.js', null, null, true );
@@ -167,7 +169,7 @@ function child_theme_enqueue() {
 	
 	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'cdc', 'jquery-ui-slider', 'jquery-ui-datepicker', 'select2', 'flex-drawer' ), NULL, true );
 	
-	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'tab-drawer', 'utilities' ), NULL, true );
+	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'tab-drawer', 'utilities', 'share-widget' ), NULL, true );
 	
 	// localize admin url
 	
@@ -341,6 +343,23 @@ add_action ( 'wp_head', function() {
 	}	
 	
 } );
+
+add_action( 'wp_footer', function() {
+	
+	if ( is_singular ( 'post' ) ) {
+
+?>
+
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+<script src="https://platform.linkedin.com/in.js" type="text/javascript">lang: en_US</script>
+<script type="IN/Share" data-url="https://www.linkedin.com"></script>
+
+<?php
+
+	}
+
+}, 10, 1 );
 
 //
 // GLOBAL JS VAR

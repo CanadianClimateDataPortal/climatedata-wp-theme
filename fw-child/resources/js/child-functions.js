@@ -132,6 +132,49 @@ const $ = jQuery;
       });
     }
 
+    // share widget
+
+    if ($('#share').length) {
+      window.fbAsyncInit = function () {
+        FB.init({
+          appId: '387199319682000',
+          autoLogAppEvents: true,
+          xfbml: true,
+          version: 'v13.0',
+        });
+      };
+
+      $('#share').share_widget({
+        site_url: '//' + window.location.hostname,
+        share_url: window.location.href,
+        title: document.title,
+        elements: {
+          facebook: {
+            display: true,
+            icon: 'fab fa-facebook me-3',
+          },
+          twitter: {
+            display: true,
+            icon: 'fab fa-twitter me-3',
+            text: null,
+            via: null,
+          },
+          linkedin: {
+            display: true,
+            icon: 'fab fa-linkedin me-3',
+          },
+          permalink: {
+            display: true,
+            icon: 'fas fa-share-alt me-3',
+            label: T('Copy link'),
+            label_success: T('Copied to clipboard'),
+            label_error: T('Error'),
+          },
+        },
+        callback: null, // callback function
+      });
+    }
+
     //
     // NEWS
     //

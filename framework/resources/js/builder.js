@@ -3812,7 +3812,10 @@
 				
 				let this_input = modal_form.find('[name="inputs-' + input.property + '"]'),
 						this_val = input.value
-						
+				
+				// console.log('---')
+				// console.log('input', this_input)		
+				
 				if (
 					input.property.includes('rows[]') &&
 					repeater_index == -1
@@ -3820,43 +3823,81 @@
 					repeater_index = 0
 				}
 				
-				if (this_input.parents('.fw-form-repeater').length) {
+				if (
+					this_input.length &&
+					this_input.parents('.fw-form-repeater').length
+				) {
 					
-					// console.log(input.property + ' is in a repeater row')
+					// single out the input that's in the current repeater row
 					
-					if (
-						input.property.includes('[]') &&
-						input.property.includes('index')
-					) {
-						
-						repeater_index += 1
-						
-						// console.log('new index', repeater_index)
-						
-					}
+					this_input = modal_form.find('[data-row-index="' + repeater_index + '"]').find('[name="inputs-' + input.property + '"]')
+				}
+				
+				if (this_input.length) {
 					
-				} else if (this_input.parents('.fw-form-flex-row').length) {
-						
-					repeater_index = -1
-					// console.log(input.property + ' is in a flex row')
+					// found an input matching the row and name
 					
-					if (
-						input.property.includes('[]') &&
-						input.property.includes('type')
-					) {
+					if (this_input.parents('.fw-form-repeater').length) {
 						
-						flex_type = input.value
-						flex_index += 1
+						// console.log(input.property + ' is in a repeater row')
 						
-						// console.log('new type', flex_type)
+						if (
+							input.property.includes('[]') &&
+							input.property.includes('index')
+						) {
+							
+							repeater_index += 1
+							
+							// console.log('new index', repeater_index)
+							
+						}
+						
+					} else if (this_input.parents('.fw-form-flex-row').length) {
+							
+						repeater_index = -1
+						// console.log(input.property + ' is in a flex row')
+						
+						if (
+							input.property.includes('[]') &&
+							input.property.includes('type')
+						) {
+							
+							flex_type = input.value
+							flex_index += 1
+							
+							// console.log('new type', flex_type)
+							
+						}
+						
+					} else {
+					
+						repeater_index = -1
+						flex_type = null
+						flex_index = -1
 						
 					}
 					
 				} else {
 					
-					repeater_index = -1
-					flex_type = null
-					flex_index = -1
+					// row doesn't have this input name
+					
+					// console.log('no input, add hidden')
+					
+					// this will be 100x easier
+					// if we add a data-key to repeater rows
+					
+					let this_index_name = input.property.split('[]'),
+							pop_index = this_index_name.pop()
+					
+					this_index_name = this_index_name.join('[]') + '[]-index'
+					
+					// find the hidden index field and prepend
+					
+					let this_index_field = modal_form.find('[name="inputs-' + this_index_name + '"][value="' + repeater_index + '"]')
+					
+					// insert before the index field
+					
+					this_input = $('<input type="hidden" name="inputs-' + input.property + '" value="' + input.value + '">').insertBefore(this_index_field)
 					
 				}
 			
@@ -3870,11 +3911,17 @@
 					
 					if (flex_type != null) {
 						
-						// repeater in a flex
+						// repeater is also in a flex
 						
 						this_input = modal_form.find('.fw-form-flex-row[data-item="' + flex_type + '"][data-row-index="' + flex_index + '"]').find('.fw-form-repeater-row[data-row-index="' + repeater_index + '"] [name="inputs-' + input.property + '"]')
 						
 					} else {
+						
+						// console.log('find repeater element now')
+						// 
+						// console.log('all input matches', this_input)
+						// 
+						// console.log('get index', repeater_index)
 						
 						// repeater only
 						

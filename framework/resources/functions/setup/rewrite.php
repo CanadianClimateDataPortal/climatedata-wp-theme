@@ -707,13 +707,23 @@ function translate_permalink ( $url, $post_id, $lang ) {
 			
 			if ( $post_obj->post_type == 'post' ) {
 				
+				// split the URL into parts
 				$post_path = explode ( '/', untrailingslashit ( $url ) );
 				
+				// drop the last empty value
 				array_pop ( $post_path );
 				
+				// grab everything after the domain and implode
 				$post_path = implode ( '/',  array_splice ( $post_path, 3 ) );
 				
-				$new_URL .= $post_path . '/' . $new_slug;
+				// if there's anything left, that's the permalink structure
+				// add it to the URL 
+				if ( $post_path != '' ) {
+					$new_URL .= $post_path . '/';
+				}
+		
+				// now add the post slug
+				$new_URL .= $new_slug;
 				
 			} else {
 				

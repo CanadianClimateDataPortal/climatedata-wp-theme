@@ -1034,22 +1034,54 @@
             });
           }
 
-          // pan
-          // doesn't work as-is, come back later
-          // let offset = options.maps['low'].object.getSize().x * 0.75;
-          //
-          // console.log('offset', offset);
-          //
-          // options.maps['low'].object
-          //   .panTo(location.coords, { animate: false })
-          //   .panBy(new L.Point(offset, 0), {
-          //     animate: false,
-          //   });
-
           if (typeof callback == 'function') {
             callback(data);
           }
         }
+      },
+
+      set_center: function (coords, zoom = null) {
+        let plugin = !this.item ? this.data('cdc_app') : this,
+          options = plugin.options,
+          item = plugin.item;
+
+        // console.log('clicked a marker', click_event, list_item);
+
+        let visible_maps = item.find('.map-panel:not(.hidden)'),
+          first_map_key = visible_maps.first().attr('data-map-key'),
+          map = options.maps[first_map_key].object,
+          offset;
+
+        console.log(visible_maps, visible_maps.first());
+        console.log(first_map_key);
+
+        console.log('cdc', 'set center');
+
+        switch (visible_maps.length) {
+          case 3:
+            offset = 0;
+            break;
+          case 2:
+            offset = 0.1;
+            break;
+          default:
+            offset = 0.25;
+            break;
+        }
+
+        if (zoom == null) zoom = map.getZoom();
+
+        // calculate pixel value for offset
+        map_offset = map.getSize().x * offset;
+
+        // zoom
+        map.setZoom(zoom);
+
+        // pan to center
+        map.panTo([coords.lat, coords.lng], { animate: false });
+
+        // pan by offset
+        map.panBy(new L.Point(-map_offset, 0), { animate: false });
       },
     },
 

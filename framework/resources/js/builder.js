@@ -3811,7 +3811,7 @@
 			flatten_data.forEach(function(input) {
 				
 				let this_input = modal_form.find('[name="inputs-' + input.property + '"]'),
-						this_val = input.value
+						this_val = plugin.unescape(input.value)
 				
 				// console.log('---')
 				// console.log('input', this_input)		
@@ -3974,12 +3974,6 @@
 					
 				}
 				
-				if (Array.isArray(this_val)) {
-					// not sure why i did this
-					this_input = modal_form.find('[name="inputs-' + input.property + '[]"]')
-					
-				}
-					
 				if (this_input.length) {
 					
 					if (input.property.includes('-d')) {
@@ -4687,7 +4681,6 @@
 			
 				element_data.inputs = plugin.reset_arrays(element_data.inputs)
 				
-			} else {
 			}
 			
 			options.data.array_key = ''
@@ -4703,11 +4696,11 @@
 				
 				// format value
 				
-				if (input.name.includes('inputs-title')) {
-					input.value = plugin.escape(input.value)
-				}
-				
-				if (input.name.includes('code')) {
+				if (
+					input.name.includes('text') ||
+					input.name.includes('inputs-title') ||
+					input.name.includes('code')
+				) {
 					input.value = plugin.escape(input.value)
 				}
 				
@@ -5277,26 +5270,55 @@
 			
 		},
 		
-		escape: function(htmlStr = '') {
-			return htmlStr.replace(/&/g, "&amp;")
-				.replace(/\n/g, "")
-				.replace(/</g, "&lt;")
-				.replace(/>/g, "&gt;")
-				.replace(/"/g, "&quot;")
-				.replace(/'/g, "&#39;")
+		escape: function(str = '') {
+			
+			str = [...str];
+			//    ^ es20XX spread to Array: keeps surrogate pairs
+			
+			let i = str.length, aRet = [];
+			
+			while (i--) {
+				var iC = str[i].codePointAt(0);
+				if (iC < 65 || iC > 127 || (iC>90 && iC<97)) {
+					aRet[i] = '&#'+iC+';';
+				} else {
+					aRet[i] = str[i];
+				}
+			}
+			
+			str = aRet.join('');
+			
+			// dial it back a notch
+			str = str.replaceAll('&#32;', ' ')
+				.replaceAll('&#44;', ',')
+				.replaceAll('&#45;', '-')
+				.replaceAll('&#46;', '.')
+				.replaceAll('&#47;', '/')
+				.replaceAll('&#58;', ':')
+				.replaceAll('&#61;', '=')
+			
+			return str
+			
 		},
 		
-		unescape: function(htmlStr = '') {
+		unescape: function(str = '') {
 			
-			// console.log('unescape', htmlStr)
+			if (typeof str == 'string') {
+				// console.log('unescape', str)
+				
+				str = str.replace(/&#([0-9]{1,3});/gi, function(match, numStr) {
+					let num = parseInt(numStr, 10)
+					return String.fromCharCode(num)
+				})
+				
+				// str = str.replaceAll(/&lt;/g , "<")
+				// str = str.replaceAll(/&gt;/g , ">")
+				// str = str.replaceAll(/&quot;/g , "\"")
+				// str = str.replaceAll(/&#39;/g , "\'")
+				// str = str.replaceAll(/&amp;/g , "&")
+			}
 			
-			htmlStr = htmlStr.replace(/&lt;/g , "<")
-			htmlStr = htmlStr.replace(/&gt;/g , ">")
-			htmlStr = htmlStr.replace(/&quot;/g , "\"")
-			htmlStr = htmlStr.replace(/&#39;/g , "\'")
-			htmlStr = htmlStr.replace(/&amp;/g , "&")
-			
-			return htmlStr
+			return str
 		},
 		
 		move_item_up: function(item) {

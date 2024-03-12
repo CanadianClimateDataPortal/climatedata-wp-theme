@@ -1927,6 +1927,7 @@
   $.fn.prepare_raster = function(){
     $('#control-bar').remove();
     $('#map-control-footer').remove();
+    $('#map-breadcrumb').remove();
     $('#map-objects').addClass('to-raster');
   };
 })(jQuery);

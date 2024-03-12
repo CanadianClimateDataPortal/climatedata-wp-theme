@@ -2,12 +2,11 @@
 // GLOBAL CONSTANTS
 //
 
-// const geoserver_url = 'https://data.climatedata.ca';
-const geoserver_url = 'https://dataclimatedata.crim.ca';
+const geoserver_url = DATA_URL;
 
 // Salt used to encode the URL when calling the screenshot feature of the API.
 // Not a security salt, only an encoding salt.
-const url_encoder_salt = 'override-me';
+const url_encoder_salt = URL_ENCODER_SALT;
 
 const svgNS = 'http://www.w3.org/2000/svg';
 

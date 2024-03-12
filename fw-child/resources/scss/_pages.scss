@@ -1000,6 +1000,29 @@ body.tab-drawer-open {
 // BETA APPS
 //
 
+.initially-hidden {
+  display: none;
+}
+
+.iframe-container {
+  position: fixed;
+  bottom: 0px;
+  top: 90px;
+  right: 0px;
+  left: 0px;
+  background: #f2f2f2;
+  padding: 0.3%;
+}
+
+.iframe-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  margin: 0;
+  padding: 0;
+  background: white;
+}
+
 .single-beta-app {
   #floating-header {
     background-color: transparent;

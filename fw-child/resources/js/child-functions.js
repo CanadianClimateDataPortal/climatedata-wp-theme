@@ -204,6 +204,19 @@ const $ = jQuery;
     }
 
     //
+    // BETA APPS
+    //
+
+    if ($('#apps-grid').length) {
+      $('#apps-grid').fw_query({
+        elements: {
+          filters: $('#control-bar .fw-query-filter'),
+          sort: $('#sort-menu'),
+        },
+      });
+    }
+
+    //
     // FORMS
     //
 

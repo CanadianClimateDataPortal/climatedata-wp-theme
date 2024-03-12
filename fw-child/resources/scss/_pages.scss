@@ -649,7 +649,7 @@ body.tab-drawer-open {
   }
 }
 
-#var-select-query {
+.variable-grid {
   .fw-query-item {
     position: relative;
     border-bottom: 1px solid $gray-300;
@@ -711,6 +711,29 @@ body.tab-drawer-open {
   .fd-drawer {
     flex: 0 0 100%;
     width: 100%;
+  }
+}
+
+// var archive
+
+#variable-grid {
+  .fw-query-item {
+    &:after {
+      border-bottom-color: $gray-400;
+    }
+  }
+
+  .fd-drawer {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    background-color: $gray-400;
+  }
+}
+
+// map tab
+
+#var-select-query {
+  .fd-drawer {
     padding: 2rem;
     background-color: $secondary;
     color: $white;

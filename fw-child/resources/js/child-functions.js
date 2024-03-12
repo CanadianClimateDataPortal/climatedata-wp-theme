@@ -132,6 +132,21 @@ const $ = jQuery;
       });
     }
 
+    if ($('body').hasClass('post-type-archive-variable')) {
+      $(document).on('fw_query_success', function (e, query_item) {
+        let query_items = query_item.find('.fw-query-items');
+
+        if (query_items.data('flex_drawer') == undefined) {
+          query_items.flex_drawer({
+            item_selector: '.fw-query-item',
+          });
+        } else {
+          // reinit if plugin is already loaded
+          query_items.flex_drawer('init_items');
+        }
+      });
+    }
+
     // share widget
 
     if ($('#share').length) {
@@ -200,6 +215,19 @@ const $ = jQuery;
             sort: $('#sort-menu'),
           },
         });
+      });
+    }
+
+    //
+    // VAR ARCHIVE
+    //
+
+    if ($('#variable-grid').length) {
+      $('#variable-grid').fw_query({
+        elements: {
+          filters: $('#control-bar .fw-query-filter'),
+          sort: $('#sort-menu'),
+        },
       });
     }
 

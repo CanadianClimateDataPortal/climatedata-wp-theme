@@ -366,6 +366,12 @@ $overlay-switch-bg: rgba($gray-400, 0.99);
 
 // LEGEND
 
+.map-panel {
+  .legend {
+    pointer-events: none;
+  }
+}
+
 $legend-off-height: 100%;
 $legend-on-height: 16px;
 

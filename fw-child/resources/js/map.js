@@ -556,7 +556,6 @@
         console.log('grid click', click_event);
 
         // load location details
-
         plugin.set_location(click_event.latlng);
       });
 
@@ -571,7 +570,7 @@
             '"]',
         );
 
-        console.log('clicked a marker', click_event, list_item);
+        $(document).cdc_app('maps.set_center', click_event.latlng, 10, 0.75);
 
         list_item.trigger('click');
       });
@@ -1672,8 +1671,14 @@
           console.log(data);
 
           // add marker
-
           $(document).cdc_app('maps.add_marker', data, function () {});
+
+          // set map center to marker location w/ offset
+          $(document).cdc_app(
+            'maps.set_center',
+            { lat: data.lat, lng: data.lng },
+            8,
+          );
 
           // search field value
           if (data.geo_name != 'Point') {

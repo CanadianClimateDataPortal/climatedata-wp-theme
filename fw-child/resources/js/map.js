@@ -1818,7 +1818,7 @@
           $(document).cdc_app(
             'maps.set_center',
             { lat: data.lat, lng: data.lng },
-            8,
+            10,
           );
 
           // search field value

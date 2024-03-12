@@ -1049,6 +1049,7 @@
 
         let visible_maps = item.find('.map-panel:not(.hidden)'),
           first_map_key = visible_maps.first().attr('data-map-key'),
+          map = options.maps[first_map_key].object,
           offset;
 
         console.log(visible_maps, visible_maps.first());
@@ -1068,15 +1069,10 @@
             break;
         }
 
-        let map = options.maps[first_map_key].object;
-
         if (zoom == null) zoom = map.getZoom();
 
-        console.log(map.getSize());
-
+        // calculate pixel value for offset
         map_offset = map.getSize().x * offset;
-
-        console.log(offset, map_offset);
 
         // zoom
         map.setZoom(zoom);

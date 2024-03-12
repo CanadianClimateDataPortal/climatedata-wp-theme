@@ -649,7 +649,8 @@ body.tab-drawer-open {
   }
 }
 
-#var-select-query {
+#var-select-query,
+#variable-grid {
   .fw-query-item {
     position: relative;
     border-bottom: 1px solid $gray-300;

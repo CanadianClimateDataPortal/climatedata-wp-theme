@@ -337,6 +337,108 @@
         },
       });
 
+      // SELECT2
+
+      $('#area-search').select2({
+        language: {
+          inputTooShort: function () {
+            let instructions = '<div class="geo-select-instructions">';
+
+            instructions += '<div class="p-2 mb-2 border-bottom">';
+
+            instructions +=
+              '<h6 class="mb-1">' + T('Search communities') + '</h6>';
+
+            instructions +=
+              '<p class="mb-1 text-body">' +
+              T('Begin typing city name') +
+              '</p>';
+
+            instructions += '</div>';
+
+            instructions += '<div class="p-2">';
+
+            instructions +=
+              '<h6 class="mb-1">' + T('Search coordinates') + '</h6>';
+
+            instructions +=
+              '<p class="mb-0 text-body">' +
+              T('Enter latitude & longitude e.g.') +
+              ' <code>54,-115</code></p>';
+
+            instructions += '</div>';
+
+            instructions += '</div>';
+
+            return instructions;
+          },
+        },
+        ajax: {
+          url: ajax_data.url,
+          dataType: 'json',
+          delay: 0,
+          data: function (params) {
+            return {
+              action: 'cdc_location_search',
+              q: params.term, // search term
+              search: params,
+              page: params.page,
+            };
+          },
+          transport: function (params, success, failure) {
+            var $request = $.ajax(params);
+
+            // console.log(params, success, failure);
+
+            var llcheck = new RegExp(
+              '^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$',
+            );
+
+            term = params.data.q;
+
+            if (llcheck.test(term)) {
+              $request.fail(failure);
+              // $('.select2-results__option').text('custom');
+              $('.select2-results__options').empty();
+
+              var term_segs = term.split(',');
+              var term_lat = term_segs[0];
+              var term_lon = term_segs[1];
+
+              $('.select2-results__options').append(
+                '<div class="geo-select-instructions p-4"><h6 class="mb-3">' +
+                  T('Coordinates detected') +
+                  '</h6><p class="mb-0"><span class="geo-select-pan-btn btn btn-outline-secondary btn-sm rounded-pill px-4" data-lat="' +
+                  term_lat +
+                  '" data-lon="' +
+                  term_lon +
+                  '">' +
+                  T('Set map view') +
+                  '</span></p></div>',
+              );
+            } else {
+              $request.then(success);
+              return $request;
+            }
+          },
+          processResults: function (data, page) {
+            // parse the results into the format expected by Select2.
+            // since we are using custom formatting functions we do not need to
+            // alter the remote JSON data
+            return {
+              results: data.items,
+            };
+          },
+          cache: true,
+        },
+        escapeMarkup: function (markup) {
+          return markup;
+        }, // let our custom formatter work
+        minimumInputLength: 1,
+        width: '100%',
+        templateResult: plugin._select2_format_item,
+      });
+
       // FREQUENCY
 
       // re-populate frequency select
@@ -422,6 +524,30 @@
         500,
         plugin,
         plugin.apply_scheme,
+      );
+    },
+
+    _select2_format_item: function (item) {
+      if (!item.id) {
+        return item.text;
+      }
+      if (item.location === null) {
+        show_comma = '';
+        item.location = '';
+      } else {
+        show_comma = ', ';
+      }
+
+      return $(
+        '<span><div class="geo-select-title">' +
+          item.text +
+          ' (' +
+          item.term +
+          ')</div>' +
+          item.location +
+          show_comma +
+          item.province +
+          '</sup></span>',
       );
     },
 
@@ -623,6 +749,17 @@
       //
       // SIDEBAR CONTROLS
       //
+
+      // search selection
+
+      item.find('#area-search').on('select2:select', function (e) {
+        console.log('selected', e.params.data);
+
+        plugin.set_location(
+          { lat: e.params.data.lat, lng: e.params.data.lon },
+          true,
+        );
+      });
 
       // triggerable handler
 
@@ -932,6 +1069,10 @@
                 // it conflicts with map stuff that's happening
                 // concurrently
                 do_update = true;
+              } else if ($(this).hasClass('select2')) {
+                console.log('update select');
+                console.log('status', options.status);
+                $(this).val(options.query[key]).trigger('change');
               }
 
               if (do_update == true) {

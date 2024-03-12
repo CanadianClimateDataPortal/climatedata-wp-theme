@@ -496,6 +496,17 @@ $control-slider-handle-width: 2.75rem;
 
     .tab-drawer-content {
       height: 100%;
+
+      &.stick {
+        position: sticky;
+        top: 0;
+        height: auto;
+        min-height: 100vh;
+
+        .tab-drawer-content-inner {
+          min-height: 100vh;
+        }
+      }
     }
 
     .tab-drawer-content-inner {

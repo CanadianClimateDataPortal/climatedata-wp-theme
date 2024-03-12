@@ -1000,6 +1000,16 @@ body.tab-drawer-open {
 // BETA APPS
 //
 
+.single-beta-app {
+  #floating-header {
+    background-color: transparent;
+  }
+
+  #header-menu-icon {
+    color: $gray-600;
+  }
+}
+
 #beta-app-breadcrumb {
   .breadcrumb {
     --bs-breadcrumb-margin-bottom: 0;

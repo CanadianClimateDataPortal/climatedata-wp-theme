@@ -35,7 +35,7 @@
 			<?php
 				
 				$module_args = array (
-					'posts_per_page' => 12,
+					'posts_per_page' => -1,
 					'post_type' => 'variable',
 					'post_parent' => 0,
 					'post_status' => 'publish'
@@ -46,7 +46,7 @@
 			<div id="variable-grid" class="py-6" data-args='<?php echo json_encode ( $module_args ); ?>'>
 				
 				<div id="" class="query-container ">
-					<div class="fw-query-items row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 g-lg-6" data-options='<?php echo json_encode ( $item_options ); ?>'>
+					<div class="fw-query-items row row-cols-1 row-cols-sm-2 row-cols-md-3" data-options='<?php echo json_encode ( $item_options ); ?>'>
 						
 						<div class="fw-query-item"></div>
 					

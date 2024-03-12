@@ -995,3 +995,26 @@ body.tab-drawer-open {
     font-size: 0.875rem;
   }
 }
+
+//
+// BETA APPS
+//
+
+#beta-app-breadcrumb {
+  .breadcrumb {
+    --bs-breadcrumb-margin-bottom: 0;
+  }
+}
+
+#beta-app-container {
+  height: 100vh;
+}
+
+#beta-app-frame {
+  flex-grow: 1;
+  position: relative;
+
+  iframe {
+    @include full-size;
+  }
+}

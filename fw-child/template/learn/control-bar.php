@@ -2,7 +2,7 @@
 	<div id="control-bar" class="control-bar tab-drawer-tabs-container">
 		
 		<div id="control-bar-tabs" class="tab-drawer-tabs pt-2">
-			<a href="#topics" class="tab-drawer-trigger">
+			<a href="#topics" class="control-bar-tab-link tab-drawer-trigger">
 				<span class="cdc-icon"><?php
 				
 					echo file_get_contents ( locate_template ( 'resources/img/icon-topic.svg' ) );
@@ -11,7 +11,7 @@
 				<span><?php _e ( 'Topics', 'cdc' ); ?></span>
 			</a>
 			
-			<a href="#filters" class="tab-drawer-trigger">
+			<a href="#filters" class="control-bar-tab-link tab-drawer-trigger">
 				<span class="cdc-icon"><?php
 				
 					echo file_get_contents ( locate_template ( 'resources/img/icon-display.svg' ) );

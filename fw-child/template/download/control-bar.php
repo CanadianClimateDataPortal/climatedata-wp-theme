@@ -7,10 +7,10 @@
 		
 	?>
 	
-	<a href="#menu" id="menu-trigger" data-bs-toggle="offcanvas" class="d-flex justify-content-center p-2"><i class="fas fa-align-left text-white"></i></a>
+	<a href="#menu" id="menu-trigger" data-bs-toggle="offcanvas" class="d-flex justify-content-center p-2"><i id="header-menu-icon" class="fas fa-align-left text-white"></i></a>
 	
 	<div id="control-bar-tabs" class="tab-drawer-tabs w-100">
-		<a href="#data" class="tab-drawer-trigger">
+		<a href="#data" class="control-bar-tab-link tab-drawer-trigger">
 			<span class="cdc-icon">
 				<?php
 				
@@ -26,7 +26,7 @@
 			</span>
 		</a>
 		
-		<a href="#area" class="tab-drawer-trigger">
+		<a href="#area" class="control-bar-tab-link tab-drawer-trigger">
 			<span class="cdc-icon">
 				<?php
 				
@@ -42,7 +42,7 @@
 			</span>
 		</a>
 		
-		<a href="#details" class="tab-drawer-trigger">
+		<a href="#details" class="control-bar-tab-link tab-drawer-trigger">
 			<span class="cdc-icon">
 				<?php
 				
@@ -58,7 +58,7 @@
 			</span>
 		</a>
 		
-		<a href="#submit" class="tab-drawer-trigger">
+		<a href="#submit" class="control-bar-tab-link tab-drawer-trigger">
 			<span class="cdc-icon">
 				<?php
 				
@@ -73,6 +73,23 @@
 				<?php _e ( 'Submit', 'cdc' ); ?>
 			</span>
 		</a>
+	</div>
+	
+	<div id="control-bar-secondary" class="w-100 mt-auto text-center">
+		
+		<a href="#help" class="control-bar-tab-link m-2"  data-bs-toggle="offcanvas" data-bs-target="#help">
+			<span class="cdc-icon"><?php
+				
+				echo file_get_contents ( locate_template ( 'resources/img/icon-help.svg' ) );
+				
+			?></span>
+			
+			<span><?php _e ( 'Help', 'cdc' ); ?></span>
+		</a>
+		
+		<a href="#about" class="control-bar-text-link">About</a>
+		
+		<a href="<?php echo home_url ( 'feedback' ); ?>" class="control-bar-text-link">Feedback</a>
 	</div>
 	
 	<div id="tab-drawer-container" class="tab-drawer-container">

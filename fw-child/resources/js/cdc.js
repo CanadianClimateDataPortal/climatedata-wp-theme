@@ -104,11 +104,9 @@
       first_map: null,
       current_sector: 'canadagrid',
       hooks: {
-        'maps.get_layer': Array(1000)
+        'maps.get_layer': Array(1000),
       },
-      legend: {
-        colormap: null,
-      },
+      legend: {},
       chart: {
         object: null,
         series: null,
@@ -230,17 +228,18 @@
     },
 
     add_hook: function (hook_name, priority, obj, hook_function) {
-      this.options.hooks[hook_name][priority] = {obj: obj, fn: hook_function};
+      this.options.hooks[hook_name][priority] = { obj: obj, fn: hook_function };
     },
 
     maps: {
-      init: function (maps, callback) {
+      init: function (maps, legend, callback) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           options = plugin.options;
 
         // console.log('cdc', 'init maps', maps);
 
         options.maps = maps;
+        options.legend = legend;
 
         for (let key in options.maps) {
           // create the map
@@ -337,7 +336,7 @@
 
       // returns Geoserver layer name
       // sample result: CDC:cmip6-HXmax30-ys-ssp585-p50-ann-30year
-      get_layer_name: function(query, scenario='high') {
+      get_layer_name: function (query, scenario = 'high') {
         const dataset_details = DATASETS[query.dataset];
         let frequency_code = query.frequency;
 
@@ -345,18 +344,21 @@
           frequency_code = period_frequency_lut[query.frequency];
         }
 
-        return 'CDC:' + dataset_details.layer_prefix +
-        query.var +
-        '-' +
-        frequency_code +
-        '-' +
-        scenario_names[query.dataset][scenario]
-          .replace(/[\W_]+/g, '')
-          .toLowerCase() +
-        '-p50-' +
-        query.frequency +
-        '-30year' +
-        (query.delta == 'true' ? '-delta7100' : '');
+        return (
+          'CDC:' +
+          dataset_details.layer_prefix +
+          query.var +
+          '-' +
+          frequency_code +
+          '-' +
+          scenario_names[query.dataset][scenario]
+            .replace(/[\W_]+/g, '')
+            .toLowerCase() +
+          '-p50-' +
+          query.frequency +
+          '-30year' +
+          (query.delta == 'true' ? '-delta7100' : '')
+        );
       },
 
       get_layer: function (query, var_data) {
@@ -409,8 +411,6 @@
 
                   // ys/ms/qsdec
 
-
-
                   // ann/spring/summer/
 
                   let frequency_name = query.frequency;
@@ -436,29 +436,34 @@
                     TIME: parseInt(query.decade) + '-01-00T00:00:00Z',
                   };
 
-                  if (var_data.slug == 'building_climate_zones') {
-                    params.styles = 'CDC:building_climate_zones';
-                  }
-
                   // apply hooks
                   options.hooks['maps.get_layer'].forEach(function (hook) {
-                    hook.obj[hook.fn](query, params);
-                    }
-                  )
+                    hook.fn.apply(hook.obj, [query, params]);
+                  });
 
                   if (
                     this_map.layers.raster &&
                     this_map.object.hasLayer(this_map.layers.raster)
                   ) {
                     // if any map parameters have changed
-                    if (!_.isEqual(this_map.layers.raster.cdc_params, params)) {
-                      // update existing
+                    if (
+                      !window.lodash.isEqual(
+                        this_map.layers.raster.cdc_params,
+                        params,
+                      )
+                    ) {
+                      // delete all parameters from layer before updating
+                      // see: https://github.com/Leaflet/Leaflet/issues/3441
+                      delete this_map.layers.raster.wmsParams.parameter;
                       this_map.layers.raster.setParams(params);
-                      this_map.layers.raster.cdc_params = _.cloneDeep(params);
+
+                      this_map.layers.raster.cdc_params =
+                        window.lodash.cloneDeep(params);
                     }
                   } else {
                     // create layer
-                    let saved_params = _.cloneDeep(params);
+
+                    let saved_params = window.lodash.cloneDeep(params);
 
                     // those three parameters must be specified at creation only
                     // otherwise, a bug in leaflet leaks them to the WMS requests
@@ -506,24 +511,11 @@
 
                     new_layer
                       .on('mouseover', function (e) {
-                        // reset highlighted
-                        options.grid.highlighted.forEach(function (feature) {
-                          new_layer.resetFeatureStyle(feature);
-                        });
-
-                        // update highlighted grid
-                        options.grid.highlighted = [e.layer.properties.gid];
-
-                        new_layer.setFeatureStyle(options.grid.highlighted, {
-                          weight: options.grid.styles.line.hover.weight,
-                          color: options.grid.styles.line.hover.color,
-                          opacity: options.grid.styles.line.hover.opacity,
-                          fillColor: options.grid.styles.fill.hover.color,
-                          fill: true,
-                          fillOpacity: options.grid.styles.fill.hover.opacity,
-                        });
+                        $(document).trigger('map_item_mouseover', [e]);
                       })
-                      .on('mouseout', function (e) {})
+                      .on('mouseout', function (e) {
+                        $(document).trigger('map_item_mouseout', [e]);
+                      })
                       .on('click', function (e) {
                         // pan map to clicked coords
                         // var offset = (map1.getSize().x * 0.5) - 100;
@@ -531,7 +523,7 @@
                         // map1.panTo([e.latlng.lat, e.latlng.lng], { animate: false }); // pan to center
                         // map1.panBy(new L.Point(offset, 0), { animate: false }); // pan by offset
 
-                        $(document).trigger('select_map_item', [e]);
+                        $(document).trigger('map_item_select', [e]);
                       });
 
                     this_map.layers.grid = new_layer.addTo(this_map.object);
@@ -573,7 +565,7 @@
                 this_map.layers.stations == undefined ||
                 !this_map.object.hasLayer(this_map.layers.stations)
               ) {
-                console.log(key + " map doesn't have stations");
+                // console.log(key + " map doesn't have stations");
                 this_map.layers.stations = L.geoJson(options.station_data, {
                   pointToLayer: function (feature, latlng) {
                     markerColor = '#e50e40';
@@ -595,7 +587,7 @@
                   })
                   .on('click', function (e) {});
 
-                console.log(this_map.layers.stations);
+                // console.log(this_map.layers.stations);
 
                 this_map.layers.stations.addTo(this_map.object);
               }
@@ -690,26 +682,30 @@
                     // same sector, but the grid layer already exists,
                     // so reset each feature
 
+                    // todo: performance issue: resetFeatureStyle is called often when not required (ex: pan/zoom)
                     for (let i = 0; i < options.choro.data[key].length; i++) {
                       options.maps[key].layers.grid.resetFeatureStyle(i);
                     }
                   } else {
                     console.log('no existing layer');
 
-                    options.grid.leaflet.vectorTileLayerStyles[query.sector] =
-                      function (properties, zoom) {
-                        return {
-                          weight: 0.2,
-                          color: 'white',
-                          fillColor: plugin.maps.get_color.apply(item, [
-                            options.choro.data[key][properties.id],
-                          ]),
-                          opacity: 0.5,
-                          fill: true,
-                          radius: 4,
-                          fillOpacity: 1,
-                        };
+                    let vectorTileLayerStyles = {};
+                    vectorTileLayerStyles[query.sector] = function (
+                      properties,
+                      zoom,
+                    ) {
+                      return {
+                        weight: 0.2,
+                        color: 'white',
+                        fillColor: plugin.maps.get_color.apply(item, [
+                          options.choro.data[key][properties.id],
+                        ]),
+                        opacity: 0.5,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 1,
                       };
+                    };
 
                     options.maps[key].layers.grid = L.vectorGrid
                       .protobuf(
@@ -729,8 +725,7 @@
                           bounds: options.canadaBounds,
                           maxZoom: 12,
                           minZoom: 3,
-                          vectorTileLayerStyles:
-                            options.grid.leaflet.vectorTileLayerStyles,
+                          vectorTileLayerStyles: vectorTileLayerStyles,
                         },
                       )
                       .on('mouseover', function (e) {
@@ -766,7 +761,7 @@
                           .closeTooltip();
                       })
                       .on('click', function (e) {
-                        $(document).trigger('select_map_item', e);
+                        $(document).trigger('map_item_select', e);
                       })
 
                       .addTo(options.maps[key].object);
@@ -785,217 +780,149 @@
           item = plugin.item,
           options = plugin.options;
 
-        let layer_name = plugin.maps.get_layer_name(query);
+        const legend_item_height = 25,
+          legend_item_width = 25,
+          legend_width = 200,
+          legend_tick_width = 4;
 
-        console.log('layer name', layer_name);
+        const colours = options.legend.colormap.colours,
+          quantities = options.legend.colormap.quantities,
+          labels = options.legend.colormap.labels,
+          categorical = options.legend.colormap.categorical,
+          opacity = options.legend.opacity,
+          label_offset = categorical ? legend_item_height / 2 : 0;
 
-        let request_url =
-          geoserver_url +
-          '/geoserver/wms?service=WMS&version=1.1.0' +
-          '&request=GetLegendGraphic' +
-          '&format=application/json' +
-          '&layer=' + layer_name;
+        // todo move this function if required elsewhere
+        /**
+         * Format numerical value according to supplied parameters
+         * @param value Number to format
+         * @param var_acf Variable details object provided by Wordpress
+         * @param delta If true, the value is formatted as a delta
+         * @returns {string} The formatted value
+         */
+        function value_formatter(value, var_acf, delta) {
+          let unit = var_acf.units;
+          if (unit === 'kelvin') {
+            unit = '°C';
+            value = delta ? value : value - 273.15;
+          }
 
-        if (var_data.slug == 'building_climate_zones') {
-          request_url += '&style=CDC:building_climate_zones';
+          if (unit === undefined) {
+            unit = '';
+          }
+          let str = '';
+          if (delta && value > 0) {
+            str += '+';
+          }
+
+          switch (var_acf.units) {
+            case 'doy':
+              if (delta) {
+                str += value.toFixed(var_acf.decimals);
+                str += ' ' + l10n_labels['days'];
+              } else {
+                str += doy_formatter(value, options.lang);
+              }
+
+              break;
+            default:
+              str += value.toFixed(var_acf.decimals);
+              str += ' ' + unit;
+              break;
+          }
+          return unit_localize(str);
         }
 
-        $.getJSON(request_url)
-          .then(function (data) {
-            // console.log('legend data', data);
+        for (let key in options.maps) {
+          options.maps[key].legend.onAdd = function (map) {
+            let div = L.DomUtil.create('div', 'info legend legendTable');
 
-            options.legend.colormap =
-              data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
-
-            options.legend.colormap = options.legend.colormap.reverse();
-
-            let labels = plugin.maps.legend_markup.apply(item, [
-              '',
-              options.legend.colormap,
-              false,
-            ]);
-
-            for (let key in options.maps) {
-              options.maps[key].legend.onAdd = function (map) {
-                let div = L.DomUtil.create('div', 'info legend legendTable'),
-                  unitValue,
-                  unitColor;
-
-                div.innerHTML = labels.join('');
-
-                // console.log('markup', div);
-                return div;
-              };
-
-              options.maps[key].legend.addTo(options.maps[key].object);
-
-              options.legend.colormap = options.legend.colormap.map(
-                function (c) {
-                  c.quantity = parseFloat(c.quantity);
-                  return c;
-                },
-              );
-            }
-
-            if (typeof callback == 'function') {
-              callback();
-            }
-          })
-          .fail(function (err) {
-            console.error(
-              'Failed to get data from geoserver for sector legend',
-            );
-          });
-      },
-
-      legend_markup: function (
-        legendTitle = 'legend',
-        colormap,
-        building_climate_zones,
-      ) {
-        let plugin = !this.item ? this.data('cdc_app') : this,
-          item = plugin.item,
-          options = plugin.options;
-
-        labels = [];
-
-        labels.push('<h6 class="legendTitle">' + legendTitle + '</h6>');
-
-        var first_label = unit_localize(colormap[0].label, options.lang);
-
-        // labels.push('<span class="legendLabel max">' + first_label + '</span>');
-
-        labels.push('<div class="legendRows">');
-
-        var min_label = '';
-
-        // what's the current opacity
-        let current_opacity = 0.8;
-        // $('#opacity-slider').data('ionRangeSlider')['old_from'] / 100;
-
-        for (let i = 0; i < colormap.length; i++) {
-          unitValue = unit_localize(colormap[i].label, options.lang);
-          unitColor = colormap[i].color;
-
-          let row_class = 'legendRow';
-
-          if (i == 0) {
-            row_class += ' first';
-          } else if (i == colormap.length - 1) {
-            row_class += ' last';
-          }
-          if (building_climate_zones) {
-            let label = '';
-            if (i == 0) {
-              label = '<span class="legendLabel min">' + unitValue + '</span>';
-            } else if (i == colormap.length - 1) {
-              label = '<span class="legendLabel min">' + unitValue + '</span>';
-            }
-            labels.push(
-              '<div class="legendRow">' +
-                label +
-                '<div class="legendColor" style="opacity: ' +
-                current_opacity +
-                '; background-color:' +
-                unitColor +
-                ';"></div>' +
-                '<div class="legendUnit">' +
-                unitValue +
-                '</div>' +
-                '</div>',
-            );
-          } else if (unitValue !== 'NaN') {
-            if (i == 0) {
-              // first row
-              labels.push(
-                '<div class="' +
-                  row_class +
-                  '">' +
-                  '<span class="legendLabel max">' +
-                  unitValue +
-                  '</span>' +
-                  '<div class="legendColor" style="opacity: ' +
-                  current_opacity +
-                  '; border-bottom: 10px solid ' +
-                  unitColor +
-                  '; border-left: 8px solid transparent; border-right: 8px solid transparent"></div>' +
-                  '<span class="legendUnit">&gt; ' +
-                  unitValue +
-                  '</span>' +
-                  '</div>',
-              );
-            } else if (i == colormap.length - 1) {
-              // last row
-              labels.push(
-                '<div class="' +
-                  row_class +
-                  '">' +
-                  '<span class="legendLabel min">' +
-                  unitValue +
-                  '</span>' +
-                  '<div class="legendColor" style="opacity: ' +
-                  current_opacity +
-                  '; border-top: 10px solid ' +
-                  unitColor +
-                  '; border-left: 8px solid transparent; border-right: 8px solid transparent"></div>' +
-                  '<span class="legendUnit">&lt; ' +
-                  unitValue +
-                  '</span>' +
-                  '</div>',
-              );
+            let svg = `<svg width="${legend_width}" height="${
+              legend_item_height * colours.length
+            }">`;
+            svg += `<g transform="translate(${
+              legend_width - legend_item_width
+            },0)">`;
+            if (query.scheme_type == 'discrete') {
+              for (let i = 0; i < colours.length; i++) {
+                svg += `<rect class="legendbox" width="${legend_item_width}" height="${legend_item_height}"
+                    y="${legend_item_height * i}" fill="${colours[i]}" style="fill-opacity: ${opacity}"/>`;
+              }
             } else {
-              labels.push(
-                '<div class="' +
-                  row_class +
-                  '">' +
-                  '<div class="legendColor" style="opacity: ' +
-                  current_opacity +
-                  '; background-color:' +
-                  unitColor +
-                  ';"></div>' +
-                  '<div class="legendUnit">' +
-                  unitValue +
-                  '</div>' +
-                  '</div>',
-              );
+              svg += `<defs><linearGradient id="legendGradient" gradientTransform="rotate(90)">`;
+              for (let i = 0; i < colours.length; i++) {
+                svg += `<stop offset="${
+                  (i / colours.length) * 100
+                }%" stop-color="${colours[i]}"/>`;
+              }
+              svg += `</linearGradient> </defs>`;
+              svg += `<rect class="legendbox" width="${legend_item_width}" height="${
+                legend_item_height * colours.length
+              }" fill="url(#legendGradient)" style="fill-opacity: ${opacity}" />`;
             }
-          } else {
-            if (i == colormap.length - 1) {
-              // last row if no unit
+            svg += `</g><g transform="translate(${
+              legend_width - legend_item_width - legend_tick_width
+            },0)">`;
 
-              labels.push(
-                '<div class="' +
-                  row_class +
-                  ' zero">' +
-                  '<span class="legendLabel ">0</span>' +
-                  '<div class="legendColor" style="opacity: ' +
-                  current_opacity +
-                  '; background-color:' +
-                  unitColor +
-                  '"></div>' +
-                  '<span class="legendUnit">0</span>' +
-                  '</div>',
-              );
+            for (let i = 0; i < colours.length - (categorical ? 0 : 1); i++) {
+              let label;
+              if (labels) {
+                label = unit_localize(labels[i], options.lang);
+              } else {
+                label = value_formatter(
+                  quantities[i],
+                  var_data.acf,
+                  query.delta === 'true',
+                );
+              }
+
+              svg += `<g opacity="1" transform="translate(0,${
+                legend_item_height * (i + 1) - label_offset
+              })">
+                    <line stroke="currentColor" x2="4"/>
+                    <text fill="currentColor" dominant-baseline="middle" text-anchor="end" x="-5">
+                    ${label}
+                    </text></g>`;
             }
-          }
+
+            svg += '</g>';
+            svg += '</svg>';
+            div.innerHTML = svg;
+            return div;
+          };
+
+          options.maps[key].legend.addTo(options.maps[key].object);
         }
 
-        labels.push('</div><!-- .legendRows -->');
-
-        return labels;
+        if (typeof callback == 'function') {
+          callback();
+        }
       },
 
       get_color: function (d) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           options = plugin.options;
 
-        for (let i = options.legend.colormap.length - 1; i > 0; i--) {
-          if (d < options.legend.colormap[i].quantity) {
-            return options.legend.colormap[i].color;
-          }
+        let i = indexOfGT(options.legend.colormap.quantities, d);
+        switch (i) {
+          case -1:
+            // fallback case in case style/legend is wrong
+            return 'rgba(0,0,0,0)';
+          case 0:
+            return options.legend.colormap.colours[0];
+          default:
+            if (options.legend.colormap.scheme_type === 'discrete') {
+              return options.legend.colormap.colours[i];
+            } else {
+              return interpolate(
+                options.legend.colormap.colours[i - 1],
+                options.legend.colormap.colours[i],
+                (d - options.legend.colormap.quantities[i - 1]) /
+                  (options.legend.colormap.quantities[i] -
+                    options.legend.colormap.quantities[i - 1]),
+              );
+            }
         }
-        // fallback case in case style/legend is wrong
-        return options.legend.colormap[0].color;
       },
 
       invalidate_size: function () {
@@ -1111,22 +1038,54 @@
             });
           }
 
-          // pan
-          // doesn't work as-is, come back later
-          // let offset = options.maps['low'].object.getSize().x * 0.75;
-          //
-          // console.log('offset', offset);
-          //
-          // options.maps['low'].object
-          //   .panTo(location.coords, { animate: false })
-          //   .panBy(new L.Point(offset, 0), {
-          //     animate: false,
-          //   });
-
           if (typeof callback == 'function') {
             callback(data);
           }
         }
+      },
+
+      set_center: function (coords, zoom = null) {
+        let plugin = !this.item ? this.data('cdc_app') : this,
+          options = plugin.options,
+          item = plugin.item;
+
+        // console.log('clicked a marker', click_event, list_item);
+
+        let visible_maps = item.find('.map-panel:not(.hidden)'),
+          first_map_key = visible_maps.first().attr('data-map-key'),
+          map = options.maps[first_map_key].object,
+          offset;
+
+        console.log(visible_maps, visible_maps.first());
+        console.log(first_map_key);
+
+        console.log('cdc', 'set center');
+
+        switch (visible_maps.length) {
+          case 3:
+            offset = 0;
+            break;
+          case 2:
+            offset = 0.1;
+            break;
+          default:
+            offset = 0.25;
+            break;
+        }
+
+        if (zoom == null) zoom = map.getZoom();
+
+        // calculate pixel value for offset
+        map_offset = map.getSize().x * offset;
+
+        // zoom
+        map.setZoom(zoom);
+
+        // pan to center
+        map.panTo([coords.lat, coords.lng], { animate: false });
+
+        // pan by offset
+        map.panBy(new L.Point(-map_offset, 0), { animate: false });
       },
     },
 
@@ -1216,13 +1175,11 @@
 
           // force scenarios to be an array
 
-          if (typeof query.scenarios == 'string') {
-            query.scenarios = [query.scenarios];
-          }
-
-          if (typeof query.percentiles == 'string') {
-            query.percentiles = [query.percentiles];
-          }
+          ['scenarios', 'percentiles', 'station'].forEach(function (key) {
+            if (typeof query[key] == 'string') {
+              query[key] = [query[key]];
+            }
+          });
 
           // console.log('merged query');
           // console.log(JSON.stringify(query, null, 4));
@@ -1296,6 +1253,11 @@
                 .each(function () {
                   query[fn_options.key].push($(this).val());
                 });
+            } else if (fn_options.item.is('select')) {
+              // console.log('update select');
+              // console.log(fn_options);
+
+              query[fn_options.key] = fn_options.val;
             } else if (fn_options.key == 'coords') {
               query[fn_options.key] = fn_options.val.split(',');
             }
@@ -1411,54 +1373,61 @@
         // reset the series array
         options.chart.series = [];
 
-        if (settings.data.observations.length > 0) {
-          options.chart.series.push({
-            name: chart_labels.observation,
-            data: settings.data.observations,
-            zIndex: 1,
-            showInNavigator: true,
-            color: '#F47D23',
-            visible: false,
-            marker: {
-              fillColor: '#F47D23',
-              lineWidth: 0,
-              radius: 0,
-              lineColor: '#F47D23',
-            },
-          });
+        if (settings.data.hasOwnProperty('observations')) {
+          if (settings.data.observations.length > 0) {
+            options.chart.series.push({
+              name: chart_labels.observation,
+              data: settings.data.observations,
+              zIndex: 1,
+              showInNavigator: true,
+              color: '#F47D23',
+              visible: false,
+              marker: {
+                fillColor: '#F47D23',
+                lineWidth: 0,
+                radius: 0,
+                lineColor: '#F47D23',
+              },
+            });
+          }
         }
 
-        if (settings.data.modeled_historical_median.length > 0) {
-          options.chart.series.push({
-            name: chart_labels.historical,
-            data: settings.data.modeled_historical_median,
-            zIndex: 1,
-            showInNavigator: true,
-            color: '#000000',
-            marker: {
-              fillColor: '#000000',
-              lineWidth: 0,
-              radius: 0,
-              lineColor: '#000000',
-            },
-          });
+        if (settings.data.hasOwnProperty('modeled_historical_median')) {
+          if (settings.data.modeled_historical_median.length > 0) {
+            options.chart.series.push({
+              name: chart_labels.historical,
+              data: settings.data.modeled_historical_median,
+              zIndex: 1,
+              showInNavigator: true,
+              color: '#000000',
+              marker: {
+                fillColor: '#000000',
+                lineWidth: 0,
+                radius: 0,
+                lineColor: '#000000',
+              },
+            });
+          }
         }
 
-        if (settings.data.modeled_historical_range.length > 0)
-          options.chart.series.push({
-            name: chart_labels.historical_range,
-            data: settings.data.modeled_historical_range,
-            type: 'arearange',
-            lineWidth: 0,
-            linkedTo: ':previous',
-            color: '#000000',
-            fillOpacity: 0.2,
-            zIndex: 0,
-            marker: {
-              radius: 0,
-              enabled: false,
-            },
-          });
+        if (settings.data.hasOwnProperty('modeled_historical_range')) {
+          if (settings.data.modeled_historical_range.length > 0) {
+            options.chart.series.push({
+              name: chart_labels.historical_range,
+              data: settings.data.modeled_historical_range,
+              type: 'arearange',
+              lineWidth: 0,
+              linkedTo: ':previous',
+              color: '#000000',
+              fillOpacity: 0.2,
+              zIndex: 0,
+              marker: {
+                radius: 0,
+                enabled: false,
+              },
+            });
+          }
+        }
 
         scenarios.forEach(function (scenario) {
           if (settings.data['{0}_median'.format(scenario.name)].length > 0) {

@@ -5,9 +5,38 @@
 // jquery UI theme
 
 @import '../vendor/jquery-ui-1.13.2/jquery-ui.min.css';
+@import '../vendor/jquery-ui-1.13.2/jquery-ui.structure.min.css';
 
 // leaflet
 
 .leaflet-container {
   font-family: $font-family-base;
+}
+
+// share widget
+
+.share-widget {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+
+  li {
+    display: flex;
+    margin-bottom: 0.5rem;
+
+    &:not(.share-permalink-wrap) {
+      order: 2;
+
+      .label {
+        display: none;
+      }
+    }
+
+    &.share-permalink-wrap {
+      order: 1;
+      flex: 0 0 100%;
+      width: 100%;
+    }
+  }
 }

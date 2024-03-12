@@ -1,3 +1,5 @@
+var swipers = {}
+
 document.documentElement.classList.remove('no-js');
 
 var current_script = document.currentScript.src
@@ -24,13 +26,18 @@ var theme_dir = current_script.replace('/resources/js/' + filename, '') + '/'
     
     if ($('.has-swiper').length) {
       
-      var swipers = {}
-      
       $('.has-swiper').each(function() {
         
         let this_swiper = $(this).find('> .swiper'),
             this_settings = JSON.parse($(this).attr('data-swiper-settings'))
             
+        if (
+          $('body').hasClass('fw-builder') && 
+          this_settings.hasOwnProperty('autoplay')
+        ) {
+          this_settings.autoplay.enabled = false
+        }
+        
         // console.log($(this), this_settings)
         
         // show controls if options are set
@@ -46,7 +53,14 @@ var theme_dir = current_script.replace('/resources/js/' + filename, '') + '/'
         // init
         swipers[$(this).attr('id')] = {
           element: this_swiper,
-          instance: new Swiper('#' + this_swiper.attr('id'), this_settings)
+          settings: this_settings,
+        }
+        
+        if (!$('body').hasClass('fw-builder')) {
+          swipers[$(this).attr('id')].instance = new Swiper('#' + this_swiper.attr('id'), this_settings)
+        } else {
+          $(this).find('.swiper').removeClass('swiper')
+          $(this).find('.swiper-wrapper').removeClass('swiper-wrapper')
         }
         
       })

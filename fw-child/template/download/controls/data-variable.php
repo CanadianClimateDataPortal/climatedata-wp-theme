@@ -8,7 +8,7 @@
 			
 			<div class="control-tab-body">
 				
-				<div id="var-select-query" class="fw-query-object"
+				<div id="var-select-query" class="variable-grid"
 					data-args='{
 						"posts_per_page": 15,
 						"post_type": [ "variable" ],

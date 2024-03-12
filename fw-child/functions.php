@@ -32,6 +32,14 @@ function child_global_vars() {
 
 add_action ( 'wp', 'child_global_vars', 20 );
 
+// process any deployment specific configuration
+
+if ( stream_resolve_include_path ( 'local_config.php' ) ) {
+	include_once 'local_config.php';
+} else {
+	include_once 'default_config.php';
+}
+
 //
 // ENQUEUE
 //
@@ -66,10 +74,20 @@ function child_theme_enqueue() {
 	
 	wp_dequeue_style ( 'global-style' );
 	
+	// VENDOR
+	
+	// font awesome
+	
 	wp_register_style ( 'font-awesome', WP_CONTENT_URL . '/vendor/font-awesome-pro/css/all.css', null, null );
 	wp_enqueue_style ( 'font-awesome' );
 
+	// leaflet
+	
 	wp_enqueue_style ( 'leaflet', $child_npm_dir . 'leaflet/dist/leaflet.css', NULL, NULL, 'all' );
+	
+	// select2
+	
+	wp_register_style ( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', null, null );
 
 	wp_register_style ( 'gutenberg', $child_theme_dir . 'resources/css/gutenberg.css', null, null );
 	wp_enqueue_style ( 'child-style', $child_theme_dir . 'style.css', NULL, NULL, 'all' );
@@ -84,10 +102,13 @@ function child_theme_enqueue() {
 	
 	if (
 		$GLOBALS['vars']['current_slug'] == 'map' ||
-		$GLOBALS['vars']['current_slug'] == 'carte'
+		$GLOBALS['vars']['current_slug'] == 'carte' ||
+		$GLOBALS['vars']['current_slug'] == 'download' ||
+		$GLOBALS['vars']['current_slug'] == 'telechargement'
 	) {
 		
 		wp_enqueue_style ( 'leaflet' );
+		wp_enqueue_style ( 'select2' );
 		
 	}
 
@@ -99,12 +120,18 @@ function child_theme_enqueue() {
 	
 	// lodash
 	
-	wp_register_script ( 'lodash-full', $child_vendor_dir . 'lodash.js', NULL, NULL, true );
+	// wp_register_script ( 'lodash-full', $child_vendor_dir . 'lodash.js', NULL, NULL, true );
 	
 	// tab drawer
 	
 	wp_register_script ( 'tab-drawer', $child_vendor_dir . 'pe-tab-drawer/tab-drawer.js', array ( 'jquery' ), NULL, true );
+	
+	// flex drawer
+	
+	wp_register_script ( 'flex-drawer', $child_vendor_dir . 'pe-flex-drawer/flex-drawer.js', array ( 'jquery' ), NULL, true );
 
+	wp_register_script ( 'share-widget', $child_vendor_dir . 'pe-social-widget/share-widget.js', array ( 'jquery' ), NULL, true );
+	
 	// leaflet
 	
 	wp_register_script ( 'leaflet', $child_npm_dir . 'leaflet/dist/leaflet-src.js', null, null, true );
@@ -122,21 +149,27 @@ function child_theme_enqueue() {
 	wp_register_script ( 'highcharts-offline-exporting', 'https://code.highcharts.com/stock/modules/offline-exporting.js', array ( 'highcharts-exporting' ), NULL, true );
 	wp_register_script ( 'highcharts-accessibility', 'https://code.highcharts.com/modules/accessibility.js', array ( 'highcharts-highstock' ), NULL, true );
 	
+	// zebra pin
+	
 	wp_register_script ( 'zebra-pin', $child_npm_dir . 'zebra_pin/dist/zebra_pin.min.js', array ( 'jquery' ), null, true );
 	
-	//
+	// select2
+	
+	wp_register_script ( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', array ( 'jquery' ), null, true );
+	
+	// utilities/constants
 	
 	wp_register_script ( 'utilities', $child_js_dir . 'utilities.js', array ( 'jquery' ), NULL, true );
 	
   wp_register_script ( 'data', $child_js_dir . 'data.js', array (  ), NULL, true );
 
-	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 'utilities', 'data', 'lodash-full', 'jquery', 'leaflet', 'leaflet-vectorgrid', 'leaflet-sync', 'tab-drawer', 'highcharts-highstock', 'highcharts-more', 'highcharts-exporting', 'highcharts-export-data', 'highcharts-offline-exporting', 'highcharts-accessibility' ), NULL, true );
+	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 'utilities', 'data', 'lodash', 'jquery', 'leaflet', 'leaflet-vectorgrid', 'leaflet-sync', 'tab-drawer', 'highcharts-highstock', 'highcharts-more', 'highcharts-exporting', 'highcharts-export-data', 'highcharts-offline-exporting', 'highcharts-accessibility' ), NULL, true );
 	
-	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'cdc', 'data', 'jquery-ui-slider' ), NULL, true );
+	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'cdc', 'data', 'jquery-ui-slider', 'select2', 'flex-drawer' ), NULL, true );
 	
-	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'cdc', 'jquery-ui-slider' ), NULL, true );
+	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'cdc', 'jquery-ui-slider', 'jquery-ui-datepicker', 'select2', 'flex-drawer' ), NULL, true );
 	
-	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'tab-drawer', 'utilities', 'cdc', 'map-app' ), NULL, true );
+	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'tab-drawer', 'utilities', 'share-widget' ), NULL, true );
 
 	// Scripts for the "custom shapefile upload" logic (in the "download" section).
 
@@ -202,7 +235,21 @@ function child_theme_enqueue() {
 			wp_enqueue_script ( 'zebra-pin' );
 			// wp_enqueue_script ( 'tab-drawer' );
 			break;
+				
+		case 'beta-apps' :
+		case 'apps-beta' :
+			wp_enqueue_script ( 'zebra-pin' );
+			break;
 		
+	}
+	
+	if ( is_singular ( 'beta-app' ) ) {
+		wp_enqueue_script ( 'iframe-functions', $child_js_dir . 'iframe-functions.js', array ( 'jquery' ), null, true );
+	}
+	
+	if ( is_post_type_archive ( 'variable' ) ) {
+		wp_enqueue_script ( 'zebra-pin' );
+		wp_enqueue_script ( 'flex-drawer' );
 	}
 	
 	wp_enqueue_script ( 'child-functions' );
@@ -221,6 +268,7 @@ $includes = array (
 	'resources/functions/taxonomies.php',
 	'resources/functions/post-types.php',
 	'resources/functions/shortcodes.php',
+	'resources/functions/ajax.php',
 	'resources/functions/rest.php',
 );
 
@@ -322,6 +370,23 @@ add_action ( 'wp_head', function() {
 	
 } );
 
+add_action( 'wp_footer', function() {
+	
+	if ( is_singular ( 'post' ) ) {
+
+?>
+
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+<script src="https://platform.linkedin.com/in.js" type="text/javascript">lang: en_US</script>
+<script type="IN/Share" data-url="https://www.linkedin.com"></script>
+
+<?php
+
+	}
+
+}, 10, 1 );
+
 //
 // GLOBAL JS VAR
 // disable 3D transform in leaflet
@@ -382,237 +447,6 @@ add_action ( 'wp_before_admin_bar_render', 'remove_comments_admin_bar' );
 // MISC
 // find a good home for these
 //
-
-function cdc_get_random_var() {
-	
-	$result = get_posts ( array (
-		'post_type' => 'variable',
-		'posts_per_page' => 1,
-		'orderby' => 'rand',
-		'post_status' => 'publish'
-	) );
-	
-	if ( !empty ( $result ) ) {
-		echo $result[0]->ID;
-	}
-	
-	wp_die();
-}
-
-add_action ( 'wp_ajax_cdc_get_random_var', 'cdc_get_random_var' );
-add_action ( 'wp_ajax_nopriv_cdc_get_random_var', 'cdc_get_random_var' );
-
-// get location by lat/lng
-
-function cdc_get_location_by_coords () {
-	
-	if (
-		( isset ( $_GET['lat'] ) && !empty ( $_GET['lat'] ) ) &&
-		( isset ( $_GET['lng'] ) && !empty ( $_GET['lng'] ) )
-	) {
-		
-		if ( locate_template ( 'resources/app/db.php' ) == '' ) {
-			
-			echo json_encode ( array (
-				'message' => 'Unable to connect to db'
-			) );
-			
-		} else {
-			
-			echo 'ya';
-			/*
-			require_once locate_template ( 'resources/app/db.php' );
-		
-			$lat = floatval ( $_GET['lat'] );
-			$lng = floatval ( $_GET['lng'] );
-			
-			// add _fr if needed
-			$term_append = ( $_GET['lang'] == 'fr' ) ? '_fr' : '';
-			
-			$columns = array (
-				"all_areas.id_code as geo_id", 
-				"geo_name", 
-				"gen_term" . $term_append . " as generic_term", 
-				"location", 
-				"province" . $term_append, 
-				"lat", 
-				"lon"
-			);
-			
-			// $columns = implode ( ",", $columns );
-			$join = "";
-			
-			if ( $_GET['sealevel'] == 'true' ) {
-				$join = "JOIN all_areas_sealevel ON (all_areas.id_code=all_areas_sealevel.id_code)";
-			}
-	
-			$ranges = [ 0.05, 0.1, 0.2 ];
-			$preferred_terms = [ 'Community', 'Metropolitan Area' ];
-			$found_community = false;
-			
-			// gradually increase the range until we find a community
-			
-			foreach ( $ranges as $range ) {
-				
-				if ( $found_community == false ) {
-					$main_query = mysqli_query($GLOBALS['vars']['con'], "SELECT " . implode(",", $columns) . "
-					, DISTANCE_BETWEEN($lat, $lng, lat,lon) as distance
-					FROM all_areas
-					$join
-					WHERE lat BETWEEN " . (round($lat, 2) - $range) . " AND " . (round($lat, 2) + $range) . "
-					AND lon BETWEEN " . (round($lng, 2) - $range) . " AND " . (round($lng, 2) + $range) . "
-					AND gen_term NOT IN ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector')
-					ORDER BY DISTANCE
-					LIMIT 50") or die (mysqli_error($GLOBALS['vars']['con']));
-					
-					if ($main_query->num_rows > 0) {
-						
-						while ( $row = mysqli_fetch_assoc ( $main_query ) ) {
-							
-							if ( in_array ( $row['generic_term'], $preferred_terms ) ) {
-								$result = $row;
-								
-								// might be good to know
-								// what range is the community in from the click
-								$result['range'] = $range;
-								
-								// send back the original coords
-								$result['coords'] = [ $lat, $lng ];
-								
-								// lon -> lng
-								$result['lng'] = $result['lon'];
-								
-								// province abbreviation
-								$result['province_short'] = short_province ( $result['province'] );
-								
-								// nice name
-								$result['title'] = $result['geo_name'] . ', ' . $result['province_short'];
-								
-								$found_community = true;
-								
-								break;
-							}
-						}
-						
-					}
-					
-				}
-				
-			}
-			
-			if ( $found_community == true ) {
-				
-				// found a community in range
-				echo json_encode ( $result );
-				
-			} else {
-				
-				// no preferred results, grab the nearest one
-	
-				// range of coordinates to search between
-				$range = 0.1;
-				
-				$main_query = mysqli_query($GLOBALS['vars']['con'], "SELECT " . implode(",", $columns) . "
-				, DISTANCE_BETWEEN($lat, $lng, lat,lon) as distance
-				FROM all_areas
-				$join
-				WHERE lat BETWEEN " . (round($lat, 2) - $range) . " AND " . (round($lat, 2) + $range) . "
-				AND lon BETWEEN " . (round($lng, 2) - $range) . " AND " . (round($lng, 2) + $range) . "
-				AND gen_term NOT IN ('Railway Point', 'Railway Junction', 'Urban Community', 'Administrative Sector')
-				ORDER BY DISTANCE
-				LIMIT 1") or die (mysqli_error($GLOBALS['vars']['con']));
-				
-				if ($main_query->num_rows > 0) {
-					
-					$result = mysqli_fetch_assoc ( $main_query );
-					
-					$result['coords'] = [ $lat, $lng ];
-					$result['lng'] = $result['lon'];
-					$result['province_short'] = short_province ( $result['province'] );
-					$result['title'] = $result['geo_name'] . ', ' . $result['province_short'];
-					
-					echo json_encode ( $result );
-					
-				} else {
-					
-					echo json_encode ( array (
-						'lat' => $lat,
-						'lng' => $lng,
-						'geo_name' => __ ( 'Point', 'cdc' ),
-						'title' => __ ( 'Point', 'cdc' ) . ' (' . $lat . ', ' . $lng . ')'
-					) );
-					
-				}
-				
-			}
-			
-		} else {
-			
-			echo json_encode ( array (
-				'lat' => $lat,
-				'lng' => $lng,
-				'geo_id' => '',
-				'geo_name' => __ ( 'Point', 'cdc' ),
-				'title' => __ ( 'Point', 'cdc' ) . ' (' . $lat . ', ' . $lng . ')'
-			) );
-			
-	*/	
-		}
-	}
-	
-	wp_die();
-
-}
-
-add_action ( 'wp_ajax_cdc_get_location_by_coords', 'cdc_get_location_by_coords' );
-add_action ( 'wp_ajax_nopriv_cdc_get_location_by_coords', 'cdc_get_location_by_coords' );
-
-// get location by ID
-
-function cdc_get_location_by_id () {
-
-	if ( isset ( $_GET['loc'] ) && !empty ( $_GET['loc'] )) {
-
-		// remove possible bad stuff
-		$loc = preg_replace ( "/[^a-zA-Z0-9]+/", "", $_GET['loc'] );
-		
-		$term_append = ( $_GET['lang'] == 'fr' ) ? '_fr' : '';
-		
-		$columns = array (
-			"id_code as geo_id",
-			"geo_name",
-			"gen_term" . $term_append . " as generic_term",
-			"location",
-			"province" . $term_append . " as province",
-			"lat",
-			"lon"
-		);
-
-		require_once locate_template ( 'resources/app/db.php' );
-
-		$main_query = mysqli_query ( $GLOBALS['vars']['con'], "SELECT " . implode ( ", ", $columns ) . " FROM all_areas WHERE id_code = '" . $loc . "'" ) or die ( mysqli_error ( $GLOBALS['vars']['con'] ) );
-
-		$row = mysqli_fetch_assoc ( $main_query );
-
-		$row['coords'] = [ floatval ( $row['lat'] ), floatval ( $row['lon'] ) ];
-		$row['lng'] = floatval ( $row['lon'] );
-		$row['province_short'] = short_province ( $row['province'] );
-		$row['title'] = $row['geo_name'] . ', ' . $row['province_short'];
-		
-		echo json_encode ( $row );
-	
-	} else {
-	
-		echo '[]';
-
-	}
-	
-	wp_die();
-
-}
-
-add_action ( 'wp_ajax_cdc_get_location_by_id', 'cdc_get_location_by_id' );
-add_action ( 'wp_ajax_nopriv_cdc_get_location_by_id', 'cdc_get_location_by_id' );
 
 // GET PROVINCE ABBREVIATION
 

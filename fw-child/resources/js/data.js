@@ -1,3 +1,4 @@
+// constants containing required data for all variables, especially used for legend and custom color ramps
 const variables_data = {
   "HXmax30": {
     "ys": {"absolute": {"low": 0.0, "high": 100.0}, "delta": {"low": -10.0, "high": 70.0}, "unit": "days"},
@@ -174,5 +175,21 @@ const variables_data = {
   "txgt_32": {
     "ys": {"absolute": {"low": 0.0, "high": 50.0}, "delta": {"low": -5.0, "high": 40.0}, "unit": "days"},
     "ms": {"absolute": {"low": 0.0, "high": 10.0}, "delta": {"low": -0.7, "high": 9.0}, "unit": "days"}
+  }
+}
+
+// Specific variables that use very custom color ramps
+// Example, building_climate_zones is actually hddheat_18 with a special categorized legend
+const special_variables = {
+  building_climate_zones: {
+    layers_replace: ['building_climate_zones', 'hddheat_18'],
+    styles: 'CDC:building_climate_zones',
+    colormap: {
+      colours: ['#C90000', '#FAEE02', '#00C936', '#0083C9', '#1400C9', '#7F00C9'],
+      quantities: [3000, 4000, 5000, 6000, 7000, 99999999],
+      labels: ['Climate Zone 4', 'Climate Zone 5', 'Climate Zone 6', 'Climate Zone 7A', 'Climate Zone 7B', 'Climate Zone 8'],
+      scheme_type: 'discrete',
+      categorical: true
+    }
   }
 }

@@ -7,10 +7,32 @@
 }
 
 #header-menu-icon {
+  font-size: 1.25rem;
   color: $white;
 }
 
 #header-logo-container {
+}
+
+#header-social-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  p {
+    margin-bottom: 0;
+  }
+
+  a {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+}
+
+#header-lang {
+  .current-nav-link {
+    color: $primary;
+  }
 }
 
 //
@@ -22,6 +44,14 @@
 
   p {
     margin-bottom: 0;
+  }
+}
+
+#footer-signup {
+  #mc_embed_signup {
+    h6 {
+      display: none;
+    }
   }
 }
 
@@ -44,6 +74,19 @@
   min-height: 100%;
   background-color: $dark;
   color: $white;
+}
+
+.tab-drawer-content {
+  position: relative;
+}
+
+.control-bar .tab-drawer .tab-drawer-content-inner {
+  position: sticky;
+  top: 0;
+  height: auto;
+}
+
+.tab-drawer-content-inner {
 }
 
 //

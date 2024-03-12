@@ -1,6 +1,6 @@
 <?php
 
-	if ( have_rows ( 'sections' ) ) {
+/*	if ( have_rows ( 'sections' ) ) {
 		include ( locate_template ( 'template/old-loop/sections.php' ) );
 	} else {
 		
@@ -10,6 +10,6 @@
 			
 		}
 		
-	}
+	}*/
 
-	//echo get_field ( 'old_output_' . $GLOBALS['fw']['current_lang_code'] );
+	echo get_field ( 'old_output_' . $GLOBALS['fw']['current_lang_code'] );

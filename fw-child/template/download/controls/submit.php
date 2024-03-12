@@ -7,9 +7,9 @@
 					<h5><?php _e ( 'Process Analysis', 'cdc' ); ?></h5>
 					<p><?php _e ( 'Enter your email address to submit your request.', 'cdc' ); ?></p>
 					
-					<p class="mb-0">
+					<p class="mb-0" data-display="station:0">
 						<strong><?php _e ( 'Note:', 'cdc' ); ?></strong>
-						<?php _e ( 'Note: Data processing starts when you click on ‘Send Request.’ It may take 30 to 90 minutes to complete, depending on available resources. You will be notified by email when your request has been processed and the data are available. Don’t forget to check your spam folder.', 'cdc' ); ?>
+						<?php _e ( 'Data processing starts when you click on ‘Send Request.’ It may take 30 to 90 minutes to complete, depending on available resources. You will be notified by email when your request has been processed and the data are available. Don’t forget to check your spam folder.', 'cdc' ); ?>
 					</p>
 				</div>
 				<span class="tab-drawer-close btn-close"></span>
@@ -23,7 +23,7 @@
 					</div>
 				</div>
 				
-				<div id="map-control-email" class="map-control-item">
+				<div id="map-control-email" class="map-control-item" data-display="station:0">
 					<label for="submit-email" id="submit-email" class="form-label h6 all-caps text-secondary" data-validate="<?php _e ( 'Please enter a valid email address', 'cdc' ); ?>"><?php _e ( 'Email Address', 'cdc' ); ?></label>
 					
 					<input type="text" class="form-control" name="submit-email" id="submit-email">
@@ -55,7 +55,13 @@
 			</div>
 			
 			<div class="control-tab-footer">
-				<button id="submit" class="btn btn-lg btn-primary w-100"><?php _e ( 'Send Request', 'cdc' ); ?></button>
+				<div data-display="station:0">
+					<button id="submit-btn" class="btn btn-lg btn-primary w-100"><?php _e ( 'Send Request', 'cdc' ); ?></button>
+				</div>
+				
+				<div data-display="station:1" style="display: none;">
+					<a id="station-submit-btn" href="" target="_blank" class="btn btn-lg btn-primary w-100 disabled"><?php _e ( 'Process and Download', 'cdc' ); ?></a>
+				</div>
 			</div>
 			
 		</div>

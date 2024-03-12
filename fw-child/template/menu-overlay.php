@@ -113,17 +113,23 @@
 			
 			<div id="menu-footer" class="ps-3 py-3 bg-gray-200">
 					
-				<?php
-				
-					include ( locate_template ( 'template/newsletter-signup.php' ) );
+				<div class="ms-3 pb-3 mb-3 border-bottom border-gray-400">
+					<?php
 					
-				?>
+						include ( locate_template ( 'template/newsletter-signup.php' ) );
+						
+					?>
+				</div>
 
 				<div id="" class="d-flex justify-content-between px-3">
 					<div>
-						<a href="" target="_blank" class="me-2"><i class="fab fa-facebook"></i></a>
-						<a href="" target="_blank" class="me-2"><i class="fab fa-twitter"></i></a>
-						<a href="" target="_blank" class="me-2"><i class="fab fa-youtube"></i></a>
+						<a href="https://www.linkedin.com/company/climate-data-canada/" target="_blank" class="text-secondary me-2" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+						
+						<a href="https://twitter.com/ClimateData_ca" target="_blank" class="text-secondary me-2" title="X (Twitter)"><i class="fab fa-twitter"></i></a>
+						
+						<a href="https://www.facebook.com/ClimateData.ca.Donneesclimatiques.ca" target="_blank" class="text-secondary me-2" title="Facebook"><i class="fab fa-facebook"></i></a>
+						
+						<a href="https://www.instagram.com/climatedata.ca/" target="_blank" class="text-secondary me-2" title="Instagram"><i class="fab fa-instagram"></i></a>
 					</div>
 					
 					<div id="menu-langs" class="fw-menu pe-3">

@@ -35,6 +35,14 @@
           },
         },
       },
+      legend: {
+        colormap: {
+          colours: [],
+          quantities: [],
+          labels: null, // placeholder for special labels
+        },
+        opacity: 1,
+      },
       query: {
         coords: [62.51231793838694, -98.48144531250001, 4],
         delta: '',
@@ -252,7 +260,11 @@
 
       // MAPS
 
-      options.maps = $(document).cdc_app('maps.init', options.maps);
+      options.maps = $(document).cdc_app(
+        'maps.init',
+        options.maps,
+        options.legend,
+      );
 
       // SLIDERS
 
@@ -325,6 +337,108 @@
         },
       });
 
+      // SELECT2
+
+      $('#area-search').select2({
+        language: {
+          inputTooShort: function () {
+            let instructions = '<div class="geo-select-instructions">';
+
+            instructions += '<div class="p-2 mb-2 border-bottom">';
+
+            instructions +=
+              '<h6 class="mb-1">' + T('Search communities') + '</h6>';
+
+            instructions +=
+              '<p class="mb-1 text-body">' +
+              T('Begin typing city name') +
+              '</p>';
+
+            instructions += '</div>';
+
+            instructions += '<div class="p-2">';
+
+            instructions +=
+              '<h6 class="mb-1">' + T('Search coordinates') + '</h6>';
+
+            instructions +=
+              '<p class="mb-0 text-body">' +
+              T('Enter latitude & longitude e.g.') +
+              ' <code>54,-115</code></p>';
+
+            instructions += '</div>';
+
+            instructions += '</div>';
+
+            return instructions;
+          },
+        },
+        ajax: {
+          url: ajax_data.url,
+          dataType: 'json',
+          delay: 0,
+          data: function (params) {
+            return {
+              action: 'cdc_location_search',
+              q: params.term, // search term
+              search: params,
+              page: params.page,
+            };
+          },
+          transport: function (params, success, failure) {
+            var $request = $.ajax(params);
+
+            // console.log(params, success, failure);
+
+            var llcheck = new RegExp(
+              '^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$',
+            );
+
+            term = params.data.q;
+
+            if (llcheck.test(term)) {
+              $request.fail(failure);
+              // $('.select2-results__option').text('custom');
+              $('.select2-results__options').empty();
+
+              var term_segs = term.split(',');
+              var term_lat = term_segs[0];
+              var term_lon = term_segs[1];
+
+              $('.select2-results__options').append(
+                '<div class="geo-select-instructions p-4"><h6 class="mb-3">' +
+                  T('Coordinates detected') +
+                  '</h6><p class="mb-0"><span class="geo-select-pan-btn btn btn-outline-secondary btn-sm rounded-pill px-4" data-lat="' +
+                  term_lat +
+                  '" data-lon="' +
+                  term_lon +
+                  '">' +
+                  T('Set map view') +
+                  '</span></p></div>',
+              );
+            } else {
+              $request.then(success);
+              return $request;
+            }
+          },
+          processResults: function (data, page) {
+            // parse the results into the format expected by Select2.
+            // since we are using custom formatting functions we do not need to
+            // alter the remote JSON data
+            return {
+              results: data.items,
+            };
+          },
+          cache: true,
+        },
+        escapeMarkup: function (markup) {
+          return markup;
+        }, // let our custom formatter work
+        minimumInputLength: 1,
+        width: '100%',
+        templateResult: plugin._select2_format_item,
+      });
+
       // FREQUENCY
 
       // re-populate frequency select
@@ -363,16 +477,77 @@
 
       // console.log('frequency', options.frequency);
 
-      // load defautl color scheme
-      plugin.update_default_scheme();
+      // OFFCANVAS
 
+      let offcanvas_els = {
+        help: document.getElementById('help'),
+        info: document.getElementById('info'),
+      };
+
+      for (let key in offcanvas_els) {
+        offcanvas_els[key].addEventListener('hide.bs.offcanvas', function (e) {
+          $('body')
+            .removeClass('offcanvas-open')
+            .removeAttr('data-offcanvas-active');
+        });
+
+        offcanvas_els[key].addEventListener('show.bs.offcanvas', function (e) {
+          $('body')
+            .addClass('offcanvas-open')
+            .attr('data-offcanvas-active', key);
+        });
+      }
+
+      // load default color scheme
+      plugin.update_default_scheme(function () {
+        $(document).cdc_app('maps.get_layer', options.query, options.var_data);
+      });
+
+      item.on('fw_query_success', function (e, query_item) {
+        let query_items = query_item.find('.fw-query-items');
+
+        if (query_items.data('flex_drawer') == undefined) {
+          query_items.flex_drawer({
+            item_selector: '.fw-query-item',
+          });
+        } else {
+          // reinit if plugin is already loaded
+          query_items.flex_drawer('init_items');
+        }
+      });
+
+      item.find('#var-select-query').fw_query();
 
       $(document).cdc_app(
         'add_hook',
         'maps.get_layer',
         500,
         plugin,
-        'apply_scheme',
+        plugin.apply_scheme,
+      );
+    },
+
+    _select2_format_item: function (item) {
+      if (!item.id) {
+        return item.text;
+      }
+      if (item.location === null) {
+        show_comma = '';
+        item.location = '';
+      } else {
+        show_comma = ', ';
+      }
+
+      return $(
+        '<span><div class="geo-select-title">' +
+          item.text +
+          ' (' +
+          item.term +
+          ')</div>' +
+          item.location +
+          show_comma +
+          item.province +
+          '</sup></span>',
       );
     },
 
@@ -385,12 +560,19 @@
       slider.find('.ui-slider-handle').text(ui.value);
 
       let this_pane = slider.attr('data-pane');
+      options.legend.opacity = ui.value / 100;
 
       // always set the given pane opacity
       // so it's consistent if we switch sectors
       item
         .find('.leaflet-pane.leaflet-' + this_pane + '-pane')
-        .css('opacity', ui.value / 100);
+        .css('opacity', options.legend.opacity);
+
+      // link legend's opacity
+      item
+        .find('.legend')
+        .find('.legendbox')
+        .css('fill-opacity', options.legend.opacity);
 
       // grid layer defaults to 1
       item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
@@ -405,7 +587,7 @@
         // adjust the grid pane
         item
           .find('.leaflet-pane.leaflet-grid-pane')
-          .css('opacity', ui.value / 100);
+          .css('opacity', options.legend.opacity);
       }
     },
 
@@ -472,13 +654,34 @@
         });
       }
 
+      //
+
+      item.on('map_item_mouseout', function (e, click_event) {
+        // TO FIX
+        /*// reset highlighted
+        options.grid.highlighted.forEach(function (feature) {
+          new_layer.resetFeatureStyle(feature);
+        });
+
+        // update highlighted grid
+        options.grid.highlighted = [e.layer.properties.gid];
+
+        new_layer.setFeatureStyle(options.grid.highlighted, {
+          weight: options.grid.styles.line.hover.weight,
+          color: options.grid.styles.line.hover.color,
+          opacity: options.grid.styles.line.hover.opacity,
+          fillColor: options.grid.styles.fill.hover.color,
+          fill: true,
+          fillOpacity: options.grid.styles.fill.hover.opacity,
+        });*/
+      });
+
       // click grid item
 
-      item.on('select_map_item', function (e, click_event) {
+      item.on('map_item_select', function (e, click_event) {
         console.log('grid click', click_event);
 
         // load location details
-
         plugin.set_location(click_event.latlng);
       });
 
@@ -493,7 +696,7 @@
             '"]',
         );
 
-        console.log('clicked a marker', click_event, list_item);
+        $(document).cdc_app('maps.set_center', click_event.latlng, 10, 0.75);
 
         list_item.trigger('click');
       });
@@ -547,6 +750,17 @@
       // SIDEBAR CONTROLS
       //
 
+      // search selection
+
+      item.find('#area-search').on('select2:select', function (e) {
+        console.log('selected', e.params.data);
+
+        plugin.set_location(
+          { lat: e.params.data.lat, lng: e.params.data.lon },
+          true,
+        );
+      });
+
       // triggerable handler
 
       item.on('update_input', function (event, item, status = null) {
@@ -566,6 +780,18 @@
           .val($(this).attr('data-var-id'))
           .trigger('change');
       });
+
+      // click a variable item description
+      //
+      //       item.on('click', '.var-description', function (e) {
+      //         e.preventDefault();
+      //
+      //         let this_item = $(this).closest('.fw-query-item'),
+      //           this_id = $(this).attr('data-var-id'),
+      //           item_order = parseInt(this_item.css('order'));
+      //
+      //
+      //       });
 
       // click a link element with a query key
 
@@ -625,8 +851,6 @@
         $('[data-query-key="scheme"]')
           .val($(this).attr('data-scheme-id'))
           .trigger('change');
-
-        plugin.update_scheme();
       });
 
       // SAVE MAP AS IMAGE
@@ -672,10 +896,6 @@
       switch (this_key) {
         case 'var_id':
           plugin.update_var(this_val, status);
-          plugin.update_default_scheme();
-          break;
-        case 'frequency':
-          plugin.update_default_scheme();
           break;
         case 'scenarios':
           // ssp1/2/5 switches
@@ -767,6 +987,27 @@
           val: this_val,
         });
 
+        // perform triggers based in input key, but with updated query object
+        switch (this_key) {
+          case 'var_id':
+          case 'frequency':
+          case 'delta':
+            plugin.update_default_scheme(function () {
+              $(document).cdc_app(
+                'maps.get_layer', // todo: not ideal, may generates a flicker of the map layer
+                options.query,
+                options.var_data,
+              );
+            });
+            break;
+          case 'scheme':
+            plugin.update_scheme();
+            break;
+          case 'scheme_type':
+            options.legend.colormap.scheme_type = options.query.scheme_type;
+            break;
+        }
+
         // run the query
 
         options.query_str.prev = options.query_str.current;
@@ -839,6 +1080,10 @@
                 // it conflicts with map stuff that's happening
                 // concurrently
                 do_update = true;
+              } else if ($(this).hasClass('select2')) {
+                console.log('update select');
+                console.log('status', options.status);
+                $(this).val(options.query[key]).trigger('change');
               }
 
               if (do_update == true) {
@@ -997,7 +1242,7 @@
       ) {
         // do nothing
       } else if (var_id != null) {
-        console.log('get_var_data because var_id changed');
+        // console.log('get_var_data because var_id changed');
         $(document).cdc_app('get_var_data', var_id, function (data) {
           // console.log('get var data', data);
 
@@ -1021,15 +1266,15 @@
       }
 
       // always do this stuff
-      console.log(options.var_data);
+      // console.log(options.var_data);
 
       // ADJUST CONTROLS BY VAR SETTINGS
 
       // fields var
       fields = options.var_data.acf;
 
-      console.log('fields');
-      console.log(fields);
+      // console.log('fields');
+      // console.log(fields);
 
       // dataset availability
       item.find('#map-control-dataset .btn-check').prop('disabled', false);
@@ -1176,6 +1421,25 @@
           });
         }
 
+        // set breadcrumb & overlay content
+
+        item
+          .find('#breadcrumb-variable')
+          .text(
+            options.lang != 'en'
+              ? options.var_data.meta.title_fr
+              : options.var_data.title.rendered,
+          );
+
+        let desc_key = 'var_description' + (options.lang != 'en' ? '_fr' : ''),
+          tech_key =
+            'var_tech_description' + (options.lang != 'en' ? '_fr' : '');
+
+        item.find('#info-description').html(options.var_data.acf[desc_key]);
+        item
+          .find('#info-tech-description')
+          .html(options.var_data.acf[tech_key]);
+
         // update frequency select
         plugin.update_frequency();
 
@@ -1200,6 +1464,14 @@
             .trigger('change');
 
           item
+            .find('[data-query-key="scheme"]')
+            .val('default')
+            .trigger('change');
+          item
+            .find('#display-scheme-select .dropdown-toggle')
+            .prop('disabled', true);
+
+          item
             .find(
               '#map-control-aggregation .form-check-input:not(#display-aggregation-grid)',
             )
@@ -1209,6 +1481,9 @@
             .find(
               '#map-control-aggregation .form-check-input:not(#display-aggregation-grid)',
             )
+            .prop('disabled', false);
+          item
+            .find('#display-scheme-select .dropdown-toggle')
             .prop('disabled', false);
         }
 
@@ -1308,31 +1583,61 @@
 
     // fetch colours of default scheme from Geoserver and update the data of the default
     // one in the dropdown
-    update_default_scheme: function () {
+    update_default_scheme: function (callback) {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
 
-      let layer_name = $(document).cdc_app('maps.get_layer_name', options.query);
-      $.getJSON(
-        geoserver_url +
-          '/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic' +
-          '&format=application/json&layer=' +
-          layer_name,
-      ).then(function (data) {
-        let colour_map =
-          data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
+      let default_scheme_element = item.find(
+        '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
+      );
 
-        item
-          .find(
-            '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
-          )
-          .data(
-            'scheme-colours',
-            colour_map.map((e) => e.color),
-          );
+      if (special_variables.hasOwnProperty(options.var_data.slug)) {
+        const special_var = special_variables[options.var_data.slug];
+        default_scheme_element.data(
+          'scheme-colours',
+          special_var.colormap.colours,
+        );
+        default_scheme_element.data(
+          'scheme-quantities',
+          special_var.colormap.quantities,
+        );
         plugin.update_scheme();
-      });
+
+        if (typeof callback === 'function') {
+          callback();
+        }
+      } else {
+        let layer_name = $(document).cdc_app(
+          'maps.get_layer_name',
+          options.query,
+        );
+        $.getJSON(
+          geoserver_url +
+            '/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic' +
+            '&format=application/json&layer=' +
+            layer_name,
+        )
+          .then(function (data) {
+            let colour_map =
+              data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
+
+            default_scheme_element.data(
+              'scheme-colours',
+              colour_map.map((e) => e.color),
+            );
+            default_scheme_element.data(
+              'scheme-quantities',
+              colour_map.map((e) => parseFloat(e.quantity)),
+            );
+            plugin.update_scheme();
+          })
+          .always(function () {
+            if (typeof callback == 'function') {
+              callback();
+            }
+          });
+      }
     },
 
     // Hook that update leaflet params object depending on selected scheme
@@ -1341,26 +1646,32 @@
         options = plugin.options,
         item = plugin.item;
 
+      if (special_variables.hasOwnProperty(options.var_data.slug)) {
+        const special_var = special_variables[options.var_data.slug];
+        layer_params.tiled = false;
+        delete layer_params.sld_body;
+        layer_params.layers = layer_params.layers.replace(
+          ...special_var.layers_replace,
+        );
+        layer_params.styles = special_var.styles;
+        return;
+      }
 
       let selected_item = item.find(
         '#display-scheme-select .dropdown-item[data-scheme-id="' +
-        query.scheme +
-        '"]',
+          query.scheme +
+          '"]',
       );
 
-      if (query.scheme == 'default') {
-        layer_params.styles = '';
+      if (query.scheme === 'default') {
+        delete layer_params.styles;
         layer_params.tiled = true;
-        layer_params.sld_boty = '';
+        delete layer_params.sld_body;
       } else {
         layer_params.tiled = false;
         layer_params.sld_body = plugin.generate_sld(
           layer_params.layers,
-          selected_item.data('scheme-colours'),
-          variables_data[query.var][period_frequency_lut[query.frequency]],
-          query.delta == 'true',
-          selected_item.data('scheme-type'),
-          query.scheme_type == 'discrete',
+          query.scheme_type === 'discrete',
         );
       }
     },
@@ -1407,35 +1718,74 @@
         plugin.redraw_colour_scheme(this);
       });
 
+      plugin.generate_ramp(selected_item);
     },
 
-    generate_sld: function (
-      layer_name,
-      colours,
-      variable_data,
-      delta,
-      type,
-      discrete,
-    ) {
-      let absolute_or_delta = delta ? 'delta' : 'absolute';
+    // generate ramp colours and keypoints, used by SLD or choro, and legend
+    generate_ramp: function (selected_scheme_item) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let colours = selected_scheme_item.data('scheme-colours');
+      let query = options.query;
+      let quantity;
+
+      if (special_variables.hasOwnProperty(options.var_data.slug)) {
+        $.extend(
+          options.legend.colormap,
+          special_variables[options.var_data.slug].colormap,
+        );
+      } else {
+        options.legend.colormap.colours = colours;
+        options.legend.colormap.quantities = [];
+        options.legend.colormap.labels = null;
+        options.legend.colormap.scheme_type = query.scheme_type;
+        options.legend.colormap.categorical = false;
+
+        if (options.query.scheme === 'default') {
+          options.legend.colormap.quantities =
+            selected_scheme_item.data('scheme-quantities');
+        } else {
+          let variable_data =
+            variables_data[query.var][period_frequency_lut[query.frequency]];
+          let absolute_or_delta = query.delta === 'true' ? 'delta' : 'absolute';
+
+          let low = variable_data[absolute_or_delta].low;
+          let high = variable_data[absolute_or_delta].high;
+          let scheme_length = colours.length;
+
+          // if we have a diverging ramp, we center the legend at zero
+          if (selected_scheme_item.data('scheme-type') === 'divergent') {
+            high = Math.max(Math.abs(low), Math.abs(high));
+            low = high * -1;
+          }
+
+          // temperature raster data files are in Kelvin, but in °C in variable_data
+          if (variable_data.unit === 'K' && query.delta !== 'true') {
+            low += 273.15;
+            high += 273.15;
+          }
+
+          let step = (high - low) / scheme_length;
+
+          for (let i = 0; i < scheme_length - 1; i++) {
+            quantity = low + i * step;
+            options.legend.colormap.quantities.push(quantity);
+          }
+          // we need a virtually high value for highest bucket
+          options.legend.colormap.quantities.push((high + 1) * (high + 1));
+        }
+      }
+    },
+
+    generate_sld: function (layer_name, discrete) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let colormap = options.legend.colormap;
       let colormap_type = discrete ? 'intervals' : 'ramp';
-      let low = variable_data[absolute_or_delta].low;
-      let high = variable_data[absolute_or_delta].high;
-      let scheme_length = colours.length;
-
-      // if we have a diverging ramp, we center the legend at zero
-      if (type == 'diverging') {
-        high = Math.max(Math.abs(low), Math.abs(high));
-        low = high * -1;
-      }
-
-      // temperature data files are in Kelvin
-      if (variable_data.unit == 'K' && !delta) {
-        low += 273.15;
-        high += 273.15;
-      }
-
-      let step = (high - low) / scheme_length;
 
       let sld_body = `<?xml version="1.0" encoding="UTF-8"?>
         <StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"
@@ -1444,13 +1794,8 @@
         <NamedLayer><Name>${layer_name}</Name><UserStyle><IsDefault>1</IsDefault><FeatureTypeStyle><Rule><RasterSymbolizer>
         <Opacity>1.0</Opacity><ColorMap type="${colormap_type}">`;
 
-      for (let i = 0; i < scheme_length; i++) {
-        if (discrete && i == scheme_length - 1) {
-          // we need a virtually high value for highest bucket, otherwise it will be blank
-          sld_body += `<ColorMapEntry color="${colours[i]}" quantity="${(high + 1) * (high + 1)}"/>`;
-        } else {
-          sld_body += `<ColorMapEntry color="${colours[i]}" quantity="${low + i * step}"/>`;
-        }
+      for (let i = 0; i < colormap.colours.length; i++) {
+        sld_body += `<ColorMapEntry color="${colormap.colours[i]}" quantity="${colormap.quantities[i]}"/>`;
       }
 
       sld_body +=
@@ -1478,8 +1823,14 @@
           console.log(data);
 
           // add marker
-
           $(document).cdc_app('maps.add_marker', data, function () {});
+
+          // set map center to marker location w/ offset
+          $(document).cdc_app(
+            'maps.set_center',
+            { lat: data.lat, lng: data.lng },
+            10,
+          );
 
           // search field value
           if (data.geo_name != 'Point') {

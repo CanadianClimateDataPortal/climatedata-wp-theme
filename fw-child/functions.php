@@ -223,7 +223,16 @@ function child_theme_enqueue() {
 			wp_enqueue_script ( 'zebra-pin' );
 			// wp_enqueue_script ( 'tab-drawer' );
 			break;
+				
+			case 'beta-apps' :
+			case 'apps-beta' :
+				wp_enqueue_script ( 'zebra-pin' );
+				break;
 		
+	}
+	
+	if ( is_singular ( 'beta-app' ) ) {
+		wp_enqueue_script ( 'iframe-functions', $child_js_dir . 'iframe-functions.js', array ( 'jquery' ), null, true );
 	}
 	
 	wp_enqueue_script ( 'child-functions' );

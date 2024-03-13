@@ -35,9 +35,9 @@ add_action ( 'wp', 'child_global_vars', 20 );
 // process any deployment specific configuration
 
 if ( stream_resolve_include_path ( 'local_config.php' ) ) {
-	include_once 'local_config.php';
+	include_once locate_template ( 'local_config.php' );
 } else {
-	include_once 'default_config.php';
+	include_once locate_template ( 'default_config.php' );
 }
 
 //

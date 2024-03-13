@@ -15,7 +15,7 @@
 		<div id="tab-drawer-container" class="tab-drawer-container">
 			
 			<div id="filters" class="tab-drawer">
-				<div class="tab-drawer-content">
+				<div class="tab-drawer-content stick">
 					<div class="tab-drawer-content-inner">
 						<div class="control-tab-head d-flex justify-content-between">
 							<h5><?php _e ( 'Filters', 'cdc' ); ?></h5>

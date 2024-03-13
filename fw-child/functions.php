@@ -384,7 +384,12 @@ add_action ( 'fw_before_footer', function() {
 	
 ?>
 
-<script type="text/javascript">var L_DISABLE_3D = true;</script>
+<script type="text/javascript">
+	var base_href = '<?php echo $GLOBALS['vars']['home_url']; ?>';
+	var L_DISABLE_3D = true;
+	const DATA_URL = '<?php echo $GLOBALS['vars']['data_url']; ?>';
+	var url_encoder_salt = '<?php echo $GLOBALS['vars']['url_encoder_salt']; ?>';
+</script>
 
 <?php
 

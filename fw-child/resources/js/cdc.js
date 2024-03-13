@@ -96,6 +96,7 @@
         data: {},
       },
       maps: {},
+      station_data: null,
       coords: {
         lat: null,
         lng: null,
@@ -299,16 +300,6 @@
             },
           ).addTo(this_object);
 
-          // stations
-          $.ajax({
-            url: 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y',
-            dataType: 'json',
-            async: false,
-            success: function (data) {
-              options.station_data = data;
-            },
-          });
-
           options.maps[key].legend = L.control({ position: 'topright' });
         }
 
@@ -364,6 +355,8 @@
 
         console.log('---');
         console.log('get layer');
+
+        console.log(query);
 
         switch (query.sector) {
           case 'canadagrid':
@@ -534,6 +527,19 @@
           case 'station':
             console.log('ADD STATIONS');
 
+            if (options.station_data == null) {
+              // stations not yet loaded
+
+              $.ajax({
+                url: 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y',
+                dataType: 'json',
+                async: false,
+                success: function (data) {
+                  options.station_data = data;
+                },
+              });
+            }
+
             Object.keys(options.maps).forEach(function (key) {
               let this_map = options.maps[key];
 
@@ -658,6 +664,7 @@
                   }
 
                   // are we swapping between sectors
+
                   if (options.current_sector != query.sector) {
                     console.log('change sector');
 
@@ -1177,8 +1184,8 @@
             }
           });
 
-          // console.log('merged query');
-          // console.log(JSON.stringify(query, null, 4));
+          console.log('merged query');
+          console.log(JSON.stringify(query, null, 4));
         }
 
         // set cdc_app's options.query too
@@ -1261,7 +1268,7 @@
             query[fn_options.key] = fn_options.val;
           }
 
-          console.log('updated ' + fn_options.key, query[fn_options.key]);
+          // console.log('updated ' + fn_options.key, query[fn_options.key]);
 
           return query[fn_options.key];
 

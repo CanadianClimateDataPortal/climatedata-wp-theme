@@ -1089,9 +1089,15 @@
           options.var_flags.station = true;
         } else {
           // console.log('var is NOT station data');
-          options.query.sector = item
-            .find('[data-query-key="sector"]:checked')
-            .val();
+
+          // find checked radio
+          // or keep default query.sector
+
+          if (item.find('[data-query-key="sector"]:checked').length) {
+            options.query.sector = item
+              .find('[data-query-key="sector"]:checked')
+              .val();
+          }
         }
 
         // always do this stuff

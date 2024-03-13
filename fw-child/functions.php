@@ -35,9 +35,9 @@ add_action ( 'wp', 'child_global_vars', 20 );
 // process any deployment specific configuration
 
 if ( stream_resolve_include_path ( 'local_config.php' ) ) {
-	include_once 'local_config.php';
+	include_once locate_template ( 'local_config.php' );
 } else {
-	include_once 'default_config.php';
+	include_once locate_template ( 'default_config.php' );
 }
 
 //
@@ -288,6 +288,10 @@ function fw_child_theme_support() {
 
 	add_image_size ( 'card-img-no-crop', '600', '380', false );
 
+	// CUSTOM POST TYPE THUMBNAILS
+	
+	add_theme_support ( 'post-thumbnails' );
+	
 	// MENUS
 
 	// LANGUAGES

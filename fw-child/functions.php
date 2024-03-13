@@ -288,6 +288,10 @@ function fw_child_theme_support() {
 
 	add_image_size ( 'card-img-no-crop', '600', '380', false );
 
+	// CUSTOM POST TYPE THUMBNAILS
+	
+	add_theme_support ( 'post-thumbnails' );
+	
 	// MENUS
 
 	// LANGUAGES

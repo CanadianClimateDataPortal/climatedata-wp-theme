@@ -141,8 +141,9 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 					)
 						.insertAfter(this_item)
 						.slideDown(250, function () {
-							this_item.addClass('fd-open')
 						})
+						
+						this_item.addClass('fd-open')
 					
 				})
 				

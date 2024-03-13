@@ -341,16 +341,18 @@
    */
   MapShapesLayer.SHAPE_STYLES = {
     normal: {
-      color: '#000',
-      opacity: 1,
-      weight: 1,
+      color: '#35495d',
+      opacity: 0.6,
+      weight: 0.5,
       fillColor: '#35495d',
-      fillOpacity: 0.5,
+      fillOpacity: 0.2,
     },
     selected: {
       opacity: 1,
-      weight: 5,
-      color: 'blue',
+      weight: 1,
+      color: '#eb1d1f',
+      fillColor: '#eb1d1f',
+      fillOpacity: 0.3,
     },
   }
 

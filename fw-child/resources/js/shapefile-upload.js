@@ -70,11 +70,11 @@
    * Class implementing the "custom shapefile" feature in the "Download" section.
    *
    * The "custom shapefile" feature allows the user to select a local shapefile (using a file input). All the shapes of
-   * the file are then displayed on the map and the user can select the shapes for which they want data.
+   * the file are then displayed on the map and the user can select a shape for which they want data.
    *
    * This class provides all the functionalities required for the feature. It validates the selected shapefile when the
-   * user selects one. It then shows its shapes on the map and allows the user to select shapes. It provides a method to
-   * validate the user selection and to retrieve the selected shapes.
+   * user selects one. It then shows its shapes on the map and allows the user to select a shape. It provides a method
+   * to validate the user selection and to retrieve the selected shape.
    *
    * Supported shapefiles: see the description of `load_shape_file` for the supported format of shapefiles.
    *
@@ -149,43 +149,34 @@
     },
 
     /**
-     * Validate that the user selected valid shapes on the map. Return a boolean indicating if valid.
+     * Validate that the user selected a valid shape on the map, and return an error message if validation fails.
      *
-     * The user's shape selection is valid if it contains at least one shape, and that the total area of the
-     * selected shapes do not exceed a certain threshold (`this.max_allowed_selected_area`).
+     * The user's shape selection is valid if it contains exactly one shape, and that the total area of the
+     * selected shape does not exceed a certain threshold (`this.max_allowed_selected_area`).
      *
-     * Validation errors are also shown in the message container element.
-     *
-     * @returns {boolean}
+     * @returns {string|null} - The error message (localized) if validation failed, else null.
      */
     validate: function() {
       this.message_container.clear();
 
       if (!this.file_input[0].files.length) {
-        this.message_container.show_error(T('Please specify a shapefile'));
-        return false;
+        return T('You selected "Custom shapefile" but didn\'t upload any file');
       }
 
-      if (!this.map_shapes_layer.visible) {
-        return false;
-      }
-
-      if (this.map_shapes_layer.selected_regions.length === 0) {
-        this.message_container.show_error(T('You must select at least one region on the map'));
-        return false;
+      if (this.map_shapes_layer.selected_region == null) {
+        return T('You must select one region of your shapefile');
       }
 
       const total_selected_area = this.map_shapes_layer.calculate_selected_total_area();
       if (total_selected_area > this.max_allowed_selected_area) {
-        this.message_container.show_error(T('The total selected area is too large, please reduce your selection'));
-        return false;
+        return T('The selected region is too large, please select a smaller region');
       }
 
-      return true;
+      return null;
     },
 
     /**
-     * Return, as a JSON string, the user's selected shapes. The JSON can be used in a request to Finch.
+     * Return, as a JSON string, the user's selected shape. The JSON can be used in a request to Finch.
      *
      * Example:
      * <code>
@@ -249,7 +240,7 @@
         .then(shape_file_data => simplify_polygons(shape_file_data))
         .then(topo_json => {
           this.map_shapes_layer.add_topo_json(topo_json);
-          this.message_container.show_info(T('Please select at least one region'));
+          this.message_container.show_info(T('Please select one region'));
         })
         .catch((message_or_error) => {
           this.file_input.val('');
@@ -318,15 +309,15 @@
      */
     show_error: function(message) {
       this.clear();
-      this.container.append('<span class="text-danger">⚠ ' + message + '</span>');
+      this.container.append('<span class="alert-icon"></span> <span class="text-danger"> ' + message + '</span>');
     },
   }
 
   /**
    * Class controlling the "custom shapes" map layer.
    *
-   * Allow to add custom shapes to Leaflet maps, and allow the user to select shapes. Contain methods to retrieve
-   * information about the selected shapes.
+   * Allow to add custom shapes to Leaflet maps, and allow the user to select a shape. Contain methods to retrieve
+   * information about the selected shape.
    *
    * The class can manage multiple maps. All maps are synchronised: calling `add_topo_json()` will add the shapes to all
    * the maps, and de/selecting a shape in one map will de/select it in the other maps.
@@ -336,7 +327,7 @@
    */
   function MapShapesLayer(maps) {
     this.maps = maps;
-    this.selected_regions = [];
+    this.selected_region = null;
     this.shape_layers = {}
     this.geo_json_output = null;
     this.visible = false;
@@ -369,7 +360,7 @@
      * Remove all shapes from the maps.
      */
     clear: function() {
-      this.selected_regions = [];
+      this.selected_region = null;
       for (let map_name in this.maps) {
         this.shape_layers[map_name].clearLayers();
       }
@@ -426,13 +417,12 @@
     handle_region_click: function(event) {
       const shape = event.layer;
       const region_index = shape['feature']['properties']['regionIndex'];
-      const region_is_deselected = this.selected_regions.includes(region_index);
+      const previous_selected_region = this.selected_region;
 
-      // Update the internal list of selected regions
-      if (region_is_deselected) {
-        this.selected_regions = this.selected_regions.filter(e => e !== region_index);
+      if (region_index === previous_selected_region) {
+        this.selected_region = null;
       } else {
-        this.selected_regions.push(region_index);
+        this.selected_region = region_index;
       }
 
       // Update the styles of the maps shapes. For performance reasons, only the selected/deselected shape will have
@@ -441,16 +431,17 @@
         this.shape_layers[map_name].eachLayer((current_shape) => {
           const current_index = current_shape['feature']['properties']['regionIndex'];
 
-          if (current_index === region_index) {
-            current_shape.setStyle(MapShapesLayer.SHAPE_STYLES[region_is_deselected ? 'normal' : 'selected']);
-            return;
+          if (current_index === previous_selected_region) {
+            current_shape.setStyle(MapShapesLayer.SHAPE_STYLES['normal']);
+          } else if (current_index === this.selected_region) {
+            current_shape.setStyle(MapShapesLayer.SHAPE_STYLES['selected']);
           }
         });
       }
     },
 
     /**
-     * Calculate and return the total area of all the selected shapes.
+     * Calculate and return the total area of the selected shape.
      *
      * @returns {number}
      */
@@ -466,18 +457,16 @@
     },
 
     /**
-     * Return the features for all the shapes selected by the user.
+     * Return the features for the shape selected by the user.
      *
      * @returns {*[]}
      */
     get_selected_features: function() {
       const selected_features = [];
 
-      for (let i in this.selected_regions) {
-        const region_index = this.selected_regions[i];
-        const geo_json_feature = this.geo_json_output['features'][region_index];
-        selected_features.push(geo_json_feature);
-      }
+      const region_index = this.selected_region;
+      const geo_json_feature = this.geo_json_output['features'][region_index];
+      selected_features.push(geo_json_feature);
 
       return selected_features
     },
@@ -624,7 +613,7 @@
   }
 
   /**
-   * Simplify the shapes ina shapefile's extracted data.
+   * Simplify the shapes in a shapefile's extracted data.
    *
    * @param shape_file_data
    * @returns {Promise} - A Promise that resolves with the simplified shape data. If an error occurs, rejects with

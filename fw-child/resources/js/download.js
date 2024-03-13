@@ -1449,6 +1449,14 @@
       } else if (prev_id == '#area') {
         if (options.var_flags.station == true) {
         }
+        
+        // Validate the custom shapefile
+        if (options.query.sector === 'custom') {
+          const validation_message = options.elements.shapefile_upload.shapefile_upload('validate');
+          if (validation_message != null) {
+            invalid_messages.push(validation_message);
+          }
+        }
       }
 
       // console.log(invalid_messages);

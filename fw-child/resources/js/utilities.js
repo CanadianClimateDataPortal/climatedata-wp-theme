@@ -191,11 +191,11 @@ var l10n_table = {
     Close: 'Fermer',
 
     // Custom shapefile
-    'Please specify a shapefile': 'Veuillez spécifier un fichier shapefile',
-    'You must select at least one region on the map': 'Vous devez sélectionner au moins une région sur la carte',
-    'The total selected area is too large, please reduce your selection': 'L\'aire totale des régions sélectionnées est trop grosse, veuillez réduire votre sélection',
+    'You selected "Custom shapefile" but didn\'t upload any file': 'Vous avez choisi d\'utiliser un shapefile, mais n\'en avez téléchargé aucun',
+    'You must select one region of your shapefile': 'Vous devez sélectionner une des régions de votre shapefile',
+    'The selected region is too large, please select a smaller region': 'La région sélectionnée est trop grosse, veuillez choisir une région plus petite',
     'Processing your file...': 'Traitement de votre fichier...',
-    'Please select at least one region': 'Veuillez sélectionner au moins une région',
+    'Please select one region': 'Veuillez sélectionner une région',
     'An error occurred': 'Une erreur s\'est produite',
     'Could not process your shapefile': 'Votre fichier shapefile ne peut pas être correctement traité',
     'Your shapefile must be a ZIP containing at least a .shp file and a .prj file': 'Votre fichier shapefile doit être un ZIP qui contient au moins un fichier .shp et un fichier .prj',
@@ -203,7 +203,6 @@ var l10n_table = {
     'No valid shapefile was found in your ZIP file': 'Aucun fichier shapefile n\' été trouvé dans votre fichier ZIP',
     'An error occurred while processing your file': 'Une erreur s\'est produite lors du traitement de votre fichier',
     'Only polygon layers are allowed': 'Seuls les polygones sont permis dans votre fichier',
-
   },
 };
 

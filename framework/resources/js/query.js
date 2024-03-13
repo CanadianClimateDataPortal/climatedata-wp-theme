@@ -357,6 +357,12 @@
 						
 					}
 					
+					if (plugin.debug == true) {
+						console.log('trigger fw_query_success')
+					}
+					
+					$(document).trigger('fw_query_success', [item])
+					
 				}
 			})
 			

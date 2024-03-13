@@ -3,7 +3,7 @@
 		<div class="tab-drawer-content-inner">
 			<div class="control-tab-head d-flex align-items-center justify-content-between">
 				<h5 class="mb-0">Location Detail</h5>
-				<span class="tab-drawer-close">&times;</span>
+				<span class="tab-drawer-close btn-close"></span>
 			</div>
 			
 			<div class="control-tab-body">
@@ -37,6 +37,7 @@
 				
 				<div id="location-tabs-container" class="ms-3 pb-3">
 					
+					<?php /*
 					<ul class="nav nav-tabs ps-3" id="location-tabs" role="tablist">
 						<li class="nav-item" role="presentation">
 							<button class="nav-link active" id="location-time-series-tab" data-bs-toggle="tab" data-bs-target="#location-time-series-pane" type="button" role="tab" aria-controls="location-time-series-pane" aria-selected="true"><?php _e ( 'Time Series', 'cdc' ); ?></button>
@@ -48,6 +49,7 @@
 							<button class="nav-link" id="location-frequency-plot-tab" data-bs-toggle="tab" data-bs-target="#location-frequency-plot-pane" type="button" role="tab" aria-controls="location-frequency-plot-pane" aria-selected="false"><?php _e ( 'Frequency Plot', 'cdc' ); ?></button>
 						</li>
 					</ul>
+					*/ ?>
 					
 					<div class="tab-content" id="location-panes">
 						<!-- tab 1: time series -->
@@ -179,6 +181,7 @@
 									</div>
 								</div>
 								
+								<?php /*
 								<div class="accordion-item">
 									<h2 class="accordion-header">
 										<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#location-chart-axes" aria-expanded="false" aria-controls="location-chart-axes">
@@ -206,7 +209,7 @@
 										</div>
 									</div>
 								</div>
-								
+								*/ ?>
 							</div>
 							
 							

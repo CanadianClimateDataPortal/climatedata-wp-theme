@@ -7,7 +7,7 @@
 					<h5><?php _e ( 'Area of Analysis', 'cdc' ); ?></h5>
 					<p class="mb-0"><?php _e ( 'Use the map to select regions to add to your request.', 'cdc' ); ?></p>
 				</div>
-				<span class="tab-drawer-close">&times;</span>
+				<span class="tab-drawer-close btn-close"></span>
 			</div>
 			
 			<div class="control-tab-body">
@@ -18,16 +18,52 @@
 					</div>
 				</div>
 				
-				<div id="map-control-aggregation" class="map-control-item conditional-trigger">
+				<input type="hidden" name="area-selections" id="area-selections" value="" data-query-key="selections" data-validate="<?php _e ( 'At least 1 map region is required', 'cdc' ); ?>">
+				
+				<div id="map-control-stations" class="map-control-item" data-display="station:1" style="display: none;">
+					<h6 class="all-caps text-secondary"><?php _e ( 'Select Stations', 'cdc' ); ?></h6>
+					
+					<select 
+						class="custom-select custom-select-md select2 form-control input-large" 
+						name="station-select" 
+						id="station-select" 
+						multiple="multiple" 
+						data-placeholder="<?php _e ( 'Select station(s)','cdc' ); ?>"
+						data-container-css-class="big-menu btn btn-lg border-primary" 
+						data-dropdown-css-class="big-menu-dropdown" 
+						data-query-key="station" 
+						data-validate="<?php _e ( 'Select at least one station', 'cdc' ); ?>"
+					>
+						<?php
+					
+							cdc_station_list();
+					
+						?>
+					</select>
+				</div>
+					
+				<div id="map-control-aggregation" class="map-control-item conditional-trigger" data-display="station:0">
 					<h6 class="all-caps text-secondary"><?php _e ( 'Change Aggregation', 'cdc' ); ?></h6>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-grid" value="canadagrid" data-query-key="sector" checked>
+						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-grid" value="canadagrid" data-query-key="sector" data-conditional="#area-aggregation-select-mode">
 						<label class="form-check-label" for="area-aggregation-grid"><?php _e ( 'Gridded Data', 'cdc' ); ?></label>
 					</div>
 					
+					<div id="area-aggregation-select-mode" class="bg-gray-200 p-2">
+						
+						<div class="btn-group" role="group">
+							<input type="radio" class="btn-check" name="area-selection" id="area-selection-select" value="select" autocomplete="off">
+							<label class="btn btn-sm btn-outline-gray-600" for="area-selection-select"><?php _e ( 'Select', 'cdc' ); ?></label>
+						
+							<input type="radio" class="btn-check" name="area-selection" id="area-selection-draw" value="draw" autocomplete="off">
+							<label class="btn btn-sm btn-outline-gray-600" for="area-selection-draw"><?php _e ( 'Draw', 'cdc' ); ?></label>
+						</div>
+						
+					</div>
+					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-csd" value="" data-query-key="census">
+						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-csd" value="census" data-query-key="sector">
 						<label class="form-check-label" for="area-aggregation-csd"><?php _e ( 'Census Subdivisions', 'cdc' ); ?></label>
 					</div>
 					
@@ -42,15 +78,14 @@
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-custom" data-conditional="#area-aggregation-shapefile">
-						<label class="form-check-label" for="area-aggregation-custom"><?php _e ( 'Custom shapefile', 'cdc' ); ?></label>
+						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-upload" value="upload" data-query-key="sector" data-conditional="#area-aggregation-shapefile">
+						<label class="form-check-label" for="area-aggregation-upload"><?php _e ( 'Upload Custom Shapefile', 'cdc' ); ?></label>
 					</div>
 					
 					<div id="area-aggregation-shapefile" class="bg-gray-200 p-2">
 						<label for="area-aggregation-shapefile-input" class="form-label"><?php _e ( 'Drop your GeoJSON file here to upload', 'cdc' ); ?></label>
 						<input class="form-control form-control-sm" id="area-aggregation-shapefile-input" type="file">
 					</div>
-					
 				</div>
 				
 				<div id="map-control-search" class="map-control-item">

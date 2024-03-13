@@ -3,7 +3,7 @@
 		<div class="tab-drawer-content-inner">
 			<div class="control-tab-head d-flex align-items-center justify-content-between">
 				<h5 class="mb-0">Location</h5>
-				<span class="tab-drawer-close">&times;</span>
+				<span class="tab-drawer-close btn-close"></span>
 			</div>
 			
 			<div class="control-tab-body">
@@ -11,10 +11,42 @@
 				<div id="map-control-search" class="map-control-item">
 					<label for="area-search"  class="h6 all-caps text-secondary">Search</label>
 					
+					<?php
+						
+						// location var
+						
+					?>
+					
 					<input type="hidden" name="area-location" id="area-location" data-query-key="location">
 					
-					<input type="text" class="form-control" name="area-search" id="area-search" placeholder="City, landmark or postal code">
+					<?php
 					
+						// search var
+						
+					?>
+					
+					<select 
+						class="custom-select custom-select-md select2 form-control" 
+						name="area-search" 
+						id="area-search" 
+						data-placeholder="<?php _e ( 'City, landmark or postal code','cdc' ); ?>"
+					>
+						<option value=""><?php _e('Search for a City/Town', 'cdc'); ?></option>
+						
+						<?php
+							
+							if ( isset ( $_GET['search'] ) ) {
+				
+						?>
+				
+						<option value="<?php echo $_GET['search']; ?>"><?php echo 'search val'; //echo $GLOBALS['vars']['current_data']['location_data']['geo_name']; ?></option>
+				
+						<?php
+							
+							}
+						
+						?>
+					</select>
 				</div>
 				
 				<div id="map-control-recent" class="map-control-item">

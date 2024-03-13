@@ -57,6 +57,7 @@ add_action ( 'fw_before_element_open', 'fw_output_extras_before_open', 10, 3 );
 add_action ( 'fw_after_element_open', 'fw_output_extras_after_open', 10, 3 );
 add_action ( 'fw_before_element_close', 'fw_output_element_children', 10, 4 );
 add_action ( 'fw_before_element_close', 'fw_output_extras_before_close', 11, 4 );
+add_action ( 'fw_after_element_close', 'fw_output_extras_after_close', 11, 4 );
 
 // BEFORE OPEN 
 
@@ -81,6 +82,10 @@ function fw_output_extras_before_open ( $element, $level, $settings ) {
 			foreach ( $setting_obj as $setting => $options ) {
 				
 				switch ( $setting ) {
+					
+					case 'carousel' :
+						
+						break;
 						
 					case 'offcanvas' :
 						
@@ -108,6 +113,17 @@ function fw_output_extras_before_open ( $element, $level, $settings ) {
 		}
 	}
 	
+	// other alterations
+	
+	if (
+		isset ( $GLOBALS['fw']['carousel'] ) && 
+		$GLOBALS['fw']['carousel']['slide'] == $settings['el_type']
+	) {
+		
+		echo '<div class="swiper-slide skip-init"><!-- extra wrapper for .col slide -->';
+		
+	}
+	
 }
 
 // AFTER OPEN
@@ -117,8 +133,6 @@ function fw_output_extras_after_open ( $element, $level, $settings ) {
 	// check for settings
 	
 	if ( isset ( $element['inputs']['settings'] ) ) {
-		
-		// dumpit ( $element['inputs']['settings'] );
 		
 		foreach ( $element['inputs']['settings'] as $setting_obj ) {
 			foreach ( $setting_obj as $setting => $options ) {
@@ -211,6 +225,23 @@ function fw_output_extras_before_close ( $element, $level, $settings, $include_a
 		}
 	}
 
+}
+
+// AFTER CLOSE
+
+function fw_output_extras_after_close ( $element, $level, $settings, $include_autogen ) {
+
+	// other alterations
+	
+	if (
+		isset ( $GLOBALS['fw']['carousel'] ) && 
+		$GLOBALS['fw']['carousel']['slide'] == $settings['el_type']
+	) {
+		
+		echo '</div><!-- close extra wrapper for .col slide -->';
+		
+	}
+	
 }
 
 //
@@ -964,6 +995,10 @@ function fw_output_element ( $element, $level, $globals, $include_autogen, $call
 		
 		if ( $settings['el_type'] != 'template' ) {
 			echo '</div>';
+		}
+		
+		if ( $callbacks == true ) {
+			do_action ( 'fw_after_element_close', $element, $level, $settings, $include_autogen );
 		}
 	
 	} else {

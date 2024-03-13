@@ -254,7 +254,7 @@ function fw_menu_output ( $menu, $level, $type, $classes ) {
 	echo '">';
 
 	foreach ( $menu as $item ) {
-
+	
 		echo '<li class="';
 
 		if (
@@ -274,12 +274,7 @@ function fw_menu_output ( $menu, $level, $type, $classes ) {
 		}
 
 		// other classes
-
-		// if ( isset ( $item_class ) ) {
-			echo $item_class;
-		// }
-
-		if ( isset ( $item['class'] ) ) echo ' ' . $item['class'];
+		echo $item_class;
 
 		echo '">';
 
@@ -297,20 +292,11 @@ function fw_menu_output ( $menu, $level, $type, $classes ) {
 			) {
 				echo 'current-nav-link ';
 			}
-
-			// if ( isset ( $item['classes'] ) && is_array ( $item['classes'] ) ) {
-
-				echo $link_class;
-				// echo implode ( ' ' , $item['classes'] ) . ' ';
-
-			// }
-
-// 			if ( isset ( $link_class ) && is_array ( $link_class ) ) {
-// 
-// 				echo implode ( ' ' , $link_class );
-// 
-// 			}
-
+			
+			if ( isset ( $item['classes'] ) && is_array ( $item['classes'] ) ) echo ' ' . implode ( ' ', $item['classes'] );
+			
+			echo ' ' . $link_class;
+			
 			echo '">';
 
 			if ( isset ( $item['icon'] ) && $item['icon'] != '' ) {

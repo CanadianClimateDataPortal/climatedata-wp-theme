@@ -1,15 +1,15 @@
 <div class="news-meta-item mb-3 mb-lg-4">
-	<h6 class="all-caps text-gray-300"><?php _e ( 'Date', 'cdc' ); ?></h6>
+	<h6 class="mb-3 all-caps text-blue-100"><?php _e ( 'Date', 'cdc' ); ?></h6>
 	
 	<?php 
-	
-		the_time ( 'F j, Y' );
+		
+		the_time ( __( 'F j, Y', 'cdc' ) );
 	
 	?>
 </div>
 
 <div class="news-meta-item mb-3 mb-lg-4">
-	<h6 class="all-caps text-gray-300"><?php _e ( 'Author', 'cdc' ); ?></h6>
+	<h6 class="mb-3 all-caps text-blue-100"><?php _e ( 'Author', 'cdc' ); ?></h6>
 	
 	<?php
 	
@@ -27,7 +27,7 @@
 ?>
 
 <div class="news-meta-item mb-3 mb-lg-4">
-	<h6 class="all-caps text-gray-300"><?php _e ( 'Topics', 'cdc' ); ?></h6>
+	<h6 class="mb-3 all-caps text-blue-100"><?php _e ( 'Topics', 'cdc' ); ?></h6>
 	
 	<p><?php
 	
@@ -49,7 +49,9 @@
 ?>
 
 <div class="news-meta-item mb-3 mb-lg-4">
-	<h6 class="all-caps text-gray-300"><?php _e ( 'Share this post', 'cdc' ); ?></h6>
+	<h6 class="mb-3 all-caps text-blue-100"><?php _e ( 'Share this post', 'cdc' ); ?></h6>
 	
-	share
+	<div id="post-share-wrap">
+		<div id="share"></div>
+	</div>
 </div>

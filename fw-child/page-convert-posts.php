@@ -57,7 +57,94 @@ if ( current_user_can ( 'administrator' ) ) {
 					
 					// 3. insert 'standard page' builder layout
 					
-					update_post_meta ( $en_ID, 'builder', '{ "type": "page", "inputs": { "id": "auto" }, "post_id": "' . $en_ID . '", "key": "' . $en_ID . '", "children": [ { "type": "template", "inputs": { "source": "post", "post_id": "11434", "path": "", "output": "template", "id": "auto", "class": [ "" ] }, "key": "' . $en_ID . '-1" }, { "type": "section", "inputs": { "id": "auto", "class": [ "" ], "settings": [ { "spacing": { "type": "spacing", "rows": [ { "property": "p", "side": "y", "breakpoint": "", "value": "4", "index": "0" }, { "property": "p", "side": "y", "breakpoint": "md", "value": "6", "index": "0" }, { "property": "p", "side": "y", "breakpoint": "lg", "value": "8", "index": "1" } ], "index": "0" } } ] }, "key": "' . $en_ID . '-2", "children": [ { "classes": [ "fw-element", "fw-template" ], "type": "template", "inputs": { "source": "include", "post_id": "", "path": "old-post-loop.php", "output": "", "id": "auto", "class": [ "" ] }, "key": "' . $en_ID . '-2-1" } ] }, { "type": "template", "inputs": { "source": "post", "post_id": "11315", "path": "", "output": "template", "id": "auto", "class": [ "" ] }, "key": "' . $en_ID . '-3" } ] }' );
+					$builder = [
+						"type" => "page",
+						"inputs" => ["id" => "auto"],
+						"post_id" => "11443",
+						"key" => "11443",
+						"children" => [
+							[
+								"type" => "template",
+								"inputs" => [
+									"source" => "post",
+									"post_id" => "11434",
+									"path" => "",
+									"output" => "template",
+									"id" => "auto",
+									"class" => [""],
+								],
+								"key" => "11443-1",
+							],
+							[
+								"type" => "section",
+								"inputs" => [
+									"id" => "auto",
+									"class" => [""],
+									"settings" => [
+										[
+											"spacing" => [
+												"type" => "spacing",
+												"rows" => [
+													[
+														"property" => "p",
+														"side" => "y",
+														"breakpoint" => "",
+														"value" => "4",
+														"index" => "0",
+													],
+													[
+														"property" => "p",
+														"side" => "y",
+														"breakpoint" => "md",
+														"value" => "6",
+														"index" => "0",
+													],
+													[
+														"property" => "p",
+														"side" => "y",
+														"breakpoint" => "lg",
+														"value" => "8",
+														"index" => "1",
+													],
+												],
+												"index" => "0",
+											],
+										],
+									],
+								],
+								"key" => "11443-2",
+								"children" => [
+									[
+										"classes" => ["fw-element", "fw-template"],
+										"type" => "template",
+										"inputs" => [
+											"source" => "include",
+											"post_id" => "",
+											"path" => "old-post-loop.php",
+											"output" => "",
+											"id" => "auto",
+											"class" => [""],
+										],
+										"key" => "11443-2-1",
+									],
+								],
+							],
+							[
+								"type" => "template",
+								"inputs" => [
+									"source" => "post",
+									"post_id" => "11315",
+									"path" => "",
+									"output" => "template",
+									"id" => "auto",
+									"class" => [""],
+								],
+								"key" => "11443-3",
+							],
+						],
+					];
+
+					update_post_meta ( $en_ID, 'builder', json_encode ( $builder, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) );
 					
 					echo 'updated builder layout<br>';
 					
@@ -66,22 +153,22 @@ if ( current_user_can ( 'administrator' ) ) {
 					// 4. get the HTML
 					// using a modified loop of the OLD system
 					
-					// $output = '';
-					// 
-					// ob_start();
-					// 
-					// include ( locate_template ( 'template/old-loop/sections.php' ) );
-					// 
-					// $output = ob_get_clean();
+					$output = '';
+					
+					ob_start();
+					
+					include ( locate_template ( 'template/old-loop/sections.php' ) );
+					
+					$output = ob_get_clean();
 					
 					// ob_end_flush();
 					
-					update_field ( 'old_output_en', '', $en_ID );
+					// update_field ( 'old_output_en', '', $en_ID );
 					
 					// 5. add it to 'old_output_en'
 					
-					// update_field ( 'old_output_en', $output );
-					// 
+					update_field ( 'old_output_en', $output );
+					
 					// echo 'populated english field<br>';
 					
 					// echo $output;
@@ -110,23 +197,23 @@ if ( current_user_can ( 'administrator' ) ) {
 						
 						echo '<h4>' . get_the_title() . '</h4>';
 						
-						// $output = '';
+						$output = '';
 						
-						// ob_start();
-						// 
-						// include ( locate_template ( 'template/old-loop/sections.php' ) );
-						// 
-						// $output = ob_get_clean();
-						// 
-						// if ( $output != '' ) {
-						// 	// ob_end_flush();
-						// 	
-						// 	update_field ( 'old_output_fr', $output, $en_ID );	
-						// 	
-						// 	echo 'populated FR field<br>';
-						// }
+						ob_start();
 						
-						update_field ( 'old_output_fr', '', $en_ID );
+						include ( locate_template ( 'template/old-loop/sections.php' ) );
+						
+						$output = ob_get_clean();
+						
+						if ( $output != '' ) {
+							// ob_end_flush();
+							
+							update_field ( 'old_output_fr', $output, $en_ID );	
+							
+							echo 'populated FR field<br>';
+						}
+						
+						// update_field ( 'old_output_fr', '', $en_ID );
 						
 						wp_update_post ( array (
 							'ID' => $fr_ID,

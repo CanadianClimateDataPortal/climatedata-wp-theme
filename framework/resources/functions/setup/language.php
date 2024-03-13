@@ -1,7 +1,5 @@
 <?php
 
-
-
 function fw_replace_lang_domain ( $str ) {
 	
 	$new_str = $str;

@@ -17,9 +17,22 @@
 		
 			foreach ( $element['inputs']['static']['rows'] as $static_parent ) {
 				
+				$static_title = get_the_title ( $static_parent['page'] );
+				
+				if (
+					isset ( $static_parent['text'][$globals['current_lang_code']] ) &&
+					$static_parent['text'][$globals['current_lang_code']] != ''
+				) {
+					$static_title = $static_parent['text'][$globals['current_lang_code']];
+				}
+				
 		?>
 		
-		<li class="breadcrumb-item"><a href="<?php echo translate_permalink ( get_permalink ( $static_parent['page'] ), $static_parent['page'], $globals['current_lang_code'] ); ?>"><?php echo $static_parent['text'][$globals['current_lang_code']]; ?></a>
+		<li class="breadcrumb-item"><a href="<?php echo translate_permalink ( get_permalink ( $static_parent['page'] ), $static_parent['page'], $globals['current_lang_code'] ); ?>"><?php 
+		
+			echo $static_title;
+			
+		?></a>
 		
 		<?php
 				

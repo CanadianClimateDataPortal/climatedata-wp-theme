@@ -2,7 +2,7 @@
 	<div id="control-bar" class="control-bar tab-drawer-tabs-container">
 		
 		<div id="control-bar-tabs" class="tab-drawer-tabs pt-2">
-			<a href="#topics" class="tab-drawer-trigger">
+			<a href="#topics" class="control-bar-tab-link tab-drawer-trigger">
 				<span class="cdc-icon"><?php
 				
 					echo file_get_contents ( locate_template ( 'resources/img/icon-topic.svg' ) );
@@ -11,7 +11,7 @@
 				<span><?php _e ( 'Topics', 'cdc' ); ?></span>
 			</a>
 			
-			<a href="#filters" class="tab-drawer-trigger">
+			<a href="#filters" class="control-bar-tab-link tab-drawer-trigger">
 				<span class="cdc-icon"><?php
 				
 					echo file_get_contents ( locate_template ( 'resources/img/icon-display.svg' ) );
@@ -24,11 +24,11 @@
 		<div id="tab-drawer-container" class="tab-drawer-container">
 			
 			<div id="topics" class="tab-drawer">
-				<div class="tab-drawer-content">
+				<div class="tab-drawer-content stick">
 					<div class="tab-drawer-content-inner">
 						<div class="control-tab-head d-flex justify-content-between">
 							<h5><?php _e ( 'Topics', 'cdc' ); ?></h5>
-							<span class="tab-drawer-close">&times;</span>
+							<span class="tab-drawer-close btn-close"></span>
 						</div>
 						
 						<div class="control-tab-body ps-2">
@@ -75,11 +75,11 @@
 			</div>
 			
 			<div id="filters" class="tab-drawer">
-				<div class="tab-drawer-content">
+				<div class="tab-drawer-content stick">
 					<div class="tab-drawer-content-inner">
 						<div class="control-tab-head d-flex justify-content-between">
 							<h5><?php _e ( 'Filters', 'cdc' ); ?></h5>
-							<span class="tab-drawer-close">&times;</span>
+							<span class="tab-drawer-close btn-close"></span>
 						</div>
 						
 						<div class="control-tab-body query-container">

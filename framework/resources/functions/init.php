@@ -15,6 +15,8 @@ function fw_register_session() {
 		session_start();
 		session_write_close();
 	}
+	
+	flush_rewrite_rules ( true );
 }
 
 function end_session() {

@@ -100,7 +100,8 @@
 		init: function () {
 
 			let plugin = this,
-					options = plugin.options
+					options = plugin.options,
+					item = plugin.item
 
 			//
 			// INITIALIZE
@@ -208,11 +209,37 @@
 					$('body').removeClass('fw-builder')
 					$(this).find('.badge').text('Off').removeClass('text-bg-success').addClass('text-bg-warning')
 					
+					if (Object.keys(swipers).length) {
+						console.log('init swipers')
+						
+						for (let key in swipers) {
+							
+							console.log(swipers[key].element)
+							
+							swipers[key].element.addClass('swiper')
+							swipers[key].element.children().first().addClass('swiper-wrapper')
+							
+							swipers[key].instance = new Swiper('#' + swipers[key].element.attr('id'), swipers[key].settings)
+							
+						}
+					}
+					
 				} else {
 					
 					$('body').addClass('fw-builder')
 					$(this).find('.badge').text('On').removeClass('text-bg-warning').addClass('text-bg-success')
 					options.status = 'ready'
+					
+					if (Object.keys(swipers).length) {
+						console.log('destroy swipers')
+						
+						for (let key in swipers) {
+							swipers[key].instance.destroy(true, true)
+							
+							swipers[key].element.removeClass('swiper')
+							swipers[key].element.find('.swiper-wrapper').removeClass('swiper-wrapper')
+						}
+					}
 					
 				}
 				
@@ -957,7 +984,7 @@
 						
 						// generate a key for the new element
 						
-						if (!options.parent.data.children) {
+						if (options.parent.data.children == undefined) {
 							options.parent.data.children = []
 						}
 						
@@ -1467,41 +1494,42 @@
 						
 						obj_data = JSON.parse(obj_data)
 						
-						// options.page = JSON.parse(obj_data.replaceAll(element.obj_data.inputs.post_id, options.globals.current_query.ID))
+						let template_parent = null
 						
-						// find the first non-autogen child
+						function check_obj(children, parent) {
+							children.forEach(function(child) {
+								if (template_parent == null) {
+									
+									// if this child is not auto-generated
+									if (
+										typeof child.autogen == 'undefined' || 
+										child.autogen == false || 
+										child.autogen == 'false'
+									) {
+										template_parent = parent
+									} else {
+										if (child.children != undefined)
+											check_obj(child.children, child)
+									}	
+								}
+							})
+						} 
 						
-						function find_real_child(obj) {
-							if (obj.autogen == undefined || obj.autogen == 'false') {
-								return obj
-							} else {
-								return find_real_child(obj.children[0])
-							}
+						check_obj(obj_data.children, obj_data)
+						
+						console.log(template_parent)
+						
+						if (template_parent != null) {
+							obj_data = template_parent.children
 						}
 						
-						obj_data = find_real_child(obj_data.children[0])
+						// console.log('obj_data')
+						// console.log(JSON.stringify(obj_data, null, 4))
 						
 						let insert_index = options.inserting.index
 						
 						if (options.inserting.where !== 'before') {
 							insert_index += 1
-						}
-						
-						if (
-							options.parent.data.children.length == 0 || 
-							options.parent.data.children == undefined
-						) {
-							
-							options.parent.data.children = [ obj_data ]
-							
-						} else {
-							
-							// parent.data.children has values already
-							// so we need to figure out where to
-							// put the new stuff
-							
-							let deleted_array = options.parent.data.children.splice(insert_index, 0, obj_data)
-							
 						}
 						
 						// console.log('children now')
@@ -1522,22 +1550,53 @@
 								// let new_html = $(loop_data.replaceAll(source_ID, options.globals.current_query.ID))
 								
 								// find first non-autogen element
-								let new_html = $(loop_data).find('.fw-element:not(.fw-page):not(.fw-auto-generated').first()
+								let new_html = $(loop_data).find('.fw-element:not(.fw-page):not(.fw-auto-generated').first().prop('outerHTML') + $(loop_data).find('.fw-element:not(.fw-page):not(.fw-auto-generated').first().nextAll().prop('outerHTML')
+								
+								// console.log('new_html')
+								// console.log(new_html)
 								
 								let keep_parent = parent
 								
 								// console.log('keep 1')
 								// console.log(JSON.stringify(keep_parent, null, 2))
 								
-								options.template_html = new_html.prop('outerHTML')
+								options.template_html = new_html//.prop('outerHTML')
 								
 								element.data = obj_data
 								
 								// console.log('new html', new_html.prop('outerHTML'))
-								element.item = new_html.prop('outerHTML')
+								element.item = $(new_html)//.prop('outerHTML')
 								
 								// auto-generate any required parents
-								plugin.create_tree(parent, element)
+								let auto_els = plugin.create_tree(parent, element)
+								
+								if (auto_els.length) {
+									keep_parent = options.parent
+								}
+								
+								// if we created autogen elements,
+								// the parent was updated by create_tree
+								
+								if (
+									options.parent.data.children.length == 0 || 
+									options.parent.data.children == undefined
+								) {
+									
+									if (Array.isArray(obj_data)) {
+										options.parent.data.children = obj_data
+									} else {
+										options.parent.data.children = [ obj_data ]
+									}
+									
+								} else {
+									
+									// parent.data.children has values already
+									// so we need to figure out where to
+									// put the new stuff
+									
+									let deleted_array = options.parent.data.children.splice(insert_index, 0, ...obj_data)
+									
+								}
 								
 								// add the html to the tree
 								console.log(options.inserting)
@@ -1563,11 +1622,14 @@
 									
 								}
 								
-								// console.log('eq', insert_eq)
+								console.log('new item')
+								console.log(element.item)
+								
+								console.log('eq', insert_eq)
 								
 								switch (options.inserting.where) {
 									case 'append' :
-										new_html.appendTo(keep_parent.item)
+										$(new_html).appendTo(keep_parent.item)
 										break
 										
 									case 'before' :
@@ -1578,7 +1640,7 @@
 											insert_eq = insert_eq[0]
 										}
 										
-										new_html.insertBefore(insert_eq)
+										$(new_html).insertBefore(insert_eq)
 										
 										break
 										
@@ -1592,7 +1654,7 @@
 											insert_eq = insert_eq[insert_eq.length - 1]
 										}
 										
-										new_html.insertAfter(insert_eq)
+										$(new_html).insertAfter(insert_eq)
 										
 										break
 										
@@ -1603,6 +1665,9 @@
 								plugin.set_element_keys()
 								
 								// activate new elements
+								console.log('activate new')
+								console.log(keep_parent)
+								
 								plugin.activate(keep_parent.data)
 								
 							}
@@ -1709,6 +1774,10 @@
 					temp_key = options.parent.data.key
 			
 			// console.log('create tree now')
+			// console.log(parent)
+			// console.log(element)
+			
+			let created_elements = []
 			
 			// find the right spot to begin the tree
 			
@@ -1736,7 +1805,15 @@
 			
 			// object type to compare with elements of options.objects
 			
-			let comparing_key = element.data.type
+			let comparing_key
+			
+			if (Array.isArray(element.data)) {
+				comparing_key = element.data[0].type
+			} else {
+				comparing_key = element.data.type
+			}
+			
+			console.log('comparing key', comparing_key)
 						
 			if (comparing_key.includes('block/')) {
 				comparing_key = 'block'
@@ -1844,7 +1921,9 @@
 									
 								}
 								
-								console.log('auto-generating temp_element ' + object_type + ' ' + temp_key + ' in ' + options.parent.data.type )
+								created_elements.push(temp_key)
+								
+								// console.log('auto-generating temp_element ' + object_type + ' ' + temp_key + ' in ' + options.parent.data.type )
 								
 								temp_element = {
 									item: $('<div class="' + options.objects[object_type].classes.join(' ') + ' fw-auto-generated" data-key="' + temp_key + '"></div>'), // DOM element to be inserted into page
@@ -1967,7 +2046,7 @@
 						
 					}
 					
-					// console.log('temp parent at end of iteration', temp_parent.data.key)
+					console.log('parent at end of iteration', options.parent.data.key)
 				}
 				
 			}
@@ -1989,6 +2068,8 @@
 				options.element.item = $('<div>')
 				
 			}
+			
+			return created_elements
 			
 		},
 		
@@ -2296,10 +2377,14 @@
 					break
 			
 				case 'image' :
-				
-					let img_urls = JSON.parse(element.data.inputs.file.url)
-				
-					element.item.find('.fw-element-inner').html('<img src="' + img_urls.full + '">')
+					
+					if (element.data.inputs.file.url != '') {
+						let img_urls = JSON.parse(element.data.inputs.file.url)
+					
+						element.item.find('.fw-element-inner').html('<img src="' + img_urls.full + '">')
+					} else {
+						console.warn('fw', 'element ' + element.data.key, 'no image selected')
+					}
 					
 					break
 					
@@ -2354,26 +2439,11 @@
 			
 			// console.log('activate', parent)
 			
-			// if (
-			// 	parent.type == 'page' &&
-			// 	!parent.children
-			// ) {
-			// 	
-			// 	// blank page
-			// 	
-			// 	$('.fw-element[data-key="' + parent.key + '"]').append(plugin.do_insert_btn(options.page))
-			// 	
-			// }
-			
-			// if (parent.type == 'template') {
-			// 	plugin.add_footer()
-			// }
-			
 			if (parent.children) {
 				
 				parent.children.forEach(function(child, i) {
 					
-					// console.log(child.key)
+					// console.log('activate', child)
 					
 					// find the item
 					
@@ -3741,8 +3811,11 @@
 			flatten_data.forEach(function(input) {
 				
 				let this_input = modal_form.find('[name="inputs-' + input.property + '"]'),
-						this_val = input.value
-						
+						this_val = plugin.unescape(input.value)
+				
+				// console.log('---')
+				// console.log('input', this_input)		
+				
 				if (
 					input.property.includes('rows[]') &&
 					repeater_index == -1
@@ -3750,43 +3823,81 @@
 					repeater_index = 0
 				}
 				
-				if (this_input.parents('.fw-form-repeater').length) {
+				if (
+					this_input.length &&
+					this_input.parents('.fw-form-repeater').length
+				) {
 					
-					// console.log(input.property + ' is in a repeater row')
+					// single out the input that's in the current repeater row
 					
-					if (
-						input.property.includes('[]') &&
-						input.property.includes('index')
-					) {
-						
-						repeater_index += 1
-						
-						// console.log('new index', repeater_index)
-						
-					}
+					this_input = modal_form.find('[data-row-index="' + repeater_index + '"]').find('[name="inputs-' + input.property + '"]')
+				}
+				
+				if (this_input.length) {
 					
-				} else if (this_input.parents('.fw-form-flex-row').length) {
-						
-					repeater_index = -1
-					// console.log(input.property + ' is in a flex row')
+					// found an input matching the row and name
 					
-					if (
-						input.property.includes('[]') &&
-						input.property.includes('type')
-					) {
+					if (this_input.parents('.fw-form-repeater').length) {
 						
-						flex_type = input.value
-						flex_index += 1
+						// console.log(input.property + ' is in a repeater row')
 						
-						// console.log('new type', flex_type)
+						if (
+							input.property.includes('[]') &&
+							input.property.includes('index')
+						) {
+							
+							repeater_index += 1
+							
+							// console.log('new index', repeater_index)
+							
+						}
+						
+					} else if (this_input.parents('.fw-form-flex-row').length) {
+							
+						repeater_index = -1
+						// console.log(input.property + ' is in a flex row')
+						
+						if (
+							input.property.includes('[]') &&
+							input.property.includes('type')
+						) {
+							
+							flex_type = input.value
+							flex_index += 1
+							
+							// console.log('new type', flex_type)
+							
+						}
+						
+					} else {
+					
+						repeater_index = -1
+						flex_type = null
+						flex_index = -1
 						
 					}
 					
 				} else {
 					
-					repeater_index = -1
-					flex_type = null
-					flex_index = -1
+					// row doesn't have this input name
+					
+					// console.log('no input, add hidden')
+					
+					// this will be 100x easier
+					// if we add a data-key to repeater rows
+					
+					let this_index_name = input.property.split('[]'),
+							pop_index = this_index_name.pop()
+					
+					this_index_name = this_index_name.join('[]') + '[]-index'
+					
+					// find the hidden index field and prepend
+					
+					let this_index_field = modal_form.find('[name="inputs-' + this_index_name + '"][value="' + repeater_index + '"]')
+					
+					// insert before the index field
+					
+					this_input = $('<input type="hidden" name="inputs-' + input.property + '" value="' + input.value + '">').insertBefore(this_index_field)
 					
 				}
 			
@@ -3800,11 +3911,17 @@
 					
 					if (flex_type != null) {
 						
-						// repeater in a flex
+						// repeater is also in a flex
 						
 						this_input = modal_form.find('.fw-form-flex-row[data-item="' + flex_type + '"][data-row-index="' + flex_index + '"]').find('.fw-form-repeater-row[data-row-index="' + repeater_index + '"] [name="inputs-' + input.property + '"]')
 						
 					} else {
+						
+						// console.log('find repeater element now')
+						// 
+						// console.log('all input matches', this_input)
+						// 
+						// console.log('get index', repeater_index)
 						
 						// repeater only
 						
@@ -3857,12 +3974,6 @@
 					
 				}
 				
-				if (Array.isArray(this_val)) {
-					// not sure why i did this
-					this_input = modal_form.find('[name="inputs-' + input.property + '[]"]')
-					
-				}
-					
 				if (this_input.length) {
 					
 					if (input.property.includes('-d')) {
@@ -3934,16 +4045,24 @@
 				if (this_input.hasClass('uploader-file-url')) {
 					
 					let this_container = this_input.closest('.uploader-container'),
-							img_urls = JSON.parse(this_val)
+							img_urls = null
+							
+					if (this_val != '') {
+						img_urls = JSON.parse(this_val)
+					}
 					
 					console.log(img_urls)
 					
-					if (this_container.attr('data-uploader-type') == 'image') {
-					
-						this_container.find('.image-placeholder').html('<img src="' + img_urls.full + '">')
+					if (img_urls != null && img_urls.hasOwnProperty('full')) {
 						
-					} else if (this_container.attr('data-uploader-type') == 'video') {
-						this_container.find('.image-placeholder').text(img_urls.full.split('/').slice(-1))
+						if (this_container.attr('data-uploader-type') == 'image') {
+						
+							this_container.find('.image-placeholder').html('<img src="' + img_urls.full + '">')
+							
+						} else if (this_container.attr('data-uploader-type') == 'video') {
+							this_container.find('.image-placeholder').text(img_urls.full.split('/').slice(-1))
+						}
+						
 					}
 					
 				}
@@ -4562,7 +4681,6 @@
 			
 				element_data.inputs = plugin.reset_arrays(element_data.inputs)
 				
-			} else {
 			}
 			
 			options.data.array_key = ''
@@ -4578,11 +4696,11 @@
 				
 				// format value
 				
-				if (input.name.includes('inputs-title')) {
-					input.value = plugin.escape(input.value)
-				}
-				
-				if (input.name.includes('code')) {
+				if (
+					input.name.includes('text') ||
+					input.name.includes('inputs-title') ||
+					input.name.includes('code')
+				) {
 					input.value = plugin.escape(input.value)
 				}
 				
@@ -5152,26 +5270,55 @@
 			
 		},
 		
-		escape: function(htmlStr = '') {
-			return htmlStr.replace(/&/g, "&amp;")
-				.replace(/\n/g, "")
-				.replace(/</g, "&lt;")
-				.replace(/>/g, "&gt;")
-				.replace(/"/g, "&quot;")
-				.replace(/'/g, "&#39;")
+		escape: function(str = '') {
+			
+			str = [...str];
+			//    ^ es20XX spread to Array: keeps surrogate pairs
+			
+			let i = str.length, aRet = [];
+			
+			while (i--) {
+				var iC = str[i].codePointAt(0);
+				if (iC < 65 || iC > 127 || (iC>90 && iC<97)) {
+					aRet[i] = '&#'+iC+';';
+				} else {
+					aRet[i] = str[i];
+				}
+			}
+			
+			str = aRet.join('');
+			
+			// dial it back a notch
+			str = str.replaceAll('&#32;', ' ')
+				.replaceAll('&#44;', ',')
+				.replaceAll('&#45;', '-')
+				.replaceAll('&#46;', '.')
+				.replaceAll('&#47;', '/')
+				.replaceAll('&#58;', ':')
+				.replaceAll('&#61;', '=')
+			
+			return str
+			
 		},
 		
-		unescape: function(htmlStr = '') {
+		unescape: function(str = '') {
 			
-			// console.log('unescape', htmlStr)
+			if (typeof str == 'string') {
+				// console.log('unescape', str)
+				
+				str = str.replace(/&#([0-9]{1,3});/gi, function(match, numStr) {
+					let num = parseInt(numStr, 10)
+					return String.fromCharCode(num)
+				})
+				
+				// str = str.replaceAll(/&lt;/g , "<")
+				// str = str.replaceAll(/&gt;/g , ">")
+				// str = str.replaceAll(/&quot;/g , "\"")
+				// str = str.replaceAll(/&#39;/g , "\'")
+				// str = str.replaceAll(/&amp;/g , "&")
+			}
 			
-			htmlStr = htmlStr.replace(/&lt;/g , "<")
-			htmlStr = htmlStr.replace(/&gt;/g , ">")
-			htmlStr = htmlStr.replace(/&quot;/g , "\"")
-			htmlStr = htmlStr.replace(/&#39;/g , "\'")
-			htmlStr = htmlStr.replace(/&amp;/g , "&")
-			
-			return htmlStr
+			return str
 		},
 		
 		move_item_up: function(item) {

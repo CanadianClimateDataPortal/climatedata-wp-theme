@@ -406,15 +406,6 @@ $control-slider-handle-width: 2.75rem;
     }
   }
 
-  #control-bar-secondary {
-    a {
-      &:hover {
-        background-color: $gray-700;
-        transition: 0.25s;
-      }
-    }
-  }
-
   .control-bar-tab-link {
     display: flex;
     flex-direction: column;
@@ -528,6 +519,15 @@ $control-slider-handle-width: 2.75rem;
       .tab-drawer-content-inner {
         background-color: $white;
       }
+    }
+  }
+}
+
+#control-bar-secondary {
+  a {
+    &:hover {
+      background-color: $gray-700;
+      transition: 0.25s;
     }
   }
 }

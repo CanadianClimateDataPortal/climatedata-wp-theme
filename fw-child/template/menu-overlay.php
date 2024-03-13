@@ -177,7 +177,7 @@
 				</div>
 			</div>
 			
-			<div id="tab-drawer-container" class="tab-drawer-container">
+			<div id="menu-td-container" class="tab-drawer-container">
 				
 				<div id="browse-vars" class="tab-drawer">
 					<div class="tab-drawer-content">

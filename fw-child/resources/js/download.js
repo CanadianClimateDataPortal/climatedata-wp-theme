@@ -589,6 +589,7 @@
 
       item.on('update_input', function (event, item, status) {
         // console.log('update input event', event, item, status);
+
         if (item) {
           // reset history push counter
           pushes_since_input = 0;
@@ -852,6 +853,10 @@
           options.status = 'ready';
         }
       }
+
+      // eval/toggle conditional elements
+      // based on new query values
+      $(document).cdc_app('toggle_conditionals');
     },
 
     refresh_inputs: function (query) {
@@ -869,6 +874,7 @@
 
         // find input(s) that matches this key
         let this_input = item.find('[data-query-key="' + key + '"]');
+
         // console.log('refresh', key, this_input.val(), options.query[key]);
 
         if (Array.isArray(options.query[key])) {
@@ -925,7 +931,7 @@
                 parseInt(options.query[key]),
               );
             } else if (key == 'var_id' || key == 'var') {
-              console.log('var', options.query[key]);
+              // console.log('var', options.query[key]);
 
               if (options.query[key] != null) {
                 plugin.update_var(
@@ -947,7 +953,7 @@
             );
 
             if (this_radio.prop('checked') != true) {
-              // console.log('radio', item.find('[data-query-key="' + key + '"]'));
+              // console.log('radio', this_radio);
               this_radio.prop('checked', true);
               $(document).trigger('update_input', [$(this_radio), 'eval']);
             }

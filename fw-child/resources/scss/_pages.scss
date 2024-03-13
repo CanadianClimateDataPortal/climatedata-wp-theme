@@ -362,6 +362,10 @@ $overlay-switch-bg: rgba($gray-400, 0.99);
     .btn {
     }
   }
+
+  #tab-drawer-container {
+    z-index: 2000;
+  }
 }
 
 // LEGEND

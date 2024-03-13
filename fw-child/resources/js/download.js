@@ -626,9 +626,9 @@
 
       item.on('change', ':input[data-query-key]', function () {
         console.log(
-          'change input',
-          $(this),
-          options.query[$(this).attr('data-query-key')] +
+          $(this).attr('data-query-key') +
+            ': ' +
+            options.query[$(this).attr('data-query-key')] +
             ' -> ' +
             $(this).val(),
         );
@@ -1368,7 +1368,7 @@
       let prev_tab = item.find(prev_id),
         new_tab = item.find(new_id);
 
-      console.log('validating tab');
+      console.log('validate tab', prev_id);
 
       let invalid_messages = [],
         tab_items = item.find('#control-bar-tabs'),
@@ -1384,12 +1384,24 @@
       $(prev_id)
         .find('[data-validate]:visible')
         .each(function () {
-          console.log('check', $(this));
+          let input_to_check = $(this),
+            valid_msg = $(this).attr('data-validate');
+
+          // if data-validate is an ID,
+          // check the value of that input instead
+
+          if (valid_msg.charAt(0) == '#') {
+            input_to_check = item.find(valid_msg);
+            valid_msg = input_to_check.attr('data-validate');
+          }
+
+          console.log('check', input_to_check, valid_msg);
+
           // check for blank value
           // console.log($(this), $(this).val());
-          if ($(this).val() == '' || $(this).val() == 'null') {
+          if (input_to_check.val() == '' || input_to_check.val() == 'null') {
             tab_items.find('[href="' + prev_id + '"]').addClass('invalid');
-            invalid_messages.push($(this).attr('data-validate'));
+            invalid_messages.push(valid_msg);
           }
         });
 

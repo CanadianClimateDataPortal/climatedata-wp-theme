@@ -68,7 +68,7 @@
 				</div>
 			</div>
 			
-			<div id="menu-secondary" class="fw-block-type-menu fw-block">
+			<div id="menu-secondary" class="fw-block-type-menu fw-block mb-2">
 				<div id="menu-secondary-inner" class=" ">
 					
 					<?php 

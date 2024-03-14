@@ -852,6 +852,18 @@
           .val($(this).attr('data-scheme-id'))
           .trigger('change');
       });
+      
+      // "Download" button
+
+      // Handle of the click on the "Download" button of the "Share" tab.
+      // Takes the current page's query and builds a URL for the "Download Data" page. That way, some of the inputs of
+      // the "Download" page are pre-filled.
+      $('#download-btn').on('click', function (event) {
+        event.preventDefault();
+        const base_href = this.href;
+        const query_string = $(document).cdc_app('query.obj_to_url', options.query, null);
+        window.location.href = base_href + query_string + '#data'; // Pre-open the "Data" tab on the "Download" page
+      });
 
       // HISTORY
 

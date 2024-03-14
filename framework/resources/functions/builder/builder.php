@@ -153,7 +153,7 @@ function fw_output_extras_after_open ( $element, $level, $settings ) {
 						$bg_classes[] = 'bg-position-' . str_replace ( ' ', '-', $options['position'] );
 						$bg_classes[] = 'bg-attachment-' . $options['attachment'];
 						$bg_classes[] = 'bg-size-' . $options['size'];
-						$bg_classes[] = 'bg-opacity-' . floatval ( $options['opacity'] ) * 100;
+						$bg_classes[] = 'opacity-' . floatval ( $options['opacity'] ) * 100;
 						
 						// 
 						

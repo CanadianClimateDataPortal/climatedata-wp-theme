@@ -12,10 +12,7 @@ if (
 ) {
 
 	// text exists in this language
-
-	// convert to rich text
-	
-	$element['text'] = htmlspecialchars_decode ( $element['inputs']['text'][$lang] );
+	$element['text'] = $element['inputs']['text'][$lang];
 	
 } else {
 	
@@ -33,10 +30,19 @@ if (
 	
 	// show EN
 	
-	$element['text'] = htmlspecialchars_decode ( $element['inputs']['text']['en'] );
+	$element['text'] = $element['inputs']['text']['en'];
 	
 }
 
+// attempt to convert windows special chars
+
+// replace specific chars
+// $element['text'] = str_replace ( '&rsquo;', '’', $element['text'] );
+
+// convert to rich text
+// $element['text'] = htmlspecialchars_decode ( $element['text'] );
+
+// apply shortcodes
 $element['text'] = do_shortcode ( $element['text'] );
 
-echo $element['text'];
+echo wp_specialchars_decode ( $element['text'], ENT_QUOTES );

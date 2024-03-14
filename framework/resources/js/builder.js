@@ -5294,6 +5294,8 @@
 		
 		escape: function(str = '') {
 			
+			str = str.replace(/\n/g, "")
+			
 			str = [...str];
 			//    ^ es20XX spread to Array: keeps surrogate pairs
 			
@@ -5301,7 +5303,13 @@
 			
 			while (i--) {
 				var iC = str[i].codePointAt(0);
-				if (iC < 65 || iC > 127 || (iC>90 && iC<97)) {
+				if (
+					iC == 39 || 
+					iC == 34 || 
+					iC == 60 || 
+					iC == 62 || 
+					iC > 127
+				) {
 					aRet[i] = '&#'+iC+';';
 				} else {
 					aRet[i] = str[i];
@@ -5311,13 +5319,13 @@
 			str = aRet.join('');
 			
 			// dial it back a notch
-			str = str.replaceAll('&#32;', ' ')
-				.replaceAll('&#44;', ',')
-				.replaceAll('&#45;', '-')
-				.replaceAll('&#46;', '.')
-				.replaceAll('&#47;', '/')
-				.replaceAll('&#58;', ':')
-				.replaceAll('&#61;', '=')
+			// str = str.replaceAll('&#32;', ' ')
+			// 	.replaceAll('&#44;', ',')
+			// 	.replaceAll('&#45;', '-')
+			// 	.replaceAll('&#46;', '.')
+			// 	.replaceAll('&#47;', '/')
+			// 	.replaceAll('&#58;', ':')
+			// 	.replaceAll('&#61;', '=')
 			
 			return str
 			

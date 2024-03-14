@@ -567,11 +567,58 @@ $control-slider-handle-width: 2.75rem;
   }
 }
 
-.filter-item.selected {
-  color: $primary;
+.filter-item {
+  cursor: pointer;
 
-  .dropdown-item {
-    color: $primary;
+  &.selected {
+    .dropdown-item {
+      color: $primary;
+    }
+  }
+}
+
+.query-page {
+  .fw-query-filter {
+    font-size: 1rem;
+  }
+
+  .fw-query-filter-reset {
+    color: $gray-600;
+    transition: 0.25s;
+
+    &:hover {
+      color: $secondary;
+    }
+  }
+
+  .filter-item {
+    color: $gray-600;
+    margin-bottom: 0.25rem;
+
+    &:before {
+      content: '';
+      display: inline-block;
+      width: 0.75rem;
+      height: 0.75rem;
+      margin-right: 1rem;
+      border-radius: 50%;
+      background-color: $gray-400;
+      transition: 0.25s;
+    }
+
+    &:hover {
+      &:before {
+        background-color: $gray-500;
+      }
+    }
+
+    &.selected {
+      color: $body-color;
+
+      &:before {
+        background-color: $primary;
+      }
+    }
   }
 }
 

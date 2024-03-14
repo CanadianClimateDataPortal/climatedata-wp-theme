@@ -5,25 +5,36 @@
 	</div>
 	
 	<div class="card-body p-0">
-		<div class="row row-cols-2 border-bottom">
-			<div class="col p-3 border-end">
+		<div class="row row-cols-3 border-bottom">
+			<div class="col p-2 border-end">
 				<label for="inputs-settings[]-background-source" class="form-label modal-label-sm">Image Source</label>
 				
 				<select name="inputs-settings[]-background-source" class="form-select form-select-sm conditional-select">
 					<option value="field" data-form-condition="#bg-field">Field Value</option>
-					<option value="upload" data-form-condition="#bg-upload">Media Library</option>
+					<option value="upload" data-form-condition="#bg-upload">Upload</option>
 					<option value="thumbnail">Post Thumbnail</option>
 				</select>
 			</div>
 			
-			<div id="bg-field" class="col p-3">
+			<div class="col p-2 border-end">
+				
+				<label for="inputs-settings[]-background-fallback" class="form-label modal-label-sm">Select from <a href="http://framework.xxx/wp-admin/admin.php?page=acf-options-defaults" target="_blank">defaults</a> as fallback</label>
+				
+				<select name="inputs-settings[]-background-fallback" class="form-select form-select-sm">
+					<option value="true">Yes</option>
+					<option value="false">No</option>
+				</select>
+				
+			</div>
+			
+			<div id="bg-field" class="col p-2">
 				<label for="inputs-settings[]-background-field" class="form-label modal-label-sm">Custom Field Key</label>
 				
 				<input type="text" name="inputs-settings[]-background-field" class="form-control form-control-sm">
 			</div>
 			
 			<div id="bg-upload" 
-				class="col p-3 uploader-container"
+				class="col p-2 uploader-container"
 				data-uploader-type="image" 
 				data-uploader-options='{
 					"title": "Select background image",

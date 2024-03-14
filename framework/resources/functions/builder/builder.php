@@ -155,12 +155,38 @@ function fw_output_extras_after_open ( $element, $level, $settings ) {
 						$bg_classes[] = 'bg-size-' . $options['size'];
 						$bg_classes[] = 'opacity-' . floatval ( $options['opacity'] ) * 100;
 						
-						// 
+						// get image ID by source
 						
-						if ( $options['source'] == 'field' ) {
-							$options['file']['id'] = get_field ( $options['field'], $GLOBALS['fw']['current_query']['ID'] );
-						} elseif ( $options['source'] == 'thumbnail' ) {
-							$options['file']['id'] = get_post_thumbnail_id ( $GLOBALS['fw']['current_query']['ID'] );
+						switch ( $options['source'] ) {
+							
+							case 'field' :
+								// field value
+								
+								$options['file']['id'] = get_field ( $options['field'], $GLOBALS['fw']['current_query']['ID'] );
+								break;
+							
+							case 'thumbnail' :
+								// post thumbnail
+								
+								$options['file']['id'] = get_post_thumbnail_id ( $GLOBALS['fw']['current_query']['ID'] );
+								break;
+							
+						}
+						
+						if (
+							empty ( $options['file']['id'] ) &&
+							$options['fallback'] == 'true'
+						) {
+							
+							// fallback on and no image ID
+							$default_imgs = get_field ( 'theme_images', 'option' );
+							
+							if ( !empty ( $default_imgs ) ) {
+								// get a random theme image
+								$random_index = mt_rand ( 0, count ( $default_imgs ) - 1 );
+								$options['file']['id'] = $default_imgs[$random_index];
+							}
+							
 						}
 						
 						if ( $options['source'] != 'upload' ) {

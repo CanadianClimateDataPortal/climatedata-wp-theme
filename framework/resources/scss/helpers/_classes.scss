@@ -177,8 +177,11 @@ $close-btn-line-height: 60px !default;
 
 .has-bg {
   position: relative;
-  
-  .fw-element {
+}
+
+.fw-bg {
+  & ~ .fw-element {
+    position: relative;
     z-index: $bg-z-index + 1;
   }
 }

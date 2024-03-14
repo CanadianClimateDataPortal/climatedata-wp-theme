@@ -40,9 +40,9 @@ if (
 // $element['text'] = str_replace ( '&rsquo;', '’', $element['text'] );
 
 // convert to rich text
-// $element['text'] = htmlspecialchars_decode ( $element['text'] );
+$element['text'] = htmlspecialchars_decode ( $element['text'], ENT_QUOTES );
 
 // apply shortcodes
 $element['text'] = do_shortcode ( $element['text'] );
 
-echo wp_specialchars_decode ( $element['text'], ENT_QUOTES );
+echo wptexturize ( $element['text'] );

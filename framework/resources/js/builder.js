@@ -881,8 +881,8 @@
 			
 			$('body').on('click', '.fw-settings-submit', function() {
 				
-				console.log('submit')
-				console.log(JSON.stringify(options.element.data))
+				// console.log('submit')
+				// console.log(JSON.stringify(options.element.data))
 				
 				let form = $(this).closest('.modal').find('form'),
 						form_data = [],
@@ -2539,6 +2539,12 @@
 							
 							break
 							
+						case 'background' :
+							
+							options.element.item.find('> .fw-bg').remove()
+						
+							break
+							
 					}
 					
 				})
@@ -2613,32 +2619,48 @@
 						
 							case 'background' :
 								
-								
-								let bg_el,
-										bg_urls = JSON.parse(this_setting.file.url)
-								
 								// element class
 								
 								options.element.item.addClass('has-bg')
 								
-								// set the image src
+								switch (this_setting.source) {
+									case 'thumbnail' :
+										// console.log('get thumb', options.post_id)
+										
+										break
+										
+									case 'field' :
+										// console.log('field val', this_settings.field)
+										
+										break
+										
+									case 'upload' :
 								
-								if (options.element.item.find('> .fw-bg').length) {
+									let bg_el,
+											bg_urls = JSON.parse(this_setting.file.url)
 									
-									bg_el = options.element.item.find('> .fw-bg')
-									bg_el.removeClass().addClass('fw-bg')
+									// set the image src
 									
-								} else {
+									if (options.element.item.find('> .fw-bg').length) {
+										
+										bg_el = options.element.item.find('> .fw-bg')
+										bg_el.removeClass().addClass('fw-bg')
+										
+									} else {
+										
+										bg_el = $('<div class="fw-bg">').prependTo(options.element.item)
+										
+									}
 									
-									bg_el = $('<div class="fw-bg">').prependTo(options.element.item)
+									bg_el.attr('style', 'background-image: url(' + bg_urls.full + ')')
+										.addClass('bg-position-' + this_setting.position.replace(' ', '-'))
+										.addClass('bg-attachment-' + this_setting.attachment)
+										.addClass('bg-size-' + this_setting.size)
+										.addClass('bg-opacity-' + parseFloat(this_setting.opacity) * 100)
+								
+									break
 									
 								}
-								
-								bg_el.attr('style', 'background-image: url(' + bg_urls.full + ')')
-									.addClass('bg-position-' + this_setting.position.replace(' ', '-'))
-									.addClass('bg-attachment-' + this_setting.attachment)
-									.addClass('bg-size-' + this_setting.size)
-									.addClass('bg-opacity-' + parseFloat(this_setting.opacity) * 100)
 								
 								break
 								

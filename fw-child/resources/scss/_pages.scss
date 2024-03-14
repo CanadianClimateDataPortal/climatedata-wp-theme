@@ -708,7 +708,7 @@ body.tab-drawer-open {
   .fw-query-item {
     .card {
       position: relative;
-      min-height: 350px;
+      min-height: 300px;
       overflow: hidden;
 
       &:after {
@@ -740,7 +740,7 @@ body.tab-drawer-open {
     .var-item-img {
       flex: 1 0 auto;
       background-repeat: no-repeat;
-      background-size: auto 100%;
+      background-size: cover;
       background-position: center center;
       transition: 0.25s ease;
     }
@@ -762,6 +762,7 @@ body.tab-drawer-open {
       display: grid;
       grid-template-rows: 0fr;
       transition: grid-template-rows 0.25s ease;
+      padding-top: 0.375rem;
     }
 
     .var-item-brief-inner {

@@ -127,6 +127,11 @@
 }
 
 #menu-secondary {
+  a {
+    &:hover {
+      color: $secondary;
+    }
+  }
 }
 
 #menu-langs {

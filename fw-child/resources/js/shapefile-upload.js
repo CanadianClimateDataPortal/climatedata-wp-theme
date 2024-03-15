@@ -341,18 +341,25 @@
    */
   MapShapesLayer.SHAPE_STYLES = {
     normal: {
-      color: '#35495d',
+      color: '#777',
+      weight: 1,
       opacity: 0.6,
-      weight: 0.5,
       fillColor: '#35495d',
-      fillOpacity: 0.2,
+      fillOpacity: 0.1,
     },
     selected: {
-      opacity: 1,
+      color: '#f00',
       weight: 1,
-      color: '#eb1d1f',
+      opacity: 1,
       fillColor: '#eb1d1f',
-      fillOpacity: 0.3,
+      fillOpacity: 0.2,
+    },
+    hover: {
+      color: '#777',
+      weight: 1,
+      opacity: 1,
+      fillColor: '#35495d',
+      fillOpacity: 0.2,
     },
   }
 
@@ -395,6 +402,10 @@
      * The layers are saved in `this.shape_layers`.
      */
     create_shape_layers: function() {
+      const click_handler = this.handle_region_click.bind(this);
+      const mouse_enter_handler = this.handle_region_mouse_enter.bind(this);
+      const mouse_leave_handler = this.handle_region_mouse_leave.bind(this);
+      
       for (let map_name in this.maps) {
         const layer = new L.TopoJSON(null, {
           style: function () {
@@ -403,9 +414,39 @@
           pane: 'custom_shapefile',
         });
 
-        layer.on('click', (e) => this.handle_region_click(e));
+        layer.on('click', click_handler);
+        layer.on('mouseover', mouse_enter_handler);
+        layer.on('mouseout', mouse_leave_handler);
 
         this.shape_layers[map_name] = layer;
+      }
+    },
+
+    /**
+     * Handles the "mouse enter" event on a shape, to change its style.
+     * 
+     * @param event - Mouse event object sent by Leaflet
+     */
+    handle_region_mouse_enter: function(event) {
+      const shape = event.layer;
+      const region_index = shape['feature']['properties']['regionIndex'];
+      
+      if (region_index !== this.selected_region) {
+        shape.setStyle(MapShapesLayer.SHAPE_STYLES['hover']);
+      }
+    },
+
+    /**
+     * Handles the "mouse leave" event on a shape, to change its style.
+     *
+     * @param event - Mouse event object sent by Leaflet
+     */
+    handle_region_mouse_leave: function(event) {
+      const shape = event.layer;
+      const region_index = shape['feature']['properties']['regionIndex'];
+
+      if (region_index !== this.selected_region) {
+        shape.setStyle(MapShapesLayer.SHAPE_STYLES['normal']);
       }
     },
 
@@ -414,7 +455,7 @@
      *
      * The shape's style will also be updated on all the other maps.
      *
-     * @param event - Click event object sent by Leaflet
+     * @param event - Mouse event object sent by Leaflet
      */
     handle_region_click: function(event) {
       const shape = event.layer;

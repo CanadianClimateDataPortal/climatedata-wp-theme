@@ -2,60 +2,60 @@
 	<div class="tab-drawer-content">
 		<div class="tab-drawer-content-inner">
 			<div class="control-tab-head d-flex align-items-center justify-content-between">
-				<h5 class="mb-0">Display</h5>
+				<h5 class="mb-0"><?php _e ( 'Display', 'cdc' ); ?></h5>
 				<span class="tab-drawer-close btn-close"></span>
 			</div>
 			
 			<div class="control-tab-body">
 				
 				<div id="map-control-values" class="map-control-item">
-					<h6 class="all-caps text-secondary">Data Values</h6>
+					<h6 class="all-caps text-secondary"><?php _e ( 'Data Values', 'cdc' ); ?></h6>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="display-values" id="display-values-absolute" value="" checked data-query-key="delta">
-						<label class="form-check-label" for="display-values-absolute">Absolute</label>
+						<label class="form-check-label" for="display-values-absolute"><?php _e ( 'Absolute', 'cdc' ); ?></label>
 					</div>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="display-values" id="display-values-delta" value="true" data-query-key="delta">
-						<label class="form-check-label" for="display-values-delta">Delta vs. Baseline</label>
+						<label class="form-check-label" for="display-values-delta"><?php _e ( 'Delta vs. Baseline', 'cdc' ); ?></label>
 					</div>
 				</div>
 				
 				<div id="map-control-aggregation" class="map-control-item">
-					<h6 class="all-caps text-secondary">Map Aggregation</h6>
+					<h6 class="all-caps text-secondary"><?php _e ( 'Map Aggregation', 'cdc' ); ?></h6>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-grid" value="canadagrid" checked data-query-key="sector">
-						<label class="form-check-label" for="display-aggregation-grid">Gridded Data</label>
+						<label class="form-check-label" for="display-aggregation-grid"><?php _e ( 'Gridded Data', 'cdc' ); ?></label>
 					</div>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-csd" value="census" data-query-key="sector">
-						<label class="form-check-label" for="display-aggregation-csd">Census Subdivisions</label>
+						<label class="form-check-label" for="display-aggregation-csd"><?php _e ( 'Census Subdivisions', 'cdc' ); ?></label>
 					</div>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-health" value="health" data-query-key="sector">
-						<label class="form-check-label" for="display-aggregation-health">Health Regions</label>
+						<label class="form-check-label" for="display-aggregation-health"><?php _e ( 'Health Regions', 'cdc' ); ?></label>
 					</div>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-watershed" value="watershed" data-query-key="sector">
-						<label class="form-check-label" for="display-aggregation-watershed">Watersheds</label>
+						<label class="form-check-label" for="display-aggregation-watershed"><?php _e ( 'Watersheds' ); ?></label>
 					</div>
 					
 				</div>
 				
 				<div id="map-control-colours" class="map-control-item">
-					<h6 class="all-caps text-secondary">Colours</h6>
+					<h6 class="all-caps text-secondary"><?php _e ( 'Colours', 'cdc' ); ?></h6>
 					
 					<input type="hidden" name="display-scheme" id="display-scheme" value="kejDjr" data-query-key="scheme">
 					
 					<div id="display-scheme-select" class="dropdown mb-3">
 						<div class="dropdown-toggle scheme-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
 							<span class="gradient"><svg width="100%" height="100%"></svg></span>
-							<span class="sr-only">Selected Scheme Name</span>
+							<span class="sr-only"><?php _e ( 'Selected Scheme Name', 'cdc' ); ?></span>
 						</div>
 						
 						<ul class="dropdown-menu w-100 p-0">
@@ -149,9 +149,9 @@
 				</div>
 				
 				<div id="map-control-opacity" class="map-control-item all-caps">
-					<h6 class="text-secondary mb-3">Layer Opacity</h6>
+					<h6 class="text-secondary mb-3"><?php _e ( 'Layer Opacity', 'cdc' ); ?></h6>
 					
-					<h6 class="text-gray-600">Data</h6>
+					<h6 class="text-gray-600"><?php _e ( 'Data', 'cdc' ); ?></h6>
 					
 					<div class="map-control-slider-well mb-4">
 						<div id="display-data-slider" class="map-control-slider opacity-slider" data-pane="raster">
@@ -159,7 +159,7 @@
 						</div>
 					</div>
 					
-					<h6 class="text-gray-600">Labels</h6>
+					<h6 class="text-gray-600"><?php _e ( 'Labels', 'cdc' ); ?></h6>
 					
 					<div class="map-control-slider-well mb-4">
 						<div id="display-labels-slider" class="map-control-slider opacity-slider" data-pane="labels">
@@ -167,7 +167,7 @@
 						</div>
 					</div>
 					
-					<h6 class="text-gray-600">Pins</h6>
+					<h6 class="text-gray-600"><?php _e ( 'Pins', 'cdc' ); ?></h6>
 					
 					<div class="map-control-slider-well">
 						<div id="display-pins-slider" class="map-control-slider opacity-slider" data-pane="marker">

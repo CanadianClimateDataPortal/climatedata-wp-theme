@@ -35,9 +35,9 @@ add_action ( 'wp', 'child_global_vars', 20 );
 // process any deployment specific configuration
 
 if ( stream_resolve_include_path ( 'local_config.php' ) ) {
-	include_once 'local_config.php';
+	include_once locate_template ( 'local_config.php' );
 } else {
-	include_once 'default_config.php';
+	include_once locate_template ( 'default_config.php' );
 }
 
 //
@@ -299,7 +299,7 @@ function fw_child_theme_support() {
 	// UNCROPPED IMAGE SIZE FOR CARD BLOCKS
 
 	add_image_size ( 'card-img-no-crop', '600', '380', false );
-
+	
 	// MENUS
 
 	// LANGUAGES
@@ -396,7 +396,12 @@ add_action ( 'fw_before_footer', function() {
 	
 ?>
 
-<script type="text/javascript">var L_DISABLE_3D = true;</script>
+<script type="text/javascript">
+	var base_href = '<?php echo $GLOBALS['vars']['home_url']; ?>';
+	var L_DISABLE_3D = true;
+	const DATA_URL = '<?php echo $GLOBALS['vars']['data_url']; ?>';
+	var url_encoder_salt = '<?php echo $GLOBALS['vars']['url_encoder_salt']; ?>';
+</script>
 
 <?php
 

@@ -15,17 +15,18 @@
 		<div id="tab-drawer-container" class="tab-drawer-container">
 			
 			<div id="filters" class="tab-drawer">
-				<div class="tab-drawer-content">
+				<div class="tab-drawer-content stick">
 					<div class="tab-drawer-content-inner">
-						<div class="control-tab-head d-flex justify-content-between">
-							<h5><?php _e ( 'Filters', 'cdc' ); ?></h5>
+						<div class="control-tab-head d-flex justify-content-between align-items-center">
+							<h5 class="me-auto mb-0 text-secondary"><?php _e ( 'Filters', 'cdc' ); ?></h5>
+							<span class="fw-query-reset me-2" style="display: none;"><i class="fas fa-sync fa-flip-horizontal"></i></span>
 							<span class="tab-drawer-close btn-close"></span>
 						</div>
 						
 						<div class="control-tab-body query-container">
 							
-							<div class="fw-query-filter p-3" data-filter-type="taxonomy" data-filter-multi="false">
-								<h6 class="text-primary"><?php _e ( 'Tag', 'fw' ); ?></h6>
+							<div class="fw-query-filter ms-3 py-4" data-filter-type="taxonomy" data-filter-key="post_tag" data-filter-multi="false">
+								<h5 class="fw-bold"><?php _e ( 'Tag', 'fw' ); ?></h5>
 								
 								<?php
 								
@@ -38,7 +39,7 @@
 									
 								?>
 								
-								<ul class="list-unstyled">
+								<ul class="list-unstyled m-0 pe-2">
 									<?php
 									
 										foreach ( $all_tags as $tag ) {

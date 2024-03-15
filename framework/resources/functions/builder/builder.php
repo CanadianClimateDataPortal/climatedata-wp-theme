@@ -6,7 +6,7 @@ $types = array (
 	'section', 'container', 'column', 'block'
 );
 
-function fw_builder() {
+function fw_builder () {
 	
 	// this page's builder object
 
@@ -153,16 +153,62 @@ function fw_output_extras_after_open ( $element, $level, $settings ) {
 						$bg_classes[] = 'bg-position-' . str_replace ( ' ', '-', $options['position'] );
 						$bg_classes[] = 'bg-attachment-' . $options['attachment'];
 						$bg_classes[] = 'bg-size-' . $options['size'];
-						$bg_classes[] = 'bg-opacity-' . floatval ( $options['opacity'] ) * 100;
+						$bg_classes[] = 'opacity-' . floatval ( $options['opacity'] ) * 100;
 						
-						$bg_urls = json_decode ( $options['file']['url'], true );
+						// get image ID by source
+						
+						switch ( $options['source'] ) {
+							
+							case 'field' :
+								// field value
+								
+								$options['file']['id'] = get_field ( $options['field'], $GLOBALS['fw']['current_query']['ID'] );
+								break;
+							
+							case 'thumbnail' :
+								// post thumbnail
+								
+								$options['file']['id'] = get_post_thumbnail_id ( $GLOBALS['fw']['current_query']['ID'] );
+								break;
+							
+						}
+						
+						if (
+							empty ( $options['file']['id'] ) &&
+							$options['fallback'] == 'true'
+						) {
+							
+							// fallback on and no image ID
+							$default_imgs = get_field ( 'theme_images', 'option' );
+							
+							if ( !empty ( $default_imgs ) ) {
+								// get a random theme image
+								$random_index = mt_rand ( 0, count ( $default_imgs ) - 1 );
+								$options['file']['id'] = $default_imgs[$random_index];
+							}
+							
+						}
+						
+						if ( $options['source'] != 'upload' ) {
+							
+							$bg_urls = array (
+								'thumbnail' => wp_get_attachment_image_url ( $options['file']['id'], 'thumbnail' ),
+								'medium' => wp_get_attachment_image_url ( $options['file']['id'], 'medium' ),
+								'full' => wp_get_attachment_image_url ( $options['file']['id'], 'full' )
+							);
+							
+						} else {
+						
+							$bg_urls = json_decode ( $options['file']['url'], true );
+							
+						}
 					
 ?>
 
 <div class="<?php echo implode ( ' ', $bg_classes ); ?>" style="background-image: url(<?php echo $bg_urls['full']; ?>);"></div>
 
 <?php
-					
+						
 						break;
 						
 					case 'offcanvas' :

@@ -68,7 +68,7 @@
 				</div>
 			</div>
 			
-			<div id="menu-secondary" class="fw-block-type-menu fw-block">
+			<div id="menu-secondary" class="fw-block-type-menu fw-block mb-2">
 				<div id="menu-secondary-inner" class=" ">
 					
 					<?php 
@@ -177,7 +177,7 @@
 				</div>
 			</div>
 			
-			<div id="tab-drawer-container" class="tab-drawer-container">
+			<div id="menu-td-container" class="tab-drawer-container">
 				
 				<div id="browse-vars" class="tab-drawer">
 					<div class="tab-drawer-content">

@@ -597,6 +597,7 @@
 
       item.on('update_input', function (event, item, status) {
         // console.log('update input event', event, item, status);
+
         if (item) {
           // reset history push counter
           pushes_since_input = 0;
@@ -633,9 +634,9 @@
 
       item.on('change', ':input[data-query-key]', function () {
         console.log(
-          'change input',
-          $(this),
-          options.query[$(this).attr('data-query-key')] +
+          $(this).attr('data-query-key') +
+            ': ' +
+            options.query[$(this).attr('data-query-key')] +
             ' -> ' +
             $(this).val(),
         );
@@ -694,9 +695,9 @@
       // CUSTOM SHAPEFILE
       //
 
-      // Show/hide the user custom shapefile when the "Custom shapefile" radio button is selected/deselected
+      // Show/hide the user custom shapefile on the map when the "Custom shapefile" radio button is selected/deselected
       item.find('input[name=area-aggregation]').on('change', function() {
-        if (this.value === 'custom') {
+        if (this.value === 'upload') {
           options.elements.shapefile_upload.shapefile_upload('show');
         } else {
           options.elements.shapefile_upload.shapefile_upload('hide');
@@ -704,7 +705,7 @@
       });
 
       // Show information with the "more info" button.
-      item.find('#area-aggregation-custom-tooltip').popover({
+      item.find('#area-aggregation-upload-tooltip').popover({
         trigger: 'hover',
         html: true,
         content: T('A shapefile is a ZIP file containing at least the <em>.shp</em> and <em>.prj</em> files. ' +
@@ -892,6 +893,10 @@
           options.status = 'ready';
         }
       }
+
+      // eval/toggle conditional elements
+      // based on new query values
+      $(document).cdc_app('toggle_conditionals');
     },
 
     refresh_inputs: function (query) {
@@ -909,6 +914,7 @@
 
         // find input(s) that matches this key
         let this_input = item.find('[data-query-key="' + key + '"]');
+
         // console.log('refresh', key, this_input.val(), options.query[key]);
 
         if (Array.isArray(options.query[key])) {
@@ -965,7 +971,7 @@
                 parseInt(options.query[key]),
               );
             } else if (key == 'var_id' || key == 'var') {
-              console.log('var', options.query[key]);
+              // console.log('var', options.query[key]);
 
               if (options.query[key] != null) {
                 plugin.update_var(
@@ -987,7 +993,7 @@
             );
 
             if (this_radio.prop('checked') != true) {
-              // console.log('radio', item.find('[data-query-key="' + key + '"]'));
+              // console.log('radio', this_radio);
               this_radio.prop('checked', true);
               $(document).trigger('update_input', [$(this_radio), 'eval']);
             }
@@ -1123,9 +1129,15 @@
           options.var_flags.station = true;
         } else {
           // console.log('var is NOT station data');
-          options.query.sector = item
-            .find('[data-query-key="sector"]:checked')
-            .val();
+
+          // find checked radio
+          // or keep default query.sector
+
+          if (item.find('[data-query-key="sector"]:checked').length) {
+            options.query.sector = item
+              .find('[data-query-key="sector"]:checked')
+              .val();
+          }
         }
 
         // always do this stuff
@@ -1402,7 +1414,7 @@
       let prev_tab = item.find(prev_id),
         new_tab = item.find(new_id);
 
-      console.log('validating tab');
+      console.log('validate tab', prev_id);
 
       let invalid_messages = [],
         tab_items = item.find('#control-bar-tabs'),
@@ -1418,12 +1430,24 @@
       $(prev_id)
         .find('[data-validate]:visible')
         .each(function () {
-          console.log('check', $(this));
+          let input_to_check = $(this),
+            valid_msg = $(this).attr('data-validate');
+
+          // if data-validate is an ID,
+          // check the value of that input instead
+
+          if (valid_msg.charAt(0) == '#') {
+            input_to_check = item.find(valid_msg);
+            valid_msg = input_to_check.attr('data-validate');
+          }
+
+          console.log('check', input_to_check, valid_msg);
+
           // check for blank value
           // console.log($(this), $(this).val());
-          if ($(this).val() == '' || $(this).val() == 'null') {
+          if (input_to_check.val() == '' || input_to_check.val() == 'null') {
             tab_items.find('[href="' + prev_id + '"]').addClass('invalid');
-            invalid_messages.push($(this).attr('data-validate'));
+            invalid_messages.push(valid_msg);
           }
         });
 
@@ -1451,7 +1475,7 @@
         }
         
         // Validate the custom shapefile
-        if (options.query.sector === 'custom') {
+        if (options.query.sector === 'upload') {
           const validation_message = options.elements.shapefile_upload.shapefile_upload('validate');
           if (validation_message != null) {
             invalid_messages.push(validation_message);

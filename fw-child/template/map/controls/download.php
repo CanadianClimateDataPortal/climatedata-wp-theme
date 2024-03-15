@@ -32,53 +32,17 @@
 					
 				</div>
 				
-				<h6 class="all-caps text-secondary mx-4 my-3"><?php _e ( 'Export Data', 'cdc' ); ?></h6>
+				<h6 class="all-caps text-secondary mx-4 my-3"><?php _e ( 'Download Data', 'cdc' ); ?></h6>
 				
-				<div id="map-control-export" class="map-control-item conditional-trigger bg-white me-2">
-					<div class="mb-3">
-					
-						<label for="download-area" class="form-label d-block h6 all-caps text-gray-600"><?php _e ( 'Data Area', 'cdc' ); ?></label>
-						
-						<div class="form-check">
-							<input class="form-check-input" type="radio" name="download-area" id="download-area-select" checked>
-							<label class="form-check-label" for="download-area-select"><?php _e ( 'Select regions', 'cdc' ); ?></label>
-						</div>
-						
-						<div class="form-check">
-							<input class="form-check-input" type="radio" name="download-area" id="download-area-draw">
-							<label class="form-check-label" for="download-area-draw"><?php _e ( 'Draw custom region', 'cdc' ); ?></label>
-						</div>
-						
-						<div class="form-check">
-							<input class="form-check-input" type="radio" name="download-area" id="download-area-custom" value="custom" data-conditional="#download-area-shapefile">
-							<label class="form-check-label" for="download-area-custom"><?php _e ( 'Custom shapefile', 'cdc' ); ?></label>
-							<a tabindex="0" role="button" id="download-area-custom-tooltip" class="text-secondary">ⓘ</a>
-						</div>
-						
-						<div id="download-area-shapefile" class="bg-gray-200 p-2">
-							<label for="download-area-shapefile-input" class="form-label"><?php _e ( 'Drop your GeoJSON file here to upload', 'cdc' ); ?></label>
-							<input class="form-control form-control-sm" id="download-area-shapefile-input" type="file">
-							<div id="download-area-shapefile-message" class="mt-2"></div>
-						</div>
-					</div>
-					
-					<div class="mb-3">
-						<label for="download-format" class="form-label d-block h6 all-caps text-gray-600"><?php _e ( 'Export Format', 'cdc' ); ?></label>
-						
-						<div class="btn-group w-100">
-							<input type="radio" class="btn-check" name="download-format" id="download-format-csv" value="csv" autocomplete="off" checked>
-							<label class="btn btn-outline-gray-400" for="download-format-csv"><?php _e ( 'CSV', 'cdc' ); ?></label>
-							
-							<input type="radio" class="btn-check" name="download-format" id="download-format-json" value="json" autocomplete="off">
-							<label class="btn btn-outline-gray-400" for="download-format-json"><?php _e ( 'JSON', 'cdc' ); ?></label>
-							
-							<input type="radio" class="btn-check" name="download-format" id="download-format-netcdf" value="netcdf" autocomplete="off">
-							<label class="btn btn-outline-gray-400" for="download-format-netcdf"><?php _e ( 'NetCDF', 'cdc' ); ?></label>
-						</div>
-					</div>
-					
-					<a href="#" class="btn btn-secondary d-block" id="process-download"><?php _e ( 'Process & Download', 'cdc' ); ?></a>
-					
+				<div id="map-control-download" class="map-control-item conditional-trigger bg-white me-2">
+					<p><?php _e ( 'You can customize and download the data displayed on this map.', 'cdc' ); ?></p>
+					<?php
+					$dl_slug = $GLOBALS['fw']['current_lang_code'] == 'fr' ? 'telechargement' : 'download';
+					?>
+					<a href="<?php echo home_url ( $dl_slug ); ?>" class="btn btn-secondary d-block" id="download-btn">
+						<span class="btn-icon"><i class="far fa-download"></i></span>
+						<span class="btn-text"><?php _e ( 'Download', 'cdc' ); ?></span>
+					</a>
 				</div>
 				
 			</div>

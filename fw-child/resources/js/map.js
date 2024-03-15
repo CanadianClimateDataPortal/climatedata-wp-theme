@@ -560,19 +560,23 @@
       slider.find('.ui-slider-handle').text(ui.value);
 
       let this_pane = slider.attr('data-pane');
-      options.legend.opacity = ui.value / 100;
+
 
       // always set the given pane opacity
       // so it's consistent if we switch sectors
       item
         .find('.leaflet-pane.leaflet-' + this_pane + '-pane')
-        .css('opacity', options.legend.opacity);
+        .css('opacity', ui.value / 100);
 
-      // link legend's opacity
-      item
-        .find('.legend')
-        .find('.legendbox')
-        .css('fill-opacity', options.legend.opacity);
+      if (this_pane == 'raster') {
+        options.legend.opacity = ui.value / 100;
+
+        // link legend's opacity
+        item
+          .find('.legend')
+          .find('.legendbox')
+          .css('fill-opacity', options.legend.opacity);
+      }
 
       // grid layer defaults to 1
       item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
@@ -1603,6 +1607,10 @@
           'scheme-quantities',
           special_var.colormap.quantities,
         );
+        default_scheme_element.data(
+          'scheme-type',
+          special_var.colormap.scheme_type
+        )
         plugin.update_scheme();
 
         if (typeof callback === 'function') {
@@ -1631,6 +1639,10 @@
               'scheme-quantities',
               colour_map.map((e) => parseFloat(e.quantity)),
             );
+            default_scheme_element.data(
+              'scheme-type',
+              data.Legend[0].rules[0].symbolizers[0].Raster.colormap.type
+            )
             plugin.update_scheme();
           })
           .always(function () {
@@ -1703,6 +1715,10 @@
       // enable/disable discrete/continuous
 
       if (selected_item.hasClass('default')) {
+        let discrete_or_continuous = selected_item.data('scheme-type') === 'ramp' ? 'continuous' : 'discrete';
+        $(`[data-query-key="scheme_type"][value="${discrete_or_continuous}"]`).prop('checked', true)
+          .trigger('change');
+
         discrete_btns.addClass('disabled');
       } else {
         discrete_btns.removeClass('disabled');

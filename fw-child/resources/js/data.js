@@ -191,5 +191,19 @@ const special_variables = {
       scheme_type: 'discrete',
       categorical: true
     }
+  },
+  idf: {
+    colormap: {
+      colours: [],
+      quantities: [],
+      labels: []
+    }
+  },
+  'weather-stations': {
+    colormap: {
+      colours: [],
+      quantities: [],
+      labels: []
+    }
   }
 }

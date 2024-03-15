@@ -1,7 +1,7 @@
 <div class="map-container min-height-100">
 	<div id="map-breadcrumb">
 		<ol class="breadcrumb">
-			<li class="breadcrumb-item"><?php _e ( 'Climate Data Canada', 'cdc' ); ?></li>
+			<li class="breadcrumb-item"><a href="<?php echo home_url(); ?>"><?php _e ( 'Climate Data Canada', 'cdc' ); ?></a></li>
 			<li class="breadcrumb-item"><?php _e ( 'Map', 'cdc' ); ?></li>
 			<li id="breadcrumb-variable" class="breadcrumb-item"></li>
 			<li id="breadcrumb-overlay-trigger" class="" data-bs-toggle="offcanvas" data-bs-target="#info"></li>

@@ -173,6 +173,14 @@
   transition: left 0.25s ease 0s;
   text-shadow: 0 1px transparentize($white, 0.2);
   z-index: 100;
+
+  a {
+    color: inherit;
+
+    &:hover {
+      color: $primary;
+    }
+  }
 }
 
 #breadcrumb-overlay-trigger {

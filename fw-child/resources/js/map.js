@@ -703,14 +703,25 @@
 
       // click item in 'recent locations'
 
-      item.on('click', '#recent-locations .list-group-item', function () {
-        let item_coords = $(this).attr('data-coords').split(',');
+      item.on('click', '#recent-locations .list-group-item', function (e) {
+        if ($(e.target).hasClass('clear')) {
+          console.log('CLEAR MARKER');
+          $(document).cdc_app('maps.remove_marker', $(this).attr('data-index'));
+        } else {
+          let item_coords = $(this).attr('data-coords').split(',');
 
-        plugin.set_location({
-          lat: item_coords[0],
-          lng: item_coords[1],
-          marker_index: $(this).attr('data-index'),
-        });
+          plugin.set_location({
+            lat: item_coords[0],
+            lng: item_coords[1],
+            marker_index: $(this).attr('data-index'),
+          });
+        }
+      });
+
+      // clear 'recent locations' list
+
+      item.on('click', '#recent-locations-clear', function () {
+        $(document).cdc_app('maps.remove_markers');
       });
 
       //
@@ -852,7 +863,7 @@
           .val($(this).attr('data-scheme-id'))
           .trigger('change');
       });
-      
+
       // "Download" button
 
       // Handle of the click on the "Download" button of the "Share" tab.
@@ -861,7 +872,11 @@
       $('#download-btn').on('click', function (event) {
         event.preventDefault();
         const base_href = this.href;
-        const query_string = $(document).cdc_app('query.obj_to_url', options.query, null);
+        const query_string = $(document).cdc_app(
+          'query.obj_to_url',
+          options.query,
+          null,
+        );
         window.location.href = base_href + query_string + '#data'; // Pre-open the "Data" tab on the "Download" page
       });
 

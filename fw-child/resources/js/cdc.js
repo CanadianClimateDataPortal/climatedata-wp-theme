@@ -1018,12 +1018,13 @@
           // add location to recents
 
           recent_list.prepend(
-            '<button class="list-group-item list-group-item-action active" data-location="' +
+            '<button class="list-group-item list-group-item-action d-flex align-items-center justify-content-between active" data-location="' +
               location.geo_id +
               '" data-coords="' +
               location.coords.join(',') +
               '">' +
               location.title +
+              '<span class="clear">&times;</span>' +
               '</button>',
           );
 
@@ -1043,6 +1044,54 @@
 
           if (typeof callback == 'function') {
             callback(data);
+          }
+        }
+
+        item.find('#recent-locations-clear').show();
+      },
+
+      remove_marker: function (item_index) {
+        let plugin = !this.item ? this.data('cdc_app') : this,
+          options = plugin.options,
+          item = plugin.item;
+
+        // console.log('remove', item_index);
+
+        let no_markers = true;
+
+        // delete the item in the sidebar
+        item.find('#recent-locations .list-group-item').eq(item_index).remove();
+
+        for (let key in options.maps) {
+          // remove from map
+          options.maps[key].object.removeLayer(
+            options.grid.markers[key][item_index],
+            options.grid.markers[key][item_index],
+          );
+
+          // splice from the markers array
+          options.grid.markers[key].splice(item_index, 1);
+
+          if (options.grid.markers[key].length > 0) {
+            no_markers = false;
+          }
+        }
+
+        if (no_markers == true) {
+          item.find('#recent-locations-clear').hide();
+        } else {
+          item.find('#recent-locations-clear').show();
+        }
+      },
+
+      remove_markers: function () {
+        let plugin = !this.item ? this.data('cdc_app') : this,
+          options = plugin.options,
+          item = plugin.item;
+
+        for (let key in options.maps) {
+          for (i = options.grid.markers[key].length - 1; i >= 0; i -= 1) {
+            plugin.maps.remove_marker.apply(item, [i]);
           }
         }
       },

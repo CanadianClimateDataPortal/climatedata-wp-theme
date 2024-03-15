@@ -845,7 +845,8 @@ function fw_setup_element ( $element, $globals ) {
 	
 	if (
 		isset ( $GLOBALS['fw']['carousel'] ) && 
-		$GLOBALS['fw']['carousel']['slide'] == $settings['el_type']
+		$GLOBALS['fw']['carousel']['slide'] == $settings['el_type'] &&
+		$settings['el_type'] != 'column'
 	) {
 		
 		$settings['classes'][] = 'swiper-slide';

@@ -102,8 +102,8 @@
 	<div id="map-control-footer">
 		<div class="d-flex">
 			
-			<div id="map-control-zoom" class="d-flex">
-				<div id="map-zoom-in" class="map-zoom-btn zoom-in">+</div>
+			<div id="map-control-zoom" class="d-flex border-end">
+				<div id="map-zoom-in" class="map-zoom-btn zoom-in border-end">+</div>
 				<div id="map-zoom-out" class="map-zoom-btn zoom-out">-</div>
 			</div>
 			

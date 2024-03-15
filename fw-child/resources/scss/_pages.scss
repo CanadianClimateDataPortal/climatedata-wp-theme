@@ -626,7 +626,7 @@ $legend-on-height: 16px;
   bottom: 0;
   right: 0;
   width: calc((100vw / 16) * 15);
-  background-color: $gray-100;
+  background-color: transparentize($gray-100, 0.05);
   transition: width 0.25s ease 0s;
   z-index: 2;
 
@@ -639,6 +639,13 @@ $legend-on-height: 16px;
     background-color: $white;
     font-size: 2rem;
     line-height: 3.75rem;
+    cursor: pointer;
+    transition: 0.25s;
+
+    &:hover {
+      background-color: $gray-200;
+      color: $primary;
+    }
   }
 }
 

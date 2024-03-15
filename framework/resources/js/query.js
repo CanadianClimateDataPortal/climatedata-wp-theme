@@ -248,8 +248,23 @@
 					item = plugin.item
 			
 			// reset default tax/meta query
-			if (options.args.tax_query) options.args.tax_query = [ ...options.default_args.tax_query ]
-			if (options.args.meta_query) options.args.meta_query = [ ...options.default_args.meta_query ]
+			console.log(JSON.stringify(options.args, null, 4))
+			
+			if (options.args.tax_query) {
+				if (options.default_args.tax_query) {
+					options.args.tax_query = [ ...options.default_args.tax_query ]
+				} else {
+					delete options.args.tax_query
+				}
+			}
+			
+			if (options.args.meta_query) {
+				if (options.default_args.meta_query) {
+					options.args.tax_query = [ ...options.default_args.meta_query ]
+				} else {
+					delete options.args.meta_query
+				}
+			}
 			
 			let has_filters = false
 			

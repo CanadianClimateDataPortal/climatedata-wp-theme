@@ -30,8 +30,6 @@
 						
 							$nav_items = wp_get_nav_menu_items ( 'Primary Navigation' );
 							
-							// dumpit ( $nav_items );
-							
 							$menu_items = array();
 							
 							foreach ( $nav_items as &$item ) {
@@ -130,6 +128,10 @@
 						<a href="https://www.facebook.com/ClimateData.ca.Donneesclimatiques.ca" target="_blank" class="text-secondary me-2" title="Facebook"><i class="fab fa-facebook"></i></a>
 						
 						<a href="https://www.instagram.com/climatedata.ca/" target="_blank" class="text-secondary me-2" title="Instagram"><i class="fab fa-instagram"></i></a>
+						
+						<a href="https://soundcloud.com/climate-data-canada" target="_blank" class="text-secondary me-2" title="Instagram"><i class="fab fa-soundcloud"></i></a>
+						
+						
 					</div>
 					
 					<div id="menu-langs" class="fw-menu pe-3">

@@ -133,6 +133,12 @@
       background-color: $white;
     }
   }
+
+  li:nth-of-type(3) {
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid $gray-300;
+  }
 }
 
 #menu-secondary {

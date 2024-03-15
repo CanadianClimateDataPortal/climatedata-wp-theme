@@ -718,14 +718,6 @@
       //
 
       item.on('click', '#submit-btn', function () {
-        // Validate the custom shapefile (if selected)
-        if (options.query.sector === 'custom') {
-          const shapefile_upload_valid = options.elements.shapefile_upload.shapefile_upload('validate');
-          if (!shapefile_upload_valid) {
-            return;
-          }
-          console.log(options.elements.shapefile_upload.shapefile_upload('selected_shapes_json'));
-        }
         console.log('SUBMIT DATA');
         console.log(JSON.stringify(options.query, null, 4));
 

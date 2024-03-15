@@ -865,6 +865,38 @@ body.tab-drawer-open {
     background-color: $secondary;
     color: $white;
   }
+
+  .dropdown-toggle {
+    &:active,
+    &.show {
+      background-color: $gray-200;
+      border-color: $gray-200;
+    }
+  }
+
+  .dropdown-item {
+    --bs-dropdown-link-active-bg: #{$gray-300};
+    --bs-dropdown-link-active-color: #{$body-color};
+  }
+
+  .dropdown-toggle {
+    width: 100%;
+
+    &:after {
+      margin-left: auto;
+    }
+  }
+
+  .fw-query-filter {
+    min-width: 25%;
+
+    .selection {
+      &:before {
+        content: ':';
+        color: $body-color;
+      }
+    }
+  }
 }
 
 #display-scheme-select {

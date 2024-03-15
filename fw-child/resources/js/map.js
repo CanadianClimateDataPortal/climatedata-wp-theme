@@ -65,6 +65,7 @@
       elements: {
         decade_slider: null,
         threshold_slider: null,
+        var_filters: {},
       },
       debug: true,
     };
@@ -518,6 +519,8 @@
 
       item.find('#var-select-query').fw_query();
 
+      //
+
       $(document).cdc_app(
         'add_hook',
         'maps.get_layer',
@@ -525,6 +528,24 @@
         plugin,
         plugin.apply_scheme,
       );
+
+      //
+
+      //       let var_filters = document.querySelectorAll('.var-select-dropdown');
+      //
+      //       item.find('.fw-query-filter').each(function() {
+      //         options.elements.var_filters[$(this)]
+      //       })
+      //
+      //
+      //       })
+      //
+      //
+      //        = [...var_filters].map(
+      //         (dropdownToggleEl) => new bootstrap.Dropdown(dropdownToggleEl),
+      //       );
+      //
+      //       console.log();
     },
 
     _select2_format_item: function (item) {
@@ -792,18 +813,6 @@
           .trigger('change');
       });
 
-      // click a variable item description
-      //
-      //       item.on('click', '.var-description', function (e) {
-      //         e.preventDefault();
-      //
-      //         let this_item = $(this).closest('.fw-query-item'),
-      //           this_id = $(this).attr('data-var-id'),
-      //           item_order = parseInt(this_item.css('order'));
-      //
-      //
-      //       });
-
       // click a link element with a query key
 
       item.on('click', 'a[data-query-key]', function () {
@@ -878,6 +887,50 @@
           null,
         );
         window.location.href = base_href + query_string + '#data'; // Pre-open the "Data" tab on the "Download" page
+      });
+
+      // var select filters
+
+      item.on('mouseup', '#var-select-query .filter-item', function (e) {
+        console.log('close');
+
+        let this_filter = $(this).closest('.fw-query-filter'),
+          this_toggle = this_filter.find('.dropdown-toggle'),
+          this_menu = $(this).closest('.dropdown-menu');
+
+        // toggle 'show' class
+
+        this_toggle.removeClass('show');
+
+        // close the dropdown
+
+        let this_dropdown = bootstrap.Dropdown.getOrCreateInstance(
+          document.getElementById($(this).closest('.dropdown-menu').attr('id')),
+        );
+
+        this_dropdown.toggle();
+
+        setTimeout(function () {
+          // add selection to toggle btn
+          console.log(this_menu);
+          console.log();
+
+          if (this_menu.find('.selected').length) {
+            this_toggle
+              .find('.selection')
+              .text(this_menu.find('.selected').text())
+              .show();
+          } else {
+            this_toggle.find('.selection').text('').hide();
+          }
+        }, 250);
+      });
+
+      $(document).on('fw_query_reset', function () {
+        item
+          .find('.fw-query-filter .dropdown-toggle .selection')
+          .text('')
+          .hide();
       });
 
       // HISTORY

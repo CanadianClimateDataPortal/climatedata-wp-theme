@@ -52,7 +52,7 @@
 				<div id="map-control-recent" class="map-control-item">
 					<div class="d-flex justify-content-between mb-3">
 						<h6 class="all-caps text-secondary mb-0">Recent Locations</h6>
-						<h6 class="all-caps text-gray-600 mb-0">Clear</h6>
+						<h6 id="recent-locations-clear" class="all-caps text-gray-600 mb-0" style="display: none;">Clear</h6>
 					</div>
 					
 					<div id="recent-locations" class="list-group list-group-flush">

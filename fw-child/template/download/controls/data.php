@@ -24,7 +24,7 @@
 					<input type="hidden" name="data-var-id" id="data-var-id" value="" data-query-key="var_id">
 					<input type="hidden" name="data-var" id="data-var" value="" data-query-key="var" data-validate="<?php _e ( 'Select a variable to download', 'cdc' ); ?>">
 					
-					<a href="#data-variable" class="tab-drawer-trigger var-name d-block bg-white text-body p-3 mb-3"><?php _e ( 'Click to select a variable', 'cdc' ); ?></a>
+					<a href="#data-variable" class="tab-drawer-trigger var-name d-block bg-white text-body p-3 mb-3" data-validate="#data-var"><?php _e ( 'Click to select a variable', 'cdc' ); ?></a>
 					
 					<div id="var-thresholds" class="me-3" style="display: none;" data-display="station:0">
 						<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Thresholds', 'cdc' ); ?></h6>

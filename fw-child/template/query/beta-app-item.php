@@ -22,5 +22,8 @@
 	<div class="card-body">
 		<h5 class="card-title item-title"><a href="<?php echo $item['permalink']; ?>" class="text-secondary stretched-link"><?php echo $item['title']; ?></a></h5>
 		
+		<div class="">
+			<?php echo apply_filters ( 'the_content', fw_get_field ( 'app_brief', $item['id'] ) ); ?>
+		</div>
 	</div>
 </div>

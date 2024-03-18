@@ -18,34 +18,49 @@
 				<div class="tab-drawer-content">
 					<div class="tab-drawer-content-inner">
 						<div class="control-tab-head d-flex justify-content-between">
-							<h5><?php _e ( 'Filters', 'cdc' ); ?></h5>
+							<h5 class="me-auto mb-0 text-secondary"><?php _e ( 'Filters', 'cdc' ); ?></h5>
+							<span class="fw-query-reset me-2" style="display: none;"><i class="fas fa-sync fa-flip-horizontal"></i></span>
 							<span class="tab-drawer-close btn-close"></span>
 						</div>
 						
 						<div class="control-tab-body query-container">
 							
-							<div class="fw-query-filter p-3" data-filter-type="taxonomy" data-filter-multi="false">
-								<h6 class="text-primary"><?php _e ( 'Tag', 'fw' ); ?></h6>
+							<?php
+							
+								foreach ( array ( 'sector', 'var-type' ) as $filter_tax ) {
+									
+									$tax_obj = get_taxonomy ( $filter_tax );
+									
+									$this_heading = $tax_obj->labels->singular_name;
+									
+									if ( get_field ( 'tax_' . $filter_tax . '_title_single_' . $GLOBALS['fw']['current_lang_code'], 'option' ) != '' ) {
+										$this_heading = get_field ( 'tax_' . $filter_tax . '_title_single_' . $GLOBALS['fw']['current_lang_code'], 'option' );
+									}
+									
+							?>
+							
+							<div class="fw-query-filter ms-3 py-4 border-bottom" data-filter-type="taxonomy" data-filter-key="<?php echo $filter_tax; ?>" data-filter-multi="false">
+								<h5 class="fw-bold"><?php echo $this_heading; ?></h5>
 								
 								<?php
 								
-									$all_tags = get_terms ( array ( 
-										'taxonomy' => 'post_tag',
-										'hide_empty' => true
+									$all_tags = get_terms ( array (
+										'taxonomy' => $filter_tax,
+										'hide_empty' => false
 									) );
 								
 									if ( !empty ( $all_tags ) ) {
 									
 								?>
 								
-								<ul class="list-unstyled">
+								<ul class="list-unstyled m-0 pe-2">
 									<?php
 									
 										foreach ( $all_tags as $tag ) {
 											
 									?>
 									
-									<li class="filter-item" data-key="post_tag" data-value="<?php echo $tag->slug; ?>"><?php echo $tag->name; ?></li>
+									<li class="filter-item" data-key="<?php echo $filter_tax; ?>" data-value="<?php echo $tag->slug; ?>"><?php echo $tag->name; ?></li>
 									
 									<?php
 									
@@ -59,6 +74,12 @@
 							
 								?>
 							</div>
+							
+							<?php
+							
+								}
+							
+							?>
 							
 						</div>
 					</div>

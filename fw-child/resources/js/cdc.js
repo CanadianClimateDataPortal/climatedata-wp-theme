@@ -96,6 +96,7 @@
         data: {},
       },
       maps: {},
+      station_data: null,
       coords: {
         lat: null,
         lng: null,
@@ -299,16 +300,6 @@
             },
           ).addTo(this_object);
 
-          // stations
-          $.ajax({
-            url: 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y',
-            dataType: 'json',
-            async: false,
-            success: function (data) {
-              options.station_data = data;
-            },
-          });
-
           options.maps[key].legend = L.control({ position: 'topright' });
         }
 
@@ -364,6 +355,8 @@
 
         console.log('---');
         console.log('get layer');
+
+        console.log(query);
 
         switch (query.sector) {
           case 'canadagrid':
@@ -534,6 +527,19 @@
           case 'station':
             console.log('ADD STATIONS');
 
+            if (options.station_data == null) {
+              // stations not yet loaded
+
+              $.ajax({
+                url: 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y',
+                dataType: 'json',
+                async: false,
+                success: function (data) {
+                  options.station_data = data;
+                },
+              });
+            }
+
             Object.keys(options.maps).forEach(function (key) {
               let this_map = options.maps[key];
 
@@ -658,6 +664,7 @@
                   }
 
                   // are we swapping between sectors
+
                   if (options.current_sector != query.sector) {
                     console.log('change sector');
 
@@ -1011,12 +1018,13 @@
           // add location to recents
 
           recent_list.prepend(
-            '<button class="list-group-item list-group-item-action active" data-location="' +
+            '<button class="list-group-item list-group-item-action d-flex align-items-center justify-content-between active" data-location="' +
               location.geo_id +
               '" data-coords="' +
               location.coords.join(',') +
               '">' +
               location.title +
+              '<span class="clear">&times;</span>' +
               '</button>',
           );
 
@@ -1036,6 +1044,54 @@
 
           if (typeof callback == 'function') {
             callback(data);
+          }
+        }
+
+        item.find('#recent-locations-clear').show();
+      },
+
+      remove_marker: function (item_index) {
+        let plugin = !this.item ? this.data('cdc_app') : this,
+          options = plugin.options,
+          item = plugin.item;
+
+        // console.log('remove', item_index);
+
+        let no_markers = true;
+
+        // delete the item in the sidebar
+        item.find('#recent-locations .list-group-item').eq(item_index).remove();
+
+        for (let key in options.maps) {
+          // remove from map
+          options.maps[key].object.removeLayer(
+            options.grid.markers[key][item_index],
+            options.grid.markers[key][item_index],
+          );
+
+          // splice from the markers array
+          options.grid.markers[key].splice(item_index, 1);
+
+          if (options.grid.markers[key].length > 0) {
+            no_markers = false;
+          }
+        }
+
+        if (no_markers == true) {
+          item.find('#recent-locations-clear').hide();
+        } else {
+          item.find('#recent-locations-clear').show();
+        }
+      },
+
+      remove_markers: function () {
+        let plugin = !this.item ? this.data('cdc_app') : this,
+          options = plugin.options,
+          item = plugin.item;
+
+        for (let key in options.maps) {
+          for (i = options.grid.markers[key].length - 1; i >= 0; i -= 1) {
+            plugin.maps.remove_marker.apply(item, [i]);
           }
         }
       },
@@ -1177,8 +1233,8 @@
             }
           });
 
-          // console.log('merged query');
-          // console.log(JSON.stringify(query, null, 4));
+          console.log('merged query');
+          console.log(JSON.stringify(query, null, 4));
         }
 
         // set cdc_app's options.query too
@@ -1261,7 +1317,7 @@
             query[fn_options.key] = fn_options.val;
           }
 
-          console.log('updated ' + fn_options.key, query[fn_options.key]);
+          // console.log('updated ' + fn_options.key, query[fn_options.key]);
 
           return query[fn_options.key];
 

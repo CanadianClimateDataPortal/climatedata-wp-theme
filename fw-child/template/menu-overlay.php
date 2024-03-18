@@ -30,8 +30,6 @@
 						
 							$nav_items = wp_get_nav_menu_items ( 'Primary Navigation' );
 							
-							// dumpit ( $nav_items );
-							
 							$menu_items = array();
 							
 							foreach ( $nav_items as &$item ) {
@@ -68,7 +66,7 @@
 				</div>
 			</div>
 			
-			<div id="menu-secondary" class="fw-block-type-menu fw-block">
+			<div id="menu-secondary" class="fw-block-type-menu fw-block mb-2">
 				<div id="menu-secondary-inner" class=" ">
 					
 					<?php 
@@ -125,11 +123,15 @@
 					<div>
 						<a href="https://www.linkedin.com/company/climate-data-canada/" target="_blank" class="text-secondary me-2" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
 						
-						<a href="https://twitter.com/ClimateData_ca" target="_blank" class="text-secondary me-2" title="X (Twitter)"><i class="fab fa-twitter"></i></a>
+						<a href="https://twitter.com/ClimateData_ca" target="_blank" class="text-secondary me-2" title="X (Twitter)">𝕏</a>
 						
 						<a href="https://www.facebook.com/ClimateData.ca.Donneesclimatiques.ca" target="_blank" class="text-secondary me-2" title="Facebook"><i class="fab fa-facebook"></i></a>
 						
 						<a href="https://www.instagram.com/climatedata.ca/" target="_blank" class="text-secondary me-2" title="Instagram"><i class="fab fa-instagram"></i></a>
+						
+						<a href="https://soundcloud.com/climate-data-canada" target="_blank" class="text-secondary me-2" title="Instagram"><i class="fab fa-soundcloud"></i></a>
+						
+						
 					</div>
 					
 					<div id="menu-langs" class="fw-menu pe-3">
@@ -177,7 +179,7 @@
 				</div>
 			</div>
 			
-			<div id="tab-drawer-container" class="tab-drawer-container">
+			<div id="menu-td-container" class="tab-drawer-container">
 				
 				<div id="browse-vars" class="tab-drawer">
 					<div class="tab-drawer-content">

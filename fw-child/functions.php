@@ -35,9 +35,9 @@ add_action ( 'wp', 'child_global_vars', 20 );
 // process any deployment specific configuration
 
 if ( stream_resolve_include_path ( 'local_config.php' ) ) {
-	include_once 'local_config.php';
+	include_once locate_template ( 'local_config.php' );
 } else {
-	include_once 'default_config.php';
+	include_once locate_template ( 'default_config.php' );
 }
 
 //
@@ -287,7 +287,7 @@ function fw_child_theme_support() {
 	// UNCROPPED IMAGE SIZE FOR CARD BLOCKS
 
 	add_image_size ( 'card-img-no-crop', '600', '380', false );
-
+	
 	// MENUS
 
 	// LANGUAGES
@@ -320,11 +320,11 @@ function add_favicon() {
 
 ?>
 
-<link rel="apple-touch-icon" sizes="180x180" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_package_v0.16/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_package_v0.16/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_package_v0.16/favicon-16x16.png">
-<link rel="manifest" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_package_v0.16/site.webmanifest">
-<link rel="mask-icon" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_package_v0.16/safari-pinned-tab.svg" color="#0018ff">
+<link rel="apple-touch-icon" sizes="180x180" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_io/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_io/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_io/favicon-16x16.png">
+<link rel="manifest" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_io/site.webmanifest">
+<link rel="mask-icon" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_io/safari-pinned-tab.svg" color="#0018ff">
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="theme-color" content="#ffffff">
 
@@ -332,7 +332,7 @@ function add_favicon() {
 
 }
 
-// add_action( 'wp_head', 'add_favicon' );
+add_action( 'wp_head', 'add_favicon' );
 
 add_action ( 'wp_head', function() {
 	
@@ -385,6 +385,7 @@ add_action ( 'fw_before_footer', function() {
 ?>
 
 <script type="text/javascript">
+	var base_href = '<?php echo $GLOBALS['vars']['home_url']; ?>';
 	var L_DISABLE_3D = true;
 	const DATA_URL = '<?php echo $GLOBALS['vars']['data_url']; ?>';
 	const URL_ENCODER_SALT = '<?php echo $GLOBALS['vars']['url_encoder_salt']; ?>';

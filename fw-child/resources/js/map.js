@@ -859,8 +859,8 @@
         event.preventDefault();
         const page_url = new URL(window.location.href);
         page_url.hash = ''; // Make sure to remove #download so no tab is opened at the time of the screenshot
-        const encoded_url = encodeURL(page_url.toString(), url_encoder_salt).encoded;
-        const api_url = geoserver_url + '/raster?url=' + encoded_url;
+        const encoded_url = encodeURL(page_url.toString(), URL_ENCODER_SALT).encoded;
+        const api_url = DATA_URL + '/raster?url=' + encoded_url;
         window.open(api_url, '_blank');
       });
 

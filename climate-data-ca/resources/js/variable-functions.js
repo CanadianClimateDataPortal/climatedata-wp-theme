@@ -2277,7 +2277,7 @@
                 } else {
                     // console.log('----- ' + history_action + ' -----');
                 }
-                $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(new_url, url_encoder_salt).encoded);
+                $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(new_url, URL_ENCODER_SALT).encoded);
             }
             history_action = 'push';
         }
@@ -3243,7 +3243,7 @@
         });
 
         // initially update screenshot button link
-        $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(window.location.href, url_encoder_salt).encoded);
+        $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(window.location.href, URL_ENCODER_SALT).encoded);
 
     });
 })(jQuery);

@@ -891,12 +891,25 @@
       // the "Download" page are pre-filled.
       $('#download-btn').on('click', function (event) {
         event.preventDefault();
+        const download_query = $.extend(true, {}, options.query);
+
+        // We do some conversions of the "map" page query to adjust it for the "download" page query
+        
+        const period = options.query.decade;
+
+        if (period != null) {
+          const period_start = parseInt(period);
+          download_query['start_year'] = period_start;
+          download_query['end_year'] = period_start + 30;
+        }
+        
         const base_href = this.href;
         const query_string = $(document).cdc_app(
           'query.obj_to_url',
-          options.query,
+          download_query,
           null,
         );
+        
         window.location.href = base_href + query_string + '#data'; // Pre-open the "Data" tab on the "Download" page
       });
 

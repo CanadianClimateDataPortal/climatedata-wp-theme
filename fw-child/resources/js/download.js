@@ -721,7 +721,7 @@
       item.on('click', '#submit-btn', function () {
         console.log('SUBMIT DATA');
         console.log(JSON.stringify(options.query, null, 4));
-        const file_name = create_file_name(options.query);
+        const file_name = generate_data_query_filename(options.query, variable_short_names);
 
         plugin.process();
       });

@@ -461,187 +461,170 @@ function encodeURL(url, salt) {
   };
 }
 
-function create_file_name(query) {
-  const file_name_parts = [];
-  let dataset = 'CanDCS-u5';
 
-  // dataset
-  switch (query.dataset) {
-    case 'cmip6':
-      dataset = 'CanDCS-u6';
-      break;
-    case 'humidex':
-      dataset = 'HUMIDEX';
-      break;
+/**
+ * Generate a filename based on a data query.
+ *
+ * The data query is an object describing a specific query for climate data. For example, it can contain the name of
+ * the variable for which we want data, the dataset to use, a specific date range, etc. This object is generally
+ * used to query a data server that will produce and return the resulting data in a file. This function can be used to
+ * generate a specific filename that will represent the query.
+ * 
+ * @param {object} query - Query object for which to create a filename.
+ * @param {object[]} variables_filename
+ *   Mapping to transform a variable id (the `var` element of the query) to its name for the file name. See the
+ *   documentation of the `variable_short_names` global variable.
+ * @param {object} options
+ *   Options configuring the generated filename.
+ *   - `include_scenarios` (default: true) If true, adds the scenario(s) to the filename.
+ *   - `with_extension` (default: true) If true, the file extension will be appended to the filename.
+ * @returns {string|null} - The generated filename, or null if the query object doesn't contain any information.
+ */
+function generate_data_query_filename(query, variables_filename = [], options = {}) {
+  const filename_parts = [];
+  options = jQuery.extend({
+    include_scenarios: true,
+    with_extension: true,
+  }, options);
+
+  // Dataset name
+  
+  if (query.dataset) {
+    let dataset = query.dataset;
+
+    switch (query.dataset) {
+      case 'cmip5':
+        dataset = 'CanDCS-u5';
+        break;
+      case 'cmip6':
+        dataset = 'CanDCS-u6';
+        break;
+      case 'humidex':
+        dataset = 'HUMIDEX';
+        break;
+    }
+
+    filename_parts.push(dataset);
   }
 
-  file_name_parts.push(dataset);
+  // Location
 
-  // ---
+  if (query.sector) {
+    let location = query.sector;
+    if (location === 'custom') {
+      location = 'CustomShape';
+    } else {
+      location = location.charAt(0).toUpperCase() + location.slice(1);
+    }
 
-  let location = (query.sector || 'canadagrid');
-  location = location.charAt(0).toUpperCase() + location.slice(1);
+    // TODO: missing here the id of the selected location
+    //  Original code:
+    //    if (form_inputs['shape'] != '') location += '_' + form_inputs['shape'];
 
-  // TODO: missing here the id of the selected location
-  //  Original code:
-  //    if (form_inputs['shape'] != '') location += '_' + form_inputs['shape'];
-
-  file_name_parts.push(location);
-
-  // ---
-
-  if (query.start_date) {
-    file_name_parts.push('from_' + query.start_date);
+    filename_parts.push(location);
   }
 
-  if (query.end_date) {
-    file_name_parts.push('to_' + query.end_date);
+  // Date range
+  
+  const date_range = []
+
+  if (query.start_year) {
+    date_range.push('from-' + query.start_year);
   }
 
-  // ---
-
-  let variable = null;
-
-  // TODO: create the `variable` based on the selected variable and the custom value
-  // const variables = {
-  //   wetdays: { label: 'WetDays', vars: '_qt_<thresh>' },
-  //   sdii: { label: 'AverageWetDayPreciIntens', vars: '_qt_<thresh>' },
-  //   cwd: { label: 'MaxConsWetDays', vars: '_qt_<thresh>' },
-  //   cdd: { label: 'MaxConsDryDays', vars: '_qt_<thresh>' },
-  //   tx_tn_days_above: {
-  //     label: 'DaysAboveTmaxAndTmin',
-  //     vars: '_<thresh_tasmin>_to_<thresh_tasmax>',
-  //   },
-  //   tx_days_above: { label: 'DaysAboveTmax', vars: '_<thresh>' },
-  //   tropical_nights: { label: 'DaysAboveTmin', vars: '_<thresh>' },
-  //   tn_days_below: { label: 'DaysBelowTmin', vars: '_<thresh>' },
-  //   cooling_degree_days: {
-  //     label: 'DegDaysAboveThreshold',
-  //     vars: '_<thresh>',
-  //   },
-  //   heating_degree_days: {
-  //     label: 'DegDaysBelowThreshold',
-  //     vars: '_<thresh>',
-  //   },
-  //   degree_days_exceedance_date: {
-  //     label: 'DegDaysExceedDate',
-  //     vars: '_<sum_thresh>_days_<op>_<thresh>_from_<after_date>',
-  //   },
-  //   heat_wave_index: {
-  //     label: 'HeatWave',
-  //     vars: '_<window>_days_at_<thresh>',
-  //   },
-  //   heat_wave_total_length: {
-  //     label: 'HeatWaveTotDuration',
-  //     vars: '_<window>_days_at_<thresh_tasmin>_to_<thresh_tasmax>',
-  //   },
-  //   heat_wave_frequency: {
-  //     label: 'HeatWaveFreq',
-  //     vars: '_<window>_days_at_<thresh_tasmin>_to_<thresh_tasmax>',
-  //   },
-  //   dlyfrzthw: {
-  //     label: 'DaysFreezeThawCycle',
-  //     vars: '_<thresh_tasmin>_to_<thresh_tasmax>',
-  //   },
-  //   cold_spell_days: {
-  //     label: 'ColdSpellDays',
-  //     vars: '_<window>_days_at_<thresh>',
-  //   },
-  //
-  //   ////
-  //
-  //   building_climate_zones: {},
-  //   cdd: {},
-  //   cddcold_18: {},
-  //   'dlyfrzthw_tx0_tn-1': {},
-  //   first_fall_frost: {},
-  //   frost_days: {},
-  //   frost_free_season: {},
-  //   gddgrow_0: {},
-  //   gddgrow_5: {},
-  //   hddheat_18: {},
-  //   HXmax30: {},
-  //   HXmax35: {},
-  //   HXmax40: {},
-  //   ice_days: {},
-  //   idf: {},
-  //   last_spring_frost: {},
-  //   nr_cdd: {},
-  //   prcptot: {},
-  //   r10mm: {},
-  //   r1mm: {},
-  //   r20mm: {},
-  //   rx1day: {},
-  //   rx5day: {},
-  //   slr: {},
-  //   spei_12m: {},
-  //   spei_3m: {},
-  //   tg_mean: {},
-  //   tn_mean: {},
-  //   tn_min: {},
-  //   'tnlt_-25': {},
-  //   tr_18: {},
-  //   tr_20: {},
-  //   tr_22: {},
-  //   tx_max: {},
-  //   tx_mean: {},
-  //   txgt_25: {},
-  //   txgt_27: {},
-  //   txgt_29: {},
-  //   txgt_30: {},
-  //   txgt_32: {},
-  //   'weather-stations': {},
-  // };
-
-  // let variable = variables[form_inputs['analyze-location']];
-  // variable = variable.label + variable.vars;
-  //
-  // [
-  //   'thresh',
-  //   'thresh_tasmin',
-  //   'thresh_tasmax',
-  //   'window',
-  //   'after_date',
-  //   'sum_thresh',
-  //   'op',
-  // ].forEach((v) => {
-  //   let val = $(`input[type="hidden"][id=${v}]`).val();
-  //   if (['thresh', 'thresh_tasmin', 'thresh_tasmax'].includes(v))
-  //     val = val.replaceAll('-', 'neg');
-  //   variable = variable.replaceAll('<' + v + '>', val);
-  // });
-
-  if (variable != null) {
-    file_name_parts.push(variable);
+  if (query.end_year) {
+    date_range.push('to-' + query.end_year);
+  }
+  
+  if (date_range.length) {
+    filename_parts.push(date_range.join('-'));
   }
 
-  // ---
+  // Selected variable (and thresholds, if applicable)
 
-  const scenario_name_mapping = {
-    low: 'ssp126',
-    medium: 'ssp245',
-    high: 'ssp585',
-  };
+  if (query.var) {
+    let variable = query.var;
 
-  if (query.scenarios) {
-    const scenarios = query.scenarios.map(name => scenario_name_mapping[name]);
-    file_name_parts.push(scenarios.join('-'));
+    for (const variable_map of variables_filename) {
+      const id_is_string = typeof variable_map.id === 'string';
+      const matches_string = id_is_string && variable_map.id === query.var;
+      const matches_regex = !id_is_string && variable_map.id.test(query.var);
+
+      if (matches_string || matches_regex) {
+        variable = variable_map.name;
+        break;
+      }
+    }
+
+    // Replace placeholders
+    if (query.inputs) {
+      for (const input of query.inputs) {
+        let value = input.value;
+
+        // Negative numbers have their "-" replaced with "neg"
+        if (/^-\d+/.test(value)) {
+          value = 'neg' + value.slice(1);
+        }
+        
+        variable = variable.replace('<'+input.name+'>', value);
+      }
+    }
+    
+    filename_parts.push(variable);
   }
+
+  // Scenario
+  
+  if (options.include_scenarios) {
+    const scenario_name_mapping = {
+      low: { 'cmip6': 'SSP126', 'cmip5': 'RCP26' },
+      medium: { 'cmip6': 'SSP245', 'cmip5': 'RCP45' },
+      high: { 'cmip6': 'SSP585', 'cmip5': 'RCP85' },
+    };
+
+    if (query.scenarios) {
+      const dataset = query.dataset;
+      const scenarios = query.scenarios.map(function (name) {
+        if (dataset && scenario_name_mapping[name] && scenario_name_mapping[name][dataset]) {
+          return scenario_name_mapping[name][dataset];
+        }
+        return name;
+      });
+      filename_parts.push(scenarios.join('-'));
+    }
+  }
+  
+  // Percentile
 
   if (query.percentiles) {
     const percentiles = query.percentiles.map(value => 'p' + value);
-    file_name_parts.push(percentiles.join('-'));
+    filename_parts.push(percentiles.join('-'));
   }
+  
+  // Frequency
 
   if (query.frequency) {
-    file_name_parts.push(query.frequency);
+    filename_parts.push(query.frequency);
   }
+  
+  // Generated file decimals
 
   if (query.decimals != null) {
-    file_name_parts.push(query.decimals);
+    filename_parts.push(query.decimals);
+  }
+  
+  if (!filename_parts.length) {
+    return null;
+  }
+  
+  // File extension
+  
+  let file_name = filename_parts.join('_');
+  
+  if (options.with_extension) {
+    const extension = query.format === 'csv' ? '.csv' : '.nc';
+    file_name = file_name + extension;
   }
 
-  const extension = query.format === 'csv' ? '.csv' : '.nc';
-
-  return file_name_parts.join('_') + extension;
+  return file_name;
 }

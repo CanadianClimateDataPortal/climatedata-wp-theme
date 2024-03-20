@@ -999,11 +999,6 @@
         options.status = 'eval';
         plugin.handle_pop(e);
       });
-
-      item.find('a#process-download').on('click', e => {
-        const file_name = create_file_name(options.query);
-        e.preventDefault();
-      })
     },
 
     handle_input: function (input, status) {

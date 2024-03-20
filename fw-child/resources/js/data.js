@@ -193,3 +193,48 @@ const special_variables = {
     }
   }
 }
+
+/**
+ * Mapping to translate a variable id to a "short" name.
+ * 
+ * Each element is a map from an id to a name. It's an object with two keys: `id` which is either a string or a regular
+ * expression matching the id; and `name` which is the variable's name to use in the filename.
+ *  
+ * The name can contain placeholders, between `<` and `>`. A function using this mapping will generally replace
+ * the placeholders will specific values.
+ * 
+ * @type {{id: string|RegExp, name: string}[]}
+ */
+const variable_short_names = [
+  { id: 'building_climate_zones', name: '' }, // Building Climate Zones
+  { id: 'cdd', name: 'MaxConsDryDays-qt-<quantity>' }, // Maximum Number of Consecutive Dry Days
+  { id: /cddcold_-?\d+/, name: 'DegDaysAboveThreshold-qt-<quantity>' }, // Cooling Degree Days
+  { id: 'cwd', name: 'MaxConsWetDays-qt-<quantity>' }, // Maximum Consecutive Wet Days'
+  { id: /dlyfrzthw_.+/, name: 'DaysFreezeThawCycle-<Tmin>-to-<Tmax>' }, // Freeze-Thaw Cycles
+  { id: 'first_fall_frost', name: '' }, // First fall frost
+  { id: 'frost_days', name: '' }, // Frost Days
+  { id: 'frost_free_season', name: '' }, // Frost free season
+  { id: /gddgrow_-?\d+/, name: 'DegDaysAboveThreshold-<Tmin>' }, // Cumulative degree-days above X/Growing Degree Days (X°C)
+  { id: /hddheat_-?\d+/, name: 'DegDaysBelowThreshold-qt-<quantity>' }, // Heating degree days
+  { id: /HXmax\d+/, name: '' }, // Days with Humidex > X
+  { id: 'idf', name: '' }, // Short-duration Rainfall IDF
+  { id: 'ice_days', name: '' }, // Ice Days
+  { id: 'last_spring_frost', name: '' }, // Last spring frost
+  { id: 'nr_cdd', name: '' }, // Number of Periods with more than 5 Consecutive Dry Days
+  { id: 'prcptot', name: '' }, // Total Precipitation
+  { id: /r\d+mm/, name: 'WetDays-qt-<thresh>' }, // Wet Days
+  { id: /rx\d+day/, name: '' }, // Maximum X-Day (Total) Precipitation
+  { id: 'sdii', name: 'AverageWetDayPreciIntens-qt-<quantity>' }, // Average ‘Wet Day’ Precipitation Intensity
+  { id: 'slr', name: '' }, // Relative Sea-Level Change
+  { id: /spei_\d+m/, name: '' }, // Standardized precipitation evapotranspiration index (X months)
+  { id: 'tg_mean', name: '' }, // Mean Temperature
+  { id: 'tn_mean', name: '' }, // Minimum Temperature
+  { id: 'tn_min', name: '' }, // Coldest Day
+  { id: /tnlt_-?\d+/, name: 'DaysBelowTmin-<Tmin>' }, // Days with Tmin < X
+  { id: /tr_-?\d+/, name: 'DaysAboveTmin-<Tmin>' }, // Tropical Nights - Days with Tmin > X
+  { id: 'tx_max', name: '' }, // Hottest Day
+  { id: 'tx_mean', name: '' }, // Maximum Temperature
+  { id: /txgt_-?\d+/, name: 'DaysAboveTmax-<Tmax>' }, // Days with Tmax > X
+  { id: 'tx_tn_days_above', name: 'DaysAboveTmaxAndTmin-<Tmin>-to-<Tmax>' }, // Days above Tmax and Tmin
+  { id: 'weather-stations', name: '' }, // MSC Climate Normals 1981-2010
+];

@@ -1,6 +1,6 @@
 <?php
 
-	// if ( current_user_can ( 'administrator' ) ) {
+	if ( current_user_can ( 'administrator' ) ) {
 		echo '<!--';
 		echo "\n\n";
 		echo 'vars';
@@ -12,7 +12,7 @@
 		print_r ( $GLOBALS['fw'] );
 		echo "\n";
 		echo '-->';
-	// }
+	}
 	
 	// dumpit ( get_option ( 'fw_test' ) );
 	

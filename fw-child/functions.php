@@ -170,6 +170,16 @@ function child_theme_enqueue() {
 	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'cdc', 'jquery-ui-slider', 'jquery-ui-datepicker', 'select2', 'flex-drawer' ), NULL, true );
 	
 	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'tab-drawer', 'utilities', 'share-widget' ), NULL, true );
+
+	// Scripts for the "custom shapefile upload" logic (in the "download" section).
+
+	wp_register_script ( 'jszip', $child_npm_dir . 'jszip/dist/jszip.min.js', null, null, true );
+	wp_register_script ( 'mapshaper_modules', $child_npm_dir . 'mapshaper/www/modules.js', null, null, true );
+	wp_register_script ( 'mapshaper', $child_npm_dir . 'mapshaper/www/mapshaper.js', array ( 'mapshaper_modules' ), null, true );
+	wp_register_script ( 'topojson', $child_npm_dir . 'topojson/dist/topojson.min.js', null, null, true );
+	wp_register_script ( 'turf', $child_npm_dir . '@turf/turf/turf.min.js', null, null, true );
+
+	wp_register_script ( 'shapefile-upload', $child_js_dir . 'shapefile-upload.js', array ( 'jquery', 'jszip', 'mapshaper', 'topojson', 'turf' ), null, true );
 	
 	// localize admin url
 	
@@ -205,11 +215,13 @@ function child_theme_enqueue() {
 		case 'map' :
 		case 'carte' :
 			wp_enqueue_script ( 'map-app' );
+			wp_enqueue_script ( 'shapefile-upload' );
 			break;
 			
 		case 'download' :
 		case 'telechargement' :
 			wp_enqueue_script ( 'download-app' );
+			wp_enqueue_script ( 'shapefile-upload' );
 			break;
 			
 		case 'learn' :
@@ -287,10 +299,6 @@ function fw_child_theme_support() {
 	// UNCROPPED IMAGE SIZE FOR CARD BLOCKS
 
 	add_image_size ( 'card-img-no-crop', '600', '380', false );
-
-	// CUSTOM POST TYPE THUMBNAILS
-	
-	add_theme_support ( 'post-thumbnails' );
 	
 	// MENUS
 
@@ -324,11 +332,11 @@ function add_favicon() {
 
 ?>
 
-<link rel="apple-touch-icon" sizes="180x180" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_package_v0.16/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_package_v0.16/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_package_v0.16/favicon-16x16.png">
-<link rel="manifest" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_package_v0.16/site.webmanifest">
-<link rel="mask-icon" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_package_v0.16/safari-pinned-tab.svg" color="#0018ff">
+<link rel="apple-touch-icon" sizes="180x180" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_io/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_io/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_io/favicon-16x16.png">
+<link rel="manifest" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_io/site.webmanifest">
+<link rel="mask-icon" href="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/vendor/favicon_io/safari-pinned-tab.svg" color="#0018ff">
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="theme-color" content="#ffffff">
 
@@ -336,7 +344,7 @@ function add_favicon() {
 
 }
 
-// add_action( 'wp_head', 'add_favicon' );
+add_action( 'wp_head', 'add_favicon' );
 
 add_action ( 'wp_head', function() {
 	
@@ -392,7 +400,7 @@ add_action ( 'fw_before_footer', function() {
 	var base_href = '<?php echo $GLOBALS['vars']['home_url']; ?>';
 	var L_DISABLE_3D = true;
 	const DATA_URL = '<?php echo $GLOBALS['vars']['data_url']; ?>';
-	var url_encoder_salt = '<?php echo $GLOBALS['vars']['url_encoder_salt']; ?>';
+	const URL_ENCODER_SALT = '<?php echo $GLOBALS['vars']['url_encoder_salt']; ?>';
 </script>
 
 <?php

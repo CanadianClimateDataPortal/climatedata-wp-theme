@@ -2,8 +2,7 @@
 // GLOBAL CONSTANTS
 //
 
-// const geoserver_url = 'https://data.climatedata.ca';
-const geoserver_url = 'https://dataclimatedata.crim.ca';
+const geoserver_url = DATA_URL;
 
 const svgNS = 'http://www.w3.org/2000/svg';
 
@@ -22,7 +21,7 @@ const scenario_names = {
 };
 
 let units = null;
-if (typeof unit_strings !== 'undefined') units = unit_strings;
+if (unit_strings) units = unit_strings;
 const UNITS = units;
 
 const DATASETS = {
@@ -165,6 +164,9 @@ var l10n_table = {
     'Choose at least one weather station. ':
       'Sélectionner au moins une station.',
 
+    'Climate normals 1981–2010':
+      'Normales et moyennes climatiques de 1981–2010',
+
     // share widget
     'Copied to clipboard': 'Copié dans le presse-papier',
     Error: 'Erreur',
@@ -189,6 +191,20 @@ var l10n_table = {
 
     'All topics': 'Tous les sujets',
     Close: 'Fermer',
+
+    // Custom shapefile
+    'You selected "Custom shapefile" but didn\'t upload any file': 'Vous avez choisi d\'utiliser un shapefile, mais n\'en avez téléchargé aucun',
+    'You must select one region of your shapefile': 'Vous devez sélectionner une des régions de votre shapefile',
+    'The selected region is too large, please select a smaller region': 'La région sélectionnée est trop grosse, veuillez choisir une région plus petite',
+    'Processing your file...': 'Traitement de votre fichier...',
+    'Please select one region': 'Veuillez sélectionner une région',
+    'An error occurred': 'Une erreur s\'est produite',
+    'Could not process your shapefile': 'Votre fichier shapefile ne peut pas être correctement traité',
+    'Your shapefile must be a ZIP containing at least a .shp file and a .prj file': 'Votre fichier shapefile doit être un ZIP qui contient au moins un fichier .shp et un fichier .prj',
+    'This file is not a valid ZIP file': 'Ce fichier n\'est pas un fichier ZIP valide',
+    'No valid shapefile was found in your ZIP file': 'Aucun fichier shapefile n\' été trouvé dans votre fichier ZIP',
+    'An error occurred while processing your file': 'Une erreur s\'est produite lors du traitement de votre fichier',
+    'Only polygon layers are allowed': 'Seuls les polygones sont permis dans votre fichier',
   },
 };
 
@@ -256,8 +272,41 @@ chart_labels = {
   click_to_zoom: 'Click and drag in the plot area to zoom in',
 };
 
+var month_names = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+if (ajax_data.current_lang_code == 'fr') {
+  month_names = [
+    'Janv.',
+    'Févr.',
+    'Mars',
+    'Avr.',
+    'Mai',
+    'Juin',
+    'Juil.',
+    'Août',
+    'Sept.',
+    'Oct.',
+    'Nov.',
+    'Déc.',
+  ];
+}
+
 // Constants
-month_number_lut = {
+
+const month_number_lut = {
   jan: 1,
   feb: 2,
   mar: 3,
@@ -383,6 +432,35 @@ function indexOfGT(arr, target)
   }
   return ans;
 }
+/**
+ * Hash a string.
+ *
+ * @param {string} s - String to hash.
+ * @returns {number}
+ */
+function hashCode(s) {
+  return s.split("").reduce(function(a, b) {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0);
+}
+
+/**
+ * Encode a URL using a salt.
+ *
+ * @param {string} url - URL to encode.
+ * @param {string} salt - Salt to for the encoding.
+ * @returns {{encoded: string, hash: number}} - Object containing the encoded string and its calculated hash.
+ */
+function encodeURL(url, salt) {
+  const hash = hashCode(url + salt);
+  const encoded = encodeURIComponent(btoa(url + '|' + hash));
+  return {
+    'encoded': encoded,
+    'hash': hash
+  };
+}
+
 function create_file_name(query) {
   const file_name_parts = [];
   let dataset = 'CanDCS-u5';

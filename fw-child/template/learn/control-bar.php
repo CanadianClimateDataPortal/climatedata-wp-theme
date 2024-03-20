@@ -26,12 +26,12 @@
 			<div id="topics" class="tab-drawer">
 				<div class="tab-drawer-content stick">
 					<div class="tab-drawer-content-inner">
-						<div class="control-tab-head d-flex justify-content-between">
-							<h5><?php _e ( 'Topics', 'cdc' ); ?></h5>
+						<div class="control-tab-head d-flex justify-content-between align-items-center">
+							<h5 class="me-auto mb-0 text-secondary"><?php _e ( 'Topics', 'cdc' ); ?></h5>
 							<span class="tab-drawer-close btn-close"></span>
 						</div>
 						
-						<div class="control-tab-body ps-2">
+						<div class="control-tab-body ms-3">
 							<?php
 							
 								$i = 1;
@@ -42,14 +42,14 @@
 							
 							?>
 							
-							<div class="position-relative p-3 border-bottom">
+							<div class="position-relative pe-3 py-4 border-bottom">
 								<a href="#<?php _e ( 'topic', 'cdc' ); ?>-<?php echo $i; ?>" class="stretched-link"></a>
 								
 								<h2 class="font-family-serif text-secondary"><?php echo $i; ?></h2>
 								
 								<h5><?php echo fw_get_field ( 'title', 'topic_' . $topic->term_id ); ?></h5>
 								
-								<p><?php
+								<p class="mb-0"><?php
 								
 									if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
 										echo get_field ( 'description_fr', 'topic_' . $topic->term_id );
@@ -77,17 +77,18 @@
 			<div id="filters" class="tab-drawer">
 				<div class="tab-drawer-content stick">
 					<div class="tab-drawer-content-inner">
-						<div class="control-tab-head d-flex justify-content-between">
-							<h5><?php _e ( 'Filters', 'cdc' ); ?></h5>
+						<div class="control-tab-head d-flex justify-content-between align-items-center">
+							<h5 class="me-auto mb-0 text-secondary"><?php _e ( 'Filters', 'cdc' ); ?></h5>
+							<span class="fw-query-reset me-2" style="display: none;"><i class="fas fa-sync fa-flip-horizontal"></i></span>
 							<span class="tab-drawer-close btn-close"></span>
 						</div>
 						
 						<div class="control-tab-body query-container">
 								
-							<div class="fw-query-filter p-3" data-filter-type="meta" data-filter-multi="false">
-								<h5 class="text-primary"><?php _e ( 'Content Type', 'cdc' ); ?></h5>
+							<div class="fw-query-filter ms-3 py-4 border-bottom" data-filter-type="meta" data-filter-key="asset_type" data-filter-multi="false">
+								<h5 class="fw-bold"><?php _e ( 'Content Type', 'cdc' ); ?></h5>
 								
-								<ul class="list-unstyled">
+								<ul class="list-unstyled m-0 pe-2">
 									<li class="filter-item" data-key="asset_type" data-value="video"><?php _e ( 'Video', 'cdc' ); ?></li>
 									<li class="filter-item" data-key="asset_type" data-value="audio"><?php _e ( 'Audio', 'cdc' ); ?></li>
 									<li class="filter-item" data-key="asset_type" data-value="interactive"><?php _e ( 'Interactive', 'cdc' ); ?></li>
@@ -109,8 +110,8 @@
 									
 							?>
 							
-							<div class="fw-query-filter p-3" data-filter-type="taxonomy" data-filter-multi="false">
-								<h5 class="text-primary"><?php echo $this_heading; ?></h5>
+							<div class="fw-query-filter ms-3 py-4 border-bottom" data-filter-type="taxonomy" data-filter-key="<?php echo $filter_tax; ?>" data-filter-multi="false">
+								<h5 class="fw-bold"><?php echo $this_heading; ?></h5>
 								
 								<?php
 								
@@ -123,14 +124,14 @@
 									
 								?>
 								
-								<ul class="list-unstyled">
+								<ul class="list-unstyled m-0 pe-2">
 									<?php
 									
 										foreach ( $all_tags as $tag ) {
 											
 									?>
 									
-									<li class="filter-item" data-key="tech_level" data-value="<?php echo $tag->slug; ?>"><?php echo $tag->name; ?></li>
+									<li class="filter-item" data-key="<?php echo $filter_tax; ?>" data-value="<?php echo $tag->slug; ?>"><?php echo $tag->name; ?></li>
 									
 									<?php
 									

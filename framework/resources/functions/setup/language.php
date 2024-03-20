@@ -190,10 +190,10 @@ function fw_flush_rewrite_on_lang_save ( $post_id, $menu_slug ) {
 		
 		// flag
 		
-		update_option ( 'teststamp', array (
-			'updated' => date ( 'H:i:s' ),
-			'array' => $option_langs
-		) );
+		// update_option ( 'teststamp', array (
+		// 	'updated' => date ( 'H:i:s' ),
+		// 	'array' => $option_langs
+		// ) );
 		
 	}
 	

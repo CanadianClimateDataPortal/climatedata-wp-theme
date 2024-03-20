@@ -65,6 +65,7 @@
       elements: {
         decade_slider: null,
         threshold_slider: null,
+        var_filters: {},
       },
       debug: true,
     };
@@ -300,6 +301,7 @@
             query: clone_query,
             do_history: 'none',
             callback: function () {
+              console.log('get_layer');
               $(document).cdc_app(
                 'maps.get_layer',
                 clone_query,
@@ -500,7 +502,10 @@
 
       // load default color scheme
       plugin.update_default_scheme(function () {
-        $(document).cdc_app('maps.get_layer', options.query, options.var_data);
+        // maybe don't do the get_layer on init
+        // because it will get called anyway
+        // console.log('update_default_scheme - get_layer');
+        // $(document).cdc_app('maps.get_layer', options.query, options.var_data);
       });
 
       item.on('fw_query_success', function (e, query_item) {
@@ -518,6 +523,8 @@
 
       item.find('#var-select-query').fw_query();
 
+      //
+
       $(document).cdc_app(
         'add_hook',
         'maps.get_layer',
@@ -525,6 +532,24 @@
         plugin,
         plugin.apply_scheme,
       );
+
+      //
+
+      //       let var_filters = document.querySelectorAll('.var-select-dropdown');
+      //
+      //       item.find('.fw-query-filter').each(function() {
+      //         options.elements.var_filters[$(this)]
+      //       })
+      //
+      //
+      //       })
+      //
+      //
+      //        = [...var_filters].map(
+      //         (dropdownToggleEl) => new bootstrap.Dropdown(dropdownToggleEl),
+      //       );
+      //
+      //       console.log();
     },
 
     _select2_format_item: function (item) {
@@ -685,6 +710,37 @@
         plugin.set_location(click_event.latlng);
       });
 
+      // click station
+
+      item.on('map_station_select', function (e, click_event) {
+        // console.log('station click', click_event);
+
+        if (options.query.var == 'idf') {
+          // popups
+
+          console.log('do popup', click_event);
+
+          $.ajax({
+            url: ajax_data.url,
+            data: {
+              action: 'cdc_get_idf_files',
+              idf: click_event.layer.feature.properties.ID,
+            },
+            dataType: 'json',
+            success: function (data) {
+              console.log(data);
+            },
+          });
+        } else {
+          // normals
+
+          // console.log('set station');
+
+          // load location details
+          plugin.set_station(click_event);
+        }
+      });
+
       // click marker
 
       item.on('click_marker', function (e, click_event) {
@@ -703,14 +759,25 @@
 
       // click item in 'recent locations'
 
-      item.on('click', '#recent-locations .list-group-item', function () {
-        let item_coords = $(this).attr('data-coords').split(',');
+      item.on('click', '#recent-locations .list-group-item', function (e) {
+        if ($(e.target).hasClass('clear')) {
+          console.log('CLEAR MARKER');
+          $(document).cdc_app('maps.remove_marker', $(this).attr('data-index'));
+        } else {
+          let item_coords = $(this).attr('data-coords').split(',');
 
-        plugin.set_location({
-          lat: item_coords[0],
-          lng: item_coords[1],
-          marker_index: $(this).attr('data-index'),
-        });
+          plugin.set_location({
+            lat: item_coords[0],
+            lng: item_coords[1],
+            marker_index: $(this).attr('data-index'),
+          });
+        }
+      });
+
+      // clear 'recent locations' list
+
+      item.on('click', '#recent-locations-clear', function () {
+        $(document).cdc_app('maps.remove_markers');
       });
 
       //
@@ -781,18 +848,6 @@
           .trigger('change');
       });
 
-      // click a variable item description
-      //
-      //       item.on('click', '.var-description', function (e) {
-      //         e.preventDefault();
-      //
-      //         let this_item = $(this).closest('.fw-query-item'),
-      //           this_id = $(this).attr('data-var-id'),
-      //           item_order = parseInt(this_item.css('order'));
-      //
-      //
-      //       });
-
       // click a link element with a query key
 
       item.on('click', 'a[data-query-key]', function () {
@@ -853,6 +908,90 @@
           .trigger('change');
       });
 
+      // SAVE MAP AS IMAGE
+
+      item.find('#download-map-image').click(function (event) {
+        event.preventDefault();
+        const page_url = new URL(window.location.href);
+        page_url.hash = ''; // Make sure to remove #download so no tab is opened at the time of the screenshot
+        const encoded_url = encodeURL(page_url.toString(), URL_ENCODER_SALT).encoded;
+        const api_url = DATA_URL + '/raster?url=' + encoded_url;
+        window.open(api_url, '_blank');
+      });
+
+      // "Download" button
+
+      // Handle of the click on the "Download" button of the "Share" tab.
+      // Takes the current page's query and builds a URL for the "Download Data" page. That way, some of the inputs of
+      // the "Download" page are pre-filled.
+      $('#download-btn').on('click', function (event) {
+        event.preventDefault();
+        const download_query = $.extend(true, {}, options.query);
+
+        // We do some conversions of the "map" page query to adjust it for the "download" page query
+        
+        const period = options.query.decade;
+
+        if (period != null) {
+          const period_start = parseInt(period);
+          download_query['start_year'] = period_start;
+          download_query['end_year'] = period_start + 30;
+        }
+        
+        const base_href = this.href;
+        const query_string = $(document).cdc_app(
+          'query.obj_to_url',
+          download_query,
+          null,
+        );
+        
+        window.location.href = base_href + query_string + '#data'; // Pre-open the "Data" tab on the "Download" page
+      });
+
+      // var select filters
+
+      item.on('mouseup', '#var-select-query .filter-item', function (e) {
+        console.log('close');
+
+        let this_filter = $(this).closest('.fw-query-filter'),
+          this_toggle = this_filter.find('.dropdown-toggle'),
+          this_menu = $(this).closest('.dropdown-menu');
+
+        // toggle 'show' class
+
+        this_toggle.removeClass('show');
+
+        // close the dropdown
+
+        let this_dropdown = bootstrap.Dropdown.getOrCreateInstance(
+          document.getElementById($(this).closest('.dropdown-menu').attr('id')),
+        );
+
+        this_dropdown.toggle();
+
+        setTimeout(function () {
+          // add selection to toggle btn
+          console.log(this_menu);
+          console.log();
+
+          if (this_menu.find('.selected').length) {
+            this_toggle
+              .find('.selection')
+              .text(this_menu.find('.selected').text())
+              .show();
+          } else {
+            this_toggle.find('.selection').text('').hide();
+          }
+        }, 250);
+      });
+
+      $(document).on('fw_query_reset', function () {
+        item
+          .find('.fw-query-filter .dropdown-toggle .selection')
+          .text('')
+          .hide();
+      });
+
       // HISTORY
 
       window.addEventListener('popstate', function (e) {
@@ -874,10 +1013,10 @@
 
       if (!status) status = options.status;
 
-      console.log('handle input, status ' + status);
-
       let this_key = input.attr('data-query-key'),
         this_val = input.val();
+
+      console.log('input: ' + this_key, 'status ' + status);
 
       // if not a form element with a value attribute,
       // look for a data-query-val
@@ -1575,7 +1714,8 @@
       }
     },
 
-    // fetch colours of default scheme from Geoserver and update the data of the default
+    // fetch colours of default scheme from Geoserver
+    // and update the data of the default
     // one in the dropdown
     update_default_scheme: function (callback) {
       let plugin = this,
@@ -1797,6 +1937,62 @@
       return sld_body;
     },
 
+    set_station: function (click_event, open_tab = true) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      console.log('station fn', click_event);
+
+      const station_id = click_event.layer.feature.properties.STN_ID,
+        coords = { lat: click_event.latlng.lat, lng: click_event.latlng.lng };
+
+      // create chart
+
+      if (open_tab == true) {
+        console.log('load station now');
+
+        // set map center to marker location w/ offset
+        $(document).cdc_app('maps.set_center', coords, 10);
+
+        // hidden input
+        item
+          .find('[data-query-key="station"]')
+          .val(station_id)
+          .trigger('change');
+
+        // tab headings
+        item
+          .find('#station-detail .control-tab-head h5')
+          .text(click_event.layer.feature.properties.STATION_NAME);
+
+        // open location tab drawer
+
+        if (window.location.hash != '#location-detail') {
+          $('#control-bar').tab_drawer('update_path', '#station-detail');
+        }
+
+        // remove legend rows
+        item.find('.chart-series-items .cloned').remove();
+
+        // chart
+
+        $(document).cdc_app('charts.render_station', {
+          query: options.query,
+          var_data: options.var_data,
+          station: {
+            id: station_id,
+            name: click_event.layer.feature.properties.STATION_NAME,
+            coords: coords,
+          },
+          download_url: null,
+          container: item.find('#station-chart-container')[0],
+        });
+
+        console.log('done');
+      }
+    },
+
     set_location: function (coords, open_tab = true) {
       let plugin = this,
         options = plugin.options,
@@ -1819,12 +2015,8 @@
           // add marker
           $(document).cdc_app('maps.add_marker', data, function () {});
 
-          // set map center to marker location w/ offset
-          $(document).cdc_app(
-            'maps.set_center',
-            { lat: data.lat, lng: data.lng },
-            10,
-          );
+          // match coords var to lat/lng returned by the function
+          coords = { lat: data.lat, lng: data.lng };
 
           // search field value
           if (data.geo_name != 'Point') {
@@ -1869,7 +2061,8 @@
             success: function (data) {
               console.log('chart data', data);
 
-              item.find('#chart-series-items .cloned').remove();
+              // remove legend rows
+              item.find('.chart-series-items .cloned').remove();
 
               $(document).cdc_app('charts.render', {
                 data: data,
@@ -1882,6 +2075,9 @@
             },
           });
         }
+
+        // set map center to marker location w/ offset
+        $(document).cdc_app('maps.set_center', coords, 10);
       });
     },
   };
@@ -1905,5 +2101,23 @@
         }
       }
     });
+  };
+
+  /**
+   * Prepare the UI of the "Explore Maps" page for a screenshot.
+   *
+   * If on the "Explore Maps" page, calling this function will adapt the UI so that the map is displayed full screen
+   * (hiding UI elements as required).
+   *
+   * This function is not intended to be called from the JavaScript. It's intended to be called by the API server
+   * when it needs to take a screenshot of the page. See the "Save map as image" button.
+   *
+   * There is no "reverse" function. Once this function is called, the UI stays modified until the page is reloaded.
+   */
+  $.fn.prepare_raster = function(){
+    $('#control-bar').remove();
+    $('#map-control-footer').remove();
+    $('#map-breadcrumb').remove();
+    $('#map-objects').addClass('to-raster');
   };
 })(jQuery);

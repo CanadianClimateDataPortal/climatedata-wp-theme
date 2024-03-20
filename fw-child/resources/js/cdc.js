@@ -97,6 +97,7 @@
       },
       maps: {},
       station_data: null,
+      idf_data: null,
       coords: {
         lat: null,
         lng: null,
@@ -280,6 +281,10 @@
           this_object.getPane('stations').style.zIndex = 600;
           this_object.getPane('stations').style.pointerEvents = 'all';
 
+          this_object.createPane('custom_shapefile');
+          this_object.getPane('custom_shapefile').style.zIndex = 700;
+          this_object.getPane('custom_shapefile').style.pointerEvents = 'all';
+
           // basemap
           L.tileLayer(
             '//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png',
@@ -354,9 +359,9 @@
           options = plugin.options;
 
         console.log('---');
-        console.log('get layer');
+        console.log('get layer', query.var);
 
-        console.log(query);
+        // console.log(query);
 
         switch (query.sector) {
           case 'canadagrid':
@@ -527,18 +532,47 @@
           case 'station':
             console.log('ADD STATIONS');
 
-            if (options.station_data == null) {
-              // stations not yet loaded
+            let layer_data,
+              marker_fill = '#f00';
 
-              $.ajax({
-                url: 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y',
-                dataType: 'json',
-                async: false,
-                success: function (data) {
-                  options.station_data = data;
-                },
-              });
+            switch (query.var) {
+              case 'weather-stations':
+                if (options.station_data == null) {
+                  // stations not yet loaded
+
+                  $.ajax({
+                    url: 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y',
+                    dataType: 'json',
+                    async: false,
+                    success: function (data) {
+                      options.station_data = data;
+                    },
+                  });
+                }
+
+                layer_data = { ...options.station_data };
+
+                break;
+              case 'idf':
+                marker_fill = '#00f';
+
+                if (options.idf_data == null) {
+                  $.ajax({
+                    url: '/site/assets/themes/fw-child/resources/app/idf_curves.json',
+                    dataType: 'json',
+                    async: false,
+                    success: function (data) {
+                      options.idf_data = data;
+                    },
+                  });
+                }
+
+                layer_data = { ...options.idf_data };
+
+                break;
             }
+
+            console.log('layer data', layer_data);
 
             Object.keys(options.maps).forEach(function (key) {
               let this_map = options.maps[key];
@@ -564,35 +598,40 @@
               }
 
               if (
-                this_map.layers.stations == undefined ||
-                !this_map.object.hasLayer(this_map.layers.stations)
+                this_map.layers.hasOwnProperty('stations') &&
+                this_map.object.hasLayer(this_map.layers.stations)
               ) {
-                // console.log(key + " map doesn't have stations");
-                this_map.layers.stations = L.geoJson(options.station_data, {
-                  pointToLayer: function (feature, latlng) {
-                    markerColor = '#e50e40';
-                    return L.circleMarker(latlng, {
-                      color: '#fff',
-                      opacity: 1,
-                      weight: 2,
-                      pane: 'stations',
-                      fillColor: '#f00',
-                      fillOpacity: 1,
-                      radius: 5,
-                    });
-                  },
-                })
-                  .on('mouseover', function (e) {
-                    e.layer
-                      .bindTooltip(e.layer.feature.properties.STATION_NAME)
-                      .openTooltip(e.latlng);
-                  })
-                  .on('click', function (e) {});
-
-                // console.log(this_map.layers.stations);
-
-                this_map.layers.stations.addTo(this_map.object);
+                // console.log('station layer exists');
+                this_map.object.removeLayer(this_map.layers.stations);
               }
+
+              // console.log(key + " map doesn't have stations");
+
+              // console.log('add', query.var, marker_fill);
+
+              this_map.layers.stations = L.geoJson(layer_data, {
+                pointToLayer: function (feature, latlng) {
+                  return L.circleMarker(latlng, {
+                    color: '#fff',
+                    opacity: 1,
+                    weight: 2,
+                    pane: 'stations',
+                    fillColor: marker_fill,
+                    fillOpacity: 1,
+                    radius: 5,
+                  });
+                },
+              })
+                .on('mouseover', function (e) {
+                  e.layer
+                    .bindTooltip(e.layer.feature.properties.STATION_NAME)
+                    .openTooltip(e.latlng);
+                })
+                .on('click', function (e) {
+                  $(document).trigger('map_station_select', e);
+                });
+
+              this_map.layers.stations.addTo(this_map.object);
             });
 
             break;
@@ -1018,12 +1057,13 @@
           // add location to recents
 
           recent_list.prepend(
-            '<button class="list-group-item list-group-item-action active" data-location="' +
+            '<button class="list-group-item list-group-item-action d-flex align-items-center justify-content-between active" data-location="' +
               location.geo_id +
               '" data-coords="' +
               location.coords.join(',') +
               '">' +
               location.title +
+              '<span class="clear">&times;</span>' +
               '</button>',
           );
 
@@ -1045,6 +1085,54 @@
             callback(data);
           }
         }
+
+        item.find('#recent-locations-clear').show();
+      },
+
+      remove_marker: function (item_index) {
+        let plugin = !this.item ? this.data('cdc_app') : this,
+          options = plugin.options,
+          item = plugin.item;
+
+        // console.log('remove', item_index);
+
+        let no_markers = true;
+
+        // delete the item in the sidebar
+        item.find('#recent-locations .list-group-item').eq(item_index).remove();
+
+        for (let key in options.maps) {
+          // remove from map
+          options.maps[key].object.removeLayer(
+            options.grid.markers[key][item_index],
+            options.grid.markers[key][item_index],
+          );
+
+          // splice from the markers array
+          options.grid.markers[key].splice(item_index, 1);
+
+          if (options.grid.markers[key].length > 0) {
+            no_markers = false;
+          }
+        }
+
+        if (no_markers == true) {
+          item.find('#recent-locations-clear').hide();
+        } else {
+          item.find('#recent-locations-clear').show();
+        }
+      },
+
+      remove_markers: function () {
+        let plugin = !this.item ? this.data('cdc_app') : this,
+          options = plugin.options,
+          item = plugin.item;
+
+        for (let key in options.maps) {
+          for (i = options.grid.markers[key].length - 1; i >= 0; i -= 1) {
+            plugin.maps.remove_marker.apply(item, [i]);
+          }
+        }
       },
 
       set_center: function (coords, zoom = null) {
@@ -1059,8 +1147,8 @@
           map = options.maps[first_map_key].object,
           offset;
 
-        console.log(visible_maps, visible_maps.first());
-        console.log(first_map_key);
+        // console.log(visible_maps, visible_maps.first());
+        // console.log(first_map_key);
 
         console.log('cdc', 'set center');
 
@@ -1076,6 +1164,8 @@
             break;
         }
 
+        // console.log('offset', offset);
+
         if (zoom == null) zoom = map.getZoom();
 
         // calculate pixel value for offset
@@ -1084,8 +1174,12 @@
         // zoom
         map.setZoom(zoom);
 
+        // console.log('pan to', coords);
+
         // pan to center
         map.panTo([coords.lat, coords.lng], { animate: false });
+
+        // console.log('pan by', map_offset);
 
         // pan by offset
         map.panBy(new L.Point(-map_offset, 0), { animate: false });
@@ -1184,8 +1278,8 @@
             }
           });
 
-          console.log('merged query');
-          console.log(JSON.stringify(query, null, 4));
+          // console.log('merged query');
+          // console.log(JSON.stringify(query, null, 4));
         }
 
         // set cdc_app's options.query too
@@ -1600,12 +1694,197 @@
         }
       },
 
+      render_station: function (fn_options) {
+        let plugin = !this.item ? this.data('cdc_app') : this;
+        let options = plugin.options,
+          item = plugin.item;
+
+        let settings = $.extend(
+          true,
+          {
+            data: null,
+            query: null,
+            var_data: null,
+            station: {},
+            series_data: [
+              {
+                id: 1,
+                key: 'daily_avg_temp',
+                type: 'line',
+                unit: '°C',
+                color: '#000',
+                tooltip: null,
+                opacity: 1,
+                zIndex: 4,
+                yAxis: 0,
+              },
+              {
+                id: 5,
+                key: 'daily_max_temp',
+                type: 'line',
+                unit: '°C',
+                color: '#f00',
+                tooltip: null,
+                opacity: 1,
+                zIndex: 3,
+                yAxis: 0,
+              },
+              {
+                id: 8,
+                key: 'daily_min_temp',
+                type: 'line',
+                unit: '°C',
+                color: '#00f',
+                tooltip: null,
+                opacity: 1,
+                zIndex: 2,
+                yAxis: 0,
+              },
+              {
+                id: 56,
+                key: 'precipitation',
+                type: 'column',
+                unit: 'mm',
+                color: '#0f0',
+                opacity: 0.75,
+                zIndex: 1,
+                yAxis: 1,
+                tooltip: {
+                  valueSuffix: ' mm',
+                },
+              },
+            ],
+            download_url: null,
+            container: null,
+            object: null,
+          },
+          fn_options,
+        );
+
+        settings.object = $(settings.container).find('.chart-object')[0];
+
+        // reset the series array
+        options.chart.series = [];
+
+        let chartUnit = ' °C';
+
+        let allAJAX = settings.series_data.map((chart_series) => {
+          // console.log('getting ' + chart_series.id);
+
+          return $.getJSON(
+            'https://api.weather.gc.ca/collections/climate-normals/items?f=json&STN_ID=' +
+              settings.station.id +
+              '&NORMAL_ID=' +
+              chart_series.id +
+              '&sortby=MONTH',
+            function (data) {
+              let timeSeries = [];
+
+              $.each(data.features, function (k, v) {
+                if (k < 12) {
+                  timeSeries.push([month_names[k], v.properties.VALUE]);
+                }
+              });
+
+              options.chart.series.push({
+                name:
+                  chart_labels[chart_series.key] +
+                  ' (' +
+                  chart_series.unit +
+                  ')',
+                data: timeSeries,
+                showInNavigator: true,
+                type: chart_series.type,
+                color: chart_series.color,
+                opacity: chart_series.opacity,
+                tooltip: chart_series.tooltip,
+                yAxis: chart_series.yAxis,
+                zIndex: chart_series.zIndex,
+                marker: {
+                  fillColor: chart_series.color,
+                  lineWidth: 0,
+                  radius: 0,
+                  opacity: chart_series.opacity,
+                  lineColor: chart_series.color,
+                },
+              });
+            },
+          );
+        });
+
+        Promise.all(allAJAX).then(function () {
+          // console.log('done ajax');
+
+          // console.log('create chart', settings.object);
+          // console.log('series', options.chart.series);
+
+          options.chart.object = Highcharts.chart(settings.object, {
+            title: {
+              text: '',
+              align: 'left',
+            },
+            subtitle: {
+              align: 'left',
+            },
+            xAxis: {
+              categories: month_names,
+            },
+            yAxis: [
+              {
+                lineWidth: 1,
+                title: {
+                  text: chart_labels.temperature + ' (°C)',
+                },
+              },
+              {
+                lineWidth: 1,
+                opposite: true,
+                title: {
+                  text: chart_labels.precipitation + ' (mm)',
+                },
+              },
+            ],
+            legend: {
+              enabled: false,
+            },
+            plotOptions: {
+              series: {
+                pointWidth: 20,
+              },
+            },
+            tooltip: {
+              valueSuffix: chartUnit,
+            },
+            exporting: {
+              csv: {
+                dateFormat: '%Y-%m-%d',
+              },
+              chartOptions: {
+                title: {
+                  text: T('Climate normals 1981–2010'),
+                },
+                subtitle: {
+                  text: settings.station.name,
+                },
+                legend: {
+                  enabled: true,
+                },
+              },
+            },
+            series: options.chart.series,
+          });
+
+          plugin.charts.do_legend.apply(item, []);
+        });
+      },
+
       do_legend: function () {
         let plugin = !this.item ? this.data('cdc_app') : this;
         let options = plugin.options,
           item = plugin.item;
 
-        options.chart.legend = item.find('#chart-series-items');
+        // console.log('chart legend', options.chart.series);
+        options.chart.legend = item.find('.td-selected .chart-series-items');
 
         // clone the row markup
         let legend_item = options.chart.legend.find('.row').clone();
@@ -2046,8 +2325,7 @@
           }
 
           // update var name in #location-detail
-
-          item.find('#location-detail .variable-name').text(var_title);
+          item.find('.tab-drawer .variable-name').text(var_title);
 
           if (typeof callback == 'function') {
             callback(data);

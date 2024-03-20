@@ -10,6 +10,7 @@
 			globals: ajax_data.globals,
 			lang: ajax_data.globals.current_lang_code,
 			fw_key: null,
+			default_args: null,
 			args: null,
 			item_options: null,
 			template: null,
@@ -17,7 +18,8 @@
 				item_container: null,
 				filters: null,
 				sort: null,
-				pagination: null
+				pagination: null,
+				reset: null
 			},
 			tax_query: null,
 			meta_query: null,
@@ -61,6 +63,11 @@
 				options.elements.filters = item.find('.fw-query-filter')
 			}
 			
+			// filter reset
+			if (options.elements.reset == null) {
+				options.elements.reset = item.find('.fw-query-reset')
+			}
+			
 			// sort container
 			if (options.elements.sort == null) {
 				options.elements.sort = item.find('.fw-query-sort')
@@ -81,6 +88,9 @@
 			options.args = JSON.parse(item.attr('data-args'))
 			// item.removeAttr('data-args')
 			
+			// clone for defaults
+			options.default_args = { ...options.args }
+			
 			// force page number
 			if (!options.args.hasOwnProperty('paged')) {
 				options.args.paged = 1
@@ -89,13 +99,13 @@
 			// any initial tax/meta query args
 			// should be kept and merged with filter args
 			
-			if (options.args.hasOwnProperty('tax_query')) {
-				options.tax_query = options.args.tax_query
-			}
-			
-			if (options.args.hasOwnProperty('meta_query')) {
-				options.meta_query = options.args.meta_query
-			}
+			// if (options.args.hasOwnProperty('tax_query')) {
+			// 	options.tax_query = options.args.tax_query
+			// }
+			// 
+			// if (options.args.hasOwnProperty('meta_query')) {
+			// 	options.meta_query = options.args.meta_query
+			// }
 			
 			options.item_options = JSON.parse(options.elements.item_container.attr('data-options'))
 			
@@ -123,6 +133,8 @@
 					
 					if (e.isPropagationStopped() == false) {
 						
+						// console.log($(this).attr('data-key'), $(this).attr('data-value'))
+						
 						if ($(this).hasClass('selected')) {
 							
 							$(this).removeClass('selected')
@@ -144,6 +156,22 @@
 					}
 					
 					plugin.update_filters()
+					
+				})
+			}
+			
+			// reset filters
+			
+			if (options.elements.reset != null) {
+				options.elements.reset.on('click', function(e) {
+					
+					options.elements.filters.each(function() {
+						$(this).find('.selected').removeClass('selected')
+					})
+					
+					plugin.update_filters(function() {
+						$(document).trigger('fw_query_reset')
+					})
 					
 				})
 			}
@@ -188,7 +216,7 @@
 					}
 					
 					if (new_page != options.args.paged) {
-						console.log('go to page ' + options.args.paged)
+						// console.log('go to page ' + options.args.paged)
 						options.args.paged = new_page
 						plugin.do_query()
 					}
@@ -198,8 +226,8 @@
 			}
 			
 			$(document).on('fw_populate_block', function(event, element) {
-				console.log('submit', event, element)
-				console.log('event here', event, element.data.key, options.fw_key)
+				// console.log('submit', event, element)
+				// console.log('event here', event, element.data.key, options.fw_key)
 				
 				if (element.data.key == options.fw_key) {
 					
@@ -215,23 +243,43 @@
 			
 		},
 		
-		update_filters: function() {
+		update_filters: function(callback = null) {
 			
 			let plugin = this,
 					options = plugin.options,
 					item = plugin.item
 			
 			// reset default tax/meta query
-			if (options.args.tax_query) options.args.tax_query = options.tax_query
-			if (options.args.meta_query) options.args.meta_query = options.meta_query
+			console.log(JSON.stringify(options.args, null, 4))
+			
+			if (options.args.tax_query) {
+				if (options.default_args.tax_query) {
+					options.args.tax_query = [ ...options.default_args.tax_query ]
+				} else {
+					delete options.args.tax_query
+				}
+			}
+			
+			if (options.args.meta_query) {
+				if (options.default_args.meta_query) {
+					options.args.tax_query = [ ...options.default_args.meta_query ]
+				} else {
+					delete options.args.meta_query
+				}
+			}
+			
+			let has_filters = false
 			
 			options.elements.filters.each(function() {
 				
 				let this_filter = $(this),
 						this_type = this_filter.attr('data-filter-type'),
+						this_key = this_filter.attr('data-filter-key'),
 						this_multi = (this_filter.attr('data-filter-multi') == 'true') ? true : false
 				
 				this_filter.find('.filter-item.selected').each(function() {
+					
+					has_filters = true
 							
 					let this_key = $(this).attr('data-key')
 							this_val = $(this).attr('data-value')
@@ -249,11 +297,30 @@
 								options.args.tax_query = []
 							}
 							
-							options.args.tax_query.push({
-								taxonomy: this_key,
-								field: 'slug',
-								terms: [ this_val ]
+							let add_to_arg = false
+							
+							options.args.tax_query.forEach(function(arg) {
+								if (add_to_arg == false) {
+									if (arg.taxonomy == this_key) {
+										
+										if (this_multi == true) {
+											arg.terms.push(this_val)
+										} else {
+											arg.terms = [ this_val ]
+										}
+										
+										add_to_arg = true
+									}
+								}
 							})
+							
+							if (add_to_arg == false) {
+								options.args.tax_query.push({
+									taxonomy: this_key,
+									field: 'slug',
+									terms: [ this_val ]
+								})
+							}
 							
 							break
 							
@@ -274,6 +341,8 @@
 					
 				})
 				
+			
+				
 			})
 			
 			// always set the page back to 1
@@ -281,11 +350,19 @@
 			
 			// console.log('new args', options.args)
 			
-			plugin.do_query()
+			if (options.elements.reset != null) { 
+				if (has_filters == true) {
+					options.elements.reset.show()
+				} else {
+					options.elements.reset.hide()
+				}
+			}
+			
+			plugin.do_query(callback)
 			
 		},
 		
-		do_query: function() {
+		do_query: function(callback = null) {
 			
 			let plugin = this,
 					options = plugin.options,
@@ -359,6 +436,10 @@
 					
 					if (plugin.debug == true) {
 						console.log('trigger fw_query_success')
+					}
+					
+					if (typeof callback == 'function') {
+						callback()
 					}
 					
 					$(document).trigger('fw_query_success', [item])

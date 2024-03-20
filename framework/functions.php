@@ -58,6 +58,9 @@ function theme_features() {
 	
 	// menus
 	add_theme_support ( 'menus' );
+	
+	// post thumbnails
+	add_theme_support ( 'post-thumbnails' );
 
 }
 

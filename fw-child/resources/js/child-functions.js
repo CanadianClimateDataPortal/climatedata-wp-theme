@@ -199,6 +199,7 @@ const $ = jQuery;
         elements: {
           filters: $('#control-bar .fw-query-filter'),
           sort: $('#sort-menu'),
+          reset: $('#control-bar .fw-query-reset'),
         },
       });
     }
@@ -213,6 +214,7 @@ const $ = jQuery;
           elements: {
             filters: $('#control-bar .fw-query-filter'),
             sort: $('#sort-menu'),
+            reset: $('#control-bar .fw-query-reset'),
           },
         });
       });
@@ -227,6 +229,7 @@ const $ = jQuery;
         elements: {
           filters: $('#control-bar .fw-query-filter'),
           sort: $('#sort-menu'),
+          reset: $('#control-bar .fw-query-reset'),
         },
       });
     }
@@ -240,6 +243,7 @@ const $ = jQuery;
         elements: {
           filters: $('#control-bar .fw-query-filter'),
           sort: $('#sort-menu'),
+          reset: $('#control-bar .fw-query-reset'),
         },
       });
     }

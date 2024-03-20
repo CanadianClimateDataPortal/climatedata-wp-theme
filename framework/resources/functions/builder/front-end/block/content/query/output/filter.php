@@ -38,6 +38,8 @@
 			if ( taxonomy_exists ( $options['taxonomy'] ) ) {
 				
 				$tax_obj = get_taxonomy ( $options['taxonomy'] );
+				
+				$filter_atts['key'] = $options['taxonomy'];
 			
 				foreach ( get_terms ( array (
 					'taxonomy' => $options['taxonomy'],
@@ -65,6 +67,8 @@
 			$is_acf_field = false;
 			
 			$meta_obj = acf_get_field ( $options['meta'] );
+			
+			$filter_atts['key'] = $options['meta'];
 			
 			if ( $meta_obj != '' ) {
 				$is_acf_field = true;

@@ -179,6 +179,13 @@ $close-btn-line-height: 60px !default;
   position: relative;
 }
 
+.fw-bg {
+  & ~ .fw-element {
+    position: relative;
+    z-index: $bg-z-index + 1;
+  }
+}
+
 .fw-block {
   &.has-bg {
     .fw-element-inner {

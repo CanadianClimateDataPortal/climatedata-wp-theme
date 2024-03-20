@@ -82,6 +82,8 @@
 		
 			include ( locate_template ( 'template/map/controls/location-detail.php' ) );
 			
+			include ( locate_template ( 'template/map/controls/station-detail.php' ) );
+			
 		?>
 	</div>
 </div>

@@ -908,6 +908,17 @@
           .trigger('change');
       });
 
+      // SAVE MAP AS IMAGE
+
+      item.find('#download-map-image').click(function (event) {
+        event.preventDefault();
+        const page_url = new URL(window.location.href);
+        page_url.hash = ''; // Make sure to remove #download so no tab is opened at the time of the screenshot
+        const encoded_url = encodeURL(page_url.toString(), URL_ENCODER_SALT).encoded;
+        const api_url = DATA_URL + '/raster?url=' + encoded_url;
+        window.open(api_url, '_blank');
+      });
+
       // "Download" button
 
       // Handle of the click on the "Download" button of the "Share" tab.
@@ -915,12 +926,25 @@
       // the "Download" page are pre-filled.
       $('#download-btn').on('click', function (event) {
         event.preventDefault();
+        const download_query = $.extend(true, {}, options.query);
+
+        // We do some conversions of the "map" page query to adjust it for the "download" page query
+        
+        const period = options.query.decade;
+
+        if (period != null) {
+          const period_start = parseInt(period);
+          download_query['start_year'] = period_start;
+          download_query['end_year'] = period_start + 30;
+        }
+        
         const base_href = this.href;
         const query_string = $(document).cdc_app(
           'query.obj_to_url',
-          options.query,
+          download_query,
           null,
         );
+        
         window.location.href = base_href + query_string + '#data'; // Pre-open the "Data" tab on the "Download" page
       });
 
@@ -2072,5 +2096,23 @@
         }
       }
     });
+  };
+
+  /**
+   * Prepare the UI of the "Explore Maps" page for a screenshot.
+   *
+   * If on the "Explore Maps" page, calling this function will adapt the UI so that the map is displayed full screen
+   * (hiding UI elements as required).
+   *
+   * This function is not intended to be called from the JavaScript. It's intended to be called by the API server
+   * when it needs to take a screenshot of the page. See the "Save map as image" button.
+   *
+   * There is no "reverse" function. Once this function is called, the UI stays modified until the page is reloaded.
+   */
+  $.fn.prepare_raster = function(){
+    $('#control-bar').remove();
+    $('#map-control-footer').remove();
+    $('#map-breadcrumb').remove();
+    $('#map-objects').addClass('to-raster');
   };
 })(jQuery);

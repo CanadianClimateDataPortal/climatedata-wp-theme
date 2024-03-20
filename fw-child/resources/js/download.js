@@ -75,6 +75,7 @@
         threshold_slider: null,
         start_picker: null,
         end_picker: null,
+        shapefile_upload: null,
       },
       debug: true,
     };
@@ -436,6 +437,13 @@
       });
 
       item.find('#var-select-query').fw_query();
+
+      // Custom shapefile component
+      options.elements.shapefile_upload = item.find('#area-aggregation-shapefile-input').first()
+          .shapefile_upload({
+            message_container: '#area-aggregation-shapefile-message',
+            maps: options.maps,
+          });
     },
 
     init_events: function () {
@@ -683,7 +691,32 @@
         }
       });
 
+      //
+      // CUSTOM SHAPEFILE
+      //
+
+      // Show/hide the user custom shapefile on the map when the "Custom shapefile" radio button is selected/deselected
+      item.find('input[name=area-aggregation]').on('change', function() {
+        if (this.value === 'upload') {
+          options.elements.shapefile_upload.shapefile_upload('show');
+        } else {
+          options.elements.shapefile_upload.shapefile_upload('hide');
+        }
+      });
+
+      // Show information with the "more info" button.
+      const tooltip_trigger = item.find('#area-aggregation-upload-tooltip').first();
+      tooltip_trigger.popover({
+        trigger: 'hover',
+        html: true,
+        content: () => {
+          return tooltip_trigger.find('span').first().html();
+        },
+      });
+
+      //
       // SUBMIT
+      //
 
       item.on('click', '#submit-btn', function () {
         console.log('SUBMIT DATA');
@@ -1432,6 +1465,14 @@
         }
       } else if (prev_id == '#area') {
         if (options.var_flags.station == true) {
+        }
+        
+        // Validate the custom shapefile
+        if (options.query.sector === 'upload') {
+          const validation_message = options.elements.shapefile_upload.shapefile_upload('validate');
+          if (validation_message != null) {
+            invalid_messages.push(validation_message);
+          }
         }
       }
 

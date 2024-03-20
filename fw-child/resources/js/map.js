@@ -914,7 +914,10 @@
         event.preventDefault();
         const page_url = new URL(window.location.href);
         page_url.hash = ''; // Make sure to remove #download so no tab is opened at the time of the screenshot
-        const encoded_url = encodeURL(page_url.toString(), URL_ENCODER_SALT).encoded;
+        const encoded_url = encodeURL(
+          page_url.toString(),
+          URL_ENCODER_SALT,
+        ).encoded;
         const api_url = DATA_URL + '/raster?url=' + encoded_url;
         window.open(api_url, '_blank');
       });
@@ -929,7 +932,7 @@
         const download_query = $.extend(true, {}, options.query);
 
         // We do some conversions of the "map" page query to adjust it for the "download" page query
-        
+
         const period = options.query.decade;
 
         if (period != null) {
@@ -937,14 +940,14 @@
           download_query['start_year'] = period_start;
           download_query['end_year'] = period_start + 30;
         }
-        
+
         const base_href = this.href;
         const query_string = $(document).cdc_app(
           'query.obj_to_url',
           download_query,
           null,
         );
-        
+
         window.location.href = base_href + query_string + '#data'; // Pre-open the "Data" tab on the "Download" page
       });
 
@@ -1024,6 +1027,50 @@
       switch (this_key) {
         case 'var_id':
           plugin.update_var(this_val, status);
+          break;
+        case 'dataset':
+          // each scenario label
+          item.find('.scenario-name').each(function () {
+            let this_item = $(this),
+              old_dataset = this_item.attr('data-dataset'),
+              old_name = this_item.attr('data-name'),
+              new_key = '';
+
+            if (old_dataset != this_val) {
+              // update data-dataset attr
+
+              this_item.attr('data-dataset', this_val);
+
+              // update the data-name attr
+
+              // find the scenario name in the correlating dataset
+              DATASETS[old_dataset].scenarios.forEach(function (scenario) {
+                if (new_key == '' && scenario.name == old_name) {
+                  // found it - store the correlating name
+                  new_key = scenario.correlations[this_val];
+                  // set the item's data-name to the new key
+                  this_item.attr('data-name', new_key);
+                }
+              });
+
+              // update the label's text
+
+              // find the selected key in the new dataset object
+              DATASETS[this_val].scenarios.forEach(function (scenario) {
+                if (scenario.name == new_key) this_item.text(scenario.label);
+              });
+            }
+          });
+
+          if (this_val == 'cmip6') {
+            item.find('.scenario-name.low').text(scenario_names[this_val].low);
+            item
+              .find('.scenario-name.medium')
+              .text(scenario_names[this_val].medium);
+            item
+              .find('.scenario-name.high')
+              .text(scenario_names[this_val].high);
+          }
           break;
         case 'scenarios':
           // ssp1/2/5 switches
@@ -2109,7 +2156,7 @@
    *
    * There is no "reverse" function. Once this function is called, the UI stays modified until the page is reloaded.
    */
-  $.fn.prepare_raster = function(){
+  $.fn.prepare_raster = function () {
     $('#control-bar').remove();
     $('#map-control-footer').remove();
     $('#map-breadcrumb').remove();

@@ -301,6 +301,7 @@
             query: clone_query,
             do_history: 'none',
             callback: function () {
+              console.log('get_layer');
               $(document).cdc_app(
                 'maps.get_layer',
                 clone_query,
@@ -501,7 +502,10 @@
 
       // load default color scheme
       plugin.update_default_scheme(function () {
-        $(document).cdc_app('maps.get_layer', options.query, options.var_data);
+        // maybe don't do the get_layer on init
+        // because it will get called anyway
+        // console.log('update_default_scheme - get_layer');
+        // $(document).cdc_app('maps.get_layer', options.query, options.var_data);
       });
 
       item.on('fw_query_success', function (e, query_item) {
@@ -704,6 +708,37 @@
 
         // load location details
         plugin.set_location(click_event.latlng);
+      });
+
+      // click station
+
+      item.on('map_station_select', function (e, click_event) {
+        // console.log('station click', click_event);
+
+        if (options.query.var == 'idf') {
+          // popups
+
+          console.log('do popup', click_event);
+
+          $.ajax({
+            url: ajax_data.url,
+            data: {
+              action: 'cdc_get_idf_files',
+              idf: click_event.layer.feature.properties.ID,
+            },
+            dataType: 'json',
+            success: function (data) {
+              console.log(data);
+            },
+          });
+        } else {
+          // normals
+
+          // console.log('set station');
+
+          // load location details
+          plugin.set_station(click_event);
+        }
       });
 
       // click marker
@@ -949,10 +984,10 @@
 
       if (!status) status = options.status;
 
-      console.log('handle input, status ' + status);
-
       let this_key = input.attr('data-query-key'),
         this_val = input.val();
+
+      console.log('input: ' + this_key, 'status ' + status);
 
       // if not a form element with a value attribute,
       // look for a data-query-val
@@ -1650,7 +1685,8 @@
       }
     },
 
-    // fetch colours of default scheme from Geoserver and update the data of the default
+    // fetch colours of default scheme from Geoserver
+    // and update the data of the default
     // one in the dropdown
     update_default_scheme: function (callback) {
       let plugin = this,
@@ -1872,6 +1908,62 @@
       return sld_body;
     },
 
+    set_station: function (click_event, open_tab = true) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      console.log('station fn', click_event);
+
+      const station_id = click_event.layer.feature.properties.STN_ID,
+        coords = { lat: click_event.latlng.lat, lng: click_event.latlng.lng };
+
+      // create chart
+
+      if (open_tab == true) {
+        console.log('load station now');
+
+        // set map center to marker location w/ offset
+        $(document).cdc_app('maps.set_center', coords, 10);
+
+        // hidden input
+        item
+          .find('[data-query-key="station"]')
+          .val(station_id)
+          .trigger('change');
+
+        // tab headings
+        item
+          .find('#station-detail .control-tab-head h5')
+          .text(click_event.layer.feature.properties.STATION_NAME);
+
+        // open location tab drawer
+
+        if (window.location.hash != '#location-detail') {
+          $('#control-bar').tab_drawer('update_path', '#station-detail');
+        }
+
+        // remove legend rows
+        item.find('.chart-series-items .cloned').remove();
+
+        // chart
+
+        $(document).cdc_app('charts.render_station', {
+          query: options.query,
+          var_data: options.var_data,
+          station: {
+            id: station_id,
+            name: click_event.layer.feature.properties.STATION_NAME,
+            coords: coords,
+          },
+          download_url: null,
+          container: item.find('#station-chart-container')[0],
+        });
+
+        console.log('done');
+      }
+    },
+
     set_location: function (coords, open_tab = true) {
       let plugin = this,
         options = plugin.options,
@@ -1944,7 +2036,8 @@
             success: function (data) {
               console.log('chart data', data);
 
-              item.find('#chart-series-items .cloned').remove();
+              // remove legend rows
+              item.find('.chart-series-items .cloned').remove();
 
               $(document).cdc_app('charts.render', {
                 data: data,

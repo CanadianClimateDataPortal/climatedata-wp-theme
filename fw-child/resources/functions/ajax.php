@@ -139,7 +139,7 @@ function cdc_get_idf_files () {
 		}
 	}
 	
-	echo json_encode($list, JSON_PRETTY_PRINT);
+	echo json_encode ( $list, JSON_PRETTY_PRINT );
 
 	if ( wp_doing_ajax() ) 
 		wp_die();

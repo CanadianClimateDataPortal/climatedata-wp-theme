@@ -85,6 +85,67 @@ function cdc_station_list() {
 
 }
 
+// IDF data
+
+add_action ( 'wp_ajax_cdc_get_idf_files', 'cdc_get_idf_files' );
+add_action ( 'wp_ajax_nopriv_cdc_get_idf_files', 'cdc_get_idf_files' );
+
+function cdc_get_idf_files () {
+
+	// This script searches for IDF files matching the idf GET parameter and returns a JSON for the Frontend
+	
+	$get_idf = isset($_GET['idf']) ? $_GET['idf'] : '';
+	
+	// ensure input is alphanumeric
+	
+	if ( !preg_match('/^[a-zA-Z0-9]+$/', $get_idf ) ) {
+		echo 'nope';
+		exit();
+	}
+	
+	$list = [];
+	$dir = get_stylesheet_directory() . '/resources/app/idf/';
+	
+	$filetypes = array (
+		array (
+			'dirname' => 'historical',
+			'label' => __('Historical IDF (ZIP)', 'cdc')
+		),
+		array (
+			'dirname' => 'cmip5',
+			'label' => __('Climate Change-Scaled IDF - CMIP5 (ZIP)', 'cdc'),
+		),
+		array (
+			'dirname' => 'cmip6',
+			'label' => __('Climate Change-Scaled IDF - CMIP6 (ZIP)', 'cdc'),
+		),
+		array (
+			'dirname' => 'cmip6-quickstart',
+			'label' => __('Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)', 'cdc'),
+		)
+	);
+	
+	// glob returns an array with the files it found matching the search pattern (* = wildcard)
+	foreach ( $filetypes as $filetype) {
+
+		// since file naming is not stable, a glob search with the station ID works
+		$files = glob ( $dir . $filetype['dirname'] . "/*" . $get_idf . "*" );
+
+		if ( count ( $files ) == 1 ) {
+			$list[] = array (
+				'filename' => '/site/assets/themes/climate-data-ca/resources/app/' . str_replace ( $dir, '', $files[0] ),
+				'label' => $filetype['label']
+			);
+		}
+	}
+	
+	echo json_encode($list, JSON_PRETTY_PRINT);
+
+	if ( wp_doing_ajax() ) 
+		wp_die();
+
+}
+
 // get location by lat/lng
 
 add_action ( 'wp_ajax_cdc_get_location_by_coords', 'cdc_get_location_by_coords' );
@@ -295,7 +356,6 @@ function cdc_get_location_by_id () {
 
 add_action ( 'wp_ajax_cdc_location_search', 'cdc_location_search' );
 add_action ( 'wp_ajax_nopriv_cdc_location_search', 'cdc_location_search' );
-
 
 function cdc_location_search() {
 	

@@ -164,6 +164,9 @@ var l10n_table = {
     'Choose at least one weather station. ':
       'Sélectionner au moins une station.',
 
+    'Climate normals 1981–2010':
+      'Normales et moyennes climatiques de 1981–2010',
+
     // share widget
     'Copied to clipboard': 'Copié dans le presse-papier',
     Error: 'Erreur',
@@ -255,8 +258,41 @@ chart_labels = {
   click_to_zoom: 'Click and drag in the plot area to zoom in',
 };
 
+var month_names = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+if (ajax_data.current_lang_code == 'fr') {
+  month_names = [
+    'Janv.',
+    'Févr.',
+    'Mars',
+    'Avr.',
+    'Mai',
+    'Juin',
+    'Juil.',
+    'Août',
+    'Sept.',
+    'Oct.',
+    'Nov.',
+    'Déc.',
+  ];
+}
+
 // Constants
-month_number_lut = {
+
+const month_number_lut = {
   jan: 1,
   feb: 2,
   mar: 3,

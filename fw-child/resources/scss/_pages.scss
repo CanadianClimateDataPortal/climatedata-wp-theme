@@ -550,8 +550,13 @@ $legend-on-height: 16px;
     width: calc((100vw / 16) * 7);
   }
 
+  #station-detail {
+    width: calc((100vw / 16) * 7);
+  }
+
   .tab-drawer-container {
-    &:has(#location-detail.td-selected) {
+    &:has(#location-detail.td-selected),
+    &:has(#station-detail.td-selected) {
       width: calc((100vw / 16) * 7);
     }
   }

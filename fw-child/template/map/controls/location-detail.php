@@ -146,7 +146,7 @@
 												</div>
 											</div>
 											
-											<div id="chart-series-items">
+											<div id="location-series-items" class="chart-series-items">
 											
 												<!-- row -->
 												<div id="legend-row-X" class="row row-cols-2 py-2 border-bottom align-items-center" style="display: none;">

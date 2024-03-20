@@ -1986,12 +1986,8 @@
           // add marker
           $(document).cdc_app('maps.add_marker', data, function () {});
 
-          // set map center to marker location w/ offset
-          $(document).cdc_app(
-            'maps.set_center',
-            { lat: data.lat, lng: data.lng },
-            10,
-          );
+          // match coords var to lat/lng returned by the function
+          coords = { lat: data.lat, lng: data.lng };
 
           // search field value
           if (data.geo_name != 'Point') {
@@ -2050,6 +2046,9 @@
             },
           });
         }
+
+        // set map center to marker location w/ offset
+        $(document).cdc_app('maps.set_center', coords, 10);
       });
     },
   };

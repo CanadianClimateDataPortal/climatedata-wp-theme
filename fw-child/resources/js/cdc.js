@@ -1160,6 +1160,8 @@
             break;
         }
 
+        // console.log('offset', offset);
+
         if (zoom == null) zoom = map.getZoom();
 
         // calculate pixel value for offset
@@ -1168,8 +1170,12 @@
         // zoom
         map.setZoom(zoom);
 
+        // console.log('pan to', coords);
+
         // pan to center
         map.panTo([coords.lat, coords.lng], { animate: false });
+
+        // console.log('pan by', map_offset);
 
         // pan by offset
         map.panBy(new L.Point(-map_offset, 0), { animate: false });

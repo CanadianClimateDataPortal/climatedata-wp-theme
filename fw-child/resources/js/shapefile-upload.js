@@ -585,22 +585,11 @@
                   promises.push(zip.files[filename].async('ArrayBuffer').then(function (data) {
                     inputs['file.shp'] = data;
                   }));
-                }
-                // else if (current_extension === 'dbf') {
-                //   promises.push(zip.files[filename].async('ArrayBuffer').then(function(data) {
-                //     inputs['file.dbf'] = data
-                //   }));
-                // }
-                else if (current_extension === 'prj') {
+                } else if (current_extension === 'prj') {
                   promises.push(zip.files[filename].async('string').then(function (data) {
                     inputs['file.prj'] = data;
                   }));
                 }
-                // else if (current_extension === 'cpg') {
-                //   promises.push(zip.files[filename].async('string').then(function(data) {
-                //     inputs['file.cpg'] = data
-                //   }));
-                // }
               }
 
               if (promises.length === 0) {

@@ -80,7 +80,14 @@
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-upload" value="upload" data-query-key="sector" data-conditional="#area-aggregation-shapefile">
 						<label class="form-check-label" for="area-aggregation-upload"><?php _e ( 'Upload Custom Shapefile', 'cdc' ); ?></label>
-						<a tabindex="0" role="button" id="area-aggregation-upload-tooltip" class="text-secondary">ⓘ</a>
+						<a tabindex="0" role="button" id="area-aggregation-upload-tooltip" class="text-secondary">ⓘ
+							<span style="display: none">
+								<?php _e ( 'A shapefile is a ZIP file containing at least the <em>.shp</em> and
+								<em>.prj</em> files. It must contain only closed polygons and must be entirely contained
+								inside the canadian territory. Once your shapefile is uploaded, click all the regions
+								for which you want data.' ) ?>
+							</span>
+						</a>
 					</div>
 					
 					<div id="area-aggregation-shapefile" class="bg-gray-200 p-3">

@@ -705,12 +705,13 @@
       });
 
       // Show information with the "more info" button.
-      item.find('#area-aggregation-upload-tooltip').popover({
+      const tooltip_trigger = item.find('#area-aggregation-upload-tooltip').first();
+      tooltip_trigger.popover({
         trigger: 'hover',
         html: true,
-        content: T('A shapefile is a ZIP file containing at least the <em>.shp</em> and <em>.prj</em> files. ' +
-          'It must contain only closed polygons and must be entirely contained inside the canadian territory. Once ' +
-          'your shapefile is uploaded, click all the regions for which you want data.'),
+        content: () => {
+          return tooltip_trigger.find('span').first().html();
+        },
       });
 
       //

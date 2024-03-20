@@ -12,7 +12,7 @@
 					data-args='{
 						"posts_per_page":15,
 						"post_type": [ "variable" ],
-						"orderby": "RAND(<?php echo mt_rand ( 100000, 999999 ); ?>)",
+						"orderby": "title",
 						"order":"asc",
 						"post_status":"publish"
 					}'

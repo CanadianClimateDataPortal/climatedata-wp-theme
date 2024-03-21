@@ -43,6 +43,10 @@
         },
         opacity: 1,
       },
+      grid: {
+        hover_timeout: null,
+        hover_ajax: null,
+      },
       query: {
         coords: [62.51231793838694, -98.48144531250001, 4],
         delta: '',
@@ -236,11 +240,20 @@
 
               console.log('init get_layer now');
 
-              $(document).cdc_app(
-                'maps.get_layer',
-                options.query,
-                options.var_data,
-              );
+              // load default color scheme
+              plugin.update_default_scheme(function () {
+                $(document).cdc_app(
+                  'maps.get_layer',
+                  options.query,
+                  options.var_data,
+                );
+              });
+
+              // $(document).cdc_app(
+              //   'maps.get_layer',
+              //   options.query,
+              //   options.var_data,
+              // );
 
               console.log('done');
 
@@ -500,14 +513,6 @@
         });
       }
 
-      // load default color scheme
-      plugin.update_default_scheme(function () {
-        // maybe don't do the get_layer on init
-        // because it will get called anyway
-        // console.log('update_default_scheme - get_layer');
-        // $(document).cdc_app('maps.get_layer', options.query, options.var_data);
-      });
-
       item.on('fw_query_success', function (e, query_item) {
         let query_items = query_item.find('.fw-query-items');
 
@@ -593,14 +598,22 @@
         .find('.leaflet-pane.leaflet-' + this_pane + '-pane')
         .css('opacity', options.legend.opacity);
 
-      // link legend's opacity
-      item
-        .find('.legend')
-        .find('.legendbox')
-        .css('fill-opacity', options.legend.opacity);
-
       // grid layer defaults to 1
       item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
+
+      // link legend's opacity
+      if (this_pane != 'labels' && this_pane != 'marker') {
+        item
+          .find('.legend')
+          .find('.legendbox')
+          .css('fill-opacity', options.legend.opacity);
+      }
+
+      if (this_pane == 'marker') {
+        item
+          .find('.leaflet-pane.leaflet-shadow-pane')
+          .css('opacity', options.legend.opacity);
+      }
 
       if (
         this_pane == 'raster' &&
@@ -678,6 +691,112 @@
           );
         });
       }
+
+      //
+
+      item.on('map_item_mouseover', function (e, click_event) {
+        let decade_value = parseInt(options.query.decade) + 1,
+          delta = options.var_data.acf.hasdelta,
+          delta7100 = delta ? '&delta7100=true' : '';
+
+        plugin._grid_hover_cancel(click_event);
+
+        if (delta !== false) {
+          options.grid.hover_timeout = setTimeout(function () {
+            let values_url,
+              var_name =
+                options.query.var == 'building_climate_zones'
+                  ? 'hddheat_18'
+                  : options.query.var;
+
+            if (options.query.sector == 'canadagrid') {
+              // gridded
+              values_url =
+                geoserver_url +
+                '/get-delta-30y-gridded-values/' +
+                click_event.latlng['lat'] +
+                '/' +
+                click_event.latlng['lng'] +
+                '/' +
+                var_name +
+                '/' +
+                options.query.frequency +
+                '?period=' +
+                decade_value +
+                '&decimals=' +
+                options.var_data.acf.decimals +
+                delta7100 +
+                '&dataset_name=' +
+                options.query.dataset;
+            } else {
+              values_url =
+                geoserver_url +
+                '/get-delta-30y-regional-values/' +
+                options.query.sector +
+                '/' +
+                click_event.layer.properties.id +
+                '/' +
+                var_name +
+                '/' +
+                options.query.frequency +
+                '?period=' +
+                decade_value +
+                '&decimals=' +
+                options.var_data.acf.decimals +
+                delta7100 +
+                '&dataset_name=' +
+                options.query.dataset;
+            }
+
+            // console.log(values_url);
+
+            options.grid.hover_ajax = $.ajax({
+              url: values_url,
+              dataType: 'json',
+              success: function (data) {
+                for (let key in options.maps) {
+                  options.maps[key].layers.grid
+                    .bindTooltip(
+                      plugin._format_grid_hover_tooltip(
+                        data,
+                        scenario_names[options.query.dataset][key]
+                          .replace(/[\W_]+/g, '')
+                          .toLowerCase(),
+                        options.var_data,
+                        delta,
+                        options.query.sector,
+                        click_event,
+                      ),
+                      { sticky: true },
+                    )
+                    .openTooltip(click_event.latlng);
+                }
+              },
+              // jQuery throws parsererror if the JSON includes NaN. The API returns NaN when no data is available
+              error: function (_, status) {
+                if (status !== 'abort') {
+                  let tip = [];
+
+                  if (options.query.sector !== 'canadagrid') {
+                    tip.push(
+                      click_event.layer.properties[l10n_labels.label_field] +
+                        '<br>',
+                    );
+                  }
+
+                  tip.push(T('No data available for this area.'));
+
+                  for (let key in options.maps) {
+                    options.maps[key].layers.grid
+                      .bindTooltip(tip.join('\n'), { sticky: true })
+                      .openTooltip(click_event.latlng);
+                  }
+                }
+              },
+            });
+          }, 100); // timeout
+        } // if delta
+      });
 
       //
 
@@ -2121,6 +2240,85 @@
         // set map center to marker location w/ offset
         $(document).cdc_app('maps.set_center', coords, 10);
       });
+    },
+
+    /**
+     *
+     * @param data Data sent by climatedata-api ( get-delta-30y-gridded-values or get-delta-30y-regional-values)
+     * @param rcp RCP scenario selection
+     * @param varDetails Variable details object provided by Wordpress
+     * @param delta If true, the value is formatted as a delta
+     * @param sector Selected sector (ex: 'census'). "" if none
+     * @param event Javascript event that triggered the grid_hover
+     * @returns {string}
+     */
+
+    _format_grid_hover_tooltip: function (
+      data,
+      rcp,
+      varDetails,
+      delta,
+      sector,
+      event,
+    ) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let to_label = options.var_data.acf.units == 'doy' ? 'to_doy' : 'to',
+        tip = [];
+
+      if (event.layer.properties.hasOwnProperty(l10n_labels.label_field)) {
+        tip.push(event.layer.properties[l10n_labels.label_field] + '<br>');
+      }
+
+      let val1 = value_formatter(data[rcp]['p50'], varDetails, delta);
+
+      tip.push(
+        '<span style="color:#00F">●</span> ' +
+          l10n_labels.median +
+          ' <b>' +
+          val1 +
+          '</b><br/>',
+      );
+
+      val1 = value_formatter(data[rcp]['p10'], varDetails, delta);
+      let val2 = value_formatter(data[rcp]['p90'], varDetails, delta);
+      tip.push(
+        '<span style="color:#00F">●</span> ' +
+          l10n_labels.range +
+          ' <b>' +
+          val1 +
+          '</b> ' +
+          l10n_labels[to_label] +
+          ' <b>' +
+          val2 +
+          '</b><br/>',
+      );
+      return tip.join('\n');
+    },
+
+    _grid_hover_cancel: function (e) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      // cancel current timeout
+      if (options.grid.hover_timeout !== null) {
+        clearTimeout(options.grid.hover_timeout);
+
+        for (let key in options.maps) {
+          options.maps[key].layers.grid.unbindTooltip();
+        }
+
+        options.grid.hover_timeout = null;
+      }
+
+      // cancel in-flight ajax call to avoid duplicated tooltips
+      if (options.grid.hover_ajax !== null) {
+        options.grid.hover_ajax.abort();
+        options.grid.hover_ajax = null;
+      }
     },
   };
 

@@ -364,12 +364,13 @@ function T(str) {
  */
 function doy_formatter(value, language) {
   const firstDayOfYear = Date.UTC(2019, 0, 1);
-  return new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * value).toLocaleDateString(language, {
+  return new Date(
+    firstDayOfYear + 1000 * 60 * 60 * 24 * value,
+  ).toLocaleDateString(language, {
     month: 'long',
-    day: 'numeric'
-  })
+    day: 'numeric',
+  });
 }
-
 
 // source: https://stackoverflow.com/a/76126221
 function interpolate(color1, color2, percent) {
@@ -388,30 +389,27 @@ function interpolate(color1, color2, percent) {
   const b = Math.round(b1 + (b2 - b1) * percent);
 
   // Convert the interpolated RGB values back to a hex color
-  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
 // source https://www.geeksforgeeks.org/first-strictly-greater-element-in-a-sorted-array-in-java/
 // Returns the index of the first element that is strictly greater than given target
-function indexOfGT(arr, target)
-{
-  let start = 0, end = arr.length - 1;
+function indexOfGT(arr, target) {
+  let start = 0,
+    end = arr.length - 1;
   let ans = -1;
 
-  while (start <= end)
-  {
+  while (start <= end) {
     let mid = Math.floor((start + end) / 2);
 
     // Move to right side if target is
     // greater.
-    if (arr[mid] <= target)
-    {
+    if (arr[mid] <= target) {
       start = mid + 1;
     }
 
     // Move left side.
-    else
-    {
+    else {
       ans = mid;
       end = mid - 1;
     }
@@ -425,8 +423,8 @@ function indexOfGT(arr, target)
  * @returns {number}
  */
 function hashCode(s) {
-  return s.split("").reduce(function(a, b) {
-    a = ((a << 5) - a) + b.charCodeAt(0);
+  return s.split('').reduce(function (a, b) {
+    a = (a << 5) - a + b.charCodeAt(0);
     return a & a;
   }, 0);
 }
@@ -442,7 +440,85 @@ function encodeURL(url, salt) {
   const hash = hashCode(url + salt);
   const encoded = encodeURIComponent(btoa(url + '|' + hash));
   return {
-    'encoded': encoded,
-    'hash': hash
+    encoded: encoded,
+    hash: hash,
   };
+}
+
+/**
+ * Format numerical value according to supplied parameters
+ * @param value Number to format
+ * @param varDetails Variable details object provided by Wordpress
+ * @param delta If true, the value is formatted as a delta
+ * @returns {string} The formatted value
+ */
+/*
+function value_formatter(value, varDetails, delta) {
+  let unit =
+    varDetails.units.value === 'kelvin' ? '°C' : varDetails.units.label;
+  if (unit === undefined) {
+    unit = '';
+  }
+  let str = '';
+  if (delta && value > 0) {
+    str += '+';
+  }
+
+  switch (varDetails.units.value) {
+    case 'doy':
+      if (delta) {
+        str += value.toFixed(varDetails.decimals);
+        str += ' ' + l10n_labels['days'];
+      } else {
+        str += doy_formatter(value);
+      }
+
+      break;
+    default:
+      str += value.toFixed(varDetails.decimals);
+      str += ' ' + unit;
+      break;
+  }
+  return unit_localize(str);
+}
+*/
+
+/**
+ * Format numerical value according to supplied parameters
+ * @param value Number to format
+ * @param var_acf Variable details object provided by Wordpress
+ * @param delta If true, the value is formatted as a delta
+ * @returns {string} The formatted value
+ */
+function value_formatter(value, var_acf, delta) {
+  let unit = var_acf.units;
+  if (unit === 'kelvin') {
+    unit = '°C';
+    value = delta ? value : value - 273.15;
+  }
+
+  if (unit === undefined) {
+    unit = '';
+  }
+  let str = '';
+  if (delta && value > 0) {
+    str += '+';
+  }
+
+  switch (var_acf.units) {
+    case 'doy':
+      if (delta) {
+        str += value.toFixed(var_acf.decimals);
+        str += ' ' + l10n_labels['days'];
+      } else {
+        str += doy_formatter(value, options.lang);
+      }
+
+      break;
+    default:
+      str += value.toFixed(var_acf.decimals);
+      str += ' ' + unit;
+      break;
+  }
+  return unit_localize(str);
 }

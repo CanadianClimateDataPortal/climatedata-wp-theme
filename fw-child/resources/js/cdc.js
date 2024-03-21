@@ -1,4 +1,5 @@
 // global CDC functions
+
 (function ($) {
   function cdc_app(item, options) {
     // options
@@ -9,18 +10,18 @@
       post_id: null,
       canadaBounds: L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.6, -49.9)),
       grid: {
-        highlighted: [],
         markers: {},
+        highlighted: null,
         styles: {
           line: {
             default: {
               color: '#fff',
-              weight: 0.2,
+              weight: 0.5,
               opacity: 0.6,
             },
             hover: {
               color: '#fff',
-              weight: 0.2,
+              weight: 1,
               opacity: 0.8,
             },
             active: {
@@ -501,6 +502,31 @@
 
                     new_layer
                       .on('mouseover', function (e) {
+                        if (options.grid.highlighted != null) {
+                          for (let key in options.maps) {
+                            options.maps[key].layers.grid.resetFeatureStyle(
+                              options.grid.highlighted,
+                            );
+                          }
+                        }
+
+                        options.grid.highlighted = e.layer.properties.gid;
+
+                        for (let key in options.maps) {
+                          options.maps[key].layers.grid.setFeatureStyle(
+                            options.grid.highlighted,
+                            {
+                              weight: options.grid.styles.line.hover.weight,
+                              color: options.grid.styles.line.hover.color,
+                              opacity: options.grid.styles.line.hover.opacity,
+                              fillColor: options.grid.styles.fill.hover.color,
+                              fill: true,
+                              fillOpacity:
+                                options.grid.styles.fill.hover.opacity,
+                            },
+                          );
+                        }
+
                         $(document).trigger('map_item_mouseover', [e]);
                       })
                       .on('mouseout', function (e) {
@@ -767,36 +793,40 @@
                         },
                       )
                       .on('mouseover', function (e) {
-                        options.maps[key].layers.grid.setFeatureStyle(
-                          e.layer.properties.id,
-                          {
-                            color: 'white',
-                            fillColor: plugin.maps.get_color.apply(item, [
-                              options.choro.data[key][e.layer.properties.id],
-                            ]),
-                            weight: 1.5,
-                            fill: true,
-                            radius: 4,
-                            opacity: 1,
-                            fillOpacity: 1,
-                          },
-                        );
+                        if (options.grid.highlighted != null) {
+                          for (let key in options.maps) {
+                            options.maps[key].layers.grid.resetFeatureStyle(
+                              options.grid.highlighted,
+                            );
+                          }
+                        }
 
-                        e.target
-                          .bindTooltip(
-                            '<div>' +
-                              e.layer.properties.label_en +
-                              '<br>' +
-                              options.choro.data[key][e.layer.properties.id] +
-                              '</div>',
-                            { sticky: true },
-                          )
-                          .openTooltip(e.latlng);
+                        options.grid.highlighted = e.layer.properties.id;
+
+                        for (let key in options.maps) {
+                          options.maps[key].layers.grid.setFeatureStyle(
+                            options.grid.highlighted,
+                            {
+                              weight: options.grid.styles.line.hover.weight,
+                              color: options.grid.styles.line.hover.color,
+                              opacity: options.grid.styles.line.hover.opacity,
+                              fillColor: plugin.maps.get_color.apply(item, [
+                                options.choro.data[key][e.layer.properties.id],
+                              ]),
+                              fill: true,
+                              fillOpacity: 1,
+                            },
+                          );
+                        }
+
+                        $(document).trigger('map_item_mouseover', [e]);
                       })
                       .on('mouseout', function (e) {
                         options.maps[key].layers.grid
                           .resetFeatureStyle(e.layer.properties.id)
                           .closeTooltip();
+
+                        $(document).trigger('map_item_mouseout', [e]);
                       })
                       .on('click', function (e) {
                         $(document).trigger('map_item_select', e);
@@ -829,47 +859,6 @@
           categorical = options.legend.colormap.categorical,
           opacity = options.legend.opacity,
           label_offset = categorical ? legend_item_height / 2 : 0;
-
-        // todo move this function if required elsewhere
-        /**
-         * Format numerical value according to supplied parameters
-         * @param value Number to format
-         * @param var_acf Variable details object provided by Wordpress
-         * @param delta If true, the value is formatted as a delta
-         * @returns {string} The formatted value
-         */
-        function value_formatter(value, var_acf, delta) {
-          let unit = var_acf.units;
-          if (unit === 'kelvin') {
-            unit = '°C';
-            value = delta ? value : value - 273.15;
-          }
-
-          if (unit === undefined) {
-            unit = '';
-          }
-          let str = '';
-          if (delta && value > 0) {
-            str += '+';
-          }
-
-          switch (var_acf.units) {
-            case 'doy':
-              if (delta) {
-                str += value.toFixed(var_acf.decimals);
-                str += ' ' + l10n_labels['days'];
-              } else {
-                str += doy_formatter(value, options.lang);
-              }
-
-              break;
-            default:
-              str += value.toFixed(var_acf.decimals);
-              str += ' ' + unit;
-              break;
-          }
-          return unit_localize(str);
-        }
 
         for (let key in options.maps) {
           options.maps[key].legend.onAdd = function (map) {
@@ -1452,10 +1441,10 @@
           options.chart.query.dataset;
 
         let scenarios = DATASETS[options.chart.query.dataset].scenarios;
-        let pointFormatter, labelFormatter;
+        let pointFormatter;
 
         // more to this to add later
-        labelFormatter = function () {
+        var labelFormatter = function () {
           return (
             this.axis.defaultLabelFormatter.call(this) +
             ' ' +
@@ -1574,6 +1563,10 @@
               numberFormatter: function (num) {
                 return Highcharts.numberFormat(num, var_fields.decimals);
               },
+              backgroundColor: 'transparent',
+              style: {
+                fontFamily: 'CDCSans',
+              },
             },
             title: {
               text: '',
@@ -1604,6 +1597,10 @@
               enabled: false,
             },
             tooltip: {
+              crosshairs: true,
+              shared: true,
+              split: false,
+              padding: 4,
               pointFormatter: pointFormatter,
               valueDecimals: var_fields.decimals,
               valueSuffix: ' ' + options.chart.unit,
@@ -1951,15 +1948,6 @@
           fn_options,
         );
 
-        // more to this to add later
-        function labelFormatter(a, b) {
-          return (
-            this.axis.defaultLabelFormatter.call(this) +
-            ' ' +
-            options.chart.unit
-          );
-        }
-
         let scenarios = DATASETS[options.chart.query.dataset].scenarios;
 
         // console.log('update', settings);
@@ -2015,19 +2003,19 @@
                       },
                     },
                     tooltip: {
+                      followPointer: true,
                       formatter: function (tooltip) {
-                        // console.log(tooltip.defaultFormatter);
-
-                        // remove existing plot band every time
-                        options.chart.object.xAxis[0].removePlotBand(
-                          '30y-plot-band',
-                        );
-
                         let [decade, decade_ms] = formatDecade(
                           this.x,
                           options.chart.query.frequency,
                         );
 
+                        // remove existing plot band
+                        options.chart.object.xAxis[0].removePlotBand(
+                          '30y-plot-band',
+                        );
+
+                        // add new plot band
                         options.chart.object.xAxis[0].addPlotBand({
                           from: Date.UTC(decade, 0, 1),
                           to: Date.UTC(decade + 29, 11, 31),
@@ -2036,15 +2024,19 @@
 
                         this.chart = tooltip.chart;
                         this.axis = tooltip.chart.yAxis[0];
+
                         let val1, val2;
 
-                        let tip = [
-                          '<span style="font-size: 10px">' +
-                            options.chart.query.decade +
-                            '-' +
-                            (options.chart.query.decade + 29) +
-                            '</span><br/>',
-                        ];
+                        let tip = [];
+
+                        let decade_label =
+                          '<span style="font-size: 0.75rem; font-weight: bold;">' +
+                          decade +
+                          ' – ' +
+                          (decade + 29) +
+                          '</span><br>';
+
+                        tip.push(decade_label);
 
                         if (
                           decade_ms in options.chart.data['30y_observations']
@@ -2054,15 +2046,14 @@
                               decade_ms
                             ][0];
 
-                          val1 =
-                            tooltip.chart.yAxis[0].labelFormatter.call(this);
-
                           tip.push(
                             '<span style="color:#F47D23">●</span> ' +
                               chart_labels.observation +
                               ' <b>' +
-                              val1 +
-                              '</b><br/>',
+                              this.value +
+                              ' ' +
+                              options.chart.unit +
+                              '</b><br>',
                           );
                         }
 
@@ -2072,17 +2063,18 @@
                               '30y_{0}_median'.format(scenario.name)
                             ][decade_ms][0];
 
-                          val1 = tooltip.defaultFormatter.call(this, tooltip);
-                          // tooltip.chart.yAxis[0].labelFormatter.call(this);
+                          // console.log(scenario.name, this.value);
 
                           tip.push(
-                            '<span style="color:{0}">●</span> '.format(
+                            '<span style="color:{0};">●</span> '.format(
                               scenario.chart_color,
                             ) +
                               T('{0} Median').format(scenario.label) +
-                              ' <b>' +
-                              val1 +
-                              '</b><br/>',
+                              ' ' +
+                              this.value +
+                              ' ' +
+                              options.chart.unit +
+                              '<br>',
                           );
 
                           this.value =
@@ -2090,29 +2082,27 @@
                               '30y_{0}_range'.format(scenario.name)
                             ][decade_ms][0];
 
-                          val1 = tooltip.defaultFormatter.call(this, tooltip);
-                          // val1 =
-                          // tooltip.chart.yAxis[0].labelFormatter.call(this);
+                          val1 = this.value;
 
                           this.value =
                             options.chart.data[
                               '30y_{0}_range'.format(scenario.name)
                             ][decade_ms][1];
 
-                          val2 = tooltip.defaultFormatter.call(this, tooltip);
-                          // val2 =
-                          // tooltip.chart.yAxis[0].labelFormatter.call(this);
+                          val2 = this.value;
 
                           tip.push(
                             '<span style="color:{0}">●</span> '.format(
                               scenario.chart_color,
                             ) +
                               T('{0} Range').format(scenario.label) +
-                              ' <b>' +
+                              ' ' +
                               val1 +
-                              '</b>-<b>' +
+                              ' – ' +
                               val2 +
-                              '</b><br/>',
+                              ' ' +
+                              options.chart.unit +
+                              '<br>',
                           );
                         }, this);
 
@@ -2126,7 +2116,7 @@
                 case 'delta':
                   // add 1970-2000 band
 
-                  console.log(options.chart.object.xAxis[0]);
+                  // console.log(options.chart.object.xAxis[0]);
 
                   options.chart.object.xAxis[0].addPlotBand({
                     from: Date.UTC(1971, 0, 1),
@@ -2218,11 +2208,10 @@
                               '</b><br/>',
                           );
 
-                          val1 = numformat(
+                          val1 =
                             options.chart.data[
                               'delta7100_{0}_range'.format(scenario.name)
-                            ][decade_ms][0],
-                          );
+                            ][decade_ms][0];
 
                           val2 = numformat(
                             options.chart.data[

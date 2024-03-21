@@ -8,7 +8,7 @@
 			
 			<div class="control-tab-body">
 				
-				<div id="map-control-values" class="map-control-item">
+				<div id="map-control-values" class="map-control-item" data-display="station:0">
 					<h6 class="all-caps text-secondary"><?php _e ( 'Data Values', 'cdc' ); ?></h6>
 					
 					<div class="form-check">
@@ -22,7 +22,7 @@
 					</div>
 				</div>
 				
-				<div id="map-control-aggregation" class="map-control-item">
+				<div id="map-control-aggregation" class="map-control-item" data-display="station:0">
 					<h6 class="all-caps text-secondary"><?php _e ( 'Map Aggregation', 'cdc' ); ?></h6>
 					
 					<div class="form-check">

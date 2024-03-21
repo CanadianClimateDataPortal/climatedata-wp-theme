@@ -1367,15 +1367,8 @@
           // console.log(key + ' has to be ' + split_attr);
 
           if (options.var_flags[key] == true) {
+            // flag is false, condition is 1
             split_attr == '1' ? $(this).show() : $(this).hide();
-
-            // if (split_attr == '1') {
-            //   console.log('show');
-            //   $(this).show();
-            // } else {
-            //   console.log('hide');
-            //   $(this).hide();
-            // }
           } else {
             // flag is false, condition is 0
             split_attr == '0' ? $(this).show() : $(this).hide();

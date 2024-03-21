@@ -65,6 +65,11 @@
         current: '',
       },
       var_data: null,
+      var_flags: {
+        single: false,
+        threshold: false,
+        station: false,
+      },
       frequency: {},
       elements: {
         decade_slider: null,
@@ -1526,6 +1531,11 @@
 
       if (status == null) status = options.status;
 
+      options.var_flags.single = false;
+      options.var_flags.inputs = false;
+      options.var_flags.threshold = false;
+      options.var_flags.station = false;
+
       console.log('updating ' + var_id + ', ' + status);
 
       let hidden_input = item.find('[data-query-key="var"]');
@@ -1639,6 +1649,8 @@
         }
 
         if (fields.var_names.length > 1) {
+          options.var_flags.threshold = true;
+
           // multiple vars
 
           if (options.elements.threshold_slider != null) {
@@ -1741,6 +1753,7 @@
         // if the var has that term
         if (options.var_data.var_types.includes('Station Data')) {
           options.query.sector = 'station';
+          options.var_flags.station = true;
         } else {
           options.query.sector = item
             .find('[data-query-key="sector"]:checked')
@@ -1785,6 +1798,54 @@
           callback(data);
         }
       }
+
+      plugin.set_controls();
+    },
+
+    set_controls: function () {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let items_to_hide = [],
+        items_to_show = [];
+
+      // SHOW / HIDE CONTROLS
+
+      // each flag
+      for (let key in options.var_flags) {
+        console.log('check', key, options.var_flags[key]);
+
+        // find items with this condition
+        item.find('[data-display*="' + key + '"]').each(function () {
+          // find its 0/1 value
+          let split_attr = $(this)
+            .attr('data-display')
+            .split(key)[1]
+            .substr(1, 1);
+
+          // console.log($(this));
+          // console.log(key + ' has to be ' + split_attr);
+
+          if (options.var_flags[key] == true) {
+            // flag is false, condition is 1
+            if (split_attr == '1') {
+              $(this).find(':input').prop('disabled', false);
+            } else {
+              $(this).find(':input').prop('disabled', true);
+            }
+          } else {
+            // flag is false, condition is 0
+            if (split_attr == '0') {
+              $(this).find(':input').prop('disabled', false);
+            } else {
+              $(this).find(':input').prop('disabled', true);
+            }
+          }
+        });
+      }
+
+      // console.log('---');
     },
 
     update_frequency: function (var_name) {

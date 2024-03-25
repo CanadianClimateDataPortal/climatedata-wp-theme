@@ -193,18 +193,27 @@ var l10n_table = {
     Close: 'Fermer',
 
     // Custom shapefile
-    'You selected "Custom shapefile" but didn\'t upload any file': 'Vous avez choisi d\'utiliser un shapefile, mais n\'en avez téléchargé aucun',
-    'You must select one region of your shapefile': 'Vous devez sélectionner une des régions de votre shapefile',
-    'The selected region is too large, please select a smaller region': 'La région sélectionnée est trop grosse, veuillez choisir une région plus petite',
+    'You selected "Custom shapefile" but didn\'t upload any file':
+      "Vous avez choisi d'utiliser un shapefile, mais n'en avez téléchargé aucun",
+    'You must select one region of your shapefile':
+      'Vous devez sélectionner une des régions de votre shapefile',
+    'The selected region is too large, please select a smaller region':
+      'La région sélectionnée est trop grosse, veuillez choisir une région plus petite',
     'Processing your file...': 'Traitement de votre fichier...',
     'Please select one region': 'Veuillez sélectionner une région',
-    'An error occurred': 'Une erreur s\'est produite',
-    'Could not process your shapefile': 'Votre fichier shapefile ne peut pas être correctement traité',
-    'Your shapefile must be a ZIP containing at least a .shp file and a .prj file': 'Votre fichier shapefile doit être un ZIP qui contient au moins un fichier .shp et un fichier .prj',
-    'This file is not a valid ZIP file': 'Ce fichier n\'est pas un fichier ZIP valide',
-    'No valid shapefile was found in your ZIP file': 'Aucun fichier shapefile n\' été trouvé dans votre fichier ZIP',
-    'An error occurred while processing your file': 'Une erreur s\'est produite lors du traitement de votre fichier',
-    'Only polygon layers are allowed': 'Seuls les polygones sont permis dans votre fichier',
+    'An error occurred': "Une erreur s'est produite",
+    'Could not process your shapefile':
+      'Votre fichier shapefile ne peut pas être correctement traité',
+    'Your shapefile must be a ZIP containing at least a .shp file and a .prj file':
+      'Votre fichier shapefile doit être un ZIP qui contient au moins un fichier .shp et un fichier .prj',
+    'This file is not a valid ZIP file':
+      "Ce fichier n'est pas un fichier ZIP valide",
+    'No valid shapefile was found in your ZIP file':
+      "Aucun fichier shapefile n' été trouvé dans votre fichier ZIP",
+    'An error occurred while processing your file':
+      "Une erreur s'est produite lors du traitement de votre fichier",
+    'Only polygon layers are allowed':
+      'Seuls les polygones sont permis dans votre fichier',
   },
 };
 
@@ -504,7 +513,7 @@ function value_formatter(value, varDetails, delta) {
  * @param delta If true, the value is formatted as a delta
  * @returns {string} The formatted value
  */
-function value_formatter(value, var_acf, delta) {
+function value_formatter(value, var_acf, delta, lang) {
   let unit = var_acf.units;
   if (unit === 'kelvin') {
     unit = '°C';
@@ -525,7 +534,7 @@ function value_formatter(value, var_acf, delta) {
         str += value.toFixed(var_acf.decimals);
         str += ' ' + l10n_labels['days'];
       } else {
-        str += doy_formatter(value, options.lang);
+        str += doy_formatter(value, lang);
       }
 
       break;

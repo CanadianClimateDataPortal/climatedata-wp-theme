@@ -26,7 +26,7 @@
 					
 					<a href="#data-variable" class="tab-drawer-trigger var-name d-block bg-white text-body p-3 mb-3" data-validate="#data-var"><?php _e ( 'Click to select a variable', 'cdc' ); ?></a>
 					
-					<div id="var-thresholds" class="me-3" style="display: none;" data-display="station:0">
+					<div id="var-thresholds" class="me-3" style="display: none;" data-display="threshold:1,inputs:1">
 						<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Thresholds', 'cdc' ); ?></h6>
 						
 						<div class="accordion accordion-flush" id="var-threshold-accordion">
@@ -48,7 +48,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="accordion-item">
+							<div class="accordion-item" data-display="inputs:1">
 								<h6 class="accordion-header" id="threshold-custom-head">
 									<button class="accordion-button all-caps text-gray-600 mb-0 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#threshold-custom" aria-expanded="false" aria-controls="threshold-custom">
 										<?php _e ( 'Custom', 'cdc'); ?>

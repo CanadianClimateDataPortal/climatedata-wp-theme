@@ -75,7 +75,7 @@
 					</div>
 				</div>
 				
-				<div id="map-control-panels" class="map-control-item" data-display="threshold:1">
+				<div id="map-control-panels" class="map-control-item" data-display="threshold:1,single:1">
 					
 					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Scenarios', 'cdc' ); ?></h6>
 					

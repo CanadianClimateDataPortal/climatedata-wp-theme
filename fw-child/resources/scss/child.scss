@@ -664,6 +664,7 @@ $decade-slider-handle-width: 140px;
   text-align: center;
   border: none;
   box-shadow: 0 0.125rem 0.875rem transparentize($black, 0.85);
+  cursor: grab;
   outline: none;
 
   &.ui-state-active {

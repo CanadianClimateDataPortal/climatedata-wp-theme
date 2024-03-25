@@ -43,6 +43,10 @@
         },
         opacity: 1,
       },
+      grid: {
+        hover_timeout: null,
+        hover_ajax: null,
+      },
       query: {
         coords: [62.51231793838694, -98.48144531250001, 4],
         delta: '',
@@ -61,10 +65,16 @@
         current: '',
       },
       var_data: null,
+      var_flags: {
+        single: false,
+        threshold: false,
+        station: false,
+      },
       frequency: {},
       elements: {
         decade_slider: null,
         threshold_slider: null,
+        var_filters: {},
       },
       debug: true,
     };
@@ -235,11 +245,20 @@
 
               console.log('init get_layer now');
 
-              $(document).cdc_app(
-                'maps.get_layer',
-                options.query,
-                options.var_data,
-              );
+              // load default color scheme
+              plugin.update_default_scheme(function () {
+                $(document).cdc_app(
+                  'maps.get_layer',
+                  options.query,
+                  options.var_data,
+                );
+              });
+
+              // $(document).cdc_app(
+              //   'maps.get_layer',
+              //   options.query,
+              //   options.var_data,
+              // );
 
               console.log('done');
 
@@ -300,6 +319,7 @@
             query: clone_query,
             do_history: 'none',
             callback: function () {
+              console.log('get_layer');
               $(document).cdc_app(
                 'maps.get_layer',
                 clone_query,
@@ -498,11 +518,6 @@
         });
       }
 
-      // load default color scheme
-      plugin.update_default_scheme(function () {
-        $(document).cdc_app('maps.get_layer', options.query, options.var_data);
-      });
-
       item.on('fw_query_success', function (e, query_item) {
         let query_items = query_item.find('.fw-query-items');
 
@@ -518,6 +533,8 @@
 
       item.find('#var-select-query').fw_query();
 
+      //
+
       $(document).cdc_app(
         'add_hook',
         'maps.get_layer',
@@ -525,6 +542,24 @@
         plugin,
         plugin.apply_scheme,
       );
+
+      //
+
+      //       let var_filters = document.querySelectorAll('.var-select-dropdown');
+      //
+      //       item.find('.fw-query-filter').each(function() {
+      //         options.elements.var_filters[$(this)]
+      //       })
+      //
+      //
+      //       })
+      //
+      //
+      //        = [...var_filters].map(
+      //         (dropdownToggleEl) => new bootstrap.Dropdown(dropdownToggleEl),
+      //       );
+      //
+      //       console.log();
     },
 
     _select2_format_item: function (item) {
@@ -568,18 +603,23 @@
         .find('.leaflet-pane.leaflet-' + this_pane + '-pane')
         .css('opacity', ui.value / 100);
 
-      if (this_pane == 'raster') {
-        options.legend.opacity = ui.value / 100;
+      // grid layer defaults to 1
+      item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
 
-        // link legend's opacity
+      // link legend's opacity
+      if (this_pane != 'labels' && this_pane != 'marker') {
+        options.legend.opacity = ui.value / 100;
         item
           .find('.legend')
           .find('.legendbox')
           .css('fill-opacity', options.legend.opacity);
       }
 
-      // grid layer defaults to 1
-      item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
+      if (this_pane == 'marker') {
+        item
+          .find('.leaflet-pane.leaflet-shadow-pane')
+          .css('opacity', options.legend.opacity);
+      }
 
       if (
         this_pane == 'raster' &&
@@ -660,6 +700,112 @@
 
       //
 
+      item.on('map_item_mouseover', function (e, click_event) {
+        let decade_value = parseInt(options.query.decade) + 1,
+          delta = options.var_data.acf.hasdelta,
+          delta7100 = delta ? '&delta7100=true' : '';
+
+        plugin._grid_hover_cancel(click_event);
+
+        if (delta !== false) {
+          options.grid.hover_timeout = setTimeout(function () {
+            let values_url,
+              var_name =
+                options.query.var == 'building_climate_zones'
+                  ? 'hddheat_18'
+                  : options.query.var;
+
+            if (options.query.sector == 'canadagrid') {
+              // gridded
+              values_url =
+                geoserver_url +
+                '/get-delta-30y-gridded-values/' +
+                click_event.latlng['lat'] +
+                '/' +
+                click_event.latlng['lng'] +
+                '/' +
+                var_name +
+                '/' +
+                options.query.frequency +
+                '?period=' +
+                decade_value +
+                '&decimals=' +
+                options.var_data.acf.decimals +
+                delta7100 +
+                '&dataset_name=' +
+                options.query.dataset;
+            } else {
+              values_url =
+                geoserver_url +
+                '/get-delta-30y-regional-values/' +
+                options.query.sector +
+                '/' +
+                click_event.layer.properties.id +
+                '/' +
+                var_name +
+                '/' +
+                options.query.frequency +
+                '?period=' +
+                decade_value +
+                '&decimals=' +
+                options.var_data.acf.decimals +
+                delta7100 +
+                '&dataset_name=' +
+                options.query.dataset;
+            }
+
+            // console.log(values_url);
+
+            options.grid.hover_ajax = $.ajax({
+              url: values_url,
+              dataType: 'json',
+              success: function (data) {
+                for (let key in options.maps) {
+                  options.maps[key].layers.grid
+                    .bindTooltip(
+                      plugin._format_grid_hover_tooltip(
+                        data,
+                        scenario_names[options.query.dataset][key]
+                          .replace(/[\W_]+/g, '')
+                          .toLowerCase(),
+                        options.var_data,
+                        delta,
+                        options.query.sector,
+                        click_event,
+                      ),
+                      { sticky: true },
+                    )
+                    .openTooltip(click_event.latlng);
+                }
+              },
+              // jQuery throws parsererror if the JSON includes NaN. The API returns NaN when no data is available
+              error: function (_, status) {
+                if (status !== 'abort') {
+                  let tip = [];
+
+                  if (options.query.sector !== 'canadagrid') {
+                    tip.push(
+                      click_event.layer.properties[l10n_labels.label_field] +
+                        '<br>',
+                    );
+                  }
+
+                  tip.push(T('No data available for this area.'));
+
+                  for (let key in options.maps) {
+                    options.maps[key].layers.grid
+                      .bindTooltip(tip.join('\n'), { sticky: true })
+                      .openTooltip(click_event.latlng);
+                  }
+                }
+              },
+            });
+          }, 100); // timeout
+        } // if delta
+      });
+
+      //
+
       item.on('map_item_mouseout', function (e, click_event) {
         // TO FIX
         /*// reset highlighted
@@ -689,6 +835,37 @@
         plugin.set_location(click_event.latlng);
       });
 
+      // click station
+
+      item.on('map_station_select', function (e, click_event) {
+        // console.log('station click', click_event);
+
+        if (options.query.var == 'idf') {
+          // popups
+
+          console.log('do popup', click_event);
+
+          $.ajax({
+            url: ajax_data.url,
+            data: {
+              action: 'cdc_get_idf_files',
+              idf: click_event.layer.feature.properties.ID,
+            },
+            dataType: 'json',
+            success: function (data) {
+              console.log(data);
+            },
+          });
+        } else {
+          // normals
+
+          // console.log('set station');
+
+          // load location details
+          plugin.set_station(click_event);
+        }
+      });
+
       // click marker
 
       item.on('click_marker', function (e, click_event) {
@@ -707,14 +884,25 @@
 
       // click item in 'recent locations'
 
-      item.on('click', '#recent-locations .list-group-item', function () {
-        let item_coords = $(this).attr('data-coords').split(',');
+      item.on('click', '#recent-locations .list-group-item', function (e) {
+        if ($(e.target).hasClass('clear')) {
+          console.log('CLEAR MARKER');
+          $(document).cdc_app('maps.remove_marker', $(this).attr('data-index'));
+        } else {
+          let item_coords = $(this).attr('data-coords').split(',');
 
-        plugin.set_location({
-          lat: item_coords[0],
-          lng: item_coords[1],
-          marker_index: $(this).attr('data-index'),
-        });
+          plugin.set_location({
+            lat: item_coords[0],
+            lng: item_coords[1],
+            marker_index: $(this).attr('data-index'),
+          });
+        }
+      });
+
+      // clear 'recent locations' list
+
+      item.on('click', '#recent-locations-clear', function () {
+        $(document).cdc_app('maps.remove_markers');
       });
 
       //
@@ -785,18 +973,6 @@
           .trigger('change');
       });
 
-      // click a variable item description
-      //
-      //       item.on('click', '.var-description', function (e) {
-      //         e.preventDefault();
-      //
-      //         let this_item = $(this).closest('.fw-query-item'),
-      //           this_id = $(this).attr('data-var-id'),
-      //           item_order = parseInt(this_item.css('order'));
-      //
-      //
-      //       });
-
       // click a link element with a query key
 
       item.on('click', 'a[data-query-key]', function () {
@@ -856,7 +1032,21 @@
           .val($(this).attr('data-scheme-id'))
           .trigger('change');
       });
-      
+
+      // SAVE MAP AS IMAGE
+
+      item.find('#download-map-image').click(function (event) {
+        event.preventDefault();
+        const page_url = new URL(window.location.href);
+        page_url.hash = ''; // Make sure to remove #download so no tab is opened at the time of the screenshot
+        const encoded_url = encodeURL(
+          page_url.toString(),
+          URL_ENCODER_SALT,
+        ).encoded;
+        const api_url = DATA_URL + '/raster?url=' + encoded_url;
+        window.open(api_url, '_blank');
+      });
+
       // "Download" button
 
       // Handle of the click on the "Download" button of the "Share" tab.
@@ -864,9 +1054,70 @@
       // the "Download" page are pre-filled.
       $('#download-btn').on('click', function (event) {
         event.preventDefault();
+        const download_query = $.extend(true, {}, options.query);
+
+        // We do some conversions of the "map" page query to adjust it for the "download" page query
+
+        const period = options.query.decade;
+
+        if (period != null) {
+          const period_start = parseInt(period);
+          download_query['start_year'] = period_start;
+          download_query['end_year'] = period_start + 30;
+        }
+
         const base_href = this.href;
-        const query_string = $(document).cdc_app('query.obj_to_url', options.query, null);
+        const query_string = $(document).cdc_app(
+          'query.obj_to_url',
+          download_query,
+          null,
+        );
+
         window.location.href = base_href + query_string + '#data'; // Pre-open the "Data" tab on the "Download" page
+      });
+
+      // var select filters
+
+      item.on('mouseup', '#var-select-query .filter-item', function (e) {
+        console.log('close');
+
+        let this_filter = $(this).closest('.fw-query-filter'),
+          this_toggle = this_filter.find('.dropdown-toggle'),
+          this_menu = $(this).closest('.dropdown-menu');
+
+        // toggle 'show' class
+
+        this_toggle.removeClass('show');
+
+        // close the dropdown
+
+        let this_dropdown = bootstrap.Dropdown.getOrCreateInstance(
+          document.getElementById($(this).closest('.dropdown-menu').attr('id')),
+        );
+
+        this_dropdown.toggle();
+
+        setTimeout(function () {
+          // add selection to toggle btn
+          console.log(this_menu);
+          console.log();
+
+          if (this_menu.find('.selected').length) {
+            this_toggle
+              .find('.selection')
+              .text(this_menu.find('.selected').text())
+              .show();
+          } else {
+            this_toggle.find('.selection').text('').hide();
+          }
+        }, 250);
+      });
+
+      $(document).on('fw_query_reset', function () {
+        item
+          .find('.fw-query-filter .dropdown-toggle .selection')
+          .text('')
+          .hide();
       });
 
       // HISTORY
@@ -885,10 +1136,10 @@
 
       if (!status) status = options.status;
 
-      console.log('handle input, status ' + status);
-
       let this_key = input.attr('data-query-key'),
         this_val = input.val();
+
+      console.log('input: ' + this_key, 'status ' + status);
 
       // if not a form element with a value attribute,
       // look for a data-query-val
@@ -901,6 +1152,50 @@
       switch (this_key) {
         case 'var_id':
           plugin.update_var(this_val, status);
+          break;
+        case 'dataset':
+          // each scenario label
+          item.find('.scenario-name').each(function () {
+            let this_item = $(this),
+              old_dataset = this_item.attr('data-dataset'),
+              old_name = this_item.attr('data-name'),
+              new_key = '';
+
+            if (old_dataset != this_val) {
+              // update data-dataset attr
+
+              this_item.attr('data-dataset', this_val);
+
+              // update the data-name attr
+
+              // find the scenario name in the correlating dataset
+              DATASETS[old_dataset].scenarios.forEach(function (scenario) {
+                if (new_key == '' && scenario.name == old_name) {
+                  // found it - store the correlating name
+                  new_key = scenario.correlations[this_val];
+                  // set the item's data-name to the new key
+                  this_item.attr('data-name', new_key);
+                }
+              });
+
+              // update the label's text
+
+              // find the selected key in the new dataset object
+              DATASETS[this_val].scenarios.forEach(function (scenario) {
+                if (scenario.name == new_key) this_item.text(scenario.label);
+              });
+            }
+          });
+
+          if (this_val == 'cmip6') {
+            item.find('.scenario-name.low').text(scenario_names[this_val].low);
+            item
+              .find('.scenario-name.medium')
+              .text(scenario_names[this_val].medium);
+            item
+              .find('.scenario-name.high')
+              .text(scenario_names[this_val].high);
+          }
           break;
         case 'scenarios':
           // ssp1/2/5 switches
@@ -1237,6 +1532,11 @@
 
       if (status == null) status = options.status;
 
+      options.var_flags.single = false;
+      options.var_flags.inputs = false;
+      options.var_flags.threshold = false;
+      options.var_flags.station = false;
+
       console.log('updating ' + var_id + ', ' + status);
 
       let hidden_input = item.find('[data-query-key="var"]');
@@ -1350,6 +1650,8 @@
         }
 
         if (fields.var_names.length > 1) {
+          options.var_flags.threshold = true;
+
           // multiple vars
 
           if (options.elements.threshold_slider != null) {
@@ -1452,6 +1754,7 @@
         // if the var has that term
         if (options.var_data.var_types.includes('Station Data')) {
           options.query.sector = 'station';
+          options.var_flags.station = true;
         } else {
           options.query.sector = item
             .find('[data-query-key="sector"]:checked')
@@ -1496,6 +1799,54 @@
           callback(data);
         }
       }
+
+      plugin.set_controls();
+    },
+
+    set_controls: function () {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let items_to_hide = [],
+        items_to_show = [];
+
+      // SHOW / HIDE CONTROLS
+
+      // each flag
+      for (let key in options.var_flags) {
+        console.log('check', key, options.var_flags[key]);
+
+        // find items with this condition
+        item.find('[data-display*="' + key + '"]').each(function () {
+          // find its 0/1 value
+          let split_attr = $(this)
+            .attr('data-display')
+            .split(key)[1]
+            .substr(1, 1);
+
+          // console.log($(this));
+          // console.log(key + ' has to be ' + split_attr);
+
+          if (options.var_flags[key] == true) {
+            // flag is false, condition is 1
+            if (split_attr == '1') {
+              $(this).find(':input').prop('disabled', false);
+            } else {
+              $(this).find(':input').prop('disabled', true);
+            }
+          } else {
+            // flag is false, condition is 0
+            if (split_attr == '0') {
+              $(this).find(':input').prop('disabled', false);
+            } else {
+              $(this).find(':input').prop('disabled', true);
+            }
+          }
+        });
+      }
+
+      // console.log('---');
     },
 
     update_frequency: function (var_name) {
@@ -1586,7 +1937,8 @@
       }
     },
 
-    // fetch colours of default scheme from Geoserver and update the data of the default
+    // fetch colours of default scheme from Geoserver
+    // and update the data of the default
     // one in the dropdown
     update_default_scheme: function (callback) {
       let plugin = this,
@@ -1820,6 +2172,62 @@
       return sld_body;
     },
 
+    set_station: function (click_event, open_tab = true) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      console.log('station fn', click_event);
+
+      const station_id = click_event.layer.feature.properties.STN_ID,
+        coords = { lat: click_event.latlng.lat, lng: click_event.latlng.lng };
+
+      // create chart
+
+      if (open_tab == true) {
+        console.log('load station now');
+
+        // set map center to marker location w/ offset
+        $(document).cdc_app('maps.set_center', coords, 10);
+
+        // hidden input
+        item
+          .find('[data-query-key="station"]')
+          .val(station_id)
+          .trigger('change');
+
+        // tab headings
+        item
+          .find('#station-detail .control-tab-head h5')
+          .text(click_event.layer.feature.properties.STATION_NAME);
+
+        // open location tab drawer
+
+        if (window.location.hash != '#location-detail') {
+          $('#control-bar').tab_drawer('update_path', '#station-detail');
+        }
+
+        // remove legend rows
+        item.find('.chart-series-items .cloned').remove();
+
+        // chart
+
+        $(document).cdc_app('charts.render_station', {
+          query: options.query,
+          var_data: options.var_data,
+          station: {
+            id: station_id,
+            name: click_event.layer.feature.properties.STATION_NAME,
+            coords: coords,
+          },
+          download_url: null,
+          container: item.find('#station-chart-container')[0],
+        });
+
+        console.log('done');
+      }
+    },
+
     set_location: function (coords, open_tab = true) {
       let plugin = this,
         options = plugin.options,
@@ -1842,12 +2250,8 @@
           // add marker
           $(document).cdc_app('maps.add_marker', data, function () {});
 
-          // set map center to marker location w/ offset
-          $(document).cdc_app(
-            'maps.set_center',
-            { lat: data.lat, lng: data.lng },
-            10,
-          );
+          // match coords var to lat/lng returned by the function
+          coords = { lat: data.lat, lng: data.lng };
 
           // search field value
           if (data.geo_name != 'Point') {
@@ -1892,7 +2296,8 @@
             success: function (data) {
               console.log('chart data', data);
 
-              item.find('#chart-series-items .cloned').remove();
+              // remove legend rows
+              item.find('.chart-series-items .cloned').remove();
 
               $(document).cdc_app('charts.render', {
                 data: data,
@@ -1905,7 +2310,89 @@
             },
           });
         }
+
+        // set map center to marker location w/ offset
+        $(document).cdc_app('maps.set_center', coords, 10);
       });
+    },
+
+    /**
+     *
+     * @param data Data sent by climatedata-api ( get-delta-30y-gridded-values or get-delta-30y-regional-values)
+     * @param rcp RCP scenario selection
+     * @param varDetails Variable details object provided by Wordpress
+     * @param delta If true, the value is formatted as a delta
+     * @param sector Selected sector (ex: 'census'). "" if none
+     * @param event Javascript event that triggered the grid_hover
+     * @returns {string}
+     */
+
+    _format_grid_hover_tooltip: function (
+      data,
+      rcp,
+      varDetails,
+      delta,
+      sector,
+      event,
+    ) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let to_label = options.var_data.acf.units == 'doy' ? 'to_doy' : 'to',
+        tip = [];
+
+      if (event.layer.properties.hasOwnProperty(l10n_labels.label_field)) {
+        tip.push(event.layer.properties[l10n_labels.label_field] + '<br>');
+      }
+
+      let val1 = value_formatter(data[rcp]['p50'], varDetails, delta);
+
+      tip.push(
+        '<span style="color:#00F">●</span> ' +
+          l10n_labels.median +
+          ' <b>' +
+          val1 +
+          '</b><br/>',
+      );
+
+      val1 = value_formatter(data[rcp]['p10'], varDetails, delta);
+      let val2 = value_formatter(data[rcp]['p90'], varDetails, delta);
+      tip.push(
+        '<span style="color:#00F">●</span> ' +
+          l10n_labels.range +
+          ' <b>' +
+          val1 +
+          '</b> ' +
+          l10n_labels[to_label] +
+          ' <b>' +
+          val2 +
+          '</b><br/>',
+      );
+      return tip.join('\n');
+    },
+
+    _grid_hover_cancel: function (e) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      // cancel current timeout
+      if (options.grid.hover_timeout !== null) {
+        clearTimeout(options.grid.hover_timeout);
+
+        for (let key in options.maps) {
+          options.maps[key].layers.grid.unbindTooltip();
+        }
+
+        options.grid.hover_timeout = null;
+      }
+
+      // cancel in-flight ajax call to avoid duplicated tooltips
+      if (options.grid.hover_ajax !== null) {
+        options.grid.hover_ajax.abort();
+        options.grid.hover_ajax = null;
+      }
     },
   };
 
@@ -1928,5 +2415,23 @@
         }
       }
     });
+  };
+
+  /**
+   * Prepare the UI of the "Explore Maps" page for a screenshot.
+   *
+   * If on the "Explore Maps" page, calling this function will adapt the UI so that the map is displayed full screen
+   * (hiding UI elements as required).
+   *
+   * This function is not intended to be called from the JavaScript. It's intended to be called by the API server
+   * when it needs to take a screenshot of the page. See the "Save map as image" button.
+   *
+   * There is no "reverse" function. Once this function is called, the UI stays modified until the page is reloaded.
+   */
+  $.fn.prepare_raster = function () {
+    $('#control-bar').remove();
+    $('#map-control-footer').remove();
+    $('#map-breadcrumb').remove();
+    $('#map-objects').addClass('to-raster');
   };
 })(jQuery);

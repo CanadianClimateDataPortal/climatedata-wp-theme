@@ -169,7 +169,9 @@
 						$(this).find('.selected').removeClass('selected')
 					})
 					
-					plugin.update_filters()
+					plugin.update_filters(function() {
+						$(document).trigger('fw_query_reset')
+					})
 					
 				})
 			}
@@ -241,15 +243,30 @@
 			
 		},
 		
-		update_filters: function() {
+		update_filters: function(callback = null) {
 			
 			let plugin = this,
 					options = plugin.options,
 					item = plugin.item
 			
 			// reset default tax/meta query
-			if (options.args.tax_query) options.args.tax_query = [ ...options.default_args.tax_query ]
-			if (options.args.meta_query) options.args.meta_query = [ ...options.default_args.meta_query ]
+			console.log(JSON.stringify(options.args, null, 4))
+			
+			if (options.args.tax_query) {
+				if (options.default_args.tax_query) {
+					options.args.tax_query = [ ...options.default_args.tax_query ]
+				} else {
+					delete options.args.tax_query
+				}
+			}
+			
+			if (options.args.meta_query) {
+				if (options.default_args.meta_query) {
+					options.args.tax_query = [ ...options.default_args.meta_query ]
+				} else {
+					delete options.args.meta_query
+				}
+			}
 			
 			let has_filters = false
 			
@@ -341,11 +358,11 @@
 				}
 			}
 			
-			plugin.do_query()
+			plugin.do_query(callback)
 			
 		},
 		
-		do_query: function() {
+		do_query: function(callback = null) {
 			
 			let plugin = this,
 					options = plugin.options,
@@ -419,6 +436,10 @@
 					
 					if (plugin.debug == true) {
 						console.log('trigger fw_query_success')
+					}
+					
+					if (typeof callback == 'function') {
+						callback()
 					}
 					
 					$(document).trigger('fw_query_success', [item])

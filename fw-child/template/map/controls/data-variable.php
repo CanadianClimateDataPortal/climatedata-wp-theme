@@ -12,13 +12,13 @@
 					data-args='{
 						"posts_per_page":15,
 						"post_type": [ "variable" ],
-						"orderby": "RAND(<?php echo mt_rand ( 100000, 999999 ); ?>)",
+						"orderby": "title",
 						"order":"asc",
 						"post_status":"publish"
 					}'
 				>
 					
-					<div id="" class="query-container row row-cols-3 align-items-center border-bottom px-1">
+					<div id="" class="query-container d-flex align-items-center border-bottom px-1">
 						<?php 
 						
 							foreach ( array ( 'var-type', 'sector' ) as $tax ) {
@@ -30,11 +30,13 @@
 						?>
 						
 						<div
-							class="fw-query-filter col dropdown"
+							id="var-select-filter-<?php echo $tax; ?>"
+							class="fw-query-filter dropdown"
 							data-filter-type="taxonomy" data-filter-multi="false"
 						>
 						
-							<div class="dropdown-toggle btn btn-sm btn-light mb-0 all-caps d-block text-start" data-bs-toggle="dropdown" aria-expanded="false"><?php
+							<div class="dropdown-toggle btn btn-sm btn-white text-body mb-0 p-2 all-caps d-flex align-items-center justify-content-between flex-nowrap text-start border-end" data-bs-toggle="dropdown" aria-expanded="false">
+								<span><?php
 									
 									if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
 										
@@ -46,9 +48,11 @@
 										
 									}
 								
-							?></div>
+								?></span>
+								<span class="selection me-3 text-gray-600" style="display: none;"></span>
+							</div>
 							
-							<ul class="dropdown-menu">
+							<ul id="var-select-filter-<?php echo $tax; ?>-dropdown" class="var-select-dropdown dropdown-menu w-100">
 								<?php
 							
 									foreach ( get_terms ( array (
@@ -95,8 +99,8 @@
 						
 						?>
 						
-						<div class="d-flex justify-content-end">
-							<h6 class="mb-0 all-caps"><?php _e ( 'Clear', 'fw' ); ?></h6>
+						<div class="d-flex justify-content-end ms-auto me-2">
+							<h6 class="fw-query-reset mb-0 all-caps" style="display: none;"><?php _e ( 'Clear', 'fw' ); ?></h6>
 						</div>
 					</div>
 					

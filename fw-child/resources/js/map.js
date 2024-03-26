@@ -57,6 +57,7 @@
         scenarios: ['medium'],
         decade: 2040,
         sector: 'canadagrid',
+        selections: [],
         scheme: 'default',
         scheme_type: 'discrete',
       },
@@ -76,6 +77,7 @@
         threshold_slider: null,
         var_filters: {},
       },
+      current_layer: null,
       debug: true,
     };
 
@@ -208,9 +210,6 @@
             },
           );
 
-          console.log('processed query object');
-          console.log(JSON.stringify(options.query, null, 4));
-
           // 4. set up UX components
 
           $('#status').text('adding components');
@@ -253,12 +252,6 @@
                   options.var_data,
                 );
               });
-
-              // $(document).cdc_app(
-              //   'maps.get_layer',
-              //   options.query,
-              //   options.var_data,
-              // );
 
               console.log('done');
 
@@ -319,7 +312,7 @@
             query: clone_query,
             do_history: 'none',
             callback: function () {
-              console.log('get_layer');
+              console.log('decade slider get_layer');
               $(document).cdc_app(
                 'maps.get_layer',
                 clone_query,
@@ -542,24 +535,6 @@
         plugin,
         plugin.apply_scheme,
       );
-
-      //
-
-      //       let var_filters = document.querySelectorAll('.var-select-dropdown');
-      //
-      //       item.find('.fw-query-filter').each(function() {
-      //         options.elements.var_filters[$(this)]
-      //       })
-      //
-      //
-      //       })
-      //
-      //
-      //        = [...var_filters].map(
-      //         (dropdownToggleEl) => new bootstrap.Dropdown(dropdownToggleEl),
-      //       );
-      //
-      //       console.log();
     },
 
     _select2_format_item: function (item) {
@@ -1286,18 +1261,21 @@
           val: this_val,
         });
 
-        // perform triggers based in input key, but with updated query object
+        // perform triggers based on input key, but with updated query object
         switch (this_key) {
           case 'var_id':
           case 'frequency':
           case 'delta':
-            plugin.update_default_scheme(function () {
-              $(document).cdc_app(
-                'maps.get_layer', // todo: not ideal, may generates a flicker of the map layer
-                options.query,
-                options.var_data,
-              );
-            });
+            // console.log(options.query.delta);
+
+            // update_default = plugin.update_default_scheme(function () {
+            // console.log('delta get_layer');
+            // $(document).cdc_app(
+            //   'maps.get_layer', // todo: not ideal, may generates a flicker of the map layer
+            //   options.query,
+            //   options.var_data,
+            // );
+            // });
             break;
           case 'scheme':
             plugin.update_scheme();
@@ -1317,16 +1295,18 @@
           query: options.query,
           do_history: do_history,
           callback: function () {
-            console.log('get_layer', options.status);
+            plugin.update_default_scheme(function () {
+              console.log('handle input get_layer', options.status);
 
-            $(document).cdc_app(
-              'maps.get_layer',
-              options.query,
-              options.var_data,
-            );
+              $(document).cdc_app(
+                'maps.get_layer',
+                options.query,
+                options.var_data,
+              );
 
-            console.log('status = ready');
-            options.status = 'ready';
+              console.log('status = ready');
+              options.status = 'ready';
+            });
           },
         });
       } else if (status != 'init' && status != 'eval') {
@@ -1340,19 +1320,20 @@
         options = plugin.options,
         item = plugin.item;
 
-      console.log('refresh');
+      // console.log('refresh');
+      // console.log(JSON.stringify(query, null, 4));
 
       // update control bar inputs from query
 
-      for (let key in options.query) {
-        // console.log(key, options.query[key]);
+      for (let key in query) {
+        // console.log(key);
 
         // for each key in the query object
 
         // find input(s) that matches this key
         let this_input = item.find('[data-query-key="' + key + '"]');
 
-        if (Array.isArray(options.query[key])) {
+        if (Array.isArray(query[key])) {
           // query option is an array
           // that means the input allows multiple selections
           // i.e. checkboxes
@@ -1363,11 +1344,11 @@
 
               if (key == 'coords') {
                 // specific action for hidden coords field
-                $(this).val(options.query[key].join(','));
+                $(this).val(query[key].join(','));
                 do_update = true;
               } else if (
                 $(this).is('[type="checkbox"]') &&
-                options.query[key].includes($(this).val()) &&
+                query[key].includes($(this).val()) &&
                 $(this).prop('checked') == false
               ) {
                 // checkbox
@@ -1382,7 +1363,7 @@
               } else if ($(this).hasClass('select2')) {
                 console.log('update select');
                 console.log('status', options.status);
-                $(this).val(options.query[key]).trigger('change');
+                $(this).val(query[key]).trigger('change');
               }
 
               if (do_update == true) {
@@ -1398,11 +1379,11 @@
             // hidden input
             // likely controlled by some other UX element
 
-            this_input.val(options.query[key]);
+            this_input.val(query[key]);
 
             // var ID
             if (key == 'var_id') {
-              plugin.update_var(options.query[key], status);
+              plugin.update_var(query[key], status);
             }
 
             // decade
@@ -1410,7 +1391,7 @@
               // update UI slider
               options.elements.decade_slider.slider(
                 'value',
-                parseInt(options.query[key]),
+                parseInt(query[key]),
               );
             }
 
@@ -1422,39 +1403,37 @@
 
             // location
             if (key == 'location') {
-              console.log('get location ' + options.query[key]);
+              if (query[key] != '') {
+                console.log('get location ' + query[key]);
 
-              $.ajax({
-                url: ajax_data.url,
-                dataType: 'json',
-                data: {
-                  action: 'cdc_get_location_by_id',
-                  lang: options.lang,
-                  loc: options.query[key],
-                },
-                success: function (data) {
-                  let open_location = false;
+                $.ajax({
+                  url: ajax_data.url,
+                  dataType: 'json',
+                  data: {
+                    action: 'cdc_get_location_by_id',
+                    lang: options.lang,
+                    loc: query[key],
+                  },
+                  success: function (data) {
+                    let open_location = false;
 
-                  if (window.location.hash == '#location-detail') {
-                    open_location = true;
-                  }
+                    if (window.location.hash == '#location-detail') {
+                      open_location = true;
+                    }
 
-                  plugin.set_location(
-                    { lat: data.lat, lng: data.lng },
-                    open_location,
-                  );
-                },
-              });
+                    plugin.set_location(
+                      { lat: data.lat, lng: data.lng },
+                      open_location,
+                    );
+                  },
+                });
+              }
             }
           } else if (this_input.is('[type="radio"]')) {
             // radio
 
             this_radio = item.find(
-              '[data-query-key="' +
-                key +
-                '"][value="' +
-                options.query[key] +
-                '"]',
+              '[data-query-key="' + key + '"][value="' + query[key] + '"]',
             );
 
             if (this_radio.prop('checked') != true) {
@@ -1463,9 +1442,9 @@
               $(document).trigger('update_input', [$(this_radio), 'eval']);
             }
           } else if (this_input.is('select')) {
-            if (this_input.val() != options.query[key]) {
+            if (this_input.val() != query[key]) {
               // console.log('change val');
-              this_input.val(options.query[key]);
+              this_input.val(query[key]);
               $(document).trigger('update_input', [$(this_input), 'eval']);
             }
           }
@@ -1509,6 +1488,7 @@
           query: options.query,
           do_history: 'none',
           callback: function () {
+            console.log('eval get_layer');
             $(document).cdc_app(
               'maps.get_layer',
               options.query,
@@ -1688,6 +1668,7 @@
                   query: clone_query,
                   do_history: 'none',
                   callback: function () {
+                    console.log('threshold get_layer');
                     $(document).cdc_app(
                       'maps.get_layer',
                       clone_query,
@@ -1755,9 +1736,9 @@
           options.query.sector = 'station';
           options.var_flags.station = true;
         } else {
-          options.query.sector = item
-            .find('[data-query-key="sector"]:checked')
-            .val();
+          // options.query.sector = item
+          // .find('[data-query-key="sector"]:checked')
+          // .val();
         }
 
         // ADJUST CONTROLS FOR INDIVIDUAL VARS
@@ -1812,38 +1793,71 @@
 
       // SHOW / HIDE CONTROLS
 
+      item.find('[data-display]').each(function () {
+        // console.log('item', $(this));
+
+        // console.log($(this).attr('data-display').split(','));
+
+        let condition_met = false;
+
+        // each condition
+        $(this)
+          .attr('data-display')
+          .split(',')
+          .forEach(function (condition) {
+            // console.log('condition', condition);
+
+            // split
+            let split_attr = condition.split(':');
+            split_attr[1] = split_attr[1] == '1' ? true : false;
+
+            // console.log(split_attr[0] + ' has to be ' + split_attr[1]);
+
+            if (options.var_flags[split_attr[0]] == split_attr[1]) {
+              // console.log('condition met');
+              condition_met = true;
+            }
+          });
+
+        if (condition_met == true) {
+          $(this).find(':input').prop('disabled', false);
+        } else {
+          $(this).find(':input').prop('disabled', true);
+        }
+      });
+
       // each flag
-      for (let key in options.var_flags) {
-        console.log('check', key, options.var_flags[key]);
-
-        // find items with this condition
-        item.find('[data-display*="' + key + '"]').each(function () {
-          // find its 0/1 value
-          let split_attr = $(this)
-            .attr('data-display')
-            .split(key)[1]
-            .substr(1, 1);
-
-          // console.log($(this));
-          // console.log(key + ' has to be ' + split_attr);
-
-          if (options.var_flags[key] == true) {
-            // flag is false, condition is 1
-            if (split_attr == '1') {
-              $(this).find(':input').prop('disabled', false);
-            } else {
-              $(this).find(':input').prop('disabled', true);
-            }
-          } else {
-            // flag is false, condition is 0
-            if (split_attr == '0') {
-              $(this).find(':input').prop('disabled', false);
-            } else {
-              $(this).find(':input').prop('disabled', true);
-            }
-          }
-        });
-      }
+      //       for (let key in options.var_flags) {
+      //         // console.log('check', key, options.var_flags[key]);
+      //
+      //         // find items with this condition
+      //         item.find('[data-display*="' + key + '"]').each(function () {
+      //           // find its 0/1 value
+      //           let split_attr = $(this)
+      //             .attr('data-display')
+      //             .split(key)[1]
+      //             .substr(1, 1);
+      //
+      //           // console.log($(this));
+      //           // console.log(key + ' has to be ' + split_attr);
+      //
+      //           if (options.var_flags[key] == true) {
+      //             // flag is false, condition is 1
+      //             if (split_attr == '1') {
+      //               $(this).find(':input').prop('disabled', false);
+      //             } else {
+      //               $(this).find(':input').prop('disabled', true);
+      //             }
+      //           } else {
+      //             // flag is false, condition is 0
+      //             if (split_attr == '0') {
+      //               $(this).find(':input').prop('disabled', false);
+      //             } else {
+      //               $(this).find(':input').prop('disabled', true);
+      //             }
+      //           }
+      //         });
+      //       }
 
       // console.log('---');
     },
@@ -1944,6 +1958,8 @@
         options = plugin.options,
         item = plugin.item;
 
+      console.log('update default scheme');
+
       let default_scheme_element = item.find(
         '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
       );
@@ -1968,31 +1984,39 @@
           'maps.get_layer_name',
           options.query,
         );
-        $.getJSON(
-          geoserver_url +
-            '/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic' +
-            '&format=application/json&layer=' +
-            layer_name,
-        )
-          .then(function (data) {
-            let colour_map =
-              data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
 
-            default_scheme_element.data(
-              'scheme-colours',
-              colour_map.map((e) => e.color),
-            );
-            default_scheme_element.data(
-              'scheme-quantities',
-              colour_map.map((e) => parseFloat(e.quantity)),
-            );
-            plugin.update_scheme();
-          })
-          .always(function () {
-            if (typeof callback == 'function') {
-              callback();
-            }
-          });
+        console.log('current', options.current_layer);
+        console.log('layer name', layer_name);
+
+        if (options.current_layer != layer_name) {
+          $.getJSON(
+            geoserver_url +
+              '/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic' +
+              '&format=application/json&layer=' +
+              layer_name,
+          )
+            .then(function (data) {
+              options.current_layer == layer_name;
+
+              let colour_map =
+                data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
+
+              default_scheme_element.data(
+                'scheme-colours',
+                colour_map.map((e) => e.color),
+              );
+              default_scheme_element.data(
+                'scheme-quantities',
+                colour_map.map((e) => parseFloat(e.quantity)),
+              );
+              plugin.update_scheme();
+            })
+            .always(function () {
+              if (typeof callback == 'function') {
+                callback();
+              }
+            });
+        }
       }
     },
 
@@ -2001,6 +2025,8 @@
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
+
+      console.log('apply scheme');
 
       if (special_variables.hasOwnProperty(options.var_data.slug)) {
         const special_var = special_variables[options.var_data.slug];
@@ -2038,6 +2064,7 @@
         options = plugin.options,
         item = plugin.item;
 
+      console.log('update scheme');
       // reset active
       let selected_item = item.find(
           '#display-scheme-select .dropdown-item[data-scheme-id="' +
@@ -2082,6 +2109,8 @@
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
+
+      console.log('generate ramp', selected_scheme_item.data('scheme-colours'));
 
       let colours = selected_scheme_item.data('scheme-colours');
       let query = options.query;
@@ -2333,7 +2362,12 @@
         tip.push(event.layer.properties[l10n_labels.label_field] + '<br>');
       }
 
-      let val1 = value_formatter(data[rcp]['p50'], varDetails, delta);
+      let val1 = value_formatter(
+        data[rcp]['p50'],
+        varDetails,
+        delta,
+        options.lang,
+      );
 
       tip.push(
         '<span style="color:#00F">●</span> ' +
@@ -2343,8 +2377,14 @@
           '</b><br/>',
       );
 
-      val1 = value_formatter(data[rcp]['p10'], varDetails, delta);
-      let val2 = value_formatter(data[rcp]['p90'], varDetails, delta);
+      val1 = value_formatter(data[rcp]['p10'], varDetails, delta, options.lang);
+      let val2 = value_formatter(
+        data[rcp]['p90'],
+        varDetails,
+        delta,
+        options.lang,
+      );
+
       tip.push(
         '<span style="color:#00F">●</span> ' +
           l10n_labels.range +

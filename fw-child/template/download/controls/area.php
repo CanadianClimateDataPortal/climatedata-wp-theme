@@ -36,7 +36,7 @@
 					>
 						<?php
 					
-							cdc_station_list();
+							// cdc_station_list ();
 					
 						?>
 					</select>
@@ -50,7 +50,7 @@
 						<label class="form-check-label" for="area-aggregation-grid"><?php _e ( 'Gridded Data', 'cdc' ); ?></label>
 					</div>
 					
-					<div id="area-aggregation-select-mode" class="bg-gray-200 p-2">
+					<div id="area-aggregation-select-mode" class="bg-gray-200 p-2 mb-2">
 						
 						<div class="btn-group" role="group">
 							<input type="radio" class="btn-check" name="area-selection" id="area-selection-select" value="select" autocomplete="off">
@@ -91,7 +91,7 @@
 					</div>
 					
 					<div id="area-aggregation-shapefile" class="bg-gray-200 p-3">
-						<label for="area-aggregation-shapefile-input" class="form-label"><?php _e ( 'Drop your GeoJSON file here to upload', 'cdc' ); ?></label>
+						<label for="area-aggregation-shapefile-input" class="form-label"><?php _e ( 'Drop your shapefile here to upload', 'cdc' ); ?></label>
 						<input class="form-control form-control-sm" id="area-aggregation-shapefile-input" type="file">
 						<div id="area-aggregation-shapefile-message" class="mt-2"></div>
 					</div>
@@ -100,7 +100,28 @@
 				<div id="map-control-search" class="map-control-item">
 					<label for="area-search" class="h6 all-caps text-secondary"><?php _e ( 'Search &amp; Zoom', 'cdc' ); ?></label>
 					
-					<input type="text" class="form-control" name="area-search" placeholder="<?php _e ( 'City, landmark or postal code', 'cdc' ); ?>">
+					<select 
+						class="custom-select custom-select-md select2 form-control" 
+						name="area-search" 
+						id="area-search" 
+						data-placeholder="<?php _e ( 'City, landmark or postal code','cdc' ); ?>"
+					>
+						<option value=""><?php _e('Search for a City/Town', 'cdc'); ?></option>
+						
+						<?php
+							
+							if ( isset ( $_GET['search'] ) ) {
+					
+						?>
+					
+						<option value="<?php echo $_GET['search']; ?>"><?php echo 'search val'; //echo $GLOBALS['vars']['current_data']['location_data']['geo_name']; ?></option>
+					
+						<?php
+							
+							}
+						
+						?>
+					</select>
 				</div>
 				
 				<div id="map-control-coords" class="map-control-item">

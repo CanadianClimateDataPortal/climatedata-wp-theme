@@ -30,9 +30,12 @@
         colormap: {
           colours: [],
           quantities: [],
+          labels: null, // placeholder for special labels
+          scheme_type: 'discrete',
         },
+        opacity: 1,
       },
-      current_selections: [],
+      // current_selections: [],
       query: {
         coords: [62.51231793838694, -98.48144531250001, 4],
         delta: '',
@@ -55,6 +58,7 @@
         input_type: 'preset',
         inputs: [],
         station: [],
+        selections: [],
       },
       query_str: {
         prev: '',
@@ -67,6 +71,7 @@
         threshold: false,
         station: false,
       },
+      current_layer: null,
       request_type: 'single',
       elements: {
         start_slider: null,
@@ -160,7 +165,7 @@
 
           console.log('download', 'refresh inputs', options.status);
 
-          plugin.refresh_inputs(options.query, options.status);
+          plugin.refresh_inputs(options.query, 'init');
 
           console.log('done');
 
@@ -177,13 +182,22 @@
               if (options.query.var != null && options.query.var != 'null') {
                 // page loaded with a variable set
 
-                console.log('init get_layer now');
+                console.log('init get_layer');
 
-                $(document).cdc_app(
-                  'maps.get_layer',
-                  options.query,
-                  options.var_data,
-                );
+                // load default color scheme
+                plugin.update_default_scheme(function () {
+                  $(document).cdc_app(
+                    'maps.get_layer',
+                    options.query,
+                    options.var_data,
+                  );
+                });
+
+                // $(document).cdc_app(
+                //   'maps.get_layer',
+                //   options.query,
+                //   options.var_data,
+                // );
               }
 
               console.log('done');
@@ -229,7 +243,7 @@
         .slider({
           min: 1950,
           max: 2100,
-          value: start_hidden.val(),
+          value: parseInt(options.query.start_year),
           step: 5,
           animate: true,
           create: function (e, ui) {
@@ -255,7 +269,7 @@
         .slider({
           min: 1950,
           max: 2100,
-          value: end_hidden.val(),
+          value: parseInt(options.query.end_year),
           step: 5,
           animate: true,
           create: function (e, ui) {
@@ -341,34 +355,37 @@
 
       // SELECT2
 
+      console.log('init station-select');
+
       $('#station-select').select2({
         language: options.lang,
-        ajax: {
-          url: ajax_data.url,
-          dataType: 'json',
-          delay: 0,
-          data: function (params) {
-            return {
-              action: 'cdc_station_search',
-              q: params.term, // search term
-              page: params.page,
-            };
-          },
-          processResults: function (data, page) {
-            // parse the results into the format expected by Select2.
-            // since we are using custom formatting functions we do not
-            // need to alter the remote JSON data
-            return {
-              results: data,
-            };
-          },
-          cache: true,
-        },
-        escapeMarkup: function (markup) {
-          return markup;
-        }, // let our custom formatter work
+        multiple: true,
+        closeOnSelect: false,
+        // ajax: {
+        //   url: ajax_data.url,
+        //   dataType: 'json',
+        //   delay: 0,
+        //   data: function (params) {
+        //     return {
+        //       action: 'cdc_station_search',
+        //       q: params.term, // search term
+        //       page: params.page,
+        //     };
+        //   },
+        //   processResults: function (data, page) {
+        //     // parse the results into the format expected by Select2.
+        //     // since we are using custom formatting functions we do not
+        //     // need to alter the remote JSON data
+        //     return {
+        //       results: data,
+        //     };
+        //   },
+        //   cache: true,
+        // },
+        // escapeMarkup: function (markup) {
+        //   return markup;
+        // }, // let our custom formatter work
         width: '100%',
-        placeholderOption: 'first',
         placeholder: $('#station-select').attr('data-placeholder'),
       });
 
@@ -406,12 +423,15 @@
           // adjust download query based on
           // type of threshold
 
+          console.log('show accordion', $(e.target).attr('id'));
+
           if ($(e.target).attr('id') == 'threshold-custom') {
             // custom:
             // populate options.query.inputs with the field values
 
             // hide the data layer - it's not applicable to a
             // custom threshold query
+            console.log('hide raster pane');
             item.find('.leaflet-raster-pane').hide();
           } else {
             // preset:
@@ -439,11 +459,115 @@
       item.find('#var-select-query').fw_query();
 
       // Custom shapefile component
-      options.elements.shapefile_upload = item.find('#area-aggregation-shapefile-input').first()
-          .shapefile_upload({
-            message_container: '#area-aggregation-shapefile-message',
-            maps: options.maps,
-          });
+      options.elements.shapefile_upload = item
+        .find('#area-aggregation-shapefile-input')
+        .first()
+        .shapefile_upload({
+          message_container: '#area-aggregation-shapefile-message',
+          maps: options.maps,
+        });
+
+      // SELECT2
+
+      $('#area-search').select2({
+        language: {
+          inputTooShort: function () {
+            let instructions = '<div class="geo-select-instructions">';
+
+            instructions += '<div class="p-2 mb-2 border-bottom">';
+
+            instructions +=
+              '<h6 class="mb-1">' + T('Search communities') + '</h6>';
+
+            instructions +=
+              '<p class="mb-1 text-body">' +
+              T('Begin typing city name') +
+              '</p>';
+
+            instructions += '</div>';
+
+            instructions += '<div class="p-2">';
+
+            instructions +=
+              '<h6 class="mb-1">' + T('Search coordinates') + '</h6>';
+
+            instructions +=
+              '<p class="mb-0 text-body">' +
+              T('Enter latitude & longitude e.g.') +
+              ' <code>54,-115</code></p>';
+
+            instructions += '</div>';
+
+            instructions += '</div>';
+
+            return instructions;
+          },
+        },
+        ajax: {
+          url: ajax_data.url,
+          dataType: 'json',
+          delay: 0,
+          data: function (params) {
+            return {
+              action: 'cdc_location_search',
+              q: params.term, // search term
+              search: params,
+              page: params.page,
+            };
+          },
+          transport: function (params, success, failure) {
+            var $request = $.ajax(params);
+
+            // console.log(params, success, failure);
+
+            var llcheck = new RegExp(
+              '^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?)\\s*,\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$',
+            );
+
+            term = params.data.q;
+
+            if (llcheck.test(term)) {
+              $request.fail(failure);
+              // $('.select2-results__option').text('custom');
+              $('.select2-results__options').empty();
+
+              var term_segs = term.split(',');
+              var term_lat = term_segs[0];
+              var term_lon = term_segs[1];
+
+              $('.select2-results__options').append(
+                '<div class="geo-select-instructions p-4"><h6 class="mb-3">' +
+                  T('Coordinates detected') +
+                  '</h6><p class="mb-0"><span class="geo-select-pan-btn btn btn-outline-secondary btn-sm rounded-pill px-4" data-lat="' +
+                  term_lat +
+                  '" data-lon="' +
+                  term_lon +
+                  '">' +
+                  T('Set map view') +
+                  '</span></p></div>',
+              );
+            } else {
+              $request.then(success);
+              return $request;
+            }
+          },
+          processResults: function (data, page) {
+            // parse the results into the format expected by Select2.
+            // since we are using custom formatting functions we do not need to
+            // alter the remote JSON data
+            return {
+              results: data.items,
+            };
+          },
+          cache: true,
+        },
+        escapeMarkup: function (markup) {
+          return markup;
+        }, // let our custom formatter work
+        minimumInputLength: 1,
+        width: '100%',
+        templateResult: plugin._select2_format_item,
+      });
     },
 
     init_events: function () {
@@ -451,7 +575,9 @@
         options = plugin.options,
         item = plugin.item;
 
-      // MAP
+      // MAP INTERACTIONS
+
+      // zoom/drag
 
       for (let key in options.maps) {
         // create zoomend/dragend events
@@ -461,33 +587,33 @@
           // console.log(e, this);
 
           if (options.status != 'init') {
+            console.log('zoomend start');
             options.status = 'mapdrag';
-          }
 
-          // update coord text fields
-          $('#coords-lat').val(this.getCenter().lat);
-          $('#coords-lng').val(this.getCenter().lng);
-          $('#coords-zoom').val(this.getZoom());
+            // update coord text fields
+            $('#coords-lat').val(this.getCenter().lat);
+            $('#coords-lng').val(this.getCenter().lng);
+            $('#coords-zoom').val(this.getZoom());
 
-          // update hidden coords field
-          $('[data-query-key="coords"]').val(
-            $('#coords-lat').val() +
-              ',' +
-              $('#coords-lng').val() +
-              ',' +
-              $('#coords-zoom').val(),
-          );
+            // update hidden coords field
+            $('[data-query-key="coords"]').val(
+              $('#coords-lat').val() +
+                ',' +
+                $('#coords-lng').val() +
+                ',' +
+                $('#coords-zoom').val(),
+            );
 
-          if (options.status == 'mapdrag') {
-            options.status = 'input';
-          }
+            if (options.status == 'mapdrag') {
+              options.status = 'input';
+            }
 
-          // console.log('moved map', options.status);
+            // console.log('moved map', options.status);
 
-          // simulate input event on coords field
-          $('#coords-lat').trigger('change');
+            // simulate input event on coords field
+            $('#coords-lat').trigger('change');
 
-          if (options.status != 'init') {
+            // if (options.status != 'init') {
             // update query value
             $('[data-query-key="coords"]').each(function () {
               $(document).cdc_app('query.update_value', options.query, {
@@ -496,107 +622,228 @@
                 val: $(this).val(),
               });
             });
+            // }
+
+            // update query string
+            options.query_str.prev = options.query_str.current;
+
+            options.query_str.current = $(document).cdc_app(
+              'query.obj_to_url',
+              options.query,
+              'replace',
+            );
+
+            console.log('zoomend done');
           }
-
-          // update query string
-          options.query_str.prev = options.query_str.current;
-
-          options.query_str.current = $(document).cdc_app(
-            'query.obj_to_url',
-            options.query,
-            'replace',
-          );
         });
       }
 
-      item.on('map_item_mouseover', function (e, click_event) {
-        let this_gid = click_event.layer.properties.gid;
+      // mouseover
 
-        if (
-          !options.current_selections.length ||
-          (options.current_selections.length &&
-            !options.current_selections.includes(this_gid))
-        ) {
-          for (let key in options.maps) {
-            options.maps[key].layers.grid.setFeatureStyle(this_gid, {
+      item.on(
+        'map_item_mouseover',
+        function (e, mouse_event, this_gid, style_obj) {
+          style_obj = {
+            ...{
               color: '#444',
               weight: 1,
               opacity: 1,
-            });
-          }
-        }
-      });
+            },
+            ...style_obj,
+          };
 
-      item.on('map_item_mouseout', function (e, click_event) {
-        let this_gid = click_event.layer.properties.gid;
-
-        if (
-          !options.current_selections.length ||
-          (options.current_selections.length &&
-            !options.current_selections.includes(this_gid))
-        ) {
-          for (let key in options.maps) {
-            options.maps[key].layers.grid.resetFeatureStyle(this_gid);
-          }
-        }
-      });
-
-      item.on('map_item_select', function (e, click_event) {
-        let this_gid = click_event.layer.properties.gid;
-
-        options.current_selections = [];
-
-        item
-          .find('#area-selections')
-          .val()
-          .split(',')
-          .forEach(function (selection) {
-            if (selection != '')
-              options.current_selections.push(parseInt(selection));
-          });
-
-        // console.log('current', current_selections);
-
-        if (options.current_selections.includes(this_gid)) {
-          // deselect
-
-          for (var i = options.current_selections.length - 1; i >= 0; i--) {
-            if (options.current_selections[i] === this_gid) {
-              options.current_selections.splice(i, 1);
+          if (
+            !options.query.selections.length ||
+            (options.query.selections.length &&
+              !options.query.selections.includes(this_gid))
+          ) {
+            for (let key in options.maps) {
+              options.maps[key].layers.grid.setFeatureStyle(
+                this_gid,
+                style_obj,
+              );
             }
           }
+        },
+      );
 
-          for (let key in options.maps) {
-            options.maps[key].layers.grid.resetFeatureStyle(this_gid);
+      // mouseout
+
+      item.on(
+        'map_item_mouseout',
+        function (e, mouse_event, this_gid, style_obj) {
+          style_obj = {
+            ...{
+              color: '#444',
+              weight: 1,
+              opacity: 1,
+            },
+            ...style_obj,
+          };
+
+          // console.log('mouseout', this_gid, options.query.selections);
+
+          if (!options.query.selections.includes(this_gid)) {
+            // not selected
+            for (let key in options.maps) {
+              options.maps[key].layers.grid.resetFeatureStyle(this_gid);
+            }
+          } else {
+            style_obj.color = '#f00';
+
+            for (let key in options.maps) {
+              options.maps[key].layers.grid.setFeatureStyle(
+                this_gid,
+                style_obj,
+              );
+            }
           }
-        } else {
-          // select
+        },
+      );
 
-          options.current_selections.push(this_gid);
+      // click
 
-          for (let key in options.maps) {
-            options.maps[key].layers.grid.setFeatureStyle(this_gid, {
+      item.on(
+        'map_item_select',
+        function (e, mouse_event, this_gid, style_obj) {
+          // reset query.selections
+          let selections = item
+            .find('#area-selections')
+            .val()
+            .split(',')
+            .filter(function (i) {
+              return i;
+            });
+
+          selections.forEach(function (selection, i) {
+            if (selection != '') selections[i] = parseInt(selection);
+          });
+
+          style_obj = {
+            ...{
               color: '#f00',
               weight: 1,
               opacity: 1,
-            });
-          }
-        }
+            },
+            ...style_obj,
+          };
 
-        item
-          .find('#area-selections')
-          .val(options.current_selections.join(','))
-          .trigger('change');
-      });
+          // console.log('select', this_gid, style_obj);
+
+          // array includes the clicked area
+          if (selections.includes(this_gid)) {
+            // deselect - splice the gid from selections
+            for (var i = selections.length - 1; i >= 0; i--) {
+              if (selections[i] === this_gid) selections.splice(i, 1);
+            }
+
+            for (let key in options.maps) {
+              options.maps[key].layers.grid.resetFeatureStyle(this_gid);
+            }
+          } else {
+            // select - add gid to the array
+            selections.push(this_gid);
+
+            for (let key in options.maps) {
+              options.maps[key].layers.grid.setFeatureStyle(
+                this_gid,
+                style_obj,
+              );
+            }
+          }
+
+          if (options.query.sector != 'canadagrid' && selections.length > 1) {
+            style_obj.color = '#fff';
+
+            selections.forEach(function (selection, i) {
+              if (i < selections.length - 1) {
+                console.log('reset ' + selection);
+
+                for (let key in options.maps) {
+                  options.maps[key].layers.grid.setFeatureStyle(
+                    selection,
+                    style_obj,
+                  );
+                }
+              }
+            });
+
+            selections = [selections[selections.length - 1]];
+          }
+
+          // console.log('selections', selections.join(','));
+
+          // update input
+          item
+            .find('#area-selections')
+            .val(selections.join(','))
+            .trigger('change');
+        },
+      );
+
+      // stations
+
+      item.on(
+        'map_station_select',
+        function (e, mouse_event, this_gid, style_obj) {
+          console.log('station click', this_gid);
+
+          let selections = item.find('#station-select').val();
+          // .split(',')
+          // .filter(function (i) {
+          //   return i;
+          // });
+
+          console.log('current selections', selections);
+
+          selections.forEach(function (selection, i) {
+            if (selection != '') selections[i] = parseInt(selection);
+          });
+
+          if (selections.includes(this_gid)) {
+            console.log('remove ' + this_gid);
+
+            for (var i = selections.length - 1; i >= 0; i--) {
+              if (selections[i] === this_gid) selections.splice(i, 1);
+            }
+          } else {
+            console.log('add ' + this_gid);
+            selections.push(this_gid);
+          }
+
+          // console.log(
+          //   item.find('#station-select option[value="' + this_gid + '"]'),
+          // );
+
+          // set hidden 'selections'
+          // item
+          //   .find('#area-selections')
+          //   .val(selections.join(','))
+          //   .trigger('change');
+
+          // set station select2
+
+          console.log('station select', selections);
+          item.find('#station-select').val(selections).trigger('change');
+        },
+      );
 
       //
       // SIDEBAR CONTROLS
       //
 
+      // search selection
+
+      item.find('#area-search').on('select2:select', function (e) {
+        console.log('selected', e.params.data);
+
+        plugin.set_location({ lat: e.params.data.lat, lng: e.params.data.lon });
+      });
+
       // triggerable handler
 
       item.on('update_input', function (event, item, status) {
-        // console.log('update input event', event, item, status);
+        // console.log('update input event', item.attr('id'), status);
 
         if (item) {
           // reset history push counter
@@ -613,14 +860,6 @@
           .val($(this).attr('data-var-id'))
           .trigger('change');
       });
-
-      // select a variable grid item
-
-      //       item.on('click', '.var-select', function () {
-      //         // get variable by ID
-      //
-
-      //       });
 
       // click a link element with a query key
 
@@ -648,7 +887,7 @@
             options.status != 'init' &&
             options.status != 'eval'
           ) {
-            console.log('status = input');
+            // console.log('status = input');
             options.status = 'input';
           }
 
@@ -696,7 +935,7 @@
       //
 
       // Show/hide the user custom shapefile on the map when the "Custom shapefile" radio button is selected/deselected
-      item.find('input[name=area-aggregation]').on('change', function() {
+      item.find('input[name=area-aggregation]').on('change', function () {
         if (this.value === 'upload') {
           options.elements.shapefile_upload.shapefile_upload('show');
         } else {
@@ -705,13 +944,59 @@
       });
 
       // Show information with the "more info" button.
-      const tooltip_trigger = item.find('#area-aggregation-upload-tooltip').first();
+      const tooltip_trigger = item
+        .find('#area-aggregation-upload-tooltip')
+        .first();
       tooltip_trigger.popover({
         trigger: 'hover',
         html: true,
         content: () => {
           return tooltip_trigger.find('span').first().html();
         },
+      });
+
+      // var select filters
+
+      item.on('mouseup', '#var-select-query .filter-item', function (e) {
+        console.log('close');
+
+        let this_filter = $(this).closest('.fw-query-filter'),
+          this_toggle = this_filter.find('.dropdown-toggle'),
+          this_menu = $(this).closest('.dropdown-menu');
+
+        // toggle 'show' class
+
+        this_toggle.removeClass('show');
+
+        // close the dropdown
+
+        let this_dropdown = bootstrap.Dropdown.getOrCreateInstance(
+          document.getElementById($(this).closest('.dropdown-menu').attr('id')),
+        );
+
+        this_dropdown.toggle();
+
+        setTimeout(function () {
+          // add selection to toggle btn
+          console.log(this_menu);
+          console.log();
+
+          if (this_menu.find('.selected').length) {
+            this_toggle
+              .find('.selection')
+              .text(this_menu.find('.selected').text())
+              .show();
+          } else {
+            this_toggle.find('.selection').text('').hide();
+          }
+        }, 250);
+      });
+
+      $(document).on('fw_query_reset', function () {
+        item
+          .find('.fw-query-filter .dropdown-toggle .selection')
+          .text('')
+          .hide();
       });
 
       //
@@ -741,15 +1026,24 @@
 
       if (!status) status = options.status;
 
-      // console.log('handle input', input, status);
+      console.log('handle input', input, status);
 
       let this_key = input.attr('data-query-key'),
         this_val = input.val();
+
+      // console.log(this_key, this_val);
 
       // if not a form element with a value attribute,
       // look for a data-query-val
       if (input.is('a')) {
         this_val = input.attr('data-query-val');
+      }
+
+      if (input.attr('type') == 'text' || input.attr('type') == 'hidden') {
+        if (window.lodash.isEqual(options.query[this_key], this_val)) {
+          console.log("value hasn't changed");
+          return true;
+        }
       }
 
       // custom UX behaviours by input key
@@ -758,7 +1052,51 @@
 
       switch (this_key) {
         case 'var_id':
-          plugin.update_var(this_val, options.query.var, status);
+          plugin.update_var(this_val, status);
+          break;
+
+        case 'dataset':
+          item.find('.scenario-name').each(function () {
+            let this_item = $(this),
+              old_dataset = this_item.attr('data-dataset'),
+              old_name = this_item.attr('data-name'),
+              new_key = '';
+
+            if (old_dataset != this_val) {
+              // update data-dataset attr
+
+              this_item.attr('data-dataset', this_val);
+
+              // update the data-name attr
+
+              // find the scenario name in the correlating dataset
+              DATASETS[old_dataset].scenarios.forEach(function (scenario) {
+                if (new_key == '' && scenario.name == old_name) {
+                  // found it - store the correlating name
+                  new_key = scenario.correlations[this_val];
+                  // set the item's data-name to the new key
+                  this_item.attr('data-name', new_key);
+                }
+              });
+
+              // update the label's text
+
+              // find the selected key in the new dataset object
+              DATASETS[this_val].scenarios.forEach(function (scenario) {
+                if (scenario.name == new_key) this_item.text(scenario.label);
+              });
+            }
+          });
+
+          if (this_val == 'cmip6') {
+            item.find('.scenario-name.low').text(scenario_names[this_val].low);
+            item
+              .find('.scenario-name.medium')
+              .text(scenario_names[this_val].medium);
+            item
+              .find('.scenario-name.high')
+              .text(scenario_names[this_val].high);
+          }
           break;
 
         case 'percentiles':
@@ -808,6 +1146,26 @@
           }, 500);
 
           break;
+
+        case 'selections':
+          console.log('handle selections', this_val);
+
+          // convert string value to array of integers
+
+          let selections = this_val.split(',').filter(function (i) {
+            return i;
+          });
+
+          this_val = [];
+
+          // each selection
+          selections.forEach(function (this_gid) {
+            this_val.push(parseInt(this_gid));
+          });
+
+          options.query.selections = this_val;
+
+          break;
         case 'coords':
           // coordinates
 
@@ -837,13 +1195,30 @@
           }
 
           break;
+
+        case 'sector':
+          // clear the current selections
+
+          console.log('clear selections');
+          console.log(item.find('[data-query-key="selections"]').val());
+
+          item.find('[data-query-key="selections"]').val('').trigger('change');
+
+          console.log(item.find('[data-query-key="selections"]').val());
+
+          break;
       }
 
       if (status == 'input' || status == 'slide') {
         // whether to pushstate on eval or not
         let do_history = status == 'slide' ? 'none' : 'push';
 
-        console.log('call update_value');
+        // console.log(
+        //   'call update_value',
+        //   this_key,
+        //   options.query[this_key],
+        //   this_val,
+        // );
 
         // use cdc helper function to
         // update the value in the query object
@@ -868,21 +1243,26 @@
               options.query.var != 'null' &&
               options.var_data != null
             ) {
-              console.log('get layer');
-              $(document).cdc_app(
-                'maps.get_layer',
-                options.query,
-                options.var_data,
-              );
-            }
+              plugin.update_default_scheme(function () {
+                console.log('handle_input get layer');
 
-            if (status != 'init') {
-              options.status = 'ready';
+                $(document).cdc_app(
+                  'maps.get_layer',
+                  options.query,
+                  options.var_data,
+                );
+
+                if (status != 'init') {
+                  // console.log('status ready');
+                  options.status = 'ready';
+                }
+              });
             }
           },
         });
       } else {
         if (status != 'init') {
+          // console.log('status ready');
           options.status = 'ready';
         }
       }
@@ -897,6 +1277,8 @@
         options = plugin.options,
         item = plugin.item;
 
+      status = options.status;
+
       // sync query objects
       options.query = query;
 
@@ -908,98 +1290,106 @@
         // find input(s) that matches this key
         let this_input = item.find('[data-query-key="' + key + '"]');
 
-        // console.log('refresh', key, this_input.val(), options.query[key]);
+        if (this_input.length) {
+          // if (key == 'selections') {
+          console.log('refresh', key, this_input.val(), options.query[key]);
+          // }
 
-        if (Array.isArray(options.query[key])) {
-          // query option is an array
-          // that means the input allows multiple selections
-          // i.e. checkboxes
+          if (Array.isArray(options.query[key])) {
+            // query option is an array
+            // that means the input allows multiple selections
+            // i.e. checkboxes
 
-          if (this_input.length) {
-            this_input.each(function (i) {
-              let do_update = false;
-              if (key == 'coords') {
-                // specific action for hidden coords field
-                $(this).val(options.query[key].join(','));
-                do_update = true;
-              } else if (
-                $(this).is('[type="checkbox"]') &&
-                options.query[key].includes($(this).val()) &&
-                $(this).prop('checked') == false
-              ) {
-                // checkbox
-                // this value is in the object
-                // but the box is not checked
-                $(this).prop('checked', true);
-                do_update = true;
-              } else if ($(this).hasClass('select2')) {
-                // console.log('update select');
-                // console.log('status', options.status);
-                $(this).val(options.query[key]).trigger('change');
-              }
+            if (this_input.length) {
+              this_input.each(function (i) {
+                let do_update = false;
+                if (key == 'coords') {
+                  // specific action for hidden coords field
+                  $(this).val(options.query[key].join(','));
+                  do_update = true;
+                } else if (
+                  $(this).is('[type="checkbox"]') &&
+                  options.query[key].includes($(this).val()) &&
+                  $(this).prop('checked') == false
+                ) {
+                  // checkbox
+                  // this value is in the object
+                  // but the box is not checked
+                  $(this).prop('checked', true);
+                  do_update = true;
+                } else if ($(this).is('[type="hidden"]')) {
+                  $(this).val(options.query[key].join(',')).trigger('change');
+                  do_update = true;
+                } else if ($(this).hasClass('select2')) {
+                  console.log('update select');
+                  console.log('status', status);
+                  $(this).val(options.query[key]).trigger('change');
+                }
 
-              if (do_update == true) {
-                $(document).trigger('update_input', [$(this), options.status]);
-              }
-            });
-          }
-        } else {
-          // query option is a single value
-          // check out what type of input goes with it
-
-          if (this_input.is('[type="hidden"]')) {
-            // hidden input
-            // likely controlled by some other UX element
-
-            this_input.val(options.query[key]);
-
-            if (key == 'start_year') {
-              options.elements.start_slider.slider(
-                'value',
-                parseInt(options.query[key]),
-              );
-            } else if (key == 'end_date') {
-              options.elements.end_slider.slider(
-                'value',
-                parseInt(options.query[key]),
-              );
-            } else if (key == 'var_id' || key == 'var') {
-              // console.log('var', options.query[key]);
-
-              if (options.query[key] != null) {
-                plugin.update_var(
-                  options.query.var_id,
-                  options.query.var,
-                  options.status,
-                );
-              }
+                if (do_update == true) {
+                  $(document).trigger('update_input', [$(this), status]);
+                }
+              });
             }
-          } else if (this_input.is('[type="radio"]')) {
-            // radio
+          } else {
+            // query option is a single value
+            // check out what type of input goes with it
 
-            this_radio = item.find(
-              '[data-query-key="' +
-                key +
-                '"][value="' +
-                options.query[key] +
-                '"]',
-            );
+            if (this_input.is('[type="hidden"]')) {
+              // hidden input
+              // likely controlled by some other UX element
 
-            if (this_radio.prop('checked') != true) {
-              // console.log('radio', this_radio);
-              this_radio.prop('checked', true);
-              $(document).trigger('update_input', [$(this_radio), 'eval']);
-            }
-          } else if (this_input.is('select')) {
-            if (this_input.val() != options.query[key]) {
+              let this_val = parseInt(options.query[key]);
+
+              if (key == 'start_year') {
+                options.elements.start_slider.slider('value', this_val);
+              } else if (key == 'end_year') {
+                if (this_val <= parseInt(options.query.start_year)) {
+                  this_val = options.query.end_year =
+                    parseInt(options.query.start_year) + 5;
+                }
+
+                options.elements.end_slider.slider('value', this_val);
+              }
+
               this_input.val(options.query[key]);
-              $(document).trigger('update_input', [$(this_input), 'eval']);
-            }
-          }
 
-          // console.log('---');
-        }
+              if (key == 'var_id' || key == 'var') {
+                // console.log('var', options.query[key]);
+
+                if (options.query[key] != null) {
+                  plugin.update_var(options.query.var_id, status);
+                }
+              }
+            } else if (this_input.is('[type="radio"]')) {
+              // radio
+
+              this_radio = item.find(
+                '[data-query-key="' +
+                  key +
+                  '"][value="' +
+                  options.query[key] +
+                  '"]',
+              );
+
+              if (this_radio.prop('checked') != true) {
+                // console.log('radio', this_radio);
+                this_radio.prop('checked', true);
+                $(document).trigger('update_input', [$(this_radio), 'eval']);
+              }
+            } else if (this_input.is('select')) {
+              if (this_input.val() != options.query[key]) {
+                this_input.val(options.query[key]);
+                $(document).trigger('update_input', [$(this_input), 'eval']);
+              }
+            }
+
+            // console.log('---');
+          }
+        } // if input
       }
+
+      console.log('end of refresh_inputs');
     },
 
     handle_pop: function (e) {
@@ -1036,6 +1426,7 @@
           query: options.query,
           do_history: 'none',
           callback: function () {
+            console.log('pop get_layer');
             $(document).cdc_app(
               'maps.get_layer',
               options.query,
@@ -1049,7 +1440,7 @@
       }
     },
 
-    update_var: function (var_id, var_name, status = null, callback = null) {
+    update_var: function (var_id, status = null, callback = null) {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
@@ -1061,7 +1452,7 @@
       options.var_flags.threshold = false;
       options.var_flags.station = false;
 
-      console.log('updating ' + var_id + ', ' + var_name + ', ' + status);
+      console.log('updating ' + var_id + ', ' + status);
 
       let hidden_input = item.find('[data-query-key="var"]');
 
@@ -1079,7 +1470,7 @@
           // the one that was sent to the function
           // console.log('skip get_var_data');
         } else {
-          // console.log('get_var_data because var_id changed');
+          console.log('get_var_data because var_id changed');
           $(document).cdc_app('get_var_data', var_id, function (data) {
             // console.log('get var data', data);
 
@@ -1121,6 +1512,15 @@
           options.query.sector = 'station';
           options.var_flags.station = true;
         } else {
+          if (options.query.sector == 'station') {
+            item
+              .find('[data-query-key="sector"][value="canadgrid"]')
+              .prop('checked', true)
+              .trigger('change');
+          }
+
+          options.var_flags.station = false;
+
           // console.log('var is NOT station data');
 
           // find checked radio
@@ -1141,17 +1541,19 @@
 
           options.query_str.prev = options.query_str.current;
 
-          options.query_str.current = $(document).cdc_app('query.eval', {
-            query: options.query,
-            do_history: 'none',
-            callback: function () {
-              $(document).cdc_app(
-                'maps.get_layer',
-                options.query,
-                options.var_data,
-              );
-            },
-          });
+          // console.log('update_var eval');
+          // options.query_str.current = $(document).cdc_app('query.eval', {
+          //   query: options.query,
+          //   do_history: 'none',
+          //   callback: function () {
+          //     console.log('update_var get_layer');
+          //     $(document).cdc_app(
+          //       'maps.get_layer',
+          //       options.query,
+          //       options.var_data,
+          //     );
+          //   },
+          // });
 
           item.find('#var-thresholds').show();
 
@@ -1248,6 +1650,7 @@
                       query: options.query, //clone_query,
                       do_history: 'none',
                       callback: function () {
+                        console.log('threshold slide get_layer');
                         $(document).cdc_app(
                           'maps.get_layer',
                           options.query, //clone_query,
@@ -1299,7 +1702,8 @@
 
           if (
             options.var_flags.inputs == false &&
-            options.var_flags.threshold == false
+            options.var_flags.threshold == false &&
+            options.var_flags.staation == false
           ) {
             options.var_flags.single = true;
 
@@ -1308,12 +1712,15 @@
               .addClass('disabled')
               .prop('disabled', true);
 
-            if (!item.find('#threshold-custom').hasClass('show')) {
-              item
-                .find('#threshold-custom-head .accordion-button')
-                .trigger('click');
-            }
+            // if (!item.find('#threshold-custom').hasClass('show')) {
+            //   item
+            //     .find('#threshold-custom-head .accordion-button')
+            //     .trigger('click');
+            // }
           }
+
+          // console.log('flags');
+          // console.log(options.var_flags);
 
           // set breadcrumb & overlay content
 
@@ -1325,16 +1732,6 @@
                 : options.var_data.title.rendered,
             )
             .show();
-
-          // let desc_key =
-          //     'var_description' + (options.lang != 'en' ? '_fr' : ''),
-          //   tech_key =
-          //     'var_tech_description' + (options.lang != 'en' ? '_fr' : '');
-
-          // item.find('#info-description').html(options.var_data.acf[desc_key]);
-          // item
-          //   .find('#info-tech-description')
-          //   .html(options.var_data.acf[tech_key]);
         }
 
         plugin.set_controls();
@@ -1351,30 +1748,38 @@
 
       // SHOW / HIDE CONTROLS
 
-      // each flag
-      for (let key in options.var_flags) {
-        // console.log('check', key, options.var_flags[key]);
+      // each item with display conditions
+      item.find('[data-display]').each(function () {
+        // console.log('item', $(this));
+        // console.log($(this).attr('data-display').split(','));
 
-        // find items with this condition
-        item.find('[data-display*="' + key + '"]').each(function () {
-          // find its 0/1 value
-          let split_attr = $(this)
-            .attr('data-display')
-            .split(key)[1]
-            .substr(1, 1);
+        let condition_met = false;
 
-          // console.log($(this));
-          // console.log(key + ' has to be ' + split_attr);
+        // each condition
+        $(this)
+          .attr('data-display')
+          .split(',')
+          .forEach(function (condition) {
+            // console.log('condition', condition);
 
-          if (options.var_flags[key] == true) {
-            // flag is false, condition is 1
-            split_attr == '1' ? $(this).show() : $(this).hide();
-          } else {
-            // flag is false, condition is 0
-            split_attr == '0' ? $(this).show() : $(this).hide();
-          }
-        });
-      }
+            // split
+            let split_attr = condition.split(':');
+            split_attr[1] = split_attr[1] == '1' ? true : false;
+
+            // console.log(split_attr[0] + ' has to be ' + split_attr[1]);
+
+            if (options.var_flags[split_attr[0]] == split_attr[1]) {
+              // console.log('condition met');
+              condition_met = true;
+            }
+          });
+
+        if (condition_met == true) {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
+      });
 
       // UPDATE CONTROL SETTINGS
 
@@ -1390,6 +1795,40 @@
       }
 
       // console.log('---');
+    },
+
+    set_location: function (coords) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      $.ajax({
+        url: ajax_data.url,
+        dataType: 'json',
+        data: {
+          action: 'cdc_get_location_by_coords',
+          lang: options.lang,
+          lat: coords.lat,
+          lng: coords.lng,
+          sealevel: false,
+        },
+        success: function (data) {
+          console.log('LOCATION');
+          console.log(data);
+
+          // match coords var to lat/lng returned by the function
+          coords = { lat: data.lat, lng: data.lng };
+
+          // search field value
+          if (data.geo_name != 'Point') {
+            item.find('#area-search').val(data.title);
+          }
+        },
+      }).then(function () {
+        console.log('set offset');
+        // set map center to marker location w/ offset
+        $(document).cdc_app('maps.set_center', coords, 10);
+      });
     },
 
     validate_tab: function (prev_id, new_id) {
@@ -1459,10 +1898,11 @@
       } else if (prev_id == '#area') {
         if (options.var_flags.station == true) {
         }
-        
+
         // Validate the custom shapefile
         if (options.query.sector === 'upload') {
-          const validation_message = options.elements.shapefile_upload.shapefile_upload('validate');
+          const validation_message =
+            options.elements.shapefile_upload.shapefile_upload('validate');
           if (validation_message != null) {
             invalid_messages.push(validation_message);
           }
@@ -1735,6 +2175,197 @@
       //
       //       let ext = form_inputs['output_format'] == 'csv' ? 'csv' : 'nc';
       //       return file_name.format(dataset, location, time, variable, options, ext);
+    },
+
+    update_default_scheme: function (callback) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let default_scheme_element = item.find(
+        '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
+      );
+
+      if (special_variables.hasOwnProperty(options.var_data.slug)) {
+        const special_var = special_variables[options.var_data.slug];
+        default_scheme_element.data(
+          'scheme-colours',
+          special_var.colormap.colours,
+        );
+        default_scheme_element.data(
+          'scheme-quantities',
+          special_var.colormap.quantities,
+        );
+        plugin.update_scheme();
+
+        if (typeof callback === 'function') {
+          callback();
+        }
+      } else {
+        let layer_name = $(document).cdc_app(
+          'maps.get_layer_name',
+          options.query,
+        );
+
+        if (options.current_layer != layer_name) {
+          $.getJSON(
+            geoserver_url +
+              '/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic' +
+              '&format=application/json&layer=' +
+              layer_name,
+          )
+            .then(function (data) {
+              let colour_map =
+                data.Legend[0].rules[0].symbolizers[0].Raster.colormap.entries;
+
+              options.legend.colormap.colours = colour_map.map((e) => e.color);
+              options.legend.colormap.quantities = colour_map.map(
+                (e) => e.quantity,
+              );
+
+              plugin.generate_ramp();
+            })
+            .always(function () {
+              if (typeof callback == 'function') {
+                callback();
+              }
+            });
+        }
+      }
+    },
+
+    // Hook that update leaflet params object depending on selected scheme
+    apply_scheme: function (query, layer_params) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      console.log('apply scheme');
+
+      if (special_variables.hasOwnProperty(options.var_data.slug)) {
+        const special_var = special_variables[options.var_data.slug];
+        layer_params.tiled = false;
+        delete layer_params.sld_body;
+        layer_params.layers = layer_params.layers.replace(
+          ...special_var.layers_replace,
+        );
+        layer_params.styles = special_var.styles;
+        return;
+      }
+
+      let selected_item = item.find(
+        '#display-scheme-select .dropdown-item[data-scheme-id="' +
+          query.scheme +
+          '"]',
+      );
+
+      if (query.scheme === 'default') {
+        delete layer_params.styles;
+        layer_params.tiled = true;
+        delete layer_params.sld_body;
+      } else {
+        layer_params.tiled = false;
+        layer_params.sld_body = plugin.generate_sld(
+          layer_params.layers,
+          query.scheme_type === 'discrete',
+        );
+      }
+    },
+
+    // handle colour scheme change
+    update_scheme: function () {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      console.log('update scheme');
+
+      // reset active
+      let selected_item = item.find(
+          '#display-scheme-select .dropdown-item[data-scheme-id="' +
+            options.query.scheme +
+            '"]',
+        ),
+        discrete_btns = selected_item
+          .closest('.map-control-item')
+          .find('#display-colours-toggle .btn');
+
+      selected_item
+        .closest('.dropdown-menu')
+        .find('.dropdown-item')
+        .removeClass('active');
+
+      selected_item.addClass('active');
+
+      // enable/disable discrete/continuous
+
+      if (selected_item.hasClass('default')) {
+        discrete_btns.addClass('disabled');
+      } else {
+        discrete_btns.removeClass('disabled');
+      }
+
+      // copy item data to toggle
+      selected_item
+        .closest('.dropdown')
+        .find('.dropdown-toggle')
+        .data(selected_item.data());
+
+      // redraw the schemes
+      item.find('#display-scheme-select .scheme-dropdown').each(function () {
+        plugin.redraw_colour_scheme(this);
+      });
+
+      plugin.generate_ramp(selected_item);
+    },
+
+    // generate ramp colours and keypoints, used by SLD or choro, and legend
+    generate_ramp: function (selected_scheme_item) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      // console.log('generate ramp', selected_scheme_item);
+      // console.log(JSON.stringify(options.legend, null, 4));
+
+      if (special_variables.hasOwnProperty(options.var_data.slug)) {
+        $.extend(
+          options.legend.colormap,
+          special_variables[options.var_data.slug].colormap,
+        );
+      } else {
+        // options.legend.colormap.colours = colours;
+        // options.legend.colormap.quantities = [];
+        options.legend.colormap.labels = null;
+        options.legend.colormap.scheme_type = 'discrete';
+        options.legend.colormap.categorical = false;
+      }
+    },
+
+    generate_sld: function (layer_name, discrete) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      console.log('generate sld');
+
+      let colormap = options.legend.colormap;
+      let colormap_type = discrete ? 'intervals' : 'ramp';
+
+      let sld_body = `<?xml version="1.0" encoding="UTF-8"?>
+        <StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"
+        xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd">
+        <NamedLayer><Name>${layer_name}</Name><UserStyle><IsDefault>1</IsDefault><FeatureTypeStyle><Rule><RasterSymbolizer>
+        <Opacity>1.0</Opacity><ColorMap type="${colormap_type}">`;
+
+      for (let i = 0; i < colormap.colours.length; i++) {
+        sld_body += `<ColorMapEntry color="${colormap.colours[i]}" quantity="${colormap.quantities[i]}"/>`;
+      }
+
+      sld_body +=
+        '</ColorMap></RasterSymbolizer></Rule></FeatureTypeStyle></UserStyle></NamedLayer></StyledLayerDescriptor>';
+      return sld_body;
     },
   };
 

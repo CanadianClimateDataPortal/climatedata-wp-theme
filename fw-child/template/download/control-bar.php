@@ -70,7 +70,7 @@
 			
 			<span>
 				<span class="badge rounded-pill me-1">4</span>
-				<?php _e ( 'Submit', 'cdc' ); ?>
+				<?php _e ( 'Download', 'cdc' ); ?>
 			</span>
 		</a>
 	</div>

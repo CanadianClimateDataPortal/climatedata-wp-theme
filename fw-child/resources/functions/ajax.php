@@ -2,6 +2,47 @@
 
 // WP ADMIN AJAX FUNCTIONS
 
+//
+// GET DEFAULT VAR
+//
+
+add_action ( 'wp_ajax_cdc_get_default_var', 'cdc_get_default_var' );
+add_action ( 'wp_ajax_nopriv_cdc_get_default_var', 'cdc_get_default_var' );
+
+function cdc_get_default_var() {
+	
+	$result = new WP_Query ( array (
+		'post_type' => 'variable',
+		'posts_per_page' => 1,
+		'post_status' => 'publish',
+		'meta_query' => array (
+			array (
+				'key' => 'var_names_$_variable',
+				'value' => 'tx_max',
+				'compare' => '='
+			)
+		)
+	) );
+	
+	if ( $result->have_posts() ) {
+		while ( $result->have_posts() ) {
+			$result->the_post();
+			
+			echo get_the_ID();
+			
+		}
+	}
+	
+	wp_die();
+}
+
+function wpza_replace_repeater_field( $where ) {
+	$where = str_replace( "meta_key = 'var_names_$", "meta_key LIKE 'var_names_%", $where );
+	return $where;
+}
+
+add_filter( 'posts_where', 'wpza_replace_repeater_field' );
+
 // 
 // GET RANDOM VAR
 //
@@ -166,7 +207,7 @@ function cdc_get_location_by_coords () {
 				'coords' => [ $lat, $lng ],
 				'geo_id' => '',
 				'geo_name' => __ ( 'Point', 'cdc' ),
-				'title' => __ ( 'Point', 'cdc' ) . ' (' . $lat . ', ' . $lng . ')'
+				'title' => __ ( 'Point', 'cdc' ) . ' (' . number_format ( $lat, 4, '.', '') . ', ' . number_format ( $lng, 4, '.', '') . ')'
 			) );
 			
 		} else {
@@ -290,7 +331,7 @@ function cdc_get_location_by_coords () {
 						'lng' => $lng,
 						'coords' => [ $lat, $lng ],
 						'geo_name' => __ ( 'Point', 'cdc' ),
-						'title' => __ ( 'Point', 'cdc' ) . ' (' . $lat . ', ' . $lng . ')'
+						'title' => __ ( 'Point', 'cdc' ) . ' (' . number_format ( $lat, 4, '.', '') . ', ' . number_format ( $lng, 4, '.', '') . ')'
 					) );
 					
 				}

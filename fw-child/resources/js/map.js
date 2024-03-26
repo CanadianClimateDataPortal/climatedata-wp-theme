@@ -54,7 +54,7 @@
         var_id: null,
         var: null,
         frequency: 'ann',
-        scenarios: ['medium'],
+        scenarios: ['high'],
         decade: 2040,
         sector: 'canadagrid',
         selections: [],
@@ -151,18 +151,18 @@
           // var_id and var are required but not necessarily given
 
           if (options.query.var_id == null) {
-            $('#status').text('getting random variable');
+            $('#status').text('loading variable');
 
             console.log('map', 'get var ID');
 
-            // if it's not set, grab a random variable
+            // if it's not set, grab the 'default' variable
 
             $.ajax({
               url: ajax_data.url,
               type: 'GET',
-              async: false, // don't continue until this is done
+              async: false,
               data: {
-                action: 'cdc_get_random_var',
+                action: 'cdc_get_default_var',
               },
               success: function (data) {
                 if (data != null) {

@@ -34,11 +34,6 @@
 						data-query-key="station" 
 						data-validate="<?php _e ( 'Select at least one station', 'cdc' ); ?>"
 					>
-						<?php
-					
-							// cdc_station_list ();
-					
-						?>
 					</select>
 				</div>
 					

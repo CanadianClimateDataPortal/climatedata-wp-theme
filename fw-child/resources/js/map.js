@@ -58,6 +58,7 @@
         decade: 2040,
         sector: 'canadagrid',
         selections: [],
+        station: [],
         scheme: 'default',
         scheme_type: 'discrete',
       },
@@ -1741,46 +1742,16 @@
           // .val();
         }
 
+        // SET CONTROLS
+
+        plugin.set_controls();
+
         // ADJUST CONTROLS FOR INDIVIDUAL VARS
-
-        // building climate zones
-
-        if (options.var_data.slug == 'building_climate_zones') {
-          item
-            .find('#display-aggregation-grid')
-            .prop('checked', true)
-            .trigger('change');
-
-          item
-            .find('[data-query-key="scheme"]')
-            .val('default')
-            .trigger('change');
-          item
-            .find('#display-scheme-select .dropdown-toggle')
-            .prop('disabled', true);
-
-          item
-            .find(
-              '#map-control-aggregation .form-check-input:not(#display-aggregation-grid)',
-            )
-            .prop('disabled', true);
-        } else {
-          item
-            .find(
-              '#map-control-aggregation .form-check-input:not(#display-aggregation-grid)',
-            )
-            .prop('disabled', false);
-          item
-            .find('#display-scheme-select .dropdown-toggle')
-            .prop('disabled', false);
-        }
 
         if (typeof callback == 'function') {
           callback(data);
         }
       }
-
-      plugin.set_controls();
     },
 
     set_controls: function () {
@@ -1826,38 +1797,49 @@
         }
       });
 
-      // each flag
-      //       for (let key in options.var_flags) {
-      //         // console.log('check', key, options.var_flags[key]);
-      //
-      //         // find items with this condition
-      //         item.find('[data-display*="' + key + '"]').each(function () {
-      //           // find its 0/1 value
-      //           let split_attr = $(this)
-      //             .attr('data-display')
-      //             .split(key)[1]
-      //             .substr(1, 1);
-      //
-      //           // console.log($(this));
-      //           // console.log(key + ' has to be ' + split_attr);
-      //
-      //           if (options.var_flags[key] == true) {
-      //             // flag is false, condition is 1
-      //             if (split_attr == '1') {
-      //               $(this).find(':input').prop('disabled', false);
-      //             } else {
-      //               $(this).find(':input').prop('disabled', true);
-      //             }
-      //           } else {
-      //             // flag is false, condition is 0
-      //             if (split_attr == '0') {
-      //               $(this).find(':input').prop('disabled', false);
-      //             } else {
-      //               $(this).find(':input').prop('disabled', true);
-      //             }
-      //           }
-      //         });
-      //       }
+      // building climate zones
+
+      switch (options.var_data.acf.var_names[0].variable) {
+        case 'building_climate_zones':
+          // set & disable aggregation
+          item
+            .find('#display-aggregation-grid')
+            .prop('checked', true)
+            .trigger('change');
+
+          item
+            .find(':input[name="display-aggregation"]')
+            .prop('disabled', true);
+
+          // set & disable colour schemes
+          item
+            .find('[data-query-key="scheme"]')
+            .val('default')
+            .trigger('change');
+          item
+            .find('#display-scheme-select .dropdown-toggle')
+            .prop('disabled', true);
+
+          // set & disable absolute/delta
+          // todo: change this so it disables when any var's hasdelta field is false
+          item
+            .find('#display-values-absolute')
+            .prop('checked', true)
+            .trigger('change');
+          item.find(':input[name="display-values"]').prop('disabled', true);
+
+          break;
+        default:
+          item
+            .find(':input[name="display-aggregation"]')
+            .prop('disabled', false);
+
+          item
+            .find('#display-scheme-select .dropdown-toggle')
+            .prop('disabled', false);
+
+          item.find(':input[name="display-values"]').prop('disabled', false);
+      }
 
       // console.log('---');
     },

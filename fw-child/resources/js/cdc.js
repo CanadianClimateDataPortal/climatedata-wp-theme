@@ -549,105 +549,134 @@
             console.log('ADD STATIONS');
 
             let layer_data,
-              marker_fill = '#f00';
+              marker_fill = query.var == 'weather-stations' ? '#f00' : '#00f';
 
-            switch (query.var) {
-              case 'weather-stations':
-                if (options.station_data == null) {
-                  // stations not yet loaded
+            options.current_choro_path = null;
 
-                  $.ajax({
-                    url: 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y',
-                    dataType: 'json',
-                    async: false,
-                    success: function (data) {
-                      options.station_data = data;
-                    },
-                  });
+            let get_layer_data = function (query_var) {
+              console.log('get data', query_var);
+
+              switch (query_var) {
+                case 'weather-stations':
+                  if (options.station_data == null) {
+                    // stations not yet loaded
+
+                    // console.log('get stations');
+
+                    return $.ajax({
+                      url: 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y',
+                      dataType: 'json',
+                      success: function (data) {
+                        options.station_data = data;
+                        return { ...options.station_data };
+                      },
+                    });
+                  } else {
+                    return { ...options.station_data };
+                  }
+
+                  break;
+                case 'idf':
+                  if (options.idf_data == null) {
+                    // idf data not yet loaded
+
+                    return $.ajax({
+                      url: '/site/assets/themes/fw-child/resources/app/idf_curves.json',
+                      dataType: 'json',
+                      success: function (data) {
+                        options.idf_data = data;
+                        return { ...options.idf_data };
+                      },
+                    });
+                  } else {
+                    return { ...options.idf_data };
+                  }
+
+                  break;
+              }
+            };
+
+            // get or load station data
+            $.when(get_layer_data(query.var)).done(function (layer_data) {
+              // console.log(layer_data);
+              // console.log('station', options.station_data);
+              // console.log('idf', options.idf_data);
+
+              if (item.find('#station-select').attr('data-list') != query.var) {
+                plugin.query.update_stations.apply(item, [query, layer_data]);
+              }
+
+              Object.keys(options.maps).forEach(function (key) {
+                let this_map = options.maps[key];
+
+                // remove raster layer
+                if (
+                  this_map.layers.raster &&
+                  this_map.object.hasLayer(this_map.layers.raster)
+                ) {
+                  // console.log('raster layer exists');
+                  this_map.object.removeLayer(this_map.layers.raster);
+                  this_map.object.removeLayer(this_map.layers.grid);
                 }
 
-                layer_data = { ...options.station_data };
-
-                break;
-              case 'idf':
-                marker_fill = '#00f';
-
-                if (options.idf_data == null) {
-                  $.ajax({
-                    url: '/site/assets/themes/fw-child/resources/app/idf_curves.json',
-                    dataType: 'json',
-                    async: false,
-                    success: function (data) {
-                      options.idf_data = data;
-                    },
-                  });
+                // remove grid layer
+                if (
+                  this_map.layers.grid &&
+                  this_map.object.hasLayer(this_map.layers.grid)
+                ) {
+                  // console.log('raster layer exists');
+                  this_map.object.removeLayer(this_map.layers.grid);
+                  this_map.object.removeLayer(this_map.layers.grid);
                 }
 
-                layer_data = { ...options.idf_data };
+                if (
+                  this_map.layers.hasOwnProperty('stations') &&
+                  this_map.object.hasLayer(this_map.layers.stations)
+                ) {
+                  // console.log('station layer exists');
+                  this_map.object.removeLayer(this_map.layers.stations);
+                }
 
-                break;
-            }
+                // console.log(key + " map doesn't have stations");
 
-            // console.log('layer data', layer_data);
+                // console.log('add', query.var, marker_fill);
 
-            Object.keys(options.maps).forEach(function (key) {
-              let this_map = options.maps[key];
-
-              // remove raster layer
-              if (
-                this_map.layers.raster &&
-                this_map.object.hasLayer(this_map.layers.raster)
-              ) {
-                // console.log('raster layer exists');
-                this_map.object.removeLayer(this_map.layers.raster);
-                this_map.object.removeLayer(this_map.layers.grid);
-              }
-
-              // remove grid layer
-              if (
-                this_map.layers.grid &&
-                this_map.object.hasLayer(this_map.layers.grid)
-              ) {
-                // console.log('raster layer exists');
-                this_map.object.removeLayer(this_map.layers.grid);
-                this_map.object.removeLayer(this_map.layers.grid);
-              }
-
-              if (
-                this_map.layers.hasOwnProperty('stations') &&
-                this_map.object.hasLayer(this_map.layers.stations)
-              ) {
-                // console.log('station layer exists');
-                this_map.object.removeLayer(this_map.layers.stations);
-              }
-
-              // console.log(key + " map doesn't have stations");
-
-              // console.log('add', query.var, marker_fill);
-
-              this_map.layers.stations = L.geoJson(layer_data, {
-                pointToLayer: function (feature, latlng) {
-                  return L.circleMarker(latlng, {
-                    color: '#fff',
-                    opacity: 1,
-                    weight: 2,
-                    pane: 'stations',
-                    fillColor: marker_fill,
-                    fillOpacity: 1,
-                    radius: 5,
-                  });
-                },
-              })
-                .on('mouseover', function (e) {
-                  e.layer
-                    .bindTooltip(e.layer.feature.properties.STATION_NAME)
-                    .openTooltip(e.latlng);
+                this_map.layers.stations = L.geoJson(layer_data, {
+                  pointToLayer: function (feature, latlng) {
+                    return L.circleMarker(latlng, {
+                      color: '#fff',
+                      opacity: 1,
+                      weight: 2,
+                      pane: 'stations',
+                      fillColor: marker_fill,
+                      fillOpacity: 1,
+                      radius: 5,
+                    });
+                  },
                 })
-                .on('click', function (e) {
-                  $(document).trigger('map_station_select', e);
-                });
+                  .on('mouseover', function (e) {
+                    let station_name =
+                      query.var == 'idf'
+                        ? e.layer.feature.properties.Name
+                        : e.layer.feature.properties.STATION_NAME;
 
-              this_map.layers.stations.addTo(this_map.object);
+                    e.layer.bindTooltip(station_name).openTooltip(e.latlng);
+                  })
+                  .on('click', function (e) {
+                    let station_id =
+                      query.var == 'idf'
+                        ? e.layer.feature.properties.ID
+                        : e.layer.feature.properties.STN_ID;
+
+                    $(document).trigger('map_station_select', [
+                      e,
+                      station_id,
+                      {},
+                    ]);
+                  });
+
+                this_map.layers.stations.addTo(this_map.object);
+              });
             });
 
             break;
@@ -1345,7 +1374,7 @@
           options = plugin.options,
           item = plugin.item;
 
-        console.log('cdc', 'update_value', fn_options.key);
+        console.log('cdc', 'update_value', fn_options);
 
         // check for necessary parameters
 
@@ -1394,8 +1423,8 @@
                   query[fn_options.key].push($(this).val());
                 });
             } else if (fn_options.item.is('select')) {
-              // console.log('update select');
-              // console.log(fn_options);
+              console.log('update select');
+              console.log(fn_options);
 
               query[fn_options.key] = fn_options.val;
             } else if (fn_options.key == 'coords') {
@@ -1447,6 +1476,50 @@
           settings.query,
           settings.do_history,
         ]);
+      },
+
+      update_stations: function (query, station_data) {
+        let plugin = !this.item ? this.data('cdc_app') : this;
+        let options = plugin.options,
+          item = plugin.item;
+
+        console.log('update stations', query.var);
+
+        item.find('#station-select').empty().attr('data-list', query.var);
+
+        let station_options = [];
+
+        station_data.features.forEach(function (station) {
+          if (query.var == 'weather-stations') {
+            station_options.push({
+              id: station.properties.STN_ID,
+              name: station.properties.STATION_NAME,
+            });
+          } else if (query.var == 'idf') {
+            station_options.push({
+              id: station.properties.ID,
+              name: station.properties.Name,
+            });
+          }
+        });
+
+        station_options.forEach(function (station) {
+          let preselect = false;
+
+          if (query.station.includes[station]) {
+            console.log(query.station + ' includes ' + station);
+            preselect = true;
+          }
+
+          let newOption = new Option(
+            station.name,
+            station.id,
+            false,
+            preselect,
+          );
+
+          item.find('#station-select').append(newOption);
+        });
       },
     },
 

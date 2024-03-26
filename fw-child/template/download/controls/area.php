@@ -36,7 +36,7 @@
 					>
 						<?php
 					
-							cdc_station_list();
+							// cdc_station_list ();
 					
 						?>
 					</select>
@@ -91,7 +91,7 @@
 					</div>
 					
 					<div id="area-aggregation-shapefile" class="bg-gray-200 p-3">
-						<label for="area-aggregation-shapefile-input" class="form-label"><?php _e ( 'Drop your GeoJSON file here to upload', 'cdc' ); ?></label>
+						<label for="area-aggregation-shapefile-input" class="form-label"><?php _e ( 'Drop your shapefile here to upload', 'cdc' ); ?></label>
 						<input class="form-control form-control-sm" id="area-aggregation-shapefile-input" type="file">
 						<div id="area-aggregation-shapefile-message" class="mt-2"></div>
 					</div>

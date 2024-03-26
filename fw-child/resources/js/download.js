@@ -355,34 +355,37 @@
 
       // SELECT2
 
+      console.log('init station-select');
+
       $('#station-select').select2({
         language: options.lang,
-        ajax: {
-          url: ajax_data.url,
-          dataType: 'json',
-          delay: 0,
-          data: function (params) {
-            return {
-              action: 'cdc_station_search',
-              q: params.term, // search term
-              page: params.page,
-            };
-          },
-          processResults: function (data, page) {
-            // parse the results into the format expected by Select2.
-            // since we are using custom formatting functions we do not
-            // need to alter the remote JSON data
-            return {
-              results: data,
-            };
-          },
-          cache: true,
-        },
-        escapeMarkup: function (markup) {
-          return markup;
-        }, // let our custom formatter work
+        multiple: true,
+        closeOnSelect: false,
+        // ajax: {
+        //   url: ajax_data.url,
+        //   dataType: 'json',
+        //   delay: 0,
+        //   data: function (params) {
+        //     return {
+        //       action: 'cdc_station_search',
+        //       q: params.term, // search term
+        //       page: params.page,
+        //     };
+        //   },
+        //   processResults: function (data, page) {
+        //     // parse the results into the format expected by Select2.
+        //     // since we are using custom formatting functions we do not
+        //     // need to alter the remote JSON data
+        //     return {
+        //       results: data,
+        //     };
+        //   },
+        //   cache: true,
+        // },
+        // escapeMarkup: function (markup) {
+        //   return markup;
+        // }, // let our custom formatter work
         width: '100%',
-        placeholderOption: 'first',
         placeholder: $('#station-select').attr('data-placeholder'),
       });
 
@@ -778,6 +781,53 @@
         },
       );
 
+      // stations
+
+      item.on(
+        'map_station_select',
+        function (e, mouse_event, this_gid, style_obj) {
+          console.log('station click', this_gid);
+
+          let selections = item.find('#station-select').val();
+          // .split(',')
+          // .filter(function (i) {
+          //   return i;
+          // });
+
+          console.log('current selections', selections);
+
+          selections.forEach(function (selection, i) {
+            if (selection != '') selections[i] = parseInt(selection);
+          });
+
+          if (selections.includes(this_gid)) {
+            console.log('remove ' + this_gid);
+
+            for (var i = selections.length - 1; i >= 0; i--) {
+              if (selections[i] === this_gid) selections.splice(i, 1);
+            }
+          } else {
+            console.log('add ' + this_gid);
+            selections.push(this_gid);
+          }
+
+          // console.log(
+          //   item.find('#station-select option[value="' + this_gid + '"]'),
+          // );
+
+          // set hidden 'selections'
+          // item
+          //   .find('#area-selections')
+          //   .val(selections.join(','))
+          //   .trigger('change');
+
+          // set station select2
+
+          console.log('station select', selections);
+          item.find('#station-select').val(selections).trigger('change');
+        },
+      );
+
       //
       // SIDEBAR CONTROLS
       //
@@ -811,14 +861,6 @@
           .trigger('change');
       });
 
-      // select a variable grid item
-
-      //       item.on('click', '.var-select', function () {
-      //         // get variable by ID
-      //
-
-      //       });
-
       // click a link element with a query key
 
       item.on('click', 'a[data-query-key]', function () {
@@ -830,13 +872,13 @@
       // change an input with a query key
 
       item.on('change', ':input[data-query-key]', function () {
-        // console.log(
-        //   $(this).attr('data-query-key') +
-        //     ': ' +
-        //     options.query[$(this).attr('data-query-key')] +
-        //     ' -> ' +
-        //     $(this).val(),
-        // );
+        console.log(
+          $(this).attr('data-query-key') +
+            ': ' +
+            options.query[$(this).attr('data-query-key')] +
+            ' -> ' +
+            $(this).val(),
+        );
 
         if ($(this).val() != options.query[$(this).attr('data-query-key')]) {
           if (
@@ -984,22 +1026,24 @@
 
       if (!status) status = options.status;
 
-      // console.log('handle input', input, status);
+      console.log('handle input', input, status);
 
       let this_key = input.attr('data-query-key'),
         this_val = input.val();
 
       // console.log(this_key, this_val);
 
-      if (window.lodash.isEqual(options.query[this_key], this_val)) {
-        console.log("value hasn't changed");
-        return true;
-      }
-
       // if not a form element with a value attribute,
       // look for a data-query-val
       if (input.is('a')) {
         this_val = input.attr('data-query-val');
+      }
+
+      if (input.attr('type') == 'text' || input.attr('type') == 'hidden') {
+        if (window.lodash.isEqual(options.query[this_key], this_val)) {
+          console.log("value hasn't changed");
+          return true;
+        }
       }
 
       // custom UX behaviours by input key
@@ -1008,8 +1052,51 @@
 
       switch (this_key) {
         case 'var_id':
-          console.log('UPDATE VAR');
           plugin.update_var(this_val, status);
+          break;
+
+        case 'dataset':
+          item.find('.scenario-name').each(function () {
+            let this_item = $(this),
+              old_dataset = this_item.attr('data-dataset'),
+              old_name = this_item.attr('data-name'),
+              new_key = '';
+
+            if (old_dataset != this_val) {
+              // update data-dataset attr
+
+              this_item.attr('data-dataset', this_val);
+
+              // update the data-name attr
+
+              // find the scenario name in the correlating dataset
+              DATASETS[old_dataset].scenarios.forEach(function (scenario) {
+                if (new_key == '' && scenario.name == old_name) {
+                  // found it - store the correlating name
+                  new_key = scenario.correlations[this_val];
+                  // set the item's data-name to the new key
+                  this_item.attr('data-name', new_key);
+                }
+              });
+
+              // update the label's text
+
+              // find the selected key in the new dataset object
+              DATASETS[this_val].scenarios.forEach(function (scenario) {
+                if (scenario.name == new_key) this_item.text(scenario.label);
+              });
+            }
+          });
+
+          if (this_val == 'cmip6') {
+            item.find('.scenario-name.low').text(scenario_names[this_val].low);
+            item
+              .find('.scenario-name.medium')
+              .text(scenario_names[this_val].medium);
+            item
+              .find('.scenario-name.high')
+              .text(scenario_names[this_val].high);
+          }
           break;
 
         case 'percentiles':
@@ -1425,6 +1512,15 @@
           options.query.sector = 'station';
           options.var_flags.station = true;
         } else {
+          if (options.query.sector == 'station') {
+            item
+              .find('[data-query-key="sector"][value="canadgrid"]')
+              .prop('checked', true)
+              .trigger('change');
+          }
+
+          options.var_flags.station = false;
+
           // console.log('var is NOT station data');
 
           // find checked radio
@@ -1606,7 +1702,8 @@
 
           if (
             options.var_flags.inputs == false &&
-            options.var_flags.threshold == false
+            options.var_flags.threshold == false &&
+            options.var_flags.staation == false
           ) {
             options.var_flags.single = true;
 
@@ -1654,7 +1751,6 @@
       // each item with display conditions
       item.find('[data-display]').each(function () {
         // console.log('item', $(this));
-
         // console.log($(this).attr('data-display').split(','));
 
         let condition_met = false;

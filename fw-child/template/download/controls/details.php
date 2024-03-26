@@ -75,7 +75,7 @@
 					</div>
 				</div>
 				
-				<div id="map-control-panels" class="map-control-item" data-display="threshold:1,single:1">
+				<div id="map-control-panels" class="map-control-item" data-display="threshold:1,single:1,station:0">
 					
 					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Scenarios', 'cdc' ); ?></h6>
 					
@@ -83,21 +83,26 @@
 						<div class="col">
 							<div class="form-check form-switch">
 								<input class="form-check-input" type="checkbox" role="switch" name="details-scenarios" id="details-scenarios-high" value="high" data-query-key="scenarios">
-								<label class="form-check-label" for="details-scenarios-high">SSP 5–8.5</label>
+								<label class="form-check-label" for="details-scenarios-high">
+									<span class="scenario-name" data-dataset="cmip6" data-name="ssp585">SSP 5–8.5</span>
+								</label>
 							</div>
 						</div>
 						
 						<div class="col">
 							<div class="form-check form-switch">
 								<input class="form-check-input" type="checkbox" role="switch" name="details-scenarios" id="details-scenarios-medium" value="medium" data-query-key="scenarios">
-								<label class="form-check-label" for="details-scenarios-medium">SSP 2–4.5</label>
+								<label class="form-check-label" for="details-scenarios-medium">
+									<span class="scenario-name" data-dataset="cmip6" data-name="ssp245">SSP 2–4.5</span>
+								</label>
 							</div>
 						</div>
 						
 						<div class="col">
 							<div class="form-check form-switch">
 								<input class="form-check-input" type="checkbox" role="switch" name="details-scenarios" id="details-scenarios-low" value="low" data-query-key="scenarios">
-								<label class="form-check-label" for="details-scenarios-low">SSP 1–2.6</label>
+								<label class="form-check-label" for="details-scenarios-low">
+									<span class="scenario-name" data-dataset="cmip6" data-name="ssp126">SSP 1–2.6</label>
 							</div>
 						</div>
 					</div>
@@ -233,7 +238,7 @@
 						
 						<div class="col d-flex align-items-center justify-content-between">
 							<div class="form-check mb-0">
-								<input class="form-check-input" type="radio" name="details-format" id="details-format-csv" value="csv" data-query-key="format" checked>
+								<input class="form-check-input" type="radio" name="details-format" id="details-format-csv" value="csv" data-query-key="format" checked data-conditional="#map-control-decimals">
 								<label class="form-check-label" for="details-format-csv">CSV</label>
 							</div>
 							

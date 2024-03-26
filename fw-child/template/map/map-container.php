@@ -114,7 +114,7 @@
 					<label for="decade" class="form-label sr-only">Decade</label>
 					<input type="hidden" name="decade" id="decade" data-query-key="decade">
 					<div id="decade-slider">
-						<div id="decade-slider-handle" class="ui-slider-handle">
+						<div id="decade-slider-handle" class="ui-slider-handle" data-bs-toggle="tooltip" data-bs-title="<?php _e ( 'Move slider to adjust time period', 'cdc' ); ?>" data-bs-offset="0,20" data-bs-custom-class="white-tip">
 							<span></span>
 						</div>
 					</div>

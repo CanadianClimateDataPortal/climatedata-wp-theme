@@ -734,6 +734,16 @@ $decade-slider-handle-width: 140px;
 // BOOTSTRAP COMPONENTS
 //
 
+// tooltip
+
+.white-tip {
+  --bs-tooltip-color: #{$gray-600};
+  --bs-tooltip-bg: #{$gray-100};
+  --bs-tooltip-opacity: 1;
+  --bs-tooltip-max-width: 400px;
+  text-transform: uppercase;
+}
+
 // card
 
 .card-img {

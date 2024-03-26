@@ -77,6 +77,7 @@
         decade_slider: null,
         threshold_slider: null,
         var_filters: {},
+        tooltips: null,
       },
       current_layer: null,
       debug: true,
@@ -279,6 +280,18 @@
         options.legend,
       );
 
+      // BOOTSTRAP
+
+      // enable tooltips
+
+      let tooltip_elements = document.querySelectorAll(
+        '[data-bs-toggle="tooltip"]',
+      );
+
+      options.elements.tooltips = [...tooltip_elements].map(
+        (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
+      );
+
       // SLIDERS
 
       // decade
@@ -296,6 +309,18 @@
             .text(val + 1 + '–' + (val + 30));
 
           $('[data-query-key="decade"]').val(val).trigger('change');
+
+          // show decade prompt
+
+          let decade_tooltip = bootstrap.Tooltip.getInstance(
+            '#decade-slider-handle',
+          );
+
+          if (decade_tooltip != undefined) {
+            setTimeout(function () {
+              bootstrap.Tooltip.getInstance('#decade-slider-handle').toggle();
+            }, 3000);
+          }
         },
         slide: function (e, ui) {
           // console.log('SLIDE');
@@ -309,11 +334,12 @@
 
           clone_query.decade = ui.value;
 
+          // eval
           options.query_str.current = $(document).cdc_app('query.eval', {
             query: clone_query,
             do_history: 'none',
             callback: function () {
-              console.log('decade slider get_layer');
+              // console.log('decade slider get_layer');
               $(document).cdc_app(
                 'maps.get_layer',
                 clone_query,
@@ -321,6 +347,16 @@
               );
             },
           });
+
+          // destroy tooltip
+
+          let decade_tooltip = bootstrap.Tooltip.getInstance(
+            '#decade-slider-handle',
+          );
+
+          if (decade_tooltip != undefined) {
+            decade_tooltip.dispose();
+          }
         },
         change: function (e, ui) {
           // status = input, changed by the stop function

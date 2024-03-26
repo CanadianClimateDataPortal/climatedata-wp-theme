@@ -58,6 +58,7 @@
         decade: 2040,
         sector: 'canadagrid',
         selections: [],
+        station: [],
         scheme: 'default',
         scheme_type: 'discrete',
       },

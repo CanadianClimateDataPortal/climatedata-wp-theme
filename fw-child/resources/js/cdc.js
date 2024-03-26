@@ -561,6 +561,12 @@
             let layer_data,
               marker_fill = '#f00';
 
+            // remove the legend
+            for (let key in options.maps) {
+              options.maps[key].object.removeControl(options.maps[key].legend);
+              //legend.addTo(options.maps[key].object);
+            }
+
             switch (query.var) {
               case 'weather-stations':
                 if (options.station_data == null) {

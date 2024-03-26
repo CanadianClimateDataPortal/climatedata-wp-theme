@@ -1772,14 +1772,6 @@
             .trigger('change');
 
           item
-            .find('[data-query-key="scheme"]')
-            .val('default')
-            .trigger('change');
-          item
-            .find('#display-scheme-select .dropdown-toggle')
-            .prop('disabled', true);
-
-          item
             .find(
               '#map-control-aggregation .form-check-input:not(#display-aggregation-grid)',
             )
@@ -1789,9 +1781,6 @@
             .find(
               '#map-control-aggregation .form-check-input:not(#display-aggregation-grid)',
             )
-            .prop('disabled', false);
-          item
-            .find('#display-scheme-select .dropdown-toggle')
             .prop('disabled', false);
         }
 
@@ -1949,8 +1938,8 @@
         '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
       );
 
-      if (special_variables.hasOwnProperty(options.var_data.slug)) {
-        const special_var = special_variables[options.var_data.slug];
+      if (special_variables.hasOwnProperty(options.query.var)) {
+        const special_var = special_variables[options.query.var];
         default_scheme_element.data(
           'scheme-colours',
           special_var.colormap.colours,
@@ -1963,7 +1952,18 @@
           'scheme-type',
           special_var.colormap.scheme_type
         )
+
         plugin.update_scheme();
+
+        // select default scheme and disable schemes dropdown
+        item
+          .find('[data-query-key="scheme"]')
+          .val('default')
+          .trigger('change');
+        item
+          .find('#display-scheme-select .dropdown-toggle')
+          .prop('disabled', true);
+
 
         if (typeof callback === 'function') {
           callback();
@@ -1996,6 +1996,12 @@
               data.Legend[0].rules[0].symbolizers[0].Raster.colormap.type
             )
             plugin.update_scheme();
+
+            // enable scheme select dropdown
+            item
+              .find('#display-scheme-select .dropdown-toggle')
+              .prop('disabled', false);
+
           })
           .always(function () {
             if (typeof callback == 'function') {
@@ -2011,8 +2017,8 @@
         options = plugin.options,
         item = plugin.item;
 
-      if (special_variables.hasOwnProperty(options.var_data.slug)) {
-        const special_var = special_variables[options.var_data.slug];
+      if (special_variables.hasOwnProperty(options.query.var)) {
+        const special_var = special_variables[options.query.var];
         layer_params.tiled = false;
         delete layer_params.sld_body;
         layer_params.layers = layer_params.layers.replace(
@@ -2100,10 +2106,10 @@
       let query = options.query;
       let quantity;
 
-      if (special_variables.hasOwnProperty(options.var_data.slug)) {
+      if (special_variables.hasOwnProperty(options.query.var)) {
         $.extend(
           options.legend.colormap,
-          special_variables[options.var_data.slug].colormap,
+          special_variables[options.query.var].colormap,
         );
       } else {
         options.legend.colormap.colours = colours;

@@ -551,6 +551,12 @@
             let layer_data,
               marker_fill = query.var == 'weather-stations' ? '#f00' : '#00f';
 
+            // remove the legend
+            for (let key in options.maps) {
+              options.maps[key].object.removeControl(options.maps[key].legend);
+              //legend.addTo(options.maps[key].object);
+            }
+
             options.current_choro_path = null;
 
             let get_layer_data = function (query_var) {

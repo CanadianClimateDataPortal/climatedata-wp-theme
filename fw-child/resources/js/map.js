@@ -46,6 +46,14 @@
       grid: {
         hover_timeout: null,
         hover_ajax: null,
+        highlighted: null,
+        selected: null,
+        style_obj: {},
+        colors: {
+          default: '#fff',
+          hovered: '#fff',
+          selected: '#00f',
+        },
       },
       query: {
         coords: [62.51231793838694, -98.48144531250001, 4],
@@ -155,7 +163,7 @@
           if (options.query.var_id == null) {
             $('#status').text('loading variable');
 
-            console.log('map', 'get var ID');
+            // console.log('map', 'get var ID');
 
             // if it's not set, grab the 'default' variable
 
@@ -651,6 +659,7 @@
       if (
         this_pane == 'raster' &&
         options.query.sector != 'canadagrid' &&
+        options.query.sector != 'canadagrid1deg' &&
         options.query.sector != 'era5landgrid'
       ) {
         // if this is the 'data' slider, and
@@ -727,156 +736,178 @@
 
       //
 
-      item.on('map_item_mouseover', function (e, click_event) {
-        let decade_value = parseInt(options.query.decade) + 1,
-          delta = options.var_data.acf.hasdelta,
-          delta7100 = delta ? '&delta7100=true' : '';
+      item.on(
+        'map_item_mouseover',
+        function (e, mouse_event, this_gid, style_obj) {
+          let decade_value = parseInt(options.query.decade) + 1,
+            hasdelta = options.var_data.acf.hasdelta,
+            delta7100 = options.query.delta !== '' ? '&delta7100=true' : '';
 
-        plugin._grid_hover_cancel(click_event);
+          plugin._grid_hover_cancel(mouse_event);
 
-        if (delta !== false) {
-          options.grid.hover_timeout = setTimeout(function () {
-            let values_url,
-              var_name =
+          // tooltip
+          if (hasdelta !== false) {
+            options.grid.hover_timeout = setTimeout(function () {
+              // build query URL for tooltip content
+
+              // var name
+              let var_name =
                 options.query.var == 'building_climate_zones'
                   ? 'hddheat_18'
                   : options.query.var;
 
-            if (options.query.sector == 'canadagrid') {
-              // gridded
-              values_url =
-                geoserver_url +
-                '/get-delta-30y-gridded-values/' +
-                click_event.latlng['lat'] +
-                '/' +
-                click_event.latlng['lng'] +
-                '/' +
-                var_name +
-                '/' +
-                options.query.frequency +
-                '?period=' +
-                decade_value +
-                '&decimals=' +
-                options.var_data.acf.decimals +
-                delta7100 +
-                '&dataset_name=' +
-                options.query.dataset;
-            } else {
-              values_url =
-                geoserver_url +
-                '/get-delta-30y-regional-values/' +
+              // request endpoint
+              let endpoint =
+                'get-delta-30y-regional-values/' +
                 options.query.sector +
                 '/' +
-                click_event.layer.properties.id +
-                '/' +
-                var_name +
-                '/' +
-                options.query.frequency +
-                '?period=' +
+                mouse_event.layer.properties.id;
+
+              // query string
+              let params =
+                'period=' +
                 decade_value +
                 '&decimals=' +
                 options.var_data.acf.decimals +
                 delta7100 +
                 '&dataset_name=' +
                 options.query.dataset;
-            }
 
-            // console.log(values_url);
+              // adjust for grid
+              if (
+                options.query.sector == 'canadagrid' ||
+                options.query.sector == 'canadagrid1deg' ||
+                options.query.sector == 'era5landgrid'
+              ) {
+                endpoint =
+                  'get-delta-30y-gridded-values/' +
+                  mouse_event.latlng['lat'] +
+                  '/' +
+                  mouse_event.latlng['lng'];
+              }
 
-            options.grid.hover_ajax = $.ajax({
-              url: values_url,
-              dataType: 'json',
-              success: function (data) {
-                for (let key in options.maps) {
-                  options.maps[key].layers.grid
-                    .bindTooltip(
-                      plugin._format_grid_hover_tooltip(
-                        data,
-                        scenario_names[options.query.dataset][key]
-                          .replace(/[\W_]+/g, '')
-                          .toLowerCase(),
-                        options.var_data,
-                        delta,
-                        options.query.sector,
-                        click_event,
-                      ),
-                      { sticky: true },
-                    )
-                    .openTooltip(click_event.latlng);
-                }
-              },
-              // jQuery throws parsererror if the JSON includes NaN. The API returns NaN when no data is available
-              error: function (_, status) {
-                if (status !== 'abort') {
-                  let tip = [];
+              values_url =
+                geoserver_url +
+                '/' +
+                endpoint +
+                '/' +
+                var_name +
+                '/' +
+                options.query.frequency +
+                '?' +
+                params;
 
-                  if (options.query.sector !== 'canadagrid') {
-                    tip.push(
-                      click_event.layer.properties[l10n_labels.label_field] +
-                        '<br>',
-                    );
-                  }
-
-                  tip.push(T('No data available for this area.'));
-
+              options.grid.hover_ajax = $.ajax({
+                url: values_url,
+                dataType: 'json',
+                success: function (data) {
                   for (let key in options.maps) {
                     options.maps[key].layers.grid
-                      .bindTooltip(tip.join('\n'), { sticky: true })
-                      .openTooltip(click_event.latlng);
+                      .bindTooltip(
+                        plugin._format_grid_hover_tooltip(
+                          data,
+                          scenario_names[options.query.dataset][key]
+                            .replace(/[\W_]+/g, '')
+                            .toLowerCase(),
+                          options.var_data,
+                          hasdelta,
+                          options.query.sector,
+                          mouse_event,
+                        ),
+                        { sticky: true },
+                      )
+                      .openTooltip(mouse_event.latlng);
                   }
-                }
-              },
-            });
-          }, 100); // timeout
-        } // if delta
-      });
+                },
+                // jQuery throws parsererror if the JSON includes NaN. The API returns NaN when no data is available
+                error: function (_, status) {
+                  if (status !== 'abort') {
+                    let tip = [];
+
+                    if (
+                      options.query.sector !== 'canadagrid' &&
+                      options.query.sector !== 'canadagrid' &&
+                      options.query.sector !== 'era5landgrid'
+                    ) {
+                      tip.push(
+                        mouse_event.layer.properties[l10n_labels.label_field] +
+                          '<br>',
+                      );
+                    }
+
+                    tip.push(T('No data available for this area.'));
+
+                    for (let key in options.maps) {
+                      options.maps[key].layers.grid
+                        .bindTooltip(tip.join('\n'), { sticky: true })
+                        .openTooltip(mouse_event.latlng);
+                    }
+                  }
+                },
+              });
+            }, 100); // timeout
+          } // if delta
+
+          // highlight
+          options.grid.highlighted = this_gid;
+
+          for (let key in options.maps) {
+            options.maps[key].layers.grid.setFeatureStyle(this_gid, style_obj);
+          }
+        },
+      );
 
       //
 
-      item.on('map_item_mouseout', function (e, click_event) {
-        // TO FIX
-        /*// reset highlighted
-        options.grid.highlighted.forEach(function (feature) {
-          new_layer.resetFeatureStyle(feature);
-        });
+      item.on(
+        'map_item_mouseout',
+        function (e, mouse_event, this_gid, style_obj) {
+          options.grid.highlighted = null;
 
-        // update highlighted grid
-        options.grid.highlighted = [e.layer.properties.gid];
-
-        new_layer.setFeatureStyle(options.grid.highlighted, {
-          weight: options.grid.styles.line.hover.weight,
-          color: options.grid.styles.line.hover.color,
-          opacity: options.grid.styles.line.hover.opacity,
-          fillColor: options.grid.styles.fill.hover.color,
-          fill: true,
-          fillOpacity: options.grid.styles.fill.hover.opacity,
-        });*/
-      });
+          // reset this
+          if (options.grid.selected != this_gid) {
+            for (let key in options.maps) {
+              options.maps[key].layers.grid.resetFeatureStyle(this_gid);
+            }
+          }
+        },
+      );
 
       // click grid item
 
-      item.on('map_item_select', function (e, click_event) {
-        console.log('grid click', click_event);
+      item.on(
+        'map_item_select',
+        function (e, mouse_event, this_gid, style_obj) {
+          // console.log('grid click', mouse_event);
 
-        // load location details
-        plugin.set_location(click_event.latlng);
+          options.grid.style_obj = style_obj;
+
+          // load location details
+          plugin.set_location(mouse_event.latlng, mouse_event);
+        },
+      );
+
+      // mouseover marker
+
+      item.on('marker_mouseover', function (e, mouse_event) {
+        plugin._grid_hover_cancel(mouse_event);
       });
 
       // click station
 
-      item.on('map_station_select', function (e, click_event) {
-        // console.log('station click', click_event);
+      item.on('map_station_select', function (e, mouse_event) {
+        // console.log('station click', mouse_event);
 
         if (options.query.var == 'idf') {
           // popups
 
-          console.log('do popup', click_event);
+          console.log('do popup', mouse_event);
 
           $.ajax({
             url: ajax_data.url,
             data: {
               action: 'cdc_get_idf_files',
-              idf: click_event.layer.feature.properties.ID,
+              idf: mouse_event.layer.feature.properties.ID,
             },
             dataType: 'json',
             success: function (data) {
@@ -889,40 +920,69 @@
           // console.log('set station');
 
           // load location details
-          plugin.set_station(click_event);
+          plugin.set_station(mouse_event);
         }
       });
 
       // click marker
 
-      item.on('click_marker', function (e, click_event) {
+      item.on('click_marker', function (e, mouse_event) {
         let list_item = item.find(
           '#recent-locations [data-coords="' +
-            click_event.latlng.lat +
+            mouse_event.latlng.lat +
             ',' +
-            click_event.latlng.lng +
+            mouse_event.latlng.lng +
             '"]',
         );
 
-        $(document).cdc_app('maps.set_center', click_event.latlng, 10, 0.75);
+        $(document).cdc_app('maps.set_center', mouse_event.latlng, 10, 0.75);
 
         list_item.trigger('click');
       });
 
+      item.on('td_update_path', function (e, prev_id, current_id) {
+        if (prev_id == '#location-detail' && options.grid.selected != null) {
+          for (let key in options.maps) {
+            options.maps[key].layers.grid.resetFeatureStyle(
+              options.grid.selected,
+            );
+          }
+
+          options.grid.selected = null;
+        }
+      });
+
       // click item in 'recent locations'
 
-      item.on('click', '#recent-locations .list-group-item', function (e) {
-        if ($(e.target).hasClass('clear')) {
-          console.log('CLEAR MARKER');
-          $(document).cdc_app('maps.remove_marker', $(this).attr('data-index'));
-        } else {
-          let item_coords = $(this).attr('data-coords').split(',');
+      item.on('click', '#recent-locations .clear', function (e) {
+        let this_item = $(this).closest('.list-group-item');
 
-          plugin.set_location({
-            lat: item_coords[0],
-            lng: item_coords[1],
-            marker_index: $(this).attr('data-index'),
+        $(document).cdc_app('maps.remove_marker', this_item.attr('data-index'));
+      });
+
+      item.on('click', '#recent-locations .view', function (e) {
+        let this_item = $(this).closest('.list-group-item');
+
+        let coords = {
+          lat: this_item.attr('data-coords').split(',')[0],
+          lng: this_item.attr('data-coords').split(',')[1],
+        };
+
+        if (this_item.attr('data-sector') == options.query.sector) {
+          plugin.set_location(coords, {
+            layer: {
+              properties: {
+                id: $(this).attr('data-grid-id'),
+                label_en: this_item.find('.title').text(),
+              },
+            },
           });
+        } else {
+          if (window.location.hash == '#location-detail') {
+            $('#control-bar').tab_drawer('update_path', '#location');
+          }
+
+          $(document).cdc_app('maps.set_center', coords, 10, false);
         }
       });
 
@@ -976,6 +1036,7 @@
 
         plugin.set_location(
           { lat: e.params.data.lat, lng: e.params.data.lon },
+          null,
           true,
         );
       });
@@ -1013,6 +1074,7 @@
       item.on('change', ':input[data-query-key]', function () {
         console.log(
           'change input',
+          $(this).attr('data-query-key'),
           options.query[$(this).attr('data-query-key')] +
             ' -> ' +
             $(this).val(),
@@ -1211,7 +1273,7 @@
       let this_key = input.attr('data-query-key'),
         this_val = input.val();
 
-      console.log('input: ' + this_key, 'status ' + status);
+      // console.log('input: ' + this_key, 'status: ' + status);
 
       // if not a form element with a value attribute,
       // look for a data-query-val
@@ -1310,11 +1372,25 @@
         case 'sector':
           item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
 
-          if (this_val != 'canadagrid' && this_val != 'era5landgrid') {
+          if (
+            this_val != 'canadagrid' &&
+            this_val != 'canadagrid1deg' &&
+            this_val != 'era5landgrid'
+          ) {
             item
               .find('.leaflet-pane.leaflet-grid-pane')
               .css('opacity', $('#display-data-slider').slider('value') / 100);
           }
+
+          // adjust 'view location' label in recent locations
+          item.find('#recent-locations .list-group-item').each(function () {
+            if ($(this).attr('data-sector') == this_val) {
+              $(this).find('.view').text(T('Select'));
+            } else {
+              $(this).find('.view').text(T('Show on map'));
+            }
+          });
+
           break;
         case 'coords':
           // coordinates
@@ -1387,7 +1463,7 @@
 
         options.query_str.prev = options.query_str.current;
 
-        console.log('handle_input call eval now, history: ' + do_history);
+        // console.log('handle_input call eval now, history: ' + do_history);
 
         options.query_str.current = $(document).cdc_app('query.eval', {
           query: options.query,
@@ -1521,6 +1597,7 @@
 
                     plugin.set_location(
                       { lat: data.lat, lng: data.lng },
+                      null,
                       open_location,
                     );
                   },
@@ -2037,7 +2114,7 @@
         options = plugin.options,
         item = plugin.item;
 
-      console.log('update default scheme');
+      // console.log('update default scheme');
 
       let default_scheme_element = item.find(
         '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
@@ -2064,8 +2141,8 @@
           options.query,
         );
 
-        console.log('current', options.current_layer);
-        console.log('layer name', layer_name);
+        // console.log('current', options.current_layer);
+        // console.log('layer name', layer_name);
 
         if (options.current_layer != layer_name) {
           $.getJSON(
@@ -2105,7 +2182,7 @@
         options = plugin.options,
         item = plugin.item;
 
-      console.log('apply scheme');
+      // console.log('apply scheme');
 
       if (special_variables.hasOwnProperty(options.var_data.slug)) {
         const special_var = special_variables[options.var_data.slug];
@@ -2143,7 +2220,8 @@
         options = plugin.options,
         item = plugin.item;
 
-      console.log('update scheme');
+      // console.log('update scheme');
+
       // reset active
       let selected_item = item.find(
           '#display-scheme-select .dropdown-item[data-scheme-id="' +
@@ -2189,7 +2267,7 @@
         options = plugin.options,
         item = plugin.item;
 
-      console.log('generate ramp', selected_scheme_item.data('scheme-colours'));
+      // console.log('generate ramp', selected_scheme_item.data('scheme-colours'));
 
       let colours = selected_scheme_item.data('scheme-colours');
       let query = options.query;
@@ -2323,92 +2401,187 @@
       }
     },
 
-    set_location: function (coords, open_tab = true) {
+    set_location: function (coords, location_data = null, open_tab = true) {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
 
-      $.ajax({
-        url: ajax_data.url,
-        dataType: 'json',
-        data: {
-          action: 'cdc_get_location_by_coords',
-          lang: options.lang,
-          lat: coords.lat,
-          lng: coords.lng,
-          sealevel: false,
-        },
-        success: function (data) {
+      console.log('set location');
+      console.log(coords);
+      console.log(location_data);
+
+      let feature_id = null,
+        zoom_level = 8;
+
+      if (typeof location_data == 'string') {
+        feature_id = parseInt(location_data);
+      }
+
+      let get_location_data = function (coords, location_data) {
+        switch (options.query.sector) {
+          case 'canadagrid':
+          case 'canadagrid1deg':
+          case 'era5landgrid':
+            console.log('grid', coords);
+
+            feature_id =
+              feature_id == null
+                ? location_data.layer.properties.gid
+                : feature_id;
+
+            zoom_level = 10;
+
+            return $.ajax({
+              url: ajax_data.url,
+              dataType: 'json',
+              data: {
+                action: 'cdc_get_location_by_coords',
+                lang: options.lang,
+                lat: coords.lat,
+                lng: coords.lng,
+                sealevel: false,
+              },
+              success: function (data) {
+                // console.log('success');
+                // console.log(data);
+
+                return data;
+              },
+            });
+            break;
+
+          default:
+            console.log('sector', location_data);
+
+            feature_id =
+              feature_id == null
+                ? location_data.layer.properties.id
+                : feature_id;
+
+            return {
+              lat: coords.lat,
+              lng: coords.lng,
+              coords: [coords.lat, coords.lng],
+              geo_name: location_data.layer.properties.label_en,
+              title: location_data.layer.properties.label_en,
+            };
+        }
+      };
+
+      // wait until location data exists
+      $.when(get_location_data(coords, location_data)).done(
+        function (location) {
           console.log('LOCATION');
-          console.log(data);
+          console.log(location);
 
           // add marker
-          $(document).cdc_app('maps.add_marker', data, function () {});
+          $(document).cdc_app(
+            'maps.add_marker',
+            location,
+            location_data,
+            function () {},
+          );
 
           // match coords var to lat/lng returned by the function
-          coords = { lat: data.lat, lng: data.lng };
+          coords = { lat: location.lat, lng: location.lng };
 
           // search field value
-          if (data.geo_name != 'Point') {
-            item.find('#area-search').val(data.title);
+          if (location.geo_name != 'Point') {
+            item.find('#area-search').val(location.title);
           }
 
-          // hidden input
+          // set the hidden input with the location code
+          // if it exists
+
           item
             .find('[data-query-key="location"]')
-            .val(data.geo_id)
+            .val(location.geo_id)
             .trigger('change');
 
           // tab headings
-          item.find('#location-detail .control-tab-head h5').text(data.title);
-        },
-      }).then(function () {
-        if (open_tab == true) {
-          console.log('load location now');
+          item
+            .find('#location-detail .control-tab-head h5')
+            .text(location.title);
 
-          if (window.location.hash != '#location-detail') {
-            $('#control-bar').tab_drawer('update_path', '#location-detail');
+          if (open_tab == true) {
+            console.log('open location detail now');
+
+            if (window.location.hash != '#location-detail') {
+              $('#control-bar').tab_drawer('update_path', '#location-detail');
+            }
+
+            // generate chart
+            $.ajax({
+              url:
+                geoserver_url +
+                '/generate-charts/' +
+                coords.lat +
+                '/' +
+                coords.lng +
+                '/' +
+                options.query.var +
+                '/' +
+                options.query.frequency +
+                '?decimals=' +
+                options.var_data.acf.decimals +
+                '&dataset_name=' +
+                options.query.dataset,
+              dataType: 'json',
+              success: function (data) {
+                // console.log('chart data', data);
+
+                // remove legend rows
+                item.find('.chart-series-items .cloned').remove();
+
+                $(document).cdc_app('charts.render', {
+                  data: data,
+                  query: options.query,
+                  var_data: options.var_data,
+                  coords: coords,
+                  download_url: null,
+                  container: item.find('#location-chart-container')[0],
+                });
+              },
+            });
           }
 
-          // console.log(options.var_data);
+          // highlight map feature
 
-          $.ajax({
-            url:
-              geoserver_url +
-              '/generate-charts/' +
-              coords.lat +
-              '/' +
-              coords.lng +
-              '/' +
-              options.query.var +
-              '/' +
-              options.query.frequency +
-              '?decimals=' +
-              options.var_data.acf.decimals +
-              '&dataset_name=' +
-              options.query.dataset,
-            dataType: 'json',
-            success: function (data) {
-              console.log('chart data', data);
+          if (options.grid.selected != null) {
+            // an item is already selected,
+            // deselect that first
+            // console.log('reset', options.grid.selected);
+            for (let key in options.maps) {
+              options.maps[key].layers.grid.resetFeatureStyle(
+                options.grid.selected,
+              );
+            }
+          }
 
-              // remove legend rows
-              item.find('.chart-series-items .cloned').remove();
+          // get ready to select the new item
 
-              $(document).cdc_app('charts.render', {
-                data: data,
-                query: options.query,
-                var_data: options.var_data,
-                coords: coords,
-                download_url: null,
-                container: item.find('#location-chart-container')[0],
-              });
-            },
-          });
-        }
+          if (feature_id != null) {
+            // console.log('select', feature_id);
 
-        // set map center to marker location w/ offset
-        $(document).cdc_app('maps.set_center', coords, 10);
-      });
+            options.grid.style_obj.color = '#00f';
+
+            console.log(options.grid.style_obj);
+
+            for (let key in options.maps) {
+              options.maps[key].layers.grid.setFeatureStyle(
+                feature_id,
+                options.grid.style_obj,
+              );
+            }
+
+            // update the selected id
+            options.grid.selected = feature_id;
+          }
+
+          // set map center to marker location w/ offset
+          $(document).cdc_app('maps.set_center', coords, zoom_level);
+        },
+      );
     },
 
     /**
@@ -2441,9 +2614,12 @@
         tip.push(event.layer.properties[l10n_labels.label_field] + '<br>');
       }
 
+      // median
+
+      // (value, var_acf, delta, lang)
       let val1 = value_formatter(
         data[rcp]['p50'],
-        varDetails,
+        varDetails.acf,
         delta,
         options.lang,
       );
@@ -2456,10 +2632,17 @@
           '</b><br/>',
       );
 
-      val1 = value_formatter(data[rcp]['p10'], varDetails, delta, options.lang);
+      // range
+      val1 = value_formatter(
+        data[rcp]['p10'],
+        varDetails.acf,
+        delta,
+        options.lang,
+      );
+
       let val2 = value_formatter(
         data[rcp]['p90'],
-        varDetails,
+        varDetails.acf,
         delta,
         options.lang,
       );
@@ -2495,6 +2678,7 @@
       }
 
       // cancel in-flight ajax call to avoid duplicated tooltips
+
       if (options.grid.hover_ajax !== null) {
         options.grid.hover_ajax.abort();
         options.grid.hover_ajax = null;

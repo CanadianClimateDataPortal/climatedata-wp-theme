@@ -997,19 +997,67 @@ body.tab-drawer-open {
   --bs-list-group-active-color: #{$body-color};
 
   .list-group-item {
-    .clear {
-      opacity: 0;
-      font-size: 1.25rem;
+    //     .clear {
+    //       opacity: 0;
+    //       font-size: 1.25rem;
+    //       transition: 0.25s;
+    //
+    //       &:hover {
+    //         color: $primary;
+    //       }
+    //     }
+    //
+    //     &:hover {
+    //       .clear {
+    //         opacity: 1;
+    //       }
+    //     }
+  }
+
+  .location-type {
+    font-size: 0.625rem;
+    @include all-caps;
+    color: $gray-600;
+  }
+
+  .item-actions {
+    display: flex;
+    height: 0;
+    overflow: hidden;
+    @include all-caps;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: $font-weight-medium;
+    opacity: 0;
+    transition: 0.25s;
+
+    span {
+      color: $secondary;
+      cursor: pointer;
+      transform: translateY(-100%);
       transition: 0.25s;
 
-      &:hover {
-        color: $primary;
+      &:not(:first-child) {
+        &:before {
+          content: '•';
+          margin: 0 0.375em;
+          color: $body-color;
+        }
       }
     }
+  }
 
+  .list-group-item {
     &:hover {
-      .clear {
+      background-color: $gray-300;
+
+      .item-actions {
+        height: 1rem;
         opacity: 1;
+
+        span {
+          transform: translateY(0);
+        }
       }
     }
   }

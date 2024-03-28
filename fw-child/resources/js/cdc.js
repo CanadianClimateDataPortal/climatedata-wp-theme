@@ -107,11 +107,11 @@
       },
       first_map: null,
       current_sector: 'canadagrid',
-      current_choro_path: null,
       current_var: null,
       hooks: {
         'maps.get_layer': Array(1000),
       },
+      query: {},
       legend: {},
       chart: {
         object: null,
@@ -876,6 +876,7 @@
                                 e,
                                 e.layer.properties.id,
                                 {
+                                  weight: 1.5,
                                   fill: true,
                                   fillOpacity: 1,
                                   fillColor: plugin.maps.get_color.apply(item, [
@@ -891,6 +892,7 @@
                                 e,
                                 e.layer.properties.id,
                                 {
+                                  weight: 1.5,
                                   fill: true,
                                   fillOpacity: 1,
                                   fillColor: plugin.maps.get_color.apply(item, [
@@ -906,6 +908,7 @@
                                 e,
                                 e.layer.properties.id,
                                 {
+                                  weight: 1.5,
                                   fill: true,
                                   fillOpacity: 1,
                                   fillColor: plugin.maps.get_color.apply(item, [
@@ -1048,7 +1051,7 @@
         }
       },
 
-      add_marker: function (location, callback = null) {
+      add_marker: function (location, location_data, callback = null) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           item = plugin.item,
           options = plugin.options;
@@ -1056,7 +1059,8 @@
         let recent_list = item.find('#recent-locations'),
           popped = false;
 
-        console.log('add marker', location.coords.join(','), location);
+        // console.log('add marker', location.coords.join(','), location);
+        console.log('add marker', location_data);
 
         // remove any existing 'active' class
         recent_list.find('.list-group-item').removeClass('active');
@@ -1096,6 +1100,9 @@
           for (let key in options.maps) {
             let new_marker = new L.Marker(location.coords, {
                 icon: options.icons.default,
+              }).bindTooltip(location.title, {
+                direction: 'top',
+                offset: [0, -30],
               }),
               popped_marker = null;
 
@@ -1115,6 +1122,9 @@
             }
 
             new_marker
+              .on('mouseover', function (e) {
+                $(document).trigger('marker_mouseover', [e]);
+              })
               .on('click', function (e) {
                 $(document).trigger('click_marker', [e]);
               })
@@ -1128,23 +1138,75 @@
 
           // add location to recents
 
-          recent_list.prepend(
-            '<button class="list-group-item list-group-item-action d-flex align-items-center justify-content-between active" data-location="' +
-              location.geo_id +
-              '" data-coords="' +
-              location.coords.join(',') +
-              '">' +
-              location.title +
-              '<span class="clear">&times;</span>' +
-              '</button>',
+          //
+
+          grid_id = '';
+
+          if (location_data.layer.properties.gid) {
+            grid_id = location_data.layer.properties.gid;
+          } else if (location_data.layer.properties.id) {
+            grid_id = location_data.layer.properties.id;
+          }
+
+          let location_type = options.current_sector;
+
+          switch (options.current_sector) {
+            case 'canadagrid':
+            case 'canadagrid1deg':
+            case 'era5landgrid':
+              location_type = T('Grid Point');
+              break;
+            case 'census':
+              location_type = T('Census Subdivision');
+              break;
+            case 'health':
+              location_type = T('Health Region');
+              break;
+          }
+
+          let new_item = $(
+            '<div class="list-group-item list-group-item-action active">',
           );
 
+          // item attributes
+          new_item
+            .attr('data-location', location.geo_id)
+            .attr('data-coords', location.coords.join(','))
+            .attr('data-sector', options.current_sector)
+            .attr('data-grid-id', grid_id);
+
+          // type
+          $('<div class="location-type">' + location_type + '</div>').appendTo(
+            new_item,
+          );
+
+          // title
+          $('<div class="title">' + location.title + '</div>').appendTo(
+            new_item,
+          );
+
+          // actions div
+
+          let item_actions = $('<div class="item-actions">').appendTo(new_item);
+
+          // view btn
+          $('<span class="view">' + T('Select') + '</span>').appendTo(
+            item_actions,
+          );
+
+          // clear btn
+          $('<span class="clear">' + T('Remove') + '</span>').appendTo(
+            item_actions,
+          );
+
+          recent_list.prepend(new_item);
+
+          // reorder index attributes for the whole list
           recent_list.find('.list-group-item').each(function (i) {
             $(this).attr('data-index', i);
           });
 
-          // swap markers
-
+          // swap active markers
           for (let key in options.maps) {
             options.grid.markers[key].forEach(function (marker, i) {
               if (i != 0) {
@@ -1188,6 +1250,11 @@
           }
         }
 
+        // reorder index attributes for the whole list
+        item.find('#recent-locations .list-group-item').each(function (i) {
+          $(this).attr('data-index', i);
+        });
+
         if (no_markers == true) {
           item.find('#recent-locations-clear').hide();
         } else {
@@ -1207,43 +1274,21 @@
         }
       },
 
-      set_center: function (coords, zoom = null) {
+      set_center: function (coords, zoom = null, do_offset = true) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           options = plugin.options,
           item = plugin.item;
 
-        // console.log('clicked a marker', click_event, list_item);
-
         let visible_maps = item.find('.map-panel:not(.hidden)'),
           first_map_key = visible_maps.first().attr('data-map-key'),
           map = options.maps[first_map_key].object,
-          offset;
+          offset = 0;
 
-        // console.log(visible_maps, visible_maps.first());
-        // console.log(first_map_key);
-
-        console.log('cdc', 'set center');
-
-        switch (visible_maps.length) {
-          case 3:
-            offset = 0;
-            break;
-          case 2:
-            offset = 0.1;
-            break;
-          default:
-            offset = 0.25;
-            break;
-        }
-
-        // console.log('offset', offset);
-
-        if (zoom == null) zoom = map.getZoom();
-
-        // calculate pixel value for offset
-        map_offset = map.getSize().x * offset;
+        // console.log('cdc', 'set center');
 
         // zoom
+        if (zoom == null) zoom = map.getZoom();
+
         map.setZoom(zoom);
 
         // console.log('pan to', coords);
@@ -1251,10 +1296,29 @@
         // pan to center
         map.panTo([coords.lat, coords.lng], { animate: false });
 
-        // console.log('pan by', map_offset);
+        if (do_offset == true) {
+          switch (visible_maps.length) {
+            case 3:
+              offset = 0;
+              break;
+            case 2:
+              offset = 0.1;
+              break;
+            default:
+              offset = 0.25;
+              break;
+          }
 
-        // pan by offset
-        map.panBy(new L.Point(-map_offset, 0), { animate: false });
+          // console.log('offset', offset);
+
+          // calculate pixel value for offset
+          map_offset = map.getSize().x * offset;
+
+          // console.log('pan by', map_offset);
+
+          // pan by offset
+          map.panBy(new L.Point(-map_offset, 0), { animate: false });
+        }
       },
     },
 
@@ -1263,7 +1327,7 @@
         let plugin = !this.item ? this.data('cdc_app') : this,
           options = plugin.options;
 
-        console.log('obj to url', do_history);
+        // console.log('obj to url', do_history);
 
         let query_str = [];
 
@@ -1369,7 +1433,7 @@
         }
 
         // set cdc_app's options.query too
-        // options.query = { ...query };
+        options.query = { ...query };
 
         // options.current_sector = query.sector;
 

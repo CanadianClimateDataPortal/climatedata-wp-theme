@@ -106,7 +106,7 @@
         zoom: null,
       },
       first_map: null,
-      current_sector: 'canadagrid',
+      current_sector: 'gridded_data',
       current_var: null,
       hooks: {
         'maps.get_layer': Array(1000),
@@ -382,9 +382,7 @@
         // console.log(query);
 
         switch (query.sector) {
-          case 'canadagrid':
-          case 'canadagrid1deg':
-          case 'era5landgrid':
+          case 'gridded_data':
             console.log('RASTER');
 
             options.choro.path = null;
@@ -500,11 +498,12 @@
                   }
 
                   if (do_grid == true) {
-                    // console.log('new grid layer');
+                    console.log('new grid layer', var_data.acf.grid);
+
                     let new_layer = L.vectorGrid.protobuf(
                       geoserver_url +
                         '/geoserver/gwc/service/tms/1.0.0/CDC:' +
-                        query.sector +
+                        var_data.acf.grid +
                         '@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf',
                       options.grid.leaflet,
                     );
@@ -686,6 +685,9 @@
 
             console.log('CHORO');
 
+            // make sure we have the right frequency code
+            // i.e. ys/ann
+
             let frequency_code = query.frequency;
 
             freq_keys = Object.keys(period_frequency_lut);
@@ -711,10 +713,8 @@
               '&decimals=' +
               var_data.acf.decimals;
 
-            // console.log('options.query');
-            // console.log(JSON.stringify(options.query, null, 4));
-            // console.log('query');
-            // console.log(JSON.stringify(query, null, 4));
+            console.log('delta', query.delta);
+            console.log(choro_path);
 
             let first_map = options.maps[Object.keys(options.maps)[0]];
 
@@ -730,8 +730,7 @@
 
               options.choro.path = choro_path;
 
-              // console.log('do legend', query.var_id, query.var);
-
+              console.log('do legend now');
               plugin.maps.do_legend.apply(item, [
                 query,
                 var_data,
@@ -745,7 +744,7 @@
                   }
 
                   if (options.current_var != query.var) {
-                    console.log('change var');
+                    // console.log('change var');
                     remove_grid = true;
                     options.current_var = query.var;
                   }
@@ -769,13 +768,14 @@
                           .toLowerCase(),
                       );
 
+                    // if (key == 'high') console.log('get choro data now');
+
                     $.ajax({
                       url: this_path,
                       dataType: 'json',
                       success: function (data) {
                         options.choro.data[key] = data;
-
-                        // console.log('done', data);
+                        // console.log('done');
 
                         // remove raster layer
                         if (
@@ -802,7 +802,7 @@
                           this_map.layers.grid != undefined &&
                           this_map.object.hasLayer(this_map.layers.grid)
                         ) {
-                          console.log('remove sector layer');
+                          // console.log('remove sector layer');
                           // sector has changed, remove the layer entirely
                           this_map.object.removeLayer(this_map.layers.grid);
                         }
@@ -815,18 +815,26 @@
                           // the grid layer already exists,
                           // so reset each feature
 
-                          // console.log('reset features');
-
                           for (
                             let i = 0;
                             i < options.choro.data[key].length;
                             i++
                           ) {
-                            options.maps[key].layers.grid.resetFeatureStyle(i);
+                            // options.maps[key].layers.grid.resetFeatureStyle(i);
+
+                            options.maps[key].layers.grid.setFeatureStyle(i, {
+                              weight: 1,
+                              color: '#fff',
+                              fillColor: plugin.maps.get_color.apply(item, [
+                                options.choro.data[key][i],
+                              ]),
+                              opacity: 0.5,
+                              fill: true,
+                              radius: 4,
+                              fillOpacity: 1,
+                            });
                           }
                         } else {
-                          // console.log('no existing layer');
-
                           options.grid.leaflet.vectorTileLayerStyles[
                             query.sector
                           ] = function (properties, zoom) {
@@ -1142,18 +1150,20 @@
 
           grid_id = '';
 
-          if (location_data.layer.properties.gid) {
-            grid_id = location_data.layer.properties.gid;
-          } else if (location_data.layer.properties.id) {
-            grid_id = location_data.layer.properties.id;
+          if (location_data != null) {
+            if (location_data.hasOwnProperty.layer) {
+              if (location_data.layer.properties.gid) {
+                grid_id = location_data.layer.properties.gid;
+              } else if (location_data.layer.properties.id) {
+                grid_id = location_data.layer.properties.id;
+              }
+            }
           }
 
           let location_type = options.current_sector;
 
           switch (options.current_sector) {
-            case 'canadagrid':
-            case 'canadagrid1deg':
-            case 'era5landgrid':
+            case 'gridded_data':
               location_type = T('Grid Point');
               break;
             case 'census':
@@ -1511,7 +1521,7 @@
                 .filter(function (i) {
                   return i;
                 });
-            } else if (fn_options.key == 'selections') {
+            } else {
               query[fn_options.key] = fn_options.val;
             }
           } else {
@@ -1762,10 +1772,10 @@
             });
           }
 
-          console.log(
-            settings.data['30y_{0}_median'.format(scenario.name)],
-            settings.data['30y_{0}_median'.format(scenario.name)].length,
-          );
+          // console.log(
+          //   settings.data['30y_{0}_median'.format(scenario.name)],
+          //   settings.data['30y_{0}_median'.format(scenario.name)].length,
+          // );
 
           // find the median values for the queried decade
 

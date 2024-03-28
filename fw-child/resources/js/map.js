@@ -657,19 +657,21 @@
       slider.find('.ui-slider-handle').text(value);
 
       let this_pane = slider.attr('data-pane');
+
       options.legend.opacity = value / 100;
 
       // always set the given pane opacity
       // so it's consistent if we switch sectors
       item
         .find('.leaflet-pane.leaflet-' + this_pane + '-pane')
-        .css('opacity', options.legend.opacity);
+        .css('opacity', ui.value / 100);
 
       // grid layer defaults to 1
       item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
 
       // link legend's opacity
       if (this_pane != 'labels' && this_pane != 'marker') {
+        options.legend.opacity = ui.value / 100;
         item
           .find('.legend')
           .find('.legendbox')
@@ -2163,8 +2165,8 @@
         '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
       );
 
-      if (special_variables.hasOwnProperty(options.var_data.slug)) {
-        const special_var = special_variables[options.var_data.slug];
+      if (special_variables.hasOwnProperty(options.query.var)) {
+        const special_var = special_variables[options.query.var];
         default_scheme_element.data(
           'scheme-colours',
           special_var.colormap.colours,
@@ -2173,7 +2175,22 @@
           'scheme-quantities',
           special_var.colormap.quantities,
         );
+        default_scheme_element.data(
+          'scheme-type',
+          special_var.colormap.scheme_type
+        )
+
         plugin.update_scheme();
+
+        // select default scheme and disable schemes dropdown
+        item
+          .find('[data-query-key="scheme"]')
+          .val('default')
+          .trigger('change');
+        item
+          .find('#display-scheme-select .dropdown-toggle')
+          .prop('disabled', true);
+
 
         if (typeof callback === 'function') {
           callback();
@@ -2208,7 +2225,16 @@
                 'scheme-quantities',
                 colour_map.map((e) => parseFloat(e.quantity)),
               );
+              default_scheme_element.data(
+                'scheme-type',
+                data.Legend[0].rules[0].symbolizers[0].Raster.colormap.type
+              )
               plugin.update_scheme();
+
+              // enable scheme select dropdown
+              item
+                .find('#display-scheme-select .dropdown-toggle')
+                .prop('disabled', false);
             })
             .always(function () {
               if (typeof callback == 'function') {
@@ -2216,6 +2242,7 @@
               }
             });
         }
+
       }
     },
 
@@ -2285,7 +2312,11 @@
       // enable/disable discrete/continuous
 
       if (selected_item.hasClass('default')) {
-        discrete_btns.first().trigger('click');
+
+        let discrete_or_continuous = selected_item.data('scheme-type') === 'ramp' ? 'continuous' : 'discrete';
+        $(`[data-query-key="scheme_type"][value="${discrete_or_continuous}"]`).prop('checked', true)
+          .trigger('change');
+
         discrete_btns.addClass('disabled');
       } else {
         discrete_btns.removeClass('disabled');
@@ -2317,10 +2348,10 @@
       let query = options.query;
       let quantity;
 
-      if (special_variables.hasOwnProperty(options.var_data.slug)) {
+      if (special_variables.hasOwnProperty(options.query.var)) {
         $.extend(
           options.legend.colormap,
-          special_variables[options.var_data.slug].colormap,
+          special_variables[options.query.var].colormap,
         );
       } else {
         options.legend.colormap.colours = colours;

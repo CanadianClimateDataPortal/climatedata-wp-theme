@@ -576,6 +576,12 @@
 
             options.choro.path = null;
 
+            // remove the legend
+            for (let key in options.maps) {
+              options.maps[key].object.removeControl(options.maps[key].legend);
+              //legend.addTo(options.maps[key].object);
+            }
+
             let get_layer_data = function (query_var) {
               console.log('get data', query_var);
 

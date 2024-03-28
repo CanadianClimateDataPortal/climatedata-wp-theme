@@ -118,9 +118,13 @@ function child_theme_enqueue() {
 	
 	// VENDOR
 	
-	// lodash
+	// js-cookie
 	
-	// wp_register_script ( 'lodash-full', $child_vendor_dir . 'lodash.js', NULL, NULL, true );
+	wp_register_script ( 'js-cookie', 'https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js', NULL, NULL, true );
+		
+	// page tour
+	
+	wp_register_script ( 'page-tour', $child_vendor_dir . 'pe-page-tour/page-tour.js', array ( 'jquery-ui-core', 'js-cookie' ), NULL, true );
 	
 	// tab drawer
 	
@@ -215,6 +219,7 @@ function child_theme_enqueue() {
 		case 'map' :
 		case 'carte' :
 			wp_enqueue_script ( 'map-app' );
+			wp_enqueue_script ( 'page-tour' );
 			wp_enqueue_script ( 'shapefile-upload' );
 			break;
 			

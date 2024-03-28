@@ -7,35 +7,49 @@
 			</div>
 			
 			<div class="control-tab-body">
-				<h4 class="variable-name p-3"></h4>
-				
-				<!-- summary -->
-				<div id="location-summary" class="row p-3">
-					<div class="col-2-of-7">
-						<h6>2041 – 2070</h6>
-						
-						<div class="var-value-future">
-							<span class="value">29.3</span>
-							<span class="unit">ºC</span>
-						</div>
-					</div>
-					
-					<div class="col">
-						<h6><?php _e ( 'Relative to Baseline', 'cdc' ); ?> (1971 – 2010)</h6>
-						
-						<div class="var-value-compare">
-							<span class="icon"><i class="fas fa-caret-up text-primary"></i></span>
+				<div class="d-flex align-items-center px-3 my-4">
+					<h4 class="variable-name mb-0"></h4>
+					<div class="ms-auto">
+						<div id="location-val-scenarios" class="btn-group">
+							<input type="radio" class="btn-check" name="location-val-scenario" id="location-val-scenario1" value="low" autocomplete="off" checked>
 							
-							<span class="value">2.3</span>
-							<span class="unit">ºC</span>
-							<span class="compare"><?php _e ( 'higher', 'cdc' ); ?></span>
+							<label class="btn btn-sm btn-outline-gray-500" for="location-val-scenario1">
+								<span class="scenario-name" data-dataset="cmip6" data-name="ssp126">SSP 1–2.6</span>
+							</label>
+						
+							<input type="radio" class="btn-check" name="location-val-scenario" id="location-val-scenario2" value="medium" autocomplete="off">
+							
+							<label class="btn btn-sm btn-outline-gray-500" for="location-val-scenario2">
+								<span class="scenario-name" data-dataset="cmip6" data-name="ssp245">SSP 2–4.5</span>
+							</label>
+						
+							<input type="radio" class="btn-check" name="location-val-scenario" id="location-val-scenario3" value="high" autocomplete="off">
+							
+							<label class="btn btn-sm btn-outline-gray-500" for="location-val-scenario3">
+								<span class="scenario-name" data-dataset="cmip6" data-name="ssp585">SSP 5–8.5</span>
+							</label>
 						</div>
 					</div>
 				</div>
 				
+				<!-- summary -->
+				<div id="location-summary" class="ps-3 mb-4 pb-3 border-bottom">
+					<div class="row">
+						<div class="location-value location-value-median col-3-of-7">
+							<h6 class="all-caps text-gray-600"><?php _e ( 'Median', 'cdc' ); ?> (<span class="decade">2041 – 2070</span>)</h6>
+						</div>
+						
+						<div class="location-value location-value-delta col pe-3">
+							<h6 class="all-caps text-gray-600"><?php _e ( 'Relative to Baseline', 'cdc' ); ?> (1971 – 2000)</h6>
+						</div>
+					</div>
+					
+					<div class="value-table"></div>
+				</div>
+				
 				<!-- tabs -->
 				
-				<div id="location-tabs-container" class="ms-3 pb-3">
+				<div id="location-tabs-container" class="pb-3">
 					
 					<?php /*
 					<ul class="nav nav-tabs ps-3" id="location-tabs" role="tablist">
@@ -57,13 +71,13 @@
 						<div class="tab-pane fade show active" id="location-time-series-pane" role="tabpanel" aria-labelledby="location-time-series-tab" tabindex="0">
 							
 							<!-- wrapper for chart -->
-							<div id="location-chart-container" class="mb-3 me-3">
+							<div id="location-chart-container" class="mb-3 mx-3">
 								<!-- chart object -->
 								<div id="location-chart" class="chart-object location-chart"></div>
 							</div>
 							
 							<!-- chart options -->
-							<div class="d-flex align-items-center justify-content-between mb-3 pe-3">
+							<div class="d-flex align-items-center justify-content-between mb-3 px-3">
 								<h5 class="mb-0"><?php _e ( 'Chart Options', 'cdc' ); ?></h5>
 								
 								<!-- export functions -->
@@ -81,7 +95,7 @@
 							
 							<!-- accordions -->
 							
-							<div id="location-chart-accordions" class="accordion">
+							<div id="location-chart-accordions" class="accordion accordion-flush">
 								
 								<div class="accordion-item">
 									

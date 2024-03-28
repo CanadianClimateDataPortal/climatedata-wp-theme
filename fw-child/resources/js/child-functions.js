@@ -16,8 +16,62 @@ const $ = jQuery;
     //
 
     if ($('body').attr('id') == 'page-map') {
+      // init apps
       $(document).cdc_app();
       $(document).map_app();
+
+      // help overlay
+
+      let help_overlay = bootstrap.Offcanvas.getOrCreateInstance('#help');
+
+      console.log('cookie', Cookies.get('cdc-map-dismiss-help'));
+
+      if (
+        Cookies.get('cdc-map-dismiss-help') == undefined ||
+        Cookies.get('cdc-map-dismiss-help') != 1
+      ) {
+        // show help
+        help_overlay.toggle();
+      }
+
+      // listeners
+
+      document
+        .getElementById('help')
+        .addEventListener('hide.bs.offcanvas', (event) => {
+          // console.log('check', $('#map-overlay-dontshow').prop('checked'));
+
+          // is the 'don't show again' switch checked
+          if ($('#map-overlay-dontshow').prop('checked') == true) {
+            Cookies.set('cdc-map-dismiss-help', 1);
+          }
+        });
+
+      // page tour
+      let tour_options = JSON.parse($('#page-tour').attr('data-steps'));
+
+      // todo
+      // if (current_lang == 'fr') {
+      //   tour_options.labels = {
+      //     start_over: 'Recommencer',
+      //     next: 'Suivant',
+      //     close: 'Quitter',
+      //     dont_show: 'Ne plus montrer',
+      //   };
+      // }
+
+      $('#page-tour').page_tour({
+        default_open: false,
+      });
+
+      $('#page-tour-start').click(function () {
+        // reset page to initial view
+        help_overlay.toggle();
+        $('#control-bar').tab_drawer('update_path', '#');
+
+        // start
+        $('#page-tour').page_tour('show_tour');
+      });
     }
 
     if ($('body').attr('id') == 'page-download') {

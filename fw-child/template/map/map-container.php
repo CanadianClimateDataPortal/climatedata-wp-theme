@@ -13,13 +13,13 @@
 			<p class="mb-4"><?php _e ( 'Explore maps and charts of climate data. Click on the Data tab on the left to access different variables. Do a location search or zoom in to visualize time series charts.', 'cdc' ); ?></p>
 			
 			<div class="map-overlay-btns d-flex">
-				<button class="btn btn-sm bg-opacity-20 text-light rounded-pill me-3"><?php _e ( 'How to use this page', 'cdc' ); ?></button>
+				<button id="page-tour-start" class="btn btn-sm bg-opacity-20 text-light rounded-pill me-3"><?php _e ( 'How to use this page', 'cdc' ); ?></button>
 				
 				<button type="button" class="btn btn-sm bg-opacity-20 text-light rounded-pill me-3" data-bs-dismiss="offcanvas" aria-label="Close"><?php _e ( 'Dismiss', 'cdc' ); ?></button>
 				
 				<div class="form-check form-switch">
-					<input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-					<label class="form-check-label" for="flexSwitchCheckDefault"><?php _e ( 'Don’t show again', 'cdc' ); ?></label>
+					<input class="form-check-input" type="checkbox" role="switch" id="map-overlay-dontshow">
+					<label class="form-check-label" for="map-overlay-dontshow"><?php _e ( 'Don’t show again', 'cdc' ); ?></label>
 				</div>
 			</div>
 		</div>
@@ -111,10 +111,10 @@
 				<div id="decade-slider-min">1970</div>
 				
 				<div class="flex-grow-1 d-flex">
-					<label for="decade" class="form-label sr-only">Decade</label>
+					<label for="decade" class="form-label sr-only"><?php _e ( 'Decade', 'cdc' ); ?></label>
 					<input type="hidden" name="decade" id="decade" data-query-key="decade">
 					<div id="decade-slider">
-						<div id="decade-slider-handle" class="ui-slider-handle">
+						<div id="decade-slider-handle" class="ui-slider-handle" data-bs-toggle="tooltip" data-bs-title="<?php _e ( 'Move slider to adjust time period', 'cdc' ); ?>" data-bs-offset="0,20" data-bs-custom-class="white-tip">
 							<span></span>
 						</div>
 					</div>
@@ -126,5 +126,23 @@
 		</div>
 	</div>
 </div>
+
+<div id="zoom-alert" style="display: none;"><?php _e ( 'Zoom in to interact with the grid layer', 'cdc' ); ?></div>
+
+<?php
+
+	// PAGE TOUR
+
+	if ( have_rows ( 'tour' ) ) {
+		
+?>
+
+<div class="page-tour" id="page-tour" data-steps='<?php echo json_encode ( get_field ( 'tour' ) ); ?>'></div>
+
+<?php
+
+	} 
+
+?>
 
 <div id="status"></div>

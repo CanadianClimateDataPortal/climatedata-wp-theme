@@ -95,6 +95,7 @@
       },
       choro: {
         data: {},
+        path: null,
       },
       maps: {},
       station_data: null,
@@ -105,12 +106,12 @@
         zoom: null,
       },
       first_map: null,
-      current_sector: 'canadagrid',
-      current_choro_path: null,
+      current_sector: 'gridded_data',
       current_var: null,
       hooks: {
         'maps.get_layer': Array(1000),
       },
+      query: {},
       legend: {},
       chart: {
         object: null,
@@ -195,15 +196,12 @@
       item.on('click', '.map-zoom-btn', function (e) {
         // get the first visible map object
 
-        let first_map = null;
-
-        for (let key in options.maps) {
-          if (first_map == null && options.maps[key].container.is(':visible')) {
-            first_map = options.maps[key];
-          }
-        }
-
-        let current_zoom = first_map.object.getZoom(),
+        let first_visible = item
+            .find('.map-panel:not(.hidden)')
+            .first()
+            .attr('data-map-key'),
+          first_map = options.maps[first_visible],
+          current_zoom = first_map.object.getZoom(),
           new_zoom = current_zoom + 1;
 
         if ($(this).hasClass('zoom-out')) {
@@ -211,6 +209,32 @@
         }
 
         first_map.object.setZoom(new_zoom);
+      });
+
+      // click map
+
+      item.find('#map-objects').on('mouseup', function (e) {
+        let first_visible = item
+            .find('.map-panel:not(.hidden)')
+            .first()
+            .attr('data-map-key'),
+          first_map = options.maps[first_visible];
+
+        // if the map is zoomed out too far
+        // to show the grid layer
+
+        if (options.current_sector == 'gridded_data') {
+          console.log(options.grid.leaflet.minZoom);
+
+          if (first_map.object.getZoom() < options.grid.leaflet.minZoom) {
+            // show the zoom alert
+            item.find('#zoom-alert').fadeIn(250, function () {
+              setTimeout(function () {
+                item.find('#zoom-alert').fadeOut(250);
+              }, 2000);
+            });
+          }
+        }
       });
 
       //
@@ -381,12 +405,10 @@
         // console.log(query);
 
         switch (query.sector) {
-          case 'canadagrid':
-          case 'canadagrid1deg':
-          case 'era5landgrid':
+          case 'gridded_data':
             console.log('RASTER');
 
-            options.current_choro_path = null;
+            options.choro.path = null;
 
             plugin.maps.do_legend.apply(item, [
               query,
@@ -499,11 +521,12 @@
                   }
 
                   if (do_grid == true) {
-                    // console.log('new grid layer');
+                    console.log('new grid layer', var_data.acf.grid);
+
                     let new_layer = L.vectorGrid.protobuf(
                       geoserver_url +
                         '/geoserver/gwc/service/tms/1.0.0/CDC:' +
-                        query.sector +
+                        var_data.acf.grid +
                         '@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf',
                       options.grid.leaflet,
                     );
@@ -551,13 +574,13 @@
             let layer_data,
               marker_fill = query.var == 'weather-stations' ? '#f00' : '#00f';
 
+            options.choro.path = null;
+
             // remove the legend
             for (let key in options.maps) {
               options.maps[key].object.removeControl(options.maps[key].legend);
               //legend.addTo(options.maps[key].object);
             }
-
-            options.current_choro_path = null;
 
             let get_layer_data = function (query_var) {
               console.log('get data', query_var);
@@ -691,6 +714,9 @@
 
             console.log('CHORO');
 
+            // make sure we have the right frequency code
+            // i.e. ys/ann
+
             let frequency_code = query.frequency;
 
             freq_keys = Object.keys(period_frequency_lut);
@@ -716,14 +742,24 @@
               '&decimals=' +
               var_data.acf.decimals;
 
-            if (choro_path != options.current_choro_path) {
-              // choro path has changed,
+            // console.log('delta', query.delta);
+            // console.log(choro_path);
+
+            let first_map = options.maps[Object.keys(options.maps)[0]];
+
+            if (
+              first_map.layers.grid == undefined ||
+              first_map.object.hasLayer(first_map.layers.grid) ||
+              !window.lodash.isEqual(query, options.query)
+            ) {
+              // grid layer doesn't exist yet
+              // or the query object has changed
+
               // get/update layer
 
-              options.current_choro_path = choro_path;
+              options.choro.path = choro_path;
 
-              // console.log('do legend', query.var_id, query.var);
-
+              console.log('do legend now');
               plugin.maps.do_legend.apply(item, [
                 query,
                 var_data,
@@ -737,21 +773,21 @@
                   }
 
                   if (options.current_var != query.var) {
-                    console.log('change var');
+                    // console.log('change var');
                     remove_grid = true;
                     options.current_var = query.var;
                   }
 
                   // each map
                   Object.keys(options.maps).forEach(function (key) {
-                    console.log(
-                      'get choro data',
-                      key,
-                      scenario_names[query.dataset][key]
-                        .replace(/[\W_]+/g, '')
-                        .toLowerCase(),
-                      query.sector,
-                    );
+                    // console.log(
+                    //   'get choro data',
+                    //   key,
+                    //   scenario_names[query.dataset][key]
+                    //     .replace(/[\W_]+/g, '')
+                    //     .toLowerCase(),
+                    //   query.sector,
+                    // );
 
                     let this_map = options.maps[key],
                       this_path = choro_path.replace(
@@ -761,13 +797,14 @@
                           .toLowerCase(),
                       );
 
+                    // if (key == 'high') console.log('get choro data now');
+
                     $.ajax({
                       url: this_path,
                       dataType: 'json',
                       success: function (data) {
                         options.choro.data[key] = data;
-
-                        // console.log('done', data);
+                        // console.log('done');
 
                         // remove raster layer
                         if (
@@ -794,7 +831,7 @@
                           this_map.layers.grid != undefined &&
                           this_map.object.hasLayer(this_map.layers.grid)
                         ) {
-                          console.log('remove sector layer');
+                          // console.log('remove sector layer');
                           // sector has changed, remove the layer entirely
                           this_map.object.removeLayer(this_map.layers.grid);
                         }
@@ -807,24 +844,32 @@
                           // the grid layer already exists,
                           // so reset each feature
 
-                          console.log('reset features');
-
                           for (
                             let i = 0;
                             i < options.choro.data[key].length;
                             i++
                           ) {
-                            options.maps[key].layers.grid.resetFeatureStyle(i);
+                            // options.maps[key].layers.grid.resetFeatureStyle(i);
+
+                            options.maps[key].layers.grid.setFeatureStyle(i, {
+                              weight: 1,
+                              color: '#fff',
+                              fillColor: plugin.maps.get_color.apply(item, [
+                                options.choro.data[key][i],
+                              ]),
+                              opacity: 0.5,
+                              fill: true,
+                              radius: 4,
+                              fillOpacity: 1,
+                            });
                           }
                         } else {
-                          // console.log('no existing layer');
-
                           options.grid.leaflet.vectorTileLayerStyles[
                             query.sector
                           ] = function (properties, zoom) {
                             let style_obj = {
                               weight: 1,
-                              color: 'white',
+                              color: '#fff',
                               fillColor: plugin.maps.get_color.apply(item, [
                                 options.choro.data[key][properties.id],
                               ]),
@@ -868,6 +913,7 @@
                                 e,
                                 e.layer.properties.id,
                                 {
+                                  weight: 1.5,
                                   fill: true,
                                   fillOpacity: 1,
                                   fillColor: plugin.maps.get_color.apply(item, [
@@ -883,6 +929,7 @@
                                 e,
                                 e.layer.properties.id,
                                 {
+                                  weight: 1.5,
                                   fill: true,
                                   fillOpacity: 1,
                                   fillColor: plugin.maps.get_color.apply(item, [
@@ -898,6 +945,7 @@
                                 e,
                                 e.layer.properties.id,
                                 {
+                                  weight: 1.5,
                                   fill: true,
                                   fillOpacity: 1,
                                   fillColor: plugin.maps.get_color.apply(item, [
@@ -1040,7 +1088,7 @@
         }
       },
 
-      add_marker: function (location, callback = null) {
+      add_marker: function (location, location_data, callback = null) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           item = plugin.item,
           options = plugin.options;
@@ -1048,7 +1096,8 @@
         let recent_list = item.find('#recent-locations'),
           popped = false;
 
-        console.log('add marker', location.coords.join(','), location);
+        // console.log('add marker', location.coords.join(','), location);
+        console.log('add marker', location_data);
 
         // remove any existing 'active' class
         recent_list.find('.list-group-item').removeClass('active');
@@ -1088,6 +1137,9 @@
           for (let key in options.maps) {
             let new_marker = new L.Marker(location.coords, {
                 icon: options.icons.default,
+              }).bindTooltip(location.title, {
+                direction: 'top',
+                offset: [0, -30],
               }),
               popped_marker = null;
 
@@ -1107,6 +1159,9 @@
             }
 
             new_marker
+              .on('mouseover', function (e) {
+                $(document).trigger('marker_mouseover', [e]);
+              })
               .on('click', function (e) {
                 $(document).trigger('click_marker', [e]);
               })
@@ -1120,23 +1175,77 @@
 
           // add location to recents
 
-          recent_list.prepend(
-            '<button class="list-group-item list-group-item-action d-flex align-items-center justify-content-between active" data-location="' +
-              location.geo_id +
-              '" data-coords="' +
-              location.coords.join(',') +
-              '">' +
-              location.title +
-              '<span class="clear">&times;</span>' +
-              '</button>',
+          //
+
+          grid_id = '';
+
+          if (location_data != null) {
+            if (location_data.hasOwnProperty.layer) {
+              if (location_data.layer.properties.gid) {
+                grid_id = location_data.layer.properties.gid;
+              } else if (location_data.layer.properties.id) {
+                grid_id = location_data.layer.properties.id;
+              }
+            }
+          }
+
+          let location_type = options.current_sector;
+
+          switch (options.current_sector) {
+            case 'gridded_data':
+              location_type = T('Grid Point');
+              break;
+            case 'census':
+              location_type = T('Census Subdivision');
+              break;
+            case 'health':
+              location_type = T('Health Region');
+              break;
+          }
+
+          let new_item = $(
+            '<div class="list-group-item list-group-item-action active">',
           );
 
+          // item attributes
+          new_item
+            .attr('data-location', location.geo_id)
+            .attr('data-coords', location.coords.join(','))
+            .attr('data-sector', options.current_sector)
+            .attr('data-grid-id', grid_id);
+
+          // type
+          $('<div class="location-type">' + location_type + '</div>').appendTo(
+            new_item,
+          );
+
+          // title
+          $('<div class="title">' + location.title + '</div>').appendTo(
+            new_item,
+          );
+
+          // actions div
+
+          let item_actions = $('<div class="item-actions">').appendTo(new_item);
+
+          // view btn
+          $('<span class="view">' + T('Select') + '</span>').appendTo(
+            item_actions,
+          );
+
+          // clear btn
+          $('<span class="clear">' + T('Remove') + '</span>').appendTo(
+            item_actions,
+          );
+
+          recent_list.prepend(new_item);
+
+          // reorder index attributes for the whole list
           recent_list.find('.list-group-item').each(function (i) {
             $(this).attr('data-index', i);
           });
 
-          // swap markers
-
+          // swap active markers
           for (let key in options.maps) {
             options.grid.markers[key].forEach(function (marker, i) {
               if (i != 0) {
@@ -1180,6 +1289,11 @@
           }
         }
 
+        // reorder index attributes for the whole list
+        item.find('#recent-locations .list-group-item').each(function (i) {
+          $(this).attr('data-index', i);
+        });
+
         if (no_markers == true) {
           item.find('#recent-locations-clear').hide();
         } else {
@@ -1199,43 +1313,21 @@
         }
       },
 
-      set_center: function (coords, zoom = null) {
+      set_center: function (coords, zoom = null, do_offset = true) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           options = plugin.options,
           item = plugin.item;
 
-        // console.log('clicked a marker', click_event, list_item);
-
         let visible_maps = item.find('.map-panel:not(.hidden)'),
           first_map_key = visible_maps.first().attr('data-map-key'),
           map = options.maps[first_map_key].object,
-          offset;
+          offset = 0;
 
-        // console.log(visible_maps, visible_maps.first());
-        // console.log(first_map_key);
-
-        console.log('cdc', 'set center');
-
-        switch (visible_maps.length) {
-          case 3:
-            offset = 0;
-            break;
-          case 2:
-            offset = 0.1;
-            break;
-          default:
-            offset = 0.25;
-            break;
-        }
-
-        // console.log('offset', offset);
-
-        if (zoom == null) zoom = map.getZoom();
-
-        // calculate pixel value for offset
-        map_offset = map.getSize().x * offset;
+        // console.log('cdc', 'set center');
 
         // zoom
+        if (zoom == null) zoom = map.getZoom();
+
         map.setZoom(zoom);
 
         // console.log('pan to', coords);
@@ -1243,10 +1335,29 @@
         // pan to center
         map.panTo([coords.lat, coords.lng], { animate: false });
 
-        // console.log('pan by', map_offset);
+        if (do_offset == true) {
+          switch (visible_maps.length) {
+            case 3:
+              offset = 0;
+              break;
+            case 2:
+              offset = 0.1;
+              break;
+            default:
+              offset = 0.25;
+              break;
+          }
 
-        // pan by offset
-        map.panBy(new L.Point(-map_offset, 0), { animate: false });
+          // console.log('offset', offset);
+
+          // calculate pixel value for offset
+          map_offset = map.getSize().x * offset;
+
+          // console.log('pan by', map_offset);
+
+          // pan by offset
+          map.panBy(new L.Point(-map_offset, 0), { animate: false });
+        }
       },
     },
 
@@ -1255,7 +1366,7 @@
         let plugin = !this.item ? this.data('cdc_app') : this,
           options = plugin.options;
 
-        console.log('obj to url', do_history);
+        // console.log('obj to url', do_history);
 
         let query_str = [];
 
@@ -1361,7 +1472,7 @@
         }
 
         // set cdc_app's options.query too
-        // options.query = { ...query };
+        options.query = { ...query };
 
         // options.current_sector = query.sector;
 
@@ -1439,7 +1550,7 @@
                 .filter(function (i) {
                   return i;
                 });
-            } else if (fn_options.key == 'selections') {
+            } else {
               query[fn_options.key] = fn_options.val;
             }
           } else {
@@ -1551,7 +1662,7 @@
 
         settings.object = $(settings.container).find('.chart-object')[0];
 
-        console.log('CHART TIME');
+        console.log('CHART');
 
         let var_fields = settings.var_data.acf;
 
@@ -1651,6 +1762,11 @@
           }
         }
 
+        let decade_utc = Date.UTC(settings.query.decade),
+          delta_utc = Date.UTC(parseInt(settings.query.decade) + 1),
+          decade_vals = [],
+          delta_vals = [];
+
         scenarios.forEach(function (scenario) {
           if (settings.data['{0}_median'.format(scenario.name)].length > 0) {
             options.chart.series.push({
@@ -1684,7 +1800,115 @@
               },
             });
           }
+
+          // console.log(
+          //   settings.data['30y_{0}_median'.format(scenario.name)],
+          //   settings.data['30y_{0}_median'.format(scenario.name)].length,
+          // );
+
+          // find the median values for the queried decade
+
+          if (
+            Object.keys(settings.data['30y_{0}_median'.format(scenario.name)])
+              .length > 0
+          ) {
+            for (let timestamp in settings.data[
+              '30y_{0}_median'.format(scenario.name)
+            ]) {
+              if (parseInt(timestamp) == delta_utc)
+                decade_vals.push(
+                  settings.data['30y_{0}_median'.format(scenario.name)][
+                    timestamp
+                  ],
+                );
+            }
+          }
+
+          // find the delta values for the queried decade
+
+          if (
+            Object.keys(
+              settings.data['delta7100_{0}_median'.format(scenario.name)],
+            ).length > 0
+          ) {
+            for (let timestamp in settings.data[
+              'delta7100_{0}_median'.format(scenario.name)
+            ]) {
+              if (parseInt(timestamp) == delta_utc)
+                delta_vals.push(
+                  settings.data['delta7100_{0}_median'.format(scenario.name)][
+                    timestamp
+                  ],
+                );
+            }
+          }
         });
+
+        // console.log('decade', decade_vals);
+        // console.log('delta', delta_vals);
+
+        // change median header decade value
+        item
+          .find('#location-summary .location-value-median .decade')
+          .text(
+            parseInt(settings.query.decade) +
+              1 +
+              ' – ' +
+              (parseInt(settings.query.decade) + 30),
+          );
+
+        item.find('#location-summary .value-table').empty();
+
+        scenarios.forEach(function (scenario, i) {
+          // new row
+          let new_val_row = $(
+            '<div class="row" data-scenario="' + scenario.name + '">',
+          );
+
+          // median value
+          new_val_row.append(
+            '<div class="col-3-of-7">' +
+              decade_vals[i] +
+              ' ' +
+              options.chart.unit +
+              '</div>',
+          );
+
+          // delta value
+          let delta_icon = 'fa-caret-up text-primary',
+            delta_label = T('higher');
+
+          if (delta_vals[i] == 0) {
+            delta_icon = 'fa-equals';
+            delta_label = '';
+          } else if (delta_vals[i] < 0) {
+            delta_icon = 'fa-caret-down text-secondary';
+            delta_label = T('lower');
+            delta_vals[i] = Math.abs(delta_vals[i]);
+          }
+
+          new_val_row.append(
+            '<div class="col"><i class="fas ' +
+              delta_icon +
+              ' me-3"></i>' +
+              delta_vals[i] +
+              ' ' +
+              options.chart.unit +
+              ' ' +
+              delta_label +
+              '</div>',
+          );
+
+          new_val_row.appendTo(item.find('#location-summary .value-table'));
+        });
+
+        item
+          .find(
+            '#location-val-scenarios .btn-check[value="' +
+              settings.query.scenarios[0] +
+              '"]',
+          )
+          .trigger('click');
 
         // render the chart
 

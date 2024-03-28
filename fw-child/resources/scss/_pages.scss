@@ -251,6 +251,17 @@ body.offcanvas-open {
   .offcanvas-body {
     // --bs-offcanvas-padding-x: 1.5rem;
   }
+
+  a {
+    color: $white;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: 0.25s;
+
+    &:hover {
+      color: $blue-200;
+    }
+  }
 }
 
 #page-map.tab-drawer-open {
@@ -378,6 +389,12 @@ $overlay-switch-bg: rgba($gray-400, 0.99);
   .legend {
     pointer-events: none;
   }
+
+  .leaflet-top.leaflet-right {
+    top: 50%;
+    transform: translateY(-50%);
+    margin-top: -1.875rem;
+  }
 }
 
 $legend-off-height: 100%;
@@ -480,6 +497,57 @@ $legend-on-height: 16px;
   pointer-events: none;
 }
 
+// LOCATION VALUES
+
+#location-val-scenarios {
+  .btn {
+    padding: 0.25rem;
+    font-size: 0.75rem;
+    line-break: 0.875rem;
+  }
+
+  .btn-check:checked + .btn,
+  :not(.btn-check) + .btn:active,
+  .btn:first-child:active,
+  .btn.active,
+  .btn.show {
+    background-color: $gray-500;
+    color: $white;
+  }
+}
+
+#location-detail {
+  .value-table {
+    @include font-size(1.75rem);
+    font-weight: 500;
+  }
+
+  [data-scenario] {
+    display: none;
+  }
+
+  &:has(#location-val-scenario1:checked) {
+    [data-scenario='ssp126'],
+    [data-scenario='rcp26'] {
+      display: flex;
+    }
+  }
+
+  &:has(#location-val-scenario2:checked) {
+    [data-scenario='ssp245'],
+    [data-scenario='rcp45'] {
+      display: flex;
+    }
+  }
+
+  &:has(#location-val-scenario3:checked) {
+    [data-scenario='ssp585'],
+    [data-scenario='rcp85'] {
+      display: flex;
+    }
+  }
+}
+
 // CHARTS
 
 #chart-values-btns {
@@ -560,6 +628,16 @@ $legend-on-height: 16px;
       width: calc((100vw / 16) * 7);
     }
   }
+
+  &:has(#location-detail.td-selected) {
+    #map-control-footer {
+      transform: translateY(100%);
+    }
+
+    .white-tip {
+      display: none;
+    }
+  }
 }
 
 .map-container {
@@ -616,7 +694,7 @@ $legend-on-height: 16px;
 
   .map-label {
     position: absolute;
-    bottom: 10%;
+    bottom: 15%;
     left: 50%;
     min-width: 5rem;
     transform: translateX(-50%);
@@ -632,7 +710,9 @@ $legend-on-height: 16px;
   right: 0;
   width: calc((100vw / 16) * 15);
   background-color: transparentize($gray-100, 0.05);
-  transition: width 0.25s ease 0s;
+  transition:
+    width 0.25s ease 0s,
+    transform 0.25s;
   z-index: 2;
 
   .map-zoom-btn {
@@ -654,6 +734,19 @@ $legend-on-height: 16px;
   }
 }
 
+#zoom-alert {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-left: calc((calc(100vw / 16) * 3) / 2);
+  padding: 0.5rem 1rem;
+  background-color: transparentize($white, 0.5);
+  text-shadow: 0 1px transparentize($white, 0.2);
+  font-size: 1.25rem;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+}
+
 body.tab-drawer-open {
   #map-breadcrumb {
     transition: left 0.25s ease 0s;
@@ -665,7 +758,9 @@ body.tab-drawer-open {
 
   #map-control-footer {
     width: calc((100vw / 16) * 12);
-    transition: width 0.25s ease 0s;
+    transition:
+      width 0.25s ease 0s,
+      transform 0.25s;
   }
 }
 
@@ -966,19 +1061,67 @@ body.tab-drawer-open {
   --bs-list-group-active-color: #{$body-color};
 
   .list-group-item {
-    .clear {
-      opacity: 0;
-      font-size: 1.25rem;
+    //     .clear {
+    //       opacity: 0;
+    //       font-size: 1.25rem;
+    //       transition: 0.25s;
+    //
+    //       &:hover {
+    //         color: $primary;
+    //       }
+    //     }
+    //
+    //     &:hover {
+    //       .clear {
+    //         opacity: 1;
+    //       }
+    //     }
+  }
+
+  .location-type {
+    font-size: 0.625rem;
+    @include all-caps;
+    color: $gray-600;
+  }
+
+  .item-actions {
+    display: flex;
+    height: 0;
+    overflow: hidden;
+    @include all-caps;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: $font-weight-medium;
+    opacity: 0;
+    transition: 0.25s;
+
+    span {
+      color: $secondary;
+      cursor: pointer;
+      transform: translateY(-100%);
       transition: 0.25s;
 
-      &:hover {
-        color: $primary;
+      &:not(:first-child) {
+        &:before {
+          content: '•';
+          margin: 0 0.375em;
+          color: $body-color;
+        }
       }
     }
+  }
 
+  .list-group-item {
     &:hover {
-      .clear {
+      background-color: $gray-300;
+
+      .item-actions {
+        height: 1rem;
         opacity: 1;
+
+        span {
+          transform: translateY(0);
+        }
       }
     }
   }

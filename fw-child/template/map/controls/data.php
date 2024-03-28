@@ -31,7 +31,10 @@
 				
 				<div id="map-control-dataset" class="map-control-item">
 					
-					<label for="data-dataset" class="form-label d-block h6 all-caps text-secondary"><?php _e ( 'Dataset', 'cdc' ); ?></label>
+					<label for="data-dataset" class="form-label d-flex align-items-center h6 mb-3 all-caps text-secondary">
+						<?php _e ( 'Dataset', 'cdc' ); ?>
+						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+					</label>
 					
 					<div class="btn-group">
 						<input type="radio" class="btn-check" name="data-dataset" id="data-dataset-cmip6" value="cmip6" autocomplete="off" data-query-key="dataset" checked>
@@ -44,7 +47,10 @@
 				</div>
 				
 				<div id="map-control-frequency" class="map-control-item">
-					<label for="data-frequency" class="form-label d-block h6 all-caps text-secondary">Frequency</label>
+					<label for="data-frequency" class="form-label d-flex align-items-center h6 mb-3 all-caps text-secondary">
+						<?php _e ( 'Frequency', 'cdc' ); ?>
+						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+				</label>
 					
 					<select class="form-select" name="data-frequency" data-query-key="frequency">
 						<option value="ann" data-field="ann"><?php _e ( 'Annual', 'cdc' ); ?></option>
@@ -74,7 +80,10 @@
 				
 				<div id="map-control-panels" class="map-control-item">
 					
-					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Scenarios', 'cdc' ); ?></h6>
+					<h6 class="all-caps text-secondary mb-3 d-flex align-items-center">
+						<?php _e ( 'Scenarios', 'cdc' ); ?>
+						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+					</h6>
 				
 					<div class="mb-2">
 						<div class="form-check form-switch">

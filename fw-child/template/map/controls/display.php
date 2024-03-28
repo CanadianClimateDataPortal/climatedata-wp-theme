@@ -9,21 +9,29 @@
 			<div class="control-tab-body">
 				
 				<div id="map-control-values" class="map-control-item" data-display="station:0">
-					<h6 class="all-caps text-secondary"><?php _e ( 'Data Values', 'cdc' ); ?></h6>
+					<h6 class="all-caps text-secondary mb-3 d-flex align-items-center">
+						<?php _e ( 'Data Values', 'cdc' ); ?>
+						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+					</h6>
 					
-					<div class="form-check">
-						<input class="form-check-input" type="radio" name="display-values" id="display-values-absolute" value="" checked data-query-key="delta">
-						<label class="form-check-label" for="display-values-absolute"><?php _e ( 'Absolute', 'cdc' ); ?></label>
-					</div>
-					
-					<div class="form-check">
-						<input class="form-check-input" type="radio" name="display-values" id="display-values-delta" value="true" data-query-key="delta">
-						<label class="form-check-label" for="display-values-delta"><?php _e ( 'Delta vs. Baseline', 'cdc' ); ?></label>
+					<div class="d-flex flex-wrap">
+						<div class="form-check me-3">
+							<input class="form-check-input" type="radio" name="display-values" id="display-values-absolute" value="" checked data-query-key="delta">
+							<label class="form-check-label" for="display-values-absolute"><?php _e ( 'Absolute', 'cdc' ); ?></label>
+						</div>
+						
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="display-values" id="display-values-delta" value="true" data-query-key="delta">
+							<label class="form-check-label" for="display-values-delta"><?php _e ( 'Delta vs. Baseline', 'cdc' ); ?></label>
+						</div>
 					</div>
 				</div>
 				
 				<div id="map-control-aggregation" class="map-control-item" data-display="station:0">
-					<h6 class="all-caps text-secondary"><?php _e ( 'Map Aggregation', 'cdc' ); ?></h6>
+					<h6 class="all-caps text-secondary mb-3 d-flex align-items-center">
+						<?php _e ( 'Map Aggregation', 'cdc' ); ?>
+						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+					</h6>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-grid" value="canadagrid" checked data-query-key="sector">

@@ -738,6 +738,33 @@ $decade-slider-handle-width: 140px;
 // BOOTSTRAP COMPONENTS
 //
 
+// popover
+
+.popover-btn {
+  display: block;
+  width: 1.375rem;
+  height: 1.375rem;
+  margin-left: 0.75rem;
+  background-color: $gray-300;
+  color: $body-color;
+  font-size: 0.75rem;
+  font-weight: $font-weight-bold;
+  text-align: center;
+  line-height: 1.375rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.25s;
+
+  &:hover {
+    background-color: $gray-400;
+  }
+
+  &[aria-describedby] {
+    background-color: $secondary;
+    color: $white;
+  }
+}
+
 // tooltip
 
 .white-tip {
@@ -746,6 +773,10 @@ $decade-slider-handle-width: 140px;
   --bs-tooltip-opacity: 1;
   --bs-tooltip-max-width: 400px;
   text-transform: uppercase;
+
+  .tooltip-inner {
+    box-shadow: 0 4px 1rem transparentize($black, 0.9);
+  }
 }
 
 // card

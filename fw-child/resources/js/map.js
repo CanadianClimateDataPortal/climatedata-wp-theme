@@ -78,6 +78,7 @@
         threshold_slider: null,
         var_filters: {},
         tooltips: null,
+        popovers: null,
       },
       current_layer: null,
       debug: true,
@@ -290,6 +291,21 @@
 
       options.elements.tooltips = [...tooltip_elements].map(
         (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
+      );
+
+      // enable popovers
+
+      let popover_elements = document.querySelectorAll(
+        '[data-bs-toggle="popover"]',
+      );
+
+      options.elements.popovers = [...popover_elements].map(
+        (popoverTriggerEl) =>
+          new bootstrap.Popover(popoverTriggerEl, {
+            placement: 'right',
+            fallbackPlacements: ['right', 'top', 'bottom', 'left'],
+            offset: [0, 16],
+          }),
       );
 
       // SLIDERS

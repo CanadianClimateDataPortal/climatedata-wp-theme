@@ -186,6 +186,10 @@ h1 {
   font-family: $font-family-serif;
 }
 
+h6 {
+  font-weight: $font-weight-bold;
+}
+
 p {
   a {
     &:hover {

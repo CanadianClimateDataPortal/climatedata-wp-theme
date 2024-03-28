@@ -251,6 +251,17 @@ body.offcanvas-open {
   .offcanvas-body {
     // --bs-offcanvas-padding-x: 1.5rem;
   }
+
+  a {
+    color: $white;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: 0.25s;
+
+    &:hover {
+      color: $blue-200;
+    }
+  }
 }
 
 #page-map.tab-drawer-open {
@@ -377,6 +388,12 @@ $overlay-switch-bg: rgba($gray-400, 0.99);
 .map-panel {
   .legend {
     pointer-events: none;
+  }
+
+  .leaflet-top.leaflet-right {
+    top: 50%;
+    transform: translateY(-50%);
+    margin-top: -1.875rem;
   }
 }
 
@@ -560,6 +577,16 @@ $legend-on-height: 16px;
       width: calc((100vw / 16) * 7);
     }
   }
+
+  &:has(#location-detail.td-selected) {
+    #map-control-footer {
+      transform: translateY(100%);
+    }
+
+    .white-tip {
+      display: none;
+    }
+  }
 }
 
 .map-container {
@@ -632,7 +659,9 @@ $legend-on-height: 16px;
   right: 0;
   width: calc((100vw / 16) * 15);
   background-color: transparentize($gray-100, 0.05);
-  transition: width 0.25s ease 0s;
+  transition:
+    width 0.25s ease 0s,
+    transform 0.25s;
   z-index: 2;
 
   .map-zoom-btn {
@@ -665,7 +694,9 @@ body.tab-drawer-open {
 
   #map-control-footer {
     width: calc((100vw / 16) * 12);
-    transition: width 0.25s ease 0s;
+    transition:
+      width 0.25s ease 0s,
+      transform 0.25s;
   }
 }
 

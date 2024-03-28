@@ -1019,6 +1019,47 @@
 
       // manually update coord fields
 
+      item.on('click', '#map-control-coords .btn', function () {
+        let this_input = $(this).siblings().filter('[type="text"]'),
+          this_val = parseFloat(this_input.val()),
+          zoom_val = parseInt(item.find('#coords-zoom').val());
+
+        if (this_input.attr('id') == 'coords-zoom') {
+          // if changing the zoom, plus or minus 1 will suffice
+          if ($(this).hasClass('down-btn')) {
+            this_val -= 1;
+          } else if ($(this).hasClass('up-btn')) {
+            this_val += 1;
+          }
+        } else {
+          // generate a number of degrees to pan
+          // based on the zoom level
+
+          let multiplier = 1;
+
+          if (zoom_val <= 10 && zoom_val >= 8) {
+            multiplier = 2;
+          } else if (zoom_val >= 5) {
+            multiplier = 4;
+          } else if (zoom_val < 5) {
+            multiplier = 8;
+          }
+
+          if ($(this).hasClass('down-2')) {
+            this_val -= 0.4 * multiplier;
+          } else if ($(this).hasClass('down-1')) {
+            this_val -= 0.1 * multiplier;
+          } else if ($(this).hasClass('up-1')) {
+            this_val += 0.1 * multiplier;
+          } else if ($(this).hasClass('up-2')) {
+            this_val += 0.4 * multiplier;
+          }
+        }
+
+        // update & trigger
+        this_input.val(this_val.toFixed(1)).trigger('change');
+      });
+
       item.on('change', '.coord-field', function () {
         // repopulate the hidden coords field
         $('[data-query-key="coords"]').val(
@@ -1028,6 +1069,10 @@
             ',' +
             $('#coords-zoom').val(),
         );
+
+        if (options.status != 'init') {
+          options.status = 'input';
+        }
 
         // trigger update event
         $(document).trigger('update_input', [$('[data-query-key="coords"]')]);

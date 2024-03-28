@@ -60,18 +60,50 @@
 				</div>
 					
 				<div id="map-control-coords" class="map-control-item">
-					<h6 class="all-caps text-secondary">Adjust Coordinates</h6>
+					<h6 class="all-caps text-secondary mb-3">Adjust Coordinates</h6>
 					
 					<input type="hidden" name="coords" id="coords" data-query-key="coords">
 					
-					<label for="coords-lat">Latitude</label>
-					<input type="text" class="form-control coord-field" name="coords-lat" id="coords-lat">
+					<div class="d-flex flex-wrap align-items-center">
+						<label for="coords-lat" class="form-label h6 all-caps text-gray-500 me-3"><?php _e ( 'Latitude', 'cdc' ); ?></label>
+						
+						<div class="input-group mb-3 border">
+							<button class="btn btn-sm btn-light p-2 down-btn down-2" type="button"><i class="fas fa-angle-double-down"></i></button>
+							
+							<button class="btn btn-sm btn-light p-2 down-btn down-1" type="button"><i class="fas fa-angle-down"></i></button>
+							
+							<input type="text" class="form-control coord-field text-center border-0" name="coords-lat" id="coords-lat">
+							
+							<button class="btn btn-sm btn-light p-2 up-btn up-1" type="button"><i class="fas fa-angle-up"></i></button>
+							
+							<button class="btn btn-sm btn-light p-2 up-btn up-2" type="button"><i class="fas fa-angle-double-up"></i></button>
+						</div>
+						
+						<label for="coords-lng" class="form-label h6 all-caps text-gray-500 me-3"><?php _e ( 'Longitude', 'cdc' ); ?></label>
+						
+						<div class="input-group mb-3 border">
+							<button class="btn btn-sm btn-light p-2 down-btn down-2" type="button"><i class="fas fa-angle-double-left"></i></button>
+							
+							<button class="btn btn-sm btn-light p-2 down-btn down-1" type="button"><i class="fas fa-angle-left"></i></button>
+							
+							<input type="text" class="form-control coord-field text-center border-0" name="coords-lng" id="coords-lng">
+							
+							<button class="btn btn-sm btn-light p-2 up-btn up-1" type="button"><i class="fas fa-angle-right"></i></button>
+							
+							<button class="btn btn-sm btn-light p-2 up-btn up-2" type="button"><i class="fas fa-angle-double-right"></i></button>
+						</div>
 					
-					<label for="coords-lng">Longitude</label>
-					<input type="text" class="form-control coord-field" name="coords-lng" id="coords-lng">
-					
-					<label for="coords-zoom">Zoom</label>
-					<input type="text" class="form-control coord-field" name="coords-zoom" id="coords-zoom">
+						<label for="coords-zoom" class="form-label h6 all-caps text-gray-500 me-3">Zoom</label>
+						
+						<div class="input-group mb-3 border w-50">
+							<button class="btn btn-sm btn-light p-2 down-btn down-1" type="button"><i class="fas fa-minus"></i></button>
+							
+							<input type="text" class="form-control coord-field text-center border-0" name="coords-zoom" id="coords-zoom">
+							
+							<button class="btn btn-sm btn-light p-2 up-btn up-1" type="button"><i class="fas fa-plus"></i></button>
+						</div>
+						
+					</div>
 				</div>
 			</div>
 		</div>

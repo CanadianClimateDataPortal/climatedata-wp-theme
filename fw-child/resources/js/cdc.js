@@ -95,6 +95,7 @@
       },
       choro: {
         data: {},
+        path: null,
       },
       maps: {},
       station_data: null,
@@ -386,7 +387,7 @@
           case 'era5landgrid':
             console.log('RASTER');
 
-            options.current_choro_path = null;
+            options.choro.path = null;
 
             plugin.maps.do_legend.apply(item, [
               query,
@@ -551,7 +552,7 @@
             let layer_data,
               marker_fill = query.var == 'weather-stations' ? '#f00' : '#00f';
 
-            options.current_choro_path = null;
+            options.choro.path = null;
 
             let get_layer_data = function (query_var) {
               console.log('get data', query_var);
@@ -710,11 +711,24 @@
               '&decimals=' +
               var_data.acf.decimals;
 
-            if (choro_path != options.current_choro_path) {
-              // choro path has changed,
+            // console.log('options.query');
+            // console.log(JSON.stringify(options.query, null, 4));
+            // console.log('query');
+            // console.log(JSON.stringify(query, null, 4));
+
+            let first_map = options.maps[Object.keys(options.maps)[0]];
+
+            if (
+              first_map.layers.grid == undefined ||
+              first_map.object.hasLayer(first_map.layers.grid) ||
+              !window.lodash.isEqual(query, options.query)
+            ) {
+              // grid layer doesn't exist yet
+              // or the query object has changed
+
               // get/update layer
 
-              options.current_choro_path = choro_path;
+              options.choro.path = choro_path;
 
               // console.log('do legend', query.var_id, query.var);
 
@@ -738,14 +752,14 @@
 
                   // each map
                   Object.keys(options.maps).forEach(function (key) {
-                    console.log(
-                      'get choro data',
-                      key,
-                      scenario_names[query.dataset][key]
-                        .replace(/[\W_]+/g, '')
-                        .toLowerCase(),
-                      query.sector,
-                    );
+                    // console.log(
+                    //   'get choro data',
+                    //   key,
+                    //   scenario_names[query.dataset][key]
+                    //     .replace(/[\W_]+/g, '')
+                    //     .toLowerCase(),
+                    //   query.sector,
+                    // );
 
                     let this_map = options.maps[key],
                       this_path = choro_path.replace(
@@ -801,7 +815,7 @@
                           // the grid layer already exists,
                           // so reset each feature
 
-                          console.log('reset features');
+                          // console.log('reset features');
 
                           for (
                             let i = 0;
@@ -818,7 +832,7 @@
                           ] = function (properties, zoom) {
                             let style_obj = {
                               weight: 1,
-                              color: 'white',
+                              color: '#fff',
                               fillColor: plugin.maps.get_color.apply(item, [
                                 options.choro.data[key][properties.id],
                               ]),

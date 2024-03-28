@@ -497,6 +497,57 @@ $legend-on-height: 16px;
   pointer-events: none;
 }
 
+// LOCATION VALUES
+
+#location-val-scenarios {
+  .btn {
+    padding: 0.25rem;
+    font-size: 0.75rem;
+    line-break: 0.875rem;
+  }
+
+  .btn-check:checked + .btn,
+  :not(.btn-check) + .btn:active,
+  .btn:first-child:active,
+  .btn.active,
+  .btn.show {
+    background-color: $gray-500;
+    color: $white;
+  }
+}
+
+#location-detail {
+  .value-table {
+    @include font-size(1.75rem);
+    font-weight: 500;
+  }
+
+  [data-scenario] {
+    display: none;
+  }
+
+  &:has(#location-val-scenario1:checked) {
+    [data-scenario='ssp126'],
+    [data-scenario='rcp26'] {
+      display: flex;
+    }
+  }
+
+  &:has(#location-val-scenario2:checked) {
+    [data-scenario='ssp245'],
+    [data-scenario='rcp45'] {
+      display: flex;
+    }
+  }
+
+  &:has(#location-val-scenario3:checked) {
+    [data-scenario='ssp585'],
+    [data-scenario='rcp85'] {
+      display: flex;
+    }
+  }
+}
+
 // CHARTS
 
 #chart-values-btns {

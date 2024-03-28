@@ -1623,7 +1623,7 @@
 
         settings.object = $(settings.container).find('.chart-object')[0];
 
-        console.log('CHART TIME');
+        console.log('CHART');
 
         let var_fields = settings.var_data.acf;
 
@@ -1723,6 +1723,11 @@
           }
         }
 
+        let decade_utc = Date.UTC(settings.query.decade),
+          delta_utc = Date.UTC(parseInt(settings.query.decade) + 1),
+          decade_vals = [],
+          delta_vals = [];
+
         scenarios.forEach(function (scenario) {
           if (settings.data['{0}_median'.format(scenario.name)].length > 0) {
             options.chart.series.push({
@@ -1756,7 +1761,115 @@
               },
             });
           }
+
+          console.log(
+            settings.data['30y_{0}_median'.format(scenario.name)],
+            settings.data['30y_{0}_median'.format(scenario.name)].length,
+          );
+
+          // find the median values for the queried decade
+
+          if (
+            Object.keys(settings.data['30y_{0}_median'.format(scenario.name)])
+              .length > 0
+          ) {
+            for (let timestamp in settings.data[
+              '30y_{0}_median'.format(scenario.name)
+            ]) {
+              if (parseInt(timestamp) == delta_utc)
+                decade_vals.push(
+                  settings.data['30y_{0}_median'.format(scenario.name)][
+                    timestamp
+                  ],
+                );
+            }
+          }
+
+          // find the delta values for the queried decade
+
+          if (
+            Object.keys(
+              settings.data['delta7100_{0}_median'.format(scenario.name)],
+            ).length > 0
+          ) {
+            for (let timestamp in settings.data[
+              'delta7100_{0}_median'.format(scenario.name)
+            ]) {
+              if (parseInt(timestamp) == delta_utc)
+                delta_vals.push(
+                  settings.data['delta7100_{0}_median'.format(scenario.name)][
+                    timestamp
+                  ],
+                );
+            }
+          }
         });
+
+        // console.log('decade', decade_vals);
+        // console.log('delta', delta_vals);
+
+        // change median header decade value
+        item
+          .find('#location-summary .location-value-median .decade')
+          .text(
+            parseInt(settings.query.decade) +
+              1 +
+              ' – ' +
+              (parseInt(settings.query.decade) + 30),
+          );
+
+        item.find('#location-summary .value-table').empty();
+
+        scenarios.forEach(function (scenario, i) {
+          // new row
+          let new_val_row = $(
+            '<div class="row" data-scenario="' + scenario.name + '">',
+          );
+
+          // median value
+          new_val_row.append(
+            '<div class="col-3-of-7">' +
+              decade_vals[i] +
+              ' ' +
+              options.chart.unit +
+              '</div>',
+          );
+
+          // delta value
+          let delta_icon = 'fa-caret-up text-primary',
+            delta_label = T('higher');
+
+          if (delta_vals[i] == 0) {
+            delta_icon = 'fa-equals';
+            delta_label = '';
+          } else if (delta_vals[i] < 0) {
+            delta_icon = 'fa-caret-down text-secondary';
+            delta_label = T('lower');
+            delta_vals[i] = Math.abs(delta_vals[i]);
+          }
+
+          new_val_row.append(
+            '<div class="col"><i class="fas ' +
+              delta_icon +
+              ' me-3"></i>' +
+              delta_vals[i] +
+              ' ' +
+              options.chart.unit +
+              ' ' +
+              delta_label +
+              '</div>',
+          );
+
+          new_val_row.appendTo(item.find('#location-summary .value-table'));
+        });
+
+        item
+          .find(
+            '#location-val-scenarios .btn-check[value="' +
+              settings.query.scenarios[0] +
+              '"]',
+          )
+          .trigger('click');
 
         // render the chart
 

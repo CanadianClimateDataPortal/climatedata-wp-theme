@@ -703,56 +703,64 @@
         // create zoomend/dragend events
         // for each map
 
-        options.maps[key].object.on('zoomend dragend', function (e) {
-          // console.log(e, this);
+        options.maps[key].object
+          .on('zoomend dragend', function (e) {
+            // console.log(e, this);
 
-          if (options.status != 'init') {
-            options.status = 'mapdrag';
-          }
+            if (options.status != 'init') {
+              options.status = 'mapdrag';
+            }
 
-          // update coord text fields
-          $('#coords-lat').val(this.getCenter().lat);
-          $('#coords-lng').val(this.getCenter().lng);
-          $('#coords-zoom').val(this.getZoom());
+            // update coord text fields
+            $('#coords-lat').val(this.getCenter().lat);
+            $('#coords-lng').val(this.getCenter().lng);
+            $('#coords-zoom').val(this.getZoom());
 
-          // update hidden coords field
-          $('[data-query-key="coords"]').val(
-            $('#coords-lat').val() +
-              ',' +
-              $('#coords-lng').val() +
-              ',' +
-              $('#coords-zoom').val(),
-          );
+            // update hidden coords field
+            $('[data-query-key="coords"]').val(
+              $('#coords-lat').val() +
+                ',' +
+                $('#coords-lng').val() +
+                ',' +
+                $('#coords-zoom').val(),
+            );
 
-          if (options.status == 'mapdrag') {
-            options.status = 'input';
-          }
+            if (options.status == 'mapdrag') {
+              options.status = 'input';
+            }
 
-          // console.log('moved map', options.status);
+            // console.log('moved map', options.status);
 
-          // simulate input event on coords field
-          $('#coords-lat').trigger('change');
+            // simulate input event on coords field
+            $('#coords-lat').trigger('change');
 
-          if (options.status != 'init') {
-            // update query value
-            $('[data-query-key="coords"]').each(function () {
-              $(document).cdc_app('query.update_value', options.query, {
-                item: $(this),
-                key: 'coords',
-                val: $(this).val(),
+            if (options.status != 'init') {
+              // update query value
+              $('[data-query-key="coords"]').each(function () {
+                $(document).cdc_app('query.update_value', options.query, {
+                  item: $(this),
+                  key: 'coords',
+                  val: $(this).val(),
+                });
               });
-            });
-          }
+            }
 
-          // update query string
-          options.query_str.prev = options.query_str.current;
+            // update query string
+            options.query_str.prev = options.query_str.current;
 
-          options.query_str.current = $(document).cdc_app(
-            'query.obj_to_url',
-            options.query,
-            'replace',
-          );
-        });
+            options.query_str.current = $(document).cdc_app(
+              'query.obj_to_url',
+              options.query,
+              'replace',
+            );
+
+            // hide the zoom alert
+          })
+          .on('zoomend', function (e) {
+            if (this.getZoom() >= 7) {
+              item.find('#zoom-alert').fadeOut(250);
+            }
+          });
       }
 
       //

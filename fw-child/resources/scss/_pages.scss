@@ -734,6 +734,19 @@ $legend-on-height: 16px;
   }
 }
 
+#zoom-alert {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-left: calc((calc(100vw / 16) * 3) / 2);
+  padding: 0.5rem 1rem;
+  background-color: transparentize($white, 0.5);
+  text-shadow: 0 1px transparentize($white, 0.2);
+  font-size: 1.25rem;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+}
+
 body.tab-drawer-open {
   #map-breadcrumb {
     transition: left 0.25s ease 0s;

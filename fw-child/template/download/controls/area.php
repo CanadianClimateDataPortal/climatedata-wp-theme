@@ -41,7 +41,7 @@
 					<h6 class="all-caps text-secondary"><?php _e ( 'Change Aggregation', 'cdc' ); ?></h6>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-grid" value="canadagrid" data-query-key="sector" data-conditional="#area-aggregation-select-mode">
+						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-grid" value="gridded_data" data-query-key="sector" data-conditional="#area-aggregation-select-mode">
 						<label class="form-check-label" for="area-aggregation-grid"><?php _e ( 'Gridded Data', 'cdc' ); ?></label>
 					</div>
 					

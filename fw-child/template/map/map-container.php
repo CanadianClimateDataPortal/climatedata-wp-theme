@@ -13,13 +13,13 @@
 			<p class="mb-4"><?php _e ( 'Explore maps and charts of climate data. Click on the Data tab on the left to access different variables. Do a location search or zoom in to visualize time series charts.', 'cdc' ); ?></p>
 			
 			<div class="map-overlay-btns d-flex">
-				<button class="btn btn-sm bg-opacity-20 text-light rounded-pill me-3"><?php _e ( 'How to use this page', 'cdc' ); ?></button>
+				<button id="page-tour-start" class="btn btn-sm bg-opacity-20 text-light rounded-pill me-3"><?php _e ( 'How to use this page', 'cdc' ); ?></button>
 				
 				<button type="button" class="btn btn-sm bg-opacity-20 text-light rounded-pill me-3" data-bs-dismiss="offcanvas" aria-label="Close"><?php _e ( 'Dismiss', 'cdc' ); ?></button>
 				
 				<div class="form-check form-switch">
-					<input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-					<label class="form-check-label" for="flexSwitchCheckDefault"><?php _e ( 'Don’t show again', 'cdc' ); ?></label>
+					<input class="form-check-input" type="checkbox" role="switch" id="map-overlay-dontshow">
+					<label class="form-check-label" for="map-overlay-dontshow"><?php _e ( 'Don’t show again', 'cdc' ); ?></label>
 				</div>
 			</div>
 		</div>

@@ -196,15 +196,12 @@
       item.on('click', '.map-zoom-btn', function (e) {
         // get the first visible map object
 
-        let first_map = null;
-
-        for (let key in options.maps) {
-          if (first_map == null && options.maps[key].container.is(':visible')) {
-            first_map = options.maps[key];
-          }
-        }
-
-        let current_zoom = first_map.object.getZoom(),
+        let first_visible = item
+            .find('.map-panel:not(.hidden)')
+            .first()
+            .attr('data-map-key'),
+          first_map = options.maps[first_visible],
+          current_zoom = first_map.object.getZoom(),
           new_zoom = current_zoom + 1;
 
         if ($(this).hasClass('zoom-out')) {
@@ -212,6 +209,32 @@
         }
 
         first_map.object.setZoom(new_zoom);
+      });
+
+      // click map
+
+      item.find('#map-objects').on('mouseup', function (e) {
+        let first_visible = item
+            .find('.map-panel:not(.hidden)')
+            .first()
+            .attr('data-map-key'),
+          first_map = options.maps[first_visible];
+
+        // if the map is zoomed out too far
+        // to show the grid layer
+
+        if (options.current_sector == 'gridded_data') {
+          console.log(options.grid.leaflet.minZoom);
+
+          if (first_map.object.getZoom() < options.grid.leaflet.minZoom) {
+            // show the zoom alert
+            item.find('#zoom-alert').fadeIn(250, function () {
+              setTimeout(function () {
+                item.find('#zoom-alert').fadeOut(250);
+              }, 2000);
+            });
+          }
+        }
       });
 
       //
@@ -713,8 +736,8 @@
               '&decimals=' +
               var_data.acf.decimals;
 
-            console.log('delta', query.delta);
-            console.log(choro_path);
+            // console.log('delta', query.delta);
+            // console.log(choro_path);
 
             let first_map = options.maps[Object.keys(options.maps)[0]];
 

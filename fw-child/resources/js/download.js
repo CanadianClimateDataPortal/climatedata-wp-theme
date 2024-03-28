@@ -46,7 +46,7 @@
         frequency: 'YS',
         scenarios: ['medium'],
         decade: 2040,
-        sector: 'canadagrid',
+        sector: 'gridded_data',
         scheme: 'default',
         scheme_type: 'discrete',
         start_year: 1950,
@@ -752,7 +752,7 @@
             }
           }
 
-          if (options.query.sector != 'canadagrid' && selections.length > 1) {
+          if (options.query.sector != 'gridded_data' && selections.length > 1) {
             style_obj.color = '#fff';
 
             selections.forEach(function (selection, i) {

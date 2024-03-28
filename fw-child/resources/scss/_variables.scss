@@ -557,7 +557,7 @@ $border-radius-pill:          50rem !default;
 // scss-docs-end border-radius-variables
 
 // scss-docs-start box-shadow-variables
-$box-shadow:                  0 .5rem 1rem rgba(var(--#{$prefix}body-color-rgb), .15) !default;
+$box-shadow:                  0 .5rem 1rem rgba(var(--#{$prefix}body-color-rgb), .25);
 $box-shadow-sm:               0 .125rem .25rem rgba(var(--#{$prefix}body-color-rgb), .075) !default;
 $box-shadow-lg:               0 1rem 3rem rgba(var(--#{$prefix}body-color-rgb), .175) !default;
 $box-shadow-inset:            inset 0 1px 2px rgba(var(--#{$prefix}body-color-rgb), .075) !default;
@@ -1116,7 +1116,7 @@ $zindex-offcanvas:                  1045 !default;
 $zindex-modal-backdrop:             1050 !default;
 $zindex-modal:                      1055 !default;
 $zindex-popover:                    1070 !default;
-$zindex-tooltip:                    1080 !default;
+$zindex-tooltip:                    999;
 $zindex-toast:                      1090 !default;
 // scss-docs-end zindex-stack
 
@@ -1401,24 +1401,24 @@ $form-feedback-tooltip-border-radius: $tooltip-border-radius !default;
 // Popovers
 
 // scss-docs-start popover-variables
-$popover-font-size:                 $font-size-sm !default;
-$popover-bg:                        var(--#{$prefix}body-bg) !default;
+$popover-font-size:                 0.875rem;
+$popover-bg:                        transparentize($dark, 0.1);
 $popover-max-width:                 276px !default;
-$popover-border-width:              var(--#{$prefix}border-width) !default;
+$popover-border-width:              0px;
 $popover-border-color:              var(--#{$prefix}border-color-translucent) !default;
-$popover-border-radius:             var(--#{$prefix}border-radius-lg) !default;
+$popover-border-radius:             0px;
 $popover-inner-border-radius:       calc($popover-border-radius - $popover-border-width) !default; // stylelint-disable-line function-disallowed-list
 $popover-box-shadow:                $box-shadow !default;
 
 $popover-header-font-size:          $font-size-base !default;
 $popover-header-bg:                 var(--#{$prefix}secondary-bg) !default;
-$popover-header-color:              $headings-color !default;
+$popover-header-color:              $white;
 $popover-header-padding-y:          .5rem !default;
 $popover-header-padding-x:          $spacer !default;
 
-$popover-body-color:                var(--#{$prefix}body-color) !default;
-$popover-body-padding-y:            $spacer !default;
-$popover-body-padding-x:            $spacer !default;
+$popover-body-color:                $white;
+$popover-body-padding-y:            $spacer * 0.75;
+$popover-body-padding-x:            $spacer * 0.75;
 
 $popover-arrow-width:               1rem !default;
 $popover-arrow-height:              .5rem !default;

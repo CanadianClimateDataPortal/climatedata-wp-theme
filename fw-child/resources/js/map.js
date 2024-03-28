@@ -57,18 +57,19 @@
       },
       query: {
         coords: [62.51231793838694, -98.48144531250001, 4],
-        delta: '',
         dataset: 'cmip6',
-        var_id: null,
-        var: null,
-        frequency: 'ann',
-        scenarios: ['high'],
         decade: 2040,
-        sector: 'canadagrid',
+        delta: '',
+        frequency: 'ann',
+        opacity: [100, 100, 100],
+        scenarios: ['high'],
+        sector: 'gridded_data',
         selections: [],
         station: [],
         scheme: 'default',
         scheme_type: 'discrete',
+        var: null,
+        var_id: null,
       },
       query_str: {
         prev: '',
@@ -398,17 +399,42 @@
 
       // opacity
 
-      item.find('.opacity-slider').slider({
-        min: 0,
-        max: 100,
-        value: 100,
-        step: 1,
-        slide: function (e, ui) {
-          plugin._opacity_slider_change($(this), e, ui);
-        },
-        change: function (e, ui) {
-          plugin._opacity_slider_change($(this), e, ui);
-        },
+      item.find('.opacity-slider').each(function (i) {
+        $(this).slider({
+          min: 0,
+          max: 100,
+          value: options.query.opacity[i],
+          step: 1,
+          create: function (e, ui) {
+            plugin._opacity_slider_change($(this), e, options.query.opacity[i]);
+          },
+          slide: function (e, ui) {
+            options.status = 'slide';
+            plugin._opacity_slider_change($(this), e, ui.value);
+          },
+          change: function (e, ui) {
+            plugin._opacity_slider_change($(this), e, ui.value);
+
+            // update hidden input
+            let input_val = $.map(
+              item.find('.opacity-slider'),
+              function (slider_item) {
+                return $(slider_item).slider('value');
+              },
+            );
+
+            console.log('opacity val', input_val.join(','));
+
+            item.find('[data-query-key="opacity"]').val(input_val.join(','));
+
+            if (options.status == 'input') {
+              item.find('[data-query-key="opacity"]').trigger('change');
+            }
+          },
+          stop: function (e, ui) {
+            options.status = 'input';
+          },
+        });
       });
 
       // SELECT2
@@ -622,16 +648,16 @@
       );
     },
 
-    _opacity_slider_change: function (slider, e, ui) {
+    _opacity_slider_change: function (slider, e, value) {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
 
       // set handle text
-      slider.find('.ui-slider-handle').text(ui.value);
+      slider.find('.ui-slider-handle').text(value);
 
       let this_pane = slider.attr('data-pane');
-      options.legend.opacity = ui.value / 100;
+      options.legend.opacity = value / 100;
 
       // always set the given pane opacity
       // so it's consistent if we switch sectors
@@ -656,12 +682,7 @@
           .css('opacity', options.legend.opacity);
       }
 
-      if (
-        this_pane == 'raster' &&
-        options.query.sector != 'canadagrid' &&
-        options.query.sector != 'canadagrid1deg' &&
-        options.query.sector != 'era5landgrid'
-      ) {
+      if (this_pane == 'raster' && options.query.sector != 'gridded_data') {
         // if this is the 'data' slider, and
         // we're looking at a sector layer
         // adjust the grid pane
@@ -774,11 +795,7 @@
                 options.query.dataset;
 
               // adjust for grid
-              if (
-                options.query.sector == 'canadagrid' ||
-                options.query.sector == 'canadagrid1deg' ||
-                options.query.sector == 'era5landgrid'
-              ) {
+              if (options.query.sector == 'gridded_data') {
                 endpoint =
                   'get-delta-30y-gridded-values/' +
                   mouse_event.latlng['lat'] +
@@ -824,11 +841,7 @@
                   if (status !== 'abort') {
                     let tip = [];
 
-                    if (
-                      options.query.sector !== 'canadagrid' &&
-                      options.query.sector !== 'canadagrid' &&
-                      options.query.sector !== 'era5landgrid'
-                    ) {
+                    if (options.query.sector !== 'gridded_data') {
                       tip.push(
                         mouse_event.layer.properties[l10n_labels.label_field] +
                           '<br>',
@@ -1072,13 +1085,13 @@
       // change an input with a query key
 
       item.on('change', ':input[data-query-key]', function () {
-        console.log(
-          'change input',
-          $(this).attr('data-query-key'),
-          options.query[$(this).attr('data-query-key')] +
-            ' -> ' +
-            $(this).val(),
-        );
+        // console.log(
+        //   'change input',
+        //   $(this).attr('data-query-key'),
+        //   options.query[$(this).attr('data-query-key')] +
+        //     ' -> ' +
+        //     $(this).val(),
+        // );
 
         if ($(this).val() != options.query[$(this).attr('data-query-key')]) {
           if (
@@ -1372,11 +1385,7 @@
         case 'sector':
           item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
 
-          if (
-            this_val != 'canadagrid' &&
-            this_val != 'canadagrid1deg' &&
-            this_val != 'era5landgrid'
-          ) {
+          if (this_val != 'gridded_data') {
             item
               .find('.leaflet-pane.leaflet-grid-pane')
               .css('opacity', $('#display-data-slider').slider('value') / 100);
@@ -1552,57 +1561,60 @@
           if (this_input.is('[type="hidden"]')) {
             // hidden input
             // likely controlled by some other UX element
+            // console.log(query[key]);
 
             this_input.val(query[key]);
 
-            // var ID
-            if (key == 'var_id') {
-              plugin.update_var(query[key], status);
-            }
+            switch (key) {
+              case 'var_id':
+                // var ID
+                plugin.update_var(query[key], status);
+                break;
 
-            // decade
-            if (key == 'decade') {
-              // update UI slider
-              options.elements.decade_slider.slider(
-                'value',
-                parseInt(query[key]),
-              );
-            }
+              // decade
+              case 'decade':
+                // update UI slider
+                options.elements.decade_slider.slider(
+                  'value',
+                  parseInt(query[key]),
+                );
+                break;
 
-            // colour scheme
-            if (key == 'scheme') {
-              // update colour scheme dropdown
-              plugin.update_scheme();
-            }
+              // colour scheme
+              case 'scheme':
+                // update colour scheme dropdown
+                plugin.update_scheme();
+                break;
 
-            // location
-            if (key == 'location') {
-              if (query[key] != '') {
-                console.log('get location ' + query[key]);
+              // location
+              case 'location':
+                if (query[key] != '') {
+                  console.log('get location ' + query[key]);
 
-                $.ajax({
-                  url: ajax_data.url,
-                  dataType: 'json',
-                  data: {
-                    action: 'cdc_get_location_by_id',
-                    lang: options.lang,
-                    loc: query[key],
-                  },
-                  success: function (data) {
-                    let open_location = false;
+                  $.ajax({
+                    url: ajax_data.url,
+                    dataType: 'json',
+                    data: {
+                      action: 'cdc_get_location_by_id',
+                      lang: options.lang,
+                      loc: query[key],
+                    },
+                    success: function (data) {
+                      let open_location = false;
 
-                    if (window.location.hash == '#location-detail') {
-                      open_location = true;
-                    }
+                      if (window.location.hash == '#location-detail') {
+                        open_location = true;
+                      }
 
-                    plugin.set_location(
-                      { lat: data.lat, lng: data.lng },
-                      null,
-                      open_location,
-                    );
-                  },
-                });
-              }
+                      plugin.set_location(
+                        { lat: data.lat, lng: data.lng },
+                        null,
+                        open_location,
+                      );
+                    },
+                  });
+                }
+                break;
             }
           } else if (this_input.is('[type="radio"]')) {
             // radio
@@ -1708,7 +1720,7 @@
           // update var_data
           options.var_data = data;
 
-          if (typeof options.var_data.acf.var_names != 'undefined') {
+          if (typeof data.acf.var_names != 'undefined') {
             if (status != 'init' && status != 'eval') {
               // update var in options.query
               options.query.var = options.var_data.acf.var_names[0].variable;
@@ -1724,166 +1736,10 @@
         });
       }
 
-      // always do this stuff
-      // console.log(options.var_data);
-
-      // ADJUST CONTROLS BY VAR SETTINGS
-
-      // fields var
       fields = options.var_data.acf;
 
-      // console.log('fields');
-      // console.log(fields);
-
-      // dataset availability
-      item.find('#map-control-dataset .btn-check').prop('disabled', false);
-
-      item.find('#map-control-dataset .btn-check').each(function () {
-        if (!fields.dataset_availability.includes($(this).val())) {
-          $(this).prop('disabled', true);
-
-          if ($(this).prop('checked') == true) {
-            $(this).prop('checked', false);
-          }
-        }
-      });
-
-      if (!item.find('#map-control-dataset :checked').length) {
-        // nothing is checked
-        // find the first enabled input and check it
-
-        item
-          .find('#map-control-dataset .btn-check:not([disabled])')
-          .first()
-          .prop('checked', true)
-          .trigger('change');
-      }
-
-      // decade & threshold slider
-
       if (typeof fields.var_names != 'undefined') {
-        // decade min/max
-
-        options.elements.decade_slider.slider(
-          'option',
-          'min',
-          fields.time_slider_min_value,
-        );
-
-        options.elements.decade_slider.slider(
-          'option',
-          'max',
-          fields.time_slider_max_value,
-        );
-
-        // slider min/max labels
-
-        item.find('#decade-slider-min').text(fields.time_slider_min_value);
-        item.find('#decade-slider-max').text(fields.time_slider_max_value + 30);
-
-        // validate slider value
-
-        if (
-          options.elements.decade_slider.slider('value') >
-          fields.time_slider_max_value
-        ) {
-          options.elements.decade_slider.slider(
-            'value',
-            fields.time_slider_max_value,
-          );
-        }
-
-        if (
-          options.elements.decade_slider.slider('value') <
-          fields.time_slider_min_value
-        ) {
-          options.elements.decade_slider.slider(
-            'value',
-            fields.time_slider_min_value,
-          );
-        }
-
-        if (fields.var_names.length > 1) {
-          options.var_flags.threshold = true;
-
-          // multiple vars
-
-          if (options.elements.threshold_slider != null) {
-            options.elements.threshold_slider
-              .off('slide')
-              .off('change')
-              .off('stop');
-
-            options.elements.threshold_slider.slider('destroy');
-          }
-
-          options.elements.threshold_slider = item
-            .find('#threshold-slider')
-            .slider({
-              min: 0,
-              max: fields.var_names.length - 1,
-              step: 1,
-              create: function () {
-                // console.log('threshold slider', 'create');
-              },
-              slide: function (e, ui) {
-                // update the hidden input/query
-
-                options.status = 'slide';
-
-                $(this)
-                  .find('.ui-slider-handle')
-                  .text(fields.var_names[ui.value].label);
-
-                let clone_query = { ...options.query };
-
-                clone_query.var = fields.var_names[ui.value].variable;
-
-                options.query_str.current = $(document).cdc_app('query.eval', {
-                  query: clone_query,
-                  do_history: 'none',
-                  callback: function () {
-                    console.log('threshold get_layer');
-                    $(document).cdc_app(
-                      'maps.get_layer',
-                      clone_query,
-                      options.var_data,
-                    );
-                  },
-                });
-              },
-              change: function (e, ui) {
-                hidden_input
-                  .val(fields.var_names[ui.value].variable)
-                  .trigger('change');
-              },
-              stop: function (e, ui) {
-                // if (status != 'init') {
-                options.status = 'input';
-                // }
-              },
-            });
-
-          // find out which index of the var_names array
-          // is the field's value
-
-          // console.log('find ' + options.query.var + ' in var_data');
-
-          fields.var_names.forEach(function (var_name, i) {
-            if (Object.values(var_name).includes(options.query.var)) {
-              // console.log(i, var_name);
-
-              options.elements.threshold_slider.slider('option', 'value', i);
-
-              // set handle text
-              options.elements.threshold_slider
-                .find('.ui-slider-handle')
-                .text(fields.var_names[i].label);
-            }
-          });
-        }
-
-        // set breadcrumb & overlay content
+        // set breadcrumb title
 
         item
           .find('#breadcrumb-variable')
@@ -1892,6 +1748,8 @@
               ? options.var_data.meta.title_fr
               : options.var_data.title.rendered,
           );
+
+        // populate var info overlay
 
         let desc_key = 'var_description' + (options.lang != 'en' ? '_fr' : ''),
           tech_key =
@@ -1902,25 +1760,17 @@
           .find('#info-tech-description')
           .html(options.var_data.acf[tech_key]);
 
-        // update frequency select
-        plugin.update_frequency();
-
-        // set 'sector' parameter to stations
-        // if the var has that term
+        // if the var is station data
         if (options.var_data.var_types.includes('Station Data')) {
+          // set 'sector' parameter
           options.query.sector = 'station';
+          // set flag
           options.var_flags.station = true;
-        } else {
-          // options.query.sector = item
-          // .find('[data-query-key="sector"]:checked')
-          // .val();
         }
 
         // SET CONTROLS
 
-        plugin.set_controls();
-
-        // ADJUST CONTROLS FOR INDIVIDUAL VARS
+        plugin.set_controls(fields);
 
         if (typeof callback == 'function') {
           callback(data);
@@ -1928,21 +1778,21 @@
       }
     },
 
-    set_controls: function () {
+    set_controls: function (fields) {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
 
+      console.log('SET CONTROLS');
+
+      // VAR FLAGS
+
+      // console.log('flags', options.var_flags);
+
       let items_to_hide = [],
         items_to_show = [];
 
-      // SHOW / HIDE CONTROLS
-
       item.find('[data-display]').each(function () {
-        // console.log('item', $(this));
-
-        // console.log($(this).attr('data-display').split(','));
-
         let condition_met = false;
 
         // each condition
@@ -1950,9 +1800,7 @@
           .attr('data-display')
           .split(',')
           .forEach(function (condition) {
-            // console.log('condition', condition);
-
-            // split
+            // split key & val
             let split_attr = condition.split(':');
             split_attr[1] = split_attr[1] == '1' ? true : false;
 
@@ -1971,54 +1819,241 @@
         }
       });
 
+      // ADJUST FOR VAR DETAIL FIELDS
+
+      // console.log('acf', fields);
+
+      // DATA TAB
+
+      // thresholds
+
+      if (
+        typeof fields.var_names != 'undefined' &&
+        fields.var_names.length > 1
+      ) {
+        // variable has thresholds
+
+        // set var_flag
+        options.var_flags.threshold = true;
+
+        // destroy the existing slider
+        if (options.elements.threshold_slider != null) {
+          options.elements.threshold_slider
+            .off('slide')
+            .off('change')
+            .off('stop');
+
+          options.elements.threshold_slider.slider('destroy');
+        }
+
+        // reinit with current settings
+
+        options.elements.threshold_slider = item
+          .find('#threshold-slider')
+          .slider({
+            min: 0,
+            max: fields.var_names.length - 1,
+            step: 1,
+            slide: function (e, ui) {
+              // update the hidden input/query
+
+              options.status = 'slide';
+
+              $(this)
+                .find('.ui-slider-handle')
+                .text(fields.var_names[ui.value].label);
+
+              let clone_query = { ...options.query };
+
+              clone_query.var = fields.var_names[ui.value].variable;
+
+              options.query_str.current = $(document).cdc_app('query.eval', {
+                query: clone_query,
+                do_history: 'none',
+                callback: function () {
+                  console.log('threshold get_layer');
+                  $(document).cdc_app(
+                    'maps.get_layer',
+                    clone_query,
+                    options.var_data,
+                  );
+                },
+              });
+            },
+            change: function (e, ui) {
+              item
+                .find('[data-query-key="var"]')
+                .val(fields.var_names[ui.value].variable)
+                .trigger('change');
+            },
+            stop: function (e, ui) {
+              options.status = 'input';
+            },
+          });
+
+        // find out which index of the var_names array
+        // is the field's value
+
+        fields.var_names.forEach(function (var_name, i) {
+          if (Object.values(var_name).includes(options.query.var)) {
+            options.elements.threshold_slider.slider('option', 'value', i);
+
+            // set handle text
+            options.elements.threshold_slider
+              .find('.ui-slider-handle')
+              .text(fields.var_names[i].label);
+          }
+        });
+      }
+
+      // dataset
+
+      // enable all
+      item.find('#map-control-dataset .btn-check').prop('disabled', false);
+
+      item.find('#map-control-dataset .btn-check').each(function () {
+        // dataset isn't available to the variable
+        if (!fields.dataset_availability.includes($(this).val())) {
+          $(this).prop('disabled', true);
+
+          if ($(this).prop('checked') == true) $(this).prop('checked', false);
+        }
+      });
+
+      if (!item.find('#map-control-dataset :checked').length) {
+        // nothing is checked
+        // find the first enabled input and check it
+
+        item
+          .find('#map-control-dataset .btn-check:not([disabled])')
+          .first()
+          .prop('checked', true)
+          .trigger('change');
+      }
+
+      // frequency
+      // fields.timestep
+      // checkboxes - Annual, Monthly, 2QS-APR, QS-DEC (Seasonal), Daily
+
+      plugin.update_frequency();
+
+      // DISPLAY TAB
+
+      // delta
+      // fields.hasdelta
+      // true/false
+
+      if (fields.hasdelta == true) {
+        // delta is available to the variable
+        // enable all
+        item
+          .find('#map-control-delta .form-check-input')
+          .prop('disabled', false);
+      } else {
+        // no delta, select 'absolute' and disable
+        item
+          .find('#display-delta-absolute')
+          .prop('checked', true)
+          .trigger('change');
+
+        item
+          .find('#map-control-delta .form-check-input')
+          .prop('disabled', true);
+      }
+
+      // aggregration
+      // fields.availability
+      // checkboxes - grid/census/health/watershed
+
+      // enable all
+      item
+        .find('#map-control-aggregation .form-check-input')
+        .prop('disabled', false);
+
+      item.find('#map-control-aggregation .form-check-input').each(function () {
+        // sector isn't available to the variable
+        if (!fields.availability.includes($(this).val())) {
+          $(this).prop('disabled', true);
+
+          if ($(this).prop('checked') == true) $(this).prop('checked', false);
+        }
+      });
+
+      if (!item.find('#map-control-aggregation :checked').length) {
+        // nothing is checked
+        // find the first enabled input and check it
+
+        item
+          .find('#map-control-aggregation .form-check-input:not([disabled])')
+          .first()
+          .prop('checked', true)
+          .trigger('change');
+      }
+
+      // colour scheme
+
+      // DECADE SLIDER
+
+      // set min/max
+
+      options.elements.decade_slider.slider(
+        'option',
+        'min',
+        fields.time_slider_min_value,
+      );
+
+      options.elements.decade_slider.slider(
+        'option',
+        'max',
+        fields.time_slider_max_value,
+      );
+
+      // slider min/max labels
+
+      item.find('#decade-slider-min').text(fields.time_slider_min_value);
+      item.find('#decade-slider-max').text(fields.time_slider_max_value + 30);
+
+      // validate slider value
+
+      if (
+        options.elements.decade_slider.slider('value') >
+        fields.time_slider_max_value
+      ) {
+        options.elements.decade_slider.slider(
+          'value',
+          fields.time_slider_max_value,
+        );
+      }
+
+      if (
+        options.elements.decade_slider.slider('value') <
+        fields.time_slider_min_value
+      ) {
+        options.elements.decade_slider.slider(
+          'value',
+          fields.time_slider_min_value,
+        );
+      }
+
+      // ADJUST CONTROLS FOR INDIVIDUAL VARS
+
       // building climate zones
+      // todo: add field to var data to allow/disallow colour schemes
 
-      switch (options.var_data.acf.var_names[0].variable) {
-        case 'building_climate_zones':
-          // set & disable aggregation
-          item
-            .find('#display-aggregation-grid')
-            .prop('checked', true)
-            .trigger('change');
-
-          item
-            .find(':input[name="display-aggregation"]')
-            .prop('disabled', true);
-
-          // set & disable colour schemes
-          item
-            .find('[data-query-key="scheme"]')
-            .val('default')
-            .trigger('change');
-          item
-            .find('#display-scheme-select .dropdown-toggle')
-            .prop('disabled', true);
-
-          // set & disable absolute/delta
-          // todo: change this so it disables when any var's hasdelta field is false
-          item
-            .find('#display-values-absolute')
-            .prop('checked', true)
-            .trigger('change');
-          item.find(':input[name="display-values"]').prop('disabled', true);
-
-          break;
-        default:
-          item
-            .find(':input[name="display-aggregation"]')
-            .prop('disabled', false);
-
-          item
-            .find('#display-scheme-select .dropdown-toggle')
-            .prop('disabled', false);
-
-          item.find(':input[name="display-values"]').prop('disabled', false);
+      if (
+        options.var_data.acf.var_names[0].variable == 'building_climate_zones'
+      ) {
+        // set & disable colour schemes
+        item.find('[data-query-key="scheme"]').val('default').trigger('change');
+        item
+          .find('#display-scheme-select .dropdown-toggle')
+          .prop('disabled', true);
       }
 
       // console.log('---');
     },
 
-    update_frequency: function (var_name) {
+    update_frequency: function () {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
@@ -2242,6 +2277,7 @@
       // enable/disable discrete/continuous
 
       if (selected_item.hasClass('default')) {
+        discrete_btns.first().trigger('click');
         discrete_btns.addClass('disabled');
       } else {
         discrete_btns.removeClass('disabled');
@@ -2419,15 +2455,19 @@
 
       let get_location_data = function (coords, location_data) {
         switch (options.query.sector) {
-          case 'canadagrid':
-          case 'canadagrid1deg':
-          case 'era5landgrid':
+          case 'gridded_data':
             console.log('grid', coords);
 
-            feature_id =
-              feature_id == null
-                ? location_data.layer.properties.gid
-                : feature_id;
+            if (
+              feature_id == null &&
+              location_data != null &&
+              typeof location_data == 'object'
+            ) {
+              if (location_data.hasOwnProperty('layer')) {
+                console.log(location_data);
+                feature_id = location_data.layer.properties.gid;
+              }
+            }
 
             zoom_level = 10;
 
@@ -2453,18 +2493,22 @@
           default:
             console.log('sector', location_data);
 
-            feature_id =
-              feature_id == null
-                ? location_data.layer.properties.id
-                : feature_id;
-
-            return {
+            let location_obj = {
               lat: coords.lat,
               lng: coords.lng,
               coords: [coords.lat, coords.lng],
-              geo_name: location_data.layer.properties.label_en,
-              title: location_data.layer.properties.label_en,
+              geo_name: 'Point',
+              title: 'Point (' + coords.lat + ', ' + coords.lng + ')',
             };
+
+            if (feature_id == null && typeof location_data == 'object') {
+              feature_id = location_data.layer.properties.gid;
+
+              location_obj.geo_name = location_data.layer.properties.label_en;
+              location_obj.title = location_data.layer.properties.label_en;
+            }
+
+            return location_obj;
         }
       };
 
@@ -2475,6 +2519,7 @@
           console.log(location);
 
           // add marker
+
           $(document).cdc_app(
             'maps.add_marker',
             location,

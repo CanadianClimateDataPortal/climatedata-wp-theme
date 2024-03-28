@@ -8,7 +8,7 @@
 			
 			<div class="control-tab-body">
 				
-				<div id="map-control-values" class="map-control-item" data-display="station:0">
+				<div id="map-control-delta" class="map-control-item" data-display="station:0">
 					<h6 class="all-caps text-secondary mb-3 d-flex align-items-center">
 						<?php _e ( 'Data Values', 'cdc' ); ?>
 						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
@@ -16,13 +16,13 @@
 					
 					<div class="d-flex flex-wrap">
 						<div class="form-check me-3">
-							<input class="form-check-input" type="radio" name="display-values" id="display-values-absolute" value="" checked data-query-key="delta">
-							<label class="form-check-label" for="display-values-absolute"><?php _e ( 'Absolute', 'cdc' ); ?></label>
+							<input class="form-check-input" type="radio" name="display-delta" id="display-delta-absolute" value="" checked data-query-key="delta">
+							<label class="form-check-label" for="display-delta-absolute"><?php _e ( 'Absolute', 'cdc' ); ?></label>
 						</div>
 						
 						<div class="form-check">
-							<input class="form-check-input" type="radio" name="display-values" id="display-values-delta" value="true" data-query-key="delta">
-							<label class="form-check-label" for="display-values-delta"><?php _e ( 'Delta vs. Baseline', 'cdc' ); ?></label>
+							<input class="form-check-input" type="radio" name="display-delta" id="display-delta-delta" value="true" data-query-key="delta">
+							<label class="form-check-label" for="display-delta-delta"><?php _e ( 'Delta vs. Baseline', 'cdc' ); ?></label>
 						</div>
 					</div>
 				</div>
@@ -34,7 +34,7 @@
 					</h6>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-grid" value="canadagrid" checked data-query-key="sector">
+						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-grid" value="gridded_data" checked data-query-key="sector">
 						<label class="form-check-label" for="display-aggregation-grid"><?php _e ( 'Gridded Data', 'cdc' ); ?></label>
 					</div>
 					
@@ -160,6 +160,8 @@
 					<h6 class="text-secondary mb-3"><?php _e ( 'Layer Opacity', 'cdc' ); ?></h6>
 					
 					<h6 class="text-gray-600"><?php _e ( 'Data', 'cdc' ); ?></h6>
+					
+					<input type="hidden" name="display-opacity" id="display-opacity" data-query-key="opacity" value="100,100,100">
 					
 					<div class="map-control-slider-well mb-4">
 						<div id="display-data-slider" class="map-control-slider opacity-slider" data-pane="raster">

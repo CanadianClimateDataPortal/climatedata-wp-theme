@@ -169,12 +169,10 @@
             // if it's not set, grab the 'default' variable
 
             $.ajax({
-              url: ajax_data.url,
+              url: ajax_data.rest_url + 'cdc/v2/get_default_var/',
               type: 'GET',
+              dataType: 'json',
               async: false,
-              data: {
-                action: 'cdc_get_default_var',
-              },
               success: function (data) {
                 if (data != null) {
                   // set the var_id

@@ -23,6 +23,7 @@ const $ = jQuery;
       // help overlay
 
       let help_overlay = bootstrap.Offcanvas.getOrCreateInstance('#help');
+      let info_overlay = bootstrap.Offcanvas.getOrCreateInstance('#info');
 
       console.log('cookie', Cookies.get('cdc-map-dismiss-help'));
 
@@ -64,9 +65,10 @@ const $ = jQuery;
         default_open: false,
       });
 
-      $('#page-tour-start').click(function () {
+      $('.page-tour-start').click(function () {
         // reset page to initial view
-        help_overlay.toggle();
+        help_overlay.hide();
+        info_overlay.hide();
         $('#control-bar').tab_drawer('update_path', '#');
 
         // start

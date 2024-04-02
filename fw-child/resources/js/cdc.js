@@ -759,7 +759,6 @@
 
               options.choro.path = choro_path;
 
-              console.log('do legend now');
               plugin.maps.do_legend.apply(item, [
                 query,
                 var_data,
@@ -972,7 +971,7 @@
           item = plugin.item,
           options = plugin.options;
 
-        console.log('do legend', query.var_id, query.var);
+        console.log('do legend', query.var, options.legend.opacity);
 
         const legend_item_height = 25,
           legend_item_width = 25,

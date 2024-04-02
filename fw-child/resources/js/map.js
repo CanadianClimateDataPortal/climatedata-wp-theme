@@ -421,7 +421,7 @@
               },
             );
 
-            console.log('opacity val', input_val.join(','));
+            // console.log('opacity val', input_val.join(','));
 
             item.find('[data-query-key="opacity"]').val(input_val.join(','));
 
@@ -655,38 +655,43 @@
       slider.find('.ui-slider-handle').text(value);
 
       let this_pane = slider.attr('data-pane');
-      options.legend.opacity = value / 100;
+      let new_opacity = value / 100;
 
       // always set the given pane opacity
       // so it's consistent if we switch sectors
       item
         .find('.leaflet-pane.leaflet-' + this_pane + '-pane')
-        .css('opacity', options.legend.opacity);
+        .css('opacity', new_opacity);
 
       // grid layer defaults to 1
       item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
 
-      // link legend's opacity
+      // if setting a data layer
       if (this_pane != 'labels' && this_pane != 'marker') {
+        // also set the legend
+        options.legend.opacity = new_opacity;
+
         item
           .find('.legend')
           .find('.legendbox')
-          .css('fill-opacity', options.legend.opacity);
+          .css('fill-opacity', new_opacity);
       }
 
+      // if setting the marker layer
       if (this_pane == 'marker') {
+        // also set the shadow
         item
           .find('.leaflet-pane.leaflet-shadow-pane')
-          .css('opacity', options.legend.opacity);
+          .css('opacity', new_opacity);
       }
 
+      // if this is the 'data' slider, and
+      // we're looking at a sector layer
       if (this_pane == 'raster' && options.query.sector != 'gridded_data') {
-        // if this is the 'data' slider, and
-        // we're looking at a sector layer
-        // adjust the grid pane
+        // also adjust the grid pane
         item
           .find('.leaflet-pane.leaflet-grid-pane')
-          .css('opacity', options.legend.opacity);
+          .css('opacity', new_opacity);
       }
     },
 

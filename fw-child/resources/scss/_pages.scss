@@ -198,6 +198,7 @@
   color: $primary;
   cursor: pointer;
   transition: 0.25s;
+  text-shadow: none;
 
   &:hover {
     background-color: $gray-200;
@@ -222,6 +223,7 @@ body.offcanvas-open {
     #breadcrumb-overlay-trigger {
       background-color: $primary;
       color: $white;
+      text-shadow: none;
 
       &:before {
         font-family: $font-family-base;

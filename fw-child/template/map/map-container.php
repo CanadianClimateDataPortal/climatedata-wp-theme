@@ -13,7 +13,7 @@
 			<p class="mb-4"><?php _e ( 'Explore maps and charts of climate data. Click on the Data tab on the left to access different variables. Do a location search or zoom in to visualize time series charts.', 'cdc' ); ?></p>
 			
 			<div class="map-overlay-btns d-flex">
-				<button id="page-tour-start" class="btn btn-sm bg-opacity-20 text-light rounded-pill me-3"><?php _e ( 'How to use this page', 'cdc' ); ?></button>
+				<button id="" class="btn btn-sm bg-opacity-20 text-light rounded-pill me-3 page-tour-start"><?php _e ( 'How to use this page', 'cdc' ); ?></button>
 				
 				<button type="button" class="btn btn-sm bg-opacity-20 text-light rounded-pill me-3" data-bs-dismiss="offcanvas" aria-label="Close"><?php _e ( 'Dismiss', 'cdc' ); ?></button>
 				
@@ -35,7 +35,7 @@
 				<div id="info-tech-description" class="mb-4"></div>
 				
 				<div class="map-overlay-btns d-flex">
-					<button class="btn btn-sm bg-opacity-20 text-light rounded-pill me-3"><?php _e ( 'How to use this page', 'cdc' ); ?></button>
+					<button class="btn btn-sm bg-opacity-20 text-light rounded-pill me-3 page-tour-start"><?php _e ( 'How to use this page', 'cdc' ); ?></button>
 					
 					<button type="button" class="btn btn-sm bg-opacity-20 text-light rounded-pill me-3" data-bs-dismiss="offcanvas" aria-label="Close"><?php _e ( 'Dismiss', 'cdc' ); ?></button>
 				</div>

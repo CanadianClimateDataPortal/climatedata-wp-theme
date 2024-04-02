@@ -146,16 +146,9 @@
 								
 								$lang_title = $lang['name'];
 								
-								if (
-									isset ( $element['inputs']['display']['lang'] ) &&
-									$element['inputs']['display']['lang'] == 'code'
-								) {
-									$lang_title = $lang['code'];
-								}
-								
 								$menu[] = array(
-									'id' => $globals['current_query']['ID'],
-									'type' => get_post_type ( $globals['current_query']['ID'] ),
+									'id' => $GLOBALS['fw']['current_query']['ID'],
+									'type' => get_post_type ( $GLOBALS['fw']['current_query']['ID'] ),
 									'url' => trailingslashit ( $lang_URL ),
 									'title' => $lang_title,
 									'classes' => array(),
@@ -163,9 +156,6 @@
 								);
 								
 							}
-							
-							$element['inputs']['classes']['menu'] .= ' fw-menu-nested';
-							$element['inputs']['classes']['item'] .= ' fw-menu-item';
 							
 							fw_menu_output ( $menu, 1, 'list', array (
 								'menu' => 'd-flex',

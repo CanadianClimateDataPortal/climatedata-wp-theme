@@ -88,21 +88,21 @@
 					<div class="mb-2">
 						<div class="form-check form-switch">
 							<input class="form-check-input" type="checkbox" role="switch" name="data-scenarios" id="data-scenarios-high" value="high" data-query-key="scenarios">
-							<label class="form-check-label" for="data-scenarios-high">High emissions (<span class="scenario-name" data-dataset="cmip6" data-name="ssp585">SSP 5–8.5</span>)</label>
+							<label class="form-check-label" for="data-scenarios-high"><?php _e ( 'High emissions', 'cdc' ); ?> (<span class="scenario-name" data-dataset="cmip6" data-name="ssp585">SSP 5–8.5</span>)</label>
 						</div>
 					</div>
 					
 					<div class="mb-2">
 						<div class="form-check form-switch">
 							<input class="form-check-input" type="checkbox" role="switch" name="data-scenarios" id="data-scenarios-medium" value="medium" data-query-key="scenarios">
-							<label class="form-check-label" for="data-scenarios-medium">Medium emissions (<span class="scenario-name" data-dataset="cmip6" data-name="ssp245">SSP 2–4.5</span>)</label>
+							<label class="form-check-label" for="data-scenarios-medium"><?php _e ( 'Medium emissions', 'cdc' ); ?> (<span class="scenario-name" data-dataset="cmip6" data-name="ssp245">SSP 2–4.5</span>)</label>
 						</div>
 					</div>
 					
 					<div class="mb-2">
 						<div class="form-check form-switch">
 							<input class="form-check-input" type="checkbox" role="switch" name="data-scenarios" id="data-scenarios-low" value="low" data-query-key="scenarios">
-							<label class="form-check-label" for="data-scenarios-low">Low emissions (<span class="scenario-name" data-dataset="cmip6" data-name="ssp126">SSP 1–2.6</span>)</label>
+							<label class="form-check-label" for="data-scenarios-low"><?php _e ( 'Low emissions', 'cdc' ); ?> (<span class="scenario-name" data-dataset="cmip6" data-name="ssp126">SSP 1–2.6</span>)</label>
 						</div>
 					</div>
 					

@@ -11,6 +11,58 @@ register_meta ( 'post', 'title_fr', array (
 	'show_in_rest' => true
 ) );
 
+//
+// GET DEFAULT VARIABLE
+//
+
+add_action ( 'rest_api_init', function () {
+	
+	register_rest_route ( 'cdc/v2', '/get_default_var/', array (
+		'methods' => 'GET', 
+		'callback' => 'cdc_get_default_var' 
+	) );
+	
+});
+
+function cdc_get_default_var () {
+	
+	$result = new WP_Query ( array (
+		'post_type' => 'variable',
+		'posts_per_page' => 1,
+		'post_status' => 'publish',
+		'meta_query' => array (
+			array (
+				'key' => 'var_names_$_variable',
+				'value' => 'tx_max',
+				'compare' => '='
+			)
+		)
+	) );
+	
+	if ( $result->have_posts() ) {
+		while ( $result->have_posts() ) {
+			$result->the_post();
+			
+			return get_the_ID();
+			
+		}
+	} else {
+		return '{}';
+	}
+	
+	// return $args;
+	
+}
+
+add_filter ( 'rest_variable_query', 'cdc_get_default_var', 10, 2 );
+
+function wpza_replace_repeater_field( $where ) {
+	$where = str_replace( "meta_key = 'var_names_$", "meta_key LIKE 'var_names_%", $where );
+	return $where;
+}
+
+add_filter ( 'posts_where', 'wpza_replace_repeater_field' );
+
 // get variable data
 
 function cdc_get_var ( $args, $request ) {

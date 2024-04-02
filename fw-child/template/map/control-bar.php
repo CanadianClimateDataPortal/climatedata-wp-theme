@@ -59,7 +59,7 @@
 			<span><?php _e ( 'Help', 'cdc' ); ?></span>
 		</a>
 		
-		<a href="#about" class="control-bar-text-link">About</a>
+		<a href="#info"	data-bs-toggle="offcanvas" data-bs-target="#info" class="control-bar-text-link"><?php _e ( 'About', 'cdc' ); ?></a>
 		
 		<a href="<?php echo home_url ( 'feedback' ); ?>" class="control-bar-text-link">Feedback</a>
 	</div>

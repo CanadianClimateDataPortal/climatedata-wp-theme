@@ -2,14 +2,14 @@
 	<div class="tab-drawer-content">
 		<div class="tab-drawer-content-inner">
 			<div class="control-tab-head d-flex align-items-center justify-content-between">
-				<h5 class="mb-0">Location</h5>
+				<h5 class="mb-0"><?php _e ( 'Location', 'cdc' ); ?></h5>
 				<span class="tab-drawer-close btn-close"></span>
 			</div>
 			
 			<div class="control-tab-body">
 				
 				<div id="map-control-search" class="map-control-item">
-					<label for="area-search"  class="h6 all-caps text-secondary">Search</label>
+					<label for="area-search"  class="h6 all-caps text-secondary"><?php _e ( 'Search', 'cdc' ); ?></label>
 					
 					<?php
 						
@@ -51,8 +51,8 @@
 				
 				<div id="map-control-recent" class="map-control-item">
 					<div class="d-flex justify-content-between mb-3">
-						<h6 class="all-caps text-secondary mb-0">Recent Locations</h6>
-						<h6 id="recent-locations-clear" class="all-caps text-gray-600 mb-0" style="display: none;">Clear</h6>
+						<h6 class="all-caps text-secondary mb-0"><?php _e ( 'Recent Locations', 'cdc' ); ?></h6>
+						<h6 id="recent-locations-clear" class="all-caps text-gray-600 mb-0" style="display: none;"><?php _e ( 'Clear', 'cdc' ); ?></h6>
 					</div>
 					
 					<div id="recent-locations" class="list-group list-group-flush">
@@ -60,7 +60,7 @@
 				</div>
 					
 				<div id="map-control-coords" class="map-control-item">
-					<h6 class="all-caps text-secondary mb-3">Adjust Coordinates</h6>
+					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Adjust Coordinates', 'cdc' ); ?></h6>
 					
 					<input type="hidden" name="coords" id="coords" data-query-key="coords">
 					
@@ -93,7 +93,7 @@
 							<button class="btn btn-sm btn-light p-2 up-btn up-2" type="button"><i class="fas fa-angle-double-right"></i></button>
 						</div>
 					
-						<label for="coords-zoom" class="form-label h6 all-caps text-gray-500 me-3">Zoom</label>
+						<label for="coords-zoom" class="form-label h6 all-caps text-gray-500 me-3"><?php _e ( 'Zoom', 'cdc' ); ?></label>
 						
 						<div class="input-group mb-3 border w-50">
 							<button class="btn btn-sm btn-light p-2 down-btn down-1" type="button"><i class="fas fa-minus"></i></button>

@@ -2,7 +2,7 @@
 	<div class="tab-drawer-content">
 		<div class="tab-drawer-content-inner">
 			<div class="control-tab-head d-flex align-items-center justify-content-between">
-			<h5 class="mb-0">Download</h5>
+			<h5 class="mb-0"><?php _e ( 'Download', 'cdc' ); ?></h5>
 				<span class="tab-drawer-close btn-close"></span>
 			</div>
 			

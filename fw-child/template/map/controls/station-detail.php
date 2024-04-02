@@ -2,7 +2,7 @@
 	<div class="tab-drawer-content">
 		<div class="tab-drawer-content-inner">
 			<div class="control-tab-head d-flex align-items-center justify-content-between">
-				<h5 class="mb-0">Station</h5>
+				<h5 class="mb-0"><?php _e ( 'Station', 'cdc' ); ?></h5>
 				<span class="tab-drawer-close btn-close"></span>
 			</div>
 			
@@ -53,7 +53,7 @@
 										<span class="export-btn py-1 px-2" data-export-type="application/pdf">PDF</span>
 										<span class="export-btn py-1 px-2" data-export-type="image/png">PNG</span>
 										<span class="export-btn py-1 px-2" data-export-type="csv">CSV</span>
-										<span class="export-btn py-1 px-2" data-export-type="print">Print</span>
+										<span class="export-btn py-1 px-2" data-export-type="print"><?php _e ( 'Print', 'cdc' ); ?></span>
 									</div>
 								</div>
 							</div>

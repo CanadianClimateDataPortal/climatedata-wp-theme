@@ -10,11 +10,18 @@
 				
 				<div id="var-select-query" class="variable-grid"
 					data-args='{
-						"posts_per_page":15,
+						"posts_per_page": 15,
 						"post_type": [ "variable" ],
 						"orderby": "title",
 						"order":"asc",
-						"post_status":"publish"
+						"post_status":"publish",
+						"meta_query": [
+							{
+								"key": "availability",
+								"value": "",
+								"compare": "!="
+							}
+						]
 					}'
 				>
 					

@@ -262,7 +262,7 @@
 			
 			if (options.args.meta_query) {
 				if (options.default_args.meta_query) {
-					options.args.tax_query = [ ...options.default_args.meta_query ]
+					options.args.meta_query = { ...options.default_args.meta_query }
 				} else {
 					delete options.args.meta_query
 				}
@@ -368,7 +368,8 @@
 					options = plugin.options,
 					item = plugin.item
 			
-			// console.log('args', options.args)
+			if (options.debug == true) console.log('do query')
+			
 			// console.log('options', options.item_options)
 			
 			let rest_url = ajax_data.rest_url + 'framework/v2/query'
@@ -393,6 +394,8 @@
 					if (data.success == true) {
 						
 						options.elements.item_container.empty()
+						
+						if (options.debug == true) console.log('returned ' + data.items.length + ' items')
 						
 						if (data.items.length > 0) {
 							

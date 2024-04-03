@@ -760,8 +760,10 @@
             // hide the zoom alert
           })
           .on('zoomend', function (e) {
-            if (this.getZoom() >= 7) {
-              item.find('#zoom-alert').fadeOut(250);
+            if (options.query.sector != 'station') {
+              if (this.getZoom() >= 7) {
+                item.find('#zoom-alert').fadeOut(250);
+              }
             }
           });
       }
@@ -1498,6 +1500,16 @@
                 options.var_data,
               );
 
+              let decade_tooltip = bootstrap.Tooltip.getInstance(
+                '#decade-slider-handle',
+              );
+
+              if (decade_tooltip != undefined) {
+                setTimeout(function () {
+                  decade_tooltip.update();
+                }, 500);
+              }
+
               console.log('status = ready');
               options.status = 'ready';
             });
@@ -1772,11 +1784,17 @@
           .html(options.var_data.acf[tech_key]);
 
         // if the var is station data
+
         if (options.var_data.var_types.includes('Station Data')) {
           // set 'sector' parameter
-          options.query.sector = 'station';
-          // set flag
           options.var_flags.station = true;
+        } else {
+          // console.log('not station');
+          // find and trigger the checked sector radio
+          // so that query.sector updates
+          item
+            .find('#map-control-aggregation .form-check-input:checked')
+            .trigger('change');
         }
 
         // SET CONTROLS

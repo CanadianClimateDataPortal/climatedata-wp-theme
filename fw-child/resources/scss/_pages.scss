@@ -631,6 +631,7 @@ $legend-on-height: 16px;
     }
   }
 
+  &:has([name='data-var'][value='weather-stations']),
   &:has(#location-detail.td-selected) {
     #map-control-footer {
       transform: translateY(100%);

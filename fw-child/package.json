@@ -11,7 +11,6 @@
     "make-pretty": "prettier --write '**/*.{js,jsx,ts,tsx}'"
   },
   "dependencies": {
-    "@geoman-io/leaflet-geoman-free": "^2.16.0",
     "@turf/turf": "^6.5.0",
     "jszip": "^3.10.1",
     "leaflet": "^1.9.4",

@@ -760,8 +760,10 @@
             // hide the zoom alert
           })
           .on('zoomend', function (e) {
-            if (this.getZoom() >= 7) {
-              item.find('#zoom-alert').fadeOut(250);
+            if (options.query.sector != 'station') {
+              if (this.getZoom() >= 7) {
+                item.find('#zoom-alert').fadeOut(250);
+              }
             }
           });
       }

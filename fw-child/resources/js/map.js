@@ -1500,6 +1500,16 @@
                 options.var_data,
               );
 
+              let decade_tooltip = bootstrap.Tooltip.getInstance(
+                '#decade-slider-handle',
+              );
+
+              if (decade_tooltip != undefined) {
+                setTimeout(function () {
+                  decade_tooltip.update();
+                }, 500);
+              }
+
               console.log('status = ready');
               options.status = 'ready';
             });

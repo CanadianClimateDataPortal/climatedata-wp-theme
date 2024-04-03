@@ -402,6 +402,15 @@
         console.log('---');
         console.log('get layer', query.var);
 
+        // when called after selecting a station variable,
+        // the 'aggregation' control will have been set to 'gridded_data'
+        // so check var_data.var_types for 'station data'
+        // and change sector to 'station' if necessary
+
+        if (var_data.var_types.includes('Station Data')) {
+          query.sector = 'station';
+        }
+
         // console.log(query);
 
         switch (query.sector) {
@@ -705,6 +714,8 @@
                   });
 
                 this_map.layers.stations.addTo(this_map.object);
+
+                options.current_sector = query.sector;
               });
             });
 

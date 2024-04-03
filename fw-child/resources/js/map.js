@@ -1772,11 +1772,17 @@
           .html(options.var_data.acf[tech_key]);
 
         // if the var is station data
+
         if (options.var_data.var_types.includes('Station Data')) {
           // set 'sector' parameter
-          options.query.sector = 'station';
-          // set flag
           options.var_flags.station = true;
+        } else {
+          // console.log('not station');
+          // find and trigger the checked sector radio
+          // so that query.sector updates
+          item
+            .find('#map-control-aggregation .form-check-input:checked')
+            .trigger('change');
         }
 
         // SET CONTROLS

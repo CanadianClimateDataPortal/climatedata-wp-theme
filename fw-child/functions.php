@@ -521,35 +521,3 @@ function cdc_list_var_types ( $object, $field_name, $request ) {
 	return $term_list;
 	
 }
-
-
-//
-// TEMPORARY
-// update all var posts with default value in 
-// page_availability field
-//
-
-add_action ( 'wp_body_open', function() {
-	
-	if ( current_user_can ( 'administrator' ) ) {
-			
-		$var_q = new WP_Query ( array (
-			'post_type' => 'variable',
-			'post_status' => 'publish',
-			'posts_per_page' => -1
-		) );
-		
-		while ( $var_q->have_posts() ) {
-			$var_q->the_post();
-			
-			update_field ( 'page_availability', array ( 'map', 'download' ), get_the_ID() );
-			
-			dumpit ( get_field ( 'page_availability' ) );
-			
-		}
-		
-		wp_reset_postdata();
-		
-	}
-	
-} );

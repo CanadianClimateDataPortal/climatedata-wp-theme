@@ -704,13 +704,14 @@
             format = $('input[name="download-format"]:checked').val();
             let dataset_name = $('input[name="download-dataset"]:checked').val();
             let selectedDatasetType = $('input[name="download-dataset-type"]:checked').val();
-            let format_extension = 'zip';
+            let format_extension = format;
 
             if (format == 'netcdf') {
                 format_extension = 'nc';
             }
 
             if (selectedVar !== 'all') {
+                format_extension = 'zip';
                 $('body').addClass('spinner-on');
                 request_args = {
                     var: selectedVar,

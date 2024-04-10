@@ -29,6 +29,7 @@ function tpl_enqueue()
 
     wp_enqueue_script('vector-grid');
     wp_enqueue_script('sync');
+    wp_enqueue_script('async');
     wp_enqueue_script('nearest');
 
     wp_enqueue_script('jquery-ui-core');

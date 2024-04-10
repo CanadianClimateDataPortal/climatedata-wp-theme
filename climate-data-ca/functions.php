@@ -135,6 +135,7 @@ function child_theme_enqueue()
     wp_register_script('leaflet-cluster-subgroup', $child_js_dir . 'leaflet.featuregroup.subgroup.js', array('leaflet-cluster'), NULL, true);
 
     wp_register_script('jszip', $bower_dir . 'jszip/dist/jszip.min.js', NULL, NULL, true);
+    wp_register_script('async', $child_js_dir . 'async.min.js', NULL, NULL, true);
     wp_register_script('FileSaver', $bower_dir . 'FileSaver/dist/FileSaver.min.js', NULL, NULL, true);
     wp_register_script('ion-slider', $bower_dir . 'ion.rangeSlider/js/ion.rangeSlider.min.js', NULL, NULL, true);
     wp_register_script('vector-grid', $child_js_dir . 'vector-grid.js', NULL, NULL, true);

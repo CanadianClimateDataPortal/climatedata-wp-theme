@@ -2389,6 +2389,16 @@
           if (selected_scheme_item.data('scheme-type') === 'divergent') {
             high = Math.max(Math.abs(low), Math.abs(high));
             low = high * -1;
+            // workaround to avoid legend with repeated values for very low range variables
+            if ((high - low) * 10**options.var_data.acf.decimals < scheme_length) {
+              low = -(scheme_length / 2.0);
+              high = scheme_length / 2.0;
+            }
+          } else {
+            // workaround to avoid legend with repeated values for very low range variables
+            if ((high - low) * 10**options.var_data.acf.decimals < scheme_length) {
+              high = low + scheme_length * 0**options.var_data.acf.decimals;
+            }
           }
 
           // temperature raster data files are in Kelvin, but in °C in variable_data

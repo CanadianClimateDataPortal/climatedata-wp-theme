@@ -1071,7 +1071,7 @@
         switch (i) {
           case -1:
             // fallback case in case style/legend is wrong
-            return 'rgba(0,0,0,0)';
+            return options.legend.colormap.colours[options.legend.colormap.colours.length-1];
           case 0:
             return options.legend.colormap.colours[0];
           default:

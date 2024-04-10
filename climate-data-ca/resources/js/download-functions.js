@@ -773,7 +773,7 @@
                         month: month,
                         dataset_name: dataset_name,
                         dataset_type: selectedDatasetType,
-                        zipped: true,
+                        zipped: format === 'netcdf' ? false : true,
                         format: format
                     };
                     Object.assign(request_args, pointsData);
@@ -784,13 +784,21 @@
                     $('body').removeClass('spinner-on');
 
                     async.reduce(results, new JSZip(), function (zip, result, callback) {
-                        zip.folder(result.var_name).loadAsync(result.data)
-                          .then(zip2 => {
-                              return callback(null, zip);
-                          });
+                        if (format === 'netcdf') {
+                            return callback(null, zip.file(result.var_name + '.nc', result.data))
+                        }
+                        else {
+                            zip.folder(result.var_name).loadAsync(result.data)
+                              .then(zip2 => {
+                                  return callback(null, zip);
+                              });
+                        }
                     })
                       .then(zip => {
-                          zip.generateAsync({type: "blob"})
+                          zip.generateAsync({
+                              type: "blob",
+                              compression: "DEFLATE"
+                          })
                             .then(function (content) {
                                 saveAs(content, $('#download-filename').val() + ".zip");
                             })

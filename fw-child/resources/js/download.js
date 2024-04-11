@@ -73,6 +73,7 @@
         models: '',
         station: [],
         selections: [],
+        check_missing: '0.05',
       },
       query_str: {
         prev: '',
@@ -963,6 +964,20 @@
 
       // station selection
 
+      item.find('#station-select').on('select2:select', function (e) {
+        let this_gid = e.params.data.id,
+          selections = $(this).val();
+
+        options.selection_data[this_gid] = {
+          properties: {
+            ID: e.params.data.id,
+            Name: e.params.data.text,
+          },
+        };
+
+        plugin.update_station_markers(selections, this_gid);
+      });
+
       item.find('#station-select').on('select2:unselect', function (e) {
         let this_gid = e.params.data.id; //parseInt(e.params.data.id);
         let selections = $(this).val();
@@ -1181,7 +1196,7 @@
         plugin.validate_tab('#submit');
       });
 
-      item.find('#submit-captcha').on('change', function () {
+      item.find('#submit-captcha').on('input', function () {
         plugin.validate_tab('#submit');
       });
 
@@ -2961,8 +2976,13 @@
           let filename = options.var_data.acf.finch_var;
 
           if (query.station.length == 1) {
-            filename +=
-              '_' + options.selection_data[query.station[0]].properties.Name;
+            let first_station = options.selection_data[query.station[0]];
+
+            if (first_station.hasOwnProperty('properties')) {
+              if (first_station.properties.hasOwnProperty('Name')) {
+                filename += '_' + first_station.properties.Name;
+              }
+            }
           }
 
           form_obj.inputs.push({

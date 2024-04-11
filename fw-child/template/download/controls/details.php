@@ -208,7 +208,7 @@
 					
 					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Temporal Frequency', 'cdc' ); ?></h6>
 					
-					<div id="map-control-frequency-radio" class="row row-cols-2" data-flags="custom:1" data-request="custom">
+					<div id="map-control-frequency-radio" class="row row-cols-2" data-flags="custom:1" data-request="custom,ahccd">
 						<div class="col">
 							<div class="form-check">
 								<input class="form-check-input" type="radio" name="details-frequency" id="details-frequency-annual" value="YS" data-query-key="frequency" checked>

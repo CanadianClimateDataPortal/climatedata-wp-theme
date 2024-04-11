@@ -694,6 +694,8 @@
                     if (options.ahccd_data == null) {
                       // we're doing an AHCCD analysis
 
+                      console.log('get AHCCD json now');
+
                       return $.ajax({
                         url:
                           theme_data.child_theme_dir +
@@ -716,7 +718,7 @@
             // get or load station data
             $.when(get_layer_data(query.var)).done(function (layer_data) {
               // console.log(layer_data);
-              // console.log('ahccd', options.ahccd_data);
+              console.log('ahccd', options.ahccd_data);
               // console.log('station', options.station_data);
               // console.log('idf', options.idf_data);
 
@@ -728,18 +730,20 @@
               }
 
               if (
+                query.dataset == 'ahccd' &&
+                query.var == options.current_var
+              ) {
+                // variable hasn't changed
+                do_stations = false;
+              }
+
+              if (
                 first_map.layers.stations == undefined ||
                 first_map.layers.stations == null ||
                 query.var != options.current_var
               ) {
+                // no station layer exists
                 do_stations = true;
-              }
-
-              if (
-                query.dataset == 'ahccd' &&
-                query.var == options.current_var
-              ) {
-                do_stations = false;
               }
 
               // each map
@@ -775,10 +779,12 @@
                     );
                   }
 
+                  console.log('create clusters');
                   this_map.layers.station_clusters = L.markerClusterGroup();
 
                   // create the layer
 
+                  console.log('create layer');
                   this_map.layers.stations = L.geoJson(layer_data, {
                     pointToLayer: function (feature, latlng) {
                       if (query.dataset == 'ahccd') {
@@ -833,6 +839,11 @@
                     this_map.layers.stations,
                   );
                 }
+
+                // console.log('addlayer');
+                // console.log(this_map.object);
+                // console.log(this_map.layers.stations);
+                // console.log(this_map.layers.station_clusters);
 
                 this_map.object.addLayer(this_map.layers.station_clusters);
 
@@ -1814,8 +1825,8 @@
                   query[fn_options.key].push($(this).val());
                 });
             } else if (fn_options.item.is('select')) {
-              console.log('update select');
-              console.log(fn_options);
+              // console.log('update select');
+              // console.log(fn_options);
 
               query[fn_options.key] = fn_options.val;
             } else if (fn_options.key == 'coords' || fn_options.key == 'bbox') {
@@ -1874,9 +1885,9 @@
         let options = plugin.options,
           item = plugin.item;
 
-        console.log('update stations', query.var);
-
         let list_name = query.dataset == 'ahccd' ? 'ahccd' : query.var;
+
+        console.log('update stations', list_name);
 
         item.find('#station-select').empty().attr('data-list', list_name);
 

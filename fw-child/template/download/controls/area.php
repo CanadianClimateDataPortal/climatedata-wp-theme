@@ -18,9 +18,9 @@
 					</div>
 				</div>
 				
-				<input type="hidden" name="area-selections" id="area-selections" value="" data-query-key="selections" data-validate="<?php _e ( 'At least 1 map region is required', 'cdc' ); ?>">
+				<input type="hidden" name="area-selections" id="area-selections" value="" data-query-key="selections" data-request="single,threshold,custom" data-validate="<?php _e ( 'At least 1 map region is required', 'cdc' ); ?>">
 				
-				<div id="map-control-stations" class="map-control-item" data-display="station:1" style="display: none;">
+				<div id="map-control-stations" class="map-control-item" data-request="station,ahccd" style="display: none;">
 					<h6 class="all-caps text-secondary"><?php _e ( 'Select Stations', 'cdc' ); ?></h6>
 					
 					<select 
@@ -37,7 +37,7 @@
 					</select>
 				</div>
 					
-				<div id="map-control-aggregation" class="map-control-item conditional-trigger" data-display="station:0">
+				<div id="map-control-aggregation" class="map-control-item conditional-trigger" data-request="single,threshold,custom">
 					<h6 class="all-caps text-secondary"><?php _e ( 'Change Aggregation', 'cdc' ); ?></h6>
 					
 					<div class="form-check">
@@ -47,8 +47,10 @@
 					
 					<div id="area-aggregation-select-mode" class="bg-gray-200 p-2 mb-2">
 						
+						<!-- <input type="hidden" name="area-bbox" id="area-bbox" value="" data-query-key="bbox"> -->
+						
 						<div class="btn-group" role="group">
-							<input type="radio" class="btn-check" name="area-selection" id="area-selection-select" value="select" autocomplete="off">
+							<input type="radio" class="btn-check" name="area-selection" id="area-selection-select" value="select" autocomplete="off" checked>
 							<label class="btn btn-sm btn-outline-gray-600" for="area-selection-select"><?php _e ( 'Select', 'cdc' ); ?></label>
 						
 							<input type="radio" class="btn-check" name="area-selection" id="area-selection-draw" value="draw" autocomplete="off">
@@ -72,23 +74,25 @@
 						<label class="form-check-label" for="area-aggregation-watershed"><?php _e ( 'Watersheds', 'cdc' ); ?></label>
 					</div>
 					
-					<div class="form-check">
-						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-upload" value="upload" data-query-key="sector" data-conditional="#area-aggregation-shapefile">
-						<label class="form-check-label" for="area-aggregation-upload"><?php _e ( 'Upload Custom Shapefile', 'cdc' ); ?></label>
-						<a tabindex="0" role="button" id="area-aggregation-upload-tooltip" class="text-secondary">ⓘ
-							<span style="display: none">
-								<?php _e ( 'A shapefile is a ZIP file containing at least the <em>.shp</em> and
-								<em>.prj</em> files. It must contain only closed polygons and must be entirely contained
-								inside the canadian territory. Once your shapefile is uploaded, click all the regions
-								for which you want data.' ) ?>
-							</span>
-						</a>
-					</div>
-					
-					<div id="area-aggregation-shapefile" class="bg-gray-200 p-3">
-						<label for="area-aggregation-shapefile-input" class="form-label"><?php _e ( 'Drop your shapefile here to upload', 'cdc' ); ?></label>
-						<input class="form-control form-control-sm" id="area-aggregation-shapefile-input" type="file">
-						<div id="area-aggregation-shapefile-message" class="mt-2"></div>
+					<div data-request="custom">
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-upload" value="upload" data-query-key="sector" data-conditional="#area-aggregation-shapefile">
+							<label class="form-check-label" for="area-aggregation-upload"><?php _e ( 'Upload Custom Shapefile', 'cdc' ); ?></label>
+							<a tabindex="0" role="button" id="area-aggregation-upload-tooltip" class="text-secondary">ⓘ
+								<span style="display: none">
+									<?php _e ( 'A shapefile is a ZIP file containing at least the <em>.shp</em> and
+									<em>.prj</em> files. It must contain only closed polygons and must be entirely contained
+									inside the canadian territory. Once your shapefile is uploaded, click all the regions
+									for which you want data.' ) ?>
+								</span>
+							</a>
+						</div>
+						
+						<div id="area-aggregation-shapefile" class="bg-gray-200 p-3">
+							<label for="area-aggregation-shapefile-input" class="form-label"><?php _e ( 'Drop your shapefile here to upload', 'cdc' ); ?></label>
+							<input class="form-control form-control-sm" id="area-aggregation-shapefile-input" type="file">
+							<div id="area-aggregation-shapefile-message" class="mt-2"></div>
+						</div>
 					</div>
 				</div>
 				

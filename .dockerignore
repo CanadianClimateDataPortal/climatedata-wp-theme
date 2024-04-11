@@ -1,0 +1,6 @@
+.dockerignore
+Dockerfile
+.git
+.gitignore
+climate-data-ca
+h7-parent

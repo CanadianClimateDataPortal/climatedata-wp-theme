@@ -416,7 +416,11 @@
           options = plugin.options;
 
         console.log('---');
-        console.log('get layer', query);
+        console.log('get layer', var_data, query);
+
+        if (var_data == undefined || var_data == null) {
+          return 'no variable';
+        }
 
         // when called after selecting a station variable,
         // the 'aggregation' control will have been set to 'gridded_data'

@@ -473,7 +473,7 @@
             do_history: 'replace',
             callback: function () {
               plugin.update_default_scheme(function () {
-                console.log('handle_input get layer');
+                console.log('accordion get layer');
 
                 $(document).cdc_app(
                   'maps.get_layer',
@@ -738,6 +738,8 @@
       item.on(
         'map_item_mouseover',
         function (e, mouse_event, this_gid, style_obj) {
+          this_gid = String(this_gid);
+
           style_obj = {
             ...{
               color: '#444',
@@ -767,6 +769,8 @@
       item.on(
         'map_item_mouseout',
         function (e, mouse_event, this_gid, style_obj) {
+          this_gid = String(this_gid);
+
           style_obj = {
             ...{
               color: '#444',
@@ -801,7 +805,10 @@
       item.on(
         'map_item_select',
         function (e, mouse_event, this_gid, style_obj) {
-          console.log('select ' + this_gid);
+          // console.log('select ' + this_gid);
+
+          this_gid = String(this_gid);
+
           // reset query.selections
           let selections = item
             .find('#area-selections')
@@ -890,6 +897,8 @@
         function (e, mouse_event, this_gid, style_obj) {
           console.log('station click', this_gid);
 
+          this_gid = String(this_gid);
+
           options.station.color = style_obj.color;
 
           let selections = item.find('#station-select').val();
@@ -902,7 +911,7 @@
           // console.log('current selections', selections);
 
           if (selections.includes(this_gid)) {
-            console.log('remove ' + this_gid);
+            // console.log('remove ' + this_gid);
 
             for (var i = selections.length - 1; i >= 0; i--) {
               if (selections[i] === this_gid) selections.splice(i, 1);
@@ -910,7 +919,7 @@
 
             delete options.selection_data[this_gid];
           } else {
-            console.log('add ' + this_gid);
+            // console.log('add ' + this_gid);
             selections.push(this_gid);
 
             options.selection_data[this_gid] = {
@@ -965,7 +974,7 @@
       // station selection
 
       item.find('#station-select').on('select2:select', function (e) {
-        let this_gid = e.params.data.id,
+        let this_gid = String(e.params.data.id),
           selections = $(this).val();
 
         options.selection_data[this_gid] = {
@@ -979,7 +988,7 @@
       });
 
       item.find('#station-select').on('select2:unselect', function (e) {
-        let this_gid = e.params.data.id; //parseInt(e.params.data.id);
+        let this_gid = String(e.params.data.id); //parseInt(e.params.data.id);
         let selections = $(this).val();
 
         // convert values to integers
@@ -1207,6 +1216,23 @@
         plugin.process(options.query);
       });
 
+      item.on('click', '#result-status-refresh', function () {
+        $.ajax({
+          url: $(this).attr('data-url'),
+          dataType: 'json',
+          cache: false,
+          success: function (data) {
+            if (data.finished == null) {
+              item
+                .find('#result-status-text span')
+                .text(data.percentCompleted + '%');
+            } else {
+              item.find('#result-status-text span').text(T('complete'));
+            }
+          },
+        });
+      });
+
       // HISTORY
 
       window.addEventListener('popstate', function (e) {
@@ -1224,6 +1250,7 @@
 
       let style_obj;
 
+      this_gid = String(this_gid);
       console.log('update stations', selections, this_gid);
 
       // each map
@@ -1324,7 +1351,16 @@
           } else {
             // console.log('NOT AHCCD');
 
+            // set request type to single
+
             options.request.type = 'single';
+
+            if (item.find('#threshold-custom').hasClass('show')) {
+              // unless the 'custom' accordion is open
+              console.log("no it's custom");
+
+              options.request.type = 'custom';
+            }
 
             // enable threshold
             item.find('#threshold-preset-btn').prop('disabled', false);
@@ -1486,11 +1522,11 @@
 
           // convert string value to array of integers
 
-          let selections = this_val.split(',').filter(function (i) {
+          this_val = this_val.split(',').filter(function (i) {
             return i;
           });
 
-          this_val = [];
+          // this_val = [];
 
           // each selection
           // selections.forEach(function (this_gid) {
@@ -2568,7 +2604,7 @@
           let this_input = $(this),
             validate_this = true;
 
-          console.log('checking', this_input);
+          // console.log('checking', this_input);
 
           if (!this_input.is(':visible') && !this_input.is('[type="hidden"]')) {
             validate_this = false;
@@ -2867,10 +2903,16 @@
       let result_tab = item.find('#submit-result'),
         result_head = result_tab.find('#result-head'),
         result_content = result_tab.find('#result-message'),
-        result_btn = result_tab.find('#result-btn a');
+        result_btn = result_tab.find('#result-btn a'),
+        result_status = result_tab.find('#result-status');
 
       result_head.text('');
       result_content.html('');
+
+      result_status.hide();
+
+      // result_btn.removeAttr('target');
+      // result_btn.text(T('Download'));
 
       result_tab.removeClass('error').removeClass('success');
 
@@ -2896,7 +2938,7 @@
           result_head.text(T('Success') + '!');
           result_content.text(T('Click below to download your data'));
 
-          result_btn.attr('href', station_url).show();
+          result_btn.attr('href', station_url);
           result_btn.show();
 
           result_tab.removeClass('error').addClass('success');
@@ -3032,6 +3074,17 @@
               if (data.status == 'accepted') {
                 result_head.text(T('Success') + '!');
                 result_content.html(data.description);
+
+                // status
+                result_status
+                  .find('#result-status-text span')
+                  .html(data.status);
+
+                result_status
+                  .find('#result-status-refresh')
+                  .attr('data-url', data.location);
+
+                result_status.show();
 
                 result_tab.removeClass('error').addClass('success');
               } else {
@@ -3247,6 +3300,17 @@
                 result_head.text(T('Success') + '!');
                 result_content.html(data.description);
 
+                // status
+                result_status
+                  .find('#result-status-text span')
+                  .html(data.status);
+
+                result_status
+                  .find('#result-status-refresh')
+                  .attr('data-url', data.location);
+
+                result_status.show();
+
                 result_tab.removeClass('error').addClass('success');
               } else {
                 result_head.text(T('Error'));
@@ -3287,7 +3351,7 @@
             for (var i = 0; i < query.selections.length; i++) {
               point = options.selection_data[query.selections[i]];
 
-              console.log(point);
+              // console.log(point);
 
               if (i != 0) pointsInfo += ' ; ';
 

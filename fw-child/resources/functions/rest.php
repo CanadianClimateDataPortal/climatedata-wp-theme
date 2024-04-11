@@ -96,7 +96,7 @@ add_action ( 'rest_api_init', function () {
 function cdc_finch_submit () {
 	
 	include_once ( locate_template ( 'resources/php/securimage/securimage.php' ) );
-	// include_once ( locate_template ( 'resources/php/mailchimp.php' ) );
+	include_once ( locate_template ( 'resources/php/mailchimp.php' ) );
 	
 	$securimage = new Securimage();
 	

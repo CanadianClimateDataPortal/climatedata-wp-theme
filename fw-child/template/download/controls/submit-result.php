@@ -12,6 +12,15 @@
 				<div id="result-btn">
 					<a class="btn btn-lg btn-primary rounded-pill" style="display: none;"><?php _e ( 'Download' ); ?></a>
 				</div>
+				
+				<div id="result-status" class="w-100 border-top p-3 d-flex justify-content-between align-items-center" style="display: none;">
+					<div id="result-status-text"><?php _e ( 'Status', 'cdc' ); ?>: <span></span></div>
+					
+					<div id="result-status-refresh" class="text-primary" role="button">
+						<i class="fas fa-sync-alt"></i>
+						<?php _e ( 'Refresh', 'cdc' ); ?>
+					</div>
+				</div>
 			</div>
 			
 		</div>

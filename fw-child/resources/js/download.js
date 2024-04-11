@@ -1216,6 +1216,23 @@
         plugin.process(options.query);
       });
 
+      item.on('click', '#result-status-refresh', function () {
+        $.ajax({
+          url: $(this).attr('data-url'),
+          dataType: 'json',
+          cache: false,
+          success: function (data) {
+            if (data.finished == null) {
+              item
+                .find('#result-status-text span')
+                .text(data.percentCompleted + '%');
+            } else {
+              item.find('#result-status-text span').text(T('complete'));
+            }
+          },
+        });
+      });
+
       // HISTORY
 
       window.addEventListener('popstate', function (e) {
@@ -1334,7 +1351,16 @@
           } else {
             // console.log('NOT AHCCD');
 
+            // set request type to single
+
             options.request.type = 'single';
+
+            if (item.find('#threshold-custom').hasClass('show')) {
+              // unless the 'custom' accordion is open
+              console.log("no it's custom");
+
+              options.request.type = 'custom';
+            }
 
             // enable threshold
             item.find('#threshold-preset-btn').prop('disabled', false);
@@ -2877,10 +2903,16 @@
       let result_tab = item.find('#submit-result'),
         result_head = result_tab.find('#result-head'),
         result_content = result_tab.find('#result-message'),
-        result_btn = result_tab.find('#result-btn a');
+        result_btn = result_tab.find('#result-btn a'),
+        result_status = result_tab.find('#result-status');
 
       result_head.text('');
       result_content.html('');
+
+      result_status.hide();
+
+      // result_btn.removeAttr('target');
+      // result_btn.text(T('Download'));
 
       result_tab.removeClass('error').removeClass('success');
 
@@ -2906,7 +2938,7 @@
           result_head.text(T('Success') + '!');
           result_content.text(T('Click below to download your data'));
 
-          result_btn.attr('href', station_url).show();
+          result_btn.attr('href', station_url);
           result_btn.show();
 
           result_tab.removeClass('error').addClass('success');
@@ -3042,6 +3074,17 @@
               if (data.status == 'accepted') {
                 result_head.text(T('Success') + '!');
                 result_content.html(data.description);
+
+                // status
+                result_status
+                  .find('#result-status-text span')
+                  .html(data.status);
+
+                result_status
+                  .find('#result-status-refresh')
+                  .attr('data-url', data.location);
+
+                result_status.show();
 
                 result_tab.removeClass('error').addClass('success');
               } else {
@@ -3256,6 +3299,17 @@
               if (data.status == 'accepted') {
                 result_head.text(T('Success') + '!');
                 result_content.html(data.description);
+
+                // status
+                result_status
+                  .find('#result-status-text span')
+                  .html(data.status);
+
+                result_status
+                  .find('#result-status-refresh')
+                  .attr('data-url', data.location);
+
+                result_status.show();
 
                 result_tab.removeClass('error').addClass('success');
               } else {

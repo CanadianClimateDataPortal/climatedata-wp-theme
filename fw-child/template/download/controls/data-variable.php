@@ -12,9 +12,16 @@
 					data-args='{
 						"posts_per_page": 15,
 						"post_type": [ "variable" ],
+						"post_status": "publish",
 						"orderby": "title",
 						"order": "asc",
-						"post_status": "publish"
+						"meta_query": [
+							{
+								"key": "page_availability",
+								"value": "download",
+								"compare": "LIKE"
+							}
+						]
 					}'
 				>
 					

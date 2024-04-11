@@ -3,6 +3,7 @@
 //
 
 const geoserver_url = DATA_URL;
+const XML_HTTP_REQUEST_DONE_STATE = 4;
 
 const svgNS = 'http://www.w3.org/2000/svg';
 
@@ -514,6 +515,7 @@ function value_formatter(value, varDetails, delta) {
  * @returns {string} The formatted value
  */
 function value_formatter(value, var_acf, delta, lang) {
+  value = parseFloat(value);
   let unit = var_acf.units;
   if (unit === 'kelvin') {
     unit = '°C';
@@ -544,4 +546,265 @@ function value_formatter(value, var_acf, delta, lang) {
       break;
   }
   return unit_localize(str);
+}
+
+//
+// DOWNLOAD
+//
+
+const ahccd_icons = {
+  P: L.icon({
+    iconUrl:
+      theme_data.child_theme_dir + '/resources/app/ahccd/triangle-blue.png',
+    iconSize: [15, 15],
+    iconAnchor: [7, 7],
+  }),
+  Pr: L.icon({
+    iconUrl:
+      theme_data.child_theme_dir + '/resources/app/ahccd/triangle-red.png',
+    iconSize: [15, 15],
+    iconAnchor: [7, 7],
+  }),
+  T: L.icon({
+    iconUrl:
+      theme_data.child_theme_dir + '/resources/app/ahccd/square-blue.png',
+    iconSize: [15, 15],
+    iconAnchor: [7, 7],
+  }),
+  Tr: L.icon({
+    iconUrl: theme_data.child_theme_dir + '/resources/app/ahccd/square-red.png',
+    iconSize: [15, 15],
+    iconAnchor: [7, 7],
+  }),
+  B: L.icon({
+    iconUrl:
+      theme_data.child_theme_dir + '/resources/app/ahccd/circle-blue.png',
+    iconSize: [15, 15],
+    iconAnchor: [7, 7],
+  }),
+  Br: L.icon({
+    iconUrl: theme_data.child_theme_dir + '/resources/app/ahccd/circle-red.png',
+    iconSize: [15, 15],
+    iconAnchor: [7, 7],
+  }),
+};
+
+var variableDataTypes = {
+  // Download_Variable-Data_BCCAQv2 ...
+  tx_max: 'Hottest-Day',
+  tg_mean: 'Mean-Temperature',
+  tn_mean: 'Minimum-Temperature',
+  'tnlt_-15': 'Days-with-Tmin_LesserThan_-15C',
+  'tnlt_-25': 'Days-with-Tmin_LesserThan_-25C',
+  txgt_25: 'Days-with-Tmax_GreaterThan_25C',
+  txgt_27: 'Days-with-Tmax_GreaterThan_27C',
+  txgt_29: 'Days-with-Tmax_GreaterThan_29C',
+  txgt_30: 'Days-with-Tmax_GreaterThan_30C',
+  txgt_32: 'Days-with-Tmax_GreaterThan_32C',
+  tx_mean: 'Maximum-Temperature',
+  tn_min: 'Coldest-Day',
+  rx1day: 'Maximum-1-Day-Total-Precipitation',
+  r1mm: 'Wet-Days_GreaterThan_1mm',
+  r10mm: 'Wet-Days_GreaterThan_10mm',
+  r20mm: 'Wet-Days_GreaterThan_20mm',
+  prcptot: 'Total-Precipitation',
+  frost_days: 'Frost-Days',
+  cddcold_18: 'Cooling-Degree-Days',
+  gddgrow_10: 'Growing-Degree-Days-10C',
+  gddgrow_5: 'Growing-Degree-Days-5C',
+  gddgrow_0: 'Cumulative-degree-days-above-0C',
+  hddheat_18: 'Heating-degree-days',
+  ice_days: 'Ice-Days',
+  tr_18: 'Tropical-Nights-Days-with-Tmin_GreaterThan_18C',
+  tr_20: 'Tropical-Nights-Days-with-Tmin_GreaterThan_20C',
+  tr_22: 'Tropical-Nights-Days-with-Tmin_GreaterThan_22C',
+  slr: 'Sea-Level_Change',
+  all: 'All',
+};
+
+function getGA4EventNameForVariableDataBCCAQv2() {
+  var gA4EventNameForVariableDataBCCAQv2 = '';
+
+  try {
+    var eventType = $('[data-query-key="var"]').val();
+
+    if (variableDataTypes[eventType]) {
+      gA4EventNameForVariableDataBCCAQv2 =
+        'Download_Variable-Data_BCCAQv2_' +
+        variableDataTypes[eventType] +
+        '_Frequency_Location_Format';
+    } else {
+      throw (
+        'Invalid GA4 event name (Download_Variable-Data_BCCAQv2): ' + eventType
+      );
+    }
+  } catch (err) {
+    console.error(err);
+  }
+
+  return gA4EventNameForVariableDataBCCAQv2;
+}
+
+function CreateAnalyzeProcessRequestData(
+  data_sectorCoord,
+  data_form_inputs,
+  data_form_obj,
+) {
+  let isBySector = data_form_inputs['shape'] != '';
+
+  for (var key in data_form_inputs) {
+    switch (key) {
+      case 'shape':
+        break;
+
+      case 'average':
+        data_form_obj['inputs'].push({
+          id: key,
+          data: data_form_inputs[key],
+        });
+        break;
+
+      case 'dataset':
+        data_form_obj['inputs'].push({
+          id: 'dataset',
+          data: DATASETS[data_form_inputs[key]].finch_name,
+        });
+        break;
+
+      case 'scenario':
+        data_form_inputs[key].split(',').forEach(function (component) {
+          data_form_obj['inputs'].push({
+            id: key,
+            data: component,
+          });
+        });
+        break;
+
+      default:
+        let addData = data_form_inputs[key];
+        if (isBySector && (key == 'lat' || key == 'lon')) {
+          addData = data_sectorCoord['s_lat'];
+          if (key == 'lon') {
+            addData = data_sectorCoord['s_lon'];
+          }
+        }
+
+        console.log(key, addData);
+
+        data_form_obj['inputs'].push({
+          id: key,
+          data: addData,
+        });
+        break;
+    }
+  }
+
+  console.log(data_form_obj);
+
+  return data_form_obj;
+}
+
+var analyze_bccaqv2_dict = {
+  hxmax_days_above: 'HXMax Days Above a Threshold',
+  wetdays: 'Wet Days',
+  sdii: 'Average Wet Day Precipitation Intensity',
+  cwd: 'Maximum Consecutive Wet Days',
+  cdd: 'Maximum Consecutive Dry Days',
+  tx_tn_days_above: 'Days above Tmax and Tmin',
+  tx_days_above: 'Days above Tmax',
+  tropical_nights: 'Days above Tmin',
+  tn_days_below: 'Days below Tmin',
+  cooling_degree_days: 'Degree Days Above a Threshold',
+  heating_degree_days: 'Degree Days Below a Threshold',
+  heat_wave_index: 'Heat Wave',
+  heat_wave_total_length: 'Heat Wave Total Duration',
+  heat_wave_frequency: 'Heat Wave Frequency',
+  dlyfrzthw: 'Days with a Freeze-Thaw Cycle',
+  cold_spell_days: 'Cold Spell Days',
+};
+
+var datalayer_parameters = {
+  // For all events
+  lat: 'latitude',
+  lon: 'longitude',
+  shape: 'shape',
+  average: 'average',
+  start_date: 'start date',
+  end_date: 'end date',
+  ensemble_percentiles: 'ensemble percentiles',
+  dataset: 'dataset name',
+  models: 'models',
+  freq: 'frequence',
+  scenario: 'scenario',
+  data_validation: 'data validation',
+  output_format: 'output format',
+  // For some events
+  window: 'window',
+  thresh: 'thresh',
+  thresh_tasmin: 'threshold tasmin',
+  thresh_tasmax: 'threshold tasmin',
+};
+var dataLayer = [];
+function set_datalayer_for_analyze_bccaqv2(
+  form_obj_inputs,
+  customize_variables,
+) {
+  var analyze_bccaqv2_parameters = '';
+  customize_variables = customize_variables.toLowerCase();
+  try {
+    $.each(form_obj_inputs, function (index, value) {
+      var value_id = value.id.toLowerCase();
+
+      if (datalayer_parameters[value_id]) {
+        analyze_bccaqv2_parameters +=
+          datalayer_parameters[value_id] + ': ' + value.data + ';  ';
+      }
+    });
+
+    if (!analyze_bccaqv2_dict[customize_variables]) {
+      throw (
+        'Can not get Analyze_BCCAQv2_* dataLayer event name: ' +
+        customize_variables
+      );
+    }
+
+    analyze_bccaqv2_dict[customize_variables] = analyze_bccaqv2_dict[
+      customize_variables
+    ].replaceAll(' ', '-');
+    event_type = 'Analyze_BCCAQv2_' + analyze_bccaqv2_dict[customize_variables];
+
+    dataLayer.push({
+      event: event_type,
+      analyze_bccaqv2_event_type: event_type,
+      analyze_bccaqv2_parameters: analyze_bccaqv2_parameters,
+    });
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function validate_email(email_val) {
+  let is_valid = false;
+
+  if (
+    typeof email_val !== 'undefined' &&
+    email_val != 'undefined' &&
+    email_val != ''
+  ) {
+    if (email_val.indexOf('@') !== -1 && email_val.indexOf('.') !== -1) {
+      if (email_val.indexOf('@') !== 0) {
+        var after_at = email_val.substring(email_val.indexOf('@'));
+
+        if (after_at.indexOf('.') !== -1) {
+          var after_dot = after_at.substring(after_at.indexOf('.'));
+
+          if (after_dot.length > 1) {
+            is_valid = true;
+          }
+        }
+      }
+    }
+  }
+
+  return is_valid;
 }

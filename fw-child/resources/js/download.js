@@ -473,7 +473,7 @@
             do_history: 'replace',
             callback: function () {
               plugin.update_default_scheme(function () {
-                console.log('handle_input get layer');
+                console.log('accordion get layer');
 
                 $(document).cdc_app(
                   'maps.get_layer',
@@ -738,6 +738,8 @@
       item.on(
         'map_item_mouseover',
         function (e, mouse_event, this_gid, style_obj) {
+          this_gid = String(this_gid);
+
           style_obj = {
             ...{
               color: '#444',
@@ -767,6 +769,8 @@
       item.on(
         'map_item_mouseout',
         function (e, mouse_event, this_gid, style_obj) {
+          this_gid = String(this_gid);
+
           style_obj = {
             ...{
               color: '#444',
@@ -801,7 +805,10 @@
       item.on(
         'map_item_select',
         function (e, mouse_event, this_gid, style_obj) {
-          console.log('select ' + this_gid);
+          // console.log('select ' + this_gid);
+
+          this_gid = String(this_gid);
+
           // reset query.selections
           let selections = item
             .find('#area-selections')
@@ -890,6 +897,8 @@
         function (e, mouse_event, this_gid, style_obj) {
           console.log('station click', this_gid);
 
+          this_gid = String(this_gid);
+
           options.station.color = style_obj.color;
 
           let selections = item.find('#station-select').val();
@@ -902,7 +911,7 @@
           // console.log('current selections', selections);
 
           if (selections.includes(this_gid)) {
-            console.log('remove ' + this_gid);
+            // console.log('remove ' + this_gid);
 
             for (var i = selections.length - 1; i >= 0; i--) {
               if (selections[i] === this_gid) selections.splice(i, 1);
@@ -910,7 +919,7 @@
 
             delete options.selection_data[this_gid];
           } else {
-            console.log('add ' + this_gid);
+            // console.log('add ' + this_gid);
             selections.push(this_gid);
 
             options.selection_data[this_gid] = {
@@ -965,7 +974,7 @@
       // station selection
 
       item.find('#station-select').on('select2:select', function (e) {
-        let this_gid = e.params.data.id,
+        let this_gid = String(e.params.data.id),
           selections = $(this).val();
 
         options.selection_data[this_gid] = {
@@ -979,7 +988,7 @@
       });
 
       item.find('#station-select').on('select2:unselect', function (e) {
-        let this_gid = e.params.data.id; //parseInt(e.params.data.id);
+        let this_gid = String(e.params.data.id); //parseInt(e.params.data.id);
         let selections = $(this).val();
 
         // convert values to integers
@@ -1224,6 +1233,7 @@
 
       let style_obj;
 
+      this_gid = String(this_gid);
       console.log('update stations', selections, this_gid);
 
       // each map
@@ -1486,11 +1496,11 @@
 
           // convert string value to array of integers
 
-          let selections = this_val.split(',').filter(function (i) {
+          this_val = this_val.split(',').filter(function (i) {
             return i;
           });
 
-          this_val = [];
+          // this_val = [];
 
           // each selection
           // selections.forEach(function (this_gid) {
@@ -2568,7 +2578,7 @@
           let this_input = $(this),
             validate_this = true;
 
-          console.log('checking', this_input);
+          // console.log('checking', this_input);
 
           if (!this_input.is(':visible') && !this_input.is('[type="hidden"]')) {
             validate_this = false;
@@ -3287,7 +3297,7 @@
             for (var i = 0; i < query.selections.length; i++) {
               point = options.selection_data[query.selections[i]];
 
-              console.log(point);
+              // console.log(point);
 
               if (i != 0) pointsInfo += ' ; ';
 

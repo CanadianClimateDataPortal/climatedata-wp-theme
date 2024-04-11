@@ -26,11 +26,11 @@
 					
 					<a href="#data-variable" class="tab-drawer-trigger var-name d-block bg-white text-body p-3 mb-3" data-validate="#data-var"><?php _e ( 'Click to select a variable', 'cdc' ); ?></a>
 					
-					<div id="var-thresholds" class="me-3" style="display: none;" data-display="threshold:1,inputs:1">
+					<div id="var-thresholds" class="me-3" style="display: none;" data-flags="threshold:1,custom:1">
 						<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Thresholds', 'cdc' ); ?></h6>
 						
 						<div class="accordion accordion-flush" id="var-threshold-accordion">
-							<div class="accordion-item" data-display="threshold:1">
+							<div class="accordion-item" data-flags="threshold:1">
 								<h6 class="accordion-header" id="threshold-preset-head">
 									<button id="threshold-preset-btn" class="accordion-button all-caps text-gray-600 mb-0" type="button" data-bs-toggle="collapse" data-bs-target="#threshold-preset" aria-expanded="true" aria-controls="threshold-preset">
 										<?php _e ( 'Presets', 'cdc' ); ?>
@@ -48,7 +48,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="accordion-item" data-display="inputs:1">
+							<div class="accordion-item" data-flags="custom:1">
 								<h6 class="accordion-header" id="threshold-custom-head">
 									<button class="accordion-button all-caps text-gray-600 mb-0 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#threshold-custom" aria-expanded="false" aria-controls="threshold-custom">
 										<?php _e ( 'Custom', 'cdc'); ?>
@@ -66,11 +66,11 @@
 					
 				</div>
 				
-				<div id="map-control-dataset" class="map-control-item" data-display="station:0">
+				<div id="map-control-dataset" class="map-control-item" data-flags="station:0">
 					<h6 class="all-caps text-secondary mb-3">Dataset</h6>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="data-dataset" id="data-dataset-cmip6" value="cmip6" data-query-key="dataset" checked>
+						<input class="form-check-input" type="radio" name="data-dataset" id="data-dataset-cmip6" value="cmip6" data-query-key="dataset">
 						<label class="form-check-label" for="data-dataset-cmip6">CMIP6 (CanDCS-U6)</label>
 					</div>
 					
@@ -79,20 +79,20 @@
 						<label class="form-check-label" for="data-dataset-cmip5">CMIP5 (CanDCS-U5)</label>
 					</div>
 					
-					<div class="form-check" data-display="threshold:1">
-						<input class="form-check-input" type="radio" name="data-dataset" id="data-dataset-humidex">
+					<div class="form-check">
+						<input class="form-check-input" type="radio" name="data-dataset" id="data-dataset-humidex" value="humidex" data-query-key="dataset">
 						<label class="form-check-label" for="data-dataset-humidex">Humidex (CMIP6)</label>
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="data-dataset" id="data-dataset-ahccd">
-						<label class="form-check-label" for="data-dataset-ahccd">AHCCD</label>
+						<input class="form-check-input" type="radio" name="data-dataset" id="data-dataset-ahccd" value="ahccd" data-query-key="dataset">
+						<label class="form-check-label" for="data-dataset-ahccd">Observations (AHCCD)</label>
 					</div>
 					
-					<div class="form-check">
-						<input class="form-check-input" type="radio" name="data-dataset" id="data-dataset-station">
+					<?php /*<div class="form-check">
+						<input class="form-check-input" type="radio" name="data-dataset" id="data-dataset-station" value="regular" data-query-key="regular">
 						<label class="form-check-label" for="data-dataset-station">Regular Station Data</label>
-					</div>
+					</div>*/ ?>
 					
 				</div>
 				

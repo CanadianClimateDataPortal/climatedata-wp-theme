@@ -39,7 +39,7 @@
  * @link https://www.phpcaptcha.org/Securimage_Docs/ Online Documentation
  * @copyright 2018 Drew Phillips
  * @author Drew Phillips <drew@drew-phillips.com>
- * @version 3.6.7 (March 2018)
+ * @version 3.6.8 (May 2020)
  * @package Securimage
  *
  */
@@ -47,6 +47,14 @@
 /**
 
  ChangeLog
+ 3.6.8
+ - Ability to fix open_basedir warning by setting Securimage::$lame_binary_path = ''; (#63)
+ - Fix division by zero if captcha length is 1 (#88)
+ - Add options to getCaptchaHtml input_required (#82) and js_url (#95)
+ - PHP 7.3/7.4 compat fixes (#101)
+ - Project status: https://github.com/dapphp/securimage/issues/99
+ - Improve handling of multi-byte wordlists (#87)
+
  3.6.7
  - Merge changes from 4.0.1-nextgen
  - Increase captcha difficulty
@@ -420,7 +428,7 @@ class Securimage
      * The length of the captcha code
      * @var int
      */
-    public $code_length    = 6;
+    public $code_length    = 4;
 
     /**
      * Display random spaces in the captcha text on the image
@@ -499,19 +507,19 @@ class Securimage
      *
      * @var double
      */
-    public $perturbation = 0.85;
+    public $perturbation = 0.5;
 
     /**
      * How many lines to draw over the captcha code to increase security
      * @var int
      */
-    public $num_lines    = 5;
+    public $num_lines    = 3;
 
     /**
      * The level of noise (random dots) to place on the image, 0-10
      * @var int
      */
-    public $noise_level  = 2;
+    public $noise_level  = 1;
 
     /**
      * The signature text to draw on the bottom corner of the image
@@ -1308,6 +1316,8 @@ class Securimage
      *         true/false  Whether or not to show a button to refresh the image (default: true)
      *     'audio_icon_url':
      *         URL to the image used for showing the HTML5 audio icon
+     *     'js_url':
+     *         URL to the javascript file
      *     'icon_size':
      *         Size (for both height & width) in pixels of the audio and refresh buttons
      *     'show_text_input':
@@ -1362,12 +1372,14 @@ class Securimage
         $icon_size         = (isset($options['icon_size'])) ? $options['icon_size'] : 32;
         $audio_play_url    = (isset($options['audio_play_url'])) ? $options['audio_play_url'] : null;
         $audio_swf_url     = (isset($options['audio_swf_url'])) ? $options['audio_swf_url'] : null;
+        $js_url            = (isset($options['js_url'])) ? $options['js_url'] : null;
         $show_input        = (isset($options['show_text_input'])) ? (bool)$options['show_text_input'] : true;
         $refresh_alt       = (isset($options['refresh_alt_text'])) ? $options['refresh_alt_text'] : 'Refresh Image';
         $refresh_title     = (isset($options['refresh_title_text'])) ? $options['refresh_title_text'] : 'Refresh Image';
         $input_text        = (isset($options['input_text'])) ? $options['input_text'] : 'Type the text:';
         $input_id          = (isset($options['input_id'])) ? $options['input_id'] : 'captcha_code';
         $input_name        = (isset($options['input_name'])) ? $options['input_name'] :  $input_id;
+        $input_required    = (isset($options['input_required'])) ? (bool)$options['input_required'] : true;
         $input_attrs       = (isset($options['input_attributes'])) ? $options['input_attributes'] : array();
         $image_attrs       = (isset($options['image_attributes'])) ? $options['image_attributes'] : array();
         $error_html        = (isset($options['error_html'])) ? $options['error_html'] : null;
@@ -1431,6 +1443,10 @@ class Securimage
             $swf_path = $audio_swf_url;
         }
 
+        if (!empty($js_url)) {
+            $js_path = $js_url;
+        }
+
         $audio_obj = $image_id . '_audioObj';
         $html      = '';
 
@@ -1445,7 +1461,7 @@ class Securimage
 
             // check for existence and executability of LAME binary
             // prefer mp3 over wav by sourcing it first, if available
-            if (is_executable(Securimage::$lame_binary_path)) {
+            if (!empty(Securimage::$lame_binary_path) && is_executable(Securimage::$lame_binary_path)) {
                 $html .= sprintf('<source id="%s_source_mp3" src="%sid=%s&amp;format=mp3" type="audio/mpeg">', $image_id, $play_path, uniqid()) . "\n";
             }
 
@@ -1533,6 +1549,7 @@ class Securimage
             $input_attrs['name'] = $input_name;
             $input_attrs['id']   = $input_id;
             $input_attrs['autocomplete'] = 'off';
+            if ($input_required) $input_attrs['required'] = $input_required;
 
             foreach($input_attrs as $name => $val) {
                 $input_attr .= sprintf('%s="%s" ', $name, htmlspecialchars($val));
@@ -1729,8 +1746,6 @@ class Securimage
     public function getCode($array = false, $returnExisting = false)
     {
         $code = array();
-        $time = 0;
-        $disp = 'error';
 
         if ($returnExisting && strlen($this->code) > 0) {
             if ($array) {
@@ -1769,9 +1784,11 @@ class Securimage
 
         if ($array == true) {
             return $code;
-        } else {
+        } elseif (!empty($code['code'])) {
             return $code['code'];
         }
+
+        return '';
     }
 
     /**
@@ -2109,7 +2126,7 @@ class Securimage
             $angleN = -$angleN;
         }
 
-        $step   = abs($angle0 - $angleN) / ($this->strlen($captcha_text) - 1);
+        $step   = abs($angle0 - $angleN) / (max(1, $this->strlen($captcha_text) - 1));
         $step   = ($angle0 > $angleN) ? -$step : $step;
         $angle  = $angle0;
 
@@ -2503,33 +2520,43 @@ class Securimage
         if (!$fp) return false;
 
         $fsize = filesize($this->wordlist_file);
-        if ($fsize < 128) return false; // too small of a list to be effective
+        if ($fsize < 512) return false; // too small of a list to be effective
 
         if ((int)$numWords < 1 || (int)$numWords > 5) $numWords = 1;
 
         $words = array();
-        $i = 0;
+        $w     = 0;
+        $tries = 0;
         do {
-            fseek($fp, mt_rand(0, $fsize - 128), SEEK_SET); // seek to a random position of file from 0 to filesize-128
-            $data = fread($fp, 128); // read a chunk from our random position
+            fseek($fp, mt_rand(0, $fsize - 512), SEEK_SET); // seek to a random position of file from 0 to filesize - 512 bytes
+            $data = fread($fp, 512); // read a chunk from our random position
 
-            if ($mb_support !== false) {
-                $data = mb_ereg_replace("\r?\n", "\n", $data);
-            } else {
-                $data = preg_replace("/\r?\n/", "\n", $data);
+            if ( ($p = $this->strpos($data, "\n")) !== false) {
+                $data = $this->substr($data, $p + 1);
             }
 
-            $start = @$this->strpos($data, "\n", mt_rand(0, 56)) + 1; // random start position
-            $end   = @$this->strpos($data, "\n", $start);          // find end of word
-
-            if ($start === false) {
-                // picked start position at end of file
+            if ( ($start = @$this->strpos($data, "\n", mt_rand(0, $this->strlen($data) / 2))) === false) {
                 continue;
-            } else if ($end === false) {
-                $end = $this->strlen($data);
             }
 
-            $word = $strtolower_func($this->substr($data, $start, $end - $start)); // return a line of the file
+            $data = $this->substr($data,$start + 1);
+            $word = '';
+
+            for ($i = 0; $i < $this->strlen($data); ++$i) {
+                $c = $this->substr($data, $i, 1);
+                if ($c == "\r") continue;
+                if ($c == "\n") break;
+
+                $word .= $c;
+            }
+
+            $word = trim($word);
+
+            if (empty($word)) {
+                continue;
+            }
+
+            $word = $strtolower_func($word);
 
             if ($mb_support) {
                 // convert to UTF-8 for imagettftext
@@ -2537,11 +2564,15 @@ class Securimage
             }
 
             $words[] = $word;
-        } while (++$i < $numWords);
+        } while (++$w < $numWords && $tries++ < $numWords * 2);
 
         fclose($fp);
 
-        if ($numWords < 2) {
+        if (count($words) < $numWords) {
+            return false;
+        }
+
+        if ($numWords == 1) {
             return $words[0];
         } else {
             return $words;

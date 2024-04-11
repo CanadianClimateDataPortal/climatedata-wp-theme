@@ -13,6 +13,9 @@
 
 // leaflet
 
+@import '../vendor/leaflet-markercluster/MarkerCluster.css';
+@import '../vendor/leaflet-markercluster/MarkerCluster.Default.css';
+
 .leaflet-container {
   font-family: $font-family-base;
 }

@@ -18,7 +18,7 @@
 					</div>
 				</div>
 			
-				<div id="map-control-timeframe" class="map-control-item" data-display="station:0">
+				<div id="map-control-timeframe" class="map-control-item" data-flags="station:0">
 				
 					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Timeframe', 'cdc' ); ?></h6>
 					
@@ -49,7 +49,7 @@
 					</div>
 				</div>
 				
-				<div id="map-control-datepicker" class="map-control-item" data-display="station:1" style="display: none;">
+				<div id="map-control-datepicker" class="map-control-item" data-request="station">
 				
 					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Timeframe', 'cdc' ); ?></h6>
 					
@@ -62,20 +62,29 @@
 								$start_date = strtotime ( "-30 years", time() );
 								echo date ( 'Y-m-d', $start_date );
 								
-							?>" data-query-key="start_date">
+							?>" data-query-key="start_date" data-validate="<?php _e ( 'Start date is required', 'cdc' ); ?>">
 							
 						</div>
 						
 						<div class="col">
 							<label for="to" class="h6 all-caps text-gray-600"><?php _e ( 'End Date', 'cdc' ); ?></label>
 							
-							<input type="text" id="details-datepicker-end" name="details-datepicker-end" class="form-control" value="<?php echo date ( 'Y-m-d' ); ?>" data-query-key="end_date">
+							<input type="text" id="details-datepicker-end" name="details-datepicker-end" class="form-control" value="<?php echo date ( 'Y-m-d' ); ?>" data-query-key="end_date" data-validate="<?php _e ( 'End date is required', 'cdc' ); ?>">
 							
 						</div>
 					</div>
 				</div>
 				
-				<div id="map-control-panels" class="map-control-item" data-display="threshold:1,single:1,station:0">
+				<div id="map-control-models" class="map-control-item" data-flags="custom:1">
+					
+					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Models', 'cdc' ); ?></h6>
+					
+					<div id="models-placeholder" class="row row-cols-2">
+						
+					</div>
+				</div>
+				
+				<div id="map-control-panels" class="map-control-item" data-flags="threshold:1,single:1,station:0">
 					
 					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Scenarios', 'cdc' ); ?></h6>
 					
@@ -108,9 +117,39 @@
 					</div>
 				</div>
 				
-				<div id="map-control-percentiles" class="map-control-item" data-display="threshold:1">
+				<div id="map-control-missing" class="map-control-item" data-request="ahccd">
+					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Missing Data Options', 'cdc' ); ?></h6>
 					
-					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Percentiles', 'cdc' ); ?></h6>
+					<div class="row row-cols-2">
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="details-missing" id="details-missing-5" value="0.05" data-query-key="check_missing">
+							<label class="form-check-label" for="details-missing-5">5%</label>
+						</div>
+						
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="details-missing" id="details-missing-10" value="0.1" data-query-key="check_missing">
+							<label class="form-check-label" for="details-missing-10">10%</label>
+						</div>
+						
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="details-missing" id="details-missing-15" value="0.15" data-query-key="check_missing">
+							<label class="form-check-label" for="details-missing-15">15%</label>
+						</div>
+						
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="details-missing" id="details-missing-wmo" value="wmo" data-query-key="check_missing">
+							<label class="form-check-label" for="details-missing-wmo">WMO Parameters</label>
+						</div>
+					</div>
+					
+				</div>
+				
+				<div id="map-control-percentiles" class="map-control-item" data-request="custom">
+					
+					<h6 class="d-flex align-items-center h6 mb-3 all-caps text-secondary">
+						<?php _e ( 'Percentiles', 'cdc' ); ?>
+						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="<?php _e ( 'Unselect all to receive output from individual models', 'cdc' ); ?>">?</a>
+					</h6>
 					
 					<div class="row row-cols-4">
 						<div class="col">
@@ -165,11 +204,11 @@
 					
 				</div>
 				
-				<div id="map-control-frequency" class="map-control-item" data-display="station:0">
+				<div id="map-control-frequency" class="map-control-item" data-flags="station:0">
 					
 					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Temporal Frequency', 'cdc' ); ?></h6>
 					
-					<div id="map-control-frequency-radio" class="row row-cols-2" data-display="threshold:1">
+					<div id="map-control-frequency-radio" class="row row-cols-2" data-flags="custom:1" data-request="custom,ahccd">
 						<div class="col">
 							<div class="form-check">
 								<input class="form-check-input" type="radio" name="details-frequency" id="details-frequency-annual" value="YS" data-query-key="frequency" checked>
@@ -200,7 +239,7 @@
 						
 					</div>
 					
-					<div id="map-control-frequency-select" data-display="threshold:0">
+					<div id="map-control-frequency-select" data-flags="custom:0" data-request="threshold,single">
 						
 						<select class="form-select" name="data-frequency" data-query-key="frequency">
 							<option value="ann" data-field="ann"><?php _e ( 'Annual', 'cdc' ); ?></option>
@@ -242,12 +281,12 @@
 								<label class="form-check-label" for="details-format-csv">CSV</label>
 							</div>
 							
-							<div class="form-check mb-0" data-display="station:0">
+							<div class="form-check mb-0" data-flags="station:0">
 								<input class="form-check-input" type="radio" name="details-format" id="details-format-netcdf" value="netcdf" data-query-key="format">
 								<label class="form-check-label" for="details-format-netcdf">NetCDF</label>
 							</div>
 							
-							<div class="form-check mb-0" data-display="station:1">
+							<div class="form-check mb-0" data-flags="station:1">
 								<input class="form-check-input" type="radio" name="details-format" id="details-format-json" value="json" data-query-key="format">
 								<label class="form-check-label" for="details-format-json">GeoJSON</label>
 							</div>
@@ -256,7 +295,7 @@
 					
 				</div>
 				
-				<div id="map-control-decimals" class="map-control-item" data-display="station:0">
+				<div id="map-control-decimals" class="map-control-item" data-flags="station:0">
 					<div class="row row-cols-2 align-items-center">
 						<div class="col">
 							<label for="" class="h6 all-caps text-secondary"><?php _e ( 'Decimal Places', 'cdc' ); ?></label>

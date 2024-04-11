@@ -16,6 +16,8 @@
           layers: {
             raster: null,
             grid: null,
+            station_clusters: null,
+            stations: null,
           },
         },
         medium: {
@@ -24,6 +26,8 @@
           layers: {
             raster: null,
             grid: null,
+            station_clusters: null,
+            stations: null,
           },
         },
         high: {
@@ -32,6 +36,8 @@
           layers: {
             raster: null,
             grid: null,
+            station_clusters: null,
+            stations: null,
           },
         },
       },
@@ -286,6 +292,7 @@
         'maps.init',
         options.maps,
         options.legend,
+        null,
       );
 
       // BOOTSTRAP
@@ -965,6 +972,8 @@
 
         list_item.trigger('click');
       });
+
+      // change tabs
 
       item.on('td_update_path', function (e, prev_id, current_id) {
         if (prev_id == '#location-detail' && options.grid.selected != null) {
@@ -1816,17 +1825,13 @@
 
       // VAR FLAGS
 
-      // console.log('flags', options.var_flags);
-
-      let items_to_hide = [],
-        items_to_show = [];
-
-      item.find('[data-display]').each(function () {
+      // each item with display conditions
+      item.find('[data-flags]').each(function () {
         let condition_met = false;
 
         // each condition
         $(this)
-          .attr('data-display')
+          .attr('data-flags')
           .split(',')
           .forEach(function (condition) {
             // split key & val

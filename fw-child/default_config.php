@@ -21,4 +21,4 @@ function custom_global_vars()
 }
 
 
-add_action('wp', 'custom_global_vars');
+add_action('init', 'custom_global_vars');

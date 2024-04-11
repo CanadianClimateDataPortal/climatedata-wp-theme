@@ -351,6 +351,7 @@ $overlay-switch-bg: rgba($gray-400, 0.99);
       }
 
       p {
+        font-size: 1rem;
         color: $gray-600;
       }
     }
@@ -746,6 +747,7 @@ $legend-on-height: 16px;
   background-color: transparentize($white, 0.5);
   text-shadow: 0 1px transparentize($white, 0.2);
   font-size: 1.25rem;
+  pointer-events: none;
   transform: translate(-50%, -50%);
   z-index: 999;
 }
@@ -1182,6 +1184,16 @@ body.tab-drawer-open {
       transition: left $td-slide-transition-duration ease 0s;
     }
   }
+
+  #area-aggregation-select-mode {
+    .btn-check {
+      &:checked {
+        & + .btn {
+          background-color: $gray-600;
+        }
+      }
+    }
+  }
 }
 
 #var-threshold-accordion {
@@ -1207,10 +1219,6 @@ body.tab-drawer-open {
     background-color: $gray-200;
 
     input {
-      margin: 0 0.25em;
-      max-width: 80px;
-      border: none;
-      font-size: 87.5%;
     }
   }
 }
@@ -1220,6 +1228,140 @@ body.tab-drawer-open {
     font-size: 1.125rem;
     line-height: 2.125rem;
   }
+}
+
+.threshold-input {
+  display: inline-block;
+  width: auto;
+  max-width: 80px;
+  margin: 0 0.5em;
+  padding: 0.25em;
+  border: none;
+  background-color: $gray-400;
+  font-size: 87.5%;
+  font-weight: bold;
+  text-align: center;
+
+  &:focus {
+    background-color: $white;
+  }
+}
+
+// SUBMIT TAB
+
+#submit-captcha {
+  input {
+  }
+}
+
+#captcha-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+
+  img {
+    flex: 1 0 100%;
+  }
+
+  a,
+  #captcha_img_audio_controls {
+    // flex: 0 0;
+
+    img {
+      display: block;
+      width: 20px;
+      height: auto;
+    }
+  }
+
+  br {
+    display: none;
+  }
+}
+
+#captcha_img {
+  margin-bottom: 1rem;
+}
+
+#captcha_img_audio_div {
+  position: absolute;
+  left: -9999px;
+}
+
+// RESULT
+
+#submit-result {
+  .btn-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+
+  .tab-drawer-content-inner {
+  }
+
+  &.success {
+    .tab-drawer-content-inner {
+      #result-head,
+      #result-message,
+      #result-btn {
+        opacity: 1;
+      }
+
+      #result-head {
+        color: $secondary;
+        transition: 0.25s ease 0.2s;
+      }
+
+      #result-message {
+        transition: 0.25s ease 0.6s;
+      }
+
+      #result-btn {
+        transition: 0.25s ease 1s;
+      }
+    }
+  }
+
+  &.error {
+    .tab-drawer-content-inner {
+      #result-head,
+      #result-message {
+        opacity: 1;
+      }
+
+      #result-head {
+        color: $primary;
+        transition: 0.25s ease 0.2s;
+      }
+
+      #result-message {
+        transition: 0.25s ease 0.6s;
+      }
+    }
+  }
+
+  #result-head {
+    opacity: 0;
+    transition: 0s;
+  }
+
+  #result-message {
+    opacity: 0;
+    text-align: center;
+    font-size: 1.25rem;
+    line-height: 1.25;
+    transition: 0s;
+  }
+
+  #result-btn {
+    opacity: 0;
+    transition: 0s;
+  }
+}
+
+#result-head {
+  text-align: center;
 }
 
 //

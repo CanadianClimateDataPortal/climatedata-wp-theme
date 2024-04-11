@@ -85,6 +85,8 @@ function child_theme_enqueue() {
 	
 	wp_enqueue_style ( 'leaflet', $child_npm_dir . 'leaflet/dist/leaflet.css', NULL, NULL, 'all' );
 	
+	wp_enqueue_style ( 'leaflet-geoman', $child_vendor_dir . 'leaflet-geoman/leaflet-geoman.css', NULL, NULL, 'all' );
+	
 	// select2
 	
 	wp_register_style ( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', null, null );
@@ -142,7 +144,13 @@ function child_theme_enqueue() {
 	
 	wp_register_script ( 'leaflet-sync', $child_npm_dir . 'leaflet.sync/L.Map.Sync.js', array ( 'leaflet' ), null, true );
 	
+	wp_register_script ( 'leaflet-geoman', $child_vendor_dir . 'leaflet-geoman/leaflet-geoman.min.js', array ( 'leaflet' ), NULL, true );
+	
 	wp_register_script ( 'leaflet-vectorgrid', $child_npm_dir . 'leaflet.vectorgrid/dist/Leaflet.VectorGrid.bundled.min.js', array ( 'leaflet' ), null, true );
+	
+	wp_register_script ( 'leaflet-cluster', $child_vendor_dir . 'leaflet-markercluster/leaflet.markercluster.js', array ( 'leaflet' ), NULL, true );
+	
+	wp_register_script ( 'leaflet-cluster-subgroup', $child_vendor_dir . 'leaflet.featuregroup.subgroup.js', array ( 'leaflet-cluster' ), NULL, true );
 	
 	// highcharts
 	
@@ -163,11 +171,37 @@ function child_theme_enqueue() {
 	
 	// utilities/constants
 	
-	wp_register_script ( 'utilities', $child_js_dir . 'utilities.js', array ( 'jquery' ), NULL, true );
+	wp_register_script ( 'utilities', $child_js_dir . 'utilities.js', array ( 'jquery', 'leaflet' ), NULL, true );
+	
+	wp_localize_script ( 'utilities', 'theme_data', array (
+		'child_theme_dir' => get_stylesheet_directory_uri()
+	) );
 	
   wp_register_script ( 'data', $child_js_dir . 'data.js', array (  ), NULL, true );
 
-	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 'utilities', 'data', 'lodash', 'jquery', 'leaflet', 'leaflet-vectorgrid', 'leaflet-sync', 'tab-drawer', 'highcharts-highstock', 'highcharts-more', 'highcharts-exporting', 'highcharts-export-data', 'highcharts-offline-exporting', 'highcharts-accessibility' ), NULL, true );
+	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 
+		'utilities', 
+		'data', 
+		'lodash', 
+		'jquery', 
+		'leaflet', 
+		'leaflet-vectorgrid', 
+		'leaflet-sync', 
+		'leaflet-geoman', 
+		'leaflet-cluster', 
+		'leaflet-cluster-subgroup', 
+		'tab-drawer', 
+		'highcharts-highstock', 
+		'highcharts-more', 
+		'highcharts-exporting', 
+		'highcharts-export-data', 
+		'highcharts-offline-exporting', 
+		'highcharts-accessibility' 
+	), NULL, true );
+	
+	wp_localize_script ( 'cdc', 'theme_data', array (
+		'child_theme_dir' => get_stylesheet_directory_uri()
+	) );
 	
 	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'cdc', 'data', 'jquery-ui-slider', 'select2', 'flex-drawer' ), NULL, true );
 	
@@ -490,34 +524,4 @@ function short_province ( $province ) {
 			return $province;
 		}
 
-}
-
-
-function cdc_var_types_field () {
-
-	register_rest_field ( 'variable',
-		'var_types',
-		array (
-			'get_callback' => 'cdc_list_var_types',
-			'update_callback' => null,
-			'schema' => null,
-		)
-	);
-	
-}
-
-add_action ( 'rest_api_init', 'cdc_var_types_field' );
-
-function cdc_list_var_types ( $object, $field_name, $request ) {
-
-	$term_list = array();
-
-	$terms = get_the_terms ( $object['id'], 'var-type' );
-
-	foreach ($terms as $term) {
-		$term_list[] = $term->name;
-	}
-
-	return $term_list;
-	
 }

@@ -8,7 +8,7 @@
 			
 			<div class="control-tab-body">
 				
-				<div id="map-control-delta" class="map-control-item" data-display="station:0">
+				<div id="map-control-delta" class="map-control-item" data-flags="station:0">
 					<h6 class="all-caps text-secondary mb-3 d-flex align-items-center">
 						<?php _e ( 'Data Values', 'cdc' ); ?>
 						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
@@ -27,7 +27,7 @@
 					</div>
 				</div>
 				
-				<div id="map-control-aggregation" class="map-control-item" data-display="station:0">
+				<div id="map-control-aggregation" class="map-control-item" data-flags="station:0">
 					<h6 class="all-caps text-secondary mb-3 d-flex align-items-center">
 						<?php _e ( 'Map Aggregation', 'cdc' ); ?>
 						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>

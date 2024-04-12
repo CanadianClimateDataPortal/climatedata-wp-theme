@@ -722,7 +722,7 @@
             // get or load station data
             $.when(get_layer_data(query.var)).done(function (layer_data) {
               // console.log(layer_data);
-              console.log('ahccd', options.ahccd_data);
+              // console.log('ahccd', options.ahccd_data);
               // console.log('station', options.station_data);
               // console.log('idf', options.idf_data);
 
@@ -783,12 +783,12 @@
                     );
                   }
 
-                  console.log('create clusters');
+                  // console.log('create clusters');
                   this_map.layers.station_clusters = L.markerClusterGroup();
 
                   // create the layer
 
-                  console.log('create layer');
+                  // console.log('create layer');
                   this_map.layers.stations = L.geoJson(layer_data, {
                     pointToLayer: function (feature, latlng) {
                       if (query.dataset == 'ahccd') {
@@ -2955,7 +2955,10 @@
 
           item.find('.tab-drawer-trigger.var-name').text(var_title);
 
-          if (typeof data.acf.var_names != 'undefined') {
+          if (
+            typeof data.acf.var_names != 'undefined' &&
+            data.acf.var_names != null
+          ) {
             if (data.acf.var_names.length == 1) {
               // hide the threshold inputs
               item.find('#var-thresholds').hide();

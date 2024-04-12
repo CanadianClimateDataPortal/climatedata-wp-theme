@@ -11,72 +11,23 @@ const $ = jQuery;
 
 (function ($) {
   $(function () {
+    let app_page = null;
+
     //
     // APPS
     //
 
     if ($('body').attr('id') == 'page-map') {
+      app_page = 'map';
+
       // init apps
       $(document).cdc_app();
       $(document).map_app();
-
-      // help overlay
-
-      let help_overlay = bootstrap.Offcanvas.getOrCreateInstance('#help');
-      let info_overlay = bootstrap.Offcanvas.getOrCreateInstance('#info');
-
-      console.log('cookie', Cookies.get('cdc-map-dismiss-help'));
-
-      if (
-        Cookies.get('cdc-map-dismiss-help') == undefined ||
-        Cookies.get('cdc-map-dismiss-help') != 1
-      ) {
-        // show help
-        help_overlay.toggle();
-      }
-
-      // listeners
-
-      document
-        .getElementById('help')
-        .addEventListener('hide.bs.offcanvas', (event) => {
-          // console.log('check', $('#map-overlay-dontshow').prop('checked'));
-
-          // is the 'don't show again' switch checked
-          if ($('#map-overlay-dontshow').prop('checked') == true) {
-            Cookies.set('cdc-map-dismiss-help', 1);
-          }
-        });
-
-      // page tour
-      let tour_options = JSON.parse($('#page-tour').attr('data-steps'));
-
-      // todo
-      // if (current_lang == 'fr') {
-      //   tour_options.labels = {
-      //     start_over: 'Recommencer',
-      //     next: 'Suivant',
-      //     close: 'Quitter',
-      //     dont_show: 'Ne plus montrer',
-      //   };
-      // }
-
-      $('#page-tour').page_tour({
-        default_open: false,
-      });
-
-      $('.page-tour-start').click(function () {
-        // reset page to initial view
-        help_overlay.hide();
-        info_overlay.hide();
-        $('#control-bar').tab_drawer('update_path', '#');
-
-        // start
-        $('#page-tour').page_tour('show_tour');
-      });
     }
 
     if ($('body').attr('id') == 'page-download') {
+      app_page = 'download';
+
       $(document).cdc_app({
         grid: {
           styles: {
@@ -118,9 +69,67 @@ const $ = jQuery;
       $(document).download_app();
     }
 
-    //
-    // BOOTSTRAP COMPONENTS
-    //
+    if (app_page != null) {
+      // help overlay
+
+      let help_overlay = bootstrap.Offcanvas.getOrCreateInstance('#help');
+      let info_overlay = bootstrap.Offcanvas.getOrCreateInstance('#info');
+
+      console.log('cookie', Cookies.get('cdc-' + app_page + '-dismiss-help'));
+
+      if (
+        Cookies.get('cdc-' + app_page + '-dismiss-help') == undefined ||
+        Cookies.get('cdc-' + app_page + '-dismiss-help') != 1
+      ) {
+        // show help
+        help_overlay.toggle();
+      }
+
+      // listeners
+
+      document
+        .getElementById('help')
+        .addEventListener('hide.bs.offcanvas', (event) => {
+          // console.log('check', $('#map-overlay-dontshow').prop('checked'));
+
+          // is the 'don't show again' switch checked
+          if ($('#map-overlay-dontshow').prop('checked') == true) {
+            console.log('set cookie', 'cdc-' + app_page + '-dismiss-help');
+            Cookies.set('cdc-' + app_page + '-dismiss-help', 1, {
+              expires: 60,
+            });
+          }
+        });
+
+      // page tour
+      let tour_options = JSON.parse($('#page-tour').attr('data-steps'));
+
+      // todo
+      // if (current_lang == 'fr') {
+      //   tour_options.labels = {
+      //     start_over: 'Recommencer',
+      //     next: 'Suivant',
+      //     close: 'Quitter',
+      //     dont_show: 'Ne plus montrer',
+      //   };
+      // }
+
+      $('#page-tour').page_tour({
+        default_open: false,
+      });
+
+      $('.page-tour-start').click(function () {
+        // reset page to initial view
+        help_overlay.hide();
+        info_overlay.hide();
+        $('#control-bar').tab_drawer('update_path', '#', false);
+
+        // start
+        $('#page-tour').page_tour('show_tour');
+      });
+    }
+
+    // TAB DRAWER
 
     $('#menu-tabs').tab_drawer({
       history: {
@@ -128,6 +137,10 @@ const $ = jQuery;
       },
       debug: true,
     });
+
+    //
+    // BOOTSTRAP COMPONENTS
+    //
 
     // get the menu instance
     // so we can create a close event

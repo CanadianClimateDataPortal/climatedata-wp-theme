@@ -21,19 +21,22 @@
 				<div id="map-control-variable" class="map-control-item pe-0">
 					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Variable', 'cdc' ); ?></h6>
 					
-					<input type="hidden" name="data-var-id" id="data-var-id" value="" data-query-key="var_id">
-					<input type="hidden" name="data-var" id="data-var" value="" data-query-key="var" data-validate="<?php _e ( 'Select a variable to download', 'cdc' ); ?>">
+					<input type="hidden" name="data-var-id" id="data-var-id" value="" data-query-key="var_id" data-validate="<?php _e ( 'Select a variable to download', 'cdc' ); ?>">
+					<input type="hidden" name="data-var" id="data-var" value="" data-query-key="var">
 					
-					<a href="#data-variable" class="tab-drawer-trigger var-name d-block bg-white text-body p-3 mb-3" data-validate="#data-var"><?php _e ( 'Click to select a variable', 'cdc' ); ?></a>
+					<a href="#data-variable" class="tab-drawer-trigger var-name d-block bg-white text-body p-3 mb-3"><?php _e ( 'Click to select a variable', 'cdc' ); ?></a>
 					
 					<div id="var-thresholds" class="me-3" style="display: none;" data-flags="threshold:1,custom:1">
-						<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Thresholds', 'cdc' ); ?></h6>
+						<h6 class="d-flex align-items-center h6 mb-3 all-caps text-secondary">
+							<?php _e ( 'Threshold Values', 'cdc' ); ?>
+							<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+						</h6>
 						
 						<div class="accordion accordion-flush" id="var-threshold-accordion">
 							<div class="accordion-item" data-flags="threshold:1">
 								<h6 class="accordion-header" id="threshold-preset-head">
 									<button id="threshold-preset-btn" class="accordion-button all-caps text-gray-600 mb-0" type="button" data-bs-toggle="collapse" data-bs-target="#threshold-preset" aria-expanded="true" aria-controls="threshold-preset">
-										<?php _e ( 'Presets', 'cdc' ); ?>
+										<?php _e ( 'Preset', 'cdc' ); ?>
 									</button>
 								</h6>
 								<div id="threshold-preset" class="accordion-collapse collapse show" aria-labelledby="threshold-preset-head" data-bs-parent="#var-threshold-accordion">
@@ -56,7 +59,7 @@
 								</h6>
 								<div id="threshold-custom" class="accordion-collapse collapse" aria-labelledby="threshold-custom-head" data-bs-parent="#var-threshold-accordion">
 									<div class="accordion-body">
-										
+										<?php // custom inputs placeholder ?>
 									</div>
 								</div>
 							</div>
@@ -67,7 +70,10 @@
 				</div>
 				
 				<div id="map-control-dataset" class="map-control-item" data-flags="station:0">
-					<h6 class="all-caps text-secondary mb-3">Dataset</h6>
+					<h6 class="d-flex align-items-center h6 mb-3 all-caps text-secondary">
+						<?php _e ( 'Dataset', 'cdc' ); ?>
+						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+					</h6>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="data-dataset" id="data-dataset-cmip6" value="cmip6" data-query-key="dataset">

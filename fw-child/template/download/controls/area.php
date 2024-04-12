@@ -21,7 +21,7 @@
 				<input type="hidden" name="area-selections" id="area-selections" value="" data-query-key="selections" data-request="single,threshold,custom" data-validate="<?php _e ( 'At least 1 map region is required', 'cdc' ); ?>">
 				
 				<div id="map-control-stations" class="map-control-item" data-request="station,ahccd" style="display: none;">
-					<h6 class="all-caps text-secondary"><?php _e ( 'Select Stations', 'cdc' ); ?></h6>
+					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Select Stations', 'cdc' ); ?></h6>
 					
 					<select 
 						class="custom-select custom-select-md select2 form-control input-large" 
@@ -38,7 +38,10 @@
 				</div>
 					
 				<div id="map-control-aggregation" class="map-control-item conditional-trigger" data-request="single,threshold,custom">
-					<h6 class="all-caps text-secondary"><?php _e ( 'Change Aggregation', 'cdc' ); ?></h6>
+					<h6 class="d-flex align-items-center h6 mb-3 all-caps text-secondary">
+						<?php _e ( 'Change Aggregation', 'cdc' ); ?>
+						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+					</h6>
 					
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-grid" value="gridded_data" data-query-key="sector" data-conditional="#area-aggregation-select-mode">
@@ -46,15 +49,12 @@
 					</div>
 					
 					<div id="area-aggregation-select-mode" class="bg-gray-200 p-2 mb-2">
-						
-						<!-- <input type="hidden" name="area-bbox" id="area-bbox" value="" data-query-key="bbox"> -->
-						
 						<div class="btn-group" role="group">
 							<input type="radio" class="btn-check" name="area-selection" id="area-selection-select" value="select" autocomplete="off" checked>
-							<label class="btn btn-sm btn-outline-gray-600" for="area-selection-select"><?php _e ( 'Select', 'cdc' ); ?></label>
+							<label class="btn btn-sm btn-outline-gray-600" for="area-selection-select"><?php _e ( 'Select areas', 'cdc' ); ?></label>
 						
 							<input type="radio" class="btn-check" name="area-selection" id="area-selection-draw" value="draw" autocomplete="off">
-							<label class="btn btn-sm btn-outline-gray-600" for="area-selection-draw"><?php _e ( 'Draw', 'cdc' ); ?></label>
+							<label class="btn btn-sm btn-outline-gray-600" for="area-selection-draw"><?php _e ( 'Draw region', 'cdc' ); ?></label>
 						</div>
 						
 					</div>
@@ -97,7 +97,7 @@
 				</div>
 				
 				<div id="map-control-search" class="map-control-item">
-					<label for="area-search" class="h6 all-caps text-secondary"><?php _e ( 'Search &amp; Zoom', 'cdc' ); ?></label>
+					<label for="area-search" class="h6 all-caps text-secondary mb-3"><?php _e ( 'Search &amp; Zoom', 'cdc' ); ?></label>
 					
 					<select 
 						class="custom-select custom-select-md select2 form-control" 
@@ -124,17 +124,17 @@
 				</div>
 				
 				<div id="map-control-coords" class="map-control-item">
-					<h6 class="all-caps text-secondary">Change Coordinates</h6>
+					<h6 class="all-caps text-secondary"><?php _e ( 'Change Coordinates', 'cdc' ); ?></h6>
 					
 					<input type="hidden" name="coords" id="coords" data-query-key="coords">
 					
-					<label for="coords-lat">Latitude</label>
+					<label for="coords-lat"><?php _e ( 'Latitude', 'cdc' ); ?></label>
 					<input type="text" class="form-control coord-field" name="coords-lat" id="coords-lat">
 					
-					<label for="coords-lng">Longitude</label>
+					<label for="coords-lng"><?php _e ( 'Longitude', 'cdc' ); ?></label>
 					<input type="text" class="form-control coord-field" name="coords-lng" id="coords-lng">
 					
-					<label for="coords-zoom">Zoom</label>
+					<label for="coords-zoom"><?php _e ( 'Zoom', 'cdc' ); ?></label>
 					<input type="text" class="form-control coord-field" name="coords-zoom" id="coords-zoom">
 				</div>
 				

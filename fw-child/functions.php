@@ -259,6 +259,7 @@ function child_theme_enqueue() {
 			
 		case 'download' :
 		case 'telechargement' :
+			wp_enqueue_script ( 'page-tour' );
 			wp_enqueue_script ( 'download-app' );
 			wp_enqueue_script ( 'shapefile-upload' );
 			break;
@@ -454,6 +455,19 @@ add_action ( 'fw_before_footer', function() {
 
 	include ( locate_template ( 'template/menu-overlay.php' ) );
 
+} );
+
+// PAGE TOUR
+
+add_action ( 'fw_before_footer', function() {
+
+	if ( have_rows ( 'tour', $GLOBALS['fw']['current_query']['ID'] ) ) {
+		
+		echo '<div class="page-tour" id="page-tour" data-steps=';
+		
+		echo "'" . json_encode ( get_field ( 'tour', $GLOBALS['fw']['current_query']['ID'] ) ) . "'></div>";
+
+	}
 } );
 
 //

@@ -459,6 +459,10 @@
           case 'gridded_data':
             console.log('RASTER');
 
+            // show the leaflet 'raster' pane
+            // it may have been hidden by the accordion
+            item.find('.leaflet-raster-pane').show();
+
             options.choro.path = null;
 
             plugin.maps.do_legend.apply(item, [
@@ -1614,12 +1618,14 @@
 
         map.setZoom(zoom);
 
-        // console.log('pan to', coords);
+        console.log('pan to', coords);
 
         // pan to center
         map.panTo([coords.lat, coords.lng], { animate: false });
 
-        if (do_offset == true) {
+        if (typeof do_offset == 'integer') {
+          offset = do_offset;
+        } else if (do_offset == true) {
           switch (visible_maps.length) {
             case 3:
               offset = 0;
@@ -1632,12 +1638,12 @@
               break;
           }
 
-          // console.log('offset', offset);
+          console.log('offset', offset);
 
           // calculate pixel value for offset
           map_offset = map.getSize().x * offset;
 
-          // console.log('pan by', map_offset);
+          console.log('pan by', map_offset);
 
           // pan by offset
           map.panBy(new L.Point(-map_offset, 0), { animate: false });

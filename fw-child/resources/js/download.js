@@ -89,6 +89,7 @@
       },
       frequency: {},
       current_layer: null,
+      selection_mode: 'select',
       selection_data: {},
       station: {
         color: '#00f',
@@ -166,6 +167,7 @@
 
                 if (
                   typeof options.var_data.acf.var_names != 'undefined' &&
+                  options.var_data.acf.var_names != null &&
                   (options.query.var == null || options.query.var == 'null')
                 ) {
                   // update var in options.query
@@ -1005,7 +1007,9 @@
       // select/draw mode
 
       item.on('change', '[name="area-selection"]', function () {
-        switch ($(this).val()) {
+        options.selection_mode = $(this).val();
+
+        switch (options.selection_mode) {
           case 'draw':
             plugin.enable_bbox();
             break;
@@ -1087,6 +1091,47 @@
       });
 
       // manually update coord fields
+
+      item.on('click', '#map-control-coords .btn', function () {
+        let this_input = $(this).siblings().filter('[type="text"]'),
+          this_val = parseFloat(this_input.val()),
+          zoom_val = parseInt(item.find('#coords-zoom').val());
+
+        if (this_input.attr('id') == 'coords-zoom') {
+          // if changing the zoom, plus or minus 1 will suffice
+          if ($(this).hasClass('down-btn')) {
+            this_val -= 1;
+          } else if ($(this).hasClass('up-btn')) {
+            this_val += 1;
+          }
+        } else {
+          // generate a number of degrees to pan
+          // based on the zoom level
+
+          let multiplier = 1;
+
+          if (zoom_val <= 10 && zoom_val >= 8) {
+            multiplier = 2;
+          } else if (zoom_val >= 5) {
+            multiplier = 4;
+          } else if (zoom_val < 5) {
+            multiplier = 8;
+          }
+
+          if ($(this).hasClass('down-2')) {
+            this_val -= 0.4 * multiplier;
+          } else if ($(this).hasClass('down-1')) {
+            this_val -= 0.1 * multiplier;
+          } else if ($(this).hasClass('up-1')) {
+            this_val += 0.1 * multiplier;
+          } else if ($(this).hasClass('up-2')) {
+            this_val += 0.4 * multiplier;
+          }
+        }
+
+        // update & trigger
+        this_input.val(this_val.toFixed(1)).trigger('change');
+      });
 
       item.on('change', '.coord-field', function () {
         // repopulate the hidden coords field
@@ -1949,6 +1994,19 @@
           });
         }
 
+        // populate var info overlay
+
+        let desc_key = 'var_description' + (options.lang != 'en' ? '_fr' : ''),
+          tech_key =
+            'var_tech_description' + (options.lang != 'en' ? '_fr' : '');
+
+        item.find('#info-description').html(options.var_data.acf[desc_key]);
+        item
+          .find('#info-tech-description')
+          .html(options.var_data.acf[tech_key]);
+
+        item.find('#breadcrumb-overlay-trigger').show();
+
         console.log(options.var_data);
         fields = options.var_data.acf;
 
@@ -1977,20 +2035,6 @@
         }
 
         if (typeof fields.var_names != 'undefined') {
-          // populate var info overlay
-
-          let desc_key =
-              'var_description' + (options.lang != 'en' ? '_fr' : ''),
-            tech_key =
-              'var_tech_description' + (options.lang != 'en' ? '_fr' : '');
-
-          item.find('#info-description').html(options.var_data.acf[desc_key]);
-          item
-            .find('#info-tech-description')
-            .html(options.var_data.acf[tech_key]);
-
-          item.find('#breadcrumb-overlay-trigger').show();
-
           // var has at least 1 value in var_names
 
           if (fields.var_names != null && fields.var_names.length > 1) {
@@ -2033,6 +2077,8 @@
                   $(this)
                     .find('.ui-slider-handle')
                     .text(fields.var_names[ui.value].label);
+
+                  options.query.var = fields.var_names[ui.value].variable;
 
                   options.query_str.prev = options.query_str.current;
 
@@ -2247,11 +2293,6 @@
       // each item with request conditions
       item.find('[data-request]').each(function () {
         let condition_met = false;
-
-        if ($(this).attr('id') == 'map-control-aggregation') {
-          console.log('HEYYOYOOO');
-          console.log('aggys', options.request.type);
-        }
 
         // each condition
         $(this)
@@ -2551,7 +2592,23 @@
       }).then(function () {
         console.log('set offset');
         // set map center to marker location w/ offset
-        $(document).cdc_app('maps.set_center', coords, 10);
+        $(document).cdc_app('maps.set_center', coords, 10, false);
+
+        $('#coords-lat').val(coords.lat);
+        $('#coords-lng').val(coords.lng);
+        $('#coords-zoom').val(10);
+
+        $('[data-query-key="coords"]')
+          .val(
+            $('#coords-lat').val() +
+              ',' +
+              $('#coords-lng').val() +
+              ',' +
+              $('#coords-zoom').val(),
+          )
+          .trigger('change');
+
+        // $(document).trigger('update_input', [$('[data-query-key="coords"]')]);
       });
     },
 
@@ -2658,7 +2715,7 @@
               valid_msg = input_to_check.attr('data-validate');
             }
 
-            console.log('check', input_to_check, valid_msg);
+            // console.log('check', input_to_check, valid_msg);
 
             // check for blank value
             if (input_to_check.val() == '' || input_to_check.val() == 'null') {
@@ -2674,15 +2731,28 @@
         case '#data':
           break;
         case '#area':
-          if (
-            options.query.sector == 'gridded_data' &&
-            item.find('#area-selection-draw').prop('checked') == true &&
-            !options.query.hasOwnProperty('bbox')
-          ) {
-            invalid_messages.push('Draw an area on the map');
-          }
+          // check for selection limit
 
-          if (options.query.sector === 'upload') {
+          if (options.query.sector == 'gridded_data') {
+            if (
+              options.selection_mode == 'draw' &&
+              !options.query.hasOwnProperty('bbox')
+            ) {
+              // no box
+              invalid_messages.push('Draw an area on the map');
+            }
+
+            let limit = plugin.get_download_limits();
+
+            if (plugin.count_selections(options.selection_mode) > limit) {
+              // too many boxes D:
+              invalid_messages.push(
+                T(
+                  'With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}',
+                ).format(limit),
+              );
+            }
+          } else if (options.query.sector === 'upload') {
             // Validate the custom shapefile
             const validation_message =
               options.elements.shapefile_upload.shapefile_upload('validate');
@@ -2690,6 +2760,8 @@
               invalid_messages.push(validation_message);
             }
           }
+
+          break;
       }
 
       // console.log(invalid_messages);
@@ -3128,13 +3200,18 @@
                   lng_str = '';
 
                 Object.keys(options.selection_data).forEach(function (gid, i) {
-                  if (i != 0) {
-                    lat_str += ',';
-                    lng_str += ',';
-                  }
+                  if (
+                    options.selection_data[gid].lat != undefined &&
+                    options.selection_data[gid].lat != undefined
+                  ) {
+                    if (i != 0) {
+                      lat_str += ',';
+                      lng_str += ',';
+                    }
 
-                  lat_str += options.selection_data[gid].lat;
-                  lng_str += options.selection_data[gid].lng;
+                    lat_str += options.selection_data[gid].lat;
+                    lng_str += options.selection_data[gid].lng;
+                  }
                 });
 
                 form_obj.inputs.push({
@@ -3989,6 +4066,48 @@
       //         .find('.select2-selection__rendered')
       //         .text(T('Around {0} grid boxes selected').format(cells));
       //       checkform();
+    },
+
+    get_download_limits: function () {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      switch (options.query.frequency) {
+        case 'all':
+          return 80;
+        case 'daily':
+          switch (options.query.format) {
+            case 'netcdf':
+              return 200;
+            case 'csv':
+              return 20;
+          }
+        default:
+          return 1000;
+      }
+    },
+
+    count_selections: function (mode) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      if (mode == 'select') {
+        return options.selections.length;
+      } else if (mode == 'draw') {
+        if (options.query.hasOwnProperty('bbox')) {
+          let coords = options.query.bbox,
+            var_grid = options.var_data.acf.grid;
+
+          return Math.round(
+            ((coords[2] - coords[0]) * (coords[3] - coords[1])) /
+              grid_resolution[var_grid] ** 2,
+          );
+        } else {
+          return 0;
+        }
+      }
     },
   };
 

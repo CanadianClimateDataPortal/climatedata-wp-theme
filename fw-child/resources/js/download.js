@@ -1010,6 +1010,8 @@
       item.on('change', '[name="area-selection"]', function () {
         options.selection_mode = $(this).val();
 
+        plugin.reset_selections();
+
         switch (options.selection_mode) {
           case 'draw':
             plugin.enable_bbox();
@@ -1034,7 +1036,13 @@
         });
       }
 
-      // triggerable handler
+      // clear selections
+
+      item.on('click', '#area-selections-reset', function () {
+        plugin.reset_selections();
+      });
+
+      // triggerable handler for [data-query-key] inputs
 
       item.on('update_input', function (event, item, status) {
         // console.log('update input event', item.attr('id'), status);
@@ -1583,20 +1591,18 @@
         case 'selections':
           console.log('handle selections', this_val);
 
-          // convert string value to array of integers
-
+          // convert to array
           this_val = this_val.split(',').filter(function (i) {
             return i;
           });
 
-          // this_val = [];
-
-          // each selection
-          // selections.forEach(function (this_gid) {
-          //   this_val.push(parseInt(this_gid));
-          // });
-
+          // update query val
           options.query.selections = this_val;
+
+          // update count
+          plugin.update_selection_count();
+
+          // console.log('result', selection_count);
 
           break;
         case 'station':
@@ -2763,7 +2769,7 @@
 
             let limit = plugin.get_download_limits();
 
-            if (plugin.count_selections(options.selection_mode) > limit) {
+            if (plugin.count_selections() > limit) {
               // too many boxes D:
               invalid_messages.push(
                 T(
@@ -4070,6 +4076,8 @@
         options = plugin.options,
         item = plugin.item;
 
+      console.log('bbox event', e);
+
       let bounds = e.layer.getBounds();
       let sw = bounds.getSouthWest();
       let ne = bounds.getNorthEast();
@@ -4077,6 +4085,8 @@
       // store the bounds in #download-coords
       // $('#download-coords').val([sw.lat, sw.lng, ne.lat, ne.lng].join('|'));
       options.query.bbox = [sw.lat, sw.lng, ne.lat, ne.lng];
+
+      plugin.update_selection_count();
 
       //       let cells = count_selected_gridcells();
       //
@@ -4107,30 +4117,89 @@
       }
     },
 
-    count_selections: function (mode) {
+    update_selection_count: function () {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
 
-      if (mode == 'select') {
-        if (options.selections) {
-          return options.selections.length;
-        } else {
-          return 0;
+      let selection_count = plugin.count_selections();
+
+      // update count
+      item.find('#area-selections-count span').text(selection_count);
+
+      // disable reset
+      item.find('#area-selections-reset').addClass('disabled');
+
+      // and re-enable if necessary
+      if (selection_count != 0) {
+        if (options.selection_mode == 'draw')
+          item.find('#area-selections-count span').prepend('~ ');
+
+        item.find('#area-selections-reset').removeClass('disabled');
+      }
+    },
+
+    reset_selections: function () {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      // grid selections
+      options.query.selections.forEach(function (this_gid) {
+        console.log('deselect', this_gid);
+        item.trigger('map_item_select', [null, this_gid, {}]);
+      });
+
+      console.log('selections now', options.query.selections);
+
+      // bbox
+      plugin.disable_bbox();
+
+      switch (options.query.sector) {
+        case 'gridded_data':
+          console.log('mode', options.selection_mode);
+
+          if (options.selection_mode == 'draw') {
+            // re-enable so user can draw a new box
+            plugin.enable_bbox();
+          }
+
+          break;
+        case 'station':
+        case 'ahccd':
+          break;
+      }
+
+      // reset the hidden input
+      // item.find('[data-query-key="selections"]').val('').trigger('change');
+
+      plugin.update_selection_count();
+    },
+
+    count_selections: function () {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let result = 0;
+
+      if (options.selection_mode == 'select') {
+        if (options.query.selections) {
+          result = options.query.selections.length;
         }
-      } else if (mode == 'draw') {
+      } else if (options.selection_mode == 'draw') {
         if (options.query.hasOwnProperty('bbox')) {
           let coords = options.query.bbox,
             var_grid = options.var_data.acf.grid;
 
-          return Math.round(
+          result = Math.round(
             ((coords[2] - coords[0]) * (coords[3] - coords[1])) /
               grid_resolution[var_grid] ** 2,
           );
-        } else {
-          return 0;
         }
       }
+
+      return result;
     },
   };
 

@@ -1184,17 +1184,9 @@ body.tab-drawer-open {
       transition: left $td-slide-transition-duration ease 0s;
     }
   }
-
-  #area-aggregation-select-mode {
-    .btn-check {
-      &:checked {
-        & + .btn {
-          background-color: $gray-600;
-        }
-      }
-    }
-  }
 }
+
+// DATA TAB
 
 #var-threshold-accordion {
   --bs-accordion-btn-padding-y: 0.75rem;
@@ -1251,6 +1243,35 @@ body.tab-drawer-open {
 
   &::placeholder {
     color: transparentize($body-color, 0.5);
+  }
+}
+
+// AREA TAB
+
+#area-selections-status {
+  font-size: 0.75rem;
+  line-height: 1.375rem;
+  color: $gray-600;
+  @include all-caps;
+}
+
+#area-selections-reset {
+  color: $primary;
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+#area-aggregation-select-mode {
+  .btn-check {
+    &:checked {
+      & + .btn {
+        background-color: $gray-600;
+      }
+    }
   }
 }
 

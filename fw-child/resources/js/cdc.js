@@ -108,6 +108,7 @@
       first_map: null,
       current_sector: 'gridded_data',
       current_var: null,
+      current_grid: null,
       hooks: {
         'maps.get_layer': Array(1000),
       },
@@ -489,6 +490,11 @@
                   }
                 }
 
+                if (options.current_grid != var_data.acf.grid) {
+                  options.current_grid = var_data.acf.grid;
+                  do_grid = true;
+                }
+
                 for (let key in options.maps) {
                   let this_map = options.maps[key];
 
@@ -498,7 +504,6 @@
                     this_map.layers.station_clusters &&
                     this_map.object.hasLayer(this_map.layers.station_clusters)
                   ) {
-                    // console.log('remove stations');
                     this_map.object.removeLayer(
                       this_map.layers.station_clusters,
                     );
@@ -583,7 +588,7 @@
                   }
 
                   if (do_grid == true) {
-                    console.log('new grid layer', var_data.acf.grid);
+                    console.log('new grid layer', options.current_grid);
 
                     let new_layer = L.vectorGrid.protobuf(
                       geoserver_url +
@@ -1614,12 +1619,14 @@
 
         map.setZoom(zoom);
 
-        // console.log('pan to', coords);
+        console.log('pan to', coords);
 
         // pan to center
         map.panTo([coords.lat, coords.lng], { animate: false });
 
-        if (do_offset == true) {
+        if (typeof do_offset == 'integer') {
+          offset = do_offset;
+        } else if (do_offset == true) {
           switch (visible_maps.length) {
             case 3:
               offset = 0;
@@ -1632,12 +1639,12 @@
               break;
           }
 
-          // console.log('offset', offset);
+          console.log('offset', offset);
 
           // calculate pixel value for offset
           map_offset = map.getSize().x * offset;
 
-          // console.log('pan by', map_offset);
+          console.log('pan by', map_offset);
 
           // pan by offset
           map.panBy(new L.Point(-map_offset, 0), { animate: false });

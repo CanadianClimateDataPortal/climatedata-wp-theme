@@ -665,6 +665,21 @@
             });
         });
 
+        function download_var(request_args, callback) {
+
+            let xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (xhttp.readyState === 4 && xhttp.status === 200) {
+                    // zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.' + format_extension, xhttp.response);
+                    return callback(null, {var_name: request_args.var, data: xhttp.response});
+                }
+            };
+            xhttp.open("POST", data_url + '/download');
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            xhttp.responseType = 'blob';
+            xhttp.send(JSON.stringify(request_args));
+        }
+
         function process_download() {
 
             var selectedVar = $('#download-variable').val();
@@ -711,12 +726,14 @@
             }
 
             if (selectedVar !== 'all') {
+                format_extension = 'zip';
                 $('body').addClass('spinner-on');
                 request_args = {
                     var: selectedVar,
                     month: month,
                     dataset_name: dataset_name,
                     dataset_type: selectedDatasetType,
+                    zipped: true,
                     format: format
                 };
                 Object.assign(request_args, pointsData);
@@ -749,55 +766,44 @@
                 });
 
                 $('body').addClass('spinner-on');
-                var dl_status = 0;
-                var dl_fraction = $('<p id="dl-fraction" style="position: absolute; left: 30%; bottom: 30%; width: 40%; padding-bottom: 1em; text-align: center;"><span>' + dl_status + '</span> / ' + varToProcess.length + '</p>').appendTo($('.spinner'));
-                var dl_progress = $('<div class="dl-progress" style="position: absolute; left: 0; bottom: 0; width: 0; height: 4px; background: red;">').appendTo(dl_fraction);
-                var i = 0;
-                var zip = new JSZip();
 
-                function download_all() {
-                    if (i < varToProcess.length) {
-                        request_args = {
-                            var: varToProcess[i],
-                            month: month,
-                            dataset_name: dataset_name,
-                            dataset_type: selectedDatasetType,
-                            format: format
-                        };
-                        Object.assign(request_args, pointsData);
-                        let xhttp = new XMLHttpRequest();
-                        xhttp.onreadystatechange = function () {
-                            if (xhttp.readyState === 4 && xhttp.status === 200) {
-                                zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.' + format_extension, xhttp.response);
+                requests = varToProcess.map(function (var_name) {
+                    let request_args = {
+                        var: var_name,
+                        month: month,
+                        dataset_name: dataset_name,
+                        dataset_type: selectedDatasetType,
+                        zipped: format === 'netcdf' ? false : true,
+                        format: format
+                    };
+                    Object.assign(request_args, pointsData);
+                    return request_args;
+                });
 
+                async.mapLimit(requests, 4, download_var, function (err, results) {
+                    $('body').removeClass('spinner-on');
 
-
-                                dl_fraction.find('span').html(i);
-                                dl_progress.css('width', (i / varToProcess.length * 100) + '%');
-                                if (i == varToProcess.length - 1) { // last one
-                                    $('body').removeClass('spinner-on');
-                                    dl_fraction.remove();
-                                    dl_progress.remove();
-                                    zip.generateAsync({type: "blob"})
-                                        .then(function (content) {
-                                            saveAs(content, $('#download-filename').val() + ".zip");
-
-                                        });
-                                }
-
-                                i++;
-                                download_all();
-                            }
-                        };
-                        xhttp.open("POST", data_url + '/download');
-                        xhttp.setRequestHeader("Content-Type", "application/json");
-                        xhttp.responseType = 'blob';
-                        xhttp.send(JSON.stringify(request_args));
-                    }
-
-                }
-
-                download_all();
+                    async.reduce(results, new JSZip(), function (zip, result, callback) {
+                        if (format === 'netcdf') {
+                            return callback(null, zip.file(result.var_name + '.nc', result.data))
+                        }
+                        else {
+                            zip.folder(result.var_name).loadAsync(result.data)
+                              .then(zip2 => {
+                                  return callback(null, zip);
+                              });
+                        }
+                    })
+                      .then(zip => {
+                          zip.generateAsync({
+                              type: "blob",
+                              compression: "DEFLATE"
+                          })
+                            .then(function (content) {
+                                saveAs(content, $('#download-filename').val() + ".zip");
+                            })
+                      })
+                });
             }
 
 
@@ -1512,7 +1518,7 @@
             create_map('normals');
             $('#normals-process-data').removeAttr("style").hide();
             
-            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y', function (data) {
+            $.getJSON('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=CLIMATE_IDENTIFIER,STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y', function (data) {
                 var markers = L.markerClusterGroup();
                 
                 normals_layer = L.geoJson(data, {
@@ -2131,7 +2137,7 @@
                 var selection = $("#ahccd-select").val() || [];
                 if (selection.length > 0) {
                     var format = $('input[name="ahccd-download-format"]:checked').val();
-                    url = data_url + '/download-ahccd?format=' + format + '&stations=' + selection.join(',');
+                    url = data_url + '/download-ahccd?format=' + format + '&zipped=true&stations=' + selection.join(',');
                     $('#ahccd-process').attr('href', url);
                     $('#ahccd-process').removeClass('disabled');
                     $('#ahccd-download-status').text(l10n_labels['readytoprocess']);

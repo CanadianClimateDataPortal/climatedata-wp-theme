@@ -2389,11 +2389,22 @@
           let low = variable_data[absolute_or_delta].low;
           let high = variable_data[absolute_or_delta].high;
           let scheme_length = colours.length;
+          let decimals = options.var_data.acf.decimals;
 
           // if we have a diverging ramp, we center the legend at zero
           if (selected_scheme_item.data('scheme-type') === 'divergent') {
             high = Math.max(Math.abs(low), Math.abs(high));
             low = high * -1;
+            // workaround to avoid legend with repeated values for very low range variables
+            if ((high - low) * 10**decimals < scheme_length) {
+              low = -(scheme_length / 10**decimals / 2.0);
+              high = scheme_length / 10**decimals / 2.0;
+            }
+          } else {
+            // workaround to avoid legend with repeated values for very low range variables
+            if ((high - low) * 10**decimals < scheme_length) {
+              high = low + scheme_length / 10**decimals;
+            }
           }
 
           // temperature raster data files are in Kelvin, but in °C in variable_data

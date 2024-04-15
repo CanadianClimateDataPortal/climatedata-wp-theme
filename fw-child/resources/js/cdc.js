@@ -460,10 +460,6 @@
           case 'gridded_data':
             console.log('RASTER');
 
-            // show the leaflet 'raster' pane
-            // it may have been hidden by the accordion
-            item.find('.leaflet-raster-pane').show();
-
             options.choro.path = null;
 
             plugin.maps.do_legend.apply(item, [
@@ -508,7 +504,6 @@
                     this_map.layers.station_clusters &&
                     this_map.object.hasLayer(this_map.layers.station_clusters)
                   ) {
-                    // console.log('remove stations');
                     this_map.object.removeLayer(
                       this_map.layers.station_clusters,
                     );

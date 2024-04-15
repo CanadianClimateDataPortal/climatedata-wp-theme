@@ -433,7 +433,7 @@
         });
       }
 
-      // threshold accordion
+      // threshold/custom accordion
 
       options.elements.threshold_accordion = document.getElementById(
         'var-threshold-accordion',
@@ -452,7 +452,7 @@
 
             // hide the data layers - they're not applicable to a
             // custom input query
-            // console.log('hide raster pane');
+            console.log('hide raster pane');
             item.find('.leaflet-raster-pane').hide();
 
             // set the request type
@@ -1199,19 +1199,6 @@
         },
       );
 
-      //
-      // CUSTOM SHAPEFILE
-      //
-
-      // Show/hide the user custom shapefile on the map when the "Custom shapefile" radio button is selected/deselected
-      item.find('input[name=area-aggregation]').on('change', function () {
-        if (this.value === 'upload') {
-          options.elements.shapefile_upload.shapefile_upload('show');
-        } else {
-          options.elements.shapefile_upload.shapefile_upload('hide');
-        }
-      });
-
       // Show information with the "more info" button.
       const tooltip_trigger = item
         .find('#area-aggregation-upload-tooltip')
@@ -1649,24 +1636,32 @@
           break;
 
         case 'sector':
+          console.log('CHANGE SECTOR');
           // clear the current selections
+          plugin.reset_selections();
 
-          item.find('[data-query-key="selections"]').val('').trigger('change');
+          // item.find('[data-query-key="selections"]').val('').trigger('change');
 
-          item
-            .find('#area-selection-select')
-            .prop('checked', true)
-            .trigger('change');
+          // item
+          //   .find('#area-selection-select')
+          //   .prop('checked', true)
+          //   .trigger('change');
 
-          // if (this_val == 'upload') {
-          //   item.find('.leaflet-raster-pane').hide();
-          //   item.find('.leaflet-grid-pane').hide();
-          //   item.find('.leaflet-stations-pane').hide();
-          // } else {
-          //   item.find('.leaflet-raster-pane').show();
-          //   item.find('.leaflet-grid-pane').show();
-          //   item.find('.leaflet-stations-pane').show();
-          // }
+          // hide the shapefile layer
+          options.elements.shapefile_upload.shapefile_upload('hide');
+
+          switch (this_val) {
+            case 'gridded_data':
+              console.log('gridded');
+              if (options.request.type != 'custom') {
+                console.log('show raster pane');
+                item.find('.leaflet-raster-pane').show();
+              }
+              break;
+            case 'upload':
+              options.elements.shapefile_upload.shapefile_upload('show');
+              break;
+          }
 
           break;
       }
@@ -3102,275 +3097,7 @@
           break;
 
         case 'custom':
-          let submit_path = 'grid_point';
-
-          form_obj = {
-            inputs: [
-              {
-                id: 'average',
-                data: query.sector != 'gridded_data' ? 'True' : 'False',
-              },
-              {
-                id: 'start_date',
-                data: query.start_year,
-              },
-              {
-                id: 'end_date',
-                data: query.end_year,
-              },
-              {
-                id: 'ensemble_percentiles',
-                data: query.percentiles.join(','),
-              },
-              {
-                id: 'dataset',
-                data: DATASETS[query.dataset].finch_name,
-              },
-              {
-                id: 'output_format',
-                data: query.format,
-              },
-              {
-                id: 'data_validation',
-                data: 'warn',
-              },
-            ],
-            response: 'document',
-            mode: 'auto',
-            outputs: [
-              {
-                transmissionMode: 'reference',
-                id: 'output',
-              },
-            ],
-            notification_email: item.find('#submit-email').val(),
-          };
-
-          // inputs
-
-          item.find('#threshold-custom :input').each(function () {
-            console.log($(this).attr('name'), $(this).val());
-
-            if ($(this).val() != '') {
-              let this_data = $(this).val();
-
-              if (
-                $(this).attr('data-units') != undefined &&
-                $(this).attr('data-units') != ''
-              ) {
-                this_data += ' ' + $(this).attr('data-units');
-              }
-
-              form_obj.inputs.push({
-                id: $(this).attr('name'),
-                data: this_data,
-              });
-            }
-          });
-
-          // frequency
-
-          if (period_frequency_lut.hasOwnProperty(frequency_code)) {
-            frequency_code = period_frequency_lut[frequency_code];
-          }
-
-          form_obj.inputs.push({
-            id: 'freq',
-            data: frequency_code.toUpperCase(),
-          });
-
-          // scenario
-          query.scenarios.forEach(function (scenario) {
-            form_obj.inputs.push({
-              id: 'scenario',
-              data: scenario_names[query.dataset][scenario]
-                .replace(/[\W_]+/g, '')
-                .toLowerCase(),
-            });
-          });
-
-          // lat/lng
-
-          switch (query.sector) {
-            case 'gridded_data':
-              // bbox or selected grids
-
-              if (query.hasOwnProperty('bbox')) {
-                submit_path = 'bbox';
-
-                console.log('bbox', query.bbox);
-
-                form_obj.inputs.push(
-                  {
-                    id: 'lat0',
-                    data: query.bbox[0],
-                  },
-                  {
-                    id: 'lon0',
-                    data: query.bbox[1],
-                  },
-                  {
-                    id: 'lat1',
-                    data: query.bbox[2],
-                  },
-                  {
-                    id: 'lon1',
-                    data: query.bbox[3],
-                  },
-                );
-              } else {
-                // gridded: comma separated values of each selection
-
-                let lat_str = '',
-                  lng_str = '';
-
-                Object.keys(options.selection_data).forEach(function (gid, i) {
-                  if (
-                    options.selection_data[gid].lat != undefined &&
-                    options.selection_data[gid].lat != undefined
-                  ) {
-                    if (i != 0) {
-                      lat_str += ',';
-                      lng_str += ',';
-                    }
-
-                    lat_str += options.selection_data[gid].lat;
-                    lng_str += options.selection_data[gid].lng;
-                  }
-                });
-
-                form_obj.inputs.push({
-                  id: 'lat',
-                  data: lat_str,
-                });
-
-                form_obj.inputs.push({
-                  id: 'lon',
-                  data: lng_str,
-                });
-              }
-              break;
-            case 'upload':
-              // custom shapefile
-
-              let shapefile_selection =
-                options.elements.shapefile_upload.shapefile_upload(
-                  'selected_shapes_json',
-                );
-
-              submit_path = 'polygon';
-
-              form_obj.inputs.push({
-                id: 'shape',
-                data: shapefile_selection,
-              });
-              break;
-            default:
-              // sector: convert sector bounds to coords
-
-              $.ajax({
-                url:
-                  geoserver_url +
-                  '/partition-to-points/' +
-                  options.var_data.acf.grid +
-                  '/' +
-                  query.sector +
-                  '/' +
-                  query.selections.join('') +
-                  '.json',
-                dataType: 'json',
-                async: false,
-                success: function (lutBySectorId) {
-                  // console.log(sectorCoord);
-
-                  form_obj.inputs.push({
-                    id: 'lat',
-                    data: lutBySectorId.map((x) => x[0]).join(','),
-                  });
-
-                  form_obj.inputs.push({
-                    id: 'lon',
-                    data: lutBySectorId.map((x) => x[1]).join(','),
-                  });
-                },
-              });
-          } // switch sector
-
-          // models
-
-          if (query.models == '') {
-            query.models = item.find('[name="details-models"]:checked').val();
-          }
-
-          form_obj.inputs.push({
-            id: 'models',
-            data: query.models,
-          });
-
-          // decimals
-          if (query.format == 'csv') {
-            form_obj.inputs.push({
-              id: 'csv_precision',
-              data: query.hasOwnProperty('decimals') ? query.decimals : 2,
-            });
-          }
-
-          submit_data = {
-            captcha_code: item.find('#submit-captcha').val(),
-            namespace: 'analyze',
-            signup: item.find('#submit-subscribe').is(':checked'),
-            request_data: form_obj,
-            submit_url:
-              '/providers/finch/processes/ensemble_' +
-              submit_path +
-              '_' +
-              options.var_data.acf.finch_var +
-              '/jobs', // ex: wetdays/jobs
-          };
-
-          console.log('submit data');
-          console.log(JSON.stringify(submit_data, null, 4));
-
-          // check captcha
-          $.ajax({
-            url: ajax_data.rest_url + 'cdc/v2/finch_submit/',
-            method: 'POST',
-            data: submit_data,
-            dataType: 'json',
-            success: function (data) {
-              // let response = JSON.parse(data);
-
-              console.log(data);
-
-              if (data.status == 'accepted') {
-                result_head.text(T('Success') + '!');
-                result_content.html(data.description);
-
-                // status
-                result_status
-                  .find('#result-status-text span')
-                  .html(data.status);
-
-                result_status
-                  .find('#result-status-refresh')
-                  .attr('data-url', data.location);
-
-                result_status.show();
-
-                result_tab.removeClass('error').addClass('success');
-              } else {
-                result_head.text(T('Error'));
-                result_content.html('Captcha failed. Please try again.');
-
-                result_tab.removeClass('success').addClass('error');
-                plugin.refresh_captcha();
-              }
-            },
-            complete: function () {
-              plugin.refresh_captcha();
-            },
-          });
-
+          plugin._process_custom();
           break;
 
         case 'threshold':
@@ -3576,6 +3303,279 @@
 
           break;
       }
+    },
+
+    _process_custom: function () {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let submit_path = 'grid_point';
+
+      form_obj = {
+        inputs: [
+          {
+            id: 'average',
+            data: query.sector != 'gridded_data' ? 'True' : 'False',
+          },
+          {
+            id: 'start_date',
+            data: query.start_year,
+          },
+          {
+            id: 'end_date',
+            data: query.end_year,
+          },
+          {
+            id: 'ensemble_percentiles',
+            data: query.percentiles.join(','),
+          },
+          {
+            id: 'dataset',
+            data: DATASETS[query.dataset].finch_name,
+          },
+          {
+            id: 'output_format',
+            data: query.format,
+          },
+          {
+            id: 'data_validation',
+            data: 'warn',
+          },
+        ],
+        response: 'document',
+        mode: 'auto',
+        outputs: [
+          {
+            transmissionMode: 'reference',
+            id: 'output',
+          },
+        ],
+        notification_email: item.find('#submit-email').val(),
+      };
+
+      // inputs
+
+      item.find('#threshold-custom :input').each(function () {
+        console.log($(this).attr('name'), $(this).val());
+
+        if ($(this).val() != '') {
+          let this_data = $(this).val();
+
+          if (
+            $(this).attr('data-units') != undefined &&
+            $(this).attr('data-units') != ''
+          ) {
+            this_data += ' ' + $(this).attr('data-units');
+          }
+
+          form_obj.inputs.push({
+            id: $(this).attr('name'),
+            data: this_data,
+          });
+        }
+      });
+
+      // frequency
+
+      if (period_frequency_lut.hasOwnProperty(frequency_code)) {
+        frequency_code = period_frequency_lut[frequency_code];
+      }
+
+      form_obj.inputs.push({
+        id: 'freq',
+        data: frequency_code.toUpperCase(),
+      });
+
+      // scenario
+      query.scenarios.forEach(function (scenario) {
+        form_obj.inputs.push({
+          id: 'scenario',
+          data: scenario_names[query.dataset][scenario]
+            .replace(/[\W_]+/g, '')
+            .toLowerCase(),
+        });
+      });
+
+      // lat/lng
+
+      switch (query.sector) {
+        case 'gridded_data':
+          // bbox or selected grids
+
+          if (query.hasOwnProperty('bbox')) {
+            submit_path = 'bbox';
+
+            console.log('bbox', query.bbox);
+
+            form_obj.inputs.push(
+              {
+                id: 'lat0',
+                data: query.bbox[0],
+              },
+              {
+                id: 'lon0',
+                data: query.bbox[1],
+              },
+              {
+                id: 'lat1',
+                data: query.bbox[2],
+              },
+              {
+                id: 'lon1',
+                data: query.bbox[3],
+              },
+            );
+          } else {
+            // gridded: comma separated values of each selection
+
+            let lat_str = '',
+              lng_str = '';
+
+            Object.keys(options.selection_data).forEach(function (gid, i) {
+              if (
+                options.selection_data[gid].lat != undefined &&
+                options.selection_data[gid].lat != undefined
+              ) {
+                if (i != 0) {
+                  lat_str += ',';
+                  lng_str += ',';
+                }
+
+                lat_str += options.selection_data[gid].lat;
+                lng_str += options.selection_data[gid].lng;
+              }
+            });
+
+            form_obj.inputs.push({
+              id: 'lat',
+              data: lat_str,
+            });
+
+            form_obj.inputs.push({
+              id: 'lon',
+              data: lng_str,
+            });
+          }
+          break;
+        case 'upload':
+          // custom shapefile
+
+          let shapefile_selection =
+            options.elements.shapefile_upload.shapefile_upload(
+              'selected_shapes_json',
+            );
+
+          submit_path = 'polygon';
+
+          form_obj.inputs.push({
+            id: 'shape',
+            data: shapefile_selection,
+          });
+          break;
+        default:
+          // sector: convert sector bounds to coords
+
+          $.ajax({
+            url:
+              geoserver_url +
+              '/partition-to-points/' +
+              options.var_data.acf.grid +
+              '/' +
+              query.sector +
+              '/' +
+              query.selections.join('') +
+              '.json',
+            dataType: 'json',
+            async: false,
+            success: function (lutBySectorId) {
+              // console.log(sectorCoord);
+
+              form_obj.inputs.push({
+                id: 'lat',
+                data: lutBySectorId.map((x) => x[0]).join(','),
+              });
+
+              form_obj.inputs.push({
+                id: 'lon',
+                data: lutBySectorId.map((x) => x[1]).join(','),
+              });
+            },
+          });
+      } // switch sector
+
+      // models
+
+      if (query.models == '') {
+        query.models = item.find('[name="details-models"]:checked').val();
+      }
+
+      form_obj.inputs.push({
+        id: 'models',
+        data: query.models,
+      });
+
+      // decimals
+      if (query.format == 'csv') {
+        form_obj.inputs.push({
+          id: 'csv_precision',
+          data: query.hasOwnProperty('decimals') ? query.decimals : 2,
+        });
+      }
+
+      submit_data = {
+        captcha_code: item.find('#submit-captcha').val(),
+        namespace: 'analyze',
+        signup: item.find('#submit-subscribe').is(':checked'),
+        request_data: form_obj,
+        submit_url:
+          '/providers/finch/processes/ensemble_' +
+          submit_path +
+          '_' +
+          options.var_data.acf.finch_var +
+          '/jobs', // ex: wetdays/jobs
+      };
+
+      console.log('submit data');
+      console.log(JSON.stringify(submit_data, null, 4));
+
+      // check captcha
+      $.ajax({
+        url: ajax_data.rest_url + 'cdc/v2/finch_submit/',
+        method: 'POST',
+        data: submit_data,
+        dataType: 'json',
+        success: function (data) {
+          // let response = JSON.parse(data);
+
+          console.log(data);
+
+          if (data.status == 'accepted') {
+            result_head.text(T('Success') + '!');
+            result_content.html(data.description);
+
+            // status
+            result_status.find('#result-status-text span').html(data.status);
+
+            result_status
+              .find('#result-status-refresh')
+              .attr('data-url', data.location);
+
+            result_status.show();
+
+            result_tab.removeClass('error').addClass('success');
+          } else {
+            result_head.text(T('Error'));
+            result_content.html('Captcha failed. Please try again.');
+
+            result_tab.removeClass('success').addClass('error');
+            plugin.refresh_captcha();
+          }
+        },
+        complete: function () {
+          plugin.refresh_captcha();
+        },
+      });
     },
 
     refresh_captcha: function () {

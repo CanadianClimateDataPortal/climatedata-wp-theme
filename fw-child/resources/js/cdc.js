@@ -108,6 +108,7 @@
       first_map: null,
       current_sector: 'gridded_data',
       current_var: null,
+      current_grid: null,
       hooks: {
         'maps.get_layer': Array(1000),
       },
@@ -493,6 +494,11 @@
                   }
                 }
 
+                if (options.current_grid != var_data.acf.grid) {
+                  options.current_grid = var_data.acf.grid;
+                  do_grid = true;
+                }
+
                 for (let key in options.maps) {
                   let this_map = options.maps[key];
 
@@ -587,7 +593,7 @@
                   }
 
                   if (do_grid == true) {
-                    console.log('new grid layer', var_data.acf.grid);
+                    console.log('new grid layer', options.current_grid);
 
                     let new_layer = L.vectorGrid.protobuf(
                       geoserver_url +

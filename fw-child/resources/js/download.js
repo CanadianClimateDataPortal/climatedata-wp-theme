@@ -91,6 +91,7 @@
       current_layer: null,
       selection_mode: 'select',
       selection_data: {},
+      current_grid: null,
       station: {
         color: '#00f',
       },
@@ -1955,8 +1956,9 @@
           // console.log('skip get_var_data');
         } else {
           console.log('get_var_data because var_id changed');
+
           $(document).cdc_app('get_var_data', var_id, function (data) {
-            // console.log('get var data', data);
+            console.log('get var data', data);
 
             // update var_data
             options.var_data = data;
@@ -2206,6 +2208,23 @@
                 : options.var_data.title.rendered,
             )
             .show();
+        }
+
+        // reset selections if grid changes
+
+        console.log(options.query.sector);
+        console.log(options.current_grid, fields.grid);
+
+        if (
+          options.query.sector == 'gridded_data' &&
+          options.current_grid != fields.grid
+        ) {
+          options.current_grid = fields.grid;
+
+          console.log('---');
+          console.log('reset selections');
+          console.log('---');
+          item.find('[data-query-key="selections"]').val('').trigger('change');
         }
 
         // set request type
@@ -4094,7 +4113,11 @@
         item = plugin.item;
 
       if (mode == 'select') {
-        return options.selections.length;
+        if (options.selections) {
+          return options.selections.length;
+        } else {
+          return 0;
+        }
       } else if (mode == 'draw') {
         if (options.query.hasOwnProperty('bbox')) {
           let coords = options.query.bbox,

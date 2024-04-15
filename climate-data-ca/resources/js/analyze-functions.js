@@ -1811,7 +1811,7 @@
 
                         if ($(this).find('.checked').length > 0) {
 
-                            var this_label = $(this).prev('.select-all').find('.form-check-label').text()
+                            var this_label = $(this).prev('.select-all').find('label.form-check-label').text()
 
                             if ($(this).find('.checked').length == 1) {
                                 this_label = this_label.slice(0, -1)
@@ -1991,6 +1991,7 @@
             // TO THE REQUEST OBJECT
 
             // build the form_inputs object
+            let optionalInputs = new Set();
 
             $('#analyze-form-inputs .add-to-object').each(function () {
 
@@ -2001,6 +2002,10 @@
 
                 if ($(this).is('select')) {
                     this_type = 'select'
+                }
+
+                if ($(this).hasClass('input-optional')) {
+                    optionalInputs.add(this_name);
                 }
 
                 //console.log('checking ' + this_name, this_type, this_val)
@@ -2068,9 +2073,8 @@
                     continue;
                 }
 
-                if (form_inputs[key] === '') {
+                if (form_inputs[key] === '' && !optionalInputs.has(key) ) {
                     is_valid = false
-                    //console.log(key)
                 }
             }
 

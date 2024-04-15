@@ -147,7 +147,7 @@
                     <div class="input-row form-check">
                         <div class="input-item">
                           <input class="form-check-input" type="radio" name="analyze-location" id="analyze-location-census-division" value="census">
-                          <label class="form-check-label" for="analyze-location-census-division"><?php _e ( 'Census division', 'cdc' ); ?></label>
+                          <label class="form-check-label" for="analyze-location-census-division"><?php _e ( 'Census subdivision', 'cdc' ); ?></label>
                         </div>
                     </div>
 
@@ -348,56 +348,57 @@
                         <div class="form-check input-row select-all">
                           <div class="input-item">
                             <input class="form-check-input" type="checkbox" name="" id="analyze-model-all" value="all">
-                            <label class="form-check-label" for="analyze-model-all"><?php _e ( 'Percentiles', 'cdc' ); ?></label>
+                              <label class="form-check-label" for="analyze-model-all"><?php _e ( 'Percentiles', 'cdc' ); ?></label>&nbsp;
+                              <p class="form-check-label"><?php _e('(Unselect all to receive output from individual models)','cdc'); ?></p>
                           </div>
                         </div>
 
                         <div class="tree d-flex flex-wrap">
                           <div class="input-row form-check w-25">
                             <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-5" value="5">
+                              <input class="form-check-input add-to-object input-optional" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-5" value="5">
                               <label class="form-check-label" for="analyze-percentile-5">5</label>
                             </div>
                           </div>
 
                           <div class="input-row form-check w-25">
                             <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-10" value="10" checked>
+                              <input class="form-check-input add-to-object input-optional" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-10" value="10" checked>
                               <label class="form-check-label" for="analyze-percentile-10">10</label>
                             </div>
                           </div>
 
                           <div class="input-row form-check w-25">
                             <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-25" value="25">
+                              <input class="form-check-input add-to-object input-optional" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-25" value="25">
                               <label class="form-check-label" for="analyze-percentile-25">25</label>
                             </div>
                           </div>
 
                           <div class="input-row form-check w-25">
                             <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-50" value="50" checked>
+                              <input class="form-check-input add-to-object input-optional" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-50" value="50" checked>
                               <label class="form-check-label" for="analyze-percentile-50">50</label>
                             </div>
                           </div>
 
                           <div class="input-row form-check w-25">
                             <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-75" value="75">
+                              <input class="form-check-input add-to-object input-optional" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-75" value="75">
                               <label class="form-check-label" for="analyze-percentile-75">75</label>
                             </div>
                           </div>
 
                           <div class="input-row form-check w-25">
                             <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-90" value="90" checked>
+                              <input class="form-check-input add-to-object input-optional" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-90" value="90" checked>
                               <label class="form-check-label" for="analyze-percentile-90">90</label>
                             </div>
                           </div>
 
                           <div class="input-row form-check w-25">
                             <div class="input-item">
-                              <input class="form-check-input add-to-object" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-95" value="95">
+                              <input class="form-check-input add-to-object input-optional" type="checkbox" name="ensemble_percentiles" id="analyze-percentile-95" value="95">
                               <label class="form-check-label" for="analyze-percentile-95">95</label>
                             </div>
                           </div>

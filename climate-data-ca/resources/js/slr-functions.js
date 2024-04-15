@@ -1763,7 +1763,13 @@
             // console.log('var changed triggered manually');
         }
 
-
+        $.fn.prepare_raster = function(){
+            $('#main-header').remove();
+            $('#var-sliders').remove();
+            $('#map-controls').remove();
+            $('.page-tour').remove();
+            $('body').addClass('to-raster');
+        };
 
     });
 })(jQuery);

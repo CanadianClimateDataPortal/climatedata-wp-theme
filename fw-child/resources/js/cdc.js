@@ -108,6 +108,7 @@
       first_map: null,
       current_sector: 'gridded_data',
       current_var: null,
+      current_grid: null,
       hooks: {
         'maps.get_layer': Array(1000),
       },
@@ -415,8 +416,8 @@
           item = plugin.item,
           options = plugin.options;
 
-        console.log('---');
-        console.log('get layer', var_data, query);
+        // console.log('---');
+        // console.log('get layer', var_data, query);
 
         if (var_data == undefined || var_data == null) {
           return 'no variable';
@@ -461,6 +462,17 @@
 
             options.choro.path = null;
 
+            if (
+              options.request == null ||
+              options.request.type == 'custom' ||
+              options.request.type == 'ahccd' ||
+              query.sector == 'station'
+            ) {
+              options.legend.display = false;
+            } else {
+              options.legend.display = true;
+            }
+
             plugin.maps.do_legend.apply(item, [
               query,
               var_data,
@@ -489,6 +501,11 @@
                   }
                 }
 
+                if (options.current_grid != var_data.acf.grid) {
+                  options.current_grid = var_data.acf.grid;
+                  do_grid = true;
+                }
+
                 for (let key in options.maps) {
                   let this_map = options.maps[key];
 
@@ -498,7 +515,6 @@
                     this_map.layers.station_clusters &&
                     this_map.object.hasLayer(this_map.layers.station_clusters)
                   ) {
-                    // console.log('remove stations');
                     this_map.object.removeLayer(
                       this_map.layers.station_clusters,
                     );
@@ -583,7 +599,7 @@
                   }
 
                   if (do_grid == true) {
-                    console.log('new grid layer', var_data.acf.grid);
+                    console.log('new grid layer', options.current_grid);
 
                     let new_layer = L.vectorGrid.protobuf(
                       geoserver_url +
@@ -722,7 +738,7 @@
             // get or load station data
             $.when(get_layer_data(query.var)).done(function (layer_data) {
               // console.log(layer_data);
-              console.log('ahccd', options.ahccd_data);
+              // console.log('ahccd', options.ahccd_data);
               // console.log('station', options.station_data);
               // console.log('idf', options.idf_data);
 
@@ -783,12 +799,12 @@
                     );
                   }
 
-                  console.log('create clusters');
+                  // console.log('create clusters');
                   this_map.layers.station_clusters = L.markerClusterGroup();
 
                   // create the layer
 
-                  console.log('create layer');
+                  // console.log('create layer');
                   this_map.layers.stations = L.geoJson(layer_data, {
                     pointToLayer: function (feature, latlng) {
                       if (query.dataset == 'ahccd') {
@@ -1007,7 +1023,7 @@
             };
 
             let get_choro_legend = function (query_var) {
-              if (options.request != null && options.request.type == 'custom') {
+              if (options.legend.display == false) {
                 // blank sector grid
                 // choro values not needed
 
@@ -1035,11 +1051,11 @@
                 if (legend_data == false) {
                   console.log('no legend');
 
-                  item.find('.info.legend').hide();
+                  // item.find('.info.legend').hide();
 
                   // blank
                 } else {
-                  item.find('.info.legend').show();
+                  // item.find('.info.legend').show();
                 }
 
                 let remove_grid = false;
@@ -1254,83 +1270,87 @@
           item = plugin.item,
           options = plugin.options;
 
-        console.log('do legend', query.var);
+        if (options.legend.display == true) {
+          console.log('do legend', query.var);
 
-        item.find('.info.legend').show();
+          const legend_item_height = 25,
+            legend_item_width = 25,
+            legend_width = 200,
+            legend_tick_width = 4;
 
-        const legend_item_height = 25,
-          legend_item_width = 25,
-          legend_width = 200,
-          legend_tick_width = 4;
+          const colours = options.legend.colormap.colours,
+            quantities = options.legend.colormap.quantities,
+            labels = options.legend.colormap.labels,
+            categorical = options.legend.colormap.categorical,
+            opacity = options.legend.opacity,
+            label_offset = categorical ? legend_item_height / 2 : 0;
 
-        const colours = options.legend.colormap.colours,
-          quantities = options.legend.colormap.quantities,
-          labels = options.legend.colormap.labels,
-          categorical = options.legend.colormap.categorical,
-          opacity = options.legend.opacity,
-          label_offset = categorical ? legend_item_height / 2 : 0;
+          for (let key in options.maps) {
+            options.maps[key].legend.onAdd = function (map) {
+              let div = L.DomUtil.create('div', 'info legend legendTable');
 
-        for (let key in options.maps) {
-          options.maps[key].legend.onAdd = function (map) {
-            let div = L.DomUtil.create('div', 'info legend legendTable');
-
-            let svg = `<svg width="${legend_width}" height="${
-              legend_item_height * colours.length
-            }">`;
-            svg += `<g transform="translate(${
-              legend_width - legend_item_width
-            },0)">`;
-            if (query.scheme_type == 'discrete') {
-              for (let i = 0; i < colours.length; i++) {
-                svg += `<rect class="legendbox" width="${legend_item_width}" height="${legend_item_height}"
-                    y="${legend_item_height * i}" fill="${colours[i]}" style="fill-opacity: ${opacity}"/>`;
-              }
-            } else {
-              svg += `<defs><linearGradient id="legendGradient" gradientTransform="rotate(90)">`;
-              for (let i = 0; i < colours.length; i++) {
-                svg += `<stop offset="${
-                  (i / colours.length) * 100
-                }%" stop-color="${colours[i]}"/>`;
-              }
-              svg += `</linearGradient> </defs>`;
-              svg += `<rect class="legendbox" width="${legend_item_width}" height="${
+              let svg = `<svg width="${legend_width}" height="${
                 legend_item_height * colours.length
-              }" fill="url(#legendGradient)" style="fill-opacity: ${opacity}" />`;
-            }
-            svg += `</g><g transform="translate(${
-              legend_width - legend_item_width - legend_tick_width
-            },0)">`;
+              }">`;
+              svg += `<g transform="translate(${
+                legend_width - legend_item_width
+              },0)">`;
 
-            for (let i = 0; i < colours.length - (categorical ? 0 : 1); i++) {
-              let label;
-              if (labels) {
-                label = unit_localize(labels[i], options.lang);
+              if (query.scheme_type == 'discrete') {
+                for (let i = 0; i < colours.length; i++) {
+                  svg += `<rect class="legendbox" width="${legend_item_width}" height="${legend_item_height}"
+                        y="${legend_item_height * i}" fill="${colours[i]}" style="fill-opacity: ${opacity}"/>`;
+                }
               } else {
-                label = value_formatter(
-                  quantities[i],
-                  var_data.acf,
-                  query.delta === 'true',
-                  options.lang,
-                );
+                svg += `<defs><linearGradient id="legendGradient" gradientTransform="rotate(90)">`;
+                for (let i = 0; i < colours.length; i++) {
+                  svg += `<stop offset="${
+                    (i / colours.length) * 100
+                  }%" stop-color="${colours[i]}"/>`;
+                }
+                svg += `</linearGradient> </defs>`;
+                svg += `<rect class="legendbox" width="${legend_item_width}" height="${
+                  legend_item_height * colours.length
+                }" fill="url(#legendGradient)" style="fill-opacity: ${opacity}" />`;
               }
 
-              svg += `<g opacity="1" transform="translate(0,${
-                legend_item_height * (i + 1) - label_offset
-              })">
-                    <line stroke="currentColor" x2="4"/>
-                    <text fill="currentColor" dominant-baseline="middle" text-anchor="end" x="-5">
-                    ${label}
-                    </text></g>`;
-            }
+              svg += `</g><g transform="translate(${
+                legend_width - legend_item_width - legend_tick_width
+              },0)">`;
 
-            svg += '</g>';
-            svg += '</svg>';
-            div.innerHTML = svg;
-            return div;
-          };
+              for (let i = 0; i < colours.length - (categorical ? 0 : 1); i++) {
+                let label;
+                if (labels) {
+                  label = unit_localize(labels[i], options.lang);
+                } else {
+                  label = value_formatter(
+                    quantities[i],
+                    var_data.acf,
+                    query.delta === 'true',
+                    options.lang,
+                  );
+                }
 
-          options.maps[key].legend.addTo(options.maps[key].object);
+                svg += `<g opacity="1" transform="translate(0,${
+                  legend_item_height * (i + 1) - label_offset
+                })">
+                        <line stroke="currentColor" x2="4"/>
+                        <text fill="currentColor" dominant-baseline="middle" text-anchor="end" x="-5">
+                        ${label}
+                        </text></g>`;
+              }
+
+              svg += '</g>';
+              svg += '</svg>';
+              div.innerHTML = svg;
+              return div;
+            };
+
+            options.maps[key].legend.addTo(options.maps[key].object);
+          }
         }
+
+        // item.find('.info.legend').show();
 
         if (typeof callback == 'function') {
           callback();
@@ -1614,12 +1634,14 @@
 
         map.setZoom(zoom);
 
-        // console.log('pan to', coords);
+        console.log('pan to', coords);
 
         // pan to center
         map.panTo([coords.lat, coords.lng], { animate: false });
 
-        if (do_offset == true) {
+        if (typeof do_offset == 'integer') {
+          offset = do_offset;
+        } else if (do_offset == true) {
           switch (visible_maps.length) {
             case 3:
               offset = 0;
@@ -1632,12 +1654,12 @@
               break;
           }
 
-          // console.log('offset', offset);
+          console.log('offset', offset);
 
           // calculate pixel value for offset
           map_offset = map.getSize().x * offset;
 
-          // console.log('pan by', map_offset);
+          console.log('pan by', map_offset);
 
           // pan by offset
           map.panBy(new L.Point(-map_offset, 0), { animate: false });
@@ -2955,7 +2977,10 @@
 
           item.find('.tab-drawer-trigger.var-name').text(var_title);
 
-          if (typeof data.acf.var_names != 'undefined') {
+          if (
+            typeof data.acf.var_names != 'undefined' &&
+            data.acf.var_names != null
+          ) {
             if (data.acf.var_names.length == 1) {
               // hide the threshold inputs
               item.find('#var-thresholds').hide();

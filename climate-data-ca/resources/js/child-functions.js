@@ -16,6 +16,7 @@ var chart_labels, legend_labels, l10n_labels;
 var l10n_table = {
     "fr": {
         'All models': 'Tous les modèles',
+        'Full ensemble': 'Tout l’ensemble',
         '{0} Median': '{0} médiane',
         '{0} Range': '{0} portée',
         "No data available for selected location": "Pas de données disponibles pour l'emplacement sélectionné",
@@ -86,7 +87,7 @@ const DATASETS = {
         'finch_name' : 'candcs-u5',
         'model_lists': [
             {'name': 'pcic12', 'label': 'PCIC12 (Ensemble)'},
-            {'name': '24models', 'label': 'All models'}]
+            {'name': '24models', 'label': 'Full ensemble'}]
     },
     "cmip6": {
         'scenarios': [
@@ -112,7 +113,7 @@ const DATASETS = {
         'grid': 'canadagrid',
         'finch_name' : 'candcs-u6',
         'model_lists': [
-            {'name': '26models', 'label': 'All models'}]
+            {'name': '26models', 'label': 'Full ensemble'}]
     },
     "humidex": {
         'scenarios': [
@@ -129,7 +130,7 @@ const DATASETS = {
         'grid': 'era5landgrid',
         'finch_name': 'humidex-daily',
         'model_lists': [
-            {'name': 'humidex_models', 'label': 'All models'}]
+            {'name': 'humidex_models', 'label': 'Full ensemble'}]
     }
 }
 
@@ -359,37 +360,42 @@ function getGA4EventNameForVariableDownloadData(chartDataFormat, keySelected) {
 }
 
 function setDataLayerForChartData(chartDataFormat, chartData, query) {
-    if (!chartDataFormat.length) {
-        return;
-    }
-    let eventName = getGA4EventNameForVariableDownloadData(chartDataFormat, query['var']);
-    let overlayTitle = $('.overlay-title').text();
-
-    let addStr = "";
-    for (let index = 0; index < chartData.series.length; index++) {
-        if (chartData.series[index].visible && chartData.series[index].type != 'areaspline') {
-            addStr += chartData.series[index].name + ", ";
+    try {
+        if (!chartDataFormat.length) {
+            return;
         }
+        let eventName = getGA4EventNameForVariableDownloadData(chartDataFormat, query['var']);
+        let overlayTitle = $('.overlay-title').text();
+
+        let addStr = "";
+        for (let index = 0; index < chartData.series.length; index++) {
+            if (chartData.series[index].visible && chartData.series[index].type != 'areaspline') {
+                addStr += chartData.series[index].name + ", ";
+            }
+        }
+
+        // Remove last 2 char: ;
+        if (addStr.length > 0) {
+            addStr = addStr.substring(0, addStr.length - 2);
+        }
+
+        // ex: Watersheds
+        var variableDownloadDataVewBy = $('.variable-download-data-view_by').find(":selected").text();
+        // ex: Région de la Montérégie, rcp26, January
+        var chartDataSettings = overlayTitle + "; " + query['rcp'] + "; " + getRealMonthName(query['mora']);
+        dataLayer.push({
+            'event': eventName,
+            'chart_data_event_type': eventName,
+            'chart_data_settings': chartDataSettings,
+            'chart_data_columns': addStr,
+            'chart_data_dataset': query.dataset,
+            'chart_data_format': chartDataFormat,
+            'chart_data_view_by': variableDownloadDataVewBy
+        });
+    } catch (err) {  // we ignore any Google Analytics errors to keep the site functional for the user in case of problem
+        console.error(err);
     }
 
-    // Remove last 2 char: ;
-    if (addStr.length > 0) {
-        addStr = addStr.substring(0, addStr.length - 2);
-    }
-
-    // ex: Watersheds
-    var variableDownloadDataVewBy = $('.variable-download-data-view_by').find(":selected").text();
-    // ex: Région de la Montérégie, rcp26, January
-    var chartDataSettings = overlayTitle + "; " + query['rcp'] + "; " + getRealMonthName(query['mora']);
-    dataLayer.push({
-        'event': eventName,
-        'chart_data_event_type': eventName,
-        'chart_data_settings': chartDataSettings,
-        'chart_data_columns': addStr,
-        'chart_data_dataset': query.dataset,
-        'chart_data_format': chartDataFormat,
-        'chart_data_view_by': variableDownloadDataVewBy
-    });
 }
 
 function formatDecade(timestampMilliseconds, period){

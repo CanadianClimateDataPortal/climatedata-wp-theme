@@ -47,6 +47,11 @@
 				<div id="map-control-email" class="map-control-item" data-request="custom,ahccd">
 					<label for="submit-email" class="form-label h6 mb-3 all-caps text-secondary"><?php _e ( 'Email Address', 'cdc' ); ?></label>
 					
+					<p class="small">
+						<strong><?php _e ( 'Note:', 'cdc' ); ?></strong>
+						<?php _e ( 'Data processing starts when you click on ‘Send Request.’ It may take 30 to 90 minutes to complete, depending on available resources. You will be notified by email when your request has been processed and the data are available. Don’t forget to check your spam folder.', 'cdc' ); ?>
+					</p>
+					
 					<input type="text" class="form-control" name="submit-email" id="submit-email" data-validate="<?php _e ( 'Please enter a valid email address', 'cdc' ); ?>">
 					
 					<div class="form-check form-switch mt-2">
@@ -94,13 +99,6 @@
 							<input type="text" class="form-control" name="captcha_code" id="submit-captcha" size="6" maxlength="4" data-validate="<?php _e ( 'CAPTCHA verification is required.', 'cdc' ); ?>">
 						</div>
 					</div>
-				</div>
-				
-				<div class="map-control-item border-0" data-request="custom,ahccd">
-					<p class="mb-0">
-						<strong><?php _e ( 'Note:', 'cdc' ); ?></strong>
-						<?php _e ( 'Data processing starts when you click on ‘Send Request.’ It may take 30 to 90 minutes to complete, depending on available resources. You will be notified by email when your request has been processed and the data are available. Don’t forget to check your spam folder.', 'cdc' ); ?>
-					</p>
 				</div>
 			</div>
 			

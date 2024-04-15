@@ -2282,6 +2282,19 @@
       console.log('set controls');
       console.log('request type', options.request.type);
 
+      switch (options.request.type) {
+        case 'single':
+          item.find('.leaflet-raster-pane').show();
+          console.log('show legend');
+          item.find('.info.legend').show();
+          break;
+        case 'custom':
+        case 'ahccd':
+          console.log('hide legend');
+          item.find('.info.legend').hide();
+          break;
+      }
+
       // each item with flag conditions
       item.find('[data-flags]').each(function () {
         let condition_met = false;
@@ -3709,6 +3722,9 @@
       let default_scheme_element = item.find(
         '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
       );
+
+      options.legend.colormap.colours = [];
+      options.legend.colormap.quantites = [];
 
       // console.log('default scheme', options.query.var);
 

@@ -1,18 +1,16 @@
 # syntax=docker/dockerfile:1
 
-# Dockerfile for the "runner".
+# Dockerfile for the "task runner".
 #
-# The "runner" is a task runner for the website files. The task runner can run various scripts and utilities to help in
-# the development of asset files, to test source files and to build assets.
+# The task runner contains various scripts and utilities (i.e. "tasks") to help in the development of asset files, to
+# test source files and to build assets.
 #
-# It's intended to be used only during development, in the CI/CD and to build production assets. It's not intended to
-# run on the production server. For this reason, the source files are not built into the image, they are expected to
-# be mounted when creating a container.
+# It's intended to be used only during development, in the CI/CD or when building production assets. It's not intended
+# to run on the production server. For this reason, the source files are not built into the image, they are expected to
+# be mounted when running a container.
 #
 # This Dockerfile assumes that the context directory is the root of the project. So, when building the image, make sure
 # to build it from the project's root.
-#
-# Currently, the runner only compiles SASS files into CSS files.
 
 FROM node:21.7-bookworm
 
@@ -27,12 +25,16 @@ ENV NPM_CONFIG_LOGLEVEL info
 #   also see: https://github.com/Yelp/dumb-init
 RUN apt-get update && apt-get install -y --no-install-recommends \
     dumb-init \
-    && rm -rf /var/lib/apt/lists/* 
+    && rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
+# Install SASS
+
 RUN wget -qO- https://github.com/sass/dart-sass/releases/download/1.72.0/dart-sass-1.72.0-linux-x64.tar.gz | tar xvz -C /opt
 RUN ln -s /opt/dart-sass/sass /usr/local/bin/sass
+
+# Install custom scripts
 
 COPY --chmod=755 dockerfiles/runner/bin /usr/local/bin
 

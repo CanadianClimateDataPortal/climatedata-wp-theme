@@ -26,7 +26,7 @@ if [[ -z "$out" ]]; then
 fi
 
 sass \
-    -s compressed \
-    --no-source-map \
-    "$src/fw-child/resources/scss:${out}/fw-child/resources/css" \
-    "$src/framework/resources/scss:${out}/framework/resources/css"
+  -s compressed \
+  --no-source-map \
+  "$src/fw-child/resources/scss:${out}/fw-child/resources/css" \
+  "$src/framework/resources/scss:${out}/framework/resources/css"

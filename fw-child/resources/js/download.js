@@ -2211,21 +2211,16 @@
             .show();
         }
 
-        // reset selections if grid changes
-
         console.log(options.query.sector);
         console.log(options.current_grid, fields.grid);
 
-        if (
-          options.query.sector == 'gridded_data' &&
-          options.current_grid != fields.grid
-        ) {
-          options.current_grid = fields.grid;
-
-          console.log('---');
-          console.log('reset selections');
-          console.log('---');
-          item.find('[data-query-key="selections"]').val('').trigger('change');
+        if (options.query.sector == 'gridded_data') {
+          // if the grid name changes
+          // i.e. canadagrid > canadagrid1deg
+          if (options.current_grid != fields.grid) {
+            options.current_grid = fields.grid;
+            plugin.reset_selections();
+          }
         }
 
         // set request type

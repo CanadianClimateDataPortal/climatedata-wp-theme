@@ -200,20 +200,48 @@ function cdc_list_var_types ( $object, $field_name, $request ) {
 }
 
 //
-// CAPTCHA
+// IDF LINKS
 //
+
+// This script searches for IDF files matching the idf GET parameter and returns a JSON for the Frontend
 
 add_action ( 'rest_api_init', function () {
 	
-	register_rest_route ( 'cdc/v2', '/captcha/', array (
-		'methods' => 'POST', 
-		'callback' => 'cdc_get_captcha' 
+	register_rest_route ( 'cdc/v2', '/get_idf_url/', array (
+		'methods' => 'GET', 
+		'callback' => 'cdc_get_idf_url' 
 	) );
 	
-});
+} );
 
-function cdc_get_captcha () {
+function cdc_get_idf_url () {
 
-	// return get_stylesheet_directory_uri() . '/resources/php/securimage/securimage_show.php';
+	if (
+		( !isset ( $_GET['data'] ) || $_GET['data'] == '' ) ||
+		( !isset ( $_GET['station'] ) || $_GET['station'] == '' )
+	) {
+		return 'no file';
+	}
+		
+	// ensure input is alphanumeric
+	if ( !preg_match ( '/^[a-zA-Z0-9]+$/', $_GET['data'] ) ) {
+		return 'invalid';
+	}
+	
+	$result = array (
+		'glob' => get_stylesheet_directory() . '/resources/app/idf/' . $_GET['data'] . '/*' . $_GET['station'] . '*',
+		'files' => []
+	);
+	
+	$glob = glob ( get_stylesheet_directory() . '/resources/app/idf/' . $_GET['data'] . '/*' . $_GET['station'] . '*' );
+	
+	if ( !empty ( $glob ) ) {
+		foreach ( $glob as $file ) {
+			$result['files'][] = str_replace ( get_stylesheet_directory(), get_stylesheet_directory_uri(), $file );
+		}
+	}
+	
+	return $result;
 	
 }
+

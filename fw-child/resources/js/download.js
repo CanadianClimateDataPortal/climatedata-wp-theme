@@ -385,7 +385,7 @@
 
       // SELECT2
 
-      $('#station-select').select2({
+      item.find('#station-select').select2({
         language: options.lang,
         multiple: true,
         closeOnSelect: false,
@@ -904,17 +904,9 @@
           console.log('station click', this_gid);
 
           this_gid = String(this_gid);
-
           options.station.color = style_obj.color;
 
           let selections = item.find('#station-select').val();
-
-          // convert values to integers
-          // selections.forEach(function (selection, i) {
-          //   if (selection != '') selections[i] = parseInt(selection);
-          // });
-
-          // console.log('current selections', selections);
 
           if (selections.includes(this_gid)) {
             // console.log('remove ' + this_gid);
@@ -925,21 +917,30 @@
 
             delete options.selection_data[this_gid];
           } else {
-            // console.log('add ' + this_gid);
-            selections.push(this_gid);
+            if (options.query.var == 'idf') {
+              // reset existing
+              selections.forEach(function (gid) {
+                plugin.update_station_markers([], gid, style_obj);
+              });
+
+              selections = [this_gid];
+            } else {
+              // console.log('add ' + this_gid);
+              selections.push(this_gid);
+            }
 
             options.selection_data[this_gid] = {
               properties: mouse_event.layer.feature.properties,
               latlng: mouse_event.latlng,
             };
+
+            // switch to submit tab
+            $('#control-bar').tab_drawer('update_path', '#submit');
           }
 
           plugin.update_station_markers(selections, this_gid, style_obj);
 
           // set station select2
-
-          console.log('station select', selections);
-          console.log('status = input');
           options.status = 'input';
           item.find('#station-select').val(selections).trigger('change');
         },
@@ -979,9 +980,20 @@
 
       // station selection
 
+      item.find('#station-select').on('select2:selecting', function (e) {
+        if (options.query.var == 'idf') {
+          $(this)
+            .val()
+            .forEach(function (gid) {
+              plugin.update_station_markers([], gid);
+            });
+
+          $(this).val(null);
+        }
+      });
+
       item.find('#station-select').on('select2:select', function (e) {
-        let this_gid = String(e.params.data.id),
-          selections = $(this).val();
+        let this_gid = String(e.params.data.id);
 
         options.selection_data[this_gid] = {
           properties: {
@@ -990,19 +1002,14 @@
           },
         };
 
-        plugin.update_station_markers(selections, this_gid);
+        plugin.update_station_markers($(this).val(), this_gid);
+
+        $('#control-bar').tab_drawer('update_path', '#submit');
       });
 
       item.find('#station-select').on('select2:unselect', function (e) {
-        let this_gid = String(e.params.data.id); //parseInt(e.params.data.id);
-        let selections = $(this).val();
-
-        // convert values to integers
-        // selections.forEach(function (selection, i) {
-        //   if (selection != '') selections[i] = parseInt(selection);
-        // });
-
-        plugin.update_station_markers(selections, this_gid);
+        let this_gid = String(e.params.data.id);
+        plugin.update_station_markers($(this).val(), this_gid);
       });
 
       // select/draw mode
@@ -1259,11 +1266,7 @@
       // SUBMIT
       //
 
-      item.find('#submit-email').on('change', function () {
-        plugin.validate_tab('#submit');
-      });
-
-      item.find('#submit-captcha').on('input', function () {
+      item.find('#submit :input').on('input', function () {
         plugin.validate_tab('#submit');
       });
 
@@ -1317,7 +1320,10 @@
         options.maps[key].layers.stations.eachLayer(function (layer) {
           let feature_ID = layer.feature.properties.ID; //parseInt(layer.feature.properties.ID);
 
-          if (options.query.var == 'weather-stations') {
+          if (
+            options.query.var == 'climate-normals' ||
+            options.query.var == 'station-data'
+          ) {
             feature_ID = layer.feature.properties.STN_ID;
           }
 
@@ -1593,6 +1599,8 @@
 
           break;
         case 'station':
+          console.log(options.query.station);
+
           // options.query.station = [];
 
           // rebuild array with integers
@@ -2221,6 +2229,16 @@
             options.current_grid = fields.grid;
             plugin.reset_selections();
           }
+        } else if (options.query.sector == 'station') {
+          item.find('#station-select').val('').trigger('change');
+        }
+
+        console.log('VARARAVRVAVRVAR', options.query.var);
+
+        if (options.query.var == 'idf') {
+          item.find('#map-control-idf').show();
+        } else {
+          item.find('#map-control-idf').hide();
         }
 
         // set request type
@@ -2717,8 +2735,7 @@
               if (
                 ['ahccd', 'station', 'upload'].includes(options.query.sector)
               ) {
-                console.log(options.query.sector + ' is in the array');
-
+                // console.log(options.query.sector + ' is in the array');
                 validate_this = false;
               }
 
@@ -2743,10 +2760,22 @@
               valid_msg = input_to_check.attr('data-validate');
             }
 
-            // console.log('check', input_to_check, valid_msg);
+            console.log('check', input_to_check, valid_msg);
 
-            // check for blank value
-            if (input_to_check.val() == '' || input_to_check.val() == 'null') {
+            if (
+              input_to_check.is('[type="radio"]') &&
+              !item.find(
+                '[type="radio"][name="' +
+                  input_to_check.attr('name') +
+                  '"]:checked',
+              ).length
+            ) {
+              invalid_messages.push(input_to_check.attr('data-validate'));
+            } else if (
+              input_to_check.val() == '' ||
+              input_to_check.val() == 'null'
+            ) {
+              // check for blank value
               tab_items.find('[href="' + prev_id + '"]').addClass('invalid');
               invalid_messages.push(valid_msg);
             }
@@ -2789,6 +2818,11 @@
             }
           }
 
+          break;
+        case '#submit':
+          // if (options.query.var == 'idf') {
+          //   if ($()
+          // }
           break;
       }
 
@@ -2910,26 +2944,94 @@
 
       switch (options.request.type) {
         case 'station':
-          let station_url =
-            'https://api.weather.gc.ca/collections/climate-daily/items' +
-            '?datetime=' +
-            query.start_date +
-            '%2000:00:00/' +
-            query.end_date +
-            '%2000:00:00' +
-            '&STN_ID=' +
-            query.station.join('|') +
-            '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' +
-            query.format +
-            '&limit=150000&startindex=0';
+          console.log('PROCESS STATION', query.var);
 
-          result_head.text(T('Success') + '!');
-          result_content.text(T('Click below to download your data'));
+          let station_url;
 
-          result_btn.attr('href', station_url);
-          result_btn.show();
+          switch (query.var) {
+            case 'station-data':
+              station_url =
+                'https://api.weather.gc.ca/collections/climate-daily/items' +
+                '?datetime=' +
+                query.start_date +
+                '%2000:00:00/' +
+                query.end_date +
+                '%2000:00:00' +
+                '&STN_ID=' +
+                query.station.join('|') +
+                '&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=' +
+                query.format +
+                '&limit=150000&startindex=0';
 
-          result_tab.removeClass('error').addClass('success');
+              result_head.text(T('Success') + '!');
+              result_content.text(T('Click below to download your data'));
+
+              result_btn.attr('href', station_url);
+              result_btn.show();
+
+              result_tab.removeClass('error').addClass('success');
+
+              break;
+            case 'idf':
+              console.log(
+                'idf thing',
+                item.find('[name="submit-idf"]:checked').val(),
+              );
+
+              let data_request = item.find('[name="submit-idf"]:checked').val();
+
+              $.ajax({
+                url: ajax_data.rest_url + 'cdc/v2/get_idf_url/',
+                dataType: 'json',
+                data: {
+                  station: options.query.station.join(''),
+                  data: data_request,
+                },
+                success: function (data) {
+                  console.log(data);
+
+                  if (data.files.length) {
+                    result_head.text(T('Success') + '!');
+                    result_content.text(T('Click below to download your data'));
+
+                    result_btn.attr('href', data.files[0]);
+                    result_btn.show();
+
+                    result_tab.removeClass('error').addClass('success');
+                  } else {
+                    result_head.text(T('Error'));
+                    result_content.text(
+                      T('No data found matching your request.') +
+                        ' ' +
+                        T('Please try again.'),
+                    );
+
+                    result_tab.addClass('error').removeClass('success');
+                  }
+                },
+              });
+
+              break;
+            case 'ahccd':
+              break;
+            case 'climate-normals':
+              station_url =
+                'https://api.weather.gc.ca/collections/climate-normals/items?CLIMATE_IDENTIFIER=' +
+                query.station.join('|') +
+                '&sortby=MONTH&f=' +
+                query.format +
+                '&limit=150000&startindex=0';
+
+              result_head.text(T('Success') + '!');
+              result_content.text(T('Click below to download your data'));
+
+              result_btn.attr('href', station_url);
+              result_btn.show();
+
+              result_tab.removeClass('error').addClass('success');
+
+              break;
+          }
 
           // item
           //   .find('#station-submit-btn')

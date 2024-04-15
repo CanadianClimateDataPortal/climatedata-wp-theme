@@ -632,7 +632,7 @@ $legend-on-height: 16px;
     }
   }
 
-  &:has([name='data-var'][value='weather-stations']),
+  &:has([name='data-var'][value='climate-normals']),
   &:has(#location-detail.td-selected) {
     #map-control-footer {
       transform: translateY(100%);

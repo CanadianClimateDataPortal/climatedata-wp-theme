@@ -100,6 +100,8 @@
       maps: {},
       station_data: null,
       idf_data: null,
+      normals_data: null,
+      ahccd_data: null,
       coords: {
         lat: null,
         lng: null,
@@ -656,7 +658,7 @@
 
             let do_stations = false,
               layer_data,
-              marker_fill = query.var == 'weather-stations' ? '#f00' : '#00f';
+              marker_fill = query.var == 'climate-normals' ? '#f00' : '#00f';
 
             options.choro.path = null;
 
@@ -668,15 +670,25 @@
             let get_layer_data = function (query_var) {
               console.log('get data', query_var);
 
-              switch (query_var) {
-                case 'weather-stations':
-                  if (options.station_data == null) {
-                    // stations not yet loaded
+              // station data
+              // https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE
 
+              // idf
+              // https://climatedata.ca/site/assets/themes/climate-data-ca/resources/app/run-frontend-sync/assets/json/idf_curves.json
+
+              // ahccd
+              // https://climatedata.ca/site/assets/themes/climate-data-ca/resources/app/ahccd/ahccd.json
+
+              // normals
+              // https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=CLIMATE_IDENTIFIER,STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y
+
+              switch (query_var) {
+                case 'station-data':
+                  if (options.station_data == null) {
                     // console.log('get stations');
 
                     return $.ajax({
-                      url: 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y',
+                      url: 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE',
                       dataType: 'json',
                       success: function (data) {
                         options.station_data = data;
@@ -688,6 +700,7 @@
                   }
 
                   break;
+
                 case 'idf':
                   if (options.idf_data == null) {
                     // idf data not yet loaded
@@ -707,6 +720,43 @@
                   }
 
                   break;
+
+                case 'ahccd':
+                  if (options.ahccd_data == null) {
+                    // idf data not yet loaded
+
+                    return $.ajax({
+                      url:
+                        theme_data.child_theme_dir +
+                        '/resources/app/ahccd.json',
+                      dataType: 'json',
+                      success: function (data) {
+                        options.ahccd_data = data;
+                        return { ...options.ahccd_data };
+                      },
+                    });
+                  } else {
+                    return { ...options.ahccd_data };
+                  }
+
+                  break;
+                case 'climate-normals':
+                  if (options.normals_data == null) {
+                    // console.log('get stations');
+
+                    return $.ajax({
+                      url: 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y',
+                      dataType: 'json',
+                      success: function (data) {
+                        options.normals_data = data;
+                        return { ...options.normals_data };
+                      },
+                    });
+                  } else {
+                    return { ...options.normals_data };
+                  }
+
+                  break;
                 default:
                   // stations are not defined by the variable
 
@@ -714,7 +764,7 @@
                     if (options.ahccd_data == null) {
                       // we're doing an AHCCD analysis
 
-                      console.log('get AHCCD json now');
+                      // console.log('get AHCCD json now');
 
                       return $.ajax({
                         url:
@@ -826,15 +876,22 @@
                   })
                     .on('mouseover', function (e) {
                       let station_name =
-                        query.var == 'weather-stations'
+                        query.var == 'climate-normals' ||
+                        query.var == 'station-data'
                           ? e.layer.feature.properties.STATION_NAME
                           : e.layer.feature.properties.Name;
+
+                      if (query.var == 'idf') {
+                        station_name +=
+                          ' (' + e.layer.feature.properties.Elevation_ + ')';
+                      }
 
                       e.layer.bindTooltip(station_name).openTooltip(e.latlng);
                     })
                     .on('click', function (e) {
                       let station_id =
-                        query.var == 'weather-stations'
+                        query.var == 'climate-normals' ||
+                        query.var == 'station-data'
                           ? e.layer.feature.properties.STN_ID
                           : e.layer.feature.properties.ID;
 
@@ -1920,7 +1977,7 @@
         let station_options = [];
 
         station_data.features.forEach(function (station) {
-          if (query.var == 'weather-stations') {
+          if (query.var == 'climate-normals' || query.var == 'station-data') {
             station_options.push({
               id: station.properties.STN_ID,
               name: station.properties.STATION_NAME,

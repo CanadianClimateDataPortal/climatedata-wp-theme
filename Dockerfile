@@ -16,6 +16,12 @@
 #      WordPress' plugin directory.
 #  - EXTRA_VENDOR_ASSETS_DIR (optional): directory, in the build context, containing zip files to extract in the
 #      assets/vendor/ directory.
+#  - APACHE_USER_ID (optional, default=10000): user id of the created Apache user (www-data). Setting the id gives more
+#      control over permissions if you mount a directory that must be writable by the website
+#      (ex: the assets/upload/ directory). For security reasons, it's recommended that the id be >= 10000, unless you
+#      know what you do.
+#  - APACHE_GROUP_ID (optional, default=10001): group id for the created Apache user's group (www-data). For security
+#      reasons, it's recommended that the id be >= 10000, unless you know what you do.
 #
 # Special runtime environment variables (used only when running the container):
 #  - WP_*: variables prefixed with WP_ are used to set WordPress constants. For example `WP_DB_NAME=test` will set the
@@ -81,11 +87,40 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
     && mv wp-cli.phar wp \
     && chmod +x wp
 
-# Supervisord configuration
+# PHP extensions
+
+# https://github.com/mlocati/docker-php-extension-installer
+ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+
+# Some PHP extensions are either core extensions or are bundled with PHP, and thus don't need a version specification
+# See: https://www.php.net/manual/en/extensions.membership.php
+RUN install-php-extensions \
+    bcmath \
+    exif \
+    gd \
+    igbinary-^3.2@stable \
+    imagick-^3.7@stable \
+    intl \
+    mysqli \
+    opcache \
+    pdo_mysql \
+    zip
+
+# Supervisord setup
 
 COPY dockerfiles/www/configs/supervisor/supervisord.conf /etc/
 
-# Apache configuration. Enable modules and the main website's configurations (HTTP and HTTPS).
+# PHP setup
+
+RUN mkdir /var/log/php && chown www-data:www-data /var/log/php
+COPY --chmod=644 dockerfiles/www/configs/php/php.ini /usr/local/etc/php
+
+# Apache setup
+
+ARG APACHE_USER_ID=10000
+ARG APACHE_GROUP_ID=10001
+
+RUN usermod -u ${APACHE_USER_ID} www-data && groupmod -g ${APACHE_GROUP_ID} www-data
 
 RUN a2enmod actions fcgid alias proxy proxy_fcgi setenvif rewrite ssl
 
@@ -99,34 +134,20 @@ RUN a2dissite 000-default && \
 
 RUN rm /var/www/html/index.html
 
-# PHP: Enabling extensions and configuration (php.ini)
-
-# https://github.com/mlocati/docker-php-extension-installer
-ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
-
-RUN install-php-extensions \
-    gd \
-    mysqli \
-    pdo \
-    pdo_mysql \
-    zip
+# Custom scripts
 
 COPY --chmod=755 dockerfiles/www/bin /usr/local/bin
 
-COPY --chmod=644 dockerfiles/www/configs/php/php.ini /usr/local/etc/php
-RUN mkdir /var/log/php && chown www-data:www-data /var/log/php
+# Wordpress files installation and setup
 
-# Wordpress files installation and configuration
-
-USER www-data
 WORKDIR /var/www/html/site
 
-RUN wp core download --version=6.3.1 --skip-content
+RUN wp core download --allow-root --version=6.3.1 --skip-content
 RUN mv wp-content assets
 RUN echo "<?php define('WP_USE_THEMES', true); require( dirname( __FILE__ ) . '/site/wp-blog-header.php' );" > ../index.php
 
-COPY --chown=www-data:www-data --chmod=744 dockerfiles/www/configs/wordpress/wp-config.php .
-COPY --chown=www-data:www-data --chmod=744 dockerfiles/www/configs/wordpress/.htaccess /var/www/html
+COPY dockerfiles/www/configs/wordpress/wp-config.php .
+COPY dockerfiles/www/configs/wordpress/.htaccess /var/www/html
 
 WORKDIR /var/www/html/site/assets/vendor
 
@@ -152,10 +173,22 @@ RUN download-wp-plugin.sh \
 
 WORKDIR /var/www/html/site/assets/themes
 
-COPY --chown=www-data:www-data --from=task-runner /home/node/app/dist .
+COPY --from=task-runner /home/node/app/dist .
 
-COPY --chown=www-data:www-data framework framework
-COPY --chown=www-data:www-data fw-child fw-child
+COPY framework framework
+COPY fw-child fw-child
+
+# Set restrictive file permissions allowing the web server only read permissions (except for specific directories)
+
+WORKDIR /var/www/html
+
+RUN mkdir site/assets/cache \
+    && chown -R root:www-data . \
+    && find . -type d -print0 | xargs -0 chmod 750 \
+    && find . -type f -print0 | xargs -0 chmod 640 \
+    && chmod 0640 site/wp-config.php \
+    && chmod 0640 .htaccess \
+    && chmod 0770 site/assets/cache
 
 WORKDIR /root
 USER root

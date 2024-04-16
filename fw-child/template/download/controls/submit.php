@@ -82,34 +82,44 @@
 						</div>
 						
 						<div class="col">
-							<?php
-							
-							/*
-								// label
-								echo Securimage::getCaptchaHtml ( $captcha_options, Securimage::HTML_INPUT_LABEL );
-									
-								// input
-								echo Securimage::getCaptchaHtml ( $captcha_options, Securimage::HTML_INPUT );
-							
-							?>
-							*/ ?>
-							
 							<label for="submit-captcha" class="form-label"><?php _e ( 'Enter the characters shown in the image:', 'cdc' ); ?></label>
 							
 							<input type="text" class="form-control" name="captcha_code" id="submit-captcha" size="6" maxlength="4" data-validate="<?php _e ( 'CAPTCHA verification is required.', 'cdc' ); ?>">
 						</div>
 					</div>
 				</div>
+				
+				<div id="map-control-idf" class="map-control-item" style="display: none;">
+					<h6 class="mb-3 all-caps text-secondary">
+						<?php _e ( 'IDF Links', 'cdc' ); ?>
+					</h6>
+					
+					<div class="form-check">
+						<input class="form-check-input" type="radio" name="submit-idf" id="submit-idf-historical" value="historical" data-validate="<?php _e ( 'Select a package to download', 'cdc' ); ?>">
+						<label class="form-check-label" for="submit-idf-historical"><?php _e ( 'Historical IDF (ZIP)', 'cdc' ); ?></label>
+					</div>
+					
+					<div class="form-check">
+						<input class="form-check-input" type="radio" name="submit-idf" id="submit-idf-cmip5" value="cmip5" data-validate="<?php _e ( 'Select a package to download', 'cdc' ); ?>">
+						<label class="form-check-label" for="submit-idf-cmip5"><?php _e ( 'Climate Change-Scaled IDF - CMIP5 (ZIP)', 'cdc' ); ?></label>
+					</div>
+					
+					<div class="form-check">
+						<input class="form-check-input" type="radio" name="submit-idf" id="submit-idf-cmip6" value="cmip6" data-validate="<?php _e ( 'Select a package to download', 'cdc' ); ?>">
+						<label class="form-check-label" for="submit-idf-cmip6"><?php _e ( 'Climate Change-Scaled IDF - CMIP6 (ZIP)', 'cdc' ); ?></label>
+					</div>
+					
+					<div class="form-check">
+						<input class="form-check-input" type="radio" name="submit-idf" id="submit-idf-cmip6-quickstart" value="cmip6-quickstart" data-validate="<?php _e ( 'Select a package to download', 'cdc' ); ?>">
+						<label class="form-check-label" for="submit-idf-cmip6-quickstart"><?php _e ( 'Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)', 'cdc' ); ?></label>
+					</div>
+					
+				</div>
+				
 			</div>
 			
 			<div class="control-tab-footer">
-				<div>
-					<button id="submit-btn" class="btn btn-lg btn-primary w-100"><?php _e ( 'Send Request', 'cdc' ); ?></button>
-				</div>
-				
-				<!-- <div data-flags="station:1" style="display: none;">
-					<a id="station-submit-btn" href="" target="_blank" class="btn btn-lg btn-primary w-100 disabled"><?php _e ( 'Process and Download', 'cdc' ); ?></a>
-				</div> -->
+				<button id="submit-btn" class="btn btn-lg btn-primary w-100"><?php _e ( 'Send Request', 'cdc' ); ?></button>
 			</div>
 			
 		</div>

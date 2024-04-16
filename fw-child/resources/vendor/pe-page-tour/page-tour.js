@@ -25,7 +25,7 @@
       elements: {
         bubble: $('.page-tour-bubble')
       },
-      debug: true
+      debug: false
     };
     
     this.options = $.extend(true, defaults, options);

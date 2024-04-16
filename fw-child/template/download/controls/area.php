@@ -43,13 +43,13 @@
 						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
 					</h6>
 					
-					<div class="d-flex align-items-start justify-content-between">
+					<div id="area-gridded-container" class="d-flex align-items-start justify-content-between">
 						<div class="form-check">
 							<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-grid" value="gridded_data" data-query-key="sector" data-conditional="#area-aggregation-select-mode">
 							<label class="form-check-label" for="area-aggregation-grid"><?php _e ( 'Gridded Data', 'cdc' ); ?></label>
 						</div>
 						
-						<div id="area-selections-status" class="d-flex">
+						<div id="area-selections-status">
 							<div id="area-selections-count"><span>0</span> <?php _e ( 'selected', 'cdc' ); ?></div>
 							<div id="area-selections-reset" class="ms-3 disabled" role="button">
 								<i class="fas fa-sync-alt"></i>

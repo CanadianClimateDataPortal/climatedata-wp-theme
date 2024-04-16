@@ -109,6 +109,13 @@
         end_picker: null,
         shapefile_upload: null,
         popovers: null,
+        result: {
+          tab: null,
+          head: null,
+          content: null,
+          btn: null,
+          status: null,
+        },
       },
       debug: true,
     };
@@ -385,7 +392,7 @@
 
       // SELECT2
 
-      $('#station-select').select2({
+      item.find('#station-select').select2({
         language: options.lang,
         multiple: true,
         closeOnSelect: false,
@@ -659,6 +666,14 @@
               });
           }
         });
+
+      // SUBMIT ELEMENTS
+
+      options.elements.result.tab = item.find('#submit-result');
+      options.elements.result.head = item.find('#result-head');
+      options.elements.result.content = item.find('#result-message');
+      options.elements.result.btn = item.find('#result-btn a');
+      options.elements.result.status = item.find('#result-status');
     },
 
     init_events: function () {
@@ -837,7 +852,7 @@
             ...style_obj,
           };
 
-          // console.log('select', this_gid, style_obj);
+          console.log('select', this_gid, style_obj);
 
           // array includes the clicked area
           if (selections.includes(this_gid)) {
@@ -875,10 +890,7 @@
                 console.log('reset ' + selection);
 
                 for (let key in options.maps) {
-                  options.maps[key].layers.grid.setFeatureStyle(
-                    selection,
-                    style_obj,
-                  );
+                  options.maps[key].layers.grid.resetFeatureStyle(selection);
                 }
               }
             });
@@ -889,6 +901,8 @@
           // console.log('selections', selections.join(','));
 
           // update input
+          options.status = 'select';
+
           item
             .find('#area-selections')
             .val(selections.join(','))
@@ -904,17 +918,9 @@
           console.log('station click', this_gid);
 
           this_gid = String(this_gid);
-
           options.station.color = style_obj.color;
 
           let selections = item.find('#station-select').val();
-
-          // convert values to integers
-          // selections.forEach(function (selection, i) {
-          //   if (selection != '') selections[i] = parseInt(selection);
-          // });
-
-          // console.log('current selections', selections);
 
           if (selections.includes(this_gid)) {
             // console.log('remove ' + this_gid);
@@ -925,8 +931,20 @@
 
             delete options.selection_data[this_gid];
           } else {
-            // console.log('add ' + this_gid);
-            selections.push(this_gid);
+            if (options.query.var == 'idf') {
+              // reset existing
+              selections.forEach(function (gid) {
+                plugin.update_station_markers([], gid, style_obj);
+              });
+
+              selections = [this_gid];
+
+              // switch to submit tab
+              $('#control-bar').tab_drawer('update_path', '#submit');
+            } else {
+              // console.log('add ' + this_gid);
+              selections.push(this_gid);
+            }
 
             options.selection_data[this_gid] = {
               properties: mouse_event.layer.feature.properties,
@@ -937,9 +955,6 @@
           plugin.update_station_markers(selections, this_gid, style_obj);
 
           // set station select2
-
-          console.log('station select', selections);
-          console.log('status = input');
           options.status = 'input';
           item.find('#station-select').val(selections).trigger('change');
         },
@@ -979,9 +994,20 @@
 
       // station selection
 
+      item.find('#station-select').on('select2:selecting', function (e) {
+        if (options.query.var == 'idf') {
+          $(this)
+            .val()
+            .forEach(function (gid) {
+              plugin.update_station_markers([], gid);
+            });
+
+          $(this).val(null);
+        }
+      });
+
       item.find('#station-select').on('select2:select', function (e) {
-        let this_gid = String(e.params.data.id),
-          selections = $(this).val();
+        let this_gid = String(e.params.data.id);
 
         options.selection_data[this_gid] = {
           properties: {
@@ -990,19 +1016,14 @@
           },
         };
 
-        plugin.update_station_markers(selections, this_gid);
+        plugin.update_station_markers($(this).val(), this_gid);
+
+        $('#control-bar').tab_drawer('update_path', '#submit');
       });
 
       item.find('#station-select').on('select2:unselect', function (e) {
-        let this_gid = String(e.params.data.id); //parseInt(e.params.data.id);
-        let selections = $(this).val();
-
-        // convert values to integers
-        // selections.forEach(function (selection, i) {
-        //   if (selection != '') selections[i] = parseInt(selection);
-        // });
-
-        plugin.update_station_markers(selections, this_gid);
+        let this_gid = String(e.params.data.id);
+        plugin.update_station_markers($(this).val(), this_gid);
       });
 
       // select/draw mode
@@ -1014,9 +1035,11 @@
 
         switch (options.selection_mode) {
           case 'draw':
+            console.log('ENABLE DRAW');
             plugin.enable_bbox();
             break;
           case 'select':
+            console.log('DISABLE DRAW');
             plugin.disable_bbox();
             break;
         }
@@ -1089,6 +1112,7 @@
             options.status != 'slide' &&
             options.status != 'mapdrag' &&
             options.status != 'init' &&
+            options.status != 'select' &&
             options.status != 'eval'
           ) {
             console.log('status = input');
@@ -1259,11 +1283,7 @@
       // SUBMIT
       //
 
-      item.find('#submit-email').on('change', function () {
-        plugin.validate_tab('#submit');
-      });
-
-      item.find('#submit-captcha').on('input', function () {
+      item.find('#submit :input').on('input', function () {
         plugin.validate_tab('#submit');
       });
 
@@ -1299,6 +1319,34 @@
         options.status = 'eval';
         plugin.handle_pop(e);
       });
+
+      // HOOKS
+
+      $(document).cdc_app(
+        'add_hook',
+        'maps.get_layer',
+        500,
+        plugin,
+        function (query) {
+          let plugin = this,
+            options = plugin.options,
+            item = plugin.item;
+
+          // console.log('get layer hook bbox');
+
+          // whether to re-enable bbox after changing/updating layers
+          if (
+            query.sector == 'gridded_data' &&
+            options.selection_mode == 'draw'
+          ) {
+            // console.log('enable');
+            plugin.enable_bbox();
+          } else {
+            // console.log('disable');
+            plugin.disable_bbox();
+          }
+        },
+      );
     },
 
     update_station_markers: function (selections, this_gid) {
@@ -1317,13 +1365,19 @@
         options.maps[key].layers.stations.eachLayer(function (layer) {
           let feature_ID = layer.feature.properties.ID; //parseInt(layer.feature.properties.ID);
 
-          if (options.query.var == 'weather-stations') {
+          if (
+            options.query.var == 'climate-normals' ||
+            options.query.var == 'station-data'
+          ) {
             feature_ID = layer.feature.properties.STN_ID;
           }
 
           if (feature_ID == this_gid) {
             if (selections.includes(this_gid)) {
-              if (options.query.dataset == 'ahccd') {
+              if (
+                options.query.var == 'ahccd' ||
+                options.query.dataset == 'ahccd'
+              ) {
                 layer.setIcon(ahccd_icons[layer.feature.properties.type + 'r']);
               } else {
                 layer.setStyle({
@@ -1332,7 +1386,10 @@
                 });
               }
             } else {
-              if (options.query.dataset == 'ahccd') {
+              if (
+                options.query.var == 'ahccd' ||
+                options.query.dataset == 'ahccd'
+              ) {
                 layer.setIcon(ahccd_icons[layer.feature.properties.type]);
               } else {
                 layer.setStyle({
@@ -1360,7 +1417,7 @@
       let this_key = input.attr('data-query-key'),
         this_val = input.val();
 
-      console.log(this_key, this_val, input);
+      // console.log(this_key, this_val, input);
 
       // if not a form element with a value attribute,
       // look for a data-query-val
@@ -1500,8 +1557,8 @@
 
             // populate the 'models' inputs
 
-            console.log('--- MODELS ---');
-            console.log(this_val);
+            // console.log('--- MODELS ---');
+            // console.log(this_val);
 
             if (DATASETS.hasOwnProperty(this_val)) {
               let models_placeholder = item.find('#models-placeholder');
@@ -1676,13 +1733,6 @@
           do_history = 'replace';
         }
 
-        // console.log(
-        //   'call update_value',
-        //   this_key,
-        //   options.query[this_key],
-        //   this_val,
-        // );
-
         // use cdc helper function to
         // update the value in the query object
         $(document).cdc_app('query.update_value', options.query, {
@@ -1690,9 +1740,6 @@
           key: this_key,
           val: this_val,
         });
-
-        // console.log('call eval');
-        // console.log(JSON.stringify(options.query, null, 4));
 
         // run the query
         options.query_str.prev = options.query_str.current;
@@ -1752,7 +1799,7 @@
 
       plugin.set_controls();
 
-      console.log('--- end of handle_input');
+      // console.log('--- end of handle_input');
     },
 
     refresh_inputs: function (query) {
@@ -1874,7 +1921,7 @@
         } // if input
       }
 
-      console.log('end of refresh_inputs');
+      // console.log('end of refresh_inputs');
     },
 
     handle_pop: function (e) {
@@ -2211,8 +2258,8 @@
             .show();
         }
 
-        console.log(options.query.sector);
-        console.log(options.current_grid, fields.grid);
+        // console.log(options.query.sector);
+        // console.log(options.current_grid, fields.grid);
 
         if (options.query.sector == 'gridded_data') {
           // if the grid name changes
@@ -2221,6 +2268,14 @@
             options.current_grid = fields.grid;
             plugin.reset_selections();
           }
+        } else if (options.query.sector == 'station') {
+          item.find('#station-select').val('').trigger('change');
+        }
+
+        if (options.query.var == 'idf') {
+          item.find('#map-control-idf').show();
+        } else {
+          item.find('#map-control-idf').hide();
         }
 
         // set request type
@@ -2274,13 +2329,13 @@
 
       // console.log(options.var_flags);
 
-      console.log('set controls');
-      console.log('request type', options.request.type);
+      // console.log('set controls');
+      // console.log('request type', options.request.type);
 
       switch (options.request.type) {
         case 'single':
           item.find('.leaflet-raster-pane').show();
-          console.log('show legend');
+          // console.log('show legend');
           item.find('.info.legend').show();
           break;
         case 'custom':
@@ -2372,21 +2427,19 @@
 
         // console.log('done enabling datasets');
 
-        console.log(item.find('#map-control-dataset :checked'));
-
         if (
           !item.find('#map-control-dataset :input:not([disabled]):checked')
             .length
         ) {
-          console.log('nothing is checked');
+          // console.log('nothing is checked');
 
           // nothing is checked
           // find the first enabled input and check it
 
-          console.log(
-            'first',
-            item.find('#map-control-dataset :input:not([disabled])').first(),
-          );
+          // console.log(
+          //   'first',
+          //   item.find('#map-control-dataset :input:not([disabled])').first(),
+          // );
 
           item
             .find('#map-control-dataset :input:not([disabled])')
@@ -2470,7 +2523,7 @@
         plugin.update_frequency();
       }
 
-      console.log('--- end of set_controls');
+      // console.log('--- end of set_controls');
     },
 
     update_frequency: function () {
@@ -2645,8 +2698,6 @@
         options = plugin.options,
         item = plugin.item;
 
-      console.log(tabs);
-
       function process_validate_queue(tabs) {
         $.when(plugin.validate_tab(tabs[0])).done(function (is_valid) {
           console.log(tabs[0], is_valid);
@@ -2654,7 +2705,6 @@
           const shift_tab = tabs.shift();
 
           if (tabs.length > 0) {
-            // console.log('again', tabs[0]);
             process_validate_queue(tabs);
           }
         });
@@ -2717,8 +2767,7 @@
               if (
                 ['ahccd', 'station', 'upload'].includes(options.query.sector)
               ) {
-                console.log(options.query.sector + ' is in the array');
-
+                // console.log(options.query.sector + ' is in the array');
                 validate_this = false;
               }
 
@@ -2743,10 +2792,20 @@
               valid_msg = input_to_check.attr('data-validate');
             }
 
-            // console.log('check', input_to_check, valid_msg);
-
-            // check for blank value
-            if (input_to_check.val() == '' || input_to_check.val() == 'null') {
+            if (
+              input_to_check.is('[type="radio"]') &&
+              !item.find(
+                '[type="radio"][name="' +
+                  input_to_check.attr('name') +
+                  '"]:checked',
+              ).length
+            ) {
+              invalid_messages.push(input_to_check.attr('data-validate'));
+            } else if (
+              input_to_check.val() == '' ||
+              input_to_check.val() == 'null'
+            ) {
+              // check for blank value
               tab_items.find('[href="' + prev_id + '"]').addClass('invalid');
               invalid_messages.push(valid_msg);
             }
@@ -2789,6 +2848,11 @@
             }
           }
 
+          break;
+        case '#submit':
+          // if (options.query.var == 'idf') {
+          //   if ($()
+          // }
           break;
       }
 
@@ -2886,31 +2950,46 @@
 
       let form_obj, submit_data;
 
-      let frequency_code = query.frequency.toLowerCase();
+      // reset elements
+      options.elements.result.head.text('');
+      options.elements.result.content.html('');
+      options.elements.result.status.hide();
+      options.elements.result.tab.removeClass('error').removeClass('success');
 
-      let result_tab = item.find('#submit-result'),
-        result_head = result_tab.find('#result-head'),
-        result_content = result_tab.find('#result-message'),
-        result_btn = result_tab.find('#result-btn a'),
-        result_status = result_tab.find('#result-status');
-
-      result_head.text('');
-      result_content.html('');
-
-      result_status.hide();
-
-      // result_btn.removeAttr('target');
-      // result_btn.text(T('Download'));
-
-      result_tab.removeClass('error').removeClass('success');
-
-      if (!result_tab.hasClass('td-selected')) {
+      if (!options.elements.result.tab.hasClass('td-selected')) {
         $('#control-bar').tab_drawer('update_path', '#submit-result', false);
       }
 
       switch (options.request.type) {
         case 'station':
-          let station_url =
+          plugin._process_station(query);
+          break;
+
+        case 'ahccd':
+          plugin._process_ahccd(query);
+          break;
+
+        case 'custom':
+          plugin._process_custom(query);
+          break;
+
+        case 'threshold':
+        case 'single':
+          plugin._process_single(query);
+          break;
+      }
+    },
+
+    _process_station: function (query) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let station_url;
+
+      switch (query.var) {
+        case 'station-data':
+          station_url =
             'https://api.weather.gc.ca/collections/climate-daily/items' +
             '?datetime=' +
             query.start_date +
@@ -2923,402 +3002,281 @@
             query.format +
             '&limit=150000&startindex=0';
 
-          result_head.text(T('Success') + '!');
-          result_content.text(T('Click below to download your data'));
+          options.elements.result.head.text(T('Success') + '!');
+          options.elements.result.content.text(
+            T('Click below to download your data'),
+          );
 
-          result_btn.attr('href', station_url);
-          result_btn.show();
+          options.elements.result.btn.attr('href', station_url);
+          options.elements.result.btn.show();
 
-          result_tab.removeClass('error').addClass('success');
-
-          // item
-          //   .find('#station-submit-btn')
-          //   .attr('href', station_url)
-          //   .removeClass('disabled');
+          options.elements.result.tab.removeClass('error').addClass('success');
 
           break;
+        case 'idf':
+          let data_request = item.find('[name="submit-idf"]:checked').val();
 
-        case 'ahccd':
-          console.log('AHCCD');
-
-          form_obj = {
-            inputs: [
-              {
-                id: 'output_format',
-                data: query.format,
-              },
-            ],
-            response: 'document',
-            mode: 'auto',
-            outputs: [
-              {
-                transmissionMode: 'reference',
-                id: 'output',
-              },
-            ],
-            notification_email: item.find('#submit-email').val(),
-          };
-
-          // inputs
-
-          item.find('#threshold-custom :input').each(function () {
-            console.log($(this).attr('name'), $(this).val());
-
-            if ($(this).val() != '') {
-              let this_data = $(this).val();
-
-              if (
-                $(this).attr('data-units') != undefined &&
-                $(this).attr('data-units') != ''
-              ) {
-                this_data += ' ' + $(this).attr('data-units');
-              }
-
-              form_obj.inputs.push({
-                id: $(this).attr('name'),
-                data: this_data,
-              });
-            }
-          });
-
-          // frequency
-
-          if (period_frequency_lut.hasOwnProperty(frequency_code)) {
-            frequency_code = period_frequency_lut[frequency_code];
-          }
-
-          form_obj.inputs.push({
-            id: 'freq',
-            data: frequency_code.toUpperCase(),
-          });
-
-          // missing data options
-
-          let missing = query.check_missing;
-
-          if (missing != 'wmo') {
-            missing = 'pct';
-
-            form_obj.inputs.push({
-              id: 'missing_options',
-              data: JSON.stringify({
-                pct: {
-                  tolerance: parseFloat(query.check_missing),
-                },
-              }),
-            });
-          }
-
-          form_obj.inputs.push({
-            id: 'check_missing',
-            data: missing,
-          });
-
-          // filename
-
-          let filename = options.var_data.acf.finch_var;
-
-          if (query.station.length == 1) {
-            let first_station = options.selection_data[query.station[0]];
-
-            if (first_station.hasOwnProperty('properties')) {
-              if (first_station.properties.hasOwnProperty('Name')) {
-                filename += '_' + first_station.properties.Name;
-              }
-            }
-          }
-
-          form_obj.inputs.push({
-            id: 'output_name',
-            data: filename,
-          });
-
-          // decimals
-
-          if (query.format == 'csv') {
-            form_obj.inputs.push({
-              id: 'csv_precision',
-              data: query.hasOwnProperty('decimals') ? query.decimals : 2,
-            });
-          }
-
-          //
-
-          console.log(query.station);
-
-          submit_data = {
-            captcha_code: item.find('#submit-captcha').val(),
-            namespace: 'analyze',
-            signup: item.find('#submit-subscribe').is(':checked'),
-            request_data: form_obj,
-            required_variables:
-              options.var_data.acf.required_variables.split('|'),
-            stations: query.station.join(','),
-            submit_url:
-              '/providers/finch/processes/' +
-              options.var_data.acf.finch_var +
-              '/jobs',
-          };
-
-          console.log('submit data');
-          console.log(JSON.stringify(submit_data, null, 4));
-
-          // submit
           $.ajax({
-            url: ajax_data.rest_url + 'cdc/v2/finch_submit/',
-            method: 'POST',
-            data: submit_data,
+            url: ajax_data.rest_url + 'cdc/v2/get_idf_url/',
             dataType: 'json',
+            data: {
+              station: options.query.station.join(''),
+              data: data_request,
+            },
             success: function (data) {
               console.log(data);
 
-              if (data.status == 'accepted') {
-                result_head.text(T('Success') + '!');
-                result_content.html(data.description);
+              if (data.files.length) {
+                options.elements.result.head.text(T('Success') + '!');
+                options.elements.result.content.text(
+                  T('Click below to download your data'),
+                );
 
-                // status
-                result_status
-                  .find('#result-status-text span')
-                  .html(data.status);
+                options.elements.result.btn.attr('href', data.files[0]);
+                options.elements.result.btn.show();
 
-                result_status
-                  .find('#result-status-refresh')
-                  .attr('data-url', data.location);
-
-                result_status.show();
-
-                result_tab.removeClass('error').addClass('success');
+                options.elements.result.tab
+                  .removeClass('error')
+                  .addClass('success');
               } else {
-                result_head.text(T('Error'));
-                result_content.html('Captcha failed. Please try again.');
+                options.elements.result.head.text(T('Error'));
+                options.elements.result.content.text(
+                  T('No data found matching your request.') +
+                    ' ' +
+                    T('Please try again.'),
+                );
 
-                result_tab.removeClass('success').addClass('error');
-
-                plugin.refresh_captcha();
+                options.elements.result.tab
+                  .addClass('error')
+                  .removeClass('success');
               }
-            },
-            complete: function () {
-              plugin.refresh_captcha();
             },
           });
 
           break;
+        case 'ahccd':
+          station_url =
+            geoserver_url +
+            '/download-ahccd?format=' +
+            query.format +
+            '&zipped=true' +
+            '&stations=' +
+            query.station.join(',');
 
-        case 'custom':
-          plugin._process_custom();
+          options.elements.result.head.text(T('Success') + '!');
+          options.elements.result.content.text(
+            T('Click below to download your data'),
+          );
+
+          options.elements.result.btn.attr('href', station_url);
+          options.elements.result.btn.show();
+
+          options.elements.result.tab.removeClass('error').addClass('success');
+
           break;
+        case 'climate-normals':
+          station_url =
+            'https://api.weather.gc.ca/collections/climate-normals/items?CLIMATE_IDENTIFIER=' +
+            query.station.join('|') +
+            '&sortby=MONTH&f=' +
+            query.format +
+            '&limit=150000&startindex=0';
 
-        case 'threshold':
-        case 'single':
-          let pointsInfo = '',
-            pointsData;
+          options.elements.result.head.text(T('Success') + '!');
+          options.elements.result.content.text(
+            T('Click below to download your data'),
+          );
 
-          dataLayerEventName = getGA4EventNameForVariableDataBCCAQv2();
+          options.elements.result.btn.attr('href', station_url);
+          options.elements.result.btn.show();
 
-          // console.log(query);
-
-          // aggregation
-          // - bbox
-          // - selected grid items
-
-          if (query.hasOwnProperty('bbox')) {
-            pointsInfo = 'BBox: ' + query.bbox.join(',');
-            pointsData = {
-              bbox: query.bbox,
-            };
-          } else {
-            pointsData = { points: [] };
-
-            for (var i = 0; i < query.selections.length; i++) {
-              point = options.selection_data[query.selections[i]];
-
-              // console.log(point);
-
-              if (i != 0) pointsInfo += ' ; ';
-
-              pointsInfo +=
-                'GridID: ' +
-                query.selections[i] +
-                ', Lat: ' +
-                point.lat +
-                ', Lng: ' +
-                point.lng;
-
-              pointsData.points.push([point.lat, point.lng]);
-            }
-          }
-
-          // format = query.format;
-          let dataset_name = query.dataset;
-
-          // TODO: add input to select 'allyears' or '30ygraph'
-          let selectedDatasetType = 'allyears';
-          //$(
-          //  'input[name="download-dataset-type"]:checked',
-          //).val();
-
-          let format_extension = query.format == 'netcdf' ? 'nc' : query.format;
-
-          if (query.var !== 'all') {
-            $('body').addClass('spinner-on');
-
-            let frequency_code = query.frequency;
-
-            freq_keys = Object.keys(period_frequency_lut);
-            freq_vals = Object.values(period_frequency_lut);
-
-            if (freq_vals.indexOf(query.frequency) !== -1) {
-              frequency_code = freq_keys[freq_vals.indexOf(query.frequency)];
-            }
-
-            request_args = {
-              var: query.var,
-              month: frequency_code,
-              dataset_name: query.dataset,
-              dataset_type: selectedDatasetType,
-              format: query.format,
-            };
-
-            Object.assign(request_args, pointsData);
-
-            let xhttp = new XMLHttpRequest();
-
-            xhttp.onreadystatechange = function () {
-              if (xhttp.readyState === XML_HTTP_REQUEST_DONE_STATE) {
-                if (xhttp.status === 200) {
-                  result_head.text(T('Success') + '!');
-                  result_content.text(T('Click below to download your data'));
-
-                  result_btn
-                    .attr('href', window.URL.createObjectURL(xhttp.response))
-                    .attr(
-                      'download',
-                      'file_name_goes_here' + '.' + format_extension,
-                    )
-                    .show();
-
-                  result_tab.removeClass('error').addClass('success');
-
-                  $('body').removeClass('spinner-on');
-                } else {
-                  result_head.text(T('An error occurred'));
-                  result_content.text(T('Please try again later'));
-                  result_btn.hide();
-                  result_tab.removeClass('success').addClass('error');
-                }
-              }
-            };
-
-            console.log('request', request_args);
-
-            xhttp.open('POST', geoserver_url + '/download');
-            xhttp.setRequestHeader('Content-Type', 'application/json');
-            xhttp.responseType = 'blob';
-            xhttp.send(JSON.stringify(request_args));
-          } else {
-            /*
-            
-            TODO
-            
-            // call download for all matching variables and build a zip file
-            selectedTimeStepCategory = $('#download-frequency')
-              .find(':selected')
-              .data('timestep');
-            varToProcess = [];
-
-            varData.forEach(function (varDetails, k) {
-              if (
-                k !== 'all' &&
-                varDetails.grid === 'canadagrid' &&
-                varDetails.timestep.includes(selectedTimeStepCategory)
-              ) {
-                varToProcess.push(k);
-              }
-            });
-
-            $('body').addClass('spinner-on');
-            var dl_status = 0;
-            var dl_fraction = $(
-              '<p id="dl-fraction" style="position: absolute; left: 30%; bottom: 30%; width: 40%; padding-bottom: 1em; text-align: center;"><span>' +
-                dl_status +
-                '</span> / ' +
-                varToProcess.length +
-                '</p>',
-            ).appendTo($('.spinner'));
-            var dl_progress = $(
-              '<div class="dl-progress" style="position: absolute; left: 0; bottom: 0; width: 0; height: 4px; background: red;">',
-            ).appendTo(dl_fraction);
-            var i = 0;
-            var zip = new JSZip();
-
-            function download_all() {
-              if (i < varToProcess.length) {
-                request_args = {
-                  var: varToProcess[i],
-                  month: month,
-                  dataset_name: dataset_name,
-                  dataset_type: selectedDatasetType,
-                  format: format,
-                };
-                Object.assign(request_args, pointsData);
-                let xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function () {
-                  if (xhttp.readyState === 4 && xhttp.status === 200) {
-                    zip.file(
-                      $('#download-filename').val() +
-                        '-' +
-                        varToProcess[i] +
-                        '.' +
-                        format_extension,
-                      xhttp.response,
-                    );
-
-                    dl_fraction.find('span').html(i);
-                    dl_progress.css(
-                      'width',
-                      (i / varToProcess.length) * 100 + '%',
-                    );
-                    if (i == varToProcess.length - 1) {
-                      // last one
-                      $('body').removeClass('spinner-on');
-                      dl_fraction.remove();
-                      dl_progress.remove();
-                      zip
-                        .generateAsync({ type: 'blob' })
-                        .then(function (content) {
-                          saveAs(
-                            content,
-                            $('#download-filename').val() + '.zip',
-                          );
-                        });
-                    }
-
-                    i++;
-                    download_all();
-                  }
-                };
-                xhttp.open('POST', data_url + '/download');
-                xhttp.setRequestHeader('Content-Type', 'application/json');
-                xhttp.responseType = 'blob';
-                xhttp.send(JSON.stringify(request_args));
-              }
-            }
-
-            download_all();
-            
-            */
-          }
+          options.elements.result.tab.removeClass('error').addClass('success');
 
           break;
       }
     },
 
-    _process_custom: function () {
+    _process_ahccd: function (query) {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
 
-      let submit_path = 'grid_point';
+      form_obj = {
+        inputs: [
+          {
+            id: 'output_format',
+            data: query.format,
+          },
+        ],
+        response: 'document',
+        mode: 'auto',
+        outputs: [
+          {
+            transmissionMode: 'reference',
+            id: 'output',
+          },
+        ],
+        notification_email: item.find('#submit-email').val(),
+      };
+
+      // inputs
+
+      item.find('#threshold-custom :input').each(function () {
+        console.log($(this).attr('name'), $(this).val());
+
+        if ($(this).val() != '') {
+          let this_data = $(this).val();
+
+          if (
+            $(this).attr('data-units') != undefined &&
+            $(this).attr('data-units') != ''
+          ) {
+            this_data += ' ' + $(this).attr('data-units');
+          }
+
+          form_obj.inputs.push({
+            id: $(this).attr('name'),
+            data: this_data,
+          });
+        }
+      });
+
+      // frequency
+
+      let frequency_code = query.frequency.toLowerCase();
+
+      if (period_frequency_lut.hasOwnProperty(frequency_code)) {
+        frequency_code = period_frequency_lut[frequency_code];
+      }
+
+      form_obj.inputs.push({
+        id: 'freq',
+        data: frequency_code.toUpperCase(),
+      });
+
+      // missing data options
+
+      let missing = query.check_missing;
+
+      if (missing != 'wmo') {
+        missing = 'pct';
+
+        form_obj.inputs.push({
+          id: 'missing_options',
+          data: JSON.stringify({
+            pct: {
+              tolerance: parseFloat(query.check_missing),
+            },
+          }),
+        });
+      }
+
+      form_obj.inputs.push({
+        id: 'check_missing',
+        data: missing,
+      });
+
+      // filename
+
+      let filename = options.var_data.acf.finch_var;
+
+      if (query.station.length == 1) {
+        let first_station = options.selection_data[query.station[0]];
+
+        if (first_station.hasOwnProperty('properties')) {
+          if (first_station.properties.hasOwnProperty('Name')) {
+            filename += '_' + first_station.properties.Name;
+          }
+        }
+      }
+
+      form_obj.inputs.push({
+        id: 'output_name',
+        data: filename,
+      });
+
+      // decimals
+
+      if (query.format == 'csv') {
+        form_obj.inputs.push({
+          id: 'csv_precision',
+          data: query.hasOwnProperty('decimals') ? query.decimals : 2,
+        });
+      }
+
+      //
+
+      console.log(query.station);
+
+      submit_data = {
+        captcha_code: item.find('#submit-captcha').val(),
+        namespace: 'analyze',
+        signup: item.find('#submit-subscribe').is(':checked'),
+        request_data: form_obj,
+        required_variables: options.var_data.acf.required_variables.split('|'),
+        stations: query.station.join(','),
+        submit_url:
+          '/providers/finch/processes/' +
+          options.var_data.acf.finch_var +
+          '/jobs',
+      };
+
+      console.log('submit data');
+      console.log(JSON.stringify(submit_data, null, 4));
+
+      // submit
+      $.ajax({
+        url: ajax_data.rest_url + 'cdc/v2/finch_submit/',
+        method: 'POST',
+        data: submit_data,
+        dataType: 'json',
+        success: function (data) {
+          console.log(data);
+
+          if (data.status == 'accepted') {
+            options.elements.result.head.text(T('Success') + '!');
+            options.elements.result.content.html(data.description);
+
+            // status
+            options.elements.result.status
+              .find('#result-status-text span')
+              .html(data.status);
+
+            options.elements.result.status
+              .find('#result-status-refresh')
+              .attr('data-url', data.location);
+
+            options.elements.result.status.show();
+
+            options.elements.result.tab
+              .removeClass('error')
+              .addClass('success');
+          } else {
+            options.elements.result.head.text(T('Error'));
+            options.elements.result.content.html(
+              'Captcha failed. Please try again.',
+            );
+
+            options.elements.result.tab
+              .removeClass('success')
+              .addClass('error');
+
+            plugin.refresh_captcha();
+          }
+        },
+        complete: function () {
+          plugin.refresh_captcha();
+        },
+      });
+    },
+
+    _process_custom: function (query) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let submit_path = 'grid_point',
+        frequency_code = query.frequency.toLowerCase();
 
       form_obj = {
         inputs: [
@@ -3559,24 +3517,32 @@
           console.log(data);
 
           if (data.status == 'accepted') {
-            result_head.text(T('Success') + '!');
-            result_content.html(data.description);
+            options.elements.result.head.text(T('Success') + '!');
+            options.elements.result.content.html(data.description);
 
             // status
-            result_status.find('#result-status-text span').html(data.status);
+            options.elements.result.status
+              .find('#result-status-text span')
+              .html(data.status);
 
-            result_status
+            options.elements.result.status
               .find('#result-status-refresh')
               .attr('data-url', data.location);
 
-            result_status.show();
+            options.elements.result.status.show();
 
-            result_tab.removeClass('error').addClass('success');
+            options.elements.result.tab
+              .removeClass('error')
+              .addClass('success');
           } else {
-            result_head.text(T('Error'));
-            result_content.html('Captcha failed. Please try again.');
+            options.elements.result.head.text(T('Error'));
+            options.elements.result.content.html(
+              'Captcha failed. Please try again.',
+            );
 
-            result_tab.removeClass('success').addClass('error');
+            options.elements.result.tab
+              .removeClass('success')
+              .addClass('error');
             plugin.refresh_captcha();
           }
         },
@@ -3584,6 +3550,216 @@
           plugin.refresh_captcha();
         },
       });
+    },
+
+    _process_single: function (query) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let pointsInfo = '',
+        pointsData,
+        frequency_code = query.frequency;
+
+      dataLayerEventName = getGA4EventNameForVariableDataBCCAQv2();
+
+      // console.log(query);
+
+      // aggregation
+      // - bbox
+      // - selected grid items
+
+      if (query.hasOwnProperty('bbox')) {
+        pointsInfo = 'BBox: ' + query.bbox.join(',');
+        pointsData = {
+          bbox: query.bbox,
+        };
+      } else {
+        pointsData = { points: [] };
+
+        for (var i = 0; i < query.selections.length; i++) {
+          point = options.selection_data[query.selections[i]];
+
+          // console.log(point);
+
+          if (i != 0) pointsInfo += ' ; ';
+
+          pointsInfo +=
+            'GridID: ' +
+            query.selections[i] +
+            ', Lat: ' +
+            point.lat +
+            ', Lng: ' +
+            point.lng;
+
+          pointsData.points.push([point.lat, point.lng]);
+        }
+      }
+
+      // format = query.format;
+      let dataset_name = query.dataset;
+
+      // TODO: add input to select 'allyears' or '30ygraph'
+      let selectedDatasetType = 'allyears';
+      //$(
+      //  'input[name="download-dataset-type"]:checked',
+      //).val();
+
+      let format_extension = query.format == 'netcdf' ? 'nc' : query.format;
+
+      if (query.var !== 'all') {
+        $('body').addClass('spinner-on');
+
+        freq_keys = Object.keys(period_frequency_lut);
+        freq_vals = Object.values(period_frequency_lut);
+
+        if (freq_vals.indexOf(query.frequency) !== -1) {
+          frequency_code = freq_keys[freq_vals.indexOf(query.frequency)];
+        }
+
+        request_args = {
+          var: query.var,
+          month: frequency_code,
+          dataset_name: query.dataset,
+          dataset_type: selectedDatasetType,
+          format: query.format,
+        };
+
+        Object.assign(request_args, pointsData);
+
+        let xhttp = new XMLHttpRequest();
+
+        xhttp.onreadystatechange = function () {
+          if (xhttp.readyState === XML_HTTP_REQUEST_DONE_STATE) {
+            if (xhttp.status === 200) {
+              options.elements.result.head.text(T('Success') + '!');
+              options.elements.result.content.text(
+                T('Click below to download your data'),
+              );
+
+              options.elements.result.btn
+                .attr('href', window.URL.createObjectURL(xhttp.response))
+                .attr(
+                  'download',
+                  'file_name_goes_here' + '.' + format_extension,
+                )
+                .show();
+
+              options.elements.result.tab
+                .removeClass('error')
+                .addClass('success');
+
+              $('body').removeClass('spinner-on');
+            } else {
+              options.elements.result.head.text(T('An error occurred'));
+              options.elements.result.content.text(T('Please try again later'));
+              options.elements.result.btn.hide();
+              options.elements.result.tab
+                .removeClass('success')
+                .addClass('error');
+            }
+          }
+        };
+
+        console.log('request', request_args);
+
+        xhttp.open('POST', geoserver_url + '/download');
+        xhttp.setRequestHeader('Content-Type', 'application/json');
+        xhttp.responseType = 'blob';
+        xhttp.send(JSON.stringify(request_args));
+      } else {
+        /*
+        
+        TODO
+        
+        // call download for all matching variables and build a zip file
+        selectedTimeStepCategory = $('#download-frequency')
+          .find(':selected')
+          .data('timestep');
+        varToProcess = [];
+      
+        varData.forEach(function (varDetails, k) {
+          if (
+            k !== 'all' &&
+            varDetails.grid === 'canadagrid' &&
+            varDetails.timestep.includes(selectedTimeStepCategory)
+          ) {
+            varToProcess.push(k);
+          }
+        });
+      
+        $('body').addClass('spinner-on');
+        var dl_status = 0;
+        var dl_fraction = $(
+          '<p id="dl-fraction" style="position: absolute; left: 30%; bottom: 30%; width: 40%; padding-bottom: 1em; text-align: center;"><span>' +
+            dl_status +
+            '</span> / ' +
+            varToProcess.length +
+            '</p>',
+        ).appendTo($('.spinner'));
+        var dl_progress = $(
+          '<div class="dl-progress" style="position: absolute; left: 0; bottom: 0; width: 0; height: 4px; background: red;">',
+        ).appendTo(dl_fraction);
+        var i = 0;
+        var zip = new JSZip();
+      
+        function download_all() {
+          if (i < varToProcess.length) {
+            request_args = {
+              var: varToProcess[i],
+              month: month,
+              dataset_name: dataset_name,
+              dataset_type: selectedDatasetType,
+              format: format,
+            };
+            Object.assign(request_args, pointsData);
+            let xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+              if (xhttp.readyState === 4 && xhttp.status === 200) {
+                zip.file(
+                  $('#download-filename').val() +
+                    '-' +
+                    varToProcess[i] +
+                    '.' +
+                    format_extension,
+                  xhttp.response,
+                );
+      
+                dl_fraction.find('span').html(i);
+                dl_progress.css(
+                  'width',
+                  (i / varToProcess.length) * 100 + '%',
+                );
+                if (i == varToProcess.length - 1) {
+                  // last one
+                  $('body').removeClass('spinner-on');
+                  dl_fraction.remove();
+                  dl_progress.remove();
+                  zip
+                    .generateAsync({ type: 'blob' })
+                    .then(function (content) {
+                      saveAs(
+                        content,
+                        $('#download-filename').val() + '.zip',
+                      );
+                    });
+                }
+      
+                i++;
+                download_all();
+              }
+            };
+            xhttp.open('POST', data_url + '/download');
+            xhttp.setRequestHeader('Content-Type', 'application/json');
+            xhttp.responseType = 'blob';
+            xhttp.send(JSON.stringify(request_args));
+          }
+        }
+      
+        download_all();
+        
+        */
+      }
     },
 
     refresh_captcha: function () {
@@ -3728,7 +3904,8 @@
         options.query.var == null ||
         options.query.var == '' ||
         options.query.var == 'null' ||
-        options.var_data == null
+        options.var_data == null ||
+        options.var_data.var_types.includes('Station Data')
       ) {
         // nothing to do,
         // prevents multiple firing of get_layer
@@ -4016,39 +4193,52 @@
         options = plugin.options,
         item = plugin.item;
 
-      for (let key in options.maps) {
+      Object.keys(options.maps).forEach(function (key) {
+        let this_map = options.maps[key];
+
         // hide grid
-        if (options.maps[key].object.hasLayer(options.maps[key].layers.grid)) {
-          options.maps[key].object.removeLayer(options.maps[key].layers.grid);
+        if (this_map.object.hasLayer(this_map.layers.grid)) {
+          this_map.object.removeLayer(this_map.layers.grid);
         }
 
-        if (!options.maps[key].layers.hasOwnProperty('bbox')) {
+        if (
+          !this_map.layers.hasOwnProperty('bbox') ||
+          this_map.layers.bbox == null
+        ) {
+          // console.log('enable draw');
+
           // initialize bbox layer
-          options.maps[key].layers.bbox = null;
+          this_map.layers.bbox = null;
 
           // enable drawing
-          options.maps[key].object.pm.enableDraw('Rectangle', {});
+          this_map.object.pm.enableDraw('Rectangle', {});
 
           // add event handler
-          options.maps[key].object.on('pm:create', function (e) {
+          this_map.object.on('pm:create', function (e) {
+            // console.log('create');
             // sync layers
             for (let key2 in options.maps) {
               options.maps[key2].layers.bbox = e.layer;
             }
 
             // enable editing
-            options.maps[key].layers.bbox.pm.enable({});
+            this_map.layers.bbox.pm.enable({});
 
             // add edit handler
-            options.maps[key].layers.bbox.on('pm:edit', function (e) {
+            this_map.layers.bbox.on('pm:edit', function (e) {
               plugin.handle_bbox_event(e);
             });
 
             // initial handler
             plugin.handle_bbox_event(e);
           });
+        } else {
+          // console.log('layer exists, enable edit');
+
+          // enable editing
+          this_map.layers.bbox.pm.enable({});
         }
-      }
+      });
     },
 
     disable_bbox: function () {
@@ -4056,30 +4246,34 @@
         options = plugin.options,
         item = plugin.item;
 
-      for (let key in options.maps) {
+      // console.log('disabling');
+
+      Object.keys(options.maps).forEach(function (key) {
+        let this_map = options.maps[key];
+
         // show the grid layer
-        if (options.maps[key].layers.grid != null) {
-          options.maps[key].object.addLayer(options.maps[key].layers.grid);
+        if (this_map.layers.grid != null) {
+          this_map.object.addLayer(this_map.layers.grid);
         }
 
         // remove bbox
         if (
-          options.maps[key].layers.hasOwnProperty('bbox') &&
-          options.maps[key].layers.bbox != null &&
-          options.maps[key].object.hasLayer(options.maps[key].layers.bbox)
+          this_map.layers.hasOwnProperty('bbox') &&
+          this_map.layers.bbox != null &&
+          this_map.object.hasLayer(this_map.layers.bbox)
         ) {
-          options.maps[key].object.removeLayer(options.maps[key].layers.bbox);
+          this_map.object.removeLayer(this_map.layers.bbox);
 
           // destroy events
-          options.maps[key].object.off('pm:create').off('pm:edit');
+          this_map.object.off('pm:create').off('pm:edit');
 
           // delete objects
-          delete options.maps[key].layers.bbox;
+          delete this_map.layers.bbox;
           delete options.query.bbox;
         }
 
-        options.maps[key].object.pm.disableDraw();
-      }
+        this_map.object.pm.disableDraw();
+      });
     },
 
     handle_bbox_event: function (e) {
@@ -4087,7 +4281,7 @@
         options = plugin.options,
         item = plugin.item;
 
-      console.log('bbox event', e);
+      // console.log('bbox event', e);
 
       let bounds = e.layer.getBounds();
       let sw = bounds.getSouthWest();

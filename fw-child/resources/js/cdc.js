@@ -96,10 +96,13 @@
       choro: {
         data: {},
         path: null,
+        reset_features: false,
       },
       maps: {},
       station_data: null,
       idf_data: null,
+      normals_data: null,
+      ahccd_data: null,
       coords: {
         lat: null,
         lng: null,
@@ -452,6 +455,17 @@
           });
         }
 
+        if (
+          options.request == null ||
+          options.request.type == 'custom' ||
+          options.request.type == 'ahccd' ||
+          query.sector == 'station'
+        ) {
+          options.legend.display = false;
+        } else {
+          options.legend.display = true;
+        }
+
         let first_map = options.maps[Object.keys(options.maps)[0]];
 
         // console.log('switch sector: ' + query.sector);
@@ -461,17 +475,6 @@
             console.log('RASTER');
 
             options.choro.path = null;
-
-            if (
-              options.request == null ||
-              options.request.type == 'custom' ||
-              options.request.type == 'ahccd' ||
-              query.sector == 'station'
-            ) {
-              options.legend.display = false;
-            } else {
-              options.legend.display = true;
-            }
 
             plugin.maps.do_legend.apply(item, [
               query,
@@ -599,7 +602,7 @@
                   }
 
                   if (do_grid == true) {
-                    console.log('new grid layer', options.current_grid);
+                    // console.log('new grid layer', options.current_grid);
 
                     let new_layer = L.vectorGrid.protobuf(
                       geoserver_url +
@@ -656,7 +659,7 @@
 
             let do_stations = false,
               layer_data,
-              marker_fill = query.var == 'weather-stations' ? '#f00' : '#00f';
+              marker_fill = query.var == 'climate-normals' ? '#f00' : '#00f';
 
             options.choro.path = null;
 
@@ -668,15 +671,25 @@
             let get_layer_data = function (query_var) {
               console.log('get data', query_var);
 
-              switch (query_var) {
-                case 'weather-stations':
-                  if (options.station_data == null) {
-                    // stations not yet loaded
+              // station data
+              // https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE
 
+              // idf
+              // https://climatedata.ca/site/assets/themes/climate-data-ca/resources/app/run-frontend-sync/assets/json/idf_curves.json
+
+              // ahccd
+              // https://climatedata.ca/site/assets/themes/climate-data-ca/resources/app/ahccd/ahccd.json
+
+              // normals
+              // https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=CLIMATE_IDENTIFIER,STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y
+
+              switch (query_var) {
+                case 'station-data':
+                  if (options.station_data == null) {
                     // console.log('get stations');
 
                     return $.ajax({
-                      url: 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y',
+                      url: 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE',
                       dataType: 'json',
                       success: function (data) {
                         options.station_data = data;
@@ -688,6 +701,7 @@
                   }
 
                   break;
+
                 case 'idf':
                   if (options.idf_data == null) {
                     // idf data not yet loaded
@@ -707,6 +721,43 @@
                   }
 
                   break;
+
+                case 'ahccd':
+                  if (options.ahccd_data == null) {
+                    // idf data not yet loaded
+
+                    return $.ajax({
+                      url:
+                        theme_data.child_theme_dir +
+                        '/resources/app/ahccd/ahccd.json',
+                      dataType: 'json',
+                      success: function (data) {
+                        options.ahccd_data = data;
+                        return { ...options.ahccd_data };
+                      },
+                    });
+                  } else {
+                    return { ...options.ahccd_data };
+                  }
+
+                  break;
+                case 'climate-normals':
+                  if (options.normals_data == null) {
+                    // console.log('get stations');
+
+                    return $.ajax({
+                      url: 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y',
+                      dataType: 'json',
+                      success: function (data) {
+                        options.normals_data = data;
+                        return { ...options.normals_data };
+                      },
+                    });
+                  } else {
+                    return { ...options.normals_data };
+                  }
+
+                  break;
                 default:
                   // stations are not defined by the variable
 
@@ -714,7 +765,7 @@
                     if (options.ahccd_data == null) {
                       // we're doing an AHCCD analysis
 
-                      console.log('get AHCCD json now');
+                      // console.log('get AHCCD json now');
 
                       return $.ajax({
                         url:
@@ -746,7 +797,10 @@
 
               if (item.find('#station-select').attr('data-list') != list_name) {
                 // repopulate the stations select2 menu
-                plugin.query.update_stations.apply(item, [query, layer_data]);
+                plugin.query.update_station_select.apply(item, [
+                  query,
+                  layer_data,
+                ]);
               }
 
               if (
@@ -768,6 +822,7 @@
 
               // each map
               Object.keys(options.maps).forEach(function (key) {
+                console.log('map key', key);
                 let this_map = options.maps[key];
 
                 // remove raster layer
@@ -805,9 +860,11 @@
                   // create the layer
 
                   // console.log('create layer');
+                  // console.log(layer_data);
+
                   this_map.layers.stations = L.geoJson(layer_data, {
                     pointToLayer: function (feature, latlng) {
-                      if (query.dataset == 'ahccd') {
+                      if (query.var == 'ahccd' || query.dataset == 'ahccd') {
                         return new L.Marker(latlng, {
                           icon: ahccd_icons[feature.properties.type],
                         });
@@ -826,15 +883,22 @@
                   })
                     .on('mouseover', function (e) {
                       let station_name =
-                        query.var == 'weather-stations'
+                        query.var == 'climate-normals' ||
+                        query.var == 'station-data'
                           ? e.layer.feature.properties.STATION_NAME
                           : e.layer.feature.properties.Name;
+
+                      if (query.var == 'idf') {
+                        station_name +=
+                          ' (' + e.layer.feature.properties.Elevation_ + ')';
+                      }
 
                       e.layer.bindTooltip(station_name).openTooltip(e.latlng);
                     })
                     .on('click', function (e) {
                       let station_id =
-                        query.var == 'weather-stations'
+                        query.var == 'climate-normals' ||
+                        query.var == 'station-data'
                           ? e.layer.feature.properties.STN_ID
                           : e.layer.feature.properties.ID;
 
@@ -843,7 +907,7 @@
                         fillColor: '#fff',
                       };
 
-                      if (query.dataset == 'ahccd') {
+                      if (query.var == 'ahccd' || query.dataset == 'ahccd') {
                         style_obj =
                           ahccd_icons[e.layer.feature.properties.type + 'r'];
                       }
@@ -866,9 +930,14 @@
                 // console.log(this_map.layers.station_clusters);
 
                 this_map.object.addLayer(this_map.layers.station_clusters);
+              });
 
-                options.current_sector = query.sector;
-                options.current_var = query.var;
+              options.current_sector = query.sector;
+              options.current_var = query.var;
+
+              // apply hooks
+              options.hooks['maps.get_layer'].forEach(function (hook) {
+                hook.fn.apply(hook.obj, [query, null]);
               });
             });
 
@@ -1015,6 +1084,7 @@
                           return style_obj;
                         };
 
+                      console.log('got choro data');
                       return data;
                     },
                   });
@@ -1048,16 +1118,6 @@
               // or the query object has changed
 
               $.when(get_choro_legend()).done(function (legend_data) {
-                if (legend_data == false) {
-                  console.log('no legend');
-
-                  // item.find('.info.legend').hide();
-
-                  // blank
-                } else {
-                  // item.find('.info.legend').show();
-                }
-
                 let remove_grid = false;
 
                 if (options.current_sector != query.sector) {
@@ -1080,14 +1140,19 @@
                     function (layer_data) {
                       // console.log(key, layer_data);
 
-                      let reset_features = layer_data == null ? true : false;
+                      if (layer_data == null) {
+                        options.choro.reset_features = true;
 
-                      if (reset_features == false) {
+                        for (i = 0; i < options.choro.data[key]; i += 1) {
+                          options.choro.data[key][i] = 0;
+                        }
+                      } else {
+                        options.choro.reset_features = false;
+
                         // only update choro.data if
                         // get_layer_data returned something
                         // otherwise, keep the features
                         // and reset them
-
                         options.choro.data[key] = layer_data;
                       }
 
@@ -1122,8 +1187,8 @@
                         this_map.layers.grid != undefined &&
                         this_map.object.hasLayer(this_map.layers.grid)
                       ) {
-                        console.log('remove now');
-                        // sector or var has changed, remove the layer entirely
+                        // sector or var has changed,
+                        // remove the layer entirely
                         this_map.object.removeLayer(this_map.layers.grid);
                       }
 
@@ -1151,14 +1216,14 @@
                             fillOpacity: 1,
                           };
 
-                          if (reset_features == true) {
+                          if (options.choro.reset_features == true) {
                             options.choro.data[key][i] = 0;
                           } else {
                             style_obj.color = '#fff';
                             style_obj.fill = true;
                             style_obj.fillColor = plugin.maps.get_color.apply(
                               item,
-                              [layer_data[i]],
+                              [options.choro.data[key][i]],
                             );
                           }
 
@@ -1169,6 +1234,8 @@
                         }
                       } else {
                         // new layer
+
+                        // console.log(layer_data);
 
                         // console.log('NEW LAYER');
 
@@ -1197,14 +1264,17 @@
                           .on('mouseover', function (e) {
                             let style_obj = {
                               weight: 1.5,
+                              fill: false,
+                              fillOpacity: 1,
+                              fillColor: plugin.maps.get_color.apply(item, [
+                                options.choro.data[key][e.layer.properties.id],
+                              ]),
                             };
 
-                            if (reset_features == false) {
+                            // console.log(options.choro.reset_features);
+
+                            if (options.choro.reset_features == false) {
                               style_obj.fill = true;
-                              style_obj.fillColor = plugin.maps.get_color.apply(
-                                item,
-                                [layer_data[e.layer.properties.id]],
-                              );
                             }
 
                             $(document).trigger('map_item_mouseover', [
@@ -1216,14 +1286,15 @@
                           .on('mouseout', function (e) {
                             let style_obj = {
                               weight: 1.5,
+                              fill: false,
+                              fillOpacity: 1,
+                              fillColor: plugin.maps.get_color.apply(item, [
+                                options.choro.data[key][e.layer.properties.id],
+                              ]),
                             };
 
-                            if (reset_features == false) {
+                            if (options.choro.reset_features == false) {
                               style_obj.fill = true;
-                              style_obj.fillColor = plugin.maps.get_color.apply(
-                                item,
-                                [layer_data[e.layer.properties.id]],
-                              );
                             }
 
                             $(document).trigger('map_item_mouseout', [
@@ -1235,18 +1306,20 @@
                           .on('click', function (e) {
                             let style_obj = {
                               weight: 1.5,
+                              fill: false,
+                              fillOpacity: 1,
+                              fillColor: plugin.maps.get_color.apply(item, [
+                                options.choro.data[key][e.layer.properties.id],
+                              ]),
                             };
 
-                            console.log(e);
+                            // console.log(e);
 
-                            if (reset_features == false) {
+                            if (options.choro.reset_features == false) {
                               // console.log(e.layer.properties.id);
                               // console.log(layer_data[e.layer.properties.id]);
 
-                              style_obj.fillColor = plugin.maps.get_color.apply(
-                                item,
-                                [layer_data[e.layer.properties.id]],
-                              );
+                              style_obj.fill = true;
                             }
 
                             $(document).trigger('map_item_select', [
@@ -1260,6 +1333,11 @@
                     },
                   ); // when choro data
                 }); // each map
+
+                // apply hooks
+                options.hooks['maps.get_layer'].forEach(function (hook) {
+                  hook.fn.apply(hook.obj, [query, null]);
+                });
               }); // when legend
             }
         } // switch
@@ -1728,7 +1806,7 @@
         // console.log('cdc', 'url to obj', status);
 
         if (window.location.search != '') {
-          console.log('convert', window.location.search);
+          // console.log('convert', window.location.search);
 
           let url_query = JSON.parse(
             '{"' +
@@ -1778,8 +1856,8 @@
             },
           );
 
-          console.log('merged query');
-          console.log(JSON.stringify(query, null, 4));
+          // console.log('merged query');
+          // console.log(JSON.stringify(query, null, 4));
         }
 
         // set cdc_app's options.query too
@@ -1906,7 +1984,7 @@
         ]);
       },
 
-      update_stations: function (query, station_data) {
+      update_station_select: function (query, station_data) {
         let plugin = !this.item ? this.data('cdc_app') : this;
         let options = plugin.options,
           item = plugin.item;
@@ -1920,7 +1998,7 @@
         let station_options = [];
 
         station_data.features.forEach(function (station) {
-          if (query.var == 'weather-stations') {
+          if (query.var == 'climate-normals' || query.var == 'station-data') {
             station_options.push({
               id: station.properties.STN_ID,
               name: station.properties.STATION_NAME,

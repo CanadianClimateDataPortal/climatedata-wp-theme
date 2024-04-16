@@ -1249,10 +1249,19 @@ body.tab-drawer-open {
 // AREA TAB
 
 #area-selections-status {
+  display: none;
   font-size: 0.75rem;
   line-height: 1.375rem;
   color: $gray-600;
   @include all-caps;
+}
+
+// show selection/reset when gridded is selected
+
+#area-gridded-container:has(:checked) {
+  #area-selections-status {
+    display: flex;
+  }
 }
 
 #area-selections-reset {

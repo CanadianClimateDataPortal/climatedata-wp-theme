@@ -96,6 +96,7 @@
       choro: {
         data: {},
         path: null,
+        reset_features: false,
       },
       maps: {},
       station_data: null,
@@ -454,6 +455,17 @@
           });
         }
 
+        if (
+          options.request == null ||
+          options.request.type == 'custom' ||
+          options.request.type == 'ahccd' ||
+          query.sector == 'station'
+        ) {
+          options.legend.display = false;
+        } else {
+          options.legend.display = true;
+        }
+
         let first_map = options.maps[Object.keys(options.maps)[0]];
 
         // console.log('switch sector: ' + query.sector);
@@ -463,17 +475,6 @@
             console.log('RASTER');
 
             options.choro.path = null;
-
-            if (
-              options.request == null ||
-              options.request.type == 'custom' ||
-              options.request.type == 'ahccd' ||
-              query.sector == 'station'
-            ) {
-              options.legend.display = false;
-            } else {
-              options.legend.display = true;
-            }
 
             plugin.maps.do_legend.apply(item, [
               query,
@@ -601,7 +602,7 @@
                   }
 
                   if (do_grid == true) {
-                    console.log('new grid layer', options.current_grid);
+                    // console.log('new grid layer', options.current_grid);
 
                     let new_layer = L.vectorGrid.protobuf(
                       geoserver_url +
@@ -728,7 +729,7 @@
                     return $.ajax({
                       url:
                         theme_data.child_theme_dir +
-                        '/resources/app/ahccd.json',
+                        '/resources/app/ahccd/ahccd.json',
                       dataType: 'json',
                       success: function (data) {
                         options.ahccd_data = data;
@@ -796,7 +797,10 @@
 
               if (item.find('#station-select').attr('data-list') != list_name) {
                 // repopulate the stations select2 menu
-                plugin.query.update_stations.apply(item, [query, layer_data]);
+                plugin.query.update_station_select.apply(item, [
+                  query,
+                  layer_data,
+                ]);
               }
 
               if (
@@ -818,6 +822,7 @@
 
               // each map
               Object.keys(options.maps).forEach(function (key) {
+                console.log('map key', key);
                 let this_map = options.maps[key];
 
                 // remove raster layer
@@ -855,9 +860,11 @@
                   // create the layer
 
                   // console.log('create layer');
+                  // console.log(layer_data);
+
                   this_map.layers.stations = L.geoJson(layer_data, {
                     pointToLayer: function (feature, latlng) {
-                      if (query.dataset == 'ahccd') {
+                      if (query.var == 'ahccd' || query.dataset == 'ahccd') {
                         return new L.Marker(latlng, {
                           icon: ahccd_icons[feature.properties.type],
                         });
@@ -900,7 +907,7 @@
                         fillColor: '#fff',
                       };
 
-                      if (query.dataset == 'ahccd') {
+                      if (query.var == 'ahccd' || query.dataset == 'ahccd') {
                         style_obj =
                           ahccd_icons[e.layer.feature.properties.type + 'r'];
                       }
@@ -923,9 +930,14 @@
                 // console.log(this_map.layers.station_clusters);
 
                 this_map.object.addLayer(this_map.layers.station_clusters);
+              });
 
-                options.current_sector = query.sector;
-                options.current_var = query.var;
+              options.current_sector = query.sector;
+              options.current_var = query.var;
+
+              // apply hooks
+              options.hooks['maps.get_layer'].forEach(function (hook) {
+                hook.fn.apply(hook.obj, [query, null]);
               });
             });
 
@@ -1072,6 +1084,7 @@
                           return style_obj;
                         };
 
+                      console.log('got choro data');
                       return data;
                     },
                   });
@@ -1105,16 +1118,6 @@
               // or the query object has changed
 
               $.when(get_choro_legend()).done(function (legend_data) {
-                if (legend_data == false) {
-                  console.log('no legend');
-
-                  // item.find('.info.legend').hide();
-
-                  // blank
-                } else {
-                  // item.find('.info.legend').show();
-                }
-
                 let remove_grid = false;
 
                 if (options.current_sector != query.sector) {
@@ -1137,14 +1140,19 @@
                     function (layer_data) {
                       // console.log(key, layer_data);
 
-                      let reset_features = layer_data == null ? true : false;
+                      if (layer_data == null) {
+                        options.choro.reset_features = true;
 
-                      if (reset_features == false) {
+                        for (i = 0; i < options.choro.data[key]; i += 1) {
+                          options.choro.data[key][i] = 0;
+                        }
+                      } else {
+                        options.choro.reset_features = false;
+
                         // only update choro.data if
                         // get_layer_data returned something
                         // otherwise, keep the features
                         // and reset them
-
                         options.choro.data[key] = layer_data;
                       }
 
@@ -1179,8 +1187,8 @@
                         this_map.layers.grid != undefined &&
                         this_map.object.hasLayer(this_map.layers.grid)
                       ) {
-                        console.log('remove now');
-                        // sector or var has changed, remove the layer entirely
+                        // sector or var has changed,
+                        // remove the layer entirely
                         this_map.object.removeLayer(this_map.layers.grid);
                       }
 
@@ -1208,14 +1216,14 @@
                             fillOpacity: 1,
                           };
 
-                          if (reset_features == true) {
+                          if (options.choro.reset_features == true) {
                             options.choro.data[key][i] = 0;
                           } else {
                             style_obj.color = '#fff';
                             style_obj.fill = true;
                             style_obj.fillColor = plugin.maps.get_color.apply(
                               item,
-                              [layer_data[i]],
+                              [options.choro.data[key][i]],
                             );
                           }
 
@@ -1226,6 +1234,8 @@
                         }
                       } else {
                         // new layer
+
+                        // console.log(layer_data);
 
                         // console.log('NEW LAYER');
 
@@ -1254,14 +1264,17 @@
                           .on('mouseover', function (e) {
                             let style_obj = {
                               weight: 1.5,
+                              fill: false,
+                              fillOpacity: 1,
+                              fillColor: plugin.maps.get_color.apply(item, [
+                                options.choro.data[key][e.layer.properties.id],
+                              ]),
                             };
 
-                            if (reset_features == false) {
+                            // console.log(options.choro.reset_features);
+
+                            if (options.choro.reset_features == false) {
                               style_obj.fill = true;
-                              style_obj.fillColor = plugin.maps.get_color.apply(
-                                item,
-                                [layer_data[e.layer.properties.id]],
-                              );
                             }
 
                             $(document).trigger('map_item_mouseover', [
@@ -1273,14 +1286,15 @@
                           .on('mouseout', function (e) {
                             let style_obj = {
                               weight: 1.5,
+                              fill: false,
+                              fillOpacity: 1,
+                              fillColor: plugin.maps.get_color.apply(item, [
+                                options.choro.data[key][e.layer.properties.id],
+                              ]),
                             };
 
-                            if (reset_features == false) {
+                            if (options.choro.reset_features == false) {
                               style_obj.fill = true;
-                              style_obj.fillColor = plugin.maps.get_color.apply(
-                                item,
-                                [layer_data[e.layer.properties.id]],
-                              );
                             }
 
                             $(document).trigger('map_item_mouseout', [
@@ -1292,18 +1306,20 @@
                           .on('click', function (e) {
                             let style_obj = {
                               weight: 1.5,
+                              fill: false,
+                              fillOpacity: 1,
+                              fillColor: plugin.maps.get_color.apply(item, [
+                                options.choro.data[key][e.layer.properties.id],
+                              ]),
                             };
 
-                            console.log(e);
+                            // console.log(e);
 
-                            if (reset_features == false) {
+                            if (options.choro.reset_features == false) {
                               // console.log(e.layer.properties.id);
                               // console.log(layer_data[e.layer.properties.id]);
 
-                              style_obj.fillColor = plugin.maps.get_color.apply(
-                                item,
-                                [layer_data[e.layer.properties.id]],
-                              );
+                              style_obj.fill = true;
                             }
 
                             $(document).trigger('map_item_select', [
@@ -1317,6 +1333,11 @@
                     },
                   ); // when choro data
                 }); // each map
+
+                // apply hooks
+                options.hooks['maps.get_layer'].forEach(function (hook) {
+                  hook.fn.apply(hook.obj, [query, null]);
+                });
               }); // when legend
             }
         } // switch
@@ -1785,7 +1806,7 @@
         // console.log('cdc', 'url to obj', status);
 
         if (window.location.search != '') {
-          console.log('convert', window.location.search);
+          // console.log('convert', window.location.search);
 
           let url_query = JSON.parse(
             '{"' +
@@ -1835,8 +1856,8 @@
             },
           );
 
-          console.log('merged query');
-          console.log(JSON.stringify(query, null, 4));
+          // console.log('merged query');
+          // console.log(JSON.stringify(query, null, 4));
         }
 
         // set cdc_app's options.query too
@@ -1963,7 +1984,7 @@
         ]);
       },
 
-      update_stations: function (query, station_data) {
+      update_station_select: function (query, station_data) {
         let plugin = !this.item ? this.data('cdc_app') : this;
         let options = plugin.options,
           item = plugin.item;

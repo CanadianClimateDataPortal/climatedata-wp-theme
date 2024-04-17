@@ -89,7 +89,7 @@
       // close
       
       plugin_elements.close_wrap = $('<div class="page-tour-close-wrap">').appendTo(plugin_elements.footer);
-      plugin_elements.close_btn = $('<span class="page-tour-close btn btn-sm btn-outline-secondary rounded-pill mr-3">' + plugin_settings.labels.close + '</span>').appendTo(plugin_elements.close_wrap);
+      plugin_elements.close_btn = $('<span class="page-tour-close btn btn-sm btn-outline-secondary rounded-pill me-3">' + plugin_settings.labels.close + '</span>').appendTo(plugin_elements.close_wrap);
       plugin_elements.dont_show = $('<label class="page-tour-dontshow" for="page-tour-dontshow"><input type="checkbox" id="page-tour-dontshow" name="page-tour-dontshow"> ' + plugin_settings.labels.dont_show + '</label>').appendTo(plugin_elements.close_wrap);
       
       // dots

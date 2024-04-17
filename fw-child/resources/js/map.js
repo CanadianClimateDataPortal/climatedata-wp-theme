@@ -614,6 +614,8 @@
           // reinit if plugin is already loaded
           query_items.flex_drawer('init_items');
         }
+
+        item.find('#data-variable .control-tab-body').scrollTop(0);
       });
 
       item.find('#var-select-query').fw_query();

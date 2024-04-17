@@ -39,7 +39,7 @@
 	
 	$footer_template = json_decode ( get_post_meta ( 11315, 'builder', true ), true );
 	
-	fw_output_loop ( $hero_template, 1, true );
+	fw_output_loop ( $footer_template, 1, true );
 
 	get_footer();
 	

@@ -127,7 +127,7 @@
 												<input type="radio" class="btn-check" name="chart-values" id="chart-value-delta" data-chart-key="values" value="delta" autocomplete="off">
 												<label class="p-2" for="chart-value-delta">
 													<strong class="d-block mb-2"><?php _e ( '30 year changes', 'cdc' ); ?></strong>
-													<span class="d-block d-block small"><?php _e ( 'Average values over the previous 30-year period', 'cdc' ); ?></span>
+													<span class="d-block d-block small"><?php _e ( 'Values that indicate the change from the 1971-2000 reference period', 'cdc' ); ?></span>
 												</label>
 												
 											</div>

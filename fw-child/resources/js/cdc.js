@@ -2885,11 +2885,11 @@
                               scenario.chart_color,
                             ) +
                               T('{0} Median').format(scenario.label) +
-                              ' ' +
+                              ' <b>' +
                               this.value +
                               ' ' +
                               options.chart.unit +
-                              '<br>',
+                              '</b><br>',
                           );
 
                           this.value =
@@ -2911,13 +2911,13 @@
                               scenario.chart_color,
                             ) +
                               T('{0} Range').format(scenario.label) +
-                              ' ' +
+                              ' <b>' +
                               val1 +
                               ' – ' +
                               val2 +
                               ' ' +
                               options.chart.unit +
-                              '<br>',
+                              '</b><br>',
                           );
                         }, this);
 

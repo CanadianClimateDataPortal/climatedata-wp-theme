@@ -1494,7 +1494,8 @@
         recent_list.find('.list-group-item').removeClass('active');
 
         location.coords.forEach(function (coord, i) {
-          location.coords[i] = coord.toFixed(4);
+          // console.log(coord);
+          location.coords[i] = parseFloat(coord).toFixed(4);
         });
 
         if (

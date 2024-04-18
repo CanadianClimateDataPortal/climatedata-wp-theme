@@ -698,8 +698,8 @@
               // options.status = 'mapdrag';
 
               // update coord text fields
-              $('#coords-lat').val(this.getCenter().lat);
-              $('#coords-lng').val(this.getCenter().lng);
+              $('#coords-lat').val(this.getCenter().lat.toFixed(4));
+              $('#coords-lng').val(this.getCenter().lng.toFixed(4));
               $('#coords-zoom').val(this.getZoom());
 
               // if (options.status == 'mapdrag') {
@@ -2057,7 +2057,6 @@
 
         item.find('#breadcrumb-overlay-trigger').show();
 
-        console.log(options.var_data);
         fields = options.var_data.acf;
 
         // set var_flags

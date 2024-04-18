@@ -88,6 +88,7 @@
         station: false,
       },
       frequency: {},
+      selection_data: {},
       elements: {
         decade_slider: null,
         threshold_slider: null,
@@ -445,6 +446,7 @@
       // SELECT2
 
       $('#area-search').select2({
+        theme: 'bootstrap-5',
         language: {
           inputTooShort: function () {
             let instructions = '<div class="geo-select-instructions">';
@@ -515,7 +517,7 @@
                   T('Coordinates detected') +
                   '</h6><p class="mb-0"><span class="geo-select-pan-btn btn btn-outline-secondary btn-sm rounded-pill px-4" data-lat="' +
                   term_lat +
-                  '" data-lon="' +
+                  '" data-lng="' +
                   term_lon +
                   '">' +
                   T('Set map view') +
@@ -614,6 +616,8 @@
           // reinit if plugin is already loaded
           query_items.flex_drawer('init_items');
         }
+
+        item.find('#data-variable .control-tab-body').scrollTop(0);
       });
 
       item.find('#var-select-query').fw_query();
@@ -722,8 +726,8 @@
             }
 
             // update coord text fields
-            $('#coords-lat').val(this.getCenter().lat);
-            $('#coords-lng').val(this.getCenter().lng);
+            $('#coords-lat').val(this.getCenter().lat.toFixed(4));
+            $('#coords-lng').val(this.getCenter().lng.toFixed(4));
             $('#coords-zoom').val(this.getZoom());
 
             // update hidden coords field
@@ -911,12 +915,24 @@
       item.on(
         'map_item_select',
         function (e, mouse_event, this_gid, style_obj) {
+          this_gid = String(this_gid);
+
           // console.log('grid click', mouse_event);
 
           options.grid.style_obj = style_obj;
 
+          if (!options.selection_data.hasOwnProperty(options.query.sector))
+            options.selection_data[options.query.sector] = {};
+
+          options.selection_data[options.query.sector][this_gid] = mouse_event;
+
           // load location details
-          plugin.set_location(mouse_event.latlng, mouse_event);
+          plugin.set_location(
+            options.query,
+            options.var_data,
+            mouse_event.latlng,
+            mouse_event,
+          );
         },
       );
 
@@ -929,7 +945,9 @@
       // click station
 
       item.on('map_station_select', function (e, mouse_event) {
-        // console.log('station click', mouse_event);
+        let this_gid = String(mouse_event.layer.feature.properties.STN_ID);
+
+        console.log('station click', mouse_event);
 
         if (options.query.var == 'idf') {
           // popups
@@ -952,8 +970,18 @@
 
           // console.log('set station');
 
+          if (!options.selection_data.hasOwnProperty('station'))
+            options.selection_data['station'] = {};
+
+          options.selection_data['station'][this_gid] = mouse_event;
+
           // load location details
-          plugin.set_station(mouse_event);
+          plugin.set_station(
+            options.query,
+            options.var_data,
+            mouse_event.latlng,
+            mouse_event,
+          );
         }
       });
 
@@ -962,15 +990,15 @@
       item.on('click_marker', function (e, mouse_event) {
         let list_item = item.find(
           '#recent-locations [data-coords="' +
-            mouse_event.latlng.lat +
+            mouse_event.latlng.lat.toFixed(4) +
             ',' +
-            mouse_event.latlng.lng +
+            mouse_event.latlng.lng.toFixed(4) +
             '"]',
         );
 
         $(document).cdc_app('maps.set_center', mouse_event.latlng, 10, 0.75);
 
-        list_item.trigger('click');
+        list_item.find('.view').trigger('click');
       });
 
       // change tabs
@@ -999,25 +1027,32 @@
         let this_item = $(this).closest('.list-group-item');
 
         let coords = {
-          lat: this_item.attr('data-coords').split(',')[0],
-          lng: this_item.attr('data-coords').split(',')[1],
+          lat: parseFloat(this_item.attr('data-coords').split(',')[0]),
+          lng: parseFloat(this_item.attr('data-coords').split(',')[1]),
         };
 
-        if (this_item.attr('data-sector') == options.query.sector) {
-          plugin.set_location(coords, {
-            layer: {
-              properties: {
-                id: $(this).attr('data-grid-id'),
-                label_en: this_item.find('.title').text(),
-              },
-            },
-          });
-        } else {
-          if (window.location.hash == '#location-detail') {
-            $('#control-bar').tab_drawer('update_path', '#location');
-          }
+        // location or station
 
-          $(document).cdc_app('maps.set_center', coords, 10, false);
+        if (this_item.attr('data-sector') == 'station') {
+          // console.log('clicked a station item');
+
+          plugin.set_station(
+            this_item.data('query'),
+            this_item.data('var_data'),
+            coords,
+            options.selection_data.station[this_item.attr('data-grid-id')],
+          );
+        } else {
+          // console.log('clicked a grid/sector item');
+
+          plugin.set_location(
+            this_item.data('query'),
+            this_item.data('var_data'),
+            coords,
+            options.selection_data[this_item.attr('data-sector')][
+              this_item.attr('data-grid-id')
+            ],
+          );
         }
       });
 
@@ -1070,10 +1105,35 @@
         console.log('selected', e.params.data);
 
         plugin.set_location(
-          { lat: e.params.data.lat, lng: e.params.data.lon },
+          options.query,
+          options.var_data,
+          {
+            lat: parseFloat(e.params.data.lat),
+            lng: parseFloat(e.params.data.lon),
+          },
           null,
-          true,
+          e.params.text,
         );
+      });
+
+      // area search pan to coords btn
+
+      item.on('click', '.geo-select-pan-btn', function () {
+        let first_map = options.maps[Object.keys(options.maps)[0]];
+
+        let thislat = parseFloat($(this).attr('data-lat')),
+          thislon = parseFloat($(this).attr('data-lng')),
+          this_zoom = first_map.object.getZoom();
+
+        if (this_zoom < 9) this_zoom = 9;
+
+        first_map.object.setView([thislat, thislon], this_zoom);
+
+        item
+          .find('#select2-area-search-container')
+          .text($(this).attr('data-lat') + ', ' + $(this).attr('data-lng'));
+
+        item.find('#area-search').select2('close');
       });
 
       // triggerable handler
@@ -1139,9 +1199,9 @@
 
         if (this_input.attr('id') == 'coords-zoom') {
           // if changing the zoom, plus or minus 1 will suffice
-          if ($(this).hasClass('down-btn')) {
+          if ($(this).hasClass('down-btn') && zoom_val > 3) {
             this_val -= 1;
-          } else if ($(this).hasClass('up-btn')) {
+          } else if ($(this).hasClass('up-btn') && zoom_val < 11) {
             this_val += 1;
           }
         } else {
@@ -1405,22 +1465,7 @@
           break;
 
         case 'sector':
-          item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
-
-          if (this_val != 'gridded_data') {
-            item
-              .find('.leaflet-pane.leaflet-grid-pane')
-              .css('opacity', $('#display-data-slider').slider('value') / 100);
-          }
-
-          // adjust 'view location' label in recent locations
-          item.find('#recent-locations .list-group-item').each(function () {
-            if ($(this).attr('data-sector') == this_val) {
-              $(this).find('.view').text(T('Select'));
-            } else {
-              $(this).find('.view').text(T('Show on map'));
-            }
-          });
+          plugin.handle_sector_change(this_val);
 
           break;
         case 'coords':
@@ -1639,7 +1684,12 @@
                       }
 
                       plugin.set_location(
-                        { lat: data.lat, lng: data.lng },
+                        options.query,
+                        options.var_data,
+                        {
+                          lat: parseFloat(data.lat),
+                          lng: parseFloat(data.lng),
+                        },
                         null,
                         open_location,
                       );
@@ -1747,15 +1797,26 @@
       } else if (var_id != null) {
         // console.log('get_var_data because var_id changed');
         $(document).cdc_app('get_var_data', var_id, function (data) {
-          // console.log('get var data', data);
+          console.log('get var data', data);
 
           // update var_data
           options.var_data = data;
 
           if (typeof data.acf.var_names != 'undefined') {
+            console.log('var names yes');
+            console.log(status);
             if (status != 'init' && status != 'eval') {
+              console.log('UPDATE QUERY VAR');
               // update var in options.query
-              options.query.var = options.var_data.acf.var_names[0].variable;
+              options.query.var = $(document).cdc_app(
+                'query.update_value',
+                options.query,
+                {
+                  item: $('[data-query-key="var"]'),
+                  key: 'var',
+                  val: options.var_data.acf.var_names[0].variable,
+                },
+              );
 
               // set hidden input
               hidden_input.val(data.acf.var_names[0].variable);
@@ -1768,43 +1829,56 @@
         });
       }
 
+      // populate var info overlay
+
+      item
+        .find('#breadcrumb-variable')
+        .text(
+          options.lang != 'en'
+            ? options.var_data.meta.title_fr
+            : options.var_data.title.rendered,
+        );
+
+      // populate var info overlay
+
+      let desc_key = 'var_description' + (options.lang != 'en' ? '_fr' : ''),
+        tech_key = 'var_tech_description' + (options.lang != 'en' ? '_fr' : '');
+
+      item.find('#info-description').html(options.var_data.acf[desc_key]);
+      item.find('#info-tech-description').html(options.var_data.acf[tech_key]);
+
       fields = options.var_data.acf;
+
+      // if the var is station data
+
+      if (options.var_data.var_types.includes('Station Data')) {
+        options.query.sector = 'station';
+
+        plugin.handle_sector_change('station');
+
+        // set 'sector' parameter
+        options.var_flags.station = true;
+
+        // turn scenarios off
+        item
+          .find('#data-scenarios-medium, #data-scenarios-low')
+          .each(function () {
+            if ($(this).prop('checked') == true) {
+              $(this).prop('checked', false).trigger('change');
+            }
+          });
+
+        //
+      } else {
+        // find and trigger the checked sector radio
+        // so that query.sector updates
+        item
+          .find('#map-control-aggregation .form-check-input:checked')
+          .trigger('change');
+      }
 
       if (typeof fields.var_names != 'undefined') {
         // set breadcrumb title
-
-        item
-          .find('#breadcrumb-variable')
-          .text(
-            options.lang != 'en'
-              ? options.var_data.meta.title_fr
-              : options.var_data.title.rendered,
-          );
-
-        // populate var info overlay
-
-        let desc_key = 'var_description' + (options.lang != 'en' ? '_fr' : ''),
-          tech_key =
-            'var_tech_description' + (options.lang != 'en' ? '_fr' : '');
-
-        item.find('#info-description').html(options.var_data.acf[desc_key]);
-        item
-          .find('#info-tech-description')
-          .html(options.var_data.acf[tech_key]);
-
-        // if the var is station data
-
-        if (options.var_data.var_types.includes('Station Data')) {
-          // set 'sector' parameter
-          options.var_flags.station = true;
-        } else {
-          // console.log('not station');
-          // find and trigger the checked sector radio
-          // so that query.sector updates
-          item
-            .find('#map-control-aggregation .form-check-input:checked')
-            .trigger('change');
-        }
 
         // SET CONTROLS
 
@@ -2087,6 +2161,31 @@
       // console.log('---');
     },
 
+    handle_sector_change: function (new_sector) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      console.log('handle sector change', new_sector);
+
+      item.find('.leaflet-pane.leaflet-grid-pane').css('opacity', 1);
+
+      if (new_sector != 'gridded_data') {
+        item
+          .find('.leaflet-pane.leaflet-grid-pane')
+          .css('opacity', $('#display-data-slider').slider('value') / 100);
+      }
+
+      // adjust 'view location' label in recent locations
+      item.find('#recent-locations .list-group-item').each(function () {
+        if ($(this).attr('data-sector') == new_sector) {
+          $(this).find('.view').text(T('View location'));
+        } else {
+          $(this).find('.view').text(T('Show on map'));
+        }
+      });
+    },
+
     update_frequency: function () {
       let plugin = this,
         options = plugin.options,
@@ -2256,7 +2355,9 @@
         options = plugin.options,
         item = plugin.item;
 
-      // console.log('apply scheme');
+      // console.log('apply scheme', layer_params);
+
+      if (layer_params == null) return false;
 
       if (
         special_variables.hasOwnProperty(
@@ -2389,22 +2490,11 @@
           let low = variable_data[absolute_or_delta].low;
           let high = variable_data[absolute_or_delta].high;
           let scheme_length = colours.length;
-          let decimals = options.var_data.acf.decimals;
 
           // if we have a diverging ramp, we center the legend at zero
           if (selected_scheme_item.data('scheme-type') === 'divergent') {
             high = Math.max(Math.abs(low), Math.abs(high));
             low = high * -1;
-            // workaround to avoid legend with repeated values for very low range variables
-            if ((high - low) * 10**decimals < scheme_length) {
-              low = -(scheme_length / 10**decimals / 2.0);
-              high = scheme_length / 10**decimals / 2.0;
-            }
-          } else {
-            // workaround to avoid legend with repeated values for very low range variables
-            if ((high - low) * 10**decimals < scheme_length) {
-              high = low + scheme_length / 10**decimals;
-            }
           }
 
           // temperature raster data files are in Kelvin, but in °C in variable_data
@@ -2449,23 +2539,54 @@
       return sld_body;
     },
 
-    set_station: function (click_event, open_tab = true) {
+    set_station: function (
+      query,
+      var_data,
+      coords,
+      location_data,
+      open_tab = true,
+    ) {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
 
-      console.log('station fn', click_event);
+      console.log('set station', location_data);
 
-      const station_id = click_event.layer.feature.properties.STN_ID,
-        coords = { lat: click_event.latlng.lat, lng: click_event.latlng.lng };
+      const station_id = location_data.layer.feature.properties.STN_ID;
 
       // create chart
 
       if (open_tab == true) {
+        // add recent list item
+        $(document).cdc_app(
+          'maps.update_recent',
+          {
+            lat: coords.lat,
+            lng: coords.lng,
+            coords: [coords.lat, coords.lng],
+            geo_name:
+              location_data.layer.feature.properties.STATION_NAME +
+              ' (' +
+              station_id +
+              ')',
+            title: location_data.layer.feature.properties.STATION_NAME,
+          },
+          location_data,
+          options.var_data,
+        );
+
         console.log('load station now');
 
         // set map center to marker location w/ offset
         $(document).cdc_app('maps.set_center', coords, 10);
+
+        // match coords var to lat/lng returned by the function
+        coords = { lat: location.lat, lng: location.lng };
+
+        // search field value
+        item.find('#area-search').val(location.title);
+
+        // set the hidden input with the location code
 
         // hidden input
         item
@@ -2476,11 +2597,20 @@
         // tab headings
         item
           .find('#station-detail .control-tab-head h5')
-          .text(click_event.layer.feature.properties.STATION_NAME);
+          .text(location_data.layer.feature.properties.STATION_NAME);
+
+        // update var name in #station-detail
+
+        let var_title =
+          options.lang != 'en'
+            ? var_data.meta.title_fr
+            : var_data.title.rendered;
+
+        item.find('#station-detail .variable-name').text(var_title);
 
         // open location tab drawer
 
-        if (window.location.hash != '#location-detail') {
+        if (window.location.hash != '#station-detail') {
           $('#control-bar').tab_drawer('update_path', '#station-detail');
         }
 
@@ -2494,7 +2624,7 @@
           var_data: options.var_data,
           station: {
             id: station_id,
-            name: click_event.layer.feature.properties.STATION_NAME,
+            name: location_data.layer.feature.properties.STATION_NAME,
             coords: coords,
           },
           download_url: null,
@@ -2505,26 +2635,63 @@
       }
     },
 
-    set_location: function (coords, location_data = null, open_tab = true) {
+    set_location: function (
+      query,
+      var_data,
+      coords,
+      location_data = null,
+      open_tab = true,
+      location_name = null,
+    ) {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
 
       console.log('set location');
-      console.log(coords);
+      console.log(coords.lat, coords.lng);
       console.log(location_data);
 
+      coords.lat = parseFloat(coords.lat).toFixed(4);
+      coords.lng = parseFloat(coords.lng).toFixed(4);
+
       let feature_id = null,
-        zoom_level = 8;
+        zoom_level = 8,
+        recent_item = null;
 
       if (typeof location_data == 'string') {
         feature_id = parseInt(location_data);
       }
 
+      if (location_data !== null) {
+        let coords_selector =
+          '#recent-locations [data-coords="' +
+          coords.lat +
+          ',' +
+          coords.lng +
+          '"]';
+
+        let sector_selector =
+          '#recent-locations [data-sector="' +
+          query.sector +
+          '"][data-grid-id="' +
+          location_data.layer.properties.id +
+          '"]';
+
+        if (item.find(coords_selector).length) {
+          recent_item = item.find(coords_selector);
+        } else if (item.find(sector_selector).length) {
+          recent_item = item.find(sector_selector);
+        }
+      }
+
+      console.log('recent', recent_item);
+
       let get_location_data = function (coords, location_data) {
-        switch (options.query.sector) {
+        console.log('get location data', coords, location_data);
+
+        switch (query.sector) {
           case 'gridded_data':
-            console.log('grid', coords);
+            // console.log('grid', coords);
 
             if (
               feature_id == null &&
@@ -2569,6 +2736,12 @@
               title: 'Point (' + coords.lat + ', ' + coords.lng + ')',
             };
 
+            console.log('recent item??', recent_item);
+
+            if (recent_item != null) {
+              location_obj.title = recent_item.find('.title').text();
+            }
+
             if (feature_id == null && typeof location_data == 'object') {
               feature_id = location_data.layer.properties.gid;
 
@@ -2584,23 +2757,40 @@
       $.when(get_location_data(coords, location_data)).done(
         function (location) {
           console.log('LOCATION');
-          console.log(location);
+          // console.log(location);
+          // console.log('LOCATION DATA');
+          // console.log(location_data);
+          // console.log('QUERY');
+          // console.log(query);
+          // console.log('VAR DATA');
+          // console.log(var_data);
 
           // add marker
+          $(document).cdc_app('maps.add_marker', location, location_data);
 
+          // add recent list item
           $(document).cdc_app(
-            'maps.add_marker',
+            'maps.update_recent',
             location,
             location_data,
-            function () {},
+            var_data,
           );
+
+          console.log('NAME', location_name);
+
+          if (location_name == null) {
+            location_name = location.title;
+          }
+
+          // set search field value
+          item.find('#select2-area-search-container').text(location_name);
 
           // match coords var to lat/lng returned by the function
           coords = { lat: location.lat, lng: location.lng };
 
           // search field value
-          if (location.geo_name != 'Point') {
-            item.find('#area-search').val(location.title);
+          if (location_name == location.title && location.geo_name != 'Point') {
+            item.find('#area-search').val(location_name);
           }
 
           // set the hidden input with the location code
@@ -2614,7 +2804,16 @@
           // tab headings
           item
             .find('#location-detail .control-tab-head h5')
-            .text(location.title);
+            .text(location_name);
+
+          // update var name in #location-detail
+
+          let var_title =
+            options.lang != 'en'
+              ? var_data.meta.title_fr
+              : var_data.title.rendered;
+
+          item.find('#location-detail .variable-name').text(var_title);
 
           if (open_tab == true) {
             console.log('open location detail now');
@@ -2632,13 +2831,13 @@
                 '/' +
                 coords.lng +
                 '/' +
-                options.query.var +
+                query.var +
                 '/' +
-                options.query.frequency +
+                query.frequency +
                 '?decimals=' +
-                options.var_data.acf.decimals +
+                var_data.acf.decimals +
                 '&dataset_name=' +
-                options.query.dataset,
+                query.dataset,
               dataType: 'json',
               success: function (data) {
                 // console.log('chart data', data);
@@ -2648,8 +2847,8 @@
 
                 $(document).cdc_app('charts.render', {
                   data: data,
-                  query: options.query,
-                  var_data: options.var_data,
+                  query: query,
+                  var_data: var_data,
                   coords: coords,
                   download_url: null,
                   container: item.find('#location-chart-container')[0],
@@ -2678,7 +2877,7 @@
 
             options.grid.style_obj.color = '#00f';
 
-            console.log(options.grid.style_obj);
+            // console.log(options.grid.style_obj);
 
             for (let key in options.maps) {
               options.maps[key].layers.grid.setFeatureStyle(

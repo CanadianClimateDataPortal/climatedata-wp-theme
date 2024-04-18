@@ -103,8 +103,8 @@
 		<div class="d-flex">
 			
 			<div id="map-control-zoom" class="d-flex border-end">
-				<div id="map-zoom-in" class="map-zoom-btn zoom-in border-end">+</div>
-				<div id="map-zoom-out" class="map-zoom-btn zoom-out">-</div>
+				<div id="map-zoom-out" class="map-zoom-btn zoom-out border-end">-</div>
+				<div id="map-zoom-in" class="map-zoom-btn zoom-in">+</div>
 			</div>
 			
 			<div id="map-control-time" class="flex-grow-1 d-flex align-items-center px-3">

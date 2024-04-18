@@ -245,3 +245,24 @@
     padding-bottom: 0;
   }
 }
+
+//
+// PAGE TOUR
+//
+
+.page-tour {
+  width: 400px;
+}
+
+.page-tour-footer {
+  border-top: 1px solid $gray-400;
+  font-size: 0.75rem;
+
+  .page-tour-dots {
+    margin-right: 1rem;
+  }
+
+  .page-tour-dontshow {
+    display: none;
+  }
+}

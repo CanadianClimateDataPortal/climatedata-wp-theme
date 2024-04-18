@@ -18,15 +18,17 @@
 					</div>
 				</div>
 				
-				<div id="map-control-variable" class="map-control-item pe-0">
-					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Variable', 'cdc' ); ?></h6>
+				<div id="map-control-variable" class="map-control-item px-0">
 					
 					<input type="hidden" name="data-var-id" id="data-var-id" value="" data-query-key="var_id" data-validate="<?php _e ( 'Select a variable to download', 'cdc' ); ?>">
 					<input type="hidden" name="data-var" id="data-var" value="" data-query-key="var">
 					
-					<a href="#data-variable" class="tab-drawer-trigger var-name d-block bg-white text-body p-3 mb-3"><?php _e ( 'Click to select a variable', 'cdc' ); ?></a>
+					<a href="#data-variable" class="tab-drawer-trigger d-block text-body p-3">
+						<span class="h6 all-caps text-secondary mb-3"><?php _e ( 'Variable', 'cdc' ); ?></span>
+						<span class="var-name p-2"><?php _e ( 'Click to select a variable', 'cdc' ); ?></span>
+					</a>
 					
-					<div id="var-thresholds" class="me-3" style="display: none;" data-flags="threshold:1,custom:1">
+					<div id="var-thresholds" class="mt-3 mx-3" style="display: none;" data-flags="threshold:1,custom:1">
 						<h6 class="d-flex align-items-center h6 mb-3 all-caps text-secondary">
 							<?php _e ( 'Threshold Values', 'cdc' ); ?>
 							<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>

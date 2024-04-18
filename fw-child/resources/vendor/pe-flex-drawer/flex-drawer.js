@@ -17,7 +17,7 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 				id: null,
 				order: null
 			},
-			debug: false,
+			debug: true,
 		}
 		
 		this.options = $.extend(true, defaults, options)
@@ -97,20 +97,24 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 				
 					let item_order_div = this_order / 10
 				
-					// console.log('my order', item_order_div)
+					// console.log('item', this_item)
+					// console.log('item order', item_order_div)
+					// console.log('drawer order', drawer_order)
 				
 					if (item_order_div % 3 == 0) {
+						
+						// console.log('item order % 3 👍')
 						
 						drawer_order = this_order + 1
 						
 					} else {
 						
 						this_item.nextAll().each(function () {
-							
 							if (drawer_order == null) {
+								// drawer order hasn't been set
+								
 								// console.log(
-								// 	'this order',
-								// 	parseInt($(this).css('order')),
+								// 	'next item',
 								// 	parseInt($(this).css('order')) / 10,
 								// )
 				
@@ -119,6 +123,13 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 								}
 							}
 						})
+						
+						if (drawer_order == null) {
+							// didn't find a 3rd column
+							drawer_order = 5000
+						}
+						
+						// console.log('set order to ' + drawer_order)
 						
 					}
 					

@@ -107,7 +107,7 @@
 						?>
 						
 						<div class="d-flex justify-content-end ms-auto me-2">
-							<h6 class="fw-query-reset mb-0 all-caps" style="display: none;"><?php _e ( 'Clear', 'fw' ); ?></h6>
+							<h6 class="fw-query-reset mb-0 all-caps" role="button" style="display: none;"><?php _e ( 'Clear', 'fw' ); ?></h6>
 						</div>
 					</div>
 					

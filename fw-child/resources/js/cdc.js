@@ -261,12 +261,31 @@
       $('body').on('change', '.conditional-trigger :input', function () {
         plugin.toggle_conditionals();
       });
+
+      //
+
+      // reset marker
+
+      item.on('td_update_path', function (e, prev_id, current_id) {
+        if (prev_id == '#location-detail') {
+          for (let key in options.maps) {
+            options.grid.markers[key].forEach(function (marker, i) {
+              marker.setIcon(options.icons.small);
+            });
+          }
+        }
+      });
     },
 
     set_option: function (opt_name, opt_val) {
       this.options[opt_name] = opt_val;
       // console.log(this.options);
       // console.log(this.options[opt_name]);
+    },
+
+    get_option: function (opt_name) {
+      console.log(this.options[opt_name]);
+      if (this.options.hasOwnProperty(opt_name)) return this.options[opt_name];
     },
 
     add_hook: function (hook_name, priority, obj, hook_function) {
@@ -424,15 +443,6 @@
 
         if (var_data == undefined || var_data == null) {
           return 'no variable';
-        }
-
-        // when called after selecting a station variable,
-        // the 'aggregation' control will have been set to 'gridded_data'
-        // so check var_data.var_types for 'station data'
-        // and change sector to 'station' if necessary
-
-        if (var_data.var_types.includes('Station Data')) {
-          query.sector = 'station';
         }
 
         // remove geoman bbox layer
@@ -1443,7 +1453,7 @@
         switch (i) {
           case -1:
             // fallback case in case style/legend is wrong
-            return options.legend.colormap.colours[options.legend.colormap.colours.length-1];
+            return 'rgba(0,0,0,0)';
           case 0:
             return options.legend.colormap.colours[0];
           default:
@@ -1470,19 +1480,22 @@
         }
       },
 
-      add_marker: function (location, location_data, callback = null) {
+      update_recent: function (location, location_data, var_data) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           item = plugin.item,
           options = plugin.options;
 
-        let recent_list = item.find('#recent-locations'),
-          popped = false;
+        let recent_list = item.find('#recent-locations');
 
         // console.log('add marker', location.coords.join(','), location);
-        console.log('add marker', location_data);
+        console.log('add recent', location, location_data);
 
         // remove any existing 'active' class
         recent_list.find('.list-group-item').removeClass('active');
+
+        location.coords.forEach(function (coord, i) {
+          location.coords[i] = coord.toFixed(4);
+        });
 
         if (
           recent_list.find('[data-coords="' + location.coords.join(',') + '"]')
@@ -1496,11 +1509,119 @@
             '[data-coords="' + location.coords.join(',') + '"]',
           );
 
-          let marker_index = parseInt($(recent_item).attr('data-index'));
-
-          let this_marker = options.grid.markers['low'][marker_index];
-
           recent_item.addClass('active');
+        } else {
+          if (recent_list.find('.list-group-item').length > 5) {
+            // remove last from recents
+            recent_list.find('.list-group-item').last().remove();
+          }
+
+          // add location to recents
+
+          grid_id = '';
+
+          if (location_data != null) {
+            if (location_data.hasOwnProperty('layer')) {
+              if (location_data.layer.hasOwnProperty('properties')) {
+                if (location_data.layer.properties.gid) {
+                  // gid
+                  grid_id = location_data.layer.properties.gid;
+                } else if (location_data.layer.properties.id) {
+                  // id
+                  grid_id = location_data.layer.properties.id;
+                }
+              } else if (location_data.layer.hasOwnProperty('feature')) {
+                // STN_ID
+                grid_id = location_data.layer.feature.properties.STN_ID;
+              }
+            }
+          }
+
+          let location_type = options.current_sector;
+
+          switch (options.current_sector) {
+            case 'gridded_data':
+              location_type = T('Grid Point');
+              break;
+            case 'census':
+              location_type = T('Census Subdivision');
+              break;
+            case 'health':
+              location_type = T('Health Region');
+              break;
+          }
+
+          let new_item = $(
+            '<div class="list-group-item list-group-item-action active">',
+          );
+
+          console.log(JSON.stringify(options.query, null, 4));
+
+          // item attributes
+          new_item
+            .attr('data-location', location.geo_id)
+            .attr('data-coords', location.coords.join(','))
+            .attr('data-var', options.query.var)
+            .attr('data-sector', options.current_sector)
+            .attr('data-grid-id', grid_id);
+
+          new_item.data('query', { ...options.query });
+          new_item.data('var_data', { ...var_data });
+
+          // type
+          $('<div class="location-type">' + location_type + '</div>').appendTo(
+            new_item,
+          );
+
+          // title
+          $('<div class="title">' + location.title + '</div>').appendTo(
+            new_item,
+          );
+
+          // actions div
+
+          let item_actions = $('<div class="item-actions">').appendTo(new_item);
+
+          // view btn
+          $('<span class="view">' + T('View location') + '</span>').appendTo(
+            item_actions,
+          );
+
+          // clear btn
+          $('<span class="clear">' + T('Remove pin') + '</span>').appendTo(
+            item_actions,
+          );
+
+          recent_list.prepend(new_item);
+
+          // reorder index attributes for the whole list
+          recent_list.find('.list-group-item').each(function (i) {
+            $(this).attr('data-index', i);
+          });
+        }
+
+        item.find('#recent-locations-clear').show();
+      },
+
+      add_marker: function (location, location_data, callback = null) {
+        let plugin = !this.item ? this.data('cdc_app') : this,
+          item = plugin.item,
+          options = plugin.options;
+
+        let recent_list = item.find('#recent-locations');
+
+        if (
+          recent_list.find('[data-coords="' + location.coords.join(',') + '"]')
+            .length
+        ) {
+          // marker already exists
+
+          let recent_item = recent_list.find(
+            '[data-coords="' + location.coords.join(',') + '"]',
+          );
+
+          let marker_index = parseInt($(recent_item).attr('data-index'));
+          let this_marker = options.grid.markers['low'][marker_index];
 
           // swap markers
 
@@ -1532,7 +1653,7 @@
             // add new marker to beginning of array
             options.grid.markers[key].unshift(new_marker);
 
-            if (options.grid.markers[key].length > 5) {
+            if (options.grid.markers[key].length >= 5) {
               // pop the last if there are more than 5
               popped_marker = options.grid.markers[key].pop();
               popped = true;
@@ -1550,83 +1671,6 @@
               .addTo(options.maps[key].object);
           }
 
-          if (popped == true) {
-            // remove last from recents
-            recent_list.find('.list-group-item').last().remove();
-          }
-
-          // add location to recents
-
-          //
-
-          grid_id = '';
-
-          if (location_data != null) {
-            if (location_data.hasOwnProperty.layer) {
-              if (location_data.layer.properties.gid) {
-                grid_id = location_data.layer.properties.gid;
-              } else if (location_data.layer.properties.id) {
-                grid_id = location_data.layer.properties.id;
-              }
-            }
-          }
-
-          let location_type = options.current_sector;
-
-          switch (options.current_sector) {
-            case 'gridded_data':
-              location_type = T('Grid Point');
-              break;
-            case 'census':
-              location_type = T('Census Subdivision');
-              break;
-            case 'health':
-              location_type = T('Health Region');
-              break;
-          }
-
-          let new_item = $(
-            '<div class="list-group-item list-group-item-action active">',
-          );
-
-          // item attributes
-          new_item
-            .attr('data-location', location.geo_id)
-            .attr('data-coords', location.coords.join(','))
-            .attr('data-sector', options.current_sector)
-            .attr('data-grid-id', grid_id);
-
-          // type
-          $('<div class="location-type">' + location_type + '</div>').appendTo(
-            new_item,
-          );
-
-          // title
-          $('<div class="title">' + location.title + '</div>').appendTo(
-            new_item,
-          );
-
-          // actions div
-
-          let item_actions = $('<div class="item-actions">').appendTo(new_item);
-
-          // view btn
-          $('<span class="view">' + T('Select') + '</span>').appendTo(
-            item_actions,
-          );
-
-          // clear btn
-          $('<span class="clear">' + T('Remove') + '</span>').appendTo(
-            item_actions,
-          );
-
-          recent_list.prepend(new_item);
-
-          // reorder index attributes for the whole list
-          recent_list.find('.list-group-item').each(function (i) {
-            $(this).attr('data-index', i);
-          });
-
           // swap active markers
           for (let key in options.maps) {
             options.grid.markers[key].forEach(function (marker, i) {
@@ -1640,8 +1684,6 @@
             callback(data);
           }
         }
-
-        item.find('#recent-locations-clear').show();
       },
 
       remove_marker: function (item_index) {
@@ -1712,7 +1754,7 @@
 
         map.setZoom(zoom);
 
-        console.log('pan to', coords);
+        // console.log('pan to', coords);
 
         // pan to center
         map.panTo([coords.lat, coords.lng], { animate: false });
@@ -1732,12 +1774,12 @@
               break;
           }
 
-          console.log('offset', offset);
+          // console.log('offset', offset);
 
           // calculate pixel value for offset
           map_offset = map.getSize().x * offset;
 
-          console.log('pan by', map_offset);
+          // console.log('pan by', map_offset);
 
           // pan by offset
           map.panBy(new L.Point(-map_offset, 0), { animate: false });
@@ -1892,13 +1934,15 @@
         ) {
           // console.log(fn_options.key + ': ' + fn_options.val);
 
+          let new_val = null;
+
           if (Array.isArray(query[fn_options.key])) {
             // the existing query value is an array
 
             // console.log(fn_options.key, 'array');
 
             // reset it to []
-            query[fn_options.key] = [];
+            new_val = [];
 
             // now figure out how to repopulate it
 
@@ -1915,10 +1959,8 @@
                   // push its value to the array
                   // if it's checked
 
-                  // console.log($(this), $(this).prop('checked'));
-
                   if ($(this).prop('checked') == true) {
-                    query[fn_options.key].push($(this).val());
+                    new_val.push($(this).val());
                   }
                 });
             } else if (fn_options.item.is('[type="text"]')) {
@@ -1926,29 +1968,30 @@
                 .closest('.map-control-item')
                 .find('[type="text"][data-query-key="' + fn_options.key + '"]')
                 .each(function () {
-                  query[fn_options.key].push($(this).val());
+                  new_val.push($(this).val());
                 });
             } else if (fn_options.item.is('select')) {
               // console.log('update select');
               // console.log(fn_options);
 
-              query[fn_options.key] = fn_options.val;
+              new_val = fn_options.val;
             } else if (fn_options.key == 'coords' || fn_options.key == 'bbox') {
-              query[fn_options.key] = fn_options.val
-                .split(',')
-                .filter(function (i) {
-                  return i;
-                });
+              new_val = fn_options.val.split(',').filter(function (i) {
+                return i;
+              });
             } else {
-              query[fn_options.key] = fn_options.val;
+              new_val = fn_options.val;
             }
           } else {
-            query[fn_options.key] = fn_options.val;
+            new_val = fn_options.val;
           }
 
           // console.log('updated ' + fn_options.key, query[fn_options.key]);
 
-          return query[fn_options.key];
+          query[fn_options.key] = new_val;
+          options.query[fn_options.key] = new_val;
+
+          return new_val;
         } else {
           console.warn('object missing key and/or value');
         }
@@ -2438,7 +2481,7 @@
             });
           }
 
-          plugin.charts.do_legend.apply(item, []);
+          plugin.charts.do_legend.apply(item, [settings]);
         }
       },
 
@@ -2622,17 +2665,28 @@
             series: options.chart.series,
           });
 
-          plugin.charts.do_legend.apply(item, []);
+          plugin.charts.do_legend.apply(item, [settings]);
         });
       },
 
-      do_legend: function () {
+      do_legend: function (settings) {
         let plugin = !this.item ? this.data('cdc_app') : this;
         let options = plugin.options,
           item = plugin.item;
 
         // console.log('chart legend', options.chart.series);
-        options.chart.legend = item.find('.td-selected .chart-series-items');
+
+        if (settings.hasOwnProperty('station')) {
+          options.chart.legend = item.find(
+            '#station-chart-accordions .chart-series-items',
+          );
+        } else {
+          options.chart.legend = item.find(
+            '#location-chart-accordions .chart-series-items',
+          );
+        }
+
+        // console.log(options.chart.legend);
 
         // clone the row markup
         let legend_item = options.chart.legend.find('.row').clone();
@@ -2646,7 +2700,10 @@
           let new_row = $(row_markup.replaceAll('row-X', 'row-' + i));
 
           if (series.visible == false) {
-            new_row.find('[type="checkbox"]').prop('checked', false);
+            new_row
+              .find('[type="checkbox"]')
+              .prop('checked', false)
+              .trigger('change');
           }
 
           new_row
@@ -2671,17 +2728,19 @@
 
         // visibility
 
-        options.chart.legend.on('change', '[type="checkbox"]', function () {
-          let this_series_i = parseInt(
-            $(this).closest('.row').attr('data-series'),
-          );
+        options.chart.legend
+          .find('[type="checkbox"]')
+          .on('change', function () {
+            let this_series_i = parseInt(
+              $(this).closest('.row').attr('data-series'),
+            );
 
-          options.chart.object.series[this_series_i].update({
-            visible: $(this).prop('checked') == true ? true : false,
+            options.chart.object.series[this_series_i].update({
+              visible: $(this).prop('checked') == true ? true : false,
+            });
           });
-        });
 
-        // for later: to set series states
+        // TODO: set series states
         // when hovering/clicking a custom legend item
         // chart.series[0].setState('hover')
       },
@@ -3053,7 +3112,7 @@
 
           // update the control button
 
-          item.find('.tab-drawer-trigger.var-name').text(var_title);
+          item.find('.tab-drawer-trigger .var-name').text(var_title);
 
           if (
             typeof data.acf.var_names != 'undefined' &&
@@ -3066,9 +3125,6 @@
               item.find('#var-thresholds').show();
             }
           }
-
-          // update var name in #location-detail
-          item.find('.tab-drawer .variable-name').text(var_title);
 
           if (typeof callback == 'function') {
             callback(data);

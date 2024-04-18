@@ -112,7 +112,7 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 			
 		},
 		
-		update_path: function(target_ID, do_history = true) {
+		update_path: function(target_ID, do_history = true, callback = null) {
 			let plugin = this,
 				item = plugin.item,
 				options = plugin.options
@@ -170,6 +170,8 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 				content_to_close, 
 				function() {
 					plugin.select_content(do_history)
+					
+					if (typeof callback == 'function') callback()
 				}
 			)
 			

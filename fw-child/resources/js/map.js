@@ -3032,8 +3032,10 @@
    */
   $.fn.prepare_raster = function () {
     $('#control-bar').remove();
+    $('#help').remove();
     $('#map-control-footer').remove();
     $('#map-breadcrumb').remove();
+    $('.tooltip').remove();
     $('#map-objects').addClass('to-raster');
   };
 })(jQuery);

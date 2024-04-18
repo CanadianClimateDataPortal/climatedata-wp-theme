@@ -160,16 +160,16 @@
       this.message_container.clear();
 
       if (!this.file_input[0].files.length) {
-        return T('You selected "Custom shapefile" but didn\'t upload any file');
+        return T('You selected “Custom shapefile” but have not uploaded a file.');
       }
 
       if (this.map_shapes_layer.selected_region == null) {
-        return T('You must select one region of your shapefile');
+        return T('You must select one region of your shapefile.');
       }
 
       const total_selected_area = this.map_shapes_layer.calculate_selected_total_area();
       if (total_selected_area > this.max_allowed_selected_area) {
-        return T('The selected region is too large, please select a smaller region');
+        return T('The selected region is too large, please select a smaller region.');
       }
 
       return null;
@@ -240,14 +240,14 @@
         .then(shape_file_data => simplify_polygons(shape_file_data))
         .then(topo_json => {
           this.map_shapes_layer.add_topo_json(topo_json);
-          this.message_container.show_info(T('Please select one region'));
+          this.message_container.show_info(T('Please select only one region.'));
         })
         .catch((message_or_error) => {
           this.file_input.val('');
           if (typeof message_or_error === 'string') {
             this.message_container.show_error(message_or_error);
           } else {
-            this.message_container.show_error(T('An error occurred'));
+            this.message_container.show_error(T('An error occurred.'));
             throw message_or_error;
           }
         });
@@ -405,7 +405,7 @@
       const click_handler = this.handle_region_click.bind(this);
       const mouse_enter_handler = this.handle_region_mouse_enter.bind(this);
       const mouse_leave_handler = this.handle_region_mouse_leave.bind(this);
-      
+
       for (let map_name in this.maps) {
         const layer = new L.TopoJSON(null, {
           style: function () {
@@ -424,13 +424,13 @@
 
     /**
      * Handles the "mouse enter" event on a shape, to change its style.
-     * 
+     *
      * @param event - Mouse event object sent by Leaflet
      */
     handle_region_mouse_enter: function(event) {
       const shape = event.layer;
       const region_index = shape['feature']['properties']['regionIndex'];
-      
+
       if (region_index !== this.selected_region) {
         shape.setStyle(MapShapesLayer.SHAPE_STYLES['hover']);
       }
@@ -559,7 +559,7 @@
 
     return new Promise((resolve, reject) => {
       if (file_ext !== 'zip') {
-        reject(T('Your shapefile must be a ZIP containing at least a .shp file and a .prj file'));
+        reject(T('Your shapefile must be a ZIP file containing at least the .shp and .prj files.'));
         return;
       }
       const file_reader = new FileReader();
@@ -569,7 +569,7 @@
 
         zip.loadAsync(file_reader.result)
           .catch(() => {
-            reject(T('This file is not a valid ZIP file'));
+            reject(T('This file is not a valid ZIP file.'));
           })
           .then(function (zip) {
             const inputs = {};
@@ -593,7 +593,7 @@
               }
 
               if (promises.length === 0) {
-                reject(T('No valid shapefile was found in your ZIP file'));
+                reject(T('Your ZIP file does not contain a valid shapefile.'));
                 return;
               }
 
@@ -603,7 +603,7 @@
 
             } catch (err) {
               console.error('Error while processing ZIP file: ', err);
-              reject(T('An error occurred while processing your file'));
+              reject(T('An error occurred while processing your file.'));
             }
           });
       };
@@ -627,14 +627,14 @@
       mapshaper.applyCommands(info_cmd, shape_file_data, (err, output) => {
         if (err) {
           console.error('mapshaper error', err);
-          reject(T('Could not process your shapefile'));
+          reject(T('Your shapefile could not be processed.'));
           return;
         }
 
         const shape_file_info = JSON.parse(output['info.json']);
 
         if (shape_file_info[0]['geometry_type'] !== 'polygon') {
-          reject(T('Only polygon layers are allowed'));
+          reject(T('Only polygon layers are allowed.'));
           return;
         }
 
@@ -659,7 +659,7 @@
       mapshaper.applyCommands(cmd, shape_file_data, (err, output) => {
         if (err) {
           console.error('mapshaper error', err);
-          reject(T('Could not process your shapefile'));
+          reject(T('Your shapefile could not be processed.'));
           return;
         }
 

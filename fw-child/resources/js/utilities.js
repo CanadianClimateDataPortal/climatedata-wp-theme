@@ -201,26 +201,26 @@ var l10n_table = {
     Close: 'Fermer',
 
     // Custom shapefile
-    'You selected "Custom shapefile" but didn\'t upload any file':
+    'You selected “Custom shapefile” but have not uploaded a file.':
       "Vous avez choisi d'utiliser un shapefile, mais n'en avez téléchargé aucun",
-    'You must select one region of your shapefile':
+    'You must select one region of your shapefile.':
       'Vous devez sélectionner une des régions de votre shapefile',
-    'The selected region is too large, please select a smaller region':
+    'The selected region is too large, please select a smaller region.':
       'La région sélectionnée est trop grosse, veuillez choisir une région plus petite',
     'Processing your file...': 'Traitement de votre fichier...',
-    'Please select one region': 'Veuillez sélectionner une région',
-    'An error occurred': "Une erreur s'est produite",
-    'Could not process your shapefile':
+    'Please select only one region.': 'Veuillez sélectionner une région',
+    'An error occurred.': "Une erreur s'est produite",
+    'Your shapefile could not be processed.':
       'Votre fichier shapefile ne peut pas être correctement traité',
-    'Your shapefile must be a ZIP containing at least a .shp file and a .prj file':
+    'Your shapefile must be a ZIP file containing at least the .shp and .prj files.':
       'Votre fichier shapefile doit être un ZIP qui contient au moins un fichier .shp et un fichier .prj',
-    'This file is not a valid ZIP file':
+    'This file is not a valid ZIP file.':
       "Ce fichier n'est pas un fichier ZIP valide",
-    'No valid shapefile was found in your ZIP file':
-      "Aucun fichier shapefile n' été trouvé dans votre fichier ZIP",
-    'An error occurred while processing your file':
+    'Your ZIP file does not contain a valid shapefile.':
+      "Aucun fichier shapefile n'a été trouvé dans votre fichier ZIP",
+    'An error occurred while processing your file.':
       "Une erreur s'est produite lors du traitement de votre fichier",
-    'Only polygon layers are allowed':
+    'Only polygon layers are allowed.':
       'Seuls les polygones sont permis dans votre fichier',
   },
 };

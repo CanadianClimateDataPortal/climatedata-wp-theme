@@ -90,10 +90,10 @@
 							<label class="form-check-label" for="area-aggregation-upload"><?php _e ( 'Upload Custom Shapefile', 'cdc' ); ?></label>
 							<a tabindex="0" role="button" id="area-aggregation-upload-tooltip" class="text-secondary">ⓘ
 								<span style="display: none">
-									<?php _e ( 'A shapefile is a ZIP file containing at least the <em>.shp</em> and
-									<em>.prj</em> files. It must contain only closed polygons and must be entirely contained
-									inside the canadian territory. Once your shapefile is uploaded, click all the regions
-									for which you want data.' ) ?>
+									<?php _e ( 'Please upload a ZIP file containing at least the .shp and .prj files.
+												The uploaded shapes must be closed polygons and be located entirely
+												within Canada. Once your shapefile is uploaded, the shapes will appear
+												on the map. Click the region of interest to continue.' ) ?>
 								</span>
 							</a>
 						</div>

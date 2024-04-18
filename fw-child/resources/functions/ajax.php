@@ -413,18 +413,13 @@ function cdc_location_search() {
 		$con = $GLOBALS['vars']['con'];
 		
 		$get_sSearch = isset($_GET['q']) ? $_GET['q'] : '';
-		$get_lang = isset($_GET['lang']) ? $_GET['lang'] : 'en';
 		$post_draw = isset($_POST['draw']) ? $_POST['draw'] : '';
 		
-		// This script is not integrated with Wordpress... hard to have a better way to know in which language we are
-		if (isset($_SERVER['HTTP_HOST'])
-				&& ($_SERVER['HTTP_HOST'] == "donneesclimatiques.ca"
-						|| $_SERVER['HTTP_HOST'] == "donneesclimatiques.crim.ca"
-						|| $_SERVER['HTTP_HOST'] == "dev-fr.climatedata.ca")
-		) {
-				$get_lang = 'fr';
+		if (isset ( $GLOBALS['fw']['current_lang_code'] ) ){
+			$get_lang = $GLOBALS['fw']['current_lang_code'];
+		} else {
+			$get_lang = 'en';
 		}
-		
 		
 		// the columns to be filtered, ordered and returned
 		// must be in the same order as displayed in the table
@@ -439,7 +434,7 @@ function cdc_location_search() {
 			"lon"
 		);
 		
-		if ( $GLOBALS['fw']['current_lang_code'] == 'fr' ) {
+		if ( $get_lang == 'fr' ) {
 			$columns = array (
 				"id_code",
 				"geo_name",
@@ -459,7 +454,7 @@ function cdc_location_search() {
 		$get_sSearch = str_replace('`','\'', $get_sSearch);
 		
 		// filtering
-		$sql_where = "where gen_term not in ('Administrative Region', 'Province', 'Territory') and geo_name like '" . mysqli_real_escape_string($con,$get_sSearch ) . "%'" ;
+		$sql_where = "where gen_term not in ('Administrative Region', 'Province', 'Territory') and geo_name like '%" . mysqli_real_escape_string ( $con,$get_sSearch ) . "%'" ;
 		
 		// ordering
 		$sql_order = "order by scale desc";

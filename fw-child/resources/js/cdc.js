@@ -436,8 +436,8 @@
         }
 
         if (options.page != 'map') {
-          console.log(options.request);
-          console.log(query.sector);
+          // console.log(options.request);
+          // console.log(query.sector);
 
           if (
             options.request == null ||
@@ -1343,8 +1343,6 @@
           item = plugin.item,
           options = plugin.options;
 
-        console.log('---');
-        console.log('HEEYEYYYYY');
         console.log('do legend', query.var, options.legend.display);
 
         if (options.legend.display == true) {

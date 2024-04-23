@@ -1212,6 +1212,11 @@
                               item,
                               [options.choro.data[key][i]],
                             );
+
+                            if (query.selections.includes(String(i))) {
+                              style_obj.weight = 1.5;
+                              style_obj.color = '#f00';
+                            }
                           }
 
                           options.maps[key].layers.grid.setFeatureStyle(

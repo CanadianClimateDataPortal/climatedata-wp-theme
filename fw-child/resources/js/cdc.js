@@ -396,7 +396,7 @@
         }
       },
 
-      get_layer: function (query, var_data, callback = null) {
+      get_layer: function (query, var_data, request = null, callback = null) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           item = plugin.item,
           options = plugin.options;
@@ -409,6 +409,10 @@
 
         if (var_data == undefined || var_data == null) {
           return 'no variable';
+        }
+
+        if (request != null) {
+          options.request = request;
         }
 
         // remove geoman bbox layer
@@ -431,16 +435,20 @@
           });
         }
 
-        if (
-          options.page != 'map' &&
-          (options.request == null ||
+        if (options.page != 'map') {
+          // console.log(options.request);
+          // console.log(query.sector);
+
+          if (
+            options.request == null ||
             options.request.type == 'custom' ||
             options.request.type == 'ahccd' ||
-            query.sector == 'station')
-        ) {
-          options.legend.display = false;
-        } else {
-          options.legend.display = true;
+            query.sector == 'station'
+          ) {
+            options.legend.display = false;
+          } else {
+            options.legend.display = true;
+          }
         }
 
         let first_map = options.maps[Object.keys(options.maps)[0]];
@@ -457,6 +465,7 @@
               query,
               var_data,
               function () {
+                console.log('did legend');
                 // get grid and raster
 
                 // are we switching to raster from another sector
@@ -1334,9 +1343,9 @@
           item = plugin.item,
           options = plugin.options;
 
-        if (options.legend.display == true) {
-          // console.log('do legend', query.var);
+        console.log('do legend', query.var, options.legend.display);
 
+        if (options.legend.display == true) {
           const legend_item_height = 25,
             legend_item_width = 25,
             legend_width = 200,

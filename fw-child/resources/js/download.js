@@ -8,6 +8,7 @@
       globals: ajax_data.globals,
       lang: 'en',
       post_id: null,
+      page: 'download',
       status: 'init',
       maps: {
         low: {
@@ -741,6 +742,7 @@
               //   'replace',
               // );
 
+              $('body').removeClass('spinner-on');
               console.log('zoomend done');
             }
           })
@@ -1034,11 +1036,11 @@
 
         switch (options.selection_mode) {
           case 'draw':
-            console.log('ENABLE DRAW');
+            // console.log('ENABLE DRAW');
             plugin.enable_bbox();
             break;
           case 'select':
-            console.log('DISABLE DRAW');
+            // console.log('DISABLE DRAW');
             plugin.disable_bbox();
             break;
         }
@@ -1334,15 +1336,14 @@
           // console.log('get layer hook bbox');
 
           // whether to re-enable bbox after changing/updating layers
-          if (
-            query.sector == 'gridded_data' &&
-            options.selection_mode == 'draw'
-          ) {
-            // console.log('enable');
-            plugin.enable_bbox();
-          } else {
-            // console.log('disable');
-            plugin.disable_bbox();
+          if (query.sector == 'gridded_data') {
+            if (options.selection_mode == 'draw') {
+              // console.log('enable');
+              plugin.enable_bbox();
+            } else {
+              // console.log('disable');
+              plugin.disable_bbox();
+            }
           }
 
           $('body').removeClass('spinner-on');
@@ -2435,6 +2436,9 @@
           break;
         case 'custom':
         case 'ahccd':
+        case 'station':
+          options.query.sector = 'station';
+
           console.log('hide legend');
           item.find('.info.legend').hide();
           break;

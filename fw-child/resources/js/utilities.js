@@ -19,6 +19,11 @@ const scenario_names = {
     medium: 'SSP 2–4.5',
     high: 'SSP 5–8.5',
   },
+  humidex: {
+    low: 'SSP 1–2.6',
+    medium: 'SSP 2–4.5',
+    high: 'SSP 5–8.5',
+  },
 };
 
 const grid_resolution = {

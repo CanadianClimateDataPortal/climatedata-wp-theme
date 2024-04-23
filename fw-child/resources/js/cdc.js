@@ -804,16 +804,19 @@
                   this_map.object.hasLayer(this_map.layers.raster)
                 ) {
                   this_map.object.removeLayer(this_map.layers.raster);
-                  this_map.object.removeLayer(this_map.layers.grid);
                 }
 
                 // remove grid layer
                 if (
-                  this_map.layers.grid &&
-                  this_map.object.hasLayer(this_map.layers.grid)
+                  this_map.layers.grid != undefined &&
+                  this_map.layers.grid != null
                 ) {
-                  this_map.object.removeLayer(this_map.layers.grid);
-                  this_map.object.removeLayer(this_map.layers.grid);
+                  // console.log('grid layer exists');
+
+                  if (this_map.object.hasLayer(this_map.layers.grid)) {
+                    // console.log('map has layer');
+                    this_map.object.removeLayer(this_map.layers.grid);
+                  }
                 }
 
                 if (do_stations == true) {
@@ -832,8 +835,8 @@
 
                   // create the layer
 
-                  console.log('create layer');
-                  console.log(layer_data);
+                  // console.log('create layer');
+                  // console.log(layer_data);
 
                   this_map.layers.stations = L.geoJson(layer_data, {
                     pointToLayer: function (feature, latlng) {

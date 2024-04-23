@@ -44,6 +44,9 @@
 								<div id="threshold-preset" class="accordion-collapse collapse show" aria-labelledby="threshold-preset-head" data-bs-parent="#var-threshold-accordion">
 									<div class="accordion-body">
 										
+										<div class="single-preset-label">
+										</div>
+										
 										<div class="map-control-slider-well">
 											<div id="threshold-slider" class="map-control-slider" data-pane="marker">
 												<div id="threshold-handle" class="ui-slider-handle"></div>

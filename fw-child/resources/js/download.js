@@ -1348,6 +1348,7 @@
             }
           }
 
+          console.log('get layer hook');
           $('body').removeClass('spinner-on');
         },
       );
@@ -2094,144 +2095,168 @@
           options.var_flags.ahccd = true;
         }
 
-        if (typeof fields.var_names != 'undefined') {
-          // var has at least 1 value in var_names
+        if (
+          fields.thresholds != undefined &&
+          Array.isArray(fields.thresholds) &&
+          fields.thresholds.length > 1
+        ) {
+          //
+          // VAR FLAG: CUSTOM
+          //
 
-          if (fields.var_names != null && fields.var_names.length > 1) {
-            //
-            // VAR FLAG: THRESHOLD
-            //
+          options.var_flags.custom = true;
 
-            options.var_flags.threshold = true;
+          // setup slider and custom inputs
 
-            // multiple vars
+          item
+            .find('#threshold-custom .accordion-body')
+            .html(plugin.generate_custom_inputs(fields.thresholds));
 
-            if (options.elements.threshold_slider != null) {
-              options.elements.threshold_slider
-                .off('slide')
-                .off('change')
-                .off('stop');
+          // enable the custom accordion
 
-              options.elements.threshold_slider.slider('destroy');
-            }
+          item
+            .find('#threshold-custom-head .accordion-button')
+            .prop('disabled', false);
 
-            options.elements.threshold_slider = item
-              .find('#threshold-slider')
-              .slider({
-                min: 0,
-                max: fields.var_names.length - 1,
-                step: 1,
-                animate: true,
-                create: function (e, ui) {
-                  // console.log('threshold slider', 'create');
-
-                  $(this)
-                    .find('.ui-slider-handle')
-                    .text(fields.var_names[0].label);
-                },
-                slide: function (e, ui) {
-                  // update the hidden input/query
-
-                  options.status = 'slide';
-
-                  $(this)
-                    .find('.ui-slider-handle')
-                    .text(fields.var_names[ui.value].label);
-
-                  options.query.var = fields.var_names[ui.value].variable;
-
-                  options.query_str.prev = options.query_str.current;
-
-                  options.query_str.current = $(document).cdc_app(
-                    'query.eval',
-                    {
-                      query: options.query,
-                      do_history: 'none',
-                      callback: function () {
-                        console.log('threshold slide get_layer');
-                        $(document).cdc_app(
-                          'maps.get_layer',
-                          options.query,
-                          options.var_data,
-                          options.request,
-                        );
-                      },
-                    },
-                  );
-                },
-                change: function (e, ui) {
-                  hidden_input
-                    .val(fields.var_names[ui.value].variable)
-                    .trigger('change');
-                },
-                stop: function (e, ui) {
-                  // if (status != 'init') {
-                  console.log('status = input');
-                  options.status = 'input';
-                  // }
-                },
-              });
-
-            // find out which index of the var_names array
-            // is the field's value
-
-            // console.log('find ' + options.query.var + ' in var_data');
-
-            fields.var_names.forEach(function (var_name, i) {
-              if (Object.values(var_name).includes(options.query.var)) {
-                // console.log(i, var_name);
-
-                options.elements.threshold_slider.slider('option', 'value', i);
-
-                // set handle text
-                options.elements.threshold_slider
-                  .find('.ui-slider-handle')
-                  .text(fields.var_names[i].label);
-              }
-            });
-
-            // enable the thresholds accordion
-
-            item
-              .find('#threshold-preset-head .accordion-button')
-              .prop('disabled', false);
-
-            // show the thresholds accordion
-
-            if (!item.find('#threshold-preset').hasClass('show')) {
+          if (options.var_flags.threshold == false) {
+            if (!item.find('#threshold-custom').hasClass('show')) {
               item
-                .find('#threshold-preset-head .accordion-button')
+                .find('#threshold-custom-head .accordion-button')
                 .trigger('click');
             }
           }
+        }
 
-          if (
-            fields.thresholds != undefined &&
-            Array.isArray(fields.thresholds) &&
-            fields.thresholds.length > 1
-          ) {
-            //
-            // VAR FLAG: CUSTOM
-            //
+        if (typeof fields.var_names != 'undefined') {
+          // var has at least 1 value in var_names
 
-            options.var_flags.custom = true;
+          if (fields.var_names != null) {
+            if (
+              fields.var_names.length > 1 ||
+              (fields.var_names.length == 1 && options.var_flags.custom)
+            ) {
+              //
+              // VAR FLAG: THRESHOLD
+              //
 
-            // setup slider and custom inputs
+              options.var_flags.threshold = true;
 
-            item
-              .find('#threshold-custom .accordion-body')
-              .html(plugin.generate_custom_inputs(fields.thresholds));
+              if (fields.var_names.length > 1) {
+                // multiple vars
 
-            // enable the custom accordion
+                item.find('#threshold-preset .map-control-slider-well').show();
 
-            item
-              .find('#threshold-custom-head .accordion-button')
-              .prop('disabled', false);
+                item.find('#threshold-preset .single-preset-label').hide();
 
-            if (options.var_flags.threshold == false) {
-              if (!item.find('#threshold-custom').hasClass('show')) {
+                if (options.elements.threshold_slider != null) {
+                  options.elements.threshold_slider
+                    .off('slide')
+                    .off('change')
+                    .off('stop');
+
+                  options.elements.threshold_slider.slider('destroy');
+                }
+
+                options.elements.threshold_slider = item
+                  .find('#threshold-slider')
+                  .slider({
+                    min: 0,
+                    max: fields.var_names.length - 1,
+                    step: 1,
+                    animate: true,
+                    create: function (e, ui) {
+                      // console.log('threshold slider', 'create');
+
+                      $(this)
+                        .find('.ui-slider-handle')
+                        .text(fields.var_names[0].label);
+                    },
+                    slide: function (e, ui) {
+                      // update the hidden input/query
+
+                      options.status = 'slide';
+
+                      $(this)
+                        .find('.ui-slider-handle')
+                        .text(fields.var_names[ui.value].label);
+
+                      options.query.var = fields.var_names[ui.value].variable;
+
+                      options.query_str.prev = options.query_str.current;
+
+                      options.query_str.current = $(document).cdc_app(
+                        'query.eval',
+                        {
+                          query: options.query,
+                          do_history: 'none',
+                          callback: function () {
+                            console.log('threshold slide get_layer');
+                            $(document).cdc_app(
+                              'maps.get_layer',
+                              options.query,
+                              options.var_data,
+                              options.request,
+                            );
+                          },
+                        },
+                      );
+                    },
+                    change: function (e, ui) {
+                      hidden_input
+                        .val(fields.var_names[ui.value].variable)
+                        .trigger('change');
+                    },
+                    stop: function (e, ui) {
+                      // if (status != 'init') {
+                      console.log('status = input');
+                      options.status = 'input';
+                      // }
+                    },
+                  });
+
+                // find out which index of the var_names array
+                // is the field's value
+
+                // console.log('find ' + options.query.var + ' in var_data');
+
+                fields.var_names.forEach(function (var_name, i) {
+                  if (Object.values(var_name).includes(options.query.var)) {
+                    // console.log(i, var_name);
+
+                    options.elements.threshold_slider.slider(
+                      'option',
+                      'value',
+                      i,
+                    );
+
+                    // set handle text
+                    options.elements.threshold_slider
+                      .find('.ui-slider-handle')
+                      .text(fields.var_names[i].label);
+                  }
+                });
+              } else {
+                // 1 var
+
+                item.find('#threshold-preset .map-control-slider-well').hide();
+
                 item
-                  .find('#threshold-custom-head .accordion-button')
+                  .find('#threshold-preset .single-preset-label')
+                  .text(fields.var_names[0].label)
+                  .show();
+              }
+
+              // enable the thresholds accordion
+
+              item
+                .find('#threshold-preset-head .accordion-button')
+                .prop('disabled', false);
+
+              // show the thresholds accordion
+
+              if (!item.find('#threshold-preset').hasClass('show')) {
+                item
+                  .find('#threshold-preset-head .accordion-button')
                   .trigger('click');
               }
             }

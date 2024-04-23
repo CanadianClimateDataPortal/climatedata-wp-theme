@@ -266,6 +266,57 @@ $alert-size: 1.375rem;
   }
 }
 
+// spinner
+
+#spinner {
+  position: fixed;
+  top: 0;
+  left: -9999px;
+  width: 100%;
+  height: 100%;
+  background-color: transparentize($white, 0.2);
+  opacity: 0;
+  transform: none;
+  transition:
+    top 0s ease 0.25s,
+    opacity 0.25s ease 0s;
+  z-index: 2000;
+
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    top: calc(100% + 100px);
+    width: 72px;
+    height: 72px;
+    transition: 0.25s ease-in-out;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 48px 48px;
+    background-color: $white;
+    background-image: url(../img/spinner.gif);
+    box-shadow: 0 5px 25px transparentize($black, 0.8);
+  }
+}
+
+.spinner-on {
+  #spinner {
+    top: 0;
+    left: 0;
+    opacity: 1;
+    transition:
+      top 0s ease 0s,
+      opacity 0.25s ease 0s;
+
+    &:after {
+      top: 50%;
+    }
+  }
+}
+
 // control bar icons
 
 .tab-drawer-trigger {

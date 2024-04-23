@@ -731,6 +731,9 @@ $legend-on-height: 16px;
     line-height: 3.75rem;
     cursor: pointer;
     transition: 0.25s;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 
     &:hover {
       background-color: $gray-200;

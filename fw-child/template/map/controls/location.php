@@ -14,7 +14,7 @@
 						
 						<?php
 							
-							// location var
+							// location vars
 							
 						?>
 						
@@ -30,7 +30,7 @@
 							class="custom-select custom-select-md select2 form-control" 
 							name="area-search" 
 							id="area-search" 
-							data-placeholder="<?php _e ( 'City/town or coordinates','cdc' ); ?>"
+							data-placeholder="<?php _e ( 'Community, landmark or coordinates','cdc' ); ?>"
 						>
 							<option value=""><?php _e('Search for a City/Town', 'cdc'); ?></option>
 							
@@ -114,12 +114,6 @@
 			</div>
 		</div>
 	</div>
-	
-	
-	https://dataclimatedata.crim.ca/generate-charts/45.6995/-74.6893/climate-normals/ann?decimals=1&dataset_name=cmip6
-	
-	https://dataclimatedata.crim.ca/generate-charts/45.6188/-75.5998/tn_min/ann?decimals=1&dataset_name=cmip6
-	
 		
 	<div class="tab-drawer-container">
 		<?php

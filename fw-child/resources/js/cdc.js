@@ -160,29 +160,6 @@
       // MAP
       //
 
-      options.icons.default = L.icon({
-        iconUrl: theme_data.child_theme_dir + '/resources/img/marker-icon.png',
-        shadowUrl:
-          theme_data.child_theme_dir + '/resources/img/marker-shadow.png',
-        iconSize: [32, 40],
-        shadowSize: [32, 40],
-        iconAnchor: [10, 40],
-        shadowAnchor: [10, 40],
-        popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
-      });
-
-      options.icons.small = L.icon({
-        iconUrl:
-          theme_data.child_theme_dir + '/resources/img/marker-sm-icon.png',
-        shadowUrl:
-          theme_data.child_theme_dir + '/resources/img/marker-sm-shadow.png',
-        iconSize: [16, 20],
-        shadowSize: [16, 20],
-        iconAnchor: [5, 20],
-        shadowAnchor: [5, 20],
-        popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
-      });
-
       //
       // TABS
       //
@@ -260,20 +237,6 @@
 
       $('body').on('change', '.conditional-trigger :input', function () {
         plugin.toggle_conditionals();
-      });
-
-      //
-
-      // reset marker
-
-      item.on('td_update_path', function (e, prev_id, current_id) {
-        if (prev_id == '#location-detail') {
-          for (let key in options.maps) {
-            options.grid.markers[key].forEach(function (marker, i) {
-              marker.setIcon(options.icons.small);
-            });
-          }
-        }
       });
     },
 
@@ -438,6 +401,9 @@
           item = plugin.item,
           options = plugin.options;
 
+        console.log('spinner on');
+        $('body').addClass('spinner-on');
+
         // console.log('---');
         // console.log('get layer', var_data, query);
 
@@ -466,10 +432,11 @@
         }
 
         if (
-          options.request == null ||
-          options.request.type == 'custom' ||
-          options.request.type == 'ahccd' ||
-          query.sector == 'station'
+          options.page != 'map' &&
+          (options.request == null ||
+            options.request.type == 'custom' ||
+            options.request.type == 'ahccd' ||
+            query.sector == 'station')
         ) {
           options.legend.display = false;
         } else {
@@ -565,6 +532,8 @@
                         params,
                       )
                     ) {
+                      // console.log('UPDATE RASTER LAYER');
+
                       // delete all parameters from layer before updating
                       // see: https://github.com/Leaflet/Leaflet/issues/3441
                       delete this_map.layers.raster.wmsParams.parameter;
@@ -577,6 +546,8 @@
                     // create layer
 
                     let saved_params = window.lodash.cloneDeep(params);
+
+                    // console.log('CREATE RASTER LAYER');
 
                     // those three parameters must be specified at creation only
                     // otherwise, a bug in leaflet leaks them to the WMS requests
@@ -681,18 +652,6 @@
             let get_layer_data = function (query_var) {
               console.log('get data', query_var);
 
-              // station data
-              // https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE
-
-              // idf
-              // https://climatedata.ca/site/assets/themes/climate-data-ca/resources/app/run-frontend-sync/assets/json/idf_curves.json
-
-              // ahccd
-              // https://climatedata.ca/site/assets/themes/climate-data-ca/resources/app/ahccd/ahccd.json
-
-              // normals
-              // https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=CLIMATE_IDENTIFIER,STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y
-
               switch (query_var) {
                 case 'station-data':
                   if (options.station_data == null) {
@@ -704,6 +663,9 @@
                       success: function (data) {
                         options.station_data = data;
                         return { ...options.station_data };
+                      },
+                      error: function () {
+                        $('body').removeClass('spinner-on');
                       },
                     });
                   } else {
@@ -801,6 +763,7 @@
               // console.log(layer_data);
               // console.log('ahccd', options.ahccd_data);
               // console.log('station', options.station_data);
+              // console.log('normals', options.normals_data);
               // console.log('idf', options.idf_data);
 
               let list_name = query.dataset == 'ahccd' ? 'ahccd' : query.var;
@@ -832,7 +795,7 @@
 
               // each map
               Object.keys(options.maps).forEach(function (key) {
-                console.log('map key', key);
+                // console.log('map key', key);
                 let this_map = options.maps[key];
 
                 // remove raster layer
@@ -869,8 +832,8 @@
 
                   // create the layer
 
-                  // console.log('create layer');
-                  // console.log(layer_data);
+                  console.log('create layer');
+                  console.log(layer_data);
 
                   this_map.layers.stations = L.geoJson(layer_data, {
                     pointToLayer: function (feature, latlng) {
@@ -944,6 +907,8 @@
 
               options.current_sector = query.sector;
               options.current_var = query.var;
+
+              console.log('apply hooks now');
 
               // apply hooks
               options.hooks['maps.get_layer'].forEach(function (hook) {
@@ -1066,7 +1031,7 @@
 
                   options.choro.path = choro_path;
 
-                  console.log('get data', choro_path);
+                  // console.log('get data', choro_path);
 
                   return $.ajax({
                     url: choro_path,
@@ -1242,6 +1207,9 @@
                             style_obj,
                           );
                         }
+
+                        console.log('spinner off');
+                        $('body').removeClass('spinner-on');
                       } else {
                         // new layer
 
@@ -1339,15 +1307,20 @@
                             ]);
                           })
                           .addTo(this_map.object);
+
+                        // apply hooks
+                        options.hooks['maps.get_layer'].forEach(
+                          function (hook) {
+                            hook.fn.apply(hook.obj, [query]);
+                          },
+                        );
+
+                        console.log('spinner off');
+                        $('body').removeClass('spinner-on');
                       }
                     },
                   ); // when choro data
                 }); // each map
-
-                // apply hooks
-                options.hooks['maps.get_layer'].forEach(function (hook) {
-                  hook.fn.apply(hook.obj, [query, null]);
-                });
               }); // when legend
             }
         } // switch
@@ -1359,7 +1332,7 @@
           options = plugin.options;
 
         if (options.legend.display == true) {
-          console.log('do legend', query.var);
+          // console.log('do legend', query.var);
 
           const legend_item_height = 25,
             legend_item_width = 25,
@@ -1413,7 +1386,8 @@
                 } else {
                   label = value_formatter(
                     quantities[i],
-                    var_data.acf,
+                    var_data.acf.units,
+                    var_data.acf.decimals,
                     query.delta === 'true',
                     options.lang,
                   );
@@ -1487,7 +1461,6 @@
 
         let recent_list = item.find('#recent-locations');
 
-        // console.log('add marker', location.coords.join(','), location);
         console.log('add recent', location, location_data);
 
         // remove any existing 'active' class
@@ -1543,6 +1516,10 @@
           switch (options.current_sector) {
             case 'gridded_data':
               location_type = T('Grid Point');
+
+              if (location.hasOwnProperty('generic_term')) {
+                location_type = location.generic_term;
+              }
               break;
             case 'census':
               location_type = T('Census Subdivision');
@@ -1556,14 +1533,12 @@
             '<div class="list-group-item list-group-item-action active">',
           );
 
-          console.log(JSON.stringify(options.query, null, 4));
-
           // item attributes
           new_item
             .attr('data-location', location.geo_id)
             .attr('data-coords', location.coords.join(','))
             .attr('data-var', options.query.var)
-            .attr('data-sector', options.current_sector)
+            .attr('data-sector', options.query.sector)
             .attr('data-grid-id', grid_id);
 
           new_item.data('query', { ...options.query });
@@ -1604,7 +1579,7 @@
         item.find('#recent-locations-clear').show();
       },
 
-      add_marker: function (location, location_data, callback = null) {
+      add_marker: function (location, callback = null) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           item = plugin.item,
           options = plugin.options;
@@ -1612,13 +1587,22 @@
         let recent_list = item.find('#recent-locations');
 
         if (
-          recent_list.find('[data-coords="' + location.coords.join(',') + '"]')
-            .length
+          recent_list.find(
+            '[data-coords="' +
+              location.coords.lat +
+              ',' +
+              location.coords.lng +
+              '"]',
+          ).length
         ) {
           // marker already exists
 
           let recent_item = recent_list.find(
-            '[data-coords="' + location.coords.join(',') + '"]',
+            '[data-coords="' +
+              location.coords.lat +
+              ',' +
+              location.coords.lng +
+              '"]',
           );
 
           let marker_index = parseInt($(recent_item).attr('data-index'));
@@ -1748,7 +1732,7 @@
           map = options.maps[first_map_key].object,
           offset = 0;
 
-        // console.log('cdc', 'set center');
+        console.log('cdc', 'set center');
 
         // zoom
         if (zoom == null) zoom = map.getZoom();
@@ -2041,37 +2025,39 @@
 
         let station_options = [];
 
-        station_data.features.forEach(function (station) {
-          if (query.var == 'climate-normals' || query.var == 'station-data') {
-            station_options.push({
-              id: station.properties.STN_ID,
-              name: station.properties.STATION_NAME,
-            });
-          } else {
-            station_options.push({
-              id: station.properties.ID,
-              name: station.properties.Name,
-            });
-          }
-        });
+        if (station_data != undefined) {
+          station_data.features.forEach(function (station) {
+            if (query.var == 'climate-normals' || query.var == 'station-data') {
+              station_options.push({
+                id: station.properties.STN_ID,
+                name: station.properties.STATION_NAME,
+              });
+            } else {
+              station_options.push({
+                id: station.properties.ID,
+                name: station.properties.Name,
+              });
+            }
+          });
 
-        station_options.forEach(function (station) {
-          let preselect = false;
+          station_options.forEach(function (station) {
+            let preselect = false;
 
-          if (query.station.includes[station]) {
-            console.log(query.station + ' includes ' + station);
-            preselect = true;
-          }
+            if (query.station.includes[station]) {
+              console.log(query.station + ' includes ' + station);
+              preselect = true;
+            }
 
-          let newOption = new Option(
-            station.name,
-            station.id,
-            false,
-            preselect,
-          );
+            let newOption = new Option(
+              station.name,
+              station.id,
+              false,
+              preselect,
+            );
 
-          item.find('#station-select').append(newOption);
-        });
+            item.find('#station-select').append(newOption);
+          });
+        }
       },
     },
 
@@ -2103,7 +2089,7 @@
 
         // if kelvin use ºC?
         options.chart.unit =
-          var_fields.units === 'kelvin' ? '°C' : UNITS[var_fields.units];
+          var_fields.units === 'kelvin' ? '°C' : var_fields.units;
 
         // deep clone query object
         options.chart.query = { ...settings.query };
@@ -2303,9 +2289,13 @@
           // median value
           new_val_row.append(
             '<div class="col-3-of-7">' +
-              decade_vals[i] +
-              ' ' +
-              options.chart.unit +
+              value_formatter(
+                decade_vals[i],
+                options.chart.unit,
+                settings.var_data.acf.decimals,
+                false,
+                options.lang,
+              ) +
               '</div>',
           );
 
@@ -2326,9 +2316,13 @@
             '<div class="col"><i class="fas ' +
               delta_icon +
               ' me-3"></i>' +
-              delta_vals[i] +
-              ' ' +
-              options.chart.unit +
+              value_formatter(
+                delta_vals[i],
+                options.chart.unit,
+                settings.var_data.acf.decimals,
+                true,
+                options.lang,
+              ) +
               ' ' +
               delta_label +
               '</div>',
@@ -2885,11 +2879,11 @@
                               scenario.chart_color,
                             ) +
                               T('{0} Median').format(scenario.label) +
-                              ' ' +
+                              ' <b>' +
                               this.value +
                               ' ' +
                               options.chart.unit +
-                              '<br>',
+                              '</b><br>',
                           );
 
                           this.value =
@@ -2911,13 +2905,13 @@
                               scenario.chart_color,
                             ) +
                               T('{0} Range').format(scenario.label) +
-                              ' ' +
+                              ' <b>' +
                               val1 +
                               ' – ' +
                               val2 +
                               ' ' +
                               options.chart.unit +
-                              '<br>',
+                              '</b><br>',
                           );
                         }, this);
 

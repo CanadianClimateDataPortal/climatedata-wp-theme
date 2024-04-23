@@ -512,6 +512,8 @@
           // reinit if plugin is already loaded
           query_items.flex_drawer('init_items');
         }
+
+        item.find('#data-variable .control-tab-body').scrollTop(0);
       });
 
       item.find('#var-select-query').fw_query({
@@ -566,15 +568,12 @@
           },
         },
         ajax: {
-          url: ajax_data.url,
+          url: ajax_data.rest_url + 'cdc/v2/location_search/',
           dataType: 'json',
           delay: 0,
           data: function (params) {
             return {
-              action: 'cdc_location_search',
-              q: params.term, // search term
-              search: params,
-              page: params.page,
+              q: params.term,
             };
           },
           transport: function (params, success, failure) {
@@ -1345,6 +1344,8 @@
             // console.log('disable');
             plugin.disable_bbox();
           }
+
+          $('body').removeClass('spinner-on');
         },
       );
     },
@@ -2057,6 +2058,8 @@
 
         item.find('#breadcrumb-overlay-trigger').show();
 
+        plugin.populate_relevant(var_id);
+
         fields = options.var_data.acf;
 
         // set var_flags
@@ -2312,6 +2315,99 @@
 
         plugin.set_controls(fields);
       }
+    },
+
+    populate_relevant: function (var_id) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      item.find('#info-relevant-vars').empty();
+      item.find('#info-relevant-vars-btn').hide();
+      item.find('#info-relevant-sectors').empty();
+      item.find('#info-relevant-sectors-btn').hide();
+      item.find('#info-relevant-training').empty();
+      item.find('#info-relevant-training-btn').hide();
+
+      $.ajax({
+        url: ajax_data.rest_url + 'cdc/v2/related/',
+        type: 'GET',
+        dataType: 'json',
+        data: {
+          var_id: var_id,
+        },
+        success: function (data) {
+          // vars
+
+          let item_card =
+            '<div class="card text-bg-dark bg-opacity-40 mb-3 p-3">';
+
+          if (data.vars.length > 0) {
+            item.find('#info-relevant-vars-btn').show();
+
+            data.vars.forEach(function (query_item, i) {
+              let new_item = $(item_card);
+
+              new_item.append(
+                '<h4 class="card-title">' + query_item.title + '</h4>',
+              );
+              new_item.append(
+                '<a href="#" data-query-key="var_id" data-query-val="' +
+                  query_item.id +
+                  '">' +
+                  'View on map' +
+                  '</a>',
+              );
+
+              item.find('#info-relevant-vars').append(new_item);
+            });
+          } else {
+          }
+
+          // sectors
+
+          if (data.sectors.length > 0) {
+            item.find('#info-relevant-sectors-btn').show();
+
+            data.sectors.forEach(function (query_item, i) {
+              let new_item = $(item_card);
+
+              new_item.append(
+                '<h4 class="card-title">' + query_item.title + '</h4>',
+              );
+              new_item.append(
+                '<a href="' + query_item.url + '">' + 'View' + '</a>',
+              );
+
+              item.find('#info-relevant-sectors').append(new_item);
+            });
+          }
+
+          // resources
+
+          if (data.training.length > 0) {
+            item.find('#info-relevant-training-btn').show();
+
+            data.training.forEach(function (query_item, i) {
+              let new_item = $(item_card);
+
+              new_item.append(
+                '<h4 class="card-title">' + query_item.title + '</h4>',
+              );
+              new_item.append(
+                '<a href="' + query_item.url + '">' + 'View' + '</a>',
+              );
+
+              item.find('#info-relevant-training').append(new_item);
+            });
+          }
+
+          item
+            .find('#info-relevant-tabs .btn:visible')
+            .first()
+            .trigger('click');
+        },
+      });
     },
 
     set_controls: function (fields) {
@@ -2648,11 +2744,9 @@
         item = plugin.item;
 
       $.ajax({
-        url: ajax_data.url,
+        url: ajax_data.rest_url + 'cdc/v2/get_location_by_coords/',
         dataType: 'json',
         data: {
-          action: 'cdc_get_location_by_coords',
-          lang: options.lang,
           lat: coords.lat,
           lng: coords.lng,
           sealevel: false,

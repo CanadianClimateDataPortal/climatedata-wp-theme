@@ -2434,7 +2434,6 @@
           // console.log('show legend');
           item.find('.info.legend').show();
           break;
-        case 'custom':
         case 'ahccd':
         case 'station':
           options.query.sector = 'station';

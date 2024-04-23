@@ -14,7 +14,7 @@
 						
 						<?php
 							
-							// location var
+							// location vars
 							
 						?>
 						

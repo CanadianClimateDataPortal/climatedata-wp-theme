@@ -395,6 +395,7 @@ function T(str) {
  */
 function doy_formatter(value, language) {
   const firstDayOfYear = Date.UTC(2019, 0, 1);
+
   return new Date(
     firstDayOfYear + 1000 * 60 * 60 * 24 * value,
   ).toLocaleDateString(language, {
@@ -521,9 +522,9 @@ function value_formatter(value, varDetails, delta) {
  * @param delta If true, the value is formatted as a delta
  * @returns {string} The formatted value
  */
-function value_formatter(value, var_acf, delta, lang) {
+function value_formatter(value, units, decimals, delta, lang) {
   value = parseFloat(value);
-  let unit = var_acf.units;
+  let unit = units;
   if (unit === 'kelvin') {
     unit = '°C';
     value = delta ? value : value - 273.15;
@@ -537,10 +538,10 @@ function value_formatter(value, var_acf, delta, lang) {
     str += '+';
   }
 
-  switch (var_acf.units) {
+  switch (units) {
     case 'doy':
-      if (delta) {
-        str += value.toFixed(var_acf.decimals);
+      if (delta == true) {
+        str += value.toFixed(decimals);
         str += ' ' + l10n_labels['days'];
       } else {
         str += doy_formatter(value, lang);
@@ -548,7 +549,7 @@ function value_formatter(value, var_acf, delta, lang) {
 
       break;
     default:
-      str += value.toFixed(var_acf.decimals);
+      str += value.toFixed(decimals);
       str += ' ' + unit;
       break;
   }

@@ -412,6 +412,8 @@ add_action ( 'wp_head', function() {
 
 add_action( 'wp_footer', function() {
 	
+	// FB/linkedin share scripts
+	
 	if ( is_singular ( 'post' ) ) {
 
 ?>
@@ -424,6 +426,14 @@ add_action( 'wp_footer', function() {
 <?php
 
 	}
+	
+	// spinner
+	
+?>
+
+<div id="spinner" class="spinner"></div>
+
+<?php
 
 }, 10, 1 );
 

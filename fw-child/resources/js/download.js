@@ -230,6 +230,7 @@
                     'maps.get_layer',
                     options.query,
                     options.var_data,
+                    options.request,
                   );
                 });
               }
@@ -493,6 +494,7 @@
                   'maps.get_layer',
                   options.query,
                   options.var_data,
+                  options.request,
                 );
 
                 options.status = 'ready';
@@ -1472,9 +1474,12 @@
 
             options.request.type = 'single';
 
-            if (item.find('#threshold-custom').hasClass('show')) {
+            if (
+              item.find('#var-thresholds').is(':visible') &&
+              item.find('#threshold-custom').hasClass('show')
+            ) {
               // unless the 'custom' accordion is open
-              console.log("no it's custom");
+              // console.log("no it's custom");
 
               options.request.type = 'custom';
             }
@@ -1759,6 +1764,7 @@
                 'maps.get_layer',
                 options.query,
                 options.var_data,
+                options.request,
               );
 
               if (status != 'init') {
@@ -1965,6 +1971,7 @@
               'maps.get_layer',
               options.query,
               options.var_data,
+              options.request,
             );
 
             console.log('status = ready');
@@ -2144,8 +2151,9 @@
                         console.log('threshold slide get_layer');
                         $(document).cdc_app(
                           'maps.get_layer',
-                          options.query, //clone_query,
+                          options.query,
                           options.var_data,
+                          options.request,
                         );
                       },
                     },
@@ -2430,16 +2438,17 @@
 
       switch (options.request.type) {
         case 'single':
+        case 'threshold':
           item.find('.leaflet-raster-pane').show();
           // console.log('show legend');
-          item.find('.info.legend').show();
+          // item.find('.info.legend').show();
           break;
         case 'ahccd':
         case 'station':
           options.query.sector = 'station';
 
           console.log('hide legend');
-          item.find('.info.legend').hide();
+          // item.find('.info.legend').hide();
           break;
       }
 
@@ -4207,6 +4216,8 @@
             break;
 
           case 'input':
+            console.log('MIN/MAX', element.min, element.max);
+
             output +=
               '<input type="number" size="4" class="form-control form-control-sm threshold-input" autocomplete="off"' +
               'name="' +
@@ -4214,9 +4225,10 @@
               '" ' +
               'data-units="' +
               element.units +
-              '" ' +
-              (element.min != '' ? 'min="' + element.min + '" ' : '') +
-              (element.max != '' ? 'max="' + element.max + '" ' : '');
+              '" ';
+
+            if (element.min != '') output += 'min="' + element.min + '" ';
+            if (element.max != '') output += 'max="' + element.max + '" ';
 
             if (element.decimals != '' && element.decimals != '0') {
               output += 'step="0.';

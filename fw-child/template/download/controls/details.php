@@ -304,7 +304,7 @@
 					
 				</div>
 				
-				<div id="map-control-decimals" class="map-control-item" data-flags="station:0">
+				<div id="map-control-decimals" class="map-control-item">
 					<div class="row row-cols-2 align-items-center">
 						<div class="col">
 							<label for="" class="h6 all-caps text-secondary"><?php _e ( 'Decimal Places', 'cdc' ); ?></label>

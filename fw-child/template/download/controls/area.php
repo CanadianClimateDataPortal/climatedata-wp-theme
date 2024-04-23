@@ -43,13 +43,13 @@
 						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
 					</h6>
 					
-					<div class="d-flex align-items-start justify-content-between">
+					<div id="area-gridded-container" class="d-flex align-items-start justify-content-between">
 						<div class="form-check">
 							<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-grid" value="gridded_data" data-query-key="sector" data-conditional="#area-aggregation-select-mode">
 							<label class="form-check-label" for="area-aggregation-grid"><?php _e ( 'Gridded Data', 'cdc' ); ?></label>
 						</div>
 						
-						<div id="area-selections-status" class="d-flex">
+						<div id="area-selections-status">
 							<div id="area-selections-count"><span>0</span> <?php _e ( 'selected', 'cdc' ); ?></div>
 							<div id="area-selections-reset" class="ms-3 disabled" role="button">
 								<i class="fas fa-sync-alt"></i>
@@ -90,10 +90,10 @@
 							<label class="form-check-label" for="area-aggregation-upload"><?php _e ( 'Upload Custom Shapefile', 'cdc' ); ?></label>
 							<a tabindex="0" role="button" id="area-aggregation-upload-tooltip" class="text-secondary">ⓘ
 								<span style="display: none">
-									<?php _e ( 'A shapefile is a ZIP file containing at least the <em>.shp</em> and
-									<em>.prj</em> files. It must contain only closed polygons and must be entirely contained
-									inside the canadian territory. Once your shapefile is uploaded, click all the regions
-									for which you want data.' ) ?>
+									<?php _e ( 'Please upload a ZIP file containing at least the .shp and .prj files.
+												The uploaded shapes must be closed polygons and be located entirely
+												within Canada. Once your shapefile is uploaded, the shapes will appear
+												on the map. Click the region of interest to continue.' ) ?>
 								</span>
 							</a>
 						</div>

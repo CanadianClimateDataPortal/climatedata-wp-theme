@@ -1569,7 +1569,7 @@
             // populate the 'models' inputs
 
             // console.log('--- MODELS ---');
-            // console.log(this_val);
+            // console.log(options.query.models);
 
             if (DATASETS.hasOwnProperty(this_val)) {
               let models_placeholder = item.find('#models-placeholder');
@@ -1590,8 +1590,14 @@
                 $(to_add).appendTo(models_placeholder);
               });
 
-              if (item.find('[name="details-models"]:checked').length) {
-                item.find('[name="details-models"]:checked').trigger('change');
+              // if query.model's value still has an existing input
+              // check it
+
+              if (item.find('#details-models-' + options.query.model).length) {
+                item
+                  .find('#details-models-' + options.query.model)
+                  .prop('checked', true)
+                  .trigger('change');
               } else {
                 item
                   .find('[name="details-models"]')
@@ -1605,6 +1611,14 @@
           break;
 
         case 'percentiles':
+          if (this_val == 'all') {
+            item
+              .find('[name="details-percentiles"]:not(#details-percentiles-all')
+              .prop('checked', false);
+          } else {
+            item.find('#details-percentiles-all').prop('checked', false);
+          }
+
           break;
 
         case 'scenarios':
@@ -2483,7 +2497,7 @@
         case 'station':
           options.query.sector = 'station';
 
-          console.log('hide legend');
+          // console.log('hide legend');
           // item.find('.info.legend').hide();
           break;
       }
@@ -2549,10 +2563,10 @@
         }
       }
 
-      // dataset
-
       if (fields) {
-        // console.log('DATASETS', fields.dataset_availability);
+        // DATA TAB
+
+        // dataset
 
         // enable all
         item
@@ -2574,26 +2588,14 @@
           !item.find('#map-control-dataset :input:not([disabled]):checked')
             .length
         ) {
-          // console.log('nothing is checked');
-
           // nothing is checked
           // find the first enabled input and check it
-
-          // console.log(
-          //   'first',
-          //   item.find('#map-control-dataset :input:not([disabled])').first(),
-          // );
 
           item
             .find('#map-control-dataset :input:not([disabled])')
             .first()
             .prop('checked', true);
         }
-
-        // console.log(
-        //   'trigger',
-        //   item.find('#map-control-dataset :input:checked'),
-        // );
 
         item.find('#map-control-dataset :input:checked').trigger('change');
 
@@ -2668,6 +2670,22 @@
         // checkboxes - Annual, Monthly, 2QS-APR, QS-DEC (Seasonal), Daily
 
         plugin.update_frequency();
+
+        // scenarios
+
+        if (
+          options.request.type == 'station' ||
+          options.query.dataset == 'ahccd'
+        ) {
+          item
+            .find('#map-control-panels .form-check-input')
+            .prop('checked', false);
+
+          item
+            .find('#details-scenarios-high')
+            .prop('checked', true)
+            .trigger('change');
+        }
       }
 
       // console.log('--- end of set_controls');
@@ -3438,10 +3456,6 @@
             data: query.end_year,
           },
           {
-            id: 'ensemble_percentiles',
-            data: query.percentiles.join(','),
-          },
-          {
             id: 'dataset',
             data: DATASETS[query.dataset].finch_name,
           },
@@ -3507,6 +3521,15 @@
             .toLowerCase(),
         });
       });
+
+      // percentiles
+
+      if (query.percentiles.join(',') != 'all') {
+        form_obj.inputs.push({
+          id: 'ensemble_percentiles',
+          data: query.percentiles.join(','),
+        });
+      }
 
       // lat/lng
 

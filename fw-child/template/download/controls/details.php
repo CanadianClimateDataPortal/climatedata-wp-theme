@@ -87,7 +87,7 @@
 					</div>
 				</div>
 				
-				<div id="map-control-panels" class="map-control-item" data-flags="threshold:1,single:1,station:0">
+				<div id="map-control-panels" class="map-control-item" data-request="threshold,single,custom">
 					
 					<h6 class="d-flex align-items-center h6 mb-3 all-caps text-secondary">
 						<?php _e ( 'Scenarios', 'cdc' ); ?>
@@ -158,6 +158,13 @@
 					</h6>
 					
 					<div class="row row-cols-4">
+						<div class="col">
+							<div class="form-check form-switch">
+								<input class="form-check-input" type="checkbox" role="switch" name="details-percentiles" id="details-percentiles-all" value="all" data-query-key="percentiles">
+								<label class="form-check-label" for="details-percentiles-all"><?php _e ( 'All', 'cdc' ); ?></label>
+							</div>
+						</div>
+						
 						<div class="col">
 							<div class="form-check form-switch">
 								<input class="form-check-input" type="checkbox" role="switch" name="details-percentiles" id="details-percentiles-5" value="5" data-query-key="percentiles">
@@ -242,7 +249,7 @@
 						<div class="col">
 							<div class="form-check">
 								<input class="form-check-input" type="radio" name="details-frequency" id="details-frequency-junjul" value="AS-JUL" data-query-key="frequency">
-								<label class="form-check-label" for="details-frequency-junjul"><?php  _e ( 'Annual (June – July)', 'cdc' ); ?></label>
+								<label class="form-check-label" for="details-frequency-junjul"><?php  _e ( 'Annual (July – June)', 'cdc' ); ?></label>
 							</div>
 						</div>
 						

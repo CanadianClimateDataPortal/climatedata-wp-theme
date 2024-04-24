@@ -87,7 +87,7 @@
 		<div id="map-low" data-map-key="low" class="map-panel hidden">
 			<div id="map-object-low" class="leaflet-object"></div>
 			<div class="map-label rounded-pill bg-light bg-opacity-90 px-3 py-1">
-				<span class="scenario-name" data-dataset="cmip6" data-name="ssp585">SSP 5–8.5</span>
+				<span class="scenario-name" data-dataset="cmip6" data-name="ssp126">SSP 1–2.6</span>
 			</div>
 		</div>
 		

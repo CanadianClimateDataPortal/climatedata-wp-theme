@@ -27,7 +27,7 @@
 						?>
 						
 						<select 
-							class="custom-select custom-select-md select2 form-control" 
+							class="custom-select custom-select-md select2 form-control cdc-select2" 
 							name="area-search" 
 							id="area-search" 
 							data-placeholder="<?php _e ( 'Community, landmark or coordinates','cdc' ); ?>"

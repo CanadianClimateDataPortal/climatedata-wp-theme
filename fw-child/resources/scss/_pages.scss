@@ -1267,6 +1267,16 @@ body.tab-drawer-open {
     .map-label {
       bottom: 1.5rem;
     }
+
+    &:has(
+        #map-low:visible,
+        #map-medium:not(:visible),
+        #map-high:not(:visible)
+      ) {
+      .map-label {
+        display: none;
+      }
+    }
   }
 
   #map-control-footer {

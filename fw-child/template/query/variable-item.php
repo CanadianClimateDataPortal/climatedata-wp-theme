@@ -69,19 +69,19 @@
 				<div class="offset-1-of-5 d-flex align-items-center">
 					<?php
 					
-						$map_slug = 'map';
-						$dl_slug = 'download';
+						$map_slug = 'map/';
+						$dl_slug = 'download/';
 						
 						if ( $GLOBALS['fw']['current_lang_code'] == 'fr' ) {
-							$map_slug = 'carte';
-							$dl_slug = 'telechargement';
+							$map_slug = 'carte/';
+							$dl_slug = 'telechargement/';
 						}
 						
 					?>
 					
 					<a href="<?php echo home_url ( $map_slug ); ?>?var_id=<?php echo $item['id']; ?>" class="btn btn-primary rounded-pill px-4 me-3"><?php _e ( 'View on Map', 'cdc' ); ?></a>
 					
-					<a href="<?php echo home_url ( $dl_slug ); ?>?var_id=<?php echo $item['id']; ?>" class="btn btn-light rounded-pill px-4"><?php _e ( 'Analyze Data', 'cdc' ); ?></a>
+					<a href="<?php echo home_url ( $dl_slug ); ?>?var_id=<?php echo $item['id']; ?>" class="btn btn-light rounded-pill px-4"><?php _e ( 'Download Data', 'cdc' ); ?></a>
 				</div>
 			</div>
 		</div>
@@ -108,7 +108,68 @@
 			</div>
 			
 			<div class="col offset-1-of-12">
-				<h6 class="all-caps text-secondary"><?php _e ( 'Relevant Sectors', 'cdc' ); ?></h6>
+				<?php
+				
+					$sectors = get_the_terms ( $item['id'], 'sector' );
+					
+					if ( !empty ( $sectors ) ) {
+						
+				?>
+				
+				<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Relevant Sectors', 'cdc' ); ?></h6>
+				
+				<div class="accordion accordion-flush" id="var-accordion-<?php echo $item['id']; ?>">
+						
+						
+					<?php
+					
+						$i = 1;
+					
+						foreach ( $sectors as $sector ) {
+								
+					?>
+					
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="var-<?php echo $item['id']; ?>-heading-<?php echo $i; ?>">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#var-<?php echo $item['id']; ?>-collapse-<?php echo $i; ?>" aria-expanded="false" aria-controls="var-<?php echo $item['id']; ?>-collapse-<?php echo $i; ?>">
+								<?php echo $sector->name; ?>
+							</button>
+						</h2>
+						<div id="var-<?php echo $item['id']; ?>-collapse-<?php echo $i; ?>" class="accordion-collapse collapse" aria-labelledby="var-<?php echo $item['id']; ?>-heading-<?php echo $i; ?>" data-bs-parent="#var-accordion-<?php echo $item['id']; ?>">
+							<div class="accordion-body p-3">
+								<?php 
+								
+									if ( $GLOBALS['fw']['current_lang_code'] == 'en' ) {
+										
+										echo $sector->description;
+										
+									} else {
+										
+										echo get_field ( 'description_' . $GLOBALS['fw']['current_lang_code'], 'sector_' . $sector->term_id );
+										
+									}
+								
+								?>
+							</div>
+						</div>
+					</div>
+					
+					<?php
+					
+							$i++;
+							
+						}
+						
+					?>
+						
+				</div>
+				
+				<?php
+				
+					}	
+				
+				?>
+					
 			</div>
 		</div>
 	</div>

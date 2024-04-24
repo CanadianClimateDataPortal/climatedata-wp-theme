@@ -37,47 +37,6 @@
 		<?php
 				
 			}
-				
-			/*
-			switch ( $element['inputs']['include']['top'] ) {
-				case 'home' :
-					$top_ID = get_option ( 'page_on_front' );
-						
-					break;
-				
-				case 'posts' :
-					$top_ID = get_option ( 'page_for_posts' );
-					break;
-					
-				case 'other' :
-					$top_ID = $element['inputs']['include']['top_other'];
-					break;
-					
-				default :
-					$top_ID = null;
-					
-			}
-			
-			if ( $top_ID != null && $top_ID != '' ) {
-				
-				$top_title = get_the_title ( $top_ID );
-				
-				if ( 
-					isset ( $element['inputs']['include']['top_label'][$globals['current_lang_code']] ) &&
-					$element['inputs']['include']['top_label'][$globals['current_lang_code']] != ''
-				) {
-					
-					$top_title = $element['inputs']['include']['top_label'][$globals['current_lang_code']];
-					
-				}
-				
-		?>
-		
-		<li class="breadcrumb-item"><a href="<?php echo get_permalink ( $top_ID ); ?>"><?php echo $top_title; ?></a></li>
-		
-		<?php
-		
-			}*/
 		
 			// posts page
 		
@@ -149,10 +108,18 @@
 			// title
 			
 			if ( $element['inputs']['include']['title'] == 'true' ) {
+				
+				$current_title = '';
+				
+				if ( isset ( $globals['current_query']['ID'] ) ) {
+					$current_title = get_the_title ( $globals['current_query']['ID'] );
+				} elseif ( isset ( $globals['current_query']['labels'] ) ) {
+					$current_title = $globals['current_query']['labels']->name;
+				}
 			
 		?>
 		
-		<li class="breadcrumb-item active" aria-current="page"><?php echo get_the_title ( $globals['current_query']['ID'] ); ?></li>
+		<li class="breadcrumb-item active" aria-current="page"><?php $current_title; ?></li>
 		
 		<?php
 		

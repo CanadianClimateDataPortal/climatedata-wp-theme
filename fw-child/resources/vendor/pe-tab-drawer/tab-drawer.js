@@ -317,7 +317,10 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 				} else {
 					
 					options.status = 'closed'
-					$('body').removeClass('tab-drawer-open')
+					
+					if (!$('body').find('.td-selected').length) {
+						$('body').removeClass('tab-drawer-open')
+					}
 					
 				}
 				

@@ -87,6 +87,7 @@
         threshold: false,
         station: false,
         ahccd: false,
+        decimals: false,
       },
       frequency: {},
       current_layer: null,
@@ -2563,11 +2564,11 @@
         }
       }
 
+      // DATA TAB
+
+      // dataset
+
       if (fields) {
-        // DATA TAB
-
-        // dataset
-
         // enable all
         item
           .find('#map-control-dataset .form-check-input')
@@ -2670,22 +2671,19 @@
         // checkboxes - Annual, Monthly, 2QS-APR, QS-DEC (Seasonal), Daily
 
         plugin.update_frequency();
+      }
 
-        // scenarios
+      // scenarios
 
-        if (
-          options.request.type == 'station' ||
-          options.query.dataset == 'ahccd'
-        ) {
-          item
-            .find('#map-control-panels .form-check-input')
-            .prop('checked', false);
+      if (options.request.type !== 'custom') {
+        item
+          .find('#map-control-panels .form-check-input')
+          .prop('checked', false);
 
-          item
-            .find('#details-scenarios-high')
-            .prop('checked', true)
-            .trigger('change');
-        }
+        item
+          .find('#details-scenarios-high')
+          .prop('checked', true)
+          .trigger('change');
       }
 
       // console.log('--- end of set_controls');

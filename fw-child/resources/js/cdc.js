@@ -897,7 +897,7 @@
                       let station_id =
                         query.var == 'climate-normals' ||
                         query.var == 'station-data'
-                          ? e.layer.feature.properties.STN_ID
+                          ? e.layer.feature.id
                           : e.layer.feature.properties.ID;
 
                       let style_obj = {
@@ -1563,7 +1563,7 @@
                 }
               } else if (location_data.layer.hasOwnProperty('feature')) {
                 // STN_ID
-                grid_id = location_data.layer.feature.properties.STN_ID;
+                grid_id = location_data.layer.feature.id;
               }
             }
           }
@@ -2086,7 +2086,7 @@
           station_data.features.forEach(function (station) {
             if (query.var == 'climate-normals' || query.var == 'station-data') {
               station_options.push({
-                id: station.properties.STN_ID,
+                id: station.id,
                 name: station.properties.STATION_NAME,
               });
             } else {

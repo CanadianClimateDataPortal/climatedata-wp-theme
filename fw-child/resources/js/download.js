@@ -87,7 +87,6 @@
         threshold: false,
         station: false,
         ahccd: false,
-        decimals: false,
       },
       frequency: {},
       current_layer: null,
@@ -926,6 +925,10 @@
           this_gid = String(this_gid);
           options.station.color = style_obj.color;
 
+          if (item.find('#submit-result').hasClass('td-selected')) {
+            $('#control-bar').tab_drawer('update_path', '#submit');
+          }
+
           let selections = item.find('#station-select').val();
 
           if (selections.includes(this_gid)) {
@@ -1378,7 +1381,7 @@
             options.query.var == 'climate-normals' ||
             options.query.var == 'station-data'
           ) {
-            feature_ID = layer.feature.properties.STN_ID;
+            feature_ID = layer.feature.id;
           }
 
           if (feature_ID == this_gid) {
@@ -2477,9 +2480,6 @@
         options = plugin.options,
         item = plugin.item;
 
-      let items_to_hide = [],
-        items_to_show = [];
-
       // VAR FLAGS
 
       // console.log(options.var_flags);
@@ -2553,6 +2553,28 @@
           $(this).hide();
         }
       });
+
+      //
+
+      // AHCCD preset
+
+      if (options.query.var == 'ahccd') {
+        item.find('#map-control-datepicker').hide();
+        item.find('#details-format-netcdf').parent().show();
+        item.find('#details-format-json').parent().hide();
+      }
+
+      if (options.query.var == 'idf') {
+        item.find('#map-control-datepicker').hide();
+        item.find('#map-control-format').hide();
+        item
+          .find('.control-bar-tab-link[href="#details"]')
+          .addClass('disabled');
+      } else {
+        item
+          .find('.control-bar-tab-link[href="#details"]')
+          .removeClass('disabled');
+      }
 
       // THRESHOLDS
 

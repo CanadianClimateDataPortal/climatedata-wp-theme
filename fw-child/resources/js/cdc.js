@@ -418,6 +418,9 @@
         // console.log('get layer', var_data, query);
 
         if (var_data == undefined || var_data == null) {
+          console.log('spinner off');
+          $('body').removeClass('spinner-on');
+
           return 'no variable';
         }
 

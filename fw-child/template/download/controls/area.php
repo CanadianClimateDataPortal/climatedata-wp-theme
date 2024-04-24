@@ -69,17 +69,17 @@
 						
 					</div>
 					
-					<div class="form-check">
+					<div class="form-check" data-request="custom">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-csd" value="census" data-query-key="sector">
 						<label class="form-check-label" for="area-aggregation-csd"><?php _e ( 'Census Subdivisions', 'cdc' ); ?></label>
 					</div>
 					
-					<div class="form-check">
+					<div class="form-check" data-request="custom">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-health" value="health" data-query-key="sector">
 						<label class="form-check-label" for="area-aggregation-health"><?php _e ( 'Health Regions', 'cdc' ); ?></label>
 					</div>
 					
-					<div class="form-check">
+					<div class="form-check" data-request="custom">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-watershed" value="watershed" data-query-key="sector">
 						<label class="form-check-label" for="area-aggregation-watershed"><?php _e ( 'Watersheds', 'cdc' ); ?></label>
 					</div>

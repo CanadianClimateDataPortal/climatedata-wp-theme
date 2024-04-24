@@ -925,6 +925,10 @@
           this_gid = String(this_gid);
           options.station.color = style_obj.color;
 
+          if (item.find('#submit-result').hasClass('td-selected')) {
+            $('#control-bar').tab_drawer('update_path', '#submit');
+          }
+
           let selections = item.find('#station-select').val();
 
           if (selections.includes(this_gid)) {
@@ -1377,7 +1381,7 @@
             options.query.var == 'climate-normals' ||
             options.query.var == 'station-data'
           ) {
-            feature_ID = layer.feature.properties.STN_ID;
+            feature_ID = layer.feature.id;
           }
 
           if (feature_ID == this_gid) {
@@ -2476,9 +2480,6 @@
         options = plugin.options,
         item = plugin.item;
 
-      let items_to_hide = [],
-        items_to_show = [];
-
       // VAR FLAGS
 
       // console.log(options.var_flags);
@@ -2553,6 +2554,28 @@
         }
       });
 
+      //
+
+      // AHCCD preset
+
+      if (options.query.var == 'ahccd') {
+        item.find('#map-control-datepicker').hide();
+        item.find('#details-format-netcdf').parent().show();
+        item.find('#details-format-json').parent().hide();
+      }
+
+      if (options.query.var == 'idf') {
+        item.find('#map-control-datepicker').hide();
+        item.find('#map-control-format').hide();
+        item
+          .find('.control-bar-tab-link[href="#details"]')
+          .addClass('disabled');
+      } else {
+        item
+          .find('.control-bar-tab-link[href="#details"]')
+          .removeClass('disabled');
+      }
+
       // THRESHOLDS
 
       if (options.request.type == 'threshold') {
@@ -2563,11 +2586,11 @@
         }
       }
 
+      // DATA TAB
+
+      // dataset
+
       if (fields) {
-        // DATA TAB
-
-        // dataset
-
         // enable all
         item
           .find('#map-control-dataset .form-check-input')
@@ -2670,22 +2693,19 @@
         // checkboxes - Annual, Monthly, 2QS-APR, QS-DEC (Seasonal), Daily
 
         plugin.update_frequency();
+      }
 
-        // scenarios
+      // scenarios
 
-        if (
-          options.request.type == 'station' ||
-          options.query.dataset == 'ahccd'
-        ) {
-          item
-            .find('#map-control-panels .form-check-input')
-            .prop('checked', false);
+      if (options.request.type !== 'custom') {
+        item
+          .find('#map-control-panels .form-check-input')
+          .prop('checked', false);
 
-          item
-            .find('#details-scenarios-high')
-            .prop('checked', true)
-            .trigger('change');
-        }
+        item
+          .find('#details-scenarios-high')
+          .prop('checked', true)
+          .trigger('change');
       }
 
       // console.log('--- end of set_controls');

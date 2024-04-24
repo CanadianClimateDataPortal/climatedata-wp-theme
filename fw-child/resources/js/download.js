@@ -2084,10 +2084,16 @@
 
         item.find('#info-description').html(options.var_data.acf[desc_key]);
 
-        if (options.var_data.acf[tech_key])
+        if (options.var_data.acf[tech_key] != '') {
+          item.find('#info-tech-description').show();
+          item.find('#info-tech-description').prev().show();
           item
             .find('#info-tech-description')
             .html(options.var_data.acf[tech_key]);
+        } else {
+          item.find('#info-tech-description').prev().hide();
+          item.find('#info-tech-description').hide();
+        }
 
         item.find('#breadcrumb-overlay-trigger').show();
 

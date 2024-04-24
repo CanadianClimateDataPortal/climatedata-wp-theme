@@ -88,18 +88,18 @@
 											<div id="station-series-items" class="chart-series-items">
 											
 												<!-- row -->
-												<div id="legend-row-X" class="row row-cols-2 py-2 border-bottom align-items-center" style="display: none;">
+												<div id="station-legend-row-X" class="row row-cols-2 py-2 border-bottom align-items-center" style="display: none;">
 													
 													<div class="col">
 														<div class="form-check form-switch mb-0">
-															<input class="form-check-input" type="checkbox" role="switch" id="legend-row-X-display-toggle" checked>
-															<label class="form-check-label" for="legend-row-X-display-toggle"></label>
+															<input class="form-check-input" type="checkbox" role="switch" id="station-legend-row-X-display-toggle" checked>
+															<label class="form-check-label" for="station-legend-row-X-display-toggle"></label>
 														</div>
 													</div>
 													
-													<div id="legend-row-X-opacity" class="col d-flex align-items-center">
+													<div id="station-legend-row-X-opacity" class="col d-flex align-items-center">
 														
-														<input type="range" class="form-range" min="1" max="100" value="100" id="legend-row-X-opacity-range">
+														<input type="range" class="form-range" min="1" max="100" value="100" id="station-legend-row-X-opacity-range">
 														
 													</div>
 													

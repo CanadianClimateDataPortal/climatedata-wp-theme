@@ -18,7 +18,7 @@
 					</div>
 				</div>
 			
-				<div id="map-control-timeframe" class="map-control-item" data-flags="station:0">
+				<div id="map-control-timeframe" class="map-control-item" data-request="custom">
 				
 					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Timeframe', 'cdc' ); ?></h6>
 					
@@ -75,7 +75,7 @@
 					</div>
 				</div>
 				
-				<div id="map-control-models" class="map-control-item" data-flags="custom:1">
+				<div id="map-control-models" class="map-control-item" data-request="custom">
 					
 					<h6 class="d-flex align-items-center h6 mb-3 all-caps text-secondary">
 						<?php _e ( 'Models', 'cdc' ); ?>
@@ -87,7 +87,7 @@
 					</div>
 				</div>
 				
-				<div id="map-control-panels" class="map-control-item" data-flags="threshold:1,single:1,station:0">
+				<div id="map-control-panels" class="map-control-item" data-request="custom">
 					
 					<h6 class="d-flex align-items-center h6 mb-3 all-caps text-secondary">
 						<?php _e ( 'Scenarios', 'cdc' ); ?>
@@ -158,6 +158,13 @@
 					</h6>
 					
 					<div class="row row-cols-4">
+						<div class="col">
+							<div class="form-check form-switch">
+								<input class="form-check-input" type="checkbox" role="switch" name="details-percentiles" id="details-percentiles-all" value="all" data-query-key="percentiles">
+								<label class="form-check-label" for="details-percentiles-all"><?php _e ( 'All', 'cdc' ); ?></label>
+							</div>
+						</div>
+						
 						<div class="col">
 							<div class="form-check form-switch">
 								<input class="form-check-input" type="checkbox" role="switch" name="details-percentiles" id="details-percentiles-5" value="5" data-query-key="percentiles">
@@ -242,7 +249,7 @@
 						<div class="col">
 							<div class="form-check">
 								<input class="form-check-input" type="radio" name="details-frequency" id="details-frequency-junjul" value="AS-JUL" data-query-key="frequency">
-								<label class="form-check-label" for="details-frequency-junjul"><?php  _e ( 'Annual (June – July)', 'cdc' ); ?></label>
+								<label class="form-check-label" for="details-frequency-junjul"><?php  _e ( 'Annual (July – June)', 'cdc' ); ?></label>
 							</div>
 						</div>
 						
@@ -254,6 +261,7 @@
 							<option value="ann" data-field="ann"><?php _e ( 'Annual', 'cdc' ); ?></option>
 							<option value="daily" data-field="daily"><?php _e ( 'Daily', 'cdc' ); ?></option>
 							<optgroup label="<?php _e ( 'Monthly', 'cdc' ); ?>" data-field="monthly">
+								<option value="all"><?php _e ( 'All months', 'cdc' ); ?></option>
 								<option value="jan"><?php _e ( 'January', 'cdc' ); ?></option>
 								<option value="feb"><?php _e ( 'February', 'cdc' ); ?></option>
 								<option value="mar"><?php _e ( 'March', 'cdc' ); ?></option>
@@ -286,7 +294,7 @@
 						
 						<div class="col d-flex align-items-center justify-content-between">
 							<div class="form-check mb-0">
-								<input class="form-check-input" type="radio" name="details-format" id="details-format-csv" value="csv" data-query-key="format" checked data-conditional="#map-control-decimals">
+								<input class="form-check-input" type="radio" name="details-format" id="details-format-csv" value="csv" data-query-key="format" checked data-conditional="#map-control-decimals-conditional">
 								<label class="form-check-label" for="details-format-csv">CSV</label>
 							</div>
 							
@@ -304,8 +312,8 @@
 					
 				</div>
 				
-				<div id="map-control-decimals" class="map-control-item">
-					<div class="row row-cols-2 align-items-center">
+				<div id="map-control-decimals" class="map-control-item" data-request="custom,ahccd">
+					<div id="map-control-decimals-conditional" class="row row-cols-2 align-items-center">
 						<div class="col">
 							<label for="" class="h6 all-caps text-secondary"><?php _e ( 'Decimal Places', 'cdc' ); ?></label>
 						</div>
@@ -325,7 +333,7 @@
 			</div>
 			
 			<div class="control-tab-footer">
-				<a href="#submit" class="btn btn-lg btn-secondary d-block tab-drawer-trigger"><?php _e ( 'Next', 'cdc' ); ?>: <?php _e ( 'Submit', 'cdc' ); ?></a>
+				<a href="#submit" class="btn btn-lg btn-secondary d-block tab-drawer-trigger"><?php _e ( 'Next', 'cdc' ); ?>: <?php _e ( 'Download', 'cdc' ); ?></a>
 			</div>
 		</div>
 	</div>

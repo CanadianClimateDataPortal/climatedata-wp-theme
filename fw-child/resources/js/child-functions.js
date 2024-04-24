@@ -1,3 +1,5 @@
+document.documentElement.classList.remove('spinner-on');
+
 // fix for 'fakeStop is not a function'
 
 if (typeof L !== 'undefined') {
@@ -21,7 +23,9 @@ const $ = jQuery;
       app_page = 'map';
 
       // init apps
-      $(document).cdc_app();
+      $(document).cdc_app({
+        page: app_page,
+      });
       $(document).map_app();
     }
 
@@ -29,6 +33,7 @@ const $ = jQuery;
       app_page = 'download';
 
       $(document).cdc_app({
+        page: app_page,
         grid: {
           styles: {
             line: {
@@ -379,5 +384,11 @@ const $ = jQuery;
         },
       });
     });
+
+    //
+    // MISC
+    //
+
+    $('body').removeClass('spinner-on');
   });
 })(jQuery);

@@ -69,17 +69,17 @@
 						
 					</div>
 					
-					<div class="form-check">
+					<div class="form-check" data-request="custom">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-csd" value="census" data-query-key="sector">
 						<label class="form-check-label" for="area-aggregation-csd"><?php _e ( 'Census Subdivisions', 'cdc' ); ?></label>
 					</div>
 					
-					<div class="form-check">
+					<div class="form-check" data-request="custom">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-health" value="health" data-query-key="sector">
 						<label class="form-check-label" for="area-aggregation-health"><?php _e ( 'Health Regions', 'cdc' ); ?></label>
 					</div>
 					
-					<div class="form-check">
+					<div class="form-check" data-request="custom">
 						<input class="form-check-input" type="radio" name="area-aggregation" id="area-aggregation-watershed" value="watershed" data-query-key="sector">
 						<label class="form-check-label" for="area-aggregation-watershed"><?php _e ( 'Watersheds', 'cdc' ); ?></label>
 					</div>
@@ -90,10 +90,10 @@
 							<label class="form-check-label" for="area-aggregation-upload"><?php _e ( 'Upload Custom Shapefile', 'cdc' ); ?></label>
 							<a tabindex="0" role="button" id="area-aggregation-upload-tooltip" class="text-secondary">ⓘ
 								<span style="display: none">
-									<?php _e ( 'A shapefile is a ZIP file containing at least the <em>.shp</em> and
-									<em>.prj</em> files. It must contain only closed polygons and must be entirely contained
-									inside the canadian territory. Once your shapefile is uploaded, click all the regions
-									for which you want data.' ) ?>
+									<?php _e ( 'Please upload a ZIP file containing at least the .shp and .prj files.
+												The uploaded shapes must be closed polygons and be located entirely
+												within Canada. Once your shapefile is uploaded, the shapes will appear
+												on the map. Click the region of interest to continue.' ) ?>
 								</span>
 							</a>
 						</div>
@@ -113,7 +113,7 @@
 						class="custom-select custom-select-md select2 form-control" 
 						name="area-search" 
 						id="area-search" 
-						data-placeholder="<?php _e ( 'City, landmark or postal code','cdc' ); ?>"
+						data-placeholder="<?php _e ( 'Community, landmark or coordinates','cdc' ); ?>"
 					>
 						<option value=""><?php _e('Search for a City/Town', 'cdc'); ?></option>
 						

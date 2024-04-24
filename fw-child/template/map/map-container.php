@@ -44,23 +44,34 @@
 			<div class="col-6-of-11 bg-dark bg-opacity-10 py-4">
 				<div class="col-4-of-6 offset-1-of-6">
 					<div id="info-relevant-tabs" class="d-flex align-items-center mb-4" role="tablist">
-						<h6 class="col-1-of-4 all-caps mb-0"><?php _e ( 'Relevant', 'cdc' ); ?></h6>
+						<h6 class="all-caps mb-0 me-2"><?php _e ( 'Relevant', 'cdc' ); ?></h6>
 						
-						<div class="col">
+						<div class="col d-flex">
+							<button 
+								id="info-relevant-vars-btn" 
+								class="btn btn-sm text-light active px-2" 
+								type="button" 
+								role="tab" 
+								data-bs-toggle="tab" 
+								data-bs-target="#info-relevant-vars" 
+								aria-controls="info-relevant-vars" 
+								aria-selected="true"
+							><?php _e ( 'Variables', 'cdc' ); ?></button>
+							
 							<button 
 								id="info-relevant-sectors-btn" 
-								class="btn btn-sm text-light rounded-pill me-2 active" 
+								class="btn btn-sm text-light px-2" 
 								type="button" 
 								role="tab" 
 								data-bs-toggle="tab" 
 								data-bs-target="#info-relevant-sectors" 
 								aria-controls="info-relevant-sectors" 
-								aria-selected="true"
+								aria-selected="false"
 							><?php _e ( 'Sectors', 'cdc' ); ?></button>
 							
 							<button 
 								id="info-relevant-training-btn" 
-								class="btn btn-sm text-light rounded-pill"  
+								class="btn btn-sm text-light px-2"  
 								type="button" 
 								role="tab" 
 								data-bs-toggle="tab" 
@@ -72,7 +83,9 @@
 					</div>
 				
 					<div class="tab-content" id="info-relevant-content">
-						<div class="tab-pane fade show active" id="info-relevant-sectors" role="tabpanel" aria-labelledby="info-relevant-sectors-btn" tabindex="0">1...</div>
+						<div class="tab-pane fade show active" id="info-relevant-vars" role="tabpanel" aria-labelledby="info-relevant-vars-btn" tabindex="0"></div>
+						
+						<div class="tab-pane fade" id="info-relevant-sectors" role="tabpanel" aria-labelledby="info-relevant-sectors-btn" tabindex="0">1...</div>
 						
 						<div class="tab-pane fade" id="info-relevant-training" role="tabpanel" aria-labelledby="info-relevant-training-btn" tabindex="0">2...</div>
 					</div>
@@ -103,8 +116,8 @@
 		<div class="d-flex">
 			
 			<div id="map-control-zoom" class="d-flex border-end">
-				<div id="map-zoom-in" class="map-zoom-btn zoom-in border-end">+</div>
-				<div id="map-zoom-out" class="map-zoom-btn zoom-out">-</div>
+				<div id="map-zoom-out" class="map-zoom-btn zoom-out border-end">-</div>
+				<div id="map-zoom-in" class="map-zoom-btn zoom-in">+</div>
 			</div>
 			
 			<div id="map-control-time" class="flex-grow-1 d-flex align-items-center px-3">

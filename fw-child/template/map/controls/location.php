@@ -8,54 +8,60 @@
 			
 			<div class="control-tab-body">
 				
-				<div id="map-control-search" class="map-control-item">
-					<label for="area-search"  class="h6 all-caps text-secondary"><?php _e ( 'Search', 'cdc' ); ?></label>
-					
-					<?php
-						
-						// location var
-						
-					?>
-					
-					<input type="hidden" name="area-location" id="area-location" data-query-key="location">
-					
-					<?php
-					
-						// search var
-						
-					?>
-					
-					<select 
-						class="custom-select custom-select-md select2 form-control" 
-						name="area-search" 
-						id="area-search" 
-						data-placeholder="<?php _e ( 'City, landmark or postal code','cdc' ); ?>"
-					>
-						<option value=""><?php _e('Search for a City/Town', 'cdc'); ?></option>
+				<div id="map-control-search" class="map-control-item px-0">
+					<div id="map-control-search-inner" class="p-3">
+						<label for="area-search" class="h6 d-block all-caps text-secondary mb-3"><?php _e ( 'Search', 'cdc' ); ?></label>
 						
 						<?php
 							
-							if ( isset ( $_GET['search'] ) ) {
-				
-						?>
-				
-						<option value="<?php echo $_GET['search']; ?>"><?php echo 'search val'; //echo $GLOBALS['vars']['current_data']['location_data']['geo_name']; ?></option>
-				
-						<?php
+							// location vars
 							
-							}
-						
 						?>
-					</select>
+						
+						<input type="hidden" name="area-location" id="area-location" data-query-key="location">
+						
+						<?php
+						
+							// search var
+							
+						?>
+						
+						<select 
+							class="custom-select custom-select-md select2 form-control cdc-select2" 
+							name="area-search" 
+							id="area-search" 
+							data-placeholder="<?php _e ( 'Community, landmark or coordinates','cdc' ); ?>"
+						>
+							<option value=""><?php _e('Search for a City/Town', 'cdc'); ?></option>
+							
+							<?php
+								
+								if ( isset ( $_GET['search'] ) ) {
+					
+							?>
+					
+							<option value="<?php echo $_GET['search']; ?>"><?php echo 'search val'; //echo $GLOBALS['vars']['current_data']['location_data']['geo_name']; ?></option>
+					
+							<?php
+								
+								}
+							
+							?>
+						</select>
+					</div>
 				</div>
 				
 				<div id="map-control-recent" class="map-control-item">
 					<div class="d-flex justify-content-between mb-3">
 						<h6 class="all-caps text-secondary mb-0"><?php _e ( 'Recent Locations', 'cdc' ); ?></h6>
-						<h6 id="recent-locations-clear" class="all-caps text-gray-600 mb-0" style="display: none;"><?php _e ( 'Clear', 'cdc' ); ?></h6>
+						<h6 id="recent-locations-clear" class="all-caps text-gray-600 mb-0" role="button" style="display: none;"><?php _e ( 'Clear', 'cdc' ); ?></h6>
 					</div>
 					
 					<div id="recent-locations" class="list-group list-group-flush">
+					</div>
+					
+					<div id="recent-locations-none">
+						<?php _e ( 'Use the map or search function to add locations to this list.', 'cdc' ); ?>
 					</div>
 				</div>
 					
@@ -108,7 +114,7 @@
 			</div>
 		</div>
 	</div>
-	
+		
 	<div class="tab-drawer-container">
 		<?php
 		

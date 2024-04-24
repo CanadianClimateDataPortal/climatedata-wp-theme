@@ -8,6 +8,7 @@
       globals: ajax_data.globals,
       lang: 'en',
       post_id: null,
+      page: 'download',
       status: 'init',
       maps: {
         low: {
@@ -229,6 +230,7 @@
                     'maps.get_layer',
                     options.query,
                     options.var_data,
+                    options.request,
                   );
                 });
               }
@@ -393,6 +395,7 @@
       // SELECT2
 
       item.find('#station-select').select2({
+        theme: 'bootstrap-5',
         language: options.lang,
         multiple: true,
         closeOnSelect: false,
@@ -479,25 +482,26 @@
           plugin.set_controls(options.var_data.acf);
 
           // trigger any input change
-          options.query_str.prev = options.query_str.current;
+          // options.query_str.prev = options.query_str.current;
 
-          options.query_str.current = $(document).cdc_app('query.eval', {
-            query: options.query,
-            do_history: 'replace',
-            callback: function () {
-              plugin.update_default_scheme(function () {
-                console.log('accordion get layer');
+          // options.query_str.current = $(document).cdc_app('query.eval', {
+          //   query: options.query,
+          //   do_history: 'replace',
+          //   callback: function () {
+          //     plugin.update_default_scheme(function () {
+          //       console.log('accordion get layer');
 
-                $(document).cdc_app(
-                  'maps.get_layer',
-                  options.query,
-                  options.var_data,
-                );
+          // $(document).cdc_app(
+          //   'maps.get_layer',
+          //   options.query,
+          //   options.var_data,
+          //   options.request,
+          // );
 
-                options.status = 'ready';
-              });
-            },
-          });
+          //   options.status = 'ready';
+          // });
+          // },
+          // });
         },
       );
 
@@ -512,6 +516,8 @@
           // reinit if plugin is already loaded
           query_items.flex_drawer('init_items');
         }
+
+        item.find('#data-variable .control-tab-body').scrollTop(0);
       });
 
       item.find('#var-select-query').fw_query({
@@ -530,6 +536,7 @@
       // SELECT2
 
       $('#area-search').select2({
+        theme: 'bootstrap-5',
         language: {
           inputTooShort: function () {
             let instructions = '<div class="geo-select-instructions">';
@@ -566,15 +573,12 @@
           },
         },
         ajax: {
-          url: ajax_data.url,
+          url: ajax_data.rest_url + 'cdc/v2/location_search/',
           dataType: 'json',
           delay: 0,
           data: function (params) {
             return {
-              action: 'cdc_location_search',
-              q: params.term, // search term
-              search: params,
-              page: params.page,
+              q: params.term,
             };
           },
           transport: function (params, success, failure) {
@@ -698,8 +702,8 @@
               // options.status = 'mapdrag';
 
               // update coord text fields
-              $('#coords-lat').val(this.getCenter().lat);
-              $('#coords-lng').val(this.getCenter().lng);
+              $('#coords-lat').val(this.getCenter().lat.toFixed(4));
+              $('#coords-lng').val(this.getCenter().lng.toFixed(4));
               $('#coords-zoom').val(this.getZoom());
 
               // if (options.status == 'mapdrag') {
@@ -742,6 +746,7 @@
               //   'replace',
               // );
 
+              $('body').removeClass('spinner-on');
               console.log('zoomend done');
             }
           })
@@ -920,6 +925,10 @@
           this_gid = String(this_gid);
           options.station.color = style_obj.color;
 
+          if (item.find('#submit-result').hasClass('td-selected')) {
+            $('#control-bar').tab_drawer('update_path', '#submit');
+          }
+
           let selections = item.find('#station-select').val();
 
           if (selections.includes(this_gid)) {
@@ -969,7 +978,10 @@
       item.find('#area-search').on('select2:select', function (e) {
         console.log('selected', e.params.data);
 
-        plugin.set_location({ lat: e.params.data.lat, lng: e.params.data.lon });
+        plugin.set_location({
+          lat: e.params.data.lat,
+          lng: e.params.data.lon,
+        });
       });
 
       // area search pan to coords btn
@@ -1017,8 +1029,6 @@
         };
 
         plugin.update_station_markers($(this).val(), this_gid);
-
-        $('#control-bar').tab_drawer('update_path', '#submit');
       });
 
       item.find('#station-select').on('select2:unselect', function (e) {
@@ -1035,11 +1045,11 @@
 
         switch (options.selection_mode) {
           case 'draw':
-            console.log('ENABLE DRAW');
+            // console.log('ENABLE DRAW');
             plugin.enable_bbox();
             break;
           case 'select':
-            console.log('DISABLE DRAW');
+            // console.log('DISABLE DRAW');
             plugin.disable_bbox();
             break;
         }
@@ -1335,16 +1345,18 @@
           // console.log('get layer hook bbox');
 
           // whether to re-enable bbox after changing/updating layers
-          if (
-            query.sector == 'gridded_data' &&
-            options.selection_mode == 'draw'
-          ) {
-            // console.log('enable');
-            plugin.enable_bbox();
-          } else {
-            // console.log('disable');
-            plugin.disable_bbox();
+          if (query.sector == 'gridded_data') {
+            if (options.selection_mode == 'draw') {
+              // console.log('enable');
+              plugin.enable_bbox();
+            } else {
+              // console.log('disable');
+              plugin.disable_bbox();
+            }
           }
+
+          console.log('get layer hook');
+          $('body').removeClass('spinner-on');
         },
       );
     },
@@ -1369,7 +1381,7 @@
             options.query.var == 'climate-normals' ||
             options.query.var == 'station-data'
           ) {
-            feature_ID = layer.feature.properties.STN_ID;
+            feature_ID = layer.feature.id;
           }
 
           if (feature_ID == this_gid) {
@@ -1404,7 +1416,7 @@
     },
 
     handle_input: function (input, status) {
-      console.log('--- start handle_input');
+      // console.log('--- start handle_input');
 
       let plugin = this,
         options = plugin.options,
@@ -1470,9 +1482,12 @@
 
             options.request.type = 'single';
 
-            if (item.find('#threshold-custom').hasClass('show')) {
+            if (
+              item.find('#var-thresholds').is(':visible') &&
+              item.find('#threshold-custom').hasClass('show')
+            ) {
               // unless the 'custom' accordion is open
-              console.log("no it's custom");
+              // console.log("no it's custom");
 
               options.request.type = 'custom';
             }
@@ -1558,7 +1573,7 @@
             // populate the 'models' inputs
 
             // console.log('--- MODELS ---');
-            // console.log(this_val);
+            // console.log(options.query.models);
 
             if (DATASETS.hasOwnProperty(this_val)) {
               let models_placeholder = item.find('#models-placeholder');
@@ -1579,8 +1594,14 @@
                 $(to_add).appendTo(models_placeholder);
               });
 
-              if (item.find('[name="details-models"]:checked').length) {
-                item.find('[name="details-models"]:checked').trigger('change');
+              // if query.model's value still has an existing input
+              // check it
+
+              if (item.find('#details-models-' + options.query.model).length) {
+                item
+                  .find('#details-models-' + options.query.model)
+                  .prop('checked', true)
+                  .trigger('change');
               } else {
                 item
                   .find('[name="details-models"]')
@@ -1594,6 +1615,14 @@
           break;
 
         case 'percentiles':
+          if (this_val == 'all') {
+            item
+              .find('[name="details-percentiles"]:not(#details-percentiles-all')
+              .prop('checked', false);
+          } else {
+            item.find('#details-percentiles-all').prop('checked', false);
+          }
+
           break;
 
         case 'scenarios':
@@ -1709,13 +1738,14 @@
 
           switch (this_val) {
             case 'gridded_data':
-              console.log('gridded');
+              // console.log('gridded');
               if (options.request.type != 'custom') {
-                console.log('show raster pane');
+                // console.log('show raster pane');
                 item.find('.leaflet-raster-pane').show();
               }
               break;
             case 'upload':
+              plugin.disable_bbox();
               options.elements.shapefile_upload.shapefile_upload('show');
               break;
           }
@@ -1757,6 +1787,7 @@
                 'maps.get_layer',
                 options.query,
                 options.var_data,
+                options.request,
               );
 
               if (status != 'init') {
@@ -1963,6 +1994,7 @@
               'maps.get_layer',
               options.query,
               options.var_data,
+              options.request,
             );
 
             console.log('status = ready');
@@ -2057,7 +2089,8 @@
 
         item.find('#breadcrumb-overlay-trigger').show();
 
-        console.log(options.var_data);
+        plugin.populate_relevant(var_id);
+
         fields = options.var_data.acf;
 
         // set var_flags
@@ -2084,143 +2117,168 @@
           options.var_flags.ahccd = true;
         }
 
-        if (typeof fields.var_names != 'undefined') {
-          // var has at least 1 value in var_names
+        if (
+          fields.thresholds != undefined &&
+          Array.isArray(fields.thresholds) &&
+          fields.thresholds.length > 1
+        ) {
+          //
+          // VAR FLAG: CUSTOM
+          //
 
-          if (fields.var_names != null && fields.var_names.length > 1) {
-            //
-            // VAR FLAG: THRESHOLD
-            //
+          options.var_flags.custom = true;
 
-            options.var_flags.threshold = true;
+          // setup slider and custom inputs
 
-            // multiple vars
+          item
+            .find('#threshold-custom .accordion-body')
+            .html(plugin.generate_custom_inputs(fields.thresholds));
 
-            if (options.elements.threshold_slider != null) {
-              options.elements.threshold_slider
-                .off('slide')
-                .off('change')
-                .off('stop');
+          // enable the custom accordion
 
-              options.elements.threshold_slider.slider('destroy');
-            }
+          item
+            .find('#threshold-custom-head .accordion-button')
+            .prop('disabled', false);
 
-            options.elements.threshold_slider = item
-              .find('#threshold-slider')
-              .slider({
-                min: 0,
-                max: fields.var_names.length - 1,
-                step: 1,
-                animate: true,
-                create: function (e, ui) {
-                  // console.log('threshold slider', 'create');
-
-                  $(this)
-                    .find('.ui-slider-handle')
-                    .text(fields.var_names[0].label);
-                },
-                slide: function (e, ui) {
-                  // update the hidden input/query
-
-                  options.status = 'slide';
-
-                  $(this)
-                    .find('.ui-slider-handle')
-                    .text(fields.var_names[ui.value].label);
-
-                  options.query.var = fields.var_names[ui.value].variable;
-
-                  options.query_str.prev = options.query_str.current;
-
-                  options.query_str.current = $(document).cdc_app(
-                    'query.eval',
-                    {
-                      query: options.query,
-                      do_history: 'none',
-                      callback: function () {
-                        console.log('threshold slide get_layer');
-                        $(document).cdc_app(
-                          'maps.get_layer',
-                          options.query, //clone_query,
-                          options.var_data,
-                        );
-                      },
-                    },
-                  );
-                },
-                change: function (e, ui) {
-                  hidden_input
-                    .val(fields.var_names[ui.value].variable)
-                    .trigger('change');
-                },
-                stop: function (e, ui) {
-                  // if (status != 'init') {
-                  console.log('status = input');
-                  options.status = 'input';
-                  // }
-                },
-              });
-
-            // find out which index of the var_names array
-            // is the field's value
-
-            // console.log('find ' + options.query.var + ' in var_data');
-
-            fields.var_names.forEach(function (var_name, i) {
-              if (Object.values(var_name).includes(options.query.var)) {
-                // console.log(i, var_name);
-
-                options.elements.threshold_slider.slider('option', 'value', i);
-
-                // set handle text
-                options.elements.threshold_slider
-                  .find('.ui-slider-handle')
-                  .text(fields.var_names[i].label);
-              }
-            });
-
-            // enable the thresholds accordion
-
-            item
-              .find('#threshold-preset-head .accordion-button')
-              .prop('disabled', false);
-
-            // show the thresholds accordion
-
-            if (!item.find('#threshold-preset').hasClass('show')) {
+          if (options.var_flags.threshold == false) {
+            if (!item.find('#threshold-custom').hasClass('show')) {
               item
-                .find('#threshold-preset-head .accordion-button')
+                .find('#threshold-custom-head .accordion-button')
                 .trigger('click');
             }
           }
+        }
 
-          if (
-            fields.thresholds != undefined &&
-            Array.isArray(fields.thresholds) &&
-            fields.thresholds.length > 1
-          ) {
-            //
-            // VAR FLAG: CUSTOM
-            //
+        if (typeof fields.var_names != 'undefined') {
+          // var has at least 1 value in var_names
 
-            options.var_flags.custom = true;
+          if (fields.var_names != null) {
+            if (
+              fields.var_names.length > 1 ||
+              (fields.var_names.length == 1 && options.var_flags.custom)
+            ) {
+              //
+              // VAR FLAG: THRESHOLD
+              //
 
-            // setup slider and custom inputs
+              options.var_flags.threshold = true;
 
-            item
-              .find('#threshold-custom .accordion-body')
-              .html(plugin.generate_custom_inputs(fields.thresholds));
+              if (fields.var_names.length > 1) {
+                // multiple vars
 
-            // enable the custom accordion
+                item.find('#threshold-preset .map-control-slider-well').show();
 
-            item
-              .find('#threshold-custom-head .accordion-button')
-              .prop('disabled', false);
+                item.find('#threshold-preset .single-preset-label').hide();
 
-            if (options.var_flags.threshold == false) {
-              if (!item.find('#threshold-custom').hasClass('show')) {
+                if (options.elements.threshold_slider != null) {
+                  options.elements.threshold_slider
+                    .off('slide')
+                    .off('change')
+                    .off('stop');
+
+                  options.elements.threshold_slider.slider('destroy');
+                }
+
+                options.elements.threshold_slider = item
+                  .find('#threshold-slider')
+                  .slider({
+                    min: 0,
+                    max: fields.var_names.length - 1,
+                    step: 1,
+                    animate: true,
+                    create: function (e, ui) {
+                      // console.log('threshold slider', 'create');
+
+                      $(this)
+                        .find('.ui-slider-handle')
+                        .text(fields.var_names[0].label);
+                    },
+                    slide: function (e, ui) {
+                      // update the hidden input/query
+
+                      options.status = 'slide';
+
+                      $(this)
+                        .find('.ui-slider-handle')
+                        .text(fields.var_names[ui.value].label);
+
+                      options.query.var = fields.var_names[ui.value].variable;
+
+                      options.query_str.prev = options.query_str.current;
+
+                      options.query_str.current = $(document).cdc_app(
+                        'query.eval',
+                        {
+                          query: options.query,
+                          do_history: 'none',
+                          callback: function () {
+                            console.log('threshold slide get_layer');
+                            $(document).cdc_app(
+                              'maps.get_layer',
+                              options.query,
+                              options.var_data,
+                              options.request,
+                            );
+                          },
+                        },
+                      );
+                    },
+                    change: function (e, ui) {
+                      hidden_input
+                        .val(fields.var_names[ui.value].variable)
+                        .trigger('change');
+                    },
+                    stop: function (e, ui) {
+                      // if (status != 'init') {
+                      console.log('status = input');
+                      options.status = 'input';
+                      // }
+                    },
+                  });
+
+                // find out which index of the var_names array
+                // is the field's value
+
+                // console.log('find ' + options.query.var + ' in var_data');
+
+                fields.var_names.forEach(function (var_name, i) {
+                  if (Object.values(var_name).includes(options.query.var)) {
+                    // console.log(i, var_name);
+
+                    options.elements.threshold_slider.slider(
+                      'option',
+                      'value',
+                      i,
+                    );
+
+                    // set handle text
+                    options.elements.threshold_slider
+                      .find('.ui-slider-handle')
+                      .text(fields.var_names[i].label);
+                  }
+                });
+              } else {
+                // 1 var
+
+                item.find('#threshold-preset .map-control-slider-well').hide();
+
                 item
-                  .find('#threshold-custom-head .accordion-button')
+                  .find('#threshold-preset .single-preset-label')
+                  .text(fields.var_names[0].label)
+                  .show();
+              }
+
+              // enable the thresholds accordion
+
+              item
+                .find('#threshold-preset-head .accordion-button')
+                .prop('disabled', false);
+
+              // show the thresholds accordion
+
+              if (!item.find('#threshold-preset').hasClass('show')) {
+                item
+                  .find('#threshold-preset-head .accordion-button')
                   .trigger('click');
               }
             }
@@ -2260,6 +2318,13 @@
 
         // console.log(options.query.sector);
         // console.log(options.current_grid, fields.grid);
+
+        // if (options.var_data.acf.var_names[0].variable == 'slr') {
+        //   item
+        //     .find('#area-aggregation-grid')
+        //     .prop('checked', true)
+        //     .trigger('change');
+        // }
 
         if (options.query.sector == 'gridded_data') {
           // if the grid name changes
@@ -2315,15 +2380,105 @@
       }
     },
 
-    set_controls: function (fields) {
-      console.log('--- start set_controls');
-
+    populate_relevant: function (var_id) {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
 
-      let items_to_hide = [],
-        items_to_show = [];
+      item.find('#info-relevant-vars').empty();
+      item.find('#info-relevant-vars-btn').hide();
+      item.find('#info-relevant-sectors').empty();
+      item.find('#info-relevant-sectors-btn').hide();
+      item.find('#info-relevant-training').empty();
+      item.find('#info-relevant-training-btn').hide();
+
+      $.ajax({
+        url: ajax_data.rest_url + 'cdc/v2/related/',
+        type: 'GET',
+        dataType: 'json',
+        data: {
+          var_id: var_id,
+        },
+        success: function (data) {
+          // vars
+
+          let item_card =
+            '<div class="card text-bg-dark bg-opacity-40 mb-3 p-3">';
+
+          if (data.vars.length > 0) {
+            item.find('#info-relevant-vars-btn').show();
+
+            data.vars.forEach(function (query_item, i) {
+              let new_item = $(item_card);
+
+              new_item.append(
+                '<h4 class="card-title">' + query_item.title + '</h4>',
+              );
+              new_item.append(
+                '<a href="#" data-query-key="var_id" data-query-val="' +
+                  query_item.id +
+                  '">' +
+                  'View on map' +
+                  '</a>',
+              );
+
+              item.find('#info-relevant-vars').append(new_item);
+            });
+          } else {
+          }
+
+          // sectors
+
+          if (data.sectors.length > 0) {
+            item.find('#info-relevant-sectors-btn').show();
+
+            data.sectors.forEach(function (query_item, i) {
+              let new_item = $(item_card);
+
+              new_item.append(
+                '<h4 class="card-title">' + query_item.title + '</h4>',
+              );
+              new_item.append(
+                '<a href="' + query_item.url + '">' + 'View' + '</a>',
+              );
+
+              item.find('#info-relevant-sectors').append(new_item);
+            });
+          }
+
+          // resources
+
+          if (data.training.length > 0) {
+            item.find('#info-relevant-training-btn').show();
+
+            data.training.forEach(function (query_item, i) {
+              let new_item = $(item_card);
+
+              new_item.append(
+                '<h4 class="card-title">' + query_item.title + '</h4>',
+              );
+              new_item.append(
+                '<a href="' + query_item.url + '">' + 'View' + '</a>',
+              );
+
+              item.find('#info-relevant-training').append(new_item);
+            });
+          }
+
+          item
+            .find('#info-relevant-tabs .btn:visible')
+            .first()
+            .trigger('click');
+        },
+      });
+    },
+
+    set_controls: function (fields) {
+      // console.log('--- start set_controls');
+
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
 
       // VAR FLAGS
 
@@ -2334,14 +2489,17 @@
 
       switch (options.request.type) {
         case 'single':
+        case 'threshold':
           item.find('.leaflet-raster-pane').show();
           // console.log('show legend');
-          item.find('.info.legend').show();
+          // item.find('.info.legend').show();
           break;
-        case 'custom':
         case 'ahccd':
-          console.log('hide legend');
-          item.find('.info.legend').hide();
+        case 'station':
+          options.query.sector = 'station';
+
+          // console.log('hide legend');
+          // item.find('.info.legend').hide();
           break;
       }
 
@@ -2396,6 +2554,28 @@
         }
       });
 
+      //
+
+      // AHCCD preset
+
+      if (options.query.var == 'ahccd') {
+        item.find('#map-control-datepicker').hide();
+        item.find('#details-format-netcdf').parent().show();
+        item.find('#details-format-json').parent().hide();
+      }
+
+      if (options.query.var == 'idf') {
+        item.find('#map-control-datepicker').hide();
+        item.find('#map-control-format').hide();
+        item
+          .find('.control-bar-tab-link[href="#details"]')
+          .addClass('disabled');
+      } else {
+        item
+          .find('.control-bar-tab-link[href="#details"]')
+          .removeClass('disabled');
+      }
+
       // THRESHOLDS
 
       if (options.request.type == 'threshold') {
@@ -2406,11 +2586,11 @@
         }
       }
 
+      // DATA TAB
+
       // dataset
 
       if (fields) {
-        // console.log('DATASETS', fields.dataset_availability);
-
         // enable all
         item
           .find('#map-control-dataset .form-check-input')
@@ -2431,26 +2611,14 @@
           !item.find('#map-control-dataset :input:not([disabled]):checked')
             .length
         ) {
-          // console.log('nothing is checked');
-
           // nothing is checked
           // find the first enabled input and check it
-
-          // console.log(
-          //   'first',
-          //   item.find('#map-control-dataset :input:not([disabled])').first(),
-          // );
 
           item
             .find('#map-control-dataset :input:not([disabled])')
             .first()
             .prop('checked', true);
         }
-
-        // console.log(
-        //   'trigger',
-        //   item.find('#map-control-dataset :input:checked'),
-        // );
 
         item.find('#map-control-dataset :input:checked').trigger('change');
 
@@ -2478,7 +2646,7 @@
             .each(function () {
               // sector isn't available to the variable
               if (!fields.availability.includes($(this).val())) {
-                // console.log('uncheck', $(this));
+                console.log('uncheck', $(this));
 
                 $(this).prop('disabled', true);
 
@@ -2487,13 +2655,17 @@
               }
             });
 
-          if (!item.find('#map-control-aggregation :checked').length) {
+          if (
+            !item.find(
+              '#map-control-aggregation [data-query-key="sector"] :checked',
+            ).length
+          ) {
             // nothing is checked
             // find the first enabled input and check it
 
             item
               .find(
-                '#map-control-aggregation .form-check-input:not([disabled])',
+                '#map-control-aggregation .form-check-input[data-query-key="sector"]:not([disabled])',
               )
               .first()
               .prop('checked', true);
@@ -2521,6 +2693,19 @@
         // checkboxes - Annual, Monthly, 2QS-APR, QS-DEC (Seasonal), Daily
 
         plugin.update_frequency();
+      }
+
+      // scenarios
+
+      if (options.request.type !== 'custom') {
+        item
+          .find('#map-control-panels .form-check-input')
+          .prop('checked', false);
+
+        item
+          .find('#details-scenarios-high')
+          .prop('checked', true)
+          .trigger('change');
       }
 
       // console.log('--- end of set_controls');
@@ -2649,11 +2834,9 @@
         item = plugin.item;
 
       $.ajax({
-        url: ajax_data.url,
+        url: ajax_data.rest_url + 'cdc/v2/get_location_by_coords/',
         dataType: 'json',
         data: {
-          action: 'cdc_get_location_by_coords',
-          lang: options.lang,
           lat: coords.lat,
           lng: coords.lng,
           sealevel: false,
@@ -3293,10 +3476,6 @@
             data: query.end_year,
           },
           {
-            id: 'ensemble_percentiles',
-            data: query.percentiles.join(','),
-          },
-          {
             id: 'dataset',
             data: DATASETS[query.dataset].finch_name,
           },
@@ -3362,6 +3541,15 @@
             .toLowerCase(),
         });
       });
+
+      // percentiles
+
+      if (query.percentiles.join(',') != 'all') {
+        form_obj.inputs.push({
+          id: 'ensemble_percentiles',
+          data: query.percentiles.join(','),
+        });
+      }
 
       // lat/lng
 
@@ -4118,9 +4306,10 @@
               '" ' +
               'data-units="' +
               element.units +
-              '" ' +
-              (element.min != '' ? 'min="' + element.min + '" ' : '') +
-              (element.max != '' ? 'max="' + element.max + '" ' : '');
+              '" ';
+
+            if (element.min != '') output += 'min="' + element.min + '" ';
+            if (element.max != '') output += 'max="' + element.max + '" ';
 
             if (element.decimals != '' && element.decimals != '0') {
               output += 'step="0.';
@@ -4197,7 +4386,10 @@
         let this_map = options.maps[key];
 
         // hide grid
-        if (this_map.object.hasLayer(this_map.layers.grid)) {
+        if (
+          this_map.layers.grid &&
+          this_map.object.hasLayer(this_map.layers.grid)
+        ) {
           this_map.object.removeLayer(this_map.layers.grid);
         }
 
@@ -4395,7 +4587,10 @@
       } else if (options.selection_mode == 'draw') {
         if (options.query.hasOwnProperty('bbox')) {
           let coords = options.query.bbox,
-            var_grid = options.var_data.acf.grid;
+            var_grid =
+              options.var_data == null
+                ? 'canadagrid'
+                : options.var_data.acf.grid;
 
           result = Math.round(
             ((coords[2] - coords[0]) * (coords[3] - coords[1])) /

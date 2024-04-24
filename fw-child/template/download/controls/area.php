@@ -113,7 +113,7 @@
 						class="custom-select custom-select-md select2 form-control" 
 						name="area-search" 
 						id="area-search" 
-						data-placeholder="<?php _e ( 'City, landmark or postal code','cdc' ); ?>"
+						data-placeholder="<?php _e ( 'Community, landmark or coordinates','cdc' ); ?>"
 					>
 						<option value=""><?php _e('Search for a City/Town', 'cdc'); ?></option>
 						

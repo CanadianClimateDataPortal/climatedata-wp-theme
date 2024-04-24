@@ -83,6 +83,16 @@
                 fillOpacity: defaults.grid.styles.fill.default.opacity,
               };
             },
+            slrgrid: function (properties, zoom) {
+              return {
+                weight: defaults.grid.styles.line.default.weight,
+                color: defaults.grid.styles.line.default.color,
+                opacity: defaults.grid.styles.line.default.opacity,
+                fill: true,
+                radius: 4,
+                fillOpacity: defaults.grid.styles.fill.default.opacity,
+              };
+            },
             health: null,
             census: null,
             watershed: null,
@@ -964,6 +974,9 @@
               }
             });
 
+            console.log('spinner off');
+            $('body').removeClass('spinner-on');
+
             break;
           default:
             // choropleth
@@ -1125,13 +1138,18 @@
 
                   $.when(get_choro_data(query, key)).done(
                     function (layer_data) {
-                      // console.log(key, layer_data);
+                      console.log(key, layer_data);
 
                       if (layer_data == null) {
                         options.choro.reset_features = true;
 
-                        for (i = 0; i < options.choro.data[key]; i += 1) {
-                          options.choro.data[key][i] = 0;
+                        if (
+                          options.choro.data.hasOwnProperty('key') &&
+                          options.choro.data[key].length
+                        ) {
+                          for (i = 0; i < options.choro.data[key]; i += 1) {
+                            options.choro.data[key][i] = 0;
+                          }
                         }
                       } else {
                         options.choro.reset_features = false;
@@ -1184,6 +1202,17 @@
                         this_map.object.hasLayer(this_map.layers.grid)
                       ) {
                         // console.log('HAS LAYER');
+
+                        // if (
+                        //   layer_data != null ||
+                        //   (options.choro.data.hasOwnProperty('key') &&
+                        //     Array.isArray(options.choro.data[key]))
+                        // ) {
+                        //   console.log('HAS ARRAY');
+                        // }
+
+                        // if we have a grid layer
+                        // AND a data array that we can work with
 
                         // choro_path has changed and
                         // the grid layer already exists,
@@ -1260,16 +1289,19 @@
                             let style_obj = {
                               weight: 1.5,
                               fill: false,
-                              fillOpacity: 1,
-                              fillColor: plugin.maps.get_color.apply(item, [
-                                options.choro.data[key][e.layer.properties.id],
-                              ]),
                             };
-
-                            // console.log(options.choro.reset_features);
 
                             if (options.choro.reset_features == false) {
                               style_obj.fill = true;
+                              style_obj.fillColor = plugin.maps.get_color.apply(
+                                item,
+                                [
+                                  options.choro.data[key][
+                                    e.layer.properties.id
+                                  ],
+                                ],
+                              );
+                              style_obj.fillOpacity = 1;
                             }
 
                             $(document).trigger('map_item_mouseover', [
@@ -1282,14 +1314,19 @@
                             let style_obj = {
                               weight: 1.5,
                               fill: false,
-                              fillOpacity: 1,
-                              fillColor: plugin.maps.get_color.apply(item, [
-                                options.choro.data[key][e.layer.properties.id],
-                              ]),
                             };
 
                             if (options.choro.reset_features == false) {
                               style_obj.fill = true;
+                              style_obj.fillOpacity = 1;
+                              style_obj.fillColor = plugin.maps.get_color.apply(
+                                item,
+                                [
+                                  options.choro.data[key][
+                                    e.layer.properties.id
+                                  ],
+                                ],
+                              );
                             }
 
                             $(document).trigger('map_item_mouseout', [
@@ -1302,19 +1339,19 @@
                             let style_obj = {
                               weight: 1.5,
                               fill: false,
-                              fillOpacity: 1,
-                              fillColor: plugin.maps.get_color.apply(item, [
-                                options.choro.data[key][e.layer.properties.id],
-                              ]),
                             };
 
-                            // console.log(e);
-
                             if (options.choro.reset_features == false) {
-                              // console.log(e.layer.properties.id);
-                              // console.log(layer_data[e.layer.properties.id]);
-
                               style_obj.fill = true;
+                              style_obj.fillOpacity = 1;
+                              style_obj.fillColor = plugin.maps.get_color.apply(
+                                item,
+                                [
+                                  options.choro.data[key][
+                                    e.layer.properties.id
+                                  ],
+                                ],
+                              );
                             }
 
                             $(document).trigger('map_item_select', [

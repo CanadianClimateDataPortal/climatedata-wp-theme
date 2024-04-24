@@ -395,6 +395,7 @@
       // SELECT2
 
       item.find('#station-select').select2({
+        theme: 'bootstrap-5',
         language: options.lang,
         multiple: true,
         closeOnSelect: false,
@@ -481,26 +482,26 @@
           plugin.set_controls(options.var_data.acf);
 
           // trigger any input change
-          options.query_str.prev = options.query_str.current;
+          // options.query_str.prev = options.query_str.current;
 
-          options.query_str.current = $(document).cdc_app('query.eval', {
-            query: options.query,
-            do_history: 'replace',
-            callback: function () {
-              plugin.update_default_scheme(function () {
-                console.log('accordion get layer');
+          // options.query_str.current = $(document).cdc_app('query.eval', {
+          //   query: options.query,
+          //   do_history: 'replace',
+          //   callback: function () {
+          //     plugin.update_default_scheme(function () {
+          //       console.log('accordion get layer');
 
-                $(document).cdc_app(
-                  'maps.get_layer',
-                  options.query,
-                  options.var_data,
-                  options.request,
-                );
+          // $(document).cdc_app(
+          //   'maps.get_layer',
+          //   options.query,
+          //   options.var_data,
+          //   options.request,
+          // );
 
-                options.status = 'ready';
-              });
-            },
-          });
+          //   options.status = 'ready';
+          // });
+          // },
+          // });
         },
       );
 
@@ -535,6 +536,7 @@
       // SELECT2
 
       $('#area-search').select2({
+        theme: 'bootstrap-5',
         language: {
           inputTooShort: function () {
             let instructions = '<div class="geo-select-instructions">';
@@ -972,7 +974,10 @@
       item.find('#area-search').on('select2:select', function (e) {
         console.log('selected', e.params.data);
 
-        plugin.set_location({ lat: e.params.data.lat, lng: e.params.data.lon });
+        plugin.set_location({
+          lat: e.params.data.lat,
+          lng: e.params.data.lon,
+        });
       });
 
       // area search pan to coords btn
@@ -1020,8 +1025,6 @@
         };
 
         plugin.update_station_markers($(this).val(), this_gid);
-
-        $('#control-bar').tab_drawer('update_path', '#submit');
       });
 
       item.find('#station-select').on('select2:unselect', function (e) {
@@ -1409,7 +1412,7 @@
     },
 
     handle_input: function (input, status) {
-      console.log('--- start handle_input');
+      // console.log('--- start handle_input');
 
       let plugin = this,
         options = plugin.options,
@@ -1717,13 +1720,14 @@
 
           switch (this_val) {
             case 'gridded_data':
-              console.log('gridded');
+              // console.log('gridded');
               if (options.request.type != 'custom') {
-                console.log('show raster pane');
+                // console.log('show raster pane');
                 item.find('.leaflet-raster-pane').show();
               }
               break;
             case 'upload':
+              plugin.disable_bbox();
               options.elements.shapefile_upload.shapefile_upload('show');
               break;
           }
@@ -2297,6 +2301,13 @@
         // console.log(options.query.sector);
         // console.log(options.current_grid, fields.grid);
 
+        // if (options.var_data.acf.var_names[0].variable == 'slr') {
+        //   item
+        //     .find('#area-aggregation-grid')
+        //     .prop('checked', true)
+        //     .trigger('change');
+        // }
+
         if (options.query.sector == 'gridded_data') {
           // if the grid name changes
           // i.e. canadagrid > canadagrid1deg
@@ -2445,7 +2456,7 @@
     },
 
     set_controls: function (fields) {
-      console.log('--- start set_controls');
+      // console.log('--- start set_controls');
 
       let plugin = this,
         options = plugin.options,
@@ -2610,7 +2621,7 @@
             .each(function () {
               // sector isn't available to the variable
               if (!fields.availability.includes($(this).val())) {
-                // console.log('uncheck', $(this));
+                console.log('uncheck', $(this));
 
                 $(this).prop('disabled', true);
 
@@ -2619,13 +2630,17 @@
               }
             });
 
-          if (!item.find('#map-control-aggregation :checked').length) {
+          if (
+            !item.find(
+              '#map-control-aggregation [data-query-key="sector"] :checked',
+            ).length
+          ) {
             // nothing is checked
             // find the first enabled input and check it
 
             item
               .find(
-                '#map-control-aggregation .form-check-input:not([disabled])',
+                '#map-control-aggregation .form-check-input[data-query-key="sector"]:not([disabled])',
               )
               .first()
               .prop('checked', true);
@@ -4241,8 +4256,6 @@
             break;
 
           case 'input':
-            console.log('MIN/MAX', element.min, element.max);
-
             output +=
               '<input type="number" size="4" class="form-control form-control-sm threshold-input" autocomplete="off"' +
               'name="' +
@@ -4330,7 +4343,10 @@
         let this_map = options.maps[key];
 
         // hide grid
-        if (this_map.object.hasLayer(this_map.layers.grid)) {
+        if (
+          this_map.layers.grid &&
+          this_map.object.hasLayer(this_map.layers.grid)
+        ) {
           this_map.object.removeLayer(this_map.layers.grid);
         }
 
@@ -4528,7 +4544,10 @@
       } else if (options.selection_mode == 'draw') {
         if (options.query.hasOwnProperty('bbox')) {
           let coords = options.query.bbox,
-            var_grid = options.var_data.acf.grid;
+            var_grid =
+              options.var_data == null
+                ? 'canadagrid'
+                : options.var_data.acf.grid;
 
           result = Math.round(
             ((coords[2] - coords[0]) * (coords[3] - coords[1])) /

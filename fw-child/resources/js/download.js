@@ -2083,9 +2083,11 @@
             'var_tech_description' + (options.lang != 'en' ? '_fr' : '');
 
         item.find('#info-description').html(options.var_data.acf[desc_key]);
-        item
-          .find('#info-tech-description')
-          .html(options.var_data.acf[tech_key]);
+
+        if (options.var_data.acf[tech_key])
+          item
+            .find('#info-tech-description')
+            .html(options.var_data.acf[tech_key]);
 
         item.find('#breadcrumb-overlay-trigger').show();
 
@@ -2484,7 +2486,7 @@
 
       // console.log(options.var_flags);
 
-      // console.log('set controls');
+      console.log('set controls');
       // console.log('request type', options.request.type);
 
       switch (options.request.type) {
@@ -2620,7 +2622,7 @@
             .prop('checked', true);
         }
 
-        item.find('#map-control-dataset :input:checked').trigger('change');
+        item.find('#map-control-dataset :input:checked'); //.trigger('change');
 
         // AREA TAB
 
@@ -2672,7 +2674,7 @@
             // .trigger('change');
           }
 
-          item.find('#map-control-aggregation :checked').trigger('change');
+          item.find('#map-control-aggregation :checked'); //.trigger('change');
         } else {
           item.find('#map-control-aggregation').hide();
         }
@@ -2680,10 +2682,8 @@
         // selection mode
 
         if (options.var_data.var_types.includes('Station Data')) {
-          item
-            .find('#area-selection-select')
-            .prop('checked', true)
-            .trigger('change');
+          item.find('#area-selection-select').prop('checked', true);
+          //.trigger('change');
         }
 
         // DETAILS TAB
@@ -2702,10 +2702,8 @@
           .find('#map-control-panels .form-check-input')
           .prop('checked', false);
 
-        item
-          .find('#details-scenarios-high')
-          .prop('checked', true)
-          .trigger('change');
+        item.find('#details-scenarios-high').prop('checked', true);
+        //.trigger('change');
       }
 
       // console.log('--- end of set_controls');

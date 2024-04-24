@@ -126,22 +126,26 @@
 			
 			if (window.location.search) {
 				
-				let init_filters = window.location.search.split('q=')[1]
+				let init_filters = []
 				
-				if (init_filters.includes('&')) {
-					init_filters = init_filters.split('&')[0]
+				if (window.location.search.includes('q=')) {
+					init_filters = window.location.search.split('q=')[1]
+					
+					if (init_filters.includes('&')) {
+						init_filters = init_filters.split('&')[0]
+					}
+					
+					if (init_filters.includes('|')) {
+						init_filters = init_filters.split('|')
+					} else {
+						init_filters = [ init_filters ]
+					}
+					
+					init_filters.forEach(function(filter) {
+						let this_filter = filter.split(':')
+						options.elements.filters.find('.filter-item[data-key="' + this_filter[0] + '"][data-value="' + this_filter[1] + '"]').addClass('selected')
+					})
 				}
-				
-				if (init_filters.includes('|')) {
-					init_filters = init_filters.split('|')
-				} else {
-					init_filters = [ init_filters ]
-				}
-				
-				init_filters.forEach(function(filter) {
-					let this_filter = filter.split(':')
-					options.elements.filters.find('.filter-item[data-key="' + this_filter[0] + '"][data-value="' + this_filter[1] + '"]').addClass('selected')
-				})
 				
 			}
 			

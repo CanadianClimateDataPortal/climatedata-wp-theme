@@ -1119,7 +1119,7 @@
       item.on('click', '#recent-locations .clear', function (e) {
         let this_item = $(this).closest('.list-group-item');
 
-        $(document).cdc_app('maps.remove_marker', this_item.attr('data-index'));
+        plugin.remove_marker(this_item.attr('data-index'));
       });
 
       // view item in 'recent locations'
@@ -1147,7 +1147,7 @@
       // clear 'recent locations' list
 
       item.on('click', '#recent-locations-clear', function () {
-        $(document).cdc_app('maps.remove_markers');
+        plugin.remove_markers();
       });
 
       //
@@ -3180,6 +3180,8 @@
             // add marker
             plugin.create_marker(settings);
           }
+
+          item.find('#recent-locations-clear').show();
         }
 
         // OPEN LOCATION/STATION DETAIL TAB
@@ -3340,17 +3342,6 @@
       return recent_item;
     },
 
-    /*get_marker: function (marker_index, location) {
-      let plugin = this,
-        options = plugin.options,
-        item = plugin.item;
-
-      let recent_list = item.find('#recent-locations'),
-        marker = options.grid.markers.low[marker_index];
-
-      return marker;
-    },*/
-
     create_marker: function (location) {
       let plugin = this,
         options = plugin.options,
@@ -3397,6 +3388,61 @@
             marker.setIcon(options.grid.icons.small);
           }
         });
+      }
+    },
+
+    remove_marker: function (item_index) {
+      let plugin = !this.item ? this.data('cdc_app') : this,
+        options = plugin.options,
+        item = plugin.item;
+
+      // console.log('remove', item_index);
+
+      let no_markers = true;
+
+      // delete the item in the sidebar
+      item.find('#recent-locations .list-group-item').eq(item_index).remove();
+
+      for (let key in options.maps) {
+        console.log(options.grid.markers[key]);
+
+        // remove from map
+        options.maps[key].object.removeLayer(
+          options.grid.markers[key][item_index],
+          options.grid.markers[key][item_index],
+        );
+
+        // splice from the markers array
+        options.grid.markers[key].splice(item_index, 1);
+
+        if (options.grid.markers[key].length > 0) {
+          no_markers = false;
+        }
+      }
+
+      // reorder index attributes for the whole list
+      item.find('#recent-locations .list-group-item').each(function (i) {
+        $(this).attr('data-index', i);
+      });
+
+      console.log(no_markers);
+
+      if (no_markers == true) {
+        item.find('#recent-locations-clear').hide();
+      } else {
+        item.find('#recent-locations-clear').show();
+      }
+    },
+
+    remove_markers: function () {
+      let plugin = !this.item ? this.data('cdc_app') : this,
+        options = plugin.options,
+        item = plugin.item;
+
+      for (let key in options.maps) {
+        for (i = options.grid.markers[key].length - 1; i >= 0; i -= 1) {
+          plugin.remove_marker(i);
+        }
       }
     },
 

@@ -721,31 +721,6 @@
                 )
                 .trigger('change');
 
-              // console.log('moved map', options.status);
-
-              // simulate input event on coords field
-              // $('#coords-lat').trigger('change');
-
-              // if (options.status != 'init') {
-              // update query value
-              // $('[data-query-key="coords"]').each(function () {
-              //   $(document).cdc_app('query.update_value', options.query, {
-              //     item: $(this),
-              //     key: 'coords',
-              //     val: $(this).val(),
-              //   });
-              // });
-              // }
-
-              // update query string
-              // options.query_str.prev = options.query_str.current;
-
-              // options.query_str.current = $(document).cdc_app(
-              //   'query.obj_to_url',
-              //   options.query,
-              //   'replace',
-              // );
-
               $('body').removeClass('spinner-on');
               console.log('zoomend done');
             }
@@ -1078,7 +1053,7 @@
       // triggerable handler for [data-query-key] inputs
 
       item.on('update_input', function (event, item, status) {
-        // console.log('update input event', item.attr('id'), status);
+        console.log('update input event', item.attr('id'), status);
 
         if (item) {
           // reset history push counter
@@ -1765,6 +1740,7 @@
 
         // use cdc helper function to
         // update the value in the query object
+
         $(document).cdc_app('query.update_value', options.query, {
           item: input,
           key: this_key,
@@ -2035,7 +2011,7 @@
           // the one that was sent to the function
           // console.log('skip get_var_data');
         } else {
-          console.log('get_var_data because var_id changed');
+          // console.log('get_var_data because var_id changed');
 
           $(document).cdc_app('get_var_data', var_id, function (data) {
             console.log('get var data', data);
@@ -2058,8 +2034,6 @@
               if (status == 'input') {
                 hidden_input.trigger('change');
               }
-
-              console.log('done');
             } else {
               hidden_input.val('');
 
@@ -2084,10 +2058,16 @@
 
         item.find('#info-description').html(options.var_data.acf[desc_key]);
 
-        if (options.var_data.acf[tech_key])
+        if (options.var_data.acf[tech_key] != '') {
+          item.find('#info-tech-description').show();
+          item.find('#info-tech-description').prev().show();
           item
             .find('#info-tech-description')
             .html(options.var_data.acf[tech_key]);
+        } else {
+          item.find('#info-tech-description').prev().hide();
+          item.find('#info-tech-description').hide();
+        }
 
         item.find('#breadcrumb-overlay-trigger').show();
 
@@ -2622,7 +2602,7 @@
             .prop('checked', true);
         }
 
-        item.find('#map-control-dataset :input:checked'); //.trigger('change');
+        item.find('#map-control-dataset :input:checked').trigger('change');
 
         // AREA TAB
 
@@ -2674,7 +2654,7 @@
             // .trigger('change');
           }
 
-          item.find('#map-control-aggregation :checked'); //.trigger('change');
+          item.find('#map-control-aggregation :checked').trigger('change');
         } else {
           item.find('#map-control-aggregation').hide();
         }
@@ -2682,8 +2662,10 @@
         // selection mode
 
         if (options.var_data.var_types.includes('Station Data')) {
-          item.find('#area-selection-select').prop('checked', true);
-          //.trigger('change');
+          item
+            .find('#area-selection-select')
+            .prop('checked', true)
+            .trigger('change');
         }
 
         // DETAILS TAB
@@ -2697,13 +2679,23 @@
 
       // scenarios
 
-      if (options.request.type !== 'custom') {
-        item
-          .find('#map-control-panels .form-check-input')
-          .prop('checked', false);
+      if (options.request.type != 'custom') {
+        // if hiding scenarios,
+        // also deselect additional checks
+        // so the extra map panes go away
 
-        item.find('#details-scenarios-high').prop('checked', true);
-        //.trigger('change');
+        if (
+          item.find('#map-control-panels .form-check-input:checked').length > 1
+        ) {
+          item
+            .find('#map-control-panels .form-check-input')
+            .prop('checked', false);
+
+          item
+            .find('#details-scenarios-high')
+            .prop('checked', true)
+            .trigger('change');
+        }
       }
 
       // console.log('--- end of set_controls');
@@ -2881,7 +2873,7 @@
 
       function process_validate_queue(tabs) {
         $.when(plugin.validate_tab(tabs[0])).done(function (is_valid) {
-          console.log(tabs[0], is_valid);
+          // console.log(tabs[0], is_valid);
 
           const shift_tab = tabs.shift();
 

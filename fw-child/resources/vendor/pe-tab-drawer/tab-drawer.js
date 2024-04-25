@@ -66,7 +66,24 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 				e.preventDefault()
 				
 				pushes_since_input = 0
-				plugin.update_path($(this).attr('href'))
+				
+				let target_href = $(this).attr('href'),
+						link_drawer = $(this).closest('.tab-drawer')
+				
+				// if the linked drawer is already selected
+				// and is a child of the drawer
+				// that the link is in
+				
+				if (item.find($(this).attr('href')).hasClass('td-selected')) {
+					
+					if (item.find($(this).attr('href')).closest('.tab-drawer-container').closest('.tab-drawer').attr('id') == link_drawer.attr('id')) {
+						
+						target_href = '#' + item.find($(this).attr('href')).closest('.tab-drawer-container').closest('.tab-drawer').attr('id')
+						
+					}
+				}
+				
+				plugin.update_path(target_href)
 				
 			})
 			

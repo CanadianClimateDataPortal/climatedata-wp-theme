@@ -2625,7 +2625,7 @@
           // console.log('getting ' + chart_series.id);
 
           return $.getJSON(
-            'https://api.weather.gc.ca/collections/climate-normals/items?f=json&STN_ID=' +
+            'https://api.weather.gc.ca/collections/climate-normals/items?f=json&CLIMATE_IDENTIFIER=' +
               settings.station.id +
               '&NORMAL_ID=' +
               chart_series.id +

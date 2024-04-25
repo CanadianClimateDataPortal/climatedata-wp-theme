@@ -3034,7 +3034,7 @@
 
               return $.ajax({
                 url:
-                  'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=1&STN_ID=' +
+                  'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=1&CLIMATE_IDENTIFIER=' +
                   settings.location_id,
                 dataType: 'json',
                 success: function (data) {

@@ -783,6 +783,8 @@
 
         options.maps[key].object
           .on('zoomend dragend', function (e) {
+            plugin._grid_hover_cancel();
+
             // console.log(e, this);
 
             // if (options.status != 'init') {

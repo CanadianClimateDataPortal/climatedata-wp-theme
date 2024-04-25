@@ -2048,6 +2048,23 @@
             }
           }
         });
+      } else {
+        options.query.var = $(document).cdc_app(
+          'query.update_value',
+          options.query,
+          {
+            item: $('[data-query-key="var"]'),
+            key: 'var',
+            val: options.var_data[var_id].acf.var_names[0].variable,
+          },
+        );
+
+        // set hidden input
+        hidden_input.val(options.var_data[var_id].acf.var_names[0].variable);
+
+        if (status == 'input') {
+          hidden_input.trigger('change');
+        }
       }
 
       let new_var_data = options.var_data[var_id];

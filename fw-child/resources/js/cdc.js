@@ -891,6 +891,11 @@
                           ' (' + e.layer.feature.properties.Elevation_ + ')';
                       }
 
+                      if (query.var == 'station-data') {
+                        station_name +=
+                          ' (' + e.layer.feature.properties.STN_ID + ')';
+                      }
+
                       e.layer.bindTooltip(station_name).openTooltip(e.latlng);
                     })
                     .on('click', function (e) {
@@ -993,6 +998,8 @@
               if (options.request != null && options.request.type == 'custom') {
                 // blank sector grid
                 // choro values not needed
+
+                console.log('custom');
 
                 options.grid.leaflet.vectorTileLayerStyles[query.sector] =
                   function (properties, zoom) {
@@ -1141,7 +1148,7 @@
 
                   $.when(get_choro_data(query, key)).done(
                     function (layer_data) {
-                      console.log(key, layer_data);
+                      // console.log(key, layer_data);
 
                       if (layer_data == null) {
                         options.choro.reset_features = true;
@@ -1217,44 +1224,47 @@
                         // if we have a grid layer
                         // AND a data array that we can work with
 
-                        // choro_path has changed and
-                        // the grid layer already exists,
+                        // choro_path has changed AND
+                        // the grid layer already exists, AND
+                        // fetched layer_data is not null,
                         // so reset each feature
 
-                        for (
-                          let i = 0;
-                          i < options.choro.data[key].length;
-                          i++
-                        ) {
-                          let style_obj = {
-                            weight: 1,
-                            color: '#444',
-                            opacity: 0.5,
-                            fill: false,
-                            radius: 4,
-                            fillOpacity: 1,
-                          };
+                        if (layer_data != null) {
+                          for (
+                            let i = 0;
+                            i < options.choro.data[key].length;
+                            i++
+                          ) {
+                            let style_obj = {
+                              weight: 1,
+                              color: '#444',
+                              opacity: 0.5,
+                              fill: false,
+                              radius: 4,
+                              fillOpacity: 1,
+                            };
 
-                          if (options.choro.reset_features == true) {
-                            options.choro.data[key][i] = 0;
-                          } else {
-                            style_obj.color = '#fff';
-                            style_obj.fill = true;
-                            style_obj.fillColor = plugin.maps.get_color.apply(
-                              item,
-                              [options.choro.data[key][i]],
-                            );
+                            if (options.choro.reset_features == true) {
+                              options.choro.data[key][i] = 0;
+                            } else {
+                              style_obj.color = '#fff';
+                              style_obj.fill = true;
+                              style_obj.fillColor = plugin.maps.get_color.apply(
+                                item,
+                                [options.choro.data[key][i]],
+                              );
 
-                            if (query.selections.includes(String(i))) {
-                              style_obj.weight = 1.5;
-                              style_obj.color = '#f00';
+                              if (query.selections.includes(String(i))) {
+                                style_obj.weight = 1.5;
+                                style_obj.color = '#f00';
+                              }
                             }
-                          }
 
-                          options.maps[key].layers.grid.setFeatureStyle(
-                            i,
-                            style_obj,
-                          );
+                            options.maps[key].layers.grid.setFeatureStyle(
+                              i,
+                              style_obj,
+                            );
+                          }
                         }
 
                         console.log('spinner off');

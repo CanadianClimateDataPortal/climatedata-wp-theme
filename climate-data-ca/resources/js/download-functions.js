@@ -269,6 +269,11 @@
                     if (typeof maps['idf'] == 'undefined') {
                         idf_init()
                     }
+                } else if (ui.panel.attr('id') === 'bdv-download') {
+
+                    if (typeof maps['bdv'] == 'undefined') {
+                        bdv_init()
+                    }
 
                 } else if (ui.panel.attr('id') === 'ahccd-download') {
 
@@ -305,6 +310,12 @@
 
                     if (typeof maps['idf'] == 'undefined') {
                         idf_init()
+                    }
+
+                } else if (ui.newPanel.attr('id') === 'bdv-download') {
+
+                    if (typeof maps['bdv'] == 'undefined') {
+                        bdv_init()
                     }
 
                 } else if (ui.newPanel.attr('id') === 'ahccd-download') {
@@ -1932,6 +1943,111 @@
 
         }
 
+        var bdv_layer;
+        function bdv_init() {
+            create_map('bdv')
+
+            $.getJSON(data_url + '/fileserver/bdv/bdv.json', function (data) {
+
+                bdv_layer = L.geoJson(data, {
+                    onEachFeature: function (feature, layer) {
+
+                        $('<option value="' + feature.properties.ID + '">' + feature.properties.Location + '</option>').appendTo('#bdv-select')
+
+                    },
+                    pointToLayer: function (feature, latlng) {
+
+                        return L.circleMarker(latlng, {
+                            pane: 'idf',
+                            color: '#fff',
+                            opacity: 1,
+                            weight: 2,
+                            fillColor: '#3869f6',
+                            fillOpacity: 1,
+                            radius: 5
+                        })
+
+                    }
+
+                }).on('mouseover', function (e) {
+
+                    e.layer.bindTooltip(e.layer.feature.properties.Location).openTooltip(e.latlng)
+
+                }).on('click', function (e) {
+
+                    $('#bdv-select').val(e.layer.feature.properties.ID).trigger('change')
+
+                })
+
+                // sort options
+
+                var arr = $('#bdv-select option').map(function (_, o) {
+                    return { t: $(o).text(), v: o.value };
+                }).get()
+
+                arr.sort(function (o1, o2) {
+                    return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0;
+                })
+
+                $('#bdv-select option').each(function (i, o) {
+                    o.value = arr[i].v
+                    $(o).text(arr[i].t)
+                })
+
+                // add to map
+
+                bdv_layer.addTo(maps['bdv'])
+
+            })
+
+        }
+
+        $('#bdv-select').on('change', function (e) {
+            let marker_id = $(this).val()
+
+            $('#idf-links ul').empty()
+            $('#download-bdv-station').slideDown()
+
+            // find the feature in the IDF layer
+            bdv_layer.eachLayer(function (layer) {
+
+
+                if (layer.feature.properties.ID == marker_id) {
+
+
+                    layer.setStyle({
+                        fillColor: '#F00'
+                    })
+
+                    var current_view = maps['bdv'].getZoom()
+
+                    if (current_view < 7) {
+                        current_view = 7
+                    }
+
+                    maps['bdv'].setView([layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0]], current_view);
+                    $('#bdv-station-name h5').text(layer.feature.properties.Location);
+                    $('#bdv-link').attr('href', data_url + '/fileserver/bdv/' + layer.feature.properties.filename);
+                } else {
+                    layer.setStyle({
+                        fillColor: '#3869f6'
+                    })
+
+                }
+            })
+
+            setTimeout(function () {
+
+                $(document).smooth_scroll({
+                    id: $('#download-bdv-station'),
+                    speed: 1000,
+                    ease: 'swing',
+                    offset: 100
+                })
+
+            }, 500)
+        })
+
         function set_datalayer_for_download_IDFCurves(idf_curves_datalayer_event_name, file) {
             // ex: Download_IDF-Curves_Short Duration Rainfall Intensity−Duration−Frequency Data (PDF) -->  Download_IDF-Curves_Short_Duration_Rainfall_Intensity−Duration−Frequency_Data_PDF
             idf_curves_datalayer_event_name = idf_curves_datalayer_event_name.replaceAll(' ', '_');
@@ -2192,7 +2308,7 @@
                 pane: 'labels'
             }).addTo(maps[map_var]);
 
-            if (map_var == 'station' || map_var == 'normals' || map_var == 'idf' || map_var == 'ahccd') {
+            if (map_var == 'station' || map_var == 'normals' || map_var == 'idf' || map_var == 'ahccd' || map_var == 'bdv') {
 
                 maps[map_var].createPane('idf');
                 maps[map_var].getPane('idf').style.zIndex = 600;

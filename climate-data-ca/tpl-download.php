@@ -94,6 +94,7 @@ if (have_posts()) : while (have_posts()) : the_post();
                 <li class="nav-item"><a href="#var-download" class="nav-link px-4 py-5 all-caps"><?php _e('Variable Data', 'cdc'); ?></a></li>
                 <li class="nav-item"><a href="#station-download" class="nav-link px-4 py-5 all-caps"><?php _e('Station Data', 'cdc'); ?></a></li>
                 <li class="nav-item"><a href="#idf-download" class="nav-link px-4 py-5 all-caps"><?php _e('IDF Curves', 'cdc'); ?></a></li>
+                <li class="nav-item"><a href="#bdv-download" class="nav-link px-4 py-5 all-caps"><?php _e('Building Design Value', 'cdc'); ?></a></li>
                 <li class="nav-item"><a href="#ahccd-download" class="nav-link px-4 py-5 all-caps"><?php _e('AHCCD', 'cdc'); ?></a></li>
                 <li class="nav-item"><a href="#normals-download" class="nav-link px-4 py-5 all-caps"><?php _e('Climate Normals', 'cdc'); ?></a></li>
             </ul>
@@ -185,6 +186,35 @@ if (have_posts()) : while (have_posts()) : the_post();
             include(locate_template('template/download/idf.php'));
 
           ?>
+        </section>
+
+        <section id="bdv-download" class="page-section tab">
+            <?php
+
+            if ( have_rows ( 'download_tabs' ) ) {
+                while ( have_rows ( 'download_tabs' ) ) {
+                    the_row();
+
+                    if ( get_sub_field ( 'bdv' ) != '' ) {
+
+                        ?>
+
+                        <div class="row mb-5">
+                            <div class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3 p-5 bg-light">
+                                <?php the_sub_field ( 'bdv' ); ?>
+                            </div>
+                        </div>
+
+                        <?php
+
+                    }
+
+                }
+            }
+
+            include(locate_template('template/download/bdv.php'));
+
+            ?>
         </section>
 
         <section id="ahccd-download" class="page-section tab">

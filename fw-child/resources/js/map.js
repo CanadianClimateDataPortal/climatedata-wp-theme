@@ -1075,11 +1075,13 @@
       // click marker
 
       item.on('click_marker', function (e, mouse_event) {
+        console.log(mouse_event.latlng);
+
         let list_item = item.find(
           '#recent-locations [data-coords="' +
-            mouse_event.latlng.lat.toFixed(4) +
+            parseFloat(mouse_event.latlng.lat).toFixed(4) +
             ',' +
-            mouse_event.latlng.lng.toFixed(4) +
+            parseFloat(mouse_event.latlng.lng).toFixed(4) +
             '"]',
         );
 

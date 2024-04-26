@@ -812,21 +812,28 @@
 
             // console.log(e, this);
 
-            // if (options.status != 'init') {
-            //   options.status = 'mapdrag';
-            // }
-
             // update coord text fields
-            $('#coords-lat').val(this.getCenter().lat.toFixed(4));
-            $('#coords-lng').val(this.getCenter().lng.toFixed(4));
+
+            let lat_val = this.getCenter().lat.toFixed(4),
+              lng_val = this.getCenter().lng.toFixed(4);
+
+            if (options.lang == 'fr') {
+              lat_val = lat_val.replace('.', ',');
+              lng_val = lng_val.replace('.', ',');
+            }
+
+            // console.log(lat_val, lng_val);
+
+            $('#coords-lat').val(lat_val);
+            $('#coords-lng').val(lng_val);
             $('#coords-zoom').val(this.getZoom());
 
             // update hidden coords field
             $('[data-query-key="coords"]')
               .val(
-                $('#coords-lat').val() +
+                this.getCenter().lat.toFixed(4) +
                   ',' +
-                  $('#coords-lng').val() +
+                  this.getCenter().lng.toFixed(4) +
                   ',' +
                   $('#coords-zoom').val(),
               )
@@ -1342,11 +1349,13 @@
       });
 
       item.on('change', '.coord-field', function () {
+        // console.log($('#coords-lat').val(), $('#coords-lng').val());
+
         // repopulate the hidden coords field
         $('[data-query-key="coords"]').val(
-          $('#coords-lat').val() +
+          $('#coords-lat').val().replace(',', '.') +
             ',' +
-            $('#coords-lng').val() +
+            $('#coords-lng').val().replace(',', '.') +
             ',' +
             $('#coords-zoom').val(),
         );
@@ -1629,16 +1638,24 @@
             // console.log('coords', lat, lng, zoom);
 
             if (!isNaN(lat) && !isNaN(lng) && !isNaN(zoom)) {
-              // only if all values exist
-              $('#coords-lat').val(lat);
-              $('#coords-lng').val(lng);
-              $('#coords-zoom').val(zoom);
-
               // update the map view
               // console.log('set view', lat, lng, zoom);
               Object.values(options.maps)[0].object.setView([lat, lng], zoom, {
                 animate: false,
               });
+
+              lat = lat.toFixed(4);
+              lng = lng.toFixed(4);
+
+              if (options.lang == 'fr') {
+                lat = lat.replace('.', ',');
+                lng = lng.replace('.', ',');
+              }
+
+              // only if all values exist
+              $('#coords-lat').val(lat);
+              $('#coords-lng').val(lng);
+              $('#coords-zoom').val(zoom);
             }
           }
 

@@ -134,7 +134,7 @@
 				</div>
 				
 				<div id="map-control-coords" class="map-control-item">
-					<h6 class="all-caps text-secondary"><?php _e ( 'Change Coordinates', 'cdc' ); ?></h6>
+					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Change Coordinates', 'cdc' ); ?></h6>
 					
 					<input type="hidden" name="coords" id="coords" data-query-key="coords">
 					

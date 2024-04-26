@@ -708,13 +708,23 @@
             // console.log(e, this);
 
             if (options.status != 'init') {
-              console.log('zoomend start');
+              // console.log('zoomend start');
               // options.status = 'mapdrag';
 
               // update coord text fields
 
-              $('#coords-lat').val(this.getCenter().lat.toFixed(4));
-              $('#coords-lng').val(this.getCenter().lng.toFixed(4));
+              let lat_val = this.getCenter().lat.toFixed(4),
+                lng_val = this.getCenter().lng.toFixed(4);
+
+              if (options.lang == 'fr') {
+                lat_val = lat_val.replace('.', ',');
+                lng_val = lng_val.replace('.', ',');
+              }
+
+              // console.log(lat_val, lng_val);
+
+              $('#coords-lat').val(lat_val);
+              $('#coords-lng').val(lng_val);
               $('#coords-zoom').val(this.getZoom());
 
               // if (options.status == 'mapdrag') {
@@ -724,9 +734,9 @@
               // update hidden coords field
               $('[data-query-key="coords"]')
                 .val(
-                  $('#coords-lat').val() +
+                  this.getCenter().lat.toFixed(4) +
                     ',' +
-                    $('#coords-lng').val() +
+                    this.getCenter().lng.toFixed(4) +
                     ',' +
                     $('#coords-zoom').val(),
                 )
@@ -1123,14 +1133,16 @@
 
       item.on('click', '#map-control-coords .btn', function () {
         let this_input = $(this).siblings().filter('[type="text"]'),
-          this_val = parseFloat(this_input.val()),
+          this_val = parseFloat(this_input.val().replace(',', '.')),
           zoom_val = parseInt(item.find('#coords-zoom').val());
+
+        console.log('old val', this_val);
 
         if (this_input.attr('id') == 'coords-zoom') {
           // if changing the zoom, plus or minus 1 will suffice
-          if ($(this).hasClass('down-btn')) {
+          if ($(this).hasClass('down-btn') && zoom_val > 3) {
             this_val -= 1;
-          } else if ($(this).hasClass('up-btn')) {
+          } else if ($(this).hasClass('up-btn') && zoom_val < 11) {
             this_val += 1;
           }
         } else {
@@ -1158,19 +1170,33 @@
           }
         }
 
+        console.log('new val', this_val);
+
         // update & trigger
         this_input.val(this_val.toFixed(1)).trigger('change');
       });
 
       item.on('change', '.coord-field', function () {
+        // console.log(
+        //   'coord btn',
+        //   $('#coords-lat').val(),
+        //   $('#coords-lng').val(),
+        // );
+
         // repopulate the hidden coords field
         $('[data-query-key="coords"]').val(
-          $('#coords-lat').val() +
+          $('#coords-lat').val().replace(',', '.') +
             ',' +
-            $('#coords-lng').val() +
+            $('#coords-lng').val().replace(',', '.') +
             ',' +
             $('#coords-zoom').val(),
         );
+
+        if (options.status != 'init') {
+          options.status = 'input';
+        }
+
+        console.log('coords now', $('[data-query-key="coords"]').val());
 
         // trigger update event
         $(document).trigger('update_input', [$('[data-query-key="coords"]')]);
@@ -1689,19 +1715,26 @@
               lng = parseFloat(coords[1]),
               zoom = parseInt(coords[2]);
 
-            // console.log('coords', lat, lng, zoom);
+            console.log('coords', lat, lng, zoom);
 
             if (!isNaN(lat) && !isNaN(lng) && !isNaN(zoom)) {
+              // update the map view
+              Object.values(options.maps)[0].object.setView([lat, lng], zoom, {
+                animate: false,
+              });
+
+              lat = lat.toFixed(4);
+              lng = lng.toFixed(4);
+
+              if (options.lang == 'fr') {
+                lat = lat.replace('.', ',');
+                lng = lng.replace('.', ',');
+              }
+
               // only if all values exist
               $('#coords-lat').val(lat);
               $('#coords-lng').val(lng);
               $('#coords-zoom').val(zoom);
-
-              // update the map view
-              // console.log('set view', lat, lng, zoom);
-              Object.values(options.maps)[0].object.setView([lat, lng], zoom, {
-                animate: false,
-              });
             }
           }
 
@@ -1712,7 +1745,7 @@
           // clear the current selections
           plugin.reset_selections();
 
-          console.log('val sent to fn', this_val);
+          // console.log('val sent to fn', this_val);
 
           // item.find('[data-query-key="selections"]').val('').trigger('change');
 
@@ -2649,7 +2682,7 @@
             .each(function () {
               // sector isn't available to the variable
               if (!fields.availability.includes($(this).val())) {
-                console.log('uncheck', $(this));
+                // console.log('uncheck', $(this));
 
                 $(this).prop('disabled', true);
 

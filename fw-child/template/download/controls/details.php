@@ -124,7 +124,10 @@
 				</div>
 				
 				<div id="map-control-missing" class="map-control-item" data-request="ahccd">
-					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Missing Data Options', 'cdc' ); ?></h6>
+					<h6 class="d-flex align-items-center h6 mb-3 all-caps text-secondary">
+						<?php _e ( 'Missing Data Options', 'cdc' ); ?>
+						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="modal" data-bs-target="#missing-data-desc">?</a>
+					</h6>
 					
 					<div class="row row-cols-2">
 						<div class="form-check">
@@ -144,7 +147,7 @@
 						
 						<div class="form-check">
 							<input class="form-check-input" type="radio" name="details-missing" id="details-missing-wmo" value="wmo" data-query-key="check_missing">
-							<label class="form-check-label" for="details-missing-wmo">WMO Parameters</label>
+							<label class="form-check-label" for="details-missing-wmo"><?php _e ( 'WMO Parameters', 'cdc' ); ?></label>
 						</div>
 					</div>
 					

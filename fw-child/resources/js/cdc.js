@@ -672,6 +672,9 @@
               options.maps[key].object.removeControl(options.maps[key].legend);
             }
 
+            // hide upload pane
+            item.find('.leaflet-custom_shapefile-pane').hide();
+
             let get_layer_data = function (query_var) {
               console.log('get data', query_var);
 
@@ -950,6 +953,8 @@
             break;
           case 'upload':
             console.log('custom shapefile');
+
+            item.find('.leaflet-custom_shapefile-pane').show();
 
             Object.keys(options.maps).forEach(function (key) {
               let this_map = options.maps[key];

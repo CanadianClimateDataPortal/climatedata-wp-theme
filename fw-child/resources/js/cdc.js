@@ -8,6 +8,7 @@
       globals: ajax_data.globals,
       lang: ajax_data.globals.lang,
       post_id: null,
+      page_title: document.title,
       canadaBounds: L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.6, -49.9)),
       grid: {
         markers: {},
@@ -1697,7 +1698,7 @@
     },
 
     query: {
-      obj_to_url: function (query, do_history = 'push') {
+      obj_to_url: function (query, var_data = null, do_history = 'push') {
         let plugin = !this.item ? this.data('cdc_app') : this,
           options = plugin.options;
 
@@ -1729,21 +1730,53 @@
           query_str.join('&') +
           window.location.hash;
 
+        let new_title = options.page_title;
+
         // console.log('obj to url', result);
+
+        if (var_data != null) {
+          let new_title =
+            (options.lang != 'en'
+              ? var_data.meta.title_fr
+              : var_data.title.rendered) +
+            ' — ' +
+            options.page_title;
+        }
+        // console.log('new title', new_title);
+
+        document.title = new_title;
 
         if (do_history == 'push') {
           // console.log('cdc', 'push');
 
           if (pushes_since_input < 1) {
             pushes_since_input += 1;
-            console.log('push', result);
-            history.pushState({}, '', result);
+            // console.log('push', result);
+            history.pushState(
+              {
+                title: new_title,
+              },
+              new_title,
+              result,
+            );
           } else {
-            history.replaceState({}, '', result);
+            history.replaceState(
+              {
+                title: new_title,
+              },
+              new_title,
+              result,
+            );
           }
         } else if (do_history == 'replace') {
           // console.log('cdc', 'replace');
-          history.replaceState({}, '', result);
+          history.replaceState(
+            {
+              title: new_title,
+            },
+            new_title,
+            result,
+          );
         }
 
         return '?' + query_str.join('&');
@@ -1915,6 +1948,7 @@
           true,
           {
             query: null,
+            var_data: null,
             do_history: 'push',
             callback: null,
           },
@@ -1932,6 +1966,7 @@
 
         return plugin.query.obj_to_url.apply(item, [
           settings.query,
+          settings.var_data,
           settings.do_history,
         ]);
       },

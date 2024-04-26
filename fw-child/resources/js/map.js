@@ -9,6 +9,7 @@
       lang: 'en',
       post_id: null,
       page: 'map',
+      page_title: document.title,
       status: 'init',
       maps: {
         low: {
@@ -284,6 +285,7 @@
 
           options.query_str.current = $(document).cdc_app('query.eval', {
             query: options.query,
+            var_data: options.var_data[options.query.var_id],
             do_history: 'replace',
             callback: function () {
               // get map layer
@@ -422,6 +424,7 @@
           // eval
           options.query_str.current = $(document).cdc_app('query.eval', {
             query: clone_query,
+            var_data: options.var_data[options.query.var_id],
             do_history: 'none',
             callback: function () {
               // console.log('decade slider get_layer');
@@ -761,6 +764,8 @@
           .css('fill-opacity', new_opacity);
       }
 
+      console.log(this_pane);
+
       // if setting the marker layer
       if (this_pane == 'marker') {
         // also set the shadow
@@ -770,12 +775,22 @@
       }
 
       // if this is the 'data' slider, and
-      // we're looking at a sector layer
-      if (this_pane == 'raster' && options.query.sector != 'gridded_data') {
-        // also adjust the grid pane
-        item
-          .find('.leaflet-pane.leaflet-grid-pane')
-          .css('opacity', new_opacity);
+      if (this_pane == 'raster') {
+        if (options.query.sector == 'station') {
+          item
+            .find('.leaflet-pane.leaflet-stations-pane')
+            .css('opacity', new_opacity);
+
+          item
+            .find('.leaflet-pane.leaflet-marker-pane')
+            .css('opacity', new_opacity);
+        } else if (options.query.sector != 'gridded_data') {
+          // we're looking at a sector layer
+          // also adjust the grid pane
+          item
+            .find('.leaflet-pane.leaflet-grid-pane')
+            .css('opacity', new_opacity);
+        }
       }
     },
 
@@ -815,37 +830,6 @@
                   $('#coords-zoom').val(),
               )
               .trigger('change');
-
-            // if (options.status == 'mapdrag') {
-            //   options.status = 'input';
-            // }
-
-            // console.log('moved map', options.status);
-
-            // simulate input event on coords field
-            // $('#coords-lat').trigger('change');
-
-            //             if (options.status != 'init') {
-            //               // update query value
-            //               $('[data-query-key="coords"]').each(function () {
-            //                 $(document).cdc_app('query.update_value', options.query, {
-            //                   item: $(this),
-            //                   key: 'coords',
-            //                   val: $(this).val(),
-            //                 });
-            //               });
-            //             }
-            //
-            //             // update query string
-            //             options.query_str.prev = options.query_str.current;
-            //
-            //             options.query_str.current = $(document).cdc_app(
-            //               'query.obj_to_url',
-            //               options.query,
-            //               'replace',
-            //             );
-
-            // hide the zoom alert
           })
           .on('zoomend', function (e) {
             if (options.query.sector != 'station') {
@@ -1011,10 +995,9 @@
             coords: mouse_event.latlng,
             var_id: options.query.var_id,
             var: options.query.var,
-            var_title:
-              options.lang != 'en'
-                ? options.var_data[options.query.var_id].meta.title_fr
-                : options.var_data[options.query.var_id].title.rendered,
+            var_title: plugin.get_var_title(
+              options.var_data[options.query.var_id],
+            ),
           };
 
           if (options.query.sector == 'gridded_data') {
@@ -1074,10 +1057,9 @@
               location_id: this_gid,
               var_id: options.query.var_id,
               var: options.query.var,
-              var_title:
-                options.lang != 'en'
-                  ? options.var_data[options.query.var_id].meta.title_fr
-                  : options.var_data[options.query.var_id].title.rendered,
+              var_title: plugin.get_var_title(
+                options.var_data[options.query.var_id],
+              ),
             });
           }
         },
@@ -1216,10 +1198,9 @@
           location_id: e.params.data.id,
           var_id: options.query.var_id,
           var: options.query.var,
-          var_title:
-            options.lang != 'en'
-              ? options.var_data[options.query.var_id].meta.title_fr
-              : options.var_data[options.query.var_id].title.rendered,
+          var_title: plugin.get_var_title(
+            options.var_data[options.query.var_id],
+          ),
         });
 
         // plugin.set_location(
@@ -1421,6 +1402,7 @@
         const query_string = $(document).cdc_app(
           'query.obj_to_url',
           download_query,
+          options.var_data[options.query.var_id],
           null,
         );
 
@@ -1435,6 +1417,7 @@
         const query_string = $(document).cdc_app(
           'query.obj_to_url',
           options.query,
+          options.var_data[options.query.var_id],
           null,
         );
 
@@ -1682,13 +1665,19 @@
 
         options.query_str.prev = options.query_str.current;
 
+        // console.log('call eval');
+        // console.log(
+        //   JSON.stringify(options.var_data[options.query.var_id], null, 4),
+        // );
+
         console.log('handle_input call eval now, history: ' + do_history);
 
         options.query_str.current = $(document).cdc_app('query.eval', {
           query: options.query,
+          var_data: options.var_data[options.query.var_id],
           do_history: do_history,
           callback: function () {
-            console.log(options.var_data[options.query.var_id]);
+            // console.log(options.var_data[options.query.var_id]);
 
             plugin.update_default_scheme(function () {
               console.log('handle input get_layer', options.status);
@@ -1852,12 +1841,9 @@
                                   location_id: query[key],
                                   var_id: options.query.var_id,
                                   var: options.query.var,
-                                  var_title:
-                                    options.lang != 'en'
-                                      ? options.var_data[options.query.var_id]
-                                          .meta.title_fr
-                                      : options.var_data[options.query.var_id]
-                                          .title.rendered,
+                                  var_title: plugin.get_var_title(
+                                    options.var_data[options.query.var_id],
+                                  ),
                                 });
                               },
                             });
@@ -1978,6 +1964,15 @@
         function (query) {
           // replace query object
           options.query = { ...query };
+
+          console.log('new query');
+          console.log(JSON.stringify(options.query, null, 4));
+
+          document.title =
+            plugin.get_var_title(options.var_data[options.query.var_id]) +
+            ' — ' +
+            options.page_title;
+
           // refresh inputs
           plugin.refresh_inputs(options.query, options.status);
         },
@@ -1995,6 +1990,7 @@
 
         options.query_str.current = $(document).cdc_app('query.eval', {
           query: options.query,
+          var_data: options.var_data[options.query.var_id],
           do_history: 'none',
           callback: function () {
             console.log('eval get_layer');
@@ -2065,6 +2061,7 @@
             }
 
             if (status == 'input') {
+              console.log('update [name=var]', data.acf.var_names[0].variable);
               hidden_input.trigger('change');
             }
           }
@@ -2084,8 +2081,17 @@
         hidden_input.val(options.var_data[var_id].acf.var_names[0].variable);
 
         if (status == 'input') {
+          console.log(
+            'update [name=var]',
+            options.var_data[var_id].acf.var_names[0].variable,
+          );
           hidden_input.trigger('change');
         }
+
+        // update the control button
+        item
+          .find('.tab-drawer-trigger .var-name')
+          .text(plugin.get_var_title(options.var_data[var_id]));
       }
 
       let new_var_data = options.var_data[var_id];
@@ -2094,11 +2100,7 @@
 
       item
         .find('#breadcrumb-variable')
-        .text(
-          options.lang != 'en'
-            ? new_var_data.meta.title_fr
-            : new_var_data.title.rendered,
-        );
+        .text(plugin.get_var_title(new_var_data));
 
       // populate var info overlay
 
@@ -2344,6 +2346,7 @@
 
               options.query_str.current = $(document).cdc_app('query.eval', {
                 query: clone_query,
+                var_data: options.var_data[options.query.var_id],
                 do_history: 'none',
                 callback: function () {
                   console.log('threshold get_layer');
@@ -2954,10 +2957,9 @@
           });
         }
 
-        settings.var_title =
-          options.lang != 'en'
-            ? options.var_data[settings.var_id].meta.title_fr
-            : options.var_data[settings.var_id].title.rendered;
+        settings.var_title = plugin.get_var_title(
+          options.var_data[settings.var_id],
+        );
       }
 
       let get_location_data = function (settings) {
@@ -3710,10 +3712,7 @@
 
           // update var name in #station-detail
 
-          let var_title =
-            options.lang != 'en'
-              ? var_data.meta.title_fr
-              : var_data.title.rendered;
+          let var_title = plugin.get_var_title(var_data);
 
           item.find('#station-detail .variable-name').text(var_title);
 
@@ -4105,6 +4104,12 @@
         options.grid.hover_ajax.abort();
         options.grid.hover_ajax = null;
       }
+    },
+
+    get_var_title: function (var_data) {
+      return this.options.lang != 'en'
+        ? var_data.meta.title_fr
+        : var_data.title.rendered;
     },
   };
 

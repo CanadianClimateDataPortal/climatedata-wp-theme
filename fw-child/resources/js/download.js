@@ -54,7 +54,7 @@
       },
       // current_selections: [],
       query: {
-        coords: [62.51231793838694, -98.48144531250001, 4],
+        coords: [62.5123, -98.4814, 4],
         delta: '',
         dataset: 'cmip6',
         var_id: null,
@@ -712,6 +712,7 @@
               // options.status = 'mapdrag';
 
               // update coord text fields
+
               $('#coords-lat').val(this.getCenter().lat.toFixed(4));
               $('#coords-lng').val(this.getCenter().lng.toFixed(4));
               $('#coords-zoom').val(this.getZoom());
@@ -1409,7 +1410,7 @@
 
       if (!status) status = options.status;
 
-      // console.log('handle input', input, status);
+      console.log('handle input', input, status);
 
       let this_key = input.attr('data-query-key'),
         this_val = input.val();
@@ -1710,6 +1711,8 @@
           console.log('CHANGE SECTOR');
           // clear the current selections
           plugin.reset_selections();
+
+          console.log('val sent to fn', this_val);
 
           // item.find('[data-query-key="selections"]').val('').trigger('change');
 
@@ -2663,16 +2666,30 @@
             // nothing is checked
             // find the first enabled input and check it
 
-            item
-              .find(
-                '#map-control-aggregation .form-check-input[data-query-key="sector"]:not([disabled])',
-              )
-              .first()
-              .prop('checked', true);
+            let first_visible = item
+              .find('#map-control-aggregation .form-check:visible')
+              .first();
+
+            options.query.sector = $(document).cdc_app(
+              'query.update_value',
+              options.query,
+              {
+                item: first_visible.find('.form-check-input'),
+                key: 'sector',
+                val: first_visible.val(),
+              },
+            );
+
+            // item
+            //   .find(
+            //     '#map-control-aggregation .form-check-input[data-query-key="sector"]:not([disabled])',
+            //   )
+            //   .first()
+            //   .prop('checked', true);
             // .trigger('change');
           }
 
-          item.find('#map-control-aggregation :checked').trigger('change');
+          // item.find('#map-control-aggregation :checked').trigger('change');
         } else {
           item.find('#map-control-aggregation').hide();
         }

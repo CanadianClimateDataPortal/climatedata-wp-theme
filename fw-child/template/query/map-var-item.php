@@ -9,7 +9,7 @@
 		
 		<div class="var-item-links">
 			<a href="#data" class="tab-drawer-trigger var-select" data-var-id="<?php echo $item['id']; ?>"><?php _e ( 'View on map', 'cdc' ); ?></a>
-			<span class="mx-2">•</span>
+			<span class="mx-1">•</span>
 			<a href="#var-description" class="flex-drawer-trigger"><?php _e ( 'Description', 'cdc' ); ?></a>
 		</div>
 	</div>

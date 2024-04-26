@@ -2670,13 +2670,15 @@
               .find('#map-control-aggregation .form-check:visible')
               .first();
 
+            console.log('visible', first_visible);
+
             options.query.sector = $(document).cdc_app(
               'query.update_value',
               options.query,
               {
                 item: first_visible.find('.form-check-input'),
                 key: 'sector',
-                val: first_visible.val(),
+                val: first_visible.find('.form-check-input').val(),
               },
             );
 

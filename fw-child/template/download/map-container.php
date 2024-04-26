@@ -119,3 +119,18 @@
 <div id="zoom-alert" style="display: none;"><?php _e ( 'Zoom in to interact with the grid layer', 'cdc' ); ?></div>
 
 <div id="status"></div>
+
+<div class="modal fade" id="missing-data-desc" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-scrollable">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="exampleModalLabel"><?php _e ( 'Missing Value Options', 'cdc' ); ?></h4>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			
+			<div class="modal-body">
+				<?php echo fw_get_field ( 'modal_missing_data' ); ?>
+			</div>
+		</div>
+	</div>
+</div>

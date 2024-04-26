@@ -97,6 +97,8 @@ const $ = jQuery;
         .addEventListener('hide.bs.offcanvas', (event) => {
           // console.log('check', $('#map-overlay-dontshow').prop('checked'));
 
+          $('#map-overlay-dontshow').closest('.form-check').hide();
+
           // is the 'don't show again' switch checked
           if ($('#map-overlay-dontshow').prop('checked') == true) {
             console.log('set cookie', 'cdc-' + app_page + '-dismiss-help');
@@ -340,6 +342,7 @@ const $ = jQuery;
       e.preventDefault();
 
       let the_form = $(this),
+        form_namespace = the_form.find('[name="namespace"]').val(),
         alert_container = $(this).find('.alert-container'),
         alert_header = alert_container.find('.alert-header'),
         alert_messages = alert_container.find('.alert-messages');
@@ -347,12 +350,11 @@ const $ = jQuery;
       alert_header.empty().removeClass().addClass('alert-header');
       alert_messages.empty();
 
-      the_form.find('border-danger').removeClass('border-danger');
+      the_form.find('.border-danger').removeClass('border-danger');
 
       $.ajax({
-        url: ajax_data.url,
+        url: ajax_data.rest_url + 'cdc/v2/submit_feedback',
         data: {
-          action: 'cdc_submit_feedback_form',
           form: the_form.serializeArray(),
         },
         dataType: 'json',
@@ -379,6 +381,15 @@ const $ = jQuery;
           } else {
             alert_header.addClass('alert alert-warning');
           }
+
+          if (typeof window.captcha_img_audioObj !== 'undefined')
+            captcha_img_audioObj.refresh();
+
+          document.getElementById(form_namespace + '_captcha_img').src =
+            '/site/assets/themes/fw-child/resources/php/securimage/securimage_show.php?namespace=' +
+            form_namespace +
+            '&' +
+            Math.random();
 
           alert_container.show();
         },

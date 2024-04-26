@@ -122,6 +122,33 @@
 			
 			// console.log(options.template)
 			
+			// check for query string
+			
+			if (window.location.search) {
+				
+				let init_filters = []
+				
+				if (window.location.search.includes('q=')) {
+					init_filters = window.location.search.split('q=')[1]
+					
+					if (init_filters.includes('&')) {
+						init_filters = init_filters.split('&')[0]
+					}
+					
+					if (init_filters.includes('|')) {
+						init_filters = init_filters.split('|')
+					} else {
+						init_filters = [ init_filters ]
+					}
+					
+					init_filters.forEach(function(filter) {
+						let this_filter = filter.split(':')
+						options.elements.filters.find('.filter-item[data-key="' + this_filter[0] + '"][data-value="' + this_filter[1] + '"]').addClass('selected')
+					})
+				}
+				
+			}
+			
 			//
 			// EVENTS
 			//
@@ -239,7 +266,8 @@
 				
 			})
 			
-			plugin.do_query()
+			// initial query
+			plugin.update_filters()
 			
 		},
 		
@@ -250,7 +278,7 @@
 					item = plugin.item
 			
 			// reset default tax/meta query
-			console.log(JSON.stringify(options.args, null, 4))
+			// console.log(JSON.stringify(options.args, null, 4))
 			
 			if (options.args.tax_query) {
 				if (options.default_args.tax_query) {
@@ -268,7 +296,8 @@
 				}
 			}
 			
-			let has_filters = false
+			let new_q = '',
+					has_filters = false
 			
 			options.elements.filters.each(function() {
 				
@@ -280,13 +309,14 @@
 				this_filter.find('.filter-item.selected').each(function() {
 					
 					has_filters = true
-							
+								
 					let this_key = $(this).attr('data-key')
 							this_val = $(this).attr('data-value')
 					
 					switch (this_type) {
 						case 'post_type' :
 						
+							this_key = 'post_type'
 							options.args.post_type = this_val
 						
 							break
@@ -338,10 +368,11 @@
 							
 							break
 					}
-					
-				})
 				
-			
+					if (new_q != '') new_q += '|' 
+					new_q += this_key + ':' + this_val
+						
+				})
 				
 			})
 			
@@ -358,7 +389,48 @@
 				}
 			}
 			
+			plugin.update_query_string(new_q)
+			
 			plugin.do_query(callback)
+			
+		},
+		
+		update_query_string: function(q) {
+			
+			let plugin = this,
+					options = plugin.options,
+					item = plugin.item
+			
+			let current_string,
+					new_q = 'q=' + q
+			
+			if (window.location.search) {
+				current_string = window.location.search.substring(1).split('&')
+				
+				let q_index = null
+				
+				current_string.forEach(function(param, i) {
+					if (param.substring(0, 2) == 'q=') {
+						q_index = i
+					}
+				})
+				
+				if (q_index != null) {
+					current_string[q_index] = new_q
+				} else {
+					current_string.push(new_q)
+				}
+			} else {
+				current_string = [new_q]
+			}
+			
+			current_string = '?' + current_string.join('&')
+			
+			if (current_string == '?q=') {
+				current_string = '?'
+			}
+			
+			history.replaceState({}, document.title, current_string)
 			
 		},
 		

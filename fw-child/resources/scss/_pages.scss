@@ -851,6 +851,7 @@ body.tab-drawer-open {
 
   .var-item-links {
     font-size: 0.75rem;
+    margin-left: -0.25rem;
 
     a {
       display: inline-block;
@@ -874,11 +875,6 @@ body.tab-drawer-open {
   .fd-drawer {
     flex: 0 0 100%;
     width: 100%;
-
-    a {
-      color: $blue-200;
-      text-decoration: underline;
-    }
   }
 }
 
@@ -1076,12 +1072,31 @@ body.tab-drawer-open {
     &:not(:nth-child(3n + 3)) {
       border-right: 1px solid $gray-300;
     }
+
+    &.current {
+      background-color: $gray-200;
+
+      .var-item-links {
+        *:not(.flex-drawer-trigger) {
+          display: none;
+        }
+      }
+    }
+
+    h5 {
+      // color: $secondary;
+    }
   }
 
   .fd-drawer {
     padding: 2rem;
     background-color: $secondary;
     color: $white;
+
+    a {
+      color: $blue-200;
+      text-decoration: underline;
+    }
   }
 
   .dropdown-toggle {
@@ -1268,11 +1283,19 @@ body.tab-drawer-open {
       bottom: 1.5rem;
     }
 
-    &:has(
-        #map-low:visible,
-        #map-medium:not(:visible),
-        #map-high:not(:visible)
-      ) {
+    &:has(#map-medium.hidden):has(#map-high.hidden) {
+      .map-label {
+        display: none;
+      }
+    }
+
+    &:has(#map-low.hidden):has(#map-high.hidden) {
+      .map-label {
+        display: none;
+      }
+    }
+
+    &:has(#map-low.hidden):has(#map-medium.hidden) {
       .map-label {
         display: none;
       }

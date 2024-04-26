@@ -1,15 +1,8 @@
 <?php
-
-	function tpl_enqueue() {
-
-		wp_enqueue_script ( 'jquery-ui-core' );
-		wp_enqueue_script ( 'jquery-ui-widget' );
-		wp_enqueue_script ( 'jquery-effects-core' );
-		wp_enqueue_script ( 'jquery-ui-tabs' );
-
-	}
-
-	// add_action ( 'wp_enqueue_scripts', 'tpl_enqueue' );
+	
+	// CAPTCHA
+	
+	require_once locate_template ( 'resources/php/securimage/securimage.php' );
 	
 ?>
 
@@ -235,10 +228,33 @@
 										
 										<div class="d-flex align-items-center mb-4">
 											<div class="captcha-img">
-												<img id="captcha" src="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/php/securimage/securimage_show.php?namespace=support" class="me-4" alt="CAPTCHA Image">
+												<?php
+												
+													$captcha_options = array (
+														'code_length' => 4,
+														'input_name' => 'feedback_captcha_code',
+														'input_id' => 'feedback_captcha',
+														'image_id' => 'feedback_captcha_img',
+														'icon_size' => 16,
+														'input_text' => __ ( 'Enter the characters shown in the image:', 'cdc' ),
+														'namespace' => 'feedback',
+													);
+												
+													// image
+													echo Securimage::getCaptchaHtml ( $captcha_options, Securimage::HTML_IMG );
+													
+													// refresh
+													echo Securimage::getCaptchaHtml ( $captcha_options, Securimage::HTML_ICON_REFRESH );
+													
+													// audio
+													echo Securimage::getCaptchaHtml ( $captcha_options, Securimage::HTML_AUDIO );
+													
+												?>
 											</div>
 											
 											<div class="">
+												<input type="hidden" name="namespace" value="<?php echo $captcha_options['namespace']; ?>">
+												
 												<label for="captcha_code" class="form-label small"><?php _e ( 'Enter the characters shown in the image', 'cdc' ); ?>:</label>
 												
 												<input type="text" name="captcha_code" id="captcha_code" class="form-control" placeholder="XXXX" size="4" maxlength="4" data-placement="bottom" title="<?php _e ( 'Non-valid entered characters. Please try again.', 'cdc' ); ?>">
@@ -332,10 +348,33 @@
 									
 									<div class="d-flex align-items-center mb-4">
 										<div class="captcha-img">
-											<img id="captcha" src="<?php echo $GLOBALS['vars']['child_theme_dir']; ?>resources/php/securimage/securimage_show.php?namespace=data" class="me-4" alt="CAPTCHA Image">
+											<?php
+											
+												$captcha_options = array (
+													'code_length' => 4,
+													'input_name' => 'support_captcha_code',
+													'input_id' => 'support_captcha',
+													'image_id' => 'support_captcha_img',
+													'icon_size' => 16,
+													'input_text' => __ ( 'Enter the characters shown in the image:', 'cdc' ),
+													'namespace' => 'support',
+												);
+												
+												// image
+												echo Securimage::getCaptchaHtml ( $captcha_options, Securimage::HTML_IMG );
+												
+												// refresh
+												echo Securimage::getCaptchaHtml ( $captcha_options, Securimage::HTML_ICON_REFRESH );
+												
+												// audio
+												echo Securimage::getCaptchaHtml ( $captcha_options, Securimage::HTML_AUDIO );
+													
+											?>
 										</div>
 										
 										<div class="">
+											<input type="hidden" name="namespace" value="<?php echo $captcha_options['namespace']; ?>">
+											
 											<label for="captcha_code" class="form-label small"><?php _e ( 'Enter the characters shown in the image', 'cdc' ); ?>:</label>
 											
 											<input type="text" name="captcha_code" id="captcha_code" class="form-control" placeholder="XXXX" size="4" maxlength="4" data-placement="bottom" title="<?php _e ( 'Non-valid entered characters. Please try again.', 'cdc' ); ?>">

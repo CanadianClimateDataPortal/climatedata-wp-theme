@@ -254,9 +254,9 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 					
 					if (pushes_since_input < 1) {
 						pushes_since_input += 1
-						history.pushState({}, '', new_path)
+						history.pushState({}, document.title, new_path)
 					} else {
-						history.replaceState({}, '', new_path)
+						history.replaceState({}, document.title, new_path)
 					}
 					
 					options.history.prev_path = new_path

@@ -8,6 +8,7 @@
       globals: ajax_data.globals,
       lang: ajax_data.globals.lang,
       post_id: null,
+      page_title: document.title,
       canadaBounds: L.latLngBounds(L.latLng(41, -141.1), L.latLng(83.6, -49.9)),
       grid: {
         markers: {},
@@ -1646,149 +1647,6 @@
         item.find('#recent-locations-clear').show();
       },
 
-      add_marker: function (location, callback = null) {
-        let plugin = !this.item ? this.data('cdc_app') : this,
-          item = plugin.item,
-          options = plugin.options;
-
-        let recent_list = item.find('#recent-locations');
-
-        if (
-          recent_list.find(
-            '[data-coords="' +
-              location.coords.lat +
-              ',' +
-              location.coords.lng +
-              '"]',
-          ).length
-        ) {
-          // marker already exists
-
-          let recent_item = recent_list.find(
-            '[data-coords="' +
-              location.coords.lat +
-              ',' +
-              location.coords.lng +
-              '"]',
-          );
-
-          let marker_index = parseInt($(recent_item).attr('data-index'));
-          let this_marker = options.grid.markers['low'][marker_index];
-
-          // swap markers
-
-          for (let key in options.maps) {
-            options.grid.markers[key].forEach(function (marker, i) {
-              if (i == marker_index) {
-                marker.setIcon(options.icons.default);
-              } else {
-                marker.setIcon(options.icons.small);
-              }
-            });
-          }
-        } else {
-          // marker doesn't exist, add a new one
-
-          for (let key in options.maps) {
-            let new_marker = new L.Marker(location.coords, {
-                icon: options.icons.default,
-              }).bindTooltip(location.title, {
-                direction: 'top',
-                offset: [0, -30],
-              }),
-              popped_marker = null;
-
-            if (options.grid.markers[key] == undefined) {
-              options.grid.markers[key] = [];
-            }
-
-            // add new marker to beginning of array
-            options.grid.markers[key].unshift(new_marker);
-
-            if (options.grid.markers[key].length >= 5) {
-              // pop the last if there are more than 5
-              popped_marker = options.grid.markers[key].pop();
-              popped = true;
-
-              options.maps[key].object.removeLayer(popped_marker);
-            }
-
-            new_marker
-              .on('mouseover', function (e) {
-                $(document).trigger('marker_mouseover', [e]);
-              })
-              .on('click', function (e) {
-                $(document).trigger('click_marker', [e]);
-              })
-              .addTo(options.maps[key].object);
-          }
-
-          // swap active markers
-          for (let key in options.maps) {
-            options.grid.markers[key].forEach(function (marker, i) {
-              if (i != 0) {
-                marker.setIcon(options.icons.small);
-              }
-            });
-          }
-
-          if (typeof callback == 'function') {
-            callback(data);
-          }
-        }
-      },
-
-      remove_marker: function (item_index) {
-        let plugin = !this.item ? this.data('cdc_app') : this,
-          options = plugin.options,
-          item = plugin.item;
-
-        // console.log('remove', item_index);
-
-        let no_markers = true;
-
-        // delete the item in the sidebar
-        item.find('#recent-locations .list-group-item').eq(item_index).remove();
-
-        for (let key in options.maps) {
-          // remove from map
-          options.maps[key].object.removeLayer(
-            options.grid.markers[key][item_index],
-            options.grid.markers[key][item_index],
-          );
-
-          // splice from the markers array
-          options.grid.markers[key].splice(item_index, 1);
-
-          if (options.grid.markers[key].length > 0) {
-            no_markers = false;
-          }
-        }
-
-        // reorder index attributes for the whole list
-        item.find('#recent-locations .list-group-item').each(function (i) {
-          $(this).attr('data-index', i);
-        });
-
-        if (no_markers == true) {
-          item.find('#recent-locations-clear').hide();
-        } else {
-          item.find('#recent-locations-clear').show();
-        }
-      },
-
-      remove_markers: function () {
-        let plugin = !this.item ? this.data('cdc_app') : this,
-          options = plugin.options,
-          item = plugin.item;
-
-        for (let key in options.maps) {
-          for (i = options.grid.markers[key].length - 1; i >= 0; i -= 1) {
-            plugin.maps.remove_marker.apply(item, [i]);
-          }
-        }
-      },
-
       set_center: function (coords, zoom = null, do_offset = true) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           options = plugin.options,
@@ -1840,7 +1698,7 @@
     },
 
     query: {
-      obj_to_url: function (query, do_history = 'push') {
+      obj_to_url: function (query, var_data = null, do_history = 'push') {
         let plugin = !this.item ? this.data('cdc_app') : this,
           options = plugin.options;
 
@@ -1872,21 +1730,53 @@
           query_str.join('&') +
           window.location.hash;
 
+        let new_title = options.page_title;
+
         // console.log('obj to url', result);
+
+        if (var_data != null) {
+          let new_title =
+            (options.lang != 'en'
+              ? var_data.meta.title_fr
+              : var_data.title.rendered) +
+            ' — ' +
+            options.page_title;
+        }
+        // console.log('new title', new_title);
+
+        document.title = new_title;
 
         if (do_history == 'push') {
           // console.log('cdc', 'push');
 
           if (pushes_since_input < 1) {
             pushes_since_input += 1;
-            console.log('push', result);
-            history.pushState({}, '', result);
+            // console.log('push', result);
+            history.pushState(
+              {
+                title: new_title,
+              },
+              new_title,
+              result,
+            );
           } else {
-            history.replaceState({}, '', result);
+            history.replaceState(
+              {
+                title: new_title,
+              },
+              new_title,
+              result,
+            );
           }
         } else if (do_history == 'replace') {
           // console.log('cdc', 'replace');
-          history.replaceState({}, '', result);
+          history.replaceState(
+            {
+              title: new_title,
+            },
+            new_title,
+            result,
+          );
         }
 
         return '?' + query_str.join('&');
@@ -2058,6 +1948,7 @@
           true,
           {
             query: null,
+            var_data: null,
             do_history: 'push',
             callback: null,
           },
@@ -2075,6 +1966,7 @@
 
         return plugin.query.obj_to_url.apply(item, [
           settings.query,
+          settings.var_data,
           settings.do_history,
         ]);
       },
@@ -2625,7 +2517,7 @@
           // console.log('getting ' + chart_series.id);
 
           return $.getJSON(
-            'https://api.weather.gc.ca/collections/climate-normals/items?f=json&STN_ID=' +
+            'https://api.weather.gc.ca/collections/climate-normals/items?f=json&CLIMATE_IDENTIFIER=' +
               settings.station.id +
               '&NORMAL_ID=' +
               chart_series.id +

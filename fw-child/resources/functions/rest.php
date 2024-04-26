@@ -108,7 +108,7 @@ function cdc_get_related_content () {
 		$result['sectors'][] = array (
 			'id' => $sector->term_id,
 			'title' => $sector->name,
-			'url' => get_term_link ( $sector->term_id, 'sector' )
+			'url' => home_url ( '/learn/' ) . '?q=sector:' . $sector->slug
 		);
 	}
 	

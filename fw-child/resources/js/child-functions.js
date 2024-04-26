@@ -97,6 +97,8 @@ const $ = jQuery;
         .addEventListener('hide.bs.offcanvas', (event) => {
           // console.log('check', $('#map-overlay-dontshow').prop('checked'));
 
+          $('#map-overlay-dontshow').closest('.form-check').hide();
+
           // is the 'don't show again' switch checked
           if ($('#map-overlay-dontshow').prop('checked') == true) {
             console.log('set cookie', 'cdc-' + app_page + '-dismiss-help');

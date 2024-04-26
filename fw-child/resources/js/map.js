@@ -662,6 +662,15 @@
       item.on('fw_query_success', function (e, query_item) {
         let query_items = query_item.find('.fw-query-items');
 
+        // set current var
+
+        item
+          .find('#var-select-query [data-var-id="' + options.query.var_id + '"')
+          .closest('.fw-query-item')
+          .addClass('current');
+
+        // init flex drawer
+
         if (query_items.data('flex_drawer') == undefined) {
           query_items.flex_drawer({
             item_selector: '.fw-query-item',
@@ -2018,6 +2027,14 @@
 
       console.log('updating variable ID ' + var_id + ', ' + status);
 
+      // reset active query item
+      item.find('#var-select-query .fw-query-item').removeClass('current');
+
+      item
+        .find('#var-select-query [data-var-id="' + var_id + '"')
+        .closest('.fw-query-item')
+        .addClass('current');
+
       let hidden_input = item.find('[data-query-key="var"]');
 
       if (var_id != null && !options.var_data.hasOwnProperty(var_id)) {
@@ -2178,7 +2195,7 @@
               new_item.append(
                 '<a href="#" data-query-key="var_id" data-query-val="' +
                   query_item.id +
-                  '">' +
+                  '" data-bs-dismiss="offcanvas">' +
                   'View on map' +
                   '</a>',
               );

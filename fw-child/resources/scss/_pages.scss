@@ -851,6 +851,7 @@ body.tab-drawer-open {
 
   .var-item-links {
     font-size: 0.75rem;
+    margin-left: -0.25rem;
 
     a {
       display: inline-block;
@@ -1070,6 +1071,20 @@ body.tab-drawer-open {
 
     &:not(:nth-child(3n + 3)) {
       border-right: 1px solid $gray-300;
+    }
+
+    &.current {
+      background-color: $gray-200;
+
+      .var-item-links {
+        *:not(.flex-drawer-trigger) {
+          display: none;
+        }
+      }
+    }
+
+    h5 {
+      // color: $secondary;
     }
   }
 

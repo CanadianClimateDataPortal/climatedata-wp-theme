@@ -43,6 +43,7 @@
         },
       },
       legend: {
+        display: true,
         colormap: {
           colours: [],
           quantities: [],
@@ -1291,7 +1292,11 @@
             options.status != 'init' &&
             options.status != 'eval'
           ) {
-            console.log('status = input');
+            // console.log(
+            //   'input event',
+            //   $(this).attr('data-query-key'),
+            //   'status = input',
+            // );
             options.status = 'input';
           }
 
@@ -1502,6 +1507,8 @@
     },
 
     handle_input: function (input, status) {
+      // console.log('--- handle input');
+
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
@@ -1646,6 +1653,8 @@
           break;
       }
 
+      console.log('status now', status);
+
       if (status == 'input' || status == 'slide') {
         // whether to pushstate on eval or not
         let do_history = status == 'slide' ? 'none' : 'push';
@@ -1669,13 +1678,16 @@
 
         options.query_str.prev = options.query_str.current;
 
-        console.log('handle_input call eval now, history: ' + do_history);
+        console.log('handle_input call eval now');
+        // console.log('history: ' + do_history);
+        // console.log('var_id: ' + options.query.var_id);
+        // console.log('var: ' + options.query.var);
 
         options.query_str.current = $(document).cdc_app('query.eval', {
           query: options.query,
           do_history: do_history,
           callback: function () {
-            console.log(options.var_data[options.query.var_id]);
+            console.log('var_data', options.var_data[options.query.var_id]);
 
             plugin.update_default_scheme(function () {
               console.log('handle input get_layer', options.status);
@@ -2098,11 +2110,21 @@
 
         //
       } else {
-        // find and trigger the checked sector radio
-        // so that query.sector updates
-        item
-          .find('#map-control-aggregation .form-check-input:checked')
-          .trigger('change');
+        // update query.sector
+
+        options.query.sector = $(document).cdc_app(
+          'query.update_value',
+          options.query,
+          {
+            item: item.find(
+              '#map-control-aggregation .form-check-input:checked',
+            ),
+            key: 'sector',
+            val: item
+              .find('#map-control-aggregation .form-check-input:checked')
+              .val(),
+          },
+        );
       }
 
       // console.log(options.query.scheme_type);

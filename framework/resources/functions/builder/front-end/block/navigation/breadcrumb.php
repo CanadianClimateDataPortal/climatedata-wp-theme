@@ -119,7 +119,7 @@
 			
 		?>
 		
-		<li class="breadcrumb-item active" aria-current="page"><?php $current_title; ?></li>
+		<li class="breadcrumb-item active" aria-current="page"><?php echo $current_title; ?></li>
 		
 		<?php
 		

@@ -814,8 +814,8 @@
 			item.on('click', '.fw-page-settings-submit', function() {
 				
 				let field_data = {
-					title: $('.modal').find('[name="title"]').val(),
-					slug: $('.modal').find('[name="slug"]').val()
+					title: plugin.escape($('.modal').find('[name="title"]').val()),
+					slug: plugin.escape($('.modal').find('[name="slug"]').val())
 				}
 				
 				// console.log(field_data)
@@ -835,16 +835,13 @@
 						action: 'fw_update_page_settings',
 						post_id: options.globals.current_query.ID,
 						lang: options.lang,
-						fields: field_data,
-						inputs: form_data
+						fields: field_data
 					},
 					success: function(data) {
 						
-						console.log(data)
-						
 						if (data.new_slug) {
 							
-							console.log(window.location.pathname + ' > ' + data.new_slug)
+							// console.log(window.location.pathname + ' > ' + data.new_slug)
 							
 							let new_slug = window.location.href.replace(data.old_slug, data.new_slug)
 							
@@ -853,7 +850,10 @@
 						}
 						
 						if (data.new_title) {
-							document.title = document.title.replace(data.old_title, data.new_title)
+							document.title = document.title.replace(
+								plugin.unescape(data.old_title), 
+								plugin.unescape(data.new_title)
+							)
 						}
 						
 						$('#fw-modal').modal('hide')

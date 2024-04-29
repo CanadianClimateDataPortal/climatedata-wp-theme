@@ -282,24 +282,31 @@ function fw_update_page_settings() {
 	// echo "\n";	
 	// echo $old_title;
 	
-	if ( $_GET['fields']['title'] != '' && $_GET['fields']['title'] != $result['old_title'] ) {
-		// echo ' > ' . $_GET['fields']['title'];
+	if ( $_GET['fields']['title'] != '') {
 		
-		if ( $_GET['lang'] == 'en' ) {
+		$result['new_title'] = htmlspecialchars_decode ( $_GET['fields']['title'], ENT_QUOTES );
+		
+		if ( $result['new_title'] != $result['old_title'] ) {
+			// echo ' > ' . $_GET['fields']['title'];
 			
-			wp_update_post ( array (
-				'ID' => $_GET['post_id'],
-				'post_title' => $_GET['fields']['title']
-			) );
-			
-		} else {
-			
-			update_post_meta ( $_GET['post_id'], 'title_' . $_GET['lang'], $_GET['fields']['title'] );
+			if ( $_GET['lang'] == 'en' ) {
+				
+				wp_update_post ( array (
+					'ID' => $_GET['post_id'],
+					'post_title' => $result['new_title']
+				) );
+				
+			} else {
+				
+				update_post_meta (
+					$_GET['post_id'], 
+					'title_' . $_GET['lang'], 
+					$result['new_title']
+				);
+				
+			}
 			
 		}
-		
-		$result['new_title'] = $_GET['fields']['title'];
-		
 	}
 	
 	// echo "\n";

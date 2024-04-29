@@ -26,7 +26,7 @@
 				<div class="row row-cols-4 g-3 align-items-center">
 					<div class="col form-settings-input element-form-input d-flex align-items-center justify-content-between">
 						<h6 class="mb-0"><?php echo $title; ?></h6>
-						<input type="hidden" name="inputs-breakpoints-<?php echo $key; ?>-d" id="breakpoints-<?php echo $key; ?>-d" value="block">
+						<input type="hidden" name="inputs-breakpoints-<?php echo $key; ?>-d" id="breakpoints-<?php echo $key; ?>-d" value="y">
 						<span class="breakpoint-hide btn btn-outline-secondary">Hide</span>
 					</div>
 					

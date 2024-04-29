@@ -245,18 +245,6 @@
 				
 			})
 			
-			// save post
-			
-			// $('#wp-admin-bar-fw-actions-item-save').click(function() {
-			// 	
-			// 	options.status = 'saving'
-			// 	
-			// 	
-			// 	
-			// 	plugin.update_post()
-			// 	
-			// })
-			
 			// debug
 			
 			$('#output-btn').click(function() {
@@ -265,17 +253,15 @@
 			
 			// click insert button
 			
-			$('body').on('click', '.fw-insert-btn', function() {
-				
+			item.on('click', '.fw-insert-btn', function() {
 				let this_element = $(this).closest('.fw-element')
-				
 			})
 			
 			// modal ajax
 			
 			// click modal trigger
 			
-			$('body').on('click', '.fw-modal-trigger', function(e) {
+			item.on('click', '.fw-modal-trigger', function(e) {
 				e.preventDefault()
 				
 				// which modal template to retrieve
@@ -332,7 +318,7 @@
 			
 			// action button
 			
-			$('body').on('click', '.fw-new-choice', function(e) {
+			item.on('click', '.fw-new-choice', function(e) {
 				
 				// console.log(options.inserting)
 				
@@ -340,7 +326,7 @@
 				
 			})
 			
-			$('body').on('click', '.fw-btn', function(e) {
+			item.on('click', '.fw-btn', function(e) {
 				
 				e.preventDefault()
 				
@@ -732,7 +718,7 @@
 			
 			// APPLY LAYOUT
 			
-			$('body').on('click', '.fw-do-layout-submit', function() {
+			item.on('click', '.fw-do-layout-submit', function() {
 				
 				let source_ID = $(this).closest('.modal').find('#inputs-post_id').val()
 				
@@ -789,7 +775,7 @@
 			
 			// NEW POST
 			
-			$('body').on('click', '.fw-new-post-submit', function() {
+			item.on('click', '.fw-new-post-submit', function() {
 				
 				let form_data = {}
 				
@@ -825,7 +811,7 @@
 			
 			// PAGE SETTINGS
 			
-			$('body').on('click', '.fw-page-settings-submit', function() {
+			item.on('click', '.fw-page-settings-submit', function() {
 				
 				let field_data = {
 					title: $('.modal').find('[name="title"]').val(),
@@ -879,7 +865,7 @@
 			
 			// INSERT/EDIT ELEMENT
 			
-			$('body').on('click', '.fw-settings-submit', function() {
+			item.on('click', '.fw-settings-submit', function() {
 				
 				// console.log('submit')
 				// console.log(JSON.stringify(options.element.data))
@@ -1155,7 +1141,7 @@
 			
 			// add setting
 			
-			$('body').on('click', '.fw-form-flex-menu .dropdown-item', function() {
+			item.on('click', '.fw-form-flex-menu .dropdown-item', function() {
 				
 				let flex_container = $(this).closest('.fw-form-flex-container')
 				
@@ -1169,7 +1155,7 @@
 			
 			// delete setting
 			
-			$('body').on('click', '.fw-form-flex-item-remove', function() {
+			item.on('click', '.fw-form-flex-item-remove', function() {
 				
 				let this_form = $(this).closest('.fw-form-flex-row'),
 						this_container = $(this).closest('.fw-form-flex-container'),
@@ -1188,7 +1174,7 @@
 			
 			// repeater - add row
 			
-			$('body').on('click', '.fw-form-repeater-add-row', function(e) {
+			item.on('click', '.fw-form-repeater-add-row', function(e) {
 				
 				plugin.add_repeater_row($(this).closest('.fw-form-repeater-container').find('.fw-form-repeater').first())
 				
@@ -1196,7 +1182,7 @@
 			
 			// repeater - delete row
 			
-			$('body').on('click', '.fw-form-repeater-delete-row', function(e) {
+			item.on('click', '.fw-form-repeater-delete-row', function(e) {
 				
 				let this_repeater = $(this).closest('.fw-form-repeater')
 				
@@ -1218,7 +1204,7 @@
 			
 			// flex - add row
 			/*
-			$('body').on('click', '.fw-form-flex-add-row', function(e) {
+			item.on('click', '.fw-form-flex-add-row', function(e) {
 				
 				plugin.add_flex_row($(this).closest('.fw-form-flex-container').find('.fw-form-flex').first(), 'resources/functions/builder/block/content/query/output/' + $(this).attr('data-item-content'))
 				
@@ -1238,6 +1224,25 @@
 					plugin.toggle_conditionals($(this))
 				})
 				
+			})
+			
+			// column show/hide
+			
+			$('#fw-modal').on('click', '.breakpoint-hide', function() {
+				let this_col = $(this).closest('.col'),
+						this_input = this_col.find('[type="hidden"]')
+				
+				// hide inputs in this row
+				
+				if ($(this).hasClass('active')) {
+					$(this).removeClass('active')
+					this_col.siblings().show()
+					this_input.val('y')
+				} else {
+					$(this).addClass('active')
+					this_col.siblings().hide()
+					this_input.val('n')
+				}
 			})
 			
 		},
@@ -2139,7 +2144,6 @@
 				
 				inserted_el = $(options.element.item.prop('outerHTML'))
 				
-				
 			}
 			
 			options.element.item = inserted_el
@@ -2269,8 +2273,8 @@
 				dataType: 'json',
 				success: function(data) {
 					
-					// console.log('setup element')
-					// console.log('setup element', data)
+					console.log('setup element')
+					console.log('setup element', data)
 					
 					element.data = {
 						...element.data,
@@ -3784,6 +3788,31 @@
 					// check for repeaters
 					plugin.check_for_repeaters(flatten_data)
 					
+					// if this is a column
+					
+					if (options.element.data.type == 'column') {
+						
+						flatten_data.forEach(function(input, i) {
+						
+							if (input.property.includes('breakpoints')) {
+								delete flatten_data[i]
+								
+								let bp_values = input.value.split('|'),
+										col_keys = [ 'd', 'col', 'offset', 'order']
+								
+								input.value.split('|').forEach(function(val, i) {
+									flatten_data.push({
+										property: input.property + '-' + col_keys[i],
+										value: val
+									})
+								})
+								
+							}
+							
+						})
+						
+					}
+					
 					// populate fields
 					plugin.modal_populate_fields(flatten_data)
 					
@@ -3836,7 +3865,7 @@
 						this_val = plugin.unescape(input.value)
 				
 				// console.log('---')
-				// console.log('input', this_input)		
+				// console.log('input', input)
 				
 				if (
 					input.property.includes('rows[]') &&
@@ -4006,7 +4035,7 @@
 							
 							// console.log('hidden', this_input, 'value', this_val)
 							
-							if (this_val == 'none') {
+							if (this_val == 'n') {
 								this_input.next().addClass('active')
 								this_input.parent().nextAll().hide()
 							} else {
@@ -4637,11 +4666,31 @@
 		
 		reset_arrays: function(data) {
 			
+			// console.log('reset data')
+			// console.log(JSON.stringify(data, null, 4))
+			
 			for (let key in data) {
 				
-				console.log(key, data[key])
+				// console.log(key, data[key])
 				
-				if (Array.isArray(data[key])) {
+				if (key == 'breakpoints') {
+					
+					// each breakpoint
+					for (let bp in data[key]) {
+						
+						// split value to array
+						let this_val = data[key][bp].split('|')
+						
+						//
+						data.breakpoints[bp]['d'] = this_val[0]
+						data.breakpoints[bp]['col'] = this_val[1]
+						data.breakpoints[bp]['offset'] = this_val[2]
+						data.breakpoints[bp]['order'] = this_val[3]
+					}
+					
+					delete data[key]
+					
+				} else if (Array.isArray(data[key])) {
 					console.log(key, typeof data)
 					data[key] = []
 				} else if (
@@ -4651,6 +4700,9 @@
 					data[key] = this.reset_arrays(data[key])
 				}
 			}
+			
+			// console.log('done')
+			// console.log(JSON.stringify(data, null, 4))
 			
 			return data
 			
@@ -4700,9 +4752,7 @@
 			// and reset any array it finds
 			
 			if (element_data.hasOwnProperty('inputs')) {
-			
 				element_data.inputs = plugin.reset_arrays(element_data.inputs)
-				
 			}
 			
 			options.data.array_key = ''
@@ -4746,19 +4796,29 @@
 					
 					// console.log('pre', JSON.stringify(element_data))
 					
-					// current_parent, key, value, lang_prop = null, array_key = '', original_key = ''
+					// params for find_child_element
+					// current_parent, 
+					// key, 
+					// value, 
+					// lang_prop = null, 
+					// array_key = '', 
+					// original_key = ''
+					
 					element_data = plugin.find_child_element(element_data, key, input.value, null, options.data.array_key, input.name)
 					
 				}
 				
 			})
 			
-			// console.log('element now')
-			// console.log(JSON.stringify(element_data, null, 2))
+			if (element_data.type == 'column') {
+				element_data = plugin._simplify_breakpoints_obj(element_data)
+			}
+			
+			console.log('element now')
+			console.log(JSON.stringify(element_data, null, 2))
 			
 			// reset array flag
 			
-			// options.data.array_key = null
 			options.data.array_indexes = {}
 			
 			if (element_has_settings == true) {
@@ -5214,79 +5274,174 @@
 			
 		},
 		
+		_simplify_breakpoints_obj: function(element_data) {
+			console.log('simplify')
+			console.log(JSON.stringify(element_data.inputs.breakpoints, null, 4))
+			
+			for (let breakpoint in element_data.inputs.breakpoints) {
+				let new_val = ''
+				
+				for (let key in element_data.inputs.breakpoints[breakpoint]) {
+					new_val += key == 'd' ? '' : '|'
+					new_val += element_data.inputs.breakpoints[breakpoint][key]
+				}
+				
+				element_data.inputs.breakpoints[breakpoint] = new_val
+				
+				// console.log(breakpoint, element_data.inputs.breakpoints[breakpoint])
+				
+			}
+			
+			return element_data
+			
+		},
+		
 		generate_column_classes: function(breakpoints, output = 'string') {
 			
 			let classes = [],
-					is_hidden = false
-					
-			// console.log(breakpoints)
+					is_hidden = false,
+					col_keys = [ 'd', 'col', 'offset', 'order' ]
 			
-			for (var breakpoint in breakpoints) {
-				for (var setting in breakpoints[breakpoint]) {
+			if (breakpoints == undefined) {
+				breakpoints = {}
+			}
+			
+			// console.log('generate classes', breakpoints)
+			
+			let new_bp_array = {}
+				
+			if (typeof breakpoints[Object.keys(breakpoints)[0]] == 'object') {
+				// breakpoint arrays need to be converted to strings
+				
+				for (let key in breakpoints) {
+					breakpoints[key] = Object.values(breakpoints[key]).join('|')
+				}
+				
+				for (let key in breakpoints) {
+					breakpoints[key] = breakpoints[key].replace('block', 'y')
+					breakpoints[key] = breakpoints[key].replace('none', 'n')
+				}
+			}
+			
+			for (let breakpoint in breakpoints) {
+				let inputs = breakpoints[breakpoint].split('|')
+				
+				inputs.forEach(function(input, col_i) {
+					let add_class = false
 					
-					let new_class = setting
-					
-					if ( breakpoint != 'xs' ) new_class += '-' + breakpoint
-					
-					new_class += '-'
-					
-					if (breakpoints[breakpoint][setting] != '') {
+					if (input != '') {
+						let new_class = col_keys[col_i]
 						
-						if (setting == 'd') {
-							
-							// hide/show setting
-							
-							if (breakpoints[breakpoint][setting] == 'none') {
-								
+						if ( breakpoint != 'xs' ) new_class += '-' + breakpoint						
+						new_class += '-'
+						
+						if (col_i == 0) {
+							if (input == 'n') {
 								// hiding at this breakpoint
 								
 								if (is_hidden == false) {
-									
-									// not already hidden
-									
+									// current shown
 									new_class += 'none'
 									is_hidden = true
-									
-									classes.push(new_class)
-									
+									add_class = true
 								}
-								
 							} else {
-								
 								// showing at this breakpoint
 								
 								if (is_hidden == true) {
-									
-									// is already hidden
-									
+									// currently hidden
 									new_class += 'block'
 									is_hidden = false
-									
-									classes.push(new_class)
-									
+									add_class = true
 								}
-								
-								
 							}
-							
 						} else {
-							
-							// other column setting
-							
-							new_class += breakpoints[breakpoint][setting]
-							
+							new_class += input
+							add_class = true
+						}
+						
+						if (add_class == true) {
 							classes.push(new_class)
-							
 						}
 						
 					}
 					
-				}
-			}
+				}) // each input
+				
+			} // each breakpoint
+			
+			// for (var breakpoint in breakpoints) {
+			// 	for (var input in breakpoints[breakpoint]) {
+			// 		
+			// 	}
+			// 	
+			// 	for (var setting in breakpoints[breakpoint]) {
+			// 		
+			// 		let new_class = setting
+			// 		
+			// 		if ( breakpoint != 'xs' ) new_class += '-' + breakpoint
+			// 		
+			// 		new_class += '-'
+			// 		
+			// 		if (breakpoints[breakpoint][setting] != '') {
+			// 			
+			// 			if (setting == 'd') {
+			// 				
+			// 				// hide/show setting
+			// 				
+			// 				if (breakpoints[breakpoint][setting] == 'none') {
+			// 					
+			// 					// hiding at this breakpoint
+			// 					
+			// 					if (is_hidden == false) {
+			// 						
+			// 						// not already hidden
+			// 						
+			// 						new_class += 'none'
+			// 						is_hidden = true
+			// 						
+			// 						classes.push(new_class)
+			// 						
+			// 					}
+			// 					
+			// 				} else {
+			// 					
+			// 					// showing at this breakpoint
+			// 					
+			// 					if (is_hidden == true) {
+			// 						
+			// 						// is already hidden
+			// 						
+			// 						new_class += 'block'
+			// 						is_hidden = false
+			// 						
+			// 						classes.push(new_class)
+			// 						
+			// 					}
+			// 					
+			// 					
+			// 				}
+			// 				
+			// 			} else {
+			// 				
+			// 				// other column setting
+			// 				
+			// 				new_class += breakpoints[breakpoint][setting]
+			// 				
+			// 				classes.push(new_class)
+			// 				
+			// 			}
+			// 			
+			// 		}
+			// 		
+			// 	}
+			// }
 			
 			if (output == 'string') {
 				classes = classes.join(' ')
 			}
+			
+			// console.log(classes)
 			
 			return classes
 			

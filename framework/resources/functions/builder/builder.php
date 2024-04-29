@@ -338,6 +338,16 @@ function fw_setup_element ( $element, $globals ) {
 		'classes' => array ( 'fw-element' )
 	);
 	
+	//
+	
+	if (
+		str_contains ( $settings['el_type'], '/' ) && 
+		isset ( $element['child'] ) && 
+		$element['child'] == 'block' 
+	) {
+		$settings['el_type'] = 'column';
+	}
+	
 	// classes array
 	
 	if ( str_contains ( $settings['el_type'], '/' ) ) {
@@ -404,80 +414,120 @@ function fw_setup_element ( $element, $globals ) {
 			
 			$settings['classes'][] = 'col';
 			
+			// dumpit ( $element );
+			
 			if (
 				isset ( $element['inputs']['breakpoints'] ) && 
 				!empty ( $element['inputs']['breakpoints'] ) 
 			) {
 				
-				$is_hidden = false;
-			
-				// dumpit ( $element['inputs']['breakpoints'] );
-			
-				foreach ( $element['inputs']['breakpoints'] as $breakpoint => $keys ) {
+				if ( gettype ( $element['inputs']['breakpoints'][array_keys ( $element['inputs']['breakpoints'] )[0]] ) == 'array' ) {
 					
-					foreach ( $keys as $key => $val ) {
+					// breakpoint arrays need to be converted to strings
+				
+					$new_bp_array = [];
+					
+					foreach ( $element['inputs']['breakpoints'] as $breakpoint => $keys ) {
+						$new_bp_array[$breakpoint] = implode ( '|', $keys );
+						echo '<br>';
 						
-						// echo $key . '-' . $breakpoint . '-' . $val . '<br>';
+					}
+					
+					foreach ( $new_bp_array as $breakpoint => $keys ) {
 						
-						$new_class = $key;
+						$keys = explode ( '|', $keys );
+					
+						if ( $keys[0] == 'block' ) {
+							$keys[0] = 'y';
+						} else {
+							$keys[0] = 'n';
+						}
 						
-						if ( $breakpoint != 'xs' ) $new_class .= '-' . $breakpoint;
+						$new_bp_array[$breakpoint] = implode ( '|', $keys );
 						
-						$new_class .= '-';
+					}
+					
+					// dumpit ( $new_bp_array );
+				
+					$element['inputs']['breakpoints'] = $new_bp_array;
+				}
+				
+				$is_hidden = false;
+				$col_keys = array ( 'd', 'col', 'offset', 'order' );
+				
+				// each breakpoint
+				foreach ( $element['inputs']['breakpoints'] as $breakpoint => $inputs ) {
+					
+					// $inputs = [ 'y', '4', '1', '1' ]
+					$inputs = explode ( '|', $inputs );
+					
+					$col_i = 0;
+					
+					// each input
+					foreach ( $inputs as $input ) {
 						
-						if ( $val != '' ) {
+						$add_class = false;
+						
+						if ( $input != '' ) {
+						
+							// input has a value
 							
-							if ( $key == 'd' ) {
+							// start writing the class name
+							// d-md
+							$new_class = $col_keys[$col_i];
+							if ( $breakpoint != 'xs' ) $new_class .= '-' . $breakpoint;
+							$new_class .= '-';
+							
+							// display
+							// y/n -> block/none
+							
+							if ( $col_i == 0 ) {
 								
-								// hide/show setting
-								
-								if ( $val == 'none' ) {
-									
+								if ( $input == 'n' ) {
 									// hiding at this breakpoint
 									
 									if ( $is_hidden == false ) {
 										
 										// not already hidden
-										
+										// d-md-none
 										$new_class .= 'none';
 										$is_hidden = true;
-										
-										array_push ( $settings['classes'], $new_class );
+										$add_class = true;
 										
 									}
-									
+							
 								} else {
-									
 									// showing at this breakpoint
 									
 									if ( $is_hidden == true ) {
 										
 										// is already hidden
-										
+										// d-md-block
 										$new_class .= 'block';
 										$is_hidden = false;
-										
-										array_push ( $settings['classes'], $new_class );
+										$add_class = true;
 										
 									}
-									
 									
 								}
 								
 							} else {
 								
-								// other column setting
-								
-								$new_class .= $val;
-								
-								array_push ( $settings['classes'], $new_class );
+								// col/offset/order
+								$new_class .= $input;
+								$add_class = true;
 								
 							}
-							
 						}
 						
-					}
-				}
+						if ( $add_class == true) {
+							array_push ( $settings['classes'], $new_class );
+						}
+						
+						$col_i++;
+					} // each input
+					
+				} // each breakpoint
 				
 			}
 			

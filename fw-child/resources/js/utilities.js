@@ -821,3 +821,291 @@ function validate_email(email_val) {
 
   return is_valid;
 }
+
+/**
+ * Returns a filtered query object with only the keys relevant for the type of variable.
+ *
+ * @param {object} query - The query object.
+ * @param {string} variable_type - Type of variable, used to determine the relevant keys.
+ * @returns {object} - The filtered query object.
+ */
+function filter_query_for_variable_type(query, variable_type) {
+  const filtered_query = {};
+  const keys_to_keep = {
+    'single': [
+      'bbox',
+      'dataset',
+      'extension',
+      'format',
+      'frequency',
+      'sector',
+      'selections',
+      'var',
+    ],
+    'custom': [
+      'bbox',
+      'dataset',
+      'decimals',
+      'end_year',
+      'format',
+      'frequency',
+      'inputs',
+      'models',
+      'percentiles',
+      'scenarios',
+      'sector',
+      'selections',
+      'start_year',
+      'var',
+    ],
+    'ahccd': [
+      'dataset',
+      'check_missing',
+      'decimals',
+      'format',
+      'frequency',
+      'inputs',
+      'station',
+      'var',
+    ]
+  }
+
+  if (!(variable_type in keys_to_keep)) {
+    return query;
+  }
+
+  for (const key of keys_to_keep[variable_type]) {
+    if (!(key in query)) {
+      continue;
+    }
+
+    // For some variable types, include the "decimals" key only if the format is "csv".
+    if (key === 'decimals' && query.format !== 'csv' && ['custom', 'ahccd'].includes(variable_type)) {
+      continue;
+    }
+
+    filtered_query[key] = query[key];
+  }
+
+  return filtered_query;
+}
+
+
+/**
+ * Generate a filename based on a data query.
+ *
+ * The data query is an object describing a specific query for climate data. For example, it can contain the name of
+ * the variable for which we want data, the dataset to use, a specific date range, etc. This function generates a
+ * custom filename for the query.
+ *
+ * @param {object} query - Query object for which to create a filename.
+ * @param {object[]} variables_filename
+ *   Mapping to transform a variable id (the `var` element of the query) to a name to use in the file name. See the
+ *   documentation of the `variable_short_names` global variable.
+ * @param {object} options
+ *   Options configuring the generated filename.
+ *   - `with_extension` (default: true) If true, the file extension will be appended to the filename.
+ * @returns {string|null} - The generated filename, or null if the query object doesn't contain any information.
+ */
+function generate_data_query_filename(query, variables_filename = [], options = {}) {
+  const filename_parts = [];
+  options = jQuery.extend({
+    with_extension: true,
+  }, options);
+
+  function rename_or_upper_first(value, name_mapping) {
+    if (value in name_mapping) {
+      return name_mapping[value];
+    } else {
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    }
+  }
+
+  // Dataset name
+
+  if (query.dataset) {
+
+    const location_mapping = {
+      cmip5: 'CanDCS-u5',
+      cmip6: 'CanDCS-u6',
+      humidex: 'HUMIDEX',
+      ahccd: 'AHCCD',
+    }
+    const dataset = rename_or_upper_first(query.dataset, location_mapping);
+
+    filename_parts.push(dataset);
+  }
+
+  // Location
+
+  if (query.sector) {
+    const location_mapping = {
+      upload: 'CustomShape',
+      gridded_data: 'Grid',
+    }
+    const location = rename_or_upper_first(query.sector, location_mapping);
+
+    let location_parts = [location];
+
+    if (query.bbox) {
+      location_parts.push('bbox');
+    }
+
+    if (jQuery.isArray(query.selections)) {
+      location_parts = location_parts.concat(query.selections.slice(0, 3));
+    }
+
+    filename_parts.push(location_parts.join('-'));
+  }
+
+  if (query.station) {
+    filename_parts.push('Stations-' + query.station.slice(0, 3).join('-'));
+  }
+
+  // Date range
+
+  const date_range = [];
+
+  if (query.start_year) {
+    date_range.push('from-' + query.start_year);
+  }
+
+  if (query.end_year) {
+    date_range.push('to-' + query.end_year);
+  }
+
+  if (date_range.length) {
+    filename_parts.push(date_range.join('-'));
+  }
+
+  // Selected variable (and custom inputs/thresholds, if applicable)
+
+  if (query.var) {
+    let variable = query.var;
+    const custom_inputs = jQuery.extend({}, query.inputs);
+
+    for (const variable_map of variables_filename) {
+      if (typeof variable_map.id === 'string') {
+        if (variable_map.id === query.var) {
+          variable = variable_map.name;
+          break;
+        }
+      } else {
+        const match = variable_map.id.exec(query.var);
+        if (match) {
+          variable = variable_map.name;
+          if (match.groups) {
+            jQuery.extend(custom_inputs, match.groups);
+          }
+        }
+      }
+    }
+
+    // Replace thresholds
+    for (let [placeholder, value] of Object.entries(custom_inputs)) {
+      // Negative numbers have their "-" replaced with "neg"
+      if (/^-\d+/.test(value)) {
+        value = 'neg' + value.slice(1);
+      }
+
+      variable = variable.replace('<'+placeholder+'>', value);
+    }
+
+    filename_parts.push(variable);
+  }
+
+  // Models
+
+  if (query.models) {
+    const models_name_mapping = {
+      pcic12: 'PCIC12',
+      '24models': 'All',
+      '26models': 'All',
+    };
+    const model_name = rename_or_upper_first(query.models, models_name_mapping);
+
+    filename_parts.push(model_name);
+  }
+
+  // Scenario
+
+  if (query.scenarios) {
+    const scenario_name_mapping = {
+      low: { 'cmip6': 'SSP126', 'cmip5': 'RCP26' },
+      medium: { 'cmip6': 'SSP245', 'cmip5': 'RCP45' },
+      high: { 'cmip6': 'SSP585', 'cmip5': 'RCP85' },
+    };
+
+    const dataset = query.dataset;
+    const scenarios = query.scenarios.map(function (name) {
+      if (dataset && scenario_name_mapping[name] && scenario_name_mapping[name][dataset]) {
+        return scenario_name_mapping[name][dataset];
+      }
+      return name;
+    });
+
+    filename_parts.push(scenarios.join('-'));
+  }
+
+  // Percentile
+
+  if (query.percentiles) {
+    const percentiles = query.percentiles.map(value => 'p' + value);
+    filename_parts.push(percentiles.join('-'));
+  }
+
+  // Missing tolerance
+
+  if (query.check_missing) {
+    filename_parts.push('tol-' + query.check_missing);
+  }
+
+  // Frequency
+
+  if (query.frequency) {
+    const frequency_name_map = {
+      jan: 'January',
+      feb: 'February',
+      mar: 'March',
+      apr: 'April',
+      may: 'May',
+      jun: 'June',
+      jul: 'July',
+      aug: 'August',
+      sep: 'September',
+      oct: 'October',
+      nov: 'November',
+      dec: 'December',
+      ann: 'Annual',
+      all: 'AllMonths',
+      YS: 'Annual',
+      'QS-DEC': 'Seasonal',
+      MS: 'Monthly',
+      'AS-JUL': 'July2June',
+    }
+    const frequency_name = rename_or_upper_first(query.frequency, frequency_name_map);
+
+    filename_parts.push(frequency_name);
+  }
+
+  // Generated file decimals
+
+  if (query.decimals != null) {
+    filename_parts.push(query.decimals);
+  }
+
+  if (!filename_parts.length) {
+    return null;
+  }
+
+  // File extension
+
+  let file_name = filename_parts.join('_');
+
+  if (options.with_extension) {
+    const extension = query.format === 'csv' ? '.csv' : '.nc';
+    file_name = file_name + extension;
+  }
+
+  return file_name;
+}

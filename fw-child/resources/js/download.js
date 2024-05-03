@@ -3368,11 +3368,15 @@
 
       // inputs
 
+      const custom_inputs = {};
       item.find('#threshold-custom :input').each(function () {
         console.log($(this).attr('name'), $(this).val());
 
         if ($(this).val() != '') {
           let this_data = $(this).val();
+          const this_id = $(this).attr('name');
+
+          custom_inputs[this_id] = this_data;
 
           if (
             $(this).attr('data-units') != undefined &&
@@ -3425,17 +3429,13 @@
 
       // filename
 
-      let filename = options.var_data.acf.finch_var;
+      const query_for_filename = filter_query_for_variable_type(query, 'ahccd');
+      query_for_filename.inputs = custom_inputs;
+      query_for_filename.var = options.var_data.acf.finch_var;
 
-      if (query.station.length == 1) {
-        let first_station = options.selection_data[query.station[0]];
-
-        if (first_station.hasOwnProperty('properties')) {
-          if (first_station.properties.hasOwnProperty('Name')) {
-            filename += '_' + first_station.properties.Name;
-          }
-        }
-      }
+      const filename = generate_data_query_filename(
+        query_for_filename, variable_short_names['custom'], { with_extension: false },
+      );
 
       form_obj.inputs.push({
         id: 'output_name',
@@ -3564,12 +3564,15 @@
       };
 
       // inputs
-
+      const custom_inputs = {};
       item.find('#threshold-custom :input').each(function () {
         console.log($(this).attr('name'), $(this).val());
 
         if ($(this).val() != '') {
           let this_data = $(this).val();
+          const this_id = $(this).attr('name');
+
+          custom_inputs[this_id] = this_data;
 
           if (
             $(this).attr('data-units') != undefined &&
@@ -3579,7 +3582,7 @@
           }
 
           form_obj.inputs.push({
-            id: $(this).attr('name'),
+            id: this_id,
             data: this_data,
           });
         }
@@ -3741,6 +3744,20 @@
         });
       }
 
+      // File name (for Finch we can only provide a file name prefix)
+
+      const query_for_filename = filter_query_for_variable_type(query, 'custom');
+      query_for_filename.inputs = custom_inputs;
+      query_for_filename.var = options.var_data.acf.finch_var;
+
+      const filename = generate_data_query_filename(
+        query_for_filename, variable_short_names['custom'], { with_extension: false },
+      );
+
+      form_obj.inputs.push({id: 'output_name', data: filename});
+
+      // Submit data
+
       submit_data = {
         captcha_code: item.find('#submit-captcha').val(),
         namespace: 'analyze',
@@ -3889,12 +3906,14 @@
                 T('Click below to download your data'),
               );
 
+              const query_for_filename = filter_query_for_variable_type(query, 'single');
+              const file_name = generate_data_query_filename(
+                query_for_filename, variable_short_names['single'], { with_extension: false },
+              );
+
               options.elements.result.btn
                 .attr('href', window.URL.createObjectURL(xhttp.response))
-                .attr(
-                  'download',
-                  'file_name_goes_here' + '.' + format_extension,
-                )
+                .attr('download', file_name + '.zip')
                 .show();
 
               options.elements.result.tab
@@ -3921,15 +3940,15 @@
         xhttp.send(JSON.stringify(request_args));
       } else {
         /*
-        
+
         TODO
-        
+
         // call download for all matching variables and build a zip file
         selectedTimeStepCategory = $('#download-frequency')
           .find(':selected')
           .data('timestep');
         varToProcess = [];
-      
+
         varData.forEach(function (varDetails, k) {
           if (
             k !== 'all' &&
@@ -3939,7 +3958,7 @@
             varToProcess.push(k);
           }
         });
-      
+
         $('body').addClass('spinner-on');
         var dl_status = 0;
         var dl_fraction = $(
@@ -3954,7 +3973,7 @@
         ).appendTo(dl_fraction);
         var i = 0;
         var zip = new JSZip();
-      
+
         function download_all() {
           if (i < varToProcess.length) {
             request_args = {
@@ -3976,7 +3995,7 @@
                     format_extension,
                   xhttp.response,
                 );
-      
+
                 dl_fraction.find('span').html(i);
                 dl_progress.css(
                   'width',
@@ -3996,7 +4015,7 @@
                       );
                     });
                 }
-      
+
                 i++;
                 download_all();
               }
@@ -4007,9 +4026,9 @@
             xhttp.send(JSON.stringify(request_args));
           }
         }
-      
+
         download_all();
-        
+
         */
       }
     },
@@ -4027,114 +4046,6 @@
         Math.random();
 
       item.find('#submit-captcha').val('');
-    },
-
-    create_file_name: function (form_inputs) {
-      let plugin = this,
-        options = plugin.options,
-        item = plugin.item;
-
-      let file_name = '{0}_{1}_{2}_{3}_{4}.{5}';
-      let dataset = 'CanDCS-u5';
-      console.log(form_inputs);
-
-      // dataset
-      if (form_inputs['dataset'] == 'cmip6') dataset = 'CanDCS-u6';
-      if (form_inputs['dataset'] == 'humidex') dataset = 'HUMIDEX';
-
-      // location
-      let location =
-        form_inputs['analyze-location'].charAt(0).toUpperCase() +
-        form_inputs['analyze-location'].slice(1);
-      if (form_inputs['shape'] != '') location += '_' + form_inputs['shape'];
-
-      // time
-      let time = 'from_{0}_to_{1}'.format(
-        form_inputs['start_date'],
-        form_inputs['end_date'],
-      );
-
-      // variables
-      let variables = {
-        wetdays: { label: 'WetDays', vars: '_qt_<thresh>' },
-        sdii: { label: 'AverageWetDayPreciIntens', vars: '_qt_<thresh>' },
-        cwd: { label: 'MaxConsWetDays', vars: '_qt_<thresh>' },
-        cdd: { label: 'MaxConsDryDays', vars: '_qt_<thresh>' },
-        tx_tn_days_above: {
-          label: 'DaysAboveTmaxAndTmin',
-          vars: '_<thresh_tasmin>_to_<thresh_tasmax>',
-        },
-        tx_days_above: { label: 'DaysAboveTmax', vars: '_<thresh>' },
-        tropical_nights: { label: 'DaysAboveTmin', vars: '_<thresh>' },
-        tn_days_below: { label: 'DaysBelowTmin', vars: '_<thresh>' },
-        cooling_degree_days: {
-          label: 'DegDaysAboveThreshold',
-          vars: '_<thresh>',
-        },
-        heating_degree_days: {
-          label: 'DegDaysBelowThreshold',
-          vars: '_<thresh>',
-        },
-        degree_days_exceedance_date: {
-          label: 'DegDaysExceedDate',
-          vars: '_<sum_thresh>_days_<op>_<thresh>_from_<after_date>',
-        },
-        heat_wave_index: {
-          label: 'HeatWave',
-          vars: '_<window>_days_at_<thresh>',
-        },
-        heat_wave_total_length: {
-          label: 'HeatWaveTotDuration',
-          vars: '_<window>_days_at_<thresh_tasmin>_to_<thresh_tasmax>',
-        },
-        heat_wave_frequency: {
-          label: 'HeatWaveFreq',
-          vars: '_<window>_days_at_<thresh_tasmin>_to_<thresh_tasmax>',
-        },
-        dlyfrzthw: {
-          label: 'DaysFreezeThawCycle',
-          vars: '_<thresh_tasmin>_to_<thresh_tasmax>',
-        },
-        cold_spell_days: {
-          label: 'ColdSpellDays',
-          vars: '_<window>_days_at_<thresh>',
-        },
-      };
-
-      //       let variable = variables[form_inputs['analyze-location']];
-      //       variable = variable.label + variable.vars;
-      //
-      //       [
-      //         'thresh',
-      //         'thresh_tasmin',
-      //         'thresh_tasmax',
-      //         'window',
-      //         'after_date',
-      //         'sum_thresh',
-      //         'op',
-      //       ].forEach((v) => {
-      //         let val = $(`input[type="hidden"][id=${v}]`).val();
-      //         if (['thresh', 'thresh_tasmin', 'thresh_tasmax'].includes(v))
-      //           val = val.replaceAll('-', 'neg');
-      //         variable = variable.replaceAll('<' + v + '>', val);
-      //       });
-      //
-      //       let options = form_inputs['scenario'].replaceAll(',', '-') + '_';
-      //       let ps = form_inputs['ensemble_percentile'].split(',');
-      //       for (let i = 0; i < ps.length; i++) ps[i] = 'p' + ps[i];
-      //       options += ps.join('-') + '_';
-      //
-      //       let frequencies = {
-      //         YS: 'Annual',
-      //         MS: 'Monthly',
-      //         'QS-DEC': 'Seasonal',
-      //         'AS-JUL': 'July2June',
-      //       };
-      //       options += frequencies[form_inputs['freq']] + '_';
-      //       options += form_inputs['csv_precision'];
-      //
-      //       let ext = form_inputs['output_format'] == 'csv' ? 'csv' : 'nc';
-      //       return file_name.format(dataset, location, time, variable, options, ext);
     },
 
     update_default_scheme: function (callback) {

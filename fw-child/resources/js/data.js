@@ -496,3 +496,69 @@ const special_variables = {
     },
   },
 };
+
+/**
+ * Mapping to translate a variable id to a "short" name, grouped by variable type.
+ *
+ * For each variable type we have a list of "variable id to name" mappings. Each mapping is an object with two keys:
+ * `id` which is either a string or a regular expression matching the id; and `name` which is the variable's name to use
+ * in the filename.
+ *
+ * The name can contain placeholders, between `<` and `>`. A function using this mapping will generally replace
+ * the placeholders will specific values. For regular expressions, named groups can be used to specify the placeholder
+ * value in the variable name.
+ *
+ * @type {Object.<string, {id: string|RegExp, name: string}[]>}
+ */
+const variable_short_names = {
+  // Pre-calculated variables (i.e. 'single')
+  'single': [
+    {id: 'tn_min', name: 'MinTmin'}, // Coldest Day
+    {id: /HXmax(?<qt>\d+)/, name: 'DaysHumidexAboveThreshold-<qt>'}, // Days with Humidex > X
+    {id: /txgt_(?<qt>-?\d+)/, name: 'DaysAboveTmax-<qt>'}, // Days with Tmax > X
+    {id: /tnlt_(?<qt>-?\d+)/, name: 'DaysBelowTmin-<qt>'}, // Days with Tmin < X
+    {id: 'first_fall_frost', name: 'FirstFallFrost'}, // First fall frost
+    {id: 'frost_free_season', name: 'FrostFreeSeason'}, // Frost free season
+    {id: 'tx_max', name: 'MaxTmax'}, // Hottest Day
+    {id: 'last_spring_frost', name: 'LastSpringFrost'}, // Last spring frost
+    {id: 'tx_mean', name: 'MeanTmax'}, // Maximum Temperature
+    {id: 'tg_mean', name: 'MeanTemperature'}, // Mean Temperature
+    {id: 'tn_mean', name: 'MeanTmin'}, // Minimum Temperature
+    {id: /rx1day/, name: 'MaxDaysTotalPreci-qt-1'}, // Maximum 1-Day (Total) Precipitation
+    {id: /rx5day/, name: 'MaxDaysTotalPreci-qt-5'}, // Maximum 5-Days (Total) Precipitation
+    {id: 'cdd', name: 'MaxConsDryDays-qt-1'}, // Maximum Number of Consecutive Dry Days
+    {id: 'nr_cdd', name: 'NbConsDryDays-qt-5'}, // Number of Periods with more than 5 Consecutive Dry Days
+    {id: /spei_(?<m>\d+)m/, name: 'SPEI-<m>Months'}, // Standardized precipitation evapotranspiration index (X months)
+    {id: 'prcptot', name: 'TotalPreci'}, // Total Precipitation
+    {id: /r(?<t>\d+)mm/, name: 'WetDays-qt-<t>'}, // Wet Days
+    {id: /cddcold_(?<t>-?\d+)/, name: 'DegDaysAboveThreshold-qt-<t>'}, // Cooling Degree Days
+    {id: /dlyfrzthw_.+/, name: 'DaysFreezeThawCycle-neg1-to-0'}, // Freeze-Thaw Cycles
+    {id: 'frost_days', name: 'FrostDays'}, // Frost Days
+    {id: /gddgrow_(?<t>-?\d+)/, name: 'GrowingDegreeDays-qt-<t>'}, // Cumulative degree-days above X/Growing Degree Days (X°C)
+    {id: /hddheat_(?<t>-?\d+)/, name: 'DegDaysBelowThreshold-qt-<t>'}, // Heating degree days
+    {id: 'ice_days', name: 'IceDays'}, // Ice Days
+    {id: 'slr', name: 'RelSeaLvlChange'}, // Relative Sea-Level Change
+    {id: /tr_(?<t>-?\d+)/, name: 'DaysAboveTmin-<t>'}, // Tropical Nights - Days with Tmin > X
+  ],
+
+  // Analysis variables (i.e. 'custom')
+  'custom': [
+    {id: 'sdii', name: 'AverageWetDayPreciIntens-qt-<thresh>'}, // Average ‘Wet Day’ Precipitation Intensity
+    {id: 'cold_spell_days', name: 'ColdSpellDays-<window>-days-at-<thresh>'}, // Cold Spell Days
+    {id: 'hxmax_days_above', name: 'DaysAboveHXmax-<thresh>'}, // Days above HXMax
+    {id: 'tx_days_above', name: 'DaysAboveTmax-<thresh>'}, // Days above Tmax
+    {id: 'tx_tn_days_above', name: 'DaysAboveTmaxAndTmin-<thresh_tasmin>-to-<thresh_tasmax>'}, // Days above Tmax and Tmin
+    {id: 'tropical_nights', name: 'DaysAboveTmin-<thresh>'}, // Days above Tmin
+    {id: 'tn_days_below', name: 'DaysBelowTmin-<thresh>'}, // Days below Tmin
+    {id: 'dlyfrzthw', name: 'DaysFreezeThawCycle-<thresh_tasmin>-to-<thresh_tasmax>'}, // Days with a Freeze-Thaw Cycle
+    {id: 'cooling_degree_days', name: 'DegDaysAboveThreshold-<thresh>'}, // Degree Days Above a Threshold
+    {id: 'heating_degree_days', name: 'DegDaysBelowThreshold-<thresh>'}, // Degree Days Below a Threshold
+    {id: 'degree_days_exceedance_date', name: 'DegDaysExceedDate-<sum_thresh>-days-<thresh>-from-<after_date>'}, // Degree days exceedance date
+    {id: 'heat_wave_index', name: 'HeatWave-<window>-days-at-<thresh>'}, // Heat Wave (index)
+    {id: 'heat_wave_frequency', name: 'HeatWaveFreq-<window>-days-at-<thresh_tasmin>-to-<thresh_tasmax>'}, // Heat Wave Frequency
+    {id: 'heat_wave_total_length', name: 'HeatWaveTotDuration-<window>-days-at-<thresh_tasmin>-to-<thresh_tasmax>'}, // Heat Wave Total Duration
+    {id: 'cdd', name: 'MaxConsDryDays-qt-<thresh>'}, // Maximum Consecutive Dry Days
+    {id: 'cwd', name: 'MaxConsWetDays-qt-<thresh>'}, // Maximum Consecutive Wet Days'
+    {id: 'wetdays', name: 'WetDays-qt-<thresh>'}, // Wet Days
+  ],
+};

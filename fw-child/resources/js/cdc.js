@@ -1078,29 +1078,6 @@
                     url: choro_path,
                     dataType: 'json',
                     success: function (data) {
-                      options.grid.leaflet.vectorTileLayerStyles[query.sector] =
-                        function (properties, zoom) {
-                          let style_obj = {
-                            weight: 1,
-                            color: '#fff',
-                            fillColor: 'transparent',
-                            opacity: 0.5,
-                            fill: true,
-                            radius: 4,
-                            fillOpacity: 1,
-                          };
-
-                          if (properties.id) {
-                            style_obj.fillColor = plugin.maps.get_color.apply(
-                              item,
-                              [data[properties.id]],
-                            );
-                          }
-
-                          return style_obj;
-                        };
-
-                      console.log('got choro data');
                       return data;
                     },
                   });
@@ -1260,7 +1237,7 @@
                                 [options.choro.data[key][i]],
                               );
 
-                              if (query.selections.includes(String(i))) {
+                              if ('selections' in query && query.selections.includes(String(i))) {
                                 style_obj.weight = 1.5;
                                 style_obj.color = '#f00';
                               }
@@ -1281,6 +1258,28 @@
                         // console.log(layer_data);
 
                         // console.log('NEW LAYER');
+                        let vectorTileLayerStyles = {};
+                        vectorTileLayerStyles[query.sector] =
+                          function (properties, zoom) {
+                            let style_obj = {
+                              weight: 1,
+                              color: '#fff',
+                              fillColor: 'transparent',
+                              opacity: 0.5,
+                              fill: true,
+                              radius: 4,
+                              fillOpacity: 1,
+                            };
+
+                            if (properties.id) {
+                              style_obj.fillColor = plugin.maps.get_color.apply(
+                                item,
+                                [layer_data[properties.id]],
+                              );
+                            }
+
+                            return style_obj;
+                          };
 
                         options.maps[key].layers.grid = L.vectorGrid
                           .protobuf(
@@ -1300,8 +1299,7 @@
                               bounds: options.canadaBounds,
                               maxZoom: 12,
                               minZoom: 3,
-                              vectorTileLayerStyles:
-                                options.grid.leaflet.vectorTileLayerStyles,
+                              vectorTileLayerStyles: vectorTileLayerStyles,
                             },
                           )
                           .on('mouseover', function (e) {
@@ -1500,7 +1498,7 @@
         switch (i) {
           case -1:
             // fallback case in case style/legend is wrong
-            return 'rgba(0,0,0,0)';
+            return options.legend.colormap.colours[options.legend.colormap.colours.length-1];
           case 0:
             return options.legend.colormap.colours[0];
           default:

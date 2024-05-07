@@ -2710,6 +2710,10 @@
           'scheme-quantities',
           special_var.colormap.quantities,
         );
+        default_scheme_element.data(
+          'scheme-type',
+          special_var.colormap.scheme_type
+        );
         plugin.update_scheme();
 
         if (typeof callback === 'function') {
@@ -2745,6 +2749,10 @@
                 'scheme-quantities',
                 colour_map.map((e) => parseFloat(e.quantity)),
               );
+              default_scheme_element.data(
+                'scheme-type',
+                data.Legend[0].rules[0].symbolizers[0].Raster.colormap.type
+              );
               plugin.update_scheme();
             })
             .always(function () {
@@ -2777,10 +2785,14 @@
           ];
         layer_params.tiled = false;
         delete layer_params.sld_body;
-        layer_params.layers = layer_params.layers.replace(
-          ...special_var.layers_replace,
-        );
-        layer_params.styles = special_var.styles;
+        if (special_var.hasOwnProperty('layers_replace')) {
+          layer_params.layers = layer_params.layers.replace(
+            ...special_var.layers_replace,
+          );
+        }
+        if (special_var.hasOwnProperty('styles')) {
+          layer_params.styles = special_var.styles;
+        }
         return;
       }
 

@@ -1433,14 +1433,14 @@
               if (query.scheme_type == 'discrete') {
                 for (let i = 0; i < colours.length; i++) {
                   svg += `<rect class="legendbox" width="${legend_item_width}" height="${legend_item_height}"
-                        y="${legend_item_height * i}" fill="${colours[i]}" style="fill-opacity: ${opacity}"/>`;
+                        y="${legend_item_height * i}" fill="${colours[colours.length - i -1]}" style="fill-opacity: ${opacity}"/>`;
                 }
               } else {
                 svg += `<defs><linearGradient id="legendGradient" gradientTransform="rotate(90)">`;
                 for (let i = 0; i < colours.length; i++) {
                   svg += `<stop offset="${
                     (i / colours.length) * 100
-                  }%" stop-color="${colours[i]}"/>`;
+                  }%" stop-color="${colours[colours.length - i - 1]}"/>`;
                 }
                 svg += `</linearGradient> </defs>`;
                 svg += `<rect class="legendbox" width="${legend_item_width}" height="${
@@ -1458,7 +1458,7 @@
                   label = unit_localize(labels[i], options.lang);
                 } else {
                   label = value_formatter(
-                    quantities[i],
+                    quantities[colours.length - i - 2],
                     var_data.acf.units,
                     var_data.acf.decimals,
                     query.delta === 'true',

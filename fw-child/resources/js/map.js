@@ -694,7 +694,7 @@
       $(document).cdc_app(
         'add_hook',
         'maps.get_layer',
-        500,
+        501,
         plugin,
         plugin.apply_scheme,
       );
@@ -3498,8 +3498,20 @@
 
       let no_markers = true;
 
+      const marker_item = item.find('#recent-locations .list-group-item').eq(item_index);
+
+      // Close the location (chart) panel if it's currently opened and showing the charts
+      // of the location to remove.
+      if (window.location.hash === '#location-detail' || window.location.hash === '#station-detail') {
+        const marker_location = marker_item.data('location');
+        const shown_location = item.find('[data-query-key="location"]').val();
+        if (marker_location == shown_location) {
+          $('#control-bar').tab_drawer('update_path', '#location');
+        }
+      }
+
       // delete the item in the sidebar
-      item.find('#recent-locations .list-group-item').eq(item_index).remove();
+      marker_item.remove();
 
       for (let key in options.maps) {
         console.log(options.grid.markers[key]);

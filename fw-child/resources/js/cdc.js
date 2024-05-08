@@ -1077,9 +1077,6 @@
                   return $.ajax({
                     url: choro_path,
                     dataType: 'json',
-                    success: function (data) {
-                      return data;
-                    },
                   });
                 }
               }
@@ -1431,7 +1428,7 @@
               if (query.scheme_type == 'discrete') {
                 for (let i = 0; i < colours.length; i++) {
                   svg += `<rect class="legendbox" width="${legend_item_width}" height="${legend_item_height}"
-                        y="${legend_item_height * i}" fill="${colours[colours.length - i -1]}" style="fill-opacity: ${opacity}"/>`;
+                        y="${legend_item_height * i}" fill="${colours[colours.length - i - 1]}" style="fill-opacity: ${opacity}"/>`;
                 }
               } else {
                 svg += `<defs><linearGradient id="legendGradient" gradientTransform="rotate(90)">`;

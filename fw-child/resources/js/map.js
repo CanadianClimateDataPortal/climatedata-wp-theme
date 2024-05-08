@@ -2710,7 +2710,20 @@
           'scheme-quantities',
           special_var.colormap.quantities,
         );
+        default_scheme_element.data(
+          'scheme-type',
+          special_var.colormap.scheme_type
+        );
         plugin.update_scheme();
+
+        // select default scheme and disable schemes dropdown
+        item
+          .find('[data-query-key="scheme"]')
+          .val('default')
+          .trigger('change');
+        item
+          .find('#display-scheme-select .dropdown-toggle')
+          .prop('disabled', true);
 
         if (typeof callback === 'function') {
           callback();
@@ -2745,7 +2758,16 @@
                 'scheme-quantities',
                 colour_map.map((e) => parseFloat(e.quantity)),
               );
+              default_scheme_element.data(
+                'scheme-type',
+                data.Legend[0].rules[0].symbolizers[0].Raster.colormap.type
+              );
               plugin.update_scheme();
+
+              // enable scheme select dropdown
+              item
+                .find('#display-scheme-select .dropdown-toggle')
+                .prop('disabled', false);
             })
             .always(function () {
               if (typeof callback == 'function') {
@@ -2777,10 +2799,14 @@
           ];
         layer_params.tiled = false;
         delete layer_params.sld_body;
-        layer_params.layers = layer_params.layers.replace(
-          ...special_var.layers_replace,
-        );
-        layer_params.styles = special_var.styles;
+        if (special_var.hasOwnProperty('layers_replace')) {
+          layer_params.layers = layer_params.layers.replace(
+            ...special_var.layers_replace,
+          );
+        }
+        if (special_var.hasOwnProperty('styles')) {
+          layer_params.styles = special_var.styles;
+        }
         return;
       }
 
@@ -2897,12 +2923,24 @@
 
           let low = variable_data[absolute_or_delta].low;
           let high = variable_data[absolute_or_delta].high;
+          let decimals = options.var_data[options.query.var_id].acf.decimals;
           let scheme_length = colours.length;
 
           // if we have a diverging ramp, we center the legend at zero
           if (selected_scheme_item.data('scheme-type') === 'divergent') {
             high = Math.max(Math.abs(low), Math.abs(high));
             low = high * -1;
+
+            if ((high - low) * 10**decimals < scheme_length) {
+              // workaround to avoid legend with repeated values for very low range variables
+              low = -(scheme_length / 10**decimals / 2.0);
+              high = scheme_length / 10**decimals / 2.0;
+            }
+          } else {
+            if ((high - low) * 10**decimals < scheme_length) {
+              // workaround to avoid legend with repeated values for very low range variables
+              high = low + scheme_length / 10**decimals;
+            }
           }
 
           // temperature raster data files are in Kelvin, but in °C in variable_data

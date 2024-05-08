@@ -1077,32 +1077,6 @@
                   return $.ajax({
                     url: choro_path,
                     dataType: 'json',
-                    success: function (data) {
-                      options.grid.leaflet.vectorTileLayerStyles[query.sector] =
-                        function (properties, zoom) {
-                          let style_obj = {
-                            weight: 1,
-                            color: '#fff',
-                            fillColor: 'transparent',
-                            opacity: 0.5,
-                            fill: true,
-                            radius: 4,
-                            fillOpacity: 1,
-                          };
-
-                          if (properties.id) {
-                            style_obj.fillColor = plugin.maps.get_color.apply(
-                              item,
-                              [data[properties.id]],
-                            );
-                          }
-
-                          return style_obj;
-                        };
-
-                      console.log('got choro data');
-                      return data;
-                    },
                   });
                 }
               }
@@ -1260,7 +1234,7 @@
                                 [options.choro.data[key][i]],
                               );
 
-                              if (query.selections.includes(String(i))) {
+                              if ('selections' in query && query.selections.includes(String(i))) {
                                 style_obj.weight = 1.5;
                                 style_obj.color = '#f00';
                               }
@@ -1281,6 +1255,28 @@
                         // console.log(layer_data);
 
                         // console.log('NEW LAYER');
+                        let vectorTileLayerStyles = {};
+                        vectorTileLayerStyles[query.sector] =
+                          function (properties, zoom) {
+                            let style_obj = {
+                              weight: 1,
+                              color: '#fff',
+                              fillColor: 'transparent',
+                              opacity: 0.5,
+                              fill: true,
+                              radius: 4,
+                              fillOpacity: 1,
+                            };
+
+                            if (properties.id) {
+                              style_obj.fillColor = plugin.maps.get_color.apply(
+                                item,
+                                [layer_data[properties.id]],
+                              );
+                            }
+
+                            return style_obj;
+                          };
 
                         options.maps[key].layers.grid = L.vectorGrid
                           .protobuf(
@@ -1300,8 +1296,7 @@
                               bounds: options.canadaBounds,
                               maxZoom: 12,
                               minZoom: 3,
-                              vectorTileLayerStyles:
-                                options.grid.leaflet.vectorTileLayerStyles,
+                              vectorTileLayerStyles: vectorTileLayerStyles,
                             },
                           )
                           .on('mouseover', function (e) {
@@ -1433,14 +1428,14 @@
               if (query.scheme_type == 'discrete') {
                 for (let i = 0; i < colours.length; i++) {
                   svg += `<rect class="legendbox" width="${legend_item_width}" height="${legend_item_height}"
-                        y="${legend_item_height * i}" fill="${colours[i]}" style="fill-opacity: ${opacity}"/>`;
+                        y="${legend_item_height * i}" fill="${colours[colours.length - i - 1]}" style="fill-opacity: ${opacity}"/>`;
                 }
               } else {
                 svg += `<defs><linearGradient id="legendGradient" gradientTransform="rotate(90)">`;
                 for (let i = 0; i < colours.length; i++) {
                   svg += `<stop offset="${
                     (i / colours.length) * 100
-                  }%" stop-color="${colours[i]}"/>`;
+                  }%" stop-color="${colours[colours.length - i - 1]}"/>`;
                 }
                 svg += `</linearGradient> </defs>`;
                 svg += `<rect class="legendbox" width="${legend_item_width}" height="${
@@ -1458,7 +1453,7 @@
                   label = unit_localize(labels[i], options.lang);
                 } else {
                   label = value_formatter(
-                    quantities[i],
+                    quantities[colours.length - i - 2],
                     var_data.acf.units,
                     var_data.acf.decimals,
                     query.delta === 'true',
@@ -1500,7 +1495,7 @@
         switch (i) {
           case -1:
             // fallback case in case style/legend is wrong
-            return 'rgba(0,0,0,0)';
+            return options.legend.colormap.colours[options.legend.colormap.colours.length-1];
           case 0:
             return options.legend.colormap.colours[0];
           default:

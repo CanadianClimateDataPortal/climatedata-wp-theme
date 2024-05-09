@@ -1309,7 +1309,7 @@
 
       item.on('click', '#map-control-coords .btn', function () {
         let this_input = $(this).siblings().filter('[type="text"]'),
-          this_val = parseFloat(this_input.val()),
+          this_val = parseFloat(this_input.val().replace(',', '.')),
           zoom_val = parseInt(item.find('#coords-zoom').val());
 
         if (this_input.attr('id') == 'coords-zoom') {

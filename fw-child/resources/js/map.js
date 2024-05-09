@@ -539,15 +539,12 @@
           },
         },
         ajax: {
-          url: ajax_data.url,
+          url: ajax_data.rest_url + 'cdc/v2/location_search/',
           dataType: 'json',
-          delay: 0,
+          delay: 400,
           data: function (params) {
             return {
-              action: 'cdc_location_search',
-              q: params.term, // search term
-              search: params,
-              page: params.page,
+              q: params.term,
             };
           },
           transport: function (params, success, failure) {
@@ -599,7 +596,7 @@
         escapeMarkup: function (markup) {
           return markup;
         }, // let our custom formatter work
-        minimumInputLength: 1,
+        minimumInputLength: 3,
         width: '100%',
         templateResult: plugin._select2_format_item,
       });

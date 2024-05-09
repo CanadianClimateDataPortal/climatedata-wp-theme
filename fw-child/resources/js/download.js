@@ -2916,7 +2916,7 @@
       }).then(function () {
         console.log('set offset');
         // set map center to marker location w/ offset
-        $(document).cdc_app('maps.set_center', coords, 10, false);
+        $(document).cdc_app('maps.set_center', coords, 10);
 
         $('#coords-lat').val(coords.lat);
         $('#coords-lng').val(coords.lng);

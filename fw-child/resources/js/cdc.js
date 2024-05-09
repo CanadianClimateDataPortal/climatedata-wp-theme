@@ -1647,7 +1647,7 @@
         item.find('#recent-locations-clear').show();
       },
 
-      set_center: function (coords, zoom = null, do_offset = true) {
+      set_center: function (coords, zoom = null, offset = 0) {
         let plugin = !this.item ? this.data('cdc_app') : this,
           options = plugin.options,
           item = plugin.item;
@@ -1655,7 +1655,7 @@
         let visible_maps = item.find('.map-panel:not(.hidden)'),
           first_map_key = visible_maps.first().attr('data-map-key'),
           map = options.maps[first_map_key].object,
-          offset = 0;
+          container = options.maps[first_map_key].container;
 
         console.log('cdc', 'set center');
 
@@ -1669,28 +1669,8 @@
         // pan to center
         map.panTo([coords.lat, coords.lng], { animate: false });
 
-        if (typeof do_offset == 'integer') {
-          offset = do_offset;
-        } else if (do_offset == true) {
-          switch (visible_maps.length) {
-            case 3:
-              offset = 0;
-              break;
-            case 2:
-              offset = 0.1;
-              break;
-            default:
-              offset = 0.25;
-              break;
-          }
-
-          // console.log('offset', offset);
-
-          // calculate pixel value for offset
-          map_offset = map.getSize().x * offset;
-
-          // console.log('pan by', map_offset);
-
+        if (offset !== 0) {
+          map_offset = container.width() * offset;
           // pan by offset
           map.panBy(new L.Point(-map_offset, 0), { animate: false });
         }

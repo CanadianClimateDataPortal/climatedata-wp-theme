@@ -1083,7 +1083,7 @@
             '"]',
         );
 
-        $(document).cdc_app('maps.set_center', mouse_event.latlng, null, 0.75);
+        $(document).cdc_app('maps.set_center', mouse_event.latlng, null, 0.1);
 
         list_item.find('.view').trigger('click');
       });
@@ -3330,7 +3330,7 @@
 
         // set map center to marker location w/ offset
         console.log('set center');
-        $(document).cdc_app('maps.set_center', settings.coords);
+        $(document).cdc_app('maps.set_center', settings.coords, null, 0.1);
       }); // when get_location_data
     },
 

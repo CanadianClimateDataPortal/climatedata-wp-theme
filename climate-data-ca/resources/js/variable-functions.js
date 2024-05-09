@@ -725,7 +725,7 @@
               </div>
               <div class="idf-popup-row">
                   <h6 >
-                    <a href="${data_url}/fileserver/bdv/${properties.filename}" target="_blank">${T('View/Download')}</a>
+                    <a href="${data_url}/fileserver/bdv/${current_lang}/${properties.filename[current_lang]}" target="_blank">${T('View/Download')}</a>
                   </h6>
               </div>`;
         }

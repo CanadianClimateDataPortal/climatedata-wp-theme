@@ -2027,7 +2027,7 @@
 
                     maps['bdv'].setView([layer.feature.geometry.coordinates[1], layer.feature.geometry.coordinates[0]], current_view);
                     $('#bdv-station-name h5').text(layer.feature.properties.Location);
-                    $('#bdv-link').attr('href', data_url + '/fileserver/bdv/' + layer.feature.properties.filename);
+                    $('#bdv-link').attr('href', data_url + '/fileserver/bdv/' + current_lang + '/' + layer.feature.properties.filename[current_lang]);
                 } else {
                     layer.setStyle({
                         fillColor: '#3869f6'

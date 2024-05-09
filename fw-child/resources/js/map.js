@@ -1083,7 +1083,7 @@
             '"]',
         );
 
-        $(document).cdc_app('maps.set_center', mouse_event.latlng, 10, 0.75);
+        $(document).cdc_app('maps.set_center', mouse_event.latlng, null, 0.75);
 
         list_item.find('.view').trigger('click');
       });
@@ -3011,8 +3011,6 @@
 
       console.log('SETUP LOCATION', settings);
 
-      let zoom_level = 8;
-
       // convert coords to 4 decimal strings
       for (let key in settings.coords) {
         settings.coords[key] = parseFloat(settings.coords[key]).toFixed(4);
@@ -3044,10 +3042,6 @@
 
         switch (settings.sector) {
           case 'gridded_data':
-            // type
-
-            zoom_level = 10;
-
             // get by coords or ID
 
             let request_lat = settings.coords.lat,
@@ -3336,7 +3330,7 @@
 
         // set map center to marker location w/ offset
         console.log('set center');
-        $(document).cdc_app('maps.set_center', settings.coords, zoom_level);
+        $(document).cdc_app('maps.set_center', settings.coords);
       }); // when get_location_data
     },
 

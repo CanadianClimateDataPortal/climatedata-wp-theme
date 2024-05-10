@@ -94,7 +94,7 @@ if (have_posts()) : while (have_posts()) : the_post();
                 <li class="nav-item"><a href="#var-download" class="nav-link px-4 py-5 all-caps"><?php _e('Variable Data', 'cdc'); ?></a></li>
                 <li class="nav-item"><a href="#station-download" class="nav-link px-4 py-5 all-caps"><?php _e('Station Data', 'cdc'); ?></a></li>
                 <li class="nav-item"><a href="#idf-download" class="nav-link px-4 py-5 all-caps"><?php _e('IDF Curves', 'cdc'); ?></a></li>
-                <li class="nav-item"><a href="#bdv-download" class="nav-link px-4 py-5 all-caps"><?php _e('Building Design Value', 'cdc'); ?></a></li>
+                <li class="nav-item"><a href="#bdv-download" class="nav-link px-4 py-5 all-caps"><?php _e('Future Building Design Value Summaries', 'cdc'); ?></a></li>
                 <li class="nav-item"><a href="#ahccd-download" class="nav-link px-4 py-5 all-caps"><?php _e('AHCCD', 'cdc'); ?></a></li>
                 <li class="nav-item"><a href="#normals-download" class="nav-link px-4 py-5 all-caps"><?php _e('Climate Normals', 'cdc'); ?></a></li>
             </ul>

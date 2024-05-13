@@ -96,7 +96,7 @@ function taxonomy_topic()
     ];
     register_taxonomy('topic', ['resource'], $args);
 }
-add_action('init', 'taxonomy_topic', 0);
+add_action('init', 'taxonomy_topic', 10);
 
 // technical level
 
@@ -153,7 +153,7 @@ function taxonomy_techlevel()
     ];
     register_taxonomy('tech_level', ['resource'], $args);
 }
-add_action('init', 'taxonomy_techlevel', 0);
+add_action('init', 'taxonomy_techlevel', 10);
 
 // sector
 
@@ -206,7 +206,7 @@ function taxonomy_sector()
     ];
     register_taxonomy('sector', ['variable', 'resource'], $args);
 }
-add_action('init', 'taxonomy_sector', 0);
+add_action('init', 'taxonomy_sector', 10);
 
 // region
 
@@ -259,7 +259,7 @@ function taxonomy_region()
     ];
     register_taxonomy('region', ['resource'], $args);
 }
-add_action('init', 'taxonomy_region', 0);
+add_action('init', 'taxonomy_region', 10);
 
 // variable type
 
@@ -301,4 +301,4 @@ function taxonomy_vartype() {
 
 }
 
-add_action( 'init', 'taxonomy_vartype', 0 );
+add_action( 'init', 'taxonomy_vartype', 10 );

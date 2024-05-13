@@ -46,17 +46,17 @@ if ( stream_resolve_include_path ( 'local_config.php' ) ) {
 
 
 add_action ( 'wp_enqueue_scripts', function() {
-	
+
 	// deregister font-awesome from parent theme
 	// to use /site/assets/font-awesome instead
-	
+
 	wp_dequeue_style ( 'font-awesome' );
 	wp_deregister_style ( 'font-awesome' );
-	
+
 }, 20 );
 
 function child_theme_enqueue() {
-	
+
 	$theme_dir = get_bloginfo ( 'template_directory' ) . '/';
 	$vendor_dir = $theme_dir . 'resources/vendor/';
 	$js_dir = $theme_dir . 'resources/js/';
@@ -69,31 +69,31 @@ function child_theme_enqueue() {
 	//
 	// STYLES
 	//
-	
+
 	// dequeue global CSS
-	
+
 	wp_dequeue_style ( 'global-style' );
-	
+
 	// VENDOR
-	
+
 	// font awesome
-	
+
 	wp_register_style ( 'font-awesome', WP_CONTENT_URL . '/vendor/font-awesome-pro/css/all.css', null, null );
 	wp_enqueue_style ( 'font-awesome' );
 
 	// leaflet
-	
+
 	wp_enqueue_style ( 'leaflet', $child_npm_dir . 'leaflet/dist/leaflet.css', NULL, NULL, 'all' );
-	
+
 	wp_enqueue_style ( 'leaflet-geoman', $child_vendor_dir . 'leaflet-geoman/leaflet-geoman.css', NULL, NULL, 'all' );
-	
+
 	// select2
-	
+
 	wp_register_style ( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css', null, null );
 
 	wp_register_style ( 'gutenberg', $child_theme_dir . 'resources/css/gutenberg.css', null, null );
 	wp_enqueue_style ( 'child-style', $child_theme_dir . 'style.css', NULL, NULL, 'all' );
-	
+
 	if (
 		is_singular ( 'interactive' ) ||
 		is_singular ( 'resource' )
@@ -101,112 +101,112 @@ function child_theme_enqueue() {
 		wp_enqueue_style ( 'wp-block-library' );
 		wp_enqueue_style ( 'gutenberg' );
 	}
-	
+
 	if (
 		$GLOBALS['vars']['current_slug'] == 'map' ||
 		$GLOBALS['vars']['current_slug'] == 'carte' ||
 		$GLOBALS['vars']['current_slug'] == 'download' ||
 		$GLOBALS['vars']['current_slug'] == 'telechargement'
 	) {
-		
+
 		wp_enqueue_style ( 'leaflet' );
 		wp_enqueue_style ( 'select2' );
-		
+
 	}
 
 	//
 	// SCRIPTS
 	//
-	
+
 	// VENDOR
-	
+
 	// js-cookie
-	
+
 	wp_register_script ( 'js-cookie', 'https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js', NULL, NULL, true );
-		
+
 	// page tour
-	
+
 	wp_register_script ( 'page-tour', $child_vendor_dir . 'pe-page-tour/page-tour.js', array ( 'jquery-ui-core', 'js-cookie' ), NULL, true );
-	
+
 	// tab drawer
-	
+
 	wp_register_script ( 'tab-drawer', $child_vendor_dir . 'pe-tab-drawer/tab-drawer.js', array ( 'jquery' ), NULL, true );
-	
+
 	// flex drawer
-	
+
 	wp_register_script ( 'flex-drawer', $child_vendor_dir . 'pe-flex-drawer/flex-drawer.js', array ( 'jquery' ), NULL, true );
 
 	wp_register_script ( 'share-widget', $child_vendor_dir . 'pe-social-widget/share-widget.js', array ( 'jquery' ), NULL, true );
-	
+
 	// leaflet
-	
+
 	wp_register_script ( 'leaflet', $child_npm_dir . 'leaflet/dist/leaflet-src.js', null, null, true );
-	
+
 	wp_register_script ( 'leaflet-sync', $child_npm_dir . 'leaflet.sync/L.Map.Sync.js', array ( 'leaflet' ), null, true );
-	
+
 	wp_register_script ( 'leaflet-geoman', $child_vendor_dir . 'leaflet-geoman/leaflet-geoman.min.js', array ( 'leaflet' ), NULL, true );
-	
+
 	wp_register_script ( 'leaflet-vectorgrid', $child_npm_dir . 'leaflet.vectorgrid/dist/Leaflet.VectorGrid.bundled.min.js', array ( 'leaflet' ), null, true );
-	
+
 	wp_register_script ( 'leaflet-cluster', $child_vendor_dir . 'leaflet-markercluster/leaflet.markercluster.js', array ( 'leaflet' ), NULL, true );
-	
+
 	wp_register_script ( 'leaflet-cluster-subgroup', $child_vendor_dir . 'leaflet.featuregroup.subgroup.js', array ( 'leaflet-cluster' ), NULL, true );
-	
+
 	// highcharts
-	
+
 	wp_register_script ( 'highcharts-highstock', 'https://code.highcharts.com/stock/highstock.js', NULL, NULL, true );
 	wp_register_script ( 'highcharts-more', 'https://code.highcharts.com/stock/highcharts-more.js', array ( 'highcharts-highstock' ), NULL, true );
 	wp_register_script ( 'highcharts-exporting', 'https://code.highcharts.com/stock/modules/exporting.js', array ( 'highcharts-highstock' ), NULL, true );
 	wp_register_script ( 'highcharts-export-data', 'https://code.highcharts.com/stock/modules/export-data.js', array ( 'highcharts-exporting' ), NULL, true );
 	wp_register_script ( 'highcharts-offline-exporting', 'https://code.highcharts.com/stock/modules/offline-exporting.js', array ( 'highcharts-exporting' ), NULL, true );
 	wp_register_script ( 'highcharts-accessibility', 'https://code.highcharts.com/modules/accessibility.js', array ( 'highcharts-highstock' ), NULL, true );
-	
+
 	// zebra pin
-	
+
 	wp_register_script ( 'zebra-pin', $child_npm_dir . 'zebra_pin/dist/zebra_pin.min.js', array ( 'jquery' ), null, true );
-	
+
 	// select2
-	
+
 	wp_register_script ( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', array ( 'jquery' ), null, true );
-	
+
 	// utilities/constants
-	
+
 	wp_register_script ( 'utilities', $child_js_dir . 'utilities.js', array ( 'jquery', 'leaflet' ), NULL, true );
-	
+
 	wp_localize_script ( 'utilities', 'theme_data', array (
 		'child_theme_dir' => get_stylesheet_directory_uri()
 	) );
-	
+
   wp_register_script ( 'data', $child_js_dir . 'data.js', array (  ), NULL, true );
 
-	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array ( 
-		'utilities', 
-		'data', 
-		'lodash', 
-		'jquery', 
-		'leaflet', 
-		'leaflet-vectorgrid', 
-		'leaflet-sync', 
-		'leaflet-geoman', 
-		'leaflet-cluster', 
-		'leaflet-cluster-subgroup', 
-		'tab-drawer', 
-		'highcharts-highstock', 
-		'highcharts-more', 
-		'highcharts-exporting', 
-		'highcharts-export-data', 
-		'highcharts-offline-exporting', 
-		'highcharts-accessibility' 
+	wp_register_script ( 'cdc', $child_js_dir . 'cdc.js', array (
+		'utilities',
+		'data',
+		'lodash',
+		'jquery',
+		'leaflet',
+		'leaflet-vectorgrid',
+		'leaflet-sync',
+		'leaflet-geoman',
+		'leaflet-cluster',
+		'leaflet-cluster-subgroup',
+		'tab-drawer',
+		'highcharts-highstock',
+		'highcharts-more',
+		'highcharts-exporting',
+		'highcharts-export-data',
+		'highcharts-offline-exporting',
+		'highcharts-accessibility'
 	), NULL, true );
-	
+
 	wp_localize_script ( 'cdc', 'theme_data', array (
 		'child_theme_dir' => get_stylesheet_directory_uri()
 	) );
-	
+
 	wp_register_script ( 'map-app', $child_js_dir . 'map.js', array ( 'cdc', 'data', 'jquery-ui-slider', 'select2', 'flex-drawer' ), NULL, true );
-	
+
 	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'cdc', 'jquery-ui-slider', 'jquery-ui-datepicker', 'select2', 'flex-drawer' ), NULL, true );
-	
+
 	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'tab-drawer', 'utilities', 'share-widget' ), NULL, true );
 
 	// Scripts for the "custom shapefile upload" logic (in the "download" section).
@@ -218,9 +218,9 @@ function child_theme_enqueue() {
 	wp_register_script ( 'turf', $child_npm_dir . '@turf/turf/turf.min.js', null, null, true );
 
 	wp_register_script ( 'shapefile-upload', $child_js_dir . 'shapefile-upload.js', array ( 'jquery', 'jszip', 'mapshaper', 'topojson', 'turf' ), null, true );
-	
+
 	// localize admin url
-	
+
 	$units = array (
 		'celcius' => 'º C',
 		'kelvin' => 'K',
@@ -233,20 +233,20 @@ function child_theme_enqueue() {
 		'number of periods' => __ ( 'number of periods', 'cdc' ),
 		'events' => __ ( 'events', 'cdc' )
 	);
-	
+
 	wp_localize_script ( 'utilities', 'unit_strings', $units );
-	
+
 	// PAGE CONDITIONALS
-	
+
 	if ( is_front_page() ) {
-		
+
 		// wp_dequeue_script ( 'jquery' );
 		wp_deregister_script ( 'jquery' );
-		
+
 		wp_enqueue_script ( 'jquery', 'https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=65dbbfa49f6b400b385a0b1d', null, null, true );
-		
+
 		wp_enqueue_script ( 'webflow', $child_vendor_dir . 'climatedata-scroll.webflow/webflow.js', array ( 'jquery' ), null, true );
-		
+
 	}
 
 	switch ( $GLOBALS['vars']['current_slug'] ) {
@@ -256,44 +256,44 @@ function child_theme_enqueue() {
 			wp_enqueue_script ( 'page-tour' );
 			wp_enqueue_script ( 'shapefile-upload' );
 			break;
-			
+
 		case 'download' :
 		case 'telechargement' :
 			wp_enqueue_script ( 'page-tour' );
 			wp_enqueue_script ( 'download-app' );
 			wp_enqueue_script ( 'shapefile-upload' );
 			break;
-			
+
 		case 'learn' :
 		case 'apprendre' :
 			wp_enqueue_script ( 'zebra-pin' );
 			// wp_enqueue_script ( 'tab-drawer' );
 			break;
-			
+
 		case 'news' :
 		case 'nouvelles' :
 			wp_enqueue_script ( 'zebra-pin' );
 			// wp_enqueue_script ( 'tab-drawer' );
 			break;
-				
+
 		case 'beta-apps' :
 		case 'apps-beta' :
 			wp_enqueue_script ( 'zebra-pin' );
 			break;
-		
+
 	}
-	
+
 	if ( is_singular ( 'beta-app' ) ) {
 		wp_enqueue_script ( 'iframe-functions', $child_js_dir . 'iframe-functions.js', array ( 'jquery' ), null, true );
 	}
-	
+
 	if ( is_post_type_archive ( 'variable' ) ) {
 		wp_enqueue_script ( 'zebra-pin' );
 		wp_enqueue_script ( 'flex-drawer' );
 	}
-	
+
 	wp_enqueue_script ( 'child-functions' );
-	
+
 
 }
 
@@ -339,11 +339,11 @@ function fw_child_theme_support() {
 	// UNCROPPED IMAGE SIZE FOR CARD BLOCKS
 
 	add_image_size ( 'card-img-no-crop', '600', '380', false );
-	
+
 	// MENUS
 
 	// LANGUAGES
-	
+
 	load_theme_textdomain ( 'cdc', get_stylesheet_directory() );
 
 }
@@ -351,16 +351,17 @@ function fw_child_theme_support() {
 add_action ( 'after_setup_theme', 'fw_load_child_theme_lang_files', 0 );
 
 function fw_load_child_theme_lang_files() {
-	
-	load_theme_textdomain ( 'cdc', get_stylesheet_directory() . '/languages' );
-	
+
+	load_theme_textdomain ( 'cdc', get_stylesheet_directory() . '/languages/cdc' );
+	load_theme_textdomain ( 'cdc-taxonomies', get_stylesheet_directory() . '/languages/cdc-taxonomies' );
+
 	$locale = get_locale();
 	$locale_file = get_stylesheet_directory() . '/languages/' . $locale . '.php';
-	
+
 	if ( is_readable ( $locale_file ) ) {
 		require_once ( $locale_file );
 	}
-	
+
 }
 
 
@@ -387,33 +388,33 @@ function add_favicon() {
 add_action( 'wp_head', 'add_favicon' );
 
 add_action ( 'wp_head', function() {
-	
+
 	if ( is_front_page() ) {
-		
+
 ?>
 
 <script type="text/javascript">
 	! function(o, c) {
 		var n = c.documentElement,
 			t = " w-mod-";
-			
+
 		n.setAttribute('data-wf-page', '65dbbfa49f6b400b385a0b23')
 		n.setAttribute('data-wf-site', '65dbbfa49f6b400b385a0b1d')
-			
+
 		n.className += t + "js", ("ontouchstart" in o || o.DocumentTouch && c instanceof DocumentTouch) && (n.className += t + "touch")
 	}(window, document);
 </script>
 
 <?php
 
-	}	
-	
+	}
+
 } );
 
 add_action( 'wp_footer', function() {
-	
+
 	// FB/linkedin share scripts
-	
+
 	if ( is_singular ( 'post' ) ) {
 
 ?>
@@ -426,9 +427,9 @@ add_action( 'wp_footer', function() {
 <?php
 
 	}
-	
+
 	// spinner
-	
+
 ?>
 
 <div id="spinner" class="spinner"></div>
@@ -443,7 +444,7 @@ add_action( 'wp_footer', function() {
 //
 
 add_action ( 'fw_before_footer', function() {
-	
+
 ?>
 
 <script type="text/javascript">
@@ -472,9 +473,9 @@ add_action ( 'fw_before_footer', function() {
 add_action ( 'fw_before_footer', function() {
 
 	if ( have_rows ( 'tour', $GLOBALS['fw']['current_query']['ID'] ) ) {
-		
+
 		echo '<div class="page-tour" id="page-tour" data-steps=';
-		
+
 		echo "'" . json_encode ( get_field ( 'tour', $GLOBALS['fw']['current_query']['ID'] ) ) . "'></div>";
 
 	}

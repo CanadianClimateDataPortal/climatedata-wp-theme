@@ -156,6 +156,35 @@ l10n_labels = {
   ahccdLegendCircle: 'Both',
 };
 
+if (ajax_data.globals.current_lang_code == 'fr') {
+  l10n_labels = {
+    to: 'à',
+    to_doy: 'au',
+    days: 'jours',
+    median: 'Médiane',
+    range: 'Portée',
+    search_city: 'Cherchez une ville ou un village pour effectuer un zoom',
+    selected: 'sélectionés',
+    label_field: 'label_fr',
+    temperature: 'température',
+    precipitation: 'précipitation',
+    other_variables: 'autres',
+    station_data: 'données des stations',
+    selectstation: 'Sélectionner au moins une station pour télécharger les données.',
+    readytoprocess: 'Prêt à traiter.',
+    misc: 'Divers',
+    allbccaq: 'Toutes les variables BCCAQv2',
+    gridded_data: 'Données maillées',
+    census: 'Subdivisions de recensement',
+    health: 'Régions socio-sanitaires',
+    watershed: 'Bassins versants',
+    ahccdLegend: 'Légende',
+    ahccdLegendSquare: 'Température',
+    ahccdLegendTriangle: 'Précipitation',
+    ahccdLegendCircle: 'Tous les deux'
+  };
+}
+
 var l10n_table = {
   fr: {
     'All models': 'Tous les modèles',
@@ -176,9 +205,17 @@ var l10n_table = {
     'Ready to process.': 'Prêt à traiter.',
     'Choose at least one weather station. ':
       'Sélectionner au moins une station.',
+    'View location': 'Afficher',
+    'Remove pin': 'Retirer',
+    'View': 'Afficher',
 
     'Climate normals 1981–2010':
       'Normales et moyennes climatiques de 1981–2010',
+
+    // Location search
+    'Searching…': 'Recherche…',
+    'No results found': 'Aucun résultat trouvé',
+    'The results could not be loaded.': 'Les résultats ne peuvent pas être chargés.',
 
     // share widget
     'Copied to clipboard': 'Copié dans le presse-papier',
@@ -294,6 +331,28 @@ chart_labels = {
   click_to_zoom: 'Click and drag in the plot area to zoom in',
 };
 
+if (ajax_data.globals.current_lang_code == 'fr') {
+  chart_labels = {
+    change_from_1971_2000: 'Changement par rapport à 1971-2000',
+    observation: 'Données observées interpolées',
+    historical: 'Historique modélisé',
+    historical_range: 'Répartition historique',
+    rcp_26_median: 'RCP 2.6 médiane',
+    rcp_26_range: 'RCP 2.6 portée',
+    rcp_45_median: 'RCP 4.5 médiane',
+    rcp_45_range: 'RCP 4.5 portée',
+    rcp_85_median: 'RCP 8.5 médiane',
+    rcp_85_range: 'RCP 8.5 portée',
+    rcp_85_enhanced: 'RCP 8.5 scénario renforcé',
+    temperature: 'Température',
+    precipitation: 'Précipitation',
+    daily_avg_temp: 'Température quotidienne moyenne',
+    daily_max_temp: 'Température quotidienne maximale',
+    daily_min_temp: 'Température quotidienne minimale',
+    click_to_zoom: 'Cliquer et faire glisser dans la zone du tracé pour agrandir',
+  };
+}
+
 var month_names = [
   'Jan',
   'Feb',
@@ -309,7 +368,7 @@ var month_names = [
   'Dec',
 ];
 
-if (ajax_data.current_lang_code == 'fr') {
+if (ajax_data.globals.current_lang_code == 'fr') {
   month_names = [
     'Janv.',
     'Févr.',
@@ -558,7 +617,7 @@ function value_formatter(value, units, decimals, delta, lang) {
       str += ' ' + unit;
       break;
   }
-  return unit_localize(str);
+  return unit_localize(str, lang);
 }
 
 //

@@ -8,10 +8,10 @@
 
 			<div class="control-tab-body">
 
-				<h6 class="all-caps text-secondary mx-4 my-3"><?php _e ( 'Export Image', 'cdc' ); ?></h6>
+				<h6 class="all-caps text-secondary mx-4 my-3"><?php _e ( 'Save Image', 'cdc' ); ?></h6>
 
 				<div id="map-control-img" class="map-control-item bg-white me-2">
-					<p><?php _e ( 'Position the map as needed and export as a PNG image', 'cdc' ); ?></p>
+					<p><?php _e ( 'Position the map as needed and save it as a PNG image.', 'cdc' ); ?></p>
 
 					<a href="#" class="btn btn-secondary d-block" id="download-map-image">
 						<span class="btn-icon"><i class="far fa-image"></i></span>
@@ -23,7 +23,7 @@
 				<h6 class="all-caps text-secondary mx-4 my-3"><?php _e ( 'Share URL', 'cdc' ); ?></h6>
 
 				<div id="map-control-share" class="map-control-item bg-white me-2">
-					<p><?php _e ( 'Copy a shareable URL containing the current map view and parameters', 'cdc' ); ?></p>
+					<p><?php _e ( 'Copy a shareable URL containing the current map view and parameters.', 'cdc' ); ?></p>
 
 					<a href="#" class="btn btn-secondary d-block" id="copy-permalink">
 						<span class="btn-icon"><i class="far fa-copy"></i></span>

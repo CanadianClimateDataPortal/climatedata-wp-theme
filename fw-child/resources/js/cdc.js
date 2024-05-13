@@ -2055,11 +2055,12 @@
         let pointFormatter;
 
         // more to this to add later
+        const localized_chart_unit = unit_localize(options.chart.unit, options.lang)
         var labelFormatter = function () {
           return (
             this.axis.defaultLabelFormatter.call(this) +
             ' ' +
-            options.chart.unit
+            localized_chart_unit
           );
         };
 
@@ -2239,16 +2240,12 @@
           );
 
           // delta value
-          let delta_icon = 'fa-caret-up text-primary',
-            delta_label = T('higher');
+          let delta_icon = 'fa-caret-up text-primary';
 
           if (delta_vals[i] == 0) {
             delta_icon = 'fa-equals';
-            delta_label = '';
           } else if (delta_vals[i] < 0) {
             delta_icon = 'fa-caret-down text-secondary';
-            delta_label = T('lower');
-            delta_vals[i] = Math.abs(delta_vals[i]);
           }
 
           new_val_row.append(
@@ -2263,7 +2260,6 @@
                 options.lang,
               ) +
               ' ' +
-              delta_label +
               '</div>',
           );
 
@@ -2283,7 +2279,7 @@
         if (options.chart.series.length == 0) {
           settings.container.innerHTML =
             '<span class="text-primary text-center"><h1>' +
-            'No data available for selected location' +
+            T('No data available for selected location') +
             '</h1></span>';
         } else {
           // console.log('render');
@@ -2335,7 +2331,7 @@
               padding: 4,
               pointFormatter: pointFormatter,
               valueDecimals: var_fields.decimals,
-              valueSuffix: ' ' + options.chart.unit,
+              valueSuffix: ' ' + localized_chart_unit,
             },
             navigation: {
               buttonOptions: {
@@ -2547,6 +2543,11 @@
             title: {
               text: '',
               align: 'left',
+            },
+            navigation: {
+              buttonOptions: {
+                enabled: false,
+              },
             },
             subtitle: {
               align: 'left',

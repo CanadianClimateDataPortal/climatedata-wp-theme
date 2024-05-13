@@ -5,67 +5,67 @@
 				<h5 class="mb-0"><?php _e ( 'Display', 'cdc' ); ?></h5>
 				<span class="tab-drawer-close btn-close"></span>
 			</div>
-			
+
 			<div class="control-tab-body">
-				
+
 				<div id="map-control-delta" class="map-control-item" data-flags="station:0">
 					<h6 class="all-caps text-secondary mb-3 d-flex align-items-center">
 						<?php _e ( 'Data Values', 'cdc' ); ?>
 						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
 					</h6>
-					
+
 					<div class="d-flex flex-wrap">
 						<div class="form-check me-3">
 							<input class="form-check-input" type="radio" name="display-delta" id="display-delta-absolute" value="" checked data-query-key="delta">
 							<label class="form-check-label" for="display-delta-absolute"><?php _e ( 'Absolute', 'cdc' ); ?></label>
 						</div>
-						
+
 						<div class="form-check">
 							<input class="form-check-input" type="radio" name="display-delta" id="display-delta-delta" value="true" data-query-key="delta">
-							<label class="form-check-label" for="display-delta-delta"><?php _e ( 'Delta vs. Baseline', 'cdc' ); ?></label>
+							<label class="form-check-label" for="display-delta-delta"><?php _e ( 'Delta', 'cdc' ); ?></label>
 						</div>
 					</div>
 				</div>
-				
+
 				<div id="map-control-aggregation" class="map-control-item" data-flags="station:0">
 					<h6 class="all-caps text-secondary mb-3 d-flex align-items-center">
 						<?php _e ( 'Map Aggregation', 'cdc' ); ?>
 						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
 					</h6>
-					
+
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-grid" value="gridded_data" checked data-query-key="sector">
 						<label class="form-check-label" for="display-aggregation-grid"><?php _e ( 'Gridded Data', 'cdc' ); ?></label>
 					</div>
-					
+
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-csd" value="census" data-query-key="sector">
 						<label class="form-check-label" for="display-aggregation-csd"><?php _e ( 'Census Subdivisions', 'cdc' ); ?></label>
 					</div>
-					
+
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-health" value="health" data-query-key="sector">
 						<label class="form-check-label" for="display-aggregation-health"><?php _e ( 'Health Regions', 'cdc' ); ?></label>
 					</div>
-					
+
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="display-aggregation" id="display-aggregation-watershed" value="watershed" data-query-key="sector">
-						<label class="form-check-label" for="display-aggregation-watershed"><?php _e ( 'Watersheds' ); ?></label>
+						<label class="form-check-label" for="display-aggregation-watershed"><?php _e ( 'Watersheds', 'cdc' ); ?></label>
 					</div>
-					
+
 				</div>
-				
+
 				<div id="map-control-colours" class="map-control-item">
 					<h6 class="all-caps text-secondary"><?php _e ( 'Colours', 'cdc' ); ?></h6>
-					
+
 					<input type="hidden" name="display-scheme" id="display-scheme" value="kejDjr" data-query-key="scheme">
-					
+
 					<div id="display-scheme-select" class="dropdown mb-3">
 						<div class="dropdown-toggle scheme-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
 							<span class="gradient"><svg width="100%" height="100%"></svg></span>
 							<span class="sr-only"><?php _e ( 'Selected Scheme Name', 'cdc' ); ?></span>
 						</div>
-						
+
 						<ul class="dropdown-menu w-100 p-0">
 							<li><button class="dropdown-item scheme-dropdown active default" data-scheme-id="default" data-scheme-colours='[]'>
 								<span class="gradient"><svg width="100%" height="100%"></svg></span>
@@ -142,51 +142,51 @@
 
                             <!-- end of generated automatically -->
 						</ul>
-						
+
 					</div>
-					
+
 					<div id="display-colours-toggle" class="btn-group w-100">
-						
+
 						<input type="radio" class="btn-check" name="display-colours-type" id="display-colours-discrete" autocomplete="off" data-query-key="scheme_type" value="discrete" checked>
 						<label class="btn disabled btn-outline-gray-400" for="display-colours-discrete"><?php _e ( 'Discrete', 'cdc' ); ?></label>
-						
+
 						<input type="radio" class="btn-check" name="display-colours-type" id="display-colours-continuous" autocomplete="off" data-query-key="scheme_type" value="continuous">
 						<label class="btn disabled btn-outline-gray-400" for="display-colours-continuous"><?php _e ( 'Continuous', 'cdc' ); ?></label>
-						
+
 					</div>
 				</div>
-				
+
 				<div id="map-control-opacity" class="map-control-item all-caps">
 					<h6 class="text-secondary mb-3"><?php _e ( 'Layer Opacity', 'cdc' ); ?></h6>
-					
+
 					<h6 class="text-gray-600"><?php _e ( 'Data', 'cdc' ); ?></h6>
-					
+
 					<input type="hidden" name="display-opacity" id="display-opacity" data-query-key="opacity" value="100,100,100">
-					
+
 					<div class="map-control-slider-well mb-4">
 						<div id="display-data-slider" class="map-control-slider opacity-slider" data-pane="raster">
 							<div id="data-opacity-handle" class="ui-slider-handle">100</div>
 						</div>
 					</div>
-					
+
 					<h6 class="text-gray-600"><?php _e ( 'Labels', 'cdc' ); ?></h6>
-					
+
 					<div class="map-control-slider-well mb-4">
 						<div id="display-labels-slider" class="map-control-slider opacity-slider" data-pane="labels">
 							<div id="labels-opacity-handle" class="ui-slider-handle">100</div>
 						</div>
 					</div>
-					
+
 					<h6 class="text-gray-600"><?php _e ( 'Pins', 'cdc' ); ?></h6>
-					
+
 					<div class="map-control-slider-well">
 						<div id="display-pins-slider" class="map-control-slider opacity-slider" data-pane="marker">
 							<div id="pins-opacity-handle" class="ui-slider-handle">100</div>
 						</div>
 					</div>
-					
-				</div>					
-				
+
+				</div>
+
 			</div>
 		</div>
 	</div>

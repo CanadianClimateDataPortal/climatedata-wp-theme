@@ -146,9 +146,9 @@ function fw_setup_current_lang() {
 add_action( 'init', 'fw_setup_current_lang', 0 );
 
 function fw_load_lang_files() {
-	
-	load_theme_textdomain ( 'fw', get_template_directory() . '/languages' );
-	
+
+	load_theme_textdomain ( 'fw', get_template_directory() . '/languages/fw' );
+
 	$locale = get_locale();
 	$locale_file = get_template_directory() . '/languages/' . $locale . '.php';
 	
@@ -158,7 +158,7 @@ function fw_load_lang_files() {
 	
 }
 
-add_action( 'after_theme_setup', 'fw_load_lang_files', 10 );
+add_action( 'after_setup_theme', 'fw_load_lang_files', 10 );
 
 // update theme options and flush rewrite
 // whenever the languages options page is updated

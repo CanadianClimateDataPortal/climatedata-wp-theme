@@ -537,6 +537,15 @@
 
             return instructions;
           },
+          noResults: function () {
+            return T('No results found');
+          },
+          searching: function () {
+            return T('Searching…');
+          },
+          errorLoading: function () {
+            return T('The results could not be loaded.');
+          },
         },
         ajax: {
           url: ajax_data.rest_url + 'cdc/v2/location_search/',
@@ -2253,7 +2262,7 @@
                 '<h4 class="card-title">' + query_item.title + '</h4>',
               );
               new_item.append(
-                '<a href="' + query_item.url + '">' + 'View' + '</a>',
+                '<a href="' + query_item.url + '">' + T('View') + '</a>',
               );
 
               item.find('#info-relevant-sectors').append(new_item);
@@ -2272,7 +2281,7 @@
                 '<h4 class="card-title">' + query_item.title + '</h4>',
               );
               new_item.append(
-                '<a href="' + query_item.url + '">' + 'View' + '</a>',
+                '<a href="' + query_item.url + '">' + T('View') + '</a>',
               );
 
               item.find('#info-relevant-training').append(new_item);

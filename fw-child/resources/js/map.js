@@ -3255,10 +3255,12 @@
             }
           }
         } else {
-          // if the list has 5 items
-          if (recent_list.find('.list-group-item').length > 4) {
-            // remove the last one
-            recent_list.find('.list-group-item').last().remove();
+          // if the list already has 5 items, remove the oldest marker
+          const nb_markers = recent_list.find('.list-group-item').length;
+          if (nb_markers >= 5) {
+            for (let i = nb_markers - 1; i >= 4; i--) {
+              plugin.remove_marker(i);
+            }
           }
 
           // create a new recent location
@@ -3461,14 +3463,6 @@
         // add new marker to beginning of array
         options.grid.markers[key].unshift(new_marker);
 
-        if (options.grid.markers[key].length >= 5) {
-          // pop the last if there are more than 5
-          popped_marker = options.grid.markers[key].pop();
-          popped = true;
-
-          options.maps[key].object.removeLayer(popped_marker);
-        }
-
         new_marker
           .on('mouseover', function (e) {
             $(document).trigger('marker_mouseover', [e]);
@@ -3494,10 +3488,6 @@
         options = plugin.options,
         item = plugin.item;
 
-      // console.log('remove', item_index);
-
-      let no_markers = true;
-
       const marker_item = item.find('#recent-locations .list-group-item').eq(item_index);
 
       // Close the location (chart) panel if it's currently opened and showing the charts
@@ -3514,20 +3504,23 @@
       marker_item.remove();
 
       for (let key in options.maps) {
-        console.log(options.grid.markers[key]);
+        const map_markers = options.grid.markers[key];
+
+        // For station variables, no markers are shown on the map
+        if (!map_markers || !map_markers.length) {
+          continue;
+        }
+
+        console.log(map_markers);
 
         // remove from map
         options.maps[key].object.removeLayer(
-          options.grid.markers[key][item_index],
-          options.grid.markers[key][item_index],
+          map_markers[item_index],
+          map_markers[item_index],
         );
 
         // splice from the markers array
-        options.grid.markers[key].splice(item_index, 1);
-
-        if (options.grid.markers[key].length > 0) {
-          no_markers = false;
-        }
+        map_markers.splice(item_index, 1);
       }
 
       // reorder index attributes for the whole list
@@ -3535,9 +3528,9 @@
         $(this).attr('data-index', i);
       });
 
-      console.log(no_markers);
+      const nb_markers_left = item.find('#recent-locations .list-group-item').length;
 
-      if (no_markers == true) {
+      if (nb_markers_left === 0) {
         item.find('#recent-locations-clear').hide();
       } else {
         item.find('#recent-locations-clear').show();
@@ -3549,10 +3542,10 @@
         options = plugin.options,
         item = plugin.item;
 
-      for (let key in options.maps) {
-        for (i = options.grid.markers[key].length - 1; i >= 0; i -= 1) {
-          plugin.remove_marker(i);
-        }
+      const nb_markers = item.find('#recent-locations .list-group-item').length;
+
+      for (let i = nb_markers - 1; i >= 0; i -= 1) {
+        plugin.remove_marker(i);
       }
     },
 

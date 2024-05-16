@@ -2587,6 +2587,8 @@
           .find('.leaflet-pane.leaflet-grid-pane')
           .css('opacity', $('#display-data-slider').slider('value') / 100);
       }
+
+      plugin.remove_markers();
     },
 
     update_frequency: function () {

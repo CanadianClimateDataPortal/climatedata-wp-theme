@@ -1148,8 +1148,6 @@
           coords: coords,
           grid_id: this_item.attr('data-grid-id'),
           location_id: this_item.attr('data-location'),
-          var_id: this_item.attr('data-var-id'),
-          var: this_item.attr('data-var'),
         });
       });
 

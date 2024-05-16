@@ -86,7 +86,7 @@
         prev: '',
         current: '',
       },
-      var_data: {},
+      var_data: {}, // Cache of loaded variable data
       var_flags: {
         single: false,
         threshold: false,
@@ -1625,6 +1625,7 @@
 
         case 'sector':
           plugin.handle_sector_change(this_val);
+          plugin.remove_markers();
 
           break;
         case 'coords':
@@ -2047,6 +2048,8 @@
 
       if (status == null) status = options.status;
 
+      const old_var_was_station = options.var_flags.station;
+
       options.var_flags.single = false;
       options.var_flags.inputs = false;
       options.var_flags.threshold = false;
@@ -2151,6 +2154,7 @@
         options.query.sector = 'station';
 
         plugin.handle_sector_change('station');
+        plugin.remove_markers();
 
         options.station.color =
           options.query.var == 'climate-normals' ? '#f00' : '#00f';
@@ -2187,6 +2191,11 @@
       }
 
       // console.log(options.query.scheme_type);
+
+      // If we are changing from a station to a non-station variable, we clear the list of recent locations
+      if (old_var_was_station) {
+        plugin.remove_markers();
+      }
 
       if (typeof fields.var_names != 'undefined') {
         // set breadcrumb title
@@ -2588,7 +2597,6 @@
           .css('opacity', $('#display-data-slider').slider('value') / 100);
       }
 
-      plugin.remove_markers();
     },
 
     update_frequency: function () {

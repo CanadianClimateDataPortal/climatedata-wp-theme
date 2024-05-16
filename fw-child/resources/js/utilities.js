@@ -264,6 +264,12 @@ var l10n_table = {
       "Une erreur s'est produite lors du traitement de votre fichier",
     'Only polygon layers are allowed.':
       'Seuls les polygones sont permis dans votre fichier',
+
+    // Sectors
+    'Census Subdivision': 'Subdivision de recensement',
+    'Health Region': 'Région socio-sanitaire',
+    'Watershed': 'Bassin versant',
+    'Grid Point': 'Point de grille',
   },
 };
 

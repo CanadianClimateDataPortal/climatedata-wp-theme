@@ -3168,10 +3168,12 @@
             console.log('sector', settings);
 
             if (settings.type == null) {
-              if (settings.sector == 'census') {
+              if (settings.sector === 'census') {
                 settings.type = T('Census Subdivision');
-              } else if (settings.sector == 'health') {
+              } else if (settings.sector === 'health') {
                 settings.type = T('Health Region');
+              } else if (settings.sector === 'watershed') {
+                settings.type = T('Watershed');
               }
             }
 
@@ -3180,8 +3182,7 @@
             if (
               settings.location_id != null &&
               options.selection_data.hasOwnProperty(settings.sector) &&
-              options.selection_data[settings.sector][settings.location_id] !=
-                undefined
+              options.selection_data[settings.sector][settings.location_id]
             ) {
               return options.selection_data[settings.sector][
                 settings.location_id
@@ -3219,6 +3220,10 @@
         // console.log(settings);
 
         // ADD OR SELECT RECENT ITEM AND MARKER
+
+        if (!settings.title) {
+          settings.title = (options.lang === 'fr' ? result.label_fr : result.label_en);
+        }
 
         let recent_list = item.find('#recent-locations');
 

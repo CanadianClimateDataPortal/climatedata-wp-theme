@@ -2463,7 +2463,7 @@
       // fields.timestep
       // checkboxes - Annual, Monthly, 2QS-APR, QS-DEC (Seasonal), Daily
 
-      plugin.update_frequency();
+      plugin.update_frequency(fields.timestep);
 
       // DISPLAY TAB
 
@@ -2599,7 +2599,7 @@
 
     },
 
-    update_frequency: function () {
+    update_frequency: function (timestep) {
       let plugin = this,
         options = plugin.options,
         item = plugin.item;
@@ -2611,13 +2611,13 @@
 
       // console.log('variable timesteps', options.var_data.acf.timestep);
 
-      if (!options.var_data[options.query.var_id].acf.timestep.length) {
+      if (!timestep.length) {
         // no timesteps
         frequency_select.prop('disabled', true);
       } else {
         frequency_select.prop('disabled', false);
 
-        options.var_data[options.query.var_id].acf.timestep.forEach(
+        timestep.forEach(
           function (option) {
             if (options.frequency.hasOwnProperty(option)) {
               let this_option = options.frequency[option];
@@ -2653,14 +2653,7 @@
           },
         );
 
-        // console.log('available', options.var_data.acf.timestep);
-        // console.log('selected', options.query.frequency);
-
-        if (
-          !options.var_data[options.query.var_id].acf.timestep.includes(
-            options.query.frequency,
-          )
-        ) {
+        if (!timestep.includes(options.query.frequency)) {
           // console.log('select first', frequency_select.find('option').first());
 
           frequency_select.val(

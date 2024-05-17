@@ -327,7 +327,7 @@ msgstr ""
 #: template/download/controls/details.php:339
 #: template/map/controls/data-variable.php:139
 msgid "Next"
-msgstr "Prochain"
+msgstr "Suivant"
 
 #: template/download/controls/data-variable.php:5
 #: template/map/controls/data-variable.php:5

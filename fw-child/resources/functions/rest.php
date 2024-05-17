@@ -64,7 +64,7 @@ function wpza_replace_repeater_field ( $where ) {
 add_filter ( 'posts_where', 'wpza_replace_repeater_field' );
 
 //
-// GET RELATED VARS
+// GET RELATED CONTENT
 //
 
 add_action ( 'rest_api_init', function () {
@@ -79,27 +79,10 @@ add_action ( 'rest_api_init', function () {
 function cdc_get_related_content () {
 	
 	$result = array(
-		'vars' => [],
 		'sectors' => [],
 		'training' => []
 	);
-	
-	// VARIABLES
-		
-	if ( isset ( $_GET['var_id'] ) ) {
-		
-		foreach ( get_field ( 'related_vars', $_GET['var_id'] ) as $related_ID ) {
-			
-			$result['vars'][] = array (
-				'id' => $related_ID,
-				'title' => get_the_title ( $related_ID ),
-				'url' => get_permalink ( $related_ID )
-			);
-			
-		}
-		
-	}
-	
+
 	// SECTORS
 	
 	$sectors = get_the_terms ( $_GET['var_id'], 'sector' );

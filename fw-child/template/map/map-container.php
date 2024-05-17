@@ -48,17 +48,6 @@
 
 						<div class="col d-flex">
 							<button
-								id="info-relevant-vars-btn"
-								class="btn btn-sm text-light active px-2"
-								type="button"
-								role="tab"
-								data-bs-toggle="tab"
-								data-bs-target="#info-relevant-vars"
-								aria-controls="info-relevant-vars"
-								aria-selected="true"
-							><?php _e ( 'Variables', 'cdc' ); ?></button>
-
-							<button
 								id="info-relevant-sectors-btn"
 								class="btn btn-sm text-light px-2"
 								type="button"
@@ -83,8 +72,6 @@
 					</div>
 
 					<div class="tab-content" id="info-relevant-content">
-						<div class="tab-pane fade show active" id="info-relevant-vars" role="tabpanel" aria-labelledby="info-relevant-vars-btn" tabindex="0"></div>
-
 						<div class="tab-pane fade" id="info-relevant-sectors" role="tabpanel" aria-labelledby="info-relevant-sectors-btn" tabindex="0">1...</div>
 
 						<div class="tab-pane fade" id="info-relevant-training" role="tabpanel" aria-labelledby="info-relevant-training-btn" tabindex="0">2...</div>

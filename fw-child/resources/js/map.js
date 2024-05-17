@@ -2215,8 +2215,6 @@
         options = plugin.options,
         item = plugin.item;
 
-      item.find('#info-relevant-vars').empty();
-      item.find('#info-relevant-vars-btn').hide();
       item.find('#info-relevant-sectors').empty();
       item.find('#info-relevant-sectors-btn').hide();
       item.find('#info-relevant-training').empty();
@@ -2230,32 +2228,8 @@
           var_id: var_id,
         },
         success: function (data) {
-          // vars
-
           let item_card =
             '<div class="card text-bg-dark bg-opacity-40 mb-3 p-3">';
-
-          if (data.vars.length > 0) {
-            item.find('#info-relevant-vars-btn').show();
-
-            data.vars.forEach(function (query_item, i) {
-              let new_item = $(item_card);
-
-              new_item.append(
-                '<h4 class="card-title">' + query_item.title + '</h4>',
-              );
-              new_item.append(
-                '<a href="#" data-query-key="var_id" data-query-val="' +
-                  query_item.id +
-                  '" data-bs-dismiss="offcanvas">' +
-                  'View on map' +
-                  '</a>',
-              );
-
-              item.find('#info-relevant-vars').append(new_item);
-            });
-          } else {
-          }
 
           // sectors
 

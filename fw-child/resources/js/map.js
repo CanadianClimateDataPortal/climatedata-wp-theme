@@ -4092,11 +4092,24 @@
         tip.push(event.layer.properties[l10n_labels.label_field] + '<br>');
       }
 
+      const values = {
+        'p10': data[rcp]['p10'],
+        'p50': data[rcp]['p50'],
+        'p90': data[rcp]['p90'],
+      }
+
+      // For temperatures, units are in Kelvin, but values are received in °C. We reconvert them to Kelvin.
+      if (units === 'kelvin' && !delta) {
+        for (let percentile in values) {
+          values[percentile] += 273.15;
+        }
+      }
+
       // median
 
       // (value, var_acf, delta, lang)
       let val1 = value_formatter(
-        data[rcp]['p50'],
+        values['p50'],
         units,
         decimals,
         delta,
@@ -4113,7 +4126,7 @@
 
       // range
       val1 = value_formatter(
-        data[rcp]['p10'],
+        values['p10'],
         units,
         decimals,
         delta,
@@ -4121,7 +4134,7 @@
       );
 
       let val2 = value_formatter(
-        data[rcp]['p90'],
+        values['p90'],
         units,
         decimals,
         delta,

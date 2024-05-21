@@ -32,19 +32,21 @@
   li {
     display: flex;
     margin-bottom: 0.5rem;
+    min-width: 2.375rem;
 
     &:not(.share-permalink-wrap) {
-      order: 2;
-
       .label {
         display: none;
       }
     }
 
     &.share-permalink-wrap {
-      order: 1;
       flex: 0 0 100%;
       width: 100%;
+
+      span {
+        font-size: 0.875rem;
+      }
     }
   }
 }

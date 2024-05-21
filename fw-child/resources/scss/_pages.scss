@@ -1575,6 +1575,11 @@ body.tab-drawer-open {
 
 // SINGLE POST
 
+.news-meta-block {
+  backdrop-filter: blur(10px);
+  background-color: transparent;
+}
+
 .single-post {
   #hero {
     h1 {

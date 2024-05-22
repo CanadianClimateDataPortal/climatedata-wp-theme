@@ -78,7 +78,7 @@ function child_theme_enqueue() {
 
 	// font awesome
 
-	wp_register_style ( 'font-awesome', WP_CONTENT_URL . '/vendor/font-awesome-pro/css/all.css', null, null );
+	wp_register_style ( 'font-awesome', $child_npm_dir . '@fortawesome/fontawesome-free/css/all.min.css', null, null );
 	wp_enqueue_style ( 'font-awesome' );
 
 	// leaflet

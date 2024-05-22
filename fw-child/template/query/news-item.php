@@ -1,5 +1,8 @@
 <?php
 
+$category = get_the_terms( $item['id'], 'category' );
+$author = get_the_terms( $item['id'], 'author' );
+
 ?>
 
 <div class="card">
@@ -28,5 +31,21 @@
 		
 		?></p>
 		
+		<?php if ( ! empty( $category ) || ! empty( $author ) ) { ?>
+			<div class="card-meta d-flex flex-row">
+				<div class="card-category w-50">
+					<?php if ( ! empty( $category ) ) { ?>
+						<span class="mb-2 all-caps text-secondary fw-medium"><?php _e ( 'Category', 'cdc' ); ?></span>
+						<p><?php print $category[0]->name; ?></p>
+					<?php } ?>
+				</div>
+				<div class="card-author w-50">
+					<?php if ( ! empty( $author ) ) { ?>
+						<span class="mb-2 all-caps text-secondary fw-medium"><?php _e ( 'Author', 'cdc' ); ?></span>
+						<p><?php print $author[0]->name; ?></p>
+					<?php } ?>
+				</div>
+			</div>
+		<?php } ?>
 	</div>
 </div>

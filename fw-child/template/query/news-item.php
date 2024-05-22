@@ -36,13 +36,13 @@ $author = get_the_terms( $item['id'], 'author' );
 				<div class="card-category w-50">
 					<?php if ( ! empty( $category ) ) { ?>
 						<span class="mb-2 all-caps text-secondary fw-medium"><?php _e ( 'Category', 'cdc' ); ?></span>
-						<p><?php print $category[0]->name; ?></p>
+						<p><?php the_terms( $item['id'], 'category' ); ?></p>
 					<?php } ?>
 				</div>
 				<div class="card-author w-50">
 					<?php if ( ! empty( $author ) ) { ?>
 						<span class="mb-2 all-caps text-secondary fw-medium"><?php _e ( 'Author', 'cdc' ); ?></span>
-						<p><?php print $author[0]->name; ?></p>
+						<p><?php the_terms( $item['id'], 'author' ); ?></p>
 					<?php } ?>
 				</div>
 			</div>

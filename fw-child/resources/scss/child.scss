@@ -873,6 +873,12 @@ $query-card-hover-padding: 0.75rem;
       }
     }
 
+    .card-meta {
+      a {
+        color: $gray-600;
+      }
+    }
+
     &:hover {
       .card {
         height: calc(100% + ($query-card-hover-padding * 2));

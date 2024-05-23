@@ -1,6 +1,6 @@
 <div class="news-meta-block p-3 border border-gray-600">
 	<div class="news-meta-item mb-3 mb-lg-4">
-		<span class="mb-2 all-caps text-blue-100 d-block"><?php _e ( 'Date', 'cdc' ); ?></span>
+		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Date', 'cdc' ); ?></span>
 
 		<?php
 
@@ -10,7 +10,7 @@
 	</div>
 
 	<div class="news-meta-item mb-3 mb-lg-4">
-		<span class="mb-2 all-caps text-blue-100 d-block"><?php _e ( 'Author', 'cdc' ); ?></span>
+		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Author', 'cdc' ); ?></span>
 
 		<?php
 
@@ -28,7 +28,7 @@
 	?>
 
 	<div class="news-meta-item mb-3 mb-lg-4">
-		<span class="mb-2 all-caps text-blue-100 d-block"><?php _e ( 'Topics', 'cdc' ); ?></span>
+		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Topics', 'cdc' ); ?></span>
 
 		<p><?php
 
@@ -50,7 +50,7 @@
 	?>
 
 	<div class="news-meta-item">
-		<span class="mb-2 all-caps text-blue-100 d-block"><?php _e ( 'Share this post', 'cdc' ); ?></span>
+		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Share this post', 'cdc' ); ?></span>
 
 		<div id="post-share-wrap">
 			<div id="share"></div>

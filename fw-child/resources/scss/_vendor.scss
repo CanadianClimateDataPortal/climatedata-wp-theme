@@ -30,22 +30,29 @@
   margin-bottom: 0;
 
   li {
-    display: flex;
-    margin-bottom: 0.5rem;
-    min-width: 2.375rem;
-
-    &:not(.share-permalink-wrap) {
-      .label {
-        display: none;
-      }
+    &:not(:first-child):not(.share-permalink-wrap) {
+      margin-left: 0.75rem;
+    }
+    
+    &.share-permalink-wrap {
+      display: flex;
+      flex: 1;
+      margin-top: 0.15rem;
     }
 
-    &.share-permalink-wrap {
-      flex: 0 0 100%;
-      width: 100%;
-
+    a {
+      display: flex;
+      align-items: center;
+      padding: 4px 0;
+      
+      i {
+        margin-right: 0.25rem !important;
+        font-size: 0.85rem;
+      }
+      
       span {
-        font-size: 0.875rem;
+        font-size: 0.85rem;
+        line-height: 1;
       }
     }
   }

@@ -1578,6 +1578,10 @@ body.tab-drawer-open {
 .news-meta-block {
   backdrop-filter: blur(10px);
   background-color: transparent;
+  
+  .news-meta-item > span {
+    font-size: 0.85rem;
+  }
 }
 
 .single-post {

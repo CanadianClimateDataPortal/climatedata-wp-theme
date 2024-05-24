@@ -30,7 +30,7 @@
 	<div class="news-meta-item mb-3 mb-lg-4">
 		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Topics', 'cdc' ); ?></span>
 
-		<p><?php
+		<?php
 
 				$i = 0;
 
@@ -40,7 +40,7 @@
 					$i++;
 				}
 
-		?></p>
+		?>
 	</div>
 
 	<?php

@@ -529,7 +529,7 @@
             instructions +=
               '<p class="mb-0 text-body">' +
               T('Enter latitude & longitude e.g.') +
-              ' <code>54,-115</code></p>';
+              ' <code>54,-115.3</code></p>';
 
             instructions += '</div>';
 
@@ -1218,38 +1218,37 @@
             options.var_data[options.query.var_id],
           ),
         });
-
-        // plugin.set_location(
-        //   options.query,
-        //   options.var_data,
-        //   {
-        //     lat: parseFloat(e.params.data.lat),
-        //     lng: parseFloat(e.params.data.lon),
-        //   },
-        //   e.params.data,
-        //   e.params.text,
-        // );
       });
 
-      // area search pan to coords btn
+      /**
+       * Attach a "click" listener on the "Set map location" button in the location search box.
+       *
+       * This button appears when the user enters latitude and longitude coordinates in the search text field
+       * (example: "54.12,-112.4").
+       */
+      item.on('click', '.geo-select-pan-btn',
+        /**
+         * Update the main latitude and longitude fields, trigger their "change" event and close the select.
+         *
+         * The new latitude and longitude values are already set as data-attributes on the button. They were set by
+         * the "select2" jQuery plugin attached to the search field.
+         *
+         * @this {HTMLElement} The "Set map location" button
+         */
+        function () {
+          const latitude = $(this).attr('data-lat');
+          const longitude = $(this).attr('data-lng');
 
-      item.on('click', '.geo-select-pan-btn', function () {
-        let first_map = options.maps[Object.keys(options.maps)[0]];
+          item
+            .find('#select2-area-search-container')
+            .text($(this).attr('data-lat') + ', ' + $(this).attr('data-lng'));
 
-        let thislat = parseFloat($(this).attr('data-lat')),
-          thislon = parseFloat($(this).attr('data-lng')),
-          this_zoom = first_map.object.getZoom();
+          item.find('#area-search').select2('close');
 
-        if (this_zoom < 9) this_zoom = 9;
-
-        first_map.object.setView([thislat, thislon], this_zoom);
-
-        item
-          .find('#select2-area-search-container')
-          .text($(this).attr('data-lat') + ', ' + $(this).attr('data-lng'));
-
-        item.find('#area-search').select2('close');
-      });
+          item.find('#coords-lat').val(latitude);
+          item.find('#coords-lng').val(longitude).trigger('change');
+        }
+      );
 
       // triggerable handler
 

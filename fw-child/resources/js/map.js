@@ -980,7 +980,11 @@
           // reset this
           if (options.grid.selected != this_gid) {
             for (let key in options.maps) {
-              options.maps[key].layers.grid.resetFeatureStyle(this_gid);
+              if (!style_obj) {
+                options.maps[key].layers.grid.resetFeatureStyle(this_gid);
+              } else {
+                options.maps[key].layers.grid.setFeatureStyle(this_gid, style_obj);
+              }
             }
           }
         },

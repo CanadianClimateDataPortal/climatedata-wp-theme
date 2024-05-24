@@ -632,7 +632,7 @@
                         $(document).trigger('map_item_mouseout', [
                           e,
                           e.layer.properties.gid,
-                          {},
+                          null,
                         ]);
                       })
                       .on('click', function (e) {
@@ -1327,7 +1327,9 @@
                           .on('mouseout', function (e) {
                             let style_obj = {
                               weight: 1.5,
+                              color: '#fff',
                               fill: false,
+                              opacity: 0.5,
                             };
 
                             if (options.choro.reset_features == false) {

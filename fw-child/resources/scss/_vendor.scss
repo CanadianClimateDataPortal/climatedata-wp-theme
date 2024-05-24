@@ -30,14 +30,9 @@
   margin-bottom: 0;
 
   li {
-    &:not(:first-child):not(.share-permalink-wrap) {
-      margin-left: 0.75rem;
-    }
-    
-    &.share-permalink-wrap {
-      display: flex;
-      flex: 1;
-      margin-top: 0.15rem;
+    &:not(:last-child) {
+      margin-right: 0.75rem;
+      margin-bottom: 0.25rem;
     }
 
     a {

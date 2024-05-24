@@ -1034,52 +1034,35 @@
         plugin._grid_hover_cancel(mouse_event);
       });
 
-      // click station
+      /**
+       * Attach handler when selecting (i.e. clicking) a station on the map.
+       */
+      item.on('map_station_select',
+        /**
+         * Center the map on the clicked station and show the station's chart.
+         *
+         * @param {Event} e - Event that triggered this handler.
+         * @param {object} mouse_event - Original Leaflet mouse event on the map.
+         * @param {string} station_id - ID of the station that was selected.
+         */
+        function (e, mouse_event, station_id) {
+          station_id = String(station_id);
 
-      item.on(
-        'map_station_select',
-        function (e, mouse_event, this_gid, style_obj) {
-          this_gid = String(this_gid);
+          if (!options.selection_data.hasOwnProperty('station'))
+            options.selection_data['station'] = {};
 
-          console.log(style_obj);
+          options.selection_data['station'][station_id] = mouse_event;
 
-          console.log('station click', mouse_event);
-
-          if (options.query.var == 'idf') {
-            // popups
-            // console.log('do popup', mouse_event);
-            // $.ajax({
-            //   url: ajax_data.url,
-            //   data: {
-            //     action: 'cdc_get_idf_files',
-            //     idf: mouse_event.layer.feature.properties.ID,
-            //   },
-            //   dataType: 'json',
-            //   success: function (data) {
-            //     console.log(data);
-            //   },
-            // });
-          } else {
-            // normals
-
-            // console.log('set station');
-
-            if (!options.selection_data.hasOwnProperty('station'))
-              options.selection_data['station'] = {};
-
-            options.selection_data['station'][this_gid] = mouse_event;
-
-            plugin.setup_location({
-              sector: options.query.sector,
-              coords: mouse_event.latlng,
-              location_id: this_gid,
-              var_id: options.query.var_id,
-              var: options.query.var,
-              var_title: plugin.get_var_title(
-                options.var_data[options.query.var_id],
-              ),
-            });
-          }
+          plugin.setup_location({
+            sector: options.query.sector,
+            coords: mouse_event.latlng,
+            location_id: station_id,
+            var_id: options.query.var_id,
+            var: options.query.var,
+            var_title: plugin.get_var_title(
+              options.var_data[options.query.var_id],
+            ),
+          });
         },
       );
 
@@ -3322,8 +3305,19 @@
             .trigger('change');
         }
 
-        // set map center to marker location w/ offset
-        console.log('set center');
+        // Update latitude and longitude in the text fields and in the URL
+        let latitude = settings.coords.lat;
+        let longitude = settings.coords.lng;
+
+        if (options.lang === 'fr') {
+          latitude = latitude.replace('.', ',');
+          longitude = longitude.replace('.', ',');
+        }
+
+        $('#coords-lat').val(latitude);
+        $('#coords-lng').val(longitude).trigger('change');
+
+        // Center the map on the location, with a slight offset
         $(document).cdc_app('maps.set_center', settings.coords, null, 0.1);
       }); // when get_location_data
     },

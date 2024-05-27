@@ -2354,7 +2354,7 @@
             series: options.chart.series,
           });
 
-          if (options.chart.query.building_climate_zones) {
+          if (options.chart.query.var === 'building_climate_zones') {
             // add climate zone colour bands
 
             const colorTransparency = 0.3;

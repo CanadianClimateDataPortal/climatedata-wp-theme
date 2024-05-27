@@ -3584,6 +3584,12 @@
           item.find('#chart-value-30y').prop('disabled', true);
           item.find('#chart-value-delta').prop('disabled', true);
 
+          let requested_variable = settings.var;
+
+          if (requested_variable === 'building_climate_zones') {
+            requested_variable = 'hddheat_18';
+          }
+
           // generate chart
           $.ajax({
             url:
@@ -3593,7 +3599,7 @@
               '/' +
               settings.coords.lng +
               '/' +
-              settings.var +
+              requested_variable +
               '/' +
               options.query.frequency +
               '?decimals=' +

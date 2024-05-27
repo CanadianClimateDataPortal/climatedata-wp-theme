@@ -1452,7 +1452,7 @@
               for (let i = 0; i < colours.length - (categorical ? 0 : 1); i++) {
                 let label;
                 if (labels) {
-                  label = unit_localize(labels[i], options.lang);
+                  label = unit_localize(labels[labels.length - i - 1], options.lang);
                 } else {
                   label = value_formatter(
                     quantities[colours.length - i - 2],

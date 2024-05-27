@@ -557,9 +557,9 @@
                     ) {
                       // console.log('UPDATE RASTER LAYER');
 
-                      // delete all parameters from layer before updating
-                      // see: https://github.com/Leaflet/Leaflet/issues/3441
-                      delete this_map.layers.raster.wmsParams.parameter;
+                      // Parameters that must be removed are not removed, so we remove them manually
+                      // Issue: https://github.com/Leaflet/Leaflet/issues/3441
+                      delete this_map.layers.raster.wmsParams.sld_body;
                       this_map.layers.raster.setParams(params);
 
                       this_map.layers.raster.cdc_params =

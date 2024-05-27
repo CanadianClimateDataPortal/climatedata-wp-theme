@@ -2777,12 +2777,6 @@
         return;
       }
 
-      let selected_item = item.find(
-        '#display-scheme-select .dropdown-item[data-scheme-id="' +
-          query.scheme +
-          '"]',
-      );
-
       if (query.scheme === 'default') {
         layer_params.tiled = true;
         delete layer_params.styles;

@@ -2125,8 +2125,7 @@
           }
         }
 
-        let decade_utc = Date.UTC(settings.query.decade),
-          delta_utc = Date.UTC(parseInt(settings.query.decade) + 1),
+        const decade = Math.floor(parseInt(settings.query.decade) / 10),
           decade_vals = [],
           delta_vals = [];
 
@@ -2164,51 +2163,38 @@
             });
           }
 
-          // console.log(
-          //   settings.data['30y_{0}_median'.format(scenario.name)],
-          //   settings.data['30y_{0}_median'.format(scenario.name)].length,
-          // );
-
           // find the median values for the queried decade
 
           if (
-            Object.keys(settings.data['30y_{0}_median'.format(scenario.name)])
-              .length > 0
+            Object.keys(settings.data['30y_{0}_median'.format(scenario.name)]).length > 0
           ) {
-            for (let timestamp in settings.data[
-              '30y_{0}_median'.format(scenario.name)
-            ]) {
-              if (parseInt(timestamp) == delta_utc)
+            for (let timestamp in settings.data['30y_{0}_median'.format(scenario.name)]) {
+              const data_date = new Date(parseInt(timestamp));
+              const data_decade = Math.floor(data_date.getUTCFullYear() / 10);
+              if (data_decade === decade) {
                 decade_vals.push(
-                  settings.data['30y_{0}_median'.format(scenario.name)][
-                    timestamp
-                  ],
+                  settings.data['30y_{0}_median'.format(scenario.name)][timestamp],
                 );
+              }
             }
           }
 
           // find the delta values for the queried decade
 
           if (
-            Object.keys(
-              settings.data['delta7100_{0}_median'.format(scenario.name)],
-            ).length > 0
+            Object.keys(settings.data['delta7100_{0}_median'.format(scenario.name)]).length > 0
           ) {
-            for (let timestamp in settings.data[
-              'delta7100_{0}_median'.format(scenario.name)
-            ]) {
-              if (parseInt(timestamp) == delta_utc)
+            for (let timestamp in settings.data['delta7100_{0}_median'.format(scenario.name)]) {
+              const data_date = new Date(parseInt(timestamp));
+              const data_decade = Math.floor(data_date.getUTCFullYear() / 10);
+              if (data_decade === decade) {
                 delta_vals.push(
-                  settings.data['delta7100_{0}_median'.format(scenario.name)][
-                    timestamp
-                  ],
+                  settings.data['delta7100_{0}_median'.format(scenario.name)][timestamp],
                 );
+              }
             }
           }
         });
-
-        // console.log('decade', decade_vals);
-        // console.log('delta', delta_vals);
 
         // change median header decade value
         item

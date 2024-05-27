@@ -2130,6 +2130,8 @@
           delta_vals = [];
 
         scenarios.forEach(function (scenario) {
+
+          // Retrieve median time series data
           if (settings.data['{0}_median'.format(scenario.name)].length > 0) {
             options.chart.series.push({
               name: T('{0} Median').format(scenario.label),
@@ -2146,6 +2148,7 @@
             });
           }
 
+          // Retrieve range time series data
           if (settings.data['{0}_range'.format(scenario.name)].length > 0) {
             options.chart.series.push({
               name: T('{0} Range').format(scenario.label),
@@ -2163,11 +2166,9 @@
             });
           }
 
-          // find the median values for the queried decade
-
-          if (
-            Object.keys(settings.data['30y_{0}_median'.format(scenario.name)]).length > 0
-          ) {
+          // Retrieve the current decade's 30 years median value
+          const thirty_years_medians = settings.data['30y_{0}_median'.format(scenario.name)];
+          if (thirty_years_medians && Object.keys(thirty_years_medians).length > 0) {
             for (let timestamp in settings.data['30y_{0}_median'.format(scenario.name)]) {
               const data_date = new Date(parseInt(timestamp));
               const data_decade = Math.floor(data_date.getUTCFullYear() / 10);
@@ -2179,11 +2180,9 @@
             }
           }
 
-          // find the delta values for the queried decade
-
-          if (
-            Object.keys(settings.data['delta7100_{0}_median'.format(scenario.name)]).length > 0
-          ) {
+          // Retrieve the current decade's median delta value (i.e. vs the reference period)
+          const delta_medians = settings.data['delta7100_{0}_median'.format(scenario.name)];
+          if (delta_medians && Object.keys(delta_medians).length > 0) {
             for (let timestamp in settings.data['delta7100_{0}_median'.format(scenario.name)]) {
               const data_date = new Date(parseInt(timestamp));
               const data_decade = Math.floor(data_date.getUTCFullYear() / 10);
@@ -2196,27 +2195,35 @@
           }
         });
 
-        // change median header decade value
-        item
-          .find('#location-summary .location-value-median .decade')
-          .text(
-            parseInt(settings.query.decade) +
+        /*
+         * Render the median header
+         */
+
+        if (decade_vals.length !== scenarios.length) {
+          item.find('#location-summary').hide();
+          item.find('#location-val-scenarios').hide();
+        } else {
+          item.find('#location-summary')
+            .show()
+            .find('.location-value-median .decade')
+            .text(
+              parseInt(settings.query.decade) +
               1 +
               ' – ' +
               (parseInt(settings.query.decade) + 30),
-          );
+            );
 
-        item.find('#location-summary .value-table').empty();
+          item.find('#location-summary .value-table').empty();
 
-        scenarios.forEach(function (scenario, i) {
-          // new row
-          let new_val_row = $(
-            '<div class="row" data-scenario="' + scenario.name + '">',
-          );
+          scenarios.forEach(function (scenario, i) {
+            // new row
+            let new_val_row = $(
+              '<div class="row" data-scenario="' + scenario.name + '">',
+            );
 
-          // median value
-          new_val_row.append(
-            '<div class="col-3-of-7">' +
+            // median value
+            new_val_row.append(
+              '<div class="col-3-of-7">' +
               value_formatter(
                 decade_vals[i],
                 options.chart.unit,
@@ -2225,19 +2232,19 @@
                 options.lang,
               ) +
               '</div>',
-          );
+            );
 
-          // delta value
-          let delta_icon = 'fa-caret-up text-primary';
+            // delta value
+            let delta_icon = 'fa-caret-up text-primary';
 
-          if (delta_vals[i] == 0) {
-            delta_icon = 'fa-equals';
-          } else if (delta_vals[i] < 0) {
-            delta_icon = 'fa-caret-down text-secondary';
-          }
+            if (delta_vals[i] === 0) {
+              delta_icon = 'fa-equals';
+            } else if (delta_vals[i] < 0) {
+              delta_icon = 'fa-caret-down text-secondary';
+            }
 
-          new_val_row.append(
-            '<div class="col"><i class="fas ' +
+            new_val_row.append(
+              '<div class="col"><i class="fas ' +
               delta_icon +
               ' me-3"></i>' +
               value_formatter(
@@ -2249,18 +2256,17 @@
               ) +
               ' ' +
               '</div>',
-          );
+            );
 
-          new_val_row.appendTo(item.find('#location-summary .value-table'));
-        });
+            new_val_row.appendTo(item.find('#location-summary .value-table'));
+          });
 
-        item
-          .find(
-            '#location-val-scenarios .btn-check[value="' +
-              settings.query.scenarios[0] +
-              '"]',
-          )
-          .trigger('click');
+          item
+            .find('#location-val-scenarios')
+            .show()
+            .find('.btn-check[value="' + settings.query.scenarios[0] + '"]')
+            .trigger('click');
+        }
 
         // render the chart
 
@@ -2270,9 +2276,6 @@
             T('No data available for selected location') +
             '</h1></span>';
         } else {
-          // console.log('render');
-          // console.log(settings.object);
-          // console.log('chart series', options.chart.series);
 
           options.chart.object = Highcharts.stockChart(settings.object, {
             chart: {

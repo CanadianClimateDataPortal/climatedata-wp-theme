@@ -3281,17 +3281,11 @@
 
             // populate detail tab
             plugin.populate_location_detail(settings);
-
             break;
+
           default:
-            // console.log('open #location-detail');
-
-            // reset chart values btn
-            item.find('#chart-value-annual').prop('checked', true);
-
-            // populate detail tab
             plugin.populate_location_detail(settings);
-
+            item.find('#chart-value-annual').prop('checked', true);
             break;
         }
 
@@ -3531,14 +3525,7 @@
         options = plugin.options,
         item = plugin.item;
 
-      // console.log('populate location', settings);
-
-      // console.log('selected var', settings.var);
-      // console.log('current var', options.query.var);
-
       if (settings.var_id !== options.query.var_id) {
-        console.log('gonna need to do something here!!~!');
-
         if (!options.var_data.hasOwnProperty(settings.var_id)) {
           // need to get var data for settings.var
 
@@ -3562,8 +3549,6 @@
 
           item.find('#station-detail .variable-name').text(settings.var_title);
 
-          console.log('open station detail now');
-
           if (window.location.hash != '#station-detail') {
             $('#control-bar').tab_drawer('update_path', '#station-detail');
           }
@@ -3580,6 +3565,7 @@
             container: item.find('#station-chart-container')[0],
           });
           break;
+
         default:
           // tab headings
           item
@@ -3590,11 +3576,13 @@
 
           item.find('#location-detail .variable-name').text(settings.var_title);
 
-          console.log('open location detail now');
-
           if (window.location.hash != '#location-detail') {
             $('#control-bar').tab_drawer('update_path', '#location-detail');
           }
+
+          // Disable "30 year averages" and "30 year changes" buttons until we receive the data
+          item.find('#chart-value-30y').prop('disabled', true);
+          item.find('#chart-value-delta').prop('disabled', true);
 
           // generate chart
           $.ajax({
@@ -3614,8 +3602,6 @@
               options.query.dataset,
             dataType: 'json',
             success: function (chart_data) {
-              console.log('chart data', chart_data);
-
               $(document).cdc_app('charts.render', {
                 data: chart_data,
                 query: options.query,
@@ -3624,6 +3610,22 @@
                 download_url: null,
                 container: item.find('#location-chart-container')[0],
               });
+
+              // Re-enable "30 year averages" button if we have 30 year averages data
+              for (let key in chart_data) {
+                if (key.startsWith('30y_') && key.endsWith('_median')) {
+                  item.find('#chart-value-30y').prop('disabled', false);
+                  break;
+                }
+              }
+
+              // Re-enable "30 year changes" button if we have 30 year changes data
+              for (let key in chart_data) {
+                if (key.startsWith('delta7100_')) {
+                  item.find('#chart-value-delta').prop('disabled', false);
+                  break;
+                }
+              }
             },
           });
 

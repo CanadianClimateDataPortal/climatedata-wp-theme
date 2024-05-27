@@ -574,6 +574,18 @@ $legend-on-height: 16px;
         background-color: $white;
       }
     }
+
+    &:disabled {
+      & + label {
+        opacity: 0.4;
+        cursor: default;
+
+        &:hover {
+          background-color: $gray-300;
+          border-color: $gray-300;
+        }
+      }
+    }
   }
 }
 

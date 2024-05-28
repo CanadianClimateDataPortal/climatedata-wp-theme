@@ -303,30 +303,30 @@ function taxonomy_vartype() {
 
 add_action( 'init', 'taxonomy_vartype', 10 );
 
-// News author
+// News Author
 
-function cd_register_tax_author() {
+function cd_register_tax_news_author() {
 	$labels = array(
-		'name'                       => _x( 'Authors', 'Taxonomy General Name', 'cdc-taxonomies' ),
-		'singular_name'              => _x( 'Author', 'Taxonomy Singular Name', 'cdc-taxonomies' ),
-		'menu_name'                  => __( 'Authors', 'cdc-taxonomies' ),
-		'all_items'                  => __( 'All Authors', 'cdc-taxonomies' ),
-		'parent_item'                => __( 'Parent Author', 'cdc-taxonomies' ),
-		'parent_item_colon'          => __( 'Parent Author:', 'cdc-taxonomies' ),
-		'new_item_name'              => __( 'New Author Name', 'cdc-taxonomies' ),
-		'add_new_item'               => __( 'Add New Author', 'cdc-taxonomies' ),
-		'edit_item'                  => __( 'Edit Author', 'cdc-taxonomies' ),
-		'update_item'                => __( 'Update Author', 'cdc-taxonomies' ),
-		'view_item'                  => __( 'View Author', 'cdc-taxonomies' ),
-		'separate_items_with_commas' => __( 'Separate authors with commas', 'cdc-taxonomies' ),
-		'add_or_remove_items'        => __( 'Add or remove authors', 'cdc-taxonomies' ),
+		'name'                       => _x( 'News Authors', 'Taxonomy General Name', 'cdc-taxonomies' ),
+		'singular_name'              => _x( 'News Author', 'Taxonomy Singular Name', 'cdc-taxonomies' ),
+		'menu_name'                  => __( 'News Authors', 'cdc-taxonomies' ),
+		'all_items'                  => __( 'All News Authors', 'cdc-taxonomies' ),
+		'parent_item'                => __( 'Parent News Author', 'cdc-taxonomies' ),
+		'parent_item_colon'          => __( 'Parent News Author:', 'cdc-taxonomies' ),
+		'new_item_name'              => __( 'New News Author Name', 'cdc-taxonomies' ),
+		'add_new_item'               => __( 'Add New News Author', 'cdc-taxonomies' ),
+		'edit_item'                  => __( 'Edit News Author', 'cdc-taxonomies' ),
+		'update_item'                => __( 'Update News Author', 'cdc-taxonomies' ),
+		'view_item'                  => __( 'View News Author', 'cdc-taxonomies' ),
+		'separate_items_with_commas' => __( 'Separate news authors with commas', 'cdc-taxonomies' ),
+		'add_or_remove_items'        => __( 'Add or remove news authors', 'cdc-taxonomies' ),
 		'choose_from_most_used'      => __( 'Choose from the most used', 'cdc-taxonomies' ),
-		'popular_items'              => __( 'Popular Authors', 'cdc-taxonomies' ),
-		'search_items'               => __( 'Search Authors', 'cdc-taxonomies' ),
+		'popular_items'              => __( 'Popular News Authors', 'cdc-taxonomies' ),
+		'search_items'               => __( 'Search News Authors', 'cdc-taxonomies' ),
 		'not_found'                  => __( 'Not Found', 'cdc-taxonomies' ),
-		'no_terms'                   => __( 'No authors', 'cdc-taxonomies' ),
-		'items_list'                 => __( 'Authors list', 'cdc-taxonomies' ),
-		'items_list_navigation'      => __( 'Authors list navigation', 'cdc-taxonomies' ),
+		'no_terms'                   => __( 'No news authors', 'cdc-taxonomies' ),
+		'items_list'                 => __( 'News Authors list', 'cdc-taxonomies' ),
+		'items_list_navigation'      => __( 'News Authors list navigation', 'cdc-taxonomies' ),
 	);
 
 	$args   = array(
@@ -340,7 +340,7 @@ function cd_register_tax_author() {
 		'show_in_rest'      => true,
 	);
 
-	register_taxonomy( 'author', array( 'post' ), $args );
+	register_taxonomy( 'news-author', array( 'post' ), $args );
 }
 
-add_action( 'init', 'cd_register_tax_author', 10 );
+add_action( 'init', 'cd_register_tax_news_author', 10 );

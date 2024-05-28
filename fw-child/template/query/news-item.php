@@ -4,7 +4,7 @@ $news_post_id = $item['id'] ?? 0;
 
 // Initialize taxonomies.
 $tax_news_category = get_the_terms( $news_post_id, 'category' );
-$tax_news_author   = get_the_terms( $news_post_id, 'author' ); ?>
+$tax_news_author   = get_the_terms( $news_post_id, 'news-author' ); ?>
 
 <div class="card">
 	<?php

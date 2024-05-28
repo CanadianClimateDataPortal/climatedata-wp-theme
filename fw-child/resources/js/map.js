@@ -151,6 +151,11 @@
         debug: false,
       });
 
+      // Unless already defined, set the URL hash to open the "Data" tab by default
+      if (!window.location.hash) {
+        window.location.hash = '#data';
+      }
+
       // things that need to happen
       // 1. set up options.query using the defaults and/or the URL
       // 2. make sure a variable ID exists

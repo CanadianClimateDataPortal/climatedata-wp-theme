@@ -148,6 +148,11 @@
 
       $('#control-bar').tab_drawer();
 
+      // Unless already defined, set the URL hash to open the "Data" tab by default
+      if (!window.location.hash) {
+        window.location.hash = '#data';
+      }
+
       // 1. set up options.query using the defaults and/or the URL
 
       console.log('download', 'setup query');

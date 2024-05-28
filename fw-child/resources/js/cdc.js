@@ -3030,32 +3030,7 @@
         beforeSend: function (xhr) {
           xhr.setRequestHeader('X-WP-Nonce', ajax_data.rest_nonce);
         },
-        success: function (data) {
-          console.log('wp-json var data', data);
-
-          let var_title =
-            options.lang != 'en' ? data.meta.title_fr : data.title.rendered;
-
-          // update the control button
-
-          item.find('.tab-drawer-trigger .var-name').text(var_title);
-
-          if (
-            typeof data.acf.var_names != 'undefined' &&
-            data.acf.var_names != null
-          ) {
-            if (data.acf.var_names.length == 1) {
-              // hide the threshold inputs
-              item.find('#var-thresholds').hide();
-            } else {
-              item.find('#var-thresholds').show();
-            }
-          }
-
-          if (typeof callback == 'function') {
-            callback(data);
-          }
-        },
+        success: callback,
       });
     },
 

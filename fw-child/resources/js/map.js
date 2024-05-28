@@ -2112,14 +2112,24 @@
           );
           hidden_input.trigger('change');
         }
-
-        // update the control button
-        item
-          .find('.tab-drawer-trigger .var-name')
-          .text(plugin.get_var_title(options.var_data[var_id]));
       }
 
-      let new_var_data = options.var_data[var_id];
+      const new_var_data = options.var_data[var_id];
+
+      // Hide/show the threshold input
+      const var_names = new_var_data.acf.var_names;
+      if (typeof var_names != 'undefined' && var_names != null) {
+        if (var_names.length === 1) {
+          item.find('#var-thresholds').hide();
+        } else {
+          item.find('#var-thresholds').show();
+        }
+      }
+
+      // Update the value of the variable select input
+      item
+        .find('.tab-drawer-trigger .var-name')
+        .text(plugin.get_var_title(new_var_data));
 
       // populate breadcrumb
 
@@ -4183,8 +4193,14 @@
       }
     },
 
+    /**
+     * Return the localized name of a variable.
+     *
+     * @param {object} var_data - Loaded data of the variable.
+     * @returns {string} - The localized name.
+     */
     get_var_title: function (var_data) {
-      return this.options.lang != 'en'
+      return this.options.lang !== 'en'
         ? var_data.meta.title_fr
         : var_data.title.rendered;
     },

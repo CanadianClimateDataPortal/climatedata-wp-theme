@@ -2126,6 +2126,11 @@
 
         item.find('#info-description').html(options.var_data.acf[desc_key]);
 
+        // Update the value of the variable select input
+        item
+          .find('.tab-drawer-trigger .var-name')
+          .text(plugin.get_var_title(options.var_data));
+
         if (options.var_data.acf[tech_key] != '') {
           item.find('#info-tech-description').show();
           item.find('#info-tech-description').prev().show();
@@ -4554,6 +4559,18 @@
       }
 
       return result;
+    },
+
+    /**
+     * Return the localized name of a variable.
+     *
+     * @param {object} var_data - Loaded data of the variable.
+     * @returns {string} - The localized name.
+     */
+    get_var_title: function (var_data) {
+      return this.options.lang !== 'en'
+        ? var_data.meta.title_fr
+        : var_data.title.rendered;
     },
   };
 

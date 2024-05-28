@@ -246,7 +246,8 @@ const $ = jQuery;
           },
           twitter: {
             display: true,
-            icon: 'fab fa-twitter me-3',
+            label: 'X',
+            icon: 'fab fa-x-twitter me-3',
             text: null,
             via: null,
           },

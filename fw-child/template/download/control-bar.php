@@ -1,15 +1,12 @@
 <div id="control-bar" class="control-bar tab-drawer-tabs-container d-flex flex-column align-items-center">
-	<?php
-
-		// LOGO
-
+	<div class="sidebar-header w-100">
+		<?php
 		include ( locate_template ( 'template/header-logo.php' ) );
+		?>
+		<a href="#menu" id="menu-trigger" data-bs-toggle="offcanvas" class="d-flex justify-content-center p-2"><i id="header-menu-icon" class="fas fa-align-left text-white"></i></a>
+	</div>
 
-	?>
-
-	<a href="#menu" id="menu-trigger" data-bs-toggle="offcanvas" class="d-flex justify-content-center p-2"><i id="header-menu-icon" class="fas fa-align-left text-white"></i></a>
-
-	<div id="control-bar-tabs" class="tab-drawer-tabs w-100">
+	<div id="control-bar-tabs" class="tab-drawer-tabs w-100 pt-2">
 		<a href="#data" class="control-bar-tab-link tab-drawer-trigger">
 			<span class="cdc-icon">
 				<?php

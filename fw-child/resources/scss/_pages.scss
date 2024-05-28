@@ -607,6 +607,12 @@ $legend-on-height: 16px;
 //
 
 #page-map {
+  .sidebar-header {
+    background-color: transparentize($dark, 0.05);
+    padding-bottom: 16px;
+    border-bottom: 1px solid $gray-700;
+  }
+  
   .tab-drawer {
     .tab-drawer {
       // width: 50vw;
@@ -1272,6 +1278,12 @@ body.tab-drawer-open {
 //
 
 #page-download {
+  .sidebar-header {
+    background-color: transparentize($dark, 0.05);
+    padding-bottom: 16px;
+    border-bottom: 1px solid $gray-700;
+  }
+
   .tab-drawer-container {
     &:has(.tab-drawer.td-selected) {
       width: calc((100vw / 16) * 4);

@@ -1263,7 +1263,7 @@ msgstr ""
 
 #: template/newsletter-signup.php:11
 msgid "Your email address"
-msgstr ""
+msgstr "Votre adresse e-mail"
 
 #: template/old-loop/blocks/chart.php:43
 #, fuzzy

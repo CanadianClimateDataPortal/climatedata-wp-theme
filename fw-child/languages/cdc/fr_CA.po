@@ -132,7 +132,7 @@ msgstr ""
 #: template/learn/control-bar.php:30
 #: template/post-meta.php:30
 msgid "Topics"
-msgstr "Topiques"
+msgstr "Sujets"
 
 #: template/download/map-container.php:60
 #: template/map/map-container.php:70
@@ -1298,7 +1298,7 @@ msgstr "Auteur"
 
 #: template/post-meta.php:52
 msgid "Share this post"
-msgstr ""
+msgstr "Partager cette publication"
 
 #: template/query/download-var-item.php:11
 msgid "Select variable"

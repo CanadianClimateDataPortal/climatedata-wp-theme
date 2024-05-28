@@ -550,3 +550,6 @@ function short_province ( $province ) {
 		}
 
 }
+
+// Disable WordPress redirection guessing on 404 errors.
+add_filter( 'do_redirect_guess_404_permalink', '__return_false' );

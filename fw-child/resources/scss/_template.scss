@@ -75,6 +75,22 @@
   }
 }
 
+// Make footer sponsor logos responsive.
+.footer-sponsors {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem !important;
+
+  .fw-block-type-image {
+    margin: 0 !important;
+
+    img {
+      max-height: 24px;
+    }
+  }
+}
+
 //
 // CONTROL BAR
 //

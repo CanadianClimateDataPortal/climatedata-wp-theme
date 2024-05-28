@@ -80,11 +80,9 @@
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 1.5rem !important;
+  gap: 1.5rem;
 
   .fw-block-type-image {
-    margin: 0 !important;
-
     img {
       max-height: 24px;
     }

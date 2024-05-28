@@ -349,7 +349,7 @@ msgstr "Sélectionner une variable"
 
 #: template/download/controls/data.php:33
 msgid "Threshold Values"
-msgstr ""
+msgstr "Valeur des seuils"
 
 #: template/download/controls/data.php:41
 msgid "Preset"
@@ -1005,7 +1005,7 @@ msgstr "Affichage"
 
 #: template/map/controls/data.php:22
 msgid "Threshold Value"
-msgstr ""
+msgstr "Valeur du seuil"
 
 #: template/map/controls/data.php:45
 msgid "CMIP6"

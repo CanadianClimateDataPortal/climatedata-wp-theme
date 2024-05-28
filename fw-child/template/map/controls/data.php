@@ -12,24 +12,10 @@
 					<input type="hidden" name="data-var-id" id="data-var-id" value="" data-query-key="var_id">
 					<input type="hidden" name="data-var" id="data-var" value="" data-query-key="var">
 
-					<a href="#data-variable" class="tab-drawer-trigger d-block text-body p-3">
+					<a href="#data-variable" class="tab-drawer-trigger d-block text-body p-3 pb-0">
 						<span class="h6 all-caps text-secondary mb-3"><?php _e ( 'Variable', 'cdc' ); ?></span>
 						<span class="var-name"><?php _e ( 'Click to select a variable', 'cdc' ); ?></span>
 					</a>
-
-					<div id="var-thresholds" class="mt-3 mx-3" style="display: none;">
-						<h6 class="all-caps text-secondary mb-3 d-flex align-items-center">
-							<?php _e ( 'Threshold Value', 'cdc' ); ?>
-							<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
-						</h6>
-
-						<div class="map-control-slider-well">
-							<div id="threshold-slider" class="map-control-slider" data-pane="marker">
-								<div id="threshold-handle" class="ui-slider-handle"></div>
-							</div>
-						</div>
-
-					</div>
 
 				</div>
 
@@ -46,6 +32,20 @@
 
 						<input type="radio" class="btn-check" name="data-dataset" id="data-dataset-cmip5" value="cmip5" autocomplete="off" data-query-key="dataset">
 						<label class="btn btn-outline-gray-400" for="data-dataset-cmip5"><?php _e ( 'CMIP5', 'cdc' ); ?></label>
+					</div>
+
+				</div>
+
+				<div id="var-thresholds" class="map-control-item" style="display: none;">
+					<h6 class="all-caps text-secondary mb-3 d-flex align-items-center">
+						<?php _e ( 'Threshold Value', 'cdc' ); ?>
+						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+					</h6>
+
+					<div class="map-control-slider-well">
+						<div id="threshold-slider" class="map-control-slider" data-pane="marker">
+							<div id="threshold-handle" class="ui-slider-handle"></div>
+						</div>
 					</div>
 
 				</div>

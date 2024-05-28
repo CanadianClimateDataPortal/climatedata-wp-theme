@@ -612,6 +612,12 @@ $legend-on-height: 16px;
     padding-bottom: 16px;
     border-bottom: 1px solid $gray-700;
   }
+
+  // For an unknown reason, the collapse-o-matic renders collapsible content opened by default, instead of closed.
+  // Here we force it to start closed.
+  #info .collapseomatic_content {
+    display: none;
+  }
   
   .tab-drawer {
     .tab-drawer {
@@ -1282,6 +1288,12 @@ body.tab-drawer-open {
     background-color: transparentize($dark, 0.05);
     padding-bottom: 16px;
     border-bottom: 1px solid $gray-700;
+  }
+
+  // For an unknown reason, the collapse-o-matic renders collapsible content opened by default, instead of closed.
+  // Here we force it to start closed.
+  #info .collapseomatic_content {
+    display: none;
   }
 
   .tab-drawer-container {

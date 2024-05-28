@@ -1,9 +1,10 @@
 <?php
+// Initialize news post ID.
+$news_post_id = $item['id'] ?? 0;
 
-$category = get_the_terms( $item['id'], 'category' );
-$author = get_the_terms( $item['id'], 'author' );
-
-?>
+// Initialize taxonomies.
+$tax_news_category = get_the_terms( $news_post_id, 'category' );
+$tax_news_author   = get_the_terms( $news_post_id, 'author' ); ?>
 
 <div class="card">
 	<?php
@@ -24,28 +25,52 @@ $author = get_the_terms( $item['id'], 'author' );
 	
 	<div class="card-body">
 		<h5 class="card-title item-title"><a href="<?php echo $item['permalink']; ?>" class="text-secondary stretched-link"><?php echo $item['title']; ?></a></h5>
-		
-		<p><?php
-		
-			echo get_post_time ( 'F j, Y', false, $item['id'] );
-		
-		?></p>
-		
-		<?php if ( ! empty( $category ) || ! empty( $author ) ) { ?>
-			<div class="card-meta d-flex flex-row">
-				<div class="card-category w-50">
-					<?php if ( ! empty( $category ) ) { ?>
-						<span class="mb-2 all-caps text-secondary fw-medium"><?php _e ( 'Category', 'cdc' ); ?></span>
-						<p><?php the_terms( $item['id'], 'category' ); ?></p>
-					<?php } ?>
+
+		<div class="mb-3">
+			<?php
+			echo get_post_time( 'F j, Y', false, $item['id'] ); ?>
+		</div>
+
+		<div class="row row-cols-2 card-meta">
+			<?php
+			// News categories.
+			if ( is_array( $tax_news_category ) && ! empty( $tax_news_category ) ) {
+				?>
+				<div class="col">
+					<div class="card-meta-item">
+						<span class="all-caps text-secondary"><?php _e( 'Topics', 'cdc' ); ?></span>
+
+						<p class="text-gray-600">
+							<?php
+							echo implode( ', ', array_map( function ( $term ) {
+								return $term->name;
+							}, $tax_news_category ) ); ?>
+						</p>
+					</div>
 				</div>
-				<div class="card-author w-50">
-					<?php if ( ! empty( $author ) ) { ?>
-						<span class="mb-2 all-caps text-secondary fw-medium"><?php _e ( 'Author', 'cdc' ); ?></span>
-						<p><?php the_terms( $item['id'], 'author' ); ?></p>
-					<?php } ?>
+				<?php
+			}
+			?>
+			
+			<?php
+			// News authors.
+			if ( is_array( $tax_news_author ) && ! empty( $tax_news_author ) ) {
+				?>
+				<div class="col">
+					<div class="card-meta-item">
+						<span class="all-caps text-secondary"><?php _e( 'Author', 'cdc' ); ?></span>
+
+						<p class="text-gray-600">
+							<?php
+							echo implode( ', ', array_map( function ( $term ) {
+								return $term->name;
+							}, $tax_news_author ) ); ?>
+						</p>
+					</div>
 				</div>
-			</div>
-		<?php } ?>
+				<?php
+			}
+			?>
+		</div>
 	</div>
 </div>

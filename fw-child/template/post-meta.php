@@ -1,5 +1,5 @@
-<div class="news-meta-block p-3 border border-gray-600">
-	<div class="news-meta-item mb-3 mb-lg-4">
+<div class="news-meta-block p-3 border border-gray-600 row">
+	<div class="news-meta-item mb-3 mb-lg-4 col-md-8 col-xl-16 pe-md-3 pe-xl-0">
 		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Date', 'cdc' ); ?></span>
 
 		<?php
@@ -9,7 +9,7 @@
 		?>
 	</div>
 
-	<div class="news-meta-item mb-3 mb-lg-4">
+	<div class="news-meta-item mb-3 mb-lg-4 col-md-8 col-xl-16">
 		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Author', 'cdc' ); ?></span>
 
 		<?php
@@ -27,7 +27,7 @@
 
 	?>
 
-	<div class="news-meta-item mb-3 mb-lg-4">
+	<div class="news-meta-item mb-3 mb-lg-4 col-md-8 col-xl-16 pe-md-3 pe-xl-0">
 		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Topics', 'cdc' ); ?></span>
 
 		<?php
@@ -49,7 +49,7 @@
 
 	?>
 
-	<div class="news-meta-item">
+	<div class="news-meta-item col-md-8 col-xl-16">
 		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Share this post', 'cdc' ); ?></span>
 
 		<div id="post-share-wrap">

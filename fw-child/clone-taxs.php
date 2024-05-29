@@ -10,6 +10,11 @@
  *  - cpt: Post type associated with the taxonomies
  */
 
+// Bail early if the user isn't logged in and isn't an administrator.
+if ( ! is_user_logged_in() || ! current_user_can( 'administrator' ) ) {
+	wp_die( 'You do not have sufficient permissions to access this page.' );
+}
+
 if ( isset( $_GET['old-tax'], $_GET['new-tax'], $_GET['cpt'] ) ) {
 	$cpt          = sanitize_text_field( $_GET['cpt'] );
 	$old_taxonomy = sanitize_text_field( $_GET['old-tax'] );

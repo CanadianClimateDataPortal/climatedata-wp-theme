@@ -1,57 +1,57 @@
-<div class="news-meta-item mb-3 mb-lg-4">
-	<h6 class="mb-3 all-caps text-blue-100"><?php _e ( 'Date', 'cdc' ); ?></h6>
-	
-	<?php 
-		
-		the_time ( __( 'F j, Y', 'cdc' ) );
-	
-	?>
-</div>
+<?php
+// Initialize news post ID.
+$news_post_id = get_the_ID();
 
-<div class="news-meta-item mb-3 mb-lg-4">
-	<h6 class="mb-3 all-caps text-blue-100"><?php _e ( 'Author', 'cdc' ); ?></h6>
-	
+// Initialize taxonomies.
+$tax_news_topic  = get_the_terms( $news_post_id, 'news-topic' );
+$tax_news_author = get_the_terms( $news_post_id, 'news-author' ); ?>
+
+<div class="news-meta-block p-3 border border-gray-600">
+	<div class="news-meta-item mb-3 mb-lg-4">
+		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Date', 'cdc' ); ?></span>
+
+		<?php
+
+			the_time ( __( 'F j, Y', 'cdc' ) );
+
+		?>
+	</div>
+
 	<?php
-	
-		the_field ( 'post_author' );
-		
+	// News authors.
+	if ( is_array( $tax_news_author ) && ! empty( $tax_news_author ) ) {
+		?>
+		<div class="news-meta-item mb-3 mb-lg-4">
+			<span class="mb-1 all-caps text-blue-100 d-block"><?php _e( 'Author', 'cdc' ); ?></span>
+
+			<?php
+			echo implode( ', ', array_map( function ( $term ) {
+				return $term->name;
+			}, $tax_news_author ) ); ?>
+		</div>
+		<?php
+	}
+
+	// News topics.
+	if ( is_array( $tax_news_topic ) && ! empty( $tax_news_topic ) ) {
+		?>
+		<div class="news-meta-item mb-3 mb-lg-4">
+			<span class="mb-1 all-caps text-blue-100 d-block"><?php _e( 'Topics', 'cdc' ); ?></span>
+
+			<?php
+			echo implode( ', ', array_map( function ( $term ) {
+				return $term->name;
+			}, $tax_news_topic ) ); ?>
+		</div>
+		<?php
+	}
 	?>
-</div>
 
-<?php
-	
-	$post_tags = get_the_terms ( get_the_ID(), 'post_tag' );
-	
-	if ( !empty ( $post_tags ) ) {
-		
-?>
+	<div class="news-meta-item">
+		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Share this post', 'cdc' ); ?></span>
 
-<div class="news-meta-item mb-3 mb-lg-4">
-	<h6 class="mb-3 all-caps text-blue-100"><?php _e ( 'Topics', 'cdc' ); ?></h6>
-	
-	<p><?php
-	
-			$i = 0;
-			
-			foreach ( $post_tags as $tag ) {
-				if ( $i != 0 ) echo ', ';
-				echo '<a href="/news/">' . $tag->name . '</a>';
-				$i++;
-			}
-			
-	?></p>
-</div>
-	
-<?php
-	
-}
-
-?>
-
-<div class="news-meta-item mb-3 mb-lg-4">
-	<h6 class="mb-3 all-caps text-blue-100"><?php _e ( 'Share this post', 'cdc' ); ?></h6>
-	
-	<div id="post-share-wrap">
-		<div id="share"></div>
+		<div id="post-share-wrap">
+			<div id="share"></div>
+		</div>
 	</div>
 </div>

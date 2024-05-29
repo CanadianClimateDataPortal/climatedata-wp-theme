@@ -3,7 +3,7 @@
 $news_post_id = $item['id'] ?? 0;
 
 // Initialize taxonomies.
-$tax_news_category = get_the_terms( $news_post_id, 'category' );
+$tax_news_topic = get_the_terms( $news_post_id, 'news-topic' );
 $tax_news_author   = get_the_terms( $news_post_id, 'news-author' ); ?>
 
 <div class="card">
@@ -33,8 +33,8 @@ $tax_news_author   = get_the_terms( $news_post_id, 'news-author' ); ?>
 
 		<div class="row row-cols-2 card-meta">
 			<?php
-			// News categories.
-			if ( is_array( $tax_news_category ) && ! empty( $tax_news_category ) ) {
+			// News topics.
+			if ( is_array( $tax_news_topic ) && ! empty( $tax_news_topic ) ) {
 				?>
 				<div class="col">
 					<div class="card-meta-item">
@@ -44,7 +44,7 @@ $tax_news_author   = get_the_terms( $news_post_id, 'news-author' ); ?>
 							<?php
 							echo implode( ', ', array_map( function ( $term ) {
 								return $term->name;
-							}, $tax_news_category ) ); ?>
+							}, $tax_news_topic ) ); ?>
 						</p>
 					</div>
 				</div>

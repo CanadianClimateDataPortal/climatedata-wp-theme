@@ -302,3 +302,87 @@ function taxonomy_vartype() {
 }
 
 add_action( 'init', 'taxonomy_vartype', 10 );
+
+// News Author
+
+function cd_register_tax_news_author() {
+	$labels = array(
+		'name'                       => _x( 'News Authors', 'Taxonomy General Name', 'cdc-taxonomies' ),
+		'singular_name'              => _x( 'News Author', 'Taxonomy Singular Name', 'cdc-taxonomies' ),
+		'menu_name'                  => __( 'News Authors', 'cdc-taxonomies' ),
+		'all_items'                  => __( 'All News Authors', 'cdc-taxonomies' ),
+		'parent_item'                => __( 'Parent News Author', 'cdc-taxonomies' ),
+		'parent_item_colon'          => __( 'Parent News Author:', 'cdc-taxonomies' ),
+		'new_item_name'              => __( 'New News Author Name', 'cdc-taxonomies' ),
+		'add_new_item'               => __( 'Add New News Author', 'cdc-taxonomies' ),
+		'edit_item'                  => __( 'Edit News Author', 'cdc-taxonomies' ),
+		'update_item'                => __( 'Update News Author', 'cdc-taxonomies' ),
+		'view_item'                  => __( 'View News Author', 'cdc-taxonomies' ),
+		'separate_items_with_commas' => __( 'Separate news authors with commas', 'cdc-taxonomies' ),
+		'add_or_remove_items'        => __( 'Add or remove news authors', 'cdc-taxonomies' ),
+		'choose_from_most_used'      => __( 'Choose from the most used', 'cdc-taxonomies' ),
+		'popular_items'              => __( 'Popular News Authors', 'cdc-taxonomies' ),
+		'search_items'               => __( 'Search News Authors', 'cdc-taxonomies' ),
+		'not_found'                  => __( 'Not Found', 'cdc-taxonomies' ),
+		'no_terms'                   => __( 'No news authors', 'cdc-taxonomies' ),
+		'items_list'                 => __( 'News Authors list', 'cdc-taxonomies' ),
+		'items_list_navigation'      => __( 'News Authors list navigation', 'cdc-taxonomies' ),
+	);
+
+	$args = array(
+		'labels'            => $labels,
+		'hierarchical'      => true,
+		'public'            => true,
+		'show_ui'           => true,
+		'show_admin_column' => true,
+		'show_in_nav_menus' => true,
+		'show_tagcloud'     => true,
+		'show_in_rest'      => true,
+	);
+
+	register_taxonomy( 'news-author', array( 'post' ), $args );
+}
+
+add_action( 'init', 'cd_register_tax_news_author', 10 );
+
+// News Topic
+
+function cd_register_tax_news_topic() {
+	$labels = array(
+		'name'                       => _x( 'News Topics', 'Taxonomy General Name', 'cdc-taxonomies' ),
+		'singular_name'              => _x( 'News Topic', 'Taxonomy Singular Name', 'cdc-taxonomies' ),
+		'menu_name'                  => __( 'News Topics', 'cdc-taxonomies' ),
+		'all_items'                  => __( 'All News Topics', 'cdc-taxonomies' ),
+		'parent_item'                => __( 'Parent News Topic', 'cdc-taxonomies' ),
+		'parent_item_colon'          => __( 'Parent News Topic:', 'cdc-taxonomies' ),
+		'new_item_name'              => __( 'New News Topic Name', 'cdc-taxonomies' ),
+		'add_new_item'               => __( 'Add New News Topic', 'cdc-taxonomies' ),
+		'edit_item'                  => __( 'Edit News Topic', 'cdc-taxonomies' ),
+		'update_item'                => __( 'Update News Topic', 'cdc-taxonomies' ),
+		'view_item'                  => __( 'View News Topic', 'cdc-taxonomies' ),
+		'separate_items_with_commas' => __( 'Separate news topics with commas', 'cdc-taxonomies' ),
+		'add_or_remove_items'        => __( 'Add or remove news topics', 'cdc-taxonomies' ),
+		'choose_from_most_used'      => __( 'Choose from the most used', 'cdc-taxonomies' ),
+		'popular_items'              => __( 'Popular News Topics', 'cdc-taxonomies' ),
+		'search_items'               => __( 'Search News Topics', 'cdc-taxonomies' ),
+		'not_found'                  => __( 'Not Found', 'cdc-taxonomies' ),
+		'no_terms'                   => __( 'No news topics', 'cdc-taxonomies' ),
+		'items_list'                 => __( 'News Topics list', 'cdc-taxonomies' ),
+		'items_list_navigation'      => __( 'News Topics list navigation', 'cdc-taxonomies' ),
+	);
+
+	$args = array(
+		'labels'            => $labels,
+		'hierarchical'      => true,
+		'public'            => true,
+		'show_ui'           => true,
+		'show_admin_column' => true,
+		'show_in_nav_menus' => true,
+		'show_tagcloud'     => true,
+		'show_in_rest'      => true,
+	);
+
+	register_taxonomy( 'news-topic', array( 'post' ), $args );
+}
+
+add_action( 'init', 'cd_register_tax_news_topic', 10 );

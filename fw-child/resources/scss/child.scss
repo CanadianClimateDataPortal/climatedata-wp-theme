@@ -877,6 +877,30 @@ $query-card-hover-padding: 0.75rem;
       }
     }
 
+    .card-meta {
+      gap: 1rem;
+
+      > .col {
+        width: auto;
+        flex: 1;
+      }
+
+      &-item {
+        display: flex;
+        flex-direction: column;
+
+        span {
+          font-size: 0.75rem;
+          font-weight: 600;
+          line-height: 1;
+        }
+
+        p {
+          margin-top: 0.25rem;
+        }
+      }
+    }
+
     &:hover {
       .card {
         height: calc(100% + ($query-card-hover-padding * 2));

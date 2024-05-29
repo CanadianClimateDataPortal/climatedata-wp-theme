@@ -1,3 +1,11 @@
+<?php
+// Initialize news post ID.
+$news_post_id = get_the_ID();
+
+// Initialize taxonomies.
+$tax_news_topic  = get_the_terms( $news_post_id, 'news-topic' );
+$tax_news_author = get_the_terms( $news_post_id, 'news-author' ); ?>
+
 <div class="news-meta-block p-3 border border-gray-600 row">
 	<div class="news-meta-item mb-3 mb-lg-4 col-md-8 col-xl-16 pe-md-3 pe-xl-0">
 		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Date', 'cdc' ); ?></span>
@@ -9,44 +17,34 @@
 		?>
 	</div>
 
-	<div class="news-meta-item mb-3 mb-lg-4 col-md-8 col-xl-16">
-		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Author', 'cdc' ); ?></span>
-
-		<?php
-
-			the_field ( 'post_author' );
-
-		?>
-	</div>
-
 	<?php
-
-		$post_tags = get_the_terms ( get_the_ID(), 'post_tag' );
-
-		if ( !empty ( $post_tags ) ) {
-
-	?>
-
-	<div class="news-meta-item mb-3 mb-lg-4 col-md-8 col-xl-16 pe-md-3 pe-xl-0">
-		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Topics', 'cdc' ); ?></span>
-
-		<?php
-
-				$i = 0;
-
-				foreach ( $post_tags as $tag ) {
-					if ( $i != 0 ) echo ', ';
-					echo '<a href="/news/">' . $tag->name . '</a>';
-					$i++;
-				}
-
+	// News authors.
+	if ( is_array( $tax_news_author ) && ! empty( $tax_news_author ) ) {
 		?>
-	</div>
+		<div class="news-meta-item mb-3 mb-lg-4 col-md-8 col-xl-16">
+			<span class="mb-1 all-caps text-blue-100 d-block"><?php _e( 'Author', 'cdc' ); ?></span>
 
-	<?php
-
+			<?php
+			echo implode( ', ', array_map( function ( $term ) {
+				return $term->name;
+			}, $tax_news_author ) ); ?>
+		</div>
+		<?php
 	}
 
+	// News topics.
+	if ( is_array( $tax_news_topic ) && ! empty( $tax_news_topic ) ) {
+		?>
+		<div class="news-meta-item mb-3 mb-lg-4 col-md-8 col-xl-16 pe-md-3 pe-xl-0">
+			<span class="mb-1 all-caps text-blue-100 d-block"><?php _e( 'Topics', 'cdc' ); ?></span>
+
+			<?php
+			echo implode( ', ', array_map( function ( $term ) {
+				return $term->name;
+			}, $tax_news_topic ) ); ?>
+		</div>
+		<?php
+	}
 	?>
 
 	<div class="news-meta-item col-md-8 col-xl-16">

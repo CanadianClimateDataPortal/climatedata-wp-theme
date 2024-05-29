@@ -151,6 +151,11 @@
         debug: false,
       });
 
+      // Unless already defined, set the URL hash to open the "Data" tab by default
+      if (!window.location.hash) {
+        window.location.hash = '#data';
+      }
+
       // things that need to happen
       // 1. set up options.query using the defaults and/or the URL
       // 2. make sure a variable ID exists
@@ -529,7 +534,7 @@
             instructions +=
               '<p class="mb-0 text-body">' +
               T('Enter latitude & longitude e.g.') +
-              ' <code>54,-115</code></p>';
+              ' <code>54,-115.3</code></p>';
 
             instructions += '</div>';
 
@@ -980,7 +985,11 @@
           // reset this
           if (options.grid.selected != this_gid) {
             for (let key in options.maps) {
-              options.maps[key].layers.grid.resetFeatureStyle(this_gid);
+              if (!style_obj) {
+                options.maps[key].layers.grid.resetFeatureStyle(this_gid);
+              } else {
+                options.maps[key].layers.grid.setFeatureStyle(this_gid, style_obj);
+              }
             }
           }
         },
@@ -1030,52 +1039,35 @@
         plugin._grid_hover_cancel(mouse_event);
       });
 
-      // click station
+      /**
+       * Attach handler when selecting (i.e. clicking) a station on the map.
+       */
+      item.on('map_station_select',
+        /**
+         * Center the map on the clicked station and show the station's chart.
+         *
+         * @param {Event} e - Event that triggered this handler.
+         * @param {object} mouse_event - Original Leaflet mouse event on the map.
+         * @param {string} station_id - ID of the station that was selected.
+         */
+        function (e, mouse_event, station_id) {
+          station_id = String(station_id);
 
-      item.on(
-        'map_station_select',
-        function (e, mouse_event, this_gid, style_obj) {
-          this_gid = String(this_gid);
+          if (!options.selection_data.hasOwnProperty('station'))
+            options.selection_data['station'] = {};
 
-          console.log(style_obj);
+          options.selection_data['station'][station_id] = mouse_event;
 
-          console.log('station click', mouse_event);
-
-          if (options.query.var == 'idf') {
-            // popups
-            // console.log('do popup', mouse_event);
-            // $.ajax({
-            //   url: ajax_data.url,
-            //   data: {
-            //     action: 'cdc_get_idf_files',
-            //     idf: mouse_event.layer.feature.properties.ID,
-            //   },
-            //   dataType: 'json',
-            //   success: function (data) {
-            //     console.log(data);
-            //   },
-            // });
-          } else {
-            // normals
-
-            // console.log('set station');
-
-            if (!options.selection_data.hasOwnProperty('station'))
-              options.selection_data['station'] = {};
-
-            options.selection_data['station'][this_gid] = mouse_event;
-
-            plugin.setup_location({
-              sector: options.query.sector,
-              coords: mouse_event.latlng,
-              location_id: this_gid,
-              var_id: options.query.var_id,
-              var: options.query.var,
-              var_title: plugin.get_var_title(
-                options.var_data[options.query.var_id],
-              ),
-            });
-          }
+          plugin.setup_location({
+            sector: options.query.sector,
+            coords: mouse_event.latlng,
+            location_id: station_id,
+            var_id: options.query.var_id,
+            var: options.query.var,
+            var_title: plugin.get_var_title(
+              options.var_data[options.query.var_id],
+            ),
+          });
         },
       );
 
@@ -1214,38 +1206,37 @@
             options.var_data[options.query.var_id],
           ),
         });
-
-        // plugin.set_location(
-        //   options.query,
-        //   options.var_data,
-        //   {
-        //     lat: parseFloat(e.params.data.lat),
-        //     lng: parseFloat(e.params.data.lon),
-        //   },
-        //   e.params.data,
-        //   e.params.text,
-        // );
       });
 
-      // area search pan to coords btn
+      /**
+       * Attach a "click" listener on the "Set map location" button in the location search box.
+       *
+       * This button appears when the user enters latitude and longitude coordinates in the search text field
+       * (example: "54.12,-112.4").
+       */
+      item.on('click', '.geo-select-pan-btn',
+        /**
+         * Update the main latitude and longitude fields, trigger their "change" event and close the select.
+         *
+         * The new latitude and longitude values are already set as data-attributes on the button. They were set by
+         * the "select2" jQuery plugin attached to the search field.
+         *
+         * @this {HTMLElement} The "Set map location" button
+         */
+        function () {
+          const latitude = $(this).attr('data-lat');
+          const longitude = $(this).attr('data-lng');
 
-      item.on('click', '.geo-select-pan-btn', function () {
-        let first_map = options.maps[Object.keys(options.maps)[0]];
+          item
+            .find('#select2-area-search-container')
+            .text($(this).attr('data-lat') + ', ' + $(this).attr('data-lng'));
 
-        let thislat = parseFloat($(this).attr('data-lat')),
-          thislon = parseFloat($(this).attr('data-lng')),
-          this_zoom = first_map.object.getZoom();
+          item.find('#area-search').select2('close');
 
-        if (this_zoom < 9) this_zoom = 9;
-
-        first_map.object.setView([thislat, thislon], this_zoom);
-
-        item
-          .find('#select2-area-search-container')
-          .text($(this).attr('data-lat') + ', ' + $(this).attr('data-lng'));
-
-        item.find('#area-search').select2('close');
-      });
+          item.find('#coords-lat').val(latitude);
+          item.find('#coords-lng').val(longitude).trigger('change');
+        }
+      );
 
       // triggerable handler
 
@@ -2121,14 +2112,24 @@
           );
           hidden_input.trigger('change');
         }
-
-        // update the control button
-        item
-          .find('.tab-drawer-trigger .var-name')
-          .text(plugin.get_var_title(options.var_data[var_id]));
       }
 
-      let new_var_data = options.var_data[var_id];
+      const new_var_data = options.var_data[var_id];
+
+      // Hide/show the threshold input
+      const var_names = new_var_data.acf.var_names;
+      if (typeof var_names != 'undefined' && var_names != null) {
+        if (var_names.length === 1) {
+          item.find('#var-thresholds').hide();
+        } else {
+          item.find('#var-thresholds').show();
+        }
+      }
+
+      // Update the value of the variable select input
+      item
+        .find('.tab-drawer-trigger .var-name')
+        .text(plugin.get_var_title(new_var_data));
 
       // populate breadcrumb
 
@@ -2215,8 +2216,6 @@
         options = plugin.options,
         item = plugin.item;
 
-      item.find('#info-relevant-vars').empty();
-      item.find('#info-relevant-vars-btn').hide();
       item.find('#info-relevant-sectors').empty();
       item.find('#info-relevant-sectors-btn').hide();
       item.find('#info-relevant-training').empty();
@@ -2230,32 +2229,8 @@
           var_id: var_id,
         },
         success: function (data) {
-          // vars
-
           let item_card =
             '<div class="card text-bg-dark bg-opacity-40 mb-3 p-3">';
-
-          if (data.vars.length > 0) {
-            item.find('#info-relevant-vars-btn').show();
-
-            data.vars.forEach(function (query_item, i) {
-              let new_item = $(item_card);
-
-              new_item.append(
-                '<h4 class="card-title">' + query_item.title + '</h4>',
-              );
-              new_item.append(
-                '<a href="#" data-query-key="var_id" data-query-val="' +
-                  query_item.id +
-                  '" data-bs-dismiss="offcanvas">' +
-                  'View on map' +
-                  '</a>',
-              );
-
-              item.find('#info-relevant-vars').append(new_item);
-            });
-          } else {
-          }
 
           // sectors
 
@@ -2817,12 +2792,6 @@
         return;
       }
 
-      let selected_item = item.find(
-        '#display-scheme-select .dropdown-item[data-scheme-id="' +
-          query.scheme +
-          '"]',
-      );
-
       if (query.scheme === 'default') {
         layer_params.tiled = true;
         delete layer_params.styles;
@@ -3321,17 +3290,11 @@
 
             // populate detail tab
             plugin.populate_location_detail(settings);
-
             break;
+
           default:
-            // console.log('open #location-detail');
-
-            // reset chart values btn
-            item.find('#chart-value-annual').prop('checked', true);
-
-            // populate detail tab
             plugin.populate_location_detail(settings);
-
+            item.find('#chart-value-annual').prop('checked', true);
             break;
         }
 
@@ -3345,8 +3308,19 @@
             .trigger('change');
         }
 
-        // set map center to marker location w/ offset
-        console.log('set center');
+        // Update latitude and longitude in the text fields and in the URL
+        let latitude = settings.coords.lat;
+        let longitude = settings.coords.lng;
+
+        if (options.lang === 'fr') {
+          latitude = latitude.replace('.', ',');
+          longitude = longitude.replace('.', ',');
+        }
+
+        $('#coords-lat').val(latitude);
+        $('#coords-lng').val(longitude).trigger('change');
+
+        // Center the map on the location, with a slight offset
         $(document).cdc_app('maps.set_center', settings.coords, null, 0.1);
       }); // when get_location_data
     },
@@ -3560,14 +3534,7 @@
         options = plugin.options,
         item = plugin.item;
 
-      // console.log('populate location', settings);
-
-      // console.log('selected var', settings.var);
-      // console.log('current var', options.query.var);
-
       if (settings.var_id !== options.query.var_id) {
-        console.log('gonna need to do something here!!~!');
-
         if (!options.var_data.hasOwnProperty(settings.var_id)) {
           // need to get var data for settings.var
 
@@ -3591,8 +3558,6 @@
 
           item.find('#station-detail .variable-name').text(settings.var_title);
 
-          console.log('open station detail now');
-
           if (window.location.hash != '#station-detail') {
             $('#control-bar').tab_drawer('update_path', '#station-detail');
           }
@@ -3609,6 +3574,7 @@
             container: item.find('#station-chart-container')[0],
           });
           break;
+
         default:
           // tab headings
           item
@@ -3619,10 +3585,18 @@
 
           item.find('#location-detail .variable-name').text(settings.var_title);
 
-          console.log('open location detail now');
-
           if (window.location.hash != '#location-detail') {
             $('#control-bar').tab_drawer('update_path', '#location-detail');
+          }
+
+          // Disable "30 year averages" and "30 year changes" buttons until we receive the data
+          item.find('#chart-value-30y').prop('disabled', true);
+          item.find('#chart-value-delta').prop('disabled', true);
+
+          let requested_variable = settings.var;
+
+          if (requested_variable === 'building_climate_zones') {
+            requested_variable = 'hddheat_18';
           }
 
           // generate chart
@@ -3634,7 +3608,7 @@
               '/' +
               settings.coords.lng +
               '/' +
-              settings.var +
+              requested_variable +
               '/' +
               options.query.frequency +
               '?decimals=' +
@@ -3643,8 +3617,6 @@
               options.query.dataset,
             dataType: 'json',
             success: function (chart_data) {
-              console.log('chart data', chart_data);
-
               $(document).cdc_app('charts.render', {
                 data: chart_data,
                 query: options.query,
@@ -3653,6 +3625,22 @@
                 download_url: null,
                 container: item.find('#location-chart-container')[0],
               });
+
+              // Re-enable "30 year averages" button if we have 30 year averages data
+              for (let key in chart_data) {
+                if (key.startsWith('30y_') && key.endsWith('_median')) {
+                  item.find('#chart-value-30y').prop('disabled', false);
+                  break;
+                }
+              }
+
+              // Re-enable "30 year changes" button if we have 30 year changes data
+              for (let key in chart_data) {
+                if (key.startsWith('delta7100_')) {
+                  item.find('#chart-value-delta').prop('disabled', false);
+                  break;
+                }
+              }
             },
           });
 
@@ -4118,11 +4106,24 @@
         tip.push(event.layer.properties[l10n_labels.label_field] + '<br>');
       }
 
+      const values = {
+        'p10': data[rcp]['p10'],
+        'p50': data[rcp]['p50'],
+        'p90': data[rcp]['p90'],
+      }
+
+      // For temperatures, units are in Kelvin, but values are received in °C. We reconvert them to Kelvin.
+      if (units === 'kelvin' && !delta) {
+        for (let percentile in values) {
+          values[percentile] += 273.15;
+        }
+      }
+
       // median
 
       // (value, var_acf, delta, lang)
       let val1 = value_formatter(
-        data[rcp]['p50'],
+        values['p50'],
         units,
         decimals,
         delta,
@@ -4139,7 +4140,7 @@
 
       // range
       val1 = value_formatter(
-        data[rcp]['p10'],
+        values['p10'],
         units,
         decimals,
         delta,
@@ -4147,7 +4148,7 @@
       );
 
       let val2 = value_formatter(
-        data[rcp]['p90'],
+        values['p90'],
         units,
         decimals,
         delta,
@@ -4192,8 +4193,14 @@
       }
     },
 
+    /**
+     * Return the localized name of a variable.
+     *
+     * @param {object} var_data - Loaded data of the variable.
+     * @returns {string} - The localized name.
+     */
     get_var_title: function (var_data) {
-      return this.options.lang != 'en'
+      return this.options.lang !== 'en'
         ? var_data.meta.title_fr
         : var_data.title.rendered;
     },

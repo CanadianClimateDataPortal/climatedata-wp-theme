@@ -28,50 +28,6 @@
 						<span class="var-name p-2"><?php _e ( 'Click to select a variable', 'cdc' ); ?></span>
 					</a>
 
-					<div id="var-thresholds" class="mt-3 mx-3" style="display: none;" data-flags="threshold:1,custom:1">
-						<h6 class="d-flex align-items-center h6 mb-3 all-caps text-secondary">
-							<?php _e ( 'Threshold Values', 'cdc' ); ?>
-							<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
-						</h6>
-
-						<div class="accordion accordion-flush" id="var-threshold-accordion">
-							<div class="accordion-item" data-flags="threshold:1">
-								<h6 class="accordion-header" id="threshold-preset-head">
-									<button id="threshold-preset-btn" class="accordion-button all-caps text-gray-600 mb-0" type="button" data-bs-toggle="collapse" data-bs-target="#threshold-preset" aria-expanded="true" aria-controls="threshold-preset">
-										<?php _e ( 'Preset', 'cdc' ); ?>
-									</button>
-								</h6>
-								<div id="threshold-preset" class="accordion-collapse collapse show" aria-labelledby="threshold-preset-head" data-bs-parent="#var-threshold-accordion">
-									<div class="accordion-body">
-
-										<div class="single-preset-label">
-										</div>
-
-										<div class="map-control-slider-well">
-											<div id="threshold-slider" class="map-control-slider" data-pane="marker">
-												<div id="threshold-handle" class="ui-slider-handle"></div>
-											</div>
-										</div>
-
-									</div>
-								</div>
-							</div>
-							<div class="accordion-item" data-flags="custom:1">
-								<h6 class="accordion-header" id="threshold-custom-head">
-									<button class="accordion-button all-caps text-gray-600 mb-0 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#threshold-custom" aria-expanded="false" aria-controls="threshold-custom">
-										<?php _e ( 'Custom', 'cdc'); ?>
-									</button>
-								</h6>
-								<div id="threshold-custom" class="accordion-collapse collapse" aria-labelledby="threshold-custom-head" data-bs-parent="#var-threshold-accordion">
-									<div class="accordion-body">
-										<?php // custom inputs placeholder ?>
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>
-
 				</div>
 
 				<div id="map-control-dataset" class="map-control-item" data-flags="station:0">
@@ -105,6 +61,49 @@
 						<label class="form-check-label" for="data-dataset-station">Regular Station Data</label>
 					</div>*/ ?>
 
+				</div>
+
+				<div id="var-thresholds" class="map-control-item" style="display: none;" data-flags="threshold:1,custom:1">
+					<h6 class="d-flex align-items-center h6 mb-3 all-caps text-secondary">
+						<?php _e ( 'Threshold Values', 'cdc' ); ?>
+						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+					</h6>
+
+					<div class="accordion accordion-flush" id="var-threshold-accordion">
+						<div class="accordion-item" data-flags="threshold:1">
+							<h6 class="accordion-header" id="threshold-preset-head">
+								<button id="threshold-preset-btn" class="accordion-button all-caps text-gray-600 mb-0" type="button" data-bs-toggle="collapse" data-bs-target="#threshold-preset" aria-expanded="true" aria-controls="threshold-preset">
+									<?php _e ( 'Preset', 'cdc' ); ?>
+								</button>
+							</h6>
+							<div id="threshold-preset" class="accordion-collapse collapse show" aria-labelledby="threshold-preset-head" data-bs-parent="#var-threshold-accordion">
+								<div class="accordion-body">
+
+									<div class="single-preset-label">
+									</div>
+
+									<div class="map-control-slider-well">
+										<div id="threshold-slider" class="map-control-slider" data-pane="marker">
+											<div id="threshold-handle" class="ui-slider-handle"></div>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+						<div class="accordion-item" data-flags="custom:1">
+							<h6 class="accordion-header" id="threshold-custom-head">
+								<button class="accordion-button all-caps text-gray-600 mb-0 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#threshold-custom" aria-expanded="false" aria-controls="threshold-custom">
+									<?php _e ( 'Custom', 'cdc'); ?>
+								</button>
+							</h6>
+							<div id="threshold-custom" class="accordion-collapse collapse" aria-labelledby="threshold-custom-head" data-bs-parent="#var-threshold-accordion">
+								<div class="accordion-body">
+									<?php // custom inputs placeholder ?>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 
 			</div>

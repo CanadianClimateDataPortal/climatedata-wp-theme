@@ -574,6 +574,18 @@ $legend-on-height: 16px;
         background-color: $white;
       }
     }
+
+    &:disabled {
+      & + label {
+        opacity: 0.4;
+        cursor: default;
+
+        &:hover {
+          background-color: $gray-300;
+          border-color: $gray-300;
+        }
+      }
+    }
   }
 }
 
@@ -595,6 +607,18 @@ $legend-on-height: 16px;
 //
 
 #page-map {
+  .sidebar-header {
+    background-color: transparentize($dark, 0.05);
+    padding-bottom: 16px;
+    border-bottom: 1px solid $gray-700;
+  }
+
+  // For an unknown reason, the collapse-o-matic renders collapsible content opened by default, instead of closed.
+  // Here we force it to start closed.
+  #info .collapseomatic_content {
+    display: none;
+  }
+  
   .tab-drawer {
     .tab-drawer {
       // width: 50vw;
@@ -1260,6 +1284,18 @@ body.tab-drawer-open {
 //
 
 #page-download {
+  .sidebar-header {
+    background-color: transparentize($dark, 0.05);
+    padding-bottom: 16px;
+    border-bottom: 1px solid $gray-700;
+  }
+
+  // For an unknown reason, the collapse-o-matic renders collapsible content opened by default, instead of closed.
+  // Here we force it to start closed.
+  #info .collapseomatic_content {
+    display: none;
+  }
+
   .tab-drawer-container {
     &:has(.tab-drawer.td-selected) {
       width: calc((100vw / 16) * 4);
@@ -1574,6 +1610,15 @@ body.tab-drawer-open {
 }
 
 // SINGLE POST
+
+.news-meta-block {
+  backdrop-filter: blur(10px);
+  background-color: transparent;
+  
+  .news-meta-item > span {
+    font-size: 0.85rem;
+  }
+}
 
 .single-post {
   #hero {

@@ -64,7 +64,7 @@ function wpza_replace_repeater_field ( $where ) {
 add_filter ( 'posts_where', 'wpza_replace_repeater_field' );
 
 //
-// GET RELATED VARS
+// GET RELATED CONTENT
 //
 
 add_action ( 'rest_api_init', function () {
@@ -79,27 +79,10 @@ add_action ( 'rest_api_init', function () {
 function cdc_get_related_content () {
 	
 	$result = array(
-		'vars' => [],
 		'sectors' => [],
 		'training' => []
 	);
-	
-	// VARIABLES
-		
-	if ( isset ( $_GET['var_id'] ) ) {
-		
-		foreach ( get_field ( 'related_vars', $_GET['var_id'] ) as $related_ID ) {
-			
-			$result['vars'][] = array (
-				'id' => $related_ID,
-				'title' => get_the_title ( $related_ID ),
-				'url' => get_permalink ( $related_ID )
-			);
-			
-		}
-		
-	}
-	
+
 	// SECTORS
 	
 	$sectors = get_the_terms ( $_GET['var_id'], 'sector' );
@@ -237,8 +220,8 @@ function cdc_finch_submit () {
 // format WYSIWYG fields in REST requests
 
 add_filter ( 'acf/rest/format_value_for_rest/name=var_description', 'cdc_format_wysiwyg_in_rest', 10, 5);
-add_filter ( 'acf/rest/format_value_for_rest/name=var_tech_description_fr', 'cdc_format_wysiwyg_in_rest', 10, 5);
-add_filter ( 'acf/rest/format_value_for_rest/name=var_description', 'cdc_format_wysiwyg_in_rest', 10, 5);
+add_filter ( 'acf/rest/format_value_for_rest/name=var_tech_description', 'cdc_format_wysiwyg_in_rest', 10, 5);
+add_filter ( 'acf/rest/format_value_for_rest/name=var_description_fr', 'cdc_format_wysiwyg_in_rest', 10, 5);
 add_filter ( 'acf/rest/format_value_for_rest/name=var_tech_description_fr', 'cdc_format_wysiwyg_in_rest', 10, 5);
 
 function cdc_format_wysiwyg_in_rest ($value_formatted, $post_id, $field, $value, $format) {

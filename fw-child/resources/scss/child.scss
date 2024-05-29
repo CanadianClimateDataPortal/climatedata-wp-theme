@@ -191,6 +191,10 @@ h6 {
 }
 
 p {
+  &:last-child {
+    margin-bottom: 0;
+  }
+
   a {
     &:hover {
       text-decoration: underline;

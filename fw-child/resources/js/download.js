@@ -148,6 +148,11 @@
 
       $('#control-bar').tab_drawer();
 
+      // Unless already defined, set the URL hash to open the "Data" tab by default
+      if (!window.location.hash) {
+        window.location.hash = '#data';
+      }
+
       // 1. set up options.query using the defaults and/or the URL
 
       console.log('download', 'setup query');
@@ -2121,6 +2126,11 @@
 
         item.find('#info-description').html(options.var_data.acf[desc_key]);
 
+        // Update the value of the variable select input
+        item
+          .find('.tab-drawer-trigger .var-name')
+          .text(plugin.get_var_title(options.var_data));
+
         if (options.var_data.acf[tech_key] != '') {
           item.find('#info-tech-description').show();
           item.find('#info-tech-description').prev().show();
@@ -2430,8 +2440,6 @@
         options = plugin.options,
         item = plugin.item;
 
-      item.find('#info-relevant-vars').empty();
-      item.find('#info-relevant-vars-btn').hide();
       item.find('#info-relevant-sectors').empty();
       item.find('#info-relevant-sectors-btn').hide();
       item.find('#info-relevant-training').empty();
@@ -2445,32 +2453,8 @@
           var_id: var_id,
         },
         success: function (data) {
-          // vars
-
           let item_card =
             '<div class="card text-bg-dark bg-opacity-40 mb-3 p-3">';
-
-          if (data.vars.length > 0) {
-            item.find('#info-relevant-vars-btn').show();
-
-            data.vars.forEach(function (query_item, i) {
-              let new_item = $(item_card);
-
-              new_item.append(
-                '<h4 class="card-title">' + query_item.title + '</h4>',
-              );
-              new_item.append(
-                '<a href="#" data-query-key="var_id" data-query-val="' +
-                  query_item.id +
-                  '">' +
-                  'View on map' +
-                  '</a>',
-              );
-
-              item.find('#info-relevant-vars').append(new_item);
-            });
-          } else {
-          }
 
           // sectors
 
@@ -4575,6 +4559,18 @@
       }
 
       return result;
+    },
+
+    /**
+     * Return the localized name of a variable.
+     *
+     * @param {object} var_data - Loaded data of the variable.
+     * @returns {string} - The localized name.
+     */
+    get_var_title: function (var_data) {
+      return this.options.lang !== 'en'
+        ? var_data.meta.title_fr
+        : var_data.title.rendered;
     },
   };
 

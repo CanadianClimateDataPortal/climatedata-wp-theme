@@ -557,9 +557,9 @@
                     ) {
                       // console.log('UPDATE RASTER LAYER');
 
-                      // delete all parameters from layer before updating
-                      // see: https://github.com/Leaflet/Leaflet/issues/3441
-                      delete this_map.layers.raster.wmsParams.parameter;
+                      // Parameters that must be removed are not removed, so we remove them manually
+                      // Issue: https://github.com/Leaflet/Leaflet/issues/3441
+                      delete this_map.layers.raster.wmsParams.sld_body;
                       this_map.layers.raster.setParams(params);
 
                       this_map.layers.raster.cdc_params =
@@ -632,7 +632,7 @@
                         $(document).trigger('map_item_mouseout', [
                           e,
                           e.layer.properties.gid,
-                          {},
+                          null,
                         ]);
                       })
                       .on('click', function (e) {
@@ -1327,7 +1327,9 @@
                           .on('mouseout', function (e) {
                             let style_obj = {
                               weight: 1.5,
+                              color: '#fff',
                               fill: false,
+                              opacity: 0.5,
                             };
 
                             if (options.choro.reset_features == false) {
@@ -1450,7 +1452,7 @@
               for (let i = 0; i < colours.length - (categorical ? 0 : 1); i++) {
                 let label;
                 if (labels) {
-                  label = unit_localize(labels[i], options.lang);
+                  label = unit_localize(labels[labels.length - i - 1], options.lang);
                 } else {
                   label = value_formatter(
                     quantities[colours.length - i - 2],
@@ -2123,12 +2125,13 @@
           }
         }
 
-        let decade_utc = Date.UTC(settings.query.decade),
-          delta_utc = Date.UTC(parseInt(settings.query.decade) + 1),
+        const decade = Math.floor(parseInt(settings.query.decade) / 10),
           decade_vals = [],
           delta_vals = [];
 
         scenarios.forEach(function (scenario) {
+
+          // Retrieve median time series data
           if (settings.data['{0}_median'.format(scenario.name)].length > 0) {
             options.chart.series.push({
               name: T('{0} Median').format(scenario.label),
@@ -2145,6 +2148,7 @@
             });
           }
 
+          // Retrieve range time series data
           if (settings.data['{0}_range'.format(scenario.name)].length > 0) {
             options.chart.series.push({
               name: T('{0} Range').format(scenario.label),
@@ -2162,73 +2166,64 @@
             });
           }
 
-          // console.log(
-          //   settings.data['30y_{0}_median'.format(scenario.name)],
-          //   settings.data['30y_{0}_median'.format(scenario.name)].length,
-          // );
-
-          // find the median values for the queried decade
-
-          if (
-            Object.keys(settings.data['30y_{0}_median'.format(scenario.name)])
-              .length > 0
-          ) {
-            for (let timestamp in settings.data[
-              '30y_{0}_median'.format(scenario.name)
-            ]) {
-              if (parseInt(timestamp) == delta_utc)
+          // Retrieve the current decade's 30 years median value
+          const thirty_years_medians = settings.data['30y_{0}_median'.format(scenario.name)];
+          if (thirty_years_medians && Object.keys(thirty_years_medians).length > 0) {
+            for (let timestamp in settings.data['30y_{0}_median'.format(scenario.name)]) {
+              const data_date = new Date(parseInt(timestamp));
+              const data_decade = Math.floor(data_date.getUTCFullYear() / 10);
+              if (data_decade === decade) {
                 decade_vals.push(
-                  settings.data['30y_{0}_median'.format(scenario.name)][
-                    timestamp
-                  ],
+                  settings.data['30y_{0}_median'.format(scenario.name)][timestamp],
                 );
+              }
             }
           }
 
-          // find the delta values for the queried decade
-
-          if (
-            Object.keys(
-              settings.data['delta7100_{0}_median'.format(scenario.name)],
-            ).length > 0
-          ) {
-            for (let timestamp in settings.data[
-              'delta7100_{0}_median'.format(scenario.name)
-            ]) {
-              if (parseInt(timestamp) == delta_utc)
+          // Retrieve the current decade's median delta value (i.e. vs the reference period)
+          const delta_medians = settings.data['delta7100_{0}_median'.format(scenario.name)];
+          if (delta_medians && Object.keys(delta_medians).length > 0) {
+            for (let timestamp in settings.data['delta7100_{0}_median'.format(scenario.name)]) {
+              const data_date = new Date(parseInt(timestamp));
+              const data_decade = Math.floor(data_date.getUTCFullYear() / 10);
+              if (data_decade === decade) {
                 delta_vals.push(
-                  settings.data['delta7100_{0}_median'.format(scenario.name)][
-                    timestamp
-                  ],
+                  settings.data['delta7100_{0}_median'.format(scenario.name)][timestamp],
                 );
+              }
             }
           }
         });
 
-        // console.log('decade', decade_vals);
-        // console.log('delta', delta_vals);
+        /*
+         * Render the median header
+         */
 
-        // change median header decade value
-        item
-          .find('#location-summary .location-value-median .decade')
-          .text(
-            parseInt(settings.query.decade) +
+        if (decade_vals.length !== scenarios.length) {
+          item.find('#location-summary').hide();
+          item.find('#location-val-scenarios').hide();
+        } else {
+          item.find('#location-summary')
+            .show()
+            .find('.location-value-median .decade')
+            .text(
+              parseInt(settings.query.decade) +
               1 +
               ' – ' +
               (parseInt(settings.query.decade) + 30),
-          );
+            );
 
-        item.find('#location-summary .value-table').empty();
+          item.find('#location-summary .value-table').empty();
 
-        scenarios.forEach(function (scenario, i) {
-          // new row
-          let new_val_row = $(
-            '<div class="row" data-scenario="' + scenario.name + '">',
-          );
+          scenarios.forEach(function (scenario, i) {
+            // new row
+            let new_val_row = $(
+              '<div class="row" data-scenario="' + scenario.name + '">',
+            );
 
-          // median value
-          new_val_row.append(
-            '<div class="col-3-of-7">' +
+            // median value
+            new_val_row.append(
+              '<div class="col-3-of-7">' +
               value_formatter(
                 decade_vals[i],
                 options.chart.unit,
@@ -2237,19 +2232,19 @@
                 options.lang,
               ) +
               '</div>',
-          );
+            );
 
-          // delta value
-          let delta_icon = 'fa-caret-up text-primary';
+            // delta value
+            let delta_icon = 'fa-caret-up text-primary';
 
-          if (delta_vals[i] == 0) {
-            delta_icon = 'fa-equals';
-          } else if (delta_vals[i] < 0) {
-            delta_icon = 'fa-caret-down text-secondary';
-          }
+            if (delta_vals[i] === 0) {
+              delta_icon = 'fa-equals';
+            } else if (delta_vals[i] < 0) {
+              delta_icon = 'fa-caret-down text-secondary';
+            }
 
-          new_val_row.append(
-            '<div class="col"><i class="fas ' +
+            new_val_row.append(
+              '<div class="col"><i class="fas ' +
               delta_icon +
               ' me-3"></i>' +
               value_formatter(
@@ -2261,18 +2256,17 @@
               ) +
               ' ' +
               '</div>',
-          );
+            );
 
-          new_val_row.appendTo(item.find('#location-summary .value-table'));
-        });
+            new_val_row.appendTo(item.find('#location-summary .value-table'));
+          });
 
-        item
-          .find(
-            '#location-val-scenarios .btn-check[value="' +
-              settings.query.scenarios[0] +
-              '"]',
-          )
-          .trigger('click');
+          item
+            .find('#location-val-scenarios')
+            .show()
+            .find('.btn-check[value="' + settings.query.scenarios[0] + '"]')
+            .trigger('click');
+        }
 
         // render the chart
 
@@ -2282,9 +2276,6 @@
             T('No data available for selected location') +
             '</h1></span>';
         } else {
-          // console.log('render');
-          // console.log(settings.object);
-          // console.log('chart series', options.chart.series);
 
           options.chart.object = Highcharts.stockChart(settings.object, {
             chart: {
@@ -2363,7 +2354,7 @@
             series: options.chart.series,
           });
 
-          if (options.chart.query.building_climate_zones) {
+          if (options.chart.query.var === 'building_climate_zones') {
             // add climate zone colour bands
 
             const colorTransparency = 0.3;
@@ -3039,32 +3030,7 @@
         beforeSend: function (xhr) {
           xhr.setRequestHeader('X-WP-Nonce', ajax_data.rest_nonce);
         },
-        success: function (data) {
-          console.log('wp-json var data', data);
-
-          let var_title =
-            options.lang != 'en' ? data.meta.title_fr : data.title.rendered;
-
-          // update the control button
-
-          item.find('.tab-drawer-trigger .var-name').text(var_title);
-
-          if (
-            typeof data.acf.var_names != 'undefined' &&
-            data.acf.var_names != null
-          ) {
-            if (data.acf.var_names.length == 1) {
-              // hide the threshold inputs
-              item.find('#var-thresholds').hide();
-            } else {
-              item.find('#var-thresholds').show();
-            }
-          }
-
-          if (typeof callback == 'function') {
-            callback(data);
-          }
-        },
+        success: callback,
       });
     },
 

@@ -277,8 +277,9 @@ $alert-size: 1.375rem;
   background-color: transparentize($white, 0.2);
   opacity: 0;
   transform: none;
-  transition: top 0s ease 0.25s,
-  opacity 0.25s ease 0s;
+  transition:
+    top 0s ease 0.25s,
+    opacity 0.25s ease 0s;
   z-index: 2000;
 
   &:after {
@@ -306,8 +307,9 @@ $alert-size: 1.375rem;
     top: 0;
     left: 0;
     opacity: 1;
-    transition: top 0s ease 0s,
-    opacity 0.25s ease 0s;
+    transition:
+      top 0s ease 0s,
+      opacity 0.25s ease 0s;
 
     &:after {
       top: 50%;
@@ -405,8 +407,9 @@ $control-slider-handle-width: 2.75rem;
     font-size: 0.875rem;
     line-height: $control-slider-height;
     text-align: center;
-    transition: background-color 0.25s,
-    color 0.25s;
+    transition:
+      background-color 0.25s,
+      color 0.25s;
   }
 }
 

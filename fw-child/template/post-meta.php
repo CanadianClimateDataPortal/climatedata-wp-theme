@@ -1,5 +1,5 @@
 <div class="news-meta-block p-3 border border-gray-600 row">
-	<div class="news-meta-item mb-3 mb-lg-4 col-md-8 col-xl-16">
+	<div class="news-meta-item mb-3 mb-lg-4 col-md-8 col-xl-16 pe-md-3 pe-xl-0">
 		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Date', 'cdc' ); ?></span>
 
 		<?php
@@ -27,7 +27,7 @@
 
 	?>
 
-	<div class="news-meta-item mb-3 mb-lg-4 col-md-8 col-xl-16">
+	<div class="news-meta-item mb-3 mb-lg-4 col-md-8 col-xl-16 pe-md-3 pe-xl-0">
 		<span class="mb-1 all-caps text-blue-100 d-block"><?php _e ( 'Topics', 'cdc' ); ?></span>
 
 		<?php

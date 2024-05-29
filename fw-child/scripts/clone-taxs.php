@@ -59,7 +59,7 @@ if ( isset( $_GET['old-tax'], $_GET['new-tax'], $_GET['cpt'] ) ) {
 							'terms'    => $old_term->slug,
 						),
 					),
-					'posts_per_page' => - 1,
+					'posts_per_page' => -1,
 				) );
 
 				// Assign the new term to the same posts.

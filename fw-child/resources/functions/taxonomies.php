@@ -329,7 +329,7 @@ function cd_register_tax_news_author() {
 		'items_list_navigation'      => __( 'News Authors list navigation', 'cdc-taxonomies' ),
 	);
 
-	$args   = array(
+	$args = array(
 		'labels'            => $labels,
 		'hierarchical'      => true,
 		'public'            => true,
@@ -371,7 +371,7 @@ function cd_register_tax_news_topic() {
 		'items_list_navigation'      => __( 'News Topics list navigation', 'cdc-taxonomies' ),
 	);
 
-	$args   = array(
+	$args = array(
 		'labels'            => $labels,
 		'hierarchical'      => true,
 		'public'            => true,

@@ -132,7 +132,7 @@ msgstr ""
 #: template/learn/control-bar.php:30
 #: template/post-meta.php:30
 msgid "Topics"
-msgstr "Topiques"
+msgstr "Sujets"
 
 #: template/download/map-container.php:60
 #: template/map/map-container.php:70
@@ -327,7 +327,7 @@ msgstr ""
 #: template/download/controls/details.php:339
 #: template/map/controls/data-variable.php:139
 msgid "Next"
-msgstr "Prochain"
+msgstr "Suivant"
 
 #: template/download/controls/data-variable.php:5
 #: template/map/controls/data-variable.php:5
@@ -349,7 +349,7 @@ msgstr "Sélectionner une variable"
 
 #: template/download/controls/data.php:33
 msgid "Threshold Values"
-msgstr ""
+msgstr "Valeur des seuils"
 
 #: template/download/controls/data.php:41
 msgid "Preset"
@@ -1005,7 +1005,7 @@ msgstr "Affichage"
 
 #: template/map/controls/data.php:22
 msgid "Threshold Value"
-msgstr ""
+msgstr "Valeur du seuil"
 
 #: template/map/controls/data.php:45
 msgid "CMIP6"
@@ -1298,7 +1298,7 @@ msgstr "Auteur"
 
 #: template/post-meta.php:52
 msgid "Share this post"
-msgstr ""
+msgstr "Partager cette publication"
 
 #: template/query/download-var-item.php:11
 msgid "Select variable"

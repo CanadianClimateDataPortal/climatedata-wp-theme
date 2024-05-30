@@ -123,6 +123,12 @@ const $ = jQuery;
 
       $('#page-tour').page_tour({
         default_open: false,
+        labels: {
+          start_over: T('Start Over'),
+          next: T('Next'),
+          close: T('Close'),
+          dont_show: T('Don’t show again'),
+        },
       });
 
       $('.page-tour-start').click(function () {

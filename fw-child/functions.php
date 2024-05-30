@@ -472,12 +472,24 @@ add_action ( 'fw_before_footer', function() {
 
 add_action ( 'fw_before_footer', function() {
 
+	/**
+	 * Generate the page tour's steps.
+	 *
+	 * The steps are defined in ACF fields in the page.
+	 */
 	if ( have_rows ( 'tour', $GLOBALS['fw']['current_query']['ID'] ) ) {
 
+		$tour_raw_data = get_field ( 'tour', $GLOBALS['fw']['current_query']['ID'] );
+		$tour_data = array_map(function($raw_data) {
+			$lang = $GLOBALS['fw']['current_lang_code'];
+			return [
+				'text' => $raw_data['text']["text_$lang"],
+				'position' => $raw_data['position'],
+			];
+		}, $tour_raw_data);
+
 		echo '<div class="page-tour" id="page-tour" data-steps=';
-
-		echo "'" . json_encode ( get_field ( 'tour', $GLOBALS['fw']['current_query']['ID'] ) ) . "'></div>";
-
+		echo "'" . json_encode ( $tour_data ) . "'></div>";
 	}
 } );
 

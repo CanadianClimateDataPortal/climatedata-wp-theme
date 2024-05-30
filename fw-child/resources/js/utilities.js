@@ -270,6 +270,11 @@ var l10n_table = {
     'Health Region': 'Région socio-sanitaire',
     'Watershed': 'Bassin versant',
     'Grid Point': 'Point de grille',
+
+    // Page tour
+    'Start Over': 'Recommencer',
+    'Next': 'Suivant',
+    'Don’t show again': 'Ne plus montrer',
   },
 };
 

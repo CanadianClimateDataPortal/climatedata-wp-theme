@@ -31,46 +31,39 @@ $tax_news_author = get_the_terms( $news_post_id, 'news-author' ); ?>
 			echo get_post_time( 'F j, Y', false, $item['id'] ); ?>
 		</div>
 
-		<div class="row row-cols-2 card-meta">
-			<?php
-			// News topics.
-			if ( is_array( $tax_news_topic ) && ! empty( $tax_news_topic ) ) {
-				?>
-				<div class="col">
-					<div class="card-meta-item">
-						<span class="all-caps text-secondary"><?php _e( 'Topics', 'cdc' ); ?></span>
-
-						<p class="text-gray-600">
-							<?php
-							echo implode( ', ', array_map( function ( $term ) {
-								return $term->name;
-							}, $tax_news_topic ) ); ?>
-						</p>
-					</div>
-				</div>
-				<?php
-			}
+		<?php
+		// News authors.
+		if ( is_array( $tax_news_author ) && ! empty( $tax_news_author ) ) {
 			?>
-			
+			<div class="card-author">
+				<p class="text-gray-600">
+					<?php
+					echo implode( ', ', array_map( function ( $term ) {
+						return $term->name;
+					}, $tax_news_author ) ); ?>
+				</p>
+			</div>
 			<?php
-			// News authors.
-			if ( is_array( $tax_news_author ) && ! empty( $tax_news_author ) ) {
-				?>
-				<div class="col">
-					<div class="card-meta-item">
-						<span class="all-caps text-secondary"><?php _e( 'Author', 'cdc' ); ?></span>
+		}
+		?>
 
-						<p class="text-gray-600">
-							<?php
-							echo implode( ', ', array_map( function ( $term ) {
-								return $term->name;
-							}, $tax_news_author ) ); ?>
-						</p>
-					</div>
-				</div>
-				<?php
-			}
+		<?php
+		// News topics.
+		if ( is_array( $tax_news_topic ) && ! empty( $tax_news_topic ) ) {
 			?>
-		</div>
+			<div class="card-topic">
+				<span class="all-caps text-secondary"><?php _e( 'Topics', 'cdc' ); ?></span>
+
+				<p class="text-gray-600">
+					<?php
+					echo implode( ', ', array_map( function ( $term ) {
+						return $term->name;
+					}, $tax_news_topic ) ); ?>
+				</p>
+			</div>
+			<?php
+		}
+		?>
+
 	</div>
 </div>

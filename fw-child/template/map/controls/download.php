@@ -40,7 +40,7 @@
 					$dl_slug = $GLOBALS['fw']['current_lang_code'] == 'fr' ? 'telechargement' : 'download';
 					?>
 					<a href="<?php echo home_url ( $dl_slug ); ?>" class="btn btn-secondary d-block" id="download-btn">
-						<span class="btn-icon"><i class="far fa-download"></i></span>
+						<span class="btn-icon"><i class="fa-solid fa-download"></i></span>
 						<span class="btn-text"><?php _e ( 'Download', 'cdc' ); ?></span>
 					</a>
 				</div>

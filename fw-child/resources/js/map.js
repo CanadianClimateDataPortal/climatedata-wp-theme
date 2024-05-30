@@ -402,18 +402,6 @@
             .text(val + 1 + '–' + (val + 30));
 
           $('[data-query-key="decade"]').val(val).trigger('change');
-
-          // show decade prompt
-
-          let decade_tooltip = bootstrap.Tooltip.getInstance(
-            '#decade-slider-handle',
-          );
-
-          if (decade_tooltip != undefined) {
-            setTimeout(function () {
-              bootstrap.Tooltip.getInstance('#decade-slider-handle').toggle();
-            }, 3000);
-          }
         },
         slide: function (e, ui) {
           // console.log('SLIDE');
@@ -441,16 +429,6 @@
               );
             },
           });
-
-          // destroy tooltip
-
-          let decade_tooltip = bootstrap.Tooltip.getInstance(
-            '#decade-slider-handle',
-          );
-
-          if (decade_tooltip != undefined) {
-            decade_tooltip.dispose();
-          }
         },
         change: function (e, ui) {
           // status = input, changed by the stop function
@@ -1710,16 +1688,6 @@
                 options.query,
                 options.var_data[options.query.var_id],
               );
-
-              let decade_tooltip = bootstrap.Tooltip.getInstance(
-                '#decade-slider-handle',
-              );
-
-              if (decade_tooltip != undefined) {
-                setTimeout(function () {
-                  decade_tooltip.update();
-                }, 500);
-              }
 
               console.log('status = ready');
               options.status = 'ready';

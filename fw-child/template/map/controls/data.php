@@ -23,7 +23,14 @@
 
 					<label for="data-dataset" class="form-label d-flex align-items-center h6 mb-3 all-caps text-secondary">
 						<?php _e ( 'Dataset', 'cdc' ); ?>
-						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+						<a
+							tabindex="0"
+							class="popover-btn"
+							role="button"
+							data-bs-toggle="popover"
+							data-bs-trigger="focus"
+							data-bs-content="<?php esc_html_e( 'Toggle between the available climate datasets.', 'csc' ) ?>"
+						>?</a>
 					</label>
 
 					<div class="btn-group">
@@ -39,7 +46,14 @@
 				<div id="var-thresholds" class="map-control-item" style="display: none;">
 					<h6 class="all-caps text-secondary mb-3 d-flex align-items-center">
 						<?php _e ( 'Threshold Value', 'cdc' ); ?>
-						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+						<a
+							tabindex="0"
+							class="popover-btn"
+							role="button"
+							data-bs-toggle="popover"
+							data-bs-trigger="focus"
+							data-bs-content="<?php esc_html_e( 'Description here.', 'csc' ) ?>"
+						>?</a>
 					</h6>
 
 					<div class="map-control-slider-well">
@@ -53,7 +67,14 @@
 				<div id="map-control-frequency" class="map-control-item">
 					<label for="data-frequency" class="form-label d-flex align-items-center h6 mb-3 all-caps text-secondary">
 						<?php _e ( 'Frequency', 'cdc' ); ?>
-						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+						<a
+							tabindex="0"
+							class="popover-btn"
+							role="button"
+							data-bs-toggle="popover"
+							data-bs-trigger="focus"
+							data-bs-content="<?php esc_html_e( 'Select Annual, Monthly or Seasonal from the drop-down menu.', 'csc' ) ?>"
+						>?</a>
 				</label>
 
 					<select class="form-select" name="data-frequency" data-query-key="frequency">
@@ -86,7 +107,14 @@
 
 					<h6 class="all-caps text-secondary mb-3 d-flex align-items-center">
 						<?php _e ( 'Scenarios', 'cdc' ); ?>
-						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+						<a
+							tabindex="0"
+							class="popover-btn"
+							role="button"
+							data-bs-toggle="popover"
+							data-bs-trigger="focus"
+							data-bs-content="<?php esc_html_e( 'Select one of the emissions scenarios available for the chosen climate model ensemble.', 'csc' ) ?>"
+						>?</a>
 					</h6>
 
 					<div class="mb-2">

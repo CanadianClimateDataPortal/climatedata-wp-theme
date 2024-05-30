@@ -11,7 +11,14 @@
 				<div id="map-control-delta" class="map-control-item" data-flags="station:0">
 					<h6 class="all-caps text-secondary mb-3 d-flex align-items-center">
 						<?php _e ( 'Data Values', 'cdc' ); ?>
-						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+						<a
+							tabindex="0"
+							class="popover-btn"
+							role="button"
+							data-bs-toggle="popover"
+							data-bs-trigger="focus"
+							data-bs-content="<?php esc_html_e( 'Select to view either absolute data values, or changes relevant to a baseline period.', 'csc' ) ?>"
+						>?</a>
 					</h6>
 
 					<div class="d-flex flex-wrap">
@@ -30,7 +37,14 @@
 				<div id="map-control-aggregation" class="map-control-item" data-flags="station:0">
 					<h6 class="all-caps text-secondary mb-3 d-flex align-items-center">
 						<?php _e ( 'Map Aggregation', 'cdc' ); ?>
-						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
+						<a
+							tabindex="0"
+							class="popover-btn"
+							role="button"
+							data-bs-toggle="popover"
+							data-bs-trigger="focus"
+							data-bs-content="<?php esc_html_e( 'View climate data as grid boxes, or aggregated by Census Subdivision, Health Region or Watershed.', 'csc' ) ?>"
+						>?</a>
 					</h6>
 
 					<div class="form-check">

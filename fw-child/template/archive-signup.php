@@ -1,6 +1,8 @@
 <!-- Begin Mailchimp Signup Form -->
-<div id="mc_embed_signup" class="">
-	<h4 class="text-blue-100 mt-5 mt-xl-0 mb-3"><?php _e ( 'Join the newsletter', 'cdc' ); ?></h4>
+<div id="mc_embed_signup" class="p-3 mt-5 mt-xl-0 border border-gray-600">
+	<div class="all-caps text-blue-100 mb-2"><?php _e ( 'Climatedata.ca newsletter', 'cdc' ); ?></div>
+
+	<p><?php _e ( 'Join our newsletter for periodic updates.', 'cdc' ); ?></p>
 
 	<form action="https://climatedata.us1.list-manage.com/subscribe/post?u=c52e1be341cba7905716a66b4&amp;id=727cebaf22" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate pe-3" target="_blank" novalidate>
 		<div id="mc_embed_signup_scroll">

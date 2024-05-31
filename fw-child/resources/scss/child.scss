@@ -428,6 +428,11 @@ $control-slider-handle-width: 2.75rem;
     @include font-size(5rem);
     font-weight: bold;
   }
+
+  #mc_embed_signup {
+    backdrop-filter: blur(10px);
+    background-color: transparent;
+  }
 }
 
 //

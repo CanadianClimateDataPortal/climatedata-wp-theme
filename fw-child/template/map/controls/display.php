@@ -17,7 +17,7 @@
 							role="button"
 							data-bs-toggle="popover"
 							data-bs-trigger="focus"
-							data-bs-content="<?php esc_html_e( 'Select to view either absolute data values, or changes relevant to a baseline period.', 'csc' ) ?>"
+							data-bs-content="<?php esc_html_e( 'Select to view either absolute data values, or changes relevant to a baseline period.', 'cdc' ) ?>"
 						>?</a>
 					</h6>
 
@@ -43,7 +43,7 @@
 							role="button"
 							data-bs-toggle="popover"
 							data-bs-trigger="focus"
-							data-bs-content="<?php esc_html_e( 'View climate data as grid boxes, or aggregated by Census Subdivision, Health Region or Watershed.', 'csc' ) ?>"
+							data-bs-content="<?php esc_html_e( 'View climate data as grid boxes, or aggregated by Census Subdivision, Health Region or Watershed.', 'cdc' ) ?>"
 						>?</a>
 					</h6>
 

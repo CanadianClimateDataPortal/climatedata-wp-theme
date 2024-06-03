@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-06-03T17:13:06+00:00\n"
+"POT-Creation-Date: 2024-06-03T18:25:33+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -1020,6 +1020,10 @@ msgstr ""
 msgid "Display"
 msgstr ""
 
+#: template/map/controls/data.php:32
+msgid "Toggle between the available climate datasets."
+msgstr ""
+
 #: template/map/controls/data.php:38
 msgid "CMIP6"
 msgstr ""
@@ -1032,8 +1036,20 @@ msgstr ""
 msgid "Threshold Value"
 msgstr ""
 
+#: template/map/controls/data.php:55
+msgid "Description here."
+msgstr ""
+
 #: template/map/controls/data.php:69
 msgid "Frequency"
+msgstr ""
+
+#: template/map/controls/data.php:76
+msgid "Select Annual, Monthly or Seasonal from the drop-down menu."
+msgstr ""
+
+#: template/map/controls/data.php:116
+msgid "Select one of the emissions scenarios available for the chosen climate model ensemble."
 msgstr ""
 
 #: template/map/controls/data.php:123
@@ -1052,6 +1068,10 @@ msgstr ""
 msgid "Data Values"
 msgstr ""
 
+#: template/map/controls/display.php:20
+msgid "Select to view either absolute data values, or changes relevant to a baseline period."
+msgstr ""
+
 #: template/map/controls/display.php:27
 msgid "Absolute"
 msgstr ""
@@ -1062,6 +1082,10 @@ msgstr ""
 
 #: template/map/controls/display.php:39
 msgid "Map Aggregation"
+msgstr ""
+
+#: template/map/controls/display.php:46
+msgid "View climate data as grid boxes, or aggregated by Census Subdivision, Health Region or Watershed."
 msgstr ""
 
 #: template/map/controls/display.php:73

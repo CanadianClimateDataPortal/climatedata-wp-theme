@@ -2054,16 +2054,41 @@
           options.chart.query.dataset;
 
         let scenarios = DATASETS[options.chart.query.dataset].scenarios;
-        let pointFormatter;
 
         // more to this to add later
-        const localized_chart_unit = unit_localize(options.chart.unit, options.lang)
-        var labelFormatter = function () {
-          return (
-            this.axis.defaultLabelFormatter.call(this) +
-            ' ' +
-            localized_chart_unit
-          );
+        const localized_chart_unit = unit_localize(options.chart.unit, options.lang);
+
+        /**
+         * Default tooltip value's label formatter.
+         *
+         * @return {string} -The unit value with its label. For 'doy' units, the returned value is a date.
+         */
+        const labelFormatter = function () {
+          const value = this.axis.defaultLabelFormatter.call(this);
+          if (localized_chart_unit === 'doy') {
+            return value_formatter(value, options.chart.unit, var_fields.decimals, false, options.lang);
+          } else {
+            return value + ' ' + localized_chart_unit;
+          }
+        };
+
+        /**
+         * Default tooltip point formatter.
+         *
+         * @return {string} - An HTML line for a single point.
+         */
+        const pointFormatter = function() {
+          if (this.series.type === 'line') {
+            return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name + ': <b>'
+              + value_formatter(this.y, options.chart.unit, var_fields.decimals, false, options.lang)
+              + '</b><br/>';
+          } else {
+            return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name + ': <b>'
+              + value_formatter(this.low, options.chart.unit, var_fields.decimals, false, options.lang)
+              + '</b> - <b>'
+              + value_formatter(this.high, options.chart.unit, var_fields.decimals, false, options.lang)
+              + '</b><br/>';
+          }
         };
 
         // reset the series array
@@ -2704,12 +2729,6 @@
               switch (settings.input.value) {
                 case 'annual':
                   options.chart.object.update({
-                    tooltip: {
-                      formatter: function (tooltip) {
-                        // console.log(tooltip.defaultFormatter);
-                        return tooltip.defaultFormatter.call(this, tooltip);
-                      },
-                    },
                     plotOptions: {
                       series: {
                         states: {
@@ -2720,6 +2739,11 @@
                             enabled: true,
                           },
                         },
+                      },
+                    },
+                    tooltip: {
+                      formatter: function (tooltip) {
+                        return plugin.charts.format_tooltip.apply(this, [plugin, 'annual', settings.var_data.acf.units, settings.var_data.acf.decimals, tooltip]);
                       },
                     },
                   });
@@ -2745,108 +2769,7 @@
                     tooltip: {
                       followPointer: true,
                       formatter: function (tooltip) {
-                        let [decade, decade_ms] = formatDecade(
-                          this.x,
-                          options.chart.query.frequency,
-                        );
-
-                        // remove existing plot band
-                        options.chart.object.xAxis[0].removePlotBand(
-                          '30y-plot-band',
-                        );
-
-                        // add new plot band
-                        options.chart.object.xAxis[0].addPlotBand({
-                          from: Date.UTC(decade, 0, 1),
-                          to: Date.UTC(decade + 29, 11, 31),
-                          id: '30y-plot-band',
-                        });
-
-                        this.chart = tooltip.chart;
-                        this.axis = tooltip.chart.yAxis[0];
-
-                        let val1, val2;
-
-                        let tip = [];
-
-                        let decade_label =
-                          '<span style="font-size: 0.75rem; font-weight: bold;">' +
-                          decade +
-                          ' – ' +
-                          (decade + 29) +
-                          '</span><br>';
-
-                        tip.push(decade_label);
-
-                        if (
-                          decade_ms in options.chart.data['30y_observations']
-                        ) {
-                          this.value =
-                            options.chart.data['30y_observations'][
-                              decade_ms
-                            ][0];
-
-                          tip.push(
-                            '<span style="color:#F47D23">●</span> ' +
-                              chart_labels.observation +
-                              ' <b>' +
-                              this.value +
-                              ' ' +
-                              options.chart.unit +
-                              '</b><br>',
-                          );
-                        }
-
-                        scenarios.forEach(function (scenario) {
-                          this.value =
-                            options.chart.data[
-                              '30y_{0}_median'.format(scenario.name)
-                            ][decade_ms][0];
-
-                          // console.log(scenario.name, this.value);
-
-                          tip.push(
-                            '<span style="color:{0};">●</span> '.format(
-                              scenario.chart_color,
-                            ) +
-                              T('{0} Median').format(scenario.label) +
-                              ' <b>' +
-                              this.value +
-                              ' ' +
-                              options.chart.unit +
-                              '</b><br>',
-                          );
-
-                          this.value =
-                            options.chart.data[
-                              '30y_{0}_range'.format(scenario.name)
-                            ][decade_ms][0];
-
-                          val1 = this.value;
-
-                          this.value =
-                            options.chart.data[
-                              '30y_{0}_range'.format(scenario.name)
-                            ][decade_ms][1];
-
-                          val2 = this.value;
-
-                          tip.push(
-                            '<span style="color:{0}">●</span> '.format(
-                              scenario.chart_color,
-                            ) +
-                              T('{0} Range').format(scenario.label) +
-                              ' <b>' +
-                              val1 +
-                              ' – ' +
-                              val2 +
-                              ' ' +
-                              options.chart.unit +
-                              '</b><br>',
-                          );
-                        }, this);
-
-                        return tip;
+                        return plugin.charts.format_tooltip.apply(this, [plugin, '30y', settings.var_data.acf.units, settings.var_data.acf.decimals, tooltip]);
                       },
                     },
                   });
@@ -2884,95 +2807,7 @@
                     },
                     tooltip: {
                       formatter: function (tooltip) {
-                        let [decade, decade_ms] = formatDecade(
-                          this.x,
-                          options.chart.query.frequency,
-                        );
-                        options.chart.object.xAxis[0].removePlotBand(
-                          '30y-plot-band',
-                        );
-                        options.chart.object.xAxis[0].addPlotBand({
-                          from: Date.UTC(decade, 0, 1),
-                          to: Date.UTC(decade + 29, 11, 31),
-                          id: '30y-plot-band',
-                        });
-
-                        function numformat(num) {
-                          let str = '';
-                          if (num > 0) {
-                            str += '+';
-                          }
-                          str += Highcharts.numberFormat(
-                            num,
-                            settings.var_data.decimals,
-                          );
-                          switch (UNITS[settings.var_data.acf.units]) {
-                            case 'day of the year':
-                              str += ' ' + l10n_labels['days'];
-                              break;
-                            default:
-                              str += ' ' + options.chart.unit;
-                              break;
-                          }
-                          return str;
-                        }
-
-                        this.chart = tooltip.chart;
-                        this.axis = tooltip.chart.yAxis[0];
-                        let val1, val2;
-
-                        let tip = [
-                          '<span style="font-size: 10px">' +
-                            decade +
-                            '-' +
-                            (decade + 29) +
-                            ' ' +
-                            chart_labels.change_from_1971_2000 +
-                            '</span><br/>',
-                        ];
-
-                        scenarios.forEach(function (scenario) {
-                          val1 = numformat(
-                            options.chart.data[
-                              'delta7100_{0}_median'.format(scenario.name)
-                            ][decade_ms][0],
-                          );
-
-                          tip.push(
-                            '<span style="color:{0}">●</span> '.format(
-                              scenario.chart_color,
-                            ) +
-                              T('{0} Median').format(scenario.label) +
-                              ' <b>' +
-                              val1 +
-                              '</b><br/>',
-                          );
-
-                          val1 =
-                            options.chart.data[
-                              'delta7100_{0}_range'.format(scenario.name)
-                            ][decade_ms][0];
-
-                          val2 = numformat(
-                            options.chart.data[
-                              'delta7100_{0}_range'.format(scenario.name)
-                            ][decade_ms][1],
-                          );
-
-                          tip.push(
-                            '<span style="color:{0}">●</span> '.format(
-                              scenario.chart_color,
-                            ) +
-                              T('{0} Range').format(scenario.label) +
-                              ' <b>' +
-                              val1 +
-                              '</b>-<b>' +
-                              val2 +
-                              '</b><br/>',
-                          );
-                        }, this);
-
-                        return tip;
+                        return plugin.charts.format_tooltip.apply(this, [plugin, 'delta', settings.var_data.acf.units, settings.var_data.acf.decimals, tooltip]);
                       },
                     },
                   });
@@ -2983,6 +2818,139 @@
               break;
           }
         }
+      },
+
+      /**
+       * Generate the tooltip's content and return its lines as a list of HTML strings.
+       *
+       * @param {cdc_app} plugin
+       * @param {('annual'|'delta'|'30y')} type - The type of data aggregation for the tooltip data.
+       * @param {string} units - The unit of the data.
+       * @param {int} decimals - Number of decimals for formatting.
+       * @param {object} tooltip - The HighChart tooltip object.
+       * @return {String[]} - Tooltip content, one HTML string for each tooltip line.
+       */
+      format_tooltip: function (plugin, type, units, decimals, tooltip) {
+        const options = plugin.options;
+        options.chart.object.xAxis[0].removePlotBand('30y-plot-band',);
+
+        /*
+         * For 'annual' aggregation type, we simply default to the default formatter.
+         */
+
+        if (type === 'annual') {
+          return tooltip.defaultFormatter.call(this, tooltip);
+        }
+
+        /*
+         * From here on, the type is either '30y' or 'delta'.
+         */
+
+        const tip = [];
+        const [decade, decade_ms] = formatDecade(this.x, options.chart.query.frequency);
+        const scenarios = DATASETS[options.chart.query.dataset].scenarios;
+
+        // Show a band for the 30-year period covered
+        options.chart.object.xAxis[0].addPlotBand({
+          from: Date.UTC(decade, 0, 1),
+          to: Date.UTC(decade + 29, 11, 31),
+          id: '30y-plot-band',
+        });
+
+        // Top label for the 30-year period covered
+        let decade_label =
+          '<span style="font-size: 0.75rem; font-weight: bold;">' +
+          decade + ' – ' + (decade + 29);
+
+        if (type === 'delta') {
+          decade_label += ' (' + chart_labels.change_from_1971_2000 + ')';
+        }
+
+        decade_label += '</span><br>';
+        tip.push(decade_label);
+
+        // For '30y' type, add the "Gridded Historical Data" line, if available for the current 30-year period
+        if (type === '30y') {
+          let value = null;
+
+          if (decade_ms in options.chart.data['30y_observations']) {
+            value = options.chart.data['30y_observations'][decade_ms][0];
+          }
+
+          if (value !== null) {
+            if (units === 'kelvin') {
+              value += 273.15;
+            }
+
+            tip.push(
+              '<span style="color:#F47D23">●</span> ' +
+              chart_labels.observation +
+              ' <b>' +
+              value_formatter(value, units, decimals, false, options.lang) +
+              '</b><br>',
+            );
+          }
+        }
+
+        const is_delta = type === 'delta';
+        const to_label = (units === 'doy' && !is_delta) ? 'to_doy' : 'to';
+
+        // Render the two lines (median and range) for each scenario
+        scenarios.forEach(function (scenario) {
+          let median, lower, upper, range;
+
+          switch (type) {
+            case '30y':
+              range = options.chart.data['30y_{0}_range'.format(scenario.name)][decade_ms];
+              median = options.chart.data['30y_{0}_median'.format(scenario.name)][decade_ms][0];
+              lower = range[0];
+              upper = range[1];
+              break
+            case 'delta':
+              range = options.chart.data['delta7100_{0}_range'.format(scenario.name)][decade_ms];
+              median = options.chart.data['delta7100_{0}_median'.format(scenario.name)][decade_ms][0];
+              lower = range[0];
+              upper = range[1];
+              break
+            default:
+              const point_index = this.point.index;
+              range = options.chart.data['{0}_range'.format(scenario.name)][point_index];
+              median = options.chart.data['{0}_median'.format(scenario.name)][point_index][1];
+              lower = range[1];
+              upper = range[2];
+              break
+          }
+
+          if (!is_delta && units === 'kelvin') {
+            median += 273.15;
+            lower += 273.15;
+            upper += 273.15;
+          }
+
+          tip.push(
+            '<span style="color:{0};">●</span> '.format(
+              scenario.chart_color,
+            ) +
+            T('{0} Median').format(scenario.label) +
+            ': <b>' +
+            value_formatter(median, units, decimals, is_delta, options.lang) +
+            '</b><br>',
+          );
+
+          tip.push(
+            '<span style="color:{0}">●</span> '.format(
+              scenario.chart_color,
+            ) +
+            T('{0} Range').format(scenario.label) +
+            ': <b>' +
+            value_formatter(lower, units, decimals, is_delta, options.lang) +
+            '</b> ' + l10n_labels[to_label] + ' <b>' +
+            value_formatter(upper, units, decimals, is_delta, options.lang) +
+            '</b><br>',
+          );
+        }, this);
+
+        return tip;
       },
 
       do_export: function (dl_type) {

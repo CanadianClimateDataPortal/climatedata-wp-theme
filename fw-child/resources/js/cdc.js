@@ -1398,12 +1398,9 @@
 
       do_legend: function (query, var_data, callback = null) {
         let plugin = !this.item ? this.data('cdc_app') : this,
-          item = plugin.item,
           options = plugin.options;
 
-        console.log('do legend', query.var, options.legend.display);
-
-        if (options.legend.display == true) {
+        if (options.legend.display) {
           const legend_item_height = 25,
             legend_item_width = 25,
             legend_width = 200,
@@ -1427,7 +1424,7 @@
                 legend_width - legend_item_width
               },0)">`;
 
-              if (query.scheme_type == 'discrete') {
+              if (query.scheme_type === 'discrete') {
                 for (let i = 0; i < colours.length; i++) {
                   svg += `<rect class="legendbox" width="${legend_item_width}" height="${legend_item_height}"
                         y="${legend_item_height * i}" fill="${colours[colours.length - i - 1]}" style="fill-opacity: ${opacity}"/>`;
@@ -1449,6 +1446,28 @@
                 legend_width - legend_item_width - legend_tick_width
               },0)">`;
 
+              /**
+               * For each unique legend label, holds the indexed positions where it would be shown.
+               *
+               * For some variables, the number of decimals to show is fixed. In some cases, it would create a
+               * legend with identical values. For example, the raw legend values are 1.0, 1.3, 1.7 and 2.0, but the
+               * number of decimals is set to 0, it would thus create a legend with the repeated values: 1, 1, 2 and 2.
+               *
+               * This array contains one element for each **unique** label and an array of their indexed positions.
+               * For the example above, it would thus be:
+               *
+               *  unique_labels = [
+               *    {value: "1", positions: [0, 1]},
+               *    {value: "2", positions: [2, 3]},
+               *  ]
+               *
+               *  Later on, this array of unique labels and their positions is used to display a unique label correctly
+               *  positioned.
+               *
+               * @type {{value: string, positions: Number[]}[]}
+               */
+              const unique_labels = []
+
               for (let i = 0; i < colours.length - (categorical ? 0 : 1); i++) {
                 let label;
                 if (labels) {
@@ -1463,14 +1482,37 @@
                   );
                 }
 
-                svg += `<g opacity="1" transform="translate(0,${
-                  legend_item_height * (i + 1) - label_offset
-                })">
-                        <line stroke="currentColor" x2="4"/>
-                        <text fill="currentColor" dominant-baseline="middle" text-anchor="end" x="-5">
-                        ${label}
-                        </text></g>`;
+                // Add the label and its position to the list of unique labels
+                const last_label = unique_labels.length ? unique_labels[unique_labels.length - 1] : null;
+                if (last_label && last_label.value === label) {
+                  last_label.positions.push(i);
+                } else {
+                  unique_labels.push({value: label, positions: [i]});
+                }
               }
+
+              // Render the (unique) labels
+              unique_labels.forEach(function (unique_label) {
+                // For discrete schemes, show a unique label only at its first position
+                let position = unique_label.positions[0];
+
+                // For continuous schemes, show a unique label at its average position
+                if (query.scheme_type === 'continuous') {
+                  position = unique_label.positions.reduce(function (total, current) {
+                    return total + current;
+                  }, 0);
+                  position /= unique_label.positions.length;
+                }
+
+                svg += `
+                    <g opacity="1" transform="translate(0,${legend_item_height * (position + 1) - label_offset})">
+                      <line stroke="currentColor" x2="4"/>
+                      <text fill="currentColor" dominant-baseline="middle" text-anchor="end" x="-5">
+                      ${unique_label.value}
+                      </text>
+                    </g>
+                `;
+              });
 
               svg += '</g>';
               svg += '</svg>';

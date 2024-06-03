@@ -680,8 +680,8 @@ msgstr "Entraînement"
 
 #: template/download/map-container.php:119
 #: template/map/map-container.php:130
-msgid "Zoom in to interact with the grid layer"
-msgstr "Faire un zoom pour interagir avec la carte"
+msgid "Zoom in to access grid level information"
+msgstr "Faire un zoom pour accéder aux informations de la grille"
 
 #: template/feedback.php:19
 msgid "Online Support"

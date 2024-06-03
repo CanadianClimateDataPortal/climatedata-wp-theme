@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-06-03T18:25:33+00:00\n"
+"POT-Creation-Date: 2024-06-03T18:35:30+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -683,7 +683,7 @@ msgstr ""
 
 #: template/download/map-container.php:119
 #: template/map/map-container.php:130
-msgid "Zoom in to interact with the grid layer"
+msgid "Zoom in to access grid level information"
 msgstr ""
 
 #: template/download/map-container.php:127

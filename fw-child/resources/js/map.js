@@ -837,29 +837,40 @@
           });
       }
 
-      //
-
+      /**
+       * Attach handler when hovering over a shape on the map.
+       */
       item.on(
         'map_item_mouseover',
-        function (e, mouse_event, this_gid, style_obj) {
+        /**
+         * Show a tooltip of the median and range values (if available) over the map shape, and highlight it.
+         *
+         * Tooltip and highlighting is done on every map. The tooltip value is specific to each map.
+         *
+         * @param {Event} e - Event that triggered this handler.
+         * @param {object} mouse_event - Original Leaflet mouse event on the map.
+         * @param {number} shape_id - ID of the shape that is hovered.
+         * @param {object} style_obj - New style to apply to the shape.
+         */
+        function (e, mouse_event, shape_id, style_obj) {
           let decade_value = parseInt(options.query.decade) + 1,
             hasdelta = options.var_data[options.query.var_id].acf.hasdelta,
             delta7100 = options.query.delta !== '' ? '&delta7100=true' : '';
 
           plugin._grid_hover_cancel(mouse_event);
 
-          // tooltip
-          if (hasdelta !== false) {
+          /*
+           * Show the tooltip, if applicable
+           */
+          if (hasdelta !== false || options.query.var === 'building_climate_zones') {
             options.grid.hover_timeout = setTimeout(function () {
               // build query URL for tooltip content
 
-              // var name
-              let var_name =
-                options.query.var == 'building_climate_zones'
+              const var_name =
+                options.query.var === 'building_climate_zones'
                   ? 'hddheat_18'
                   : options.query.var;
 
-              // request endpoint
               let endpoint =
                 'get-delta-30y-regional-values/' +
                 options.query.sector +
@@ -867,7 +878,7 @@
                 mouse_event.layer.properties.id;
 
               // query string
-              let params =
+              const params =
                 'period=' +
                 decade_value +
                 '&decimals=' +
@@ -877,7 +888,7 @@
                 options.query.dataset;
 
               // adjust for grid
-              if (options.query.sector == 'gridded_data') {
+              if (options.query.sector === 'gridded_data') {
                 endpoint =
                   'get-delta-30y-gridded-values/' +
                   mouse_event.latlng['lat'] +
@@ -885,7 +896,7 @@
                   mouse_event.latlng['lng'];
               }
 
-              values_url =
+              const values_url =
                 geoserver_url +
                 '/' +
                 endpoint +
@@ -910,7 +921,7 @@
                             .toLowerCase(),
                           options.var_data[options.query.var_id].acf.units,
                           options.var_data[options.query.var_id].acf.decimals,
-                          options.query.delta == 'true',
+                          options.query.delta === 'true',
                           options.query.sector,
                           mouse_event,
                         ),
@@ -941,19 +952,16 @@
                   }
                 },
               });
-            }, 100); // timeout
-          } // if delta
+            }, 100);
+          }
 
-          // highlight
-          options.grid.highlighted = this_gid;
+          options.grid.highlighted = shape_id;
 
           for (let key in options.maps) {
-            options.maps[key].layers.grid.setFeatureStyle(this_gid, style_obj);
+            options.maps[key].layers.grid.setFeatureStyle(shape_id, style_obj);
           }
         },
       );
-
-      //
 
       item.on(
         'map_item_mouseout',

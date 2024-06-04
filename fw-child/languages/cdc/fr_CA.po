@@ -1342,9 +1342,9 @@ msgid "Annual (July – June)"
 msgstr ""
 
 #: template/archive-signup.php:3
-msgid "Climatedata.ca Newsletter"
-msgstr "Donneesclimatiques.ca Infolettre"
+msgid "Climatedata.ca newsletter"
+msgstr ""
 
 #: template/archive-signup.php:5
 msgid "Join our newsletter for periodic updates."
-msgstr "Inscrivez-vous à notre infolettre pour recevoir des mises à jour périodiques."
+msgstr ""

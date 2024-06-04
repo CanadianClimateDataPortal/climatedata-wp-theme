@@ -1245,6 +1245,7 @@ msgstr ""
 msgid "Join the newsletter"
 msgstr ""
 
+#: template/newsletter-hero.php:16
 #: template/newsletter-signup.php:11
 msgid "Your email address"
 msgstr "Votre adresse courriel"
@@ -1353,3 +1354,11 @@ msgstr "Sélectionnez pour afficher soit les valeurs de données absolues, soit 
 #: template/map/controls/display.php:46
 msgid "View climate data as grid boxes, or aggregated by Census Subdivision, Health Region or Watershed."
 msgstr "Affichez les données climatiques sous forme de grilles ou regroupées par subdivision de recensement, région socio-sanitaire ou bassin versant."
+
+#: template/newsletter-hero.php:3
+msgid "Climatedata.ca Newsletter"
+msgstr "Donneesclimatiques.ca Infolettre"
+
+#: template/newsletter-hero.php:5
+msgid "Join our newsletter for periodic updates."
+msgstr "Inscrivez-vous à notre infolettre pour recevoir des mises à jour périodiques."

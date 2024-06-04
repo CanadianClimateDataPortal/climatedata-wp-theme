@@ -1294,11 +1294,11 @@ msgstr ""
 
 #: template/newsletter-hero.php:3
 msgid "Climatedata.ca Newsletter"
-msgstr "Donneesclimatiques.ca Infolettre"
+msgstr ""
 
 #: template/newsletter-hero.php:5
 msgid "Join our newsletter for periodic updates."
-msgstr "Inscrivez-vous à notre infolettre pour recevoir des mises à jour périodiques."
+msgstr ""
 
 #: template/newsletter-hero.php:16
 #: template/newsletter-signup.php:11

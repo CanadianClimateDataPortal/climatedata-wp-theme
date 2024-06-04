@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Climate Data 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Phil Evans <phil@habitatseven.com>\n"
+"Last-Translator: Xavier Frenette <xavier.frenette@crim.ca>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -57,23 +57,23 @@ msgstr ""
 msgid "Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)"
 msgstr ""
 
-#: resources/functions/rest.php:708
+#: resources/functions/rest.php:691
 msgid "An error occurred"
 msgstr ""
 
-#: resources/functions/rest.php:744
+#: resources/functions/rest.php:727
 msgid "CAPTCHA verification failed."
 msgstr ""
 
-#: resources/functions/rest.php:760
+#: resources/functions/rest.php:743
 msgid "Please enter a valid email address."
 msgstr ""
 
-#: resources/functions/rest.php:767
+#: resources/functions/rest.php:750
 msgid "Please provide the details of your inquiry."
 msgstr ""
 
-#: resources/functions/rest.php:772
+#: resources/functions/rest.php:755
 msgid "Some required fields are missing."
 msgstr ""
 
@@ -82,28 +82,24 @@ msgstr ""
 msgid "Organization"
 msgstr ""
 
-#: resources/functions/rest.php:834
+#: resources/functions/rest.php:817
 msgid "Thanks! We’ve received your inquiry."
 msgstr ""
 
-#: resources/functions/rest.php:835
+#: resources/functions/rest.php:818
 msgid "Please note: we are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays."
 msgstr ""
 
-#: resources/functions/rest.php:838
+#: resources/functions/rest.php:821
 msgid "Something went wrong while sending your message. Please try again later."
 msgstr ""
 
-#: resources/functions/rest.php:850
+#: resources/functions/rest.php:833
 msgid "Your email address has been added to our mailing list. You can unsubscribe at any time."
 msgstr ""
 
-#: resources/functions/rest.php:853
+#: resources/functions/rest.php:836
 msgid "An error occurred while adding your email address to our mailing list."
-msgstr ""
-
-#: template/map/map-container.php:59
-msgid "Variables"
 msgstr ""
 
 #: template/download/controls/data.php:27
@@ -121,34 +117,35 @@ msgstr ""
 msgid "Interactive"
 msgstr ""
 
-#: resources/functions/rest.php:365
-#: resources/functions/rest.php:366
-#: resources/functions/rest.php:489
-#: resources/functions/rest.php:490
+#: resources/functions/rest.php:348
+#: resources/functions/rest.php:349
+#: resources/functions/rest.php:472
+#: resources/functions/rest.php:473
 msgid "Point"
 msgstr ""
 
 #: template/learn/control-bar.php:11
 #: template/learn/control-bar.php:30
-#: template/post-meta.php:30
+#: template/post-meta.php:39
+#: template/query/news-item.php:41
 msgid "Topics"
 msgstr "Sujets"
 
 #: template/download/map-container.php:60
-#: template/map/map-container.php:70
+#: template/map/map-container.php:59
 msgid "Sectors"
 msgstr "Secteurs"
 
 #: template/beta-apps/control-btns.php:10
-#: template/download/control-bar.php:57
+#: template/download/control-bar.php:54
 #: template/download/controls/area.php:186
 msgid "Details"
 msgstr "Détails"
 
 #: template/beta-apps/control-btns.php:13
-#: template/download/control-bar.php:97
+#: template/download/control-bar.php:94
 #: template/feedback.php:336
-#: template/map/control-bar.php:69
+#: template/map/control-bar.php:65
 msgid "Feedback"
 msgstr "Rétroaction"
 
@@ -185,35 +182,35 @@ msgstr ""
 msgid "Oldest First"
 msgstr ""
 
-#: template/download/control-bar.php:25
+#: template/download/control-bar.php:22
 #: template/download/controls/data.php:7
-#: template/map/control-bar.php:19
+#: template/map/control-bar.php:15
 #: template/map/controls/data.php:5
-#: template/map/controls/display.php:162
+#: template/map/controls/display.php:176
 msgid "Data"
 msgstr "Données"
 
-#: template/download/control-bar.php:41
+#: template/download/control-bar.php:38
 msgid "Area"
 msgstr ""
 
-#: template/download/control-bar.php:73
+#: template/download/control-bar.php:70
 #: template/download/controls/details.php:339
 #: template/download/map-container.php:5
-#: template/map/control-bar.php:46
+#: template/map/control-bar.php:42
 #: template/map/controls/download.php:5
 #: template/map/controls/download.php:44
 #: template/menu-overlay.php:195
 msgid "Download"
 msgstr "Télécharger"
 
-#: template/download/control-bar.php:87
-#: template/map/control-bar.php:59
+#: template/download/control-bar.php:84
+#: template/map/control-bar.php:55
 msgid "Help"
 msgstr "Aide"
 
 #: template/download/controls/area.php:7
-#: template/download/controls/data.php:113
+#: template/download/controls/data.php:112
 msgid "Area of Analysis"
 msgstr ""
 
@@ -242,7 +239,7 @@ msgid "Change Aggregation"
 msgstr ""
 
 #: template/download/controls/area.php:49
-#: template/map/controls/display.php:38
+#: template/map/controls/display.php:52
 msgid "Gridded Data"
 msgstr "Données maillées"
 
@@ -266,17 +263,17 @@ msgid "Draw region"
 msgstr ""
 
 #: template/download/controls/area.php:74
-#: template/map/controls/display.php:43
+#: template/map/controls/display.php:57
 msgid "Census Subdivisions"
 msgstr "Subdivisions de recensement"
 
 #: template/download/controls/area.php:79
-#: template/map/controls/display.php:48
+#: template/map/controls/display.php:62
 msgid "Health Regions"
 msgstr "Régions socio-sanitaires"
 
 #: template/download/controls/area.php:84
-#: template/map/controls/display.php:53
+#: template/map/controls/display.php:67
 msgid "Watersheds"
 msgstr "Bassins versants"
 
@@ -323,7 +320,7 @@ msgstr ""
 
 #: template/download/controls/area.php:186
 #: template/download/controls/data-variable.php:139
-#: template/download/controls/data.php:113
+#: template/download/controls/data.php:112
 #: template/download/controls/details.php:339
 #: template/map/controls/data-variable.php:139
 msgid "Next"
@@ -347,20 +344,20 @@ msgstr ""
 msgid "Click to select a variable"
 msgstr "Sélectionner une variable"
 
-#: template/download/controls/data.php:33
+#: template/download/controls/data.php:68
 msgid "Threshold Values"
 msgstr "Valeur des seuils"
 
-#: template/download/controls/data.php:41
+#: template/download/controls/data.php:76
 msgid "Preset"
 msgstr ""
 
-#: template/download/controls/data.php:62
+#: template/download/controls/data.php:97
 msgid "Custom"
 msgstr ""
 
-#: template/download/controls/data.php:79
-#: template/map/controls/data.php:39
+#: template/download/controls/data.php:35
+#: template/map/controls/data.php:25
 msgid "Dataset"
 msgstr "Jeu de données"
 
@@ -410,12 +407,11 @@ msgid "About models"
 msgstr ""
 
 #: template/download/controls/details.php:93
-#: template/map/controls/data.php:88
+#: template/map/controls/data.php:109
 msgid "Scenarios"
 msgstr "Scénarios"
 
 #: template/download/controls/details.php:94
-#, fuzzy
 msgid "About scenarios"
 msgstr "Scénarios"
 
@@ -440,25 +436,24 @@ msgid "Temporal Frequency"
 msgstr "Fréquence temporelle"
 
 #: template/download/controls/details.php:227
-#, fuzzy
 msgid "About frequency"
 msgstr "Fréquence"
 
 #: template/download/controls/details.php:234
 #: template/download/controls/details.php:264
-#: template/map/controls/data.php:60
+#: template/map/controls/data.php:81
 msgid "Annual"
 msgstr "Annuelle"
 
 #: template/download/controls/details.php:241
 #: template/download/controls/details.php:266
-#: template/map/controls/data.php:61
+#: template/map/controls/data.php:82
 msgid "Monthly"
 msgstr "Mensuelle"
 
 #: template/download/controls/details.php:248
 #: template/download/controls/details.php:282
-#: template/map/controls/data.php:76
+#: template/map/controls/data.php:97
 msgid "Seasonal"
 msgstr "Saisonnière"
 
@@ -471,82 +466,82 @@ msgid "All months"
 msgstr "Tous les mois"
 
 #: template/download/controls/details.php:268
-#: template/map/controls/data.php:62
+#: template/map/controls/data.php:83
 msgid "January"
 msgstr "Janvier"
 
 #: template/download/controls/details.php:269
-#: template/map/controls/data.php:63
+#: template/map/controls/data.php:84
 msgid "February"
 msgstr "Février"
 
 #: template/download/controls/details.php:270
-#: template/map/controls/data.php:64
+#: template/map/controls/data.php:85
 msgid "March"
 msgstr "Mars"
 
 #: template/download/controls/details.php:271
-#: template/map/controls/data.php:65
+#: template/map/controls/data.php:86
 msgid "April"
 msgstr "Avril"
 
 #: template/download/controls/details.php:272
-#: template/map/controls/data.php:66
+#: template/map/controls/data.php:87
 msgid "May"
 msgstr "Mai"
 
 #: template/download/controls/details.php:273
-#: template/map/controls/data.php:67
+#: template/map/controls/data.php:88
 msgid "June"
 msgstr "Juin"
 
 #: template/download/controls/details.php:274
-#: template/map/controls/data.php:68
+#: template/map/controls/data.php:89
 msgid "July"
 msgstr "Juillet"
 
 #: template/download/controls/details.php:275
-#: template/map/controls/data.php:69
+#: template/map/controls/data.php:90
 msgid "August"
 msgstr "Août"
 
 #: template/download/controls/details.php:276
-#: template/map/controls/data.php:70
+#: template/map/controls/data.php:91
 msgid "September"
 msgstr "Septembre"
 
 #: template/download/controls/details.php:277
-#: template/map/controls/data.php:71
+#: template/map/controls/data.php:92
 msgid "October"
 msgstr "Octobre"
 
 #: template/download/controls/details.php:278
-#: template/map/controls/data.php:72
+#: template/map/controls/data.php:93
 msgid "November"
 msgstr "Novembre"
 
 #: template/download/controls/details.php:279
-#: template/map/controls/data.php:73
+#: template/map/controls/data.php:94
 msgid "December"
 msgstr "Décembre"
 
 #: template/download/controls/details.php:283
-#: template/map/controls/data.php:77
+#: template/map/controls/data.php:98
 msgid "Spring"
 msgstr "Printemps"
 
 #: template/download/controls/details.php:284
-#: template/map/controls/data.php:78
+#: template/map/controls/data.php:99
 msgid "Summer"
 msgstr "Été"
 
 #: template/download/controls/details.php:285
-#: template/map/controls/data.php:79
+#: template/map/controls/data.php:100
 msgid "Fall"
 msgstr "Automne"
 
 #: template/download/controls/details.php:286
-#: template/map/controls/data.php:80
+#: template/map/controls/data.php:101
 msgid "Winter"
 msgstr "Hiver"
 
@@ -574,7 +569,6 @@ msgid "Enter the characters shown in the image:"
 msgstr "Entrer les caractères qui apparaissent ici :"
 
 #: template/download/controls/submit.php:27
-#, fuzzy
 msgid "Submit and Download"
 msgstr "Téléchargement"
 
@@ -680,14 +674,14 @@ msgid "Relevant"
 msgstr "Reliés"
 
 #: template/download/map-container.php:71
-#: template/map/map-container.php:81
+#: template/map/map-container.php:70
 msgid "Training"
 msgstr "Entraînement"
 
 #: template/download/map-container.php:119
-#: template/map/map-container.php:143
-msgid "Zoom in to interact with the grid layer"
-msgstr "Faire un zoom pour interagir avec la carte"
+#: template/map/map-container.php:130
+msgid "Zoom in to access grid level information"
+msgstr "Faire un zoom pour accéder aux informations de la grille"
 
 #: template/feedback.php:19
 msgid "Online Support"
@@ -949,7 +943,6 @@ msgid "Non-valid entered characters. Please try again."
 msgstr ""
 
 #: template/feedback.php:290
-#, fuzzy
 msgid "Dataset Support"
 msgstr "Données"
 
@@ -993,90 +986,89 @@ msgstr "Titre (A à Z)"
 msgid "Title (Z–A)"
 msgstr "Titre (Z à A)"
 
-#: template/map/control-bar.php:28
+#: template/map/control-bar.php:24
 #: template/map/controls/location.php:5
 msgid "Location"
 msgstr "Emplacement"
 
-#: template/map/control-bar.php:37
+#: template/map/control-bar.php:33
 #: template/map/controls/display.php:5
 msgid "Display"
 msgstr "Affichage"
 
-#: template/map/controls/data.php:22
+#: template/map/controls/data.php:48
 msgid "Threshold Value"
 msgstr "Valeur du seuil"
 
-#: template/map/controls/data.php:45
+#: template/map/controls/data.php:38
 msgid "CMIP6"
 msgstr ""
 
-#: template/map/controls/data.php:48
+#: template/map/controls/data.php:41
 msgid "CMIP5"
 msgstr ""
 
-#: template/map/controls/data.php:55
+#: template/map/controls/data.php:69
 msgid "Frequency"
 msgstr "Fréquence"
 
-#: template/map/controls/data.php:95
+#: template/map/controls/data.php:123
 msgid "High emissions"
 msgstr "Émissions élévées"
 
-#: template/map/controls/data.php:102
+#: template/map/controls/data.php:130
 msgid "Medium emissions"
 msgstr "Émissions modérées"
 
-#: template/map/controls/data.php:109
+#: template/map/controls/data.php:137
 msgid "Low emissions"
 msgstr "Émissions faibles"
 
 #: template/map/controls/display.php:13
-#, fuzzy
 msgid "Data Values"
 msgstr "Données"
 
-#: template/map/controls/display.php:20
+#: template/map/controls/display.php:27
 msgid "Absolute"
 msgstr "Absolue"
 
-#: template/map/controls/display.php:25
+#: template/map/controls/display.php:32
 msgid "Delta"
 msgstr "Delta"
 
-#: template/map/controls/display.php:32
+#: template/map/controls/display.php:39
 msgid "Map Aggregation"
 msgstr "Agrégation de la carte"
 
-#: template/map/controls/display.php:59
+#: template/map/controls/display.php:73
 msgid "Colours"
 msgstr "Palette de couleurs"
 
-#: template/map/controls/display.php:66
+#: template/map/controls/display.php:80
 msgid "Selected Scheme Name"
 msgstr ""
 
-#: template/map/controls/display.php:72
+#: template/map/controls/display.php:86
 msgid "Default"
 msgstr "Défaut"
 
-#: template/map/controls/display.php:151
+#: template/map/controls/display.php:165
 msgid "Discrete"
 msgstr "Discrète"
 
-#: template/map/controls/display.php:154
+#: template/map/controls/display.php:168
 msgid "Continuous"
 msgstr "Continue"
 
-#: template/map/controls/display.php:160
+#: template/map/controls/display.php:174
 msgid "Layer Opacity"
 msgstr "Opacité"
 
-#: template/map/controls/display.php:172
+#: template/map/controls/display.php:186
 msgid "Labels"
 msgstr "Étiquettes"
 
-#: template/map/controls/display.php:180
+#: template/map/controls/display.php:194
 msgid "Pins"
 msgstr "Marqueurs"
 
@@ -1106,7 +1098,6 @@ msgstr "Copier un lien vers cette carte"
 
 #: template/map/controls/download.php:35
 #: template/query/variable-item.php:84
-#, fuzzy
 msgid "Download Data"
 msgstr "Télécharger les données"
 
@@ -1115,7 +1106,6 @@ msgid "Click here to customize and download the data displayed on this map."
 msgstr "Cliquez ici pour configurer et télécharger les données affichées sur cette carte."
 
 #: template/map/controls/location-detail.php:5
-#, fuzzy
 msgid "Location Detail"
 msgstr "Emplacement"
 
@@ -1195,7 +1185,6 @@ msgid "Search"
 msgstr "Recherche"
 
 #: template/map/controls/location.php:56
-#, fuzzy
 msgid "Recent Locations"
 msgstr "Emplacement"
 
@@ -1208,7 +1197,6 @@ msgid "Coordinates"
 msgstr "Coordonnées"
 
 #: template/map/controls/station-detail.php:5
-#, fuzzy
 msgid "Station"
 msgstr "Emplacement"
 
@@ -1223,16 +1211,12 @@ msgstr "Carte"
 
 #: template/map/map-container.php:13
 msgid "Explore climate data using maps and charts. Click on the Data tab on the left for more data options, including selection of variable and emissions scenario. Select the Location tab or zoom in to view charts."
-msgstr ""
+msgstr "Explorez les données climatiques à l'aide de cartes et de graphiques. Cliquez sur l'onglet “Données”, à gauche, pour plus d'options de données, y compris la sélection de variables et de scénarios d'émissions. Sélectionnez l'onglet “Emplacement” ou effectuez un zoom avant pour afficher des graphiques."
 
-#: template/map/map-container.php:127
+#: template/map/map-container.php:114
 #: template/old-loop/blocks/map.php:256
 msgid "Decade"
 msgstr ""
-
-#: template/map/map-container.php:130
-msgid "Move slider to adjust time period"
-msgstr "Déplacer pour ajuster la période"
 
 #: template/menu-overlay.php:18
 msgid "Climate Data"
@@ -1266,12 +1250,10 @@ msgid "Your email address"
 msgstr "Votre adresse courriel"
 
 #: template/old-loop/blocks/chart.php:43
-#, fuzzy
 msgid "Download data"
 msgstr "Téléchargement"
 
 #: template/old-loop/blocks/chart.php:51
-#, fuzzy
 msgid "Download image"
 msgstr "Téléchargement"
 
@@ -1284,19 +1266,20 @@ msgstr "Duration"
 msgid "Learn More"
 msgstr "En savoir plus"
 
-#: template/post-meta.php:2
+#: template/post-meta.php:11
 msgid "Date"
 msgstr "Date"
 
-#: template/post-meta.php:6
+#: template/post-meta.php:15
 msgid "F j, Y"
 msgstr "\\l\\e j F, Y"
 
-#: template/post-meta.php:12
+#: template/post-meta.php:25
+#: template/query/news-item.php:61
 msgid "Author"
 msgstr "Auteur"
 
-#: template/post-meta.php:52
+#: template/post-meta.php:51
 msgid "Share this post"
 msgstr "Partager cette publication"
 
@@ -1317,10 +1300,12 @@ msgid "Relevant Sectors"
 msgstr ""
 
 #. Theme Name of the theme
+#: style.css
 msgid "[fw] Child"
 msgstr ""
 
 #. Author of the theme
+#: style.css
 msgid "Phil Evans"
 msgstr ""
 
@@ -1340,3 +1325,31 @@ msgstr "Précédent"
 #: template/download/controls/details.php:255
 msgid "Annual (July – June)"
 msgstr ""
+
+#. Template Name of the theme
+msgid "Clone Taxonomy"
+msgstr ""
+
+#: template/map/controls/data.php:32
+msgid "Toggle between the available climate datasets."
+msgstr "Basculez entre les ensembles de données climatiques disponibles."
+
+#: template/map/controls/data.php:55
+msgid "Description here."
+msgstr "Description ici."
+
+#: template/map/controls/data.php:76
+msgid "Select Annual, Monthly or Seasonal from the drop-down menu."
+msgstr "Sélectionnez Annuel, Mensuel ou Saisonnier dans le menu déroulant."
+
+#: template/map/controls/data.php:116
+msgid "Select one of the emissions scenarios available for the chosen climate model ensemble."
+msgstr "Sélectionnez l'un des scénarios d'émissions disponibles pour l'ensemble de modèles climatiques choisi."
+
+#: template/map/controls/display.php:20
+msgid "Select to view either absolute data values, or changes relevant to a baseline period."
+msgstr "Sélectionnez pour afficher soit les valeurs de données absolues, soit les changements par rapport à une période de référence."
+
+#: template/map/controls/display.php:46
+msgid "View climate data as grid boxes, or aggregated by Census Subdivision, Health Region or Watershed."
+msgstr "Affichez les données climatiques sous forme de grilles ou regroupées par subdivision de recensement, région socio-sanitaire ou bassin versant."

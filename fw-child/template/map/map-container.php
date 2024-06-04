@@ -127,6 +127,6 @@
 	</div>
 </div>
 
-<div id="zoom-alert" style="display: none;"><?php _e ( 'Zoom in to interact with the grid layer', 'cdc' ); ?></div>
+<div id="zoom-alert" style="display: none;"><?php _e ( 'Zoom in to access grid level information', 'cdc' ); ?></div>
 
 <div id="status"></div>

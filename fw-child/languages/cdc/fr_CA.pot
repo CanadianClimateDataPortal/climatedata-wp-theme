@@ -9,16 +9,18 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-05-13T19:59:46+00:00\n"
+"POT-Creation-Date: 2024-06-03T18:35:30+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.9.0\n"
+"X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
 
 #. Theme Name of the theme
+#: style.css
 msgid "[fw] Child"
 msgstr ""
 
 #. Author of the theme
+#: style.css
 msgid "Phil Evans"
 msgstr ""
 
@@ -62,63 +64,67 @@ msgstr ""
 msgid "Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)"
 msgstr ""
 
-#: resources/functions/rest.php:365
-#: resources/functions/rest.php:366
-#: resources/functions/rest.php:489
-#: resources/functions/rest.php:490
+#: resources/functions/rest.php:348
+#: resources/functions/rest.php:349
+#: resources/functions/rest.php:472
+#: resources/functions/rest.php:473
 msgid "Point"
 msgstr ""
 
-#: resources/functions/rest.php:708
+#: resources/functions/rest.php:691
 msgid "An error occurred"
 msgstr ""
 
-#: resources/functions/rest.php:744
+#: resources/functions/rest.php:727
 msgid "CAPTCHA verification failed."
 msgstr ""
 
-#: resources/functions/rest.php:760
+#: resources/functions/rest.php:743
 msgid "Please enter a valid email address."
 msgstr ""
 
-#: resources/functions/rest.php:767
+#: resources/functions/rest.php:750
 msgid "Please provide the details of your inquiry."
 msgstr ""
 
-#: resources/functions/rest.php:772
+#: resources/functions/rest.php:755
 msgid "Some required fields are missing."
 msgstr ""
 
-#: resources/functions/rest.php:834
+#: resources/functions/rest.php:817
 msgid "Thanks! We’ve received your inquiry."
 msgstr ""
 
-#: resources/functions/rest.php:835
+#: resources/functions/rest.php:818
 msgid "Please note: we are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays."
 msgstr ""
 
-#: resources/functions/rest.php:838
+#: resources/functions/rest.php:821
 msgid "Something went wrong while sending your message. Please try again later."
 msgstr ""
 
-#: resources/functions/rest.php:850
+#: resources/functions/rest.php:833
 msgid "Your email address has been added to our mailing list. You can unsubscribe at any time."
 msgstr ""
 
-#: resources/functions/rest.php:853
+#: resources/functions/rest.php:836
 msgid "An error occurred while adding your email address to our mailing list."
 msgstr ""
 
+#. Template Name of the theme
+msgid "Clone Taxonomy"
+msgstr ""
+
 #: template/beta-apps/control-btns.php:10
-#: template/download/control-bar.php:57
+#: template/download/control-bar.php:54
 #: template/download/controls/area.php:186
 msgid "Details"
 msgstr ""
 
 #: template/beta-apps/control-btns.php:13
-#: template/download/control-bar.php:97
+#: template/download/control-bar.php:94
 #: template/feedback.php:336
-#: template/map/control-bar.php:69
+#: template/map/control-bar.php:65
 msgid "Feedback"
 msgstr ""
 
@@ -155,35 +161,35 @@ msgstr ""
 msgid "Oldest First"
 msgstr ""
 
-#: template/download/control-bar.php:25
+#: template/download/control-bar.php:22
 #: template/download/controls/data.php:7
-#: template/map/control-bar.php:19
+#: template/map/control-bar.php:15
 #: template/map/controls/data.php:5
-#: template/map/controls/display.php:162
+#: template/map/controls/display.php:176
 msgid "Data"
 msgstr ""
 
-#: template/download/control-bar.php:41
+#: template/download/control-bar.php:38
 msgid "Area"
 msgstr ""
 
-#: template/download/control-bar.php:73
+#: template/download/control-bar.php:70
 #: template/download/controls/details.php:339
 #: template/download/map-container.php:5
-#: template/map/control-bar.php:46
+#: template/map/control-bar.php:42
 #: template/map/controls/download.php:5
 #: template/map/controls/download.php:44
 #: template/menu-overlay.php:195
 msgid "Download"
 msgstr ""
 
-#: template/download/control-bar.php:87
-#: template/map/control-bar.php:59
+#: template/download/control-bar.php:84
+#: template/map/control-bar.php:55
 msgid "Help"
 msgstr ""
 
 #: template/download/controls/area.php:7
-#: template/download/controls/data.php:113
+#: template/download/controls/data.php:112
 msgid "Area of Analysis"
 msgstr ""
 
@@ -212,7 +218,7 @@ msgid "Change Aggregation"
 msgstr ""
 
 #: template/download/controls/area.php:49
-#: template/map/controls/display.php:38
+#: template/map/controls/display.php:52
 msgid "Gridded Data"
 msgstr ""
 
@@ -236,17 +242,17 @@ msgid "Draw region"
 msgstr ""
 
 #: template/download/controls/area.php:74
-#: template/map/controls/display.php:43
+#: template/map/controls/display.php:57
 msgid "Census Subdivisions"
 msgstr ""
 
 #: template/download/controls/area.php:79
-#: template/map/controls/display.php:48
+#: template/map/controls/display.php:62
 msgid "Health Regions"
 msgstr ""
 
 #: template/download/controls/area.php:84
-#: template/map/controls/display.php:53
+#: template/map/controls/display.php:67
 msgid "Watersheds"
 msgstr ""
 
@@ -293,7 +299,7 @@ msgstr ""
 
 #: template/download/controls/area.php:186
 #: template/download/controls/data-variable.php:139
-#: template/download/controls/data.php:113
+#: template/download/controls/data.php:112
 #: template/download/controls/details.php:339
 #: template/map/controls/data-variable.php:139
 msgid "Next"
@@ -328,21 +334,21 @@ msgstr ""
 msgid "Click to select a variable"
 msgstr ""
 
-#: template/download/controls/data.php:33
+#: template/download/controls/data.php:35
+#: template/map/controls/data.php:25
+msgid "Dataset"
+msgstr ""
+
+#: template/download/controls/data.php:68
 msgid "Threshold Values"
 msgstr ""
 
-#: template/download/controls/data.php:41
+#: template/download/controls/data.php:76
 msgid "Preset"
 msgstr ""
 
-#: template/download/controls/data.php:62
+#: template/download/controls/data.php:97
 msgid "Custom"
-msgstr ""
-
-#: template/download/controls/data.php:79
-#: template/map/controls/data.php:39
-msgid "Dataset"
 msgstr ""
 
 #: template/download/controls/details.php:7
@@ -391,7 +397,7 @@ msgid "About models"
 msgstr ""
 
 #: template/download/controls/details.php:93
-#: template/map/controls/data.php:88
+#: template/map/controls/data.php:109
 msgid "Scenarios"
 msgstr ""
 
@@ -429,19 +435,19 @@ msgstr ""
 
 #: template/download/controls/details.php:234
 #: template/download/controls/details.php:264
-#: template/map/controls/data.php:60
+#: template/map/controls/data.php:81
 msgid "Annual"
 msgstr ""
 
 #: template/download/controls/details.php:241
 #: template/download/controls/details.php:266
-#: template/map/controls/data.php:61
+#: template/map/controls/data.php:82
 msgid "Monthly"
 msgstr ""
 
 #: template/download/controls/details.php:248
 #: template/download/controls/details.php:282
-#: template/map/controls/data.php:76
+#: template/map/controls/data.php:97
 msgid "Seasonal"
 msgstr ""
 
@@ -458,82 +464,82 @@ msgid "All months"
 msgstr ""
 
 #: template/download/controls/details.php:268
-#: template/map/controls/data.php:62
+#: template/map/controls/data.php:83
 msgid "January"
 msgstr ""
 
 #: template/download/controls/details.php:269
-#: template/map/controls/data.php:63
+#: template/map/controls/data.php:84
 msgid "February"
 msgstr ""
 
 #: template/download/controls/details.php:270
-#: template/map/controls/data.php:64
+#: template/map/controls/data.php:85
 msgid "March"
 msgstr ""
 
 #: template/download/controls/details.php:271
-#: template/map/controls/data.php:65
+#: template/map/controls/data.php:86
 msgid "April"
 msgstr ""
 
 #: template/download/controls/details.php:272
-#: template/map/controls/data.php:66
+#: template/map/controls/data.php:87
 msgid "May"
 msgstr ""
 
 #: template/download/controls/details.php:273
-#: template/map/controls/data.php:67
+#: template/map/controls/data.php:88
 msgid "June"
 msgstr ""
 
 #: template/download/controls/details.php:274
-#: template/map/controls/data.php:68
+#: template/map/controls/data.php:89
 msgid "July"
 msgstr ""
 
 #: template/download/controls/details.php:275
-#: template/map/controls/data.php:69
+#: template/map/controls/data.php:90
 msgid "August"
 msgstr ""
 
 #: template/download/controls/details.php:276
-#: template/map/controls/data.php:70
+#: template/map/controls/data.php:91
 msgid "September"
 msgstr ""
 
 #: template/download/controls/details.php:277
-#: template/map/controls/data.php:71
+#: template/map/controls/data.php:92
 msgid "October"
 msgstr ""
 
 #: template/download/controls/details.php:278
-#: template/map/controls/data.php:72
+#: template/map/controls/data.php:93
 msgid "November"
 msgstr ""
 
 #: template/download/controls/details.php:279
-#: template/map/controls/data.php:73
+#: template/map/controls/data.php:94
 msgid "December"
 msgstr ""
 
 #: template/download/controls/details.php:283
-#: template/map/controls/data.php:77
+#: template/map/controls/data.php:98
 msgid "Spring"
 msgstr ""
 
 #: template/download/controls/details.php:284
-#: template/map/controls/data.php:78
+#: template/map/controls/data.php:99
 msgid "Summer"
 msgstr ""
 
 #: template/download/controls/details.php:285
-#: template/map/controls/data.php:79
+#: template/map/controls/data.php:100
 msgid "Fall"
 msgstr ""
 
 #: template/download/controls/details.php:286
-#: template/map/controls/data.php:80
+#: template/map/controls/data.php:101
 msgid "Winter"
 msgstr ""
 
@@ -666,18 +672,18 @@ msgid "Relevant"
 msgstr ""
 
 #: template/download/map-container.php:60
-#: template/map/map-container.php:70
+#: template/map/map-container.php:59
 msgid "Sectors"
 msgstr ""
 
 #: template/download/map-container.php:71
-#: template/map/map-container.php:81
+#: template/map/map-container.php:70
 msgid "Training"
 msgstr ""
 
 #: template/download/map-container.php:119
-#: template/map/map-container.php:143
-msgid "Zoom in to interact with the grid layer"
+#: template/map/map-container.php:130
+msgid "Zoom in to access grid level information"
 msgstr ""
 
 #: template/download/map-container.php:127
@@ -954,7 +960,8 @@ msgstr ""
 
 #: template/learn/control-bar.php:11
 #: template/learn/control-bar.php:30
-#: template/post-meta.php:30
+#: template/post-meta.php:39
+#: template/query/news-item.php:41
 msgid "Topics"
 msgstr ""
 
@@ -1003,41 +1010,57 @@ msgstr ""
 msgid "Title (Z–A)"
 msgstr ""
 
-#: template/map/control-bar.php:28
+#: template/map/control-bar.php:24
 #: template/map/controls/location.php:5
 msgid "Location"
 msgstr ""
 
-#: template/map/control-bar.php:37
+#: template/map/control-bar.php:33
 #: template/map/controls/display.php:5
 msgid "Display"
 msgstr ""
 
-#: template/map/controls/data.php:22
-msgid "Threshold Value"
+#: template/map/controls/data.php:32
+msgid "Toggle between the available climate datasets."
 msgstr ""
 
-#: template/map/controls/data.php:45
+#: template/map/controls/data.php:38
 msgid "CMIP6"
 msgstr ""
 
-#: template/map/controls/data.php:48
+#: template/map/controls/data.php:41
 msgid "CMIP5"
 msgstr ""
 
+#: template/map/controls/data.php:48
+msgid "Threshold Value"
+msgstr ""
+
 #: template/map/controls/data.php:55
+msgid "Description here."
+msgstr ""
+
+#: template/map/controls/data.php:69
 msgid "Frequency"
 msgstr ""
 
-#: template/map/controls/data.php:95
+#: template/map/controls/data.php:76
+msgid "Select Annual, Monthly or Seasonal from the drop-down menu."
+msgstr ""
+
+#: template/map/controls/data.php:116
+msgid "Select one of the emissions scenarios available for the chosen climate model ensemble."
+msgstr ""
+
+#: template/map/controls/data.php:123
 msgid "High emissions"
 msgstr ""
 
-#: template/map/controls/data.php:102
+#: template/map/controls/data.php:130
 msgid "Medium emissions"
 msgstr ""
 
-#: template/map/controls/data.php:109
+#: template/map/controls/data.php:137
 msgid "Low emissions"
 msgstr ""
 
@@ -1046,46 +1069,54 @@ msgid "Data Values"
 msgstr ""
 
 #: template/map/controls/display.php:20
+msgid "Select to view either absolute data values, or changes relevant to a baseline period."
+msgstr ""
+
+#: template/map/controls/display.php:27
 msgid "Absolute"
 msgstr ""
 
-#: template/map/controls/display.php:25
+#: template/map/controls/display.php:32
 msgid "Delta"
 msgstr ""
 
-#: template/map/controls/display.php:32
+#: template/map/controls/display.php:39
 msgid "Map Aggregation"
 msgstr ""
 
-#: template/map/controls/display.php:59
+#: template/map/controls/display.php:46
+msgid "View climate data as grid boxes, or aggregated by Census Subdivision, Health Region or Watershed."
+msgstr ""
+
+#: template/map/controls/display.php:73
 msgid "Colours"
 msgstr ""
 
-#: template/map/controls/display.php:66
+#: template/map/controls/display.php:80
 msgid "Selected Scheme Name"
 msgstr ""
 
-#: template/map/controls/display.php:72
+#: template/map/controls/display.php:86
 msgid "Default"
 msgstr ""
 
-#: template/map/controls/display.php:151
+#: template/map/controls/display.php:165
 msgid "Discrete"
 msgstr ""
 
-#: template/map/controls/display.php:154
+#: template/map/controls/display.php:168
 msgid "Continuous"
 msgstr ""
 
-#: template/map/controls/display.php:160
+#: template/map/controls/display.php:174
 msgid "Layer Opacity"
 msgstr ""
 
-#: template/map/controls/display.php:172
+#: template/map/controls/display.php:186
 msgid "Labels"
 msgstr ""
 
-#: template/map/controls/display.php:180
+#: template/map/controls/display.php:194
 msgid "Pins"
 msgstr ""
 
@@ -1229,17 +1260,9 @@ msgstr ""
 msgid "Explore climate data using maps and charts. Click on the Data tab on the left for more data options, including selection of variable and emissions scenario. Select the Location tab or zoom in to view charts."
 msgstr ""
 
-#: template/map/map-container.php:59
-msgid "Variables"
-msgstr ""
-
-#: template/map/map-container.php:127
+#: template/map/map-container.php:114
 #: template/old-loop/blocks/map.php:256
 msgid "Decade"
-msgstr ""
-
-#: template/map/map-container.php:130
-msgid "Move slider to adjust time period"
 msgstr ""
 
 #: template/menu-overlay.php:18
@@ -1294,19 +1317,20 @@ msgstr ""
 msgid "Learn More"
 msgstr ""
 
-#: template/post-meta.php:2
+#: template/post-meta.php:11
 msgid "Date"
 msgstr ""
 
-#: template/post-meta.php:6
+#: template/post-meta.php:15
 msgid "F j, Y"
 msgstr ""
 
-#: template/post-meta.php:12
+#: template/post-meta.php:25
+#: template/query/news-item.php:61
 msgid "Author"
 msgstr ""
 
-#: template/post-meta.php:52
+#: template/post-meta.php:51
 msgid "Share this post"
 msgstr ""
 

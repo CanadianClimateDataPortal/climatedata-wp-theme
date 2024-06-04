@@ -1398,12 +1398,9 @@
 
       do_legend: function (query, var_data, callback = null) {
         let plugin = !this.item ? this.data('cdc_app') : this,
-          item = plugin.item,
           options = plugin.options;
 
-        console.log('do legend', query.var, options.legend.display);
-
-        if (options.legend.display == true) {
+        if (options.legend.display) {
           const legend_item_height = 25,
             legend_item_width = 25,
             legend_width = 200,
@@ -1427,7 +1424,7 @@
                 legend_width - legend_item_width
               },0)">`;
 
-              if (query.scheme_type == 'discrete') {
+              if (query.scheme_type === 'discrete') {
                 for (let i = 0; i < colours.length; i++) {
                   svg += `<rect class="legendbox" width="${legend_item_width}" height="${legend_item_height}"
                         y="${legend_item_height * i}" fill="${colours[colours.length - i - 1]}" style="fill-opacity: ${opacity}"/>`;
@@ -1449,6 +1446,28 @@
                 legend_width - legend_item_width - legend_tick_width
               },0)">`;
 
+              /**
+               * For each unique legend label, holds the indexed positions where it would be shown.
+               *
+               * For some variables, the number of decimals to show is fixed. In some cases, it would create a
+               * legend with identical values. For example, the raw legend values are 1.0, 1.3, 1.7 and 2.0, but the
+               * number of decimals is set to 0, it would thus create a legend with the repeated values: 1, 1, 2 and 2.
+               *
+               * This array contains one element for each **unique** label and an array of their indexed positions.
+               * For the example above, it would thus be:
+               *
+               *  unique_labels = [
+               *    {value: "1", positions: [0, 1]},
+               *    {value: "2", positions: [2, 3]},
+               *  ]
+               *
+               *  Later on, this array of unique labels and their positions is used to display a unique label correctly
+               *  positioned.
+               *
+               * @type {{value: string, positions: Number[]}[]}
+               */
+              const unique_labels = []
+
               for (let i = 0; i < colours.length - (categorical ? 0 : 1); i++) {
                 let label;
                 if (labels) {
@@ -1463,14 +1482,37 @@
                   );
                 }
 
-                svg += `<g opacity="1" transform="translate(0,${
-                  legend_item_height * (i + 1) - label_offset
-                })">
-                        <line stroke="currentColor" x2="4"/>
-                        <text fill="currentColor" dominant-baseline="middle" text-anchor="end" x="-5">
-                        ${label}
-                        </text></g>`;
+                // Add the label and its position to the list of unique labels
+                const last_label = unique_labels.length ? unique_labels[unique_labels.length - 1] : null;
+                if (last_label && last_label.value === label) {
+                  last_label.positions.push(i);
+                } else {
+                  unique_labels.push({value: label, positions: [i]});
+                }
               }
+
+              // Render the (unique) labels
+              unique_labels.forEach(function (unique_label) {
+                // For discrete schemes, show a unique label only at its first position
+                let position = unique_label.positions[0];
+
+                // For continuous schemes, show a unique label at its average position
+                if (query.scheme_type === 'continuous') {
+                  position = unique_label.positions.reduce(function (total, current) {
+                    return total + current;
+                  }, 0);
+                  position /= unique_label.positions.length;
+                }
+
+                svg += `
+                    <g opacity="1" transform="translate(0,${legend_item_height * (position + 1) - label_offset})">
+                      <line stroke="currentColor" x2="4"/>
+                      <text fill="currentColor" dominant-baseline="middle" text-anchor="end" x="-5">
+                      ${unique_label.value}
+                      </text>
+                    </g>
+                `;
+              });
 
               svg += '</g>';
               svg += '</svg>';
@@ -2054,16 +2096,41 @@
           options.chart.query.dataset;
 
         let scenarios = DATASETS[options.chart.query.dataset].scenarios;
-        let pointFormatter;
 
         // more to this to add later
-        const localized_chart_unit = unit_localize(options.chart.unit, options.lang)
-        var labelFormatter = function () {
-          return (
-            this.axis.defaultLabelFormatter.call(this) +
-            ' ' +
-            localized_chart_unit
-          );
+        const localized_chart_unit = unit_localize(options.chart.unit, options.lang);
+
+        /**
+         * Default tooltip value's label formatter.
+         *
+         * @return {string} -The unit value with its label. For 'doy' units, the returned value is a date.
+         */
+        const labelFormatter = function () {
+          const value = this.axis.defaultLabelFormatter.call(this);
+          if (localized_chart_unit === 'doy') {
+            return value_formatter(value, options.chart.unit, var_fields.decimals, false, options.lang);
+          } else {
+            return value + ' ' + localized_chart_unit;
+          }
+        };
+
+        /**
+         * Default tooltip point formatter.
+         *
+         * @return {string} - An HTML line for a single point.
+         */
+        const pointFormatter = function() {
+          if (this.series.type === 'line') {
+            return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name + ': <b>'
+              + value_formatter(this.y, options.chart.unit, var_fields.decimals, false, options.lang)
+              + '</b><br/>';
+          } else {
+            return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name + ': <b>'
+              + value_formatter(this.low, options.chart.unit, var_fields.decimals, false, options.lang)
+              + '</b> - <b>'
+              + value_formatter(this.high, options.chart.unit, var_fields.decimals, false, options.lang)
+              + '</b><br/>';
+          }
         };
 
         // reset the series array
@@ -2704,12 +2771,6 @@
               switch (settings.input.value) {
                 case 'annual':
                   options.chart.object.update({
-                    tooltip: {
-                      formatter: function (tooltip) {
-                        // console.log(tooltip.defaultFormatter);
-                        return tooltip.defaultFormatter.call(this, tooltip);
-                      },
-                    },
                     plotOptions: {
                       series: {
                         states: {
@@ -2720,6 +2781,11 @@
                             enabled: true,
                           },
                         },
+                      },
+                    },
+                    tooltip: {
+                      formatter: function (tooltip) {
+                        return plugin.charts.format_tooltip.apply(this, [plugin, 'annual', settings.var_data.acf.units, settings.var_data.acf.decimals, tooltip]);
                       },
                     },
                   });
@@ -2745,108 +2811,7 @@
                     tooltip: {
                       followPointer: true,
                       formatter: function (tooltip) {
-                        let [decade, decade_ms] = formatDecade(
-                          this.x,
-                          options.chart.query.frequency,
-                        );
-
-                        // remove existing plot band
-                        options.chart.object.xAxis[0].removePlotBand(
-                          '30y-plot-band',
-                        );
-
-                        // add new plot band
-                        options.chart.object.xAxis[0].addPlotBand({
-                          from: Date.UTC(decade, 0, 1),
-                          to: Date.UTC(decade + 29, 11, 31),
-                          id: '30y-plot-band',
-                        });
-
-                        this.chart = tooltip.chart;
-                        this.axis = tooltip.chart.yAxis[0];
-
-                        let val1, val2;
-
-                        let tip = [];
-
-                        let decade_label =
-                          '<span style="font-size: 0.75rem; font-weight: bold;">' +
-                          decade +
-                          ' – ' +
-                          (decade + 29) +
-                          '</span><br>';
-
-                        tip.push(decade_label);
-
-                        if (
-                          decade_ms in options.chart.data['30y_observations']
-                        ) {
-                          this.value =
-                            options.chart.data['30y_observations'][
-                              decade_ms
-                            ][0];
-
-                          tip.push(
-                            '<span style="color:#F47D23">●</span> ' +
-                              chart_labels.observation +
-                              ' <b>' +
-                              this.value +
-                              ' ' +
-                              options.chart.unit +
-                              '</b><br>',
-                          );
-                        }
-
-                        scenarios.forEach(function (scenario) {
-                          this.value =
-                            options.chart.data[
-                              '30y_{0}_median'.format(scenario.name)
-                            ][decade_ms][0];
-
-                          // console.log(scenario.name, this.value);
-
-                          tip.push(
-                            '<span style="color:{0};">●</span> '.format(
-                              scenario.chart_color,
-                            ) +
-                              T('{0} Median').format(scenario.label) +
-                              ' <b>' +
-                              this.value +
-                              ' ' +
-                              options.chart.unit +
-                              '</b><br>',
-                          );
-
-                          this.value =
-                            options.chart.data[
-                              '30y_{0}_range'.format(scenario.name)
-                            ][decade_ms][0];
-
-                          val1 = this.value;
-
-                          this.value =
-                            options.chart.data[
-                              '30y_{0}_range'.format(scenario.name)
-                            ][decade_ms][1];
-
-                          val2 = this.value;
-
-                          tip.push(
-                            '<span style="color:{0}">●</span> '.format(
-                              scenario.chart_color,
-                            ) +
-                              T('{0} Range').format(scenario.label) +
-                              ' <b>' +
-                              val1 +
-                              ' – ' +
-                              val2 +
-                              ' ' +
-                              options.chart.unit +
-                              '</b><br>',
-                          );
-                        }, this);
-
-                        return tip;
+                        return plugin.charts.format_tooltip.apply(this, [plugin, '30y', settings.var_data.acf.units, settings.var_data.acf.decimals, tooltip]);
                       },
                     },
                   });
@@ -2884,95 +2849,7 @@
                     },
                     tooltip: {
                       formatter: function (tooltip) {
-                        let [decade, decade_ms] = formatDecade(
-                          this.x,
-                          options.chart.query.frequency,
-                        );
-                        options.chart.object.xAxis[0].removePlotBand(
-                          '30y-plot-band',
-                        );
-                        options.chart.object.xAxis[0].addPlotBand({
-                          from: Date.UTC(decade, 0, 1),
-                          to: Date.UTC(decade + 29, 11, 31),
-                          id: '30y-plot-band',
-                        });
-
-                        function numformat(num) {
-                          let str = '';
-                          if (num > 0) {
-                            str += '+';
-                          }
-                          str += Highcharts.numberFormat(
-                            num,
-                            settings.var_data.decimals,
-                          );
-                          switch (UNITS[settings.var_data.acf.units]) {
-                            case 'day of the year':
-                              str += ' ' + l10n_labels['days'];
-                              break;
-                            default:
-                              str += ' ' + options.chart.unit;
-                              break;
-                          }
-                          return str;
-                        }
-
-                        this.chart = tooltip.chart;
-                        this.axis = tooltip.chart.yAxis[0];
-                        let val1, val2;
-
-                        let tip = [
-                          '<span style="font-size: 10px">' +
-                            decade +
-                            '-' +
-                            (decade + 29) +
-                            ' ' +
-                            chart_labels.change_from_1971_2000 +
-                            '</span><br/>',
-                        ];
-
-                        scenarios.forEach(function (scenario) {
-                          val1 = numformat(
-                            options.chart.data[
-                              'delta7100_{0}_median'.format(scenario.name)
-                            ][decade_ms][0],
-                          );
-
-                          tip.push(
-                            '<span style="color:{0}">●</span> '.format(
-                              scenario.chart_color,
-                            ) +
-                              T('{0} Median').format(scenario.label) +
-                              ' <b>' +
-                              val1 +
-                              '</b><br/>',
-                          );
-
-                          val1 =
-                            options.chart.data[
-                              'delta7100_{0}_range'.format(scenario.name)
-                            ][decade_ms][0];
-
-                          val2 = numformat(
-                            options.chart.data[
-                              'delta7100_{0}_range'.format(scenario.name)
-                            ][decade_ms][1],
-                          );
-
-                          tip.push(
-                            '<span style="color:{0}">●</span> '.format(
-                              scenario.chart_color,
-                            ) +
-                              T('{0} Range').format(scenario.label) +
-                              ' <b>' +
-                              val1 +
-                              '</b>-<b>' +
-                              val2 +
-                              '</b><br/>',
-                          );
-                        }, this);
-
-                        return tip;
+                        return plugin.charts.format_tooltip.apply(this, [plugin, 'delta', settings.var_data.acf.units, settings.var_data.acf.decimals, tooltip]);
                       },
                     },
                   });
@@ -2983,6 +2860,139 @@
               break;
           }
         }
+      },
+
+      /**
+       * Generate the tooltip's content and return its lines as a list of HTML strings.
+       *
+       * @param {cdc_app} plugin
+       * @param {('annual'|'delta'|'30y')} type - The type of data aggregation for the tooltip data.
+       * @param {string} units - The unit of the data.
+       * @param {int} decimals - Number of decimals for formatting.
+       * @param {object} tooltip - The HighChart tooltip object.
+       * @return {String[]} - Tooltip content, one HTML string for each tooltip line.
+       */
+      format_tooltip: function (plugin, type, units, decimals, tooltip) {
+        const options = plugin.options;
+        options.chart.object.xAxis[0].removePlotBand('30y-plot-band',);
+
+        /*
+         * For 'annual' aggregation type, we simply default to the default formatter.
+         */
+
+        if (type === 'annual') {
+          return tooltip.defaultFormatter.call(this, tooltip);
+        }
+
+        /*
+         * From here on, the type is either '30y' or 'delta'.
+         */
+
+        const tip = [];
+        const [decade, decade_ms] = formatDecade(this.x, options.chart.query.frequency);
+        const scenarios = DATASETS[options.chart.query.dataset].scenarios;
+
+        // Show a band for the 30-year period covered
+        options.chart.object.xAxis[0].addPlotBand({
+          from: Date.UTC(decade, 0, 1),
+          to: Date.UTC(decade + 29, 11, 31),
+          id: '30y-plot-band',
+        });
+
+        // Top label for the 30-year period covered
+        let decade_label =
+          '<span style="font-size: 0.75rem; font-weight: bold;">' +
+          decade + ' – ' + (decade + 29);
+
+        if (type === 'delta') {
+          decade_label += ' (' + chart_labels.change_from_1971_2000 + ')';
+        }
+
+        decade_label += '</span><br>';
+        tip.push(decade_label);
+
+        // For '30y' type, add the "Gridded Historical Data" line, if available for the current 30-year period
+        if (type === '30y') {
+          let value = null;
+
+          if (decade_ms in options.chart.data['30y_observations']) {
+            value = options.chart.data['30y_observations'][decade_ms][0];
+          }
+
+          if (value !== null) {
+            if (units === 'kelvin') {
+              value += 273.15;
+            }
+
+            tip.push(
+              '<span style="color:#F47D23">●</span> ' +
+              chart_labels.observation +
+              ' <b>' +
+              value_formatter(value, units, decimals, false, options.lang) +
+              '</b><br>',
+            );
+          }
+        }
+
+        const is_delta = type === 'delta';
+        const to_label = (units === 'doy' && !is_delta) ? 'to_doy' : 'to';
+
+        // Render the two lines (median and range) for each scenario
+        scenarios.forEach(function (scenario) {
+          let median, lower, upper, range;
+
+          switch (type) {
+            case '30y':
+              range = options.chart.data['30y_{0}_range'.format(scenario.name)][decade_ms];
+              median = options.chart.data['30y_{0}_median'.format(scenario.name)][decade_ms][0];
+              lower = range[0];
+              upper = range[1];
+              break
+            case 'delta':
+              range = options.chart.data['delta7100_{0}_range'.format(scenario.name)][decade_ms];
+              median = options.chart.data['delta7100_{0}_median'.format(scenario.name)][decade_ms][0];
+              lower = range[0];
+              upper = range[1];
+              break
+            default:
+              const point_index = this.point.index;
+              range = options.chart.data['{0}_range'.format(scenario.name)][point_index];
+              median = options.chart.data['{0}_median'.format(scenario.name)][point_index][1];
+              lower = range[1];
+              upper = range[2];
+              break
+          }
+
+          if (!is_delta && units === 'kelvin') {
+            median += 273.15;
+            lower += 273.15;
+            upper += 273.15;
+          }
+
+          tip.push(
+            '<span style="color:{0};">●</span> '.format(
+              scenario.chart_color,
+            ) +
+            T('{0} Median').format(scenario.label) +
+            ': <b>' +
+            value_formatter(median, units, decimals, is_delta, options.lang) +
+            '</b><br>',
+          );
+
+          tip.push(
+            '<span style="color:{0}">●</span> '.format(
+              scenario.chart_color,
+            ) +
+            T('{0} Range').format(scenario.label) +
+            ': <b>' +
+            value_formatter(lower, units, decimals, is_delta, options.lang) +
+            '</b> ' + l10n_labels[to_label] + ' <b>' +
+            value_formatter(upper, units, decimals, is_delta, options.lang) +
+            '</b><br>',
+          );
+        }, this);
+
+        return tip;
       },
 
       do_export: function (dl_type) {

@@ -29,7 +29,7 @@
 							role="button"
 							data-bs-toggle="popover"
 							data-bs-trigger="focus"
-							data-bs-content="<?php esc_html_e( 'Toggle between the available climate datasets.', 'csc' ) ?>"
+							data-bs-content="<?php esc_html_e( 'Toggle between the available climate datasets.', 'cdc' ) ?>"
 						>?</a>
 					</label>
 
@@ -52,7 +52,7 @@
 							role="button"
 							data-bs-toggle="popover"
 							data-bs-trigger="focus"
-							data-bs-content="<?php esc_html_e( 'Description here.', 'csc' ) ?>"
+							data-bs-content="<?php esc_html_e( 'Description here.', 'cdc' ) ?>"
 						>?</a>
 					</h6>
 
@@ -73,7 +73,7 @@
 							role="button"
 							data-bs-toggle="popover"
 							data-bs-trigger="focus"
-							data-bs-content="<?php esc_html_e( 'Select Annual, Monthly or Seasonal from the drop-down menu.', 'csc' ) ?>"
+							data-bs-content="<?php esc_html_e( 'Select Annual, Monthly or Seasonal from the drop-down menu.', 'cdc' ) ?>"
 						>?</a>
 				</label>
 
@@ -113,7 +113,7 @@
 							role="button"
 							data-bs-toggle="popover"
 							data-bs-trigger="focus"
-							data-bs-content="<?php esc_html_e( 'Select one of the emissions scenarios available for the chosen climate model ensemble.', 'csc' ) ?>"
+							data-bs-content="<?php esc_html_e( 'Select one of the emissions scenarios available for the chosen climate model ensemble.', 'cdc' ) ?>"
 						>?</a>
 					</h6>
 

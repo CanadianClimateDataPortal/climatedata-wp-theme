@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-06-03T18:35:30+00:00\n"
+"POT-Creation-Date: 2024-06-04T00:57:11+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -1292,12 +1292,21 @@ msgstr ""
 msgid "All Variables"
 msgstr ""
 
-#: template/newsletter-signup.php:3
-msgid "Join the newsletter"
+#: template/newsletter-hero.php:3
+msgid "Climatedata.ca Newsletter"
 msgstr ""
 
+#: template/newsletter-hero.php:5
+msgid "Join our newsletter for periodic updates."
+msgstr ""
+
+#: template/newsletter-hero.php:16
 #: template/newsletter-signup.php:11
 msgid "Your email address"
+msgstr ""
+
+#: template/newsletter-signup.php:3
+msgid "Join the newsletter"
 msgstr ""
 
 #: template/old-loop/blocks/chart.php:43

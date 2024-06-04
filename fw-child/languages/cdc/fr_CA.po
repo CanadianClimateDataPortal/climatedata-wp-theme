@@ -1340,11 +1340,3 @@ msgstr "Précédent"
 #: template/download/controls/details.php:255
 msgid "Annual (July – June)"
 msgstr ""
-
-#: template/archive-signup.php:3
-msgid "Climatedata.ca newsletter"
-msgstr ""
-
-#: template/archive-signup.php:5
-msgid "Join our newsletter for periodic updates."
-msgstr ""

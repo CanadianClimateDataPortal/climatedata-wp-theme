@@ -755,12 +755,12 @@
           this_gid = String(this_gid);
 
           style_obj = {
+            ...style_obj,
             ...{
               color: '#444',
               weight: 1,
               opacity: 1,
             },
-            ...style_obj,
           };
 
           if (
@@ -786,12 +786,12 @@
           this_gid = String(this_gid);
 
           style_obj = {
+            ...style_obj,
             ...{
               color: '#444',
               weight: 1,
               opacity: 1,
             },
-            ...style_obj,
           };
 
           // console.log('mouseout', this_gid, options.query.selections);

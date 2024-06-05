@@ -1263,7 +1263,7 @@
                           function (properties, zoom) {
                             let style_obj = {
                               weight: 1,
-                              color: '#fff',
+                              color: layer_data ? '#fff' : '#999',
                               fillColor: 'transparent',
                               opacity: 0.5,
                               fill: true,
@@ -1271,7 +1271,7 @@
                               fillOpacity: 1,
                             };
 
-                            if (properties.id) {
+                            if (layer_data && properties.id) {
                               style_obj.fillColor = plugin.maps.get_color.apply(
                                 item,
                                 [layer_data[properties.id]],

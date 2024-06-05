@@ -12,29 +12,10 @@
       page_title: document.title,
       status: 'init',
       maps: {
-        low: {
-          container: null,
-          object: null,
-          layers: {
-            raster: null,
-            grid: null,
-            station_clusters: null,
-            stations: null,
-          },
-        },
         medium: {
           container: null,
           object: null,
-          layers: {
-            raster: null,
-            grid: null,
-            station_clusters: null,
-            stations: null,
-          },
-        },
-        high: {
-          container: null,
-          object: null,
+          no_raster: true, // Do not show a raster layer for this map
           layers: {
             raster: null,
             grid: null,
@@ -230,15 +211,12 @@
 
                 console.log('init get_layer');
 
-                // load default color scheme
-                plugin.update_default_scheme(function () {
-                  $(document).cdc_app(
-                    'maps.get_layer',
-                    options.query,
-                    options.var_data,
-                    options.request,
-                  );
-                });
+                $(document).cdc_app(
+                  'maps.get_layer',
+                  options.query,
+                  options.var_data,
+                  options.request,
+                );
               }
 
               console.log('done');
@@ -1654,20 +1632,6 @@
         case 'scenarios':
           // ssp1/2/5 switches
 
-          item.find('[data-query-key="scenarios"]').each(function () {
-            // each radio
-
-            // find the matching map panel
-            let this_panel = $('#map-' + $(this).val());
-
-            // hide it by default
-            this_panel.addClass('hidden');
-
-            if ($(this).prop('checked') == true) {
-              this_panel.removeClass('hidden');
-            }
-          });
-
           if (item.find('[data-query-key="scenarios"]:checked').length <= 1) {
             item
               .find('[data-query-key="scenarios"]:checked')
@@ -1675,15 +1639,6 @@
           } else {
             item.find('[data-query-key="scenarios"]').prop('disabled', false);
           }
-
-          // console.log(options.query.scenarios);
-
-          // wait for CSS transition
-          // ideally with something better than
-          // a setTimeout
-          setTimeout(function () {
-            $(document).cdc_app('maps.invalidate_size');
-          }, 500);
 
           break;
 
@@ -1814,23 +1769,17 @@
           query: options.query,
           do_history: do_history,
           callback: function () {
-            console.log('eval callback');
 
-            plugin.update_default_scheme(function () {
-              console.log('handle_input get layer');
+            $(document).cdc_app(
+              'maps.get_layer',
+              options.query,
+              options.var_data,
+              options.request,
+            );
 
-              $(document).cdc_app(
-                'maps.get_layer',
-                options.query,
-                options.var_data,
-                options.request,
-              );
-
-              if (status != 'init') {
-                console.log('status ready');
-                options.status = 'ready';
-              }
-            });
+            if (status !== 'init') {
+              options.status = 'ready';
+            }
           },
         });
       } else {
@@ -4041,83 +3990,6 @@
       item.find('#submit-captcha').val('');
     },
 
-    update_default_scheme: function (callback) {
-      let plugin = this,
-        options = plugin.options,
-        item = plugin.item;
-
-      let default_scheme_element = item.find(
-        '#display-scheme-select .dropdown-item[data-scheme-id="default"]',
-      );
-
-      options.legend.colormap.colours = [];
-      options.legend.colormap.quantites = [];
-
-      // console.log('default scheme', options.query.var);
-
-      if (
-        options.query.dataset == 'ahccd' ||
-        options.query.var == null ||
-        options.query.var == '' ||
-        options.query.var == 'null' ||
-        options.var_data == null ||
-        options.var_data.var_types.includes('Station Data')
-      ) {
-        // nothing to do,
-        // prevents multiple firing of get_layer
-
-        if (typeof callback === 'function') {
-          callback();
-        }
-      } else {
-        if (special_variables.hasOwnProperty(options.var_data.slug)) {
-          const special_var = special_variables[options.var_data.slug];
-          default_scheme_element.data(
-            'scheme-colours',
-            special_var.colormap.colours,
-          );
-          default_scheme_element.data(
-            'scheme-quantities',
-            special_var.colormap.quantities,
-          );
-          plugin.update_scheme();
-
-          if (typeof callback === 'function') callback();
-        } else {
-          let layer_name = $(document).cdc_app(
-            'maps.get_layer_name',
-            options.query,
-          );
-
-          if (options.current_layer != layer_name) {
-            $.getJSON(
-              geoserver_url +
-                '/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic' +
-                '&format=application/json&layer=' +
-                layer_name,
-            )
-              .then(function (data) {
-                let colour_map =
-                  data.Legend[0].rules[0].symbolizers[0].Raster.colormap
-                    .entries;
-
-                options.legend.colormap.colours = colour_map.map(
-                  (e) => e.color,
-                );
-                options.legend.colormap.quantities = colour_map.map(
-                  (e) => e.quantity,
-                );
-
-                plugin.generate_ramp();
-              })
-              .always(function () {
-                if (typeof callback == 'function') callback();
-              });
-          }
-        }
-      }
-    },
-
     // Hook that update leaflet params object depending on selected scheme
     apply_scheme: function (query, layer_params) {
       let plugin = this,
@@ -4200,30 +4072,6 @@
         plugin.redraw_colour_scheme(this);
       });
 
-      plugin.generate_ramp(selected_item);
-    },
-
-    // generate ramp colours and keypoints, used by SLD or choro, and legend
-    generate_ramp: function (selected_scheme_item) {
-      let plugin = this,
-        options = plugin.options,
-        item = plugin.item;
-
-      // console.log('generate ramp', selected_scheme_item);
-      // console.log(JSON.stringify(options.legend, null, 4));
-
-      if (special_variables.hasOwnProperty(options.var_data.slug)) {
-        $.extend(
-          options.legend.colormap,
-          special_variables[options.var_data.slug].colormap,
-        );
-      } else {
-        // options.legend.colormap.colours = colours;
-        // options.legend.colormap.quantities = [];
-        options.legend.colormap.labels = null;
-        options.legend.colormap.scheme_type = 'discrete';
-        options.legend.colormap.categorical = false;
-      }
     },
 
     generate_sld: function (layer_name, discrete) {

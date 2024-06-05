@@ -543,45 +543,48 @@
                     hook.fn.apply(hook.obj, [query, params]);
                   });
 
-                  if (
-                    this_map.layers.raster &&
-                    this_map.object.hasLayer(this_map.layers.raster)
-                  ) {
-                    // map already has a raster layer
-                    // if any map parameters have changed
+                  // Add/update the raster layer of the map
+                  if (!this_map.no_raster) {
                     if (
-                      !window.lodash.isEqual(
-                        this_map.layers.raster.cdc_params,
-                        params,
-                      )
+                      this_map.layers.raster &&
+                      this_map.object.hasLayer(this_map.layers.raster)
                     ) {
-                      // console.log('UPDATE RASTER LAYER');
+                      // map already has a raster layer
+                      // if any map parameters have changed
+                      if (
+                        !window.lodash.isEqual(
+                          this_map.layers.raster.cdc_params,
+                          params,
+                        )
+                      ) {
+                        // console.log('UPDATE RASTER LAYER');
 
-                      // Parameters that must be removed are not removed, so we remove them manually
-                      // Issue: https://github.com/Leaflet/Leaflet/issues/3441
-                      delete this_map.layers.raster.wmsParams.sld_body;
-                      this_map.layers.raster.setParams(params);
+                        // Parameters that must be removed are not removed, so we remove them manually
+                        // Issue: https://github.com/Leaflet/Leaflet/issues/3441
+                        delete this_map.layers.raster.wmsParams.sld_body;
+                        this_map.layers.raster.setParams(params);
 
-                      this_map.layers.raster.cdc_params =
-                        window.lodash.cloneDeep(params);
+                        this_map.layers.raster.cdc_params =
+                          window.lodash.cloneDeep(params);
+                      }
+                    } else {
+                      // create layer
+
+                      let saved_params = window.lodash.cloneDeep(params);
+
+                      // console.log('CREATE RASTER LAYER');
+
+                      // those three parameters must be specified at creation only
+                      // otherwise, a bug in leaflet leaks them to the WMS requests
+                      params.opacity = 1;
+                      params.pane = 'raster';
+                      params.bounds = options.canadaBounds;
+
+                      this_map.layers.raster = L.tileLayer
+                        .wms(geoserver_url + '/geoserver/ows?', params)
+                        .addTo(this_map.object);
+                      this_map.layers.raster.cdc_params = saved_params;
                     }
-                  } else {
-                    // create layer
-
-                    let saved_params = window.lodash.cloneDeep(params);
-
-                    // console.log('CREATE RASTER LAYER');
-
-                    // those three parameters must be specified at creation only
-                    // otherwise, a bug in leaflet leaks them to the WMS requests
-                    params.opacity = 1;
-                    params.pane = 'raster';
-                    params.bounds = options.canadaBounds;
-
-                    this_map.layers.raster = L.tileLayer
-                      .wms(geoserver_url + '/geoserver/ows?', params)
-                      .addTo(this_map.object);
-                    this_map.layers.raster.cdc_params = saved_params;
                   }
 
                   // grid

@@ -228,6 +228,11 @@ p {
   @include full-size;
 }
 
+.bg-blur {
+  backdrop-filter: blur(10px);
+  background-color: transparent;
+}
+
 .font-family-serif {
   font-family: $font-family-serif;
 }
@@ -427,11 +432,6 @@ $control-slider-handle-width: 2.75rem;
   h1 {
     @include font-size(5rem);
     font-weight: bold;
-  }
-
-  #mc_embed_signup {
-    backdrop-filter: blur(10px);
-    background-color: transparent;
   }
 }
 

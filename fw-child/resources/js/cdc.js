@@ -845,6 +845,7 @@
                   if (this_map.object.hasLayer(this_map.layers.grid)) {
                     // console.log('map has layer');
                     this_map.object.removeLayer(this_map.layers.grid);
+                    this_map.layers.grid = undefined;
                   }
                 }
 
@@ -991,9 +992,6 @@
               }
             });
 
-            console.log('spinner off');
-            $('body').removeClass('spinner-on');
-
             break;
           default:
             // choropleth
@@ -1103,7 +1101,7 @@
             };
 
             if (
-              first_map.layers.grid == undefined ||
+              !first_map.layers.grid ||
               first_map.object.hasLayer(first_map.layers.grid) ||
               !window.lodash.isEqual(query, options.query)
             ) {
@@ -1249,9 +1247,6 @@
                             );
                           }
                         }
-
-                        console.log('spinner off');
-                        $('body').removeClass('spinner-on');
                       } else {
                         // new layer
 
@@ -1387,9 +1382,6 @@
                             hook.fn.apply(hook.obj, [query]);
                           },
                         );
-
-                        console.log('spinner off');
-                        $('body').removeClass('spinner-on');
                       }
                     },
                   ); // when choro data
@@ -1397,6 +1389,8 @@
               }); // when legend
             }
         } // switch
+
+        $('body').removeClass('spinner-on');
       },
 
       do_legend: function (query, var_data, callback = null) {

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-06-03T18:35:30+00:00\n"
+"POT-Creation-Date: 2024-06-05T13:22:26+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -179,7 +179,7 @@ msgstr ""
 #: template/map/control-bar.php:42
 #: template/map/controls/download.php:5
 #: template/map/controls/download.php:44
-#: template/menu-overlay.php:195
+#: template/menu-overlay.php:196
 msgid "Download"
 msgstr ""
 
@@ -1269,34 +1269,34 @@ msgstr ""
 msgid "Climate Data"
 msgstr ""
 
-#: template/menu-overlay.php:180
+#: template/menu-overlay.php:115
+msgid "Join the newsletter"
+msgstr ""
+
+#: template/menu-overlay.php:181
 msgid "Popular Variables"
 msgstr ""
 
-#: template/menu-overlay.php:193
+#: template/menu-overlay.php:194
 #: template/query/map-var-item.php:11
 msgid "View on map"
 msgstr ""
 
-#: template/menu-overlay.php:197
+#: template/menu-overlay.php:198
 #: template/query/download-var-item.php:13
 #: template/query/map-var-item.php:13
 msgid "Description"
 msgstr ""
 
-#: template/menu-overlay.php:210
+#: template/menu-overlay.php:211
 msgid "Variables by Sector"
 msgstr ""
 
-#: template/menu-overlay.php:237
+#: template/menu-overlay.php:238
 msgid "All Variables"
 msgstr ""
 
-#: template/newsletter-signup.php:3
-msgid "Join the newsletter"
-msgstr ""
-
-#: template/newsletter-signup.php:11
+#: template/newsletter-signup.php:10
 msgid "Your email address"
 msgstr ""
 

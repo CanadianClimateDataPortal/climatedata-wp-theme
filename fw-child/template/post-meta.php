@@ -4,7 +4,15 @@ $news_post_id = get_the_ID();
 
 // Initialize taxonomies.
 $tax_news_topic  = get_the_terms( $news_post_id, 'news-topic' );
-$tax_news_author = get_the_terms( $news_post_id, 'news-author' ); ?>
+$tax_news_author = get_the_terms( $news_post_id, 'news-author' ); 
+
+// Initialize current language.
+$current_lang = 'en';
+
+if ( isset( $GLOBALS['fw'] ) && isset( $GLOBALS['fw']['current_lang'] ) ) {
+	$current_lang = $GLOBALS['fw']['current_lang_code'];
+} 
+?>
 
 <div class="news-meta-block p-3 border border-gray-600 row">
 	<div class="news-meta-item mb-3 mb-lg-4 col-md-8 col-xl-16 pe-md-3 pe-xl-0">
@@ -26,7 +34,7 @@ $tax_news_author = get_the_terms( $news_post_id, 'news-author' ); ?>
 
 			<?php
 			echo implode( ', ', array_map( function ( $term ) {
-				return $term->name;
+				return ( 'en' === $current_lang ) ? $term->name : get_field( 'admin_term_title_fr', $term );
 			}, $tax_news_author ) ); ?>
 		</div>
 		<?php
@@ -40,7 +48,7 @@ $tax_news_author = get_the_terms( $news_post_id, 'news-author' ); ?>
 
 			<?php
 			echo implode( ', ', array_map( function ( $term ) {
-				return $term->name;
+				return ( 'en' === $current_lang ) ? $term->name : get_field( 'admin_term_title_fr', $term );
 			}, $tax_news_topic ) ); ?>
 		</div>
 		<?php

@@ -963,3 +963,20 @@ $query-card-hover-padding: 0.75rem;
 //
 
 @import 'pages';
+
+//
+// Pagination
+//
+
+@media (max-width: 1000px) {
+  .fw-query-pagination {
+    flex-wrap: wrap;
+
+    &-pages {
+      margin-top: 1rem;
+      margin-right: 0 !important;
+      order: 3;
+      width: 100%;
+    }
+  }
+}

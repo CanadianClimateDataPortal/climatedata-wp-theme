@@ -225,20 +225,26 @@
 			
 			if (options.elements.pagination != null) {
 				
-				options.elements.pagination.on('click', '.fw-query-pagination-btn', function(e) {
+				options.elements.pagination.on( 'click', '.fw-query-pagination-btn', function ( e ) {
+					let new_page;
 					
-					let new_page = options.args.paged
-					
-					if ($(this).hasClass('next')) {
-						if (options.max_pages > options.args.paged) {
-							// page number can still go higher
-							new_page += 1
+					// Specified page number.
+					if ($( this ).hasClass( 'page-number' ) && $( this ).data( 'queryPage' )) {
+						new_page = parseInt( $( this ).data( 'queryPage' ) );
+					} else {
+						// Use prev/next buttons.
+						new_page = options.args.paged;
+						
+						if ($( this ).hasClass( 'next' )) {
+							if (options.max_pages > options.args.paged) {
+								new_page += 1;
+							}
 						}
-					}
-					
-					if ($(this).hasClass('previous')) {
-						if (options.args.paged > 1) {
-							new_page -= 1
+						
+						if ($( this ).hasClass( 'previous' )) {
+							if (options.args.paged > 1) {
+								new_page -= 1;
+							}
 						}
 					}
 					
@@ -248,7 +254,7 @@
 						plugin.do_query()
 					}
 					
-				})
+				} )
 				
 			}
 			
@@ -434,6 +440,48 @@
 			
 		},
 		
+		generate_pagination_links: function ( pagination_data ) {
+			const pagination_container = $( '.fw-query-pagination-pages' );
+			
+			if (!pagination_container) {
+				// console.error( 'Unable to find the element with class "fw-query-pagination-pages".' );
+				
+				return;
+			}
+			
+			// Initialize.
+			const total_pages = parseInt( pagination_data.total);
+			const current_page = parseInt( pagination_data.current );
+			const posts_per_page = parseInt( pagination_data.posts_per_page );
+			
+			if (isNaN( total_pages ) || isNaN( current_page ) || total_pages <= 0 || isNaN( posts_per_page )) {
+				// console.error( 'Invalid total pages or current page values.' );
+				
+				pagination_container.remove();
+				
+				return;
+			}
+			
+			// Clean pagination container HTML.
+			pagination_container.html('');
+			
+			for (let page_index = 1; page_index <= total_pages; page_index++) {
+				const div_element = document.createElement( 'div' );
+				
+				div_element.classList.add( 'fw-query-pagination-btn', 'page-number', 'btn', 'btn-light' );
+				
+				div_element.dataset.queryPage = page_index;
+				
+				div_element.textContent = page_index;
+				
+				if (page_index === current_page) {
+					div_element.classList.add( 'btn-dark', 'pe-none' );
+				}
+				
+				pagination_container.append( div_element );
+			}
+		},
+		
 		do_query: function(callback = null) {
 			
 			let plugin = this,
@@ -491,6 +539,15 @@
 								item.find('.fw-query-pagination-btn.next').removeClass('disabled')
 							}
 							
+							// Generate pagination links.
+							const pagination_data = {
+								total: options.max_pages,
+								current: options.args.paged,
+								posts_per_page: options.args.posts_per_page
+							};
+							
+							plugin.generate_pagination_links( pagination_data );
+
 							data.items.forEach(function(item, i) {
 								
 								// console.log(item)

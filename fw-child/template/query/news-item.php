@@ -14,7 +14,7 @@ if ( isset( $item['lang'] ) ) {
 }
 ?>
 
-<div class="card">
+<div class="card card--news">
 	<?php
 	
 		if ( has_post_thumbnail ( $item['id'] ) ) {
@@ -32,53 +32,43 @@ if ( isset( $item['lang'] ) ) {
 	?>
 	
 	<div class="card-body">
-		<h5 class="card-title item-title"><a href="<?php echo $item['permalink']; ?>" class="text-secondary stretched-link"><?php echo $item['title']; ?></a></h5>
+		<h5 class="card-title item-title mb-1"><a href="<?php echo $item['permalink']; ?>" class="text-secondary stretched-link"><?php echo $item['title']; ?></a></h5>
 
-		<div class="mb-3">
+		<div class="card-date mb-1">
 			<?php
 			echo get_post_time( 'F j, Y', false, $item['id'] ); ?>
 		</div>
 
-		<div class="row row-cols-2 card-meta">
-			<?php
-			// News topics.
-			if ( is_array( $tax_news_topic ) && ! empty( $tax_news_topic ) ) {
-				?>
-				<div class="col">
-					<div class="card-meta-item">
-						<span class="all-caps text-secondary"><?php _e( 'Topics', 'cdc' ); ?></span>
-
-						<p class="text-gray-600">
-							<?php
-							echo implode( ', ', array_map( function ( $term ) use ( $current_lang ) {
-								return ( 'en' === $current_lang ) ? $term->name : get_field( 'admin_term_title_fr', $term );
-							}, $tax_news_topic ) ); ?>
-						</p>
-					</div>
-				</div>
-				<?php
-			}
+		<?php
+		// News authors.
+		if ( is_array( $tax_news_author ) && ! empty( $tax_news_author ) ) {
 			?>
-			
+			<div class="card-authors">
+				<p class="text-gray-600">
+					<?php
+					echo implode( ', ', array_map( function ( $term ) use ( $current_lang ) {
+						return ( 'en' === $current_lang ) ? $term->name : get_field( 'admin_term_title_fr', $term );
+					}, $tax_news_author ) ); ?>
+				</p>
+			</div>
 			<?php
-			// News authors.
-			if ( is_array( $tax_news_author ) && ! empty( $tax_news_author ) ) {
-				?>
-				<div class="col">
-					<div class="card-meta-item">
-						<span class="all-caps text-secondary"><?php _e( 'Author', 'cdc' ); ?></span>
+		}
 
-						<p class="text-gray-600">
-							<?php
-							echo implode( ', ', array_map( function ( $term ) use ( $current_lang ) {
-								return ( 'en' === $current_lang ) ? $term->name : get_field( 'admin_term_title_fr', $term );
-							}, $tax_news_author ) ); ?>
-						</p>
-					</div>
-				</div>
-				<?php
-			}
+		// News topics.
+		if ( is_array( $tax_news_topic ) && ! empty( $tax_news_topic ) ) {
 			?>
-		</div>
+			<div class="card-topics mt-2">
+				<span class="all-caps fw-bold"><?php _e( 'Topics', 'cdc' ); ?></span>
+
+				<p class="text-gray-600">
+					<?php
+					echo implode( ', ', array_map( function ( $term ) use ( $current_lang ) {
+						return ( 'en' === $current_lang ) ? $term->name : get_field( 'admin_term_title_fr', $term );
+					}, $tax_news_topic ) ); ?>
+				</p>
+			</div>
+			<?php
+		}
+		?>
 	</div>
 </div>

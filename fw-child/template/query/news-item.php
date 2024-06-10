@@ -4,7 +4,15 @@ $news_post_id = $item['id'] ?? 0;
 
 // Initialize taxonomies.
 $tax_news_topic  = get_the_terms( $news_post_id, 'news-topic' );
-$tax_news_author = get_the_terms( $news_post_id, 'news-author' ); ?>
+$tax_news_author = get_the_terms( $news_post_id, 'news-author' );
+
+// Initialize current language.
+$current_lang = 'en';
+
+if ( isset( $item['lang'] ) ) {
+	$current_lang = 'fr';
+}
+?>
 
 <div class="card">
 	<?php
@@ -42,8 +50,8 @@ $tax_news_author = get_the_terms( $news_post_id, 'news-author' ); ?>
 
 						<p class="text-gray-600">
 							<?php
-							echo implode( ', ', array_map( function ( $term ) {
-								return $term->name;
+							echo implode( ', ', array_map( function ( $term ) use ( $current_lang ) {
+								return ( 'en' === $current_lang ) ? $term->name : get_field( 'admin_term_title_fr', $term );
 							}, $tax_news_topic ) ); ?>
 						</p>
 					</div>
@@ -62,8 +70,8 @@ $tax_news_author = get_the_terms( $news_post_id, 'news-author' ); ?>
 
 						<p class="text-gray-600">
 							<?php
-							echo implode( ', ', array_map( function ( $term ) {
-								return $term->name;
+							echo implode( ', ', array_map( function ( $term ) use ( $current_lang ) {
+								return ( 'en' === $current_lang ) ? $term->name : get_field( 'admin_term_title_fr', $term );
 							}, $tax_news_author ) ); ?>
 						</p>
 					</div>

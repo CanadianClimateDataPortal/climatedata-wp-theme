@@ -41,7 +41,8 @@ function fw_query_builder() {
 			$item = array (
 				'id' => get_the_ID(),
 				'title' => get_the_title(),
-				'permalink' => get_permalink()
+				'permalink' => get_permalink(),
+				'lang' => $_GET['lang'],
 			);
 			
 			if ( $_GET['lang'] != 'en' ) {

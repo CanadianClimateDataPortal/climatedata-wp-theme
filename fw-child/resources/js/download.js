@@ -1726,16 +1726,21 @@
           // hide the shapefile layer
           options.elements.shapefile_upload.shapefile_upload('hide');
 
+          if (this_val === 'gridded_data' && options.selection_mode === 'draw') {
+            plugin.enable_bbox();
+          } else {
+            plugin.disable_bbox();
+          }
+
           switch (this_val) {
             case 'gridded_data':
               // console.log('gridded');
-              if (options.request.type != 'custom') {
+              if (options.request.type !== 'custom') {
                 // console.log('show raster pane');
                 item.find('.leaflet-raster-pane').show();
               }
               break;
             case 'upload':
-              plugin.disable_bbox();
               options.elements.shapefile_upload.shapefile_upload('show');
               break;
           }
@@ -4201,13 +4206,7 @@
       Object.keys(options.maps).forEach(function (key) {
         let this_map = options.maps[key];
 
-        // hide grid
-        if (
-          this_map.layers.grid &&
-          this_map.object.hasLayer(this_map.layers.grid)
-        ) {
-          this_map.object.removeLayer(this_map.layers.grid);
-        }
+        item.find('.leaflet-grid-pane').hide();
 
         if (
           !this_map.layers.hasOwnProperty('bbox') ||
@@ -4254,7 +4253,7 @@
         options = plugin.options,
         item = plugin.item;
 
-      // console.log('disabling');
+      item.find('.leaflet-grid-pane').show();
 
       Object.keys(options.maps).forEach(function (key) {
         let this_map = options.maps[key];
@@ -4368,10 +4367,7 @@
       // bbox
       plugin.disable_bbox();
 
-      if (
-        options.query.sector == 'gridded_data' &&
-        options.selection_mode == 'draw'
-      ) {
+      if (options.query.sector === 'gridded_data' && options.selection_mode === 'draw') {
         plugin.enable_bbox();
       } else {
         plugin.disable_bbox();

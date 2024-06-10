@@ -450,12 +450,11 @@
 			}
 			
 			// Initialize.
-			const total_pages = parseInt( pagination_data.total);
+			const total_pages = parseInt( pagination_data.total );
 			const current_page = parseInt( pagination_data.current );
-			const posts_per_page = parseInt( pagination_data.posts_per_page );
 			
-			if (isNaN( total_pages ) || isNaN( current_page ) || total_pages <= 0 || isNaN( posts_per_page )) {
-				// console.error( 'Invalid total pages or current page values.' );
+			if (isNaN( total_pages ) || isNaN( current_page ) || total_pages <= 0 ) {
+				// console.error('Invalid total pages or current page values.');
 				
 				pagination_container.remove();
 				
@@ -463,23 +462,49 @@
 			}
 			
 			// Clean pagination container HTML.
-			pagination_container.html('');
+			pagination_container.html( '' );
 			
-			for (let page_index = 1; page_index <= total_pages; page_index++) {
+			// Pagination algorithm.
+			const pagination_map = (function ( {current, max} ) {
+				if (!current || !max) return null;
+				
+				let prev = current === 1 ? null : current - 1,
+					next = current === max ? null : current + 1,
+					items = [ 1 ];
+				
+				if (current === 1 && max === 1) return {current, prev, next, items};
+				if (current > 4) items.push( 'ELLIPSIS' );
+				
+				let r = 2, r1 = current - r, r2 = current + r;
+				
+				for (let i = r1 > 2 ? r1 : 2; i <= Math.min( max, r2 ); i++) items.push( i );
+				
+				if (r2 + 1 < max) items.push( 'ELLIPSIS' );
+				if (r2 < max) items.push( max );
+				
+				return {current, prev, next, items};
+			})( {current: current_page, max: total_pages} );
+			
+			pagination_map.items.forEach( page_index => {
 				const div_element = document.createElement( 'div' );
 				
 				div_element.classList.add( 'fw-query-pagination-btn', 'page-number', 'btn', 'btn-light' );
 				
-				div_element.dataset.queryPage = page_index;
-				
-				div_element.textContent = page_index;
-				
-				if (page_index === current_page) {
-					div_element.classList.add( 'btn-dark', 'pe-none' );
+				if (page_index === 'ELLIPSIS') {
+					div_element.textContent = '…';
+					div_element.classList.add( 'pe-none' );
+					div_element.classList.remove( 'btn-light' );
+				} else {
+					div_element.dataset.queryPage = page_index;
+					div_element.textContent = page_index;
+					
+					if (page_index === current_page) {
+						div_element.classList.add( 'btn-dark', 'pe-none' );
+					}
 				}
 				
 				pagination_container.append( div_element );
-			}
+			} );
 		},
 		
 		do_query: function(callback = null) {
@@ -542,8 +567,7 @@
 							// Generate pagination links.
 							const pagination_data = {
 								total: options.max_pages,
-								current: options.args.paged,
-								posts_per_page: options.args.posts_per_page
+								current: options.args.paged
 							};
 							
 							plugin.generate_pagination_links( pagination_data );

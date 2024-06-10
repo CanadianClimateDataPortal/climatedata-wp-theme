@@ -2638,40 +2638,16 @@
               }
             });
 
-          if (
-            !item.find(
-              '#map-control-aggregation [data-query-key="sector"] :checked',
-            ).length
-          ) {
+          if (!item.find('#map-control-aggregation [data-query-key="sector"] :checked').length) {
             // nothing is checked
             // find the first enabled input and check it
 
-            let first_visible = item
+            item
               .find('#map-control-aggregation .form-check:visible')
-              .first();
-
-            console.log('visible', first_visible);
-
-            options.query.sector = $(document).cdc_app(
-              'query.update_value',
-              options.query,
-              {
-                item: first_visible.find('.form-check-input'),
-                key: 'sector',
-                val: first_visible.find('.form-check-input').val(),
-              },
-            );
-
-            // item
-            //   .find(
-            //     '#map-control-aggregation .form-check-input[data-query-key="sector"]:not([disabled])',
-            //   )
-            //   .first()
-            //   .prop('checked', true);
-            // .trigger('change');
+              .first()
+              .find('input[type=radio]')
+              .trigger('click');
           }
-
-          // item.find('#map-control-aggregation :checked').trigger('change');
         } else {
           item.find('#map-control-aggregation').hide();
         }

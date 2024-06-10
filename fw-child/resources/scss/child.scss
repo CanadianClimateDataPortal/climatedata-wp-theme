@@ -228,6 +228,11 @@ p {
   @include full-size;
 }
 
+.bg-blur {
+  backdrop-filter: blur(10px);
+  background-color: transparent;
+}
+
 .font-family-serif {
   font-family: $font-family-serif;
 }

@@ -108,7 +108,7 @@ msgstr ""
 msgid "Variable"
 msgstr "Variable"
 
-#: template/menu-overlay.php:237
+#: template/menu-overlay.php:238
 msgid "All Variables"
 msgstr ""
 
@@ -200,7 +200,7 @@ msgstr ""
 #: template/map/control-bar.php:42
 #: template/map/controls/download.php:5
 #: template/map/controls/download.php:44
-#: template/menu-overlay.php:195
+#: template/menu-overlay.php:196
 msgid "Download"
 msgstr "Télécharger"
 
@@ -1222,30 +1222,30 @@ msgstr ""
 msgid "Climate Data"
 msgstr "Données Climatiques"
 
-#: template/menu-overlay.php:180
+#: template/menu-overlay.php:181
 msgid "Popular Variables"
 msgstr ""
 
-#: template/menu-overlay.php:193
+#: template/menu-overlay.php:194
 #: template/query/map-var-item.php:11
 msgid "View on map"
 msgstr "Voir sur la carte"
 
-#: template/menu-overlay.php:197
+#: template/menu-overlay.php:198
 #: template/query/download-var-item.php:13
 #: template/query/map-var-item.php:13
 msgid "Description"
 msgstr "Description"
 
-#: template/menu-overlay.php:210
+#: template/menu-overlay.php:211
 msgid "Variables by Sector"
 msgstr ""
 
-#: template/newsletter-signup.php:3
+#: template/menu-overlay.php:115
 msgid "Join the newsletter"
 msgstr ""
 
-#: template/newsletter-signup.php:11
+#: template/newsletter-signup.php:10
 msgid "Your email address"
 msgstr "Votre adresse courriel"
 

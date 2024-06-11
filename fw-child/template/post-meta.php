@@ -9,9 +9,12 @@ $tax_news_author = get_the_terms( $news_post_id, 'news-author' );
 // Initialize current language.
 $current_lang = 'en';
 
-if ( isset( $GLOBALS['fw'] ) && isset( $GLOBALS['fw']['current_lang'] ) ) {
+if ( isset( $GLOBALS['fw'] ) && isset( $GLOBALS['fw']['current_lang_code'] ) && in_array( $GLOBALS['fw']['current_lang_code'], array(
+		'en',
+		'fr'
+	), true ) ) {
 	$current_lang = $GLOBALS['fw']['current_lang_code'];
-} 
+}
 ?>
 
 <div class="news-meta-block p-3 border border-gray-600 row">

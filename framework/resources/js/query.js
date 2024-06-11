@@ -444,8 +444,6 @@
 			const pagination_container = $( '.fw-query-pagination-pages' );
 			
 			if (!pagination_container) {
-				// console.error( 'Unable to find the element with class "fw-query-pagination-pages".' );
-				
 				return;
 			}
 			
@@ -454,8 +452,6 @@
 			const current_page = parseInt( pagination_data.current );
 			
 			if (isNaN( total_pages ) || isNaN( current_page ) || total_pages <= 0 ) {
-				// console.error('Invalid total pages or current page values.');
-				
 				pagination_container.remove();
 				
 				return;
@@ -464,7 +460,11 @@
 			// Clean pagination container HTML.
 			pagination_container.html( '' );
 			
-			// Pagination algorithm.
+			/**
+			 * Pagination algorithm.
+			 * 
+			 * See more: https://www.zacfukuda.com/blog/pagination-algorithm
+			 */
 			const pagination_map = (function ( {current, max} ) {
 				if (!current || !max) return null;
 				
@@ -475,12 +475,14 @@
 				if (current === 1 && max === 1) return {current, prev, next, items};
 				if (current > 4) items.push( 'ELLIPSIS' );
 				
-				let r = 2, r1 = current - r, r2 = current + r;
+				let page_display_radius = 2,
+					left_range_start = current - page_display_radius,
+					right_range_end = current + page_display_radius;
 				
-				for (let i = r1 > 2 ? r1 : 2; i <= Math.min( max, r2 ); i++) items.push( i );
+				for (let i = left_range_start > 2 ? left_range_start : 2; i <= Math.min( max, right_range_end ); i++) items.push( i );
 				
-				if (r2 + 1 < max) items.push( 'ELLIPSIS' );
-				if (r2 < max) items.push( max );
+				if (right_range_end + 1 < max) items.push( 'ELLIPSIS' );
+				if (right_range_end < max) items.push( max );
 				
 				return {current, prev, next, items};
 			})( {current: current_page, max: total_pages} );

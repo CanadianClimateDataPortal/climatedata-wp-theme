@@ -9,7 +9,7 @@
 	
 	<a href="#" class="flex-drawer-trigger stretched-link"></a>
 	
-	<div class="var-item-img bg-gray-400" style="background-image: url(<?php echo get_the_post_thumbnail_url ( $item['id'], 'large' ); ?>);"></div>
+	<div class="var-item-img bg-gray-400" style="background-image: url(<?php echo get_the_post_thumbnail_url ( $item['id'], 'medium_large' ); ?>);"></div>
 	
 	<div class="var-item-text bg-white">
 		<div class="var-item-text-inner">

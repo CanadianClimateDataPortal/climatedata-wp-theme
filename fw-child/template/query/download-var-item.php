@@ -1,7 +1,7 @@
 <div class="p-2">
 	
 	<div class="var-item-img bg-gray-200">
-		<div class="bg" style="background-image: url(<?php echo get_the_post_thumbnail_url ( $item['id'], 'medium' ); ?>);"></div>
+		<div class="bg" style="background-image: url(<?php echo get_the_post_thumbnail_url ( $item['id'], 'medium_large' ); ?>);"></div>
 	</div>
 	
 	<div class="var-item-text p-3">

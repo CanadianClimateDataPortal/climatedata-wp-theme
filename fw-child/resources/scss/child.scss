@@ -959,7 +959,7 @@ $query-card-hover-padding: 0.75rem;
 // Pagination
 //
 
-@media (max-width: 1000px) {
+@include media-breakpoint-down(lg) {
   .fw-query-pagination {
     flex-wrap: wrap;
 

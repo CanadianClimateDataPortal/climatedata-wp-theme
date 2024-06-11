@@ -9,8 +9,8 @@ $tax_news_author = get_the_terms( $news_post_id, 'news-author' );
 // Initialize current language.
 $current_lang = 'en';
 
-if ( isset( $item['lang'] ) ) {
-	$current_lang = 'fr';
+if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), true ) ) {
+	$current_lang = $item['lang'];
 }
 ?>
 

@@ -47,7 +47,10 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 				<p class="text-gray-600">
 					<?php
 					echo implode( ', ', array_map( function ( $term ) use ( $current_lang ) {
-						return ( 'en' === $current_lang ) ? $term->name : get_field( 'admin_term_title_fr', $term );
+						$term_name_fr = get_field( 'admin_term_title_fr', $term );
+						$term_name_fr = ( empty( $term_name_fr ) ) ? $term->name : $term_name_fr;
+
+						return ( 'en' === $current_lang ) ? $term->name : $term_name_fr;
 					}, $tax_news_author ) ); ?>
 				</p>
 			</div>
@@ -63,7 +66,10 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 				<p class="text-gray-600">
 					<?php
 					echo implode( ', ', array_map( function ( $term ) use ( $current_lang ) {
-						return ( 'en' === $current_lang ) ? $term->name : get_field( 'admin_term_title_fr', $term );
+						$term_name_fr = get_field( 'admin_term_title_fr', $term );
+						$term_name_fr = ( empty( $term_name_fr ) ) ? $term->name : $term_name_fr;
+
+						return ( 'en' === $current_lang ) ? $term->name : $term_name_fr;
 					}, $tax_news_topic ) ); ?>
 				</p>
 			</div>

@@ -36,8 +36,11 @@ if ( isset( $GLOBALS['fw'] ) && isset( $GLOBALS['fw']['current_lang_code'] ) && 
 			<span class="mb-1 all-caps text-blue-100 d-block"><?php _e( 'Author', 'cdc' ); ?></span>
 
 			<?php
-			echo implode( ', ', array_map( function ( $term ) {
-				return ( 'en' === $current_lang ) ? $term->name : get_field( 'admin_term_title_fr', $term );
+			echo implode( ', ', array_map( function ( $term ) use ( $current_lang ) {
+				$term_name_fr = get_field( 'admin_term_title_fr', $term );
+				$term_name_fr = ( empty( $term_name_fr ) ) ? $term->name : $term_name_fr;
+
+				return ( 'en' === $current_lang ) ? $term->name : $term_name_fr;
 			}, $tax_news_author ) ); ?>
 		</div>
 		<?php
@@ -50,8 +53,11 @@ if ( isset( $GLOBALS['fw'] ) && isset( $GLOBALS['fw']['current_lang_code'] ) && 
 			<span class="mb-1 all-caps text-blue-100 d-block"><?php _e( 'Topics', 'cdc' ); ?></span>
 
 			<?php
-			echo implode( ', ', array_map( function ( $term ) {
-				return ( 'en' === $current_lang ) ? $term->name : get_field( 'admin_term_title_fr', $term );
+			echo implode( ', ', array_map( function ( $term ) use ( $current_lang ) {
+				$term_name_fr = get_field( 'admin_term_title_fr', $term );
+				$term_name_fr = ( empty( $term_name_fr ) ) ? $term->name : $term_name_fr;
+
+				return ( 'en' === $current_lang ) ? $term->name : $term_name_fr;
 			}, $tax_news_topic ) ); ?>
 		</div>
 		<?php

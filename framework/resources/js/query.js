@@ -479,10 +479,17 @@
 					left_range_start = current - page_display_radius,
 					right_range_end = current + page_display_radius;
 				
-				for (let i = left_range_start > 2 ? left_range_start : 2; i <= Math.min( max, right_range_end ); i++) items.push( i );
+				for (let i = left_range_start > 2 ? left_range_start : 2; i <= Math.min( max, right_range_end ); i++) {
+					items.push( i );
+				}
 				
-				if (right_range_end + 1 < max) items.push( 'ELLIPSIS' );
-				if (right_range_end < max) items.push( max );
+				if (right_range_end + 1 < max) {
+					items.push( 'ELLIPSIS' );
+				}
+				
+				if (right_range_end < max) {
+					items.push( max );
+				}
 				
 				return {current, prev, next, items};
 			})( {current: current_page, max: total_pages} );

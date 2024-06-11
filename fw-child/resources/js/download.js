@@ -2571,50 +2571,42 @@
 
       // DATA TAB
 
-      // dataset
-
       if (fields) {
-        // enable all
-        item
-          .find('#map-control-dataset .form-check-input')
-          .prop('disabled', false);
-
-        item.find('#map-control-dataset .form-check-input').each(function () {
-          // dataset isn't available to the variable
-          if (!fields.dataset_availability.includes($(this).val())) {
-            $(this).prop('disabled', true);
-
-            if ($(this).prop('checked') == true) $(this).prop('checked', false);
-          }
-        });
-
-        // console.log('done enabling datasets');
-
-        if (
-          !item.find('#map-control-dataset :input:not([disabled]):checked')
-            .length
-        ) {
-          // nothing is checked
-          // find the first enabled input and check it
-
-          item
-            .find('#map-control-dataset :input:not([disabled])')
-            .first()
-            .prop('checked', true);
-        }
-
-        item.find('#map-control-dataset :input:checked').trigger('change');
-
-        // AREA TAB
-
-        // aggregration
-        // fields.availability
-        // checkboxes - grid/census/health/watershed
-
         if (
           options.request.type != 'station' &&
           options.request.type != 'ahccd'
         ) {
+
+          // Datasets
+          item
+            .find('#map-control-dataset .form-check-input')
+            .prop('disabled', false);
+
+          item.find('#map-control-dataset .form-check-input').each(function () {
+            // dataset isn't available to the variable
+            if (!fields.dataset_availability.includes($(this).val())) {
+              $(this).prop('disabled', true);
+
+              if ($(this).prop('checked') == true) $(this).prop('checked', false);
+            }
+          });
+
+          if (
+            !item.find('#map-control-dataset :input:not([disabled]):checked')
+              .length
+          ) {
+            // nothing is checked
+            // find the first enabled input and check it
+
+            item
+              .find('#map-control-dataset :input:not([disabled])')
+              .first()
+              .prop('checked', true);
+          }
+
+          item.find('#map-control-dataset :input:checked').trigger('change');
+
+          // Aggregations
           item.find('#map-control-aggregation').show();
 
           // enable all

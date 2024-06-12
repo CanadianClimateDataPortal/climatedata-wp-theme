@@ -228,12 +228,12 @@
 				options.elements.pagination.on( 'click', '.fw-query-pagination-btn', function ( e ) {
 					let new_page;
 					
+					// Scroll to top of query container.
+					$( this ).closest( '.fw-container' )[0].scrollIntoView( {behavior: 'smooth'} );
+						
 					// Specified page number.
 					if ($( this ).hasClass( 'page-number' ) && $( this ).data( 'queryPage' )) {
 						new_page = parseInt( $( this ).data( 'queryPage' ) );
-						
-						// Scroll to top of query container.
-						$( this ).closest( '.fw-container' )[0].scrollIntoView( {behavior: 'smooth'} );
 					} else {
 						// Use prev/next buttons.
 						new_page = options.args.paged;

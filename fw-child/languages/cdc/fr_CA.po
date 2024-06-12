@@ -173,14 +173,14 @@ msgstr ""
 #: template/news/query.php:29
 #: template/variable/query.php:29
 msgid "Newest First"
-msgstr ""
+msgstr "Nouveautés d'abord"
 
 #: template/beta-apps/query.php:30
 #: template/learn/query.php:32
 #: template/news/query.php:30
 #: template/variable/query.php:30
 msgid "Oldest First"
-msgstr ""
+msgstr "Anciens d'abord"
 
 #: template/download/control-bar.php:22
 #: template/download/controls/data.php:7

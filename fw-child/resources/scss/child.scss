@@ -866,6 +866,21 @@ $query-card-hover-padding: 0.75rem;
     .card {
       height: 100%;
       transition: 0.25s;
+      
+      &--news {
+        .card-date,
+        .card-authors,
+        .card-topics {
+          font-size: 0.875rem;
+        }
+        
+        .card-topics {
+          span {
+            font-size: 0.75rem;
+            color: $gray-800;
+          }
+        }
+      }
     }
 
     .card-body {
@@ -878,30 +893,6 @@ $query-card-hover-padding: 0.75rem;
 
         &:hover {
           text-decoration: underline;
-        }
-      }
-    }
-
-    .card-meta {
-      gap: 1rem;
-
-      > .col {
-        width: auto;
-        flex: 1;
-      }
-
-      &-item {
-        display: flex;
-        flex-direction: column;
-
-        span {
-          font-size: 0.75rem;
-          font-weight: 600;
-          line-height: 1;
-        }
-
-        p {
-          margin-top: 0.25rem;
         }
       }
     }
@@ -963,3 +954,20 @@ $query-card-hover-padding: 0.75rem;
 //
 
 @import 'pages';
+
+//
+// Pagination
+//
+
+@include media-breakpoint-down(lg) {
+  .fw-query-pagination {
+    flex-wrap: wrap;
+
+    &-pages {
+      margin-top: 1rem;
+      margin-right: 0 !important;
+      order: 3;
+      width: 100%;
+    }
+  }
+}

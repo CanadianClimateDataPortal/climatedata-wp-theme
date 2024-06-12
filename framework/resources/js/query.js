@@ -225,20 +225,33 @@
 			
 			if (options.elements.pagination != null) {
 				
-				options.elements.pagination.on('click', '.fw-query-pagination-btn', function(e) {
+				options.elements.pagination.on( 'click', '.fw-query-pagination-btn', function ( e ) {
+					let new_page;
 					
-					let new_page = options.args.paged
+					// Scroll to top of query container.
+					const query_container = $( this ).closest( '.fw-container' );
 					
-					if ($(this).hasClass('next')) {
-						if (options.max_pages > options.args.paged) {
-							// page number can still go higher
-							new_page += 1
-						}
+					if (query_container.length) {
+						query_container[0].scrollIntoView( {behavior: 'smooth'} );
 					}
-					
-					if ($(this).hasClass('previous')) {
-						if (options.args.paged > 1) {
-							new_page -= 1
+						
+					// Specified page number.
+					if ($( this ).hasClass( 'page-number' ) && $( this ).data( 'queryPage' )) {
+						new_page = parseInt( $( this ).data( 'queryPage' ) );
+					} else {
+						// Use prev/next buttons.
+						new_page = options.args.paged;
+						
+						if ($( this ).hasClass( 'next' )) {
+							if (options.max_pages > options.args.paged) {
+								new_page += 1;
+							}
+						}
+						
+						if ($( this ).hasClass( 'previous' )) {
+							if (options.args.paged > 1) {
+								new_page -= 1;
+							}
 						}
 					}
 					
@@ -248,7 +261,7 @@
 						plugin.do_query()
 					}
 					
-				})
+				} )
 				
 			}
 			
@@ -434,6 +447,82 @@
 			
 		},
 		
+		generate_pagination_links: function ( pagination_data ) {
+			const pagination_container = $( '.fw-query-pagination-pages' );
+			
+			if (!pagination_container) {
+				return;
+			}
+			
+			// Initialize.
+			const total_pages = parseInt( pagination_data.total );
+			const current_page = parseInt( pagination_data.current );
+			
+			if (isNaN( total_pages ) || isNaN( current_page ) || total_pages <= 0 ) {
+				pagination_container.remove();
+				
+				return;
+			}
+			
+			// Clean pagination container HTML.
+			pagination_container.html( '' );
+			
+			/**
+			 * Pagination algorithm.
+			 * 
+			 * See more: https://www.zacfukuda.com/blog/pagination-algorithm
+			 */
+			const pagination_map = (function ( {current, max} ) {
+				if (!current || !max) return null;
+				
+				let prev = current === 1 ? null : current - 1,
+					next = current === max ? null : current + 1,
+					items = [ 1 ];
+				
+				if (current === 1 && max === 1) return {current, prev, next, items};
+				if (current > 4) items.push( 'ELLIPSIS' );
+				
+				let page_display_radius = 2,
+					left_range_start = current - page_display_radius,
+					right_range_end = current + page_display_radius;
+				
+				for (let i = left_range_start > 2 ? left_range_start : 2; i <= Math.min( max, right_range_end ); i++) {
+					items.push( i );
+				}
+				
+				if (right_range_end + 1 < max) {
+					items.push( 'ELLIPSIS' );
+				}
+				
+				if (right_range_end < max) {
+					items.push( max );
+				}
+				
+				return {current, prev, next, items};
+			})( {current: current_page, max: total_pages} );
+			
+			pagination_map.items.forEach( page_index => {
+				const div_element = document.createElement( 'div' );
+				
+				div_element.classList.add( 'fw-query-pagination-btn', 'page-number', 'btn', 'btn-light' );
+				
+				if (page_index === 'ELLIPSIS') {
+					div_element.textContent = '…';
+					div_element.classList.add( 'pe-none' );
+					div_element.classList.remove( 'btn-light' );
+				} else {
+					div_element.dataset.queryPage = page_index;
+					div_element.textContent = page_index;
+					
+					if (page_index === current_page) {
+						div_element.classList.add( 'btn-dark', 'pe-none' );
+					}
+				}
+				
+				pagination_container.append( div_element );
+			} );
+		},
+		
 		do_query: function(callback = null) {
 			
 			let plugin = this,
@@ -491,6 +580,14 @@
 								item.find('.fw-query-pagination-btn.next').removeClass('disabled')
 							}
 							
+							// Generate pagination links.
+							const pagination_data = {
+								total: options.max_pages,
+								current: options.args.paged
+							};
+							
+							plugin.generate_pagination_links( pagination_data );
+
 							data.items.forEach(function(item, i) {
 								
 								// console.log(item)

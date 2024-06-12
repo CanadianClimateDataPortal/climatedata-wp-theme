@@ -68,6 +68,14 @@ if ( isset( $_GET['old-tax'], $_GET['new-tax'], $_GET['cpt'] ) ) {
 						wp_set_post_terms( $post_id, $new_term_id, $new_taxonomy, true );
 					}
 				}
+
+				// Update term FR ACF meta.
+				$new_term_obj      = get_term_by( 'term_id', $new_term_id, $new_taxonomy );
+				$old_term_acf_meta = get_fields( $old_term );
+
+				update_field( 'title_fr', $old_term_acf_meta['title_fr'], $new_term_obj );
+				update_field( 'slug_fr', $old_term_acf_meta['slug_fr'], $new_term_obj );
+				update_field( 'description_fr', $old_term_acf_meta['description_fr'], $new_term_obj );
 			}
 		}
 	}

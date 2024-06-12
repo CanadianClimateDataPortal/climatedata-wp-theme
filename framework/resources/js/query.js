@@ -229,7 +229,11 @@
 					let new_page;
 					
 					// Scroll to top of query container.
-					$( this ).closest( '.fw-container' )[0].scrollIntoView( {behavior: 'smooth'} );
+					const query_container = $( this ).closest( '.fw-container' );
+					
+					if (query_container.length) {
+						query_container[0].scrollIntoView( {behavior: 'smooth'} );
+					}
 						
 					// Specified page number.
 					if ($( this ).hasClass( 'page-number' ) && $( this ).data( 'queryPage' )) {

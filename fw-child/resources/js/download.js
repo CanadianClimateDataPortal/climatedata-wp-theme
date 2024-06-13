@@ -928,7 +928,7 @@
 
             delete options.selection_data[this_gid];
           } else {
-            if (options.query.var == 'idf') {
+            if (options.query.var == 'idf' || options.query.var == 'bdv') {
               // reset existing
               selections.forEach(function (gid) {
                 plugin.update_station_markers([], gid, style_obj);
@@ -995,7 +995,7 @@
       // station selection
 
       item.find('#station-select').on('select2:selecting', function (e) {
-        if (options.query.var == 'idf') {
+        if (options.query.var == 'idf' || options.query.var == 'bdv') {
           $(this)
             .val()
             .forEach(function (gid) {
@@ -2547,7 +2547,7 @@
         item.find('#details-format-json').parent().hide();
       }
 
-      if (options.query.var == 'idf') {
+      if (options.query.var == 'idf' || options.query.var == 'bdv') {
         item.find('#map-control-datepicker').hide();
         item.find('#map-control-format').hide();
         item
@@ -3214,6 +3214,23 @@
               }
             },
           });
+
+          break;
+        case 'bdv':
+
+          let filename = options.selection_data[query.station.join('')].properties.filename[options.lang];
+          station_url = `${geoserver_url}/fileserver/bdv/${options.lang}/${filename}`;
+
+          options.elements.result.head.text(T('Success') + '!');
+          options.elements.result.content.text(
+            T('Click below to download your data'),
+          );
+
+          options.elements.result.btn.attr('href', station_url);
+          options.elements.result.btn.attr('target', '_blank');
+          options.elements.result.btn.show();
+
+          options.elements.result.tab.removeClass('error').addClass('success');
 
           break;
         case 'ahccd':

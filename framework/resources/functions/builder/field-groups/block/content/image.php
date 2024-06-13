@@ -1,3 +1,12 @@
+
+<?php
+$lang = 'en';
+
+if ( isset ( $globals['current_lang_code'] ) ) {
+	$lang = $globals['current_lang_code'];
+}
+?>
+
 <div class="accordion-item">
 	<h2 class="accordion-header" id="element-form-head-content">
 		<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#element-form-content" aria-expanded="true" aria-controls="element-form-content">
@@ -26,8 +35,8 @@
 					<span class="btn btn-outline-secondary element-form-upload-btn">Upload image</span>
 					<span class="btn btn-outline-secondary image-remove d-none">Remove image</span>
 					
-					<input type="hidden" name="inputs-file-id" value="" class="uploader-file-id">
-					<input type="hidden" name="inputs-file-url" value="" class="uploader-file-url">
+					<input type="hidden" name="inputs-file-id-<?php echo $lang ?>" value="" class="uploader-file-id">
+					<input type="hidden" name="inputs-file-url-<?php echo $lang ?>" value="" class="uploader-file-url">
 				</div>
 				
 				<div class="col p-3">
@@ -38,9 +47,9 @@
 			
 			<div class="row row-cols-3">
 				<div class="col p-3 border-end">
-					<label for="inputs-link-type" class="form-label mb-1">Add link</label>
+					<label for="inputs-link-type-<?php echo $lang ?>" class="form-label mb-1">Add link</label>
 					
-					<select name="inputs-link-type" class="form-select conditional-select">
+					<select name="inputs-link-type-<?php echo $lang ?>" class="form-select conditional-select">
 						<option value="">None</option>
 						<option value="post" data-form-condition="#img-link-post">Internal</option>
 						<option value="url" data-form-condition="#img-link-url">URL</option>
@@ -48,9 +57,9 @@
 				</div>
 				
 				<div id="img-link-post" class="col p-3 border-end">
-					<label for="inputs-link-post" class="form-label mb-1">Internal link</label>
+					<label for="inputs-link-post-<?php echo $lang ?>" class="form-label mb-1">Internal link</label>
 					
-					<select name="inputs-link-post" class="form-select">
+					<select name="inputs-link-post-<?php echo $lang ?>" class="form-select">
 						<?php
 						
 							// each post type
@@ -98,15 +107,15 @@
 				</div>
 				
 				<div id="img-link-url" class="col p-3 border-end">
-					<label for="inputs-link-url" class="form-label mb-1">URL</label>
+					<label for="inputs-link-url-<?php echo $lang ?>" class="form-label mb-1">URL</label>
 					
 					<input type="text" class="form-control" name="inputs-link-url">
 				</div>
 				
 				<div id="img-link-target" class="col p-3">
-					<label for="inputs-link-target" class="form-label mb-1">Link target</label>
+					<label for="inputs-link-target-<?php echo $lang ?>" class="form-label mb-1">Link target</label>
 					
-					<select name="inputs-link-target" class="form-select">
+					<select name="inputs-link-target-<?php echo $lang ?>" class="form-select">
 						<option value="">Same window</option>
 						<option value="blank">New window</option>
 					</select>

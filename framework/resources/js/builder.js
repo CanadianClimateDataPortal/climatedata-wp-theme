@@ -2378,8 +2378,8 @@
 			
 				case 'image' :
 					
-					if (element.data.inputs.file.url != '') {
-						let img_urls = JSON.parse(element.data.inputs.file.url)
+					if (element.data.inputs.file.url[options.lang] != '') {
+						let img_urls = JSON.parse(element.data.inputs.file.url[options.lang])
 					
 						element.item.find('.fw-element-inner').html('<img src="' + img_urls.full + '">')
 					} else {

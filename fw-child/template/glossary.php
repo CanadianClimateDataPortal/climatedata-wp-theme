@@ -1,51 +1,52 @@
 <?php
 
-$glossary = array();
+$is_fr = $GLOBALS['fw']['current_lang_code'] != 'en';
+$order_by_field = $is_fr ? 'glossary_term_fr' : 'title';
 
-$glossary_query = new WP_Query ( array (
-	'post_type' => 'definition',
-	'posts_per_page' => -1,
-	'orderby' => 'title',
-	'order' => 'asc'
-) );
+$glossary_query_args = array(
+    'post_type' => 'definition',
+    'posts_per_page' => -1,
+    'orderby' => $order_by_field,
+    'order' => 'asc'
+);
+
+if ( $is_fr ) {
+	$glossary_query_args['meta_key'] = $order_by_field;
+}
+
+$glossary_query = new WP_Query($glossary_query_args);
+
 
 if ( $glossary_query->have_posts() ) {
-	
-	$current_letter = '';
-	
-	while ( $glossary_query->have_posts() ) {
-		$glossary_query->the_post();
-		
-		$first_letter = substr ( get_the_title(), 0, 1 );
-		
-		if ( !isset ( $glossary[$first_letter] ) ) {
-			$glossary[$first_letter] = array();
-		}
-		
-		$term = array (
-			'id' => get_the_ID(),
-			'term' => get_the_title(),
-			'definition' => get_field ( 'glossary_definition' )
-		);
-		
-		if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
-			
-			$term = array (
-				'id' => get_the_ID(),
-				'term' => get_field ( 'glossary_term_fr'),
-				'definition' => get_field ( 'glossary_definition_fr' )
-			);
-			
-		}
-		
-		$glossary[$first_letter][] = $term;
-		
-	}
+
+	$glossary = array();
+
+    while ( $glossary_query->have_posts() ) {
+        $glossary_query->the_post();
+        
+		$term = array(
+            'id' => get_the_ID(),
+            'term' => $is_fr ? get_field('glossary_term_fr') : get_the_title(),
+            'definition' => $is_fr ? get_field('glossary_definition_fr') : get_field('glossary_definition')
+        );
+        
+        $first_letter = mb_substr($term['term'], 0, 1);
+        
+        if ( !isset($glossary[$first_letter]) ) {
+            $glossary[$first_letter] = array();
+        }
+        
+        $glossary[$first_letter][] = $term;
+    }
+
 }
+
+wp_reset_postdata();
+
 
 // dumpit ( $glossary );
 
-if ( !empty ( $glossary ) ) :?>
+if ( $glossary ) :?>
 
 <nav id="glossary-list-nav" class="d-none d-md-flex bg-light sticky-top border overflow-hidden">
 	<ul class="nav offset-1 flex-nowrap">

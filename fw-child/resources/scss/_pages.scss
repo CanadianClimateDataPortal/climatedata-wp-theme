@@ -1648,6 +1648,40 @@ body.tab-drawer-open {
 #glossary-list {
   background-color: $gray-100;
 
+  &-nav {
+    .nav {
+      position: relative;
+      left: -2px;
+    }
+
+    .nav-item {
+      a,
+      span {
+        display: inline-block;
+        width: 1.6875rem;
+        padding: .625rem 0;
+        border-right: 1px solid transparent;
+        border-left: 1px solid transparent;
+        text-align: center;
+        @include all-caps;
+        
+        &.active,
+        &:hover:not(span) {
+          background-color: $white;
+          border-color: $border-color;
+          }
+          
+          @include media-breakpoint-up(lg) {
+          width: 2.25rem;
+        }
+      }
+
+      span {
+        cursor: default;
+      }
+    }
+  }
+
   .letter {
     background-color: $gray-200;
 
@@ -1683,7 +1717,7 @@ body.tab-drawer-open {
 
   dd {
     padding-top: 0.375rem;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
   }
 }
 

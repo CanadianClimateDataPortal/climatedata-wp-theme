@@ -189,6 +189,38 @@ const $ = jQuery;
       }
     }
 
+    // SMOOTH SCROLL
+
+    let scrollOffset = 0;
+
+    if ($('#glossary-list-nav').length) {
+      scrollOffset = $('#glossary-list-nav').outerHeight();
+    }
+
+    $('a.smooth-scroll').click(function(event) {
+      event.preventDefault();
+      
+      const target = $($(this).attr('href'));
+
+      if (target.length) {
+        const scrollPosition = target.offset().top - scrollOffset;
+
+        $('html, body').animate({
+          scrollTop: scrollPosition
+        }, 300);
+      }
+    });
+
+    //
+    // GLOSSARY
+    //
+
+    if ($('#glossary-list-nav').length) {
+      let scrollSpy = new bootstrap.ScrollSpy(document.body, {
+        target: '#glossary-list-nav'
+      });
+    }
+
     //
     // VENDOR
     //

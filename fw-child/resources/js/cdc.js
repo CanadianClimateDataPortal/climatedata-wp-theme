@@ -912,6 +912,10 @@
 
                 this_map.layers.station_clusters = L.markerClusterGroup();
 
+                if (!layer_data) {
+                  return;
+                }
+
                 // create the layer
 
                 const filtered_layer_data = {...layer_data};

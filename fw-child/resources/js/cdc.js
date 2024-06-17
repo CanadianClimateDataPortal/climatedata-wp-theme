@@ -451,9 +451,17 @@
           });
         }
 
+        // Remove the AHCCD legend if not showing station data
+        if (query.sector !== 'station') {
+          for (let key in options.maps) {
+            const map = options.maps[key];
+            if (map.ahccd_legend) {
+              map.object.removeControl(map.ahccd_legend);
+            }
+          }
+        }
+
         if (options.page != 'map') {
-          // console.log(options.request);
-          // console.log(query.sector);
 
           if (
             options.request == null ||
@@ -468,8 +476,6 @@
         }
 
         let first_map = options.maps[Object.keys(options.maps)[0]];
-
-        // console.log('switch sector: ' + query.sector);
 
         switch (query.sector) {
           case 'gridded_data':
@@ -661,9 +667,13 @@
 
             break;
           case 'station':
-            console.log('STATIONS');
+            let is_ahccd = (request && request.type === 'ahccd') || query.var === 'ahccd';
 
-            if (query.var_id === options.current_var_id && query.dataset === options.current_dataset ) {
+            if (query.var === '') {
+              is_ahccd = query.dataset === 'ahccd';
+            }
+
+            if (query.var_id === options.current_var_id && query.dataset === options.current_dataset) {
               // apply hooks
               options.hooks['maps.get_layer'].forEach(function (hook) {
                 hook.fn.apply(hook.obj, [query, null]);
@@ -675,9 +685,56 @@
 
             options.choro.path = null;
 
-            // remove the legend
             for (let key in options.maps) {
-              options.maps[key].object.removeControl(options.maps[key].legend);
+              const map = options.maps[key];
+              // remove the legend
+              map.object.removeControl(map.legend);
+
+              // Remove the AHCCD legend
+              if (map.ahccd_legend) {
+                map.object.removeControl(map.ahccd_legend);
+              }
+            }
+
+            // Show the AHCCD legend, if applicable
+            if (is_ahccd) {
+              for (let key in options.maps) {
+                const map = options.maps[key];
+
+                map.ahccd_legend = L.control({position: 'topright'});
+                map.ahccd_legend.onAdd = function () {
+                  let variable_types = var_data['acf']['ahccd_station_type'];
+
+                  if (!variable_types.length) {
+                    variable_types = ['P', 'T'];
+                  }
+
+                  const div = document.createElement('div');
+                  div.className = 'ahccd_legend';
+                  let innerHTML = ['<div class="title">' + T('Station\'s data') + '</div>'];
+
+                  const values = {
+                    'P': T('Precipitation only'),
+                    'T': T('Temperature only'),
+                    'B': T('Precipitation and temperature'),
+                  }
+
+                  for (let key of [...variable_types, 'B']) {
+                    const label = values[key];
+                    if (!label) {
+                      continue;
+                    }
+                    innerHTML.push('<div class="entry"><img src="' + ahccd_icons[key].options.iconUrl + '"><span>');
+                    innerHTML.push(label);
+                    innerHTML.push('</span></div>');
+                  }
+
+                  div.innerHTML = innerHTML.join('');
+                  return div;
+                };
+
+                map.ahccd_legend.addTo(map.object);
+              }
             }
 
             // hide upload pane
@@ -856,12 +913,6 @@
                 this_map.layers.station_clusters = L.markerClusterGroup();
 
                 // create the layer
-
-                let is_ahccd = (request && request.type === 'ahccd') || query.var === 'ahccd';
-
-                if (query.var === '') {
-                  is_ahccd = query.dataset === 'ahccd';
-                }
 
                 const filtered_layer_data = {...layer_data};
 

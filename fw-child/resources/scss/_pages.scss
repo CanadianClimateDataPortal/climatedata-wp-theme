@@ -1361,6 +1361,24 @@ body.tab-drawer-open {
       transition: left $td-slide-transition-duration ease 0s;
     }
   }
+
+  .ahccd_legend {
+    background-color: rgba($white, 0.75);
+    border: 1px solid $gray-700;
+    margin-right: 20px;
+    padding: 15px;
+
+    .title {
+      font-weight: bold;
+    }
+
+    .entry {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
+    }
+  }
 }
 
 // DATA TAB

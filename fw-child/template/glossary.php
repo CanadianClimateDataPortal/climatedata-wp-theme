@@ -56,18 +56,20 @@ if ( is_array( $glossary ) && ! empty( $glossary ) ) { ?>
 
 	<div class="container-fluid">
 
-		<nav id="glossary-list-nav" class="row bg-light sticky-top border border-top-0 overflow-hidden">
+		<nav id="glossary-list-nav" class="row bg-light overflow-hidden">
 			<div class="col-2 col-sm-1 bg-gray-400"></div>
-			<ul class="nav col-14 col-sm-15 col-xl-14 justify-content-md-between">
+			<ul class="nav col-14 col-sm-15 col-xl-14 bg-light justify-content-lg-between">
 	
 				<?php foreach ( range( 'A', 'Z' ) as $letter ) { ?>
 	
 					<li class="nav-item">
-						<?php if ( array_key_exists( $letter, $glossary ) ) { ?>
-							<a class="smooth-scroll" href="#<?php echo $letter ?>"><?php echo $letter ?></a>
-						<?php } else { ?>
-							<span class="text-gray-500"><?php echo $letter ?></span>
-						<?php } ?>
+						<div class="ratio ratio-1x1">
+							<?php if ( array_key_exists( $letter, $glossary ) ) { ?>
+								<a class="smooth-scroll" href="#<?php echo $letter ?>"><?php echo $letter ?></a>
+							<?php } else { ?>
+								<span class="text-gray-500"><?php echo $letter ?></span>
+							<?php } ?>
+						</div>
 					</li>
 	
 				<?php } ?>

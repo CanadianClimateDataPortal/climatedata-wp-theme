@@ -1649,20 +1649,23 @@ body.tab-drawer-open {
   background-color: $gray-100;
 
   &-nav {
-    .nav {
-      position: relative;
-      left: -2px;
-    }
+    position: sticky;
+    top: -1px;
+    z-index: 1020;
+    border-bottom: 1px solid $border-color;
 
     .nav-item {
       display: flex;
-      width: 1.3125rem;
+      width: 1.875rem;
+      margin-left: -1px;
+      margin-bottom: -1px;
       
-      @include media-breakpoint-up(sm) {
+      @include media-breakpoint-up(xsm) {
         width: 2.25rem;
       }
       
-      @include media-breakpoint-up(md) {
+      @include media-breakpoint-up(lg) {
+        position: relative;
         flex: 1;
         width: 100%;
       }
@@ -1671,11 +1674,12 @@ body.tab-drawer-open {
       span {
         display: inline-block;
         width: 100%;
-        padding: .625rem 0;
+        padding: .4375rem 0 .3125rem;
         border: 1px solid transparent;
-        text-align: center;
         color: $gray-800;
+        text-align: center;
         font-family: $font-family-serif;
+        line-height: 1;
         @include all-caps;
 
         &.active,
@@ -1689,9 +1693,22 @@ body.tab-drawer-open {
           font-weight: 700;
         }
 
-        @include media-breakpoint-up(md) {
+        @include media-breakpoint-up(xsm) {
+          padding: .625rem 0 .5rem;
+        }
+        
+        @include media-breakpoint-up(lg) {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 100%;
           border-top: none;
           border-bottom: none;
+        }
+
+        @include media-breakpoint-up(xxl) {
+          font-size: 1.0625rem;
         }
       }
 
@@ -1742,7 +1759,7 @@ body.tab-drawer-open {
   }
 
   dt {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     color: $gray-600;
   }
 

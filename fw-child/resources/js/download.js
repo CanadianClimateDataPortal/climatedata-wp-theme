@@ -1390,10 +1390,7 @@
 
           if (feature_ID == this_gid) {
             if (selections.includes(this_gid)) {
-              if (
-                options.query.var == 'ahccd' ||
-                options.query.dataset == 'ahccd'
-              ) {
+              if (options.query.var === 'ahccd' || options.request.type === 'ahccd') {
                 layer.setIcon(ahccd_icons[layer.feature.properties.type + 'r']);
               } else {
                 layer.setStyle({
@@ -1402,10 +1399,7 @@
                 });
               }
             } else {
-              if (
-                options.query.var == 'ahccd' ||
-                options.query.dataset == 'ahccd'
-              ) {
+              if (options.query.var === 'ahccd' || options.request.type === 'ahccd') {
                 layer.setIcon(ahccd_icons[layer.feature.properties.type]);
               } else {
                 layer.setStyle({

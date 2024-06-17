@@ -57,7 +57,7 @@ if ( is_array( $glossary ) && ! empty( $glossary ) ) { ?>
 	<div class="container-fluid">
 
 		<nav id="glossary-list-nav" class="row bg-light overflow-hidden">
-			<div class="col-2 col-sm-1 bg-gray-400"></div>
+			<div class="col-2 col-sm-1 bg-gray-200 bg-opacity-60"></div>
 			<ul class="nav col-14 col-sm-15 col-xl-14 bg-light justify-content-lg-between">
 	
 				<?php foreach ( range( 'A', 'Z' ) as $letter ) { ?>

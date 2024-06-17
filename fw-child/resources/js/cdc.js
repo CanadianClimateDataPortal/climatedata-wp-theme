@@ -973,11 +973,13 @@
                     e.layer.bindTooltip(station_name).openTooltip(e.latlng);
                   })
                   .on('click', function (e) {
-                    let station_id =
-                      query.var == 'climate-normals' ||
-                      query.var == 'station-data'
-                        ? e.layer.feature.id
-                        : e.layer.feature.properties.ID;
+                    let station_id = e.layer.feature.properties.ID;
+
+                    if (query.var === 'climate-normals') {
+                      station_id = e.layer.feature.id;
+                    } else if (query.var === 'station-data') {
+                      station_id = e.layer.feature.properties.STN_ID;
+                    }
 
                     let style_obj = {
                       color: marker_fill,
@@ -2061,9 +2063,14 @@
 
         if (station_data != undefined) {
           station_data.features.forEach(function (station) {
-            if (query.var == 'climate-normals' || query.var == 'station-data') {
+            if (query.var === 'climate-normals') {
               station_options.push({
                 id: station.id,
+                name: station.properties.STATION_NAME,
+              });
+            } else if (query.var === 'station-data') {
+              station_options.push({
+                id: station.properties.STN_ID,
                 name: station.properties.STATION_NAME,
               });
             } else {

@@ -1381,11 +1381,10 @@
         options.maps[key].layers.stations.eachLayer(function (layer) {
           let feature_ID = layer.feature.properties.ID; //parseInt(layer.feature.properties.ID);
 
-          if (
-            options.query.var == 'climate-normals' ||
-            options.query.var == 'station-data'
-          ) {
+          if (options.query.var === 'climate-normals') {
             feature_ID = layer.feature.id;
+          } else if (options.query.var === 'station-data') {
+            feature_ID = layer.feature.properties.STN_ID;
           }
 
           if (feature_ID == this_gid) {

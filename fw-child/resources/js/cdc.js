@@ -863,7 +863,22 @@
                   is_ahccd = query.dataset === 'ahccd';
                 }
 
-                this_map.layers.stations = L.geoJson(layer_data, {
+                const filtered_layer_data = {...layer_data};
+
+                // If AHCCD, we keep only stations whose type matches the variable type(s)
+                if (is_ahccd) {
+                  const variable_types = var_data['acf']['ahccd_station_type'];
+
+                  // If no type has been defined, we default to not filter any station
+                  if (variable_types.length) {
+                    filtered_layer_data.features = layer_data.features.filter(function (feature) {
+                      const type = feature.properties.type;
+                      return (type === 'B' || variable_types.includes(type));
+                    });
+                  }
+                }
+
+                this_map.layers.stations = L.geoJson(filtered_layer_data, {
                   pointToLayer: function (feature, latlng) {
 
                     if (is_ahccd) {

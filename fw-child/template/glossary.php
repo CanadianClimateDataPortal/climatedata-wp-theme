@@ -1,101 +1,106 @@
 <?php
+// Initialize current language.
+$current_lang = 'en';
 
-$is_fr = $GLOBALS['fw']['current_lang_code'] != 'en';
-$order_by_field = $is_fr ? 'glossary_term_fr' : 'title';
+if ( isset( $GLOBALS['fw'] ) && isset( $GLOBALS['fw']['current_lang_code'] ) && in_array( $GLOBALS['fw']['current_lang_code'], array(
+		'en',
+		'fr'
+	), true ) ) {
+	$current_lang = $GLOBALS['fw']['current_lang_code'];
+}
+
+$is_fr = 'fr' === $current_lang;
 
 $glossary_query_args = array(
-    'post_type' => 'definition',
-    'posts_per_page' => -1,
-    'orderby' => $order_by_field,
-    'order' => 'asc'
+	'post_type'      => 'definition',
+	'posts_per_page' => -1,
+	'order'          => 'asc'
 );
 
 if ( $is_fr ) {
-	$glossary_query_args['meta_key'] = $order_by_field;
+	$glossary_query_args['meta_key'] = 'glossary_term_fr';
+} else {
+	$glossary_query_args['orderby'] = 'title';
 }
 
-$glossary_query = new WP_Query($glossary_query_args);
+$glossary_query = new WP_Query( $glossary_query_args );
 
 
 if ( $glossary_query->have_posts() ) {
 
 	$glossary = array();
 
-    while ( $glossary_query->have_posts() ) {
-        $glossary_query->the_post();
-        
+	while ( $glossary_query->have_posts() ) {
+		$glossary_query->the_post();
+
 		$term = array(
-            'id' => get_the_ID(),
-            'term' => $is_fr ? get_field('glossary_term_fr') : get_the_title(),
-            'definition' => $is_fr ? get_field('glossary_definition_fr') : get_field('glossary_definition')
-        );
-        
-        $first_letter = mb_substr($term['term'], 0, 1);
-        
-        if ( !isset($glossary[$first_letter]) ) {
-            $glossary[$first_letter] = array();
-        }
-        
-        $glossary[$first_letter][] = $term;
-    }
+			'id'         => get_the_ID(),
+			'term'       => $is_fr ? get_field( 'glossary_term_fr' ) : get_the_title(),
+			'definition' => $is_fr ? get_field( 'glossary_definition_fr' ) : get_field( 'glossary_definition' )
+		);
+
+		$first_letter = mb_substr( $term['term'], 0, 1 );
+
+		if ( ! isset( $glossary[ $first_letter ] ) ) {
+			$glossary[ $first_letter ] = array();
+		}
+
+		$glossary[ $first_letter ][] = $term;
+	}
 
 }
 
 wp_reset_postdata();
 
+if ( is_array( $glossary ) && ! empty( $glossary ) ) { ?>
 
-// dumpit ( $glossary );
+	<nav id="glossary-list-nav" class="d-none d-md-flex bg-light sticky-top border overflow-hidden">
+		<ul class="nav offset-1 flex-nowrap">
 
-if ( $glossary ) :?>
+			<?php foreach ( range( 'A', 'Z' ) as $letter ) { ?>
 
-<nav id="glossary-list-nav" class="d-none d-md-flex bg-light sticky-top border overflow-hidden">
-	<ul class="nav offset-1 flex-nowrap">
+				<li class="nav-item">
+					<?php if ( array_key_exists( $letter, $glossary ) ) { ?>
+						<a class="smooth-scroll" href="#<?php echo $letter ?>"><?php echo $letter ?></a>
+					<?php } else { ?>
+						<span class="text-gray-500"><?php echo $letter ?></span>
+					<?php } ?>
+				</li>
 
-		<?php foreach ( range('A', 'Z') as $letter ) :?>
+			<?php } ?>
 
-			<li class="nav-item">
-				<?php if (array_key_exists($letter, $glossary)): ?>
-					<a class="smooth-scroll" href="#<?php echo $letter ?>"><?php echo $letter ?></a>
-				<?php else : ?>
-					<span class="text-gray-500"><?php echo $letter ?></span>
-				<?php endif; ?>
-			</li>
+		</ul>
+	</nav>
 
-		<?php endforeach; ?>
+	<?php foreach ( $glossary as $letter => $terms ) { ?>
 
-	</ul>
-</nav>
+		<div id="<?php echo $letter; ?>" class="row">
 
-<?php foreach ( $glossary as $letter => $terms ) :?>
-
-	<div id="<?php echo $letter; ?>" class="row">
-
-		<div class="col-1 letter border-bottom border-gray-400">
-			<h2 class="font-family-serif text-secondary"><?php echo $letter; ?></h2>
-		</div>
-		
-		<dl class="col term-list mb-0 border-bottom">
-			
-			<?php foreach ( $terms as $term ) : ?>
-			
-			<div id="def-<?php echo $term['id']; ?>" class="row py-4 align-items-start">
-			
-				<dt class="col-4-of-15 offset-1-of-15 pe-3">
-					<?php echo $term['term']; ?>
-				</dt>
-				
-				<dd class="col-6-of-15">
-					<?php echo $term['definition']; ?>
-				</dd>
-				
+			<div class="col-1 letter border-bottom border-gray-400">
+				<h2 class="font-family-serif text-secondary"><?php echo $letter; ?></h2>
 			</div>
-			
-			<?php endforeach; ?>
 
-		</dl>
+			<dl class="col term-list mb-0 border-bottom">
 
-	</div>
+				<?php foreach ( $terms as $term ) { ?>
 
-<?php endforeach; ?>
+					<div id="def-<?php echo $term['id']; ?>" class="row py-4 align-items-start">
 
-<?php endif; ?>
+						<dt class="col-4-of-15 offset-1-of-15 pe-3">
+							<?php echo $term['term']; ?>
+						</dt>
+
+						<dd class="col-6-of-15">
+							<?php echo $term['definition']; ?>
+						</dd>
+
+					</div>
+
+				<?php } ?>
+
+			</dl>
+
+		</div>
+
+	<?php }
+}

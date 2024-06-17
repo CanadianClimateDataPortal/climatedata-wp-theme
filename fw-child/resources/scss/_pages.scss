@@ -1664,14 +1664,14 @@ body.tab-drawer-open {
         border-left: 1px solid transparent;
         text-align: center;
         @include all-caps;
-        
+
         &.active,
         &:hover:not(span) {
           background-color: $white;
           border-color: $border-color;
-          }
-          
-          @include media-breakpoint-up(lg) {
+        }
+
+        @include media-breakpoint-up(lg) {
           width: 2.25rem;
         }
       }

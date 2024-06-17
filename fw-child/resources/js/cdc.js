@@ -123,6 +123,7 @@
       current_sector: 'gridded_data',
       current_dataset: null,
       current_var: null,
+      current_var_id: null,
       current_grid: null,
       hooks: {
         'maps.get_layer': Array(1000),
@@ -662,7 +663,7 @@
           case 'station':
             console.log('STATIONS');
 
-            if (query.var === options.current_var && query.dataset === options.current_dataset && options.current_dataset === query.dataset) {
+            if (query.var_id === options.current_var_id && query.dataset === options.current_dataset ) {
               // apply hooks
               options.hooks['maps.get_layer'].forEach(function (hook) {
                 hook.fn.apply(hook.obj, [query, null]);
@@ -1374,6 +1375,7 @@
 
         options.current_sector = query.sector;
         options.current_var = query.var;
+        options.current_var_id = query.var_id;
         options.current_dataset = query.dataset;
 
         $('body').removeClass('spinner-on');

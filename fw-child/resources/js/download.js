@@ -1610,6 +1610,8 @@
             }
           }
 
+          item.find('#station-select').val('').trigger('change');
+
           break;
 
         case 'percentiles':

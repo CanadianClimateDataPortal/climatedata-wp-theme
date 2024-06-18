@@ -519,18 +519,10 @@ function remove_comments_admin_bar() {
 	$wp_admin_bar->remove_menu ( 'comments' );
 }
 
-function disable_classic_editor_by_post_type($use_block_editor, $post_type) {
-    if ($post_type === 'interactive') {
-        return true;
-    }
-    return $use_block_editor;
-}
-
 add_action ( 'init', 'remove_default_editor' );
 add_action ( 'init', 'remove_comments_post_type_support', 100 );
 add_action ( 'admin_menu', 'remove_comments_admin_menu' );
 add_action ( 'wp_before_admin_bar_render', 'remove_comments_admin_bar' );
-add_filter ( 'use_block_editor_for_post_type', 'disable_classic_editor_by_post_type', 10, 2);
 
 //
 // MISC

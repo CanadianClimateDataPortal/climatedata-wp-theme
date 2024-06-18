@@ -216,7 +216,7 @@ const $ = jQuery;
     //
 
     if ($('#glossary-list-nav').length) {
-      let scrollSpy = new bootstrap.ScrollSpy(document.body, {
+      new bootstrap.ScrollSpy(document.body, {
         target: '#glossary-list-nav'
       });
     }

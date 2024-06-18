@@ -16,7 +16,7 @@ $glossary_query_args = array(
 	'post_type'      => 'definition',
 	'posts_per_page' => -1,
 	'order'          => 'asc',
-	'orderby'		 => 'title'
+	'orderby'        => 'title'
 );
 
 if ( $is_fr ) {

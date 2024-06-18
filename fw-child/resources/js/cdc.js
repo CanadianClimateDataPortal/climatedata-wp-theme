@@ -112,6 +112,7 @@
       maps: {},
       station_data: null,
       idf_data: null,
+      bdv_data: null,
       normals_data: null,
       ahccd_data: null,
       coords: {
@@ -785,9 +786,28 @@
 
                   break;
 
+                case 'bdv':
+                  if (options.bdv_data == null) {
+                    // bdv geojson not yet loaded
+
+                    return $.ajax({
+                      url:
+                        `${geoserver_url}/fileserver/bdv/bdv.json`,
+                      dataType: 'json',
+                      success: function (data) {
+                        options.bdv_data = data;
+                        return { ...options.bdv_data };
+                      },
+                    });
+                  } else {
+                    return { ...options.bdv_data };
+                  }
+
+                  break;
+
                 case 'ahccd':
                   if (options.ahccd_data == null) {
-                    // idf data not yet loaded
+                    // ahccd data not yet loaded
 
                     return $.ajax({
                       url:
@@ -954,20 +974,23 @@
                   },
                 })
                   .on('mouseover', function (e) {
-                    let station_name =
-                      query.var == 'climate-normals' ||
-                      query.var == 'station-data'
-                        ? e.layer.feature.properties.STATION_NAME
-                        : e.layer.feature.properties.Name;
-
-                    if (query.var == 'idf') {
-                      station_name +=
-                        ' (' + e.layer.feature.properties.Elevation_ + ')';
-                    }
-
-                    if (query.var == 'station-data') {
-                      station_name +=
-                        ' (' + e.layer.feature.properties.STN_ID + ')';
+                    let station_name;
+                    const feature_properties = e.layer.feature.properties;
+                    switch(query.var) {
+                      case 'climate-normals':
+                        station_name = feature_properties.STATION_NAME;
+                        break;
+                      case 'station-data':
+                        station_name = `${feature_properties.STATION_NAME} (${feature_properties.STN_ID})`;
+                        break;
+                      case 'idf':
+                        station_name = `${feature_properties.Name} (${feature_properties.Elevation_})`;
+                        break;
+                      case 'bdv':
+                        station_name = feature_properties.Location;
+                        break;
+                      default:
+                        station_name = feature_properties.Name
                     }
 
                     e.layer.bindTooltip(station_name).openTooltip(e.latlng);
@@ -2063,21 +2086,31 @@
 
         if (station_data != undefined) {
           station_data.features.forEach(function (station) {
-            if (query.var === 'climate-normals') {
-              station_options.push({
-                id: station.id,
-                name: station.properties.STATION_NAME,
-              });
-            } else if (query.var === 'station-data') {
-              station_options.push({
-                id: station.properties.STN_ID,
-                name: station.properties.STATION_NAME,
-              });
-            } else {
-              station_options.push({
-                id: station.properties.ID,
-                name: station.properties.Name,
-              });
+            switch (query.var) {
+              case 'climate-normals':
+                station_options.push({
+                  id: station.id,
+                  name: station.properties.STATION_NAME,
+                });
+                break;
+              case 'station-data':
+                station_options.push({
+                  id: station.properties.STN_ID,
+                  name: station.properties.STATION_NAME,
+                });
+                break;
+              case 'bdv':
+                station_options.push({
+                  id: station.properties.ID,
+                  name: station.properties.Location,
+                });
+                break;
+              default:
+                station_options.push({
+                  id: station.properties.ID,
+                  name: station.properties.Name,
+                });
+                break;
             }
           });
 

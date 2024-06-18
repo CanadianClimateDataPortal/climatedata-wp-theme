@@ -2,10 +2,11 @@
 // Initialize current language.
 $current_lang = 'en';
 
-if ( isset( $GLOBALS['fw'] ) && isset( $GLOBALS['fw']['current_lang_code'] ) && in_array( $GLOBALS['fw']['current_lang_code'], array(
-		'en',
-		'fr'
-	), true ) ) {
+if (
+		isset( $GLOBALS['fw'] ) 
+		&& isset( $GLOBALS['fw']['current_lang_code'] )
+		&& in_array( $GLOBALS['fw']['current_lang_code'], array('en','fr'), true )
+) {
 	$current_lang = $GLOBALS['fw']['current_lang_code'];
 }
 
@@ -14,13 +15,13 @@ $is_fr = 'fr' === $current_lang;
 $glossary_query_args = array(
 	'post_type'      => 'definition',
 	'posts_per_page' => -1,
-	'order'          => 'asc'
+	'order'          => 'asc',
+	'orderby'		 => 'title'
 );
 
 if ( $is_fr ) {
 	$glossary_query_args['meta_key'] = 'glossary_term_fr';
-} else {
-	$glossary_query_args['orderby'] = 'title';
+	$glossary_query_args['orderby'] = 'meta_value';
 }
 
 $glossary_query = new WP_Query( $glossary_query_args );
@@ -39,7 +40,9 @@ if ( $glossary_query->have_posts() ) {
 			'definition' => $is_fr ? get_field( 'glossary_definition_fr' ) : get_field( 'glossary_definition' )
 		);
 
-		$first_letter = mb_substr( $term['term'], 0, 1 );
+		$normalized_term = remove_accents( $term['term'] );
+
+		$first_letter = mb_substr( $normalized_term, 0, 1 );
 
 		if ( ! isset( $glossary[ $first_letter ] ) ) {
 			$glossary[ $first_letter ] = array();
@@ -109,7 +112,7 @@ if ( is_array( $glossary ) && ! empty( $glossary ) ) { ?>
 
 		<?php } ?>
 
-	</div> <!-- end .container-fluid ?>
+	</div> <!-- end .container-fluid -->
 
 <?php
 }

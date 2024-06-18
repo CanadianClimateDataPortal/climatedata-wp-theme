@@ -1666,6 +1666,76 @@ body.tab-drawer-open {
 #glossary-list {
   background-color: $gray-100;
 
+  &-nav {
+    position: sticky;
+    top: -1px;
+    z-index: 1020;
+    border-bottom: 1px solid $border-color;
+
+    .nav-item {
+      display: flex;
+      width: 1.875rem;
+      margin-left: -1px;
+      margin-bottom: -1px;
+      
+      @include media-breakpoint-up(xsm) {
+        width: 2.25rem;
+      }
+      
+      @include media-breakpoint-up(lg) {
+        position: relative;
+        flex: 1;
+        width: 100%;
+      }
+
+      a,
+      span {
+        display: inline-block;
+        width: 100%;
+        padding: .4375rem 0 .3125rem;
+        border: 1px solid transparent;
+        color: $gray-800;
+        text-align: center;
+        font-family: $font-family-serif;
+        line-height: 1;
+        @include all-caps;
+
+        &.active,
+        &:hover:not(span) {
+          background-color: $white;
+          border-color: $border-color;
+        }
+
+        &.active {
+          color: $blue-500;
+          font-weight: 700;
+        }
+
+        @include media-breakpoint-up(xsm) {
+          padding: .625rem 0 .5rem;
+        }
+        
+        @include media-breakpoint-up(lg) {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 100%;
+          border-top: none;
+          border-bottom: none;
+        }
+
+        @include media-breakpoint-up(xxl) {
+          font-size: 1.0625rem;
+        }
+      }
+
+      span {
+        cursor: default;
+      }
+    }
+  }
+
   .letter {
     background-color: $gray-200;
 
@@ -1674,8 +1744,20 @@ body.tab-drawer-open {
       top: 120px;
       padding-top: 2rem;
       text-align: center;
-      font-size: 4rem;
+      font-size: 2.75rem;
       font-weight: $font-weight-bold;
+      
+      @include media-breakpoint-up(lg) {
+        font-size: 3.5rem;
+      }
+      
+      @include media-breakpoint-up(xl) {
+        font-size: 4rem;
+      }
+      
+      @include media-breakpoint-up(xxl) {
+        top: 160px;
+      }
     }
   }
 
@@ -1701,7 +1783,10 @@ body.tab-drawer-open {
 
   dd {
     padding-top: 0.375rem;
-    font-size: 0.875rem;
+
+    @include media-breakpoint-up(md) {
+      padding-top: 0;
+    }
   }
 }
 

@@ -193,12 +193,12 @@ const $ = jQuery;
 
     let smoothScrollOffset = 0;
 
-    if ($('#glossary-list-nav').length) {
-      smoothScrollOffset = $('#glossary-list-nav').outerHeight();
-    }
-
     $('a.smooth-scroll').click(function(event) {
       event.preventDefault();
+
+      if ($('#glossary-list-nav').length) {
+        smoothScrollOffset = $('#glossary-list-nav').outerHeight();
+      }
       
       const target = $($(this).attr('href'));
 

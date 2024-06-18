@@ -191,10 +191,10 @@ const $ = jQuery;
 
     // SMOOTH SCROLL
 
-    let glossaryScrollOffset = 0;
+    let smoothScrollOffset = 0;
 
     if ($('#glossary-list-nav').length) {
-      glossaryScrollOffset = $('#glossary-list-nav').outerHeight();
+      smoothScrollOffset = $('#glossary-list-nav').outerHeight();
     }
 
     $('a.smooth-scroll').click(function(event) {
@@ -203,7 +203,7 @@ const $ = jQuery;
       const target = $($(this).attr('href'));
 
       if (target.length) {
-        const scrollPosition = target.offset().top - glossaryScrollOffset;
+        const scrollPosition = target.offset().top - smoothScrollOffset;
 
         $('html, body').animate({
           scrollTop: scrollPosition

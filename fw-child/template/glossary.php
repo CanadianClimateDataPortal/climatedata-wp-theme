@@ -112,7 +112,7 @@ if ( is_array( $glossary ) && ! empty( $glossary ) ) { ?>
 
 		<?php } ?>
 
-	</div> <!-- end .container-fluid -->
+	</div>
 
 <?php
 }

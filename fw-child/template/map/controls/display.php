@@ -77,7 +77,6 @@
 					<div id="display-scheme-select" class="dropdown mb-3">
 						<div class="dropdown-toggle scheme-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
 							<span class="gradient"><svg width="100%" height="100%"></svg></span>
-							<span class="sr-only"><?php _e ( 'Selected Scheme Name', 'cdc' ); ?></span>
 						</div>
 
 						<ul class="dropdown-menu w-100 p-0">

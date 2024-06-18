@@ -18,10 +18,10 @@
 					</div>
 				</div>
 				
-				<input type="hidden" name="area-selections" id="area-selections" value="" data-query-key="selections" data-request="single,threshold,custom" data-validate="<?php _e ( 'At least 1 map region is required', 'cdc' ); ?>">
+				<input type="hidden" name="area-selections" id="area-selections" value="" data-query-key="selections" data-request="single,threshold,custom" data-validate="<?php _e ( 'At least 1 map region is required.', 'cdc' ); ?>">
 				
 				<div id="map-control-stations" class="map-control-item" data-request="station,ahccd" style="display: none;">
-					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Select Stations', 'cdc' ); ?></h6>
+					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Stations', 'cdc' ); ?></h6>
 					
 					<select 
 						class="custom-select custom-select-md select2 form-control input-large" 
@@ -32,14 +32,14 @@
 						data-container-css-class="big-menu btn btn-lg border-primary" 
 						data-dropdown-css-class="big-menu-dropdown" 
 						data-query-key="station" 
-						data-validate="<?php _e ( 'Select at least one station', 'cdc' ); ?>"
+						data-validate="<?php _e ( 'Select at least one station.', 'cdc' ); ?>"
 					>
 					</select>
 				</div>
 					
 				<div id="map-control-aggregation" class="map-control-item conditional-trigger" data-request="single,threshold,custom">
 					<h6 class="d-flex align-items-center h6 mb-3 all-caps text-secondary">
-						<?php _e ( 'Change Aggregation', 'cdc' ); ?>
+						<?php _e ( 'Data Aggregation', 'cdc' ); ?>
 						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>
 					</h6>
 					
@@ -50,7 +50,7 @@
 						</div>
 						
 						<div id="area-selections-status">
-							<div id="area-selections-count"><span>0</span> <?php _e ( 'selected', 'cdc' ); ?></div>
+							<div id="area-selections-count"><span>0</span> <?php _e ( 'cells', 'cdc' ); ?></div>
 							<div id="area-selections-reset" class="ms-3 disabled" role="button">
 								<i class="fas fa-sync-alt"></i>
 								<?php _e ( 'Clear', 'cdc' ); ?>
@@ -61,7 +61,7 @@
 					<div id="area-aggregation-select-mode" class="bg-gray-200 p-2 mb-2">
 						<div class="btn-group w-100" role="group">
 							<input type="radio" class="btn-check" name="area-selection" id="area-selection-select" value="select" autocomplete="off" checked>
-							<label class="btn btn-sm btn-outline-gray-600" for="area-selection-select"><?php _e ( 'Select areas', 'cdc' ); ?></label>
+							<label class="btn btn-sm btn-outline-gray-600" for="area-selection-select"><?php _e ( 'Grid cells', 'cdc' ); ?></label>
 						
 							<input type="radio" class="btn-check" name="area-selection" id="area-selection-draw" value="draw" autocomplete="off">
 							<label class="btn btn-sm btn-outline-gray-600" for="area-selection-draw"><?php _e ( 'Draw region', 'cdc' ); ?></label>
@@ -90,16 +90,13 @@
 							<label class="form-check-label" for="area-aggregation-upload"><?php _e ( 'Upload Custom Shapefile', 'cdc' ); ?></label>
 							<a tabindex="0" role="button" id="area-aggregation-upload-tooltip" class="text-secondary">ⓘ
 								<span style="display: none">
-									<?php _e ( 'Please upload a ZIP file containing at least the .shp and .prj files.
-												The uploaded shapes must be closed polygons and be located entirely
-												within Canada. Once your shapefile is uploaded, the shapes will appear
-												on the map. Click the region of interest to continue.' ) ?>
+									<?php _e ( 'Please upload a ZIP file containing at least the .shp and .prj files. The uploaded shapes must be closed polygons and be located entirely within Canada. Once your shapefile is uploaded, the shapes will appear on the map. Click the region of interest to continue.', 'cdc' ) ?>
 								</span>
 							</a>
 						</div>
 						
 						<div id="area-aggregation-shapefile" class="bg-gray-200 p-3">
-							<label for="area-aggregation-shapefile-input" class="form-label"><?php _e ( 'Drop your shapefile here to upload', 'cdc' ); ?></label>
+							<label for="area-aggregation-shapefile-input" class="form-label"><?php _e ( 'Select your Shapefile', 'cdc' ); ?></label>
 							<input class="form-control form-control-sm" id="area-aggregation-shapefile-input" type="file">
 							<div id="area-aggregation-shapefile-message" class="mt-2"></div>
 						</div>
@@ -107,7 +104,7 @@
 				</div>
 				
 				<div id="map-control-search" class="map-control-item">
-					<label for="area-search" class="h6 all-caps text-secondary mb-3"><?php _e ( 'Search &amp; Zoom', 'cdc' ); ?></label>
+					<label for="area-search" class="h6 all-caps text-secondary mb-3"><?php _e ( 'Search', 'cdc' ); ?></label>
 					
 					<select 
 						class="custom-select custom-select-md select2 form-control" 
@@ -134,7 +131,7 @@
 				</div>
 				
 				<div id="map-control-coords" class="map-control-item">
-					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Change Coordinates', 'cdc' ); ?></h6>
+					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Coordinates', 'cdc' ); ?></h6>
 					
 					<input type="hidden" name="coords" id="coords" data-query-key="coords">
 					

@@ -380,7 +380,20 @@
 
       item.find('#station-select').select2({
         theme: 'bootstrap-5',
-        language: options.lang,
+        language: {
+          noResults: function () {
+            return T('No results found');
+          },
+          searching: function () {
+            return T('Searching…');
+          },
+          errorLoading: function () {
+            return T('The results could not be loaded.');
+          },
+          removeItem: function () {
+            return T('Remove item');
+          },
+        },
         multiple: true,
         closeOnSelect: false,
         width: '100%',
@@ -556,7 +569,7 @@
             instructions +=
               '<p class="mb-0 small">' +
               T('Enter latitude & longitude e.g.') +
-              ' <code>54,-115</code></p>';
+              ' <code>54,-115.3</code></p>';
 
             instructions += '</div>';
 
@@ -1044,6 +1057,7 @@
       });
 
       for (let key in options.maps) {
+        options.maps[key].object.pm.setLang(options.lang);
         options.maps[key].object.on('pm:create', function (e) {
           for (let key2 in options.maps) {
             options.maps[key2].layers.bbox = e.layer;
@@ -2979,7 +2993,7 @@
               !options.query.hasOwnProperty('bbox')
             ) {
               // no box
-              invalid_messages.push('Draw an area on the map');
+              invalid_messages.push(T('Draw an area on the map.'));
             }
 
             let limit = plugin.get_download_limits();
@@ -2988,7 +3002,7 @@
               // too many boxes D:
               invalid_messages.push(
                 T(
-                  'With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}',
+                  'With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}.',
                 ).format(limit),
               );
             }
@@ -3429,7 +3443,7 @@
           } else {
             options.elements.result.head.text(T('Error'));
             options.elements.result.content.html(
-              'Captcha failed. Please try again.',
+              T('The CAPTCHA verification failed. Please try again.'),
             );
 
             options.elements.result.tab
@@ -3734,7 +3748,7 @@
           } else {
             options.elements.result.head.text(T('Error'));
             options.elements.result.content.html(
-              'Captcha failed. Please try again.',
+              T('The CAPTCHA verification failed. Please try again.'),
             );
 
             options.elements.result.tab

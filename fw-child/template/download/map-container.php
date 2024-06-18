@@ -107,7 +107,7 @@
 	<div class="modal-dialog modal-lg modal-dialog-scrollable">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title" id="exampleModalLabel"><?php _e ( 'Missing Value Options', 'cdc' ); ?></h4>
+				<h4 class="modal-title" id="exampleModalLabel"><?php _e ( 'Missing Data Options', 'cdc' ); ?></h4>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			

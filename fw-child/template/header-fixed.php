@@ -1,4 +1,4 @@
-<div id="floating-header" class="fixed-top col-1">
+<div id="floating-header" class="fixed-top col-2 col-md-1">
 	<?php 
 	
 		// LOGO

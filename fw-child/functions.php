@@ -100,6 +100,7 @@ function child_theme_enqueue() {
 	) {
 		wp_enqueue_style ( 'wp-block-library' );
 		wp_enqueue_style ( 'gutenberg' );
+		wp_enqueue_style ( 'global-styles' );
 	}
 
 	if (

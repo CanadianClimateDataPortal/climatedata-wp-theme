@@ -188,6 +188,7 @@ if (ajax_data.globals.current_lang_code == 'fr') {
 var l10n_table = {
   fr: {
     'All models': 'Tous les modèles',
+    'PCIC12 (Ensemble)': 'PCIC12 (Ensemble)',
     '{0} Median': '{0} médiane',
     '{0} Range': '{0} portée',
     'No data available for selected location':

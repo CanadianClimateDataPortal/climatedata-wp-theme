@@ -2290,15 +2290,7 @@
 
               item
                 .find('#threshold-preset-head .accordion-button')
-                .prop('disabled', false);
-
-              // show the thresholds accordion
-
-              if (!item.find('#threshold-preset').hasClass('show')) {
-                item
-                  .find('#threshold-preset-head .accordion-button')
-                  .trigger('click');
-              }
+                .prop('disabled', options.query.dataset === 'ahccd');
             }
           }
 

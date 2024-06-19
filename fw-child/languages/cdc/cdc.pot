@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-06-18T19:46:57+00:00\n"
+"POT-Creation-Date: 2024-06-19T19:53:14+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -175,7 +175,7 @@ msgid "Area"
 msgstr ""
 
 #: template/download/control-bar.php:70
-#: template/download/controls/details.php:339
+#: template/download/controls/details.php:353
 #: template/download/controls/submit-result.php:13
 #: template/download/map-container.php:5
 #: template/map/control-bar.php:42
@@ -308,7 +308,7 @@ msgstr ""
 #: template/download/controls/area.php:183
 #: template/download/controls/data-variable.php:139
 #: template/download/controls/data.php:112
-#: template/download/controls/details.php:339
+#: template/download/controls/details.php:353
 #: template/map/controls/data-variable.php:139
 #: template/news/query.php:61
 msgid "Next"
@@ -558,11 +558,19 @@ msgstr ""
 msgid "Winter"
 msgstr ""
 
-#: template/download/controls/details.php:295
+#: template/download/controls/details.php:294
+msgid "All years"
+msgstr ""
+
+#: template/download/controls/details.php:299
+msgid "30 years average"
+msgstr ""
+
+#: template/download/controls/details.php:309
 msgid "Output Format"
 msgstr ""
 
-#: template/download/controls/details.php:321
+#: template/download/controls/details.php:335
 msgid "Decimal Places"
 msgstr ""
 

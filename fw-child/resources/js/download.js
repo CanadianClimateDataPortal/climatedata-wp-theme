@@ -42,6 +42,7 @@
         var: null,
         percentiles: ['5'],
         frequency: 'ann',
+        average: '30ygraph',
         scenarios: ['medium'],
         decade: 2040,
         sector: 'gridded_data',
@@ -2663,6 +2664,8 @@
         plugin.update_frequency();
       }
 
+      plugin.update_averages();
+
       // scenarios
 
       if (options.request.type != 'custom') {
@@ -2801,6 +2804,40 @@
 
           frequency_select.trigger('change');
         }
+      }
+    },
+
+    /**
+     * Update the availability of the "average" radio buttons (shown below the "Frequency" dropdown).
+     *
+     * If the previously selected value is not available anymore (after changing variable, for example), default to the
+     * first available.
+     *
+     * @this download_app
+     */
+    update_averages: function () {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      const outer = item.find('#map-control-frequency-select');
+
+      if (!outer.is(':visible')) {
+        return;
+      }
+
+      const available_averages = (options.var_data ? options.var_data.acf.averages : null) || [];
+      const radios = outer.find('#map-control-frequency-average input[name=details-average]');
+
+      radios.prop('disabled', true);
+
+      available_averages.forEach(function (average) {
+        radios.filter('[value=' + average + ']').prop('disabled', false)
+      });
+
+      // Select the first available radio button if the currently selected average is not available
+      if (radios.filter('[value=' + options.query.average + ']').is(':disabled')) {
+        radios.filter(':not(:disabled)').first().click();
       }
     },
 
@@ -3799,17 +3836,6 @@
         }
       }
 
-      // format = query.format;
-      let dataset_name = query.dataset;
-
-      // TODO: add input to select 'allyears' or '30ygraph'
-      let selectedDatasetType = 'allyears';
-      //$(
-      //  'input[name="download-dataset-type"]:checked',
-      //).val();
-
-      let format_extension = query.format == 'netcdf' ? 'nc' : query.format;
-
       if (query.var !== 'all') {
         $('body').addClass('spinner-on');
 
@@ -3820,11 +3846,11 @@
           frequency_code = freq_keys[freq_vals.indexOf(query.frequency)];
         }
 
-        request_args = {
+        const request_args = {
           var: query.var,
           month: frequency_code,
           dataset_name: query.dataset,
-          dataset_type: selectedDatasetType,
+          dataset_type: query.average,
           format: query.format,
         };
 

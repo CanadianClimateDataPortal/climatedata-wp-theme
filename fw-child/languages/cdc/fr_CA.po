@@ -191,7 +191,7 @@ msgid "Area"
 msgstr "Zone"
 
 #: template/download/control-bar.php:70
-#: template/download/controls/details.php:339
+#: template/download/controls/details.php:353
 #: template/download/controls/submit-result.php:13
 #: template/download/map-container.php:5
 #: template/map/control-bar.php:42
@@ -306,7 +306,7 @@ msgstr "Zoom"
 #: template/download/controls/area.php:183
 #: template/download/controls/data-variable.php:139
 #: template/download/controls/data.php:112
-#: template/download/controls/details.php:339
+#: template/download/controls/details.php:353
 #: template/map/controls/data-variable.php:139
 #: template/news/query.php:61
 msgid "Next"
@@ -532,11 +532,11 @@ msgstr "Automne"
 msgid "Winter"
 msgstr "Hiver"
 
-#: template/download/controls/details.php:295
+#: template/download/controls/details.php:309
 msgid "Output Format"
 msgstr "Type de fichier"
 
-#: template/download/controls/details.php:321
+#: template/download/controls/details.php:335
 msgid "Decimal Places"
 msgstr "Décimales"
 
@@ -1351,3 +1351,11 @@ msgstr "Observations (DCCAH)"
 #: resources/functions/rest.php:743
 msgid "Please enter a valid email address"
 msgstr ""
+
+#: template/download/controls/details.php:294
+msgid "All years"
+msgstr "Toutes les années"
+
+#: template/download/controls/details.php:299
+msgid "30 years average"
+msgstr "Moyennes sur 30 ans"

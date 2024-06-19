@@ -14,6 +14,12 @@
 #header-logo-container {
 }
 
+#header-social {
+  @include media-breakpoint-up(md) {
+    border-left: 1px solid $white;
+  }
+}
+
 #header-social-inner {
   display: flex;
   align-items: center;

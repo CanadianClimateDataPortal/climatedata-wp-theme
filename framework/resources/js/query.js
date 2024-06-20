@@ -443,7 +443,7 @@
 				current_string = '?'
 			}
 			
-			history.replaceState({}, document.title, current_string)
+			history.replaceState( {}, document.title, current_string + window.location.hash )
 			
 		},
 		

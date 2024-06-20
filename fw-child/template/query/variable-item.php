@@ -1,13 +1,14 @@
 <?php
+// sectors
+$this_sectors = get_the_terms( $item['id'], 'sector' );
 
-	// sectors
-	$this_sectors = get_the_terms ( $item['id'], 'sector' );
-
+// Get variable post slug.
+$variable_slug = get_post_field( 'post_name', $item['id'] );
 ?>
 
-<div class="card position-relative">
+<div class="card position-relative" id="v-<?php echo esc_attr( $variable_slug ); ?>">
 	
-	<a href="#" class="flex-drawer-trigger stretched-link"></a>
+	<a href="/variable#v-<?php echo esc_attr( $variable_slug ); ?>" class="flex-drawer-trigger stretched-link"></a>
 	
 	<div class="var-item-img bg-gray-400" style="background-image: url(<?php echo get_the_post_thumbnail_url ( $item['id'], 'medium_large' ); ?>);"></div>
 	

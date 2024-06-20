@@ -287,9 +287,9 @@ function child_theme_enqueue() {
 		wp_enqueue_script ( 'iframe-functions', $child_js_dir . 'iframe-functions.js', array ( 'jquery' ), null, true );
 	}
 
-	if ( is_post_type_archive ( 'variable' ) ) {
-		wp_enqueue_script ( 'zebra-pin' );
-		wp_enqueue_script ( 'flex-drawer' );
+	if ( is_page( 'variable' ) || is_single( 'variable' ) ) {
+		wp_enqueue_script( 'zebra-pin' );
+		wp_enqueue_script( 'flex-drawer' );
 	}
 
 	wp_enqueue_script ( 'child-functions' );

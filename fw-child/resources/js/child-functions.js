@@ -246,7 +246,7 @@ const $ = jQuery;
       });
     }
 
-    if ($('body').hasClass('post-type-archive-variable')) {
+    if ($('.variable-archive-page').length > 0) {
       $(document).on('fw_query_success', function (e, query_item) {
         let query_items = query_item.find('.fw-query-items');
 

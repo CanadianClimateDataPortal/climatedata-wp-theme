@@ -163,7 +163,17 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 						} )
 					
 					this_item.addClass( 'fd-open' )
-					
+          
+          // Update the URL hash if the variable item hash exists.
+          let variable_item = this_item.find( '.variable-item' );
+          
+          if (variable_item.length > 0) {
+            let variable_item_hash = variable_item.attr( 'id' );
+            
+            if (variable_item_hash) { // Check if variable_item_hash is not empty
+              window.location.hash = variable_item_hash;
+            } 
+          }
 				} )
 				
 			}

@@ -330,3 +330,34 @@ function posttype_app() {
 
 }
 add_action( 'init', 'posttype_app', 0 );
+
+/**
+ * Updates the 'sector' taxonomy terms.
+ *
+ * @param int $post_id The ID of the post being updated.
+ *
+ * @return void
+ */
+function cd_variable_update_tax_sector_terms( $post_id ) {
+	// Get relevant sectors.
+	$relevant_sectors = get_field( 'relevant_sectors', $post_id );
+
+	// Check if relevant sectors are available.
+	if ( ! is_array( $relevant_sectors ) || empty( $relevant_sectors ) ) {
+		return;
+	}
+
+	// Extract term IDs from the relevant sectors.
+	$term_ids = array();
+
+	foreach ( $relevant_sectors as $sector ) {
+		if ( isset( $sector['sector_term'] ) && is_object( $sector['sector_term'] ) ) {
+			$term_ids[] = $sector['sector_term']->term_id;
+		}
+	}
+
+	// Update the 'sector' taxonomy terms.
+	wp_set_post_terms( $post_id, $term_ids, 'sector', false );
+}
+
+add_action( 'acf/save_post', 'cd_variable_update_tax_sector_terms' );

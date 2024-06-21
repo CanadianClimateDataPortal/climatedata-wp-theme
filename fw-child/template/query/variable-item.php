@@ -4,6 +4,13 @@ $this_sectors = get_the_terms( $item['id'], 'sector' );
 
 // Get variable post slug.
 $variable_slug = get_post_field( 'post_name', $item['id'] );
+
+// Initialize current language.
+$current_lang = 'en';
+
+if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), true ) ) {
+	$current_lang = $item['lang'];
+}
 ?>
 
 <div class="card position-relative variable-item" id="v-<?php echo esc_attr( $variable_slug ); ?>">
@@ -110,67 +117,54 @@ $variable_slug = get_post_field( 'post_name', $item['id'] );
 			
 			<div class="col offset-1-of-12">
 				<?php
-				
-					$sectors = get_the_terms ( $item['id'], 'sector' );
-					
-					if ( !empty ( $sectors ) ) {
-						
-				?>
-				
-				<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Relevant Sectors', 'cdc' ); ?></h6>
-				
-				<div class="accordion accordion-flush" id="var-accordion-<?php echo $item['id']; ?>">
-						
-						
-					<?php
-					
-						$i = 1;
-					
-						foreach ( $sectors as $sector ) {
-								
+				$relevant_sectors = get_field( 'relevant_sectors', $item['id'] );
+
+				if ( is_array( $relevant_sectors ) && ! empty ( $relevant_sectors ) ) {
 					?>
-					
-					<div class="accordion-item">
-						<h2 class="accordion-header" id="var-<?php echo $item['id']; ?>-heading-<?php echo $i; ?>">
-							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#var-<?php echo $item['id']; ?>-collapse-<?php echo $i; ?>" aria-expanded="false" aria-controls="var-<?php echo $item['id']; ?>-collapse-<?php echo $i; ?>">
-								<?php echo $sector->name; ?>
-							</button>
-						</h2>
-						<div id="var-<?php echo $item['id']; ?>-collapse-<?php echo $i; ?>" class="accordion-collapse collapse" aria-labelledby="var-<?php echo $item['id']; ?>-heading-<?php echo $i; ?>" data-bs-parent="#var-accordion-<?php echo $item['id']; ?>">
-							<div class="accordion-body p-3">
-								<?php 
-								
-									if ( $GLOBALS['fw']['current_lang_code'] == 'en' ) {
-										
-										echo $sector->description;
-										
-									} else {
-										
-										echo get_field ( 'description_' . $GLOBALS['fw']['current_lang_code'], 'sector_' . $sector->term_id );
-										
-									}
-								
-								?>
+					<h6 class="all-caps text-secondary mb-3"><?php _e( 'Relevant Sectors', 'cdc' ); ?></h6>
+
+					<div class="accordion accordion-flush" id="var-accordion-<?php echo $item['id']; ?>">
+						<?php
+
+						foreach ( $relevant_sectors as $relevant_sector ) {
+							$relevant_sector_term_id   = $relevant_sector['sector_term']->term_id;
+							$relevant_sector_term_name = $relevant_sector['sector_term']->name;
+
+							if ( 'fr' === $current_lang ) {
+								$relevant_sector_term_name_fr = get_field( 'admin_term_title_fr', $relevant_sector['sector_term'] );
+								$relevant_sector_term_name    = ( empty( $relevant_sector_term_name_fr ) ) ? $relevant_sector_term_name : $relevant_sector_term_name_fr;
+							}
+							?>
+							<div class="accordion-item">
+								<h2 class="accordion-header"
+									id="var-<?php echo $item['id']; ?>-heading-<?php echo esc_attr( $relevant_sector_term_id ); ?>">
+									<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+											data-bs-target="#var-<?php echo $item['id']; ?>-collapse-<?php echo esc_attr( $relevant_sector_term_id ); ?>"
+											aria-expanded="false"
+											aria-controls="var-<?php echo $item['id']; ?>-collapse-<?php echo esc_attr( $relevant_sector_term_id ); ?>">
+										<?php echo esc_html( $relevant_sector_term_name ); ?>
+									</button>
+								</h2>
+								<div id="var-<?php echo $item['id']; ?>-collapse-<?php echo esc_attr( $relevant_sector_term_id );; ?>"
+									 class="accordion-collapse collapse"
+									 aria-labelledby="var-<?php echo $item['id']; ?>-heading-<?php echo esc_attr( $relevant_sector_term_id );; ?>"
+									 data-bs-parent="#var-accordion-<?php echo $item['id']; ?>">
+									<div class="accordion-body p-3">
+										<?php
+										$sector_description = ( 'fr' === $current_lang ) ? $relevant_sector['sector_description_fr'] : $relevant_sector['sector_description'];
+
+										echo esc_html( $sector_description );
+										?>
+									</div>
+								</div>
 							</div>
-						</div>
-					</div>
-					
-					<?php
-					
-							$i++;
-							
+							<?php
 						}
-						
-					?>
-						
-				</div>
-				
-				<?php
-				
-					}	
-				
+						?>
+					</div>
+					<?php
+				}
 				?>
-					
 			</div>
 		</div>
 	</div>

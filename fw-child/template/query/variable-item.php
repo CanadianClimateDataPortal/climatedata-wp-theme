@@ -67,35 +67,35 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 		</div>
 	</div>
 	
-	<div class="flex-drawer-content d-none">
+	<div class="flex-drawer-content d-none variable-details">
 		<div class="row">
-			<div class="col-5-of-12 offset-1-of-12 mb-5 pb-5 border-bottom border-gray-500">
+			<div class="col col-lg-6 col-14 offset-1 variable-details__title">
 				<h2 class="mb-0 font-family-serif text-secondary"><?php echo get_the_title ( $item['id'] ); ?></h2>
 			</div>
-			
-			<div class="col-5-of-12 d-flex align-items-center mb-5 pb-5 border-bottom border-gray-500">
-				<div class="offset-1-of-5 d-flex align-items-center">
-					<?php
-					
-						$map_slug = 'map/';
-						$dl_slug = 'download/';
-						
-						if ( $GLOBALS['fw']['current_lang_code'] == 'fr' ) {
-							$map_slug = 'carte/';
-							$dl_slug = 'telechargement/';
-						}
-						
-					?>
-					
-					<a href="<?php echo home_url ( $map_slug ); ?>?var_id=<?php echo $item['id']; ?>" class="btn btn-primary rounded-pill px-4 me-3"><?php _e ( 'View on Map', 'cdc' ); ?></a>
-					
-					<a href="<?php echo home_url ( $dl_slug ); ?>?var_id=<?php echo $item['id']; ?>" class="btn btn-light rounded-pill px-4"><?php _e ( 'Download Data', 'cdc' ); ?></a>
-				</div>
+
+			<div class="col col-lg-8 offset-lg-0 col-14 offset-1 variable-details__links">
+				<?php
+				$map_slug = 'map/';
+				$dl_slug  = 'download/';
+
+				if ( $GLOBALS['fw']['current_lang_code'] == 'fr' ) {
+					$map_slug = 'carte/';
+					$dl_slug  = 'telechargement/';
+				}
+				?>
+
+				<a href="<?php echo home_url( $map_slug ); ?>?var_id=<?php echo $item['id']; ?>"
+				   class="btn btn-primary btn-sm rounded-pill px-3"><?php _e( 'View on Map', 'cdc' ); ?></a>
+
+				<a href="<?php echo home_url( $dl_slug ); ?>?var_id=<?php echo $item['id']; ?>"
+				   class="btn btn-light btn-sm rounded-pill px-3"><?php _e( 'Download Data', 'cdc' ); ?></a>
 			</div>
+			
+			<div class="col col-14 offset-1 border-bottom border-gray-500 variable-details__separator"></div>
 		</div>
 		
 		<div class="row">
-			<div class="col-5-of-12 offset-1-of-12">
+			<div class="col col-lg-7 col-14 offset-1">
 				<?php echo fw_get_field ( 'var_description', $item['id'] ); ?>
 				
 				<?php
@@ -104,7 +104,7 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 						
 				?>
 				
-				<h6 class="all-caps text-secondary my-4"><?php _e ( 'Technical Description', 'cdc' ); ?></h6>
+				<h6 class="all-caps text-secondary mb-3 mt-5"><?php _e ( 'Technical Description', 'cdc' ); ?></h6>
 				
 				<?php echo fw_get_field ( 'var_tech_description', $item['id'] ); ?>
 				
@@ -115,7 +115,7 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 				?>
 			</div>
 			
-			<div class="col offset-1-of-12">
+			<div class="col col-lg-6 col-14 offset-1 variable-details__relevant">
 				<?php
 				$relevant_sectors = get_field( 'relevant_sectors', $item['id'] );
 
@@ -149,7 +149,7 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 									 class="accordion-collapse collapse"
 									 aria-labelledby="var-<?php echo $item['id']; ?>-heading-<?php echo esc_attr( $relevant_sector_term_id );; ?>"
 									 data-bs-parent="#var-accordion-<?php echo $item['id']; ?>">
-									<div class="accordion-body p-3">
+									<div class="accordion-body p-3 bg-gray-200">
 										<?php
 										$sector_description = ( 'fr' === $current_lang ) ? $relevant_sector['sector_description_fr'] : $relevant_sector['sector_description'];
 

@@ -12,6 +12,20 @@
 }
 
 #header-logo-container {
+  a {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    width: 2rem;
+
+    @include media-breakpoint-up(sm) {
+      width: 2.75rem;
+    }
+
+    @include media-breakpoint-up(xl) {
+      width: 5rem;
+    }
+  }
 }
 
 #header-social {

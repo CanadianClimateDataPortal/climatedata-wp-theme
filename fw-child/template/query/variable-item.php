@@ -6,7 +6,7 @@ $this_sectors = get_the_terms( $item['id'], 'sector' );
 $variable_slug = get_post_field( 'post_name', $item['id'] );
 ?>
 
-<div class="card position-relative" id="v-<?php echo esc_attr( $variable_slug ); ?>">
+<div class="card position-relative variable-item" id="v-<?php echo esc_attr( $variable_slug ); ?>">
 	
 	<a href="/variable#v-<?php echo esc_attr( $variable_slug ); ?>" class="flex-drawer-trigger stretched-link"></a>
 	

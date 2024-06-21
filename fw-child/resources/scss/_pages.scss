@@ -1048,15 +1048,11 @@ body.tab-drawer-open {
 
     &.fd-open {
       .card {
-        height: calc(100% + ($query-card-hover-padding * 2));
-        margin-top: $query-card-hover-padding * -1;
-        margin-left: $query-card-hover-padding * -1;
-        margin-right: $query-card-hover-padding * -1;
         box-shadow: 0 0.25rem 1.5rem transparentize($black, 0.8);
 
         &:after {
           left: 0;
-          opacity: 1;
+          opacity: .6;
           transition:
             left 0s ease 0s,
             opacity 0.25s ease 0s;
@@ -1075,9 +1071,11 @@ body.tab-drawer-open {
   }
 
   .fd-drawer {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
-    background-color: $gray-400;
+    &__wrapper {
+      padding-top: 4rem;
+      padding-bottom: 4rem;
+      background-color: $gray-400;
+    }
   }
 }
 

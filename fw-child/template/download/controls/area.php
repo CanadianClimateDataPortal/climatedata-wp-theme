@@ -18,7 +18,7 @@
 					</div>
 				</div>
 				
-				<input type="hidden" name="area-selections" id="area-selections" value="" data-query-key="selections" data-request="single,threshold,custom" data-validate="<?php _e ( 'At least 1 map region is required.', 'cdc' ); ?>">
+				<input type="hidden" name="area-selections" id="area-selections" value="" data-query-key="selections" data-request="daily,single,threshold,custom" data-validate="<?php _e ( 'At least 1 map region is required.', 'cdc' ); ?>">
 				
 				<div id="map-control-stations" class="map-control-item" data-request="station,ahccd" style="display: none;">
 					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Stations', 'cdc' ); ?></h6>
@@ -37,7 +37,7 @@
 					</select>
 				</div>
 					
-				<div id="map-control-aggregation" class="map-control-item conditional-trigger" data-request="single,threshold,custom">
+				<div id="map-control-aggregation" class="map-control-item conditional-trigger" data-request="daily,single,threshold,custom">
 					<h6 class="d-flex align-items-center h6 mb-3 all-caps text-secondary">
 						<?php _e ( 'Data Aggregation', 'cdc' ); ?>
 						<a tabindex="0" class="popover-btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-content="Description here">?</a>

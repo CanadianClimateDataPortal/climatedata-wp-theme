@@ -1490,9 +1490,11 @@
           } else {
             // console.log('NOT AHCCD');
 
-            // set request type to single
+            // set request type to single (but leave it "daily" if it was already)
 
-            options.request.type = 'single';
+            if (options.request.type !== 'daily') {
+              options.request.type = 'single';
+            }
 
             if (
               item.find('#var-thresholds').is(':visible') &&
@@ -1756,9 +1758,27 @@
           }
 
           break;
-      }
 
-      console.log('status', status);
+        case 'frequency':
+          // The "daily" frequency is available only for some "single" or "threshold" variables. But, contrary to
+          // the other frequencies of those variables, a Finch request must be sent for this frequency. To
+          // support this specific case, we set the `request.type` to "daily".
+          if (this_val === 'daily') {
+            options.request.type = 'daily';
+          } else if (options.request.type === 'daily') {
+            // When switching back from daily, we reset the `request.type` to its original value (either "single" or
+            // "threshold").
+            if (
+              options.var_flags.threshold &&
+              (!options.var_flags.custom  || item.find('#var-thresholds .collapse.show').attr('id') === 'threshold-preset')
+            ) {
+              options.request.type = 'threshold';
+            } else {
+              options.request.type = 'single';
+            }
+          }
+          break;
+      }
 
       if (status == 'input' || status == 'slide') {
         // whether to pushstate on eval or not
@@ -2372,17 +2392,14 @@
             options.request.type = 'ahccd';
           }
         } else if (
-          options.var_flags.threshold == true &&
-          (options.var_flags.custom == false ||
-            item.find('#var-thresholds .collapse.show').attr('id') ==
-              'threshold-preset')
+          options.var_flags.threshold &&
+          (!options.var_flags.custom || item.find('#var-thresholds .collapse.show').attr('id') === 'threshold-preset')
         ) {
-          // console.log('set request type to threshold');
-          options.request.type = 'threshold';
-        } else if (options.var_flags.station == true) {
+          options.request.type = options.query.frequency === 'daily' ? 'daily' : 'threshold';
+        } else if (options.var_flags.station) {
           options.request.type = 'station';
-        } else if (options.var_flags.single == true) {
-          options.request.type = 'single';
+        } else if (options.var_flags.single) {
+            options.request.type = options.query.frequency === 'daily' ? 'daily' : 'single';
         }
 
         console.log('request type is now ' + options.request.type);
@@ -3169,6 +3186,10 @@
           plugin._process_custom(query);
           break;
 
+        case 'daily':
+          plugin._process_daily(query);
+          break;
+
         case 'threshold':
         case 'single':
           plugin._process_single(query);
@@ -3784,6 +3805,139 @@
               .removeClass('success')
               .addClass('error');
             plugin.refresh_captcha();
+          }
+        },
+        complete: function () {
+          plugin.refresh_captcha();
+        },
+      });
+    },
+
+    /**
+     * Prepare and send the Finch request for a "Daily frequency" request.
+     *
+     * @param {object} query
+     * @this {download_app}
+     */
+    _process_daily: function (query) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let submit_path = 'grid_point';
+
+      const form_obj = {
+        inputs: [
+          {
+            id: 'variable',
+            data: options.var_data.acf.daily_variable_name || query.var,
+          },
+          {
+            id: 'dataset',
+            data: DATASETS[query.dataset].finch_name,
+          },
+          {
+            id: 'output_format',
+            data: query.format,
+          },
+          {
+            id: 'data_validation',
+            data: 'warn',
+          },
+        ],
+        response: 'document',
+        mode: 'auto',
+        outputs: [
+          {
+            transmissionMode: 'reference',
+            id: 'output',
+          },
+        ],
+        notification_email: item.find('#submit-email').val(),
+      };
+
+      // lat/lng
+
+      if (query.hasOwnProperty('bbox')) {
+        submit_path = 'bbox';
+
+        form_obj.inputs.push(
+          {
+            id: 'lat0',
+            data: query.bbox[0],
+          },
+          {
+            id: 'lon0',
+            data: query.bbox[1],
+          },
+          {
+            id: 'lat1',
+            data: query.bbox[2],
+          },
+          {
+            id: 'lon1',
+            data: query.bbox[3],
+          },
+        );
+      } else {
+        const latitudes = [];
+        const longitudes = [];
+
+        Object.values(options.selection_data).forEach(function(data) {
+          latitudes.push(data.lat);
+          longitudes.push(data.lng);
+        });
+
+        form_obj.inputs.push({
+          id: 'lat',
+          data: latitudes.join(','),
+        });
+
+        form_obj.inputs.push({
+          id: 'lon',
+          data: longitudes.join(','),
+        });
+      }
+
+      const submit_data = {
+        captcha_code: item.find('#submit-captcha').val(),
+        namespace: 'analyze',
+        signup: item.find('#submit-subscribe').is(':checked'),
+        request_data: form_obj,
+        submit_url:
+          '/providers/finch/processes/subset_' +
+          submit_path +
+          '_dataset/jobs',
+      };
+
+      $.ajax({
+        url: ajax_data.rest_url + 'cdc/v2/finch_submit/',
+        method: 'POST',
+        data: submit_data,
+        dataType: 'json',
+        success: function (data) {
+          if (data.status === 'accepted') {
+            options.elements.result.head.text(T('Success') + '!');
+            options.elements.result.content.html(data.description);
+
+            options.elements.result.status
+              .find('#result-status-text span')
+              .html(data.status);
+
+            options.elements.result.status.show();
+
+            options.elements.result.tab
+              .removeClass('error')
+              .addClass('success');
+          } else {
+            options.elements.result.head.text(T('Error'));
+            options.elements.result.content.html(
+              T('The CAPTCHA verification failed. Please try again.'),
+            );
+
+            options.elements.result.tab
+              .removeClass('success')
+              .addClass('error');
           }
         },
         complete: function () {

@@ -29,7 +29,7 @@
 						<p class="mb-0"><?php _e ( 'Click the button below to prepare your download.', 'cdc' ); ?></p>
 					</div>
 					
-					<div data-request="custom,ahccd">
+					<div data-request="daily,custom,ahccd">
 						<h5><?php _e ( 'Process Analysis', 'cdc' ); ?></h5>
 						<p class="mb-0"><?php _e ( 'Enter your email address to submit your request.', 'cdc' ); ?></p>
 					</div>
@@ -45,7 +45,7 @@
 					</div>
 				</div>
 				
-				<div id="map-control-email" class="map-control-item" data-request="custom,ahccd">
+				<div id="map-control-email" class="map-control-item" data-request="daily,custom,ahccd">
 					<label for="submit-email" class="form-label h6 mb-3 all-caps text-secondary"><?php _e ( 'Email Address', 'cdc' ); ?></label>
 					
 					<p class="small">
@@ -61,7 +61,7 @@
 					</div>
 				</div>
 				
-				<div id="map-control-captcha" class="map-control-item" data-request="custom,ahccd">
+				<div id="map-control-captcha" class="map-control-item" data-request="daily,custom,ahccd">
 					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'CAPTCHA Verification', 'cdc' ); ?></h6>
 					
 					<div class="row row-cols-2 align-items-center">

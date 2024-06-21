@@ -258,7 +258,7 @@
 						
 					</div>
 					
-					<div id="map-control-frequency-select" data-flags="custom:0" data-request="threshold,single">
+					<div id="map-control-frequency-select" data-flags="custom:0" data-request="threshold,single,daily">
 						<div>
 							<select class="form-select" name="data-frequency" data-query-key="frequency">
 								<option value="ann" data-field="ann"><?php _e ( 'Annual', 'cdc' ); ?></option>
@@ -287,7 +287,7 @@
 								</optgroup>
 							</select>
 						</div>
-						<div id="map-control-frequency-average" class="row align-items-center mt-3 mx-1">
+						<div id="map-control-frequency-average" class="row align-items-center mt-3 mx-1" data-request="threshold,single">
 							<div class="col d-flex gap-4">
 								<div class="form-check mb-0">
 									<input class="form-check-input" type="radio" name="details-average" id="details-average-allyears" value="allyears" data-query-key="average">

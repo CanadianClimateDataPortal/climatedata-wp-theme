@@ -121,6 +121,8 @@
   }
 
   .page-section {
+    background-color: $gray-200;
+
     &:before {
       content: '';
       display: block;
@@ -225,12 +227,124 @@
 
   .tl-section {
     h1, h2, h3, h4, h5, h6 {
-			margin-bottom: 0.5em;
-		}
+        margin-bottom: 0.5em;
+    }
+
+    h1 {
+      font-size: 1.875rem;
+
+      @media (min-width: 751px) {
+        font-size: 2.375rem;
+      }
+
+      @media (min-width: 851px) {
+        font-size: 3.125rem;
+      }
+
+      @media (min-width: 1001px) {
+        font-size: 4.125rem;
+      }
+    }
+
+    h2 {
+      font-size: 1.5rem;
+
+      @media (min-width: 751px) {
+        font-size: 2.125rem;
+      }
+
+      @media (min-width: 851px) {
+        font-size: 2.75rem;
+      }
+
+      @media (min-width: 1001px) {
+        font-size: 3.125rem;
+      }
+    }
+
+    h3 {
+      font-size: 1.25rem;
+
+      @media (min-width: 751px) {
+        font-size: 1.625rem;
+      }
+
+      @media (min-width: 851px) {
+        font-size: 1.75rem;
+      }
+
+      @media (min-width: 1001px) {
+        font-size: 2.5rem;
+      }
+    }
+
+    h4 {
+      font-size: 1rem;
+
+      @media (min-width: 751px) {
+        font-size: 1.25rem;
+      }
+
+      @media (min-width: 851px) {
+        font-size: 1.375rem;
+      }
+
+      @media (min-width: 1001px) {
+        font-size: 1.875rem;
+      }
+    }
+
+    h5 {
+      font-size: .8125rem;
+
+      @media (min-width: 751px) {
+        font-size: .875rem;
+      }
+
+      @media (min-width: 851px) {
+        font-size: 1rem;
+      }
+
+      @media (min-width: 1001px) {
+        font-size: 1.25rem;
+      }
+    }
+
+    h6 {
+      font-size: .625rem;
+
+      @media (min-width: 751px) {
+        font-size: .6875rem;
+      }
+
+      @media (min-width: 851px) {
+        font-size: .75rem;
+      }
+
+      @media (min-width: 1001px) {
+        font-size: 1rem;
+      }
+    }
+
+    p {
+      font-size: .625rem;
+
+      @media (min-width: 751px) {
+        font-size: .6875rem;
+      }
+
+      @media (min-width: 851px) {
+        font-size: .75rem;
+      }
+
+      @media (min-width: 1001px) {
+        font-size: 1.1875rem;
+      }
+    }
 
     &.headings-primary {
       h1, h2, h3, h4, h5, h6 {
-        color: $primary;
+        color: $secondary;
       }
     }
 
@@ -254,7 +368,7 @@
 
     &.links-primary {
       a {
-        color: $primary;
+        color: $secondary;
       }
     }
 
@@ -275,6 +389,10 @@
         color: $dark;
       }
     }
+  }
+
+  .bg-dark {
+    background-color: $gray-900 !important;
   }
 
   .element {
@@ -398,48 +516,6 @@
   [data-size-x="75"][data-position-x="center"] {
   	left: 12.5%;
   }
-}
-
-@media ( max-width: 1000px ) {
-
-	#timeline {
-		h1 { font-size: 5em; }
-		h2 { font-size: 4.4em; }
-		h3 { font-size: 2.8em; }
-		h4 { font-size: 2.2em; }
-		h5 { font-size: 1.6em; }
-		h6 { font-size: 1.2em; }
-		p { font-size: 1.2em; }
-	}
-
-}
-
-@media ( max-width: 850px ) {
-
-	#timeline {
-		h1 { font-size: 3.8em; }
-		h2 { font-size: 3.4em; }
-		h3 { font-size: 2.6em; }
-		h4 { font-size: 2em; }
-		h5 { font-size: 1.4em; }
-		h6 { font-size: 1.1em; }
-		p { font-size: 1.1em; }
-	}
-
-}
-
-@media ( max-width: 750px ) {
-
-	#timeline {
-		h1 { font-size: 3em; }
-		h2 { font-size: 2.4em; }
-		h3 { font-size: 2em; }
-		h4 { font-size: 1.6em; }
-		h5 { font-size: 1.3em; }
-		h6 { font-size: 1em; }
-		p { font-size: 1em; }
-	}
-
 }
 
 // basic accordion block

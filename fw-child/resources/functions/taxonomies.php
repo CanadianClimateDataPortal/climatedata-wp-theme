@@ -217,7 +217,7 @@ add_action('init', 'taxonomy_sector', 10);
 function cd_hide_tax_sector_metabox_cpt_variable() {
 	$current_screen = get_current_screen();
 
-	if ( ! is_object( $current_screen ) || 'variable' !== $current_screen->post_type ) {
+	if ( ! is_admin() || ! is_object( $current_screen ) || 'variable' !== $current_screen->post_type ) {
 		return;
 	}
 

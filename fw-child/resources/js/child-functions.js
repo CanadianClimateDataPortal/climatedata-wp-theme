@@ -245,20 +245,36 @@ const $ = jQuery;
         contained: true,
       });
     }
-
-    if ($('.variable-archive-page').length > 0) {
-      $(document).on('fw_query_success', function (e, query_item) {
-        let query_items = query_item.find('.fw-query-items');
-
-        if (query_items.data('flex_drawer') == undefined) {
-          query_items.flex_drawer({
+    
+    if ($( '.variable-archive-page' ).length > 0) {
+      $( document ).on( 'fw_query_success', function ( e, query_item ) {
+        let query_items = query_item.find( '.fw-query-items' );
+        
+        if (query_items.data( 'flex_drawer' ) == undefined) {
+          query_items.flex_drawer( {
             item_selector: '.fw-query-item',
-          });
+          } );
         } else {
           // reinit if plugin is already loaded
-          query_items.flex_drawer('init_items');
+          query_items.flex_drawer( 'init_items' );
         }
-      });
+        
+        /**
+         * Auto-scroll and open variable details if 
+         * a variable hash exists.
+         */
+        if (window.location.hash) {
+          let variable_item_hash = window.location.hash;
+          
+          if ($( variable_item_hash ).length > 0) {
+            $( 'html, body' ).animate( {
+              scrollTop: $( variable_item_hash ).parent().position().top
+            }, 10, 'swing' ).promise().done( function () {
+              $( variable_item_hash ).find( '.flex-drawer-trigger' ).trigger( 'click' );
+            } );
+          }
+        }
+      } );
     }
 
     // share widget

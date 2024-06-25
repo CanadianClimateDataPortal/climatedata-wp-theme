@@ -526,24 +526,27 @@ function remove_comments_admin_bar() {
 	$wp_admin_bar->remove_menu ( 'comments' );
 }
 
-function enable_block_editor_by_post_type($use_block_editor, $post_type) {
-	$post_types_bloc_editor_enabled = array( 'interactive' );
-	$post_types_bloc_editor_disabled = array( 'variable','resource','definition','beta-app' );
-
-    if ( in_array( $post_type, $post_types_bloc_editor_enabled ) ) {
-        return true;
-    }
-	elseif ( in_array( $post_type, $post_types_bloc_editor_disabled ) ) {
-		return false;
+/**
+ * Enables Gutenberg editor for specific post types.
+ *
+ * @param bool   $use_block_editor Whether the post type can use the block editor.
+ * @param string $post_type The post type being checked.
+ *
+ * @return bool Status of block editor.
+ */
+function cd_enable_block_editor( $use_block_editor, $post_type ) {
+	if ( in_array( $post_type, array( 'interactive' ), true ) ) {
+		return true;
 	}
-    return $use_block_editor;
+
+	return false;
 }
 
 add_action ( 'init', 'remove_default_editor' );
 add_action ( 'init', 'remove_comments_post_type_support', 100 );
 add_action ( 'admin_menu', 'remove_comments_admin_menu' );
 add_action ( 'wp_before_admin_bar_render', 'remove_comments_admin_bar' );
-add_filter ( 'use_block_editor_for_post_type', 'enable_block_editor_by_post_type', 10, 2);
+add_filter( 'use_block_editor_for_post_type', 'cd_enable_block_editor', 10, 2 );
 
 //
 // MISC

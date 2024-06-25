@@ -95,7 +95,6 @@ function child_theme_enqueue() {
 	wp_enqueue_style ( 'child-style', $child_theme_dir . 'style.css', NULL, NULL, 'all' );
 
 	if (
-		is_singular ( 'interactive' ) ||
 		is_singular ( 'resource' )
 	) {
 		wp_enqueue_style ( 'wp-block-library' );

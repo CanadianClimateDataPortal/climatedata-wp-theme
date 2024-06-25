@@ -197,7 +197,7 @@ function posttype_interactive() {
         'labels'              => $labels,
         'supports'            => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions', 'author' ),
         'hierarchical'        => true,
-        'public'              => true,
+        'public'              => false,
         'show_ui'             => true,
         'show_in_menu'        => true,
         'menu_position'       => 23,
@@ -207,7 +207,7 @@ function posttype_interactive() {
         'can_export'          => true,
         'has_archive'         => false,
         'exclude_from_search' => false,
-        'publicly_queryable'  => true,
+        'publicly_queryable'  => false,
         'capability_type'     => 'page',
         'show_in_rest'        => true,
     );

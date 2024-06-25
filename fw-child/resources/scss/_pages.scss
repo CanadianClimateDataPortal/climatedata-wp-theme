@@ -22,18 +22,34 @@
 
 #hero-text {
   h1 {
-    @include font-size(4.375rem);
+    @include font-size(3.5rem);
+    line-height: 1;
+
+    @include media-breakpoint-up(lg) {
+      @include font-size(4.375rem);
+    }
   }
 
   p {
-    @include font-size(2.125rem);
-    line-height: 1.3;
+    @include font-size(1.5rem);
+    line-height: 1.1;
     color: $blue-200;
+    margin-bottom: 1rem;
+
+    @include media-breakpoint-up(lg) {
+      @include font-size(2.125rem);
+      line-height: 1.3;
+    }
   }
 }
 
 #hero-text-carousel {
+  margin-top: 5rem;
   overflow: visible;
+
+  @include media-breakpoint-up(md) {
+    margin-top: 6.25rem;
+  }
 }
 
 #hero-text-carousel-pagination {
@@ -86,10 +102,6 @@
 #page-home {
   #floating-header {
     background-color: transparent;
-  }
-
-  #header-primary {
-    @include font-size(1.25rem);
   }
 
   #header-lang {
@@ -1755,7 +1767,7 @@ body.tab-drawer-open {
       top: 120px;
       padding-top: 2rem;
       text-align: center;
-      font-size: 2.75rem;
+      font-size: 2.5rem;
       font-weight: $font-weight-bold;
       
       @include media-breakpoint-up(lg) {

@@ -32,19 +32,29 @@
   }
 }
 
+#hero-text-carousel {
+  overflow: visible;
+}
+
 #hero-text-carousel-pagination {
   --swiper-pagination-bullet-horizontal-gap: 0.75rem;
   --swiper-pagination-bullet-inactive-color: #{$blue-200};
   --swiper-pagination-color: #{$white};
   position: relative;
   top: auto;
-  bottom: auto;
+  bottom: -5rem;
   left: auto;
   right: auto;
-  width: calc((100vw / 16) * 2);
+  width: 100vw;
   height: 0;
-  margin-left: calc((100vw / 16) * 8);
-  text-align: right;
+  text-align: center;
+
+  @include media-breakpoint-up(md) {
+    bottom: auto;
+    margin-left: calc((100vw / 16) * 7);
+    text-align: right;
+    width: calc((100vw / 16) * 3);
+  }
 
   .swiper-pagination-bullet {
     position: relative;
@@ -67,6 +77,7 @@
 }
 
 #hero-eccc {
+
   p {
     font-size: 0.625rem;
   }

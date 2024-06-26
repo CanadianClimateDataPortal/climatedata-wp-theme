@@ -23,3 +23,44 @@
 <em>Refer to the image below for graphically represented Git workflow.</em>
 
 ![Branching strategy](branching.png)
+
+## Pull requests process
+
+When submitting a pull request, make sure to provide a meaningful description. Depending on what your update does, don't hesitate to add context, to
+describe the current (incorrect) behavior, to describe what modification your update brings, etc.
+
+If the PR is related to a specific ticket, include a link to the ticket.
+
+### If your pull request is "approved" by the reviewer
+
+A PR will be approved when there are no changes requested, or when there are only minor changes requested (ex: related to code style or comments, code changes that don't affect the general logic, etc.).
+
+The person that opened the PR will then be responsible to:
+1. Update the code as requested, if changes were requested.
+2. Mark as "resolved" all pending discussions.
+3. **_Squash and Merge_** the PR.
+4. Delete the branch, if it's a _feature_ or _fix_ branch.
+
+**Notes**:
+* Make sure to read the comments left by the reviewer. Even if the PR is approved, there might be requests for minor changes.
+* Beside the requested minor changes, don't update your code after the PR has been approved.
+* Always _Squash and Merge_, unless exception.
+* If a requested change needs more discussion, discuss under the comment left by the reviewer. If a discussion happened outside of GitHub
+  (ex: by video call), write in the comment's discussion a summary of what was discussed.
+
+### If your pull request is marked "Request changes" by the reviewer
+
+A PR will be marked "Request changes" when requested changes are significant enough that the necessary updates would
+need a new review.
+
+The person that opened the PR will then be responsible to:
+1. Update the code as requested (but don't "resolve" the reviewer's comments).
+2. Request again a review from the reviewer (using the button beside the reviewer's name).
+
+**Notes**:
+* When ready for another review, use the "Re-request review" button beside the reviewer's name. Don't simply add a comment
+  nor simply send a message to the reviewer.
+* **_Don't_** mark the reviewer's comments as "Resolved" after you updated your code. The reviewer will need to know
+  what was the comment before re-validating it. The reviewer will "resolve" the conversation once it's considered resolved.
+  If you want to show that you have now "resolved" the comment, you can add a reaction (ex: 👍) or a comment to the comment.
+* Once your PR is approved, follow the instructions in "_If your pull request is approved_".

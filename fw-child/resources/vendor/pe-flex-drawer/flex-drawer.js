@@ -214,7 +214,8 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 			}
 			
 		},
-		
+
+		// Monitors the screen size and dynamically updates the column count.
 		variable_archive_watch_column_count: function () {
 			let plugin = this,
 				current_screen = null;

@@ -209,8 +209,9 @@ function taxonomy_sector()
 add_action('init', 'taxonomy_sector', 10);
 
 /**
- * Hides the sector taxonomy metabox on the
- * edit page of CPT 'variable'.
+ * Hides the sector taxonomy metabox on the edit page of CPT 'variable'.
+ * 
+ * @param WP_Screen $current_screen Current WP_Screen object.
  *
  * @return void
  */

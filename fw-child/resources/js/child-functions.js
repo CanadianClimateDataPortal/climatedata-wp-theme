@@ -263,14 +263,18 @@ const $ = jQuery;
          * Auto-scroll and open variable details if a variable hash exists.
          */
         if (window.location.hash) {
-          let variable_item_hash = window.location.hash;
+          const variable_element = $( window.location.hash );
           
-          if ($( variable_item_hash ).length > 0) {
-            $( 'html, body' ).animate( {
-              scrollTop: $( variable_item_hash ).parent().position().top
-            }, 10, 'swing' ).promise().done( function () {
-              $( variable_item_hash ).find( '.flex-drawer-trigger' ).trigger( 'click' );
-            } );
+          if (variable_element.length > 0) {
+            const scroll_top = variable_element.parent().position().top;
+            $( 'html, body' )
+              .animate( {scrollTop: scroll_top}, 10, 'swing' )
+              .promise()
+              .done( function () {
+                variable_element
+                  .find( '.flex-drawer-trigger' )
+                  .trigger( 'click' );
+              } );
           }
         }
       } );

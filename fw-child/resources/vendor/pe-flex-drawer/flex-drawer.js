@@ -108,13 +108,8 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 					// console.log('drawer order', drawer_order)
 					
 					if (item_order_div % options.column_count == 0) {
-						
-						// console.log('item order % options.column_count 👍')
-						
-						drawer_order = this_order + 1
-						
+						drawer_order = this_order + 1;
 					} else {
-						
 						this_item.nextAll().each( function () {
 							if (drawer_order == null) {
 								// drawer order hasn't been set
@@ -144,9 +139,9 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 					// activate links
 					
 					this_item.find( options.trigger_selector ).addClass( 'fd-selected' )
-					
+
 					// create the drawer element
-					
+
 					this_drawer = $(
 						'<div class="fd-drawer" data-fd-item="' +
 						item_id +
@@ -161,21 +156,20 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 						.insertAfter( this_item )
 						.slideDown( 250, function () {
 						} )
-					
+
 					this_item.addClass( 'fd-open' )
-          
-          // Update the URL hash if the variable item hash exists.
-          let variable_item = this_item.find( '.variable-item' );
-          
-          if (variable_item.length > 0) {
-            let variable_item_hash = variable_item.attr( 'id' );
-            
-            if (variable_item_hash) { // Check if variable_item_hash is not empty
-              window.location.hash = variable_item_hash;
-            } 
-          }
+
+					// Update the URL hash if the variable item hash exists.
+					let variable_item = this_item.find( '.variable-item' );
+
+					if (variable_item.length > 0) {
+						let variable_item_hash = variable_item.attr( 'id' );
+
+						if (variable_item_hash) { // Check if variable_item_hash is not empty
+							window.location.hash = variable_item_hash;
+						} 
+					}
 				} )
-				
 			}
 			
 		},

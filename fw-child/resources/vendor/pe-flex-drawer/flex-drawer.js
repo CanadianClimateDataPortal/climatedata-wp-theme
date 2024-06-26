@@ -6,7 +6,7 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 (function ( $ ) {
 	function flex_drawer( item, options ) {
 		// options
-		
+
 		var defaults = {
 			globals: ajax_data.globals,
 			lang: 'en',

@@ -332,13 +332,14 @@ function posttype_app() {
 add_action( 'init', 'posttype_app', 0 );
 
 /**
- * Updates the 'sector' taxonomy terms.
+ * Updates the 'sector' taxonomy terms of the post from
+ * the values of the ACF field "Relevant sectors".
  *
  * @param int $post_id The ID of the post being updated.
  *
  * @return void
  */
-function cd_variable_update_tax_sector_terms( $post_id ) {
+function cdc_variable_update_tax_sector_terms( $post_id ) {
 	// Get relevant sectors.
 	$relevant_sectors = get_field( 'relevant_sectors', $post_id );
 
@@ -360,4 +361,4 @@ function cd_variable_update_tax_sector_terms( $post_id ) {
 	wp_set_post_terms( $post_id, $term_ids, 'sector', false );
 }
 
-add_action( 'acf/save_post', 'cd_variable_update_tax_sector_terms' );
+add_action( 'acf/save_post', 'cdc_variable_update_tax_sector_terms' );

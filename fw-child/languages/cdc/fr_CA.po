@@ -1293,11 +1293,11 @@ msgstr ""
 
 #: template/query/variable-item.php:82
 msgid "View on Map"
-msgstr "Voir sur la Carte"
+msgstr "Voir sur la carte"
 
 #: template/query/variable-item.php:119
 msgid "Relevant Sectors"
-msgstr "Secteurs Pertinents"
+msgstr "Secteurs pertinents"
 
 #. Theme Name of the theme
 #: style.css

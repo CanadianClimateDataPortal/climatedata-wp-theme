@@ -268,12 +268,12 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 			}
 			
 			// Initial check.
-			let screen_columns = update_screen_condition( plugin, current_screen );
+			const screen_columns = update_screen_condition( plugin, current_screen );
 			[ current_screen, plugin.options.column_count ] = screen_columns;
 			
 			// Listen to resize event.
 			$( window ).on( 'resize', function () {
-				let screen_columns = update_screen_condition( plugin, current_screen );
+				const screen_columns = update_screen_condition( plugin, current_screen );
 				[ current_screen, plugin.options.column_count ] = screen_columns;
 			} );
 		}

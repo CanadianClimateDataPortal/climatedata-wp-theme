@@ -271,7 +271,7 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 			let screen_columns = update_screen_condition( plugin, current_screen );
 			[ current_screen, plugin.options.column_count ] = screen_columns;
 			
-			// Debounced resize event listener.
+			// Listen to resize event.
 			$( window ).on( 'resize', function () {
 				let screen_columns = update_screen_condition( plugin, current_screen );
 				[ current_screen, plugin.options.column_count ] = screen_columns;

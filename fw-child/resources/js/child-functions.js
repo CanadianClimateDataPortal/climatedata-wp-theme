@@ -258,10 +258,9 @@ const $ = jQuery;
           // reinit if plugin is already loaded
           query_items.flex_drawer( 'init_items' );
         }
-        
+
         /**
-         * Auto-scroll and open variable details if 
-         * a variable hash exists.
+         * Auto-scroll and open variable details if a variable hash exists.
          */
         if (window.location.hash) {
           let variable_item_hash = window.location.hash;

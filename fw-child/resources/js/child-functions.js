@@ -267,6 +267,7 @@ const $ = jQuery;
           
           if (variable_element.length > 0) {
             const scroll_top = variable_element.parent().position().top;
+
             $( 'html, body' )
               .animate( {scrollTop: scroll_top}, 10, 'swing' )
               .promise()

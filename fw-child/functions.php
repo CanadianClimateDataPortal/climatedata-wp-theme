@@ -94,9 +94,7 @@ function child_theme_enqueue() {
 	wp_register_style ( 'gutenberg', $child_theme_dir . 'resources/css/gutenberg.css', null, null );
 	wp_enqueue_style ( 'child-style', $child_theme_dir . 'style.css', NULL, NULL, 'all' );
 
-	if (
-		is_singular ( 'resource' )
-	) {
+	if ( is_singular ( 'resource' ) ) {
 		wp_enqueue_style ( 'wp-block-library' );
 		wp_enqueue_style ( 'gutenberg' );
 		wp_enqueue_style ( 'global-styles' );
@@ -171,9 +169,9 @@ function child_theme_enqueue() {
 
 	// GSAP
 
-	wp_enqueue_script ( 'gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.3/gsap.min.js', null, '3.3.3', true );
-	wp_enqueue_script ( 'scrolltrigger', 'https://assets.codepen.io/16327/ScrollTrigger.min.js?v=32', array ( 'gsap' ), null, true );
-	wp_enqueue_script ( 'scroll', $child_js_dir . 'scroll.js', array ( 'jquery','scrolltrigger' ), null, true );
+	wp_register_script ( 'gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.3/gsap.min.js', null, '3.3.3', true );
+	wp_register_script ( 'scrolltrigger', 'https://assets.codepen.io/16327/ScrollTrigger.min.js?v=32', array ( 'gsap' ), null, true );
+	wp_register_script ( 'scroll', $child_js_dir . 'scroll.js', array ( 'jquery', 'scrolltrigger' ), '1.1', true );
 
 	// utilities/constants
 
@@ -526,14 +524,14 @@ function remove_comments_admin_bar() {
 }
 
 /**
- * Enables Gutenberg editor for specific post types.
+ * Returns a boolean indicating if the Gutenberg editor must be enabled for a post type.
  *
  * @param bool   $use_block_editor Whether the post type can use the block editor.
  * @param string $post_type The post type being checked.
  *
  * @return bool Status of block editor.
  */
-function cd_enable_block_editor( $use_block_editor, $post_type ) {
+function cdc_enable_block_editor( $use_block_editor, $post_type ) {
 	if ( in_array( $post_type, array( 'interactive' ), true ) ) {
 		return true;
 	}
@@ -545,7 +543,7 @@ add_action ( 'init', 'remove_default_editor' );
 add_action ( 'init', 'remove_comments_post_type_support', 100 );
 add_action ( 'admin_menu', 'remove_comments_admin_menu' );
 add_action ( 'wp_before_admin_bar_render', 'remove_comments_admin_bar' );
-add_filter( 'use_block_editor_for_post_type', 'cd_enable_block_editor', 10, 2 );
+add_filter ( 'use_block_editor_for_post_type', 'cd_enable_block_editor', 10, 2 );
 
 //
 // MISC

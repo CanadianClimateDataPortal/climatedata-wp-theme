@@ -23,22 +23,7 @@
       });
     }
 
-    function once(el, event, fn, opts) {
-
-      const onceFn = function (e) {
-        el.removeEventListener(event, onceFn);
-        fn.apply(this, arguments);
-      };
-
-      el.addEventListener(event, onceFn, opts);
-
-      return onceFn;
-
-    }
-
     function video_trigger(element_id) {
-
-      console.log(element_id);
 
       const this_vid = document.querySelector(element_id);
 
@@ -81,63 +66,20 @@
       'scale-out': { to: { scale: 0.5 } }
     };
 
-    const tl_effects = {
-      enter: {
-        'fade': {
-          from: { opacity: 0 },
-          to: { opacity: 1 }
-        },
-        'fade-left': {
-          from: { opacity: 0, xPercent: 50 },
-          to: { opacity: 1, xPercent: 0 }
-        },
-        'fade-right': {
-          from: { opacity: 0, xPercent: -50 },
-          to: { opacity: 1, xPercent: 0 }
-        },
-        'fade-down': {
-          from: { opacity: 0, yPercent: -50 },
-          to: { opacity: 1, yPercent: 0 }
-        },
-        'fade-up': {
-          from: { opacity: 0, yPercent: 50 },
-          to: { opacity: 1, yPercent: 0 }
-        },
-        'scale': {
-          from: { opacity: 0, scale: 0.5 },
-          to: { opacity: 1, scale: 1 }
-        }
-      },
-      exit: {
-        'fade': { opacity: 0 },
-        'fade-left': { opacity: 0, xPercent: -50 },
-        'fade-right': { opacity: 0, xPercent: 50 },
-        'fade-down': { opacity: 0, yPercent: 50 },
-        'fade-up': { opacity: 0, yPercent: -50 },
-        'scale': { scale: 0.5 }
-      }
-    };
-
     let videos_to_load = 0;
-
-    const video_URLs = [];
 
     if ($('video').length) {
 
       videos_to_load = $('video').length;
-
-      console.log('videos to load', videos_to_load);
 
       $('body').addClass('spinner-on');
 
       $('video').each(function() {
 
         const this_vid = $(this),
-              video_ID = $(this).attr('id'),
-              video = document.getElementById(video_ID);
+              video_ID = $(this).attr('id');
 
-        const url = $(this).attr('src'),
-              mime = $(this).attr('data-mime');
+        const url = $(this).attr('src');
 
         request('GET', url)
           .then(function (e) {
@@ -147,13 +89,10 @@
 
             videos_to_load -= 1;
 
-            if (videos_to_load == 0) {
-              console.log('all videos loaded');
+            if (videos_to_load === 0) {
               $(document).trigger('videos_loaded');
             }
 
-          }, function (e) {
-            // handle errors
           });
 
       });
@@ -167,8 +106,6 @@
     }
 
     $(document).on('videos_loaded', function() {
-
-      console.log('begin timeline');
 
       gsap.utils.toArray(".tl-container").forEach((panel, i) => {
 
@@ -197,17 +134,15 @@
 
         tl_array.forEach(function(el) {
 
-          let this_from, this_to;
-
           if ($(id_pre + el.id).length) {
 
             if (!$(id_pre + el.id).hasClass('entered')) {
               $(id_pre + el.id).css('opacity', 0).addClass('entered');
             }
 
-            if (el.effect == 'manual' ) {
+            if (el.effect === 'manual' ) {
 
-              this_to = {
+              const this_to = {
                 ...el.properties,
                 ...{
                   duration: el.duration,
@@ -223,11 +158,11 @@
                 }
               };
 
-              tl.fromTo( id_pre + el.id, this_from, this_to, el.position );
+              tl.fromTo( id_pre + el.id, null, this_to, el.position );
 
             } else {
 
-              this_to = {
+              const this_to = {
                 ...tweens[el.effect].to,
                 ...{
                   duration: el.duration,
@@ -247,12 +182,10 @@
 
             }
           } else {
-            console.log('⚠ ' + id_pre + el.id + ' does not exist');
+            console.warn('⚠ ' + id_pre + el.id + ' does not exist');
           }
 
         });
-
-        console.log(tl);
 
         $('body').removeClass('spinner-on');
 

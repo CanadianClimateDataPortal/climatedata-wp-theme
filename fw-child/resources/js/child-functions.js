@@ -436,6 +436,55 @@ const $ = jQuery;
     });
 
     //
+    // Learn block GSAP Animation on front page
+    //
+
+    if ($('#page-home').length) {
+      gsap.registerPlugin(ScrollTrigger);
+
+      gsap.utils.toArray('.scroll-card').forEach((card, i) => {
+        let tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 60%',
+            end: 'top -20%',
+            scrub: true,
+            markers: false    // Set to true to debug
+          }
+        });
+        
+        tl.fromTo(card, 
+          { 
+            y: '-50%',
+            opacity: 0,
+            scale: 0.75
+          },
+          {
+            y: '0%',
+            opacity: 1,
+            scale: 1
+          }
+        )
+        .to(card,
+          {
+            y: '0%',
+            opacity: 1,
+            scale: 1
+          }
+        )
+        .to(card,
+          {
+            y: '20%',
+            opacity: 0,
+            scale: 0.75,
+            ease: 'power2.in'
+          }
+        )
+      });
+
+    };
+
+    //
     // MISC
     //
 

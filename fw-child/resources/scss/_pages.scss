@@ -167,6 +167,10 @@
     position: sticky;
     top: 25vh;
     margin-bottom: 25vh;
+
+    & + div {
+      margin-bottom: 25vh;
+    }
   }
 
   #resources-query {

@@ -251,6 +251,10 @@ function child_theme_enqueue() {
 
 		wp_enqueue_script ( 'webflow', $child_vendor_dir . 'climatedata-scroll.webflow/webflow.js', array ( 'jquery' ), null, true );
 
+		wp_enqueue_script ( 'gsap' );
+		wp_enqueue_script ( 'scrolltrigger' );
+		wp_enqueue_script ( 'scroll' );
+
 	}
 
 	switch ( $GLOBALS['vars']['current_slug'] ) {
@@ -543,7 +547,7 @@ add_action ( 'init', 'remove_default_editor' );
 add_action ( 'init', 'remove_comments_post_type_support', 100 );
 add_action ( 'admin_menu', 'remove_comments_admin_menu' );
 add_action ( 'wp_before_admin_bar_render', 'remove_comments_admin_bar' );
-add_filter ( 'use_block_editor_for_post_type', 'cd_enable_block_editor', 10, 2 );
+add_filter ( 'use_block_editor_for_post_type', 'cdc_enable_block_editor', 10, 2 );
 
 //
 // MISC

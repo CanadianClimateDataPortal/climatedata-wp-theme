@@ -219,6 +219,12 @@ p {
     margin-right: 0.5rem;
     opacity: 0.8;
   }
+
+  &-lg {
+    @include media-breakpoint-down(sm) {
+      padding: $input-padding-y-lg $input-padding-x-lg; 
+    }
+  }
 }
 
 .bg {

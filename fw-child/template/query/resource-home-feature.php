@@ -20,7 +20,7 @@
 
         </div>
 
-        <div class="card-body position-absolute bottom-0 w-100 bg-black-50 text-light">
+        <div class="card-body text-light">
 
             <h5 class="card-title item-title text-light">
 
@@ -32,13 +32,17 @@
 
             </h5>
 
-            <?php
+            <div class="d-none d-lg-block">
 
-                echo apply_filters ( 'the_content', custom_excerpt ( 20, $item['id'] ) );
+                <?php
 
-            ?>
+                    echo apply_filters ( 'the_content', custom_excerpt ( 20, $item['id'] ) );
 
-            <p class="text-capitalize">
+                ?>
+
+            </div>
+
+            <p class="post-type">
 
                 <i class="me-1 fa-solid icon-<?php the_field ( 'asset_type', $item['id']) ; ?>"></i>
 

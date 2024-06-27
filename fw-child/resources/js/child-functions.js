@@ -457,19 +457,22 @@ const $ = jQuery;
           { 
             y: '-50%',
             opacity: 0,
-            scale: 0.75
+            scale: 0.75,
+            zIndex: 0
           },
           {
             y: '0%',
             opacity: 1,
-            scale: 1
+            scale: 1,
+            zIndex: 100
           }
         )
         .to(card,
           {
             y: '0%',
             opacity: 1,
-            scale: 1
+            scale: 1,
+            zIndex: 100
           }
         )
         .to(card,
@@ -477,6 +480,7 @@ const $ = jQuery;
             y: '20%',
             opacity: 0,
             scale: 0.75,
+            zIndex: 0,
             ease: 'power2.in'
           }
         )

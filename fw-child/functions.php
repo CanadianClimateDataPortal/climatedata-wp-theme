@@ -251,6 +251,10 @@ function child_theme_enqueue() {
 
 		wp_enqueue_script ( 'webflow', $child_vendor_dir . 'climatedata-scroll.webflow/webflow.js', array ( 'jquery' ), null, true );
 
+		wp_enqueue_script ( 'gsap' );
+		wp_enqueue_script ( 'scrolltrigger' );
+		wp_enqueue_script ( 'scroll' );
+
 	}
 
 	switch ( $GLOBALS['vars']['current_slug'] ) {

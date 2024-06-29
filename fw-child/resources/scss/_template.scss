@@ -287,3 +287,54 @@
     display: none;
   }
 }
+
+//
+// ASIDE MENU
+//
+
+.climatedata-menu {
+  .climatedata-menu-item {
+    padding: .125rem 0 .125rem .5rem;
+  }
+
+  .climatedata-collapsible-item {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .climatedata-expand {
+    background-color: transparent;
+    border: none;
+    color: $secondary;
+    display: inline-block;
+    padding: .375rem .5rem;
+    transition: background-color .2s;
+
+    &:hover {
+      background-color: $gray-400;
+    }
+  }
+
+  .submenu {
+    padding-left: .75rem;
+    width: 100%;
+  }
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  a {
+    color: $secondary;
+    display: inline-block;
+    font-size: 1.125rem;
+
+    &:hover,
+    &:focus {
+      text-decoration: underline;
+    }
+  }
+}

@@ -143,7 +143,7 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 										<?php echo esc_html( $relevant_sector_term_name ); ?>
 									</button>
 								</h2>
-								<div id="var-<?php echo $item['id']; ?>-collapse-<?php echo esc_attr( $relevant_sector_term_id );; ?>"
+								<div id="var-<?php echo $item['id']; ?>-collapse-<?php echo esc_attr( $relevant_sector_term_id ); ?>"
 									 class="accordion-collapse collapse"
 									 aria-labelledby="var-<?php echo $item['id']; ?>-heading-<?php echo esc_attr( $relevant_sector_term_id );; ?>"
 									 data-bs-parent="#var-accordion-<?php echo $item['id']; ?>">

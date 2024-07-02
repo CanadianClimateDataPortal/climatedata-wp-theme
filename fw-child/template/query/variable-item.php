@@ -83,7 +83,6 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 				}
 
 				if ( is_array( $page_availability ) && ! empty( $page_availability ) ) {
-					var_dump($page_availability);
 					if ( in_array( 'map', $page_availability, true ) ) {
 						?>
 						<a href="<?php echo home_url( $map_slug ); ?>?var_id=<?php echo $item['id']; ?>"

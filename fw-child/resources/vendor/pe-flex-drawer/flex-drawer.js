@@ -47,12 +47,7 @@ if (typeof pushes_since_input == 'undefined') {
 				console.log( 'td', 'init' )
 			}
 			
-			plugin.init_items()
-			
-			// Update the number of columns on variable archive page.
-			if ($( '.variable-archive-page' ).length > 0) {
-				plugin.variable_archive_watch_column_count()
-			}
+			plugin.init_items();
 		},
 		
 		init_items: function () {
@@ -158,18 +153,9 @@ if (typeof pushes_since_input == 'undefined') {
 						.slideDown( 250, function () {
 						} )
 
-					this_item.addClass( 'fd-open' )
+					this_item.addClass( 'fd-open' );
 
-					// Update the URL hash if the variable item hash exists.
-					let variable_item = this_item.find( '.variable-item' );
-
-					if (variable_item.length > 0) {
-						let variable_item_hash = variable_item.attr( 'id' );
-
-						if (variable_item_hash) { // Check if variable_item_hash is not empty
-							window.location.hash = variable_item_hash;
-						} 
-					}
+					$(document).trigger('fw_fd_open', [this_item]);
 				} )
 			}
 			
@@ -214,64 +200,6 @@ if (typeof pushes_since_input == 'undefined') {
 				callback()
 			}
 			
-		},
-
-		// Monitors the screen size and dynamically updates the column count.
-		variable_archive_watch_column_count: function () {
-			let plugin = this,
-				current_screen = null;
-			
-			const media_queries = {
-				large_screen: '(min-width: 768px)',
-				medium_screen: '(min-width: 576px) and (max-width: 767px)',
-				small_screen: '(max-width: 575px)',
-			};
-
-			const update_screen_condition = function ( plugin_obj, screen ) {
-				let updated_column_count = plugin_obj.options.column_count;
-
-				for (const screen_condition in media_queries) {
-					if (window.matchMedia( media_queries[screen_condition] ).matches) {
-						if (screen === screen_condition) {
-							return [
-								screen_condition,
-								updated_column_count
-							]
-						}
-
-						switch (screen_condition) {
-							case 'small_screen':
-								updated_column_count = 1;
-
-								break;
-							case 'medium_screen':
-								updated_column_count = 2;
-
-								break;
-							default:
-								updated_column_count = 3;
-						}
-
-						plugin_obj.close_all();
-						plugin_obj.init_items();
-
-						return [
-							screen_condition,
-							updated_column_count
-						]
-					}
-				}
-			}
-
-			// Initial check.
-			const screen_columns = update_screen_condition( plugin, current_screen );
-			[ current_screen, plugin.options.column_count ] = screen_columns;
-
-			// Listen to resize event.
-			$( window ).on( 'resize', function () {
-				const screen_columns = update_screen_condition( plugin, current_screen );
-				[ current_screen, plugin.options.column_count ] = screen_columns;
-			} );
 		}
 	}
 

@@ -249,7 +249,8 @@ const $ = jQuery;
     if ($( '.variable-archive-page' ).length > 0) {
       $( document ).on( 'fw_query_success', function ( e, query_item ) {
         let query_items = query_item.find( '.fw-query-items' );
-        
+        let current_screen = null;
+
         if (query_items.data( 'flex_drawer' ) == undefined) {
           query_items.flex_drawer( {
             item_selector: '.fw-query-item',
@@ -259,12 +260,56 @@ const $ = jQuery;
           query_items.flex_drawer( 'init_items' );
         }
 
+        const media_queries = {
+          large_screen: '(min-width: 768px)',
+          medium_screen: '(min-width: 576px) and (max-width: 767px)',
+          small_screen: '(max-width: 575px)',
+        };
+
+        const update_screen_condition = function ( plugin_obj, screen ) {
+          let updated_column_count = plugin_obj.options.column_count;
+
+          for (const screen_condition in media_queries) {
+            if (window.matchMedia( media_queries[screen_condition] ).matches) {
+              if (screen === screen_condition) {
+                return [ screen_condition, updated_column_count ];
+              }
+
+              switch (screen_condition) {
+                case 'small_screen':
+                  updated_column_count = 1;
+                  break;
+                case 'medium_screen':
+                  updated_column_count = 2;
+                  break;
+                default:
+                  updated_column_count = 3;
+              }
+
+              plugin_obj.close_all();
+              plugin_obj.init_items();
+
+              return [ screen_condition, updated_column_count ];
+            }
+          }
+        };
+
+        // Initial check.
+        const screen_columns = update_screen_condition( query_items.data( 'flex_drawer' ), current_screen );
+        [ current_screen, query_items.data( 'flex_drawer' ).options.column_count ] = screen_columns;
+
+        // Listen to resize event.
+        $( window ).on( 'resize', function () {
+          const screen_columns = update_screen_condition( query_items.data( 'flex_drawer' ), current_screen );
+          [ current_screen, query_items.data( 'flex_drawer' ).options.column_count ] = screen_columns;
+        } );
+
         /**
          * Auto-scroll and open variable details if a variable hash exists.
          */
         if (window.location.hash) {
           const variable_element = $( window.location.hash );
-          
+
           if (variable_element.length > 0) {
             const scroll_top = variable_element.parent().position().top;
 
@@ -276,6 +321,19 @@ const $ = jQuery;
                   .find( '.flex-drawer-trigger' )
                   .trigger( 'click' );
               } );
+          }
+        }
+      } );
+
+      $( document ).on( 'fw_fd_open', function ( e, drawer_item ) {
+        // Update the URL hash if the variable item hash exists.
+        let variable_item = drawer_item.find( '.variable-item' );
+
+        if (variable_item.length > 0) {
+          let variable_item_hash = variable_item.attr( 'id' );
+
+          if (variable_item_hash) { // Check if variable_item_hash is not empty
+            window.location.hash = variable_item_hash;
           }
         }
       } );

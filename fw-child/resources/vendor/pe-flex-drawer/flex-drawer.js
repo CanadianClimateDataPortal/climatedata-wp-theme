@@ -1,8 +1,9 @@
 // flex drawer plugin
 
-if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
+if (typeof pushes_since_input == 'undefined') {
+  var pushes_since_input = 0;
+}
 
-;
 (function ( $ ) {
 	function flex_drawer( item, options ) {
 		// options
@@ -21,27 +22,27 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 			debug: true,
 			column_count: 3,
 		}
-		
+
 		this.options = $.extend( true, defaults, options )
-		
+
 		this.item = $( item )
 		this.init()
 	}
-	
+
 	flex_drawer.prototype = {
 		// init
-		
+
 		init: function () {
 			let plugin = this,
 				item = plugin.item,
 				options = plugin.options
 			
 			options.lang = options.globals.current_lang_code
-			
+
 			//
 			// INITIALIZE
 			//
-			
+
 			if (options.debug == true) {
 				console.log( 'td', 'init' )
 			}
@@ -98,15 +99,15 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 				// close all drawers
 				
 				plugin.close_all( function () {
-					
+
 					// find the next item that's in the options.column_count column
-					
+
 					let item_order_div = this_order / 10
-					
+
 					// console.log('item', this_item)
 					// console.log('item order', item_order_div)
 					// console.log('drawer order', drawer_order)
-					
+
 					if (item_order_div % options.column_count == 0) {
 						drawer_order = this_order + 1;
 					} else {
@@ -118,7 +119,7 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 								// 	'next item',
 								// 	parseInt($(this).css('order')) / 10,
 								// )
-								
+
 								if ((parseInt( $( this ).css( 'order' ) ) / 10) % options.column_count == 0) {
 									drawer_order = parseInt( $( this ).css( 'order' ) ) + 1
 								}
@@ -225,10 +226,10 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 				medium_screen: '(min-width: 576px) and (max-width: 767px)',
 				small_screen: '(max-width: 575px)',
 			};
-			
+
 			const update_screen_condition = function ( plugin_obj, screen ) {
 				let updated_column_count = plugin_obj.options.column_count;
-				
+
 				for (const screen_condition in media_queries) {
 					if (window.matchMedia( media_queries[screen_condition] ).matches) {
 						if (screen === screen_condition) {
@@ -237,23 +238,23 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 								updated_column_count
 							]
 						}
-						
+
 						switch (screen_condition) {
 							case 'small_screen':
 								updated_column_count = 1;
-								
+
 								break;
 							case 'medium_screen':
 								updated_column_count = 2;
-								
+
 								break;
 							default:
 								updated_column_count = 3;
 						}
-						
+
 						plugin_obj.close_all();
 						plugin_obj.init_items();
-						
+
 						return [
 							screen_condition,
 							updated_column_count
@@ -261,11 +262,11 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 					}
 				}
 			}
-			
+
 			// Initial check.
 			const screen_columns = update_screen_condition( plugin, current_screen );
 			[ current_screen, plugin.options.column_count ] = screen_columns;
-			
+
 			// Listen to resize event.
 			$( window ).on( 'resize', function () {
 				const screen_columns = update_screen_condition( plugin, current_screen );
@@ -273,17 +274,17 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 			} );
 		}
 	}
-	
+
 	// jQuery plugin interface
-	
+
 	$.fn.flex_drawer = function ( opt ) {
 		var args = Array.prototype.slice.call( arguments, 1 ),
 			result = true
-		
+
 		this.each( function () {
 			var item = $( this )
 			var instance = item.data( 'flex_drawer' )
-			
+
 			if (!instance) {
 				// create plugin instance if not created
 				item.data( 'flex_drawer', new flex_drawer( this, opt ) )
@@ -294,7 +295,7 @@ if (typeof pushes_since_input == 'undefined') var pushes_since_input = 0
 				}
 			}
 		} )
-		
+
 		return result
 	}
 })( jQuery )

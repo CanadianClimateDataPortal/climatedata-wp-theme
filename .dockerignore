@@ -1,0 +1,8 @@
+.dockerignore
+Dockerfile
+.git
+.gitignore
+climate-data-ca
+h7-parent
+fw-child/**/local_config.php
+fw-child/**/db.php

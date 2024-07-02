@@ -73,6 +73,7 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 
 			<div class="col col-lg-8 offset-lg-0 col-14 offset-1 variable-details__links">
 				<?php
+				$page_availability = get_field( 'page_availability', $item['id'] );
 				$map_slug = 'map/';
 				$dl_slug  = 'download/';
 
@@ -80,13 +81,24 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 					$map_slug = 'carte/';
 					$dl_slug  = 'telechargement/';
 				}
+
+				if ( is_array( $page_availability ) && ! empty( $page_availability ) ) {
+					var_dump($page_availability);
+					if ( in_array( 'map', $page_availability, true ) ) {
+						?>
+						<a href="<?php echo home_url( $map_slug ); ?>?var_id=<?php echo $item['id']; ?>"
+						   class="btn btn-primary btn-sm rounded-pill px-3"><?php _e( 'View on Map', 'cdc' ); ?></a>
+						<?php
+					}
+
+					if ( in_array( 'download', $page_availability, true ) ) {
+						?>
+						<a href="<?php echo home_url( $dl_slug ); ?>?var_id=<?php echo $item['id']; ?>"
+						   class="btn btn-light btn-sm rounded-pill px-3"><?php _e( 'Download Data', 'cdc' ); ?></a>
+						<?php
+					}
+				}
 				?>
-
-				<a href="<?php echo home_url( $map_slug ); ?>?var_id=<?php echo $item['id']; ?>"
-				   class="btn btn-primary btn-sm rounded-pill px-3"><?php _e( 'View on Map', 'cdc' ); ?></a>
-
-				<a href="<?php echo home_url( $dl_slug ); ?>?var_id=<?php echo $item['id']; ?>"
-				   class="btn btn-light btn-sm rounded-pill px-3"><?php _e( 'Download Data', 'cdc' ); ?></a>
 			</div>
 			
 			<div class="col col-14 offset-1 border-bottom border-gray-500 variable-details__separator"></div>

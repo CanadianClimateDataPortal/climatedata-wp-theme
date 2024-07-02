@@ -76,7 +76,7 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 				$map_slug = 'map/';
 				$dl_slug  = 'download/';
 
-				if ( $GLOBALS['fw']['current_lang_code'] == 'fr' ) {
+				if ( 'fr' === $GLOBALS['fw']['current_lang_code'] ) {
 					$map_slug = 'carte/';
 					$dl_slug  = 'telechargement/';
 				}

@@ -37,11 +37,21 @@ if ( !empty ( $all_children ) ) {
 
 <div class="climatedata-menu">
 	<?php
-        function climatedata_aside_menu( $menu_structure, $is_submenu ) {
-            echo '<ul class="climatedata-menu-list';
+        function climatedata_aside_menu( $menu_structure, $is_submenu, $submenu_id = NULL ) {
+            if ( is_null( $submenu_id ) ) {
+                $submenu_id = 0;
+            }
+
+            echo '<ul';
+
+            if ( ! empty( $submenu_id ) ) {
+                echo ' id="climatedata-submenu-' . $submenu_id . '"';
+            }
+
+            echo ' class="climatedata-menu-list';
 
             if ( $is_submenu ) {
-                echo ' submenu';
+                echo ' submenu collapse';
             }
 
             echo '">';
@@ -103,9 +113,10 @@ if ( !empty ( $all_children ) ) {
 
                 if ( isset ( $item['children'] ) ) {
 
-                    echo '<button class="climatedata-expand fa-solid fa-caret-down"></button>';
+                    $submenu_id++;
+                    echo '<button class="climatedata-expand fa-solid fa-caret-down" data-bs-toggle="collapse" data-bs-target="#climatedata-submenu-' . $submenu_id . '" ></button>';
                     echo '</div>';
-                    climatedata_aside_menu ( $item['children'], TRUE );
+                    climatedata_aside_menu ( $item['children'], TRUE, $submenu_id );
 
                 }
 

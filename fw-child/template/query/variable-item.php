@@ -145,7 +145,7 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 								</h2>
 								<div id="var-<?php echo $item['id']; ?>-collapse-<?php echo esc_attr( $relevant_sector_term_id ); ?>"
 									 class="accordion-collapse collapse"
-									 aria-labelledby="var-<?php echo $item['id']; ?>-heading-<?php echo esc_attr( $relevant_sector_term_id );; ?>"
+									 aria-labelledby="var-<?php echo $item['id']; ?>-heading-<?php echo esc_attr( $relevant_sector_term_id ); ?>"
 									 data-bs-parent="#var-accordion-<?php echo $item['id']; ?>">
 									<div class="accordion-body p-3 bg-gray-200">
 										<?php

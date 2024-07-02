@@ -1,8 +1,6 @@
 <?php
-// sectors
 $this_sectors = get_the_terms( $item['id'], 'sector' );
 
-// Get variable post slug.
 $variable_slug = get_post_field( 'post_name', $item['id'] );
 
 // Initialize current language.

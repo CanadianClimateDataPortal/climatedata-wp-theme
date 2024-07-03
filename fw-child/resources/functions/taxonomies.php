@@ -215,9 +215,7 @@ add_action('init', 'taxonomy_sector', 10);
  *
  * @return void
  */
-function cdc_hide_tax_sector_metabox_cpt_variable() {
-	$current_screen = get_current_screen();
-
+function cdc_hide_tax_sector_metabox_cpt_variable( $current_screen ) {
 	if ( ! is_object( $current_screen ) || 'variable' !== $current_screen->post_type ) {
 		return;
 	}

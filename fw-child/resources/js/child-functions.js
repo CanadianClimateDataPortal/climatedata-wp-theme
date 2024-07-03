@@ -249,7 +249,8 @@ const $ = jQuery;
     // Functionalities for variable archive page.
     if ($( '.variable-archive-page' ).length > 0) {
       $( document ).on( 'fw_query_success', function ( e, query_item ) {
-        let query_items = query_item.find( '.fw-query-items' );
+        const query_items = query_item.find( '.fw-query-items' );
+
         let current_screen = null;
 
         if (query_items.data( 'flex_drawer' ) == undefined) {
@@ -337,10 +338,10 @@ const $ = jQuery;
 
       $( document ).on( 'fw_fd_open', function ( e, drawer_item ) {
         // Update the URL hash if the variable item hash exists.
-        let variable_item = drawer_item.find( '.variable-item' );
+        const variable_item = drawer_item.find( '.variable-item' );
 
         if (variable_item.length > 0) {
-          let variable_item_hash = variable_item.attr( 'id' );
+          const variable_item_hash = variable_item.attr( 'id' );
 
           if (variable_item_hash) { // Check if variable_item_hash is not empty
             window.location.hash = variable_item_hash;

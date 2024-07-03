@@ -43,12 +43,17 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 			
 			<div class="var-item-sectors d-flex">
 				<?php
-					
 						foreach ( $this_sectors as $sector ) {
-							
+							$sector_term_id   = $sector->term_id;
+							$sector_term_name = $sector->name;
+
+							if ( 'fr' === $current_lang ) {
+								$sector_term_name_fr = get_field( 'admin_term_title_fr', $sector );
+								$sector_term_name    = ( empty( $sector_term_name_fr ) ) ? $sector_term_name : $sector_term_name_fr;
+							}
 				?>
 				
-				<span class="badge all-caps text-bg-light me-2"><?php echo $sector->name; ?></span>
+				<span class="badge all-caps text-bg-light me-2"><?php echo esc_html( $sector_term_name ); ?></span>
 				
 				<?php
 			

@@ -17,23 +17,23 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: node_modules\n"
 "X-Poedit-SearchPathExcluded-1: resources/vendor\n"
 
-#: functions.php:230
+#: functions.php:234
 msgid "days"
 msgstr "jours"
 
-#: functions.php:231
+#: functions.php:235
 msgid "day of the year"
 msgstr "jour de l’année"
 
-#: functions.php:232
+#: functions.php:236
 msgid "degree days"
 msgstr "degrés-jours"
 
-#: functions.php:233
+#: functions.php:237
 msgid "number of periods"
 msgstr ""
 
-#: functions.php:234
+#: functions.php:238
 msgid "events"
 msgstr ""
 
@@ -648,7 +648,7 @@ msgstr "Ne plus montrer"
 
 #: template/download/map-container.php:34
 #: template/map/map-container.php:33
-#: template/query/variable-item.php:99
+#: template/query/variable-item.php:121
 msgid "Technical Description"
 msgstr "Description technique"
 
@@ -1077,7 +1077,7 @@ msgid "Copy link to this map"
 msgstr "Copier un lien vers cette carte"
 
 #: template/map/controls/download.php:35
-#: template/query/variable-item.php:84
+#: template/query/variable-item.php:101
 msgid "Download Data"
 msgstr "Télécharger les données"
 
@@ -1272,11 +1272,11 @@ msgstr "Sélectionner"
 msgid "Format"
 msgstr ""
 
-#: template/query/variable-item.php:82
+#: template/query/variable-item.php:94
 msgid "View on Map"
 msgstr "Voir sur la carte"
 
-#: template/query/variable-item.php:119
+#: template/query/variable-item.php:138
 msgid "Relevant Sectors"
 msgstr "Secteurs pertinents"
 
@@ -1359,3 +1359,7 @@ msgstr "Toutes les années"
 #: template/download/controls/details.php:299
 msgid "30 years average"
 msgstr "Moyennes sur 30 ans"
+
+#. Template Name of the theme
+msgid "Update ACF Relevant Sectors"
+msgstr ""

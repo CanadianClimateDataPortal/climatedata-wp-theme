@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-06-19T19:53:14+00:00\n"
+"POT-Creation-Date: 2024-07-03T20:28:31+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -24,23 +24,23 @@ msgstr ""
 msgid "Phil Evans"
 msgstr ""
 
-#: functions.php:230
+#: functions.php:234
 msgid "days"
 msgstr ""
 
-#: functions.php:231
+#: functions.php:235
 msgid "day of the year"
 msgstr ""
 
-#: functions.php:232
+#: functions.php:236
 msgid "degree days"
 msgstr ""
 
-#: functions.php:233
+#: functions.php:237
 msgid "number of periods"
 msgstr ""
 
-#: functions.php:234
+#: functions.php:238
 msgid "events"
 msgstr ""
 
@@ -114,6 +114,10 @@ msgstr ""
 
 #. Template Name of the theme
 msgid "Clone Taxonomy"
+msgstr ""
+
+#. Template Name of the theme
+msgid "Update ACF Relevant Sectors"
 msgstr ""
 
 #: template/beta-apps/control-btns.php:10
@@ -685,7 +689,7 @@ msgstr ""
 
 #: template/download/map-container.php:34
 #: template/map/map-container.php:33
-#: template/query/variable-item.php:99
+#: template/query/variable-item.php:121
 msgid "Technical Description"
 msgstr ""
 
@@ -1160,7 +1164,7 @@ msgid "Copy link to this map"
 msgstr ""
 
 #: template/map/controls/download.php:35
-#: template/query/variable-item.php:84
+#: template/query/variable-item.php:101
 msgid "Download Data"
 msgstr ""
 
@@ -1348,10 +1352,10 @@ msgstr ""
 msgid "Format"
 msgstr ""
 
-#: template/query/variable-item.php:82
+#: template/query/variable-item.php:94
 msgid "View on Map"
 msgstr ""
 
-#: template/query/variable-item.php:119
+#: template/query/variable-item.php:138
 msgid "Relevant Sectors"
 msgstr ""

@@ -267,6 +267,15 @@ const $ = jQuery;
           small_screen: '(max-width: 575px)',
         };
 
+        /**
+         * Updates column count based on the current media queries.
+         *
+         * @param {Object} plugin_obj - flex_drawer object.
+         * @param {string} screen - The current screen condition.
+         *
+         * @returns {[string, number]} - An array containing the screen condition
+         *                               and updated column count.
+         */
         const update_screen_condition = function ( plugin_obj, screen ) {
           let updated_column_count = plugin_obj.options.column_count;
 

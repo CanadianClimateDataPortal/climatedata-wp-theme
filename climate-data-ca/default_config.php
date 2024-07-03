@@ -11,6 +11,12 @@ function custom_global_vars()
     $vars['analytics_ua_en'] = "G-CPGH39EQSH"; // GA4 account valid for dev-(en|fr).climatedata.ca
     $vars['analytics_ua_fr'] = "G-CPGH39EQSH";
     $vars['googletag_id'] = "GTM-NJ7L4NR";
+
+    // CookieYes site ID (as found in the required script tag URL: https://cdn-cookieyes.com/client_data/<ID>/script.js)
+    // If empty, no CookieYes script will be included.
+    $vars['cookieyes_id_fr'] = ""; // ID for French site
+    $vars['cookieyes_id_en'] = ""; // ID for English site
+
     $vars['ga_cross_domain'] = "";
     $vars['feedback_email'] = "nullbox@climatedata.ca";
     $vars['training_email'] = "nullbox@climatedata.ca";

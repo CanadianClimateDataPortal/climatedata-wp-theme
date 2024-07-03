@@ -12,6 +12,19 @@
 }
 
 #header-logo-container {
+  a {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    padding-top: .375rem;
+    width: 90%;
+  }
+}
+
+#header-social {
+  @include media-breakpoint-up(md) {
+    border-left: 1px solid $white;
+  }
 }
 
 #header-social-inner {

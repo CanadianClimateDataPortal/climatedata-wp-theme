@@ -188,12 +188,16 @@ if (ajax_data.globals.current_lang_code == 'fr') {
 var l10n_table = {
   fr: {
     'All models': 'Tous les modèles',
+    'PCIC12 (Ensemble)': 'PCIC12 (Ensemble)',
     '{0} Median': '{0} médiane',
     '{0} Range': '{0} portée',
     'No data available for selected location':
       "Pas de données disponibles pour l'emplacement sélectionné",
     'No data available for this area.':
       'Pas de données disponibles pour cette zone.',
+    'The CAPTCHA verification failed. Please try again.': 'La vérification CAPTCHA a échoué. Veuillez réessayer.',
+    'Click below to download your data': 'Cliquez ci-dessous pour télécharger les données',
+    'Success': 'Succès',
 
     'Search communities': 'Recherche par ville',
     'Begin typing city name': "Commencer à saisir le nom d'une ville",
@@ -209,6 +213,11 @@ var l10n_table = {
     'Remove pin': 'Retirer',
     'View': 'Afficher',
 
+    'Station\'s data': 'Données de la station',
+    'Precipitation only': 'Précipitations seulement',
+    'Temperature only': 'Températures seulement',
+    'Precipitation and temperature': 'Précipitations et températures',
+
     'Climate normals 1981–2010':
       'Normales et moyennes climatiques de 1981–2010',
 
@@ -216,6 +225,7 @@ var l10n_table = {
     'Searching…': 'Recherche…',
     'No results found': 'Aucun résultat trouvé',
     'The results could not be loaded.': 'Les résultats ne peuvent pas être chargés.',
+    'Remove item': 'Retirer l\'élément',
 
     // share widget
     'Copied to clipboard': 'Copié dans le presse-papier',
@@ -232,10 +242,12 @@ var l10n_table = {
     'Sorry, an error occurred while sending your feedback. Please try again later.':
       'Désolé, une erreur est survenue. Veuillez réessayer plus tard.',
 
-    'With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}':
-      'Avec les paramètres actuels de fréquence et de format de donnée, le nombre maximal de points de grille par requête est de {0}',
+    'With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}.':
+      'Avec les paramètres actuels de fréquence et de format de donnée, le nombre maximal de points de grille par requête est de {0}.',
     'Around {0} grid boxes selected':
       'Environ {0} points de grille sélectionnés',
+    'Make sure a value is entered for each variable threshold.': 'Assurez-vous d\'entrer une valeur pour chaque seuil.',
+    'Draw an area on the map.': 'Dessinez une région sur la carte.',
 
     // news
 

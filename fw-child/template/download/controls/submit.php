@@ -12,6 +12,7 @@
 		'icon_size' => 16,
 		'input_text' => __ ( 'Enter the characters shown in the image:', 'cdc' ),
 		'namespace' => 'analyze',
+		'refresh_title_text' => __('Refresh Image', 'cdc'),
 	);
 
 ?>
@@ -28,7 +29,7 @@
 						<p class="mb-0"><?php _e ( 'Click the button below to prepare your download.', 'cdc' ); ?></p>
 					</div>
 					
-					<div data-request="custom,ahccd">
+					<div data-request="daily,custom,ahccd">
 						<h5><?php _e ( 'Process Analysis', 'cdc' ); ?></h5>
 						<p class="mb-0"><?php _e ( 'Enter your email address to submit your request.', 'cdc' ); ?></p>
 					</div>
@@ -44,7 +45,7 @@
 					</div>
 				</div>
 				
-				<div id="map-control-email" class="map-control-item" data-request="custom,ahccd">
+				<div id="map-control-email" class="map-control-item" data-request="daily,custom,ahccd">
 					<label for="submit-email" class="form-label h6 mb-3 all-caps text-secondary"><?php _e ( 'Email Address', 'cdc' ); ?></label>
 					
 					<p class="small">
@@ -52,7 +53,7 @@
 						<?php _e ( 'Data processing starts when you click on ‘Send Request.’ It may take 30 to 90 minutes to complete, depending on available resources. You will be notified by email when your request has been processed and the data are available. Don’t forget to check your spam folder.', 'cdc' ); ?>
 					</p>
 					
-					<input type="text" class="form-control" name="submit-email" id="submit-email" data-validate="<?php _e ( 'Please enter a valid email address', 'cdc' ); ?>">
+					<input type="text" class="form-control" name="submit-email" id="submit-email" data-validate="<?php _e ( 'Please enter a valid email address.', 'cdc' ); ?>">
 					
 					<div class="form-check form-switch mt-2">
 						<input class="form-check-input" type="checkbox" role="switch" name="submit-subscribe" id="submit-subscribe"">
@@ -60,8 +61,8 @@
 					</div>
 				</div>
 				
-				<div id="map-control-captcha" class="map-control-item" data-request="custom,ahccd">
-					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'Human Verification', 'cdc' ); ?></h6>
+				<div id="map-control-captcha" class="map-control-item" data-request="daily,custom,ahccd">
+					<h6 class="all-caps text-secondary mb-3"><?php _e ( 'CAPTCHA Verification', 'cdc' ); ?></h6>
 					
 					<div class="row row-cols-2 align-items-center">
 						<div class="col pe-3">
@@ -91,26 +92,26 @@
 				
 				<div id="map-control-idf" class="map-control-item" style="display: none;">
 					<h6 class="mb-3 all-caps text-secondary">
-						<?php _e ( 'IDF Links', 'cdc' ); ?>
+						<?php _e ( 'IDF Documents', 'cdc' ); ?>
 					</h6>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="submit-idf" id="submit-idf-historical" value="historical" data-validate="<?php _e ( 'Select a package to download', 'cdc' ); ?>">
+						<input class="form-check-input" type="radio" name="submit-idf" id="submit-idf-historical" value="historical" data-validate="<?php _e ( 'Select a package to download.', 'cdc' ); ?>">
 						<label class="form-check-label" for="submit-idf-historical"><?php _e ( 'Historical IDF (ZIP)', 'cdc' ); ?></label>
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="submit-idf" id="submit-idf-cmip5" value="cmip5" data-validate="<?php _e ( 'Select a package to download', 'cdc' ); ?>">
+						<input class="form-check-input" type="radio" name="submit-idf" id="submit-idf-cmip5" value="cmip5" data-validate="<?php _e ( 'Select a package to download.', 'cdc' ); ?>">
 						<label class="form-check-label" for="submit-idf-cmip5"><?php _e ( 'Climate Change-Scaled IDF - CMIP5 (ZIP)', 'cdc' ); ?></label>
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="submit-idf" id="submit-idf-cmip6" value="cmip6" data-validate="<?php _e ( 'Select a package to download', 'cdc' ); ?>">
+						<input class="form-check-input" type="radio" name="submit-idf" id="submit-idf-cmip6" value="cmip6" data-validate="<?php _e ( 'Select a package to download.', 'cdc' ); ?>">
 						<label class="form-check-label" for="submit-idf-cmip6"><?php _e ( 'Climate Change-Scaled IDF - CMIP6 (ZIP)', 'cdc' ); ?></label>
 					</div>
 					
 					<div class="form-check">
-						<input class="form-check-input" type="radio" name="submit-idf" id="submit-idf-cmip6-quickstart" value="cmip6-quickstart" data-validate="<?php _e ( 'Select a package to download', 'cdc' ); ?>">
+						<input class="form-check-input" type="radio" name="submit-idf" id="submit-idf-cmip6-quickstart" value="cmip6-quickstart" data-validate="<?php _e ( 'Select a package to download.', 'cdc' ); ?>">
 						<label class="form-check-label" for="submit-idf-cmip6-quickstart"><?php _e ( 'Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)', 'cdc' ); ?></label>
 					</div>
 					

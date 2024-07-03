@@ -42,6 +42,7 @@
         var: null,
         percentiles: ['5'],
         frequency: 'ann',
+        average: '30ygraph',
         scenarios: ['medium'],
         decade: 2040,
         sector: 'gridded_data',
@@ -380,7 +381,20 @@
 
       item.find('#station-select').select2({
         theme: 'bootstrap-5',
-        language: options.lang,
+        language: {
+          noResults: function () {
+            return T('No results found');
+          },
+          searching: function () {
+            return T('Searching…');
+          },
+          errorLoading: function () {
+            return T('The results could not be loaded.');
+          },
+          removeItem: function () {
+            return T('Remove item');
+          },
+        },
         multiple: true,
         closeOnSelect: false,
         width: '100%',
@@ -556,7 +570,7 @@
             instructions +=
               '<p class="mb-0 small">' +
               T('Enter latitude & longitude e.g.') +
-              ' <code>54,-115</code></p>';
+              ' <code>54,-115.3</code></p>';
 
             instructions += '</div>';
 
@@ -1044,6 +1058,7 @@
       });
 
       for (let key in options.maps) {
+        options.maps[key].object.pm.setLang(options.lang);
         options.maps[key].object.on('pm:create', function (e) {
           for (let key2 in options.maps) {
             options.maps[key2].layers.bbox = e.layer;
@@ -1475,9 +1490,11 @@
           } else {
             // console.log('NOT AHCCD');
 
-            // set request type to single
+            // set request type to single (but leave it "daily" if it was already)
 
-            options.request.type = 'single';
+            if (options.request.type !== 'daily') {
+              options.request.type = 'single';
+            }
 
             if (
               item.find('#var-thresholds').is(':visible') &&
@@ -1741,9 +1758,27 @@
           }
 
           break;
-      }
 
-      console.log('status', status);
+        case 'frequency':
+          // The "daily" frequency is available only for some "single" or "threshold" variables. But, contrary to
+          // the other frequencies of those variables, a Finch request must be sent for this frequency. To
+          // support this specific case, we set the `request.type` to "daily".
+          if (this_val === 'daily') {
+            options.request.type = 'daily';
+          } else if (options.request.type === 'daily') {
+            // When switching back from daily, we reset the `request.type` to its original value (either "single" or
+            // "threshold").
+            if (
+              options.var_flags.threshold &&
+              (!options.var_flags.custom  || item.find('#var-thresholds .collapse.show').attr('id') === 'threshold-preset')
+            ) {
+              options.request.type = 'threshold';
+            } else {
+              options.request.type = 'single';
+            }
+          }
+          break;
+      }
 
       if (status == 'input' || status == 'slide') {
         // whether to pushstate on eval or not
@@ -2276,15 +2311,7 @@
 
               item
                 .find('#threshold-preset-head .accordion-button')
-                .prop('disabled', false);
-
-              // show the thresholds accordion
-
-              if (!item.find('#threshold-preset').hasClass('show')) {
-                item
-                  .find('#threshold-preset-head .accordion-button')
-                  .trigger('click');
-              }
+                .prop('disabled', options.query.dataset === 'ahccd');
             }
           }
 
@@ -2365,17 +2392,14 @@
             options.request.type = 'ahccd';
           }
         } else if (
-          options.var_flags.threshold == true &&
-          (options.var_flags.custom == false ||
-            item.find('#var-thresholds .collapse.show').attr('id') ==
-              'threshold-preset')
+          options.var_flags.threshold &&
+          (!options.var_flags.custom || item.find('#var-thresholds .collapse.show').attr('id') === 'threshold-preset')
         ) {
-          // console.log('set request type to threshold');
-          options.request.type = 'threshold';
-        } else if (options.var_flags.station == true) {
+          options.request.type = options.query.frequency === 'daily' ? 'daily' : 'threshold';
+        } else if (options.var_flags.station) {
           options.request.type = 'station';
-        } else if (options.var_flags.single == true) {
-          options.request.type = 'single';
+        } else if (options.var_flags.single) {
+            options.request.type = options.query.frequency === 'daily' ? 'daily' : 'single';
         }
 
         console.log('request type is now ' + options.request.type);
@@ -2657,6 +2681,8 @@
         plugin.update_frequency();
       }
 
+      plugin.update_averages();
+
       // scenarios
 
       if (options.request.type != 'custom') {
@@ -2795,6 +2821,40 @@
 
           frequency_select.trigger('change');
         }
+      }
+    },
+
+    /**
+     * Update the availability of the "average" radio buttons (shown below the "Frequency" dropdown).
+     *
+     * If the previously selected value is not available anymore (after changing variable, for example), default to the
+     * first available.
+     *
+     * @this download_app
+     */
+    update_averages: function () {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      const outer = item.find('#map-control-frequency-select');
+
+      if (!outer.is(':visible')) {
+        return;
+      }
+
+      const available_averages = (options.var_data ? options.var_data.acf.averages : null) || [];
+      const radios = outer.find('#map-control-frequency-average input[name=details-average]');
+
+      radios.prop('disabled', true);
+
+      available_averages.forEach(function (average) {
+        radios.filter('[value=' + average + ']').prop('disabled', false)
+      });
+
+      // Select the first available radio button if the currently selected average is not available
+      if (radios.filter('[value=' + options.query.average + ']').is(':disabled')) {
+        radios.filter(':not(:disabled)').first().click();
       }
     },
 
@@ -2979,7 +3039,7 @@
               !options.query.hasOwnProperty('bbox')
             ) {
               // no box
-              invalid_messages.push('Draw an area on the map');
+              invalid_messages.push(T('Draw an area on the map.'));
             }
 
             let limit = plugin.get_download_limits();
@@ -2988,7 +3048,7 @@
               // too many boxes D:
               invalid_messages.push(
                 T(
-                  'With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}',
+                  'With the current frequency and format setting, the maximum number of grid boxes that can be selected per request is {0}.',
                 ).format(limit),
               );
             }
@@ -3124,6 +3184,10 @@
 
         case 'custom':
           plugin._process_custom(query);
+          break;
+
+        case 'daily':
+          plugin._process_daily(query);
           break;
 
         case 'threshold':
@@ -3429,7 +3493,7 @@
           } else {
             options.elements.result.head.text(T('Error'));
             options.elements.result.content.html(
-              'Captcha failed. Please try again.',
+              T('The CAPTCHA verification failed. Please try again.'),
             );
 
             options.elements.result.tab
@@ -3734,13 +3798,146 @@
           } else {
             options.elements.result.head.text(T('Error'));
             options.elements.result.content.html(
-              'Captcha failed. Please try again.',
+              T('The CAPTCHA verification failed. Please try again.'),
             );
 
             options.elements.result.tab
               .removeClass('success')
               .addClass('error');
             plugin.refresh_captcha();
+          }
+        },
+        complete: function () {
+          plugin.refresh_captcha();
+        },
+      });
+    },
+
+    /**
+     * Prepare and send the Finch request for a "Daily frequency" request.
+     *
+     * @param {object} query
+     * @this {download_app}
+     */
+    _process_daily: function (query) {
+      let plugin = this,
+        options = plugin.options,
+        item = plugin.item;
+
+      let submit_path = 'grid_point';
+
+      const form_obj = {
+        inputs: [
+          {
+            id: 'variable',
+            data: options.var_data.acf.daily_variable_name || query.var,
+          },
+          {
+            id: 'dataset',
+            data: DATASETS[query.dataset].finch_name,
+          },
+          {
+            id: 'output_format',
+            data: query.format,
+          },
+          {
+            id: 'data_validation',
+            data: 'warn',
+          },
+        ],
+        response: 'document',
+        mode: 'auto',
+        outputs: [
+          {
+            transmissionMode: 'reference',
+            id: 'output',
+          },
+        ],
+        notification_email: item.find('#submit-email').val(),
+      };
+
+      // lat/lng
+
+      if (query.hasOwnProperty('bbox')) {
+        submit_path = 'bbox';
+
+        form_obj.inputs.push(
+          {
+            id: 'lat0',
+            data: query.bbox[0],
+          },
+          {
+            id: 'lon0',
+            data: query.bbox[1],
+          },
+          {
+            id: 'lat1',
+            data: query.bbox[2],
+          },
+          {
+            id: 'lon1',
+            data: query.bbox[3],
+          },
+        );
+      } else {
+        const latitudes = [];
+        const longitudes = [];
+
+        Object.values(options.selection_data).forEach(function(data) {
+          latitudes.push(data.lat);
+          longitudes.push(data.lng);
+        });
+
+        form_obj.inputs.push({
+          id: 'lat',
+          data: latitudes.join(','),
+        });
+
+        form_obj.inputs.push({
+          id: 'lon',
+          data: longitudes.join(','),
+        });
+      }
+
+      const submit_data = {
+        captcha_code: item.find('#submit-captcha').val(),
+        namespace: 'analyze',
+        signup: item.find('#submit-subscribe').is(':checked'),
+        request_data: form_obj,
+        submit_url:
+          '/providers/finch/processes/subset_' +
+          submit_path +
+          '_dataset/jobs',
+      };
+
+      $.ajax({
+        url: ajax_data.rest_url + 'cdc/v2/finch_submit/',
+        method: 'POST',
+        data: submit_data,
+        dataType: 'json',
+        success: function (data) {
+          if (data.status === 'accepted') {
+            options.elements.result.head.text(T('Success') + '!');
+            options.elements.result.content.html(data.description);
+
+            options.elements.result.status
+              .find('#result-status-text span')
+              .html(data.status);
+
+            options.elements.result.status.show();
+
+            options.elements.result.tab
+              .removeClass('error')
+              .addClass('success');
+          } else {
+            options.elements.result.head.text(T('Error'));
+            options.elements.result.content.html(
+              T('The CAPTCHA verification failed. Please try again.'),
+            );
+
+            options.elements.result.tab
+              .removeClass('success')
+              .addClass('error');
           }
         },
         complete: function () {
@@ -3793,17 +3990,6 @@
         }
       }
 
-      // format = query.format;
-      let dataset_name = query.dataset;
-
-      // TODO: add input to select 'allyears' or '30ygraph'
-      let selectedDatasetType = 'allyears';
-      //$(
-      //  'input[name="download-dataset-type"]:checked',
-      //).val();
-
-      let format_extension = query.format == 'netcdf' ? 'nc' : query.format;
-
       if (query.var !== 'all') {
         $('body').addClass('spinner-on');
 
@@ -3814,11 +4000,11 @@
           frequency_code = freq_keys[freq_vals.indexOf(query.frequency)];
         }
 
-        request_args = {
+        const request_args = {
           var: query.var,
           month: frequency_code,
           dataset_name: query.dataset,
-          dataset_type: selectedDatasetType,
+          dataset_type: query.average,
           format: query.format,
         };
 

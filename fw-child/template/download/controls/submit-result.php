@@ -10,7 +10,7 @@
 				<div id="result-message" class="mb-4"></div>
 				
 				<div id="result-btn">
-					<a class="btn btn-lg btn-primary rounded-pill" style="display: none;"><?php _e ( 'Download' ); ?></a>
+					<a class="btn btn-lg btn-primary rounded-pill" style="display: none;"><?php _e ( 'Download', 'cdc' ); ?></a>
 				</div>
 				
 				<div id="result-status" class="w-100 border-top" style="display: none;">

@@ -2867,7 +2867,7 @@
 			
 			// edit
 			
-			$('<li class="col fw-footer-edit-link edit"><a href="#fw-modal" class="fw-modal-trigger fw-btn edit-element d-flex flex-column align-items-center justify-content-between" data-modal-content="' + element.type + '"><div><i class="far fa-pencil-alt"></i></div><span>Edit</span></a></li>').appendTo(actions_container)
+			$('<li class="col fw-footer-edit-link edit"><a href="#fw-modal" class="fw-modal-trigger fw-btn edit-element d-flex flex-column align-items-center justify-content-between" data-modal-content="' + element.type + '"><div><i class="fa fa-pencil"></i></div><span>Edit</span></a></li>').appendTo(actions_container)
 			
 			// duplicate
 			
@@ -2879,7 +2879,7 @@
 			
 			// move
 			
-			$('<li class="col fw-footer-edit-link move"><div class="d-flex flex-column align-items-center justify-content-between"><div class="d-flex align-items-center"><i class="far fa-arrow-up fw-btn move-element move-up"></i><i class="far fa-arrow-down fw-btn move-element move-down"></i></div><span>Move</span></li>').appendTo(actions_container)
+			$('<li class="col fw-footer-edit-link move"><div class="d-flex flex-column align-items-center justify-content-between"><div class="d-flex align-items-center"><i class="fa fa-arrow-up fw-btn move-element move-up"></i><i class="fa fa-arrow-down fw-btn move-element move-down"></i></div><span>Move</span></li>').appendTo(actions_container)
 			
 			dropdown_menu.append('<li><hr class="dropdown-divider"></li>')
 			

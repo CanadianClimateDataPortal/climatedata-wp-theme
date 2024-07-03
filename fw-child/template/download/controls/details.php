@@ -258,34 +258,48 @@
 						
 					</div>
 					
-					<div id="map-control-frequency-select" data-flags="custom:0" data-request="threshold,single">
-						
-						<select class="form-select" name="data-frequency" data-query-key="frequency">
-							<option value="ann" data-field="ann"><?php _e ( 'Annual', 'cdc' ); ?></option>
-							<option value="daily" data-field="daily"><?php _e ( 'Daily', 'cdc' ); ?></option>
-							<optgroup label="<?php _e ( 'Monthly', 'cdc' ); ?>" data-field="monthly">
-								<option value="all"><?php _e ( 'All months', 'cdc' ); ?></option>
-								<option value="jan"><?php _e ( 'January', 'cdc' ); ?></option>
-								<option value="feb"><?php _e ( 'February', 'cdc' ); ?></option>
-								<option value="mar"><?php _e ( 'March', 'cdc' ); ?></option>
-								<option value="apr"><?php _e ( 'April', 'cdc' ); ?></option>
-								<option value="may"><?php _e ( 'May', 'cdc' ); ?></option>
-								<option value="jun"><?php _e ( 'June', 'cdc' ); ?></option>
-								<option value="jul"><?php _e ( 'July', 'cdc' ); ?></option>
-								<option value="aug"><?php _e ( 'August', 'cdc' ); ?></option>
-								<option value="sep"><?php _e ( 'September', 'cdc' ); ?></option>
-								<option value="oct"><?php _e ( 'October', 'cdc' ); ?></option>
-								<option value="nov"><?php _e ( 'November', 'cdc' ); ?></option>
-								<option value="dec"><?php _e ( 'December', 'cdc' ); ?></option>
-							</optgroup>
-							
-							<optgroup label="<?php _e ( 'Seasonal', 'cdc' ); ?>" data-field="qsdec">
-								<option value="spring"><?php _e ( 'Spring', 'cdc' ); ?></option>
-								<option value="summer"><?php _e ( 'Summer', 'cdc' ); ?></option>
-								<option value="fall"><?php _e ( 'Fall', 'cdc' ); ?></option>
-								<option value="winter"><?php _e ( 'Winter', 'cdc' ); ?></option>
-							</optgroup>
-						</select>
+					<div id="map-control-frequency-select" data-flags="custom:0" data-request="threshold,single,daily">
+						<div>
+							<select class="form-select" name="data-frequency" data-query-key="frequency">
+								<option value="ann" data-field="ann"><?php _e ( 'Annual', 'cdc' ); ?></option>
+								<option value="daily" data-field="daily"><?php _e ( 'Daily', 'cdc' ); ?></option>
+								<optgroup label="<?php _e ( 'Monthly', 'cdc' ); ?>" data-field="monthly">
+									<option value="all"><?php _e ( 'All months', 'cdc' ); ?></option>
+									<option value="jan"><?php _e ( 'January', 'cdc' ); ?></option>
+									<option value="feb"><?php _e ( 'February', 'cdc' ); ?></option>
+									<option value="mar"><?php _e ( 'March', 'cdc' ); ?></option>
+									<option value="apr"><?php _e ( 'April', 'cdc' ); ?></option>
+									<option value="may"><?php _e ( 'May', 'cdc' ); ?></option>
+									<option value="jun"><?php _e ( 'June', 'cdc' ); ?></option>
+									<option value="jul"><?php _e ( 'July', 'cdc' ); ?></option>
+									<option value="aug"><?php _e ( 'August', 'cdc' ); ?></option>
+									<option value="sep"><?php _e ( 'September', 'cdc' ); ?></option>
+									<option value="oct"><?php _e ( 'October', 'cdc' ); ?></option>
+									<option value="nov"><?php _e ( 'November', 'cdc' ); ?></option>
+									<option value="dec"><?php _e ( 'December', 'cdc' ); ?></option>
+								</optgroup>
+
+								<optgroup label="<?php _e ( 'Seasonal', 'cdc' ); ?>" data-field="qsdec">
+									<option value="spring"><?php _e ( 'Spring', 'cdc' ); ?></option>
+									<option value="summer"><?php _e ( 'Summer', 'cdc' ); ?></option>
+									<option value="fall"><?php _e ( 'Fall', 'cdc' ); ?></option>
+									<option value="winter"><?php _e ( 'Winter', 'cdc' ); ?></option>
+								</optgroup>
+							</select>
+						</div>
+						<div id="map-control-frequency-average" class="row align-items-center mt-3 mx-1" data-request="threshold,single">
+							<div class="col d-flex gap-4">
+								<div class="form-check mb-0">
+									<input class="form-check-input" type="radio" name="details-average" id="details-average-allyears" value="allyears" data-query-key="average">
+									<label class="form-check-label" for="details-average-allyears"><?php _e( 'All years', 'cdc' ) ?></label>
+								</div>
+
+								<div class="form-check mb-0" data-flags="station:0">
+									<input class="form-check-input" type="radio" name="details-average" id="details-average-30ygraph" value="30ygraph" data-query-key="average" checked>
+									<label class="form-check-label" for="details-average-30ygraph"><?php _e( '30 years average', 'cdc' ) ?></label>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 				

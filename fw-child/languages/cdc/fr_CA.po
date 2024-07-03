@@ -27,7 +27,7 @@ msgstr "jour de l’année"
 
 #: functions.php:232
 msgid "degree days"
-msgstr ""
+msgstr "degrés-jours"
 
 #: functions.php:233
 msgid "number of periods"
@@ -38,36 +38,32 @@ msgid "events"
 msgstr ""
 
 #: resources/functions/ajax.php:153
-#: template/download/controls/submit.php:99
+#: template/download/controls/submit.php:100
 msgid "Historical IDF (ZIP)"
-msgstr ""
+msgstr "Données IDF historiques (ZIP)"
 
 #: resources/functions/ajax.php:157
-#: template/download/controls/submit.php:104
+#: template/download/controls/submit.php:105
 msgid "Climate Change-Scaled IDF - CMIP5 (ZIP)"
-msgstr ""
+msgstr "Données IDF tenant compte des changements climatiques - CMIP5 (ZIP)"
 
 #: resources/functions/ajax.php:161
-#: template/download/controls/submit.php:109
+#: template/download/controls/submit.php:110
 msgid "Climate Change-Scaled IDF - CMIP6 (ZIP)"
-msgstr ""
+msgstr "Données IDF tenant compte des changements climatiques - CMIP6 (ZIP)"
 
 #: resources/functions/ajax.php:165
-#: template/download/controls/submit.php:114
+#: template/download/controls/submit.php:115
 msgid "Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)"
-msgstr ""
+msgstr "Démarrage rapide - Données IDF tenant compte des changements climatiques - CMIP6 (ZIP)"
 
 #: resources/functions/rest.php:691
 msgid "An error occurred"
-msgstr ""
+msgstr "Une erreur s'est produite"
 
-#: resources/functions/rest.php:727
-msgid "CAPTCHA verification failed."
-msgstr ""
-
-#: resources/functions/rest.php:743
+#: template/download/controls/submit.php:56
 msgid "Please enter a valid email address."
-msgstr ""
+msgstr "Veuillez saisir une adresse courriel valide."
 
 #: resources/functions/rest.php:750
 msgid "Please provide the details of your inquiry."
@@ -126,8 +122,8 @@ msgstr ""
 
 #: template/learn/control-bar.php:11
 #: template/learn/control-bar.php:30
-#: template/post-meta.php:39
-#: template/query/news-item.php:41
+#: template/post-meta.php:53
+#: template/query/news-item.php:64
 msgid "Topics"
 msgstr "Sujets"
 
@@ -138,7 +134,7 @@ msgstr "Secteurs"
 
 #: template/beta-apps/control-btns.php:10
 #: template/download/control-bar.php:54
-#: template/download/controls/area.php:186
+#: template/download/controls/area.php:183
 msgid "Details"
 msgstr "Détails"
 
@@ -173,7 +169,7 @@ msgstr ""
 #: template/news/query.php:29
 #: template/variable/query.php:29
 msgid "Newest First"
-msgstr "Nouveautés d'abord"
+msgstr "Nouveaux d'abord"
 
 #: template/beta-apps/query.php:30
 #: template/learn/query.php:32
@@ -186,16 +182,17 @@ msgstr "Anciens d'abord"
 #: template/download/controls/data.php:7
 #: template/map/control-bar.php:15
 #: template/map/controls/data.php:5
-#: template/map/controls/display.php:176
+#: template/map/controls/display.php:175
 msgid "Data"
 msgstr "Données"
 
 #: template/download/control-bar.php:38
 msgid "Area"
-msgstr ""
+msgstr "Zone"
 
 #: template/download/control-bar.php:70
-#: template/download/controls/details.php:339
+#: template/download/controls/details.php:353
+#: template/download/controls/submit-result.php:13
 #: template/download/map-container.php:5
 #: template/map/control-bar.php:42
 #: template/map/controls/download.php:5
@@ -212,31 +209,27 @@ msgstr "Aide"
 #: template/download/controls/area.php:7
 #: template/download/controls/data.php:112
 msgid "Area of Analysis"
-msgstr ""
+msgstr "Zone d'analyse"
 
 #: template/download/controls/area.php:8
 msgid "Use the map to select regions to add to your request."
 msgstr ""
 
 #: template/download/controls/area.php:21
-msgid "At least 1 map region is required"
-msgstr ""
+msgid "At least 1 map region is required."
+msgstr "Au moins une zone doit être sélectionnée."
 
 #: template/download/controls/area.php:24
-msgid "Select Stations"
-msgstr ""
+msgid "Stations"
+msgstr "Stations"
 
 #: template/download/controls/area.php:31
 msgid "Select station(s)"
-msgstr ""
+msgstr "Sélectionner une/des stations"
 
 #: template/download/controls/area.php:35
-msgid "Select at least one station"
-msgstr ""
-
-#: template/download/controls/area.php:42
-msgid "Change Aggregation"
-msgstr ""
+msgid "Select at least one station."
+msgstr "Sélectionnez au moins une station."
 
 #: template/download/controls/area.php:49
 #: template/map/controls/display.php:52
@@ -244,8 +237,8 @@ msgid "Gridded Data"
 msgstr "Données maillées"
 
 #: template/download/controls/area.php:53
-msgid "selected"
-msgstr ""
+msgid "cells"
+msgstr "cellules"
 
 #: template/download/controls/area.php:56
 #: template/download/controls/data-variable.php:117
@@ -255,12 +248,12 @@ msgid "Clear"
 msgstr "Effacer"
 
 #: template/download/controls/area.php:64
-msgid "Select areas"
-msgstr ""
+msgid "Grid cells"
+msgstr "Cellules"
 
 #: template/download/controls/area.php:67
 msgid "Draw region"
-msgstr ""
+msgstr "Dessiner une région"
 
 #: template/download/controls/area.php:74
 #: template/map/controls/display.php:57
@@ -279,50 +272,43 @@ msgstr "Bassins versants"
 
 #: template/download/controls/area.php:90
 msgid "Upload Custom Shapefile"
-msgstr ""
+msgstr "Téléverser un Shapefile"
 
-#: template/download/controls/area.php:102
-msgid "Drop your shapefile here to upload"
-msgstr ""
+#: template/download/controls/area.php:99
+msgid "Select your Shapefile"
+msgstr "Sélectionner votre Shapefile"
 
-#: template/download/controls/area.php:110
-msgid "Search &amp; Zoom"
-msgstr ""
-
-#: template/download/controls/area.php:116
+#: template/download/controls/area.php:113
 #: template/map/controls/location.php:33
 msgid "Community, landmark or coordinates"
 msgstr "Communauté, point de repère ou coordonnées"
 
-#: template/download/controls/area.php:118
+#: template/download/controls/area.php:115
 #: template/map/controls/location.php:35
 msgid "Search for a City/Town"
-msgstr ""
+msgstr "Rechercher une ville"
 
-#: template/download/controls/area.php:137
-msgid "Change Coordinates"
-msgstr ""
-
-#: template/download/controls/area.php:142
+#: template/download/controls/area.php:139
 #: template/map/controls/location.php:74
 msgid "Latitude"
-msgstr ""
+msgstr "Latitude"
 
-#: template/download/controls/area.php:156
+#: template/download/controls/area.php:153
 #: template/map/controls/location.php:88
 msgid "Longitude"
-msgstr ""
+msgstr "Longitude"
 
-#: template/download/controls/area.php:170
+#: template/download/controls/area.php:167
 #: template/map/controls/location.php:102
 msgid "Zoom"
-msgstr ""
+msgstr "Zoom"
 
-#: template/download/controls/area.php:186
+#: template/download/controls/area.php:183
 #: template/download/controls/data-variable.php:139
 #: template/download/controls/data.php:112
-#: template/download/controls/details.php:339
+#: template/download/controls/details.php:353
 #: template/map/controls/data-variable.php:139
+#: template/news/query.php:61
 msgid "Next"
 msgstr "Suivant"
 
@@ -336,8 +322,8 @@ msgid "Select a variable and dataset to begin building your request."
 msgstr ""
 
 #: template/download/controls/data.php:23
-msgid "Select a variable to download"
-msgstr ""
+msgid "Select a variable to download."
+msgstr "Sélectionnez une variable à télécharger."
 
 #: template/download/controls/data.php:28
 #: template/map/controls/data.php:17
@@ -350,11 +336,11 @@ msgstr "Valeur des seuils"
 
 #: template/download/controls/data.php:76
 msgid "Preset"
-msgstr ""
+msgstr "Prédéfinis"
 
 #: template/download/controls/data.php:97
 msgid "Custom"
-msgstr ""
+msgstr "Personalisés"
 
 #: template/download/controls/data.php:35
 #: template/map/controls/data.php:25
@@ -363,7 +349,7 @@ msgstr "Jeu de données"
 
 #: template/download/controls/details.php:7
 msgid "Additional Details"
-msgstr ""
+msgstr "Détails additionnels"
 
 #: template/download/controls/details.php:8
 msgid "Adjust the controls below to customize your analysis."
@@ -372,7 +358,7 @@ msgstr ""
 #: template/download/controls/details.php:23
 #: template/download/controls/details.php:54
 msgid "Timeframe"
-msgstr ""
+msgstr "Période"
 
 #: template/download/controls/details.php:27
 msgid "Start Year"
@@ -388,7 +374,7 @@ msgstr "Début"
 
 #: template/download/controls/details.php:65
 msgid "Start date is required"
-msgstr ""
+msgstr "La date de début est requise"
 
 #: template/download/controls/details.php:70
 msgid "End Date"
@@ -396,11 +382,11 @@ msgstr "Fin"
 
 #: template/download/controls/details.php:72
 msgid "End date is required"
-msgstr ""
+msgstr "La date de fin est requise"
 
 #: template/download/controls/details.php:81
 msgid "Models"
-msgstr ""
+msgstr "Modèles"
 
 #: template/download/controls/details.php:82
 msgid "About models"
@@ -416,12 +402,13 @@ msgid "About scenarios"
 msgstr "Scénarios"
 
 #: template/download/controls/details.php:128
+#: template/download/map-container.php:110
 msgid "Missing Data Options"
-msgstr ""
+msgstr "Options pour les valeurs manquantes"
 
 #: template/download/controls/details.php:159
 msgid "Percentiles"
-msgstr ""
+msgstr "Percentiles"
 
 #: template/download/controls/details.php:160
 msgid "Unselect all to receive output from individual models"
@@ -545,11 +532,11 @@ msgstr "Automne"
 msgid "Winter"
 msgstr "Hiver"
 
-#: template/download/controls/details.php:295
+#: template/download/controls/details.php:309
 msgid "Output Format"
-msgstr ""
+msgstr "Type de fichier"
 
-#: template/download/controls/details.php:321
+#: template/download/controls/details.php:335
 msgid "Decimal Places"
 msgstr "Décimales"
 
@@ -562,73 +549,70 @@ msgid "Refresh"
 msgstr ""
 
 #: template/download/controls/submit.php:13
-#: template/download/controls/submit.php:85
+#: template/download/controls/submit.php:86
 #: template/feedback.php:239
 #: template/feedback.php:359
 msgid "Enter the characters shown in the image:"
-msgstr "Entrer les caractères qui apparaissent ici :"
-
-#: template/download/controls/submit.php:27
-msgid "Submit and Download"
-msgstr "Téléchargement"
+msgstr "Entrer les caractères affichés dans l'image"
 
 #: template/download/controls/submit.php:28
-msgid "Click the button below to prepare your download."
-msgstr ""
+msgid "Submit and Download"
+msgstr "Télécharger"
 
-#: template/download/controls/submit.php:32
-msgid "Process Analysis"
-msgstr ""
+#: template/download/controls/submit.php:29
+msgid "Click the button below to prepare your download."
+msgstr "Cliquez le bouton ci-dessous pour préparer le téléchargement."
 
 #: template/download/controls/submit.php:33
-msgid "Enter your email address to submit your request."
-msgstr ""
+msgid "Process Analysis"
+msgstr "Soumettre la requête"
 
-#: template/download/controls/submit.php:48
+#: template/download/controls/submit.php:34
+msgid "Enter your email address to submit your request."
+msgstr "Entrez votre adresse courriel pour soumettre votre requête."
+
+#: template/download/controls/submit.php:49
 #: template/feedback.php:48
 #: template/feedback.php:319
 msgid "Email Address"
 msgstr "Adresse courriel"
 
-#: template/download/controls/submit.php:51
-msgid "Note:"
-msgstr ""
-
 #: template/download/controls/submit.php:52
+msgid "Note:"
+msgstr "Note :"
+
+#: template/download/controls/submit.php:53
 msgid "Data processing starts when you click on ‘Send Request.’ It may take 30 to 90 minutes to complete, depending on available resources. You will be notified by email when your request has been processed and the data are available. Don’t forget to check your spam folder."
-msgstr ""
+msgstr "Le traitement des données commence lorsque vous cliquez sur \"Envoyer votre requête\". Il peut prendre de 30 à 90 minutes, en fonction des ressources disponibles. Vous serez informé par courrier électronique lorsque votre demande aura été traitée et que les données seront disponibles. N'oubliez pas de vérifier votre dossier de courrier indésirable."
 
-#: template/download/controls/submit.php:55
-msgid "Please enter a valid email address"
-msgstr ""
-
-#: template/download/controls/submit.php:59
+#: template/download/controls/submit.php:60
 #: template/feedback.php:55
 msgid "Subscribe to the ClimateData.ca newsletter"
-msgstr ""
+msgstr "M'inscrire à l'infolettre de DonneesClimatiques.ca"
 
-#: template/download/controls/submit.php:64
-msgid "Human Verification"
-msgstr ""
+#: template/download/controls/submit.php:65
+msgid "CAPTCHA Verification"
+msgstr "Vérification CAPTCHA"
 
-#: template/download/controls/submit.php:87
+#: resources/functions/rest.php:727
+#: template/download/controls/submit.php:88
 msgid "CAPTCHA verification is required."
-msgstr ""
+msgstr "La vérification CAPTCHA est requise."
 
-#: template/download/controls/submit.php:94
-msgid "IDF Links"
-msgstr ""
+#: template/download/controls/submit.php:95
+msgid "IDF Documents"
+msgstr "Documents IDF"
 
-#: template/download/controls/submit.php:98
-#: template/download/controls/submit.php:103
-#: template/download/controls/submit.php:108
-#: template/download/controls/submit.php:113
-msgid "Select a package to download"
-msgstr ""
+#: template/download/controls/submit.php:99
+#: template/download/controls/submit.php:104
+#: template/download/controls/submit.php:109
+#: template/download/controls/submit.php:114
+msgid "Select a package to download."
+msgstr "Sélectionnez un document à télécharger."
 
-#: template/download/controls/submit.php:122
+#: template/download/controls/submit.php:123
 msgid "Send Request"
-msgstr ""
+msgstr "Envoyer la requête"
 
 #: template/download/map-container.php:4
 #: template/map/map-container.php:4
@@ -678,7 +662,7 @@ msgstr "Reliés"
 msgid "Training"
 msgstr "Entraînement"
 
-#: template/download/map-container.php:119
+#: template/download/map-container.php:102
 #: template/map/map-container.php:130
 msgid "Zoom in to access grid level information"
 msgstr "Faire un zoom pour accéder aux informations de la grille"
@@ -935,7 +919,7 @@ msgstr ""
 #: template/feedback.php:258
 #: template/feedback.php:378
 msgid "Enter the characters shown in the image"
-msgstr "Entrer les caractères qui apparaissent ici"
+msgstr "Entrez les caractères qui apparaissent dans l'image"
 
 #: template/feedback.php:260
 #: template/feedback.php:380
@@ -953,7 +937,7 @@ msgstr "Données"
 #: template/variable/control-bar.php:11
 #: template/variable/control-bar.php:21
 msgid "Filters"
-msgstr ""
+msgstr "Filtres"
 
 #: template/learn/control-bar.php:46
 msgid "topic"
@@ -1002,11 +986,11 @@ msgstr "Valeur du seuil"
 
 #: template/map/controls/data.php:38
 msgid "CMIP6"
-msgstr ""
+msgstr "CMIP6"
 
 #: template/map/controls/data.php:41
 msgid "CMIP5"
-msgstr ""
+msgstr "CMIP5"
 
 #: template/map/controls/data.php:69
 msgid "Frequency"
@@ -1014,7 +998,7 @@ msgstr "Fréquence"
 
 #: template/map/controls/data.php:123
 msgid "High emissions"
-msgstr "Émissions élévées"
+msgstr "Émissions élevées"
 
 #: template/map/controls/data.php:130
 msgid "Medium emissions"
@@ -1044,37 +1028,33 @@ msgstr "Agrégation de la carte"
 msgid "Colours"
 msgstr "Palette de couleurs"
 
-#: template/map/controls/display.php:80
-msgid "Selected Scheme Name"
-msgstr ""
-
-#: template/map/controls/display.php:86
+#: template/map/controls/display.php:85
 msgid "Default"
 msgstr "Défaut"
 
-#: template/map/controls/display.php:165
+#: template/map/controls/display.php:164
 msgid "Discrete"
 msgstr "Discrète"
 
-#: template/map/controls/display.php:168
+#: template/map/controls/display.php:167
 msgid "Continuous"
 msgstr "Continue"
 
-#: template/map/controls/display.php:174
+#: template/map/controls/display.php:173
 msgid "Layer Opacity"
 msgstr "Opacité"
 
-#: template/map/controls/display.php:186
+#: template/map/controls/display.php:185
 msgid "Labels"
 msgstr "Étiquettes"
 
-#: template/map/controls/display.php:194
+#: template/map/controls/display.php:193
 msgid "Pins"
 msgstr "Marqueurs"
 
 #: template/map/controls/download.php:11
 msgid "Save Image"
-msgstr "Enregistrer l’image"
+msgstr "Enregistrer l'image"
 
 #: template/map/controls/download.php:14
 msgid "Position the map as needed and save it as a PNG image."
@@ -1180,6 +1160,7 @@ msgstr "Série"
 msgid "Opacity"
 msgstr "Opacité"
 
+#: template/download/controls/area.php:107
 #: template/map/controls/location.php:13
 msgid "Search"
 msgstr "Recherche"
@@ -1190,8 +1171,9 @@ msgstr "Emplacement"
 
 #: template/map/controls/location.php:64
 msgid "Your recently viewed locations will appear here."
-msgstr "Les derniers \templacements visualisés apparaitront ici."
+msgstr "Les derniers emplacements visualisés apparaitront ici."
 
+#: template/download/controls/area.php:134
 #: template/map/controls/location.php:69
 msgid "Coordinates"
 msgstr "Coordonnées"
@@ -1216,7 +1198,7 @@ msgstr "Explorez les données climatiques à l'aide de cartes et de graphiques. 
 #: template/map/map-container.php:114
 #: template/old-loop/blocks/map.php:256
 msgid "Decade"
-msgstr ""
+msgstr "Décénnie"
 
 #: template/menu-overlay.php:18
 msgid "Climate Data"
@@ -1266,26 +1248,25 @@ msgstr "Duration"
 msgid "Learn More"
 msgstr "En savoir plus"
 
-#: template/post-meta.php:11
+#: template/post-meta.php:22
 msgid "Date"
 msgstr "Date"
 
-#: template/post-meta.php:15
+#: template/post-meta.php:26
 msgid "F j, Y"
 msgstr "\\l\\e j F, Y"
 
-#: template/post-meta.php:25
-#: template/query/news-item.php:61
+#: template/post-meta.php:36
 msgid "Author"
 msgstr "Auteur"
 
-#: template/post-meta.php:51
+#: template/post-meta.php:68
 msgid "Share this post"
 msgstr "Partager cette publication"
 
 #: template/query/download-var-item.php:11
 msgid "Select variable"
-msgstr ""
+msgstr "Sélectionner"
 
 #: template/query/learn-item.php:31
 msgid "Format"
@@ -1311,20 +1292,17 @@ msgstr ""
 
 #: template/download/controls/details.php:150
 msgid "WMO Parameters"
-msgstr ""
-
-#: template/download/map-container.php:127
-msgid "Missing Value Options"
-msgstr ""
+msgstr "Paramètres de l'OMM"
 
 #: template/download/controls/data-variable.php:137
 #: template/map/controls/data-variable.php:137
+#: template/news/query.php:57
 msgid "Previous"
 msgstr "Précédent"
 
 #: template/download/controls/details.php:255
 msgid "Annual (July – June)"
-msgstr ""
+msgstr "Annuelle (juillet à juin)"
 
 #. Template Name of the theme
 msgid "Clone Taxonomy"
@@ -1353,3 +1331,31 @@ msgstr "Sélectionnez pour afficher soit les valeurs de données absolues, soit 
 #: template/map/controls/display.php:46
 msgid "View climate data as grid boxes, or aggregated by Census Subdivision, Health Region or Watershed."
 msgstr "Affichez les données climatiques sous forme de grilles ou regroupées par subdivision de recensement, région socio-sanitaire ou bassin versant."
+
+#: template/download/controls/area.php:93
+msgid "Please upload a ZIP file containing at least the .shp and .prj files. The uploaded shapes must be closed polygons and be located entirely within Canada. Once your shapefile is uploaded, the shapes will appear on the map. Click the region of interest to continue."
+msgstr ""
+
+#: template/download/controls/area.php:42
+msgid "Data Aggregation"
+msgstr "Aggrégation des données"
+
+#: template/download/controls/submit.php:15
+msgid "Refresh Image"
+msgstr "Rafraichir l'image"
+
+#: template/download/controls/data.php:56
+msgid "Observations (AHCCD)"
+msgstr "Observations (DCCAH)"
+
+#: resources/functions/rest.php:743
+msgid "Please enter a valid email address"
+msgstr ""
+
+#: template/download/controls/details.php:294
+msgid "All years"
+msgstr "Toutes les années"
+
+#: template/download/controls/details.php:299
+msgid "30 years average"
+msgstr "Moyennes sur 30 ans"

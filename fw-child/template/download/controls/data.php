@@ -20,7 +20,7 @@
 
 				<div id="map-control-variable" class="map-control-item px-0">
 
-					<input type="hidden" name="data-var-id" id="data-var-id" value="" data-query-key="var_id" data-validate="<?php _e ( 'Select a variable to download', 'cdc' ); ?>">
+					<input type="hidden" name="data-var-id" id="data-var-id" value="" data-query-key="var_id" data-validate="<?php _e ( 'Select a variable to download.', 'cdc' ); ?>">
 					<input type="hidden" name="data-var" id="data-var" value="" data-query-key="var">
 
 					<a href="#data-variable" class="tab-drawer-trigger d-block text-body p-3">
@@ -53,7 +53,7 @@
 
 					<div class="form-check">
 						<input class="form-check-input" type="radio" name="data-dataset" id="data-dataset-ahccd" value="ahccd" data-query-key="dataset">
-						<label class="form-check-label" for="data-dataset-ahccd">Observations (AHCCD)</label>
+						<label class="form-check-label" for="data-dataset-ahccd"><?php _e ( 'Observations (AHCCD)', 'cdc' ) ?></label>
 					</div>
 
 					<?php /*<div class="form-check">

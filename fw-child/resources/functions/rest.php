@@ -724,7 +724,7 @@ function cdc_submit_feedback_form() {
 			$valid = false;
 			
 			$result['invalid'][] = 'captcha_code';
-			$result['messages'][] = __ ( 'CAPTCHA verification failed.', 'cdc' );
+			$result['messages'][] = __ ( 'CAPTCHA verification is required.', 'cdc' );
 		
 		}
 		
@@ -740,7 +740,7 @@ function cdc_submit_feedback_form() {
 			
 			$valid = false;
 			$result['invalid'][] = 'email';
-			$result['messages'][] = __ ( 'Please enter a valid email address.', 'cdc' );
+			$result['messages'][] = __ ( 'Please enter a valid email address', 'cdc' );
 			
 		}
 		

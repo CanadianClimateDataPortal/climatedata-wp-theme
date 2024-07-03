@@ -208,6 +208,23 @@ function taxonomy_sector()
 }
 add_action('init', 'taxonomy_sector', 10);
 
+/**
+ * Hides the sector taxonomy metabox on the edit page of CPT 'variable'.
+ * 
+ * @param WP_Screen $current_screen Current WP_Screen object.
+ *
+ * @return void
+ */
+function cdc_hide_tax_sector_metabox_cpt_variable( $current_screen ) {
+	if ( ! is_object( $current_screen ) || 'variable' !== $current_screen->post_type ) {
+		return;
+	}
+
+	remove_meta_box( 'tagsdiv-sector', 'variable', 'normal' );
+}
+
+add_action( 'current_screen', 'cdc_hide_tax_sector_metabox_cpt_variable' );
+
 // region
 
 function taxonomy_region()

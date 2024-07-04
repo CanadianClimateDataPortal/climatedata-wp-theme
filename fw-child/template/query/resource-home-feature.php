@@ -1,4 +1,20 @@
-<div class="card mb-5 mb-lg-0 scroll-card">
+<?php
+// Initialize current language.
+$current_lang = 'en';
+
+if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), true ) ) {
+	$current_lang = $item['lang'];
+}
+
+$native_excerpt = apply_filters ( 'the_content', custom_excerpt ( 20, $item['id'] ) );
+
+$excerpts = array (
+    'en' => $native_excerpt ?: get_field( 'excerpt', $item['id'] ), // Overrides native excerpt with custom excerpt if present
+    'fr' => get_field( 'excerpt_fr', $item['id'] ) ?: $native_excerpt // Defaults back to native excerpt if no custom FR not present
+);
+?>
+
+<div class="card mb-5 mb-lg-0 scroll-card" data-post-id="<?php echo $item['id'] ?>">
 
     <a href="<?php echo $item['permalink']; ?>" class="">
 
@@ -36,7 +52,7 @@
 
                 <?php
 
-                    echo apply_filters ( 'the_content', custom_excerpt ( 20, $item['id'] ) );
+                    echo $excerpts[ $item['lang'] ];
 
                 ?>
 

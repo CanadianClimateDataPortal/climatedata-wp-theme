@@ -195,6 +195,33 @@ function child_theme_enqueue()
 
 add_action('wp_enqueue_scripts', 'child_theme_enqueue');
 
+/**
+ * Insert the CookieYes script tag in the head.
+ *
+ * CookieYes does provide a WordPress plugin that automatically includes the required script tag, but it supports only
+ * one ID. Since we use different domains for each language, and that CookieYes requires a different ID for different
+ * domains, the plugin is replaced by this hook that can insert a different ID for each language (i.e. domain).
+ */
+add_action('wp_head',
+
+    /**
+     * Add the CookieYes language specific script tag to the head.
+     *
+     * The inserted script tag requires an ID in the `cookieyes_id_<lang>` entry in the global 'vars' array. If the
+     * entry is not defined or empty, no script tag is inserted.
+     */
+    function () {
+        $lang = $GLOBALS['vars']['current_lang'];
+        $id_key = 'cookieyes_id_' . $lang;
+        $cookieyes_id = $GLOBALS['vars'][$id_key] ?? '';
+
+        if ( !empty( $cookieyes_id ) ) {
+            echo '<script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/' . $cookieyes_id . '/script.js"></script>';
+        }
+    },
+    1
+);
+
 //
 // ADMIN JS
 //

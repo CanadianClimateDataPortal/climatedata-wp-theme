@@ -245,6 +245,30 @@ const $ = jQuery;
         contained: true,
       });
     }
+
+    // Position control bar footer at the bottom of the screen keeping it in the container
+    if ($('#control-bar-tabs-footer').length) {
+      function updateControlBarFooterPosition() {
+        const controlBar = document.getElementById('control-bar');
+        const footer = document.getElementById('control-bar-tabs-footer');
+        const controlBarRect = controlBar.getBoundingClientRect();
+  
+        if (controlBarRect.bottom <= window.innerHeight) {
+          footer.style.position = 'absolute';
+          footer.style.bottom = '0';
+        } else if (controlBarRect.top < window.innerHeight && controlBarRect.bottom > window.innerHeight) {
+          footer.style.position = 'fixed';
+          footer.style.bottom = '0';
+        } else {
+          footer.style.position = 'absolute';
+          footer.style.bottom = '0';
+        }
+      }
+
+      updateControlBarFooterPosition();
+      document.addEventListener('scroll', updateControlBarFooterPosition);
+      window.addEventListener('resize', updateControlBarFooterPosition);
+    }
     
     // Functionalities for variable archive page.
     if ($( '.variable-archive-page' ).length > 0) {

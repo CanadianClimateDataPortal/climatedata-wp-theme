@@ -75,28 +75,29 @@ msgstr ""
 
 #: template/feedback.php:104
 #: template/feedback.php:325
+#: template/feedback.php:448
 msgid "Organization"
-msgstr ""
+msgstr "Organisation"
 
 #: resources/functions/rest.php:817
 msgid "Thanks! We’ve received your inquiry."
-msgstr ""
+msgstr "Merci ! Nous avons reçu votre demande."
 
 #: resources/functions/rest.php:818
 msgid "Please note: we are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays."
-msgstr ""
+msgstr "Veuillez noter : nous recevons actuellement un nombre de demandes plus élevé que d'habitude à notre service d'assistance. Nous ferons de notre mieux pour vous répondre dès que possible, mais veuillez noter qu'il pourrait y avoir des délais."
 
 #: resources/functions/rest.php:821
 msgid "Something went wrong while sending your message. Please try again later."
-msgstr ""
+msgstr "Une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer plus tard."
 
 #: resources/functions/rest.php:833
 msgid "Your email address has been added to our mailing list. You can unsubscribe at any time."
-msgstr ""
+msgstr "Votre adresse e-mail a été ajoutée à notre liste de diffusion. Vous pouvez vous désinscrire à tout moment."
 
 #: resources/functions/rest.php:836
 msgid "An error occurred while adding your email address to our mailing list."
-msgstr ""
+msgstr "Une erreur s'est produite lors de l'ajout de votre adresse e-mail à notre liste de diffusion."
 
 #: template/download/controls/data.php:27
 #: template/map/controls/data.php:16
@@ -138,9 +139,11 @@ msgstr "Secteurs"
 msgid "Details"
 msgstr "Détails"
 
+#: template/beta-apps/control-bar.php:14
 #: template/beta-apps/control-btns.php:13
 #: template/download/control-bar.php:94
 #: template/feedback.php:336
+#: template/feedback.php:509
 #: template/map/control-bar.php:65
 msgid "Feedback"
 msgstr "Rétroaction"
@@ -156,13 +159,14 @@ msgstr "Quitter"
 #: template/beta-apps/modals.php:20
 #: template/beta-apps/modals.php:30
 msgid "Provide Feedback"
-msgstr ""
+msgstr "Fournir une rétroaction"
 
 #: template/beta-apps/modals.php:49
 #: template/feedback.php:264
 #: template/feedback.php:384
+#: template/feedback.php:557
 msgid "Submit Feedback"
-msgstr ""
+msgstr "Soumettre une rétroaction"
 
 #: template/beta-apps/query.php:29
 #: template/learn/query.php:31
@@ -552,6 +556,7 @@ msgstr ""
 #: template/download/controls/submit.php:86
 #: template/feedback.php:239
 #: template/feedback.php:359
+#: template/feedback.php:532
 msgid "Enter the characters shown in the image:"
 msgstr "Entrer les caractères affichés dans l'image"
 
@@ -574,6 +579,7 @@ msgstr "Entrez votre adresse courriel pour soumettre votre requête."
 #: template/download/controls/submit.php:49
 #: template/feedback.php:48
 #: template/feedback.php:319
+#: template/feedback.php:440
 msgid "Email Address"
 msgstr "Adresse courriel"
 
@@ -669,10 +675,11 @@ msgstr "Faire un zoom pour accéder aux informations de la grille"
 
 #: template/feedback.php:19
 msgid "Online Support"
-msgstr ""
+msgstr "Support en ligne"
 
 #: template/feedback.php:39
 #: template/feedback.php:313
+#: template/feedback.php:432
 msgid "Full Name"
 msgstr "Nom"
 
@@ -682,11 +689,11 @@ msgstr "Téléphone"
 
 #: template/feedback.php:70
 msgid "Where are you contacting us from?"
-msgstr ""
+msgstr "D'où nous contactez-vous ?"
 
 #: template/feedback.php:74
 msgid "Select your region"
-msgstr ""
+msgstr "Sélectionnez votre région"
 
 #: template/feedback.php:75
 msgid "Alberta"
@@ -726,7 +733,7 @@ msgstr ""
 
 #: template/feedback.php:84
 msgid "Prince Edward Island"
-msgstr "Îsle du Prince-Édouard"
+msgstr "Île du Prince-Édouard"
 
 #: template/feedback.php:85
 msgid "Québec"
@@ -742,59 +749,59 @@ msgstr ""
 
 #: template/feedback.php:88
 msgid "USA"
-msgstr ""
+msgstr "États-Unis"
 
 #: template/feedback.php:89
 #: template/feedback.php:126
 #: template/feedback.php:159
 #: template/feedback.php:215
 msgid "Other"
-msgstr ""
+msgstr "Autre"
 
 #: template/feedback.php:92
 #: template/feedback.php:129
 #: template/feedback.php:162
 #: template/feedback.php:218
 msgid "Please specify"
-msgstr ""
+msgstr "SVP précisez"
 
 #: template/feedback.php:112
 msgid "Which role best describes you?"
-msgstr ""
+msgstr "Quel rôle vous décrit le mieux ?"
 
 #: template/feedback.php:116
 #: template/feedback.php:144
 #: template/feedback.php:207
 msgid "Select an option"
-msgstr ""
+msgstr "Sélectionnez une option"
 
 #: template/feedback.php:117
 msgid "General public"
-msgstr ""
+msgstr "Grand public"
 
 #: template/feedback.php:118
 msgid "Academic / Research"
-msgstr ""
+msgstr "Universitaire / Recherche"
 
 #: template/feedback.php:119
 msgid "Business / Industry"
-msgstr ""
+msgstr "Affaires / Industrie"
 
 #: template/feedback.php:120
 msgid "Government – federal"
-msgstr ""
+msgstr "Gouvernement - fédéral"
 
 #: template/feedback.php:121
 msgid "Government – Indigenous"
-msgstr ""
+msgstr "Gouvernement - Autochtones"
 
 #: template/feedback.php:122
 msgid "Government – municipal"
-msgstr ""
+msgstr "Gouvernement - municipal"
 
 #: template/feedback.php:123
 msgid "Government – provincial / territorial"
-msgstr ""
+msgstr "Gouvernement - provincial / territorial"
 
 #: template/feedback.php:124
 msgid "Media"
@@ -802,39 +809,39 @@ msgstr "Média"
 
 #: template/feedback.php:125
 msgid "Not-for-profit organization"
-msgstr ""
+msgstr "Organisme à but non lucratif"
 
 #: template/feedback.php:140
 msgid "What is your inquiry related to?"
-msgstr ""
+msgstr "Quel est le sujet de votre demande ?"
 
 #: template/feedback.php:145
 msgid "Agriculture / Food / Fishing"
-msgstr ""
+msgstr "Agriculture / Alimentation / Pêche"
 
 #: template/feedback.php:146
 msgid "Conservation / Environment"
-msgstr ""
+msgstr "Conservation / Environnement"
 
 #: template/feedback.php:147
 msgid "Construction / Buildings"
-msgstr ""
+msgstr "Construction / Bâtiments"
 
 #: template/feedback.php:148
 msgid "Education / Training"
-msgstr ""
+msgstr "Education / Formation"
 
 #: template/feedback.php:149
 msgid "Energy"
-msgstr ""
+msgstr "Energie"
 
 #: template/feedback.php:150
 msgid "Finance / Insurance"
-msgstr ""
+msgstr "Finance / Assurance"
 
 #: template/feedback.php:151
 msgid "Forestry"
-msgstr ""
+msgstr "Sylviculture"
 
 #: template/feedback.php:152
 msgid "Health"
@@ -842,89 +849,91 @@ msgstr "Santé"
 
 #: template/feedback.php:153
 msgid "Information Technology"
-msgstr ""
+msgstr "Technologie de l'information"
 
 #: template/feedback.php:154
 msgid "Mining"
-msgstr ""
+msgstr "Exploitation minière"
 
 #: template/feedback.php:155
 msgid "Municipal Services / Planning"
-msgstr ""
+msgstr "Services municipaux / Planification"
 
 #: template/feedback.php:156
 msgid "Public Safety"
-msgstr ""
+msgstr "Sécurité publique"
 
 #: template/feedback.php:157
 msgid "Tourism / Recreation"
-msgstr ""
+msgstr "Tourisme / Loisirs"
 
 #: template/feedback.php:158
 msgid "Transportation"
-msgstr ""
+msgstr "Transport"
 
 #: template/feedback.php:168
 msgid "Describe your inquiry"
-msgstr ""
+msgstr "Décrivez votre demande"
 
 #: template/feedback.php:173
 msgid "General"
-msgstr ""
+msgstr "Général"
 
 #: template/feedback.php:178
 msgid "Report a bug"
-msgstr ""
+msgstr "Signaler un bug"
 
 #: template/feedback.php:183
 msgid "Request a demo"
-msgstr ""
+msgstr "Demander une démonstration"
 
 #: template/feedback.php:194
 msgid "Comments"
-msgstr ""
+msgstr "Commentaires"
 
 #: template/feedback.php:203
 msgid "How did you hear about ClimateData.ca?"
-msgstr ""
+msgstr "Comment avez-vous entendu parler de ClimateData.ca ?"
 
 #: template/feedback.php:208
 msgid "Word of mouth"
-msgstr ""
+msgstr "Bouche à oreille"
 
 #: template/feedback.php:209
 msgid "Services offered by the Canadian Centre for Climate Services (e.g. webinar, workshop or Support Desk)"
-msgstr ""
+msgstr "Services offerts par le Centre canadien des services climatiques (p. ex. webinaire, atelier ou service d'assistance)"
 
 #: template/feedback.php:210
 msgid "Professional association"
-msgstr ""
+msgstr "Association professionnelle"
 
 #: template/feedback.php:211
 msgid "Organization focused on climate/adaptation"
-msgstr ""
+msgstr "Organisation axée sur le climat/l'adaptation"
 
 #: template/feedback.php:212
 msgid "Conference"
-msgstr ""
+msgstr "Conférence"
 
 #: template/feedback.php:213
 msgid "Media (e.g. social media, online, TV, print, radio)"
-msgstr ""
+msgstr "Médias (p. ex. médias sociaux, en ligne, TV, presse, radio)"
 
 #: template/feedback.php:214
 msgid "Internet search"
-msgstr ""
+msgstr "Recherche Internet"
 
 #: template/feedback.php:258
 #: template/feedback.php:378
+#: template/feedback.php:551
 msgid "Enter the characters shown in the image"
 msgstr "Entrez les caractères qui apparaissent dans l'image"
 
 #: template/feedback.php:260
 #: template/feedback.php:380
+#: template/feedback.php:553
 msgid "Non-valid entered characters. Please try again."
-msgstr ""
+msgstr "Caractères saisis non valides. Veuillez réessayer."
 
 #: template/feedback.php:290
 msgid "Dataset Support"
@@ -1363,3 +1372,11 @@ msgstr "Moyennes sur 30 ans"
 #. Template Name of the theme
 msgid "Update ACF Relevant Sectors"
 msgstr ""
+
+#: template/feedback.php:408
+msgid "Beta Apps Support"
+msgstr "Soutien aux applications bêta"
+
+#: template/feedback.php:456
+msgid "Which apps do you need support for?"
+msgstr "Quelles sont les applications pour lesquelles vous avez besoin d'un soutien ?"

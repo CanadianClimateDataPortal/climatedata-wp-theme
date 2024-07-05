@@ -539,11 +539,37 @@ function cdc_enable_block_editor( $use_block_editor, $post_type ) {
 	return false;
 }
 
+/**
+ * Unregisters default taxonomies that are not used.
+ *
+ * @return void
+ */
+function cdc_remove_unused_taxonomies() {
+	unregister_taxonomy_for_object_type( 'post_tag', 'post' );
+	unregister_taxonomy_for_object_type( 'category', 'post' );
+}
+
+/**
+ * Returns the list of columns to show for the "post" listing page (of the administration).
+ *
+ * @param string[] $post_columns Associative array `[$id => $name]` of the current columns. `$id` is the column's id,
+ *                               and `$value` is the column's name.
+ *
+ * @return string[] Associative array `[$id => $name]` of the columns to show.
+ */
+function cdc_manage_post_columns( $post_columns ) {
+	unset( $post_columns['author'] );
+	unset( $post_columns['post_type'] );
+	return $post_columns;
+}
+
 add_action ( 'init', 'remove_default_editor' );
+add_action ( 'init', 'cdc_remove_unused_taxonomies' );
 add_action ( 'init', 'remove_comments_post_type_support', 100 );
 add_action ( 'admin_menu', 'remove_comments_admin_menu' );
 add_action ( 'wp_before_admin_bar_render', 'remove_comments_admin_bar' );
 add_filter ( 'use_block_editor_for_post_type', 'cdc_enable_block_editor', 10, 2 );
+add_filter ( 'manage_post_posts_columns', 'cdc_manage_post_columns', 10, 1 );
 
 //
 // MISC

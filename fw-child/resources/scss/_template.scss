@@ -293,10 +293,6 @@
 //
 
 .climatedata-menu {
-  .climatedata-menu-item {
-    padding: .125rem 0 .125rem .5rem;
-  }
-
   .climatedata-collapsible-item {
     display: flex;
     flex-wrap: nowrap;
@@ -315,9 +311,25 @@
     &:hover {
       background-color: $gray-400;
     }
+
+    &::before {
+      display: block;
+      transition: transform .2s;
+    }
+
+    &[aria-expanded="true"] {
+      &::before {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .current-nav-link {
+    color: $primary;
   }
 
   .submenu {
+    border-left: 1px solid $gray-400;
     padding-left: .75rem;
     width: 100%;
   }
@@ -331,9 +343,13 @@
     color: $secondary;
     display: inline-block;
     font-size: 1.125rem;
+    padding: .125rem 0 .125rem .5rem;
+    transition: background-color .15s;
+    width: 100%;
 
     &:hover,
     &:focus {
+      background-color: $gray-400;
       text-decoration: underline;
     }
   }

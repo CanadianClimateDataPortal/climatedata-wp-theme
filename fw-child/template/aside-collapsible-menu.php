@@ -1,5 +1,10 @@
 <?php
 
+//
+// Code adapted from parent theme menu
+// framework/resources/functions/builder/front-end/block/navigation/menu.php
+//
+
 $menu = array();
 
 $menu_items = array();
@@ -37,7 +42,7 @@ if ( !empty ( $all_children ) ) {
 
 <div class="climatedata-menu">
 	<?php
-        function climatedata_aside_menu( $menu_structure, $is_submenu, $submenu_id = NULL ) {
+        function climatedata_aside_menu( $menu_structure, $is_submenu, $submenu_id = NULL, $in_active_trail = NULL ) {
             if ( is_null( $submenu_id ) ) {
                 $submenu_id = 0;
             }
@@ -52,6 +57,10 @@ if ( !empty ( $all_children ) ) {
 
             if ( $is_submenu ) {
                 echo ' submenu collapse';
+
+                if ( $in_active_trail ) {
+                    echo ' show';
+                }
             }
 
             echo '">';
@@ -69,11 +78,8 @@ if ( !empty ( $all_children ) ) {
 
                 // if the page is an ancestor of the current ID
 
-                if (
-                    isset ( $GLOBALS['vars']['current_ancestors'] ) &&
-                    in_array ( $item['id'], $GLOBALS['vars']['current_ancestors'] )
-                ) {
-                    echo 'ancestor-nav-item ';
+                if ( in_array ( $item['id'], get_post_ancestors( get_the_ID() ) ) ) {
+                    echo 'in-active-trail ';
                 }
 
                 if ( isset ( $item['children'] ) ) {
@@ -114,9 +120,19 @@ if ( !empty ( $all_children ) ) {
                 if ( isset ( $item['children'] ) ) {
 
                     $submenu_id++;
-                    echo '<button class="climatedata-expand fa-solid fa-caret-down" data-bs-toggle="collapse" data-bs-target="#climatedata-submenu-' . $submenu_id . '" ></button>';
+                    $in_active_trail = FALSE;
+                    if ( in_array ( $item['id'], get_post_ancestors( get_the_ID() ) ) ) {
+                        $in_active_trail = TRUE;
+                    }
+                    echo '<button class="climatedata-expand fa-solid fa-chevron-down" data-bs-toggle="collapse" data-bs-target="#climatedata-submenu-' . $submenu_id . '" ';
+                    if ( $in_active_trail ) {
+                        echo 'aria-expanded="true"';
+                    } else {
+                        echo 'aria-expanded="false"';
+                    }
+                    echo '></button>';
                     echo '</div>';
-                    climatedata_aside_menu ( $item['children'], TRUE, $submenu_id );
+                    climatedata_aside_menu ( $item['children'], TRUE, $submenu_id, $in_active_trail );
 
                 }
 

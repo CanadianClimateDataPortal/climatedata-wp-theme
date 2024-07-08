@@ -120,9 +120,9 @@ if ( !empty ( $all_children ) ) {
                 if ( isset ( $item['children'] ) ) {
 
                     $submenu_id++;
-                    $in_active_trail = FALSE;
+                    $in_active_trail = false;
                     if ( in_array ( $item['id'], get_post_ancestors( get_the_ID() ) ) ) {
-                        $in_active_trail = TRUE;
+                        $in_active_trail = true;
                     }
                     echo '<button class="climatedata-expand fa-solid fa-chevron-down" data-bs-toggle="collapse" data-bs-target="#climatedata-submenu-' . $submenu_id . '" ';
                     if ( $in_active_trail ) {
@@ -132,7 +132,7 @@ if ( !empty ( $all_children ) ) {
                     }
                     echo '></button>';
                     echo '</div>';
-                    climatedata_aside_menu ( $item['children'], TRUE, $submenu_id, $in_active_trail );
+                    climatedata_aside_menu ( $item['children'], true, $submenu_id, $in_active_trail );
 
                 }
 
@@ -143,7 +143,7 @@ if ( !empty ( $all_children ) ) {
             echo '</ul>';
         }
 
-        climatedata_aside_menu( $menu, FALSE );
+        climatedata_aside_menu( $menu, false );
 
     ?>
 

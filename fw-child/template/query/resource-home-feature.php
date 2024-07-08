@@ -9,14 +9,14 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 $native_excerpt = apply_filters ( 'the_content', custom_excerpt ( 20, $item['id'] ) );
 
 $excerpts = array (
-    'en' => $native_excerpt ?: get_field( 'excerpt', $item['id'] ), // Overrides native excerpt with custom excerpt if present
-    'fr' => get_field( 'excerpt_fr', $item['id'] ) ?: $native_excerpt // Defaults back to native excerpt if no custom FR not present
+    'en' => $native_excerpt ? $native_excerpt : get_field( 'excerpt', $item['id'] ), // Overrides native excerpt with custom excerpt if present
+    'fr' => get_field( 'excerpt_fr', $item['id'] ) ? get_field( 'excerpt_fr', $item['id'] ) : $native_excerpt, // Defaults back to native excerpt if no custom FR not present
 );
 ?>
 
-<div class="card mb-5 mb-lg-0 scroll-card" data-post-id="<?php echo $item['id'] ?>">
+<div class="card mb-5 mb-lg-0 shadow scroll-card" data-post-id="<?php echo $item['id'] ?>">
 
-    <a href="<?php echo $item['permalink']; ?>" class="">
+    <a href="<?php echo $item['permalink']; ?>">
 
         <div class="ratio ratio-3x2 bg-dark">
 
@@ -52,15 +52,21 @@ $excerpts = array (
 
                 <?php
 
-                    echo $excerpts[ $item['lang'] ];
+                    echo wp_kses_post( $excerpts[ $item['lang'] ] );
 
                 ?>
 
             </div>
 
+            <?php
+
+                if ( get_field ( 'asset_type', $item['id'] ) ) {
+
+            ?>
+
             <p class="post-type">
 
-                <i class="me-1 fa-solid icon-<?php the_field ( 'asset_type', $item['id']) ; ?>"></i>
+                <i class="me-1 fa-solid icon-<?php the_field ( 'asset_type', $item['id'] ) ; ?>"></i>
 
                 <?php
 
@@ -69,6 +75,12 @@ $excerpts = array (
                 ?>
 
             </p>
+
+            <?php
+
+                }
+
+            ?>
 
         </div>
 

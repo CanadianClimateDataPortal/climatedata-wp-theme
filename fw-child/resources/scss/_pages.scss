@@ -132,12 +132,14 @@
       @include all-caps;
 
       @include media-breakpoint-down(sm) {
-        font-size: 13px;
+        font-size: .8125rem;
       }
     }
 
     .post-type {
       margin-top: .5rem;
+      margin-left: .0625rem;
+      font-size: .875rem;
       text-transform: capitalize;
 
       @include media-breakpoint-down(sm) {

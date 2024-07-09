@@ -132,9 +132,9 @@ if ( !empty ( $all_children ) ) {
                 if ( isset ( $item['children'] ) ) {
 
                     $submenu_id++;
-                    $in_active_trail = FALSE;
+                    $in_active_trail = false;
                     if ( in_array ( $item['id'], get_post_ancestors( get_the_ID() ) ) ) {
-                        $in_active_trail = TRUE;
+                        $in_active_trail = true;
                     }
                     echo '<button class="button-expand fa-solid fa-chevron-down" data-bs-toggle="collapse" data-bs-target="#hierarchical-submenu-' . $submenu_id . '" ';
                     if ( $in_active_trail ) {
@@ -144,7 +144,7 @@ if ( !empty ( $all_children ) ) {
                     }
                     echo '></button>';
                     echo '</div>';
-                    cdc_aside_menu ( $item['children'], TRUE, $submenu_id, $in_active_trail );
+                    cdc_aside_menu ( $item['children'], true, $submenu_id, $in_active_trail );
 
                 }
 
@@ -155,7 +155,7 @@ if ( !empty ( $all_children ) ) {
             echo '</ul>';
         }
 
-        cdc_aside_menu( $menu, FALSE );
+        cdc_aside_menu( $menu, false );
 
     ?>
 

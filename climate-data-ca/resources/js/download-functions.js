@@ -670,7 +670,6 @@
             let xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
                 if (xhttp.readyState === 4 && xhttp.status === 200) {
-                    // zip.file($('#download-filename').val() + '-' + varToProcess[i] + '.' + format_extension, xhttp.response);
                     return callback(null, {var_name: request_args.var, data: xhttp.response});
                 }
             };
@@ -719,14 +718,9 @@
             format = $('input[name="download-format"]:checked').val();
             let dataset_name = $('input[name="download-dataset"]:checked').val();
             let selectedDatasetType = $('input[name="download-dataset-type"]:checked').val();
-            let format_extension = format;
-
-            if (format == 'netcdf') {
-                format_extension = 'nc';
-            }
+            let format_extension = format == 'netcdf' ? 'nc' : 'zip';
 
             if (selectedVar !== 'all') {
-                format_extension = 'zip';
                 $('body').addClass('spinner-on');
                 request_args = {
                     var: selectedVar,

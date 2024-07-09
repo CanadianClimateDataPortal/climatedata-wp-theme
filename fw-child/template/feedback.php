@@ -302,7 +302,7 @@
 				
 				<form id="feedback-data-form" class="feedback-form needs-validation" novalidate>
 					
-					<input type="hidden" name="feedback-type" value="data">
+					<input type="hidden" name="feedback-type" value="beta-apps">
 					
 					<div class="row">
 					

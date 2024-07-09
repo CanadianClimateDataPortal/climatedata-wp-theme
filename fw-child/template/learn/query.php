@@ -39,8 +39,14 @@
 			<?php
 			$i = 1;
 
-			foreach ( get_terms( array( 'taxonomy' => 'topic' ) ) as $topic ) {
-				$topic_args = array(
+			$tax_topic_terms = get_terms(
+				array(
+					'taxonomy' => 'topic',
+				)
+			);
+
+			foreach ( $tax_topic_terms as $topic_term ) {
+				$posts_args = array(
 					'posts_per_page' => 12,
 					'post_type'      => 'resource',
 					'orderby'        => 'menu_order',
@@ -51,7 +57,7 @@
 						array(
 							'taxonomy' => 'topic',
 							'field'    => 'slug',
-							'terms'    => array( $topic->slug )
+							'terms'    => array( $topic_term->slug )
 						)
 					)
 				);
@@ -59,12 +65,12 @@
 
 				<div id="topic-<?php echo $i; ?>"
 					 class="learn-topic-grid py-7"
-					 data-args='<?php echo json_encode( $topic_args ); ?>'>
+					 data-args='<?php echo json_encode( $posts_args ); ?>'>
 					<h4 class="learn-topic-title mb-7 d-flex align-items-center font-weight-normal">
 						<span class="circle-number"><?php echo $i; ?></span>
 
 						<?php
-						echo fw_get_field( 'title', 'topic_' . $topic->term_id );
+						echo fw_get_field( 'title', 'topic_' . $topic_term->term_id );
 						?>
 					</h4>
 

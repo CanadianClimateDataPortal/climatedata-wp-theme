@@ -292,15 +292,15 @@
 // ASIDE MENU
 //
 
-.climatedata-menu {
-  .climatedata-collapsible-item {
+.hierarchical-menu {
+  .collapsible-item {
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
     width: 100%;
   }
 
-  .climatedata-expand {
+  .button-expand {
     background-color: transparent;
     border: none;
     color: $secondary;

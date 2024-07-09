@@ -40,9 +40,21 @@ if ( !empty ( $all_children ) ) {
 
 ?>
 
-<div class="climatedata-menu">
+<div class="hierarchical-menu">
 	<?php
-        function climatedata_aside_menu( $menu_structure, $is_submenu, $submenu_id = NULL, $in_active_trail = NULL ) {
+        /**
+         * Displays the menu hierarchy and makes it collapsible.
+         *
+         * @param array $menu_structure The entire menu structure generated
+         * @param boolean $is_submenu Defines whether the current tree is a
+         *                            submenu or not
+         * @param int $submenu_id Optional. Ordinal to create unique ID for
+         *                        submenu. Default: null
+         * @param boolean $in_active_trail Optional. Defines if the current
+         *                                 menu is part of the active trail.
+         *                                 Default: null
+         */
+        function cdc_aside_menu( $menu_structure, $is_submenu, $submenu_id = NULL, $in_active_trail = NULL ) {
             if ( is_null( $submenu_id ) ) {
                 $submenu_id = 0;
             }
@@ -50,10 +62,10 @@ if ( !empty ( $all_children ) ) {
             echo '<ul';
 
             if ( ! empty( $submenu_id ) ) {
-                echo ' id="climatedata-submenu-' . $submenu_id . '"';
+                echo ' id="hierarchical-submenu-' . $submenu_id . '"';
             }
 
-            echo ' class="climatedata-menu-list';
+            echo ' class="hierarchical-menu-list';
 
             if ( $is_submenu ) {
                 echo ' submenu collapse';
@@ -86,10 +98,10 @@ if ( !empty ( $all_children ) ) {
                     echo 'has-children ';
                 }
 
-                echo 'climatedata-menu-item">';
+                echo 'menu-item">';
 
                 if ( isset ( $item['children'] ) ) {
-                    echo '<div class="climatedata-collapsible-item">';
+                    echo '<div class="collapsible-item">';
                 }
 
                 echo '<a href="' . $item['url'] . '"';
@@ -124,7 +136,7 @@ if ( !empty ( $all_children ) ) {
                     if ( in_array ( $item['id'], get_post_ancestors( get_the_ID() ) ) ) {
                         $in_active_trail = TRUE;
                     }
-                    echo '<button class="climatedata-expand fa-solid fa-chevron-down" data-bs-toggle="collapse" data-bs-target="#climatedata-submenu-' . $submenu_id . '" ';
+                    echo '<button class="button-expand fa-solid fa-chevron-down" data-bs-toggle="collapse" data-bs-target="#hierarchical-submenu-' . $submenu_id . '" ';
                     if ( $in_active_trail ) {
                         echo 'aria-expanded="true"';
                     } else {
@@ -132,7 +144,7 @@ if ( !empty ( $all_children ) ) {
                     }
                     echo '></button>';
                     echo '</div>';
-                    climatedata_aside_menu ( $item['children'], TRUE, $submenu_id, $in_active_trail );
+                    cdc_aside_menu ( $item['children'], TRUE, $submenu_id, $in_active_trail );
 
                 }
 
@@ -143,7 +155,7 @@ if ( !empty ( $all_children ) ) {
             echo '</ul>';
         }
 
-        climatedata_aside_menu( $menu, FALSE );
+        cdc_aside_menu( $menu, FALSE );
 
     ?>
 

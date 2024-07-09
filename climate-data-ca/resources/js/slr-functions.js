@@ -1555,7 +1555,7 @@
                     transparent: true,
                     opacity: 1,
                     pane: 'raster',
-                    'TIME': decade_value + '-01-00T00:00:00Z',
+                    'TIME': rcp_value == 'rcp85plus65-p50' ? '' : decade_value + '-01-00T00:00:00Z',
                     'VERSION': '1.3.0',
                     layers: 'CDC:' + 'slr-ys-' + rcp_value + '-ann-30year'
                 });
@@ -1568,7 +1568,7 @@
                         opacity: 1,
                         pane: 'raster',
                         styles: 'slr-' + rcp_value,
-                        'TIME': decade_value + '-01-00T00:00:00Z',
+                        'TIME': right_rcp_value == 'rcp85plus65-p50' ? '' :  decade_value + '-01-00T00:00:00Z',
                         'VERSION': '1.3.0',
                         layers: 'CDC:' + 'slr-ys-' + right_rcp_value + '-ann-30year'
                     });
@@ -1588,7 +1588,7 @@
                     format: 'image/png',
                     transparent: true,
                     opacity: 1,
-                    'TIME': decade_value + '-01-00T00:00:00Z',
+                    'TIME': rcp_value == 'rcp85plus65-p50' ? '' : decade_value + '-01-00T00:00:00Z',
                     'VERSION': '1.3.0',
                     layers: 'CDC:' + singleLayerName
                 });

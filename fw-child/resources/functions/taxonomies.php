@@ -87,7 +87,7 @@ function taxonomy_topic()
     $args = [
         'labels' => $labels,
         'hierarchical' => true,
-        'public' => true,
+        'public' => false,
         'show_ui' => true,
         'show_admin_column' => true,
         'show_in_nav_menus' => true,
@@ -144,7 +144,7 @@ function taxonomy_techlevel()
     $args = [
         'labels' => $labels,
         'hierarchical' => true,
-        'public' => true,
+        'public' => false,
         'show_ui' => true,
         'show_admin_column' => false,
         'show_in_nav_menus' => true,
@@ -197,7 +197,7 @@ function taxonomy_sector()
     $args = [
         'labels' => $labels,
         'hierarchical' => true,
-        'public' => true,
+        'public' => false,
         'show_ui' => true,
         'show_admin_column' => true,
         'show_in_nav_menus' => true,
@@ -267,7 +267,7 @@ function taxonomy_region()
     $args = [
         'labels' => $labels,
         'hierarchical' => true,
-        'public' => true,
+        'public' => false,
         'show_ui' => true,
         'show_admin_column' => true,
         'show_in_nav_menus' => true,
@@ -306,8 +306,8 @@ function taxonomy_vartype() {
     );
     $args = array(
         'labels'                     => $labels,
-        'hierarchical'               => false,
-        'public'                     => true,
+        'hierarchical'               => true,
+        'public'                     => false,
         'show_ui'                    => true,
         'show_admin_column'          => true,
         'show_in_nav_menus'          => true,
@@ -349,7 +349,7 @@ function cd_register_tax_news_author() {
 	$args = array(
 		'labels'            => $labels,
 		'hierarchical'      => true,
-		'public'            => true,
+		'public'            => false,
 		'show_ui'           => true,
 		'show_admin_column' => true,
 		'show_in_nav_menus' => true,
@@ -391,7 +391,7 @@ function cd_register_tax_news_topic() {
 	$args = array(
 		'labels'            => $labels,
 		'hierarchical'      => true,
-		'public'            => true,
+		'public'            => false,
 		'show_ui'           => true,
 		'show_admin_column' => true,
 		'show_in_nav_menus' => true,

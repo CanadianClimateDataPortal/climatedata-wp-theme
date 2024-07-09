@@ -41,17 +41,17 @@
 
 			$tax_topic_terms = get_terms(
 				array(
-					'taxonomy' => 'topic',
+					'taxonomy'   => 'topic',
+					'hide_empty' => true,
 				)
 			);
 
 			foreach ( $tax_topic_terms as $topic_term ) {
 				$posts_args = array(
-					'posts_per_page' => 12,
-					'post_type'      => 'resource',
-					'orderby'        => 'menu_order',
+					'posts_per_page' => -1,
+					'post_type'      => array( 'page', 'resource', 'beta-app' ),
+					'orderby'        => 'title',
 					'order'          => 'asc',
-					'post_parent'    => 0,
 					'post_status'    => 'publish',
 					'tax_query'      => array(
 						array(
@@ -59,7 +59,13 @@
 							'field'    => 'slug',
 							'terms'    => array( $topic_term->slug )
 						)
-					)
+					),
+					'meta_query'     => array(
+						array(
+							'key'     => 'display_in_learning_zone',
+							'value'   => '1',
+						)
+					),
 				);
 				?>
 

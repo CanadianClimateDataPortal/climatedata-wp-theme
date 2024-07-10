@@ -290,7 +290,7 @@
 					<?php _e ( 'Dataset Support', 'cdc' ); ?>
 				</h3>
 			</div> 
-		</h2>
+		</div>
 		
 		<div
 			id="dataset-support"
@@ -408,7 +408,7 @@
 					<?php _e ( 'Beta Apps Support', 'cdc' ); ?>
 				</h3>
 			</div> 
-		</h2>
+		</div>
 		
 		<div
 			id="beta-apps-support"
@@ -425,7 +425,7 @@
 					<div class="row">
 					
 						<div class="col-10 offset-2">
-							<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 pb-6 mb-6 border-bottom">
+							<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 pb-4">
 								
 								<div class="col">
 
@@ -450,7 +450,11 @@
 									<input type="text" name="organization" class="form-control">
 
 								</div>
-								
+
+							</div>
+
+							<div class="row pb-6 mb-6 border-bottom">
+
 								<div class="col">
 									
 									<p class="form-label"><?php _e ( 'Which apps do you need support for?', 'cdc' ); ?></p>
@@ -525,12 +529,12 @@
 											
 												$captcha_options = array (
 													'code_length' => 4,
-													'input_name' => 'support_captcha_code',
-													'input_id' => 'support_captcha',
-													'image_id' => 'support_captcha_img',
+													'input_name' => 'betaapps_captcha_code',
+													'input_id' => 'betaapps_captcha',
+													'image_id' => 'betaapps_captcha_img',
 													'icon_size' => 16,
 													'input_text' => __ ( 'Enter the characters shown in the image:', 'cdc' ),
-													'namespace' => 'support',
+													'namespace' => 'betaapps',
 												);
 												
 												// image

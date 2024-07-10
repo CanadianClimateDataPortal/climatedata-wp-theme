@@ -565,7 +565,7 @@ $control-slider-handle-width: 2.75rem;
         min-height: 100vh;
 
         .tab-drawer-content-inner {
-          min-height: 100vh;
+          height: 100vh;
         }
       }
     }
@@ -588,7 +588,7 @@ $control-slider-handle-width: 2.75rem;
 
     .control-tab-body {
       flex-grow: 1;
-      overflow: auto;
+      overflow-y: auto;
       // padding: 1rem;
     }
 

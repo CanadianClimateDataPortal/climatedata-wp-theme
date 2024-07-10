@@ -441,6 +441,19 @@ $control-slider-handle-width: 2.75rem;
 
 // BREADCRUMB
 
+#header-breadcrumb {
+  overflow-x: scroll;
+
+  .breadcrumb {
+    display: flex;
+    flex-wrap: nowrap;
+
+    li {
+      white-space: nowrap;
+    }
+  }
+}
+
 // CONTROL BAR
 
 .control-bar {

@@ -22,7 +22,7 @@
 }
 
 #header-social {
-  @include media-breakpoint-up(md) {
+  @include media-breakpoint-up(xl) {
     border-left: 1px solid $white;
   }
 }

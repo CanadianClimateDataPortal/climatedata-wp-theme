@@ -459,7 +459,7 @@
 									
 									<p class="form-label"><?php _e ( 'Which apps do you need support for?', 'cdc' ); ?></p>
 									
-									<div class="my-2">
+									<div class="my-2 form-error-border">
 
 										<?php
 

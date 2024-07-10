@@ -509,6 +509,7 @@ const $ = jQuery;
 
       alert_header.empty().removeClass().addClass('alert-header');
       alert_messages.empty();
+      the_form.removeClass('form-error');
 
       the_form.find('.border-danger').removeClass('border-danger');
 
@@ -529,14 +530,17 @@ const $ = jQuery;
 
           if (data.invalid.length) {
             alert_header.addClass('alert alert-warning');
-
+          
             data.invalid.forEach(function (input) {
               the_form.find('[name="' + input + '"]').addClass('border-danger');
             });
+          
+            the_form.addClass('form-error');
           }
 
           if (data.mail == 'success') {
             alert_header.addClass('alert alert-success');
+            the_form.removeClass('form-error');
             the_form.find('.submit-btn').addClass('disabled');
           } else {
             alert_header.addClass('alert alert-warning');

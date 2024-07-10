@@ -1900,7 +1900,14 @@ body.tab-drawer-open {
     background-color: $gray-300;
     font-size: 0.875rem;
   }
+
+  &.form-error {
+    .form-error-border {
+      border: 1px solid $danger;
+    }
+  }
 }
+
 
 //
 // BETA APPS

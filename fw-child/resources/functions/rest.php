@@ -687,20 +687,30 @@ add_action ( 'rest_api_init', function () {
 
 function cdc_submit_feedback_form () {
     $form_type = 'feedback';
-    handle_form_submission ( $form_type );
+    $required_fields = array(
+        'feedback' => __ ( 'Please provide the details of your inquiry.', 'cdc' ),
+    );
+    handle_form_submission ( $form_type, $required_fields, true );
 }
 
 function cdc_submit_support_form () {
     $form_type = 'support';
-    handle_form_submission ( $form_type );
+    $required_fields = array(
+        'feedback' => __ ( 'Please provide the details of your inquiry.', 'cdc' ),
+    );
+    handle_form_submission ( $form_type, $required_fields, false );
 }
 
 function cdc_submit_betaapps_form () {
     $form_type = 'betaapps';
-    handle_form_submission ( $form_type );
+    $required_fields = array(
+        'feedback' => __ ( 'Please provide the details of your inquiry.', 'cdc' ),
+        'betaapps-posts[]' => __ ( 'Please choose at least one app.', 'cdc' )
+    );
+    handle_form_submission ( $form_type, $required_fields, false );
 }
 
-function handle_form_submission ( $form_type ) {
+function handle_form_submission ( $form_type, $required_fields, $include_mailchimp ) {
     $result = array(
         'invalid' => array(),
         'mail' => 'failed',
@@ -720,10 +730,7 @@ function handle_form_submission ( $form_type ) {
 
         // Init captcha
         include_once ( locate_template ( 'resources/php/securimage/securimage.php' ) );
-        include_once ( locate_template ( 'resources/php/mailchimp.php' ) );
         $securimage = new Securimage();
-
-        // Set captcha namespace by form type
         $securimage->setNamespace ( $form_data['namespace'] );
 
         // Validate captcha
@@ -734,57 +741,47 @@ function handle_form_submission ( $form_type ) {
         }
 
         // Validate email address
-        if (
-            $form_data['email'] == '' ||
-            !filter_var (
-                sanitize_input ( $form_data['email'] ),
-                FILTER_VALIDATE_EMAIL
-            )
-        ) {
+        if ( empty ( $form_data['email'] ) || !filter_var ( sanitize_input ( $form_data['email'] ), FILTER_VALIDATE_EMAIL ) ) {
             $valid = false;
             $result['invalid'][] = 'email';
             $result['messages'][] = __ ( 'Please enter a valid email address.', 'cdc' );
         }
 
-        if ( $form_data['feedback'] == '' ) {
-            $valid = false;
-            $result['invalid'][] = 'feedback';
-            $result['messages'][] = __ ( 'Please provide the details of your inquiry.', 'cdc' );
-        }
+		// Validate other required fields
+		foreach ( $required_fields as $field => $error_msg ) {
+			if ( is_array ( $form_data[$field] ) ) {
+				// Check if the array (checkboxes) is empty
+				if ( !isset($form_data[$field]) || count ( array_filter ( $form_data[$field] ) ) == 0 ) {
+					$valid = false;
+					$result['invalid'][] = $field;
+					$result['messages'][] = $error_msg;
+				}
+			} else {
+				// Check if the individual field is empty
+				if ( empty ( $form_data[$field] ) ) {
+					$valid = false;
+					$result['invalid'][] = $field;
+					$result['messages'][] = $error_msg;
+				}
+			}
+		}
 
         if ( $valid == false ) {
             $result['header'] = __ ( 'Some required fields are missing.', 'cdc' );
-        } elseif ( $valid == true ) {
+        } else {
             // Form validation succeeded
             // Set email headers
-			$email_key = $form_type . '_email';
-			$to = $GLOBALS['vars'][$email_key];
-            $subject = get_bloginfo ( 'title' ) . __( ': Feedback form submission', 'cdc-feedback' );
+            $email_key = $form_type . '_email';
+            $to = $GLOBALS['vars'][$email_key]; // Use actual email for each form type
+            $subject = get_bloginfo ( 'title' ) . __( ': ' . ucfirst($form_type) . ' form submission', 'cdc-feedback' );
             $headers = array(
                 'Content-Type: text/html; charset=UTF-8',
-                "From: Climatedata Feedback Form <feedback@climatedata.ca>",
+                "From: Climatedata " . ucfirst($form_type) . " Form <{$form_type}@climatedata.ca>",
                 "Reply-To: {$form_data['fullname']} <{$form_data['email']}>"
             );
 
-            // Message body
-            $body = '';
-            $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __( 'Name', 'cdc-feedback' ) . '</span><span style="display: inline-block; vertical-align: top;">' . $form_data['fullname'] . '</span></p>';
-            $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __( 'Email', 'cdc-feedback' ) . '</span><span style="display: inline-block; vertical-align: top;"><a href="mailto:' . $form_data['email'] . '">' . $form_data['email'] . '</a></span></p>';
-            $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __( 'Organization', 'cdc-feedback' ) . '</span><span style="display: inline-block; vertical-align: top;">' . $form_data['organization'] . '</span></p>';
-            $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Type</span><span style="display: inline-block; vertical-align: top;">' . $form_data['feedback-type'] . '</span></p>';
-            $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Region</span><span style="display: inline-block; vertical-align: top;">' . $form_data['region'];
-            if ( $form_data['region'] == 'Other' && $form_data['region-other'] != '' ) $body .= ': ' . $form_data['region-other'];
-            $body .= '</span></p>';
-            $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Role</span><span style="display: inline-block; vertical-align: top;">' . $form_data['role'];
-            if ( $form_data['role'] == 'Other' && $form_data['role-other'] != '' ) $body .= ': ' . $form_data['role-other'];
-            $body .= '</span></p>';
-            $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Subject</span><span style="display: inline-block; vertical-align: top;">' . $form_data['subject'];
-            if ( $form_data['subject'] == 'Other' && $form_data['subject-other'] != '' ) $body .= ': ' . $form_data['subject-other'];
-            $body .= '</span></p>';
-            $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Referred from</span><span style="display: inline-block; vertical-align: top;">' . $form_data['referral'];
-            if ( $form_data['referral'] == 'Other' && $form_data['referral-other'] != '' ) $body .= ': ' . $form_data['referral-other'];
-            $body .= '</span></p>';
-            $body .= '<p style="font-weight: bold;">Message</p><p><pre>' . $form_data['feedback'] . '</pre></p>';
+            // Build message body
+            $body = build_message_body ( $form_data, $form_type );
             $result['body'] = $body;
 
             // Send mail
@@ -798,10 +795,9 @@ function handle_form_submission ( $form_type ) {
                 $result['messages'][] = __( 'Something went wrong while sending your message. Please try again later.', 'cdc' );
             }
 
-            if (
-                isset ( $form_data['signup'] ) &&
-                $form_data['signup'] == 'true'
-            ) {
+            // Mailchimp signup for feedback form
+            if ( $include_mailchimp && isset ( $form_data['signup'] ) && $form_data['signup'] == 'true' ) {
+                include_once ( locate_template ( 'resources/php/mailchimp.php' ) );
                 $signup = mailchimp_register ( $form_data['email'] );
                 if ( $signup == true ) {
                     $result['signup'] = 'success';
@@ -820,4 +816,59 @@ function handle_form_submission ( $form_type ) {
     }
 
     echo json_encode ( $result );
+}
+
+function build_message_body ( $form_data, $form_type ) {
+    $body = '';
+    $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __( 'Name', 'cdc-feedback' ) . '</span><span style="display: inline-block; vertical-align: top;">' . $form_data['fullname'] . '</span></p>';
+    $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __( 'Email', 'cdc-feedback' ) . '</span><span style="display: inline-block; vertical-align: top;"><a href="mailto:' . $form_data['email'] . '">' . $form_data['email'] . '</a></span></p>';
+    $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __( 'Organization', 'cdc-feedback' ) . '</span><span style="display: inline-block; vertical-align: top;">' . $form_data['organization'] . '</span></p>';
+
+    // Custom fields for feedback form
+    if ( $form_type == 'feedback' ) {
+        $body .= build_feedback_body ( $form_data );
+    } 
+    // Custom fields for betaapps form
+    elseif ( $form_type == 'betaapps' ) {
+        $body .= build_betaapps_body ( $form_data );
+    }
+    
+    $body .= '<p style="font-weight: bold;">Message</p><p><pre>' . $form_data['feedback'] . '</pre></p>';
+    return $body;
+}
+
+function build_feedback_body ( $form_data ) {
+    $body = '';
+    $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __( 'Type', 'cdc-feedback' ) . '</span><span style="display: inline-block; vertical-align: top;">' . $form_data['feedback-type'] . '</span></p>';
+    $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __( 'Region', 'cdc-feedback' ) . '</span><span style="display: inline-block; vertical-align: top;">' . $form_data['region'];
+    if ( $form_data['region'] == 'Other' && $form_data['region-other'] != '' ) $body .= ': ' . $form_data['region-other'];
+    $body .= '</span></p>';
+    $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __( 'Role', 'cdc-feedback' ) . '</span><span style="display: inline-block; vertical-align: top;">' . $form_data['role'];
+    if ( $form_data['role'] == 'Other' && $form_data['role-other'] != '' ) $body .= ': ' . $form_data['role-other'];
+    $body .= '</span></p>';
+    $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __( 'Subject', 'cdc-feedback' ) . '</span><span style="display: inline-block; vertical-align: top;">' . $form_data['subject'];
+    if ( $form_data['subject'] == 'Other' && $form_data['subject-other'] != '' ) $body .= ': ' . $form_data['subject-other'];
+    $body .= '</span></p>';
+	$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __( 'Referred from', 'cdc-feedback' ) . '</span><span style="display: inline-block; vertical-align: top;">' . $form_data['referral'];
+    if ( $form_data['referral'] == 'Other' && $form_data['referral-other'] != '' ) $body .= ': ' . $form_data['referral-other'];
+    $body .= '</span></p>';
+    return $body;
+}
+
+function build_betaapps_body ( $form_data ) {
+    $body = '';
+    $body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">' . __( 'Beta Apps', 'cdc-feedback' ) . '</span><span style="display: inline-block; vertical-align: top;">';
+    
+    if ( isset ( $form_data['betaapps-posts[]'] ) ) {
+        if ( is_array ( $form_data['betaapps-posts[]'] ) ) {
+            $body .= implode ( ', ', $form_data['betaapps-posts[]'] );
+        } else {
+            $body .= $form_data['betaapps-posts[]'];
+        }
+    } else {
+        $body .= __( 'None selected', 'cdc-feedback' );
+    }
+
+    $body .= '</span></p>';
+    return $body;
 }

@@ -20,8 +20,6 @@
 	<div class="col-13 offset-1">
 		<div class="tab-drawer-bumper">
 			<?php
-			$i = 1;
-
 			$tax_topic_terms = get_terms(
 				array(
 					'taxonomy'   => 'topic',
@@ -56,9 +54,7 @@
 				<div id="topic-<?php echo esc_attr( $topic_term->term_id ); ?>"
 					 class="learn-topic-grid py-7"
 					 data-args='<?php echo json_encode( $posts_args ); ?>'>
-					<h4 class="learn-topic-title mb-7 d-flex align-items-center font-weight-normal">
-						<span class="circle-number"><?php echo $i; ?></span>
-
+					<h4 class="learn-topic-title mb-5">
 						<?php
 						echo fw_get_field( 'title', 'topic_' . $topic_term->term_id );
 						?>
@@ -73,7 +69,6 @@
 				</div>
 
 				<?php
-				$i ++;
 			}
 			?>
 

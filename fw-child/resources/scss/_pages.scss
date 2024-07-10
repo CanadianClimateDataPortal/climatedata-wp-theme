@@ -1683,6 +1683,16 @@ body.tab-drawer-open {
   }
 }
 
+.learn-topic-title {
+  &:after {
+    content: "";
+    width: 10%;
+    border-top: 4px solid $secondary;
+    margin-top: 1rem;
+    display: block;
+  }
+}
+
 //
 // NEWS
 //

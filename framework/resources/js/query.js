@@ -303,7 +303,7 @@
 			
 			if (options.args.meta_query) {
 				if (options.default_args.meta_query) {
-					options.args.meta_query = { ...options.default_args.meta_query }
+					options.args.meta_query = [ ...options.default_args.meta_query ]
 				} else {
 					delete options.args.meta_query
 				}

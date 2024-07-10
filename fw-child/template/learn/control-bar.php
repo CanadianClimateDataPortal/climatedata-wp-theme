@@ -33,43 +33,36 @@
 						
 						<div class="control-tab-body ms-3">
 							<?php
-							
-								$i = 1;
-								
-								foreach ( get_terms ( array (
-									'taxonomy' => 'topic'
-								) ) as $topic ) {
-							
+							$tax_topic_terms = get_terms(
+								array(
+									'taxonomy'   => 'topic',
+									'hide_empty' => true,
+								)
+							);
+
+							foreach ( $tax_topic_terms as $topic_term ) {
+								?>
+								<div class="learn-zone-topic-filter position-relative pe-3 py-4 border-bottom"
+									 data-topic-id="topic-<?php echo esc_attr( $topic_term->term_id ); ?>">
+									<a href="#topic-<?php echo esc_attr( $topic_term->term_id ); ?>"
+									   class="stretched-link"></a>
+
+									<h5><?php echo fw_get_field( 'title', 'topic_' . $topic_term->term_id ); ?></h5>
+
+									<p class="mb-0">
+										<?php
+										if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
+											echo get_field( 'description_fr', 'topic_' . $topic_term->term_id );
+										} else {
+											echo $topic_term->description;
+										}
+										?>
+									</p>
+
+								</div>
+								<?php
+							}
 							?>
-							
-							<div class="learn-zone-topic-filter position-relative pe-3 py-4 border-bottom" 
-								 data-topic-id="topic-<?php echo esc_attr( $topic->term_id ); ?>">
-								<a href="#topic-<?php echo esc_attr( $topic->term_id ); ?>" class="stretched-link"></a>
-								
-								<h2 class="font-family-serif text-secondary"><?php echo $i; ?></h2>
-								
-								<h5><?php echo fw_get_field ( 'title', 'topic_' . $topic->term_id ); ?></h5>
-								
-								<p class="mb-0"><?php
-								
-									if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
-										echo get_field ( 'description_fr', 'topic_' . $topic->term_id );
-									} else {
-										echo $topic->description;
-									}
-								
-								?></p>
-								
-							</div>
-							
-							<?php
-							
-									$i++;
-									
-								}
-								
-							?>
-							
 						</div>
 					</div>
 				</div>
@@ -96,6 +89,7 @@
 									<li class="filter-item" data-key="asset_type" data-value="audio"><?php _e ( 'Audio', 'cdc' ); ?></li>
 									<li class="filter-item" data-key="asset_type" data-value="interactive"><?php _e ( 'Interactive', 'cdc' ); ?></li>
 									<li class="filter-item" data-key="asset_type" data-value="article"><?php _e ( 'Article', 'cdc' ); ?></li>
+									<li class="filter-item" data-key="asset_type" data-value="app"><?php _e ( 'Application', 'cdc' ); ?></li>
 								</ul>
 							</div>
 							

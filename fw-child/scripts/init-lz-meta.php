@@ -31,4 +31,48 @@ if ( ! empty( $resources ) ) {
 	}
 }
 
-echo 'ACF "Learning Zone" meta updated successfully.';
+echo 'ACF "Learning Zone" meta updated successfully.<br>';
+
+// Get all posts of the custom post type 'page'.
+$args = array(
+	'post_type'      => 'page',
+	'posts_per_page' => -1,
+	'fields'         => 'ids'
+);
+
+$query = new WP_Query( $args );
+
+$pages = $query->posts;
+
+if ( ! empty( $pages ) ) {
+	foreach ( $pages as $post_id ) {
+		// Update "page" CPT posts asset type.
+		update_field( 'asset_type', 'article', $post_id );
+
+		echo "Post Updated: $post_id<br>";
+	}
+}
+
+echo '"Page" CPT posts asset type updated successfully.<br>';
+
+// Get all posts of the custom post type 'beta-app'.
+$args = array(
+	'post_type'      => 'beta-app',
+	'posts_per_page' => -1,
+	'fields'         => 'ids'
+);
+
+$query = new WP_Query( $args );
+
+$beta_apps = $query->posts;
+
+if ( ! empty( $beta_apps ) ) {
+	foreach ( $beta_apps as $post_id ) {
+		// Update "beta-app" CPT posts asset type.
+		update_field( 'asset_type', 'app', $post_id );
+
+		echo "Post Updated: $post_id<br>";
+	}
+}
+
+echo '"Beta app" CPT posts asset type updated successfully.<br>';

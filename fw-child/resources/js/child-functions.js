@@ -513,7 +513,7 @@ const $ = jQuery;
       the_form.find('.border-danger').removeClass('border-danger');
 
       $.ajax({
-        url: ajax_data.rest_url + 'cdc/v2/submit_feedback',
+        url: ajax_data.rest_url + 'cdc/v2/submit_' + form_namespace, // Use the namespace to target the right API endpoint
         data: {
           form: the_form.serializeArray(),
         },

@@ -302,7 +302,7 @@
 				
 				<form id="feedback-data-form" class="feedback-form needs-validation" novalidate>
 					
-					<input type="hidden" name="feedback-type" value="beta-apps">
+					<input type="hidden" name="feedback-type" value="data">
 					
 					<div class="row">
 					
@@ -397,12 +397,12 @@
 	</div>
 
 	<div class="accordion-item"> 
-		<div id="accordion-head-beta-apps" class="accordion-header">
+		<div id="accordion-head-betaapps" class="accordion-header">
 			<div class="accordion-button collapsed row py-4 ps-0" 
 				data-bs-toggle="collapse"
-				data-bs-target="#beta-apps-support" 
+				data-bs-target="#betaapps-support" 
 				aria-expanded="false" 
-				aria-controls="beta-apps-support"
+				aria-controls="betaapps-support"
 			>
 				<h3 class="col offset-2 mb-0">
 					<?php _e ( 'Beta Apps Support', 'cdc' ); ?>
@@ -411,16 +411,16 @@
 		</div>
 		
 		<div
-			id="beta-apps-support"
+			id="betaapps-support"
 			class="accordion-collapse collapse" 
-			aria-labelledby="accordion-head-beta-apps"
+			aria-labelledby="accordion-head-betaapps"
 			data-bs-parent="#feedback-accordion"
 		> 
 			<div class="accordion-body py-6"> 
 				
-				<form id="feedback-beta-apps-form" class="feedback-form needs-validation" novalidate>
+				<form id="feedback-betaapps-form" class="feedback-form needs-validation" novalidate>
 					
-					<input type="hidden" name="feedback-type" value="data">
+					<input type="hidden" name="feedback-type" value="betaapps">
 					
 					<div class="row">
 					
@@ -484,9 +484,9 @@
 													
 										<div class="form-check form-check-inline">
 
-											<input class="form-check-input" type="checkbox" name="beta-app-posts[]" id="beta-app-type-<?php echo $post_slug ?>" value="<?php echo $post_slug ?>">
+											<input class="form-check-input" type="checkbox" name="betaapps-posts[]" id="betaapp-type-<?php echo $post_slug ?>" value="<?php echo $post_slug ?>">
 
-											<label class="form-check-label" for="beta-app-type-<?php echo $post_slug ?>"><?php echo $post_title ?></label>
+											<label class="form-check-label" for="betaapp-type-<?php echo $post_slug ?>"><?php echo $post_title ?></label>
 
 										</div>
 

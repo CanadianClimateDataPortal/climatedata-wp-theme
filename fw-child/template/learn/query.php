@@ -33,8 +33,8 @@
 				$posts_args = array(
 					'posts_per_page' => -1,
 					'post_type'      => array( 'page', 'resource', 'beta-app' ),
-					'orderby'        => 'title',
-					'order'          => 'asc',
+					'orderby'        => 'date',
+					'order'          => 'desc',
 					'post_status'    => 'publish',
 					'tax_query'      => array(
 						array(

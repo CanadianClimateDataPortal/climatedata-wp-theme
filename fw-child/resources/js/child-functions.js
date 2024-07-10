@@ -246,25 +246,33 @@ const $ = jQuery;
       });
     }
 
-    // Position control bar footer at the bottom of the screen keeping it in the container
+    /**
+     * Ensure the control bar footer stays at the bottom of the screen while keeping it within its parent container.
+     * Executes at page load, on scroll and on window resize.
+     * Applies to the Beta Apps page, or anywhere the #control-bar-tabs-footer id is used.
+     * 
+     * #control-bar-tabs-footer must be initially set to position:fixed & bottom:0 in CSS.
+     * #control-bar-tabs-footer.position-absolute must be width:100%!important in CSS.
+     */
     if ($('#control-bar-tabs-footer').length) {
       function updateControlBarFooterPosition() {
         const controlBar = document.getElementById('control-bar');
         const footer = document.getElementById('control-bar-tabs-footer');
         const controlBarRect = controlBar.getBoundingClientRect();
-  
-        if (controlBarRect.bottom <= window.innerHeight) {
-          footer.style.position = 'absolute';
-          footer.style.bottom = '0';
-        } else if (controlBarRect.top < window.innerHeight && controlBarRect.bottom > window.innerHeight) {
-          footer.style.position = 'fixed';
+    
+        if (controlBarRect.bottom <= window.innerHeight || controlBarRect.top >= window.innerHeight) {
+          if (!footer.classList.contains('position-absolute')) {
+            footer.classList.add('position-absolute');
+          }
           footer.style.bottom = '0';
         } else {
-          footer.style.position = 'absolute';
+          if (footer.classList.contains('position-absolute')) {
+            footer.classList.remove('position-absolute');
+          }
           footer.style.bottom = '0';
         }
       }
-
+    
       updateControlBarFooterPosition();
       document.addEventListener('scroll', updateControlBarFooterPosition);
       window.addEventListener('resize', updateControlBarFooterPosition);

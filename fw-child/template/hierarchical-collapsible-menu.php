@@ -45,16 +45,16 @@ if ( !empty ( $all_children ) ) {
         /**
          * Displays the menu hierarchy and makes it collapsible.
          *
-         * @param array $menu_structure The entire menu structure generated
+         * @param array $menu_structure The entire menu structure generated.
          * @param boolean $is_submenu Defines whether the current tree is a
-         *                            submenu or not
+         *                            submenu or not.
          * @param int $submenu_id Optional. Ordinal to create unique ID for
-         *                        submenu. Default: null
+         *                        submenu. Default: NULL.
          * @param boolean $in_active_trail Optional. Defines if the current
          *                                 menu is part of the active trail.
-         *                                 Default: null
+         *                                 Default: NULL.
          */
-        function cdc_aside_menu( $menu_structure, $is_submenu, $submenu_id = NULL, $in_active_trail = NULL ) {
+        function cdc_hierarchical_menu( $menu_structure, $is_submenu, $submenu_id = NULL, $in_active_trail = NULL ) {
             if ( is_null( $submenu_id ) ) {
                 $submenu_id = 0;
             }
@@ -144,7 +144,7 @@ if ( !empty ( $all_children ) ) {
                     }
                     echo '></button>';
                     echo '</div>';
-                    cdc_aside_menu ( $item['children'], true, $submenu_id, $in_active_trail );
+                    cdc_hierarchical_menu ( $item['children'], true, $submenu_id, $in_active_trail );
 
                 }
 
@@ -155,7 +155,7 @@ if ( !empty ( $all_children ) ) {
             echo '</ul>';
         }
 
-        cdc_aside_menu( $menu, false );
+        cdc_hierarchical_menu( $menu, false );
 
     ?>
 

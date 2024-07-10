@@ -303,7 +303,7 @@
   .button-expand {
     background-color: transparent;
     border: none;
-    color: $secondary;
+    color: $primary;
     display: inline-block;
     padding: .375rem .5rem;
     transition: background-color .2s;
@@ -325,7 +325,7 @@
   }
 
   .current-nav-link {
-    color: $primary;
+    color: var(--bs-link-hover-color);
   }
 
   .submenu {
@@ -340,17 +340,9 @@
   }
 
   a {
-    color: $secondary;
     display: inline-block;
     font-size: 1.125rem;
     padding: .125rem 0 .125rem .5rem;
-    transition: background-color .15s;
     width: 100%;
-
-    &:hover,
-    &:focus {
-      background-color: $gray-400;
-      text-decoration: underline;
-    }
   }
 }

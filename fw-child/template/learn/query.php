@@ -52,7 +52,7 @@
 				);
 				?>
 
-				<div id="topic-<?php echo $i; ?>"
+				<div id="topic-<?php echo esc_attr( $topic_term->term_id ); ?>"
 					 class="learn-topic-grid py-7"
 					 data-args='<?php echo json_encode( $posts_args ); ?>'>
 					<h4 class="learn-topic-title mb-7 d-flex align-items-center font-weight-normal">

@@ -349,7 +349,26 @@ const $ = jQuery;
         }
       } );
     }
+    
+    // Functionalities for learning zone archive page.
+    if ($( '#learn-grid' ).length > 0) {
+      $( document ).on( 'fw_query_no_matches', function ( e, query_item ) {
+        const topic_id = query_item.attr( 'id' );
 
+        // Hide query container and its associated filter.
+        query_item.hide();
+        $( '.learn-zone-topic-filter[data-topic-id="' + topic_id + '"]' ).addClass( 'disabled' );
+      } );
+
+      $( document ).on( 'fw_query_items_retrieved', function ( e, query_item ) {
+        const topic_id = query_item.attr( 'id' );
+
+        // Show query container and its associated filter.
+        query_item.show();
+        $( '.learn-zone-topic-filter[data-topic-id="' + topic_id + '"]' ).removeClass( 'disabled' );
+      } );
+    }
+    
     // share widget
 
     if ($('#share').length) {

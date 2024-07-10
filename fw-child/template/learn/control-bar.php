@@ -42,8 +42,9 @@
 							
 							?>
 							
-							<div class="position-relative pe-3 py-4 border-bottom">
-								<a href="#<?php _e ( 'topic', 'cdc' ); ?>-<?php echo $i; ?>" class="stretched-link"></a>
+							<div class="learn-zone-topic-filter position-relative pe-3 py-4 border-bottom" 
+								 data-topic-id="topic-<?php echo esc_attr( $topic->term_id ); ?>">
+								<a href="#topic-<?php echo esc_attr( $topic->term_id ); ?>" class="stretched-link"></a>
 								
 								<h2 class="font-family-serif text-secondary"><?php echo $i; ?></h2>
 								

@@ -600,10 +600,12 @@
 							
 						}
 						
+            $(document).trigger('fw_query_items_retrieved', [item])
 					} else {
 						
 						options.elements.item_container.html('<p class="alert alert-warning">' + data.message + '</a>')
 						
+            $(document).trigger('fw_query_no_matches', [item])
 					}
 					
 					if (plugin.debug == true) {

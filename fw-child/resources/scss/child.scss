@@ -605,7 +605,7 @@ $control-slider-handle-width: 2.75rem;
 
   .learn-zone-topic-filter {
     &:hover {
-      background-color: rgba(var(--bs-gray-200-rgb), 1);
+      background-color: $light-blue;
     }
 
     &.disabled {

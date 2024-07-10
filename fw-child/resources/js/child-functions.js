@@ -417,7 +417,6 @@ const $ = jQuery;
         $(this).fw_query({
           elements: {
             filters: $('#control-bar .fw-query-filter'),
-            sort: $('#sort-menu'),
             reset: $('#control-bar .fw-query-reset'),
           },
         });

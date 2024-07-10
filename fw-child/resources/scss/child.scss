@@ -442,7 +442,11 @@ $control-slider-handle-width: 2.75rem;
 // BREADCRUMB
 
 #header-breadcrumb {
-  overflow-x: scroll;
+  overflow-x: auto;
+
+  @include media-breakpoint-up(lg) {
+    overflow-x: visible;
+  }
 
   .breadcrumb {
     display: flex;
@@ -450,6 +454,10 @@ $control-slider-handle-width: 2.75rem;
 
     li {
       white-space: nowrap;
+
+      @include media-breakpoint-up(lg) {
+        font-size: 1.25rem;
+      }
     }
   }
 }

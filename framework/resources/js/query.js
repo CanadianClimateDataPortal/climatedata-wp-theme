@@ -549,8 +549,8 @@
 					lang: options.lang
 				},
 				success: function(data) {
-					
-					// console.log(data)
+					// Hide global no matches message.
+					$('.fw-query-items-no-matches').hide();
 					
 					if (data.success == true) {
 						

@@ -75,6 +75,10 @@
 				$i ++;
 			}
 			?>
+
+			<div class="fw-query-items-no-matches py-7" style="display: none;">
+				<p class="alert alert-warning">No items found.</p>
+			</div>
 		</div>
 	</div>
 </div>

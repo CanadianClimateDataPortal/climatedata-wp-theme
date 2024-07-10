@@ -1,4 +1,4 @@
-<div class="card">
+<div class="card card--learn">
 	<?php
 	if ( has_post_thumbnail( $item['id'] ) ) { ?>
 		<div class="bg-dark">
@@ -9,7 +9,7 @@
 	}
 	?>
 
-	<div class="card-body">
+	<div class="card-body d-flex flex-column">
 		<h5 class="card-title item-title">
 			<a href="<?php echo $item['permalink']; ?>"
 			   class="text-secondary stretched-link">
@@ -17,28 +17,34 @@
 			</a>
 		</h5>
 
-		<div class="mb-3">
+		<div class="card-desc text-gray-600">
 			<?php
 			echo apply_filters( 'the_content', custom_excerpt( 20, $item['id'] ) );
 			?>
 		</div>
 
-		<div class="row row-cols-2">
+		<?php
+		// Initialize card format and time.
+		$card_asset_type = get_field( 'asset_type', $item['id'] );
+		$card_asset_time = get_field( 'asset_time', $item['id'] );
+		?>
+
+		<div class="row row-cols-2 pt-3 mt-auto">
 			<div class="col">
-				<h6 class="all-caps text-secondary"><?php _e( 'Format', 'cdc' ); ?></h6>
+				<h6 class="all-caps fw-bold"><?php _e( 'Format', 'cdc' ); ?></h6>
 
 				<?php
 				$format_icon = '';
-				$format_name = get_field( 'asset_type', $item['id'] );
+				$format_name = '';
 
-				switch ( get_field( 'asset_type', $item['id'] ) ) {
+				switch ( $card_asset_type ) {
 					case 'video' :
 						$format_icon = 'fas fa-video';
 						$format_name = __( 'Video', 'cdc' );
 
 						break;
 					case 'audio' :
-						$format_icon = 'fas fa-volume';
+						$format_icon = 'fas fa-microphone';
 						$format_name = __( 'Audio', 'cdc' );
 
 						break;
@@ -47,7 +53,12 @@
 						$format_name = __( 'Interactive', 'cdc' );
 
 						break;
-					case 'article' :
+					case 'app' :
+						$format_icon = 'far fa-window-maximize';
+						$format_name = __( 'Application', 'cdc' );
+
+						break;
+					default : // Article.
 						$format_icon = 'far fa-newspaper';
 						$format_name = __( 'Article', 'cdc' );
 
@@ -55,20 +66,27 @@
 				}
 				?>
 
-				<p class="mb-0 small text-gray-600">
-					<i class="<?php echo $format_icon; ?> me-2"></i><?php echo $format_name; ?>
+				<p class="card-asset-type mb-0 text-gray-600 d-flex align-items-center">
+					<i class="<?php echo $format_icon; ?> me-2"></i>
+					<span><?php echo $format_name; ?></span>
 				</p>
 			</div>
 
-			<div class="col">
-				<h6 class="all-caps text-secondary"><?php _e( 'Time', 'cdc' ); ?></h6>
+			<?php
+			if ( ! empty( $card_asset_time ) ) {
+				?>
+				<div class="col">
+					<h6 class="all-caps fw-bold"><?php _e( 'Time', 'cdc' ); ?></h6>
 
-				<p class="mb-0 small text-gray-600">
-					<?php
-					echo get_field( 'asset_time', $item['id'] ) . ' minutes';
-					?>
-				</p>
-			</div>
+					<p class="card-asset-time mb-0 text-gray-600 d-flex align-items-center">
+						<?php
+						echo $card_asset_time . ' minutes';
+						?>
+					</p>
+				</div>
+				<?php
+			}
+			?>
 		</div>
 	</div>
 </div>

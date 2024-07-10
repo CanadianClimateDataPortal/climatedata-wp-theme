@@ -887,6 +887,22 @@ $query-card-hover-padding: 0.75rem;
           }
         }
       }
+
+      &--learn {
+        .card-desc {
+          font-size: 0.925rem;
+        }
+
+        .card-asset-type,
+        .card-asset-time {
+          font-size: 0.875rem;
+          margin-top: -0.25rem;
+
+          i {
+            font-size: 0.75rem;
+          }
+        }
+      }
     }
 
     .card-body {

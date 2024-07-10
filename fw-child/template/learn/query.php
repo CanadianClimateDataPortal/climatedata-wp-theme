@@ -36,6 +36,7 @@
 					'orderby'        => 'date',
 					'order'          => 'desc',
 					'post_status'    => 'publish',
+					'post_parent'    => 0, // Only parent posts.
 					'tax_query'      => array(
 						array(
 							'taxonomy' => 'topic',

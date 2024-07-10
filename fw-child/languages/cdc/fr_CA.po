@@ -57,21 +57,24 @@ msgstr "Données IDF tenant compte des changements climatiques - CMIP6 (ZIP)"
 msgid "Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)"
 msgstr "Démarrage rapide - Données IDF tenant compte des changements climatiques - CMIP6 (ZIP)"
 
-#: resources/functions/rest.php:691
-msgid "An error occurred"
-msgstr "Une erreur s'est produite"
+#: resources/functions/rest.php:718
+msgid "An error occurred."
+msgstr "Une erreur s'est produite."
 
+#: resources/functions/rest.php:747
 #: template/download/controls/submit.php:56
 msgid "Please enter a valid email address."
 msgstr "Veuillez saisir une adresse courriel valide."
 
-#: resources/functions/rest.php:750
+#: resources/functions/rest.php:691
+#: resources/functions/rest.php:699
+#: resources/functions/rest.php:707
 msgid "Please provide the details of your inquiry."
-msgstr ""
+msgstr "Veuillez fournir les détails de votre demande."
 
-#: resources/functions/rest.php:755
+#: resources/functions/rest.php:770
 msgid "Some required fields are missing."
-msgstr ""
+msgstr "Certains champs requis sont manquants."
 
 #: template/feedback.php:104
 #: template/feedback.php:325
@@ -79,25 +82,25 @@ msgstr ""
 msgid "Organization"
 msgstr "Organisation"
 
-#: resources/functions/rest.php:817
+#: resources/functions/rest.php:792
 msgid "Thanks! We’ve received your inquiry."
 msgstr "Merci ! Nous avons reçu votre demande."
 
-#: resources/functions/rest.php:818
+#: resources/functions/rest.php:793
 msgid "Please note: we are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays."
-msgstr "Veuillez noter : nous recevons actuellement un nombre de demandes plus élevé que d'habitude à notre service d'assistance. Nous ferons de notre mieux pour vous répondre dès que possible, mais veuillez noter qu'il pourrait y avoir des délais."
+msgstr "Veuillez noter : nous recevons actuellement un nombre de demandes plus élevé que d'habitude à notre service d'assistance. Nous ferons de notre mieux pour vous répondre dès que possible, mais veuillez noter qu'il pourrait y avoir des délais."
 
-#: resources/functions/rest.php:821
+#: resources/functions/rest.php:795
 msgid "Something went wrong while sending your message. Please try again later."
 msgstr "Une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer plus tard."
 
-#: resources/functions/rest.php:833
+#: resources/functions/rest.php:804
 msgid "Your email address has been added to our mailing list. You can unsubscribe at any time."
-msgstr "Votre adresse e-mail a été ajoutée à notre liste de diffusion. Vous pouvez vous désinscrire à tout moment."
+msgstr "Votre adresse courriel a été ajoutée à notre liste de diffusion. Vous pouvez vous désinscrire à tout moment."
 
-#: resources/functions/rest.php:836
+#: resources/functions/rest.php:807
 msgid "An error occurred while adding your email address to our mailing list."
-msgstr "Une erreur s'est produite lors de l'ajout de votre adresse e-mail à notre liste de diffusion."
+msgstr "Une erreur s'est produite lors de l'ajout de votre adresse courriel à notre liste de diffusion."
 
 #: template/download/controls/data.php:27
 #: template/map/controls/data.php:16
@@ -143,7 +146,7 @@ msgstr "Détails"
 #: template/beta-apps/control-btns.php:13
 #: template/download/control-bar.php:94
 #: template/feedback.php:336
-#: template/feedback.php:509
+#: template/feedback.php:513
 #: template/map/control-bar.php:65
 msgid "Feedback"
 msgstr "Rétroaction"
@@ -164,7 +167,7 @@ msgstr "Fournir une rétroaction"
 #: template/beta-apps/modals.php:49
 #: template/feedback.php:264
 #: template/feedback.php:384
-#: template/feedback.php:557
+#: template/feedback.php:561
 msgid "Submit Feedback"
 msgstr "Soumettre une rétroaction"
 
@@ -556,9 +559,9 @@ msgstr ""
 #: template/download/controls/submit.php:86
 #: template/feedback.php:239
 #: template/feedback.php:359
-#: template/feedback.php:532
+#: template/feedback.php:536
 msgid "Enter the characters shown in the image:"
-msgstr "Entrer les caractères affichés dans l'image"
+msgstr "Entrer les caractères affichés dans l'image:"
 
 #: template/download/controls/submit.php:28
 msgid "Submit and Download"
@@ -600,7 +603,7 @@ msgstr "M'inscrire à l'infolettre de DonneesClimatiques.ca"
 msgid "CAPTCHA Verification"
 msgstr "Vérification CAPTCHA"
 
-#: resources/functions/rest.php:727
+#: resources/functions/rest.php:740
 #: template/download/controls/submit.php:88
 msgid "CAPTCHA verification is required."
 msgstr "La vérification CAPTCHA est requise."
@@ -689,7 +692,7 @@ msgstr "Téléphone"
 
 #: template/feedback.php:70
 msgid "Where are you contacting us from?"
-msgstr "D'où nous contactez-vous ?"
+msgstr "D'où nous contactez-vous ?"
 
 #: template/feedback.php:74
 msgid "Select your region"
@@ -767,7 +770,7 @@ msgstr "SVP précisez"
 
 #: template/feedback.php:112
 msgid "Which role best describes you?"
-msgstr "Quel rôle vous décrit le mieux ?"
+msgstr "Quel rôle vous décrit le mieux ?"
 
 #: template/feedback.php:116
 #: template/feedback.php:144
@@ -813,7 +816,7 @@ msgstr "Organisme à but non lucratif"
 
 #: template/feedback.php:140
 msgid "What is your inquiry related to?"
-msgstr "Quel est le sujet de votre demande ?"
+msgstr "Quel est le sujet de votre demande ?"
 
 #: template/feedback.php:145
 msgid "Agriculture / Food / Fishing"
@@ -881,7 +884,7 @@ msgstr "Général"
 
 #: template/feedback.php:178
 msgid "Report a bug"
-msgstr "Signaler un bug"
+msgstr "Signaler un bogue"
 
 #: template/feedback.php:183
 msgid "Request a demo"
@@ -893,7 +896,7 @@ msgstr "Commentaires"
 
 #: template/feedback.php:203
 msgid "How did you hear about ClimateData.ca?"
-msgstr "Comment avez-vous entendu parler de ClimateData.ca ?"
+msgstr "Comment avez-vous entendu parler de DonneesClimatiques.ca ?"
 
 #: template/feedback.php:208
 msgid "Word of mouth"
@@ -925,13 +928,13 @@ msgstr "Recherche Internet"
 
 #: template/feedback.php:258
 #: template/feedback.php:378
-#: template/feedback.php:551
+#: template/feedback.php:555
 msgid "Enter the characters shown in the image"
 msgstr "Entrez les caractères qui apparaissent dans l'image"
 
 #: template/feedback.php:260
 #: template/feedback.php:380
-#: template/feedback.php:553
+#: template/feedback.php:557
 msgid "Non-valid entered characters. Please try again."
 msgstr "Caractères saisis non valides. Veuillez réessayer."
 
@@ -1357,10 +1360,6 @@ msgstr "Rafraichir l'image"
 msgid "Observations (AHCCD)"
 msgstr "Observations (DCCAH)"
 
-#: resources/functions/rest.php:743
-msgid "Please enter a valid email address"
-msgstr ""
-
 #: template/download/controls/details.php:294
 msgid "All years"
 msgstr "Toutes les années"
@@ -1377,6 +1376,10 @@ msgstr ""
 msgid "Beta Apps Support"
 msgstr "Soutien aux applications bêta"
 
-#: template/feedback.php:456
+#: template/feedback.php:460
 msgid "Which apps do you need support for?"
-msgstr "Quelles sont les applications pour lesquelles vous avez besoin d'un soutien ?"
+msgstr "Pour quelles applications avez-vous besoin d'un soutien ?"
+
+#: resources/functions/rest.php:708
+msgid "Please choose at least one app."
+msgstr "Sélectionnez au moins une app."

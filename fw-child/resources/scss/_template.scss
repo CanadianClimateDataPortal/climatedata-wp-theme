@@ -306,10 +306,11 @@
     color: $primary;
     display: inline-block;
     padding: .375rem .5rem;
-    transition: background-color .2s;
+    transition: background-color .15s, color .15s;
 
     &:hover {
-      background-color: $gray-400;
+      background-color: $primary;
+      color: $white;
     }
 
     &::before {

@@ -20,7 +20,7 @@
 						<div class="control-tab-head d-flex justify-content-between align-items-center">
 							<h5 class="me-auto mb-0 text-secondary"><?php _e ( 'Filters', 'cdc' ); ?></h5>
 
-							<button class="fw-query-reset btn btn-sm btn-gray-400 p-1 me-2" style="display: none;">Clear</button>
+							<button class="fw-query-reset btn btn-sm btn-gray-400 me-2" style="display: none;">Clear</button>
 
 							<span class="tab-drawer-close btn-close"></span>
 						</div>

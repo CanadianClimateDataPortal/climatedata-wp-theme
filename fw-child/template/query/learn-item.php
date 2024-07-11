@@ -59,7 +59,7 @@ $excerpts = array (
 							break;
 							
 						case 'audio' :
-							$format_icon = 'fa-solid fa-volume-high';
+							$format_icon = 'fas fa-volume';
 							$format_name = __ ( 'Audio', 'cdc' );
 							break;
 							

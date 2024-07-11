@@ -614,8 +614,12 @@
 						callback()
 					}
 					
-					$(document).trigger('fw_query_success', [item])
-					
+					$(document).trigger('fw_query_success', [item]);
+
+					// Scroll to the top of the results.
+					const scroll_top = $('.query-page').position().top;
+
+					$( 'html, body' ).animate( {scrollTop: scroll_top}, 10, 'swing' );
 				}
 			})
 			

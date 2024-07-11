@@ -353,6 +353,20 @@ const $ = jQuery;
           $( 'html, body' ).animate( {scrollTop: scroll_top}, 10, 'swing' );
         }
       } );
+      
+      $( document ).on( 'fw_fd_close', function ( e, drawer_item ) {
+        // Remove the URL hash.
+        const variable_item = drawer_item.find( '.variable-item' );
+
+        if (variable_item.length > 0) {
+          const variable_item_hash = '#' + variable_item.attr( 'id' );
+          const url_hash = window.location.hash;
+
+          if (variable_item_hash === url_hash) {
+            history.replaceState(null, null, ' ');
+          }
+        }
+      } );
     }
 
     // share widget

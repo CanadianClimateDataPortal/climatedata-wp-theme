@@ -1,3 +1,18 @@
+<?php
+// Initialize current language.
+$current_lang = 'en';
+
+if (
+	isset( $GLOBALS['fw'] )
+	&& isset( $GLOBALS['fw']['current_lang_code'] )
+	&& in_array( $GLOBALS['fw']['current_lang_code'], array( 'en', 'fr' ), true )
+) {
+	$current_lang = $GLOBALS['fw']['current_lang_code'];
+}
+
+$is_fr = 'fr' === $current_lang;
+?>
+
 <div id="" class="col row bg-gray-200">
 	<?php
 	
@@ -31,21 +46,24 @@
 				</ul>
 				
 			</div>
-			
+
 			<?php
-				
-				$module_args = array (
-					'posts_per_page' => -1,
-					'post_type' => 'variable',
-					'post_parent' => 0,
-					'post_status' => 'publish',
-					'orderby' => 'title',
-					'order' => 'asc'
-				);
-				
+			$variables_args = array(
+				'posts_per_page' => -1,
+				'post_type'      => 'variable',
+				'post_parent'    => 0,
+				'post_status'    => 'publish',
+				'orderby'        => 'title',
+				'order'          => 'asc'
+			);
+
+			if ( $is_fr ) {
+				$variables_args['meta_key'] = 'title_fr';
+				$variables_args['orderby']  = 'meta_value';
+			}
 			?>
-			
-			<div id="variable-grid" class="py-6" data-args='<?php echo json_encode ( $module_args ); ?>'>
+
+			<div id="variable-grid" class="py-6" data-args='<?php echo json_encode ( $variables_args ); ?>'>
 				
 				<div id="" class="query-container ">
 					<div class="fw-query-items row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 g-lg-6" data-options='<?php echo json_encode ( $item_options ); ?>'>

@@ -15,11 +15,13 @@
 		<div id="tab-drawer-container" class="tab-drawer-container">
 			
 			<div id="filters" class="tab-drawer">
-				<div class="tab-drawer-content">
+				<div class="tab-drawer-content stick">
 					<div class="tab-drawer-content-inner">
-						<div class="control-tab-head d-flex justify-content-between">
+						<div class="control-tab-head d-flex justify-content-between align-items-center">
 							<h5 class="me-auto mb-0 text-secondary"><?php _e ( 'Filters', 'cdc' ); ?></h5>
-							<span class="fw-query-reset me-2" style="display: none;"><i class="fas fa-sync fa-flip-horizontal"></i></span>
+
+							<button class="fw-query-reset btn btn-sm btn-gray-400 p-1 me-2" style="display: none;">Clear</button>
+
 							<span class="tab-drawer-close btn-close"></span>
 						</div>
 						

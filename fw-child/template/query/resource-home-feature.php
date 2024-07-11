@@ -62,15 +62,42 @@ $excerpts = array (
 
                 if ( get_field ( 'asset_type', $item['id'] ) ) {
 
+                    $format_icon = '';
+					$format_name = get_field ( 'asset_type', $item['id'] );
+					
+					switch ( get_field ( 'asset_type', $item['id'] ) ) {
+						
+						case 'video' :
+							$format_icon = 'fas fa-video';
+							$format_name = __ ( 'Video', 'cdc' );
+							break;
+							
+						case 'audio' :
+							$format_icon = 'fa-solid fa-volume-high';
+							$format_name = __ ( 'Audio', 'cdc' );
+							break;
+							
+						case 'interactive' :
+							$format_icon = 'far fa-hand-pointer';
+							$format_name = __ ( 'Interactive', 'cdc' );
+							break;
+							
+						case 'article' :
+							$format_icon = 'far fa-newspaper';
+							$format_name = __ ( 'Article', 'cdc' );
+							break;
+							
+					}
+
             ?>
 
             <p class="post-type">
 
-                <i class="me-1 fa-solid icon-<?php the_field ( 'asset_type', $item['id'] ) ; ?>"></i>
+                <i class="me-1 <?php echo $format_icon; ?>"></i>
 
                 <?php
 
-                    the_field ( 'asset_type', $item['id'] );
+                    echo $format_name;
 
                 ?>
 

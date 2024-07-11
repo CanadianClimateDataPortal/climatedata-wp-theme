@@ -441,9 +441,11 @@ const $ = jQuery;
 
     if ($('#page-home').length) {
       gsap.registerPlugin(ScrollTrigger);
-
-      gsap.utils.toArray('.scroll-card').forEach((card, i) => {
-        let tl = gsap.timeline({
+    
+      $('.scroll-card').each(function () {
+        const card = this;
+    
+        const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: card,
             start: 'top 60%',
@@ -452,8 +454,8 @@ const $ = jQuery;
             markers: false    // Set to true to debug
           }
         });
-        
-        tl.fromTo(card, 
+    
+        timeline.fromTo(card, 
           { 
             y: '-50%',
             opacity: 0,
@@ -483,7 +485,7 @@ const $ = jQuery;
             zIndex: 0,
             ease: 'power2.in'
           }
-        )
+        );
       });
 
     };

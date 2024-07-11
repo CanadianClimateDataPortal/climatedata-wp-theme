@@ -41,7 +41,7 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 					
 			?>
 			
-			<div class="var-item-sectors d-flex flex-wrap">
+			<div class="var-item-sectors d-flex flex-wrap mt-1">
 				<?php
 						foreach ( $this_sectors as $sector ) {
 							$sector_term_id   = $sector->term_id;

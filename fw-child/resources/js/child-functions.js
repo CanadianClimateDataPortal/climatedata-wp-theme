@@ -346,6 +346,11 @@ const $ = jQuery;
           if (variable_item_hash) { // Check if variable_item_hash is not empty
             window.location.hash = variable_item_hash;
           }
+
+          // Adjust auto-scroll position.
+          const scroll_top = variable_item.parent().position().top;
+          
+          $( 'html, body' ).animate( {scrollTop: scroll_top}, 10, 'swing' );
         }
       } );
     }

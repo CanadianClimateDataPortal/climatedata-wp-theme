@@ -151,11 +151,10 @@ if (typeof pushes_since_input == 'undefined') {
 					)
 						.insertAfter( this_item )
 						.slideDown( 250, function () {
+							$( document ).trigger( 'fw_fd_open', [ this_item ] );
 						} )
 
 					this_item.addClass( 'fd-open' );
-
-					$(document).trigger('fw_fd_open', [this_item]);
 				} )
 			}
 			

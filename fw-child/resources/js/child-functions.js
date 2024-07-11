@@ -347,6 +347,16 @@ const $ = jQuery;
             window.location.hash = variable_item_hash;
           }
 
+          // Fix jQuery collapse-o-matic duplicate ID bug.
+          const fd_drawer_clone = drawer_item.parent().find( '.fd-drawer' );
+          fd_drawer_clone.find( '.collapseomatic, .collapseomatic_content ' ).each( function () {
+            $( this ).attr( 'id', $( this ).attr( 'id' ) + '_c' );
+            
+            if ($( this ).hasClass( 'collapseomatic_content' )) {
+              $( this ).hide();
+            }
+          } );
+
           // Adjust auto-scroll position.
           const scroll_top = variable_item.parent().position().top;
           

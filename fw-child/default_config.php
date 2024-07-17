@@ -14,6 +14,8 @@ function custom_global_vars()
     $vars['ga_cross_domain'] = "";
     $vars['feedback_email'] = "nullbox@climatedata.ca";
     $vars['training_email'] = "nullbox@climatedata.ca";
+    $vars['support_email'] = "nullbox@climatedata.ca";
+    $vars['betaapps_email'] = "nullbox@climatedata.ca";
     $vars['mailchimp_api_key'] = "";
     $vars['mailchimp_url'] = "";
     $vars['mailchimp_list_id'] = "";

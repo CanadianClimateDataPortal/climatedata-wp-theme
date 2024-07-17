@@ -2,7 +2,7 @@
 
 	<div id="control-bar" class="control-bar tab-drawer-tabs-container">
 
-		<div id="control-bar-tabs-footer" class="col-2 col-sm-1 px-2 py-3 text-center">
+		<div id="control-bar-tabs-footer" class="col-2 col-sm-1 text-center">
 		
 			<?php
 			$feedback_slug = 'feedback';

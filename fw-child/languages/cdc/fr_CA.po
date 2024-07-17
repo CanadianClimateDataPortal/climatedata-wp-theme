@@ -169,7 +169,7 @@ msgstr "Fournir une rétroaction"
 #: template/feedback.php:384
 #: template/feedback.php:561
 msgid "Submit Feedback"
-msgstr "Soumettre une rétroaction"
+msgstr "Soumettre"
 
 #: template/beta-apps/query.php:29
 #: template/learn/query.php:31
@@ -940,7 +940,7 @@ msgstr "Caractères saisis non valides. Veuillez réessayer."
 
 #: template/feedback.php:290
 msgid "Dataset Support"
-msgstr "Données"
+msgstr "Support pour les jeux de données"
 
 #: template/learn/control-bar.php:20
 #: template/learn/control-bar.php:81
@@ -1374,12 +1374,12 @@ msgstr ""
 
 #: template/feedback.php:408
 msgid "Beta Apps Support"
-msgstr "Soutien aux applications bêta"
+msgstr "Support pour les applications bêta"
 
 #: template/feedback.php:460
 msgid "Which apps do you need support for?"
 msgstr "Pour quelles applications avez-vous besoin d'un soutien ?"
 
 #: resources/functions/rest.php:708
-msgid "Please choose at least one app."
-msgstr "Sélectionnez au moins une app."
+msgid "Please select at least one app."
+msgstr "Sélectionnez au moins une application."

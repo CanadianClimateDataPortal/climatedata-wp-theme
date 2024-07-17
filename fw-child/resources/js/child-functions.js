@@ -167,7 +167,7 @@ const $ = jQuery;
 
     //
 
-    if ($('body').attr('id') == 'page-feedback') {
+    if ($('body').attr('id') === 'page-feedback' || $('body').attr('id') === 'page-retroaction') {
       const feedback_accordion = document.getElementById('feedback-accordion');
 
       //  replace state on accordion change
@@ -259,7 +259,7 @@ const $ = jQuery;
         const controlBar = document.getElementById('control-bar');
         const footer = document.getElementById('control-bar-tabs-footer');
         const controlBarRect = controlBar.getBoundingClientRect();
-    
+
         if (controlBarRect.bottom <= window.innerHeight || controlBarRect.top >= window.innerHeight) {
           if (!footer.classList.contains('position-absolute')) {
             footer.classList.add('position-absolute');
@@ -272,7 +272,7 @@ const $ = jQuery;
           footer.style.bottom = '0';
         }
       }
-    
+
       updateControlBarFooterPosition();
       document.addEventListener('scroll', updateControlBarFooterPosition);
       window.addEventListener('resize', updateControlBarFooterPosition);
@@ -509,7 +509,6 @@ const $ = jQuery;
 
       alert_header.empty().removeClass().addClass('alert-header');
       alert_messages.empty();
-      the_form.removeClass('form-error');
 
       the_form.find('.border-danger').removeClass('border-danger');
 
@@ -530,18 +529,22 @@ const $ = jQuery;
 
           if (data.invalid.length) {
             alert_header.addClass('alert alert-warning');
-          
+
             data.invalid.forEach(function (input) {
-              the_form.find('[name="' + input + '"]').addClass('border-danger');
-            });
-          
-            the_form.addClass('form-error');
+              const $input = the_form.find('[name="' + input + '"]');
+              const $parent = $input.closest('.error-input-parent');
+
+              if ($parent.length) {
+                $parent.addClass('border-danger');
+              } else {
+                $input.addClass('border-danger');
+              }
+            });            
           }
 
           if (data.mail == 'success') {
             alert_header.addClass('alert alert-success');
-            the_form.removeClass('form-error');
-            the_form.find('.submit-btn').addClass('disabled');
+            the_form[0].reset();
           } else {
             alert_header.addClass('alert alert-warning');
           }

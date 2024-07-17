@@ -57,22 +57,22 @@ msgstr "Données IDF tenant compte des changements climatiques - CMIP6 (ZIP)"
 msgid "Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)"
 msgstr "Démarrage rapide - Données IDF tenant compte des changements climatiques - CMIP6 (ZIP)"
 
-#: resources/functions/rest.php:718
+#: resources/functions/rest.php:729
 msgid "An error occurred."
 msgstr "Une erreur s'est produite."
 
-#: resources/functions/rest.php:747
+#: resources/functions/rest.php:763
 #: template/download/controls/submit.php:56
 msgid "Please enter a valid email address."
 msgstr "Veuillez saisir une adresse courriel valide."
 
-#: resources/functions/rest.php:691
-#: resources/functions/rest.php:699
-#: resources/functions/rest.php:707
+#: resources/functions/rest.php:689
+#: resources/functions/rest.php:700
+#: resources/functions/rest.php:711
 msgid "Please provide the details of your inquiry."
 msgstr "Veuillez fournir les détails de votre demande."
 
-#: resources/functions/rest.php:770
+#: resources/functions/rest.php:779
 msgid "Some required fields are missing."
 msgstr "Certains champs requis sont manquants."
 
@@ -82,23 +82,23 @@ msgstr "Certains champs requis sont manquants."
 msgid "Organization"
 msgstr "Organisation"
 
-#: resources/functions/rest.php:792
+#: resources/functions/rest.php:801
 msgid "Thanks! We’ve received your inquiry."
 msgstr "Merci ! Nous avons reçu votre demande."
 
-#: resources/functions/rest.php:793
+#: resources/functions/rest.php:802
 msgid "Please note: we are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays."
 msgstr "Veuillez noter : nous recevons actuellement un nombre de demandes plus élevé que d'habitude à notre service d'assistance. Nous ferons de notre mieux pour vous répondre dès que possible, mais veuillez noter qu'il pourrait y avoir des délais."
 
-#: resources/functions/rest.php:795
+#: resources/functions/rest.php:804
 msgid "Something went wrong while sending your message. Please try again later."
 msgstr "Une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer plus tard."
 
-#: resources/functions/rest.php:804
+#: resources/functions/rest.php:813
 msgid "Your email address has been added to our mailing list. You can unsubscribe at any time."
 msgstr "Votre adresse courriel a été ajoutée à notre liste de diffusion. Vous pouvez vous désinscrire à tout moment."
 
-#: resources/functions/rest.php:807
+#: resources/functions/rest.php:816
 msgid "An error occurred while adding your email address to our mailing list."
 msgstr "Une erreur s'est produite lors de l'ajout de votre adresse courriel à notre liste de diffusion."
 
@@ -603,7 +603,7 @@ msgstr "M'inscrire à l'infolettre de DonneesClimatiques.ca"
 msgid "CAPTCHA Verification"
 msgstr "Vérification CAPTCHA"
 
-#: resources/functions/rest.php:740
+#: resources/functions/rest.php:757
 #: template/download/controls/submit.php:88
 msgid "CAPTCHA verification is required."
 msgstr "La vérification CAPTCHA est requise."
@@ -1380,6 +1380,6 @@ msgstr "Support pour les applications bêta"
 msgid "Which apps do you need support for?"
 msgstr "Pour quelles applications avez-vous besoin d'un soutien ?"
 
-#: resources/functions/rest.php:708
+#: resources/functions/rest.php:712
 msgid "Please select at least one app."
 msgstr "Sélectionnez au moins une application."

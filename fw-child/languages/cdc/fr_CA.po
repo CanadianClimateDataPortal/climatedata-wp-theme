@@ -57,11 +57,11 @@ msgstr "Données IDF tenant compte des changements climatiques - CMIP6 (ZIP)"
 msgid "Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)"
 msgstr "Démarrage rapide - Données IDF tenant compte des changements climatiques - CMIP6 (ZIP)"
 
-#: resources/functions/rest.php:729
+#: resources/functions/rest.php:728
 msgid "An error occurred."
 msgstr "Une erreur s'est produite."
 
-#: resources/functions/rest.php:763
+#: resources/functions/rest.php:762
 #: template/download/controls/submit.php:56
 msgid "Please enter a valid email address."
 msgstr "Veuillez saisir une adresse courriel valide."
@@ -72,33 +72,33 @@ msgstr "Veuillez saisir une adresse courriel valide."
 msgid "Please provide the details of your inquiry."
 msgstr "Veuillez fournir les détails de votre demande."
 
-#: resources/functions/rest.php:779
+#: resources/functions/rest.php:778
 msgid "Some required fields are missing."
 msgstr "Certains champs requis sont manquants."
 
 #: template/feedback.php:104
-#: template/feedback.php:325
-#: template/feedback.php:448
+#: template/feedback.php:333
+#: template/feedback.php:462
 msgid "Organization"
 msgstr "Organisation"
 
-#: resources/functions/rest.php:801
+#: resources/functions/rest.php:800
 msgid "Thanks! We’ve received your inquiry."
 msgstr "Merci ! Nous avons reçu votre demande."
 
-#: resources/functions/rest.php:802
+#: resources/functions/rest.php:801
 msgid "Please note: we are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays."
 msgstr "Veuillez noter : nous recevons actuellement un nombre de demandes plus élevé que d'habitude à notre service d'assistance. Nous ferons de notre mieux pour vous répondre dès que possible, mais veuillez noter qu'il pourrait y avoir des délais."
 
-#: resources/functions/rest.php:804
+#: resources/functions/rest.php:803
 msgid "Something went wrong while sending your message. Please try again later."
 msgstr "Une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer plus tard."
 
-#: resources/functions/rest.php:813
+#: resources/functions/rest.php:812
 msgid "Your email address has been added to our mailing list. You can unsubscribe at any time."
 msgstr "Votre adresse courriel a été ajoutée à notre liste de diffusion. Vous pouvez vous désinscrire à tout moment."
 
-#: resources/functions/rest.php:816
+#: resources/functions/rest.php:815
 msgid "An error occurred while adding your email address to our mailing list."
 msgstr "Une erreur s'est produite lors de l'ajout de votre adresse courriel à notre liste de diffusion."
 
@@ -145,8 +145,8 @@ msgstr "Détails"
 #: template/beta-apps/control-bar.php:14
 #: template/beta-apps/control-btns.php:13
 #: template/download/control-bar.php:94
-#: template/feedback.php:336
-#: template/feedback.php:513
+#: template/feedback.php:344
+#: template/feedback.php:527
 #: template/map/control-bar.php:65
 msgid "Feedback"
 msgstr "Rétroaction"
@@ -166,8 +166,8 @@ msgstr "Fournir une rétroaction"
 
 #: template/beta-apps/modals.php:49
 #: template/feedback.php:264
-#: template/feedback.php:384
-#: template/feedback.php:561
+#: template/feedback.php:392
+#: template/feedback.php:575
 msgid "Submit Feedback"
 msgstr "Soumettre"
 
@@ -558,8 +558,8 @@ msgstr ""
 #: template/download/controls/submit.php:13
 #: template/download/controls/submit.php:86
 #: template/feedback.php:239
-#: template/feedback.php:359
-#: template/feedback.php:536
+#: template/feedback.php:367
+#: template/feedback.php:550
 msgid "Enter the characters shown in the image:"
 msgstr "Entrer les caractères affichés dans l'image:"
 
@@ -581,8 +581,8 @@ msgstr "Entrez votre adresse courriel pour soumettre votre requête."
 
 #: template/download/controls/submit.php:49
 #: template/feedback.php:48
-#: template/feedback.php:319
-#: template/feedback.php:440
+#: template/feedback.php:321
+#: template/feedback.php:449
 msgid "Email Address"
 msgstr "Adresse courriel"
 
@@ -596,6 +596,8 @@ msgstr "Le traitement des données commence lorsque vous cliquez sur \"Envoyer v
 
 #: template/download/controls/submit.php:60
 #: template/feedback.php:55
+#: template/feedback.php:327
+#: template/feedback.php:455
 msgid "Subscribe to the ClimateData.ca newsletter"
 msgstr "M'inscrire à l'infolettre de DonneesClimatiques.ca"
 
@@ -603,7 +605,7 @@ msgstr "M'inscrire à l'infolettre de DonneesClimatiques.ca"
 msgid "CAPTCHA Verification"
 msgstr "Vérification CAPTCHA"
 
-#: resources/functions/rest.php:757
+#: resources/functions/rest.php:756
 #: template/download/controls/submit.php:88
 msgid "CAPTCHA verification is required."
 msgstr "La vérification CAPTCHA est requise."
@@ -682,7 +684,7 @@ msgstr "Support en ligne"
 
 #: template/feedback.php:39
 #: template/feedback.php:313
-#: template/feedback.php:432
+#: template/feedback.php:440
 msgid "Full Name"
 msgstr "Nom"
 
@@ -927,14 +929,14 @@ msgid "Internet search"
 msgstr "Recherche Internet"
 
 #: template/feedback.php:258
-#: template/feedback.php:378
-#: template/feedback.php:555
+#: template/feedback.php:386
+#: template/feedback.php:569
 msgid "Enter the characters shown in the image"
 msgstr "Entrez les caractères qui apparaissent dans l'image"
 
 #: template/feedback.php:260
-#: template/feedback.php:380
-#: template/feedback.php:557
+#: template/feedback.php:388
+#: template/feedback.php:571
 msgid "Non-valid entered characters. Please try again."
 msgstr "Caractères saisis non valides. Veuillez réessayer."
 
@@ -1372,14 +1374,14 @@ msgstr "Moyennes sur 30 ans"
 msgid "Update ACF Relevant Sectors"
 msgstr ""
 
-#: template/feedback.php:408
-msgid "Beta Apps Support"
-msgstr "Support pour les applications bêta"
-
-#: template/feedback.php:460
+#: template/feedback.php:474
 msgid "Which apps do you need support for?"
 msgstr "Pour quelles applications avez-vous besoin d'un soutien ?"
 
 #: resources/functions/rest.php:712
 msgid "Please select at least one app."
 msgstr "Sélectionnez au moins une application."
+
+#: template/feedback.php:416
+msgid "Apps Support"
+msgstr "Support pour les applications"

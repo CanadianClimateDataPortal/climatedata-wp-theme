@@ -11,7 +11,7 @@
 				$feedback_slug = 'retroaction';
 			?>
 
-			<a href="<?php echo home_url ( $feedback_slug ); ?>#betaapps-support" class="control-bar-text-link"><?php _e ( 'Feedback', 'cdc' ); ?></a>
+			<a href="<?php echo home_url ( $feedback_slug ); ?>#apps-support" class="control-bar-text-link"><?php _e ( 'Feedback', 'cdc' ); ?></a>
 
 		</div>
 

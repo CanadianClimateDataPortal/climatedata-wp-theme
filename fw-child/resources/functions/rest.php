@@ -674,9 +674,9 @@ add_action ( 'rest_api_init', function () {
 		'methods' => 'GET',
 		'callback' => 'cdc_submit_support_form'
 	) );
-	register_rest_route ( 'cdc/v2', '/submit_betaapps/', array (
+	register_rest_route ( 'cdc/v2', '/submit_apps/', array (
 		'methods' => 'GET',
-		'callback' => 'cdc_submit_betaapps_form'
+		'callback' => 'cdc_submit_apps_form'
 	) );
 } );
 
@@ -703,13 +703,13 @@ function cdc_submit_support_form () {
 }
 
 /**
- * Handle the beta apps form submission.
+ * Handle the  apps form submission.
  */
-function cdc_submit_betaapps_form () {
-	$form_type = 'betaapps';
+function cdc_submit_apps_form () {
+	$form_type = 'apps';
 	$required_fields = array(
 		'feedback' => __ ( 'Please provide the details of your inquiry.', 'cdc' ),
-		'betaapps-posts[]' => __ ( 'Please select at least one app.', 'cdc' )
+		'apps-posts[]' => __ ( 'Please select at least one app.', 'cdc' )
 	);
 	handle_form_submission ( $form_type, $required_fields );
 }
@@ -842,9 +842,9 @@ function build_message_body ( $form_data, $form_type ) {
 	if ( $form_type == 'feedback' ) {
 		$body .= build_feedback_body ( $form_data );
 	} 
-	// Custom fields for betaapps form
-	elseif ( $form_type == 'betaapps' ) {
-		$body .= build_betaapps_body ( $form_data );
+	// Custom fields for apps form
+	elseif ( $form_type == 'apps' ) {
+		$body .= build_apps_body ( $form_data );
 	}
 
 	$body .= '<p style="font-weight: bold;">Message</p><pre>' . esc_html( $form_data['feedback'] ) . '</pre>';
@@ -908,20 +908,20 @@ function build_feedback_body ( $form_data ) {
 }
 
 /**
- * Build the beta apps form body for the email.
+ * Build the apps form body for the email.
  *
  * @param array $form_data The form data submitted by the user.
- * @return string The beta apps form body for the email.
+ * @return string The apps form body for the email.
  */
-function build_betaapps_body ( $form_data ) {
+function build_apps_body ( $form_data ) {
 	$body = '';
-	$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Beta Apps</span><span style="display: inline-block; vertical-align: top;">';
+	$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Apps</span><span style="display: inline-block; vertical-align: top;">';
 
-	if ( isset ( $form_data['betaapps-posts[]'] ) ) {
-		if ( is_array ( $form_data['betaapps-posts[]'] ) ) {
-			$body .= implode ( ', ', array_map( 'esc_html', $form_data['betaapps-posts[]'] ) );
+	if ( isset ( $form_data['apps-posts[]'] ) ) {
+		if ( is_array ( $form_data['apps-posts[]'] ) ) {
+			$body .= implode ( ', ', array_map( 'esc_html', $form_data['apps-posts[]'] ) );
 		} else {
-			$body .= esc_html( $form_data['betaapps-posts[]'] );
+			$body .= esc_html( $form_data['apps-posts[]'] );
 		}
 	} else {
 		$body .= 'None selected';

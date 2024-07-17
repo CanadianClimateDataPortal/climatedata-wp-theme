@@ -405,30 +405,30 @@
 	</div>
 
 	<div class="accordion-item"> 
-		<div id="accordion-head-betaapps" class="accordion-header">
+		<div id="accordion-head-apps" class="accordion-header">
 			<div class="accordion-button collapsed row py-4 ps-0" 
 				data-bs-toggle="collapse"
-				data-bs-target="#betaapps-support" 
+				data-bs-target="#apps-support" 
 				aria-expanded="false" 
-				aria-controls="betaapps-support"
+				aria-controls="apps-support"
 			>
 				<h3 class="col offset-2 mb-0">
-					<?php _e ( 'Beta Apps Support', 'cdc' ); ?>
+					<?php _e ( 'Apps Support', 'cdc' ); ?>
 				</h3>
 			</div> 
 		</div>
 		
 		<div
-			id="betaapps-support"
+			id="apps-support"
 			class="accordion-collapse collapse" 
-			aria-labelledby="accordion-head-betaapps"
+			aria-labelledby="accordion-head-apps"
 			data-bs-parent="#feedback-accordion"
 		> 
 			<div class="accordion-body py-6"> 
 				
-				<form id="feedback-betaapps-form" class="feedback-form needs-validation" novalidate>
+				<form id="feedback-apps-form" class="feedback-form needs-validation" novalidate>
 					
-					<input type="hidden" name="feedback-type" value="betaapps">
+					<input type="hidden" name="feedback-type" value="apps">
 					
 					<div class="row">
 					
@@ -498,9 +498,9 @@
 													
 										<div class="form-check form-check-inline">
 
-											<input class="form-check-input" type="checkbox" name="betaapps-posts[]" id="betaapp-type-<?php echo $post_slug ?>" value="<?php echo $post_slug ?>">
+											<input class="form-check-input" type="checkbox" name="apps-posts[]" id="app-type-<?php echo $post_slug ?>" value="<?php echo $post_slug ?>">
 
-											<label class="form-check-label" for="betaapp-type-<?php echo $post_slug ?>"><?php echo $post_title ?></label>
+											<label class="form-check-label" for="app-type-<?php echo $post_slug ?>"><?php echo $post_title ?></label>
 
 										</div>
 
@@ -543,12 +543,12 @@
 											
 												$captcha_options = array (
 													'code_length' => 4,
-													'input_name' => 'betaapps_captcha_code',
-													'input_id' => 'betaapps_captcha',
-													'image_id' => 'betaapps_captcha_img',
+													'input_name' => 'apps_captcha_code',
+													'input_id' => 'apps_captcha',
+													'image_id' => 'apps_captcha_img',
 													'icon_size' => 16,
 													'input_text' => __ ( 'Enter the characters shown in the image:', 'cdc' ),
-													'namespace' => 'betaapps',
+													'namespace' => 'apps',
 												);
 												
 												// image

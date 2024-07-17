@@ -108,8 +108,8 @@ msgstr "Variable"
 msgid "All Variables"
 msgstr ""
 
-#: template/learn/control-bar.php:94
-#: template/query/learn-item.php:52
+#: template/learn/control-bar.php:90
+#: template/query/learn-item.php:53
 msgid "Interactive"
 msgstr ""
 
@@ -165,14 +165,12 @@ msgid "Submit Feedback"
 msgstr ""
 
 #: template/beta-apps/query.php:29
-#: template/learn/query.php:31
 #: template/news/query.php:29
 #: template/variable/query.php:29
 msgid "Newest First"
 msgstr "Nouveaux d'abord"
 
 #: template/beta-apps/query.php:30
-#: template/learn/query.php:32
 #: template/news/query.php:30
 #: template/variable/query.php:30
 msgid "Oldest First"
@@ -931,7 +929,7 @@ msgid "Dataset Support"
 msgstr "Données"
 
 #: template/learn/control-bar.php:20
-#: template/learn/control-bar.php:81
+#: template/learn/control-bar.php:75
 #: template/news/control-bar.php:11
 #: template/news/control-bar.php:21
 #: template/variable/control-bar.php:11
@@ -939,36 +937,24 @@ msgstr "Données"
 msgid "Filters"
 msgstr "Filtres"
 
-#: template/learn/control-bar.php:46
-msgid "topic"
-msgstr ""
-
-#: template/learn/control-bar.php:89
+#: template/learn/control-bar.php:85
 msgid "Content Type"
 msgstr ""
 
-#: template/learn/control-bar.php:92
-#: template/query/learn-item.php:42
+#: template/learn/control-bar.php:88
+#: template/query/learn-item.php:43
 msgid "Video"
 msgstr "Vidéo"
 
-#: template/learn/control-bar.php:93
-#: template/query/learn-item.php:47
+#: template/learn/control-bar.php:89
+#: template/query/learn-item.php:48
 msgid "Audio"
 msgstr ""
 
-#: template/learn/control-bar.php:95
-#: template/query/learn-item.php:57
+#: template/learn/control-bar.php:91
+#: template/query/learn-item.php:63
 msgid "Article"
 msgstr ""
-
-#: template/learn/query.php:29
-msgid "Title (A–Z)"
-msgstr "Titre (A à Z)"
-
-#: template/learn/query.php:30
-msgid "Title (Z–A)"
-msgstr "Titre (Z à A)"
 
 #: template/map/control-bar.php:24
 #: template/map/controls/location.php:5
@@ -1240,7 +1226,7 @@ msgid "Download image"
 msgstr "Téléchargement"
 
 #: template/old-loop/blocks/map.php:227
-#: template/query/learn-item.php:70
+#: template/query/learn-item.php:79
 msgid "Time"
 msgstr "Duration"
 
@@ -1268,7 +1254,7 @@ msgstr "Partager cette publication"
 msgid "Select variable"
 msgstr "Sélectionner"
 
-#: template/query/learn-item.php:31
+#: template/query/learn-item.php:34
 msgid "Format"
 msgstr ""
 
@@ -1362,4 +1348,13 @@ msgstr "Moyennes sur 30 ans"
 
 #. Template Name of the theme
 msgid "Update ACF Relevant Sectors"
+msgstr ""
+
+#. Template Name of the theme
+msgid "Init LZ meta"
+msgstr ""
+
+#: template/learn/control-bar.php:92
+#: template/query/learn-item.php:58
+msgid "Application"
 msgstr ""

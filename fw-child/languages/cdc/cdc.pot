@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-07-03T20:28:31+00:00\n"
+"POT-Creation-Date: 2024-07-10T18:25:28+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -117,6 +117,10 @@ msgid "Clone Taxonomy"
 msgstr ""
 
 #. Template Name of the theme
+msgid "Init LZ meta"
+msgstr ""
+
+#. Template Name of the theme
 msgid "Update ACF Relevant Sectors"
 msgstr ""
 
@@ -153,14 +157,12 @@ msgid "Submit Feedback"
 msgstr ""
 
 #: template/beta-apps/query.php:29
-#: template/learn/query.php:31
 #: template/news/query.php:29
 #: template/variable/query.php:29
 msgid "Newest First"
 msgstr ""
 
 #: template/beta-apps/query.php:30
-#: template/learn/query.php:32
 #: template/news/query.php:30
 #: template/variable/query.php:30
 msgid "Oldest First"
@@ -989,7 +991,7 @@ msgid "Topics"
 msgstr ""
 
 #: template/learn/control-bar.php:20
-#: template/learn/control-bar.php:81
+#: template/learn/control-bar.php:75
 #: template/news/control-bar.php:11
 #: template/news/control-bar.php:21
 #: template/variable/control-bar.php:11
@@ -997,40 +999,33 @@ msgstr ""
 msgid "Filters"
 msgstr ""
 
-#: template/learn/control-bar.php:46
-msgid "topic"
-msgstr ""
-
-#: template/learn/control-bar.php:89
+#: template/learn/control-bar.php:85
 msgid "Content Type"
 msgstr ""
 
-#: template/learn/control-bar.php:92
-#: template/query/learn-item.php:42
+#: template/learn/control-bar.php:88
+#: template/query/learn-item.php:43
 msgid "Video"
 msgstr ""
 
-#: template/learn/control-bar.php:93
-#: template/query/learn-item.php:47
+#: template/learn/control-bar.php:89
+#: template/query/learn-item.php:48
 msgid "Audio"
 msgstr ""
 
-#: template/learn/control-bar.php:94
-#: template/query/learn-item.php:52
+#: template/learn/control-bar.php:90
+#: template/query/learn-item.php:53
 msgid "Interactive"
 msgstr ""
 
-#: template/learn/control-bar.php:95
-#: template/query/learn-item.php:57
+#: template/learn/control-bar.php:91
+#: template/query/learn-item.php:63
 msgid "Article"
 msgstr ""
 
-#: template/learn/query.php:29
-msgid "Title (A–Z)"
-msgstr ""
-
-#: template/learn/query.php:30
-msgid "Title (Z–A)"
+#: template/learn/control-bar.php:92
+#: template/query/learn-item.php:58
+msgid "Application"
 msgstr ""
 
 #: template/map/control-bar.php:24
@@ -1320,7 +1315,7 @@ msgid "Download image"
 msgstr ""
 
 #: template/old-loop/blocks/map.php:227
-#: template/query/learn-item.php:70
+#: template/query/learn-item.php:79
 msgid "Time"
 msgstr ""
 
@@ -1348,7 +1343,7 @@ msgstr ""
 msgid "Select variable"
 msgstr ""
 
-#: template/query/learn-item.php:31
+#: template/query/learn-item.php:34
 msgid "Format"
 msgstr ""
 

@@ -86,15 +86,15 @@ function taxonomy_topic()
     ];
     $args = [
         'labels' => $labels,
-        'hierarchical' => false,
-        'public' => true,
+        'hierarchical' => true,
+        'public' => false,
         'show_ui' => true,
         'show_admin_column' => true,
         'show_in_nav_menus' => true,
         'show_tagcloud' => true,
         'show_in_rest' => true,
     ];
-    register_taxonomy('topic', ['resource'], $args);
+    register_taxonomy( 'topic', array( 'page', 'resource', 'beta-app' ), $args );
 }
 add_action('init', 'taxonomy_topic', 10);
 
@@ -143,15 +143,15 @@ function taxonomy_techlevel()
     ];
     $args = [
         'labels' => $labels,
-        'hierarchical' => false,
-        'public' => true,
+        'hierarchical' => true,
+        'public' => false,
         'show_ui' => true,
         'show_admin_column' => false,
         'show_in_nav_menus' => true,
         'show_tagcloud' => true,
         'show_in_rest' => true,
     ];
-    register_taxonomy('tech_level', ['resource'], $args);
+    register_taxonomy( 'tech_level', array( 'page', 'resource', 'beta-app' ), $args );
 }
 add_action('init', 'taxonomy_techlevel', 10);
 
@@ -196,15 +196,15 @@ function taxonomy_sector()
     ];
     $args = [
         'labels' => $labels,
-        'hierarchical' => false,
-        'public' => true,
+        'hierarchical' => true,
+        'public' => false,
         'show_ui' => true,
         'show_admin_column' => true,
         'show_in_nav_menus' => true,
         'show_tagcloud' => true,
         'show_in_rest' => true,
     ];
-    register_taxonomy('sector', ['variable', 'resource'], $args);
+    register_taxonomy( 'sector', array( 'variable', 'page', 'resource', 'beta-app' ), $args );
 }
 add_action('init', 'taxonomy_sector', 10);
 
@@ -266,15 +266,15 @@ function taxonomy_region()
     ];
     $args = [
         'labels' => $labels,
-        'hierarchical' => false,
-        'public' => true,
+        'hierarchical' => true,
+        'public' => false,
         'show_ui' => true,
         'show_admin_column' => true,
         'show_in_nav_menus' => true,
         'show_tagcloud' => true,
         'show_in_rest' => true,
     ];
-    register_taxonomy('region', ['resource'], $args);
+    register_taxonomy('region', array( 'variable', 'page', 'resource', 'beta-app' ), $args);
 }
 add_action('init', 'taxonomy_region', 10);
 
@@ -306,8 +306,8 @@ function taxonomy_vartype() {
     );
     $args = array(
         'labels'                     => $labels,
-        'hierarchical'               => false,
-        'public'                     => true,
+        'hierarchical'               => true,
+        'public'                     => false,
         'show_ui'                    => true,
         'show_admin_column'          => true,
         'show_in_nav_menus'          => true,
@@ -349,7 +349,7 @@ function cd_register_tax_news_author() {
 	$args = array(
 		'labels'            => $labels,
 		'hierarchical'      => true,
-		'public'            => true,
+		'public'            => false,
 		'show_ui'           => true,
 		'show_admin_column' => true,
 		'show_in_nav_menus' => true,
@@ -391,7 +391,7 @@ function cd_register_tax_news_topic() {
 	$args = array(
 		'labels'            => $labels,
 		'hierarchical'      => true,
-		'public'            => true,
+		'public'            => false,
 		'show_ui'           => true,
 		'show_admin_column' => true,
 		'show_in_nav_menus' => true,

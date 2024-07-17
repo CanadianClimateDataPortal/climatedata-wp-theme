@@ -688,7 +688,7 @@ function cdc_submit_feedback_form () {
 	$required_fields = array(
 		'feedback' => __ ( 'Please provide the details of your inquiry.', 'cdc' ),
 	);
-	handle_form_submission ( $form_type, $required_fields, true );
+	handle_form_submission ( $form_type, $required_fields );
 }
 
 /**
@@ -699,7 +699,7 @@ function cdc_submit_support_form () {
 	$required_fields = array(
 		'feedback' => __ ( 'Please provide the details of your inquiry.', 'cdc' ),
 	);
-	handle_form_submission ( $form_type, $required_fields, false );
+	handle_form_submission ( $form_type, $required_fields );
 }
 
 /**
@@ -711,7 +711,7 @@ function cdc_submit_betaapps_form () {
 		'feedback' => __ ( 'Please provide the details of your inquiry.', 'cdc' ),
 		'betaapps-posts[]' => __ ( 'Please select at least one app.', 'cdc' )
 	);
-	handle_form_submission ( $form_type, $required_fields, false );
+	handle_form_submission ( $form_type, $required_fields );
 }
 
 /**
@@ -719,9 +719,8 @@ function cdc_submit_betaapps_form () {
  *
  * @param string $form_type The type of form being submitted.
  * @param array $required_fields The required fields for the form.
- * @param bool $include_mailchimp Whether to include Mailchimp signup.
  */
-function handle_form_submission ( $form_type, $required_fields, $include_mailchimp ) {
+function handle_form_submission ( $form_type, $required_fields ) {
 	$result = array(
 		'invalid' => array(),
 		'mail' => 'failed',
@@ -805,7 +804,7 @@ function handle_form_submission ( $form_type, $required_fields, $include_mailchi
 			}
 
 			// Mailchimp signup for feedback form
-			if ( $include_mailchimp && isset ( $form_data['signup'] ) && $form_data['signup'] == 'true' ) {
+			if ( isset ( $form_data['signup'] ) && $form_data['signup'] == 'true' ) {
 				include_once ( locate_template ( 'resources/php/mailchimp.php' ) );
 				$signup = mailchimp_register ( $form_data['email'] );
 				if ( $signup == true ) {
@@ -835,9 +834,9 @@ function handle_form_submission ( $form_type, $required_fields, $include_mailchi
  */
 function build_message_body ( $form_data, $form_type ) {
 	$body = '';
-	$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Name</span><span style="display: inline-block; vertical-align: top;">' . esc_html($form_data['fullname']) . '</span></p>';
-	$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Email</span><span style="display: inline-block; vertical-align: top;"><a href="mailto:' . esc_attr($form_data['email']) . '">' . esc_html($form_data['email']) . '</a></span></p>';
-	$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Organization</span><span style="display: inline-block; vertical-align: top;">' . esc_html($form_data['organization']) . '</span></p>';
+	$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Name</span><span style="display: inline-block; vertical-align: top;">' . esc_html( $form_data['fullname'] ) . '</span></p>';
+	$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Email</span><span style="display: inline-block; vertical-align: top;"><a href="mailto:' . esc_attr( $form_data['email'] ) . '">' . esc_html( $form_data['email'] ) . '</a></span></p>';
+	$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Organization</span><span style="display: inline-block; vertical-align: top;">' . esc_html( $form_data['organization'] ) . '</span></p>';
 
 	// Custom fields for feedback form
 	if ( $form_type == 'feedback' ) {
@@ -848,7 +847,7 @@ function build_message_body ( $form_data, $form_type ) {
 		$body .= build_betaapps_body ( $form_data );
 	}
 
-	$body .= '<p style="font-weight: bold;">Message</p><p><pre>' . esc_html($form_data['feedback']) . '</pre></p>';
+	$body .= '<p style="font-weight: bold;">Message</p><pre>' . esc_html( $form_data['feedback'] ) . '</pre>';
 	return $body;
 }
 
@@ -860,27 +859,51 @@ function build_message_body ( $form_data, $form_type ) {
  */
 function build_feedback_body ( $form_data ) {
 	$body = '';
-	$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Type</span><span style="display: inline-block; vertical-align: top;">' . esc_html($form_data['feedback-type']) . '</span></p>';
-	$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Region</span><span style="display: inline-block; vertical-align: top;">' . esc_html($form_data['region']);
-	if ( $form_data['region'] == 'Other' && $form_data['region-other'] != '' ) {
-		$body .= ': ' . esc_html($form_data['region-other']);
+
+	if ( isset( $form_data['feedback-type'] ) ) {
+		$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Type</span><span style="display: inline-block; vertical-align: top;">' . esc_html( $form_data['feedback-type'] ) . '</span></p>';
 	}
-	$body .= '</span></p>';
-	$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Role</span><span style="display: inline-block; vertical-align: top;">' . esc_html($form_data['role']);
-	if ( $form_data['role'] == 'Other' && $form_data['role-other'] != '' ) {
-		$body .= ': ' . esc_html($form_data['role-other']);
+
+	if ( isset( $form_data['region'] ) ) {
+		$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Region</span><span style="display: inline-block; vertical-align: top;">' . esc_html( $form_data['region'] );
+
+		if ( $form_data['region'] == 'Other' && $form_data['region-other'] != '' ) {
+			$body .= ': ' . esc_html( $form_data['region-other'] );
+		}
+
+		$body .= '</span></p>';
 	}
-	$body .= '</span></p>';
-	$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Subject</span><span style="display: inline-block; vertical-align: top;">' . esc_html($form_data['subject']);
-	if ( $form_data['subject'] == 'Other' && $form_data['subject-other'] != '' ) {
-		$body .= ': ' . esc_html($form_data['subject-other']);
+
+	if ( isset( $form_data['role'] ) ) {
+		$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Role</span><span style="display: inline-block; vertical-align: top;">' . esc_html( $form_data['role'] );
+	
+		if ( $form_data['role'] == 'Other' && $form_data['role-other'] != '' ) {
+			$body .= ': ' . esc_html( $form_data['role-other'] );
+		}
+
+		$body .= '</span></p>';
 	}
-	$body .= '</span></p>';
-	$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Referred from</span><span style="display: inline-block; vertical-align: top;">' . esc_html($form_data['referral']);
-	if ( $form_data['referral'] == 'Other' && $form_data['referral-other'] != '' ) {
-		$body .= ': ' . esc_html($form_data['referral-other']);
+
+	if ( isset( $form_data['subject'] ) ) {
+		$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Subject</span><span style="display: inline-block; vertical-align: top;">' . esc_html( $form_data['subject'] );
+
+		if ( $form_data['subject'] == 'Other' && $form_data['subject-other'] != '' ) {
+			$body .= ': ' . esc_html( $form_data['subject-other'] );
+		}
+	
+		$body .= '</span></p>';
 	}
-	$body .= '</span></p>';
+
+	if ( isset( $form_data['referral'] ) ) {
+		$body .= '<p><span style="display: inline-block; width: 150px; font-weight: bold; vertical-align: top;">Referred from</span><span style="display: inline-block; vertical-align: top;">' . esc_html( $form_data['referral'] );
+
+		if ( $form_data['referral'] == 'Other' && $form_data['referral-other'] != '' ) {
+			$body .= ': ' . esc_html( $form_data['referral-other'] );
+		}
+
+		$body .= '</span></p>';
+	}
+
 	return $body;
 }
 
@@ -896,9 +919,9 @@ function build_betaapps_body ( $form_data ) {
 
 	if ( isset ( $form_data['betaapps-posts[]'] ) ) {
 		if ( is_array ( $form_data['betaapps-posts[]'] ) ) {
-			$body .= implode ( ', ', array_map('esc_html', $form_data['betaapps-posts[]']) );
+			$body .= implode ( ', ', array_map( 'esc_html', $form_data['betaapps-posts[]'] ) );
 		} else {
-			$body .= esc_html($form_data['betaapps-posts[]']);
+			$body .= esc_html( $form_data['betaapps-posts[]'] );
 		}
 	} else {
 		$body .= 'None selected';

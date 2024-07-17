@@ -51,8 +51,8 @@
 									</div>
 									
 									<div class="form-text form-check form-check-inline feedback-subscribe">
-										<input class="form-check-input" type="checkbox" value="true" name="signup" id="signup">
-										<label class="form-check-label" for="signup"><?php _e ( 'Subscribe to the ClimateData.ca newsletter', 'cdc' ); ?></label>
+										<input class="form-check-input" type="checkbox" value="true" name="signup" id="online-signup">
+										<label class="form-check-label" for="online-signup"><?php _e ( 'Subscribe to the ClimateData.ca newsletter', 'cdc' ); ?></label>
 									</div>
 									
 								</div>
@@ -316,9 +316,17 @@
 								</div>
 								
 								<div class="col">
-									<label for="email" class="form-label"><?php _e ( 'Email Address', 'cdc' ); ?></label>
-								
-									<input type="email" name="email" class="form-control">
+
+									<div class="mb-1">
+										<label for="email" class="form-label"><?php _e ( 'Email Address', 'cdc' ); ?></label>
+										<input type="email" name="email" class="form-control">
+									</div>
+
+									<div class="form-text form-check form-check-inline feedback-subscribe">
+										<input class="form-check-input" type="checkbox" value="true" name="signup" id="data-signup">
+										<label class="form-check-label" for="data-signup"><?php _e ( 'Subscribe to the ClimateData.ca newsletter', 'cdc' ); ?></label>
+									</div>
+
 								</div>
 								
 								<div class="col">
@@ -437,9 +445,15 @@
 								
 								<div class="col">
 
-									<label for="email" class="form-label"><?php _e ( 'Email Address', 'cdc' ); ?></label>
-								
-									<input type="email" name="email" class="form-control">
+									<div class="mb-1">
+										<label for="email" class="form-label"><?php _e ( 'Email Address', 'cdc' ); ?></label>
+										<input type="email" name="email" class="form-control">
+									</div>
+
+									<div class="form-text form-check form-check-inline feedback-subscribe">
+										<input class="form-check-input" type="checkbox" value="true" name="signup" id="app-signup">
+										<label class="form-check-label" for="app-signup"><?php _e ( 'Subscribe to the ClimateData.ca newsletter', 'cdc' ); ?></label>
+									</div>
 
 								</div>
 								

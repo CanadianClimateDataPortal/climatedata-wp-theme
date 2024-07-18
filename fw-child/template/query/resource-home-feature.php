@@ -82,7 +82,7 @@ $excerpts = array (
                             break;
                         case 'app' :
                             $format_icon = 'far fa-window-maximize';
-                            $format_name = __( 'Application', 'cdc' );
+                            $format_name = __( 'App', 'cdc' );
     
                             break;
                         default : // Article.

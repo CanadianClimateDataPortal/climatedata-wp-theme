@@ -6,11 +6,9 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 	$current_lang = $item['lang'];
 }
 
-$native_excerpt = apply_filters ( 'the_content', custom_excerpt ( 20, $item['id'] ) );
-
 $excerpts = array (
-    'en' => $native_excerpt ? $native_excerpt : get_field( 'excerpt', $item['id'] ), // Overrides native excerpt with custom excerpt if present
-    'fr' => get_field( 'excerpt_fr', $item['id'] ) ? get_field( 'excerpt_fr', $item['id'] ) : $native_excerpt, // Defaults back to native excerpt if no custom FR not present
+    'en' => get_field( 'excerpt', $item['id'] ),
+    'fr' => get_field( 'excerpt_fr', $item['id'] ),
 );
 ?>
 

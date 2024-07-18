@@ -518,9 +518,36 @@ function remove_comments_post_type_support() {
 	remove_post_type_support ( 'page', 'comments' );
 }
 
-function remove_comments_admin_bar() {
+function remove_comments_admin_bar () {
 	global $wp_admin_bar;
 	$wp_admin_bar->remove_menu ( 'comments' );
+}
+
+/**
+ * Add a 'Display in Learning Zone' column.
+ *
+ * @param array $columns The existing columns.
+ * @return array Modified columns with 'Display in Learning Zone'.
+ */
+function add_display_in_learning_zone_column ( $columns ) {
+	return array_merge ( $columns, ['display_in_learning_zone' => __ ( 'Display in Learning Zone', 'cdc' )] );
+}
+
+/**
+ * Display the value of 'display_in_learning_zone' ACF in a readable format.
+ *
+ * @param string $column_key The key of the column being displayed.
+ * @param int $post_id The ID of the current post/page.
+ */
+function display_in_learning_zone_value ( $column_key, $post_id ) {
+	if ( $column_key == 'display_in_learning_zone' ) {
+		$display_in_learning_zone = get_post_meta ( $post_id, 'display_in_learning_zone', true );
+		if ( $display_in_learning_zone ) {
+			echo '<span style="color:green;">' . __ ( 'Yes', 'cdc') . '</span>';
+		} else {
+			echo '<span style="color:red;">' . __ ( 'No', 'cdc') . '</span>';
+		}
+	}
 }
 
 /**
@@ -568,8 +595,15 @@ add_action ( 'init', 'cdc_remove_unused_taxonomies' );
 add_action ( 'init', 'remove_comments_post_type_support', 100 );
 add_action ( 'admin_menu', 'remove_comments_admin_menu' );
 add_action ( 'wp_before_admin_bar_render', 'remove_comments_admin_bar' );
+add_action ( 'manage_pages_custom_column', 'display_in_learning_zone_value', 10, 2 );
+add_action ( 'manage_beta-app_posts_custom_column', 'display_in_learning_zone_value', 10, 2 );
+
 add_filter ( 'use_block_editor_for_post_type', 'cdc_enable_block_editor', 10, 2 );
 add_filter ( 'manage_post_posts_columns', 'cdc_manage_post_columns', 10, 1 );
+add_filter ( 'manage_pages_columns', 'add_display_in_learning_zone_column' );
+add_filter ( 'manage_resource_posts_columns', 'add_display_in_learning_zone_column' );
+add_filter ( 'manage_beta-app_posts_columns', 'add_display_in_learning_zone_column' );
+
 
 //
 // MISC

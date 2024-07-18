@@ -1687,6 +1687,7 @@ body.tab-drawer-open {
   &:after {
     content: "";
     width: 10%;
+    min-width: 3.75rem;
     border-top: 4px solid $secondary;
     margin-top: 1rem;
     display: block;

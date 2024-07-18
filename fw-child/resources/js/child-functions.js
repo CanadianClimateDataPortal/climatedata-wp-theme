@@ -359,7 +359,7 @@ const $ = jQuery;
         query_item.hide().addClass('no-matches');
         $( '.learn-zone-topic-filter[data-topic-id="' + topic_id + '"]' ).addClass( 'disabled' );
         
-        // Check if there is no matches in ALL query items.
+        // Check if there are no matches in ALL query items.
         const query_items_count = $('#learn-grid .tab-drawer-bumper > .learn-topic-grid').length;
         const query_items_no_matches_count = $('#learn-grid .tab-drawer-bumper > .learn-topic-grid.no-matches').length;
         

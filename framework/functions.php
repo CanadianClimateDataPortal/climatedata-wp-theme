@@ -257,12 +257,13 @@ function fw_menu_output ( $menu, $level, $type, $classes ) {
 	echo '">';
 
 	foreach ( $menu as $item ) {
-	
+
 		echo '<li class="';
 
+		$base_current_url = strpos($GLOBALS['vars']['current_url'], '?') ? substr($GLOBALS['vars']['current_url'], 0, strpos($GLOBALS['vars']['current_url'], '?')) : $GLOBALS['vars']['current_url'];
 		if (
 			isset ( $GLOBALS['vars']['current_url'] ) &&
-			$GLOBALS['vars']['current_url'] == $item['url']
+			$base_current_url == $item['url']
 		) {
 			echo 'current-nav-item ';
 		}
@@ -291,7 +292,7 @@ function fw_menu_output ( $menu, $level, $type, $classes ) {
 
 			if (
 				isset ( $GLOBALS['vars']['current_url'] ) &&
-				$GLOBALS['vars']['current_url'] == $item['url']
+				$base_current_url == $item['url']
 			) {
 				echo 'current-nav-link ';
 			}

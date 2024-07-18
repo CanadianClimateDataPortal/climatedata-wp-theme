@@ -1225,7 +1225,7 @@ msgstr ""
 
 #: template/menu-overlay.php:115
 msgid "Join the newsletter"
-msgstr ""
+msgstr "S'inscrire a l'infolettre"
 
 #: template/newsletter-signup.php:10
 msgid "Your email address"

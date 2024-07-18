@@ -282,6 +282,7 @@ function child_theme_enqueue() {
 
 		case 'beta-apps' :
 		case 'apps-beta' :
+		case 'apps' :
 			wp_enqueue_script ( 'zebra-pin' );
 			break;
 

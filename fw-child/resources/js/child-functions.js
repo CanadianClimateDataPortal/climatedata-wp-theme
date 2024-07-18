@@ -249,7 +249,7 @@ const $ = jQuery;
     /**
      * Ensure the control bar footer stays at the bottom of the screen while keeping it within its parent container.
      * Executes at page load, on scroll and on window resize.
-     * Applies to the Beta Apps page, or anywhere the #control-bar-tabs-footer id is used.
+     * Applies to the Apps page, or anywhere the #control-bar-tabs-footer id is used.
      * 
      * #control-bar-tabs-footer must be initially set to position:fixed & bottom:0 in CSS.
      * #control-bar-tabs-footer.position-absolute must be width:100%!important in CSS.
@@ -471,7 +471,7 @@ const $ = jQuery;
     }
 
     //
-    // BETA APPS
+    // APPS
     //
 
     if ($('#apps-grid').length) {

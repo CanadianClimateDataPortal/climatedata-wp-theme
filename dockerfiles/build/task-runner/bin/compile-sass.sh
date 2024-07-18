@@ -7,7 +7,7 @@ set -e
 show_help() {
   echo "Usage: $0 <source-directory> [<output-directory>]"
   echo ""
-  echo "  <source-directory>: Directory containing the source files of the themes (one subdirectory per theme)."
+  echo "  <source-directory>: Directory containing the themes' source files."
   echo "  <output-directory>: Directory where to output the generated CSS files. The themes' directory structure will"
   echo "    be recreated. Defaults to the source directory."
 }
@@ -26,7 +26,7 @@ if [[ -z "$out" ]]; then
 fi
 
 sass \
-  -s compressed \
+  --style=compressed \
   --no-source-map \
-  "$src/fw-child/resources/scss:${out}/fw-child/resources/css" \
-  "$src/framework/resources/scss:${out}/framework/resources/css"
+  "${src}/fw-child/resources/scss:${out}/fw-child/resources/css" \
+  "${src}/framework/resources/scss:${out}/framework/resources/css"

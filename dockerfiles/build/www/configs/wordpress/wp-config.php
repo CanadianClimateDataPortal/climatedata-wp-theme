@@ -7,11 +7,14 @@
  *   1) Prevents storing sensitive information permanently in the Docker image
  *   2) Allows to reuse the same Docker image in different environments (with a different database, for example)
  *
+ * # TODO: rajouter instruction par rapport aux variables booléennes (doit être la string "true" ou "false")
+ *
  * To set a WordPress constant, define an environment variable with the name of the WordPress constant, but prefixed
  * with "WP_". For example, to set the "DB_NAME" constant, define a "WP_DB_NAME" variable. To set the "WP_DEBUG"
  * constant, define a "WP_WP_DEBUG" variable.
  *
  * At least the following WordPress constants need to be set (prefix your environment variable with "WP_"):
+ * - WP_SITEURL (full URL, including protocol)
  * - DB_NAME
  * - DB_USER
  * - DB_PASSWORD
@@ -36,9 +39,6 @@
  *
  * See this page for details about the constants:
  * https://developer.wordpress.org/advanced-administration/wordpress/wp-config/
- *
- * The configuration also uses those environment variables (not prefixed by "WP_"):
- * - APP_NO_HTTPS: if "true", use the http:// protocol for the website's URL. By default, use https://
  *
  * Some WordPress constants which are expected to apply to all environment are explicitly set in this file. They cannot
  * be redefined with environment variables.
@@ -90,23 +90,17 @@ define('WP_AUTO_UPDATE_CORE', false);
 define('AUTOMATIC_UPDATER_DISABLED', true);
 define('DISALLOW_FILE_MODS', true);
 
-// Directory locations and URLs
-$protocol = getenv('APP_NO_HTTPS') === 'true' ? 'http://' : 'https://';
-
 if ( !defined('ABSPATH') )
-	define('ABSPATH', dirname(__FILE__) . '/');
+	define('ABSPATH', dirname(__FILE__) . 'wp-config.php/');
 
 define('WP_CONTENT_DIR', ABSPATH . 'assets');
-define('WP_SITEURL', $protocol . $_SERVER['HTTP_HOST'] . '/site/');
+# TODO: PHPStorm affiche une erreur ici: WP_SITEURL n'existe pas
 define('WP_CONTENT_URL', WP_SITEURL . 'assets');
 
 // Other configurations
 define('WP_CACHE', false);
 define('COOKIE_DOMAIN', $_SERVER['HTTP_HOST']);
 define('WP_POST_REVISIONS', 10);
-
-// Unset temporary variables to not pollute the WordPress' global scope
-unset($protocol);
 
 $table_prefix  = 'wp_';
 

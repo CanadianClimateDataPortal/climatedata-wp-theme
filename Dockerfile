@@ -1,33 +1,14 @@
 # syntax=docker/dockerfile:1
 
+# TODO: update the whole description (maybe move most of it in a Markdown documentation file)
 # Dockerfile for the climatedata.ca web server.
 #
-# The image contains PHP-FPM, a web server (Apache) and all the site files (WordPress, plugins, custom themes).
+# The image contains PHP-FPM, a web server (Nginx) and all the site files (WordPress, plugins, custom themes).
 #
 # This image doesn't contain:
 # - The database (should be another Docker image).
 # - The "upload/" directory containing files uploaded from the administration (should be mounted as a volume since we
 #     need those files to persist).
-#
-# Build arguments:
-#  - TASK_RUNNER_IMAGE (required): name of the task runner Docker image (see description below).
-#  - EXTRA_WP_PLUGINS_DIR (optional): directory, in the build context, containing zip files of extra WordPress plugins
-#      to extract in the assets/plugins/ directory. Can be used, for example, to add plugins not available in the
-#      WordPress' plugin directory.
-#  - EXTRA_VENDOR_ASSETS_DIR (optional): directory, in the build context, containing zip files to extract in the
-#      assets/vendor/ directory.
-#  - APACHE_USER_ID (optional, default=10000): user id of the created Apache user (www-data). Setting the id gives more
-#      control over permissions if you mount a directory that must be writable by the website
-#      (ex: the assets/upload/ directory). For security reasons, it's recommended that the id be >= 10000, unless you
-#      know what you do.
-#  - APACHE_GROUP_ID (optional, default=10001): group id for the created Apache user's group (www-data). For security
-#      reasons, it's recommended that the id be >= 10000, unless you know what you do.
-#
-# Special runtime environment variables (used only when running the container):
-#  - WP_*: variables prefixed with WP_ are used to set WordPress constants. For example `WP_DB_NAME=test` will set the
-#      `DB_NAME` WordPress constant to "test". See dockerfiles/www/configs/wordpress/wp-config.php for details.
-#  - APP_NO_HTTPS: if "true", informs various components in the container to allow non-HTTPS requests. If not set, or
-#      not set to "true", those components will act in "required HTTPS" mode.
 #
 # The build process is multi-stage, and the "target" you want to build the website is "production".
 #
@@ -42,6 +23,29 @@
 # Example build:
 #
 #   `docker build --target production --build-arg TASK_RUNNER_IMAGE=task-runner:v2`
+#
+# Build arguments:
+#
+#  - TASK_RUNNER_IMAGE (required): name of the task runner Docker image (see description below).
+#  - EXTRA_WP_PLUGINS_DIR (optional): directory, in the build context, containing zip files of extra WordPress plugins
+#      to extract in the assets/plugins/ directory. Can be used, for example, to add plugins not available in the
+#      WordPress' plugin directory.
+# TODO: still used ?
+#  - EXTRA_VENDOR_ASSETS_DIR (optional): directory, in the build context, containing zip files to extract in the
+#      assets/vendor/ directory.
+#  - NGINX_USER_ID (optional, default=10000): user id of the created Apache user (www-data). Setting the id gives more
+#      control over permissions if you mount a directory that must be writable by the website
+#      (ex: the assets/upload/ directory). For security reasons, it's recommended that the id be >= 10000, unless you
+#      know what you do.
+#  - NGINX_GROUP_ID (optional, default=10001): group id for the created Apache user's group (www-data). For security
+#      reasons, it's recommended that the id be >= 10000, unless you know what you do.
+#
+# Special runtime environment variables (used only when running the container):
+#
+#  - WP_*: variables prefixed with WP_ are used to set WordPress constants. For example `WP_DB_NAME=test` will set the
+#      `DB_NAME` WordPress constant to "test". See dockerfiles/php/configs/wordpress/wp-config.php for details.
+#  - APP_NO_HTTPS: if "true", informs various components in the container to allow non-HTTPS requests. If not set, or
+#      not set to "true", those components will act in "required HTTPS" mode.
 
 ARG TASK_RUNNER_IMAGE
 
@@ -51,7 +55,8 @@ ARG TASK_RUNNER_IMAGE
 # The task runner compiles some site's assets from their source files. It outputs the generated files in a local dist/
 # directory.
 ###
-FROM ${TASK_RUNNER_IMAGE} as task-runner
+
+FROM ${TASK_RUNNER_IMAGE} AS task-runner
 
 WORKDIR /home/node/app
 
@@ -60,19 +65,21 @@ COPY --chown=node fw-child src/fw-child
 
 RUN compile-sass.sh src dist
 
-CMD ["echo", "Done"]
-
 
 ###
 # Production website building stage.
 ###
-FROM php:8.2-fpm as production
+
+FROM php:8.2-fpm AS production
+
+###
+# Installation
+###
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        apache2 \
         jq \
         less \
-        libapache2-mod-fcgid \
+        nginx \
         supervisor \
         unzip \
         vim \
@@ -80,16 +87,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# WP-CLI download and installation
-
-WORKDIR /usr/local/bin
-RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
-    && mv wp-cli.phar wp \
-    && chmod +x wp
-
 # PHP extensions
 
 # https://github.com/mlocati/docker-php-extension-installer
+# ToDO: use a specific version here
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 # Some PHP extensions are either core extensions or are bundled with PHP, and thus don't need a version specification
@@ -106,57 +107,69 @@ RUN install-php-extensions \
     pdo_mysql \
     zip
 
+# WP-CLI download and installation
+
+WORKDIR /usr/local/bin
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+    && mv wp-cli.phar wp \
+    && chmod +x wp
+
+# Custom scripts
+
+COPY --chmod=755 dockerfiles/build/www/bin /usr/local/bin
+
+###
+# Configurations
+###
+
 # Supervisord setup
 
-COPY dockerfiles/www/configs/supervisor/supervisord.conf /etc/
+COPY dockerfiles/build/www/configs/supervisor/supervisord.conf /etc/
 
 # PHP setup
 
 RUN mkdir /var/log/php && chown www-data:www-data /var/log/php
-COPY --chmod=644 dockerfiles/www/configs/php/php.ini /usr/local/etc/php
+COPY --chmod=644 dockerfiles/build/www/configs/php/php.ini /usr/local/etc/php
 
-# Apache setup
+# PHP-FPM setup
 
-ARG APACHE_USER_ID=10000
-ARG APACHE_GROUP_ID=10001
+COPY --chmod=644 dockerfiles/build/www/configs/php-fpm/zz-docker.conf /usr/local/etc/php-fpm.d/
 
-RUN usermod -u ${APACHE_USER_ID} www-data && groupmod -g ${APACHE_GROUP_ID} www-data
+# Nginx setup
 
-RUN a2enmod actions fcgid alias proxy proxy_fcgi setenvif rewrite ssl
+ARG NGINX_USER_ID=10000
+ARG NGINX_GROUP_ID=10001
 
-COPY dockerfiles/www/configs/apache/100-climatedata*.conf /etc/apache2/sites-available
-COPY dockerfiles/www/configs/apache/php-fpm.conf /etc/apache2/conf-available
+RUN usermod -u ${NGINX_USER_ID} www-data && groupmod -g ${NGINX_GROUP_ID} www-data
 
-RUN a2dissite 000-default && \
-    a2ensite 100-climatedata && \
-    a2ensite 100-climatedata-ssl && \
-    a2enconf php-fpm
+COPY --chmod=644 dockerfiles/build/www/configs/nginx/conf.d/* /etc/nginx/conf.d/
 
-RUN rm /var/www/html/index.html
+COPY --chmod=644 dockerfiles/build/www/configs/nginx/climatedata-site.conf /etc/nginx/sites-available/
+RUN mkdir -m 644 /etc/nginx/conf.d/climatedata-site
 
-# Custom scripts
+RUN rm /etc/nginx/sites-enabled/default \
+    && ln -s ../sites-available/climatedata-site.conf /etc/nginx/sites-enabled/climatedata-site.conf
 
-COPY --chmod=755 dockerfiles/www/bin /usr/local/bin
 
+###
 # Wordpress files installation and setup
+###
 
-WORKDIR /var/www/html/site
+WORKDIR /var/www/html
 
+RUN rm index.nginx-debian.html
+
+# TODO: put WordPress version in a variable, to make it easier to update instead of searching for it
 RUN wp core download --allow-root --version=6.3.1 --skip-content
 RUN mv wp-content assets
-RUN echo "<?php define('WP_USE_THEMES', true); require( dirname( __FILE__ ) . '/site/wp-blog-header.php' );" > ../index.php
+RUN mkdir assets/uploads
+RUN mkdir mkdir assets/cache
 
-COPY dockerfiles/www/configs/wordpress/wp-config.php .
-COPY dockerfiles/www/configs/wordpress/.htaccess /var/www/html
-
-WORKDIR /var/www/html/site/assets/vendor
-
-ARG EXTRA_VENDOR_ASSETS_DIR
-RUN --mount=type=bind,target=/tmp/vendor-assets,source=$EXTRA_VENDOR_ASSETS_DIR unzip-all.sh /tmp/vendor-assets
+COPY dockerfiles/build/www/configs/wordpress/wp-config.php .
 
 # WordPress plugins installation
 
-WORKDIR /var/www/html/site/assets/plugins
+WORKDIR /var/www/html/assets/plugins
 
 ARG EXTRA_WP_PLUGINS_DIR
 RUN --mount=type=bind,target=/tmp/wp-plugins,source=$EXTRA_WP_PLUGINS_DIR unzip-all.sh /tmp/wp-plugins
@@ -171,7 +184,7 @@ RUN download-wp-plugin.sh \
 
 # Site's custom WordPress themes installation
 
-WORKDIR /var/www/html/site/assets/themes
+WORKDIR /var/www/html/assets/themes
 
 COPY --from=task-runner /home/node/app/dist .
 
@@ -182,14 +195,24 @@ COPY fw-child fw-child
 
 WORKDIR /var/www/html
 
-RUN mkdir site/assets/cache \
-    && chown -R root:www-data . \
+RUN chown -R root:www-data . \
     && find . -type d -print0 | xargs -0 chmod 750 \
     && find . -type f -print0 | xargs -0 chmod 640 \
-    && chmod 0640 site/wp-config.php \
-    && chmod 0640 .htaccess \
-    && chmod 0770 site/assets/cache
+    && chmod 0770 assets/cache assets/uploads
 
 WORKDIR /root
 USER root
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
+
+
+###
+# Developer image, based on production.
+###
+
+
+FROM production AS development
+
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug
+
+RUN echo "<?php phpinfo();" > /var/www/html/phpinfo.php

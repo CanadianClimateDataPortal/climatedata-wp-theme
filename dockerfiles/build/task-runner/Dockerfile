@@ -17,8 +17,8 @@ FROM node:21.7-bookworm
 # Put global npm packages in the `node` user's directory instead of the `root` user's directory
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 ENV PATH=$PATH:/home/node/.npm-global/bin:/home/node/bin/dart-sass
-ENV NODE_ENV production
-ENV NPM_CONFIG_LOGLEVEL info
+ENV NODE_ENV=production
+ENV NPM_CONFIG_LOGLEVEL=info
 
 # For `dumb-init`, see point #5 in:
 #   https://snyk.io/blog/10-best-practices-to-containerize-nodejs-web-applications-with-docker/
@@ -36,7 +36,7 @@ RUN ln -s /opt/dart-sass/sass /usr/local/bin/sass
 
 # Install custom scripts
 
-COPY --chmod=755 dockerfiles/runner/bin /usr/local/bin
+COPY --chmod=755 dockerfiles/build/task-runner/bin /usr/local/bin
 
 USER node
 WORKDIR /home/node/app

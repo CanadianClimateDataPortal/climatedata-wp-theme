@@ -1,6 +1,7 @@
-.dockerignore
 Dockerfile
-.git
+.idea
+docker-compose-dev.yaml
+docker-override.yml
 .gitignore
 climate-data-ca
 h7-parent

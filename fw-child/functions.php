@@ -295,9 +295,9 @@ function child_theme_enqueue() {
 		wp_enqueue_script ( 'iframe-functions', $child_js_dir . 'iframe-functions.js', array ( 'jquery' ), null, true );
 	}
 
-	if ( is_post_type_archive ( 'variable' ) ) {
-		wp_enqueue_script ( 'zebra-pin' );
-		wp_enqueue_script ( 'flex-drawer' );
+	if ( is_page( 'variable' ) || is_single( 'variable' ) ) {
+		wp_enqueue_script( 'zebra-pin' );
+		wp_enqueue_script( 'flex-drawer' );
 	}
 
 	wp_enqueue_script ( 'child-functions' );
@@ -466,6 +466,33 @@ add_action ( 'fw_before_footer', function() {
 
 } );
 
+/**
+ * Insert the CookieYes script tag in the head.
+ *
+ * CookieYes does provide a WordPress plugin that automatically includes the required script tag, but it supports only
+ * one ID. Since we use a different domain for each language, and since CookieYes requires a different ID for different
+ * domains, the plugin is replaced by this hook that can insert a different ID for each language (i.e. domain).
+ */
+add_action('wp_head',
+
+	/**
+	 * Output the CookieYes language specific script tag.
+	 *
+	 * The inserted script tag requires an ID in the `cookieyes_id_<lang>` entry in the global 'vars' array. If the
+	 * entry is not defined or empty, no script tag is inserted.
+	 */
+	function () {
+		$lang = $GLOBALS['fw']['current_lang_code'];
+		$id_key = 'cookieyes_id_' . $lang;
+		$cookieyes_id = $GLOBALS['vars'][$id_key] ?? '';
+
+		if ( !empty( $cookieyes_id ) ) {
+			echo '<script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/' . $cookieyes_id . '/script.js"></script>';
+		}
+	},
+	1
+);
+
 //
 // VARIABLES OFFCANVAS
 //
@@ -543,11 +570,37 @@ function cdc_enable_block_editor( $use_block_editor, $post_type ) {
 	return false;
 }
 
+/**
+ * Unregisters default taxonomies that are not used.
+ *
+ * @return void
+ */
+function cdc_remove_unused_taxonomies() {
+	unregister_taxonomy_for_object_type( 'post_tag', 'post' );
+	unregister_taxonomy_for_object_type( 'category', 'post' );
+}
+
+/**
+ * Returns the list of columns to show for the "post" listing page (of the administration).
+ *
+ * @param string[] $post_columns Associative array `[$id => $name]` of the current columns. `$id` is the column's id,
+ *                               and `$value` is the column's name.
+ *
+ * @return string[] Associative array `[$id => $name]` of the columns to show.
+ */
+function cdc_manage_post_columns( $post_columns ) {
+	unset( $post_columns['author'] );
+	unset( $post_columns['post_type'] );
+	return $post_columns;
+}
+
 add_action ( 'init', 'remove_default_editor' );
+add_action ( 'init', 'cdc_remove_unused_taxonomies' );
 add_action ( 'init', 'remove_comments_post_type_support', 100 );
 add_action ( 'admin_menu', 'remove_comments_admin_menu' );
 add_action ( 'wp_before_admin_bar_render', 'remove_comments_admin_bar' );
 add_filter ( 'use_block_editor_for_post_type', 'cdc_enable_block_editor', 10, 2 );
+add_filter ( 'manage_post_posts_columns', 'cdc_manage_post_columns', 10, 1 );
 
 //
 // MISC

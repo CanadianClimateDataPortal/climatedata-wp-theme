@@ -967,6 +967,52 @@ body.tab-drawer-open {
   }
 }
 
+.variable-details {
+  &__separator {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+
+    @include media-breakpoint-down(md) {
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  &__links {
+    display: flex;
+    justify-content: flex-end;
+    align-self: center;
+
+    a {
+      &:not(:first-child) {
+        margin-left: 1rem;
+      }
+    }
+
+    @include media-breakpoint-down(sm) {
+      flex-direction: column;
+      align-items: flex-start;
+
+      a {
+        &:not(:first-child) {
+          margin-top: 0.75rem;
+          margin-left: 0;
+        }
+      }
+    }
+
+    @include media-breakpoint-down(lg) {
+      margin-top: 1rem;
+      justify-content: flex-start;
+    }
+  }
+
+  &__relevant {
+    @include media-breakpoint-down(lg) {
+      margin-top: 2rem;
+    }
+  }
+}
+
 // LOCATION TAB
 
 #map-control-coords {
@@ -1113,15 +1159,11 @@ body.tab-drawer-open {
 
     &.fd-open {
       .card {
-        height: calc(100% + ($query-card-hover-padding * 2));
-        margin-top: $query-card-hover-padding * -1;
-        margin-left: $query-card-hover-padding * -1;
-        margin-right: $query-card-hover-padding * -1;
         box-shadow: 0 0.25rem 1.5rem transparentize($black, 0.8);
 
         &:after {
           left: 0;
-          opacity: 1;
+          opacity: .6;
           transition:
             left 0s ease 0s,
             opacity 0.25s ease 0s;
@@ -1140,9 +1182,16 @@ body.tab-drawer-open {
   }
 
   .fd-drawer {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
-    background-color: $gray-400;
+    &__wrapper {
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+      background-color: $gray-400;
+
+      @include media-breakpoint-down(md) {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+      }
+    }
   }
 }
 
@@ -1721,6 +1770,35 @@ body.tab-drawer-open {
     &.text-body {
       color: $gray-600 !important;
     }
+  }
+}
+
+//
+// ABOUT US
+//
+.regional-partners {
+  img {
+    max-height: 9.375rem;
+    transition: opacity .2s;
+
+    &:hover {
+      opacity: .8;
+    }
+  }
+}
+
+.about-accordion {
+  --bs-accordion-active-bg: #{$gray-300};
+  --bs-accordion-btn-color: #{$secondary};
+  --bs-accordion-active-color: #{$primary};
+
+  .accordion-item {
+    border-left-width: 0;
+    border-right-width: 0;
+  }
+
+  .accordion-heading {
+    cursor: pointer;
   }
 }
 

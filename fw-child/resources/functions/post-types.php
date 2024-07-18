@@ -67,7 +67,7 @@ function posttype_variable()
         'show_in_admin_bar' => true,
         'show_in_nav_menus' => true,
         'can_export' => true,
-        'has_archive' => true,
+        'has_archive' => false,
         'exclude_from_search' => false,
         'publicly_queryable' => true,
         'capability_type' => 'page',
@@ -330,3 +330,35 @@ function posttype_app() {
 
 }
 add_action( 'init', 'posttype_app', 0 );
+
+/**
+ * Updates the 'sector' taxonomy terms of the post from
+ * the values of the ACF field "Relevant sectors".
+ *
+ * @param int $post_id The ID of the post being updated.
+ *
+ * @return void
+ */
+function cdc_variable_update_tax_sector_terms( $post_id ) {
+	// Get relevant sectors.
+	$relevant_sectors = get_field( 'relevant_sectors', $post_id );
+
+	// Check if relevant sectors are available.
+	if ( ! is_array( $relevant_sectors ) || empty( $relevant_sectors ) ) {
+		return;
+	}
+
+	// Extract term IDs from the relevant sectors.
+	$term_ids = array();
+
+	foreach ( $relevant_sectors as $sector ) {
+		if ( isset( $sector['sector_term'] ) && is_object( $sector['sector_term'] ) ) {
+			$term_ids[] = $sector['sector_term']->term_id;
+		}
+	}
+
+	// Update the 'sector' taxonomy terms.
+	wp_set_post_terms( $post_id, $term_ids, 'sector', false );
+}
+
+add_action( 'acf/save_post', 'cdc_variable_update_tax_sector_terms' );

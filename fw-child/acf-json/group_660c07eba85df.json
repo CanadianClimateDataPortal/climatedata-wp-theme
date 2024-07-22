@@ -165,7 +165,7 @@
             {
                 "param": "post_type",
                 "operator": "==",
-                "value": "beta-app"
+                "value": "app"
             }
         ]
     ],
@@ -178,5 +178,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1721648297
+    "modified": 1721667440
 }

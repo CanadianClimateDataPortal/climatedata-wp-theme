@@ -260,12 +260,15 @@ function fw_menu_output ( $menu, $level, $type, $classes ) {
 
 		echo '<li class="';
 
-		$base_current_url = strpos($GLOBALS['vars']['current_url'], '?') ? substr($GLOBALS['vars']['current_url'], 0, strpos($GLOBALS['vars']['current_url'], '?')) : $GLOBALS['vars']['current_url'];
-		if (
-			isset ( $GLOBALS['vars']['current_url'] ) &&
-			$base_current_url == $item['url']
-		) {
-			echo 'current-nav-item ';
+		if ( isset ( $GLOBALS['vars']['current_url'] ) ) {
+			$query_position = strpos( $GLOBALS['vars']['current_url'], '?' );
+			$base_current_url = $query_position ?
+				substr( $GLOBALS['vars']['current_url'], 0, $query_position ) :
+				$GLOBALS['vars']['current_url'];
+
+			if ( $base_current_url == $item['url'] ) {
+				echo 'current-nav-item ';
+			}
 		}
 
 		// if the page is an ancestor of the current ID

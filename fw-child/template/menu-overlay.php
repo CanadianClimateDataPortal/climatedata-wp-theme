@@ -130,7 +130,7 @@
 						
 						<a href="https://www.instagram.com/climatedata.ca/" target="_blank" class="text-secondary me-2" title="Instagram"><i class="fab fa-instagram"></i></a>
 						
-						<a href="https://soundcloud.com/climate-data-canada" target="_blank" class="text-secondary me-2" title="Soundcloud"><i class="fab fa-soundcloud"></i></a>
+						<a href="https://soundcloud.com/climate-data-canada" target="_blank" class="text-secondary" title="SoundCloud"><i class="fab fa-soundcloud"></i></a>
 						
 						
 					</div>

@@ -20,10 +20,9 @@
 		);
 		
 	?>
-	
-	<div class="col-13 offset-1">
-		<div class="pt-6">
 
+	<div class="col-12 offset-1 col-sm-13">
+		<div class="pt-6">
 			<ul id="sort-menu" class="fw-query-sort list-unstyled d-flex all-caps">
 				<li class="selected me-4" data-sort="date_desc"><i class="fas fa-arrow-up me-2"></i> <?php _e ( 'Newest First', 'cdc' ); ?></li>
 				<li class="" data-sort="date_asc"><i class="fas fa-arrow-down me-2"></i> <?php _e ( 'Oldest First', 'cdc' ); ?></li>

@@ -21,7 +21,7 @@
 			
 	?>
 	
-	<div class="col-13 offset-1">
+	<div class="col-12 offset-1 col-sm-13">
 		<div class="pt-6">
 
 			<ul id="sort-menu" class="fw-query-sort list-unstyled d-flex all-caps">

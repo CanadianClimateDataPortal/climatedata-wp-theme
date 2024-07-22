@@ -535,7 +535,11 @@ $control-slider-handle-width: 2.75rem;
     }
 
     svg {
-      width: 30px;
+      width: 24px;
+
+      @include media-breakpoint-up(lg) {
+        width: 30px;
+      }
     }
   }
 
@@ -548,12 +552,6 @@ $control-slider-handle-width: 2.75rem;
   }
 
   .tab-drawer-tabs {
-    padding-left: 0.5rem;
-
-    a {
-      // display: block;
-    }
-
     .tab-drawer-trigger {
       .alert-icon {
         display: none;

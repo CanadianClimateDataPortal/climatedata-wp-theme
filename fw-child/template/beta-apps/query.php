@@ -21,7 +21,7 @@
 		
 	?>
 	
-	<div class="col-13 offset-1">
+	<div class="col-12 offset-1 col-sm-13">
 		<div class="tab-drawer-bumper">
 			<div class="pt-6">
 				

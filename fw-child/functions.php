@@ -280,8 +280,7 @@ function child_theme_enqueue() {
 			// wp_enqueue_script ( 'tab-drawer' );
 			break;
 
-		case 'beta-apps' :
-		case 'apps-beta' :
+		case 'apps' :
 			wp_enqueue_script ( 'zebra-pin' );
 			break;
 

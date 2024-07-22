@@ -625,7 +625,8 @@ $control-slider-handle-width: 2.75rem;
   }
 }
 
-#control-bar-secondary {
+#control-bar-secondary,
+#control-bar-tabs-footer {
   a {
     &:hover {
       background-color: $gray-700;

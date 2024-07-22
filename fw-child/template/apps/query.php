@@ -5,7 +5,7 @@
 		// CONTROL BAR
 		//
 		
-		include ( locate_template ( 'template/beta-apps/control-bar.php' ) );
+		include ( locate_template ( 'template/apps/control-bar.php' ) );
 		
 		//
 		// QUERY
@@ -13,7 +13,7 @@
 		
 		$item_options = array (
 			'type' => 'items',
-			'template' => 'template/query/beta-app-item.php',
+			'template' => 'template/query/app-item.php',
 			'id' => '',
 			'class' => array ( 'row', 'row-cols-3' ),
 			'item_class' => 'col'
@@ -36,7 +36,7 @@
 				
 				$module_args = array (
 					'posts_per_page' => 12,
-					'post_type' => 'beta-app',
+					'post_type' => 'app',
 					'post_parent' => 0,
 					'post_status' => 'publish'
 				);

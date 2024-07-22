@@ -486,8 +486,24 @@ $control-slider-handle-width: 2.75rem;
     z-index: -1;
 
     &:has(.tab-drawer.td-selected) {
-      width: calc((100vw / 16) * 3);
       box-shadow: 0 0 20px transparentize($black, 0.8);
+      width: calc((100vw / 16) * 13);
+
+      @include media-breakpoint-up(sm) {
+        width: calc((100vw / 16) * 14);
+      }
+
+      @include media-breakpoint-up(md) {
+        width: calc((100vw / 16) * 5);
+      }
+
+      @include media-breakpoint-up(lg) {
+        width: calc((100vw / 16) * 4);
+      }
+
+      @include media-breakpoint-up(xl) {
+        width: calc((100vw / 16) * 3);
+      }
     }
   }
 
@@ -570,9 +586,24 @@ $control-slider-handle-width: 2.75rem;
   }
 
   .tab-drawer {
-    width: calc((100vw / 16) * 3);
+    width: calc((100vw / 16) * 13);
     height: 100%;
-    // height: 100vh;
+
+    @include media-breakpoint-up(sm) {
+      width: calc((100vw / 16) * 14);
+    }
+
+    @include media-breakpoint-up(md) {
+      width: calc((100vw / 16) * 5);
+    }
+
+    @include media-breakpoint-up(lg) {
+      width: calc((100vw / 16) * 4);
+    }
+
+    @include media-breakpoint-up(xl) {
+      width: calc((100vw / 16) * 3);
+    }
 
     .tab-drawer-content {
       height: 100%;

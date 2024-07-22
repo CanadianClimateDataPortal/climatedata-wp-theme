@@ -219,6 +219,12 @@ p {
     margin-right: 0.5rem;
     opacity: 0.8;
   }
+
+  &-lg {
+    @include media-breakpoint-down(sm) {
+      padding: $input-padding-y-lg $input-padding-x-lg; 
+    }
+  }
 }
 
 .bg {
@@ -998,4 +1004,20 @@ $query-card-hover-padding: 0.75rem;
       width: 100%;
     }
   }
+}
+
+//
+// HELPERS
+//
+
+.ratio-3x2 {
+  --bs-aspect-ratio: 66.66667%;
+}
+
+.bg-black-50 {
+  background-color: rgba($black, .5);
+}
+
+.mb-25vh {
+  margin-bottom: 25vh;
 }

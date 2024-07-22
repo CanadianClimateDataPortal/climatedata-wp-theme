@@ -232,19 +232,6 @@ const $ = jQuery;
         },
       });
     }
-
-    let scroll_offset = 0;
-
-    if ($('#floating-header').length) {
-      scroll_offset += $('#floating-header').outerHeight();
-    }
-
-    if ($('.query-page #control-bar-tabs').length) {
-      new $.Zebra_Pin($('#control-bar-tabs'), {
-        top_spacing: scroll_offset,
-        contained: true,
-      });
-    }
     
     // Functionalities for variable archive page.
     if ($( '.variable-archive-page' ).length > 0) {
@@ -530,4 +517,19 @@ const $ = jQuery;
 
     $('body').removeClass('spinner-on');
   });
+
+  window.addEventListener('load', function () {
+    let scroll_offset = 0;
+
+    if ($('#floating-header').length) {
+      scroll_offset += $('#floating-header').outerHeight();
+    }
+
+    if ($('.query-page #control-bar-tabs').length) {
+      new $.Zebra_Pin($('#control-bar-tabs'), {
+        top_spacing: scroll_offset,
+        contain: true,
+      });
+    }
+  })
 })(jQuery);

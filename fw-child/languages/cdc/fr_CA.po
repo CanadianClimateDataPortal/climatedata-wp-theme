@@ -1376,12 +1376,12 @@ msgstr ""
 
 #: template/feedback.php:474
 msgid "Which apps do you need support for?"
-msgstr "Pour quelles applications avez-vous besoin d'un soutien ?"
+msgstr "Pour quelles apps avez-vous besoin d'un soutien ?"
 
 #: resources/functions/rest.php:712
 msgid "Please select at least one app."
-msgstr "Sélectionnez au moins une application."
+msgstr "Sélectionnez au moins une app."
 
 #: template/feedback.php:416
 msgid "Apps Support"
-msgstr "Support pour les applications"
+msgstr "Support pour les apps"

@@ -718,7 +718,7 @@ function cdc_submit_apps_form () {
  * Handle the form submission and process the data.
  *
  * @param string $form_type The type of form being submitted.
- * @param array $required_fields The required fields for the form.
+ * @param string[] $required_fields The required fields for the form.
  */
 function handle_form_submission ( $form_type, $required_fields ) {
 	$result = array(
@@ -765,8 +765,7 @@ function handle_form_submission ( $form_type, $required_fields ) {
 		// Validate other required fields
 		foreach ( $required_fields as $field => $error_msg ) {
 			if (
-				( !isset( $form_data[$field] ) ) || // Check if the field is not set
-				( empty( $form_data[$field] ) ) ||  // Or if the field is empty
+				( empty( $form_data[$field] ) ) || // Check if the field is not set, or empty
 				( is_array( $form_data[$field] ) && count( array_filter( $form_data[$field] ) ) == 0 ) // Or if the array is empty
 			) {
 				$result['invalid'][] = $field;
@@ -810,7 +809,7 @@ function handle_form_submission ( $form_type, $required_fields ) {
 				if ( $signup == true ) {
 					$result['signup'] = 'success';
 					$result['messages'][] = __( 'Your email address has been added to our mailing list. You can unsubscribe at any time.', 'cdc' );
-				} elseif ( $signup == false ) {
+				} else {
 					$result['signup'] = 'failed';
 					$result['messages'][] = __( 'An error occurred while adding your email address to our mailing list.', 'cdc' );
 				}

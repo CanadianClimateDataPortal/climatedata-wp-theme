@@ -199,7 +199,7 @@ const $ = jQuery;
       if ($('#glossary-list-nav').length) {
         smoothScrollOffset = $('#glossary-list-nav').outerHeight();
       }
-      
+
       const target = $($(this).attr('href'));
 
       if (target.length) {
@@ -277,7 +277,7 @@ const $ = jQuery;
       document.addEventListener('scroll', updateControlBarFooterPosition);
       window.addEventListener('resize', updateControlBarFooterPosition);
     }
-    
+
     // Functionalities for variable archive page.
     if ($( '.variable-archive-page' ).length > 0) {
       $( document ).on( 'fw_query_success', function ( e, query_item ) {
@@ -539,7 +539,7 @@ const $ = jQuery;
               } else {
                 $input.addClass('border-danger');
               }
-            });            
+            });
           }
 
           if (data.mail == 'success') {

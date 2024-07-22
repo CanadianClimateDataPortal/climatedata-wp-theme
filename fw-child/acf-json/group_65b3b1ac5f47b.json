@@ -1,0 +1,489 @@
+{
+    "key": "group_65b3b1ac5f47b",
+    "title": "Download Inputs",
+    "fields": [
+        {
+            "key": "field_6617d674fc693",
+            "label": "Finch Variable Name",
+            "name": "finch_var",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_65b3b20ff1d7d",
+            "label": "Threshold Inputs",
+            "name": "thresholds",
+            "aria-label": "",
+            "type": "flexible_content",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layouts": {
+                "layout_5e62699a52aa9": {
+                    "key": "layout_5e62699a52aa9",
+                    "name": "text",
+                    "label": "Text",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_65b3b20ff1d86",
+                            "label": "Text",
+                            "name": "text",
+                            "aria-label": "",
+                            "type": "textarea",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "show_column_filter": false,
+                            "allow_bulkedit": 0,
+                            "allow_quickedit": 0,
+                            "show_column": 0,
+                            "show_column_weight": 1000,
+                            "show_column_sortable": false,
+                            "default_value": "",
+                            "maxlength": "",
+                            "rows": 2,
+                            "placeholder": "",
+                            "new_lines": ""
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_5e6268d732f15": {
+                    "key": "layout_5e6268d732f15",
+                    "name": "input",
+                    "label": "Input",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_65b3b20ff1d7e",
+                            "label": "ID",
+                            "name": "id",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "e.g. <code>thresh<\/code>",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "40",
+                                "class": "",
+                                "id": ""
+                            },
+                            "show_column_filter": false,
+                            "allow_bulkedit": 0,
+                            "allow_quickedit": 0,
+                            "show_column": 0,
+                            "show_column_weight": 1000,
+                            "show_column_sortable": false,
+                            "default_value": "",
+                            "maxlength": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_65b3b20ff1d7f",
+                            "label": "Units",
+                            "name": "units",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "e.g. <code>degC<\/code>",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "show_column_filter": false,
+                            "allow_bulkedit": 0,
+                            "allow_quickedit": 0,
+                            "show_column": 0,
+                            "show_column_weight": 1000,
+                            "show_column_sortable": false,
+                            "default_value": "",
+                            "maxlength": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_65b3b20ff1d80",
+                            "label": "Decimal places",
+                            "name": "decimals",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "15",
+                                "class": "",
+                                "id": ""
+                            },
+                            "show_column_filter": false,
+                            "allow_bulkedit": 0,
+                            "allow_quickedit": 0,
+                            "show_column": 0,
+                            "show_column_weight": 1000,
+                            "show_column_sortable": false,
+                            "default_value": 0,
+                            "min": 0,
+                            "max": 2,
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_65b3b20ff1d81",
+                            "label": "Minimum",
+                            "name": "min",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "10",
+                                "class": "",
+                                "id": ""
+                            },
+                            "show_column_filter": false,
+                            "allow_bulkedit": 0,
+                            "allow_quickedit": 0,
+                            "show_column": 0,
+                            "show_column_weight": 1000,
+                            "show_column_sortable": false,
+                            "default_value": "",
+                            "min": "",
+                            "max": "",
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_65b3b20ff1d82",
+                            "label": "Maximum",
+                            "name": "max",
+                            "aria-label": "",
+                            "type": "number",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "10",
+                                "class": "",
+                                "id": ""
+                            },
+                            "show_column_filter": false,
+                            "allow_bulkedit": 0,
+                            "allow_quickedit": 0,
+                            "show_column": 0,
+                            "show_column_weight": 1000,
+                            "show_column_sortable": false,
+                            "default_value": "",
+                            "min": "",
+                            "max": "",
+                            "placeholder": "",
+                            "step": "",
+                            "prepend": "",
+                            "append": ""
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_6144e9d8f13f8": {
+                    "key": "layout_6144e9d8f13f8",
+                    "name": "select",
+                    "label": "Select",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_65b3b20ff1d87",
+                            "label": "ID",
+                            "name": "id",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "show_column_filter": false,
+                            "allow_bulkedit": 0,
+                            "allow_quickedit": 0,
+                            "show_column": 0,
+                            "show_column_weight": 1000,
+                            "show_column_sortable": false,
+                            "default_value": "",
+                            "maxlength": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_65b3b20ff1d88",
+                            "label": "Units",
+                            "name": "units",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "e.g. <code>degC<\/code>",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "show_column_filter": false,
+                            "allow_bulkedit": 0,
+                            "allow_quickedit": 0,
+                            "show_column": 0,
+                            "show_column_weight": 1000,
+                            "show_column_sortable": false,
+                            "default_value": "",
+                            "maxlength": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_65b3b20ff1d89",
+                            "label": "Values",
+                            "name": "values",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "All values, separated by pipes ( | )",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "show_column_filter": false,
+                            "allow_bulkedit": 0,
+                            "allow_quickedit": 0,
+                            "show_column": 0,
+                            "show_column_weight": 1000,
+                            "show_column_sortable": false,
+                            "default_value": "",
+                            "maxlength": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_65b3b20ff1d8a",
+                            "label": "Labels",
+                            "name": "labels",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "All labels, separated by pipes ( | )",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "show_column_filter": false,
+                            "allow_bulkedit": 0,
+                            "allow_quickedit": 0,
+                            "show_column": 0,
+                            "show_column_weight": 1000,
+                            "show_column_sortable": false,
+                            "default_value": "",
+                            "maxlength": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_614b44826e4b2": {
+                    "key": "layout_614b44826e4b2",
+                    "name": "mm_dd",
+                    "label": "Date (MM-DD)",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_65b3b20ff1d83",
+                            "label": "ID",
+                            "name": "id",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "e.g. <code>thresh<\/code>",
+                            "required": 1,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "40",
+                                "class": "",
+                                "id": ""
+                            },
+                            "show_column_filter": false,
+                            "allow_bulkedit": 0,
+                            "allow_quickedit": 0,
+                            "show_column": 0,
+                            "show_column_weight": 1000,
+                            "show_column_sortable": false,
+                            "default_value": "",
+                            "maxlength": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_65b3b20ff1d84",
+                            "label": "Units",
+                            "name": "units",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "e.g. <code>degC<\/code>",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "25",
+                                "class": "",
+                                "id": ""
+                            },
+                            "show_column_filter": false,
+                            "allow_bulkedit": 0,
+                            "allow_quickedit": 0,
+                            "show_column": 0,
+                            "show_column_weight": 1000,
+                            "show_column_sortable": false,
+                            "default_value": "",
+                            "maxlength": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": ""
+                        },
+                        {
+                            "key": "field_65b3b20ff1d85",
+                            "label": "Optional",
+                            "name": "optional",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "show_column_filter": 0,
+                            "allow_bulkedit": 0,
+                            "allow_quickedit": 0,
+                            "show_column": 0,
+                            "show_column_weight": 1000,
+                            "show_column_sortable": false,
+                            "message": "",
+                            "default_value": 0,
+                            "ui": 0,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                }
+            },
+            "min": "",
+            "max": "",
+            "button_label": "Add Block"
+        },
+        {
+            "key": "field_65b3b20ff1d7c",
+            "label": "Frequencies",
+            "name": "frequencies",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "(Optional) Allow to filter which frequencies are available for this variable. Separated by pipes e.g. <code>YS|MS<\/code>",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_65b3b20ff1d8b",
+            "label": "Required variables",
+            "name": "required_variables",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Variables required for computation (<a href=\"https:\/\/pavics-sdi.readthedocs.io\/projects\/finch\/en\/latest\/processes.html#xclim-indicators\" target=\"_blank\">learn more<\/a>). Separated by pipes e.g. <code>tasmin|tasmax<\/code>",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "variable"
+            }
+        ]
+    ],
+    "menu_order": 23,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 1,
+    "modified": 1721648300
+}

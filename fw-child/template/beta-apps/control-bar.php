@@ -1,15 +1,20 @@
-<div class="col-1">
+<div class="col-2 col-sm-1">
+
 	<div id="control-bar" class="control-bar tab-drawer-tabs-container">
+
+		<div id="control-bar-tabs-footer" class="col-2 col-sm-1 text-center">
 		
-		<div id="control-bar-tabs" class="tab-drawer-tabs pt-2">
-			
+			<?php
+			$feedback_slug = 'feedback';
+
+			if ( $GLOBALS['fw']['current_lang_code'] == 'fr' )
+				$feedback_slug = 'retroaction';
+			?>
+
+			<a href="<?php echo home_url ( $feedback_slug ); ?>#apps-support" class="control-bar-text-link"><?php _e ( 'Feedback', 'cdc' ); ?></a>
+
 		</div>
-		
-		<div id="tab-drawer-container" class="tab-drawer-container">
-			
-			
-			
-		</div>
+
 	</div>
-	
+
 </div>

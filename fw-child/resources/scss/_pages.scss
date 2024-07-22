@@ -115,13 +115,47 @@
     position: relative;
 
     h2 {
-      font-size: 4rem;
+      font-size: 2rem;
       font-family: $font-family-serif;
       color: $secondary;
+
+      @include media-breakpoint-up(md) {
+        font-size: 3rem;
+      }
+
+      @include media-breakpoint-up(lg) {
+        font-size: 4rem;
+      }
     }
 
     h5 {
       @include all-caps;
+
+      @include media-breakpoint-down(sm) {
+        font-size: .8125rem;
+      }
+    }
+
+    .post-type {
+      margin-top: .5rem;
+      margin-left: .0625rem;
+      font-size: .875rem;
+      text-transform: capitalize;
+
+      @include media-breakpoint-down(sm) {
+        font-size: 11px;
+      }
+    }
+
+    .card-body {
+      width: 100%;
+      background-color: $black;
+
+      @include media-breakpoint-up(md) {
+        position: absolute;
+        bottom: 0;
+        background-color: rgba($black, .5);
+      }
     }
   }
 
@@ -167,6 +201,14 @@
     position: sticky;
     top: 25vh;
     margin-bottom: 25vh;
+
+    & + div {
+      margin-bottom: 25vh;
+
+      @include media-breakpoint-up(md) {
+        margin-left: 2.25rem;
+      }
+    }
   }
 
   #resources-query {
@@ -406,6 +448,15 @@ $overlay-switch-bg: rgba($gray-400, 0.99);
   .control-tab-footer {
     .btn {
     }
+  }
+}
+
+#control-bar-tabs-footer {
+  position: fixed;
+  bottom: 0;
+
+  &.position-absolute {
+    width: 100% !important;
   }
 }
 
@@ -1922,8 +1973,13 @@ body.tab-drawer-open {
   }
 }
 
+.error-input-parent {
+  border: var(--bs-border-width) var(--bs-border-style) transparent;
+}
+
+
 //
-// BETA APPS
+// APPS
 //
 
 .initially-hidden {
@@ -1947,9 +2003,6 @@ body.tab-drawer-open {
   margin: 0;
   padding: 0;
   background: white;
-}
-
-.single-beta-app {
 }
 
 #beta-app-breadcrumb {

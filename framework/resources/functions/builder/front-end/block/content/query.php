@@ -7,6 +7,9 @@ $args = $element['inputs']['args'];
 if ( $element['inputs']['type'] == 'posts' ) {
 	
 	$args['post_status'] = 'publish';
+
+	// Exclude password-protected posts
+	$args['post_password'] = '';
 	
 	$args['posts_per_page'] = (int) $args['posts_per_page'];
 	

@@ -167,7 +167,7 @@ const $ = jQuery;
 
     //
 
-    if ($('body').attr('id') == 'page-feedback') {
+    if ($('body').attr('id') === 'page-feedback' || $('body').attr('id') === 'page-retroaction') {
       const feedback_accordion = document.getElementById('feedback-accordion');
 
       //  replace state on accordion change
@@ -199,7 +199,7 @@ const $ = jQuery;
       if ($('#glossary-list-nav').length) {
         smoothScrollOffset = $('#glossary-list-nav').outerHeight();
       }
-      
+
       const target = $($(this).attr('href'));
 
       if (target.length) {
@@ -245,7 +245,39 @@ const $ = jQuery;
         contained: true,
       });
     }
-    
+
+    /**
+     * Ensure the control bar footer stays at the bottom of the screen while keeping it within its parent container.
+     * Executes at page load, on scroll and on window resize.
+     * Applies to the Apps page, or anywhere the #control-bar-tabs-footer id is used.
+     * 
+     * #control-bar-tabs-footer must be initially set to position:fixed & bottom:0 in CSS.
+     * #control-bar-tabs-footer.position-absolute must be width:100%!important in CSS.
+     */
+    if ($('#control-bar-tabs-footer').length) {
+      function updateControlBarFooterPosition() {
+        const controlBar = document.getElementById('control-bar');
+        const footer = document.getElementById('control-bar-tabs-footer');
+        const controlBarRect = controlBar.getBoundingClientRect();
+
+        if (controlBarRect.bottom <= window.innerHeight || controlBarRect.top >= window.innerHeight) {
+          if (!footer.classList.contains('position-absolute')) {
+            footer.classList.add('position-absolute');
+          }
+          footer.style.bottom = '0';
+        } else {
+          if (footer.classList.contains('position-absolute')) {
+            footer.classList.remove('position-absolute');
+          }
+          footer.style.bottom = '0';
+        }
+      }
+
+      updateControlBarFooterPosition();
+      document.addEventListener('scroll', updateControlBarFooterPosition);
+      window.addEventListener('resize', updateControlBarFooterPosition);
+    }
+
     // Functionalities for variable archive page.
     if ($( '.variable-archive-page' ).length > 0) {
       $( document ).on( 'fw_query_success', function ( e, query_item ) {
@@ -439,7 +471,7 @@ const $ = jQuery;
     }
 
     //
-    // BETA APPS
+    // APPS
     //
 
     if ($('#apps-grid').length) {
@@ -481,7 +513,7 @@ const $ = jQuery;
       the_form.find('.border-danger').removeClass('border-danger');
 
       $.ajax({
-        url: ajax_data.rest_url + 'cdc/v2/submit_feedback',
+        url: ajax_data.rest_url + 'cdc/v2/submit_' + form_namespace, // Use the namespace to target the right API endpoint
         data: {
           form: the_form.serializeArray(),
         },
@@ -499,13 +531,20 @@ const $ = jQuery;
             alert_header.addClass('alert alert-warning');
 
             data.invalid.forEach(function (input) {
-              the_form.find('[name="' + input + '"]').addClass('border-danger');
+              const $input = the_form.find('[name="' + input + '"]');
+              const $parent = $input.closest('.error-input-parent');
+
+              if ($parent.length) {
+                $parent.addClass('border-danger');
+              } else {
+                $input.addClass('border-danger');
+              }
             });
           }
 
           if (data.mail == 'success') {
             alert_header.addClass('alert alert-success');
-            the_form.find('.submit-btn').addClass('disabled');
+            the_form[0].reset();
           } else {
             alert_header.addClass('alert alert-warning');
           }
@@ -523,6 +562,61 @@ const $ = jQuery;
         },
       });
     });
+
+    //
+    // Learn block GSAP Animation on front page
+    //
+
+    if ($('#page-home').length) {
+      gsap.registerPlugin(ScrollTrigger);
+    
+      $('.scroll-card').each(function () {
+        const card = this;
+    
+        const timeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 60%',
+            end: 'top -20%',
+            scrub: true,
+            markers: false    // Set to true to debug
+          }
+        });
+    
+        timeline.fromTo(card, 
+          { 
+            y: '-50%',
+            opacity: 0,
+            scale: 0.75,
+            zIndex: 0
+          },
+          {
+            y: '0%',
+            opacity: 1,
+            scale: 1,
+            zIndex: 100
+          }
+        )
+        .to(card,
+          {
+            y: '0%',
+            opacity: 1,
+            scale: 1,
+            zIndex: 100
+          }
+        )
+        .to(card,
+          {
+            y: '20%',
+            opacity: 0,
+            scale: 0.75,
+            zIndex: 0,
+            ease: 'power2.in'
+          }
+        );
+      });
+
+    };
 
     //
     // MISC

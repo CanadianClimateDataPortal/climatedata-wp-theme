@@ -274,15 +274,15 @@ function posttype_definition() {
 }
 add_action( 'init', 'posttype_definition', 0 );
 
-// beta apps
+// Apps (formerly beta-apps)
 
 function posttype_app() {
 
     $labels = array(
-        'name'                  => _x( 'Beta Apps', 'Post Type General Name', 'cdc-post-types' ),
-        'singular_name'         => _x( 'Beta App', 'Post Type Singular Name', 'cdc-post-types' ),
-        'menu_name'             => __( 'Beta Apps', 'cdc-post-types' ),
-        'name_admin_bar'        => __( 'Beta Apps', 'cdc-post-types' ),
+        'name'                  => _x( 'Apps', 'Post Type General Name', 'cdc-post-types' ),
+        'singular_name'         => _x( 'App', 'Post Type Singular Name', 'cdc-post-types' ),
+        'menu_name'             => __( 'Apps', 'cdc-post-types' ),
+        'name_admin_bar'        => __( 'Apps', 'cdc-post-types' ),
         'archives'              => __( 'App Archives', 'cdc-post-types' ),
         'attributes'            => __( 'App Attributes', 'cdc-post-types' ),
         'parent_item_colon'     => __( 'Parent App:', 'cdc-post-types' ),
@@ -308,7 +308,7 @@ function posttype_app() {
         'filter_items_list'     => __( 'Filter items list', 'cdc-post-types' ),
     );
     $args = array(
-        'label'                 => __( 'Beta App', 'cdc-post-types' ),
+        'label'                 => __( 'App', 'cdc-post-types' ),
         'description'           => __( 'Post Type Description', 'cdc-post-types' ),
         'labels'                => $labels,
         'supports'              => array( 'title', 'thumbnail', 'custom-fields' ),

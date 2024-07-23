@@ -233,6 +233,37 @@ const $ = jQuery;
       });
     }
 
+    let pinned_item = null;
+    let scroll_offset = 0;
+
+    if ($('#floating-header').length) {
+      scroll_offset += $('#floating-header').outerHeight();
+    }
+
+    if ($('.query-page #control-bar-tabs').length) {
+      pinned_item = new $.Zebra_Pin($('#control-bar-tabs'), {
+        top_spacing: scroll_offset,
+        contain: true,
+      });
+    }
+
+    let resize_observer = new ResizeObserver( function() {
+      if (pinned_item != null) {
+        pinned_item.update();
+      }
+    });
+
+    resize_observer.observe(document.querySelector('#control-bar'));
+
+    $(window).on('resize', function() {
+      scroll_offset = 0;
+      if ($('#floating-header').length) {
+        scroll_offset += $('#floating-header').outerHeight();
+      }
+      pinned_item.settings.top_spacing = scroll_offset;
+      pinned_item.update();
+    });
+
     /**
      * Ensure the control bar footer stays at the bottom of the screen while keeping it within its parent container.
      * Executes at page load, on scroll and on window resize.
@@ -612,18 +643,4 @@ const $ = jQuery;
     $('body').removeClass('spinner-on');
   });
 
-  window.addEventListener('load', function () {
-    let scroll_offset = 0;
-
-    if ($('#floating-header').length) {
-      scroll_offset += $('#floating-header').outerHeight();
-    }
-
-    if ($('.query-page #control-bar-tabs').length) {
-      new $.Zebra_Pin($('#control-bar-tabs'), {
-        top_spacing: scroll_offset,
-        contain: true,
-      });
-    }
-  })
 })(jQuery);

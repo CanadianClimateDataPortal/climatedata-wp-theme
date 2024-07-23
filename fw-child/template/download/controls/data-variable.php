@@ -132,7 +132,7 @@
 						</div>
 					</div>
 
-					<div id="" class="query-container p-2">
+					<div class="query-container p-2">
 						<div class="fw-query-pagination d-flex justify-content-between align-items-center">
 							<div class="fw-query-pagination-btn previous btn btn-secondary btn-sm"><?php _e ( 'Previous', 'cdc' ); ?></div>
 

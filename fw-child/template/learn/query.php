@@ -28,7 +28,7 @@
 				<li class="selected me-4" data-sort="title_asc"><i class="fas fa-arrow-up me-2"></i> <?php _e ( 'Title (A–Z)', 'cdc' ); ?></li>
 				<li class="me-4" data-sort="title_desc"><i class="fas fa-arrow-down me-2"></i> <?php _e ( 'Title (Z–A)', 'cdc' ); ?></li>
 				<li class="me-4" data-sort="date_desc"><i class="fas fa-arrow-up me-2"></i> <?php _e ( 'Newest First', 'cdc' ); ?></li>
-				<li class="" data-sort="date_asc"><i class="fas fa-arrow-down me-2"></i> <?php _e ( 'Oldest First', 'cdc' ); ?></li>
+				<li data-sort="date_asc"><i class="fas fa-arrow-down me-2"></i> <?php _e ( 'Oldest First', 'cdc' ); ?></li>
 			</ul>
 
 		</div>
@@ -70,7 +70,7 @@
 				?>
 			</h4>
 
-			<div id="" class="query-container ">
+			<div class="query-container ">
 				<div class="fw-query-items row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 g-lg-6" data-options='<?php echo json_encode ( $item_options ); ?>'>
 
 					<div class="fw-query-item"></div>

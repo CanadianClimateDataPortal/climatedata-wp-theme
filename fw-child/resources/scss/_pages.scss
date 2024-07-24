@@ -104,6 +104,12 @@
     background-color: transparent;
   }
 
+  #header-primary {
+    @include media-breakpoint-up(xxl) {
+      @include font-size(1.25rem);
+    }
+  }
+
   #header-lang {
     font-size: 0.875rem;
     font-weight: $font-weight-bold;

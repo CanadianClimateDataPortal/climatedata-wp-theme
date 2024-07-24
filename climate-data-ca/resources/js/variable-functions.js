@@ -2355,7 +2355,8 @@
                 } else {
                     // console.log('----- ' + history_action + ' -----');
                 }
-                $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(new_url, url_encoder_salt).encoded);
+                const screenshot_url = new_url + '&nocookieyes=yes';
+                $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(screenshot_url, url_encoder_salt).encoded);
             }
             history_action = 'push';
         }
@@ -3321,7 +3322,9 @@
         });
 
         // initially update screenshot button link
-        $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(window.location.href, url_encoder_salt).encoded);
+        const url_has_params = window.location.href.indexOf('?') !== -1;
+        const screenshot_url = window.location.href + ( url_has_params ? '&' : '?') + 'nocookieyes=yes';
+        $('#screenshot').attr('href', data_url + '/raster?url=' + encodeURL(screenshot_url, url_encoder_salt).encoded);
 
         $.fn.prepare_raster = function(){
           $('#main-header').remove();

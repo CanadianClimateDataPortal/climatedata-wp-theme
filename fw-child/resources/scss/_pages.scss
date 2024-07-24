@@ -1786,6 +1786,19 @@ body.tab-drawer-open {
 // ABOUT US
 //
 .regional-partners {
+  .partner-wrapper {
+    align-items: center;
+    border: 1px solid $blue-200;
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    height: 15.625rem;
+    justify-content: center;
+    max-width: 22.5rem;
+    padding: 1.25rem;
+    width: 100%;
+  }
+
   img {
     max-height: 9.375rem;
     transition: opacity .2s;

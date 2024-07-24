@@ -293,6 +293,21 @@
 //
 
 .hierarchical-menu {
+  position: relative;
+
+  @include media-breakpoint-up(lg) {
+    &::after {
+      background-color: $gray-900;
+      content: '';
+      display: block;
+      height: 100%;
+      position: absolute;
+      right: calc(100vw / 32 * -1);
+      top: 0;
+      width: 1px;
+    }
+  }
+
   .collapsible-item {
     display: flex;
     flex-wrap: nowrap;
@@ -303,13 +318,13 @@
   .button-expand {
     background-color: transparent;
     border: none;
-    color: $primary;
+    color: $gray-900;
     display: inline-block;
     padding: .375rem .5rem;
     transition: background-color .15s, color .15s;
 
     &:hover {
-      background-color: $primary;
+      background-color: $gray-900;
       color: $white;
     }
 
@@ -326,7 +341,7 @@
   }
 
   .current-nav-link {
-    color: var(--bs-link-hover-color);
+    font-weight: $font-weight-bold;
   }
 
   .submenu {
@@ -341,6 +356,7 @@
   }
 
   a {
+    color: $gray-900;
     display: inline-block;
     font-size: 1.125rem;
     padding: .125rem 0 .125rem .5rem;

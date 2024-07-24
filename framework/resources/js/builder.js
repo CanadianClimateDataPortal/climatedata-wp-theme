@@ -1247,15 +1247,19 @@
 		/**
 		 * Remove, from a list fields, empty variation settings.
 		 *
-		 * Some settings are made only of a list of variations. When they have no variation, the setting is essentially
-		 * empty. This function removes those.
+		 * Some settings are made only of a list of variations. When they have
+		 * no variation, the setting is essentially empty. This function removes
+		 * those.
 		 *
-		 * @param {{name: String, value: String}[]} fields List of form fields containing setting fields.
-		 * @return {{name: String, value: String}[]} The list of form fields without the empty variation settings.
+		 * @param {{name: String, value: String}[]} fields List of form fields
+		 *     containing setting fields.
+		 * @return {{name: String, value: String}[]} The list of form fields
+		 *     without the empty variation settings.
 		 */
-		filter_empty_variation_settings: function (fields) {
-			// The function makes two passes over the list of fields. A single pass would have been possible, but it would
-			// have made the code more complex, for no significant gain in performance.
+		filter_empty_variation_settings: function ( fields ) {
+			// The function makes two passes over the list of fields. A single
+			// pass would have been possible, but it would have made the code
+			// more complex, for no significant gain in performance.
 
 			////
 			// For each setting, save if it has rows defined.
@@ -1263,44 +1267,47 @@
 
 			const setting_has_variations = {};
 
-			fields.forEach(function (field) {
-				const name_parts = field.name.split('-');
+			fields.forEach( function ( field ) {
+				const name_parts = field.name.split( '-' );
 
-				if (name_parts.length < 4 || name_parts[1] !== 'settings[]') {
+				if ( name_parts.length < 4 || name_parts[ 1 ] !== 'settings[]' ) {
 					return;
 				}
 
-				const setting_name = name_parts[2];
+				const setting_name = name_parts[ 2 ];
 
-				if (!(setting_name in setting_has_variations)) {
-					setting_has_variations[setting_name] = false;
+				if ( ! ( setting_name in setting_has_variations ) ) {
+					setting_has_variations[ setting_name ] = false;
 				}
 
-				if (!setting_has_variations[setting_name] && name_parts[3] === 'rows[]') {
-					setting_has_variations[setting_name] = true;
+				if ( ! setting_has_variations[ setting_name ] && name_parts[ 3 ] === 'rows[]' ) {
+					setting_has_variations[ setting_name ] = true;
 				}
-			});
+			} );
 
 			////
 			// Filter out fields missing their required rows.
 			////
 
-			const settings_requiring_variations = ['spacing', 'attributes'];
+			const settings_requiring_variations = [ 'spacing', 'attributes' ];
 			const filtered_form_data = [];
 
-			fields.forEach(function (field) {
-				const name_parts = field.name.split('-');
+			fields.forEach( function ( field ) {
+				const name_parts = field.name.split( '-' );
 
-				if (name_parts.length >= 3 && name_parts[1] === 'settings[]') {
-					const setting_name = name_parts[2];
+				if ( name_parts.length >= 3 && name_parts[ 1 ] === 'settings[]' ) {
+					const setting_name = name_parts[ 2 ];
 
-					if (settings_requiring_variations.includes(setting_name) && !setting_has_variations[setting_name]) {
+					if (
+						settings_requiring_variations.includes( setting_name ) &&
+						! setting_has_variations[ setting_name ]
+					) {
 						return;
 					}
 				}
 
-				filtered_form_data.push(field);
-			});
+				filtered_form_data.push( field );
+			} );
 
 			return filtered_form_data;
 		},

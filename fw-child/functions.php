@@ -290,7 +290,7 @@ function child_theme_enqueue() {
 
 	}
 
-	if ( is_singular ( 'beta-app' ) ) {
+	if ( is_singular ( 'app' ) ) {
 		wp_enqueue_script ( 'iframe-functions', $child_js_dir . 'iframe-functions.js', array ( 'jquery' ), null, true );
 	}
 

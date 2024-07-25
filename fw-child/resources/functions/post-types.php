@@ -274,7 +274,7 @@ function posttype_definition() {
 }
 add_action( 'init', 'posttype_definition', 0 );
 
-// Apps (formerly beta-apps)
+// Apps
 
 function posttype_app() {
 
@@ -326,7 +326,7 @@ function posttype_app() {
         'publicly_queryable'    => true,
         'capability_type'       => 'page',
     );
-    register_post_type( 'beta-app', $args );
+    register_post_type( 'app', $args );
 
 }
 add_action( 'init', 'posttype_app', 0 );

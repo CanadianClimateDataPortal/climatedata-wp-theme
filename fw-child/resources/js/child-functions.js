@@ -234,35 +234,32 @@ const $ = jQuery;
     }
 
     let pinned_item = null;
-    let scroll_offset = 0;
 
-    if ($('#floating-header').length) {
-      scroll_offset += $('#floating-header').outerHeight();
-    }
+    function pin_item() {
+      let scroll_offset = 0;
 
-    if ($('.query-page #control-bar-tabs').length) {
-      pinned_item = new $.Zebra_Pin($('#control-bar-tabs'), {
-        top_spacing: scroll_offset,
-        contain: true,
-      });
-    }
-
-    let resize_observer = new ResizeObserver( function() {
-      if (pinned_item != null) {
-        pinned_item.update();
-      }
-    });
-
-    resize_observer.observe(document.querySelector('#control-bar'));
-
-    $(window).on('resize', function() {
-      scroll_offset = 0;
       if ($('#floating-header').length) {
         scroll_offset += $('#floating-header').outerHeight();
       }
-      pinned_item.settings.top_spacing = scroll_offset;
-      pinned_item.update();
-    });
+
+      if ($('.query-page #control-bar-tabs').length) {
+        if (pinned_item == null) {
+          pinned_item = new $.Zebra_Pin($('#control-bar-tabs'), {
+            top_spacing: scroll_offset,
+            contain: true,
+          });
+        }
+        else {
+          pinned_item.settings.top_spacing = scroll_offset;
+          pinned_item.update();
+        }
+      }
+    }
+
+    pin_item();
+
+    let resize_observer = new ResizeObserver( pin_item );
+    resize_observer.observe(document.querySelector('#control-bar'));
 
     /**
      * Ensure the control bar footer stays at the bottom of the screen while keeping it within its parent container.

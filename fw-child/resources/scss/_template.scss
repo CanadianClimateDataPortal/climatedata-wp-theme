@@ -361,5 +361,31 @@
     font-size: 1.125rem;
     padding: .125rem 0 .125rem .5rem;
     width: 100%;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+//
+// ABOUT US SOCIAL NETWORKS
+//
+.social-networks {
+  margin-top: 1.25rem;
+
+  ul {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  li {
+    display: inline-block;
+    font-size: 1.25rem;
+    margin-right: 1.25rem;
+
+    &:last-child {
+      margin-right: 0;
+    }
   }
 }

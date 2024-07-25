@@ -1812,7 +1812,7 @@ body.tab-drawer-open {
 .about-accordion {
   --bs-accordion-active-bg: #{$gray-300};
   --bs-accordion-btn-color: #{$secondary};
-  --bs-accordion-active-color: #{$primary};
+  --bs-accordion-active-color: #{$secondary};
 
   .accordion-item {
     border-left-width: 0;

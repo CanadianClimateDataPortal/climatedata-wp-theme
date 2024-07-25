@@ -209,8 +209,14 @@ add_action('wp_head',
      *
      * The inserted script tag requires an ID in the `cookieyes_id_<lang>` entry in the global 'vars' array. If the
      * entry is not defined or empty, no script tag is inserted.
+     *
+     * The script tag is not inserted if the HTTP GET parameter "nocookieyes" is present (no matter its value).
      */
     function () {
+        if ( isset( $_GET['nocookieyes'] ) ) {
+            return;
+        }
+
         $lang = $GLOBALS['vars']['current_lang'];
         $id_key = 'cookieyes_id_' . $lang;
         $cookieyes_id = $GLOBALS['vars'][$id_key] ?? '';

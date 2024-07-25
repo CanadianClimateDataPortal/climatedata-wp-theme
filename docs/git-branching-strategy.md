@@ -81,7 +81,8 @@ The version number for the release is determined by the developer, based on the 
 globally inspired by the [semver](https://semver.org/) format `<MAJOR>.<MINOR>.<PATCH>`.
 
 * The `<PATCH>` is increased when introducing fixes that don’t introduce or change existing features. In this Git
-  strategy, a new release should always introduce new features, so it should have a `<PATCH>` number of 0.
+  strategy, this number is increased only for [hot fixes](#hot-fixes). A new release should always introduce new
+  features, so it should have a `<PATCH>` number of 0.
 * The `<MINOR>` is increased when introducing a new feature, or changing an existing feature.
 * The `<MAJOR>` is increased when introducing a major redesign that affects most of the site.
 

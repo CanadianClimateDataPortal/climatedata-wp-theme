@@ -1,6 +1,6 @@
 {
     "key": "group_65efa3288aca3",
-    "title": "Beta App",
+    "title": "App",
     "fields": [
         {
             "key": "field_65f1e38b935ab",
@@ -288,7 +288,7 @@
             {
                 "param": "post_type",
                 "operator": "==",
-                "value": "beta-app"
+                "value": "app"
             }
         ]
     ],
@@ -301,5 +301,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1721648294
+    "modified": 1721667384
 }

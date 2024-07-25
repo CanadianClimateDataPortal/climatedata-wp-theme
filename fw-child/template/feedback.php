@@ -477,9 +477,9 @@
 
 										<?php
 
-											// Query posts from the custom post type 'beta-app'
+											// Query posts from the custom post type 'app'
 											$args = array(
-												'post_type' => 'beta-app',
+												'post_type' => 'app',
 												'posts_per_page' => -1,
 											);
 

@@ -72,7 +72,7 @@ msgstr "Veuillez saisir une adresse courriel valide."
 msgid "Please provide the details of your inquiry."
 msgstr "Veuillez fournir les détails de votre demande."
 
-#: resources/functions/rest.php:778
+#: resources/functions/rest.php:777
 msgid "Some required fields are missing."
 msgstr "Certains champs requis sont manquants."
 
@@ -82,23 +82,23 @@ msgstr "Certains champs requis sont manquants."
 msgid "Organization"
 msgstr "Organisation"
 
-#: resources/functions/rest.php:800
+#: resources/functions/rest.php:799
 msgid "Thanks! We’ve received your inquiry."
 msgstr "Merci ! Nous avons reçu votre demande."
 
-#: resources/functions/rest.php:801
+#: resources/functions/rest.php:800
 msgid "Please note: we are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays."
 msgstr "Veuillez noter : nous recevons actuellement un nombre de demandes plus élevé que d'habitude à notre service d'assistance. Nous ferons de notre mieux pour vous répondre dès que possible, mais veuillez noter qu'il pourrait y avoir des délais."
 
-#: resources/functions/rest.php:803
+#: resources/functions/rest.php:802
 msgid "Something went wrong while sending your message. Please try again later."
 msgstr "Une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer plus tard."
 
-#: resources/functions/rest.php:812
+#: resources/functions/rest.php:811
 msgid "Your email address has been added to our mailing list. You can unsubscribe at any time."
 msgstr "Votre adresse courriel a été ajoutée à notre liste de diffusion. Vous pouvez vous désinscrire à tout moment."
 
-#: resources/functions/rest.php:815
+#: resources/functions/rest.php:814
 msgid "An error occurred while adding your email address to our mailing list."
 msgstr "Une erreur s'est produite lors de l'ajout de votre adresse courriel à notre liste de diffusion."
 
@@ -113,7 +113,8 @@ msgid "All Variables"
 msgstr ""
 
 #: template/learn/control-bar.php:94
-#: template/query/learn-item.php:52
+#: template/query/learn-item.php:68
+#: template/query/resource-home-feature.php:80
 msgid "Interactive"
 msgstr ""
 
@@ -962,17 +963,20 @@ msgid "Content Type"
 msgstr ""
 
 #: template/learn/control-bar.php:92
-#: template/query/learn-item.php:42
+#: template/query/learn-item.php:58
+#: template/query/resource-home-feature.php:70
 msgid "Video"
 msgstr "Vidéo"
 
 #: template/learn/control-bar.php:93
-#: template/query/learn-item.php:47
+#: template/query/learn-item.php:63
+#: template/query/resource-home-feature.php:75
 msgid "Audio"
 msgstr ""
 
 #: template/learn/control-bar.php:95
-#: template/query/learn-item.php:57
+#: template/query/learn-item.php:73
+#: template/query/resource-home-feature.php:90
 msgid "Article"
 msgstr ""
 
@@ -1239,7 +1243,7 @@ msgstr ""
 
 #: template/menu-overlay.php:115
 msgid "Join the newsletter"
-msgstr "S'inscrire a l'infolettre"
+msgstr "S'inscrire à l'infolettre"
 
 #: template/newsletter-signup.php:10
 msgid "Your email address"
@@ -1254,7 +1258,7 @@ msgid "Download image"
 msgstr "Téléchargement"
 
 #: template/old-loop/blocks/map.php:227
-#: template/query/learn-item.php:70
+#: template/query/learn-item.php:86
 msgid "Time"
 msgstr "Duration"
 
@@ -1282,7 +1286,7 @@ msgstr "Partager cette publication"
 msgid "Select variable"
 msgstr "Sélectionner"
 
-#: template/query/learn-item.php:31
+#: template/query/learn-item.php:47
 msgid "Format"
 msgstr ""
 
@@ -1385,3 +1389,7 @@ msgstr "Sélectionnez au moins une app."
 #: template/feedback.php:416
 msgid "Apps Support"
 msgstr "Support pour les apps"
+
+#: template/query/resource-home-feature.php:85
+msgid "App"
+msgstr ""

@@ -1732,6 +1732,35 @@ body.tab-drawer-open {
 }
 
 //
+// ABOUT US
+//
+.regional-partners {
+  img {
+    max-height: 9.375rem;
+    transition: opacity .2s;
+
+    &:hover {
+      opacity: .8;
+    }
+  }
+}
+
+.about-accordion {
+  --bs-accordion-active-bg: #{$gray-300};
+  --bs-accordion-btn-color: #{$secondary};
+  --bs-accordion-active-color: #{$primary};
+
+  .accordion-item {
+    border-left-width: 0;
+    border-right-width: 0;
+  }
+
+  .accordion-heading {
+    cursor: pointer;
+  }
+}
+
+//
 // GLOSSARY
 //
 

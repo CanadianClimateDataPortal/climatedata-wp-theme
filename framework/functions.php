@@ -257,18 +257,21 @@ function fw_menu_output ( $menu, $level, $type, $classes ) {
 	echo '">';
 
 	foreach ( $menu as $item ) {
-	
+		$is_item_of_current_page = false;
+
 		echo '<li class="';
 
-		if (
-			isset ( $GLOBALS['vars']['current_url'] ) &&
-			$GLOBALS['vars']['current_url'] == $item['url']
-		) {
-			echo 'current-nav-item ';
+		if ( isset ( $GLOBALS['vars']['current_url'] ) ) {
+			$url_path = parse_url($GLOBALS['vars']['current_url'], PHP_URL_PATH);
+			$item_path = parse_url($item['url'], PHP_URL_PATH);
+
+			if ( $url_path == $item_path ) {
+				$is_item_of_current_page = true;
+				echo 'current-nav-item ';
+			}
 		}
 
 		// if the page is an ancestor of the current ID
-
 		if ( 
 			isset ( $GLOBALS['vars']['current_ancestors'] ) &&
 			in_array ( $item['id'], $GLOBALS['vars']['current_ancestors'] )
@@ -289,10 +292,7 @@ function fw_menu_output ( $menu, $level, $type, $classes ) {
 
 			echo ' class="';
 
-			if (
-				isset ( $GLOBALS['vars']['current_url'] ) &&
-				$GLOBALS['vars']['current_url'] == $item['url']
-			) {
+			if ( $is_item_of_current_page ) {
 				echo 'current-nav-link ';
 			}
 			

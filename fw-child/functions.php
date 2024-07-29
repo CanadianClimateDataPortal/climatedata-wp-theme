@@ -541,22 +541,22 @@ function cdc_enable_block_editor( $use_block_editor, $post_type ) {
 }
 
 /**
- * Returns a an array of args making interactive posts public if loaded by Motion.page editor.
+ * Updates the `interactive` post type arguments to make it public if loaded by the motion.page editor.
  * 
  * @param array   $args Array of arguments for registering a post type.
  * @param string  $post_type Post type key.
  * 
  * @return array  Array of arguments for registering a post type.
  */
-function make_interactive_cpt_public_for_motion_page( $args, $post_type ) {
+function cdc_make_interactive_cpt_public_for_motion_page( $args, $post_type ) {
 	if ( $post_type === 'interactive' ) {
 		// Check if the request is coming from Motion.page
-        if ( isset( $_GET['motionpage_iframe'] ) && $_GET['motionpage_iframe'] == 'true' ) {
+		if ( isset( $_GET['motionpage_iframe'] ) && $_GET['motionpage_iframe'] == 'true' ) {
 			$args['public'] = true;
-            $args['publicly_queryable'] = true;
-        }
-    }
-    return $args;
+			$args['publicly_queryable'] = true;
+		}
+	}
+	return $args;
 }
 
 /**
@@ -590,7 +590,7 @@ add_action ( 'admin_menu', 'remove_comments_admin_menu' );
 add_action ( 'wp_before_admin_bar_render', 'remove_comments_admin_bar' );
 add_filter ( 'use_block_editor_for_post_type', 'cdc_enable_block_editor', 10, 2 );
 add_filter ( 'manage_post_posts_columns', 'cdc_manage_post_columns', 10, 1 );
-add_filter ( 'register_post_type_args', 'make_interactive_cpt_public_for_motion_page', 10, 2 );
+add_filter ( 'register_post_type_args', 'cdc_make_interactive_cpt_public_for_motion_page', 10, 2 );
 
 //
 // MISC

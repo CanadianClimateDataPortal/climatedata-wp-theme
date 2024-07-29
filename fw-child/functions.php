@@ -94,7 +94,8 @@ function child_theme_enqueue() {
 	wp_register_style ( 'gutenberg', $child_theme_dir . 'resources/css/gutenberg.css', null, null );
 	wp_enqueue_style ( 'child-style', $child_theme_dir . 'style.css', NULL, NULL, 'all' );
 
-	if ( is_singular ( 'resource' ) ) {
+	// Load WP native styles for resource and interactive posts
+	if ( is_singular ( 'resource' ) || is_singular ( 'interactive' ) ) {
 		wp_enqueue_style ( 'wp-block-library' );
 		wp_enqueue_style ( 'gutenberg' );
 		wp_enqueue_style ( 'global-styles' );
@@ -570,6 +571,25 @@ function cdc_enable_block_editor( $use_block_editor, $post_type ) {
 }
 
 /**
+ * Updates the `interactive` post type arguments to make it public if loaded by the motion.page editor.
+ * 
+ * @param array   $args Array of arguments for registering a post type.
+ * @param string  $post_type Post type key.
+ * 
+ * @return array  Array of arguments for registering a post type.
+ */
+function cdc_make_interactive_cpt_public_for_motion_page( $args, $post_type ) {
+	if ( $post_type === 'interactive' ) {
+		// Check if the request is coming from Motion.page
+		if ( isset( $_GET['motionpage_iframe'] ) && $_GET['motionpage_iframe'] == 'true' ) {
+			$args['public'] = true;
+			$args['publicly_queryable'] = true;
+		}
+	}
+	return $args;
+}
+
+/**
  * Unregisters default taxonomies that are not used.
  *
  * @return void
@@ -600,6 +620,7 @@ add_action ( 'admin_menu', 'remove_comments_admin_menu' );
 add_action ( 'wp_before_admin_bar_render', 'remove_comments_admin_bar' );
 add_filter ( 'use_block_editor_for_post_type', 'cdc_enable_block_editor', 10, 2 );
 add_filter ( 'manage_post_posts_columns', 'cdc_manage_post_columns', 10, 1 );
+add_filter ( 'register_post_type_args', 'cdc_make_interactive_cpt_public_for_motion_page', 10, 2 );
 
 //
 // MISC

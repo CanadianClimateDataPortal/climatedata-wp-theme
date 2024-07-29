@@ -2,19 +2,16 @@
 
 # Dockerfile for the "task runner".
 #
-# The task runner contains various scripts and utilities (i.e. "tasks") to help in the development of asset files, to
-# test source files and to build assets.
+# The task runner contains various scripts and utilities (i.e. "tasks") to help
+# in the development of asset files, to test source files and to build assets.
 #
-# It's intended to be used only during development, in the CI/CD or when building production assets. It's not intended
-# to run on the production server. For this reason, the source files are not built into the image, they are expected to
-# be mounted when running a container.
-#
-# This Dockerfile assumes that the context directory is the root of the project. So, when building the image, make sure
-# to build it from the project's root.
+# This Dockerfile assumes that the context directory is the root of the project.
+# So, when building the image, make sure to build it from the project's root.
 
 FROM node:21.7-bookworm
 
-# Put global npm packages in the `node` user's directory instead of the `root` user's directory
+# Put global npm packages in the `node` user's directory instead of the `root`
+# user's directory
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 ENV PATH=$PATH:/home/node/.npm-global/bin:/home/node/bin/dart-sass
 ENV NODE_ENV=production

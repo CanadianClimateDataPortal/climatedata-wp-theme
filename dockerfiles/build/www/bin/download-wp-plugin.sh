@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# Downloads specific version of plugins from the Wordpress repository and unzips them in the current working directory.
+# Downloads specific version of plugins from the Wordpress repository and unzips
+# them in the current working directory.
 
 set -e
 

@@ -1,10 +1,16 @@
-name: ccdp-portal
+name: climatedata
 
 services:
+
   portal:
+    image: climatedata-portal:dev
     build:
       context: .
       target: development
+      args:
+        TASK_RUNNER_IMAGE: climatedata-task-runner
+    depends_on:
+      - task_runner
     volumes:
       - "./framework:/var/www/html/assets/themes/framework"
       - "./fw-child:/var/www/html/assets/themes/fw-child"
@@ -15,7 +21,9 @@ services:
         source: dockerfiles/dev/www/configs/php/php-development.ini
         target: /usr/local/etc/php/conf.d/php-development.ini
     environment:
-      # TODO: rajouter commentaire par rapport aux booléens qui doivent être "true" ou "false"
+      # Note: to set a boolean value, always quote the words "true" and "false",
+      # else the YAML parser may transform them to 1 and 0. Example:
+      #   WP_WP_DEBUG: "true"
       WP_DB_NAME: climatedata
       WP_DB_USER: climatedata
       WP_DB_PASSWORD: climatedata
@@ -36,7 +44,6 @@ services:
     image: registry.gitlab.com/crim.ca/clients/ccdp/docker/db:v2
     volumes:
       - db_data:/var/lib/mysql
-    restart: always
     environment:
       MARIADB_ROOT_PASSWORD: root
       MARIADB_DATABASE: climatedata
@@ -44,7 +51,8 @@ services:
       MARIADB_PASSWORD: climatedata
     command: --innodb-buffer-pool-size=128M --innodb-log-buffer-size=64M --innodb-doublewrite=0 --innodb-flush-log-at-trx-commit=0
 
-  task_builder:
+  task_runner:
+    image: climatedata-task-runner
     build:
       context: .
       dockerfile: dockerfiles/build/task-runner/Dockerfile

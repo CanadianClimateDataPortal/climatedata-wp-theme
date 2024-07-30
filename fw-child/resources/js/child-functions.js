@@ -576,8 +576,8 @@ const $ = jQuery;
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: card,
-            start: 'top 60%',
-            end: 'top -20%',
+            start: 'top 100%',
+            end: 'top -50%',
             scrub: true,
             markers: false    // Set to true to debug
           }
@@ -585,13 +585,21 @@ const $ = jQuery;
     
         timeline.fromTo(card, 
           { 
-            y: '-50%',
+            y: '-85%',
             opacity: 0,
             scale: 0.75,
             zIndex: 0
           },
           {
-            y: '0%',
+            y: '-85%',
+            opacity: 0,
+            scale: 0.75,
+            zIndex: 0
+          }
+        )
+        .to(card,
+          {
+            y: '-15%',
             opacity: 1,
             scale: 1,
             zIndex: 100
@@ -599,15 +607,7 @@ const $ = jQuery;
         )
         .to(card,
           {
-            y: '0%',
-            opacity: 1,
-            scale: 1,
-            zIndex: 100
-          }
-        )
-        .to(card,
-          {
-            y: '20%',
+            y: '55%',
             opacity: 0,
             scale: 0.75,
             zIndex: 0,

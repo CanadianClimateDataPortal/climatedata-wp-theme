@@ -574,15 +574,7 @@ const $ = jQuery;
             zIndex: 0,
             ease: 'power2.in'
           }
-        )
-        // .to(card,
-        //   {
-        //     y: '30%',
-        //     opacity: 0,
-        //     scale: 0.75,
-        //     zIndex: 0
-        //   }
-        // );
+        );
       });
 
     };

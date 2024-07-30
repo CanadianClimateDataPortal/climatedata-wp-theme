@@ -219,6 +219,12 @@ p {
     margin-right: 0.5rem;
     opacity: 0.8;
   }
+
+  &-lg {
+    @include media-breakpoint-down(sm) {
+      padding: $input-padding-y-lg $input-padding-x-lg; 
+    }
+  }
 }
 
 .bg {
@@ -441,6 +447,27 @@ $control-slider-handle-width: 2.75rem;
 
 // BREADCRUMB
 
+#header-breadcrumb {
+  overflow-x: auto;
+
+  @include media-breakpoint-up(lg) {
+    overflow-x: visible;
+  }
+
+  .breadcrumb {
+    display: flex;
+    flex-wrap: nowrap;
+
+    li {
+      white-space: nowrap;
+
+      @include media-breakpoint-up(lg) {
+        font-size: 1.25rem;
+      }
+    }
+  }
+}
+
 // CONTROL BAR
 
 .control-bar {
@@ -615,7 +642,8 @@ $control-slider-handle-width: 2.75rem;
   }
 }
 
-#control-bar-secondary {
+#control-bar-secondary,
+#control-bar-tabs-footer {
   a {
     &:hover {
       background-color: $gray-700;
@@ -998,4 +1026,20 @@ $query-card-hover-padding: 0.75rem;
       width: 100%;
     }
   }
+}
+
+//
+// HELPERS
+//
+
+.ratio-3x2 {
+  --bs-aspect-ratio: 66.66667%;
+}
+
+.bg-black-50 {
+  background-color: rgba($black, .5);
+}
+
+.mb-25vh {
+  margin-bottom: 25vh;
 }

@@ -12,7 +12,7 @@ $excerpts = array (
 );
 ?>
 
-<div class="card mb-5 mb-lg-0 shadow scroll-card" data-post-id="<?php echo $item['id'] ?>">
+<div class="card mb-5 shadow scroll-card" data-post-id="<?php echo $item['id'] ?>">
 
     <a href="<?php echo $item['permalink']; ?>">
 

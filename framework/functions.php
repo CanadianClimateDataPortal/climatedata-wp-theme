@@ -262,12 +262,17 @@ function fw_menu_output ( $menu, $level, $type, $classes ) {
 		echo '<li class="';
 
 		if ( isset ( $GLOBALS['vars']['current_url'] ) ) {
-			$url_path = parse_url($GLOBALS['vars']['current_url'], PHP_URL_PATH);
-			$item_path = parse_url($item['url'], PHP_URL_PATH);
+			$current_host = parse_url( $GLOBALS['vars']['current_url'], PHP_URL_HOST );
+			$current_path = parse_url( $GLOBALS['vars']['current_url'], PHP_URL_PATH );
+			$current_url = $current_host . $current_path;
 
-			if ( $url_path == $item_path ) {
+			$item_host = parse_url( $item['url'], PHP_URL_HOST );
+			$item_path = parse_url( $item['url'], PHP_URL_PATH );
+			$item_url =  $item_host . $item_path;
+
+			if ( $current_url == $item_url ) {
 				$is_item_of_current_page = true;
-				echo 'current-nav-item ';
+				echo 'current-nav-item ' . $current_url . ' ';
 			}
 		}
 

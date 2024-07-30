@@ -1,0 +1,88 @@
+{
+    "key": "group_6375151f1f8f5",
+    "title": "IFrame",
+    "fields": [
+        {
+            "key": "field_63751538fc87c",
+            "label": "url",
+            "name": "url",
+            "aria-label": "",
+            "type": "url",
+            "instructions": "",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "wpml_cf_preferences": 3
+        },
+        {
+            "key": "field_63fd46f62b3c9",
+            "label": "Timeout",
+            "name": "timeout_timer",
+            "aria-label": "",
+            "type": "number",
+            "instructions": "This is the number of second(s) for the timeout to wait before checking if the Iframe is correctly mounted\r\n0 = No Timeout\r\n\r\nThe app needs to send a message using window.parent.postMessage(\"\", \"*\"); to cancel the timeout",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "min": "",
+            "max": "",
+            "step": "",
+            "wpml_cf_preferences": 1
+        },
+        {
+            "key": "field_63fd47422b3ca",
+            "label": "Timeout message",
+            "name": "timeout_message",
+            "aria-label": "",
+            "type": "wysiwyg",
+            "instructions": "Message to display in case after the timeout",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 1,
+            "delay": 0,
+            "wpml_cf_preferences": 0
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "page_template",
+                "operator": "==",
+                "value": "tpl-iframe.php"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": false,
+    "description": "",
+    "show_in_rest": false,
+    "acfml_field_group_mode": "advanced",
+    "modified": 1721648347
+}

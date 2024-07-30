@@ -590,7 +590,7 @@ const $ = jQuery;
             scale: 0.75,
             zIndex: 0
           },
-          { 
+          {
             y: '-85%',
             opacity: 0,
             scale: 0.75,

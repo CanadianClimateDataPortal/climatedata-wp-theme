@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-07-17T20:21:46+00:00\n"
+"POT-Creation-Date: 2024-07-30T16:57:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -24,24 +24,36 @@ msgstr ""
 msgid "Phil Evans"
 msgstr ""
 
-#: functions.php:234
+#: functions.php:235
 msgid "days"
 msgstr ""
 
-#: functions.php:235
+#: functions.php:236
 msgid "day of the year"
 msgstr ""
 
-#: functions.php:236
+#: functions.php:237
 msgid "degree days"
 msgstr ""
 
-#: functions.php:237
+#: functions.php:238
 msgid "number of periods"
 msgstr ""
 
-#: functions.php:238
+#: functions.php:239
 msgid "events"
+msgstr ""
+
+#: functions.php:564
+msgid "Display in Learning Zone"
+msgstr ""
+
+#: functions.php:577
+msgid "Yes"
+msgstr ""
+
+#: functions.php:579
+msgid "No"
 msgstr ""
 
 #: resources/functions/ajax.php:153
@@ -95,27 +107,27 @@ msgstr ""
 msgid "Please enter a valid email address."
 msgstr ""
 
-#: resources/functions/rest.php:778
+#: resources/functions/rest.php:777
 msgid "Some required fields are missing."
 msgstr ""
 
-#: resources/functions/rest.php:800
+#: resources/functions/rest.php:799
 msgid "Thanks! We’ve received your inquiry."
 msgstr ""
 
-#: resources/functions/rest.php:801
+#: resources/functions/rest.php:800
 msgid "Please note: we are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays."
 msgstr ""
 
-#: resources/functions/rest.php:803
+#: resources/functions/rest.php:802
 msgid "Something went wrong while sending your message. Please try again later."
 msgstr ""
 
-#: resources/functions/rest.php:812
+#: resources/functions/rest.php:811
 msgid "Your email address has been added to our mailing list. You can unsubscribe at any time."
 msgstr ""
 
-#: resources/functions/rest.php:815
+#: resources/functions/rest.php:814
 msgid "An error occurred while adding your email address to our mailing list."
 msgstr ""
 
@@ -131,8 +143,8 @@ msgstr ""
 msgid "Update ACF Relevant Sectors"
 msgstr ""
 
-#: template/beta-apps/control-bar.php:14
-#: template/beta-apps/control-btns.php:13
+#: template/apps/control-bar-inner.php:12
+#: template/apps/control-btns.php:13
 #: template/download/control-bar.php:94
 #: template/feedback.php:344
 #: template/feedback.php:527
@@ -140,39 +152,39 @@ msgstr ""
 msgid "Feedback"
 msgstr ""
 
-#: template/beta-apps/control-btns.php:10
+#: template/apps/control-btns.php:10
 #: template/download/control-bar.php:54
 #: template/download/controls/area.php:183
 msgid "Details"
 msgstr ""
 
-#: template/beta-apps/modals.php:5
+#: template/apps/modals.php:5
 msgid "About this app"
 msgstr ""
 
-#: template/beta-apps/modals.php:18
+#: template/apps/modals.php:18
 msgid "Close"
 msgstr ""
 
-#: template/beta-apps/modals.php:20
-#: template/beta-apps/modals.php:30
+#: template/apps/modals.php:20
+#: template/apps/modals.php:30
 msgid "Provide Feedback"
 msgstr ""
 
-#: template/beta-apps/modals.php:49
+#: template/apps/modals.php:49
 #: template/feedback.php:264
 #: template/feedback.php:392
 #: template/feedback.php:575
 msgid "Submit Feedback"
 msgstr ""
 
-#: template/beta-apps/query.php:29
+#: template/apps/query.php:29
 #: template/news/query.php:29
 #: template/variable/query.php:29
 msgid "Newest First"
 msgstr ""
 
-#: template/beta-apps/query.php:30
+#: template/apps/query.php:30
 #: template/news/query.php:30
 #: template/variable/query.php:30
 msgid "Oldest First"
@@ -246,6 +258,7 @@ msgstr ""
 
 #: template/download/controls/area.php:56
 #: template/download/controls/data-variable.php:117
+#: template/learn/control-bar.php:77
 #: template/map/controls/data-variable.php:117
 #: template/map/controls/location.php:57
 msgid "Clear"
@@ -1026,27 +1039,30 @@ msgid "Content Type"
 msgstr ""
 
 #: template/learn/control-bar.php:88
-#: template/query/learn-item.php:43
+#: template/query/learn-item.php:60
+#: template/query/resource-home-feature.php:70
 msgid "Video"
 msgstr ""
 
 #: template/learn/control-bar.php:89
-#: template/query/learn-item.php:48
+#: template/query/learn-item.php:65
+#: template/query/resource-home-feature.php:75
 msgid "Audio"
 msgstr ""
 
 #: template/learn/control-bar.php:90
-#: template/query/learn-item.php:53
+#: template/query/learn-item.php:70
+#: template/query/resource-home-feature.php:80
 msgid "Interactive"
 msgstr ""
 
 #: template/learn/control-bar.php:91
-#: template/query/learn-item.php:63
+#: template/query/learn-item.php:80
+#: template/query/resource-home-feature.php:90
 msgid "Article"
 msgstr ""
 
 #: template/learn/control-bar.php:92
-#: template/query/learn-item.php:58
 msgid "Application"
 msgstr ""
 
@@ -1337,7 +1353,7 @@ msgid "Download image"
 msgstr ""
 
 #: template/old-loop/blocks/map.php:227
-#: template/query/learn-item.php:79
+#: template/query/learn-item.php:96
 msgid "Time"
 msgstr ""
 
@@ -1365,8 +1381,17 @@ msgstr ""
 msgid "Select variable"
 msgstr ""
 
-#: template/query/learn-item.php:34
+#: template/query/learn-item.php:51
 msgid "Format"
+msgstr ""
+
+#: template/query/learn-item.php:75
+#: template/query/resource-home-feature.php:85
+msgid "App"
+msgstr ""
+
+#: template/query/learn-item.php:100
+msgid "%s minutes"
 msgstr ""
 
 #: template/query/variable-item.php:94

@@ -72,7 +72,7 @@ $excerpts = array (
 						break;
 					case 'app' :
 						$format_icon = 'far fa-window-maximize';
-						$format_name = __( 'Application', 'cdc' );
+						$format_name = __( 'App', 'cdc' );
 
 						break;
 					default : // Article.
@@ -97,7 +97,7 @@ $excerpts = array (
 
 					<p class="card-asset-time mb-0 text-gray-600 d-flex align-items-center">
 						<?php
-						echo $card_asset_time . ' minutes';
+						echo sprintf( __( '%s minutes', 'cdc' ), $card_asset_time);
 						?>
 					</p>
 				</div>

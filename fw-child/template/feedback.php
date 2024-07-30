@@ -413,7 +413,7 @@
 				aria-controls="apps-support"
 			>
 				<h3 class="col offset-2 mb-0">
-					<?php _e ( 'Apps Support', 'cdc' ); ?>
+					<?php _e ( 'Applications Feedback', 'cdc' ); ?>
 				</h3>
 			</div> 
 		</div>
@@ -471,7 +471,7 @@
 
 								<div class="col">
 									
-									<p class="form-label"><?php _e ( 'Which apps do you need support for?', 'cdc' ); ?></p>
+									<p class="form-label"><?php _e ( 'Which application would you like to provide feedback on?', 'cdc' ); ?></p>
 									
 									<div class="my-2 error-input-parent">
 

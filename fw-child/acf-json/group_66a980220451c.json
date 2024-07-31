@@ -31,30 +31,9 @@
     "location": [
         [
             {
-                "param": "page",
+                "param": "page_template",
                 "operator": "==",
-                "value": "11483"
-            }
-        ],
-        [
-            {
-                "param": "page",
-                "operator": "==",
-                "value": "11485"
-            }
-        ],
-        [
-            {
-                "param": "page",
-                "operator": "==",
-                "value": "11487"
-            }
-        ],
-        [
-            {
-                "param": "page",
-                "operator": "==",
-                "value": "11489"
+                "value": "page-templates\/partners.php"
             }
         ]
     ],
@@ -67,5 +46,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1722438449
+    "modified": 1722439622
 }

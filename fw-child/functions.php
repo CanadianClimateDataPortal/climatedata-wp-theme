@@ -94,7 +94,8 @@ function child_theme_enqueue() {
 	wp_register_style ( 'gutenberg', $child_theme_dir . 'resources/css/gutenberg.css', null, null );
 	wp_enqueue_style ( 'child-style', $child_theme_dir . 'style.css', NULL, NULL, 'all' );
 
-	if ( is_singular ( 'resource' ) ) {
+	// Load WP native styles for resource and interactive posts
+	if ( is_singular ( 'resource' ) || is_singular ( 'interactive' ) ) {
 		wp_enqueue_style ( 'wp-block-library' );
 		wp_enqueue_style ( 'gutenberg' );
 		wp_enqueue_style ( 'global-styles' );
@@ -169,8 +170,8 @@ function child_theme_enqueue() {
 
 	// GSAP
 
-	wp_register_script ( 'gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.3/gsap.min.js', null, '3.3.3', true );
-	wp_register_script ( 'scrolltrigger', 'https://assets.codepen.io/16327/ScrollTrigger.min.js?v=32', array ( 'gsap' ), null, true );
+	wp_register_script ( 'gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js', null, '3.11.5', true );
+	wp_register_script ( 'scrolltrigger', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js', array ( 'gsap' ), '3.11.5', true );
 	wp_register_script ( 'scroll', $child_js_dir . 'scroll.js', array ( 'jquery', 'scrolltrigger' ), '1.1', true );
 
 	// utilities/constants
@@ -251,6 +252,10 @@ function child_theme_enqueue() {
 
 		wp_enqueue_script ( 'webflow', $child_vendor_dir . 'climatedata-scroll.webflow/webflow.js', array ( 'jquery' ), null, true );
 
+		wp_enqueue_script ( 'gsap' );
+		wp_enqueue_script ( 'scrolltrigger' );
+		wp_enqueue_script ( 'scroll' );
+
 	}
 
 	switch ( $GLOBALS['vars']['current_slug'] ) {
@@ -280,14 +285,13 @@ function child_theme_enqueue() {
 			// wp_enqueue_script ( 'tab-drawer' );
 			break;
 
-		case 'beta-apps' :
-		case 'apps-beta' :
+		case 'apps' :
 			wp_enqueue_script ( 'zebra-pin' );
 			break;
 
 	}
 
-	if ( is_singular ( 'beta-app' ) ) {
+	if ( is_singular ( 'app' ) ) {
 		wp_enqueue_script ( 'iframe-functions', $child_js_dir . 'iframe-functions.js', array ( 'jquery' ), null, true );
 	}
 
@@ -462,6 +466,33 @@ add_action ( 'fw_before_footer', function() {
 
 } );
 
+/**
+ * Insert the CookieYes script tag in the head.
+ *
+ * CookieYes does provide a WordPress plugin that automatically includes the required script tag, but it supports only
+ * one ID. Since we use a different domain for each language, and since CookieYes requires a different ID for different
+ * domains, the plugin is replaced by this hook that can insert a different ID for each language (i.e. domain).
+ */
+add_action('wp_head',
+
+	/**
+	 * Output the CookieYes language specific script tag.
+	 *
+	 * The inserted script tag requires an ID in the `cookieyes_id_<lang>` entry in the global 'vars' array. If the
+	 * entry is not defined or empty, no script tag is inserted.
+	 */
+	function () {
+		$lang = $GLOBALS['fw']['current_lang_code'];
+		$id_key = 'cookieyes_id_' . $lang;
+		$cookieyes_id = $GLOBALS['vars'][$id_key] ?? '';
+
+		if ( !empty( $cookieyes_id ) ) {
+			echo '<script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/' . $cookieyes_id . '/script.js"></script>';
+		}
+	},
+	1
+);
+
 //
 // VARIABLES OFFCANVAS
 //
@@ -540,6 +571,25 @@ function cdc_enable_block_editor( $use_block_editor, $post_type ) {
 }
 
 /**
+ * Updates the `interactive` post type arguments to make it public if loaded by the motion.page editor.
+ * 
+ * @param array   $args Array of arguments for registering a post type.
+ * @param string  $post_type Post type key.
+ * 
+ * @return array  Array of arguments for registering a post type.
+ */
+function cdc_make_interactive_cpt_public_for_motion_page( $args, $post_type ) {
+	if ( $post_type === 'interactive' ) {
+		// Check if the request is coming from Motion.page
+		if ( isset( $_GET['motionpage_iframe'] ) && $_GET['motionpage_iframe'] == 'true' ) {
+			$args['public'] = true;
+			$args['publicly_queryable'] = true;
+		}
+	}
+	return $args;
+}
+
+/**
  * Unregisters default taxonomies that are not used.
  *
  * @return void
@@ -570,6 +620,7 @@ add_action ( 'admin_menu', 'remove_comments_admin_menu' );
 add_action ( 'wp_before_admin_bar_render', 'remove_comments_admin_bar' );
 add_filter ( 'use_block_editor_for_post_type', 'cdc_enable_block_editor', 10, 2 );
 add_filter ( 'manage_post_posts_columns', 'cdc_manage_post_columns', 10, 1 );
+add_filter ( 'register_post_type_args', 'cdc_make_interactive_cpt_public_for_motion_page', 10, 2 );
 
 //
 // MISC

@@ -1,4 +1,4 @@
-<div id="beta-app-frame">
+<div id="app-frame">
 
 	<div id='iframe-error' class="initially-hidden bg-danger section-content p-4 text-center"></div>
 	

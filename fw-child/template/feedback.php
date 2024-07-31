@@ -51,8 +51,8 @@
 									</div>
 									
 									<div class="form-text form-check form-check-inline feedback-subscribe">
-										<input class="form-check-input" type="checkbox" value="true" name="signup" id="signup">
-										<label class="form-check-label" for="signup"><?php _e ( 'Subscribe to the ClimateData.ca newsletter', 'cdc' ); ?></label>
+										<input class="form-check-input" type="checkbox" value="true" name="signup" id="online-signup">
+										<label class="form-check-label" for="online-signup"><?php _e ( 'Subscribe to the ClimateData.ca newsletter', 'cdc' ); ?></label>
 									</div>
 									
 								</div>
@@ -290,7 +290,7 @@
 					<?php _e ( 'Dataset Support', 'cdc' ); ?>
 				</h3>
 			</div> 
-		</h2>
+		</div>
 		
 		<div
 			id="dataset-support"
@@ -316,9 +316,17 @@
 								</div>
 								
 								<div class="col">
-									<label for="email" class="form-label"><?php _e ( 'Email Address', 'cdc' ); ?></label>
-								
-									<input type="email" name="email" class="form-control">
+
+									<div class="mb-1">
+										<label for="email" class="form-label"><?php _e ( 'Email Address', 'cdc' ); ?></label>
+										<input type="email" name="email" class="form-control">
+									</div>
+
+									<div class="form-text form-check form-check-inline feedback-subscribe">
+										<input class="form-check-input" type="checkbox" value="true" name="signup" id="data-signup">
+										<label class="form-check-label" for="data-signup"><?php _e ( 'Subscribe to the ClimateData.ca newsletter', 'cdc' ); ?></label>
+									</div>
+
 								</div>
 								
 								<div class="col">
@@ -358,6 +366,189 @@
 													'icon_size' => 16,
 													'input_text' => __ ( 'Enter the characters shown in the image:', 'cdc' ),
 													'namespace' => 'support',
+												);
+												
+												// image
+												echo Securimage::getCaptchaHtml ( $captcha_options, Securimage::HTML_IMG );
+												
+												// refresh
+												echo Securimage::getCaptchaHtml ( $captcha_options, Securimage::HTML_ICON_REFRESH );
+												
+												// audio
+												echo Securimage::getCaptchaHtml ( $captcha_options, Securimage::HTML_AUDIO );
+													
+											?>
+										</div>
+										
+										<div class="">
+											<input type="hidden" name="namespace" value="<?php echo $captcha_options['namespace']; ?>">
+											
+											<label for="captcha_code" class="form-label small"><?php _e ( 'Enter the characters shown in the image', 'cdc' ); ?>:</label>
+											
+											<input type="text" name="captcha_code" id="captcha_code" class="form-control" placeholder="XXXX" size="4" maxlength="4" data-placement="bottom" title="<?php _e ( 'Non-valid entered characters. Please try again.', 'cdc' ); ?>">
+										</div>
+									</div>
+								
+									<button class="submit-btn btn btn-lg btn-primary rounded-pill d-block mx-auto" type="submit" id="feedback-data-submit"><?php _e ( 'Submit Feedback', 'cdc' ); ?> <i class="far fa-arrow-alt-circle-right ms-3"></i></button>	
+									
+								</div>
+								
+							</div>
+						</div>
+						
+					</div>
+					
+				</form>
+				
+			</div> 
+		</div> 
+	</div>
+
+	<div class="accordion-item"> 
+		<div id="accordion-head-apps" class="accordion-header">
+			<div class="accordion-button collapsed row py-4 ps-0" 
+				data-bs-toggle="collapse"
+				data-bs-target="#apps-support" 
+				aria-expanded="false" 
+				aria-controls="apps-support"
+			>
+				<h3 class="col offset-2 mb-0">
+					<?php _e ( 'Applications Feedback', 'cdc' ); ?>
+				</h3>
+			</div> 
+		</div>
+		
+		<div
+			id="apps-support"
+			class="accordion-collapse collapse" 
+			aria-labelledby="accordion-head-apps"
+			data-bs-parent="#feedback-accordion"
+		> 
+			<div class="accordion-body py-6"> 
+				
+				<form id="feedback-apps-form" class="feedback-form needs-validation" novalidate>
+					
+					<input type="hidden" name="feedback-type" value="apps">
+					
+					<div class="row">
+					
+						<div class="col-10 offset-2">
+							<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 pb-4">
+								
+								<div class="col">
+
+									<label for="fullname" class="form-label"><?php _e ( 'Full Name', 'cdc' ); ?></label>
+								
+									<input type="text" name="fullname" class="form-control">
+
+								</div>
+								
+								<div class="col">
+
+									<div class="mb-1">
+										<label for="email" class="form-label"><?php _e ( 'Email Address', 'cdc' ); ?></label>
+										<input type="email" name="email" class="form-control">
+									</div>
+
+									<div class="form-text form-check form-check-inline feedback-subscribe">
+										<input class="form-check-input" type="checkbox" value="true" name="signup" id="app-signup">
+										<label class="form-check-label" for="app-signup"><?php _e ( 'Subscribe to the ClimateData.ca newsletter', 'cdc' ); ?></label>
+									</div>
+
+								</div>
+								
+								<div class="col">
+
+									<label for="organization" class="form-label"><?php _e ( 'Organization', 'cdc' ); ?></label>
+								
+									<input type="text" name="organization" class="form-control">
+
+								</div>
+
+							</div>
+
+							<div class="row pb-6 mb-6 border-bottom">
+
+								<div class="col">
+									
+									<p class="form-label"><?php _e ( 'Which application would you like to provide feedback on?', 'cdc' ); ?></p>
+									
+									<div class="my-2 error-input-parent">
+
+										<?php
+
+											// Query posts from the custom post type 'app'
+											$args = array(
+												'post_type' => 'app',
+												'posts_per_page' => -1,
+											);
+
+											$query = new WP_Query( $args );
+
+											if ( $query->have_posts() ) {
+
+												while ( $query->have_posts() ) {
+
+													$query->the_post();
+													$post_id = get_the_ID();
+													$post_title = get_the_title();
+													$post_slug = sanitize_title_with_dashes( $post_title );
+
+										?>
+													
+										<div class="form-check form-check-inline">
+
+											<input class="form-check-input" type="checkbox" name="apps-posts[]" id="app-type-<?php echo $post_slug ?>" value="<?php echo $post_slug ?>">
+
+											<label class="form-check-label" for="app-type-<?php echo $post_slug ?>"><?php echo $post_title ?></label>
+
+										</div>
+
+										<?php
+
+												}
+												
+											}
+
+											wp_reset_postdata();
+
+										?>
+
+									</div>
+									
+								</div>
+								
+							</div>
+						
+							<div class="row row-cols-1 row-cols-lg-2 g-4">
+						
+								<div class="col d-flex flex-column">
+								
+									<label for="feedback" class="form-label"><?php _e ( 'Feedback', 'cdc' ); ?></label>
+									
+									<textarea name="feedback" rows="12" class="form-control flex-grow-1"></textarea>
+									
+								</div>
+								
+								<div class="col bg-light p-4 align-self-end">
+									
+									<div class="alert-container" style="display: none;">
+										<h5 class="alert-header"></h5>
+										<ul class="alert-messages"></ul>
+									</div>
+									
+									<div class="d-flex align-items-center mb-4">
+										<div class="captcha-img">
+											<?php
+											
+												$captcha_options = array (
+													'code_length' => 4,
+													'input_name' => 'apps_captcha_code',
+													'input_id' => 'apps_captcha',
+													'image_id' => 'apps_captcha_img',
+													'icon_size' => 16,
+													'input_text' => __ ( 'Enter the characters shown in the image:', 'cdc' ),
+													'namespace' => 'apps',
 												);
 												
 												// image

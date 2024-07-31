@@ -280,6 +280,7 @@ const $ = jQuery;
 
     // Functionalities for variable archive page.
     if ($( '.variable-archive-page' ).length > 0) {
+      let isFirstPageLoad = true;
       $( document ).on( 'fw_query_success', function ( e, query_item ) {
         const query_items = query_item.find( '.fw-query-items' );
 
@@ -365,7 +366,14 @@ const $ = jQuery;
                   .trigger( 'click' );
               } );
           }
+        } else if ( !isFirstPageLoad ) {
+          // Scroll to the top of the results if not first page load
+          const scroll_top = $('.query-page').position().top;
+
+          $( 'html, body' ).animate( {scrollTop: scroll_top}, 10, 'swing' );
         }
+
+        isFirstPageLoad = false;
       } );
 
       $( document ).on( 'fw_fd_open', function ( e, drawer_item ) {

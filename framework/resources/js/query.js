@@ -531,7 +531,7 @@
 			
 			if (options.debug == true) console.log('do query')
 			
-			// console.log('options', options.item_options)
+			console.log('options', options)
 			
 			let rest_url = ajax_data.rest_url + 'framework/v2/query'
 			
@@ -550,7 +550,7 @@
 				},
 				success: function(data) {
 					
-					// console.log(data)
+					console.log(data)
 					
 					if (data.success == true) {
 						
@@ -616,10 +616,6 @@
 					
 					$(document).trigger('fw_query_success', [item]);
 
-					// Scroll to the top of the results.
-					const scroll_top = $('.query-page').position().top;
-
-					$( 'html, body' ).animate( {scrollTop: scroll_top}, 10, 'swing' );
 				}
 			})
 			

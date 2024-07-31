@@ -72,7 +72,7 @@
 				<div class="tab-drawer-content stick">
 					<div class="tab-drawer-content-inner">
 						<div class="control-tab-head d-flex justify-content-between align-items-center">
-							<h5 class="me-auto mb-0 text-secondary"><?php _e ( 'Filters', 'cdc' ); ?></h5>
+							<h5 class="me-auto mb-0 text-secondary lh-base"><?php _e ( 'Filters', 'cdc' ); ?></h5>
 
 							<button class="fw-query-reset btn btn-sm btn-gray-400 p-1 me-2" style="display: none;"><?php _e ( 'Clear', 'cdc' ); ?></button>
 
@@ -89,7 +89,7 @@
 									<li class="filter-item" data-key="asset_type" data-value="audio"><?php _e ( 'Audio', 'cdc' ); ?></li>
 									<li class="filter-item" data-key="asset_type" data-value="interactive"><?php _e ( 'Interactive', 'cdc' ); ?></li>
 									<li class="filter-item" data-key="asset_type" data-value="article"><?php _e ( 'Article', 'cdc' ); ?></li>
-									<li class="filter-item" data-key="asset_type" data-value="app"><?php _e ( 'Application', 'cdc' ); ?></li>
+									<li class="filter-item" data-key="asset_type" data-value="app"><?php _e ( 'App', 'cdc' ); ?></li>
 								</ul>
 							</div>
 							
@@ -125,10 +125,16 @@
 									<?php
 									
 										foreach ( $all_tags as $tag ) {
+
+											if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
+												$tag_name = get_field( 'admin_term_title_' . $GLOBALS['fw']['current_lang_code'], $tag );
+											} else {
+												$tag_name = $tag->name;
+											}
 											
 									?>
 									
-									<li class="filter-item" data-key="<?php echo $filter_tax; ?>" data-value="<?php echo $tag->slug; ?>"><?php echo $tag->name; ?></li>
+									<li class="filter-item" data-key="<?php echo $filter_tax; ?>" data-value="<?php echo $tag->slug; ?>"><?php echo $tag_name; ?></li>
 									
 									<?php
 									

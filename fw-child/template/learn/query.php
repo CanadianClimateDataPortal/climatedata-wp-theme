@@ -73,7 +73,7 @@
 			?>
 
 			<div class="fw-query-items-no-matches py-7" style="display: none;">
-				<p class="alert alert-warning">No items found.</p>
+				<p class="alert alert-warning"><?php _e ( 'No items found.', 'cdc' ); ?></p>
 			</div>
 		</div>
 	</div>

@@ -955,7 +955,7 @@ msgstr "Filtres"
 
 #: template/learn/control-bar.php:85
 msgid "Content Type"
-msgstr ""
+msgstr "Type de contenu"
 
 #: template/learn/control-bar.php:88
 #: template/query/learn-item.php:60
@@ -1394,9 +1394,6 @@ msgid "Init LZ meta"
 msgstr ""
 
 #: template/learn/control-bar.php:92
-msgid "Application"
-msgstr ""
-
 #: template/query/learn-item.php:75
 #: template/query/resource-home-feature.php:85
 msgid "App"
@@ -1405,3 +1402,7 @@ msgstr ""
 #: template/query/learn-item.php:100
 msgid "%s minutes"
 msgstr ""
+
+#: template/learn/query.php:76
+msgid "No items found."
+msgstr "Aucun item trouvé."

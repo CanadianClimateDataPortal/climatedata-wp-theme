@@ -1550,7 +1550,7 @@
 								// let new_html = $(loop_data.replaceAll(source_ID, options.globals.current_query.ID))
 								
 								// find first non-autogen element
-								let new_html = $(loop_data).find('.fw-element:not(.fw-page):not(.fw-auto-generated').first().prop('outerHTML') + $(loop_data).find('.fw-element:not(.fw-page):not(.fw-auto-generated').first().nextAll().prop('outerHTML')
+								let new_html = $(loop_data).find('.fw-element:not(.fw-page):not(.fw-auto-generated)').first().prop('outerHTML') + $(loop_data).find('.fw-element:not(.fw-page):not(.fw-auto-generated)').first().nextAll().prop('outerHTML')
 								
 								// console.log('new_html')
 								// console.log(new_html)
@@ -4871,8 +4871,7 @@
 					action: 'fw_update_post',
 					globals: options.globals,
 					post_id: options.post_id,
-					builder: options.page,
-					builder_string: JSON.stringify(options.page)
+					builder: JSON.stringify(options.page),
 				},
 				success: function(data) {
 					console.log(data)

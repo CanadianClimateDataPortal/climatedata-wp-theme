@@ -1,3 +1,11 @@
+<?php
+
+//
+// Display social network links.
+//
+
+?>
+
 <div class="social-networks">
     <ul>
         <?php

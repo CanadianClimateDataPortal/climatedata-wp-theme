@@ -373,16 +373,22 @@
 //
 .social-networks {
   margin-top: 1.25rem;
+  border-top: 1px solid $gray-400;
 
   ul {
-    list-style: none;
+    padding-top: 1rem;
     padding-left: 0;
+    list-style: none;
   }
 
   li {
     display: inline-block;
     font-size: 1.25rem;
-    margin-right: 1.25rem;
+    margin-right: .25rem;
+
+    a {
+      padding: .375rem;
+    } 
 
     &:last-child {
       margin-right: 0;

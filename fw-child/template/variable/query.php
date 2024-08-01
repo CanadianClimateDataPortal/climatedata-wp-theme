@@ -38,30 +38,37 @@ $is_fr = 'fr' === $current_lang;
 	
 	<div class="col-13 offset-1">
 		<div class="tab-drawer-bumper">
+
+			<?php
+				$sort_asc = 'title_asc';
+				$sort_desc = 'title_desc';
+
+				$variables_args = array(
+					'posts_per_page' => -1,
+					'post_type'      => 'variable',
+					'post_parent'    => 0,
+					'post_status'    => 'publish',
+					'orderby'        => 'title',
+					'order'          => 'asc'
+				);
+
+				if ( $is_fr ) {
+					$sort_asc = 'meta_value_asc';
+					$sort_desc = 'meta_value_desc';
+
+					$variables_args['meta_key'] = 'title_fr';
+					$variables_args['orderby']  = 'meta_value';
+				}
+			?>
+
 			<div class="pt-6">
 				
 				<ul id="sort-menu" class="fw-query-sort list-unstyled d-flex all-caps">
-					<li class="selected me-4" data-sort="title_asc"><i class="fas fa-arrow-up me-2"></i> <?php _e ( 'Name (A–Z)', 'cdc' ); ?></li>
-					<li data-sort="title_desc"><i class="fas fa-arrow-down me-2"></i> <?php _e ( 'Name (Z–A)', 'cdc' ); ?></li>
+					<li class="selected me-4" data-sort="<?php echo $sort_asc; ?>"><i class="fas fa-arrow-up me-2"></i> <?php _e ( 'Name (A–Z)', 'cdc' ); ?></li>
+					<li data-sort="<?php echo $sort_desc; ?>"><i class="fas fa-arrow-down me-2"></i> <?php _e ( 'Name (Z–A)', 'cdc' ); ?></li>
 				</ul>
 				
 			</div>
-
-			<?php
-			$variables_args = array(
-				'posts_per_page' => -1,
-				'post_type'      => 'variable',
-				'post_parent'    => 0,
-				'post_status'    => 'publish',
-				'orderby'        => 'title',
-				'order'          => 'asc'
-			);
-
-			if ( $is_fr ) {
-				$variables_args['meta_key'] = 'title_fr';
-				$variables_args['orderby']  = 'meta_value';
-			}
-			?>
 
 			<div id="variable-grid" class="py-6" data-args='<?php echo json_encode ( $variables_args ); ?>'>
 				

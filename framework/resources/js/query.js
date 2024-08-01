@@ -208,18 +208,21 @@
 			if (options.elements.sort != null) {
 				options.elements.sort.on('click', 'li', function(e) {
 					
-					let sort = $(this).attr('data-sort').split('_')
+					let dataSort = $(this).attr('data-sort');
+					let lastUnderscoreIndex = dataSort.lastIndexOf('_');
 					
-					options.args.orderby = sort[0]
-					options.args.order = sort[1]
+					let orderby = dataSort.substring(0, lastUnderscoreIndex);
+					let order = dataSort.substring(lastUnderscoreIndex + 1);
 					
-					options.elements.sort.find('li').removeClass('selected')
-					$(this).addClass('selected')
+					options.args.orderby = orderby;
+					options.args.order = order;
 					
-					plugin.do_query()
+					options.elements.sort.find('li').removeClass('selected');
+					$(this).addClass('selected');
 					
-				})
-			}
+					plugin.do_query();
+				});
+			}			
 			
 			// pagination
 			
@@ -531,7 +534,7 @@
 			
 			if (options.debug == true) console.log('do query')
 			
-			console.log('options', options)
+			// console.log('options', options)
 			
 			let rest_url = ajax_data.rest_url + 'framework/v2/query'
 			
@@ -550,7 +553,7 @@
 				},
 				success: function(data) {
 					
-					console.log(data)
+					// console.log(data)
 					
 					if (data.success == true) {
 						

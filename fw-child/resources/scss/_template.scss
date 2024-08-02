@@ -297,14 +297,14 @@
 
   @include media-breakpoint-up(lg) {
     &::after {
-      background-color: $gray-900;
       content: '';
       display: block;
       height: 100%;
       position: absolute;
-      right: -.75rem;
+      right: -.125rem;
       top: 0;
       width: 1px;
+      background-color: $gray-400;
     }
   }
 
@@ -355,12 +355,29 @@
     padding: 0;
   }
 
+  & > ul {
+    padding-top: .75rem;
+  }
+
+  li {
+    margin-bottom: .75rem;
+
+    li:first-child {
+      padding-top: .75rem;
+    }
+
+    li:last-child {
+      margin-bottom: 0;
+    }
+  }
+
   a {
     color: $gray-900;
     display: inline-block;
     font-size: 1.125rem;
-    padding: .125rem 0 .125rem .5rem;
+    padding: .125rem .125rem .125rem .5rem;
     width: 100%;
+    line-height: 1.25;
 
     &:hover {
       text-decoration: none;

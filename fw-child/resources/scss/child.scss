@@ -441,6 +441,10 @@ $control-slider-handle-width: 2.75rem;
   }
 
   .hero-side-image {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+
     img {
       width: 100%;
       max-width: 21.875rem;

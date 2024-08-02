@@ -1791,16 +1791,16 @@ body.tab-drawer-open {
 //
 .regional-partners {
   .partner-wrapper {
-    align-items: center;
-    border: 1px solid $blue-200;
-    border-radius: 2px;
     display: flex;
     flex-direction: column;
-    height: 15.625rem;
     justify-content: center;
-    max-width: 22.5rem;
-    padding: 1.25rem;
+    align-items: center;
     width: 100%;
+    max-width: 22.5rem;
+    height: 15.625rem;
+    padding: 1.25rem;
+    border-radius: 4px;
+    box-shadow: 4px 4px 16px rgb(0 0 0 / 5%);
   }
 
   img {

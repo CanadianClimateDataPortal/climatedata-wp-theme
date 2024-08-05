@@ -1,7 +1,8 @@
 <?php
 
 //
-// Display image on the side of the regional partners hero.
+// A template to insert an image in a hero.
+// The image is from the field "hero_side_image"
 //
 
 $image = get_field( 'hero_side_image' );

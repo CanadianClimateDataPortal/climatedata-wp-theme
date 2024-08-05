@@ -36,7 +36,7 @@
 
             if ( is_user_logged_in() ) {
 
-                foreach ( $social_networks as $network => $icon ) {
+                foreach ( array_keys( $social_networks ) as $network ) {
                     $field_value = get_field( 'social_link_' . $network );
 
                     if ( empty( $field_value ) ) {

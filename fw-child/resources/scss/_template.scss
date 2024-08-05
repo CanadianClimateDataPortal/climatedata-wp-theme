@@ -313,6 +313,10 @@
     flex-wrap: nowrap;
     justify-content: space-between;
     width: 100%;
+
+    a {
+      padding-right: .125rem;
+    }
   }
 
   .button-expand {
@@ -375,25 +379,22 @@
     color: $gray-900;
     display: inline-block;
     font-size: 1.125rem;
-    padding: .125rem .125rem .125rem .5rem;
+    padding: .125rem 1rem .125rem .5rem;
     width: 100%;
     line-height: 1.25;
 
     &:hover {
+      color: $red;
       text-decoration: none;
     }
   }
 }
 
 //
-// ABOUT US SOCIAL NETWORKS
+// SOCIAL NETWORKS
 //
 .social-networks {
-  margin-top: 1.25rem;
-  border-top: 1px solid $gray-400;
-
   ul {
-    padding-top: 1rem;
     padding-left: 0;
     list-style: none;
   }

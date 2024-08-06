@@ -208,11 +208,11 @@
 			if (options.elements.sort != null) {
 				options.elements.sort.on('click', 'li', function(e) {
 					
-					let dataSort = $(this).attr('data-sort');
-					let lastUnderscoreIndex = dataSort.lastIndexOf('_');
+					const dataSort = $(this).attr('data-sort');
+					const lastUnderscoreIndex = dataSort.lastIndexOf('_');
 					
-					let orderby = dataSort.substring(0, lastUnderscoreIndex);
-					let order = dataSort.substring(lastUnderscoreIndex + 1);
+					const orderby = dataSort.substring(0, lastUnderscoreIndex);
+					const order = dataSort.substring(lastUnderscoreIndex + 1);
 					
 					options.args.orderby = orderby;
 					options.args.order = order;
@@ -222,7 +222,7 @@
 					
 					plugin.do_query();
 				});
-			}			
+			}
 			
 			// pagination
 			
@@ -533,8 +533,6 @@
 					item = plugin.item
 			
 			if (options.debug == true) console.log('do query')
-			
-			// console.log('options', options)
 			
 			let rest_url = ajax_data.rest_url + 'framework/v2/query'
 			

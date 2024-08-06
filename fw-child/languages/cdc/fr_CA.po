@@ -1393,10 +1393,10 @@ msgstr "Pour quelle application souhaitez-vous nous faire un retour ?"
 msgid "App"
 msgstr "Application"
 
-#: template/variable/query.php:44
+#: template/variable/query.php:67
 msgid "Name (A–Z)"
 msgstr "Nom (A-Z)"
 
-#: template/variable/query.php:45
+#: template/variable/query.php:68
 msgid "Name (Z–A)"
 msgstr "Nom (Z-A)"

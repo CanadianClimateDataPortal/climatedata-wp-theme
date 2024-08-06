@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-07-31T13:39:31+00:00\n"
+"POT-Creation-Date: 2024-08-06T13:58:31+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -1389,10 +1389,10 @@ msgstr ""
 msgid "Relevant Sectors"
 msgstr ""
 
-#: template/variable/query.php:44
+#: template/variable/query.php:67
 msgid "Name (A–Z)"
 msgstr ""
 
-#: template/variable/query.php:45
+#: template/variable/query.php:68
 msgid "Name (Z–A)"
 msgstr ""

@@ -351,14 +351,14 @@ const $ = jQuery;
         /**
          * Auto-scroll and open variable details if a variable hash exists.
          */
-        if (window.location.hash) {
+        if ( window.location.hash ) {
           const variable_element = $( window.location.hash );
-
-          if (variable_element.length > 0) {
+        
+          if ( variable_element.length > 0 ) {
             const scroll_top = variable_element.parent().position().top;
-
+        
             $( 'html, body' )
-              .animate( {scrollTop: scroll_top}, 10, 'swing' )
+              .animate( { scrollTop: scroll_top }, 10, 'swing' )
               .promise()
               .done( function () {
                 variable_element
@@ -368,10 +368,10 @@ const $ = jQuery;
           }
         } else if ( !isFirstPageLoad ) {
           // Scroll to the top of the results if not first page load
-          const scroll_top = $('.query-page').position().top;
-
-          $( 'html, body' ).animate( {scrollTop: scroll_top}, 10, 'swing' );
-        }
+          const scroll_top = $( '.query-page' ).position().top;
+        
+          $( 'html, body' ).animate( { scrollTop: scroll_top }, 10, 'swing' );
+        }        
 
         isFirstPageLoad = false;
       } );

@@ -328,7 +328,7 @@
         //
         //
 
-        var idf_layer, station_layer, highlight, highlight2, currentSector, colormap;
+        var idf_layer, bdv_layer, station_layer, highlight, highlight2, currentSector, colormap;
         //
         // var has_mapRight = false,
         //     grid_initialized = false;
@@ -715,6 +715,65 @@
 
             if (query['var'] == 'idf') {
                 idf_layer.addTo(map1);
+            }
+
+        });
+
+        function bdv_popup_markup(properties) {
+            return `<div class="idf-popup-row">
+              <h5 class="idfTitle">${properties.Location}</h5>
+              </div>
+              <div class="idf-popup-row">
+                  <h6 >
+                    <a href="${data_url}/fileserver/bdv/${current_lang}/${properties.filename[current_lang]}" target="_blank">${T('View/Download')}</a>
+                  </h6>
+              </div>`;
+        }
+
+        $.getJSON(data_url + '/fileserver/bdv/bdv.json', function (data) {
+
+
+            bdv_layer = L.geoJson(data, {
+                onEachFeature: function (feature, layer) {
+                    layer.bindPopup(bdv_popup_markup(feature.properties));
+                },
+                /*
+                 * When each feature is load{
+                 maxWidth: "auto"
+                 }ed from the GeoJSON this
+                 * function is called. Here we create a cicle marker
+                 * for the feature and style the circle marker.
+                 */
+                pointToLayer: function (feature, latlng) {
+
+                    return L.circleMarker(latlng, {
+                        // Stroke properties
+                        color: '#FFF',
+                        opacity: 1,
+                        weight: 2,
+
+                        pane: 'idf',
+                        // Fill properties
+                        fillColor: '#3869f6',
+                        fillOpacity: 1,
+
+                        radius: 5
+                    });
+                }
+            }).on('mouseover', function (e) {
+                e.layer.bindTooltip(e.layer.feature.properties.Location).openTooltip(e.latlng);
+            }).on('click', function (e) {
+
+                e.layer.bindPopup(bdv_popup_markup(e.layer.feature.properties));
+
+                e.layer.bindPopup(getIDFLinks(e.layer.feature.properties.ID, '.idfBody', 'variable-download-idf-curves'), {
+                    maxWidth: 300
+                });
+
+            });
+
+            if (query['var'] == 'bdv') {
+                bdv_layer.addTo(map1);
             }
 
         });
@@ -1925,7 +1984,9 @@
                                 // console.log("REMOVE STATION LAYER")
                                 map1.removeLayer(station_layer).closePopup();
                             }
-
+                            if (typeof bdv_layer !== 'undefined') {
+                                map1.removeLayer(bdv_layer).closePopup();
+                            }
                         } else if (settings.station === 'weather-stations') {
 
 
@@ -1937,7 +1998,22 @@
                             if (typeof idf_layer !== 'undefined') {
                                 map1.removeLayer(idf_layer).closePopup();
                             }
+                            if (typeof bdv_layer !== 'undefined') {
+                                map1.removeLayer(bdv_layer).closePopup();
+                            }
+                        } else if (settings.station === 'bdv') {
+                            if (typeof bdv_layer !== 'undefined') {
+                                map1.addLayer(bdv_layer);
+                            }
 
+                            if (typeof idf_layer !== 'undefined') {
+                                map1.removeLayer(idf_layer).closePopup();
+                            }
+
+                            if (typeof station_layer !== 'undefined') {
+                                // console.log("REMOVE STATION LAYER")
+                                map1.removeLayer(station_layer).closePopup();
+                            }
                         }
 
                         // disable filters
@@ -1972,7 +2048,9 @@
                         if (typeof idf_layer !== 'undefined' && idf_layer !== null) {
                             map1.removeLayer(idf_layer).closePopup();
                         }
-
+                        if (typeof bdv_layer !== 'undefined' && bdv_layer !== null) {
+                            map1.removeLayer(bdv_layer).closePopup();
+                        }
                         if (typeof station_layer !== 'undefined' && station_layer !== null) {
                             map1.removeLayer(station_layer).closePopup();
                         }

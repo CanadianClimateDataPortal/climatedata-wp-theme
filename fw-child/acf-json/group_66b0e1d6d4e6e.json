@@ -65,6 +65,25 @@
                     "parent_repeater": "field_66b0e1f299646"
                 },
                 {
+                    "key": "field_66b0fdef1ed51",
+                    "label": "English",
+                    "name": "",
+                    "aria-label": "",
+                    "type": "tab",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "placement": "top",
+                    "endpoint": 0,
+                    "selected": 0,
+                    "parent_repeater": "field_66b0e1f299646"
+                },
+                {
                     "key": "field_66b0e2f99964a",
                     "label": "LinkedIn",
                     "name": "linkedin",
@@ -74,7 +93,7 @@
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
-                        "width": "51",
+                        "width": "",
                         "class": "",
                         "id": ""
                     },
@@ -92,7 +111,7 @@
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
-                        "width": "51",
+                        "width": "",
                         "class": "",
                         "id": ""
                     },
@@ -110,7 +129,7 @@
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
-                        "width": "51",
+                        "width": "",
                         "class": "",
                         "id": ""
                     },
@@ -128,7 +147,7 @@
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
-                        "width": "51",
+                        "width": "",
                         "class": "",
                         "id": ""
                     },
@@ -146,7 +165,98 @@
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
-                        "width": "50",
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "placeholder": "",
+                    "parent_repeater": "field_66b0e1f299646"
+                },
+                {
+                    "key": "field_66b352bb78885",
+                    "label": "French",
+                    "name": "",
+                    "aria-label": "",
+                    "type": "tab",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "placement": "top",
+                    "endpoint": 0,
+                    "selected": 0,
+                    "parent_repeater": "field_66b0e1f299646"
+                },
+                {
+                    "key": "field_66b352d678886",
+                    "label": "LinkedIn",
+                    "name": "linkedin_fr",
+                    "aria-label": "",
+                    "type": "url",
+                    "instructions": "Enter the url of the LinkedIn page",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "placeholder": "",
+                    "parent_repeater": "field_66b0e1f299646"
+                },
+                {
+                    "key": "field_66b352d978887",
+                    "label": "Instagram",
+                    "name": "instagram_fr",
+                    "aria-label": "",
+                    "type": "url",
+                    "instructions": "Enter the url of the Instagram page",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "placeholder": "",
+                    "parent_repeater": "field_66b0e1f299646"
+                },
+                {
+                    "key": "field_66b352dc78888",
+                    "label": "Facebook",
+                    "name": "facebook_fr",
+                    "aria-label": "",
+                    "type": "url",
+                    "instructions": "Enter the url of the Facebook page",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "placeholder": "",
+                    "parent_repeater": "field_66b0e1f299646"
+                },
+                {
+                    "key": "field_66b352e078889",
+                    "label": "SoundCloud",
+                    "name": "soundcloud_fr",
+                    "aria-label": "",
+                    "type": "url",
+                    "instructions": "Enter the url of the SoundCloud page",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
                         "class": "",
                         "id": ""
                     },
@@ -156,29 +266,11 @@
                 },
                 {
                     "key": "field_66b0e41499650",
-                    "label": "X (twitter) - FR",
+                    "label": "X (twitter)",
                     "name": "x-twitter_fr",
                     "aria-label": "",
                     "type": "url",
-                    "instructions": "Enter the url of the french X (twitter) page",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "50",
-                        "class": "",
-                        "id": ""
-                    },
-                    "default_value": "",
-                    "placeholder": "",
-                    "parent_repeater": "field_66b0e1f299646"
-                },
-                {
-                    "key": "field_66b0fdef1ed51",
-                    "label": "",
-                    "name": "",
-                    "aria-label": "",
-                    "type": "text",
-                    "instructions": "",
+                    "instructions": "Enter the url of the X (twitter) page",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -187,10 +279,7 @@
                         "id": ""
                     },
                     "default_value": "",
-                    "maxlength": "",
                     "placeholder": "",
-                    "prepend": "",
-                    "append": "",
                     "parent_repeater": "field_66b0e1f299646"
                 }
             ]
@@ -214,5 +303,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1722875534
+    "modified": 1723028429
 }

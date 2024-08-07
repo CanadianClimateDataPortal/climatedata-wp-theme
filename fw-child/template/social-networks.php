@@ -43,20 +43,41 @@ if (
                         // Find the matching group
                         if ( $group['slug'] === $social_links_slug ) {
 
-                            // Loop through the Social networks icons
+                            // Loop through the social networks icons
                             foreach ( $social_networks as $network => $icon ) {
 
-                                // Check if a URL exist for each social network and echo the icon and link
-                                if ( isset( $group[$network] ) && !empty( $group[$network] ) ) {
+                                $network_url = '';
 
-                                    $network_url = $group[$network];
+                                // Check if current language is different from English
+                                if ( $current_lang != 'en' ) {
 
-                                    // If language is not english, look for an existing language custom field
-                                    if ( $current_lang != 'en' && array_key_exists( $network . '_' . $current_lang, $group ) ) {
+                                    // Determine the key for the current language
+                                    $lang_key = $network . '_' . $current_lang;
 
-                                        $network_url = $group[$network . '_' . $current_lang];
+                                    // Check if a URL exists for the current language and default to English if not available
+                                    if ( isset( $group[$lang_key] ) && !empty( $group[$lang_key] ) ) {
+
+                                        $network_url = $group[$lang_key];
+
+                                    } elseif ( isset( $group[$network] ) && !empty( $group[$network] ) ) {
+
+                                        $network_url = $group[$network];
 
                                     }
+
+                                // If current language is English
+                                } else {
+
+                                    if ( isset( $group[$network] ) && !empty( $group[$network] ) ) {
+
+                                        $network_url = $group[$network];
+
+                                    }
+
+                                }
+
+                                // Output the social network icon and link if a URL is available
+                                if ( !empty( $network_url ) ) {
 
         ?>
 

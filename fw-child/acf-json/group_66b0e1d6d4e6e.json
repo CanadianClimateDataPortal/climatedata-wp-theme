@@ -175,7 +175,7 @@
                 },
                 {
                     "key": "field_66b352bb78885",
-                    "label": "French",
+                    "label": "Français",
                     "name": "",
                     "aria-label": "",
                     "type": "tab",
@@ -303,5 +303,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1723028429
+    "modified": 1723030477
 }

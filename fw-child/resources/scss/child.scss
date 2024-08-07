@@ -621,7 +621,7 @@ $control-slider-handle-width: 2.75rem;
         min-height: 100vh;
 
         .tab-drawer-content-inner {
-          min-height: 100vh;
+          height: 100vh;
         }
       }
     }
@@ -709,13 +709,9 @@ $control-slider-handle-width: 2.75rem;
     font-size: 1rem;
   }
 
-  .fw-query-filter-reset {
-    color: $gray-600;
-    transition: 0.25s;
-
-    &:hover {
-      color: $secondary;
-    }
+  .fw-query-reset {
+    line-height: 0.75rem;
+    padding: 0.15rem 0.25rem;
   }
 
   .filter-item {

@@ -6,12 +6,12 @@
 	
 	
 		<iframe
-			data-src="<?php echo get_field ( 'app_url' ); ?>"
+			data-src="<?php echo fw_get_field ( 'app_url' ); ?>"
 			id="i_frame"
 			title="iframe"
 			allow="fullscreen"
-			data-timeout="<?php echo get_field ( 'timeout_timer' ); ?>"
-			data-timeout-message="<?php echo htmlspecialchars ( get_field ( 'timeout_message' ) ); ?>"
+			data-timeout="<?php echo get_field ( 'timeout' ); ?>"
+			data-timeout-message="<?php echo htmlspecialchars ( fw_get_field ( 'timeout_message' ) ); ?>"
 		></iframe>
 	
 

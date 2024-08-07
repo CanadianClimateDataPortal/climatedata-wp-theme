@@ -344,8 +344,8 @@ function cdc_variable_update_tax_sector_terms( $post_id ) {
 	$relevant_sectors = get_field( 'relevant_sectors', $post_id );
 
 	// Check if relevant sectors are available.
-	if ( ! is_array( $relevant_sectors ) || empty( $relevant_sectors ) ) {
-		return;
+	if ( empty( $relevant_sectors ) ) {
+		$relevant_sectors = array();
 	}
 
 	// Extract term IDs from the relevant sectors.

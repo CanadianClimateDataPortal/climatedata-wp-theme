@@ -1,8 +1,9 @@
 <?php
 
-//
-// Display social network links.
-//
+/**
+ * Display social network links.
+ */
+
 $current_lang = 'en';
 
 if (
@@ -55,11 +56,11 @@ if (
                                     $lang_key = $network . '_' . $current_lang;
 
                                     // Check if a URL exists for the current language and default to English if not available
-                                    if ( isset( $group[$lang_key] ) && !empty( $group[$lang_key] ) ) {
+                                    if ( !empty( $group[$lang_key] ) ) {
 
                                         $network_url = $group[$lang_key];
 
-                                    } elseif ( isset( $group[$network] ) && !empty( $group[$network] ) ) {
+                                    } elseif ( !empty( $group[$network] ) ) {
 
                                         $network_url = $group[$network];
 
@@ -68,7 +69,7 @@ if (
                                 // If current language is English
                                 } else {
 
-                                    if ( isset( $group[$network] ) && !empty( $group[$network] ) ) {
+                                    if ( !empty( $group[$network] ) ) {
 
                                         $network_url = $group[$network];
 

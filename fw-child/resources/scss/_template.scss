@@ -293,23 +293,42 @@
 //
 
 .hierarchical-menu {
+  position: relative;
+
+  @include media-breakpoint-up(lg) {
+    &::after {
+      content: '';
+      display: block;
+      height: 100%;
+      position: absolute;
+      right: -.125rem;
+      top: 0;
+      width: 1px;
+      background-color: $gray-400;
+    }
+  }
+
   .collapsible-item {
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
     width: 100%;
+
+    a {
+      padding-right: .125rem;
+    }
   }
 
   .button-expand {
     background-color: transparent;
     border: none;
-    color: $primary;
+    color: $gray-900;
     display: inline-block;
     padding: .375rem .5rem;
     transition: background-color .15s, color .15s;
 
     &:hover {
-      background-color: $primary;
+      background-color: $gray-900;
       color: $white;
     }
 
@@ -326,13 +345,24 @@
   }
 
   .current-nav-link {
-    color: var(--bs-link-hover-color);
+    font-weight: $font-weight-bold;
   }
 
   .submenu {
-    border-left: 1px solid $gray-400;
+    position: relative;
     padding-left: .75rem;
     width: 100%;
+    
+    &::before {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: calc(100% - .75rem);
+      border-left: 1px solid $gray-400;
+    }
   }
 
   ul {
@@ -340,10 +370,58 @@
     padding: 0;
   }
 
+  & > ul {
+    padding-top: .75rem;
+  }
+
+  li {
+    margin-bottom: .75rem;
+
+    li:first-child {
+      padding-top: .75rem;
+    }
+
+    li:last-child {
+      margin-bottom: 0;
+    }
+  }
+
   a {
+    color: $gray-900;
     display: inline-block;
     font-size: 1.125rem;
-    padding: .125rem 0 .125rem .5rem;
+    padding: .125rem 1rem .125rem .5rem;
     width: 100%;
+    line-height: 1.25;
+
+    &:hover {
+      color: $red;
+      text-decoration: none;
+    }
+  }
+}
+
+//
+// SOCIAL NETWORKS
+//
+
+.social-networks {
+  ul {
+    padding-left: 0;
+    list-style: none;
+  }
+
+  li {
+    display: inline-block;
+    font-size: 1.25rem;
+    margin-right: .25rem;
+
+    a {
+      padding: .375rem;
+    } 
+
+    &:last-child {
+      margin-right: 0;
+    }
   }
 }

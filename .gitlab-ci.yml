@@ -2,12 +2,16 @@ default:
   tags:
     - runner_CRIM
 
-build-job:
-  stage: build
-  script:
-    - echo "Hello, $GITLAB_USER_LOGIN!"
-
 test-job1:
   stage: test
   script:
     - echo "This job tests something"
+
+build-job:
+  stage: build
+  script:
+    - echo "Starting Docker"
+    - docker build -f dockerfiles/build/task-runner/Dockerfile -t ccdp_task_runner .
+    - echo "Done !"
+  tags:
+    - crim-docker

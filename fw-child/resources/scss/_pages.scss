@@ -442,7 +442,12 @@ $overlay-switch-bg: rgba($gray-400, 0.99);
 
 #control-bar-tabs-footer {
   position: fixed;
+  width: calc(12.5% - .25rem);
   bottom: 0;
+
+  @include media-breakpoint-up(sm) {
+    width: calc(6.25% - .25rem);
+  }
 
   &.position-absolute {
     width: 100% !important;

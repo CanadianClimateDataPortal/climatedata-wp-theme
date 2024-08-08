@@ -9,7 +9,11 @@ test-job1:
 
 build-job:
   stage: build
+  variables:
+    DOCKER_IMAGE: "$DOCKER_REGISTRY_URL/ccdp_task_runner"
   script:
     - echo "Starting Docker"
-    - docker build -f dockerfiles/build/task-runner/Dockerfile -t ccdp_task_runner .
+    - docker build -f dockerfiles/build/task-runner/Dockerfile -t $DOCKER_IMAGE .
+    - docker image tag -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA .
+    - docker push -a $DOCKER_IMAGE
     - echo "Done !"

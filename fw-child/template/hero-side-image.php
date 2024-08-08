@@ -21,7 +21,7 @@ if ( $image ) {
 
 ?>
 
-<div class="alert alert-warning fw-builder-alert">Custom field <code>hero_side_image</code> is empty. Click <span class="py-1 px-2 mx-1 text-bg-light"><i class="fas fa-pencil-alt me-2"></i>Edit in Wordpress</span> to add a value.</div>
+<div class="alert alert-warning fw-builder-alert">Custom field <code>hero_side_image</code> is empty. Click <span class="py-1 px-2 mx-1 text-bg-light"><i class="fas fa-pencil-alt me-2"></i>Edit in Wordpress</span> to add a value corresponding to a media post ID.</div>
 
 <?php
 }

@@ -14,6 +14,6 @@ build-job:
   script:
     - echo "Starting Docker"
     - docker build -f dockerfiles/build/task-runner/Dockerfile -t $DOCKER_IMAGE .
-    - docker image tag -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA .
+    - docker image tag $DOCKER_IMAGE $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
     - docker push -a $DOCKER_IMAGE
     - echo "Done !"

@@ -13,5 +13,3 @@ build-job:
     - echo "Starting Docker"
     - docker build -f dockerfiles/build/task-runner/Dockerfile -t ccdp_task_runner .
     - echo "Done !"
-  tags:
-    - crim-docker

@@ -274,7 +274,7 @@ function posttype_definition() {
 }
 add_action( 'init', 'posttype_definition', 0 );
 
-// Apps (formerly beta-apps)
+// Apps
 
 function posttype_app() {
 
@@ -326,7 +326,7 @@ function posttype_app() {
         'publicly_queryable'    => true,
         'capability_type'       => 'page',
     );
-    register_post_type( 'beta-app', $args );
+    register_post_type( 'app', $args );
 
 }
 add_action( 'init', 'posttype_app', 0 );
@@ -344,8 +344,8 @@ function cdc_variable_update_tax_sector_terms( $post_id ) {
 	$relevant_sectors = get_field( 'relevant_sectors', $post_id );
 
 	// Check if relevant sectors are available.
-	if ( ! is_array( $relevant_sectors ) || empty( $relevant_sectors ) ) {
-		return;
+	if ( empty( $relevant_sectors ) ) {
+		$relevant_sectors = array();
 	}
 
 	// Extract term IDs from the relevant sectors.

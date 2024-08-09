@@ -280,6 +280,7 @@ const $ = jQuery;
 
     // Functionalities for variable archive page.
     if ($( '.variable-archive-page' ).length > 0) {
+      let isFirstPageLoad = true;
       $( document ).on( 'fw_query_success', function ( e, query_item ) {
         const query_items = query_item.find( '.fw-query-items' );
 
@@ -350,14 +351,14 @@ const $ = jQuery;
         /**
          * Auto-scroll and open variable details if a variable hash exists.
          */
-        if (window.location.hash) {
+        if ( window.location.hash ) {
           const variable_element = $( window.location.hash );
-
-          if (variable_element.length > 0) {
+        
+          if ( variable_element.length > 0 ) {
             const scroll_top = variable_element.parent().position().top;
-
+        
             $( 'html, body' )
-              .animate( {scrollTop: scroll_top}, 10, 'swing' )
+              .animate( { scrollTop: scroll_top }, 10, 'swing' )
               .promise()
               .done( function () {
                 variable_element
@@ -365,7 +366,14 @@ const $ = jQuery;
                   .trigger( 'click' );
               } );
           }
-        }
+        } else if ( !isFirstPageLoad ) {
+          // Scroll to the top of the results if not first page load
+          const scroll_top = $( '.query-page' ).position().top;
+        
+          $( 'html, body' ).animate( { scrollTop: scroll_top }, 10, 'swing' );
+        }        
+
+        isFirstPageLoad = false;
       } );
 
       $( document ).on( 'fw_fd_open', function ( e, drawer_item ) {
@@ -377,6 +385,35 @@ const $ = jQuery;
 
           if (variable_item_hash) { // Check if variable_item_hash is not empty
             window.location.hash = variable_item_hash;
+          }
+
+          // Fix jQuery collapse-o-matic duplicate ID bug.
+          const fd_drawer_clone = drawer_item.parent().find( '.fd-drawer' );
+          fd_drawer_clone.find( '.collapseomatic, .collapseomatic_content ' ).each( function () {
+            $( this ).attr( 'id', $( this ).attr( 'id' ) + '_c' );
+            
+            if ($( this ).hasClass( 'collapseomatic_content' )) {
+              $( this ).hide();
+            }
+          } );
+
+          // Adjust auto-scroll position.
+          const scroll_top = variable_item.parent().position().top;
+          
+          $( 'html, body' ).animate( {scrollTop: scroll_top}, 10, 'swing' );
+        }
+      } );
+      
+      $( document ).on( 'fw_fd_close', function ( e, drawer_item ) {
+        // Remove the URL hash.
+        const variable_item = drawer_item.find( '.variable-item' );
+
+        if (variable_item.length > 0) {
+          const variable_item_hash = '#' + variable_item.attr( 'id' );
+          const url_hash = window.location.hash;
+
+          if (variable_item_hash === url_hash) {
+            history.replaceState(null, null, ' ');
           }
         }
       } );
@@ -576,8 +613,8 @@ const $ = jQuery;
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: card,
-            start: 'top 60%',
-            end: 'top -20%',
+            start: 'top 100%',
+            end: 'top -50%',
             scrub: true,
             markers: false    // Set to true to debug
           }
@@ -585,13 +622,21 @@ const $ = jQuery;
     
         timeline.fromTo(card, 
           { 
-            y: '-50%',
+            y: '-85%',
             opacity: 0,
             scale: 0.75,
             zIndex: 0
           },
           {
-            y: '0%',
+            y: '-85%',
+            opacity: 0,
+            scale: 0.75,
+            zIndex: 0
+          }
+        )
+        .to(card,
+          {
+            y: '-15%',
             opacity: 1,
             scale: 1,
             zIndex: 100
@@ -599,15 +644,7 @@ const $ = jQuery;
         )
         .to(card,
           {
-            y: '0%',
-            opacity: 1,
-            scale: 1,
-            zIndex: 100
-          }
-        )
-        .to(card,
-          {
-            y: '20%',
+            y: '55%',
             opacity: 0,
             scale: 0.75,
             zIndex: 0,

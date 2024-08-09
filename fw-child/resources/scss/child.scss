@@ -572,6 +572,7 @@ $control-slider-handle-width: 2.75rem;
     }
   }
 
+  // Accomodate the "Rétroaction" fr wording to fit in the tiny sidebar
   [lang="fr"] & {
     .control-bar-text-link {
       @include media-breakpoint-only(sm) {

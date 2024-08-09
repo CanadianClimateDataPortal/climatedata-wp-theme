@@ -1,0 +1,271 @@
+{
+    "key": "group_5cb72bb99c0bf",
+    "title": "Tour",
+    "fields": [
+        {
+            "key": "field_5cb72be54a589",
+            "label": "Tour",
+            "name": "tour",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "collapsed": "",
+            "min": 0,
+            "max": 0,
+            "layout": "block",
+            "button_label": "Add Slide",
+            "wpml_cf_preferences": 0,
+            "sub_fields": [
+                {
+                    "key": "field_6659d22bceb2a",
+                    "label": "Text",
+                    "name": "text",
+                    "aria-label": "",
+                    "type": "group",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "layout": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_6659d242ceb2b",
+                            "label": "English",
+                            "name": "",
+                            "aria-label": "",
+                            "type": "tab",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "placement": "top",
+                            "endpoint": 0,
+                            "selected": 0
+                        },
+                        {
+                            "key": "field_6659d251ceb2c",
+                            "label": "Text",
+                            "name": "text_en",
+                            "aria-label": "",
+                            "type": "wysiwyg",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "tabs": "all",
+                            "toolbar": "full",
+                            "media_upload": 1,
+                            "delay": 0
+                        },
+                        {
+                            "key": "field_6659d263ceb2d",
+                            "label": "French",
+                            "name": "",
+                            "aria-label": "",
+                            "type": "tab",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "placement": "top",
+                            "endpoint": 0,
+                            "selected": 0
+                        },
+                        {
+                            "key": "field_6659d26cceb2e",
+                            "label": "Text",
+                            "name": "text_fr",
+                            "aria-label": "",
+                            "type": "wysiwyg",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "tabs": "all",
+                            "toolbar": "full",
+                            "media_upload": 1,
+                            "delay": 0
+                        }
+                    ],
+                    "parent_repeater": "field_5cb72be54a589"
+                },
+                {
+                    "key": "field_5cb72c634a58c",
+                    "label": "Position",
+                    "name": "position",
+                    "aria-label": "",
+                    "type": "group",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 0,
+                    "layout": "table",
+                    "sub_fields": [
+                        {
+                            "key": "field_5cb72c6c4a58d",
+                            "label": "My",
+                            "name": "my",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "wpml_cf_preferences": 0,
+                            "default_value": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
+                            "maxlength": ""
+                        },
+                        {
+                            "key": "field_5cb72c7b4a58e",
+                            "label": "At",
+                            "name": "at",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "wpml_cf_preferences": 0,
+                            "default_value": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
+                            "maxlength": ""
+                        },
+                        {
+                            "key": "field_5cb72c804a58f",
+                            "label": "Of",
+                            "name": "of",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "wpml_cf_preferences": 0,
+                            "default_value": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
+                            "maxlength": ""
+                        },
+                        {
+                            "key": "field_5cb77afe64c87",
+                            "label": "Bubble",
+                            "name": "bubble",
+                            "aria-label": "",
+                            "type": "select",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "wpml_cf_preferences": 0,
+                            "choices": {
+                                "top left": "top left",
+                                "top center": "top center",
+                                "top right": "top right",
+                                "right top": "right top",
+                                "right center": "right center",
+                                "right bottom": "right bottom",
+                                "bottom left": "bottom left",
+                                "bottom center": "bottom center",
+                                "bottom right": "bottom right",
+                                "left top": "left top",
+                                "left center": "left center",
+                                "left bottom": "left bottom"
+                            },
+                            "default_value": [],
+                            "allow_null": 1,
+                            "multiple": 0,
+                            "ui": 0,
+                            "return_format": "value",
+                            "ajax": 0,
+                            "placeholder": ""
+                        }
+                    ],
+                    "parent_repeater": "field_5cb72be54a589"
+                }
+            ],
+            "rows_per_page": 20
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "page",
+                "operator": "==",
+                "value": "11330"
+            }
+        ],
+        [
+            {
+                "param": "page",
+                "operator": "==",
+                "value": "43"
+            }
+        ]
+    ],
+    "menu_order": 39,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "modified": 1721648301
+}

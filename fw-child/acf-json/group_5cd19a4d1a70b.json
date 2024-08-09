@@ -1,0 +1,328 @@
+{
+    "key": "group_5cd19a4d1a70b",
+    "title": "Page — Variable",
+    "fields": [
+        {
+            "key": "field_5cd19a6f69f59",
+            "label": "Filters",
+            "name": "variable_filters",
+            "aria-label": "",
+            "type": "flexible_content",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 0,
+            "layouts": {
+                "layout_5cd4663fbe210": {
+                    "key": "layout_5cd4663fbe210",
+                    "name": "sector",
+                    "label": "Sector",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_5d079ea6a1a50",
+                            "label": "Label for 'none' value",
+                            "name": "label",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "wpml_cf_preferences": 0,
+                            "default_value": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
+                            "maxlength": ""
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "5cd19ac47062b": {
+                    "key": "5cd19ac47062b",
+                    "name": "geo-select",
+                    "label": "Location Search",
+                    "display": "block",
+                    "sub_fields": [],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_5cd19b9f69f5f": {
+                    "key": "layout_5cd19b9f69f5f",
+                    "name": "var",
+                    "label": "Variable",
+                    "display": "block",
+                    "sub_fields": [],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_5cd19bb669f61": {
+                    "key": "layout_5cd19bb669f61",
+                    "name": "mora",
+                    "label": "Month",
+                    "display": "block",
+                    "sub_fields": [],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_5cd19bc469f63": {
+                    "key": "layout_5cd19bc469f63",
+                    "name": "rcp",
+                    "label": "Scenario",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_5cd19bd169f64",
+                            "label": "Include 'Compare' scenarios",
+                            "name": "compare",
+                            "aria-label": "",
+                            "type": "true_false",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "wpml_cf_preferences": 0,
+                            "message": "",
+                            "default_value": 1,
+                            "ui": 1,
+                            "ui_on_text": "",
+                            "ui_off_text": ""
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_5cd1a015ced13": {
+                    "key": "layout_5cd1a015ced13",
+                    "name": "tour",
+                    "label": "Tour",
+                    "display": "block",
+                    "sub_fields": [],
+                    "min": "",
+                    "max": ""
+                }
+            },
+            "button_label": "Add Filter",
+            "min": "",
+            "max": ""
+        },
+        {
+            "key": "field_5cd1a09326992",
+            "label": "Sliders",
+            "name": "variable_sliders",
+            "aria-label": "",
+            "type": "flexible_content",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layouts": {
+                "5cd1a09fc6093": {
+                    "key": "5cd1a09fc6093",
+                    "name": "decade",
+                    "label": "Decade",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_5cd1a0ad26993",
+                            "label": "Minimum value",
+                            "name": "min",
+                            "aria-label": "",
+                            "type": "range",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "33",
+                                "class": "",
+                                "id": ""
+                            },
+                            "wpml_cf_preferences": 0,
+                            "default_value": 1950,
+                            "min": 1900,
+                            "max": 2080,
+                            "step": 10,
+                            "prepend": "",
+                            "append": "",
+                            "show_column": 0,
+                            "show_column_sortable": 0,
+                            "show_column_weight": 1000,
+                            "allow_quickedit": 0,
+                            "allow_bulkedit": 0
+                        },
+                        {
+                            "key": "field_5cd1a16b77db4",
+                            "label": "Maximum value",
+                            "name": "max",
+                            "aria-label": "",
+                            "type": "range",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "33",
+                                "class": "",
+                                "id": ""
+                            },
+                            "wpml_cf_preferences": 0,
+                            "default_value": 2090,
+                            "min": 1960,
+                            "max": 2100,
+                            "step": 10,
+                            "prepend": "",
+                            "append": "",
+                            "show_column": 0,
+                            "show_column_sortable": 0,
+                            "show_column_weight": 1000,
+                            "allow_quickedit": 0,
+                            "allow_bulkedit": 0
+                        },
+                        {
+                            "key": "field_5cd1a18777db5",
+                            "label": "Default value",
+                            "name": "default",
+                            "aria-label": "",
+                            "type": "range",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "33",
+                                "class": "",
+                                "id": ""
+                            },
+                            "wpml_cf_preferences": 0,
+                            "default_value": 1980,
+                            "min": 1950,
+                            "max": 2090,
+                            "step": 10,
+                            "prepend": "",
+                            "append": ""
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
+                "layout_5cd1a0db26994": {
+                    "key": "layout_5cd1a0db26994",
+                    "name": "opacity",
+                    "label": "Opacity",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_5cd1a0e026995",
+                            "label": "Minimum value",
+                            "name": "min",
+                            "aria-label": "",
+                            "type": "range",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "33",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": 0,
+                            "min": 0,
+                            "max": 90,
+                            "step": 10,
+                            "prepend": "",
+                            "append": "",
+                            "wpml_cf_preferences": 0
+                        },
+                        {
+                            "key": "field_5cd1a0fa26996",
+                            "label": "Maximum value",
+                            "name": "max",
+                            "aria-label": "",
+                            "type": "range",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "33",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": 100,
+                            "min": 10,
+                            "max": 100,
+                            "step": 10,
+                            "prepend": "",
+                            "append": "",
+                            "wpml_cf_preferences": 0
+                        },
+                        {
+                            "key": "field_5cd1a1e877db6",
+                            "label": "Default value",
+                            "name": "default",
+                            "aria-label": "",
+                            "type": "range",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "33",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": 80,
+                            "min": 0,
+                            "max": 100,
+                            "step": 10,
+                            "prepend": "",
+                            "append": "",
+                            "wpml_cf_preferences": 0
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                }
+            },
+            "button_label": "Add Row",
+            "min": "",
+            "max": "",
+            "wpml_cf_preferences": 0
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "page_template",
+                "operator": "==",
+                "value": "tpl-variable.php"
+            }
+        ]
+    ],
+    "menu_order": 13,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": false,
+    "description": "",
+    "show_in_rest": false,
+    "acfml_field_group_mode": "advanced",
+    "modified": 1721648350
+}

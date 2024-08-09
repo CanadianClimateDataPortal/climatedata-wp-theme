@@ -1,0 +1,325 @@
+# Copyright (C) 2024 Phil Evans
+# This file is distributed under the .
+msgid ""
+msgstr ""
+"Project-Id-Version: [fw] Child 1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/theme/fw-child\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2024-05-13T17:16:02+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.9.0\n"
+"X-Domain: cdc-taxonomies\n"
+
+#. Theme Name of the theme
+msgid "[fw] Child"
+msgstr ""
+
+#. Author of the theme
+msgid "Phil Evans"
+msgstr ""
+
+#: resources/functions/taxonomies.php:53
+msgctxt "Taxonomy General Name"
+msgid "Topics"
+msgstr ""
+
+#: resources/functions/taxonomies.php:54
+msgctxt "Taxonomy Singular Name"
+msgid "Topic"
+msgstr ""
+
+#: resources/functions/taxonomies.php:59
+msgid "Topics"
+msgstr ""
+
+#: resources/functions/taxonomies.php:60
+msgid "All Topics"
+msgstr ""
+
+#: resources/functions/taxonomies.php:61
+msgid "Parent Topic"
+msgstr ""
+
+#: resources/functions/taxonomies.php:62
+msgid "Parent Topic:"
+msgstr ""
+
+#: resources/functions/taxonomies.php:63
+msgid "New Topic Name"
+msgstr ""
+
+#: resources/functions/taxonomies.php:64
+msgid "Add New Topic"
+msgstr ""
+
+#: resources/functions/taxonomies.php:65
+msgid "Edit Topic"
+msgstr ""
+
+#: resources/functions/taxonomies.php:66
+msgid "Update Topic"
+msgstr ""
+
+#: resources/functions/taxonomies.php:67
+msgid "View Topic"
+msgstr ""
+
+#: resources/functions/taxonomies.php:68
+#: resources/functions/taxonomies.php:125
+#: resources/functions/taxonomies.php:178
+#: resources/functions/taxonomies.php:231
+#: resources/functions/taxonomies.php:280
+msgid "Separate items with commas"
+msgstr ""
+
+#: resources/functions/taxonomies.php:72
+#: resources/functions/taxonomies.php:129
+#: resources/functions/taxonomies.php:182
+#: resources/functions/taxonomies.php:235
+#: resources/functions/taxonomies.php:281
+msgid "Add or remove items"
+msgstr ""
+
+#: resources/functions/taxonomies.php:73
+#: resources/functions/taxonomies.php:130
+#: resources/functions/taxonomies.php:183
+#: resources/functions/taxonomies.php:236
+#: resources/functions/taxonomies.php:282
+msgid "Choose from the most used"
+msgstr ""
+
+#: resources/functions/taxonomies.php:77
+#: resources/functions/taxonomies.php:134
+#: resources/functions/taxonomies.php:187
+#: resources/functions/taxonomies.php:240
+#: resources/functions/taxonomies.php:283
+msgid "Popular Items"
+msgstr ""
+
+#: resources/functions/taxonomies.php:78
+#: resources/functions/taxonomies.php:135
+#: resources/functions/taxonomies.php:188
+#: resources/functions/taxonomies.php:241
+#: resources/functions/taxonomies.php:284
+msgid "Search Items"
+msgstr ""
+
+#: resources/functions/taxonomies.php:79
+#: resources/functions/taxonomies.php:136
+#: resources/functions/taxonomies.php:189
+#: resources/functions/taxonomies.php:242
+#: resources/functions/taxonomies.php:285
+msgid "Not Found"
+msgstr ""
+
+#: resources/functions/taxonomies.php:80
+#: resources/functions/taxonomies.php:137
+#: resources/functions/taxonomies.php:190
+#: resources/functions/taxonomies.php:243
+#: resources/functions/taxonomies.php:286
+msgid "No items"
+msgstr ""
+
+#: resources/functions/taxonomies.php:81
+#: resources/functions/taxonomies.php:138
+#: resources/functions/taxonomies.php:191
+#: resources/functions/taxonomies.php:244
+#: resources/functions/taxonomies.php:287
+msgid "Items list"
+msgstr ""
+
+#: resources/functions/taxonomies.php:82
+#: resources/functions/taxonomies.php:139
+#: resources/functions/taxonomies.php:192
+#: resources/functions/taxonomies.php:245
+#: resources/functions/taxonomies.php:288
+msgid "Items list navigation"
+msgstr ""
+
+#: resources/functions/taxonomies.php:106
+msgctxt "Taxonomy General Name"
+msgid "Technical Levels"
+msgstr ""
+
+#: resources/functions/taxonomies.php:111
+msgctxt "Taxonomy Singular Name"
+msgid "Technical Level"
+msgstr ""
+
+#: resources/functions/taxonomies.php:116
+msgid "Technical Levels"
+msgstr ""
+
+#: resources/functions/taxonomies.php:117
+msgid "All Levels"
+msgstr ""
+
+#: resources/functions/taxonomies.php:118
+msgid "Parent Level"
+msgstr ""
+
+#: resources/functions/taxonomies.php:119
+msgid "Parent Level:"
+msgstr ""
+
+#: resources/functions/taxonomies.php:120
+msgid "New Level Name"
+msgstr ""
+
+#: resources/functions/taxonomies.php:121
+msgid "Add New Level"
+msgstr ""
+
+#: resources/functions/taxonomies.php:122
+msgid "Edit Level"
+msgstr ""
+
+#: resources/functions/taxonomies.php:123
+msgid "Update Level"
+msgstr ""
+
+#: resources/functions/taxonomies.php:124
+msgid "View Level"
+msgstr ""
+
+#: resources/functions/taxonomies.php:163
+msgctxt "Taxonomy General Name"
+msgid "Sectors"
+msgstr ""
+
+#: resources/functions/taxonomies.php:164
+msgctxt "Taxonomy Singular Name"
+msgid "Sector"
+msgstr ""
+
+#: resources/functions/taxonomies.php:169
+msgid "Sectors"
+msgstr ""
+
+#: resources/functions/taxonomies.php:170
+msgid "All Sectors"
+msgstr ""
+
+#: resources/functions/taxonomies.php:171
+msgid "Parent Sector"
+msgstr ""
+
+#: resources/functions/taxonomies.php:172
+msgid "Parent Sector:"
+msgstr ""
+
+#: resources/functions/taxonomies.php:173
+msgid "New Sector Name"
+msgstr ""
+
+#: resources/functions/taxonomies.php:174
+msgid "Add New Sector"
+msgstr ""
+
+#: resources/functions/taxonomies.php:175
+msgid "Edit Sector"
+msgstr ""
+
+#: resources/functions/taxonomies.php:176
+msgid "Update Sector"
+msgstr ""
+
+#: resources/functions/taxonomies.php:177
+msgid "View Sector"
+msgstr ""
+
+#: resources/functions/taxonomies.php:216
+msgctxt "Taxonomy General Name"
+msgid "Regions"
+msgstr ""
+
+#: resources/functions/taxonomies.php:217
+msgctxt "Taxonomy Singular Name"
+msgid "Region"
+msgstr ""
+
+#: resources/functions/taxonomies.php:222
+msgid "Regions"
+msgstr ""
+
+#: resources/functions/taxonomies.php:223
+msgid "All Regions"
+msgstr ""
+
+#: resources/functions/taxonomies.php:224
+msgid "Parent Region"
+msgstr ""
+
+#: resources/functions/taxonomies.php:225
+msgid "Parent Region:"
+msgstr ""
+
+#: resources/functions/taxonomies.php:226
+msgid "New Region Name"
+msgstr ""
+
+#: resources/functions/taxonomies.php:227
+msgid "Add New Region"
+msgstr ""
+
+#: resources/functions/taxonomies.php:228
+msgid "Edit Region"
+msgstr ""
+
+#: resources/functions/taxonomies.php:229
+msgid "Update Region"
+msgstr ""
+
+#: resources/functions/taxonomies.php:230
+msgid "View Region"
+msgstr ""
+
+#: resources/functions/taxonomies.php:269
+msgctxt "Taxonomy General Name"
+msgid "Variable Types"
+msgstr ""
+
+#: resources/functions/taxonomies.php:270
+msgctxt "Taxonomy Singular Name"
+msgid "Variable Type"
+msgstr ""
+
+#: resources/functions/taxonomies.php:271
+msgid "Variable Types"
+msgstr ""
+
+#: resources/functions/taxonomies.php:272
+msgid "All Types"
+msgstr ""
+
+#: resources/functions/taxonomies.php:273
+msgid "Parent Type"
+msgstr ""
+
+#: resources/functions/taxonomies.php:274
+msgid "Parent Type:"
+msgstr ""
+
+#: resources/functions/taxonomies.php:275
+msgid "New Type Name"
+msgstr ""
+
+#: resources/functions/taxonomies.php:276
+msgid "Add New Type"
+msgstr ""
+
+#: resources/functions/taxonomies.php:277
+msgid "Edit Type"
+msgstr ""
+
+#: resources/functions/taxonomies.php:278
+msgid "Update Type"
+msgstr ""
+
+#: resources/functions/taxonomies.php:279
+msgid "View Type"
+msgstr ""

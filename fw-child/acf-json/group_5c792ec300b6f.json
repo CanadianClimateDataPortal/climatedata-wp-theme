@@ -1,0 +1,54 @@
+{
+    "key": "group_5c792ec300b6f",
+    "title": "Variable Type",
+    "fields": [
+        {
+            "key": "field_5c792ece899aa",
+            "label": "Accent Colour",
+            "name": "vartype_colour",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "primary": "Primary (Blue)",
+                "secondary": "Secondary (Red)",
+                "muted": "Muted (Slate)"
+            },
+            "default_value": [],
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 0,
+            "return_format": "value",
+            "wpml_cf_preferences": 0,
+            "ajax": 0,
+            "placeholder": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "taxonomy",
+                "operator": "==",
+                "value": "var-type"
+            }
+        ]
+    ],
+    "menu_order": 16,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": false,
+    "description": "",
+    "show_in_rest": false,
+    "acfml_field_group_mode": "advanced",
+    "modified": 1721648351
+}

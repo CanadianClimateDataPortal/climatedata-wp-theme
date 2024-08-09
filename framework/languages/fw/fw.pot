@@ -1,0 +1,60 @@
+# Copyright (C) 2024 Phil Evans
+# This file is distributed under the .
+msgid ""
+msgstr ""
+"Project-Id-Version: Framework 2.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/theme/framework\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2024-05-13T19:42:38+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.9.0\n"
+"X-Domain: fw\n"
+
+#. Theme Name of the theme
+msgid "Framework"
+msgstr ""
+
+#. Theme URI of the theme
+#. Author URI of the theme
+msgid "https://philevans.co"
+msgstr ""
+
+#. Author of the theme
+msgid "Phil Evans"
+msgstr ""
+
+#: resources/functions/builder/front-end/block/content/query/output/filter.php:145
+msgid "Post Type"
+msgstr ""
+
+#: resources/functions/builder/front-end/block/content/query/output/reset.php:11
+msgid "Reset Filters"
+msgstr ""
+
+#: resources/functions/builder/front-end/block/content/query/output/sort.php:2
+msgid "Sort"
+msgstr ""
+
+#: resources/functions/builder/front-end/block/content/query/output/sort.php:11
+msgid "Title (Ascending)"
+msgstr ""
+
+#: resources/functions/builder/front-end/block/content/query/output/sort.php:21
+msgid "Title (Descending)"
+msgstr ""
+
+#: resources/functions/builder/front-end/block/content/query/output/sort.php:31
+msgid "Date (Newest First)"
+msgstr ""
+
+#: resources/functions/builder/front-end/block/content/query/output/sort.php:41
+msgid "Date (Oldest First)"
+msgstr ""
+
+#: resources/functions/builder/rest.php:66
+msgid "No items found."
+msgstr ""

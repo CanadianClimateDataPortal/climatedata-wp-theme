@@ -1,0 +1,72 @@
+{
+    "key": "group_61719d3ca3bf1",
+    "title": "Newsletter",
+    "fields": [
+        {
+            "key": "field_61719d40eed9a",
+            "label": "Form Title",
+            "name": "newsletter_title",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 0,
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": "",
+            "show_column": 0,
+            "show_column_sortable": 0,
+            "show_column_weight": 1000,
+            "allow_quickedit": 0,
+            "allow_bulkedit": 0
+        },
+        {
+            "key": "field_61719d49eed9b",
+            "label": "Intro Text",
+            "name": "newsletter_text",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "maxlength": "",
+            "rows": 3,
+            "new_lines": "",
+            "wpml_cf_preferences": 0
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "acf-options-general"
+            }
+        ]
+    ],
+    "menu_order": 40,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": false,
+    "description": "",
+    "show_in_rest": false,
+    "modified": 1721648359
+}

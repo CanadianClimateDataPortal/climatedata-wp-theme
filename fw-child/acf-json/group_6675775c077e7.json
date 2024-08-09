@@ -1,0 +1,117 @@
+{
+    "key": "group_6675775c077e7",
+    "title": "Relevant Sectors",
+    "fields": [
+        {
+            "key": "field_6675775c2985a",
+            "label": "Relevant Sectors",
+            "name": "relevant_sectors",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "pagination": 0,
+            "min": 0,
+            "max": 0,
+            "collapsed": "",
+            "button_label": "Add Sector",
+            "rows_per_page": 20,
+            "sub_fields": [
+                {
+                    "key": "field_667577a82985b",
+                    "label": "Sector Name",
+                    "name": "sector_term",
+                    "aria-label": "",
+                    "type": "taxonomy",
+                    "instructions": "",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "taxonomy": "sector",
+                    "add_term": 0,
+                    "save_terms": 0,
+                    "load_terms": 0,
+                    "return_format": "object",
+                    "field_type": "select",
+                    "allow_null": 0,
+                    "bidirectional": 0,
+                    "multiple": 0,
+                    "bidirectional_target": [],
+                    "parent_repeater": "field_6675775c2985a"
+                },
+                {
+                    "key": "field_667577d62985c",
+                    "label": "Sector Description (English)",
+                    "name": "sector_description",
+                    "aria-label": "",
+                    "type": "textarea",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "rows": "",
+                    "placeholder": "",
+                    "new_lines": "",
+                    "parent_repeater": "field_6675775c2985a"
+                },
+                {
+                    "key": "field_66758d60dd5dc",
+                    "label": "Sector Description (French)",
+                    "name": "sector_description_fr",
+                    "aria-label": "",
+                    "type": "textarea",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "rows": "",
+                    "placeholder": "",
+                    "new_lines": "",
+                    "parent_repeater": "field_6675775c2985a"
+                }
+            ]
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "variable"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "modified": 1721648297
+}

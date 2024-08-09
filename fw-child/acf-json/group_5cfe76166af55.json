@@ -1,0 +1,252 @@
+{
+    "key": "group_5cfe76166af55",
+    "title": "Block — Map Object",
+    "fields": [
+        {
+            "key": "field_5cfe761672591",
+            "label": "Variable",
+            "name": "variable",
+            "aria-label": "",
+            "type": "post_object",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 0,
+            "post_type": [
+                "variable"
+            ],
+            "taxonomy": "",
+            "allow_null": 0,
+            "multiple": 1,
+            "return_format": "id",
+            "ui": 1,
+            "bidirectional_target": []
+        },
+        {
+            "key": "field_5cfe7616725cc",
+            "label": "Scenario",
+            "name": "scenario",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 0,
+            "choices": {
+                "rcp26": "RCP 2.6",
+                "rcp45": "RCP 4.5",
+                "rcp85": "RCP 8.5",
+                "rcp26vsrcp45": "RCP 2.6 vs RCP 4.5",
+                "rcp26vsrcp85": "RCP 2.6 vs RCP 8.5",
+                "rcp45vsrcp26": "RCP 4.5 vs RCP 2.6",
+                "rcp45vsrcp85": "RCP 4.5 vs RCP 8.5",
+                "rcp85vsrcp26": "RCP 8.5 vs RCP 2.6",
+                "rcp85vsrcp45": "RCP 8.5 vs RCP 4.5"
+            },
+            "default_value": [
+                "rcp85"
+            ],
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 0,
+            "return_format": "value",
+            "ajax": 0,
+            "placeholder": ""
+        },
+        {
+            "key": "field_6000ba8441450",
+            "label": "Time",
+            "name": "time",
+            "aria-label": "",
+            "type": "checkbox",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "ann": "Annual",
+                "jan": "January",
+                "feb": "February",
+                "mar": "March",
+                "apr": "April",
+                "may": "May",
+                "jun": "June",
+                "jul": "July",
+                "aug": "August",
+                "sep": "September",
+                "oct": "October",
+                "nov": "November",
+                "dec": "December"
+            },
+            "allow_custom": 0,
+            "default_value": [],
+            "layout": "vertical",
+            "toggle": 0,
+            "return_format": "array",
+            "wpml_cf_preferences": 0,
+            "save_custom": 0,
+            "custom_choice_button_text": "Add new choice"
+        },
+        {
+            "key": "field_5e8b67fe0845e",
+            "label": "Initial Location",
+            "name": "center",
+            "aria-label": "",
+            "type": "group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "wpml_cf_preferences": 0,
+            "sub_fields": [
+                {
+                    "key": "field_5e8b68090845f",
+                    "label": "Latitude",
+                    "name": "lat",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "33",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 0,
+                    "default_value": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "maxlength": ""
+                },
+                {
+                    "key": "field_5e8b682708460",
+                    "label": "Longitude",
+                    "name": "lng",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "33",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 0,
+                    "default_value": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "maxlength": ""
+                },
+                {
+                    "key": "field_5e8b683508461",
+                    "label": "Zoom",
+                    "name": "zoom",
+                    "aria-label": "",
+                    "type": "select",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "34",
+                        "class": "",
+                        "id": ""
+                    },
+                    "choices": {
+                        "1": "1",
+                        "2": "2",
+                        "3": "3",
+                        "4": "4",
+                        "5": "5",
+                        "6": "6",
+                        "7": "7",
+                        "8": "8",
+                        "9": "9",
+                        "10": "10",
+                        "11": "11",
+                        "12": "12",
+                        "13": "13",
+                        "14": "14",
+                        "15": "15"
+                    },
+                    "default_value": [],
+                    "allow_null": 1,
+                    "multiple": 0,
+                    "ui": 0,
+                    "return_format": "value",
+                    "wpml_cf_preferences": 0,
+                    "ajax": 0,
+                    "placeholder": ""
+                }
+            ]
+        },
+        {
+            "key": "field_5cfe761672606",
+            "label": "Sector",
+            "name": "sector",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "none": "None",
+                "human-health": "Human Health"
+            },
+            "default_value": [],
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 0,
+            "return_format": "value",
+            "wpml_cf_preferences": 0,
+            "ajax": 0,
+            "placeholder": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "post"
+            }
+        ]
+    ],
+    "menu_order": 28,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": false,
+    "description": "",
+    "show_in_rest": false,
+    "modified": 1721648354
+}

@@ -1,0 +1,583 @@
+{
+    "key": "group_5e5013fa3f6e4",
+    "title": "Analyze",
+    "fields": [
+        {
+            "key": "field_63c6c50e9dc64",
+            "label": "Variables",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "wpml_cf_preferences": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_5e62655252aa1",
+            "label": "Variables",
+            "name": "analyze_vars",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 1,
+            "collapsed": "field_5e6266e052aa5",
+            "min": 0,
+            "max": 0,
+            "layout": "block",
+            "button_label": "Add Variable",
+            "sub_fields": [
+                {
+                    "key": "field_5e6266e052aa5",
+                    "label": "Name",
+                    "name": "name",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "e.g. 'Wet Days'",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 2,
+                    "default_value": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "maxlength": "",
+                    "parent_repeater": "field_5e62655252aa1"
+                },
+                {
+                    "key": "field_5e62662052aa3",
+                    "label": "Variable",
+                    "name": "var",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "e.g. <code>wetdays<\/code>",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 1,
+                    "default_value": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "maxlength": "",
+                    "parent_repeater": "field_5e62655252aa1"
+                },
+                {
+                    "key": "field_614b75b1ddfbf",
+                    "label": "Frequencies",
+                    "name": "frequencies",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "(Optional) Allow to filter which frequencies is available for this variable, separated by pipes. Ex: YS|MS",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 1,
+                    "default_value": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "maxlength": "",
+                    "show_column": 0,
+                    "show_column_sortable": 0,
+                    "show_column_weight": 1000,
+                    "allow_quickedit": 0,
+                    "allow_bulkedit": 0,
+                    "parent_repeater": "field_5e62655252aa1"
+                },
+                {
+                    "key": "field_5e62685452aa7",
+                    "label": "Description",
+                    "name": "description",
+                    "aria-label": "",
+                    "type": "flexible_content",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 1,
+                    "layouts": {
+                        "layout_5e6268d732f15": {
+                            "key": "layout_5e6268d732f15",
+                            "name": "input",
+                            "label": "Input",
+                            "display": "block",
+                            "sub_fields": [
+                                {
+                                    "key": "field_5e62697752aa8",
+                                    "label": "ID",
+                                    "name": "id",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "e.g. <code>thresh<\/code>",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "40",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "wpml_cf_preferences": 1,
+                                    "default_value": "",
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "maxlength": ""
+                                },
+                                {
+                                    "key": "field_5e6269d152aab",
+                                    "label": "Units",
+                                    "name": "units",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "e.g. <code>degC<\/code>",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "25",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "wpml_cf_preferences": 1,
+                                    "default_value": "",
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "maxlength": ""
+                                },
+                                {
+                                    "key": "field_5e6269b652aaa",
+                                    "label": "Decimal places",
+                                    "name": "decimals",
+                                    "aria-label": "",
+                                    "type": "number",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "15",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "wpml_cf_preferences": 1,
+                                    "default_value": 0,
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "min": 0,
+                                    "max": 2,
+                                    "step": ""
+                                },
+                                {
+                                    "key": "field_5e626a4452aad",
+                                    "label": "Minimum",
+                                    "name": "min",
+                                    "aria-label": "",
+                                    "type": "number",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "10",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "wpml_cf_preferences": 1,
+                                    "default_value": "",
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "min": "",
+                                    "max": "",
+                                    "step": ""
+                                },
+                                {
+                                    "key": "field_5e626a5752aae",
+                                    "label": "Maximum",
+                                    "name": "max",
+                                    "aria-label": "",
+                                    "type": "number",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "10",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "wpml_cf_preferences": 1,
+                                    "default_value": "",
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "min": "",
+                                    "max": "",
+                                    "step": ""
+                                }
+                            ],
+                            "min": "",
+                            "max": ""
+                        },
+                        "layout_614b44826e4b2": {
+                            "key": "layout_614b44826e4b2",
+                            "name": "mm_dd",
+                            "label": "Month-date (MM-DD)",
+                            "display": "block",
+                            "sub_fields": [
+                                {
+                                    "key": "field_614b44826e4b3",
+                                    "label": "ID",
+                                    "name": "id",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "e.g. <code>thresh<\/code>",
+                                    "required": 1,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "40",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "wpml_cf_preferences": 1,
+                                    "default_value": "",
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "maxlength": "",
+                                    "show_column": 0,
+                                    "show_column_sortable": 0,
+                                    "show_column_weight": 1000,
+                                    "allow_quickedit": 0,
+                                    "allow_bulkedit": 0
+                                },
+                                {
+                                    "key": "field_614b44826e4b4",
+                                    "label": "Units",
+                                    "name": "units",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "e.g. <code>degC<\/code>",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "25",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "wpml_cf_preferences": 1,
+                                    "default_value": "",
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "maxlength": "",
+                                    "show_column": 0,
+                                    "show_column_sortable": 0,
+                                    "show_column_weight": 1000,
+                                    "allow_quickedit": 0,
+                                    "allow_bulkedit": 0
+                                },
+                                {
+                                    "key": "field_614b4b554d39d",
+                                    "label": "Optional",
+                                    "name": "optional",
+                                    "aria-label": "",
+                                    "type": "true_false",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "wpml_cf_preferences": 1,
+                                    "message": "",
+                                    "default_value": 0,
+                                    "ui": 0,
+                                    "show_column": 0,
+                                    "show_column_sortable": 0,
+                                    "show_column_weight": 1000,
+                                    "allow_quickedit": 0,
+                                    "allow_bulkedit": 0,
+                                    "ui_on_text": "",
+                                    "ui_off_text": ""
+                                }
+                            ],
+                            "min": "",
+                            "max": ""
+                        },
+                        "layout_5e62699a52aa9": {
+                            "key": "layout_5e62699a52aa9",
+                            "name": "text",
+                            "label": "Text",
+                            "display": "block",
+                            "sub_fields": [
+                                {
+                                    "key": "field_5e626a2452aac",
+                                    "label": "Text",
+                                    "name": "text",
+                                    "aria-label": "",
+                                    "type": "textarea",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "wpml_cf_preferences": 2,
+                                    "default_value": "",
+                                    "placeholder": "",
+                                    "maxlength": "",
+                                    "rows": 2,
+                                    "new_lines": ""
+                                }
+                            ],
+                            "min": "",
+                            "max": ""
+                        },
+                        "layout_6144e9d8f13f8": {
+                            "key": "layout_6144e9d8f13f8",
+                            "name": "select",
+                            "label": "select",
+                            "display": "block",
+                            "sub_fields": [
+                                {
+                                    "key": "field_6144e9eaf13f9",
+                                    "label": "ID",
+                                    "name": "id",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "wpml_cf_preferences": 1,
+                                    "default_value": "",
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "maxlength": "",
+                                    "show_column": 0,
+                                    "show_column_sortable": 0,
+                                    "show_column_weight": 1000,
+                                    "allow_quickedit": 0,
+                                    "allow_bulkedit": 0
+                                },
+                                {
+                                    "key": "field_6144e9f8f13fa",
+                                    "label": "Units",
+                                    "name": "units",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "e.g. <code>degC<\/code>",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "25",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "wpml_cf_preferences": 1,
+                                    "default_value": "",
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "maxlength": "",
+                                    "show_column": 0,
+                                    "show_column_sortable": 0,
+                                    "show_column_weight": 1000,
+                                    "allow_quickedit": 0,
+                                    "allow_bulkedit": 0
+                                },
+                                {
+                                    "key": "field_6144ea1cf13fb",
+                                    "label": "Values",
+                                    "name": "values",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "All values, separated by pipes ( | )",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "wpml_cf_preferences": 1,
+                                    "default_value": "",
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "maxlength": "",
+                                    "show_column": 0,
+                                    "show_column_sortable": 0,
+                                    "show_column_weight": 1000,
+                                    "allow_quickedit": 0,
+                                    "allow_bulkedit": 0
+                                },
+                                {
+                                    "key": "field_6144ea3af13fc",
+                                    "label": "Labels",
+                                    "name": "labels",
+                                    "aria-label": "",
+                                    "type": "text",
+                                    "instructions": "All labels, separated by pipes ( | )",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "wpml_cf_preferences": 2,
+                                    "default_value": "",
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "maxlength": "",
+                                    "show_column": 0,
+                                    "show_column_sortable": 0,
+                                    "show_column_weight": 1000,
+                                    "allow_quickedit": 0,
+                                    "allow_bulkedit": 0
+                                }
+                            ],
+                            "min": "",
+                            "max": ""
+                        }
+                    },
+                    "button_label": "Add Block",
+                    "min": "",
+                    "max": "",
+                    "parent_repeater": "field_5e62655252aa1"
+                },
+                {
+                    "key": "field_638e5fbb06edc",
+                    "label": "Required variables",
+                    "name": "required_variables",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "Required variables for computation (see https:\/\/pavics-sdi.readthedocs.io\/projects\/finch\/en\/latest\/processes.html#xclim-indicators  ).\r\nseparated by pipes. Ex: tasmin|tasmax",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 1,
+                    "default_value": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": "",
+                    "maxlength": "",
+                    "show_column": 0,
+                    "show_column_sortable": 0,
+                    "show_column_weight": 1000,
+                    "allow_quickedit": 0,
+                    "allow_bulkedit": 0,
+                    "parent_repeater": "field_5e62655252aa1"
+                }
+            ],
+            "rows_per_page": 20
+        },
+        {
+            "key": "field_63c6c5149dc65",
+            "label": "Modal Content",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "wpml_cf_preferences": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_63c6c5229dc66",
+            "label": "Missing Data Options",
+            "name": "modal_missing_data",
+            "aria-label": "",
+            "type": "wysiwyg",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 2,
+            "default_value": "",
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 1,
+            "delay": 0
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "page_template",
+                "operator": "==",
+                "value": "tpl-analyze.php"
+            }
+        ]
+    ],
+    "menu_order": 1,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": false,
+    "acfml_field_group_mode": "advanced",
+    "modified": 1721648297
+}

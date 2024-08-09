@@ -1,0 +1,14 @@
+{
+  "name": "pe-social-widget",
+  "homepage": "https://github.com/phil-evans/pe-social-widget",
+  "_release": "665d45c450",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "665d45c450288ed6da0721edd5cae11829e7fb0b"
+  },
+  "_source": "https://github.com/phil-evans/pe-social-widget.git",
+  "_target": "*",
+  "_originalSource": "phil-evans/pe-social-widget",
+  "_direct": true
+}

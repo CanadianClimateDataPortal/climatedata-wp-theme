@@ -1,0 +1,110 @@
+{
+    "key": "group_5cc85c4e857a9",
+    "title": "Sub-Sector Content",
+    "fields": [
+        {
+            "key": "field_5cc85c5831c65",
+            "label": "Case Studies",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "wpml_cf_preferences": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_5cc85efcc9bb3",
+            "label": "Section Content",
+            "name": "subsector_casestudies",
+            "aria-label": "",
+            "type": "group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "wpml_cf_preferences": 0,
+            "sub_fields": []
+        },
+        {
+            "key": "field_5cc85c6131c66",
+            "label": "Variables",
+            "name": "",
+            "aria-label": "",
+            "type": "tab",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "placement": "top",
+            "endpoint": 0,
+            "wpml_cf_preferences": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_5ccc4aa79cc33_field_5ccc47218f071",
+            "label": "Variables",
+            "name": "related_vars",
+            "aria-label": "",
+            "type": "post_object",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 0,
+            "post_type": [
+                "variable"
+            ],
+            "taxonomy": "",
+            "allow_null": 0,
+            "multiple": 1,
+            "return_format": "id",
+            "ui": 1,
+            "_clone": "field_5ccc4aa79cc33",
+            "__key": "field_5ccc47218f071",
+            "__name": "related_vars",
+            "__label": "Variables",
+            "bidirectional_target": []
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "page_template",
+                "operator": "==",
+                "value": "tpl-subsector.php"
+            }
+        ]
+    ],
+    "menu_order": 14,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": false,
+    "description": "",
+    "show_in_rest": false,
+    "modified": 1721648350
+}

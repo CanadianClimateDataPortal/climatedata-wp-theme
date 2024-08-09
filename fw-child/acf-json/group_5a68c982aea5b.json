@@ -1,0 +1,344 @@
+{
+    "key": "group_5a68c982aea5b",
+    "title": "Element — Button",
+    "fields": [
+        {
+            "key": "field_5a68c987d264a",
+            "label": "Link Type",
+            "name": "type",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "30",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 0,
+            "choices": {
+                "next": "Scroll to next section",
+                "id": "Scroll to section ID",
+                "post": "Post",
+                "page": "Page",
+                "url": "URL"
+            },
+            "default_value": [],
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 0,
+            "return_format": "value",
+            "ajax": 0,
+            "placeholder": ""
+        },
+        {
+            "key": "field_5a68ca07d264b",
+            "label": "URL",
+            "name": "url",
+            "aria-label": "",
+            "type": "url",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_5a68c987d264a",
+                        "operator": "==",
+                        "value": "url"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "40",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": ""
+        },
+        {
+            "key": "field_5beae8f2e9e19",
+            "label": "Section ID",
+            "name": "id",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_5a68c987d264a",
+                        "operator": "==",
+                        "value": "id"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "40",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "#",
+            "append": "",
+            "maxlength": ""
+        },
+        {
+            "key": "field_5a68ca45d264d",
+            "label": "Post",
+            "name": "post",
+            "aria-label": "",
+            "type": "post_object",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_5a68c987d264a",
+                        "operator": "==",
+                        "value": "post"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "40",
+                "class": "",
+                "id": ""
+            },
+            "wpml_cf_preferences": 0,
+            "post_type": [
+                "post"
+            ],
+            "taxonomy": "",
+            "allow_null": 0,
+            "multiple": 0,
+            "return_format": "id",
+            "ui": 1,
+            "bidirectional_target": []
+        },
+        {
+            "key": "field_5bd088da80d4e",
+            "label": "Page",
+            "name": "page",
+            "aria-label": "",
+            "type": "post_object",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_5a68c987d264a",
+                        "operator": "==",
+                        "value": "page"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "40",
+                "class": "",
+                "id": ""
+            },
+            "post_type": [
+                "page"
+            ],
+            "taxonomy": "",
+            "allow_null": 0,
+            "multiple": 0,
+            "return_format": "id",
+            "ui": 1,
+            "bidirectional_target": []
+        },
+        {
+            "key": "field_5a68ca33d264c",
+            "label": "Text",
+            "name": "text",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_5a68c987d264a",
+                        "operator": "!=",
+                        "value": "none"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "30",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": ""
+        },
+        {
+            "key": "field_5c0fed3a0f80f",
+            "label": "Icon",
+            "name": "icon",
+            "aria-label": "",
+            "type": "group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "sub_fields": [
+                {
+                    "key": "field_5c0fea6a0f80e",
+                    "label": "Icon",
+                    "name": "icon",
+                    "aria-label": "",
+                    "type": "select",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "wpml_cf_preferences": 0,
+                    "choices": {
+                        "none": "No Icon",
+                        "icon-caret-up": "Caret (Up)",
+                        "icon-caret-down": "Caret (Down)",
+                        "icon-caret-left": "Caret (Left)",
+                        "icon-caret-right": "Caret (Right)",
+                        "icon-share": "Share",
+                        "icon-search": "Search",
+                        "icon-permalink": "Link",
+                        "icon-plus": "Plus",
+                        "icon-minus": "Minus"
+                    },
+                    "default_value": [],
+                    "allow_null": 0,
+                    "multiple": 0,
+                    "ui": 0,
+                    "return_format": "value",
+                    "ajax": 0,
+                    "placeholder": ""
+                },
+                {
+                    "key": "field_5c0fed4f0f810",
+                    "label": "Placement",
+                    "name": "placement",
+                    "aria-label": "",
+                    "type": "select",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "50",
+                        "class": "",
+                        "id": ""
+                    },
+                    "choices": {
+                        "before": "Before text",
+                        "after": "After text"
+                    },
+                    "default_value": [
+                        "after"
+                    ],
+                    "allow_null": 0,
+                    "multiple": 0,
+                    "ui": 0,
+                    "return_format": "value",
+                    "ajax": 0,
+                    "placeholder": ""
+                }
+            ]
+        },
+        {
+            "key": "field_5bec48055f226",
+            "label": "Colour",
+            "name": "colour",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "primary": "Primary",
+                "secondary": "Secondary"
+            },
+            "default_value": [],
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 0,
+            "return_format": "value",
+            "wpml_cf_preferences": 0,
+            "ajax": 0,
+            "placeholder": ""
+        },
+        {
+            "key": "field_5bec47885f225",
+            "label": "Button Style",
+            "name": "style",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_5a68c987d264a",
+                        "operator": "!=",
+                        "value": "none"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "50",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "default": "Default",
+                "outline": "Outline",
+                "large": "Large"
+            },
+            "default_value": [],
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 0,
+            "return_format": "value",
+            "ajax": 0,
+            "placeholder": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "post"
+            }
+        ]
+    ],
+    "menu_order": 37,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": false,
+    "description": "",
+    "show_in_rest": false,
+    "modified": 1721648358
+}

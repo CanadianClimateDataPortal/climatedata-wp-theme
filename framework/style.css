@@ -1,0 +1,11 @@
+/*
+Theme Name: Framework
+Theme URI: https://philevans.co
+Author: Phil Evans
+Author URI: https://philevans.co
+Description: 
+Requires PHP: 7.4
+Version: 2.0
+Text Domain: fw
+*/
+@import url(resources/css/global.css);

@@ -632,7 +632,7 @@ $control-slider-handle-width: 2.75rem;
 
   .learn-zone-topic-filter {
     &:hover {
-      background-color: $light-blue;
+      background-color: $gray-200;
     }
 
     &.disabled {
@@ -693,6 +693,7 @@ $control-slider-handle-width: 2.75rem;
 
   .fw-query-reset {
     line-height: 0.75rem;
+    font-weight: 600;
   }
 
   .filter-item {

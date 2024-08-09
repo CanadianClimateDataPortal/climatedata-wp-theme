@@ -31,7 +31,7 @@
 							<span class="tab-drawer-close btn-close"></span>
 						</div>
 						
-						<div class="control-tab-body ms-3">
+						<div class="control-tab-body">
 							<?php
 							$tax_topic_terms = get_terms(
 								array(
@@ -42,7 +42,7 @@
 
 							foreach ( $tax_topic_terms as $topic_term ) {
 								?>
-								<div class="learn-zone-topic-filter position-relative pe-3 py-4 border-bottom"
+								<div class="learn-zone-topic-filter position-relative px-3 py-4 border-bottom"
 									 data-topic-id="topic-<?php echo esc_attr( $topic_term->term_id ); ?>">
 									<a href="#topic-<?php echo esc_attr( $topic_term->term_id ); ?>"
 									   class="stretched-link"></a>

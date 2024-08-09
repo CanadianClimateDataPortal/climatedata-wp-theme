@@ -143,7 +143,6 @@ msgstr "Secteurs"
 msgid "Details"
 msgstr "Détails"
 
-#: template/apps/control-bar-inner.php:12
 #: template/apps/control-btns.php:13
 #: template/download/control-bar.php:94
 #: template/feedback.php:344
@@ -172,15 +171,15 @@ msgstr "Fournir une rétroaction"
 msgid "Submit Feedback"
 msgstr "Soumettre"
 
-#: template/apps/query.php:29
-#: template/learn/query.php:31
-#: template/news/query.php:29
+#: template/apps/query.php:28
+#: template/learn/query.php:30
+#: template/news/query.php:27
 msgid "Newest First"
 msgstr "Nouveaux d'abord"
 
-#: template/apps/query.php:30
-#: template/learn/query.php:32
-#: template/news/query.php:30
+#: template/apps/query.php:29
+#: template/learn/query.php:31
+#: template/news/query.php:28
 msgid "Oldest First"
 msgstr "Anciens d'abord"
 
@@ -315,7 +314,7 @@ msgstr "Zoom"
 #: template/download/controls/data.php:112
 #: template/download/controls/details.php:353
 #: template/map/controls/data-variable.php:139
-#: template/news/query.php:61
+#: template/news/query.php:59
 msgid "Next"
 msgstr "Suivant"
 
@@ -979,11 +978,11 @@ msgstr ""
 msgid "Article"
 msgstr ""
 
-#: template/learn/query.php:29
+#: template/learn/query.php:28
 msgid "Title (A–Z)"
 msgstr "Titre (A à Z)"
 
-#: template/learn/query.php:30
+#: template/learn/query.php:29
 msgid "Title (Z–A)"
 msgstr "Titre (Z à A)"
 
@@ -1313,7 +1312,7 @@ msgstr "Paramètres de l'OMM"
 
 #: template/download/controls/data-variable.php:137
 #: template/map/controls/data-variable.php:137
-#: template/news/query.php:57
+#: template/news/query.php:55
 msgid "Previous"
 msgstr "Précédent"
 
@@ -1393,10 +1392,14 @@ msgstr "Pour quelle application souhaitez-vous nous faire un retour ?"
 msgid "App"
 msgstr "Application"
 
-#: template/variable/query.php:67
+#: template/variable/query.php:66
 msgid "Name (A–Z)"
 msgstr "Nom (A-Z)"
 
-#: template/variable/query.php:68
+#: template/variable/query.php:67
 msgid "Name (Z–A)"
 msgstr "Nom (Z-A)"
+
+#: template/apps/control-bar-inner.php:12
+msgid "Feed&shy;back"
+msgstr "Rétro&shy;action"

@@ -119,12 +119,12 @@
 					</div>
 
 					<div id="" class="query-container ">
-						<div class="fw-query-items row row-cols-3"
+						<div class="fw-query-items row row-cols-1 row-cols-md-2 row-cols-lg-3"
 							data-options='{
 								"type":"items",
 								"template":"template/query/map-var-item.php",
 								"id":"",
-								"class":["row","row-cols-3"],
+								"class":["row","row-cols-1", "row-cols-md-2", "row-cols-lg-3"],
 								"item_class":"col",
 								"index":"4"
 							}'

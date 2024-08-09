@@ -113,11 +113,11 @@
 					
 				<div class="ms-3 pb-3 mb-3 border-bottom border-gray-400">
 					<h6 class="all-caps text-body mb-3"><?php _e ( 'Join the newsletter', 'cdc' ); ?></h6>
+					<div class="pe-3">
 					<?php
-					
 						include ( locate_template ( 'template/newsletter-signup.php' ) );
-						
 					?>
+					</div>
 				</div>
 
 				<div id="" class="d-flex justify-content-between px-3">

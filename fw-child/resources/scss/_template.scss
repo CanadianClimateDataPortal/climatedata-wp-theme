@@ -61,6 +61,42 @@
 // FOOTER
 //
 
+#footer-signup {
+  .col-12 {
+    & + #mc_embed_signup {
+      width: 75%;
+    }
+  }
+
+  .offset-2{
+    & + #mc_embed_signup {
+      margin-left: 12.5%;
+    }
+  }
+
+  .col-lg-16 {
+    & + #mc_embed_signup {
+      @include media-breakpoint-up(lg) {
+        width: 100%;
+      }
+    }
+  }
+
+  .offset-lg-0 {
+    & + #mc_embed_signup {
+      @include media-breakpoint-up(lg) {
+        margin-left: 0;
+      }
+    }
+  }
+
+  #mc_embed_signup {
+    form {
+      padding-right: 0 !important;
+    }
+  }
+}
+
 #footer-copyright {
   font-size: 0.75rem;
 

@@ -105,9 +105,16 @@
   }
 
   #header-primary {
-    @include media-breakpoint-up(xxl) {
-      @include font-size(1.25rem);
+    font-size: 1rem;
+  
+    @media screen and (min-width:1240px) {
+      @include font-size(17px);
     }
+  
+    @include media-breakpoint-up(xxl) {
+      @include font-size(19px);
+    }
+  
   }
 
   #header-lang {

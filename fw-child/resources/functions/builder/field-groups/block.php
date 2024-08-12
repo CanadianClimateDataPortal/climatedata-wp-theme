@@ -1,6 +1,6 @@
 <?php
 /**
- * "Add block" modal.
+ * Content of the "Add block" modal.
  */
 ?>
 

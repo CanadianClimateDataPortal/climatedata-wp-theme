@@ -62,9 +62,9 @@ if ( isset( $element[ 'inputs' ][ 'links' ][ 'rows' ] ) ) {
 ?>
 
 <div class="social-networks">
-	<?php if ( ! empty( $links ) ) { ?>
+	<?php if ( ! empty( $links ) ) : ?>
 		<ul>
-			<?php foreach ( $links as $link ) { ?>
+			<?php foreach ( $links as $link ) : ?>
 				<li>
 					<a
 						href="<?php echo esc_attr( $link[ 'url' ] ) ?>"
@@ -73,16 +73,16 @@ if ( isset( $element[ 'inputs' ][ 'links' ][ 'rows' ] ) ) {
 						title="<?php echo esc_attr( $link[ 'label' ] ) ?>"
 					>
 						<i class="fa-brands <?php echo $link[ 'icon' ] ?>"></i>
-						<?php if ( $show_network_names ) { ?>
+						<?php if ( $show_network_names ) : ?>
 							<span><?php echo esc_html( $link[ 'label' ] ); ?></span>
-						<?php } ?>
+						<?php endif; ?>
 					</a>
 				</li>
-			<?php } ?>
+			<?php endforeach; ?>
 		</ul>
-	<?php } elseif ( is_user_logged_in() ) { ?>
+	<?php elseif ( is_user_logged_in() ) : ?>
 		<div class="alert alert-warning fw-builder-alert">
 			No social links have been defined in this language.
 		</div>
-	<?php } ?>
+	<?php endif; ?>
 </div>

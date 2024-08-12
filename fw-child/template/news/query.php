@@ -24,14 +24,12 @@
 	<div class="col-13 offset-1">
 		<div class="tab-drawer-bumper">
 			<?php
-				
 				$module_args = array (
 					'posts_per_page' => 9,
 					'post_type' => 'post',
 					'post_parent' => 0,
 					'post_status' => 'publish'
 				);
-				
 			?>
 			
 			<div id="news-grid" class="py-6" data-args='<?php echo json_encode ( $module_args ); ?>'>

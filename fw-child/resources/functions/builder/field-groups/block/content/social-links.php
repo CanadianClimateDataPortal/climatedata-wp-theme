@@ -9,20 +9,31 @@ $lang = $_GET[ 'globals' ][ 'current_lang_code' ];
 
 <div class="accordion-item">
 	<h2 class="accordion-header" id="element-form-head-content">
-		<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#element-form-content" aria-expanded="true" aria-controls="element-form-content">
+		<button
+			class="accordion-button"
+			type="button"
+			data-bs-toggle="collapse"
+			data-bs-target="#element-form-content"
+			aria-expanded="true"
+			aria-controls="element-form-content"
+		>
 			Social links list
 		</button>
 	</h2>
 
-	<div id="element-form-content" class="accordion-collapse collapse show" aria-labelledby="element-form-head-content" data-bs-parent="#element-form">
+	<div
+		id="element-form-content"
+		class="accordion-collapse collapse show"
+		aria-labelledby="element-form-head-content"
+		data-bs-parent="#element-form"
+	>
 		<div class="accordion-body p-3">
-
 			<div class="fw-form-repeater-container">
-
 				<div class="small p-2">
-					<strong>Note:</strong> The <em>list</em> of networks is common to all languages,
-					but the <em>URL</em> of each link can be redefined per language. To hide a network in
-					only one language, leave the URL empty.
+					<strong>Note:</strong> The <em>list</em> of networks is
+					common to all languages, but the <em>URL</em> of each link
+					can be redefined per language. To hide a network in only
+					one language, leave the URL empty.
 				</div>
 
 				<div class="row border-bottom p-2 fw-form-repeater-head modal-label-sm">
@@ -32,7 +43,6 @@ $lang = $_GET[ 'globals' ][ 'current_lang_code' ];
 				</div>
 
 				<div class="fw-form-repeater p-2 border-bottom" data-key="links" data-rows="1">
-
 					<div class="fw-form-repeater-row row my-1" data-row-index="0">
 
 						<div class="col pe-3">
@@ -45,17 +55,13 @@ $lang = $_GET[ 'globals' ][ 'current_lang_code' ];
 						</div>
 
 						<div class="col pe-3">
-
 							<select class="form-select" name="inputs-links-rows[]-network" id="inputs-links-rows[]-network">
-
 								<option value="linkedin">LinkedIn</option>
 								<option value="x-twitter">X (Twitter)</option>
 								<option value="facebook">Facebook</option>
 								<option value="instagram">Instagram</option>
 								<option value="soundcloud">SoundCloud</option>
-
 							</select>
-
 						</div>
 
 						<div class="col-1 d-flex align-items-end justify-content-center">

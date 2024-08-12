@@ -72,7 +72,10 @@
 #footer-socials {
   a {
     color: $gray-600;
-    text-decoration: none;
+
+    &:hover {
+      color: var(--bs-link-hover-color);
+    }
   }
 
   .social-networks {

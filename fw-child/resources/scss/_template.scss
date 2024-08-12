@@ -72,10 +72,24 @@
 #footer-socials {
   a {
     color: $gray-600;
-    text-decoration: none;
+
+    &:hover {
+      color: var(--bs-link-hover-color);
+    }
+  }
+
+  .social-networks {
+    li {
+      display: block;
+      margin-bottom: 1rem;
+    }
 
     i {
-      margin-right: 0.75rem;
+      margin-right: 0.4em;
+    }
+
+    a {
+      padding-left: 0;
     }
   }
 }
@@ -413,15 +427,19 @@
 
   li {
     display: inline-block;
-    font-size: 1.25rem;
-    margin-right: .25rem;
+    align-items: center;
+    margin-right: .25em;
 
     a {
-      padding: .375rem;
+      padding: .375rem .375rem .375rem 0;
     } 
 
     &:last-child {
       margin-right: 0;
+    }
+
+    span {
+      margin-left: .20em;
     }
   }
 }

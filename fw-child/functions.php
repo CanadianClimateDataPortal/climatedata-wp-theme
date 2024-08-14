@@ -590,6 +590,20 @@ function cdc_make_interactive_cpt_public_for_motion_page( $args, $post_type ) {
 }
 
 /**
+ * Adjusts the current user and permissions if loaded by the Motion.page editor, 
+ * making the page appear as if the user is not logged in.
+ *
+ * @return void
+ */
+function cdc_page_as_guest_for_motion_page() {
+	// Check if the request is coming from Motion.page
+	if ( isset( $_GET['motionpage_iframe'] ) && $_GET['motionpage_iframe'] == 'true' ) {
+		// Simulate a non-logged-in user
+		wp_set_current_user( 0 );
+	}
+}
+
+/**
  * Unregisters default taxonomies that are not used.
  *
  * @return void
@@ -616,6 +630,7 @@ function cdc_manage_post_columns( $post_columns ) {
 add_action ( 'init', 'remove_default_editor' );
 add_action ( 'init', 'cdc_remove_unused_taxonomies' );
 add_action ( 'init', 'remove_comments_post_type_support', 100 );
+add_action ( 'init', 'cdc_page_as_guest_for_motion_page' );
 add_action ( 'admin_menu', 'remove_comments_admin_menu' );
 add_action ( 'wp_before_admin_bar_render', 'remove_comments_admin_bar' );
 add_filter ( 'use_block_editor_for_post_type', 'cdc_enable_block_editor', 10, 2 );

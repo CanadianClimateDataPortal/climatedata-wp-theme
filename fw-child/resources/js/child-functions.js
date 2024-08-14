@@ -606,22 +606,23 @@ const $ = jQuery;
 
     if ($('#page-home').length) {
       gsap.registerPlugin(ScrollTrigger);
-    
+
       $('.scroll-card').each(function () {
         const card = this;
         const isLastCard = $(card).closest('.fw-query-item').is(':last-child');
 
          // Set pointer-events to none at the beginning for every card
         $(card).css('pointer-events', 'none');
-        
+
         // Define common properties
-        let fromToProps = { 
+        const fromToProps = { 
           y: '-85%',
           opacity: 0,
           scale: 0.75,
-          zIndex: 0
+          zIndex: 0,
         };
-        let toProps1 = {
+
+        const toProps1 = {
           y: '-15%',
           opacity: 1,
           scale: 1,
@@ -631,9 +632,10 @@ const $ = jQuery;
           },
           onReverseComplete: function() {
             $(card).css('pointer-events', 'none'); // Disable pointer-events when reversing the animation
-          }
+          },
         };
-        let toProps2 = {
+
+        const toProps2 = {
           y: '55%',
           opacity: 0,
           scale: 0.75,
@@ -644,9 +646,9 @@ const $ = jQuery;
           },
           onReverseComplete: function() {
             $(card).css('pointer-events', '');  // Enable pointer-events when this animation is complete on reverse
-          }
+          },
         };
-        
+
         // Customize properties for the last card
         if (isLastCard) {
           toProps2.y = '0%';
@@ -654,7 +656,7 @@ const $ = jQuery;
           toProps2.scale = 1;
           toProps2.zIndex = 100;
         }
-      
+
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: card,
@@ -667,20 +669,14 @@ const $ = jQuery;
             },
             onEnterBack: function() {
               $(card).css('pointer-events', '');  // Disable pointer-events when card enters back
-            }
+            },
           }
         });
-      
-        timeline.fromTo(card, 
-          fromToProps,
-          fromToProps
-        )
-        .to(card,
-          toProps1
-        )
-        .to(card,
-          toProps2
-        );
+
+        timeline
+          .fromTo(card, fromToProps, fromToProps)
+          .to(card, toProps1)
+          .to(card, toProps2);
       });
 
     };

@@ -17,23 +17,23 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: node_modules\n"
 "X-Poedit-SearchPathExcluded-1: resources/vendor\n"
 
-#: functions.php:234
+#: functions.php:235
 msgid "days"
 msgstr "jours"
 
-#: functions.php:235
+#: functions.php:236
 msgid "day of the year"
 msgstr "jour de l’année"
 
-#: functions.php:236
+#: functions.php:237
 msgid "degree days"
 msgstr "degrés-jours"
 
-#: functions.php:237
+#: functions.php:238
 msgid "number of periods"
 msgstr ""
 
-#: functions.php:238
+#: functions.php:239
 msgid "events"
 msgstr ""
 
@@ -137,14 +137,14 @@ msgstr "Sujets"
 msgid "Sectors"
 msgstr "Secteurs"
 
-#: template/beta-apps/control-btns.php:10
+#: template/apps/control-btns.php:10
 #: template/download/control-bar.php:54
 #: template/download/controls/area.php:183
 msgid "Details"
 msgstr "Détails"
 
-#: template/beta-apps/control-bar.php:14
-#: template/beta-apps/control-btns.php:13
+#: template/apps/control-bar-inner.php:12
+#: template/apps/control-btns.php:13
 #: template/download/control-bar.php:94
 #: template/feedback.php:344
 #: template/feedback.php:527
@@ -152,37 +152,35 @@ msgstr "Détails"
 msgid "Feedback"
 msgstr "Rétroaction"
 
-#: template/beta-apps/modals.php:5
+#: template/apps/modals.php:5
 msgid "About this app"
 msgstr ""
 
-#: template/beta-apps/modals.php:18
+#: template/apps/modals.php:18
 msgid "Close"
 msgstr "Quitter"
 
-#: template/beta-apps/modals.php:20
-#: template/beta-apps/modals.php:30
+#: template/apps/modals.php:20
+#: template/apps/modals.php:30
 msgid "Provide Feedback"
 msgstr "Fournir une rétroaction"
 
-#: template/beta-apps/modals.php:49
+#: template/apps/modals.php:49
 #: template/feedback.php:264
 #: template/feedback.php:392
 #: template/feedback.php:575
 msgid "Submit Feedback"
 msgstr "Soumettre"
 
-#: template/beta-apps/query.php:29
+#: template/apps/query.php:29
 #: template/learn/query.php:31
 #: template/news/query.php:29
-#: template/variable/query.php:29
 msgid "Newest First"
 msgstr "Nouveaux d'abord"
 
-#: template/beta-apps/query.php:30
+#: template/apps/query.php:30
 #: template/learn/query.php:32
 #: template/news/query.php:30
-#: template/variable/query.php:30
 msgid "Oldest First"
 msgstr "Anciens d'abord"
 
@@ -252,6 +250,7 @@ msgstr "cellules"
 #: template/download/controls/data-variable.php:117
 #: template/map/controls/data-variable.php:117
 #: template/map/controls/location.php:57
+#: template/variable/control-bar.php:23
 msgid "Clear"
 msgstr "Effacer"
 
@@ -1378,18 +1377,26 @@ msgstr "Moyennes sur 30 ans"
 msgid "Update ACF Relevant Sectors"
 msgstr ""
 
-#: template/feedback.php:474
-msgid "Which apps do you need support for?"
-msgstr "Pour quelles apps avez-vous besoin d'un soutien ?"
-
 #: resources/functions/rest.php:712
 msgid "Please select at least one app."
 msgstr "Sélectionnez au moins une app."
 
 #: template/feedback.php:416
-msgid "Apps Support"
-msgstr "Support pour les apps"
+msgid "Applications Feedback"
+msgstr "Rétroaction sur les applications"
+
+#: template/feedback.php:474
+msgid "Which application would you like to provide feedback on?"
+msgstr "Pour quelle application souhaitez-vous nous faire un retour ?"
 
 #: template/query/resource-home-feature.php:85
 msgid "App"
-msgstr ""
+msgstr "Application"
+
+#: template/variable/query.php:67
+msgid "Name (A–Z)"
+msgstr "Nom (A-Z)"
+
+#: template/variable/query.php:68
+msgid "Name (Z–A)"
+msgstr "Nom (Z-A)"

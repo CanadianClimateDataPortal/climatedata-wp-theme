@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-07-29T12:42:18+00:00\n"
+"POT-Creation-Date: 2024-08-06T13:58:31+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -24,23 +24,23 @@ msgstr ""
 msgid "Phil Evans"
 msgstr ""
 
-#: functions.php:234
+#: functions.php:235
 msgid "days"
 msgstr ""
 
-#: functions.php:235
+#: functions.php:236
 msgid "day of the year"
 msgstr ""
 
-#: functions.php:236
+#: functions.php:237
 msgid "degree days"
 msgstr ""
 
-#: functions.php:237
+#: functions.php:238
 msgid "number of periods"
 msgstr ""
 
-#: functions.php:238
+#: functions.php:239
 msgid "events"
 msgstr ""
 
@@ -127,8 +127,8 @@ msgstr ""
 msgid "Update ACF Relevant Sectors"
 msgstr ""
 
-#: template/beta-apps/control-bar.php:14
-#: template/beta-apps/control-btns.php:13
+#: template/apps/control-bar-inner.php:12
+#: template/apps/control-btns.php:13
 #: template/download/control-bar.php:94
 #: template/feedback.php:344
 #: template/feedback.php:527
@@ -136,43 +136,41 @@ msgstr ""
 msgid "Feedback"
 msgstr ""
 
-#: template/beta-apps/control-btns.php:10
+#: template/apps/control-btns.php:10
 #: template/download/control-bar.php:54
 #: template/download/controls/area.php:183
 msgid "Details"
 msgstr ""
 
-#: template/beta-apps/modals.php:5
+#: template/apps/modals.php:5
 msgid "About this app"
 msgstr ""
 
-#: template/beta-apps/modals.php:18
+#: template/apps/modals.php:18
 msgid "Close"
 msgstr ""
 
-#: template/beta-apps/modals.php:20
-#: template/beta-apps/modals.php:30
+#: template/apps/modals.php:20
+#: template/apps/modals.php:30
 msgid "Provide Feedback"
 msgstr ""
 
-#: template/beta-apps/modals.php:49
+#: template/apps/modals.php:49
 #: template/feedback.php:264
 #: template/feedback.php:392
 #: template/feedback.php:575
 msgid "Submit Feedback"
 msgstr ""
 
-#: template/beta-apps/query.php:29
+#: template/apps/query.php:29
 #: template/learn/query.php:31
 #: template/news/query.php:29
-#: template/variable/query.php:29
 msgid "Newest First"
 msgstr ""
 
-#: template/beta-apps/query.php:30
+#: template/apps/query.php:30
 #: template/learn/query.php:32
 #: template/news/query.php:30
-#: template/variable/query.php:30
 msgid "Oldest First"
 msgstr ""
 
@@ -246,6 +244,7 @@ msgstr ""
 #: template/download/controls/data-variable.php:117
 #: template/map/controls/data-variable.php:117
 #: template/map/controls/location.php:57
+#: template/variable/control-bar.php:23
 msgid "Clear"
 msgstr ""
 
@@ -996,11 +995,11 @@ msgid "Dataset Support"
 msgstr ""
 
 #: template/feedback.php:416
-msgid "Apps Support"
+msgid "Applications Feedback"
 msgstr ""
 
 #: template/feedback.php:474
-msgid "Which apps do you need support for?"
+msgid "Which application would you like to provide feedback on?"
 msgstr ""
 
 #: template/learn/control-bar.php:11
@@ -1388,4 +1387,12 @@ msgstr ""
 
 #: template/query/variable-item.php:138
 msgid "Relevant Sectors"
+msgstr ""
+
+#: template/variable/query.php:67
+msgid "Name (A–Z)"
+msgstr ""
+
+#: template/variable/query.php:68
+msgid "Name (Z–A)"
 msgstr ""

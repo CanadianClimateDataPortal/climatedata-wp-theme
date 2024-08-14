@@ -1,7 +1,6 @@
 <?php
 	
 	if (
-		!is_user_logged_in() &&
 		get_field ( 'asset_type' ) == 'interactive' &&
 		get_field ( 'asset_post_' . $GLOBALS['fw']['current_lang_code'] ) != ''
 	) {

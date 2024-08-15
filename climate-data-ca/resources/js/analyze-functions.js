@@ -1364,7 +1364,7 @@
 
             });
 
-            $.getJSON(child_theme_dir + 'resources/app/ahccd/ahccd.json', function (data) {
+            $.getJSON(data_url + '/fileserver/ahccd/ahccd.json', function (data) {
                 let ahccd_layer_cluster = L.markerClusterGroup();
 
                 ahccd_layer = L.geoJson(data, {

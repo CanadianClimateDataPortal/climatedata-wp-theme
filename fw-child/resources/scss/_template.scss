@@ -3,7 +3,28 @@
 //
 
 #floating-header {
-  background-color: transparentize($dark, 0.1);
+  @include media-breakpoint-down(sm) {
+    transition: transform 300ms linear, background-color 300ms linear;
+    transform-origin: top left;
+    transform: scale(1.33333);
+  
+    .scrolled & {
+      transform: scale(1);
+      background-color: transparentize($dark, 0.1);
+    }
+  }
+}
+
+#menu-trigger {
+  @include media-breakpoint-down(sm) {
+    transition: transform 300ms linear;
+    transform-origin: center;
+    transform: scale(.75);
+
+    .scrolled & {
+      transform: scale(1);
+    }
+  }
 }
 
 #header-menu-icon {

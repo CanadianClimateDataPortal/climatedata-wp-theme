@@ -3,27 +3,42 @@
 //
 
 #floating-header {
-  @include media-breakpoint-down(sm) {
-    transition: transform 300ms linear, background-color 300ms linear;
-    transform-origin: top left;
-    transform: scale(1.33333);
-  
-    .scrolled & {
-      transform: scale(1);
-      background-color: transparentize($dark, 0.1);
-    }
+  transition: transform 300ms linear, background-color 300ms linear;
+  transform-origin: top left;
+
+  @include media-breakpoint-down(md) {
+    transform: scale(1.5);
   }
+
+  @include media-breakpoint-down(sm) {
+    transform: scale(1.33333);
+  }
+
+  @include media-breakpoint-up(md) {
+    background-color: transparentize($dark, 0.1);
+  }
+
+  .scrolled & {
+    transform: scale(1);
+    background-color: transparentize($dark, 0.1);
+  }
+
 }
 
 #menu-trigger {
-  @include media-breakpoint-down(sm) {
-    transition: transform 300ms linear;
-    transform-origin: center;
-    transform: scale(.75);
+  transition: transform 300ms linear;
+  transform-origin: center;
 
-    .scrolled & {
-      transform: scale(1);
-    }
+  @include media-breakpoint-down(md) {
+    transform: scale(.66667);
+  }
+
+  @include media-breakpoint-down(sm) {
+    transform: scale(.75);
+  }
+
+  .scrolled & {
+    transform: scale(1);
   }
 }
 

@@ -9,16 +9,18 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-05-13T17:16:02+00:00\n"
+"POT-Creation-Date: 2024-08-16T11:49:09+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.9.0\n"
+"X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc-taxonomies\n"
 
 #. Theme Name of the theme
+#: style.css
 msgid "[fw] Child"
 msgstr ""
 
 #. Author of the theme
+#: style.css
 msgid "Phil Evans"
 msgstr ""
 
@@ -71,72 +73,76 @@ msgstr ""
 #: resources/functions/taxonomies.php:68
 #: resources/functions/taxonomies.php:125
 #: resources/functions/taxonomies.php:178
-#: resources/functions/taxonomies.php:231
-#: resources/functions/taxonomies.php:280
+#: resources/functions/taxonomies.php:248
+#: resources/functions/taxonomies.php:297
 msgid "Separate items with commas"
 msgstr ""
 
 #: resources/functions/taxonomies.php:72
 #: resources/functions/taxonomies.php:129
 #: resources/functions/taxonomies.php:182
-#: resources/functions/taxonomies.php:235
-#: resources/functions/taxonomies.php:281
+#: resources/functions/taxonomies.php:252
+#: resources/functions/taxonomies.php:298
 msgid "Add or remove items"
 msgstr ""
 
 #: resources/functions/taxonomies.php:73
 #: resources/functions/taxonomies.php:130
 #: resources/functions/taxonomies.php:183
-#: resources/functions/taxonomies.php:236
-#: resources/functions/taxonomies.php:282
+#: resources/functions/taxonomies.php:253
+#: resources/functions/taxonomies.php:299
+#: resources/functions/taxonomies.php:340
+#: resources/functions/taxonomies.php:382
 msgid "Choose from the most used"
 msgstr ""
 
 #: resources/functions/taxonomies.php:77
 #: resources/functions/taxonomies.php:134
 #: resources/functions/taxonomies.php:187
-#: resources/functions/taxonomies.php:240
-#: resources/functions/taxonomies.php:283
+#: resources/functions/taxonomies.php:257
+#: resources/functions/taxonomies.php:300
 msgid "Popular Items"
 msgstr ""
 
 #: resources/functions/taxonomies.php:78
 #: resources/functions/taxonomies.php:135
 #: resources/functions/taxonomies.php:188
-#: resources/functions/taxonomies.php:241
-#: resources/functions/taxonomies.php:284
+#: resources/functions/taxonomies.php:258
+#: resources/functions/taxonomies.php:301
 msgid "Search Items"
 msgstr ""
 
 #: resources/functions/taxonomies.php:79
 #: resources/functions/taxonomies.php:136
 #: resources/functions/taxonomies.php:189
-#: resources/functions/taxonomies.php:242
-#: resources/functions/taxonomies.php:285
+#: resources/functions/taxonomies.php:259
+#: resources/functions/taxonomies.php:302
+#: resources/functions/taxonomies.php:343
+#: resources/functions/taxonomies.php:385
 msgid "Not Found"
 msgstr ""
 
 #: resources/functions/taxonomies.php:80
 #: resources/functions/taxonomies.php:137
 #: resources/functions/taxonomies.php:190
-#: resources/functions/taxonomies.php:243
-#: resources/functions/taxonomies.php:286
+#: resources/functions/taxonomies.php:260
+#: resources/functions/taxonomies.php:303
 msgid "No items"
 msgstr ""
 
 #: resources/functions/taxonomies.php:81
 #: resources/functions/taxonomies.php:138
 #: resources/functions/taxonomies.php:191
-#: resources/functions/taxonomies.php:244
-#: resources/functions/taxonomies.php:287
+#: resources/functions/taxonomies.php:261
+#: resources/functions/taxonomies.php:304
 msgid "Items list"
 msgstr ""
 
 #: resources/functions/taxonomies.php:82
 #: resources/functions/taxonomies.php:139
 #: resources/functions/taxonomies.php:192
-#: resources/functions/taxonomies.php:245
-#: resources/functions/taxonomies.php:288
+#: resources/functions/taxonomies.php:262
+#: resources/functions/taxonomies.php:305
 msgid "Items list navigation"
 msgstr ""
 
@@ -232,94 +238,254 @@ msgstr ""
 msgid "View Sector"
 msgstr ""
 
-#: resources/functions/taxonomies.php:216
+#: resources/functions/taxonomies.php:233
 msgctxt "Taxonomy General Name"
 msgid "Regions"
 msgstr ""
 
-#: resources/functions/taxonomies.php:217
+#: resources/functions/taxonomies.php:234
 msgctxt "Taxonomy Singular Name"
 msgid "Region"
 msgstr ""
 
-#: resources/functions/taxonomies.php:222
+#: resources/functions/taxonomies.php:239
 msgid "Regions"
 msgstr ""
 
-#: resources/functions/taxonomies.php:223
+#: resources/functions/taxonomies.php:240
 msgid "All Regions"
 msgstr ""
 
-#: resources/functions/taxonomies.php:224
+#: resources/functions/taxonomies.php:241
 msgid "Parent Region"
 msgstr ""
 
-#: resources/functions/taxonomies.php:225
+#: resources/functions/taxonomies.php:242
 msgid "Parent Region:"
 msgstr ""
 
-#: resources/functions/taxonomies.php:226
+#: resources/functions/taxonomies.php:243
 msgid "New Region Name"
 msgstr ""
 
-#: resources/functions/taxonomies.php:227
+#: resources/functions/taxonomies.php:244
 msgid "Add New Region"
 msgstr ""
 
-#: resources/functions/taxonomies.php:228
+#: resources/functions/taxonomies.php:245
 msgid "Edit Region"
 msgstr ""
 
-#: resources/functions/taxonomies.php:229
+#: resources/functions/taxonomies.php:246
 msgid "Update Region"
 msgstr ""
 
-#: resources/functions/taxonomies.php:230
+#: resources/functions/taxonomies.php:247
 msgid "View Region"
 msgstr ""
 
-#: resources/functions/taxonomies.php:269
+#: resources/functions/taxonomies.php:286
 msgctxt "Taxonomy General Name"
 msgid "Variable Types"
 msgstr ""
 
-#: resources/functions/taxonomies.php:270
+#: resources/functions/taxonomies.php:287
 msgctxt "Taxonomy Singular Name"
 msgid "Variable Type"
 msgstr ""
 
-#: resources/functions/taxonomies.php:271
+#: resources/functions/taxonomies.php:288
 msgid "Variable Types"
 msgstr ""
 
-#: resources/functions/taxonomies.php:272
+#: resources/functions/taxonomies.php:289
 msgid "All Types"
 msgstr ""
 
-#: resources/functions/taxonomies.php:273
+#: resources/functions/taxonomies.php:290
 msgid "Parent Type"
 msgstr ""
 
-#: resources/functions/taxonomies.php:274
+#: resources/functions/taxonomies.php:291
 msgid "Parent Type:"
 msgstr ""
 
-#: resources/functions/taxonomies.php:275
+#: resources/functions/taxonomies.php:292
 msgid "New Type Name"
 msgstr ""
 
-#: resources/functions/taxonomies.php:276
+#: resources/functions/taxonomies.php:293
 msgid "Add New Type"
 msgstr ""
 
-#: resources/functions/taxonomies.php:277
+#: resources/functions/taxonomies.php:294
 msgid "Edit Type"
 msgstr ""
 
-#: resources/functions/taxonomies.php:278
+#: resources/functions/taxonomies.php:295
 msgid "Update Type"
 msgstr ""
 
-#: resources/functions/taxonomies.php:279
+#: resources/functions/taxonomies.php:296
 msgid "View Type"
+msgstr ""
+
+#: resources/functions/taxonomies.php:327
+msgctxt "Taxonomy General Name"
+msgid "News Authors"
+msgstr ""
+
+#: resources/functions/taxonomies.php:328
+msgctxt "Taxonomy Singular Name"
+msgid "News Author"
+msgstr ""
+
+#: resources/functions/taxonomies.php:329
+msgid "News Authors"
+msgstr ""
+
+#: resources/functions/taxonomies.php:330
+msgid "All News Authors"
+msgstr ""
+
+#: resources/functions/taxonomies.php:331
+msgid "Parent News Author"
+msgstr ""
+
+#: resources/functions/taxonomies.php:332
+msgid "Parent News Author:"
+msgstr ""
+
+#: resources/functions/taxonomies.php:333
+msgid "New News Author Name"
+msgstr ""
+
+#: resources/functions/taxonomies.php:334
+msgid "Add New News Author"
+msgstr ""
+
+#: resources/functions/taxonomies.php:335
+msgid "Edit News Author"
+msgstr ""
+
+#: resources/functions/taxonomies.php:336
+msgid "Update News Author"
+msgstr ""
+
+#: resources/functions/taxonomies.php:337
+msgid "View News Author"
+msgstr ""
+
+#: resources/functions/taxonomies.php:338
+msgid "Separate news authors with commas"
+msgstr ""
+
+#: resources/functions/taxonomies.php:339
+msgid "Add or remove news authors"
+msgstr ""
+
+#: resources/functions/taxonomies.php:341
+msgid "Popular News Authors"
+msgstr ""
+
+#: resources/functions/taxonomies.php:342
+msgid "Search News Authors"
+msgstr ""
+
+#: resources/functions/taxonomies.php:344
+msgid "No news authors"
+msgstr ""
+
+#: resources/functions/taxonomies.php:345
+msgid "News Authors list"
+msgstr ""
+
+#: resources/functions/taxonomies.php:346
+msgid "News Authors list navigation"
+msgstr ""
+
+#: resources/functions/taxonomies.php:369
+msgctxt "Taxonomy General Name"
+msgid "News Topics"
+msgstr ""
+
+#: resources/functions/taxonomies.php:370
+msgctxt "Taxonomy Singular Name"
+msgid "News Topic"
+msgstr ""
+
+#: resources/functions/taxonomies.php:371
+msgid "News Topics"
+msgstr ""
+
+#: resources/functions/taxonomies.php:372
+msgid "All News Topics"
+msgstr ""
+
+#: resources/functions/taxonomies.php:373
+msgid "Parent News Topic"
+msgstr ""
+
+#: resources/functions/taxonomies.php:374
+msgid "Parent News Topic:"
+msgstr ""
+
+#: resources/functions/taxonomies.php:375
+msgid "New News Topic Name"
+msgstr ""
+
+#: resources/functions/taxonomies.php:376
+msgid "Add New News Topic"
+msgstr ""
+
+#: resources/functions/taxonomies.php:377
+msgid "Edit News Topic"
+msgstr ""
+
+#: resources/functions/taxonomies.php:378
+msgid "Update News Topic"
+msgstr ""
+
+#: resources/functions/taxonomies.php:379
+msgid "View News Topic"
+msgstr ""
+
+#: resources/functions/taxonomies.php:380
+msgid "Separate news topics with commas"
+msgstr ""
+
+#: resources/functions/taxonomies.php:381
+msgid "Add or remove news topics"
+msgstr ""
+
+#: resources/functions/taxonomies.php:383
+msgid "Popular News Topics"
+msgstr ""
+
+#: resources/functions/taxonomies.php:384
+msgid "Search News Topics"
+msgstr ""
+
+#: resources/functions/taxonomies.php:386
+msgid "No news topics"
+msgstr ""
+
+#: resources/functions/taxonomies.php:387
+msgid "News Topics list"
+msgstr ""
+
+#: resources/functions/taxonomies.php:388
+msgid "News Topics list navigation"
+msgstr ""
+
+#. Template Name of the theme
+msgid "Clone Taxonomy"
+msgstr ""
+
+#. Template Name of the theme
+msgid "Init LZ meta"
+msgstr ""
+
+#. Template Name of the theme
+msgid "Update ACF Relevant Sectors"
 msgstr ""

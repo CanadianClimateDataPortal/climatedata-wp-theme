@@ -73,7 +73,7 @@ function taxonomy_layouttype() {
 	);
 	$args = array(
 		'labels'                     => $labels,
-		'hierarchical'               => false,
+		'hierarchical'               => true,
 		'public'                     => false,
 		'show_ui'                    => true,
 		'show_admin_column'          => true,

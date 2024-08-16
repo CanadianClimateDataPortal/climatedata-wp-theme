@@ -418,7 +418,35 @@ const $ = jQuery;
         }
       } );
     }
+    
+    // Functionalities for learning zone archive page.
+    if ($( '#learn-grid' ).length > 0) {
+      $( document ).on( 'fw_query_no_matches', function ( e, query_item ) {
+        const topic_id = query_item.attr( 'id' );
 
+        // Hide query container and its associated filter.
+        query_item.hide().addClass('no-matches');
+        $( '.learn-zone-topic-filter[data-topic-id="' + topic_id + '"]' ).addClass( 'disabled' );
+        
+        // Check if there are no matches in ALL query items.
+        const query_items_count = $('#learn-grid .tab-drawer-bumper > .learn-topic-grid').length;
+        const query_items_no_matches_count = $('#learn-grid .tab-drawer-bumper > .learn-topic-grid.no-matches').length;
+        
+        if (query_items_no_matches_count === query_items_count ) {
+          // Show global no matches message.
+          $('.fw-query-items-no-matches').show();
+        }
+      } );
+
+      $( document ).on( 'fw_query_items_retrieved', function ( e, query_item ) {
+        const topic_id = query_item.attr( 'id' );
+
+        // Show query container and its associated filter.
+        query_item.show().removeClass('no-matches');
+        $( '.learn-zone-topic-filter[data-topic-id="' + topic_id + '"]' ).removeClass( 'disabled' );
+      } );
+    }
+    
     // share widget
 
     if ($('#share').length) {
@@ -486,7 +514,6 @@ const $ = jQuery;
         $(this).fw_query({
           elements: {
             filters: $('#control-bar .fw-query-filter'),
-            sort: $('#sort-menu'),
             reset: $('#control-bar .fw-query-reset'),
           },
         });

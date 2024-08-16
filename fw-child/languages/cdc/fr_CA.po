@@ -1227,7 +1227,7 @@ msgstr ""
 
 #: template/menu-overlay.php:115
 msgid "Join the newsletter"
-msgstr ""
+msgstr "S'inscrire à l'infolettre"
 
 #: resources/functions/builder/front-end/block/content/mailchimp.php:39
 msgid "Your email address"

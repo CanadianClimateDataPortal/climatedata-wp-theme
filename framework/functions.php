@@ -272,14 +272,21 @@ function fw_menu_output ( $menu, $level, $type, $classes ) {
 
 			if ( $current_url == $item_url ) {
 				$is_item_of_current_page = true;
-				echo 'current-nav-item ' . $current_url . ' ';
+				echo 'current-nav-item ';
 			}
 		}
 
-		// if the page is an ancestor of the current ID
+		// If the item's page is an ancestor of the current page
+		// or if the item is an ancestor of the current menu item ID
+		$post_id = url_to_postid( $item['url'] );
+		$ancestors = get_post_ancestors( get_the_ID() );
+
 		if ( 
-			isset ( $GLOBALS['vars']['current_ancestors'] ) &&
-			in_array ( $item['id'], $GLOBALS['vars']['current_ancestors'] )
+			! empty( $ancestors ) &&
+			in_array( $post_id, $ancestors ) ||
+
+			isset( $GLOBALS['vars']['current_ancestors'] ) &&
+			in_array( $item['id'], $GLOBALS['vars']['current_ancestors'] )
 		) {
 			echo 'ancestor-nav-item ';
 		}

@@ -112,11 +112,11 @@ msgstr "Variable"
 msgid "All Variables"
 msgstr ""
 
-#: template/learn/control-bar.php:94
-#: template/query/learn-item.php:68
+#: template/learn/control-bar.php:90
+#: template/query/learn-item.php:70
 #: template/query/resource-home-feature.php:80
 msgid "Interactive"
-msgstr ""
+msgstr "Interactif"
 
 #: resources/functions/rest.php:348
 #: resources/functions/rest.php:349
@@ -173,12 +173,10 @@ msgid "Submit Feedback"
 msgstr "Soumettre"
 
 #: template/apps/query.php:29
-#: template/learn/query.php:31
 msgid "Newest First"
 msgstr "Nouveaux d'abord"
 
 #: template/apps/query.php:30
-#: template/learn/query.php:32
 msgid "Oldest First"
 msgstr "Anciens d'abord"
 
@@ -246,6 +244,7 @@ msgstr "cellules"
 
 #: template/download/controls/area.php:56
 #: template/download/controls/data-variable.php:117
+#: template/learn/control-bar.php:77
 #: template/map/controls/data-variable.php:117
 #: template/map/controls/location.php:57
 #: template/variable/control-bar.php:23
@@ -943,7 +942,7 @@ msgid "Dataset Support"
 msgstr "Support pour les jeux de données"
 
 #: template/learn/control-bar.php:20
-#: template/learn/control-bar.php:81
+#: template/learn/control-bar.php:75
 #: template/news/control-bar.php:11
 #: template/news/control-bar.php:21
 #: template/variable/control-bar.php:11
@@ -951,39 +950,27 @@ msgstr "Support pour les jeux de données"
 msgid "Filters"
 msgstr "Filtres"
 
-#: template/learn/control-bar.php:46
-msgid "topic"
-msgstr ""
-
-#: template/learn/control-bar.php:89
+#: template/learn/control-bar.php:85
 msgid "Content Type"
-msgstr ""
+msgstr "Type de contenu"
 
-#: template/learn/control-bar.php:92
-#: template/query/learn-item.php:58
+#: template/learn/control-bar.php:88
+#: template/query/learn-item.php:60
 #: template/query/resource-home-feature.php:70
 msgid "Video"
 msgstr "Vidéo"
 
-#: template/learn/control-bar.php:93
-#: template/query/learn-item.php:63
+#: template/learn/control-bar.php:89
+#: template/query/learn-item.php:65
 #: template/query/resource-home-feature.php:75
 msgid "Audio"
 msgstr ""
 
-#: template/learn/control-bar.php:95
-#: template/query/learn-item.php:73
+#: template/learn/control-bar.php:91
+#: template/query/learn-item.php:80
 #: template/query/resource-home-feature.php:90
 msgid "Article"
 msgstr ""
-
-#: template/learn/query.php:29
-msgid "Title (A–Z)"
-msgstr "Titre (A à Z)"
-
-#: template/learn/query.php:30
-msgid "Title (Z–A)"
-msgstr "Titre (Z à A)"
 
 #: template/map/control-bar.php:24
 #: template/map/controls/location.php:5
@@ -1255,9 +1242,9 @@ msgid "Download image"
 msgstr "Téléchargement"
 
 #: template/old-loop/blocks/map.php:227
-#: template/query/learn-item.php:86
+#: template/query/learn-item.php:96
 msgid "Time"
-msgstr "Duration"
+msgstr "Durée"
 
 #: template/old-loop/blocks/post_grid.php:80
 msgid "Learn More"
@@ -1284,7 +1271,7 @@ msgstr "Partager cette publication"
 msgid "Select variable"
 msgstr "Sélectionner"
 
-#: template/query/learn-item.php:47
+#: template/query/learn-item.php:51
 msgid "Format"
 msgstr ""
 
@@ -1388,6 +1375,8 @@ msgstr "Rétroaction sur les applications"
 msgid "Which application would you like to provide feedback on?"
 msgstr "Pour quelle application souhaitez-vous nous faire un retour ?"
 
+#: template/learn/control-bar.php:92
+#: template/query/learn-item.php:75
 #: template/query/resource-home-feature.php:85
 msgid "App"
 msgstr "Application"
@@ -1399,3 +1388,27 @@ msgstr "Nom (A-Z)"
 #: template/variable/query.php:68
 msgid "Name (Z–A)"
 msgstr "Nom (Z-A)"
+
+#: functions.php:564
+msgid "Display in Learning Zone"
+msgstr "Afficher dans Apprentissage"
+
+#: functions.php:577
+msgid "Yes"
+msgstr "Oui"
+
+#: functions.php:579
+msgid "No"
+msgstr "Non"
+
+#. Template Name of the theme
+msgid "Init LZ meta"
+msgstr ""
+
+#: template/query/learn-item.php:100
+msgid "%s minutes"
+msgstr ""
+
+#: template/learn/query.php:76
+msgid "No items found."
+msgstr "Aucun item trouvé."

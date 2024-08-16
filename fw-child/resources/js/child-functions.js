@@ -691,13 +691,13 @@ const $ = jQuery;
     // Add 'scrolled' class on body after 50px scroll.
     //
 
-    $(window).on('scroll', function () {
-      if ($(this).scrollTop() > 50) {
-        $('body').addClass('scrolled');
+    $( window ).on( 'scroll', function() {
+      if ( $( this ).scrollTop() > 50 ) {
+        $( 'body' ).addClass( 'scrolled' );
       } else {
-        $('body').removeClass('scrolled');
+        $( 'body' ).removeClass( 'scrolled' );
       }
     });
   });
 
-})(jQuery);
+})( jQuery );

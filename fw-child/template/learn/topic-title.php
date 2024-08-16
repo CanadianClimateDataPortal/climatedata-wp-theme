@@ -11,7 +11,7 @@ if ( isset( $GLOBALS['fw'] ) ) {
             $topic_name  = $topic->name;
             $topic_title = fw_get_field( 'title', 'topic_' . $topic->term_id );
 
-            if ( 
+            if (
                 $GLOBALS['fw']['current_lang_code'] !== 'en' &&
                 get_field( 'term_' . $GLOBALS['fw']['current_lang_code'], 'topic_' . $topic->term_id )
             ) {

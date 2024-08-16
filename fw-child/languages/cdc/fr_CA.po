@@ -108,7 +108,7 @@ msgstr "Une erreur s'est produite lors de l'ajout de votre adresse courriel à n
 msgid "Variable"
 msgstr "Variable"
 
-#: template/menu-overlay.php:238
+#: template/menu-overlay.php:236
 msgid "All Variables"
 msgstr ""
 
@@ -128,7 +128,7 @@ msgstr ""
 #: template/learn/control-bar.php:11
 #: template/learn/control-bar.php:30
 #: template/post-meta.php:53
-#: template/query/news-item.php:64
+#: template/query/news-item.php:71
 msgid "Topics"
 msgstr "Sujets"
 
@@ -174,13 +174,11 @@ msgstr "Soumettre"
 
 #: template/apps/query.php:29
 #: template/learn/query.php:31
-#: template/news/query.php:29
 msgid "Newest First"
 msgstr "Nouveaux d'abord"
 
 #: template/apps/query.php:30
 #: template/learn/query.php:32
-#: template/news/query.php:30
 msgid "Oldest First"
 msgstr "Anciens d'abord"
 
@@ -203,7 +201,7 @@ msgstr "Zone"
 #: template/map/control-bar.php:42
 #: template/map/controls/download.php:5
 #: template/map/controls/download.php:44
-#: template/menu-overlay.php:196
+#: template/menu-overlay.php:194
 msgid "Download"
 msgstr "Télécharger"
 
@@ -315,7 +313,7 @@ msgstr "Zoom"
 #: template/download/controls/data.php:112
 #: template/download/controls/details.php:353
 #: template/map/controls/data-variable.php:139
-#: template/news/query.php:61
+#: template/news/query.php:50
 msgid "Next"
 msgstr "Suivant"
 
@@ -1221,22 +1219,22 @@ msgstr "Décénnie"
 msgid "Climate Data"
 msgstr "Données Climatiques"
 
-#: template/menu-overlay.php:181
+#: template/menu-overlay.php:179
 msgid "Popular Variables"
 msgstr ""
 
-#: template/menu-overlay.php:194
+#: template/menu-overlay.php:192
 #: template/query/map-var-item.php:11
 msgid "View on map"
 msgstr "Voir sur la carte"
 
-#: template/menu-overlay.php:198
+#: template/menu-overlay.php:196
 #: template/query/download-var-item.php:13
 #: template/query/map-var-item.php:13
 msgid "Description"
 msgstr "Description"
 
-#: template/menu-overlay.php:211
+#: template/menu-overlay.php:209
 msgid "Variables by Sector"
 msgstr ""
 
@@ -1244,7 +1242,7 @@ msgstr ""
 msgid "Join the newsletter"
 msgstr ""
 
-#: template/newsletter-signup.php:10
+#: resources/functions/builder/front-end/block/content/mailchimp.php:39
 msgid "Your email address"
 msgstr "Votre adresse courriel"
 
@@ -1270,8 +1268,9 @@ msgid "Date"
 msgstr "Date"
 
 #: template/post-meta.php:26
+#: template/query/news-item.php:44
 msgid "F j, Y"
-msgstr "\\l\\e j F, Y"
+msgstr "j F, Y"
 
 #: template/post-meta.php:36
 msgid "Author"
@@ -1313,7 +1312,7 @@ msgstr "Paramètres de l'OMM"
 
 #: template/download/controls/data-variable.php:137
 #: template/map/controls/data-variable.php:137
-#: template/news/query.php:57
+#: template/news/query.php:46
 msgid "Previous"
 msgstr "Précédent"
 

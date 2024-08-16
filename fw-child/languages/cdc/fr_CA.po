@@ -108,15 +108,15 @@ msgstr "Une erreur s'est produite lors de l'ajout de votre adresse courriel à n
 msgid "Variable"
 msgstr "Variable"
 
-#: template/menu-overlay.php:238
+#: template/menu-overlay.php:236
 msgid "All Variables"
 msgstr ""
 
-#: template/learn/control-bar.php:94
-#: template/query/learn-item.php:68
+#: template/learn/control-bar.php:90
+#: template/query/learn-item.php:70
 #: template/query/resource-home-feature.php:80
 msgid "Interactive"
-msgstr ""
+msgstr "Interactif"
 
 #: resources/functions/rest.php:348
 #: resources/functions/rest.php:349
@@ -128,7 +128,7 @@ msgstr ""
 #: template/learn/control-bar.php:11
 #: template/learn/control-bar.php:30
 #: template/post-meta.php:53
-#: template/query/news-item.php:64
+#: template/query/news-item.php:71
 msgid "Topics"
 msgstr "Sujets"
 
@@ -173,14 +173,10 @@ msgid "Submit Feedback"
 msgstr "Soumettre"
 
 #: template/apps/query.php:29
-#: template/learn/query.php:31
-#: template/news/query.php:29
 msgid "Newest First"
 msgstr "Nouveaux d'abord"
 
 #: template/apps/query.php:30
-#: template/learn/query.php:32
-#: template/news/query.php:30
 msgid "Oldest First"
 msgstr "Anciens d'abord"
 
@@ -203,7 +199,7 @@ msgstr "Zone"
 #: template/map/control-bar.php:42
 #: template/map/controls/download.php:5
 #: template/map/controls/download.php:44
-#: template/menu-overlay.php:196
+#: template/menu-overlay.php:194
 msgid "Download"
 msgstr "Télécharger"
 
@@ -248,6 +244,7 @@ msgstr "cellules"
 
 #: template/download/controls/area.php:56
 #: template/download/controls/data-variable.php:117
+#: template/learn/control-bar.php:77
 #: template/map/controls/data-variable.php:117
 #: template/map/controls/location.php:57
 #: template/variable/control-bar.php:23
@@ -315,7 +312,7 @@ msgstr "Zoom"
 #: template/download/controls/data.php:112
 #: template/download/controls/details.php:353
 #: template/map/controls/data-variable.php:139
-#: template/news/query.php:61
+#: template/news/query.php:50
 msgid "Next"
 msgstr "Suivant"
 
@@ -945,7 +942,7 @@ msgid "Dataset Support"
 msgstr "Support pour les jeux de données"
 
 #: template/learn/control-bar.php:20
-#: template/learn/control-bar.php:81
+#: template/learn/control-bar.php:75
 #: template/news/control-bar.php:11
 #: template/news/control-bar.php:21
 #: template/variable/control-bar.php:11
@@ -953,39 +950,27 @@ msgstr "Support pour les jeux de données"
 msgid "Filters"
 msgstr "Filtres"
 
-#: template/learn/control-bar.php:46
-msgid "topic"
-msgstr ""
-
-#: template/learn/control-bar.php:89
+#: template/learn/control-bar.php:85
 msgid "Content Type"
-msgstr ""
+msgstr "Type de contenu"
 
-#: template/learn/control-bar.php:92
-#: template/query/learn-item.php:58
+#: template/learn/control-bar.php:88
+#: template/query/learn-item.php:60
 #: template/query/resource-home-feature.php:70
 msgid "Video"
 msgstr "Vidéo"
 
-#: template/learn/control-bar.php:93
-#: template/query/learn-item.php:63
+#: template/learn/control-bar.php:89
+#: template/query/learn-item.php:65
 #: template/query/resource-home-feature.php:75
 msgid "Audio"
 msgstr ""
 
-#: template/learn/control-bar.php:95
-#: template/query/learn-item.php:73
+#: template/learn/control-bar.php:91
+#: template/query/learn-item.php:80
 #: template/query/resource-home-feature.php:90
 msgid "Article"
 msgstr ""
-
-#: template/learn/query.php:29
-msgid "Title (A–Z)"
-msgstr "Titre (A à Z)"
-
-#: template/learn/query.php:30
-msgid "Title (Z–A)"
-msgstr "Titre (Z à A)"
 
 #: template/map/control-bar.php:24
 #: template/map/controls/location.php:5
@@ -1221,22 +1206,22 @@ msgstr "Décénnie"
 msgid "Climate Data"
 msgstr "Données Climatiques"
 
-#: template/menu-overlay.php:181
+#: template/menu-overlay.php:179
 msgid "Popular Variables"
 msgstr ""
 
-#: template/menu-overlay.php:194
+#: template/menu-overlay.php:192
 #: template/query/map-var-item.php:11
 msgid "View on map"
 msgstr "Voir sur la carte"
 
-#: template/menu-overlay.php:198
+#: template/menu-overlay.php:196
 #: template/query/download-var-item.php:13
 #: template/query/map-var-item.php:13
 msgid "Description"
 msgstr "Description"
 
-#: template/menu-overlay.php:211
+#: template/menu-overlay.php:209
 msgid "Variables by Sector"
 msgstr ""
 
@@ -1244,7 +1229,7 @@ msgstr ""
 msgid "Join the newsletter"
 msgstr "S'inscrire à l'infolettre"
 
-#: template/newsletter-signup.php:10
+#: resources/functions/builder/front-end/block/content/mailchimp.php:39
 msgid "Your email address"
 msgstr "Votre adresse courriel"
 
@@ -1257,9 +1242,9 @@ msgid "Download image"
 msgstr "Téléchargement"
 
 #: template/old-loop/blocks/map.php:227
-#: template/query/learn-item.php:86
+#: template/query/learn-item.php:96
 msgid "Time"
-msgstr "Duration"
+msgstr "Durée"
 
 #: template/old-loop/blocks/post_grid.php:80
 msgid "Learn More"
@@ -1270,8 +1255,9 @@ msgid "Date"
 msgstr "Date"
 
 #: template/post-meta.php:26
+#: template/query/news-item.php:44
 msgid "F j, Y"
-msgstr "\\l\\e j F, Y"
+msgstr "j F, Y"
 
 #: template/post-meta.php:36
 msgid "Author"
@@ -1285,7 +1271,7 @@ msgstr "Partager cette publication"
 msgid "Select variable"
 msgstr "Sélectionner"
 
-#: template/query/learn-item.php:47
+#: template/query/learn-item.php:51
 msgid "Format"
 msgstr ""
 
@@ -1313,7 +1299,7 @@ msgstr "Paramètres de l'OMM"
 
 #: template/download/controls/data-variable.php:137
 #: template/map/controls/data-variable.php:137
-#: template/news/query.php:57
+#: template/news/query.php:46
 msgid "Previous"
 msgstr "Précédent"
 
@@ -1389,6 +1375,8 @@ msgstr "Rétroaction sur les applications"
 msgid "Which application would you like to provide feedback on?"
 msgstr "Pour quelle application souhaitez-vous nous faire un retour ?"
 
+#: template/learn/control-bar.php:92
+#: template/query/learn-item.php:75
 #: template/query/resource-home-feature.php:85
 msgid "App"
 msgstr "Application"
@@ -1400,3 +1388,27 @@ msgstr "Nom (A-Z)"
 #: template/variable/query.php:68
 msgid "Name (Z–A)"
 msgstr "Nom (Z-A)"
+
+#: functions.php:564
+msgid "Display in Learning Zone"
+msgstr "Afficher dans Apprentissage"
+
+#: functions.php:577
+msgid "Yes"
+msgstr "Oui"
+
+#: functions.php:579
+msgid "No"
+msgstr "Non"
+
+#. Template Name of the theme
+msgid "Init LZ meta"
+msgstr ""
+
+#: template/query/learn-item.php:100
+msgid "%s minutes"
+msgstr ""
+
+#: template/learn/query.php:76
+msgid "No items found."
+msgstr "Aucun item trouvé."

@@ -262,11 +262,6 @@ function custom_theme_setup() {
 			'menu_slug' => 'taxonomies',
 			'parent_slug' => 'theme-settings',
 		) );
-		
-		acf_add_options_page ( array (
-			'page_title' => 'Social Networks',
-			'parent_slug' => 'theme-settings',
-		) );
 
 	}
 

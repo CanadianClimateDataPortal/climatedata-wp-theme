@@ -23,24 +23,13 @@
 	
 	<div class="col-13 offset-1">
 		<div class="tab-drawer-bumper">
-			<div class="pt-6">
-				
-				<ul id="sort-menu" class="fw-query-sort list-unstyled d-flex all-caps">
-					<li class="selected me-4" data-sort="date_desc"><i class="fas fa-arrow-up me-2"></i> <?php _e ( 'Newest First', 'cdc' ); ?></li>
-					<li class="" data-sort="date_asc"><i class="fas fa-arrow-down me-2"></i> <?php _e ( 'Oldest First', 'cdc' ); ?></li>
-				</ul>
-				
-			</div>
-			
 			<?php
-				
 				$module_args = array (
 					'posts_per_page' => 9,
 					'post_type' => 'post',
 					'post_parent' => 0,
 					'post_status' => 'publish'
 				);
-				
 			?>
 			
 			<div id="news-grid" class="py-6" data-args='<?php echo json_encode ( $module_args ); ?>'>

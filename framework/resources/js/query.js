@@ -587,10 +587,8 @@
 							};
 							
 							plugin.generate_pagination_links( pagination_data );
-
+							
 							data.items.forEach(function(item, i) {
-								
-								// console.log(item)
 								
 								let new_item = options.template.clone()
 								
@@ -600,12 +598,14 @@
 							
 						}
 						
-			$(document).trigger('fw_query_items_retrieved', [item])
+						$(document).trigger('fw_query_items_retrieved', [item])
+
 					} else {
 						
 						options.elements.item_container.html('<p class="alert alert-warning">' + data.message + '</a>')
 						
-			$(document).trigger('fw_query_no_matches', [item])
+						$(document).trigger('fw_query_no_matches', [item])
+
 					}
 					
 					if (plugin.debug == true) {

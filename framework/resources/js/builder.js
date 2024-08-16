@@ -4941,8 +4941,7 @@
 					action: 'fw_update_post',
 					globals: options.globals,
 					post_id: options.post_id,
-					builder: options.page,
-					builder_string: JSON.stringify(options.page)
+					builder: JSON.stringify(options.page),
 				},
 				success: function(data) {
 					console.log(data)

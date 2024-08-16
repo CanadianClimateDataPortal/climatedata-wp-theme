@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-07-31T12:49:06+00:00\n"
+"POT-Creation-Date: 2024-08-16T12:24:50+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -74,6 +74,10 @@ msgstr ""
 #: resources/functions/ajax.php:165
 #: template/download/controls/submit.php:115
 msgid "Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)"
+msgstr ""
+
+#: resources/functions/builder/front-end/block/content/mailchimp.php:39
+msgid "Your email address"
 msgstr ""
 
 #: resources/functions/rest.php:348
@@ -179,14 +183,10 @@ msgid "Submit Feedback"
 msgstr ""
 
 #: template/apps/query.php:29
-#: template/news/query.php:29
-#: template/variable/query.php:29
 msgid "Newest First"
 msgstr ""
 
 #: template/apps/query.php:30
-#: template/news/query.php:30
-#: template/variable/query.php:30
 msgid "Oldest First"
 msgstr ""
 
@@ -209,7 +209,7 @@ msgstr ""
 #: template/map/control-bar.php:42
 #: template/map/controls/download.php:5
 #: template/map/controls/download.php:44
-#: template/menu-overlay.php:196
+#: template/menu-overlay.php:194
 msgid "Download"
 msgstr ""
 
@@ -261,6 +261,7 @@ msgstr ""
 #: template/learn/control-bar.php:77
 #: template/map/controls/data-variable.php:117
 #: template/map/controls/location.php:57
+#: template/variable/control-bar.php:23
 msgid "Clear"
 msgstr ""
 
@@ -339,7 +340,7 @@ msgstr ""
 #: template/download/controls/data.php:112
 #: template/download/controls/details.php:353
 #: template/map/controls/data-variable.php:139
-#: template/news/query.php:61
+#: template/news/query.php:50
 msgid "Next"
 msgstr ""
 
@@ -350,7 +351,7 @@ msgstr ""
 
 #: template/download/controls/data-variable.php:137
 #: template/map/controls/data-variable.php:137
-#: template/news/query.php:57
+#: template/news/query.php:46
 msgid "Previous"
 msgstr ""
 
@@ -1011,17 +1012,17 @@ msgid "Dataset Support"
 msgstr ""
 
 #: template/feedback.php:416
-msgid "Apps Support"
+msgid "Applications Feedback"
 msgstr ""
 
 #: template/feedback.php:474
-msgid "Which apps do you need support for?"
+msgid "Which application would you like to provide feedback on?"
 msgstr ""
 
 #: template/learn/control-bar.php:11
 #: template/learn/control-bar.php:30
 #: template/post-meta.php:53
-#: template/query/news-item.php:64
+#: template/query/news-item.php:71
 msgid "Topics"
 msgstr ""
 
@@ -1323,31 +1324,27 @@ msgstr ""
 msgid "Join the newsletter"
 msgstr ""
 
-#: template/menu-overlay.php:181
+#: template/menu-overlay.php:179
 msgid "Popular Variables"
 msgstr ""
 
-#: template/menu-overlay.php:194
+#: template/menu-overlay.php:192
 #: template/query/map-var-item.php:11
 msgid "View on map"
 msgstr ""
 
-#: template/menu-overlay.php:198
+#: template/menu-overlay.php:196
 #: template/query/download-var-item.php:13
 #: template/query/map-var-item.php:13
 msgid "Description"
 msgstr ""
 
-#: template/menu-overlay.php:211
+#: template/menu-overlay.php:209
 msgid "Variables by Sector"
 msgstr ""
 
-#: template/menu-overlay.php:238
+#: template/menu-overlay.php:236
 msgid "All Variables"
-msgstr ""
-
-#: template/newsletter-signup.php:10
-msgid "Your email address"
 msgstr ""
 
 #: template/old-loop/blocks/chart.php:43
@@ -1372,6 +1369,7 @@ msgid "Date"
 msgstr ""
 
 #: template/post-meta.php:26
+#: template/query/news-item.php:44
 msgid "F j, Y"
 msgstr ""
 
@@ -1401,4 +1399,12 @@ msgstr ""
 
 #: template/query/variable-item.php:138
 msgid "Relevant Sectors"
+msgstr ""
+
+#: template/variable/query.php:67
+msgid "Name (A–Z)"
+msgstr ""
+
+#: template/variable/query.php:68
+msgid "Name (Z–A)"
 msgstr ""

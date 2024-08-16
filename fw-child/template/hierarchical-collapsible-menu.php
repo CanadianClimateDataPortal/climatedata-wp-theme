@@ -41,7 +41,7 @@ if ( !empty ( $all_children ) ) {
 ?>
 
 <div class="hierarchical-menu">
-	<?php
+    <?php
         /**
          * Displays the menu hierarchy and makes it collapsible.
          *
@@ -132,19 +132,18 @@ if ( !empty ( $all_children ) ) {
                 if ( isset ( $item['children'] ) ) {
 
                     $submenu_id++;
-                    $in_active_trail = false;
-                    if ( in_array ( $item['id'], get_post_ancestors( get_the_ID() ) ) ) {
-                        $in_active_trail = true;
-                    }
+                    $is_current_page = ( isset ( $GLOBALS['vars']['current_url'] ) && $GLOBALS['vars']['current_url'] == $item['url'] );
+                    $in_active_trail = in_array ( $item['id'], get_post_ancestors( get_the_ID() ) );
+
                     echo '<button class="button-expand fa-solid fa-chevron-down" data-bs-toggle="collapse" data-bs-target="#hierarchical-submenu-' . $submenu_id . '" ';
-                    if ( $in_active_trail ) {
+                    if ( $is_current_page || $in_active_trail ) {
                         echo 'aria-expanded="true"';
                     } else {
                         echo 'aria-expanded="false"';
                     }
                     echo '></button>';
                     echo '</div>';
-                    cdc_hierarchical_menu ( $item['children'], true, $submenu_id, $in_active_trail );
+                    cdc_hierarchical_menu ( $item['children'], true, $submenu_id, $is_current_page || $in_active_trail );
 
                 }
 

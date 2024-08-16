@@ -208,17 +208,20 @@
 			if (options.elements.sort != null) {
 				options.elements.sort.on('click', 'li', function(e) {
 					
-					let sort = $(this).attr('data-sort').split('_')
+					const dataSort = $(this).attr('data-sort');
+					const lastUnderscoreIndex = dataSort.lastIndexOf('_');
 					
-					options.args.orderby = sort[0]
-					options.args.order = sort[1]
+					const orderby = dataSort.substring(0, lastUnderscoreIndex);
+					const order = dataSort.substring(lastUnderscoreIndex + 1);
 					
-					options.elements.sort.find('li').removeClass('selected')
-					$(this).addClass('selected')
+					options.args.orderby = orderby;
+					options.args.order = order;
 					
-					plugin.do_query()
+					options.elements.sort.find('li').removeClass('selected');
+					$(this).addClass('selected');
 					
-				})
+					plugin.do_query();
+				});
 			}
 			
 			// pagination
@@ -531,8 +534,6 @@
 			
 			if (options.debug == true) console.log('do query')
 			
-			// console.log('options', options.item_options)
-			
 			let rest_url = ajax_data.rest_url + 'framework/v2/query'
 			
 			$.ajax({
@@ -616,8 +617,8 @@
 						callback()
 					}
 					
-					$(document).trigger('fw_query_success', [item])
-					
+					$(document).trigger('fw_query_success', [item]);
+
 				}
 			})
 			

@@ -322,19 +322,6 @@
 .hierarchical-menu {
   position: relative;
 
-  @include media-breakpoint-up(lg) {
-    &::after {
-      content: '';
-      display: block;
-      height: 100%;
-      position: absolute;
-      right: -.125rem;
-      top: 0;
-      width: 1px;
-      background-color: $gray-400;
-    }
-  }
-
   .collapsible-item {
     display: flex;
     flex-wrap: nowrap;

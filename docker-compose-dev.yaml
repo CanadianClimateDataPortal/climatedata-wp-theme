@@ -23,7 +23,7 @@ services:
     environment:
       # Note: to set a boolean value, always quote the words "true" and "false",
       # else the YAML parser may transform them to 1 and 0. Example:
-      #   WP_WP_DEBUG: "true"
+      # WP_WP_DEBUG: "true"
       WP_DB_NAME: climatedata
       WP_DB_USER: climatedata
       WP_DB_PASSWORD: climatedata

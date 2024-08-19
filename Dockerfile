@@ -164,18 +164,21 @@ COPY dockerfiles/build/www/configs/wordpress/wp-config.php .
 
 WORKDIR /var/www/html/assets/plugins
 
+# Read plugins defined in the wp-plugins/local.txt file and unzip them from the
+# `LOCAL_WP_PLUGINS_DIR` directory.
 ARG LOCAL_WP_PLUGINS_DIR
-RUN --mount=type=bind,source=$LOCAL_WP_PLUGINS_DIR,target=/tmp/wp-plugins unzip-multiple.sh \
-    /tmp/wp-plugins/advanced-custom-fields-pro-6.3.3.zip \
-    /tmp/wp-plugins/motionpage-2.0.0.zip
+RUN --mount=type=bind,source=$LOCAL_WP_PLUGINS_DIR,target=/tmp/wp-plugins \
+    --mount=type=bind,source=dockerfiles/build/www/wp-plugins/local.txt,target=/tmp/plugins.txt \
+    plugins=$(grep -v -e '^\s*$' -e '^#' /tmp/plugins.txt) \
+    && set -- $plugins \
+    && unzip-multiple.sh /tmp/wp-plugins "$@"
 
-RUN download-wp-plugin.sh \
-    classic-editor=1.6.3 \
-    custom-taxonomy-order-ne=4.0.0 \
-    post-type-switcher=3.3.0 \
-    regenerate-thumbnails=3.1.6 \
-    simple-page-ordering=2.5.1 \
-    wordpress-importer=0.8.1
+# Read plugins defined in the wp-plugins/public.txt file and download them from
+# the WordPress plugin repository.
+RUN --mount=type=bind,source=dockerfiles/build/www/wp-plugins/public.txt,target=/tmp/plugins.txt \
+    plugins=$(grep -v -e '^\s*$' -e '^#' /tmp/plugins.txt) \
+    && set -- $plugins \
+    && download-wp-plugin.sh "$@"
 
 # ----
 # Themes files

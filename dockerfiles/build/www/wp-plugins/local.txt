@@ -1,0 +1,9 @@
+# List of zipped WordPress plugins to unzip from a local directory.
+#
+# Each line is a zipped plugin file name. This files doesn't specify the
+# directory containing those files, only their name.
+#
+# In this file, empty lines and lines that start with # are ignored.
+
+advanced-custom-fields-pro-6.3.3.zip
+motionpage-2.0.0.zip

@@ -222,7 +222,7 @@ p {
 
   &-lg {
     @include media-breakpoint-down(sm) {
-      padding: $input-padding-y-lg $input-padding-x-lg; 
+      padding: $input-padding-y-lg $input-padding-x-lg;
     }
   }
 }
@@ -467,7 +467,8 @@ $control-slider-handle-width: 2.75rem;
 
 // BREADCRUMB
 
-#header-breadcrumb {
+#header-breadcrumb,
+#app-breadcrumb {
   overflow-x: auto;
 
   @include media-breakpoint-up(lg) {
@@ -483,6 +484,30 @@ $control-slider-handle-width: 2.75rem;
 
       @include media-breakpoint-up(lg) {
         font-size: 1.25rem;
+      }
+
+      &:first-child {
+        display: none;
+
+        @include media-breakpoint-up(lg) {
+          display: list-item;
+        }
+
+        & + li::before {
+          display: none;
+
+          @include media-breakpoint-up(lg) {
+            display: block;
+          }
+        }
+      }
+
+      &.active {
+        display: none;
+
+        @include media-breakpoint-up(lg) {
+          display: list-item;
+        }
       }
     }
   }
@@ -909,14 +934,14 @@ $query-card-hover-padding: 0.75rem;
     .card {
       height: 100%;
       transition: 0.25s;
-      
+
       &--news {
         .card-date,
         .card-authors,
         .card-topics {
           font-size: 0.875rem;
         }
-        
+
         .card-topics {
           span {
             font-size: 0.75rem;

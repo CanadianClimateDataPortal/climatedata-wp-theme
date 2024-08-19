@@ -104,11 +104,6 @@
     background-color: transparent;
   }
 
-  #header-lang {
-    font-size: 0.875rem;
-    font-weight: $font-weight-bold;
-  }
-
   // features & lottie
 
   #features {
@@ -711,7 +706,7 @@ $legend-on-height: 16px;
   #info .collapseomatic_content {
     display: none;
   }
-  
+
   .tab-drawer {
     .tab-drawer {
       // width: 50vw;
@@ -1774,7 +1769,7 @@ body.tab-drawer-open {
 .news-meta-block {
   backdrop-filter: blur(10px);
   background-color: transparent;
-  
+
   .news-meta-item > span {
     font-size: 0.85rem;
   }
@@ -1861,11 +1856,11 @@ body.tab-drawer-open {
       width: 1.875rem;
       margin-left: -1px;
       margin-bottom: -1px;
-      
+
       @include media-breakpoint-up(xsm) {
         width: 2.25rem;
       }
-      
+
       @include media-breakpoint-up(lg) {
         position: relative;
         flex: 1;
@@ -1898,7 +1893,7 @@ body.tab-drawer-open {
         @include media-breakpoint-up(xsm) {
           padding: .625rem 0 .5rem;
         }
-        
+
         @include media-breakpoint-up(lg) {
           display: flex;
           justify-content: center;
@@ -1930,15 +1925,15 @@ body.tab-drawer-open {
       text-align: center;
       font-size: 2.5rem;
       font-weight: $font-weight-bold;
-      
+
       @include media-breakpoint-up(lg) {
         font-size: 3.5rem;
       }
-      
+
       @include media-breakpoint-up(xl) {
         font-size: 4rem;
       }
-      
+
       @include media-breakpoint-up(xxl) {
         top: 160px;
       }

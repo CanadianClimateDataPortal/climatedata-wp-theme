@@ -1,8 +1,7 @@
 <nav aria-label="breadcrumb">
 	<ol class="breadcrumb">
 		<?php
-
-			// static parents
+			// Static parents.
 
 			foreach ( $element['inputs']['static']['rows'] as $static_parent ) {
 
@@ -27,7 +26,7 @@
 
 			}
 
-			// posts page
+			// Posts page.
 
 			if ( $element['inputs']['include']['posts'] == 'true' ) {
 
@@ -39,7 +38,7 @@
 
 			}
 
-			// ancestors
+			// Ancestors.
 
 			if (
 				$element['inputs']['include']['ancestors'] &&
@@ -58,7 +57,7 @@
 
 			}
 
-			// category
+			// Category.
 
 			if (
 				$element['inputs']['include']['category'] == 'true' &&
@@ -80,7 +79,7 @@
 
 			}
 
-			// post type
+			// Post type.
 
 			if ( $element['inputs']['include']['post_type'] == 'true' ) {
 
@@ -94,7 +93,7 @@
 
 			}
 
-			// title
+			// Title.
 
 			if ( $element['inputs']['include']['title'] == 'true' ) {
 

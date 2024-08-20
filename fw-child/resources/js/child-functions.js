@@ -691,13 +691,22 @@ const $ = jQuery;
     // Add 'scrolled' class on body after 50px scroll.
     //
 
-    $( window ).on( 'scroll', function() {
-      if ( $( this ).scrollTop() > 50 ) {
-        $( 'body' ).addClass( 'scrolled' );
+    function toggleBodyScrolledClass() {
+      if ($(window).scrollTop() > 50) {
+        $('body').addClass('scrolled');
       } else {
-        $( 'body' ).removeClass( 'scrolled' );
+        $('body').removeClass('scrolled');
       }
+    }
+
+    $( window ).on( 'scroll', function() {
+      toggleBodyScrolledClass();
     });
+
+    $( window ).on( 'load', function() {
+      toggleBodyScrolledClass();
+    });
+
   });
 
 })( jQuery );

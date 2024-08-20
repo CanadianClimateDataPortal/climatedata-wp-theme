@@ -18,7 +18,7 @@
     background-color: transparentize($dark, 0.1);
   }
 
-  .scrolled & {
+  body.scrolled & {
     transform: scale(1);
     background-color: transparentize($dark, 0.1);
   }
@@ -37,7 +37,7 @@
     transform: scale(.75);
   }
 
-  .scrolled & {
+  body.scrolled & {
     transform: scale(1);
   }
 }
@@ -54,6 +54,15 @@
     max-width: 100%;
     padding-top: .375rem;
     width: 90%;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 6rem;
+    max-height: 6rem;
+    margin: 0 auto;
   }
 }
 

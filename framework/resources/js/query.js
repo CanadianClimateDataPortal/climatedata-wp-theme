@@ -306,7 +306,7 @@
 			
 			if (options.args.meta_query) {
 				if (options.default_args.meta_query) {
-					options.args.meta_query = { ...options.default_args.meta_query }
+					options.args.meta_query = [ ...options.default_args.meta_query ]
 				} else {
 					delete options.args.meta_query
 				}
@@ -550,8 +550,8 @@
 					lang: options.lang
 				},
 				success: function(data) {
-					
-					// console.log(data)
+					// Hide global no matches message.
+					$('.fw-query-items-no-matches').hide();
 					
 					if (data.success == true) {
 						
@@ -588,10 +588,8 @@
 							};
 							
 							plugin.generate_pagination_links( pagination_data );
-
+							
 							data.items.forEach(function(item, i) {
-								
-								// console.log(item)
 								
 								let new_item = options.template.clone()
 								
@@ -601,10 +599,14 @@
 							
 						}
 						
+						$(document).trigger('fw_query_items_retrieved', [item])
+
 					} else {
 						
 						options.elements.item_container.html('<p class="alert alert-warning">' + data.message + '</a>')
 						
+						$(document).trigger('fw_query_no_matches', [item])
+
 					}
 					
 					if (plugin.debug == true) {

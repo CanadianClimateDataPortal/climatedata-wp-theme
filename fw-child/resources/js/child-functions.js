@@ -433,7 +433,35 @@ const $ = jQuery;
         }
       } );
     }
+    
+    // Functionalities for learning zone archive page.
+    if ($( '#learn-grid' ).length > 0) {
+      $( document ).on( 'fw_query_no_matches', function ( e, query_item ) {
+        const topic_id = query_item.attr( 'id' );
 
+        // Hide query container and its associated filter.
+        query_item.hide().addClass('no-matches');
+        $( '.learn-zone-topic-filter[data-topic-id="' + topic_id + '"]' ).addClass( 'disabled' );
+        
+        // Check if there are no matches in ALL query items.
+        const query_items_count = $('#learn-grid .tab-drawer-bumper > .learn-topic-grid').length;
+        const query_items_no_matches_count = $('#learn-grid .tab-drawer-bumper > .learn-topic-grid.no-matches').length;
+        
+        if (query_items_no_matches_count === query_items_count ) {
+          // Show global no matches message.
+          $('.fw-query-items-no-matches').show();
+        }
+      } );
+
+      $( document ).on( 'fw_query_items_retrieved', function ( e, query_item ) {
+        const topic_id = query_item.attr( 'id' );
+
+        // Show query container and its associated filter.
+        query_item.show().removeClass('no-matches');
+        $( '.learn-zone-topic-filter[data-topic-id="' + topic_id + '"]' ).removeClass( 'disabled' );
+      } );
+    }
+    
     // share widget
 
     if ($('#share').length) {
@@ -501,7 +529,6 @@ const $ = jQuery;
         $(this).fw_query({
           elements: {
             filters: $('#control-bar .fw-query-filter'),
-            sort: $('#sort-menu'),
             reset: $('#control-bar .fw-query-reset'),
           },
         });
@@ -621,51 +648,77 @@ const $ = jQuery;
 
     if ($('#page-home').length) {
       gsap.registerPlugin(ScrollTrigger);
-    
+
       $('.scroll-card').each(function () {
         const card = this;
-    
+        const isLastCard = $(card).closest('.fw-query-item').is(':last-child');
+
+         // Set pointer-events to none at the beginning for every card
+        $(card).css('pointer-events', 'none');
+
+        // Define common properties
+        const fromToProps = { 
+          y: '-85%',
+          opacity: 0,
+          scale: 0.75,
+          zIndex: 0,
+        };
+
+        const toProps1 = {
+          y: '-15%',
+          opacity: 1,
+          scale: 1,
+          zIndex: 100,
+          onStart: function() {
+            $(card).css('pointer-events', ''); // Enable pointer-events as soon as the animation starts
+          },
+          onReverseComplete: function() {
+            $(card).css('pointer-events', 'none'); // Disable pointer-events when reversing the animation
+          },
+        };
+
+        const toProps2 = {
+          y: '55%',
+          opacity: 0,
+          scale: 0.75,
+          zIndex: 0,
+          ease: 'power2.in',
+          onComplete: function() {
+            $(card).css('pointer-events', 'none');  // Disable pointer-events when this animation is complete
+          },
+          onReverseComplete: function() {
+            $(card).css('pointer-events', '');  // Enable pointer-events when this animation is complete on reverse
+          },
+        };
+
+        // Customize properties for the last card
+        if (isLastCard) {
+          toProps2.y = '0%';
+          toProps2.opacity = 1;
+          toProps2.scale = 1;
+          toProps2.zIndex = 100;
+        }
+
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: card,
             start: 'top 100%',
             end: 'top -50%',
             scrub: true,
-            markers: false    // Set to true to debug
+            markers: false,    // Set to true to debug
+            onLeave: function() {
+              $(card).css('pointer-events', 'none');  // Disable pointer-events when card leaves
+            },
+            onEnterBack: function() {
+              $(card).css('pointer-events', '');  // Disable pointer-events when card enters back
+            },
           }
         });
-    
-        timeline.fromTo(card, 
-          { 
-            y: '-85%',
-            opacity: 0,
-            scale: 0.75,
-            zIndex: 0
-          },
-          {
-            y: '-85%',
-            opacity: 0,
-            scale: 0.75,
-            zIndex: 0
-          }
-        )
-        .to(card,
-          {
-            y: '-15%',
-            opacity: 1,
-            scale: 1,
-            zIndex: 100
-          }
-        )
-        .to(card,
-          {
-            y: '55%',
-            opacity: 0,
-            scale: 0.75,
-            zIndex: 0,
-            ease: 'power2.in'
-          }
-        );
+
+        timeline
+          .fromTo(card, fromToProps, fromToProps)
+          .to(card, toProps1)
+          .to(card, toProps2);
       });
 
     };

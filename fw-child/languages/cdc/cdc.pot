@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-08-08T17:18:28+00:00\n"
+"POT-Creation-Date: 2024-08-16T12:24:50+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -44,6 +44,18 @@ msgstr ""
 msgid "events"
 msgstr ""
 
+#: functions.php:564
+msgid "Display in Learning Zone"
+msgstr ""
+
+#: functions.php:577
+msgid "Yes"
+msgstr ""
+
+#: functions.php:579
+msgid "No"
+msgstr ""
+
 #: resources/functions/ajax.php:153
 #: template/download/controls/submit.php:100
 msgid "Historical IDF (ZIP)"
@@ -62,6 +74,10 @@ msgstr ""
 #: resources/functions/ajax.php:165
 #: template/download/controls/submit.php:115
 msgid "Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)"
+msgstr ""
+
+#: resources/functions/builder/front-end/block/content/mailchimp.php:39
+msgid "Your email address"
 msgstr ""
 
 #: resources/functions/rest.php:348
@@ -124,6 +140,10 @@ msgid "Clone Taxonomy"
 msgstr ""
 
 #. Template Name of the theme
+msgid "Init LZ meta"
+msgstr ""
+
+#. Template Name of the theme
 msgid "Update ACF Relevant Sectors"
 msgstr ""
 
@@ -165,15 +185,11 @@ msgstr ""
 msgid "Submit Feedback"
 msgstr ""
 
-#: template/apps/query.php:28
-#: template/learn/query.php:30
-#: template/news/query.php:27
+#: template/apps/query.php:29
 msgid "Newest First"
 msgstr ""
 
-#: template/apps/query.php:29
-#: template/learn/query.php:31
-#: template/news/query.php:28
+#: template/apps/query.php:30
 msgid "Oldest First"
 msgstr ""
 
@@ -196,7 +212,7 @@ msgstr ""
 #: template/map/control-bar.php:42
 #: template/map/controls/download.php:5
 #: template/map/controls/download.php:44
-#: template/menu-overlay.php:196
+#: template/menu-overlay.php:194
 msgid "Download"
 msgstr ""
 
@@ -245,6 +261,7 @@ msgstr ""
 
 #: template/download/controls/area.php:56
 #: template/download/controls/data-variable.php:117
+#: template/learn/control-bar.php:77
 #: template/map/controls/data-variable.php:117
 #: template/map/controls/location.php:57
 #: template/variable/control-bar.php:23
@@ -326,7 +343,7 @@ msgstr ""
 #: template/download/controls/data.php:112
 #: template/download/controls/details.php:353
 #: template/map/controls/data-variable.php:139
-#: template/news/query.php:59
+#: template/news/query.php:50
 msgid "Next"
 msgstr ""
 
@@ -337,7 +354,7 @@ msgstr ""
 
 #: template/download/controls/data-variable.php:137
 #: template/map/controls/data-variable.php:137
-#: template/news/query.php:55
+#: template/news/query.php:46
 msgid "Previous"
 msgstr ""
 
@@ -1008,12 +1025,12 @@ msgstr ""
 #: template/learn/control-bar.php:11
 #: template/learn/control-bar.php:30
 #: template/post-meta.php:53
-#: template/query/news-item.php:64
+#: template/query/news-item.php:71
 msgid "Topics"
 msgstr ""
 
 #: template/learn/control-bar.php:20
-#: template/learn/control-bar.php:81
+#: template/learn/control-bar.php:75
 #: template/news/control-bar.php:11
 #: template/news/control-bar.php:21
 #: template/variable/control-bar.php:11
@@ -1021,44 +1038,42 @@ msgstr ""
 msgid "Filters"
 msgstr ""
 
-#: template/learn/control-bar.php:46
-msgid "topic"
-msgstr ""
-
-#: template/learn/control-bar.php:89
+#: template/learn/control-bar.php:85
 msgid "Content Type"
 msgstr ""
 
-#: template/learn/control-bar.php:92
-#: template/query/learn-item.php:58
+#: template/learn/control-bar.php:88
+#: template/query/learn-item.php:60
 #: template/query/resource-home-feature.php:70
 msgid "Video"
 msgstr ""
 
-#: template/learn/control-bar.php:93
-#: template/query/learn-item.php:63
+#: template/learn/control-bar.php:89
+#: template/query/learn-item.php:65
 #: template/query/resource-home-feature.php:75
 msgid "Audio"
 msgstr ""
 
-#: template/learn/control-bar.php:94
-#: template/query/learn-item.php:68
+#: template/learn/control-bar.php:90
+#: template/query/learn-item.php:70
 #: template/query/resource-home-feature.php:80
 msgid "Interactive"
 msgstr ""
 
-#: template/learn/control-bar.php:95
-#: template/query/learn-item.php:73
+#: template/learn/control-bar.php:91
+#: template/query/learn-item.php:80
 #: template/query/resource-home-feature.php:90
 msgid "Article"
 msgstr ""
 
-#: template/learn/query.php:28
-msgid "Title (A–Z)"
+#: template/learn/control-bar.php:92
+#: template/query/learn-item.php:75
+#: template/query/resource-home-feature.php:85
+msgid "App"
 msgstr ""
 
-#: template/learn/query.php:29
-msgid "Title (Z–A)"
+#: template/learn/query.php:76
+msgid "No items found."
 msgstr ""
 
 #: template/map/control-bar.php:24
@@ -1312,31 +1327,27 @@ msgstr ""
 msgid "Join the newsletter"
 msgstr ""
 
-#: template/menu-overlay.php:181
+#: template/menu-overlay.php:179
 msgid "Popular Variables"
 msgstr ""
 
-#: template/menu-overlay.php:194
+#: template/menu-overlay.php:192
 #: template/query/map-var-item.php:11
 msgid "View on map"
 msgstr ""
 
-#: template/menu-overlay.php:198
+#: template/menu-overlay.php:196
 #: template/query/download-var-item.php:13
 #: template/query/map-var-item.php:13
 msgid "Description"
 msgstr ""
 
-#: template/menu-overlay.php:211
+#: template/menu-overlay.php:209
 msgid "Variables by Sector"
 msgstr ""
 
-#: template/menu-overlay.php:238
+#: template/menu-overlay.php:236
 msgid "All Variables"
-msgstr ""
-
-#: template/newsletter-signup.php:10
-msgid "Your email address"
 msgstr ""
 
 #: template/old-loop/blocks/chart.php:43
@@ -1348,7 +1359,7 @@ msgid "Download image"
 msgstr ""
 
 #: template/old-loop/blocks/map.php:227
-#: template/query/learn-item.php:86
+#: template/query/learn-item.php:96
 msgid "Time"
 msgstr ""
 
@@ -1361,6 +1372,7 @@ msgid "Date"
 msgstr ""
 
 #: template/post-meta.php:26
+#: template/query/news-item.php:44
 msgid "F j, Y"
 msgstr ""
 
@@ -1376,12 +1388,12 @@ msgstr ""
 msgid "Select variable"
 msgstr ""
 
-#: template/query/learn-item.php:47
+#: template/query/learn-item.php:51
 msgid "Format"
 msgstr ""
 
-#: template/query/resource-home-feature.php:85
-msgid "App"
+#: template/query/learn-item.php:100
+msgid "%s minutes"
 msgstr ""
 
 #: template/query/variable-item.php:94

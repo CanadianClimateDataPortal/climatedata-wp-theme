@@ -16,14 +16,9 @@ $excerpts = array (
 
 <div class="card card--learn">
 
-	<?php
-	if ( has_post_thumbnail( $item['id'] ) ) { ?>
-		<div class="bg-dark">
-			<div class="card-img item-thumb" style="background-image: url(<?php echo get_the_post_thumbnail_url( $item['id'], 'medium_large' ); ?>);"></div>
-		</div>
-		<?php
-	}
-	?>
+	<div class="bg-dark">
+		<div class="card-img item-thumb" <?php echo has_post_thumbnail( $item['id'] ) ? 'style="background-image: url(' . get_the_post_thumbnail_url( $item['id'], 'medium_large' ) . ');"' : '' ?>></div>
+	</div>
 
 	<div class="card-body d-flex flex-column">
 		<h5 class="card-title item-title">

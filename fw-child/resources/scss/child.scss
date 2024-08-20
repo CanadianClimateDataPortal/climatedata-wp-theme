@@ -635,7 +635,7 @@ $control-slider-handle-width: 2.75rem;
 
     .control-tab-body {
       flex-grow: 1;
-      overflow: auto;
+      overflow-y: auto;
       // padding: 1rem;
     }
 
@@ -647,6 +647,17 @@ $control-slider-handle-width: 2.75rem;
       .tab-drawer-content-inner {
         background-color: $white;
       }
+    }
+  }
+
+  .learn-zone-topic-filter {
+    &:hover {
+      background-color: $gray-200;
+    }
+
+    &.disabled {
+      pointer-events: none;
+      opacity: .5;
     }
   }
 }
@@ -702,6 +713,7 @@ $control-slider-handle-width: 2.75rem;
 
   .fw-query-reset {
     line-height: 0.75rem;
+    font-weight: 600;
     padding: 0.15rem 0.25rem;
   }
 
@@ -924,6 +936,22 @@ $query-card-hover-padding: 0.75rem;
           }
         }
       }
+
+      &--learn {
+        .card-desc {
+          font-size: 0.925rem;
+        }
+
+        .card-asset-type,
+        .card-asset-time {
+          font-size: 0.875rem;
+          margin-top: -0.25rem;
+
+          i {
+            font-size: 0.75rem;
+          }
+        }
+      }
     }
 
     .card-body {
@@ -1031,4 +1059,8 @@ $query-card-hover-padding: 0.75rem;
 
 .mb-25vh {
   margin-bottom: 25vh;
+}
+
+.w-max {
+  width: max-content;
 }

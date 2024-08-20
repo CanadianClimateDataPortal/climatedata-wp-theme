@@ -261,7 +261,7 @@ function fw_menu_output ( $menu, $level, $type, $classes ) {
 
 		echo '<li class="';
 
-		if ( isset ( $GLOBALS['vars']['current_url'] ) ) {
+		if ( isset( $GLOBALS['vars']['current_url'] ) ) {
 			$current_host = parse_url( $GLOBALS['vars']['current_url'], PHP_URL_HOST );
 			$current_path = parse_url( $GLOBALS['vars']['current_url'], PHP_URL_PATH );
 			$current_url = $current_host . $current_path;
@@ -278,7 +278,7 @@ function fw_menu_output ( $menu, $level, $type, $classes ) {
 
 		// If the item's page is an ancestor of the current page
 		// or if the item is an ancestor of the current menu item ID
-		$post_id = url_to_postid( $item['url'] );
+		$post_id = get_post_meta( $item['id'], '_menu_item_object_id', true );
 		$ancestors = get_post_ancestors( get_the_ID() );
 
 		if ( 

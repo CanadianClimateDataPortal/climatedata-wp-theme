@@ -16,7 +16,7 @@ $excerpts = array (
 
 <div class="card card--learn">
 
-	<div class="bg-dark">
+	<div class="bg-gray-400">
 		<div class="card-img item-thumb" <?php echo has_post_thumbnail( $item['id'] ) ? 'style="background-image: url(' . get_the_post_thumbnail_url( $item['id'], 'medium_large' ) . ');"' : '' ?>></div>
 	</div>
 

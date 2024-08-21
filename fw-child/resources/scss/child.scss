@@ -575,11 +575,12 @@ $control-slider-handle-width: 2.75rem;
 
   .tab-drawer-tabs {
     padding-left: 0.5rem;
+    transition: border-top 500ms;
+    border-top: 2px solid transparent;
 
-    a {
-      // display: block;
+    &--fixed {
+      border-color: $gray-700;
     }
-
     .tab-drawer-trigger {
       .alert-icon {
         display: none;

@@ -264,6 +264,7 @@ const $ = jQuery;
       new $.Zebra_Pin($('#control-bar-tabs'), {
         top_spacing: scroll_offset,
         contained: true,
+        class_name: 'tab-drawer-tabs--fixed'
       });
     }
 
@@ -271,7 +272,7 @@ const $ = jQuery;
      * Ensure the control bar footer stays at the bottom of the screen while keeping it within its parent container.
      * Executes at page load, on scroll and on window resize.
      * Applies to the Apps page, or anywhere the #control-bar-tabs-footer id is used.
-     * 
+     *
      * #control-bar-tabs-footer must be initially set to position:fixed & bottom:0 in CSS.
      * #control-bar-tabs-footer.position-absolute must be width:100%!important in CSS.
      */
@@ -374,10 +375,10 @@ const $ = jQuery;
          */
         if ( window.location.hash ) {
           const variable_element = $( window.location.hash );
-        
+
           if ( variable_element.length > 0 ) {
             const scroll_top = variable_element.parent().position().top;
-        
+
             $( 'html, body' )
               .animate( { scrollTop: scroll_top }, 10, 'swing' )
               .promise()
@@ -390,9 +391,9 @@ const $ = jQuery;
         } else if ( !isFirstPageLoad ) {
           // Scroll to the top of the results if not first page load
           const scroll_top = $( '.query-page' ).position().top;
-        
+
           $( 'html, body' ).animate( { scrollTop: scroll_top }, 10, 'swing' );
-        }        
+        }
 
         isFirstPageLoad = false;
       } );
@@ -412,7 +413,7 @@ const $ = jQuery;
           const fd_drawer_clone = drawer_item.parent().find( '.fd-drawer' );
           fd_drawer_clone.find( '.collapseomatic, .collapseomatic_content ' ).each( function () {
             $( this ).attr( 'id', $( this ).attr( 'id' ) + '_c' );
-            
+
             if ($( this ).hasClass( 'collapseomatic_content' )) {
               $( this ).hide();
             }
@@ -420,11 +421,11 @@ const $ = jQuery;
 
           // Adjust auto-scroll position.
           const scroll_top = variable_item.parent().position().top;
-          
+
           $( 'html, body' ).animate( {scrollTop: scroll_top}, 10, 'swing' );
         }
       } );
-      
+
       $( document ).on( 'fw_fd_close', function ( e, drawer_item ) {
         // Remove the URL hash.
         const variable_item = drawer_item.find( '.variable-item' );
@@ -663,7 +664,7 @@ const $ = jQuery;
         $(card).css('pointer-events', 'none');
 
         // Define common properties
-        const fromToProps = { 
+        const fromToProps = {
           y: '-85%',
           opacity: 0,
           scale: 0.75,
@@ -728,6 +729,25 @@ const $ = jQuery;
       });
 
     };
+
+    //
+    // Dynamic logo block display scroll behavior
+    //
+    //
+
+    if ($('#floating-header').length && $('#hero').length) {
+      $(window).scroll(function() {
+        const floatingHeaderBottom = $('#floating-header').offset().top + $('#floating-header').outerHeight();
+        const elementAfterHero = $('#hero').next();
+        const elementAfterHeroTop = elementAfterHero.offset().top;
+
+        if (floatingHeaderBottom >= elementAfterHeroTop && !elementAfterHero.hasClass('query-page')) {
+          $('#floating-header').addClass('on-white');
+        } else {
+          $('#floating-header').removeClass('on-white');
+        }
+      });
+    }
 
     //
     // MISC

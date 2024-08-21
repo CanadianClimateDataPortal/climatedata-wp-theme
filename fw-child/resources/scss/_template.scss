@@ -104,6 +104,15 @@
   pointer-events: none;
 }
 
+.header-fixed-menu {
+  &.on-white {
+    #header-menu-icon {
+      color: $black;
+      transition: color 500ms;
+    }
+  }
+}
+
 //
 // FOOTER
 //
@@ -426,7 +435,7 @@
     position: relative;
     padding-left: .75rem;
     width: 100%;
-    
+
     &::before {
       content: '';
       display: block;
@@ -492,7 +501,7 @@
 
     a {
       padding: .375rem .375rem .375rem 0;
-    } 
+    }
 
     &:last-child {
       margin-right: 0;
@@ -506,7 +515,7 @@
   &.brand-colored {
     a {
       transition: opacity 0.1s;
-      
+
       &:hover {
         opacity: 0.6;
       }

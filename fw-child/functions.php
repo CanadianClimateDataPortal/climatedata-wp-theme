@@ -429,8 +429,7 @@ add_action( 'wp_footer', function() {
 
 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
 
-<script src="https://platform.linkedin.com/in.js" type="text/javascript">lang: en_US</script>
-<script type="IN/Share" data-url="https://www.linkedin.com"></script>
+<script src="https://platform.linkedin.com/in.js" type="text/javascript">lang: en_US</script>]
 
 <?php
 
@@ -599,10 +598,10 @@ function cdc_enable_block_editor( $use_block_editor, $post_type ) {
 
 /**
  * Updates the `interactive` post type arguments to make it public if loaded by the motion.page editor.
- * 
+ *
  * @param array   $args Array of arguments for registering a post type.
  * @param string  $post_type Post type key.
- * 
+ *
  * @return array  Array of arguments for registering a post type.
  */
 function cdc_make_interactive_cpt_public_for_motion_page( $args, $post_type ) {
@@ -617,7 +616,7 @@ function cdc_make_interactive_cpt_public_for_motion_page( $args, $post_type ) {
 }
 
 /**
- * Adjusts the current user and permissions if loaded by the Motion.page editor, 
+ * Adjusts the current user and permissions if loaded by the Motion.page editor,
  * making the page appear as if the user is not logged in.
  *
  * @return void

@@ -692,20 +692,16 @@ const $ = jQuery;
     //
 
     function toggleBodyScrolledClass() {
-      if ($(window).scrollTop() > 50) {
-        $('body').addClass('scrolled');
+      if ( $( window ).scrollTop() > 50 ) {
+        $( 'body' ).addClass( 'scrolled' );
       } else {
-        $('body').removeClass('scrolled');
+        $( 'body' ).removeClass( 'scrolled' );
       }
     }
 
-    $( window ).on( 'scroll', function() {
-      toggleBodyScrolledClass();
-    });
+    $( window ).on( 'scroll', toggleBodyScrolledClass );
 
-    $( window ).on( 'load', function() {
-      toggleBodyScrolledClass();
-    });
+    $( toggleBodyScrolledClass );
 
   });
 

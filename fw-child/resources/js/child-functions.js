@@ -142,6 +142,29 @@ const $ = jQuery;
       });
     }
 
+    // CARD LINKS HOVERING
+
+    function handleCardLinkHovering() {
+      if ( $( '.card.has-links' ).length ) {
+        $( '.card.has-links a.hover-toggle' ).hover(
+          function() {
+            $( this ).closest( '.card' ).addClass( 'card-hover' );
+          },
+          function() {
+            $( this ).closest( '.card' ).removeClass( 'card-hover' );
+          }
+        );
+      }
+    }
+
+    // Initial call on page load
+    handleCardLinkHovering();
+
+    // Bind to fw_query_success event for dynamically loaded content
+    $( document ).on( 'fw_query_success', function () {
+      handleCardLinkHovering();
+    });
+
     // TAB DRAWER
 
     $('#menu-tabs').tab_drawer({

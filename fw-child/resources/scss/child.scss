@@ -910,6 +910,7 @@ $decade-slider-handle-width: 140px;
   background-position: center;
   background-size: cover;
   transition: 0.25s;
+  opacity: 0.9;
 }
 
 $query-card-hover-padding: 0.75rem;
@@ -958,7 +959,8 @@ $query-card-hover-padding: 0.75rem;
       transition: 0.25s;
     }
 
-    .card-title {
+    .card-title,
+    .related-content {
       a {
         text-decoration: none;
 
@@ -968,18 +970,25 @@ $query-card-hover-padding: 0.75rem;
       }
     }
 
-    &:hover {
-      .card:not(.variable-item) {
-        height: calc(100% + ($query-card-hover-padding * 2));
-        margin-top: $query-card-hover-padding * -1;
-        margin-left: $query-card-hover-padding * -1;
-        margin-right: $query-card-hover-padding * -1;
-        box-shadow: 0 0.25rem 1.5rem transparentize($black, 0.9);
+    &:hover .card:not(.no-resize),
+    .card.card-hover {
+      height: calc(100% + ($query-card-hover-padding * 2));
+      margin-top: $query-card-hover-padding * -1;
+      margin-left: $query-card-hover-padding * -1;
+      margin-right: $query-card-hover-padding * -1;
+      box-shadow: 0 0.25rem 1.5rem transparentize($black, 0.9);
 
-        .card-body {
-          margin-left: $query-card-hover-padding;
-          margin-right: $query-card-hover-padding;
-        }
+      .card-body {
+        margin-left: $query-card-hover-padding;
+        margin-right: $query-card-hover-padding;
+      }
+    }
+
+    .card.card-hover {
+      a {
+        padding: .125rem;
+        margin-right: -.125rem;
+        margin-left: -.125rem;
       }
     }
   }

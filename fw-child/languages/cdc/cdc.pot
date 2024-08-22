@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-08-16T12:24:50+00:00\n"
+"POT-Creation-Date: 2024-08-22T14:42:40+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -180,14 +180,6 @@ msgstr ""
 #: template/feedback.php:392
 #: template/feedback.php:575
 msgid "Submit Feedback"
-msgstr ""
-
-#: template/apps/query.php:29
-msgid "Newest First"
-msgstr ""
-
-#: template/apps/query.php:30
-msgid "Oldest First"
 msgstr ""
 
 #: template/download/control-bar.php:22
@@ -1379,6 +1371,14 @@ msgstr ""
 
 #: template/post-meta.php:68
 msgid "Share this post"
+msgstr ""
+
+#: template/query/app-item.php:25
+msgid "Launch App"
+msgstr ""
+
+#: template/query/app-item.php:35
+msgid "Related Content"
 msgstr ""
 
 #: template/query/download-var-item.php:11

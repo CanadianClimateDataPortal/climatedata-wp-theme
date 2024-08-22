@@ -104,6 +104,23 @@
     background-color: transparent;
   }
 
+  #header-primary {
+    font-size: 1rem;
+  
+    @media screen and (min-width:1240px) {
+      @include font-size(17px);
+    }
+  
+    @include media-breakpoint-up(xxl) {
+      @include font-size(19px);
+    }
+  }
+
+  #header-lang {
+    font-size: 0.875rem;
+    font-weight: $font-weight-bold;
+  }
+
   // features & lottie
 
   #features {
@@ -1745,6 +1762,17 @@ body.tab-drawer-open {
 
   iframe {
     @include full-size;
+  }
+}
+
+.learn-topic-title {
+  &:after {
+    content: "";
+    width: 10%;
+    min-width: 3.75rem;
+    border-top: 4px solid $secondary;
+    margin-top: 1rem;
+    display: block;
   }
 }
 

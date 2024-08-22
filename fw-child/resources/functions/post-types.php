@@ -362,3 +362,21 @@ function cdc_variable_update_tax_sector_terms( $post_id ) {
 }
 
 add_action( 'acf/save_post', 'cdc_variable_update_tax_sector_terms' );
+
+
+/**
+ * Set asset type based on post type when saving a post.
+ *
+ * @param int $post_id The ID of the post being saved.
+ */
+function cdc_set_asset_type_for_posts( $post_id ) {
+    $post_type = get_post_type( $post_id );
+    
+    if ( $post_type === 'beta-app' ) {
+        update_field( 'asset_type', 'app', $post_id );
+    } elseif ( $post_type === 'page' ) {
+        update_field( 'asset_type', 'article', $post_id );
+    }
+}
+
+add_action( 'acf/save_post', 'cdc_set_asset_type_for_posts' );

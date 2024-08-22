@@ -248,8 +248,7 @@ const $ = jQuery;
             top_spacing: scroll_offset,
             contain: true,
           });
-        }
-        else {
+        } else {
           pinned_item.settings.top_spacing = scroll_offset;
           pinned_item.update();
         }
@@ -258,7 +257,7 @@ const $ = jQuery;
 
     pin_item();
 
-    let resize_observer = new ResizeObserver( pin_item );
+    const resize_observer = new ResizeObserver( pin_item );
     resize_observer.observe(document.querySelector('#control-bar'));
 
     /**

@@ -1,0 +1,17 @@
+# List of plugins to download from the public WordPress plugins repository
+# (i.e. https://en-ca.wordpress.org/plugins/).
+#
+# Each line is a plugin to download and unzip. The format is:
+# <slug>=<version>
+# Where:
+#  - <slug> is the plugin's slug on the WordPress repository.
+#  - <version> is the exact plugin's version to install.
+#
+# In this file, empty lines and lines that start with # are ignored.
+
+classic-editor=1.6.3
+custom-taxonomy-order-ne=4.0.0
+post-type-switcher=3.3.0
+regenerate-thumbnails=3.1.6
+simple-page-ordering=2.5.1
+wordpress-importer=0.8.1

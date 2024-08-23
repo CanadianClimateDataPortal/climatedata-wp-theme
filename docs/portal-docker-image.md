@@ -54,15 +54,21 @@ For more details, see the [documentation about the Task Runner](./task-runner.md
 
 ### The `LOCAL_WP_PLUGINS_DIR` argument
 
-The building process installs all the required WordPress plugins. While most 
-plugins can be installed from the public plugins repository, some plugins 
-cannot (plugins that were bought, for example).
+The building process installs all the required WordPress plugins. Most 
+plugins can be installed from the
+[public plugin repository](https://en-ca.wordpress.org/plugins/). The list of
+plugins to be installed from the public repository is defined in the
+[wp-plugins/public.txt](../dockerfiles/build/www/wp-plugins/public.txt) file.
+
+But some other plugins are not available on the public repository (ex: because
+they were bought), and they must be installed from local files.
 
 The `LOCAL_WP_PLUGINS_DIR` build argument is a path to a local directory 
 containing those non-public plugins to install. It must contain one zip file 
 for each required plugin to install (the same zip file that can be used to 
 install the plugin through the administration). The list of required plugin 
-files can be found in the [Dockerfile](../Dockerfile).
+files is defined in the [wp-plugins/local.txt](../dockerfiles/build/www/wp-plugins/local.txt)
+file.
 
 The directory must be inside the build context (you can use the `dockerfiles/mounts`
 directory for this, see [its documentation](../dockerfiles/mounts)), and the

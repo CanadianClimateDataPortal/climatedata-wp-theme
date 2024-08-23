@@ -1,7 +1,9 @@
-# List of zipped WordPress plugins to unzip from a local directory.
+# List of required WordPress plugins to unzip from a local directory.
 #
-# Each line is a zipped plugin file name. This files doesn't specify the
-# directory containing those files, only their name.
+# Each line is a zipped plugin file name.
+#
+# The path of the local directory containing those files is a build argument
+# to set when building the Docker image.
 #
 # In this file, empty lines and lines that start with # are ignored.
 

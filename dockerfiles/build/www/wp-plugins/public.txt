@@ -1,4 +1,5 @@
-# List of plugins to download from the public WordPress plugins repository.
+# List of plugins to download from the public WordPress plugins repository
+# (i.e. https://en-ca.wordpress.org/plugins/).
 #
 # Each line is a plugin to download and unzip. The format is:
 # <slug>=<version>

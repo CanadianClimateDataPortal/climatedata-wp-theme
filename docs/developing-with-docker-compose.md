@@ -46,8 +46,12 @@ multiple example configurations that you can use.
 The _overrides_ file is required and requires a minimum of configuration.
 
 First, if you want the Docker Compose setup to build the _Portal_ image, you
-must specify the `LOCAL_WP_PLUGINS_DIR` build argument. See the [documentation
-about this argument](./portal-docker-image.md#the-local_wp_plugins_dir-argument).
+must have a local directory containing the zip files of all the non-public
+required WordPress plugins defined in the
+[wp-plugins/local.txt](../dockerfiles/build/www/wp-plugins/local.txt) file. You
+must then set the `LOCAL_WP_PLUGINS_DIR` build argument to the path of this
+directory. See the [documentation about this argument](./portal-docker-image.md#the-local_wp_plugins_dir-argument)
+for more details.
 
 Second, you must add configurations for whether you want to serve the site
 over HTTP or HTTPS:

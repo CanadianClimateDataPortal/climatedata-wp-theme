@@ -21,10 +21,10 @@
 #
 #  - TASK_RUNNER_IMAGE (required): name of the Task Runner Docker image used
 #      during the multi-stage build.
-#  - LOCAL_WP_PLUGINS_DIR (required): directory, in the build context,
-#      containing zip files of extra WordPress plugins to extract in the
-#      assets/plugins/ directory. Can be used, for example, to specify source of
-#      plugins not available in the WordPress' plugin directory.
+#  - LOCAL_WP_PLUGINS_DIR (required): local directory, in the build context,
+#      containing zip files of WordPress plugins to extract in the WordPress's
+#      assets/plugins/ directory. The directory must contain all the files
+#      listed in the dockerfiles/build/www/wp-plugins/local.txt file.
 #  - WEB_SERVER_USER_ID (optional, default=10000): user id of the created
 #      we server user (www-data). Setting the id gives more control over
 #      permissions if you mount a directory that must be writable by the website

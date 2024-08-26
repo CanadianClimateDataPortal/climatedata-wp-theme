@@ -442,4 +442,14 @@
       margin-left: .20em;
     }
   }
+
+  &.brand-colored {
+    a {
+      transition: opacity 0.1s;
+    }
+
+    a:hover {
+      opacity: 0.6;
+    }
+  }
 }

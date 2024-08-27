@@ -50,22 +50,22 @@ $excerpts = array (
 				$format_name = '';
 
 				switch ( $card_asset_type ) {
-					case 'video' :
+					case 'video':
 						$format_icon = 'fas fa-video';
 						$format_name = __( 'Video', 'cdc' );
 
 						break;
-					case 'audio' :
+					case 'audio':
 						$format_icon = 'fas fa-microphone';
 						$format_name = __( 'Audio', 'cdc' );
 
 						break;
-					case 'interactive' :
+					case 'interactive':
 						$format_icon = 'far fa-hand-pointer';
 						$format_name = __( 'Interactive', 'cdc' );
 
 						break;
-					case 'app' :
+					case 'app':
 						$format_icon = 'far fa-window-maximize';
 						$format_name = __( 'App', 'cdc' );
 

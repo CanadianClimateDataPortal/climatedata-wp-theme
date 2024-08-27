@@ -340,25 +340,30 @@ add_action( 'init', 'posttype_app', 0 );
  * @return void
  */
 function cdc_variable_update_tax_sector_terms( $post_id ) {
-	// Get relevant sectors.
-	$relevant_sectors = get_field( 'relevant_sectors', $post_id );
+    $post_type = get_post_type( $post_id );
 
-	// Check if relevant sectors are available.
-	if ( empty( $relevant_sectors ) ) {
-		$relevant_sectors = array();
-	}
+    if ( $post_type === 'variable' ) {
 
-	// Extract term IDs from the relevant sectors.
-	$term_ids = array();
+        // Get relevant sectors.
+        $relevant_sectors = get_field( 'relevant_sectors', $post_id );
 
-	foreach ( $relevant_sectors as $sector ) {
-		if ( isset( $sector['sector_term'] ) && is_object( $sector['sector_term'] ) ) {
-			$term_ids[] = $sector['sector_term']->term_id;
-		}
-	}
+        // Check if relevant sectors are available.
+        if ( empty( $relevant_sectors ) ) {
+            $relevant_sectors = array();
+        }
 
-	// Update the 'sector' taxonomy terms.
-	wp_set_post_terms( $post_id, $term_ids, 'sector', false );
+        // Extract term IDs from the relevant sectors.
+        $term_ids = array();
+        
+        foreach ( $relevant_sectors as $sector ) {
+            if ( isset( $sector['sector_term'] ) && is_object( $sector['sector_term'] ) ) {
+                $term_ids[] = $sector['sector_term']->term_id;
+            }
+        }
+
+        // Update the 'sector' taxonomy terms.
+        wp_set_post_terms( $post_id, $term_ids, 'sector', false );
+    }
 }
 
 add_action( 'acf/save_post', 'cdc_variable_update_tax_sector_terms' );
@@ -372,7 +377,7 @@ add_action( 'acf/save_post', 'cdc_variable_update_tax_sector_terms' );
 function cdc_set_asset_type_for_posts( $post_id ) {
     $post_type = get_post_type( $post_id );
     
-    if ( $post_type === 'beta-app' ) {
+    if ( $post_type === 'app' ) {
         update_field( 'asset_type', 'app', $post_id );
     } elseif ( $post_type === 'page' ) {
         update_field( 'asset_type', 'article', $post_id );

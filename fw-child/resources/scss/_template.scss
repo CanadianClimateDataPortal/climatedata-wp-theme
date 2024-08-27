@@ -197,9 +197,16 @@
   }
 }
 
-#menu-langs {
+#menu-langs,
+#menu-tabs {
   .current-nav-link {
     color: $primary;
+  }
+
+  .ancestor-nav-item {
+    a {
+      color: $primary;
+    }
   }
 }
 

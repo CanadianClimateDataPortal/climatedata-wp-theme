@@ -113,7 +113,7 @@ msgid "All Variables"
 msgstr ""
 
 #: template/learn/control-bar.php:90
-#: template/query/learn-item.php:70
+#: template/query/learn-item.php:65
 #: template/query/resource-home-feature.php:80
 msgid "Interactive"
 msgstr "Interactif"
@@ -171,11 +171,11 @@ msgstr "Fournir une rétroaction"
 msgid "Submit Feedback"
 msgstr "Soumettre"
 
-#: template/apps/query.php:29
+#: template/apps/query.php:28
 msgid "Newest First"
 msgstr "Nouveaux d'abord"
 
-#: template/apps/query.php:30
+#: template/apps/query.php:29
 msgid "Oldest First"
 msgstr "Anciens d'abord"
 
@@ -311,7 +311,7 @@ msgstr "Zoom"
 #: template/download/controls/data.php:112
 #: template/download/controls/details.php:353
 #: template/map/controls/data-variable.php:139
-#: template/news/query.php:50
+#: template/news/query.php:48
 msgid "Next"
 msgstr "Suivant"
 
@@ -954,30 +954,22 @@ msgid "Content Type"
 msgstr "Type de contenu"
 
 #: template/learn/control-bar.php:88
-#: template/query/learn-item.php:60
+#: template/query/learn-item.php:55
 #: template/query/resource-home-feature.php:70
 msgid "Video"
 msgstr "Vidéo"
 
 #: template/learn/control-bar.php:89
-#: template/query/learn-item.php:65
+#: template/query/learn-item.php:60
 #: template/query/resource-home-feature.php:75
 msgid "Audio"
 msgstr ""
 
 #: template/learn/control-bar.php:91
-#: template/query/learn-item.php:80
+#: template/query/learn-item.php:75
 #: template/query/resource-home-feature.php:90
 msgid "Article"
 msgstr ""
-
-#: template/learn/query.php:28
-msgid "Title (A–Z)"
-msgstr "Titre (A à Z)"
-
-#: template/learn/query.php:29
-msgid "Title (Z–A)"
-msgstr "Titre (Z à A)"
 
 #: template/map/control-bar.php:24
 #: template/map/controls/location.php:5
@@ -1249,7 +1241,7 @@ msgid "Download image"
 msgstr "Téléchargement"
 
 #: template/old-loop/blocks/map.php:227
-#: template/query/learn-item.php:96
+#: template/query/learn-item.php:91
 msgid "Time"
 msgstr "Durée"
 
@@ -1278,7 +1270,7 @@ msgstr "Partager cette publication"
 msgid "Select variable"
 msgstr "Sélectionner"
 
-#: template/query/learn-item.php:51
+#: template/query/learn-item.php:46
 msgid "Format"
 msgstr ""
 
@@ -1306,7 +1298,7 @@ msgstr "Paramètres de l'OMM"
 
 #: template/download/controls/data-variable.php:137
 #: template/map/controls/data-variable.php:137
-#: template/news/query.php:46
+#: template/news/query.php:44
 msgid "Previous"
 msgstr "Précédent"
 
@@ -1383,7 +1375,7 @@ msgid "Which application would you like to provide feedback on?"
 msgstr "Pour quelle application souhaitez-vous nous faire un retour ?"
 
 #: template/learn/control-bar.php:92
-#: template/query/learn-item.php:75
+#: template/query/learn-item.php:70
 #: template/query/resource-home-feature.php:85
 msgid "App"
 msgstr "Application"
@@ -1412,11 +1404,11 @@ msgstr "Non"
 msgid "Init LZ meta"
 msgstr ""
 
-#: template/query/learn-item.php:100
+#: template/query/learn-item.php:95
 msgid "%s minutes"
 msgstr ""
 
-#: template/learn/query.php:76
+#: template/learn/query.php:79
 msgid "No items found."
 msgstr "Aucun item trouvé."
 

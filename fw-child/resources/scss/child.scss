@@ -497,7 +497,6 @@ $control-slider-handle-width: 2.75rem;
   background-color: transparentize($dark, 0.1);
   font-size: 0.875rem;
   margin-right: 0.25rem;
-  z-index: 10;
 
   @include media-breakpoint-up(md) {
     font-size: 0.75rem;
@@ -561,7 +560,7 @@ $control-slider-handle-width: 2.75rem;
         width: 24px;
       }
 
-      @include media-breakpoint-up(lg) {
+      @include media-breakpoint-up(xl) {
         width: 30px;
       }
     }
@@ -609,21 +608,26 @@ $control-slider-handle-width: 2.75rem;
   }
 
   .tab-drawer-container {
-    left: -100vw;
+    left: 0;
     margin-left: 100%;
     box-shadow: 0 0 20px transparentize($black, 0.8);
-    transition: left 0.25s;
+    transition: transform 0.5s;
     z-index: -1;
+    transform: translateX( calc(-100% - 12.5vw) );
+
+    @include media-breakpoint-up(sm) {
+      transform: translateX( calc(-100% - 6.25vw) );
+    }
 
     &:has(.tab-drawer.td-selected) {
-      left: 0;
+      transform: translateX(0);
     }
   }
 
   .tab-drawer {
-    left: -100vw;
+    left: 0 !important;
     height: 100%;
-    transition: left 0.25s;
+    transition: none !important;
 
     .tab-drawer-content {
       height: 100%;
@@ -636,6 +640,8 @@ $control-slider-handle-width: 2.75rem;
 
         .tab-drawer-content-inner {
           height: 100vh;
+          transform: none !important;
+          transition: none !important;
         }
       }
     }

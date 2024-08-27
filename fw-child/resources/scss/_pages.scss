@@ -735,7 +735,6 @@ $legend-on-height: 16px;
     }
 
     @include media-breakpoint-up(md) {
-      left: 100%;
       width: calc((100vw / 16) * 7);
     }
 
@@ -746,9 +745,12 @@ $legend-on-height: 16px;
 
   .tab-drawer-container {
     .tab-drawer-container {
+      width: 0;
       left: 0;
       pointer-events: none;
       z-index: 10;
+      overflow: hidden;
+      box-shadow: none;
 
       @include media-breakpoint-up(md) {
         pointer-events: all;
@@ -757,6 +759,7 @@ $legend-on-height: 16px;
 
       &:has(.tab-drawer.td-selected) {
         pointer-events: all;
+        overflow: visible;
       }
     }
   }
@@ -1474,7 +1477,7 @@ body.tab-drawer-open {
       width: calc((100vw / 16) * 9);
     }
 
-    &:has(#data-variable.td-selected) {
+    .tab-drawer-container:has(#data-variable.td-selected) {
       width: calc((100vw / 16) * 9);
     }
   }

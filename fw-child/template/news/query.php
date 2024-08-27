@@ -1,4 +1,4 @@
-<div id="" class="col row bg-gray-200">
+<div class="col row bg-gray-200 position-relative z-0">
 	<?php
 
 	//
@@ -29,12 +29,6 @@
 	?>
 
 	<div class="col-12 offset-1 col-sm-13">
-		<div class="pt-6">
-			<ul id="sort-menu" class="fw-query-sort list-unstyled d-flex all-caps">
-				<li class="selected me-4" data-sort="date_desc"><i class="fas fa-arrow-up me-2"></i> <?php _e( 'Newest First', 'cdc' ); ?></li>
-				<li data-sort="date_asc"><i class="fas fa-arrow-down me-2"></i> <?php _e( 'Oldest First', 'cdc' ); ?></li>
-			</ul>
-		</div>
 
 		<div id="news-grid" class="py-6" data-args='<?php echo json_encode( $module_args ); ?>'>
 
@@ -54,7 +48,9 @@
 					<div class="fw-query-pagination-btn next btn btn-secondary"><?php _e( 'Next', 'cdc' ); ?></div>
 				</div>
 			</div>
+
 		</div>
+
 	</div>
 	
 </div>

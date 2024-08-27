@@ -1,4 +1,4 @@
-<div class="col-2 col-sm-1">
+<div class="col-2 col-sm-1 position-relative z-3">
 	<div id="control-bar" class="control-bar tab-drawer-tabs-container">
 		
 		<div id="control-bar-tabs" class="tab-drawer-tabs">

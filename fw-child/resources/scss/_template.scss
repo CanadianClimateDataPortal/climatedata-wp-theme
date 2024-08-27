@@ -49,7 +49,6 @@
 }
 
 .nav-item-divider {
-  // font-size: 0;
   text-indent: -9999px;
   width: 1px;
   background: transparentize($white, 0.6);
@@ -169,10 +168,24 @@
     }
   }
 
-  li:nth-of-type(3) {
-    padding-bottom: 0.75rem;
-    margin-bottom: 0.75rem;
-    border-bottom: 1px solid $gray-300;
+  .nav-item-divider {
+    text-indent: unset;
+    width: 100%;
+    background: unset;
+    cursor: default;
+    pointer-events: all;
+    position: relative;
+    margin-bottom: 1.5rem;
+
+    &::after {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 0;
+      bottom: -0.75rem;
+      width: calc(100% - 1rem);
+      border-bottom: 1px solid $gray-300;
+    }
   }
 }
 
@@ -315,19 +328,6 @@
 
 .hierarchical-menu {
   position: relative;
-
-  @include media-breakpoint-up(lg) {
-    &::after {
-      content: '';
-      display: block;
-      height: 100%;
-      position: absolute;
-      right: -.125rem;
-      top: 0;
-      width: 1px;
-      background-color: $gray-400;
-    }
-  }
 
   .collapsible-item {
     display: flex;

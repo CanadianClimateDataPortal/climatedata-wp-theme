@@ -250,7 +250,7 @@ const $ = jQuery;
      * Ensure the control bar footer stays at the bottom of the screen while keeping it within its parent container.
      * Executes at page load, on scroll and on window resize.
      * Applies to the Apps page, or anywhere the #control-bar-tabs-footer id is used.
-     * 
+     *
      * #control-bar-tabs-footer must be initially set to position:fixed & bottom:0 in CSS.
      * #control-bar-tabs-footer.position-absolute must be width:100%!important in CSS.
      */
@@ -353,10 +353,10 @@ const $ = jQuery;
          */
         if ( window.location.hash ) {
           const variable_element = $( window.location.hash );
-        
+
           if ( variable_element.length > 0 ) {
             const scroll_top = variable_element.parent().position().top;
-        
+
             $( 'html, body' )
               .animate( { scrollTop: scroll_top }, 10, 'swing' )
               .promise()
@@ -369,9 +369,9 @@ const $ = jQuery;
         } else if ( !isFirstPageLoad ) {
           // Scroll to the top of the results if not first page load
           const scroll_top = $( '.query-page' ).position().top;
-        
+
           $( 'html, body' ).animate( { scrollTop: scroll_top }, 10, 'swing' );
-        }        
+        }
 
         isFirstPageLoad = false;
       } );
@@ -391,7 +391,7 @@ const $ = jQuery;
           const fd_drawer_clone = drawer_item.parent().find( '.fd-drawer' );
           fd_drawer_clone.find( '.collapseomatic, .collapseomatic_content ' ).each( function () {
             $( this ).attr( 'id', $( this ).attr( 'id' ) + '_c' );
-            
+
             if ($( this ).hasClass( 'collapseomatic_content' )) {
               $( this ).hide();
             }
@@ -399,11 +399,11 @@ const $ = jQuery;
 
           // Adjust auto-scroll position.
           const scroll_top = variable_item.parent().position().top;
-          
+
           $( 'html, body' ).animate( {scrollTop: scroll_top}, 10, 'swing' );
         }
       } );
-      
+
       $( document ).on( 'fw_fd_close', function ( e, drawer_item ) {
         // Remove the URL hash.
         const variable_item = drawer_item.find( '.variable-item' );
@@ -418,7 +418,7 @@ const $ = jQuery;
         }
       } );
     }
-    
+
     // Functionalities for learning zone archive page.
     if ($( '#learn-grid' ).length > 0) {
       $( document ).on( 'fw_query_no_matches', function ( e, query_item ) {
@@ -427,11 +427,11 @@ const $ = jQuery;
         // Hide query container and its associated filter.
         query_item.hide().addClass('no-matches');
         $( '.learn-zone-topic-filter[data-topic-id="' + topic_id + '"]' ).addClass( 'disabled' );
-        
+
         // Check if there are no matches in ALL query items.
         const query_items_count = $('#learn-grid .tab-drawer-bumper > .learn-topic-grid').length;
         const query_items_no_matches_count = $('#learn-grid .tab-drawer-bumper > .learn-topic-grid.no-matches').length;
-        
+
         if (query_items_no_matches_count === query_items_count ) {
           // Show global no matches message.
           $('.fw-query-items-no-matches').show();
@@ -446,7 +446,7 @@ const $ = jQuery;
         $( '.learn-zone-topic-filter[data-topic-id="' + topic_id + '"]' ).removeClass( 'disabled' );
       } );
     }
-    
+
     // share widget
 
     if ($('#share').length) {
@@ -633,77 +633,81 @@ const $ = jQuery;
 
     if ($('#page-home').length) {
       gsap.registerPlugin(ScrollTrigger);
+      const mm = gsap.matchMedia();
 
-      $('.scroll-card').each(function () {
-        const card = this;
-        const isLastCard = $(card).closest('.fw-query-item').is(':last-child');
+      // Add GSAP animations after the "lg" breakpoint (992px) is reached
+      mm.add("(min-width: 992px)", () => {
+        $('.scroll-card').each(function () {
+          const card = this;
+          const isLastCard = $(card).closest('.fw-query-item').is(':last-child');
 
-         // Set pointer-events to none at the beginning for every card
-        $(card).css('pointer-events', 'none');
+          // Set pointer-events to none at the beginning for every card
+          $(card).css('pointer-events', 'none');
 
-        // Define common properties
-        const fromToProps = { 
-          y: '-85%',
-          opacity: 0,
-          scale: 0.75,
-          zIndex: 0,
-        };
+          // Define common properties
+          const fromToProps = {
+            y: '-85%',
+            opacity: 0,
+            scale: 0.75,
+            zIndex: 0,
+          };
 
-        const toProps1 = {
-          y: '-15%',
-          opacity: 1,
-          scale: 1,
-          zIndex: 100,
-          onStart: function() {
-            $(card).css('pointer-events', ''); // Enable pointer-events as soon as the animation starts
-          },
-          onReverseComplete: function() {
-            $(card).css('pointer-events', 'none'); // Disable pointer-events when reversing the animation
-          },
-        };
-
-        const toProps2 = {
-          y: '55%',
-          opacity: 0,
-          scale: 0.75,
-          zIndex: 0,
-          ease: 'power2.in',
-          onComplete: function() {
-            $(card).css('pointer-events', 'none');  // Disable pointer-events when this animation is complete
-          },
-          onReverseComplete: function() {
-            $(card).css('pointer-events', '');  // Enable pointer-events when this animation is complete on reverse
-          },
-        };
-
-        // Customize properties for the last card
-        if (isLastCard) {
-          toProps2.y = '0%';
-          toProps2.opacity = 1;
-          toProps2.scale = 1;
-          toProps2.zIndex = 100;
-        }
-
-        const timeline = gsap.timeline({
-          scrollTrigger: {
-            trigger: card,
-            start: 'top 100%',
-            end: 'top -50%',
-            scrub: true,
-            markers: false,    // Set to true to debug
-            onLeave: function() {
-              $(card).css('pointer-events', 'none');  // Disable pointer-events when card leaves
+          const toProps1 = {
+            y: '-15%',
+            opacity: 1,
+            scale: 1,
+            zIndex: 100,
+            onStart: function() {
+              $(card).css('pointer-events', ''); // Enable pointer-events as soon as the animation starts
             },
-            onEnterBack: function() {
-              $(card).css('pointer-events', '');  // Disable pointer-events when card enters back
+            onReverseComplete: function() {
+              $(card).css('pointer-events', 'none'); // Disable pointer-events when reversing the animation
             },
+          };
+
+          const toProps2 = {
+            y: '55%',
+            opacity: 0,
+            scale: 0.75,
+            zIndex: 0,
+            ease: 'power2.in',
+            onComplete: function() {
+              $(card).css('pointer-events', 'none');  // Disable pointer-events when this animation is complete
+            },
+            onReverseComplete: function() {
+              $(card).css('pointer-events', '');  // Enable pointer-events when this animation is complete on reverse
+            },
+          };
+
+          // Customize properties for the last card
+          if (isLastCard) {
+            toProps2.y = '0%';
+            toProps2.opacity = 1;
+            toProps2.scale = 1;
+            toProps2.zIndex = 100;
           }
-        });
 
-        timeline
-          .fromTo(card, fromToProps, fromToProps)
-          .to(card, toProps1)
-          .to(card, toProps2);
+          const timeline = gsap.timeline({
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 100%',
+              end: 'top -50%',
+              scrub: true,
+              markers: false,    // Set to true to debug
+              onLeave: function() {
+                $(card).css('pointer-events', 'none');  // Disable pointer-events when card leaves
+              },
+              onEnterBack: function() {
+                $(card).css('pointer-events', '');  // Disable pointer-events when card enters back
+              },
+            }
+          });
+
+          timeline
+            .fromTo(card, fromToProps, fromToProps)
+            .to(card, toProps1)
+            .to(card, toProps2);
+        });
       });
 
     };

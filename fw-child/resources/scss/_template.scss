@@ -73,7 +73,10 @@
 
 #footer-socials {
   a {
+    align-items: center;
     color: $gray-600;
+    display: flex;
+    column-gap: 0.5rem;
 
     &:hover {
       color: var(--bs-link-hover-color);
@@ -376,7 +379,7 @@
     position: relative;
     padding-left: .75rem;
     width: 100%;
-    
+
     &::before {
       content: '';
       display: block;
@@ -442,7 +445,7 @@
 
     a {
       padding: .375rem .375rem .375rem 0;
-    } 
+    }
 
     &:last-child {
       margin-right: 0;

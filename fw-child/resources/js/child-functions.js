@@ -735,7 +735,7 @@ const $ = jQuery;
     //
     //
 
-    if ($('#floating-header').length && $('#hero').length) {
+    if ( $( '#floating-header' ).length && $( '#hero' ).length ) {
       $(window).scroll(function() {
         const floatingHeaderBottom = $('#floating-header').offset().top + $('#floating-header').outerHeight();
         const elementAfterHero = $('#hero').next();

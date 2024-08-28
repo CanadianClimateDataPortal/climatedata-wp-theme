@@ -152,6 +152,10 @@ function posttype_resource()
         'publicly_queryable' => true,
         'capability_type' => 'page',
         'show_in_rest' => true,
+        'rewrite' => [
+            'slug' => __( 'resource', 'cdc-post-types' ),
+            'with_front' => false
+        ],
     ];
     register_post_type('resource', $args);
 }

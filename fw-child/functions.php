@@ -362,6 +362,7 @@ function fw_load_child_theme_lang_files() {
 
 	load_theme_textdomain ( 'cdc', get_stylesheet_directory() . '/languages/cdc' );
 	load_theme_textdomain ( 'cdc-taxonomies', get_stylesheet_directory() . '/languages/cdc-taxonomies' );
+	load_theme_textdomain ( 'cdc-post-types', get_stylesheet_directory() . '/languages/cdc-post-types' );
 
 	$locale = get_locale();
 	$locale_file = get_stylesheet_directory() . '/languages/' . $locale . '.php';

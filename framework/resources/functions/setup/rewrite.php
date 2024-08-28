@@ -583,6 +583,7 @@ function fw_rewrite_link ( $url, $post_id, $sample, $type ) {
 }
 
 function translate_path ( $post_id, $lang ) {
+	$all_langs = get_option ( 'fw_langs' );
 	
 	if ( gettype ( $post_id ) == 'object' ) {
 		$post_id = $post_id->ID;
@@ -595,7 +596,18 @@ function translate_path ( $post_id, $lang ) {
 		) && 
 		in_array ( get_post_type ( $post_id ), array_keys ( get_post_types () ) )
 	) {
-		$path[] = get_post_type ( $post_id );
+		$post_type = get_post_type( $post_id );
+		$post_type_object = get_post_type_object( $post_type );
+		
+		if (
+			isset( $post_type_object->rewrite['slug'] )
+		) {
+			switch_to_locale( $all_langs[$lang]['locale'] );
+			$path[] = __( $post_type_object->rewrite['slug'], 'cdc-post-types' );
+			restore_previous_locale();
+		} else {
+			$path[] = get_post_type ( $post_id );
+		}
 	}
 	
 	// parents

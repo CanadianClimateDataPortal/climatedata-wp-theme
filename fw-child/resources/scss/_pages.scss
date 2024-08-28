@@ -53,8 +53,9 @@
 }
 
 #hero-text-carousel {
-  margin-top: 5rem;
-  overflow: visible;
+  --hero-carousel-pb: 3rem;
+  margin-top: calc(5rem + var(--hero-carousel-pb));
+  padding-bottom: var(--hero-carousel-pb);
 
   @include media-breakpoint-up(md) {
     margin-top: 6.25rem;
@@ -65,9 +66,10 @@
   --swiper-pagination-bullet-horizontal-gap: 0.75rem;
   --swiper-pagination-bullet-inactive-color: #{$blue-200};
   --swiper-pagination-color: #{$white};
+  --swiper-pagination-bottom: -5rem;
+  --swiper-pagination-top: auto;
+
   position: relative;
-  top: auto;
-  bottom: -5rem;
   left: auto;
   right: auto;
   width: 100vw;

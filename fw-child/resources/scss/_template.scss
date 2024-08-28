@@ -73,10 +73,7 @@
 
 #footer-socials {
   a {
-    align-items: center;
     color: $gray-600;
-    display: flex;
-    column-gap: 0.5rem;
 
     &:hover {
       color: var(--bs-link-hover-color);

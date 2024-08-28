@@ -736,7 +736,7 @@ const $ = jQuery;
     //
 
     if ( $( '#floating-header' ).length && $( '#hero' ).length ) {
-      $(window).scroll(function() {
+      $( window ).on( 'scroll', function() {
         const floatingHeaderBottom = $('#floating-header').offset().top + $('#floating-header').outerHeight();
         const elementAfterHero = $('#hero').next();
         const elementAfterHeroTop = elementAfterHero.offset().top;

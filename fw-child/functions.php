@@ -429,7 +429,7 @@ add_action( 'wp_footer', function() {
 
 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
 
-<script src="https://platform.linkedin.com/in.js" type="text/javascript">lang: en_US</script>]
+<script src="https://platform.linkedin.com/in.js" type="text/javascript">lang: en_US</script>
 
 <?php
 

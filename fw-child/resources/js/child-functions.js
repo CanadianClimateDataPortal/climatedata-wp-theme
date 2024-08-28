@@ -440,7 +440,7 @@ const $ = jQuery;
         }
       } );
     }
-    
+
     // Functionalities for learning zone archive page.
     if ($( '#learn-grid' ).length > 0) {
       $( document ).on( 'fw_query_no_matches', function ( e, query_item ) {
@@ -449,11 +449,11 @@ const $ = jQuery;
         // Hide query container and its associated filter.
         query_item.hide().addClass('no-matches');
         $( '.learn-zone-topic-filter[data-topic-id="' + topic_id + '"]' ).addClass( 'disabled' );
-        
+
         // Check if there are no matches in ALL query items.
         const query_items_count = $('#learn-grid .tab-drawer-bumper > .learn-topic-grid').length;
         const query_items_no_matches_count = $('#learn-grid .tab-drawer-bumper > .learn-topic-grid.no-matches').length;
-        
+
         if (query_items_no_matches_count === query_items_count ) {
           // Show global no matches message.
           $('.fw-query-items-no-matches').show();
@@ -468,7 +468,7 @@ const $ = jQuery;
         $( '.learn-zone-topic-filter[data-topic-id="' + topic_id + '"]' ).removeClass( 'disabled' );
       } );
     }
-    
+
     // share widget
 
     if ($('#share').length) {
@@ -733,15 +733,15 @@ const $ = jQuery;
     //
     // Dynamic logo block display scroll behavior
     //
-    //
 
     if ( $( '#floating-header' ).length && $( '#hero' ).length ) {
       $( window ).on( 'scroll', function() {
         const floatingHeaderBottom = $('#floating-header').offset().top + $('#floating-header').outerHeight();
+        const menuHeaderHamburgerHeight = $('#menu-trigger').outerHeight();
         const elementAfterHero = $('#hero').next();
         const elementAfterHeroTop = elementAfterHero.offset().top;
 
-        if (floatingHeaderBottom >= elementAfterHeroTop && !elementAfterHero.hasClass('query-page')) {
+        if ( floatingHeaderBottom - ( menuHeaderHamburgerHeight / 2 ) >= elementAfterHeroTop && !elementAfterHero.hasClass('query-page') ) {
           $('#floating-header').addClass('on-white');
         } else {
           $('#floating-header').removeClass('on-white');

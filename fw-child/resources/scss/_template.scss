@@ -45,6 +45,7 @@
 #header-menu-icon {
   font-size: 1.25rem;
   color: $white;
+  transition: color 500ms;
 }
 
 #header-logo-container {
@@ -108,7 +109,6 @@
   &.on-white {
     #header-menu-icon {
       color: $black;
-      transition: color 500ms;
     }
   }
 }

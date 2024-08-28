@@ -43,6 +43,9 @@
 }
 
 #header-lang {
+  font-size: 0.875rem;
+  font-weight: $font-weight-bold;
+
   .current-nav-link {
     color: $blue-200;
   }
@@ -172,7 +175,7 @@
     text-indent: unset;
     width: 100%;
     background: unset;
-    cursor: default;
+    cursor: pointer;
     pointer-events: all;
     position: relative;
     margin-bottom: 1.5rem;

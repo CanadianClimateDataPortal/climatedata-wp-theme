@@ -122,13 +122,13 @@
 					<div>
 						<a href="https://www.linkedin.com/company/climate-data-canada/" target="_blank" class="text-secondary me-2" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
 						
-						<a href="https://twitter.com/ClimateData_ca" target="_blank" class="text-secondary me-2" title="X (Twitter)">𝕏</a>
+						<a href="https://twitter.com/ClimateData_ca" target="_blank" class="text-secondary me-2" title="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
 						
 						<a href="https://www.facebook.com/ClimateData.ca.Donneesclimatiques.ca" target="_blank" class="text-secondary me-2" title="Facebook"><i class="fab fa-facebook"></i></a>
 						
 						<a href="https://www.instagram.com/climatedata.ca/" target="_blank" class="text-secondary me-2" title="Instagram"><i class="fab fa-instagram"></i></a>
 						
-						<a href="https://soundcloud.com/climate-data-canada" target="_blank" class="text-secondary me-2" title="Instagram"><i class="fab fa-soundcloud"></i></a>
+						<a href="https://soundcloud.com/climate-data-canada" target="_blank" class="text-secondary" title="SoundCloud"><i class="fab fa-soundcloud"></i></a>
 						
 						
 					</div>

@@ -662,12 +662,12 @@ add_action ( 'init', 'cdc_page_as_guest_for_motion_page' );
 add_action ( 'admin_menu', 'cdc_remove_comments_admin_menu' );
 add_action ( 'wp_before_admin_bar_render', 'cdc_remove_comments_admin_bar' );
 add_action ( 'manage_pages_custom_column', 'cdc_display_in_learning_zone_value', 10, 2 );
-add_action ( 'manage_beta-app_posts_custom_column', 'cdc_display_in_learning_zone_value', 10, 2 );
+add_action ( 'manage_app_posts_custom_column', 'cdc_display_in_learning_zone_value', 10, 2 );
 add_filter ( 'use_block_editor_for_post_type', 'cdc_enable_block_editor', 10, 2 );
 add_filter ( 'manage_post_posts_columns', 'cdc_manage_post_columns', 10, 1 );
 add_filter ( 'manage_pages_columns', 'cdc_add_display_in_learning_zone_column' );
 add_filter ( 'manage_resource_posts_columns', 'cdc_add_display_in_learning_zone_column' );
-add_filter ( 'manage_beta-app_posts_columns', 'cdc_add_display_in_learning_zone_column' );
+add_filter ( 'manage_app_posts_columns', 'cdc_add_display_in_learning_zone_column' );
 add_filter ( 'register_post_type_args', 'cdc_make_interactive_cpt_public_for_motion_page', 10, 2 );
 
 

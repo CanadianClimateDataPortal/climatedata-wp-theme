@@ -195,7 +195,7 @@
     text-indent: unset;
     width: 100%;
     background: unset;
-    cursor: default;
+    cursor: pointer;
     pointer-events: all;
     position: relative;
     margin-bottom: 1.5rem;
@@ -220,9 +220,16 @@
   }
 }
 
-#menu-langs {
+#menu-langs,
+#menu-tabs {
   .current-nav-link {
     color: $primary;
+  }
+
+  .ancestor-nav-item {
+    a {
+      color: $primary;
+    }
   }
 }
 

@@ -602,9 +602,10 @@ function translate_path ( $post_id, $lang ) {
 		if (
 			isset( $post_type_object->rewrite['slug'] )
 		) {
+			$current_locale = get_locale();
 			switch_to_locale( $all_langs[$lang]['locale'] );
 			$path[] = __( $post_type_object->rewrite['slug'], 'cdc-post-types' );
-			restore_previous_locale();
+			switch_to_locale( $current_locale );
 		} else {
 			$path[] = get_post_type ( $post_id );
 		}

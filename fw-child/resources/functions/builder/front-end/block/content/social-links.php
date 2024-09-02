@@ -84,7 +84,9 @@ if ( isset( $element[ 'inputs' ][ 'links' ][ 'rows' ] ) ) {
 						target="_blank"
 						rel="noopener"
 						title="<?php echo esc_attr( $link[ 'label' ] ) ?>"
-						style="<?php echo ( ! empty( $link[ 'brand-color' ] ) ) ? "color: {$link[ 'brand-color' ]};" : "" ?>"
+						<?php if ( ! empty( $link[ 'brand-color' ] ) ) : ?>
+							style="color: <?php echo $link[ 'brand-color' ] ?>;"
+						<?php endif; ?>
 					>
 						<i class="fa-brands <?php echo $link[ 'icon' ] ?>"></i>
 						<?php if ( $show_network_names ) : ?>

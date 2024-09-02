@@ -446,10 +446,10 @@
   &.brand-colored {
     a {
       transition: opacity 0.1s;
-    }
-
-    a:hover {
-      opacity: 0.6;
+      
+      &:hover {
+        opacity: 0.6;
+      }
     }
   }
 }

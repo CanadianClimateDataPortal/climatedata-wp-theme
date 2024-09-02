@@ -106,11 +106,18 @@
 }
 
 .header-fixed-menu {
-  &.on-white {
-    #header-menu-icon {
-      color: $black;
-    }
+  &.on-white .menu-hamburger {
+    mix-blend-mode: difference;
+    filter: grayscale(100%);
   }
+}
+
+.menu-hamburger {
+  position: fixed;
+  top: var(--menu-hamburger-top);
+  left: var(--menu-hamburger-left);
+  transform: translateX(-50%);
+  z-index: $zindex-fixed;
 }
 
 //

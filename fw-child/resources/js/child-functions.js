@@ -733,20 +733,37 @@ const $ = jQuery;
     //
     // Dynamic logo block display scroll behavior
     //
-
-    if ( $( '#floating-header' ).length && $( '#hero' ).length ) {
+    if ( $( '#menu-trigger' ).length && $( '#hero' ).length ) {
       $( window ).on( 'scroll', function() {
-        const floatingHeaderBottom = $('#floating-header').offset().top + $('#floating-header').outerHeight();
-        const menuHeaderHamburgerHeight = $('#menu-trigger').outerHeight();
-        const elementAfterHero = $('#hero').next();
-        const elementAfterHeroTop = elementAfterHero.offset().top;
+        const menuButtonBottom = $( '#menu-trigger' ).offset().top + $( '#menu-trigger' ).outerHeight();
+        const menuHeaderHamburgerHeight = $( '#menu-trigger' ).outerHeight();
+        const elementAfterHero = $( '#hero' ).next();
+        const { top: elementAfterHeroTop } = elementAfterHero.offset();
+        const isHeaderOverlap = menuButtonBottom - ( menuHeaderHamburgerHeight / 2 ) >= elementAfterHeroTop;
+        const pageHasFilters = elementAfterHero.hasClass( 'query-page' );
+        const addOnWhiteClass = isHeaderOverlap && !pageHasFilters;
 
-        if ( floatingHeaderBottom - ( menuHeaderHamburgerHeight / 2 ) >= elementAfterHeroTop && !elementAfterHero.hasClass('query-page') ) {
-          $('#floating-header').addClass('on-white');
-        } else {
-          $('#floating-header').removeClass('on-white');
-        }
+        $( '#floating-header' ).toggleClass( 'on-white', addOnWhiteClass );
       });
+    }
+
+    //
+    // Dynamic set of menu button position.
+    //
+    if ( $( '#menu-trigger' ).length && $( '#header-logo-container' ) ) {
+      function setMenuButtonPosition() {
+        const headerLogoContainer = $( '#header-logo-container' );
+        const headerLogoContainerWidth = headerLogoContainer.outerWidth();
+        const headerLogoContainerHeight = headerLogoContainer.outerHeight();
+
+        // Set as css variables the position of the logo container.
+        document.documentElement.style.setProperty( '--menu-hamburger-left', `${ headerLogoContainerWidth / 2 }px` );
+        document.documentElement.style.setProperty( '--menu-hamburger-top', `${ headerLogoContainerHeight }px` );
+      }
+
+      setMenuButtonPosition();
+
+      $( window ).on( 'resize', setMenuButtonPosition );
     }
 
     //

@@ -583,7 +583,6 @@ const $ = jQuery;
         },
         dataType: 'json',
         success: function (data) {
-          console.log(data);
 
           alert_header.text(data.header);
 
@@ -631,18 +630,18 @@ const $ = jQuery;
     // Learn block GSAP Animation on front page
     //
 
-    if ($('#page-home').length) {
+    if ($( '#page-home' ).length) {
       gsap.registerPlugin(ScrollTrigger);
       const mm = gsap.matchMedia();
 
       // Add GSAP animations after the "lg" breakpoint (992px) is reached
-      mm.add("(min-width: 992px)", () => {
-        $('.scroll-card').each(function () {
+      mm.add( '(min-width: 992px)', () => {
+        $( '.scroll-card' ).each(function () {
           const card = this;
-          const isLastCard = $(card).closest('.fw-query-item').is(':last-child');
+          const isLastCard = $( card ).closest( '.fw-query-item' ).is( ':last-child' );
 
           // Set pointer-events to none at the beginning for every card
-          $(card).css('pointer-events', 'none');
+          $( card ).css( 'pointer-events', 'none' );
 
           // Define common properties
           const fromToProps = {
@@ -680,7 +679,7 @@ const $ = jQuery;
           };
 
           // Customize properties for the last card
-          if (isLastCard) {
+          if ( isLastCard ) {
             toProps2.y = '0%';
             toProps2.opacity = 1;
             toProps2.scale = 1;
@@ -695,10 +694,10 @@ const $ = jQuery;
               scrub: true,
               markers: false,    // Set to true to debug
               onLeave: function() {
-                $(card).css('pointer-events', 'none');  // Disable pointer-events when card leaves
+                $( card ).css( 'pointer-events', 'none' );  // Disable pointer-events when card leaves
               },
               onEnterBack: function() {
-                $(card).css('pointer-events', '');  // Disable pointer-events when card enters back
+                $(card).css( 'pointer-events', '' );  // Disable pointer-events when card enters back
               },
             }
           });
@@ -708,8 +707,22 @@ const $ = jQuery;
             .to(card, toProps1)
             .to(card, toProps2);
         });
-      });
+      } );
 
+      // Add Slick carousel to news images on mobile only.
+      $( '#resources-query .fw-query-items' ).slick( {
+        dots: true,
+        arrows: false,
+        mobileFirst: true,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        responsive: [
+          {
+            breakpoint: 991,
+            settings: 'unslick'
+          },
+        ],
+      } );
     };
 
     //

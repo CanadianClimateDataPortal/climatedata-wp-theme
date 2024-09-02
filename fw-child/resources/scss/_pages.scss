@@ -53,9 +53,9 @@
 }
 
 #hero-text-carousel {
-  --hero-carousel-pb: 3rem;
-  margin-top: calc(5rem + var(--hero-carousel-pb));
-  padding-bottom: var(--hero-carousel-pb);
+  $hero-carousel-pb: 3rem;
+  margin-top: calc(5rem + $hero-carousel-pb);
+  padding-bottom: $hero-carousel-pb;
 
   @include media-breakpoint-up(md) {
     margin-top: 6.25rem;
@@ -66,8 +66,6 @@
   --swiper-pagination-bullet-horizontal-gap: 0.75rem;
   --swiper-pagination-bullet-inactive-color: #{$blue-200};
   --swiper-pagination-color: #{$white};
-  --swiper-pagination-bottom: -5rem;
-  --swiper-pagination-top: auto;
 
   position: relative;
   left: auto;
@@ -75,6 +73,11 @@
   width: 100vw;
   height: 0;
   text-align: center;
+
+  @include media-breakpoint-up(xsm) {
+    --swiper-pagination-bottom: -5rem;
+    --swiper-pagination-top: auto;
+  }
 
   @include media-breakpoint-up(md) {
     bottom: auto;
@@ -216,9 +219,13 @@
   }
 
   #resources-text {
-    position: sticky;
-    top: 25vh;
-    margin-bottom: 25vh;
+    margin-bottom: 2rem;
+
+    @include media-breakpoint-up(lg) {
+      position: sticky;
+      top: 25vh;
+      margin-bottom: 25vh;
+    }
 
     & + div {
       @include media-breakpoint-only(sm) {

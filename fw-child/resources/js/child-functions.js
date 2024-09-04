@@ -713,5 +713,23 @@ const $ = jQuery;
     //
 
     $('body').removeClass('spinner-on');
+
+    //
+    // Add 'scrolled' class on body after 50px scroll.
+    //
+
+    function toggleBodyScrolledClass() {
+      if ( $( window ).scrollTop() > 50 ) {
+        $( 'body' ).addClass( 'scrolled' );
+      } else {
+        $( 'body' ).removeClass( 'scrolled' );
+      }
+    }
+
+    $( window ).on( 'scroll', toggleBodyScrolledClass );
+
+    $( toggleBodyScrolledClass );
+
   });
-})(jQuery);
+
+})( jQuery );

@@ -1412,3 +1412,7 @@ msgstr ""
 #: template/learn/query.php:75
 msgid "No items found."
 msgstr "Aucun item trouvé."
+
+#: template/news/control-bar.php:31
+msgid "Tag"
+msgstr "Étiquette"

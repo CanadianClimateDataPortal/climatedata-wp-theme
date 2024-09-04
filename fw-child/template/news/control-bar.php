@@ -44,22 +44,22 @@
 								<ul class="list-unstyled m-0 pe-2">
 									<?php
 									
-									foreach ( $all_tags as $tag ) {
+										foreach ( $all_tags as $tag ) {
 
-										if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
-											$tag_name = get_field( 'admin_term_title_' . $GLOBALS['fw']['current_lang_code'], $tag );
-										} else {
-											$tag_name = $tag->name;
-										}
-										
+											if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
+												$tag_name = get_field( 'admin_term_title_' . $GLOBALS['fw']['current_lang_code'], $tag );
+											} else {
+												$tag_name = $tag->name;
+											}
+
 									?>
-								
+
 									<li class="filter-item" data-key="post_tag" data-value="<?php echo $tag->slug; ?>"><?php echo $tag_name; ?></li>
-									
+
 									<?php
-									
+
 										}
-								
+
 									?>
 								</ul>
 								<?php

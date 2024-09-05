@@ -101,8 +101,6 @@ function fw_add_custom_rewrites () {
 	
 	$all_langs = get_option ( 'fw_langs' );
 	
-	$rewrite_code = $GLOBALS['fw']['current_lang_code'];
-	
 	switch ( fw_get_rewrite_method() ) {
 		
 		case 'path' :
@@ -221,46 +219,50 @@ function fw_add_custom_rewrites () {
 			
 			update_option ( 'rewrite_rules', array() );
 			
-			// echo $GLOBALS['fw']['current_lang_code'] . '<br>';
-			// dumpit ( $_SERVER );
-			
 			add_filter ( 'rewrite_rules_array', function ( $rules ) {
 				
 				$rewrite_code = $GLOBALS['fw']['current_lang_code'];
+				$new_rules = array();
+				$rules_to_remove = array();
 				
-				// $new_rules = $rules;
-				
-				if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
-					
-					// $new_rules = array();
+				if ( $rewrite_code != 'en' ) {
 					
 					foreach ( $rules as $rule => $query ) {
 						
 						$add_rule = false;
 						
 						// add lang=XX
-						
 						$new_query = $query . '&lang=' . $rewrite_code;
 						
-						// 
-						
-						foreach ( get_post_types ( array ( 'public' => true, '_builtin' => false ) ) as $cpt ) {
+						// Modify the 'resource' CPT rule for French ('ressource') based on slug translation
+						foreach ( get_post_types( array ( 'public' => true, '_builtin' => false ) ) as $cpt ) {
 							
 							if ( $add_rule == false ) {
 								
-								// if the path includes 'cpt=', 
-								// change it to 'post_type=cpt&slug_XX='
-								
+								// If the query contains the CPT
 								if ( str_contains ( $query, $cpt . '=' ) ) {
 									
+									// Fetch the translated slug using the text domain 'cdc-post-types'
+									$translated_slug = __( $cpt, 'cdc-post-types' );
+
+									// Create the new query with the translated slug
 									$new_query = str_replace ( $cpt . '=', 'cpt=' . $cpt . '&slug_' . $rewrite_code . '=', $new_query );
-									
+
+									// Modify the rule with the translated slug
+									$new_key = str_replace( $cpt . '/', $translated_slug . '/', $rule );
+
+									// Add the new rule to the new_rules array
+									$new_rules[$new_key] = $new_query;
+
+									// Mark the original rule for removal
+									$rules_to_remove[] = $rule;
+			
 									$add_rule = true;
 									
 								}
 								
 							}
-								
+							
 						}
 						
 						if ( $add_rule == false ) {
@@ -278,7 +280,15 @@ function fw_add_custom_rewrites () {
 						}
 						
 					}
-					
+
+					// Unset the original rules after the loop
+					foreach ( $rules_to_remove as $rule_to_remove ) {
+						unset( $rules[$rule_to_remove] );
+					}
+
+					// Merge the new translated rules back into the original rules array
+					$rules = array_merge( $new_rules, $rules );
+
 				}
 				
 				// taxonomies
@@ -312,13 +322,13 @@ function fw_add_custom_rewrites () {
 							// echo $new_query . '<br>';
 							
 							$rules = array ( $new_key => $new_query ) + $rules;
-							
+
 						}
 							
 					}
 					
 				}
-				
+
 				return $rules;
 				
 			}, 1 );

@@ -272,6 +272,9 @@ function posttype_definition() {
         'exclude_from_search'   => false,
         'publicly_queryable'    => true,
         'capability_type'       => 'page',
+        'rewrite' => [
+            'with_front' => false
+        ],
     );
     register_post_type( 'definition', $args );
 
@@ -329,6 +332,9 @@ function posttype_app() {
         'exclude_from_search'   => false,
         'publicly_queryable'    => true,
         'capability_type'       => 'page',
+        'rewrite' => [
+            'with_front' => false
+        ],
     );
     register_post_type( 'app', $args );
 

@@ -1,154 +1,76 @@
 <?php
 
-function array_key_exists_wildcard ( $array, $search, $return = '' ) {
+function array_key_exists_wildcard( $arr, $search, $return = '' ) {
 	$search = str_replace( '\*', '.*?', preg_quote( $search, '/' ) );
-	$result = preg_grep( '/^' . $search . '$/i', array_keys( $array ) );
-	
-	if ( $return == 'key-value' )
-		return array_intersect_key( $array, array_flip( $result ) );
-		
+	$result = preg_grep( '/^' . $search . '$/i', array_keys( $arr ) );
+
+	if ( 'key-value' === $return ) {
+		return array_intersect_key( $arr, array_flip( $result ) );
+	}
+
 	return $result;
 }
 
-// add_action ( 'parse_request', 'debug_404_rewrite_dump', 100 );
+add_action( 'init', 'fw_add_custom_rewrites', 10 );
 
-function debug_404_rewrite_dump ( &$wp ) {
-	
-	if ( !is_admin() ) {
-		
-		global $wp;
-		global $wp_rewrite;
-		
-		echo '<h4>rewrite rules</h4>';
-		dumpit ( $wp_rewrite->wp_rewrite_rules(), true );
-		
-		// echo '<h4>request</h4>';
-		// dumpit ( $wp->request, true );
-		
-		echo '<h4>matched rule and query</h4>';
-		dumpit ( $wp->matched_rule, true );
-		
-		echo '<h4>matched query</h4>';
-		dumpit ( $wp->matched_query, true );
-		
-	}
-	
-}
+/**
+ * Add custom rewrites.
+ */
+function fw_add_custom_rewrites() {
 
-// add_action ( 'init', 'fw_init_get_langs', 10 );
-
-function fw_init_get_langs() {
-	
-	// delete_option ( 'fw_langs' );
-	
-	if ( !get_option ( 'fw_langs' ) ) {
-		
-		if (
-			is_array ( get_field ( 'fw_languages', 'option' ) ) &&
-			!empty ( get_field ( 'fw_languages', 'option' ) )
-		) {
-			
-			// dumpit ( get_field ( 'fw_languages', 'option' ) );
-			
-		} else {
-			
-			// setup default langs field
-			
-			update_field ( 'fw_languages', array (
-				array (
-					'name' => 'English',
-					'code' => 'en',
-					'locale' => 'en_US'
-				)
-			), 'option' );
-			
-			// update the theme option
-			// for init/rewrite function
-			
-			
-			
-		}
-		
-		// add_option (
-		// 	'fw_langs', 
-		// 	array ( 
-		// 		'en' => 'English',
-		// 		'fr' => 'Français',
-		// 		'es' => 'Español'
-		// 	)
-		// );
-		
-		// dumpit ( get_option ( 'fw_langs' ) );
-		
-	}
-	
-}
-// 
-// add_action ( 'init', function() {
-// 	
-// 	$GLOBALS['rewrite_code'] = 'fr';
-// 	
-// }, 9 );
-
-
-add_action ( 'init', 'fw_add_custom_rewrites', 10 );
-
-function fw_add_custom_rewrites () {
-	
 	global $wp_rewrite;
-	
-	add_rewrite_tag ( '%lang%', '([^&]+)' );
-	
-	$all_langs = get_option ( 'fw_langs' );
-	
+
+	add_rewrite_tag( '%lang%', '([^&]+)' );
+
+	$all_langs = get_option( 'fw_langs' );
+
 	switch ( fw_get_rewrite_method() ) {
-		
-		case 'path' :
-			
+
+		case 'path':
 			// rewrite method:
-			// add language to path
-	
-			//
-			// ALL PAGES OTHER THAN HOME
-			//
-			
+			// add language to path.
+
+			/**
+			 * ALL PAGES OTHER THAN HOME
+			 */
+
 			foreach ( $all_langs as $code => $lang ) {
-				
-				if ( $code != 'en' ) {
-					
-					// custom post types
-					
-					foreach ( get_post_types ( array ( 'public' => true ) ) as $cpt ) {
-						
-						add_rewrite_rule (
+
+				if ( 'en' !== $code ) {
+
+					// custom post types.
+
+					foreach ( get_post_types( array( 'public' => true ) ) as $cpt ) {
+
+						add_rewrite_rule(
 							'(^' . $code . ')/' . $cpt . '/(.*)([^/]+)?',
 							'index.php?lang=$matches[1]&cpt=' . $cpt . '&slug_' . $code . '=$matches[2]',
 							'top'
 						);
-						
+
 					}
-					
-					// posts with permalink structure
-					
-					// month and name
-					
-					add_rewrite_rule (
+
+					// posts with permalink structure.
+
+					// month and name.
+
+					add_rewrite_rule(
 						'(^' . $code . ')/([0-9]{4})/([0-9]{1,2})/([^/]+)(?:/([0-9]+))?/?$',
 						'index.php?lang=$matches[1]&year=$matches[2]&monthnum=$matches[3]&slug_' . $code . '=$matches[4]&page=$matches[5]',
 						'top'
 					);
-					
-					// day and name
-					
-					add_rewrite_rule (
+
+					// day and name.
+
+					add_rewrite_rule(
 						'(^' . $code . ')/([0-9]{4})/([0-9]{1,2})/([0-9]{1,2})/([^/]+)(?:/([0-9]+))?/?$',
 						'index.php?lang=$matches[1]&year=$matches[2]&monthnum=$matches[3]&day=$matches[4]&slug_' . $code . '=$matches[5]&page=$matches[6]',
 						'top'
 					);
-					
-					// archive
-					
-					foreach ( get_taxonomies ( array ( 'public' => true ) ) as $taxonomy ) {
+
+					// archive.
+
+					foreach( get_taxonomies ( array( 'public' => true ) ) as $taxonomy ) {
 						
 						if ( $taxonomy != 'post_format' ) {
 						
@@ -187,167 +109,166 @@ function fw_add_custom_rewrites () {
 						}
 						
 					}
-					
-					// page/post
-					
-					add_rewrite_rule (
+
+					// page/post.
+
+					add_rewrite_rule(
 						'(^' . $code . ')/(.*)([^/]+)?',
 						'index.php?lang=$matches[1]&path_' . $code . '=$matches[2]',
 						'top'
 					);
-					
-					// HOME
-					
-					add_rewrite_rule (
+
+					// HOME.
+
+					add_rewrite_rule(
 						'(^' . $code . ')/?$',
-						'index.php?lang=$matches[1]&page_id=' . get_option ( 'page_on_front' ),
-						'top' 
+						'index.php?lang=$matches[1]&page_id=' . get_option( 'page_on_front' ),
+						'top'
 					);
-					
+
 				}
-					
 			}
-			
+
 			break;
-		
-		case 'domain' :
-			
+
+		case 'domain':
 			// * unpleasant *
 			// destroy the existing rewrite rules
 			// completely, because we need to replace everything
-			// with the lang=XX query
-			
-			update_option ( 'rewrite_rules', array() );
-			
-			add_filter ( 'rewrite_rules_array', function ( $rules ) {
-				
-				$rewrite_code = $GLOBALS['fw']['current_lang_code'];
-				$new_rules = array();
-				$rules_to_remove = array();
-				
-				if ( $rewrite_code != 'en' ) {
-					
-					foreach ( $rules as $rule => $query ) {
-						
-						$add_rule = false;
-						
-						// add lang=XX
-						$new_query = $query . '&lang=' . $rewrite_code;
-						
-						// Modify the 'resource' CPT rule for French ('ressource') based on slug translation
-						foreach ( get_post_types( array ( 'public' => true, '_builtin' => false ) ) as $cpt ) {
-							
-							if ( $add_rule == false ) {
-								
-								// If the query contains the CPT
-								if ( str_contains ( $query, $cpt . '=' ) ) {
-									
-									// Fetch the translated slug using the text domain 'cdc-post-types'
-									$translated_slug = __( $cpt, 'cdc-post-types' );
+			// with the lang=XX query.
 
-									// Create the new query with the translated slug
-									$new_query = str_replace ( $cpt . '=', 'cpt=' . $cpt . '&slug_' . $rewrite_code . '=', $new_query );
+			update_option( 'rewrite_rules', array() );
 
-									// Modify the rule with the translated slug
-									$new_key = str_replace( $cpt . '/', $translated_slug . '/', $rule );
+			add_filter(
+				'rewrite_rules_array',
+				function ( $rules ) {
 
-									// Add the new rule to the new_rules array
-									$new_rules[$new_key] = $new_query;
+					$rewrite_code    = $GLOBALS['fw']['current_lang_code'];
+					$new_rules       = array();
+					$rules_to_remove = array();
 
-									// Mark the original rule for removal
-									$rules_to_remove[] = $rule;
-			
-									$add_rule = true;
-									
+					if ( 'en' !== $rewrite_code ) {
+
+						foreach ( $rules as $rule => $query ) {
+
+							$add_rule = false;
+
+							// add lang=XX .
+							$new_query = $query . '&lang=' . $rewrite_code;
+
+							// Modify the 'resource' CPT rule for French ('ressource') based on slug translation.
+							foreach ( get_post_types(
+								array(
+									'public' => true,
+									'_builtin' => false,
+								)
+							) as $cpt ) {
+
+								if ( false === $add_rule ) {
+
+									// If the query contains the CPT.
+									if ( str_contains( $query, $cpt . '=' ) ) {
+
+										// Fetch the translated slug using the text domain 'cdc-post-types'.
+										$translated_slug = __( $cpt, 'cdc-post-types' );
+
+										// Create the new query with the translated slug.
+										$new_query = str_replace( $cpt . '=', 'cpt=' . $cpt . '&slug_' . $rewrite_code . '=', $new_query );
+
+										// Modify the rule with the translated slug.
+										$new_key = str_replace( $cpt . '/', $translated_slug . '/', $rule );
+
+										// Add the new rule to the new_rules array.
+										$new_rules[ $new_key ] = $new_query;
+
+										// Mark the original rule for removal.
+										$rules_to_remove[] = $rule;
+
+										$add_rule = true;
+									}
 								}
-								
 							}
-							
+
+							if ( false === $add_rule ) {
+
+								$new_query = str_replace( '&name=', '&slug_' . $rewrite_code . '=', $new_query );
+
+								$new_query = str_replace( 'pagename=', 'path_' . $rewrite_code . '=', $new_query );
+
+								$add_rule = true;
+
+							}
+
+							if ( true === $add_rule ) {
+								$rules[ $rule ] = $new_query;
+							}
 						}
-						
-						if ( $add_rule == false ) {
-						
-							$new_query = str_replace ( '&name=', '&slug_' . $rewrite_code . '=', $new_query );
-								
-							$new_query = str_replace ( 'pagename=', 'path_' . $rewrite_code . '=', $new_query );
-							
-							$add_rule = true;
-							
+
+						// Unset the original rules after the loop.
+						foreach ( $rules_to_remove as $rule_to_remove ) {
+							unset( $rules[ $rule_to_remove ] );
 						}
-						
-						if ( $add_rule == true ) {
-							$rules[$rule] = $new_query;
-						}
-						
+
+						// Merge the new translated rules back into the original rules array.
+						$rules = array_merge( $new_rules, $rules );
+
 					}
 
-					// Unset the original rules after the loop
-					foreach ( $rules_to_remove as $rule_to_remove ) {
-						unset( $rules[$rule_to_remove] );
-					}
+					// taxonomies.
 
-					// Merge the new translated rules back into the original rules array
-					$rules = array_merge( $new_rules, $rules );
+					foreach ( get_taxonomies( array( 'public' => true ) ) as $taxonomy ) {
 
-				}
-				
-				// taxonomies
-				
-				foreach ( get_taxonomies ( array ( 'public' => true ) ) as $taxonomy ) {
-					
-					// echo $taxonomy . '<br>';
-					
-					if ( $taxonomy != 'post_format' ) {
-						
-						$tax_slug = get_option ( 'options_tax_' . $taxonomy . '_slug_' . $rewrite_code );
-						
-						// taxonomy archive i.e. /tax(fr)/term(fr)/
-						
-						// find items in $rules that start with the taxonomy slug
-						
-						$default_rules = array_key_exists_wildcard ( $rules, $taxonomy . '*', 'key-value' );
-						
-						foreach ( $default_rules as $rule => $query ) {
-							
-							$new_key = str_replace ( $taxonomy . '/', $tax_slug . '/', $rule );
-							
-							$new_query = $query . '&archive=' . $taxonomy;
-							
-							// replace category_name= with slug=
-							$new_query = str_replace ( 'category_name=', 'slug_' . $rewrite_code . '=', $new_query );
-							
-							// replace tax= with slug=
-							$new_query = str_replace ( $taxonomy . '=', 'slug_' . $rewrite_code . '=', $new_query );
-							
-							// echo $new_query . '<br>';
-							
-							$rules = array ( $new_key => $new_query ) + $rules;
+						if ( 'post_format' !== $taxonomy ) {
 
+							$tax_slug = get_option( 'options_tax_' . $taxonomy . '_slug_' . $rewrite_code );
+
+							// taxonomy archive i.e. /tax(fr)/term(fr)/ .
+
+							// find items in $rules that start with the taxonomy slug.
+
+							$default_rules = array_key_exists_wildcard( $rules, $taxonomy . '*', 'key-value' );
+
+							foreach ( $default_rules as $rule => $query ) {
+
+								$new_key = str_replace( $taxonomy . '/', $tax_slug . '/', $rule );
+
+								$new_query = $query . '&archive=' . $taxonomy;
+
+								// replace category_name= with slug= .
+								$new_query = str_replace( 'category_name=', 'slug_' . $rewrite_code . '=', $new_query );
+
+								// replace tax= with slug= .
+								$new_query = str_replace( $taxonomy . '=', 'slug_' . $rewrite_code . '=', $new_query );
+
+								$rules = array( $new_key => $new_query ) + $rules;
+
+							}
 						}
-							
 					}
-					
-				}
 
-				return $rules;
-				
-			}, 1 );
-			
+					return $rules;
+				},
+				1
+			);
+
 			break;
-			
+
 	}
-	
 }
 
-// don't redirect the front page
+// don't redirect the front page.
 
-add_action ( 'template_redirect', function() {
-	if ( is_front_page() ) {
-		remove_action ( 'template_redirect', 'redirect_canonical' );
-	}
-}, 0 );
+add_action(
+	'template_redirect',
+	function () {
+		if ( is_front_page() ) {
+			remove_action ( 'template_redirect', 'redirect_canonical' );
+		}
+	},
+	0
+);
 
-// add lang to query vars
+// add lang to query vars.
 
 add_filter ( 'query_vars', function ( $query_vars ) {
 	

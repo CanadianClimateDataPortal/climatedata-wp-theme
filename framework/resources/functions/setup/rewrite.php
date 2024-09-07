@@ -1,5 +1,16 @@
 <?php
+/**
+ * This file contains the rewrite setup functions.
+ */
 
+/**
+ * Check if a wildcard key exists in an array.
+ *
+ * @param array  $arr The array to search in.
+ * @param string $search The key to search for (supports wildcard *).
+ * @param string $return The return type ('' for keys, 'key-value' for key-value pairs).
+ * @return mixed The result of the search.
+ */
 function array_key_exists_wildcard( $arr, $search, $return = '' ) {
 	$search = str_replace( '\*', '.*?', preg_quote( $search, '/' ) );
 	$result = preg_grep( '/^' . $search . '$/i', array_keys( $arr ) );
@@ -71,7 +82,7 @@ function fw_add_custom_rewrites() {
 
 					// archive.
 
-					foreach( get_taxonomies( array( 'public' => true ) ) as $taxonomy ) {
+					foreach ( get_taxonomies( array( 'public' => true ) ) as $taxonomy ) {
 
 						if ( 'post_format' !== $taxonomy ) {
 
@@ -81,20 +92,20 @@ function fw_add_custom_rewrites() {
 
 							$taxonomy_rules = array(
 								array(
-									'rule' => '(^' . $code . ')/' . $tax_slug . '/(.+?)/(feed|rdf|rss|rss2|atom)/?$',
-									'query' => 'index.php?lang=$matches[1]&archive=' . $taxonomy . '&slug_' . $code . '=$matches[2]&feed=$matches[3]'
+									'rule'  => '(^' . $code . ')/' . $tax_slug . '/(.+?)/(feed|rdf|rss|rss2|atom)/?$',
+									'query' => 'index.php?lang=$matches[1]&archive=' . $taxonomy . '&slug_' . $code . '=$matches[2]&feed=$matches[3]',
 								),
 								array(
-									'rule' => '(^' . $code . ')/' . $tax_slug . '/(.+?)/embed/?$',
-									'query' => 'index.php?lang=$matches[1]&archive=' . $taxonomy . '&slug_' . $code . '=$matches[2]&embed=true'
+									'rule'  => '(^' . $code . ')/' . $tax_slug . '/(.+?)/embed/?$',
+									'query' => 'index.php?lang=$matches[1]&archive=' . $taxonomy . '&slug_' . $code . '=$matches[2]&embed=true',
 								),
 								array(
-									'rule' => '(^' . $code . ')/' . $tax_slug . '/(.+?)/page/?([0-9]{1,})/?$',
-									'query' => 'index.php?lang=$matches[1]&archive=' . $taxonomy . '&slug_' . $code . '=$matches[2]&paged=$matches[3]'
+									'rule'  => '(^' . $code . ')/' . $tax_slug . '/(.+?)/page/?([0-9]{1,})/?$',
+									'query' => 'index.php?lang=$matches[1]&archive=' . $taxonomy . '&slug_' . $code . '=$matches[2]&paged=$matches[3]',
 								),
 								array(
-									'rule' => '(^' . $code . ')/' . $tax_slug . '/(.+?)/?$',
-									'query' => 'index.php?lang=$matches[1]&archive=' . $taxonomy . '&slug_' . $code . '=$matches[2]'
+									'rule'  => '(^' . $code . ')/' . $tax_slug . '/(.+?)/?$',
+									'query' => 'index.php?lang=$matches[1]&archive=' . $taxonomy . '&slug_' . $code . '=$matches[2]',
 								),
 							);
 
@@ -162,7 +173,7 @@ function fw_add_custom_rewrites() {
 							// Modify the CPT rules based on slug translation.
 							foreach ( get_post_types(
 								array(
-									'public' => true,
+									'public'   => true,
 									'_builtin' => false,
 								)
 							) as $cpt ) {
@@ -301,7 +312,7 @@ add_filter(
 // there's probably a better way to do all of this,
 // someday.
 
-add_action ( 'pre_get_posts', 'get_post_by_lang_slug' );
+add_action( 'pre_get_posts', 'get_post_by_lang_slug' );
 
 /**
  * Get post by language slug.
@@ -359,8 +370,8 @@ function get_post_by_lang_slug( $query ) {
 						'meta_query',
 						array(
 							array(
-								'key' => 'path_' . $code,
-								'value' => $query->query_vars['path_' . $code],
+								'key'     => 'path_' . $code,
+								'value'   => $query->query_vars[ 'path_' . $code ],
 								'compare' => '=',
 							),
 						)
@@ -388,8 +399,8 @@ function get_post_by_lang_slug( $query ) {
 							'hide_empty' => false,
 							'meta_query' => array(
 								array(
-									'key' => 'slug_' . $code,
-									'value' => $query->query_vars[ 'slug_' . $code ],
+									'key'     => 'slug_' . $code,
+									'value'   => $query->query_vars[ 'slug_' . $code ],
 									'compare' => 'LIKE',
 								),
 							),
@@ -433,15 +444,15 @@ function get_post_by_lang_slug( $query ) {
 				) {
 
 					// tell the query what this isn't.
-					$query->is_home = false;
+					$query->is_home    = false;
 					$query->is_archive = false;
-					$query->is_date = false;
-					$query->is_year = false;
-					$query->is_month = false;
-					$query->is_day = false;
+					$query->is_date    = false;
+					$query->is_year    = false;
+					$query->is_month   = false;
+					$query->is_day     = false;
 
 					// tell it what it is.
-					$query->is_single = true;
+					$query->is_single   = true;
 					$query->is_singular = true;
 
 					if (
@@ -460,18 +471,9 @@ function get_post_by_lang_slug( $query ) {
 	}
 }
 
-// dumpit SQL after any query.
-
-function dump_query_sql( $query ) {
-	dumpit ( $query );
-	return $query;
-}
-
-// add_filter ( 'query', 'dump_query_sql' );
-
-//
-// PERMALINKS
-//
+/**
+ * PERMALINKS
+ */
 
 foreach ( array( 'post', 'page', 'attachment', 'post_type' ) as $single_type ) {
 
@@ -485,7 +487,7 @@ foreach ( array( 'post', 'page', 'attachment', 'post_type' ) as $single_type ) {
 	);
 }
 
-add_filter ( 'wpse_link', 'fw_rewrite_link', 10, 4 );
+add_filter( 'wpse_link', 'fw_rewrite_link', 10, 4 );
 
 /**
  * Rewrite the link.
@@ -493,7 +495,7 @@ add_filter ( 'wpse_link', 'fw_rewrite_link', 10, 4 );
  * Add prefix for posts.
  *
  * @param string $url The original URL.
- * @param int $post_id The ID of the post.
+ * @param int    $post_id The ID or Object of the post.
  * @return string The rewritten URL.
  */
 function fw_rewrite_link( $url, $post_id ) {
@@ -511,7 +513,7 @@ function fw_rewrite_link( $url, $post_id ) {
 
 		$url = translate_permalink( $url, $post_id, $GLOBALS['fw']['current_lang_code'] );
 
-	// Else, if it's a post, add the news prefix.
+		// Else, if it's a post, add the news prefix.
 	} elseif ( 'post' === get_post_type( $post_id ) ) {
 
 		$url = trailingslashit( $GLOBALS['vars']['home_url'] ) . 'news/' . get_the_slug( $post_id );
@@ -524,7 +526,7 @@ function fw_rewrite_link( $url, $post_id ) {
 /**
  * Translate the path based on the language.
  *
- * @param int $post_id The ID or Object of the post.
+ * @param int    $post_id The ID or Object of the post.
  * @param string $lang The language code.
  * @return array The translated path.
  */
@@ -542,7 +544,7 @@ function translate_path( $post_id, $lang ) {
 		)
 		&& in_array( get_post_type( $post_id ), array_keys( get_post_types() ) )
 	) {
-		$post_type = get_post_type( $post_id );
+		$post_type        = get_post_type( $post_id );
 		$post_type_object = get_post_type_object( $post_type );
 
 		if (
@@ -579,7 +581,7 @@ function translate_path( $post_id, $lang ) {
  * Translate the permalink based on the language.
  *
  * @param string $url The original permalink.
- * @param int $post_id The ID of the post.
+ * @param int    $post_id The ID of the post.
  * @param string $lang The language code.
  * @return string The translated permalink.
  */
@@ -636,7 +638,7 @@ function translate_permalink( $url, $post_id, $lang ) {
 
 				$new_url .= implode( '/', translate_path( $post_id, $lang ) );
 
-			} elseif ( (int) $post_id !== (int) get_option( 'page_on_front' ) ) {
+			} elseif ( (int) get_option( 'page_on_front' ) !== (int) $post_id ) {
 
 				$new_url .= implode( '/', translate_path( $post_id, $lang ) );
 
@@ -668,7 +670,7 @@ function translate_permalink( $url, $post_id, $lang ) {
 				// Construct the new URL with the prefix and post slug.
 				$new_url .= $news_prefix . '/' . $post_slug;
 
-			} elseif ( (int) $post_id !== (int) get_option( 'page_on_front' ) ) {
+			} elseif ( (int) get_option( 'page_on_front' ) !== (int) $post_id ) {
 
 				$new_url .= implode( '/', translate_path( $post_id, $lang ) );
 
@@ -681,9 +683,9 @@ function translate_permalink( $url, $post_id, $lang ) {
 	return trailingslashit( $new_url );
 }
 
-//
-// TITLES
-//
+/**
+ * TITLES
+ */
 
 add_filter( 'document_title_parts', 'translate_doc_title' );
 
@@ -742,7 +744,7 @@ add_filter( 'the_title', 'translate_post_title', 10, 2 );
  * Translate the post title based on the language.
  *
  * @param string $title The original post title.
- * @param int $id The ID of the post.
+ * @param int    $id The ID of the post.
  * @return string The translated post title.
  */
 function translate_post_title( $title, $id ) {

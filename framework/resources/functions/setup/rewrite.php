@@ -303,166 +303,164 @@ add_filter(
 
 add_action ( 'pre_get_posts', 'get_post_by_lang_slug' );
 
-function get_post_by_lang_slug ( $query ) {
+/**
+ * Get post by language slug.
+ *
+ * @param WP_Query $query The WP_Query object.
+ */
+function get_post_by_lang_slug( $query ) {
 
-	if ( is_admin() )
+	if ( is_admin() ) {
 		return $query;
+	}
 
 	if (
-		!is_admin() && 
+		! is_admin() &&
 		$query->is_main_query()
 	) {
-		
-		// dumpit ( $query );
-		
-		foreach ( get_option ( 'fw_langs' ) as $code => $lang ) {
-			
-			if ( $code != 'en' ) {
-			
+
+		foreach ( get_option( 'fw_langs' ) as $code => $lang ) {
+
+			if ( 'en' !== $code ) {
+
 				$has_slug = false;
 				$has_path = false;
-				
-				$query->set ( 'post_status', array ( 'publish', 'draft', 'private', 'inherit' ) );
-				
+
+				$query->set( 'post_status', array( 'publish', 'draft', 'private', 'inherit' ) );
+
 				if (
-					isset ( $query->query_vars['slug_' . $code] ) &&
-					!empty ( $query->query_vars['slug_' . $code] )
+					isset( $query->query_vars[ 'slug_' . $code ] ) &&
+					! empty( $query->query_vars[ 'slug_' . $code ] )
 				) {
-					
+
 					$has_slug = true;
-					
-					$query->set ( 'meta_query', array ( 
-						array (
-							'key' => 'slug_' . $code,
-							'value' => $query->query_vars['slug_' . $code],
-							'compare' => '='
+
+					$query->set(
+						'meta_query',
+						array(
+							array(
+								'key'     => 'slug_' . $code,
+								'value'   => $query->query_vars[ 'slug_' . $code ],
+								'compare' => '=',
+							),
 						)
-					) );
-					
-					$query->set ( 'post_type', array ( 'post', 'page' ) );
-					
+					);
+
+					$query->set( 'post_type', array( 'post', 'page' ) );
+
 				}
-				
+
 				if (
-					isset ( $query->query_vars['path_' . $code] ) &&
-					!empty ( $query->query_vars['path_' . $code] )
+					isset( $query->query_vars[ 'path_' . $code ] ) &&
+					! empty( $query->query_vars[ 'path_' . $code ] )
 				) {
-					
-					$query->set ( 'meta_query', array ( 
-						array (
-							'key' => 'path_' . $code,
-							'value' => $query->query_vars['path_' . $code],
-							'compare' => '='
+
+					$query->set(
+						'meta_query',
+						array(
+							array(
+								'key' => 'path_' . $code,
+								'value' => $query->query_vars['path_' . $code],
+								'compare' => '=',
+							),
 						)
-					) );
-					
-					$query->set ( 'post_type', array ( 'post', 'page' ) );
-					
+					);
+
+					$query->set( 'post_type', array( 'post', 'page' ) );
+
 					$has_path = true;
 				}
-					
+
 				if (
-					$has_slug == true &
+					true === $has_slug &&
 					(
-						isset ( $query->query_vars['archive'] ) &&
-						$query->query_vars['archive'] != ''
+						isset( $query->query_vars['archive'] ) &&
+						! empty( $query->query_vars['archive'] )
 					)
 				) {
-				
-					// TAXONOMY ARCHIVE
-					
-					// find the term that matches the slug
-					
-					$en_term = get_terms ( array (
-						'hide_empty' => false,
-						'meta_query' => array(
-							array (
-								'key' => 'slug_' . $code,
-								'value' => $query->query_vars['slug_' . $code],
-								'compare' => 'LIKE'
-							)
-						),
-					) );
-						
-					if ( !empty ( $en_term ) ) {
-						
+
+					// TAXONOMY ARCHIVE.
+
+					// find the term that matches the slug.
+
+					$en_term = get_terms(
+						array(
+							'hide_empty' => false,
+							'meta_query' => array(
+								array(
+									'key' => 'slug_' . $code,
+									'value' => $query->query_vars[ 'slug_' . $code ],
+									'compare' => 'LIKE',
+								),
+							),
+						)
+					);
+
+					if ( ! empty( $en_term ) ) {
+
 						$en_term = $en_term[0];
-						
+
 						$query->is_archive = true;
-						$query->is_home = false;
-						
-						if ( $query->query_vars['archive'] == 'category' ) {
-							
-							// category
-							
-							// unset ( $query->query_vars['slug_' . $code] );
-							// unset ( $query->query_vars['archive'] );
-							
-							$query->query['category_name'] = $en_term->slug;
+						$query->is_home    = false;
+
+						if ( 'category' === $query->query_vars['archive'] ) {
+
+							// category.
+
+							$query->query['category_name']      = $en_term->slug;
 							$query->query_vars['category_name'] = $en_term->slug;
-							
+
 							$query->is_category = true;
-							
-						} elseif ( $query->query_vars['archive'] == 'post_tag' ) {
-							
-							// tag
-							
+
+						} elseif ( 'post_tag' === $query->query_vars['archive'] ) {
+
+							// tag.
+
 							$query->is_tag = true;
-							
+
 						} else {
-							
-							// custom taxonomy
-						
+
+							// custom taxonomy.
+
 							$query->is_tax = true;
-							$query->query_vars[$query->query_vars['archive']] = $en_term->slug;
-							
+							$query->query_vars[ $query->query_vars['archive'] ] = $en_term->slug;
+
 						}
-						
 					}
-				
 				} elseif (
-					$has_slug == true ||
-					$has_path == true
+					true === $has_slug ||
+					true === $has_path
 				) {
-					
-					// tell the query what this isn't
+
+					// tell the query what this isn't.
 					$query->is_home = false;
 					$query->is_archive = false;
 					$query->is_date = false;
 					$query->is_year = false;
 					$query->is_month = false;
 					$query->is_day = false;
-					
-					// tell it what it is
+
+					// tell it what it is.
 					$query->is_single = true;
 					$query->is_singular = true;
-					
+
 					if (
-						isset ( $query->query_vars['cpt'] ) &&
-						!empty ( $query->query_vars['cpt'] )
+						isset( $query->query_vars['cpt'] ) &&
+						! empty( $query->query_vars['cpt'] )
 					) {
-					
-						// CPT SINGLE
-						
-						$query->set ( 'post_type', array ( $query->query_vars['cpt'] ) );
-						
+
+						// CPT SINGLE.
+
+						$query->set( 'post_type', array( $query->query_vars['cpt'] ) );
+
 					}
-					
 				}
-				
 			}
-			
 		} // foreach lang
-		
-		// correct here
-		// dumpit ( $query );
-		// echo '<hr>';
-		
 	}
-	
 }
 
-// dumpit SQL after any query
+// dumpit SQL after any query.
 
 function dump_query_sql( $query ) {
 	dumpit ( $query );
@@ -687,68 +685,78 @@ function translate_permalink( $url, $post_id, $lang ) {
 // TITLES
 //
 
-add_filter ( 'document_title_parts', 'translate_doc_title' );
+add_filter( 'document_title_parts', 'translate_doc_title' );
 
-function translate_doc_title ( $title_array ) {
-	
+/**
+ * Translate the document title based on the language.
+ *
+ * @param array $title_array The array containing the document title parts.
+ * @return array The translated document title parts.
+ */
+function translate_doc_title( $title_array ) {
+
 	$lang = $GLOBALS['fw']['current_lang_code'];
-	
+
 	if ( is_archive() ) {
-		
-		$this_tax = get_taxonomy ( $GLOBALS['fw']['current_query']['taxonomy'] );
-		$tax_name = $this_tax->labels->singular_name;
+
+		$this_tax  = get_taxonomy( $GLOBALS['fw']['current_query']['taxonomy'] );
+		$tax_name  = $this_tax->labels->singular_name;
 		$term_name = '';
-			
-		if ( $lang != 'en' ) {
-			
-			$tax_name = get_option ( 'options_tax_' . $GLOBALS['fw']['current_query']['taxonomy'] . '_title_single_' . $lang );
-			
-			$term_name = get_term_meta ( $GLOBALS['fw']['current_query']['term_id'], 'title_' . $lang, true );
-			
+
+		if ( 'en' !== $lang ) {
+
+			$tax_name = get_option( 'options_tax_' . $GLOBALS['fw']['current_query']['taxonomy'] . '_title_single_' . $lang );
+
+			$term_name = get_term_meta( $GLOBALS['fw']['current_query']['term_id'], 'title_' . $lang, true );
+
 		}
-		
-		if ( $term_name != '' ) {
-		
-			$title_array['title'] = get_term_meta ( $GLOBALS['fw']['current_query']['term_id'], 'title_' . $lang, true );
-			
+
+		if ( ! empty( $term_name ) ) {
+
+			$title_array['title'] = get_term_meta( $GLOBALS['fw']['current_query']['term_id'], 'title_' . $lang, true );
+
 		}
-		
-		if ( $tax_name != '' ) {
-		
-			$title_array = array_slice ( $title_array, 0, 1, true ) 
-				+ array ( 'tax' => $tax_name ) 
-				+ array_slice ( $title_array, 1, true );
-				
+
+		if ( ! empty( $tax_name ) ) {
+
+			$title_array = array_slice( $title_array, 0, 1, true )
+				+ array( 'tax' => $tax_name )
+				+ array_slice( $title_array, 1, true );
+
 		}
-		
 	} elseif (
 		( is_page() || is_singular() ) &&
-		get_post_meta ( get_the_ID(), 'title_' . $lang, true ) != ''
+		! empty( get_post_meta( get_the_ID(), 'title_' . $lang, true ) )
 	) {
-		
-		$title_array['title'] = get_post_meta ( get_the_ID(), 'title_' . $lang, true );
-		
+
+		$title_array['title'] = get_post_meta( get_the_ID(), 'title_' . $lang, true );
+
 	}
-	
+
 	return $title_array;
-	
 }
 
-add_filter ( 'the_title', 'translate_post_title', 10, 2 );
+add_filter( 'the_title', 'translate_post_title', 10, 2 );
 
-function translate_post_title ( $title, $id ) {
-	
-	if ( is_admin() && !wp_doing_ajax() ) {
+/**
+ * Translate the post title based on the language.
+ *
+ * @param string $title The original post title.
+ * @param int $id The ID of the post.
+ * @return string The translated post title.
+ */
+function translate_post_title( $title, $id ) {
+
+	if ( is_admin() && ! wp_doing_ajax() ) {
 		return $title;
 	}
-	
-	if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
-		if (get_post_meta ( $id, 'title_' . $GLOBALS['fw']['current_lang_code'], true ) != '') {
-			$title = get_post_meta ( $id, 'title_' . $GLOBALS['fw']['current_lang_code'], true );
-		}
-	}
-	
-	return $title;
-	
-}
 
+	if (
+		'en' !== $GLOBALS['fw']['current_lang_code'] &&
+		! empty( get_post_meta( $id, 'title_' . $GLOBALS['fw']['current_lang_code'], true ) )
+	) {
+		$title = get_post_meta( $id, 'title_' . $GLOBALS['fw']['current_lang_code'], true );
+	}
+
+	return $title;
+}

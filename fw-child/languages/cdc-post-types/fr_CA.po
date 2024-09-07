@@ -66,7 +66,7 @@ msgstr ""
 #: resources/functions/post-types.php:102
 #: resources/functions/post-types.php:179
 #: resources/functions/post-types.php:238
-#: resources/functions/post-types.php:295
+#: resources/functions/post-types.php:298
 msgid "Add New"
 msgstr ""
 
@@ -98,7 +98,7 @@ msgstr ""
 #: resources/functions/post-types.php:109
 #: resources/functions/post-types.php:186
 #: resources/functions/post-types.php:245
-#: resources/functions/post-types.php:302
+#: resources/functions/post-types.php:305
 msgid "Not found"
 msgstr ""
 
@@ -106,7 +106,7 @@ msgstr ""
 #: resources/functions/post-types.php:110
 #: resources/functions/post-types.php:187
 #: resources/functions/post-types.php:246
-#: resources/functions/post-types.php:303
+#: resources/functions/post-types.php:306
 msgid "Not found in Trash"
 msgstr ""
 
@@ -114,7 +114,7 @@ msgstr ""
 #: resources/functions/post-types.php:111
 #: resources/functions/post-types.php:188
 #: resources/functions/post-types.php:247
-#: resources/functions/post-types.php:304
+#: resources/functions/post-types.php:307
 msgid "Featured Image"
 msgstr ""
 
@@ -122,7 +122,7 @@ msgstr ""
 #: resources/functions/post-types.php:112
 #: resources/functions/post-types.php:189
 #: resources/functions/post-types.php:248
-#: resources/functions/post-types.php:305
+#: resources/functions/post-types.php:308
 msgid "Set featured image"
 msgstr ""
 
@@ -130,7 +130,7 @@ msgstr ""
 #: resources/functions/post-types.php:113
 #: resources/functions/post-types.php:190
 #: resources/functions/post-types.php:249
-#: resources/functions/post-types.php:306
+#: resources/functions/post-types.php:309
 msgid "Remove featured image"
 msgstr ""
 
@@ -138,7 +138,7 @@ msgstr ""
 #: resources/functions/post-types.php:117
 #: resources/functions/post-types.php:191
 #: resources/functions/post-types.php:250
-#: resources/functions/post-types.php:307
+#: resources/functions/post-types.php:310
 msgid "Use as featured image"
 msgstr ""
 
@@ -146,7 +146,7 @@ msgstr ""
 #: resources/functions/post-types.php:118
 #: resources/functions/post-types.php:192
 #: resources/functions/post-types.php:251
-#: resources/functions/post-types.php:308
+#: resources/functions/post-types.php:311
 msgid "Insert into item"
 msgstr ""
 
@@ -154,7 +154,7 @@ msgstr ""
 #: resources/functions/post-types.php:119
 #: resources/functions/post-types.php:193
 #: resources/functions/post-types.php:252
-#: resources/functions/post-types.php:309
+#: resources/functions/post-types.php:312
 msgid "Uploaded to this item"
 msgstr ""
 
@@ -162,7 +162,7 @@ msgstr ""
 #: resources/functions/post-types.php:123
 #: resources/functions/post-types.php:194
 #: resources/functions/post-types.php:253
-#: resources/functions/post-types.php:310
+#: resources/functions/post-types.php:313
 msgid "Items list"
 msgstr ""
 
@@ -170,7 +170,7 @@ msgstr ""
 #: resources/functions/post-types.php:124
 #: resources/functions/post-types.php:195
 #: resources/functions/post-types.php:254
-#: resources/functions/post-types.php:311
+#: resources/functions/post-types.php:314
 msgid "Items list navigation"
 msgstr ""
 
@@ -178,14 +178,14 @@ msgstr ""
 #: resources/functions/post-types.php:128
 #: resources/functions/post-types.php:196
 #: resources/functions/post-types.php:255
-#: resources/functions/post-types.php:312
+#: resources/functions/post-types.php:315
 msgid "Filter items list"
 msgstr ""
 
 #: resources/functions/post-types.php:51
 #: resources/functions/post-types.php:132
 #: resources/functions/post-types.php:259
-#: resources/functions/post-types.php:316
+#: resources/functions/post-types.php:319
 msgid "Post Type Description"
 msgstr ""
 
@@ -386,66 +386,66 @@ msgstr ""
 msgid "Search Definition"
 msgstr ""
 
-#: resources/functions/post-types.php:286
+#: resources/functions/post-types.php:289
 msgctxt "Post Type General Name"
 msgid "Apps"
 msgstr ""
 
-#: resources/functions/post-types.php:287
+#: resources/functions/post-types.php:290
 msgctxt "Post Type Singular Name"
 msgid "App"
 msgstr ""
 
-#: resources/functions/post-types.php:288
-#: resources/functions/post-types.php:289
+#: resources/functions/post-types.php:291
+#: resources/functions/post-types.php:292
 msgid "Apps"
 msgstr ""
 
-#: resources/functions/post-types.php:290
+#: resources/functions/post-types.php:293
 msgid "App Archives"
 msgstr ""
 
-#: resources/functions/post-types.php:291
+#: resources/functions/post-types.php:294
 msgid "App Attributes"
 msgstr ""
 
-#: resources/functions/post-types.php:292
+#: resources/functions/post-types.php:295
 msgid "Parent App:"
 msgstr ""
 
-#: resources/functions/post-types.php:293
+#: resources/functions/post-types.php:296
 msgid "All Apps"
 msgstr ""
 
-#: resources/functions/post-types.php:294
+#: resources/functions/post-types.php:297
 msgid "Add New App"
 msgstr ""
 
-#: resources/functions/post-types.php:296
+#: resources/functions/post-types.php:299
 msgid "New App"
 msgstr ""
 
-#: resources/functions/post-types.php:297
+#: resources/functions/post-types.php:300
 msgid "Edit App"
 msgstr ""
 
-#: resources/functions/post-types.php:298
+#: resources/functions/post-types.php:301
 msgid "Update App"
 msgstr ""
 
-#: resources/functions/post-types.php:299
+#: resources/functions/post-types.php:302
 msgid "View App"
 msgstr ""
 
-#: resources/functions/post-types.php:300
+#: resources/functions/post-types.php:303
 msgid "View Apps"
 msgstr ""
 
-#: resources/functions/post-types.php:301
+#: resources/functions/post-types.php:304
 msgid "Search App"
 msgstr ""
 
-#: resources/functions/post-types.php:315
+#: resources/functions/post-types.php:318
 msgid "App"
 msgstr ""
 
@@ -460,3 +460,7 @@ msgstr ""
 #. Template Name of the theme
 msgid "Update ACF Relevant Sectors"
 msgstr ""
+
+#: resources/functions/post-types.php:403
+msgid "news"
+msgstr "nouvelles"

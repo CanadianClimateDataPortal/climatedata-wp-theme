@@ -139,9 +139,12 @@ function fw_add_custom_rewrites() {
 
 			update_option( 'rewrite_rules', array() );
 
+			$news_prefix = __( 'news', 'cdc-post-types' );
+			add_permastruct( 'news', '/' . $news_prefix . '/%postname%', false );
+
 			add_filter(
 				'rewrite_rules_array',
-				function ( $rules ) {
+				function ( $rules ) use ( $news_prefix ) {
 
 					$rewrite_code    = $GLOBALS['fw']['current_lang_code'];
 					$new_rules       = array();
@@ -156,7 +159,7 @@ function fw_add_custom_rewrites() {
 							// add lang=XX .
 							$new_query = $query . '&lang=' . $rewrite_code;
 
-							// Modify the 'resource' CPT rule for French ('ressource') based on slug translation.
+							// Modify the CPT rules based on slug translation.
 							foreach ( get_post_types(
 								array(
 									'public' => true,
@@ -169,7 +172,6 @@ function fw_add_custom_rewrites() {
 									// If the query contains the CPT.
 									if ( str_contains( $query, $cpt . '=' ) ) {
 
-										// Fetch the translated slug using the text domain 'cdc-post-types'.
 										$translated_slug = __( $cpt, 'cdc-post-types' );
 
 										// Create the new query with the translated slug.
@@ -187,6 +189,14 @@ function fw_add_custom_rewrites() {
 										$add_rule = true;
 									}
 								}
+							}
+
+							// Modify the rule for post URLs to use translated news prefix.
+							if ( false === $add_rule && str_contains( $rule, $news_prefix . '/([^/]+)' ) ) {
+
+								$new_query = str_replace( 'name=', 'slug_' . $rewrite_code . '=', $new_query );
+
+								$add_rule = true;
 							}
 
 							if ( false === $add_rule ) {

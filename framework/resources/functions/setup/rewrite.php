@@ -569,143 +569,111 @@ function translate_path ( $post_id, $lang ) {
 	
 }
 
-function translate_permalink ( $url, $post_id, $lang ) {
-	
-	// echo 'url: ' . $url . '<br>';
-	// echo 'id: ' . $post_id . '<br>';
-	// echo 'lang: ' . $lang . '<br>';
-		
-	$post_obj = get_post ( $post_id );
-	
+function translate_permalink( $url, $post_id, $lang ) {
+
+	$post_obj = get_post( $post_id );
+
 	$new_slug = $post_obj->post_name;
-	
-	if ( $lang != 'en' ) {
-		$new_slug = get_post_meta ( $post_id, 'slug_' . $lang, true );
+
+	if ( 'en' !== $lang ) {
+		$new_slug = get_post_meta( $post_id, 'slug_' . $lang, true );
 	}
-	
+
 	// todo
 	// fix this so it's an independent function
 	// use it in rewrite
-	// and menu
-	
-	// domain/prefix
-	
-	// default to the current home URL
+	// and menu.
+
+	// domain/prefix.
+
+	// default to the current home URL.
 	$new_URL = $GLOBALS['vars']['home_url'];
-	
+
 	switch ( fw_get_rewrite_method() ) {
-		
-		case 'path' :
-			
-			// add the language path
+
+		case 'path':
+			// add the language path.
 			$new_URL = $GLOBALS['vars']['original_home_url'];
-			
-			if ( $lang != 'en' ) {
+
+			if ( 'en' !== $lang ) {
 				$new_URL .= $lang . '/';
 			}
-			
-			if ( $post_obj->post_type == 'post' ) {
-				
-				$post_path = explode ( '/', untrailingslashit ( $url ) );
-				
+
+			if ( 'post' === $post_obj->post_type ) {
+
+				$post_path = explode( '/', untrailingslashit( $url ) );
+
 				$splice_index = 4;
-				
+
 				if (
 					$GLOBALS['fw']['current_lang_code'] == 'en' ||
-					!str_contains ( $url, '/' . $GLOBALS['fw']['current_lang_code'] . '/' )
+					! str_contains( $url, '/' . $GLOBALS['fw']['current_lang_code'] . '/' )
 				) {
 					$splice_index = 3;
 				}
-					
-				array_pop ( $post_path );
-				
-				// dumpit ( $post_path );
-				
-				$post_path = implode ( '/',  array_splice ( $post_path, $splice_index ) );
-				
+
+				array_pop( $post_path );
+
+				$post_path = implode( '/', array_splice( $post_path, $splice_index ) );
+
 				$new_URL .= $post_path . '/' . $new_slug;
-				
-			} elseif ( $post_obj->post_type != 'page' ) {
-				
-				$new_URL .= implode ( '/', translate_path ( $post_id, $lang ) );
-				
-			} else {
-				
-				if ( (int) $post_id != (int) get_option ( 'page_on_front' ) ) {
-					
-					$new_URL .= implode ( '/', translate_path ( $post_id, $lang ) );
-					
-				}
-				
+
+			} elseif ( 'page' !== $post_obj->post_type ) {
+
+				$new_URL .= implode( '/', translate_path( $post_id, $lang ) );
+
+			} elseif ( (int) $post_id != (int) get_option( 'page_on_front' ) ) {
+
+				$new_URL .= implode( '/', translate_path( $post_id, $lang ) );
+
 			}
-			
+
 			break;
-			
-		case 'domain' :
-			
-			// echo $GLOBALS['fw']['current_lang_code'] . ' > ' . $lang . '<br>';
-			
-			if ( $lang == 'en' ) {
-				
+
+		case 'domain':
+			if ( 'en' === $lang ) {
+
 				$new_URL = $GLOBALS['vars']['original_home_url'];
-				
-			} elseif ( $lang != $GLOBALS['fw']['current_lang_code'] ) {
-				
-				$all_langs = get_option ( 'fw_langs' );
-				
-				// dumpit ( $all_langs[$lang] );
-				
-				$new_URL = $_SERVER['REQUEST_SCHEME'] . '://' . $all_langs[$lang]['domain'] . '/';
-				
+
+			} elseif ( $lang !== $GLOBALS['fw']['current_lang_code'] ) {
+
+				$all_langs = get_option( 'fw_langs' );
+
+				$new_URL = $_SERVER['REQUEST_SCHEME'] . '://' . $all_langs[ $lang ]['domain'] . '/';
+
 			}
-			
-			if ( $post_obj->post_type == 'post' ) {
-				
-				// split the URL into parts
-				$post_path = explode ( '/', untrailingslashit ( $url ) );
-				
-				// drop the last empty value
-				array_pop ( $post_path );
-				
-				// grab everything after the domain and implode
-				$post_path = implode ( '/',  array_splice ( $post_path, 3 ) );
-				
-				// if there's anything left, that's the permalink structure
-				// add it to the URL 
-				if ( $post_path != '' ) {
+
+			if ( 'post' === $post_obj->post_type ) {
+
+				// Split the URL into parts.
+				$post_path = explode( '/', untrailingslashit( $url ) );
+
+				// Drop the last empty value.
+				array_pop( $post_path );
+
+				// Grab everything after the domain and implode.
+				$post_path = implode( '/', array_splice( $post_path, 3 ) );
+
+				// If there's anything left, that's the permalink structure
+				// Add it to the URL.
+				if ( '' !== $post_path ) {
 					$new_URL .= $post_path . '/';
 				}
-		
-				// now add the post slug
+
+				// Now add the post slug.
 				$new_URL .= $new_slug;
-				
-			} else {
-				
-				if ( (int) $post_id != (int) get_option ( 'page_on_front' ) ) {
-					
-					$new_URL .= implode ( '/', translate_path ( $post_id, $lang ) );
-					
-				}
-				
-				// echo '5b. ' . $new_URL;
-				
+
+			} elseif ( (int) $post_id !== (int) get_option( 'page_on_front' ) ) {
+
+				$new_URL .= implode( '/', translate_path( $post_id, $lang ) );
+
 			}
-			
+
 			break;
-			
+
 	}
-	
-	// echo '1. ' . $new_URL . '<br>';
-	
-	// dumpit ( $post_obj );
-	
-	
-	
-	// echo 'result: ' . $new_URL . '<hr>';
-	// echo '<hr>';
-	
-	return trailingslashit ( $new_URL );
-	
+
+	return trailingslashit( $new_URL );
 }
 
 //

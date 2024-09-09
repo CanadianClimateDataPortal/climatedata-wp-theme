@@ -182,14 +182,6 @@ msgstr ""
 msgid "Submit Feedback"
 msgstr ""
 
-#: template/apps/query.php:29
-msgid "Newest First"
-msgstr ""
-
-#: template/apps/query.php:30
-msgid "Oldest First"
-msgstr ""
-
 #: template/download/control-bar.php:22
 #: template/download/controls/data.php:7
 #: template/map/control-bar.php:15
@@ -1383,6 +1375,14 @@ msgstr ""
 
 #: template/post-meta.php:68
 msgid "Share this post"
+msgstr ""
+
+#: template/query/app-item.php:25
+msgid "Launch App"
+msgstr ""
+
+#: template/query/app-item.php:35
+msgid "Related Content"
 msgstr ""
 
 #: template/query/download-var-item.php:11

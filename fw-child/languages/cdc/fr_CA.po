@@ -239,6 +239,7 @@ msgstr "cellules"
 #: template/learn/control-bar.php:77
 #: template/map/controls/data-variable.php:117
 #: template/map/controls/location.php:57
+#: template/news/control-bar.php:23
 #: template/variable/control-bar.php:23
 msgid "Clear"
 msgstr "Effacer"
@@ -1381,15 +1382,15 @@ msgstr "Nom (A-Z)"
 msgid "Name (Z–A)"
 msgstr "Nom (Z-A)"
 
-#: functions.php:564
+#: functions.php:559
 msgid "Display in Learning Zone"
 msgstr "Afficher dans Apprentissage"
 
-#: functions.php:577
+#: functions.php:572
 msgid "Yes"
 msgstr "Oui"
 
-#: functions.php:579
+#: functions.php:574
 msgid "No"
 msgstr "Non"
 
@@ -1412,3 +1413,7 @@ msgstr "Lancer l'app"
 #: template/query/app-item.php:35
 msgid "Related Content"
 msgstr "Contenu connexe"
+
+#: template/news/control-bar.php:31
+msgid "Tag"
+msgstr "Étiquette"

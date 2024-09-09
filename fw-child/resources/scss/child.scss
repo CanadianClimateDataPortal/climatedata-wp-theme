@@ -970,8 +970,8 @@ $query-card-hover-padding: 0.75rem;
       }
     }
 
-    &:hover .card:not(.no-resize),
-    .card.card-hover {
+    &:hover .card:not(.no-enlarge),
+    .card.card-enlarged {
       height: calc(100% + ($query-card-hover-padding * 2));
       margin-top: $query-card-hover-padding * -1;
       margin-left: $query-card-hover-padding * -1;
@@ -984,7 +984,7 @@ $query-card-hover-padding: 0.75rem;
       }
     }
 
-    .card.card-hover {
+    .card.card-enlarged {
       a {
         padding: .125rem;
         margin-right: -.125rem;

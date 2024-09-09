@@ -148,10 +148,10 @@ const $ = jQuery;
       if ( $( '.card.has-links' ).length ) {
         $( '.card.has-links a.hover-toggle' ).hover(
           function() {
-            $( this ).closest( '.card' ).addClass( 'card-hover' );
+            $( this ).closest( '.card' ).addClass( 'card-enlarged' );
           },
           function() {
-            $( this ).closest( '.card' ).removeClass( 'card-hover' );
+            $( this ).closest( '.card' ).removeClass( 'card-enlarged' );
           }
         );
       }
@@ -161,9 +161,7 @@ const $ = jQuery;
     handleCardLinkHovering();
 
     // Bind to fw_query_success event for dynamically loaded content
-    $( document ).on( 'fw_query_success', function () {
-      handleCardLinkHovering();
-    });
+    $( document ).on( 'fw_query_success', handleCardLinkHovering );
 
     // TAB DRAWER
 

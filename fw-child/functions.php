@@ -421,8 +421,6 @@ add_action ( 'wp_head', function() {
 
 add_action( 'wp_footer', function() {
 
-	// FB/linkedin share scripts
-
 	if ( is_singular ( 'post' ) ) {
 
 ?>

@@ -30,30 +30,29 @@
 			foreach ( $tax_topic_terms as $topic_term ) {
 				$posts_args = array(
 					'posts_per_page' => -1,
-					'post_type'      => array( 'page', 'resource', 'beta-app' ),
+					'post_type'      => array( 'page', 'resource', 'app' ),
 					'orderby'        => 'date',
 					'order'          => 'desc',
 					'post_status'    => 'publish',
-					'post_parent'    => 0, // Only parent posts.
 					'tax_query'      => array(
 						array(
 							'taxonomy' => 'topic',
 							'field'    => 'slug',
-							'terms'    => array( $topic_term->slug )
-						)
+							'terms'    => array( $topic_term->slug ),
+						),
 					),
-					'meta_query'     => array(
+					'meta_query'    => array(
 						array(
-							'key'     => 'display_in_learning_zone',
-							'value'   => '1',
-						)
+							'key'   => 'display_in_learning_zone',
+							'value' => '1',
+						),
 					),
 				);
 				?>
 
 				<div id="topic-<?php echo esc_attr( $topic_term->term_id ); ?>"
-					 class="learn-topic-grid py-7"
-					 data-args='<?php echo json_encode( $posts_args ); ?>'>
+					class="learn-topic-grid py-7"
+					data-args='<?php echo json_encode( $posts_args ); ?>'>
 					<h4 class="learn-topic-title mb-5">
 						<?php
 						echo fw_get_field( 'title', 'topic_' . $topic_term->term_id );
@@ -62,7 +61,7 @@
 
 					<div class="query-container ">
 						<div class="fw-query-items row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 g-lg-6"
-							 data-options='<?php echo json_encode( $item_options ); ?>'>
+							data-options='<?php echo json_encode( $item_options ); ?>'>
 							<div class="fw-query-item"></div>
 						</div>
 					</div>
@@ -73,7 +72,7 @@
 			?>
 
 			<div class="fw-query-items-no-matches py-7" style="display: none;">
-				<p class="alert alert-warning"><?php _e ( 'No items found.', 'cdc' ); ?></p>
+				<p class="alert alert-warning"><?php _e( 'No items found.', 'cdc' ); ?></p>
 			</div>
 		</div>
 	</div>

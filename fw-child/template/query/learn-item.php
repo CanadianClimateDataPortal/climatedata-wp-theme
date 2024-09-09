@@ -16,14 +16,9 @@ $excerpts = array (
 
 <div class="card card--learn">
 
-	<?php
-	if ( has_post_thumbnail( $item['id'] ) ) { ?>
-		<div class="bg-dark">
-			<div class="card-img item-thumb" style="background-image: url(<?php echo get_the_post_thumbnail_url( $item['id'], 'medium_large' ); ?>);"></div>
-		</div>
-		<?php
-	}
-	?>
+	<div class="bg-gray-400">
+		<div class="card-img item-thumb" <?php echo has_post_thumbnail( $item['id'] ) ? 'style="background-image: url(' . get_the_post_thumbnail_url( $item['id'], 'medium_large' ) . ');"' : '' ?>></div>
+	</div>
 
 	<div class="card-body d-flex flex-column">
 		<h5 class="card-title item-title">
@@ -55,22 +50,22 @@ $excerpts = array (
 				$format_name = '';
 
 				switch ( $card_asset_type ) {
-					case 'video' :
+					case 'video':
 						$format_icon = 'fas fa-video';
 						$format_name = __( 'Video', 'cdc' );
 
 						break;
-					case 'audio' :
+					case 'audio':
 						$format_icon = 'fas fa-microphone';
 						$format_name = __( 'Audio', 'cdc' );
 
 						break;
-					case 'interactive' :
+					case 'interactive':
 						$format_icon = 'far fa-hand-pointer';
 						$format_name = __( 'Interactive', 'cdc' );
 
 						break;
-					case 'app' :
+					case 'app':
 						$format_icon = 'far fa-window-maximize';
 						$format_name = __( 'App', 'cdc' );
 

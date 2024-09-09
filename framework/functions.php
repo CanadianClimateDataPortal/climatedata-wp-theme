@@ -257,21 +257,36 @@ function fw_menu_output ( $menu, $level, $type, $classes ) {
 	echo '">';
 
 	foreach ( $menu as $item ) {
-	
+		$is_item_of_current_page = false;
+
 		echo '<li class="';
 
-		if (
-			isset ( $GLOBALS['vars']['current_url'] ) &&
-			$GLOBALS['vars']['current_url'] == $item['url']
-		) {
-			echo 'current-nav-item ';
+		if ( isset( $GLOBALS['vars']['current_url'] ) ) {
+			$current_host = parse_url( $GLOBALS['vars']['current_url'], PHP_URL_HOST );
+			$current_path = parse_url( $GLOBALS['vars']['current_url'], PHP_URL_PATH );
+			$current_url = $current_host . $current_path;
+
+			$item_host = parse_url( $item['url'], PHP_URL_HOST );
+			$item_path = parse_url( $item['url'], PHP_URL_PATH );
+			$item_url =  $item_host . $item_path;
+
+			if ( $current_url == $item_url ) {
+				$is_item_of_current_page = true;
+				echo 'current-nav-item ';
+			}
 		}
 
-		// if the page is an ancestor of the current ID
+		// If the item's page is an ancestor of the current page
+		// or if the item is an ancestor of the current menu item ID
+		$post_id = get_post_meta( $item['id'], '_menu_item_object_id', true );
+		$ancestors = get_post_ancestors( get_the_ID() );
 
 		if ( 
-			isset ( $GLOBALS['vars']['current_ancestors'] ) &&
-			in_array ( $item['id'], $GLOBALS['vars']['current_ancestors'] )
+			! empty( $ancestors ) &&
+			in_array( $post_id, $ancestors ) ||
+
+			isset( $GLOBALS['vars']['current_ancestors'] ) &&
+			in_array( $item['id'], $GLOBALS['vars']['current_ancestors'] )
 		) {
 			echo 'ancestor-nav-item ';
 		}
@@ -289,10 +304,7 @@ function fw_menu_output ( $menu, $level, $type, $classes ) {
 
 			echo ' class="';
 
-			if (
-				isset ( $GLOBALS['vars']['current_url'] ) &&
-				$GLOBALS['vars']['current_url'] == $item['url']
-			) {
+			if ( $is_item_of_current_page ) {
 				echo 'current-nav-link ';
 			}
 			

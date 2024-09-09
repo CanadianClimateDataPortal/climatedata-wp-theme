@@ -85,6 +85,11 @@ $lang = $_GET[ 'globals' ][ 'current_lang_code' ];
 				<label class="form-check-label" for="inputs-show_name">Show network names</label>
 			</div>
 
+			<div class="form-check form-check-inline">
+				<input class="form-check-input" type="checkbox" value="true" name="inputs-brand_colored" id="inputs-brand_colored">
+				<label class="form-check-label" for="inputs-brand_colored">Use brand colors</label>
+			</div>
+
 		</div>
 	</div>
 </div>

@@ -216,6 +216,14 @@
   #resources {
     position: relative;
     z-index: 10;
+
+    .slick-list {
+      padding-right: 2rem;
+    }
+
+    .slick-slide {
+      padding: 0 0.5rem;
+    }
   }
 
   #resources-text {
@@ -230,16 +238,12 @@
     & + div {
       @include media-breakpoint-only(sm) {
         margin-bottom: calc(172px - 0.376963 * (100vw - 576px));
-
-        .fw-query-items {
-          margin-left: 1rem;
-        }
       }
       @include media-breakpoint-up(md) {
-        margin-left: 2.25rem;
         margin-bottom: calc(160px - 0.35874 * (100vw - 768px));
       }
       @include media-breakpoint-up(lg) {
+        margin-left: 2.25rem;
         margin-bottom: calc(80px - 0.154589 * (100vw - 992px));
       }
       @include media-breakpoint-up(xl) {

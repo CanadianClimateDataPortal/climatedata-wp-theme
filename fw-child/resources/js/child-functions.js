@@ -718,6 +718,18 @@ const $ = jQuery;
         slidesToScroll: 1,
         responsive: [
           {
+            breakpoint: 575,
+            settings: {
+              slidesToShow: 2,
+            }
+          },
+          {
+            breakpoint: 767,
+            settings: {
+              slidesToShow: 3,
+            }
+          },
+          {
             breakpoint: 991,
             settings: 'unslick'
           },

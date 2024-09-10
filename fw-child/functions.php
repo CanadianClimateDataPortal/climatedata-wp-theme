@@ -212,7 +212,7 @@ function child_theme_enqueue() {
 
 	wp_register_script ( 'download-app', $child_js_dir . 'download.js', array ( 'cdc', 'jquery-ui-slider', 'jquery-ui-datepicker', 'select2', 'flex-drawer' ), NULL, true );
 
-	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'tab-drawer', 'utilities', 'share-widget', 'slick' ), NULL, true );
+	wp_register_script ( 'child-functions', $child_js_dir . 'child-functions.js', array ( 'tab-drawer', 'utilities', 'share-widget' ), NULL, true );
 
 	// Scripts for the "custom shapefile upload" logic (in the "download" section).
 
@@ -260,6 +260,7 @@ function child_theme_enqueue() {
 		wp_enqueue_script ( 'slick', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js', array ( 'jquery' ), null, true );
 		wp_enqueue_style ( 'slick', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.css', null, null );
 		wp_enqueue_style ( 'slick-theme', 'https://cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick-theme.css', null, null );
+		wp_enqueue_script ( 'slick-carousel', $child_js_dir . 'slick-carousel.js', array ( 'slick' ), NULL, true );
 	}
 
 	switch ( $GLOBALS['vars']['current_slug'] ) {

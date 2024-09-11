@@ -4,11 +4,11 @@
     "fields": [
         {
             "key": "field_66df02086184d",
-            "label": "Label FR",
+            "label": "Custom Label for French",
             "name": "label_fr",
             "aria-label": "",
             "type": "text",
-            "instructions": "",
+            "instructions": "Custom menu label to use in French. Leave empty to use the page's name.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {

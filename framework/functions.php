@@ -289,7 +289,6 @@ function fw_menu_output( $menu, $level, $type, $classes ) {
 
 		if (
 			( ! empty( $ancestors ) && in_array( $post_id, $ancestors ) ) ||
-
 			( isset( $GLOBALS['vars']['current_ancestors'] ) && in_array( $item['id'], $GLOBALS['vars']['current_ancestors'] ) )
 		) {
 			echo 'ancestor-nav-item ';
@@ -320,7 +319,7 @@ function fw_menu_output( $menu, $level, $type, $classes ) {
 
 		echo '">';
 
-		if ( isset( $item['icon'] ) && ! empty( $item['icon'] ) ) {
+		if ( ! empty( $item['icon'] ) ) {
 			echo '<i class="icon ' . esc_attr( $item['icon'] ) . ' mr-3"></i>';
 		}
 

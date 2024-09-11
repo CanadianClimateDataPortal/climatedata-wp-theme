@@ -11,7 +11,7 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 }
 ?>
 
-<div class="card position-relative variable-item" id="v-<?php echo esc_attr( $variable_slug ); ?>">
+<div class="card position-relative variable-item no-enlarge" id="v-<?php echo esc_attr( $variable_slug ); ?>">
 	
 	<a href="/variable#v-<?php echo esc_attr( $variable_slug ); ?>" class="flex-drawer-trigger stretched-link"></a>
 	

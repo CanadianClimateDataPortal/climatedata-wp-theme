@@ -179,54 +179,6 @@
             "delay": 0
         },
         {
-            "key": "field_66c635bff12da",
-            "label": "",
-            "name": "",
-            "aria-label": "",
-            "type": "accordion",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "open": 0,
-            "multi_expand": 0,
-            "endpoint": 1
-        },
-        {
-            "key": "field_66c63386ab915",
-            "label": "Related content",
-            "name": "related_content",
-            "aria-label": "",
-            "type": "post_object",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "post_type": [
-                "post",
-                "page",
-                "resource"
-            ],
-            "post_status": [
-                "publish"
-            ],
-            "taxonomy": "",
-            "return_format": "id",
-            "multiple": 1,
-            "allow_null": 0,
-            "bidirectional": 0,
-            "ui": 1,
-            "bidirectional_target": []
-        },
-        {
             "key": "field_65f1e367935aa",
             "label": "Embed",
             "name": "",
@@ -467,5 +419,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1724266022
+    "modified": 1722439596
 }

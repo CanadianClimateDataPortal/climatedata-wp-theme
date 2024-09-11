@@ -30,7 +30,7 @@
 		foreach ( $tax_topic_terms as $topic_term ) {
 			$posts_args = array(
 				'posts_per_page' => -1,
-				'post_type'      => array( 'page', 'resource', 'app' ),
+				'post_type'      => array( 'page', 'resource', 'beta-app' ),
 				'orderby'        => 'date',
 				'order'          => 'desc',
 				'post_status'    => 'publish',

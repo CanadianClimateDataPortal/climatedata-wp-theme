@@ -42,14 +42,7 @@
             {
                 "param": "post_type",
                 "operator": "==",
-                "value": "post"
-            }
-        ],
-        [
-            {
-                "param": "post_type",
-                "operator": "==",
-                "value": "app"
+                "value": "beta-app"
             }
         ]
     ],
@@ -62,5 +55,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1724755683
+    "modified": 1723813287
 }

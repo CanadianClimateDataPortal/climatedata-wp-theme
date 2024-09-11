@@ -94,7 +94,7 @@ function taxonomy_topic()
         'show_tagcloud' => true,
         'show_in_rest' => true,
     ];
-    register_taxonomy( 'topic', array( 'page', 'resource', 'app' ), $args );
+    register_taxonomy( 'topic', array( 'page', 'resource', 'beta-app' ), $args );
 }
 add_action('init', 'taxonomy_topic', 10);
 
@@ -151,7 +151,7 @@ function taxonomy_techlevel()
         'show_tagcloud' => true,
         'show_in_rest' => true,
     ];
-    register_taxonomy( 'tech_level', array( 'page', 'resource', 'app' ), $args );
+    register_taxonomy( 'tech_level', array( 'page', 'resource', 'beta-app' ), $args );
 }
 add_action('init', 'taxonomy_techlevel', 10);
 
@@ -204,7 +204,7 @@ function taxonomy_sector()
         'show_tagcloud' => true,
         'show_in_rest' => true,
     ];
-    register_taxonomy( 'sector', array( 'variable', 'page', 'resource', 'app' ), $args );
+    register_taxonomy( 'sector', array( 'variable', 'page', 'resource', 'beta-app' ), $args );
 }
 add_action('init', 'taxonomy_sector', 10);
 
@@ -274,7 +274,7 @@ function taxonomy_region()
         'show_tagcloud' => true,
         'show_in_rest' => true,
     ];
-    register_taxonomy('region', array( 'variable', 'page', 'resource', 'app' ), $args);
+    register_taxonomy('region', array( 'variable', 'page', 'resource', 'beta-app' ), $args);
 }
 add_action('init', 'taxonomy_region', 10);
 

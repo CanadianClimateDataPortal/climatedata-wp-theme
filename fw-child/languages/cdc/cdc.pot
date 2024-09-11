@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-09-09T13:17:21+00:00\n"
+"POT-Creation-Date: 2024-08-27T17:19:45+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -44,15 +44,15 @@ msgstr ""
 msgid "events"
 msgstr ""
 
-#: functions.php:559
+#: functions.php:564
 msgid "Display in Learning Zone"
 msgstr ""
 
-#: functions.php:572
+#: functions.php:577
 msgid "Yes"
 msgstr ""
 
-#: functions.php:574
+#: functions.php:579
 msgid "No"
 msgstr ""
 
@@ -185,6 +185,14 @@ msgstr ""
 msgid "Submit Feedback"
 msgstr ""
 
+#: template/apps/query.php:28
+msgid "Newest First"
+msgstr ""
+
+#: template/apps/query.php:29
+msgid "Oldest First"
+msgstr ""
+
 #: template/download/control-bar.php:22
 #: template/download/controls/data.php:7
 #: template/map/control-bar.php:15
@@ -256,7 +264,6 @@ msgstr ""
 #: template/learn/control-bar.php:77
 #: template/map/controls/data-variable.php:117
 #: template/map/controls/location.php:57
-#: template/news/control-bar.php:23
 #: template/variable/control-bar.php:23
 msgid "Clear"
 msgstr ""
@@ -1065,7 +1072,7 @@ msgstr ""
 msgid "App"
 msgstr ""
 
-#: template/learn/query.php:75
+#: template/learn/query.php:79
 msgid "No items found."
 msgstr ""
 
@@ -1343,10 +1350,6 @@ msgstr ""
 msgid "All Variables"
 msgstr ""
 
-#: template/news/control-bar.php:31
-msgid "Tag"
-msgstr ""
-
 #: template/old-loop/blocks/chart.php:43
 msgid "Download data"
 msgstr ""
@@ -1379,14 +1382,6 @@ msgstr ""
 
 #: template/post-meta.php:68
 msgid "Share this post"
-msgstr ""
-
-#: template/query/app-item.php:25
-msgid "Launch App"
-msgstr ""
-
-#: template/query/app-item.php:35
-msgid "Related Content"
 msgstr ""
 
 #: template/query/download-var-item.php:11

@@ -222,7 +222,7 @@ p {
 
   &-lg {
     @include media-breakpoint-down(sm) {
-      padding: $input-padding-y-lg $input-padding-x-lg; 
+      padding: $input-padding-y-lg $input-padding-x-lg;
     }
   }
 }
@@ -574,7 +574,7 @@ $control-slider-handle-width: 2.75rem;
     border-top: 1px solid $gray-700;
     font-size: 0.6875rem;
     word-break: break-word;
-    
+
     @include media-breakpoint-up(md) {
       font-size: 0.75rem;
     }
@@ -590,6 +590,8 @@ $control-slider-handle-width: 2.75rem;
   }
 
   .tab-drawer-tabs {
+    background: $gray-800;
+
     .tab-drawer-trigger {
       .alert-icon {
         display: none;
@@ -610,10 +612,9 @@ $control-slider-handle-width: 2.75rem;
   .tab-drawer-container {
     left: 0;
     margin-left: 100%;
-    box-shadow: 0 0 20px transparentize($black, 0.8);
-    transition: transform 0.5s;
     z-index: -1;
     transform: translateX( calc(-100% - 12.5vw) );
+    transition: transform 0.5s;
 
     @include media-breakpoint-up(sm) {
       transform: translateX( calc(-100% - 6.25vw) );
@@ -628,6 +629,13 @@ $control-slider-handle-width: 2.75rem;
     left: 0 !important;
     height: 100%;
     transition: none !important;
+    z-index: -9999 !important;
+    box-shadow: none;
+
+    &.td-selected {
+      z-index: -1 !important;
+      box-shadow: 0 0 20px transparentize($black, 0.9);
+    }
 
     .tab-drawer-content {
       height: 100%;
@@ -959,14 +967,14 @@ $query-card-hover-padding: 0.75rem;
     .card {
       height: 100%;
       transition: 0.25s;
-      
+
       &--news {
         .card-date,
         .card-authors,
         .card-topics {
           font-size: 0.875rem;
         }
-        
+
         .card-topics {
           span {
             font-size: 0.75rem;

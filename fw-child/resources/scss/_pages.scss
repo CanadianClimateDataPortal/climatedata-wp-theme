@@ -106,11 +106,11 @@
 
   #header-primary {
     font-size: 1rem;
-  
+
     @media screen and (min-width:1240px) {
       @include font-size(17px);
     }
-  
+
     @include media-breakpoint-up(xxl) {
       @include font-size(19px);
     }
@@ -418,7 +418,7 @@ $overlay-switch-bg: rgba($gray-400, 0.99);
     position: fixed;
     left: 0;
     top: 0;
-    background-color: transparentize($dark, 0.1);
+    background-color: $dark;
     z-index: 1000;
 
     .control-tab-head {
@@ -713,12 +713,6 @@ $legend-on-height: 16px;
   #info .collapseomatic_content {
     display: none;
   }
-  
-  .tab-drawer {
-    .tab-drawer {
-      // width: 50vw;
-    }
-  }
 
   .control-tab-head {
     flex: 0 0 calc(6.25vw - 1rem);
@@ -904,15 +898,26 @@ $legend-on-height: 16px;
 }
 
 body.tab-drawer-open {
+  .map-page-overlay,
+  #map-breadcrumb {
+    left: 25vw !important;
+    transition: left $td-slide-transition-duration ease 0s;
+  }
+
   #map-breadcrumb {
     transition: left 0.25s ease 0s;
   }
 
   #map-control-footer {
     width: calc((100vw / 16) * 12);
-    transition:
-      width 0.25s ease 0s,
-      transform 0.25s;
+    transition: width $td-slide-transition-duration ease 0s;
+  }
+
+  #page-download {
+    .map-page-overlay,
+    #map-breadcrumb {
+      left: 29.5vw !important;
+    }
   }
 }
 
@@ -1473,7 +1478,7 @@ body.tab-drawer-open {
       width: calc((100vw / 16) * 4);
     }
 
-    #data-variable {
+    #data-variable.td-selected {
       width: calc((100vw / 16) * 9);
     }
 
@@ -1807,7 +1812,7 @@ body.tab-drawer-open {
 .news-meta-block {
   backdrop-filter: blur(10px);
   background-color: transparent;
-  
+
   .news-meta-item > span {
     font-size: 0.85rem;
   }
@@ -1894,11 +1899,11 @@ body.tab-drawer-open {
       width: 1.875rem;
       margin-left: -1px;
       margin-bottom: -1px;
-      
+
       @include media-breakpoint-up(xsm) {
         width: 2.25rem;
       }
-      
+
       @include media-breakpoint-up(lg) {
         position: relative;
         flex: 1;
@@ -1931,7 +1936,7 @@ body.tab-drawer-open {
         @include media-breakpoint-up(xsm) {
           padding: .625rem 0 .5rem;
         }
-        
+
         @include media-breakpoint-up(lg) {
           display: flex;
           justify-content: center;
@@ -1963,15 +1968,15 @@ body.tab-drawer-open {
       text-align: center;
       font-size: 2.5rem;
       font-weight: $font-weight-bold;
-      
+
       @include media-breakpoint-up(lg) {
         font-size: 3.5rem;
       }
-      
+
       @include media-breakpoint-up(xl) {
         font-size: 4rem;
       }
-      
+
       @include media-breakpoint-up(xxl) {
         top: 160px;
       }

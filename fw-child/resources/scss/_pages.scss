@@ -115,7 +115,6 @@
   --swiper-pagination-bullet-inactive-opacity: 0.5;
   --swiper-pagination-color: #{$dark};
   width: 100%;
-  top: .5rem;
 }
 
 #hero-eccc {
@@ -310,10 +309,6 @@
         filter: blur(0);
       }
     }
-  }
-
-  .scroll-card {
-    margin-bottom: 0.5rem !important;
   }
 }
 

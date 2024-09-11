@@ -780,8 +780,8 @@ const $ = jQuery;
             },
           },
           pagination: {
-            el: '.swiper-pagination',  // Ensure this matches the dynamically added element
-            clickable: true,           // Allow clicking on the bullets
+            el: '.swiper-pagination',
+            clickable: true,
             type: 'bullets',
           }
         });

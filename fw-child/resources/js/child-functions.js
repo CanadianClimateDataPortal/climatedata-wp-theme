@@ -708,6 +708,95 @@ const $ = jQuery;
             .to(card, toProps2);
         });
       } );
+
+      //
+      // Learn block Swiper Carousel on front page
+      //
+
+      // Function to add AOS attributes to the resources container when window width is under 992px
+      function applyResourcesAosAttributes() {
+        const resourcesContainer = document.querySelector('#resources-query');
+        
+        if (window.innerWidth < 992) {
+          // Add AOS attributes
+          resourcesContainer.setAttribute('data-aos', 'fade-up');
+          resourcesContainer.setAttribute('data-aos-easing', 'ease-in-out-quad');
+          resourcesContainer.setAttribute('data-aos-duration', '1000');
+          resourcesContainer.setAttribute('data-aos-delay', '250');
+          resourcesContainer.setAttribute('data-aos-index', '0');
+
+          AOS.init();     // Initialize AOS if not already done
+          AOS.refresh();  // Refresh AOS to detect new attributes
+        } else {
+          // Remove AOS attributes if window width is 992px or more
+          resourcesContainer.removeAttribute('data-aos');
+          resourcesContainer.removeAttribute('data-aos-easing');
+          resourcesContainer.removeAttribute('data-aos-duration');
+          resourcesContainer.removeAttribute('data-aos-delay');
+          resourcesContainer.removeAttribute('data-aos-index');
+        }
+      }
+
+      // Function to initialize Swiper
+      function initializeResourcesSwiper() {
+        const queryItemsContainer = document.querySelector('#resources-query .query-container');
+        const queryItemsWrapper = document.querySelector('#resources-query .fw-query-items');
+        const queryItemElements = document.querySelectorAll('#resources-query .fw-query-items .fw-query-item');
+
+        // Add the 'swiper-container' class to #resources-query .query-container
+        if (queryItemsContainer) {
+          queryItemsContainer.classList.add('swiper-container');
+
+          // Create and append the 'swiper-pagination' element
+          const paginationElement = document.createElement('div');
+          paginationElement.classList.add('swiper-pagination');
+          queryItemsContainer.appendChild(paginationElement);
+        }
+
+        // Add the 'swiper-wrapper' class to #resources-query .fw-query-items
+        if (queryItemsWrapper) {
+          queryItemsWrapper.classList.add('swiper-wrapper');
+        }
+
+        // Add the 'swiper-slide' class to each .fw-query-item element
+        queryItemElements.forEach(item => {
+          item.classList.add('swiper-slide');
+        });
+
+        // Initialize Swiper
+        const resourcesSwiper = new Swiper('#resources-query .swiper-container', {
+          slidesPerView: 1,
+          breakpoints: {
+            0: {
+              enabled: true,
+              slidesPerView: 1,
+            },
+            576: {
+              enabled: true,
+              slidesPerView: 2,
+            },
+            992: {
+              enabled: false,  // Disable Swiper for lg screens and up
+            },
+          },
+          pagination: {
+            el: '.swiper-pagination',  // Ensure this matches the dynamically added element
+            clickable: true,           // Allow clicking on the bullets
+            type: 'bullets',
+          }
+        });
+      }
+
+      // Initial call to apply AOS attributes and initialize Swiper on resources
+      applyResourcesAosAttributes();
+      initializeResourcesSwiper();
+
+      // Listen for window resize events to re-apply AOS attributes and refresh AOS when necessary
+      $(window).resize(function () {
+        applyResourcesAosAttributes();
+        AOS.refresh();
+      });
+
     };
 
     //

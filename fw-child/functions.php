@@ -255,12 +255,8 @@ function child_theme_enqueue() {
 		wp_enqueue_script ( 'gsap' );
 		wp_enqueue_script ( 'scrolltrigger' );
 		wp_enqueue_script ( 'scroll' );
+		wp_enqueue_script ( 'swiper' );
 
-		// Slick Slider
-		wp_enqueue_script ( 'slick', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js', array ( 'jquery' ), null, true );
-		wp_enqueue_style ( 'slick', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.css', null, null );
-		wp_enqueue_style ( 'slick-theme', 'https://cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick-theme.css', null, null );
-		wp_enqueue_script ( 'slick-carousel', $child_js_dir . 'slick-carousel.js', array ( 'slick' ), NULL, true );
 	}
 
 	switch ( $GLOBALS['vars']['current_slug'] ) {

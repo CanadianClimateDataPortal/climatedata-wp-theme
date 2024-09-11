@@ -171,14 +171,6 @@ msgstr "Fournir une rétroaction"
 msgid "Submit Feedback"
 msgstr "Soumettre"
 
-#: template/apps/query.php:28
-msgid "Newest First"
-msgstr "Nouveaux d'abord"
-
-#: template/apps/query.php:29
-msgid "Oldest First"
-msgstr "Anciens d'abord"
-
 #: template/download/control-bar.php:22
 #: template/download/controls/data.php:7
 #: template/map/control-bar.php:15
@@ -246,6 +238,7 @@ msgstr "cellules"
 #: template/learn/control-bar.php:77
 #: template/map/controls/data-variable.php:117
 #: template/map/controls/location.php:57
+#: template/news/control-bar.php:23
 #: template/variable/control-bar.php:23
 msgid "Clear"
 msgstr "Effacer"
@@ -1388,15 +1381,15 @@ msgstr "Nom (A-Z)"
 msgid "Name (Z–A)"
 msgstr "Nom (Z-A)"
 
-#: functions.php:564
+#: functions.php:559
 msgid "Display in Learning Zone"
 msgstr "Afficher dans Apprentissage"
 
-#: functions.php:577
+#: functions.php:572
 msgid "Yes"
 msgstr "Oui"
 
-#: functions.php:579
+#: functions.php:574
 msgid "No"
 msgstr "Non"
 
@@ -1408,9 +1401,21 @@ msgstr ""
 msgid "%s minutes"
 msgstr ""
 
-#: template/learn/query.php:79
+#: template/learn/query.php:75
 msgid "No items found."
 msgstr "Aucun item trouvé."
+
+#: template/query/app-item.php:25
+msgid "Launch App"
+msgstr "Lancer l'app"
+
+#: template/query/app-item.php:35
+msgid "Related Content"
+msgstr "Contenu connexe"
+
+#: template/news/control-bar.php:31
+msgid "Tag"
+msgstr "Étiquette"
 
 #: template/apps/control-bar-inner.php:12
 msgid "Feed&shy;back"

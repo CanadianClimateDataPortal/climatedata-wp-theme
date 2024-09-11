@@ -257,7 +257,8 @@ const $ = jQuery;
     let scroll_offset = 0;
 
     if ($('#floating-header').length) {
-      scroll_offset += $('#floating-header').outerHeight();
+      scroll_offset += $('#floating-header .fixed-top').outerHeight();
+      scroll_offset += $('#floating-header #menu-trigger').outerHeight();
     }
 
     if ($('.query-page #control-bar-tabs').length) {

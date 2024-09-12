@@ -8,5 +8,5 @@
 
 		?>
 	</div>
-	<a href="#menu" id="menu-trigger" data-bs-toggle="offcanvas" class="d-flex justify-content-center pt-2 px-2 pb-3 mt-2 menu-hamburger"><i id="header-menu-icon" class="fas fa-align-left"></i></a>
+	<a href="#menu" id="menu-trigger" data-bs-toggle="offcanvas" class="d-flex justify-content-center pt-2 px-2 pb-3 mt-md-2 menu-hamburger"><i id="header-menu-icon" class="fas fa-align-left"></i></a>
 </div>

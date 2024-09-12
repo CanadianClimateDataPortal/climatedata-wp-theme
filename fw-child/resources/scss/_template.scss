@@ -2,59 +2,52 @@
 // HEADER
 //
 
-#floating-header {
-  transition: transform 300ms linear, background-color 300ms linear;
-  transform-origin: top left;
-
-  @include media-breakpoint-down(md) {
-    transform: scale(1.5);
+body.scrolled {
+  #header-menu-icon {
+    font-size: 1.25rem;
   }
 
-  @include media-breakpoint-down(sm) {
-    transform: scale(1.33333);
+  #header-logo-container a {
+    max-width: 90%;
   }
 
-  @include media-breakpoint-up(md) {
-    background-color: transparentize($dark, 0.1);
-  }
-
-  body.scrolled & {
-    transform: scale(1);
-    background-color: transparentize($dark, 0.1);
-  }
-
-}
-
-#menu-trigger {
-  transition: transform 300ms linear;
-  transform-origin: center;
-
-  @include media-breakpoint-down(md) {
-    transform: scale(.66667);
-  }
-
-  @include media-breakpoint-down(sm) {
-    transform: scale(.75);
-  }
-
-  body.scrolled & {
-    transform: scale(1);
+  .menu-hamburger {
+    @include media-breakpoint-down(md) {
+      padding-top: 0 !important;
+    }
   }
 }
 
 #header-menu-icon {
   font-size: 1.25rem;
   color: $white;
-  transition: color 500ms;
+  transition: font-size 300ms linear;
+
+  @include media-breakpoint-down(md) {
+    font-size: 1.75rem;
+  }
+
+  @include media-breakpoint-down(sm) {
+    font-size: 1.5rem;
+  }
 }
 
 #header-logo-container {
   a {
     display: block;
     margin: 0 auto;
-    max-width: 100%;
+    max-width: 90%;
     padding-top: .375rem;
-    width: 90%;
+    width: 100%;
+    transition: max-width 300ms linear;
+
+    @include media-breakpoint-down(md) {
+      max-width: 150%;
+    }
+
+    @include media-breakpoint-down(sm) {
+      max-width: 120%;
+    }
   }
 
   svg {
@@ -106,9 +99,11 @@
 }
 
 .header-fixed-menu {
-  &.on-white .menu-hamburger {
-    mix-blend-mode: difference;
-    filter: grayscale(100%);
+  &.on-white {
+    #header-menu-icon {
+      color: $black;
+      transition: color 500ms;
+    }
   }
 }
 
@@ -118,6 +113,7 @@
   left: var(--menu-hamburger-left);
   transform: translateX(-50%);
   z-index: $zindex-fixed;
+  transition: padding-top 300ms linear;
 }
 
 //

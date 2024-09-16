@@ -706,3 +706,34 @@ function short_province ( $province ) {
 
 // Disable WordPress redirection guessing on 404 errors.
 add_filter( 'do_redirect_guess_404_permalink', '__return_false' );
+
+//
+// Error 404 related functions
+//
+
+/**
+ * Add a page selector in the "Reading Settings" page to choose a 404 page.
+ */
+function cdc_custom_404_page_setting() {
+
+	function page_selector() {
+		$page_404 = get_option( 'cdc_page_404' );
+		wp_dropdown_pages( array(
+			'name' => 'cdc_page_404',
+			'selected' => $page_404,
+			'show_option_none' => '-- No custom page --',
+		) );
+		echo '<p class="description">The <em>content</em> of this page will be used for the 404 page.</p>';
+	}
+
+	add_settings_field(
+		'cdc_page_404',
+		'Custom 404 error page',
+		'page_selector',
+		'reading',
+	);
+
+	register_setting( 'reading', 'cdc_page_404' );
+}
+
+add_action( 'admin_init', 'cdc_custom_404_page_setting' );

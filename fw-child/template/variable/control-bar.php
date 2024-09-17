@@ -1,7 +1,7 @@
-<div class="col-1">
+<div class="col-2 col-sm-1 position-relative z-3">
 	<div id="control-bar" class="control-bar tab-drawer-tabs-container">
 		
-		<div id="control-bar-tabs" class="tab-drawer-tabs pt-2">
+		<div id="control-bar-tabs" class="tab-drawer-tabs">
 			<a href="#filters" class="control-bar-tab-link tab-drawer-trigger">
 				<span class="cdc-icon"><?php
 				

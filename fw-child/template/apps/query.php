@@ -22,8 +22,8 @@
 	?>
 	
 	<div class="col-12 col-sm-13 offset-1">
-		<div class="tab-drawer-bumper">
-			
+		<div class="pt-6">
+
 			<?php
 				
 				$module_args = array (
@@ -41,11 +41,10 @@
 					<div class="fw-query-items row row-cols-1 row-cols-md-2 g-3 g-lg-6" data-options='<?php echo json_encode ( $item_options ); ?>'>
 						
 						<div class="fw-query-item"></div>
-					
+
 					</div>
 				</div>
 			</div>
-		
 		</div>
 	</div>
 	

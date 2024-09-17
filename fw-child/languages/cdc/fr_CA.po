@@ -113,7 +113,7 @@ msgid "All Variables"
 msgstr ""
 
 #: template/learn/control-bar.php:90
-#: template/query/learn-item.php:70
+#: template/query/learn-item.php:65
 #: template/query/resource-home-feature.php:80
 msgid "Interactive"
 msgstr "Interactif"
@@ -143,7 +143,6 @@ msgstr "Secteurs"
 msgid "Details"
 msgstr "Détails"
 
-#: template/apps/control-bar-inner.php:12
 #: template/apps/control-btns.php:13
 #: template/download/control-bar.php:94
 #: template/feedback.php:344
@@ -171,14 +170,6 @@ msgstr "Fournir une rétroaction"
 #: template/feedback.php:575
 msgid "Submit Feedback"
 msgstr "Soumettre"
-
-#: template/apps/query.php:29
-msgid "Newest First"
-msgstr "Nouveaux d'abord"
-
-#: template/apps/query.php:30
-msgid "Oldest First"
-msgstr "Anciens d'abord"
 
 #: template/download/control-bar.php:22
 #: template/download/controls/data.php:7
@@ -247,6 +238,7 @@ msgstr "cellules"
 #: template/learn/control-bar.php:77
 #: template/map/controls/data-variable.php:117
 #: template/map/controls/location.php:57
+#: template/news/control-bar.php:23
 #: template/variable/control-bar.php:23
 msgid "Clear"
 msgstr "Effacer"
@@ -312,7 +304,7 @@ msgstr "Zoom"
 #: template/download/controls/data.php:112
 #: template/download/controls/details.php:353
 #: template/map/controls/data-variable.php:139
-#: template/news/query.php:50
+#: template/news/query.php:48
 msgid "Next"
 msgstr "Suivant"
 
@@ -955,19 +947,19 @@ msgid "Content Type"
 msgstr "Type de contenu"
 
 #: template/learn/control-bar.php:88
-#: template/query/learn-item.php:60
+#: template/query/learn-item.php:55
 #: template/query/resource-home-feature.php:70
 msgid "Video"
 msgstr "Vidéo"
 
 #: template/learn/control-bar.php:89
-#: template/query/learn-item.php:65
+#: template/query/learn-item.php:60
 #: template/query/resource-home-feature.php:75
 msgid "Audio"
 msgstr ""
 
 #: template/learn/control-bar.php:91
-#: template/query/learn-item.php:80
+#: template/query/learn-item.php:75
 #: template/query/resource-home-feature.php:90
 msgid "Article"
 msgstr ""
@@ -1242,7 +1234,7 @@ msgid "Download image"
 msgstr "Téléchargement"
 
 #: template/old-loop/blocks/map.php:227
-#: template/query/learn-item.php:96
+#: template/query/learn-item.php:91
 msgid "Time"
 msgstr "Durée"
 
@@ -1271,7 +1263,7 @@ msgstr "Partager cette publication"
 msgid "Select variable"
 msgstr "Sélectionner"
 
-#: template/query/learn-item.php:51
+#: template/query/learn-item.php:46
 msgid "Format"
 msgstr ""
 
@@ -1299,7 +1291,7 @@ msgstr "Paramètres de l'OMM"
 
 #: template/download/controls/data-variable.php:137
 #: template/map/controls/data-variable.php:137
-#: template/news/query.php:46
+#: template/news/query.php:44
 msgid "Previous"
 msgstr "Précédent"
 
@@ -1376,28 +1368,28 @@ msgid "Which application would you like to provide feedback on?"
 msgstr "Pour quelle application souhaitez-vous nous faire un retour ?"
 
 #: template/learn/control-bar.php:92
-#: template/query/learn-item.php:75
+#: template/query/learn-item.php:70
 #: template/query/resource-home-feature.php:85
 msgid "App"
 msgstr "Application"
 
-#: template/variable/query.php:67
+#: template/variable/query.php:66
 msgid "Name (A–Z)"
 msgstr "Nom (A-Z)"
 
-#: template/variable/query.php:68
+#: template/variable/query.php:67
 msgid "Name (Z–A)"
 msgstr "Nom (Z-A)"
 
-#: functions.php:564
+#: functions.php:559
 msgid "Display in Learning Zone"
 msgstr "Afficher dans Apprentissage"
 
-#: functions.php:577
+#: functions.php:572
 msgid "Yes"
 msgstr "Oui"
 
-#: functions.php:579
+#: functions.php:574
 msgid "No"
 msgstr "Non"
 
@@ -1405,10 +1397,26 @@ msgstr "Non"
 msgid "Init LZ meta"
 msgstr ""
 
-#: template/query/learn-item.php:100
+#: template/query/learn-item.php:95
 msgid "%s minutes"
 msgstr ""
 
-#: template/learn/query.php:76
+#: template/learn/query.php:79
 msgid "No items found."
 msgstr "Aucun item trouvé."
+
+#: template/query/app-item.php:25
+msgid "Launch App"
+msgstr "Lancer l'app"
+
+#: template/query/app-item.php:35
+msgid "Related Content"
+msgstr "Contenu connexe"
+
+#: template/news/control-bar.php:31
+msgid "Tag"
+msgstr "Étiquette"
+
+#: template/apps/control-bar-inner.php:12
+msgid "Feed&shy;back"
+msgstr "Rétro&shy;action"

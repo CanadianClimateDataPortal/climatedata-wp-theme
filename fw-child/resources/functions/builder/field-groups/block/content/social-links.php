@@ -61,6 +61,7 @@ $lang = $_GET[ 'globals' ][ 'current_lang_code' ];
 								<option value="facebook">Facebook</option>
 								<option value="instagram">Instagram</option>
 								<option value="soundcloud">SoundCloud</option>
+								<option value="youtube">YouTube</option>
 							</select>
 						</div>
 
@@ -83,6 +84,11 @@ $lang = $_GET[ 'globals' ][ 'current_lang_code' ];
 			<div class="form-check form-check-inline">
 				<input class="form-check-input" type="checkbox" value="true" name="inputs-show_name" id="inputs-show_name">
 				<label class="form-check-label" for="inputs-show_name">Show network names</label>
+			</div>
+
+			<div class="form-check form-check-inline">
+				<input class="form-check-input" type="checkbox" value="true" name="inputs-brand_colored" id="inputs-brand_colored">
+				<label class="form-check-label" for="inputs-brand_colored">Use brand colors</label>
 			</div>
 
 		</div>

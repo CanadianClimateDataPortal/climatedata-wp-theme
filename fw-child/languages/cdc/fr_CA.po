@@ -1401,7 +1401,7 @@ msgstr ""
 msgid "%s minutes"
 msgstr ""
 
-#: template/learn/query.php:75
+#: template/learn/query.php:79
 msgid "No items found."
 msgstr "Aucun item trouvé."
 

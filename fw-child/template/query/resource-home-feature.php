@@ -63,32 +63,32 @@ $excerpts = array (
                     $card_asset_type = get_field( 'asset_type', $item['id'] );
                     $format_icon = '';
                     $format_name = '';
-    
+
                     switch ( $card_asset_type ) {
                         case 'video' :
                             $format_icon = 'fas fa-video';
                             $format_name = __( 'Video', 'cdc' );
-    
+
                             break;
                         case 'audio' :
                             $format_icon = 'fas fa-microphone';
                             $format_name = __( 'Audio', 'cdc' );
-    
+
                             break;
                         case 'interactive' :
                             $format_icon = 'far fa-hand-pointer';
                             $format_name = __( 'Interactive', 'cdc' );
-    
+
                             break;
                         case 'app' :
                             $format_icon = 'far fa-window-maximize';
                             $format_name = __( 'App', 'cdc' );
-    
+
                             break;
                         default : // Article.
                             $format_icon = 'far fa-newspaper';
                             $format_name = __( 'Article', 'cdc' );
-    
+
                             break;
                     }
 

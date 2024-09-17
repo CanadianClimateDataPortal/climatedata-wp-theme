@@ -255,6 +255,7 @@ function child_theme_enqueue() {
 		wp_enqueue_script ( 'gsap' );
 		wp_enqueue_script ( 'scrolltrigger' );
 		wp_enqueue_script ( 'scroll' );
+		wp_enqueue_script ( 'swiper' );
 
 	}
 

@@ -18,6 +18,15 @@
     from(rgba(0, 0, 0, 1)),
     to(rgba(0, 0, 0, 0))
   );
+
+  img {
+    @include media-breakpoint-down(lg) {
+      object-fit: cover;
+      object-position: center;
+      width: 100%;
+      height: 90vh;
+    }
+  }
 }
 
 #hero-text {
@@ -44,37 +53,27 @@
 }
 
 #hero-text-carousel {
-  margin-top: 5rem;
-  overflow: visible;
+  $hero-carousel-pb: 3rem;
+  margin-top: calc(5rem + $hero-carousel-pb);
+  padding-bottom: $hero-carousel-pb;
 
   @include media-breakpoint-up(md) {
     margin-top: 6.25rem;
   }
 }
 
-#hero-text-carousel-pagination {
+#hero-text-carousel-pagination,
+#resources-query .swiper-pagination {
   --swiper-pagination-bullet-horizontal-gap: 0.75rem;
-  --swiper-pagination-bullet-inactive-color: #{$blue-200};
-  --swiper-pagination-color: #{$white};
   position: relative;
-  top: auto;
-  bottom: -5rem;
   left: auto;
   right: auto;
-  width: 100vw;
   height: 0;
   text-align: center;
 
-  @include media-breakpoint-up(md) {
-    bottom: auto;
-    margin-left: calc((100vw / 16) * 7);
-    text-align: right;
-    width: calc((100vw / 16) * 3);
-  }
 
   .swiper-pagination-bullet {
     position: relative;
-    top: -3.5rem;
   }
 
   .swiper-pagination-bullet-active {
@@ -90,6 +89,32 @@
       border: 2px solid $primary;
     }
   }
+}
+
+#hero-text-carousel-pagination {
+  --swiper-pagination-bullet-inactive-color: #{$blue-200};
+  --swiper-pagination-color: #{$white};
+  width: 100vw;
+
+  .swiper-pagination-bullet {
+    top: 1rem;
+  }
+  
+  @include media-breakpoint-up(md) {
+    --swiper-pagination-bottom: -5rem;
+    --swiper-pagination-top: auto;
+    bottom: auto;
+    margin: auto;
+    width: calc((100vw / 16) * 3);
+  }
+
+}
+
+#resources-query .swiper-pagination {
+  --swiper-pagination-bullet-inactive-color: #{$dark};
+  --swiper-pagination-bullet-inactive-opacity: 0.5;
+  --swiper-pagination-color: #{$dark};
+  width: 100%;
 }
 
 #hero-eccc {
@@ -157,8 +182,15 @@
     .card-body {
       width: 100%;
       background-color: $black;
+      min-height: 5.5rem;
 
-      @include media-breakpoint-up(md) {
+      @include media-breakpoint-down(md) {
+        h5 {
+          font-size: .8125rem;
+        }
+      }
+
+      @include media-breakpoint-up(lg) {
         position: absolute;
         bottom: 0;
         background-color: rgba($black, .5);
@@ -202,26 +234,52 @@
   #resources {
     position: relative;
     z-index: 10;
+
+    .swiper-container {
+      position: relative;
+      width: calc(75% + 1rem);
+      margin-left: calc(12.5% - .5rem);
+
+      @include media-breakpoint-up(lg) {
+        width: 100%;
+        margin-left: 0;
+      }
+    }
+
+    .swiper-wrapper {
+      @include media-breakpoint-up(lg) {
+        display: block !important;
+        transform: none !important;
+      }
+    }
+
+    .swiper-slide {
+      padding: 0 .5rem;
+
+      @include media-breakpoint-up(lg) {
+        width: 100% !important;
+      }
+    }
   }
 
   #resources-text {
-    position: sticky;
-    top: 25vh;
-    margin-bottom: 25vh;
+    margin-bottom: 2rem;
+
+    @include media-breakpoint-up(lg) {
+      position: sticky;
+      top: 25vh;
+      margin-bottom: 25vh;
+    }
 
     & + div {
       @include media-breakpoint-only(sm) {
         margin-bottom: calc(172px - 0.376963 * (100vw - 576px));
-
-        .fw-query-items {
-          margin-left: 1rem;
-        }
       }
       @include media-breakpoint-up(md) {
-        margin-left: 2.25rem;
         margin-bottom: calc(160px - 0.35874 * (100vw - 768px));
       }
       @include media-breakpoint-up(lg) {
+        margin-left: 2.25rem;
         margin-bottom: calc(80px - 0.154589 * (100vw - 992px));
       }
       @include media-breakpoint-up(xl) {
@@ -234,6 +292,15 @@
   }
 
   #resources-query {
+    width: 100vw;
+    overflow: hidden;
+    padding: 1rem 0 2rem;
+
+    @include media-breakpoint-up(lg) {
+      width: 100%;
+      overflow: visible;
+    }
+
     [data-aos] {
       filter: blur(20px);
       transition-property: opacity, transform, filter;
@@ -242,10 +309,6 @@
         filter: blur(0);
       }
     }
-  }
-
-  .scroll-card {
-    margin-bottom: 25%!important;
   }
 }
 

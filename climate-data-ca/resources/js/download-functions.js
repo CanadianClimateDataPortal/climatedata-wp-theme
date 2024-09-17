@@ -785,7 +785,7 @@
                     return request_args;
                 });
 
-                async.mapLimit(requests, 4, download_var, function (err, results) {
+                async.mapLimit(requests, 2, download_var, function (err, results) {
                     $('body').removeClass('spinner-on');
 
                     async.reduce(results, new JSZip(), function (zip, result, callback) {

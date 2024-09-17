@@ -240,19 +240,25 @@ function fw_build_menu ( array &$elements, $parent_id = 0, $level = 1 ) {
 
 }
 
-function fw_menu_output ( $menu, $level, $type, $classes ) {
+/**
+ * Outputs the menu HTML.
+ *
+ * @param array  $menu The menu items.
+ * @param int    $level The menu level.
+ * @param string $type The menu type.
+ * @param array  $classes The CSS classes.
+ */
+function fw_menu_output( $menu, $level, $type, $classes ) {
 
 	$element_class = $classes['menu'];
-	$item_class = $classes['item'];
-	$link_class = $classes['link'];
-	
-	// global $element_class;
-	// global $item_class;
-	// global $link_class;
+	$item_class    = $classes['item'];
+	$link_class    = $classes['link'];
 
-	echo '<ul class="fw-menu-' . $type . ' menu-level-' . $level . ' ';
+	echo '<ul class="fw-menu-' . esc_attr( $type ) . ' menu-level-' . esc_attr( $level ) . ' ';
 
-	if ( $level == 1 ) echo $element_class;
+	if ( 1 === $level ) {
+		echo esc_attr( $element_class );
+	}
 
 	echo '">';
 
@@ -264,74 +270,86 @@ function fw_menu_output ( $menu, $level, $type, $classes ) {
 		if ( isset( $GLOBALS['vars']['current_url'] ) ) {
 			$current_host = parse_url( $GLOBALS['vars']['current_url'], PHP_URL_HOST );
 			$current_path = parse_url( $GLOBALS['vars']['current_url'], PHP_URL_PATH );
-			$current_url = $current_host . $current_path;
+			$current_url  = $current_host . $current_path;
 
 			$item_host = parse_url( $item['url'], PHP_URL_HOST );
 			$item_path = parse_url( $item['url'], PHP_URL_PATH );
-			$item_url =  $item_host . $item_path;
+			$item_url  = $item_host . $item_path;
 
-			if ( $current_url == $item_url ) {
+			if ( $current_url === $item_url ) {
 				$is_item_of_current_page = true;
 				echo 'current-nav-item ';
 			}
 		}
 
 		// If the item's page is an ancestor of the current page
-		// or if the item is an ancestor of the current menu item ID
-		$post_id = get_post_meta( $item['id'], '_menu_item_object_id', true );
+		// or if the item is an ancestor of the current menu item ID.
+		$post_id   = get_post_meta( $item['id'], '_menu_item_object_id', true );
 		$ancestors = get_post_ancestors( get_the_ID() );
 
-		if ( 
-			! empty( $ancestors ) &&
-			in_array( $post_id, $ancestors ) ||
-
-			isset( $GLOBALS['vars']['current_ancestors'] ) &&
-			in_array( $item['id'], $GLOBALS['vars']['current_ancestors'] )
+		if (
+			( ! empty( $ancestors ) && in_array( $post_id, $ancestors ) ) ||
+			( isset( $GLOBALS['vars']['current_ancestors'] ) && in_array( $item['id'], $GLOBALS['vars']['current_ancestors'] ) )
 		) {
 			echo 'ancestor-nav-item ';
 		}
 
-		// other classes
-		echo $item_class;
+		// other classes.
+		echo esc_attr( $item_class );
 
 		echo '">';
 
-			echo '<a href="' . $item['url'] . '"';
+		echo '<a href="' . esc_url( $item['url'] ) . '"';
 
-			if ( isset ( $item['target'] ) && $item['target'] == 'blank' ) {
-				echo ' target="_blank"';
-			}
+		if ( isset( $item['target'] ) && 'blank' === $item['target'] ) {
+			echo ' target="_blank"';
+		}
 
-			echo ' class="';
+		echo ' class="';
 
-			if ( $is_item_of_current_page ) {
-				echo 'current-nav-link ';
-			}
-			
-			if ( isset ( $item['classes'] ) && is_array ( $item['classes'] ) ) echo ' ' . implode ( ' ', $item['classes'] );
-			
-			echo ' ' . $link_class;
-			
-			echo '">';
+		if ( $is_item_of_current_page ) {
+			echo 'current-nav-link ';
+		}
 
-			if ( isset ( $item['icon'] ) && $item['icon'] != '' ) {
-				echo '<i class="icon ' . $item['icon'] . ' mr-3"></i>';
-			}
+		if ( isset( $item['classes'] ) && is_array( $item['classes'] ) ) {
+			echo ' ' . esc_attr( implode( ' ', $item['classes'] ) );
+		}
 
-			echo $item['title'] . '</a>';
+		echo ' ' . esc_attr( $link_class );
 
-			if ( isset ( $item['children'] ) ) {
+		echo '">';
 
-				fw_menu_output ( $item['children'], $level + 1, $type, $classes );
+		if ( ! empty( $item['icon'] ) ) {
+			echo '<i class="icon ' . esc_attr( $item['icon'] ) . ' mr-3"></i>';
+		}
 
-			}
+		// Get the translation of the item label.
+		$item_label_translation = get_post_meta( $item['id'] )[ 'label_' . $GLOBALS['fw']['current_lang_code'] ];
+
+		// If the current language is not English and the translation is not empty, use the translation.
+		if ( 'en' !== $GLOBALS['fw']['current_lang_code'] && ! empty( $item_label_translation[0] ) ) {
+
+			$item_title = $item_label_translation[0];
+
+		} else {
+
+			$item_title = $item['title'];
+
+		}
+
+		echo esc_html( $item_title ) . '</a>';
+
+		if ( isset( $item['children'] ) ) {
+
+			fw_menu_output( $item['children'], $level + 1, $type, $classes );
+
+		}
 
 		echo '</li>';
 
 	}
 
 	echo '</ul>';
-
 }
 
 add_action ( 'fw_global_css', function() { } );

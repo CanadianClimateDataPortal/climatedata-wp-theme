@@ -1,0 +1,45 @@
+{
+    "key": "group_66df020542d03",
+    "title": "Menu items",
+    "fields": [
+        {
+            "key": "field_66df02086184d",
+            "label": "Custom Label for French",
+            "name": "label_fr",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Custom menu label to use in French. Leave empty to use the page's name.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "nav_menu_item",
+                "operator": "==",
+                "value": "all"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "modified": 1725891164
+}

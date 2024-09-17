@@ -142,6 +142,27 @@ const $ = jQuery;
       });
     }
 
+    // CARD LINKS HOVERING
+
+    function handleCardLinkHovering() {
+      if ( $( '.card.has-links' ).length ) {
+        $( '.card.has-links a.hover-toggle' ).hover(
+          function() {
+            $( this ).closest( '.card' ).addClass( 'card-enlarged' );
+          },
+          function() {
+            $( this ).closest( '.card' ).removeClass( 'card-enlarged' );
+          }
+        );
+      }
+    }
+
+    // Initial call on page load
+    handleCardLinkHovering();
+
+    // Bind to fw_query_success event for dynamically loaded content
+    $( document ).on( 'fw_query_success', handleCardLinkHovering );
+
     // TAB DRAWER
 
     $('#menu-tabs').tab_drawer({
@@ -233,18 +254,32 @@ const $ = jQuery;
       });
     }
 
-    let scroll_offset = 0;
+    let pinned_item = null;
 
-    if ($('#floating-header').length) {
-      scroll_offset += $('#floating-header').outerHeight();
+    function pin_item() {
+      let scroll_offset = 0;
+
+      if ($('#floating-header').length) {
+        scroll_offset += $('#floating-header').outerHeight();
+      }
+
+      if ($('.query-page #control-bar-tabs').length) {
+        if (pinned_item == null) {
+          pinned_item = new $.Zebra_Pin($('#control-bar-tabs'), {
+            top_spacing: scroll_offset,
+            contain: true,
+          });
+        } else {
+          pinned_item.settings.top_spacing = scroll_offset;
+          pinned_item.update();
+        }
+      }
     }
 
-    if ($('.query-page #control-bar-tabs').length) {
-      new $.Zebra_Pin($('#control-bar-tabs'), {
-        top_spacing: scroll_offset,
-        contained: true,
-      });
-    }
+    pin_item();
+
+    const resize_observer = new ResizeObserver( pin_item );
+    resize_observer.observe(document.querySelector('#control-bar'));
 
     /**
      * Ensure the control bar footer stays at the bottom of the screen while keeping it within its parent container.
@@ -804,5 +839,23 @@ const $ = jQuery;
     //
 
     $('body').removeClass('spinner-on');
+
+    //
+    // Add 'scrolled' class on body after 50px scroll.
+    //
+
+    function toggleBodyScrolledClass() {
+      if ( $( window ).scrollTop() > 50 ) {
+        $( 'body' ).addClass( 'scrolled' );
+      } else {
+        $( 'body' ).removeClass( 'scrolled' );
+      }
+    }
+
+    $( window ).on( 'scroll', toggleBodyScrolledClass );
+
+    $( toggleBodyScrolledClass );
+
   });
-})(jQuery);
+
+})( jQuery );

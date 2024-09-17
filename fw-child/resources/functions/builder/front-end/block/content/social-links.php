@@ -35,6 +35,11 @@ $networks = [
 		'name' => 'SoundCloud',
 		'brand-color' => '#ff5500',
 	],
+	'youtube' => [
+		'icon' => 'fa-youtube',
+		'name' => 'YouTube',
+		'brand-color' => '#ff0000',
+	],
 ];
 
 $links = [];

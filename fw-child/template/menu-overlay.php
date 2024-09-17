@@ -111,7 +111,7 @@
 			
 			<div id="menu-footer" class="ps-3 py-3 bg-gray-200">
 					
-				<div class="ms-3 pb-3 mb-3 border-bottom border-gray-400">
+				<div class="ms-3 me-5 pb-3 mb-3 border-bottom border-gray-400">
 					<h6 class="all-caps text-body mb-3"><?php _e ( 'Join the newsletter', 'cdc' ); ?></h6>
 					<div class="pe-3">
 					<?php include ( locate_template ( 'template/newsletter-signup.php' ) ); ?>

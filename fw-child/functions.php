@@ -422,16 +422,11 @@ add_action ( 'wp_head', function() {
 
 add_action( 'wp_footer', function() {
 
-	// FB/linkedin share scripts
-
 	if ( is_singular ( 'post' ) ) {
 
 ?>
 
 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
-
-<script src="https://platform.linkedin.com/in.js" type="text/javascript">lang: en_US</script>
-<script type="IN/Share" data-url="https://www.linkedin.com"></script>
 
 <?php
 

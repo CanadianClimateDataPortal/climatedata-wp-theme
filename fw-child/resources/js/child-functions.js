@@ -278,8 +278,10 @@ const $ = jQuery;
 
     pin_item();
 
-    const resize_observer = new ResizeObserver( pin_item );
-    resize_observer.observe(document.querySelector('#control-bar'));
+    if (document.querySelector('#control-bar')) {
+      const resize_observer = new ResizeObserver( pin_item );
+      resize_observer.observe( document.querySelector('#control-bar') );
+    }
 
     /**
      * Ensure the control bar footer stays at the bottom of the screen while keeping it within its parent container.

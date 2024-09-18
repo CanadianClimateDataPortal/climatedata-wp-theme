@@ -254,19 +254,34 @@ const $ = jQuery;
       });
     }
 
-    let scroll_offset = 0;
+    let pinned_item = null;
 
-    if ($('#floating-header').length) {
-      scroll_offset += $('#floating-header .fixed-top').outerHeight();
-      scroll_offset += $('#floating-header #menu-trigger').outerHeight();
+    function pin_item() {
+      let scroll_offset = 0;
+
+      if ($('#floating-header').length) {
+        scroll_offset += $('#floating-header').outerHeight();
+      }
+
+      if ($('.query-page #control-bar-tabs').length) {
+        if (pinned_item == null) {
+          pinned_item = new $.Zebra_Pin($('#control-bar-tabs'), {
+            top_spacing: scroll_offset,
+            contain: true,
+            class_name: 'tab-drawer-tabs--fixed',
+          });
+        } else {
+          pinned_item.settings.top_spacing = scroll_offset;
+          pinned_item.update();
+        }
+      }
     }
 
-    if ($('.query-page #control-bar-tabs').length) {
-      new $.Zebra_Pin($('#control-bar-tabs'), {
-        top_spacing: scroll_offset,
-        contained: true,
-        class_name: 'tab-drawer-tabs--fixed'
-      });
+    pin_item();
+
+    if (document.querySelector('#control-bar')) {
+      const resize_observer = new ResizeObserver( pin_item );
+      resize_observer.observe( document.querySelector('#control-bar') );
     }
 
     /**
@@ -606,7 +621,6 @@ const $ = jQuery;
         },
         dataType: 'json',
         success: function (data) {
-          console.log(data);
 
           alert_header.text(data.header);
 
@@ -654,79 +668,171 @@ const $ = jQuery;
     // Learn block GSAP Animation on front page
     //
 
-    if ($('#page-home').length) {
+    if ($( '#page-home' ).length) {
       gsap.registerPlugin(ScrollTrigger);
+      const mm = gsap.matchMedia();
 
-      $('.scroll-card').each(function () {
-        const card = this;
-        const isLastCard = $(card).closest('.fw-query-item').is(':last-child');
+      // Add GSAP animations after the "lg" breakpoint (992px) is reached
+      mm.add( '(min-width: 992px)', () => {
+        $( '.scroll-card' ).each(function () {
+          const card = this;
+          const isLastCard = $( card ).closest( '.fw-query-item' ).is( ':last-child' );
 
-         // Set pointer-events to none at the beginning for every card
-        $(card).css('pointer-events', 'none');
+          // Set pointer-events to none at the beginning for every card
+          $( card ).css( 'pointer-events', 'none' );
 
-        // Define common properties
-        const fromToProps = {
-          y: '-85%',
-          opacity: 0,
-          scale: 0.75,
-          zIndex: 0,
-        };
+          // Define common properties
+          const fromToProps = {
+            y: '-85%',
+            opacity: 0,
+            scale: 0.75,
+            zIndex: 0,
+          };
 
-        const toProps1 = {
-          y: '-15%',
-          opacity: 1,
-          scale: 1,
-          zIndex: 100,
-          onStart: function() {
-            $(card).css('pointer-events', ''); // Enable pointer-events as soon as the animation starts
-          },
-          onReverseComplete: function() {
-            $(card).css('pointer-events', 'none'); // Disable pointer-events when reversing the animation
-          },
-        };
+          const toProps1 = {
+            y: '-15%',
+            opacity: 1,
+            scale: 1,
+            zIndex: 100,
+            onStart: function() {
+              $(card).css('pointer-events', ''); // Enable pointer-events as soon as the animation starts
+            },
+            onReverseComplete: function() {
+              $(card).css('pointer-events', 'none'); // Disable pointer-events when reversing the animation
+            },
+          };
 
-        const toProps2 = {
-          y: '55%',
-          opacity: 0,
-          scale: 0.75,
-          zIndex: 0,
-          ease: 'power2.in',
-          onComplete: function() {
-            $(card).css('pointer-events', 'none');  // Disable pointer-events when this animation is complete
-          },
-          onReverseComplete: function() {
-            $(card).css('pointer-events', '');  // Enable pointer-events when this animation is complete on reverse
-          },
-        };
+          const toProps2 = {
+            y: '55%',
+            opacity: 0,
+            scale: 0.75,
+            zIndex: 0,
+            ease: 'power2.in',
+            onComplete: function() {
+              $(card).css('pointer-events', 'none');  // Disable pointer-events when this animation is complete
+            },
+            onReverseComplete: function() {
+              $(card).css('pointer-events', '');  // Enable pointer-events when this animation is complete on reverse
+            },
+          };
 
-        // Customize properties for the last card
-        if (isLastCard) {
-          toProps2.y = '0%';
-          toProps2.opacity = 1;
-          toProps2.scale = 1;
-          toProps2.zIndex = 100;
+          // Customize properties for the last card
+          if ( isLastCard ) {
+            toProps2.y = '0%';
+            toProps2.opacity = 1;
+            toProps2.scale = 1;
+            toProps2.zIndex = 100;
+          }
+
+          const timeline = gsap.timeline({
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 100%',
+              end: 'top -50%',
+              scrub: true,
+              markers: false,    // Set to true to debug
+              onLeave: function() {
+                $( card ).css( 'pointer-events', 'none' );  // Disable pointer-events when card leaves
+              },
+              onEnterBack: function() {
+                $(card).css( 'pointer-events', '' );  // Disable pointer-events when card enters back
+              },
+            }
+          });
+
+          timeline
+            .fromTo(card, fromToProps, fromToProps)
+            .to(card, toProps1)
+            .to(card, toProps2);
+        });
+      } );
+
+      //
+      // Learn block Swiper Carousel on front page
+      //
+
+      // Function to add AOS attributes to the resources container when window width is under 992px
+      function applyResourcesAosAttributes() {
+        const resourcesContainer = document.querySelector('#resources-query');
+        
+        if (window.innerWidth < 992) {
+          // Add AOS attributes
+          resourcesContainer.setAttribute('data-aos', 'fade-up');
+          resourcesContainer.setAttribute('data-aos-easing', 'ease-in-out-quad');
+          resourcesContainer.setAttribute('data-aos-duration', '1000');
+          resourcesContainer.setAttribute('data-aos-delay', '250');
+          resourcesContainer.setAttribute('data-aos-index', '0');
+
+          AOS.init();     // Initialize AOS if not already done
+          AOS.refresh();  // Refresh AOS to detect new attributes
+        } else {
+          // Remove AOS attributes if window width is 992px or more
+          resourcesContainer.removeAttribute('data-aos');
+          resourcesContainer.removeAttribute('data-aos-easing');
+          resourcesContainer.removeAttribute('data-aos-duration');
+          resourcesContainer.removeAttribute('data-aos-delay');
+          resourcesContainer.removeAttribute('data-aos-index');
+        }
+      }
+
+      // Function to initialize Swiper
+      function initializeResourcesSwiper() {
+        const queryItemsContainer = document.querySelector('#resources-query .query-container');
+        const queryItemsWrapper = document.querySelector('#resources-query .fw-query-items');
+        const queryItemElements = document.querySelectorAll('#resources-query .fw-query-items .fw-query-item');
+
+        // Add the 'swiper-container' class to #resources-query .query-container
+        if (queryItemsContainer) {
+          queryItemsContainer.classList.add('swiper-container');
+
+          // Create and append the 'swiper-pagination' element
+          const paginationElement = document.createElement('div');
+          paginationElement.classList.add('swiper-pagination');
+          queryItemsContainer.appendChild(paginationElement);
         }
 
-        const timeline = gsap.timeline({
-          scrollTrigger: {
-            trigger: card,
-            start: 'top 100%',
-            end: 'top -50%',
-            scrub: true,
-            markers: false,    // Set to true to debug
-            onLeave: function() {
-              $(card).css('pointer-events', 'none');  // Disable pointer-events when card leaves
-            },
-            onEnterBack: function() {
-              $(card).css('pointer-events', '');  // Disable pointer-events when card enters back
-            },
-          }
+        // Add the 'swiper-wrapper' class to #resources-query .fw-query-items
+        if (queryItemsWrapper) {
+          queryItemsWrapper.classList.add('swiper-wrapper');
+        }
+
+        // Add the 'swiper-slide' class to each .fw-query-item element
+        queryItemElements.forEach(item => {
+          item.classList.add('swiper-slide');
         });
 
-        timeline
-          .fromTo(card, fromToProps, fromToProps)
-          .to(card, toProps1)
-          .to(card, toProps2);
+        // Initialize Swiper
+        const resourcesSwiper = new Swiper('#resources-query .swiper-container', {
+          slidesPerView: 1,
+          breakpoints: {
+            0: {
+              enabled: true,
+              slidesPerView: 1,
+            },
+            576: {
+              enabled: true,
+              slidesPerView: 2,
+            },
+            992: {
+              enabled: false,  // Disable Swiper for lg screens and up
+            },
+          },
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+            type: 'bullets',
+          }
+        });
+      }
+
+      // Initial call to apply AOS attributes and initialize Swiper on resources
+      applyResourcesAosAttributes();
+      initializeResourcesSwiper();
+
+      // Listen for window resize events to re-apply AOS attributes and refresh AOS when necessary
+      $(window).resize(function () {
+        applyResourcesAosAttributes();
+        AOS.refresh();
       });
 
     };

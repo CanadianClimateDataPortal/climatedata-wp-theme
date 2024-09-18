@@ -1,4 +1,4 @@
-<div id="control-bar" class="control-bar tab-drawer-tabs-container d-flex flex-column align-items-center">
+<div id="control-bar" class="col-2 col-sm-1 control-bar tab-drawer-tabs-container d-flex flex-column align-items-center">
 	<div class="sidebar-header w-100">
 		<?php
 		include ( locate_template ( 'template/header-logo.php' ) );

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-09-09T13:17:21+00:00\n"
+"POT-Creation-Date: 2024-09-17T13:41:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -148,18 +148,21 @@ msgid "Update ACF Relevant Sectors"
 msgstr ""
 
 #: template/apps/control-bar-inner.php:12
-#: template/apps/control-btns.php:13
-#: template/download/control-bar.php:94
-#: template/feedback.php:344
-#: template/feedback.php:527
-#: template/map/control-bar.php:65
-msgid "Feedback"
+msgid "Feed&shy;back"
 msgstr ""
 
 #: template/apps/control-btns.php:10
 #: template/download/control-bar.php:54
 #: template/download/controls/area.php:183
 msgid "Details"
+msgstr ""
+
+#: template/apps/control-btns.php:13
+#: template/download/control-bar.php:94
+#: template/feedback.php:344
+#: template/feedback.php:527
+#: template/map/control-bar.php:65
+msgid "Feedback"
 msgstr ""
 
 #: template/apps/modals.php:5
@@ -333,7 +336,7 @@ msgstr ""
 #: template/download/controls/data.php:112
 #: template/download/controls/details.php:353
 #: template/map/controls/data-variable.php:139
-#: template/news/query.php:50
+#: template/news/query.php:48
 msgid "Next"
 msgstr ""
 
@@ -344,7 +347,7 @@ msgstr ""
 
 #: template/download/controls/data-variable.php:137
 #: template/map/controls/data-variable.php:137
-#: template/news/query.php:46
+#: template/news/query.php:44
 msgid "Previous"
 msgstr ""
 
@@ -1062,7 +1065,7 @@ msgstr ""
 msgid "App"
 msgstr ""
 
-#: template/learn/query.php:75
+#: template/learn/query.php:79
 msgid "No items found."
 msgstr ""
 
@@ -1406,10 +1409,10 @@ msgstr ""
 msgid "Relevant Sectors"
 msgstr ""
 
-#: template/variable/query.php:67
+#: template/variable/query.php:66
 msgid "Name (A–Z)"
 msgstr ""
 
-#: template/variable/query.php:68
+#: template/variable/query.php:67
 msgid "Name (Z–A)"
 msgstr ""

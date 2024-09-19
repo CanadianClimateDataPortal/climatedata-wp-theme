@@ -20,65 +20,61 @@ add_action ( 'wp_ajax_fw_output_loop_ajax', 'fw_output_loop_ajax' );
 // UPDATE POST
 //
 
+/**
+ * Update a post's content from a Builder JSON object in a POST request.
+ *
+ * From the POST request, retrieve the Builder JSON object in the `builder`
+ * argument and update the post's content accordingly.
+ */
 function fw_update_post() {
-	
-	// dumpit ( $_POST );
-	
 	$success = false;
-	
-	if (
-		( isset ( $_POST['post_id'] ) && !empty ( $_POST['post_id'] ) ) &&
-		( isset ( $_POST['builder'] ) && !empty ( $_POST['builder'] ) )
-	) {
-		
-		// $globals = $_POST['globals'];
-		$lang = $_POST['globals']['current_lang_code'];
-		
-		$new_builder = json_encode ( $_POST['builder'], JSON_PRETTY_PRINT );
-		
-		$revision = wp_save_post_revision ( $_POST['post_id'] );
-		
-		// update builder object
-		update_post_meta ( $_POST['post_id'], 'builder', $new_builder );
-		
-		// echo 'updated id #' . $_POST['post_id'] . "\n";
-		
-		// other meta
-		
-		$title_to_update = wptexturize ( $_POST['builder']['inputs']['title'][$lang] );
-		
-		if ( $title_to_update != '' ) {
-			if ( $lang == 'en' ) {
-				
-				// if en, update the post title
-			
-				$post_update = array (
-					'ID' => $_POST['post_id'],
-					'post_title' => $title_to_update
-				);
-				
-				wp_update_post ( $post_update );
 
-			} else {
-				
-				// not en, update title_[lang]
-				
-				update_post_meta ( $_POST['post_id'], 'title_' . $lang, $title_to_update );
-		
+	if ( ! empty ( $_POST[ 'post_id' ] ) && ! empty ( $_POST[ 'builder' ] ) ) {
+		$lang = $_POST[ 'globals' ][ 'current_lang_code' ];
+
+		// To validate the received JSON and save it in pretty print, we load
+		// the JSON as a PHP array to later re-convert it to a JSON string.
+
+		$builder_object = json_decode( stripslashes( $_POST[ 'builder' ] ), true );
+		$builder_object = wp_slash( $builder_object );
+
+		if ( json_last_error() !== JSON_ERROR_NONE ) {
+			error_log( 'Could not parse Builder JSON: ' . json_last_error_msg() );
+		} else {
+			wp_save_post_revision( $_POST[ 'post_id' ] );
+
+			// Update Builder field
+			$builder_json = json_encode( $builder_object, JSON_PRETTY_PRINT );
+			update_post_meta( $_POST[ 'post_id' ], 'builder', $builder_json );
+
+			// Update page title
+
+			if ( ! empty( $builder_object[ 'inputs' ][ 'title' ] ) ) {
+				$title_to_update = wptexturize( $builder_object[ 'inputs' ][ 'title' ][ $lang ] );
+
+				if ( $title_to_update != '' ) {
+					if ( $lang == 'en' ) {
+
+						$post_update = array(
+							'ID' => $_POST[ 'post_id' ],
+							'post_title' => $title_to_update
+						);
+
+						wp_update_post( $post_update );
+					} else {
+						update_post_meta( $_POST[ 'post_id' ], 'title_' . $lang, $title_to_update );
+					}
+				}
 			}
-			
-			// echo  'updated ' . $globals['current_lang_code'] . ' title' . "\n";
-			
+
+			$success = true;
 		}
-		
-		$success = true;
-		
 	}
-	
-	echo ( $success == true ) ? 'success' : '';
-	
+
+	echo $success ? 'success' : '';
+
 	wp_die();
-	
+
 }
 
 add_action ( 'wp_ajax_fw_update_post', 'fw_update_post' );

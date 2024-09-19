@@ -11,7 +11,7 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 }
 ?>
 
-<div class="card position-relative variable-item" id="v-<?php echo esc_attr( $variable_slug ); ?>">
+<div class="card position-relative variable-item no-enlarge" id="v-<?php echo esc_attr( $variable_slug ); ?>">
 	
 	<a href="/variable#v-<?php echo esc_attr( $variable_slug ); ?>" class="flex-drawer-trigger stretched-link"></a>
 	
@@ -41,7 +41,7 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 					
 			?>
 			
-			<div class="var-item-sectors d-flex">
+			<div class="var-item-sectors d-flex flex-wrap mt-1">
 				<?php
 						foreach ( $this_sectors as $sector ) {
 							$sector_term_id   = $sector->term_id;
@@ -53,7 +53,7 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 							}
 				?>
 				
-				<span class="badge all-caps text-bg-light me-2"><?php echo esc_html( $sector_term_name ); ?></span>
+				<span class="badge all-caps text-bg-light mt-1 me-1"><?php echo esc_html( $sector_term_name ); ?></span>
 				
 				<?php
 			

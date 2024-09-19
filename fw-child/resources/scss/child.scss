@@ -219,6 +219,12 @@ p {
     margin-right: 0.5rem;
     opacity: 0.8;
   }
+
+  &-lg {
+    @include media-breakpoint-down(sm) {
+      padding: $input-padding-y-lg $input-padding-x-lg;
+    }
+  }
 }
 
 .bg {
@@ -433,6 +439,26 @@ $control-slider-handle-width: 2.75rem;
     @include font-size(5rem);
     font-weight: bold;
   }
+
+  .hero-side-image {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+
+    img {
+      width: 100%;
+      max-width: 21.875rem;
+    }
+  }
+
+  a {
+    color: inherit;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
 }
 
 //
@@ -468,9 +494,9 @@ $control-slider-handle-width: 2.75rem;
   position: relative;
   height: 100%;
   min-height: 100vh;
-  background-color: transparentize($dark, 0.1);
+  background-color: mix($dark, $gray-200, 90%);
   font-size: 0.875rem;
-  z-index: 10;
+  margin-right: 0.25rem;
 
   @include media-breakpoint-up(md) {
     font-size: 0.75rem;
@@ -480,17 +506,6 @@ $control-slider-handle-width: 2.75rem;
     font-size: 0.875rem;
   }
 
-  .tab-drawer-container {
-    box-shadow: 0 0 0 transparentize($black, 0.8);
-    transition: box-shadow $td-slide-transition-duration ease 0.25s;
-    z-index: -1;
-
-    &:has(.tab-drawer.td-selected) {
-      width: calc((100vw / 16) * 3);
-      box-shadow: 0 0 20px transparentize($black, 0.8);
-    }
-  }
-
   .control-bar-tab-link {
     display: flex;
     flex-direction: column;
@@ -498,10 +513,14 @@ $control-slider-handle-width: 2.75rem;
     justify-content: space-between;
     padding: 0.5rem;
     color: $white;
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     text-decoration: none;
     text-align: center;
     transition: 0.25s;
+
+    @include media-breakpoint-up(md) {
+      font-size: 0.75rem;
+    }
 
     &.disabled {
       opacity: 0.5;
@@ -535,25 +554,42 @@ $control-slider-handle-width: 2.75rem;
     }
 
     svg {
-      width: 30px;
+      width: 22px;
+
+      @include media-breakpoint-up(lg) {
+        width: 24px;
+      }
+
+      @include media-breakpoint-up(xl) {
+        width: 30px;
+      }
     }
   }
 
   .control-bar-text-link {
     display: block;
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
+    padding: 0.75rem 0.125rem;
+    max-width: 100%;
     color: $white;
     border-top: 1px solid $gray-700;
+    font-size: 0.6875rem;
+    word-break: break-word;
+
+    @include media-breakpoint-up(md) {
+      font-size: 0.75rem;
+    }
+  }
+
+  // Accomodate the "Rétroaction" fr wording to fit in the tiny sidebar
+  [lang="fr"] & {
+    .control-bar-text-link {
+      @include media-breakpoint-only(sm) {
+        hyphens: none;
+      }
+    }
   }
 
   .tab-drawer-tabs {
-    padding-left: 0.5rem;
-
-    a {
-      // display: block;
-    }
-
     .tab-drawer-trigger {
       .alert-icon {
         display: none;
@@ -571,10 +607,33 @@ $control-slider-handle-width: 2.75rem;
     }
   }
 
+  .tab-drawer-container {
+    left: 0;
+    margin-left: 100%;
+    z-index: -1;
+    transform: translateX( calc(-100% - 12.5vw) );
+    transition: transform 0.5s;
+
+    @include media-breakpoint-up(sm) {
+      transform: translateX( calc(-100% - 6.25vw) );
+    }
+
+    &:has(.tab-drawer.td-selected) {
+      transform: translateX(0);
+    }
+  }
+
   .tab-drawer {
-    width: calc((100vw / 16) * 3);
+    left: 0 !important;
     height: 100%;
-    // height: 100vh;
+    transition: none !important;
+    z-index: -9999 !important;
+    box-shadow: none;
+
+    &.td-selected {
+      z-index: -1 !important;
+      box-shadow: 0 0 20px transparentize($black, 0.9);
+    }
 
     .tab-drawer-content {
       height: 100%;
@@ -586,7 +645,9 @@ $control-slider-handle-width: 2.75rem;
         min-height: 100vh;
 
         .tab-drawer-content-inner {
-          min-height: 100vh;
+          height: 100vh;
+          transform: none !important;
+          transition: none !important;
         }
       }
     }
@@ -599,7 +660,7 @@ $control-slider-handle-width: 2.75rem;
     }
 
     .control-tab-head {
-      padding: 1rem;
+      padding: 1rem .375rem 1rem 1rem;
       background-color: $gray-200;
 
       @include media-breakpoint-down(md) {
@@ -610,7 +671,6 @@ $control-slider-handle-width: 2.75rem;
     .control-tab-body {
       flex-grow: 1;
       overflow: auto;
-      // padding: 1rem;
     }
 
     .tab-drawer {
@@ -623,9 +683,46 @@ $control-slider-handle-width: 2.75rem;
       }
     }
   }
+
+  .tab-drawer-container,
+  .tab-drawer {
+    width: calc((100vw / 16) * 12);
+
+    @include media-breakpoint-up(sm) {
+      width: calc((100vw / 16) * 6);
+    }
+
+    @include media-breakpoint-up(md) {
+      width: calc((100vw / 16) * 5);
+    }
+
+    @include media-breakpoint-up(lg) {
+      width: calc((100vw / 16) * 4);
+    }
+
+    @include media-breakpoint-up(xl) {
+      width: calc((100vw / 16) * 3);
+    }
+  }
+
+  .learn-zone-topic-filter {
+    &:hover {
+      background-color: $gray-200;
+    }
+
+    &.disabled {
+      pointer-events: none;
+      opacity: .5;
+    }
+  }
 }
 
-#control-bar-secondary {
+#control-bar-tabs {
+  width: 100%;
+}
+
+#control-bar-secondary,
+#control-bar-tabs-footer {
   a {
     &:hover {
       background-color: $gray-700;
@@ -635,8 +732,7 @@ $control-slider-handle-width: 2.75rem;
 }
 
 .tab-drawer-close {
-  // font-size: 2rem;
-  // line-height: 1rem;
+  padding: .625rem;
   cursor: pointer;
 }
 
@@ -646,16 +742,6 @@ $control-slider-handle-width: 2.75rem;
   padding: 1rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid $gray-300;
-}
-
-.tab-drawer-bumper {
-  transition: margin-left $td-slide-transition-duration ease;
-}
-
-.tab-drawer-open {
-  .tab-drawer-bumper {
-    margin-left: 18.75vw;
-  }
 }
 
 .filter-item {
@@ -673,13 +759,10 @@ $control-slider-handle-width: 2.75rem;
     font-size: 1rem;
   }
 
-  .fw-query-filter-reset {
-    color: $gray-600;
-    transition: 0.25s;
-
-    &:hover {
-      color: $secondary;
-    }
+  .fw-query-reset {
+    line-height: 0.75rem;
+    font-weight: 600;
+    padding: 0.15rem 0.25rem;
   }
 
   .filter-item {
@@ -870,12 +953,12 @@ $decade-slider-handle-width: 140px;
 
 .card-img {
   height: 0;
-  padding-bottom: 50%;
+  padding-bottom: 63.33%;
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  opacity: 0.6;
   transition: 0.25s;
+  opacity: 0.9;
 }
 
 $query-card-hover-padding: 0.75rem;
@@ -887,18 +970,34 @@ $query-card-hover-padding: 0.75rem;
     .card {
       height: 100%;
       transition: 0.25s;
-      
+
       &--news {
         .card-date,
         .card-authors,
         .card-topics {
           font-size: 0.875rem;
         }
-        
+
         .card-topics {
           span {
             font-size: 0.75rem;
             color: $gray-800;
+          }
+        }
+      }
+
+      &--learn {
+        .card-desc {
+          font-size: 0.925rem;
+        }
+
+        .card-asset-type,
+        .card-asset-time {
+          font-size: 0.875rem;
+          margin-top: -0.25rem;
+
+          i {
+            font-size: 0.75rem;
           }
         }
       }
@@ -908,7 +1007,8 @@ $query-card-hover-padding: 0.75rem;
       transition: 0.25s;
     }
 
-    .card-title {
+    .card-title,
+    .related-content {
       a {
         text-decoration: none;
 
@@ -918,22 +1018,17 @@ $query-card-hover-padding: 0.75rem;
       }
     }
 
-    &:hover {
-      .card:not(.variable-item) {
-        height: calc(100% + ($query-card-hover-padding * 2));
-        margin-top: $query-card-hover-padding * -1;
-        margin-left: $query-card-hover-padding * -1;
-        margin-right: $query-card-hover-padding * -1;
-        box-shadow: 0 0.25rem 1.5rem transparentize($black, 0.9);
+    &:hover .card:not(.no-enlarge),
+    .card.card-enlarged {
+      height: calc(100% + ($query-card-hover-padding * 2));
+      margin-top: $query-card-hover-padding * -1;
+      margin-left: $query-card-hover-padding * -1;
+      margin-right: $query-card-hover-padding * -1;
+      box-shadow: 0 0.25rem 1.5rem transparentize($black, 0.9);
 
-        .card-img {
-          opacity: 1;
-        }
-
-        .card-body {
-          margin-left: $query-card-hover-padding;
-          margin-right: $query-card-hover-padding;
-        }
+      .card-body {
+        margin-left: $query-card-hover-padding;
+        margin-right: $query-card-hover-padding;
       }
     }
   }
@@ -997,4 +1092,24 @@ $query-card-hover-padding: 0.75rem;
       width: 100%;
     }
   }
+}
+
+//
+// HELPERS
+//
+
+.ratio-3x2 {
+  --bs-aspect-ratio: 66.66667%;
+}
+
+.bg-black-50 {
+  background-color: rgba($black, .5);
+}
+
+.mb-25vh {
+  margin-bottom: 25vh;
+}
+
+.w-max {
+  width: max-content;
 }

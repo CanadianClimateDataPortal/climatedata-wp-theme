@@ -3,7 +3,7 @@
 function mailchimp_register($email)
 {
 
-    $lang = $GLOBALS['vars']['current_lang'];
+    $lang = $GLOBALS['fw']['current_lang_code'];
 
     if ($GLOBALS['vars']['mailchimp_api_key'] == '' ||
         $GLOBALS['vars']['mailchimp_url'] == '' ||

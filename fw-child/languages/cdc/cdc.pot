@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-07-03T20:28:31+00:00\n"
+"POT-Creation-Date: 2024-09-17T13:41:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -24,24 +24,36 @@ msgstr ""
 msgid "Phil Evans"
 msgstr ""
 
-#: functions.php:234
+#: functions.php:235
 msgid "days"
 msgstr ""
 
-#: functions.php:235
+#: functions.php:236
 msgid "day of the year"
 msgstr ""
 
-#: functions.php:236
+#: functions.php:237
 msgid "degree days"
 msgstr ""
 
-#: functions.php:237
+#: functions.php:238
 msgid "number of periods"
 msgstr ""
 
-#: functions.php:238
+#: functions.php:239
 msgid "events"
+msgstr ""
+
+#: functions.php:559
+msgid "Display in Learning Zone"
+msgstr ""
+
+#: functions.php:572
+msgid "Yes"
+msgstr ""
+
+#: functions.php:574
+msgid "No"
 msgstr ""
 
 #: resources/functions/ajax.php:153
@@ -64,6 +76,10 @@ msgstr ""
 msgid "Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)"
 msgstr ""
 
+#: resources/functions/builder/front-end/block/content/mailchimp.php:39
+msgid "Your email address"
+msgstr ""
+
 #: resources/functions/rest.php:348
 #: resources/functions/rest.php:349
 #: resources/functions/rest.php:472
@@ -71,44 +87,51 @@ msgstr ""
 msgid "Point"
 msgstr ""
 
-#: resources/functions/rest.php:691
-msgid "An error occurred"
+#: resources/functions/rest.php:689
+#: resources/functions/rest.php:700
+#: resources/functions/rest.php:711
+msgid "Please provide the details of your inquiry."
 msgstr ""
 
-#: resources/functions/rest.php:727
+#: resources/functions/rest.php:712
+msgid "Please select at least one app."
+msgstr ""
+
+#: resources/functions/rest.php:728
+msgid "An error occurred."
+msgstr ""
+
+#: resources/functions/rest.php:756
 #: template/download/controls/submit.php:88
 msgid "CAPTCHA verification is required."
 msgstr ""
 
-#: resources/functions/rest.php:743
-msgid "Please enter a valid email address"
+#: resources/functions/rest.php:762
+#: template/download/controls/submit.php:56
+msgid "Please enter a valid email address."
 msgstr ""
 
-#: resources/functions/rest.php:750
-msgid "Please provide the details of your inquiry."
-msgstr ""
-
-#: resources/functions/rest.php:755
+#: resources/functions/rest.php:777
 msgid "Some required fields are missing."
 msgstr ""
 
-#: resources/functions/rest.php:817
+#: resources/functions/rest.php:799
 msgid "Thanks! We’ve received your inquiry."
 msgstr ""
 
-#: resources/functions/rest.php:818
+#: resources/functions/rest.php:800
 msgid "Please note: we are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays."
 msgstr ""
 
-#: resources/functions/rest.php:821
+#: resources/functions/rest.php:802
 msgid "Something went wrong while sending your message. Please try again later."
 msgstr ""
 
-#: resources/functions/rest.php:833
+#: resources/functions/rest.php:811
 msgid "Your email address has been added to our mailing list. You can unsubscribe at any time."
 msgstr ""
 
-#: resources/functions/rest.php:836
+#: resources/functions/rest.php:814
 msgid "An error occurred while adding your email address to our mailing list."
 msgstr ""
 
@@ -117,53 +140,49 @@ msgid "Clone Taxonomy"
 msgstr ""
 
 #. Template Name of the theme
+msgid "Init LZ meta"
+msgstr ""
+
+#. Template Name of the theme
 msgid "Update ACF Relevant Sectors"
 msgstr ""
 
-#: template/beta-apps/control-btns.php:10
+#: template/apps/control-bar-inner.php:12
+msgid "Feed&shy;back"
+msgstr ""
+
+#: template/apps/control-btns.php:10
 #: template/download/control-bar.php:54
 #: template/download/controls/area.php:183
 msgid "Details"
 msgstr ""
 
-#: template/beta-apps/control-btns.php:13
+#: template/apps/control-btns.php:13
 #: template/download/control-bar.php:94
-#: template/feedback.php:336
+#: template/feedback.php:344
+#: template/feedback.php:527
 #: template/map/control-bar.php:65
 msgid "Feedback"
 msgstr ""
 
-#: template/beta-apps/modals.php:5
+#: template/apps/modals.php:5
 msgid "About this app"
 msgstr ""
 
-#: template/beta-apps/modals.php:18
+#: template/apps/modals.php:18
 msgid "Close"
 msgstr ""
 
-#: template/beta-apps/modals.php:20
-#: template/beta-apps/modals.php:30
+#: template/apps/modals.php:20
+#: template/apps/modals.php:30
 msgid "Provide Feedback"
 msgstr ""
 
-#: template/beta-apps/modals.php:49
+#: template/apps/modals.php:49
 #: template/feedback.php:264
-#: template/feedback.php:384
+#: template/feedback.php:392
+#: template/feedback.php:575
 msgid "Submit Feedback"
-msgstr ""
-
-#: template/beta-apps/query.php:29
-#: template/learn/query.php:31
-#: template/news/query.php:29
-#: template/variable/query.php:29
-msgid "Newest First"
-msgstr ""
-
-#: template/beta-apps/query.php:30
-#: template/learn/query.php:32
-#: template/news/query.php:30
-#: template/variable/query.php:30
-msgid "Oldest First"
 msgstr ""
 
 #: template/download/control-bar.php:22
@@ -185,7 +204,7 @@ msgstr ""
 #: template/map/control-bar.php:42
 #: template/map/controls/download.php:5
 #: template/map/controls/download.php:44
-#: template/menu-overlay.php:196
+#: template/menu-overlay.php:194
 msgid "Download"
 msgstr ""
 
@@ -234,8 +253,11 @@ msgstr ""
 
 #: template/download/controls/area.php:56
 #: template/download/controls/data-variable.php:117
+#: template/learn/control-bar.php:77
 #: template/map/controls/data-variable.php:117
 #: template/map/controls/location.php:57
+#: template/news/control-bar.php:23
+#: template/variable/control-bar.php:23
 msgid "Clear"
 msgstr ""
 
@@ -314,7 +336,7 @@ msgstr ""
 #: template/download/controls/data.php:112
 #: template/download/controls/details.php:353
 #: template/map/controls/data-variable.php:139
-#: template/news/query.php:61
+#: template/news/query.php:48
 msgid "Next"
 msgstr ""
 
@@ -325,7 +347,7 @@ msgstr ""
 
 #: template/download/controls/data-variable.php:137
 #: template/map/controls/data-variable.php:137
-#: template/news/query.php:57
+#: template/news/query.php:44
 msgid "Previous"
 msgstr ""
 
@@ -589,7 +611,8 @@ msgstr ""
 #: template/download/controls/submit.php:13
 #: template/download/controls/submit.php:86
 #: template/feedback.php:239
-#: template/feedback.php:359
+#: template/feedback.php:367
+#: template/feedback.php:550
 msgid "Enter the characters shown in the image:"
 msgstr ""
 
@@ -615,7 +638,8 @@ msgstr ""
 
 #: template/download/controls/submit.php:49
 #: template/feedback.php:48
-#: template/feedback.php:319
+#: template/feedback.php:321
+#: template/feedback.php:449
 msgid "Email Address"
 msgstr ""
 
@@ -627,12 +651,10 @@ msgstr ""
 msgid "Data processing starts when you click on ‘Send Request.’ It may take 30 to 90 minutes to complete, depending on available resources. You will be notified by email when your request has been processed and the data are available. Don’t forget to check your spam folder."
 msgstr ""
 
-#: template/download/controls/submit.php:56
-msgid "Please enter a valid email address."
-msgstr ""
-
 #: template/download/controls/submit.php:60
 #: template/feedback.php:55
+#: template/feedback.php:327
+#: template/feedback.php:455
 msgid "Subscribe to the ClimateData.ca newsletter"
 msgstr ""
 
@@ -719,6 +741,7 @@ msgstr ""
 
 #: template/feedback.php:39
 #: template/feedback.php:313
+#: template/feedback.php:440
 msgid "Full Name"
 msgstr ""
 
@@ -805,7 +828,8 @@ msgid "Please specify"
 msgstr ""
 
 #: template/feedback.php:104
-#: template/feedback.php:325
+#: template/feedback.php:333
+#: template/feedback.php:462
 msgid "Organization"
 msgstr ""
 
@@ -968,12 +992,14 @@ msgid "Internet search"
 msgstr ""
 
 #: template/feedback.php:258
-#: template/feedback.php:378
+#: template/feedback.php:386
+#: template/feedback.php:569
 msgid "Enter the characters shown in the image"
 msgstr ""
 
 #: template/feedback.php:260
-#: template/feedback.php:380
+#: template/feedback.php:388
+#: template/feedback.php:571
 msgid "Non-valid entered characters. Please try again."
 msgstr ""
 
@@ -981,15 +1007,23 @@ msgstr ""
 msgid "Dataset Support"
 msgstr ""
 
+#: template/feedback.php:416
+msgid "Applications Feedback"
+msgstr ""
+
+#: template/feedback.php:474
+msgid "Which application would you like to provide feedback on?"
+msgstr ""
+
 #: template/learn/control-bar.php:11
 #: template/learn/control-bar.php:30
 #: template/post-meta.php:53
-#: template/query/news-item.php:64
+#: template/query/news-item.php:71
 msgid "Topics"
 msgstr ""
 
 #: template/learn/control-bar.php:20
-#: template/learn/control-bar.php:81
+#: template/learn/control-bar.php:75
 #: template/news/control-bar.php:11
 #: template/news/control-bar.php:21
 #: template/variable/control-bar.php:11
@@ -997,40 +1031,42 @@ msgstr ""
 msgid "Filters"
 msgstr ""
 
-#: template/learn/control-bar.php:46
-msgid "topic"
-msgstr ""
-
-#: template/learn/control-bar.php:89
+#: template/learn/control-bar.php:85
 msgid "Content Type"
 msgstr ""
 
-#: template/learn/control-bar.php:92
-#: template/query/learn-item.php:42
+#: template/learn/control-bar.php:88
+#: template/query/learn-item.php:55
+#: template/query/resource-home-feature.php:70
 msgid "Video"
 msgstr ""
 
-#: template/learn/control-bar.php:93
-#: template/query/learn-item.php:47
+#: template/learn/control-bar.php:89
+#: template/query/learn-item.php:60
+#: template/query/resource-home-feature.php:75
 msgid "Audio"
 msgstr ""
 
-#: template/learn/control-bar.php:94
-#: template/query/learn-item.php:52
+#: template/learn/control-bar.php:90
+#: template/query/learn-item.php:65
+#: template/query/resource-home-feature.php:80
 msgid "Interactive"
 msgstr ""
 
-#: template/learn/control-bar.php:95
-#: template/query/learn-item.php:57
+#: template/learn/control-bar.php:91
+#: template/query/learn-item.php:75
+#: template/query/resource-home-feature.php:90
 msgid "Article"
 msgstr ""
 
-#: template/learn/query.php:29
-msgid "Title (A–Z)"
+#: template/learn/control-bar.php:92
+#: template/query/learn-item.php:70
+#: template/query/resource-home-feature.php:85
+msgid "App"
 msgstr ""
 
-#: template/learn/query.php:30
-msgid "Title (Z–A)"
+#: template/learn/query.php:79
+msgid "No items found."
 msgstr ""
 
 #: template/map/control-bar.php:24
@@ -1284,31 +1320,31 @@ msgstr ""
 msgid "Join the newsletter"
 msgstr ""
 
-#: template/menu-overlay.php:181
+#: template/menu-overlay.php:179
 msgid "Popular Variables"
 msgstr ""
 
-#: template/menu-overlay.php:194
+#: template/menu-overlay.php:192
 #: template/query/map-var-item.php:11
 msgid "View on map"
 msgstr ""
 
-#: template/menu-overlay.php:198
+#: template/menu-overlay.php:196
 #: template/query/download-var-item.php:13
 #: template/query/map-var-item.php:13
 msgid "Description"
 msgstr ""
 
-#: template/menu-overlay.php:211
+#: template/menu-overlay.php:209
 msgid "Variables by Sector"
 msgstr ""
 
-#: template/menu-overlay.php:238
+#: template/menu-overlay.php:236
 msgid "All Variables"
 msgstr ""
 
-#: template/newsletter-signup.php:10
-msgid "Your email address"
+#: template/news/control-bar.php:31
+msgid "Tag"
 msgstr ""
 
 #: template/old-loop/blocks/chart.php:43
@@ -1320,7 +1356,7 @@ msgid "Download image"
 msgstr ""
 
 #: template/old-loop/blocks/map.php:227
-#: template/query/learn-item.php:70
+#: template/query/learn-item.php:91
 msgid "Time"
 msgstr ""
 
@@ -1333,6 +1369,7 @@ msgid "Date"
 msgstr ""
 
 #: template/post-meta.php:26
+#: template/query/news-item.php:44
 msgid "F j, Y"
 msgstr ""
 
@@ -1344,12 +1381,24 @@ msgstr ""
 msgid "Share this post"
 msgstr ""
 
+#: template/query/app-item.php:25
+msgid "Launch App"
+msgstr ""
+
+#: template/query/app-item.php:35
+msgid "Related Content"
+msgstr ""
+
 #: template/query/download-var-item.php:11
 msgid "Select variable"
 msgstr ""
 
-#: template/query/learn-item.php:31
+#: template/query/learn-item.php:46
 msgid "Format"
+msgstr ""
+
+#: template/query/learn-item.php:95
+msgid "%s minutes"
 msgstr ""
 
 #: template/query/variable-item.php:94
@@ -1358,4 +1407,12 @@ msgstr ""
 
 #: template/query/variable-item.php:138
 msgid "Relevant Sectors"
+msgstr ""
+
+#: template/variable/query.php:66
+msgid "Name (A–Z)"
+msgstr ""
+
+#: template/variable/query.php:67
+msgid "Name (Z–A)"
 msgstr ""

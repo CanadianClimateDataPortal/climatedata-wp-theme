@@ -94,7 +94,8 @@ function child_theme_enqueue() {
 	wp_register_style ( 'gutenberg', $child_theme_dir . 'resources/css/gutenberg.css', null, null );
 	wp_enqueue_style ( 'child-style', $child_theme_dir . 'style.css', NULL, NULL, 'all' );
 
-	if ( is_singular ( 'resource' ) ) {
+	// Load WP native styles for resource and interactive posts
+	if ( is_singular ( 'resource' ) || is_singular ( 'interactive' ) ) {
 		wp_enqueue_style ( 'wp-block-library' );
 		wp_enqueue_style ( 'gutenberg' );
 		wp_enqueue_style ( 'global-styles' );
@@ -169,8 +170,8 @@ function child_theme_enqueue() {
 
 	// GSAP
 
-	wp_register_script ( 'gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.3/gsap.min.js', null, '3.3.3', true );
-	wp_register_script ( 'scrolltrigger', 'https://assets.codepen.io/16327/ScrollTrigger.min.js?v=32', array ( 'gsap' ), null, true );
+	wp_register_script ( 'gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js', null, '3.11.5', true );
+	wp_register_script ( 'scrolltrigger', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js', array ( 'gsap' ), '3.11.5', true );
 	wp_register_script ( 'scroll', $child_js_dir . 'scroll.js', array ( 'jquery', 'scrolltrigger' ), '1.1', true );
 
 	// utilities/constants
@@ -251,6 +252,11 @@ function child_theme_enqueue() {
 
 		wp_enqueue_script ( 'webflow', $child_vendor_dir . 'climatedata-scroll.webflow/webflow.js', array ( 'jquery' ), null, true );
 
+		wp_enqueue_script ( 'gsap' );
+		wp_enqueue_script ( 'scrolltrigger' );
+		wp_enqueue_script ( 'scroll' );
+		wp_enqueue_script ( 'swiper' );
+
 	}
 
 	switch ( $GLOBALS['vars']['current_slug'] ) {
@@ -280,14 +286,13 @@ function child_theme_enqueue() {
 			// wp_enqueue_script ( 'tab-drawer' );
 			break;
 
-		case 'beta-apps' :
-		case 'apps-beta' :
+		case 'apps' :
 			wp_enqueue_script ( 'zebra-pin' );
 			break;
 
 	}
 
-	if ( is_singular ( 'beta-app' ) ) {
+	if ( is_singular ( 'app' ) ) {
 		wp_enqueue_script ( 'iframe-functions', $child_js_dir . 'iframe-functions.js', array ( 'jquery' ), null, true );
 	}
 
@@ -417,16 +422,11 @@ add_action ( 'wp_head', function() {
 
 add_action( 'wp_footer', function() {
 
-	// FB/linkedin share scripts
-
 	if ( is_singular ( 'post' ) ) {
 
 ?>
 
 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
-
-<script src="https://platform.linkedin.com/in.js" type="text/javascript">lang: en_US</script>
-<script type="IN/Share" data-url="https://www.linkedin.com"></script>
 
 <?php
 
@@ -530,24 +530,51 @@ add_action ( 'fw_before_footer', function() {
 
 // DISABLE EDITOR
 
-function remove_default_editor() {
+function cdc_remove_default_editor() {
 	remove_post_type_support ( 'page', 'editor' );
 }
 
 // DISABLE COMMENTS
 
-function remove_comments_admin_menu() {
+function cdc_remove_comments_admin_menu() {
 	remove_menu_page ( 'edit-comments.php' );
 }
 
-function remove_comments_post_type_support() {
+function cdc_remove_comments_post_type_support() {
 	remove_post_type_support ( 'post', 'comments' );
 	remove_post_type_support ( 'page', 'comments' );
 }
 
-function remove_comments_admin_bar() {
+function cdc_remove_comments_admin_bar () {
 	global $wp_admin_bar;
 	$wp_admin_bar->remove_menu ( 'comments' );
+}
+
+/**
+ * Add a 'Display in Learning Zone' column.
+ *
+ * @param array $columns The existing columns.
+ * @return array Modified columns with 'Display in Learning Zone' added.
+ */
+function cdc_add_display_in_learning_zone_column ( $columns ) {
+	return array_merge ( $columns, ['display_in_learning_zone' => __ ( 'Display in Learning Zone', 'cdc' )] );
+}
+
+/**
+ * Display the value of 'display_in_learning_zone' ACF in a readable format.
+ *
+ * @param string $column_key The key of the column being displayed.
+ * @param int $post_id The ID of the current post/page.
+ */
+function cdc_display_in_learning_zone_value ( $column_key, $post_id ) {
+	if ( $column_key == 'display_in_learning_zone' ) {
+		$display_in_learning_zone = get_post_meta ( $post_id, 'display_in_learning_zone', true );
+		if ( $display_in_learning_zone ) {
+			echo '<span style="color:green;">' . __ ( 'Yes', 'cdc') . '</span>';
+		} else {
+			echo '<span style="color:red;">' . __ ( 'No', 'cdc') . '</span>';
+		}
+	}
 }
 
 /**
@@ -564,6 +591,39 @@ function cdc_enable_block_editor( $use_block_editor, $post_type ) {
 	}
 
 	return false;
+}
+
+/**
+ * Updates the `interactive` post type arguments to make it public if loaded by the motion.page editor.
+ *
+ * @param array   $args Array of arguments for registering a post type.
+ * @param string  $post_type Post type key.
+ *
+ * @return array  Array of arguments for registering a post type.
+ */
+function cdc_make_interactive_cpt_public_for_motion_page( $args, $post_type ) {
+	if ( $post_type === 'interactive' ) {
+		// Check if the request is coming from Motion.page
+		if ( isset( $_GET['motionpage_iframe'] ) && $_GET['motionpage_iframe'] == 'true' ) {
+			$args['public'] = true;
+			$args['publicly_queryable'] = true;
+		}
+	}
+	return $args;
+}
+
+/**
+ * Adjusts the current user and permissions if loaded by the Motion.page editor,
+ * making the page appear as if the user is not logged in.
+ *
+ * @return void
+ */
+function cdc_page_as_guest_for_motion_page() {
+	// Check if the request is coming from Motion.page
+	if ( isset( $_GET['motionpage_iframe'] ) && $_GET['motionpage_iframe'] == 'true' ) {
+		// Simulate a non-logged-in user
+		wp_set_current_user( 0 );
+	}
 }
 
 /**
@@ -590,13 +650,21 @@ function cdc_manage_post_columns( $post_columns ) {
 	return $post_columns;
 }
 
-add_action ( 'init', 'remove_default_editor' );
+add_action ( 'init', 'cdc_remove_default_editor' );
 add_action ( 'init', 'cdc_remove_unused_taxonomies' );
-add_action ( 'init', 'remove_comments_post_type_support', 100 );
-add_action ( 'admin_menu', 'remove_comments_admin_menu' );
-add_action ( 'wp_before_admin_bar_render', 'remove_comments_admin_bar' );
+add_action ( 'init', 'cdc_remove_comments_post_type_support', 100 );
+add_action ( 'init', 'cdc_page_as_guest_for_motion_page' );
+add_action ( 'admin_menu', 'cdc_remove_comments_admin_menu' );
+add_action ( 'wp_before_admin_bar_render', 'cdc_remove_comments_admin_bar' );
+add_action ( 'manage_pages_custom_column', 'cdc_display_in_learning_zone_value', 10, 2 );
+add_action ( 'manage_app_posts_custom_column', 'cdc_display_in_learning_zone_value', 10, 2 );
 add_filter ( 'use_block_editor_for_post_type', 'cdc_enable_block_editor', 10, 2 );
 add_filter ( 'manage_post_posts_columns', 'cdc_manage_post_columns', 10, 1 );
+add_filter ( 'manage_pages_columns', 'cdc_add_display_in_learning_zone_column' );
+add_filter ( 'manage_resource_posts_columns', 'cdc_add_display_in_learning_zone_column' );
+add_filter ( 'manage_app_posts_columns', 'cdc_add_display_in_learning_zone_column' );
+add_filter ( 'register_post_type_args', 'cdc_make_interactive_cpt_public_for_motion_page', 10, 2 );
+
 
 //
 // MISC

@@ -142,6 +142,27 @@ const $ = jQuery;
       });
     }
 
+    // CARD LINKS HOVERING
+
+    function handleCardLinkHovering() {
+      if ( $( '.card.has-links' ).length ) {
+        $( '.card.has-links a.hover-toggle' ).hover(
+          function() {
+            $( this ).closest( '.card' ).addClass( 'card-enlarged' );
+          },
+          function() {
+            $( this ).closest( '.card' ).removeClass( 'card-enlarged' );
+          }
+        );
+      }
+    }
+
+    // Initial call on page load
+    handleCardLinkHovering();
+
+    // Bind to fw_query_success event for dynamically loaded content
+    $( document ).on( 'fw_query_success', handleCardLinkHovering );
+
     // TAB DRAWER
 
     $('#menu-tabs').tab_drawer({
@@ -167,7 +188,7 @@ const $ = jQuery;
 
     //
 
-    if ($('body').attr('id') == 'page-feedback') {
+    if ($('body').attr('id') === 'page-feedback' || $('body').attr('id') === 'page-retroaction') {
       const feedback_accordion = document.getElementById('feedback-accordion');
 
       //  replace state on accordion change
@@ -199,7 +220,7 @@ const $ = jQuery;
       if ($('#glossary-list-nav').length) {
         smoothScrollOffset = $('#glossary-list-nav').outerHeight();
       }
-      
+
       const target = $($(this).attr('href'));
 
       if (target.length) {
@@ -233,21 +254,70 @@ const $ = jQuery;
       });
     }
 
-    let scroll_offset = 0;
+    let pinned_item = null;
 
-    if ($('#floating-header').length) {
-      scroll_offset += $('#floating-header').outerHeight();
+    function pin_item() {
+      let scroll_offset = 0;
+
+      if ($('#floating-header').length) {
+        scroll_offset += $('#floating-header').outerHeight();
+      }
+
+      if ($('.query-page #control-bar-tabs').length) {
+        if (pinned_item == null) {
+          pinned_item = new $.Zebra_Pin($('#control-bar-tabs'), {
+            top_spacing: scroll_offset,
+            contain: true,
+          });
+        } else {
+          pinned_item.settings.top_spacing = scroll_offset;
+          pinned_item.update();
+        }
+      }
     }
 
-    if ($('.query-page #control-bar-tabs').length) {
-      new $.Zebra_Pin($('#control-bar-tabs'), {
-        top_spacing: scroll_offset,
-        contained: true,
-      });
+    pin_item();
+
+    if (document.querySelector('#control-bar')) {
+      const resize_observer = new ResizeObserver( pin_item );
+      resize_observer.observe( document.querySelector('#control-bar') );
     }
-    
+
+    /**
+     * Ensure the control bar footer stays at the bottom of the screen while keeping it within its parent container.
+     * Executes at page load, on scroll and on window resize.
+     * Applies to the Apps page, or anywhere the #control-bar-tabs-footer id is used.
+     *
+     * #control-bar-tabs-footer must be initially set to position:fixed & bottom:0 in CSS.
+     * #control-bar-tabs-footer.position-absolute must be width:100%!important in CSS.
+     */
+    if ($('#control-bar-tabs-footer').length) {
+      function updateControlBarFooterPosition() {
+        const controlBar = document.getElementById('control-bar');
+        const footer = document.getElementById('control-bar-tabs-footer');
+        const controlBarRect = controlBar.getBoundingClientRect();
+
+        if (controlBarRect.bottom <= window.innerHeight || controlBarRect.top >= window.innerHeight) {
+          if (!footer.classList.contains('position-absolute')) {
+            footer.classList.add('position-absolute');
+          }
+          footer.style.bottom = '0';
+        } else {
+          if (footer.classList.contains('position-absolute')) {
+            footer.classList.remove('position-absolute');
+          }
+          footer.style.bottom = '0';
+        }
+      }
+
+      updateControlBarFooterPosition();
+      document.addEventListener('scroll', updateControlBarFooterPosition);
+      window.addEventListener('resize', updateControlBarFooterPosition);
+    }
+
     // Functionalities for variable archive page.
     if ($( '.variable-archive-page' ).length > 0) {
+      let isFirstPageLoad = true;
       $( document ).on( 'fw_query_success', function ( e, query_item ) {
         const query_items = query_item.find( '.fw-query-items' );
 
@@ -318,14 +388,14 @@ const $ = jQuery;
         /**
          * Auto-scroll and open variable details if a variable hash exists.
          */
-        if (window.location.hash) {
+        if ( window.location.hash ) {
           const variable_element = $( window.location.hash );
 
-          if (variable_element.length > 0) {
+          if ( variable_element.length > 0 ) {
             const scroll_top = variable_element.parent().position().top;
 
             $( 'html, body' )
-              .animate( {scrollTop: scroll_top}, 10, 'swing' )
+              .animate( { scrollTop: scroll_top }, 10, 'swing' )
               .promise()
               .done( function () {
                 variable_element
@@ -333,7 +403,14 @@ const $ = jQuery;
                   .trigger( 'click' );
               } );
           }
+        } else if ( !isFirstPageLoad ) {
+          // Scroll to the top of the results if not first page load
+          const scroll_top = $( '.query-page' ).position().top;
+
+          $( 'html, body' ).animate( { scrollTop: scroll_top }, 10, 'swing' );
         }
+
+        isFirstPageLoad = false;
       } );
 
       $( document ).on( 'fw_fd_open', function ( e, drawer_item ) {
@@ -346,7 +423,64 @@ const $ = jQuery;
           if (variable_item_hash) { // Check if variable_item_hash is not empty
             window.location.hash = variable_item_hash;
           }
+
+          // Fix jQuery collapse-o-matic duplicate ID bug.
+          const fd_drawer_clone = drawer_item.parent().find( '.fd-drawer' );
+          fd_drawer_clone.find( '.collapseomatic, .collapseomatic_content ' ).each( function () {
+            $( this ).attr( 'id', $( this ).attr( 'id' ) + '_c' );
+
+            if ($( this ).hasClass( 'collapseomatic_content' )) {
+              $( this ).hide();
+            }
+          } );
+
+          // Adjust auto-scroll position.
+          const scroll_top = variable_item.parent().position().top;
+
+          $( 'html, body' ).animate( {scrollTop: scroll_top}, 10, 'swing' );
         }
+      } );
+
+      $( document ).on( 'fw_fd_close', function ( e, drawer_item ) {
+        // Remove the URL hash.
+        const variable_item = drawer_item.find( '.variable-item' );
+
+        if (variable_item.length > 0) {
+          const variable_item_hash = '#' + variable_item.attr( 'id' );
+          const url_hash = window.location.hash;
+
+          if (variable_item_hash === url_hash) {
+            history.replaceState(null, null, ' ');
+          }
+        }
+      } );
+    }
+
+    // Functionalities for learning zone archive page.
+    if ($( '#learn-grid' ).length > 0) {
+      $( document ).on( 'fw_query_no_matches', function ( e, query_item ) {
+        const topic_id = query_item.attr( 'id' );
+
+        // Hide query container and its associated filter.
+        query_item.hide().addClass('no-matches');
+        $( '.learn-zone-topic-filter[data-topic-id="' + topic_id + '"]' ).addClass( 'disabled' );
+
+        // Check if there are no matches in ALL query items.
+        const query_items_count = $('#learn-grid .tab-drawer-bumper > .learn-topic-grid').length;
+        const query_items_no_matches_count = $('#learn-grid .tab-drawer-bumper > .learn-topic-grid.no-matches').length;
+
+        if (query_items_no_matches_count === query_items_count ) {
+          // Show global no matches message.
+          $('.fw-query-items-no-matches').show();
+        }
+      } );
+
+      $( document ).on( 'fw_query_items_retrieved', function ( e, query_item ) {
+        const topic_id = query_item.attr( 'id' );
+
+        // Show query container and its associated filter.
+        query_item.show().removeClass('no-matches');
+        $( '.learn-zone-topic-filter[data-topic-id="' + topic_id + '"]' ).removeClass( 'disabled' );
       } );
     }
 
@@ -417,7 +551,6 @@ const $ = jQuery;
         $(this).fw_query({
           elements: {
             filters: $('#control-bar .fw-query-filter'),
-            sort: $('#sort-menu'),
             reset: $('#control-bar .fw-query-reset'),
           },
         });
@@ -439,7 +572,7 @@ const $ = jQuery;
     }
 
     //
-    // BETA APPS
+    // APPS
     //
 
     if ($('#apps-grid').length) {
@@ -481,13 +614,12 @@ const $ = jQuery;
       the_form.find('.border-danger').removeClass('border-danger');
 
       $.ajax({
-        url: ajax_data.rest_url + 'cdc/v2/submit_feedback',
+        url: ajax_data.rest_url + 'cdc/v2/submit_' + form_namespace, // Use the namespace to target the right API endpoint
         data: {
           form: the_form.serializeArray(),
         },
         dataType: 'json',
         success: function (data) {
-          console.log(data);
 
           alert_header.text(data.header);
 
@@ -499,13 +631,20 @@ const $ = jQuery;
             alert_header.addClass('alert alert-warning');
 
             data.invalid.forEach(function (input) {
-              the_form.find('[name="' + input + '"]').addClass('border-danger');
+              const $input = the_form.find('[name="' + input + '"]');
+              const $parent = $input.closest('.error-input-parent');
+
+              if ($parent.length) {
+                $parent.addClass('border-danger');
+              } else {
+                $input.addClass('border-danger');
+              }
             });
           }
 
           if (data.mail == 'success') {
             alert_header.addClass('alert alert-success');
-            the_form.find('.submit-btn').addClass('disabled');
+            the_form[0].reset();
           } else {
             alert_header.addClass('alert alert-warning');
           }
@@ -525,9 +664,200 @@ const $ = jQuery;
     });
 
     //
+    // Learn block GSAP Animation on front page
+    //
+
+    if ($( '#page-home' ).length) {
+      gsap.registerPlugin(ScrollTrigger);
+      const mm = gsap.matchMedia();
+
+      // Add GSAP animations after the "lg" breakpoint (992px) is reached
+      mm.add( '(min-width: 992px)', () => {
+        $( '.scroll-card' ).each(function () {
+          const card = this;
+          const isLastCard = $( card ).closest( '.fw-query-item' ).is( ':last-child' );
+
+          // Set pointer-events to none at the beginning for every card
+          $( card ).css( 'pointer-events', 'none' );
+
+          // Define common properties
+          const fromToProps = {
+            y: '-85%',
+            opacity: 0,
+            scale: 0.75,
+            zIndex: 0,
+          };
+
+          const toProps1 = {
+            y: '-15%',
+            opacity: 1,
+            scale: 1,
+            zIndex: 100,
+            onStart: function() {
+              $(card).css('pointer-events', ''); // Enable pointer-events as soon as the animation starts
+            },
+            onReverseComplete: function() {
+              $(card).css('pointer-events', 'none'); // Disable pointer-events when reversing the animation
+            },
+          };
+
+          const toProps2 = {
+            y: '55%',
+            opacity: 0,
+            scale: 0.75,
+            zIndex: 0,
+            ease: 'power2.in',
+            onComplete: function() {
+              $(card).css('pointer-events', 'none');  // Disable pointer-events when this animation is complete
+            },
+            onReverseComplete: function() {
+              $(card).css('pointer-events', '');  // Enable pointer-events when this animation is complete on reverse
+            },
+          };
+
+          // Customize properties for the last card
+          if ( isLastCard ) {
+            toProps2.y = '0%';
+            toProps2.opacity = 1;
+            toProps2.scale = 1;
+            toProps2.zIndex = 100;
+          }
+
+          const timeline = gsap.timeline({
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 100%',
+              end: 'top -50%',
+              scrub: true,
+              markers: false,    // Set to true to debug
+              onLeave: function() {
+                $( card ).css( 'pointer-events', 'none' );  // Disable pointer-events when card leaves
+              },
+              onEnterBack: function() {
+                $(card).css( 'pointer-events', '' );  // Disable pointer-events when card enters back
+              },
+            }
+          });
+
+          timeline
+            .fromTo(card, fromToProps, fromToProps)
+            .to(card, toProps1)
+            .to(card, toProps2);
+        });
+      } );
+
+      //
+      // Learn block Swiper Carousel on front page
+      //
+
+      // Function to add AOS attributes to the resources container when window width is under 992px
+      function applyResourcesAosAttributes() {
+        const resourcesContainer = document.querySelector('#resources-query');
+        
+        if (window.innerWidth < 992) {
+          // Add AOS attributes
+          resourcesContainer.setAttribute('data-aos', 'fade-up');
+          resourcesContainer.setAttribute('data-aos-easing', 'ease-in-out-quad');
+          resourcesContainer.setAttribute('data-aos-duration', '1000');
+          resourcesContainer.setAttribute('data-aos-delay', '250');
+          resourcesContainer.setAttribute('data-aos-index', '0');
+
+          AOS.init();     // Initialize AOS if not already done
+          AOS.refresh();  // Refresh AOS to detect new attributes
+        } else {
+          // Remove AOS attributes if window width is 992px or more
+          resourcesContainer.removeAttribute('data-aos');
+          resourcesContainer.removeAttribute('data-aos-easing');
+          resourcesContainer.removeAttribute('data-aos-duration');
+          resourcesContainer.removeAttribute('data-aos-delay');
+          resourcesContainer.removeAttribute('data-aos-index');
+        }
+      }
+
+      // Function to initialize Swiper
+      function initializeResourcesSwiper() {
+        const queryItemsContainer = document.querySelector('#resources-query .query-container');
+        const queryItemsWrapper = document.querySelector('#resources-query .fw-query-items');
+        const queryItemElements = document.querySelectorAll('#resources-query .fw-query-items .fw-query-item');
+
+        // Add the 'swiper-container' class to #resources-query .query-container
+        if (queryItemsContainer) {
+          queryItemsContainer.classList.add('swiper-container');
+
+          // Create and append the 'swiper-pagination' element
+          const paginationElement = document.createElement('div');
+          paginationElement.classList.add('swiper-pagination');
+          queryItemsContainer.appendChild(paginationElement);
+        }
+
+        // Add the 'swiper-wrapper' class to #resources-query .fw-query-items
+        if (queryItemsWrapper) {
+          queryItemsWrapper.classList.add('swiper-wrapper');
+        }
+
+        // Add the 'swiper-slide' class to each .fw-query-item element
+        queryItemElements.forEach(item => {
+          item.classList.add('swiper-slide');
+        });
+
+        // Initialize Swiper
+        const resourcesSwiper = new Swiper('#resources-query .swiper-container', {
+          slidesPerView: 1,
+          breakpoints: {
+            0: {
+              enabled: true,
+              slidesPerView: 1,
+            },
+            576: {
+              enabled: true,
+              slidesPerView: 2,
+            },
+            992: {
+              enabled: false,  // Disable Swiper for lg screens and up
+            },
+          },
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+            type: 'bullets',
+          }
+        });
+      }
+
+      // Initial call to apply AOS attributes and initialize Swiper on resources
+      applyResourcesAosAttributes();
+      initializeResourcesSwiper();
+
+      // Listen for window resize events to re-apply AOS attributes and refresh AOS when necessary
+      $(window).resize(function () {
+        applyResourcesAosAttributes();
+        AOS.refresh();
+      });
+
+    };
+
+    //
     // MISC
     //
 
     $('body').removeClass('spinner-on');
+
+    //
+    // Add 'scrolled' class on body after 50px scroll.
+    //
+
+    function toggleBodyScrolledClass() {
+      if ( $( window ).scrollTop() > 50 ) {
+        $( 'body' ).addClass( 'scrolled' );
+      } else {
+        $( 'body' ).removeClass( 'scrolled' );
+      }
+    }
+
+    $( window ).on( 'scroll', toggleBodyScrolledClass );
+
+    $( toggleBodyScrolledClass );
+
   });
-})(jQuery);
+
+})( jQuery );

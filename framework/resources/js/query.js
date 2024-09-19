@@ -208,17 +208,20 @@
 			if (options.elements.sort != null) {
 				options.elements.sort.on('click', 'li', function(e) {
 					
-					let sort = $(this).attr('data-sort').split('_')
+					const dataSort = $(this).attr('data-sort');
+					const lastUnderscoreIndex = dataSort.lastIndexOf('_');
 					
-					options.args.orderby = sort[0]
-					options.args.order = sort[1]
+					const orderby = dataSort.substring(0, lastUnderscoreIndex);
+					const order = dataSort.substring(lastUnderscoreIndex + 1);
 					
-					options.elements.sort.find('li').removeClass('selected')
-					$(this).addClass('selected')
+					options.args.orderby = orderby;
+					options.args.order = order;
 					
-					plugin.do_query()
+					options.elements.sort.find('li').removeClass('selected');
+					$(this).addClass('selected');
 					
-				})
+					plugin.do_query();
+				});
 			}
 			
 			// pagination
@@ -303,7 +306,7 @@
 			
 			if (options.args.meta_query) {
 				if (options.default_args.meta_query) {
-					options.args.meta_query = { ...options.default_args.meta_query }
+					options.args.meta_query = [ ...options.default_args.meta_query ]
 				} else {
 					delete options.args.meta_query
 				}
@@ -531,8 +534,6 @@
 			
 			if (options.debug == true) console.log('do query')
 			
-			// console.log('options', options.item_options)
-			
 			let rest_url = ajax_data.rest_url + 'framework/v2/query'
 			
 			$.ajax({
@@ -549,8 +550,8 @@
 					lang: options.lang
 				},
 				success: function(data) {
-					
-					// console.log(data)
+					// Hide global no matches message.
+					$('.fw-query-items-no-matches').hide();
 					
 					if (data.success == true) {
 						
@@ -587,10 +588,8 @@
 							};
 							
 							plugin.generate_pagination_links( pagination_data );
-
+							
 							data.items.forEach(function(item, i) {
-								
-								// console.log(item)
 								
 								let new_item = options.template.clone()
 								
@@ -600,10 +599,14 @@
 							
 						}
 						
+						$(document).trigger('fw_query_items_retrieved', [item])
+
 					} else {
 						
 						options.elements.item_container.html('<p class="alert alert-warning">' + data.message + '</a>')
 						
+						$(document).trigger('fw_query_no_matches', [item])
+
 					}
 					
 					if (plugin.debug == true) {
@@ -614,8 +617,8 @@
 						callback()
 					}
 					
-					$(document).trigger('fw_query_success', [item])
-					
+					$(document).trigger('fw_query_success', [item]);
+
 				}
 			})
 			

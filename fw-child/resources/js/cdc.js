@@ -811,8 +811,7 @@
 
                     return $.ajax({
                       url:
-                        theme_data.child_theme_dir +
-                        '/resources/app/ahccd/ahccd.json',
+                        `${geoserver_url}/fileserver/ahccd/ahccd.json`,
                       dataType: 'json',
                       success: function (data) {
                         options.ahccd_data = data;
@@ -852,8 +851,7 @@
 
                       return $.ajax({
                         url:
-                          theme_data.child_theme_dir +
-                          '/resources/app/ahccd/ahccd.json',
+                          `${geoserver_url}/fileserver/ahccd/ahccd.json`,
                         dataType: 'json',
                         success: function (data) {
                           options.ahccd_data = data;

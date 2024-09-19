@@ -262,26 +262,7 @@ function custom_theme_setup() {
 			'menu_slug' => 'taxonomies',
 			'parent_slug' => 'theme-settings',
 		) );
-		
-		// 
-		// acf_add_options_sub_page ( array (
-		// 	'page_title'  => 'Header',
-		// 	'menu_title'  => 'Header',
-		// 	'parent_slug' => 'theme-settings',
-		// ) );
-		// 
-		// acf_add_options_sub_page ( array (
-		// 	'page_title'  => 'Footer',
-		// 	'menu_title'  => 'Footer',
-		// 	'parent_slug' => 'theme-settings',
-		// ) );
-		// 
-		// acf_add_options_sub_page ( array (
-		// 	'page_title'  => 'Components',
-		// 	'menu_title'  => 'Component Settings',
-		// 	'parent_slug' => 'theme-settings',
-		// ) );
-	
+
 	}
 
 }

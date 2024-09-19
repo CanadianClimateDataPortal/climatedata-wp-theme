@@ -69,7 +69,7 @@ function posttype_variable()
         'can_export' => true,
         'has_archive' => false,
         'exclude_from_search' => false,
-        'publicly_queryable' => true,
+        'publicly_queryable' => false,
         'capability_type' => 'page',
         'show_in_rest' => true,
     ];
@@ -274,15 +274,15 @@ function posttype_definition() {
 }
 add_action( 'init', 'posttype_definition', 0 );
 
-// beta apps
+// Apps
 
 function posttype_app() {
 
     $labels = array(
-        'name'                  => _x( 'Beta Apps', 'Post Type General Name', 'cdc-post-types' ),
-        'singular_name'         => _x( 'Beta App', 'Post Type Singular Name', 'cdc-post-types' ),
-        'menu_name'             => __( 'Beta Apps', 'cdc-post-types' ),
-        'name_admin_bar'        => __( 'Beta Apps', 'cdc-post-types' ),
+        'name'                  => _x( 'Apps', 'Post Type General Name', 'cdc-post-types' ),
+        'singular_name'         => _x( 'App', 'Post Type Singular Name', 'cdc-post-types' ),
+        'menu_name'             => __( 'Apps', 'cdc-post-types' ),
+        'name_admin_bar'        => __( 'Apps', 'cdc-post-types' ),
         'archives'              => __( 'App Archives', 'cdc-post-types' ),
         'attributes'            => __( 'App Attributes', 'cdc-post-types' ),
         'parent_item_colon'     => __( 'Parent App:', 'cdc-post-types' ),
@@ -308,7 +308,7 @@ function posttype_app() {
         'filter_items_list'     => __( 'Filter items list', 'cdc-post-types' ),
     );
     $args = array(
-        'label'                 => __( 'Beta App', 'cdc-post-types' ),
+        'label'                 => __( 'App', 'cdc-post-types' ),
         'description'           => __( 'Post Type Description', 'cdc-post-types' ),
         'labels'                => $labels,
         'supports'              => array( 'title', 'thumbnail', 'custom-fields' ),
@@ -326,7 +326,7 @@ function posttype_app() {
         'publicly_queryable'    => true,
         'capability_type'       => 'page',
     );
-    register_post_type( 'beta-app', $args );
+    register_post_type( 'app', $args );
 
 }
 add_action( 'init', 'posttype_app', 0 );
@@ -340,25 +340,48 @@ add_action( 'init', 'posttype_app', 0 );
  * @return void
  */
 function cdc_variable_update_tax_sector_terms( $post_id ) {
-	// Get relevant sectors.
-	$relevant_sectors = get_field( 'relevant_sectors', $post_id );
+    $post_type = get_post_type( $post_id );
 
-	// Check if relevant sectors are available.
-	if ( ! is_array( $relevant_sectors ) || empty( $relevant_sectors ) ) {
-		return;
-	}
+    if ( $post_type === 'variable' ) {
 
-	// Extract term IDs from the relevant sectors.
-	$term_ids = array();
+        // Get relevant sectors.
+        $relevant_sectors = get_field( 'relevant_sectors', $post_id );
 
-	foreach ( $relevant_sectors as $sector ) {
-		if ( isset( $sector['sector_term'] ) && is_object( $sector['sector_term'] ) ) {
-			$term_ids[] = $sector['sector_term']->term_id;
-		}
-	}
+        // Check if relevant sectors are available.
+        if ( empty( $relevant_sectors ) ) {
+            $relevant_sectors = array();
+        }
 
-	// Update the 'sector' taxonomy terms.
-	wp_set_post_terms( $post_id, $term_ids, 'sector', false );
+        // Extract term IDs from the relevant sectors.
+        $term_ids = array();
+        
+        foreach ( $relevant_sectors as $sector ) {
+            if ( isset( $sector['sector_term'] ) && is_object( $sector['sector_term'] ) ) {
+                $term_ids[] = $sector['sector_term']->term_id;
+            }
+        }
+
+        // Update the 'sector' taxonomy terms.
+        wp_set_post_terms( $post_id, $term_ids, 'sector', false );
+    }
 }
 
 add_action( 'acf/save_post', 'cdc_variable_update_tax_sector_terms' );
+
+
+/**
+ * Set asset type based on post type when saving a post.
+ *
+ * @param int $post_id The ID of the post being saved.
+ */
+function cdc_set_asset_type_for_posts( $post_id ) {
+    $post_type = get_post_type( $post_id );
+    
+    if ( $post_type === 'app' ) {
+        update_field( 'asset_type', 'app', $post_id );
+    } elseif ( $post_type === 'page' ) {
+        update_field( 'asset_type', 'article', $post_id );
+    }
+}
+
+add_action( 'acf/save_post', 'cdc_set_asset_type_for_posts' );

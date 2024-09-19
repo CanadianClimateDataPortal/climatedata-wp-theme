@@ -12,6 +12,9 @@ $current_lang = 'en';
 if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), true ) ) {
 	$current_lang = $item['lang'];
 }
+
+// Get post time in default Unix format
+$post_time = get_post_time( 'U', false, $item['id'] );
 ?>
 
 <div class="card card--news">
@@ -36,7 +39,11 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 
 		<div class="card-date mb-1">
 			<?php
-			echo get_post_time( 'F j, Y', false, $item['id'] ); ?>
+
+				// Echo post time in current language
+				echo date_i18n( __( 'F j, Y', 'cdc' ), $post_time );
+
+			?>
 		</div>
 
 		<?php

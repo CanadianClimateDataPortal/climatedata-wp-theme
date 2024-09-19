@@ -117,7 +117,7 @@
 										</li>
 										<?php
 									}
-									// Reset post data after each query.
+
 									wp_reset_postdata();
 								}
 								?>
@@ -126,22 +126,22 @@
 							
 							<?php
 							
-								foreach ( array ( 'sector', 'region', 'tech_level' ) as $filter_tax ) {
-									
-									$tax_obj = get_taxonomy ( $filter_tax );
-									
-									$this_heading = $tax_obj->labels->singular_name;
-									
-									if ( get_field ( 'tax_' . $filter_tax . '_title_single_' . $GLOBALS['fw']['current_lang_code'], 'option' ) != '' ) {
-										$this_heading = get_field ( 'tax_' . $filter_tax . '_title_single_' . $GLOBALS['fw']['current_lang_code'], 'option' );
-									}
+							foreach ( array( 'topic', 'sector', 'region', 'tech_level' ) as $filter_tax ) {
+								
+								$tax_obj = get_taxonomy ( $filter_tax );
+								
+								$this_heading = $tax_obj->labels->singular_name;
+								
+								if ( get_field ( 'tax_' . $filter_tax . '_title_single_' . $GLOBALS['fw']['current_lang_code'], 'option' ) != '' ) {
+									$this_heading = get_field ( 'tax_' . $filter_tax . '_title_single_' . $GLOBALS['fw']['current_lang_code'], 'option' );
+								}
 
-									$filter_multi = "false";
+								$filter_multi = "false";
 
-									if ( in_array( $filter_tax, array( 'sector', 'region') ) ) {
-										$filter_multi = "true";
-									}
-							?>
+								if ( in_array( $filter_tax, array( 'sector', 'region') ) ) {
+									$filter_multi = "true";
+								}
+								?>
 							
 							<div class="fw-query-filter ms-3 py-4 border-bottom" data-filter-type="taxonomy" data-filter-key="<?php echo $filter_tax; ?>" data-filter-multi="<?php echo $filter_multi; ?>">
 								<h5 class="fw-bold"><?php echo $this_heading; ?></h5>
@@ -159,36 +159,29 @@
 								
 								<ul class="list-unstyled m-0 pe-2">
 									<?php
-									
-										foreach ( $all_tags as $tag ) {
+									foreach ( $all_tags as $the_tag ) {
 
-											if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
-												$tag_name = get_field( 'admin_term_title_' . $GLOBALS['fw']['current_lang_code'], $tag );
-											} else {
-												$tag_name = $tag->name;
-											}
-											
-									?>
-									
-									<li class="filter-item" data-key="<?php echo $filter_tax; ?>" data-value="<?php echo $tag->slug; ?>"><?php echo $tag_name; ?></li>
-									
-									<?php
-									
+										if ( 'en' !== $GLOBALS['fw']['current_lang_code'] ) {
+											$tag_name = get_field( 'admin_term_title_' . $GLOBALS['fw']['current_lang_code'], $the_tag );
+										} else {
+											$tag_name = $the_tag->name;
 										}
-								
+										
+										?>
+									
+									<li class="filter-item" data-key="<?php echo $filter_tax; ?>" data-value="<?php echo $the_tag->slug; ?>"><?php echo $tag_name; ?></li>
+									
+										<?php
+									}
 									?>
 								</ul>
-								<?php
-									
-									}
-								
-									?>
+									<?php
+								}
+								?>
 							</div>
 							
-							<?php
-							
-								}
-						
+								<?php
+							}
 							?>
 							
 						</div>

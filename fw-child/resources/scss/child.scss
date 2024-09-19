@@ -766,15 +766,19 @@ $control-slider-handle-width: 2.75rem;
   }
 
   .filter-item {
-    color: $gray-600;
+    position: relative;
+    padding-left: 1.75rem;
     margin-bottom: 0.25rem;
+    color: $gray-600;
 
     &:before {
       content: '';
       display: inline-block;
+      position: absolute;
+      left: 0;
       width: 0.75rem;
       height: 0.75rem;
-      margin-right: 1rem;
+      margin-top: .375rem;
       border-radius: 50%;
       background-color: $gray-400;
       transition: 0.25s;

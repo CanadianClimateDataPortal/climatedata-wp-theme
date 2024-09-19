@@ -255,6 +255,19 @@ const $ = jQuery;
     }
 
     let pinned_item = null;
+    let isControlbarAbsolute = false; // Track the current position state
+
+    function toggleClassOnControlbarAbsolute() {
+      if (pinned_item && $('#control-bar-tabs').css('position') === 'absolute' && !isControlbarAbsolute) {
+        // The element switched to position 'absolute'
+        $('#control-bar-tabs').addClass('opacity-20');
+        isControlbarAbsolute = true;
+      } else if ($('#control-bar-tabs').css('position') !== 'absolute' && isControlbarAbsolute) {
+        // The element switched back to position 'fixed' or another position
+        $('#control-bar-tabs').removeClass('opacity-20');
+        isControlbarAbsolute = false;
+      }
+    }
 
     function pin_item() {
       let scroll_offset = 0;
@@ -270,6 +283,9 @@ const $ = jQuery;
             contain: true,
             class_name: 'tab-drawer-tabs--fixed',
           });
+
+          $(window).on('scroll resize', toggleClassOnControlbarAbsolute);
+
         } else {
           pinned_item.settings.top_spacing = scroll_offset;
           pinned_item.update();
@@ -280,8 +296,8 @@ const $ = jQuery;
     pin_item();
 
     if (document.querySelector('#control-bar')) {
-      const resize_observer = new ResizeObserver( pin_item );
-      resize_observer.observe( document.querySelector('#control-bar') );
+      const resize_observer = new ResizeObserver(pin_item);
+      resize_observer.observe(document.querySelector('#control-bar'));
     }
 
     /**

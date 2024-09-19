@@ -725,6 +725,7 @@ $control-slider-handle-width: 2.75rem;
 
 #control-bar-tabs {
   width: 100%;
+  transition: opacity .25s;
 }
 
 #control-bar-secondary,

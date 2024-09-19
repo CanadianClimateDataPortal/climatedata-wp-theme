@@ -2,13 +2,13 @@
 	<div id="control-bar" class="control-bar tab-drawer-tabs-container">
 		
 		<div id="control-bar-tabs" class="tab-drawer-tabs">
-			<a href="#topics" class="control-bar-tab-link tab-drawer-trigger">
+			<a href="#modules" class="control-bar-tab-link tab-drawer-trigger">
 				<span class="cdc-icon"><?php
 				
 					echo file_get_contents ( locate_template ( 'resources/img/icon-topic.svg' ) );
 					
 				?></span>
-				<span><?php _e ( 'Topics', 'cdc' ); ?></span>
+				<span><?php _e ( 'Modules', 'cdc' ); ?></span>
 			</a>
 			
 			<a href="#filters" class="control-bar-tab-link tab-drawer-trigger">
@@ -23,11 +23,11 @@
 		
 		<div id="tab-drawer-container" class="tab-drawer-container">
 			
-			<div id="topics" class="tab-drawer">
+			<div id="modules" class="tab-drawer">
 				<div class="tab-drawer-content stick">
 					<div class="tab-drawer-content-inner">
 						<div class="control-tab-head d-flex justify-content-between align-items-center">
-							<h5 class="me-auto mb-0 text-secondary"><?php _e ( 'Topics', 'cdc' ); ?></h5>
+							<h5 class="me-auto mb-0 text-secondary"><?php _e ( 'Modules', 'cdc' ); ?></h5>
 							<span class="tab-drawer-close btn-close"></span>
 						</div>
 						

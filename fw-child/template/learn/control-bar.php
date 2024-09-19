@@ -135,10 +135,15 @@
 									if ( get_field ( 'tax_' . $filter_tax . '_title_single_' . $GLOBALS['fw']['current_lang_code'], 'option' ) != '' ) {
 										$this_heading = get_field ( 'tax_' . $filter_tax . '_title_single_' . $GLOBALS['fw']['current_lang_code'], 'option' );
 									}
-									
+
+									$filter_multi = "false";
+
+									if ( in_array( $filter_tax, array( 'sector', 'region') ) ) {
+										$filter_multi = "true";
+									}
 							?>
 							
-							<div class="fw-query-filter ms-3 py-4 border-bottom" data-filter-type="taxonomy" data-filter-key="<?php echo $filter_tax; ?>" data-filter-multi="false">
+							<div class="fw-query-filter ms-3 py-4 border-bottom" data-filter-type="taxonomy" data-filter-key="<?php echo $filter_tax; ?>" data-filter-multi="<?php echo $filter_multi; ?>">
 								<h5 class="fw-bold"><?php echo $this_heading; ?></h5>
 								
 								<?php
@@ -174,10 +179,10 @@
 									?>
 								</ul>
 								<?php
-								
+									
 									}
-							
-								?>
+								
+									?>
 							</div>
 							
 							<?php

@@ -55,9 +55,9 @@ $excerpts = array (
 						$format_name = __( 'Video', 'cdc' );
 
 						break;
-					case 'audio':
+					case 'podcast':
 						$format_icon = 'fas fa-microphone';
-						$format_name = __( 'Audio', 'cdc' );
+						$format_name = __( 'Podcast', 'cdc' );
 
 						break;
 					case 'interactive':

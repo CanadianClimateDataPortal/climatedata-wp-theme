@@ -86,7 +86,7 @@
 								
 								<ul class="list-unstyled m-0 pe-2">
 									<li class="filter-item" data-key="asset_type" data-value="video"><?php _e ( 'Video', 'cdc' ); ?></li>
-									<li class="filter-item" data-key="asset_type" data-value="audio"><?php _e ( 'Audio', 'cdc' ); ?></li>
+									<li class="filter-item" data-key="asset_type" data-value="podcast"><?php _e ( 'Podcast', 'cdc' ); ?></li>
 									<li class="filter-item" data-key="asset_type" data-value="interactive"><?php _e ( 'Interactive', 'cdc' ); ?></li>
 									<li class="filter-item" data-key="asset_type" data-value="article"><?php _e ( 'Article', 'cdc' ); ?></li>
 									<li class="filter-item" data-key="asset_type" data-value="app"><?php _e ( 'App', 'cdc' ); ?></li>

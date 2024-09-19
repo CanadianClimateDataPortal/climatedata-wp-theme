@@ -107,7 +107,7 @@
 					
 					<select name="post_meta-asset_type" class="form-select">
 						<option value="video">Video</option>
-						<option value="audio">Audio</option>
+						<option value="podcast">Podcast</option>
 						<option value="interactive">Interactive</option>
 						<option value="article">Article</option>
 					</select>

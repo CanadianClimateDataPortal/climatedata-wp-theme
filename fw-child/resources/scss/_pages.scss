@@ -2136,11 +2136,29 @@ body.tab-drawer-open {
 #app-breadcrumb {
   .breadcrumb {
     --bs-breadcrumb-margin-bottom: 0;
+
+    a {
+      color: $gray-800;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+      color: $gray-800;
+    }
   }
 }
 
 #app-container {
   height: 100vh;
+
+  #header-lang {
+    a {
+      color: $gray-600;
+
+      &.current-nav-link {
+        color: $blue-200;
+      }
+    }
+  }
 }
 
 #app-frame {

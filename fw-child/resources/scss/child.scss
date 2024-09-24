@@ -469,10 +469,11 @@ $control-slider-handle-width: 2.75rem;
 
 #header-breadcrumb,
 #app-breadcrumb {
-  overflow-x: auto;
+  display: none;
+  overflow-x: visible;
 
   @include media-breakpoint-up(lg) {
-    overflow-x: visible;
+    display: block;
   }
 
   .breadcrumb {
@@ -484,30 +485,6 @@ $control-slider-handle-width: 2.75rem;
 
       @include media-breakpoint-up(lg) {
         font-size: 1.25rem;
-      }
-
-      &:first-child {
-        display: none;
-
-        @include media-breakpoint-up(lg) {
-          display: list-item;
-        }
-
-        & + li::before {
-          display: none;
-
-          @include media-breakpoint-up(lg) {
-            display: block;
-          }
-        }
-      }
-
-      &.active {
-        display: none;
-
-        @include media-breakpoint-up(lg) {
-          display: list-item;
-        }
       }
     }
   }

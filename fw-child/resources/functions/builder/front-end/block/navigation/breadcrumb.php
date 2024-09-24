@@ -6,25 +6,26 @@
 <nav aria-label="breadcrumb">
 	<ol class="breadcrumb">
 		<?php
-		// Static parents.
+		// Show static parents only if it has ancestors, or if there is more than 1 static parent.
+		if (
+			( $element['inputs']['include']['ancestors'] && ! empty( $globals['current_ancestors'][0] ) )
+			|| count( $element['inputs']['static']['rows'] ) > 1
+		) {
 
-		foreach ( $element['inputs']['static']['rows'] as $static_parent ) {
+			foreach ( $element['inputs']['static']['rows'] as $static_parent ) {
 
-			$static_title = get_the_title( $static_parent['page'] );
+				$static_title = get_the_title( $static_parent['page'] );
 
-			if (
-				isset( $static_parent['text'][ $globals['current_lang_code'] ] ) &&
-				! empty( $static_parent['text'][ $globals['current_lang_code'] ] )
-			) {
-				$static_title = $static_parent['text'][ $globals['current_lang_code'] ];
+				if ( ! empty( $static_parent['text'][ $globals['current_lang_code'] ] ) ) {
+					$static_title = $static_parent['text'][ $globals['current_lang_code'] ];
+				}
+
+				?>
+
+			<li class="breadcrumb-item"><a href="<?php echo esc_url( translate_permalink( get_permalink( $static_parent['page'] ), $static_parent['page'], $globals['current_lang_code'] ) ); ?>"><?php echo esc_html( $static_title ); ?></a>
+
+				<?php
 			}
-
-			?>
-
-		<li class="breadcrumb-item"><a href="<?php echo esc_url( translate_permalink( get_permalink( $static_parent['page'] ), $static_parent['page'], $globals['current_lang_code'] ) ); ?>"><?php echo esc_html( $static_title ); ?></a>
-
-			<?php
-
 		}
 
 		// Posts page.

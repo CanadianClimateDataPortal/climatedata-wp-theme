@@ -101,7 +101,7 @@ body.scrolled {
 .header-fixed-menu {
   &.on-white {
     #header-menu-icon {
-      color: $black;
+      color: $gray-800;
       transition: color 500ms;
     }
   }

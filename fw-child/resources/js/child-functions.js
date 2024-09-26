@@ -255,17 +255,17 @@ const $ = jQuery;
     }
 
     let pinned_item = null;
-    let isControlbarAbsolute = false; // Track the current position state
+    let isControlBarAbsolute = false; // Track the current position state
 
     function toggleClassOnControlbarAbsolute() {
-      if (pinned_item && $('#control-bar-tabs').css('position') === 'absolute' && !isControlbarAbsolute) {
+      if (pinned_item && $('#control-bar-tabs').css('position') === 'absolute' && !isControlBarAbsolute) {
         // The element switched to position 'absolute'
         $('#control-bar-tabs').addClass('opacity-20');
-        isControlbarAbsolute = true;
-      } else if ($('#control-bar-tabs').css('position') !== 'absolute' && isControlbarAbsolute) {
+        isControlBarAbsolute = true;
+      } else if ($('#control-bar-tabs').css('position') !== 'absolute' && isControlBarAbsolute) {
         // The element switched back to position 'fixed' or another position
         $('#control-bar-tabs').removeClass('opacity-20');
-        isControlbarAbsolute = false;
+        isControlBarAbsolute = false;
       }
     }
 
@@ -854,19 +854,42 @@ const $ = jQuery;
     };
 
     //
-    // Dynamic logo block display scroll behavior
+    // Dynamic logo block display scroll and resize behavior
     //
-    if ( $( '#menu-trigger' ).length && $( '#hero' ).length ) {
-      $( window ).on( 'scroll', function() {
-        const menuButtonBottom = $( '#menu-trigger' ).offset().top + $( '#menu-trigger' ).outerHeight();
-        const menuHeaderHamburgerHeight = $( '#menu-trigger' ).outerHeight();
-        const elementAfterHero = $( '#hero' ).next();
-        const { top: elementAfterHeroTop } = elementAfterHero.offset();
+    const $menuTrigger = $( '#menu-trigger' );
+    const $hero = $( '#hero' );
+    const $footer = $( '#main-footer' );
+    
+    if ( $menuTrigger.length && $hero.length ) {
+      let menuHeaderHamburgerHeight = $menuTrigger.outerHeight();
+      let $elementAfterHero = $hero.next();
+      let pageHasFilters = $elementAfterHero.hasClass( 'query-page' );
+      let footerTop = $footer.offset().top;
+    
+      function updateLayoutValues() {
+        // Update values that change on resize
+        menuHeaderHamburgerHeight = $menuTrigger.outerHeight();
+        $elementAfterHero = $hero.next();
+        footerTop = $footer.offset().top;
+        pageHasFilters = $elementAfterHero.hasClass( 'query-page' );
+      }
+    
+      function toggleOnWhiteClass() {
+        const menuButtonBottom = $menuTrigger.offset().top + menuHeaderHamburgerHeight;
+        const { top: elementAfterHeroTop } = $elementAfterHero.offset();
         const isHeaderOverlap = menuButtonBottom - ( menuHeaderHamburgerHeight / 2 ) >= elementAfterHeroTop;
-        const pageHasFilters = elementAfterHero.hasClass( 'query-page' );
-        const addOnWhiteClass = isHeaderOverlap && !pageHasFilters;
-
+        const isOverFooter = menuButtonBottom >= footerTop;
+    
+        const addOnWhiteClass = ( isHeaderOverlap && !pageHasFilters ) || isOverFooter;
+    
         $( '#floating-header' ).toggleClass( 'on-white', addOnWhiteClass );
+      }
+    
+      $( window ).on( 'load scroll resize', () => {
+        if (event.type === 'resize') {
+          updateLayoutValues();
+        }
+        toggleOnWhiteClass();
       });
     }
 

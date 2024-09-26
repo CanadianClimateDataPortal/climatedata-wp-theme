@@ -260,11 +260,11 @@ const $ = jQuery;
     function toggleClassOnControlbarAbsolute() {
       if (pinned_item && $('#control-bar-tabs').css('position') === 'absolute' && !isControlBarAbsolute) {
         // The element switched to position 'absolute'
-        $('#control-bar-tabs').addClass('opacity-20');
+        $('#control-bar-tabs').addClass('opacity-10');
         isControlBarAbsolute = true;
       } else if ($('#control-bar-tabs').css('position') !== 'absolute' && isControlBarAbsolute) {
         // The element switched back to position 'fixed' or another position
-        $('#control-bar-tabs').removeClass('opacity-20');
+        $('#control-bar-tabs').removeClass('opacity-10');
         isControlBarAbsolute = false;
       }
     }

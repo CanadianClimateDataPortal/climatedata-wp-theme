@@ -5,7 +5,7 @@
 			<a href="#modules" class="control-bar-tab-link tab-drawer-trigger">
 				<span class="cdc-icon"><?php
 				
-					echo file_get_contents ( locate_template ( 'resources/img/icon-topic.svg' ) );
+					echo file_get_contents ( locate_template ( 'resources/img/icon-module.svg' ) );
 					
 				?></span>
 				<span><?php _e ( 'Modules', 'cdc' ); ?></span>
@@ -33,28 +33,28 @@
 						
 						<div class="control-tab-body">
 							<?php
-							$tax_topic_terms = get_terms(
+							$tax_module_terms = get_terms(
 								array(
-									'taxonomy'   => 'topic',
+									'taxonomy'   => 'module',
 									'hide_empty' => true,
 								)
 							);
 
-							foreach ( $tax_topic_terms as $topic_term ) {
+							foreach ( $tax_module_terms as $module_term ) {
 								?>
-								<div class="learn-zone-topic-filter position-relative px-3 py-4 border-bottom"
-									 data-topic-id="topic-<?php echo esc_attr( $topic_term->term_id ); ?>">
-									<a href="#topic-<?php echo esc_attr( $topic_term->term_id ); ?>"
+								<div class="learn-zone-module-filter position-relative px-3 py-4 border-bottom"
+									 data-module-id="module-<?php echo esc_attr( $module_term->term_id ); ?>">
+									<a href="#module-<?php echo esc_attr( $module_term->term_id ); ?>"
 									   class="stretched-link"></a>
 
-									<h5><?php echo fw_get_field( 'title', 'topic_' . $topic_term->term_id ); ?></h5>
+									<h5><?php echo fw_get_field( 'title', 'module_' . $module_term->term_id ); ?></h5>
 
 									<p class="mb-0">
 										<?php
 										if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
-											echo get_field( 'description_fr', 'topic_' . $topic_term->term_id );
+											echo get_field( 'description_fr', 'module_' . $module_term->term_id );
 										} else {
-											echo $topic_term->description;
+											echo $module_term->description;
 										}
 										?>
 									</p>

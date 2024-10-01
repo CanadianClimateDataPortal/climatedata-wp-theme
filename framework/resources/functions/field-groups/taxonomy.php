@@ -6,11 +6,11 @@
 
 // REGISTER FIELD GROUP
 
-$GLOBALS['fw_fields']['admin']['tax_term'] = array (
-	'settings' => array (
+$GLOBALS['fw_fields']['admin']['tax_term'] = array(
+	'settings' => array(
 		'title' => 'Taxonomy Term'
 	),
-	'field_group' => array (
+	'field_group' => array(
 		'key' => 'admin_term',
 		'title' => 'Taxonomy Term',
 		'fields' => array(),
@@ -35,13 +35,43 @@ $GLOBALS['fw_fields']['admin']['tax_term'] = array (
 	)
 );
 
-foreach ( get_option ( 'fw_langs') as $code => $lang ) {
+foreach ( get_option( 'fw_langs' ) as $code => $lang ) {
 
-	if ( $code != 'en' ) {
-		
-		array_push (
+	if ( 'en' === $code ) {
+		array_push(
 			$GLOBALS['fw_fields']['admin']['tax_term']['field_group']['fields'],
-			array (
+			array(
+				'key' => 'admin_term_tab_' . $code,
+				'label' => $lang['name'],
+				'name' => '',
+				'type' => 'tab',
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '',
+					'class' => '',
+					'id' => '',
+				),
+				'placement' => 'top',
+				'endpoint' => 0,
+			),
+			array(
+				'key' => 'admin_term_title',
+				'label' => 'Title',
+				'name' => 'title',
+				'type' => 'text',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '',
+					'class' => '',
+					'id' => '',
+				),
+			),
+		);
+	} else {
+		array_push(
+			$GLOBALS['fw_fields']['admin']['tax_term']['field_group']['fields'],
+			array(
 				'key' => 'admin_term_tab_' . $code,
 				'label' => $lang['name'],
 				'name' => '',
@@ -96,7 +126,6 @@ foreach ( get_option ( 'fw_langs') as $code => $lang ) {
 				'rows' => 4,
 			)
 		);
-		
 	}
 	
 }

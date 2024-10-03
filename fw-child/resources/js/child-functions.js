@@ -466,8 +466,8 @@ const $ = jQuery;
         $( '.learn-zone-module-filter[data-module-id="' + module_id + '"]' ).addClass( 'disabled' );
 
         // Check if there are no matches in ALL query items.
-        const query_items_count = $('#learn-grid .tab-drawer-bumper > .learn-module-grid').length;
-        const query_items_no_matches_count = $('#learn-grid .tab-drawer-bumper > .learn-module-grid.no-matches').length;
+        const query_items_count = $('#learn-grid .learn-module-grid').length;
+        const query_items_no_matches_count = $('#learn-grid .learn-module-grid.no-matches').length;
 
         if (query_items_no_matches_count === query_items_count ) {
           // Show global no matches message.

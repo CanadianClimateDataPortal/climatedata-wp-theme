@@ -86,39 +86,44 @@
 								
 								<ul class="list-unstyled m-0 pe-2">
 								<?php
-								// Array of asset types to check.
-								$asset_types = array( 'video', 'podcast', 'interactive', 'article', 'app' );
+								// Get the asset type field object.
+								$asset_type_object = acf_get_field( 'asset_type' );
 
-								foreach ( $asset_types as $asset_type ) {
-									// Query to check if there are posts for the current asset type and if 'display_in_learning_zone' is true.
-									$query = new WP_Query(
-										array(
-											'post_type'      => array( 'page', 'resource', 'app' ),
-											'posts_per_page' => 1,
-											'meta_query'     => array(
-												'relation' => 'AND',
-												array(
-													'key'   => 'asset_type',
-													'value' => $asset_type,
+								if ( $asset_type_object && isset( $asset_type_object['choices'] ) ) {
+									// Array of asset types to check, dynamically retrieved from ACF.
+									$asset_types = array_keys( $asset_type_object['choices'] );
+
+									foreach ( $asset_types as $asset_type ) {
+										// Query to check if there are posts for the current asset type and if 'display_in_learning_zone' is true.
+										$query = new WP_Query(
+											array(
+												'post_type'      => array( 'page', 'resource', 'app' ),
+												'posts_per_page' => 1,
+												'meta_query'     => array(
+													'relation' => 'AND',
+													array(
+														'key'   => 'asset_type',
+														'value' => $asset_type,
+													),
+													array(
+														'key'   => 'display_in_learning_zone',
+														'value' => '1',
+													),
 												),
-												array(
-													'key'   => 'display_in_learning_zone',
-													'value' => '1',
-												),
-											),
-										)
-									);
-									
-									// If the query has results, display the filter item.
-									if ( $query->have_posts() ) {
-										?>
-										<li class="filter-item" data-key="asset_type" data-value="<?php echo esc_attr( $asset_type ); ?>">
-											<?php _e( ucfirst( $asset_type ), 'cdc' ); ?>
-										</li>
-										<?php
+											)
+										);
+										
+										// If the query has results, display the filter item.
+										if ( $query->have_posts() ) {
+											?>
+											<li class="filter-item" data-key="asset_type" data-value="<?php echo esc_attr( $asset_type ); ?>">
+												<?php _e( esc_html( $asset_type_object['choices'][ $asset_type ] ), 'cdc' ); ?>
+											</li>
+											<?php
+										}
+
+										wp_reset_postdata();
 									}
-
-									wp_reset_postdata();
 								}
 								?>
 								</ul>

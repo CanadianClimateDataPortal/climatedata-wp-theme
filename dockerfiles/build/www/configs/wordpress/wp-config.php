@@ -106,6 +106,17 @@ define( 'DISALLOW_FILE_MODS', true );
 
 define( 'WP_CONTENT_DIR', __DIR__ . '/assets' );
 
+// If the site is behind a reverse-proxy that serves the site over HTTPS, but
+// communicates with the Portal over HTTP, we "trick" WordPress into thinking
+// it is served over HTTPS.
+if (
+	isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) &&
+	'https' === $_SERVER['HTTP_X_FORWARDED_PROTO']
+) {
+	$_SERVER['HTTPS'] = 'on';
+	$_SERVER['REQUEST_SCHEME'] = 'https';
+}
+
 $is_https = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
 $protocol = $is_https ? 'https://' : 'http://';
 

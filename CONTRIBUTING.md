@@ -14,7 +14,7 @@ developing hot fixes, etc.
 
 ## Docker images
 
-The [**_Portal Docker image_**](./docs/portal-docker-image) document gives more
+The [**_Portal Docker image_**](./docs/portal-docker-image.md) document gives more
 details on the Docker image of the _Portal_. This image is used during
 development, but is also deployed on our different environments, including
 production.

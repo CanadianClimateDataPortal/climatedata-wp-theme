@@ -150,7 +150,9 @@ WORKDIR /var/www/html
 # Installation
 
 RUN rm index.nginx-debian.html
-RUN wp core download --allow-root --version=6.3.1 --skip-content
+# We add the core fr_CA language to have this language recognized when
+# translating strings.
+RUN wp core download --allow-root --version=6.3.1 --skip-content --locale=fr_CA
 
 # Base setup
 
@@ -190,6 +192,7 @@ COPY --from=task-runner /home/node/app/dist .
 
 COPY framework framework
 COPY fw-child fw-child
+COPY dockerfiles/build/www/configs/wordpress/db.php ./fw-child/resources/app/db.php
 
 # ----
 # File permissions

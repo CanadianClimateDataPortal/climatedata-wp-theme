@@ -7,5 +7,7 @@
 #
 # In this file, empty lines and lines that start with # are ignored.
 
-advanced-custom-fields-pro-6.3.3.zip
-motionpage-2.0.0.zip
+advanced-custom-fields-pro-6.3.6.zip
+motionpage-2.1.9.zip
+jquery-collapse-o-matic-1.8.5.3.zip
+katex-4.5.4.zip

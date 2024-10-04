@@ -8,7 +8,7 @@ Docker image](./portal-docker-image)), a pre-filled database and a
 [_Task Runner_](./task-runner.md). It also configures the _Portal_ container
 for development.
 
-## TLDR;
+## TL;DR
 
 1. Copy `docker-override.sample.yaml` to `docker-override.yaml`
 2. Edit the `docker-override.yaml` file as required. You _must_ edit this file
@@ -45,22 +45,44 @@ multiple example configurations that you can use.
 
 The _overrides_ file is required and requires a minimum of configuration.
 
-First, if you want the Docker Compose setup to build the _Portal_ image, you
-must have a local directory containing the zip files of all the non-public
-required WordPress plugins defined in the
-[wp-plugins/local.txt](../dockerfiles/build/www/wp-plugins/local.txt) file. You
-must then set the `LOCAL_WP_PLUGINS_DIR` build argument to the path of this
-directory. See the [documentation about this argument](./portal-docker-image.md#the-local_wp_plugins_dir-argument)
+For all the cases below, see the [`docker-override.sample.yaml`](../docker-override.sample.yaml)
+file for example configurations.
+
+#### Non-public WordPress plugins when rebuilding
+
+If you want (or need) to build the _Portal_ image during the Docker Compose set
+up , you must instruct Docker where to find the files of the non-public
+WordPress plugins. Those plugins are the ones that cannot be installed from the
+public WordPress plugin repository. For example, paid plugins, custom plugins
+or plugins not available anymore.
+
+To have those plugins installed during the image building, you must have their
+source zip files locally (ask the Tech Lead for a copy of those files). The
+files you require are listed in the
+[wp-plugins/local.txt](../dockerfiles/build/www/wp-plugins/local.txt) file.
+
+You must then set the `LOCAL_WP_PLUGINS_DIR` build argument to the path of the
+directory containing the files. See the
+[documentation about this argument](./portal-docker-image.md#the-local_wp_plugins_dir-argument)
 for more details.
 
-Second, you must add configurations for whether you want to serve the site
-over HTTP or HTTPS:
-* To serve over HTTP, you must change the site's default configuration (which
-  forces HTTPS) and open port 80.
-* To server over HTTPS, you must mount your SSL certificates and open port 443.
+#### Serving over HTTP or HTTPS
 
-The [`docker-override.sample.yaml`](../docker-override.sample.yaml) file has
-examples for all those cases.
+Whether you want to serve your local _Portal_ site over HTTP or HTTPS, you have
+configurations to do in your _overrides_ file.
+
+To serve over HTTP:
+
+* Using a volume mount, you must replace the site's Nginx configuration since
+  the default one forces HTTPS. A suggested replacement configuration already
+  exists (see the examples).
+* You must open port 80.
+
+To server over HTTPS:
+
+* You must mount the SSL certificate files to the correct directory (see the
+  examples). Ask the Tech Lead for a copy of the SSL certificates.
+* You must open ports 80 and 443.
 
 ## Run the setup
 

@@ -3,7 +3,7 @@ climate-data-ca/resources/app/idf/
 topo.json
 twentynineteen
 twentytwenty
-db.php
+fw-child/**/db.php
 local_config.php
 error_log
 .ftpconfig

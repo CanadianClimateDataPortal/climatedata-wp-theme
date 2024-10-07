@@ -163,6 +163,22 @@ const $ = jQuery;
     // Bind to fw_query_success event for dynamically loaded content
     $( document ).on( 'fw_query_success', handleCardLinkHovering );
 
+    // Scroll up to .query-page container after query success
+    if ( $( '.query-page' ).length ) {
+      // Capture the initial scroll position
+      const initialScrollTop = $( window ).scrollTop();
+
+      $( document ).on( 'fw_query_success', function() {
+        // Check if the current scroll position is different from the initial one
+        // If the user has scrolled, perform the scroll action
+        if ( $( window ).scrollTop() > initialScrollTop ) {
+          $( 'html, body' ).animate( {
+            scrollTop: $( '.query-page' ).offset().top
+          }, 300 );
+        }
+      });
+    }
+
     // TAB DRAWER
 
     $('#menu-tabs').tab_drawer({

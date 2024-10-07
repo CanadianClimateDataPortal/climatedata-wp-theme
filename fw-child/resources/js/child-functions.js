@@ -271,6 +271,19 @@ const $ = jQuery;
     }
 
     let pinned_item = null;
+    let isControlBarAbsolute = false; // Track the current position state
+
+    function toggleClassOnControlbarAbsolute() {
+      if (pinned_item && $('#control-bar-tabs').css('position') === 'absolute' && !isControlBarAbsolute) {
+        // The element switched to position 'absolute'
+        $('#control-bar-tabs').addClass('opacity-10');
+        isControlBarAbsolute = true;
+      } else if ($('#control-bar-tabs').css('position') !== 'absolute' && isControlBarAbsolute) {
+        // The element switched back to position 'fixed' or another position
+        $('#control-bar-tabs').removeClass('opacity-10');
+        isControlBarAbsolute = false;
+      }
+    }
 
     function pin_item() {
       let scroll_offset = 0;
@@ -284,7 +297,11 @@ const $ = jQuery;
           pinned_item = new $.Zebra_Pin($('#control-bar-tabs'), {
             top_spacing: scroll_offset,
             contain: true,
+            class_name: 'tab-drawer-tabs--fixed',
           });
+
+          $(window).on('scroll resize', toggleClassOnControlbarAbsolute);
+
         } else {
           pinned_item.settings.top_spacing = scroll_offset;
           pinned_item.update();
@@ -295,8 +312,8 @@ const $ = jQuery;
     pin_item();
 
     if (document.querySelector('#control-bar')) {
-      const resize_observer = new ResizeObserver( pin_item );
-      resize_observer.observe( document.querySelector('#control-bar') );
+      const resize_observer = new ResizeObserver(pin_item);
+      resize_observer.observe(document.querySelector('#control-bar'));
     }
 
     /**
@@ -851,6 +868,65 @@ const $ = jQuery;
       });
 
     };
+
+    //
+    // Dynamic logo block display scroll and resize behavior
+    //
+    const $menuTrigger = $( '#menu-trigger' );
+    const $hero = $( '#hero' );
+    const $footer = $( '#main-footer' );
+    
+    if ( $menuTrigger.length && $hero.length ) {
+      let menuHeaderHamburgerHeight = $menuTrigger.outerHeight();
+      let $elementAfterHero = $hero.next();
+      let pageHasFilters = $elementAfterHero.hasClass( 'query-page' );
+      let footerTop = $footer.offset().top;
+    
+      function updateLayoutValues() {
+        // Update values that change on resize
+        menuHeaderHamburgerHeight = $menuTrigger.outerHeight();
+        $elementAfterHero = $hero.next();
+        footerTop = $footer.offset().top;
+        pageHasFilters = $elementAfterHero.hasClass( 'query-page' );
+      }
+    
+      function toggleOnWhiteClass() {
+        const menuButtonBottom = $menuTrigger.offset().top + menuHeaderHamburgerHeight;
+        const { top: elementAfterHeroTop } = $elementAfterHero.offset();
+        const isHeaderOverlap = menuButtonBottom - ( menuHeaderHamburgerHeight / 2 ) >= elementAfterHeroTop;
+        const isOverFooter = menuButtonBottom >= footerTop;
+    
+        const addOnWhiteClass = ( isHeaderOverlap && !pageHasFilters ) || isOverFooter;
+    
+        $( '#floating-header' ).toggleClass( 'on-white', addOnWhiteClass );
+      }
+    
+      $( window ).on( 'load scroll resize', () => {
+        if (event.type === 'resize') {
+          updateLayoutValues();
+        }
+        toggleOnWhiteClass();
+      });
+    }
+
+    //
+    // Dynamic set of menu button position.
+    //
+    if ( $( '#menu-trigger' ).length && $( '#header-logo-container' ) ) {
+      function setMenuButtonPosition() {
+        const headerLogoContainer = $( '#header-logo-container' );
+        const headerLogoContainerWidth = headerLogoContainer.outerWidth();
+        const headerLogoContainerHeight = headerLogoContainer.outerHeight();
+
+        // Set as css variables the position of the logo container.
+        document.documentElement.style.setProperty( '--menu-hamburger-left', `${ headerLogoContainerWidth / 2 }px` );
+        document.documentElement.style.setProperty( '--menu-hamburger-top', `${ headerLogoContainerHeight }px` );
+      }
+
+      setMenuButtonPosition();
+
+      $( window ).on( 'resize', setMenuButtonPosition );
+    }
 
     //
     // MISC

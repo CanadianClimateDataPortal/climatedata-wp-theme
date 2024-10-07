@@ -592,6 +592,12 @@ $control-slider-handle-width: 2.75rem;
   }
 
   .tab-drawer-tabs {
+    transition: border-top 500ms;
+    border-top: 2px solid transparent;
+
+    &--fixed {
+      border-color: $gray-700;
+    }
     .tab-drawer-trigger {
       .alert-icon {
         display: none;
@@ -721,6 +727,7 @@ $control-slider-handle-width: 2.75rem;
 
 #control-bar-tabs {
   width: 100%;
+  transition: opacity .25s;
 }
 
 #control-bar-secondary,

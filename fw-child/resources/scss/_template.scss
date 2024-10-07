@@ -94,6 +94,26 @@
   .current-nav-link {
     color: $blue-200;
   }
+
+  li:first-child {
+    display: flex;
+    position: relative;
+
+    &::after {
+      content: '\007C';
+      color: $white;
+      font-weight: lighter;
+      font-size: 1.25rem;
+      position: absolute;
+      right: -0.7rem;
+      top: 50%;
+      transform: translateY(-50%);
+
+      @include media-breakpoint-up(lg) {
+        display: none;
+      }
+    }
+  }
 }
 
 .nav-item-divider {

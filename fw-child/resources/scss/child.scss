@@ -467,11 +467,13 @@ $control-slider-handle-width: 2.75rem;
 
 // BREADCRUMB
 
-#header-breadcrumb {
-  overflow-x: auto;
+#header-breadcrumb,
+#app-breadcrumb {
+  display: none;
+  overflow-x: visible;
 
   @include media-breakpoint-up(lg) {
-    overflow-x: visible;
+    display: block;
   }
 
   .breadcrumb {

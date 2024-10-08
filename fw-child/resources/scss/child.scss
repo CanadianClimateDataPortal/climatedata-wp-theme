@@ -472,7 +472,7 @@ $control-slider-handle-width: 2.75rem;
   display: none;
   overflow-x: visible;
 
-  @include media-breakpoint-up(lg) {
+  @include media-breakpoint-up(md) {
     display: block;
   }
 

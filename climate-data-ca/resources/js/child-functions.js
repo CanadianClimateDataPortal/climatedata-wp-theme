@@ -110,8 +110,8 @@ const DATASETS = {
                 }
             },
         ],
-        'grid': 'canadagrid',
-        'finch_name' : 'candcs-u6',
+        'grid': 'canadagrid-m6',
+        'finch_name' : 'candcs-m6',
         'model_lists': [
             {'name': '26models', 'label': 'Full ensemble'}]
     },

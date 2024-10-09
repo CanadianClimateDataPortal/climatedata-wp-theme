@@ -120,6 +120,16 @@
                         fillOpacity: 0
                     }
                 },
+                'canadagrid-m6': function (properties, zoom) {
+                    return {
+                        weight: 0.1,
+                        color: gridline_color,
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0
+                    }
+                },
                 'canadagrid1deg': function (properties, zoom) {
                     return {
                         weight: 0.1,
@@ -2831,6 +2841,20 @@
                     let scenarios = DATASETS[dataset_name].scenarios;
                     dec_value = $("#decade").val();
 
+
+                    // ugly patch to replace grid layer depending of selected dataset
+                    if (['canadagrid', 'canadagrid-m6'].includes(sv.grid)) {
+                        switch (dataset_name) {
+                            case 'cmip5':
+                                sv.grid = 'canadagrid';
+                                break;
+                            case 'cmip6':
+                                sv.grid = 'canadagrid-m6';
+                                break
+
+                        }
+                    }
+
                     updated_slider_values = [];
 
                     tsmax = parseInt(sv.time_slider_max_value);
@@ -3309,7 +3333,7 @@
             '</div>'].join('');
 
 
-        $('#absolute_or_deltas_help').popover({
+        $('.popoverbtn').popover({
             template: popoverTemplate,
             placement: "bottom",
             html: true

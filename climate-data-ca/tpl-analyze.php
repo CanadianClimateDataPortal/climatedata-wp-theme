@@ -104,7 +104,7 @@
                       <div class="input-row form-check">
                           <div class="input-item">
                               <input class="form-check-input add-to-object" type="radio" name="dataset" id="analyze-dataset-cmip6" value="cmip6">
-                              <label class="form-check-label" for="analyze-dataset-cmip6">CMIP6 (CanDCS-U6)</label>
+                              <label class="form-check-label" for="analyze-dataset-cmip6">CMIP6 (CanDCS-M6)</label>
                           </div>
                       </div>
                         <div class="input-row form-check">

@@ -324,10 +324,16 @@ function fw_menu_output( $menu, $level, $type, $classes ) {
 		}
 
 		// Get the translation of the item label.
-		$item_label_translation = get_post_meta( $item['id'] )[ 'label_' . $GLOBALS['fw']['current_lang_code'] ];
+		$item_label_translation = '';
+		$item_post_meta = get_post_meta( $item['id'] );
+		$label_key = 'label_' . $GLOBALS['fw']['current_lang_code'];
+
+		if ( array_key_exists( $label_key, $item_post_meta)) {
+			$item_label_translation = $item_post_meta[ $label_key ];
+		}
 
 		// If the current language is not English and the translation is not empty, use the translation.
-		if ( 'en' !== $GLOBALS['fw']['current_lang_code'] && ! empty( $item_label_translation[0] ) ) {
+		if ( 'en' !== $GLOBALS['fw']['current_lang_code'] && ! is_array( $item_label_translation ) && ! empty( $item_label_translation[0] ) ) {
 
 			$item_title = $item_label_translation[0];
 
@@ -383,5 +389,3 @@ function my_correct_filetypes ( $data, $file, $filename, $mimes, $real_mime ) {
 }
 
 add_filter ( 'wp_check_filetype_and_ext', 'my_correct_filetypes', 10, 5 );
-
-

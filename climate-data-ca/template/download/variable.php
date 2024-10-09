@@ -45,7 +45,7 @@
 
     <div id="selection-dataset" class="form-layout-row row align-items-center">
         <p class="form-label-wrap col-10 col-sm-3 offset-1 mb-3 mb-sm-0">
-            <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">2</span> <label for="dataset" class="form-label"><?php _e('Select a dataset', 'cdc'); ?></label>
+            <span class="form-step d-inline-block rounded-circle border border-primary text-primary text-center">2</span> <label style="display: contents;" for="dataset" class="form-label"><?php _e('Select a generation of climate models', 'cdc'); ?></label>
         </p>
 
         <div class="form-select col-10 offset-1 col-sm-4 offset-sm-0">

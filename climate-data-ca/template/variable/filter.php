@@ -382,7 +382,7 @@ $get_dataset = filter_input(INPUT_GET, 'dataset', FILTER_SANITIZE_URL);
         <label for="toggle-cmip5" style="float: left;white-space: nowrap;margin-top:3px">CMIP 5</label>
         <input id="toggle-cmip6" type="radio" value="cmip6" name="dataset_switch"<?php if (!$get_dataset || $get_dataset == "cmip6") { echo ' checked="checked"'; } ?> />
         <label for="toggle-cmip6" style="float: left;white-space: nowrap">CMIP 6</label>
-        <div class="text-dark fas fa-question-circle popoverbtn" data-content="<div class='popovertitle'><?php _e('TITLE','cdc');?></div><?php _e('Placeholder"','cdc');?>"></div>
+        <div class="text-dark fas fa-question-circle popoverbtn" style="margin-top: 23px;" data-content="<div class='popovertitle'><?php _e('TITLE','cdc');?></div><?php _e('Placeholder"','cdc');?>"></div>
         <span class="toggle-outside">
         <span class="toggle-inside"></span>
       </span>

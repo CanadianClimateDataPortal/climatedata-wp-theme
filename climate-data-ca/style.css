@@ -65,7 +65,7 @@ Text Domain:
     font-size: 17px;
     line-height: 15px;
     display: block;
-    width: 75px;
+    /* width: 75px; */
     height: 50%;
     margin: 0;
     text-align: left;
@@ -115,7 +115,7 @@ Text Domain:
 
 .popoverbtn {
     position:absolute;
-    margin-left: -5px;
+    margin-left: 3px;
     margin-top: 2px;
     cursor:pointer;
 }

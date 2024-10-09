@@ -37,7 +37,7 @@
             "wpml_cf_preferences": 1,
             "choices": {
                 "video": "Video",
-                "audio": "Audio",
+                "podcast": "Podcast",
                 "interactive": "Interactive",
                 "article": "Article"
             },
@@ -107,8 +107,8 @@
         },
         {
             "key": "field_64b1866521db6",
-            "label": "Audio Embed Code",
-            "name": "asset_audio",
+            "label": "Podcast Embed Code",
+            "name": "asset_podcast",
             "aria-label": "",
             "type": "textarea",
             "instructions": "",
@@ -118,7 +118,7 @@
                     {
                         "field": "field_5f92c91e0fd5c",
                         "operator": "==",
-                        "value": "audio"
+                        "value": "podcast"
                     }
                 ]
             ],

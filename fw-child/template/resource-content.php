@@ -7,9 +7,9 @@
 			echo '<h4>video here</h4>';
 			break;
 			
-		case 'audio' :
+		case 'podcast' :
 			
-			echo '<h4>audio here</h4>';
+			echo '<h4>podcast here</h4>';
 			break;
 			
 		case 'interactive' :

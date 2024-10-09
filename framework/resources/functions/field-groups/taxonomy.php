@@ -35,71 +35,75 @@ $GLOBALS['fw_fields']['admin']['tax_term'] = array (
 	)
 );
 
-foreach ( get_option ( 'fw_langs') as $code => $lang ) {
+$fw_langs = get_option ( 'fw_langs');
+if ( is_array( $fw_langs ) ) {
+	foreach ( $fw_langs as $code => $lang ) {
 
-	if ( $code != 'en' ) {
-		
-		array_push (
-			$GLOBALS['fw_fields']['admin']['tax_term']['field_group']['fields'],
-			array (
-				'key' => 'admin_term_tab_' . $code,
-				'label' => $lang['name'],
-				'name' => '',
-				'type' => 'tab',
-				'conditional_logic' => 0,
-				'wrapper' => array(
-					'width' => '',
-					'class' => '',
-					'id' => '',
+		if ( $code != 'en' ) {
+
+			array_push (
+				$GLOBALS['fw_fields']['admin']['tax_term']['field_group']['fields'],
+				array (
+					'key' => 'admin_term_tab_' . $code,
+					'label' => $lang['name'],
+					'name' => '',
+					'type' => 'tab',
+					'conditional_logic' => 0,
+					'wrapper' => array(
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					),
+					'placement' => 'top',
+					'endpoint' => 0,
 				),
-				'placement' => 'top',
-				'endpoint' => 0,
-			),
-			array(
-				'key' => 'admin_term_title_' . $code,
-				'label' => 'Title',
-				'name' => 'title_' . $code,
-				'type' => 'text',
-				'required' => 0,
-				'conditional_logic' => 0,
-				'wrapper' => array(
-					'width' => '',
-					'class' => '',
-					'id' => '',
+				array(
+					'key' => 'admin_term_title_' . $code,
+					'label' => 'Title',
+					'name' => 'title_' . $code,
+					'type' => 'text',
+					'required' => 0,
+					'conditional_logic' => 0,
+					'wrapper' => array(
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					),
 				),
-			),
-			array(
-				'key' => 'admin_term_slug_' . $code,
-				'label' => 'Slug',
-				'name' => 'slug_' . $code,
-				'type' => 'text',
-				'required' => 0,
-				'conditional_logic' => 0,
-				'wrapper' => array(
-					'width' => '',
-					'class' => '',
-					'id' => '',
+				array(
+					'key' => 'admin_term_slug_' . $code,
+					'label' => 'Slug',
+					'name' => 'slug_' . $code,
+					'type' => 'text',
+					'required' => 0,
+					'conditional_logic' => 0,
+					'wrapper' => array(
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					)
+				),
+				array(
+					'key' => 'admin_term_description_' . $code,
+					'label' => 'Description',
+					'name' => 'description_' . $code,
+					'type' => 'textarea',
+					'required' => 0,
+					'conditional_logic' => 0,
+					'wrapper' => array(
+						'width' => '',
+						'class' => '',
+						'id' => '',
+					),
+					'rows' => 4,
 				)
-			),
-			array(
-				'key' => 'admin_term_description_' . $code,
-				'label' => 'Description',
-				'name' => 'description_' . $code,
-				'type' => 'textarea',
-				'required' => 0,
-				'conditional_logic' => 0,
-				'wrapper' => array(
-					'width' => '',
-					'class' => '',
-					'id' => '',
-				),
-				'rows' => 4,
-			)
-		);
-		
+			);
+
+		}
+
 	}
-	
 }
+
 
 // SANITIZE SLUGS ON SAVE
 

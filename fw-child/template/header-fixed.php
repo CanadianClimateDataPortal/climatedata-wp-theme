@@ -1,5 +1,6 @@
+
 <div class="fixed-top col-2 col-sm-1">
-	<div id="floating-header" class="me-1">
+	<div id="floating-header" class="header-fixed-menu me-1">
 		<?php 
 		
 			// LOGO

@@ -82,14 +82,45 @@
 						<div class="control-tab-body query-container">
 								
 							<div class="fw-query-filter ms-3 py-4 border-bottom" data-filter-type="meta" data-filter-key="asset_type" data-filter-multi="false">
-								<h5 class="fw-bold"><?php _e ( 'Content Type', 'cdc' ); ?></h5>
+								<h5 class="fw-bold"><?php _e( 'Content Type', 'cdc' ); ?></h5>
 								
 								<ul class="list-unstyled m-0 pe-2">
-									<li class="filter-item" data-key="asset_type" data-value="video"><?php _e ( 'Video', 'cdc' ); ?></li>
-									<li class="filter-item" data-key="asset_type" data-value="audio"><?php _e ( 'Audio', 'cdc' ); ?></li>
-									<li class="filter-item" data-key="asset_type" data-value="interactive"><?php _e ( 'Interactive', 'cdc' ); ?></li>
-									<li class="filter-item" data-key="asset_type" data-value="article"><?php _e ( 'Article', 'cdc' ); ?></li>
-									<li class="filter-item" data-key="asset_type" data-value="app"><?php _e ( 'App', 'cdc' ); ?></li>
+								<?php
+								// Array of asset types to check.
+								$asset_types = array( 'video', 'podcast', 'interactive', 'article', 'app' );
+
+								foreach ( $asset_types as $asset_type ) {
+									// Query to check if there are posts for the current asset type and if 'display_in_learning_zone' is true.
+									$query = new WP_Query(
+										array(
+											'post_type'      => array( 'page', 'resource', 'app' ),
+											'posts_per_page' => 1,
+											'meta_query'     => array(
+												'relation' => 'AND',
+												array(
+													'key'   => 'asset_type',
+													'value' => $asset_type,
+												),
+												array(
+													'key'   => 'display_in_learning_zone',
+													'value' => '1',
+												),
+											),
+										)
+									);
+									
+									// If the query has results, display the filter item.
+									if ( $query->have_posts() ) {
+										?>
+										<li class="filter-item" data-key="asset_type" data-value="<?php echo esc_attr( $asset_type ); ?>">
+											<?php _e( ucfirst( $asset_type ), 'cdc' ); ?>
+										</li>
+										<?php
+									}
+									// Reset post data after each query.
+									wp_reset_postdata();
+								}
+								?>
 								</ul>
 							</div>
 							

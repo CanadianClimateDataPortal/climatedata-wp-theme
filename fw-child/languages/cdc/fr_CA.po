@@ -112,7 +112,6 @@ msgstr "Variable"
 msgid "All Variables"
 msgstr ""
 
-#: template/learn/control-bar.php:90
 #: template/query/learn-item.php:65
 #: template/query/resource-home-feature.php:80
 msgid "Interactive"
@@ -946,19 +945,16 @@ msgstr "Filtres"
 msgid "Content Type"
 msgstr "Type de contenu"
 
-#: template/learn/control-bar.php:88
 #: template/query/learn-item.php:55
 #: template/query/resource-home-feature.php:70
 msgid "Video"
 msgstr "Vidéo"
 
-#: template/learn/control-bar.php:89
 #: template/query/learn-item.php:60
 #: template/query/resource-home-feature.php:75
-msgid "Audio"
+msgid "Podcast"
 msgstr ""
 
-#: template/learn/control-bar.php:91
 #: template/query/learn-item.php:75
 #: template/query/resource-home-feature.php:90
 msgid "Article"
@@ -1367,7 +1363,6 @@ msgstr "Rétroaction sur les applications"
 msgid "Which application would you like to provide feedback on?"
 msgstr "Pour quelle application souhaitez-vous nous faire un retour ?"
 
-#: template/learn/control-bar.php:92
 #: template/query/learn-item.php:70
 #: template/query/resource-home-feature.php:85
 msgid "App"
@@ -1381,15 +1376,15 @@ msgstr "Nom (A-Z)"
 msgid "Name (Z–A)"
 msgstr "Nom (Z-A)"
 
-#: functions.php:559
+#: functions.php:560
 msgid "Display in Learning Zone"
 msgstr "Afficher dans Apprentissage"
 
-#: functions.php:572
+#: functions.php:573
 msgid "Yes"
 msgstr "Oui"
 
-#: functions.php:574
+#: functions.php:575
 msgid "No"
 msgstr "Non"
 

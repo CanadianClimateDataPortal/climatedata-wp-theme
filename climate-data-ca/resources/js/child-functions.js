@@ -522,6 +522,12 @@ function displayChartData(data, varDetails, download_url, query, container) {
                 }
             });
     });
+
+    // store query in container for future reference
+    $(container).data('query', $.extend(true, {}, query));
+    $(container).data('varDetails', varDetails);
+
+
     if (chartSeries.length == 0) {
         container.innerHTML = '<span class="text-primary text-center"><h1>' +
             T('No data available for selected location') + '</h1></span>';
@@ -581,7 +587,6 @@ function displayChartData(data, varDetails, download_url, query, container) {
             series: chartSeries
         });
 
-        chart.query = $.extend(true, {}, query);  // creates a deep copy of the object to avoid side-effects
 
         if (query.building_climate_zones) {
             const colorTransparency = 0.30;
@@ -600,181 +605,182 @@ function displayChartData(data, varDetails, download_url, query, container) {
         }
 
         chart.download_url = download_url;
-        chart.varDetails = varDetails;
+
 
         parentPlaceholder.find('.chart-option').on('change', function() {
             if ($(this).prop('checked') == true) {
 
                 let chart = $(this).parents('.var-chart-container, .overlay-content').find('.var-chart').highcharts();
-
-                switch ($(this).attr('value')) {
-                    case 'annual':
-                        chart.update({
-                            tooltip: {
-                                formatter: function (tooltip) {
-                                    let r = tooltip.defaultFormatter.call(this, tooltip);
-                                    return r;
-                                }
-
-                            },
-                            plotOptions: {
-                                series: {
-                                    states: {
-                                        hover: {
-                                            enabled: true
-                                        },
-                                        inactive: {
-                                            enabled: true
-                                        }
-                                    }
-                                }
-                            },
-                        });
-                        chart.xAxis[0].removePlotBand('30y-plot-band');
-                        chart.xAxis[0].removePlotBand('delta-plot-band');
-
-                        break;
-                    case '30y':
-                        chart.xAxis[0].removePlotBand('30y-plot-band');
-                        chart.xAxis[0].removePlotBand('delta-plot-band');
-                        chart.update({
-                            xAxis: {
-                                crosshair: false
-                            },
-                            plotOptions: {
-                                series: {
-                                    states: {
-                                        hover: {
-                                            enabled: false
-                                        },
-                                        inactive: {
-                                            enabled: false
-                                        }
-                                    }
-                                }
-                            },
-                            tooltip: {
-
-                                formatter: function (tooltip) {
-
-                                    let [decade, decade_ms] = formatDecade(this.x, query['mora']);
-                                    chart.xAxis[0].removePlotBand('30y-plot-band');
-                                    chart.xAxis[0].addPlotBand({
-                                        from: Date.UTC(decade, 0, 1),
-                                        to: Date.UTC(decade + 29, 11, 31),
-                                        id: '30y-plot-band'
-                                    });
-
-                                    this.chart = tooltip.chart;
-                                    this.axis = tooltip.chart.yAxis[0];
-                                    let val1, val2;
-
-                                    let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + "</span><br/>"];
-
-                                    if (decade_ms in data['30y_observations']) {
-                                        this.value = data['30y_observations'][decade_ms][0];
-                                        val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                        tip.push("<span style=\"color:#F47D23\">●</span> " + chart_labels.observation + " <b>"
-                                            + val1 + "</b><br/>");
+                if (chart !== undefined) {
+                    switch ($(this).attr('value')) {
+                        case 'annual':
+                            chart.update({
+                                tooltip: {
+                                    formatter: function (tooltip) {
+                                        let r = tooltip.defaultFormatter.call(this, tooltip);
+                                        return r;
                                     }
 
-                                    scenarios.forEach(function (scenario) {
-                                        this.value = data['30y_{0}_median'.format(scenario.name)][decade_ms][0];
-                                        val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                        tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Median').format(scenario.label) + " <b>"
-                                            + val1 + "</b><br/>");
-
-                                        this.value = data['30y_{0}_range'.format(scenario.name)][decade_ms][0];
-                                        val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                        this.value = data['30y_{0}_range'.format(scenario.name)][decade_ms][1];
-                                        val2 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                        tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Range').format(scenario.label) + " <b>"
-                                            + val1 + "</b>-<b>" + val2 + "</b><br/>");
-                                    }, this);
-
-                                    return tip;
-                                }
-                            }
-                        });
-                        break;
-                    case 'delta':
-                        chart.xAxis[0].removePlotBand('30y-plot-band');
-                        chart.xAxis[0].removePlotBand('delta-plot-band');
-                        chart.xAxis[0].addPlotBand({
-                            from: Date.UTC(1971, 0, 1),
-                            to: Date.UTC(2000, 11, 31),
-                            color: 'rgba(51,63,80,0.05)',
-                            id: 'delta-plot-band'
-                        });
-
-                        chart.update({
-                            xAxis: {
-                                crosshair: false
-                            },
-                            plotOptions: {
-                                series: {
-                                    states: {
-                                        hover: {
-                                            enabled: false
-                                        },
-                                        inactive: {
-                                            enabled: false
+                                },
+                                plotOptions: {
+                                    series: {
+                                        states: {
+                                            hover: {
+                                                enabled: true
+                                            },
+                                            inactive: {
+                                                enabled: true
+                                            }
                                         }
                                     }
-                                }
-                            },
-                            tooltip: {
+                                },
+                            });
+                            chart.xAxis[0].removePlotBand('30y-plot-band');
+                            chart.xAxis[0].removePlotBand('delta-plot-band');
 
-                                formatter: function (tooltip) {
-
-                                    let [decade, decade_ms] = formatDecade(this.x, query['mora']);
-                                    chart.xAxis[0].removePlotBand('30y-plot-band');
-                                    chart.xAxis[0].addPlotBand({
-                                        from: Date.UTC(decade, 0, 1),
-                                        to: Date.UTC(decade + 29, 11, 31),
-                                        id: '30y-plot-band'
-                                    });
-
-                                    function numformat(num) {
-                                        let str = "";
-                                        if (num > 0) {
-                                            str += "+"
+                            break;
+                        case '30y':
+                            chart.xAxis[0].removePlotBand('30y-plot-band');
+                            chart.xAxis[0].removePlotBand('delta-plot-band');
+                            chart.update({
+                                xAxis: {
+                                    crosshair: false
+                                },
+                                plotOptions: {
+                                    series: {
+                                        states: {
+                                            hover: {
+                                                enabled: false
+                                            },
+                                            inactive: {
+                                                enabled: false
+                                            }
                                         }
-                                        str += Highcharts.numberFormat(num, chartDecimals);
-                                        switch (chartUnit) {
-                                            case "day of the year":
-                                                str += " " + l10n_labels['days'];
-                                                break;
-                                            default:
-                                                str += " " + chartUnit;
-                                                break;
-                                        }
-                                        return str;
                                     }
+                                },
+                                tooltip: {
 
+                                    formatter: function (tooltip) {
 
-                                    this.chart = tooltip.chart;
-                                    this.axis = tooltip.chart.yAxis[0];
-                                    let val1, val2;
+                                        let [decade, decade_ms] = formatDecade(this.x, query['mora']);
+                                        chart.xAxis[0].removePlotBand('30y-plot-band');
+                                        chart.xAxis[0].addPlotBand({
+                                            from: Date.UTC(decade, 0, 1),
+                                            to: Date.UTC(decade + 29, 11, 31),
+                                            id: '30y-plot-band'
+                                        });
 
-                                    let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + " " + chart_labels.change_from_1971_2000 + "</span><br/>"];
+                                        this.chart = tooltip.chart;
+                                        this.axis = tooltip.chart.yAxis[0];
+                                        let val1, val2;
 
-                                    scenarios.forEach(function (scenario) {
-                                        val1 = numformat(data['delta7100_{0}_median'.format(scenario.name)][decade_ms][0]);
-                                        tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Median').format(scenario.label) + " <b>"
-                                            + val1 + "</b><br/>");
+                                        let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + "</span><br/>"];
 
-                                        val1 = numformat(data['delta7100_{0}_range'.format(scenario.name)][decade_ms][0]);
-                                        val2 = numformat(data['delta7100_{0}_range'.format(scenario.name)][decade_ms][1]);
-                                        tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Range').format(scenario.label) + " <b>"
-                                            + val1 + "</b>-<b>" + val2 + "</b><br/>");
-                                    }, this);
+                                        if (decade_ms in data['30y_observations']) {
+                                            this.value = data['30y_observations'][decade_ms][0];
+                                            val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                            tip.push("<span style=\"color:#F47D23\">●</span> " + chart_labels.observation + " <b>"
+                                              + val1 + "</b><br/>");
+                                        }
 
-                                    return tip;
+                                        scenarios.forEach(function (scenario) {
+                                            this.value = data['30y_{0}_median'.format(scenario.name)][decade_ms][0];
+                                            val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                            tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Median').format(scenario.label) + " <b>"
+                                              + val1 + "</b><br/>");
+
+                                            this.value = data['30y_{0}_range'.format(scenario.name)][decade_ms][0];
+                                            val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                            this.value = data['30y_{0}_range'.format(scenario.name)][decade_ms][1];
+                                            val2 = tooltip.chart.yAxis[0].labelFormatter.call(this);
+                                            tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Range').format(scenario.label) + " <b>"
+                                              + val1 + "</b>-<b>" + val2 + "</b><br/>");
+                                        }, this);
+
+                                        return tip;
+                                    }
                                 }
-                            }
-                        });
-                        break;
+                            });
+                            break;
+                        case 'delta':
+                            chart.xAxis[0].removePlotBand('30y-plot-band');
+                            chart.xAxis[0].removePlotBand('delta-plot-band');
+                            chart.xAxis[0].addPlotBand({
+                                from: Date.UTC(1971, 0, 1),
+                                to: Date.UTC(2000, 11, 31),
+                                color: 'rgba(51,63,80,0.05)',
+                                id: 'delta-plot-band'
+                            });
+
+                            chart.update({
+                                xAxis: {
+                                    crosshair: false
+                                },
+                                plotOptions: {
+                                    series: {
+                                        states: {
+                                            hover: {
+                                                enabled: false
+                                            },
+                                            inactive: {
+                                                enabled: false
+                                            }
+                                        }
+                                    }
+                                },
+                                tooltip: {
+
+                                    formatter: function (tooltip) {
+
+                                        let [decade, decade_ms] = formatDecade(this.x, query['mora']);
+                                        chart.xAxis[0].removePlotBand('30y-plot-band');
+                                        chart.xAxis[0].addPlotBand({
+                                            from: Date.UTC(decade, 0, 1),
+                                            to: Date.UTC(decade + 29, 11, 31),
+                                            id: '30y-plot-band'
+                                        });
+
+                                        function numformat(num) {
+                                            let str = "";
+                                            if (num > 0) {
+                                                str += "+"
+                                            }
+                                            str += Highcharts.numberFormat(num, chartDecimals);
+                                            switch (chartUnit) {
+                                                case "day of the year":
+                                                    str += " " + l10n_labels['days'];
+                                                    break;
+                                                default:
+                                                    str += " " + chartUnit;
+                                                    break;
+                                            }
+                                            return str;
+                                        }
+
+
+                                        this.chart = tooltip.chart;
+                                        this.axis = tooltip.chart.yAxis[0];
+                                        let val1, val2;
+
+                                        let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + " " + chart_labels.change_from_1971_2000 + "</span><br/>"];
+
+                                        scenarios.forEach(function (scenario) {
+                                            val1 = numformat(data['delta7100_{0}_median'.format(scenario.name)][decade_ms][0]);
+                                            tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Median').format(scenario.label) + " <b>"
+                                              + val1 + "</b><br/>");
+
+                                            val1 = numformat(data['delta7100_{0}_range'.format(scenario.name)][decade_ms][0]);
+                                            val2 = numformat(data['delta7100_{0}_range'.format(scenario.name)][decade_ms][1]);
+                                            tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Range').format(scenario.label) + " <b>"
+                                              + val1 + "</b>-<b>" + val2 + "</b><br/>");
+                                        }, this);
+
+                                        return tip;
+                                    }
+                                }
+                            });
+                            break;
+                    }
                 }
 
             } // if checked
@@ -1442,11 +1448,12 @@ function getIDFLinks(station_id, target, css_class) {
         $('body').on('click', '.chart-export-data', function (e) {
             e.preventDefault();
             let parentPlaceholder = $(this).parents('.var-chart-container, .overlay-content');
-            let chart = parentPlaceholder.find('.var-chart').highcharts();
+            let container = parentPlaceholder.find('.var-chart');
+            let chart = container.highcharts();
 
             switch ($(this).attr('data-type')) {
                 case 'csv':
-                    setDataLayerForChartData('csv', chart, chart.query);
+                    setDataLayerForChartData('csv', chart, container.data('query'));
                     switch(parentPlaceholder.find('.chart-option:checked').val()) {
                         case '30y':
                         case 'delta':
@@ -1463,7 +1470,8 @@ function getIDFLinks(station_id, target, css_class) {
 
         $('body').on('click', '.chart-export-img', function (e) {
             e.preventDefault();
-            let chart = $(this).parents('.var-chart-container, .overlay-content').find('.var-chart').highcharts()
+            let container = $(this).parents('.var-chart-container, .overlay-content').find('.var-chart');
+            let chart = container.highcharts()
             var dl_type = '';
             var fileFormat = '';
 
@@ -1478,7 +1486,7 @@ function getIDFLinks(station_id, target, css_class) {
                     break;
             }
 
-            setDataLayerForChartData(fileFormat, chart, chart.query);
+            setDataLayerForChartData(fileFormat, chart, container.data('query'));
 
             chart.exportChart({
                 type: dl_type
@@ -1491,8 +1499,8 @@ function getIDFLinks(station_id, target, css_class) {
             let parentPlaceholder = $(this).parents('.var-chart-container, .overlay-content');
             let container = parentPlaceholder.find('.var-chart');
             let oldchart = container.highcharts();
-            let query = oldchart.query;
-            let varDetails = oldchart.varDetails;
+            let query = container.data('query');
+            let varDetails = container.data('varDetails');
             let dataset_name = e.target.value;
 
             query.dataset = dataset_name;
@@ -1512,7 +1520,9 @@ function getIDFLinks(station_id, target, css_class) {
                 chart_url = data_url + '/generate-regional-charts/' + query.sector + '/' + query.id
                     + '/' + query.var + '/' + query.mora + '?decimals=' + varDetails.decimals + '&dataset_name=' + dataset_name;
             }
-            oldchart.destroy();
+            if (oldchart !== undefined) {
+                oldchart.destroy();
+            }
 
             $.getJSON(chart_url,
                 function (data) {

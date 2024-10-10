@@ -6,101 +6,144 @@
 
 // REGISTER FIELD GROUP
 
-$GLOBALS['fw_fields']['admin']['tax_term'] = array (
-	'settings' => array (
-		'title' => 'Taxonomy Term'
-	),
-	'field_group' => array (
-		'key' => 'admin_term',
+$GLOBALS['fw_fields']['admin']['tax_term'] = array(
+	'settings'    => array(
 		'title' => 'Taxonomy Term',
-		'fields' => array(),
-		'location' => array(
+	),
+	'field_group' => array(
+		'key'                   => 'admin_term',
+		'title'                 => 'Taxonomy Term',
+		'fields'                => array(),
+		'location'              => array(
 			array(
 				array(
-					'param' => 'taxonomy',
+					'param'    => 'taxonomy',
 					'operator' => '==',
-					'value' => 'all',
+					'value'    => 'all',
 				),
 			),
 		),
-		'menu_order' => 0,
-		'position' => 'normal',
-		'style' => 'default',
-		'label_placement' => 'top',
+		'menu_order'            => 0,
+		'position'              => 'normal',
+		'style'                 => 'default',
+		'label_placement'       => 'top',
 		'instruction_placement' => 'label',
-		'hide_on_screen' => '',
-		'active' => true,
-		'description' => '',
-		'show_in_rest' => 0,
-	)
+		'hide_on_screen'        => '',
+		'active'                => true,
+		'description'           => '',
+		'show_in_rest'          => 0,
+	),
 );
 
-$fw_langs = get_option ( 'fw_langs');
+$fw_langs = get_option( 'fw_langs' );
 if ( is_array( $fw_langs ) ) {
 	foreach ( $fw_langs as $code => $lang ) {
 
-		if ( $code != 'en' ) {
-
-			array_push (
+		if ( 'en' === $code ) {
+			array_push(
 				$GLOBALS['fw_fields']['admin']['tax_term']['field_group']['fields'],
-				array (
-					'key' => 'admin_term_tab_' . $code,
-					'label' => $lang['name'],
-					'name' => '',
-					'type' => 'tab',
-					'conditional_logic' => 0,
-					'wrapper' => array(
-						'width' => '',
-						'class' => '',
-						'id' => '',
-					),
-					'placement' => 'top',
-					'endpoint' => 0,
-				),
 				array(
-					'key' => 'admin_term_title_' . $code,
-					'label' => 'Title',
-					'name' => 'title_' . $code,
-					'type' => 'text',
-					'required' => 0,
+					'key'               => 'admin_term_tab_' . $code,
+					'label'             => $lang['name'],
+					'name'              => '',
+					'type'              => 'tab',
 					'conditional_logic' => 0,
-					'wrapper' => array(
+					'placement'         => 'top',
+					'endpoint'          => 0,
+					'wrapper'           => array(
 						'width' => '',
 						'class' => '',
-						'id' => '',
+						'id'    => '',
 					),
 				),
 				array(
-					'key' => 'admin_term_slug_' . $code,
-					'label' => 'Slug',
-					'name' => 'slug_' . $code,
-					'type' => 'text',
-					'required' => 0,
+					'key'               => 'admin_term_title',
+					'label'             => 'Title',
+					'name'              => 'title',
+					'type'              => 'text',
+					'required'          => 0,
 					'conditional_logic' => 0,
-					'wrapper' => array(
+					'wrapper'           => array(
 						'width' => '',
 						'class' => '',
-						'id' => '',
-					)
+						'id'    => '',
+					),
+				),
+			);
+		} else {
+			array_push(
+				$GLOBALS['fw_fields']['admin']['tax_term']['field_group']['fields'],
+				array(
+					'key'               => 'admin_term_tab_' . $code,
+					'label'             => $lang['name'],
+					'name'              => '',
+					'type'              => 'tab',
+					'conditional_logic' => 0,
+					'placement'         => 'top',
+					'endpoint'          => 0,
+					'wrapper'           => array(
+						'width' => '',
+						'class' => '',
+						'id'    => '',
+					),
 				),
 				array(
-					'key' => 'admin_term_description_' . $code,
-					'label' => 'Description',
-					'name' => 'description_' . $code,
-					'type' => 'textarea',
-					'required' => 0,
+					'key'               => 'admin_term_title_' . $code,
+					'label'             => 'Title',
+					'name'              => 'title_' . $code,
+					'type'              => 'text',
+					'required'          => 0,
 					'conditional_logic' => 0,
-					'wrapper' => array(
+					'wrapper'           => array(
 						'width' => '',
 						'class' => '',
-						'id' => '',
+						'id'    => '',
 					),
-					'rows' => 4,
+					array(
+						'key'               => 'admin_term_slug_' . $code,
+						'label'             => 'Slug',
+						'name'              => 'slug_' . $code,
+						'type'              => 'text',
+						'required'          => 0,
+						'conditional_logic' => 0,
+						'wrapper'           => array(
+							'width' => '',
+							'class' => '',
+							'id'    => '',
+						),
+					),
+					array(
+						'key'               => 'admin_term_description_' . $code,
+						'label'             => 'Description',
+						'name'              => 'description_' . $code,
+						'type'              => 'textarea',
+						'required'          => 0,
+						'conditional_logic' => 0,
+						'rows'              => 4,
+						'wrapper'           => array(
+							'width' => '',
+							'class' => '',
+							'id'    => '',
+						),
+					),
+				),
+				array(
+					'key'               => 'admin_term_description_' . $code,
+					'label'             => 'Description',
+					'name'              => 'description_' . $code,
+					'type'              => 'textarea',
+					'required'          => 0,
+					'conditional_logic' => 0,
+					'rows'              => 4,
+					'wrapper'           => array(
+						'width' => '',
+						'class' => '',
+						'id'    => '',
+					),
 				)
 			);
 
 		}
-
 	}
 }
 

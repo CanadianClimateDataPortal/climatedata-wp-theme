@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-10-07T20:05:19+00:00\n"
+"POT-Creation-Date: 2024-10-10T15:58:20+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -54,6 +54,38 @@ msgstr ""
 
 #: functions.php:575
 msgid "No"
+msgstr ""
+
+#: functions.php:717
+msgid "Video"
+msgstr ""
+
+#: functions.php:722
+msgid "Podcast"
+msgstr ""
+
+#: functions.php:727
+msgid "Interactive"
+msgstr ""
+
+#: functions.php:732
+msgid "App"
+msgstr ""
+
+#: functions.php:737
+msgid "Sector overview"
+msgstr ""
+
+#: functions.php:742
+msgid "Case study"
+msgstr ""
+
+#: functions.php:747
+msgid "Regional profile"
+msgstr ""
+
+#: functions.php:752
+msgid "Article"
 msgstr ""
 
 #: resources/functions/ajax.php:153
@@ -1017,9 +1049,7 @@ msgstr ""
 
 #: template/learn/control-bar.php:11
 #: template/learn/control-bar.php:30
-#: template/post-meta.php:53
-#: template/query/news-item.php:71
-msgid "Topics"
+msgid "Modules"
 msgstr ""
 
 #: template/learn/control-bar.php:20
@@ -1035,7 +1065,7 @@ msgstr ""
 msgid "Content Type"
 msgstr ""
 
-#: template/learn/query.php:79
+#: template/learn/query.php:77
 msgid "No items found."
 msgstr ""
 
@@ -1326,7 +1356,7 @@ msgid "Download image"
 msgstr ""
 
 #: template/old-loop/blocks/map.php:227
-#: template/query/learn-item.php:91
+#: template/query/learn-item.php:59
 msgid "Time"
 msgstr ""
 
@@ -1347,6 +1377,11 @@ msgstr ""
 msgid "Author"
 msgstr ""
 
+#: template/post-meta.php:53
+#: template/query/news-item.php:71
+msgid "Topics"
+msgstr ""
+
 #: template/post-meta.php:68
 msgid "Share this post"
 msgstr ""
@@ -1363,36 +1398,11 @@ msgstr ""
 msgid "Select variable"
 msgstr ""
 
-#: template/query/learn-item.php:46
+#: template/query/learn-item.php:47
 msgid "Format"
 msgstr ""
 
-#: template/query/learn-item.php:55
-#: template/query/resource-home-feature.php:70
-msgid "Video"
-msgstr ""
-
-#: template/query/learn-item.php:60
-#: template/query/resource-home-feature.php:75
-msgid "Podcast"
-msgstr ""
-
-#: template/query/learn-item.php:65
-#: template/query/resource-home-feature.php:80
-msgid "Interactive"
-msgstr ""
-
-#: template/query/learn-item.php:70
-#: template/query/resource-home-feature.php:85
-msgid "App"
-msgstr ""
-
-#: template/query/learn-item.php:75
-#: template/query/resource-home-feature.php:90
-msgid "Article"
-msgstr ""
-
-#: template/query/learn-item.php:95
+#: template/query/learn-item.php:63
 msgid "%s minutes"
 msgstr ""
 

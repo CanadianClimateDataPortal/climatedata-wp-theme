@@ -39,12 +39,14 @@
 						'terms'    => array( $module_term->slug ),
 					),
 				),
-				'meta_query'    => array(
+				'meta_query'     => array(
 					array(
 						'key'   => 'display_in_learning_zone',
 						'value' => '1',
 					),
 				),
+				'orderby'        => 'menu_order', // Use native 'menu_order'
+				'order'          => 'ASC',
 			);
 			?>
 

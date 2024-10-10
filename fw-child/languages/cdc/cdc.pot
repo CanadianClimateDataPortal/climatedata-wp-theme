@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-10-07T20:05:19+00:00\n"
+"POT-Creation-Date: 2024-10-10T15:58:20+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: cdc\n"
@@ -1065,7 +1065,7 @@ msgstr ""
 msgid "Content Type"
 msgstr ""
 
-#: template/learn/query.php:79
+#: template/learn/query.php:77
 msgid "No items found."
 msgstr ""
 
@@ -1402,32 +1402,7 @@ msgstr ""
 msgid "Format"
 msgstr ""
 
-#: template/query/learn-item.php:55
-#: template/query/resource-home-feature.php:70
-msgid "Video"
-msgstr ""
-
-#: template/query/learn-item.php:60
-#: template/query/resource-home-feature.php:75
-msgid "Podcast"
-msgstr ""
-
-#: template/query/learn-item.php:65
-#: template/query/resource-home-feature.php:80
-msgid "Interactive"
-msgstr ""
-
-#: template/query/learn-item.php:70
-#: template/query/resource-home-feature.php:85
-msgid "App"
-msgstr ""
-
-#: template/query/learn-item.php:75
-#: template/query/resource-home-feature.php:90
-msgid "Article"
-msgstr ""
-
-#: template/query/learn-item.php:95
+#: template/query/learn-item.php:63
 msgid "%s minutes"
 msgstr ""
 

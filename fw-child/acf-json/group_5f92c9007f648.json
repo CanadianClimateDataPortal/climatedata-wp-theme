@@ -152,8 +152,8 @@
         },
         {
             "key": "field_64b1866521db6",
-            "label": "Audio Embed Code",
-            "name": "asset_audio",
+            "label": "Podcast Embed Code",
+            "name": "asset_podcast",
             "aria-label": "",
             "type": "textarea",
             "instructions": "",
@@ -162,11 +162,6 @@
                 [
                     {
                         "field": "field_66ff1e6fdd303",
-                        "operator": "==",
-                        "value": "1"
-                    },
-                    {
-                        "field": "field_66ff1edbdd304",
                         "operator": "==",
                         "value": "podcast"
                     }

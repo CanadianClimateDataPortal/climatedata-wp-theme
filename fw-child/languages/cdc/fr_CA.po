@@ -112,7 +112,8 @@ msgstr "Variable"
 msgid "All Variables"
 msgstr ""
 
-#: functions.php:727
+#: template/query/learn-item.php:65
+#: template/query/resource-home-feature.php:80
 msgid "Interactive"
 msgstr "Interactif"
 
@@ -942,15 +943,18 @@ msgstr "Filtres"
 msgid "Content Type"
 msgstr "Type de contenu"
 
-#: functions.php:717
+#: template/query/learn-item.php:55
+#: template/query/resource-home-feature.php:70
 msgid "Video"
 msgstr "Vidéo"
 
-#: functions.php:722
+#: template/query/learn-item.php:60
+#: template/query/resource-home-feature.php:75
 msgid "Podcast"
 msgstr ""
 
-#: functions.php:752
+#: template/query/learn-item.php:75
+#: template/query/resource-home-feature.php:90
 msgid "Article"
 msgstr ""
 
@@ -1357,7 +1361,8 @@ msgstr "Rétroaction sur les applications"
 msgid "Which application would you like to provide feedback on?"
 msgstr "Pour quelle application souhaitez-vous nous faire un retour ?"
 
-#: functions.php:732
+#: template/query/learn-item.php:70
+#: template/query/resource-home-feature.php:85
 msgid "App"
 msgstr "Application"
 

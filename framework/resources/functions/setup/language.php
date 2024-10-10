@@ -58,72 +58,66 @@ function fw_setup_current_lang() {
 			break;
 			
 		case 'domain' :
-	
-			foreach ( $all_langs as $code => $lang ) {
-				
-				// echo 'check lang';
-				// dumpit ( $lang );
-				// echo '<br>';
-				
-				// echo $lang['domain'] . ' vs ' . $_SERVER['HTTP_HOST'];
-				
-				if ( $lang['domain'] == $_SERVER['HTTP_HOST'] ) {
-					
-					// this is where we're setting the current language
-					
-					$fw['current_lang_code'] = $code;
-					
-					// echo 'code: ' . $code . '<br>';
-					
-					// generate the new home/site URLs
-					
-					$vars['home_url'] = $_SERVER['REQUEST_SCHEME'] . '://' . $lang['domain'] . '/';
-					
-					// override the original_site_URL defined incorrectly
-					// with the WP_SITEURL constant in wp-config.php
-					
-					$vars['original_site_url'] = str_replace ( $vars['home_url'], $vars['original_home_url'], $vars['original_site_url'] );
-					
-					$url_array = explode ( '/', $GLOBALS['vars']['original_site_url'] );
-					
-					// grab the protocol
-					$vars['site_url'] = $url_array[0];
-					
-					// remove the first 3 elements (protocol and domain)
-					$url_array = array_splice ( $url_array, 3 );
-					
-					$vars['site_url'] .= '//' . $lang['domain'] . '/' . implode ( '/', $url_array );
-						
-					// filter any new calls to home_url and site_url
-					
-					add_filter ( 'home_url', function ( $url, $path ) {
-						// echo '<br><br>home_url - ';
-						if ( !is_admin() )
-							return $GLOBALS['vars']['home_url'] . ltrim ( $path, '/' );
-							
-						return $url;
-					}, 1, 2 );
-					
-					add_filter ( 'site_url', function ( $url ) {
-						// echo '<br>site_url - ';
-						if ( !is_admin() ) return trailingslashit ( $GLOBALS['vars']['site_url'] );
-						return $url;
-					}, 1 );
-					
-					add_filter ( 'admin_url', function ( $url ) {
-						// echo '<br><br>admin_url - ';
-						return $GLOBALS['vars']['original_site_url'] . 'wp-admin/';
-					}, 1 );
-					
-					add_filter ( 'content_url', 'fw_replace_lang_domain', 1, 2 );
-					add_filter ( 'script_loader_tag', 'fw_replace_lang_domain', 1 );
-					add_filter ( 'rest_url', 'fw_replace_lang_domain', 1 );
-					
-					
-				} else {
-					// echo 'uh oh';
+
+			if ( is_array( $all_langs ) ) {
+				foreach ( $all_langs as $code => $lang ) {
+
+					if ( $lang[ 'domain' ] == $_SERVER[ 'HTTP_HOST' ] ) {
+
+						// this is where we're setting the current language
+
+						$fw[ 'current_lang_code' ] = $code;
+
+						// echo 'code: ' . $code . '<br>';
+
+						// generate the new home/site URLs
+
+						$vars[ 'home_url' ] = $_SERVER[ 'REQUEST_SCHEME' ] . '://' . $lang[ 'domain' ] . '/';
+
+						// override the original_site_URL defined incorrectly
+						// with the WP_SITEURL constant in wp-config.php
+
+						$vars[ 'original_site_url' ] = str_replace( $vars[ 'home_url' ], $vars[ 'original_home_url' ], $vars[ 'original_site_url' ] );
+
+						$url_array = explode( '/', $GLOBALS[ 'vars' ][ 'original_site_url' ] );
+
+						// grab the protocol
+						$vars[ 'site_url' ] = $url_array[ 0 ];
+
+						// remove the first 3 elements (protocol and domain)
+						$url_array = array_splice( $url_array, 3 );
+
+						$vars[ 'site_url' ] .= '//' . $lang[ 'domain' ] . '/' . implode( '/', $url_array );
+
+						// filter any new calls to home_url and site_url
+
+						add_filter( 'home_url', function( $url, $path ) {
+							// echo '<br><br>home_url - ';
+							if ( ! is_admin() )
+								return $GLOBALS[ 'vars' ][ 'home_url' ] . ltrim( $path, '/' );
+
+							return $url;
+						}, 1, 2 );
+
+						add_filter( 'site_url', function( $url ) {
+							// echo '<br>site_url - ';
+							if ( ! is_admin() ) return trailingslashit( $GLOBALS[ 'vars' ][ 'site_url' ] );
+							return $url;
+						}, 1 );
+
+						add_filter( 'admin_url', function( $url ) {
+							// echo '<br><br>admin_url - ';
+							return $GLOBALS[ 'vars' ][ 'original_site_url' ] . 'wp-admin/';
+						}, 1 );
+
+						add_filter( 'content_url', 'fw_replace_lang_domain', 1, 2 );
+						add_filter( 'script_loader_tag', 'fw_replace_lang_domain', 1 );
+						add_filter( 'rest_url', 'fw_replace_lang_domain', 1 );
+
+
+					}
+
 				}
-				
 			}
 		
 			break;
@@ -134,10 +128,6 @@ function fw_setup_current_lang() {
 		$fw['current_lang_obj'] = $all_langs[$fw['current_lang_code']];
 		
 		switch_to_locale ( $fw['current_lang_obj']['locale'] );
-		
-	} else {
-		
-		echo 'uh oh';
 		
 	}
 	

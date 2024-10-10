@@ -117,7 +117,7 @@
 										if ( $query->have_posts() ) {
 											?>
 											<li class="filter-item" data-key="asset_type" data-value="<?php echo esc_attr( $asset_type ); ?>">
-												<?php _e( esc_html( $asset_type_object['choices'][ $asset_type ] ), 'cdc' ); ?>
+												<?php echo esc_html( cdc_get_asset_type_meta( $asset_type )['label'] ); ?>
 											</li>
 											<?php
 										}

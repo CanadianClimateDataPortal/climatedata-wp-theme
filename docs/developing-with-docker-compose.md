@@ -12,7 +12,8 @@ for development.
 
 1. Copy `docker-override.sample.yaml` to `docker-override.yaml`
 2. Edit the `docker-override.yaml` file as required. You _must_ edit this file
-   since its default content is not sufficient to correctly run the site.
+   since its default content is not sufficient to correctly run the site. See
+   the [_Minimum overrides_](#minimum-overrides) section below for details.
 3. Start the services:
    ```shell
    docker compose -f docker-compose-dev.yaml -f docker-override.yaml up
@@ -43,28 +44,12 @@ multiple example configurations that you can use.
 
 ### Minimum overrides
 
-The _overrides_ file is required and requires a minimum of configuration.
+The _overrides_ file is required and requires a minimum of configuration. This
+section details the minimum overrides required.
 
-For all the cases below, see the [`docker-override.sample.yaml`](../docker-override.sample.yaml)
-file for example configurations.
-
-#### Non-public WordPress plugins when rebuilding
-
-If you want (or need) to build the _Portal_ image during the Docker Compose set
-up , you must instruct Docker where to find the files of the non-public
-WordPress plugins. Those plugins are the ones that cannot be installed from the
-public WordPress plugin repository. For example, paid plugins, custom plugins
-or plugins not available anymore.
-
-To have those plugins installed during the image building, you must have their
-source zip files locally (ask the Tech Lead for a copy of those files). The
-files you require are listed in the
-[wp-plugins/local.txt](../dockerfiles/build/www/wp-plugins/local.txt) file.
-
-You must then set the `LOCAL_WP_PLUGINS_DIR` build argument to the path of the
-directory containing the files. See the
-[documentation about this argument](./portal-docker-image.md#the-local_wp_plugins_dir-argument)
-for more details.
+For example of those minimum overrides, and for examples of other kinds of
+overrides, see the examples in the
+[`docker-override.sample.yaml`](../docker-override.sample.yaml) file.
 
 #### Serving over HTTP or HTTPS
 
@@ -83,6 +68,27 @@ To server over HTTPS:
 * You must mount the SSL certificate files to the correct directory (see the
   examples). Ask the Tech Lead for a copy of the SSL certificates.
 * You must open ports 80 and 443.
+
+#### Non-public WordPress plugins when rebuilding
+
+_This section is only if you want to build the Portal image during the Docker
+Compose set up. You can skip it if you use an already built image._
+
+To build the _Portal_ image during the Docker Compose set up , you must instruct
+Docker where to find the files of the non-public WordPress plugins. Those
+plugins are the ones that cannot be installed from the public WordPress plugin
+repository. For example, paid plugins, custom plugins or plugins not available
+anymore.
+
+To have those plugins installed during the image building, you must have their
+source zip files locally (ask the Tech Lead for a copy of those files). The
+files you require are listed in the
+[wp-plugins/local.txt](../dockerfiles/build/www/wp-plugins/local.txt) file.
+
+You must then set the `LOCAL_WP_PLUGINS_DIR` build argument to the path of the
+directory containing the files. See the
+[documentation about this argument](./portal-docker-image.md#the-local_wp_plugins_dir-argument)
+for more details.
 
 ## Run the setup
 

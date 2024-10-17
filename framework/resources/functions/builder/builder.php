@@ -381,7 +381,7 @@ function fw_setup_element ( $element, $globals ) {
 	// data-* attributes array
 	
 	$settings['atts'] = array (
-		'key' => $element['key']
+		'key' => $element['key'] ?? null
 	);
 	
 	switch ( $settings['el_type'] ) {
@@ -487,7 +487,7 @@ function fw_setup_element ( $element, $globals ) {
 	
 	// classes
 	
-	$settings['el_id'] = 'element-' . $element['key'];
+	$settings['el_id'] = 'element-' . ($element['key'] ?? '');
 	
 	if (
 		isset ( $element['inputs']['id'] ) && 

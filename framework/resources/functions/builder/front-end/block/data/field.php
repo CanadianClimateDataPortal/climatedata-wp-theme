@@ -31,9 +31,9 @@
 			echo '<' . $element['inputs']['display'] . '>';
 		}
 
-		echo $element['inputs']['prepend'];
+		echo $element['inputs']['prepend'] ?? '';
 		echo $field_output;
-		echo $element['inputs']['append'];
+		echo $element['inputs']['append'] ?? '';
 		
 		if ( $element['inputs']['display'] != 'none' ) {
 			echo '</' . $element['inputs']['display'] . '>';

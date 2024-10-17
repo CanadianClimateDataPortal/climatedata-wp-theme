@@ -4,7 +4,7 @@ $menu = array();
 
 // 1. CREATE MENU ITEMS
 
-if ( str_contains ( $element['inputs']['menu'], 'menu-' ) ) {
+if ( str_contains ( $element['inputs']['menu'] ?? '', 'menu-' ) ) {
 	
 	// WP MENU
 	

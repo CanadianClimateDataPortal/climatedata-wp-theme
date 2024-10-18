@@ -39,9 +39,12 @@ services:
       WP_LOGGED_IN_SALT: 'i=GdI3/!VdU,+Y T-f?kr-.0(Q4kxiqZ[Hu*tB3TY(@W5M3mee/XRI-~[cHNOZ&j'
       WP_NONCE_SALT: 'Up<Q /#k4>;p)GYi)+--Pls<>-7NywT.JVmrW9C,bET(F@Tz*Bkp+kHtN)87<5 l'
       WP_WP_DEBUG: "true"
+      # Required, for the login page to work correctly
+      WP_WP_SITEURL: https://dev-en.climatedata.ca/
+      WP_WP_HOME: https://dev-en.climatedata.ca/
 
   db:
-    image: registry.gitlab.com/crim.ca/clients/ccdp/docker/db:v2
+    image: registry.gitlab.com/crim.ca/clients/ccdp/portal/deployment/db:latest
     volumes:
       - db_data:/var/lib/mysql
     environment:

@@ -15,18 +15,19 @@ services:
   #   args:
   #     LOCAL_WP_PLUGINS_DIR: dockerfiles/mounts/wp-plugins
 
-  # For HTTPS:
+  # IF you want to mainly serve over HTTPS (with HTTP redirected to HTTPS):
   # Specify SSL certificates (put your SSL certificates in the directory below)
   # and open port 443
   #
   # volumes:
   #   - type: bind
-  #     source: dockerfiles/dev/mounts/ssl
+  #     source: dockerfiles/mounts/ssl
   #     target: /etc/nginx/ssl
   # ports:
   #   - "443:443"
+  #   - "80:80"  # Requests to port 80 will simply redirect the user to HTTPS
 
-  # For HTTP:
+  # IF you want to serve ONLY over HTTP:
   # Disable forced HTTPS and open port 80.
   #
   # volumes:
@@ -70,10 +71,10 @@ services:
 #   portal:
 #     volumes:
 #       - type: bind
-#         source: dockerfiles/dev/mounts/config/my-nginx-config.conf
+#         source: dockerfiles/mounts/config/my-nginx-config.conf
 #         target: /etc/nginx/conf.d/my-nginx-config.conf
 #       - type: bind
-#         source: dockerfiles/dev/mounts/config/my-climatedata-config.conf
+#         source: dockerfiles/mounts/config/my-climatedata-config.conf
 #         target: /etc/nginx/conf.d/climatedata-site/my-climatedata-config.conf
 #
 ###
@@ -88,7 +89,7 @@ services:
 #   portal:
 #     volumes:
 #       - type: bind
-#         source: dockerfiles/dev/mounts/config/my-php-config.ini
+#         source: dockerfiles/mounts/config/my-php-config.ini
 #         target: /usr/local/etc/php/conf.d/my-php-config.ini
 #
 ###

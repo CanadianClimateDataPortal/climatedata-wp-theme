@@ -10,85 +10,121 @@ for development.
 
 ## TL;DR
 
-1. Copy `docker-override.sample.yaml` to `docker-override.yaml`
-2. Edit the `docker-override.yaml` file as required. You _must_ edit this file
-   since its default content is not sufficient to correctly run the site. See
-   the [_Minimum overrides_](#minimum-overrides) section below for details.
-3. Start the services:
+1. Clone this repository, it contains a pre-defined Docker Compose setup.
+2. Create an empty `docker-override.yaml` file.
+3. Edit the `docker-override.yaml` file as required. See the
+   [_Detailed setup_](#detailed-setup) section below for details. You _must_
+   edit this file its default content is not sufficient to correctly run the
+   site. 
+4. Start the services:
    ```shell
    docker compose -f docker-compose-dev.yaml -f docker-override.yaml up
    ```
-4. Visit the website! The default URL is https://dev-en.climatedata.ca.
+5. Visit the website! The default URL are https://dev-en.climatedata.ca and
+   https://dev-fr.climatedata.ca.
 
-## Setup
+## Detailed setup
 
 The development setup is simply started with Docker Compose and two compose
 files:
 
 * [`docker-compose-dev.yaml`](../docker-compose-dev.yaml) which contains the
-  main Docker Compose configuration, and is common to all development
-  environments.
-* `docker-override.yaml` (the "_overrides_" file) which contains configuration
-  overrides specific to your environment.
+  base Docker Compose configuration (common to every developer).
+* `docker-override.yaml` which contains configuration overrides specific to
+  your environment.
 
-The _overrides_ file allows you to customize your environment as you wish. For
-example to allow non-HTTPS requests, to change WordPress constants, to add
-custom nginx configuration files, etc.
+The `docker-override.yaml` file is required since the base Docker setup requires
+that you set some minimum configurations, and that you mount some required
+files.
 
-The _overrides_ file must be created since it's ignored by Git. A simple way
-is to copy
-[`docker-override.sample.yaml`](../docker-override.sample.yaml) to
-`docker-override.yaml`, then edit it based on your needs. The
-[`docker-override.sample.yaml`](../docker-override.sample.yaml) file contains
-multiple example configurations that you can use.
+The following lists the minimum required content of your `docker-override.yaml`.
 
-### Minimum overrides
+### Configurations for serving over HTTPS or HTTP
 
-The _overrides_ file is required and requires a minimum of configuration. This
-section details the minimum overrides required.
+If you want to serve your local _Portal_ site over **HTTPS**, you must mount a
+valid SSL certificate (ask the Tech Lead for a copy of the SSL certificate) and
+open ports 443 and 80. Add the following to your `docker-override.yaml`:
 
-For example of those minimum overrides, and for examples of other kinds of
-overrides, see the examples in the
-[`docker-override.sample.yaml`](../docker-override.sample.yaml) file.
+```yaml
+services:
+  portal:
+    volumes:
+      # Bind SSL certificate
+      - type: bind
+        # The location below in `source` is a suggested directory for your SSL
+        # certificate. You can use any valid path you want.
+        source: dockerfiles/mounts/ssl
+        target: /etc/nginx/ssl
+    ports:
+      # Open port 80 and 443
+      - "80:80"
+      - "443:443"
+```
 
-#### Serving over HTTP or HTTPS
+If you want to serve your local _Portal_ site over **HTTP**, you must replace
+the site's Nginx configuration with one that allows non-HTTPS requests (already
+provided), and you must open port 80. Add the following to your
+`docker-override.yaml`:
 
-Whether you want to serve your local _Portal_ site over HTTP or HTTPS, you have
-configurations to do in your _overrides_ file.
+```yaml
+services:
+  portal:
+    volumes:
+      # Replace the site's default Nginx configuration with the provided one
+      # that allows non-HTTPS requests.
+      - type: bind
+        source: dockerfiles/dev/www/configs/nginx/climatedata-site-no-ssl.conf
+        target: /etc/nginx/sites-available/climatedata-site.conf
+    ports:
+      # Open port 80
+      - "80:80"
+```
 
-To serve over HTTP:
+### Building the Portal image with Docker Compose
 
-* Using a volume mount, you must replace the site's Nginx configuration since
-  the default one forces HTTPS. A suggested replacement configuration already
-  exists (see the examples).
-* You must open port 80.
+If you want the _Portal_ image to be built when starting Docker Compose, you
+must specify the local directory, used by the Dockerfile, containing the
+required, but "non-public", WordPress plugins.
 
-To server over HTTPS:
+> If you don't want to build the image and instead want to use a pre-built
+> image, simply put the path of a pre-built _Portal_ image in the
+> `services > portal > image` configuration of your `docker-override.yaml`.
+> Then skip this section.
 
-* You must mount the SSL certificate files to the correct directory (see the
-  examples). Ask the Tech Lead for a copy of the SSL certificates.
-* You must open ports 80 and 443.
-
-#### Non-public WordPress plugins when rebuilding
-
-_This section is only if you want to build the Portal image during the Docker
-Compose set up. You can skip it if you use an already built image._
-
-To build the _Portal_ image during the Docker Compose set up , you must instruct
-Docker where to find the files of the non-public WordPress plugins. Those
-plugins are the ones that cannot be installed from the public WordPress plugin
-repository. For example, paid plugins, custom plugins or plugins not available
-anymore.
+The non-public WordPress plugins are the ones that cannot be installed by the
+Dockerfile from the public WordPress plugin repository. For example, paid
+plugins, custom plugins or plugins not available anymore.
 
 To have those plugins installed during the image building, you must have their
-source zip files locally (ask the Tech Lead for a copy of those files). The
-files you require are listed in the
+source zip files available locally (ask the Tech Lead for a copy of those
+files), and you then set the `LOCAL_WP_PLUGINS_DIR` build argument to the path
+of the directory containing the files (see the
+[documentation about this argument](./portal-docker-image.md#the-local_wp_plugins_dir-argument)).
+
+The required plugin files are listed in the
 [wp-plugins/local.txt](../dockerfiles/build/www/wp-plugins/local.txt) file.
 
-You must then set the `LOCAL_WP_PLUGINS_DIR` build argument to the path of the
-directory containing the files. See the
-[documentation about this argument](./portal-docker-image.md#the-local_wp_plugins_dir-argument)
-for more details.
+The add the following to your `docker-override.yaml`:
+
+```yaml
+services:
+  portal:
+    build:
+      args:
+        # Set `LOCAL_WP_PLUGINS_DIR` to a directory containing the files of the
+        # required non-public WordPress plugins.
+        # The following path is only a suggestion. You can put any valid path.
+        LOCAL_WP_PLUGINS_DIR: dockerfiles/mounts/wp-plugins
+```
+
+### Other recipes for `docker-override.yaml`
+
+The [`docker-override.sample.yaml`](../docker-override.sample.yaml) file
+contains other optional "recipes" showing how to use the
+`docker-override.yaml` file for some specific tasks, like adding new Nginx
+configurations, adding a custom PHP configuration or changing a WordPress
+constant (also see the [Setting WordPress constants](#setting-wordpress-constants)
+for more details about this).
 
 ## Run the setup
 
@@ -99,12 +135,13 @@ command as you wish):
 docker compose -f docker-compose-dev.yaml -f docker-override.yaml up
 ```
 
-If the _Portal_ and _Task Runner_ images are not already built, the Compose
-files are configured to rebuild them.
+If the _Portal_ and _Task Runner_ images are not already built, they will be
+built.
 
-Then visit the site! The default URL is https://dev-en.climatedata.ca.
+Then visit the site! The default URLs are https://dev-en.climatedata.ca and
+https://dev-fr.climatedata.ca.
 
-## Develop
+## Developing process
 
 The themes' files are mounted to the running container, so any change to any
 file is immediately available on the server.
@@ -114,13 +151,13 @@ rebuilt by the _Task Runner_ service.
 
 The _Portal_ image contains [wp-cli](https://wp-cli.org/).
 
-## WordPress constants
+### Setting WordPress constants
 
 The `wp-config.php` file used in the _Portal_ image is a custom script that 
 allows setting WordPress constants using environment variables.
 
 Environment variables prefixed with `WP_` will be used to set the
-corresponding WordPress constants (i.e. the name after the `WP_` prefix).
+corresponding WordPress constants (i.e. the name _after_ the `WP_` prefix).
 
 For example, if the environment variables `WP_DB_NAME` and `WP_WP_DEBUG` are
 set, they will be used to set the WordPress constants `DB_NAME` and `WP_DEBUG`.

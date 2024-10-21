@@ -359,7 +359,7 @@
                 }
                 highlightGridFeature = null;
             };
-            addGrid('canadagrid');
+            addGrid('canadagrid-m6');
 
 
             $('#var-download .select2').on('select2:select', function (e) {
@@ -924,10 +924,12 @@
             if (curValData === undefined) {
                 $('#download-variable').val(1).trigger('change.select2');
             }
-            if (typeof pbfLayer !== 'undefined' && pbfLayer.gridType !== curValData.grid) {
+            let selectedDataset = $('input[name="download-dataset"]:checked').val();
+            let newgrid = selectedDataset == 'cmip6' && curValData.grid == 'canadagrid' ? 'canadagrid-m6':  curValData.grid;
+            if (typeof pbfLayer !== 'undefined' && pbfLayer.gridType !== newgrid) {
                 maps['variable'].removeLayer(pbfLayer);
-                console.log("Adding Grid:" + curValData.grid);
-                addGrid(curValData.grid);
+                console.log("Adding Grid:" + newgrid);
+                addGrid(newgrid);
                 clear_var_selections();
             }
         });

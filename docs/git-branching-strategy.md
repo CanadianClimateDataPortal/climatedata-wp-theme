@@ -125,3 +125,18 @@ _cherry-pick_ the commits.
 
 If `main` evolved in a way that the fix cannot be applied the same way, develop the fix like a _feature_ (see
 ["Developing new features"](#developing-new-features) above).
+
+
+## About v1
+
+> The following applies only during the transition period where v1 is still the _production_ version and v2 is being
+> developed.
+
+For the development of a new feature or a hot fix on v1:
+
+1. Create a branch from the `demo` branch.
+2. Develop your code and create a pull request (to merge into `demo`). Once merged, the staging server will
+   automatically pull from the `demo` branch.
+3. Once approved for _production_ deployment, merge _only the new commit(s)_ (ex: with cherry-picking) into the
+   `release/v1.x` branch.
+4. This branch will then have to be manually pulled on the production server.

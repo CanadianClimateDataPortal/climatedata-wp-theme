@@ -192,7 +192,6 @@ COPY --from=task-runner /home/node/app/dist .
 
 COPY framework framework
 COPY fw-child fw-child
-COPY dockerfiles/build/www/configs/wordpress/db.php ./fw-child/resources/app/db.php
 
 # ----
 # File permissions

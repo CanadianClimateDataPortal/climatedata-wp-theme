@@ -44,7 +44,7 @@ services:
       WP_WP_HOME: https://dev-en.climatedata.ca/
 
   db:
-    image: registry.gitlab.com/crim.ca/clients/ccdp/portal/deployment/db:latest
+    image: registry.gitlab.com/crim.ca/clients/ccdp/portal/deployment/db:dev
     volumes:
       - db_data:/var/lib/mysql
     environment:

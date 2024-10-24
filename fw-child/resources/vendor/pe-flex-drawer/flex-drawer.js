@@ -79,7 +79,7 @@ if (typeof pushes_since_input == 'undefined') {
 			let drawer_order = null
 			
 			let this_item = item.find( options.item_selector + '[data-fd-item="' + item_id + '"]' ),
-				this_order = parseInt( this_item.css( 'order' ) ),
+				this_order = parseInt( this_item[0].style.getPropertyValue( 'order' ) ),
 				this_drawer
 			
 			if (this_item.hasClass( 'fd-open' )) {
@@ -109,14 +109,11 @@ if (typeof pushes_since_input == 'undefined') {
 						this_item.nextAll().each( function () {
 							if (drawer_order == null) {
 								// drawer order hasn't been set
-								
-								// console.log(
-								// 	'next item',
-								// 	parseInt($(this).css('order')) / 10,
-								// )
 
-								if ((parseInt( $( this ).css( 'order' ) ) / 10) % options.column_count == 0) {
-									drawer_order = parseInt( $( this ).css( 'order' ) ) + 1
+								const item_order = parseInt( $( this )[0].style.getPropertyValue( 'order' ) );
+
+								if ( ( item_order / 10 ) % options.column_count === 0 ) {
+									drawer_order = item_order + 1
 								}
 							}
 						} )

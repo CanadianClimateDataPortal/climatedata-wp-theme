@@ -169,6 +169,10 @@ const $ = jQuery;
       const initialScrollTop = $( window ).scrollTop();
 
       $( document ).on( 'fw_query_success', function() {
+        // Do not add scroll animation if there is already one on going.
+        if ( $( 'body' ).is( ':animated' ) ) {
+          return;
+        }
         // Check if the current scroll position is different from the initial one
         // If the user has scrolled, perform the scroll action
         if ( $( window ).scrollTop() > initialScrollTop ) {
@@ -425,22 +429,17 @@ const $ = jQuery;
           const variable_element = $( window.location.hash );
 
           if ( variable_element.length > 0 ) {
-            const scroll_top = variable_element.parent().position().top;
+            const scroll_top = variable_element.parent().offset().top;
 
-            $( 'html, body' )
-              .animate( { scrollTop: scroll_top }, 10, 'swing' )
-              .promise()
-              .done( function () {
-                variable_element
-                  .find( '.flex-drawer-trigger' )
-                  .trigger( 'click' );
-              } );
+            $(window).load( function() {
+              $( 'html, body' )
+                .animate( { scrollTop: scroll_top }, 10, 'swing' );
+            } );
+
+            variable_element
+              .find( '.flex-drawer-trigger' )
+              .trigger( 'click' );
           }
-        } else if ( !isFirstPageLoad ) {
-          // Scroll to the top of the results if not first page load
-          const scroll_top = $( '.query-page' ).position().top;
-
-          $( 'html, body' ).animate( { scrollTop: scroll_top }, 10, 'swing' );
         }
 
         isFirstPageLoad = false;
@@ -466,11 +465,6 @@ const $ = jQuery;
               $( this ).hide();
             }
           } );
-
-          // Adjust auto-scroll position.
-          const scroll_top = variable_item.parent().position().top;
-
-          $( 'html, body' ).animate( {scrollTop: scroll_top}, 10, 'swing' );
         }
       } );
 

@@ -140,9 +140,14 @@
 							$menu = array();
 							
 							foreach ( get_field ( 'fw_languages', 'option' ) as $lang ) {
-							
-								$lang_URL = translate_permalink ( $GLOBALS['vars']['current_url'], $GLOBALS['fw']['current_query']['ID'], $lang['code'] );
-								
+
+								if ( is_404() ) {
+									$home_post_id = get_option( 'page_on_front' );
+									$lang_URL = translate_permalink( $GLOBALS['vars']['home_url'], $home_post_id, $lang['code'] );
+								} else {
+									$lang_URL = translate_permalink ( $GLOBALS['vars']['current_url'], $GLOBALS['fw']['current_query']['ID'], $lang['code'] );
+								}
+
 								$lang_title = $lang['name'];
 								
 								$menu[] = array(
@@ -166,81 +171,6 @@
 					
 					</div>
 				</div>
-			</div>
-			
-			<div id="menu-td-container" class="tab-drawer-container">
-				
-				<div id="browse-vars" class="tab-drawer">
-					<div class="tab-drawer-content">
-						<div class="tab-drawer-content-inner bg-white ps-3 py-3">
-							<span class="tab-drawer-close btn-close"></span>
-							
-							<div id="popular-vars" class="pt-3 mb-3 border-bottom">
-								<h6 class="all-caps text-secondary px-3 mb-3"><?php _e ( 'Popular Variables', 'cdc' ); ?></h6>
-								
-								<ul class="list-unstyled">
-									<?php
-									
-										foreach ( get_field ( 'menu_popvars', 'option' ) as $var_ID ) {
-									
-									?>
-									
-									<li class="px-3 py-2">
-										<span class="var-title"><?php echo get_the_title ( $var_ID ); ?></span>
-										
-										<span class="var-links d-flex">
-											<a href="/map/?var_id=<?php echo $var_ID; ?>"><?php _e ( 'View on map', 'cdc' ); ?></a>
-											
-											<a href="/download/?var_id=<?php echo $var_ID; ?>"><?php _e ( 'Download', 'cdc' ); ?></a>
-											
-											<a href="#"><?php _e ( 'Description', 'cdc' ); ?></a>
-										</span>
-									</li>
-									
-									<?php
-									
-										}
-								
-									?>
-								</ul>
-							</div>
-							
-							<div class="pt-3 mb-3 border-bottom">
-								<h6 class="all-caps text-secondary px-3 mb-3"><?php _e ( 'Variables by Sector', 'cdc' ); ?></h6>
-								
-								<ul class="list-unstyled">
-									<?php
-									
-										$sectors = get_terms ( array (
-											'taxonomy' => 'sector',
-											'hide_empty' => false
-										) );
-									
-										foreach ( $sectors as $term ) {
-									
-									?>
-									
-									<li class="var-title">
-										<a href="#" class="d-block px-3 py-2"><?php echo $term->name; ?></a>
-									</li>
-									
-									<?php
-									
-										}
-								
-									?>
-								</ul>
-							</div>
-							
-							<div class="pt-3 d-flex justify-content-center">
-								<a href="<?php echo get_post_type_archive_link ( 'variable' ); ?>" class="btn btn-outline-primary rounded-pill py-2 px-5"><?php _e ( 'All Variables', 'cdc' ); ?></a>
-							</div>
-							
-						</div>
-					</div>
-				</div>
-				
-				
 			</div>
 		</div>
 	</div>

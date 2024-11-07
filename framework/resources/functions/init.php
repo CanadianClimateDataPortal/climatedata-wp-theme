@@ -46,9 +46,17 @@ function fw_global_vars() {
 	// dumpit ( $wp_query );
 	
 	if ( is_archive() ) {
-		
+
 		$fw['current_query'] = (array) get_queried_object();
 		// $fw['current_query'] = $wp_query->tax_query;
+
+	} elseif ( is_404() ) {
+
+		$page_404_id = get_option( 'cdc_page_404' );
+
+		if ( $page_404_id ) {
+			$fw[ 'current_query' ] = (array) get_post( $page_404_id );
+		}
 		
 	} else {
 	

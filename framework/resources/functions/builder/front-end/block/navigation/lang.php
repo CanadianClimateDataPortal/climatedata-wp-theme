@@ -1,9 +1,16 @@
 <ul class="<?php echo $element['inputs']['classes']['menu']; ?>">
 	<?php
+
+		if ( is_404() ) {
+			// If we are currently displaying the 404 page, we want the language buttons to link to the home page.
+			$page_id = get_option( 'page_on_front' );
+		} else {
+			$page_id = $GLOBALS['fw']['current_query']['ID'];
+		}
 	
-		$this_path = str_replace ( home_url() . '/', '', get_permalink ( $globals['current_query']['ID'] ) );
+		$this_path = str_replace ( home_url() . '/', '', get_permalink ( $page_id ) );
 		
-		if ( $globals['current_lang_code'] != 'en' ) {
+		if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
 			$this_path = substr ( $this_path, 3 );
 		}
 		

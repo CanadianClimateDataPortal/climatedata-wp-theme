@@ -2330,7 +2330,7 @@
 			
 			$.ajax({
 				url: ajax_data.url,
-				type: 'GET',
+				type: 'POST',
 				data: {
 					action: 'fw_setup_element_ajax',
 					globals: options.globals,

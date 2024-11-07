@@ -55,11 +55,15 @@ function fw_global_vars() {
 		$fw['current_query'] = (array) $wp_query->post;
 		
 		unset ( $fw['current_query']['post_content'] );
-	
-		$fw['current_ancestors'] = get_ancestors ( $fw['current_query']['ID'], $fw['current_query']['post_type'] );
+
+		if ( ! empty ( $fw['current_query']['ID'] ) ) {
+			$fw['current_ancestors'] = get_ancestors ( $fw['current_query']['ID'], $fw['current_query']['post_type'] );
+		} else {
+			$fw['current_ancestors'] = [];
+		}
 
 	}
-	
+
 	$fw['elements'] = array ( 'section', 'container', 'row', 'column', 'block' );
 	
 	$fw['autogen'] = true;

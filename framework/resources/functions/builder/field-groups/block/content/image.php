@@ -109,7 +109,7 @@ if ( isset ( $globals['current_lang_code'] ) ) {
 				<div id="img-link-url" class="col p-3 border-end">
 					<label for="inputs-link-url-<?php echo $lang ?>" class="form-label mb-1">URL</label>
 					
-					<input type="text" class="form-control" name="inputs-link-url">
+					<input type="text" class="form-control" name="inputs-link-url-<?php echo $lang ?>">
 				</div>
 				
 				<div id="img-link-target" class="col p-3">

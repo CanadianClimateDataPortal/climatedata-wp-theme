@@ -16,16 +16,17 @@
 
 $lang = 'en';
 
-if ( isset ( $globals['current_lang_code'] ) ) {
-	$lang = $globals['current_lang_code'];
+if ( isset ( $globals[ 'current_lang_code' ] ) ) {
+	$lang = $globals[ 'current_lang_code' ];
 }
 
 // Field used to test if the block's content was created with the older (single-) or the newer (multilingual) code
-$backward_test_field = $element['inputs']['file']['id'];
-$backward_compatible_mode = is_string($backward_test_field);
+$backward_test_field = $element[ 'inputs' ][ 'file' ][ 'id' ];
+$backward_compatible_mode = is_string( $backward_test_field );
 // Test if content was created for the current language
-$has_current_lang = !$backward_compatible_mode && array_key_exists($lang, $backward_test_field);
-$actual_lang = ($backward_compatible_mode || $has_current_lang) ? $lang : array_keys($backward_test_field)[0];
+$has_current_lang = ! $backward_compatible_mode && array_key_exists( $lang, $backward_test_field );
+$default_lang = $backward_compatible_mode ? 'en' : array_keys( $backward_test_field )[ 0 ];
+$actual_lang = ( $backward_compatible_mode || $has_current_lang ) ? $lang : $default_lang;
 
 $element_keys = [
 	'inputs-file-url',
@@ -37,62 +38,72 @@ $element_keys = [
 
 $element_values = [];
 
-foreach ($element_keys as $element_key) {
-	$localized_element_key = "$element_key-$actual_lang";
+foreach ( $element_keys as $element_key ) {
 	$value = $element;
 
-	foreach (explode('-', $localized_element_key) as $level_key) {
-		if ( is_array($value) &&  array_key_exists($level_key, $value) ) {
-			$value = $value[$level_key];
+	foreach ( explode( '-', $element_key ) as $level_key ) {
+		if ( is_array( $value ) && array_key_exists( $level_key, $value ) ) {
+			$value = $value[ $level_key ];
 		} else {
 			break;
 		}
 	}
-	
-	$element_values[$element_key] = $value;
+
+	if ( is_array( $value ) ) {
+		foreach ( [ $actual_lang, $default_lang ] as $search_lang ) {
+			if ( array_key_exists( $search_lang, $value ) ) {
+				// An empty value should be considered as "no value", except for
+				// `inputs-link-type` where an empty string is a valid value.
+				if ( 'inputs-link-type' === $element_key || ! empty( $value[ $search_lang ] ) ) {
+					$value = $value[ $search_lang ];
+					break;
+				}
+			}
+		}
+	}
+
+	$element_values[ $element_key ] = $value;
 }
 
-if (is_user_logged_in()) {
-	if ($backward_compatible_mode) {
+if ( is_user_logged_in() ) {
+	if ( $backward_compatible_mode ) {
 		echo '<div class="alert alert-warning fw-builder-alert">';
 		echo 'Using old format<br>(do <strong>NOT</strong> edit: delete and recreate)';
 		echo '</div>';
-	} else if (!$has_current_lang) {
+	} else if ( ! $has_current_lang ) {
 		echo '<div class="alert alert-warning fw-builder-alert">';
 		echo 'Missing image <strong>' . $lang . '</strong>';
 		echo '</div>';
 	}
 }
 
-$img_urls = json_decode ( $element_values['inputs-file-url'], true );
+$img_urls = json_decode( $element_values[ 'inputs-file-url' ], true );
 
 $link_url = '';
 
-switch ( $element_values['inputs-link-type'] ) {
+switch ( $element_values[ 'inputs-link-type' ] ) {
 	case 'post' :
-		$link_url = get_permalink ( $element_values['inputs-link-post'] );
+		$link_url = get_permalink( $element_values[ 'inputs-link-post' ] );
 		break;
 	case 'url' :
-		$link_url = $element_values['inputs-link-url'];
+		$link_url = $element_values[ 'inputs-link-url' ];
 		break;
 }
 
 if ( $link_url != '' ) {
-
 	echo '<a href="' . $link_url . '"';
 
-	if ( $element_values['inputs-link-target'] == 'blank' ) {
+	if ( $element_values[ 'inputs-link-target' ] == 'blank' ) {
 		echo ' target="_blank"';
 	}
 
 	echo '>';
-
 }
 
-$img_url = $img_urls['full'];
+$img_url = $img_urls[ 'full' ];
 
 ?>
-<img src="<?php echo $img_url ?>">
+	<img src="<?php echo $img_url ?>">
 <?php
 
 if ( $link_url != '' ) {

@@ -1,0 +1,67 @@
+name: climatedata-dev
+
+services:
+
+  portal:
+    image: climatedata-portal:dev
+    build:
+      context: .
+      target: development
+      args:
+        TASK_RUNNER_IMAGE: climatedata-task-runner
+    depends_on:
+      - task_runner
+    volumes:
+      - "./framework:/var/www/html/assets/themes/framework"
+      - "./fw-child:/var/www/html/assets/themes/fw-child"
+      - type: bind
+        source: dockerfiles/dev/www/configs/nginx/site-extra/no-static-cache.conf
+        target: /etc/nginx/conf.d/climatedata-site/no-static-cache.conf
+      - type: bind
+        source: dockerfiles/dev/www/configs/php/php-development.ini
+        target: /usr/local/etc/php/conf.d/php-development.ini
+    environment:
+      # Note: to set a boolean value, always quote the words "true" and "false",
+      # else the YAML parser may transform them to 1 and 0. Example:
+      # WP_WP_DEBUG: "true"
+      WP_DB_NAME: climatedata
+      WP_DB_USER: climatedata
+      WP_DB_PASSWORD: climatedata
+      WP_DB_HOST: db
+      WP_DB_CHARSET: utf8
+      WP_DB_COLLATE: ""
+      WP_AUTH_KEY: ']jkQVSgz &&!>1<bK9JpD<Y_3 Xb#t|4=(g|Km+._e{YC5Bb>zrJl8I[r)!!Qq%{'
+      WP_SECURE_AUTH_KEY: '/{LmO@Hj|=6|y>W|9%uEPIvd%@F,?@tOofJo6C:YnOdfQk@t-K!4n,3Kolvo fDy'
+      WP_LOGGED_IN_KEY: 'K!9E9_~C;6Fqh8/i>^dWK7~F=mk!FsWOyz^y^A-0eU_a&d-ysykH9/1:/ils,F1d'
+      WP_NONCE_KEY: 'azzh.48v*8iRO2l`*-=gUT_kYOD<Ig9[qUaM>phg6ip8-avN<`#TBYf?yDPL_5UO'
+      WP_AUTH_SALT: '{i{+<`BhmtR`I2+9]lE2IU3!ypRkw9HjY;1}L!/OndY9nHR%N1*^W2?!?+cPG0+c'
+      WP_SECURE_AUTH_SALT: 'wI~I>Rooz-+-{lNI%[g3~|# 9R4 k6I?j7vF!!{Q>I^Utr^Pr5tZuZg?Pc!+N5gF'
+      WP_LOGGED_IN_SALT: 'i=GdI3/!VdU,+Y T-f?kr-.0(Q4kxiqZ[Hu*tB3TY(@W5M3mee/XRI-~[cHNOZ&j'
+      WP_NONCE_SALT: 'Up<Q /#k4>;p)GYi)+--Pls<>-7NywT.JVmrW9C,bET(F@Tz*Bkp+kHtN)87<5 l'
+      WP_WP_DEBUG: "true"
+      # Required, for the login page to work correctly
+      WP_WP_SITEURL: https://dev-en.climatedata.ca/
+      WP_WP_HOME: https://dev-en.climatedata.ca/
+
+  db:
+    image: registry.gitlab.com/crim.ca/clients/ccdp/portal/deployment/db:dev
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: climatedata
+      MARIADB_USER: climatedata
+      MARIADB_PASSWORD: climatedata
+    command: --innodb-buffer-pool-size=128M --innodb-log-buffer-size=64M --innodb-doublewrite=0 --innodb-flush-log-at-trx-commit=0
+
+  task_runner:
+    image: climatedata-task-runner
+    build:
+      context: .
+      dockerfile: dockerfiles/build/task-runner/Dockerfile
+    command: ["watch-sass.sh", "/app"]
+    volumes:
+      - ".:/app"
+
+volumes:
+  db_data: {}

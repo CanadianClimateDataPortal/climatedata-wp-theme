@@ -255,6 +255,7 @@ function child_theme_enqueue() {
 		wp_enqueue_script ( 'gsap' );
 		wp_enqueue_script ( 'scrolltrigger' );
 		wp_enqueue_script ( 'scroll' );
+		wp_enqueue_script ( 'swiper' );
 
 	}
 
@@ -706,6 +707,54 @@ function short_province ( $province ) {
 
 // Disable WordPress redirection guessing on 404 errors.
 add_filter( 'do_redirect_guess_404_permalink', '__return_false' );
+
+// Get asset type meta for Learning Zone.
+function cdc_get_asset_type_meta( $asset_type ) {
+
+	switch ( $asset_type ) {
+		case 'video' :
+			$meta['icon']  = 'fas fa-video';
+			$meta['label'] = __( 'Video', 'cdc' );
+			break;
+
+		case 'podcast' :
+			$meta['icon']  = 'fas fa-microphone';
+			$meta['label'] = __( 'Podcast', 'cdc' );
+			break;
+
+		case 'interactive' :
+			$meta['icon']  = 'far fa-hand-pointer';
+			$meta['label'] = __( 'Interactive', 'cdc' );
+			break;
+
+		case 'app' :
+			$meta['icon']  = 'far fa-window-maximize';
+			$meta['label'] = __( 'App', 'cdc' );
+			break;
+
+		case 'sector_overview':
+			$meta['icon']  = 'fa-solid fa-gear';
+			$meta['label'] = __( 'Sector overview', 'cdc' );
+			break;
+
+		case 'case_study':
+			$meta['icon']  = 'fa-solid fa-book';
+			$meta['label'] = __( 'Case study', 'cdc' );
+			break;
+
+		case 'regional_profile':
+			$meta['icon']  = 'fas fa-globe';
+			$meta['label'] = __( 'Regional profile', 'cdc' );
+			break;
+
+		default : // Article.
+			$meta['icon'] = 'far fa-newspaper';
+			$meta['label'] = __( 'Article', 'cdc' );
+			break;
+	}
+
+	return $meta;
+}
 
 //
 // Error 404 related functions

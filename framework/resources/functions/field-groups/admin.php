@@ -319,56 +319,59 @@ foreach ( get_taxonomies ( array ( 'public' => true ), 'objects' ) as $taxonomy 
 			'ui_off_text' => '',
 		)*/
 	);
-	
-	foreach ( get_option ( 'fw_langs') as $code => $lang ) {
-	
-		if ( $code != 'en' ) {
-			
-			array_push (
-				$GLOBALS['fw_fields']['admin']['taxonomy']['field_group']['fields'],
-				array(
-					'key' => 'admin_tax_' . $taxonomy->name . '_name_' . $code,
-					'label' => $lang['name'],
-					'name' => '',
-					'type' => 'message',
-					'wrapper' => array(
-						'width' => '',
-						'class' => '',
-						'id' => '',
+
+	$fw_langs = get_option ( 'fw_langs');
+
+	if ( is_array( $fw_langs ) ) {
+		foreach ( $fw_langs as $code => $lang ) {
+
+			if ( $code != 'en' ) {
+
+				array_push(
+					$GLOBALS[ 'fw_fields' ][ 'admin' ][ 'taxonomy' ][ 'field_group' ][ 'fields' ],
+					array(
+						'key' => 'admin_tax_' . $taxonomy->name . '_name_' . $code,
+						'label' => $lang[ 'name' ],
+						'name' => '',
+						'type' => 'message',
+						'wrapper' => array(
+							'width' => '',
+							'class' => '',
+							'id' => '',
+						),
+						'esc_html' => 0,
+						'new_lines' => 'wpautop',
 					),
-					'esc_html' => 0,
-					'new_lines' => 'wpautop',
-				),
-				array(
-					'key' => 'admin_tax_' . $taxonomy->name . '_title_single_' . $code,
-					'label' => 'Title (Singular)',
-					'name' => 'tax_' . $taxonomy->name . '_title_single_' . $code,
-					'type' => 'text',
-					'wrapper' => array(
-						'width' => '33',
+					array(
+						'key' => 'admin_tax_' . $taxonomy->name . '_title_single_' . $code,
+						'label' => 'Title (Singular)',
+						'name' => 'tax_' . $taxonomy->name . '_title_single_' . $code,
+						'type' => 'text',
+						'wrapper' => array(
+							'width' => '33',
+						),
 					),
-				),
-				array(
-					'key' => 'admin_tax_' . $taxonomy->name . '_title_plural_' . $code,
-					'label' => 'Title (Plural)',
-					'name' => 'tax_' . $taxonomy->name . '_title_plural_' . $code,
-					'type' => 'text',
-					'wrapper' => array(
-						'width' => '33',
+					array(
+						'key' => 'admin_tax_' . $taxonomy->name . '_title_plural_' . $code,
+						'label' => 'Title (Plural)',
+						'name' => 'tax_' . $taxonomy->name . '_title_plural_' . $code,
+						'type' => 'text',
+						'wrapper' => array(
+							'width' => '33',
+						),
 					),
-				),
-				array(
-					'key' => 'admin_tax_' . $taxonomy->name . '_slug_' . $code,
-					'label' => 'Slug',
-					'name' => 'tax_' . $taxonomy->name . '_slug_' . $code,
-					'type' => 'text',
-					'wrapper' => array(
-						'width' => '33',
+					array(
+						'key' => 'admin_tax_' . $taxonomy->name . '_slug_' . $code,
+						'label' => 'Slug',
+						'name' => 'tax_' . $taxonomy->name . '_slug_' . $code,
+						'type' => 'text',
+						'wrapper' => array(
+							'width' => '33',
+						),
 					),
-				),
-			);
-			
+				);
+
+			}
 		}
 	}
-	
 }

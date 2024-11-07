@@ -222,7 +222,7 @@ p {
 
   &-lg {
     @include media-breakpoint-down(sm) {
-      padding: $input-padding-y-lg $input-padding-x-lg; 
+      padding: $input-padding-y-lg $input-padding-x-lg;
     }
   }
 }
@@ -467,11 +467,13 @@ $control-slider-handle-width: 2.75rem;
 
 // BREADCRUMB
 
-#header-breadcrumb {
-  overflow-x: auto;
+#header-breadcrumb,
+#app-breadcrumb {
+  display: none;
+  overflow-x: visible;
 
-  @include media-breakpoint-up(lg) {
-    overflow-x: visible;
+  @include media-breakpoint-up(md) {
+    display: block;
   }
 
   .breadcrumb {
@@ -494,9 +496,9 @@ $control-slider-handle-width: 2.75rem;
   position: relative;
   height: 100%;
   min-height: 100vh;
-  background-color: transparentize($dark, 0.1);
+  background-color: mix($dark, $gray-200, 90%);
   font-size: 0.875rem;
-  z-index: 10;
+  margin-right: 0.25rem;
 
   @include media-breakpoint-up(md) {
     font-size: 0.75rem;
@@ -506,17 +508,6 @@ $control-slider-handle-width: 2.75rem;
     font-size: 0.875rem;
   }
 
-  .tab-drawer-container {
-    box-shadow: 0 0 0 transparentize($black, 0.8);
-    transition: box-shadow $td-slide-transition-duration ease 0.25s;
-    z-index: -1;
-
-    &:has(.tab-drawer.td-selected) {
-      width: calc((100vw / 16) * 3);
-      box-shadow: 0 0 20px transparentize($black, 0.8);
-    }
-  }
-
   .control-bar-tab-link {
     display: flex;
     flex-direction: column;
@@ -524,10 +515,14 @@ $control-slider-handle-width: 2.75rem;
     justify-content: space-between;
     padding: 0.5rem;
     color: $white;
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     text-decoration: none;
     text-align: center;
     transition: 0.25s;
+
+    @include media-breakpoint-up(md) {
+      font-size: 0.75rem;
+    }
 
     &.disabled {
       opacity: 0.5;
@@ -561,25 +556,48 @@ $control-slider-handle-width: 2.75rem;
     }
 
     svg {
-      width: 30px;
+      width: 22px;
+
+      @include media-breakpoint-up(lg) {
+        width: 24px;
+      }
+
+      @include media-breakpoint-up(xl) {
+        width: 30px;
+      }
     }
   }
 
   .control-bar-text-link {
     display: block;
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
+    padding: 0.75rem 0.125rem;
+    max-width: 100%;
     color: $white;
     border-top: 1px solid $gray-700;
+    font-size: 0.6875rem;
+    word-break: break-word;
+
+    @include media-breakpoint-up(md) {
+      font-size: 0.75rem;
+    }
+  }
+
+  // Accomodate the "Rétroaction" fr wording to fit in the tiny sidebar
+  [lang="fr"] & {
+    .control-bar-text-link {
+      @include media-breakpoint-only(sm) {
+        hyphens: none;
+      }
+    }
   }
 
   .tab-drawer-tabs {
-    padding-left: 0.5rem;
+    transition: border-top 500ms;
+    border-top: 2px solid transparent;
 
-    a {
-      // display: block;
+    &--fixed {
+      border-color: $gray-700;
     }
-
     .tab-drawer-trigger {
       .alert-icon {
         display: none;
@@ -597,10 +615,33 @@ $control-slider-handle-width: 2.75rem;
     }
   }
 
+  .tab-drawer-container {
+    left: 0;
+    margin-left: 100%;
+    z-index: -1;
+    transform: translateX( calc(-100% - 12.5vw) );
+    transition: transform 0.5s;
+
+    @include media-breakpoint-up(sm) {
+      transform: translateX( calc(-100% - 6.25vw) );
+    }
+
+    &:has(.tab-drawer.td-selected) {
+      transform: translateX(0);
+    }
+  }
+
   .tab-drawer {
-    width: calc((100vw / 16) * 3);
+    left: 0 !important;
     height: 100%;
-    // height: 100vh;
+    transition: none !important;
+    z-index: -9999 !important;
+    box-shadow: none;
+
+    &.td-selected {
+      z-index: -1 !important;
+      box-shadow: 0 0 20px transparentize($black, 0.9);
+    }
 
     .tab-drawer-content {
       height: 100%;
@@ -613,6 +654,8 @@ $control-slider-handle-width: 2.75rem;
 
         .tab-drawer-content-inner {
           height: 100vh;
+          transform: none !important;
+          transition: none !important;
         }
       }
     }
@@ -625,7 +668,7 @@ $control-slider-handle-width: 2.75rem;
     }
 
     .control-tab-head {
-      padding: 1rem;
+      padding: 1rem .375rem 1rem 1rem;
       background-color: $gray-200;
 
       @include media-breakpoint-down(md) {
@@ -635,8 +678,7 @@ $control-slider-handle-width: 2.75rem;
 
     .control-tab-body {
       flex-grow: 1;
-      overflow-y: auto;
-      // padding: 1rem;
+      overflow: auto;
     }
 
     .tab-drawer {
@@ -650,7 +692,28 @@ $control-slider-handle-width: 2.75rem;
     }
   }
 
-  .learn-zone-topic-filter {
+  .tab-drawer-container,
+  .tab-drawer {
+    width: calc((100vw / 16) * 12);
+
+    @include media-breakpoint-up(sm) {
+      width: calc((100vw / 16) * 6);
+    }
+
+    @include media-breakpoint-up(md) {
+      width: calc((100vw / 16) * 5);
+    }
+
+    @include media-breakpoint-up(lg) {
+      width: calc((100vw / 16) * 4);
+    }
+
+    @include media-breakpoint-up(xl) {
+      width: calc((100vw / 16) * 3);
+    }
+  }
+
+  .learn-zone-module-filter {
     &:hover {
       background-color: $gray-200;
     }
@@ -660,6 +723,11 @@ $control-slider-handle-width: 2.75rem;
       opacity: .5;
     }
   }
+}
+
+#control-bar-tabs {
+  width: 100%;
+  transition: opacity .25s;
 }
 
 #control-bar-secondary,
@@ -673,8 +741,7 @@ $control-slider-handle-width: 2.75rem;
 }
 
 .tab-drawer-close {
-  // font-size: 2rem;
-  // line-height: 1rem;
+  padding: .625rem;
   cursor: pointer;
 }
 
@@ -684,16 +751,6 @@ $control-slider-handle-width: 2.75rem;
   padding: 1rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid $gray-300;
-}
-
-.tab-drawer-bumper {
-  transition: margin-left $td-slide-transition-duration ease;
-}
-
-.tab-drawer-open {
-  .tab-drawer-bumper {
-    margin-left: 18.75vw;
-  }
 }
 
 .filter-item {
@@ -718,15 +775,19 @@ $control-slider-handle-width: 2.75rem;
   }
 
   .filter-item {
-    color: $gray-600;
+    position: relative;
+    padding-left: 1.75rem;
     margin-bottom: 0.25rem;
+    color: $gray-600;
 
     &:before {
       content: '';
       display: inline-block;
+      position: absolute;
+      left: 0;
       width: 0.75rem;
       height: 0.75rem;
-      margin-right: 1rem;
+      margin-top: .375rem;
       border-radius: 50%;
       background-color: $gray-400;
       transition: 0.25s;
@@ -744,6 +805,14 @@ $control-slider-handle-width: 2.75rem;
       &:before {
         background-color: $primary;
       }
+    }
+  }
+
+  [data-filter-multi="true"] {
+    .filter-item::before {
+      width: 0.6875rem;
+      height: 0.6875rem;
+      border-radius: .125rem;
     }
   }
 }
@@ -922,14 +991,14 @@ $query-card-hover-padding: 0.75rem;
     .card {
       height: 100%;
       transition: 0.25s;
-      
+
       &--news {
         .card-date,
         .card-authors,
         .card-topics {
           font-size: 0.875rem;
         }
-        
+
         .card-topics {
           span {
             font-size: 0.75rem;

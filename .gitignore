@@ -3,7 +3,6 @@ climate-data-ca/resources/app/idf/
 topo.json
 twentynineteen
 twentytwenty
-db.php
 local_config.php
 error_log
 .ftpconfig
@@ -12,9 +11,8 @@ proto/
 .DS_Store
 *.css.map
 climate-data-ca/resources/css/child.css
-framework/resources/css/global.css
-framework/resources/css/framework.css
-fw-child/resources/css/child.css
+framework/resources/css/**/*.css
+fw-child/resources/css/**/*.css
 framework/resources/vendor/aos/
 !framework/resources/vendor/aos/dist/
 framework/resources/vendor/bootstrap/
@@ -23,3 +21,6 @@ framework/resources/vendor/bootstrap/
 framework/resources/vendor/font-awesome-pro/
 fw-child/node_modules/
 .nova/
+/docker-override.yaml
+/dockerfiles/mounts/*
+!/dockerfiles/mounts/README.md

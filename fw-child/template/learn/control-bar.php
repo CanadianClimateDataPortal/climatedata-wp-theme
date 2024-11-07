@@ -1,14 +1,14 @@
-<div class="col-1">
+<div class="col-2 col-sm-1 position-relative z-3">
 	<div id="control-bar" class="control-bar tab-drawer-tabs-container">
 		
-		<div id="control-bar-tabs" class="tab-drawer-tabs pt-2">
-			<a href="#topics" class="control-bar-tab-link tab-drawer-trigger">
+		<div id="control-bar-tabs" class="tab-drawer-tabs">
+			<a href="#modules" class="control-bar-tab-link tab-drawer-trigger">
 				<span class="cdc-icon"><?php
 				
-					echo file_get_contents ( locate_template ( 'resources/img/icon-topic.svg' ) );
+					echo file_get_contents ( locate_template ( 'resources/img/icon-module.svg' ) );
 					
 				?></span>
-				<span><?php _e ( 'Topics', 'cdc' ); ?></span>
+				<span><?php _e ( 'Modules', 'cdc' ); ?></span>
 			</a>
 			
 			<a href="#filters" class="control-bar-tab-link tab-drawer-trigger">
@@ -23,38 +23,38 @@
 		
 		<div id="tab-drawer-container" class="tab-drawer-container">
 			
-			<div id="topics" class="tab-drawer">
+			<div id="modules" class="tab-drawer">
 				<div class="tab-drawer-content stick">
 					<div class="tab-drawer-content-inner">
 						<div class="control-tab-head d-flex justify-content-between align-items-center">
-							<h5 class="me-auto mb-0 text-secondary"><?php _e ( 'Topics', 'cdc' ); ?></h5>
+							<h5 class="me-auto mb-0 text-secondary"><?php _e ( 'Modules', 'cdc' ); ?></h5>
 							<span class="tab-drawer-close btn-close"></span>
 						</div>
 						
 						<div class="control-tab-body">
 							<?php
-							$tax_topic_terms = get_terms(
+							$tax_module_terms = get_terms(
 								array(
-									'taxonomy'   => 'topic',
+									'taxonomy'   => 'module',
 									'hide_empty' => true,
 								)
 							);
 
-							foreach ( $tax_topic_terms as $topic_term ) {
+							foreach ( $tax_module_terms as $module_term ) {
 								?>
-								<div class="learn-zone-topic-filter position-relative px-3 py-4 border-bottom"
-									 data-topic-id="topic-<?php echo esc_attr( $topic_term->term_id ); ?>">
-									<a href="#topic-<?php echo esc_attr( $topic_term->term_id ); ?>"
+								<div class="learn-zone-module-filter position-relative px-3 py-4 border-bottom"
+									 data-module-id="module-<?php echo esc_attr( $module_term->term_id ); ?>">
+									<a href="#module-<?php echo esc_attr( $module_term->term_id ); ?>"
 									   class="stretched-link"></a>
 
-									<h5><?php echo fw_get_field( 'title', 'topic_' . $topic_term->term_id ); ?></h5>
+									<h5><?php echo fw_get_field( 'title', 'module_' . $module_term->term_id ); ?></h5>
 
 									<p class="mb-0">
 										<?php
 										if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
-											echo get_field( 'description_fr', 'topic_' . $topic_term->term_id );
+											echo get_field( 'description_fr', 'module_' . $module_term->term_id );
 										} else {
-											echo $topic_term->description;
+											echo $module_term->description;
 										}
 										?>
 									</p>
@@ -82,32 +82,73 @@
 						<div class="control-tab-body query-container">
 								
 							<div class="fw-query-filter ms-3 py-4 border-bottom" data-filter-type="meta" data-filter-key="asset_type" data-filter-multi="false">
-								<h5 class="fw-bold"><?php _e ( 'Content Type', 'cdc' ); ?></h5>
+								<h5 class="fw-bold"><?php _e( 'Content Type', 'cdc' ); ?></h5>
 								
 								<ul class="list-unstyled m-0 pe-2">
-									<li class="filter-item" data-key="asset_type" data-value="video"><?php _e ( 'Video', 'cdc' ); ?></li>
-									<li class="filter-item" data-key="asset_type" data-value="audio"><?php _e ( 'Audio', 'cdc' ); ?></li>
-									<li class="filter-item" data-key="asset_type" data-value="interactive"><?php _e ( 'Interactive', 'cdc' ); ?></li>
-									<li class="filter-item" data-key="asset_type" data-value="article"><?php _e ( 'Article', 'cdc' ); ?></li>
-									<li class="filter-item" data-key="asset_type" data-value="app"><?php _e ( 'App', 'cdc' ); ?></li>
+								<?php
+								// Get the asset type field object.
+								$asset_type_object = acf_get_field( 'asset_type' );
+
+								if ( $asset_type_object && isset( $asset_type_object['choices'] ) ) {
+									// Array of asset types to check, dynamically retrieved from ACF.
+									$asset_types = array_keys( $asset_type_object['choices'] );
+
+									foreach ( $asset_types as $asset_type ) {
+										// Query to check if there are posts for the current asset type and if 'display_in_learning_zone' is true.
+										$query = new WP_Query(
+											array(
+												'post_type'      => array( 'page', 'resource', 'app' ),
+												'posts_per_page' => 1,
+												'meta_query'     => array(
+													'relation' => 'AND',
+													array(
+														'key'   => 'asset_type',
+														'value' => $asset_type,
+													),
+													array(
+														'key'   => 'display_in_learning_zone',
+														'value' => '1',
+													),
+												),
+											)
+										);
+										
+										// If the query has results, display the filter item.
+										if ( $query->have_posts() ) {
+											?>
+											<li class="filter-item" data-key="asset_type" data-value="<?php echo esc_attr( $asset_type ); ?>">
+												<?php echo esc_html( cdc_get_asset_type_meta( $asset_type )['label'] ); ?>
+											</li>
+											<?php
+										}
+
+										wp_reset_postdata();
+									}
+								}
+								?>
 								</ul>
 							</div>
 							
 							<?php
 							
-								foreach ( array ( 'sector', 'region', 'tech_level' ) as $filter_tax ) {
-									
-									$tax_obj = get_taxonomy ( $filter_tax );
-									
-									$this_heading = $tax_obj->labels->singular_name;
-									
-									if ( get_field ( 'tax_' . $filter_tax . '_title_single_' . $GLOBALS['fw']['current_lang_code'], 'option' ) != '' ) {
-										$this_heading = get_field ( 'tax_' . $filter_tax . '_title_single_' . $GLOBALS['fw']['current_lang_code'], 'option' );
-									}
-									
-							?>
+							foreach ( array( 'topic', 'sector', 'region', 'tech_level' ) as $filter_tax ) {
+								
+								$tax_obj = get_taxonomy ( $filter_tax );
+								
+								$this_heading = $tax_obj->labels->singular_name;
+								
+								if ( get_field ( 'tax_' . $filter_tax . '_title_single_' . $GLOBALS['fw']['current_lang_code'], 'option' ) != '' ) {
+									$this_heading = get_field ( 'tax_' . $filter_tax . '_title_single_' . $GLOBALS['fw']['current_lang_code'], 'option' );
+								}
+
+								$filter_multi = "false";
+
+								if ( in_array( $filter_tax, array( 'sector', 'region') ) ) {
+									$filter_multi = "true";
+								}
+								?>
 							
-							<div class="fw-query-filter ms-3 py-4 border-bottom" data-filter-type="taxonomy" data-filter-key="<?php echo $filter_tax; ?>" data-filter-multi="false">
+							<div class="fw-query-filter ms-3 py-4 border-bottom" data-filter-type="taxonomy" data-filter-key="<?php echo $filter_tax; ?>" data-filter-multi="<?php echo $filter_multi; ?>">
 								<h5 class="fw-bold"><?php echo $this_heading; ?></h5>
 								
 								<?php
@@ -123,36 +164,29 @@
 								
 								<ul class="list-unstyled m-0 pe-2">
 									<?php
-									
-										foreach ( $all_tags as $tag ) {
+									foreach ( $all_tags as $the_tag ) {
 
-											if ( $GLOBALS['fw']['current_lang_code'] != 'en' ) {
-												$tag_name = get_field( 'admin_term_title_' . $GLOBALS['fw']['current_lang_code'], $tag );
-											} else {
-												$tag_name = $tag->name;
-											}
-											
-									?>
-									
-									<li class="filter-item" data-key="<?php echo $filter_tax; ?>" data-value="<?php echo $tag->slug; ?>"><?php echo $tag_name; ?></li>
-									
-									<?php
-									
+										if ( 'en' !== $GLOBALS['fw']['current_lang_code'] ) {
+											$tag_name = get_field( 'admin_term_title_' . $GLOBALS['fw']['current_lang_code'], $the_tag );
+										} else {
+											$tag_name = $the_tag->name;
 										}
-								
+										
+										?>
+									
+									<li class="filter-item" data-key="<?php echo $filter_tax; ?>" data-value="<?php echo $the_tag->slug; ?>"><?php echo $tag_name; ?></li>
+									
+										<?php
+									}
 									?>
 								</ul>
-								<?php
-								
-									}
-							
+									<?php
+								}
 								?>
 							</div>
 							
-							<?php
-							
-								}
-						
+								<?php
+							}
 							?>
 							
 						</div>

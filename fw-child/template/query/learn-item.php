@@ -38,6 +38,7 @@ $excerpts = array (
 		<?php
 		// Initialize card format and time.
 		$card_asset_type = get_field( 'asset_type', $item['id'] );
+		$asset_type_meta = cdc_get_asset_type_meta( $card_asset_type );
 		$card_asset_time = get_field( 'asset_time', $item['id'] );
 		?>
 
@@ -45,42 +46,9 @@ $excerpts = array (
 			<div class="col">
 				<h6 class="all-caps fw-bold"><?php _e( 'Format', 'cdc' ); ?></h6>
 
-				<?php
-				$format_icon = '';
-				$format_name = '';
-
-				switch ( $card_asset_type ) {
-					case 'video':
-						$format_icon = 'fas fa-video';
-						$format_name = __( 'Video', 'cdc' );
-
-						break;
-					case 'audio':
-						$format_icon = 'fas fa-microphone';
-						$format_name = __( 'Audio', 'cdc' );
-
-						break;
-					case 'interactive':
-						$format_icon = 'far fa-hand-pointer';
-						$format_name = __( 'Interactive', 'cdc' );
-
-						break;
-					case 'app':
-						$format_icon = 'far fa-window-maximize';
-						$format_name = __( 'App', 'cdc' );
-
-						break;
-					default : // Article.
-						$format_icon = 'far fa-newspaper';
-						$format_name = __( 'Article', 'cdc' );
-
-						break;
-				}
-				?>
-
 				<p class="card-asset-type mb-0 text-gray-600 d-flex align-items-center">
-					<i class="<?php echo $format_icon; ?> me-2"></i>
-					<span><?php echo $format_name; ?></span>
+					<i class="<?php echo esc_attr( $asset_type_meta['icon'] ); ?> me-2"></i>
+					<span><?php echo esc_html( $asset_type_meta['label'] ); ?></span>
 				</p>
 			</div>
 

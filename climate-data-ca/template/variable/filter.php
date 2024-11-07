@@ -371,7 +371,7 @@ $get_dataset = filter_input(INPUT_GET, 'dataset', FILTER_SANITIZE_URL);
         <label for="toggle-a"><?php _e('Absolute','cdc');?></label>
         <input id="toggle-b" type="radio" value="d" name="absolute_delta_switch"<?php if ($get_delta == "true") { echo ' checked="checked"'; } ?> />
         <label for="toggle-b" style="float: left">Delta</label>
-        <div class="text-dark fas fa-question-circle" id="absolute_or_deltas_help" data-content="<div id=aordpoptitle><?php _e('DELTA WITH 1971-2000','cdc');?></div><?php _e('Deltas is the difference between the future value and the reference period (or baseline) value of a climate variable, as simulated by a climate model. The reference period used here is 1971-2000."','cdc');?>"></div>
+        <div class="text-dark fas fa-question-circle popoverbtn" data-content="<div class='popovertitle'><?php _e('DELTA WITH 1971-2000','cdc');?></div><?php _e('Deltas is the difference between the future value and the reference period (or baseline) value of a climate variable, as simulated by a climate model. The reference period used here is 1971-2000."','cdc');?>"></div>
         <span class="toggle-outside">
         <span class="toggle-inside"></span>
       </span>
@@ -382,6 +382,7 @@ $get_dataset = filter_input(INPUT_GET, 'dataset', FILTER_SANITIZE_URL);
         <label for="toggle-cmip5" style="float: left;white-space: nowrap;margin-top:3px">CMIP 5</label>
         <input id="toggle-cmip6" type="radio" value="cmip6" name="dataset_switch"<?php if (!$get_dataset || $get_dataset == "cmip6") { echo ' checked="checked"'; } ?> />
         <label for="toggle-cmip6" style="float: left;white-space: nowrap">CMIP 6</label>
+        <div class="text-dark fas fa-question-circle popoverbtn" style="margin-top: 23px;" data-content="<?php _e('The core datasets for the majority of the temperature- and precipitation-based climate projections shown here (aside from Humidex and SPEI) are CanDCS-U5 for CMIP5 and CanDCS-M6 for CMIP6."','cdc');?>"></div>
         <span class="toggle-outside">
         <span class="toggle-inside"></span>
       </span>

@@ -287,8 +287,8 @@
 				
 				// if inserting/editing a block,
 				// also set category and content properties
-				
-				if (options.modal.content.includes('/')) {
+
+				if (options.status !== 'editing' && options.modal.content.includes('/')) {
 					options.element.data.type = options.modal.content
 				}
 				

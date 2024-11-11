@@ -139,8 +139,7 @@ if (current_user_can('administrator')) {
     //
     // CHECK FOR ALERTS
     //
-
-    if (is_front_page()) {
+    if (is_front_page() || in_array($body_ID, array("page-variable", "page-download", "page-analyze", "page-analyser", "page-telechargement") ) ) {
 
         $alert_query = new WP_Query (array('post_type' => 'post', 'posts_per_page' => 1, 'meta_query' => array('relation' => 'AND', array('key' => 'post_alert', 'value' => 1), array('key' => 'post_alert-start', 'value' => $GLOBALS['vars']['date'], 'compare' => '<'), array('key' => 'post_alert-end', 'value' => $GLOBALS['vars']['date'], 'compare' => '>'))));
 

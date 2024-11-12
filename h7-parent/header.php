@@ -140,32 +140,28 @@ if (current_user_can('administrator')) {
     // CHECK FOR ALERTS
     //
 
-    if (is_front_page()) {
+	$alert_query = new WP_Query (array('post_type' => 'post', 'posts_per_page' => 1, 'meta_query' => array('relation' => 'AND', array('key' => 'post_alert', 'value' => 1), array('key' => 'post_alert-start', 'value' => $GLOBALS['vars']['date'], 'compare' => '<'), array('key' => 'post_alert-end', 'value' => $GLOBALS['vars']['date'], 'compare' => '>'))));
 
-        $alert_query = new WP_Query (array('post_type' => 'post', 'posts_per_page' => 1, 'meta_query' => array('relation' => 'AND', array('key' => 'post_alert', 'value' => 1), array('key' => 'post_alert-start', 'value' => $GLOBALS['vars']['date'], 'compare' => '<'), array('key' => 'post_alert-end', 'value' => $GLOBALS['vars']['date'], 'compare' => '>'))));
+	if ($alert_query->have_posts()) :
 
-        if ($alert_query->have_posts()) :
+		$body_class[] = 'has-alert';
 
-            $body_class[] = 'has-alert';
+		while ($alert_query->have_posts()) : $alert_query->the_post();
 
-            while ($alert_query->have_posts()) : $alert_query->the_post();
+			$alert = array('title' => get_the_title(), 'permalink' => get_permalink());
 
-                $alert = array('title' => get_the_title(), 'permalink' => get_permalink());
+		endwhile;
 
-            endwhile;
+	endif;
 
-        endif;
+	wp_reset_postdata();
 
-        wp_reset_postdata();
+	//
 
-    }
-
-		//
-
-		// $body_class = do_action ( 'example_action', $body_class );
+	// $body_class = do_action ( 'example_action', $body_class );
 
 
-		$body_class = apply_filters ( 'custom_body_classes', $body_class );
+	$body_class = apply_filters ( 'custom_body_classes', $body_class );
 
     ?>
 

@@ -88,10 +88,17 @@ if ( str_contains ( $element['inputs']['menu'] ?? '', 'menu-' ) ) {
 	//
 	// LANG SWITCHER
 	//
+
+	if ( is_404() ) {
+		// If we are currently displaying the 404 page, we want the language buttons to link to the home page.
+		$page_id = get_option( 'page_on_front' );
+	} else {
+		$page_id = $GLOBALS['fw']['current_query']['ID'];
+	}
 	
 	foreach ( get_field ( 'fw_languages', 'option' ) as $lang ) {
-		
-		$lang_URL = translate_permalink ( $GLOBALS['vars']['current_url'], $globals['current_query']['ID'], $lang['code'] );
+
+		$lang_URL = translate_permalink ( $GLOBALS['vars']['current_url'], $page_id, $lang['code'] );
 		
 		$lang_title = $lang['name'];
 		
@@ -103,8 +110,8 @@ if ( str_contains ( $element['inputs']['menu'] ?? '', 'menu-' ) ) {
 		}
 		
 		$menu[] = array(
-			'id' => $globals['current_query']['ID'],
-			'type' => get_post_type ( $globals['current_query']['ID'] ),
+			'id' => $page_id,
+			'type' => get_post_type ( $page_id ),
 			'url' => trailingslashit ( $lang_URL ),
 			'title' => $lang_title,
 			'classes' => array(),

@@ -84,6 +84,7 @@
 				attachment: null,
 				selection: null
 			},
+			active_wp_editor: null,
 			debug: true
 		}
 
@@ -162,6 +163,19 @@
 			//
 			// EVENTS
 			//
+
+			// Fix conflict between Bootstrap and text fields inside modals (see CLIM-741).
+			//
+			// By default, when a Bootstrap modal is opened (ex: the block editor modal), any
+			// text field outside the modal's HTML element (DOM wise) won't be "focusable". A
+			// problem arises with WordPress' TinyMCE since some of its buttons create
+			// elements (ex: a popup) outside the modal's HTML element, so their inputs cannot
+			// be focussed (ex: not able to change the content of a text field).
+			document.addEventListener( 'focusin', function( e ) {
+				if ( e.target.closest(".media-modal, .mce-container, #wp-link") !== null ) {
+					e.stopImmediatePropagation();
+				}
+			} );
 			
 			// CLICKS
 			
@@ -311,13 +325,9 @@
 			})
 			
 			$('#fw-modal').on('hide.bs.modal', function() {
-			
-				if (tinymce.activeEditor != null) {
-					
-					console.log('remove editor')
-					
-					tinymce.activeEditor.destroy()
-					
+				if ( options.active_wp_editor !== null ) {
+					wp.editor.remove( options.active_wp_editor );
+					options.active_wp_editor = null;
 				}
 				
 			})
@@ -3375,41 +3385,31 @@
 			// CONTENT TYPES:
 					
 			// block/content/text
-			
-			if (modal_body.find('.editor').length) {
-				
-				quicktags({ id: 'inputs-text-' + options.lang })
-				
-				tinymce.execCommand('mceAddEditor', false, 'inputs-text-' + options.lang)
-				
-				// console.log('destroy editor')
-				
-				// console.log(tinymce)
-				
-				// destroy the tinymce editor
-				// tinymce.execCommand('mceRemoveEditor', false, 'inputs-text-' + options.lang)
-				
-				// setTimeout(function() {
-					
-					// re-init
-					// not happy about the timeout
-					
-					console.log('init mce', 'inputs-text-' + options.lang)
-					
-					// console.log(options.element.data.inputs)
-					// console.log(options.element.data.inputs['text-' + options.lang])
-					// 
-					// if (typeof options.element.data.inputs['text-' + options.lang] != 'undefined') {
-					// 	
-					// 	console.log('yaahhh', tinymce.get('inputs-text-' + options.lang))
-					// 	
-					// 	tinymce.get('inputs-text-' + options.lang).setContent(plugin.unescape(options.element.data.inputs['text-' + options.lang]))
-					// 	
-					// }
-					
-				// }, 150)
-				
-			}
+
+			$( '#fw-modal' ).on( 'shown.bs.modal', function() {
+				const editor_element = modal_body.find( '.fw-text-editor' );
+				if ( editor_element.length ) {
+					const textarea_element = editor_element.find( 'textarea' );
+					textarea_element.css( 'opacity', 1 );
+
+					if ( options.active_wp_editor === null ) {
+						const tinymce_editor_id = textarea_element.attr( 'id' );
+						options.active_wp_editor = tinymce_editor_id;
+						wp.editor.initialize(
+							tinymce_editor_id,
+							{
+								tinymce: {
+									wpautop: true,
+									plugins: 'charmap colorpicker compat3x directionality fullscreen hr image lists media paste tabfocus textcolor wordpress wpautoresize wpdialogs wpeditimage wpemoji wpgallery wplink wptextpattern wpview',
+									toolbar1: 'formatselect bold italic underline | bullist numlist | outdent indent | link unlink | alignleft aligncenter alignright | pastetext removeformat | undo redo | wp_help',
+								},
+								quicktags: true,
+								mediaButtons: true,
+							}
+						);
+					}
+				}
+			})
 			
 			// uploader
 			

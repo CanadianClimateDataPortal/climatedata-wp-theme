@@ -287,8 +287,8 @@
 				
 				// if inserting/editing a block,
 				// also set category and content properties
-				
-				if (options.modal.content.includes('/')) {
+
+				if (options.status !== 'editing' && options.modal.content.includes('/')) {
 					options.element.data.type = options.modal.content
 				}
 				
@@ -2330,7 +2330,7 @@
 			
 			$.ajax({
 				url: ajax_data.url,
-				type: 'GET',
+				type: 'POST',
 				data: {
 					action: 'fw_setup_element_ajax',
 					globals: options.globals,

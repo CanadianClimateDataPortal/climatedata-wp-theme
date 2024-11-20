@@ -23,6 +23,7 @@ if ( isset ( $globals['current_lang_code'] ) ) {
 						name="inputs-text-<?php echo $lang ?>"
 						style="opacity: 0;"
 						rows="15"
+						data-wysiwyg="true"
 					></textarea>
 				</div>
 			</div>

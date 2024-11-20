@@ -84,7 +84,7 @@
 				attachment: null,
 				selection: null
 			},
-			active_wp_editor: null,
+			active_wp_editors: [],
 			debug: true
 		}
 
@@ -323,14 +323,13 @@
 			$('#fw-modal').on('show.bs.modal', function() {
 				plugin.modal_get_form()
 			})
-			
-			$('#fw-modal').on('hide.bs.modal', function() {
-				if ( options.active_wp_editor !== null ) {
-					wp.editor.remove( options.active_wp_editor );
-					options.active_wp_editor = null;
-				}
-				
-			})
+
+			$( '#fw-modal' ).on( 'hide.bs.modal', function () {
+				options.active_wp_editors.forEach( function ( editor_id ) {
+					wp.editor.remove( editor_id );
+				} );
+				options.active_wp_editors = [];
+			} );
 			
 			$('#fw-modal').on('hidden.bs.modal', function() {
 				
@@ -3383,33 +3382,6 @@
 			//
 			
 			// CONTENT TYPES:
-					
-			// block/content/text
-
-			$( '#fw-modal' ).on( 'shown.bs.modal', function() {
-				const editor_element = modal_body.find( '.fw-text-editor' );
-				if ( editor_element.length ) {
-					const textarea_element = editor_element.find( 'textarea' );
-					textarea_element.css( 'opacity', 1 );
-
-					if ( options.active_wp_editor === null ) {
-						const tinymce_editor_id = textarea_element.attr( 'id' );
-						options.active_wp_editor = tinymce_editor_id;
-						wp.editor.initialize(
-							tinymce_editor_id,
-							{
-								tinymce: {
-									wpautop: true,
-									plugins: 'charmap colorpicker compat3x directionality fullscreen hr image lists media paste tabfocus textcolor wordpress wpautoresize wpdialogs wpeditimage wpemoji wpgallery wplink wptextpattern wpview',
-									toolbar1: 'formatselect bold italic underline | bullist numlist | outdent indent | link unlink | alignleft aligncenter alignright | pastetext removeformat | undo redo | wp_help',
-								},
-								quicktags: true,
-								mediaButtons: true,
-							}
-						);
-					}
-				}
-			})
 			
 			// uploader
 			
@@ -3421,355 +3393,7 @@
 				plugin.do_uploader($(this).closest('.uploader-container'))
 				
 			})
-			
-			if (modal_body.find('.element-form-upload-btn').length) {
-				
-				// let upload_btn = modal_body.find('.element-form-upload-btn'),
-				// 		uploader.options = {
-				// 			title: 'Insert image',
-				// 			library: {
-				// 				type: 'image'
-				// 			},
-				// 			button: {
-				// 				text: 'Use this image'
-				// 			},
-				// 			multiple: false
-				// 		},
-				// 		upload_id_input = modal_body.find('[name="inputs-file-id"]'),
-				// 		upload_url_input = modal_body.find('[name="inputs-file-url"]'),
-				// 		img_placeholder = modal_body.find('.image-placeholder'),
-				// 		placeholder_src,
-				// 		img_url = {},
-				// 		attachment,
-				// 		selection
-			
-					// 
-					// // uploader
-					// 
-					// if (modal_body.find('.element-form-upload-btn').length) {
-					// 	
-					// 	let upload_btn = modal_body.find('.element-form-upload-btn'),
-					// 			uploader_options = {
-					// 				title: 'Insert image',
-					// 				library: {
-					// 					type: 'image'
-					// 				},
-					// 				button: {
-					// 					text: 'Use this image'
-					// 				},
-					// 				multiple: false
-					// 			},
-					// 			upload_id_input = modal_body.find('[name="inputs-file-id"]'),
-					// 			upload_url_input = modal_body.find('[name="inputs-file-url"]'),
-					// 			img_placeholder = modal_body.find('.image-placeholder'),
-					// 			placeholder_src,
-					// 			img_url = {},
-					// 			attachment,
-					// 			selection
-					// 	
-					// 	switch (options.modal.content) {
-					// 		case 'block/content/image' :
-					// 			
-					// 			break
-					// 			
-					// 		case 'block/content/animation' :
-					// 		
-					// 			uploader_options = {
-					// 				title: 'Upload Lottie Animation',
-					// 				library: {
-					// 					type: 'application/json'
-					// 				},
-					// 				button: {
-					// 					text: 'Select'
-					// 				},
-					// 				multiple: false
-					// 			}
-					// 		
-					// 			break
-					// 		
-					// 		
-					// 		
-					// 	}
-					// 	
-					// 	plugin.uploader = wp.media(uploader_options).on('select', function() {
-					// 		
-					// 		attachment = plugin.uploader.state().get('selection').first().toJSON()
-					// 		
-					// 		// set hidden image ID input
-					// 		upload_id_input.val(attachment.id)
-					// 		
-					// 		console.log(attachment)
-					// 		
-					// 		// set URL and placeholder
-					// 		
-					// 		if (img_placeholder.length) {
-					// 				
-					// 			img_url.full = attachment.url
-					// 			
-					// 			placeholder_src = img_url.full
-					// 			
-					// 			if (attachment.sizes.thumbnail) {
-					// 				img_url.thumbnail = attachment.sizes.thumbnail.url
-					// 			}
-					// 			
-					// 			if (attachment.sizes.medium) {
-					// 				img_url.medium = attachment.sizes.medium.url
-					// 				
-					// 				placeholder_src = img_url.medium
-					// 			}
-					// 			
-					// 			if (attachment.sizes.large) {
-					// 				img_url.thumbnail = attachment.sizes.large.url
-					// 			}
-					// 			
-					// 			img_placeholder.html('<img src="' + placeholder_src + '">')
-					// 			
-					// 			upload_url_input.val(JSON.stringify(img_url))
-					// 			
-					// 			// change button text
-					// 			upload_btn.text('Replace Image')
-					// 			
-					// 		} else {
-					// 			
-					// 			upload_url_input.val(JSON.stringify({ full: attachment.url }))
-					// 			
-					// 		}
-					// 		
-					// 		// upload_btn.addClass('disabled')
-					// 		// remove_btn.removeClass('d-none')
-					// 		
-					// 	}).on('open', function() {
-					// 	
-					// 		if (upload_id_input.val()) {
-					// 			
-					// 			selection = plugin.uploader.state().get('selection')
-					// 			attachment = wp.media.attachment(upload_id_input.val())
-					// 			attachment.fetch()
-					// 			selection.add( attachment ? [attachment] : [] )
-					// 			
-					// 		}
-					// 		
-					// 	})
-					// 	
-						// if (upload_id_input.val() != '') {
-						// 	
-						// 	// element has an ID set
-						// 	
-						// 	if (img_placeholder.length) {
-						// 		
-						// 		// there's also an image placeholder
-						// 	
-						// 		// grab the best image size and set the placeholder
-						// 		
-						// 		let img_urls = JSON.parse(upload_url_input.val())
-						// 		
-						// 		placeholder_src = img_urls.full
-						// 		
-						// 		if (img_urls.medium) {
-						// 			placeholder_src = img_urls.medium
-						// 		}
-						// 		
-						// 		img_placeholder.html('<img src="' + placeholder_src + '">')
-						// 		
-						// 		// change button text
-						// 		upload_btn.text('Replace image')
-						// 		
-						// 	} else {
-						// 		
-						// 		// change button text
-						// 		upload_btn.text('Replace file')
-						// 		
-						// 	}
-						// 	
-						// }
-					// 	
-					// 	upload_btn.click(function(e) {
-					// 		e.preventDefault()
-					// 		
-					// 		plugin.uploader.open()
-					// 	
-					// 	})
-					// 	
-					// 	
-					}
-					
-					// /image
-					
-			// 		if (options.modal.content == 'block/content/image') {
-			// 			
-			// 			let upload_btn = modal_body.find('.element-form-upload-btn'),
-			// 					remove_btn = modal_body.find('.image-remove'),
-			// 					img_placeholder = modal_body.find('.image-placeholder'),
-			// 					image_id_val = modal_body.find('[name="inputs-file-id"]'),
-			// 					image_url_val = modal_body.find('[name="inputs-file-url"]'),
-			// 					img_url = {},
-			// 					placeholder_src,
-			// 					attachment,
-			// 					selection
-			// 					
-			// 			plugin.uploader = wp.media({
-			// 				title: 'Insert image',
-			// 				library: {
-			// 					type: 'image'
-			// 				},
-			// 				button: {
-			// 					text: 'Use this image'
-			// 				},
-			// 				multiple: false
-			// 			}).on( 'select', function() {
-			// 				
-			// 				attachment = plugin.uploader.state().get('selection').first().toJSON()
-			// 				
-			// 				img_url.full = attachment.url
-			// 				
-			// 				placeholder_src = img_url.full
-			// 				
-			// 				console.log(attachment)
-			// 				
-			// 				if (attachment.sizes.thumbnail) {
-			// 					img_url.thumbnail = attachment.sizes.thumbnail.url
-			// 				}
-			// 				
-			// 				if (attachment.sizes.medium) {
-			// 					img_url.medium = attachment.sizes.medium.url
-			// 					
-			// 					placeholder_src = img_url.medium
-			// 				}
-			// 				
-			// 				if (attachment.sizes.large) {
-			// 					img_url.thumbnail = attachment.sizes.large.url
-			// 				}
-			// 				
-			// 				img_placeholder.html('<img src="' + placeholder_src + '">')
-			// 				
-			// 				// upload_btn.addClass('disabled')
-			// 				// remove_btn.removeClass('d-none')
-			// 				
-			// 				// set hidden image input
-			// 				image_id_val.val(attachment.id)
-			// 				image_url_val.val(JSON.stringify(img_url))
-			// 				
-			// 			}).on('open', function() {
-			// 			
-			// 				if (image_id_val.val()) {
-			// 					
-			// 					selection = plugin.uploader.state().get('selection')
-			// 					attachment = wp.media.attachment(image_id_val.val())
-			// 					attachment.fetch()
-			// 					selection.add( attachment ? [attachment] : [] )
-			// 					
-			// 				}
-			// 				
-			// 			})
-			// 
-			// 			if (image_url_val.val() != '') {
-			// 				console.log(image_url_val.val())
-			// 				
-			// 				let img_urls = JSON.parse(image_url_val.val())
-			// 				
-			// 				placeholder_src = img_urls.full
-			// 				
-			// 				if (attachment.sizes.medium) {
-			// 					placeholder_src = attachment.sizes.medium.url
-			// 				}
-			// 				
-			// 				img_placeholder.html('<img src="' + placeholder_src + '">')
-			// 				
-			// 			}
-			// 		
-			// 			upload_btn.click(function(e) {
-			// 				e.preventDefault()
-			// 				
-			// 				plugin.uploader.open()
-			// 			
-			// 			})
-			// 			
-			// 			// remove
-			// 			
-			// 			remove_btn.click(function(e) {
-			// 				
-			// 				e.preventDefault()
-			// 				
-			// 				// upload_btn.removeClass('disabled')
-			// 				// remove_btn.addClass('d-none')
-			// 				
-			// 				img_placeholder.empty()
-			// 				image_id_val.val('')
-			// 				image_url_val.val('')
-			// 				
-			// 			})
-			// 			
-			// 		}
-					
-					// /animation
-					
-					// if (options.modal.content == 'block/content/animation') {
-					// 	
-					// 	let upload_id_input = modal_body.find('[name="inputs-animation-id"]'),
-					// 			upload_url_input = modal_body.find('[name="inputs-animation-url"]'),
-					// 			attachment,
-					// 			selection
-					// 			
-					// 	plugin.uploader = wp.media({
-					// 		title: 'Upload Animation',
-					// 		library: {
-					// 			type: 'application/json'
-					// 		},
-					// 		button: {
-					// 			text: 'Select'
-					// 		},
-					// 		multiple: false
-					// 	}).on('select', function() {
-					// 		
-					// 		attachment = plugin.uploader.state().get('selection').first().toJSON()
-					// 		
-					// 		console.log('select', attachment)
-					// 		
-					// 		// set hidden image input
-					// 		upload_id_input.val(attachment.id)
-					// 		upload_url_input.val(attachment.url)
-					// 		
-					// 	}).on('open', function() {
-					// 	
-					// 		if (upload_id_input.val()) {
-					// 			
-					// 			selection = plugin.uploader.state().get('selection')
-					// 			attachment = wp.media.attachment(upload_id_input.val())
-					// 			attachment.fetch()
-					// 			selection.add( attachment ? [attachment] : [] )
-					// 			
-					// 		}
-					// 		
-					// 	})
-					// 	
-					// 	
-					// 	modal_body.find('.element-form-upload-btn').click(function(e) {
-					// 		e.preventDefault()
-					// 		
-					// 		plugin.uploader.open()
-					// 	
-					// 	})
-					// 	
-					// }
-					
-					// /navigation
-					
-					// /menu
-					
-					// DISPLAY MENU
-					// set the modal's data-display attribute
-					// to show/hide relevant field sets with CSS
-					// 
-					// if ($('#fw-modal').find('.fw-display-select').length) {
-					// 	
-					// 	let first_display_option = $('#fw-modal').find('.fw-display-select').first().val()
-					// 	
-					// 	$('#fw-modal').attr('data-display', first_display_option)
-					// 	
-					// }
-					
-			
-			
+
 			//
 			// ADD EXISTING DATA
 			//
@@ -3877,6 +3501,33 @@
 				})
 				
 			}
+
+			//
+			// INITIALIZE WYSIWYG EDITORS
+			//
+
+			const textarea_elements = modal_body.find( 'textarea[data-wysiwyg=true]' );
+			textarea_elements.each( function () {
+				const textarea_element = $( this );
+				textarea_element.css( 'opacity', 1 );
+				const editor_id = textarea_element.attr( 'id' );
+
+				if ( ! options.active_wp_editors.includes( editor_id ) ) {
+					options.active_wp_editors.push( editor_id );
+					wp.editor.initialize(
+						editor_id,
+						{
+							tinymce: {
+								wpautop: true,
+								plugins: 'charmap colorpicker compat3x directionality fullscreen hr image lists media paste tabfocus textcolor wordpress wpautoresize wpdialogs wpeditimage wpemoji wpgallery wplink wptextpattern wpview',
+								toolbar1: 'formatselect bold italic underline | bullist numlist | outdent indent | link unlink | alignleft aligncenter alignright | pastetext removeformat | undo redo | wp_help',
+							},
+							quicktags: true,
+							mediaButtons: true,
+						}
+					);
+				}
+			} );
 			
 			console.log('init form', 'done')
 			
@@ -5017,14 +4668,16 @@
 				if (property == 'class') {
 					value = value.split(' ')
 				}
-				
-				if (
-					lang_prop != null &&
-					tinymce.get('inputs-' + lang_prop + '-' + options.lang) != null
-				) {
-				
-					value = plugin.escape(tinymce.get('inputs-' + lang_prop + '-' + options.lang).getContent())
-				
+
+				// If the input is a textarea linked to a TinyMCE editor which is currently in the
+				// "Visual" tab, we use the editor's content as the value.
+				if ( lang_prop != null ) {
+					const textarea_element = $( 'textarea#inputs-' + lang_prop + '-' + options.lang );
+					const tinymce_editor = tinymce.get( textarea_element.attr( 'id' ) );
+
+					if ( textarea_element.is( ':hidden' ) && tinymce_editor ) {
+						value = plugin.escape( tinymce_editor.getContent() );
+					}
 				}
 				
 				// console.log('setting ' + property + '\'s value now')

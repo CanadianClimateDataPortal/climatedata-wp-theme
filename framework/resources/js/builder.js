@@ -3519,7 +3519,7 @@
 						{
 							tinymce: {
 								wpautop: true,
-								plugins: 'charmap colorpicker compat3x directionality fullscreen hr image lists media paste tabfocus textcolor wordpress wpautoresize wpdialogs wpeditimage wpemoji wpgallery wplink wptextpattern wpview',
+								plugins: 'lists paste wordpress wpautoresize wpdialogs wpeditimage wpemoji wpgallery wplink wptextpattern wpview',
 								toolbar1: 'formatselect bold italic underline | bullist numlist | outdent indent | link unlink | alignleft aligncenter alignright | pastetext removeformat | undo redo | wp_help',
 							},
 							quicktags: true,

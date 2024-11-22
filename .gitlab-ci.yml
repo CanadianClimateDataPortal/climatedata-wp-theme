@@ -30,10 +30,10 @@ update-instance-job:
   - chmod 644 ~/.ssh/known_hosts
   - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
   - eval $(ssh-agent -s)
-  # - chmod 400 "$SSH_PRIVATE_KEY"
-  - ssh-add "$SSH_PRIVATE_KEY"
+  - $SSH_PRIVATE_KEY > touch ~/.ssh/id_rsa
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
+  - ssh-add
 
   script:
   - ssh $QA_SERVER_USER@$QA_SERVER_IP app-manager restart

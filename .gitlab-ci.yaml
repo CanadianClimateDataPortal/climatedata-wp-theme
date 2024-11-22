@@ -1,0 +1,37 @@
+default:
+  tags:
+    - runner_CRIM
+
+test-job1:
+  stage: test
+  script:
+    - echo "This job tests something"
+
+build-job:
+  stage: build
+  variables:
+    DOCKER_IMAGE: "$CI_REGISTRY_IMAGE/ccdp_task_runner"
+  script:
+    - echo "Starting Docker"
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -f dockerfiles/build/task-runner/Dockerfile -t $DOCKER_IMAGE .
+    - docker image tag $DOCKER_IMAGE $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
+    - docker push -a $DOCKER_IMAGE
+    - echo "Done !"
+
+update-instance-job:
+  stage: deploy
+  variables:
+
+  before_script:
+  - ssh-keyscan -t rsa,ed25519 $SERVER_IP >> ~/.ssh/known_hosts
+  - chmod 644 ~/.ssh/known_hosts
+  - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - chmod 400 "$SSH_PRIVATE_KEY"
+  - ssh-add "$SSH_PRIVATE_KEY"
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+
+  script:
+  - ssh $QA_SERVER_USER@$QA_SERVER_IP app-manager restart

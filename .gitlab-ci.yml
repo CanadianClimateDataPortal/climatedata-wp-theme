@@ -33,6 +33,7 @@ update-instance-job:
   - echo $SSH_PRIVATE_KEY > ~/.ssh/id_rsa
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
+  - chmod 400 ~/.ssh/id_rsa
   - ssh-add
 
   script:

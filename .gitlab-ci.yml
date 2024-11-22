@@ -24,7 +24,7 @@ update-instance-job:
   variables:
 
   before_script:
-  - ssh-keyscan -t rsa,ed25519 $SERVER_IP >> ~/.ssh/known_hosts
+  - ssh-keyscan -t rsa,ed25519 $QA_SERVER_IP >> ~/.ssh/known_hosts
   - chmod 644 ~/.ssh/known_hosts
   - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
   - eval $(ssh-agent -s)

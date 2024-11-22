@@ -30,7 +30,7 @@ update-instance-job:
   - chmod 644 ~/.ssh/known_hosts
   - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
   - eval $(ssh-agent -s)
-  - $SSH_PRIVATE_KEY > touch ~/.ssh/id_rsa
+  - echo $SSH_PRIVATE_KEY > ~/.ssh/id_rsa
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   - ssh-add

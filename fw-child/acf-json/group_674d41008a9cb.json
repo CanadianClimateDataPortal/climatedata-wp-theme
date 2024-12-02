@@ -25,8 +25,8 @@
         },
         {
             "key": "field_674d4164b944b",
-            "label": "Related Variables",
-            "name": "related_vars",
+            "label": "Related Training",
+            "name": "related_training",
             "aria-label": "",
             "type": "post_object",
             "instructions": "",
@@ -38,7 +38,9 @@
                 "id": ""
             },
             "post_type": [
-                "variable"
+                "post",
+                "page",
+                "resource"
             ],
             "post_status": "",
             "taxonomy": "",
@@ -69,5 +71,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1733116352
+    "modified": 1733152436
 }

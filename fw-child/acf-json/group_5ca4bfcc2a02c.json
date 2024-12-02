@@ -1,25 +1,7 @@
 {
     "key": "group_5ca4bfcc2a02c",
-    "title": "Variable Details",
+    "title": "Variable Content",
     "fields": [
-        {
-            "key": "field_65e8913bc9519",
-            "label": "Content",
-            "name": "",
-            "aria-label": "",
-            "type": "accordion",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "open": 0,
-            "multi_expand": 1,
-            "endpoint": 0
-        },
         {
             "key": "field_65e89178c951c",
             "label": "English",
@@ -177,11 +159,11 @@
             "delay": 0
         },
         {
-            "key": "field_65e89149c951a",
-            "label": "Details",
+            "key": "field_674d48802e0a9",
+            "label": "",
             "name": "",
             "aria-label": "",
-            "type": "accordion",
+            "type": "tab",
             "instructions": "",
             "required": 0,
             "conditional_logic": 0,
@@ -190,9 +172,9 @@
                 "class": "",
                 "id": ""
             },
-            "open": 0,
-            "multi_expand": 1,
-            "endpoint": 0
+            "placement": "top",
+            "endpoint": 1,
+            "selected": 0
         },
         {
             "key": "field_65bd3783c9159",
@@ -725,5 +707,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 1,
-    "modified": 1721648300
+    "modified": 1733118237
 }

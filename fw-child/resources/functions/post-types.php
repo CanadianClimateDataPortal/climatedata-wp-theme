@@ -14,7 +14,6 @@ function posttype_variable()
         'menu_name' => __('Variables', 'cdc-post-types'),
         'name_admin_bar' => __('Variable', 'cdc-post-types'),
         'archives' => __('Variable Archives', 'cdc-post-types'),
-        'attributes' => __('Variable Attributes', 'cdc-post-types'),
         'parent_item_colon' => __('Parent Variable:', 'cdc-post-types'),
         'all_items' => __('All Variables', 'cdc-post-types'),
         'add_new_item' => __('Add New Variable', 'cdc-post-types'),
@@ -54,7 +53,6 @@ function posttype_variable()
             'title',
             'editor',
             'custom-fields',
-            'page-attributes',
             'thumbnail',
             'revisions',
         ],
@@ -354,7 +352,7 @@ function cdc_variable_update_tax_sector_terms( $post_id ) {
 
         // Extract term IDs from the relevant sectors.
         $term_ids = array();
-        
+
         foreach ( $relevant_sectors as $sector ) {
             if ( isset( $sector['sector_term'] ) && is_object( $sector['sector_term'] ) ) {
                 $term_ids[] = $sector['sector_term']->term_id;

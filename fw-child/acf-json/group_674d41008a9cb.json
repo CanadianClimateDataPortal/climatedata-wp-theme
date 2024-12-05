@@ -5,11 +5,11 @@
         {
             "key": "field_674d4100b944a",
             "label": "Variable ID",
-            "name": "var_name",
+            "name": "var_id",
             "aria-label": "",
             "type": "text",
-            "instructions": "",
-            "required": 0,
+            "instructions": "Please use a unique ID. No Spaces.",
+            "required": 1,
             "conditional_logic": 0,
             "wrapper": {
                 "width": "",
@@ -28,9 +28,9 @@
             "label": "Related Training",
             "name": "related_training",
             "aria-label": "",
-            "type": "post_object",
-            "instructions": "",
-            "required": 0,
+            "type": "relationship",
+            "instructions": "This will be shown as training suggestion content for this variable.",
+            "required": 1,
             "conditional_logic": 0,
             "wrapper": {
                 "width": "",
@@ -42,14 +42,20 @@
                 "page",
                 "resource"
             ],
-            "post_status": "",
+            "post_status": [
+                "publish"
+            ],
             "taxonomy": "",
+            "filters": [
+                "search",
+                "post_type"
+            ],
             "return_format": "id",
-            "multiple": 1,
-            "allow_null": 0,
+            "min": 1,
+            "max": 5,
             "allow_in_bindings": 1,
+            "elements": "",
             "bidirectional": 0,
-            "ui": 1,
             "bidirectional_target": []
         }
     ],
@@ -71,5 +77,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1733152436
+    "modified": 1733423736
 }

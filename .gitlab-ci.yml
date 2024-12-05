@@ -1,13 +1,17 @@
 default:
   tags:
     - runner_CRIM
-  
+
+stages:
+  - build
+  - tag
+  - deploy
+
 variables:
   PLUGINS_PATH: "dockerfiles/mounts/wp-plugins"
   TASK_RUNNER_IMAGE: "task_runner"
   PORTAL_IMAGE: "$DOCKER_IMAGE_REGISTRY/portal"
 
- 
 build-push-portal-image:
   stage: build
   rules:
@@ -17,60 +21,54 @@ build-push-portal-image:
   - docker build -f dockerfiles/build/task-runner/Dockerfile -t $TASK_RUNNER_IMAGE .
 
   - mkdir $PLUGINS_PATH
-  - > 
+  - >
     curl --header "JOB-TOKEN: $CI_JOB_TOKEN"
     --location
     "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/wp-plugins/1.0.0/advanced-custom-fields-pro-6.3.6.zip"
     --output $PLUGINS_PATH/advanced-custom-fields-pro-6.3.6.zip
-  - > 
+  - >
     curl --header "JOB-TOKEN: $CI_JOB_TOKEN"
     --location
     "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/wp-plugins/1.0.0/jquery-collapse-o-matic-1.8.5.3.zip"
     --output $PLUGINS_PATH/jquery-collapse-o-matic-1.8.5.3.zip
-  - > 
+  - >
     curl --header "JOB-TOKEN: $CI_JOB_TOKEN"
     --location
     "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/wp-plugins/1.0.0/katex-4.5.4.zip"
     --output $PLUGINS_PATH/katex-4.5.4.zip
-  - > 
+  - >
     curl --header "JOB-TOKEN: $CI_JOB_TOKEN"
     --location
     "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/wp-plugins/1.0.0/motionpage-2.1.9.zip"
     --output $PLUGINS_PATH/motionpage-2.1.9.zip
-  
+
   script:
-  - > 
+  - >
     docker build
     --target production
-    --build-arg TASK_RUNNER_IMAGE=$TASK_RUNNER_IMAGE           
+    --build-arg TASK_RUNNER_IMAGE=$TASK_RUNNER_IMAGE
     --build-arg LOCAL_WP_PLUGINS_DIR=$PLUGINS_PATH
     -t $PORTAL_IMAGE
-    . 
+    .
   - echo $DOCKER_DEPLOY_TOKEN | docker login -u $DOCKER_DEPLOY_USER $DOCKER_IMAGE_REGISTRY --password-stdin
   - docker image tag $PORTAL_IMAGE $PORTAL_IMAGE:$CI_COMMIT_SHORT_SHA
   - docker push $PORTAL_IMAGE:$CI_COMMIT_SHORT_SHA
 
-tag-image:
-  stage: build
-  needs:
-  - job: build-push-portal-image
-    optional: true
-
   rules:
   - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG != "preprod" && $CI_COMMIT_TAG != "uat"
-    variables: 
+    variables:
       SERVER_USER: $QA_SERVER_USER
       SERVER_IP: $QA_SERVER_IP
       DEPLOY_TAG: "qa"
 
   - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG == "uat"
-    variables: 
+    variables:
       SERVER_USER: $UAT_SERVER_USER
       SERVER_IP: $UAT_SERVER_IP
       DEPLOY_TAG: "uat"
 
   - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG == "preprod"
-    variables: 
+    variables:
       SERVER_USER: $PREPROD_SERVER_USER
       SERVER_IP: $PREPROD_SERVER_IP
       DEPLOY_TAG: "preprod"
@@ -81,25 +79,23 @@ tag-image:
   - docker image tag $PORTAL_IMAGE:$CI_COMMIT_SHORT_SHA $PORTAL_IMAGE:$DEPLOY_TAG
   - docker push $PORTAL_IMAGE:$DEPLOY_TAG
 
-
 update-instance:
   stage: deploy
   rules:
   - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG != "preprod" && $CI_COMMIT_TAG != "uat"
-    variables: 
+    variables:
       SERVER_USER: $QA_SERVER_USER
       SERVER_IP: $QA_SERVER_IP
 
   - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG == "uat"
-    variables: 
+    variables:
       SERVER_USER: $UAT_SERVER_USER
       SERVER_IP: $UAT_SERVER_IP
 
   - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG == "preprod"
-    variables: 
+    variables:
       SERVER_USER: $PREPROD_SERVER_USER
       SERVER_IP: $PREPROD_SERVER_IP
-
 
   before_script:
   - ssh-keyscan -t rsa,ed25519 $SERVER_IP > ~/.ssh/known_hosts

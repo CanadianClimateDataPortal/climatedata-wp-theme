@@ -5,7 +5,7 @@ default:
 variables:
   PLUGINS_PATH: "dockerfiles/mounts/wp-plugins"
   DOCKER_IMAGE_TASK_RUNNER: "task_runner"
-  PORTAL_IMAGE: "$DOCKER_IMAGE_REGISTRY/portal"
+  DOCKER_IMAGE_PORTAL: "$DOCKER_IMAGE_REGISTRY/portal"
 
  
 build-push-portal-image:

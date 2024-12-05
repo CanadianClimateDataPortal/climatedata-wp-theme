@@ -248,7 +248,7 @@ add_action( 'init', 'taxonomy_module', 10 );
 
 /**
  * Hides the sector taxonomy metabox on the edit page of CPT 'variable'.
- * 
+ *
  * @param WP_Screen $current_screen Current WP_Screen object.
  *
  * @return void
@@ -357,6 +357,48 @@ function taxonomy_vartype() {
 }
 
 add_action( 'init', 'taxonomy_vartype', 10 );
+
+// variable dataset
+
+function taxonomy_variabledataset() {
+
+  $labels = array(
+      'name'                       => _x( 'Variable Datasets', 'Taxonomy General Name', 'cdc-taxonomies' ),
+      'singular_name'              => _x( 'Variable Dataset', 'Taxonomy Singular Name', 'cdc-taxonomies' ),
+      'menu_name'                  => __( 'Variable Datasets', 'cdc-taxonomies' ),
+      'all_items'                  => __( 'All Datasets', 'cdc-taxonomies' ),
+      'parent_item'                => __( 'Parent Dataset', 'cdc-taxonomies' ),
+      'parent_item_colon'          => __( 'Parent Dataset:', 'cdc-taxonomies' ),
+      'new_item_name'              => __( 'New Dataset Name', 'cdc-taxonomies' ),
+      'add_new_item'               => __( 'Add New Dataset', 'cdc-taxonomies' ),
+      'edit_item'                  => __( 'Edit Dataset', 'cdc-taxonomies' ),
+      'update_item'                => __( 'Update Dataset', 'cdc-taxonomies' ),
+      'view_item'                  => __( 'View Dataset', 'cdc-taxonomies' ),
+      'separate_items_with_commas' => __( 'Separate items with commas', 'cdc-taxonomies' ),
+      'add_or_remove_items'        => __( 'Add or remove items', 'cdc-taxonomies' ),
+      'choose_from_most_used'      => __( 'Choose from the most used', 'cdc-taxonomies' ),
+      'popular_items'              => __( 'Popular Items', 'cdc-taxonomies' ),
+      'search_items'               => __( 'Search Items', 'cdc-taxonomies' ),
+      'not_found'                  => __( 'Not Found', 'cdc-taxonomies' ),
+      'no_terms'                   => __( 'No items', 'cdc-taxonomies' ),
+      'items_list'                 => __( 'Items list', 'cdc-taxonomies' ),
+      'items_list_navigation'      => __( 'Items list navigation', 'cdc-taxonomies' ),
+  );
+  $args = array(
+      'labels'                     => $labels,
+      'hierarchical'               => true,
+      'public'                     => false,
+      'show_ui'                    => true,
+      'show_admin_column'          => true,
+      'show_in_nav_menus'          => false,
+      'show_tagcloud'              => false,
+      'show_in_rest'               => true,
+  );
+  register_taxonomy( 'variable-dataset', array( 'variable' ), $args );
+
+}
+
+add_action( 'init', 'taxonomy_variabledataset', 10 );
 
 // News Author
 

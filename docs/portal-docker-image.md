@@ -30,6 +30,7 @@ docker build \
   --target production \
   --build-arg TASK_RUNNER_IMAGE=<IMAGE> \
   --build-arg LOCAL_WP_PLUGINS_DIR=<PATH> \
+  -t <IMAGE-NAME:TAG> \
   .
 ```
 

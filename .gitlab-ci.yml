@@ -11,100 +11,92 @@ variables:
   PLUGINS_PATH: "dockerfiles/mounts/wp-plugins"
   DOCKER_IMAGE_TASK_RUNNER: "task_runner"
   DOCKER_IMAGE_PORTAL: "$DOCKER_IMAGE_REGISTRY/portal"
+  CI_COMMIT_BRANCH: "main"
+
+.validate-deployment-tag:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG != "preprod" && $CI_COMMIT_TAG != "uat"
+      variables:
+        DEPLOYMENT_TAG: "qa"
+        INSTANCE_USER: $QA_INSTANCE_USER
+        INSTANCE_IP: $QA_INSTANCE_IP
+
+    - if: $CI_COMMIT_TAG == "uat"
+      variables:
+        DEPLOYMENT_TAG: "uat"
+        INSTANCE_USER: $UAT_INSTANCE_USER
+        INSTANCE_IP: $UAT_INSTANCE_IP
+
+    - if: $CI_COMMIT_TAG == "preprod"
+      variables:
+        DEPLOYMENT_TAG: "preprod"
+        INSTANCE_USER: $PREPROD_INSTANCE_USER
+        INSTANCE_IP: $PREPROD_INSTANCE_IP
 
 build-push-portal-image:
   stage: build
-  rules:
-  - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG != "preprod" && $CI_COMMIT_TAG != "uat"
+  extends: .validate-deployment-tag
 
   before_script:
-  - docker build -f dockerfiles/build/task-runner/Dockerfile -t $TASK_RUNNER_IMAGE .
-
+  - docker build -f dockerfiles/build/task-runner/Dockerfile -t $DOCKER_IMAGE_TASK_RUNNER .
   - mkdir $PLUGINS_PATH
   - >
-    curl --header "JOB-TOKEN: $CI_JOB_TOKEN"
-    --location
-    "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/wp-plugins/1.0.0/advanced-custom-fields-pro-6.3.6.zip"
-    --output $PLUGINS_PATH/advanced-custom-fields-pro-6.3.6.zip
-  - >
-    curl --header "JOB-TOKEN: $CI_JOB_TOKEN"
-    --location
-    "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/wp-plugins/1.0.0/jquery-collapse-o-matic-1.8.5.3.zip"
-    --output $PLUGINS_PATH/jquery-collapse-o-matic-1.8.5.3.zip
-  - >
-    curl --header "JOB-TOKEN: $CI_JOB_TOKEN"
-    --location
-    "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/wp-plugins/1.0.0/katex-4.5.4.zip"
-    --output $PLUGINS_PATH/katex-4.5.4.zip
-  - >
-    curl --header "JOB-TOKEN: $CI_JOB_TOKEN"
-    --location
-    "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/wp-plugins/1.0.0/motionpage-2.1.9.zip"
-    --output $PLUGINS_PATH/motionpage-2.1.9.zip
+    plugins=$(grep -v -e '^\s*$' -e '^#' ./dockerfiles/build/www/wp-plugins/local.txt);
+    for plugin in $plugins;
+    do
+        curl \
+          --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+          --location "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/wp-plugins/1.0.0/$plugin" \
+          --output $PLUGINS_PATH/$plugin;
+    done
 
   script:
+  - echo $DOCKER_IMAGE_REGISTRY
+  - echo $DOCKER_IMAGE_PORTAL
   - >
     docker build
     --target production
-    --build-arg TASK_RUNNER_IMAGE=$TASK_RUNNER_IMAGE
+    --build-arg TASK_RUNNER_IMAGE=$DOCKER_IMAGE_TASK_RUNNER
     --build-arg LOCAL_WP_PLUGINS_DIR=$PLUGINS_PATH
-    -t $PORTAL_IMAGE
+    -t $DOCKER_IMAGE_PORTAL
     .
   - echo $DOCKER_DEPLOY_TOKEN | docker login -u $DOCKER_DEPLOY_USER $DOCKER_IMAGE_REGISTRY --password-stdin
-  - docker image tag $PORTAL_IMAGE $PORTAL_IMAGE:$CI_COMMIT_SHORT_SHA
-  - docker push $PORTAL_IMAGE:$CI_COMMIT_SHORT_SHA
+  - docker image tag $DOCKER_IMAGE_PORTAL $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA
+  - docker push $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA
 
-  rules:
-  - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG != "preprod" && $CI_COMMIT_TAG != "uat"
-    variables:
-      SERVER_USER: $QA_SERVER_USER
-      SERVER_IP: $QA_SERVER_IP
-      DEPLOY_TAG: "qa"
-
-  - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG == "uat"
-    variables:
-      SERVER_USER: $UAT_SERVER_USER
-      SERVER_IP: $UAT_SERVER_IP
-      DEPLOY_TAG: "uat"
-
-  - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG == "preprod"
-    variables:
-      SERVER_USER: $PREPROD_SERVER_USER
-      SERVER_IP: $PREPROD_SERVER_IP
-      DEPLOY_TAG: "preprod"
-
+tag-image:
+  stage: tag
+  extends: .validate-deployment-tag
+  
   script:
   - echo $DOCKER_DEPLOY_TOKEN | docker login -u $DOCKER_DEPLOY_USER $DOCKER_IMAGE_REGISTRY --password-stdin
-  - docker pull $PORTAL_IMAGE:$CI_COMMIT_SHORT_SHA
-  - docker image tag $PORTAL_IMAGE:$CI_COMMIT_SHORT_SHA $PORTAL_IMAGE:$DEPLOY_TAG
-  - docker push $PORTAL_IMAGE:$DEPLOY_TAG
+  - docker pull $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA
+  - docker image tag $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA $DOCKER_IMAGE_PORTAL:$DEPLOYMENT_TAG
+  - docker push $DOCKER_IMAGE_PORTAL:$DEPLOYMENT_TAG
 
 update-instance:
   stage: deploy
-  rules:
-  - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG != "preprod" && $CI_COMMIT_TAG != "uat"
-    variables:
-      SERVER_USER: $QA_SERVER_USER
-      SERVER_IP: $QA_SERVER_IP
-
-  - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG == "uat"
-    variables:
-      SERVER_USER: $UAT_SERVER_USER
-      SERVER_IP: $UAT_SERVER_IP
-
-  - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG == "preprod"
-    variables:
-      SERVER_USER: $PREPROD_SERVER_USER
-      SERVER_IP: $PREPROD_SERVER_IP
+  extends: .validate-deployment-tag
 
   before_script:
-  - ssh-keyscan -t rsa,ed25519 $SERVER_IP > ~/.ssh/known_hosts
-  - chmod 644 ~/.ssh/known_hosts
-  - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
-  - rm ~/.ssh/id_ed25519
-  - echo $SSH_PRIVATE_KEY | base64 --decode > ~/.ssh/id_ed25519
-  - chmod 400 ~/.ssh/id_ed25519
+  - >
+    if [ ! -f ~/.ssh/known_hosts ]; then
+      touch ~/.ssh/known_hosts;
+      chmod 644 ~/.ssh/known_hosts;
+    fi
+  - export INSTANCE_HOST="$(ssh-keyscan -t rsa,ed25519 $INSTANCE_IP)"
+  - >
+    if ! grep -q $INSTANCE_HOST ~/.ssh/known_hosts; then
+      $INSTANCE_HOST >> ~/.ssh/known_hosts;
+    fi
 
+  - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+  - rm ~/.ssh/ccdp_deploy
+  - touch ~/.ssh/ccdp_deploy
+  - chmod 700 ~/.ssh/ccdp_deploy
+  - echo $SSH_PRIVATE_KEY | base64 --decode > ~/.ssh/ccdp_deploy
   script:
-  - ssh $SERVER_USER@$SERVER_IP app-manager restart
+  - eval "$(ssh-agent)"
+  - ssh-add -k ~/.ssh/ccdp_deploy
+  - ssh $INSTANCE_USER@$INSTANCE_IP app-manager restart
 

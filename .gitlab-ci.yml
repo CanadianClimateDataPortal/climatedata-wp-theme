@@ -11,7 +11,6 @@ variables:
   PLUGINS_PATH: "dockerfiles/mounts/wp-plugins"
   DOCKER_IMAGE_TASK_RUNNER: "task_runner"
   DOCKER_IMAGE_PORTAL: "$DOCKER_IMAGE_REGISTRY/portal"
-  CI_COMMIT_BRANCH: "main"
 
 .validate-deployment-tag:
   rules:

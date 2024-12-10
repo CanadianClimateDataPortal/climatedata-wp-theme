@@ -67,7 +67,7 @@ build-push-portal-image:
 tag-image:
   stage: tag
   extends: .validate-deployment-tag
-  
+
   script:
   - echo $DOCKER_DEPLOY_TOKEN | docker login -u $DOCKER_DEPLOY_USER $DOCKER_IMAGE_REGISTRY --password-stdin
   - docker pull $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA

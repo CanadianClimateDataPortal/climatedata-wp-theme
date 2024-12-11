@@ -8,7 +8,7 @@
             "name": "var_id",
             "aria-label": "",
             "type": "text",
-            "instructions": "Please use a unique ID. No Spaces.",
+            "instructions": "Please use a unique ID. No spaces.",
             "required": 1,
             "conditional_logic": 0,
             "wrapper": {
@@ -22,41 +22,6 @@
             "placeholder": "",
             "prepend": "",
             "append": ""
-        },
-        {
-            "key": "field_674d4164b944b",
-            "label": "Related Training",
-            "name": "related_training",
-            "aria-label": "",
-            "type": "relationship",
-            "instructions": "This will be shown as training suggestion content for this variable.",
-            "required": 1,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "post_type": [
-                "post",
-                "page",
-                "resource"
-            ],
-            "post_status": [
-                "publish"
-            ],
-            "taxonomy": "",
-            "filters": [
-                "search",
-                "post_type"
-            ],
-            "return_format": "id",
-            "min": 1,
-            "max": 5,
-            "allow_in_bindings": 1,
-            "elements": "",
-            "bidirectional": 0,
-            "bidirectional_target": []
         },
         {
             "key": "field_6751f6a8f83b5",
@@ -80,10 +45,47 @@
             "return_format": "value",
             "allow_custom": 0,
             "allow_in_bindings": 0,
-            "layout": "vertical",
+            "layout": "horizontal",
             "toggle": 0,
             "save_custom": 0,
             "custom_choice_button_text": "Add new choice"
+        },
+        {
+            "key": "field_674d4164b944b",
+            "label": "Relevant Trainings",
+            "name": "relevant_trainings",
+            "aria-label": "",
+            "type": "relationship",
+            "instructions": "This will be shown under Relevant Trainings for this variable.",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "post_type": [
+                "post",
+                "page",
+                "resource"
+            ],
+            "post_status": [
+                "publish"
+            ],
+            "taxonomy": "",
+            "filters": [
+                "search",
+                "post_type"
+            ],
+            "return_format": "id",
+            "min": 1,
+            "max": 5,
+            "allow_in_bindings": 0,
+            "elements": [
+                "featured_image"
+            ],
+            "bidirectional": 0,
+            "bidirectional_target": []
         }
     ],
     "location": [
@@ -104,5 +106,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1733424899
+    "modified": 1733928231
 }

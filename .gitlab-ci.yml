@@ -89,7 +89,7 @@ update-instance:
       $INSTANCE_HOST >> ~/.ssh/known_hosts;
     fi
 
-  - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+  - command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )
   - rm ~/.ssh/ccdp_deploy
   - touch ~/.ssh/ccdp_deploy
   - chmod 700 ~/.ssh/ccdp_deploy

@@ -21,26 +21,6 @@
             "selected": 0
         },
         {
-            "key": "field_660ecd7f12cba",
-            "label": "Brief Description",
-            "name": "var_brief",
-            "aria-label": "",
-            "type": "wysiwyg",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "tabs": "all",
-            "toolbar": "full",
-            "media_upload": 0,
-            "delay": 0
-        },
-        {
             "key": "field_65e89167c951b",
             "label": "Full Description",
             "name": "var_description",
@@ -97,26 +77,6 @@
             "placement": "left",
             "endpoint": 0,
             "selected": 0
-        },
-        {
-            "key": "field_660ecd9c12cbb",
-            "label": "Brief Description",
-            "name": "var_brief_fr",
-            "aria-label": "",
-            "type": "wysiwyg",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "tabs": "all",
-            "toolbar": "full",
-            "media_upload": 0,
-            "delay": 0
         },
         {
             "key": "field_65e891ccc9521",
@@ -177,5 +137,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 1,
-    "modified": 1733928314
+    "modified": 1733935267
 }

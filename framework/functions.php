@@ -327,7 +327,7 @@ function fw_menu_output( $menu, $level, $type, $classes ) {
 		$item_label_translation = get_post_meta( $item['id'] )[ 'label_' . $GLOBALS['fw']['current_lang_code'] ] ?? '';
 
 		// If the current language is not English and the translation is not empty, use the translation.
-		if ( 'en' !== $GLOBALS['fw']['current_lang_code'] && ! is_array( $item_label_translation ) && ! empty( $item_label_translation[0] ) ) {
+		if ( 'en' !== $GLOBALS['fw']['current_lang_code'] && is_array( $item_label_translation ) && ! empty( $item_label_translation[0] ) ) {
 
 			$item_title = $item_label_translation[0];
 

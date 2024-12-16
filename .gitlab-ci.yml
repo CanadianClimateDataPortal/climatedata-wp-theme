@@ -84,10 +84,7 @@ update-instance:
   extends: .validate-deployment-tag
 
   before_script:
-  - >
-    if ! grep -q $INSTANCE_HOST ~/.ssh/known_hosts; then
-      $INSTANCE_HOST >> ~/.ssh/known_hosts;
-    fi
+
   - command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )
   - touch ~/.ssh/ccdp_deploy
   - chmod 600 ~/.ssh/ccdp_deploy
@@ -96,7 +93,7 @@ update-instance:
   script:
   - eval "$(ssh-agent)"
   - ssh-add -k ~/.ssh/ccdp_deploy
-  - ssh -o StrictHostKeyChecking=no $INSTANCE_USER@$INSTANCE_IP app-manager restart
+  - ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $INSTANCE_USER@$INSTANCE_IP app-manager restart
 
   after_script:
   - rm -f ~/.ssh/ccdp_deploy

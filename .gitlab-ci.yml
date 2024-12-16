@@ -84,7 +84,6 @@ update-instance:
   extends: .validate-deployment-tag
 
   before_script:
-
   - command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )
   - touch ~/.ssh/ccdp_deploy
   - chmod 600 ~/.ssh/ccdp_deploy

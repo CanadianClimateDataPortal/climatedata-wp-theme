@@ -1,0 +1,107 @@
+default:
+  tags:
+    - runner_CRIM
+
+stages:
+  - build
+  - tag
+  - deploy
+
+variables:
+  LOCAL_WP_PLUGINS_DIR: "dockerfiles/mounts/wp-plugins"
+  DOCKER_IMAGE_TASK_RUNNER: "task_runner"
+  DOCKER_IMAGE_PORTAL: "$DOCKER_REGISTRY/portal"
+
+.validate-deployment-tag:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG != "preprod" && $CI_COMMIT_TAG != "uat" && $CI_COMMIT_TAG !~ /v[0-9]+\.[0-9]+\.[0-9]+/
+      variables:
+        DEPLOYMENT_TAG: "qa"
+        INSTANCE_USER: $INSTANCE_USER_QA
+        INSTANCE_IP: $INSTANCE_IP_QA
+
+    - if: $CI_COMMIT_TAG == "uat" && $CI_JOB_STAGE != "build"
+      variables:
+        DEPLOYMENT_TAG: "uat"
+        INSTANCE_USER: $INSTANCE_USER_UAT
+        INSTANCE_IP: $INSTANCE_IP_UAT
+
+    - if: $CI_COMMIT_TAG == "preprod" && $CI_JOB_STAGE != "build"
+      variables:
+        DEPLOYMENT_TAG: "preprod"
+        INSTANCE_USER: $INSTANCE_USER_PREPROD
+        INSTANCE_IP: $INSTANCE_IP_PREPROD
+
+    - if: $CI_COMMIT_TAG =~ /v[0-9]+\.[0-9]+\.[0-9]+/ && $CI_JOB_STAGE == "tag"
+      variables:
+        DEPLOYMENT_TAG: $CI_COMMIT_TAG
+
+build-push-portal-image:
+  stage: build
+  extends: .validate-deployment-tag
+
+  before_script:
+  - docker build -f dockerfiles/build/task-runner/Dockerfile -t $DOCKER_IMAGE_TASK_RUNNER .
+  - mkdir -p $LOCAL_WP_PLUGINS_DIR
+  - plugins=$(grep -v -e '^\s*$' -e '^#' ./dockerfiles/build/www/wp-plugins/local.txt)
+  - >
+    for plugin in $plugins;
+    do
+        curl \
+          --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+          --location "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/wp-plugins/1.0.0/$plugin" \
+          --output $LOCAL_WP_PLUGINS_DIR/$plugin;
+    done
+  - echo $DOCKER_DEPLOY_TOKEN | docker login -u $DOCKER_DEPLOY_USER $DOCKER_REGISTRY --password-stdin
+
+  script:
+  - >
+    docker build
+    --target production
+    --build-arg TASK_RUNNER_IMAGE=$DOCKER_IMAGE_TASK_RUNNER
+    --build-arg LOCAL_WP_PLUGINS_DIR=$LOCAL_WP_PLUGINS_DIR
+    -t $DOCKER_IMAGE_PORTAL
+    .
+  - docker image tag $DOCKER_IMAGE_PORTAL $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA
+  - docker push $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA
+
+  after_script:
+  - docker logout $DOCKER_REGISTRY
+
+tag-image:
+  stage: tag
+  extends: .validate-deployment-tag
+
+  before_script:
+  - echo $DOCKER_DEPLOY_TOKEN | docker login -u $DOCKER_DEPLOY_USER $DOCKER_REGISTRY --password-stdin
+
+  script:
+  - >
+    docker pull $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA
+    || { echo "The pipeline can only tag already built Docker images tagged with the current Git commit's SHA";
+    exit 1; }
+  - docker image tag $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA $DOCKER_IMAGE_PORTAL:$DEPLOYMENT_TAG
+  - docker push $DOCKER_IMAGE_PORTAL:$DEPLOYMENT_TAG
+
+  after_script:
+  - docker logout $DOCKER_REGISTRY
+
+update-instance:
+  stage: deploy
+  extends: .validate-deployment-tag
+
+  before_script:
+    - echo $SSH_PRIVATE_KEY | base64 --decode > ~/.ssh/ccdp_deploy
+    - chmod 600 ~/.ssh/ccdp_deploy
+
+  script:
+  - >
+    ssh
+    -o UserKnownHostsFile=/dev/null
+    -o StrictHostKeyChecking=no
+    -i ~/.ssh/ccdp_deploy
+    $INSTANCE_USER@$INSTANCE_IP
+    app-manager restart
+
+  after_script:
+  - rm -f ~/.ssh/ccdp_deploy

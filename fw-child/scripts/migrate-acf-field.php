@@ -1,99 +1,99 @@
 <?php
 /**
- * Template Name: Migrate ACF Field
+ * Template Name: ACF Field Migration
  *
- * Script to migrate data from one ACF field to another.
+ * Script to migrate data from a post meta into an ACF field (single value).
  *
- * This script utilizes $_GET parameters:
- *  - old-field: Name of the old ACF field
- *  - new-field: Name of the new ACF field
- *  - post-type: Post type to use for filtering (optional)
+ * This script utilizes the below $_GET parameters:
+ *  - post-meta: The name of the old post meta field.
+ *  - acf-field-key: The key of the new ACF field.
+ *  - post-type: The post type to filter by.
  *
- * Example:
- *  https://dev-en.climatedata.ca/migrate-acf-fields/?old-field=var_name&new-field=var_id&post-type=variable
+ * Usage:
+ *  - https://dev-en.climatedata.ca/migrate/?post-meta=var_name&acf-field-key=field_XXXX&post-type=variable
  */
 
 // Bail early if the user isn't logged in and isn't an administrator.
 if ( ! is_user_logged_in() || ! current_user_can( 'administrator' ) ) {
-  wp_die( 'You do not have sufficient permissions to access this page.' );
+	die( 'You do not have sufficient permissions to access this page.' );
 }
 
-// check for required parameters
-if ( ! isset( $_GET['old-field'], $_GET['new-field'] ) ) {
-  // show usage instructions if required parameters are missing
-  echo <<<HTML
-    <h1>ACF Field Migration Tool</h1>
-    <p><strong>Required Parameters:</strong></p>
-    <ul>
-      <li><code>?old-field=</code> (Name of the old ACF field)</li>
-      <li><code>?new-field=</code> (Name of the new ACF field)</li>
-    </ul>
-    <p><i>Optional Parameters:</i></p>
-      <li><code>?post-type=</code> (Optional, filter by post type)</li>
-    </ul>
-    <p>Example:
-      <code>?old-field=var_name&new-field=var_id&post-type=post</code>
-    </p>
-  HTML;
-  wp_die();
+// Check for required parameters.
+if ( ! isset( $_GET['post-meta'] ) || ! isset( $_GET['acf-field-key'] ) || ! isset( $_GET['post-type'] ) ) {
+	// Output a simple usage guide.
+	echo <<<HTML
+	<h1>ACF Field Migration Tool</h1>
+	<p><strong>Required Parameters:</strong></p>
+	<ul>
+	  <li><code>?post-meta=</code> (The name of the old post meta field)</li>
+	  <li><code>?acf-field-key=</code> (The key of the new ACF field)</li>
+	  <li><code>?post-type=</code> (The post type to filter by)</li>
+	</ul>
+	<p>Example:
+	  <code>?post-meta=var_name&acf-field-key=field_XXXX&post-type=variable</code>
+	</p>
+	HTML;
+
+	die();
 }
 
-$old_field = sanitize_text_field( $_GET['old-field'] );
-$new_field = sanitize_text_field( $_GET['new-field'] );
+// Sanitize parameters.
+$post_meta     = sanitize_text_field( $_GET['post-meta'] );
+$acf_field_key = sanitize_text_field( $_GET['acf-field-key'] );
+$post_type     = sanitize_text_field( $_GET['post-type'] );
 
-// optional post type parameter, to narrow down results
-$post_type = isset( $_GET['post-type'] ) ? sanitize_text_field( $_GET['post-type'] ) : 'any';
+// Check if the ACF field exists.
+$acf_field_key_obj = get_field_object( $acf_field_key, $post_type );
 
-// make sure the new field exists in ACF, otherwise there's no point in continuing
-$new_field_data = acf_get_field( $new_field );
-if ( ! $new_field_data ) {
-  wp_die( "The new field '{$new_field}' does not exist in ACF." );
+if ( empty( $acf_field_key_obj ) ) {
+	die( "The new ACF field with key '{$acf_field_key}' does not exist." );
 }
 
-// fetch posts
-$args = [
-    'post_type'      => $post_type,
-    'posts_per_page' => -1,
-    'post_status'    => 'any',
+// Get $post_type posts.
+$query_args = [
+	'post_type'      => $post_type,
+	'posts_per_page' => - 1,
+	'post_status'    => 'any',
 ];
-$posts = get_posts( $args );
+
+$query = new WP_Query( $query_args );
+$posts = $query->posts;
 
 if ( empty( $posts ) ) {
-  wp_die('No posts found for the specified post type.');
+	die( "No posts found for the specified post type '{$post_type}'." );
 }
 
-// just so we can output a nice summary at the end
-$output = [];
+// Migrate the data.
+$output = array();
 
-// start the migration process
 foreach ( $posts as $post ) {
-  // get the old field value from post meta, instead of ACF -- because it may not exist in ACF anymore
-  $old_value = get_post_meta( $post->ID, $old_field, true );
+	$post_meta_value = trim( get_post_meta( $post->ID, $post_meta, true ) );
 
-  // update the new field only if the old field has any data
-  if ( ! empty( $old_value ) ) {
-    update_field( $new_field, $old_value, $post->ID );
+	if ( 'variable' == $post_type && 'var_name' === $post_meta && empty( $post_meta_value ) ) {
+		$post_meta_value = trim( get_post_meta( $post->ID, 'var_names_0_variable', true ) );
 
-    // store the old value for the summary
-    $output[$post->ID] = $old_value;
-  }
+		// Note: if $post_meta_value is still empty, we check the finch_var post_meta.
+	}
 
-  // finally delete the old field meta if it exists
-  delete_post_meta( $post->ID, $old_field );
+	update_field( $acf_field_key, $post_meta_value, $post->ID );
+
+	// store the old value for the summary
+	$output[ $post->ID ] = $post_meta_value;
 }
 
-echo "<p><strong>Migrating '{$old_field}' -> '{$new_field}'</strong></p>";
+/**
+ * Output the migration summary.
+ */
 
-$table_output = "Post ID   | Old Value\n";
-$table_output .= str_repeat('-', 40) . "\n";
-foreach ( $output as $post_id => $old_value ) {
-  $table_output .= str_pad($post_id, 10) . " | " . $old_value . "\n";
-}
+echo "<div class='migration-status'><p><strong>Migrating '{$post_meta}' -> '{$acf_field_key}'</strong></p></div>";
 
-// in case this is run from the CLI
-if ( php_sapi_name() === 'cli' ) {
-  echo $table_output;
-}
-else {
-  echo '<pre>' . htmlspecialchars($table_output) . '</pre>';
-}
+$table_rows = array_map( function ( $post_id, $post_meta_value ) {
+	return str_pad( (string) $post_id, 10 ) . " | " . $post_meta_value;
+}, array_keys( $output ), $output );
+
+$table = implode( "\n", array_merge(
+	[ "Post ID   | Old Value", str_repeat( '-', 40 ) ],
+	$table_rows
+) );
+
+echo ( PHP_SAPI === 'cli' ) ? $table : '<pre>' . htmlspecialchars( $table ) . '</pre>';

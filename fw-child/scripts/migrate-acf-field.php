@@ -52,7 +52,7 @@ if ( empty( $acf_field_key_obj ) ) {
 // Get $post_type posts.
 $query_args = [
 	'post_type'      => $post_type,
-	'posts_per_page' => - 1,
+	'posts_per_page' => -1,
 	'post_status'    => 'any',
 ];
 

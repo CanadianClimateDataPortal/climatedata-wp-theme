@@ -52,7 +52,7 @@ if ( empty( $acf_field_key_obj ) ) {
 // Get $post_type posts.
 $query_args = [
 	'post_type'      => $post_type,
-	'posts_per_page' => -1,
+	'posts_per_page' => - 1,
 	'post_status'    => 'any',
 ];
 
@@ -77,7 +77,7 @@ foreach ( $posts as $post ) {
 
 	update_field( $acf_field_key, $post_meta_value, $post->ID );
 
-	// store the old value for the summary
+	// Add output record.
 	$output[ $post->ID ] = $post_meta_value;
 }
 

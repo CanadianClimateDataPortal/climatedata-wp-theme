@@ -92,7 +92,7 @@ $table_rows = array_map( function ( $post_id, $post_meta_value ) {
 }, array_keys( $output ), $output );
 
 $table = implode( "\n", array_merge(
-	[ "Post ID   | Old Value", str_repeat( '-', 40 ) ],
+	[ "Post ID    | Old Value", str_repeat( '-', 40 ) ],
 	$table_rows
 ) );
 

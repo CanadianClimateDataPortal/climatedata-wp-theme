@@ -104,6 +104,12 @@ const DATASETS = {
                 }
             },
             {
+                'name': 'ssp370', 'label': 'SSP3-7.0', 'chart_color': '#F47D23',
+                'correlations': {
+                    'cmip5': 'rcp85'
+                }
+            },
+            {
                 'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#F00',
                 'correlations': {
                     'cmip5': 'rcp85'
@@ -492,6 +498,9 @@ function displayChartData(data, varDetails, download_url, query, container) {
             }
         });
     scenarios.forEach(function (scenario) {
+        if (!('{0}_median'.format(scenario.name) in data)) {
+            return;
+        }
         if (data['{0}_median'.format(scenario.name)].length > 0)
             chartSeries.push({
                 name: T('{0} Median').format(scenario.label),
@@ -684,6 +693,9 @@ function displayChartData(data, varDetails, download_url, query, container) {
                                         }
 
                                         scenarios.forEach(function (scenario) {
+                                            if (!('30y_{0}_median'.format(scenario.name) in data)) {
+                                                return;
+                                            }
                                             this.value = data['30y_{0}_median'.format(scenario.name)][decade_ms][0];
                                             val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
                                             tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Median').format(scenario.label) + " <b>"
@@ -765,6 +777,9 @@ function displayChartData(data, varDetails, download_url, query, container) {
                                         let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + " " + chart_labels.change_from_1971_2000 + "</span><br/>"];
 
                                         scenarios.forEach(function (scenario) {
+                                            if (!('delta7100_{0}_median'.format(scenario.name) in data)) {
+                                                return;
+                                            }
                                             val1 = numformat(data['delta7100_{0}_median'.format(scenario.name)][decade_ms][0]);
                                             tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Median').format(scenario.label) + " <b>"
                                               + val1 + "</b><br/>");

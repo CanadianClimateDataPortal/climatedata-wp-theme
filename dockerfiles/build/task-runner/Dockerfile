@@ -10,13 +10,9 @@
 
 FROM node:23.5-bookworm
 
-# Put global npm packages in the `node` user's directory instead of the `root`
-# user's directory
-ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
-ENV PATH=$PATH:/home/node/.npm-global/bin
-ENV NODE_ENV=production
-ENV NPM_CONFIG_LOGLEVEL=info
+# Define environment variables
 ENV NVM_DIR=/home/node/.nvm
+ENV NPM_CONFIG_LOGLEVEL=info
 
 # For `dumb-init`, see point #5 in:
 #   https://snyk.io/blog/10-best-practices-to-containerize-nodejs-web-applications-with-docker/
@@ -27,9 +23,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-USER node
-WORKDIR /home/node/app
-
 # Install custom scripts
 
 COPY --chmod=755 dockerfiles/build/task-runner/bin /usr/local/bin
@@ -38,6 +31,17 @@ COPY --chmod=755 dockerfiles/build/task-runner/bin /usr/local/bin
 
 RUN npm install -g sass
 
+# Install concurrently
+# This is needed to output both SASS and Vite logs in the same terminal
+
+RUN npm install -g concurrently
+
+# Switch to the `node` user
+
+USER node
+
 # Install NVM
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+
+WORKDIR /home/node/app

@@ -8,14 +8,15 @@
 # This Dockerfile assumes that the context directory is the root of the project.
 # So, when building the image, make sure to build it from the project's root.
 
-FROM node:21.7-bookworm
+FROM node:23.5-bookworm
 
 # Put global npm packages in the `node` user's directory instead of the `root`
 # user's directory
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
-ENV PATH=$PATH:/home/node/.npm-global/bin:/home/node/bin/dart-sass
+ENV PATH=$PATH:/home/node/.npm-global/bin
 ENV NODE_ENV=production
 ENV NPM_CONFIG_LOGLEVEL=info
+ENV NVM_DIR=/home/node/.nvm
 
 # For `dumb-init`, see point #5 in:
 #   https://snyk.io/blog/10-best-practices-to-containerize-nodejs-web-applications-with-docker/
@@ -26,14 +27,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-# Install SASS
-
-RUN wget -qO- https://github.com/sass/dart-sass/releases/download/1.72.0/dart-sass-1.72.0-linux-x64.tar.gz | tar xvz -C /opt
-RUN ln -s /opt/dart-sass/sass /usr/local/bin/sass
+USER node
+WORKDIR /home/node/app
 
 # Install custom scripts
 
 COPY --chmod=755 dockerfiles/build/task-runner/bin /usr/local/bin
 
-USER node
-WORKDIR /home/node/app
+# Install SASS
+
+RUN npm install -g sass
+
+# Install NVM
+
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash

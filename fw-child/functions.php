@@ -786,3 +786,111 @@ function cdc_custom_404_page_setting() {
 }
 
 add_action( 'admin_init', 'cdc_custom_404_page_setting' );
+
+/**
+ * Load and process assets from the map app built index.html
+ *
+ * @param string $base_dir Base directory path
+ *
+ * @return array|null Array of assets or null on failure
+ */
+function cdc_map_asset_load( $base_dir ) {
+	$base_dir   = rtrim( $base_dir, '/' );
+	$index_path = $base_dir . '/template/map-app/app/dist/index.html';
+
+	// Verify directory and file
+	if ( ! is_dir( $base_dir ) || ! file_exists( $index_path ) || ! is_readable( $index_path ) ) {
+		error_log( 'Invalid directory or file: ' . $base_dir . ' or ' . $index_path );
+
+		return null;
+	}
+
+	try {
+		// Read index.html file content
+		$html_content = file_get_contents( $index_path );
+
+		if ( $html_content === false ) {
+			error_log( 'Failed to read file: ' . $index_path );
+
+			return null;
+		}
+
+		// Parse HTML
+		$dom = new \DOMDocument();
+		libxml_use_internal_errors( true );
+		$dom->loadHTML( $html_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+		libxml_clear_errors();
+
+		// Get script source
+		$script_src = '';
+		$scripts    = $dom->getElementsByTagName( 'script' );
+		foreach ( $scripts as $script ) {
+			if ( $script->getAttribute( 'type' ) === 'module' ) {
+				$script_src = filter_var( $script->getAttribute( 'src' ), FILTER_SANITIZE_URL );
+
+				break;
+			}
+		}
+
+		// Get stylesheet href
+		$style_href = '';
+		$links      = $dom->getElementsByTagName( 'link' );
+		foreach ( $links as $link ) {
+			if ( $link->getAttribute( 'rel' ) === 'stylesheet' ) {
+				$style_href = filter_var( $link->getAttribute( 'href' ), FILTER_SANITIZE_URL );
+
+				break;
+			}
+		}
+
+		# Theme directory URI
+		$theme_directory_uri = get_stylesheet_directory_uri();
+
+		return array(
+			'script_src' => $script_src ? $theme_directory_uri . '/template/map-app/app/dist/' . $script_src : '',
+			'link_href'  => $style_href ? $theme_directory_uri . '/template/map-app/app/dist/' . $style_href : ''
+		);
+	} catch ( \Exception $e ) {
+		error_log( 'Map app asset loader error: ' . $e->getMessage() );
+
+		return null;
+	}
+}
+
+/**
+ * Enqueue map app assets
+ *
+ * @return void
+ */
+function cdc_enqueue_map_assets() {
+	# Check if the current page is a map app page
+	if (
+		! is_page() ||
+		strpos( get_post_meta( get_the_ID(), 'builder', true ), 'map-app/template.php' ) === false
+	) {
+		return;
+	}
+
+	$assets         = cdc_map_asset_load( __DIR__ );
+	$assets_version = str_replace( 'index-', '', pathinfo( $assets['link_href'], PATHINFO_FILENAME ) ); // Extract random version from filename
+
+	if ( $assets && ! empty( $assets['link_href'] ) ) {
+		wp_enqueue_style(
+			'map-app-styles',
+			$assets['link_href'],
+			[],
+			$assets_version
+		);
+	}
+
+	if ( $assets && ! empty( $assets['script_src'] ) ) {
+		wp_enqueue_script(
+			'map-app-script',
+			$assets['script_src'],
+			[],
+			$assets_version,
+			true // Load in footer
+		);
+	}
+}
+add_action( 'wp_enqueue_scripts', 'cdc_enqueue_map_assets' );

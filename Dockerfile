@@ -33,24 +33,6 @@
 #  - WEB_SERVER_GROUP_ID (optional, default=10001): group id for the created
 #      web server user's group (www-data).
 
-ARG TASK_RUNNER_IMAGE
-
-###
-# Task runner stage.
-#
-# The task runner compiles some site's assets from their source files. It
-# outputs the generated files in a local dist/ directory.
-###
-
-FROM ${TASK_RUNNER_IMAGE} AS task-runner
-
-WORKDIR /home/node/app
-
-COPY --chown=node framework src/framework
-COPY --chown=node fw-child src/fw-child
-
-RUN compile-sass.sh src dist
-
 ###
 # Production website building stage.
 #
@@ -181,17 +163,6 @@ RUN --mount=type=bind,source=dockerfiles/build/www/wp-plugins/public.txt,target=
     plugins=$(grep -v -e '^\s*$' -e '^#' /tmp/plugins.txt) \
     && set -- $plugins \
     && download-wp-plugin.sh "$@"
-
-# ----
-# Themes files
-# ----
-
-WORKDIR /var/www/html/assets/themes
-
-COPY --from=task-runner /home/node/app/dist .
-
-COPY framework framework
-COPY fw-child fw-child
 
 # ----
 # File permissions

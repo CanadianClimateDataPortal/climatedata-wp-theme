@@ -12,8 +12,12 @@ services:
     depends_on:
       - task_runner
     volumes:
-      - "./framework:/var/www/html/assets/themes/framework"
-      - "./fw-child:/var/www/html/assets/themes/fw-child"
+      - type: bind
+        source: ./framework
+        target: /var/www/html/assets/themes/framework
+      - type: bind
+        source: ./fw-child
+        target: /var/www/html/assets/themes/fw-child
       - type: bind
         source: dockerfiles/dev/www/configs/nginx/site-extra/no-static-cache.conf
         target: /etc/nginx/conf.d/climatedata-site/no-static-cache.conf
@@ -59,7 +63,7 @@ services:
     build:
       context: .
       dockerfile: dockerfiles/build/task-runner/Dockerfile
-    command: ["watch-fe.sh", "/app"]
+    command: ["sh", "-c", "build-fe.sh /app && watch-fe.sh /app"]
     volumes:
       - ".:/app"
 

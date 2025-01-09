@@ -3,6 +3,13 @@
 //
 
 #training-filter {
+  // (Following line) Fix: The learning zone page keeps slowly scrolling (only
+  //   in Chrome) when the filters bar is "sticky".
+  //   Ref: CLIM-867
+  @include media-breakpoint-up(sm) {
+    height: 59px;
+  }
+
   &.is_stuck {
     z-index: 10;
   }

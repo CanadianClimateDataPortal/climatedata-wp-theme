@@ -51,7 +51,6 @@ function posttype_variable()
         'labels' => $labels,
         'supports' => [
             'title',
-            'editor',
             'custom-fields',
             'thumbnail',
             'revisions',

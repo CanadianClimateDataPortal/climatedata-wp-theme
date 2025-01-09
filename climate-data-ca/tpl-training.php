@@ -44,11 +44,11 @@
     <nav id="training-filter" class="navbar navbar-expand navbar-light bg-light">
       
       <ul class="navbar-nav tabs-nav w-100 flex-column flex-sm-row align-items-center justify-content-center">
-        <li class="nav-item"><span class="nav-link disabled p-4 all-caps"><?php _e ( 'Filter:', 'cdc' ); ?></a></li>
-        <li class="nav-item"><span class="nav-link p-4 all-caps" data-type="video"><?php _e ( 'Video', 'cdc' ); ?></a></li>
-        <li class="nav-item"><span class="nav-link p-4 all-caps" data-type="audio"><?php _e ( 'Audio', 'cdc' ); ?></a></li>
-        <li class="nav-item"><span class="nav-link p-4 all-caps" data-type="interactive"><?php _e ( 'Interactive', 'cdc' ); ?></a></li>
-        <li class="nav-item"><span class="nav-link p-4 all-caps" data-type="article"><?php _e ( 'Article', 'cdc' ); ?></a></li>
+        <li class="nav-item"><span class="nav-link disabled p-4 all-caps"><?php _e ( 'Filter:', 'cdc' ); ?></span></li>
+        <li class="nav-item"><span class="nav-link p-4 all-caps" data-type="video"><?php _e ( 'Video', 'cdc' ); ?></span></li>
+        <li class="nav-item"><span class="nav-link p-4 all-caps" data-type="audio"><?php _e ( 'Audio', 'cdc' ); ?></span></li>
+        <li class="nav-item"><span class="nav-link p-4 all-caps" data-type="interactive"><?php _e ( 'Interactive', 'cdc' ); ?></span></li>
+        <li class="nav-item"><span class="nav-link p-4 all-caps" data-type="article"><?php _e ( 'Article', 'cdc' ); ?></span></li>
       </ul>
       
     </nav>

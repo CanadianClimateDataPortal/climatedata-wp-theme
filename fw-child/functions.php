@@ -853,8 +853,12 @@ function cdc_enqueue_map_assets() {
 		return;
 	}
 
-	$assets         = cdc_map_asset_load( __DIR__ );
-	$assets_version = str_replace( 'index-', '', pathinfo( $assets['link_href'], PATHINFO_FILENAME ) ); // Extract random version from filename
+	// Get asset files URLs.
+	$assets = cdc_map_asset_load( __DIR__ );
+
+	// Extract random version from filename
+	$assets_version = str_replace( 'index-', '', pathinfo( $assets['script_src'], PATHINFO_FILENAME ) );
+	$assets_version .= '-' . str_replace( 'index-', '', pathinfo( $assets['link_href'], PATHINFO_FILENAME ) );
 
 	if ( $assets && ! empty( $assets['link_href'] ) ) {
 		wp_enqueue_style(

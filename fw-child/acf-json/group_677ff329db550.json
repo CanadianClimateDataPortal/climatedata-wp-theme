@@ -16,8 +16,8 @@
                 "class": "",
                 "id": ""
             },
-            "placement": "left",
-            "endpoint": 0,
+            "placement": "top",
+            "endpoint": 1,
             "selected": 0
         },
         {
@@ -26,7 +26,7 @@
             "name": "card_description",
             "aria-label": "",
             "type": "textarea",
-            "instructions": "This data will appear on the variable cards.",
+            "instructions": "A short description that shows on the dataset card.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -36,8 +36,8 @@
             },
             "default_value": "",
             "maxlength": "",
-            "allow_in_bindings": 1,
-            "rows": "",
+            "allow_in_bindings": 0,
+            "rows": 3,
             "placeholder": "",
             "new_lines": ""
         },
@@ -47,7 +47,7 @@
             "name": "card_link",
             "aria-label": "",
             "type": "link",
-            "instructions": "",
+            "instructions": "URL for the \"Learn more\" link on the dataset card.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -55,8 +55,8 @@
                 "class": "",
                 "id": ""
             },
-            "return_format": "url",
-            "allow_in_bindings": 1
+            "return_format": "array",
+            "allow_in_bindings": 0
         },
         {
             "key": "field_677ff3c4c0004",
@@ -72,7 +72,7 @@
                 "class": "",
                 "id": ""
             },
-            "placement": "left",
+            "placement": "top",
             "endpoint": 0,
             "selected": 0
         },
@@ -82,7 +82,7 @@
             "name": "card_description_fr",
             "aria-label": "",
             "type": "textarea",
-            "instructions": "This data will appear on the variable cards.",
+            "instructions": "A short description that shows on the dataset card.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -92,8 +92,8 @@
             },
             "default_value": "",
             "maxlength": "",
-            "allow_in_bindings": 1,
-            "rows": "",
+            "allow_in_bindings": 0,
+            "rows": 3,
             "placeholder": "",
             "new_lines": ""
         },
@@ -103,7 +103,7 @@
             "name": "card_link_fr",
             "aria-label": "",
             "type": "link",
-            "instructions": "",
+            "instructions": "URL for the \"Learn more\" link on the dataset card.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -111,8 +111,8 @@
                 "class": "",
                 "id": ""
             },
-            "return_format": "url",
-            "allow_in_bindings": 1
+            "return_format": "array",
+            "allow_in_bindings": 0
         }
     ],
     "location": [
@@ -124,7 +124,7 @@
             }
         ]
     ],
-    "menu_order": 0,
+    "menu_order": 1,
     "position": "normal",
     "style": "default",
     "label_placement": "top",
@@ -133,5 +133,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1736438991
+    "modified": 1736523124
 }

@@ -74,6 +74,24 @@
                 "class": "",
                 "id": ""
             },
+            "placement": "left",
+            "endpoint": 0,
+            "selected": 0
+        },
+        {
+            "key": "field_67813772c69f7",
+            "label": "Title",
+            "name": "title_fr",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The variable French title.",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
             "default_value": "",
             "maxlength": "",
             "allow_in_bindings": 1,

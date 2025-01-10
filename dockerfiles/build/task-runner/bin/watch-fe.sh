@@ -68,7 +68,7 @@ npm install
 log "Watching frontend assets..."
 concurrently \
     --names "MAP-APP,THEMES" \
-    "npm run dev" \
+    "npm run watch" \
     "sass --watch --style=expanded \
         ${src}/fw-child/resources/scss:${src}/fw-child/resources/css \
         ${src}/framework/resources/scss:${src}/framework/resources/css"

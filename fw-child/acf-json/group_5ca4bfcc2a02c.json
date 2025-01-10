@@ -21,6 +21,44 @@
             "selected": 0
         },
         {
+            "key": "field_678027c5f00b3",
+            "label": "Card Description",
+            "name": "card_description",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "A short description that shows on the variable cards.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "rows": 3,
+            "placeholder": "",
+            "new_lines": ""
+        },
+        {
+            "key": "field_67802804f00b4",
+            "label": "Card Link",
+            "name": "card_link",
+            "aria-label": "",
+            "type": "link",
+            "instructions": "URL for the \"Learn more\" link on the variable card.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "allow_in_bindings": 0
+        },
+        {
             "key": "field_65e89167c951b",
             "label": "Full Description",
             "name": "var_description",
@@ -35,8 +73,9 @@
                 "id": ""
             },
             "default_value": "",
+            "allow_in_bindings": 0,
             "tabs": "all",
-            "toolbar": "full",
+            "toolbar": "basic",
             "media_upload": 0,
             "delay": 0
         },
@@ -55,18 +94,19 @@
                 "id": ""
             },
             "default_value": "",
+            "allow_in_bindings": 0,
             "tabs": "all",
-            "toolbar": "full",
-            "media_upload": 1,
+            "toolbar": "basic",
+            "media_upload": 0,
             "delay": 0
         },
         {
-            "key": "field_678027c5f00b3",
-            "label": "Card Description",
-            "name": "card_description",
+            "key": "field_65e8918cc951f",
+            "label": "Français",
+            "name": "",
             "aria-label": "",
-            "type": "textarea",
-            "instructions": "This data will appear on the variable cards.",
+            "type": "tab",
+            "instructions": "",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -94,18 +134,39 @@
             },
             "default_value": "",
             "maxlength": "",
-            "allow_in_bindings": 1,
-            "rows": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_67802838f00b5",
+            "label": "Card Description",
+            "name": "card_description_fr",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "A short description that shows on the variable cards.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "rows": 3,
             "placeholder": "",
             "new_lines": ""
         },
         {
-            "key": "field_67802804f00b4",
+            "key": "field_6780283ff00b6",
             "label": "Card Link",
-            "name": "card_link",
+            "name": "card_link_fr",
             "aria-label": "",
             "type": "link",
-            "instructions": "",
+            "instructions": "URL for the \"Learn more\" link on the variable card.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -113,26 +174,8 @@
                 "class": "",
                 "id": ""
             },
-            "return_format": "url",
+            "return_format": "array",
             "allow_in_bindings": 0
-        },
-        {
-            "key": "field_65e8918cc951f",
-            "label": "Français",
-            "name": "",
-            "aria-label": "",
-            "type": "tab",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "placement": "left",
-            "endpoint": 0,
-            "selected": 0
         },
         {
             "key": "field_65e891ccc9521",
@@ -149,8 +192,9 @@
                 "id": ""
             },
             "default_value": "",
+            "allow_in_bindings": 0,
             "tabs": "all",
-            "toolbar": "full",
+            "toolbar": "basic",
             "media_upload": 0,
             "delay": 0
         },
@@ -169,48 +213,11 @@
                 "id": ""
             },
             "default_value": "",
+            "allow_in_bindings": 0,
             "tabs": "all",
-            "toolbar": "full",
-            "media_upload": 1,
+            "toolbar": "basic",
+            "media_upload": 0,
             "delay": 0
-        },
-        {
-            "key": "field_67802838f00b5",
-            "label": "Card Description",
-            "name": "card_description_fr",
-            "aria-label": "",
-            "type": "textarea",
-            "instructions": "This data will appear on the variable cards.",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "maxlength": "",
-            "allow_in_bindings": 1,
-            "rows": "",
-            "placeholder": "",
-            "new_lines": ""
-        },
-        {
-            "key": "field_6780283ff00b6",
-            "label": "Card Link",
-            "name": "card_link_fr",
-            "aria-label": "",
-            "type": "link",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "return_format": "url",
-            "allow_in_bindings": 0
         }
     ],
     "location": [
@@ -231,5 +238,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 1,
-    "modified": 1736452264
+    "modified": 1736522049
 }

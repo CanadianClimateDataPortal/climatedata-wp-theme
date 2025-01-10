@@ -788,67 +788,49 @@ function cdc_custom_404_page_setting() {
 add_action( 'admin_init', 'cdc_custom_404_page_setting' );
 
 /**
- * Load and process assets from the map app built index.html
+ * Load and process assets from the map app built manifest.json
  *
  * @param string $base_dir Base directory path
  *
  * @return array|null Array of assets or null on failure
  */
 function cdc_map_asset_load( $base_dir ) {
-	$base_dir   = rtrim( $base_dir, '/' );
-	$index_path = $base_dir . '/template/map-app/app/dist/index.html';
+	$base_dir      = rtrim( $base_dir, '/' );
+	$manifest_path = $base_dir . '/template/map-app/app/dist/.vite/manifest.json';
 
 	// Verify directory and file
-	if ( ! is_dir( $base_dir ) || ! file_exists( $index_path ) || ! is_readable( $index_path ) ) {
-		error_log( 'Invalid directory or file: ' . $base_dir . ' or ' . $index_path );
+	if ( ! is_dir( $base_dir ) || ! file_exists( $manifest_path ) || ! is_readable( $manifest_path ) ) {
+		error_log( 'Invalid directory or file: ' . $base_dir . ' or ' . $manifest_path );
 
 		return null;
 	}
 
 	try {
-		// Read index.html file content
-		$html_content = file_get_contents( $index_path );
+		// Read and decode manifest.json
+		$manifest_content = file_get_contents( $manifest_path );
 
-		if ( $html_content === false ) {
-			error_log( 'Failed to read file: ' . $index_path );
+		if ( $manifest_content === false ) {
+			error_log( 'Failed to read file: ' . $manifest_path );
 
 			return null;
 		}
 
-		// Parse HTML
-		$dom = new \DOMDocument();
-		libxml_use_internal_errors( true );
-		$dom->loadHTML( $html_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
-		libxml_clear_errors();
+		$manifest = json_decode( $manifest_content, true );
 
-		// Get script source
-		$script_src = '';
-		$scripts    = $dom->getElementsByTagName( 'script' );
-		foreach ( $scripts as $script ) {
-			if ( $script->getAttribute( 'type' ) === 'module' ) {
-				$script_src = filter_var( $script->getAttribute( 'src' ), FILTER_SANITIZE_URL );
+		if ( json_last_error() !== JSON_ERROR_NONE || ! isset( $manifest['index.html'] ) ) {
+			error_log( 'Failed to parse manifest.json or missing index.html key.' );
 
-				break;
-			}
+			return null;
 		}
 
-		// Get stylesheet href
-		$style_href = '';
-		$links      = $dom->getElementsByTagName( 'link' );
-		foreach ( $links as $link ) {
-			if ( $link->getAttribute( 'rel' ) === 'stylesheet' ) {
-				$style_href = filter_var( $link->getAttribute( 'href' ), FILTER_SANITIZE_URL );
-
-				break;
-			}
-		}
+		$index_data = $manifest['index.html'];
 
 		# Theme directory URI
 		$theme_directory_uri = get_stylesheet_directory_uri();
 
 		return array(
-			'script_src' => $script_src ? $theme_directory_uri . '/template/map-app/app/dist/' . $script_src : '',
-			'link_href'  => $style_href ? $theme_directory_uri . '/template/map-app/app/dist/' . $style_href : ''
+			'script_src' => $theme_directory_uri . '/template/map-app/app/dist/' . $index_data['file'],
+			'link_href'  => $theme_directory_uri . '/template/map-app/app/dist/' . $index_data['css'][0],
 		);
 	} catch ( \Exception $e ) {
 		error_log( 'Map app asset loader error: ' . $e->getMessage() );

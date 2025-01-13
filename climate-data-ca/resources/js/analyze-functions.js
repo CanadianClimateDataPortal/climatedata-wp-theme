@@ -923,7 +923,8 @@
 
         $('input[name=dataset]').change(function (e) {
             // fill model and scenarios input since they depend on dataset selection
-            let dataset_info = DATASETS[e.target.value];
+            const dataset = e.target.value;
+            let dataset_info = DATASETS[dataset];
             let new_html="";
             // add models to form
             dataset_info.model_lists.forEach(function(model) {
@@ -935,6 +936,11 @@
                     '</div>';
                 new_html += to_add.format(model.name, T(model.label));
             });
+
+            if ( dataset === 'cmip6' ) {
+                new_html += '<div class="my-4" style="font-size: 1.2rem">* ' + T('The full ensemble consists of 26 models. But if the SSP3-7.0 emission scenario is selected below, a subset of 24 models will be used for all selected scenarios.') + '</div>';
+            }
+
             $('#models-placeholder').html(new_html);
             prepend_icons($('#models-placeholder').closest('.field'), false);
             $('#models-placeholder').find('.input-item:first').trigger('click');
@@ -1285,9 +1291,19 @@
                         break;
 
                     case 'dataset':
+                        const finch_name_generator = DATASETS[data_form_inputs[key]].finch_name;
+                        let finch_name;
+
+                        if ( typeof finch_name_generator === 'function' ) {
+                            const scenarios = data_form_inputs[ 'scenario' ].split( ',' );
+                            finch_name = finch_name_generator( scenarios );
+                        } else {
+                            finch_name = finch_name_generator;
+                        }
+
                         data_form_obj['inputs'].push({
                             'id': 'dataset',
-                            'data': DATASETS[data_form_inputs[key]].finch_name
+                            'data': finch_name
                         })
                         break;
 

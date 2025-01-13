@@ -75,28 +75,40 @@ if (have_posts()) : while (have_posts()) : the_post();
 
 
                         <div class="d-lg-flex justify-content-around align-items-center w-100">
-                            <div class="btn-group btn-group-toggle mb-5 mb-lg-0" data-toggle="buttons">
-                                <?php
-                                if (in_array(get_field('var_name'), ['spei_12m', 'spei_3m'])) {
-                                    ?>
-                                    <input type="hidden" name="mora" value="sep">
-                                    <label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="rcp85" checked> <?php _e('High Emissions', 'cdc'); ?><br>(RCP 8.5) </label>
+							<div>
+								<div class="btn-group btn-group-toggle mb-5 mb-lg-0" data-toggle="buttons">
+									<?php
+									if (in_array(get_field('var_name'), ['spei_12m', 'spei_3m'])) {
+										?>
+										<input type="hidden" name="mora" value="sep">
+										<label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-highest" autocomplete="off" value="rcp85" checked> RCP 8.5 </label>
 
-                                    <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="rcp45"> <?php _e('Moderate Emissions', 'cdc'); ?><br>(RCP 4.5) </label>
+										<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="rcp45"> RCP 4.5 </label>
 
-                                    <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="rcp26"> <?php _e('Low Emissions', 'cdc'); ?><br>(RCP 2.6) </label>
-                                    <?php
-                                } else {
-                                ?>
-                                <label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="ssp585" checked> <?php _e('High Emissions', 'cdc'); ?><br>(SSP5-8.5) </label>
+										<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="rcp26"> RCP 2.6 </label>
+										<?php
+									} else {
+									?>
+									<label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-highest" autocomplete="off" value="ssp585" checked> SSP5-8.5 </label>
 
-                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="ssp245"> <?php _e('Moderate Emissions', 'cdc'); ?><br>(SSP2-4.5) </label>
+									<?php
+									if ( substr( get_field('var_name'), 0, 5 ) != "HXmax" ) {
+									?>
+										<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="ssp370"> SSP3-7.0 </label>
+									<?php } ?>
 
-                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="ssp126"> <?php _e('Low Emissions', 'cdc'); ?><br>(SSP1-2.6) </label>
-                                    <?php
-                                }
-                                    ?>
-                            </div>
+									<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="ssp245"> SSP2-4.5 </label>
+
+									<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="ssp126"> SSP1-2.6 </label>
+										<?php
+									}
+										?>
+								</div>
+								<div class="d-flex justify-content-between font-italic mt-1">
+									<span><?php _e('Highest Emissions', 'cdc'); ?></span>
+									<span><?php _e('Lowest Emissions', 'cdc'); ?></span>
+								</div>
+							</div>
 
                             <div class="d-flex justify-content-center d-lg-block" role="group" aria-label="">
                                 <button type="submit" class="btn btn-secondary border-white rounded-pill all-caps"><?php _e('Explore', 'cdc'); ?></button>
@@ -817,28 +829,41 @@ if (have_posts()) : while (have_posts()) : the_post();
                         <input type="hidden" name="var" value="<?php the_field('var_name'); ?>">
 
                         <div class="d-lg-flex justify-content-around align-items-center w-100">
-                            <div class="btn-group btn-group-toggle mb-5 mb-lg-0" data-toggle="buttons">
-                                <?php
-                                if (in_array(get_field('var_name'), ['spei_12m', 'spei_3m'])) {
-                                    ?>
-                                    <input type="hidden" name="mora" value="sep">
-                                    <label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="rcp85" checked> <?php _e('High Emissions', 'cdc'); ?><br>(RCP 8.5) </label>
+							<div>
+								<div class="btn-group btn-group-toggle mb-5 mb-lg-0" data-toggle="buttons">
+									<?php
+									if (in_array(get_field('var_name'), ['spei_12m', 'spei_3m'])) {
+										?>
+										<input type="hidden" name="mora" value="sep">
+										<label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-highest" autocomplete="off" value="rcp85" checked> RCP 8.5 </label>
 
-                                    <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="rcp45"> <?php _e('Moderate Emissions', 'cdc'); ?><br>(RCP 4.5) </label>
+										<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="rcp45"> RCP 4.5 </label>
 
-                                    <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="rcp26"> <?php _e('Low Emissions', 'cdc'); ?><br>(RCP 2.6) </label>
-                                    <?php
-                                } else {
-                                ?>
-                                <label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="ssp585" checked> <?php _e('High Emissions', 'cdc'); ?><br>(SSP5-8.5) </label>
+										<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="rcp26"> RCP 2.6 </label>
+										<?php
+									} else {
+									?>
+									<label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-highest" autocomplete="off" value="ssp585" checked> SSP5-8.5 </label>
 
-                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="ssp245"> <?php _e('Moderate Emissions', 'cdc'); ?><br>(SSP2-4.5) </label>
+									<?php
+									if ( substr( get_field('var_name'), 0, 5 ) != "HXmax" ) {
+									?>
+										<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="ssp370"> SSP3-7.0 </label>
+									<?php } ?>
 
-                                <label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="ssp126"> <?php _e('Low Emissions', 'cdc'); ?><br>(SSP1-2.6) </label>
-                                    <?php
-                                }
-                                    ?>
-                            </div>
+									<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="ssp245"> SSP2-4.5 </label>
+
+									<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="ssp126"> SSP1-2.6 </label>
+										<?php
+									}
+										?>
+								</div>
+
+								<div class="d-flex justify-content-between font-italic mt-1">
+									<span><?php _e('Highest Emissions', 'cdc'); ?></span>
+									<span><?php _e('Lowest Emissions', 'cdc'); ?></span>
+								</div>
+							</div>
 
                             <div class="d-flex justify-content-center d-lg-block" role="group" aria-label="">
                                 <button type="submit" class="btn btn-secondary border-white rounded-pill all-caps"><?php _e('Explore', 'cdc'); ?></button>

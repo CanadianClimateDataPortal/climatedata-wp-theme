@@ -191,13 +191,13 @@
                                     data: data['observations'],
                                     zIndex: 1,
                                     showInNavigator: true,
-                                    color: '#F47D23',
+                                    color: '#ffd039',
                                     visible: false,
                                     marker: {
-                                        fillColor: '#F47D23',
+                                        fillColor: '#ffd039',
                                         lineWidth: 0,
                                         radius: 0,
-                                        lineColor: '#F47D23'
+                                        lineColor: '#ffd039'
                                     }
                                 });
                             if (data['modeled_historical_median'].length > 0)

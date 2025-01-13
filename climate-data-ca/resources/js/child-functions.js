@@ -460,13 +460,13 @@ function displayChartData(data, varDetails, download_url, query, container) {
             data: data['observations'],
             zIndex: 1,
             showInNavigator: true,
-            color: '#F47D23',
+            color: '#ffd039',
             visible: false,
             marker: {
-                fillColor: '#F47D23',
+                fillColor: '#ffd039',
                 lineWidth: 0,
                 radius: 0,
-                lineColor: '#F47D23'
+                lineColor: '#ffd039'
             }
         });
     }
@@ -693,7 +693,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
                                         if (decade_ms in data['30y_observations']) {
                                             this.value = data['30y_observations'][decade_ms][0];
                                             val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                            tip.push("<span style=\"color:#F47D23\">●</span> " + chart_labels.observation + " <b>"
+                                            tip.push("<span style=\"color:#ffd039\">●</span> " + chart_labels.observation + " <b>"
                                               + val1 + "</b><br/>");
                                         }
 

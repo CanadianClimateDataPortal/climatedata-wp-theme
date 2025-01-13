@@ -234,18 +234,28 @@ if (get_the_ID() == filtered_ID_by_path('explore/variable')) {
                             array('value' => 'rcp85', 'label' => 'RCP 8.5', 'compare' => false),
                             array('value' => 'rcp85vsrcp26', 'label' => 'RCP 8.5 vs RCP 2.6', 'compare' => true),
                             array('value' => 'rcp85vsrcp45', 'label' => 'RCP 8.5 vs RCP 4.5', 'compare' => true),
+                        );
 
-                            // CMIP6 values must be pre-existing in the HTML, otherwise we get a bootstrapping issue
-                            // between eval_query_obj and buildFilterMenu
-                            array('value' => 'ssp126', 'label' => 'RCP 2.6', 'compare' => false),
-                            array('value' => 'ssp126vsssp245', 'label' => 'RCP 2.6 vs RCP 4.5', 'compare' => true),
-                            array('value' => 'ssp126vsssp585', 'label' => 'RCP 2.6 vs RCP 8.5', 'compare' => true),
-                            array('value' => 'ssp245', 'label' => 'RCP 4.5', 'compare' => false),
-                            array('value' => 'ssp245vsssp126', 'label' => 'RCP 4.5 vs RCP 2.6', 'compare' => true),
-                            array('value' => 'ssp245vsssp585', 'label' => 'RCP 4.5 vs RCP 8.5', 'compare' => true),
-                            array('value' => 'ssp585', 'label' => 'RCP 8.5', 'compare' => false),
-                            array('value' => 'ssp585vsssp126', 'label' => 'RCP 8.5 vs RCP 2.6', 'compare' => true),
-                            array('value' => 'ssp585vsssp245', 'label' => 'RCP 8.5 vs RCP 4.5', 'compare' => true));
+                        // CMIP6 values must be pre-existing in the HTML, otherwise we get a bootstrapping issue
+                        // between eval_query_obj and buildFilterMenu
+                        $ssp_scenarios = [ 'ssp126', 'ssp245', 'ssp370', 'ssp585' ];
+                        foreach ( $ssp_scenarios as $ssp_scenario ) {
+                            $scenarios[] = array(
+                                'value' => $ssp_scenario,
+                                'label' => $ssp_scenario,
+                                'compare' => false,
+                            );
+
+                            foreach ( $ssp_scenarios as $other_scenario ) {
+                                if ( $other_scenario != $ssp_scenario ) {
+                                    $scenarios[] = array(
+                                        'value' => $ssp_scenario . 'vs' . $other_scenario,
+                                        'label' => $ssp_scenario . ' vs ' . $other_scenario,
+                                        'compare' => true,
+                                    );
+                                }
+                            }
+                        }
                         ?>
 
                         <div id="" class="filter-block col-2">

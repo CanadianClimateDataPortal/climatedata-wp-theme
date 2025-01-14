@@ -119,7 +119,7 @@ const DATASETS = {
         'grid': 'canadagrid-m6',
         'finch_name' : function ( scenarios ) {
             if ( 'all' === scenarios || scenarios.includes( 'ssp370' ) ) {
-                return 'candcs-m6-24models';
+                return 'candcs-m6-24';
             }
             return 'candcs-m6';
         },

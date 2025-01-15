@@ -680,7 +680,7 @@ const $ = jQuery;
             captcha_img_audioObj.refresh();
 
           document.getElementById(form_namespace + '_captcha_img').src =
-            '/site/assets/themes/fw-child/resources/php/securimage/securimage_show.php?namespace=' +
+            '/assets/themes/fw-child/resources/php/securimage/securimage_show.php?namespace=' +
             form_namespace +
             '&' +
             Math.random();

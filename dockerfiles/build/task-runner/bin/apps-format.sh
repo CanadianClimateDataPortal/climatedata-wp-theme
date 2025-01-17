@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Map app formatter
-# Usage example (host machine): docker exec -it climatedata-dev-task_runner-1 map-app-format.sh /app
+# Apps formatter (map, download)
+# Usage example (host machine): docker exec -it climatedata-dev-task_runner-1 apps-format.sh /app
 
 # Enable strict mode
 set -euo pipefail
@@ -24,7 +24,7 @@ error() {
 # Show help message
 show_help() {
     echo "Usage: $(basename "$0") <source-directory>"
-    echo "Compiles frontend assets for themes and the map app"
+    echo "Apps formatter (map, download)"
 }
 
 # Validate input
@@ -45,8 +45,8 @@ for cmd in node npm sass concurrently; do
     command -v "$cmd" >/dev/null 2>&1 || error "$cmd is required but not installed"
 done
 
-# Change to map app directory
-cd "${src}/fw-child/template/map-app/app" || error "Map app directory not found"
+# Change to apps directory
+cd "${src}/fw-child/apps/src" || error "Apps directory not found"
 
 # Setup correct Node environment
 log "Setting up Node.js environment..."

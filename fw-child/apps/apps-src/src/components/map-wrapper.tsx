@@ -1,0 +1,100 @@
+import { useEffect, useState, useRef } from "react";
+
+// components
+import MapHeader from "@/components/map-header";
+import Map from "@/components/map";
+
+// other
+import { cn } from "@/lib/utils";
+import { MapInfoData } from "@/types/types";
+import { fetchWPData } from "@/services/services";
+import { useAppSelector } from "@/app/hooks";
+import { useMapContext } from "@/context/map-provider";
+
+/**
+ * Renders a Leaflet map, including custom panes and tile layers.
+ */
+export default function MapWrapper() {
+  const [mapInfo, setMapInfo] = useState<MapInfoData | null>(null);
+  const [showComparisonMap, setShowComparisonMap] = useState<boolean>(false);
+
+  const { emissionScenarioCompare, emissionScenarioCompareTo } = useAppSelector(state => state.map);
+
+  const { setMap } = useMapContext();
+
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const comparisonMapRef = useRef<L.Map | null>(null);
+
+  useEffect(() => {
+    fetchWPData().then(data => setMapInfo(data.mapInfo));
+  }, []);
+
+  // show the comparison map if compare checkbox is checked and there is a compare-to scenario
+  useEffect(() => {
+    setShowComparisonMap(emissionScenarioCompare && !!emissionScenarioCompareTo)
+  }, [emissionScenarioCompare, emissionScenarioCompareTo]);
+
+  useEffect(() => {
+    // dynamically import leaflet.sync, then syncMaps will wait until both maps are ready..
+    // for some reason it doesn't work when imported in the beginning of the file
+    // @ts-ignore: suppress dynamic import typescript error
+    import('leaflet.sync')
+    .then(syncMaps)
+    .catch((err: Error) => console.error('Failed to load leaflet.sync:', err))
+
+    // maybe we should unsync the maps when the component unmounts? won't hurt I guess...
+    return unsyncMaps;
+  }, [showComparisonMap]);
+
+  // helper sync/unsync methods for convenience
+  const syncMaps = () => {
+    if (mapRef.current && comparisonMapRef.current) {
+      // @ts-ignore: suppress leaflet typescript errors
+      mapRef.current.sync(comparisonMapRef.current);
+      // @ts-ignore: suppress leaflet typescript errors
+      comparisonMapRef.current.sync(mapRef.current);
+    }
+  };
+
+  const unsyncMaps = () => {
+    if (mapRef.current && comparisonMapRef.current) {
+      // @ts-ignore: suppress leaflet typescript errors
+      mapRef.current.unsync(comparisonMapRef.current);
+      // @ts-ignore: suppress leaflet typescript errors
+      comparisonMapRef.current.unsync(mapRef.current);
+
+      // if we don't clear this reference, the primary map will attempt to sync
+      // with an invalid comparisonMapRef reference.. so, let's just clear the
+      // reference and be done with it.. no need to clear the primary map reference
+      comparisonMapRef.current = null;
+    }
+  };
+
+  return (
+		<div className="relative">
+      {mapInfo && <MapHeader data={mapInfo} mapRef={wrapperRef} />}
+      <div
+        ref={wrapperRef}
+        className={cn(
+        "map-wrapper",
+        "grid gap-4",
+        showComparisonMap ? "sm:grid-cols-2" : "grid-cols-1"
+      )}>
+        <Map
+          onMapReady={(map: L.Map) => {
+            mapRef.current = map;
+            setMap(map)
+          }}
+          onUnmount={() => mapRef.current = null}
+        />
+        {showComparisonMap && (
+          <Map
+            onMapReady={(map: L.Map) => comparisonMapRef.current = map}
+            onUnmount={unsyncMaps} // unsync and clear the reference to this map
+          />
+        )}
+      </div>
+    </div>
+  );
+}

@@ -803,7 +803,7 @@ function cdc_app_asset_load( $app_type ) {
 	}
 
 	// Set manifest paths based on current theme
-	$base_path     = get_stylesheet_directory() . '/apps/src/dist';
+	$base_path     = get_stylesheet_directory() . '/apps/apps-src/dist';
 	$manifest_path = $base_path . '/.vite/manifest.json';
 
 	// Verify if manifest file exists and is readable
@@ -844,7 +844,7 @@ function cdc_app_asset_load( $app_type ) {
 		$entry_data = $manifest[ $entry_key ];
 
 		// Initialize apps dist URI
-		$apps_dist_uri = get_stylesheet_directory_uri() . '/apps/src/dist';
+		$apps_dist_uri = get_stylesheet_directory_uri() . '/apps/apps-src/dist';
 
 		// Initialize arrays for JS (with type) and CSS files
 		$js_files  = array(

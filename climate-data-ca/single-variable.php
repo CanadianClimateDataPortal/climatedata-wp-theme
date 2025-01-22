@@ -105,8 +105,8 @@ if (have_posts()) : while (have_posts()) : the_post();
 										?>
 								</div>
 								<div class="d-flex justify-content-between font-italic mt-1">
-									<span><?php _e('Highest Emissions', 'cdc'); ?></span>
-									<span><?php _e('Lowest Emissions', 'cdc'); ?></span>
+									<span><?php _e('Higher Emissions', 'cdc'); ?></span>
+									<span><?php _e('Lower Emissions', 'cdc'); ?></span>
 								</div>
 							</div>
 
@@ -860,8 +860,8 @@ if (have_posts()) : while (have_posts()) : the_post();
 								</div>
 
 								<div class="d-flex justify-content-between font-italic mt-1">
-									<span><?php _e('Highest Emissions', 'cdc'); ?></span>
-									<span><?php _e('Lowest Emissions', 'cdc'); ?></span>
+									<span><?php _e('Higher Emissions', 'cdc'); ?></span>
+									<span><?php _e('Lower Emissions', 'cdc'); ?></span>
 								</div>
 							</div>
 

@@ -191,13 +191,14 @@
                                     data: data['observations'],
                                     zIndex: 1,
                                     showInNavigator: true,
-                                    color: '#ffd039',
+                                    color: '#777777',
+                                    dashStyle: 'ShortDash',
                                     visible: false,
                                     marker: {
-                                        fillColor: '#ffd039',
+                                        fillColor: '#777777',
                                         lineWidth: 0,
                                         radius: 0,
-                                        lineColor: '#ffd039'
+                                        lineColor: '#777777'
                                     }
                                 });
                             if (data['modeled_historical_median'].length > 0)

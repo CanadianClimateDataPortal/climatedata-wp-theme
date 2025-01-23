@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import "leaflet.sync";
 
 // components
 import MapHeader from "@/components/map-header";
@@ -16,7 +17,6 @@ import { useMapContext } from "@/context/map-provider";
  */
 export default function MapWrapper() {
   const [mapInfo, setMapInfo] = useState<MapInfoData | null>(null);
-  const [showComparisonMap, setShowComparisonMap] = useState<boolean>(false);
 
   const { emissionScenarioCompare, emissionScenarioCompareTo } = useAppSelector(state => state.map);
 
@@ -31,21 +31,7 @@ export default function MapWrapper() {
   }, []);
 
   // show the comparison map if compare checkbox is checked and there is a compare-to scenario
-  useEffect(() => {
-    setShowComparisonMap(emissionScenarioCompare && !!emissionScenarioCompareTo)
-  }, [emissionScenarioCompare, emissionScenarioCompareTo]);
-
-  useEffect(() => {
-    // dynamically import leaflet.sync, then syncMaps will wait until both maps are ready..
-    // for some reason it doesn't work when imported in the beginning of the file
-    // @ts-ignore: suppress dynamic import typescript error
-    import('leaflet.sync')
-    .then(syncMaps)
-    .catch((err: Error) => console.error('Failed to load leaflet.sync:', err))
-
-    // maybe we should unsync the maps when the component unmounts? won't hurt I guess...
-    return unsyncMaps;
-  }, [showComparisonMap]);
+  const showComparisonMap = emissionScenarioCompare && !!emissionScenarioCompareTo;
 
   // helper sync/unsync methods for convenience
   const syncMaps = () => {
@@ -72,15 +58,15 @@ export default function MapWrapper() {
   };
 
   return (
-		<div className="relative">
+    <div className="relative">
       {mapInfo && <MapHeader data={mapInfo} mapRef={wrapperRef} />}
       <div
         ref={wrapperRef}
         className={cn(
-        "map-wrapper",
-        "grid gap-4",
-        showComparisonMap ? "sm:grid-cols-2" : "grid-cols-1"
-      )}>
+          "map-wrapper",
+          "grid gap-4",
+          showComparisonMap ? "sm:grid-cols-2" : "grid-cols-1"
+        )}>
         <Map
           onMapReady={(map: L.Map) => {
             mapRef.current = map;
@@ -90,7 +76,10 @@ export default function MapWrapper() {
         />
         {showComparisonMap && (
           <Map
-            onMapReady={(map: L.Map) => comparisonMapRef.current = map}
+            onMapReady={(map: L.Map) => {
+              comparisonMapRef.current = map;
+              syncMaps(); // sync once the comparison map is ready
+            }}
             onUnmount={unsyncMaps} // unsync and clear the reference to this map
           />
         )}

@@ -14,6 +14,8 @@ import { SidebarPanel, useSidebar } from "@/components/ui/sidebar";
 // other
 import { useAppSelector } from "@/app/hooks";
 import { MapLocation } from "@/types/types";
+import { SEARCH_DEFAULT_ZOOM } from "@/lib/constants";
+import { useMapContext } from "@/context/map-provider";
 import { cn } from "@/lib/utils";
 
 // link and panel slug
@@ -53,6 +55,7 @@ RecentLocationsLink.displayName = "RecentLocationsLink";
 const RecentLocationsPanel: React.FC = () => {
   const { __ } = useI18n();
 
+  const { map } = useMapContext();
   const { recentLocations } = useAppSelector(state => state.map);
 
   if (! recentLocations) {
@@ -60,9 +63,7 @@ const RecentLocationsPanel: React.FC = () => {
   }
 
   const moveToLocation = (location: MapLocation) => {
-    console.log(location)
-    // TODO: dispatch moving to the location once the search control is implemented,
-    //  which is the one that will add proper locations to the recent locations list
+    map.setView(location, SEARCH_DEFAULT_ZOOM);
   }
 
   return (

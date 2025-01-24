@@ -1,0 +1,62 @@
+[
+  {
+    "id": 108,
+    "description": "",
+    "link": "https://dev-en.climatedata.ca/sector/agriculture/",
+    "name": "Agriculture",
+    "slug": "agriculture",
+    "taxonomy": "sector",
+    "meta": [],
+    "acf": []
+  },
+  {
+    "id": 105,
+    "description": "",
+    "link": "https://dev-en.climatedata.ca/sector/buildings/",
+    "name": "Buildings",
+    "slug": "buildings",
+    "taxonomy": "sector",
+    "meta": [],
+    "acf": []
+  },
+  {
+    "id": 107,
+    "description": "",
+    "link": "https://dev-en.climatedata.ca/sector/finance/",
+    "name": "Finance",
+    "slug": "finance",
+    "taxonomy": "sector",
+    "meta": [],
+    "acf": []
+  },
+  {
+    "id": 103,
+    "description": "",
+    "link": "https://dev-en.climatedata.ca/sector/health/",
+    "name": "Health",
+    "slug": "health",
+    "taxonomy": "sector",
+    "meta": [],
+    "acf": []
+  },
+  {
+    "id": 104,
+    "description": "",
+    "link": "https://dev-en.climatedata.ca/sector/marine/",
+    "name": "Marine",
+    "slug": "marine",
+    "taxonomy": "sector",
+    "meta": [],
+    "acf": []
+  },
+  {
+    "id": 106,
+    "description": "",
+    "link": "https://dev-en.climatedata.ca/sector/transportation/",
+    "name": "Transportation",
+    "slug": "transportation",
+    "taxonomy": "sector",
+    "meta": [],
+    "acf": []
+  }
+]

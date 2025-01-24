@@ -51,6 +51,8 @@ COPY --chown=node fw-child src/fw-child
 
 RUN build-fe.sh /home/node/app/src
 
+RUN rm -rf src/fw-child/apps/apps-src/node_modules
+
 ###
 # Production website building stage.
 #
@@ -189,8 +191,6 @@ RUN --mount=type=bind,source=dockerfiles/build/www/wp-plugins/public.txt,target=
 WORKDIR /var/www/html/assets/themes
 
 COPY --from=task-runner /home/node/app/src .
-
-RUN rm -rf fw-child/apps/apps-src/node_modules
 
 # ----
 # File permissions

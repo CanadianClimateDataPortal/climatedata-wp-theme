@@ -49,7 +49,7 @@ WORKDIR /home/node/app
 COPY --chown=node framework src/framework
 COPY --chown=node fw-child src/fw-child
 
-RUN compile-sass.sh src dist
+RUN build-fe.sh /home/node/app/src
 
 ###
 # Production website building stage.
@@ -188,10 +188,9 @@ RUN --mount=type=bind,source=dockerfiles/build/www/wp-plugins/public.txt,target=
 
 WORKDIR /var/www/html/assets/themes
 
-COPY --from=task-runner /home/node/app/dist .
+COPY --from=task-runner /home/node/app/src .
 
-COPY framework framework
-COPY fw-child fw-child
+RUN rm -rf fw-child/apps/apps-src/node_modules
 
 # ----
 # File permissions

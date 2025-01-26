@@ -18,6 +18,8 @@ import Link from "@/components/ui/link";
 import { fetchPostsData, fetchTaxonomyData } from "@/services/services";
 import { normalizeRadioCardProps } from "@/lib/format";
 import { InteractivePanelProps, TaxonomyData, PostData } from "@/types/types";
+import TaxonomyDropdownFilter from "@/components/taxonomy-dropdown-filter";
+import VariableRadioCards from "@/components/variable-radio-cards";
 
 // menu and panel slug
 const slug = 'variable';
@@ -49,77 +51,9 @@ VariablesMenuItem.displayName = "VariablesMenuItem";
  * A panel component that displays a list of variables.
  */
 const VariablesPanel: React.FC<InteractivePanelProps> = ({ selected, onSelect }) => {
-  const [variables, setVariables] = useState<PostData[]>([]);
   const [filterValues, setFilterValues] = useState<Record<string, string>>({});
-  const [filterOptions, setFilterOptions] = useState<{
-    label: string;
-    slug: string;
-    tooltip: string;
-    placeholder: string;
-    options: TaxonomyData[];
-    onChange: (value: string) => void;
-  }[]>([]);
 
   const { __ } = useI18n();
-
-  const { activePanel, isPanelActive } = useSidebar();
-
-  useEffect(() => {
-    if (! isPanelActive(slug))  {
-      return;
-    }
-
-    // fetch filter options once the panel is active
-    (async () => {
-      const options = await Promise.all([
-        {
-          label: __('Variable Types'),
-          slug: 'var-type',
-          tooltip: __('Select a variable type'),
-          placeholder: __('All'),
-          options: await fetchTaxonomyData('var-type'),
-          onChange: (value: string) =>
-            setFilterValues((prev) => ({
-              ...prev,
-              ['var-type']: value === __('All') ? '' : value,
-            })),
-        },
-        {
-          label: __('Sectors'),
-          slug: 'sector',
-          tooltip: __('Select a sector'),
-          placeholder: __('All'),
-          options: await fetchTaxonomyData('sector'),
-          onChange: (value: string) =>
-            setFilterValues((prev) => ({
-              ...prev,
-              ['sector']: value === __('All') ? '' : value,
-            })),
-        },
-      ]);
-
-      setFilterOptions(options);
-    })();
-  }, [activePanel]);
-
-  useEffect(() => {
-    if (! filterValues)  {
-      return;
-    }
-
-    // fetch variables once filters are set
-    (async () => {
-      const data = await fetchPostsData(slug, filterValues);
-      const normalizedData = await normalizeRadioCardProps(data, 'post');
-
-      setVariables(normalizedData);
-    })();
-  }, [filterValues]);
-
-  // don't render if there are no variables set
-  if (! variables) {
-    return null;
-  }
 
   return (
     <SidebarPanel id={slug} className="w-[36rem]">
@@ -129,47 +63,38 @@ const VariablesPanel: React.FC<InteractivePanelProps> = ({ selected, onSelect })
           <CardDescription>
             {__('Here you can browse all the variables contained in the selected dataset.')}
           </CardDescription>
-          <Grid columns={filterOptions.length} className="gap-4 mt-4">
-            {filterOptions.map((filter, index) => (
-              <Dropdown
-                key={index}
-                searchable
-                label={filter.label}
-                tooltip={filter.tooltip}
-                placeholder={filter.placeholder}
-                options={filter.options.map((option: TaxonomyData) => ({
-                  value: String(option.id),
-                  label: option.name,
-                }))}
-                onChange={(value) => filter.onChange(value)}
-              />
-            ))}
+          <Grid columns={2} className="gap-4 mt-4">
+            <TaxonomyDropdownFilter
+              className="sm:w-52"
+              onFilterChange={(value) =>
+                setFilterValues((prev) => ({ ...prev, 'var-type': value }))
+              }
+              slug="var-type"
+              label="Variable Types"
+              tooltip="Select a variable type"
+              placeholder="All"
+              value={filterValues["var-type"] || ""}
+            />
+            <TaxonomyDropdownFilter
+              className="sm:w-52"
+              onFilterChange={(value) =>
+                setFilterValues((prev) => ({ ...prev, sector: value }))
+              }
+              slug="sector"
+              label="Sectors"
+              tooltip="Select a sector"
+              placeholder="All"
+              value={filterValues.sector || ""}
+            />
           </Grid>
         </CardHeader>
         <CardContent className="p-4 pt-0">
           <Grid columns={2} className="gap-4">
-            {variables.map((item) => (
-              <RadioCard
-                key={item.id}
-                value={item.id}
-                radioGroup="variable"
-                title={item.title}
-                description={item.description}
-                thumbnail={item.thumbnail}
-                selected={selected === String(item.id)}
-                onSelect={() => onSelect(String(item.id))}
-              >
-                <RadioCardFooter>
-                  <Link
-                    icon={<ExternalLink size={16} />}
-                    href={item.link}
-                    className="text-sm text-brand-blue"
-                  >
-                    {__('Learn more')}
-                  </Link>
-                </RadioCardFooter>
-              </RadioCard>
-            ))}
+            <VariableRadioCards
+              filterValues={filterValues}
+              selected={selected}
+              onSelect={onSelect}
+            />
           </Grid>
         </CardContent>
       </Card>

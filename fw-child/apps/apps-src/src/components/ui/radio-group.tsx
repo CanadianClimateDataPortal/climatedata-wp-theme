@@ -56,29 +56,52 @@ RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName
 const RadioGroupFactory = forwardRef<
   React.ElementRef<typeof RadioGroup>,
   React.ComponentPropsWithoutRef<typeof RadioGroup> & {
-    name: string
-    options: { value: string; label: string }[] | string[] | number[]
-    title?: string
-    tooltip?: boolean
+    name: string;
+    options: { value: string; label: string }[] | string[] | number[];
+    optionClassName?: string;
+    title?: string;
+    tooltip?: React.ReactNode;
+    orientation?: "horizontal" | "vertical";
   }
-  >(({ name, title, tooltip, options, className, ...props }, ref) => {
+  >(({
+  name,
+  title,
+  tooltip,
+  orientation = 'vertical',
+  options,
+  optionClassName,
+  className,
+  ...props
+}, ref) => {
   // when receiving an array of strings or numbers as options we will convert them valid value/label objects
   const normalizedOptions = normalizeOptions(options)
 
+  const orientationClasses = {
+    vertical: 'sm:flex-col',
+    horizontal: '',
+  };
+
   return (
-    <RadioGroup ref={ref} className={cn("mb-4", className)} {...props}>
+    <RadioGroup ref={ref} className={cn("radio-group-factory mb-4", className)} {...props}>
       {title && <ControlTitle title={title} tooltip={tooltip} className="my-0" />}
-      {normalizedOptions.map((option, index) => (
-        <div key={index} className="flex items-center space-x-2 mb-1">
-          <RadioGroupItem value={option.value} id={`radio-${name}-${index}`} />
-          <label
-            htmlFor={`radio-${name}-${index}`}
-            className="text-zinc-900 text-sm font-medium leading-none cursor-pointer"
+      <div className={cn('flex flex-wrap gap-y-4 gap-x-0', orientationClasses[orientation])}>
+        {normalizedOptions.map((option, index) => (
+          <div key={index}
+               className={cn(
+                 'flex items-center space-x-2',
+                 optionClassName ?? ''
+               )}
           >
-            {option.label}
-          </label>
-        </div>
-      ))}
+            <RadioGroupItem value={option.value} id={`radio-${name}-${index}`} />
+            <label
+              htmlFor={`radio-${name}-${index}`}
+              className="text-zinc-900 text-sm font-medium leading-none cursor-pointer"
+            >
+              {option.label}
+            </label>
+          </div>
+        ))}
+      </div>
     </RadioGroup>
   );
 });

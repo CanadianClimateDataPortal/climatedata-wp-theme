@@ -3,23 +3,24 @@
  * This component allows users to search for locations using the OpenStreetMap Nominatim API and navigate the map to the selected location.
  */
 
-import { useEffect, ReactElement } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
-import { useMap } from 'react-leaflet';
-import mapPinIcon from '@/assets/map-pin.svg';
-import L from 'leaflet';
-import 'leaflet-search/dist/leaflet-search.min.css';
-import 'leaflet-search';
-import './styles.css';
+import { useState, useEffect, ReactElement } from "react";
+import { useI18n } from "@wordpress/react-i18n";
+import { Locate, LocateFixed } from "lucide-react";
+import { useMap } from "react-leaflet";
 
-import { useAppDispatch } from '@/app/hooks';
-import { addRecentLocation } from '@/features/map/map-slice';
+import L from "leaflet";
+import "leaflet-search/dist/leaflet-search.min.css";
+import "leaflet-search";
+import mapPinIcon from "@/assets/map-pin.svg";
+
+import { useAppDispatch } from "@/app/hooks";
+import { addRecentLocation } from "@/features/map/map-slice";
+import { cn } from "@/lib/utils";
 import {
 	SEARCH_PLACEHOLDER,
 	SEARCH_DEFAULT_ZOOM,
-	SEARCH_COUNTRY_CODE,
 	MAP_SEARCH_URL,
-} from '@/lib/constants.ts';
+} from "@/lib/constants.ts";
 
 /**
  * SearchControl Component
@@ -31,18 +32,25 @@ import {
  * @example
  * <SearchControl />
  */
-export default function SearchControl(): ReactElement | null {
+export default function SearchControl({ className }: { className?: string }): ReactElement | null {
+	const [isGeolocationEnabled, setIsGeolocationEnabled] = useState<boolean>(false);
+	const [isTracking, setIsTracking] = useState<boolean>(false);
+
 	const { __ } = useI18n();
+
+	// we need a unique id for the search control container for cases where multiple maps
+	// are rendered on the same page -- ie. comparing emission scenarios
+	const searchControlId = Math.random().toString(36);
 
 	// defining default placeholder here so that it can be translated
 	const textPlaceholder = __(SEARCH_PLACEHOLDER) || '';
 
-	const map = useMap(); // Access the Leaflet map instance from the context.
+	const map = useMap();
 
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		if (!map) {
+		if (! map) {
 			return;
 		}
 
@@ -53,9 +61,11 @@ export default function SearchControl(): ReactElement | null {
 			jsonpParam: 'json_callback',
 			propertyName: 'display_name',
 			propertyLoc: ['lat', 'lon'],
+			collapsed: false,
 			autoCollapse: false,
 			autoType: false,
 			minLength: 2,
+			container: searchControlId,
 			textPlaceholder,
 			// @ts-ignore: suppress leaflet typescript errors
 			marker: L.marker([0, 0], {
@@ -68,31 +78,93 @@ export default function SearchControl(): ReactElement | null {
 				}),
 			}),
 			// @ts-ignore: suppress leaflet typescript errors
-			moveToLocation: (latlng: L.LatLng, title: string, map: L.Map) => {
-				map.setView(latlng, SEARCH_DEFAULT_ZOOM); // Move the map view to the selected location.
-
-				dispatch(
-					addRecentLocation({
-						title,
-						...latlng,
-					})
-				);
+			moveToLocation: (latlng: L.LatLng, title: string, _: L.Map) => {
+				handleLocationChange(title, latlng);
 			},
 		});
 
-		// Add the search control to the map.
 		map.addControl(searchControl);
 
-		// Expand the search control by default for user visibility.
-		// @ts-ignore: suppress leaflet typescript errors
-		searchControl.expand();
-
-		// Cleanup function to remove the search control when the component unmounts.
 		return () => {
 			map.removeControl(searchControl);
 		};
-	}, [map, SEARCH_PLACEHOLDER, SEARCH_DEFAULT_ZOOM, SEARCH_COUNTRY_CODE]);
+	}, [map]);
 
-	// This component does not render any JSX since it directly interacts with the Leaflet map.
-	return null;
+	const handleLocationChange = (title: string, latlng: L.LatLng) => {
+		map.setView(latlng, SEARCH_DEFAULT_ZOOM);
+
+		dispatch(
+			addRecentLocation({
+				title,
+				...latlng,
+			})
+		);
+	}
+
+	const toggleGeoLocation = () => {
+		if (! navigator.geolocation) {
+			// TODO: what do do if geolocation is not supported?
+			alert(__('Geolocation is not supported by your browser.'));
+			return;
+		}
+
+		if (! isGeolocationEnabled) {
+			setIsTracking(true);
+
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					const { latitude, longitude } = position.coords;
+
+					handleLocationChange(
+						__('Your current location'),
+						L.latLng(latitude, longitude)
+					);
+
+					setIsGeolocationEnabled(true);
+					setIsTracking(false)
+				},
+				(err) => {
+					setIsTracking(false);
+
+					console.error('Error fetching geolocation:', err);
+					// TODO: what do do if geolocation fails?
+					alert(__('Unable to retrieve your location.'));
+				}
+			);
+		}
+		else {
+			setIsGeolocationEnabled(false);
+		}
+	}
+
+	const geolocationIconClass = cn(
+		'w-4 h-4',
+		isGeolocationEnabled ? 'text-white' : 'text-zinc-900',
+		isTracking ? 'animate-ping' : '',
+	);
+
+	return (
+		<div
+			className={cn(
+				'search-control absolute top-24 left-4 z-[9999] flex items-center space-x-1',
+				className,
+			)}
+		>
+			<div id={searchControlId} className="border border-gray-300 shadow-md inline-block" />
+			<div
+				className={cn(
+					'bg-white shadow-md',
+					'transition-colors duration-300 ease-out',
+					isGeolocationEnabled ? 'bg-brand-blue' : 'bg-white',
+				)}
+			>
+				<button className="w-10 h-10 flex items-center justify-center" onClick={toggleGeoLocation} disabled={isTracking}>
+					{isGeolocationEnabled
+						? <LocateFixed className={geolocationIconClass} />
+						: <Locate className={geolocationIconClass} />
+					}
+				</button>
+			</div>
+		</div>
+	);
 }

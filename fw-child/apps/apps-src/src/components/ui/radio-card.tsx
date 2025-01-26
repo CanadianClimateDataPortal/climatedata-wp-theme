@@ -41,7 +41,7 @@ const RadioCard: React.FC<RadioCardProps> = ({
     <div
       className={cn(
         "radio-card",
-        "block mb-4 border border-cold-grey-2 hover:bg-neutral-grey-light transition-colors duration-100",
+        "flex flex-col mb-4 bg-white hover:bg-neutral-grey-light border border-cold-grey-2 transition-colors duration-100",
         selected ? 'bg-neutral-grey-light border-brand-blue' : '',
         className
       )}
@@ -93,7 +93,7 @@ const RadioCardFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   ...props
 }) => (
   <div
-    className={cn("radio-card-footer", "mt-2 p-2 border-t border-gray-200", className)}
+    className={cn("radio-card-footer", "mt-auto p-2 border-t border-gray-200", className)}
     {...props}
   >
     {children}

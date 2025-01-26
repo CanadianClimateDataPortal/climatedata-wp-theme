@@ -151,8 +151,29 @@ export interface MapState {
   dataset: string;
   decade: string;
   pane: string;
-  opacity: MapItemsOpacity;
 }
+
+/**
+ * Represents the download app state in redux store.
+ */
+export interface DownloadState {
+  dataset: TaxonomyData | null;
+  variable: PostData | null;
+  version: string;
+  degrees: number;
+  interactiveRegion: string;
+  startYear: number;
+  endYear: number;
+  frequency: string;
+  emissionScenarios: string[];
+  selectedCells: number;
+  percentiles: string[];
+  decimalPlace: number;
+  format: string;
+  email: string;
+  subscribe: boolean;
+}
+
 
 /**
  * Represents an individual entry in a WMS legend colormap.
@@ -218,7 +239,7 @@ export interface AnchorProps
  * @extends React.HTMLAttributes<HTMLDivElement>
  */
 export interface RadioCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  value: string | number;
+  value: PostData | TaxonomyData;
   title: string;
   radioGroup: string;
   description?: string;
@@ -253,9 +274,7 @@ export interface ButtonProps
  * Extends the default HTML `<a>` tag attributes to include additional properties
  * for enhanced functionality, such as supporting an icon component.
  */
-type CombinedAnchorButtonAttributes = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'onAbort' | 'onAbortCapture'> & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onAbort' | 'onAbortCapture'>;
-
-export interface LinkWithIconProps extends CombinedAnchorButtonAttributes {
+export interface LinkWithIconProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   icon: LucideIcon;
   children: React.ReactNode;
 }
@@ -366,31 +385,31 @@ export interface ZoomControlProps {
 }
 
 export interface ClimateDataProps {
-    data: {
-        // If you have your own typed interface, use that here instead
-        observations: number[][];
-        modeled_historical_median: number[][];
-        modeled_historical_range: number[][];
-        ssp126_median: number[][];
-        ssp126_range: number[][];
-        ssp245_median: number[][];
-        ssp245_range: number[][];
-        ssp585_median: number[][];
-        ssp585_range: number[][];
-        "30y_observations"?: Record<string, number[]>;
-        "30y_ssp126_median"?: Record<string, number[]>;
-        "30y_ssp126_range"?: Record<string, number[]>;
-        "30y_ssp245_median"?: Record<string, number[]>;
-        "30y_ssp245_range"?: Record<string, number[]>;
-        "30y_ssp585_median"?: Record<string, number[]>;
-        "30y_ssp585_range"?: Record<string, number[]>;
-        "delta7100_ssp126_median"?: Record<string, number[]>;
-        "delta7100_ssp126_range"?: Record<string, number[]>;
-        "delta7100_ssp245_median"?: Record<string, number[]>;
-        "delta7100_ssp245_range"?: Record<string, number[]>;
-        "delta7100_ssp585_median"?: Record<string, number[]>;
-        "delta7100_ssp585_range"?: Record<string, number[]>;
-    };
+  data: {
+    // If you have your own typed interface, use that here instead
+    observations: number[][];
+    modeled_historical_median: number[][];
+    modeled_historical_range: number[][];
+    ssp126_median: number[][];
+    ssp126_range: number[][];
+    ssp245_median: number[][];
+    ssp245_range: number[][];
+    ssp585_median: number[][];
+    ssp585_range: number[][];
+    "30y_observations"?: Record<string, number[]>;
+    "30y_ssp126_median"?: Record<string, number[]>;
+    "30y_ssp126_range"?: Record<string, number[]>;
+    "30y_ssp245_median"?: Record<string, number[]>;
+    "30y_ssp245_range"?: Record<string, number[]>;
+    "30y_ssp585_median"?: Record<string, number[]>;
+    "30y_ssp585_range"?: Record<string, number[]>;
+    "delta7100_ssp126_median"?: Record<string, number[]>;
+    "delta7100_ssp126_range"?: Record<string, number[]>;
+    "delta7100_ssp245_median"?: Record<string, number[]>;
+    "delta7100_ssp245_range"?: Record<string, number[]>;
+    "delta7100_ssp585_median"?: Record<string, number[]>;
+    "delta7100_ssp585_range"?: Record<string, number[]>;
+  };
 }
 
 /**
@@ -429,19 +448,3 @@ export interface InteractivePanelProps {
   selected: string;
   onSelect: (id: string) => void;
 }
-
-/**
- * Represents the properties of the `MapItems` for the map.
- */
-export interface MapItemsOpacity {
-  mapData: number;
-  labels: number;
-}
-
-/**
- * Represents the properties of the Labels available for the Slider.
- */
-export type SliderLabelsMap = {
-	mapData: string;
-	labels: string;
-};

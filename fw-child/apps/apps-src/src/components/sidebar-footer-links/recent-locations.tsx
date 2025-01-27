@@ -58,7 +58,7 @@ const RecentLocationsPanel: React.FC = () => {
   const { map } = useMapContext();
   const { recentLocations } = useAppSelector(state => state.map);
 
-  if (! recentLocations) {
+  if (! recentLocations || ! map) {
     return null;
   }
 

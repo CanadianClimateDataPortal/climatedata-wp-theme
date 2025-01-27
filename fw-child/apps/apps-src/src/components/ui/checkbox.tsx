@@ -3,11 +3,14 @@
  *
  * A custom checkbox component built with Radix UI's Checkbox primitives.
  */
-import React, { forwardRef } from "react";
+import React, { useState, forwardRef } from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { Check } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
+import { normalizeOptions } from "@/lib/format"
+import { ControlTitle } from "@/components/ui/control-title";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
 const Checkbox = forwardRef<
   React.ElementRef<typeof CheckboxPrimitive.Root>,
@@ -41,4 +44,71 @@ const Checkbox = forwardRef<
 ));
 Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
-export { Checkbox };
+const CheckboxFactory: React.FC<{
+  name: string;
+  options: { value: string; label: string }[] | string[] | number[];
+  optionClassName?: string;
+  className?: string;
+  title?: string;
+  tooltip?: React.ReactNode;
+  orientation?: string;
+  onChange?: (selectedValues: string[]) => void;
+  values?: string[];
+}> = ({
+  name,
+  options,
+  optionClassName,
+  className,
+  title,
+  tooltip,
+  orientation = "vertical",
+  onChange,
+  values = [],
+}) => {
+  const [selectedValues, setSelectedValues] = useState<string[]>(values);
+
+  const handleCheckboxChange = (checked: CheckedState | boolean, optionValue: string) => {
+    const updatedValues = checked
+      ? [...selectedValues, optionValue] // Add the value if checked
+      : selectedValues.filter((v) => v !== optionValue); // Remove the value if unchecked
+
+    setSelectedValues(updatedValues); // Update local state
+    onChange?.(updatedValues); // Trigger the callback with updated values
+  };
+
+  // when receiving an array of strings or numbers as options we will convert them valid value/label objects
+  const normalizedOptions = normalizeOptions(options)
+
+  const orientationClasses = {
+    vertical: 'sm:flex-col',
+    horizontal: '',
+  };
+
+  return (
+    <div className={cn('checkbox-factory space-y-4 mb-2', className)}>
+      {title && <ControlTitle title={title} tooltip={tooltip} />}
+      <div className={cn('flex flex-wrap gap-y-4 gap-x-0', orientationClasses[orientation])}>
+        {normalizedOptions.map((option, index) => (
+          <label key={index}
+                 htmlFor={`checkbox-${name}-${index}`}
+                 className={cn(
+                   'flex items-center space-x-2 cursor-pointer',
+                   optionClassName ?? ''
+                 )}
+          >
+            <Checkbox
+              id={`checkbox-${name}-${index}`}
+              checked={selectedValues.includes(option.value)}
+              onCheckedChange={(checked) => handleCheckboxChange(checked, option.value)}
+            />
+            <span className="text-zinc-900 text-sm font-medium leading-none cursor-pointer">
+              {option.label}
+            </span>
+          </label>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export { Checkbox, CheckboxFactory };

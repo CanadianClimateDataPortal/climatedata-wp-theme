@@ -10,6 +10,7 @@ import { configureStore } from "@reduxjs/toolkit";
 
 // Store Slices and Reducers
 import mapReducer from "@/features/map/map-slice";
+import downloadReducer from "@/features/download/download-slice";
 
 // API Slices and Reducers - Fetch requests that are going to populate the store
 import { wpApiSlice } from "@/services/wp-node";
@@ -29,6 +30,7 @@ import { wpApiSlice } from "@/services/wp-node";
 export const store = configureStore({
   reducer: {
     map: mapReducer,
+    download: downloadReducer,
     [wpApiSlice.reducerPath]: wpApiSlice.reducer
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(wpApiSlice.middleware)

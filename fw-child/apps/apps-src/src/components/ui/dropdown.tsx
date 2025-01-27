@@ -23,17 +23,18 @@ import { DropdownOption, DropdownProps } from "@/types/types";
 
 const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
   ({
-     className,
-     placeholder,
-     options = [],
-     searchable = false,
-     searchPlaceholder,
-     label,
-     tooltip,
-     onChange
+    className,
+    placeholder,
+    options = [],
+    searchable = false,
+    searchPlaceholder,
+    label,
+    tooltip,
+    value,
+    onChange
    }, ref) => {
-    const [selected, setSelected] = useState<string>("")
-    const [search, setSearch] = useState<string>("")
+    const [selected, setSelected] = useState<string>(value)
+    const [search, setSearch] = useState<string>('')
 
     const { __ } = useI18n();
 
@@ -58,7 +59,7 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
 
     // search functionality
     const filteredOptions = normalizedOptions.filter((option) =>
-      option.label.toLowerCase().includes(search.toLowerCase())
+      String(option.label).toLowerCase().includes(search.toLowerCase())
     );
 
     const handleValueChanged = (value: string) => {
@@ -79,8 +80,8 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
     return (
       <div ref={ref} className={cn("dropdown z-[99999]", className)}>
         {label && <ControlTitle title={label} tooltip={tooltip} />}
-        <Select onValueChange={handleValueChanged}>
-          <SelectTrigger className="w-full focus:ring-0">
+        <Select value={value} onValueChange={handleValueChanged}>
+          <SelectTrigger className="w-full focus:ring-0 focus:ring-offset-0">
             <SelectValue placeholder={placeholderTranslated} />
           </SelectTrigger>
           <SelectContent className="z-[99999]">
@@ -97,8 +98,8 @@ const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(
             {selected && searchable && (
               <SelectItem value="all">{placeholder}</SelectItem>
             )}
-            {filteredOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
+            {filteredOptions.map((option, index) => (
+              <SelectItem key={index} value={option.value}>
                 {option.label}
               </SelectItem>
             ))}

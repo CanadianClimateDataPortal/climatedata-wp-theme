@@ -32,7 +32,7 @@ import {
  * @example
  * <SearchControl />
  */
-export default function SearchControl(): ReactElement | null {
+export default function SearchControl({ className }: { className?: string }): ReactElement | null {
 	const [isGeolocationEnabled, setIsGeolocationEnabled] = useState<boolean>(false);
 	const [isTracking, setIsTracking] = useState<boolean>(false);
 
@@ -115,7 +115,6 @@ export default function SearchControl(): ReactElement | null {
 				(position) => {
 					const { latitude, longitude } = position.coords;
 
-					// TODO: what to use as title here, and do we update the search control input box with this latlng?
 					handleLocationChange(
 						__('Your current location'),
 						L.latLng(latitude, longitude)
@@ -145,7 +144,12 @@ export default function SearchControl(): ReactElement | null {
 	);
 
 	return (
-		<div className="search-control absolute top-24 left-4 z-[9999] flex items-center space-x-1">
+		<div
+			className={cn(
+				'search-control absolute top-24 left-4 z-[9999] flex items-center space-x-1',
+				className,
+			)}
+		>
 			<div id={searchControlId} className="border border-gray-300 shadow-md inline-block" />
 			<div
 				className={cn(

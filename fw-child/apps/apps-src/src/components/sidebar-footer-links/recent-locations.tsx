@@ -7,13 +7,15 @@ import React from "react";
 import { History, ArrowRight } from "lucide-react";
 import { useI18n } from "@wordpress/react-i18n";
 
-// componennts
+// components
 import { Button } from "@/components/ui/button";
 import { SidebarPanel, useSidebar } from "@/components/ui/sidebar";
 
 // other
 import { useAppSelector } from "@/app/hooks";
 import { MapLocation } from "@/types/types";
+import { SEARCH_DEFAULT_ZOOM } from "@/lib/constants";
+import { useMapContext } from "@/context/map-provider";
 import { cn } from "@/lib/utils";
 
 // link and panel slug
@@ -30,7 +32,7 @@ const RecentLocationsLink: React.FC = () => {
     <Button
       variant="link"
       onClick={() => togglePanel(slug)}
-      className="justify-start p-2 text-dark-purple hover:-underline"
+      className="justify-start p-2 text-dark-purple hover:-underline font-normal"
     >
       <History size={16} />
       <span
@@ -53,6 +55,7 @@ RecentLocationsLink.displayName = "RecentLocationsLink";
 const RecentLocationsPanel: React.FC = () => {
   const { __ } = useI18n();
 
+  const { map } = useMapContext();
   const { recentLocations } = useAppSelector(state => state.map);
 
   if (! recentLocations) {
@@ -60,9 +63,7 @@ const RecentLocationsPanel: React.FC = () => {
   }
 
   const moveToLocation = (location: MapLocation) => {
-    console.log(location)
-    // TODO: dispatch moving to the location once the search control is implemented,
-    //  which is the one that will add proper locations to the recent locations list
+    map.setView(location, SEARCH_DEFAULT_ZOOM);
   }
 
   return (

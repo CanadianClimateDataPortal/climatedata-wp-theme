@@ -17,8 +17,8 @@ function App() {
 
   return (
     <LocaleProvider>
-      <AnimatedPanelProvider>
-        <MapProvider>
+      <MapProvider>
+        <AnimatedPanelProvider>
           <SidebarProvider>
             <AppSidebar />
             <SidebarTrigger />
@@ -27,8 +27,8 @@ function App() {
               <MapWrapper />
             </main>
           </SidebarProvider>
-        </MapProvider>
-      </AnimatedPanelProvider>
+        </AnimatedPanelProvider>
+      </MapProvider>
     </LocaleProvider>
   );
 }

@@ -6,6 +6,7 @@ import CustomPanesLayer from "@/components/map-layers/custom-panes";
 import InteractiveRegionsLayer from "@/components/map-layers/interactive-regions";
 import ZoomControl from "@/components/map-layers/zoom-control";
 import MapEvents from "@/components/map-layers/map-events";
+import SearchControl from "@/components/map-layers/search-control";
 
 import { CANADA_CENTER, DEFAULT_ZOOM, DEFAULT_MIN_ZOOM, DEFAULT_MAX_ZOOM } from '@/lib/constants';
 import { useAppSelector } from "@/app/hooks";
@@ -34,10 +35,7 @@ export default function Map({ onMapReady, onUnmount }: {
       <InteractiveRegionsLayer />
       <VariableLayer />
       <ZoomControl />
-
-      {/* TODO: showing the search control causes an error when clicking the map */}
-      {/* @see https://gitlab.ewdev.ca/evolvingweb/climate-data/climdatedata-map/-/merge_requests/10#note_118304 */}
-      {/*<SearchControl />*/}
+      <SearchControl />
 
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

@@ -79,7 +79,7 @@ const CheckboxFactory: React.FC<{
   // when receiving an array of strings or numbers as options we will convert them valid value/label objects
   const normalizedOptions = normalizeOptions(options)
 
-  const orientationClasses = {
+  const orientationClasses: { [key: string]: string } = {
     vertical: 'sm:flex-col',
     horizontal: '',
   };

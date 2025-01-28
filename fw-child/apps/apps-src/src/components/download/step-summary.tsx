@@ -4,7 +4,7 @@ import { PencilLine } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { useAppSelector } from "@/app/hooks";
 import { useDownloadContext } from "@/context/download-provider";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,6 @@ const StepSummary: React.FC = () => {
 
 	const { currentStep, goToStep } = useDownloadContext();
 
-	// const dispatch = useAppDispatch();
 	const state = useAppSelector(state => state.download);
 
 	const summaryData = [

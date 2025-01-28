@@ -20,11 +20,28 @@ fi
 
 server=$1
 url="$server/ssl/wildcard.climatedata.ca.tgz"
+read -p "Enter username: " username
+
+if [[ -n "$username" ]]; then
+    read -s -p "Enter password: " password
+    echo ""
+    auth_option="--user=$username:$password"
+else
+    echo "No username provided."
+    auth_option=""
+fi
+
 temp_dir=$(mktemp -d)
 file_name=$(basename "$url")
 full_path="$temp_dir/$file_name"
 
-wget -O "$full_path" "$url" || {
+if [[ -n "$username" && -n "$password" ]]; then
+    auth_option="--user=$username --password=$password"
+else
+    auth_option=""
+fi
+
+wget $auth_option -O "$full_path" "$url" || {
     echo "ERROR: Download failed."
     exit 1
 }
@@ -42,5 +59,3 @@ fi
 destination="../mounts/ssl"
 mv "$temp_dir"/* "$destination"
 rm -rf "$temp_dir"
-
-echo "File moved to $destination."

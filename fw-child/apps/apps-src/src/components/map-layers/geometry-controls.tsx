@@ -27,6 +27,7 @@ export default function GeometryControls({ onAreaSelected }: {
       return;
     }
 
+    // Add Leaflet.pm controls
     // @ts-ignore: suppress typescript error
     map.pm.addControls({
       position: 'topright',

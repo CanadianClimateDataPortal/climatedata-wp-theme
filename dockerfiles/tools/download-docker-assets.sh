@@ -3,10 +3,13 @@
 set -e
 
 show_help() {
-    echo "Usage: $0 <server_url> [--username <user>] [--password-file <file_path>]"
+    echo "Usage: $0 <server_url> [--username <username>] [--password-file <file_path>]"
     echo "  <server_url>: URL to download the assets from."
-    echo "  [--username <user>]: (Optional) Username for authentication. If provided, the script will prompt for the password."
+    echo "  [--username <username>]: (Optional) Username for authentication. If provided, the script will prompt for the password."
     echo "  [--password-file <file_path>]: (Optional) password file for authentication."
+    echo ""
+    echo "  If no authentication options are provided, the script will prompt for both username and password interactively."
+    echo ""
 }
 
 if [[ "$#" -eq 0 ]]; then

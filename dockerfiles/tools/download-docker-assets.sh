@@ -21,7 +21,8 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
 fi
 
 server=$1
-url="$server/ssl/wildcard.climatedata.ca.tgz"
+url_ssl="$server/ssl/wildcard.climatedata.ca.tgz"
+url_wp="$server/wp-plugins"
 
 if [[ "$#" -ge 2 && "$2" == --username* ]]; then
     username=${2#--username=}
@@ -50,10 +51,13 @@ auth_option="--user=$username --password=$password"
 
 
 temp_dir=$(mktemp -d)
-file_name=$(basename "$url")
+file_name=$(basename "$url_ssl")
 full_path="$temp_dir/$file_name"
+destination_ssl="../mounts/ssl"
+destination_wp="../mounts/wp-plugins"
+file_list="../build/www/wp-plugins/local.txt"
 
-wget $auth_option -O "$full_path" "$url" || {
+wget $auth_option -O "$full_path" "$url_ssl" || {
     echo "ERROR: Download failed."
     exit 1
 }
@@ -68,6 +72,13 @@ else
     exit 1
 fi
 
-destination="../mounts/ssl"
-mv "$temp_dir"/* "$destination"
+mv "$temp_dir"/* "$destination_ssl"
 rm -rf "$temp_dir"
+
+while IFS= read -r file; do
+    [[ -z "$file" || "$file" =~ ^# ]] && continue
+
+    curl -u "$username:$password" "$url_wp/$file" -o "$destination_wp/$file" || {
+        echo "ERROR: $file Download failed."
+    }
+done < "$file_list"

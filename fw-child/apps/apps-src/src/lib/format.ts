@@ -31,13 +31,27 @@ export function normalizeOptions(
   options: Array<string | number | { label: string; value: string }>
 ): { label: string; value: string }[] {
   return options.map((item) => {
-    if (typeof item === "string" || typeof item === "number") {
+    if (typeof item === 'string' || typeof item === 'number') {
       // convert strings and numbers to { label, value } objects, all string for type safety
       return { label: String(item), value: String(item) };
     }
 
     // default to unmodified options, ie. label/value objects array
     return item;
+  });
+}
+
+/**
+ * Normalizes an array of options into the format required by the Dropdown component.
+ */
+export function normalizeDropdownOptions<T>(
+  options: Array<T | { value: T; label: string }>
+): { value: T; label: string }[] {
+  return options.map((option) => {
+    if (option && typeof option === 'object' && 'value' in option) {
+      return option;
+    }
+    return { value: option as T, label: String(option) };
   });
 }
 

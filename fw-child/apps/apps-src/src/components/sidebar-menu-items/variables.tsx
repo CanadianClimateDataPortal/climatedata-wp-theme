@@ -2,22 +2,17 @@
  * A menu item and panel component that displays a list of variables with some custom filters.
  * TODO: make this work with the new AnimatedPanel component
  */
-import React, { useState, useEffect } from "react";
-import { Map, ChevronRight, ExternalLink } from "lucide-react";
+import React, { useState } from "react";
+import { Map, ChevronRight } from "lucide-react";
 import { useI18n } from "@wordpress/react-i18n";
 
 // components
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioCard, RadioCardFooter } from "@/components/ui/radio-card";
 import { SidebarMenuItem, SidebarMenuButton, SidebarPanel, useSidebar } from "@/components/ui/sidebar";
-import Dropdown from "@/components/ui/dropdown";
 import Grid from "@/components/ui/grid";
-import Link from "@/components/ui/link";
 
 // other
-import { fetchPostsData, fetchTaxonomyData } from "@/services/services";
-import { normalizeRadioCardProps } from "@/lib/format";
-import { InteractivePanelProps, TaxonomyData, PostData } from "@/types/types";
+import { InteractivePanelProps } from "@/types/types";
 import TaxonomyDropdownFilter from "@/components/taxonomy-dropdown-filter";
 import VariableRadioCards from "@/components/variable-radio-cards";
 

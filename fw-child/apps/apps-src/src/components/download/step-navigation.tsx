@@ -9,7 +9,7 @@ import { useDownloadContext } from "@/context/download-provider";
  * Includes proper rendering of "Step X of Y".
  */
 const StepNavigation: React.FC<{ totalSteps: number }> = ({ totalSteps }) => {
-	const { currentStep, goToStep } = useDownloadContext();
+	const { currentStep } = useDownloadContext();
 
 	// Array of step numbers [1...totalSteps]
 	const steps = Array.from({ length: totalSteps }, (_, i) => i + 1);

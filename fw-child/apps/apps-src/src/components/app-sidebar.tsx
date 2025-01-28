@@ -31,12 +31,14 @@ import { RecentLocationsLink, RecentLocationsPanel } from "@/components/sidebar-
 import LinkWithIcon from "@/components/sidebar-footer-links/link-with-icon";
 import LayerOpacities from "@/components/ui/layer-opacities";
 
+import { TaxonomyData, PostData } from "@/types/types";
+
 /**
  * A `Sidebar` component that provides a tabbed interface for exploring data or adjusting map settings.
  */
 export function AppSidebar() {
-  const [selectedDataset, setSelectedDataset] = useState<string>('');
-  const [selectedVariable, setSelectedVariable] = useState<string>('');
+  const [selectedDataset, setSelectedDataset] = useState<TaxonomyData>();
+  const [selectedVariable, setSelectedVariable] = useState<PostData>();
   const { setExtendInfo } = useMapContext();
 
 	const { __ } = useI18n();

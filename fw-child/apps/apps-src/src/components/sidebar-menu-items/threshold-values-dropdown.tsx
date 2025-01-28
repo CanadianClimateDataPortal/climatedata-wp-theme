@@ -22,13 +22,7 @@ const ThresholdValuesDropdown: React.FC = () => {
   // TODO: fetch these values from the API
   const options = {
     unit: '°C',
-    values: [
-      5,
-      10,
-      15,
-      20,
-      25,
-      30],
+    values: [5, 10, 15, 20, 25, 30],
   };
 
   const Tooltip = () => (
@@ -42,13 +36,13 @@ const ThresholdValuesDropdown: React.FC = () => {
       <Dropdown
         placeholder={__('Select an option')}
         options={options.values.map((value) => ({
-          value: String(value),
+          value,
           label: `${value} ${options.unit}`,
         }))}
         label={__('Threshold Values')}
         tooltip={<Tooltip />}
         onChange={(value) => {
-          dispatch(setThresholdValue(parseInt(value)));
+          dispatch(setThresholdValue(value));
         }}
       />
     </SidebarMenuItem>

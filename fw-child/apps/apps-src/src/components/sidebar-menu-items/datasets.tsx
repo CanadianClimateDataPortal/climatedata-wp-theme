@@ -81,12 +81,12 @@ const DatasetsPanel: React.FC<InteractivePanelProps> = ({ selected, onSelect }) 
             {datasets.map((item) => (
               <RadioCard
                 key={item.id}
-                value={String(item.id)}
+                value={item}
                 radioGroup={slug}
                 title={item.name ?? ''}
                 description={item.description}
-                selected={selected === String(item.id)}
-                onSelect={() => onSelect(String(item.id))}
+                selected={selected === item}
+                onSelect={() => onSelect(item)}
               >
                 <RadioCardFooter>
                   <Link

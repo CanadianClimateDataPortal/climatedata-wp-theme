@@ -137,6 +137,22 @@ export type MapLocation = {
 };
 
 /**
+ * Represents the properties of the `MapItems` for the map.
+ */
+export interface MapItemsOpacity {
+  mapData: number;
+  labels: number;
+}
+
+/**
+ * Represents the properties of the Labels available for the Slider.
+ */
+export type SliderLabelsMap = {
+  mapData: string;
+  labels: string;
+};
+
+/**
  * Represents the map state in redux store.
  */
 export interface MapState {
@@ -151,6 +167,10 @@ export interface MapState {
   dataset: string;
   decade: string;
   pane: string;
+  opacity: {
+    mapData: number;
+    labels: number;
+  };
 }
 
 /**
@@ -239,7 +259,7 @@ export interface AnchorProps
  * @extends React.HTMLAttributes<HTMLDivElement>
  */
 export interface RadioCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  value: PostData | TaxonomyData;
+  value: any; // this value may be very specific to the use case, so it's left as any
   title: string;
   radioGroup: string;
   description?: string;
@@ -274,10 +294,14 @@ export interface ButtonProps
  * Extends the default HTML `<a>` tag attributes to include additional properties
  * for enhanced functionality, such as supporting an icon component.
  */
-export interface LinkWithIconProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+export interface LinkWithIconBaseProps {
   icon: LucideIcon;
   children: React.ReactNode;
+  className?: string;
 }
+export type LinkWithIconProps =
+  | (LinkWithIconBaseProps & React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string })
+  | (LinkWithIconBaseProps & React.ButtonHTMLAttributes<HTMLButtonElement> & { href?: never });
 
 /**
  * Represents the properties of the `Modal` component.
@@ -350,15 +374,16 @@ export interface DropdownOption {
  * @interface {DropdownProps}
  *
  */
-export interface DropdownProps
-  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "onChange"> {
-  options: DropdownOption[] | string[]
-  placeholder?: string
-  label?: string | React.ReactNode
-  tooltip?: string | React.ReactNode
-  searchable?: boolean
-  searchPlaceholder?: string
-  onChange: (value: string) => void
+export interface DropdownProps<T = string> // generic default type is string
+  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "onChange" | "value"> {
+  options: { value: T; label: string }[] | T[];
+  placeholder?: string;
+  label?: string | React.ReactNode;
+  tooltip?: string | React.ReactNode;
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  onChange: (value: T) => void;
+  value?: T;
 }
 
 /**
@@ -445,6 +470,6 @@ export interface AnimatedPanelProps extends ProviderPanelProps {
  * as `DatasetsPanel` and `VariablesPanel` where items are selected and some action is taken.
  */
 export interface InteractivePanelProps {
-  selected: string;
-  onSelect: (id: string) => void;
+  selected: any;
+  onSelect: (selected: any) => void;
 }

@@ -47,7 +47,8 @@ const TaxonomyDropdownFilter: React.FC<{
       placeholder={__(placeholder)}
       options={options}
       onChange={(selectedValue) => {
-        onFilterChange(selectedValue === __(placeholder) ? '' : selectedValue);
+        const normalizedValue = typeof selectedValue === 'string' ? selectedValue : '';
+        onFilterChange(normalizedValue === __(placeholder) ? '' : normalizedValue);
       }}
     />
   );

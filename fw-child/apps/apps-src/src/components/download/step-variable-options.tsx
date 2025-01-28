@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useI18n } from "@wordpress/react-i18n";
 import { ChevronRight } from "lucide-react";
 
@@ -61,7 +61,7 @@ const StepVariableOptions: React.FC = () => {
 						placeholder="3"
 						value={degrees}
 						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-							dispatch(setDegrees(e.target.value));
+							dispatch(setDegrees(parseInt(e.target.value)));
 						}}
 					/>
 				</div>

@@ -1,4 +1,4 @@
-import React, { useMap } from 'react-leaflet';
+import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import { useEffect } from 'react';
 
@@ -8,7 +8,7 @@ const GridLayer = () => {
   useEffect(() => {
     // Define a custom grid layer
     const gridLayer = L.GridLayer.extend({
-      createTile: function (coords) {
+      createTile: function (coords: L.Coords) {
         const tile = document.createElement('div');
         tile.style.outline = '1px solid rgba(0, 0, 0, 0.2)';
         tile.style.background = 'transparent';

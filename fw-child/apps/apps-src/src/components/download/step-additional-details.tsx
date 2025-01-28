@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useI18n } from "@wordpress/react-i18n";
 
 import { CheckboxFactory } from "@/components/ui/checkbox";
@@ -16,6 +16,8 @@ import {
 	setDecimalPlace,
 } from "@/features/download/download-slice";
 
+import { normalizeDropdownOptions } from "@/lib/format";
+
 /**
  * Additional details step
  */
@@ -26,22 +28,23 @@ const StepAdditionalDetails: React.FC = () => {
 	const { startYear, endYear, frequency, emissionScenarios, percentiles, decimalPlace } = useAppSelector(state => state.download);
 
 	const yearRange = Array.from({ length: 31 }, (_, i) => (i + 2000));
-	const yearOptions = yearRange.map((year) => ({ value: year, label: year }));
+	const yearOptions = normalizeDropdownOptions(yearRange.map((year) =>
+		({ value: year, label: String(year) })));
 
-	const frequencyOptions = [
+	const frequencyOptions = normalizeDropdownOptions([
 		__('Annual'),
 		__('Annual (July-June)'),
 		__('Seasonal'),
 		__('Monthly'),
-	];
+	]);
 
-	const emissionScenariosOptions = [
+	const emissionScenariosOptions = normalizeDropdownOptions([
 		'SSP5–8.5',
 		'SSP1–2.6',
 		'SSP2–4.5',
-	];
+	]);
 
-	const percentilesOptions = [
+	const percentilesOptions = normalizeDropdownOptions([
 		'05',
 		'10',
 		'25',
@@ -49,9 +52,10 @@ const StepAdditionalDetails: React.FC = () => {
 		'75',
 		'90',
 		'95',
-	];
+	]);
 
-	const decimalPlaceOptions = [0, 2].map((value) => ({ value, label: value }));
+	const decimalPlaceOptions = normalizeDropdownOptions([0, 2].map((value) =>
+		({ value, label: String(value) })));
 
 	return (
 		<StepContainer title="Additional details">
@@ -60,7 +64,7 @@ const StepAdditionalDetails: React.FC = () => {
 			</StepContainerDescription>
 
 			<div className="flex gap-4 sm:gap-8 mb-6">
-				<Dropdown
+				<Dropdown<number>
 					className="w-1/2 sm:w-52"
 					label={__('Start Year')}
 					value={startYear}
@@ -70,7 +74,7 @@ const StepAdditionalDetails: React.FC = () => {
 					}}
 				/>
 
-				<Dropdown
+				<Dropdown<number>
 					className="w-1/2 sm:w-52"
 					label={__('End Year')}
 					value={endYear}
@@ -127,7 +131,7 @@ const StepAdditionalDetails: React.FC = () => {
 				value={decimalPlace}
 				options={decimalPlaceOptions}
 				onChange={(value) => {
-					setDecimalPlace(value);
+					dispatch(setDecimalPlace(value));
 				}}
 			/>
 

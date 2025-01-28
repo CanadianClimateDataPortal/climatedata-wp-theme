@@ -1,11 +1,11 @@
-import React, { ReactElement, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
 import { GeoJSON } from "geojson";
 
 import L from "leaflet";
+import "leaflet.pm";
 import "leaflet/dist/leaflet.css";
 import "leaflet.pm/dist/leaflet.pm.css";
-import "leaflet.pm";
 
 /**
  * Component that adds geometry drawing controls to the map.
@@ -20,7 +20,6 @@ export default function GeometryControls({ onAreaSelected }: {
   const map = useMap();
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
   const ref = useRef<L.LayerGroup>(new L.LayerGroup());
 
   useEffect(() => {
@@ -29,6 +28,7 @@ export default function GeometryControls({ onAreaSelected }: {
     }
 
     // Add Leaflet.pm controls
+    // @ts-ignore: suppress typescript error
     map.pm.addControls({
       position: 'topright',
       drawMarker: false,
@@ -40,8 +40,6 @@ export default function GeometryControls({ onAreaSelected }: {
     map.addLayer(ref.current);
 
     // Listen for shape creation
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
     map.on('pm:create', (e: L.LeafletEvent & { layer: L.Layer }) => {
       const shape = e.layer.toGeoJSON() as GeoJSON;
 
@@ -55,6 +53,7 @@ export default function GeometryControls({ onAreaSelected }: {
     });
 
     return () => {
+      // @ts-ignore: suppress typescript error
       map.pm.removeControls();
     };
   }, [map, onAreaSelected]);

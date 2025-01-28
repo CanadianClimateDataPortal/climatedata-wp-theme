@@ -3,8 +3,9 @@
 set -e
 
 show_help() {
-    echo "Usage: $0 <server_url>"
+    echo "Usage: $0 <server_url> [username]"
     echo "  <server_url>: URL to download the assets from."
+    echo "  [username]: (Optional) Username for authentication. If provided, the script will prompt for the password."
 }
 
 if [[ "$#" -eq 0 ]]; then
@@ -20,14 +21,19 @@ fi
 
 server=$1
 url="$server/ssl/wildcard.climatedata.ca.tgz"
-read -p "Enter username: " username
+
+if [[ "$#" -eq 2 ]]; then
+    username=$2
+else
+    read -p "Enter username: " username
+fi
 
 if [[ -n "$username" ]]; then
     read -s -p "Enter password: " password
     echo ""
     auth_option="--user=$username:$password"
 else
-    echo "No username provided."
+    echo "No username provided. Proceeding without authentication."
     auth_option=""
 fi
 

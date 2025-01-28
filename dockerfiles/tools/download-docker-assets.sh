@@ -3,9 +3,10 @@
 set -e
 
 show_help() {
-    echo "Usage: $0 <server_url> [username]"
+    echo "Usage: $0 <server_url> [--username <user>] [--password-file <file_path>]"
     echo "  <server_url>: URL to download the assets from."
-    echo "  [username]: (Optional) Username for authentication. If provided, the script will prompt for the password."
+    echo "  [--username <user>]: (Optional) Username for authentication. If provided, the script will prompt for the password."
+    echo "  [--password-file <file_path>]: (Optional) password file for authentication."
 }
 
 if [[ "$#" -eq 0 ]]; then
@@ -22,30 +23,35 @@ fi
 server=$1
 url="$server/ssl/wildcard.climatedata.ca.tgz"
 
-if [[ "$#" -eq 2 ]]; then
-    username=$2
+if [[ "$#" -ge 2 && "$2" == --username* ]]; then
+    username=${2#--username=}
 else
     read -p "Enter username: " username
 fi
 
-if [[ -n "$username" ]]; then
+
+if [[ "$#" -eq 3 && "$3" == --password-file* ]]; then
+    password_file="${3#--password-file=}"
+    if [[ ! -f "$password_file" ]]; then
+        echo "ERROR: Password file '$password_file' does not exist."
+        exit 1
+    fi
+    password=$(<"$password_file")
+else
     read -s -p "Enter password: " password
     echo ""
-    auth_option="--user=$username:$password"
-else
-    echo "No username provided. Proceeding without authentication."
-    auth_option=""
 fi
+
+if [[ -z "$username" && -n "$password" ]]; then
+    echo "ERROR: Password provided but no username entered." && exit 1
+fi
+
+auth_option="--user=$username --password=$password"
+
 
 temp_dir=$(mktemp -d)
 file_name=$(basename "$url")
 full_path="$temp_dir/$file_name"
-
-if [[ -n "$username" && -n "$password" ]]; then
-    auth_option="--user=$username --password=$password"
-else
-    auth_option=""
-fi
 
 wget $auth_option -O "$full_path" "$url" || {
     echo "ERROR: Download failed."

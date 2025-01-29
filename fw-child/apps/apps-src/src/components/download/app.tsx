@@ -10,15 +10,13 @@ import StepSendRequest from '@/components/download/step-send-request';
 import StepNavigation from "@/components/download/step-navigation";
 import StepSummary from "@/components/download/step-summary";
 
-import { useAppSelector } from "@/app/hooks";
 import { DownloadProvider, useDownloadContext } from "@/context/download-provider";
 import { cn } from "@/lib/utils";
 
 const Steps: React.FC = () => {
 	const { __ } = useI18n();
 
-	const data = useAppSelector(state => state.download)
-	const { goToNextStep, currentStep } = useDownloadContext();
+	const { goToNextStep, currentStep, isStepValid, fields } = useDownloadContext();
 
 	const steps = [
 		<StepDataset />,
@@ -32,8 +30,7 @@ const Steps: React.FC = () => {
 	const isLastStep = currentStep === steps.length;
 	const isSecondToLastStep = currentStep === steps.length - 1;
 
-	// TODO: add logic to disable the next button when the fields in the current step have not been filled out
-	const isDisabled = false;
+	const isDisabled = !isStepValid();
 
 	let buttonText = __('Next Step');
 	if (isLastStep) {
@@ -49,8 +46,8 @@ const Steps: React.FC = () => {
 		}
 		else {
 			// TODO: add logic to actually send the request
-			console.log(data)
-			alert('See dev console for data that would be sent in the request');
+			console.log(fields)
+			alert('See dev console for data captured in the form');
 		}
 	}
 
@@ -63,9 +60,10 @@ const Steps: React.FC = () => {
 			<button
 				type="button"
 				onClick={handleNext}
+				disabled={isDisabled}
 				className={cn(
-					'w-64 mx-auto sm:mx-0 py-2 rounded-full uppercase bg-brand-red hover:bg-brand-red/50 text-white',
-					isDisabled ? 'opacity-25' : '',
+					'w-64 mx-auto sm:mx-0 py-2 rounded-full uppercase bg-brand-red text-white',
+					isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-brand-red/75',
 				)}
 			>
 				{buttonText} &rarr;

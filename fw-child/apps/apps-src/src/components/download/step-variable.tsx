@@ -5,8 +5,7 @@ import { StepContainer, StepContainerDescription } from "@/components/download/s
 import TaxonomyDropdownFilter from "@/components/taxonomy-dropdown-filter";
 import VariableRadioCards from "@/components/variable-radio-cards";
 
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { setVariable } from "@/features/download/download-slice";
+import { useDownloadContext } from "@/context/download-provider";
 
 /**
  * Variable step
@@ -16,11 +15,11 @@ const StepVariable: React.FC = () => {
 
 	const { __ } = useI18n();
 
-	const dispatch = useAppDispatch();
-	const { variable } = useAppSelector(state => state.download);
+	const { setField, fields } = useDownloadContext();
+	const { variable } = fields;
 
 	return (
-		<StepContainer title="Select a variable">
+		<StepContainer title={__('Select a variable')}>
 			<StepContainerDescription>
 				{__('Select a variable contained in the dataset previously selected. Use the filters below to narrow down the list of variables.')}
 			</StepContainerDescription>
@@ -32,10 +31,10 @@ const StepVariable: React.FC = () => {
 						setFilterValues((prev) => ({ ...prev, 'var-type': value }))
 					}
 					slug="var-type"
-					label="Variable Types"
-					tooltip="Select a variable type"
-					placeholder="All"
-					value={filterValues["var-type"] || ""}
+					label={__('Variable Types')}
+					tooltip={__('Select a variable type')}
+					placeholder={__('All')}
+					value={filterValues["var-type"] || ''}
 				/>
 				<TaxonomyDropdownFilter
 					className="sm:w-52"
@@ -43,10 +42,10 @@ const StepVariable: React.FC = () => {
 						setFilterValues((prev) => ({ ...prev, sector: value }))
 					}
 					slug="sector"
-					label="Sectors"
-					tooltip="Select a sector"
-					placeholder="All"
-					value={filterValues.sector || ""}
+					label={__('Sectors')}
+					tooltip={__('Select a sector')}
+					placeholder={__('All')}
+					value={filterValues.sector || ''}
 				/>
 			</div>
 
@@ -55,7 +54,7 @@ const StepVariable: React.FC = () => {
 					filterValues={filterValues}
 					selected={variable}
 					onSelect={(selected) => {
-						dispatch(setVariable(selected));
+						setField('variable', selected);
 					}}
 				/>
 			</div>

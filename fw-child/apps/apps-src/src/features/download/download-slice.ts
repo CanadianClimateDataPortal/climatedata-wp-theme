@@ -6,10 +6,10 @@
  */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { DownloadState, TaxonomyData, PostData } from "@/types/types";
+import { DownloadState } from "@/types/types";
 
 // Define the initial state this slice is going to use.
-const initialState: DownloadState = {
+export const initialState: DownloadState = {
   dataset: null,
   variable: null,
   version: 'CMIP5',
@@ -19,7 +19,7 @@ const initialState: DownloadState = {
   endYear: 2030,
   frequency: 'Annual',
   emissionScenarios: [],
-  selectedCells: 0,
+  selectedCells: 1, // temporarily set to 1 so that the step can be submitted
   percentiles: [],
   decimalPlace: 2,
   format: 'csv',
@@ -32,72 +32,15 @@ const downloadSlice = createSlice({
   name: 'download',
   initialState,
   reducers: {
-    setDataset(state, action: PayloadAction<TaxonomyData>) {
-      state.dataset = action.payload;
-    },
-    setVariable(state, action: PayloadAction<PostData>) {
-      state.variable = action.payload;
-    },
-    setVersion(state, action: PayloadAction<string>) {
-      state.version = action.payload;
-    },
-    setDegrees(state, action: PayloadAction<number>) {
-      state.degrees = action.payload;
-    },
-    setInteractiveRegion(state, action: PayloadAction<string>) {
-      state.interactiveRegion = action.payload;
-    },
-    setSelectedCells(state, action: PayloadAction<number>) {
-      state.selectedCells = action.payload;
-    },
-    setStartYear(state, action: PayloadAction<number>) {
-      state.startYear = action.payload;
-    },
-    setEndYear(state, action: PayloadAction<number>) {
-      state.endYear = action.payload;
-    },
-    setFrequency(state, action: PayloadAction<string>) {
-      state.frequency = action.payload;
-    },
-    setEmissionScenarios(state, action: PayloadAction<string[]>) {
-      state.emissionScenarios = action.payload;
-    },
-    setPercentiles(state, action: PayloadAction<string[]>) {
-      state.percentiles = action.payload;
-    },
-    setDecimalPlace(state, action: PayloadAction<number>) {
-      state.decimalPlace = action.payload;
-    },
-    setFormat(state, action: PayloadAction<string>) {
-      state.format = action.payload;
-    },
-    setEmail(state, action: PayloadAction<string>) {
-      state.email = action.payload;
-    },
-    setSubscribe(state, action: PayloadAction<boolean>) {
-      state.subscribe = action.payload;
-    },
+    setValue<K extends keyof DownloadState>(state: DownloadState, action: PayloadAction<{ key: K; value: DownloadState[K] }>) {
+      const { key, value } = action.payload;
+      state[key] = value;
+    }
   },
 });
 
 // Export actions
-export const {
-  setDataset,
-  setVariable,
-  setVersion,
-  setDegrees,
-  setInteractiveRegion,
-  setSelectedCells,
-  setStartYear,
-  setEndYear,
-  setFrequency,
-  setEmissionScenarios,
-  setPercentiles,
-  setDecimalPlace,
-  setFormat,
-  setEmail,
-  setSubscribe,
-} = downloadSlice.actions;
+export const { setValue } = downloadSlice.actions;
 
 // Export reducer
 export default downloadSlice.reducer;

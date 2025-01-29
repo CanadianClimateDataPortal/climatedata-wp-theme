@@ -7,8 +7,7 @@ import Dropdown from "@/components/ui/dropdown";
 import { ControlTitle } from "@/components/ui/control-title";
 import { Input } from "@/components/ui/input";
 
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { setVersion, setDegrees } from "@/features/download/download-slice";
+import { useDownloadContext } from "@/context/download-provider";
 
 /**
  * Variable options step
@@ -16,8 +15,8 @@ import { setVersion, setDegrees } from "@/features/download/download-slice";
 const StepVariableOptions: React.FC = () => {
 	const { __ } = useI18n();
 
-	const dispatch = useAppDispatch();
-	const { version, degrees } = useAppSelector(state => state.download);
+	const { setField, fields } = useDownloadContext();
+	const { version, degrees } = fields;
 
 	const options = [
 		'CMIP5',
@@ -42,7 +41,7 @@ const StepVariableOptions: React.FC = () => {
 						label={__('Versions of the dataset')}
 						tooltip={__('Select a version for the dataset')}
 						onChange={(value) => {
-							dispatch(setVersion(value));
+							setField('version', value);
 						}}
 					/>
 				</div>
@@ -58,10 +57,10 @@ const StepVariableOptions: React.FC = () => {
 					<Input
 						className="sm:w-64"
 						type="number"
-						placeholder="3"
-						value={degrees}
+						value={degrees !== undefined ? degrees : ''} // fixes controlled/uncontrolled input warning
 						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-							dispatch(setDegrees(parseInt(e.target.value)));
+							const newValue = e.target.value.trim() ? parseInt(e.target.value) : undefined;
+							setField('degrees', newValue);
 						}}
 					/>
 				</div>

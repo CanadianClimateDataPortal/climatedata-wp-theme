@@ -4,7 +4,6 @@ import { PencilLine } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { useAppSelector } from "@/app/hooks";
 import { useDownloadContext } from "@/context/download-provider";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -12,46 +11,57 @@ import { Button } from "@/components/ui/button";
 const StepSummary: React.FC = () => {
 	const { __ } = useI18n();
 
-	const { currentStep, goToStep } = useDownloadContext();
-
-	const state = useAppSelector(state => state.download);
+	const { currentStep, goToStep, fields } = useDownloadContext();
+	const {
+		dataset,
+		variable,
+		version,
+		degrees,
+		selectedCells,
+		startYear,
+		endYear,
+		frequency,
+		emissionScenarios,
+		percentiles,
+		decimalPlace
+	} = fields;
 
 	const summaryData = [
 		{
 			title: __('Dataset'),
 			content: [
-				state.dataset?.name
+				dataset?.name
 			],
 		},
 		{
 			title: __('Variable'),
 			content: [
-				state.variable?.title
+				variable?.title
 			],
 		},
 		{
 			title: __('Variable options'),
-			content: `${state.version}, ` + __('MEAN TEMP >') + ' ' + state.degrees + ' °C'
+			content: `${version}, ` + __('MEAN TEMP >') + ' ' + degrees + ' °C'
 		},
 		{
 			title: __('Location or area'),
-			content: `${state.selectedCells} ` + __(' cells selected'),
+			content: `${selectedCells} ` + __(' cells selected'),
 		},
 		{
 			title: __('Additional details'),
 			content: [
-				`${state.startYear}-${state.endYear}`,
-				state.frequency,
-				state.percentiles.length === 7
+				`${startYear}-${endYear}`,
+				frequency,
+				percentiles.length === 7
 					? __('All percentiles')
-					: `${state.percentiles.length} ` + __('percentiles'),
-				state.emissionScenarios.length
-					? `${state.emissionScenarios.length} ` +
-						(state.emissionScenarios.length === 1
+					: `${percentiles.length} ` + __('percentiles'),
+				emissionScenarios.length
+					? `${emissionScenarios.length} ` +
+						(emissionScenarios.length === 1
 							? __('Scenario selected')
 							: __('Scenarios selected'))
 						: __('No Scenarios selected'),
-				`${state.decimalPlace} Decimal places`,
+				`${decimalPlace} Decimal places`,
 			].join(', ')
 		}
 	];

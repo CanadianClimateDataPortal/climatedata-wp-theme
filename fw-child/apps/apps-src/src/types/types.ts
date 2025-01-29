@@ -180,7 +180,7 @@ export interface DownloadState {
   dataset: TaxonomyData | null;
   variable: PostData | null;
   version: string;
-  degrees: number;
+  degrees: number | undefined;
   interactiveRegion: string;
   startYear: number;
   endYear: number;
@@ -193,7 +193,6 @@ export interface DownloadState {
   email: string;
   subscribe: boolean;
 }
-
 
 /**
  * Represents an individual entry in a WMS legend colormap.
@@ -294,14 +293,14 @@ export interface ButtonProps
  * Extends the default HTML `<a>` tag attributes to include additional properties
  * for enhanced functionality, such as supporting an icon component.
  */
-export interface LinkWithIconBaseProps {
+type CombinedAnchorButtonAttributes =
+  Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'onAbort' | 'onAbortCapture'> &
+  Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onAbort' | 'onAbortCapture'>;
+
+export interface LinkWithIconProps extends CombinedAnchorButtonAttributes {
   icon: LucideIcon;
   children: React.ReactNode;
-  className?: string;
 }
-export type LinkWithIconProps =
-  | (LinkWithIconBaseProps & React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string })
-  | (LinkWithIconBaseProps & React.ButtonHTMLAttributes<HTMLButtonElement> & { href?: never });
 
 /**
  * Represents the properties of the `Modal` component.

@@ -7,8 +7,8 @@ import { ControlTitle } from "@/components/ui/control-title";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { setFormat, setEmail, setSubscribe } from "@/features/download/download-slice";
+import { cn, isValidEmail } from "@/lib/utils";
+import { useDownloadContext } from "@/context/download-provider";
 
 /**
  * Send download request step
@@ -18,16 +18,18 @@ const StepSendRequest: React.FC = () => {
 
 	const { __ } = useI18n();
 
-	const dispatch = useAppDispatch();
-	const { format, email, subscribe } = useAppSelector(state => state.download);
+	const { setField, fields } = useDownloadContext();
+	const { format, email, subscribe } = fields;
 
 	const formatOptions = [
 		{ value: 'csv', label: 'CSV' },
 		{ value: 'netcdf', label: 'NetCDF' },
 	];
 
+	const isEmailValid = isValidEmail(email);
+
 	return (
-		<StepContainer title="Download your file" isLastStep>
+		<StepContainer title={__('Download your file')} isLastStep>
 			<StepContainerDescription>
 				<p>{__('Data processing starts after you “Send Request”. It may take 30 to 90 minutes to complete, depending on available resources.')}</p>
 				<p>{__('You will be notified by email when your request has been processed and the data are available. Don’t forget to check your spam folder.')}</p>
@@ -40,7 +42,7 @@ const StepSendRequest: React.FC = () => {
 				value={format}
 				options={formatOptions}
 				onValueChange={(value) => {
-					dispatch(setFormat(value));
+					setField('format', value);
 				}}
 			/>
 
@@ -53,19 +55,31 @@ const StepSendRequest: React.FC = () => {
 					placeholder={__('john.doe@gmail.com')}
 					value={email}
 					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-						dispatch(setEmail(e.target.value));
+						setField('email', e.target.value);
 					}}
 				/>
-				<label htmlFor="newsletter" className="inline-flex items-center space-x-2 mb-8 cursor-pointer">
+				<label
+					htmlFor="newsletter"
+					className={cn(
+						'inline-flex items-center space-x-2 mb-8',
+						isEmailValid ? '' : 'opacity-50 cursor-not-allowed',
+					)}
+				>
 					<Checkbox
 						id="newsletter"
 						className="text-brand-red"
+						disabled={!isEmailValid}
 						checked={subscribe}
 						onCheckedChange={() => {
-							dispatch(setSubscribe(! subscribe));
+							setField('subscribe', ! subscribe);
 						}}
 					/>
-					<span className="text-sm font-medium leading-none cursor-pointer">
+					<span
+						className={cn(
+							'text-sm font-medium leading-none',
+							isEmailValid ? 'cursor-pointer' : 'opacity-50 cursor-not-allowed'
+						)}
+					>
 						{__('I would like to subscribe to ClimateData Newsletter')}
 					</span>
 				</label>

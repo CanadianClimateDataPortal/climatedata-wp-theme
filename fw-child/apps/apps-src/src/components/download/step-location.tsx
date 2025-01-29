@@ -13,9 +13,8 @@ import SearchControl from "@/components/map-layers/search-control";
 import GeometryControls from "@/components/map-layers/geometry-controls";
 import GridLayer from "@/components/map-layers/grid-layer";
 
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { setInteractiveRegion } from "@/features/download/download-slice";
 import { CANADA_CENTER, DEFAULT_ZOOM, DEFAULT_MIN_ZOOM, DEFAULT_MAX_ZOOM } from '@/lib/constants';
+import { useDownloadContext } from "@/context/download-provider";
 
 /**
  * Location step
@@ -23,14 +22,14 @@ import { CANADA_CENTER, DEFAULT_ZOOM, DEFAULT_MIN_ZOOM, DEFAULT_MAX_ZOOM } from 
 const StepLocation: React.FC = () => {
 	const { __ } = useI18n();
 
-	const dispatch = useAppDispatch();
-	const { interactiveRegion, selectedCells } = useAppSelector(state => state.download);
+	const { setField, fields } = useDownloadContext();
+	const { interactiveRegion, selectedCells } = fields;
 
 	const [selectionMode, setSelectionMode] = useState<string>('cells');
 
 	// TODO: when selecting inside the map, update the selected cells
 	// const handleRegionSelected = (cells: number) => {
-	// 	dispatch(setSelectedCells(cells));
+	// 	setField('selectedCells', cells);
 	// }
 
 	// TODO: fetch these values from the API
@@ -42,7 +41,7 @@ const StepLocation: React.FC = () => {
 	];
 
 	return (
-		<StepContainer title="Select a location or area">
+		<StepContainer title={__('Select a location or area')}>
 			<StepContainerDescription>
 				{__('Using the tool below, you can select or draw a selection to include in your download file.')}
 			</StepContainerDescription>
@@ -56,7 +55,7 @@ const StepLocation: React.FC = () => {
 						label={__('Interactive Regions')}
 						tooltip={__('Select an option')}
 						onChange={(value) => {
-							dispatch(setInteractiveRegion(value));
+							setField('interactiveRegion', value);
 						}}
 					/>
 				</div>

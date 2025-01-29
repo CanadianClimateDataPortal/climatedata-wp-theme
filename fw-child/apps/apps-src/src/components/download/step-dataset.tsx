@@ -6,8 +6,7 @@ import { StepContainer, StepContainerDescription } from '@/components/download/s
 import { RadioCard, RadioCardFooter } from "@/components/ui/radio-card";
 import Link from "@/components/ui/link";
 
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { setDataset } from "@/features/download/download-slice";
+import { useDownloadContext } from "@/context/download-provider";
 import { fetchTaxonomyData } from "@/services/services";
 import { TaxonomyData } from "@/types/types";
 
@@ -19,8 +18,8 @@ const StepDataset: React.FC = () => {
 
 	const { __ } = useI18n();
 
-	const dispatch = useAppDispatch();
-	const { dataset } = useAppSelector(state => state.download);
+	const { setField, fields } = useDownloadContext();
+	const { dataset } = fields;
 
 	useEffect(() => {
 		fetchTaxonomyData('variable-dataset').then((data) => {
@@ -44,7 +43,7 @@ const StepDataset: React.FC = () => {
 							description={option.description}
 							selected={dataset?.id === option.id}
 							onSelect={() => {
-								dispatch(setDataset(option));
+								setField('dataset', option);
 							}}
 							className="mb-0"
 						>

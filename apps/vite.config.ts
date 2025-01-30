@@ -40,7 +40,7 @@ export default defineConfig({
     build: {
         manifest: true,
         assetsDir: '.',
-        outDir: 'dist', // Directory for build output relative to the config file
+        outDir: './../fw-child/apps/dist', // Directory for build output relative to the config file
         emptyOutDir: true, // Empties the outDir on build
         rollupOptions: {
             input: {

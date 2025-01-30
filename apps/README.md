@@ -64,7 +64,7 @@ To create an optimized production build:
 npm run build
 ```
 
-The production-ready files will be available in the `dist` folder.
+The production-ready files will be available in the `/fw-child/apps/dist` folder.
 
 There are additional build scripts available:
 

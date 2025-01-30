@@ -7,7 +7,7 @@ import prettierConfig from 'eslint-config-prettier';
 import wordpress from '@wordpress/eslint-plugin';
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  { ignores: [] },
   {
     extends: [
       js.configs.recommended,

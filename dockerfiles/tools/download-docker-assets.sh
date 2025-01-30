@@ -26,21 +26,34 @@ initialize_variables() {
 }
 
 authenticate_user() {
-    if [[ "$#" -ge 2 && "$2" == --username=* ]]; then
-        username=${2#--username=}
-    else
+    shift
+    while [[ "$#" -gt 0 ]]; do
+        case "$1" in
+        --username=*)
+            username="${1#--username=}"
+            ;;
+        --password-file=*)
+            password_file="${1#--password-file=}"
+            if [[ -f "$password_file" ]]; then
+                password=$(<"$password_file")
+            else
+                echo "ERROR: Password file '$password_file' does not exist."
+                exit 1
+            fi
+            ;;
+        *)
+            echo "ERROR: Invalid argument '$1'"
+            exit 1
+            ;;
+        esac
+        shift
+    done
+
+    if [[ -z "$username" ]]; then
         read -p "Enter username: " username
     fi
 
-    if [[ "$#" -eq 3 && "$3" == --password-file=* ]]; then
-        password_file="${3#--password-file=}"
-        if [[ -f "$password_file" ]]; then
-            password=$(<"$password_file")
-        else
-            echo "ERROR: Password file '$password_file' does not exist."
-            exit 1
-        fi
-    elif [[ -n "$username" ]]; then
+    if [[ -z "$password" && -n "$username" ]]; then
         read -s -p "Enter password: " password
         echo ""
     fi

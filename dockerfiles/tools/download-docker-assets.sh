@@ -1,16 +1,16 @@
 #!/bin/bash
 
-# Downloads SSL files and specific WordPress plugins from the server to local directories.
-
 set -e
 
 show_help() {
-    echo "Usage: $0 <server_url> [--username <username>] [--password-file <file_path>]"
-    echo "  <server_url>: URL to download the assets from."
-    echo "  [--username <username>]: (Optional) Username for authentication. If provided, the script will prompt for the password."
-    echo "  [--password-file <file_path>]: (Optional) password file for authentication."
+    echo "Downloads SSL files and specific WordPress plugins from the server to local directories."
     echo ""
-    echo "  Any missing authentication information will be requested interactively."
+    echo "Usage: $0 <server_url> [--username=<username>] [--password-file=<file_path>]"
+    echo "  <server_url>: URL to download the assets from."
+    echo "  [--username=<username>]: (Optional) Username for authentication. If provided, the script will prompt for the password."
+    echo "  [--password-file=<file_path>]: (Optional) password file for authentication."
+    echo ""
+    echo "Any missing authentication information will be requested interactively."
     echo ""
 }
 
@@ -26,13 +26,13 @@ initialize_variables() {
 }
 
 authenticate_user() {
-    if [[ "$#" -ge 2 && "$2" == --username* ]]; then
+    if [[ "$#" -ge 2 && "$2" == --username=* ]]; then
         username=${2#--username=}
     else
         read -p "Enter username: " username
     fi
 
-    if [[ "$#" -eq 3 && "$3" == --password-file* ]]; then
+    if [[ "$#" -eq 3 && "$3" == --password-file=* ]]; then
         password_file="${3#--password-file=}"
         if [[ -f "$password_file" ]]; then
             password=$(<"$password_file")
@@ -126,6 +126,6 @@ fi
 server=$1
 initialize_variables
 authenticate_user "$@"
-download_file "$ssl_archive_url" "$ssl_archive_temp_path" 
+download_file "$ssl_archive_url" "$ssl_archive_temp_path"
 extract_file "$ssl_archive_temp_path" "$ssl_destination_dir"
 download_from_list "$wp_plugins_list_file" "$wp_plugins_url" "$wp_plugins_destination_dir"

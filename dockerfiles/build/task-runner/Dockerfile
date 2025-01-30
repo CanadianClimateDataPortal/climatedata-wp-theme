@@ -13,6 +13,7 @@ FROM node:23.5-bookworm
 # Define environment variables
 ENV NVM_DIR=/home/node/.nvm
 ENV NPM_CONFIG_LOGLEVEL=info
+ENV NODE_ENV=production
 
 # For `dumb-init`, see point #5 in:
 #   https://snyk.io/blog/10-best-practices-to-containerize-nodejs-web-applications-with-docker/

@@ -63,7 +63,7 @@ services:
     build:
       context: .
       dockerfile: dockerfiles/build/task-runner/Dockerfile
-    command: ["sh", "-c", "watch-fe.sh /app"]
+    command: ["bash", "-c", "watch-fe.sh /app"]
     volumes:
       - ".:/app"
 

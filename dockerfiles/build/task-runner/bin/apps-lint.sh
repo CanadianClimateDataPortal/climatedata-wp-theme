@@ -46,7 +46,7 @@ for cmd in node npm sass concurrently; do
 done
 
 # Change to apps directory
-cd "${src}/fw-child/apps/apps-src" || error "Apps directory not found"
+cd "${src}/apps" || error "Apps directory not found"
 
 # Setup correct Node environment
 log "Setting up Node.js environment..."

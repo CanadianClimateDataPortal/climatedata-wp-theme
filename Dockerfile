@@ -46,12 +46,11 @@ FROM ${TASK_RUNNER_IMAGE} AS task-runner
 
 WORKDIR /home/node/app
 
+COPY --chown=node apps src/apps
 COPY --chown=node framework src/framework
 COPY --chown=node fw-child src/fw-child
 
 RUN build-fe.sh /home/node/app/src
-
-RUN rm -rf src/fw-child/apps/apps-src/node_modules
 
 ###
 # Production website building stage.
@@ -190,7 +189,8 @@ RUN --mount=type=bind,source=dockerfiles/build/www/wp-plugins/public.txt,target=
 
 WORKDIR /var/www/html/assets/themes
 
-COPY --from=task-runner /home/node/app/src .
+COPY --from=task-runner /home/node/app/src/framework framework
+COPY --from=task-runner /home/node/app/src/fw-child fw-child
 
 # ----
 # File permissions

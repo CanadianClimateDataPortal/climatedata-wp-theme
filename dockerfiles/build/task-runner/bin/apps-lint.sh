@@ -41,7 +41,7 @@ src=$1
 [ ! -d "$src" ] && error "Directory not found: $src"
 
 # Check dependencies
-for cmd in node npm sass concurrently; do
+for cmd in node npm; do
     command -v "$cmd" >/dev/null 2>&1 || error "$cmd is required but not installed"
 done
 

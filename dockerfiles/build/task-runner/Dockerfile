@@ -24,10 +24,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-# Install custom scripts
-
-COPY --chmod=755 dockerfiles/build/task-runner/bin /usr/local/bin
-
 # Install SASS
 
 RUN npm install -g sass
@@ -36,6 +32,10 @@ RUN npm install -g sass
 # This is needed to output both SASS and Vite logs in the same terminal
 
 RUN npm install -g concurrently
+
+# Install custom scripts
+
+COPY --chmod=755 dockerfiles/build/task-runner/bin /usr/local/bin
 
 # Switch to the `node` user
 

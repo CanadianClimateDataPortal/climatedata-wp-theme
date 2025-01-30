@@ -10,19 +10,19 @@ show_help() {
     echo "  [--username <username>]: (Optional) Username for authentication. If provided, the script will prompt for the password."
     echo "  [--password-file <file_path>]: (Optional) password file for authentication."
     echo ""
-    echo "  If no authentication options are provided, the script will prompt for both username and password interactively."
+    echo "  Any missing authentication information will be requested interactively."
     echo ""
 }
 
 initialize_variables() {
-    url_ssl="$server/ssl/wildcard.climatedata.ca.tgz"
-    url_wp="$server/wp-plugins"
-    temp_dir=$(mktemp -d)
-    file_name=$(basename "$url_ssl")
-    temp_full_path="$temp_dir/$file_name"
-    destination_ssl="../mounts/ssl"
-    destination_wp="../mounts/wp-plugins"
-    file_list="../build/www/wp-plugins/local.txt"
+    ssl_archive_url="$server/ssl/wildcard.climatedata.ca.tgz"
+    wp_plugins_url="$server/wp-plugins"
+    temp_download_dir=$(mktemp -d)
+    ssl_archive_filename=$(basename "$ssl_archive_url")
+    ssl_archive_temp_path="$temp_download_dir/$ssl_archive_filename"
+    ssl_destination_dir="../mounts/ssl"
+    wp_plugins_destination_dir="../mounts/wp-plugins"
+    wp_plugins_list_file="../build/www/wp-plugins/local.txt"
 }
 
 authenticate_user() {
@@ -48,9 +48,7 @@ authenticate_user() {
     if [[ -z "$username" && -n "$password" ]]; then
         echo "ERROR: Password provided but no username entered."
         exit 1
-    fi
-
-    if [[ -n "$username" && -n "$password" ]]; then
+    elif [[ -n "$username" && -n "$password" ]]; then
         auth_option="-u $username:$password"
     else
         auth_option=""
@@ -68,39 +66,25 @@ validate_url() {
 }
 
 download_file() {
-    local temp_full_path=$1
-    local url=$2
+    local url=$1
+    local ssl_archive_temp_path=$2
 
     validate_url "$url"
 
-    curl $auth_option -o "$temp_full_path" "$url" || {
+    curl $auth_option -o "$ssl_archive_temp_path" "$url" || {
         echo "ERROR: Download failed for URL: $url"
         exit 1
     }
 }
 
-# extract_file() {
-#     local file=$1
-#     local destination_ssl=$2
-
-#     mkdir -p "$destination_ssl"
-
-#     if [[ "$file" == *.tgz ]]; then
-#         tar -xzf "$file" -C "$destination_ssl" || {
-#             echo "ERROR: Extraction failed."
-#             exit 1
-#         }
-#     else
-#         echo "ERROR: Not a TGZ file."
-#         exit 1
-#     fi
-# }
 extract_file() {
     local file=$1
-    local temp_full_path=$2
+    local ssl_destination_dir=$2
+
+    mkdir -p "$ssl_destination_dir"
 
     if [[ "$file" == *.tgz ]]; then
-        tar -xzf "$file" -C "$temp_full_path" || {
+        tar -xzf "$file" -C "$ssl_destination_dir" || {
             echo "ERROR: Extraction failed."
             exit 1
         }
@@ -108,22 +92,24 @@ extract_file() {
         echo "ERROR: Not a TGZ file."
         exit 1
     fi
+
+    rm -rf "$temp_download_dir"
 }
 
 download_from_list() {
-    local file_list=$1
-    local url_wp=$2
-    local destination_wp=$3
+    local wp_plugins_list_file=$1
+    local wp_plugins_url=$2
+    local wp_plugins_destination_dir=$3
 
-    mkdir -p "$destination_wp"
+    mkdir -p "$wp_plugins_destination_dir"
 
     while IFS= read -r file; do
         [[ -z "$file" || "$file" =~ ^# ]] && continue
 
-        curl $auth_option --fail "$url_wp/$file" -o "$destination_wp/$file" || {
+        curl $auth_option --fail "$wp_plugins_url/$file" -o "$wp_plugins_destination_dir/$file" || {
             echo "ERROR: $file Download failed."
         }
-    done <"$file_list"
+    done <"$wp_plugins_list_file"
 }
 
 if [[ "$#" -eq 0 ]]; then
@@ -140,15 +126,6 @@ fi
 server=$1
 initialize_variables
 authenticate_user "$@"
-download_file "$temp_full_path" "$url_ssl"
-# extract_file "$temp_full_path" "$destination_ssl"
-
-# rm -rf "$temp_dir"
-
-extract_file "$temp_full_path" "$temp_dir"
-
-mkdir -p "$destination_ssl"
-mv "$temp_dir"/* "$destination_ssl"
-rm -rf "$temp_dir"
-
-download_from_list "$file_list" "$url_wp" "$destination_wp"
+download_file "$ssl_archive_url" "$ssl_archive_temp_path" 
+extract_file "$ssl_archive_temp_path" "$ssl_destination_dir"
+download_from_list "$wp_plugins_list_file" "$wp_plugins_url" "$wp_plugins_destination_dir"

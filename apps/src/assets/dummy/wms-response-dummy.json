@@ -1,0 +1,162 @@
+{"Legend": [{
+  "layerName": "cmip6-tx_max-ys-ssp585-p50-ann-30year",
+  "title": "cmip6-tx_max-ys-ssp585-p50-ann-30year",
+  "rules": [{"symbolizers": [{"Raster":   {
+    "colormap":     {
+      "entries":       [
+                {
+          "label": "0°C",
+          "quantity": "273",
+          "color": "#FFFFCC",
+          "opacity": "1.0"
+        },
+                {
+          "label": "2°C",
+          "quantity": "275",
+          "color": "#FFF8BA",
+          "opacity": "1.0"
+        },
+                {
+          "label": "3°C",
+          "quantity": "276",
+          "color": "#FFF4B2",
+          "opacity": "1.0"
+        },
+                {
+          "label": "5°C",
+          "quantity": "278",
+          "color": "#FFEDA0",
+          "opacity": "1.0"
+        },
+                {
+          "label": "7°C",
+          "quantity": "280",
+          "color": "#FFE58F",
+          "opacity": "1.0"
+        },
+                {
+          "label": "8°C",
+          "quantity": "281",
+          "color": "#FEE187",
+          "opacity": "1.0"
+        },
+                {
+          "label": "10°C",
+          "quantity": "283",
+          "color": "#FED976",
+          "opacity": "1.0"
+        },
+                {
+          "label": "12°C",
+          "quantity": "285",
+          "color": "#FEC965",
+          "opacity": "1.0"
+        },
+                {
+          "label": "13°C",
+          "quantity": "286",
+          "color": "#FEC25D",
+          "opacity": "1.0"
+        },
+                {
+          "label": "15°C",
+          "quantity": "288",
+          "color": "#FEB24C",
+          "opacity": "1.0"
+        },
+                {
+          "label": "17°C",
+          "quantity": "290",
+          "color": "#FEA346",
+          "opacity": "1.0"
+        },
+                {
+          "label": "18°C",
+          "quantity": "291",
+          "color": "#FD9C42",
+          "opacity": "1.0"
+        },
+                {
+          "label": "20°C",
+          "quantity": "293",
+          "color": "#FD8D3C",
+          "opacity": "1.0"
+        },
+                {
+          "label": "22°C",
+          "quantity": "295",
+          "color": "#FD7435",
+          "opacity": "1.0"
+        },
+                {
+          "label": "23°C",
+          "quantity": "296",
+          "color": "#FC6731",
+          "opacity": "1.0"
+        },
+                {
+          "label": "25°C",
+          "quantity": "298",
+          "color": "#FC4E2A",
+          "opacity": "1.0"
+        },
+                {
+          "label": "27°C",
+          "quantity": "300",
+          "color": "#F23924",
+          "opacity": "1.0"
+        },
+                {
+          "label": "28°C",
+          "quantity": "301",
+          "color": "#ED2F22",
+          "opacity": "1.0"
+        },
+                {
+          "label": "30°C",
+          "quantity": "303",
+          "color": "#E31A1C",
+          "opacity": "1.0"
+        },
+                {
+          "label": "32°C",
+          "quantity": "305",
+          "color": "#D41020",
+          "opacity": "1.0"
+        },
+                {
+          "label": "33°C",
+          "quantity": "306",
+          "color": "#CC0A22",
+          "opacity": "1.0"
+        },
+                {
+          "label": "35°C",
+          "quantity": "308",
+          "color": "#BD0026",
+          "opacity": "1.0"
+        },
+                {
+          "label": "37°C",
+          "quantity": "310",
+          "color": "#A50026",
+          "opacity": "1.0"
+        },
+                {
+          "label": "38°C",
+          "quantity": "311",
+          "color": "#990026",
+          "opacity": "1.0"
+        },
+                {
+          "label": "40°C",
+          "quantity": "313",
+          "color": "#800026",
+          "opacity": "1.0"
+        }
+      ],
+      "type": "ramp"
+    },
+    "opacity": "1.0"
+  }}]}]
+}]}

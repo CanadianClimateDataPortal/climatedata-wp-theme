@@ -1,0 +1,697 @@
+[
+  {
+    "id": 12394,
+    "date": "2024-04-15T10:30:21",
+    "date_gmt": "2024-04-15T14:30:21",
+    "guid": {
+      "rendered": "https://dev-en.climatedata.ca/?post_type=variable&#038;p=12394"
+    },
+    "modified": "2024-04-16T14:20:34",
+    "modified_gmt": "2024-04-16T18:20:34",
+    "slug": "station-data",
+    "status": "publish",
+    "type": "variable",
+    "link": "https://dev-en.climatedata.ca/variable/station-data/",
+    "title": {
+      "rendered": "Station Data"
+    },
+    "content": {
+      "rendered": "",
+      "protected": false
+    },
+    "featured_media": 12406,
+    "parent": 0,
+    "template": "",
+    "meta": {
+      "title_fr": "Données de station"
+    },
+    "sector": [],
+    "region": [],
+    "var-type": [
+      10
+    ],
+    "variable-dataset": [],
+    "acf": {
+      "var_brief": "",
+      "var_description": "\u003Cp\u003EDaily Station Data is historical daily observed weather station data from the Meteorological Service of Canada and Environment and Climate Change Canada.  Download data by selecting stations from the drop-down list, or click one of the clusters on the map below to see which stations are available for download in that area. Click on one, or multiple stations, to select for download.\u003C/p\u003E\n\u003Cp\u003ERead more\u003C/p\u003E\n\u003Cp\u003EFor more information regarding the daily data: Technical documentation: Daily Data\u003C/p\u003E\n\u003Cp\u003EFor further technical details: Technical Documentation Digital Archive of Canadian Climatological Data\u003C/p\u003E\n",
+      "var_tech_description": "",
+      "var_brief_fr": "",
+      "var_description_fr": "\u003Cp\u003ELes données des stations sont des données historiques quotidiennes observées par les stations météorologiques du Service météorologique du Canada et d’Environnement et Changement Climatique Canada.  Téléchargez les données en sélectionnant les stations dans la liste déroulante, ou cliquez sur l’un des groupes de la carte ci-dessous pour voir quelles stations sont disponibles pour le téléchargement dans cette région. Cliquez sur une ou plusieurs stations pour les sélectionner et les télécharger.\u003C/p\u003E\n\u003Cp\u003ELire la suite\u003C/p\u003E\n\u003Cp\u003EPour plus d’information concernant les données quotidiennes: Documentation technique : Données quotidiennes\u003C/p\u003E\n\u003Cp\u003EPour plus de détails techniques: Documentation technique Archives nationales de données climatologiques\u003C/p\u003E\n",
+      "var_tech_description_fr": ""
+    },
+    "var_types": [
+      "Station Data"
+    ],
+    "_links": {
+      "self": [
+        {
+          "href": "https://dev-en.climatedata.ca/wp-json/wp/v2/variable/12394"
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://dev-en.climatedata.ca/wp-json/wp/v2/variable"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://dev-en.climatedata.ca/wp-json/wp/v2/types/variable"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 3,
+          "href": "https://dev-en.climatedata.ca/wp-json/wp/v2/variable/12394/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 12407,
+          "href": "https://dev-en.climatedata.ca/wp-json/wp/v2/variable/12394/revisions/12407"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https://dev-en.climatedata.ca/wp-json/wp/v2/media/12406"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https://dev-en.climatedata.ca/wp-json/wp/v2/media?parent=12394"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "sector",
+          "embeddable": true,
+          "href": "https://dev-en.climatedata.ca/wp-json/wp/v2/sector?post=12394"
+        },
+        {
+          "taxonomy": "region",
+          "embeddable": true,
+          "href": "https://dev-en.climatedata.ca/wp-json/wp/v2/region?post=12394"
+        },
+        {
+          "taxonomy": "var-type",
+          "embeddable": true,
+          "href": "https://dev-en.climatedata.ca/wp-json/wp/v2/var-type?post=12394"
+        },
+        {
+          "taxonomy": "variable-dataset",
+          "embeddable": true,
+          "href": "https://dev-en.climatedata.ca/wp-json/wp/v2/variable-dataset?post=12394"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 11920,
+    "date": "2024-03-13T20:15:32",
+    "date_gmt": "2024-03-14T00:15:32",
+    "guid": {
+      "rendered": "https:\/\/dev-en.climatedata.ca\/?post_type=variable&#038;p=11920"
+    },
+    "modified": "2024-08-07T16:01:04",
+    "modified_gmt": "2024-08-07T20:01:04",
+    "slug": "cold-spell-days",
+    "status": "publish",
+    "type": "variable",
+    "link": "https:\/\/dev-en.climatedata.ca\/variable\/cold-spell-days\/",
+    "title": {
+      "rendered": "Cold Spell Days"
+    },
+    "content": {
+      "rendered": "",
+      "protected": false
+    },
+    "featured_media": 12056,
+    "parent": 0,
+    "template": "",
+    "meta": {
+      "title_fr": "Cold Spell Days"
+    },
+    "sector": [
+      105,
+      104
+    ],
+    "region": [],
+    "var-type": [
+      5
+    ],
+    "variable-dataset": [],
+    "acf": {
+      "var_brief": "",
+      "var_description": "<p>Cold Spell Days returns the total number of days that are part of cold spell events. A cold spell is defined as a sequence of consecutive days with mean daily temperature below a specific threshold value. Enter an appropriate threshold value to download Cold Spell Days for your location(s). <\/p>\n",
+      "var_tech_description": "<p>The number of days that are part of a cold spell event, defined as x or more consecutive days with mean daily temperature < y degrees C, where x and y are user defined.\n<\/p>\n",
+      "var_brief_fr": "",
+      "var_description_fr": "<p>Jours de vague de froid retourne le nombre total de jours inclus dans des vagues de froid. Une vague de froid est d\u00e9finie comme une s\u00e9quence de jours cons\u00e9cutifs o\u00f9 la temp\u00e9rature moyenne quotidienne est inf\u00e9rieure \u00e0 une valeur seuil sp\u00e9cifique. Saisissez une valeur seuil appropri\u00e9e pour t\u00e9l\u00e9charger le nombre de jours de vague de froid pour votre (vos) lieu(x)<\/p>\n",
+      "var_tech_description_fr": "<p>Le nombre de jours faisant partie d&#8217;une vague de froid, d\u00e9finie comme x jours cons\u00e9cutifs ou plus avec une temp\u00e9rature moyenne journali\u00e8re < y degr\u00e9s C, o\u00f9 x et y sont d\u00e9finis par l'utilisateur.\n<\/p>\n"
+    },
+    "var_types": [
+      "Temperature"
+    ],
+    "_links": {
+      "self": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable\/11920"
+        }
+      ],
+      "collection": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable"
+        }
+      ],
+      "about": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/types\/variable"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 6,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable\/11920\/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 14581,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable\/11920\/revisions\/14581"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/media\/12056"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/media?parent=11920"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "sector",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/sector?post=11920"
+        },
+        {
+          "taxonomy": "region",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/region?post=11920"
+        },
+        {
+          "taxonomy": "var-type",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/var-type?post=11920"
+        },
+        {
+          "taxonomy": "variable-dataset",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable-dataset?post=11920"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https:\/\/api.w.org\/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 11915,
+    "date": "2024-03-13T20:06:02",
+    "date_gmt": "2024-03-14T00:06:02",
+    "guid": {
+      "rendered": "https:\/\/dev-en.climatedata.ca\/?post_type=variable&#038;p=11915"
+    },
+    "modified": "2024-06-18T14:04:06",
+    "modified_gmt": "2024-06-18T18:04:06",
+    "slug": "heat-wave-index",
+    "status": "publish",
+    "type": "variable",
+    "link": "https:\/\/dev-en.climatedata.ca\/variable\/heat-wave-index\/",
+    "title": {
+      "rendered": "Heat Wave Index"
+    },
+    "content": {
+      "rendered": "",
+      "protected": false
+    },
+    "featured_media": 1103,
+    "parent": 0,
+    "template": "",
+    "meta": {
+      "title_fr": "Vague de chaleur"
+    },
+    "sector": [],
+    "region": [],
+    "var-type": [
+      5
+    ],
+    "variable-dataset": [],
+    "acf": {
+      "var_brief": "",
+      "var_description": "<p>The Simple Heat Wave Index returns the total number of days that occur in heat wave events during the selected temporal frequency, where a heat wave is defined as at least x consecutive days when daily maximum temperature exceeds y degrees C. <\/p>\n",
+      "var_tech_description": "<p>The number of days in a heat wave, defined as >= x consecutive days when daily maximum temperature > y degrees C, for the specified temporal frequency.<\/p>\n",
+      "var_brief_fr": "",
+      "var_description_fr": "<p>L&#8217;indice simple de vague de chaleur indique le nombre total de jours de vague de chaleur pendant la fr\u00e9quence temporelle s\u00e9lectionn\u00e9e, une vague de chaleur \u00e9tant d\u00e9finie comme au moins x jours cons\u00e9cutifs pendant lesquels la temp\u00e9rature maximale quotidienne d\u00e9passe y degr\u00e9s C.<\/p>\n",
+      "var_tech_description_fr": "<p>Le nombre de jours d&#8217;une vague de chaleur, d\u00e9finie comme >= x jours cons\u00e9cutifs o\u00f9 la temp\u00e9rature maximale quotidienne > y degr\u00e9s C, pour la fr\u00e9quence temporelle sp\u00e9cifi\u00e9e.<\/p>\n"
+    },
+    "var_types": [
+      "Temperature"
+    ],
+    "_links": {
+      "self": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable\/11915"
+        }
+      ],
+      "collection": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable"
+        }
+      ],
+      "about": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/types\/variable"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 3,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable\/11915\/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 13687,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable\/11915\/revisions\/13687"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/media\/1103"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/media?parent=11915"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "sector",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/sector?post=11915"
+        },
+        {
+          "taxonomy": "region",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/region?post=11915"
+        },
+        {
+          "taxonomy": "var-type",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/var-type?post=11915"
+        },
+        {
+          "taxonomy": "variable-dataset",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable-dataset?post=11915"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https:\/\/api.w.org\/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 311,
+    "date": "2019-03-21T04:03:44",
+    "date_gmt": "2019-03-21T08:03:44",
+    "guid": {
+      "rendered": "http:\/\/climatedata.habitatseven.work\/?post_type=variable&#038;p=311"
+    },
+    "modified": "2024-07-05T10:17:09",
+    "modified_gmt": "2024-07-05T14:17:09",
+    "slug": "tx_max-2",
+    "status": "publish",
+    "type": "variable",
+    "link": "https:\/\/dev-en.climatedata.ca\/variable\/tx_max-2\/",
+    "title": {
+      "rendered": "Hottest Day"
+    },
+    "content": {
+      "rendered": "<p class=\"p1\">The <i>Hottest Day<\/i> describes the warmest daytime temperature in the selected time period. In general, the hottest day of the year occurs during the summer months.<\/p>\n<p class=\"p1\">High temperatures are important. They determine if plants and animals can thrive, they limit or enable outdoor activities, define how we design our buildings and vehicles, and shape our transportation and energy use. However, when temperatures are very hot, people &#8211; especially the elderly &#8211; are much more likely to suffer from heat exhaustion and heat stroke. Many outdoor activities become dangerous or impossible in very high temperatures.<\/p>\n<p class=\"p1\"><b>Technical Description:<\/b><\/p>\n<p class=\"p1\">The highest maximum temperature (T<span class=\"s1\"><sub>max<\/sub><\/span>) in the selected time period. Use the <i>Variable<\/i> menu option to view annual, monthly or seasonal values for this index.<\/p>\n<p>&nbsp;<\/p>\n",
+      "protected": false
+    },
+    "featured_media": 1102,
+    "parent": 0,
+    "template": "",
+    "meta": {
+      "title_fr": "Jour le plus chaud"
+    },
+    "sector": [
+      108,
+      105,
+      107,
+      103,
+      104,
+      106
+    ],
+    "region": [],
+    "var-type": [
+      5
+    ],
+    "variable-dataset": [],
+    "acf": {
+      "var_brief": "",
+      "var_description": "<p>The <i>Hottest Day<\/i> describes the warmest daytime temperature in the selected time period. In general, the hottest day of the year occurs during the summer months.<\/p>\n<p>High temperatures are important. They determine if plants and animals can thrive, they limit or enable outdoor activities, define how we design our buildings and vehicles, and shape our transportation and energy use. However, when temperatures are very hot, people \u2013 especially the elderly \u2013 are much more likely to suffer from heat exhaustion and heat stroke. Many outdoor activities become dangerous or impossible in very high temperatures.<\/p>\n<p>&nbsp;<\/p>\n",
+      "var_tech_description": "<p>The highest maximum temperature (T<span class=\"s1\"><sub>max<\/sub><\/span>) in the selected time period. Use the <i>Variable<\/i> menu option to view annual, monthly or seasonal values for this index.<\/p>\n",
+      "var_brief_fr": "",
+      "var_description_fr": "<p>Le <i>jour le plus chaud<\/i> d\u00e9crit la temp\u00e9rature diurne la plus chaude au cours de la p\u00e9riode s\u00e9lectionn\u00e9e. En g\u00e9n\u00e9ral, le jour le plus chaud de l\u2019ann\u00e9e se produit pendant les mois d\u2019\u00e9t\u00e9.<\/p>\n<p>Les temp\u00e9ratures \u00e9lev\u00e9es sont importantes. Elles d\u00e9terminent si les plantes et les animaux peuvent prosp\u00e9rer, ils limitent ou permettent les activit\u00e9s de plein air, d\u00e9finissent la fa\u00e7on dont nous concevons nos b\u00e2timents et nos v\u00e9hicules, et d\u00e9terminent notre utilisation du transport et de l\u2019\u00e9nergie.<\/p>\n<p>Cependant, lorsque les temp\u00e9ratures sont tr\u00e8s chaudes, les gens \u2013 particuli\u00e8rement les personnes \u00e2g\u00e9es \u2013 sont plus susceptibles de souffrir d\u2019\u00e9puisement par la chaleur et de coup de chaleur. Plusieurs activit\u00e9s ext\u00e9rieures deviennent dangereuses, voire impossibles, lors de temp\u00e9ratures tr\u00e8s \u00e9lev\u00e9es.<\/p>\n<p>&nbsp;<\/p>\n",
+      "var_tech_description_fr": "<p>La temp\u00e9rature maximale la plus \u00e9lev\u00e9e (Tmax) au cours de la p\u00e9riode s\u00e9lectionn\u00e9e.<\/p>\n<p>Utilisez l\u2019option du menu <i>Variables<\/i> pour afficher les valeurs annuelles, mensuelles ou saisonni\u00e8res de cet indice.<\/p>\n"
+    },
+    "var_types": [
+      "Temperature"
+    ],
+    "_links": {
+      "self": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable\/311"
+        }
+      ],
+      "collection": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable"
+        }
+      ],
+      "about": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/types\/variable"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 8,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable\/311\/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 13854,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable\/311\/revisions\/13854"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/media\/1102"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/media?parent=311"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "sector",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/sector?post=311"
+        },
+        {
+          "taxonomy": "region",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/region?post=311"
+        },
+        {
+          "taxonomy": "var-type",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/var-type?post=311"
+        },
+        {
+          "taxonomy": "variable-dataset",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable-dataset?post=311"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https:\/\/api.w.org\/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 291,
+    "date": "2019-02-01T15:36:03",
+    "date_gmt": "2019-02-01T20:36:03",
+    "guid": {
+      "rendered": "http:\/\/climatedata.habitatseven.work\/?post_type=variable&#038;p=291"
+    },
+    "modified": "2024-07-05T10:20:06",
+    "modified_gmt": "2024-07-05T14:20:06",
+    "slug": "tg_mean-2",
+    "status": "publish",
+    "type": "variable",
+    "link": "https:\/\/dev-en.climatedata.ca\/variable\/tg_mean-2\/",
+    "title": {
+      "rendered": "Mean Temperature"
+    },
+    "content": {
+      "rendered": "<p class=\"p1\"><i>Mean temperature<\/i> describes the average temperature for the 24-hour day.<\/p>\n<p class=\"p1\">The average temperature is an environmental indicator with many applications in agriculture, engineering, health, energy management, recreation, and more.<\/p>\n<p class=\"p3\"><b>Technical description:<\/b><\/p>\n<p class=\"p3\">The average of the daily maximum temperature (T<span class=\"s1\"><sub>max<\/sub><\/span>) and the daily minimum temperature (T<span class=\"s1\"><sub>min<\/sub><\/span>). Use the<i> Variable<\/i> menu option to view annual, monthly or seasonal values for this variable.<\/p>\n",
+      "protected": false
+    },
+    "featured_media": 12053,
+    "parent": 0,
+    "template": "",
+    "meta": {
+      "title_fr": "Temp\u00e9rature moyenne"
+    },
+    "sector": [
+      108
+    ],
+    "region": [],
+    "var-type": [
+      5
+    ],
+    "variable-dataset": [],
+    "acf": {
+      "var_brief": "",
+      "var_description": "<p><i>Mean temperature<\/i> describes the average temperature for the 24-hour day.<\/p>\n<p>The average temperature is an environmental indicator with many applications in agriculture, engineering, health, energy management, recreation, and more.<\/p>\n<p>&nbsp;<\/p>\n",
+      "var_tech_description": "<p>The average of the daily maximum temperature (T<span class=\"s1\"><sub>max<\/sub><\/span>) and the daily minimum temperature (T<span class=\"s1\"><sub>min<\/sub><\/span>). Use the<i> Variable<\/i> menu option to view annual, monthly or seasonal values for this variable.<\/p>\n",
+      "var_brief_fr": "",
+      "var_description_fr": "<p><i>La temp\u00e9rature moyenne<\/i> d\u00e9crit la temp\u00e9rature moyenne de la journ\u00e9e de 24 heures.<\/p>\n<p>La temp\u00e9rature moyenne est un indicateur environnemental affectant de nombreuses applications d\u2019agriculture, d\u2019ing\u00e9nierie, de la sant\u00e9, de la gestion de l\u2019\u00e9nergie, des loisirs, et plus encore.<\/p>\n<p><b>Description technique\u00a0:<\/b><\/p>\n<p>La moyenne entre la temp\u00e9rature maximale quotidienne (T<span class=\"s1\"><sub>max<\/sub><\/span>) et la temp\u00e9rature minimale quotidienne (T<span class=\"s1\"><sub>min<\/sub><\/span>).<\/p>\n<p>Utilisez l\u2019option du menu <i>Variables<\/i> pour afficher les valeurs annuelles, mensuelles ou saisonni\u00e8res de cet indice.<\/p>\n",
+      "var_tech_description_fr": ""
+    },
+    "var_types": [
+      "Temperature"
+    ],
+    "_links": {
+      "self": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable\/291"
+        }
+      ],
+      "collection": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable"
+        }
+      ],
+      "about": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/types\/variable"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 7,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable\/291\/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 13855,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable\/291\/revisions\/13855"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/media\/12053"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/media?parent=291"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "sector",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/sector?post=291"
+        },
+        {
+          "taxonomy": "region",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/region?post=291"
+        },
+        {
+          "taxonomy": "var-type",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/var-type?post=291"
+        },
+        {
+          "taxonomy": "variable-dataset",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable-dataset?post=291"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https:\/\/api.w.org\/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 11677,
+    "date": "2024-03-05T09:09:19",
+    "date_gmt": "2024-03-05T14:09:19",
+    "guid": {
+      "rendered": "https:\/\/dev-en.climatedata.ca\/?post_type=variable&#038;p=11677"
+    },
+    "modified": "2024-09-27T10:47:18",
+    "modified_gmt": "2024-09-27T14:47:18",
+    "slug": "wet-days",
+    "status": "publish",
+    "type": "variable",
+    "link": "https:\/\/dev-en.climatedata.ca\/variable\/wet-days\/",
+    "title": {
+      "rendered": "Wet Days"
+    },
+    "content": {
+      "rendered": "<p class=\"p1\"><i>Wet Days &gt;=1mm <\/i>describes the number of days where at least 1 mm of precipitation (rain and snow combined) falls in the selected time period. This index generally captures every day when there is measurable precipitation.<\/p>\n<p class=\"p1\">Adequate precipitation is crucial to water availability, agriculture, electricity generation and wildfire suppression.<\/p>\n<p class=\"p3\"><b>Technical description:<\/b><\/p>\n<p class=\"p4\">The number of days with precipitation &gt;= 1.0 mm. Use the <i>Variable <\/i>menu option to view the annual, monthly or seasonal values for this index.<\/p>\n",
+      "protected": false
+    },
+    "featured_media": 12321,
+    "parent": 0,
+    "template": "",
+    "meta": {
+      "title_fr": "Jours de pr\u00e9cipitations"
+    },
+    "sector": [
+      108,
+      105,
+      103,
+      106
+    ],
+    "region": [],
+    "var-type": [
+      4
+    ],
+    "variable-dataset": [],
+    "acf": {
+      "var_brief": "",
+      "var_description": "<p>Wet Days >= x mm describes the number of days where at least x mm of precipitation (rain and snow combined) falls during the selected temporal frequency. To view on the map select x from the available threshold values, or enter your preferred value for data download. <\/p>\n",
+      "var_tech_description": "<p>The number of days with precipitation >= x mm<\/p>\n",
+      "var_brief_fr": "",
+      "var_description_fr": "<p>Les jours de pr\u00e9cipitations  >= x mm d\u00e9crit le nombre de jours o\u00f9 il est tomb\u00e9 au moins de x mm de pr\u00e9cipitations (pluie et neige combin\u00e9es) pendant la fr\u00e9quence temporelle s\u00e9lectionn\u00e9e. Pour visualiser la carte, s\u00e9lectionnez x parmi les valeurs seuils disponibles, ou entrez votre valeur pr\u00e9f\u00e9r\u00e9e pour le t\u00e9l\u00e9chargement des donn\u00e9es.<\/p>\n",
+      "var_tech_description_fr": "<p>Le nombre de jours avec des pr\u00e9cipitations &gt;= x mm.<\/p>\n"
+    },
+    "var_types": [
+      "Precipitation"
+    ],
+    "_links": {
+      "self": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable\/11677"
+        }
+      ],
+      "collection": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable"
+        }
+      ],
+      "about": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/types\/variable"
+        }
+      ],
+      "version-history": [
+        {
+          "count": 7,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable\/11677\/revisions"
+        }
+      ],
+      "predecessor-version": [
+        {
+          "id": 15033,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable\/11677\/revisions\/15033"
+        }
+      ],
+      "wp:featuredmedia": [
+        {
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/media\/12321"
+        }
+      ],
+      "wp:attachment": [
+        {
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/media?parent=11677"
+        }
+      ],
+      "wp:term": [
+        {
+          "taxonomy": "sector",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/sector?post=11677"
+        },
+        {
+          "taxonomy": "region",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/region?post=11677"
+        },
+        {
+          "taxonomy": "var-type",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/var-type?post=11677"
+        },
+        {
+          "taxonomy": "variable-dataset",
+          "embeddable": true,
+          "href": "https:\/\/dev-en.climatedata.ca\/wp-json\/wp\/v2\/variable-dataset?post=11677"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https:\/\/api.w.org\/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  }
+]

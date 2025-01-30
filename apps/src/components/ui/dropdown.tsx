@@ -125,5 +125,4 @@ const Dropdown = forwardRef(DropdownGeneric) as <T>(
   props: DropdownProps<T> & { ref?: React.Ref<HTMLDivElement> }
 ) => React.ReactElement;
 
-
 export default Dropdown;

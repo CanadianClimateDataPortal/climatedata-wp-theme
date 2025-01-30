@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Assets watcher and compiler
+# Assets watcher and compiler (map and download apps)
 # Watches and compiles frontend assets for themes and apps (map, download)
 
 # Enable strict mode

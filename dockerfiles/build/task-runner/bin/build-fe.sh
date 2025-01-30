@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Assets compiler
+# Assets compiler (map and download apps)
 # Compiles frontend assets for themes and apps (map, download)
 
 # Enable strict mode

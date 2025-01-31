@@ -36,6 +36,9 @@ if (
     <title><?php wp_title(); ?></title>
 
     <?php
+    // Add favicon.
+    add_favicon();
+
     // Load CSS assets.
     if ( isset( $assets['css'] ) && is_array( $assets['css'] ) ) {
         foreach ( $assets['css'] as $css_file ) {

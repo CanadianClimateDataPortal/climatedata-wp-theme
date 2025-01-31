@@ -25,7 +25,7 @@ initialize_variables() {
     wp_plugins_list_file="../build/www/wp-plugins/local.txt"
 }
 
-authenticate_user() {
+process_arguments() {
     shift
     while [[ "$#" -gt 0 ]]; do
         case "$1" in
@@ -48,7 +48,9 @@ authenticate_user() {
         esac
         shift
     done
+}
 
+handle_user_input() {
     if [[ -z "$username" ]]; then
         read -p "Enter username: " username
     fi
@@ -66,6 +68,11 @@ authenticate_user() {
     else
         auth_option=""
     fi
+}
+
+authenticate_user() {
+    process_arguments "$@"
+    handle_user_input
 }
 
 validate_url() {

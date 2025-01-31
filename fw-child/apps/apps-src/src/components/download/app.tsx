@@ -77,7 +77,7 @@ const App: React.FC = () => (
 	<DownloadProvider>
 		<div className="min-h-screen bg-cold-grey-1">
 			<div className="max-w-6xl mx-auto py-10">
-				<div className="flex flex-col sm:flex-row">
+				<div className="flex flex-col sm:flex-row gap-4">
 					<div className="flex-1">
 						<Steps />
 					</div>

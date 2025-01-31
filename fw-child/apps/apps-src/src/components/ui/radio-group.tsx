@@ -84,7 +84,7 @@ const RadioGroupFactory = forwardRef<
   return (
     <RadioGroup ref={ref} className={cn("radio-group-factory mb-4", className)} {...props}>
       {title && <ControlTitle title={title} tooltip={tooltip} className="my-0" />}
-      <div className={cn('flex flex-wrap gap-y-4 gap-x-0', orientationClasses[orientation])}>
+      <div className={cn('flex flex-wrap gap-y-2 gap-x-0', orientationClasses[orientation])}>
         {normalizedOptions.map((option, index) => (
           <div key={index}
                className={cn(
@@ -95,7 +95,7 @@ const RadioGroupFactory = forwardRef<
             <RadioGroupItem value={option.value} id={`radio-${name}-${index}`} />
             <label
               htmlFor={`radio-${name}-${index}`}
-              className="text-zinc-900 text-sm font-medium leading-none cursor-pointer"
+              className="text-zinc-900 text-sm leading-5 cursor-pointer"
             >
               {option.label}
             </label>

@@ -86,7 +86,7 @@ const DropdownGeneric = <T extends string | undefined>(
     <div ref={ref} className={cn("dropdown z-[99999]", className)}>
       {label && <ControlTitle title={label} tooltip={tooltip} />}
       <Select value={value} onValueChange={handleValueChanged}>
-        <SelectTrigger className="w-full focus:ring-0 focus:ring-offset-0">
+        <SelectTrigger className="w-full focus:ring-0 focus:ring-offset-0 text-cdc-black [&>svg]:text-brand-blue [&>svg]:opacity-100">
           <SelectValue placeholder={placeholderTranslated} />
         </SelectTrigger>
         <SelectContent className="z-[99999]">

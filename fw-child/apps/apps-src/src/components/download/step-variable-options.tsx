@@ -1,6 +1,5 @@
 import React from "react";
 import { useI18n } from "@wordpress/react-i18n";
-import { ChevronRight } from "lucide-react";
 
 import { StepContainer, StepContainerDescription } from "@/components/download/step-container";
 import Dropdown from "@/components/ui/dropdown";
@@ -51,8 +50,7 @@ const StepVariableOptions: React.FC = () => {
 						{__('This variable returns the number of degree days accumulated when daily mean temperature are above a certain temperature. Please set one below:')}
 					</div>
 					<div className="flex items-center">
-						<ChevronRight size={16} />
-						<ControlTitle title={__('Degree Celsius')} tooltip={__('Enter a number')} />
+						<ControlTitle title={__('> Degree Celsius')} tooltip={__('Enter a number')} />
 					</div>
 					<Input
 						className="sm:w-64"

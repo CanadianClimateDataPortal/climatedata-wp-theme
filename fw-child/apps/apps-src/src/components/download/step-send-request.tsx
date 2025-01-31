@@ -47,8 +47,8 @@ const StepSendRequest: React.FC = () => {
 			/>
 
 			<div className="flex flex-col gap-2">
-				<p>{__('Please enter your email address to receive your download link.')}</p>
-				<ControlTitle title={__('Email Address')} />
+				<p className="text-sm text-neutral-grey-medium">{__('Please enter your email address to receive your download link.')}</p>
+				<ControlTitle title={__('Email Address')} className="mb-0" />
 				<Input
 					type="email"
 					className="sm:w-64 mb-2"
@@ -77,7 +77,7 @@ const StepSendRequest: React.FC = () => {
 					<span
 						className={cn(
 							'text-sm font-medium leading-none',
-							isEmailValid ? 'cursor-pointer' : 'opacity-50 cursor-not-allowed'
+							isEmailValid ? 'cursor-pointer' : 'opacity-75 cursor-not-allowed'
 						)}
 					>
 						{__('I would like to subscribe to ClimateData Newsletter')}
@@ -87,8 +87,8 @@ const StepSendRequest: React.FC = () => {
 
 			{/* TODO: make this look good at least */}
 			<div className="mb-4">
-				<p className="text-sm font-semibold mb-1">
-					Enter the characters shown:
+				<p className="text-sm text-neutral-grey-medium leading-5 mb-2">
+					{__('Enter the characters shown:')}
 				</p>
 				<div className="flex items-center space-x-3">
 					{/* Captcha display */}
@@ -103,7 +103,7 @@ const StepSendRequest: React.FC = () => {
 						onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 							setCaptchaValue(e.target.value)
 						}
-						className="border bg-white border-gray-300 rounded px-2 py-1 text-sm"
+						className="border bg-white border-gray-300 rounded px-2 py-1 text-sm placeholder:text-neutral-grey-medium"
 					/>
 				</div>
 			</div>

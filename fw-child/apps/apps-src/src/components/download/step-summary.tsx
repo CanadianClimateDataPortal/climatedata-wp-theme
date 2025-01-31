@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const StepSummary: React.FC = () => {
-	const { __ } = useI18n();
+	const { __, _n } = useI18n();
 
 	const { currentStep, goToStep, fields } = useDownloadContext();
 	const {
@@ -41,11 +41,11 @@ const StepSummary: React.FC = () => {
 		},
 		{
 			title: __('Variable options'),
-			content: `${version}, ` + __('MEAN TEMP >') + ' ' + degrees + ' °C'
+			content: `${version}, ` + __('MEAN TEMP') + ' > ' + degrees + ' °C'
 		},
 		{
 			title: __('Location or area'),
-			content: `${selectedCells} ` + __(' cells selected'),
+			content: _n('1 cell selected', '%d cells selected', selectedCells).replace('%d', String(selectedCells))
 		},
 		{
 			title: __('Additional details'),
@@ -54,13 +54,18 @@ const StepSummary: React.FC = () => {
 				frequency,
 				percentiles.length === 7
 					? __('All percentiles')
-					: `${percentiles.length} ` + __('percentiles'),
+					: _n(
+							'1 percentile',
+							'%d percentiles',
+							percentiles.length
+						).replace('%d', String(percentiles.length)),
 				emissionScenarios.length
-					? `${emissionScenarios.length} ` +
-						(emissionScenarios.length === 1
-							? __('Scenario selected')
-							: __('Scenarios selected'))
-						: __('No Scenarios selected'),
+					? _n(
+							'1 Scenario selected',
+							'%d Scenarios selected',
+							emissionScenarios.length
+						).replace('%d', String(emissionScenarios.length))
+					: __('No Scenarios selected'),
 				`${decimalPlace} Decimal places`,
 			].join(', ')
 		}
@@ -72,7 +77,7 @@ const StepSummary: React.FC = () => {
 			currentStep === 1 ? 'invisible' : ''
 		)}>
 			<CardHeader className="py-4">
-				<CardTitle className="text-xl font-semibold">Summary</CardTitle>
+				<CardTitle className="text-xl font-semibold">{__('Summary')}</CardTitle>
 			</CardHeader>
 			<CardContent>
 				{summaryData
@@ -80,7 +85,7 @@ const StepSummary: React.FC = () => {
 				.map((item, index) => (
 					<div key={index} className="flex items-start justify-between py-4 border-t border-soft-purple last:pb-0">
 						<div className="flex-1">
-							<h3 className="text-xs font-medium text-dark-purple uppercase mb-1">{item.title}</h3>
+							<h3 className="text-xs font-semibold text-dark-purple tracking-wider leading-4 uppercase mb-1">{item.title}</h3>
 							<p className="text-brand-blue">
 								{item.content}
 							</p>

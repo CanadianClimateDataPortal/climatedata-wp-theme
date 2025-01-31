@@ -13,6 +13,7 @@ import SearchControl from "@/components/map-layers/search-control";
 import GeometryControls from "@/components/map-layers/geometry-controls";
 import GridLayer from "@/components/map-layers/grid-layer";
 
+import { cn } from "@/lib/utils";
 import { CANADA_CENTER, DEFAULT_ZOOM, DEFAULT_MIN_ZOOM, DEFAULT_MAX_ZOOM } from '@/lib/constants';
 import { useDownloadContext } from "@/context/download-provider";
 
@@ -20,7 +21,7 @@ import { useDownloadContext } from "@/context/download-provider";
  * Location step
  */
 const StepLocation: React.FC = () => {
-	const { __ } = useI18n();
+	const { __, _n } = useI18n();
 
 	const { setField, fields } = useDownloadContext();
 	const { interactiveRegion, selectedCells } = fields;
@@ -76,8 +77,19 @@ const StepLocation: React.FC = () => {
 							]}
 						/>
 						<div>
-							<ControlTitle title={__('You selected')} className="my-0" />
-							<div className="text-2xl text-neutral-grey-medium font-semibold">{selectedCells} {__('Cells')}</div>
+							<ControlTitle title={__('You selected:')} className="my-0" />
+							<div
+								className={cn(
+									'text-2xl font-semibold leading-7',
+									selectedCells > 0 ? 'text-brand-blue' : 'text-neutral-grey-medium',
+								)}
+							>
+								{_n(
+									'1 Cell',
+									`${selectedCells} Cells`,
+									selectedCells
+								)}
+							</div>
 						</div>
 					</div>
 				</div>
@@ -90,7 +102,7 @@ const StepLocation: React.FC = () => {
 				minZoom={DEFAULT_MIN_ZOOM}
 				maxZoom={DEFAULT_MAX_ZOOM}
 				scrollWheelZoom={false}
-				className="h-[560px]"
+				className="h-[560px] font-sans"
 			>
 				{selectionMode === 'region' && (
 					<GeometryControls />

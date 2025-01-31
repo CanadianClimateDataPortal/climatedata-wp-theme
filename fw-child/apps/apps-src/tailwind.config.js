@@ -7,7 +7,18 @@ export default {
   ],
   theme: {
   	extend: {
-  		borderRadius: {
+			fontFamily: {
+				serif: ["CDCSerif", "serif"],
+				sans: ["CDCSans", "sans-serif"],
+			},
+			fontWeight: {
+				light: "300",
+				normal: "400",
+				book: "500",
+				semibold: "600",
+				bold: "700",
+			},
+			borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
@@ -56,7 +67,6 @@ export default {
 				'brand-red': 'hsl(var(--brand-red))',
 				'red-hover': 'hsl(var(--red-hover))',
 				'dark-purple': 'hsl(var(--dark-purple))',
-				'soft-purple': 'hsl(var(--soft-purple))',
 				'brand-blue': 'hsl(var(--brand-blue))',
 				'brand-blue-medium': 'hsl(var(--brand-blue-medium))',
 				'cdc-black': 'hsl(var(--cdc-black))',
@@ -71,6 +81,9 @@ export default {
 					medium: 'hsl(var(--neutral-grey-medium))',
 					light: 'hsl(var(--neutral-grey-light))',
 				},
+				'soft-purple': {
+					DEFAULT: 'hsl(var(--soft-purple))',
+				},
   			sidebar: {
   				DEFAULT: 'hsl(var(--sidebar-background))',
   				foreground: 'hsl(var(--sidebar-foreground))',
@@ -81,9 +94,6 @@ export default {
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
   			},
-				'soft-purple': {
-					DEFAULT: 'hsl(var(--soft-purple))',
-				}
   		}
   	}
   },

@@ -21,7 +21,6 @@ export default function GeometryControls({
 }): null {
 	const map = useMap();
 
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	const ref = useRef<L.LayerGroup>(new L.LayerGroup());
 
 	useEffect(() => {
@@ -30,7 +29,7 @@ export default function GeometryControls({
 		}
 
 		// Add Leaflet.pm controls
-		// @ts-ignore: suppress typescript error
+		// @ts-expect-error: suppress typescript error
 		map.pm.addControls({
 			position: 'topright',
 			drawMarker: false,
@@ -55,7 +54,7 @@ export default function GeometryControls({
 		});
 
 		return () => {
-			// @ts-ignore: suppress typescript error
+			// @ts-expect-error: suppress typescript error
 			map.pm.removeControls();
 		};
 	}, [map, onAreaSelected]);

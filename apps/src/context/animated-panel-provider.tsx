@@ -16,7 +16,7 @@
  *
  * Example usage:
  * ```
- * import { useAnimatedPanel } from '@/context/animated-panel-provider';
+ * import { useAnimatedPanel } from '@/hooks/use-animated-panel-context';
  *
  * const SomeComponent = () => {
  *   const { togglePanel } = useAnimatedPanel();
@@ -36,7 +36,7 @@
  * };
  * ```
  */
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, ReactNode } from 'react';
 import AnimatedPanel from '@/components/ui/animated-panel';
 import { AnimatedPanelContextType, ProviderPanelProps } from '@/types/types';
 
@@ -97,12 +97,4 @@ export const AnimatedPanelProvider: React.FC<{ children: ReactNode }> = ({
 	);
 };
 
-export const useAnimatedPanel = () => {
-	const context = useContext(AnimatedPanelContext);
-	if (!context) {
-		throw new Error(
-			'useAnimatedPanel must be used within a AnimatedPanelProvider'
-		);
-	}
-	return context;
-};
+export { AnimatedPanelContext };

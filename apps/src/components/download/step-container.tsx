@@ -1,7 +1,7 @@
 import React from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
-import { useDownloadContext } from '@/context/download-provider';
+import { useDownload } from '@/hooks/use-download';
 
 /**
  * A Wrapper for each step's content.
@@ -16,7 +16,7 @@ const StepContainer = ({
 	children: React.ReactNode;
 }) => {
 	const { __ } = useI18n();
-	const { currentStep } = useDownloadContext();
+	const { currentStep } = useDownload();
 
 	const stepText = isLastStep
 		? __('Final Step')

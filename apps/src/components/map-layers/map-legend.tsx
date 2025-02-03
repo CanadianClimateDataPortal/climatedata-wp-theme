@@ -16,11 +16,11 @@ export default function MapLegend() {
 	}, []);
 
 	useEffect(() => {
-		// @ts-ignore: suppress leaflet typescript error
+		// @ts-expect-error: suppress leaflet typescript error
 		const legend = new L.Control({ position: 'topright' });
 
 		legend.onAdd = () => {
-			// @ts-ignore: suppress leaflet typescript error
+			// @ts-expect-error: suppress leaflet typescript error
 			const div = L.DomUtil.create('div', 'info legend legendTable');
 			const LEGEND_ITEM_HEIGHT = 25,
 				LEGEND_ITEM_WIDTH = 25,

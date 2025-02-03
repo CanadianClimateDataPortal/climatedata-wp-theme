@@ -2,14 +2,14 @@ import React from 'react';
 import { Check } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import { useDownloadContext } from '@/context/download-provider';
+import { useDownload } from '@/hooks/use-download';
 
 /**
  * Displays the current step and allows navigation between steps.
  * Includes proper rendering of "Step X of Y".
  */
 const StepNavigation: React.FC<{ totalSteps: number }> = ({ totalSteps }) => {
-	const { currentStep } = useDownloadContext();
+	const { currentStep } = useDownload();
 
 	// Array of step numbers [1...totalSteps]
 	const steps = Array.from({ length: totalSteps }, (_, i) => i + 1);

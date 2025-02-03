@@ -53,7 +53,7 @@ export default function VariableLayer(): null {
 		);
 		newLayer.addTo(map);
 		layerRef.current = newLayer;
-	}, [L, map, frequency, dataset, decade, pane, GEOSERVER_BASE_URL]);
+	}, [map, frequency, dataset, decade, pane]);
 
 	useEffect(() => {
 		if (layerRef.current) {

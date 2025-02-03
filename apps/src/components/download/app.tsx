@@ -11,17 +11,15 @@ import StepNavigation from '@/components/download/step-navigation';
 import StepSummary from '@/components/download/step-summary';
 
 import { useAppSelector } from '@/app/hooks';
-import {
-	DownloadProvider,
-	useDownloadContext,
-} from '@/context/download-provider';
+import { DownloadProvider } from '@/context/download-provider';
+import { useDownload } from '@/hooks/use-download';
 import { cn } from '@/lib/utils';
 
 const Steps: React.FC = () => {
 	const { __ } = useI18n();
 
 	const data = useAppSelector((state) => state.download);
-	const { goToNextStep, currentStep } = useDownloadContext();
+	const { goToNextStep, currentStep } = useDownload();
 
 	const steps = [
 		<StepDataset />,

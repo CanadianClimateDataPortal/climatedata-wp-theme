@@ -6,7 +6,7 @@
  * in the future a language switcher is implemented.
  *
  */
-import React, { createContext, useContext } from 'react';
+import React, { createContext } from 'react';
 import { Locale } from '@/types/types';
 
 // Define the LocaleContext
@@ -27,14 +27,4 @@ export const LocaleProvider: React.FC<{ children: React.ReactNode }> = ({
 	);
 };
 
-// How to use the LocaleContext
-export const useLocaleContext = () => {
-	const context = useContext(LocaleContext);
-	if (!context) {
-		throw new Error(
-			'useLocaleContext must be used within a LocaleProvider'
-		);
-	}
-
-	return context;
-};
+export { LocaleContext };

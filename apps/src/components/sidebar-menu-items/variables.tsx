@@ -17,12 +17,12 @@ import {
 import {
 	SidebarMenuItem,
 	SidebarMenuButton,
-	SidebarPanel,
-	useSidebar,
+	SidebarPanel
 } from '@/components/ui/sidebar';
 import Grid from '@/components/ui/grid';
 
 // other
+import { useSidebar } from '@/hooks/use-sidebar';
 import { InteractivePanelProps } from '@/types/types';
 import TaxonomyDropdownFilter from '@/components/taxonomy-dropdown-filter';
 import VariableRadioCards from '@/components/variable-radio-cards';

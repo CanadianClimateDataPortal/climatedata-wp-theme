@@ -23,7 +23,7 @@ export default function MapEvents({
 				onUnmount();
 			}
 		};
-	}, [map, onMapReady]);
+	}, [map, onMapReady, onUnmount]);
 
 	return null;
 }

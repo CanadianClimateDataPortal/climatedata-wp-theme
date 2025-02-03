@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 import { BadgeInfo, MessageCircleQuestion } from 'lucide-react';
-import { useMapContext } from '@/context/map-provider';
+import { useMap } from '@/hooks/use-map';
 
 import {
 	Sidebar,
@@ -43,7 +43,7 @@ import { TaxonomyData, PostData } from '@/types/types';
 export function AppSidebar() {
 	const [selectedDataset, setSelectedDataset] = useState<TaxonomyData>();
 	const [selectedVariable, setSelectedVariable] = useState<PostData>();
-	const { setExtendInfo } = useMapContext();
+	const { setExtendInfo } = useMap();
 
 	const { __ } = useI18n();
 

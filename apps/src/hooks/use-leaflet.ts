@@ -56,14 +56,14 @@ const vectorTileLayerStylesCallback = () => ({
 	fillOpacity: defaultGridStyles.fill.default.opacity,
 });
 
-export function useLeaflet(): { config: any } {
+export function useLeaflet(): { config: unknown } {
 	useEffect(() => {
 		// fix for 'fakeStop is not a function' coming from original implementation
 		// tracked leaflet issue and tried to mimic the way it was back in 2013
 		// see: https://github.com/Leaflet/Leaflet/commit/5a7420dd1a43474cccaa8cdefa4f324452d18f36
-		// @ts-ignore: suppress leaflet typescript error
+		// @ts-expect-error: suppress leaflet typescript error
 		if (typeof L !== 'undefined' && !L.DomEvent.fakeStop) {
-			// @ts-ignore: suppress leaflet typescript error
+			// @ts-expect-error: suppress leaflet typescript error
 			L.DomEvent.fakeStop = function (e) {
 				e._leaflet_stop = true;
 			};
@@ -88,10 +88,10 @@ export function useLeaflet(): { config: any } {
 				highlighted: null,
 				styles: defaultGridStyles,
 				leaflet: {
-					// @ts-ignore: suppress leaflet typescript error
+					// @ts-expect-error: suppress leaflet typescript error
 					rendererFactory: L.canvas.tile,
 					interactive: true,
-					getFeatureId: (f: any) => f.properties.gid,
+					getFeatureId: (f: unknown) => f.properties.gid,
 					vectorTileLayerStyles: {
 						canadagrid: vectorTileLayerStylesCallback,
 						canadagrid1deg: vectorTileLayerStylesCallback,

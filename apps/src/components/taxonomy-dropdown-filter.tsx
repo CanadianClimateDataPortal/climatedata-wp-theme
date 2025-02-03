@@ -3,6 +3,7 @@ import { useI18n } from '@wordpress/react-i18n';
 
 import Dropdown from '@/components/ui/dropdown';
 import { fetchTaxonomyData } from '@/services/services';
+import { TaxonomyData } from '@/types/types';
 
 const TaxonomyDropdownFilter: React.FC<{
 	slug: string;
@@ -29,15 +30,15 @@ const TaxonomyDropdownFilter: React.FC<{
 
 	useEffect(() => {
 		(async () => {
-			const data = await fetchTaxonomyData(slug);
+			const data = await fetchTaxonomyData<TaxonomyData>(slug);
 			setOptions(
-				data.map((option: any) => ({
+				data.map((option: TaxonomyData) => ({
 					value: String(option.id),
 					label: option.name,
 				}))
 			);
 		})();
-	}, []);
+	}, [slug]);
 
 	return (
 		<Dropdown

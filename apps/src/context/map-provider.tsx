@@ -5,9 +5,8 @@
  * Allows components to access and update the map instance globally.
  *
  */
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useState } from 'react';
 
-// Define the MapContext
 const MapContext = createContext<{
 	map: L.Map | null;
 	setMap: (map: L.Map) => void;
@@ -15,7 +14,6 @@ const MapContext = createContext<{
 	setExtendInfo: (extendInfo: boolean) => void;
 } | null>(null);
 
-// Provider component
 export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
@@ -29,11 +27,4 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
 	);
 };
 
-export const useMapContext = () => {
-	const context = useContext(MapContext);
-	if (!context) {
-		throw new Error('useMapContext must be used within a MapProvider');
-	}
-
-	return context;
-};
+export { MapContext };

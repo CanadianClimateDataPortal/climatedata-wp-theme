@@ -30,11 +30,9 @@ const dummyResponses = {
 
 type DummyResponseKey = keyof typeof dummyResponses;
 
-export const fetchRelatedData = async (
-	// @ts-ignore: doing this so typescript build doesn't complain.. remove this when the API is ready
-	postId: number
-): Promise<RelatedData> => {
+export const fetchRelatedData = async (): Promise<RelatedData> => {
 	// TODO: uncomment this and use correct API endpoint when ready
+	// re add `postId: number` as a parameter to the function
 	// const response = await fetch(
 	// 	`/dummy/related-response-${postId}-dummy.json`
 	// );
@@ -115,7 +113,7 @@ export const fetchTaxonomyData = async (
 	// 	throw new Error('Failed to fetch data');
 	// }
 	// TODO: remove this when the API is ready
-	let response: { json: () => Promise<any> };
+	let response: { json: () => Promise<unknown> };
 	if (slug in dummyResponses) {
 		response = {
 			json: async () => dummyResponses[slug as DummyResponseKey], // mimic fetch response.json()
@@ -153,7 +151,7 @@ export const fetchPostsData = async (
 	// 	throw new Error('Failed to fetch data');
 	// }
 	// TODO: remove this when the API is ready
-	let response: { json: () => Promise<any> };
+	let response: { json: () => Promise<unknown> };
 	if (postType in dummyResponses) {
 		response = {
 			json: async () => dummyResponses[postType as DummyResponseKey], // mimic fetch response.json()

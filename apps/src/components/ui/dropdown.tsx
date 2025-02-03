@@ -49,7 +49,7 @@ const DropdownGeneric = <T extends string | undefined>(
 		if (onChange) {
 			onChange(selected as T);
 		}
-	}, [selected]);
+	}, [selected, onChange]);
 
 	// when receiving an array of strings as options we will make them valid DropdownOption objects
 	const normalizedOptions: DropdownOption[] = useMemo(() => {

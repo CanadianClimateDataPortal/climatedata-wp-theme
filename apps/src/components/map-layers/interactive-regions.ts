@@ -30,13 +30,13 @@ export default function InteractiveRegionsLayer(): null {
 		}
 
 		// event handlers
-		const onClick = (e: any) => {
+		const onClick = (e: object) => {
 			console.log('clicked:', e.layer.properties);
 		};
 
 		// initial setup of the grid layer
 		// TODO: there are a lot of other events and settings that need to be ported over from the JS version
-		// @ts-ignore: suppress leaflet typescript error
+		// @ts-expect-error: suppress leaflet typescript error
 		const vectorGridLayer = L.vectorGrid.protobuf(
 			`${GEOSERVER_BASE_URL}/geoserver/gwc/service/tms/1.0.0/CDC:${interactiveRegion}/{z}/{x}/{-y}.pbf`,
 			config.grid.leaflet

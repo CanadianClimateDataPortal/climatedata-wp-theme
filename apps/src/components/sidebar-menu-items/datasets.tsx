@@ -10,8 +10,7 @@ import { useI18n } from '@wordpress/react-i18n';
 import {
 	SidebarMenuButton,
 	SidebarMenuItem,
-	SidebarPanel,
-	useSidebar,
+	SidebarPanel
 } from '@/components/ui/sidebar';
 import {
 	Card,
@@ -25,6 +24,7 @@ import Grid from '@/components/ui/grid';
 import Link from '@/components/ui/link';
 
 // other
+import { useSidebar } from '@/hooks/use-sidebar';
 import { fetchTaxonomyData } from '@/services/services';
 import { InteractivePanelProps, TaxonomyData } from '@/types/types';
 
@@ -66,11 +66,11 @@ const DatasetsPanel: React.FC<InteractivePanelProps> = ({
 	onSelect,
 }) => {
 	const [datasets, setDatasets] = useState<TaxonomyData[]>([]);
-	const { activePanel, isPanelActive } = useSidebar();
+	const { activePanel } = useSidebar();
 	const { __ } = useI18n();
 
 	useEffect(() => {
-		if (!isPanelActive(slug)) {
+		if (activePanel !== slug) {
 			return;
 		}
 

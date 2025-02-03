@@ -3,7 +3,7 @@
  * This component allows users to search for locations using the OpenStreetMap Nominatim API and navigate the map to the selected location.
  */
 
-import { useState, useEffect, ReactElement } from 'react';
+import { useState, useEffect, ReactElement, useCallback } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 import { Locate, LocateFixed } from 'lucide-react';
 import { useMap } from 'react-leaflet';
@@ -54,57 +54,19 @@ export default function SearchControl({
 
 	const dispatch = useAppDispatch();
 
-	useEffect(() => {
-		if (!map) {
-			return;
-		}
+	const handleLocationChange = useCallback(
+		(title: string, latlng: L.LatLng) => {
+			map.setView(latlng, SEARCH_DEFAULT_ZOOM);
 
-		// Create a new Leaflet Search Control with custom options.
-		// @ts-ignore: suppress leaflet typescript error
-		const searchControl = new L.Control.Search({
-			url: MAP_SEARCH_URL,
-			jsonpParam: 'json_callback',
-			propertyName: 'display_name',
-			propertyLoc: ['lat', 'lon'],
-			collapsed: false,
-			autoCollapse: false,
-			autoType: false,
-			minLength: 2,
-			container: searchControlId,
-			textPlaceholder,
-			// @ts-ignore: suppress leaflet typescript errors
-			marker: L.marker([0, 0], {
-				// @ts-ignore: suppress leaflet typescript errors
-				icon: L.icon({
-					iconUrl: mapPinIcon, // Custom marker icon
-					iconSize: [25, 41], // Size of the icon
-					iconAnchor: [12, 41], // Anchor of the icon
-					popupAnchor: [0, -41], // Popup position relative to the icon
-				}),
-			}),
-			// @ts-ignore: suppress leaflet typescript errors
-			moveToLocation: (latlng: L.LatLng, title: string, _: L.Map) => {
-				handleLocationChange(title, latlng);
-			},
-		});
-
-		map.addControl(searchControl);
-
-		return () => {
-			map.removeControl(searchControl);
-		};
-	}, [map]);
-
-	const handleLocationChange = (title: string, latlng: L.LatLng) => {
-		map.setView(latlng, SEARCH_DEFAULT_ZOOM);
-
-		dispatch(
-			addRecentLocation({
-				title,
-				...latlng,
-			})
-		);
-	};
+			dispatch(
+				addRecentLocation({
+					title,
+					...latlng,
+				})
+			);
+		},
+		[map, dispatch]
+	);
 
 	const toggleGeoLocation = () => {
 		if (!navigator.geolocation) {
@@ -146,6 +108,48 @@ export default function SearchControl({
 		isGeolocationEnabled ? 'text-white' : 'text-zinc-900',
 		isTracking ? 'animate-ping' : ''
 	);
+
+	useEffect(() => {
+		if (!map) {
+			return;
+		}
+
+		// Create a new Leaflet Search Control with custom options.
+		// @ts-expect-error: suppress leaflet typescript error
+		const searchControl = new L.Control.Search({
+			url: MAP_SEARCH_URL,
+			jsonpParam: 'json_callback',
+			propertyName: 'display_name',
+			propertyLoc: ['lat', 'lon'],
+			collapsed: false,
+			autoCollapse: false,
+			autoType: false,
+			minLength: 2,
+			container: searchControlId,
+			textPlaceholder,
+			// @ts-expect-error: suppress leaflet typescript errors
+			marker: L.marker([0, 0], {
+				// @ts-expect-error: suppress leaflet typescript errors
+				icon: L.icon({
+					iconUrl: mapPinIcon, // Custom marker icon
+					iconSize: [25, 41], // Size of the icon
+					iconAnchor: [12, 41], // Anchor of the icon
+					popupAnchor: [0, -41], // Popup position relative to the icon
+				}),
+			}),
+			// @ts-expect-error: suppress leaflet typescript errors
+			moveToLocation: (latlng: L.LatLng, title: string, _: L.Map) => {
+				void _; // intentionally ignore the map argument for now
+				handleLocationChange(title, latlng);
+			},
+		});
+
+		map.addControl(searchControl);
+
+		return () => {
+			map.removeControl(searchControl);
+		};
+	}, [map, handleLocationChange, searchControlId, textPlaceholder]);
 
 	return (
 		<div

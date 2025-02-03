@@ -17,7 +17,7 @@ import ShareMapModal from '@/components/map-info/share-map-modal';
 import DownloadMapModal from '@/components/map-info/download-map-modal';
 
 // other
-import { useAnimatedPanel } from '@/context/animated-panel-provider';
+import { useAnimatedPanel } from '@/hooks/use-animated-panel';
 import { MapInfoProps, ProviderPanelProps } from '@/types/types';
 
 /**

@@ -5,14 +5,14 @@ import { PencilLine } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 import { useAppSelector } from '@/app/hooks';
-import { useDownloadContext } from '@/context/download-provider';
+import { useDownload } from '@/hooks/use-download';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 const StepSummary: React.FC = () => {
 	const { __ } = useI18n();
 
-	const { currentStep, goToStep } = useDownloadContext();
+	const { currentStep, goToStep } = useDownload();
 
 	const state = useAppSelector((state) => state.download);
 

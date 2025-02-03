@@ -9,13 +9,14 @@ import { useI18n } from '@wordpress/react-i18n';
 
 // components
 import { Button } from '@/components/ui/button';
-import { SidebarPanel, useSidebar } from '@/components/ui/sidebar';
+import { SidebarPanel } from '@/components/ui/sidebar';
 
 // other
 import { useAppSelector } from '@/app/hooks';
 import { MapLocation } from '@/types/types';
 import { SEARCH_DEFAULT_ZOOM } from '@/lib/constants';
-import { useMapContext } from '@/context/map-provider';
+import { useMap } from '@/hooks/use-map';
+import { useSidebar } from '@/hooks/use-sidebar';
 import { cn } from '@/lib/utils';
 
 // link and panel slug
@@ -54,7 +55,7 @@ RecentLocationsLink.displayName = 'RecentLocationsLink';
 const RecentLocationsPanel: React.FC = () => {
 	const { __ } = useI18n();
 
-	const { map } = useMapContext();
+	const { map } = useMap();
 	const { recentLocations } = useAppSelector((state) => state.map);
 
 	if (!recentLocations || !map) {

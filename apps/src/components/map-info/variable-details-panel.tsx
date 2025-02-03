@@ -14,7 +14,7 @@ import Link from '@/components/ui/link';
 
 // other
 import { MapInfoData, RelatedCardData } from '@/types/types';
-import { useLocaleContext } from '@/context/locale-provider';
+import { useLocale } from '@/hooks/use-locale';
 import { cn } from '@/lib/utils';
 
 /**
@@ -25,7 +25,7 @@ const VariableDetailsPanel: React.FC<{ mapInfo: MapInfoData }> = ({
 	mapInfo,
 }) => {
 	const { __ } = useI18n();
-	const { locale } = useLocaleContext();
+	const { locale } = useLocale();
 
 	const { relatedData } = mapInfo;
 

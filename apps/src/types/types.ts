@@ -1,7 +1,7 @@
 // Here we can define global types and interfaces that can be used throughout the application
 import React from 'react';
 import { VariantProps } from 'class-variance-authority';
-import { buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/lib/format';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { LucideIcon } from 'lucide-react';
 
@@ -51,7 +51,7 @@ export type TaxonomyData = {
 	slug: string;
 	description: string;
 	link: string;
-	[key: string]: any;
+	[key: string]: unknown;
 };
 
 /**
@@ -66,7 +66,7 @@ export type ApiPostData = {
 	title: { rendered: string };
 	link: string;
 	featured_media?: number;
-	[key: string]: any;
+	[key: string]: unknown;
 };
 
 /**
@@ -98,7 +98,7 @@ export interface MapInfoData {
  * Used in the MapEvents map layer component
  */
 export interface MapEventsProps {
-	onMapReady?: (map: any) => void;
+	onMapReady?: (map: unknown) => void;
 	onUnmount?: () => void;
 }
 
@@ -106,7 +106,7 @@ export interface MapEventsProps {
  * Used in the MapEvents map layer component
  */
 export interface MapEventsProps {
-	onMapReady?: (map: any) => void;
+	onMapReady?: (map: unknown) => void;
 	onUnmount?: () => void;
 }
 
@@ -114,7 +114,7 @@ export interface MapEventsProps {
  * Used in the MapEvents map layer component
  */
 export interface MapEventsProps {
-	onMapReady?: (map: any) => void;
+	onMapReady?: (map: unknown) => void;
 	onUnmount?: () => void;
 }
 
@@ -122,7 +122,7 @@ export interface MapEventsProps {
  * Used in the MapEvents map layer component
  */
 export interface MapEventsProps {
-	onMapReady?: (map: any) => void;
+	onMapReady?: (map: unknown) => void;
 	onUnmount?: () => void;
 }
 
@@ -258,7 +258,7 @@ export interface AnchorProps
  * @extends React.HTMLAttributes<HTMLDivElement>
  */
 export interface RadioCardProps extends React.HTMLAttributes<HTMLDivElement> {
-	value: any; // this value may be very specific to the use case, so it's left as any
+	value: unknown; // this value may be very specific to the use case, so it's left as unknown
 	title: string;
 	radioGroup: string;
 	description?: string;
@@ -474,6 +474,6 @@ export interface AnimatedPanelProps extends ProviderPanelProps {
  * as `DatasetsPanel` and `VariablesPanel` where items are selected and some action is taken.
  */
 export interface InteractivePanelProps {
-	selected: any;
-	onSelect: (selected: any) => void;
+	selected: unknown;
+	onSelect: (selected: unknown) => void;
 }

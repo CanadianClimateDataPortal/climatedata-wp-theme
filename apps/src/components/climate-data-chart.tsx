@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import Highcharts, { Options, SeriesOptionsType } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import 'highcharts/highcharts-more';
@@ -22,7 +22,7 @@ export function ClimateDataChart({ data }: ClimateDataProps) {
 			...values,
 		]);
 
-	const getFilteredSeries = (): SeriesOptionsType[] => {
+	const getFilteredSeries = useCallback((): SeriesOptionsType[] => {
 		switch (activeTab) {
 			case 'annual-values':
 				return [
@@ -218,7 +218,7 @@ export function ClimateDataChart({ data }: ClimateDataProps) {
 			default:
 				return [];
 		}
-	};
+	}, [__, activeTab, data]);
 
 	const chartOptions = useMemo<Options>(() => {
 		return {

@@ -1,5 +1,6 @@
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
+import { SidebarProvider } from '@/context/sidebar-provider';
 import Header from '@/components/header';
 import MapWrapper from '@/components/map-wrapper';
 

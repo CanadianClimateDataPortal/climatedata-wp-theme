@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { MapInfoData } from '@/types/types';
 import { fetchWPData } from '@/services/services';
 import { useAppSelector } from '@/app/hooks';
-import { useMapContext } from '@/context/map-provider';
+import { useMap } from '@/hooks/use-map';
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
@@ -21,7 +21,7 @@ export default function MapWrapper() {
 	const { emissionScenarioCompare, emissionScenarioCompareTo } =
 		useAppSelector((state) => state.map);
 
-	const { setMap } = useMapContext();
+	const { setMap } = useMap();
 
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const mapRef = useRef<L.Map | null>(null);
@@ -38,18 +38,18 @@ export default function MapWrapper() {
 	// helper sync/unsync methods for convenience
 	const syncMaps = () => {
 		if (mapRef.current && comparisonMapRef.current) {
-			// @ts-ignore: suppress leaflet typescript errors
+			// @ts-expect-error: suppress leaflet typescript errors
 			mapRef.current.sync(comparisonMapRef.current);
-			// @ts-ignore: suppress leaflet typescript errors
+			// @ts-expect-error: suppress leaflet typescript errors
 			comparisonMapRef.current.sync(mapRef.current);
 		}
 	};
 
 	const unsyncMaps = () => {
 		if (mapRef.current && comparisonMapRef.current) {
-			// @ts-ignore: suppress leaflet typescript errors
+			// @ts-expect-error: suppress leaflet typescript errors
 			mapRef.current.unsync(comparisonMapRef.current);
-			// @ts-ignore: suppress leaflet typescript errors
+			// @ts-expect-error: suppress leaflet typescript errors
 			comparisonMapRef.current.unsync(mapRef.current);
 
 			// if we don't clear this reference, the primary map will attempt to sync

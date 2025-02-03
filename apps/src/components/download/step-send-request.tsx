@@ -1,14 +1,21 @@
-import React, { useState } from "react";
-import { useI18n } from "@wordpress/react-i18n";
+import React, { useState } from 'react';
+import { useI18n } from '@wordpress/react-i18n';
 
-import { StepContainer, StepContainerDescription } from "@/components/download/step-container";
-import { RadioGroupFactory } from "@/components/ui/radio-group";
-import { ControlTitle } from "@/components/ui/control-title";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+import {
+	StepContainer,
+	StepContainerDescription,
+} from '@/components/download/step-container';
+import { RadioGroupFactory } from '@/components/ui/radio-group';
+import { ControlTitle } from '@/components/ui/control-title';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { setFormat, setEmail, setSubscribe } from "@/features/download/download-slice";
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import {
+	setFormat,
+	setEmail,
+	setSubscribe,
+} from '@/features/download/download-slice';
 
 /**
  * Send download request step
@@ -19,7 +26,9 @@ const StepSendRequest: React.FC = () => {
 	const { __ } = useI18n();
 
 	const dispatch = useAppDispatch();
-	const { format, email, subscribe } = useAppSelector(state => state.download);
+	const { format, email, subscribe } = useAppSelector(
+		(state) => state.download
+	);
 
 	const formatOptions = [
 		{ value: 'csv', label: 'CSV' },
@@ -29,8 +38,16 @@ const StepSendRequest: React.FC = () => {
 	return (
 		<StepContainer title="Download your file" isLastStep>
 			<StepContainerDescription>
-				<p>{__('Data processing starts after you “Send Request”. It may take 30 to 90 minutes to complete, depending on available resources.')}</p>
-				<p>{__('You will be notified by email when your request has been processed and the data are available. Don’t forget to check your spam folder.')}</p>
+				<p>
+					{__(
+						'Data processing starts after you “Send Request”. It may take 30 to 90 minutes to complete, depending on available resources.'
+					)}
+				</p>
+				<p>
+					{__(
+						'You will be notified by email when your request has been processed and the data are available. Don’t forget to check your spam folder.'
+					)}
+				</p>
 			</StepContainerDescription>
 
 			<RadioGroupFactory
@@ -45,7 +62,11 @@ const StepSendRequest: React.FC = () => {
 			/>
 
 			<div className="flex flex-col gap-2">
-				<p>{__('Please enter your email address to receive your download link.')}</p>
+				<p>
+					{__(
+						'Please enter your email address to receive your download link.'
+					)}
+				</p>
 				<ControlTitle title={__('Email Address')} />
 				<Input
 					type="email"
@@ -56,17 +77,22 @@ const StepSendRequest: React.FC = () => {
 						dispatch(setEmail(e.target.value));
 					}}
 				/>
-				<label htmlFor="newsletter" className="inline-flex items-center space-x-2 mb-8 cursor-pointer">
+				<label
+					htmlFor="newsletter"
+					className="inline-flex items-center space-x-2 mb-8 cursor-pointer"
+				>
 					<Checkbox
 						id="newsletter"
 						className="text-brand-red"
 						checked={subscribe}
 						onCheckedChange={() => {
-							dispatch(setSubscribe(! subscribe));
+							dispatch(setSubscribe(!subscribe));
 						}}
 					/>
 					<span className="text-sm font-medium leading-none cursor-pointer">
-						{__('I would like to subscribe to ClimateData Newsletter')}
+						{__(
+							'I would like to subscribe to ClimateData Newsletter'
+						)}
 					</span>
 				</label>
 			</div>
@@ -93,10 +119,9 @@ const StepSendRequest: React.FC = () => {
 					/>
 				</div>
 			</div>
-
 		</StepContainer>
 	);
 };
-StepSendRequest.displayName = "StepSendRequest";
+StepSendRequest.displayName = 'StepSendRequest';
 
 export default StepSendRequest;

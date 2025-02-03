@@ -1,13 +1,13 @@
-import { cn } from "@/lib/utils";
-import { ControlTitle } from "@/components/ui/control-title";
-import { useAppSelector } from "@/app/hooks";
+import { cn } from '@/lib/utils';
+import { ControlTitle } from '@/components/ui/control-title';
+import { useAppSelector } from '@/app/hooks';
 import { useI18n } from '@wordpress/react-i18n';
-import { setOpacity } from "@/features/map/map-slice";
-import { useAppDispatch } from "@/app/hooks";
+import { setOpacity } from '@/features/map/map-slice';
+import { useAppDispatch } from '@/app/hooks';
 import { MapItemsOpacity } from '@/types/types';
 import { SliderLabelsMap } from '@/types/types';
 import * as Slider from '@radix-ui/react-slider';
-import { ReactElement } from "react";
+import { ReactElement } from 'react';
 
 /**
  * LayerOpacities Component
@@ -21,8 +21,11 @@ import { ReactElement } from "react";
  */
 
 const LayerOpacities = (): ReactElement => {
-  const { opacity } = useAppSelector(state => state.map);
-	const opacityMap = Object.entries(opacity) as [keyof SliderLabelsMap, number][];
+	const { opacity } = useAppSelector((state) => state.map);
+	const opacityMap = Object.entries(opacity) as [
+		keyof SliderLabelsMap,
+		number,
+	][];
 	const { __ } = useI18n();
 	const dispatch = useAppDispatch();
 
@@ -33,10 +36,12 @@ const LayerOpacities = (): ReactElement => {
 
 	const handleChange = (values: number[], key: keyof MapItemsOpacity) => {
 		if (values.length && values[0]) {
-			dispatch(setOpacity({
-				value: values[0],
-				key,
-			}));
+			dispatch(
+				setOpacity({
+					value: values[0],
+					key,
+				})
+			);
 		}
 	};
 
@@ -46,11 +51,13 @@ const LayerOpacities = (): ReactElement => {
 			<div className="flex flex-col gap-y-3">
 				{opacityMap.map(([key, value]) => (
 					<div key={key}>
-						<span className="text-sm text-dark-purple mb-2">{sliderLabelsMap[key]}</span>
+						<span className="text-sm text-dark-purple mb-2">
+							{sliderLabelsMap[key]}
+						</span>
 						<Slider.Root
 							className={cn(
-								"relative flex items-center select-none",
-								"h-[20px] [touch-action:none]",
+								'relative flex items-center select-none',
+								'h-[20px] [touch-action:none]'
 							)}
 							value={[value * 100]}
 							onValueChange={(value) => handleChange(value, key)}
@@ -60,27 +67,26 @@ const LayerOpacities = (): ReactElement => {
 						>
 							<Slider.Track
 								className={cn(
-									"relative flex-grow rounded-full",
-									"h-[6px] bg-[hsl(var(--cold-grey-005))]"
+									'relative flex-grow rounded-full',
+									'h-[6px] bg-[hsl(var(--cold-grey-005))]'
 								)}
 							>
 								<Slider.Range
 									className={cn(
-										"absolute rounded-full h-full",
-										"bg-[hsl(var(--destructive-red))]"
+										'absolute rounded-full h-full',
+										'bg-[hsl(var(--destructive-red))]'
 									)}
 								/>
 							</Slider.Track>
 							<Slider.Thumb
 								className={cn(
-									"relative block w-[20px] h-[20px]",
-									"bg-white rounded-[10px]",
-									"[box-shadow:0_2px_10px_hsl(var(--cold-grey-005))]",
-									"hover:bg-white focus:outline-none focus:[box-shadow:0_0_0_2px_hsl(var(--cold-grey-005))]"
+									'relative block w-[20px] h-[20px]',
+									'bg-white rounded-[10px]',
+									'[box-shadow:0_2px_10px_hsl(var(--cold-grey-005))]',
+									'hover:bg-white focus:outline-none focus:[box-shadow:0_0_0_2px_hsl(var(--cold-grey-005))]'
 								)}
 								aria-label="Year Range"
-							>
-							</Slider.Thumb>
+							></Slider.Thumb>
 						</Slider.Root>
 					</div>
 				))}

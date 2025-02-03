@@ -36,52 +36,73 @@
  * };
  * ```
  */
-import React, { createContext, useContext, useState, ReactNode } from "react";
-import AnimatedPanel from "@/components/ui/animated-panel";
-import { AnimatedPanelContextType, ProviderPanelProps } from "@/types/types";
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import AnimatedPanel from '@/components/ui/animated-panel';
+import { AnimatedPanelContextType, ProviderPanelProps } from '@/types/types';
 
 // Create the context
-const AnimatedPanelContext = createContext<AnimatedPanelContextType | undefined>(undefined);
+const AnimatedPanelContext = createContext<
+	AnimatedPanelContextType | undefined
+>(undefined);
 
 // AnimatedPanelProvider component
-export const AnimatedPanelProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [activePanel, setActivePanel] = useState<React.ReactNode | null>(null);
-  const [panelProps, setPanelProps] = useState<ProviderPanelProps | undefined>(undefined);
+export const AnimatedPanelProvider: React.FC<{ children: ReactNode }> = ({
+	children,
+}) => {
+	const [activePanel, setActivePanel] = useState<React.ReactNode | null>(
+		null
+	);
+	const [panelProps, setPanelProps] = useState<
+		ProviderPanelProps | undefined
+	>(undefined);
 
-  const openPanel = (content: React.ReactNode, props: ProviderPanelProps = {}) => {
-    setActivePanel(content);
-    setPanelProps(props);
-  };
+	const openPanel = (
+		content: React.ReactNode,
+		props: ProviderPanelProps = {}
+	) => {
+		setActivePanel(content);
+		setPanelProps(props);
+	};
 
-  const closePanel = () => {
-    setActivePanel(null);
-  };
+	const closePanel = () => {
+		setActivePanel(null);
+	};
 
-  const togglePanel = (content: React.ReactNode, props: ProviderPanelProps = {}) => {
-    if (activePanel) {
-      closePanel();
-    }
-    else {
-      openPanel(content, props);
-    }
-  };
+	const togglePanel = (
+		content: React.ReactNode,
+		props: ProviderPanelProps = {}
+	) => {
+		if (activePanel) {
+			closePanel();
+		} else {
+			openPanel(content, props);
+		}
+	};
 
-  return (
-    <AnimatedPanelContext.Provider value={{ activePanel, openPanel, closePanel, togglePanel }}>
-      {children}
+	return (
+		<AnimatedPanelContext.Provider
+			value={{ activePanel, openPanel, closePanel, togglePanel }}
+		>
+			{children}
 
-      {/* this will render the panel as a direct child of the root element */}
-      <AnimatedPanel isOpen={!!activePanel} {...panelProps} onClose={closePanel}>
-        {activePanel}
-      </AnimatedPanel>
-    </AnimatedPanelContext.Provider>
-  );
+			{/* this will render the panel as a direct child of the root element */}
+			<AnimatedPanel
+				isOpen={!!activePanel}
+				{...panelProps}
+				onClose={closePanel}
+			>
+				{activePanel}
+			</AnimatedPanel>
+		</AnimatedPanelContext.Provider>
+	);
 };
 
 export const useAnimatedPanel = () => {
-  const context = useContext(AnimatedPanelContext);
-  if (!context) {
-    throw new Error('useAnimatedPanel must be used within a AnimatedPanelProvider');
-  }
-  return context;
+	const context = useContext(AnimatedPanelContext);
+	if (!context) {
+		throw new Error(
+			'useAnimatedPanel must be used within a AnimatedPanelProvider'
+		);
+	}
+	return context;
 };

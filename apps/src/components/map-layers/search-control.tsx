@@ -3,24 +3,24 @@
  * This component allows users to search for locations using the OpenStreetMap Nominatim API and navigate the map to the selected location.
  */
 
-import { useState, useEffect, ReactElement } from "react";
-import { useI18n } from "@wordpress/react-i18n";
-import { Locate, LocateFixed } from "lucide-react";
-import { useMap } from "react-leaflet";
+import { useState, useEffect, ReactElement } from 'react';
+import { useI18n } from '@wordpress/react-i18n';
+import { Locate, LocateFixed } from 'lucide-react';
+import { useMap } from 'react-leaflet';
 
-import L from "leaflet";
-import "leaflet-search/dist/leaflet-search.min.css";
-import "leaflet-search";
-import mapPinIcon from "@/assets/map-pin.svg";
+import L from 'leaflet';
+import 'leaflet-search/dist/leaflet-search.min.css';
+import 'leaflet-search';
+import mapPinIcon from '@/assets/map-pin.svg';
 
-import { useAppDispatch } from "@/app/hooks";
-import { addRecentLocation } from "@/features/map/map-slice";
-import { cn } from "@/lib/utils";
+import { useAppDispatch } from '@/app/hooks';
+import { addRecentLocation } from '@/features/map/map-slice';
+import { cn } from '@/lib/utils';
 import {
 	SEARCH_PLACEHOLDER,
 	SEARCH_DEFAULT_ZOOM,
 	MAP_SEARCH_URL,
-} from "@/lib/constants.ts";
+} from '@/lib/constants.ts';
 
 /**
  * SearchControl Component
@@ -32,8 +32,13 @@ import {
  * @example
  * <SearchControl />
  */
-export default function SearchControl({ className }: { className?: string }): ReactElement | null {
-	const [isGeolocationEnabled, setIsGeolocationEnabled] = useState<boolean>(false);
+export default function SearchControl({
+	className,
+}: {
+	className?: string;
+}): ReactElement | null {
+	const [isGeolocationEnabled, setIsGeolocationEnabled] =
+		useState<boolean>(false);
 	const [isTracking, setIsTracking] = useState<boolean>(false);
 
 	const { __ } = useI18n();
@@ -50,7 +55,7 @@ export default function SearchControl({ className }: { className?: string }): Re
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		if (! map) {
+		if (!map) {
 			return;
 		}
 
@@ -99,16 +104,16 @@ export default function SearchControl({ className }: { className?: string }): Re
 				...latlng,
 			})
 		);
-	}
+	};
 
 	const toggleGeoLocation = () => {
-		if (! navigator.geolocation) {
+		if (!navigator.geolocation) {
 			// TODO: what do do if geolocation is not supported?
 			alert(__('Geolocation is not supported by your browser.'));
 			return;
 		}
 
-		if (! isGeolocationEnabled) {
+		if (!isGeolocationEnabled) {
 			setIsTracking(true);
 
 			navigator.geolocation.getCurrentPosition(
@@ -121,7 +126,7 @@ export default function SearchControl({ className }: { className?: string }): Re
 					);
 
 					setIsGeolocationEnabled(true);
-					setIsTracking(false)
+					setIsTracking(false);
 				},
 				(err) => {
 					setIsTracking(false);
@@ -131,38 +136,45 @@ export default function SearchControl({ className }: { className?: string }): Re
 					alert(__('Unable to retrieve your location.'));
 				}
 			);
-		}
-		else {
+		} else {
 			setIsGeolocationEnabled(false);
 		}
-	}
+	};
 
 	const geolocationIconClass = cn(
 		'w-4 h-4',
 		isGeolocationEnabled ? 'text-white' : 'text-zinc-900',
-		isTracking ? 'animate-ping' : '',
+		isTracking ? 'animate-ping' : ''
 	);
 
 	return (
 		<div
 			className={cn(
 				'search-control absolute top-24 left-4 z-[9999] flex items-center space-x-1',
-				className,
+				className
 			)}
 		>
-			<div id={searchControlId} className="border border-gray-300 shadow-md inline-block" />
+			<div
+				id={searchControlId}
+				className="border border-gray-300 shadow-md inline-block"
+			/>
 			<div
 				className={cn(
 					'bg-white shadow-md',
 					'transition-colors duration-300 ease-out',
-					isGeolocationEnabled ? 'bg-brand-blue' : 'bg-white',
+					isGeolocationEnabled ? 'bg-brand-blue' : 'bg-white'
 				)}
 			>
-				<button className="w-10 h-10 flex items-center justify-center" onClick={toggleGeoLocation} disabled={isTracking}>
-					{isGeolocationEnabled
-						? <LocateFixed className={geolocationIconClass} />
-						: <Locate className={geolocationIconClass} />
-					}
+				<button
+					className="w-10 h-10 flex items-center justify-center"
+					onClick={toggleGeoLocation}
+					disabled={isTracking}
+				>
+					{isGeolocationEnabled ? (
+						<LocateFixed className={geolocationIconClass} />
+					) : (
+						<Locate className={geolocationIconClass} />
+					)}
 				</button>
 			</div>
 		</div>

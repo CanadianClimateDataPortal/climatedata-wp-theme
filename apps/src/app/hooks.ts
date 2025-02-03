@@ -5,11 +5,11 @@
  * This file contains custom Redux hooks for the application.
  *
  */
-import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux"
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
-import type { RootState, AppDispatch } from "@/app/store";
+import type { RootState, AppDispatch } from '@/app/store';
 
-export const useAppDispatch = () => useDispatch<AppDispatch>()
+export const useAppDispatch = () => useDispatch<AppDispatch>();
 
 /**
  * Custom hook that acts as a typed version of the useSelector hook from Redux.
@@ -17,4 +17,4 @@ export const useAppDispatch = () => useDispatch<AppDispatch>()
  *
  * @type {TypedUseSelectorHook<RootState>}
  */
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

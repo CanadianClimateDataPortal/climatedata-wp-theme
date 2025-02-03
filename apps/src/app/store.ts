@@ -6,14 +6,14 @@
  *
  * @module store
  */
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore } from '@reduxjs/toolkit';
 
 // Store Slices and Reducers
-import mapReducer from "@/features/map/map-slice";
-import downloadReducer from "@/features/download/download-slice";
+import mapReducer from '@/features/map/map-slice';
+import downloadReducer from '@/features/download/download-slice';
 
 // API Slices and Reducers - Fetch requests that are going to populate the store
-import { wpApiSlice } from "@/services/wp-node";
+import { wpApiSlice } from '@/services/wp-node';
 
 /**
  * Configures and exports the Redux store for the application.
@@ -28,12 +28,13 @@ import { wpApiSlice } from "@/services/wp-node";
  * @see {@link https://redux-toolkit.js.org/api/configureStore} for more information on configuring the store.
  */
 export const store = configureStore({
-  reducer: {
-    map: mapReducer,
-    download: downloadReducer,
-    [wpApiSlice.reducerPath]: wpApiSlice.reducer
-  },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(wpApiSlice.middleware)
+	reducer: {
+		map: mapReducer,
+		download: downloadReducer,
+		[wpApiSlice.reducerPath]: wpApiSlice.reducer,
+	},
+	middleware: (getDefaultMiddleware) =>
+		getDefaultMiddleware().concat(wpApiSlice.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;

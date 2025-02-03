@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { VariantProps, cva } from "class-variance-authority";
-import { X as CloseIcon, PanelLeft } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
-import { useI18n } from "@wordpress/react-i18n";
+import React, { useState, useEffect } from 'react';
+import { Slot } from '@radix-ui/react-slot';
+import { VariantProps, cva } from 'class-variance-authority';
+import { X as CloseIcon, PanelLeft } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useI18n } from '@wordpress/react-i18n';
 
-import { useIsMobile } from "@/hooks/use-mobile"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@/components/ui/tooltip';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar:state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -27,19 +27,19 @@ const SIDEBAR_WIDTH_ICON = '3rem';
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 
 type SidebarContext = {
-  state: "expanded" | "collapsed"
-  open: boolean
-  setOpen: (open: boolean) => void
-  openMobile: boolean
-  setOpenMobile: (open: boolean) => void
-  isMobile: boolean
-  toggleSidebar: () => void
-  activePanel: string | null
-  isPanelActive: (id: string) => boolean
-  togglePanel: (id: string) => void
-  openPanel: (id: string) => void
-  closePanel: () => void
-}
+	state: 'expanded' | 'collapsed';
+	open: boolean;
+	setOpen: (open: boolean) => void;
+	openMobile: boolean;
+	setOpenMobile: (open: boolean) => void;
+	isMobile: boolean;
+	toggleSidebar: () => void;
+	activePanel: string | null;
+	isPanelActive: (id: string) => boolean;
+	togglePanel: (id: string) => void;
+	openPanel: (id: string) => void;
+	closePanel: () => void;
+};
 
 const SidebarContext = React.createContext<SidebarContext | null>(null);
 
@@ -53,12 +53,12 @@ function useSidebar() {
 }
 
 const SidebarProvider = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<"div"> & {
-    defaultOpen?: boolean
-    open?: boolean
-    onOpenChange?: (open: boolean) => void
-  }
+	HTMLDivElement,
+	React.ComponentProps<'div'> & {
+		defaultOpen?: boolean;
+		open?: boolean;
+		onOpenChange?: (open: boolean) => void;
+	}
 >(
 	(
 		{
@@ -75,36 +75,39 @@ const SidebarProvider = React.forwardRef<
 		const isMobile = useIsMobile();
 		const [openMobile, setOpenMobile] = useState(false);
 
-    // controls the sidebar sliding panels open state
-    const [activePanel, setActivePanel] = useState<string | null>(null);
+		// controls the sidebar sliding panels open state
+		const [activePanel, setActivePanel] = useState<string | null>(null);
 
-    const isPanelActive = React.useCallback((id: string) => {
-      return activePanel === id;
-    }, [activePanel]);
+		const isPanelActive = React.useCallback(
+			(id: string) => {
+				return activePanel === id;
+			},
+			[activePanel]
+		);
 
-    const openPanel = React.useCallback((id: string) => {
-      setActivePanel(id);
-    }, []);
+		const openPanel = React.useCallback((id: string) => {
+			setActivePanel(id);
+		}, []);
 
-    const closePanel = React.useCallback(() => {
-      setActivePanel(null);
-    }, []);
+		const closePanel = React.useCallback(() => {
+			setActivePanel(null);
+		}, []);
 
-    const togglePanel = React.useCallback((id: string) => {
-      setActivePanel((prev) => (prev === id ? null : id));
-    }, []);
+		const togglePanel = React.useCallback((id: string) => {
+			setActivePanel((prev) => (prev === id ? null : id));
+		}, []);
 
-    // This is the internal state of the sidebar.
-    // We use openProp and setOpenProp for control from outside the component.
-    const [_open, _setOpen] = useState(defaultOpen)
-    const open = openProp ?? _open
-    const setOpen = React.useCallback(
-      (value: boolean | ((value: boolean) => boolean)) => {
-        if (setOpenProp) {
-          return setOpenProp?.(
-            typeof value === "function" ? value(open) : value
-          )
-        }
+		// This is the internal state of the sidebar.
+		// We use openProp and setOpenProp for control from outside the component.
+		const [_open, _setOpen] = useState(defaultOpen);
+		const open = openProp ?? _open;
+		const setOpen = React.useCallback(
+			(value: boolean | ((value: boolean) => boolean)) => {
+				if (setOpenProp) {
+					return setOpenProp?.(
+						typeof value === 'function' ? value(open) : value
+					);
+				}
 
 				_setOpen(value);
 
@@ -141,23 +144,36 @@ const SidebarProvider = React.forwardRef<
 		// This makes it easier to style the sidebar with Tailwind classes.
 		const state = open ? 'expanded' : 'collapsed';
 
-    const contextValue = React.useMemo<SidebarContext>(
-      () => ({
-        state,
-        open,
-        setOpen,
-        isMobile,
-        openMobile,
-        setOpenMobile,
-        toggleSidebar,
-        activePanel,
-        isPanelActive,
-        openPanel,
-        closePanel,
-        togglePanel
-      }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, activePanel, isPanelActive, openPanel, closePanel, togglePanel]
-    )
+		const contextValue = React.useMemo<SidebarContext>(
+			() => ({
+				state,
+				open,
+				setOpen,
+				isMobile,
+				openMobile,
+				setOpenMobile,
+				toggleSidebar,
+				activePanel,
+				isPanelActive,
+				openPanel,
+				closePanel,
+				togglePanel,
+			}),
+			[
+				state,
+				open,
+				setOpen,
+				isMobile,
+				openMobile,
+				setOpenMobile,
+				toggleSidebar,
+				activePanel,
+				isPanelActive,
+				openPanel,
+				closePanel,
+				togglePanel,
+			]
+		);
 
 		return (
 			<SidebarContext.Provider value={contextValue}>
@@ -211,10 +227,10 @@ const Sidebar = React.forwardRef<
 			return (
 				<div
 					className={cn(
-						"sidebar",
-						"flex flex-col",
-						"h-full w-[--sidebar-width]",
-						"bg-sidebar text-sidebar-foreground",
+						'sidebar',
+						'flex flex-col',
+						'h-full w-[--sidebar-width]',
+						'bg-sidebar text-sidebar-foreground',
 						className
 					)}
 					ref={ref}
@@ -251,62 +267,65 @@ const Sidebar = React.forwardRef<
 			);
 		}
 
-    // define classes based on the side and variant props
-    const sideClasses = side === "left"
-      ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
-      : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]";
+		// define classes based on the side and variant props
+		const sideClasses =
+			side === 'left'
+				? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]'
+				: 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]';
 
-    const variantPaddingClasses = variant === "floating" || variant === "inset"
-      ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]"
-      : "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l";
+		const variantPaddingClasses =
+			variant === 'floating' || variant === 'inset'
+				? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]'
+				: 'group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l';
 
-    const gapVariantPaddingClasses = variant === "floating" || variant === "inset"
-      ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]"
-      : "group-data-[collapsible=icon]:w-[--sidebar-width-icon]"
+		const gapVariantPaddingClasses =
+			variant === 'floating' || variant === 'inset'
+				? 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]'
+				: 'group-data-[collapsible=icon]:w-[--sidebar-width-icon]';
 
-    return (
-      <div
-        ref={ref}
-        className="sidebar z-[99999] group peer hidden md:block text-sidebar-foreground"
-        data-state={state}
-        data-collapsible={state === "collapsed" ? collapsible : ""}
-        data-variant={variant}
-        data-side={side}
-      >
-        {/* This is what handles the sidebar gap on desktop */}
-        <div
-          className={cn(
-            "duration-200 relative h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear",
-            "group-data-[collapsible=offcanvas]:w-0",
-            "group-data-[side=right]:rotate-180",
-            gapVariantPaddingClasses
-          )}
-        />
-        <div
-          className={cn(
-            "duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex",
-            "z-[99999]", // this shows the sidebar above the sliding content component when present
-            sideClasses,
-            variantPaddingClasses,
-            className
-          )}
-          {...props}
-        >
-          <div
-            data-sidebar="sidebar"
-            className={cn(
-							"flex flex-col",
-							"h-full w-full bg-sidebar p-2",
-							"group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow",
+		return (
+			<div
+				ref={ref}
+				className="sidebar z-[99999] group peer hidden md:block text-sidebar-foreground"
+				data-state={state}
+				data-collapsible={state === 'collapsed' ? collapsible : ''}
+				data-variant={variant}
+				data-side={side}
+			>
+				{/* This is what handles the sidebar gap on desktop */}
+				<div
+					className={cn(
+						'duration-200 relative h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear',
+						'group-data-[collapsible=offcanvas]:w-0',
+						'group-data-[side=right]:rotate-180',
+						gapVariantPaddingClasses
+					)}
+				/>
+				<div
+					className={cn(
+						'duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex',
+						'z-[99999]', // this shows the sidebar above the sliding content component when present
+						sideClasses,
+						variantPaddingClasses,
+						className
+					)}
+					{...props}
+				>
+					<div
+						data-sidebar="sidebar"
+						className={cn(
+							'flex flex-col',
+							'h-full w-full bg-sidebar p-2',
+							'group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow'
 						)}
-          >
-            {children}
-          </div>
-        </div>
-      </div>
-    )
-  }
-)
+					>
+						{children}
+					</div>
+				</div>
+			</div>
+		);
+	}
+);
 Sidebar.displayName = 'Sidebar';
 
 const SidebarTrigger = React.forwardRef<
@@ -471,10 +490,7 @@ const SidebarGroup = React.forwardRef<
 		<div
 			ref={ref}
 			data-sidebar="group"
-			className={cn(
-				'relative flex w-full min-w-0 flex-col',
-				className
-			)}
+			className={cn('relative flex w-full min-w-0 flex-col', className)}
 			{...props}
 		/>
 	);
@@ -804,92 +820,94 @@ SidebarMenuSubButton.displayName = 'SidebarMenuSubButton';
  * @component
  */
 const SidebarPanel = React.forwardRef<
-  HTMLDivElement,
-  {
-    id: string // used to identify the panel and keep track of its state.. must be unique
-    onClose?: () => void
-  } & React.ComponentProps<"div">
-  >(
-  ({ id, onClose, children, className }, ref) => {
-    const [sidebarWidth, setSidebarWidth] = useState(0);
+	HTMLDivElement,
+	{
+		id: string; // used to identify the panel and keep track of its state.. must be unique
+		onClose?: () => void;
+	} & React.ComponentProps<'div'>
+>(({ id, onClose, children, className }, ref) => {
+	const [sidebarWidth, setSidebarWidth] = useState(0);
 
-    const { isPanelActive, closePanel } = useSidebar();
-    const { __ } = useI18n();
+	const { isPanelActive, closePanel } = useSidebar();
+	const { __ } = useI18n();
 
-    // get the sidebar width
-    useEffect(() => {
-      const sidebarElement = document.querySelector('[data-sidebar="sidebar"]');
-      if (sidebarElement) {
-        setSidebarWidth(sidebarElement.getBoundingClientRect().width);
-      }
-    }, []);
+	// get the sidebar width
+	useEffect(() => {
+		const sidebarElement = document.querySelector(
+			'[data-sidebar="sidebar"]'
+		);
+		if (sidebarElement) {
+			setSidebarWidth(sidebarElement.getBoundingClientRect().width);
+		}
+	}, []);
 
-    // close the panel and call the onClose callback if provided
-    const handleClose = () => {
-      if (onClose) {
-        onClose();
-      }
+	// close the panel and call the onClose callback if provided
+	const handleClose = () => {
+		if (onClose) {
+			onClose();
+		}
 
-      closePanel();
-    }
+		closePanel();
+	};
 
-    return (
-      <AnimatePresence>
-        {isPanelActive(id) && (
-					<motion.div
-						ref={ref}
-						className={cn(
-							"sidebar-panel absolute top-0 left-0 bg-white shadow-md -z-10",
-							className
-						)}
-						initial={{ x:  -sidebarWidth }}
-						animate={{ x: sidebarWidth }}
-						exit={{ x:  -sidebarWidth }}
-						transition={{ duration: 0.25 }}
+	return (
+		<AnimatePresence>
+			{isPanelActive(id) && (
+				<motion.div
+					ref={ref}
+					className={cn(
+						'sidebar-panel absolute top-0 left-0 bg-white shadow-md -z-10',
+						className
+					)}
+					initial={{ x: -sidebarWidth }}
+					animate={{ x: sidebarWidth }}
+					exit={{ x: -sidebarWidth }}
+					transition={{ duration: 0.25 }}
+				>
+					<button
+						className="absolute top-4 right-4 text-gray-500"
+						onClick={handleClose}
 					>
-						<button
-							className="absolute top-4 right-4 text-gray-500"
-							onClick={handleClose}
-						>
-							<span className="sr-only">{__('Close panel')}</span>
-							<CloseIcon size={16} aria-hidden="true" focusable="false" />
-						</button>
-						<div className="p-0">
-							{children}
-						</div>
-					</motion.div>
-        )}
-      </AnimatePresence>
-    );
-  }
-)
+						<span className="sr-only">{__('Close panel')}</span>
+						<CloseIcon
+							size={16}
+							aria-hidden="true"
+							focusable="false"
+						/>
+					</button>
+					<div className="p-0">{children}</div>
+				</motion.div>
+			)}
+		</AnimatePresence>
+	);
+});
 SidebarPanel.displayName = 'SidebarPanel';
 
 export {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupAction,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarInput,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuAction,
-  SidebarMenuBadge,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSkeleton,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarPanel,
-  SidebarProvider,
-  SidebarRail,
-  SidebarSeparator,
-  SidebarTrigger,
-}
+	Sidebar,
+	SidebarContent,
+	SidebarFooter,
+	SidebarGroup,
+	SidebarGroupAction,
+	SidebarGroupContent,
+	SidebarGroupLabel,
+	SidebarHeader,
+	SidebarInput,
+	SidebarInset,
+	SidebarMenu,
+	SidebarMenuAction,
+	SidebarMenuBadge,
+	SidebarMenuButton,
+	SidebarMenuItem,
+	SidebarMenuSkeleton,
+	SidebarMenuSub,
+	SidebarMenuSubButton,
+	SidebarMenuSubItem,
+	SidebarPanel,
+	SidebarProvider,
+	SidebarRail,
+	SidebarSeparator,
+	SidebarTrigger,
+};
 
 export { useSidebar };

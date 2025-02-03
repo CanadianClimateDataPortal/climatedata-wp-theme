@@ -1,9 +1,9 @@
 // Here we can define global types and interfaces that can be used throughout the application
-import React from "react";
-import { VariantProps } from "class-variance-authority";
-import { buttonVariants } from "@/components/ui/button";
-import * as SheetPrimitive from "@radix-ui/react-dialog";
-import { LucideIcon } from "lucide-react";
+import React from 'react';
+import { VariantProps } from 'class-variance-authority';
+import { buttonVariants } from '@/components/ui/button';
+import * as SheetPrimitive from '@radix-ui/react-dialog';
+import { LucideIcon } from 'lucide-react';
 
 /**
  * Represents valid locale values.
@@ -14,26 +14,26 @@ export type Locale = 'en' | 'fr';
  * Represents the structure used as props for the RelatedCard component.
  */
 export interface RelatedCardData {
-  id: number;
-  title: string;
-  description: string;
-  url: string;
+	id: number;
+	title: string;
+	description: string;
+	url: string;
 }
 
 /**
  * Represents the properties of the RelatedCard component.
  */
 export interface RelatedCardProps {
-  data: RelatedCardData
+	data: RelatedCardData;
 }
 
 /**
  * Represents the structure received from the WordPress API for related data.
  */
 export interface RelatedData {
-  datasets: RelatedCardData[];
-  sectors: RelatedCardData[];
-  training: RelatedCardData[];
+	datasets: RelatedCardData[];
+	sectors: RelatedCardData[];
+	training: RelatedCardData[];
 }
 
 /**
@@ -46,12 +46,12 @@ export interface RelatedData {
  * @type {TaxonomyData}
  */
 export type TaxonomyData = {
-  id: string | number;
-  name: string;
-  slug: string;
-  description: string;
-  link: string;
-  [key: string]: any;
+	id: string | number;
+	name: string;
+	slug: string;
+	description: string;
+	link: string;
+	[key: string]: any;
 };
 
 /**
@@ -62,180 +62,179 @@ export type TaxonomyData = {
  * Additional dynamic properties can also be included.
  */
 export type ApiPostData = {
-  id: string | number;
-  title: { rendered: string };
-  link: string;
-  featured_media?: number;
-  [key: string]: any;
+	id: string | number;
+	title: { rendered: string };
+	link: string;
+	featured_media?: number;
+	[key: string]: any;
 };
 
 /**
  * Represents a normalized version of ApiPostData to be used in the application, with a plain string title.
  */
 export type PostData = Omit<ApiPostData, 'title'> & {
-  title: string;
+	title: string;
 };
 
 /**
  * Represents the structure used as props for MapInfo component.
  */
 export interface MapInfoData {
-  title: string;
-  relatedData?: RelatedData;
-  en: {
-    title: string;
-    description: string;
-    techDescription: string;
-  };
-  fr: {
-    title: string;
-    description: string;
-    techDescription: string;
-  };
+	title: string;
+	relatedData?: RelatedData;
+	en: {
+		title: string;
+		description: string;
+		techDescription: string;
+	};
+	fr: {
+		title: string;
+		description: string;
+		techDescription: string;
+	};
 }
 
 /**
  * Used in the MapEvents map layer component
  */
 export interface MapEventsProps {
-  onMapReady?: (map: any) => void;
-  onUnmount?: () => void;
+	onMapReady?: (map: any) => void;
+	onUnmount?: () => void;
 }
 
 /**
  * Used in the MapEvents map layer component
  */
 export interface MapEventsProps {
-  onMapReady?: (map: any) => void;
-  onUnmount?: () => void;
+	onMapReady?: (map: any) => void;
+	onUnmount?: () => void;
 }
 
 /**
  * Used in the MapEvents map layer component
  */
 export interface MapEventsProps {
-  onMapReady?: (map: any) => void;
-  onUnmount?: () => void;
+	onMapReady?: (map: any) => void;
+	onUnmount?: () => void;
 }
 
 /**
  * Used in the MapEvents map layer component
  */
 export interface MapEventsProps {
-  onMapReady?: (map: any) => void;
-  onUnmount?: () => void;
+	onMapReady?: (map: any) => void;
+	onUnmount?: () => void;
 }
 
 /**
  * Represents a map location object in redux store.
  */
 export type MapLocation = {
-  id: string;
-  title: string;
-  lat: number;
-  lng: number;
+	id: string;
+	title: string;
+	lat: number;
+	lng: number;
 };
 
 /**
  * Represents the properties of the `MapItems` for the map.
  */
 export interface MapItemsOpacity {
-  mapData: number;
-  labels: number;
+	mapData: number;
+	labels: number;
 }
 
 /**
  * Represents the properties of the Labels available for the Slider.
  */
 export type SliderLabelsMap = {
-  mapData: string;
-  labels: string;
+	mapData: string;
+	labels: string;
 };
 
 /**
  * Represents the map state in redux store.
  */
 export interface MapState {
-  emissionScenario: string;
-  emissionScenarioCompare: boolean;
-  emissionScenarioCompareTo: string;
-  interactiveRegion: string | null;
-  thresholdValue: number | null;
-  frequency: string;
-  timePeriodEnd: number[]; // using an array because the slider that uses it expects an array
-  recentLocations: MapLocation[];
-  dataset: string;
-  decade: string;
-  pane: string;
-  opacity: {
-    mapData: number;
-    labels: number;
-  };
+	emissionScenario: string;
+	emissionScenarioCompare: boolean;
+	emissionScenarioCompareTo: string;
+	interactiveRegion: string | null;
+	thresholdValue: number | null;
+	frequency: string;
+	timePeriodEnd: number[]; // using an array because the slider that uses it expects an array
+	recentLocations: MapLocation[];
+	dataset: string;
+	decade: string;
+	pane: string;
+	opacity: {
+		mapData: number;
+		labels: number;
+	};
 }
 
 /**
  * Represents the download app state in redux store.
  */
 export interface DownloadState {
-  dataset: TaxonomyData | null;
-  variable: PostData | null;
-  version: string;
-  degrees: number;
-  interactiveRegion: string;
-  startYear: number;
-  endYear: number;
-  frequency: string;
-  emissionScenarios: string[];
-  selectedCells: number;
-  percentiles: string[];
-  decimalPlace: number;
-  format: string;
-  email: string;
-  subscribe: boolean;
+	dataset: TaxonomyData | null;
+	variable: PostData | null;
+	version: string;
+	degrees: number;
+	interactiveRegion: string;
+	startYear: number;
+	endYear: number;
+	frequency: string;
+	emissionScenarios: string[];
+	selectedCells: number;
+	percentiles: string[];
+	decimalPlace: number;
+	format: string;
+	email: string;
+	subscribe: boolean;
 }
-
 
 /**
  * Represents an individual entry in a WMS legend colormap.
  */
 export interface WMSLegendEntry {
-  label: string;
-  color: string;
-  opacity: string;
+	label: string;
+	color: string;
+	opacity: string;
 }
 
 /**
  * Represents the structure of WMS legend data.
  */
 export interface WMSLegendData {
-  Legend?: {
-    rules?: {
-      symbolizers?: {
-        Raster?: {
-          colormap?: {
-            entries: WMSLegendEntry[];
-          };
-        };
-      }[];
-    }[];
-  }[];
+	Legend?: {
+		rules?: {
+			symbolizers?: {
+				Raster?: {
+					colormap?: {
+						entries: WMSLegendEntry[];
+					};
+				};
+			}[];
+		}[];
+	}[];
 }
 
 /**
  * Represents a processed legend entry with parsed data.
  */
 export interface TransformedLegendEntry {
-  label: string;
-  color: string;
-  opacity: number;
+	label: string;
+	color: string;
+	opacity: number;
 }
 
 /**
  * Represents the properties of the `Sheet` component.
  */
 export interface SheetContentProps
-  extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content> {
-  side?: 'top' | 'bottom' | 'left' | 'right';
+	extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content> {
+	side?: 'top' | 'bottom' | 'left' | 'right';
 }
 
 /**
@@ -246,8 +245,8 @@ export interface SheetContentProps
  * @extends AnchorHTMLAttributes<HTMLAnchorElement>
  */
 export interface AnchorProps
-  extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
-  icon?: React.ReactNode;
+	extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+	icon?: React.ReactNode;
 }
 
 /**
@@ -259,13 +258,13 @@ export interface AnchorProps
  * @extends React.HTMLAttributes<HTMLDivElement>
  */
 export interface RadioCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  value: any; // this value may be very specific to the use case, so it's left as any
-  title: string;
-  radioGroup: string;
-  description?: string;
-  thumbnail?: string;
-  selected: boolean;
-  onSelect: () => void;
+	value: any; // this value may be very specific to the use case, so it's left as any
+	title: string;
+	radioGroup: string;
+	description?: string;
+	thumbnail?: string;
+	selected: boolean;
+	onSelect: () => void;
 }
 
 /**
@@ -275,7 +274,7 @@ export interface RadioCardProps extends React.HTMLAttributes<HTMLDivElement> {
  * @extends React.HTMLAttributes<HTMLDivElement>
  */
 export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
-  columns?: number // number of columns, eg, 1, 2, 3
+	columns?: number; // number of columns, eg, 1, 2, 3
 }
 
 /**
@@ -285,9 +284,9 @@ export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
  * @extends React.ButtonHTMLAttributes<HTMLButtonElement>
  */
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
+	extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+		VariantProps<typeof buttonVariants> {
+	asChild?: boolean;
 }
 
 /**
@@ -295,46 +294,48 @@ export interface ButtonProps
  * for enhanced functionality, such as supporting an icon component.
  */
 export interface LinkWithIconBaseProps {
-  icon: LucideIcon;
-  children: React.ReactNode;
-  className?: string;
+	icon: LucideIcon;
+	children: React.ReactNode;
+	className?: string;
 }
 export type LinkWithIconProps =
-  | (LinkWithIconBaseProps & React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string })
-  | (LinkWithIconBaseProps & React.ButtonHTMLAttributes<HTMLButtonElement> & { href?: never });
+	| (LinkWithIconBaseProps &
+			React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string })
+	| (LinkWithIconBaseProps &
+			React.ButtonHTMLAttributes<HTMLButtonElement> & { href?: never });
 
 /**
  * Represents the properties of the `Modal` component.
  */
-export interface ModalProps extends React.HTMLAttributes<HTMLDivElement>{
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode
-  className?: string
+export interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
+	isOpen: boolean;
+	onClose: () => void;
+	children: React.ReactNode;
+	className?: string;
 }
 
 /**
  * Props for the MapInfo component.
  */
 export interface MapInfoProps {
-  data: MapInfoData;
-  mapRef: React.RefObject<HTMLDivElement>;
+	data: MapInfoData;
+	mapRef: React.RefObject<HTMLDivElement>;
 }
 
 /**
  * Represents a single color palette option.
  */
 export interface ColorPaletteOption {
-  name: string;
-  colors: string[]; // Array of color strings in the palette
+	name: string;
+	colors: string[]; // Array of color strings in the palette
 }
 
 /**
  * Represents the properties of the ColorSelect component.
  */
 export interface ColorSelectProps {
-  options: ColorPaletteOption[];
-  onChange?: (selectedOption: ColorPaletteOption) => void;
+	options: ColorPaletteOption[];
+	onChange?: (selectedOption: ColorPaletteOption) => void;
 }
 
 /**
@@ -345,9 +346,9 @@ export interface ColorSelectProps {
  * @property {string} [countryCodes] - The country codes (comma-separated) to limit the search results. Default is "ca".
  */
 export interface SearchControlProps {
-  placeholder?: string;
-  zoom?: number;
-  countryCodes?: string;
+	placeholder?: string;
+	zoom?: number;
+	countryCodes?: string;
 }
 
 /**
@@ -359,8 +360,8 @@ export interface SearchControlProps {
  *
  */
 export interface DropdownOption {
-  label: string;
-  value: string;
+	label: string;
+	value: string;
 }
 
 /**
@@ -375,15 +376,18 @@ export interface DropdownOption {
  *
  */
 export interface DropdownProps<T = string> // generic default type is string
-  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "onChange" | "value"> {
-  options: { value: T; label: string }[] | T[];
-  placeholder?: string;
-  label?: string | React.ReactNode;
-  tooltip?: string | React.ReactNode;
-  searchable?: boolean;
-  searchPlaceholder?: string;
-  onChange: (value: T) => void;
-  value?: T;
+	extends Omit<
+		React.SelectHTMLAttributes<HTMLSelectElement>,
+		'onChange' | 'value'
+	> {
+	options: { value: T; label: string }[] | T[];
+	placeholder?: string;
+	label?: string | React.ReactNode;
+	tooltip?: string | React.ReactNode;
+	searchable?: boolean;
+	searchPlaceholder?: string;
+	onChange: (value: T) => void;
+	value?: T;
 }
 
 /**
@@ -394,75 +398,75 @@ export interface DropdownProps<T = string> // generic default type is string
  *
  */
 export interface ControlTitleProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
-  title: string | React.ReactNode;
-  tooltip?: React.ReactNode;
+	extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
+	title: string | React.ReactNode;
+	tooltip?: React.ReactNode;
 }
 
 /**
  * Represents the properties of the ZoomControl component.
  */
 export interface ZoomControlProps {
-  className?: string;
-  wrapperClass?: string;
-  onZoomIn: () => void;
-  onZoomOut: () => void;
+	className?: string;
+	wrapperClass?: string;
+	onZoomIn: () => void;
+	onZoomOut: () => void;
 }
 
 export interface ClimateDataProps {
-  data: {
-    // If you have your own typed interface, use that here instead
-    observations: number[][];
-    modeled_historical_median: number[][];
-    modeled_historical_range: number[][];
-    ssp126_median: number[][];
-    ssp126_range: number[][];
-    ssp245_median: number[][];
-    ssp245_range: number[][];
-    ssp585_median: number[][];
-    ssp585_range: number[][];
-    "30y_observations"?: Record<string, number[]>;
-    "30y_ssp126_median"?: Record<string, number[]>;
-    "30y_ssp126_range"?: Record<string, number[]>;
-    "30y_ssp245_median"?: Record<string, number[]>;
-    "30y_ssp245_range"?: Record<string, number[]>;
-    "30y_ssp585_median"?: Record<string, number[]>;
-    "30y_ssp585_range"?: Record<string, number[]>;
-    "delta7100_ssp126_median"?: Record<string, number[]>;
-    "delta7100_ssp126_range"?: Record<string, number[]>;
-    "delta7100_ssp245_median"?: Record<string, number[]>;
-    "delta7100_ssp245_range"?: Record<string, number[]>;
-    "delta7100_ssp585_median"?: Record<string, number[]>;
-    "delta7100_ssp585_range"?: Record<string, number[]>;
-  };
+	data: {
+		// If you have your own typed interface, use that here instead
+		observations: number[][];
+		modeled_historical_median: number[][];
+		modeled_historical_range: number[][];
+		ssp126_median: number[][];
+		ssp126_range: number[][];
+		ssp245_median: number[][];
+		ssp245_range: number[][];
+		ssp585_median: number[][];
+		ssp585_range: number[][];
+		'30y_observations'?: Record<string, number[]>;
+		'30y_ssp126_median'?: Record<string, number[]>;
+		'30y_ssp126_range'?: Record<string, number[]>;
+		'30y_ssp245_median'?: Record<string, number[]>;
+		'30y_ssp245_range'?: Record<string, number[]>;
+		'30y_ssp585_median'?: Record<string, number[]>;
+		'30y_ssp585_range'?: Record<string, number[]>;
+		delta7100_ssp126_median?: Record<string, number[]>;
+		delta7100_ssp126_range?: Record<string, number[]>;
+		delta7100_ssp245_median?: Record<string, number[]>;
+		delta7100_ssp245_range?: Record<string, number[]>;
+		delta7100_ssp585_median?: Record<string, number[]>;
+		delta7100_ssp585_range?: Record<string, number[]>;
+	};
 }
 
 /**
  * Represents style position properties. Used to control the position of a component like the AnimatedPanel component.
  */
-export interface ProviderPanelProps  {
-  direction?: 'left' | 'right' | 'top' | 'bottom';
-  position?: { top?: number; left?: number; right?: number; bottom?: number };
-  className?: string;
+export interface ProviderPanelProps {
+	direction?: 'left' | 'right' | 'top' | 'bottom';
+	position?: { top?: number; left?: number; right?: number; bottom?: number };
+	className?: string;
 }
 
 /**
  * Represents the properties of the `AnimatedPanel` context.
  */
 export interface AnimatedPanelContextType {
-  activePanel: React.ReactNode | null;
-  openPanel: (content: React.ReactNode, props?: ProviderPanelProps) => void;
-  togglePanel: (content: React.ReactNode, props?: ProviderPanelProps) => void;
-  closePanel: () => void;
+	activePanel: React.ReactNode | null;
+	openPanel: (content: React.ReactNode, props?: ProviderPanelProps) => void;
+	togglePanel: (content: React.ReactNode, props?: ProviderPanelProps) => void;
+	closePanel: () => void;
 }
 
 /**
  * Represents the properties of the `AnimatedPanel` component.
  */
 export interface AnimatedPanelProps extends ProviderPanelProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
+	isOpen: boolean;
+	onClose: () => void;
+	children: React.ReactNode;
 }
 
 /**
@@ -470,6 +474,6 @@ export interface AnimatedPanelProps extends ProviderPanelProps {
  * as `DatasetsPanel` and `VariablesPanel` where items are selected and some action is taken.
  */
 export interface InteractivePanelProps {
-  selected: any;
-  onSelect: (selected: any) => void;
+	selected: any;
+	onSelect: (selected: any) => void;
 }

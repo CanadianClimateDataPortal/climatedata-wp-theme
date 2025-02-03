@@ -1,21 +1,29 @@
-import React, { useState } from "react";
-import { MapContainer, TileLayer } from "react-leaflet";
-import { useI18n } from "@wordpress/react-i18n";
+import React, { useState } from 'react';
+import { MapContainer, TileLayer } from 'react-leaflet';
+import { useI18n } from '@wordpress/react-i18n';
 
-import "leaflet/dist/leaflet.css";
+import 'leaflet/dist/leaflet.css';
 
-import { StepContainer, StepContainerDescription } from "@/components/download/step-container";
-import { ControlTitle } from "@/components/ui/control-title";
-import { RadioGroupFactory } from "@/components/ui/radio-group";
-import Dropdown from "@/components/ui/dropdown";
-import ZoomControl from "@/components/map-layers/zoom-control";
-import SearchControl from "@/components/map-layers/search-control";
-import GeometryControls from "@/components/map-layers/geometry-controls";
-import GridLayer from "@/components/map-layers/grid-layer";
+import {
+	StepContainer,
+	StepContainerDescription,
+} from '@/components/download/step-container';
+import { ControlTitle } from '@/components/ui/control-title';
+import { RadioGroupFactory } from '@/components/ui/radio-group';
+import Dropdown from '@/components/ui/dropdown';
+import ZoomControl from '@/components/map-layers/zoom-control';
+import SearchControl from '@/components/map-layers/search-control';
+import GeometryControls from '@/components/map-layers/geometry-controls';
+import GridLayer from '@/components/map-layers/grid-layer';
 
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { setInteractiveRegion } from "@/features/download/download-slice";
-import { CANADA_CENTER, DEFAULT_ZOOM, DEFAULT_MIN_ZOOM, DEFAULT_MAX_ZOOM } from '@/lib/constants';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { setInteractiveRegion } from '@/features/download/download-slice';
+import {
+	CANADA_CENTER,
+	DEFAULT_ZOOM,
+	DEFAULT_MIN_ZOOM,
+	DEFAULT_MAX_ZOOM,
+} from '@/lib/constants';
 
 /**
  * Location step
@@ -24,7 +32,9 @@ const StepLocation: React.FC = () => {
 	const { __ } = useI18n();
 
 	const dispatch = useAppDispatch();
-	const { interactiveRegion, selectedCells } = useAppSelector(state => state.download);
+	const { interactiveRegion, selectedCells } = useAppSelector(
+		(state) => state.download
+	);
 
 	const [selectionMode, setSelectionMode] = useState<string>('cells');
 
@@ -44,7 +54,9 @@ const StepLocation: React.FC = () => {
 	return (
 		<StepContainer title="Select a location or area">
 			<StepContainerDescription>
-				{__('Using the tool below, you can select or draw a selection to include in your download file.')}
+				{__(
+					'Using the tool below, you can select or draw a selection to include in your download file.'
+				)}
 			</StepContainerDescription>
 
 			<div className="gap-4">
@@ -77,8 +89,13 @@ const StepLocation: React.FC = () => {
 							]}
 						/>
 						<div>
-							<ControlTitle title={__('You selected')} className="my-0" />
-							<div className="text-2xl text-neutral-grey-medium font-semibold">{selectedCells} {__('Cells')}</div>
+							<ControlTitle
+								title={__('You selected')}
+								className="my-0"
+							/>
+							<div className="text-2xl text-neutral-grey-medium font-semibold">
+								{selectedCells} {__('Cells')}
+							</div>
 						</div>
 					</div>
 				</div>
@@ -93,13 +110,9 @@ const StepLocation: React.FC = () => {
 				scrollWheelZoom={false}
 				className="h-[560px]"
 			>
-				{selectionMode === 'region' && (
-					<GeometryControls />
-				)}
+				{selectionMode === 'region' && <GeometryControls />}
 
-				{selectionMode === 'cells' && (
-					<GridLayer />
-				)}
+				{selectionMode === 'cells' && <GridLayer />}
 
 				<ZoomControl />
 				<SearchControl className="top-6 left-6" />
@@ -109,10 +122,9 @@ const StepLocation: React.FC = () => {
 					attribution="&copy; OpenStreetMap contributors"
 				/>
 			</MapContainer>
-
 		</StepContainer>
 	);
 };
-StepLocation.displayName = "StepLocation";
+StepLocation.displayName = 'StepLocation';
 
 export default StepLocation;

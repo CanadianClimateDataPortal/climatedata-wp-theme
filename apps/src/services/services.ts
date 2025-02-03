@@ -1,8 +1,14 @@
 // Any kind of service that you want to use in your application should be defined here.
 // For example any external request to an API, or any kind of data manipulation.
 
-import { transformLegendData } from "@/lib/format";
-import { RelatedData, MapInfoData, TaxonomyData, PostData, ApiPostData } from "@/types/types";
+import { transformLegendData } from '@/lib/format';
+import {
+	RelatedData,
+	MapInfoData,
+	TaxonomyData,
+	PostData,
+	ApiPostData,
+} from '@/types/types';
 
 // TODO: temporarily using dummy data inside the assets folder, until the API is ready
 import variableResponseDummy from '@/assets/dummy/variable-response-dummy.json';
@@ -25,7 +31,7 @@ const dummyResponses = {
 type DummyResponseKey = keyof typeof dummyResponses;
 
 export const fetchRelatedData = async (
-  // @ts-ignore: doing this so typescript build doesn't complain.. remove this when the API is ready
+	// @ts-ignore: doing this so typescript build doesn't complain.. remove this when the API is ready
 	postId: number
 ): Promise<RelatedData> => {
 	// TODO: uncomment this and use correct API endpoint when ready
@@ -99,7 +105,10 @@ export const fetchLegendData = async () => {
  * @param slug - the taxonomy slug
  * @param filters - the filters to apply to the data
  */
-export const fetchTaxonomyData = async (slug: string, filters?: Record<string, string | number | null>): Promise<TaxonomyData[]> => {
+export const fetchTaxonomyData = async (
+	slug: string,
+	filters?: Record<string, string | number | null>
+): Promise<TaxonomyData[]> => {
 	// TODO: uncomment this and use correct API endpoint when ready
 	// const response = await fetch(`/dummy/${slug}-response-dummy.json`);
 	// if (!response.ok) {
@@ -111,15 +120,14 @@ export const fetchTaxonomyData = async (slug: string, filters?: Record<string, s
 		response = {
 			json: async () => dummyResponses[slug as DummyResponseKey], // mimic fetch response.json()
 		};
-	}
-	else {
+	} else {
 		return [];
 	}
 
 	const data: TaxonomyData[] = await response.json();
 
 	// applying filters for the dummy implementation.. for the real implementation, this should be done via query params when fetching
-	if (filters)  {
+	if (filters) {
 		return data.filter((item) => {
 			return Object.keys(filters).every((key) => {
 				return item[key] === filters[key];
@@ -135,7 +143,10 @@ export const fetchTaxonomyData = async (slug: string, filters?: Record<string, s
  * @param postType - the post type to fetch
  * @param filters - the filters to apply to the data
  */
-export const fetchPostsData = async (postType: string, filters: Record<string, string | number | null>): Promise<PostData[]> => {
+export const fetchPostsData = async (
+	postType: string,
+	filters: Record<string, string | number | null>
+): Promise<PostData[]> => {
 	// TODO: uncomment this and use correct API endpoint when ready
 	// const response = await fetch(`/dummy/${postType}-response-dummy.json`);
 	// if (!response.ok) {
@@ -147,23 +158,24 @@ export const fetchPostsData = async (postType: string, filters: Record<string, s
 		response = {
 			json: async () => dummyResponses[postType as DummyResponseKey], // mimic fetch response.json()
 		};
-	}
-	else {
+	} else {
 		return [];
 	}
 
-	const data: PostData[] = (await response.json() as ApiPostData[]).map((post) => ({
-		...post,
-		title: post.title.rendered,
-	}));
+	const data: PostData[] = ((await response.json()) as ApiPostData[]).map(
+		(post) => ({
+			...post,
+			title: post.title.rendered,
+		})
+	);
 
 	// applying filters for the dummy implementation.. for the real implementation, this should be done via query params when fetching
-	if (filters)  {
+	if (filters) {
 		return data.filter((item) => {
 			return Object.keys(filters).every((key) => {
 				const filterValue = String(filters[key]);
 
-				if (! filterValue) {
+				if (!filterValue) {
 					return true;
 				}
 

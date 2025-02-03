@@ -66,7 +66,7 @@ const RadioCard: React.FC<RadioCardProps> = ({
 						<input
 							type="radio"
 							name={radioGroup}
-							value={value}
+							value={value as string}
 							checked={selected}
 							onChange={onSelect}
 							className="hidden"

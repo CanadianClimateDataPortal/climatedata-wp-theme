@@ -89,13 +89,22 @@ export const normalizeRadioCardProps = async <T extends 'taxonomy' | 'post'>(
 			}
 
 			const postItem = item as PostData;
-			const terms = postItem?._links['wp:term'] || [];
+			const links = postItem._links as
+				| Record<string, unknown>
+				| undefined;
+			const terms =
+				(links?.['wp:term'] as { taxonomy: string; href: string }[]) ||
+				[];
 
 			const taxonomies = terms.reduce(
 				// TODO: replace with correctly typed params
-				(acc: Record<string, unknown[]>, term: { taxonomy: string }) => {
+				(
+					acc: Record<string, unknown[]>,
+					term: { taxonomy: string }
+				) => {
 					if (term.taxonomy) {
-						acc[term.taxonomy] = postItem[term.taxonomy] || [];
+						acc[term.taxonomy] =
+							(postItem[term.taxonomy] as unknown[]) || [];
 					}
 					return acc;
 				},
@@ -107,7 +116,9 @@ export const normalizeRadioCardProps = async <T extends 'taxonomy' | 'post'>(
 				value: postItem.id,
 				title: postItem.title,
 				slug: postItem.slug || '',
-				description: postItem.acf?.var_description || postItem.title,
+				description:
+					(postItem.acf as { var_description?: string })
+						?.var_description || postItem.title,
 				link: postItem.link || '',
 				taxonomies,
 				// TODO: do we want to use the post's featured_media image here? if so, we might need to make sure those have specific dimensions

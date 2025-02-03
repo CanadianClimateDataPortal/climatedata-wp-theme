@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
 
-import { StepContainer, StepContainerDescription } from '@/components/download/step-container';
-import { RadioCard, RadioCardFooter } from "@/components/ui/radio-card";
-import Link from "@/components/ui/link";
+import {
+	StepContainer,
+	StepContainerDescription,
+} from '@/components/download/step-container';
+import { RadioCard, RadioCardFooter } from '@/components/ui/radio-card';
+import Link from '@/components/ui/link';
 
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { setDataset } from "@/features/download/download-slice";
-import { fetchTaxonomyData } from "@/services/services";
-import { TaxonomyData } from "@/types/types";
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { setDataset } from '@/features/download/download-slice';
+import { fetchTaxonomyData } from '@/services/services';
+import { TaxonomyData } from '@/types/types';
 
 /**
  * Dataset step
@@ -20,7 +23,7 @@ const StepDataset: React.FC = () => {
 	const { __ } = useI18n();
 
 	const dispatch = useAppDispatch();
-	const { dataset } = useAppSelector(state => state.download);
+	const { dataset } = useAppSelector((state) => state.download);
 
 	useEffect(() => {
 		fetchTaxonomyData('variable-dataset').then((data) => {
@@ -31,7 +34,9 @@ const StepDataset: React.FC = () => {
 	return (
 		<StepContainer title={__('Select a Dataset')}>
 			<StepContainerDescription>
-				{__('Select dataset to begin building your download request. Several options will be available after this selection.')}
+				{__(
+					'Select dataset to begin building your download request. Several options will be available after this selection.'
+				)}
 			</StepContainerDescription>
 			<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 sm:gap-4">
 				{options.map((option, index) => {
@@ -64,6 +69,6 @@ const StepDataset: React.FC = () => {
 		</StepContainer>
 	);
 };
-StepDataset.displayName = "StepDataset";
+StepDataset.displayName = 'StepDataset';
 
 export default StepDataset;

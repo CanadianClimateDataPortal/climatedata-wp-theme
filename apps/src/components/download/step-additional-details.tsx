@@ -1,12 +1,15 @@
 import React from 'react';
-import { useI18n } from "@wordpress/react-i18n";
+import { useI18n } from '@wordpress/react-i18n';
 
-import { CheckboxFactory } from "@/components/ui/checkbox";
-import Dropdown from "@/components/ui/dropdown";
-import { RadioGroupFactory } from "@/components/ui/radio-group";
-import { StepContainer, StepContainerDescription } from "@/components/download/step-container";
+import { CheckboxFactory } from '@/components/ui/checkbox';
+import Dropdown from '@/components/ui/dropdown';
+import { RadioGroupFactory } from '@/components/ui/radio-group';
+import {
+	StepContainer,
+	StepContainerDescription,
+} from '@/components/download/step-container';
 
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
 	setStartYear,
 	setEndYear,
@@ -14,9 +17,9 @@ import {
 	setEmissionScenarios,
 	setPercentiles,
 	setDecimalPlace,
-} from "@/features/download/download-slice";
+} from '@/features/download/download-slice';
 
-import { normalizeDropdownOptions } from "@/lib/format";
+import { normalizeDropdownOptions } from '@/lib/format';
 
 /**
  * Additional details step
@@ -25,11 +28,19 @@ const StepAdditionalDetails: React.FC = () => {
 	const { __ } = useI18n();
 
 	const dispatch = useAppDispatch();
-	const { startYear, endYear, frequency, emissionScenarios, percentiles, decimalPlace } = useAppSelector(state => state.download);
+	const {
+		startYear,
+		endYear,
+		frequency,
+		emissionScenarios,
+		percentiles,
+		decimalPlace,
+	} = useAppSelector((state) => state.download);
 
-	const yearRange = Array.from({ length: 31 }, (_, i) => (i + 2000));
-	const yearOptions = normalizeDropdownOptions(yearRange.map((year) =>
-		({ value: year, label: String(year) })));
+	const yearRange = Array.from({ length: 31 }, (_, i) => i + 2000);
+	const yearOptions = normalizeDropdownOptions(
+		yearRange.map((year) => ({ value: year, label: String(year) }))
+	);
 
 	const frequencyOptions = normalizeDropdownOptions([
 		__('Annual'),
@@ -54,8 +65,9 @@ const StepAdditionalDetails: React.FC = () => {
 		'95',
 	]);
 
-	const decimalPlaceOptions = normalizeDropdownOptions([0, 2].map((value) =>
-		({ value, label: String(value) })));
+	const decimalPlaceOptions = normalizeDropdownOptions(
+		[0, 2].map((value) => ({ value, label: String(value) }))
+	);
 
 	return (
 		<StepContainer title="Additional details">
@@ -134,10 +146,9 @@ const StepAdditionalDetails: React.FC = () => {
 					dispatch(setDecimalPlace(value));
 				}}
 			/>
-
 		</StepContainer>
 	);
 };
-StepAdditionalDetails.displayName = "StepAdditionalDetails";
+StepAdditionalDetails.displayName = 'StepAdditionalDetails';
 
 export default StepAdditionalDetails;

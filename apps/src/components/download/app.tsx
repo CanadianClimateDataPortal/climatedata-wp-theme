@@ -1,5 +1,5 @@
-import React from "react";
-import { useI18n } from "@wordpress/react-i18n";
+import React from 'react';
+import { useI18n } from '@wordpress/react-i18n';
 
 import StepDataset from '@/components/download/step-dataset';
 import StepVariable from '@/components/download/step-variable';
@@ -7,18 +7,19 @@ import StepVariableOptions from '@/components/download/step-variable-options';
 import StepLocation from '@/components/download/step-location';
 import StepAdditionalDetails from '@/components/download/step-additional-details';
 import StepSendRequest from '@/components/download/step-send-request';
-import StepNavigation from "@/components/download/step-navigation";
-import StepSummary from "@/components/download/step-summary";
+import StepNavigation from '@/components/download/step-navigation';
+import StepSummary from '@/components/download/step-summary';
 
-import { useAppSelector } from "@/app/hooks";
-import { DownloadProvider, useDownloadContext } from "@/context/download-provider";
-import { cn } from "@/lib/utils";
+import { useAppSelector } from '@/app/hooks';
+import { DownloadProvider } from '@/context/download-provider';
+import { useDownload } from '@/hooks/use-download';
+import { cn } from '@/lib/utils';
 
 const Steps: React.FC = () => {
 	const { __ } = useI18n();
 
-	const data = useAppSelector(state => state.download)
-	const { goToNextStep, currentStep } = useDownloadContext();
+	const data = useAppSelector((state) => state.download);
+	const { goToNextStep, currentStep } = useDownload();
 
 	const steps = [
 		<StepDataset />,
@@ -38,34 +39,30 @@ const Steps: React.FC = () => {
 	let buttonText = __('Next Step');
 	if (isLastStep) {
 		buttonText = __('Send Request');
-	}
-	else if (isSecondToLastStep) {
+	} else if (isSecondToLastStep) {
 		buttonText = __('Final Step');
 	}
 
 	const handleNext = () => {
-		if (! isLastStep) {
+		if (!isLastStep) {
 			goToNextStep();
-		}
-		else {
+		} else {
 			// TODO: add logic to actually send the request
-			console.log(data)
+			console.log(data);
 			alert('See dev console for data that would be sent in the request');
 		}
-	}
+	};
 
 	return (
 		<div className="steps flex flex-col px-4">
 			<StepNavigation totalSteps={steps.length} />
-			<div className="mb-8">
-				{steps[currentStep - 1]}
-			</div>
+			<div className="mb-8">{steps[currentStep - 1]}</div>
 			<button
 				type="button"
 				onClick={handleNext}
 				className={cn(
 					'w-64 mx-auto sm:mx-0 py-2 rounded-full uppercase bg-brand-red hover:bg-brand-red/50 text-white',
-					isDisabled ? 'opacity-25' : '',
+					isDisabled ? 'opacity-25' : ''
 				)}
 			>
 				{buttonText} &rarr;
@@ -73,7 +70,7 @@ const Steps: React.FC = () => {
 		</div>
 	);
 };
-Steps.displayName = "Steps";
+Steps.displayName = 'Steps';
 
 const App: React.FC = () => (
 	<DownloadProvider>

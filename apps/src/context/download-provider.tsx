@@ -6,17 +6,17 @@
  * the different data variables to setup the download.
  *
  */
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useState } from 'react';
 
-// Define the DownloadContext
 const DownloadContext = createContext<{
 	currentStep: number;
 	goToNextStep: () => void;
 	goToStep: (step: number) => void;
 } | null>(null);
 
-// Provider component
-export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
+	children,
+}) => {
 	const [currentStep, setCurrentStep] = useState<number>(1);
 
 	const goToNextStep = () => setCurrentStep((prev) => prev + 1);
@@ -25,8 +25,8 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 	const values = {
 		currentStep,
 		goToNextStep,
-		goToStep
-	}
+		goToStep,
+	};
 
 	return (
 		<DownloadContext.Provider value={values}>
@@ -35,11 +35,4 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 	);
 };
 
-export const useDownloadContext = () => {
-	const context = useContext(DownloadContext);
-	if (! context) {
-		throw new Error("useDownloadContext must be used within a DownloadProvider");
-	}
-
-	return context;
-};
+export { DownloadContext };

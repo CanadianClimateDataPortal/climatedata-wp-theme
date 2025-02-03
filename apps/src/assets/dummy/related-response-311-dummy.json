@@ -1,68 +1,68 @@
 {
-    "datasets": [
-        {
-            "id": 183,
-            "title": "Historical Canadian Climate Normals",
-            "description": "Warmest daytime temperature in the selected time period.",
-            "url": "https:\/\/climatedata2.crim.ca\/dataset\/historical-canadian-climate-normals\/"
-        }
-    ],
-    "sectors": [
-        {
-            "id": 108,
-            "title": "Agriculture",
-            "description": "High temperatures can be detrimental to crops, particularly during flowering and seed development, resulting in reduced yields. Heat stress in animals can lead to reductions in milk production and in summer weight gain in livestock.",
-            "url": "https:\/\/climatedata2.crim.ca\/learn\/?q=sector:agriculture"
-        },
-        {
-            "id": 105,
-            "title": "Buildings",
-            "description": "High temperatures exacerbate the urban heat island effect in cities leading to even higher temperatures in urban locations. Without cooling, conditions indoors may become unsuitable for building inhabitants, and outdoor construction may need to be limited.",
-            "url": "https:\/\/climatedata2.crim.ca\/learn\/?q=sector:buildings"
-        },
-        {
-            "id": 107,
-            "title": "Finance",
-            "description": "Extreme heat impacts can inhibit national economic growth through, for example, reduced economic activity in the construction and agricultural sectors.",
-            "url": "https:\/\/climatedata2.crim.ca\/learn\/?q=sector:finance"
-        },
-        {
-            "id": 103,
-            "title": "Health",
-            "description": "Extreme heat impacts everyone, and unless adequate precautions are taken, it may lead to dehydration, heat stroke and death. Outdoor workers, the elderly and children are more vulnerable to extreme heat conditions.",
-            "url": "https:\/\/climatedata2.crim.ca\/learn\/?q=sector:health"
-        },
-        {
-            "id": 104,
-            "title": "Marine",
-            "description": "Extreme heat can lead to marine heatwaves which can stress many marine species, including sea grass, kelp and corals, as well as crab, squid, salmon and other fisheries. Warmer ocean temperatures can also fuel developing tropical cyclones.",
-            "url": "https:\/\/climatedata2.crim.ca\/learn\/?q=sector:marine"
-        },
-        {
-            "id": 106,
-            "title": "Transportation",
-            "description": "Extreme heat impacts all forms of transportation - it can cause rutting and bleeding of asphalt road surfaces, warping of railroad tracks leading to slow-go orders, as well as safety concerns for marine shipping and weight restrictions for airplanes.",
-            "url": "https:\/\/climatedata2.crim.ca\/learn\/?q=sector:transportation"
-        }
-    ],
-    "training": [
-        {
-            "id": 3884,
-            "title": "Understanding Multi-Model Ensembles",
-            "description": "",
-            "url": "https:\/\/climatedata2.crim.ca\/resource\/multi-model-ensembles\/"
-        },
-        {
-            "id": 2900,
-            "title": "Modelled Historical Data",
-            "description": "",
-            "url": "https:\/\/climatedata2.crim.ca\/resource\/modelled-historical-data\/"
-        },
-        {
-            "id": 2944,
-            "title": "Introduction to Decision Making Using Climate Scenarios",
-            "description": "",
-            "url": "https:\/\/climatedata2.crim.ca\/resource\/introduction-to-decision-making-using-climate-scenarios\/"
-        }
-    ]
+	"datasets": [
+		{
+			"id": 183,
+			"title": "Historical Canadian Climate Normals",
+			"description": "Warmest daytime temperature in the selected time period.",
+			"url": "https:\/\/climatedata2.crim.ca\/dataset\/historical-canadian-climate-normals\/"
+		}
+	],
+	"sectors": [
+		{
+			"id": 108,
+			"title": "Agriculture",
+			"description": "High temperatures can be detrimental to crops, particularly during flowering and seed development, resulting in reduced yields. Heat stress in animals can lead to reductions in milk production and in summer weight gain in livestock.",
+			"url": "https:\/\/climatedata2.crim.ca\/learn\/?q=sector:agriculture"
+		},
+		{
+			"id": 105,
+			"title": "Buildings",
+			"description": "High temperatures exacerbate the urban heat island effect in cities leading to even higher temperatures in urban locations. Without cooling, conditions indoors may become unsuitable for building inhabitants, and outdoor construction may need to be limited.",
+			"url": "https:\/\/climatedata2.crim.ca\/learn\/?q=sector:buildings"
+		},
+		{
+			"id": 107,
+			"title": "Finance",
+			"description": "Extreme heat impacts can inhibit national economic growth through, for example, reduced economic activity in the construction and agricultural sectors.",
+			"url": "https:\/\/climatedata2.crim.ca\/learn\/?q=sector:finance"
+		},
+		{
+			"id": 103,
+			"title": "Health",
+			"description": "Extreme heat impacts everyone, and unless adequate precautions are taken, it may lead to dehydration, heat stroke and death. Outdoor workers, the elderly and children are more vulnerable to extreme heat conditions.",
+			"url": "https:\/\/climatedata2.crim.ca\/learn\/?q=sector:health"
+		},
+		{
+			"id": 104,
+			"title": "Marine",
+			"description": "Extreme heat can lead to marine heatwaves which can stress many marine species, including sea grass, kelp and corals, as well as crab, squid, salmon and other fisheries. Warmer ocean temperatures can also fuel developing tropical cyclones.",
+			"url": "https:\/\/climatedata2.crim.ca\/learn\/?q=sector:marine"
+		},
+		{
+			"id": 106,
+			"title": "Transportation",
+			"description": "Extreme heat impacts all forms of transportation - it can cause rutting and bleeding of asphalt road surfaces, warping of railroad tracks leading to slow-go orders, as well as safety concerns for marine shipping and weight restrictions for airplanes.",
+			"url": "https:\/\/climatedata2.crim.ca\/learn\/?q=sector:transportation"
+		}
+	],
+	"training": [
+		{
+			"id": 3884,
+			"title": "Understanding Multi-Model Ensembles",
+			"description": "",
+			"url": "https:\/\/climatedata2.crim.ca\/resource\/multi-model-ensembles\/"
+		},
+		{
+			"id": 2900,
+			"title": "Modelled Historical Data",
+			"description": "",
+			"url": "https:\/\/climatedata2.crim.ca\/resource\/modelled-historical-data\/"
+		},
+		{
+			"id": 2944,
+			"title": "Introduction to Decision Making Using Climate Scenarios",
+			"description": "",
+			"url": "https:\/\/climatedata2.crim.ca\/resource\/introduction-to-decision-making-using-climate-scenarios\/"
+		}
+	]
 }

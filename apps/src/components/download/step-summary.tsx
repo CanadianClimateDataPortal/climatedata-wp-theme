@@ -1,37 +1,38 @@
-import React from "react";
-import { useI18n } from "@wordpress/react-i18n";
-import { PencilLine } from "lucide-react";
+import React from 'react';
+import { useI18n } from '@wordpress/react-i18n';
+import { PencilLine } from 'lucide-react';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { useAppSelector } from "@/app/hooks";
-import { useDownloadContext } from "@/context/download-provider";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { useAppSelector } from '@/app/hooks';
+import { useDownload } from '@/hooks/use-download';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 const StepSummary: React.FC = () => {
 	const { __ } = useI18n();
 
-	const { currentStep, goToStep } = useDownloadContext();
+	const { currentStep, goToStep } = useDownload();
 
-	const state = useAppSelector(state => state.download);
+	const state = useAppSelector((state) => state.download);
 
 	const summaryData = [
 		{
 			title: __('Dataset'),
-			content: [
-				state.dataset?.name
-			],
+			content: [state.dataset?.name],
 		},
 		{
 			title: __('Variable'),
-			content: [
-				state.variable?.title
-			],
+			content: [state.variable?.title],
 		},
 		{
 			title: __('Variable options'),
-			content: `${state.version}, ` + __('MEAN TEMP >') + ' ' + state.degrees + ' °C'
+			content:
+				`${state.version}, ` +
+				__('MEAN TEMP >') +
+				' ' +
+				state.degrees +
+				' °C',
 		},
 		{
 			title: __('Location or area'),
@@ -50,36 +51,47 @@ const StepSummary: React.FC = () => {
 						(state.emissionScenarios.length === 1
 							? __('Scenario selected')
 							: __('Scenarios selected'))
-						: __('No Scenarios selected'),
+					: __('No Scenarios selected'),
 				`${state.decimalPlace} Decimal places`,
-			].join(', ')
-		}
+			].join(', '),
+		},
 	];
 
 	return (
-		<Card className={cn(
-			'rounded-none my-6 sm:my-0',
-			currentStep === 1 ? 'invisible' : ''
-		)}>
+		<Card
+			className={cn(
+				'rounded-none my-6 sm:my-0',
+				currentStep === 1 ? 'invisible' : ''
+			)}
+		>
 			<CardHeader className="py-4">
 				<CardTitle className="text-xl font-semibold">Summary</CardTitle>
 			</CardHeader>
 			<CardContent>
 				{summaryData
-				.filter((_, index) => index < (currentStep - 1)) // only show data up to the current step
-				.map((item, index) => (
-					<div key={index} className="flex items-start justify-between py-4 border-t border-soft-purple last:pb-0">
-						<div className="flex-1">
-							<h3 className="text-xs font-medium text-dark-purple uppercase mb-1">{item.title}</h3>
-							<p className="text-brand-blue">
-								{item.content}
-							</p>
+					.filter((_, index) => index < currentStep - 1) // only show data up to the current step
+					.map((item, index) => (
+						<div
+							key={index}
+							className="flex items-start justify-between py-4 border-t border-soft-purple last:pb-0"
+						>
+							<div className="flex-1">
+								<h3 className="text-xs font-medium text-dark-purple uppercase mb-1">
+									{item.title}
+								</h3>
+								<p className="text-brand-blue">
+									{item.content}
+								</p>
+							</div>
+							<Button
+								variant="ghost"
+								className="w-4 h-4 p-0 hover:bg-white"
+								onClick={() => goToStep(index + 1)}
+							>
+								<PencilLine className="text-brand-blue cursor-pointer" />
+							</Button>
 						</div>
-						<Button variant="ghost" className="w-4 h-4 p-0 hover:bg-white" onClick={() => goToStep(index + 1)}>
-							<PencilLine className="text-brand-blue cursor-pointer" />
-						</Button>
-					</div>
-				))}
+					))}
 			</CardContent>
 		</Card>
 	);

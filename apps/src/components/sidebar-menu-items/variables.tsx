@@ -17,13 +17,13 @@ import {
 import {
 	SidebarMenuItem,
 	SidebarMenuButton,
-	SidebarPanel
+	SidebarPanel,
 } from '@/components/ui/sidebar';
 import Grid from '@/components/ui/grid';
 
 // other
 import { useSidebar } from '@/hooks/use-sidebar';
-import { InteractivePanelProps } from '@/types/types';
+import { InteractivePanelProps, PostData } from '@/types/types';
 import TaxonomyDropdownFilter from '@/components/taxonomy-dropdown-filter';
 import VariableRadioCards from '@/components/variable-radio-cards';
 
@@ -60,7 +60,7 @@ VariablesMenuItem.displayName = 'VariablesMenuItem';
 /**
  * A panel component that displays a list of variables.
  */
-const VariablesPanel: React.FC<InteractivePanelProps> = ({
+const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 	selected,
 	onSelect,
 }) => {

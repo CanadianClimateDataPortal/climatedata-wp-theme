@@ -30,7 +30,7 @@ const TaxonomyDropdownFilter: React.FC<{
 
 	useEffect(() => {
 		(async () => {
-			const data = await fetchTaxonomyData<TaxonomyData>(slug);
+			const data = await fetchTaxonomyData(slug);
 			setOptions(
 				data.map((option: TaxonomyData) => ({
 					value: String(option.id),

@@ -4,6 +4,7 @@ import { VariantProps } from 'class-variance-authority';
 import { buttonVariants } from '@/lib/format';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { LucideIcon } from 'lucide-react';
+import L from 'leaflet';
 
 /**
  * Represents valid locale values.
@@ -66,6 +67,14 @@ export type ApiPostData = {
 	title: { rendered: string };
 	link: string;
 	featured_media?: number;
+	_links?: {
+		'wp:term'?: {
+			href: string;
+			taxonomy: string;
+			[key: string]: unknown;
+		}[];
+		[key: string]: unknown;
+	};
 	[key: string]: unknown;
 };
 
@@ -74,6 +83,8 @@ export type ApiPostData = {
  */
 export type PostData = Omit<ApiPostData, 'title'> & {
 	title: string;
+	description?: string;
+	thumbnail?: string;
 };
 
 /**
@@ -98,31 +109,7 @@ export interface MapInfoData {
  * Used in the MapEvents map layer component
  */
 export interface MapEventsProps {
-	onMapReady?: (map: unknown) => void;
-	onUnmount?: () => void;
-}
-
-/**
- * Used in the MapEvents map layer component
- */
-export interface MapEventsProps {
-	onMapReady?: (map: unknown) => void;
-	onUnmount?: () => void;
-}
-
-/**
- * Used in the MapEvents map layer component
- */
-export interface MapEventsProps {
-	onMapReady?: (map: unknown) => void;
-	onUnmount?: () => void;
-}
-
-/**
- * Used in the MapEvents map layer component
- */
-export interface MapEventsProps {
-	onMapReady?: (map: unknown) => void;
+	onMapReady?: (map: L.Map) => void;
 	onUnmount?: () => void;
 }
 
@@ -473,7 +460,7 @@ export interface AnimatedPanelProps extends ProviderPanelProps {
  * Represents the properties of custom `SidebarPanel` components with interactive children, such
  * as `DatasetsPanel` and `VariablesPanel` where items are selected and some action is taken.
  */
-export interface InteractivePanelProps {
-	selected: unknown;
-	onSelect: (selected: unknown) => void;
+export interface InteractivePanelProps<T> {
+	selected: T | null;
+	onSelect: (selected: T) => void;
 }

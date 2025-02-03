@@ -127,9 +127,7 @@ export default function SearchControl({
 			minLength: 2,
 			container: searchControlId,
 			textPlaceholder,
-			// @ts-expect-error: suppress leaflet typescript errors
 			marker: L.marker([0, 0], {
-				// @ts-expect-error: suppress leaflet typescript errors
 				icon: L.icon({
 					iconUrl: mapPinIcon, // Custom marker icon
 					iconSize: [25, 41], // Size of the icon
@@ -137,7 +135,6 @@ export default function SearchControl({
 					popupAnchor: [0, -41], // Popup position relative to the icon
 				}),
 			}),
-			// @ts-expect-error: suppress leaflet typescript errors
 			moveToLocation: (latlng: L.LatLng, title: string, _: L.Map) => {
 				void _; // intentionally ignore the map argument for now
 				handleLocationChange(title, latlng);

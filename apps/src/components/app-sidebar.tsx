@@ -47,6 +47,7 @@ export function AppSidebar() {
 	const [selectedVariable, setSelectedVariable] = useState<PostData | null>(
 		null
 	);
+
 	const { setExtendInfo } = useMap();
 
 	const { __ } = useI18n();

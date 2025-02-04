@@ -15,6 +15,7 @@ show_help() {
 }
 
 initialize_variables() {
+    local server=$1
     script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     ssl_archive_url="$server/ssl/wildcard.climatedata.ca.tgz"
     wp_plugins_url="$server/wp-plugins"
@@ -24,6 +25,18 @@ initialize_variables() {
     ssl_destination_dir="$script_dir/../mounts/ssl"
     wp_plugins_destination_dir="$script_dir/../mounts/wp-plugins"
     wp_plugins_list_file="$script_dir/../build/www/wp-plugins/local.txt"
+
+    create_directories
+}
+
+create_directories() {
+    mkdir -p "$ssl_destination_dir" "$wp_plugins_destination_dir"
+}
+
+cleanup_temp_files() {
+    if [[ -d "$temp_download_dir" ]]; then
+        rm -rf "$temp_download_dir"
+    fi
 }
 
 process_arguments() {
@@ -78,21 +91,25 @@ setup_authentification() {
 
 validate_url() {
     local url=$1
-    http_status=$(curl -s -o /dev/null -w "%{http_code}" $auth_option "$url")
+    http_status=$(curl -s --head -o /dev/null -w "%{http_code}" $auth_option "$url")
 
-    if [[ "$http_status" -ne 200 && "$http_status" -ne 401 ]]; then
-        echo "ERROR: $url is not valid or does not return a successful status. HTTP status: $http_status"
+    if [[ "$http_status" -eq 401 ]]; then
+        echo "ERROR: Authentication failed for '$url'. Invalid username or password."
+        exit 1
+    elif [[ "$http_status" -ne 200 ]]; then
+        echo "ERROR: '$url' is not valid or is unreachable. HTTP status: $http_status"
         exit 1
     fi
+
 }
 
 download_file() {
     local url=$1
-    local ssl_archive_temp_path=$2
+    local archive_temp_path=$2
 
     validate_url "$url"
 
-    curl $auth_option -o "$ssl_archive_temp_path" "$url" || {
+    curl $auth_option -o "$archive_temp_path" "$url" || {
         echo "ERROR: Download failed for URL: $url"
         exit 1
     }
@@ -100,12 +117,10 @@ download_file() {
 
 extract_file() {
     local file=$1
-    local ssl_destination_dir=$2
-
-    mkdir -p "$ssl_destination_dir"
+    local destination_dir=$2
 
     if [[ "$file" == *.tgz ]]; then
-        tar -xzf "$file" -C "$ssl_destination_dir" || {
+        tar -xzf "$file" -C "$destination_dir" || {
             echo "ERROR: "$file" extraction failed."
             exit 1
         }
@@ -114,23 +129,20 @@ extract_file() {
         exit 1
     fi
 
-    rm -rf "$temp_download_dir"
 }
 
 download_from_list() {
-    local wp_plugins_list_file=$1
-    local wp_plugins_url=$2
-    local wp_plugins_destination_dir=$3
-
-    mkdir -p "$wp_plugins_destination_dir"
+    local list_file=$1
+    local url=$2
+    local destination_dir=$3
 
     while IFS= read -r file; do
         [[ -z "$file" || "$file" =~ ^# ]] && continue
 
-        curl $auth_option --fail "$wp_plugins_url/$file" -o "$wp_plugins_destination_dir/$file" || {
+        curl $auth_option --fail "$url/$file" -o "$destination_dir/$file" || {
             echo "ERROR: $file Download failed."
         }
-    done <"$wp_plugins_list_file"
+    done < "$list_file"
 }
 
 if [[ "$#" -eq 0 ]]; then
@@ -145,8 +157,9 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
 fi
 
 server=$1
-initialize_variables
+initialize_variables "$server"
 setup_authentification "$@"
 download_file "$ssl_archive_url" "$ssl_archive_temp_path"
 extract_file "$ssl_archive_temp_path" "$ssl_destination_dir"
 download_from_list "$wp_plugins_list_file" "$wp_plugins_url" "$wp_plugins_destination_dir"
+cleanup_temp_files

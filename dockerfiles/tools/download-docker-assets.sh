@@ -1,28 +1,29 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
 show_help() {
-    echo "Downloads SSL files and specific WordPress plugins from the server to local directories."
+    echo "Sets up necessary files for Docker by downloading SSL files and specific WordPress plugins from the server to local directories."
     echo ""
     echo "Usage: $0 <server_url> [--username=<username>] [--password-file=<file_path>]"
     echo "  <server_url>: URL to download the assets from."
-    echo "  [--username=<username>]: (Optional) Username for authentication. If provided, the script will prompt for the password."
-    echo "  [--password-file=<file_path>]: (Optional) password file for authentication."
+    echo "  --username=<username>: Username for authentication."
+    echo "  --password-file=<file_path>: File containing the password for authentication."
     echo ""
     echo "Any missing authentication information will be requested interactively."
     echo ""
 }
 
 initialize_variables() {
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     ssl_archive_url="$server/ssl/wildcard.climatedata.ca.tgz"
     wp_plugins_url="$server/wp-plugins"
     temp_download_dir=$(mktemp -d)
     ssl_archive_filename=$(basename "$ssl_archive_url")
     ssl_archive_temp_path="$temp_download_dir/$ssl_archive_filename"
-    ssl_destination_dir="../mounts/ssl"
-    wp_plugins_destination_dir="../mounts/wp-plugins"
-    wp_plugins_list_file="../build/www/wp-plugins/local.txt"
+    ssl_destination_dir="$script_dir/../mounts/ssl"
+    wp_plugins_destination_dir="$script_dir/../mounts/wp-plugins"
+    wp_plugins_list_file="$script_dir/../build/www/wp-plugins/local.txt"
 }
 
 process_arguments() {
@@ -70,7 +71,7 @@ handle_user_input() {
     fi
 }
 
-authenticate_user() {
+setup_authentification() {
     process_arguments "$@"
     handle_user_input
 }
@@ -105,11 +106,11 @@ extract_file() {
 
     if [[ "$file" == *.tgz ]]; then
         tar -xzf "$file" -C "$ssl_destination_dir" || {
-            echo "ERROR: Extraction failed."
+            echo "ERROR: "$file" extraction failed."
             exit 1
         }
     else
-        echo "ERROR: Not a TGZ file."
+        echo "ERROR: "$file" not a TGZ file."
         exit 1
     fi
 
@@ -145,7 +146,7 @@ fi
 
 server=$1
 initialize_variables
-authenticate_user "$@"
+setup_authentification "$@"
 download_file "$ssl_archive_url" "$ssl_archive_temp_path"
 extract_file "$ssl_archive_temp_path" "$ssl_destination_dir"
 download_from_list "$wp_plugins_list_file" "$wp_plugins_url" "$wp_plugins_destination_dir"

@@ -47,7 +47,7 @@ const VariableRadioCards: React.FC<{
 					<RadioCardFooter>
 						<Link
 							icon={<ExternalLink size={16} />}
-							href={item.link}
+							href={item.link as string}
 							className="text-sm text-brand-blue"
 						>
 							Learn more

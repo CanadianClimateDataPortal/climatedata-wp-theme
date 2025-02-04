@@ -48,7 +48,7 @@ export const fetchRelatedData = async (): Promise<RelatedData> => {
 };
 
 export const fetchWPData = async () => {
-	const POST_ID = 311;
+	// const POST_ID = 311;
 	// TODO: uncomment this and use correct API endpoint when ready
 	// const response = await fetch(`/dummy/wp-response-${POST_ID}-dummy.json`);
 	// if (!response.ok) {
@@ -61,7 +61,7 @@ export const fetchWPData = async () => {
 	};
 
 	const _responseJson = await response.json();
-	const _relatedData = await fetchRelatedData(POST_ID);
+	const _relatedData = await fetchRelatedData();
 	const { acf: acfData } = _responseJson;
 
 	const mapInfo: MapInfoData = {
@@ -122,7 +122,7 @@ export const fetchTaxonomyData = async (
 		return [];
 	}
 
-	const data: TaxonomyData[] = await response.json();
+	const data = (await response.json()) as TaxonomyData[];
 
 	// applying filters for the dummy implementation.. for the real implementation, this should be done via query params when fetching
 	if (filters) {

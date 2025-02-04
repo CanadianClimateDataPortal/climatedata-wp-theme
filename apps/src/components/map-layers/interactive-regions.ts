@@ -30,7 +30,7 @@ export default function InteractiveRegionsLayer(): null {
 		}
 
 		// event handlers
-		const onClick = (e: object) => {
+		const onClick = (e: { layer: { properties: object } }) => {
 			console.log('clicked:', e.layer.properties);
 		};
 

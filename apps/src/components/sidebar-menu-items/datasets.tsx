@@ -10,7 +10,7 @@ import { useI18n } from '@wordpress/react-i18n';
 import {
 	SidebarMenuButton,
 	SidebarMenuItem,
-	SidebarPanel
+	SidebarPanel,
 } from '@/components/ui/sidebar';
 import {
 	Card,
@@ -61,7 +61,7 @@ DatasetsMenuItem.displayName = 'DatasetsMenuItem';
 /**
  * A panel component that displays a list of datasets.
  */
-const DatasetsPanel: React.FC<InteractivePanelProps> = ({
+const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData>> = ({
 	selected,
 	onSelect,
 }) => {

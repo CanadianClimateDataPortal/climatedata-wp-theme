@@ -41,8 +41,12 @@ import { TaxonomyData, PostData } from '@/types/types';
  * A `Sidebar` component that provides a tabbed interface for exploring data or adjusting map settings.
  */
 export function AppSidebar() {
-	const [selectedDataset, setSelectedDataset] = useState<TaxonomyData>();
-	const [selectedVariable, setSelectedVariable] = useState<PostData>();
+	const [selectedDataset, setSelectedDataset] = useState<TaxonomyData | null>(
+		null
+	);
+	const [selectedVariable, setSelectedVariable] = useState<PostData | null>(
+		null
+	);
 	const { setExtendInfo } = useMap();
 
 	const { __ } = useI18n();

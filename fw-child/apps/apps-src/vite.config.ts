@@ -52,14 +52,14 @@ export default defineConfig({
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
-            '@fonts': path.resolve(__dirname, '../../resources/fonts'), // alias for the fonts folder for easier access
+            '@fonts': path.resolve(__dirname, '../fw-child/resources/fonts'), // alias for the fonts folder for easier access
         },
     },
     server: {
         fs: {
             allow: [
                 path.resolve(__dirname), // allow access to root
-                path.resolve(__dirname, '../../resources/fonts') // allow access to the fonts folder
+                path.resolve(__dirname, '../fw-child/resources/fonts') // allow access to the fonts folder
             ]
         }
     }

@@ -12,6 +12,11 @@ The [**_Git branching strategy_**](./docs/git-branching-strategy.md) explains
 how we use Git and branches for development, when releasing versions, when
 developing hot fixes, etc.
 
+## Pull requests
+
+The [**_Pull requests process_**](./docs/pull-request-process.md) document
+details the steps to follow when submitting or reviewing a pull request.
+
 ## Docker images
 
 The [**_Portal Docker image_**](./docs/portal-docker-image.md) document gives more

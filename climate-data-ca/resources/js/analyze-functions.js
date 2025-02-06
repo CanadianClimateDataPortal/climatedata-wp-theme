@@ -938,7 +938,9 @@
             });
 
             if ( dataset === 'cmip6' ) {
-                new_html += '<div class="my-4" style="font-size: 1.2rem">* ' + T('The full ensemble consists of 26 models. But if the SSP3-7.0 emission scenario is selected below, a subset of 24 models will be used for all selected scenarios.') + '</div>';
+                new_html += '<div class="my-4" style="font-size: 1.2rem">* '
+                    + T('If SSP3-7.0 is selected below, either alone or with any of the other emissions scenarios, then only 24 models are included in the analysis for all selected scenarios. To use the 26 models available for all emissions scenarios except SSP3-7.0, do not include SSP3-7.0 in your selection below.')
+                    + '</div>';
             }
 
             $('#models-placeholder').html(new_html);

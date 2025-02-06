@@ -50,7 +50,11 @@ var l10n_table = {
         // news
         
         "All topics" : "Tous les sujets",
-        "Close": "Fermer"
+        "Close": "Fermer",
+
+        // Analyze
+        "If SSP3-7.0 is selected below, either alone or with any of the other emissions scenarios, then only 24 models are included in the analysis for all selected scenarios. To use the 26 models available for all emissions scenarios except SSP3-7.0, do not include SSP3-7.0 in your selection below.":
+            "Si SSP3-7.0 est sélectionné ci-dessous, seul ou avec l'un des autres scénarios d'émissions, alors seulement 24 modèles sont inclus dans l'analyse pour tous les scénarios sélectionnés. Pour utiliser les 26 modèles disponibles pour tous les scénarios d’émissions à l’exception de SSP3-7.0, n’incluez pas SSP3-7.0 dans votre sélection ci-dessous.",
     }
 };
 
@@ -77,7 +81,7 @@ const DATASETS = {
                 }
             },
             {
-                'name': 'rcp85', 'label': 'RCP 8.5', 'chart_color': '#F00',
+                'name': 'rcp85', 'label': 'RCP 8.5', 'chart_color': '#980002',
                 'correlations': {
                     'cmip6': 'ssp585'
                 }
@@ -104,13 +108,13 @@ const DATASETS = {
                 }
             },
             {
-                'name': 'ssp370', 'label': 'SSP3-7.0', 'chart_color': '#F47D23',
+                'name': 'ssp370', 'label': 'SSP3-7.0', 'chart_color': '#f16f0c',
                 'correlations': {
                     'cmip5': 'rcp85'
                 }
             },
             {
-                'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#F00',
+                'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#980002',
                 'correlations': {
                     'cmip5': 'rcp85'
                 }
@@ -135,7 +139,7 @@ const DATASETS = {
                 'name': 'ssp245', 'label': 'SSP2-4.5', 'chart_color': '#00640c'
             },
             {
-                'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#F00'
+                'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#980002'
             },
         ],
         'grid': 'era5landgrid',
@@ -460,14 +464,14 @@ function displayChartData(data, varDetails, download_url, query, container) {
             data: data['observations'],
             zIndex: 1,
             showInNavigator: true,
-            color: '#777777',
+            color: '#808080',
             dashStyle: 'ShortDash',
             visible: false,
             marker: {
-                fillColor: '#777777',
+                fillColor: '#808080',
                 lineWidth: 0,
                 radius: 0,
-                lineColor: '#777777'
+                lineColor: '#808080'
             }
         });
     }
@@ -694,7 +698,7 @@ function displayChartData(data, varDetails, download_url, query, container) {
                                         if (decade_ms in data['30y_observations']) {
                                             this.value = data['30y_observations'][decade_ms][0];
                                             val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                            tip.push("<span style=\"color:#777777\">●</span> " + chart_labels.observation + " <b>"
+                                            tip.push("<span style=\"color:#808080\">●</span> " + chart_labels.observation + " <b>"
                                               + val1 + "</b><br/>");
                                         }
 

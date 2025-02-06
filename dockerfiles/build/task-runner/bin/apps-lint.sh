@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Apps linter (map, download)
+# Lint the source code using ESLint (map and download apps)
 # Usage example (host machine): docker exec -it climatedata-dev-task_runner-1 apps-lint.sh /app
 
 # Enable strict mode
@@ -24,7 +24,7 @@ error() {
 # Show help message
 show_help() {
     echo "Usage: $(basename "$0") <source-directory>"
-    echo "Apps linter (map, download)"
+    echo "Lint the source code of the map and download apps using ESLint"
 }
 
 # Validate input
@@ -41,12 +41,12 @@ src=$1
 [ ! -d "$src" ] && error "Directory not found: $src"
 
 # Check dependencies
-for cmd in node npm sass concurrently; do
+for cmd in node npm; do
     command -v "$cmd" >/dev/null 2>&1 || error "$cmd is required but not installed"
 done
 
 # Change to apps directory
-cd "${src}/fw-child/apps/apps-src" || error "Apps directory not found"
+cd "${src}/apps" || error "Apps directory not found"
 
 # Setup correct Node environment
 log "Setting up Node.js environment..."

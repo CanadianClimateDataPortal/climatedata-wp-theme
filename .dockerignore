@@ -6,3 +6,4 @@ docker-override.yml
 climate-data-ca
 h7-parent
 fw-child/**/local_config.php
+apps/node_modules

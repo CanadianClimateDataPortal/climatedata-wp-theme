@@ -1,38 +1,0 @@
-[
-  {
-    "id": 5,
-    "description": "Warmest daytime temperature in the selected time period.",
-    "link": "https://climatedata2.crim.ca/var-type/temperature/",
-    "name": "Temperature",
-    "slug": "temperature",
-    "meta": [],
-    "acf": []
-  },
-  {
-    "id": 4,
-    "description": "Warmest daytime temperature in the selected time period.",
-    "link": "https://climatedata2.crim.ca/var-type/precipitation/",
-    "name": "Precipitation",
-    "slug": "precipitation",
-    "meta": [],
-    "acf": []
-  },
-  {
-    "id": 10,
-    "description": "Warmest daytime temperature in the selected time period.",
-    "link": "https://climatedata2.crim.ca/var-type/station-data/",
-    "name": "Station Data",
-    "slug": "station-data",
-    "meta": [],
-    "acf": []
-  },
-  {
-    "id": 6,
-    "description": "Warmest daytime temperature in the selected time period.",
-    "link": "https://climatedata2.crim.ca/var-type/other/",
-    "name": "Other Variables",
-    "slug": "other",
-    "meta": [],
-    "acf": []
-  }
-]

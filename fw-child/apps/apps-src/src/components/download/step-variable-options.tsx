@@ -25,7 +25,7 @@ const StepVariableOptions: React.FC = () => {
 	return (
 		<StepContainer title={__('Set your variable options')}>
 			<StepContainerDescription>
-				Please set your variables options to your needs.
+				{__('Please set your variables options to your needs.')}
 			</StepContainerDescription>
 			<div className="gap-4">
 				<div className="mb-8">

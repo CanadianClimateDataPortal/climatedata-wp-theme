@@ -28,7 +28,9 @@ const ControlTitle = forwardRef<HTMLDivElement, ControlTitleProps>(
 			)}
 			{...props}
 		>
-			<div className="text-sm font-semibold uppercase">{title}</div>
+			<div className="text-xs font-semibold leading-4 tracking-wider uppercase">
+				{title}
+			</div>
 			{tooltip && (
 				<Popover>
 					<PopoverTrigger>

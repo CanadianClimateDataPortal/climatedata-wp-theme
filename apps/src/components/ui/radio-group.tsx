@@ -100,7 +100,7 @@ const RadioGroupFactory = forwardRef<
 				)}
 				<div
 					className={cn(
-						'flex flex-wrap gap-y-4 gap-x-0',
+						'flex flex-wrap gap-y-2 gap-x-0',
 						orientationClasses[orientation]
 					)}
 				>
@@ -118,7 +118,7 @@ const RadioGroupFactory = forwardRef<
 							/>
 							<label
 								htmlFor={`radio-${name}-${index}`}
-								className="text-zinc-900 text-sm font-medium leading-none cursor-pointer"
+								className="text-zinc-900 text-sm leading-5 cursor-pointer"
 							>
 								{option.label}
 							</label>

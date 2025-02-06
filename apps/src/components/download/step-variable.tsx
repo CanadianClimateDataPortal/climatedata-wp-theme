@@ -8,8 +8,7 @@ import {
 import TaxonomyDropdownFilter from '@/components/taxonomy-dropdown-filter';
 import VariableRadioCards from '@/components/variable-radio-cards';
 
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setVariable } from '@/features/download/download-slice';
+import { useDownload } from '@/hooks/use-download';
 
 /**
  * Variable step
@@ -21,11 +20,11 @@ const StepVariable: React.FC = () => {
 
 	const { __ } = useI18n();
 
-	const dispatch = useAppDispatch();
-	const { variable } = useAppSelector((state) => state.download);
+	const { setField, fields } = useDownload();
+	const { variable } = fields;
 
 	return (
-		<StepContainer title="Select a variable">
+		<StepContainer title={__('Select a variable')}>
 			<StepContainerDescription>
 				{__(
 					'Select a variable contained in the dataset previously selected. Use the filters below to narrow down the list of variables.'
@@ -42,9 +41,9 @@ const StepVariable: React.FC = () => {
 						}))
 					}
 					slug="var-type"
-					label="Variable Types"
-					tooltip="Select a variable type"
-					placeholder="All"
+					label={__('Variable Types')}
+					tooltip={__('Select a variable type')}
+					placeholder={__('All')}
 					value={filterValues['var-type'] || ''}
 				/>
 				<TaxonomyDropdownFilter
@@ -53,9 +52,9 @@ const StepVariable: React.FC = () => {
 						setFilterValues((prev) => ({ ...prev, sector: value }))
 					}
 					slug="sector"
-					label="Sectors"
-					tooltip="Select a sector"
-					placeholder="All"
+					label={__('Sectors')}
+					tooltip={__('Select a sector')}
+					placeholder={__('All')}
 					value={filterValues.sector || ''}
 				/>
 			</div>
@@ -65,7 +64,7 @@ const StepVariable: React.FC = () => {
 					filterValues={filterValues}
 					selected={variable}
 					onSelect={(selected) => {
-						dispatch(setVariable(selected));
+						setField('variable', selected);
 					}}
 				/>
 			</div>

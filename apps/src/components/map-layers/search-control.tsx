@@ -157,11 +157,11 @@ export default function SearchControl({
 		>
 			<div
 				id={searchControlId}
-				className="border border-gray-300 shadow-md inline-block"
+				className="border border-gray-300 shadow-md inline-block [&_input]:leading-5 [&_input]:placeholder:text-neutral-grey-medium"
 			/>
 			<div
 				className={cn(
-					'bg-white shadow-md',
+					'shadow-md',
 					'transition-colors duration-300 ease-out',
 					isGeolocationEnabled ? 'bg-brand-blue' : 'bg-white'
 				)}

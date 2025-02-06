@@ -9,8 +9,7 @@ import {
 import { RadioCard, RadioCardFooter } from '@/components/ui/radio-card';
 import Link from '@/components/ui/link';
 
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setDataset } from '@/features/download/download-slice';
+import { useDownload } from '@/hooks/use-download';
 import { fetchTaxonomyData } from '@/services/services';
 import { TaxonomyData } from '@/types/types';
 
@@ -22,8 +21,8 @@ const StepDataset: React.FC = () => {
 
 	const { __ } = useI18n();
 
-	const dispatch = useAppDispatch();
-	const { dataset } = useAppSelector((state) => state.download);
+	const { setField, fields } = useDownload();
+	const { dataset } = fields;
 
 	useEffect(() => {
 		fetchTaxonomyData('variable-dataset').then((data) => {
@@ -38,7 +37,7 @@ const StepDataset: React.FC = () => {
 					'Select dataset to begin building your download request. Several options will be available after this selection.'
 				)}
 			</StepContainerDescription>
-			<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 sm:gap-4">
+			<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
 				{options.map((option, index) => {
 					return (
 						<RadioCard
@@ -49,7 +48,7 @@ const StepDataset: React.FC = () => {
 							description={option.description}
 							selected={dataset?.id === option.id}
 							onSelect={() => {
-								dispatch(setDataset(option));
+								setField('dataset', option);
 							}}
 							className="mb-0"
 						>
@@ -57,7 +56,7 @@ const StepDataset: React.FC = () => {
 								<Link
 									icon={<ExternalLink size={16} />}
 									href={option.link ?? '#'}
-									className="text-sm text-brand-blue"
+									className="text-base text-brand-blue leading-6"
 								>
 									{__('Learn more')}
 								</Link>

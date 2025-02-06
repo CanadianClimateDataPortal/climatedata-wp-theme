@@ -10,12 +10,8 @@ import { ControlTitle } from '@/components/ui/control-title';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import {
-	setFormat,
-	setEmail,
-	setSubscribe,
-} from '@/features/download/download-slice';
+import { cn, isValidEmail } from '@/lib/utils';
+import { useDownload } from '@/hooks/use-download';
 
 /**
  * Send download request step
@@ -25,18 +21,18 @@ const StepSendRequest: React.FC = () => {
 
 	const { __ } = useI18n();
 
-	const dispatch = useAppDispatch();
-	const { format, email, subscribe } = useAppSelector(
-		(state) => state.download
-	);
+	const { setField, fields } = useDownload();
+	const { format, email, subscribe } = fields;
 
 	const formatOptions = [
 		{ value: 'csv', label: 'CSV' },
 		{ value: 'netcdf', label: 'NetCDF' },
 	];
 
+	const isEmailValid = isValidEmail(email);
+
 	return (
-		<StepContainer title="Download your file" isLastStep>
+		<StepContainer title={__('Download your file')} isLastStep>
 			<StepContainerDescription>
 				<p>
 					{__(
@@ -57,39 +53,50 @@ const StepSendRequest: React.FC = () => {
 				value={format}
 				options={formatOptions}
 				onValueChange={(value) => {
-					dispatch(setFormat(value));
+					setField('format', value);
 				}}
 			/>
 
 			<div className="flex flex-col gap-2">
-				<p>
+				<p className="text-sm text-neutral-grey-medium">
 					{__(
 						'Please enter your email address to receive your download link.'
 					)}
 				</p>
-				<ControlTitle title={__('Email Address')} />
+				<ControlTitle title={__('Email Address')} className="mb-0" />
 				<Input
 					type="email"
 					className="sm:w-64 mb-2"
 					placeholder={__('john.doe@gmail.com')}
 					value={email}
 					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-						dispatch(setEmail(e.target.value));
+						setField('email', e.target.value);
 					}}
 				/>
 				<label
 					htmlFor="newsletter"
-					className="inline-flex items-center space-x-2 mb-8 cursor-pointer"
+					className={cn(
+						'inline-flex items-center space-x-2 mb-8',
+						isEmailValid ? '' : 'opacity-50 cursor-not-allowed'
+					)}
 				>
 					<Checkbox
 						id="newsletter"
 						className="text-brand-red"
+						disabled={!isEmailValid}
 						checked={subscribe}
 						onCheckedChange={() => {
-							dispatch(setSubscribe(!subscribe));
+							setField('subscribe', !subscribe);
 						}}
 					/>
-					<span className="text-sm font-medium leading-none cursor-pointer">
+					<span
+						className={cn(
+							'text-sm font-medium leading-none',
+							isEmailValid
+								? 'cursor-pointer'
+								: 'opacity-75 cursor-not-allowed'
+						)}
+					>
 						{__(
 							'I would like to subscribe to ClimateData Newsletter'
 						)}
@@ -99,8 +106,8 @@ const StepSendRequest: React.FC = () => {
 
 			{/* TODO: make this look good at least */}
 			<div className="mb-4">
-				<p className="text-sm font-semibold mb-1">
-					Enter the characters shown:
+				<p className="text-sm text-neutral-grey-medium leading-5 mb-2">
+					{__('Enter the characters shown:')}
 				</p>
 				<div className="flex items-center space-x-3">
 					{/* Captcha display */}
@@ -115,7 +122,7 @@ const StepSendRequest: React.FC = () => {
 						onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 							setCaptchaValue(e.target.value)
 						}
-						className="border bg-white border-gray-300 rounded px-2 py-1 text-sm"
+						className="border bg-white border-gray-300 rounded px-2 py-1 text-sm placeholder:text-neutral-grey-medium"
 					/>
 				</div>
 			</div>

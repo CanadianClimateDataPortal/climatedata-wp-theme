@@ -9,17 +9,8 @@ import {
 	StepContainerDescription,
 } from '@/components/download/step-container';
 
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import {
-	setStartYear,
-	setEndYear,
-	setFrequency,
-	setEmissionScenarios,
-	setPercentiles,
-	setDecimalPlace,
-} from '@/features/download/download-slice';
-
 import { normalizeDropdownOptions } from '@/lib/format';
+import { useDownload } from '@/hooks/use-download';
 
 /**
  * Additional details step
@@ -27,7 +18,7 @@ import { normalizeDropdownOptions } from '@/lib/format';
 const StepAdditionalDetails: React.FC = () => {
 	const { __ } = useI18n();
 
-	const dispatch = useAppDispatch();
+	const { setField, fields } = useDownload();
 	const {
 		startYear,
 		endYear,
@@ -35,7 +26,7 @@ const StepAdditionalDetails: React.FC = () => {
 		emissionScenarios,
 		percentiles,
 		decimalPlace,
-	} = useAppSelector((state) => state.download);
+	} = fields;
 
 	const yearRange = Array.from({ length: 31 }, (_, i) => i + 2000);
 	const yearOptions = normalizeDropdownOptions(
@@ -82,7 +73,7 @@ const StepAdditionalDetails: React.FC = () => {
 					value={startYear}
 					options={yearOptions}
 					onChange={(value) => {
-						dispatch(setStartYear(value));
+						setField('startYear', value);
 					}}
 				/>
 
@@ -92,7 +83,7 @@ const StepAdditionalDetails: React.FC = () => {
 					value={endYear}
 					options={yearOptions}
 					onChange={(value) => {
-						dispatch(setEndYear(value));
+						setField('endYear', value);
 					}}
 				/>
 			</div>
@@ -105,7 +96,7 @@ const StepAdditionalDetails: React.FC = () => {
 				options={frequencyOptions}
 				value={frequency}
 				onValueChange={(value) => {
-					dispatch(setFrequency(value));
+					setField('frequency', value);
 				}}
 			/>
 
@@ -119,7 +110,7 @@ const StepAdditionalDetails: React.FC = () => {
 				options={emissionScenariosOptions}
 				values={emissionScenarios}
 				onChange={(values) => {
-					dispatch(setEmissionScenarios(values));
+					setField('emissionScenarios', values);
 				}}
 			/>
 
@@ -133,7 +124,7 @@ const StepAdditionalDetails: React.FC = () => {
 				options={percentilesOptions}
 				values={percentiles}
 				onChange={(values) => {
-					dispatch(setPercentiles(values));
+					setField('percentiles', values);
 				}}
 			/>
 
@@ -143,7 +134,7 @@ const StepAdditionalDetails: React.FC = () => {
 				value={decimalPlace}
 				options={decimalPlaceOptions}
 				onChange={(value) => {
-					dispatch(setDecimalPlace(value));
+					setField('decimalPlace', value);
 				}}
 			/>
 		</StepContainer>

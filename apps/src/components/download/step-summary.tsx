@@ -4,55 +4,69 @@ import { PencilLine } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { useAppSelector } from '@/app/hooks';
 import { useDownload } from '@/hooks/use-download';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 const StepSummary: React.FC = () => {
-	const { __ } = useI18n();
+	const { __, _n } = useI18n();
 
-	const { currentStep, goToStep } = useDownload();
-
-	const state = useAppSelector((state) => state.download);
+	const { currentStep, goToStep, fields } = useDownload();
+	const {
+		dataset,
+		variable,
+		version,
+		degrees,
+		selectedCells,
+		startYear,
+		endYear,
+		frequency,
+		emissionScenarios,
+		percentiles,
+		decimalPlace,
+	} = fields;
 
 	const summaryData = [
 		{
 			title: __('Dataset'),
-			content: [state.dataset?.name],
+			content: [dataset?.name],
 		},
 		{
 			title: __('Variable'),
-			content: [state.variable?.title],
+			content: [variable?.title],
 		},
 		{
 			title: __('Variable options'),
-			content:
-				`${state.version}, ` +
-				__('MEAN TEMP >') +
-				' ' +
-				state.degrees +
-				' °C',
+			content: `${version}, ` + __('MEAN TEMP') + ' > ' + degrees + ' °C',
 		},
 		{
 			title: __('Location or area'),
-			content: `${state.selectedCells} ` + __(' cells selected'),
+			content: _n(
+				'1 cell selected',
+				'%d cells selected',
+				selectedCells
+			).replace('%d', String(selectedCells)),
 		},
 		{
 			title: __('Additional details'),
 			content: [
-				`${state.startYear}-${state.endYear}`,
-				state.frequency,
-				state.percentiles.length === 7
+				`${startYear}-${endYear}`,
+				frequency,
+				percentiles.length === 7
 					? __('All percentiles')
-					: `${state.percentiles.length} ` + __('percentiles'),
-				state.emissionScenarios.length
-					? `${state.emissionScenarios.length} ` +
-						(state.emissionScenarios.length === 1
-							? __('Scenario selected')
-							: __('Scenarios selected'))
+					: _n(
+							'1 percentile',
+							'%d percentiles',
+							percentiles.length
+						).replace('%d', String(percentiles.length)),
+				emissionScenarios.length
+					? _n(
+							'1 Scenario selected',
+							'%d Scenarios selected',
+							emissionScenarios.length
+						).replace('%d', String(emissionScenarios.length))
 					: __('No Scenarios selected'),
-				`${state.decimalPlace} Decimal places`,
+				`${decimalPlace} Decimal places`,
 			].join(', '),
 		},
 	];
@@ -65,7 +79,9 @@ const StepSummary: React.FC = () => {
 			)}
 		>
 			<CardHeader className="py-4">
-				<CardTitle className="text-xl font-semibold">Summary</CardTitle>
+				<CardTitle className="text-xl font-semibold">
+					{__('Summary')}
+				</CardTitle>
 			</CardHeader>
 			<CardContent>
 				{summaryData
@@ -76,7 +92,7 @@ const StepSummary: React.FC = () => {
 							className="flex items-start justify-between py-4 border-t border-soft-purple last:pb-0"
 						>
 							<div className="flex-1">
-								<h3 className="text-xs font-medium text-dark-purple uppercase mb-1">
+								<h3 className="text-xs font-semibold text-dark-purple tracking-wider leading-4 uppercase mb-1">
 									{item.title}
 								</h3>
 								<p className="text-brand-blue">

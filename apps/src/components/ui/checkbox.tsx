@@ -88,11 +88,11 @@ const CheckboxFactory: React.FC<{
 	};
 
 	return (
-		<div className={cn('checkbox-factory space-y-4 mb-2', className)}>
+		<div className={cn('checkbox-factory space-y-2 mb-2', className)}>
 			{title && <ControlTitle title={title} tooltip={tooltip} />}
 			<div
 				className={cn(
-					'flex flex-wrap gap-y-4 gap-x-0',
+					'flex flex-wrap gap-y-2 gap-x-0',
 					orientationClasses[orientation]
 				)}
 			>
@@ -112,7 +112,7 @@ const CheckboxFactory: React.FC<{
 								handleCheckboxChange(checked, option.value)
 							}
 						/>
-						<span className="text-zinc-900 text-sm font-medium leading-none cursor-pointer">
+						<span className="text-zinc-900 text-sm leading-5 cursor-pointer">
 							{option.label}
 						</span>
 					</label>

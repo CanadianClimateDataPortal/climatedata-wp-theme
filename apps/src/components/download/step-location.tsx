@@ -16,31 +16,29 @@ import SearchControl from '@/components/map-layers/search-control';
 import GeometryControls from '@/components/map-layers/geometry-controls';
 import GridLayer from '@/components/map-layers/grid-layer';
 
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setInteractiveRegion } from '@/features/download/download-slice';
+import { cn } from '@/lib/utils';
 import {
 	CANADA_CENTER,
 	DEFAULT_ZOOM,
 	DEFAULT_MIN_ZOOM,
 	DEFAULT_MAX_ZOOM,
 } from '@/lib/constants';
+import { useDownload } from '@/hooks/use-download';
 
 /**
  * Location step
  */
 const StepLocation: React.FC = () => {
-	const { __ } = useI18n();
+	const { __, _n } = useI18n();
 
-	const dispatch = useAppDispatch();
-	const { interactiveRegion, selectedCells } = useAppSelector(
-		(state) => state.download
-	);
+	const { setField, fields } = useDownload();
+	const { interactiveRegion, selectedCells } = fields;
 
 	const [selectionMode, setSelectionMode] = useState<string>('cells');
 
 	// TODO: when selecting inside the map, update the selected cells
 	// const handleRegionSelected = (cells: number) => {
-	// 	dispatch(setSelectedCells(cells));
+	// 	setField('selectedCells', cells);
 	// }
 
 	// TODO: fetch these values from the API
@@ -52,7 +50,7 @@ const StepLocation: React.FC = () => {
 	];
 
 	return (
-		<StepContainer title="Select a location or area">
+		<StepContainer title={__('Select a location or area')}>
 			<StepContainerDescription>
 				{__(
 					'Using the tool below, you can select or draw a selection to include in your download file.'
@@ -68,7 +66,7 @@ const StepLocation: React.FC = () => {
 						label={__('Interactive Regions')}
 						tooltip={__('Select an option')}
 						onChange={(value) => {
-							dispatch(setInteractiveRegion(value));
+							setField('interactiveRegion', value);
 						}}
 					/>
 				</div>
@@ -90,11 +88,22 @@ const StepLocation: React.FC = () => {
 						/>
 						<div>
 							<ControlTitle
-								title={__('You selected')}
+								title={__('You selected:')}
 								className="my-0"
 							/>
-							<div className="text-2xl text-neutral-grey-medium font-semibold">
-								{selectedCells} {__('Cells')}
+							<div
+								className={cn(
+									'text-2xl font-semibold leading-7',
+									selectedCells > 0
+										? 'text-brand-blue'
+										: 'text-neutral-grey-medium'
+								)}
+							>
+								{_n(
+									'1 Cell',
+									`${selectedCells} Cells`,
+									selectedCells
+								)}
 							</div>
 						</div>
 					</div>
@@ -108,7 +117,7 @@ const StepLocation: React.FC = () => {
 				minZoom={DEFAULT_MIN_ZOOM}
 				maxZoom={DEFAULT_MAX_ZOOM}
 				scrollWheelZoom={false}
-				className="h-[560px]"
+				className="h-[560px] font-sans"
 			>
 				{selectionMode === 'region' && <GeometryControls />}
 

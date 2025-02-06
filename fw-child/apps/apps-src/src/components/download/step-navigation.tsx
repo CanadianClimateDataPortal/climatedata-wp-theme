@@ -36,14 +36,14 @@ const StepNavigation: React.FC<{ totalSteps: number }> = ({ totalSteps }) => {
 						<React.Fragment key={step}>
 							<div
 								className={cn(
-									'flex items-center justify-center rounded-full shadow-sm w-10 h-10 text-xl',
+									'flex items-center justify-center rounded-full shadow-sm w-10 h-10',
 									currentStateClasses,
 								)}
 							>
 								{isCompleted ? (
 									<Check />
 								) : (
-									step
+									<span className="text-xl font-serif font-bold leading-5">{step}</span>
 								)}
 							</div>
 

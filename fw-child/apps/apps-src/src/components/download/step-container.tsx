@@ -19,8 +19,8 @@ const StepContainer = ({ title, isLastStep = false, children }: {
 	return (
 		<div className="step-container">
 			<div className="flex items-center gap-2 mb-2">
-				<div className="text-4xl font-boldbold text-brand-blue whitespace-nowrap">{stepText}:</div>
-				<div className="text-2xl text-zinc-900 leading-tight">{title}</div>
+				<div className="text-[40px] text-brand-blue font-bold font-serif leading-10 whitespace-nowrap">{stepText}:</div>
+				<div className="text-2xl text-zinc-900 leading-6">{title}</div>
 			</div>
 			{children}
 		</div>
@@ -29,7 +29,7 @@ const StepContainer = ({ title, isLastStep = false, children }: {
 StepContainer.displayName = "StepContainer";
 
 const StepContainerDescription = ({ children }: { children: React.ReactNode }) => (
-	<div className="text-sm text-cdc-black font-medium mb-6">
+	<div className="text-sm text-cdc-black mb-6">
 		{children}
 	</div>
 );

@@ -55,18 +55,18 @@
 		--sidebar-ring: 217.2 91.2% 59.8%;
 		--brand-red: 344.5 89.6% 49.2%;
 		--red-hover: 350.2 65.6% 40.2%;
-		--dark-purple: 220.2 22.6% 47.9%;
-		--soft-purple: 224 90% 88%;
+		--dark-purple: 225.33 18.22% 48.43%;
+		--soft-purple: 224.21 90.48% 87.65%;
 		--brand-blue: 224.53 91.35% 59.22%;
 		--brand-blue-medium: 224.4 87.2% 61.6%;
-		--cdc-black: 210 33.3% 7.8%;
+		--cdc-black: 205 50% 4.71%;
 		--cold-grey-001: 220 33.3% 94.7%;
 		--cold-grey-002: 220 20% 91.6%;
 		--cold-grey-003: 220 18.4% 89.2%;
 		--cold-grey-004: 220 13.8% 80.4%;
 		--cold-grey-005: 220 10% 81%;
 		--grey-dark: 210 11.1% 13.1%;
-		--neutral-grey-medium: 0 0% 46.7%;
+		--neutral-grey-medium: 240 3.83% 46.08%;
 		--neutral-grey-light: 0 0% 97.8%;
 	}
 	.dark {
@@ -116,6 +116,36 @@
 	}
 }
 
+@font-face {
+	font-family: 'CDCSerif';
+	font-weight: normal;
+	src: url('@fonts/CDCSerif-Medium.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'CDCSerif';
+	font-weight: bold;
+	src: url('@fonts/CDCSerif-Bold.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'CDCSans';
+	src: url('@fonts/CDCSans-Light.woff2');
+	font-weight: normal;
+}
+
+@font-face {
+	font-family: 'CDCSans';
+	src: url('@fonts/CDCSans-Book.woff2');
+	font-weight: 500;
+}
+
+@font-face {
+	font-family: 'CDCSans';
+	src: url('@fonts/CDCSans-SemiBold.woff2');
+	font-weight: 600;
+}
+
 /* map search control override styles */
 
 .leaflet-container .leaflet-control-search {
@@ -161,7 +191,6 @@
 }
 
 .leaflet-container .leaflet-control-search .search-input {
-	color: #09090B;
 	padding: 5px;
 	border: none;
 	margin: 0;

@@ -17,7 +17,7 @@ const Input = forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputEl
 					"bg-background px-3 py-2",
 					"text-sm ring-offset-background",
 					"file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground",
-					"placeholder:text-muted-foreground",
+					"placeholder:text-neutral-grey-medium",
 					"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-blue",
 					"disabled:cursor-not-allowed disabled:opacity-50",
 					className

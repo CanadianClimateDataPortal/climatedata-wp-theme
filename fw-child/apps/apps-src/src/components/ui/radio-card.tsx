@@ -41,7 +41,7 @@ const RadioCard: React.FC<RadioCardProps> = ({
     <div
       className={cn(
         "radio-card",
-        "flex flex-col mb-4 bg-white hover:bg-neutral-grey-light border border-cold-grey-2 transition-colors duration-100",
+        "flex flex-col bg-white hover:bg-neutral-grey-light border border-cold-grey-2 transition-colors duration-100",
         selected ? 'bg-neutral-grey-light border-brand-blue' : '',
         className
       )}
@@ -56,7 +56,7 @@ const RadioCard: React.FC<RadioCardProps> = ({
       >
         <div className="p-2">
           <div className="flex items-start">
-            <div className="grow text-sm font-semibold mr-4">{title}</div>
+            <div className="grow text-base text-zinc-950 font-semibold leading-4 mr-4">{title}</div>
             <input
               type="radio"
               name={radioGroup}
@@ -70,7 +70,7 @@ const RadioCard: React.FC<RadioCardProps> = ({
           {description && (
             <div
               className={cn(
-                'line-clamp-3 text-xs text-gray-500 my-2',
+                'line-clamp-3 text-sm text-neutral-grey-medium leading-5 my-2',
                 thumbnail ? '' : 'pr-16',
               )}
               dangerouslySetInnerHTML={{ __html: description }}

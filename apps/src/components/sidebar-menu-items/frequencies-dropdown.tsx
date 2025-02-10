@@ -11,13 +11,14 @@ import { SidebarMenuItem } from '@/components/ui/sidebar';
 import Dropdown from '@/components/ui/dropdown';
 
 // other
-import { useAppDispatch } from '@/app/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setFrequency } from '@/features/map/map-slice';
 
 const FrequenciesDropdown: React.FC = () => {
 	const { __ } = useI18n();
 
 	const dispatch = useAppDispatch();
+	const frequency = useAppSelector((state) => state.map.frequency);
 
 	// TODO: fetch these values from the API
 	const options = [
@@ -49,7 +50,7 @@ const FrequenciesDropdown: React.FC = () => {
 				label={__('Frequencies')}
 				tooltip={<Tooltip />}
 				options={options}
-				defaultValue={options[0].value}
+				value={frequency}
 				onChange={(value) => {
 					dispatch(setFrequency(value));
 				}}

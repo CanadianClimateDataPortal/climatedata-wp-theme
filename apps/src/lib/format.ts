@@ -131,6 +131,20 @@ export const normalizeRadioCardProps = async <T extends 'taxonomy' | 'post'>(
 	return normalizedData as T extends 'taxonomy' ? TaxonomyData[] : PostData[];
 };
 
+export const doyFormatter = (value: number, language: string) => {
+	// First day of the year (UTC)
+	const firstDayOfYear = Date.UTC(2019, 0, 1);
+
+	// Convert the day-of-year value to a Date object
+	const date = new Date(firstDayOfYear + 1000 * 60 * 60 * 24 * value);
+
+	// Format the date according to the given language
+	return date.toLocaleDateString(language, {
+		month: 'long',
+		day: 'numeric',
+	});
+};
+
 export const buttonVariants = cva(
 	'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
 	{

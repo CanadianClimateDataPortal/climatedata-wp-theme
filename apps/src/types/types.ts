@@ -146,11 +146,12 @@ export interface MapState {
 	emissionScenario: string;
 	emissionScenarioCompare: boolean;
 	emissionScenarioCompareTo: string;
-	interactiveRegion: string | null;
-	thresholdValue: number | null;
+	interactiveRegion: string;
+	thresholdValue: number;
 	frequency: string;
 	timePeriodEnd: number[]; // using an array because the slider that uses it expects an array
 	recentLocations: MapLocation[];
+	variable: string;
 	dataset: string;
 	decade: string;
 	pane: string;
@@ -403,32 +404,47 @@ export interface ZoomControlProps {
 	onZoomOut: () => void;
 }
 
+// {
+// 	"geo_id": "OAHEK",
+// 	"geo_name": "Hicks Lake",
+// 	"generic_term": "Lake",
+// 	"location": "",
+// 	"province": "Nunavut",
+// 	"lat": "61.416667",
+// 	"lon": "-100",
+// 	"distance": "10701.56037475816",
+// 	"coords": [
+// 	61.5122,
+// 	-99.9756
+// ],
+// 	"lng": "-100",
+// 	"province_short": "NU",
+// 	"title": "Hicks Lake, NU"
+// }
+
 export interface ClimateDataProps {
-	data: {
-		// If you have your own typed interface, use that here instead
-		observations: number[][];
-		modeled_historical_median: number[][];
-		modeled_historical_range: number[][];
-		ssp126_median: number[][];
-		ssp126_range: number[][];
-		ssp245_median: number[][];
-		ssp245_range: number[][];
-		ssp585_median: number[][];
-		ssp585_range: number[][];
-		'30y_observations'?: Record<string, number[]>;
-		'30y_ssp126_median'?: Record<string, number[]>;
-		'30y_ssp126_range'?: Record<string, number[]>;
-		'30y_ssp245_median'?: Record<string, number[]>;
-		'30y_ssp245_range'?: Record<string, number[]>;
-		'30y_ssp585_median'?: Record<string, number[]>;
-		'30y_ssp585_range'?: Record<string, number[]>;
-		delta7100_ssp126_median?: Record<string, number[]>;
-		delta7100_ssp126_range?: Record<string, number[]>;
-		delta7100_ssp245_median?: Record<string, number[]>;
-		delta7100_ssp245_range?: Record<string, number[]>;
-		delta7100_ssp585_median?: Record<string, number[]>;
-		delta7100_ssp585_range?: Record<string, number[]>;
-	};
+	observations: number[][];
+	modeled_historical_median: number[][];
+	modeled_historical_range: number[][];
+	ssp126_median: number[][];
+	ssp126_range: number[][];
+	ssp245_median: number[][];
+	ssp245_range: number[][];
+	ssp585_median: number[][];
+	ssp585_range: number[][];
+	'30y_observations'?: Record<string, number[]>;
+	'30y_ssp126_median'?: Record<string, number[]>;
+	'30y_ssp126_range'?: Record<string, number[]>;
+	'30y_ssp245_median'?: Record<string, number[]>;
+	'30y_ssp245_range'?: Record<string, number[]>;
+	'30y_ssp585_median'?: Record<string, number[]>;
+	'30y_ssp585_range'?: Record<string, number[]>;
+	delta7100_ssp126_median?: Record<string, number[]>;
+	delta7100_ssp126_range?: Record<string, number[]>;
+	delta7100_ssp245_median?: Record<string, number[]>;
+	delta7100_ssp245_range?: Record<string, number[]>;
+	delta7100_ssp585_median?: Record<string, number[]>;
+	delta7100_ssp585_range?: Record<string, number[]>;
 }
 
 /**
@@ -466,4 +482,27 @@ export interface AnimatedPanelProps extends ProviderPanelProps {
 export interface InteractivePanelProps<T> {
 	selected: T | null;
 	onSelect: (selected: T) => void;
+}
+
+/**
+ * Represents the options for the request to fetch chart data.
+ */
+export interface ChartDataOptions {
+	latlng: L.LatLng;
+	variable: string;
+	dataset: string;
+	frequency: string;
+}
+
+export interface DeltaValuesOptions {
+	endpoint: string;
+	varName: string;
+	frequency: string;
+	params: string;
+}
+
+export interface PercentileData {
+	p10?: number;
+	p50?: number;
+	p90?: number;
 }

@@ -11,16 +11,19 @@ import { SidebarMenuItem } from '@/components/ui/sidebar';
 import Dropdown from '@/components/ui/dropdown';
 
 // other
-import { useAppDispatch } from '@/app/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setInteractiveRegion } from '@/features/map/map-slice';
 
 const InteractiveRegionsDropdown: React.FC = () => {
 	const { __ } = useI18n();
 
 	const dispatch = useAppDispatch();
+	const interactiveValue = useAppSelector(
+		(state) => state.map.interactiveRegion
+	);
 
 	// TODO: fetch these values from the API
-	const options = [
+	const options: { value: string; label: string }[] = [
 		{ value: 'gridded_data', label: __('Grid Cells') },
 		{ value: 'census', label: __('Census Subdivisions') },
 		{ value: 'health', label: __('Health Regions') },
@@ -44,6 +47,7 @@ const InteractiveRegionsDropdown: React.FC = () => {
 				options={options}
 				label={__('Interactive Regions')}
 				tooltip={<Tooltip />}
+				value={interactiveValue}
 				onChange={handleInteractiveRegionChange}
 			/>
 		</SidebarMenuItem>

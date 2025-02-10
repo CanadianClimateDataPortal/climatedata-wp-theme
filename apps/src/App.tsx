@@ -23,7 +23,7 @@ function App() {
 					<SidebarProvider>
 						<AppSidebar />
 						<SidebarTrigger />
-						<main>
+						<main className="flex flex-col h-screen">
 							<Header />
 							<MapWrapper />
 						</main>

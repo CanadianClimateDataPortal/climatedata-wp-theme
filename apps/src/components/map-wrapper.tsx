@@ -60,13 +60,13 @@ export default function MapWrapper() {
 	};
 
 	return (
-		<div className="relative">
+		<div className="relative flex-1">
 			{mapInfo && <MapHeader data={mapInfo} mapRef={wrapperRef} />}
 			<div
 				ref={wrapperRef}
 				className={cn(
 					'map-wrapper',
-					'grid gap-4',
+					'grid gap-4 h-full',
 					showComparisonMap ? 'sm:grid-cols-2' : 'grid-cols-1'
 				)}
 			>

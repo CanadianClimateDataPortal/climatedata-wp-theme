@@ -9,3 +9,11 @@ export function cn(...inputs: ClassValue[]) {
 export const isValidEmail = (email: string): boolean => {
 	return validator.isEmail(email);
 };
+
+// converts a rem value to pixels
+export const remToPx = (rem: string): number => {
+	return (
+		parseFloat(rem) *
+		parseFloat(getComputedStyle(document.documentElement).fontSize)
+	);
+};

@@ -10,6 +10,8 @@ import StepSendRequest from '@/components/download/step-send-request';
 import StepNavigation from '@/components/download/step-navigation';
 import StepSummary from '@/components/download/step-summary';
 
+import { MapProvider } from '@/context/map-provider';
+import { AnimatedPanelProvider } from '@/context/animated-panel-provider';
 import { DownloadProvider } from '@/context/download-provider';
 import { useDownload } from '@/hooks/use-download';
 import { cn } from '@/lib/utils';
@@ -73,20 +75,24 @@ const Steps: React.FC = () => {
 Steps.displayName = 'Steps';
 
 const App: React.FC = () => (
-	<DownloadProvider>
-		<div className="min-h-screen bg-cold-grey-1">
-			<div className="max-w-6xl mx-auto py-10">
-				<div className="flex flex-col sm:flex-row gap-4">
-					<div className="flex-1">
-						<Steps />
-					</div>
-					<div className="w-full sm:w-72">
-						<StepSummary />
+	<MapProvider>
+		<AnimatedPanelProvider>
+			<DownloadProvider>
+				<div className="min-h-screen bg-cold-grey-1">
+					<div className="max-w-6xl mx-auto py-10">
+						<div className="flex flex-col sm:flex-row gap-4">
+							<div className="flex-1">
+								<Steps />
+							</div>
+							<div className="w-full sm:w-72">
+								<StepSummary />
+							</div>
+						</div>
 					</div>
 				</div>
-			</div>
-		</div>
-	</DownloadProvider>
+			</DownloadProvider>
+		</AnimatedPanelProvider>
+	</MapProvider>
 );
 
 export default App;

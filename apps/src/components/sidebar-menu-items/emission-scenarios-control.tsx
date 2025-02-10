@@ -24,9 +24,11 @@ const EmissionScenariosControl: React.FC = () => {
 	const { __ } = useI18n();
 	const dispatch = useAppDispatch();
 
-	const { emissionScenario, emissionScenarioCompare } = useAppSelector(
-		(state) => state.map
-	);
+	const {
+		emissionScenario,
+		emissionScenarioCompare,
+		emissionScenarioCompareTo,
+	} = useAppSelector((state) => state.map);
 
 	// TODO: fetch these values from the API
 	const emissionScenariosOptions = [
@@ -62,6 +64,7 @@ const EmissionScenariosControl: React.FC = () => {
 					tooltip={<Tooltip />}
 					placeholder={__('Select an option')}
 					options={emissionScenariosOptions}
+					value={emissionScenario}
 					onChange={handleEmissionScenarioChange}
 				/>
 
@@ -85,6 +88,7 @@ const EmissionScenariosControl: React.FC = () => {
 						options={emissionScenariosOptions.filter(
 							(option) => option.value !== emissionScenario
 						)}
+						value={emissionScenarioCompareTo}
 						onChange={handleEmissionScenarioCompareToChange}
 					/>
 				)}

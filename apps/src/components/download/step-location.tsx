@@ -14,7 +14,10 @@ import Dropdown from '@/components/ui/dropdown';
 import ZoomControl from '@/components/map-layers/zoom-control';
 import SearchControl from '@/components/map-layers/search-control';
 import GeometryControls from '@/components/map-layers/geometry-controls';
-import GridLayer from '@/components/map-layers/grid-layer';
+import CustomPanesLayer from '@/components/map-layers/custom-panes';
+import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions';
+import CellsGridLayer from '@/components/map-layers/cells-grid-layer';
+import MapEvents from '@/components/map-layers/map-events';
 
 import { cn } from '@/lib/utils';
 import {
@@ -24,6 +27,7 @@ import {
 	DEFAULT_MAX_ZOOM,
 } from '@/lib/constants';
 import { useDownload } from '@/hooks/use-download';
+import { useMap } from '@/hooks/use-map';
 
 /**
  * Location step
@@ -31,6 +35,7 @@ import { useDownload } from '@/hooks/use-download';
 const StepLocation: React.FC = () => {
 	const { __, _n } = useI18n();
 
+	const { setMap } = useMap();
 	const { setField, fields } = useDownload();
 	const { interactiveRegion, selectedCells } = fields;
 
@@ -119,17 +124,33 @@ const StepLocation: React.FC = () => {
 				scrollWheelZoom={false}
 				className="h-[560px] font-sans"
 			>
-				{selectionMode === 'region' && <GeometryControls />}
-
-				{selectionMode === 'cells' && <GridLayer />}
-
+				<MapEvents onMapReady={(map: L.Map) => setMap(map)} />
+				<CustomPanesLayer />
+				<InteractiveRegionsLayer />
 				<ZoomControl />
 				<SearchControl className="top-6 left-6" />
 
+				{selectionMode === 'region' && <GeometryControls />}
+				{selectionMode === 'cells' && <CellsGridLayer />}
+
 				<TileLayer
+					attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 					url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-					attribution="&copy; OpenStreetMap contributors"
 				/>
+
+				{/* Basemap TileLayer */}
+				<TileLayer
+					url="//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png"
+					attribution=""
+					subdomains="abcd"
+					pane="basemap"
+					maxZoom={DEFAULT_MAX_ZOOM}
+				/>
+
+				{/*<TileLayer*/}
+				{/*	url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"*/}
+				{/*	attribution="&copy; OpenStreetMap contributors"*/}
+				{/*/>*/}
 			</MapContainer>
 		</StepContainer>
 	);

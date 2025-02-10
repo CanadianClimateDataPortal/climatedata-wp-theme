@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import Highcharts, { Options, SeriesOptionsType } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import 'highcharts/highcharts-more';
@@ -12,7 +12,10 @@ function sortByTimestamp(seriesData: number[][]) {
 	return seriesData.slice().sort((a, b) => a[0] - b[0]);
 }
 
-export function ClimateDataChart({ data }: ClimateDataProps) {
+const ClimateDataChart: React.FC<{ title: string; data: ClimateDataProps }> = ({
+	title,
+	data,
+}) => {
 	const [activeTab, setActiveTab] = useState('annual-values');
 	const { __ } = useI18n();
 
@@ -258,9 +261,7 @@ export function ClimateDataChart({ data }: ClimateDataProps) {
 		<div className="climate-chart z-[500] px-5 py-5">
 			<div className="flex justify-between items-start mb-4">
 				<div className="text-left">
-					<h2 className="text-2xl font-bold m-0">
-						{__('Oldman Lake, AB')}
-					</h2>
+					<h2 className="text-2xl font-bold m-0">{title}</h2>
 					<p className="text-base text-gray-500 m-0">
 						{__(
 							'Historical Canadian Climate Normals – Hottest Day – CMIP6'
@@ -336,4 +337,7 @@ export function ClimateDataChart({ data }: ClimateDataProps) {
 			<HighchartsReact highcharts={Highcharts} options={chartOptions} />
 		</div>
 	);
-}
+};
+ClimateDataChart.displayName = 'ClimateDataChart';
+
+export default ClimateDataChart;

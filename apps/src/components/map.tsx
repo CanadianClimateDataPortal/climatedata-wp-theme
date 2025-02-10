@@ -7,6 +7,7 @@ import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions
 import ZoomControl from '@/components/map-layers/zoom-control';
 import MapEvents from '@/components/map-layers/map-events';
 import SearchControl from '@/components/map-layers/search-control';
+import CellsGridLayer from '@/components/map-layers/cells-grid-layer';
 
 import {
 	CANADA_CENTER,
@@ -27,6 +28,10 @@ export default function Map({
 	onUnmount?: () => void;
 }) {
 	const labelsOpacity = useAppSelector((state) => state.map.opacity.labels);
+	const interactiveRegion = useAppSelector(
+		(state) => state.map.interactiveRegion
+	);
+
 	return (
 		<MapContainer
 			center={CANADA_CENTER}
@@ -44,6 +49,8 @@ export default function Map({
 			<VariableLayer />
 			<ZoomControl />
 			<SearchControl />
+
+			{interactiveRegion === 'gridded_data' && <CellsGridLayer />}
 
 			<TileLayer
 				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

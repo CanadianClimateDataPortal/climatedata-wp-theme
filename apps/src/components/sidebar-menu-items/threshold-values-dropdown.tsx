@@ -11,13 +11,14 @@ import { SidebarMenuItem } from '@/components/ui/sidebar';
 import Dropdown from '@/components/ui/dropdown';
 
 // other
-import { useAppDispatch } from '@/app/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setThresholdValue } from '@/features/map/map-slice';
 
 const ThresholdValuesDropdown: React.FC = () => {
 	const { __ } = useI18n();
 
 	const dispatch = useAppDispatch();
+	const thresholdValue = useAppSelector((state) => state.map.thresholdValue);
 
 	// TODO: fetch these values from the API
 	const options = {
@@ -41,6 +42,7 @@ const ThresholdValuesDropdown: React.FC = () => {
 				}))}
 				label={__('Threshold Values')}
 				tooltip={<Tooltip />}
+				value={thresholdValue}
 				onChange={(value) => {
 					dispatch(setThresholdValue(value));
 				}}

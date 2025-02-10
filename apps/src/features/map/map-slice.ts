@@ -42,16 +42,17 @@ const defaultTimePeriodEnd = Math.min(
 
 // Define the initial state this slice is going to use.
 const initialState: MapState = {
-	emissionScenario: '',
+	dataset: 'cmip6',
+	variable: 'tx_max',
+	decade: '2040',
+	emissionScenario: 'high',
 	emissionScenarioCompare: false,
 	emissionScenarioCompareTo: '',
 	thresholdValue: 5,
+	interactiveRegion: 'gridded_data',
 	frequency: 'ann',
-	interactiveRegion: '',
 	timePeriodEnd: [defaultTimePeriodEnd], // needs an array because of the slider component that uses it
 	recentLocations: [],
-	dataset: 'cmip6',
-	decade: '2040',
 	pane: 'raster',
 	opacity: {
 		mapData: 1,
@@ -64,6 +65,15 @@ const mapSlice = createSlice({
 	name: 'map',
 	initialState,
 	reducers: {
+		setDataset(state, action: PayloadAction<string>) {
+			state.dataset = action.payload;
+		},
+		setVariable(state, action: PayloadAction<string>) {
+			state.variable = action.payload;
+		},
+		setDecade(state, action: PayloadAction<string>) {
+			state.decade = action.payload;
+		},
 		setEmissionScenario(state, action: PayloadAction<string>) {
 			state.emissionScenario = action.payload;
 		},
@@ -73,10 +83,10 @@ const mapSlice = createSlice({
 		setEmissionScenarioCompareTo(state, action: PayloadAction<string>) {
 			state.emissionScenarioCompareTo = action.payload;
 		},
-		setThresholdValue(state, action: PayloadAction<number | null>) {
+		setThresholdValue(state, action: PayloadAction<number>) {
 			state.thresholdValue = action.payload;
 		},
-		setInteractiveRegion(state, action: PayloadAction<string | null>) {
+		setInteractiveRegion(state, action: PayloadAction<string>) {
 			state.interactiveRegion = action.payload;
 		},
 		setFrequency(state, action: PayloadAction<string>) {
@@ -124,6 +134,9 @@ const mapSlice = createSlice({
 
 // Export actions
 export const {
+	setDataset,
+	setVariable,
+	setDecade,
 	setEmissionScenario,
 	setEmissionScenarioCompare,
 	setEmissionScenarioCompareTo,

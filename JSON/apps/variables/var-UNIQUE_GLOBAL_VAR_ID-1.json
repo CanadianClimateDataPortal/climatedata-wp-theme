@@ -19,6 +19,7 @@
       "enabled": true,
       "standard": true,
       "station": true,
+      "grid": "canadagrid",
       "props": {
         "standard": [
           "sea_level"

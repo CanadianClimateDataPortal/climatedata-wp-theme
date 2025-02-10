@@ -1,0 +1,241 @@
+{
+  "variables": [
+    {
+      "id": "UNIQUE_GLOBAL_VAR_ID_SET_ON_WP",
+      "props": {
+        "ids": {
+          "wp": {
+            "post_id": 123
+          }
+        }
+      },
+      "meta": {
+        "updated-on": "2021-01-01 00:00:00",
+        "content": {
+          "title": {
+            "en": "This is a title",
+            "fr": "Ceci est un titre"
+          },
+          "card": {
+            "description": {
+              "en": "This is a description",
+              "fr": "Ceci est une description"
+            },
+            "link": {
+              "en": "LINK_GO_HERE",
+              "fr": "LINK_GO_HERE"
+            }
+          },
+          "thumbnail": {
+            "en": "THUMBNAIL_URL",
+            "fr": "THUMBNAIL_URL"
+          }
+        },
+        "taxonomy": {
+          "sector": {
+            "terms": [
+              {
+                "term_id": 1,
+                "title": {
+                  "en": "Agriculture",
+                  "fr": "Agriculture"
+                }
+              }
+            ]
+          },
+          "region": {
+            "terms": [
+              {
+                "term_id": 2,
+                "title": {
+                  "en": "Atlantic",
+                  "fr": "Atlantique"
+                }
+              }
+            ]
+          },
+          "var-type": {
+            "terms": [
+              {
+                "term_id": 3,
+                "title": {
+                  "en": "Station Data",
+                  "fr": "Données de station"
+                }
+              }
+            ]
+          },
+          "variable-datasets": {
+            "terms": [
+              {
+                "term_id": 4,
+                "title": {
+                  "en": "Historical Climate Data",
+                  "fr": "Données climatiques historiques"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "ANOTHER_UNIQUE_GLOBAL_VAR_ID_SET_ON_WP",
+      "props": {
+        "ids": {
+          "wp": {
+            "post_id": 456
+          }
+        }
+      },
+      "meta": {
+        "updated-on": "2021-01-01 00:00:00",
+        "content": {
+          "title": {
+            "en": "This is a title",
+            "fr": "Ceci est un titre"
+          },
+          "card": {
+            "description": {
+              "en": "This is a description",
+              "fr": "Ceci est une description"
+            },
+            "link": {
+              "en": "LINK_GO_HERE",
+              "fr": "LINK_GO_HERE"
+            }
+          },
+          "thumbnail": {
+            "en": "THUMBNAIL_URL",
+            "fr": "THUMBNAIL_URL"
+          }
+        },
+        "taxonomy": {
+          "sector": {
+            "terms": [
+              {
+                "term_id": 1,
+                "title": {
+                  "en": "Agriculture",
+                  "fr": "Agriculture"
+                }
+              }
+            ]
+          },
+          "region": {
+            "terms": [
+              {
+                "term_id": 2,
+                "title": {
+                  "en": "Atlantic",
+                  "fr": "Atlantique"
+                }
+              }
+            ]
+          },
+          "var-type": {
+            "terms": [
+              {
+                "term_id": 3,
+                "title": {
+                  "en": "Station Data",
+                  "fr": "Données de station"
+                }
+              }
+            ]
+          },
+          "variable-datasets": {
+            "terms": [
+              {
+                "term_id": 4,
+                "title": {
+                  "en": "Historical Climate Data",
+                  "fr": "Données climatiques historiques"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "YET_ANOTHER_UNIQUE_GLOBAL_VAR_ID_SET_ON_WP",
+      "props": {
+        "ids": {
+          "wp": {
+            "post_id": 789
+          }
+        }
+      },
+      "meta": {
+        "updated-on": "2021-01-01 00:00:00",
+        "content": {
+          "title": {
+            "en": "This is a title",
+            "fr": "Ceci est un titre"
+          },
+          "card": {
+            "description": {
+              "en": "This is a description",
+              "fr": "Ceci est une description"
+            },
+            "link": {
+              "en": "LINK_GO_HERE",
+              "fr": "LINK_GO_HERE"
+            }
+          },
+          "thumbnail": {
+            "en": "THUMBNAIL_URL",
+            "fr": "THUMBNAIL_URL"
+          }
+        },
+        "taxonomy": {
+          "sector": {
+            "terms": [
+              {
+                "term_id": 1,
+                "title": {
+                  "en": "Agriculture",
+                  "fr": "Agriculture"
+                }
+              }
+            ]
+          },
+          "region": {
+            "terms": [
+              {
+                "term_id": 2,
+                "title": {
+                  "en": "Atlantic",
+                  "fr": "Atlantique"
+                }
+              }
+            ]
+          },
+          "var-type": {
+            "terms": [
+              {
+                "term_id": 3,
+                "title": {
+                  "en": "Station Data",
+                  "fr": "Données de station"
+                }
+              }
+            ]
+          },
+          "variable-datasets": {
+            "terms": [
+              {
+                "term_id": 4,
+                "title": {
+                  "en": "Historical Climate Data",
+                  "fr": "Données climatiques historiques"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

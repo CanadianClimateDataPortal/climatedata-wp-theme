@@ -1,0 +1,140 @@
+{
+  "props": {
+    "api": {
+      "internal": {
+        "url": "URL_OF_WP",
+        "endpoint": {
+          "idf": {
+            "url": "/path/to/endpoint",
+            "method": "GET",
+            "allowed_params": []
+          },
+          "another_endpoint": {
+            "url": "/path/to/endpoint",
+            "method": "GET",
+            "allowed_params": []
+          }
+        }
+      },
+      "geoserver": {
+        "url": "URL_GO_HERE",
+        "endpoint": {
+          "endpoint_name": {
+            "url": "/path/to/endpoint",
+            "method": "GET",
+            "allowed_params": [
+              "LAYERS",
+              "QUERY_LAYERS",
+              "INFO_FORMAT",
+              "FEATURE_COUNT"
+            ]
+          },
+          "idf": {
+            "url": "/path/to/endpoint",
+            "method": "GET",
+            "allowed_params": [
+              "LAYERS",
+              "QUERY_LAYERS",
+              "INFO_FORMAT",
+              "FEATURE_COUNT"
+            ]
+          },
+          "ahccd": {
+            "url": "/path/to/endpoint",
+            "method": "GET",
+            "allowed_params": [
+              "LAYERS",
+              "QUERY_LAYERS",
+              "INFO_FORMAT",
+              "FEATURE_COUNT"
+            ]
+          }
+        }
+      },
+      "msc-geomet": {
+        "url": "https://api.weather.gc.ca",
+        "endpoint": {
+          "climate-normals": {
+            "name": "climate-normals",
+            "url": "/collections/climate-normals/",
+            "method": "GET",
+            "allowed_params": [
+              "LAYERS",
+              "QUERY_LAYERS",
+              "INFO_FORMAT",
+              "FEATURE_COUNT"
+            ]
+          }
+        }
+      }
+    },
+    "geolocation": {
+      "center": {
+        "lat": 46.603354,
+        "lng": 1.888334
+      },
+      "bounds": [
+        {
+          "lat": 51.124213,
+          "lng": -5.267857
+        },
+        {
+          "lat": 41.342726,
+          "lng": 9.559320
+        }
+      ]
+    },
+    "search": {
+      "placeholder": {
+        "en": "Search for a location",
+        "fr": "Rechercher un lieu"
+      },
+      "zoom": {
+        "default": 10
+      }
+    },
+    "zoom": {
+      "default": 4,
+      "min": 3,
+      "max": 11
+    },
+    "links": {
+      "home": {
+        "en": "LINK_GO_HERE",
+        "fr": "LINK_GO_HERE"
+      },
+      "download": {
+        "en": "LINK_GO_HERE",
+        "fr": "LINK_GO_HERE"
+      },
+      "about": {
+        "en": "LINK_GO_HERE",
+        "fr": "LINK_GO_HERE"
+      },
+      "support": {
+        "en": "LINK_GO_HERE",
+        "fr": "LINK_GO_HERE"
+      }
+    },
+    "share": {
+      "facebook": {
+        "enabled": true,
+        "url": "URL_GO_HERE"
+      },
+      "x": {
+        "enabled": true,
+        "url": "URL_GO_HERE"
+      },
+      "linkedin": {
+        "enabled": true,
+        "url": "URL_GO_HERE"
+      },
+      "email": {
+        "enabled": true
+      }
+    },
+    "encryption": {
+      "salt": "SALT_GO_HERE"
+    }
+  }
+}

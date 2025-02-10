@@ -1,0 +1,1205 @@
+{
+  "id": "UNIQUE_GLOBAL_VAR_ID_SET_ON_WP",
+  "props": {
+    "ids": {
+      "wp": {
+        "post_id": 123
+      },
+      "map": {
+        "standard": "MAP_STANDARD_ID",
+        "station": "MAP_STATION_ID"
+      },
+      "download": {
+        "precalculated": "DOWNLOAD_PRECALCULATED_ID",
+        "analyze": "DOWNLOAD_ANALYZE_ID",
+        "station": "DOWNLOAD_STATION_ID"
+      }
+    },
+    "map": {
+      "enabled": true,
+      "standard": true,
+      "station": true,
+      "props": {
+        "standard": [
+          "sea_level"
+        ],
+        "station": [
+          "legand",
+          "ahccd",
+          "idf",
+          "bdv"
+        ]
+      }
+    },
+    "download": {
+      "enabled": true,
+      "precalculated": false,
+      "analyze": false,
+      "station": false,
+      "data_processing": {
+        "instant": false,
+        "email": true
+      },
+      "props": {
+        "precalculated": [
+          "TAG_1",
+          "TAG_2"
+        ],
+        "analyze": [
+          "TAG_1",
+          "TAG_2"
+        ]
+      }
+    },
+    "period": {
+      "year_min": 1950,
+      "year_max": 2100,
+      "year_step": 10,
+      "year_default": 2020,
+      "year_interval": 30
+    },
+    "map_layers": {
+      "opacity": {
+        "data": true,
+        "labels": true,
+        "pins": false
+      }
+    }
+  },
+  "fields": {
+    "base": {
+      "versions": {
+        "name": "versions",
+        "type": "select",
+        "default": "cmip5",
+        "label": {
+          "en": "Versions",
+          "fr": "Versions"
+        },
+        "instruction": {
+          "en": "Select a version",
+          "fr": "Sélectionnez une version"
+        },
+        "hint": {
+          "en": "Select a version",
+          "fr": "Sélectionnez une version"
+        },
+        "placeholder": {
+          "en": "Select a version",
+          "fr": "Sélectionnez une version"
+        },
+        "options": [
+          {
+            "value": "cmip5",
+            "label": {
+              "en": "CanDCS-U5",
+              "fr": "CanDCS-U5"
+            }
+          },
+          {
+            "value": "cmip6",
+            "label": {
+              "en": "CanDCS-U6",
+              "fr": "CanDCS-U6"
+            }
+          },
+          {
+            "value": "humidex",
+            "label": {
+              "en": "Humidex (CMIP6)",
+              "fr": "Humidex CMIP6"
+            }
+          },
+          {
+            "value": "ahccd",
+            "label": {
+              "en": "AHCCD",
+              "fr": "AHCCD"
+            },
+            "props": {
+              "map": {
+                "enabled": false
+              },
+              "download": {
+                "enabled": false
+              }
+            }
+          }
+        ],
+        "props": {}
+      },
+      "thresholds": {
+        "name": "thresholds",
+        "type": "select",
+        "default": 10,
+        "label": {
+          "en": "Threshold Value",
+          "fr": "Valeur de Seuil"
+        },
+        "instruction": {
+          "en": "Select a threshold value",
+          "fr": "Sélectionnez une valeur de seuil"
+        },
+        "hint": {
+          "en": "Select a threshold value",
+          "fr": "Sélectionnez une valeur de seuil"
+        },
+        "placeholder": {
+          "en": "Select a threshold value",
+          "fr": "Sélectionnez une valeur de seuil"
+        },
+        "options": [
+          {
+            "value": 5,
+            "label": {
+              "en": "5",
+              "fr": "5"
+            }
+          },
+          {
+            "value": 10,
+            "label": {
+              "en": "10",
+              "fr": "10"
+            }
+          },
+          {
+            "value": 20,
+            "label": {
+              "en": "20",
+              "fr": "20"
+            }
+          },
+          {
+            "value": 30,
+            "label": {
+              "en": "30",
+              "fr": "30"
+            }
+          }
+        ],
+        "props": {
+          "unit": "C",
+          "labels": {
+            "download": {
+              "en": "Threshold Value Download",
+              "fr": "Valeur de seuil Télécharger"
+            }
+          }
+        }
+      },
+      "scenario": {
+        "name": "scenario",
+        "type": "select",
+        "default": "rcp85",
+        "label": {
+          "en": "Emissions Scenario",
+          "fr": "Scénario d'émissions"
+        },
+        "instruction": {
+          "en": "Select a scenario",
+          "fr": "Sélectionnez un scénario"
+        },
+        "hint": {
+          "en": "Select a scenario",
+          "fr": "Sélectionnez un scénario"
+        },
+        "placeholder": {
+          "en": "Select a scenario",
+          "fr": "Sélectionnez un scénario"
+        },
+        "options": [
+          {
+            "value": "rcp45",
+            "label": {
+              "en": "RCP 4.5",
+              "fr": "RCP 4.5"
+            }
+          },
+          {
+            "value": "rcp85",
+            "label": {
+              "en": "RCP 8.5",
+              "fr": "RCP 8.5"
+            },
+            "props": {
+              "map": {
+                "enabled": false
+              },
+              "download": {
+                "enabled": false
+              },
+              "labels": {
+                "download": {
+                  "en": "RCP 8.5 Download",
+                  "fr": "RCP 8.5 Télécharger"
+                }
+              },
+              "period": {
+                "year-min": 2100,
+                "year-max": 2100,
+                "year-step": 0,
+                "year-default": 2100,
+                "year-interval": 0
+              }
+            }
+          }
+        ],
+        "props": {
+          "map": {
+            "enabled": false
+          },
+          "download": {
+            "enabled": false
+          },
+          "names": {
+            "download": "scenario_download"
+          },
+          "types": {
+            "download": "checkbox"
+          },
+          "defaults": {
+            "download": "rcp45"
+          },
+          "labels": {
+            "download": {
+              "en": "Emissions Scenario Download",
+              "fr": "Scénario d'émissions Télécharger"
+            }
+          },
+          "instructions": {
+            "download": {
+              "en": "Select a scenario - Download",
+              "fr": "Sélectionnez un scénario - Télécharger"
+            }
+          },
+          "hint": {
+            "download": {
+              "en": "Select a scenario - Download",
+              "fr": "Sélectionnez un scénario - Télécharger"
+            }
+          },
+          "placeholder": {
+            "download": {
+              "en": "Select a scenario - Download",
+              "fr": "Sélectionnez un scénario - Télécharger"
+            }
+          },
+          "map_comparison": {
+            "map": {
+              "enabled": false
+            },
+            "label": {
+              "en": "Compare scenarios",
+              "fr": "Comparer les scénarios"
+            }
+          }
+        }
+      },
+      "regions": {
+        "name": "regions",
+        "type": "select",
+        "default": "gridded",
+        "label": {
+          "en": "Interactive Regions",
+          "fr": "Régions interactives"
+        },
+        "instruction": {
+          "en": "Select a region",
+          "fr": "Sélectionnez une région"
+        },
+        "hint": {
+          "en": "Select a region",
+          "fr": "Sélectionnez une région"
+        },
+        "placeholder": {
+          "en": "Select a region",
+          "fr": "Sélectionnez une région"
+        },
+        "options": [
+          {
+            "value": "gridded",
+            "label": {
+              "en": "Gridded Data",
+              "fr": "Données maillées"
+            }
+          },
+          {
+            "value": "census",
+            "label": {
+              "en": "Census Subdivisions",
+              "fr": "Subdivisions de recensement"
+            }
+          },
+          {
+            "value": "health",
+            "label": {
+              "en": "Health Regions",
+              "fr": "Régions de santé"
+            }
+          },
+          {
+            "value": "watersheds",
+            "label": {
+              "en": "Watersheds",
+              "fr": "Bassins versants"
+            }
+          }
+        ],
+        "props": {
+          "names": {
+            "download": "regions_download"
+          },
+          "labels": {
+            "download": {
+              "en": "Select Interactive Regions Download",
+              "fr": "Sélectionnez les régions interactives Télécharger"
+            }
+          }
+        }
+      },
+      "regions_selections": {
+        "name": "regions_selections",
+        "type": "radio",
+        "default": "grid_cells",
+        "label": {
+          "en": "Regions Selections",
+          "fr": "Sélections de Régions"
+        },
+        "instruction": {
+          "en": "Select a region type",
+          "fr": "Sélectionnez un type de région"
+        },
+        "hint": {
+          "en": "Select a region type",
+          "fr": "Sélectionnez un type de région"
+        },
+        "placeholder": {
+          "en": "Select a region type",
+          "fr": "Sélectionnez un type de région"
+        },
+        "options": [
+          {
+            "value": "grid_cells",
+            "label": {
+              "en": "Grid Cells",
+              "fr": "Cellules de Grille"
+            }
+          },
+          {
+            "value": "draw_region",
+            "label": {
+              "en": "Draw Region",
+              "fr": "Dessiner la Région"
+            }
+          }
+        ],
+        "props": {
+          "labels": {
+            "download": {
+              "en": "Ways to Select Regions Download",
+              "fr": "Moyens de sélectionner les régions Télécharger"
+            }
+          }
+        }
+      },
+      "frequencies": {
+        "name": "frequencies",
+        "type": "select",
+        "default": "ann",
+        "label": {
+          "en": "Frequencies",
+          "fr": "Fréquences"
+        },
+        "instruction": {
+          "en": "Select a frequency",
+          "fr": "Sélectionnez une fréquence"
+        },
+        "hint": {
+          "en": "Select a frequency",
+          "fr": "Sélectionnez une fréquence"
+        },
+        "placeholder": {
+          "en": "Select a frequency",
+          "fr": "Sélectionnez une fréquence"
+        },
+        "options": [
+          {
+            "value": "ann",
+            "label": {
+              "en": "Annual",
+              "fr": "Annuel"
+            }
+          },
+          {
+            "value": "ann_jul_jun",
+            "label": {
+              "en": "Annual (July to June)",
+              "fr": "Annuel (juillet à juin)"
+            }
+          },
+          {
+            "value": "day",
+            "label": {
+              "en": "Daily",
+              "fr": "Quotidien"
+            },
+            "props": {
+              "map": {
+                "enabled": false
+              },
+              "download": {
+                "enabled": false
+              }
+            }
+          },
+          {
+            "group": {
+              "label": {
+                "en": "Months",
+                "fr": "Mois"
+              },
+              "options": [
+                {
+                  "value": "all_months",
+                  "label": {
+                    "en": "All Months",
+                    "fr": "Tous les mois"
+                  }
+                },
+                {
+                  "value": "jan",
+                  "label": {
+                    "en": "January",
+                    "fr": "Janvier"
+                  }
+                },
+                {
+                  "value": "feb",
+                  "label": {
+                    "en": "February",
+                    "fr": "Février"
+                  }
+                },
+                {
+                  "value": "mar",
+                  "label": {
+                    "en": "March",
+                    "fr": "Mars"
+                  },
+                  "props": {
+                    "download": {
+                      "enabled": false
+                    }
+                  }
+                },
+                {
+                  "value": "apr",
+                  "label": {
+                    "en": "April",
+                    "fr": "Avril"
+                  }
+                },
+                {
+                  "value": "may",
+                  "label": {
+                    "en": "May",
+                    "fr": "Mai"
+                  }
+                },
+                {
+                  "value": "jun",
+                  "label": {
+                    "en": "June",
+                    "fr": "Juin"
+                  }
+                },
+                {
+                  "value": "jul",
+                  "label": {
+                    "en": "July",
+                    "fr": "Juillet"
+                  }
+                },
+                {
+                  "value": "aug",
+                  "label": {
+                    "en": "August",
+                    "fr": "Août"
+                  }
+                },
+                {
+                  "value": "sep",
+                  "label": {
+                    "en": "September",
+                    "fr": "Septembre"
+                  }
+                },
+                {
+                  "value": "oct",
+                  "label": {
+                    "en": "October",
+                    "fr": "Octobre"
+                  }
+                },
+                {
+                  "value": "nov",
+                  "label": {
+                    "en": "November",
+                    "fr": "Novembre"
+                  }
+                },
+                {
+                  "value": "dec",
+                  "label": {
+                    "en": "December",
+                    "fr": "Décembre"
+                  }
+                }
+              ],
+              "props": {
+                "map": {
+                  "enabled": false
+                },
+                "download": {
+                  "enabled": false
+                }
+              }
+            }
+          },
+          {
+            "group": {
+              "label": {
+                "en": "Seasons",
+                "fr": "Saisons"
+              },
+              "options": [
+                {
+                  "value": "spr",
+                  "label": {
+                    "en": "Spring",
+                    "fr": "Printemps"
+                  }
+                },
+                {
+                  "value": "sum",
+                  "label": {
+                    "en": "Summer",
+                    "fr": "Été"
+                  }
+                },
+                {
+                  "value": "aut",
+                  "label": {
+                    "en": "Autumn",
+                    "fr": "Automne"
+                  }
+                },
+                {
+                  "value": "win",
+                  "label": {
+                    "en": "Winter",
+                    "fr": "Hiver"
+                  }
+                }
+              ],
+              "props": {
+                "labels": {
+                  "download": {
+                    "en": "Seasons Download",
+                    "fr": "Saisons Télécharger"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "props": {}
+      },
+      "frequencies_averages": {
+        "name": "frequencies_averages",
+        "type": "select",
+        "default": "all_years",
+        "label": {
+          "en": "Frequencies Averages",
+          "fr": "Moyennes des Fréquences"
+        },
+        "instruction": {
+          "en": "Select a frequency average",
+          "fr": "Sélectionnez une moyenne de fréquence"
+        },
+        "hint": {
+          "en": "Select a frequency average",
+          "fr": "Sélectionnez une moyenne de fréquence"
+        },
+        "placeholder": {
+          "en": "Select a frequency average",
+          "fr": "Sélectionnez une moyenne de fréquence"
+        },
+        "options": [
+          {
+            "value": "all_years",
+            "label": {
+              "en": "All Years",
+              "fr": "Toutes les années"
+            }
+          },
+          {
+            "value": "30_years",
+            "label": {
+              "en": "30 Years",
+              "fr": "30 ans"
+            }
+          }
+        ],
+        "props": {}
+      },
+      "delta": {
+        "name": "delta",
+        "type": "radio",
+        "default": "absolute",
+        "label": {
+          "en": "Absolute and Delta value",
+          "fr": "Valeur absolue et delta"
+        },
+        "instruction": {
+          "en": "Select a value type",
+          "fr": "Sélectionnez un type de valeur"
+        },
+        "hint": {
+          "en": "Select a value type",
+          "fr": "Sélectionnez un type de valeur"
+        },
+        "placeholder": {
+          "en": "Select a value type",
+          "fr": "Sélectionnez un type de valeur"
+        },
+        "options": [
+          {
+            "value": "absolute",
+            "label": {
+              "en": "Absolute",
+              "fr": "Absolue"
+            }
+          },
+          {
+            "value": "delta",
+            "label": {
+              "en": "Delta",
+              "fr": "Delta"
+            }
+          }
+        ],
+        "props": {}
+      },
+      "delta_example_2": {
+        "props": {
+          "map": {
+            "enabled": false
+          }
+        }
+      },
+      "map_colors": {
+        "name": "map_colors",
+        "type": "radio",
+        "default": "continuous",
+        "label": {
+          "en": "Map Colors",
+          "fr": "Couleurs de la carte"
+        },
+        "instruction": {
+          "en": "Select a colour type",
+          "fr": "Sélectionnez un type de couleur"
+        },
+        "hint": {
+          "en": "Select a colour type",
+          "fr": "Sélectionnez un type de couleur"
+        },
+        "placeholder": {
+          "en": "Select a colour type",
+          "fr": "Sélectionnez un type de couleur"
+        },
+        "options": [
+          {
+            "value": "discret",
+            "label": {
+              "en": "Discret",
+              "fr": "Discret"
+            }
+          },
+          {
+            "value": "continuous",
+            "label": {
+              "en": "Continuous",
+              "fr": "Continu"
+            }
+          }
+        ],
+        "props": {}
+      },
+      "map_style": {
+        "name": "map_style",
+        "type": "select",
+        "default": "basemap",
+        "label": {
+          "en": "Map Style",
+          "fr": "Style de carte"
+        },
+        "instruction": {
+          "en": "Select a map style",
+          "fr": "Sélectionnez un style de carte"
+        },
+        "hint": {
+          "en": "Select a map style",
+          "fr": "Sélectionnez un style de carte"
+        },
+        "placeholder": {
+          "en": "Select a map style",
+          "fr": "Sélectionnez un style de carte"
+        },
+        "options": [
+          {
+            "value": "basemap",
+            "label": {
+              "en": "Basemap",
+              "fr": "Carte de base"
+            }
+          },
+          {
+            "value": "others",
+            "label": {
+              "en": "Others",
+              "fr": "Autres"
+            }
+          }
+        ],
+        "props": {}
+      },
+      "percentiles": {
+        "name": "percentiles",
+        "type": "checkbox",
+        "default": "",
+        "label": {
+          "en": "Percentiles",
+          "fr": "Percentiles"
+        },
+        "instruction": {
+          "en": "Select percentiles",
+          "fr": "Sélectionnez les percentiles"
+        },
+        "hint": {
+          "en": "Select percentiles",
+          "fr": "Sélectionnez les percentiles"
+        },
+        "placeholder": {
+          "en": "Select percentiles",
+          "fr": "Sélectionnez les percentiles"
+        },
+        "options": [
+          {
+            "value": 5,
+            "label": {
+              "en": "5",
+              "fr": "5"
+            }
+          },
+          {
+            "value": 10,
+            "label": {
+              "en": "10",
+              "fr": "10"
+            }
+          },
+          {
+            "value": 25,
+            "label": {
+              "en": "25",
+              "fr": "25"
+            }
+          },
+          {
+            "value": 50,
+            "label": {
+              "en": "50",
+              "fr": "50"
+            }
+          },
+          {
+            "value": 75,
+            "label": {
+              "en": "75",
+              "fr": "75"
+            }
+          },
+          {
+            "value": 90,
+            "label": {
+              "en": "90",
+              "fr": "90"
+            }
+          },
+          {
+            "value": 95,
+            "label": {
+              "en": "95",
+              "fr": "95"
+            }
+          }
+        ],
+        "props": {}
+      },
+      "decimal_place": {
+        "name": "decimal_place",
+        "type": "number",
+        "default": 2,
+        "label": {
+          "en": "Decimal Place",
+          "fr": "Décimale"
+        },
+        "instruction": {
+          "en": "Select the number of decimal places",
+          "fr": "Sélectionnez le nombre de décimales"
+        },
+        "hint": {
+          "en": "Select the number of decimal places",
+          "fr": "Sélectionnez le nombre de décimales"
+        },
+        "placeholder": {
+          "en": "0",
+          "fr": "0"
+        },
+        "props": {
+          "step": 1,
+          "min": 0,
+          "max": 10
+        }
+      },
+      "output_format": {
+        "name": "output_format",
+        "type": "radio",
+        "default": "csv",
+        "label": {
+          "en": "Export Format",
+          "fr": "Format d'exportation"
+        },
+        "instruction": {
+          "en": "Select the output format",
+          "fr": "Sélectionnez le format de sortie"
+        },
+        "hint": {
+          "en": "Select the output format",
+          "fr": "Sélectionnez le format de sortie"
+        },
+        "placeholder": {
+          "en": "Select the output format",
+          "fr": "Sélectionnez le format de sortie"
+        },
+        "options": [
+          {
+            "value": "csv",
+            "label": {
+              "en": "CSV",
+              "fr": "CSV"
+            }
+          },
+          {
+            "value": "netcdf",
+            "label": {
+              "en": "NetCDF",
+              "fr": "NetCDF"
+            }
+          },
+          {
+            "value": "json",
+            "label": {
+              "en": "JSON",
+              "fr": "JSON"
+            }
+          },
+          {
+            "value": "geojson",
+            "label": {
+              "en": "GeoJSON",
+              "fr": "GeoJSON"
+            }
+          }
+        ],
+        "props": {
+          "download": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    "custom": [
+      {
+        "name": "models",
+        "type": "radio",
+        "default": "pcic12",
+        "label": {
+          "en": "Models",
+          "fr": "Modèles"
+        },
+        "instruction": {
+          "en": "Select a model",
+          "fr": "Sélectionnez un modèle"
+        },
+        "hint": {
+          "en": "Select a model",
+          "fr": "Sélectionnez un modèle"
+        },
+        "placeholder": {
+          "en": "Select a model",
+          "fr": "Sélectionnez un modèle"
+        },
+        "options": [
+          {
+            "value": "pcic12",
+            "label": {
+              "en": "PCIC12 (Ensemble)",
+              "fr": "PCIC12 (Ensemble)"
+            }
+          },
+          {
+            "value": "full_ensemble",
+            "label": {
+              "en": "Full ensemble",
+              "fr": "Ensemble complet"
+            }
+          }
+        ],
+        "props": {
+          "views": [
+            "download_step_5"
+          ],
+          "priority": 3
+        }
+      },
+      {
+        "name": "threshold_min",
+        "type": "number",
+        "default": 3,
+        "label": {
+          "en": "Threshold Min",
+          "fr": "Seuil Min"
+        },
+        "instruction": {
+          "en": "Select a minimum threshold value",
+          "fr": "Sélectionnez une valeur de seuil minimale"
+        },
+        "hint": {
+          "en": "Select a minimum threshold value",
+          "fr": "Sélectionnez une valeur de seuil minimale"
+        },
+        "placeholder": {
+          "en": 5,
+          "fr": 5
+        },
+        "props": {
+          "views": [
+            "download_step_3"
+          ],
+          "priority": 2,
+          "step": 1,
+          "min": 0
+        }
+      },
+      {
+        "name": "threshold_max",
+        "type": "number",
+        "default": 3,
+        "label": {
+          "en": "Threshold Max",
+          "fr": "Seuil Max"
+        },
+        "instruction": {
+          "en": "Select a maximum threshold value",
+          "fr": "Sélectionnez une valeur de seuil maximale"
+        },
+        "hint": {
+          "en": "Select a maximum threshold value",
+          "fr": "Sélectionnez une valeur de seuil maximale"
+        },
+        "placeholder": {
+          "en": 1,
+          "fr": 1
+        },
+        "props": {
+          "views": [
+            "download_step_3"
+          ],
+          "priority": 3,
+          "step": 1,
+          "min": 0
+        }
+      },
+      {
+        "name": "consecutive_days",
+        "type": "number",
+        "default": 3,
+        "label": {
+          "en": "Consecutive Days",
+          "fr": "Jours Consécutifs"
+        },
+        "instruction": {
+          "en": "Select a minimum number of consecutive days",
+          "fr": "Sélectionnez un nombre minimum de jours consécutifs"
+        },
+        "hint": {
+          "en": "Select a minimum number of consecutive days",
+          "fr": "Sélectionnez un nombre minimum de jours consécutifs"
+        },
+        "placeholder": {
+          "en": 7,
+          "fr": 7
+        },
+        "props": {
+          "views": [
+            "download_step_3"
+          ],
+          "priority": 4,
+          "step": 1,
+          "max": 10,
+          "min": 0
+        }
+      },
+      {
+        "name": "threshold_comparison",
+        "type": "select",
+        "default": "above",
+        "label": {
+          "en": "Threshold Comparison",
+          "fr": "Comparaison de Seuil"
+        },
+        "instruction": {
+          "en": "Select a threshold comparison",
+          "fr": "Sélectionnez une comparaison de seuil"
+        },
+        "hint": {
+          "en": "Select a threshold comparison",
+          "fr": "Sélectionnez une comparaison de seuil"
+        },
+        "placeholder": {
+          "en": "Select a threshold comparison",
+          "fr": "Sélectionnez une comparaison de seuil"
+        },
+        "options": [
+          {
+            "value": "above",
+            "label": {
+              "en": "Above",
+              "fr": "Au-dessus"
+            }
+          },
+          {
+            "value": "below",
+            "label": {
+              "en": "Below",
+              "fr": "En dessous"
+            }
+          }
+        ],
+        "props": {
+          "views": [
+            "download_step_3"
+          ],
+          "priority": 4
+        }
+      },
+      {
+        "name": "missing_data_options",
+        "type": "radio",
+        "default": "5",
+        "label": {
+          "en": "Missing Data Options",
+          "fr": "Options de Données Manquantes"
+        },
+        "instruction": {
+          "en": "Select a missing data option",
+          "fr": "Sélectionnez une option de données manquantes"
+        },
+        "hint": {
+          "en": "Select a missing data option",
+          "fr": "Sélectionnez une option de données manquantes"
+        },
+        "placeholder": {
+          "en": "Select a missing data option",
+          "fr": "Sélectionnez une option de données manquantes"
+        },
+        "options": [
+          {
+            "value": "5",
+            "label": {
+              "en": "5%",
+              "fr": "5%"
+            }
+          },
+          {
+            "value": "10",
+            "label": {
+              "en": "10%",
+              "fr": "10%"
+            }
+          },
+          {
+            "value": "15",
+            "label": {
+              "en": "15%",
+              "fr": "15%"
+            }
+          },
+          {
+            "value": "wmo_parameters",
+            "label": {
+              "en": "WMO Parameters",
+              "fr": "Paramètres de l'OMM"
+            }
+          }
+        ],
+        "props": {
+          "views": [
+            "download_step_5"
+          ],
+          "priority": 2
+        }
+      },
+      {
+        "name": "stations",
+        "type": "select",
+        "label": {
+          "en": "Stations",
+          "fr": "Stations"
+        },
+        "instruction": {
+          "en": "Select a station",
+          "fr": "Sélectionnez une station"
+        },
+        "hint": {
+          "en": "Select a station",
+          "fr": "Sélectionnez une station"
+        },
+        "placeholder": {
+          "en": "Select a station",
+          "fr": "Sélectionnez une station"
+        },
+        "options": [],
+        "props": {
+          "views": [
+            "download_step_3",
+            "download_station_step_4"
+          ],
+          "priority": 1,
+          "multiselect": true,
+          "data": {
+            "api": {
+              "url": "URL",
+              "endpoint": "URL",
+              "method": "GET",
+              "param_name": "q"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "datasets": [
+    {
+      "term_id": 1,
+      "title": {
+        "en": "Agriculture",
+        "fr": "Agriculture"
+      },
+      "card": {
+        "description": {
+          "en": "This is a description",
+          "fr": "Ceci est une description"
+        },
+        "link": {
+          "en": "LINK_GO_HERE",
+          "fr": "LINK_GO_HERE"
+        }
+      }
+    },
+    {
+      "term_id": 2,
+      "title": {
+        "en": "Atlantic",
+        "fr": "Atlantique"
+      },
+      "card": {
+        "description": {
+          "en": "This is a description",
+          "fr": "Ceci est une description"
+        },
+        "link": {
+          "en": "LINK_GO_HERE",
+          "fr": "LINK_GO_HERE"
+        }
+      }
+    },
+    {
+      "term_id": 3,
+      "title": {
+        "en": "Station Data",
+        "fr": "Données de station"
+      },
+      "card": {
+        "description": {
+          "en": "This is a description",
+          "fr": "Ceci est une description"
+        },
+        "link": {
+          "en": "LINK_GO_HERE",
+          "fr": "LINK_GO_HERE"
+        }
+      }
+    }
+  ]
+}

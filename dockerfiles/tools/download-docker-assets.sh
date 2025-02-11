@@ -84,7 +84,7 @@ handle_user_input() {
     fi
 }
 
-setup_authentification() {
+setup_authentication() {
     process_arguments "$@"
     handle_user_input
 }
@@ -105,11 +105,11 @@ validate_url() {
 
 download_file() {
     local url=$1
-    local archive_temp_path=$2
+    local destination_dir=$2
 
     validate_url "$url"
 
-    curl $auth_option -o "$archive_temp_path" "$url" || {
+    curl $auth_option -o "$destination_dir" "$url" || {
         echo "ERROR: Download failed for URL: $url"
         exit 1
     }
@@ -121,11 +121,11 @@ extract_file() {
 
     if [[ "$file" == *.tgz ]]; then
         tar -xzf "$file" -C "$destination_dir" || {
-            echo "ERROR: "$file" extraction failed."
+            echo "ERROR: $file extraction failed."
             exit 1
         }
     else
-        echo "ERROR: "$file" not a TGZ file."
+        echo "ERROR: $file not a TGZ file."
         exit 1
     fi
 
@@ -140,7 +140,7 @@ download_from_list() {
         [[ -z "$file" || "$file" =~ ^# ]] && continue
 
         curl $auth_option --fail "$url/$file" -o "$destination_dir/$file" || {
-            echo "ERROR: $file Download failed."
+            echo "ERROR: $file download failed."
         }
     done < "$list_file"
 }
@@ -158,7 +158,7 @@ fi
 
 server=$1
 initialize_variables "$server"
-setup_authentification "$@"
+setup_authentication "$@"
 download_file "$ssl_archive_url" "$ssl_archive_temp_path"
 extract_file "$ssl_archive_temp_path" "$ssl_destination_dir"
 download_from_list "$wp_plugins_list_file" "$wp_plugins_url" "$wp_plugins_destination_dir"

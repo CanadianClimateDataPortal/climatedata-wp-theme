@@ -9,7 +9,7 @@ HEADERS = {}
 def make_api_request(method, url):
     """
     Makes an API request to the given URL using the specified HTTP method.
-    Checks for a successful response (status code 200) and returns the JSON data.
+    Exits the program if the request fails.
     
     Args:
     - method (str): The HTTP method to use (GET, POST, etc.)
@@ -34,9 +34,8 @@ def get_repository_path(api_url, project_id):
     - project_id (str): The ID of the GitLab project.
     
     Returns:
-    - str: The full path of the 'portal' repository, or None if not found.
+    - str: The full path of the repository, or None if not found.
     """
-
     repo_url = f"{api_url}/{project_id}/registry/repositories"
     repositories = make_api_request("GET", repo_url)
 
@@ -71,26 +70,34 @@ def get_tag_info(repo_path, tag):
     tag_info = make_api_request("GET", url)
     return tag_info.get("digest"), tag_info.get("created_at")
 
-
-def get_all_tags_with_digests(repo_path):
+def get_all_tags(repo_path):
     """
-    Retrieves all tags along with their digests, categorizing them based on importance.
-    Also groups the tags by their digests and creation dates.
-
+    Retrieves all tags available in the repository.
+    
     Args:
     - repo_path (str): The full repository path.
     
     Returns:
-    - dict: A dictionary containing two categories: 'tag_digests_important' and 'tag_digests_not_important'.
+    - list: A list of all tag metadata.
     """
-    tag_digests_important = {}
-    tag_digests_not_important = {}
-
     tags = make_api_request("GET", f"{repo_path}/tags") or []
     if not tags:
         print("No tags found for this repository.")
-        return tag_digests_important, tag_digests_not_important
+    return tags
 
+def get_non_important_tags(tags, repo_path):
+    """
+    Filters out important tags and returns only non-important tags 
+
+    Args:
+    - tags (list): List of all tags retrieved from the repository.
+    - repo_path (str): The full repository path.
+    
+    Returns:
+    - dict: A dictionary of non-important tags with their digests and creation dates.
+    """
+    tag_digests_important = {}
+    tag_digests_not_important = {}
     all_digests = {}
 
     for tag in tags:
@@ -114,36 +121,50 @@ def get_all_tags_with_digests(repo_path):
             tag_digests_important[tag_name] = tag_info
             del tag_digests_not_important[tag_name]
 
-    return {
-        "tag_digests_important": tag_digests_important,
-        "tag_digests_not_important": tag_digests_not_important,
-    }
+    return tag_digests_not_important
+    
 
-
-def retain_first_n_items(items_dict, n):
+def sort_and_retaining_n_latest(tags_dict, n):
     """
-    Retains the first n items in the dictionary based on a specific attribute and deletes the rest.
+    Sorts tags by creation date in descending order
 
     Args:
     - items_dict (dict): A dictionary of tags that are not marked as important.
     - n (int): The number of most recent tags to ignore (i.e., not delete).
+    Returns:
+    - list: A list of tags that should be deleted.
     """
     sorted_tags = sorted(
-        items_dict.items(),
+        tags_dict.items(),
         key=lambda x: datetime.fromisoformat(x[1]["created_at"]),
         reverse=True,
     )
+    return sorted_tags[n:]
 
-    remaining_tags = sorted_tags[n:]
+def delete_old_tags(tags, n):
+    """
+    Deletes tags that are older than the n most recent ones.
 
-    if remaining_tags:
-        print("Remaining tags after ignoring the {} most recent tags:".format(n))
-    for tag in remaining_tags:
-        print(
+    Args:
+    - tags (list): The list of tags to delete.
+    - n (int): The number of most recent tags to keep.
+    """
+
+    if tags:
+        print("Deleting the following tags (older than the {} most recent ones):".format(n))
+        for tag in tags:
+            print(
             f"Tag: {tag[0]}, Digest: {tag[1]['digest']}, Created At: {tag[1]['created_at']}"
         )
+            # tag_name = tag[0]
+            # delete_url = f"{repo_path}/tags/{tag_name}"
+            # response = make_api_request("DELETE", delete_url)
+            # if response == {}:
+            #     print(f"Successfully deleted tag: {tag_name}")
+            # else:
+            #     print(f"Failed to delete tag: {tag_name}.")
     else:
-        print(f"No tags remaining after ignoring the {n} most recent tags.")
+        print(f"No tags to delete after keeping the {n} most recent ones.")
 
 
 def main():
@@ -166,11 +187,10 @@ def main():
     repo_path = get_repository_path(args.api_url, args.project_id)
 
     if repo_path:
-        tag_info = get_all_tags_with_digests(repo_path)
-        print(tag_info)
-        tag_digests_not_important = tag_info["tag_digests_not_important"]
-        retain_first_n_items(tag_digests_not_important, args.nb_to_keep)
-
+        tags=get_all_tags(repo_path)
+        tag_digests_not_important = get_non_important_tags(tags, repo_path)
+        remaining_tags = sort_and_retaining_n_latest(tag_digests_not_important, args.nb_to_keep)
+        delete_old_tags(remaining_tags, args.nb_to_keep)
 
 if __name__ == "__main__":
     main()

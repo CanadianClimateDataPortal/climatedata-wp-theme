@@ -330,16 +330,26 @@ export interface ColorSelectProps {
 }
 
 /**
- * SearchControl Props
- * ---------------------------
- * @property {string} [placeholder] - The placeholder text for the search input. Default is "Zoom to a location, region, city, coordinates...".
- * @property {number} [zoom] - The zoom level to apply when moving to a location. Default is 10.
- * @property {string} [countryCodes] - The country codes (comma-separated) to limit the search results. Default is "ca".
+ * SearchControlResponse represents the response data from the custom cdc location_search endpoint to the search control.
  */
-export interface SearchControlProps {
-	placeholder?: string;
-	zoom?: number;
-	countryCodes?: string;
+export interface SearchControlResponse {
+	draw: number;
+	recordsFiltered: string;
+	recordsTotal: string;
+	items: SearchControlLocationItem[];
+}
+
+/**
+ * Represents an individual location item in the search control.
+ */
+export interface SearchControlLocationItem {
+	id: string;
+	text: string;
+	term: string;
+	location: string;
+	province: string;
+	lat: string;
+	lon: string;
 }
 
 /**
@@ -403,24 +413,6 @@ export interface ZoomControlProps {
 	onZoomIn: () => void;
 	onZoomOut: () => void;
 }
-
-// {
-// 	"geo_id": "OAHEK",
-// 	"geo_name": "Hicks Lake",
-// 	"generic_term": "Lake",
-// 	"location": "",
-// 	"province": "Nunavut",
-// 	"lat": "61.416667",
-// 	"lon": "-100",
-// 	"distance": "10701.56037475816",
-// 	"coords": [
-// 	61.5122,
-// 	-99.9756
-// ],
-// 	"lng": "-100",
-// 	"province_short": "NU",
-// 	"title": "Hicks Lake, NU"
-// }
 
 export interface ClimateDataProps {
 	observations: number[][];

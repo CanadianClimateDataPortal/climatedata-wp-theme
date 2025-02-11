@@ -27,7 +27,7 @@ def make_api_request(method, url):
 
 def get_repository_path(api_url, project_id):
     """
-    Retrieves the repository path for the 'portal' repository within a GitLab project.
+    Retrieves the repository path for a specific repository within a GitLab project.
     
     Args:
     - api_url (str): The base URL of the GitLab API.
@@ -72,9 +72,9 @@ def get_tag_info(repo_path, tag):
     return tag_info.get("digest"), tag_info.get("created_at")
 
 
-def get_tags_with_digests(repo_path):
+def get_all_tags_with_digests(repo_path):
     """
-    Retrieves all tags from the repository and sorts them into 'important' and 'not important' categories.
+    Retrieves all tags along with their digests, categorizing them based on importance.
     Also groups the tags by their digests and creation dates.
 
     Args:
@@ -120,16 +120,16 @@ def get_tags_with_digests(repo_path):
     }
 
 
-def get_tags_ignore_n_latest(tag_digests_not_important, n):
+def retain_first_n_items(items_dict, n):
     """
-    Sorts the 'not important' tags by their creation date and removes the most recent 'n' tags.
+    Retains the first n items in the dictionary based on a specific attribute and deletes the rest.
 
     Args:
-    - tag_digests_not_important (dict): A dictionary of tags that are not marked as important.
+    - items_dict (dict): A dictionary of tags that are not marked as important.
     - n (int): The number of most recent tags to ignore (i.e., not delete).
     """
     sorted_tags = sorted(
-        tag_digests_not_important.items(),
+        items_dict.items(),
         key=lambda x: datetime.fromisoformat(x[1]["created_at"]),
         reverse=True,
     )
@@ -166,10 +166,10 @@ def main():
     repo_path = get_repository_path(args.api_url, args.project_id)
 
     if repo_path:
-        tag_info = get_tags_with_digests(repo_path)
+        tag_info = get_all_tags_with_digests(repo_path)
         print(tag_info)
         tag_digests_not_important = tag_info["tag_digests_not_important"]
-        get_tags_ignore_n_latest(tag_digests_not_important, args.nb_to_keep)
+        retain_first_n_items(tag_digests_not_important, args.nb_to_keep)
 
 
 if __name__ == "__main__":

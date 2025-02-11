@@ -8,6 +8,15 @@ HEADERS = {}
 
 def make_api_request(method, url):
     """
+    Makes an API request to the given URL using the specified HTTP method.
+    Checks for a successful response (status code 200) and returns the JSON data.
+    
+    Args:
+    - method (str): The HTTP method to use (GET, POST, etc.)
+    - url (str): The URL to send the request to.
+    
+    Returns:
+    - dict: The response data in JSON format.
     """
     response = requests.request(method, url, headers=HEADERS)
     if response.status_code != 200:
@@ -17,6 +26,16 @@ def make_api_request(method, url):
     return response.json()
 
 def get_repository_path(api_url, project_id):
+    """
+    Retrieves the repository path for the 'portal' repository within a GitLab project.
+    
+    Args:
+    - api_url (str): The base URL of the GitLab API.
+    - project_id (str): The ID of the GitLab project.
+    
+    Returns:
+    - str: The full path of the 'portal' repository, or None if not found.
+    """
 
     repo_url = f"{api_url}/{project_id}/registry/repositories"
     repositories = make_api_request("GET", repo_url)
@@ -37,6 +56,16 @@ def get_repository_path(api_url, project_id):
 
 
 def get_tag_info(repo_path, tag):
+    """
+    Retrieves detailed information (digest and creation date) for a specific tag in the repository.
+    
+    Args:
+    - repo_path (str): The full repository path.
+    - tag (str): The name of the tag to query.
+    
+    Returns:
+    - tuple: A tuple containing the digest and the creation date of the tag.
+    """
     url = f"{repo_path}/tags/{tag}"
 
     tag_info = make_api_request("GET", url)
@@ -44,6 +73,16 @@ def get_tag_info(repo_path, tag):
 
 
 def get_tags_with_digests(repo_path):
+    """
+    Retrieves all tags from the repository and sorts them into 'important' and 'not important' categories.
+    Also groups the tags by their digests and creation dates.
+
+    Args:
+    - repo_path (str): The full repository path.
+    
+    Returns:
+    - dict: A dictionary containing two categories: 'tag_digests_important' and 'tag_digests_not_important'.
+    """
     tag_digests_important = {}
     tag_digests_not_important = {}
 
@@ -82,7 +121,13 @@ def get_tags_with_digests(repo_path):
 
 
 def get_tags_ignore_n_latest(tag_digests_not_important, n):
+    """
+    Sorts the 'not important' tags by their creation date and removes the most recent 'n' tags.
 
+    Args:
+    - tag_digests_not_important (dict): A dictionary of tags that are not marked as important.
+    - n (int): The number of most recent tags to ignore (i.e., not delete).
+    """
     sorted_tags = sorted(
         tag_digests_not_important.items(),
         key=lambda x: datetime.fromisoformat(x[1]["created_at"]),
@@ -111,7 +156,7 @@ def main():
     )
     parser.add_argument("--project_id", required=True, help="GitLab project ID")
     parser.add_argument(
-        "--nb_to_keep", type=int, default=3, help="Number of most recent tags to keep"
+        "--nb_to_keep", type=int, required=True, help="Number of most recent tags to keep"
     )
 
     args = parser.parse_args()

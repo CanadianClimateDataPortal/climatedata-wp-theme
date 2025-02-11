@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { useI18n } from '@wordpress/react-i18n';
 
@@ -16,18 +16,14 @@ import SearchControl from '@/components/map-layers/search-control';
 import GeometryControls from '@/components/map-layers/geometry-controls';
 import CustomPanesLayer from '@/components/map-layers/custom-panes';
 import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions';
-import CellsGridLayer from '@/components/map-layers/cells-grid-layer';
+import SelectableCellsGridLayer from '@/components/map-layers/selectable-cells-grid-layer';
 import MapEvents from '@/components/map-layers/map-events';
 
 import { cn } from '@/lib/utils';
-import {
-	CANADA_CENTER,
-	DEFAULT_ZOOM,
-	DEFAULT_MIN_ZOOM,
-	DEFAULT_MAX_ZOOM,
-} from '@/lib/constants';
+import { DEFAULT_MIN_ZOOM, DEFAULT_MAX_ZOOM } from '@/lib/constants';
 import { useDownload } from '@/hooks/use-download';
 import { useMap } from '@/hooks/use-map';
+import L from 'leaflet';
 
 /**
  * Location step
@@ -37,8 +33,11 @@ const StepLocation: React.FC = () => {
 
 	const { setMap } = useMap();
 	const { setField, fields } = useDownload();
-	const { interactiveRegion, selectedCells } = fields;
+	const { interactiveRegion, selectedCells, zoom, center } = fields;
 
+	const [selected, setSelected] = useState<Set<number>>(
+		new Set(selectedCells)
+	);
 	const [selectionMode, setSelectionMode] = useState<string>('cells');
 
 	// TODO: when selecting inside the map, update the selected cells
@@ -53,6 +52,17 @@ const StepLocation: React.FC = () => {
 		{ value: 'health', label: __('Health Regions') },
 		{ value: 'watershed', label: __('Watersheds') },
 	];
+
+	const handleSelectCell = (updatedCells: Set<number>) => {
+		// using state (Set) to avoid duplicates and for better performance
+		setSelected(updatedCells);
+	};
+
+	useEffect(() => {
+		// we still need to send the selected cells as an array to redux, since
+		// redux does not support Set because it's not serializable
+		setField('selectedCells', Array.from(selected));
+	}, [selected, setField]);
 
 	return (
 		<StepContainer title={__('Select a location or area')}>
@@ -99,15 +109,15 @@ const StepLocation: React.FC = () => {
 							<div
 								className={cn(
 									'text-2xl font-semibold leading-7',
-									selectedCells > 0
+									selected.size > 0
 										? 'text-brand-blue'
 										: 'text-neutral-grey-medium'
 								)}
 							>
 								{_n(
 									'1 Cell',
-									`${selectedCells} Cells`,
-									selectedCells
+									`${selected.size} Cells`,
+									selected.size
 								)}
 							</div>
 						</div>
@@ -116,12 +126,12 @@ const StepLocation: React.FC = () => {
 			</div>
 
 			<MapContainer
-				center={CANADA_CENTER}
+				center={center}
 				zoomControl={false}
-				zoom={DEFAULT_ZOOM}
+				zoom={zoom}
 				minZoom={DEFAULT_MIN_ZOOM}
 				maxZoom={DEFAULT_MAX_ZOOM}
-				scrollWheelZoom={false}
+				scrollWheelZoom={true}
 				className="h-[560px] font-sans"
 			>
 				<MapEvents onMapReady={(map: L.Map) => setMap(map)} />
@@ -131,7 +141,12 @@ const StepLocation: React.FC = () => {
 				<SearchControl className="top-6 left-6" />
 
 				{selectionMode === 'region' && <GeometryControls />}
-				{selectionMode === 'cells' && <CellsGridLayer />}
+				{selectionMode === 'cells' && (
+					<SelectableCellsGridLayer
+						selectedCells={new Set(selectedCells)}
+						onSelectCell={handleSelectCell}
+					/>
+				)}
 
 				<TileLayer
 					attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

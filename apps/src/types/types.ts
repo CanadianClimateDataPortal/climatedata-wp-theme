@@ -4,7 +4,7 @@ import { VariantProps } from 'class-variance-authority';
 import { buttonVariants } from '@/lib/format';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { LucideIcon } from 'lucide-react';
-import L from 'leaflet';
+import L, { LatLngExpression } from 'leaflet';
 
 /**
  * Represents valid locale values.
@@ -174,7 +174,9 @@ export interface DownloadState {
 	endYear: number;
 	frequency: string;
 	emissionScenarios: string[];
-	selectedCells: number;
+	selectedCells: number[];
+	zoom: number;
+	center: LatLngExpression;
 	percentiles: string[];
 	decimalPlace: number;
 	format: string;

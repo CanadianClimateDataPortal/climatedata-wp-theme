@@ -104,13 +104,15 @@ def get_tags_ignore_n_latest(tag_digests_not_important, n):
 def main():
     global HEADERS
 
-    parser = argparse.ArgumentParser(description="")
+    parser = argparse.ArgumentParser(description="Clean up Docker image tags in GitLab Container Registry, keeping the most recent tags as specified.")
     parser.add_argument("api_url", help="GitLab project API URL")
     parser.add_argument(
         "--token", required=True, help="GitLab API authentication token."
     )
     parser.add_argument("--project_id", required=True, help="GitLab project ID")
-    # parser.add_argument("--nb_to_keep", required=True, help="GitLab project ID")
+    parser.add_argument(
+        "--nb_to_keep", type=int, default=3, help="Number of most recent tags to keep"
+    )
 
     args = parser.parse_args()
 
@@ -122,9 +124,7 @@ def main():
         tag_info = get_tags_with_digests(repo_path)
         print(tag_info)
         tag_digests_not_important = tag_info["tag_digests_not_important"]
-        # n = args.nb_to_keep
-        n=3
-        get_tags_ignore_n_latest(tag_digests_not_important, n)
+        get_tags_ignore_n_latest(tag_digests_not_important, args.nb_to_keep)
 
 
 if __name__ == "__main__":

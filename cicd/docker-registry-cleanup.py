@@ -84,7 +84,7 @@ def get_all_tags(repo_path):
     return tags
 
 
-def get_non_important_tags(tags, repo_path):
+def get_excludable_tags(tags, repo_path):
     """
     Filters out important tags and returns only non-important tags
 
@@ -123,7 +123,7 @@ def get_non_important_tags(tags, repo_path):
     return tag_digests_not_important
 
 
-def sort_and_retaining_n_latest(tags_dict, n):
+def get_deletable_tags(tags_dict, n):
     """
     Sorts tags by creation date in descending order
 
@@ -193,8 +193,8 @@ def main():
 
     if repo_path:
         tags = get_all_tags(repo_path)
-        unimportant_tags = get_non_important_tags(tags, repo_path)
-        tags_to_delete = sort_and_retaining_n_latest(unimportant_tags, args.nb_to_keep)
+        unimportant_tags = get_excludable_tags(tags, repo_path)
+        tags_to_delete = get_deletable_tags(unimportant_tags, args.nb_to_keep)
         delete_old_tags(tags_to_delete, args.nb_to_keep)
 
 

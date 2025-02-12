@@ -1,0 +1,73 @@
+# This file contains example setups to use in your `compose.override.yaml file.
+
+###
+# Scenario:
+#   Serve the website over HTTP instead of HTTPS.
+#   Note: all URLs in the database will also need to be updated to use HTTP
+#   instead of HTTPS.
+#
+# Solution:
+#
+# services:
+#   portal:
+#     volumes:
+#       - type: bind
+#         source: dockerfiles/dev/www/configs/nginx/climatedata-site-no-ssl.conf
+#         target: /etc/nginx/sites-available/climatedata-site.conf
+#     ports:
+#       - "80:80"
+
+###
+# Scenario:
+#   Add custom nginx or site configurations.
+#
+# Solution:
+#   * Nginx global configurations can be mounted inside `/etc/nginx/conf.d/` and
+#     will be automatically loaded.
+#   * Custom configurations to be added inside the `server` block of the site's
+#     configuration can be mounted inside `/etc/nginx/conf.d/climatedata-site/`.
+#     They will be automatically loaded.
+#
+# services:
+#   portal:
+#     volumes:
+#       - type: bind
+#         source: dockerfiles/mounts/config/my-nginx-config.conf
+#         target: /etc/nginx/conf.d/my-nginx-config.conf
+#       - type: bind
+#         source: dockerfiles/mounts/config/my-climatedata-config.conf
+#         target: /etc/nginx/conf.d/climatedata-site/my-climatedata-config.conf
+#
+
+###
+# Scenario:
+#   Add a custom PHP configuration.
+#
+# Solution:
+#   Custom ini configuration files can be mounted inside /usr/local/etc/php/conf.d/,
+#   and will be automatically loaded.
+#
+# services:
+#   portal:
+#     volumes:
+#       - type: bind
+#         source: dockerfiles/mounts/config/my-php-config.ini
+#         target: /usr/local/etc/php/conf.d/my-php-config.ini
+#
+
+###
+# Scenario:
+#   Change a WordPress constant.
+#
+# Solution:
+#   Create environment variables for WordPress constants by prefixing the
+#   constant with `WP_`.
+#   Note that booleans must be quoted, to not be misinterpreted by the YAML
+#   parser.
+#
+# services:
+#   portal:
+#     environment:
+#       WP_DB_HOST: my-custom-db
+#       WP_WP_DEBUG: "false"
+#

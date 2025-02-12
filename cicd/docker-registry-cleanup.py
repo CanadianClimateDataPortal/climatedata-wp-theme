@@ -4,8 +4,6 @@ from datetime import datetime
 
 important_tags = ["preprod", "uat", "qa"]
 
-HEADERS = {}
-
 
 def make_api_request(method, url):
     """
@@ -27,32 +25,29 @@ def make_api_request(method, url):
     return response.json()
 
 
-def get_repository_path(api_url, project_id):
+def get_repository_path(api_url, project_id, repository_name):
     """
     Retrieves the repository path for a specific repository within a GitLab project.
 
     Args:
     - api_url (str): The base URL of the GitLab API.
     - project_id (str): The ID of the GitLab project.
+    - repository_name (str): The name of the repository to find.
 
     Returns:
-    - str: The full path of the repository, or None if not found.
+    - str: The full path of the repository if found, otherwise None.
     """
     repo_url = f"{api_url}/{project_id}/registry/repositories"
-    repositories = make_api_request("GET", repo_url)
+    repositories = make_api_request("GET", repo_url) or []
 
-    if not repositories:
-        print("No repository found in the registry.")
-        exit(1)
-
-    portal_repo = next(
-        (repo for repo in repositories if repo.get("name") == "portal"), None
+    repo = next(
+        (repo for repo in repositories if repo.get("name") == repository_name), None
     )
 
-    if portal_repo:
-        return f"{repo_url}/{portal_repo['id']}"
+    if repo:
+        return f"{repo_url}/{repo['id']}"
     else:
-        print("No repository named 'portal' found.")
+        print(f"No repository named '{repository_name}' found.")
         return None
 
 
@@ -154,13 +149,8 @@ def delete_old_tags(tags, n):
     - tags (list): The list of tags to delete.
     - n (int): The number of most recent tags to keep.
     """
-
     if tags:
-        print(
-            "Deleting the following tags (older than the {} most recent ones):".format(
-                n
-            )
-        )
+        print(f"Deleting the following tags (older than the {n} most recent ones):")
         for tag in tags:
             print(
                 f"Tag: {tag[0]}, Digest: {tag[1]['digest']}, Created At: {tag[1]['created_at']}"
@@ -197,16 +187,15 @@ def main():
     args = parser.parse_args()
 
     HEADERS = {"PRIVATE-TOKEN": args.token}
+    repository_name = "portal"
 
-    repo_path = get_repository_path(args.api_url, args.project_id)
+    repo_path = get_repository_path(args.api_url, args.project_id, repository_name)
 
     if repo_path:
         tags = get_all_tags(repo_path)
-        tag_digests_not_important = get_non_important_tags(tags, repo_path)
-        remaining_tags = sort_and_retaining_n_latest(
-            tag_digests_not_important, args.nb_to_keep
-        )
-        delete_old_tags(remaining_tags, args.nb_to_keep)
+        unimportant_tags = get_non_important_tags(tags, repo_path)
+        tags_to_delete = sort_and_retaining_n_latest(unimportant_tags, args.nb_to_keep)
+        delete_old_tags(tags_to_delete, args.nb_to_keep)
 
 
 if __name__ == "__main__":

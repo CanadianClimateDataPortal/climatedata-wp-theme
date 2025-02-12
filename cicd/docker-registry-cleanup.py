@@ -6,15 +6,16 @@ important_tags = ["preprod", "uat", "qa"]
 
 HEADERS = {}
 
+
 def make_api_request(method, url):
     """
     Makes an API request to the given URL using the specified HTTP method.
     Exits the program if the request fails.
-    
+
     Args:
     - method (str): The HTTP method to use (GET, POST, etc.)
     - url (str): The URL to send the request to.
-    
+
     Returns:
     - dict: The response data in JSON format.
     """
@@ -25,14 +26,15 @@ def make_api_request(method, url):
         exit(1)
     return response.json()
 
+
 def get_repository_path(api_url, project_id):
     """
     Retrieves the repository path for a specific repository within a GitLab project.
-    
+
     Args:
     - api_url (str): The base URL of the GitLab API.
     - project_id (str): The ID of the GitLab project.
-    
+
     Returns:
     - str: The full path of the repository, or None if not found.
     """
@@ -57,11 +59,11 @@ def get_repository_path(api_url, project_id):
 def get_tag_info(repo_path, tag):
     """
     Retrieves detailed information (digest and creation date) for a specific tag in the repository.
-    
+
     Args:
     - repo_path (str): The full repository path.
     - tag (str): The name of the tag to query.
-    
+
     Returns:
     - tuple: A tuple containing the digest and the creation date of the tag.
     """
@@ -70,13 +72,14 @@ def get_tag_info(repo_path, tag):
     tag_info = make_api_request("GET", url)
     return tag_info.get("digest"), tag_info.get("created_at")
 
+
 def get_all_tags(repo_path):
     """
     Retrieves all tags available in the repository.
-    
+
     Args:
     - repo_path (str): The full repository path.
-    
+
     Returns:
     - list: A list of all tag metadata.
     """
@@ -85,14 +88,15 @@ def get_all_tags(repo_path):
         print("No tags found for this repository.")
     return tags
 
+
 def get_non_important_tags(tags, repo_path):
     """
-    Filters out important tags and returns only non-important tags 
+    Filters out important tags and returns only non-important tags
 
     Args:
     - tags (list): List of all tags retrieved from the repository.
     - repo_path (str): The full repository path.
-    
+
     Returns:
     - dict: A dictionary of non-important tags with their digests and creation dates.
     """
@@ -122,7 +126,7 @@ def get_non_important_tags(tags, repo_path):
             del tag_digests_not_important[tag_name]
 
     return tag_digests_not_important
-    
+
 
 def sort_and_retaining_n_latest(tags_dict, n):
     """
@@ -141,6 +145,7 @@ def sort_and_retaining_n_latest(tags_dict, n):
     )
     return sorted_tags[n:]
 
+
 def delete_old_tags(tags, n):
     """
     Deletes tags that are older than the n most recent ones.
@@ -151,11 +156,15 @@ def delete_old_tags(tags, n):
     """
 
     if tags:
-        print("Deleting the following tags (older than the {} most recent ones):".format(n))
+        print(
+            "Deleting the following tags (older than the {} most recent ones):".format(
+                n
+            )
+        )
         for tag in tags:
             print(
-            f"Tag: {tag[0]}, Digest: {tag[1]['digest']}, Created At: {tag[1]['created_at']}"
-        )
+                f"Tag: {tag[0]}, Digest: {tag[1]['digest']}, Created At: {tag[1]['created_at']}"
+            )
             # tag_name = tag[0]
             # delete_url = f"{repo_path}/tags/{tag_name}"
             # response = make_api_request("DELETE", delete_url)
@@ -170,14 +179,19 @@ def delete_old_tags(tags, n):
 def main():
     global HEADERS
 
-    parser = argparse.ArgumentParser(description="Clean up Docker image tags in GitLab Container Registry, keeping the most recent tags as specified.")
+    parser = argparse.ArgumentParser(
+        description="Clean up Docker image tags in GitLab Container Registry, keeping the most recent tags as specified."
+    )
     parser.add_argument("api_url", help="GitLab project API URL")
     parser.add_argument(
         "--token", required=True, help="GitLab API authentication token."
     )
     parser.add_argument("--project_id", required=True, help="GitLab project ID")
     parser.add_argument(
-        "--nb_to_keep", type=int, required=True, help="Number of most recent tags to keep"
+        "--nb_to_keep",
+        type=int,
+        required=True,
+        help="Number of most recent tags to keep",
     )
 
     args = parser.parse_args()
@@ -187,10 +201,13 @@ def main():
     repo_path = get_repository_path(args.api_url, args.project_id)
 
     if repo_path:
-        tags=get_all_tags(repo_path)
+        tags = get_all_tags(repo_path)
         tag_digests_not_important = get_non_important_tags(tags, repo_path)
-        remaining_tags = sort_and_retaining_n_latest(tag_digests_not_important, args.nb_to_keep)
+        remaining_tags = sort_and_retaining_n_latest(
+            tag_digests_not_important, args.nb_to_keep
+        )
         delete_old_tags(remaining_tags, args.nb_to_keep)
+
 
 if __name__ == "__main__":
     main()

@@ -9,6 +9,9 @@ services:
       target: development
       args:
         TASK_RUNNER_IMAGE: climatedata-task-runner
+        # Directory containing local WordPress plugins. Those files can be
+        # downloaded using the `dockerfiles/tools/download-docker-assets.sh`
+        # script.
         LOCAL_WP_PLUGINS_DIR: dockerfiles/mounts/wp-plugins
     depends_on:
       - task_runner
@@ -17,19 +20,20 @@ services:
       # Source files of the themes
       - "./framework:/var/www/html/assets/themes/framework"
       - "./fw-child:/var/www/html/assets/themes/fw-child"
-      # Add header to prevent static files caching by the browser
+      # Add an HTTP header to prevent static files caching by the browser
       - type: bind
         source: dockerfiles/dev/www/configs/nginx/site-extra/no-static-cache.conf
         target: /etc/nginx/conf.d/climatedata-site/no-static-cache.conf
-      # Proxy all requests to assets/uploads to a central server containing the files
+      # Proxy all requests to /assets/uploads to a central server containing the files
       - type: bind
         source: dockerfiles/dev/www/configs/nginx/site-extra/proxy-uploads.conf
         target: /etc/nginx/conf.d/climatedata-site/proxy-uploads.conf
-      # Use a configuration PHP configuration
+      # Use a development PHP configuration
       - type: bind
         source: dockerfiles/dev/www/configs/php/php-development.ini
         target: /usr/local/etc/php/conf.d/php-development.ini
-      # Mount the SSL certificate (you must provide them in the directory below)
+      # Mount the SSL certificate files. Those files can be downloaded using the
+      # `dockerfiles/tools/download-docker-assets.sh`
       - type: bind
         source: dockerfiles/mounts/ssl
         target: /etc/nginx/ssl

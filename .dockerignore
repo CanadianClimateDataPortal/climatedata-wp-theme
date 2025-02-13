@@ -1,6 +1,7 @@
 Dockerfile
 .idea
 compose.yaml
-docker-override.yml
+compose.override.yaml
+compose.override.sample.yaml
 .gitignore
 fw-child/**/local_config.php

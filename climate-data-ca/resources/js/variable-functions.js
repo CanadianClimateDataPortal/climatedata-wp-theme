@@ -2840,6 +2840,9 @@
                     let scenarios = DATASETS[dataset_name].scenarios;
                     dec_value = $("#decade").val();
 
+                    if (var_value.startsWith("HXmax") && dataset_name !== "humidex") {
+                        scenarios = DATASETS["humidex"].scenarios;
+                    }
 
                     // ugly patch to replace grid layer depending of selected dataset
                     if (['canadagrid', 'canadagrid-m6'].includes(sv.grid)) {

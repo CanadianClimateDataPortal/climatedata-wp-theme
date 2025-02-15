@@ -50,7 +50,11 @@ var l10n_table = {
         // news
         
         "All topics" : "Tous les sujets",
-        "Close": "Fermer"
+        "Close": "Fermer",
+
+        // Analyze
+        "If SSP3-7.0 is selected below, either alone or with any of the other emissions scenarios, then only 24 models are included in the analysis for all selected scenarios. To use the 26 models available for all emissions scenarios except SSP3-7.0, do not include SSP3-7.0 in your selection below.":
+            "Si SSP3-7.0 est sélectionné ci-dessous, seul ou avec l'un des autres scénarios d'émissions, alors seulement 24 modèles sont inclus dans l'analyse pour tous les scénarios sélectionnés. Pour utiliser les 26 modèles disponibles pour tous les scénarios d’émissions à l’exception de SSP3-7.0, n’incluez pas SSP3-7.0 dans votre sélection ci-dessous.",
     }
 };
 
@@ -77,7 +81,7 @@ const DATASETS = {
                 }
             },
             {
-                'name': 'rcp85', 'label': 'RCP 8.5', 'chart_color': '#F00',
+                'name': 'rcp85', 'label': 'RCP 8.5', 'chart_color': '#980002',
                 'correlations': {
                     'cmip6': 'ssp585'
                 }
@@ -104,14 +108,25 @@ const DATASETS = {
                 }
             },
             {
-                'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#F00',
+                'name': 'ssp370', 'label': 'SSP3-7.0', 'chart_color': '#f16f0c',
+                'correlations': {
+                    'cmip5': 'rcp85'
+                }
+            },
+            {
+                'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#980002',
                 'correlations': {
                     'cmip5': 'rcp85'
                 }
             },
         ],
         'grid': 'canadagrid-m6',
-        'finch_name' : 'candcs-m6',
+        'finch_name' : function ( scenarios ) {
+            if ( 'all' === scenarios || scenarios.includes( 'ssp370' ) ) {
+                return 'candcs-m6-24';
+            }
+            return 'candcs-m6';
+        },
         'model_lists': [
             {'name': '26models', 'label': 'Full ensemble'}]
     },
@@ -124,7 +139,7 @@ const DATASETS = {
                 'name': 'ssp245', 'label': 'SSP2-4.5', 'chart_color': '#00640c'
             },
             {
-                'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#F00'
+                'name': 'ssp585', 'label': 'SSP5-8.5', 'chart_color': '#980002'
             },
         ],
         'grid': 'era5landgrid',
@@ -449,13 +464,14 @@ function displayChartData(data, varDetails, download_url, query, container) {
             data: data['observations'],
             zIndex: 1,
             showInNavigator: true,
-            color: '#F47D23',
+            color: '#808080',
+            dashStyle: 'ShortDash',
             visible: false,
             marker: {
-                fillColor: '#F47D23',
+                fillColor: '#808080',
                 lineWidth: 0,
                 radius: 0,
-                lineColor: '#F47D23'
+                lineColor: '#808080'
             }
         });
     }
@@ -492,6 +508,9 @@ function displayChartData(data, varDetails, download_url, query, container) {
             }
         });
     scenarios.forEach(function (scenario) {
+        if (!('{0}_median'.format(scenario.name) in data)) {
+            return;
+        }
         if (data['{0}_median'.format(scenario.name)].length > 0)
             chartSeries.push({
                 name: T('{0} Median').format(scenario.label),
@@ -679,11 +698,14 @@ function displayChartData(data, varDetails, download_url, query, container) {
                                         if (decade_ms in data['30y_observations']) {
                                             this.value = data['30y_observations'][decade_ms][0];
                                             val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
-                                            tip.push("<span style=\"color:#F47D23\">●</span> " + chart_labels.observation + " <b>"
+                                            tip.push("<span style=\"color:#808080\">●</span> " + chart_labels.observation + " <b>"
                                               + val1 + "</b><br/>");
                                         }
 
                                         scenarios.forEach(function (scenario) {
+                                            if (!('30y_{0}_median'.format(scenario.name) in data)) {
+                                                return;
+                                            }
                                             this.value = data['30y_{0}_median'.format(scenario.name)][decade_ms][0];
                                             val1 = tooltip.chart.yAxis[0].labelFormatter.call(this);
                                             tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Median').format(scenario.label) + " <b>"
@@ -765,6 +787,9 @@ function displayChartData(data, varDetails, download_url, query, container) {
                                         let tip = ["<span style=\"font-size: 10px\">" + decade + "-" + (decade + 29) + " " + chart_labels.change_from_1971_2000 + "</span><br/>"];
 
                                         scenarios.forEach(function (scenario) {
+                                            if (!('delta7100_{0}_median'.format(scenario.name) in data)) {
+                                                return;
+                                            }
                                             val1 = numformat(data['delta7100_{0}_median'.format(scenario.name)][decade_ms][0]);
                                             tip.push("<span style=\"color:{0}\">●</span> ".format(scenario.chart_color) + T('{0} Median').format(scenario.label) + " <b>"
                                               + val1 + "</b><br/>");

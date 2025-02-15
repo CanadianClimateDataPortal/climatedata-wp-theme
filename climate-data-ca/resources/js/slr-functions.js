@@ -788,12 +788,12 @@
                 data: data['rcp85_median'],
                 zIndex: 1,
                 showInNavigator: true,
-                color: '#F00',
+                color: '#980002',
                 marker: {
-                    fillColor: '#F00',
+                    fillColor: '#980002',
                     lineWidth: 0,
                     radius: 0,
-                    lineColor: '#F00'
+                    lineColor: '#980002'
                 }});
 
             chartSeries.push({
@@ -802,7 +802,7 @@
                 type: 'arearange',
                 lineWidth: 0,
                 linkedTo: ':previous',
-                color: '#F00',
+                color: '#980002',
                 fillOpacity: 0.2,
                 zIndex: 0,
                 marker: {

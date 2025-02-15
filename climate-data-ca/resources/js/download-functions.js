@@ -1050,6 +1050,15 @@
                     break;
             }
 
+            const finch_name_generator = DATASETS[dataset_name].finch_name;
+            let finch_name;
+
+            if ( typeof finch_name_generator === 'function' ) {
+                finch_name = finch_name_generator( 'all' );
+            } else {
+                finch_name = finch_name_generator;
+            }
+
             var submit_data = {
                 "captcha_code":$('#daily-captcha_code').val(),
                 "signup":$('#signup').is(":checked"),
@@ -1069,7 +1078,7 @@
                         },
                         {
                             "id": "dataset",
-                            "data": DATASETS[dataset_name].finch_name
+                            "data": finch_name
                         }
                     ],
                     "response": "document",

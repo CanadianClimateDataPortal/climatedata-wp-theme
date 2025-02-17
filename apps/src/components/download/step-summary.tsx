@@ -17,7 +17,7 @@ const StepSummary: React.FC = () => {
 		variable,
 		version,
 		degrees,
-		selectedCells,
+		selectedCellsCount,
 		startYear,
 		endYear,
 		frequency,
@@ -44,8 +44,8 @@ const StepSummary: React.FC = () => {
 			content: _n(
 				'1 cell selected',
 				'%d cells selected',
-				selectedCells
-			).replace('%d', String(selectedCells)),
+				selectedCellsCount
+			).replace('%d', String(selectedCellsCount)),
 		},
 		{
 			title: __('Additional details'),

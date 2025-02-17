@@ -8,7 +8,8 @@ import {
 import TaxonomyDropdownFilter from '@/components/taxonomy-dropdown-filter';
 import VariableRadioCards from '@/components/variable-radio-cards';
 
-import { useDownload } from '@/hooks/use-download';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { setVariable } from '@/features/download/download-slice';
 
 /**
  * Variable step
@@ -20,8 +21,8 @@ const StepVariable: React.FC = () => {
 
 	const { __ } = useI18n();
 
-	const { setField, fields } = useDownload();
-	const { variable } = fields;
+	const variable = useAppSelector((state) => state.download.variable);
+	const dispatch = useAppDispatch();
 
 	return (
 		<StepContainer title={__('Select a variable')}>
@@ -64,7 +65,7 @@ const StepVariable: React.FC = () => {
 					filterValues={filterValues}
 					selected={variable}
 					onSelect={(selected) => {
-						setField('variable', selected);
+						dispatch(setVariable(selected));
 					}}
 				/>
 			</div>

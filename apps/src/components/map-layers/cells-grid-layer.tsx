@@ -17,7 +17,11 @@ import {
 	generateChartData,
 } from '@/services/services';
 import { PercentileData } from '@/types/types';
-import { DEFAULT_MAX_ZOOM, SIDEBAR_WIDTH } from '@/lib/constants';
+import {
+	DEFAULT_MAX_ZOOM,
+	SIDEBAR_WIDTH,
+	SCENARIO_NAMES,
+} from '@/lib/constants';
 
 /**
  * Mouse over event handler logic:
@@ -100,29 +104,11 @@ const CellsGridLayer: React.FC = () => {
 		// Helper method to extract percentile values and handle Kelvin conversion
 		const getPercentileValues = (data: Record<string, PercentileData>) => {
 			// RCP scenario selection
-			const scenarioNames = {
-				cmip5: {
-					low: 'RCP 2.6',
-					medium: 'RCP 4.5',
-					high: 'RCP 8.5',
-				},
-				cmip6: {
-					low: 'SSP 1–2.6',
-					medium: 'SSP 2–4.5',
-					high: 'SSP 5–8.5',
-				},
-				humidex: {
-					low: 'SSP 1–2.6',
-					medium: 'SSP 2–4.5',
-					high: 'SSP 5–8.5',
-				},
-			};
-
-			const datasetKey = dataset as keyof typeof scenarioNames;
+			const datasetKey = dataset as keyof typeof SCENARIO_NAMES;
 			const emissionKey =
-				emissionScenario as keyof (typeof scenarioNames)[keyof typeof scenarioNames];
+				emissionScenario as keyof (typeof SCENARIO_NAMES)[keyof typeof SCENARIO_NAMES];
 
-			const rcp = scenarioNames[datasetKey][emissionKey]
+			const rcp = SCENARIO_NAMES[datasetKey][emissionKey]
 				.replace(/[\W_]+/g, '')
 				.toLowerCase();
 
@@ -384,9 +370,9 @@ const CellsGridLayer: React.FC = () => {
 			vectorTileLayerStyles: {
 				[gridName]: function () {
 					return {
-						weight: 0.1,
+						weight: 0.5,
 						color: '#fff',
-						opacity: 1,
+						opacity: 0.6,
 						fill: true,
 						radius: 4,
 						fillOpacity: 0,

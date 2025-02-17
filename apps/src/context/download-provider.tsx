@@ -91,8 +91,8 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 				return isValidEmail(String(value));
 			}
 
-			// a zero is valid for number types, except in step 4 where selectedCells are required
-			if (typeof value === 'number' && key !== 'selectedCells') {
+			// a zero is valid for number types
+			if (typeof value === 'number') {
 				return true;
 			}
 

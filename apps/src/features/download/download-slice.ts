@@ -7,6 +7,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { DownloadState } from '@/types/types';
+import { CANADA_CENTER, DEFAULT_ZOOM } from '@/lib/constants';
 
 // Define the initial state this slice is going to use.
 export const initialState: DownloadState = {
@@ -19,7 +20,9 @@ export const initialState: DownloadState = {
 	endYear: 2030,
 	frequency: 'Annual',
 	emissionScenarios: [],
-	selectedCells: 1, // temporarily set to 1 so that the step can be submitted
+	selectedCells: [],
+	zoom: DEFAULT_ZOOM,
+	center: CANADA_CENTER,
 	percentiles: [],
 	decimalPlace: 2,
 	format: 'csv',

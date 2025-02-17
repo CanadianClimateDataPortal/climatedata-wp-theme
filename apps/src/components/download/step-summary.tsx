@@ -44,8 +44,8 @@ const StepSummary: React.FC = () => {
 			content: _n(
 				'1 cell selected',
 				'%d cells selected',
-				selectedCells
-			).replace('%d', String(selectedCells)),
+				selectedCells.length
+			).replace('%d', String(selectedCells.length)),
 		},
 		{
 			title: __('Additional details'),

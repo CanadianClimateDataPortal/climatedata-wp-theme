@@ -200,7 +200,7 @@
 						$(document).trigger('fw_query_reset')
 					})
 					
-					$(".fw-query-reset").addClass("tab-drawer-close")
+					$(".fw-query-reset").filter('button').addClass("tab-drawer-close")
 
 				})
 			}

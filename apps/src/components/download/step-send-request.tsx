@@ -10,8 +10,13 @@ import { ControlTitle } from '@/components/ui/control-title';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { cn, isValidEmail } from '@/lib/utils';
-import { useDownload } from '@/hooks/use-download';
+import {
+	setEmail,
+	setFormat,
+	setSubscribe,
+} from '@/features/download/download-slice';
 
 /**
  * Send download request step
@@ -21,8 +26,10 @@ const StepSendRequest: React.FC = () => {
 
 	const { __ } = useI18n();
 
-	const { setField, fields } = useDownload();
-	const { format, email, subscribe } = fields;
+	const { format, email, subscribe } = useAppSelector(
+		(state) => state.download
+	);
+	const dispatch = useAppDispatch();
 
 	const formatOptions = [
 		{ value: 'csv', label: 'CSV' },
@@ -53,7 +60,7 @@ const StepSendRequest: React.FC = () => {
 				value={format}
 				options={formatOptions}
 				onValueChange={(value) => {
-					setField('format', value);
+					dispatch(setFormat(value));
 				}}
 			/>
 
@@ -70,7 +77,7 @@ const StepSendRequest: React.FC = () => {
 					placeholder={__('john.doe@gmail.com')}
 					value={email}
 					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-						setField('email', e.target.value);
+						dispatch(setEmail(e.target.value));
 					}}
 				/>
 				<label
@@ -86,7 +93,7 @@ const StepSendRequest: React.FC = () => {
 						disabled={!isEmailValid}
 						checked={subscribe}
 						onCheckedChange={() => {
-							setField('subscribe', !subscribe);
+							dispatch(setSubscribe(!subscribe));
 						}}
 					/>
 					<span

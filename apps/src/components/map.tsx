@@ -40,7 +40,6 @@ export default function Map({
 			minZoom={DEFAULT_MIN_ZOOM}
 			maxZoom={DEFAULT_MAX_ZOOM}
 			scrollWheelZoom={true}
-			className="h-screen"
 		>
 			<MapEvents onMapReady={onMapReady} onUnmount={onUnmount} />
 			<MapLegend />

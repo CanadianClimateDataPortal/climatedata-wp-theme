@@ -2,7 +2,7 @@ import argparse
 import requests
 from datetime import datetime
 
-important_tags = ["preprod", "uat", "qa"]
+reserved_tags = ["preprod", "uat", "qa"]
 
 
 def make_api_request(method, url):
@@ -11,11 +11,11 @@ def make_api_request(method, url):
     Exits the program if the request fails.
 
     Args:
-    - method (str): The HTTP method to use (GET, POST, etc.)
+    - method (str): The HTTP method to use (GET, POST, etc.).
     - url (str): The URL to send the request to.
 
     Returns:
-    - dict: The response data in JSON format.
+    - dict: The parsed response data as a Python dictionary.
     """
     response = requests.request(method, url, headers=HEADERS)
     if response.status_code != 200:
@@ -27,7 +27,7 @@ def make_api_request(method, url):
 
 def get_repository_path(api_url, project_id, repository_name):
     """
-    Retrieves the repository path for a specific repository within a GitLab project.
+    Retrieves the path for a specific registry repository within a GitLab project.
 
     Args:
     - api_url (str): The base URL of the GitLab API.
@@ -84,9 +84,9 @@ def get_all_tags(repo_path):
     return tags
 
 
-def get_excludable_tags(tags, repo_path):
+def filter_non_important_tags(tags, repo_path):
     """
-    Filters out important tags and returns only non-important tags
+    Filters out important tags and returns only non-important tags.
 
     Args:
     - tags (list): List of all tags retrieved from the repository.
@@ -106,7 +106,7 @@ def get_excludable_tags(tags, repo_path):
             all_digests[tag_name] = {"digest": digest, "created_at": created_at}
 
     for tag_name, tag_info in all_digests.items():
-        if tag_name in important_tags:
+        if tag_name in reserved_tags:
             tag_digests_important[tag_name] = tag_info
         else:
             tag_digests_not_important[tag_name] = tag_info
@@ -123,15 +123,16 @@ def get_excludable_tags(tags, repo_path):
     return tag_digests_not_important
 
 
-def get_deletable_tags(tags_dict, n):
+def get_old_tags(tags_dict, n):
     """
-    Sorts tags by creation date in descending order
+    Returns the tags older than the n most recent ones, sorted by creation date.
 
     Args:
-    - items_dict (dict): A dictionary of tags that are not marked as important.
-    - n (int): The number of most recent tags to ignore (i.e., not delete).
+    - tags_dict (dict): A dictionary of tags with their associated metadata (e.g., digest and creation date).
+    - n (int): The number of most recent tags to retain.
+
     Returns:
-    - list: A list of tags that should be deleted.
+    - list: A list of tags older than the n most recent ones.
     """
     sorted_tags = sorted(
         tags_dict.items(),
@@ -141,7 +142,7 @@ def get_deletable_tags(tags_dict, n):
     return sorted_tags[n:]
 
 
-def delete_old_tags(tags, n):
+def delete_tags(tags, n):
     """
     Deletes tags that are older than the n most recent ones.
 
@@ -176,9 +177,13 @@ def main():
     parser.add_argument(
         "--token", required=True, help="GitLab API authentication token."
     )
-    parser.add_argument("--project_id", required=True, help="GitLab project ID")
     parser.add_argument(
-        "--nb_to_keep",
+        "--project-id",
+        required=True,
+        help="ID of the GitLab project hosting the Container Registry to clean",
+    )
+    parser.add_argument(
+        "--nb-to-keep",
         type=int,
         required=True,
         help="Number of most recent tags to keep",
@@ -193,9 +198,9 @@ def main():
 
     if repo_path:
         tags = get_all_tags(repo_path)
-        unimportant_tags = get_excludable_tags(tags, repo_path)
-        tags_to_delete = get_deletable_tags(unimportant_tags, args.nb_to_keep)
-        delete_old_tags(tags_to_delete, args.nb_to_keep)
+        unimportant_tags = filter_non_important_tags(tags, repo_path)
+        tags_to_delete = get_old_tags(unimportant_tags, args.nb_to_keep)
+        delete_tags(tags_to_delete, args.nb_to_keep)
 
 
 if __name__ == "__main__":

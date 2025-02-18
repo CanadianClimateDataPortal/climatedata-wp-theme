@@ -43,7 +43,7 @@ build-push-portal-image:
   before_script:
   - docker build -f dockerfiles/build/task-runner/Dockerfile -t $DOCKER_IMAGE_TASK_RUNNER .
   - mkdir -p $LOCAL_WP_PLUGINS_DIR
-  - ./dockerfiles/tools/download-docker-assets.sh $DOCKER_ASSETS_URL --username=$DOCKER_ASSETS_USERNAME --password-file=$DOCKER_ASSETS_PASSWORD_FILE
+  - dockerfiles/tools/download-docker-assets.sh $DOCKER_ASSETS_URL --username=$DOCKER_ASSETS_USERNAME --password-file=$DOCKER_ASSETS_PASSWORD_FILE
   # - plugins=$(grep -v -e '^\s*$' -e '^#' ./dockerfiles/build/www/wp-plugins/local.txt)
   # - >
   #   for plugin in $plugins;

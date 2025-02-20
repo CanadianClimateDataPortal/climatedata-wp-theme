@@ -12,8 +12,8 @@ import 'leaflet.vectorgrid';
 
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
-	setSelectedCells,
-	setSelectedCellsCount,
+	setSelection,
+	setSelectionCount,
 	setZoom,
 	setCenter,
 } from '@/features/download/download-slice';
@@ -21,20 +21,13 @@ import { DEFAULT_MAX_ZOOM } from '@/lib/constants';
 import { GridCellProps } from '@/types/types';
 
 /**
- * Mouse over event handler logic:
- * map.js line 843
- *
- * Grid layer for gridded_data sector:
- * cdc.js line 623
+ * Component that allows to select cells on the map and tally the number of cells selected
  */
-
 const SelectableCellsGridLayer = forwardRef<{
 	clearSelection: () => void;
 }>((_, ref) => {
 	const map = useMap();
-	const selectedCells = useAppSelector(
-		(state) => state.download.selectedCells
-	);
+	const selection = useAppSelector((state) => state.download.selection);
 	const dispatch = useAppDispatch();
 
 	// @ts-expect-error: suppress leaflet typescript error
@@ -89,12 +82,12 @@ const SelectableCellsGridLayer = forwardRef<{
 		}
 
 		// now apply the selected cell styles
-		selectedCells.forEach((gid) => {
+		selection.forEach((gid) => {
 			gridLayerRef.current.setFeatureStyle(gid, selectedCellStyles);
 		});
 		// disabling because setting previously selected cells need the gridLayerRef dependency to work
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [gridLayerRef.current, selectedCells, selectedCellStyles]);
+	}, [gridLayerRef.current, selection, selectedCellStyles]);
 
 	/**********************************************
 	 * keep track of the map's zoom and center
@@ -119,11 +112,11 @@ const SelectableCellsGridLayer = forwardRef<{
 	const handleMouseOut = useCallback(
 		(e: GridCellProps) => {
 			const { gid } = e.layer.properties;
-			if (!selectedCells.includes(gid)) {
+			if (!selection.includes(gid)) {
 				gridLayerRef.current?.resetFeatureStyle(gid);
 			}
 		},
-		[selectedCells]
+		[selection]
 	);
 
 	const handleClick = useCallback(
@@ -131,7 +124,7 @@ const SelectableCellsGridLayer = forwardRef<{
 			const { gid } = e.layer.properties;
 
 			// using a set to avoid duplicates and to make it easier to remove
-			const selected = new Set(selectedCells);
+			const selected = new Set(selection);
 
 			if (selected.has(gid)) {
 				selected.delete(gid);
@@ -141,10 +134,10 @@ const SelectableCellsGridLayer = forwardRef<{
 				gridLayerRef.current.setFeatureStyle(gid, selectedCellStyles);
 			}
 
-			dispatch(setSelectedCells(Array.from(selected)));
-			dispatch(setSelectedCellsCount(selected.size));
+			dispatch(setSelection(Array.from(selected)));
+			dispatch(setSelectionCount(selected.size));
 		},
-		[selectedCells, selectedCellStyles, dispatch]
+		[selection, selectedCellStyles, dispatch]
 	);
 
 	// ensure refs always have the latest function versions
@@ -220,15 +213,15 @@ const SelectableCellsGridLayer = forwardRef<{
 		ref,
 		() => ({
 			clearSelection() {
-				selectedCells.forEach((gid) => {
+				selection.forEach((gid) => {
 					gridLayerRef.current?.resetFeatureStyle(gid);
 				});
 
-				dispatch(setSelectedCells([]));
-				dispatch(setSelectedCellsCount(0));
+				dispatch(setSelection([]));
+				dispatch(setSelectionCount(0));
 			},
 		}),
-		[selectedCells, dispatch]
+		[selection, dispatch]
 	);
 
 	return null;

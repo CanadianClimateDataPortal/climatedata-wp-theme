@@ -37,6 +37,11 @@ export const SEARCH_COUNTRY_CODE: string = 'ca';
 export const MAP_SEARCH_URL: string = `https://nominatim.openstreetmap.org/search?format=json&q={s}&countrycodes=${SEARCH_COUNTRY_CODE}`;
 export const OWS_FORMAT: string = 'image/png';
 
+export const REGION_GRID: string = 'gridded_data';
+export const REGION_CENSUS: string = 'census';
+export const REGION_HEALTH: string = 'health';
+export const REGION_WATERSHED: string = 'watershed';
+
 export const SCENARIO_NAMES = {
 	cmip5: {
 		low: 'RCP 2.6',

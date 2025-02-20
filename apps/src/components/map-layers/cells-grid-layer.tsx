@@ -108,6 +108,7 @@ const CellsGridLayer: React.FC = () => {
 			const emissionKey =
 				emissionScenario as keyof (typeof SCENARIO_NAMES)[keyof typeof SCENARIO_NAMES];
 
+			// TODO: replace with data from the API
 			const rcp = SCENARIO_NAMES[datasetKey][emissionKey]
 				.replace(/[\W_]+/g, '')
 				.toLowerCase();

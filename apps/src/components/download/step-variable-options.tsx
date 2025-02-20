@@ -21,6 +21,7 @@ const StepVariableOptions: React.FC = () => {
 	const { version, degrees } = useAppSelector((state) => state.download);
 	const dispatch = useAppDispatch();
 
+	// TODO: replace with data from the API
 	const options = ['CMIP5', 'CMIP6'];
 
 	return (

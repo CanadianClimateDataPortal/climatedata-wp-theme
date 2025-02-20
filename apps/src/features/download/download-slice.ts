@@ -22,8 +22,8 @@ export const initialState: DownloadState = {
 	frequency: 'Annual',
 	emissionScenarios: [],
 	selectionMode: 'cells',
-	selectedCells: [],
-	selectedCellsCount: 0,
+	selection: [],
+	selectionCount: 0,
 	zoom: DEFAULT_ZOOM,
 	center: CANADA_CENTER,
 	percentiles: [],
@@ -68,11 +68,11 @@ const downloadSlice = createSlice({
 		setSelectionMode(state, action: PayloadAction<string>) {
 			state.selectionMode = action.payload;
 		},
-		setSelectedCells(state, action: PayloadAction<number[]>) {
-			state.selectedCells = action.payload;
+		setSelection(state, action: PayloadAction<number[]>) {
+			state.selection = action.payload;
 		},
-		setSelectedCellsCount(state, action: PayloadAction<number>) {
-			state.selectedCellsCount = action.payload;
+		setSelectionCount(state, action: PayloadAction<number>) {
+			state.selectionCount = action.payload;
 		},
 		setZoom(state, action: PayloadAction<number>) {
 			state.zoom = action.payload;
@@ -110,8 +110,8 @@ export const {
 	setFrequency,
 	setEmissionScenarios,
 	setSelectionMode,
-	setSelectedCells,
-	setSelectedCellsCount,
+	setSelection,
+	setSelectionCount,
 	setZoom,
 	setCenter,
 	setPercentiles,

@@ -25,8 +25,8 @@ import {
 	setFrequency,
 	setInteractiveRegion,
 	setPercentiles,
-	setSelectedCells,
-	setSelectedCellsCount,
+	setSelection,
+	setSelectionCount,
 	setStartYear,
 	setSubscribe,
 	setVariable,
@@ -50,7 +50,7 @@ const stepValues: Record<number, (keyof DownloadState)[]> = {
 	1: ['dataset'],
 	2: ['variable'],
 	3: ['version', 'degrees'],
-	4: ['selectedCells', 'selectedCellsCount', 'selectionMode'],
+	4: ['selection', 'selectionCount', 'selectionMode'],
 	5: [
 		'startYear',
 		'endYear',
@@ -71,6 +71,8 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	const dispatch = useAppDispatch();
 	const state = useAppSelector((state) => state.download);
 
+	// TODO: once data is fetched from the API, we will likely need to replace this because
+	//  not all variables will have the same options
 	// helper method used to reset step fields when moving back to a previous step
 	const setField = useCallback(
 		<K extends keyof DownloadState>(key: K, value: DownloadState[K]) => {
@@ -102,11 +104,11 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 				case 'emissionScenarios':
 					dispatch(setEmissionScenarios(value as string[]));
 					break;
-				case 'selectedCells':
-					dispatch(setSelectedCells(value as number[]));
+				case 'selection':
+					dispatch(setSelection(value as number[]));
 					break;
-				case 'selectedCellsCount':
-					dispatch(setSelectedCellsCount(value as number));
+				case 'selectionCount':
+					dispatch(setSelectionCount(value as number));
 					break;
 				case 'zoom':
 					dispatch(setZoom(value as number));
@@ -166,8 +168,8 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 				return isValidEmail(String(value));
 			}
 
-			// a zero is valid for number types, except in step 4 where selectedCells are required
-			if (typeof value === 'number' && key !== 'selectedCells') {
+			// a zero is valid for number types, except in step 4 where selection are required
+			if (typeof value === 'number' && key !== 'selection') {
 				return true;
 			}
 

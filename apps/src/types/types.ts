@@ -175,8 +175,8 @@ export interface DownloadState {
 	frequency: string;
 	emissionScenarios: string[];
 	selectionMode: string;
-	selectedCells: number[];
-	selectedCellsCount: number;
+	selection: number[];
+	selectionCount: number;
 	zoom: number;
 	center: L.LatLngExpression;
 	percentiles: string[];

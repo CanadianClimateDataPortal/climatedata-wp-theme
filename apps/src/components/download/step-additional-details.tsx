@@ -21,7 +21,7 @@ import {
 import { normalizeDropdownOptions } from '@/lib/format';
 
 /**
- * Additional details step
+ * Additional details step will allow the user to customize the download request
  */
 const StepAdditionalDetails: React.FC = () => {
 	const { __ } = useI18n();
@@ -75,7 +75,7 @@ const StepAdditionalDetails: React.FC = () => {
 			</StepContainerDescription>
 
 			<div className="flex gap-4 sm:gap-8 mb-6">
-				<Dropdown<number>
+				<Dropdown
 					className="w-1/2 sm:w-52"
 					label={__('Start Year')}
 					value={startYear}
@@ -85,7 +85,7 @@ const StepAdditionalDetails: React.FC = () => {
 					}}
 				/>
 
-				<Dropdown<number>
+				<Dropdown
 					className="w-1/2 sm:w-52"
 					label={__('End Year')}
 					value={endYear}

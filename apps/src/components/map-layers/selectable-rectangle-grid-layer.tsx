@@ -16,13 +16,13 @@ import 'leaflet.pm/dist/leaflet.pm.css';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
 	setCenter,
-	setSelectedCells,
-	setSelectedCellsCount,
+	setSelection,
+	setSelectionCount,
 	setZoom,
 } from '@/features/download/download-slice';
 
 /**
- * Component that allows to select a rectangle on the map.
+ * Component that allows to select a rectangle on the map and calculate the number of cells selected
  */
 const SelectableRectangleGridLayer = forwardRef<{
 	clearSelection: () => void;
@@ -30,9 +30,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 	const map = useMap();
 	const layerGroupRef = useRef<L.LayerGroup>(new L.LayerGroup());
 
-	const selectedCells = useAppSelector(
-		(state) => state.download.selectedCells
-	);
+	const selection = useAppSelector((state) => state.download.selection);
 	const dispatch = useAppDispatch();
 
 	const gridResolutions = useMemo(
@@ -72,8 +70,8 @@ const SelectableRectangleGridLayer = forwardRef<{
 			const area = latDiff * lngDiff;
 			const totalCells = Math.round(area / gridResolutions[varGrid] ** 2);
 
-			dispatch(setSelectedCells([minLat, minLng, maxLat, maxLng]));
-			dispatch(setSelectedCellsCount(totalCells));
+			dispatch(setSelection([minLat, minLng, maxLat, maxLng]));
+			dispatch(setSelectionCount(totalCells));
 		},
 		[gridResolutions, dispatch]
 	);
@@ -88,10 +86,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 			updateCellCount(e.layer);
 
 			// enable resizing
-			e.layer.pm.enable({
-				allowSelfIntersection: false,
-				draggable: true,
-			});
+			e.layer.pm.enable();
 
 			// disable drawing mode
 			map.pm.disableDraw('Rectangle');
@@ -107,41 +102,48 @@ const SelectableRectangleGridLayer = forwardRef<{
 		[map, updateCellCount]
 	);
 
+	// draw a rectangle if there are selected cells when the component mounts
+	useEffect(() => {
+		if (selection.length > 0) {
+			const bounds: L.LatLngBoundsExpression = [
+				[selection[0], selection[1]], // southwest corner [minLat, minLng]
+				[selection[2], selection[3]], // northeast corner [maxLat, maxLng]
+			];
+
+			L.rectangle(bounds).addTo(layerGroupRef.current);
+		}
+		// disabling because we want this logic to run only once when the component mounts, and
+		// including selection in the dependency array breaks the shape resizing feature
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
 	useEffect(() => {
 		if (!map) {
 			return;
 		}
 
+		// enable drawing a rectangle
+		map.pm.enableDraw('Rectangle');
+
+		// adding events
+		map.on('pm:create', onCreate);
 		map.on('zoomend', handleMoveEnd);
 		map.on('moveend', handleMoveEnd);
 
 		map.addLayer(layerGroupRef.current);
 
-		// enable drawing a rectangle
-		map.pm.enableDraw('Rectangle');
-
-		map.on('pm:create', onCreate);
-
-		if (selectedCells.length > 0) {
-			const bounds: L.LatLngBoundsExpression = [
-				[selectedCells[0], selectedCells[1]], // southwest corner [minLat, minLng]
-				[selectedCells[2], selectedCells[3]], // northeast corner [maxLat, maxLng]
-			];
-
-			L.rectangle(bounds).addTo(layerGroupRef.current);
-		}
-
+		// making the layer group available to other hooks
 		const layerGroup = layerGroupRef.current;
 
 		return () => {
+			map.pm.disableDraw('Rectangle');
+			map.off('pm:create', onCreate);
+
 			if (layerGroup) {
 				map.removeLayer(layerGroup);
 			}
-
-			map.pm.disableDraw('Rectangle');
-			map.off('pm:create', onCreate);
 		};
-	}, [map, onCreate, selectedCells, handleMoveEnd]);
+	}, [map, onCreate, handleMoveEnd]);
 
 	// expose the clear selection method to the parent component
 	useImperativeHandle(
@@ -155,8 +157,9 @@ const SelectableRectangleGridLayer = forwardRef<{
 				// re enable drawing a rectangle
 				map.pm.enableDraw('Rectangle');
 
-				dispatch(setSelectedCells([]));
-				dispatch(setSelectedCellsCount(0));
+				// clear selection in redux
+				dispatch(setSelection([]));
+				dispatch(setSelectionCount(0));
 			},
 		}),
 		[map, dispatch]

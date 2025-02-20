@@ -168,12 +168,12 @@ WORKDIR /var/www/html/assets/plugins
 
 # Read plugins defined in the wp-plugins/local.txt file and unzip them from the
 # `LOCAL_WP_PLUGINS_DIR` directory.
-ARG LOCAL_WP_PLUGINS_DIR
-RUN --mount=type=bind,source=$LOCAL_WP_PLUGINS_DIR,target=/tmp/wp-plugins \
-    --mount=type=bind,source=dockerfiles/build/www/wp-plugins/local.txt,target=/tmp/plugins.txt \
-    plugins=$(grep -v -e '^\s*$' -e '^#' /tmp/plugins.txt) \
-    && set -- $plugins \
-    && unzip-multiple.sh /tmp/wp-plugins "$@"
+# ARG LOCAL_WP_PLUGINS_DIR
+# RUN --mount=type=bind,source=$LOCAL_WP_PLUGINS_DIR,target=/tmp/wp-plugins \
+#     --mount=type=bind,source=dockerfiles/build/www/wp-plugins/local.txt,target=/tmp/plugins.txt \
+#     plugins=$(grep -v -e '^\s*$' -e '^#' /tmp/plugins.txt) \
+#     && set -- $plugins \
+#     && unzip-multiple.sh /tmp/wp-plugins "$@"
 
 # Read plugins defined in the wp-plugins/public.txt file and download them from
 # the WordPress plugin repository.

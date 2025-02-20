@@ -3,10 +3,11 @@
  * This component allows users to search for locations using the OpenStreetMap Nominatim API and navigate the map to the selected location.
  */
 
-import { useState, useEffect, ReactElement, useCallback } from 'react';
+import { useState, useEffect, ReactElement, useCallback, useMemo } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 import { Locate, LocateFixed } from 'lucide-react';
 import { useMap } from 'react-leaflet';
+import { nanoid } from 'nanoid';
 
 import L from 'leaflet';
 import 'leaflet-search/dist/leaflet-search.min.css';
@@ -23,7 +24,7 @@ import {
 import {
 	SEARCH_PLACEHOLDER,
 	SEARCH_DEFAULT_ZOOM,
-	MAP_SEARCH_URL,
+	LOCATION_SEARCH_ENDPOINT,
 } from '@/lib/constants.ts';
 
 /**
@@ -49,7 +50,7 @@ export default function SearchControl({
 
 	// we need a unique id for the search control container for cases where multiple maps
 	// are rendered on the same page -- ie. comparing emission scenarios
-	const searchControlId = Math.random().toString(36).substring(2, 10);
+	const searchControlId = useMemo(() => nanoid(), []);
 
 	// defining default placeholder here so that it can be translated
 	const textPlaceholder = __(SEARCH_PLACEHOLDER) || '';
@@ -118,6 +119,10 @@ export default function SearchControl({
 			return;
 		}
 
+		// helper function to build the title for a location item, following same format as original implementation
+		// eg.: text (term) location, province
+		// 	Ottawa (City) Carleton; Russel, Ontario
+		// 	Nottawasaga River (River), Simcoe, Ontario
 		const buildLocationTitle = (item: SearchControlLocationItem) => {
 			const parts = [item.text];
 
@@ -138,7 +143,7 @@ export default function SearchControl({
 		// Create a new Leaflet Search Control with custom options.
 		// @ts-expect-error: suppress leaflet typescript error
 		const searchControl = new L.Control.Search({
-			url: MAP_SEARCH_URL,
+			url: LOCATION_SEARCH_ENDPOINT,
 			propertyLoc: ['lat', 'lon'],
 			collapsed: false,
 			autoCollapse: false,

@@ -33,5 +33,6 @@ export const SLIDER_DEFAULT_YEAR_VALUE: number = 1971;
 export const SEARCH_PLACEHOLDER: string =
 	'Zoom to a location, region, city, coordinates...';
 export const SEARCH_DEFAULT_ZOOM: number = 10;
-export const MAP_SEARCH_URL: string = '/wp-json/cdc/v2/location_search/?q={s}';
+export const LOCATION_SEARCH_ENDPOINT: string =
+	'/wp-json/cdc/v2/location_search/?q={s}';
 export const OWS_FORMAT: string = 'image/png';

@@ -17,7 +17,7 @@ import {
 	setZoom,
 	setCenter,
 } from '@/features/download/download-slice';
-import { DEFAULT_MAX_ZOOM } from '@/lib/constants';
+import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM } from '@/lib/constants';
 import { GridCellProps } from '@/types/types';
 
 /**
@@ -101,7 +101,7 @@ const SelectableCellsGridLayer = forwardRef<{
 	/**********************************************
 	 * grid cell event handlers
 	 **********************************************/
-	const handleMouseOver = useCallback(
+	const handleOver = useCallback(
 		(e: GridCellProps) => {
 			const { gid } = e.layer.properties;
 			gridLayerRef.current.setFeatureStyle(gid, hoverCellStyles);
@@ -109,7 +109,7 @@ const SelectableCellsGridLayer = forwardRef<{
 		[hoverCellStyles]
 	);
 
-	const handleMouseOut = useCallback(
+	const handleOut = useCallback(
 		(e: GridCellProps) => {
 			const { gid } = e.layer.properties;
 			if (!selection.includes(gid)) {
@@ -142,16 +142,16 @@ const SelectableCellsGridLayer = forwardRef<{
 
 	// ensure refs always have the latest function versions
 	const handleClickRef = useRef(handleClick);
-	const handleMouseOverRef = useRef(handleMouseOver);
-	const handleMouseOutRef = useRef(handleMouseOut);
+	const handleOverRef = useRef(handleOver);
+	const handleOutRef = useRef(handleOut);
 	const handleMoveEndRef = useRef(handleMoveEnd);
 
 	useEffect(() => {
 		handleClickRef.current = handleClick;
-		handleMouseOverRef.current = handleMouseOver;
-		handleMouseOutRef.current = handleMouseOut;
+		handleOverRef.current = handleOver;
+		handleOutRef.current = handleOut;
 		handleMoveEndRef.current = handleMoveEnd;
-	}, [handleClick, handleMouseOver, handleMouseOut, handleMoveEnd]);
+	}, [handleClick, handleOver, handleOut, handleMoveEnd]);
 
 	/**********************************************
 	 * initialize the grid layer
@@ -163,10 +163,9 @@ const SelectableCellsGridLayer = forwardRef<{
 
 		const handleClick = (event: GridCellProps) =>
 			handleClickRef.current(event);
-		const handleMouseOver = (event: GridCellProps) =>
-			handleMouseOverRef.current(event);
-		const handleMouseOut = (event: GridCellProps) =>
-			handleMouseOutRef.current(event);
+		const handleOver = (event: GridCellProps) =>
+			handleOverRef.current(event);
+		const handleOut = (event: GridCellProps) => handleOutRef.current(event);
 		const handleMoveEnd = () => handleMoveEndRef.current();
 
 		// @ts-expect-error: suppress leaflet typescript error
@@ -176,10 +175,7 @@ const SelectableCellsGridLayer = forwardRef<{
 			getFeatureId: (feature: { properties: { gid: number } }) =>
 				feature.properties.gid,
 			vectorTileLayerStyles: tileLayerStyles,
-			bounds: L.latLngBounds(
-				L.latLng(41, -141.1), // _southWest
-				L.latLng(83.6, -49.9) // _northEast
-			),
+			bounds: CANADA_BOUNDS,
 			maxZoom: DEFAULT_MAX_ZOOM,
 			minZoom: 7, // not using DEFAULT_MIN_ZOOM because then the cells would appear before zooming in and it slows the map rendering
 			pane: 'grid',
@@ -188,10 +184,16 @@ const SelectableCellsGridLayer = forwardRef<{
 		map.on('zoomend', handleMoveEnd);
 		map.on('moveend', handleMoveEnd);
 
-		gridLayer
-			.on('click', handleClick)
-			.on('mouseover', handleMouseOver)
-			.on('mouseout', handleMouseOut);
+		gridLayer.on('click', handleClick);
+
+		// touch events for mobile devices
+		if ('ontouchstart' in window) {
+			gridLayer.on('touchstart', handleOver).on('touchend', handleOut);
+		}
+		// mouse events for desktop
+		else {
+			gridLayer.on('mouseover', handleOver).on('mouseout', handleOut);
+		}
 
 		gridLayer.addTo(map);
 

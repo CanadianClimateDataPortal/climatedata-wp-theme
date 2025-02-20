@@ -21,14 +21,12 @@ import {
 	DEFAULT_MAX_ZOOM,
 	SIDEBAR_WIDTH,
 	SCENARIO_NAMES,
+	CANADA_BOUNDS,
+	REGION_GRID,
 } from '@/lib/constants';
 
 /**
- * Mouse over event handler logic:
- * map.js line 843
- *
- * Grid layer for gridded_data sector:
- * cdc.js line 623
+ * Component that displays the cells grid layer on the map and handles interactions with it like hover and click
  */
 const CellsGridLayer: React.FC = () => {
 	const map = useMap();
@@ -267,12 +265,12 @@ const CellsGridLayer: React.FC = () => {
 			);
 		};
 
-		const handleMouseOver = (e: {
+		const handleOver = (e: {
 			latlng: L.LatLng;
 			layer: { properties: { gid: number } };
 		}) => {
 			// clear any opened tooltips to avoid multiple tooltips at the same time
-			handleMouseOut();
+			handleOut();
 
 			// store the gid of the hovered cell
 			const { gid } = e.layer.properties;
@@ -315,7 +313,7 @@ const CellsGridLayer: React.FC = () => {
 						dataset_name: dataset,
 					}).toString();
 
-					if (interactiveRegion === 'gridded_data') {
+					if (interactiveRegion === REGION_GRID) {
 						endpoint = `get-delta-30y-gridded-values/${lat}/${lng}`;
 					}
 
@@ -339,7 +337,7 @@ const CellsGridLayer: React.FC = () => {
 			}, 100);
 		};
 
-		const handleMouseOut = () => {
+		const handleOut = () => {
 			// close the tooltip
 			const gridLayer = gridLayerRef.current;
 			gridLayer.unbindTooltip();
@@ -380,10 +378,7 @@ const CellsGridLayer: React.FC = () => {
 					};
 				},
 			},
-			bounds: L.latLngBounds(
-				L.latLng(41, -141.1), // _southWest
-				L.latLng(83.6, -49.9) // _northEast
-			),
+			bounds: CANADA_BOUNDS,
 			maxZoom: DEFAULT_MAX_ZOOM,
 			minZoom: 7, // not using DEFAULT_MIN_ZOOM because then the cells would appear before zooming in and it slows the map rendering
 			pane: 'grid', // TODO: figure out how `pane` works in the map
@@ -395,10 +390,16 @@ const CellsGridLayer: React.FC = () => {
 		const gridLayer = L.vectorGrid.protobuf(tileLayerUrl, gridOptions);
 		gridLayerRef.current = gridLayer;
 
-		gridLayer
-			.on('mouseover', handleMouseOver)
-			.on('mouseout', handleMouseOut)
-			.on('click', handleClick);
+		gridLayer.on('click', handleClick);
+
+		// touch events for mobile devices
+		if ('ontouchstart' in window) {
+			gridLayer.on('touchstart', handleOver).on('touchend', handleOut);
+		}
+		// mouse events for desktop
+		else {
+			gridLayer.on('mouseover', handleOver).on('mouseout', handleOut);
+		}
 
 		gridLayer.addTo(map);
 

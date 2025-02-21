@@ -148,3 +148,35 @@ function cdc_rest_v3_build_multilingual_field( $en, $fr ) {
 
 	return ! empty( $field ) ? $field : null;
 }
+
+/**
+ * Set cache headers for REST API V3 endpoints.
+ *
+ * This function sets the Cache-Control header to cache the response
+ * for 24 hours for specific REST API V3 endpoints.
+ *
+ * @param bool $served Whether the request has already been served.
+ * @param WP_HTTP_Response $result Result to send to the client.
+ * @param WP_REST_Request $request Request used to generate the response.
+ * @param WP_REST_Server $server Server instance.
+ *
+ * @return bool True if the request has been served, otherwise false.
+ */
+function cdc_rest_v3_set_cache( $served, $result, $request, $server ) {
+	$cacheable_endpoints = [
+		'cdc/v3/datasets-list',
+		'cdc/v3/variables-list',
+	];
+
+	$route = $request->get_route();
+
+	if ( array_filter( $cacheable_endpoints, function ( $endpoint ) use ( $route ) {
+		return strpos( $route, $endpoint ) !== false;
+	} ) ) {
+		header( 'Cache-Control: public, max-age=86400' ); // Cache for 24 hours.
+	}
+
+	return $served;
+}
+
+add_action( 'rest_pre_serve_request', 'cdc_rest_v3_set_cache', 10, 4 );

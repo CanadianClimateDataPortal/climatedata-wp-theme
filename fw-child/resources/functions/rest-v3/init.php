@@ -18,12 +18,13 @@ defined( 'ABSPATH' ) || exit;
 function cdc_rest_v3_init() {
 	// Load endpoint definitions.
 	require_once dirname( __FILE__ ) . '/datasets-list.php';
+	require_once dirname( __FILE__ ) . '/variables-list.php';
 }
 
 add_action( 'rest_api_init', 'cdc_rest_v3_init' );
 
 /**
- * Permission callback for V3 endpoints.
+ * Permission callback for REST API V3 endpoints.
  *
  * Ensures requests only come from the same WordPress domain.
  *

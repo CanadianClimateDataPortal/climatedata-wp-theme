@@ -97,7 +97,7 @@ function cdc_rest_v3_get_datasets_list( $request ) {
 			);
 
 			if ( ! empty( $card_descriptions ) ) {
-				$card['description'] = $card_description;
+				$card['description'] = $card_descriptions;
 			}
 
 			// Add card links if available.

@@ -38,8 +38,8 @@ register_rest_route(
 function cdc_rest_v3_get_datasets_list( $request ) {
 	try {
 		// Get pagination parameters.
-		$per_page = $request->get_param( 'per_page' );
-		$page     = $request->get_param( 'page' );
+		$terms_per_page = $request->get_param( 'terms_per_page' );
+		$paged          = $request->get_param( 'paged' );
 
 		// Get all variable dataset terms.
 		$args = array(
@@ -48,9 +48,9 @@ function cdc_rest_v3_get_datasets_list( $request ) {
 		);
 
 		// Only add 'number' and offset if not requesting all items.
-		if ( $per_page !== -1 ) {
-			$args['number'] = $per_page;
-			$args['offset'] = ( $page - 1 ) * $per_page;
+		if ( $terms_per_page !== -1 ) {
+			$args['number'] = $terms_per_page;
+			$args['offset'] = ( $paged - 1 ) * $terms_per_page;
 		}
 
 		$terms = get_terms( $args );
@@ -81,14 +81,11 @@ function cdc_rest_v3_get_datasets_list( $request ) {
 				'term_id' => $term_id,
 			);
 
-			// Add titles if available.
-			$titles = cdc_rest_v3_build_multilingual_field(
+			// Add titles.
+			$dataset['title'] = cdc_rest_v3_build_multilingual_field(
 				$term->name,
 				$title_fr
 			);
-			if ( ! empty( $titles ) ) {
-				$dataset['title'] = $titles;
-			}
 
 			// Build card object.
 			$card = array();
@@ -98,6 +95,7 @@ function cdc_rest_v3_get_datasets_list( $request ) {
 				$card_description,
 				$card_description_fr
 			);
+
 			if ( ! empty( $card_descriptions ) ) {
 				$card['description'] = $card_description;
 			}
@@ -107,6 +105,7 @@ function cdc_rest_v3_get_datasets_list( $request ) {
 				$card_link,
 				$card_link_fr
 			);
+
 			if ( ! empty( $card_links ) ) {
 				$card['link'] = $card_links;
 			}
@@ -125,12 +124,13 @@ function cdc_rest_v3_get_datasets_list( $request ) {
 		);
 
 		// Add pagination headers only if not requesting all items.
-		if ( $per_page !== -1 ) {
+		if ( $terms_per_page !== -1 ) {
 			$total_terms = wp_count_terms( array( 'taxonomy' => 'variable-dataset' ) );
 			if ( is_wp_error( $total_terms ) ) {
 				$total_terms = 0;
 			}
-			$total_pages = ceil( $total_terms / $per_page );
+
+			$total_pages = ceil( $total_terms / $terms_per_page );
 
 			// Set headers for pagination.
 			$response_headers = array(
@@ -140,6 +140,7 @@ function cdc_rest_v3_get_datasets_list( $request ) {
 
 			// Add headers to response.
 			$response_object = new WP_REST_Response( $response, 200 );
+
 			foreach ( $response_headers as $key => $value ) {
 				$response_object->header( $key, $value );
 			}
@@ -149,7 +150,6 @@ function cdc_rest_v3_get_datasets_list( $request ) {
 		}
 
 		return $response_object;
-
 	} catch ( Exception $e ) {
 		return new WP_Error(
 			'server_error',
@@ -170,7 +170,7 @@ function cdc_rest_v3_get_datasets_list( $request ) {
  */
 function cdc_rest_v3_get_datasets_args() {
 	return array(
-		'per_page' => array(
+		'terms_per_page' => array(
 			'description'       => 'Number of items per page. Use -1 for all items.',
 			'type'              => 'integer',
 			'default'           => -1,
@@ -178,7 +178,7 @@ function cdc_rest_v3_get_datasets_args() {
 			'maximum'           => 100,
 			'sanitize_callback' => 'cdc_rest_v3_sanitize_arg_per_page',
 		),
-		'page'     => array(
+		'paged'           => array(
 			'description'       => 'Current page number',
 			'type'              => 'integer',
 			'default'           => 1,
@@ -187,26 +187,3 @@ function cdc_rest_v3_get_datasets_args() {
 		),
 	);
 }
-
-/**
- * Set cache headers for the datasets list REST API endpoint.
- *
- * This function sets the Cache-Control header to cache the response
- * for 24 hours if the request is for the 'cdc/v3/datasets-list' endpoint.
- *
- * @param bool $served Whether the request has already been served.
- * @param WP_HTTP_Response $result Result to send to the client.
- * @param WP_REST_Request $request Request used to generate the response.
- * @param WP_REST_Server $server Server instance.
- *
- * @return bool True if the request has been served, otherwise false.
- */
-function cdc_rest_v3_set_cache( $served, $result, $request, $server ) {
-	if ( strpos( $request->get_route(), 'cdc/v3/datasets-list' ) !== false ) {
-		header( 'Cache-Control: public, max-age=86400' ); // Cache for 24 hours.
-	}
-
-	return $served;
-}
-
-add_action( 'rest_pre_serve_request', 'cdc_rest_v3_set_cache', 10, 4 );

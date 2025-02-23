@@ -118,7 +118,7 @@ export const fetchTaxonomyData = async (
 	// fetch from the PI or directly return dummy json response
 	const data: TaxonomyData[] = fetchFromApi
 		? await fetch(
-				`https://dev-en.climatedata.ca/wp-json/cdc/v3/${slug}-list`
+				`/wp-json/cdc/v3/${slug}-list`
 			)
 				.then((res) => {
 					if (!res.ok) {

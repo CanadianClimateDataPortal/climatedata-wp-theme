@@ -9,6 +9,7 @@ import {
 import { RadioCard, RadioCardFooter } from '@/components/ui/radio-card';
 import Link from '@/components/ui/link';
 
+import { useLocale } from '@/hooks/use-locale';
 import { useDownload } from '@/hooks/use-download';
 import { fetchTaxonomyData } from '@/services/services';
 import { TaxonomyData } from '@/types/types';
@@ -20,12 +21,13 @@ const StepDataset: React.FC = () => {
 	const [options, setOptions] = useState<TaxonomyData[]>([]);
 
 	const { __ } = useI18n();
+	const { locale } = useLocale();
 
 	const { setField, fields } = useDownload();
 	const { dataset } = fields;
 
 	useEffect(() => {
-		fetchTaxonomyData('variable-dataset').then((data) => {
+		fetchTaxonomyData('datasets').then((data) => {
 			setOptions(data);
 		});
 	}, []);
@@ -42,25 +44,32 @@ const StepDataset: React.FC = () => {
 					return (
 						<RadioCard
 							key={index}
-							value={option.id}
+							value={option.term_id}
 							radioGroup="dataset"
-							title={option.name ?? ''}
-							description={option.description}
-							selected={dataset?.id === option.id}
+							title={option.title?.[locale] ?? ''}
+							description={
+								option?.card?.description?.[locale] ?? ''
+							}
+							selected={dataset?.term_id === option.term_id}
 							onSelect={() => {
 								setField('dataset', option);
 							}}
 							className="mb-0"
 						>
-							<RadioCardFooter>
-								<Link
-									icon={<ExternalLink size={16} />}
-									href={option.link ?? '#'}
-									className="text-base text-brand-blue leading-6"
-								>
-									{__('Learn more')}
-								</Link>
-							</RadioCardFooter>
+							{option?.card?.link && (
+								<RadioCardFooter>
+									<Link
+										icon={<ExternalLink size={16} />}
+										href={
+											option.card.link?.[locale]?.url ??
+											'#'
+										}
+										className="text-base text-brand-blue leading-6"
+									>
+										{__('Learn more')}
+									</Link>
+								</RadioCardFooter>
+							)}
 						</RadioCard>
 					);
 				})}

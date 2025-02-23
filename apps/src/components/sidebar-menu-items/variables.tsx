@@ -92,9 +92,9 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 								}))
 							}
 							slug="var-type"
-							label="Variable Types"
-							tooltip="Select a variable type"
-							placeholder="All"
+							label={__('Variable Types')}
+							tooltip={__('Select a variable type')}
+							placeholder={__('All')}
 							value={filterValues['var-type'] || ''}
 						/>
 						<TaxonomyDropdownFilter
@@ -106,9 +106,9 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 								}))
 							}
 							slug="sector"
-							label="Sectors"
-							tooltip="Select a sector"
-							placeholder="All"
+							label={__('Sectors')}
+							tooltip={__('Select a sector')}
+							placeholder={__('All')}
 							value={filterValues.sector || ''}
 						/>
 					</Grid>

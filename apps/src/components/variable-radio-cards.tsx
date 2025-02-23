@@ -22,7 +22,7 @@ const VariableRadioCards: React.FC<{
 			}
 
 			const data = await fetchPostsData('variable', filterValues);
-			const normalizedData = await normalizeRadioCardProps(data, 'post');
+			const normalizedData = await normalizeRadioCardProps(data);
 			setVariables(normalizedData);
 		})();
 	}, [filterValues]);

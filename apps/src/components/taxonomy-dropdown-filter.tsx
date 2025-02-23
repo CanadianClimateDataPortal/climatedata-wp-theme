@@ -3,6 +3,7 @@ import { useI18n } from '@wordpress/react-i18n';
 
 import Dropdown from '@/components/ui/dropdown';
 import { fetchTaxonomyData } from '@/services/services';
+import { useLocale } from '@/hooks/use-locale';
 import { TaxonomyData } from '@/types/types';
 
 const TaxonomyDropdownFilter: React.FC<{
@@ -26,6 +27,7 @@ const TaxonomyDropdownFilter: React.FC<{
 		[]
 	);
 
+	const { locale } = useLocale();
 	const { __ } = useI18n();
 
 	useEffect(() => {
@@ -33,12 +35,12 @@ const TaxonomyDropdownFilter: React.FC<{
 			const data = await fetchTaxonomyData(slug);
 			setOptions(
 				data.map((option: TaxonomyData) => ({
-					value: String(option.id),
-					label: option.name,
+					value: String(option.term_id),
+					label: option.title?.[locale] as string,
 				}))
 			);
 		})();
-	}, [slug]);
+	}, [slug, locale]);
 
 	return (
 		<Dropdown

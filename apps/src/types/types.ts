@@ -12,6 +12,14 @@ import L from 'leaflet';
 export type Locale = 'en' | 'fr';
 
 /**
+ * Represents a field with multilingual support.
+ */
+export interface MultilingualField<T = string> {
+	en: T;
+	fr?: T;
+}
+
+/**
  * Represents the structure used as props for the RelatedCard component.
  */
 export interface RelatedCardData {
@@ -47,6 +55,24 @@ export interface RelatedData {
  * @type {TaxonomyData}
  */
 export type TaxonomyData = {
+	term_id: number;
+	title: MultilingualField;
+	card?: {
+		description?: MultilingualField;
+		link?: MultilingualField<{
+			title: string;
+			url: string;
+			target: string;
+		}>;
+	};
+};
+
+/**
+ * Taxonomy data for dummy json files. Will be removed once all data is fetched from the API.
+ *
+ * @type {DummyTaxonomyData}
+ */
+export type DummyTaxonomyData = {
 	id: string | number;
 	name: string;
 	slug: string;

@@ -1,10 +1,5 @@
 import { cva } from 'class-variance-authority';
-import {
-	WMSLegendData,
-	TransformedLegendEntry,
-	TaxonomyData,
-	PostData,
-} from '@/types/types';
+import { WMSLegendData, TransformedLegendEntry, PostData } from '@/types/types';
 
 export async function transformLegendData(
 	input: WMSLegendData
@@ -59,35 +54,15 @@ export function normalizeDropdownOptions<T>(
 /**
  * Normalize props used by the RadioCard component
  * @param dataOrPromise - The data to normalize
- * @param type - The type of data to normalize, either 'taxonomy' or 'post'
- *
  */
-export const normalizeRadioCardProps = async <T extends 'taxonomy' | 'post'>(
-	dataOrPromise:
-		| (T extends 'taxonomy' ? TaxonomyData : PostData)[]
-		| Promise<(T extends 'taxonomy' ? TaxonomyData : PostData)[]>,
-	type: T
-): Promise<T extends 'taxonomy' ? TaxonomyData[] : PostData[]> => {
+export const normalizeRadioCardProps = async (
+	dataOrPromise: PostData[] | Promise<PostData[]>
+): Promise<PostData[]> => {
 	// make sure the data is resolved in case we received a promise
 	const data = await dataOrPromise;
 
 	const normalizedData = await Promise.all(
 		data?.map(async (item) => {
-			// extract taxonomy data into a key:value structure (if available)
-			if (type === 'taxonomy') {
-				const taxonomyItem = item as TaxonomyData;
-
-				return {
-					id: taxonomyItem.id,
-					name: taxonomyItem.name,
-					slug: taxonomyItem.slug,
-					link: taxonomyItem.link,
-					value: taxonomyItem.slug,
-					description: taxonomyItem.description || '',
-					thumbnail: taxonomyItem?.thumbnail || null,
-				} as TaxonomyData;
-			}
-
 			const postItem = item as PostData;
 			const links = postItem._links as
 				| Record<string, unknown>
@@ -128,7 +103,7 @@ export const normalizeRadioCardProps = async <T extends 'taxonomy' | 'post'>(
 		})
 	);
 
-	return normalizedData as T extends 'taxonomy' ? TaxonomyData[] : PostData[];
+	return normalizedData;
 };
 
 export const doyFormatter = (value: number, language: string) => {

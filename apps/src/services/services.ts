@@ -6,16 +6,16 @@ import {
 	RelatedData,
 	MapInfoData,
 	TaxonomyData,
-	PostData,
 	ApiPostData,
+	PostData,
 	ChartDataOptions,
 	DeltaValuesOptions,
+	DummyTaxonomyData,
 } from '@/types/types';
 import L from 'leaflet';
 
 // TODO: temporarily using dummy data inside the assets folder, until the API is ready
 import variableResponseDummy from '@/assets/dummy/variable-response-dummy.json';
-import datasetResponseDummy from '@/assets/dummy/dataset-response-dummy.json';
 import variableDatasetResponseDummy from '@/assets/dummy/variable-dataset-response-dummy.json';
 import varTypeResponseDummy from '@/assets/dummy/var-type-response-dummy.json';
 import sectorResponseDummy from '@/assets/dummy/sector-response-dummy.json';
@@ -29,7 +29,6 @@ import deltaValuesDummy from '@/assets/dummy/delta-values-dummy.json';
 const dummyResponses = {
 	variable: variableResponseDummy,
 	'variable-dataset': variableDatasetResponseDummy,
-	dataset: datasetResponseDummy,
 	'var-type': varTypeResponseDummy,
 	sector: sectorResponseDummy,
 } as const;
@@ -113,28 +112,44 @@ export const fetchTaxonomyData = async (
 	slug: string,
 	filters?: Record<string, string | number | null>
 ): Promise<TaxonomyData[]> => {
-	// TODO: uncomment this and use correct API endpoint when ready
-	// const response = await fetch(`/dummy/${slug}-response-dummy.json`);
-	// if (!response.ok) {
-	// 	throw new Error('Failed to fetch data');
-	// }
-	// TODO: remove this when the API is ready
-	let response: { json: () => Promise<unknown> };
-	if (slug in dummyResponses) {
-		response = {
-			json: async () => dummyResponses[slug as DummyResponseKey], // mimic fetch response.json()
-		};
-	} else {
-		return [];
-	}
+	// check if the there is a dummy response for the slug, which means the API is not yet implemented for it in the backend
+	const fetchFromApi = !Object.keys(dummyResponses).includes(slug);
 
-	const data = (await response.json()) as TaxonomyData[];
+	// fetch from the PI or directly return dummy json response
+	const data: TaxonomyData[] = fetchFromApi
+		? await fetch(
+				`https://dev-en.climatedata.ca/wp-json/cdc/v3/${slug}-list`
+			)
+				.then((res) => {
+					if (!res.ok) {
+						throw new Error('Failed to fetch data');
+					}
+					return res.json();
+				})
+				.then((json) => json[slug])
+		: (dummyResponses[slug as DummyResponseKey] as DummyTaxonomyData[]).map(
+				(item) => ({
+					term_id: Number(item.id),
+					title: { en: item.name },
+					card:
+						item.description || item.link
+							? {
+									description: item.description
+										? { en: item.description }
+										: undefined,
+									link: item.link
+										? { en: item.link }
+										: undefined,
+								}
+							: undefined,
+				})
+			);
 
 	// applying filters for the dummy implementation.. for the real implementation, this should be done via query params when fetching
 	if (filters) {
 		return data.filter((item) => {
 			return Object.keys(filters).every((key) => {
-				return item[key] === filters[key];
+				return item[key as keyof TaxonomyData] === filters[key];
 			});
 		});
 	}

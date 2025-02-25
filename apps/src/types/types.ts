@@ -68,49 +68,53 @@ export type TaxonomyData = {
 };
 
 /**
- * Taxonomy data for dummy json files. Will be removed once all data is fetched from the API.
- *
- * @type {DummyTaxonomyData}
+ * Represents an individual term with multilingual title and term id.
  */
-export type DummyTaxonomyData = {
-	id: string | number;
-	name: string;
-	slug: string;
-	description: string;
-	link: string;
-	[key: string]: unknown;
+export type TermItem = {
+	term_id: number;
+	title: MultilingualField;
 };
 
 /**
  * Represents data returned from WordPress for a post.
  *
- * This type is used to define the structure of post data objects,
- * which may include predefined fields like `id`, `title`, `link`, etc.
- * Additional dynamic properties can also be included.
+ * This type is used to define the structure of post data objects coming from the API
  */
 export type ApiPostData = {
 	id: string | number;
-	title: { rendered: string };
-	link: string;
-	featured_media?: number;
-	_links?: {
-		'wp:term'?: {
-			href: string;
-			taxonomy: string;
-			[key: string]: unknown;
-		}[];
-		[key: string]: unknown;
+	meta: {
+		updated_on?: string;
+		content: {
+			title: MultilingualField;
+			card?: {
+				description?: MultilingualField;
+				link?: MultilingualField<{
+					title: string;
+					url: string;
+					target: string;
+				}>;
+			};
+			thumbnail?: string;
+		};
+		taxonomy: Record<
+			string,
+			{
+				terms: TermItem[];
+			}
+		>;
 	};
-	[key: string]: unknown;
 };
 
 /**
- * Represents a normalized version of ApiPostData to be used in the application, with a plain string title.
+ * Represents a normalized version of ApiPostData to be used in the application.
  */
-export type PostData = Omit<ApiPostData, 'title'> & {
+export type PostData = {
+	id: string | number;
 	title: string;
 	description?: string;
+	link?: { title: string; url: string; target: string };
 	thumbnail?: string;
+	taxonomies?: Record<string, { id: number; title: string }[]>;
 };
 
 /**

@@ -2,7 +2,7 @@ Dockerfile
 .idea
 compose.yaml
 compose.override.yaml
-compose.override.sample.yaml
+compose.override.examples.yaml
 .gitignore
 fw-child/**/local_config.php
 apps/node_modules

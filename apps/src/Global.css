@@ -222,6 +222,7 @@
 	margin: 0;
 	padding: 10px 15px;
 	max-width: 100%;
+	text-wrap: auto;
 }
 
 .leaflet-container .leaflet-control-search .search-tooltip .search-tip:hover {

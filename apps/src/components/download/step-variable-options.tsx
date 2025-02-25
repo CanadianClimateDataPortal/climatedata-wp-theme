@@ -9,7 +9,8 @@ import Dropdown from '@/components/ui/dropdown';
 import { ControlTitle } from '@/components/ui/control-title';
 import { Input } from '@/components/ui/input';
 
-import { useDownload } from '@/hooks/use-download';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { setDegrees, setVersion } from '@/features/download/download-slice';
 
 /**
  * Variable options step
@@ -17,9 +18,10 @@ import { useDownload } from '@/hooks/use-download';
 const StepVariableOptions: React.FC = () => {
 	const { __ } = useI18n();
 
-	const { setField, fields } = useDownload();
-	const { version, degrees } = fields;
+	const { version, degrees } = useAppSelector((state) => state.download);
+	const dispatch = useAppDispatch();
 
+	// TODO: replace with data from the API
 	const options = ['CMIP5', 'CMIP6'];
 
 	return (
@@ -42,7 +44,7 @@ const StepVariableOptions: React.FC = () => {
 						label={__('Versions of the dataset')}
 						tooltip={__('Select a version for the dataset')}
 						onChange={(value) => {
-							setField('version', value);
+							dispatch(setVersion(value));
 						}}
 					/>
 				</div>
@@ -62,12 +64,13 @@ const StepVariableOptions: React.FC = () => {
 					<Input
 						className="sm:w-64"
 						type="number"
-						value={degrees !== undefined ? degrees : ''} // fixes controlled/uncontrolled input warning
+						value={degrees}
 						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-							const newValue = e.target.value.trim()
-								? parseInt(e.target.value)
-								: undefined;
-							setField('degrees', newValue);
+							const parsedNumber = parseInt(e.target.value);
+							const newValue = !isNaN(parsedNumber)
+								? parsedNumber
+								: 0;
+							dispatch(setDegrees(newValue));
 						}}
 					/>
 				</div>

@@ -168,13 +168,17 @@ export interface DownloadState {
 	dataset: TaxonomyData | null;
 	variable: PostData | null;
 	version: string;
-	degrees: number | undefined;
+	degrees: number;
 	interactiveRegion: string;
 	startYear: number;
 	endYear: number;
 	frequency: string;
 	emissionScenarios: string[];
-	selectedCells: number;
+	selectionMode: string;
+	selection: number[];
+	selectionCount: number;
+	zoom: number;
+	center: L.LatLngExpression;
 	percentiles: string[];
 	decimalPlace: number;
 	format: string;
@@ -505,4 +509,16 @@ export interface PercentileData {
 	p10?: number;
 	p50?: number;
 	p90?: number;
+}
+
+/**
+ * Represents the properties of a cell in the maps's grid layer.
+ */
+export interface GridCellProps {
+	latlng: L.LatLng;
+	layer: {
+		properties: {
+			gid: number;
+		};
+	};
 }

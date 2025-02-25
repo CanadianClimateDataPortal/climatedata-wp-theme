@@ -4,12 +4,14 @@ import { PencilLine } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+import { useLocale } from '@/hooks/use-locale';
 import { useDownload } from '@/hooks/use-download';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 const StepSummary: React.FC = () => {
 	const { __, _n } = useI18n();
+	const { locale } = useLocale();
 
 	const { currentStep, goToStep, fields } = useDownload();
 	const {
@@ -29,7 +31,7 @@ const StepSummary: React.FC = () => {
 	const summaryData = [
 		{
 			title: __('Dataset'),
-			content: [dataset?.name],
+			content: [dataset?.title[locale]],
 		},
 		{
 			title: __('Variable'),

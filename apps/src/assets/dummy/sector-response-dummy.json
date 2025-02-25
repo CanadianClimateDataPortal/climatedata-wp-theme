@@ -1,62 +1,80 @@
 [
 	{
-		"id": 108,
-		"description": "",
-		"link": "https://dev-en.climatedata.ca/sector/agriculture/",
-		"name": "Agriculture",
-		"slug": "agriculture",
-		"taxonomy": "sector",
-		"meta": [],
-		"acf": []
+		"term_id": 108,
+		"title": { "en": "Agriculture" },
+		"card": {
+			"link": {
+				"en": {
+					"title": "Agriculture",
+					"url": "https://dev-en.climatedata.ca/sector/agriculture/",
+					"target": ""
+				}
+			}
+		}
 	},
 	{
-		"id": 105,
-		"description": "",
-		"link": "https://dev-en.climatedata.ca/sector/buildings/",
-		"name": "Buildings",
-		"slug": "buildings",
-		"taxonomy": "sector",
-		"meta": [],
-		"acf": []
+		"term_id": 105,
+		"title": { "en": "Buildings" },
+		"card": {
+			"link": {
+				"en": {
+					"title": "Buildings",
+					"url": "https://dev-en.climatedata.ca/sector/buildings/",
+					"target": ""
+				}
+			}
+		}
 	},
 	{
-		"id": 107,
-		"description": "",
-		"link": "https://dev-en.climatedata.ca/sector/finance/",
-		"name": "Finance",
-		"slug": "finance",
-		"taxonomy": "sector",
-		"meta": [],
-		"acf": []
+		"term_id": 107,
+		"title": { "en": "Finance" },
+		"card": {
+			"link": {
+				"en": {
+					"title": "Finance",
+					"url": "https://dev-en.climatedata.ca/sector/finance/",
+					"target": ""
+				}
+			}
+		}
 	},
 	{
-		"id": 103,
-		"description": "",
-		"link": "https://dev-en.climatedata.ca/sector/health/",
-		"name": "Health",
-		"slug": "health",
-		"taxonomy": "sector",
-		"meta": [],
-		"acf": []
+		"term_id": 103,
+		"title": { "en": "Health" },
+		"card": {
+			"link": {
+				"en": {
+					"title": "Health",
+					"url": "https://dev-en.climatedata.ca/sector/health/",
+					"target": ""
+				}
+			}
+		}
 	},
 	{
-		"id": 104,
-		"description": "",
-		"link": "https://dev-en.climatedata.ca/sector/marine/",
-		"name": "Marine",
-		"slug": "marine",
-		"taxonomy": "sector",
-		"meta": [],
-		"acf": []
+		"term_id": 104,
+		"title": { "en": "Marine" },
+		"card": {
+			"link": {
+				"en": {
+					"title": "Marine",
+					"url": "https://dev-en.climatedata.ca/sector/marine/",
+					"target": ""
+				}
+			}
+		}
 	},
 	{
-		"id": 106,
-		"description": "",
-		"link": "https://dev-en.climatedata.ca/sector/transportation/",
-		"name": "Transportation",
-		"slug": "transportation",
-		"taxonomy": "sector",
-		"meta": [],
-		"acf": []
+		"term_id": 106,
+		"title": { "en": "Transportation" },
+		"card": {
+			"link": {
+				"en": {
+					"title": "Transportation",
+					"url": "https://dev-en.climatedata.ca/sector/transportation/",
+					"target": ""
+				}
+			}
+		}
 	}
 ]

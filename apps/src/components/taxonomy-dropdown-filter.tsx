@@ -36,7 +36,7 @@ const TaxonomyDropdownFilter: React.FC<{
 			setOptions(
 				data.map((option: TaxonomyData) => ({
 					value: String(option.term_id),
-					label: option.title?.[locale] as string,
+					label: option.title?.[locale] || '',
 				}))
 			);
 		})();
@@ -47,7 +47,7 @@ const TaxonomyDropdownFilter: React.FC<{
 			className={className}
 			searchable
 			value={value}
-			label={__(label)}
+			label={label}
 			tooltip={tooltip && __(tooltip)}
 			placeholder={__(placeholder)}
 			options={options}

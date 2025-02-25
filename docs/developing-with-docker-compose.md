@@ -3,11 +3,12 @@
 This documentation explains the recommended development setup when developing for the
 portal site (i.e. the _Climate Data_ website).
 
-## TL;DR
+## Simple setup
 
 1. Clone this repository, it contains a pre-defined Docker Compose setup.
-2. Download the required files to build the Docker image (ask the tech lead
-   for the `<URL>` and the authentication credentials):
+2. Using the following script, download the extra files required to build the
+   Docker images (ask the tech lead for the `<URL>` and the authentication
+   credentials):
    ```shell
    ./dockerfiles/tools/download-docker-assets.sh <URL>
    ```
@@ -15,31 +16,30 @@ portal site (i.e. the _Climate Data_ website).
    ```shell
    docker compose up -d
    ```
-4. Visit the website! The default URLs are https://dev-en.climatedata.ca and
-   https://dev-fr.climatedata.ca.
+4. Visit the website! The default URLs are:
+   * https://dev-en.climatedata.ca
+   * https://dev-fr.climatedata.ca
 
-## Custom setup
+### Created Docker services
 
-To customize your development setup, create a `compose.override.yaml` file in the
-root directory of the repository.
-
-The [`compose.override.sample.yaml`](../compose.override.sample.yaml) file
-contains example of various custom setups.
-
-The `docker compose up -d` command will, by default, use both the `compose.yaml`
-and `compose.override.yaml` files (the latter being included after the former).
-
-## Docker services
-
-The setup will create the following Docker services:
+This setup creates three Docker services:
 
 * `portal`: The _Portal_ image, containing the website.
   [More details here](./portal-docker-image.md).
 * `db`: A MySQL database. The default image is a pre-filled Maria DB database.
-  The port `3306` of the DB is exposed on the host machine.
+  The port `3306` is mapped to the same port on the host machine.
 * `task-runner`: The _Task Runner_ image, used to watch and rebuild, on change,
   the assets (CSS, JS, etc.) from their sources.
   [More details here](./task-runner.md).
+
+## Custom setup
+
+To customize your development setup, create a `compose.override.yaml` file in the
+root directory of the repository. This file will automatically be used by the
+`docker compose up -d` command.
+
+The [`compose.override.examples.yaml`](../compose.override.examples.yaml) file
+contains examples of various custom setups.
 
 ## Development process
 
@@ -50,6 +50,9 @@ Files built from assets (like CSS files built from SASS files) are automatically
 rebuilt by the _Task Runner_ service.
 
 The _Portal_ image contains [wp-cli](https://wp-cli.org/).
+
+The port `3306` on the host is mapped to the same port on the database
+container.
 
 ### Setting WordPress constants
 

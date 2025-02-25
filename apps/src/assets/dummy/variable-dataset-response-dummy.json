@@ -1,0 +1,56 @@
+[
+	{
+		"id": 183,
+		"name": "Historical Canadian Climate Normals",
+		"slug": "historical-canadian-climate-normals",
+		"description": "Warmest daytime temperature in the selected time period.",
+		"link": "https://climatedata2.crim.ca/variable-dataset/historical-canadian-climate-normals/",
+		"meta": [],
+		"acf": []
+	},
+	{
+		"id": 184,
+		"name": "Historical and Future IDF Curves",
+		"slug": "historical-and-future-idf-curves",
+		"description": "Warmest daytime temperature in the selected time period.",
+		"link": "https://climatedata2.crim.ca/variable-dataset/historical-and-future-idf-curves/",
+		"meta": [],
+		"acf": []
+	},
+	{
+		"id": 185,
+		"name": "Adjusted and Homogenized Canadian Climate Data (AHCCD)",
+		"slug": "adjusted-and-homogenized-canadian-climate-data-ahccd",
+		"description": "Warmest daytime temperature in the selected time period.",
+		"link": "https://climatedata2.crim.ca/variable-dataset/adjusted-and-homogenized-canadian-climate-data-ahccd/",
+		"meta": [],
+		"acf": []
+	},
+	{
+		"id": 186,
+		"name": "Canadian Climate Normals 1981-2010",
+		"slug": "canadian-climate-normals-1981-2010",
+		"description": "Warmest daytime temperature in the selected time period.",
+		"link": "https://climatedata2.crim.ca/variable-dataset/canadian-climate-normals-1981-2010/",
+		"meta": [],
+		"acf": []
+	},
+	{
+		"id": 187,
+		"name": "Climate Projections (Downscaled future data)",
+		"slug": "climate-projections-downscaled-future-data",
+		"description": "Warmest daytime temperature in the selected time period.",
+		"link": "https://climatedata2.crim.ca/variable-dataset/climate-projections-downscaled-future-data/",
+		"meta": [],
+		"acf": []
+	},
+	{
+		"id": 188,
+		"name": "Days below temperature threshold",
+		"slug": "days-below-temperature-threshold",
+		"link": "https://climatedata2.crim.ca/variable-dataset/days-below-temperature-threshold/",
+		"description": "Warmest daytime temperature in the selected time period.",
+		"meta": [],
+		"acf": []
+	}
+]

@@ -1,0 +1,146 @@
+{
+	"id": 311,
+	"date": "2019-03-21T04:03:44",
+	"date_gmt": "2019-03-21T08:03:44",
+	"guid": {
+		"rendered": "http:\/\/climatedata.habitatseven.work\/?post_type=variable&#038;p=311"
+	},
+	"modified": "2024-07-05T10:17:09",
+	"modified_gmt": "2024-07-05T14:17:09",
+	"slug": "tx_max-2",
+	"status": "publish",
+	"type": "variable",
+	"link": "https:\/\/climatedata2.crim.ca\/variable\/tx_max-2\/",
+	"title": {
+		"rendered": "Hottest Day"
+	},
+	"content": {
+		"rendered": "<p class=\"p1\">The <i>Hottest Day<\/i> describes the warmest daytime temperature in the selected time period. In general, the hottest day of the year occurs during the summer months.<\/p>\n<p class=\"p1\">High temperatures are important. They determine if plants and animals can thrive, they limit or enable outdoor activities, define how we design our buildings and vehicles, and shape our transportation and energy use. However, when temperatures are very hot, people &#8211; especially the elderly &#8211; are much more likely to suffer from heat exhaustion and heat stroke. Many outdoor activities become dangerous or impossible in very high temperatures.<\/p>\n<p class=\"p1\"><b>Technical Description:<\/b><\/p>\n<p class=\"p1\">The highest maximum temperature (T<span class=\"s1\"><sub>max<\/sub><\/span>) in the selected time period. Use the <i>Variable<\/i> menu option to view annual, monthly or seasonal values for this index.<\/p>\n<p>&nbsp;<\/p>\n",
+		"protected": false
+	},
+	"featured_media": 1102,
+	"parent": 0,
+	"menu_order": 51,
+	"template": "",
+	"meta": {
+		"_acf_changed": false,
+		"title_fr": "Jour le plus chaud",
+		"footnotes": ""
+	},
+	"sector": [108, 105, 107, 103, 104, 106],
+	"region": [],
+	"var-type": [5],
+	"acf": {
+		"var_brief": "",
+		"var_description": "<p>The <i>Hottest Day<\/i> describes the warmest daytime temperature in the selected time period. In general, the hottest day of the year occurs during the summer months.<\/p>\n<p>High temperatures are important. They determine if plants and animals can thrive, they limit or enable outdoor activities, define how we design our buildings and vehicles, and shape our transportation and energy use. However, when temperatures are very hot, people \u2013 especially the elderly \u2013 are much more likely to suffer from heat exhaustion and heat stroke. Many outdoor activities become dangerous or impossible in very high temperatures.<\/p>\n<p>&nbsp;<\/p>\n",
+		"var_tech_description": "<p>The highest maximum temperature (T<span class=\"s1\"><sub>max<\/sub><\/span>) in the selected time period. Use the <i>Variable<\/i> menu option to view annual, monthly or seasonal values for this index.<\/p>\n",
+		"var_brief_fr": "",
+		"var_description_fr": "<p>Le <i>jour le plus chaud<\/i> d\u00e9crit la temp\u00e9rature diurne la plus chaude au cours de la p\u00e9riode s\u00e9lectionn\u00e9e. En g\u00e9n\u00e9ral, le jour le plus chaud de l\u2019ann\u00e9e se produit pendant les mois d\u2019\u00e9t\u00e9.<\/p>\n<p>Les temp\u00e9ratures \u00e9lev\u00e9es sont importantes. Elles d\u00e9terminent si les plantes et les animaux peuvent prosp\u00e9rer, ils limitent ou permettent les activit\u00e9s de plein air, d\u00e9finissent la fa\u00e7on dont nous concevons nos b\u00e2timents et nos v\u00e9hicules, et d\u00e9terminent notre utilisation du transport et de l\u2019\u00e9nergie.<\/p>\n<p>Cependant, lorsque les temp\u00e9ratures sont tr\u00e8s chaudes, les gens \u2013 particuli\u00e8rement les personnes \u00e2g\u00e9es \u2013 sont plus susceptibles de souffrir d\u2019\u00e9puisement par la chaleur et de coup de chaleur. Plusieurs activit\u00e9s ext\u00e9rieures deviennent dangereuses, voire impossibles, lors de temp\u00e9ratures tr\u00e8s \u00e9lev\u00e9es.<\/p>\n<p>&nbsp;<\/p>\n",
+		"var_tech_description_fr": "<p>La temp\u00e9rature maximale la plus \u00e9lev\u00e9e (Tmax) au cours de la p\u00e9riode s\u00e9lectionn\u00e9e.<\/p>\n<p>Utilisez l\u2019option du menu <i>Variables<\/i> pour afficher les valeurs annuelles, mensuelles ou saisonni\u00e8res de cet indice.<\/p>\n",
+		"var_names": [
+			{
+				"variable": "tx_max",
+				"label": ""
+			}
+		],
+		"units": "kelvin",
+		"grid": "canadagrid",
+		"decimals": 1,
+		"hasdelta": true,
+		"page_availability": ["map", "download"],
+		"dataset_availability": ["cmip5", "cmip6"],
+		"ahccd_station_type": [],
+		"availability": ["gridded_data", "census", "health", "watershed"],
+		"timestep": ["ann", "monthly"],
+		"averages": ["allyears", "30ygraph"],
+		"time_slider_min_value": 1950,
+		"time_slider_max_value": 2070,
+		"daily_variable_name": "",
+		"time_slider_default_value": 2040,
+		"time_slider_interval": 30,
+		"related_vars": [291, 292, 497],
+		"finch_var": "",
+		"thresholds": null,
+		"frequencies": "",
+		"required_variables": ""
+	},
+	"var_types": ["Temperature"],
+	"_links": {
+		"self": [
+			{
+				"href": "https:\/\/climatedata2.crim.ca\/wp-json\/wp\/v2\/variable\/311"
+			}
+		],
+		"collection": [
+			{
+				"href": "https:\/\/climatedata2.crim.ca\/wp-json\/wp\/v2\/variable"
+			}
+		],
+		"about": [
+			{
+				"href": "https:\/\/climatedata2.crim.ca\/wp-json\/wp\/v2\/types\/variable"
+			}
+		],
+		"version-history": [
+			{
+				"count": 8,
+				"href": "https:\/\/climatedata2.crim.ca\/wp-json\/wp\/v2\/variable\/311\/revisions"
+			}
+		],
+		"predecessor-version": [
+			{
+				"id": 13854,
+				"href": "https:\/\/climatedata2.crim.ca\/wp-json\/wp\/v2\/variable\/311\/revisions\/13854"
+			}
+		],
+		"acf:post": [
+			{
+				"embeddable": true,
+				"href": "https:\/\/climatedata2.crim.ca\/wp-json\/wp\/v2\/variable\/497"
+			},
+			{
+				"embeddable": true,
+				"href": "https:\/\/climatedata2.crim.ca\/wp-json\/wp\/v2\/variable\/292"
+			},
+			{
+				"embeddable": true,
+				"href": "https:\/\/climatedata2.crim.ca\/wp-json\/wp\/v2\/variable\/291"
+			}
+		],
+		"wp:featuredmedia": [
+			{
+				"embeddable": true,
+				"href": "https:\/\/climatedata2.crim.ca\/wp-json\/wp\/v2\/media\/1102"
+			}
+		],
+		"wp:attachment": [
+			{
+				"href": "https:\/\/climatedata2.crim.ca\/wp-json\/wp\/v2\/media?parent=311"
+			}
+		],
+		"wp:term": [
+			{
+				"taxonomy": "sector",
+				"embeddable": true,
+				"href": "https:\/\/climatedata2.crim.ca\/wp-json\/wp\/v2\/sector?post=311"
+			},
+			{
+				"taxonomy": "region",
+				"embeddable": true,
+				"href": "https:\/\/climatedata2.crim.ca\/wp-json\/wp\/v2\/region?post=311"
+			},
+			{
+				"taxonomy": "var-type",
+				"embeddable": true,
+				"href": "https:\/\/climatedata2.crim.ca\/wp-json\/wp\/v2\/var-type?post=311"
+			}
+		],
+		"curies": [
+			{
+				"name": "wp",
+				"href": "https:\/\/api.w.org\/{rel}",
+				"templated": true
+			}
+		]
+	}
+}

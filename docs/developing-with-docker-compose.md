@@ -1,7 +1,7 @@
 # Developing with Docker Compose
 
-This documentation explains the recommended development setup when developing for the
-portal site (i.e. the _Climate Data_ website).
+This documentation explains the recommended development setup when developing
+for the portal site (i.e. the _Climate Data_ website).
 
 ## Simple setup
 
@@ -34,9 +34,9 @@ This setup creates three Docker services:
 
 ## Custom setup
 
-To customize your development setup, create a `compose.override.yaml` file in the
-root directory of the repository. This file will automatically be used by the
-`docker compose up -d` command.
+To customize your development setup, create a `compose.override.yaml` file in
+the root directory of the repository. This file will automatically be used by
+the `docker compose up -d` command.
 
 The [`compose.override.examples.yaml`](../compose.override.examples.yaml) file
 contains examples of various custom setups.

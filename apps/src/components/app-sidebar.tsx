@@ -121,20 +121,6 @@ export function AppSidebar() {
 										name="values"
 										options={[__('Absolute'), __('Delta')]}
 									/>
-									<RadioGroupFactory
-										title={__('Units')}
-										name="units"
-										options={[
-											{
-												value: 'metric',
-												label: __('Metric'),
-											},
-											{
-												value: 'imperial',
-												label: __('Imperial'),
-											},
-										]}
-									/>
 									<SidebarSeparator />
 
 									<SidebarMenuItem>

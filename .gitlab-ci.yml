@@ -47,16 +47,11 @@ build-push-portal-image:
   before_script:
   - docker build -f dockerfiles/build/task-runner/Dockerfile -t $DOCKER_IMAGE_TASK_RUNNER .
   - mkdir -p $LOCAL_WP_PLUGINS_DIR
-  - dockerfiles/tools/download-docker-assets.sh $DOCKER_ASSETS_URL --username=$DOCKER_ASSETS_USERNAME --password-file=$DOCKER_ASSETS_PASSWORD_FILE
-  # - plugins=$(grep -v -e '^\s*$' -e '^#' ./dockerfiles/build/www/wp-plugins/local.txt)
-  # - >
-  #   for plugin in $plugins;
-  #   do
-  #       curl \
-  #         --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-  #         --location "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/wp-plugins/1.0.0/$plugin" \
-  #         --output $LOCAL_WP_PLUGINS_DIR/$plugin;
-  #   done
+  - 
+    dockerfiles/tools/download-docker-assets.sh
+    $DOCKER_ASSETS_URL
+    --username=$DOCKER_ASSETS_USERNAME
+    --password-file=$DOCKER_ASSETS_PASSWORD_FILE
   - echo $DOCKER_DEPLOY_TOKEN | docker login -u $DOCKER_DEPLOY_USER $DOCKER_REGISTRY --password-stdin
 
   script:

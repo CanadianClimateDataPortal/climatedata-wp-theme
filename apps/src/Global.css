@@ -148,6 +148,11 @@
 
 /* map search control override styles */
 
+.leaflet-container .leaflet-control,
+.leaflet-control-container > div {
+	z-index: 30;
+}
+
 .leaflet-container .leaflet-control-search {
 	font-size: 14px;
 	display: flex;

@@ -69,7 +69,7 @@ const AnimatedPanel: React.FC<AnimatedPanelProps> = ({
 						...position, // may override left/right defaults if provided
 					}}
 					className={cn(
-						'absolute bg-white shadow-sm z-[99998]',
+						'absolute bg-white shadow-sm z-40',
 						className
 					)}
 				>

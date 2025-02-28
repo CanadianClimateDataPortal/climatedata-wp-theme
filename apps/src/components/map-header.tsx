@@ -73,31 +73,34 @@ const MapHeader: React.FC<MapInfoProps> = ({
 	};
 
 	return (
-		<aside className="map-header">
-			<div
-				ref={ref}
-				className="absolute top-0 left-0 z-[9999] overflow-y-auto w-full"
-			>
-				<div className="flex items-center gap-x-2 bg-white p-4">
-					<Breadcrumbs
-						title={data.title}
-						onClick={toggleVariableDetailsPanel}
-					/>
-					<ModalToggleButtons
-						onToggleShare={toggleShareInfo}
-						onToggleDownload={toggleDownloadInfo}
-					/>
+		<>
+			<aside className="map-header relative z-20">
+				<div
+					ref={ref}
+					className="absolute top-0 left-0 overflow-y-auto w-full"
+				>
+					<div className="flex items-center gap-x-2 bg-white p-4">
+						<Breadcrumbs
+							title={data.title}
+							onClick={toggleVariableDetailsPanel}
+						/>
+						<ModalToggleButtons
+							onToggleShare={toggleShareInfo}
+							onToggleDownload={toggleDownloadInfo}
+						/>
+					</div>
 				</div>
+			</aside>
 
-				<ShareMapModal isOpen={shareInfo} onClose={toggleShareInfo} />
-				<DownloadMapModal
-					isOpen={downloadInfo}
-					onClose={toggleDownloadInfo}
-					title={data.title}
-					mapRef={mapRef}
-				/>
-			</div>
-		</aside>
+			{/* moved outside of the map header container for the modal overaly to cover also the sidebar*/}
+			<ShareMapModal isOpen={shareInfo} onClose={toggleShareInfo} />
+			<DownloadMapModal
+				isOpen={downloadInfo}
+				onClose={toggleDownloadInfo}
+				title={data.title}
+				mapRef={mapRef}
+			/>
+		</>
 	);
 };
 MapHeader.displayName = 'MapHeader';

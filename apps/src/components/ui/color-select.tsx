@@ -54,7 +54,7 @@ export const ColorSelect: React.FC<ColorSelectProps> = ({
 			{isOpen && (
 				<ul
 					role="listbox"
-					className="absolute top-full left-0 z-10 bg-white border border-gray-300 rounded mt-1 p-0 list-none w-full"
+					className="absolute top-full left-0 z-50 bg-white border border-gray-300 rounded mt-1 p-0 list-none w-full"
 				>
 					{options.map((option, index) => (
 						<li

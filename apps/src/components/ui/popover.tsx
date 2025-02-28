@@ -28,7 +28,7 @@ const PopoverContent = forwardRef<
 			align={align}
 			sideOffset={sideOffset}
 			className={cn(
-				'popover-content z-[99999]',
+				'popover-content z-50',
 				'w-full p-4 rounded-md border',
 				'bg-popover text-popover-foreground shadow-md outline-none',
 				'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',

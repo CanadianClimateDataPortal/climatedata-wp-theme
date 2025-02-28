@@ -177,7 +177,6 @@ RUN --mount=type=bind,source=$LOCAL_WP_PLUGINS_DIR,target=/tmp/wp-plugins \
 
 # Read plugins defined in the wp-plugins/public.txt file and download them from
 # the WordPress plugin repository.
-
 RUN --mount=type=bind,source=dockerfiles/build/www/wp-plugins/public.txt,target=/tmp/plugins.txt \
     plugins=$(grep -v -e '^\s*$' -e '^#' /tmp/plugins.txt) \
     && set -- $plugins \

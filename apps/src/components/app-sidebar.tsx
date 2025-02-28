@@ -9,12 +9,9 @@ import {
 	SidebarGroup,
 	SidebarGroupContent,
 	SidebarMenu,
-	SidebarMenuItem,
 	SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ColorSelect } from '@/components/ui/color-select';
-import { RadioGroupFactory } from '@/components/ui/radio-group';
 import {
 	DatasetsMenuItem,
 	DatasetsPanel,
@@ -28,6 +25,8 @@ import { ThresholdValuesDropdown } from '@/components/sidebar-menu-items/thresho
 import { InteractiveRegionsDropdown } from '@/components/sidebar-menu-items/interactive-regions-dropdown';
 import { FrequenciesDropdown } from '@/components/sidebar-menu-items/frequencies-dropdown';
 import { TimePeriodsControl } from '@/components/sidebar-menu-items/time-periods-control';
+import { DataValuesControl } from '@/components/sidebar-menu-items/data-values-control';
+import { MapColorsDropdown } from '@/components/sidebar-menu-items/map-colors-dropdown';
 import {
 	RecentLocationsLink,
 	RecentLocationsPanel,
@@ -50,31 +49,6 @@ export function AppSidebar() {
 	const { setExtendInfo } = useMap();
 
 	const { __ } = useI18n();
-
-	// TODO: This will be fetched from API or maybe a store
-	//  also, refactor this to the sidebar-menu-items folder
-	//colorPalettes for testing
-	const colorPalettes = [
-		{
-			name: 'Warm Palette',
-			colors: ['#FF5733', '#FF8D1A', '#FFC300', '#FFDA6C', '#FFD1A3'],
-		},
-		{
-			name: 'Cool Palette',
-			colors: ['#4DA8DA', '#34A7C1', '#378AD5', '#2167A9', '#174A7B'],
-		},
-		{
-			name: 'Neutral Palette',
-			colors: ['#D9D9D9', '#BFBFBF', '#A6A6A6', '#8C8C8C', '#737373'],
-		},
-	];
-
-	const handlePaletteChange = (palette: {
-		name: string;
-		colors: string[];
-	}) => {
-		console.log('Selected palette:', palette);
-	};
 
 	return (
 		<Sidebar>
@@ -115,38 +89,13 @@ export function AppSidebar() {
 						<TabsContent value="settings">
 							<SidebarGroupContent>
 								<SidebarMenu>
-									{/* TODO: refactor to the sidebar-menu-items folder once their store is setup */}
-									<RadioGroupFactory
-										title={__('Values')}
-										name="values"
-										options={[__('Absolute'), __('Delta')]}
-									/>
-									<RadioGroupFactory
-										title={__('Units')}
-										name="units"
-										options={[
-											{
-												value: 'metric',
-												label: __('Metric'),
-											},
-											{
-												value: 'imperial',
-												label: __('Imperial'),
-											},
-										]}
-									/>
+									<DataValuesControl />
 									<SidebarSeparator />
 
-									<SidebarMenuItem>
-										<ColorSelect
-											options={colorPalettes}
-											onChange={handlePaletteChange}
-										/>
-									</SidebarMenuItem>
+									<MapColorsDropdown />
+									<SidebarSeparator />
 
-									<SidebarMenu>
-										<LayerOpacities />
-									</SidebarMenu>
+									<LayerOpacities />
 								</SidebarMenu>
 							</SidebarGroupContent>
 						</TabsContent>

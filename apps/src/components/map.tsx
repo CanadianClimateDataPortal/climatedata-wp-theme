@@ -40,6 +40,7 @@ export default function Map({
 			minZoom={DEFAULT_MIN_ZOOM}
 			maxZoom={DEFAULT_MAX_ZOOM}
 			scrollWheelZoom={true}
+			className="z-10" // important to keep the map below other interactive elements
 		>
 			<MapEvents onMapReady={onMapReady} onUnmount={onUnmount} />
 			<MapLegend />

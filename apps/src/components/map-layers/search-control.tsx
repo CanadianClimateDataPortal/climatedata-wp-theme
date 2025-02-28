@@ -151,7 +151,7 @@ export default function SearchControl({
 	return (
 		<div
 			className={cn(
-				'search-control absolute top-24 left-4 z-[9999] flex items-center space-x-1',
+				'search-control absolute top-24 left-4 z-20 flex items-center space-x-1',
 				className
 			)}
 		>

@@ -77,6 +77,27 @@
             "selected": 0
         },
         {
+            "key": "field_67b7ad4a9038f",
+            "label": "Title",
+            "name": "title_fr",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The dataset term French title.",
+            "required": 1,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_677ff44bc0007",
             "label": "Card Description",
             "name": "card_description_fr",
@@ -133,5 +154,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1736523124
+    "modified": 1740090740
 }

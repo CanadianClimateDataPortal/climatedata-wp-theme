@@ -67,7 +67,7 @@ export default function MapWrapper() {
 				className={cn(
 					'map-wrapper',
 					'grid gap-4 h-full',
-					showComparisonMap ? 'sm:grid-cols-2' : 'grid-cols-1'
+					showComparisonMap ? 'grid-cols-2' : 'grid-cols-1'
 				)}
 			>
 				<Map

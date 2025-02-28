@@ -25,7 +25,7 @@ const StepContainer = ({
 	return (
 		<div className="step-container">
 			<div className="flex items-center gap-2 mb-2">
-				<div className="text-[40px] text-brand-blue font-bold font-serif leading-10 whitespace-nowrap">
+				<div className="text-[40px] text-brand-blue font-bold font-serif leading-[43px] whitespace-nowrap">
 					{stepText}:
 				</div>
 				<div className="text-2xl text-zinc-900 leading-6">{title}</div>

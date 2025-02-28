@@ -54,6 +54,8 @@ const initialState: MapState = {
 	timePeriodEnd: [defaultTimePeriodEnd], // needs an array because of the slider component that uses it
 	recentLocations: [],
 	pane: 'raster',
+	dataValue: 'absolute',
+	mapColor: 'default',
 	opacity: {
 		mapData: 1,
 		labels: 1,
@@ -122,6 +124,12 @@ const mapSlice = createSlice({
 		clearRecentLocations(state) {
 			state.recentLocations = [];
 		},
+		setDataValue(state, action: PayloadAction<string>) {
+			state.dataValue = action.payload;
+		},
+		setMapColor(state, action: PayloadAction<string>) {
+			state.mapColor = action.payload;
+		},
 		setOpacity(
 			state,
 			action: PayloadAction<{ key: keyof MapItemsOpacity; value: number }>
@@ -147,6 +155,8 @@ export const {
 	addRecentLocation,
 	deleteLocation,
 	clearRecentLocations,
+	setDataValue,
+	setMapColor,
 	setOpacity,
 } = mapSlice.actions;
 

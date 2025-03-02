@@ -4,9 +4,10 @@
  * A modal component that allows users to download the map as an image.
  *
  */
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 import { toPng } from 'html-to-image';
+import { Download, ExternalLink } from 'lucide-react';
 
 // components
 import Modal from '@/components/ui/modal';
@@ -51,13 +52,26 @@ const DownloadMapModal: React.FC<{
 		}
 	};
 
+	const buttonText = useMemo(() => {
+		if (isGenerating) {
+			return __('Generating...');
+		}
+
+		return (
+			<div className="flex items-center gap-2">
+				{__('Download')}
+				<Download className="w-4 h-4 text-[#FAFAFA] -mt-1" />
+			</div>
+		);
+	}, [isGenerating, __]);
+
 	return (
 		<Modal isOpen={isOpen} onClose={onClose}>
 			<div className="download-map-modal">
-				<h3 className="font-semibold">
+				<h3 className="text-cdc-black font-semibold leading-4 mb-2">
 					{__('Download image from viewport')}
 				</h3>
-				<p className="text-gray-400 my-2 text-sm">
+				<p className="text-neutral-grey-medium text-sm leading-5 mb-2.5">
 					{__(
 						'Your export will showcase your various data options. The map position will be the one you see on your screen.'
 					)}
@@ -68,20 +82,18 @@ const DownloadMapModal: React.FC<{
 					aria-label={__(
 						'Download current map image (opens in a new tab)'
 					)}
-					className={`px-4 py-2 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 ${
+					className={`inline-flex text-md font-normal leading-6 tracking-[0.8px] uppercase rounded-full px-4 py-2 mb-6 bg-destructive text-destructive-foreground hover:bg-destructive/90 ${
 						isGenerating ? 'opacity-50 pointer-events-none' : ''
 					}`}
 					download={`${title}-map.png`}
 					onClick={handleDownloadClick}
 				>
-					{isGenerating ? __('Generating...') : __('Download')}
+					{buttonText}
 				</a>
-			</div>
-			<div>
-				<p className="font-bold">
+				<h3 className="text-cdc-black font-semibold leading-4 mb-1.5">
 					{__('Need control over your own data?')}
-				</p>
-				<p className="text-gray-400 my-2 text-sm">
+				</h3>
+				<p className="text-neutral-grey-medium text-sm leading-5 mb-2.5">
 					{__(
 						'Head over to the download section where you can select multiple grid cells and personalize more data options.'
 					)}
@@ -92,9 +104,12 @@ const DownloadMapModal: React.FC<{
 					aria-label={__(
 						'Go to download sections (opens in a new tab)'
 					)}
-					className="text-blue-500"
+					className="text-brand-blue font-normal text-md leading-6"
 				>
-					{__('Go to download section')}
+					<div className="flex items-center gap-2 ms-2">
+						{__('Go to Download Section')}
+						<ExternalLink className="w-4 h-4" />
+					</div>
 				</a>
 			</div>
 		</Modal>

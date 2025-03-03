@@ -34,7 +34,7 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
 				<div
 					ref={ref}
 					className={cn(
-						'p-6 bg-white rounded-md shadow-lg max-w-md mx-auto relative flex flex-col gap-6',
+						'p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto relative flex flex-col gap-6',
 						className
 					)}
 					onClick={(e: React.MouseEvent<HTMLDivElement>) =>

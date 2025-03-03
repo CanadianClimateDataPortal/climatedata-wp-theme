@@ -16,41 +16,52 @@ variables:
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG != "preprod" && $CI_COMMIT_TAG != "uat" && $CI_COMMIT_TAG !~ /v[0-9]+\.[0-9]+\.[0-9]+/
       variables:
-        DEPLOYMENT_TAG: "qa"
+        DEPLOYMENT_TAG: "qa-test"
+        INSTANCE_NAME: "QA"
         INSTANCE_USER: $INSTANCE_USER_QA
         INSTANCE_IP: $INSTANCE_IP_QA
 
     - if: $CI_COMMIT_TAG == "uat" && $CI_JOB_STAGE != "build"
       variables:
-        DEPLOYMENT_TAG: "uat"
+        DEPLOYMENT_TAG: "uat-test"
+        INSTANCE_NAME: "UAT"
         INSTANCE_USER: $INSTANCE_USER_UAT
         INSTANCE_IP: $INSTANCE_IP_UAT
 
     - if: $CI_COMMIT_TAG == "preprod" && $CI_JOB_STAGE != "build"
       variables:
-        DEPLOYMENT_TAG: "preprod"
+        DEPLOYMENT_TAG: "preprod-test"
+        INSTANCE_NAME: "PreProd"
         INSTANCE_USER: $INSTANCE_USER_PREPROD
         INSTANCE_IP: $INSTANCE_IP_PREPROD
 
     - if: $CI_COMMIT_TAG =~ /v[0-9]+\.[0-9]+\.[0-9]+/ && $CI_JOB_STAGE == "tag"
       variables:
-        DEPLOYMENT_TAG: $CI_COMMIT_TAG
+        DEPLOYMENT_TAG: ${CI_COMMIT_TAG}-test
 
 build-push-portal-image:
   stage: build
   extends: .validate-deployment-tag
 
   before_script:
+  - echo -e "\e[0Ksection_start:`date +%s`:task_runner_build\r\e[0KBuilding Task Runner image"
   - docker build -f dockerfiles/build/task-runner/Dockerfile -t $DOCKER_IMAGE_TASK_RUNNER .
+  - echo -e "\e[0Ksection_end:`date +%s`:task_runner_build\r\e[0K"
+  - >
+    echo -e "\e[0Ksection_start:`date +%s`:assets_download\r\e[0KDownloading Docker assets from: $DOCKER_ASSETS_URL"
   - mkdir -p $LOCAL_WP_PLUGINS_DIR
-  - 
+  -
     dockerfiles/tools/download-docker-assets.sh
     $DOCKER_ASSETS_URL
     --username=$DOCKER_ASSETS_USERNAME
     --password-file=$DOCKER_ASSETS_PASSWORD_FILE
+  - echo -e "\e[0Ksection_end:`date +%s`:assets_download\r\e[0K"
   - echo $DOCKER_DEPLOY_TOKEN | docker login -u $DOCKER_DEPLOY_USER $DOCKER_REGISTRY --password-stdin
 
   script:
+  - echo -e "\e[0Ksection_start:`date +%s`:portal_build\r\e[0KBuilding Portal image"
+  - >
+    echo "Image will be tagged with commit SHA: $CI_COMMIT_SHORT_SHA"
   - >
     docker build
     --target production
@@ -59,7 +70,10 @@ build-push-portal-image:
     -t $DOCKER_IMAGE_PORTAL
     .
   - docker image tag $DOCKER_IMAGE_PORTAL $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA
+  - echo -e "\e[0Ksection_end:`date +%s`:portal_build\r\e[0K"
+  - echo -e "\e[0Ksection_start:`date +%s`:portal_push\r\e[0KPushing Portal image"
   - docker push $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA
+  - echo -e "\e[0Ksection_end:`date +%s`:portal_push\r\e[0K"
 
   after_script:
   - docker logout $DOCKER_REGISTRY
@@ -73,11 +87,19 @@ tag-image:
 
   script:
   - >
+    echo -e "\e[0Ksection_start:`date +%s`:portal_pull\r\e[0KPulling the Portal image with tag: $CI_COMMIT_SHORT_SHA"
+  - >
     docker pull $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA
-    || { echo "The pipeline can only tag already built Docker images tagged with the current Git commit's SHA";
-    exit 1; }
+    || {
+      echo "Cannot find a Docker image tagged with the current commit's SHA. See https://ccdpwiki.atlassian.net/wiki/spaces/CCDP/pages/edit-v2/2482110477#Troubleshoot";
+      exit 1;
+    }
+  - echo -e "\e[0Ksection_end:`date +%s`:portal_pull\r\e[0K"
+  - >
+    echo -e "\e[0Ksection_start:`date +%s`:portal_env_tag_push\r\e[0KAdding tag '$DEPLOYMENT_TAG' and pushing image"
   - docker image tag $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA $DOCKER_IMAGE_PORTAL:$DEPLOYMENT_TAG
   - docker push $DOCKER_IMAGE_PORTAL:$DEPLOYMENT_TAG
+  - echo -e "\e[0Ksection_end:`date +%s`:portal_env_tag_push\r\e[0K"
 
   after_script:
   - docker logout $DOCKER_REGISTRY
@@ -92,7 +114,9 @@ update-instance:
 
   script:
   - >
-    ssh
+    echo "Deploying to: $INSTANCE_NAME"
+  - >
+    echo ssh
     -o UserKnownHostsFile=/dev/null
     -o StrictHostKeyChecking=no
     -i ~/.ssh/ccdp_deploy

@@ -54,7 +54,7 @@ const RadioCard: React.FC<RadioCardProps> = ({
 						: undefined
 				}
 				className={cn(
-					'flex cursor-pointer',
+					'flex cursor-pointer flex-1',
 					thumbnail ? `bg-[2.5] bg-no-repeat bg-top-left pl-10` : ''
 				)}
 			>
@@ -101,7 +101,7 @@ const RadioCardFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
 	<div
 		className={cn(
 			'radio-card-footer',
-			'mt-auto p-2 border-t border-gray-200',
+			'p-2 border-t border-gray-200',
 			className
 		)}
 		{...props}

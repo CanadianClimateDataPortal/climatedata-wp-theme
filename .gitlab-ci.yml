@@ -14,30 +14,30 @@ variables:
 
 .validate-deployment-tag:
   rules:
-    - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG != "preprod" && $CI_COMMIT_TAG != "uat" && $CI_COMMIT_TAG !~ /v[0-9]+\.[0-9]+\.[0-9]+/
-      variables:
-        DEPLOYMENT_TAG: "qa-test"
-        INSTANCE_NAME: "QA"
-        INSTANCE_USER: $INSTANCE_USER_QA
-        INSTANCE_IP: $INSTANCE_IP_QA
+  - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG != "preprod" && $CI_COMMIT_TAG != "uat" && $CI_COMMIT_TAG !~ /v[0-9]+\.[0-9]+\.[0-9]+/
+    variables:
+      DEPLOYMENT_TAG: "qa-test"
+      INSTANCE_NAME: "QA"
+      INSTANCE_USER: $INSTANCE_USER_QA
+      INSTANCE_IP: $INSTANCE_IP_QA
 
-    - if: $CI_COMMIT_TAG == "uat" && $CI_JOB_STAGE != "build"
-      variables:
-        DEPLOYMENT_TAG: "uat-test"
-        INSTANCE_NAME: "UAT"
-        INSTANCE_USER: $INSTANCE_USER_UAT
-        INSTANCE_IP: $INSTANCE_IP_UAT
+  - if: $CI_COMMIT_TAG == "uat" && $CI_JOB_STAGE != "build"
+    variables:
+      DEPLOYMENT_TAG: "uat-test"
+      INSTANCE_NAME: "UAT"
+      INSTANCE_USER: $INSTANCE_USER_UAT
+      INSTANCE_IP: $INSTANCE_IP_UAT
 
-    - if: $CI_COMMIT_TAG == "preprod" && $CI_JOB_STAGE != "build"
-      variables:
-        DEPLOYMENT_TAG: "preprod-test"
-        INSTANCE_NAME: "PreProd"
-        INSTANCE_USER: $INSTANCE_USER_PREPROD
-        INSTANCE_IP: $INSTANCE_IP_PREPROD
+  - if: $CI_COMMIT_TAG == "preprod" && $CI_JOB_STAGE != "build"
+    variables:
+      DEPLOYMENT_TAG: "preprod-test"
+      INSTANCE_NAME: "PreProd"
+      INSTANCE_USER: $INSTANCE_USER_PREPROD
+      INSTANCE_IP: $INSTANCE_IP_PREPROD
 
-    - if: $CI_COMMIT_TAG =~ /v[0-9]+\.[0-9]+\.[0-9]+/ && $CI_JOB_STAGE == "tag"
-      variables:
-        DEPLOYMENT_TAG: ${CI_COMMIT_TAG}-test
+  - if: $CI_COMMIT_TAG =~ /v[0-9]+\.[0-9]+\.[0-9]+/ && $CI_JOB_STAGE == "tag"
+    variables:
+      DEPLOYMENT_TAG: ${CI_COMMIT_TAG}-test
 
 .log-macros: &log-macros
   # The `log_section_start` and `log_section_end` functions are to create
@@ -46,12 +46,21 @@ variables:
   - |
     # Define text formatting macros
     TXT_INFO="\e[94m"
+    TXT_ERROR="\e[91m"
     TXT_CLEAR="\e[0m"
+    
+    function log_info() {
+      echo "${TXT_INFO}$1${TXT_CLEAR}"
+    }
+    
+    function log_error() {
+      echo "${TXT_ERROR}$1${TXT_CLEAR}"
+    }
     
     function log_section_start() {
       section_id="$1"
-      section_name="$2"
-      echo -e "\e[0Ksection_start:`date +%s`:${section_id}\r\e[0K${TXT_INFO}${section_name}${TXT_CLEAR}"
+      section_name=`log_info "$2"`
+      echo -e "\e[0Ksection_start:`date +%s`:${section_id}\r\e[0K$section_name"
     }
     
     function log_section_end() {
@@ -82,7 +91,7 @@ build-push-portal-image:
   script:
   - log_section_start portal_build "Building Portal image"
   - >
-    echo "Image will be tagged with commit SHA: $CI_COMMIT_SHORT_SHA"
+    log_info "Image will be tagged with commit SHA: $CI_COMMIT_SHORT_SHA"
   - >
     docker build
     --target production
@@ -104,6 +113,7 @@ tag-image:
   extends: .validate-deployment-tag
 
   before_script:
+  - *log-macros
   - echo $DOCKER_DEPLOY_TOKEN | docker login -u $DOCKER_DEPLOY_USER $DOCKER_REGISTRY --password-stdin
 
   script:
@@ -112,7 +122,7 @@ tag-image:
   - >
     docker pull $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA
     || {
-      echo "Cannot find a Docker image tagged with the current commit's SHA. See https://ccdpwiki.atlassian.net/wiki/spaces/CCDP/pages/2482110477/Portal+CI+CD+pipelines#Troubleshoot";
+      log_error "Cannot find a Docker image tagged with the current commit's SHA. See https://ccdpwiki.atlassian.net/wiki/spaces/CCDP/pages/2482110477/Portal+CI+CD+pipelines#Troubleshoot";
       exit 1;
     }
   - log_section_end portal_pull
@@ -130,12 +140,13 @@ update-instance:
   extends: .validate-deployment-tag
 
   before_script:
-    - echo $SSH_PRIVATE_KEY | base64 --decode > ~/.ssh/ccdp_deploy
-    - chmod 600 ~/.ssh/ccdp_deploy
+  - *log-macros
+  - echo $SSH_PRIVATE_KEY | base64 --decode > ~/.ssh/ccdp_deploy
+  - chmod 600 ~/.ssh/ccdp_deploy
 
   script:
   - >
-    echo "Deploying to: $INSTANCE_NAME"
+    log_info "Deploying to: $INSTANCE_NAME"
   - >
     echo
     ssh

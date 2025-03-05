@@ -39,30 +39,48 @@ variables:
       variables:
         DEPLOYMENT_TAG: ${CI_COMMIT_TAG}-test
 
+.log-macros: &log-macros
+  # The `log_section_start` and `log_section_end` functions are to create
+  # collapsible sections in the GitLab CI/CD job log.
+  # See https://docs.gitlab.com/ci/jobs/job_logs/#custom-collapsible-sections
+  - |
+    # Define text formatting macros
+    TXT_INFO="\e[94m"
+    TXT_CLEAR="\e[0m"
+    
+    function log_section_start() {
+      section_id="$1"
+      section_name="$2"
+      echo -e "\e[0Ksection_start:`date +%s`:${section_id}\r\e[0K${TXT_INFO}${section_name}${TXT_CLEAR}"
+    }
+    
+    function log_section_end() {
+      section_id="$1"
+      echo -e "\e[0Ksection_end:`date +%s`:${section_id}\r\e[0K"
+    }
+
 build-push-portal-image:
   stage: build
   extends: .validate-deployment-tag
 
   before_script:
-    # The weird-looking `echo` commands are to create collapsible sections in
-    # the GitLab CI/CD job log.
-    # See https://docs.gitlab.com/ci/jobs/job_logs/#custom-collapsible-sections
-  - echo -e "\e[0Ksection_start:`date +%s`:task_runner_build\r\e[0KBuilding Task Runner image"
+  - *log-macros
+  - log_section_start task_runner_build "Building Task Runner image"
   - docker build -f dockerfiles/build/task-runner/Dockerfile -t $DOCKER_IMAGE_TASK_RUNNER .
-  - echo -e "\e[0Ksection_end:`date +%s`:task_runner_build\r\e[0K"
+  - log_section_end task_runner_build
   - >
-    echo -e "\e[0Ksection_start:`date +%s`:assets_download\r\e[0KDownloading Docker assets from: $DOCKER_ASSETS_URL"
+    log_section_start assets_download "Downloading Docker assets from: $DOCKER_ASSETS_URL"
   - mkdir -p $LOCAL_WP_PLUGINS_DIR
   -
     dockerfiles/tools/download-docker-assets.sh
     $DOCKER_ASSETS_URL
     --username=$DOCKER_ASSETS_USERNAME
     --password-file=$DOCKER_ASSETS_PASSWORD_FILE
-  - echo -e "\e[0Ksection_end:`date +%s`:assets_download\r\e[0K"
+  - log_section_end assets_download
   - echo $DOCKER_DEPLOY_TOKEN | docker login -u $DOCKER_DEPLOY_USER $DOCKER_REGISTRY --password-stdin
 
   script:
-  - echo -e "\e[0Ksection_start:`date +%s`:portal_build\r\e[0KBuilding Portal image"
+  - log_section_start portal_build "Building Portal image"
   - >
     echo "Image will be tagged with commit SHA: $CI_COMMIT_SHORT_SHA"
   - >
@@ -73,10 +91,10 @@ build-push-portal-image:
     -t $DOCKER_IMAGE_PORTAL
     .
   - docker image tag $DOCKER_IMAGE_PORTAL $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA
-  - echo -e "\e[0Ksection_end:`date +%s`:portal_build\r\e[0K"
-  - echo -e "\e[0Ksection_start:`date +%s`:portal_push\r\e[0KPushing Portal image"
+  - log_section_end portal_build
+  - log_section_start portal_push "Pushing Portal image"
   - docker push $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA
-  - echo -e "\e[0Ksection_end:`date +%s`:portal_push\r\e[0K"
+  - log_section_end portal_push
 
   after_script:
   - docker logout $DOCKER_REGISTRY
@@ -90,19 +108,19 @@ tag-image:
 
   script:
   - >
-    echo -e "\e[0Ksection_start:`date +%s`:portal_pull\r\e[0KPulling the Portal image tagged with commit's SHA: $CI_COMMIT_SHORT_SHA"
+    log_section_start portal_pull "Pulling the Portal image tagged with commit's SHA: $CI_COMMIT_SHORT_SHA"
   - >
     docker pull $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA
     || {
       echo "Cannot find a Docker image tagged with the current commit's SHA. See https://ccdpwiki.atlassian.net/wiki/spaces/CCDP/pages/2482110477/Portal+CI+CD+pipelines#Troubleshoot";
       exit 1;
     }
-  - echo -e "\e[0Ksection_end:`date +%s`:portal_pull\r\e[0K"
+  - log_section_end portal_pull
   - >
-    echo -e "\e[0Ksection_start:`date +%s`:portal_env_tag_push\r\e[0KAdding tag '$DEPLOYMENT_TAG' and pushing image"
+    log_section_start portal_env_tag_push "Adding tag '$DEPLOYMENT_TAG' and pushing image"
   - docker image tag $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA $DOCKER_IMAGE_PORTAL:$DEPLOYMENT_TAG
   - docker push $DOCKER_IMAGE_PORTAL:$DEPLOYMENT_TAG
-  - echo -e "\e[0Ksection_end:`date +%s`:portal_env_tag_push\r\e[0K"
+  - log_section_end portal_env_tag_push
 
   after_script:
   - docker logout $DOCKER_REGISTRY
@@ -119,11 +137,12 @@ update-instance:
   - >
     echo "Deploying to: $INSTANCE_NAME"
   - >
-    echo ssh
+    echo
+    ssh
     -o UserKnownHostsFile=/dev/null
     -o StrictHostKeyChecking=no
     -i ~/.ssh/ccdp_deploy
-    $INSTANCE_USER@$INSTANCE_IP
+    \$INSTANCE_USER@\$INSTANCE_IP
     app-manager restart
 
   after_script:

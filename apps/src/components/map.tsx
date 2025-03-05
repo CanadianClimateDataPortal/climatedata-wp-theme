@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 
 import MapLegend from '@/components/map-layers/map-legend';
@@ -9,13 +10,17 @@ import MapEvents from '@/components/map-layers/map-events';
 import SearchControl from '@/components/map-layers/search-control';
 import CellsGridLayer from '@/components/map-layers/cells-grid-layer';
 
+import { useAppSelector } from '@/app/hooks';
+import { DatasetKey, EmissionScenarioKey } from '@/types/types';
 import {
 	CANADA_CENTER,
 	DEFAULT_ZOOM,
 	DEFAULT_MIN_ZOOM,
 	DEFAULT_MAX_ZOOM,
+	DATASETS,
+	SCENARIO_NAMES,
+	GEOSERVER_BASE_URL,
 } from '@/lib/constants';
-import { useAppSelector } from '@/app/hooks';
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
@@ -27,10 +32,42 @@ export default function Map({
 	onMapReady: (map: L.Map) => void;
 	onUnmount?: () => void;
 }) {
-	const labelsOpacity = useAppSelector((state) => state.map.opacity.labels);
-	const interactiveRegion = useAppSelector(
-		(state) => state.map.interactiveRegion
-	);
+	const {
+		dataset,
+		variable,
+		frequency,
+		emissionScenario,
+		opacity: { labels: labelsOpacity },
+		interactiveRegion,
+	} = useAppSelector((state) => state.map);
+
+	// construct the URL for the map legend to get its data
+	const mapLegendUrl = useMemo(() => {
+		const datasetKey = dataset as DatasetKey;
+		const emissionScenarioKey = emissionScenario as EmissionScenarioKey;
+
+		const datasetPrefix = DATASETS[datasetKey].layer_prefix ?? '';
+		const scenarioName = SCENARIO_NAMES[datasetKey][emissionScenarioKey]
+			.replace(/[\W_]+/g, '')
+			.toLowerCase();
+
+		if (!datasetPrefix || !scenarioName) {
+			return '';
+		}
+
+		const layerName = [
+			`CDC:${datasetPrefix}${variable}`,
+			frequency === 'ann' ? 'ys' : 'ms',
+			scenarioName.replace(/[\W_]+/g, '').toLowerCase(),
+			'p50',
+			frequency,
+			'30year',
+		]
+			.filter(Boolean)
+			.join('-'); // Removes empty values before joining
+
+		return `${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerName}`;
+	}, [dataset, variable, frequency, emissionScenario]);
 
 	return (
 		<MapContainer
@@ -42,7 +79,7 @@ export default function Map({
 			scrollWheelZoom={true}
 		>
 			<MapEvents onMapReady={onMapReady} onUnmount={onUnmount} />
-			<MapLegend />
+			<MapLegend url={mapLegendUrl} />
 			<CustomPanesLayer />
 			<InteractiveRegionsLayer />
 			<VariableLayer />

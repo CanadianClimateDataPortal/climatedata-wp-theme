@@ -44,6 +44,9 @@ build-push-portal-image:
   extends: .validate-deployment-tag
 
   before_script:
+    # The weird-looking `echo` commands are to create collapsible sections in
+    # the GitLab CI/CD job log.
+    # See https://docs.gitlab.com/ci/jobs/job_logs/#custom-collapsible-sections
   - echo -e "\e[0Ksection_start:`date +%s`:task_runner_build\r\e[0KBuilding Task Runner image"
   - docker build -f dockerfiles/build/task-runner/Dockerfile -t $DOCKER_IMAGE_TASK_RUNNER .
   - echo -e "\e[0Ksection_end:`date +%s`:task_runner_build\r\e[0K"
@@ -87,11 +90,11 @@ tag-image:
 
   script:
   - >
-    echo -e "\e[0Ksection_start:`date +%s`:portal_pull\r\e[0KPulling the Portal image with tag: $CI_COMMIT_SHORT_SHA"
+    echo -e "\e[0Ksection_start:`date +%s`:portal_pull\r\e[0KPulling the Portal image tagged with commit's SHA: $CI_COMMIT_SHORT_SHA"
   - >
     docker pull $DOCKER_IMAGE_PORTAL:$CI_COMMIT_SHORT_SHA
     || {
-      echo "Cannot find a Docker image tagged with the current commit's SHA. See https://ccdpwiki.atlassian.net/wiki/spaces/CCDP/pages/edit-v2/2482110477#Troubleshoot";
+      echo "Cannot find a Docker image tagged with the current commit's SHA. See https://ccdpwiki.atlassian.net/wiki/spaces/CCDP/pages/2482110477/Portal+CI+CD+pipelines#Troubleshoot";
       exit 1;
     }
   - echo -e "\e[0Ksection_end:`date +%s`:portal_pull\r\e[0K"

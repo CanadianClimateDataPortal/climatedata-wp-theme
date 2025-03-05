@@ -20,7 +20,6 @@ import variableDatasetResponseDummy from '@/assets/dummy/variable-dataset-respon
 import varTypeResponseDummy from '@/assets/dummy/var-type-response-dummy.json';
 import sectorResponseDummy from '@/assets/dummy/sector-response-dummy.json';
 import relatedResponse311Dummy from '@/assets/dummy/related-response-311-dummy.json';
-import wmsResponseDummy from '@/assets/dummy/wms-response-dummy.json';
 import wpResponse311Dummy from '@/assets/dummy/wp-response-311-dummy.json';
 import locationByCoordsDummy from '@/assets/dummy/location-by-coords-dummy.json';
 import generateChartDummy from '@/assets/dummy/generate-chart-dummy.json';
@@ -90,18 +89,15 @@ export const fetchWPData = async () => {
 	};
 };
 
-export const fetchLegendData = async () => {
-	// TODO: uncomment this and use correct API endpoint when ready
-	// const response = await fetch('/dummy/wms-response-dummy.json');
-	// if (!response.ok) {
-	// 	throw new Error('Failed to fetch data');
-	// }
-	// TODO: remove this when the API is ready
-	const response = {
-		json: async () => wmsResponseDummy, // mimic fetch response.json()
-	};
-
-	return transformLegendData(await response.json());
+export const fetchLegendData = async (url: string) => {
+	return await fetch(url)
+		.then((res) => {
+			if (!res.ok) {
+				throw new Error('Failed to fetch data');
+			}
+			return res.json();
+		})
+		.then((json) => transformLegendData(json));
 };
 
 /**

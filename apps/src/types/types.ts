@@ -12,6 +12,16 @@ import L from 'leaflet';
 export type Locale = 'en' | 'fr';
 
 /**
+ * Represents valid dataset keys.
+ */
+export type DatasetKey = 'cmip5' | 'cmip6' | 'humidex';
+
+/**
+ * Represents valid emission scenario keys.
+ */
+export type EmissionScenarioKey = 'low' | 'medium' | 'high';
+
+/**
  * Represents the structure used as props for the RelatedCard component.
  */
 export interface RelatedCardData {

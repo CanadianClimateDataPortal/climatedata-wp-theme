@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { useI18n } from '@wordpress/react-i18n';
+import { RefreshCw } from 'lucide-react';
 
 import 'leaflet/dist/leaflet.css';
 
@@ -10,49 +11,70 @@ import {
 } from '@/components/download/step-container';
 import { ControlTitle } from '@/components/ui/control-title';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
+import { Button } from '@/components/ui/button';
 import Dropdown from '@/components/ui/dropdown';
 import ZoomControl from '@/components/map-layers/zoom-control';
 import SearchControl from '@/components/map-layers/search-control';
-import GeometryControls from '@/components/map-layers/geometry-controls';
+import SelectableRectangleGridLayer from '@/components/map-layers/selectable-rectangle-grid-layer';
 import CustomPanesLayer from '@/components/map-layers/custom-panes';
-import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions';
-import CellsGridLayer from '@/components/map-layers/cells-grid-layer';
+import SelectableCellsGridLayer from '@/components/map-layers/selectable-cells-grid-layer';
 import MapEvents from '@/components/map-layers/map-events';
 
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { cn } from '@/lib/utils';
+import { DEFAULT_MIN_ZOOM, DEFAULT_MAX_ZOOM } from '@/lib/constants';
 import {
-	CANADA_CENTER,
-	DEFAULT_ZOOM,
-	DEFAULT_MIN_ZOOM,
-	DEFAULT_MAX_ZOOM,
-} from '@/lib/constants';
-import { useDownload } from '@/hooks/use-download';
+	setSelectionMode,
+	setInteractiveRegion,
+} from '@/features/download/download-slice';
 import { useMap } from '@/hooks/use-map';
+import {
+	REGION_GRID,
+	REGION_CENSUS,
+	REGION_HEALTH,
+	REGION_WATERSHED,
+} from '@/lib/constants';
 
 /**
- * Location step
+ * Location step, allows the user to make a selection on the map and choose what type of region to select
  */
 const StepLocation: React.FC = () => {
 	const { __, _n } = useI18n();
 
+	const gridLayerRef = useRef<{
+		clearSelection: () => void;
+	}>(null);
+
 	const { setMap } = useMap();
-	const { setField, fields } = useDownload();
-	const { interactiveRegion, selectedCells } = fields;
-
-	const [selectionMode, setSelectionMode] = useState<string>('cells');
-
-	// TODO: when selecting inside the map, update the selected cells
-	// const handleRegionSelected = (cells: number) => {
-	// 	setField('selectedCells', cells);
-	// }
+	const { interactiveRegion, zoom, center, selectionMode, selectionCount } =
+		useAppSelector((state) => state.download);
+	const dispatch = useAppDispatch();
 
 	// TODO: fetch these values from the API
 	const options = [
-		{ value: 'gridded_data', label: __('Grid Cells') },
-		{ value: 'census', label: __('Census Subdivisions') },
-		{ value: 'health', label: __('Health Regions') },
-		{ value: 'watershed', label: __('Watersheds') },
+		{ value: REGION_GRID, label: __('Grid Cells') },
+		{ value: REGION_CENSUS, label: __('Census Subdivisions') },
+		{ value: REGION_HEALTH, label: __('Health Regions') },
+		{ value: REGION_WATERSHED, label: __('Watersheds') },
 	];
+
+	const clearSelection = () => {
+		gridLayerRef.current?.clearSelection();
+	};
+
+	// conditionally render the grid layer based on the selected interactive region and selection mode
+	const renderGrid = () => {
+		if (interactiveRegion === REGION_GRID) {
+			if (selectionMode === 'cells') {
+				return <SelectableCellsGridLayer ref={gridLayerRef} />;
+			}
+
+			return <SelectableRectangleGridLayer ref={gridLayerRef} />;
+		}
+
+		// TODO: add other types of interactive regions
+		return null;
+	};
 
 	return (
 		<StepContainer title={__('Select a location or area')}>
@@ -71,72 +93,86 @@ const StepLocation: React.FC = () => {
 						label={__('Interactive Regions')}
 						tooltip={__('Select an option')}
 						onChange={(value) => {
-							setField('interactiveRegion', value);
+							dispatch(setInteractiveRegion(value));
 						}}
 					/>
 				</div>
 
-				<div className="mb-4">
-					<div className="flex flex-col sm:flex-row gap-4 justify-between items-start">
-						<RadioGroupFactory
-							title={__('Ways to select on the map')}
-							name="map-selection-mode"
-							value={selectionMode}
-							orientation="horizontal"
-							className="mb-0"
-							optionClassName="me-8"
-							onValueChange={(value) => setSelectionMode(value)}
-							options={[
-								{ value: 'cells', label: __('Grid cells') },
-								{ value: 'region', label: __('Draw region') },
-							]}
-						/>
-						<div>
-							<ControlTitle
-								title={__('You selected:')}
-								className="my-0"
+				{/* these are only relevant for grid cells interactive region */}
+				{interactiveRegion === REGION_GRID && (
+					<div className="mb-4">
+						<div className="flex flex-col sm:flex-row gap-4 justify-between items-start">
+							<RadioGroupFactory
+								title={__('Ways to select on the map')}
+								name="map-selection-mode"
+								value={selectionMode}
+								orientation="horizontal"
+								className="mb-0"
+								optionClassName="me-8"
+								onValueChange={(value) => {
+									dispatch(setSelectionMode(value));
+									clearSelection();
+								}}
+								options={[
+									{ value: 'cells', label: __('Grid cells') },
+									{
+										value: 'region',
+										label: __('Draw region'),
+									},
+								]}
 							/>
-							<div
-								className={cn(
-									'text-2xl font-semibold leading-7 text-right',
-									selectedCells > 0
-										? 'text-brand-blue'
-										: 'text-neutral-grey-medium'
+							<div className="flex flex-row items-start gap-4">
+								{selectionCount > 0 && (
+									<Button
+										variant="ghost"
+										className="text-xs text-brand-red font-semibold leading-4 tracking-wider uppercase h-auto p-0"
+										onClick={clearSelection}
+									>
+										<RefreshCw size={16} />
+										{__('Clear')}
+									</Button>
 								)}
-							>
-								{_n(
-									'1 Cell',
-									`${selectedCells} Cells`,
-									selectedCells
-								)}
+								<div>
+									<ControlTitle
+										title={__('You selected:')}
+										className="my-0"
+									/>
+									<div
+										className={cn(
+											'text-2xl font-semibold leading-7 text-right',
+											selectionCount > 0
+												? 'text-brand-blue'
+												: 'text-neutral-grey-medium'
+										)}
+									>
+										{_n(
+											'1 Cell',
+											`${selectionCount} Cells`,
+											selectionCount
+										)}
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+				)}
 			</div>
 
 			<MapContainer
-				center={CANADA_CENTER}
+				center={center}
 				zoomControl={false}
-				zoom={DEFAULT_ZOOM}
+				zoom={zoom}
 				minZoom={DEFAULT_MIN_ZOOM}
 				maxZoom={DEFAULT_MAX_ZOOM}
-				scrollWheelZoom={false}
+				scrollWheelZoom={true}
 				className="h-[560px] font-sans"
 			>
 				<MapEvents onMapReady={(map: L.Map) => setMap(map)} />
 				<CustomPanesLayer />
-				<InteractiveRegionsLayer />
 				<ZoomControl />
 				<SearchControl className="top-6 left-6" />
 
-				{selectionMode === 'region' && <GeometryControls />}
-				{selectionMode === 'cells' && <CellsGridLayer />}
-
-				<TileLayer
-					attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-					url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-				/>
+				{renderGrid()}
 
 				{/* Basemap TileLayer */}
 				<TileLayer
@@ -147,10 +183,10 @@ const StepLocation: React.FC = () => {
 					maxZoom={DEFAULT_MAX_ZOOM}
 				/>
 
-				{/*<TileLayer*/}
-				{/*	url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"*/}
-				{/*	attribution="&copy; OpenStreetMap contributors"*/}
-				{/*/>*/}
+				<TileLayer
+					attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+					url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+				/>
 			</MapContainer>
 		</StepContainer>
 	);

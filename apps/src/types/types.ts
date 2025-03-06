@@ -198,13 +198,17 @@ export interface DownloadState {
 	dataset: TaxonomyData | null;
 	variable: PostData | null;
 	version: string;
-	degrees: number | undefined;
+	degrees: number;
 	interactiveRegion: string;
 	startYear: number;
 	endYear: number;
 	frequency: string;
 	emissionScenarios: string[];
-	selectedCells: number;
+	selectionMode: string;
+	selection: number[];
+	selectionCount: number;
+	zoom: number;
+	center: L.LatLngExpression;
 	percentiles: string[];
 	decimalPlace: number;
 	format: string;
@@ -360,16 +364,26 @@ export interface ColorSelectProps {
 }
 
 /**
- * SearchControl Props
- * ---------------------------
- * @property {string} [placeholder] - The placeholder text for the search input. Default is "Zoom to a location, region, city, coordinates...".
- * @property {number} [zoom] - The zoom level to apply when moving to a location. Default is 10.
- * @property {string} [countryCodes] - The country codes (comma-separated) to limit the search results. Default is "ca".
+ * SearchControlResponse represents the response data from the custom cdc location_search endpoint to the search control.
  */
-export interface SearchControlProps {
-	placeholder?: string;
-	zoom?: number;
-	countryCodes?: string;
+export interface SearchControlResponse {
+	draw: number;
+	recordsFiltered: string;
+	recordsTotal: string;
+	items: SearchControlLocationItem[];
+}
+
+/**
+ * Represents an individual location item in the search control.
+ */
+export interface SearchControlLocationItem {
+	id: string;
+	text: string;
+	term: string;
+	location: string;
+	province: string;
+	lat: string;
+	lon: string;
 }
 
 /**
@@ -433,24 +447,6 @@ export interface ZoomControlProps {
 	onZoomIn: () => void;
 	onZoomOut: () => void;
 }
-
-// {
-// 	"geo_id": "OAHEK",
-// 	"geo_name": "Hicks Lake",
-// 	"generic_term": "Lake",
-// 	"location": "",
-// 	"province": "Nunavut",
-// 	"lat": "61.416667",
-// 	"lon": "-100",
-// 	"distance": "10701.56037475816",
-// 	"coords": [
-// 	61.5122,
-// 	-99.9756
-// ],
-// 	"lng": "-100",
-// 	"province_short": "NU",
-// 	"title": "Hicks Lake, NU"
-// }
 
 export interface ClimateDataProps {
 	observations: number[][];
@@ -535,4 +531,16 @@ export interface PercentileData {
 	p10?: number;
 	p50?: number;
 	p90?: number;
+}
+
+/**
+ * Represents the properties of a cell in the maps's grid layer.
+ */
+export interface GridCellProps {
+	latlng: L.LatLng;
+	layer: {
+		properties: {
+			gid: number;
+		};
+	};
 }

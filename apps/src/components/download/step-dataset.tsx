@@ -10,7 +10,8 @@ import { RadioCard, RadioCardFooter } from '@/components/ui/radio-card';
 import Link from '@/components/ui/link';
 
 import { useLocale } from '@/hooks/use-locale';
-import { useDownload } from '@/hooks/use-download';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { setDataset } from '@/features/download/download-slice';
 import { fetchTaxonomyData } from '@/services/services';
 import { TaxonomyData } from '@/types/types';
 
@@ -23,8 +24,8 @@ const StepDataset: React.FC = () => {
 	const { __ } = useI18n();
 	const { locale } = useLocale();
 
-	const { setField, fields } = useDownload();
-	const { dataset } = fields;
+	const dataset = useAppSelector((state) => state.download.dataset);
+	const dispatch = useAppDispatch();
 
 	useEffect(() => {
 		fetchTaxonomyData('datasets').then((data) => {
@@ -52,7 +53,7 @@ const StepDataset: React.FC = () => {
 							}
 							selected={dataset?.term_id === option.term_id}
 							onSelect={() => {
-								setField('dataset', option);
+								dispatch(setDataset(option));
 							}}
 							className="mb-0"
 						>

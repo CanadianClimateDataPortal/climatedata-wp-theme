@@ -36,3 +36,118 @@ export const SEARCH_DEFAULT_ZOOM: number = 10;
 export const SEARCH_COUNTRY_CODE: string = 'ca';
 export const MAP_SEARCH_URL: string = `https://nominatim.openstreetmap.org/search?format=json&q={s}&countrycodes=${SEARCH_COUNTRY_CODE}`;
 export const OWS_FORMAT: string = 'image/png';
+
+export const REGION_GRID: string = 'gridded_data';
+export const REGION_CENSUS: string = 'census';
+export const REGION_HEALTH: string = 'health';
+export const REGION_WATERSHED: string = 'watershed';
+
+export const SCENARIO_NAMES = {
+	cmip5: {
+		low: 'RCP 2.6',
+		medium: 'RCP 4.5',
+		high: 'RCP 8.5',
+	},
+	cmip6: {
+		low: 'SSP 1–2.6',
+		medium: 'SSP 2–4.5',
+		high: 'SSP 5–8.5',
+	},
+	humidex: {
+		low: 'SSP 1–2.6',
+		medium: 'SSP 2–4.5',
+		high: 'SSP 5–8.5',
+	},
+};
+
+export const DATASETS = {
+	cmip5: {
+		scenarios: [
+			{
+				name: 'rcp26',
+				label: 'RCP 2.6',
+				chart_color: '#00F',
+				correlations: {
+					cmip6: 'ssp126',
+				},
+			},
+			{
+				name: 'rcp45',
+				label: 'RCP 4.5',
+				chart_color: '#00640c',
+				correlations: {
+					cmip6: 'ssp245',
+				},
+			},
+			{
+				name: 'rcp85',
+				label: 'RCP 8.5',
+				chart_color: '#F00',
+				correlations: {
+					cmip6: 'ssp585',
+				},
+			},
+		],
+		layer_prefix: '',
+		grid: 'canadagrid',
+		finch_name: 'candcs-u5',
+		model_lists: [
+			{ name: 'pcic12', label: 'PCIC12 (Ensemble)' },
+			{ name: '24models', label: 'All models' },
+		],
+	},
+	cmip6: {
+		scenarios: [
+			{
+				name: 'ssp126',
+				label: 'SSP1-2.6',
+				chart_color: '#00F',
+				correlations: {
+					cmip5: 'rcp26',
+				},
+			},
+			{
+				name: 'ssp245',
+				label: 'SSP2-4.5',
+				chart_color: '#00640c',
+				correlations: {
+					cmip5: 'rcp45',
+				},
+			},
+			{
+				name: 'ssp585',
+				label: 'SSP5-8.5',
+				chart_color: '#F00',
+				correlations: {
+					cmip5: 'rcp85',
+				},
+			},
+		],
+		layer_prefix: 'cmip6-',
+		grid: 'canadagrid',
+		finch_name: 'candcs-u6',
+		model_lists: [{ name: '26models', label: 'All models' }],
+	},
+	humidex: {
+		scenarios: [
+			{
+				name: 'ssp126',
+				label: 'SSP1-2.6',
+				chart_color: '#00F',
+			},
+			{
+				name: 'ssp245',
+				label: 'SSP2-4.5',
+				chart_color: '#00640c',
+			},
+			{
+				name: 'ssp585',
+				label: 'SSP5-8.5',
+				chart_color: '#F00',
+			},
+		],
+		grid: 'era5landgrid',
+		finch_name: 'humidex-daily',
+		model_lists: [{ name: 'humidex_models', label: 'All models' }],
+	},
+};

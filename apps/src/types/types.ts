@@ -185,6 +185,8 @@ export interface MapState {
 	dataset: string;
 	decade: string;
 	pane: string;
+	dataValue: string;
+	mapColor: string;
 	opacity: {
 		mapData: number;
 		labels: number;

@@ -12,6 +12,14 @@ import L from 'leaflet';
 export type Locale = 'en' | 'fr';
 
 /**
+ * Represents a field with multilingual support.
+ */
+export interface MultilingualField<T = string> {
+	en: T;
+	fr?: T;
+}
+
+/**
  * Represents the structure used as props for the RelatedCard component.
  */
 export interface RelatedCardData {
@@ -47,44 +55,66 @@ export interface RelatedData {
  * @type {TaxonomyData}
  */
 export type TaxonomyData = {
-	id: string | number;
-	name: string;
-	slug: string;
-	description: string;
-	link: string;
-	[key: string]: unknown;
+	term_id: number;
+	title: MultilingualField;
+	card?: {
+		description?: MultilingualField;
+		link?: MultilingualField<{
+			title: string;
+			url: string;
+			target: string;
+		}>;
+	};
+};
+
+/**
+ * Represents an individual term with multilingual title and term id.
+ */
+export type TermItem = {
+	term_id: number;
+	title: MultilingualField;
 };
 
 /**
  * Represents data returned from WordPress for a post.
  *
- * This type is used to define the structure of post data objects,
- * which may include predefined fields like `id`, `title`, `link`, etc.
- * Additional dynamic properties can also be included.
+ * This type is used to define the structure of post data objects coming from the API
  */
 export type ApiPostData = {
 	id: string | number;
-	title: { rendered: string };
-	link: string;
-	featured_media?: number;
-	_links?: {
-		'wp:term'?: {
-			href: string;
-			taxonomy: string;
-			[key: string]: unknown;
-		}[];
-		[key: string]: unknown;
+	meta: {
+		updated_on?: string;
+		content: {
+			title: MultilingualField;
+			card?: {
+				description?: MultilingualField;
+				link?: MultilingualField<{
+					title: string;
+					url: string;
+					target: string;
+				}>;
+			};
+			thumbnail?: string;
+		};
+		taxonomy: Record<
+			string,
+			{
+				terms: TermItem[];
+			}
+		>;
 	};
-	[key: string]: unknown;
 };
 
 /**
- * Represents a normalized version of ApiPostData to be used in the application, with a plain string title.
+ * Represents a normalized version of ApiPostData to be used in the application.
  */
-export type PostData = Omit<ApiPostData, 'title'> & {
+export type PostData = {
+	id: string | number;
 	title: string;
 	description?: string;
+	link?: { title: string; url: string; target: string };
 	thumbnail?: string;
+	taxonomies?: Record<string, { id: number; title: string }[]>;
 };
 
 /**
@@ -170,13 +200,17 @@ export interface DownloadState {
 	dataset: TaxonomyData | null;
 	variable: PostData | null;
 	version: string;
-	degrees: number | undefined;
+	degrees: number;
 	interactiveRegion: string;
 	startYear: number;
 	endYear: number;
 	frequency: string;
 	emissionScenarios: string[];
-	selectedCells: number;
+	selectionMode: string;
+	selection: number[];
+	selectionCount: number;
+	zoom: number;
+	center: L.LatLngExpression;
 	percentiles: string[];
 	decimalPlace: number;
 	format: string;
@@ -332,16 +366,26 @@ export interface ColorSelectProps {
 }
 
 /**
- * SearchControl Props
- * ---------------------------
- * @property {string} [placeholder] - The placeholder text for the search input. Default is "Zoom to a location, region, city, coordinates...".
- * @property {number} [zoom] - The zoom level to apply when moving to a location. Default is 10.
- * @property {string} [countryCodes] - The country codes (comma-separated) to limit the search results. Default is "ca".
+ * SearchControlResponse represents the response data from the custom cdc location_search endpoint to the search control.
  */
-export interface SearchControlProps {
-	placeholder?: string;
-	zoom?: number;
-	countryCodes?: string;
+export interface SearchControlResponse {
+	draw: number;
+	recordsFiltered: string;
+	recordsTotal: string;
+	items: SearchControlLocationItem[];
+}
+
+/**
+ * Represents an individual location item in the search control.
+ */
+export interface SearchControlLocationItem {
+	id: string;
+	text: string;
+	term: string;
+	location: string;
+	province: string;
+	lat: string;
+	lon: string;
 }
 
 /**
@@ -405,24 +449,6 @@ export interface ZoomControlProps {
 	onZoomIn: () => void;
 	onZoomOut: () => void;
 }
-
-// {
-// 	"geo_id": "OAHEK",
-// 	"geo_name": "Hicks Lake",
-// 	"generic_term": "Lake",
-// 	"location": "",
-// 	"province": "Nunavut",
-// 	"lat": "61.416667",
-// 	"lon": "-100",
-// 	"distance": "10701.56037475816",
-// 	"coords": [
-// 	61.5122,
-// 	-99.9756
-// ],
-// 	"lng": "-100",
-// 	"province_short": "NU",
-// 	"title": "Hicks Lake, NU"
-// }
 
 export interface ClimateDataProps {
 	observations: number[][];
@@ -507,4 +533,16 @@ export interface PercentileData {
 	p10?: number;
 	p50?: number;
 	p90?: number;
+}
+
+/**
+ * Represents the properties of a cell in the maps's grid layer.
+ */
+export interface GridCellProps {
+	latlng: L.LatLng;
+	layer: {
+		properties: {
+			gid: number;
+		};
+	};
 }

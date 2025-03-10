@@ -3,12 +3,11 @@ name: climatedata-dev
 services:
 
   portal:
-    image: climatedata-portal:dev
     build:
       context: .
       target: development
       args:
-        TASK_RUNNER_IMAGE: climatedata-task-runner
+        TASK_RUNNER_IMAGE: climatedata-task-runner:dev
         # Directory containing local WordPress plugins. Those files can be
         # downloaded using the `dockerfiles/tools/download-docker-assets.sh`
         # script.
@@ -16,7 +15,6 @@ services:
     depends_on:
       - task_runner
     volumes:
-      # Source files of the themes
       # Source files of the themes
       - "./framework:/var/www/html/assets/themes/framework"
       - "./fw-child:/var/www/html/assets/themes/fw-child"
@@ -77,11 +75,13 @@ services:
     command: --innodb-buffer-pool-size=128M --innodb-log-buffer-size=64M --innodb-doublewrite=0 --innodb-flush-log-at-trx-commit=0
 
   task_runner:
-    image: climatedata-task-runner
     build:
       context: .
       dockerfile: dockerfiles/build/task-runner/Dockerfile
+      tags:
+        - climatedata-task-runner:dev
     command: ["bash", "-c", "watch-fe.sh /app"]
+    user: "${USER_ID}:${GROUP_ID}"
     volumes:
       - ".:/app"
 

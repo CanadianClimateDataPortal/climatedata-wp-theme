@@ -5,20 +5,31 @@ for the portal site (i.e. the _Climate Data_ website).
 
 ## Simple setup
 
-1. Clone this repository, it contains a pre-defined Docker Compose setup.
-2. Using the following script, download the extra files required to build the
+1. You need a GitLab access token to the Docker Container Registry. Ask the tech
+   lead for details.
+2. Clone this repository.
+3. Using the following command, download the extra files required to build the
    Docker images (ask the tech lead for the `<URL>` and the authentication
    credentials):
    ```shell
-   ./dockerfiles/tools/download-docker-assets.sh <URL>
+   ./dev.sh download-docker-assets <URL>
    ```
-3. Start the services:
+4. Start the services (always use the `dev.sh` script):
    ```shell
-   docker compose up -d
+   ./dev.sh start
    ```
-4. Visit the website! The default URLs are:
+5. Visit the website! The default URLs are:
    * https://dev-en.climatedata.ca
    * https://dev-fr.climatedata.ca
+6. To stop the services:
+   ```shell
+    ./dev.sh stop
+    ```
+
+To ease your development, be sure to check the available commands in `dev.sh`:
+```shell
+./dev.sh --help
+```
 
 ### Created Docker services
 

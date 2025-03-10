@@ -670,7 +670,7 @@ $display-line-height: $headings-line-height !default;
 // scss-docs-end display-headings
 
 // scss-docs-start type-variables
-$lead-font-size:              $font-size-base * 1.25 !default;
+$lead-font-size:              $font-size-base * (20 / 17) !default;
 $lead-font-weight:            300 !default;
 
 $small-font-size:             0.75em;

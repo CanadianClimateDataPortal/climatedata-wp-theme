@@ -3,7 +3,7 @@
 //
 
 #home-nav {
-  // @include font-size(1.25rem);
+  font-size: 1rem;
 
   p {
     margin-bottom: 0;
@@ -1866,7 +1866,6 @@ body.tab-drawer-open {
 .news-meta-block {
   backdrop-filter: blur(10px);
   background-color: transparent;
-  font-size: 1rem;
 
   .news-meta-item > span {
     font-size: 0.85rem;

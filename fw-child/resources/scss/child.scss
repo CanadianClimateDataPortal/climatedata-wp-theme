@@ -522,7 +522,7 @@ $control-slider-handle-width: 2.75rem;
     transition: 0.25s;
 
     @include media-breakpoint-up(md) {
-      font-size: 0.75rem;
+      font-size: 0.85rem;
     }
 
     &.disabled {
@@ -557,14 +557,14 @@ $control-slider-handle-width: 2.75rem;
     }
 
     svg {
-      width: 22px;
+      width: 25px;
 
       @include media-breakpoint-up(lg) {
-        width: 24px;
+        width: 27px;
       }
 
       @include media-breakpoint-up(xl) {
-        width: 30px;
+        width: 35px;
       }
     }
   }

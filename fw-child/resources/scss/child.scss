@@ -434,6 +434,7 @@ $control-slider-handle-width: 2.75rem;
 
 #hero {
   color: $white;
+  font-size: 1rem;
 
   h1 {
     @include font-size(5rem);

@@ -148,6 +148,11 @@
 
 /* map search control override styles */
 
+.leaflet-container .leaflet-control,
+.leaflet-control-container > div {
+	z-index: 30;
+}
+
 .leaflet-container .leaflet-control-search {
 	font-size: 14px;
 	display: flex;
@@ -222,6 +227,7 @@
 	margin: 0;
 	padding: 10px 15px;
 	max-width: 100%;
+	text-wrap: auto;
 }
 
 .leaflet-container .leaflet-control-search .search-tooltip .search-tip:hover {
@@ -230,4 +236,19 @@
 
 .leaflet-container .leaflet-control-search .search-cancel {
 	display: none !important;
+}
+
+.leaflet-container .leaflet-control.legend-wrapper {
+	margin-right: 0;
+	margin-top: 0;
+}
+
+.leaflet-container .leaflet-control.legend-wrapper .legend-temp-text {
+	font-family: CDCSans;
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 20px;
+	fill: #18181b;
+	text-anchor: end;
+	dominant-baseline: middle;
 }

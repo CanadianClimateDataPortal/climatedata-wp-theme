@@ -25,11 +25,12 @@ import Link from '@/components/ui/link';
 
 // other
 import { useSidebar } from '@/hooks/use-sidebar';
+import { useLocale } from '@/hooks/use-locale';
 import { fetchTaxonomyData } from '@/services/services';
 import { InteractivePanelProps, TaxonomyData } from '@/types/types';
 
 // menu and panel slug
-const slug = 'variable-dataset';
+const slug = 'datasets';
 
 /**
  * A menu item link component that toggles the datasets panel.
@@ -68,6 +69,7 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData>> = ({
 	const [datasets, setDatasets] = useState<TaxonomyData[]>([]);
 	const { activePanel } = useSidebar();
 	const { __ } = useI18n();
+	const { locale } = useLocale();
 
 	useEffect(() => {
 		if (activePanel !== slug) {
@@ -102,23 +104,30 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData>> = ({
 					<Grid columns={1} className="gap-4">
 						{datasets.map((item) => (
 							<RadioCard
-								key={item.id}
+								key={item.term_id}
 								value={item}
 								radioGroup={slug}
-								title={item.name ?? ''}
-								description={item.description}
+								title={item.title?.[locale] ?? ''}
+								description={
+									item?.card?.description?.[locale] ?? ''
+								}
 								selected={selected === item}
 								onSelect={() => onSelect(item)}
 							>
-								<RadioCardFooter>
-									<Link
-										icon={<ExternalLink size={16} />}
-										href={item.link}
-										className="text-sm text-brand-blue"
-									>
-										{__('Learn more')}
-									</Link>
-								</RadioCardFooter>
+								{item?.card?.link && (
+									<RadioCardFooter>
+										<Link
+											icon={<ExternalLink size={16} />}
+											href={
+												item.card.link?.[locale]?.url ??
+												'#'
+											}
+											className="text-sm text-brand-blue"
+										>
+											{__('Learn more')}
+										</Link>
+									</RadioCardFooter>
+								)}
 							</RadioCard>
 						))}
 					</Grid>

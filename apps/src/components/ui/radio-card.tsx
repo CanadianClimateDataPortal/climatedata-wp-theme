@@ -57,8 +57,8 @@ const RadioCard: React.FC<RadioCardProps> = ({
 					'flex cursor-pointer flex-1',
 					thumbnail ? `bg-[2.5] bg-no-repeat bg-top-left pl-10` : ''
 				)}
-			>
-				<div className="p-2">
+      >
+				<div className={cn('p-2', thumbnail ? 'ml-[50px] h-28' : '')}>
 					<div className="flex items-start">
 						<div className="grow text-base text-zinc-950 font-semibold leading-4 mr-4">
 							{title}
@@ -75,10 +75,7 @@ const RadioCard: React.FC<RadioCardProps> = ({
 					</div>
 					{description && (
 						<div
-							className={cn(
-								'line-clamp-3 text-sm text-neutral-grey-medium leading-5 my-2',
-								thumbnail ? '' : 'pr-16'
-							)}
+							className="line-clamp-3 text-sm text-neutral-grey-medium leading-5 my-2"
 							dangerouslySetInnerHTML={{ __html: description }}
 						/>
 					)}

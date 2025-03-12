@@ -9,12 +9,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Info, Share2, Download } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
-import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 // components
 import VariableDetailsPanel from '@/components/map-info/variable-details-panel';
 import ShareMapModal from '@/components/map-info/share-map-modal';
 import DownloadMapModal from '@/components/map-info/download-map-modal';
+import { Button } from '@/components/ui/button';
 
 // other
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
@@ -73,31 +74,34 @@ const MapHeader: React.FC<MapInfoProps> = ({
 	};
 
 	return (
-		<aside className="map-header">
-			<div
-				ref={ref}
-				className="absolute top-0 left-0 z-[9999] overflow-y-auto w-full"
-			>
-				<div className="flex items-center gap-x-2 bg-white p-4">
-					<Breadcrumbs
-						title={data.title}
-						onClick={toggleVariableDetailsPanel}
-					/>
-					<ModalToggleButtons
-						onToggleShare={toggleShareInfo}
-						onToggleDownload={toggleDownloadInfo}
-					/>
+		<>
+			<aside className="map-header relative z-20">
+				<div
+					ref={ref}
+					className="absolute top-0 left-0 overflow-y-auto w-full"
+				>
+					<div className="flex items-center gap-x-2 bg-white p-4">
+						<Breadcrumbs
+							title={data.title}
+							onClick={toggleVariableDetailsPanel}
+						/>
+						<ModalToggleButtons
+							onToggleShare={toggleShareInfo}
+							onToggleDownload={toggleDownloadInfo}
+						/>
+					</div>
 				</div>
+			</aside>
 
-				<ShareMapModal isOpen={shareInfo} onClose={toggleShareInfo} />
-				<DownloadMapModal
-					isOpen={downloadInfo}
-					onClose={toggleDownloadInfo}
-					title={data.title}
-					mapRef={mapRef}
-				/>
-			</div>
-		</aside>
+			{/* moved outside of the map header container for the modal overaly to cover also the sidebar*/}
+			<ShareMapModal isOpen={shareInfo} onClose={toggleShareInfo} />
+			<DownloadMapModal
+				isOpen={downloadInfo}
+				onClose={toggleDownloadInfo}
+				title={data.title}
+				mapRef={mapRef}
+			/>
+		</>
 	);
 };
 MapHeader.displayName = 'MapHeader';
@@ -139,28 +143,36 @@ const ModalToggleButtons: React.FC<{
 	onToggleDownload: () => void;
 }> = ({ onToggleShare, onToggleDownload }) => {
 	const { __ } = useI18n();
+	const buttonClasses =
+		'text-md font-normal leading-6 tracking-[0.8px] uppercase rounded-full h-7 sm:h-9 max-sm:py-1.5 max-sm:px-3';
 
 	return (
-		<div className="flex gap-2 ml-auto">
+		<div className="flex gap-3 sm:gap-5 ml-auto">
 			<Button
 				variant="outline"
-				className="rounded-full"
+				className={cn(buttonClasses, 'border border-cold-grey-4')}
 				onClick={onToggleShare}
 			>
-				{__('Share')}{' '}
-				<span className="sr-only">{__('the current visible map')}</span>
+				<div className="hidden sm:block text-dark-purple">
+					{__('Share')}{' '}
+					<span className="sr-only">
+						{__('the current visible map')}
+					</span>
+				</div>
 				<Share2 />
 			</Button>
 
 			<Button
 				variant="destructive"
-				className="rounded-full"
+				className={buttonClasses}
 				onClick={onToggleDownload}
 			>
-				{__('Download')}{' '}
-				<span className="sr-only">
-					{__('image from your viewport')}
-				</span>
+				<div className="hidden sm:block">
+					{__('Download')}{' '}
+					<span className="sr-only">
+						{__('image from your viewport')}
+					</span>
+				</div>
 				<Download />
 			</Button>
 		</div>

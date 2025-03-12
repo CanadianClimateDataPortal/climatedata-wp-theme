@@ -26,7 +26,7 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
 
 		return (
 			<div
-				className="modal fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]"
+				className="modal fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
 				onClick={onClose}
 				role="presentation" // Indicates the backdrop is a background presentation element
 				aria-hidden={!isOpen} // Ensures the backdrop is ignored by screen readers when modal is not open
@@ -34,7 +34,7 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
 				<div
 					ref={ref}
 					className={cn(
-						'p-6 bg-white rounded-md shadow-lg max-w-md mx-auto relative flex flex-col gap-6',
+						'p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto relative flex flex-col gap-6',
 						className
 					)}
 					onClick={(e: React.MouseEvent<HTMLDivElement>) =>

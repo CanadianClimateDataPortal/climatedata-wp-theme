@@ -84,13 +84,13 @@ const DropdownGeneric = <T extends string | undefined>(
 	};
 
 	return (
-		<div ref={ref} className={cn('dropdown z-[99999]', className)}>
+		<div ref={ref} className={cn('dropdown z-50', className)}>
 			{label && <ControlTitle title={label} tooltip={tooltip} />}
 			<Select value={value} onValueChange={handleValueChanged}>
 				<SelectTrigger className="w-full focus:ring-0 focus:ring-offset-0 text-cdc-black [&>svg]:text-brand-blue [&>svg]:opacity-100">
 					<SelectValue placeholder={placeholderTranslated} />
 				</SelectTrigger>
-				<SelectContent className="z-[99999]">
+				<SelectContent>
 					{/* TODO: this stopped working after fixing typescript errors.. revisit and unhide!! */}
 					{searchable && (
 						<div className="p-2 hidden">

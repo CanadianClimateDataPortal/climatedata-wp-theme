@@ -6,7 +6,6 @@ import {
 	RelatedData,
 	MapInfoData,
 	TaxonomyData,
-	PostData,
 	ApiPostData,
 	ChartDataOptions,
 	DeltaValuesOptions,
@@ -14,22 +13,17 @@ import {
 import L from 'leaflet';
 
 // TODO: temporarily using dummy data inside the assets folder, until the API is ready
-import variableResponseDummy from '@/assets/dummy/variable-response-dummy.json';
-import datasetResponseDummy from '@/assets/dummy/dataset-response-dummy.json';
 import variableDatasetResponseDummy from '@/assets/dummy/variable-dataset-response-dummy.json';
 import varTypeResponseDummy from '@/assets/dummy/var-type-response-dummy.json';
 import sectorResponseDummy from '@/assets/dummy/sector-response-dummy.json';
 import relatedResponse311Dummy from '@/assets/dummy/related-response-311-dummy.json';
-import wmsResponseDummy from '@/assets/dummy/wms-response-dummy.json';
 import wpResponse311Dummy from '@/assets/dummy/wp-response-311-dummy.json';
 import locationByCoordsDummy from '@/assets/dummy/location-by-coords-dummy.json';
 import generateChartDummy from '@/assets/dummy/generate-chart-dummy.json';
 import deltaValuesDummy from '@/assets/dummy/delta-values-dummy.json';
 
 const dummyResponses = {
-	variable: variableResponseDummy,
 	'variable-dataset': variableDatasetResponseDummy,
-	dataset: datasetResponseDummy,
 	'var-type': varTypeResponseDummy,
 	sector: sectorResponseDummy,
 } as const;
@@ -90,18 +84,15 @@ export const fetchWPData = async () => {
 	};
 };
 
-export const fetchLegendData = async () => {
-	// TODO: uncomment this and use correct API endpoint when ready
-	// const response = await fetch('/dummy/wms-response-dummy.json');
-	// if (!response.ok) {
-	// 	throw new Error('Failed to fetch data');
-	// }
-	// TODO: remove this when the API is ready
-	const response = {
-		json: async () => wmsResponseDummy, // mimic fetch response.json()
-	};
-
-	return transformLegendData(await response.json());
+export const fetchLegendData = async (url: string) => {
+	return await fetch(url)
+		.then((res) => {
+			if (!res.ok) {
+				throw new Error('Failed to fetch data');
+			}
+			return res.json();
+		})
+		.then((json) => transformLegendData(json));
 };
 
 /**
@@ -113,28 +104,28 @@ export const fetchTaxonomyData = async (
 	slug: string,
 	filters?: Record<string, string | number | null>
 ): Promise<TaxonomyData[]> => {
-	// TODO: uncomment this and use correct API endpoint when ready
-	// const response = await fetch(`/dummy/${slug}-response-dummy.json`);
-	// if (!response.ok) {
-	// 	throw new Error('Failed to fetch data');
-	// }
-	// TODO: remove this when the API is ready
-	let response: { json: () => Promise<unknown> };
-	if (slug in dummyResponses) {
-		response = {
-			json: async () => dummyResponses[slug as DummyResponseKey], // mimic fetch response.json()
-		};
-	} else {
-		return [];
-	}
+	// check if the there is a dummy response for the slug, which means the API is not yet implemented for it in the backend
+	const fetchFromApi = !Object.keys(dummyResponses).includes(slug);
 
-	const data = (await response.json()) as TaxonomyData[];
+	// fetch from the API or directly return dummy json response
+	const data: TaxonomyData[] = !fetchFromApi
+		? dummyResponses[slug as DummyResponseKey]
+		: await fetch(
+				`https://dev-en.climatedata.ca/wp-json/cdc/v3/${slug}-list`
+			)
+				.then((res) => {
+					if (!res.ok) {
+						throw new Error('Failed to fetch data');
+					}
+					return res.json();
+				})
+				.then((json) => json[slug]);
 
 	// applying filters for the dummy implementation.. for the real implementation, this should be done via query params when fetching
 	if (filters) {
 		return data.filter((item) => {
 			return Object.keys(filters).every((key) => {
-				return item[key] === filters[key];
+				return item[key as keyof TaxonomyData] === filters[key];
 			});
 		});
 	}
@@ -150,49 +141,55 @@ export const fetchTaxonomyData = async (
 export const fetchPostsData = async (
 	postType: string,
 	filters: Record<string, string | number | null>
-): Promise<PostData[]> => {
-	// TODO: uncomment this and use correct API endpoint when ready
-	// const response = await fetch(`/dummy/${postType}-response-dummy.json`);
-	// if (!response.ok) {
-	// 	throw new Error('Failed to fetch data');
-	// }
-	// TODO: remove this when the API is ready
-	let response: { json: () => Promise<unknown> };
-	if (postType in dummyResponses) {
-		response = {
-			json: async () => dummyResponses[postType as DummyResponseKey], // mimic fetch response.json()
-		};
-	} else {
-		return [];
-	}
+): Promise<ApiPostData[]> => {
+	// check if the there is a dummy response for the slug, which means the API is not yet implemented for it in the backend
+	const fetchFromApi = !Object.keys(dummyResponses).includes(postType);
 
-	const data: PostData[] = ((await response.json()) as ApiPostData[]).map(
-		(post) => ({
-			...post,
-			title: post.title.rendered,
-		})
-	);
+	// fetch from the API or directly return dummy json response
+	const data: ApiPostData[] = fetchFromApi
+		? await fetch(
+				`https://dev-en.climatedata.ca/wp-json/cdc/v3/${postType}-list`
+			)
+				.then((res) => {
+					if (!res.ok) {
+						throw new Error('Failed to fetch data');
+					}
+					return res.json();
+				})
+				.then((json) => json[postType])
+		: dummyResponses[postType as DummyResponseKey];
+
+	// only interested in items with an id
+	const filteredData = data.filter((item) => item.id);
 
 	// applying filters for the dummy implementation.. for the real implementation, this should be done via query params when fetching
-	if (filters) {
-		return data.filter((item) => {
+	if (Object.values(filters).some((value) => value)) {
+		return filteredData.filter((item) => {
 			return Object.keys(filters).every((key) => {
-				const filterValue = String(filters[key]);
+				const filterValue = filters[key];
 
+				// if filterValue is falsy (0, null, etc) don't filter by it
 				if (!filterValue) {
 					return true;
 				}
 
-				if (Array.isArray(item[key])) {
-					return String(item[key]).includes(filterValue);
+				// access taxonomies inside meta.taxonomy
+				const taxonomy = item.meta?.taxonomy?.[key];
+
+				// if taxonomy is missing, filter it out
+				if (!taxonomy || !taxonomy.terms) {
+					return false;
 				}
 
-				return false;
+				// check if any term_id matches the filterValue
+				return taxonomy.terms.some(
+					(term) => String(term.term_id) === String(filterValue)
+				);
 			});
 		});
 	}
 
-	return data;
+	return filteredData;
 };
 
 /**

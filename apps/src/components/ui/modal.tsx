@@ -26,7 +26,7 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
 
 		return (
 			<div
-				className="modal fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]"
+				className="modal fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
 				onClick={onClose}
 				role="presentation" // Indicates the backdrop is a background presentation element
 				aria-hidden={!isOpen} // Ensures the backdrop is ignored by screen readers when modal is not open

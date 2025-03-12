@@ -12,6 +12,13 @@ export default function CustomPanesLayer(): null {
 	const map = useMap();
 
 	useEffect(() => {
+		// target the main leaflet-map-pane element
+		const mapPane = map.getPane('mapPane');
+		if (mapPane) {
+			// apply custom z-index class to avoid it being too high
+			mapPane.classList.add('z-20');
+		}
+
 		// Used for the primary map tiles or base layers.
 		// Non-interactive with the lowest z-index to ensure it's below other elements.
 		map.createPane('basemap');

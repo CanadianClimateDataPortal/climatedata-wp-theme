@@ -11,6 +11,12 @@ import { useI18n } from '@wordpress/react-i18n';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SocialShareButtons } from '@/components/social-share-buttons';
+import {
+	ModalSection,
+	ModalSectionBlock,
+	ModalSectionBlockTitle,
+	ModalSectionBlockDescription,
+} from '@/components/map-info/modal-section';
 import Modal from '@/components/ui/modal';
 
 const ShareMapModal: React.FC<{
@@ -36,38 +42,43 @@ const ShareMapModal: React.FC<{
 
 	return (
 		<Modal isOpen={isOpen} onClose={onClose}>
-			<div>
-				<h3 className="font-semibold">{__('Sharing this map')}</h3>
-				<p className="text-gray-400 my-2 text-sm">
-					{__(
-						'You can copy-paste this link anywhere you want; it will keep all your data options and your map position.'
-					)}
-				</p>
-				<div className="flex gap-4">
-					<Input
-						type="text"
-						placeholder="crim.ca/map/?coords=62.5102..."
-					/>
-					<Button
-						className="rounded-full uppercase"
-						variant={copyLinkVariant}
-						onClick={copyLinkHandler}
-					>
-						{copyLinkVariant === 'secondary'
-							? __('Copied')
-							: __('Copy Link')}
-					</Button>
-				</div>
-			</div>
-			<div>
-				<p className="font-bold">
-					{__('Or click one of these social links:')}
-				</p>
-				<p className="text-gray-400 my-2 text-sm">
-					{__('Clicking on icons will launch a new window.')}
-				</p>
-				<SocialShareButtons />
-			</div>
+			<ModalSection className="share-map-modal">
+				<ModalSectionBlock className="mb-4">
+					<ModalSectionBlockTitle>
+						{__('Sharing this map')}
+					</ModalSectionBlockTitle>
+					<ModalSectionBlockDescription>
+						{__(
+							'You can copy-paste this link anywhere you want; it will keep all your data options and your map position.'
+						)}
+					</ModalSectionBlockDescription>
+					<div className="flex gap-4">
+						<Input
+							type="text"
+							placeholder="crim.ca/map/?coords=62.5102..."
+							className="text-neutral-grey-medium placeholder:text-neutral-grey-medium border-cold-grey-4 rounded-none"
+						/>
+						<Button
+							className="rounded-full uppercase"
+							variant={copyLinkVariant}
+							onClick={copyLinkHandler}
+						>
+							{copyLinkVariant === 'secondary'
+								? __('Copied')
+								: __('Copy Link')}
+						</Button>
+					</div>
+				</ModalSectionBlock>
+				<ModalSectionBlock>
+					<ModalSectionBlockTitle>
+						{__('Or click one of these social links:')}
+					</ModalSectionBlockTitle>
+					<ModalSectionBlockDescription>
+						{__('Clicking on icons will launch a new window.')}
+					</ModalSectionBlockDescription>
+					<SocialShareButtons />
+				</ModalSectionBlock>
+			</ModalSection>
 		</Modal>
 	);
 };

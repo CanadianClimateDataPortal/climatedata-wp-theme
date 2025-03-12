@@ -4,12 +4,19 @@
  * A modal component that allows users to download the map as an image.
  *
  */
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 import { toPng } from 'html-to-image';
+import { Download, ExternalLink } from 'lucide-react';
 
 // components
 import Modal from '@/components/ui/modal';
+import {
+	ModalSection,
+	ModalSectionBlock,
+	ModalSectionBlockTitle,
+	ModalSectionBlockDescription,
+} from '@/components/map-info/modal-section';
 
 // TODO: replace mapRef with a reference coming from MapContext or the useLeafetMap hook if possible
 const DownloadMapModal: React.FC<{
@@ -51,52 +58,71 @@ const DownloadMapModal: React.FC<{
 		}
 	};
 
+	const buttonText = useMemo(() => {
+		if (isGenerating) {
+			return __('Generating...');
+		}
+
+		return (
+			<div className="flex items-center gap-2">
+				{__('Download')}
+				<Download className="w-4 h-4 text-[#FAFAFA] -mt-1" />
+			</div>
+		);
+	}, [isGenerating, __]);
+
 	return (
 		<Modal isOpen={isOpen} onClose={onClose}>
-			<div className="download-map-modal">
-				<h3 className="font-semibold">
-					{__('Download image from viewport')}
-				</h3>
-				<p className="text-gray-400 my-2 text-sm">
-					{__(
-						'Your export will showcase your various data options. The map position will be the one you see on your screen.'
-					)}
-				</p>
-				<a
-					href={downloadUrl || '#'}
-					target="_blank"
-					aria-label={__(
-						'Download current map image (opens in a new tab)'
-					)}
-					className={`px-4 py-2 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 ${
-						isGenerating ? 'opacity-50 pointer-events-none' : ''
-					}`}
-					download={`${title}-map.png`}
-					onClick={handleDownloadClick}
-				>
-					{isGenerating ? __('Generating...') : __('Download')}
-				</a>
-			</div>
-			<div>
-				<p className="font-bold">
-					{__('Need control over your own data?')}
-				</p>
-				<p className="text-gray-400 my-2 text-sm">
-					{__(
-						'Head over to the download section where you can select multiple grid cells and personalize more data options.'
-					)}
-				</p>
-				<a
-					href="#"
-					target="_blank"
-					aria-label={__(
-						'Go to download sections (opens in a new tab)'
-					)}
-					className="text-blue-500"
-				>
-					{__('Go to download section')}
-				</a>
-			</div>
+			<ModalSection className="download-map-modal">
+				<ModalSectionBlock>
+					<ModalSectionBlockTitle>
+						{__('Download image from viewport')}
+					</ModalSectionBlockTitle>
+					<ModalSectionBlockDescription>
+						{__(
+							'Your export will showcase your various data options. The map position will be the one you see on your screen.'
+						)}
+					</ModalSectionBlockDescription>
+					<a
+						href={downloadUrl || '#'}
+						target="_blank"
+						aria-label={__(
+							'Download current map image (opens in a new tab)'
+						)}
+						className={`inline-flex text-md font-normal leading-6 tracking-[0.8px] uppercase rounded-full px-4 py-2 bg-destructive text-destructive-foreground hover:bg-destructive/90 ${
+							isGenerating ? 'opacity-50 pointer-events-none' : ''
+						}`}
+						download={`${title}-map.png`}
+						onClick={handleDownloadClick}
+					>
+						{buttonText}
+					</a>
+				</ModalSectionBlock>
+
+				<ModalSectionBlock>
+					<ModalSectionBlockTitle>
+						{__('Need control over your own data?')}
+					</ModalSectionBlockTitle>
+					<ModalSectionBlockDescription>
+						{__(
+							'Head over to the download section where you can select multiple grid cells and personalize more data options.'
+						)}
+					</ModalSectionBlockDescription>
+					<a
+						href="#"
+						target="_blank"
+						aria-label={__(
+							'Go to download sections (opens in a new tab)'
+						)}
+						className="text-brand-blue font-normal text-md leading-6"
+					>
+						<div className="flex items-center gap-2 ms-2">
+							{__('Go to Download Section')}
+							<ExternalLink className="w-4 h-4" />
+						</div>
+					</a>
+				</ModalSectionBlock>
+			</ModalSection>
 		</Modal>
 	);
 };

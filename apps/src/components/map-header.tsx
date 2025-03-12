@@ -144,7 +144,7 @@ const ModalToggleButtons: React.FC<{
 	const { __ } = useI18n();
 
 	return (
-		<div className="flex gap-2 ml-auto">
+		<div className="flex gap-3 sm:gap-5 ml-auto">
 			<Button
 				variant="outline"
 				className="rounded-full"

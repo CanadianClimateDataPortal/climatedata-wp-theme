@@ -47,18 +47,15 @@ const RadioCard: React.FC<RadioCardProps> = ({
 			)}
 			{...props}
 		>
-			<label
-				style={
-					thumbnail
-						? { backgroundImage: `url(${thumbnail})` }
-						: undefined
-				}
-				className={cn(
-					'flex cursor-pointer',
-					thumbnail ? `bg-[2.5] bg-no-repeat bg-top-left pl-10` : ''
+			<label className="flex cursor-pointer relative">
+				{thumbnail && (
+					<span
+						className="absolute left-0 top-0 h-full w-[40px] bg-no-repeat bg-cover bg-center"
+						style={{ backgroundImage: `url(${thumbnail})` }}
+					/>
 				)}
-			>
-				<div className="p-2">
+
+				<div className={cn('p-2', thumbnail ? 'ml-[50px] h-28' : '')}>
 					<div className="flex items-start">
 						<div className="grow text-base text-zinc-950 font-semibold leading-4 mr-4">
 							{title}
@@ -75,10 +72,7 @@ const RadioCard: React.FC<RadioCardProps> = ({
 					</div>
 					{description && (
 						<div
-							className={cn(
-								'line-clamp-3 text-sm text-neutral-grey-medium leading-5 my-2',
-								thumbnail ? '' : 'pr-16'
-							)}
+							className="line-clamp-3 text-sm text-neutral-grey-medium leading-5 my-2"
 							dangerouslySetInnerHTML={{ __html: description }}
 						/>
 					)}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 import {
@@ -15,8 +15,15 @@ import { setVariable } from '@/features/download/download-slice';
  * Variable step
  */
 const StepVariable: React.FC = () => {
-	const [filterValues, setFilterValues] = useState<Record<string, string>>(
-		{}
+	const [varType, setVarType] = useState<string>('');
+	const [sector, setSector] = useState<string>('');
+
+	const filterValues = useMemo(
+		() => ({
+			'var-type': varType,
+			sector,
+		}),
+		[varType, sector]
 	);
 
 	const { __ } = useI18n();
@@ -35,12 +42,7 @@ const StepVariable: React.FC = () => {
 			<div className="flex flex-col md:flex-row gap-4 mb-8">
 				<TaxonomyDropdownFilter
 					className="sm:w-52"
-					onFilterChange={(value) =>
-						setFilterValues((prev) => ({
-							...prev,
-							'var-type': value,
-						}))
-					}
+					onFilterChange={(value) => setVarType(value)}
 					slug="var-type"
 					label={__('Variable Types')}
 					tooltip={__('Select a variable type')}
@@ -49,9 +51,7 @@ const StepVariable: React.FC = () => {
 				/>
 				<TaxonomyDropdownFilter
 					className="sm:w-52"
-					onFilterChange={(value) =>
-						setFilterValues((prev) => ({ ...prev, sector: value }))
-					}
+					onFilterChange={(value) => setSector(value)}
 					slug="sector"
 					label={__('Sectors')}
 					tooltip={__('Select a sector')}

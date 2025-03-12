@@ -28,7 +28,7 @@ const ZoomButtons: React.FC<ZoomControlProps> = ({
 	);
 
 	return (
-		<div className="absolute bottom-6 left-6 z-[9999] overflow-y-auto">
+		<div className="absolute bottom-6 left-6 z-20 overflow-y-auto">
 			<div
 				className={cn(
 					'zoom-control',

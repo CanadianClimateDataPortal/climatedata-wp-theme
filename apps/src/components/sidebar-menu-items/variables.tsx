@@ -2,7 +2,7 @@
  * A menu item and panel component that displays a list of variables with some custom filters.
  * TODO: make this work with the new AnimatedPanel component
  */
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Map, ChevronRight } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
 
@@ -64,11 +64,18 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 	selected,
 	onSelect,
 }) => {
-	const [filterValues, setFilterValues] = useState<Record<string, string>>(
-		{}
-	);
+	const [varType, setVarType] = useState<string>('');
+	const [sector, setSector] = useState<string>('');
 
 	const { __ } = useI18n();
+
+	const filterValues = useMemo(
+		() => ({
+			'var-type': varType,
+			sector,
+		}),
+		[varType, sector]
+	);
 
 	return (
 		<SidebarPanel id={slug} className="w-[36rem]">
@@ -85,30 +92,20 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 					<Grid columns={2} className="gap-4 mt-4">
 						<TaxonomyDropdownFilter
 							className="sm:w-52"
-							onFilterChange={(value) =>
-								setFilterValues((prev) => ({
-									...prev,
-									'var-type': value,
-								}))
-							}
+							onFilterChange={(value) => setVarType(value)}
 							slug="var-type"
-							label="Variable Types"
-							tooltip="Select a variable type"
-							placeholder="All"
+							label={__('Variable Types')}
+							tooltip={__('Select a variable type')}
+							placeholder={__('All')}
 							value={filterValues['var-type'] || ''}
 						/>
 						<TaxonomyDropdownFilter
 							className="sm:w-52"
-							onFilterChange={(value) =>
-								setFilterValues((prev) => ({
-									...prev,
-									sector: value,
-								}))
-							}
+							onFilterChange={(value) => setSector(value)}
 							slug="sector"
-							label="Sectors"
-							tooltip="Select a sector"
-							placeholder="All"
+							label={__('Sectors')}
+							tooltip={__('Select a sector')}
+							placeholder={__('All')}
 							value={filterValues.sector || ''}
 						/>
 					</Grid>

@@ -1,51 +1,55 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createRoot } from 'react-dom/client';
 import L from 'leaflet';
 import { useMap } from 'react-leaflet';
+
+import MapLegendControl from '@/components/map-legend-control';
 
 import { fetchLegendData } from '@/services/services';
 import { TransformedLegendEntry } from '@/types/types';
 
-export default function MapLegend() {
-	const map = useMap();
+const MapLegend: React.FC<{ url: string }> = ({ url }) => {
+	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [legendData, setLegendData] = useState<
 		TransformedLegendEntry[] | null
 	>(null);
 
-	useEffect(() => {
-		fetchLegendData().then((data) => setLegendData(data));
-	}, []);
+	const map = useMap();
 
 	useEffect(() => {
+		(async () => {
+			const data = await fetchLegendData(url);
+			setLegendData(data.slice().reverse()); // reverse the data to put higher values at the top
+		})();
+	}, [url]);
+
+	useEffect(() => {
+		if (!legendData) {
+			return;
+		}
+
 		const legend = new L.Control({ position: 'topright' });
 
 		legend.onAdd = () => {
-			const div = L.DomUtil.create('div', 'info legend legendTable');
-			const LEGEND_ITEM_HEIGHT = 25,
-				LEGEND_ITEM_WIDTH = 25,
-				LEGEND_WIDTH = 200;
+			const container = L.DomUtil.create(
+				'div',
+				'legend-wrapper top-24 right-5 m-0 !mt-1.5 z-30'
+			);
+			const root = createRoot(container);
 
-			let svg = `<svg width="${LEGEND_WIDTH}" height="${legendData ? LEGEND_ITEM_HEIGHT * legendData.length : 0}" class="mt-16">`;
-			svg +=
-				'<defs><linearGradient id="temperatureGradient" gradientTransform="rotate(90)">';
-			legendData?.forEach((entry, index) => {
-				const offset = (index / (legendData.length - 1)) * 100;
-				svg += `<stop offset="${offset}%" stop-color="${entry.color}" stop-opacity="${entry.opacity}"/>`;
-			});
-			svg += '</linearGradient></defs>';
-			// Create gradient rectangle
-			svg += `<rect width="${LEGEND_ITEM_WIDTH}" height="${legendData ? LEGEND_ITEM_HEIGHT * legendData.length : 0}" fill="url(#temperatureGradient)" />`;
+			root.render(
+				<MapLegendControl
+					data={legendData}
+					isOpen={isOpen}
+					toggleOpen={() => setIsOpen((prev) => !prev)}
+				/>
+			);
 
-			// Add temperature labels
-			legendData?.forEach((entry, index) => {
-				const y = LEGEND_ITEM_HEIGHT * index + LEGEND_ITEM_HEIGHT / 2;
-				svg += `<text x="35" y="${y}" fill="black" font-size="14" dominant-baseline="middle">${entry.label}</text>`;
-				svg += `<line x1="30" y1="${y}" x2="33" y2="${y}" stroke="black" stroke-width="1"/>`;
-			});
+			// prevent interactions from affecting the map
+			L.DomEvent.disableClickPropagation(container);
+			L.DomEvent.disableScrollPropagation(container);
 
-			svg += '</svg>';
-
-			div.innerHTML = svg;
-			return div;
+			return container;
 		};
 
 		legend.addTo(map);
@@ -53,7 +57,9 @@ export default function MapLegend() {
 		return () => {
 			legend.remove();
 		};
-	}, [map, legendData]);
+	}, [map, legendData, isOpen]);
 
 	return null;
-}
+};
+
+export default MapLegend;

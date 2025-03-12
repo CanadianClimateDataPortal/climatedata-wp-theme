@@ -1,5 +1,6 @@
 import L from 'leaflet';
 import type { LatLngExpression, LatLngBounds } from 'leaflet';
+import { DatasetKey, EmissionScenarioKey } from '@/types/types';
 
 export const SIDEBAR_COOKIE_NAME = 'sidebar:state';
 export const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -42,7 +43,11 @@ export const REGION_CENSUS: string = 'census';
 export const REGION_HEALTH: string = 'health';
 export const REGION_WATERSHED: string = 'watershed';
 
-export const SCENARIO_NAMES = {
+// TODO: these will come from the API
+export const SCENARIO_NAMES: Record<
+	DatasetKey,
+	Record<EmissionScenarioKey, string>
+> = {
 	cmip5: {
 		low: 'RCP 2.6',
 		medium: 'RCP 4.5',
@@ -60,7 +65,25 @@ export const SCENARIO_NAMES = {
 	},
 };
 
-export const DATASETS = {
+// TODO: these will come from the API
+export const DATASETS: Record<
+	DatasetKey,
+	{
+		layer_prefix?: string;
+		scenarios: {
+			name: string;
+			label: string;
+			chart_color: string;
+			correlations?: Partial<Record<DatasetKey, string>>;
+		}[];
+		grid: string;
+		finch_name: string;
+		model_lists: {
+			name: string;
+			label: string;
+		}[];
+	}
+> = {
 	cmip5: {
 		scenarios: [
 			{
@@ -146,6 +169,7 @@ export const DATASETS = {
 				chart_color: '#F00',
 			},
 		],
+		layer_prefix: '',
 		grid: 'era5landgrid',
 		finch_name: 'humidex-daily',
 		model_lists: [{ name: 'humidex_models', label: 'All models' }],

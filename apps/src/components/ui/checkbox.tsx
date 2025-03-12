@@ -97,25 +97,23 @@ const CheckboxFactory: React.FC<{
 				)}
 			>
 				{normalizedOptions.map((option, index) => (
-					<label
-						key={index}
-						htmlFor={`checkbox-${name}-${index}`}
-						className={cn(
-							'flex items-center space-x-2 cursor-pointer',
-							optionClassName ?? ''
-						)}
-					>
-						<Checkbox
-							id={`checkbox-${name}-${index}`}
-							checked={selectedValues.includes(option.value)}
-							onCheckedChange={(checked) =>
-								handleCheckboxChange(checked, option.value)
-							}
-						/>
-						<span className="text-zinc-900 text-sm leading-5 cursor-pointer">
-							{option.label}
-						</span>
-					</label>
+					<div key={index} className={optionClassName ?? ''}>
+						<label
+							htmlFor={`checkbox-${name}-${index}`}
+							className="flex items-center space-x-2 cursor-pointer w-fit"
+						>
+							<Checkbox
+								id={`checkbox-${name}-${index}`}
+								checked={selectedValues.includes(option.value)}
+								onCheckedChange={(checked) =>
+									handleCheckboxChange(checked, option.value)
+								}
+							/>
+							<span className="text-zinc-900 text-sm leading-5">
+								{option.label}
+							</span>
+						</label>
+					</div>
 				))}
 			</div>
 		</div>

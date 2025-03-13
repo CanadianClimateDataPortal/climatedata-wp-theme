@@ -67,12 +67,15 @@ class RepositoryAPI:
         repositories = response.json()
 
         try:
-            repos_with_matching_name = (repo for repo in repositories if repo.get("name") == self._repository_name)
+            repos_with_matching_name = (
+                repo
+                for repo in repositories
+                if repo.get("name") == self._repository_name
+            )
             repo = next(repos_with_matching_name)
             return f"{repo_endpoint}/{repo['id']}"
         except StopIteration:
             raise ValueError(f"No repository named '{self._repository_name}' found.")
-
 
     def _get_tag_info(self, tag):
         """
@@ -82,13 +85,16 @@ class RepositoryAPI:
           tag (str): The name of the tag to query.
 
         Returns:
-          tuple: A tuple containing the digest and the creation date of the tag.
+          dict: A dict containing the digest and the creation date of the tag.
         """
         endpoint = f"{self._repo_endpoint}/tags/{tag}"
 
         response = self._make_api_request("GET", endpoint)
         tag_info = response.json()
-        return tag_info.get("digest"), tag_info.get("created_at")
+        return {
+            "digest": tag_info.get("digest"),
+            "created_at": tag_info.get("created_at"),
+        }
 
     def get_all_tags_with_infos(self):
         """
@@ -107,7 +113,9 @@ class RepositoryAPI:
         has_next_page = True
 
         while has_next_page:
-            response = self._make_api_request("GET", f"{self._repo_endpoint}/tags?page={next_page}")
+            response = self._make_api_request(
+                "GET", f"{self._repo_endpoint}/tags?page={next_page}"
+            )
             tags.extend(response.json())
             total_nb_pages = int(response.headers.get("x-total-pages"))
             has_next_page = next_page < total_nb_pages
@@ -118,10 +126,8 @@ class RepositoryAPI:
 
         for tag in tags:
             tag_name = tag["name"]
-            digest, created_at = self._get_tag_info(tag_name)
-            tags_infos.append(
-                {"name": tag_name, "digest": digest, "created_at": created_at}
-            )
+            tag_info = self._get_tag_info(tag_name)
+            tags_infos.append({"name": tag_name, **tag_info})
 
         return tags_infos
 
@@ -133,7 +139,7 @@ class RepositoryAPI:
           tags (list): The list of tags to delete.
         """
         for tag in tags:
-            tag_name = tag['name']
+            tag_name = tag["name"]
             delete_endpoint = f"{self._repo_endpoint}/tags/{tag_name}"
             self._make_api_request("DELETE", delete_endpoint)
 
@@ -230,7 +236,9 @@ def main():
             print("No tags to delete.")
             return
 
-        print(f"The following tags will be deleted: {', '.join(t['name'] for t in tags_to_delete)}")
+        print(
+            f"The following tags will be deleted: {', '.join(t['name'] for t in tags_to_delete)}"
+        )
         do_delete = args.yes or input("Continue? [y/N]: ").lower() in ["y", "yes"]
         if do_delete:
             repo_api.delete_tags(tags_to_delete)

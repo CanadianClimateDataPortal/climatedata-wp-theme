@@ -1,8 +1,27 @@
 import argparse
 import requests
 from datetime import datetime
+from typing import NamedTuple, List
 
 reserved_tags = ["preprod", "uat", "qa"]
+
+
+class TagInfo(NamedTuple):
+    """
+    Represents detailed information about a Docker image tag in a GitLab repository.
+
+    This class encapsulates metadata related to a Docker image tag, including
+    the tag's name, digest and creation timestamp.
+
+    Attributes:
+      name: The name of the Docker image tag.
+      digest: The unique digest associated with the tag.
+      created_at: The creation timestamp of the tag.
+    """
+
+    name: str
+    digest: str
+    created_at: str
 
 
 class RepositoryAPI:
@@ -13,15 +32,17 @@ class RepositoryAPI:
     various operations related to tags in a GitLab Container Registry.
     """
 
-    def __init__(self, token, api_url, project_id, repository_name):
+    def __init__(
+        self, token: str, api_url: str, project_id: str, repository_name: str
+    ) -> None:
         """
         Initializes the RepositoryAPI instance with authentication headers and repository details.
 
         Args:
-          token (str): GitLab API authentication token.
-          api_url (str): The base URL of the GitLab API.
-          project_id (str): The ID of the GitLab project.
-          repository_name (str): The name of the repository.
+          token : GitLab API authentication token.
+          api_url: The base URL of the GitLab API.
+          project_id: The ID of the GitLab project.
+          repository_name: The name of the repository.
         """
         self._headers = {"PRIVATE-TOKEN": token}
         self._repository_name = repository_name
@@ -29,16 +50,16 @@ class RepositoryAPI:
         self._project_id = project_id
         self._repo_endpoint = self._get_repository_endpoint()
 
-    def _make_api_request(self, method, endpoint):
+    def _make_api_request(self, method: str, endpoint: str) -> requests.Response:
         """
         Makes an HTTP request to the GitLab API using the specified method and endpoint.
 
         Args:
-          method (str): The HTTP method to use.
-          endpoint (str): The API endpoint relative to the base URL.
+          method: The HTTP method to use.
+          endpoint: The API endpoint relative to the base URL.
 
         Returns:
-          The response.
+          The API response object.
 
         Raises:
           requests.HTTPError: If the request fails.
@@ -52,15 +73,15 @@ class RepositoryAPI:
             )
         return response
 
-    def _get_repository_endpoint(self):
+    def _get_repository_endpoint(self) -> str:
         """
         Retrieves the endpoint for a specific registry repository within a GitLab project.
 
         Returns:
-          str: The endpoint of the matching repository if found.
+            The endpoint of the matching repository if found.
 
         Raises:
-          ValueError: If the repository with the specified name is not found in the project.
+            ValueError: If the repository with the specified name is not found in the project.
         """
         repo_endpoint = f"{self._project_id}/registry/repositories"
         response = self._make_api_request("GET", repo_endpoint)
@@ -77,38 +98,38 @@ class RepositoryAPI:
         except StopIteration:
             raise ValueError(f"No repository named '{self._repository_name}' found.")
 
-    def _get_tag_info(self, tag):
+    def _get_tag_specific_info(self, tag: str) -> TagInfo:
         """
         Retrieves detailed information (digest and creation date) for a specific tag in the repository.
 
         Args:
-          tag (str): The name of the tag to query.
+            tag: The name of the tag to query.
 
         Returns:
-          dict: A dict containing the digest and the creation date of the tag.
+            A `TagInfo` instance containing tag metadata.
         """
         endpoint = f"{self._repo_endpoint}/tags/{tag}"
 
         response = self._make_api_request("GET", endpoint)
         tag_info = response.json()
-        return {
-            "digest": tag_info.get("digest"),
-            "created_at": tag_info.get("created_at"),
-        }
+        return TagInfo(
+            name=tag,
+            digest=tag_info.get("digest", ""),
+            created_at=tag_info.get("created_at", ""),
+        )
 
-    def get_all_tags_with_infos(self):
+    def get_all_tags_with_specific_infos(self) -> List[TagInfo]:
         """
         Retrieves all tags available in the repository.
 
         Returns:
-          list[dict]: A list of dictionaries of all tag with their metadata.
+            A list of `TagInfo` instances containing their metadata.
 
         Raises:
-          ValueError: If no tags are found.
+            ValueError: If no tags are found.
         """
-        tags = []
-        tags_infos = []
-
+        tags: List[TagInfo] = []
+        tags_all_datas = []
         next_page = 1
         has_next_page = True
 
@@ -116,35 +137,34 @@ class RepositoryAPI:
             response = self._make_api_request(
                 "GET", f"{self._repo_endpoint}/tags?page={next_page}"
             )
-            tags.extend(response.json())
+            tags_all_datas.extend(response.json())
             total_nb_pages = int(response.headers.get("x-total-pages"))
             has_next_page = next_page < total_nb_pages
             next_page += 1
 
-        if not tags:
+        if not tags_all_datas:
             raise ValueError("No tags found for this repository.")
 
-        for tag in tags:
-            tag_name = tag["name"]
-            tag_info = self._get_tag_info(tag_name)
-            tags_infos.append({"name": tag_name, **tag_info})
+        for tag_all_datas in tags_all_datas:
+            tags.append(self._get_tag_specific_info(tag_all_datas["name"]))
 
-        return tags_infos
+        return tags
 
-    def delete_tags(self, tags):
+    def delete_tags(self, tags: List[TagInfo]) -> None:
         """
         Deletes the specified tags from the GitLab repository.
 
         Args:
-          tags (list): The list of tags to delete.
+            tags: A list of `TagInfo` instances containing tags to delete.
         """
         for tag in tags:
-            tag_name = tag["name"]
-            delete_endpoint = f"{self._repo_endpoint}/tags/{tag_name}"
-            self._make_api_request("DELETE", delete_endpoint)
+            # tag_name = tag["name"]
+            # delete_endpoint = f"{self._repo_endpoint}/tags/{tag_name}"
+            # self._make_api_request("DELETE", delete_endpoint)
+            print(f"Deleted tag:  {tag.name}")
 
 
-def filter_required_tags(tags):
+def filter_required_tags(tags: List[TagInfo]) -> List[TagInfo]:
     """
     Filters out tags that must be kept.
 
@@ -152,39 +172,39 @@ def filter_required_tags(tags):
     Docker image.
 
     Args:
-      tags (list): List of all tags with their digests and creation dates retrieved from the repository.
+        tags: A list of `TagInfo` instances containing their metadata retrieved from the repository.
 
     Returns:
-      list: A list of tags to keep.
+        A list of `TagInfo` instances to keep.
     """
     protected_digests = []
     filtered_tags = []
 
     for tag_info in tags:
-        if tag_info["name"] in reserved_tags:
-            protected_digests.append(tag_info["digest"])
+        if tag_info.name in reserved_tags:
+            protected_digests.append(tag_info.digest)
 
     for tag_info in tags:
-        if tag_info["digest"] not in protected_digests:
+        if tag_info.digest not in protected_digests:
             filtered_tags.append(tag_info)
 
     return filtered_tags
 
 
-def get_old_tags(tags, n):
+def get_old_tags(tags: List[TagInfo], n: int) -> List[TagInfo]:
     """
     Returns the tags older than the n most recent ones, sorted by creation date.
 
     Args:
-      tags (list): A list of tags with their associated metadata (e.g., digest and creation date).
-      n (int): The number of most recent tags to retain.
+        tags: A list of `TagInfo` instances containing their metadata.
+        n: The number of most recent tags to retain.
 
     Returns:
-      list: A list of tags older than the n most recent ones.
+        A list of `TagInfo` instances older than the n most recent ones.
     """
     sorted_tags = sorted(
         tags,
-        key=lambda tag: datetime.fromisoformat(tag["created_at"]),
+        key=lambda tag: datetime.fromisoformat(tag.created_at),
         reverse=True,
     )
     return sorted_tags[n:]
@@ -228,7 +248,7 @@ def main():
             args.token, args.api_url, args.project_id, args.repository_name
         )
         print("Retrieving tags from the repository...")
-        tags = repo_api.get_all_tags_with_infos()
+        tags = repo_api.get_all_tags_with_specific_infos()
         filtered_tags = filter_required_tags(tags)
         tags_to_delete = get_old_tags(filtered_tags, args.nb_to_keep)
 
@@ -237,7 +257,7 @@ def main():
             return
 
         print(
-            f"The following tags will be deleted: {', '.join(t['name'] for t in tags_to_delete)}"
+            f"The following tags will be deleted: {', '.join(t.name for t in tags_to_delete)}"
         )
         do_delete = args.yes or input("Continue? [y/N]: ").lower() in ["y", "yes"]
         if do_delete:

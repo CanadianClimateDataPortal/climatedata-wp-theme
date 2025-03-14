@@ -139,7 +139,7 @@ const StepLocation: React.FC = () => {
 									/>
 									<div
 										className={cn(
-											'text-2xl font-semibold leading-7',
+											'text-2xl font-semibold leading-7 text-right',
 											selectionCount > 0
 												? 'text-brand-blue'
 												: 'text-neutral-grey-medium'

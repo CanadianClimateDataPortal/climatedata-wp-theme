@@ -189,6 +189,15 @@ export default function SearchControl({
 
 		map.addControl(searchControl);
 
+		// manually trigger search when the input changes.. this fixes the issue where deleting characters doesn't trigger a search
+		const searchInput = document.querySelector(`#${searchControlId} input`);
+		searchInput?.addEventListener('input', (event) => {
+			const value = (event.target as HTMLInputElement).value.trim();
+			if (value.length >= 2) {
+				searchControl.searchText(value);
+			}
+		});
+
 		return () => {
 			map.removeControl(searchControl);
 		};

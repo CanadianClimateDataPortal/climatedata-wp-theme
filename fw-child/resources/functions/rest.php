@@ -608,7 +608,7 @@ function cdc_location_search() {
 	header('Content-type: application/json');
 
 	echo json_encode ( $response );
-
+	die();
 }
 
 //

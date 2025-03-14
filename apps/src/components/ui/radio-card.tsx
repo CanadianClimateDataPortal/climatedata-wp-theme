@@ -54,7 +54,6 @@ const RadioCard: React.FC<RadioCardProps> = ({
 						style={{ backgroundImage: `url(${thumbnail})` }}
 					/>
 				)}
-
 				<div className={cn('p-2', thumbnail ? 'ml-[50px] h-28' : '')}>
 					<div className="flex items-start">
 						<div className="grow text-base text-zinc-950 font-semibold leading-4 mr-4">
@@ -95,7 +94,7 @@ const RadioCardFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
 	<div
 		className={cn(
 			'radio-card-footer',
-			'mt-auto p-2 border-t border-gray-200',
+			'p-2 border-t border-gray-200',
 			className
 		)}
 		{...props}

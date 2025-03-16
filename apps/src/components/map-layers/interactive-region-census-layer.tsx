@@ -13,7 +13,7 @@ import {
 	SCENARIO_NAMES,
 } from '@/lib/constants';
 
-const WatershedLayer: React.FC = () => {
+const InteractiveRegionCensusLayer: React.FC = () => {
 	const [layerData, setLayerData] = useState<Record<number, number> | null>(
 		null
 	);
@@ -134,7 +134,7 @@ const WatershedLayer: React.FC = () => {
 	);
 
 	const handleClick = async (e: { latlng: L.LatLng }) => {
-		console.log('Watershed clicked!', e.latlng);
+		console.log('Area clicked!', e.latlng);
 	};
 
 	// TODO: implement this
@@ -197,7 +197,7 @@ const WatershedLayer: React.FC = () => {
 			return;
 		}
 
-		const tileLayerUrl = `${GEOSERVER_BASE_URL}/geoserver/gwc/service/tms/1.0.0/CDC:watershed/{z}/{x}/{-y}.pbf`;
+		const tileLayerUrl = `${GEOSERVER_BASE_URL}/geoserver/gwc/service/tms/1.0.0/CDC:census/{z}/{x}/{-y}.pbf`;
 
 		const gridOptions = {
 			// @ts-expect-error: suppress leaflet typescript error
@@ -211,7 +211,7 @@ const WatershedLayer: React.FC = () => {
 			maxZoom: DEFAULT_MAX_ZOOM,
 			minZoom: DEFAULT_MIN_ZOOM,
 			vectorTileLayerStyles: {
-				watershed: (properties: { id: number }) => ({
+				census: (properties: { id: number }) => ({
 					weight: 1,
 					color: '#fff',
 					fillColor: layerData[properties.id]
@@ -246,4 +246,4 @@ const WatershedLayer: React.FC = () => {
 	return null;
 };
 
-export default WatershedLayer;
+export default InteractiveRegionCensusLayer;

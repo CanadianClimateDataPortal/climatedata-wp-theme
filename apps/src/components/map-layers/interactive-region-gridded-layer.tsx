@@ -28,7 +28,7 @@ import {
 /**
  * Component that displays the cells grid layer on the map and handles interactions with it like hover and click
  */
-const CellsGridLayer: React.FC = () => {
+const InteractiveRegionGriddedLayer: React.FC = () => {
 	const map = useMap();
 
 	const { __ } = useI18n();
@@ -421,4 +421,4 @@ const CellsGridLayer: React.FC = () => {
 	return null;
 };
 
-export default CellsGridLayer;
+export default InteractiveRegionGriddedLayer;

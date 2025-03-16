@@ -556,3 +556,16 @@ export interface GridCellProps {
 		};
 	};
 }
+
+/**
+ * Represents the properties of the arguments used for a request to get ChoroData for interactive region data.
+ */
+export interface ChoroValuesOptions {
+	variable: string;
+	dataset: string;
+	decade: string;
+	frequency: string;
+	interactiveRegion: string;
+	emissionScenario: string;
+	decimals: number;
+}

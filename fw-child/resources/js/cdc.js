@@ -1392,6 +1392,8 @@
                               style_obj.fillOpacity = 1;
                             }
 
+                            console.log('aaaaaaa',style_obj)
+
                             $(document).trigger('map_item_mouseover', [
                               e,
                               e.layer.properties.id,

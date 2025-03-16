@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 
 import MapLegend from '@/components/map-layers/map-legend';
@@ -7,10 +7,7 @@ import CustomPanesLayer from '@/components/map-layers/custom-panes';
 import ZoomControl from '@/components/map-layers/zoom-control';
 import MapEvents from '@/components/map-layers/map-events';
 import SearchControl from '@/components/map-layers/search-control';
-import InteractiveRegionGriddedLayer from '@/components/map-layers/interactive-region-gridded-layer';
-import InteractiveRegionCensusLayer from '@/components/map-layers/interactive-region-census-layer';
-import InteractiveRegionHealthLayer from '@/components/map-layers/interactive-region-health-layer';
-import InteractiveRegionWatershedLayer from '@/components/map-layers/interactive-region-watershed-layer';
+import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions-layer';
 
 import { useAppSelector } from '@/app/hooks';
 import { DatasetKey, EmissionScenarioKey } from '@/types/types';
@@ -40,7 +37,6 @@ export default function Map({
 		frequency,
 		emissionScenario,
 		opacity: { labels: labelsOpacity },
-		interactiveRegion,
 	} = useAppSelector((state) => state.map);
 
 	// construct the URL for the map legend to get its data
@@ -71,21 +67,6 @@ export default function Map({
 		return `${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerName}`;
 	}, [dataset, variable, frequency, emissionScenario]);
 
-	const renderInteractiveRegionLayer = useCallback(() => {
-		switch (interactiveRegion) {
-			case 'gridded_data':
-				return <InteractiveRegionGriddedLayer />;
-			case 'census':
-				return <InteractiveRegionCensusLayer />;
-			case 'health':
-				return <InteractiveRegionHealthLayer />;
-			case 'watershed':
-				return <InteractiveRegionWatershedLayer />;
-			default:
-				return null;
-		}
-	}, [interactiveRegion]);
-
 	return (
 		<MapContainer
 			center={CANADA_CENTER}
@@ -103,7 +84,7 @@ export default function Map({
 			<ZoomControl />
 			<SearchControl />
 
-			{renderInteractiveRegionLayer()}
+			<InteractiveRegionsLayer />
 
 			<TileLayer
 				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

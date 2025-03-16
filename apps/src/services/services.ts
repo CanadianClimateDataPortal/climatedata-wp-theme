@@ -1,7 +1,6 @@
 // Any kind of service that you want to use in your application should be defined here.
 // For example any external request to an API, or any kind of data manipulation.
 
-import { transformLegendData } from '@/lib/format';
 import {
 	RelatedData,
 	MapInfoData,
@@ -93,7 +92,7 @@ export const fetchLegendData = async (url: string) => {
 			}
 			return res.json();
 		})
-		.then((json) => transformLegendData(json));
+		.then((json) => json);
 };
 
 /**

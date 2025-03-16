@@ -43,7 +43,8 @@ export const REGION_CENSUS: string = 'census';
 export const REGION_HEALTH: string = 'health';
 export const REGION_WATERSHED: string = 'watershed';
 
-// TODO: these will come from the API
+// TODO: these will come from the API.. also, "very-high" key was added because when choosing
+//  that in the UI it would break because the key was not found in the SCENARIO_NAMES object..
 export const SCENARIO_NAMES: Record<
 	DatasetKey,
 	Record<EmissionScenarioKey, string>
@@ -52,16 +53,19 @@ export const SCENARIO_NAMES: Record<
 		low: 'RCP 2.6',
 		medium: 'RCP 4.5',
 		high: 'RCP 8.5',
+		'very-high': 'RCP 8.5',
 	},
 	cmip6: {
 		low: 'SSP 1–2.6',
 		medium: 'SSP 2–4.5',
 		high: 'SSP 5–8.5',
+		'very-high': 'SSP 5–8.5',
 	},
 	humidex: {
 		low: 'SSP 1–2.6',
 		medium: 'SSP 2–4.5',
 		high: 'SSP 5–8.5',
+		'very-high': 'SSP 5–8.5',
 	},
 };
 

@@ -9,6 +9,7 @@ import {
 	ApiPostData,
 	ChartDataOptions,
 	DeltaValuesOptions,
+	ChoroValuesOptions,
 } from '@/types/types';
 import L from 'leaflet';
 
@@ -257,4 +258,30 @@ export const fetchDeltaValues = async (options: DeltaValuesOptions) => {
 		console.error('Failed to fetch', err);
 		return null;
 	}
+};
+
+export const fetchChoroValues = async (options: ChoroValuesOptions) => {
+	const urlPath = [
+		options.interactiveRegion,
+		options.variable,
+		options.emissionScenario,
+		options.frequency,
+	].join('/');
+
+	const urlQuery = [
+		`period=${parseInt(options.decade) + 1}`,
+		`dataset_name=${options.dataset}`,
+		`decimals=${options.decimals}`,
+	].join('&');
+
+	return await fetch(
+		`//dataclimatedata.crim.ca/get-choro-values/${urlPath}?${urlQuery}`
+	)
+		.then((res) => {
+			if (!res.ok) {
+				throw new Error('Failed to fetch data');
+			}
+			return res.json();
+		})
+		.then((json) => json);
 };

@@ -14,9 +14,9 @@ class TagInfo(NamedTuple):
     the tag's name, digest and creation timestamp.
 
     Attributes:
-      name: The name of the Docker image tag.
-      digest: The unique digest associated with the tag.
-      created_at: The creation timestamp of the tag.
+        name: The name of the Docker image tag.
+        digest: The unique digest associated with the tag.
+        created_at: The creation timestamp of the tag.
     """
 
     name: str
@@ -39,10 +39,10 @@ class RepositoryAPI:
         Initializes the RepositoryAPI instance with authentication headers and repository details.
 
         Args:
-          token : GitLab API authentication token.
-          api_url: The base URL of the GitLab API.
-          project_id: The ID of the GitLab project.
-          repository_name: The name of the repository.
+            token : GitLab API authentication token.
+            api_url: The base URL of the GitLab API.
+            project_id: The ID of the GitLab project.
+            repository_name: The name of the repository.
         """
         self._headers = {"PRIVATE-TOKEN": token}
         self._repository_name = repository_name
@@ -55,14 +55,14 @@ class RepositoryAPI:
         Makes an HTTP request to the GitLab API using the specified method and endpoint.
 
         Args:
-          method: The HTTP method to use.
-          endpoint: The API endpoint relative to the base URL.
+            method: The HTTP method to use.
+            endpoint: The API endpoint relative to the base URL.
 
         Returns:
-          The API response object.
+            The API response object.
 
         Raises:
-          requests.HTTPError: If the request fails.
+            requests.HTTPError: If the request fails.
         """
         response = requests.request(
             method, f"{self._api_url}/{endpoint}", headers=self._headers
@@ -106,7 +106,7 @@ class RepositoryAPI:
             tag: The name of the tag to query.
 
         Returns:
-            A `TagInfo` instance containing tag metadata.
+            The tag metadata.
         """
         endpoint = f"{self._repo_endpoint}/tags/{tag}"
 
@@ -123,7 +123,7 @@ class RepositoryAPI:
         Retrieves all tags available in the repository.
 
         Returns:
-            A list of `TagInfo` instances containing their metadata.
+            The tags metadata.
 
         Raises:
             ValueError: If no tags are found.
@@ -155,13 +155,12 @@ class RepositoryAPI:
         Deletes the specified tags from the GitLab repository.
 
         Args:
-            tags: A list of `TagInfo` instances containing tags to delete.
+            tags: elements to delete.
         """
         for tag in tags:
-            # tag_name = tag["name"]
-            # delete_endpoint = f"{self._repo_endpoint}/tags/{tag_name}"
-            # self._make_api_request("DELETE", delete_endpoint)
-            print(f"Deleted tag:  {tag.name}")
+            tag_name = tag["name"]
+            delete_endpoint = f"{self._repo_endpoint}/tags/{tag_name}"
+            self._make_api_request("DELETE", delete_endpoint)
 
 
 def filter_required_tags(tags: List[TagInfo]) -> List[TagInfo]:
@@ -172,10 +171,10 @@ def filter_required_tags(tags: List[TagInfo]) -> List[TagInfo]:
     Docker image.
 
     Args:
-        tags: A list of `TagInfo` instances containing their metadata retrieved from the repository.
+        tags: elements with their metadata retrieved from the repository.
 
     Returns:
-        A list of `TagInfo` instances to keep.
+        tags to keep.
     """
     protected_digests = []
     filtered_tags = []
@@ -196,11 +195,11 @@ def get_old_tags(tags: List[TagInfo], n: int) -> List[TagInfo]:
     Returns the tags older than the n most recent ones, sorted by creation date.
 
     Args:
-        tags: A list of `TagInfo` instances containing their metadata.
+        tags: elememts with their metadata.
         n: The number of most recent tags to retain.
 
     Returns:
-        A list of `TagInfo` instances older than the n most recent ones.
+        tags older than the n most recent ones.
     """
     sorted_tags = sorted(
         tags,

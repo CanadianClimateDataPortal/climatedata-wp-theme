@@ -957,7 +957,6 @@
 
           options.grid.highlighted = shape_id;
 
-          console.log('aaaa', shape_id, style_obj);
           for (let key in options.maps) {
             options.maps[key].layers.grid.setFeatureStyle(shape_id, style_obj);
           }

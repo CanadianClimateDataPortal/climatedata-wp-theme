@@ -1,3 +1,6 @@
+/**
+ * Component that adds interaction to the map depending on the selected region (gridded data, watershed, health, census).
+ */
 import React, {
 	useEffect,
 	useRef,
@@ -20,9 +23,6 @@ import {
 	SCENARIO_NAMES,
 } from '@/lib/constants';
 
-/**
- * Component that adds interaction to the map depending on the selected region
- */
 const InteractiveRegionsLayer: React.FC = () => {
 	const [layerData, setLayerData] = useState<Record<number, number> | null>(
 		null
@@ -43,7 +43,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 		legendData,
 	} = useAppSelector((state) => state.map);
 
-	// TODO: revisit this because colors are not correct.. need to check the original implementation
+	// Convert legend data to a color map usable by the getColor method to generate colors for each feature
 	const colorMap = useMemo(() => {
 		if (!legendData || !legendData.Legend) {
 			return null;
@@ -61,6 +61,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 	}, [legendData]);
 
 	// Function to interpolate between colors
+	// Taken from fw-child/resources/js/utilities.js interpolate function, but optimized for React
 	const interpolate = useCallback(
 		(color1: string, color2: string, ratio: number) => {
 			ratio = Math.max(0, Math.min(1, ratio));
@@ -86,13 +87,15 @@ const InteractiveRegionsLayer: React.FC = () => {
 		[]
 	);
 
+	// Function to get color based on feature ID
+	// Taken from fw-child/resources/js/cdc.js get_color function, but optimized for React
 	const getColor = useCallback(
 		(featureId: number) => {
 			if (!colorMap || !colorMap.quantities || !colorMap.colours) {
-				return '#000';
+				return '#fff';
 			}
 
-			// the value in the layer data for this feature, to properly calculate the color to use
+			// Extract value based on interactive region type
 			const value =
 				interactiveRegion === 'gridded_data'
 					? featureId
@@ -100,8 +103,27 @@ const InteractiveRegionsLayer: React.FC = () => {
 
 			const { colours, quantities, scheme_type } = colorMap;
 
-			// Find where this value fits into the quantity array
-			const index = quantities.findIndex((q) => value < q);
+			// More efficient binary search
+			// Taken from fw-child/resources/js/utilities.js indexOfGT function
+			const indexOfGT = (arr: number[], target: number): number => {
+				let start = 0,
+					end = arr.length - 1;
+				let ans = -1;
+
+				while (start <= end) {
+					const mid = Math.floor((start + end) / 2);
+
+					if (arr[mid] <= target) {
+						start = mid + 1;
+					} else {
+						ans = mid;
+						end = mid - 1;
+					}
+				}
+				return ans;
+			};
+
+			const index = indexOfGT(quantities, value);
 
 			// Use last color if `value` is greater than all
 			if (index === -1) {

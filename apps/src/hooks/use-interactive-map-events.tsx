@@ -1,4 +1,7 @@
-import { useMemo, useRef } from 'react';
+/**
+ * Hook that returns event handlers for interactive map layers.
+ */
+import React, { useMemo, useRef } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 import L from 'leaflet';
 
@@ -17,9 +20,6 @@ import { SIDEBAR_WIDTH, REGION_GRID, SCENARIO_NAMES } from '@/lib/constants';
 import { PercentileData } from '@/types/types';
 import { doyFormatter } from '@/lib/format';
 
-/**
- * Hook that returns event handlers for interactive map layers.
- */
 export const useInteractiveMapEvents = (
 	// @ts-expect-error: suppress leaflet typescript error
 	layerInstanceRef: React.MutableRefObject<L.VectorGrid | null>,

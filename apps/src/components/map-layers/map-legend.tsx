@@ -5,26 +5,38 @@ import { useMap } from 'react-leaflet';
 
 import MapLegendControl from '@/components/map-legend-control';
 
+import { useAppDispatch } from '@/app/hooks';
+import { setLegendData } from '@/features/map/map-slice';
+import { transformLegendData } from '@/lib/format';
 import { fetchLegendData } from '@/services/services';
 import { TransformedLegendEntry } from '@/types/types';
 
 const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
-	const [legendData, setLegendData] = useState<
+	const [transformedLegendData, setTransformedLegendData] = useState<
 		TransformedLegendEntry[] | null
 	>(null);
 
 	const map = useMap();
 
+	const dispatch = useAppDispatch();
+
 	useEffect(() => {
 		(async () => {
 			const data = await fetchLegendData(url);
-			setLegendData(data.slice().reverse()); // reverse the data to put higher values at the top
+
+			// store in redux
+			dispatch(setLegendData(data));
+
+			// TODO: make use of the data from redux instead, for now this works because of time constraints
+			const transformedData: TransformedLegendEntry[] =
+				await transformLegendData(data);
+			setTransformedLegendData(transformedData.slice().reverse()); // reverse the data to put higher values at the top
 		})();
-	}, [url]);
+	}, [url, dispatch]);
 
 	useEffect(() => {
-		if (!legendData) {
+		if (!transformedLegendData) {
 			return;
 		}
 
@@ -39,7 +51,7 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 
 			root.render(
 				<MapLegendControl
-					data={legendData}
+					data={transformedLegendData}
 					isOpen={isOpen}
 					toggleOpen={() => setIsOpen((prev) => !prev)}
 				/>
@@ -57,7 +69,7 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 		return () => {
 			legend.remove();
 		};
-	}, [map, legendData, isOpen]);
+	}, [map, transformedLegendData, isOpen]);
 
 	return null;
 };

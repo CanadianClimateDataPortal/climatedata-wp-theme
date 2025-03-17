@@ -4,11 +4,10 @@ import { MapContainer, TileLayer } from 'react-leaflet';
 import MapLegend from '@/components/map-layers/map-legend';
 import VariableLayer from '@/components/map-layers/variable';
 import CustomPanesLayer from '@/components/map-layers/custom-panes';
-import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions';
 import ZoomControl from '@/components/map-layers/zoom-control';
 import MapEvents from '@/components/map-layers/map-events';
 import SearchControl from '@/components/map-layers/search-control';
-import CellsGridLayer from '@/components/map-layers/cells-grid-layer';
+import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions-layer';
 
 import { useAppSelector } from '@/app/hooks';
 import { DatasetKey, EmissionScenarioKey } from '@/types/types';
@@ -38,7 +37,6 @@ export default function Map({
 		frequency,
 		emissionScenario,
 		opacity: { labels: labelsOpacity },
-		interactiveRegion,
 	} = useAppSelector((state) => state.map);
 
 	// construct the URL for the map legend to get its data
@@ -64,7 +62,7 @@ export default function Map({
 			'30year',
 		]
 			.filter(Boolean)
-			.join('-'); // Removes empty values before joining
+			.join('-'); // Remove empty values before joining
 
 		return `${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerName}`;
 	}, [dataset, variable, frequency, emissionScenario]);
@@ -82,12 +80,11 @@ export default function Map({
 			<MapEvents onMapReady={onMapReady} onUnmount={onUnmount} />
 			<MapLegend url={mapLegendUrl} />
 			<CustomPanesLayer />
-			<InteractiveRegionsLayer />
 			<VariableLayer />
 			<ZoomControl />
 			<SearchControl />
 
-			{interactiveRegion === 'gridded_data' && <CellsGridLayer />}
+			<InteractiveRegionsLayer />
 
 			<TileLayer
 				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

@@ -19,7 +19,7 @@ export type DatasetKey = 'cmip5' | 'cmip6' | 'humidex';
 /**
  * Represents valid emission scenario keys.
  */
-export type EmissionScenarioKey = 'low' | 'medium' | 'high';
+export type EmissionScenarioKey = 'low' | 'medium' | 'high' | 'very-high';
 
 /**
  * Represents a field with multilingual support.
@@ -197,6 +197,7 @@ export interface MapState {
 	pane: string;
 	dataValue: string;
 	mapColor: string;
+	legendData: WMSLegendData;
 	opacity: {
 		mapData: number;
 		labels: number;
@@ -235,6 +236,7 @@ export interface WMSLegendEntry {
 	label: string;
 	color: string;
 	opacity: string;
+	quantity: number;
 }
 
 /**
@@ -555,4 +557,17 @@ export interface GridCellProps {
 			gid: number;
 		};
 	};
+}
+
+/**
+ * Represents the properties of the arguments used for a request to get ChoroData for interactive region data.
+ */
+export interface ChoroValuesOptions {
+	variable: string;
+	dataset: string;
+	decade: string;
+	frequency: string;
+	interactiveRegion: string;
+	emissionScenario: string;
+	decimals: number;
 }

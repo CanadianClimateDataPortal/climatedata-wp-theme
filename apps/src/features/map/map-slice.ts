@@ -32,6 +32,7 @@ import {
 	SLIDER_DEFAULT_YEAR_VALUE,
 	SLIDER_MAX_YEAR,
 	SLIDER_YEAR_WINDOW_SIZE,
+	REGION_GRID,
 } from '@/lib/constants';
 import { MapItemsOpacity } from '@/types/types';
 
@@ -49,7 +50,7 @@ const initialState: MapState = {
 	emissionScenarioCompare: false,
 	emissionScenarioCompareTo: '',
 	thresholdValue: 5,
-	interactiveRegion: 'gridded_data',
+	interactiveRegion: REGION_GRID,
 	frequency: 'ann',
 	timePeriodEnd: [defaultTimePeriodEnd], // needs an array because of the slider component that uses it
 	recentLocations: [],

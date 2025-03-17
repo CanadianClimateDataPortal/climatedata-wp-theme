@@ -21,6 +21,7 @@ import {
 	GEOSERVER_BASE_URL,
 	CANADA_BOUNDS,
 	SCENARIO_NAMES,
+	REGION_GRID,
 } from '@/lib/constants';
 
 const InteractiveRegionsLayer: React.FC = () => {
@@ -97,7 +98,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 
 			// Extract value based on interactive region type
 			const value =
-				interactiveRegion === 'gridded_data'
+				interactiveRegion === REGION_GRID
 					? featureId
 					: (layerData?.[featureId] ?? 0);
 
@@ -164,7 +165,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 	}, [interactiveRegion]);
 
 	const vectorTileLayerStyles = useMemo(() => {
-		if (interactiveRegion === 'gridded_data') {
+		if (interactiveRegion === REGION_GRID) {
 			return {
 				canadagrid: (properties: { gid: number }) => ({
 					weight: 0.5,
@@ -205,7 +206,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 	useEffect(() => {
 		(async () => {
 			// no need to fetch anything for gridded data
-			if (interactiveRegion === 'gridded_data') {
+			if (interactiveRegion === REGION_GRID) {
 				return;
 			}
 
@@ -245,7 +246,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 		// make sure all needed data is available
 		if (
 			!tileLayerUrl ||
-			(interactiveRegion !== 'gridded_data' && !layerData)
+			(interactiveRegion !== REGION_GRID && !layerData)
 		) {
 			return;
 		}
@@ -261,8 +262,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 			maxNativeZoom: DEFAULT_MAX_ZOOM,
 			bounds: CANADA_BOUNDS,
 			maxZoom: DEFAULT_MAX_ZOOM,
-			minZoom:
-				interactiveRegion === 'gridded_data' ? 7 : DEFAULT_MIN_ZOOM,
+			minZoom: interactiveRegion === REGION_GRID ? 7 : DEFAULT_MIN_ZOOM,
 			vectorTileLayerStyles,
 		};
 

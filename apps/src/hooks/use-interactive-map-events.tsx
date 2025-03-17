@@ -253,10 +253,10 @@ export const useInteractiveMapEvents = (
 		layerInstanceRef.current.setFeatureStyle(featureId, {
 			fill: true,
 			fillColor:
-				interactiveRegion === 'gridded_data'
+				interactiveRegion === REGION_GRID
 					? '#fff'
 					: getColor(featureId),
-			fillOpacity: interactiveRegion === 'gridded_data' ? 0.2 : 1,
+			fillOpacity: interactiveRegion === REGION_GRID ? 0.2 : 1,
 			weight: 1.5,
 		});
 

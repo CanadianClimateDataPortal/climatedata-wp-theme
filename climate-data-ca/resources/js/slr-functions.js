@@ -3,6 +3,129 @@
     $(function () {
         // GLOBAL vars
 
+        var SLR_DATASETS = {
+            "cmip5": {
+                'scenarios': [
+                    {
+                        'name': 'rcp85plus65-p50',
+                        'label': 'RCP 8.5 enhanced scenario',
+                        'chart_color': '#00F',
+                        'correlations': {
+                            'cmip6': 'ssp585-p50'
+                        }
+                    },
+                    {
+                        'name': 'rcp85-p05',
+                        'label': 'RCP 8.5 lower (5th percentile)',
+                        'chart_color': '#00F',
+                        'correlations': {
+                            'cmip6': 'ssp585-p50'
+                        }
+                    },
+                    {
+                        'name': 'rcp85-p50',
+                        'label': 'RCP 8.5 median (50th percentile)',
+                        'chart_color': '#00F',
+                        'correlations': {
+                            'cmip6': 'ssp585-p50'
+                        }
+                    },
+                    {
+                        'name': 'rcp85-p95',
+                        'label': 'RCP 8.5 upper (95th percentile)',
+                        'chart_color': '#00F',
+                        'correlations': {
+                            'cmip6': 'ssp585-p50'
+                        }
+                    },
+                    {
+                        'name': 'rcp45-p05',
+                        'label': 'RCP 4.5 lower (5th percentile)',
+                        'chart_color': '#00F',
+                        'correlations': {
+                            'cmip6': 'ssp245-p50'
+                        }
+                    },
+                    {
+                        'name': 'rcp45-p50',
+                        'label': 'RCP 4.5 median (50th percentile)',
+                        'chart_color': '#00F',
+                        'correlations': {
+                            'cmip6': 'ssp245-p50'
+                        }
+                    },
+                    {
+                        'name': 'rcp45-p95',
+                        'label': 'RCP 4.5 upper (95th percentile)',
+                        'chart_color': '#00F',
+                        'correlations': {
+                            'cmip6': 'ssp245-p50'
+                        }
+                    },
+                    {
+                        'name': 'rcp26-p05',
+                        'label': 'RCP 2.6 lower (5th percentile)',
+                        'chart_color': '#00F',
+                        'correlations': {
+                            'cmip6': 'ssp126-p50'
+                        }
+                    },
+                    {
+                        'name': 'rcp26-p50',
+                        'label': 'RCP 2.6 median (50th percentile)',
+                        'chart_color': '#00F',
+                        'correlations': {
+                            'cmip6': 'ssp126-p50'
+                        }
+                    },
+                    {
+                        'name': 'rcp26-p95',
+                        'label': 'RCP 2.6 upper (95th percentile)',
+                        'chart_color': '#00F',
+                        'correlations': {
+                            'cmip6': 'ssp126-p50'
+                        }
+                    },
+                ],
+            },
+            "cmip6": {
+                'scenarios': [
+                    {
+                        'name': 'ssp585-p50',
+                        'label': 'SSP5-8.5',
+                        'chart_color': '#00F',
+                        'correlations': {
+                            'cmip5': 'rcp85-p50'
+                        }
+                    },
+                    {
+                        'name': 'ssp370-p50',
+                        'label': 'SSP3-7.0',
+                        'chart_color': '#00F',
+                        'correlations': {
+                            'cmip5': 'rcp85-p50'
+                        }
+                    },
+                    {
+                        'name': 'ssp245-p50',
+                        'label': 'SSP2-4.5',
+                        'chart_color': '#00F',
+                        'correlations': {
+                            'cmip5': 'rcp45-p50'
+                        }
+                    },
+                    {
+                        'name': 'ssp126-p50',
+                        'label': 'SSP1-2.6',
+                        'chart_color': '#00F',
+                        'correlations': {
+                            'cmip5': 'rcp26-p50'
+                        }
+                    },
+                ],
+            },
+        };
+
         var landmassLayerLeft, landmassLayerRight;
 
         has_mapRight = false;
@@ -38,6 +161,11 @@
         } else {
             query['decade'] = '2020';
         }
+
+        let dataset = $('input[name="dataset_switch"]:checked').val();
+        query['dataset'] = dataset;
+
+        query['rcp'] = SLR_DATASETS[dataset].scenarios[0].name;
 
 
 
@@ -1120,10 +1248,12 @@
 
         function generateLeftLegend() {
 
+            const dataset_name = $('input[name="dataset_switch"]:checked').val();
             rcp_value = $("#rcp").val();
             decade_value = parseInt($("#decade").val());
 
-            var layer = 'slr-ys-' + rcp_value + '-ann-30year';
+            const layer_prefix = dataset_name === "cmip6" ? "cmip6-" : "";
+            var layer = layer_prefix + 'slr-ys-' + rcp_value + '-ann-30year';
 
             var legendTitle = "";// mora_text_value;
 
@@ -1481,6 +1611,20 @@
             changeLayers();
         });
 
+        $('input[type=radio][name=dataset_switch]').change(function() {
+            let dataset_name = $('input[name="dataset_switch"]:checked').val();
+            let old_dataset = query['dataset'];
+            query['dataset'] = dataset_name;
+
+            // replace all scenarios with their matching one when swapping datasets
+            let old_rcp_values = query['rcp'];
+            query['rcp'] = SLR_DATASETS[old_dataset].scenarios.find(e => e.name === old_rcp_values).correlations[dataset_name];
+
+            update_query_string();
+            buildFilterMenu();
+            changeLayers();
+        });
+
 
         $('#rcp').change(function (e) {
             //console.log('rcp changed', $(this).val());
@@ -1500,8 +1644,9 @@
         });
 
         function changeLayers() {
-            rcp_value = $("#rcp").val();
-            right_rcp_value =  $("#rightrcp").val();
+            const rcp_value = $("#rcp").val();
+            const right_rcp_value =  $("#rightrcp").val();
+            const dataset_name = $('input[name="dataset_switch"]:checked').val();
             gridLayer.rcp = rcp_value.split("-")[0];
             gridLayer.percentile = rcp_value.split("-")[1];
             gridLayerRight.rcp = right_rcp_value.split("-")[0];
@@ -1521,8 +1666,8 @@
 
             generateLeftLegend();
 
-
-            singleLayerName = 'slr-ys-' + rcp_value + '-ann-30year';
+            const layer_prefix = dataset_name === 'cmip6' ? "cmip6-" : "";
+            const leftLayerName = layer_prefix + 'slr-ys-' + rcp_value + '-ann-30year';
 
             if (rcp_value === 'rcp85plus65-p50' || right_rcp_value === 'rcp85plus65-p50' ) {
                 // disable decade slider
@@ -1557,11 +1702,13 @@
                     pane: 'raster',
                     'TIME': rcp_value == 'rcp85plus65-p50' ? '' : decade_value + '-01-00T00:00:00Z',
                     'VERSION': '1.3.0',
-                    layers: 'CDC:' + 'slr-ys-' + rcp_value + '-ann-30year'
+                    layers: 'CDC:' + leftLayerName
                 });
 
 
                 if (has_mapRight === true) {
+                    var rightLayerName = layer_prefix + 'slr-ys-' + right_rcp_value + '-ann-30year';
+
                     rightLayer.setParams({
                         format: 'image/png',
                         transparent: true,
@@ -1570,7 +1717,7 @@
                         styles: 'slr-' + rcp_value,
                         'TIME': right_rcp_value == 'rcp85plus65-p50' ? '' :  decade_value + '-01-00T00:00:00Z',
                         'VERSION': '1.3.0',
-                        layers: 'CDC:' + 'slr-ys-' + right_rcp_value + '-ann-30year'
+                        layers: 'CDC:' + rightLayerName
                     });
                 }
 
@@ -1590,12 +1737,31 @@
                     opacity: 1,
                     'TIME': rcp_value == 'rcp85plus65-p50' ? '' : decade_value + '-01-00T00:00:00Z',
                     'VERSION': '1.3.0',
-                    layers: 'CDC:' + singleLayerName
+                    layers: 'CDC:' + leftLayerName
                 });
 
             }
 
 
+        }
+
+        function buildFilterMenu() {
+            let dataset_name = getQueryVariable('dataset');
+            let scenarios = SLR_DATASETS[dataset_name].scenarios;
+
+            $('#rcp').empty();
+            let rcpDropGroup = "";
+            let rcpOptions = [];
+            scenarios.forEach(function (scenario) {
+                rcpOptions.push(scenario.name);
+                rcpDropGroup += '<option value="{0}">{1}</option> '.format(scenario.name, scenario.label);
+            });
+
+            $('#rcp').append(rcpDropGroup);
+            let queryRCP = getQueryVariable('rcp');
+            if (rcpOptions.includes(queryRCP)) {
+                $("#rcp").val(queryRCP).prop('selected', true);
+            }
         }
 
 
@@ -1761,6 +1927,18 @@
             $('#var-filter .select2').trigger('change');
             flag = false;
             // console.log('var changed triggered manually');
+        }
+
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
+            }
+            return (false);
         }
 
         $.fn.prepare_raster = function(){

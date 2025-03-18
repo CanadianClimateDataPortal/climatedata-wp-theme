@@ -50,7 +50,16 @@ export default function SearchControl({
 
 	// we need a unique id for the search control container for cases where multiple maps
 	// are rendered on the same page -- ie. comparing emission scenarios
-	const searchControlId = useMemo(() => nanoid(), []);
+	const searchControlId = useMemo(() => {
+		let id = nanoid(); // Generate a normal nanoid
+
+		// If it starts with a number, prepend a letter for querySelector compatibility
+		if (/^\d/.test(id)) {
+			id = 'a' + id.substring(1);
+		}
+
+		return id;
+	}, []);
 
 	// defining default placeholder here so that it can be translated
 	const textPlaceholder = __(SEARCH_PLACEHOLDER) || '';

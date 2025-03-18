@@ -13,6 +13,12 @@ import Dropdown from '@/components/ui/dropdown';
 // other
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setInteractiveRegion } from '@/features/map/map-slice';
+import {
+	REGION_GRID,
+	REGION_CENSUS,
+	REGION_HEALTH,
+	REGION_WATERSHED,
+} from '@/lib/constants';
 
 const InteractiveRegionsDropdown: React.FC = () => {
 	const { __ } = useI18n();
@@ -24,10 +30,10 @@ const InteractiveRegionsDropdown: React.FC = () => {
 
 	// TODO: fetch these values from the API
 	const options: { value: string; label: string }[] = [
-		{ value: 'gridded_data', label: __('Grid Cells') },
-		{ value: 'census', label: __('Census Subdivisions') },
-		{ value: 'health', label: __('Health Regions') },
-		{ value: 'watershed', label: __('Watersheds') },
+		{ value: REGION_GRID, label: __('Grid Cells') },
+		{ value: REGION_CENSUS, label: __('Census Subdivisions') },
+		{ value: REGION_HEALTH, label: __('Health Regions') },
+		{ value: REGION_WATERSHED, label: __('Watersheds') },
 	];
 
 	const handleInteractiveRegionChange = (value: string) => {

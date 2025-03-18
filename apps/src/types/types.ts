@@ -19,7 +19,7 @@ export type DatasetKey = 'cmip5' | 'cmip6' | 'humidex';
 /**
  * Represents valid emission scenario keys.
  */
-export type EmissionScenarioKey = 'low' | 'medium' | 'high' | 'very-high';
+export type EmissionScenarioKey = 'low' | 'medium' | 'high';
 
 /**
  * Represents a field with multilingual support.

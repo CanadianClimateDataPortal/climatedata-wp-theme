@@ -30,10 +30,10 @@ const EmissionScenariosControl: React.FC = () => {
 		emissionScenarioCompareTo,
 	} = useAppSelector((state) => state.map);
 
-	// TODO: fetch these values from the API
+	// TODO: fetch these values from the API.. currently these are hardcoded
+	//  based on what the current map implementation
 	const emissionScenariosOptions = [
-		{ value: 'very-high', label: __('SSP5-8.5 (Very High)') },
-		{ value: 'high', label: __('SSP3-7.0 (High)') },
+		{ value: 'high', label: __('SSP5-8.5 (High)') },
 		{ value: 'medium', label: __('SSP2-4.5 (Medium)') },
 		{ value: 'low', label: __('SSP1-2.6 (Low)') },
 	];

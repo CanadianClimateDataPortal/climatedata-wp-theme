@@ -7,7 +7,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { DownloadState, PostData, TaxonomyData } from '@/types/types';
-import { CANADA_CENTER, DEFAULT_ZOOM } from '@/lib/constants';
+import { CANADA_CENTER, DEFAULT_ZOOM, REGION_GRID } from '@/lib/constants';
 import { LatLngExpression } from 'leaflet';
 
 // Define the initial state this slice is going to use.
@@ -16,7 +16,7 @@ export const initialState: DownloadState = {
 	variable: null,
 	version: 'CMIP5',
 	degrees: 2,
-	interactiveRegion: 'gridded_data',
+	interactiveRegion: REGION_GRID,
 	startYear: 2010,
 	endYear: 2030,
 	frequency: 'Annual',

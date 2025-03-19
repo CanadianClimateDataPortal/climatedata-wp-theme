@@ -67,6 +67,10 @@ if (
 if ( isset( $assets['js'] ) && is_array( $assets['js'] ) && isset( $assets['js']['module'] ) && is_array( $assets['js']['module'] ) ) {
     foreach ( $assets['js']['module'] as $js_assets ) {
         if ( filter_var( $js_assets, FILTER_VALIDATE_URL ) ) { ?>
+            <script>
+                // Disable Leaflet's 3D features
+                L_DISABLE_3D = true;
+            </script>
             <script type="module" crossorigin src="<?php echo esc_url( $js_assets ); ?>"></script>
         <?php }
     }

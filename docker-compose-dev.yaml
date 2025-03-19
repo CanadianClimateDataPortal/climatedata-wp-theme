@@ -62,6 +62,8 @@ services:
     image: climatedata-task-runner
     build:
       context: .
+      args:
+        VITE_WP_API_DOMAIN: https://dev-en.climatedata.ca
       dockerfile: dockerfiles/build/task-runner/Dockerfile
     command: ["bash", "-c", "watch-fe.sh /app"]
     volumes:

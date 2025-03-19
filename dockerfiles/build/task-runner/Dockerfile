@@ -13,6 +13,7 @@ FROM node:23.5-bookworm
 # Define environment variables
 ENV NVM_DIR=/home/node/.nvm
 ENV NPM_CONFIG_LOGLEVEL=info
+ARG VITE_WP_API_DOMAIN
 
 # For `dumb-init`, see point #5 in:
 #   https://snyk.io/blog/10-best-practices-to-containerize-nodejs-web-applications-with-docker/

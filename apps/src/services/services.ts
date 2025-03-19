@@ -30,6 +30,8 @@ const dummyResponses = {
 
 type DummyResponseKey = keyof typeof dummyResponses;
 
+import {WP_API_DOMAIN} from "@/config.tsx";
+
 export const fetchRelatedData = async (): Promise<RelatedData> => {
 	// TODO: uncomment this and use correct API endpoint when ready
 	// re add `postId: number` as a parameter to the function
@@ -111,7 +113,7 @@ export const fetchTaxonomyData = async (
 	const data: TaxonomyData[] = !fetchFromApi
 		? dummyResponses[slug as DummyResponseKey]
 		: await fetch(
-				`https://dev-en.climatedata.ca/wp-json/cdc/v3/${slug}-list`
+				`${WP_API_DOMAIN}/wp-json/cdc/v3/${slug}-list`
 			)
 				.then((res) => {
 					if (!res.ok) {
@@ -148,7 +150,7 @@ export const fetchPostsData = async (
 	// fetch from the API or directly return dummy json response
 	const data: ApiPostData[] = fetchFromApi
 		? await fetch(
-				`https://dev-en.climatedata.ca/wp-json/cdc/v3/${postType}-list`
+				`${WP_API_DOMAIN}/wp-json/cdc/v3/${postType}-list`
 			)
 				.then((res) => {
 					if (!res.ok) {

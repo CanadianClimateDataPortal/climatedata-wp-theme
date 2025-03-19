@@ -32,9 +32,7 @@ class RepositoryAPI:
     various operations related to tags in a GitLab Container Registry.
     """
 
-    def __init__(
-        self, token: str, api_url: str, project_id: str, repository_name: str
-    ) -> None:
+    def __init__(self, token: str, api_url: str, project_id: str, repository_name: str):
         """
         Initializes the RepositoryAPI instance with authentication headers and repository details.
 
@@ -75,10 +73,7 @@ class RepositoryAPI:
 
     def _get_repository_endpoint(self) -> str:
         """
-        Retrieves the endpoint for a specific registry repository within a GitLab project.
-
-        Returns:
-            The endpoint of the matching repository if found.
+        Returns the endpoint for a specific registry repository within a GitLab project if found.
 
         Raises:
             ValueError: If the repository with the specified name is not found in the project.
@@ -100,13 +95,11 @@ class RepositoryAPI:
 
     def _get_tag_specific_info(self, tag: str) -> TagInfo:
         """
-        Retrieves detailed information (digest and creation date) for a specific tag in the repository.
+        Returns detailed information for a specific tag in the repository.
 
         Args:
             tag: The name of the tag to query.
 
-        Returns:
-            The tag metadata.
         """
         endpoint = f"{self._repo_endpoint}/tags/{tag}"
 
@@ -120,16 +113,12 @@ class RepositoryAPI:
 
     def get_all_tags_with_specific_infos(self) -> List[TagInfo]:
         """
-        Retrieves all tags available in the repository.
-
-        Returns:
-            The tags metadata.
+        Returns all tags available in the repository.
 
         Raises:
             ValueError: If no tags are found.
         """
-        tags: List[TagInfo] = []
-        tags_all_datas = []
+        tags = []
         next_page = 1
         has_next_page = True
 
@@ -137,20 +126,19 @@ class RepositoryAPI:
             response = self._make_api_request(
                 "GET", f"{self._repo_endpoint}/tags?page={next_page}"
             )
-            tags_all_datas.extend(response.json())
+            tags.extend(
+                self._get_tag_specific_info(tag["name"]) for tag in response.json()
+            )
             total_nb_pages = int(response.headers.get("x-total-pages"))
             has_next_page = next_page < total_nb_pages
             next_page += 1
 
-        if not tags_all_datas:
+        if not tags:
             raise ValueError("No tags found for this repository.")
-
-        for tag_all_datas in tags_all_datas:
-            tags.append(self._get_tag_specific_info(tag_all_datas["name"]))
 
         return tags
 
-    def delete_tags(self, tags: List[TagInfo]) -> None:
+    def delete_tags(self, tags: List[TagInfo]):
         """
         Deletes the specified tags from the GitLab repository.
 
@@ -165,7 +153,7 @@ class RepositoryAPI:
 
 def filter_required_tags(tags: List[TagInfo]) -> List[TagInfo]:
     """
-    Filters out tags that must be kept.
+    Returns tags that must be kept.
 
     Tags that must be kept are the "reserved" tags and all the other tags of the same
     Docker image.
@@ -173,8 +161,6 @@ def filter_required_tags(tags: List[TagInfo]) -> List[TagInfo]:
     Args:
         tags: elements with their metadata retrieved from the repository.
 
-    Returns:
-        tags to keep.
     """
     protected_digests = []
     filtered_tags = []
@@ -198,8 +184,6 @@ def get_old_tags(tags: List[TagInfo], n: int) -> List[TagInfo]:
         tags: elememts with their metadata.
         n: The number of most recent tags to retain.
 
-    Returns:
-        tags older than the n most recent ones.
     """
     sorted_tags = sorted(
         tags,

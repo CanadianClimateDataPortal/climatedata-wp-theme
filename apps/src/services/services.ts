@@ -30,7 +30,7 @@ const dummyResponses = {
 
 type DummyResponseKey = keyof typeof dummyResponses;
 
-import { WP_API_DOMAIN } from "@/config.tsx";
+import { WP_API_DOMAIN } from "@/lib/constants.ts";
 
 export const fetchRelatedData = async (): Promise<RelatedData> => {
 	// TODO: uncomment this and use correct API endpoint when ready

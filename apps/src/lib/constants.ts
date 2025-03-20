@@ -43,6 +43,9 @@ export const REGION_CENSUS: string = 'census';
 export const REGION_HEALTH: string = 'health';
 export const REGION_WATERSHED: string = 'watershed';
 
+const rootElement = document.getElementById('root');
+export const WP_API_DOMAIN = (rootElement?.getAttribute('data-wp-home-url')) ?? 'https://dev-en.climatedata.ca';
+
 // TODO: these will come from the API..
 //  also, "high" key has the value that in the figma designs is set for "very-high", and
 //  the value for "high" from the designs doesn't seem to work, so these below are the

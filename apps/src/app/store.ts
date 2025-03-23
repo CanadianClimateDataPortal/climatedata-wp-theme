@@ -9,6 +9,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 // Store Slices and Reducers
+import climateVariableReducer from '@/store/climate-variable-slice';
 import mapReducer from '@/features/map/map-slice';
 import downloadReducer from '@/features/download/download-slice';
 
@@ -29,6 +30,7 @@ import { wpApiSlice } from '@/services/wp-node';
  */
 export const store = configureStore({
 	reducer: {
+		climateVariable: climateVariableReducer,
 		map: mapReducer,
 		download: downloadReducer,
 		[wpApiSlice.reducerPath]: wpApiSlice.reducer,

@@ -92,6 +92,7 @@ export type TermItem = {
  */
 export type ApiPostData = {
 	id: string | number;
+	post_id: number;
 	meta: {
 		updated_on?: string;
 		content: {
@@ -120,6 +121,7 @@ export type ApiPostData = {
  */
 export type PostData = {
 	id: string | number;
+	postId: number;
 	title: string;
 	description?: string;
 	link?: { title: string; url: string; target: string };

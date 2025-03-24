@@ -71,6 +71,7 @@ export const normalizePostData = async (
 
 	return data.map((post: ApiPostData) => ({
 		id: post.id,
+		wpId: post.post_id,
 		title: post.meta.content.title[locale] || '',
 		description: post.meta.content.card?.description?.[locale] || '',
 		link: post.meta.content.card?.link?.[locale] || undefined,

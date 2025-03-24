@@ -121,7 +121,7 @@ export type ApiPostData = {
  */
 export type PostData = {
 	id: string | number;
-	wpId: number;
+	postId: number;
 	title: string;
 	description?: string;
 	link?: { title: string; url: string; target: string };

@@ -6,6 +6,7 @@ export type ClimateVariableContextType = {
 	climateVariable: ClimateVariableInterface | null;
 	selectClimateVariable: (variable: PostData) => void;
 	setVersion: (version: string) => void;
+	setScenario: (scenario: string) => void;
 }
 
 const ClimateVariableContext = createContext<ClimateVariableContextType | null>(null);

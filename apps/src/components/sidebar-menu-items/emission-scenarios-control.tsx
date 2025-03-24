@@ -7,6 +7,8 @@
 import React from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
+import { useClimateVariable } from "@/hooks/use-climate-variable";
+
 // components
 import { SidebarMenuItem } from '@/components/ui/sidebar';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -15,7 +17,6 @@ import Dropdown from '@/components/ui/dropdown';
 // other
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
-	setEmissionScenario,
 	setEmissionScenarioCompare,
 	setEmissionScenarioCompareTo,
 } from '@/features/map/map-slice';
@@ -23,24 +24,12 @@ import {
 const EmissionScenariosControl: React.FC = () => {
 	const { __ } = useI18n();
 	const dispatch = useAppDispatch();
+	const { climateVariable, setScenario } = useClimateVariable();
 
 	const {
-		emissionScenario,
 		emissionScenarioCompare,
 		emissionScenarioCompareTo,
 	} = useAppSelector((state) => state.map);
-
-	// TODO: fetch these values from the API.. currently these are hardcoded
-	//  based on what the current map implementation
-	const emissionScenariosOptions = [
-		{ value: 'high', label: __('SSP5-8.5 (High)') },
-		{ value: 'medium', label: __('SSP2-4.5 (Medium)') },
-		{ value: 'low', label: __('SSP1-2.6 (Low)') },
-	];
-
-	const handleEmissionScenarioChange = (value: string) => {
-		dispatch(setEmissionScenario(value));
-	};
 
 	const handleEmissionScenarioCompareChange = (checked: boolean) => {
 		dispatch(setEmissionScenarioCompare(checked));
@@ -63,9 +52,9 @@ const EmissionScenariosControl: React.FC = () => {
 					label={__('Emissions Scenarios')}
 					tooltip={<Tooltip />}
 					placeholder={__('Select an option')}
-					options={emissionScenariosOptions}
-					value={emissionScenario}
-					onChange={handleEmissionScenarioChange}
+					options={climateVariable?.getScenarios() ?? []}
+					value={climateVariable?.getScenario() ?? undefined}
+					onChange={setScenario}
 				/>
 
 				<div className="flex items-center space-x-2">
@@ -85,9 +74,9 @@ const EmissionScenariosControl: React.FC = () => {
 
 				{emissionScenarioCompare && (
 					<Dropdown
-						options={emissionScenariosOptions.filter(
-							(option) => option.value !== emissionScenario
-						)}
+						options={climateVariable?.getScenarios()?.filter(
+							(option) => option.value !== climateVariable?.getScenario()
+						) ?? []}
 						value={emissionScenarioCompareTo}
 						onChange={handleEmissionScenarioCompareToChange}
 					/>

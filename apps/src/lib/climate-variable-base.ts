@@ -44,7 +44,11 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getScenario(): string | null {
-		return this._config.scenario ?? null;
+		// Check if the current scenario actually belongs to the current version.
+		// If not, return the first scenario that belongs to the current version.
+		const currentVersion = this.getVersion();
+		const filteredScenario = this.getScenarios()?.find((scenario) => scenario.value === this._config.scenario && scenario.version === currentVersion);
+		return filteredScenario?.value || this.getScenarios()?.[0]?.value || null;
 	}
 
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null {

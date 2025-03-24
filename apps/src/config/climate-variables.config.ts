@@ -30,23 +30,33 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		],
 		scenarios: [
 			{
-				value: "scenario1",
-				label: "Scenario 1",
+				value: "rcp26",
+				label: "RCP 2.6",
 				version: "cmip5",
 			},
 			{
-				value: "scenario2",
-				label: "Scenario 2",
+				value: "rcp45",
+				label: "RCP 4.5",
 				version: "cmip5",
 			},
 			{
-				value: "scenario3",
-				label: "Scenario 3",
+				value: "rcp85",
+				label: "RCP 8.5",
+				version: "cmip5",
+			},
+			{
+				value: "ssp126",
+				label: "SSP 1–2.6",
 				version: "cmip6",
 			},
 			{
-				value: "scenario4",
-				label: "Scenario 4",
+				value: "ssp245",
+				label: "SSP 2–4.5",
+				version: "cmip6",
+			},
+			{
+				value: "ssp585",
+				label: "SSP 5–8.5",
 				version: "cmip6",
 			},
 		],

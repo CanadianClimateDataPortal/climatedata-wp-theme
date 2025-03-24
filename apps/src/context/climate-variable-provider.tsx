@@ -4,7 +4,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from "@/app/hooks";
-import ClimateVariableContext from "@/hooks/use-climate-variable";
+import ClimateVariableContext, { ClimateVariableContextType } from "@/hooks/use-climate-variable";
 import { PostData } from "@/types/types";
 import {
 	setClimateVariable,
@@ -17,6 +17,10 @@ import {
 } from "@/types/climate-variable-interface";
 
 type ClassMapType = Record<string, new (arg: ClimateVariableConfigInterface) => ClimateVariableInterface>;
+
+/**
+ * Maps climate variable class names to their corresponding class implementations.
+ */
 const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
 	"ClimateVariableBase": ClimateVariableBase
 };
@@ -86,10 +90,17 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		}));
 	}, [dispatch]);
 
-	const value = {
+	const setScenario = useCallback((scenario: string) => {
+		dispatch(updateClimateVariable({
+			scenario
+		}));
+	}, [dispatch]);
+
+	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
 		setVersion,
+		setScenario,
 	}
 
 	return (

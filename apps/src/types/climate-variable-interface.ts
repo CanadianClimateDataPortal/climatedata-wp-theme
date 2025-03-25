@@ -11,7 +11,7 @@ export interface ScenarioInterface {
 }
 
 export interface ThresholdInterface {
-	value: string | number;
+	value: string;
 	label: string;
 }
 

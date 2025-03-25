@@ -13,7 +13,7 @@ import {
 import ClimateVariableBase from "@/lib/climate-variable-base";
 import {
 	ClimateVariableConfigInterface,
-	ClimateVariableInterface
+	ClimateVariableInterface, InteractiveRegionOption
 } from "@/types/climate-variable-interface";
 
 type ClassMapType = Record<string, new (arg: ClimateVariableConfigInterface) => ClimateVariableInterface>;
@@ -102,12 +102,19 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		}));
 	}, [dispatch]);
 
+	const setInteractiveRegion = useCallback((interactiveRegion: InteractiveRegionOption) => {
+		dispatch(updateClimateVariable({
+			interactiveRegion
+		}));
+	}, [dispatch]);
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
 		setVersion,
 		setScenario,
 		setThreshold,
+		setInteractiveRegion,
 	}
 
 	return (

@@ -56,7 +56,23 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getInteractiveRegion(): InteractiveRegionOption | null {
-		return this._config.interactiveRegion ?? null;
+		const interactiveRegionConfig = this.getInteractiveRegionConfig();
+
+		// If we have a region and is valid.
+		if (this._config.interactiveRegion && interactiveRegionConfig?.[this._config.interactiveRegion]) {
+			return this._config.interactiveRegion;
+		}
+
+		// Get the first region that's active.
+		if (interactiveRegionConfig) {
+			for (const [key, value] of Object.entries(interactiveRegionConfig)) {
+				if (value) {
+					return key as InteractiveRegionOption;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	getFrequencyConfig(): FrequencyConfig | null {

@@ -34,7 +34,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.thresholds ?? [];
 	}
 
-	getThreshold(): string | number | null {
+	getThreshold(): string | null {
 		return this._config.threshold || this._config.thresholds?.[0]?.value || null;
 	}
 

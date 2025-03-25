@@ -69,7 +69,7 @@ export interface ClimateVariableConfigInterface {
 	thresholds?: ThresholdInterface[];
 
 	/** Selected threshold value for display or computation */
-	threshold?: string | number | null;
+	threshold?: string | null;
 
 	/** Available scenarios linked to this climate variable */
 	scenarios?: ScenarioInterface[];
@@ -112,7 +112,7 @@ export interface ClimateVariableInterface {
 
 	getThresholds(): ThresholdInterface[];
 
-	getThreshold(): string | number | null;
+	getThreshold(): string | null;
 
 	getScenarios(): ScenarioInterface[];
 

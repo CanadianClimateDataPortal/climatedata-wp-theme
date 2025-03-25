@@ -96,11 +96,18 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		}));
 	}, [dispatch]);
 
+	const setThreshold = useCallback((threshold: string) => {
+		dispatch(updateClimateVariable({
+			threshold
+		}));
+	}, [dispatch]);
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
 		setVersion,
 		setScenario,
+		setThreshold,
 	}
 
 	return (

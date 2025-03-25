@@ -11,20 +11,11 @@ import { SidebarMenuItem } from '@/components/ui/sidebar';
 import Dropdown from '@/components/ui/dropdown';
 
 // other
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setThresholdValue } from '@/features/map/map-slice';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 const ThresholdValuesDropdown: React.FC = () => {
 	const { __ } = useI18n();
-
-	const dispatch = useAppDispatch();
-	const thresholdValue = useAppSelector((state) => state.map.thresholdValue);
-
-	// TODO: fetch these values from the API
-	const options = {
-		unit: '°C',
-		values: [5, 10, 15, 20, 25, 30],
-	};
+	const { climateVariable, setThreshold } = useClimateVariable();
 
 	const Tooltip = () => (
 		<div className="text-sm text-gray-500">
@@ -36,16 +27,11 @@ const ThresholdValuesDropdown: React.FC = () => {
 		<SidebarMenuItem>
 			<Dropdown
 				placeholder={__('Select an option')}
-				options={options.values.map((value) => ({
-					value,
-					label: `${value} ${options.unit}`,
-				}))}
+				options={climateVariable?.getThresholds() ?? []}
 				label={__('Threshold Values')}
 				tooltip={<Tooltip />}
-				value={thresholdValue}
-				onChange={(value) => {
-					dispatch(setThresholdValue(value));
-				}}
+				value={climateVariable?.getThreshold() ?? undefined}
+				onChange={setThreshold}
 			/>
 		</SidebarMenuItem>
 	);

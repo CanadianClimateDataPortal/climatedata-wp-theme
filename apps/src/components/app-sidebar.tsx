@@ -43,7 +43,7 @@ import { TaxonomyData, PostData } from '@/types/types';
  * A `Sidebar` component that provides a tabbed interface for exploring data or adjusting map settings.
  */
 export function AppSidebar() {
-	const { selectClimateVariable } = useClimateVariable();
+	const { climateVariable, selectClimateVariable } = useClimateVariable();
 	const [selectedDataset, setSelectedDataset] = useState<TaxonomyData | null>(
 		null
 	);
@@ -58,6 +58,8 @@ export function AppSidebar() {
 		setSelectedVariable(variable);
 		selectClimateVariable(variable);
 	}
+
+	const hasThreshold = climateVariable && climateVariable.getThresholds() && climateVariable.getThresholds().length > 0;
 
 	return (
 		<Sidebar>
@@ -80,7 +82,7 @@ export function AppSidebar() {
 									<SidebarSeparator />
 
 									<VersionsDropdown />
-									<ThresholdValuesDropdown />
+									{hasThreshold && <ThresholdValuesDropdown/>}
 									<SidebarSeparator />
 
 									<EmissionScenariosControl />

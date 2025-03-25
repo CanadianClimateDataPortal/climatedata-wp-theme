@@ -24,7 +24,7 @@ import {
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
  */
-export default function Map({
+export default function RasterMapContainer({
 	onMapReady,
 	onUnmount,
 }: {

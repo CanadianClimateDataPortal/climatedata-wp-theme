@@ -3,7 +3,7 @@ import 'leaflet.sync';
 
 // components
 import MapHeader from '@/components/map-header';
-import Map from '@/components/map';
+import RasterMapContainer from '@/components/raster-map-container';
 
 // other
 import { cn } from '@/lib/utils';
@@ -70,7 +70,7 @@ export default function RasterMap(): React.ReactElement {
 					showComparisonMap ? 'sm:grid-cols-2' : 'grid-cols-1'
 				)}
 			>
-				<Map
+				<RasterMapContainer
 					onMapReady={(map: L.Map) => {
 						mapRef.current = map;
 						setMap(map);
@@ -78,7 +78,7 @@ export default function RasterMap(): React.ReactElement {
 					onUnmount={() => (mapRef.current = null)}
 				/>
 				{showComparisonMap && (
-					<Map
+					<RasterMapContainer
 						onMapReady={(map: L.Map) => {
 							comparisonMapRef.current = map;
 							syncMaps(); // sync once the comparison map is ready

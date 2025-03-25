@@ -93,7 +93,7 @@ class RepositoryAPI:
         except StopIteration:
             raise ValueError(f"No repository named '{self._repository_name}' found.")
 
-    def _get_tag_specific_info(self, tag: str) -> TagInfo:
+    def _get_tag_info(self, tag: str) -> TagInfo:
         """
         Returns detailed information for a specific tag in the repository.
 
@@ -107,18 +107,18 @@ class RepositoryAPI:
         tag_info = response.json()
         return TagInfo(
             name=tag,
-            digest=tag_info.get("digest", ""),
-            created_at=tag_info.get("created_at", ""),
+            digest=tag_info.get("digest"),
+            created_at=tag_info.get("created_at"),
         )
 
-    def get_all_tags_with_specific_infos(self) -> List[TagInfo]:
+    def get_all_tags_with_infos(self) -> List[TagInfo]:
         """
         Returns all tags available in the repository.
 
         Raises:
             ValueError: If no tags are found.
         """
-        tags = []
+        tags: List[TagInfo] = []
         next_page = 1
         has_next_page = True
 
@@ -127,9 +127,9 @@ class RepositoryAPI:
                 "GET", f"{self._repo_endpoint}/tags?page={next_page}"
             )
             tags.extend(
-                self._get_tag_specific_info(tag["name"]) for tag in response.json()
+                self._get_tag_info(tag["name"]) for tag in response.json()
             )
-            total_nb_pages = int(response.headers.get("x-total-pages"))
+            total_nb_pages = int(response.headers.get("x-total-pages", "1"))
             has_next_page = next_page < total_nb_pages
             next_page += 1
 
@@ -146,7 +146,7 @@ class RepositoryAPI:
             tags: elements to delete.
         """
         for tag in tags:
-            tag_name = tag["name"]
+            tag_name = tag.name
             delete_endpoint = f"{self._repo_endpoint}/tags/{tag_name}"
             self._make_api_request("DELETE", delete_endpoint)
 
@@ -181,7 +181,7 @@ def get_old_tags(tags: List[TagInfo], n: int) -> List[TagInfo]:
     Returns the tags older than the n most recent ones, sorted by creation date.
 
     Args:
-        tags: elememts with their metadata.
+        tags: elements with their metadata.
         n: The number of most recent tags to retain.
 
     """
@@ -231,7 +231,7 @@ def main():
             args.token, args.api_url, args.project_id, args.repository_name
         )
         print("Retrieving tags from the repository...")
-        tags = repo_api.get_all_tags_with_specific_infos()
+        tags = repo_api.get_all_tags_with_infos()
         filtered_tags = filter_required_tags(tags)
         tags_to_delete = get_old_tags(filtered_tags, args.nb_to_keep)
 

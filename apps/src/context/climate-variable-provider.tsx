@@ -108,6 +108,12 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		}));
 	}, [dispatch]);
 
+	const setFrequency = useCallback((frequency: string) => {
+		dispatch(updateClimateVariable({
+			frequency
+		}));
+	}, [dispatch]);
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
@@ -115,6 +121,7 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		setScenario,
 		setThreshold,
 		setInteractiveRegion,
+		setFrequency
 	}
 
 	return (

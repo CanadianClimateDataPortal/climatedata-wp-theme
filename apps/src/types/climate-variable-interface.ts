@@ -86,8 +86,8 @@ export interface ClimateVariableConfigInterface {
 	/** Configuration defining frequency options and corresponding display modes */
 	frequencyConfig?: FrequencyConfig;
 
-	/** Currently selected frequency option */
-	frequency?: FrequencyOption;
+	/** Currently selected frequency */
+	frequency?: string;
 
 	/** Indicates whether delta (difference) values are available */
 	hasDelta?: boolean;
@@ -124,7 +124,7 @@ export interface ClimateVariableInterface {
 
 	getFrequencyConfig(): FrequencyConfig | null;
 
-	getFrequency(): FrequencyOption | null;
+	getFrequency(): string | null;
 
 	hasDelta(): boolean;
 

@@ -2,7 +2,6 @@ import {
 	ClimateVariableConfigInterface,
 	ClimateVariableInterface,
 	FrequencyConfig,
-	FrequencyOption,
 	InteractiveRegionConfig,
 	InteractiveRegionOption,
 	ScenarioInterface,
@@ -79,7 +78,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.frequencyConfig ?? null;
 	}
 
-	getFrequency(): FrequencyOption | null {
+	getFrequency(): string | null {
 		return this._config.frequency ?? null;
 	}
 

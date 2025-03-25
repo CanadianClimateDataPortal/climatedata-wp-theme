@@ -69,7 +69,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			annual: FrequencyDisplayModeOption.ALWAYS,
 			months: FrequencyDisplayModeOption.ALWAYS,
-			seasons: FrequencyDisplayModeOption.NONE
+			seasons: FrequencyDisplayModeOption.MAP,
 		},
 		hasDelta: false,
 		defaultColourScheme: [

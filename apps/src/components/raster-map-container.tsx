@@ -10,14 +10,12 @@ import SearchControl from '@/components/map-layers/search-control';
 import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions-layer';
 
 import { useAppSelector } from '@/app/hooks';
-import { DatasetKey, EmissionScenarioKey } from '@/types/types';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
 import {
 	CANADA_CENTER,
 	DEFAULT_ZOOM,
 	DEFAULT_MIN_ZOOM,
 	DEFAULT_MAX_ZOOM,
-	DATASETS,
-	SCENARIO_NAMES,
 	GEOSERVER_BASE_URL,
 } from '@/lib/constants';
 
@@ -32,31 +30,36 @@ export default function RasterMapContainer({
 	onUnmount?: () => void;
 }) {
 	const {
-		dataset,
-		variable,
-		frequency,
-		emissionScenario,
 		opacity: { labels: labelsOpacity },
 	} = useAppSelector((state) => state.map);
 
+	const { climateVariable } = useClimateVariable();
+
 	// construct the URL for the map legend to get its data
 	const mapLegendUrl = useMemo(() => {
-		const datasetKey = dataset as DatasetKey;
-		const emissionScenarioKey = emissionScenario as EmissionScenarioKey;
+		let version;
+		if (climateVariable) {
+			version = climateVariable.getVersion() === 'cmip5' ? '' : climateVariable.getVersion();
+		}
 
-		const datasetPrefix = DATASETS[datasetKey].layer_prefix ?? '';
-		const scenarioName = SCENARIO_NAMES[datasetKey][emissionScenarioKey]
-			.replace(/[\W_]+/g, '')
-			.toLowerCase();
+		const scenario = climateVariable?.getScenario();
+		const threshold = climateVariable?.getThreshold();
+		const frequency = climateVariable?.getFrequency() ?? 'ann';
 
-		if (!datasetPrefix || !scenarioName) {
-			return '';
+		let frequencyCode;
+		if (frequency === 'ann') {
+			frequencyCode = 'ys';
+		} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
+			frequencyCode = 'ms';
+		} else if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
+			frequencyCode = 'qsdec';
 		}
 
 		const layerName = [
-			`CDC:${datasetPrefix}${variable}`,
-			frequency === 'ann' ? 'ys' : 'ms',
-			scenarioName.replace(/[\W_]+/g, '').toLowerCase(),
+			version,
+			threshold,
+			frequencyCode,
+			scenario,
 			'p50',
 			frequency,
 			'30year',
@@ -64,8 +67,8 @@ export default function RasterMapContainer({
 			.filter(Boolean)
 			.join('-'); // Remove empty values before joining
 
-		return `${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerName}`;
-	}, [dataset, variable, frequency, emissionScenario]);
+		return `${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=CDC:${layerName}`;
+	}, [climateVariable]);
 
 	return (
 		<MapContainer

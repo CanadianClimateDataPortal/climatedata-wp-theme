@@ -126,9 +126,7 @@ class RepositoryAPI:
             response = self._make_api_request(
                 "GET", f"{self._repo_endpoint}/tags?page={next_page}"
             )
-            tags.extend(
-                self._get_tag_info(tag["name"]) for tag in response.json()
-            )
+            tags.extend(self._get_tag_info(tag["name"]) for tag in response.json())
             total_nb_pages = int(response.headers.get("x-total-pages", "1"))
             has_next_page = next_page < total_nb_pages
             next_page += 1

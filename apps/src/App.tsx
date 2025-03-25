@@ -2,8 +2,7 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { SidebarProvider } from '@/context/sidebar-provider';
 import Header from '@/components/header';
-import MapWrapper from '@/components/map-wrapper';
-
+import { MapWrapper } from "@/components/map-wrapper";
 import { MapProvider } from '@/context/map-provider';
 import { LocaleProvider } from '@/context/locale-provider';
 import { AnimatedPanelProvider } from '@/context/animated-panel-provider';

@@ -13,9 +13,11 @@ import { RadioGroupFactory } from '@/components/ui/radio-group';
 // other
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setDataValue } from '@/features/map/map-slice';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 const DataValuesControl: React.FC = () => {
 	const { __ } = useI18n();
+	const { climateVariable } = useClimateVariable();
 
 	const dispatch = useAppDispatch();
 	const dataValue = useAppSelector((state) => state.map.dataValue);
@@ -32,6 +34,7 @@ const DataValuesControl: React.FC = () => {
 				name="data-value"
 				options={options}
 				value={dataValue}
+				disabled={climateVariable ? !climateVariable.hasDelta() : false}
 				onValueChange={(value) => {
 					dispatch(setDataValue(value));
 				}}

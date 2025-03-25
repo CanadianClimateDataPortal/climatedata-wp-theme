@@ -7,6 +7,7 @@ import MapWrapper from '@/components/map-wrapper';
 import { MapProvider } from '@/context/map-provider';
 import { LocaleProvider } from '@/context/locale-provider';
 import { AnimatedPanelProvider } from '@/context/animated-panel-provider';
+import { ClimateVariableProvider } from "@/context/climate-variable-provider";
 
 import { useLeaflet } from '@/hooks/use-leaflet';
 
@@ -18,18 +19,20 @@ function App() {
 
 	return (
 		<LocaleProvider>
-			<MapProvider>
-				<AnimatedPanelProvider>
-					<SidebarProvider>
-						<AppSidebar />
-						<SidebarTrigger />
-						<main className="flex flex-col h-screen">
-							<Header />
-							<MapWrapper />
-						</main>
-					</SidebarProvider>
-				</AnimatedPanelProvider>
-			</MapProvider>
+			<ClimateVariableProvider>
+				<MapProvider>
+					<AnimatedPanelProvider>
+						<SidebarProvider>
+							<AppSidebar />
+							<SidebarTrigger />
+							<main className="flex flex-col h-screen">
+								<Header />
+								<MapWrapper />
+							</main>
+						</SidebarProvider>
+					</AnimatedPanelProvider>
+				</MapProvider>
+			</ClimateVariableProvider>
 		</LocaleProvider>
 	);
 }

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 
 import MapLegend from '@/components/map-layers/map-legend';
-import VariableLayer from '@/components/map-layers/variable';
+import VariableLayer from '@/components/map-layers/variable-layer';
 import CustomPanesLayer from '@/components/map-layers/custom-panes';
 import ZoomControl from '@/components/map-layers/zoom-control';
 import MapEvents from '@/components/map-layers/map-events';
@@ -10,21 +10,19 @@ import SearchControl from '@/components/map-layers/search-control';
 import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions-layer';
 
 import { useAppSelector } from '@/app/hooks';
-import { DatasetKey, EmissionScenarioKey } from '@/types/types';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
 import {
 	CANADA_CENTER,
 	DEFAULT_ZOOM,
 	DEFAULT_MIN_ZOOM,
 	DEFAULT_MAX_ZOOM,
-	DATASETS,
-	SCENARIO_NAMES,
 	GEOSERVER_BASE_URL,
 } from '@/lib/constants';
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
  */
-export default function Map({
+export default function RasterMapContainer({
 	onMapReady,
 	onUnmount,
 }: {
@@ -32,40 +30,44 @@ export default function Map({
 	onUnmount?: () => void;
 }) {
 	const {
-		dataset,
-		variable,
-		frequency,
-		emissionScenario,
 		opacity: { labels: labelsOpacity },
 	} = useAppSelector((state) => state.map);
 
-	// construct the URL for the map legend to get its data
-	const mapLegendUrl = useMemo(() => {
-		const datasetKey = dataset as DatasetKey;
-		const emissionScenarioKey = emissionScenario as EmissionScenarioKey;
+	const { climateVariable } = useClimateVariable();
 
-		const datasetPrefix = DATASETS[datasetKey].layer_prefix ?? '';
-		const scenarioName = SCENARIO_NAMES[datasetKey][emissionScenarioKey]
-			.replace(/[\W_]+/g, '')
-			.toLowerCase();
-
-		if (!datasetPrefix || !scenarioName) {
-			return '';
+	const layerValue: string = useMemo(() => {
+		let version;
+		if (climateVariable) {
+			version = climateVariable.getVersion() === 'cmip5' ? '' : climateVariable.getVersion();
 		}
 
-		const layerName = [
-			`CDC:${datasetPrefix}${variable}`,
-			frequency === 'ann' ? 'ys' : 'ms',
-			scenarioName.replace(/[\W_]+/g, '').toLowerCase(),
-			'p50',
-			frequency,
-			'30year',
-		]
-			.filter(Boolean)
-			.join('-'); // Remove empty values before joining
+		const scenario = climateVariable?.getScenario();
+		const threshold = climateVariable?.getThreshold();
+		const frequency = climateVariable?.getFrequency() ?? 'ann';
 
-		return `${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerName}`;
-	}, [dataset, variable, frequency, emissionScenario]);
+		let frequencyCode;
+		if (frequency === 'ann') {
+			frequencyCode = 'ys';
+		} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
+			frequencyCode = 'ms';
+		} else if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
+			frequencyCode = 'qsdec';
+		}
+
+		const value = [
+				version,
+				threshold,
+				frequencyCode,
+				scenario,
+				'p50',
+				frequency,
+				'30year',
+			]
+			.filter(Boolean)
+			.join('-');
+
+		return `CDC:${value}`;
+	}, [climateVariable])
 
 	return (
 		<MapContainer
@@ -78,9 +80,9 @@ export default function Map({
 			className="z-10" // important to keep the map below other interactive elements
 		>
 			<MapEvents onMapReady={onMapReady} onUnmount={onUnmount} />
-			<MapLegend url={mapLegendUrl} />
+			<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
 			<CustomPanesLayer />
-			<VariableLayer />
+			<VariableLayer layerValue={layerValue} />
 			<ZoomControl />
 			<SearchControl />
 

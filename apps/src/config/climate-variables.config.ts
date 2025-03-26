@@ -20,12 +20,8 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		],
 		thresholds: [
 			{
-				value: "txgt_25",
-				label: "25 ºC",
-			},
-			{
-				value: "txgt_27",
-				label: "27 ºC",
+				value: "tx_max",
+				label: "",
 			}
 		],
 		scenarios: [

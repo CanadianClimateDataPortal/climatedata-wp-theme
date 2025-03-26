@@ -59,7 +59,8 @@ export function AppSidebar() {
 		selectClimateVariable(variable);
 	}
 
-	const hasThreshold = climateVariable && climateVariable.getThresholds() && climateVariable.getThresholds().length > 0;
+	// We don't need to show if there's only 1 option.
+	const showThreshold = climateVariable && climateVariable.getThresholds() && climateVariable.getThresholds().length > 1;
 
 	return (
 		<Sidebar>
@@ -82,7 +83,7 @@ export function AppSidebar() {
 									<SidebarSeparator />
 
 									<VersionsDropdown />
-									{hasThreshold && <ThresholdValuesDropdown/>}
+									{showThreshold && <ThresholdValuesDropdown/>}
 									<SidebarSeparator />
 
 									<EmissionScenariosControl />

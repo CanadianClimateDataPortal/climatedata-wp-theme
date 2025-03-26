@@ -1,3 +1,4 @@
+import React from "react";
 
 export interface VersionInterface {
 	value: string;
@@ -131,6 +132,8 @@ export interface ClimateVariableInterface {
 	getColourScheme(): string[];
 
 	getColourOptionsStatus(): boolean;
+
+	renderMap(): React.ReactElement;
 
 	toObject(): ClimateVariableConfigInterface;
 }

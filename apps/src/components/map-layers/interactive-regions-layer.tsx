@@ -1,13 +1,7 @@
 /**
  * Component that adds interaction to the map depending on the selected region (gridded data, watershed, health, census).
  */
-import React, {
-	useEffect,
-	useRef,
-	useState,
-	useMemo,
-	useCallback,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.vectorgrid';
@@ -16,13 +10,14 @@ import { useAppSelector } from '@/app/hooks';
 import { useInteractiveMapEvents } from '@/hooks/use-interactive-map-events';
 import { fetchChoroValues } from '@/services/services';
 import {
+	CANADA_BOUNDS,
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
 	GEOSERVER_BASE_URL,
-	CANADA_BOUNDS,
 	SCENARIO_NAMES,
-	REGION_GRID,
 } from '@/lib/constants';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { InteractiveRegionOption } from "@/types/climate-variable-interface";
 
 const InteractiveRegionsLayer: React.FC = () => {
 	const [layerData, setLayerData] = useState<Record<number, number> | null>(
@@ -39,10 +34,12 @@ const InteractiveRegionsLayer: React.FC = () => {
 		dataset,
 		decade,
 		frequency,
-		interactiveRegion,
 		emissionScenario,
 		legendData,
 	} = useAppSelector((state) => state.map);
+
+	const { climateVariable } = useClimateVariable();
+	const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
 
 	// Convert legend data to a color map usable by the getColor method to generate colors for each feature
 	const colorMap = useMemo(() => {
@@ -98,7 +95,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 
 			// Extract value based on interactive region type
 			const value =
-				interactiveRegion === REGION_GRID
+				interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
 					? featureId
 					: (layerData?.[featureId] ?? 0);
 
@@ -152,6 +149,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 	);
 
 	const tileLayerUrl = useMemo(() => {
+		// @todo retrieve the grid type ("canadagrid") from config.
 		const regionPbfValues: Record<string, string> = {
 			gridded_data: 'CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf',
 			watershed: 'CDC:watershed/{z}/{x}/{-y}.pbf',
@@ -159,13 +157,14 @@ const InteractiveRegionsLayer: React.FC = () => {
 			census: 'CDC:census/{z}/{x}/{-y}.pbf',
 		};
 		const regionPbf =
-			regionPbfValues[interactiveRegion] || regionPbfValues.gridded_data;
+			regionPbfValues[interactiveRegion] || regionPbfValues[InteractiveRegionOption.GRIDDED_DATA];
 
 		return `${GEOSERVER_BASE_URL}/geoserver/gwc/service/tms/1.0.0/${regionPbf}`;
 	}, [interactiveRegion]);
 
 	const vectorTileLayerStyles = useMemo(() => {
-		if (interactiveRegion === REGION_GRID) {
+		if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
+			// @todo retrieve the grid type ("canadagrid") from config.
 			return {
 				canadagrid: (properties: { gid: number }) => ({
 					weight: 0.5,
@@ -206,7 +205,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 	useEffect(() => {
 		(async () => {
 			// no need to fetch anything for gridded data
-			if (interactiveRegion === REGION_GRID) {
+			if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
 				return;
 			}
 
@@ -246,7 +245,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 		// make sure all needed data is available
 		if (
 			!tileLayerUrl ||
-			(interactiveRegion !== REGION_GRID && !layerData)
+			(interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA && !layerData)
 		) {
 			return;
 		}
@@ -262,7 +261,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 			maxNativeZoom: DEFAULT_MAX_ZOOM,
 			bounds: CANADA_BOUNDS,
 			maxZoom: DEFAULT_MAX_ZOOM,
-			minZoom: interactiveRegion === REGION_GRID ? 7 : DEFAULT_MIN_ZOOM,
+			minZoom: interactiveRegion === InteractiveRegionOption.GRIDDED_DATA ? 7 : DEFAULT_MIN_ZOOM,
 			vectorTileLayerStyles,
 		};
 

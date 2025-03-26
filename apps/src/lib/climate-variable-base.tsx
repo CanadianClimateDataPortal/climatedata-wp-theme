@@ -1,3 +1,4 @@
+import React from "react";
 import {
 	ClimateVariableConfigInterface,
 	ClimateVariableInterface,
@@ -8,6 +9,7 @@ import {
 	ThresholdInterface,
 	VersionInterface,
 } from "@/types/climate-variable-interface";
+import RasterMap from "@/components/raster-map";
 
 /**
  * A base class representing a climate variable and its configuration. This class provides methods
@@ -98,6 +100,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return {
 			...this._config,
 		};
+	}
+
+	renderMap(): React.ReactElement {
+		return <RasterMap />
 	}
 }
 

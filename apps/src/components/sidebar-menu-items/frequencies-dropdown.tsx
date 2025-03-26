@@ -31,6 +31,7 @@ const FrequenciesDropdown: React.FC = () => {
 	return (
 		<SidebarMenuItem>
 			<FrequencySelect
+				title={'Frequencies'}
 				config={frequencyConfig}
 				section={section}
 				value={defaultValue}

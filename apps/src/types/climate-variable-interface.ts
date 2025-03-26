@@ -37,7 +37,9 @@ export enum FrequencyDisplayModeOption {
 export enum FrequencyOption {
 	ANNUAL = "annual",
 	MONTHLY = "months",
-	SEASONAL = "seasons"
+	SEASONAL = "seasons",
+	ALL_MONTHS = "allMonths",
+	DAILY = "daily",
 }
 
 export type FrequencyConfig = {
@@ -62,6 +64,21 @@ export interface FieldConfig {
 
 export interface FieldValues {
 	[key: string]: string | null;
+}
+
+export interface DateRangeConfig {
+	type: 'year' | 'full';
+	min: string;
+	max: string;
+}
+
+export enum AveragingType {
+	ALL_YEARS = 'allYears',
+	THIRTY_YEARS = '30years'
+}
+
+export type AveragingOptions = {
+	[key in AveragingType]: boolean;
 }
 
 /**
@@ -128,6 +145,11 @@ export interface ClimateVariableConfigInterface {
 	/** Holds submitted values for analysisFields */
 	analysisFieldValues?: FieldValues;
 
+	/** Configuration defining the date range to be used in the Download section */
+	dateRangeConfig?: DateRangeConfig;
+
+	/** Contains available averaging options */
+	averagingOptions?: AveragingOptions;
 }
 
 /**

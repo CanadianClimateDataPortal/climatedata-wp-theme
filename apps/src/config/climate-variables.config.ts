@@ -65,7 +65,13 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			annual: FrequencyDisplayModeOption.ALWAYS,
 			months: FrequencyDisplayModeOption.ALWAYS,
-			seasons: FrequencyDisplayModeOption.MAP,
+			seasons: FrequencyDisplayModeOption.DOWNLOAD,
+			allMonths: FrequencyDisplayModeOption.DOWNLOAD,
+			daily: FrequencyDisplayModeOption.DOWNLOAD
+		},
+		averagingOptions: {
+			allYears: true,
+			"30years": false
 		},
 		hasDelta: false,
 		defaultColourScheme: [
@@ -119,6 +125,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					placeholder: "0",
 				}
 			}
-		],
+		]
 	},
 ];

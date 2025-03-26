@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 import { CheckboxFactory } from '@/components/ui/checkbox';
@@ -14,17 +14,23 @@ import {
 	setDecimalPlace,
 	setEmissionScenarios,
 	setEndYear,
-	setFrequency,
 	setPercentiles,
 	setStartYear,
 } from '@/features/download/download-slice';
 import { normalizeDropdownOptions } from '@/lib/format';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { FrequencyConfig } from "@/types/climate-variable-interface";
+import { FrequencySelect } from "@/components/frequency-select";
+import SectionContext from "@/context/section-provider";
 
 /**
  * Additional details step will allow the user to customize the download request
  */
 const StepAdditionalDetails: React.FC = () => {
 	const { __ } = useI18n();
+	const { climateVariable, setFrequency } = useClimateVariable();
+	const section = useContext(SectionContext);
+	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
 
 	const {
 		startYear,
@@ -96,6 +102,15 @@ const StepAdditionalDetails: React.FC = () => {
 				/>
 			</div>
 
+			<FrequencySelect
+				title={'Temporal frequency'}
+				config={frequencyConfig}
+				section={section}
+				value={climateVariable?.getFrequency() ?? undefined}
+				onValueChange={setFrequency}
+				className={"sm:w-64 mb-8"}
+			/>
+
 			<RadioGroupFactory
 				title={__('Temporal frequency')}
 				name="temporal-frequency"
@@ -103,9 +118,6 @@ const StepAdditionalDetails: React.FC = () => {
 				optionClassName="w-1/2"
 				options={frequencyOptions}
 				value={frequency}
-				onValueChange={(value) => {
-					dispatch(setFrequency(value));
-				}}
 			/>
 
 			<CheckboxFactory

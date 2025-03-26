@@ -11,26 +11,31 @@ import {
 } from "@/components/ui/select";
 import {
 	FrequencyConfig,
-	FrequencyDisplayModeOption
+	FrequencyDisplayModeOption,
 } from "@/types/climate-variable-interface";
 import { ControlTitle } from "@/components/ui/control-title";
+import { cn } from "@/lib/utils";
 
 interface FrequencySelectProps {
 	config: FrequencyConfig;
 	section: 'map' | 'download';
+	title: string;
 	value: string | undefined;
 	placeholder?: string;
 	tooltip?: React.ReactNode;
 	onValueChange: (value: string) => void;
+	className?: string | undefined;
 }
 
 const FrequencySelect = ({
 	config,
 	section,
+	title,
 	value,
 	placeholder,
 	tooltip,
 	onValueChange,
+	className
 }: FrequencySelectProps) => {
 	const { __ } = useI18n();
 
@@ -44,10 +49,19 @@ const FrequencySelect = ({
 			config.months === FrequencyDisplayModeOption.ALWAYS
 			|| config.months === section
 		)
+	const hasAllMonths = config.allMonths && (
+		config.allMonths === FrequencyDisplayModeOption.ALWAYS
+		|| config.allMonths === section
+	)
 	const hasSeasons = config.seasons
 		&& (
 			config.seasons === FrequencyDisplayModeOption.ALWAYS
 			|| config.seasons === section
+		)
+	const hasDaily = config.seasons
+		&& (
+			config.daily === FrequencyDisplayModeOption.ALWAYS
+			|| config.daily === section
 		)
 
 	let defaultValue = value ?? undefined;
@@ -85,11 +99,17 @@ const FrequencySelect = ({
 
 	const FrequencyOptions = () => (
 		<SelectContent>
-			{hasAnnual && <SelectItem key={'ann'} value={'ann'}>
+			{hasAnnual && <SelectItem value={'ann'}>
 				{__('Annual')}
 			</SelectItem>}
-			{hasMonths && <SelectGroup>
+			{hasDaily && <SelectItem value={'daily'}>
+				{__('Daily')}
+			</SelectItem>}
+			{(hasMonths || hasAllMonths) && <SelectGroup>
 				<SelectLabel className={'pl-2'}>{__('Monthly')}</SelectLabel>
+				{hasAllMonths && <SelectItem value={'all'} className={'pl-4'}>
+					{__('All months')}
+				</SelectItem>}
 				{months.map((option) => (
 					<SelectItem key={option.value} value={option.value} className={'pl-4'}>
 						{option.label}
@@ -108,8 +128,8 @@ const FrequencySelect = ({
 	)
 
 	return (
-		<div className={'dropdown z-50'}>
-			<ControlTitle title={__('Frequencies')} tooltip={tooltip}/>
+		<div className={cn('dropdown z-50', className)}>
+			<ControlTitle title={__(title)} tooltip={tooltip}/>
 			<Select value={defaultValue} onValueChange={onValueChange}>
 				<SelectTrigger
 					className="w-full focus:ring-0 focus:ring-offset-0 text-cdc-black [&>svg]:text-brand-blue [&>svg]:opacity-100">

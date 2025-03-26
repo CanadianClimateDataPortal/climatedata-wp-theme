@@ -71,7 +71,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 		averagingOptions: {
 			allYears: true,
-			"30years": false
+			"30years": true
 		},
 		hasDelta: false,
 		defaultColourScheme: [

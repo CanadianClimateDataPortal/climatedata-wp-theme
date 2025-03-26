@@ -150,6 +150,9 @@ export interface ClimateVariableConfigInterface {
 
 	/** Contains available averaging options */
 	averagingOptions?: AveragingOptions;
+
+	/** Stores the selected averaging type */
+	averagingType?: AveragingType;
 }
 
 /**
@@ -187,6 +190,10 @@ export interface ClimateVariableInterface {
 	getAnalysisFieldValues(): FieldValues;
 
 	getAnalysisFieldValue(key: string): string | null;
+
+	getAveragingOptions(): AveragingOptions | null;
+
+	getAveragingType(): AveragingType | null;
 
 	renderMap(): React.ReactElement;
 

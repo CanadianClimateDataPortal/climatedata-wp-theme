@@ -13,6 +13,7 @@ import {
 } from "@/store/climate-variable-slice";
 import ClimateVariableBase from "@/lib/climate-variable-base";
 import {
+	AveragingType,
 	ClimateVariableConfigInterface,
 	ClimateVariableInterface, InteractiveRegionOption
 } from "@/types/climate-variable-interface";
@@ -122,6 +123,12 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		}))
 	}, [dispatch]);
 
+	const setAveragingType = useCallback((averagingType: AveragingType) => {
+		dispatch(updateClimateVariable({
+			averagingType
+		}));
+	}, [dispatch]);
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
@@ -130,7 +137,8 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		setThreshold,
 		setInteractiveRegion,
 		setFrequency,
-		setAnalysisFieldValue
+		setAnalysisFieldValue,
+		setAveragingType
 	}
 
 	return (

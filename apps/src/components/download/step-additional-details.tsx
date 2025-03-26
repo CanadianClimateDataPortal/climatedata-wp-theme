@@ -19,7 +19,10 @@ import {
 } from '@/features/download/download-slice';
 import { normalizeDropdownOptions } from '@/lib/format';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { FrequencyConfig } from "@/types/climate-variable-interface";
+import {
+	AveragingType,
+	FrequencyConfig
+} from "@/types/climate-variable-interface";
 import { FrequencySelect } from "@/components/frequency-select";
 import SectionContext from "@/context/section-provider";
 
@@ -28,14 +31,13 @@ import SectionContext from "@/context/section-provider";
  */
 const StepAdditionalDetails: React.FC = () => {
 	const { __ } = useI18n();
-	const { climateVariable, setFrequency } = useClimateVariable();
+	const { climateVariable, setFrequency, setAveragingType } = useClimateVariable();
 	const section = useContext(SectionContext);
 	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
 
 	const {
 		startYear,
 		endYear,
-		frequency,
 		emissionScenarios,
 		percentiles,
 		decimalPlace,
@@ -47,12 +49,18 @@ const StepAdditionalDetails: React.FC = () => {
 		yearRange.map((year) => ({ value: year, label: String(year) }))
 	);
 
-	const frequencyOptions = normalizeDropdownOptions([
-		__('Annual'),
-		__('Annual (July-June)'),
-		__('Seasonal'),
-		__('Monthly'),
-	]);
+	const averagingOptions = [
+		{
+			value: AveragingType.ALL_YEARS,
+			label: __('All years'),
+		},
+		{
+			value: AveragingType.THIRTY_YEARS,
+			label: __('30 years'),
+		},
+	].filter((option) =>
+		climateVariable?.getAveragingOptions()?.[option.value]
+	);
 
 	const emissionScenariosOptions = normalizeDropdownOptions([
 		'SSP5–8.5',
@@ -108,16 +116,16 @@ const StepAdditionalDetails: React.FC = () => {
 				section={section}
 				value={climateVariable?.getFrequency() ?? undefined}
 				onValueChange={setFrequency}
-				className={"sm:w-64 mb-8"}
+				className={"sm:w-64 mb-4"}
 			/>
 
 			<RadioGroupFactory
-				title={__('Temporal frequency')}
 				name="temporal-frequency"
 				className="max-w-md mb-8"
 				optionClassName="w-1/2"
-				options={frequencyOptions}
-				value={frequency}
+				options={averagingOptions}
+				value={climateVariable?.getAveragingType() ?? undefined}
+				onValueChange={setAveragingType}
 			/>
 
 			<CheckboxFactory

@@ -1,9 +1,10 @@
 import { createContext, useContext } from "react";
-import { PostData } from "@/types/types.ts";
+import { PostData } from "@/types/types";
 import {
+	AveragingType,
 	ClimateVariableInterface,
 	InteractiveRegionOption
-} from "@/types/climate-variable-interface.ts";
+} from "@/types/climate-variable-interface";
 
 // @todo move to climate-variable-interface.ts.
 export type ClimateVariableContextType = {
@@ -15,6 +16,7 @@ export type ClimateVariableContextType = {
 	setInteractiveRegion: (interactiveRegion: InteractiveRegionOption) => void;
 	setFrequency: (frequency: string) => void;
 	setAnalysisFieldValue: (key: string, value: string | null) => void;
+	setAveragingType: (type: AveragingType) => void;
 }
 
 const ClimateVariableContext = createContext<ClimateVariableContextType | null>(null);

@@ -25,38 +25,40 @@ import { cn } from '@/lib/utils';
 import { DEFAULT_MIN_ZOOM, DEFAULT_MAX_ZOOM } from '@/lib/constants';
 import {
 	setSelectionMode,
-	setInteractiveRegion,
 } from '@/features/download/download-slice';
 import { useMap } from '@/hooks/use-map';
-import {
-	REGION_GRID,
-	REGION_CENSUS,
-	REGION_HEALTH,
-	REGION_WATERSHED,
-} from '@/lib/constants';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { InteractiveRegionConfig, InteractiveRegionOption } from "@/types/climate-variable-interface";
 
 /**
  * Location step, allows the user to make a selection on the map and choose what type of region to select
  */
 const StepLocation: React.FC = () => {
 	const { __, _n } = useI18n();
+	const  { climateVariable, setInteractiveRegion } = useClimateVariable();
 
 	const gridLayerRef = useRef<{
 		clearSelection: () => void;
 	}>(null);
 
 	const { setMap } = useMap();
-	const { interactiveRegion, zoom, center, selectionMode, selectionCount } =
-		useAppSelector((state) => state.download);
+	const { zoom, center, selectionMode, selectionCount } = useAppSelector((state) => state.download);
 	const dispatch = useAppDispatch();
 
-	// TODO: fetch these values from the API
+	const interactiveRegion =climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA
+
 	const options = [
-		{ value: REGION_GRID, label: __('Grid Cells') },
-		{ value: REGION_CENSUS, label: __('Census Subdivisions') },
-		{ value: REGION_HEALTH, label: __('Health Regions') },
-		{ value: REGION_WATERSHED, label: __('Watersheds') },
+		{ value: InteractiveRegionOption.GRIDDED_DATA, label: __('Grid Cells') },
+		{ value: InteractiveRegionOption.CENSUS, label: __('Census Subdivisions') },
+		{ value: InteractiveRegionOption.HEALTH, label: __('Health Regions') },
+		{ value: InteractiveRegionOption.WATERSHED, label: __('Watersheds') },
 	];
+
+	const interactiveRegionConfig = climateVariable?.getInteractiveRegionConfig() ?? {} as InteractiveRegionConfig;
+
+	const availableOptions = options.filter((option) =>
+		(option.value in interactiveRegionConfig) && interactiveRegionConfig[option.value as InteractiveRegionOption]
+	);
 
 	const clearSelection = () => {
 		gridLayerRef.current?.clearSelection();
@@ -64,7 +66,7 @@ const StepLocation: React.FC = () => {
 
 	// conditionally render the grid layer based on the selected interactive region and selection mode
 	const renderGrid = () => {
-		if (interactiveRegion === REGION_GRID) {
+		if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
 			if (selectionMode === 'cells') {
 				return <SelectableCellsGridLayer ref={gridLayerRef} />;
 			}
@@ -89,17 +91,15 @@ const StepLocation: React.FC = () => {
 					<Dropdown
 						className="sm:w-64"
 						value={interactiveRegion}
-						options={options}
+						options={availableOptions}
 						label={__('Interactive Regions')}
 						tooltip={__('Select an option')}
-						onChange={(value) => {
-							dispatch(setInteractiveRegion(value));
-						}}
+						onChange={setInteractiveRegion}
 					/>
 				</div>
 
 				{/* these are only relevant for grid cells interactive region */}
-				{interactiveRegion === REGION_GRID && (
+				{interactiveRegion === InteractiveRegionOption.GRIDDED_DATA && (
 					<div className="mb-4">
 						<div className="flex flex-col sm:flex-row gap-4 justify-between items-start">
 							<RadioGroupFactory

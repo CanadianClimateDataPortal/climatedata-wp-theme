@@ -2,7 +2,6 @@ import {
 	ClimateVariableConfigInterface,
 	ClimateVariableInterface,
 	FrequencyConfig,
-	FrequencyOption,
 	InteractiveRegionConfig,
 	InteractiveRegionOption,
 	ScenarioInterface,
@@ -34,7 +33,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.thresholds ?? [];
 	}
 
-	getThreshold(): string | number | null {
+	getThreshold(): string | null {
 		return this._config.threshold || this._config.thresholds?.[0]?.value || null;
 	}
 
@@ -44,7 +43,11 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getScenario(): string | null {
-		return this._config.scenario ?? null;
+		// Check if the current scenario actually belongs to the current version.
+		// If not, return the first scenario that belongs to the current version.
+		const currentVersion = this.getVersion();
+		const filteredScenario = this.getScenarios()?.find((scenario) => scenario.value === this._config.scenario && scenario.version === currentVersion);
+		return filteredScenario?.value || this.getScenarios()?.[0]?.value || null;
 	}
 
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null {
@@ -52,14 +55,30 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getInteractiveRegion(): InteractiveRegionOption | null {
-		return this._config.interactiveRegion ?? null;
+		const interactiveRegionConfig = this.getInteractiveRegionConfig();
+
+		// If we have a region and is valid.
+		if (this._config.interactiveRegion && interactiveRegionConfig?.[this._config.interactiveRegion]) {
+			return this._config.interactiveRegion;
+		}
+
+		// Get the first region that's active.
+		if (interactiveRegionConfig) {
+			for (const [key, value] of Object.entries(interactiveRegionConfig)) {
+				if (value) {
+					return key as InteractiveRegionOption;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	getFrequencyConfig(): FrequencyConfig | null {
 		return this._config.frequencyConfig ?? null;
 	}
 
-	getFrequency(): FrequencyOption | null {
+	getFrequency(): string | null {
 		return this._config.frequency ?? null;
 	}
 

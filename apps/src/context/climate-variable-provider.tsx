@@ -4,7 +4,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from "@/app/hooks";
-import ClimateVariableContext from "@/hooks/use-climate-variable";
+import ClimateVariableContext, { ClimateVariableContextType } from "@/hooks/use-climate-variable";
 import { PostData } from "@/types/types";
 import {
 	setClimateVariable,
@@ -13,10 +13,14 @@ import {
 import ClimateVariableBase from "@/lib/climate-variable-base";
 import {
 	ClimateVariableConfigInterface,
-	ClimateVariableInterface
+	ClimateVariableInterface, InteractiveRegionOption
 } from "@/types/climate-variable-interface";
 
 type ClassMapType = Record<string, new (arg: ClimateVariableConfigInterface) => ClimateVariableInterface>;
+
+/**
+ * Maps climate variable class names to their corresponding class implementations.
+ */
 const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
 	"ClimateVariableBase": ClimateVariableBase
 };
@@ -86,10 +90,38 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		}));
 	}, [dispatch]);
 
-	const value = {
+	const setScenario = useCallback((scenario: string) => {
+		dispatch(updateClimateVariable({
+			scenario
+		}));
+	}, [dispatch]);
+
+	const setThreshold = useCallback((threshold: string) => {
+		dispatch(updateClimateVariable({
+			threshold
+		}));
+	}, [dispatch]);
+
+	const setInteractiveRegion = useCallback((interactiveRegion: InteractiveRegionOption) => {
+		dispatch(updateClimateVariable({
+			interactiveRegion
+		}));
+	}, [dispatch]);
+
+	const setFrequency = useCallback((frequency: string) => {
+		dispatch(updateClimateVariable({
+			frequency
+		}));
+	}, [dispatch]);
+
+	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
 		setVersion,
+		setScenario,
+		setThreshold,
+		setInteractiveRegion,
+		setFrequency
 	}
 
 	return (

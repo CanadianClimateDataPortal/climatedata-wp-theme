@@ -11,34 +11,26 @@ import { SidebarMenuItem } from '@/components/ui/sidebar';
 import Dropdown from '@/components/ui/dropdown';
 
 // other
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setInteractiveRegion } from '@/features/map/map-slice';
-import {
-	REGION_GRID,
-	REGION_CENSUS,
-	REGION_HEALTH,
-	REGION_WATERSHED,
-} from '@/lib/constants';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { InteractiveRegionConfig, InteractiveRegionOption } from "@/types/climate-variable-interface";
 
 const InteractiveRegionsDropdown: React.FC = () => {
 	const { __ } = useI18n();
+	const { climateVariable, setInteractiveRegion } = useClimateVariable();
 
-	const dispatch = useAppDispatch();
-	const interactiveValue = useAppSelector(
-		(state) => state.map.interactiveRegion
-	);
-
-	// TODO: fetch these values from the API
-	const options: { value: string; label: string }[] = [
-		{ value: REGION_GRID, label: __('Grid Cells') },
-		{ value: REGION_CENSUS, label: __('Census Subdivisions') },
-		{ value: REGION_HEALTH, label: __('Health Regions') },
-		{ value: REGION_WATERSHED, label: __('Watersheds') },
+	const options: { value: InteractiveRegionOption; label: string }[] = [
+		{ value: InteractiveRegionOption.GRIDDED_DATA, label: __('Grid Cells') },
+		{ value: InteractiveRegionOption.CENSUS, label: __('Census Subdivisions') },
+		{ value: InteractiveRegionOption.HEALTH, label: __('Health Regions') },
+		{ value: InteractiveRegionOption.WATERSHED, label: __('Watersheds') },
 	];
 
-	const handleInteractiveRegionChange = (value: string) => {
-		dispatch(setInteractiveRegion(value));
-	};
+	const interactiveRegionConfig = climateVariable?.getInteractiveRegionConfig() ?? {} as InteractiveRegionConfig;
+
+	// Filter options based on the config.
+	const availableOptions = options.filter((option) =>
+		(option.value in interactiveRegionConfig) && interactiveRegionConfig[option.value as InteractiveRegionOption]
+	);
 
 	const Tooltip = () => (
 		<div className="text-sm text-gray-500">
@@ -50,11 +42,11 @@ const InteractiveRegionsDropdown: React.FC = () => {
 		<SidebarMenuItem>
 			<Dropdown
 				placeholder={__('Select an option')}
-				options={options}
+				options={availableOptions}
 				label={__('Interactive Regions')}
 				tooltip={<Tooltip />}
-				value={interactiveValue}
-				onChange={handleInteractiveRegionChange}
+				value={climateVariable?.getInteractiveRegion() ?? undefined}
+				onChange={setInteractiveRegion}
 			/>
 		</SidebarMenuItem>
 	);

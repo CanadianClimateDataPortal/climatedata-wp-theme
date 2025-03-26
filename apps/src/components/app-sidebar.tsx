@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 import { BadgeInfo, MessageCircleQuestion } from 'lucide-react';
 import { useMap } from '@/hooks/use-map';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 import {
 	Sidebar,
@@ -27,6 +28,8 @@ import { FrequenciesDropdown } from '@/components/sidebar-menu-items/frequencies
 import { TimePeriodsControl } from '@/components/sidebar-menu-items/time-periods-control';
 import { DataValuesControl } from '@/components/sidebar-menu-items/data-values-control';
 import { MapColorsDropdown } from '@/components/sidebar-menu-items/map-colors-dropdown';
+import { VersionsDropdown } from "@/components/sidebar-menu-items/versions-dropdown";
+
 import {
 	RecentLocationsLink,
 	RecentLocationsPanel,
@@ -40,6 +43,7 @@ import { TaxonomyData, PostData } from '@/types/types';
  * A `Sidebar` component that provides a tabbed interface for exploring data or adjusting map settings.
  */
 export function AppSidebar() {
+	const { climateVariable, selectClimateVariable } = useClimateVariable();
 	const [selectedDataset, setSelectedDataset] = useState<TaxonomyData | null>(
 		null
 	);
@@ -49,6 +53,13 @@ export function AppSidebar() {
 	const { setExtendInfo } = useMap();
 
 	const { __ } = useI18n();
+
+	const handleSelectVariable = (variable: PostData) => {
+		setSelectedVariable(variable);
+		selectClimateVariable(variable);
+	}
+
+	const hasThreshold = climateVariable && climateVariable.getThresholds() && climateVariable.getThresholds().length > 0;
 
 	return (
 		<Sidebar>
@@ -70,7 +81,8 @@ export function AppSidebar() {
 									<VariablesMenuItem />
 									<SidebarSeparator />
 
-									<ThresholdValuesDropdown />
+									<VersionsDropdown />
+									{hasThreshold && <ThresholdValuesDropdown/>}
 									<SidebarSeparator />
 
 									<EmissionScenariosControl />
@@ -128,7 +140,7 @@ export function AppSidebar() {
 			/>
 			<VariablesPanel
 				selected={selectedVariable}
-				onSelect={setSelectedVariable}
+				onSelect={handleSelectVariable}
 			/>
 			<RecentLocationsPanel />
 		</Sidebar>

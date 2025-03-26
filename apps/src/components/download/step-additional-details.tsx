@@ -59,7 +59,7 @@ const StepAdditionalDetails: React.FC = () => {
 			label: __('30 years'),
 		},
 	].filter((option) =>
-		climateVariable?.getAveragingOptions()?.[option.value]
+		climateVariable?.getAveragingOptions()?.includes(option.value)
 	);
 
 	const emissionScenariosOptions = normalizeDropdownOptions([

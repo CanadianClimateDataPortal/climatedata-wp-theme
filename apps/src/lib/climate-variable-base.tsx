@@ -1,6 +1,5 @@
 import React from "react";
 import {
-	AveragingOptions,
 	AveragingType,
 	ClimateVariableConfigInterface,
 	ClimateVariableInterface,
@@ -112,25 +111,15 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.analysisFieldValues?.[key] ?? null;
 	}
 
-	getAveragingOptions(): AveragingOptions | null {
-		return this._config.averagingOptions ?? null;
+	getAveragingOptions(): AveragingType[] {
+		return this._config.averagingOptions ?? [];
 	}
 
 	getAveragingType(): AveragingType | null {
 		if (this._config.averagingType) {
-			return this._config.averagingType
+			return this._config.averagingType;
 		} else {
-			const averagingOptions = this.getAveragingOptions();
-
-			if (averagingOptions) {
-				for (const [key, value] of Object.entries(averagingOptions)) {
-					if (value) {
-						return key as AveragingType;
-					}
-				}
-			}
-
-			return null;
+			return this.getAveragingOptions()?.[0] ?? null;
 		}
 	}
 

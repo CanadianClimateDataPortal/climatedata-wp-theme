@@ -1,4 +1,5 @@
 import {
+	AveragingType,
 	ClimateVariableConfigInterface,
 	FrequencyDisplayModeOption,
 } from "@/types/climate-variable-interface";
@@ -69,10 +70,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			allMonths: FrequencyDisplayModeOption.DOWNLOAD,
 			daily: FrequencyDisplayModeOption.DOWNLOAD
 		},
-		averagingOptions: {
-			allYears: true,
-			"30years": true
-		},
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS
+		],
 		hasDelta: false,
 		defaultColourScheme: [
 			"#ffffcc",

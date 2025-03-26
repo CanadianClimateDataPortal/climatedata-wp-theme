@@ -77,10 +77,6 @@ export enum AveragingType {
 	THIRTY_YEARS = '30years'
 }
 
-export type AveragingOptions = {
-	[key in AveragingType]: boolean;
-}
-
 /**
  * Interface representing the configuration for a climate variable.
  */
@@ -149,7 +145,7 @@ export interface ClimateVariableConfigInterface {
 	dateRangeConfig?: DateRangeConfig;
 
 	/** Contains available averaging options */
-	averagingOptions?: AveragingOptions;
+	averagingOptions?: AveragingType[];
 
 	/** Stores the selected averaging type */
 	averagingType?: AveragingType;
@@ -191,7 +187,7 @@ export interface ClimateVariableInterface {
 
 	getAnalysisFieldValue(key: string): string | null;
 
-	getAveragingOptions(): AveragingOptions | null;
+	getAveragingOptions(): AveragingType[];
 
 	getAveragingType(): AveragingType | null;
 

@@ -1,3 +1,4 @@
+import React from "react";
 import { useI18n } from "@wordpress/react-i18n";
 import {
 	Select,
@@ -8,13 +9,18 @@ import {
 	SelectTrigger,
 	SelectValue
 } from "@/components/ui/select";
-import { FrequencyConfig, FrequencyDisplayModeOption } from "@/types/climate-variable-interface";
+import {
+	FrequencyConfig,
+	FrequencyDisplayModeOption
+} from "@/types/climate-variable-interface";
+import { ControlTitle } from "@/components/ui/control-title";
 
 interface FrequencySelectProps {
 	config: FrequencyConfig;
 	section: 'map' | 'download';
 	value: string | undefined;
 	placeholder?: string;
+	tooltip?: React.ReactNode;
 	onValueChange: (value: string) => void;
 }
 
@@ -23,6 +29,7 @@ const FrequencySelect = ({
 	section,
 	value,
 	placeholder,
+	tooltip,
 	onValueChange,
 }: FrequencySelectProps) => {
 	const { __ } = useI18n();
@@ -101,12 +108,16 @@ const FrequencySelect = ({
 	)
 
 	return (
-		<Select value={defaultValue} onValueChange={onValueChange}>
-			<SelectTrigger className="w-full focus:ring-0 focus:ring-offset-0 text-cdc-black [&>svg]:text-brand-blue [&>svg]:opacity-100">
-				<SelectValue placeholder={placeholder && __(placeholder)} />
-				<FrequencyOptions />
-			</SelectTrigger>
-		</Select>
+		<div className={'dropdown z-50'}>
+			<ControlTitle title={__('Frequencies')} tooltip={tooltip}/>
+			<Select value={defaultValue} onValueChange={onValueChange}>
+				<SelectTrigger
+					className="w-full focus:ring-0 focus:ring-offset-0 text-cdc-black [&>svg]:text-brand-blue [&>svg]:opacity-100">
+					<SelectValue placeholder={placeholder && __(placeholder)}/>
+					<FrequencyOptions/>
+				</SelectTrigger>
+			</Select>
+		</div>
 	);
 }
 

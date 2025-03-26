@@ -8,7 +8,6 @@ import { useI18n } from '@wordpress/react-i18n';
 
 // components
 import { SidebarMenuItem } from '@/components/ui/sidebar';
-import { ControlTitle } from "@/components/ui/control-title";
 
 // other
 import SectionContext from "@/context/section-provider";
@@ -31,16 +30,14 @@ const FrequenciesDropdown: React.FC = () => {
 
 	return (
 		<SidebarMenuItem>
-			<div className={'dropdown z-50'}>
-				<ControlTitle title={__('Frequencies')} tooltip={<Tooltip />} />
-				<FrequencySelect
-					config={frequencyConfig}
-					section={section}
-					value={defaultValue}
-					placeholder={'Select an option'}
-					onValueChange={setFrequency}
-				/>
-			</div>
+			<FrequencySelect
+				config={frequencyConfig}
+				section={section}
+				value={defaultValue}
+				placeholder={'Select an option'}
+				tooltip={<Tooltip />}
+				onValueChange={setFrequency}
+			/>
 		</SidebarMenuItem>
 	);
 };

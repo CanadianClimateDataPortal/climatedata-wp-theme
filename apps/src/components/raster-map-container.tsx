@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 
 import MapLegend from '@/components/map-layers/map-legend';
-import VariableLayer from '@/components/map-layers/variable';
+import VariableLayer from '@/components/map-layers/variable-layer';
 import CustomPanesLayer from '@/components/map-layers/custom-panes';
 import ZoomControl from '@/components/map-layers/zoom-control';
 import MapEvents from '@/components/map-layers/map-events';
@@ -35,8 +35,7 @@ export default function RasterMapContainer({
 
 	const { climateVariable } = useClimateVariable();
 
-	// construct the URL for the map legend to get its data
-	const mapLegendUrl = useMemo(() => {
+	const layerValue: string = useMemo(() => {
 		let version;
 		if (climateVariable) {
 			version = climateVariable.getVersion() === 'cmip5' ? '' : climateVariable.getVersion();
@@ -55,20 +54,20 @@ export default function RasterMapContainer({
 			frequencyCode = 'qsdec';
 		}
 
-		const layerName = [
-			version,
-			threshold,
-			frequencyCode,
-			scenario,
-			'p50',
-			frequency,
-			'30year',
-		]
+		const value = [
+				version,
+				threshold,
+				frequencyCode,
+				scenario,
+				'p50',
+				frequency,
+				'30year',
+			]
 			.filter(Boolean)
-			.join('-'); // Remove empty values before joining
+			.join('-');
 
-		return `${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=CDC:${layerName}`;
-	}, [climateVariable]);
+		return `CDC:${value}`;
+	}, [climateVariable])
 
 	return (
 		<MapContainer
@@ -81,9 +80,9 @@ export default function RasterMapContainer({
 			className="z-10" // important to keep the map below other interactive elements
 		>
 			<MapEvents onMapReady={onMapReady} onUnmount={onUnmount} />
-			<MapLegend url={mapLegendUrl} />
+			<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
 			<CustomPanesLayer />
-			<VariableLayer />
+			<VariableLayer layerValue={layerValue} />
 			<ZoomControl />
 			<SearchControl />
 

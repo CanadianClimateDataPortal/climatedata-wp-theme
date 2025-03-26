@@ -2,6 +2,8 @@ import React from "react";
 import {
 	ClimateVariableConfigInterface,
 	ClimateVariableInterface,
+	FieldConfig,
+	FieldValues,
 	FrequencyConfig,
 	InteractiveRegionConfig,
 	InteractiveRegionOption,
@@ -94,6 +96,18 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getColourOptionsStatus(): boolean {
 		return this._config.enableColourOptions ?? false;
+	}
+
+	getAnalysisFields(): FieldConfig[] {
+		return this._config.analysisFields ?? [];
+	}
+
+	getAnalysisFieldValues(): FieldValues {
+		return this._config.analysisFieldValues ?? {};
+	}
+
+	getAnalysisFieldValue(key: keyof FieldValues): string | null {
+		return this._config.analysisFieldValues?.[key] ?? null;
 	}
 
 	toObject(): ClimateVariableConfigInterface {

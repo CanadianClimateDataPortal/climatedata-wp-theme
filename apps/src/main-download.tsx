@@ -7,13 +7,19 @@ import { Provider } from 'react-redux';
 
 import App from '@/components/download/app';
 import { store } from '@/app/store';
+import SectionContext from "@/context/section-provider";
 
 import '@/Global.css';
+import { ClimateVariableProvider } from "@/context/climate-variable-provider";
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
 		<Provider store={store}>
-			<App />
+			<SectionContext.Provider value={'download'}>
+				<ClimateVariableProvider>
+					<App />
+				</ClimateVariableProvider>
+			</SectionContext.Provider>
 		</Provider>
 	</StrictMode>
 );

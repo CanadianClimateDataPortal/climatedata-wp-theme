@@ -14,6 +14,7 @@ export type ClimateVariableContextType = {
 	setThreshold: (threshold: string) => void;
 	setInteractiveRegion: (interactiveRegion: InteractiveRegionOption) => void;
 	setFrequency: (frequency: string) => void;
+	setAnalysisFieldValue: (key: string, value: string | null) => void;
 }
 
 const ClimateVariableContext = createContext<ClimateVariableContextType | null>(null);

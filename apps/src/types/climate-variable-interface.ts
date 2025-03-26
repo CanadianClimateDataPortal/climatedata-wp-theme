@@ -44,6 +44,26 @@ export type FrequencyConfig = {
 	[K in FrequencyOption]: FrequencyDisplayModeOption;
 }
 
+export interface FieldConfig {
+	key: string;
+	type: 'input' | 'select';
+	label: string;
+	description?: string;
+	help?: string;
+	attributes?: {
+		type?: 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
+		placeholder?: string;
+	};
+	options?: Array<{
+		value: string | number;
+		label: string;
+	}>;
+}
+
+export interface FieldValues {
+	[key: string]: string | null;
+}
+
 /**
  * Interface representing the configuration for a climate variable.
  */
@@ -101,6 +121,13 @@ export interface ClimateVariableConfigInterface {
 
 	/** Flag indicating whether color options are enabled */
 	enableColourOptions?: boolean;
+
+	/** An array of FieldConfigs used in the Download section */
+	analysisFields?: FieldConfig[];
+
+	/** Holds submitted values for analysisFields */
+	analysisFieldValues?: FieldValues;
+
 }
 
 /**
@@ -132,6 +159,12 @@ export interface ClimateVariableInterface {
 	getColourScheme(): string[];
 
 	getColourOptionsStatus(): boolean;
+
+	getAnalysisFields(): FieldConfig[];
+
+	getAnalysisFieldValues(): FieldValues;
+
+	getAnalysisFieldValue(key: string): string | null;
 
 	renderMap(): React.ReactElement;
 

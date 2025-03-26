@@ -8,7 +8,8 @@ import ClimateVariableContext, { ClimateVariableContextType } from "@/hooks/use-
 import { PostData } from "@/types/types";
 import {
 	setClimateVariable,
-	updateClimateVariable
+	updateClimateVariable,
+	updateClimateVariableAnalysisFieldValue
 } from "@/store/climate-variable-slice";
 import ClimateVariableBase from "@/lib/climate-variable-base";
 import {
@@ -114,6 +115,13 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		}));
 	}, [dispatch]);
 
+	const setAnalysisFieldValue = useCallback((key: string, value: string | null) => {
+		dispatch(updateClimateVariableAnalysisFieldValue({
+			key,
+			value
+		}))
+	}, [dispatch]);
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
@@ -121,7 +129,8 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		setScenario,
 		setThreshold,
 		setInteractiveRegion,
-		setFrequency
+		setFrequency,
+		setAnalysisFieldValue
 	}
 
 	return (

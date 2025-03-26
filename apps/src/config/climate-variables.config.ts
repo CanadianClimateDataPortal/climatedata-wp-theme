@@ -96,5 +96,29 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			"#800026",
 		],
 		enableColourOptions: true,
+		analysisFields: [
+			{
+				key: "tasmin",
+				type: "input",
+				label: "Tasmin",
+				description: "Tasmin description",
+				help: "Tasmin help",
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
+				key: "tasmax",
+				type: "input",
+				label: "Tasmax",
+				description: "Tasmax description",
+				help: "Tasmax help",
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			}
+		],
 	},
 ];

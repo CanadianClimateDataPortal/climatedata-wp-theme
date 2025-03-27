@@ -1,6 +1,7 @@
 import ClimateVariableBase from "@/lib/climate-variable-base";
 import {
 	AveragingType,
+	DateRangeConfig,
 	FileFormatType,
 	FrequencyConfig,
 	FrequencyDisplayModeOption,
@@ -64,6 +65,14 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 			FileFormatType.JSON,
 			FileFormatType.NetCDF,
 		];
+	}
+
+	getDateRangeConfig(): DateRangeConfig | null {
+		return {
+			min: "1950",
+			max: "2100",
+			interval: 30
+		};
 	}
 }
 

@@ -929,3 +929,12 @@ function build_apps_body ( $form_data ) {
 	$body .= '</span></p>';
 	return $body;
 }
+
+/**
+ * Load REST API V3.
+ */
+$rest_v3_init_path = dirname( __FILE__ ) . '/rest-v3/init.php';
+
+if ( file_exists( $rest_v3_init_path ) ) {
+	require_once $rest_v3_init_path;
+}

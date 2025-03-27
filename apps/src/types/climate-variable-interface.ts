@@ -159,6 +159,7 @@ export interface ClimateVariableConfigInterface {
 	/** Configuration defining the date range to be used in the Download section */
 	dateRangeConfig?: DateRangeConfig;
 
+	/** Stores the selected date range */
 	dateRange?: string[] | null;
 
 	/** Contains available averaging options */
@@ -166,6 +167,12 @@ export interface ClimateVariableConfigInterface {
 
 	/** Stores the selected averaging type */
 	averagingType?: AveragingType;
+
+	/** Available percentile options used for analysis */
+	percentileOptions?: string[];
+
+	/** Stores the selected percentiles */
+	percentiles?: string[];
 
 	/** Determines if the variable data must be analyzed or is already precalculated. */
 	downloadType?: DownloadType;
@@ -219,6 +226,10 @@ export interface ClimateVariableInterface {
 	getAveragingOptions(): AveragingType[];
 
 	getAveragingType(): AveragingType | null;
+
+	getPercentileOptions(): string[];
+
+	getPercentiles(): string[];
 
 	getDownloadType(): DownloadType | null;
 

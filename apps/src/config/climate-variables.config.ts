@@ -136,6 +136,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			}
 		],
+		percentileOptions: [ "5", "10", "25", "50", "75", "90", "95", ],
 		downloadType: DownloadType.ANALYZED,
 		fileFormatTypes: [
 			FileFormatType.CSV,

@@ -8,11 +8,6 @@ import {
 	StepContainerDescription,
 } from '@/components/download/step-container';
 
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import {
-	setPercentiles,
-} from '@/features/download/download-slice';
-import { normalizeDropdownOptions } from '@/lib/format';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import {
 	AveragingType,
@@ -28,14 +23,9 @@ import { YearRange } from "@/components/year-range";
  */
 const StepAdditionalDetails: React.FC = () => {
 	const { __ } = useI18n();
-	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios } = useClimateVariable();
+	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios, setPercentiles } = useClimateVariable();
 	const section = useContext(SectionContext);
 	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
-
-	const {
-		percentiles,
-	} = useAppSelector((state) => state.download);
-	const dispatch = useAppDispatch();
 
 	const averagingOptions = [
 		{
@@ -49,16 +39,6 @@ const StepAdditionalDetails: React.FC = () => {
 	].filter((option) =>
 		climateVariable?.getAveragingOptions()?.includes(option.value)
 	);
-
-	const percentilesOptions = normalizeDropdownOptions([
-		'05',
-		'10',
-		'25',
-		'50',
-		'75',
-		'90',
-		'95',
-	]);
 
 	const dateRangeConfig = climateVariable?.getDateRangeConfig();
 	const dateRange = climateVariable?.getDateRange() ?? [];
@@ -116,19 +96,19 @@ const StepAdditionalDetails: React.FC = () => {
 				/>
 			}
 
-			<CheckboxFactory
-				name="percentiles"
-				title={__('Percentiles')}
-				tooltip={__('Select percentiles')}
-				orientation="horizontal"
-				className="max-w-md mb-8"
-				optionClassName="w-1/4"
-				options={percentilesOptions}
-				values={percentiles}
-				onChange={(values) => {
-					dispatch(setPercentiles(values));
-				}}
-			/>
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED &&
+				<CheckboxFactory
+					name="percentiles"
+					title={__('Percentiles')}
+					tooltip={__('Select percentiles')}
+					orientation="horizontal"
+					className="max-w-md mb-8"
+					optionClassName="w-1/4"
+					options={climateVariable?.getPercentileOptions() ?? []}
+					values={climateVariable?.getPercentiles() ?? []}
+					onChange={setPercentiles}
+				/>
+			}
 		</StepContainer>
 	);
 };

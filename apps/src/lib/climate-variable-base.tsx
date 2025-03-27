@@ -138,6 +138,14 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		}
 	}
 
+	getPercentileOptions(): string[] {
+		return this._config.percentileOptions ?? [];
+	}
+
+	getPercentiles(): string[] {
+		return this._config.percentiles ?? [];
+	}
+
 	getDownloadType(): DownloadType | null {
 		return this._config.downloadType ?? null;
 	}

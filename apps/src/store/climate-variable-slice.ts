@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { ClimateVariables } from "@/config/climate-variables.config.ts";
-import { ClimateVariableConfigInterface } from "@/types/climate-variable-interface.ts";
+import { ClimateVariables } from "@/config/climate-variables.config";
+import { ClimateVariableConfigInterface } from "@/types/climate-variable-interface";
 
 interface ClimateVariableStateInterface {
 	data: ClimateVariableConfigInterface;

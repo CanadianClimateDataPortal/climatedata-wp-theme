@@ -30,6 +30,7 @@ export type ClimateVariableContextType = {
 	setAnalysisFieldValue: (key: string, value: string | null) => void;
 	setAveragingType: (type: AveragingType) => void;
 	setDateRange: (dates: string[]) => void;
+	setPercentiles: (percentiles: string[]) => void;
 }
 
 type ClassMapType = Record<string, new (arg: ClimateVariableConfigInterface) => ClimateVariableInterface>;
@@ -155,6 +156,12 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		}));
 	}, [dispatch]);
 
+	const setPercentiles = useCallback((percentiles: string[]) => {
+		dispatch(updateClimateVariable({
+			percentiles
+		}));
+	}, [dispatch]);
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
@@ -167,6 +174,7 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		setAnalysisFieldValue,
 		setAveragingType,
 		setDateRange,
+		setPercentiles,
 	}
 
 	return (

@@ -16,6 +16,7 @@ import {
 	VersionInterface,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
+import RasterMapDownload from "@/components/download/raster-map-download";
 
 /**
  * A base class representing a climate variable and its configuration. This class provides methods
@@ -162,6 +163,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	renderMap(): React.ReactElement {
 		return <RasterMap />
+	}
+
+	renderDownloadMap(): React.ReactElement {
+		return <RasterMapDownload />;
 	}
 }
 

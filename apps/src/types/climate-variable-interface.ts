@@ -234,5 +234,7 @@ export interface ClimateVariableInterface {
 
 	renderMap(): React.ReactElement;
 
+	renderDownloadMap(): React.ReactElement;
+
 	toObject(): ClimateVariableConfigInterface;
 }

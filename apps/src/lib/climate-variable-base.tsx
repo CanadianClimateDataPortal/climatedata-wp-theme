@@ -13,7 +13,6 @@ import {
 	InteractiveRegionOption,
 	ScenarioInterface,
 	ThresholdInterface,
-	VersionInterface,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
 import RasterMapDownload from "@/components/download/raster-map-download";
@@ -30,12 +29,12 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		this._config = config;
 	}
 
-	getVersions(): VersionInterface[] {
+	getVersions(): string[] {
 		return this._config.versions ?? [];
 	}
 
 	getVersion(): string | null {
-		return this._config.version || this._config.versions?.[0]?.value || null;
+		return this._config.version || this._config.versions?.[0] || null;
 	}
 
 	getThresholds(): ThresholdInterface[] {

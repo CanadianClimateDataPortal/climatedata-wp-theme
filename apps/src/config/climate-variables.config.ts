@@ -9,17 +9,11 @@ import {
 
 export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	{
-		id: "hottest_day",
+		id: "test_variable",
 		class: "ClimateVariableBase",
 		versions: [
-			{
-				value: "cmip5",
-				label: "CMIP5",
-			},
-			{
-				value: "cmip6",
-				label: "CMIP6",
-			}
+			"cmip5",
+			"cmip6"
 		],
 		thresholds: [
 			{

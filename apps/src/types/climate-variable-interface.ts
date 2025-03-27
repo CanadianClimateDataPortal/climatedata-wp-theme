@@ -1,10 +1,5 @@
 import React from "react";
 
-export interface VersionInterface {
-	value: string;
-	label: string;
-}
-
 export interface ScenarioInterface {
 	value: string;
 	label: string;
@@ -103,7 +98,7 @@ export interface ClimateVariableConfigInterface {
 	class: string;
 
 	/** Available versions for this climate variable */
-	versions?: VersionInterface[];
+	versions?: string[];
 
 	/** Selected version for this climate variable */
 	version?: string | null;
@@ -182,7 +177,7 @@ export interface ClimateVariableConfigInterface {
  * Interface representing functionality for handling climate variables and their configurations.
  */
 export interface ClimateVariableInterface {
-	getVersions(): VersionInterface[];
+	getVersions(): string[];
 
 	getVersion(): string | null;
 

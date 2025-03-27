@@ -28,6 +28,16 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		threshold: "tn_min",
 	},
 	{
+		id: "all_candcs_variables",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "all",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+	},
+	{
 		id: "test_variable",
 		class: "ClimateVariableBase",
 		versions: [

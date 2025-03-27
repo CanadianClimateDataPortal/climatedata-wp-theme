@@ -73,11 +73,6 @@ function cdc_rest_v3_endpoint_permission() {
 		if ( ! empty( $origin_host ) && $origin_host === $site_url ) {
 			$is_same_domain = true;
 		}
-
-		// Allow local environment (useful when testing against production).
-		if ( WP_DEBUG && in_array( $request_host, [ 'dev-en.climatedata.ca', 'dev-fr.climatedata.ca' ] ) ) {
-			$is_same_domain = true;
-		}
 	}
 
 	// Log unauthorized attempts if logging is enabled.

@@ -12,7 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Register custom REST API endpoints for retrieving
- * datasets list,
+ * datasets list.
  */
 register_rest_route(
 	'cdc/v3',

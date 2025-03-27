@@ -176,7 +176,6 @@ function cdc_rest_v3_get_datasets_args() {
 			'default'           => -1,
 			'minimum'           => -1,
 			'maximum'           => 100,
-			'sanitize_callback' => 'cdc_rest_v3_sanitize_arg_per_page',
 		),
 		'paged'           => array(
 			'description'       => 'Current page number',

@@ -58,7 +58,7 @@ const FrequencySelect = ({
 	let defaultValue = value ?? undefined;
 	if (!defaultValue) {
 		if (hasAnnual) {
-			defaultValue = 'ann';
+			defaultValue = FrequencyType.ANNUAL;
 		} else if (hasMonths) {
 			defaultValue = 'jan';
 		} else if (hasSeasons) {
@@ -90,18 +90,18 @@ const FrequencySelect = ({
 
 	const FrequencyOptions = () => (
 		<SelectContent>
-			{hasAnnual && <SelectItem value={'ann'}>
+			{hasAnnual && <SelectItem value={FrequencyType.ANNUAL}>
 				{__('Annual')}
 			</SelectItem>}
 			{hasAnnualJulJun && <SelectItem value={FrequencyType.ANNUAL_JUL_JUN}>
 				{__('Annual (July to June)')}
 			</SelectItem>}
-			{hasDaily && <SelectItem value={'daily'}>
+			{hasDaily && <SelectItem value={FrequencyType.DAILY}>
 				{__('Daily')}
 			</SelectItem>}
 			{(hasMonths || hasAllMonths) && <SelectGroup>
 				<SelectLabel className={'pl-2'}>{__('Monthly')}</SelectLabel>
-				{hasAllMonths && <SelectItem value={'all'} className={'pl-4'}>
+				{hasAllMonths && <SelectItem value={FrequencyType.ALL_MONTHS} className={'pl-4'}>
 					{__('All months')}
 				</SelectItem>}
 				{months.map((option) => (

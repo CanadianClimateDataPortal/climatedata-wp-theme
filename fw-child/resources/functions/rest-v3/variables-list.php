@@ -56,9 +56,9 @@ function cdc_rest_v3_get_variables_list( $request ) {
 		if ( ! empty( $app ) ) {
 			$meta_query = array(
 				array(
-					'key'     => $app === 'map' ? 'map' : 'download',
-					'value'   => '1',
-					'compare' => '=',
+					'key'     => 'variable_availability',
+					'value'   => '"' . $app . '"',
+					'compare' => 'LIKE',
 				),
 			);
 

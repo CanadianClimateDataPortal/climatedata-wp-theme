@@ -21,38 +21,18 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				label: "",
 			}
 		],
-		scenarios: [
-			{
-				value: "rcp26",
-				label: "RCP 2.6",
-				version: "cmip5",
-			},
-			{
-				value: "rcp45",
-				label: "RCP 4.5",
-				version: "cmip5",
-			},
-			{
-				value: "rcp85",
-				label: "RCP 8.5",
-				version: "cmip5",
-			},
-			{
-				value: "ssp126",
-				label: "SSP 1–2.6",
-				version: "cmip6",
-			},
-			{
-				value: "ssp245",
-				label: "SSP 2–4.5",
-				version: "cmip6",
-			},
-			{
-				value: "ssp585",
-				label: "SSP 5–8.5",
-				version: "cmip6",
-			},
-		],
+		scenarios: {
+			cmip5: [
+				"rcp26",
+				"rcp45",
+				"rcp85",
+			],
+			cmip6: [
+				"ssp126",
+				"ssp245",
+				"ssp585",
+			],
+		},
 		interactiveRegionConfig: {
 			gridded_data: true,
 			census: true,

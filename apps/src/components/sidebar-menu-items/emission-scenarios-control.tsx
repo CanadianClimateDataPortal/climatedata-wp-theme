@@ -20,6 +20,7 @@ import {
 	setEmissionScenarioCompare,
 	setEmissionScenarioCompareTo,
 } from '@/features/map/map-slice';
+import appConfig from "@/config/app.config";
 
 const EmissionScenariosControl: React.FC = () => {
 	const { __ } = useI18n();
@@ -45,6 +46,10 @@ const EmissionScenariosControl: React.FC = () => {
 		</div>
 	);
 
+	const scenarioOptions = appConfig.scenarios.filter((scenario) =>
+		climateVariable?.getScenarios()?.includes(scenario.value)
+	);
+
 	return (
 		<SidebarMenuItem>
 			<div className="flex flex-col gap-4">
@@ -52,7 +57,7 @@ const EmissionScenariosControl: React.FC = () => {
 					label={__('Emissions Scenarios')}
 					tooltip={<Tooltip />}
 					placeholder={__('Select an option')}
-					options={climateVariable?.getScenarios() ?? []}
+					options={scenarioOptions}
 					value={climateVariable?.getScenario() ?? undefined}
 					onChange={setScenario}
 				/>
@@ -74,7 +79,7 @@ const EmissionScenariosControl: React.FC = () => {
 
 				{emissionScenarioCompare && (
 					<Dropdown
-						options={climateVariable?.getScenarios()?.filter(
+						options={scenarioOptions.filter(
 							(option) => option.value !== climateVariable?.getScenario()
 						) ?? []}
 						value={emissionScenarioCompareTo}

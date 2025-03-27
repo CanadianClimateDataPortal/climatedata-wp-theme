@@ -11,7 +11,6 @@ import {
 	FrequencyConfig,
 	InteractiveRegionConfig,
 	InteractiveRegionOption,
-	ScenarioInterface,
 	ThresholdInterface,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
@@ -45,17 +44,20 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.threshold || this._config.thresholds?.[0]?.value || null;
 	}
 
-	getScenarios(): ScenarioInterface[] {
+	getScenarios(): string[] {
 		// Only retrieve scenarios matching the current version.
-		return this._config.scenarios?.filter((scenario) => scenario.version === this.getVersion()) ?? [];
+		const version = this.getVersion() || Object.keys(this._config.scenarios ?? {})[0];
+		return version ? this._config.scenarios?.[version] ?? [] : [];
 	}
 
 	getScenario(): string | null {
 		// Check if the current scenario actually belongs to the current version.
 		// If not, return the first scenario that belongs to the current version.
-		const currentVersion = this.getVersion();
-		const filteredScenario = this.getScenarios()?.find((scenario) => scenario.value === this._config.scenario && scenario.version === currentVersion);
-		return filteredScenario?.value || this.getScenarios()?.[0]?.value || null;
+		const currentScenario = this._config.scenario;
+		if (currentScenario && this.getScenarios().includes(currentScenario)) {
+			return currentScenario;
+		}
+		return this.getScenarios()[0] || null;
 	}
 
 	getAnalyzeScenarios(): string[] {

@@ -17,6 +17,7 @@ import {
 import { FrequencySelect } from "@/components/frequency-select";
 import SectionContext from "@/context/section-provider";
 import { YearRange } from "@/components/year-range";
+import appConfig from "@/config/app.config";
 
 /**
  * Additional details step will allow the user to customize the download request
@@ -42,6 +43,9 @@ const StepAdditionalDetails: React.FC = () => {
 
 	const dateRangeConfig = climateVariable?.getDateRangeConfig();
 	const dateRange = climateVariable?.getDateRange() ?? [];
+	const scenarioOptions = appConfig.scenarios.filter((scenario) =>
+		climateVariable?.getScenarios()?.includes(scenario.value)
+	);
 
 	return (
 		<StepContainer title="Additional details">
@@ -90,7 +94,7 @@ const StepAdditionalDetails: React.FC = () => {
 					orientation="horizontal"
 					className="max-w-md mb-8"
 					optionClassName="w-1/2 sm:w-1/4"
-					options={climateVariable?.getScenarios() ?? []}
+					options={scenarioOptions}
 					values={climateVariable?.getAnalyzeScenarios()}
 					onChange={setAnalyzeScenarios}
 				/>

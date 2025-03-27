@@ -1,9 +1,7 @@
 import React from "react";
 
-export interface ScenarioInterface {
-	value: string;
-	label: string;
-	version: string;
+export interface ScenariosInterface {
+	[key: string]: string[];
 }
 
 export interface ThresholdInterface {
@@ -110,7 +108,7 @@ export interface ClimateVariableConfigInterface {
 	threshold?: string | null;
 
 	/** Available scenarios linked to this climate variable */
-	scenarios?: ScenarioInterface[];
+	scenarios?: ScenariosInterface;
 
 	/** Selected scenario value */
 	scenario?: string | null;
@@ -185,7 +183,7 @@ export interface ClimateVariableInterface {
 
 	getThreshold(): string | null;
 
-	getScenarios(): ScenarioInterface[];
+	getScenarios(): string[];
 
 	getScenario(): string | null;
 

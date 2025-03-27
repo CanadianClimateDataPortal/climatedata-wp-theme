@@ -136,7 +136,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			}
 		],
-		downloadType: DownloadType.PRECALCULATED,
+		downloadType: DownloadType.ANALYZED,
 		fileFormatTypes: [
 			FileFormatType.CSV,
 			FileFormatType.JSON,

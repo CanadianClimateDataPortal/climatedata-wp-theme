@@ -12,14 +12,14 @@ import {
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
 	setDecimalPlace,
-	setEmissionScenarios,
 	setPercentiles,
 } from '@/features/download/download-slice';
 import { normalizeDropdownOptions } from '@/lib/format';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import {
 	AveragingType,
-	FrequencyConfig
+	DownloadType,
+	FrequencyConfig,
 } from "@/types/climate-variable-interface";
 import { FrequencySelect } from "@/components/frequency-select";
 import SectionContext from "@/context/section-provider";
@@ -30,12 +30,11 @@ import { YearRange } from "@/components/year-range";
  */
 const StepAdditionalDetails: React.FC = () => {
 	const { __ } = useI18n();
-	const { climateVariable, setFrequency, setAveragingType, setDateRange } = useClimateVariable();
+	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios } = useClimateVariable();
 	const section = useContext(SectionContext);
 	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
 
 	const {
-		emissionScenarios,
 		percentiles,
 		decimalPlace,
 	} = useAppSelector((state) => state.download);
@@ -53,12 +52,6 @@ const StepAdditionalDetails: React.FC = () => {
 	].filter((option) =>
 		climateVariable?.getAveragingOptions()?.includes(option.value)
 	);
-
-	const emissionScenariosOptions = normalizeDropdownOptions([
-		'SSP5–8.5',
-		'SSP1–2.6',
-		'SSP2–4.5',
-	]);
 
 	const percentilesOptions = normalizeDropdownOptions([
 		'05',
@@ -116,19 +109,19 @@ const StepAdditionalDetails: React.FC = () => {
 				onValueChange={setAveragingType}
 			/>
 
-			<CheckboxFactory
-				name="emission-scenarios"
-				title={__('Emissions Scenarios')}
-				tooltip={__('Select emission scenarios')}
-				orientation="horizontal"
-				className="max-w-md mb-8"
-				optionClassName="w-1/2 sm:w-1/4"
-				options={emissionScenariosOptions}
-				values={emissionScenarios}
-				onChange={(values) => {
-					dispatch(setEmissionScenarios(values));
-				}}
-			/>
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED &&
+				<CheckboxFactory
+					name="emission-scenarios"
+					title={__('Emissions Scenarios')}
+					tooltip={__('Select emission scenarios')}
+					orientation="horizontal"
+					className="max-w-md mb-8"
+					optionClassName="w-1/2 sm:w-1/4"
+					options={climateVariable?.getScenarios() ?? []}
+					values={climateVariable?.getAnalyzeScenarios()}
+					onChange={setAnalyzeScenarios}
+				/>
+			}
 
 			<CheckboxFactory
 				name="percentiles"

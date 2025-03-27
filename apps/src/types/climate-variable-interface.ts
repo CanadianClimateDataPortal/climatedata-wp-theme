@@ -123,6 +123,9 @@ export interface ClimateVariableConfigInterface {
 	/** Selected scenario value */
 	scenario?: string | null;
 
+	/** Selected scenarios for analysis */
+	analyzeScenarios?: string[];
+
 	/** Configuration defining interactive region options and their status */
 	interactiveRegionConfig?: InteractiveRegionConfig;
 
@@ -186,6 +189,8 @@ export interface ClimateVariableInterface {
 	getScenarios(): ScenarioInterface[];
 
 	getScenario(): string | null;
+
+	getAnalyzeScenarios(): string[];
 
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null;
 

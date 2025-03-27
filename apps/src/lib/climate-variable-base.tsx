@@ -58,6 +58,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return filteredScenario?.value || this.getScenarios()?.[0]?.value || null;
 	}
 
+	getAnalyzeScenarios(): string[] {
+		return this._config.analyzeScenarios ?? [];
+	}
+
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null {
 		return this._config.interactiveRegionConfig ?? null;
 	}

@@ -54,7 +54,7 @@ const StepAdditionalDetails: React.FC = () => {
 				{__('Adjust the controls below to customize your analysis.')}
 			</StepContainerDescription>
 
-			{dateRangeConfig &&
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED && dateRangeConfig &&
 				<YearRange
 					startYear={{
 						label: __('Start Year'),

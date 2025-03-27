@@ -4,7 +4,8 @@ import {
 	DownloadType,
 	FileFormatType,
 	FrequencyDisplayModeOption,
-	FrequencyType, InteractiveRegionOption,
+	FrequencyType,
+	InteractiveRegionOption,
 } from "@/types/climate-variable-interface";
 
 export const ClimateVariables: ClimateVariableConfigInterface[] = [

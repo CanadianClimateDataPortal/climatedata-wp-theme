@@ -17,7 +17,7 @@ import {
 	ClimateVariableConfigInterface,
 	ClimateVariableInterface, InteractiveRegionOption
 } from "@/types/climate-variable-interface";
-import RasterPrecalculatedClimateVariable from "@/lib/raster-precalculated-climate-variable.tsx";
+import RasterPrecalculatedClimateVariable from "@/lib/raster-precalculated-climate-variable";
 
 export type ClimateVariableContextType = {
 	climateVariable: ClimateVariableInterface | null;

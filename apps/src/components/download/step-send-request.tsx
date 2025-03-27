@@ -36,8 +36,9 @@ const StepSendRequest: React.FC = () => {
 		climateVariable?.getFileFormatTypes()?.includes(option.value)
 	);
 
+	const maxDecimals = climateVariable?.getMaxDecimals() ?? 0;
 	const decimalPlaceOptions = normalizeDropdownOptions(
-		[0, 2].map((value) => ({ value, label: String(value) }))
+		[...Array(maxDecimals + 1).keys()].map((value) => ({value, label: String(value)}))
 	);
 
 	const isEmailValid = isValidEmail(email);
@@ -68,7 +69,7 @@ const StepSendRequest: React.FC = () => {
 				}}
 			/>
 
-			<Dropdown
+			{maxDecimals > 0 && <Dropdown
 				className="sm:w-64 mb-8"
 				label={__('Decimal Place')}
 				value={decimalPlace}
@@ -76,7 +77,7 @@ const StepSendRequest: React.FC = () => {
 				onChange={(value) => {
 					dispatch(setDecimalPlace(value));
 				}}
-			/>
+			/>}
 
 			{climateVariable?.getDownloadType() === "analyzed" && <>
 				<div className="flex flex-col gap-2">

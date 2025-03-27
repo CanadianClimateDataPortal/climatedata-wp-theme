@@ -102,9 +102,6 @@ export interface ClimateVariableConfigInterface {
 	/** Class name defining the type or category of the climate variable */
 	class: string;
 
-	/** Human-readable name for the climate variable */
-	name: string;
-
 	/** Available versions for this climate variable */
 	versions?: VersionInterface[];
 

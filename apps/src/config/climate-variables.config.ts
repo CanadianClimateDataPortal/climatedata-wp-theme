@@ -9,9 +9,8 @@ import {
 
 export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	{
-		id: "test_full",
+		id: "hottest_day",
 		class: "ClimateVariableBase",
-		name: "Test variable",
 		versions: [
 			{
 				value: "cmip5",

@@ -15,6 +15,19 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		threshold: "tx_max",
 	},
 	{
+		id: "ice_days",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "ice_days",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+	},
+	{
+		id: "coldest_day",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "tn_min",
+	},
+	{
 		id: "test_variable",
 		class: "ClimateVariableBase",
 		versions: [

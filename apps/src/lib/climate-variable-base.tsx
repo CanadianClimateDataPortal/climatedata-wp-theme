@@ -1,7 +1,13 @@
 import React from "react";
 import {
+	AveragingType,
 	ClimateVariableConfigInterface,
 	ClimateVariableInterface,
+	DateRangeConfig,
+	DownloadType,
+	FieldConfig,
+	FieldValues,
+	FileFormatType,
 	FrequencyConfig,
 	InteractiveRegionConfig,
 	InteractiveRegionOption,
@@ -10,6 +16,7 @@ import {
 	VersionInterface,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
+import RasterMapDownload from "@/components/download/raster-map-download";
 
 /**
  * A base class representing a climate variable and its configuration. This class provides methods
@@ -50,6 +57,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		const currentVersion = this.getVersion();
 		const filteredScenario = this.getScenarios()?.find((scenario) => scenario.value === this._config.scenario && scenario.version === currentVersion);
 		return filteredScenario?.value || this.getScenarios()?.[0]?.value || null;
+	}
+
+	getAnalyzeScenarios(): string[] {
+		return this._config.analyzeScenarios ?? [];
 	}
 
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null {
@@ -96,6 +107,54 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.enableColourOptions ?? false;
 	}
 
+	getAnalysisFields(): FieldConfig[] {
+		return this._config.analysisFields ?? [];
+	}
+
+	getAnalysisFieldValues(): FieldValues {
+		return this._config.analysisFieldValues ?? {};
+	}
+
+	getAnalysisFieldValue(key: keyof FieldValues): string | null {
+		return this._config.analysisFieldValues?.[key] ?? null;
+	}
+
+	getDateRangeConfig(): DateRangeConfig | null {
+		return this._config.dateRangeConfig ?? null;
+	}
+
+	getDateRange(): string[] | null {
+		return this._config.dateRange ?? null;
+	}
+
+	getAveragingOptions(): AveragingType[] {
+		return this._config.averagingOptions ?? [];
+	}
+
+	getAveragingType(): AveragingType | null {
+		if (this._config.averagingType) {
+			return this._config.averagingType;
+		} else {
+			return this.getAveragingOptions()?.[0] ?? null;
+		}
+	}
+
+	getPercentileOptions(): string[] {
+		return this._config.percentileOptions ?? [];
+	}
+
+	getPercentiles(): string[] {
+		return this._config.percentiles ?? [];
+	}
+
+	getDownloadType(): DownloadType | null {
+		return this._config.downloadType ?? null;
+	}
+
+	getFileFormatTypes(): FileFormatType[] | null {
+		return this._config.fileFormatTypes ?? [];
+	}
+
 	toObject(): ClimateVariableConfigInterface {
 		return {
 			...this._config,
@@ -104,6 +163,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	renderMap(): React.ReactElement {
 		return <RasterMap />
+	}
+
+	renderDownloadMap(): React.ReactElement {
+		return <RasterMapDownload />;
 	}
 }
 

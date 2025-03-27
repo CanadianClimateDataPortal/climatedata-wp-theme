@@ -4,17 +4,34 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from "@/app/hooks";
-import ClimateVariableContext, { ClimateVariableContextType } from "@/hooks/use-climate-variable";
+import ClimateVariableContext from "@/hooks/use-climate-variable";
 import { PostData } from "@/types/types";
 import {
 	setClimateVariable,
-	updateClimateVariable
+	updateClimateVariable,
+	updateClimateVariableAnalysisFieldValue,
 } from "@/store/climate-variable-slice";
 import ClimateVariableBase from "@/lib/climate-variable-base";
 import {
+	AveragingType,
 	ClimateVariableConfigInterface,
 	ClimateVariableInterface, InteractiveRegionOption
 } from "@/types/climate-variable-interface";
+
+export type ClimateVariableContextType = {
+	climateVariable: ClimateVariableInterface | null;
+	selectClimateVariable: (variable: PostData) => void;
+	setVersion: (version: string) => void;
+	setScenario: (scenario: string) => void;
+	setAnalyzeScenarios: (analyzeScenarios: string[]) => void;
+	setThreshold: (threshold: string) => void;
+	setInteractiveRegion: (interactiveRegion: InteractiveRegionOption) => void;
+	setFrequency: (frequency: string) => void;
+	setAnalysisFieldValue: (key: string, value: string | null) => void;
+	setAveragingType: (type: AveragingType) => void;
+	setDateRange: (dates: string[]) => void;
+	setPercentiles: (percentiles: string[]) => void;
+}
 
 type ClassMapType = Record<string, new (arg: ClimateVariableConfigInterface) => ClimateVariableInterface>;
 
@@ -90,6 +107,12 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		}));
 	}, [dispatch]);
 
+	const setAnalyzeScenarios = useCallback((scenarios: string[]) => {
+		dispatch(updateClimateVariable({
+			analyzeScenarios: scenarios
+		}));
+	}, [dispatch]);
+
 	const setScenario = useCallback((scenario: string) => {
 		dispatch(updateClimateVariable({
 			scenario
@@ -114,14 +137,44 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		}));
 	}, [dispatch]);
 
+	const setAnalysisFieldValue = useCallback((key: string, value: string | null) => {
+		dispatch(updateClimateVariableAnalysisFieldValue({
+			key,
+			value
+		}))
+	}, [dispatch]);
+
+	const setAveragingType = useCallback((averagingType: AveragingType) => {
+		dispatch(updateClimateVariable({
+			averagingType
+		}));
+	}, [dispatch]);
+
+	const setDateRange = useCallback((dates: string[]) => {
+		dispatch(updateClimateVariable({
+			dateRange: dates
+		}));
+	}, [dispatch]);
+
+	const setPercentiles = useCallback((percentiles: string[]) => {
+		dispatch(updateClimateVariable({
+			percentiles
+		}));
+	}, [dispatch]);
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
 		setVersion,
 		setScenario,
+		setAnalyzeScenarios,
 		setThreshold,
 		setInteractiveRegion,
-		setFrequency
+		setFrequency,
+		setAnalysisFieldValue,
+		setAveragingType,
+		setDateRange,
+		setPercentiles,
 	}
 
 	return (

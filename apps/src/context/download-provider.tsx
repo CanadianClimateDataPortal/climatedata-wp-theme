@@ -46,19 +46,14 @@ const DownloadContext = createContext<{
 } | null>(null);
 
 // keep track of which fields are required for each step
+// @todo rework since the fields in a step can be dynamic.
+//  This must be checked from inside the step.
 const stepValues: Record<number, (keyof DownloadState)[]> = {
 	1: ['dataset'],
 	2: ['variable'],
 	3: ['version', 'degrees'],
 	4: ['selection', 'selectionCount', 'selectionMode'],
-	5: [
-		'startYear',
-		'endYear',
-		'frequency',
-		'emissionScenarios',
-		'percentiles',
-		'decimalPlace',
-	],
+	5: [],
 	6: ['format', 'email'], // TODO: do we want the step to also require the `subcribe` box to be checked?
 };
 

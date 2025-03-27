@@ -360,7 +360,6 @@ export interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 export interface MapInfoProps {
 	data: MapInfoData;
-	mapRef: React.RefObject<HTMLDivElement>;
 }
 
 /**

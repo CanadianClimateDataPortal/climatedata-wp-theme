@@ -1,14 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import 'leaflet.sync';
 
 // components
-import MapHeader from '@/components/map-header';
 import RasterMapContainer from '@/components/raster-map-container';
 
 // other
 import { cn } from '@/lib/utils';
-import { MapInfoData } from '@/types/types';
-import { fetchWPData } from '@/services/services';
 import { useAppSelector } from '@/app/hooks';
 import { useMap } from '@/hooks/use-map';
 
@@ -16,8 +13,6 @@ import { useMap } from '@/hooks/use-map';
  * Renders a Leaflet map, including custom panes and tile layers.
  */
 export default function RasterMap(): React.ReactElement {
-	const [mapInfo, setMapInfo] = useState<MapInfoData | null>(null);
-
 	const { emissionScenarioCompare, emissionScenarioCompareTo } =
 		useAppSelector((state) => state.map);
 
@@ -26,10 +21,6 @@ export default function RasterMap(): React.ReactElement {
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const mapRef = useRef<L.Map | null>(null);
 	const comparisonMapRef = useRef<L.Map | null>(null);
-
-	useEffect(() => {
-		fetchWPData().then((data) => setMapInfo(data.mapInfo));
-	}, []);
 
 	// show the comparison map if compare checkbox is checked and there is a compare-to scenario
 	const showComparisonMap =
@@ -60,33 +51,30 @@ export default function RasterMap(): React.ReactElement {
 	};
 
 	return (
-		<div className="relative flex-1">
-			{mapInfo && <MapHeader data={mapInfo} mapRef={wrapperRef} />}
-			<div
-				ref={wrapperRef}
-				className={cn(
-					'map-wrapper',
-					'grid gap-4 h-full z-30',
-					showComparisonMap ? 'sm:grid-cols-2' : 'grid-cols-1'
-				)}
-			>
+		<div
+			ref={wrapperRef}
+			className={cn(
+				'map-wrapper',
+				'grid gap-4 h-full z-30',
+				showComparisonMap ? 'sm:grid-cols-2' : 'grid-cols-1'
+			)}
+		>
+			<RasterMapContainer
+				onMapReady={(map: L.Map) => {
+					mapRef.current = map;
+					setMap(map);
+				}}
+				onUnmount={() => (mapRef.current = null)}
+			/>
+			{showComparisonMap && (
 				<RasterMapContainer
 					onMapReady={(map: L.Map) => {
-						mapRef.current = map;
-						setMap(map);
+						comparisonMapRef.current = map;
+						syncMaps(); // sync once the comparison map is ready
 					}}
-					onUnmount={() => (mapRef.current = null)}
+					onUnmount={unsyncMaps} // unsync and clear the reference to this map
 				/>
-				{showComparisonMap && (
-					<RasterMapContainer
-						onMapReady={(map: L.Map) => {
-							comparisonMapRef.current = map;
-							syncMaps(); // sync once the comparison map is ready
-						}}
-						onUnmount={unsyncMaps} // unsync and clear the reference to this map
-					/>
-				)}
-			</div>
+			)}
 		</div>
 	);
 }

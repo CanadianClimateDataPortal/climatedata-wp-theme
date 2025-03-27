@@ -34,14 +34,59 @@ export enum FrequencyDisplayModeOption {
 	NONE = "none",
 }
 
-export enum FrequencyOption {
+export enum FrequencyType {
 	ANNUAL = "annual",
+	ANNUAL_JUL_JUN = "annual_jul_jun",
 	MONTHLY = "months",
-	SEASONAL = "seasons"
+	SEASONAL = "seasons",
+	ALL_MONTHS = "allMonths",
+	DAILY = "daily",
 }
 
 export type FrequencyConfig = {
-	[K in FrequencyOption]: FrequencyDisplayModeOption;
+	[K in FrequencyType]?: FrequencyDisplayModeOption;
+}
+
+export interface FieldConfig {
+	key: string;
+	type: 'input' | 'select';
+	label: string;
+	description?: string;
+	help?: string;
+	attributes?: {
+		type?: 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
+		placeholder?: string;
+	};
+	options?: Array<{
+		value: string | number;
+		label: string;
+	}>;
+}
+
+export interface FieldValues {
+	[key: string]: string | null;
+}
+
+export interface DateRangeConfig {
+	min: string;
+	max: string;
+	interval: number;
+}
+
+export enum AveragingType {
+	ALL_YEARS = "allYears",
+	THIRTY_YEARS = "30years",
+}
+
+export enum DownloadType {
+	PRECALCULATED = "precalculated",
+	ANALYZED = "analyzed",
+}
+
+export enum FileFormatType {
+	CSV = "csv",
+	JSON = "json",
+	NetCDF = "netcdf",
 }
 
 /**
@@ -56,9 +101,6 @@ export interface ClimateVariableConfigInterface {
 
 	/** Class name defining the type or category of the climate variable */
 	class: string;
-
-	/** Human-readable name for the climate variable */
-	name: string;
 
 	/** Available versions for this climate variable */
 	versions?: VersionInterface[];
@@ -77,6 +119,9 @@ export interface ClimateVariableConfigInterface {
 
 	/** Selected scenario value */
 	scenario?: string | null;
+
+	/** Selected scenarios for analysis */
+	analyzeScenarios?: string[];
 
 	/** Configuration defining interactive region options and their status */
 	interactiveRegionConfig?: InteractiveRegionConfig;
@@ -101,6 +146,36 @@ export interface ClimateVariableConfigInterface {
 
 	/** Flag indicating whether color options are enabled */
 	enableColourOptions?: boolean;
+
+	/** An array of FieldConfigs used in the Download section */
+	analysisFields?: FieldConfig[];
+
+	/** Holds submitted values for analysisFields */
+	analysisFieldValues?: FieldValues;
+
+	/** Configuration defining the date range to be used in the Download section */
+	dateRangeConfig?: DateRangeConfig;
+
+	/** Stores the selected date range */
+	dateRange?: string[] | null;
+
+	/** Contains available averaging options */
+	averagingOptions?: AveragingType[];
+
+	/** Stores the selected averaging type */
+	averagingType?: AveragingType;
+
+	/** Available percentile options used for analysis */
+	percentileOptions?: string[];
+
+	/** Stores the selected percentiles */
+	percentiles?: string[];
+
+	/** Determines if the variable data must be analyzed or is already precalculated. */
+	downloadType?: DownloadType;
+
+	/** The type of formats available */
+	fileFormatTypes?: FileFormatType[];
 }
 
 /**
@@ -119,6 +194,8 @@ export interface ClimateVariableInterface {
 
 	getScenario(): string | null;
 
+	getAnalyzeScenarios(): string[];
+
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null;
 
 	getInteractiveRegion(): InteractiveRegionOption | null;
@@ -133,7 +210,31 @@ export interface ClimateVariableInterface {
 
 	getColourOptionsStatus(): boolean;
 
+	getAnalysisFields(): FieldConfig[];
+
+	getAnalysisFieldValues(): FieldValues;
+
+	getAnalysisFieldValue(key: string): string | null;
+
+	getDateRangeConfig(): DateRangeConfig | null;
+
+	getDateRange(): string[] | null;
+
+	getAveragingOptions(): AveragingType[];
+
+	getAveragingType(): AveragingType | null;
+
+	getPercentileOptions(): string[];
+
+	getPercentiles(): string[];
+
+	getDownloadType(): DownloadType | null;
+
+	getFileFormatTypes(): FileFormatType[] | null;
+
 	renderMap(): React.ReactElement;
+
+	renderDownloadMap(): React.ReactElement;
 
 	toObject(): ClimateVariableConfigInterface;
 }

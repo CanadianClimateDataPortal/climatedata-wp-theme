@@ -24,23 +24,19 @@ import { MapInfoProps, ProviderPanelProps } from '@/types/types';
 /**
  * MapHeader component, displays the header for the map with breadcrumbs and buttons for extra information.
  */
-const MapHeader: React.FC<MapInfoProps> = ({
-	data,
-	mapRef,
-}): React.ReactElement => {
+const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 	const [shareInfo, setShareInfo] = useState<boolean>(false);
 	const [downloadInfo, setDownloadInfo] = useState<boolean>(false);
 	const [panelProps, setPanelProps] = useState<
 		ProviderPanelProps | undefined
 	>(undefined);
-
 	const { togglePanel } = useAnimatedPanel();
 
 	const ref = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		if (ref.current) {
-			// set the position of the panel to be below the header.. ref here is the toggle buttons container element
+			// set the position of the panel to be below the header. ref here is the toggle buttons container element
 			setPanelProps({
 				direction: 'right',
 				position: {
@@ -93,13 +89,11 @@ const MapHeader: React.FC<MapInfoProps> = ({
 				</div>
 			</aside>
 
-			{/* moved outside of the map header container for the modal overaly to cover also the sidebar*/}
 			<ShareMapModal isOpen={shareInfo} onClose={toggleShareInfo} />
 			<DownloadMapModal
 				isOpen={downloadInfo}
 				onClose={toggleDownloadInfo}
-				title={data.title}
-				mapRef={mapRef}
+				title={data?.title ?? ''}
 			/>
 		</>
 	);

@@ -101,25 +101,6 @@ function cdc_rest_v3_endpoint_permission() {
 }
 
 /**
- * Sanitize the 'per_page' argument for REST API requests.
- *
- * @param int $value The 'per_page' argument to sanitize.
- *
- * @return int The sanitized 'per_page' value.
- */
-function cdc_rest_v3_sanitize_arg_per_page( $value ) {
-	$value = intval( $value );
-
-	// Allow -1 for all items.
-	if ( $value === -1 ) {
-		return -1;
-	}
-
-	// Ensure value is between 1 and 100.
-	return max( 1, min( 100, $value ) );
-}
-
-/**
  * Build a multilingual field array.
  *
  * This function creates an associative array with 'en' and 'fr' keys

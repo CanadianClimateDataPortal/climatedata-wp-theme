@@ -73,8 +73,19 @@ export interface DateRangeConfig {
 }
 
 export enum AveragingType {
-	ALL_YEARS = 'allYears',
-	THIRTY_YEARS = '30years'
+	ALL_YEARS = "allYears",
+	THIRTY_YEARS = "30years",
+}
+
+export enum DownloadType {
+	PRECALCULATED = "precalculated",
+	ANALYZED = "analyzed",
+}
+
+export enum FileFormatType {
+	CSV = "csv",
+	JSON = "json",
+	NetCDF = "netcdf",
 }
 
 /**
@@ -151,6 +162,12 @@ export interface ClimateVariableConfigInterface {
 
 	/** Stores the selected averaging type */
 	averagingType?: AveragingType;
+
+	/** Determines if the variable data must be analyzed or is already precalculated. */
+	downloadType?: DownloadType;
+
+	/** The type of formats available */
+	fileFormatTypes?: FileFormatType[];
 }
 
 /**
@@ -196,6 +213,10 @@ export interface ClimateVariableInterface {
 	getAveragingOptions(): AveragingType[];
 
 	getAveragingType(): AveragingType | null;
+
+	getDownloadType(): DownloadType | null;
+
+	getFileFormatTypes(): FileFormatType[] | null;
 
 	renderMap(): React.ReactElement;
 

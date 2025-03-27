@@ -1,6 +1,8 @@
 import {
 	AveragingType,
 	ClimateVariableConfigInterface,
+	DownloadType,
+	FileFormatType,
 	FrequencyDisplayModeOption,
 } from "@/types/climate-variable-interface";
 
@@ -131,6 +133,12 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					placeholder: "0",
 				}
 			}
-		]
+		],
+		downloadType: DownloadType.PRECALCULATED,
+		fileFormatTypes: [
+			FileFormatType.CSV,
+			FileFormatType.JSON,
+			FileFormatType.NetCDF,
+		],
 	},
 ];

@@ -2,9 +2,12 @@ import React from "react";
 import {
 	AveragingType,
 	ClimateVariableConfigInterface,
-	ClimateVariableInterface, DateRangeConfig,
+	ClimateVariableInterface,
+	DateRangeConfig,
+	DownloadType,
 	FieldConfig,
 	FieldValues,
+	FileFormatType,
 	FrequencyConfig,
 	InteractiveRegionConfig,
 	InteractiveRegionOption,
@@ -129,6 +132,14 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		} else {
 			return this.getAveragingOptions()?.[0] ?? null;
 		}
+	}
+
+	getDownloadType(): DownloadType | null {
+		return this._config.downloadType ?? null;
+	}
+
+	getFileFormatTypes(): FileFormatType[] | null {
+		return this._config.fileFormatTypes ?? [];
 	}
 
 	toObject(): ClimateVariableConfigInterface {

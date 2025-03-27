@@ -13,9 +13,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
 	setDecimalPlace,
 	setEmissionScenarios,
-	setEndYear,
 	setPercentiles,
-	setStartYear,
 } from '@/features/download/download-slice';
 import { normalizeDropdownOptions } from '@/lib/format';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
@@ -25,29 +23,23 @@ import {
 } from "@/types/climate-variable-interface";
 import { FrequencySelect } from "@/components/frequency-select";
 import SectionContext from "@/context/section-provider";
+import { YearRange } from "@/components/year-range";
 
 /**
  * Additional details step will allow the user to customize the download request
  */
 const StepAdditionalDetails: React.FC = () => {
 	const { __ } = useI18n();
-	const { climateVariable, setFrequency, setAveragingType } = useClimateVariable();
+	const { climateVariable, setFrequency, setAveragingType, setDateRange } = useClimateVariable();
 	const section = useContext(SectionContext);
 	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
 
 	const {
-		startYear,
-		endYear,
 		emissionScenarios,
 		percentiles,
 		decimalPlace,
 	} = useAppSelector((state) => state.download);
 	const dispatch = useAppDispatch();
-
-	const yearRange = Array.from({ length: 31 }, (_, i) => i + 2000);
-	const yearOptions = normalizeDropdownOptions(
-		yearRange.map((year) => ({ value: year, label: String(year) }))
-	);
 
 	const averagingOptions = [
 		{
@@ -82,33 +74,29 @@ const StepAdditionalDetails: React.FC = () => {
 		[0, 2].map((value) => ({ value, label: String(value) }))
 	);
 
+	const dateRangeConfig = climateVariable?.getDateRangeConfig();
+	const dateRange = climateVariable?.getDateRange() ?? [];
+
 	return (
 		<StepContainer title="Additional details">
 			<StepContainerDescription>
 				{__('Adjust the controls below to customize your analysis.')}
 			</StepContainerDescription>
 
-			<div className="flex gap-4 sm:gap-8 mb-6">
-				<Dropdown
-					className="w-1/2 sm:w-52"
-					label={__('Start Year')}
-					value={startYear}
-					options={yearOptions}
-					onChange={(value) => {
-						dispatch(setStartYear(value));
+			{dateRangeConfig &&
+				<YearRange
+					startYear={{
+						label: __('Start Year'),
+						value: dateRange[0],
 					}}
-				/>
-
-				<Dropdown
-					className="w-1/2 sm:w-52"
-					label={__('End Year')}
-					value={endYear}
-					options={yearOptions}
-					onChange={(value) => {
-						dispatch(setEndYear(value));
+					endYear={{
+						label: __('End Year'),
+						value: dateRange[1],
 					}}
+					config={dateRangeConfig}
+					onChange={setDateRange}
 				/>
-			</div>
+			}
 
 			<FrequencySelect
 				title={'Temporal frequency'}

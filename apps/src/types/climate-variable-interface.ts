@@ -67,9 +67,9 @@ export interface FieldValues {
 }
 
 export interface DateRangeConfig {
-	type: 'year' | 'full';
 	min: string;
 	max: string;
+	interval: number;
 }
 
 export enum AveragingType {
@@ -144,6 +144,8 @@ export interface ClimateVariableConfigInterface {
 	/** Configuration defining the date range to be used in the Download section */
 	dateRangeConfig?: DateRangeConfig;
 
+	dateRange?: string[] | null;
+
 	/** Contains available averaging options */
 	averagingOptions?: AveragingType[];
 
@@ -186,6 +188,10 @@ export interface ClimateVariableInterface {
 	getAnalysisFieldValues(): FieldValues;
 
 	getAnalysisFieldValue(key: string): string | null;
+
+	getDateRangeConfig(): DateRangeConfig | null;
+
+	getDateRange(): string[] | null;
 
 	getAveragingOptions(): AveragingType[];
 

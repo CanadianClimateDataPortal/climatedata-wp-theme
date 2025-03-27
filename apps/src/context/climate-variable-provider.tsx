@@ -9,7 +9,7 @@ import { PostData } from "@/types/types";
 import {
 	setClimateVariable,
 	updateClimateVariable,
-	updateClimateVariableAnalysisFieldValue
+	updateClimateVariableAnalysisFieldValue,
 } from "@/store/climate-variable-slice";
 import ClimateVariableBase from "@/lib/climate-variable-base";
 import {
@@ -129,6 +129,12 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		}));
 	}, [dispatch]);
 
+	const setDateRange = useCallback((dates: string[]) => {
+		dispatch(updateClimateVariable({
+			dateRange: dates
+		}));
+	}, [dispatch]);
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
@@ -138,7 +144,8 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		setInteractiveRegion,
 		setFrequency,
 		setAnalysisFieldValue,
-		setAveragingType
+		setAveragingType,
+		setDateRange,
 	}
 
 	return (

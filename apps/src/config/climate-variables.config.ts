@@ -74,6 +74,11 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS
 		],
+		dateRangeConfig: {
+			min: "2000",
+			max: "2020",
+			interval: 5
+		},
 		hasDelta: false,
 		defaultColourScheme: [
 			"#ffffcc",

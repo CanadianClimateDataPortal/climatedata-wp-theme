@@ -2,7 +2,7 @@ import React from "react";
 import {
 	AveragingType,
 	ClimateVariableConfigInterface,
-	ClimateVariableInterface,
+	ClimateVariableInterface, DateRangeConfig,
 	FieldConfig,
 	FieldValues,
 	FrequencyConfig,
@@ -109,6 +109,14 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getAnalysisFieldValue(key: keyof FieldValues): string | null {
 		return this._config.analysisFieldValues?.[key] ?? null;
+	}
+
+	getDateRangeConfig(): DateRangeConfig | null {
+		return this._config.dateRangeConfig ?? null;
+	}
+
+	getDateRange(): string[] | null {
+		return this._config.dateRange ?? null;
 	}
 
 	getAveragingOptions(): AveragingType[] {

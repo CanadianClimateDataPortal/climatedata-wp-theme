@@ -17,6 +17,7 @@ export type ClimateVariableContextType = {
 	setFrequency: (frequency: string) => void;
 	setAnalysisFieldValue: (key: string, value: string | null) => void;
 	setAveragingType: (type: AveragingType) => void;
+	setDateRange: (dates: string[]) => void;
 }
 
 const ClimateVariableContext = createContext<ClimateVariableContextType | null>(null);

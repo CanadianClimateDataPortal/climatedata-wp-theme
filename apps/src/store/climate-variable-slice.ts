@@ -32,14 +32,14 @@ const climateVariableSlice = createSlice({
 					[key]: value
 				}
 			};
-		}
+		},
 	}
 })
 
 export const {
 	setClimateVariable,
 	updateClimateVariable,
-	updateClimateVariableAnalysisFieldValue
+	updateClimateVariableAnalysisFieldValue,
 } = climateVariableSlice.actions;
 
 export default climateVariableSlice.reducer;

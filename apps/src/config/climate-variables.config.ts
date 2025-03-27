@@ -4,6 +4,7 @@ import {
 	DownloadType,
 	FileFormatType,
 	FrequencyDisplayModeOption,
+	FrequencyType,
 } from "@/types/climate-variable-interface";
 
 export const ClimateVariables: ClimateVariableConfigInterface[] = [
@@ -62,15 +63,16 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		interactiveRegionConfig: {
 			gridded_data: true,
 			census: true,
-			health: false,
-			watershed: false
+			health: true,
+			watershed: true
 		},
 		frequencyConfig: {
-			annual: FrequencyDisplayModeOption.ALWAYS,
-			months: FrequencyDisplayModeOption.ALWAYS,
-			seasons: FrequencyDisplayModeOption.DOWNLOAD,
-			allMonths: FrequencyDisplayModeOption.DOWNLOAD,
-			daily: FrequencyDisplayModeOption.DOWNLOAD
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.NONE,
 		},
 		averagingOptions: [
 			AveragingType.ALL_YEARS,

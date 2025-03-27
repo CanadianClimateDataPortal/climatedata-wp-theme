@@ -34,8 +34,9 @@ export enum FrequencyDisplayModeOption {
 	NONE = "none",
 }
 
-export enum FrequencyOption {
+export enum FrequencyType {
 	ANNUAL = "annual",
+	ANNUAL_JUL_JUN = "annual_jul_jun",
 	MONTHLY = "months",
 	SEASONAL = "seasons",
 	ALL_MONTHS = "allMonths",
@@ -43,7 +44,7 @@ export enum FrequencyOption {
 }
 
 export type FrequencyConfig = {
-	[K in FrequencyOption]: FrequencyDisplayModeOption;
+	[K in FrequencyType]?: FrequencyDisplayModeOption;
 }
 
 export interface FieldConfig {

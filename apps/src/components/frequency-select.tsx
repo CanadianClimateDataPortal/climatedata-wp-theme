@@ -12,6 +12,7 @@ import {
 import {
 	FrequencyConfig,
 	FrequencyDisplayModeOption,
+	FrequencyType,
 } from "@/types/climate-variable-interface";
 import { ControlTitle } from "@/components/ui/control-title";
 import { cn } from "@/lib/utils";
@@ -39,30 +40,20 @@ const FrequencySelect = ({
 }: FrequencySelectProps) => {
 	const { __ } = useI18n();
 
-	const hasAnnual = config.annual
-		&& (
-			config.annual === FrequencyDisplayModeOption.ALWAYS
-			|| config.annual === section
-		)
-	const hasMonths = config.months
-		&& (
-			config.months === FrequencyDisplayModeOption.ALWAYS
-			|| config.months === section
-		)
-	const hasAllMonths = config.allMonths && (
-		config.allMonths === FrequencyDisplayModeOption.ALWAYS
-		|| config.allMonths === section
-	)
-	const hasSeasons = config.seasons
-		&& (
-			config.seasons === FrequencyDisplayModeOption.ALWAYS
-			|| config.seasons === section
-		)
-	const hasDaily = config.seasons
-		&& (
-			config.daily === FrequencyDisplayModeOption.ALWAYS
-			|| config.daily === section
-		)
+	const isFrequencyEnabled = (frequencyType: FrequencyType): boolean => {
+		const configValue = config[frequencyType];
+		return Boolean(configValue && (
+			configValue === FrequencyDisplayModeOption.ALWAYS ||
+			configValue === section
+		));
+	};
+
+	const hasAnnual = isFrequencyEnabled(FrequencyType.ANNUAL);
+	const hasAnnualJulJun = isFrequencyEnabled(FrequencyType.ANNUAL_JUL_JUN);
+	const hasMonths = isFrequencyEnabled(FrequencyType.MONTHLY)
+	const hasAllMonths = isFrequencyEnabled(FrequencyType.ALL_MONTHS);
+	const hasSeasons = isFrequencyEnabled(FrequencyType.SEASONAL);
+	const hasDaily = isFrequencyEnabled(FrequencyType.DAILY);
 
 	let defaultValue = value ?? undefined;
 	if (!defaultValue) {
@@ -101,6 +92,9 @@ const FrequencySelect = ({
 		<SelectContent>
 			{hasAnnual && <SelectItem value={'ann'}>
 				{__('Annual')}
+			</SelectItem>}
+			{hasAnnualJulJun && <SelectItem value={FrequencyType.ANNUAL_JUL_JUN}>
+				{__('Annual (July to June)')}
 			</SelectItem>}
 			{hasDaily && <SelectItem value={'daily'}>
 				{__('Daily')}

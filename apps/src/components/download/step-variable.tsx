@@ -10,11 +10,13 @@ import VariableRadioCards from '@/components/variable-radio-cards';
 
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setVariable } from '@/features/download/download-slice';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 /**
  * Variable step
  */
 const StepVariable: React.FC = () => {
+	const { selectClimateVariable } = useClimateVariable();
 	const [varType, setVarType] = useState<string>('');
 	const [sector, setSector] = useState<string>('');
 
@@ -66,6 +68,7 @@ const StepVariable: React.FC = () => {
 					selected={variable}
 					onSelect={(selected) => {
 						dispatch(setVariable(selected));
+						selectClimateVariable(selected);
 					}}
 				/>
 			</div>

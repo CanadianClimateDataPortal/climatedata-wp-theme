@@ -34,22 +34,51 @@ register_rest_route(
 function cdc_rest_v3_get_variables_list( $request ) {
 	try {
 		// Get pagination parameters
-		$posts_per_page = $request->get_param( 'posts_per_page' );
-		$paged          = $request->get_param( 'paged' );
+		$posts_per_page           = $request->get_param( 'posts_per_page' );
+		$paged                    = $request->get_param( 'paged' );
+		$app                      = $request->get_param( 'app' );
+		$variable_dataset_term_id = $request->get_param( 'variable_dataset_term_id' );
 
 		// Query arguments for variables
 		$args = array(
-			'post_type'   => 'variable',
-			'post_status' => 'publish',
+			'post_type'      => 'variable',
+			'post_status'    => 'publish',
 			'posts_per_page' => -1,
 		);
 
-		// Only add 'posts_per_page' and 'paged' if not requesting all items.
+		// Only add 'posts_per_page' and 'paged' if not requesting all items
 		if ( $posts_per_page !== -1 ) {
 			$args['posts_per_page'] = $posts_per_page;
 			$args['paged']          = $paged;
 		}
 
+		// Add meta query for app filter (Map or Download)
+		if ( ! empty( $app ) ) {
+			$meta_query = array(
+				array(
+					'key'     => $app === 'map' ? 'map' : 'download',
+					'value'   => '1',
+					'compare' => '=',
+				),
+			);
+
+			$args['meta_query'] = $meta_query;
+		}
+
+		// Add taxonomy query for variable-dataset term ID
+		if ( ! empty( $variable_dataset_term_id ) ) {
+			$tax_query = array(
+				array(
+					'taxonomy' => 'variable-dataset',
+					'field'    => 'term_id',
+					'terms'    => $variable_dataset_term_id,
+				),
+			);
+
+			$args['tax_query'] = $tax_query;
+		}
+
+		// Query variable posts
 		$query     = new WP_Query( $args );
 		$variables = array();
 
@@ -191,27 +220,40 @@ function cdc_rest_v3_get_taxonomy_terms_data( $post_id, $taxonomy ) {
  * Get the arguments for the datasets list REST API endpoint.
  *
  * This function returns an array of arguments for the variables list
- * endpoint, including pagination parameters. Each argument includes
- * a description, type, default value, and a sanitize callback.
+ * endpoint, including pagination parameters, app type and variable
+ * dataset term ID. Each argument includes a description, type,
+ * default value, and a sanitize callback.
  *
  * @return array The arguments for the datasets list endpoint.
  */
 function cdc_rest_v3_get_variables_args() {
 	return array(
-		'posts_per_page' => array(
-			'description'       => 'Number of items per page. Use -1 for all items.',
-			'type'              => 'integer',
-			'default'           => -1,
-			'minimum'           => -1,
-			'maximum'           => 100,
-			'sanitize_callback' => 'cdc_rest_v3_sanitize_arg_per_page',
+		'posts_per_page'           => array(
+			'description' => 'Number of items per page. Use -1 for all items.',
+			'type'        => 'integer',
+			'default'     => -1,
+			'minimum'     => -1,
+			'maximum'     => 100,
 		),
-		'paged'          => array(
+		'paged'                    => array(
 			'description'       => 'Current page number',
 			'type'              => 'integer',
 			'default'           => 1,
 			'minimum'           => 1,
 			'sanitize_callback' => 'absint',
+		),
+		'app'                      => array(
+			'description' => 'Filter by app type (map or download)',
+			'type'        => 'string',
+			'enum'        => array( 'map', 'download' ),
+			"required"    => true,
+		),
+		'variable_dataset_term_id' => array(
+			'description'       => 'Filter by variable-dataset taxonomy term ID',
+			'type'              => 'integer',
+			'minimum'           => 1,
+			'sanitize_callback' => 'absint',
+			"required"          => true,
 		),
 	);
 }

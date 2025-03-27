@@ -228,7 +228,7 @@ export interface ClimateVariableInterface {
 
 	getDownloadType(): DownloadType | null;
 
-	getFileFormatTypes(): FileFormatType[] | null;
+	getFileFormatTypes(): FileFormatType[];
 
 	getMaxDecimals(): number;
 

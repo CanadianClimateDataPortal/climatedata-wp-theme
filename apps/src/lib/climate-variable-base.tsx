@@ -157,7 +157,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.downloadType ?? null;
 	}
 
-	getFileFormatTypes(): FileFormatType[] | null {
+	getFileFormatTypes(): FileFormatType[] {
 		return this._config.fileFormatTypes ?? [];
 	}
 

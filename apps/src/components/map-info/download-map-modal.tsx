@@ -6,7 +6,6 @@
  */
 import React, { useMemo, useState } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
-import { toPng } from 'html-to-image';
 import { Download, ExternalLink } from 'lucide-react';
 
 // components
@@ -18,13 +17,12 @@ import {
 	ModalSectionBlockDescription,
 } from '@/components/map-info/modal-section';
 
-// TODO: replace mapRef with a reference coming from MapContext or the useLeafetMap hook if possible
+// @todo: Currently does nothing. The image must be generated from the server.
 const DownloadMapModal: React.FC<{
 	isOpen: boolean;
 	onClose: () => void;
 	title: string;
-	mapRef: React.RefObject<HTMLElement>;
-}> = ({ isOpen, onClose, title, mapRef }) => {
+}> = ({ isOpen, onClose, title }) => {
 	const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
@@ -37,19 +35,14 @@ const DownloadMapModal: React.FC<{
 	const handleDownloadClick = async (
 		e: React.MouseEvent<HTMLAnchorElement>
 	) => {
-		const anchor = e.currentTarget;
-
-		if (!downloadUrl && mapRef.current) {
+		if (!downloadUrl) {
 			e.preventDefault();
 
 			setIsGenerating(true);
 			try {
-				const url = await toPng(mapRef.current, { cacheBust: true });
+				// The image needs to be generated using a backend API.
+				const url = '';
 				setDownloadUrl(url);
-
-				// set the href dynamically and trigger the click manually
-				anchor.href = url;
-				anchor.click();
 			} catch (error) {
 				console.error('Failed to generate download URL:', error);
 			} finally {

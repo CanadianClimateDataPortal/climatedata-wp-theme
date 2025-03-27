@@ -13,6 +13,7 @@ import {
 	AveragingType,
 	DownloadType,
 	FrequencyConfig,
+	FrequencyType,
 } from "@/types/climate-variable-interface";
 import { FrequencySelect } from "@/components/frequency-select";
 import SectionContext from "@/context/section-provider";
@@ -77,14 +78,14 @@ const StepAdditionalDetails: React.FC = () => {
 				className={"sm:w-64 mb-4"}
 			/>
 
-			<RadioGroupFactory
+			{averagingOptions.length > 0 && climateVariable?.getFrequency() !== FrequencyType.DAILY && <RadioGroupFactory
 				name="temporal-frequency"
 				className="max-w-md mb-8"
 				optionClassName="w-1/2"
 				options={averagingOptions}
 				value={climateVariable?.getAveragingType() ?? undefined}
 				onValueChange={setAveragingType}
-			/>
+			/>}
 
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED &&
 				<CheckboxFactory

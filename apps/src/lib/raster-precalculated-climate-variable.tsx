@@ -1,7 +1,10 @@
 import ClimateVariableBase from "@/lib/climate-variable-base";
 import {
+	AveragingType,
 	FileFormatType,
-	FrequencyConfig, FrequencyDisplayModeOption, FrequencyType,
+	FrequencyConfig,
+	FrequencyDisplayModeOption,
+	FrequencyType,
 	InteractiveRegionConfig,
 	InteractiveRegionOption,
 	ScenariosConfig
@@ -46,6 +49,13 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
 		};
+	}
+
+	getAveragingOptions(): AveragingType[] {
+		return [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS
+		];
 	}
 
 	getFileFormatTypes(): FileFormatType[] | null {

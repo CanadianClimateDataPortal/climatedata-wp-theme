@@ -27,7 +27,7 @@ export const initialState: DownloadState = {
 	zoom: DEFAULT_ZOOM,
 	center: CANADA_CENTER,
 	percentiles: [],
-	decimalPlace: 2,
+	decimalPlace: 0,
 	format: 'csv',
 	email: '',
 	subscribe: false,

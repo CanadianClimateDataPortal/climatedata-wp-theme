@@ -4,10 +4,15 @@ import {
 	DownloadType,
 	FileFormatType,
 	FrequencyDisplayModeOption,
-	FrequencyType,
+	FrequencyType, InteractiveRegionOption,
 } from "@/types/climate-variable-interface";
 
 export const ClimateVariables: ClimateVariableConfigInterface[] = [
+	{
+		id: "hottest_day",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "tx_max",
+	},
 	{
 		id: "test_variable",
 		class: "ClimateVariableBase",
@@ -34,10 +39,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			],
 		},
 		interactiveRegionConfig: {
-			gridded_data: true,
-			census: true,
-			health: true,
-			watershed: true
+			[InteractiveRegionOption.GRIDDED_DATA]: true,
+			[InteractiveRegionOption.CENSUS]: true,
+			[InteractiveRegionOption.HEALTH]: true,
+			[InteractiveRegionOption.WATERSHED]: true
 		},
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,

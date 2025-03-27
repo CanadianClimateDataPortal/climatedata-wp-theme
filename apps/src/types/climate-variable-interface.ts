@@ -1,6 +1,6 @@
 import React from "react";
 
-export interface ScenariosInterface {
+export interface ScenariosConfig {
 	[key: string]: string[];
 }
 
@@ -108,7 +108,7 @@ export interface ClimateVariableConfigInterface {
 	threshold?: string | null;
 
 	/** Available scenarios linked to this climate variable */
-	scenarios?: ScenariosInterface;
+	scenarios?: ScenariosConfig;
 
 	/** Selected scenario value */
 	scenario?: string | null;
@@ -169,6 +169,9 @@ export interface ClimateVariableConfigInterface {
 
 	/** The type of formats available */
 	fileFormatTypes?: FileFormatType[];
+
+	/** The maximum number of decimals to be used for the file */
+	maxDecimals?: number;
 }
 
 /**
@@ -182,6 +185,8 @@ export interface ClimateVariableInterface {
 	getThresholds(): ThresholdInterface[];
 
 	getThreshold(): string | null;
+
+	getScenariosConfig(): ScenariosConfig | null;
 
 	getScenarios(): string[];
 
@@ -224,6 +229,8 @@ export interface ClimateVariableInterface {
 	getDownloadType(): DownloadType | null;
 
 	getFileFormatTypes(): FileFormatType[] | null;
+
+	getMaxDecimals(): number;
 
 	renderMap(): React.ReactElement;
 

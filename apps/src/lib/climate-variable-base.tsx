@@ -10,11 +10,11 @@ import {
 	FileFormatType,
 	FrequencyConfig,
 	InteractiveRegionConfig,
-	InteractiveRegionOption,
+	InteractiveRegionOption, ScenariosConfig,
 	ThresholdInterface,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
-import RasterMapDownload from "@/components/download/raster-map-download";
+import RasterDownloadMap from "@/components/download/raster-download-map";
 
 /**
  * A base class representing a climate variable and its configuration. This class provides methods
@@ -33,7 +33,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getVersion(): string | null {
-		return this._config.version || this._config.versions?.[0] || null;
+		return this._config.version || this.getVersions()?.[0] || null;
 	}
 
 	getThresholds(): ThresholdInterface[] {
@@ -44,10 +44,15 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.threshold || this._config.thresholds?.[0]?.value || null;
 	}
 
+	getScenariosConfig(): ScenariosConfig | null {
+		return this._config.scenarios ?? null;
+	}
+
 	getScenarios(): string[] {
 		// Only retrieve scenarios matching the current version.
-		const version = this.getVersion() || Object.keys(this._config.scenarios ?? {})[0];
-		return version ? this._config.scenarios?.[version] ?? [] : [];
+		const scenariosConfig = this.getScenariosConfig() ?? {};
+		const version = this.getVersion() || Object.keys(scenariosConfig)[0];
+		return version ? scenariosConfig?.[version] ?? [] : [];
 	}
 
 	getScenario(): string | null {
@@ -156,6 +161,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.fileFormatTypes ?? [];
 	}
 
+	getMaxDecimals(): number {
+		return this._config.maxDecimals ?? 0;
+	}
+
 	toObject(): ClimateVariableConfigInterface {
 		return {
 			...this._config,
@@ -167,7 +176,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	renderDownloadMap(): React.ReactElement {
-		return <RasterMapDownload />;
+		return <RasterDownloadMap />;
 	}
 }
 

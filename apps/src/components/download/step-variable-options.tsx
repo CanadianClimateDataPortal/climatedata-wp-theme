@@ -10,6 +10,7 @@ import { ControlTitle } from '@/components/ui/control-title';
 import { Input } from '@/components/ui/input';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import appConfig from "@/config/app.config";
 
 /**
  * Variable options step
@@ -17,6 +18,10 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 const StepVariableOptions: React.FC = () => {
 	const { __ } = useI18n();
 	const { climateVariable, setVersion, setAnalysisFieldValue } = useClimateVariable();
+
+	const versionOptions = appConfig.versions.filter((version) =>
+		climateVariable?.getVersions()?.includes(version.value)
+	);
 
 	const analysisFields = climateVariable?.getAnalysisFields()?.map(({ key, type, label, description, help, attributes}) => {
 		const { type: attributeType, placeholder } = attributes || {};
@@ -58,7 +63,7 @@ const StepVariableOptions: React.FC = () => {
 					<Dropdown
 						className="sm:w-64"
 						placeholder={__('Select an option')}
-						options={climateVariable?.getVersions() ?? []}
+						options={versionOptions}
 						value={climateVariable?.getVersion() ?? undefined}
 						label={__('Versions of the dataset')}
 						tooltip={__('Select a version for the dataset')}

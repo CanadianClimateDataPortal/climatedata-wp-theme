@@ -9,9 +9,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { cn, isValidEmail } from '@/lib/utils';
-import { setEmail, setFormat, setSubscribe, } from '@/features/download/download-slice';
+import { setDecimalPlace, setEmail, setFormat, setSubscribe, } from '@/features/download/download-slice';
 import { FileFormatType } from "@/types/climate-variable-interface";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import Dropdown from "@/components/ui/dropdown.tsx";
+import { normalizeDropdownOptions } from "@/lib/format.ts";
 
 /**
  * Send download request step
@@ -19,10 +21,9 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 const StepSendRequest: React.FC = () => {
 	const [captchaValue, setCaptchaValue] = useState<string>('');
 	const { climateVariable } = useClimateVariable();
-
 	const { __ } = useI18n();
 
-	const { format, email, subscribe } = useAppSelector(
+	const { format, email, subscribe, decimalPlace } = useAppSelector(
 		(state) => state.download
 	);
 	const dispatch = useAppDispatch();
@@ -33,6 +34,10 @@ const StepSendRequest: React.FC = () => {
 		{ value: FileFormatType.NetCDF, label: 'NetCDF' },
 	].filter((option) =>
 		climateVariable?.getFileFormatTypes()?.includes(option.value)
+	);
+
+	const decimalPlaceOptions = normalizeDropdownOptions(
+		[0, 2].map((value) => ({ value, label: String(value) }))
 	);
 
 	const isEmailValid = isValidEmail(email);
@@ -60,6 +65,16 @@ const StepSendRequest: React.FC = () => {
 				options={formatOptions}
 				onValueChange={(value) => {
 					dispatch(setFormat(value));
+				}}
+			/>
+
+			<Dropdown
+				className="sm:w-64 mb-8"
+				label={__('Decimal Place')}
+				value={decimalPlace}
+				options={decimalPlaceOptions}
+				onChange={(value) => {
+					dispatch(setDecimalPlace(value));
 				}}
 			/>
 

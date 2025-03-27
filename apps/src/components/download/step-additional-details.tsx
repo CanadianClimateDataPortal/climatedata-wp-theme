@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 import { CheckboxFactory } from '@/components/ui/checkbox';
-import Dropdown from '@/components/ui/dropdown';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
 import {
 	StepContainer,
@@ -11,7 +10,6 @@ import {
 
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
-	setDecimalPlace,
 	setPercentiles,
 } from '@/features/download/download-slice';
 import { normalizeDropdownOptions } from '@/lib/format';
@@ -36,7 +34,6 @@ const StepAdditionalDetails: React.FC = () => {
 
 	const {
 		percentiles,
-		decimalPlace,
 	} = useAppSelector((state) => state.download);
 	const dispatch = useAppDispatch();
 
@@ -62,10 +59,6 @@ const StepAdditionalDetails: React.FC = () => {
 		'90',
 		'95',
 	]);
-
-	const decimalPlaceOptions = normalizeDropdownOptions(
-		[0, 2].map((value) => ({ value, label: String(value) }))
-	);
 
 	const dateRangeConfig = climateVariable?.getDateRangeConfig();
 	const dateRange = climateVariable?.getDateRange() ?? [];
@@ -134,16 +127,6 @@ const StepAdditionalDetails: React.FC = () => {
 				values={percentiles}
 				onChange={(values) => {
 					dispatch(setPercentiles(values));
-				}}
-			/>
-
-			<Dropdown
-				className="sm:w-64"
-				label={__('Decimal Place')}
-				value={decimalPlace}
-				options={decimalPlaceOptions}
-				onChange={(value) => {
-					dispatch(setDecimalPlace(value));
 				}}
 			/>
 		</StepContainer>

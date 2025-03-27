@@ -15,6 +15,16 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		threshold: "tx_max",
 	},
 	{
+		id: "coldest_day",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "tn_min",
+	},
+	{
+		id: "cumulative_degree_days_above_0",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "gddgrow_0",
+	},
+	{
 		id: "ice_days",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "ice_days",
@@ -23,9 +33,20 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 	},
 	{
-		id: "coldest_day",
+		id: "first_fall_frost",
 		class: "RasterPrecalculatedClimateVariable",
-		threshold: "tn_min",
+		threshold: "first_fall_frost",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+	},
+	{
+		id: "frost_days",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "frost_days",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
 	},
 	{
 		id: "all_candcs_variables",

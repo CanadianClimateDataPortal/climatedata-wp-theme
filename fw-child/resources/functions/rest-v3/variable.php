@@ -37,6 +37,7 @@ function cdc_rest_v3_get_variable( $request ) {
 		$post_id = $request->get_param( 'id' );
 
 		$variable = array(
+			'id'      => get_field( 'var_id', $post_id ),
 			'post_id' => $post_id,
 			'meta'    => array(
 				'content'  => array(

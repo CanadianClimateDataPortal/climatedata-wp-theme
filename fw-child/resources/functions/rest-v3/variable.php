@@ -186,13 +186,24 @@ function cdc_rest_v3_get_relevant_trainings( $post_id ) {
 
 	if ( ! empty( $training_post_ids ) ) {
 		foreach ( $training_post_ids as $training_post_id ) {
+			// Training post links.
+			$training_link_en = get_permalink( $training_post_id );
+			if ( strpos( $training_link_en, '-en' ) !== false ) {
+				$training_link_fr = str_replace( '-en', '-fr', $training_link_en );
+			} else {
+				$training_link_fr = str_replace( 'climatedata', 'donneesclimatiques', $training_link_en );
+			}
+
 			$trainings[] = array(
-				'id'    => $training_post_id,
-				'title' => cdc_rest_v3_build_multilingual_field(
+				'post_id' => $training_post_id,
+				'title'   => cdc_rest_v3_build_multilingual_field(
 					get_the_title( $training_post_id ),
 					get_field( 'title_fr', $training_post_id )
 				),
-				'link'  => get_permalink( $training_post_id ),
+				'link'    => cdc_rest_v3_build_multilingual_field(
+					$training_link_en,
+					$training_link_fr
+				),
 			);
 		}
 	}

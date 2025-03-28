@@ -34,7 +34,7 @@ register_rest_route(
 function cdc_rest_v3_get_variable( $request ) {
 	try {
 		// Get variable post ID
-		$post_id = $request->get_param( 'id' );
+		$post_id = $request->get_param( 'post_id' );
 
 		$variable = array(
 			'id'      => get_field( 'var_id', $post_id ),
@@ -125,7 +125,7 @@ function cdc_rest_v3_get_variable( $request ) {
  */
 function cdc_rest_v3_get_variable_args() {
 	return array(
-		'id' => array(
+		'post_id' => array(
 			'description'       => 'Variable post ID',
 			'type'              => 'integer',
 			'required'          => true,

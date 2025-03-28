@@ -52,7 +52,7 @@ function cdc_rest_v3_get_variable( $request ) {
 			),
 		);
 
-		// Variable tagline (card description)
+		// Variable tagline (card descriptions)
 		$tagline = cdc_rest_v3_build_multilingual_field(
 			get_field( 'card_description', $post_id ),
 			get_field( 'card_description_fr', $post_id )
@@ -96,7 +96,7 @@ function cdc_rest_v3_get_variable( $request ) {
 			$variable['meta']['content']['relevant_trainings'] = $relevant_trainings;
 		}
 
-		// Featured image.
+		// Featured images.
 		$featured_images = cdc_rest_v3_get_featured_image( $post_id );
 
 		if ( ! empty( $featured_images ) ) {

@@ -54,6 +54,9 @@ if (
             <?php }
         }
     }
+
+    // Server load font-face style bypassing vite completely
+    require_once get_stylesheet_directory() . '/apps/app-fonts.php';
     ?>
 </head>
 <body>

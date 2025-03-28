@@ -190,33 +190,6 @@ function cdc_rest_v3_get_variables_list( $request ) {
 }
 
 /**
- * Helper function to get taxonomy terms data.
- *
- * @param int $post_id The post ID.
- * @param string $taxonomy The taxonomy name.
- *
- * @return array The formatted taxonomy terms data.
- */
-function cdc_rest_v3_get_taxonomy_terms_data( $post_id, $taxonomy ) {
-	$terms           = wp_get_post_terms( $post_id, $taxonomy );
-	$formatted_terms = array();
-
-	if ( ! is_wp_error( $terms ) ) {
-		foreach ( $terms as $term ) {
-			$formatted_terms[] = array(
-				'term_id' => $term->term_id,
-				'title'   => cdc_rest_v3_build_multilingual_field(
-					$term->name,
-					get_field( 'title_fr', $term )
-				),
-			);
-		}
-	}
-
-	return array( 'terms' => $formatted_terms );
-}
-
-/**
  * Get the arguments for the datasets list REST API endpoint.
  *
  * This function returns an array of arguments for the variables list

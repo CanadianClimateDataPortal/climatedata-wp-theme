@@ -41,11 +41,10 @@ function cdc_rest_v3_get_variable( $request ) {
 			'post_id' => $post_id,
 			'meta'    => array(
 				'content'  => array(
-					'title'          => cdc_rest_v3_build_multilingual_field(
+					'title' => cdc_rest_v3_build_multilingual_field(
 						get_the_title( $post_id ),
 						get_field( 'title_fr', $post_id )
 					),
-					'featured_image' => cdc_rest_v3_get_featured_image( $post_id ),
 				),
 				'taxonomy' => array(
 					'variable-dataset' => cdc_rest_v3_get_taxonomy_terms_data( $post_id, 'variable-dataset' ),
@@ -97,7 +96,14 @@ function cdc_rest_v3_get_variable( $request ) {
 			$variable['meta']['content']['relevant_trainings'] = $relevant_trainings;
 		}
 
-		// Prepare response
+		// Featured image.
+		$featured_images = cdc_rest_v3_get_featured_image( $post_id );
+
+		if ( ! empty( $featured_images ) ) {
+			$variable['meta']['content']['featured_image'] = $featured_images;
+		}
+
+		// Prepare response.
 		$response = array(
 			'variable' => $variable,
 		);

@@ -90,7 +90,7 @@ function cdc_rest_v3_get_variables_list( $request ) {
 				'sector'            => cdc_rest_v3_get_taxonomy_terms_data( $post_id, 'sector' ),
 				'region'            => cdc_rest_v3_get_taxonomy_terms_data( $post_id, 'region' ),
 				'var-type'          => cdc_rest_v3_get_taxonomy_terms_data( $post_id, 'var-type' ),
-				'variable-datasets' => cdc_rest_v3_get_taxonomy_terms_data( $post_id, 'variable-dataset' ),
+				'variable-dataset' => cdc_rest_v3_get_taxonomy_terms_data( $post_id, 'variable-dataset' ),
 			);
 
 			// Build variable array

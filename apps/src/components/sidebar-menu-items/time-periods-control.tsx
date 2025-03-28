@@ -7,37 +7,48 @@ import { SidebarMenuItem } from '@/components/ui/sidebar';
 import { ControlTitle } from '@/components/ui/control-title';
 
 // other
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setTimePeriodEnd } from '@/features/map/map-slice';
 import { cn } from '@/lib/utils';
 import {
-	SLIDER_YEAR_WINDOW_SIZE,
 	SLIDER_STEP,
-	SLIDER_MIN_YEAR,
-	SLIDER_MAX_YEAR,
-} from '@/lib/constants.ts';
+} from '@/lib/constants';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 const TimePeriodsControl: React.FC = () => {
 	const { __ } = useI18n();
+	const { climateVariable, setDateRange } = useClimateVariable();
 
-	const dispatch = useAppDispatch();
+	const {min, max, interval} = climateVariable?.getDateRangeConfig() ?? {
+		min: 1950,
+		max: 2100,
+		interval: 30,
+	};
 
-	const { timePeriodEnd } = useAppSelector((state) => state.map);
+	const [ startYear, endYear ] = climateVariable?.getDateRange() ?? [
+		"2041",
+		"2070"
+	];
+	const sliderValue = [Number(endYear)];
+
+	const minYear = Number(min);
+	const maxYear = Number(max);
+	const intervalYears = interval - 1;
 
 	const handleChange = (values: number[]) => {
 		let newEnd = values[0];
 
-		if (newEnd < SLIDER_MIN_YEAR + SLIDER_YEAR_WINDOW_SIZE) {
-			newEnd = SLIDER_MAX_YEAR + SLIDER_YEAR_WINDOW_SIZE;
+		if (newEnd < minYear + intervalYears) {
+			newEnd = maxYear + intervalYears;
 		}
-		if (newEnd > SLIDER_MAX_YEAR) {
-			newEnd = SLIDER_MAX_YEAR;
+		if (newEnd > maxYear) {
+			newEnd = maxYear;
 		}
 
-		dispatch(setTimePeriodEnd([newEnd]));
+		// Convert to string.
+		setDateRange([
+			newEnd - intervalYears + '',
+			newEnd + '',
+		]);
 	};
-
-	const startYear = timePeriodEnd[0] - SLIDER_YEAR_WINDOW_SIZE;
 
 	return (
 		<SidebarMenuItem>
@@ -51,10 +62,10 @@ const TimePeriodsControl: React.FC = () => {
 						'relative flex items-center select-none',
 						'mt-14 [touch-action:none]'
 					)}
-					value={timePeriodEnd}
+					value={sliderValue}
 					onValueChange={handleChange}
-					min={SLIDER_MIN_YEAR + SLIDER_YEAR_WINDOW_SIZE}
-					max={SLIDER_MAX_YEAR}
+					min={minYear + intervalYears}
+					max={maxYear}
 					step={SLIDER_STEP}
 				>
 					<Slider.Track
@@ -87,7 +98,7 @@ const TimePeriodsControl: React.FC = () => {
 								'flex items-center pointer-events-none'
 							)}
 						>
-							{startYear} - {timePeriodEnd}
+							{startYear} - {endYear}
 							<div
 								className={cn(
 									'slider-range-tooltip',
@@ -100,8 +111,8 @@ const TimePeriodsControl: React.FC = () => {
 					</Slider.Thumb>
 				</Slider.Root>
 				<div className="flex justify-between mt-2.5 text-sm">
-					<span>{SLIDER_MIN_YEAR}</span>
-					<span>{SLIDER_MAX_YEAR}</span>
+					<span>{minYear}</span>
+					<span>{maxYear}</span>
 				</div>
 			</div>
 		</SidebarMenuItem>

@@ -4,6 +4,7 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 import { SidebarMenuItem } from "@/components/ui/sidebar";
 import Dropdown from "@/components/ui/dropdown";
+import appConfig from "@/config/app.config"
 
 /**
  * Versions dropdown component.
@@ -11,6 +12,9 @@ import Dropdown from "@/components/ui/dropdown";
 const VersionsDropdown: React.FC = () => {
 	const { climateVariable, setVersion } = useClimateVariable();
 	const { __ } = useI18n();
+	const options = appConfig.versions.filter((version) =>
+		climateVariable?.getVersions()?.includes(version.value)
+	);
 
 	const Tooltip = () => (
 		<div className="text-sm text-gray-500">
@@ -22,7 +26,7 @@ const VersionsDropdown: React.FC = () => {
 		<SidebarMenuItem>
 			<Dropdown
 				label={__('Versions')}
-				options={climateVariable?.getVersions() ?? []}
+				options={options}
 				value={climateVariable?.getVersion() ?? undefined}
 				onChange={setVersion}
 				tooltip={<Tooltip />}

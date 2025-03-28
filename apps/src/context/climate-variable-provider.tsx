@@ -17,6 +17,7 @@ import {
 	ClimateVariableConfigInterface,
 	ClimateVariableInterface, InteractiveRegionOption
 } from "@/types/climate-variable-interface";
+import RasterPrecalculatedClimateVariable from "@/lib/raster-precalculated-climate-variable";
 
 export type ClimateVariableContextType = {
 	climateVariable: ClimateVariableInterface | null;
@@ -39,7 +40,8 @@ type ClassMapType = Record<string, new (arg: ClimateVariableConfigInterface) => 
  * Maps climate variable class names to their corresponding class implementations.
  */
 const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
-	"ClimateVariableBase": ClimateVariableBase
+	"ClimateVariableBase": ClimateVariableBase,
+	"RasterPrecalculatedClimateVariable": RasterPrecalculatedClimateVariable,
 };
 
 /**

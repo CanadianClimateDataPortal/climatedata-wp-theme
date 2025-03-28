@@ -39,6 +39,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
+	const gridType = climateVariable?.getGridType() ?? 'canadagrid';
 	const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
 
 	// Convert legend data to a color map usable by the getColor method to generate colors for each feature
@@ -149,9 +150,8 @@ const InteractiveRegionsLayer: React.FC = () => {
 	);
 
 	const tileLayerUrl = useMemo(() => {
-		// @todo retrieve the grid type ("canadagrid") from config.
 		const regionPbfValues: Record<string, string> = {
-			gridded_data: 'CDC:canadagrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf',
+			gridded_data: `CDC:${gridType}@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf`,
 			watershed: 'CDC:watershed/{z}/{x}/{-y}.pbf',
 			health: 'CDC:health/{z}/{x}/{-y}.pbf',
 			census: 'CDC:census/{z}/{x}/{-y}.pbf',
@@ -160,13 +160,12 @@ const InteractiveRegionsLayer: React.FC = () => {
 			regionPbfValues[interactiveRegion] || regionPbfValues[InteractiveRegionOption.GRIDDED_DATA];
 
 		return `${GEOSERVER_BASE_URL}/geoserver/gwc/service/tms/1.0.0/${regionPbf}`;
-	}, [interactiveRegion]);
+	}, [interactiveRegion, gridType]);
 
 	const vectorTileLayerStyles = useMemo(() => {
 		if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
-			// @todo retrieve the grid type ("canadagrid") from config.
 			return {
-				canadagrid: (properties: { gid: number }) => ({
+				[gridType]: (properties: { gid: number }) => ({
 					weight: 0.5,
 					color: '#fff',
 					fillColor: properties.gid
@@ -194,7 +193,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 				fillOpacity: 1,
 			}),
 		};
-	}, [interactiveRegion, layerData, getColor]);
+	}, [interactiveRegion, layerData, getColor, gridType]);
 
 	const { handleClick, handleOver, handleOut } = useInteractiveMapEvents(
 		layerRef,

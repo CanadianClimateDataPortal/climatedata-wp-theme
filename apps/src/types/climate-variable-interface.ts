@@ -1,14 +1,7 @@
 import React from "react";
 
-export interface VersionInterface {
-	value: string;
-	label: string;
-}
-
-export interface ScenarioInterface {
-	value: string;
-	label: string;
-	version: string;
+export interface ScenariosConfig {
+	[key: string]: string[];
 }
 
 export interface ThresholdInterface {
@@ -103,7 +96,7 @@ export interface ClimateVariableConfigInterface {
 	class: string;
 
 	/** Available versions for this climate variable */
-	versions?: VersionInterface[];
+	versions?: string[];
 
 	/** Selected version for this climate variable */
 	version?: string | null;
@@ -115,7 +108,7 @@ export interface ClimateVariableConfigInterface {
 	threshold?: string | null;
 
 	/** Available scenarios linked to this climate variable */
-	scenarios?: ScenarioInterface[];
+	scenarios?: ScenariosConfig;
 
 	/** Selected scenario value */
 	scenario?: string | null;
@@ -128,6 +121,9 @@ export interface ClimateVariableConfigInterface {
 
 	/** Currently selected interactive region option */
 	interactiveRegion?: InteractiveRegionOption;
+
+	/** Grid type used for raster maps */
+	gridType?: string | null;
 
 	/** Configuration defining frequency options and corresponding display modes */
 	frequencyConfig?: FrequencyConfig;
@@ -176,13 +172,16 @@ export interface ClimateVariableConfigInterface {
 
 	/** The type of formats available */
 	fileFormatTypes?: FileFormatType[];
+
+	/** The maximum number of decimals to be used for the file */
+	maxDecimals?: number;
 }
 
 /**
  * Interface representing functionality for handling climate variables and their configurations.
  */
 export interface ClimateVariableInterface {
-	getVersions(): VersionInterface[];
+	getVersions(): string[];
 
 	getVersion(): string | null;
 
@@ -190,7 +189,9 @@ export interface ClimateVariableInterface {
 
 	getThreshold(): string | null;
 
-	getScenarios(): ScenarioInterface[];
+	getScenariosConfig(): ScenariosConfig | null;
+
+	getScenarios(): string[];
 
 	getScenario(): string | null;
 
@@ -199,6 +200,8 @@ export interface ClimateVariableInterface {
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null;
 
 	getInteractiveRegion(): InteractiveRegionOption | null;
+
+	getGridType(): string | null;
 
 	getFrequencyConfig(): FrequencyConfig | null;
 
@@ -230,7 +233,9 @@ export interface ClimateVariableInterface {
 
 	getDownloadType(): DownloadType | null;
 
-	getFileFormatTypes(): FileFormatType[] | null;
+	getFileFormatTypes(): FileFormatType[];
+
+	getMaxDecimals(): number;
 
 	renderMap(): React.ReactElement;
 

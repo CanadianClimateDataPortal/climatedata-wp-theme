@@ -10,13 +10,11 @@ import {
 	FileFormatType,
 	FrequencyConfig,
 	InteractiveRegionConfig,
-	InteractiveRegionOption,
-	ScenarioInterface,
+	InteractiveRegionOption, ScenariosConfig,
 	ThresholdInterface,
-	VersionInterface,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
-import RasterMapDownload from "@/components/download/raster-map-download";
+import RasterDownloadMap from "@/components/download/raster-download-map";
 
 /**
  * A base class representing a climate variable and its configuration. This class provides methods
@@ -30,12 +28,12 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		this._config = config;
 	}
 
-	getVersions(): VersionInterface[] {
+	getVersions(): string[] {
 		return this._config.versions ?? [];
 	}
 
 	getVersion(): string | null {
-		return this._config.version || this._config.versions?.[0]?.value || null;
+		return this._config.version || this.getVersions()?.[0] || null;
 	}
 
 	getThresholds(): ThresholdInterface[] {
@@ -46,17 +44,25 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.threshold || this._config.thresholds?.[0]?.value || null;
 	}
 
-	getScenarios(): ScenarioInterface[] {
+	getScenariosConfig(): ScenariosConfig | null {
+		return this._config.scenarios ?? null;
+	}
+
+	getScenarios(): string[] {
 		// Only retrieve scenarios matching the current version.
-		return this._config.scenarios?.filter((scenario) => scenario.version === this.getVersion()) ?? [];
+		const scenariosConfig = this.getScenariosConfig() ?? {};
+		const version = this.getVersion() || Object.keys(scenariosConfig)[0];
+		return version ? scenariosConfig?.[version] ?? [] : [];
 	}
 
 	getScenario(): string | null {
 		// Check if the current scenario actually belongs to the current version.
 		// If not, return the first scenario that belongs to the current version.
-		const currentVersion = this.getVersion();
-		const filteredScenario = this.getScenarios()?.find((scenario) => scenario.value === this._config.scenario && scenario.version === currentVersion);
-		return filteredScenario?.value || this.getScenarios()?.[0]?.value || null;
+		const currentScenario = this._config.scenario;
+		if (currentScenario && this.getScenarios().includes(currentScenario)) {
+			return currentScenario;
+		}
+		return this.getScenarios()[0] || null;
 	}
 
 	getAnalyzeScenarios(): string[] {
@@ -93,6 +99,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getFrequency(): string | null {
 		return this._config.frequency ?? null;
+	}
+
+	getGridType(): string | null {
+		return this._config.gridType ?? null
 	}
 
 	hasDelta(): boolean {
@@ -151,8 +161,12 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.downloadType ?? null;
 	}
 
-	getFileFormatTypes(): FileFormatType[] | null {
+	getFileFormatTypes(): FileFormatType[] {
 		return this._config.fileFormatTypes ?? [];
+	}
+
+	getMaxDecimals(): number {
+		return this._config.maxDecimals ?? 0;
 	}
 
 	toObject(): ClimateVariableConfigInterface {
@@ -166,7 +180,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	renderDownloadMap(): React.ReactElement {
-		return <RasterMapDownload />;
+		return <RasterDownloadMap />;
 	}
 }
 

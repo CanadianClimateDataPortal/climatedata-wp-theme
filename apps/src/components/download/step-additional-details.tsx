@@ -13,10 +13,12 @@ import {
 	AveragingType,
 	DownloadType,
 	FrequencyConfig,
+	FrequencyType,
 } from "@/types/climate-variable-interface";
 import { FrequencySelect } from "@/components/frequency-select";
 import SectionContext from "@/context/section-provider";
 import { YearRange } from "@/components/year-range";
+import appConfig from "@/config/app.config";
 
 /**
  * Additional details step will allow the user to customize the download request
@@ -42,6 +44,9 @@ const StepAdditionalDetails: React.FC = () => {
 
 	const dateRangeConfig = climateVariable?.getDateRangeConfig();
 	const dateRange = climateVariable?.getDateRange() ?? [];
+	const scenarioOptions = appConfig.scenarios.filter((scenario) =>
+		climateVariable?.getScenarios()?.includes(scenario.value)
+	);
 
 	return (
 		<StepContainer title="Additional details">
@@ -49,7 +54,7 @@ const StepAdditionalDetails: React.FC = () => {
 				{__('Adjust the controls below to customize your analysis.')}
 			</StepContainerDescription>
 
-			{dateRangeConfig &&
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED && dateRangeConfig &&
 				<YearRange
 					startYear={{
 						label: __('Start Year'),
@@ -73,14 +78,14 @@ const StepAdditionalDetails: React.FC = () => {
 				className={"sm:w-64 mb-4"}
 			/>
 
-			<RadioGroupFactory
+			{averagingOptions.length > 0 && climateVariable?.getFrequency() !== FrequencyType.DAILY && <RadioGroupFactory
 				name="temporal-frequency"
 				className="max-w-md mb-8"
 				optionClassName="w-1/2"
 				options={averagingOptions}
 				value={climateVariable?.getAveragingType() ?? undefined}
 				onValueChange={setAveragingType}
-			/>
+			/>}
 
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED &&
 				<CheckboxFactory
@@ -90,7 +95,7 @@ const StepAdditionalDetails: React.FC = () => {
 					orientation="horizontal"
 					className="max-w-md mb-8"
 					optionClassName="w-1/2 sm:w-1/4"
-					options={climateVariable?.getScenarios() ?? []}
+					options={scenarioOptions}
 					values={climateVariable?.getAnalyzeScenarios()}
 					onChange={setAnalyzeScenarios}
 				/>

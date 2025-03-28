@@ -19,6 +19,7 @@ function cdc_rest_v3_init() {
 	// Load endpoint definitions.
 	require_once dirname( __FILE__ ) . '/datasets-list.php';
 	require_once dirname( __FILE__ ) . '/variables-list.php';
+	require_once dirname( __FILE__ ) . '/variables-filters.php';
 }
 
 add_action( 'rest_api_init', 'cdc_rest_v3_init' );
@@ -143,6 +144,7 @@ function cdc_rest_v3_set_cache( $served, $result, $request, $server ) {
 	$cacheable_endpoints = [
 		'cdc/v3/datasets-list',
 		'cdc/v3/variables-list',
+		'cdc/v3/variables-filters',
 	];
 
 	$route = $request->get_route();

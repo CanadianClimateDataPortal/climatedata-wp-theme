@@ -1,0 +1,124 @@
+<?php
+/**
+ * Variables filters endpoint.
+ *
+ * This file defines the REST API endpoint for retrieving variables
+ * filters (taxonomies: 'var-type' and 'sector'). It includes functions
+ * for data formatting and response handling.
+ */
+
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Register custom REST API endpoints for retrieving
+ * variables filters options.
+ */
+register_rest_route(
+	'cdc/v3',
+	'variables-filters',
+	array(
+		'methods'             => WP_REST_Server::READABLE,
+		'callback'            => 'cdc_rest_v3_get_variables_filters',
+		'permission_callback' => 'cdc_rest_v3_endpoint_permission',
+	)
+);
+
+/**
+ * Retrieve the variables filters options for the REST API endpoint.
+ *
+ * This function handles the retrieval of terms data from
+ * 'var-type' and 'sector' taxonomies.
+ *
+ * @param WP_REST_Request $request The request object.
+ *
+ * @return WP_REST_Response|WP_Error The response object or WP_Error on failure.
+ */
+function cdc_rest_v3_get_variables_filters( $request ) {
+	try {
+		// Get taxonomy "var-type" terms.
+		$var_type_args = array(
+			'taxonomy'   => 'var-type',
+			'hide_empty' => true,
+		);
+
+		$var_type_terms = get_terms( $var_type_args );
+
+		// Check if var-type terms exist.
+		if ( is_wp_error( $var_type_terms ) ) {
+			$var_type_terms = array();
+		}
+
+		// Get taxonomy "sector" terms.
+		$sector_args = array(
+			'taxonomy'   => 'sector',
+			'hide_empty' => true,
+		);
+
+		$sector_terms = get_terms( $sector_args );
+
+		// Check if sector terms exist.
+		if ( is_wp_error( $sector_terms ) ) {
+			$sector_terms = array();
+		}
+
+		// Process var-type terms.
+		$var_types = array();
+
+		foreach ( $var_type_terms as $term ) {
+			$term_id = absint( $term->term_id );
+
+			// Get the French title.
+			$title_fr = get_field( 'title_fr', 'term_' . $term_id );
+
+			// Build var-type array.
+			$var_type = array(
+				'term_id' => $term_id,
+				'title'   => cdc_rest_v3_build_multilingual_field(
+					$term->name,
+					$title_fr
+				),
+			);
+
+			$var_types[] = $var_type;
+		}
+
+		// Process sector terms.
+		$sectors = array();
+
+		foreach ( $sector_terms as $term ) {
+			$term_id = absint( $term->term_id );
+
+			// Get the French title.
+			$title_fr = get_field( 'title_fr', 'term_' . $term_id );
+
+			// Build sector array.
+			$sector = array(
+				'term_id' => $term_id,
+				'title'   => cdc_rest_v3_build_multilingual_field(
+					$term->name,
+					$title_fr
+				),
+			);
+
+			$sectors[] = $sector;
+		}
+
+		// Prepare the response.
+		$response = array(
+			'var_types' => $var_types,
+			'sectors'   => $sectors,
+		);
+
+		// Create and return the response.
+		$response_object = new WP_REST_Response( $response, 200 );
+
+		return $response_object;
+	} catch ( Exception $e ) {
+		return new WP_Error(
+			'server_error',
+			esc_html__( 'An unexpected error occurred.', 'cdc' ),
+			array( 'status' => 500 )
+		);
+	}
+}

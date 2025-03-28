@@ -38,13 +38,13 @@ function cdc_rest_v3_get_variables_filters( $request ) {
 	try {
 		// Define the taxonomies to process.
 		$taxonomies = array(
-			'var_types' => 'var-type',
-			'sectors'   => 'sector',
+			'var-type',
+			'sector',
 		);
 
 		$response = array();
 
-		foreach ( $taxonomies as $key => $taxonomy ) {
+		foreach ( $taxonomies as $taxonomy ) {
 			// Get taxonomy terms.
 			$args = array(
 				'taxonomy'   => $taxonomy,
@@ -59,7 +59,7 @@ function cdc_rest_v3_get_variables_filters( $request ) {
 			}
 
 			// Process terms.
-			$response[ $key ] = array();
+			$response[ $taxonomy ] = array();
 
 			foreach ( $terms as $term ) {
 				$term_id = absint( $term->term_id );
@@ -76,7 +76,7 @@ function cdc_rest_v3_get_variables_filters( $request ) {
 					),
 				);
 
-				$response[ $key ][] = $processed_term;
+				$response[ $taxonomy ]['terms'][] = $processed_term;
 			}
 		}
 

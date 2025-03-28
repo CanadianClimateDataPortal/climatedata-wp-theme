@@ -120,7 +120,9 @@ function cdc_rest_v3_get_datasets_list( $request ) {
 
 		// Prepare the response.
 		$response = array(
-			'datasets' => $datasets,
+			'datasets' => array(
+				'terms' => $datasets,
+			),
 		);
 
 		// Add pagination headers only if not requesting all items.

@@ -25,6 +25,16 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		threshold: "gddgrow_0",
 	},
 	{
+		id: "max_5d_total_precipitation",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "rx5day",
+	},
+	{
+		id: "periods_more_5_consecutive_dry_days",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "nr_cdd",
+	},
+	{
 		id: "ice_days",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "ice_days",
@@ -46,6 +56,60 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		threshold: "frost_days",
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+	},
+	{
+		id: "frost_free_season",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "frost_free_season",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+	},
+	{
+		id: "growing_degree_days_5",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "gddgrow_5",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+	},
+	{
+		id: "last_spring_frost",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "last_spring_frost",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+	},
+	{
+		id: "max_number_consecutive_dry_days",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "cdd",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+	},
+	{
+		id: "max_1d_total_precipitation",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "rx1day",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+	},
+	{
+		id: "mean_temp",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "tg_mean",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 	},
 	{

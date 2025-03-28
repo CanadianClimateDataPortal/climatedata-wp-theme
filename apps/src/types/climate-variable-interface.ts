@@ -167,14 +167,22 @@ export interface ClimateVariableConfigInterface {
 	/** Stores the selected percentiles */
 	percentiles?: string[];
 
-	/** Determines if the variable data must be analyzed or is already precalculated. */
-	downloadType?: DownloadType;
-
 	/** The type of formats available */
 	fileFormatTypes?: FileFormatType[];
 
 	/** The maximum number of decimals to be used for the file */
 	maxDecimals?: number;
+
+	/** Determines if the variable data must be analyzed or is already precalculated. */
+	downloadType?: DownloadType;
+
+	hasMultipleDownloadUrls?: boolean;
+
+	downloadUrls?: string[];
+
+	downloadUrl?: string;
+
+	analysisUrl?: string;
 }
 
 /**
@@ -231,8 +239,6 @@ export interface ClimateVariableInterface {
 
 	getPercentiles(): string[];
 
-	getDownloadType(): DownloadType | null;
-
 	getFileFormatTypes(): FileFormatType[];
 
 	getMaxDecimals(): number;
@@ -240,6 +246,16 @@ export interface ClimateVariableInterface {
 	renderMap(): React.ReactElement;
 
 	renderDownloadMap(): React.ReactElement;
+
+	getDownloadType(): DownloadType | null;
+
+	hasMultipleDownloadUrls(): boolean;
+
+	getDownloadUrls(): string[];
+
+	getDownloadUrl(): string | null;
+
+	getAnalysisUrl(): string | null;
 
 	toObject(): ClimateVariableConfigInterface;
 }

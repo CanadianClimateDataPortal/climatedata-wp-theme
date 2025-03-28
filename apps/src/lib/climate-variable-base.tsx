@@ -157,10 +157,6 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.percentiles ?? [];
 	}
 
-	getDownloadType(): DownloadType | null {
-		return this._config.downloadType ?? null;
-	}
-
 	getFileFormatTypes(): FileFormatType[] {
 		return this._config.fileFormatTypes ?? [];
 	}
@@ -169,18 +165,38 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.maxDecimals ?? 0;
 	}
 
-	toObject(): ClimateVariableConfigInterface {
-		return {
-			...this._config,
-		};
-	}
-
 	renderMap(): React.ReactElement {
 		return <RasterMap />
 	}
 
 	renderDownloadMap(): React.ReactElement {
 		return <RasterDownloadMap />;
+	}
+
+	getDownloadType(): DownloadType | null {
+		return this._config.downloadType ?? null;
+	}
+
+	hasMultipleDownloadUrls(): boolean {
+		return this._config.hasMultipleDownloadUrls ?? false;
+	}
+
+	getDownloadUrls(): string[] {
+		return this._config.downloadUrls ?? [];
+	}
+
+	getDownloadUrl(): string | null {
+		return this._config.downloadUrl ?? null;
+	}
+
+	getAnalysisUrl(): string | null {
+		return this._config.analysisUrl ?? null;
+	}
+
+	toObject(): ClimateVariableConfigInterface {
+		return {
+			...this._config,
+		};
 	}
 }
 

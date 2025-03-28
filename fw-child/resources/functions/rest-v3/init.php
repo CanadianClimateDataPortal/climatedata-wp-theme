@@ -20,6 +20,7 @@ function cdc_rest_v3_init() {
 	require_once dirname( __FILE__ ) . '/datasets-list.php';
 	require_once dirname( __FILE__ ) . '/variables-list.php';
 	require_once dirname( __FILE__ ) . '/variables-filters.php';
+	require_once dirname( __FILE__ ) . '/variable.php';
 }
 
 add_action( 'rest_api_init', 'cdc_rest_v3_init' );
@@ -128,6 +129,33 @@ function cdc_rest_v3_build_multilingual_field( $en, $fr ) {
 }
 
 /**
+ * Helper function to get taxonomy terms data.
+ *
+ * @param int $post_id The post ID.
+ * @param string $taxonomy The taxonomy name.
+ *
+ * @return array The formatted taxonomy terms data.
+ */
+function cdc_rest_v3_get_taxonomy_terms_data( $post_id, $taxonomy ) {
+	$terms           = wp_get_post_terms( $post_id, $taxonomy );
+	$formatted_terms = array();
+
+	if ( ! is_wp_error( $terms ) ) {
+		foreach ( $terms as $term ) {
+			$formatted_terms[] = array(
+				'term_id' => $term->term_id,
+				'title'   => cdc_rest_v3_build_multilingual_field(
+					$term->name,
+					get_field( 'title_fr', $term )
+				),
+			);
+		}
+	}
+
+	return array( 'terms' => $formatted_terms );
+}
+
+/**
  * Set cache headers for REST API V3 endpoints.
  *
  * This function sets the Cache-Control header to cache the response
@@ -145,6 +173,7 @@ function cdc_rest_v3_set_cache( $served, $result, $request, $server ) {
 		'cdc/v3/datasets-list',
 		'cdc/v3/variables-list',
 		'cdc/v3/variables-filters',
+		'cdc/v3/variable',
 	];
 
 	$route = $request->get_route();

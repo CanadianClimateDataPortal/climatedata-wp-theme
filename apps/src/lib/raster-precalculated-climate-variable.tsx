@@ -17,8 +17,8 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 		return super.getVersions().length > 0
 			? super.getVersions()
 			: [
-				"cmip5",
 				"cmip6",
+				"cmip5",
 			];
 	}
 

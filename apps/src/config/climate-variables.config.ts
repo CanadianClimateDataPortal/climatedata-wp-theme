@@ -126,8 +126,8 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "test_variable",
 		class: "ClimateVariableBase",
 		versions: [
+			"cmip6",
 			"cmip5",
-			"cmip6"
 		],
 		thresholds: [
 			{

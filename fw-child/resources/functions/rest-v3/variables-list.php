@@ -85,14 +85,6 @@ function cdc_rest_v3_get_variables_list( $request ) {
 		foreach ( $query->posts as $post ) {
 			$post_id = $post->ID;
 
-			// Get taxonomies data.
-			$taxonomies = array(
-				'sector'            => cdc_rest_v3_get_taxonomy_terms_data( $post_id, 'sector' ),
-				'region'            => cdc_rest_v3_get_taxonomy_terms_data( $post_id, 'region' ),
-				'var-type'          => cdc_rest_v3_get_taxonomy_terms_data( $post_id, 'var-type' ),
-				'variable-dataset' => cdc_rest_v3_get_taxonomy_terms_data( $post_id, 'variable-dataset' ),
-			);
-
 			// Build variable array
 			$variable = array(
 				'id'      => get_field( 'var_id', $post_id ),
@@ -105,17 +97,22 @@ function cdc_rest_v3_get_variables_list( $request ) {
 							get_field( 'title_fr', $post_id )
 						),
 					),
+					'taxonomy'   => array(
+						'sector'           => cdc_rest_v3_get_taxonomy_terms_data( $post_id, 'sector' ),
+						'region'           => cdc_rest_v3_get_taxonomy_terms_data( $post_id, 'region' ),
+						'var-type'         => cdc_rest_v3_get_taxonomy_terms_data( $post_id, 'var-type' ),
+						'variable-dataset' => cdc_rest_v3_get_taxonomy_terms_data( $post_id, 'variable-dataset' ),
+					),
 				),
 			);
 
-			// Get ACF fields
+			// Build card object.
+			$card = array();
+
 			$card_description    = get_field( 'card_description', $post_id );
 			$card_description_fr = get_field( 'card_description_fr', $post_id );
 			$card_link           = get_field( 'card_link', $post_id );
 			$card_link_fr        = get_field( 'card_link_fr', $post_id );
-
-			// Build card object.
-			$card = array();
 
 			// Add card descriptions if available.
 			$card_descriptions = cdc_rest_v3_build_multilingual_field(
@@ -142,17 +139,11 @@ function cdc_rest_v3_get_variables_list( $request ) {
 				$variable['meta']['content']['card'] = $card;
 			}
 
-			// Add thumbnail if available
-			$thumbnail_size = 'post-thumbnail';
-			$thumbnail      = get_the_post_thumbnail_url( $post_id, $thumbnail_size );
+			// Featured image.
+			$thumbnail = get_the_post_thumbnail_url( $post_id, 'thumbnail' );
 
 			if ( ! empty( $thumbnail ) ) {
 				$variable['meta']['content']['thumbnail'] = $thumbnail;
-			}
-
-			// Add taxonomies if not empty
-			if ( ! empty( $taxonomies ) ) {
-				$variable['meta']['taxonomy'] = $taxonomies;
 			}
 
 			$variables[] = $variable;

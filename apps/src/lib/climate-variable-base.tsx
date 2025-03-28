@@ -101,6 +101,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.frequency ?? null;
 	}
 
+	getGridType(): string | null {
+		return this._config.gridType ?? null
+	}
+
 	hasDelta(): boolean {
 		return this._config.hasDelta ?? false;
 	}

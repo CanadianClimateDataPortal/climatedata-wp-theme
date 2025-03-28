@@ -60,6 +60,10 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 			};
 	}
 
+	getGridType(): string | null {
+		return super.getGridType() ? super.getGridType() : "canadagrid";
+	}
+
 	getAveragingOptions(): AveragingType[] {
 		return super.getAveragingOptions().length > 0
 			? super.getAveragingOptions()

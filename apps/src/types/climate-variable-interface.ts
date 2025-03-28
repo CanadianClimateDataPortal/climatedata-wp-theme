@@ -122,6 +122,9 @@ export interface ClimateVariableConfigInterface {
 	/** Currently selected interactive region option */
 	interactiveRegion?: InteractiveRegionOption;
 
+	/** Grid type used for raster maps */
+	gridType?: string | null;
+
 	/** Configuration defining frequency options and corresponding display modes */
 	frequencyConfig?: FrequencyConfig;
 
@@ -197,6 +200,8 @@ export interface ClimateVariableInterface {
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null;
 
 	getInteractiveRegion(): InteractiveRegionOption | null;
+
+	getGridType(): string | null;
 
 	getFrequencyConfig(): FrequencyConfig | null;
 

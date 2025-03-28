@@ -113,6 +113,32 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 	},
 	{
+		id: "days_humidex_above_threshold",
+		class: "RasterPrecalculatedClimateVariable",
+		versions: [ "cmip6" ],
+		gridType: "era5landgrid",
+		thresholds: [
+			{
+				value: "HXmax30",
+				label: "30",
+			},
+			{
+				value: "HXmax35",
+				label: "35",
+			},
+			{
+				value: "HXmax40",
+				label: "40",
+			},
+		],
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+	},
+	{
 		id: "all_candcs_variables",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "all",
@@ -161,6 +187,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.NONE,
 		},
+		gridType: "canadagrid",
 		averagingOptions: [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS

@@ -65,8 +65,8 @@ function cdc_rest_v3_get_variable( $request ) {
 
 		// Variable full descriptions.
 		$full_descriptions = cdc_rest_v3_build_multilingual_field(
-			get_field( 'var_full_description', $post_id ),
-			get_field( 'var_full_description_fr', $post_id )
+			get_field( 'var_description', $post_id ),
+			get_field( 'var_description_fr', $post_id )
 		);
 
 		if ( ! empty( $full_descriptions ) ) {

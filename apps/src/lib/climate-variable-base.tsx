@@ -161,6 +161,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.fileFormatTypes ?? [];
 	}
 
+	getFileFormat(): FileFormatType | null {
+		return this._config.fileFormat || this.getFileFormatTypes()?.[0] || null;
+	}
+
 	getMaxDecimals(): number {
 		return this._config.maxDecimals ?? 0;
 	}

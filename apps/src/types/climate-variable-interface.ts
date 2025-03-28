@@ -170,6 +170,9 @@ export interface ClimateVariableConfigInterface {
 	/** The type of formats available */
 	fileFormatTypes?: FileFormatType[];
 
+	/** The file format to use for download */
+	fileFormat?: FileFormatType;
+
 	/** The maximum number of decimals to be used for the file */
 	maxDecimals?: number;
 
@@ -240,6 +243,8 @@ export interface ClimateVariableInterface {
 	getPercentiles(): string[];
 
 	getFileFormatTypes(): FileFormatType[];
+
+	getFileFormat(): FileFormatType | null;
 
 	getMaxDecimals(): number;
 

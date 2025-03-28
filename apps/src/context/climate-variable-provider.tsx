@@ -15,7 +15,9 @@ import ClimateVariableBase from "@/lib/climate-variable-base";
 import {
 	AveragingType,
 	ClimateVariableConfigInterface,
-	ClimateVariableInterface, InteractiveRegionOption
+	ClimateVariableInterface,
+	FileFormatType,
+	InteractiveRegionOption,
 } from "@/types/climate-variable-interface";
 import RasterPrecalculatedClimateVariable from "@/lib/raster-precalculated-climate-variable";
 
@@ -32,6 +34,7 @@ export type ClimateVariableContextType = {
 	setAveragingType: (type: AveragingType) => void;
 	setDateRange: (dates: string[]) => void;
 	setPercentiles: (percentiles: string[]) => void;
+	setFileFormat: (fileFormat: FileFormatType) => void;
 }
 
 type ClassMapType = Record<string, new (arg: ClimateVariableConfigInterface) => ClimateVariableInterface>;
@@ -164,6 +167,12 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		}));
 	}, [dispatch]);
 
+	const setFileFormat = useCallback((fileFormat: FileFormatType) => {
+		dispatch(updateClimateVariable({
+			fileFormat
+		}));
+	}, [dispatch]);
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
@@ -177,6 +186,7 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		setAveragingType,
 		setDateRange,
 		setPercentiles,
+		setFileFormat,
 	}
 
 	return (

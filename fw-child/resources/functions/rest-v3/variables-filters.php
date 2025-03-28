@@ -36,79 +36,49 @@ register_rest_route(
  */
 function cdc_rest_v3_get_variables_filters( $request ) {
 	try {
-		// Get taxonomy "var-type" terms.
-		$var_type_args = array(
-			'taxonomy'   => 'var-type',
-			'hide_empty' => true,
+		// Define the taxonomies to process.
+		$taxonomies = array(
+			'var_types' => 'var-type',
+			'sectors'   => 'sector',
 		);
 
-		$var_type_terms = get_terms( $var_type_args );
+		$response = array();
 
-		// Check if var-type terms exist.
-		if ( is_wp_error( $var_type_terms ) ) {
-			$var_type_terms = array();
-		}
-
-		// Get taxonomy "sector" terms.
-		$sector_args = array(
-			'taxonomy'   => 'sector',
-			'hide_empty' => true,
-		);
-
-		$sector_terms = get_terms( $sector_args );
-
-		// Check if sector terms exist.
-		if ( is_wp_error( $sector_terms ) ) {
-			$sector_terms = array();
-		}
-
-		// Process var-type terms.
-		$var_types = array();
-
-		foreach ( $var_type_terms as $term ) {
-			$term_id = absint( $term->term_id );
-
-			// Get the French title.
-			$title_fr = get_field( 'title_fr', 'term_' . $term_id );
-
-			// Build var-type array.
-			$var_type = array(
-				'term_id' => $term_id,
-				'title'   => cdc_rest_v3_build_multilingual_field(
-					$term->name,
-					$title_fr
-				),
+		foreach ( $taxonomies as $key => $taxonomy ) {
+			// Get taxonomy terms.
+			$args = array(
+				'taxonomy'   => $taxonomy,
+				'hide_empty' => true,
 			);
 
-			$var_types[] = $var_type;
+			$terms = get_terms( $args );
+
+			// Check if terms exist.
+			if ( is_wp_error( $terms ) ) {
+				$terms = array();
+			}
+
+			// Process terms.
+			$response[ $key ] = array();
+
+			foreach ( $terms as $term ) {
+				$term_id = absint( $term->term_id );
+
+				// Get the French title.
+				$title_fr = get_field( 'title_fr', 'term_' . $term_id );
+
+				// Build term array.
+				$processed_term = array(
+					'term_id' => $term_id,
+					'title'   => cdc_rest_v3_build_multilingual_field(
+						$term->name,
+						$title_fr
+					),
+				);
+
+				$response[ $key ][] = $processed_term;
+			}
 		}
-
-		// Process sector terms.
-		$sectors = array();
-
-		foreach ( $sector_terms as $term ) {
-			$term_id = absint( $term->term_id );
-
-			// Get the French title.
-			$title_fr = get_field( 'title_fr', 'term_' . $term_id );
-
-			// Build sector array.
-			$sector = array(
-				'term_id' => $term_id,
-				'title'   => cdc_rest_v3_build_multilingual_field(
-					$term->name,
-					$title_fr
-				),
-			);
-
-			$sectors[] = $sector;
-		}
-
-		// Prepare the response.
-		$response = array(
-			'var_types' => $var_types,
-			'sectors'   => $sectors,
-		);
 
 		// Create and return the response.
 		$response_object = new WP_REST_Response( $response, 200 );

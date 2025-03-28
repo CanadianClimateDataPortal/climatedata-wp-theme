@@ -786,3 +786,114 @@ function cdc_custom_404_page_setting() {
 }
 
 add_action( 'admin_init', 'cdc_custom_404_page_setting' );
+
+/**
+ * Load and process FE assets for apps from the built `manifest.json`
+ *
+ * @param string $app_type The type of app ('map' or 'download')
+ *
+ * @return array|null Array of assets or null on failure
+ */
+function cdc_app_asset_load( $app_type ) {
+	// Validate app type
+	if ( ! in_array( $app_type, array( 'map', 'download' ), true ) ) {
+		error_log( 'Invalid app type: ' . $app_type );
+
+		return null;
+	}
+
+	// Set manifest paths based on current theme
+	$base_path     = get_stylesheet_directory() . '/apps/dist';
+	$manifest_path = $base_path . '/.vite/manifest.json';
+
+	// Verify if manifest file exists and is readable
+	if ( ! file_exists( $manifest_path ) || ! is_readable( $manifest_path ) ) {
+		error_log( 'Invalid manifest file: ' . $manifest_path );
+
+		return null;
+	}
+
+	try {
+		// Read and decode manifest.json
+		$manifest_content = file_get_contents( $manifest_path );
+
+		if ( false === $manifest_content ) {
+			error_log( 'Failed to read file: ' . $manifest_path );
+
+			return null;
+		}
+
+		$manifest = json_decode( $manifest_content, true );
+
+		if ( json_last_error() !== JSON_ERROR_NONE ) {
+			error_log( 'Failed to parse manifest.json' );
+
+			return null;
+		}
+
+		// Get entry point data based on app type
+		$entry_key = $app_type . '.html';
+
+		if ( ! isset( $manifest[ $entry_key ] ) ) {
+			error_log( 'Missing entry point for: ' . $entry_key );
+
+			return null;
+		}
+
+		// Initialize entry data.
+		$entry_data = $manifest[ $entry_key ];
+
+		// Initialize apps dist URI
+		$apps_dist_uri = get_stylesheet_directory_uri() . '/apps/dist';
+
+		// Initialize arrays for JS (with type) and CSS files
+		$js_files  = array(
+			'module'        => array(),
+			'modulepreload' => array()
+		);
+		$css_files = array();
+
+		// Add main entry JS file as module
+		$js_files['module'][] = $apps_dist_uri . '/' . $entry_data['file'];
+
+		// Add imported JS files as modulepreload
+		if ( isset( $entry_data['imports'] ) ) {
+			foreach ( $entry_data['imports'] as $import ) {
+				if ( isset( $manifest[ $import ]['file'] ) ) {
+					$js_files['modulepreload'][] = $apps_dist_uri . '/' . $manifest[ $import ]['file'];
+				}
+			}
+		}
+
+		// Add CSS files from imports
+		if ( isset( $entry_data['imports'] ) ) {
+			foreach ( $entry_data['imports'] as $import ) {
+				if ( isset( $manifest[ $import ]['css'] ) ) {
+					foreach ( $manifest[ $import ]['css'] as $css ) {
+						$css_files[] = $apps_dist_uri . '/' . $css;
+					}
+				}
+			}
+		}
+
+		// Add CSS files from entry
+		if ( isset( $entry_data['css'] ) ) {
+			foreach ( $entry_data['css'] as $css ) {
+				$css_files[] = $apps_dist_uri . '/' . $css;
+			}
+		}
+
+		return array(
+			'js'  => array(
+				'module'        => array_unique( $js_files['module'] ),
+				'modulepreload' => array_unique( $js_files['modulepreload'] )
+			),
+			'css' => array_unique( $css_files )
+		);
+
+	} catch ( \Exception $e ) {
+		error_log( 'App asset loader error: ' . $e->getMessage() );
+
+		return null;
+	}
+}

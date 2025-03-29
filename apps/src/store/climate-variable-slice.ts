@@ -5,8 +5,9 @@ import { ClimateVariableConfigInterface } from "@/types/climate-variable-interfa
 interface ClimateVariableStateInterface {
 	data: ClimateVariableConfigInterface;
 }
+
 const initialState: ClimateVariableStateInterface = {
-	data: ClimateVariables[0]
+	data: ClimateVariables[0],
 }
 
 const climateVariableSlice = createSlice({

@@ -8,7 +8,7 @@ import {
 	FieldConfig,
 	FieldValues,
 	FileFormatType,
-	FrequencyConfig,
+	FrequencyConfig, GridCoordinates,
 	InteractiveRegionConfig,
 	InteractiveRegionOption, ScenariosConfig,
 	ThresholdInterface,
@@ -189,12 +189,16 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.downloadUrls ?? [];
 	}
 
-	getDownloadUrl(): string | null {
+	async getDownloadUrl(): Promise<string | null> {
 		return this._config.downloadUrl ?? null;
 	}
 
 	getAnalysisUrl(): string | null {
 		return this._config.analysisUrl ?? null;
+	}
+
+	getSelectedPoints(): GridCoordinates | null {
+		return this._config.selectedPoints ?? null;
 	}
 
 	toObject(): ClimateVariableConfigInterface {

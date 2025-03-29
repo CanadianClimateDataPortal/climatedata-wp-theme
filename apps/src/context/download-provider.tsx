@@ -52,9 +52,9 @@ const stepValues: Record<number, (keyof DownloadState)[]> = {
 	1: ['dataset'],
 	2: ['variable'],
 	3: ['version', 'degrees'],
-	4: ['selection', 'selectionCount', 'selectionMode'],
+	4: [],
 	5: [],
-	6: ['format', 'email'], // TODO: do we want the step to also require the `subcribe` box to be checked?
+	6: ['format'], // TODO: do we want the step to also require the `subcribe` box to be checked?
 };
 
 export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({

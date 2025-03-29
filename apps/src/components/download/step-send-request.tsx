@@ -9,7 +9,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { cn, isValidEmail } from '@/lib/utils';
-import { setDecimalPlace, setEmail, setFormat, setSubscribe, } from '@/features/download/download-slice';
+import {
+	setDecimalPlace,
+	setEmail,
+	setSubscribe,
+} from '@/features/download/download-slice';
 import { DownloadType, FileFormatType } from "@/types/climate-variable-interface";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import Dropdown from "@/components/ui/dropdown.tsx";
@@ -20,10 +24,10 @@ import { normalizeDropdownOptions } from "@/lib/format.ts";
  */
 const StepSendRequest: React.FC = () => {
 	const [captchaValue, setCaptchaValue] = useState<string>('');
-	const { climateVariable } = useClimateVariable();
+	const { climateVariable, setFileFormat } = useClimateVariable();
 	const { __ } = useI18n();
 
-	const { format, email, subscribe, decimalPlace } = useAppSelector(
+	const { email, subscribe, decimalPlace } = useAppSelector(
 		(state) => state.download
 	);
 	const dispatch = useAppDispatch();
@@ -62,11 +66,9 @@ const StepSendRequest: React.FC = () => {
 				title={__('Format')}
 				name="format"
 				className="mb-8"
-				value={format}
+				value={climateVariable?.getFileFormat() ?? undefined}
 				options={formatOptions}
-				onValueChange={(value) => {
-					dispatch(setFormat(value));
-				}}
+				onValueChange={setFileFormat}
 			/>
 
 			{maxDecimals > 0 && <Dropdown

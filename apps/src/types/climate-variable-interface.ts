@@ -82,6 +82,15 @@ export enum FileFormatType {
 	NetCDF = "netcdf",
 }
 
+export interface Coordinates {
+	lat: number;
+	lng: number;
+}
+
+export interface GridCoordinates {
+	[key: number]: Coordinates;
+}
+
 /**
  * Interface representing the configuration for a climate variable.
  */
@@ -186,6 +195,8 @@ export interface ClimateVariableConfigInterface {
 	downloadUrl?: string;
 
 	analysisUrl?: string;
+
+	selectedPoints?: GridCoordinates;
 }
 
 /**
@@ -258,9 +269,11 @@ export interface ClimateVariableInterface {
 
 	getDownloadUrls(): string[];
 
-	getDownloadUrl(): string | null;
+	getDownloadUrl(): Promise<string | null>;
 
 	getAnalysisUrl(): string | null;
+
+	getSelectedPoints(): GridCoordinates | null;
 
 	toObject(): ClimateVariableConfigInterface;
 }

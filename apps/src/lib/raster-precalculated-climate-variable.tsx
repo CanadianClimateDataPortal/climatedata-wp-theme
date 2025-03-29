@@ -2,6 +2,7 @@ import ClimateVariableBase from "@/lib/climate-variable-base";
 import {
 	AveragingType,
 	DateRangeConfig,
+	DownloadType,
 	FileFormatType,
 	FrequencyConfig,
 	FrequencyDisplayModeOption,
@@ -64,6 +65,10 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 		return super.getGridType() ? super.getGridType() : "canadagrid";
 	}
 
+	getFrequency(): string | null {
+		return super.getFrequency() ? super.getFrequency() : FrequencyType.ANNUAL;
+	}
+
 	getAveragingOptions(): AveragingType[] {
 		return super.getAveragingOptions().length > 0
 			? super.getAveragingOptions()
@@ -91,6 +96,69 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 				max: "2100",
 				interval: 30
 			};
+	}
+
+	getDownloadType(): DownloadType | null {
+		return super.getDownloadType() ?? DownloadType.PRECALCULATED;
+	}
+
+	async getDownloadUrl(): Promise<string | null> {
+		const downloadUrl = await super.getDownloadUrl();
+		if (downloadUrl) {
+			return downloadUrl;
+		}
+
+		let frequencyCode;
+		switch (this.getFrequency()) {
+			case FrequencyType.ANNUAL:
+				frequencyCode = "ann";
+				break;
+			case FrequencyType.ALL_MONTHS:
+				frequencyCode = "all";
+				break;
+			default:
+				frequencyCode = this.getFrequency();
+		}
+
+		const points: [number, number][] = [];
+
+		Object.values(this.getSelectedPoints() ?? {}).forEach(({lat, lng}) => {
+			points.push([lat, lng]);
+		});
+
+		const payload = {
+			dataset_name: this.getVersion(),
+			dataset_type: this.getAveragingType() === AveragingType.ALL_YEARS
+				? "allyears"
+				: "30ygraph",
+			format: this.getFileFormat(),
+			month: frequencyCode,
+			points: points,
+			var: this.getThreshold(),
+			zipped: true,
+		};
+
+		const url = "https://data.climatedata.ca/download";
+
+		try {
+			const response = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(payload)
+			});
+
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+
+			const blob = await response.blob();
+			return window.URL.createObjectURL(blob);
+		} catch (error) {
+			console.error('Download error:', error);
+			throw error;
+		}
 	}
 }
 

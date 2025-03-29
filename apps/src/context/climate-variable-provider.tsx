@@ -17,6 +17,7 @@ import {
 	ClimateVariableConfigInterface,
 	ClimateVariableInterface,
 	FileFormatType,
+	GridCoordinates,
 	InteractiveRegionOption,
 } from "@/types/climate-variable-interface";
 import RasterPrecalculatedClimateVariable from "@/lib/raster-precalculated-climate-variable";
@@ -35,6 +36,9 @@ export type ClimateVariableContextType = {
 	setDateRange: (dates: string[]) => void;
 	setPercentiles: (percentiles: string[]) => void;
 	setFileFormat: (fileFormat: FileFormatType) => void;
+	addSelectedPoints: (gridCoordinate: GridCoordinates) => void;
+	removeSelectedPoint: (gid: number) => void;
+	resetSelectedPoints: () => void;
 }
 
 type ClassMapType = Record<string, new (arg: ClimateVariableConfigInterface) => ClimateVariableInterface>;
@@ -53,7 +57,7 @@ const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
 export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const dispatch = useAppDispatch();
 
-	const climateVariableData = useAppSelector((state) => state.climateVariable.data)
+	const { data: climateVariableData } = useAppSelector((state) => state.climateVariable)
 
 	/**
 	 * Returns an instance of a climate variable class, derived from the provided climate variable data.
@@ -173,6 +177,31 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		}));
 	}, [dispatch]);
 
+	const addSelectedPoints = useCallback((gridCoordinates: GridCoordinates) => {
+		const { selectedPoints } = climateVariableData;
+		dispatch(updateClimateVariable({
+			selectedPoints: {
+				...selectedPoints,
+				...gridCoordinates
+			},
+		}));
+	}, [dispatch, climateVariableData]);
+
+	const removeSelectedPoint = useCallback((gid: number) => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { [gid]: removed, ...rest } = climateVariableData.selectedPoints ?? {};
+		console.log({removed, rest});
+		dispatch(updateClimateVariable({
+			selectedPoints: rest
+		}));
+	}, [dispatch, climateVariableData]);
+
+	const resetSelectedPoints = useCallback(() => {
+		dispatch(updateClimateVariable({
+			selectedPoints: {}
+		}));
+	}, [dispatch]);
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
@@ -187,6 +216,9 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		setDateRange,
 		setPercentiles,
 		setFileFormat,
+		addSelectedPoints,
+		removeSelectedPoint,
+		resetSelectedPoints,
 	}
 
 	return (

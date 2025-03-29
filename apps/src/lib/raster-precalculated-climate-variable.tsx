@@ -65,6 +65,12 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 		return super.getGridType() ? super.getGridType() : "canadagrid";
 	}
 
+	hasDelta(): boolean | undefined {
+		return super.hasDelta() !== undefined
+			? super.hasDelta()
+			: true;
+	}
+
 	getFrequency(): string | null {
 		return super.getFrequency() ? super.getFrequency() : FrequencyType.ANNUAL;
 	}

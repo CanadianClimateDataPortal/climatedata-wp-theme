@@ -105,8 +105,8 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.gridType ?? null
 	}
 
-	hasDelta(): boolean {
-		return this._config.hasDelta ?? false;
+	hasDelta(): boolean | undefined {
+		return this._config.hasDelta;
 	}
 
 	getColourScheme(): string[] {

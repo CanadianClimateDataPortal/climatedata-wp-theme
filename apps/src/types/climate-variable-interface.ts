@@ -229,7 +229,7 @@ export interface ClimateVariableInterface {
 
 	getFrequency(): string | null;
 
-	hasDelta(): boolean;
+	hasDelta(): boolean | undefined;
 
 	getColourScheme(): string[];
 

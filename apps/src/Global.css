@@ -119,30 +119,30 @@
 @font-face {
 	font-family: "CDCSerif";
 	font-weight: normal;
-	src: url("@fonts/CDCSerif-Medium.woff2") format("woff2");
+	src: url("./../../resources/fonts/CDCSerif-Medium.woff2") format("woff2");
 }
 
 @font-face {
 	font-family: "CDCSerif";
 	font-weight: bold;
-	src: url("@fonts/CDCSerif-Bold.woff2") format("woff2");
+	src: url("./../../resources/fonts/CDCSerif-Bold.woff2") format("woff2");
 }
 
 @font-face {
 	font-family: "CDCSans";
-	src: url("@fonts/CDCSans-Light.woff2");
+	src: url("./../../resources/fonts/CDCSans-Light.woff2") format("woff2");
 	font-weight: normal;
 }
 
 @font-face {
 	font-family: "CDCSans";
-	src: url("@fonts/CDCSans-Book.woff2");
+	src: url("./../../resources/fonts/CDCSans-Book.woff2") format("woff2");
 	font-weight: 500;
 }
 
 @font-face {
 	font-family: "CDCSans";
-	src: url("@fonts/CDCSans-SemiBold.woff2");
+	src: url("./../../resources/fonts/CDCSans-SemiBold.woff2") format("woff2");
 	font-weight: 600;
 }
 

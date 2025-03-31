@@ -174,7 +174,7 @@ function cdc_get_idf_files () {
 
 		if ( count ( $files ) == 1 ) {
 			$list[] = array (
-				'filename' => '/site/assets/themes/climate-data-ca/resources/app/' . str_replace ( $dir, '', $files[0] ),
+				'filename' => get_stylesheet_directory() . '/resources/app/' . str_replace ( $dir, '', $files[0] ),
 				'label' => $filetype['label']
 			);
 		}

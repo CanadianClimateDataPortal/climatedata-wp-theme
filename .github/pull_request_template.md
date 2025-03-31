@@ -11,7 +11,7 @@ with the URL to the ticket. If not applicable, you can remove this whole
 section.)
 
 
-> Make sure to read the *Pull requests process* in CONTRIBUTING.md.
+> Make sure to read the *Pull requests* section in CONTRIBUTING.md.
 >
 > Main points:
 >

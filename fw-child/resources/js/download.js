@@ -4156,7 +4156,7 @@
         captcha_img_audioObj.refresh();
 
       document.getElementById('captcha_img').src =
-        '/site/assets/themes/fw-child/resources/php/securimage/securimage_show.php?namespace=analyze&' +
+        '/assets/themes/fw-child/resources/php/securimage/securimage_show.php?namespace=analyze&' +
         Math.random();
 
       item.find('#submit-captcha').val('');

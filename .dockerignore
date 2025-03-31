@@ -3,7 +3,5 @@ Dockerfile
 docker-compose-dev.yaml
 docker-override.yml
 .gitignore
-climate-data-ca
-h7-parent
 fw-child/**/local_config.php
 apps/node_modules

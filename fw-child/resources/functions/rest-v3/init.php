@@ -19,6 +19,7 @@ function cdc_rest_v3_init() {
 	// Load endpoint definitions.
 	require_once dirname( __FILE__ ) . '/datasets-list.php';
 	require_once dirname( __FILE__ ) . '/variables-list.php';
+	require_once dirname( __FILE__ ) . '/variables-filters.php';
 }
 
 add_action( 'rest_api_init', 'cdc_rest_v3_init' );
@@ -73,11 +74,6 @@ function cdc_rest_v3_endpoint_permission() {
 		if ( ! empty( $origin_host ) && $origin_host === $site_url ) {
 			$is_same_domain = true;
 		}
-
-		// Allow local environment (useful when testing against production).
-		if ( WP_DEBUG && in_array( $request_host, [ 'dev-en.climatedata.ca', 'dev-fr.climatedata.ca' ] ) ) {
-			$is_same_domain = true;
-		}
 	}
 
 	// Log unauthorized attempts if logging is enabled.
@@ -103,25 +99,6 @@ function cdc_rest_v3_endpoint_permission() {
 			'source' => 'domain_restriction'
 		)
 	);
-}
-
-/**
- * Sanitize the 'per_page' argument for REST API requests.
- *
- * @param int $value The 'per_page' argument to sanitize.
- *
- * @return int The sanitized 'per_page' value.
- */
-function cdc_rest_v3_sanitize_arg_per_page( $value ) {
-	$value = intval( $value );
-
-	// Allow -1 for all items.
-	if ( $value === -1 ) {
-		return -1;
-	}
-
-	// Ensure value is between 1 and 100.
-	return max( 1, min( 100, $value ) );
 }
 
 /**
@@ -167,6 +144,7 @@ function cdc_rest_v3_set_cache( $served, $result, $request, $server ) {
 	$cacheable_endpoints = [
 		'cdc/v3/datasets-list',
 		'cdc/v3/variables-list',
+		'cdc/v3/variables-filters',
 	];
 
 	$route = $request->get_route();

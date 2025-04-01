@@ -84,9 +84,7 @@ class RepositoryAPI:
 
         try:
             repos_with_matching_name = (
-                repo
-                for repo in repositories
-                if repo.get("name") == self._repository_name
+                repo for repo in repositories if repo["name"] == self._repository_name
             )
             repo = next(repos_with_matching_name)
             return f"{repo_endpoint}/{repo['id']}"
@@ -107,8 +105,8 @@ class RepositoryAPI:
         tag_info = response.json()
         return TagInfo(
             name=tag,
-            digest=tag_info.get("digest"),
-            created_at=tag_info.get("created_at"),
+            digest=tag_info["digest"],
+            created_at=tag_info["created_at"],
         )
 
     def get_all_tags_with_infos(self) -> List[TagInfo]:

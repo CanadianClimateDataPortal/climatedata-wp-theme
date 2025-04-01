@@ -12,8 +12,11 @@ import { Button } from '@/components/ui/button';
 const StepSummary: React.FC = () => {
 	const { __, _n } = useI18n();
 	const { locale } = useLocale();
-
 	const { currentStep, goToStep, fields } = useDownload();
+
+	/**
+	 * @todo Most, if not all, of these variables will have to be retrieved from the climateVariable class.
+	 */
 	const {
 		dataset,
 		variable,

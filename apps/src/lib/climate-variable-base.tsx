@@ -8,7 +8,7 @@ import {
 	FieldConfig,
 	FieldValues,
 	FileFormatType,
-	FrequencyConfig,
+	FrequencyConfig, GridCoordinates,
 	InteractiveRegionConfig,
 	InteractiveRegionOption, ScenariosConfig,
 	ThresholdInterface,
@@ -105,8 +105,8 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.gridType ?? null
 	}
 
-	hasDelta(): boolean {
-		return this._config.hasDelta ?? false;
+	hasDelta(): boolean | undefined {
+		return this._config.hasDelta;
 	}
 
 	getColourScheme(): string[] {
@@ -157,22 +157,16 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.percentiles ?? [];
 	}
 
-	getDownloadType(): DownloadType | null {
-		return this._config.downloadType ?? null;
-	}
-
 	getFileFormatTypes(): FileFormatType[] {
 		return this._config.fileFormatTypes ?? [];
 	}
 
-	getMaxDecimals(): number {
-		return this._config.maxDecimals ?? 0;
+	getFileFormat(): FileFormatType | null {
+		return this._config.fileFormat || this.getFileFormatTypes()?.[0] || null;
 	}
 
-	toObject(): ClimateVariableConfigInterface {
-		return {
-			...this._config,
-		};
+	getMaxDecimals(): number {
+		return this._config.maxDecimals ?? 0;
 	}
 
 	renderMap(): React.ReactElement {
@@ -181,6 +175,36 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	renderDownloadMap(): React.ReactElement {
 		return <RasterDownloadMap />;
+	}
+
+	getDownloadType(): DownloadType | null {
+		return this._config.downloadType ?? null;
+	}
+
+	hasMultipleDownloadUrls(): boolean {
+		return this._config.hasMultipleDownloadUrls ?? false;
+	}
+
+	getDownloadUrls(): string[] {
+		return this._config.downloadUrls ?? [];
+	}
+
+	async getDownloadUrl(): Promise<string | null> {
+		return this._config.downloadUrl ?? null;
+	}
+
+	getAnalysisUrl(): string | null {
+		return this._config.analysisUrl ?? null;
+	}
+
+	getSelectedPoints(): GridCoordinates | null {
+		return this._config.selectedPoints ?? null;
+	}
+
+	toObject(): ClimateVariableConfigInterface {
+		return {
+			...this._config,
+		};
 	}
 }
 

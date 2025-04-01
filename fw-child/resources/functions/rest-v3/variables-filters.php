@@ -81,9 +81,7 @@ function cdc_rest_v3_get_variables_filters( $request ) {
 		}
 
 		// Create and return the response.
-		$response_object = new WP_REST_Response( $response, 200 );
-
-		return $response_object;
+		return new WP_REST_Response( $response, 200 );
 	} catch ( Exception $e ) {
 		return new WP_Error(
 			'server_error',

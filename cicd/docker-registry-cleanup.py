@@ -1,6 +1,6 @@
 import argparse
 import requests
-import re
+import sys
 from datetime import datetime
 from typing import NamedTuple, List
 
@@ -248,12 +248,16 @@ def main():
             print("Aborted.")
     except requests.HTTPError as http_err:
         print(f"HTTP error occurred: {http_err}")
+        sys.exit(1)
     except ValueError as val_err:
         print(f"Value error: {val_err}")
+        sys.exit(1)
     except requests.RequestException as req_err:
         print(f"Request failed: {req_err}")
+        sys.exit(1)
     except Exception as err:
         print(f"An unexpected error occurred: {err}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

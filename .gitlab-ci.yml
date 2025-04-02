@@ -115,4 +115,4 @@ cleanup:
       --token $REGISTRY_CLEANUP_TOKEN
       --project-id $REGISTRY_CLEANUP_PROJECT_ID 
       --nb-to-keep $REGISTRY_CLEANUP_NB_OF_TAG_TO_KEEP
-      
+

@@ -152,7 +152,7 @@ function cdc_validate_variable_post_id( $param ) {
  *
  * @param int $post_id The variable post ID.
  *
- * @return array The formatted relevant sectors data.
+ * @return array The formatted relevant sectors' data.
  */
 function cdc_rest_v3_get_relevant_sectors( $post_id ) {
 	$sectors          = array();
@@ -184,7 +184,7 @@ function cdc_rest_v3_get_relevant_sectors( $post_id ) {
  *
  * @param int $post_id The variable post ID.
  *
- * @return array The formatted relevant trainings data.
+ * @return array The formatted relevant trainings' data.
  */
 function cdc_rest_v3_get_relevant_trainings( $post_id ) {
 	$trainings         = array();

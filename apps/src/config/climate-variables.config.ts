@@ -170,6 +170,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "hddheat_18",
 		hasDownload: false,
+		layerStyles: "CDC:building_climate_zones",
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},

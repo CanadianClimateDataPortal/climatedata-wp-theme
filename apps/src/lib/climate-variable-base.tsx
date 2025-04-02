@@ -77,6 +77,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.analyzeScenarios ?? [];
 	}
 
+	getLayerStyles(): string {
+		return this._config.layerStyles ?? '';
+	}
+
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null {
 		return this._config.interactiveRegionConfig ?? null;
 	}

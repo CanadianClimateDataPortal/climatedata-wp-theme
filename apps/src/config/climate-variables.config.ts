@@ -164,6 +164,102 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 	},
+	/** Building Climate Zones */
+	{
+		id: "building_climate_zones",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "hddheat_18",
+		hasDownload: false,
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: true,
+			[InteractiveRegionOption.CENSUS]: false,
+			[InteractiveRegionOption.HEALTH]: false,
+			[InteractiveRegionOption.WATERSHED]: false
+		},
+		hasDelta: false,
+	},
+	/** Maximum Temperature */
+	{
+		id: "maximum_temperature",
+		class: "RasterPrecalculatedWithDailyFormatsClimateVariable",
+		threshold: "tx_mean",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
+		},
+	},
+	/** Minimum Temperature */
+	{
+		id: "minimum_temperature",
+		class: "RasterPrecalculatedWithDailyFormatsClimateVariable",
+		threshold: "tn_mean",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
+		},
+	},
+	/** Standardized precipitation evapotranspiration index (12-months) */
+	{
+		id: "spei_12",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "spei_12m",
+		versions: [ "cmip5" ],
+		frequencyConfig: {
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: true,
+			[InteractiveRegionOption.CENSUS]: false,
+			[InteractiveRegionOption.HEALTH]: false,
+			[InteractiveRegionOption.WATERSHED]: false
+		},
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+		],
+	},
+	/** Standardized precipitation evapotranspiration index (3-months) */
+	{
+		id: "spei_3",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "spei_3m",
+		versions: [ "cmip5" ],
+		frequencyConfig: {
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: true,
+			[InteractiveRegionOption.CENSUS]: false,
+			[InteractiveRegionOption.HEALTH]: false,
+			[InteractiveRegionOption.WATERSHED]: false
+		},
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+		],
+	},
+	/** Total Precipitation */
+	{
+		id: "total_precipitation",
+		class: "RasterPrecalculatedWithDailyFormatsClimateVariable",
+		threshold: "prcptot",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
+		},
+	},
 	/** Test variable */
 	{
 		id: "test_variable",

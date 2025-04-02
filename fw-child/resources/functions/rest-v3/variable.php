@@ -32,6 +32,12 @@ register_rest_route(
  * @return WP_REST_Response|WP_Error The response object or WP_Error on failure.
  */
 function cdc_rest_v3_get_variable( $request ) {
+	/**
+	 * Force global variable configuration initialization since
+	 * this function isn't called during AJAX requests.
+	 */
+	theme_global_vars();
+
 	try {
 		// Get variable post ID
 		$post_id = $request->get_param( 'post_id' );
@@ -194,11 +200,7 @@ function cdc_rest_v3_get_relevant_trainings( $post_id ) {
 		foreach ( $training_post_ids as $training_post_id ) {
 			// Training post links.
 			$training_link_en = get_permalink( $training_post_id );
-			if ( strpos( $training_link_en, '-en' ) !== false ) {
-				$training_link_fr = str_replace( '-en', '-fr', $training_link_en );
-			} else {
-				$training_link_fr = str_replace( 'climatedata', 'donneesclimatiques', $training_link_en );
-			}
+			$training_link_fr = translate_permalink( '', $training_post_id, 'fr' );
 
 			$trainings[] = array(
 				'post_id' => $training_post_id,

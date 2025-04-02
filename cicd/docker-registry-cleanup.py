@@ -1,6 +1,7 @@
 import argparse
 import requests
 import sys
+import re
 from datetime import datetime
 from typing import NamedTuple, List
 

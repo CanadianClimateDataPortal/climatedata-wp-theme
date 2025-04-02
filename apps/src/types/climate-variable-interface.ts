@@ -101,6 +101,12 @@ export interface ClimateVariableConfigInterface {
 	/** WordPress Post ID, used for backend operations (optional) */
 	postId?: number;
 
+	/** Determines whether a variable can be rendered in a map. */
+	hasMap?: boolean;
+
+	/** Determines whether a variable’s data can be downloaded or analyzed. */
+	hasDownload?: boolean;
+
 	/** Class name defining the type or category of the climate variable */
 	class: string;
 
@@ -203,6 +209,10 @@ export interface ClimateVariableConfigInterface {
  * Interface representing functionality for handling climate variables and their configurations.
  */
 export interface ClimateVariableInterface {
+	hasMap(): boolean;
+
+	hasDownload(): boolean;
+
 	getVersions(): string[];
 
 	getVersion(): string | null;

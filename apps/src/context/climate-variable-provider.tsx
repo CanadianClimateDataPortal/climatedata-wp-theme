@@ -39,6 +39,7 @@ export type ClimateVariableContextType = {
 	addSelectedPoints: (gridCoordinate: GridCoordinates) => void;
 	removeSelectedPoint: (gid: number) => void;
 	resetSelectedPoints: () => void;
+	variableCanBeDisplayed: (variable: PostData | null, mode: 'map' | 'download') => boolean;
 }
 
 type ClassMapType = Record<string, new (arg: ClimateVariableConfigInterface) => ClimateVariableInterface>;
@@ -202,6 +203,23 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		}));
 	}, [dispatch]);
 
+	/**
+	 * Checks if a variable can be displayed
+	 * 	- if map: we check hasMap()
+	 *  - if download: check hasDownload()
+	 */
+	const variableCanBeDisplayed = useCallback((variable: PostData | null, section: 'map' | 'download'): boolean => {
+		if (!variable) return false;
+		
+		const matchedVariable = ClimateVariables.find((config) => config.id === variable.id);
+		if (!matchedVariable) return false;
+
+		return section === 'map' 
+			? matchedVariable.hasMap !== false
+			: matchedVariable.hasDownload !== false;
+	}, []);
+
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
@@ -219,6 +237,7 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		addSelectedPoints,
 		removeSelectedPoint,
 		resetSelectedPoints,
+		variableCanBeDisplayed,
 	}
 
 	return (

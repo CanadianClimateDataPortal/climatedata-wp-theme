@@ -28,6 +28,14 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		this._config = config;
 	}
 
+	hasMap(): boolean {
+		return this._config.hasMap ?? true;
+	}
+
+	hasDownload(): boolean {
+		return this._config.hasDownload ?? true;
+	}
+
 	getVersions(): string[] {
 		return this._config.versions ?? [];
 	}

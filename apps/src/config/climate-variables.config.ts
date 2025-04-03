@@ -261,6 +261,224 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 	},
+	/** Average ‘Wet Day’ Precipitation Intensity */
+	{
+		id: "average_wet_day_precipitation_intensity",
+		class: "AnalyzeClimateVariable",
+		hasMap: false,
+		hasDelta: false,
+	},
+	/** Cold Spell Days */
+	{
+		id: "cold_spell_days",
+		class: "AnalyzeClimateVariable",
+		hasMap: false,
+		hasDelta: false,
+	},
+	/** Cooling Degree Days */
+	{
+		id: "cooling_degree_days",
+		class: "AnalyzeClimateVariable",
+		threshold: "cddcold_18",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
+		],
+	},
+	/** Days above HXmax */
+	{
+		id: "days_above_hxmax",
+		class: "AnalyzeClimateVariable",
+		hasMap: false,
+		hasDelta: false,
+		versions: [ "humidex" ],
+		scenarios: {
+			humidex: [
+				"ssp126",
+				"ssp245",
+				"ssp585",
+			],
+		},
+		gridType: "era5landgrid",
+	},
+	/** Days above Tmax */
+	{
+		id: "days_above_tmax",
+		class: "AnalyzeClimateVariable",
+		thresholds: [
+			{
+				value: "txgt_25",
+				label: "25 ºC",
+			},
+			{
+				value: "txgt_27",
+				label: "27 ºC",
+			},
+			{
+				value: "txgt_29",
+				label: "29 ºC",
+			},
+			{
+				value: "txgt_30",
+				label: "30 ºC",
+			},
+			{
+				value: "txgt_32",
+				label: "32 ºC",
+			},
+		],
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
+		],
+	},
+	/** Days above Tmax and Tmin */
+	{
+		id: "days_above_tmax_and_tmin",
+		class: "AnalyzeClimateVariable",
+		hasMap: false,
+		hasDelta: false,
+	},
+	/** Days below temperature threshold */
+	{
+		id: "days_below_temperature_threshold",
+		class: "AnalyzeClimateVariable",
+		thresholds: [
+			{
+				value: "tnlt_-15",
+				label: "-15 ºC",
+			},
+			{
+				value: "tnlt_-25",
+				label: "-25 ºC",
+			},
+		],
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
+		],
+	},
+	/** Degree days exceedance date */
+	{
+		id: "degree_days_exceedance_date",
+		class: "AnalyzeClimateVariable",
+		hasMap: false,
+		hasDelta: false,
+	},
+	/** Freeze-Thaw Cycles */
+	{
+		id: "freeze_thaw_cycles",
+		class: "AnalyzeClimateVariable",
+		threshold: "dlyfrzthw_tx0_tn-1",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
+		},
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
+		],
+	},
+	/** Heat Wave Frequency */
+	{
+		id: "heat_wave_frequency",
+		class: "AnalyzeClimateVariable",
+		hasMap: false,
+		hasDelta: false,
+	},
+	/** Heat Wave */
+	{
+		id: "heat_wave_index",
+		class: "AnalyzeClimateVariable",
+		hasMap: false,
+		hasDelta: false,
+	},
+	/** Heat Wave Total Duration */
+	{
+		id: "heat_wave_total_duration",
+		class: "AnalyzeClimateVariable",
+		hasMap: false,
+		hasDelta: false,
+	},
+	/** Heating Degree Days */
+	{
+		id: "heating_degree_days",
+		class: "AnalyzeClimateVariable",
+		threshold: "hddheat_18",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
+		},
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
+		],
+	},
+	/** Maximum Consecutive Dry Days */
+	{
+		id: "maximum_consecutive_dry_days",
+		class: "AnalyzeClimateVariable",
+		hasMap: false,
+		hasDelta: false,
+	},
+	/** Maximum Consecutive Wet Days */
+	{
+		id: "maximum_consecutive_wet_days",
+		class: "AnalyzeClimateVariable",
+		hasMap: false,
+		hasDelta: false,
+	},
+	/** Tropical Nights (Days with Tmin above threshold) */
+	{
+		id: "tropical_nights_days_with_tmin_above_threshold",
+		class: "AnalyzeClimateVariable",
+		thresholds: [
+			{
+				value: "tr_18",
+				label: "18 ºC",
+			},
+			{
+				value: "tr_20",
+				label: "20 ºC",
+			},
+			{
+				value: "tr_22",
+				label: "22 ºC",
+			},
+		],
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
+		],
+	},
+	/** Wet Days */
+	{
+		id: "wet_days",
+		class: "AnalyzeClimateVariable",
+		thresholds: [
+			{
+				value: "r1mm",
+				label: "1 mm",
+			},
+			{
+				value: "r10mm",
+				label: "10 mm",
+			},
+			{
+				value: "r20mm",
+				label: "20 mm",
+			},
+		],
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
+		],
+	},
 	/** Test variable */
 	{
 		id: "test_variable",

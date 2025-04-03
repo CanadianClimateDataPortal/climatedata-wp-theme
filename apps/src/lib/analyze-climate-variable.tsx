@@ -80,10 +80,7 @@ class AnalyzeClimateVariable extends ClimateVariableBase {
 	getAveragingOptions(): AveragingType[] {
 		return super.getAveragingOptions().length > 0
 			? super.getAveragingOptions()
-			: [
-				AveragingType.ALL_YEARS,
-				AveragingType.THIRTY_YEARS
-			];
+			: [];
 	}
 
 	getFileFormatTypes(): FileFormatType[] {

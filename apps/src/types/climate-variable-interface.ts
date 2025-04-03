@@ -28,7 +28,7 @@ export enum FrequencyDisplayModeOption {
 }
 
 export enum FrequencyType {
-	ANNUAL = "annual",
+	ANNUAL = "ann",
 	ANNUAL_JUL_JUN = "annual_jul_jun",
 	MONTHLY = "months",
 	SEASONAL = "seasons",
@@ -203,6 +203,8 @@ export interface ClimateVariableConfigInterface {
  * Interface representing functionality for handling climate variables and their configurations.
  */
 export interface ClimateVariableInterface {
+	getId(): string;
+
 	getVersions(): string[];
 
 	getVersion(): string | null;

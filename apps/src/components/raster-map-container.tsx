@@ -18,7 +18,6 @@ import {
 	DEFAULT_MAX_ZOOM,
 	GEOSERVER_BASE_URL,
 } from '@/lib/constants';
-import { FrequencyType } from "@/types/climate-variable-interface";
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
@@ -44,11 +43,10 @@ export default function RasterMapContainer({
 
 		const scenario = climateVariable?.getScenario();
 		const threshold = climateVariable?.getThreshold();
-		const frequency = (climateVariable?.getFrequency() === FrequencyType.ANNUAL || climateVariable?.getFrequency() === null)
-			? 'ann'
-			: climateVariable?.getFrequency() ?? 'ann';
+		const frequency = climateVariable?.getFrequency() ?? '';
 
-		let frequencyCode;
+		let frequencyCode = '';
+
 		if (frequency === 'ann') {
 			frequencyCode = 'ys';
 		} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
@@ -63,7 +61,7 @@ export default function RasterMapContainer({
 				frequencyCode,
 				scenario,
 				'p50',
-				frequency,
+				climateVariable?.getFrequency(),
 				'30year',
 			]
 			.filter(Boolean)

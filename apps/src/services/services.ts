@@ -121,7 +121,9 @@ export const fetchTaxonomyData = async (
 					}
 					return res.json();
 				})
-				.then((json) => json[slug]);
+				.then((json) => {
+					return json[slug].terms
+				});
 
 	// applying filters for the dummy implementation.. for the real implementation, this should be done via query params when fetching
 	if (filters) {

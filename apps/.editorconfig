@@ -1,0 +1,29 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Match all files
+[*]
+indent_style = tab
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# Match JavaScript files
+[*.js]
+quote_type = single
+
+# Match TypeScript files
+[*.ts]
+quote_type = single
+
+# Match JSX files
+[*.jsx]
+quote_type = single
+
+# Match TSX files
+[*.tsx]
+quote_type = single

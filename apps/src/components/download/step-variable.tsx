@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 import {
@@ -11,6 +11,7 @@ import VariableRadioCards from '@/components/variable-radio-cards';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setVariable } from '@/features/download/download-slice';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import SectionContext from "@/context/section-provider";
 
 /**
  * Variable step
@@ -19,6 +20,8 @@ const StepVariable: React.FC = () => {
 	const { selectClimateVariable } = useClimateVariable();
 	const [varType, setVarType] = useState<string>('');
 	const [sector, setSector] = useState<string>('');
+	const section = useContext(SectionContext);
+	const { dataset } = useAppSelector((state) => state.download);
 
 	const filterValues = useMemo(
 		() => ({
@@ -63,14 +66,16 @@ const StepVariable: React.FC = () => {
 			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
-				<VariableRadioCards
+				{dataset && <VariableRadioCards
+					dataset={dataset}
+					section={section}
 					filterValues={filterValues}
 					selected={variable}
 					onSelect={(selected) => {
 						dispatch(setVariable(selected));
 						selectClimateVariable(selected);
 					}}
-				/>
+				/>}
 			</div>
 		</StepContainer>
 	);

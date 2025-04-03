@@ -12,7 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Register custom REST API endpoints for retrieving
- * datasets list,
+ * datasets list.
  */
 register_rest_route(
 	'cdc/v3',
@@ -120,7 +120,9 @@ function cdc_rest_v3_get_datasets_list( $request ) {
 
 		// Prepare the response.
 		$response = array(
-			'datasets' => $datasets,
+			'datasets' => array(
+				'terms' => $datasets,
+			),
 		);
 
 		// Add pagination headers only if not requesting all items.
@@ -176,7 +178,6 @@ function cdc_rest_v3_get_datasets_args() {
 			'default'           => -1,
 			'minimum'           => -1,
 			'maximum'           => 100,
-			'sanitize_callback' => 'cdc_rest_v3_sanitize_arg_per_page',
 		),
 		'paged'           => array(
 			'description'       => 'Current page number',

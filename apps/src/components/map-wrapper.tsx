@@ -9,7 +9,7 @@ const MapWrapper = () => {
 	const [mapInfo, setMapInfo] = useState<MapInfoData | null>(null);
 
 	useEffect(() => {
-		fetchWPData().then((data) => setMapInfo(data.mapInfo));
+		fetchWPData(17116).then((data) => setMapInfo(data.mapInfo));
 	}, []);
 
 	return (

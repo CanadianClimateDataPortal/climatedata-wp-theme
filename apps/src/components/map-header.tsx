@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 // other
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
 import { MapInfoProps, ProviderPanelProps } from '@/types/types';
+import {useLocale} from "@/hooks/use-locale.ts";
 
 /**
  * MapHeader component, displays the header for the map with breadcrumbs and buttons for extra information.
@@ -31,6 +32,8 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 		ProviderPanelProps | undefined
 	>(undefined);
 	const { togglePanel } = useAnimatedPanel();
+
+	const { locale } = useLocale();
 
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -78,7 +81,7 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 				>
 					<div className="flex items-center gap-x-2 bg-white p-4">
 						<Breadcrumbs
-							title={data.title}
+							title={data?.dataset?.[0]?.title?.[locale] ?? ''}
 							onClick={toggleVariableDetailsPanel}
 						/>
 						<ModalToggleButtons
@@ -93,7 +96,7 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 			<DownloadMapModal
 				isOpen={downloadInfo}
 				onClose={toggleDownloadInfo}
-				title={data?.title ?? ''}
+				title={data?.dataset?.[0]?.title?.[locale] ?? ''}
 			/>
 		</>
 	);

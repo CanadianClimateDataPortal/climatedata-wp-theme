@@ -14,7 +14,6 @@ import {
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
 	GEOSERVER_BASE_URL,
-	SCENARIO_NAMES,
 } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
@@ -30,11 +29,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 	const map = useMap();
 
 	const {
-		variable,
-		dataset,
 		decade,
-		frequency,
-		emissionScenario,
 		legendData,
 	} = useAppSelector((state) => state.map);
 
@@ -203,41 +198,34 @@ const InteractiveRegionsLayer: React.FC = () => {
 	// fetch layer data if needed
 	useEffect(() => {
 		(async () => {
+			const interactiveRegion = climateVariable?.getInteractiveRegion() ?? '';
+
 			// no need to fetch anything for gridded data
 			if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
 				return;
 			}
 
+			const frequency = climateVariable?.getFrequency() ?? '';
+
 			try {
-				const datasetKey = dataset as keyof typeof SCENARIO_NAMES;
-				const emissionKey =
-					emissionScenario as keyof (typeof SCENARIO_NAMES)[keyof typeof SCENARIO_NAMES];
-
-				const rcp = SCENARIO_NAMES[datasetKey][emissionKey]
-					.replace(/[\W_]+/g, '')
-					.toLowerCase();
-
 				const data = await fetchChoroValues({
-					variable,
-					dataset,
+					variable: climateVariable?.getThreshold() ?? '',
+					dataset: climateVariable?.getVersion() ?? '',
 					decade,
 					frequency,
 					interactiveRegion,
-					emissionScenario: rcp,
+					emissionScenario: climateVariable?.getScenario() ?? '',
 					decimals: 1,
 				});
+
 				setLayerData(data);
 			} catch (error) {
 				console.error('Error fetching layer data:', error);
 			}
 		})();
 	}, [
-		variable,
-		dataset,
 		decade,
-		frequency,
-		interactiveRegion,
-		emissionScenario,
+		climateVariable,
 	]);
 
 	useEffect(() => {

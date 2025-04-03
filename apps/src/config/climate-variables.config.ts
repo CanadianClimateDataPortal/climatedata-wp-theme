@@ -169,7 +169,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "building_climate_zones",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "hddheat_18",
-		hasDownload: false,
 		layerStyles: "CDC:building_climate_zones",
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
@@ -265,14 +264,12 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	{
 		id: "average_wet_day_precipitation_intensity",
 		class: "RasterAnalyzeClimateVariable",
-		hasMap: false,
 		hasDelta: false,
 	},
 	/** Cold Spell Days */
 	{
 		id: "cold_spell_days",
 		class: "RasterAnalyzeClimateVariable",
-		hasMap: false,
 		hasDelta: false,
 	},
 	/** Cooling Degree Days */
@@ -292,7 +289,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	{
 		id: "days_above_hxmax",
 		class: "RasterAnalyzeClimateVariable",
-		hasMap: false,
 		hasDelta: false,
 		versions: [ "humidex" ],
 		scenarios: {
@@ -339,7 +335,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	{
 		id: "days_above_tmax_and_tmin",
 		class: "RasterAnalyzeClimateVariable",
-		hasMap: false,
 		hasDelta: false,
 	},
 	/** Days below temperature threshold */
@@ -365,7 +360,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	{
 		id: "degree_days_exceedance_date",
 		class: "RasterAnalyzeClimateVariable",
-		hasMap: false,
 		hasDelta: false,
 	},
 	/** Freeze-Thaw Cycles */
@@ -386,21 +380,18 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	{
 		id: "heat_wave_frequency",
 		class: "RasterAnalyzeClimateVariable",
-		hasMap: false,
 		hasDelta: false,
 	},
 	/** Heat Wave */
 	{
 		id: "heat_wave_index",
 		class: "RasterAnalyzeClimateVariable",
-		hasMap: false,
 		hasDelta: false,
 	},
 	/** Heat Wave Total Duration */
 	{
 		id: "heat_wave_total_duration",
 		class: "RasterAnalyzeClimateVariable",
-		hasMap: false,
 		hasDelta: false,
 	},
 	/** Heating Degree Days */
@@ -423,14 +414,12 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	{
 		id: "maximum_consecutive_dry_days",
 		class: "RasterAnalyzeClimateVariable",
-		hasMap: false,
 		hasDelta: false,
 	},
 	/** Maximum Consecutive Wet Days */
 	{
 		id: "maximum_consecutive_wet_days",
 		class: "RasterAnalyzeClimateVariable",
-		hasMap: false,
 		hasDelta: false,
 	},
 	/** Tropical Nights (Days with Tmin above threshold) */

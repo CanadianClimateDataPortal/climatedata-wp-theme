@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
 
@@ -9,6 +9,7 @@ import { useLocale } from '@/hooks/use-locale';
 import { fetchPostsData } from '@/services/services';
 import { normalizePostData } from '@/lib/format';
 import { PostData } from '@/types/types';
+import SectionContext from "@/context/section-provider";
 
 const VariableRadioCards: React.FC<{
 	filterValues: Record<string, string>;
@@ -16,6 +17,7 @@ const VariableRadioCards: React.FC<{
 	onSelect: (variable: PostData) => void;
 }> = ({ filterValues, selected, onSelect }) => {
 	const [variables, setVariables] = useState<PostData[]>([]);
+	const section = useContext(SectionContext);
 	const { __ } = useI18n();
 	const { locale } = useLocale();
 
@@ -25,14 +27,14 @@ const VariableRadioCards: React.FC<{
 				return;
 			}
 
-			const data = await fetchPostsData('variables', filterValues);
+			const data = await fetchPostsData('variables', filterValues, section);
 
 			// data from API has some complex structure, so we need to normalize it which will make it easier to work with
 			const normalizedData = await normalizePostData(data, locale);
 
 			setVariables(normalizedData);
 		})();
-	}, [filterValues, locale]);
+	}, [filterValues, locale, section]);
 
 	if (!variables) {
 		return null;

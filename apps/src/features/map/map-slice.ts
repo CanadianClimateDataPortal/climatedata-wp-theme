@@ -70,7 +70,6 @@ const mapSlice = createSlice({
 	reducers: {
 		setDataset(state, action: PayloadAction<TaxonomyData | null>) {
 			console.log('setDataset', action.payload);
-			state.dataset = action.payload ?? undefined;
 		},
 		setVariable(state, action: PayloadAction<string>) {
 			state.variable = action.payload;

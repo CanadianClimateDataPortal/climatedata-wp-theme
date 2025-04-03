@@ -194,7 +194,7 @@ export interface MapState {
 	timePeriodEnd: number[]; // using an array because the slider that uses it expects an array
 	recentLocations: MapLocation[];
 	variable: string;
-	dataset: string;
+	dataset?: TaxonomyData;
 	decade: string;
 	pane: string;
 	dataValue: string;

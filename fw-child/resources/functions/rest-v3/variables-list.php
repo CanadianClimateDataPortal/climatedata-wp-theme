@@ -66,7 +66,7 @@ function cdc_rest_v3_get_variables_list( $request ) {
 		}
 
 		// Add taxonomy query for variable-dataset term ID
-		if ( ! empty( $variable_dataset_term_id ) ) {
+		if ( $variable_dataset_term_id > 0 ) {
 			$tax_query = array(
 				array(
 					'taxonomy' => 'variable-dataset',
@@ -76,6 +76,12 @@ function cdc_rest_v3_get_variables_list( $request ) {
 			);
 
 			$args['tax_query'] = $tax_query;
+		} else {
+			return new WP_Error(
+				'invalid_variable_dataset_term_id',
+				esc_html__( 'Invalid variable dataset term ID.', 'cdc' ),
+				array( 'status' => 500 )
+			);
 		}
 
 		// Query variable posts

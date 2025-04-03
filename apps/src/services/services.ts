@@ -140,19 +140,30 @@ export const fetchTaxonomyData = async (
 /**
  * Fetches posts data from the API
  * @param postType - the post type to fetch
+ * @param dataset - the dataset
  * @param filters - the filters to apply to the data
+ * @param section - the section we are in (e.g. map, download)
  */
 export const fetchPostsData = async (
 	postType: string,
-	filters: Record<string, string | number | null>
+	section: string,
+	dataset: TaxonomyData,
+	filters: Record<string, string | number | null>,
 ): Promise<ApiPostData[]> => {
 	// check if the there is a dummy response for the slug, which means the API is not yet implemented for it in the backend
 	const fetchFromApi = !Object.keys(dummyResponses).includes(postType);
+	const { term_id } = dataset;
 
 	// fetch from the API or directly return dummy json response
 	const data: ApiPostData[] = fetchFromApi
 		? await fetch(
-				`${WP_API_DOMAIN}/wp-json/cdc/v3/${postType}-list`
+				`${WP_API_DOMAIN}/wp-json/cdc/v3/${postType}-list?app=${section}&variable_dataset_term_id=${term_id}`, {
+					method: 'GET',
+					headers: {
+						'Accept': 'application/json',
+						'Content-Type': 'application/json',
+					},
+			}
 			)
 				.then((res) => {
 					if (!res.ok) {

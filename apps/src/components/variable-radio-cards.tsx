@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
 
@@ -8,33 +8,33 @@ import Link from '@/components/ui/link';
 import { useLocale } from '@/hooks/use-locale';
 import { fetchPostsData } from '@/services/services';
 import { normalizePostData } from '@/lib/format';
-import { PostData } from '@/types/types';
-import SectionContext from "@/context/section-provider";
+import { PostData, TaxonomyData } from '@/types/types';
 
 const VariableRadioCards: React.FC<{
 	filterValues: Record<string, string>;
 	selected: PostData | null;
 	onSelect: (variable: PostData) => void;
-}> = ({ filterValues, selected, onSelect }) => {
+	dataset: TaxonomyData;
+	section: string;
+}> = ({ filterValues, selected, onSelect, dataset, section }) => {
 	const [variables, setVariables] = useState<PostData[]>([]);
-	const section = useContext(SectionContext);
 	const { __ } = useI18n();
 	const { locale } = useLocale();
 
 	useEffect(() => {
 		(async () => {
-			if (!filterValues) {
+			if (!filterValues || !dataset) {
 				return;
 			}
 
-			const data = await fetchPostsData('variables', filterValues, section);
+			const data = await fetchPostsData('variables', section, dataset, filterValues);
 
 			// data from API has some complex structure, so we need to normalize it which will make it easier to work with
 			const normalizedData = await normalizePostData(data, locale);
 
 			setVariables(normalizedData);
 		})();
-	}, [filterValues, locale, section]);
+	}, [dataset, filterValues, locale, section]);
 
 	if (!variables) {
 		return null;

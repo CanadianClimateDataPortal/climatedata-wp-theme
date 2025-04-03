@@ -264,21 +264,21 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Average ‘Wet Day’ Precipitation Intensity */
 	{
 		id: "average_wet_day_precipitation_intensity",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		hasMap: false,
 		hasDelta: false,
 	},
 	/** Cold Spell Days */
 	{
 		id: "cold_spell_days",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		hasMap: false,
 		hasDelta: false,
 	},
 	/** Cooling Degree Days */
 	{
 		id: "cooling_degree_days",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		threshold: "cddcold_18",
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
@@ -291,7 +291,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Days above HXmax */
 	{
 		id: "days_above_hxmax",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		hasMap: false,
 		hasDelta: false,
 		versions: [ "humidex" ],
@@ -307,7 +307,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Days above Tmax */
 	{
 		id: "days_above_tmax",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		thresholds: [
 			{
 				value: "txgt_25",
@@ -338,14 +338,14 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Days above Tmax and Tmin */
 	{
 		id: "days_above_tmax_and_tmin",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		hasMap: false,
 		hasDelta: false,
 	},
 	/** Days below temperature threshold */
 	{
 		id: "days_below_temperature_threshold",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		thresholds: [
 			{
 				value: "tnlt_-15",
@@ -364,14 +364,14 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Degree days exceedance date */
 	{
 		id: "degree_days_exceedance_date",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		hasMap: false,
 		hasDelta: false,
 	},
 	/** Freeze-Thaw Cycles */
 	{
 		id: "freeze_thaw_cycles",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		threshold: "dlyfrzthw_tx0_tn-1",
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
@@ -385,28 +385,28 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Heat Wave Frequency */
 	{
 		id: "heat_wave_frequency",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		hasMap: false,
 		hasDelta: false,
 	},
 	/** Heat Wave */
 	{
 		id: "heat_wave_index",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		hasMap: false,
 		hasDelta: false,
 	},
 	/** Heat Wave Total Duration */
 	{
 		id: "heat_wave_total_duration",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		hasMap: false,
 		hasDelta: false,
 	},
 	/** Heating Degree Days */
 	{
 		id: "heating_degree_days",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		threshold: "hddheat_18",
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
@@ -422,21 +422,21 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Maximum Consecutive Dry Days */
 	{
 		id: "maximum_consecutive_dry_days",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		hasMap: false,
 		hasDelta: false,
 	},
 	/** Maximum Consecutive Wet Days */
 	{
 		id: "maximum_consecutive_wet_days",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		hasMap: false,
 		hasDelta: false,
 	},
 	/** Tropical Nights (Days with Tmin above threshold) */
 	{
 		id: "tropical_nights_days_with_tmin_above_threshold",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		thresholds: [
 			{
 				value: "tr_18",
@@ -459,7 +459,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Wet Days */
 	{
 		id: "wet_days",
-		class: "AnalyzeClimateVariable",
+		class: "RasterAnalyzeClimateVariable",
 		thresholds: [
 			{
 				value: "r1mm",

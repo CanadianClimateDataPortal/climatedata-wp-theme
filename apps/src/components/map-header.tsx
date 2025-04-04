@@ -22,6 +22,7 @@ import { useAnimatedPanel } from '@/hooks/use-animated-panel';
 import { MapInfoProps, ProviderPanelProps } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
 import { useAppSelector } from "@/app/hooks";
+import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 /**
  * MapHeader component, displays the header for the map with breadcrumbs and buttons for extra information.
@@ -112,29 +113,34 @@ const Breadcrumbs: React.FC<{ title: string; onClick: () => void }> = ({
   const { __ } = useI18n();
   const { locale } = useLocale();
   const dataset = useAppSelector((state) => state.map.dataset);
-
-  console.log(dataset);
+  const { climateVariable } = useClimateVariable();
 
   const datasetName = useMemo(() => {
     if (!dataset) return '';
-
     return locale === 'fr' && dataset.title.fr
       ? dataset.title.fr
       : dataset.title.en;
   }, [dataset, locale]);
 
+  const variableTitle = useMemo(() => {
+    if (!climateVariable) return title;
+
+    return __(climateVariable.getId()) || title;
+
+  }, [climateVariable, __, title]);
+
   return (
     <div className="flex items-center gap-2">
       {datasetName && <span>{datasetName}</span>}
-      {datasetName && title && <span>/</span>}
-      {title && (
+      {datasetName && variableTitle && <span>/</span>}
+      {variableTitle && (
         <Button
           variant="ghost"
           className="text-md text-cdc-black hover:text-dark-purple hover:bg-transparent p-0 h-auto"
           onClick={onClick}
           aria-label={__('View details')}
         >
-          {title}
+          {variableTitle}
           <Info />
         </Button>
       )}

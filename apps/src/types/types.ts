@@ -193,7 +193,7 @@ export interface MapState {
 	frequency: string;
 	timePeriodEnd: number[]; // using an array because the slider that uses it expects an array
 	recentLocations: MapLocation[];
-	variable: string;
+	variable: ApiPostData | string;
 	dataset?: TaxonomyData;
 	decade: string;
 	pane: string;
@@ -571,71 +571,4 @@ export interface ChoroValuesOptions {
 	interactiveRegion: string;
 	emissionScenario: string;
 	decimals: number;
-}
-
-/**
- * Represents the structure of variable metadata from the API
- */
-export interface VariableMetadata {
-  'updated-on': string;
-  content: {
-    title: MultilingualField;
-    thumbnail?: string;
-  };
-  taxonomy: {
-    sector: { terms: TermItem[] };
-    region: { terms: TermItem[] };
-    'var-type': { terms: TermItem[] };
-    'variable-datasets': { terms: TermItem[] };
-  };
-}
-
-/**
- * Represents a variable item from the API response
- */
-export interface VariableItem {
-  id: null | string | number;
-  post_id: number;
-  meta: VariableMetadata;
-}
-
-/**
- * Represents the API response structure for variables
- */
-export interface VariablesResponse {
-  variables: VariableItem[];
-}
-
-/**
- * Represents the structure of a variable response extending TaxonomyData.
- */
-export interface VariableResponse extends TaxonomyData {
-  meta?: {
-    content: {
-      title: MultilingualField;
-      thumbnail?: string;
-    };
-    taxonomy?: {
-      sector: { terms: TermItem[] };
-      region: { terms: TermItem[] };
-      'var-type': { terms: TermItem[] };
-      'variable-datasets': { terms: TermItem[] };
-    };
-    'updated-on'?: string;
-  };
-}
-
-/**
- * Type guard helper to check if a taxonomy data object is a VariableResponse.
- */
-export function isVariableResponse(data: TaxonomyData): data is VariableResponse {
-  return (
-    'meta' in data &&
-    typeof data.meta === 'object' &&
-    data.meta !== null &&
-    'content' in data.meta &&
-    typeof data.meta.content === 'object' &&
-    data.meta.content !== null &&
-    'title' in data.meta.content
-  );
 }

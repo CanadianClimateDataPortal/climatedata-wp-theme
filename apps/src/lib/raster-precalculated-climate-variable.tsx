@@ -116,9 +116,6 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 
 		let frequencyCode;
 		switch (this.getFrequency()) {
-			case FrequencyType.ANNUAL:
-				frequencyCode = "ann";
-				break;
 			case FrequencyType.ALL_MONTHS:
 				frequencyCode = "all";
 				break;

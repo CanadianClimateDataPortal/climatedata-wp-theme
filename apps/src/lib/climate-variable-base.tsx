@@ -8,7 +8,8 @@ import {
 	FieldConfig,
 	FieldValues,
 	FileFormatType,
-	FrequencyConfig, GridCoordinates,
+	FrequencyConfig,
+	GridCoordinates,
 	InteractiveRegionConfig,
 	InteractiveRegionOption, ScenariosConfig,
 	ThresholdInterface,
@@ -26,6 +27,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	constructor(config: ClimateVariableConfigInterface) {
 		this._config = config;
+	}
+
+	getId(): string {
+		return this._config.id;
 	}
 
 	getVersions(): string[] {
@@ -67,6 +72,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getAnalyzeScenarios(): string[] {
 		return this._config.analyzeScenarios ?? [];
+	}
+
+	getLayerStyles(): string {
+		return this._config.layerStyles ?? '';
 	}
 
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null {

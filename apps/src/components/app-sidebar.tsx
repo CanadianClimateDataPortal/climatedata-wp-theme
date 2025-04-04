@@ -37,20 +37,23 @@ import {
 import LinkWithIcon from '@/components/sidebar-footer-links/link-with-icon';
 import LayerOpacities from '@/components/ui/layer-opacities';
 
-import { TaxonomyData, PostData } from '@/types/types';
+import { PostData } from '@/types/types';
+import { setDataset } from '@/features/map/map-slice';
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
 
 /**
  * A `Sidebar` component that provides a tabbed interface for exploring data or adjusting map settings.
  */
 export function AppSidebar() {
 	const { climateVariable, selectClimateVariable } = useClimateVariable();
-	const [selectedDataset, setSelectedDataset] = useState<TaxonomyData | null>(
-		null
-	);
+	const {
+		dataset,
+	} = useAppSelector((state) => state.map);
 	const [selectedVariable, setSelectedVariable] = useState<PostData | null>(
 		null
 	);
 	const { setExtendInfo } = useMap();
+	const dispatch = useAppDispatch();
 
 	const { __ } = useI18n();
 
@@ -136,8 +139,12 @@ export function AppSidebar() {
 			</SidebarContent>
 
 			<DatasetsPanel
-				selected={selectedDataset}
-				onSelect={setSelectedDataset}
+				selected={dataset ?? null}
+				onSelect={(selectedDataset) => {
+					if (selectedDataset) {
+						dispatch(setDataset(selectedDataset));
+					}
+				}}
 			/>
 			<VariablesPanel
 				selected={selectedVariable}

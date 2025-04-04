@@ -4,6 +4,7 @@
 import {
 	RelatedData,
 	MapInfoData,
+	Sector,
 	TaxonomyData,
 	ApiPostData,
 	ChartDataOptions,
@@ -17,7 +18,7 @@ import variableDatasetResponseDummy from '@/assets/dummy/variable-dataset-respon
 import varTypeResponseDummy from '@/assets/dummy/var-type-response-dummy.json';
 import sectorResponseDummy from '@/assets/dummy/sector-response-dummy.json';
 import relatedResponse311Dummy from '@/assets/dummy/related-response-311-dummy.json';
-import wpResponse311Dummy from '@/assets/dummy/wp-response-311-dummy.json';
+//import wpResponse311Dummy from '@/assets/dummy/wp-response-311-dummy.json';
 import locationByCoordsDummy from '@/assets/dummy/location-by-coords-dummy.json';
 import generateChartDummy from '@/assets/dummy/generate-chart-dummy.json';
 import deltaValuesDummy from '@/assets/dummy/delta-values-dummy.json';
@@ -30,7 +31,7 @@ const dummyResponses = {
 
 type DummyResponseKey = keyof typeof dummyResponses;
 
-import { WP_API_DOMAIN } from "@/lib/constants.ts";
+import {WP_API_DOMAIN, WP_API_VARIABLE_PATH} from "@/lib/constants.ts";
 
 export const fetchRelatedData = async (): Promise<RelatedData> => {
 	// TODO: uncomment this and use correct API endpoint when ready
@@ -49,41 +50,72 @@ export const fetchRelatedData = async (): Promise<RelatedData> => {
 	return response.json();
 };
 
-export const fetchWPData = async () => {
-	// const POST_ID = 311;
-	// TODO: uncomment this and use correct API endpoint when ready
-	// const response = await fetch(`/dummy/wp-response-${POST_ID}-dummy.json`);
-	// if (!response.ok) {
-	// 	// TODO: this is a error handler dummy, we should use a redux alternative for this.
-	// 	throw new Error('Failed to fetch data');
-	// }
-	// TODO: remove this when the API is ready
-	const response = {
-		json: async () => wpResponse311Dummy, // mimic fetch response.json()
-	};
+/**
+ * Fetches WordPress variable data by post ID from the custom WP REST API endpoint.
+ * Processes and normalizes the response into a structured MapInfoData object,
+ * including sectors, trainings, featured image, and dataset taxonomy terms.
+ */
+export const fetchWPData = async (postId: number) => {
+	try {
+		// Make the Fetch request.
+		const response = await fetch(`${WP_API_DOMAIN}${WP_API_VARIABLE_PATH}?post_id=${postId}`, {
+			method: 'GET',
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json',
+			},
+		});
 
-	const _responseJson = await response.json();
-	const _relatedData = await fetchRelatedData();
-	const { acf: acfData } = _responseJson;
+		// Handle HTTP errors
+		if (!response.ok) {
+			const errorDetails = await response.json();
+			throw new Error(`HTTP error ${response.status}: ${response.statusText} - ${errorDetails}`);
+		}
 
-	const mapInfo: MapInfoData = {
-		title: _responseJson.title.rendered,
-		relatedData: _relatedData,
-		en: {
-			title: _responseJson.title.rendered,
-			description: acfData.var_description,
-			techDescription: acfData.var_tech_description,
-		},
-		fr: {
-			title: _responseJson.meta.title_fr, // TODO: this should come from ACF instead of meta (?)
-			description: acfData.var_description_fr,
-			techDescription: acfData.var_tech_description_fr,
-		},
-	};
+		// Parse response JSON
+		const data = await response.json();
+		const content = data?.variable?.meta?.content;
+		const taxonomy = data?.variable?.meta?.taxonomy;
+		// @todo Add fallback for empty dataset.
+		const dataset = taxonomy?.['variable-dataset']?.terms;
 
-	return {
-		mapInfo,
-	};
+		// Map sectors if available and valid.
+		// @todo Add dynamic lear URL and slug.
+		const baseLearnUrl = '/learn/?q=sector:';
+		const sectors = Array.isArray(content?.relevant_sectors)
+			? content.relevant_sectors.map((item: Sector) => {
+				const slug = item.name.en.toLowerCase().replace(/\s+/g, '-');
+				const link = `${baseLearnUrl}${slug}`;
+				return {
+					...item,
+					link,
+				};
+			})
+			: [];
+
+		// Generate the mapInfo object.
+		const mapInfo: MapInfoData = {
+			title: content?.title || { en: '', fr: '' },
+			tagline: content?.tagline || { en: '', fr: '' },
+			fullDescription: content?.full_description || { en: '', fr: '' },
+			techDescription: content?.tech_description || { en: '', fr: '' },
+			relevantSectors: sectors,
+			relevantTrainings: Array.isArray(content?.relevant_trainings) ? content.relevant_trainings : [],
+			featuredImage: content?.featured_image || {
+				thumbnail: '',
+				medium: '',
+				large: '',
+				full: '',
+			},
+			dataset: Array.isArray(dataset) ? dataset : []
+		};
+
+		return { mapInfo };
+
+	} catch (error) {
+		console.error('Fetch error:', error);
+		throw error;
+	}
 };
 
 export const fetchLegendData = async (url: string) => {

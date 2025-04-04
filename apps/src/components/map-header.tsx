@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button';
 // other
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
 import { MapInfoProps, ProviderPanelProps } from '@/types/types';
-import {useLocale} from "@/hooks/use-locale.ts";
+import { useLocale } from "@/hooks/use-locale";
 
 /**
  * MapHeader component, displays the header for the map with breadcrumbs and buttons for extra information.

@@ -6,7 +6,7 @@
  * and buttons that toggle share and download map modals.
  *
  */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Info, Share2, Download } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
 import { cn } from '@/lib/utils';
@@ -19,9 +19,10 @@ import { Button } from '@/components/ui/button';
 
 // other
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
-import { MapInfoProps, ProviderPanelProps, isVariableResponse, VariableResponse } from '@/types/types';
-import { fetchTaxonomyData } from "@/services/services";
+import { MapInfoProps, ProviderPanelProps } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
+import { useAppSelector } from "@/app/hooks";
+
 /**
  * MapHeader component, displays the header for the map with breadcrumbs and buttons for extra information.
  */
@@ -110,54 +111,33 @@ const Breadcrumbs: React.FC<{ title: string; onClick: () => void }> = ({
 }) => {
   const { __ } = useI18n();
   const { locale } = useLocale();
-  const [datasetName, setDatasetName] = useState<string>('');
+  const dataset = useAppSelector((state) => state.map.dataset);
 
-  useEffect(() => {
-    const fetchDatasetName = async () => {
-      try {
-        const variables = (await fetchTaxonomyData('variables', {})) as VariableResponse[];
+  console.log(dataset);
 
-        const currentVariable = variables.find(variable =>
-          isVariableResponse(variable) &&
-          (variable.meta?.content?.title?.[locale] === title ||
-           Object.values(variable.meta?.content?.title ?? {}).some(t => t === title))
-        );
+  const datasetName = useMemo(() => {
+    if (!dataset) return '';
 
-        // Get the dataset name from taxonomy data
-        const datasetTerms = currentVariable?.meta?.taxonomy?.['variable-datasets']?.terms;
-
-        if (datasetTerms?.[0]) {
-          const firstDataset = datasetTerms[0];
-          setDatasetName(locale === 'fr' && firstDataset.title.fr
-            ? firstDataset.title.fr
-            : firstDataset.title.en);
-        } else {
-          // Fallback to default dataset name if no terms found
-          setDatasetName(__('Historical Canadian Climate Data'));
-        }
-      } catch (error) {
-        console.error('Error fetching dataset name:', error);
-        setDatasetName(__('Historical Canadian Climate Data'));
-      }
-    };
-
-    fetchDatasetName();
-  }, [locale, title, __]);
+    return locale === 'fr' && dataset.title.fr
+      ? dataset.title.fr
+      : dataset.title.en;
+  }, [dataset, locale]);
 
   return (
-    <div>
-      <span className="me-2">{__('Canada')}</span>/
-      <span className="mx-2">{__('Map')}</span>/
-      <span className="mx-2">{datasetName}</span>/
-      <Button
-        variant="ghost"
-        className="text-md text-cdc-black hover:text-dark-purple hover:bg-transparent ms-2 p-0 h-auto"
-        onClick={onClick}
-        aria-label={__('View details')}
-      >
-        {title}
-        <Info />
-      </Button>
+    <div className="flex items-center gap-2">
+      {datasetName && <span>{datasetName}</span>}
+      {datasetName && title && <span>/</span>}
+      {title && (
+        <Button
+          variant="ghost"
+          className="text-md text-cdc-black hover:text-dark-purple hover:bg-transparent p-0 h-auto"
+          onClick={onClick}
+          aria-label={__('View details')}
+        >
+          {title}
+          <Info />
+        </Button>
+      )}
     </div>
   );
 };

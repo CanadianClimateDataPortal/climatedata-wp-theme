@@ -1,21 +1,21 @@
-import React, { useRef } from "react";
-import { RadioGroupFactory } from "@/components/ui/radio-group";
-import { setSelectionMode } from "@/features/download/download-slice";
-import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
-import { ControlTitle } from "@/components/ui/control-title";
-import { cn } from "@/lib/utils";
-import { MapContainer, TileLayer } from "react-leaflet";
-import { DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM } from "@/lib/constants";
-import MapEvents from "@/components/map-layers/map-events";
-import CustomPanesLayer from "@/components/map-layers/custom-panes";
-import ZoomControl from "@/components/map-layers/zoom-control";
-import SearchControl from "@/components/map-layers/search-control";
-import SelectableCellsGridLayer from "@/components/map-layers/selectable-cells-grid-layer";
-import SelectableRectangleGridLayer from "@/components/map-layers/selectable-rectangle-grid-layer";
-import { useI18n } from "@wordpress/react-i18n";
-import { useMap } from "@/hooks/use-map";
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import React, { useRef } from 'react';
+import { RadioGroupFactory } from '@/components/ui/radio-group';
+import { setSelectionMode } from '@/features/download/download-slice';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
+import { ControlTitle } from '@/components/ui/control-title';
+import { cn } from '@/lib/utils';
+import { MapContainer, TileLayer } from 'react-leaflet';
+import { DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM } from '@/lib/constants';
+import MapEvents from '@/components/map-layers/map-events';
+import CustomPanesLayer from '@/components/map-layers/custom-panes';
+import ZoomControl from '@/components/map-layers/zoom-control';
+import SearchControl from '@/components/map-layers/search-control';
+import SelectableCellsGridLayer from '@/components/map-layers/selectable-cells-grid-layer';
+import SelectableRectangleGridLayer from '@/components/map-layers/selectable-rectangle-grid-layer';
+import { useI18n } from '@wordpress/react-i18n';
+import { useMap } from '@/hooks/use-map';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 
 export default function RasterDownloadMap(): React.ReactElement {
 	const { __, _n } = useI18n();
@@ -25,7 +25,9 @@ export default function RasterDownloadMap(): React.ReactElement {
 	}>(null);
 
 	const { setMap } = useMap();
-	const { zoom, center, selectionMode, selectionCount } = useAppSelector((state) => state.download);
+	const { zoom, center, selectionMode, selectionCount } = useAppSelector(
+		(state) => state.download
+	);
 	const dispatch = useAppDispatch();
 
 	const clearSelection = () => {
@@ -33,9 +35,11 @@ export default function RasterDownloadMap(): React.ReactElement {
 	};
 
 	const renderGrid = () => {
-		return selectionMode === "cells"
-			? <SelectableCellsGridLayer ref={gridLayerRef} />
-			: <SelectableRectangleGridLayer ref={gridLayerRef} />;
+		return selectionMode === 'cells' ? (
+			<SelectableCellsGridLayer ref={gridLayerRef} />
+		) : (
+			<SelectableRectangleGridLayer ref={gridLayerRef} />
+		);
 	};
 
 	return (
@@ -54,7 +58,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 							clearSelection();
 						}}
 						options={[
-							{value: 'cells', label: __('Grid cells')},
+							{ value: 'cells', label: __('Grid cells') },
 							{
 								value: 'region',
 								label: __('Draw region'),
@@ -68,7 +72,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 								className="text-xs text-brand-red font-semibold leading-4 tracking-wider uppercase h-auto p-0"
 								onClick={clearSelection}
 							>
-								<RefreshCw size={16}/>
+								<RefreshCw size={16} />
 								{__('Clear')}
 							</Button>
 						)}
@@ -79,7 +83,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 							/>
 							<div
 								className={cn(
-									'text-2xl font-semibold leading-7',
+									'text-2xl font-semibold leading-7 text-right',
 									selectionCount > 0
 										? 'text-brand-blue'
 										: 'text-neutral-grey-medium'
@@ -105,10 +109,10 @@ export default function RasterDownloadMap(): React.ReactElement {
 				scrollWheelZoom={true}
 				className="h-[560px] font-sans"
 			>
-				<MapEvents onMapReady={(map: L.Map) => setMap(map)}/>
-				<CustomPanesLayer/>
-				<ZoomControl/>
-				<SearchControl className="top-6 left-6"/>
+				<MapEvents onMapReady={(map: L.Map) => setMap(map)} />
+				<CustomPanesLayer />
+				<ZoomControl />
+				<SearchControl className="top-6 left-6" />
 
 				{renderGrid()}
 

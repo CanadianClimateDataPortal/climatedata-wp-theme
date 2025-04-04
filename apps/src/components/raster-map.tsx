@@ -56,7 +56,7 @@ export default function RasterMap(): React.ReactElement {
 			className={cn(
 				'map-wrapper',
 				'grid gap-4 h-full z-30',
-				showComparisonMap ? 'sm:grid-cols-2' : 'grid-cols-1'
+				showComparisonMap ? 'grid-cols-2' : 'grid-cols-1'
 			)}
 		>
 			<RasterMapContainer

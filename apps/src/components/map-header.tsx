@@ -19,8 +19,9 @@ import { Button } from '@/components/ui/button';
 
 // other
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
-import { MapInfoProps, ProviderPanelProps } from '@/types/types';
-
+import { MapInfoProps, ProviderPanelProps, isVariableResponse, VariableResponse } from '@/types/types';
+import { fetchTaxonomyData } from "@/services/services";
+import { useLocale } from '@/hooks/use-locale';
 /**
  * MapHeader component, displays the header for the map with breadcrumbs and buttons for extra information.
  */
@@ -104,27 +105,61 @@ MapHeader.displayName = 'MapHeader';
  * Breadcrumbs component, displays the breadcrumbs for the selected state of the map.
  */
 const Breadcrumbs: React.FC<{ title: string; onClick: () => void }> = ({
-	title,
-	onClick,
+  title,
+  onClick,
 }) => {
-	const { __ } = useI18n();
+  const { __ } = useI18n();
+  const { locale } = useLocale();
+  const [datasetName, setDatasetName] = useState<string>('');
 
-	// TODO: replace this with dynamically generated breadcrumbs
-	return (
-		<div>
-			<span className="me-2">{__('ClimateData Canada')}</span>/
-			<span className="mx-2">{__('Map')}</span>/
-			<Button
-				variant="ghost"
-				className="text-md text-cdc-black hover:text-dark-purple hover:bg-transparent ms-2 p-0 h-auto"
-				onClick={onClick}
-				aria-label={__('View details')}
-			>
-				{title}
-				<Info />
-			</Button>
-		</div>
-	);
+  useEffect(() => {
+    const fetchDatasetName = async () => {
+      try {
+        const variables = (await fetchTaxonomyData('variables', {})) as VariableResponse[];
+
+        const currentVariable = variables.find(variable =>
+          isVariableResponse(variable) &&
+          (variable.meta?.content?.title?.[locale] === title ||
+           Object.values(variable.meta?.content?.title ?? {}).some(t => t === title))
+        );
+
+        // Get the dataset name from taxonomy data
+        const datasetTerms = currentVariable?.meta?.taxonomy?.['variable-datasets']?.terms;
+
+        if (datasetTerms?.[0]) {
+          const firstDataset = datasetTerms[0];
+          setDatasetName(locale === 'fr' && firstDataset.title.fr
+            ? firstDataset.title.fr
+            : firstDataset.title.en);
+        } else {
+          // Fallback to default dataset name if no terms found
+          setDatasetName(__('Historical Canadian Climate Data'));
+        }
+      } catch (error) {
+        console.error('Error fetching dataset name:', error);
+        setDatasetName(__('Historical Canadian Climate Data'));
+      }
+    };
+
+    fetchDatasetName();
+  }, [locale, title, __]);
+
+  return (
+    <div>
+      <span className="me-2">{__('Canada')}</span>/
+      <span className="mx-2">{__('Map')}</span>/
+      <span className="mx-2">{datasetName}</span>/
+      <Button
+        variant="ghost"
+        className="text-md text-cdc-black hover:text-dark-purple hover:bg-transparent ms-2 p-0 h-auto"
+        onClick={onClick}
+        aria-label={__('View details')}
+      >
+        {title}
+        <Info />
+      </Button>
+    </div>
+  );
 };
 Breadcrumbs.displayName = 'Breadcrumbs';
 

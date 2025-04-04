@@ -9,8 +9,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { cn, isValidEmail } from '@/lib/utils';
-import { setDecimalPlace, setEmail, setFormat, setSubscribe, } from '@/features/download/download-slice';
-import { FileFormatType } from "@/types/climate-variable-interface";
+import {
+	setDecimalPlace,
+	setEmail,
+	setSubscribe,
+} from '@/features/download/download-slice';
+import { DownloadType, FileFormatType } from "@/types/climate-variable-interface";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import Dropdown from "@/components/ui/dropdown.tsx";
 import { normalizeDropdownOptions } from "@/lib/format.ts";
@@ -20,10 +24,10 @@ import { normalizeDropdownOptions } from "@/lib/format.ts";
  */
 const StepSendRequest: React.FC = () => {
 	const [captchaValue, setCaptchaValue] = useState<string>('');
-	const { climateVariable } = useClimateVariable();
+	const { climateVariable, setFileFormat } = useClimateVariable();
 	const { __ } = useI18n();
 
-	const { format, email, subscribe, decimalPlace } = useAppSelector(
+	const { email, subscribe, decimalPlace } = useAppSelector(
 		(state) => state.download
 	);
 	const dispatch = useAppDispatch();
@@ -62,11 +66,9 @@ const StepSendRequest: React.FC = () => {
 				title={__('Format')}
 				name="format"
 				className="mb-8"
-				value={format}
+				value={climateVariable?.getFileFormat() ?? undefined}
 				options={formatOptions}
-				onValueChange={(value) => {
-					dispatch(setFormat(value));
-				}}
+				onValueChange={setFileFormat}
 			/>
 
 			{maxDecimals > 0 && <Dropdown
@@ -79,7 +81,7 @@ const StepSendRequest: React.FC = () => {
 				}}
 			/>}
 
-			{climateVariable?.getDownloadType() === "analyzed" && <>
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED &&
 				<div className="flex flex-col gap-2">
 					<p className="text-sm text-neutral-grey-medium">
 						{__(
@@ -120,36 +122,36 @@ const StepSendRequest: React.FC = () => {
 									: 'opacity-75 cursor-not-allowed'
 							)}
 						>
-						{__(
-							'I would like to subscribe to ClimateData Newsletter'
-						)}
-					</span>
+							{__(
+								'I would like to subscribe to ClimateData Newsletter'
+							)}
+						</span>
 					</label>
 				</div>
+			}
 
-				{/* TODO: make this look good at least */}
-				<div className="mb-4">
-					<p className="text-sm text-neutral-grey-medium leading-5 mb-2">
-						{__('Enter the characters shown:')}
-					</p>
-					<div className="flex items-center space-x-3">
-						{/* Captcha display */}
-						<div className="w-20 h-10 bg-gray-200 flex items-center justify-center text-lg font-bold text-gray-600">
-							h5qj
-						</div>
-						{/* Captcha input */}
-						<input
-							type="text"
-							placeholder="XXXX"
-							value={captchaValue}
-							onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-								setCaptchaValue(e.target.value)
-							}
-							className="border bg-white border-gray-300 rounded px-2 py-1 text-sm placeholder:text-neutral-grey-medium"
-						/>
+			{/* TODO: make this look good at least */}
+			<div className="mb-4">
+				<p className="text-sm text-neutral-grey-medium leading-5 mb-2">
+					{__('Enter the characters shown:')}
+				</p>
+				<div className="flex items-center space-x-3">
+					{/* Captcha display */}
+					<div className="w-20 h-10 bg-gray-200 flex items-center justify-center text-lg font-bold text-gray-600">
+						h5qj
 					</div>
+					{/* Captcha input */}
+					<input
+						type="text"
+						placeholder="XXXX"
+						value={captchaValue}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+							setCaptchaValue(e.target.value)
+						}
+						className="border bg-white border-gray-300 rounded px-2 py-1 text-sm placeholder:text-neutral-grey-medium"
+					/>
 				</div>
-			</>}
+			</div>
 		</StepContainer>
 	);
 };

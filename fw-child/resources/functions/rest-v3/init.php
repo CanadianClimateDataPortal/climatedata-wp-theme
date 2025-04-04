@@ -19,6 +19,8 @@ function cdc_rest_v3_init() {
 	// Load endpoint definitions.
 	require_once dirname( __FILE__ ) . '/datasets-list.php';
 	require_once dirname( __FILE__ ) . '/variables-list.php';
+	require_once dirname( __FILE__ ) . '/variables-filters.php';
+	require_once dirname( __FILE__ ) . '/variable.php';
 }
 
 add_action( 'rest_api_init', 'cdc_rest_v3_init' );
@@ -73,11 +75,6 @@ function cdc_rest_v3_endpoint_permission() {
 		if ( ! empty( $origin_host ) && $origin_host === $site_url ) {
 			$is_same_domain = true;
 		}
-
-		// Allow local environment (useful when testing against production).
-		if ( WP_DEBUG && in_array( $request_host, [ 'dev-en.climatedata.ca', 'dev-fr.climatedata.ca' ] ) ) {
-			$is_same_domain = true;
-		}
 	}
 
 	// Log unauthorized attempts if logging is enabled.
@@ -103,25 +100,6 @@ function cdc_rest_v3_endpoint_permission() {
 			'source' => 'domain_restriction'
 		)
 	);
-}
-
-/**
- * Sanitize the 'per_page' argument for REST API requests.
- *
- * @param int $value The 'per_page' argument to sanitize.
- *
- * @return int The sanitized 'per_page' value.
- */
-function cdc_rest_v3_sanitize_arg_per_page( $value ) {
-	$value = intval( $value );
-
-	// Allow -1 for all items.
-	if ( $value === -1 ) {
-		return -1;
-	}
-
-	// Ensure value is between 1 and 100.
-	return max( 1, min( 100, $value ) );
 }
 
 /**
@@ -151,6 +129,33 @@ function cdc_rest_v3_build_multilingual_field( $en, $fr ) {
 }
 
 /**
+ * Helper function to get taxonomy terms data.
+ *
+ * @param int $post_id The post ID.
+ * @param string $taxonomy The taxonomy name.
+ *
+ * @return array The formatted taxonomy terms data.
+ */
+function cdc_rest_v3_get_taxonomy_terms_data( $post_id, $taxonomy ) {
+	$terms           = wp_get_post_terms( $post_id, $taxonomy );
+	$formatted_terms = array();
+
+	if ( ! is_wp_error( $terms ) ) {
+		foreach ( $terms as $term ) {
+			$formatted_terms[] = array(
+				'term_id' => $term->term_id,
+				'title'   => cdc_rest_v3_build_multilingual_field(
+					$term->name,
+					get_field( 'title_fr', $term )
+				),
+			);
+		}
+	}
+
+	return array( 'terms' => $formatted_terms );
+}
+
+/**
  * Set cache headers for REST API V3 endpoints.
  *
  * This function sets the Cache-Control header to cache the response
@@ -167,6 +172,8 @@ function cdc_rest_v3_set_cache( $served, $result, $request, $server ) {
 	$cacheable_endpoints = [
 		'cdc/v3/datasets-list',
 		'cdc/v3/variables-list',
+		'cdc/v3/variables-filters',
+		'cdc/v3/variable',
 	];
 
 	$route = $request->get_route();

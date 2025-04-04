@@ -40,6 +40,7 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			tiled: true,
 			version: climateVariable?.getVersion() === 'cmip6' ? '1.3.0' : '1.1.1',
 			layers: layerValue,
+			styles: climateVariable?.getLayerStyles(),
 			TIME: parseInt(decade) + '-01-00T00:00:00Z',
 			opacity: 1,
 			pane: pane,

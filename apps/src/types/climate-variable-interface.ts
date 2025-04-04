@@ -28,7 +28,7 @@ export enum FrequencyDisplayModeOption {
 }
 
 export enum FrequencyType {
-	ANNUAL = "annual",
+	ANNUAL = "ann",
 	ANNUAL_JUL_JUN = "annual_jul_jun",
 	MONTHLY = "months",
 	SEASONAL = "seasons",
@@ -82,6 +82,15 @@ export enum FileFormatType {
 	NetCDF = "netcdf",
 }
 
+export interface Coordinates {
+	lat: number;
+	lng: number;
+}
+
+export interface GridCoordinates {
+	[key: number]: Coordinates;
+}
+
 /**
  * Interface representing the configuration for a climate variable.
  */
@@ -115,6 +124,9 @@ export interface ClimateVariableConfigInterface {
 
 	/** Selected scenarios for analysis */
 	analyzeScenarios?: string[];
+
+	/** Layer styles */
+	layerStyles?: string;
 
 	/** Configuration defining interactive region options and their status */
 	interactiveRegionConfig?: InteractiveRegionConfig;
@@ -167,20 +179,35 @@ export interface ClimateVariableConfigInterface {
 	/** Stores the selected percentiles */
 	percentiles?: string[];
 
-	/** Determines if the variable data must be analyzed or is already precalculated. */
-	downloadType?: DownloadType;
-
 	/** The type of formats available */
 	fileFormatTypes?: FileFormatType[];
 
+	/** The file format to use for download */
+	fileFormat?: FileFormatType;
+
 	/** The maximum number of decimals to be used for the file */
 	maxDecimals?: number;
+
+	/** Determines if the variable data must be analyzed or is already precalculated. */
+	downloadType?: DownloadType;
+
+	hasMultipleDownloadUrls?: boolean;
+
+	downloadUrls?: string[];
+
+	downloadUrl?: string;
+
+	analysisUrl?: string;
+
+	selectedPoints?: GridCoordinates;
 }
 
 /**
  * Interface representing functionality for handling climate variables and their configurations.
  */
 export interface ClimateVariableInterface {
+	getId(): string;
+
 	getVersions(): string[];
 
 	getVersion(): string | null;
@@ -197,6 +224,8 @@ export interface ClimateVariableInterface {
 
 	getAnalyzeScenarios(): string[];
 
+	getLayerStyles(): string;
+
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null;
 
 	getInteractiveRegion(): InteractiveRegionOption | null;
@@ -207,7 +236,7 @@ export interface ClimateVariableInterface {
 
 	getFrequency(): string | null;
 
-	hasDelta(): boolean;
+	hasDelta(): boolean | undefined;
 
 	getColourScheme(): string[];
 
@@ -231,15 +260,27 @@ export interface ClimateVariableInterface {
 
 	getPercentiles(): string[];
 
-	getDownloadType(): DownloadType | null;
-
 	getFileFormatTypes(): FileFormatType[];
+
+	getFileFormat(): FileFormatType | null;
 
 	getMaxDecimals(): number;
 
 	renderMap(): React.ReactElement;
 
 	renderDownloadMap(): React.ReactElement;
+
+	getDownloadType(): DownloadType | null;
+
+	hasMultipleDownloadUrls(): boolean;
+
+	getDownloadUrls(): string[];
+
+	getDownloadUrl(): Promise<string | null>;
+
+	getAnalysisUrl(): string | null;
+
+	getSelectedPoints(): GridCoordinates | null;
 
 	toObject(): ClimateVariableConfigInterface;
 }

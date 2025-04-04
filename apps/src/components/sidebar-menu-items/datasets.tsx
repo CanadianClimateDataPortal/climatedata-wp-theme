@@ -62,7 +62,7 @@ DatasetsMenuItem.displayName = 'DatasetsMenuItem';
 /**
  * A panel component that displays a list of datasets.
  */
-const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData>> = ({
+const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 	selected,
 	onSelect,
 }) => {

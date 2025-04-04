@@ -9,31 +9,37 @@ import {
 } from "@/types/climate-variable-interface";
 
 export const ClimateVariables: ClimateVariableConfigInterface[] = [
+	/** Hottest Day */
 	{
 		id: "hottest_day",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "tx_max",
 	},
+	/** Coldest Day */
 	{
 		id: "coldest_day",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "tn_min",
 	},
+	/** Cumulative degree-days above 0°C */
 	{
 		id: "cumulative_degree_days_above_0",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "gddgrow_0",
 	},
+	/** Maximum 5-Day Precipitation */
 	{
 		id: "max_5d_total_precipitation",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "rx5day",
 	},
+	/** Number of Periods with more than 5 Consecutive Dry Days */
 	{
 		id: "periods_more_5_consecutive_dry_days",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "nr_cdd",
 	},
+	/** Ice Days */
 	{
 		id: "ice_days",
 		class: "RasterPrecalculatedClimateVariable",
@@ -42,6 +48,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 	},
+	/** First fall frost */
 	{
 		id: "first_fall_frost",
 		class: "RasterPrecalculatedClimateVariable",
@@ -50,6 +57,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 	},
+	/** Frost Days */
 	{
 		id: "frost_days",
 		class: "RasterPrecalculatedClimateVariable",
@@ -58,6 +66,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 	},
+	/** Frost free season */
 	{
 		id: "frost_free_season",
 		class: "RasterPrecalculatedClimateVariable",
@@ -66,6 +75,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 	},
+	/** Growing Degree Days (5°C) */
 	{
 		id: "growing_degree_days_5",
 		class: "RasterPrecalculatedClimateVariable",
@@ -74,6 +84,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 	},
+	/** Last spring frost */
 	{
 		id: "last_spring_frost",
 		class: "RasterPrecalculatedClimateVariable",
@@ -82,6 +93,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 	},
+	/** Maximum Number of Consecutive Dry Days */
 	{
 		id: "max_number_consecutive_dry_days",
 		class: "RasterPrecalculatedClimateVariable",
@@ -90,6 +102,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 	},
+	/** Maximum 1-Day Total Precipitation */
 	{
 		id: "max_1d_total_precipitation",
 		class: "RasterPrecalculatedClimateVariable",
@@ -101,6 +114,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 	},
+	/** Mean Temperature */
 	{
 		id: "mean_temp",
 		class: "RasterPrecalculatedClimateVariable",
@@ -112,6 +126,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 	},
+	/** Days with Humidex above threshold */
 	{
 		id: "days_humidex_above_threshold",
 		class: "RasterPrecalculatedClimateVariable",
@@ -138,6 +153,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 	},
+	/** All CanDCS variables */
 	{
 		id: "all_candcs_variables",
 		class: "RasterPrecalculatedClimateVariable",
@@ -148,6 +164,311 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 	},
+	/** Building Climate Zones */
+	{
+		id: "building_climate_zones",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "hddheat_18",
+		layerStyles: "CDC:building_climate_zones",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: true,
+			[InteractiveRegionOption.CENSUS]: false,
+			[InteractiveRegionOption.HEALTH]: false,
+			[InteractiveRegionOption.WATERSHED]: false
+		},
+		hasDelta: false,
+	},
+	/** Maximum Temperature */
+	{
+		id: "maximum_temperature",
+		class: "RasterPrecalculatedWithDailyFormatsClimateVariable",
+		threshold: "tx_mean",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
+		},
+	},
+	/** Minimum Temperature */
+	{
+		id: "minimum_temperature",
+		class: "RasterPrecalculatedWithDailyFormatsClimateVariable",
+		threshold: "tn_mean",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
+		},
+	},
+	/** Standardized precipitation evapotranspiration index (12-months) */
+	{
+		id: "spei_12",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "spei_12m",
+		versions: [ "cmip5" ],
+		frequencyConfig: {
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: true,
+			[InteractiveRegionOption.CENSUS]: false,
+			[InteractiveRegionOption.HEALTH]: false,
+			[InteractiveRegionOption.WATERSHED]: false
+		},
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+		],
+	},
+	/** Standardized precipitation evapotranspiration index (3-months) */
+	{
+		id: "spei_3",
+		class: "RasterPrecalculatedClimateVariable",
+		threshold: "spei_3m",
+		versions: [ "cmip5" ],
+		frequencyConfig: {
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: true,
+			[InteractiveRegionOption.CENSUS]: false,
+			[InteractiveRegionOption.HEALTH]: false,
+			[InteractiveRegionOption.WATERSHED]: false
+		},
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+		],
+	},
+	/** Total Precipitation */
+	{
+		id: "total_precipitation",
+		class: "RasterPrecalculatedWithDailyFormatsClimateVariable",
+		threshold: "prcptot",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
+		},
+	},
+	/** Average ‘Wet Day’ Precipitation Intensity */
+	{
+		id: "average_wet_day_precipitation_intensity",
+		class: "RasterAnalyzeClimateVariable",
+		hasDelta: false,
+	},
+	/** Cold Spell Days */
+	{
+		id: "cold_spell_days",
+		class: "RasterAnalyzeClimateVariable",
+		hasDelta: false,
+	},
+	/** Cooling Degree Days */
+	{
+		id: "cooling_degree_days",
+		class: "RasterAnalyzeClimateVariable",
+		threshold: "cddcold_18",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
+		],
+	},
+	/** Days above HXmax */
+	{
+		id: "days_above_hxmax",
+		class: "RasterAnalyzeClimateVariable",
+		hasDelta: false,
+		versions: [ "humidex" ],
+		scenarios: {
+			humidex: [
+				"ssp126",
+				"ssp245",
+				"ssp585",
+			],
+		},
+		gridType: "era5landgrid",
+	},
+	/** Days above Tmax */
+	{
+		id: "days_above_tmax",
+		class: "RasterAnalyzeClimateVariable",
+		thresholds: [
+			{
+				value: "txgt_25",
+				label: "25 ºC",
+			},
+			{
+				value: "txgt_27",
+				label: "27 ºC",
+			},
+			{
+				value: "txgt_29",
+				label: "29 ºC",
+			},
+			{
+				value: "txgt_30",
+				label: "30 ºC",
+			},
+			{
+				value: "txgt_32",
+				label: "32 ºC",
+			},
+		],
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
+		],
+	},
+	/** Days above Tmax and Tmin */
+	{
+		id: "days_above_tmax_and_tmin",
+		class: "RasterAnalyzeClimateVariable",
+		hasDelta: false,
+	},
+	/** Days below temperature threshold */
+	{
+		id: "days_below_temperature_threshold",
+		class: "RasterAnalyzeClimateVariable",
+		thresholds: [
+			{
+				value: "tnlt_-15",
+				label: "-15 ºC",
+			},
+			{
+				value: "tnlt_-25",
+				label: "-25 ºC",
+			},
+		],
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
+		],
+	},
+	/** Degree days exceedance date */
+	{
+		id: "degree_days_exceedance_date",
+		class: "RasterAnalyzeClimateVariable",
+		hasDelta: false,
+	},
+	/** Freeze-Thaw Cycles */
+	{
+		id: "freeze_thaw_cycles",
+		class: "RasterAnalyzeClimateVariable",
+		threshold: "dlyfrzthw_tx0_tn-1",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
+		},
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
+		],
+	},
+	/** Heat Wave Frequency */
+	{
+		id: "heat_wave_frequency",
+		class: "RasterAnalyzeClimateVariable",
+		hasDelta: false,
+	},
+	/** Heat Wave */
+	{
+		id: "heat_wave_index",
+		class: "RasterAnalyzeClimateVariable",
+		hasDelta: false,
+	},
+	/** Heat Wave Total Duration */
+	{
+		id: "heat_wave_total_duration",
+		class: "RasterAnalyzeClimateVariable",
+		hasDelta: false,
+	},
+	/** Heating Degree Days */
+	{
+		id: "heating_degree_days",
+		class: "RasterAnalyzeClimateVariable",
+		threshold: "hddheat_18",
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
+		},
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
+		],
+	},
+	/** Maximum Consecutive Dry Days */
+	{
+		id: "maximum_consecutive_dry_days",
+		class: "RasterAnalyzeClimateVariable",
+		hasDelta: false,
+	},
+	/** Maximum Consecutive Wet Days */
+	{
+		id: "maximum_consecutive_wet_days",
+		class: "RasterAnalyzeClimateVariable",
+		hasDelta: false,
+	},
+	/** Tropical Nights (Days with Tmin above threshold) */
+	{
+		id: "tropical_nights_days_with_tmin_above_threshold",
+		class: "RasterAnalyzeClimateVariable",
+		thresholds: [
+			{
+				value: "tr_18",
+				label: "18 ºC",
+			},
+			{
+				value: "tr_20",
+				label: "20 ºC",
+			},
+			{
+				value: "tr_22",
+				label: "22 ºC",
+			},
+		],
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
+		],
+	},
+	/** Wet Days */
+	{
+		id: "wet_days",
+		class: "RasterAnalyzeClimateVariable",
+		thresholds: [
+			{
+				value: "r1mm",
+				label: "1 mm",
+			},
+			{
+				value: "r10mm",
+				label: "10 mm",
+			},
+			{
+				value: "r20mm",
+				label: "20 mm",
+			},
+		],
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS,
+		],
+	},
+	/** Test variable */
 	{
 		id: "test_variable",
 		class: "ClimateVariableBase",

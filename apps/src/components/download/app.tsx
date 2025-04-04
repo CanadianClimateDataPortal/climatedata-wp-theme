@@ -15,11 +15,14 @@ import { AnimatedPanelProvider } from '@/context/animated-panel-provider';
 import { DownloadProvider } from '@/context/download-provider';
 import { useDownload } from '@/hooks/use-download';
 import { cn } from '@/lib/utils';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { DownloadType } from "@/types/climate-variable-interface";
 
 const Steps: React.FC = () => {
 	const { __ } = useI18n();
+	const { climateVariable } = useClimateVariable();
 
-	const { goToNextStep, currentStep, isStepValid, fields } = useDownload();
+	const { goToNextStep, currentStep, isStepValid } = useDownload();
 
 	const steps = [
 		<StepDataset />,
@@ -33,6 +36,12 @@ const Steps: React.FC = () => {
 	const isLastStep = currentStep === steps.length;
 	const isSecondToLastStep = currentStep === steps.length - 1;
 
+	/**
+	 * @todo This needs to be refactored. The validity of the step should be
+	 *   determined by the step itself since a step can have dynamic fields.
+	 *   We could instead pass a handler or have the step themselves set
+	 *   the isStepValid state.
+	 */
 	const isDisabled = !isStepValid();
 
 	let buttonText = __('Next Step');
@@ -46,9 +55,15 @@ const Steps: React.FC = () => {
 		if (!isLastStep) {
 			goToNextStep();
 		} else {
-			// TODO: add logic to actually send the request
-			console.log(fields);
-			alert('See dev console for data captured in the form');
+			if (climateVariable?.getDownloadType() === DownloadType.PRECALCULATED) {
+				// Generate the file to be downloaded.
+				climateVariable.getDownloadUrl().then(url => {
+					// @todo Either print or immediately initiate the download.
+					console.log(url);
+				});
+			} else {
+				// Send the request for analysis.
+			}
 		}
 	};
 

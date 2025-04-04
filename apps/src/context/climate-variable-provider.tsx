@@ -15,9 +15,14 @@ import ClimateVariableBase from "@/lib/climate-variable-base";
 import {
 	AveragingType,
 	ClimateVariableConfigInterface,
-	ClimateVariableInterface, InteractiveRegionOption
+	ClimateVariableInterface,
+	FileFormatType,
+	GridCoordinates,
+	InteractiveRegionOption,
 } from "@/types/climate-variable-interface";
 import RasterPrecalculatedClimateVariable from "@/lib/raster-precalculated-climate-variable";
+import RasterPrecalculatedWithDailyFormatsClimateVariable from "@/lib/raster-precalculated-with-daily-formats-climate-variable";
+import RasterAnalyzeClimateVariable from "@/lib/raster-analyze-climate-variable";
 
 export type ClimateVariableContextType = {
 	climateVariable: ClimateVariableInterface | null;
@@ -32,6 +37,10 @@ export type ClimateVariableContextType = {
 	setAveragingType: (type: AveragingType) => void;
 	setDateRange: (dates: string[]) => void;
 	setPercentiles: (percentiles: string[]) => void;
+	setFileFormat: (fileFormat: FileFormatType) => void;
+	addSelectedPoints: (gridCoordinate: GridCoordinates) => void;
+	removeSelectedPoint: (gid: number) => void;
+	resetSelectedPoints: () => void;
 }
 
 type ClassMapType = Record<string, new (arg: ClimateVariableConfigInterface) => ClimateVariableInterface>;
@@ -42,6 +51,8 @@ type ClassMapType = Record<string, new (arg: ClimateVariableConfigInterface) => 
 const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
 	"ClimateVariableBase": ClimateVariableBase,
 	"RasterPrecalculatedClimateVariable": RasterPrecalculatedClimateVariable,
+	"RasterPrecalculatedWithDailyFormatsClimateVariable": RasterPrecalculatedWithDailyFormatsClimateVariable,
+	"RasterAnalyzeClimateVariable": RasterAnalyzeClimateVariable,
 };
 
 /**
@@ -50,7 +61,7 @@ const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
 export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const dispatch = useAppDispatch();
 
-	const climateVariableData = useAppSelector((state) => state.climateVariable.data)
+	const { data: climateVariableData } = useAppSelector((state) => state.climateVariable)
 
 	/**
 	 * Returns an instance of a climate variable class, derived from the provided climate variable data.
@@ -164,6 +175,37 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		}));
 	}, [dispatch]);
 
+	const setFileFormat = useCallback((fileFormat: FileFormatType) => {
+		dispatch(updateClimateVariable({
+			fileFormat
+		}));
+	}, [dispatch]);
+
+	const addSelectedPoints = useCallback((gridCoordinates: GridCoordinates) => {
+		const { selectedPoints } = climateVariableData;
+		dispatch(updateClimateVariable({
+			selectedPoints: {
+				...selectedPoints,
+				...gridCoordinates
+			},
+		}));
+	}, [dispatch, climateVariableData]);
+
+	const removeSelectedPoint = useCallback((gid: number) => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { [gid]: removed, ...rest } = climateVariableData.selectedPoints ?? {};
+		console.log({removed, rest});
+		dispatch(updateClimateVariable({
+			selectedPoints: rest
+		}));
+	}, [dispatch, climateVariableData]);
+
+	const resetSelectedPoints = useCallback(() => {
+		dispatch(updateClimateVariable({
+			selectedPoints: {}
+		}));
+	}, [dispatch]);
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
@@ -177,6 +219,10 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 		setAveragingType,
 		setDateRange,
 		setPercentiles,
+		setFileFormat,
+		addSelectedPoints,
+		removeSelectedPoint,
+		resetSelectedPoints,
 	}
 
 	return (

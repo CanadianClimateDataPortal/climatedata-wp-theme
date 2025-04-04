@@ -10,15 +10,14 @@ import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.vectorgrid';
 
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { useAppDispatch } from '@/app/hooks';
 import {
-	setSelection,
-	setSelectionCount,
 	setZoom,
 	setCenter,
 } from '@/features/download/download-slice';
 import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM } from '@/lib/constants';
 import { GridCellProps } from '@/types/types';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 /**
  * Component that allows to select cells on the map and tally the number of cells selected
@@ -27,7 +26,7 @@ const SelectableCellsGridLayer = forwardRef<{
 	clearSelection: () => void;
 }>((_, ref) => {
 	const map = useMap();
-	const selection = useAppSelector((state) => state.download.selection);
+	const { climateVariable, addSelectedPoints, removeSelectedPoint, resetSelectedPoints } = useClimateVariable();
 	const dispatch = useAppDispatch();
 
 	// @ts-expect-error: suppress leaflet typescript error
@@ -73,6 +72,10 @@ const SelectableCellsGridLayer = forwardRef<{
 		[]
 	);
 
+	const selectedGridIds = useMemo(() => {
+		return Object.keys(climateVariable?.getSelectedPoints() ?? {}).map(Number);
+	}, [climateVariable])
+
 	/**********************************************
 	 * update styles of selected cells
 	 **********************************************/
@@ -82,12 +85,13 @@ const SelectableCellsGridLayer = forwardRef<{
 		}
 
 		// now apply the selected cell styles
-		selection.forEach((gid) => {
+		selectedGridIds.forEach((gid) => {
 			gridLayerRef.current.setFeatureStyle(gid, selectedCellStyles);
 		});
+
 		// disabling because setting previously selected cells need the gridLayerRef dependency to work
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [gridLayerRef.current, selection, selectedCellStyles]);
+	}, [gridLayerRef.current, selectedGridIds, selectedCellStyles]);
 
 	/**********************************************
 	 * keep track of the map's zoom and center
@@ -112,32 +116,28 @@ const SelectableCellsGridLayer = forwardRef<{
 	const handleOut = useCallback(
 		(e: GridCellProps) => {
 			const { gid } = e.layer.properties;
-			if (!selection.includes(gid)) {
+			if (!selectedGridIds.includes(gid)) {
 				gridLayerRef.current?.resetFeatureStyle(gid);
 			}
 		},
-		[selection]
+		[selectedGridIds]
 	);
 
 	const handleClick = useCallback(
 		(e: GridCellProps) => {
 			const { gid } = e.layer.properties;
-
-			// using a set to avoid duplicates and to make it easier to remove
-			const selected = new Set(selection);
-
-			if (selected.has(gid)) {
-				selected.delete(gid);
+			const selectedPoints = climateVariable?.getSelectedPoints();
+			if (selectedPoints && selectedPoints[gid] !== undefined) {
 				gridLayerRef.current.resetFeatureStyle(gid);
+				removeSelectedPoint(gid);
 			} else {
-				selected.add(gid);
 				gridLayerRef.current.setFeatureStyle(gid, selectedCellStyles);
+				addSelectedPoints({
+					[gid]: { ...e.latlng },
+				})
 			}
-
-			dispatch(setSelection(Array.from(selected)));
-			dispatch(setSelectionCount(selected.size));
 		},
-		[selection, selectedCellStyles, dispatch]
+		[selectedCellStyles, climateVariable, addSelectedPoints, removeSelectedPoint]
 	);
 
 	// ensure refs always have the latest function versions
@@ -215,15 +215,14 @@ const SelectableCellsGridLayer = forwardRef<{
 		ref,
 		() => ({
 			clearSelection() {
-				selection.forEach((gid) => {
+				selectedGridIds.forEach((gid) => {
 					gridLayerRef.current?.resetFeatureStyle(gid);
 				});
 
-				dispatch(setSelection([]));
-				dispatch(setSelectionCount(0));
+				resetSelectedPoints();
 			},
 		}),
-		[selection, dispatch]
+		[selectedGridIds, resetSelectedPoints]
 	);
 
 	return null;

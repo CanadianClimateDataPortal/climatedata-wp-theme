@@ -1,16 +1,18 @@
 <?php
 /**
- * Template Name: Populate variables global IDs
+ * Template Name: Populate variables meta
  *
- * Script for programmatic population of ACF 'var_id' field values in variable posts
- * from a predefined mapping array.
+ * Script for programmatic population of variable post metadata:
+ * - ACF 'var_id' field values from a predefined mapping array
+ * - ACF 'variable_availability' checkbox field values (map, download)
+ * - Variable-dataset taxonomy terms assignment
  *
- * Endpoint: /populate-variables-global-ids
+ * Endpoint: /populate-variables-meta
  * Auth: Admin-level authentication required
  *
  * Implementation Note:
- * Requires a WordPress page with template "Populate variables global IDs"
- * and slug "populate-variables-global-ids" to function correctly.
+ * Requires a WordPress page with template "Populate variables meta"
+ * and slug "populate-variables-meta" to function correctly.
  */
 
 // Prevent direct script access
@@ -88,11 +90,12 @@ $var_id_post_id_mapping = array(
 );
 
 // Initialize counters for logging
-$updated_count = 0;
-$skipped_count = 0;
-$error_count   = 0;
+$var_id_updated_count          = 0;
+$var_id_skipped_count          = 0;
+$var_id_error_count            = 0;
+$successfully_updated_post_ids = array(); // Track post IDs of successfully updated posts
 
-echo "=== Variable Global ID Population Process Log ===<br><br>";
+echo "=== Variable Metadata Population Process Log ===<br><br>";
 
 // Process each variable in the mapping array
 foreach ( $var_id_post_id_mapping as $variable_name => $data ) {
@@ -102,14 +105,14 @@ foreach ( $var_id_post_id_mapping as $variable_name => $data ) {
 	// Skip entries with empty var_id
 	if ( empty( $var_id ) ) {
 		echo "SKIPPED: Post ID {$post_id} ({$variable_name}) - No var_id value provided<br>";
-		$skipped_count ++;
+		$var_id_skipped_count ++;
 		continue;
 	}
 
 	// Verify post exists
 	if ( ! get_post( $post_id ) ) {
 		echo "ERROR: Post ID {$post_id} ({$variable_name}) does not exist<br>";
-		$error_count ++;
+		$var_id_error_count ++;
 		continue;
 	}
 
@@ -118,17 +121,103 @@ foreach ( $var_id_post_id_mapping as $variable_name => $data ) {
 
 	if ( $update_result ) {
 		echo "UPDATED: Post ID {$post_id} ({$variable_name}) - var_id set to: {$var_id}<br>";
-		$updated_count ++;
+		$var_id_updated_count ++;
+		$successfully_updated_post_ids[] = $post_id;
 	} else {
 		// Check if field already has this value
 		$current_value = get_field( 'var_id', $post_id );
 
 		if ( $current_value === $var_id ) {
 			echo "UNCHANGED: Post ID {$post_id} ({$variable_name}) - var_id already set to: {$var_id}<br>";
-			$updated_count ++;
+			$var_id_updated_count ++;
+			$successfully_updated_post_ids[] = $post_id;
 		} else {
 			echo "ERROR: Failed to update Post ID {$post_id} ({$variable_name})<br>";
-			$error_count ++;
+			$var_id_error_count ++;
+		}
+	}
+}
+
+// Update the variable_availability field for each successfully updated variable post
+echo "<br>=== Setting Variable Availability Options ===<br>";
+$availability_updated_count = 0;
+
+foreach ( $successfully_updated_post_ids as $post_id ) {
+	// Set both 'map' and 'download' checkbox values
+	$availability_options = array( 'map', 'download' );
+	$update_result        = update_field( 'variable_availability', $availability_options, $post_id );
+
+	if ( $update_result ) {
+		$post = get_post( $post_id );
+		echo "AVAILABILITY UPDATED: Post ID {$post_id} ({$post->post_title}) - Set to map and download<br>";
+		$availability_updated_count ++;
+	} else {
+		echo "Availability options already updated for Post ID {$post_id}<br>";
+	}
+}
+
+// Create dataset taxonomy terms if they don't exist and store their IDs
+echo "<br>=== Creating Variable Dataset Terms ===<br>";
+$dataset_terms    = array(
+	'Dataset example 1',
+	'Dataset example 2',
+	'Dataset example 3'
+);
+$dataset_term_ids = array();
+
+foreach ( $dataset_terms as $term_name ) {
+	// Create slug (lowercase with hyphens)
+	$term_slug = sanitize_title( $term_name );
+
+	// Check if term already exists
+	$existing_term = get_term_by( 'slug', $term_slug, 'variable-dataset' );
+
+	if ( $existing_term ) {
+		// Term exists, get its ID
+		$term_id = $existing_term->term_id;
+		echo "EXISTING TERM: '{$term_name}' already exists with ID {$term_id}<br>";
+	} else {
+		// Term doesn't exist, create it
+		$term_result = wp_insert_term(
+			$term_name,           // Term name
+			'variable-dataset',   // Taxonomy
+			array(
+				'slug' => $term_slug
+			)
+		);
+
+		if ( is_wp_error( $term_result ) ) {
+			echo "ERROR: Failed to create term '{$term_name}': " . $term_result->get_error_message() . "<br>";
+			continue;
+		}
+
+		$term_id = $term_result['term_id'];
+		echo "CREATED TERM: '{$term_name}' with ID {$term_id}<br>";
+	}
+
+	$dataset_term_ids[] = $term_id;
+}
+
+// Assign dataset terms to successfully updated variable posts
+echo "<br>=== Assigning Dataset Terms to Variables ===<br>";
+$dataset_assignment_count = 0;
+
+if ( ! empty( $dataset_term_ids ) && ! empty( $successfully_updated_post_ids ) ) {
+	foreach ( $successfully_updated_post_ids as $post_id ) {
+		// Get a random term ID from the dataset terms
+		$term_index = array_rand( $dataset_term_ids );
+		$term_id    = $dataset_term_ids[ $term_index ];
+
+		// Assign the term to the post
+		$assign_result = wp_set_object_terms( $post_id, $term_id, 'variable-dataset' );
+
+		if ( is_wp_error( $assign_result ) ) {
+			echo "ERROR: Failed to assign dataset term to Post ID {$post_id}: " . $assign_result->get_error_message() . "<br>";
+		} else {
+			$post = get_post( $post_id );
+			$term = get_term( $term_id, 'variable-dataset' );
+			echo "ASSIGNED: Post ID {$post_id} ({$post->post_title}) assigned to dataset '{$term->name}'<br>";
+			$dataset_assignment_count ++;
 		}
 	}
 }
@@ -136,6 +225,9 @@ foreach ( $var_id_post_id_mapping as $variable_name => $data ) {
 // Display summary
 echo "<br>=== Process Summary ===<br>";
 echo "Total variables processed: " . count( $var_id_post_id_mapping ) . "<br>";
-echo "Successfully updated: {$updated_count}<br>";
-echo "Skipped (no var_id): {$skipped_count}<br>";
-echo "Errors: {$error_count}<br>";
+echo "Successfully updated var ID: {$var_id_updated_count}<br>";
+echo "Successfully updated availability options: {$availability_updated_count}<br>";
+echo "Var ID skipped (empty var ID): {$var_id_skipped_count}<br>";
+echo "Var ID errors: {$var_id_error_count}<br>";
+echo "Dataset terms created/used: " . count( $dataset_term_ids ) . "<br>";
+echo "Variables assigned to datasets: {$dataset_assignment_count}<br>";

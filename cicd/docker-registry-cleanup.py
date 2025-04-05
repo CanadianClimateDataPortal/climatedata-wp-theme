@@ -1,10 +1,12 @@
 import argparse
 import requests
 import sys
+import re
 from datetime import datetime
 from typing import NamedTuple, List
 
 reserved_tags = ["preprod", "uat", "qa"]
+version_pattern = re.compile(r"^v\d+\.\d+\.\d+$")
 
 
 class TagInfo(NamedTuple):
@@ -163,7 +165,7 @@ def filter_required_tags(tags: List[TagInfo]) -> List[TagInfo]:
     filtered_tags = []
 
     for tag_info in tags:
-        if tag_info.name in reserved_tags:
+        if tag_info.name in reserved_tags or version_pattern.match(tag_info.name):
             protected_digests.append(tag_info.digest)
 
     for tag_info in tags:

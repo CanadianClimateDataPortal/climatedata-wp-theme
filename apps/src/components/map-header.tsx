@@ -107,45 +107,44 @@ MapHeader.displayName = 'MapHeader';
  * Breadcrumbs component, displays the breadcrumbs for the selected state of the map.
  */
 const Breadcrumbs: React.FC<{ title: string; onClick: () => void }> = ({
-  title,
-  onClick,
+	title,
+	onClick,
 }) => {
-  const { __ } = useI18n();
-  const { locale } = useLocale();
-  const dataset = useAppSelector((state) => state.map.dataset);
-  const { climateVariable } = useClimateVariable();
+	const { __ } = useI18n();
+	const { locale } = useLocale();
+	const dataset = useAppSelector((state) => state.map.dataset);
+	const { climateVariable } = useClimateVariable();
 
-  const datasetName = useMemo(() => {
-    if (!dataset) return '';
-    return locale === 'fr' && dataset.title.fr
-      ? dataset.title.fr
-      : dataset.title.en;
-  }, [dataset, locale]);
+	const datasetName = useMemo(() => {
+		if (!dataset) return '';
+		return locale === 'fr' && dataset.title.fr
+			? dataset.title.fr
+			: dataset.title.en;
+	}, [dataset, locale]);
 
-  const variableTitle = useMemo(() => {
-    if (!climateVariable) return title;
+	const variableTitle = useMemo(() => {
+		if (!climateVariable) return title;
 
-    return __(climateVariable.getId()) || title;
+		return climateVariable.getTitle() || __(climateVariable.getId()) || title;
+	}, [climateVariable, __, title]);
 
-  }, [climateVariable, __, title]);
-
-  return (
-    <div className="flex items-center gap-2">
-      {datasetName && <span>{datasetName}</span>}
-      {datasetName && variableTitle && <span>/</span>}
-      {variableTitle && (
-        <Button
-          variant="ghost"
-          className="text-md text-cdc-black hover:text-dark-purple hover:bg-transparent p-0 h-auto"
-          onClick={onClick}
-          aria-label={__('View details')}
-        >
-          {variableTitle}
-          <Info />
-        </Button>
-      )}
-    </div>
-  );
+	return (
+		<div className="flex items-center gap-2">
+			{datasetName && <span>{datasetName}</span>}
+			{datasetName && variableTitle && <span>/</span>}
+			{variableTitle && (
+				<Button
+					variant="ghost"
+					className="text-md text-cdc-black hover:text-dark-purple hover:bg-transparent p-0 h-auto"
+					onClick={onClick}
+					aria-label={__('View details')}
+				>
+					{variableTitle}
+					<Info />
+				</Button>
+			)}
+		</div>
+	);
 };
 Breadcrumbs.displayName = 'Breadcrumbs';
 

@@ -101,6 +101,7 @@ export const ClimateVariableProvider: React.FC<{ children: React.ReactNode }> = 
 			dispatch(setClimateVariable({
 				...matchedVariable,
 				postId: variable.postId,
+				title: variable.title
 			}));
 		} else {
 			throw new Error(`No matching variable found for id: ${variable.id}`);

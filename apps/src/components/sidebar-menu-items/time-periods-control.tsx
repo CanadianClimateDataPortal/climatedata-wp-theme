@@ -8,9 +8,6 @@ import { ControlTitle } from '@/components/ui/control-title';
 
 // other
 import { cn } from '@/lib/utils';
-import {
-	SLIDER_STEP,
-} from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 const TimePeriodsControl: React.FC = () => {
@@ -24,7 +21,7 @@ const TimePeriodsControl: React.FC = () => {
 	};
 
 	const [ startYear, endYear ] = climateVariable?.getDateRange() ?? [
-		"2041",
+		"2040",
 		"2070"
 	];
 
@@ -32,7 +29,7 @@ const TimePeriodsControl: React.FC = () => {
 
 	const minYear = Number(min);
 	const maxYear = Number(max);
-	const intervalYears = interval - 1;
+	const intervalYears = interval;
 
 	const handleChange = (values: number[]) => {
 		let newEnd = values[0];
@@ -67,7 +64,7 @@ const TimePeriodsControl: React.FC = () => {
 					onValueChange={handleChange}
 					min={minYear + intervalYears}
 					max={maxYear}
-					step={SLIDER_STEP}
+					step={10}
 				>
 					<Slider.Track
 						className={cn(
@@ -99,7 +96,8 @@ const TimePeriodsControl: React.FC = () => {
 								'flex items-center pointer-events-none'
 							)}
 						>
-							{startYear} - {endYear}
+							{/* For display purposes we add 1, e.g. 2041 - 2070. */}
+							{Number(startYear) + 1} - {endYear}
 							<div
 								className={cn(
 									'slider-range-tooltip',
@@ -112,7 +110,8 @@ const TimePeriodsControl: React.FC = () => {
 					</Slider.Thumb>
 				</Slider.Root>
 				<div className="flex justify-between mt-2.5 text-sm">
-					<span>{minYear}</span>
+					{/* For display purposes we add 1, e.g. 1951 - 2100. */}
+					<span>{minYear + 1}</span>
 					<span>{maxYear}</span>
 				</div>
 			</div>

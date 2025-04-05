@@ -43,7 +43,7 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			version: climateVariable?.getVersion() === 'cmip6' ? '1.3.0' : '1.1.1',
 			layers: layerValue,
 			styles: climateVariable?.getLayerStyles(),
-			TIME: (parseInt(startYear) - 1) + '-01-00T00:00:00Z',
+			TIME: parseInt(startYear) + '-01-00T00:00:00Z',
 			opacity: 1,
 			pane: pane,
 			bounds: CANADA_BOUNDS,

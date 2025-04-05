@@ -29,6 +29,7 @@ export type ClimateVariableContextType = {
 	setAnalyzeScenarios: (analyzeScenarios: string[]) => void;
 	setThreshold: (threshold: string) => void;
 	setInteractiveRegion: (interactiveRegion: InteractiveRegionOption) => void;
+	setColourScheme: (colourScheme: string) => void;
 	setColourType: (colourType: string) => void;
 	setFrequency: (frequency: string) => void;
 	setAnalysisFieldValue: (key: string, value: string | null) => void;
@@ -184,6 +185,17 @@ export const ClimateVariableProvider: React.FC<{
 		[dispatch]
 	);
 
+	const setColourScheme = useCallback(
+		(colourScheme: string) => {
+			dispatch(
+				updateClimateVariable({
+					colourScheme,
+				})
+			);
+		},
+		[dispatch]
+	);
+
 	const setColourType = useCallback(
 		(colourType: string) => {
 			dispatch(
@@ -307,6 +319,7 @@ export const ClimateVariableProvider: React.FC<{
 		setAnalyzeScenarios,
 		setThreshold,
 		setInteractiveRegion,
+		setColourScheme,
 		setColourType,
 		setFrequency,
 		setAnalysisFieldValue,

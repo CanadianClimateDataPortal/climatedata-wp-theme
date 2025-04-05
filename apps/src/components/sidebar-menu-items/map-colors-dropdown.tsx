@@ -8,28 +8,15 @@ import { useI18n } from '@wordpress/react-i18n';
 
 // components
 import { SidebarMenuItem } from '@/components/ui/sidebar';
-import Dropdown from '@/components/ui/dropdown';
 
 // other
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setMapColor } from '@/features/map/map-slice';
 import { RadioGroupFactory } from "@/components/ui/radio-group";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { ColourSchemeDropdown } from "@/components/sidebar-menu-items/colour-scheme-dropdown";
 
 const MapColorsDropdown: React.FC = () => {
 	const { __ } = useI18n();
-	const { climateVariable, setColourType } = useClimateVariable();
-
-	const dispatch = useAppDispatch();
-	const mapColor = useAppSelector((state) => state.map.mapColor);
-
-	// TODO: find out the correct options for the dropdown
-	const options = [
-		{ value: 'default', label: __('Default') },
-		{ value: 'warm', label: __('Warm Palette') },
-		{ value: 'cool', label: __('Cool Palette') },
-		{ value: 'custom', label: __('Custom Palette') },
-	];
+	const { climateVariable, setColourType, setColourScheme } = useClimateVariable();
 
 	const Tooltip = () => (
 		<div className="text-sm text-gray-500">{__('Select a map color.')}</div>
@@ -37,15 +24,12 @@ const MapColorsDropdown: React.FC = () => {
 
 	return (
 		<SidebarMenuItem className={"space-y-4"}>
-			<Dropdown
+			<ColourSchemeDropdown
+				title={'Map colours'}
 				placeholder={__('Select an option')}
-				options={options}
-				label={__('Map Colors')}
 				tooltip={<Tooltip />}
-				value={mapColor}
-				onChange={(value) => {
-					dispatch(setMapColor(value));
-				}}
+				value={climateVariable?.getColourScheme() ?? 'default'}
+				onValueChange={setColourScheme}
 			/>
 			<RadioGroupFactory
 				name="colour-type"

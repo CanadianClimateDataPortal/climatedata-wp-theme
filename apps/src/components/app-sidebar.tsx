@@ -67,8 +67,8 @@ export function AppSidebar() {
 
 	return (
 		<Sidebar>
-			<SidebarContent>
-				<SidebarGroup>
+			<SidebarContent className={'overflow-x-hidden'}>
+				<SidebarGroup className={'absolute pr-4'}>
 					<Tabs defaultValue="explore" className="mb-6">
 						<TabsList>
 							<TabsTrigger value="explore">

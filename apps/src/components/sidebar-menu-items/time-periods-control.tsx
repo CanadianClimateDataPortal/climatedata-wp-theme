@@ -27,6 +27,7 @@ const TimePeriodsControl: React.FC = () => {
 		"2041",
 		"2070"
 	];
+
 	const sliderValue = [Number(endYear)];
 
 	const minYear = Number(min);

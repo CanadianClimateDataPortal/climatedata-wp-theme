@@ -155,6 +155,8 @@ export interface ClimateVariableConfigInterface {
 	/** Flag indicating whether color options are enabled */
 	enableColourOptions?: boolean;
 
+	colourType?: string;
+
 	/** An array of FieldConfigs used in the Download section */
 	analysisFields?: FieldConfig[];
 
@@ -241,6 +243,8 @@ export interface ClimateVariableInterface {
 	getColourScheme(): string[];
 
 	getColourOptionsStatus(): boolean;
+
+	getColourType(): string | null;
 
 	getAnalysisFields(): FieldConfig[];
 

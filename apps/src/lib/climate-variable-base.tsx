@@ -126,6 +126,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.enableColourOptions ?? false;
 	}
 
+	getColourType(): string | null {
+		return this._config.colourType ?? null;
+	}
+
 	getAnalysisFields(): FieldConfig[] {
 		return this._config.analysisFields ?? [];
 	}

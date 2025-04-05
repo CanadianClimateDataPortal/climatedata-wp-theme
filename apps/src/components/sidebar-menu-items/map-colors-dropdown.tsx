@@ -1,7 +1,7 @@
 /**
  * Map colors dropdown component.
  *
- * A dropdown component that allows the user to select a a map color.
+ * A dropdown component that allows the user to select a map color.
  */
 import React from 'react';
 import { useI18n } from '@wordpress/react-i18n';
@@ -13,9 +13,12 @@ import Dropdown from '@/components/ui/dropdown';
 // other
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setMapColor } from '@/features/map/map-slice';
+import { RadioGroupFactory } from "@/components/ui/radio-group";
+import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 const MapColorsDropdown: React.FC = () => {
 	const { __ } = useI18n();
+	const { climateVariable, setColourType } = useClimateVariable();
 
 	const dispatch = useAppDispatch();
 	const mapColor = useAppSelector((state) => state.map.mapColor);
@@ -33,7 +36,7 @@ const MapColorsDropdown: React.FC = () => {
 	);
 
 	return (
-		<SidebarMenuItem>
+		<SidebarMenuItem className={"space-y-4"}>
 			<Dropdown
 				placeholder={__('Select an option')}
 				options={options}
@@ -43,6 +46,20 @@ const MapColorsDropdown: React.FC = () => {
 				onChange={(value) => {
 					dispatch(setMapColor(value));
 				}}
+			/>
+			<RadioGroupFactory
+				name="colour-type"
+				orientation={"horizontal"}
+				options={[{
+					value: 'intervals',
+					label: __('Discrete'),
+				}, {
+					value: 'ramp',
+					label: __('Continuous'),
+				}]}
+				className={"space-x-2"}
+				value={climateVariable?.getColourType() ?? 'ramp'}
+				onValueChange={setColourType}
 			/>
 		</SidebarMenuItem>
 	);

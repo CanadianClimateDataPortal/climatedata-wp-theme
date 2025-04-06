@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils.ts";
 import { ControlTitle } from "@/components/ui/control-title";
 import { useI18n } from "@wordpress/react-i18n";
 import { DEFAULT_COLOUR_SCHEMES } from "@/lib/constants";
+import { useAppSelector } from "@/app/hooks";
 
 interface ColourSchemeDropdownProps {
 	title: string;
@@ -23,6 +24,28 @@ const ColourSchemeDropdown = ({
 	className
 }: ColourSchemeDropdownProps) => {
 	const { __ } = useI18n();
+	const legendData = useAppSelector((state) => state.map.legendData);
+
+	const getLegendColours = useCallback(() => {
+		if (!legendData) return;
+
+		if (!legendData?.Legend?.length) return;
+
+		const firstLegend = legendData.Legend[0];
+		if (!firstLegend.rules?.length) return;
+
+		const firstRule = firstLegend.rules[0];
+
+		if (!firstRule.symbolizers?.length) return;
+
+		const entries = firstRule.symbolizers[0]?.Raster?.colormap?.entries;
+
+		if (!entries) return;
+
+		return entries.map((entry) => {
+			return entry.color;
+		})
+	}, [legendData]);
 
 	const renderColourOption = (colors: string[]) => {
 		return (
@@ -39,12 +62,15 @@ const ColourSchemeDropdown = ({
 	}
 
 	const options = () => {
+		const legendColours = getLegendColours();
+
 		return (
 			<SelectContent>
-				<SelectItem value={'default'}>
-					{/* @todo Replace with colours from legend. */}
-					{__('Default')}
-				</SelectItem>
+				{(legendColours && legendColours.length > 0) &&
+					<SelectItem value={'default'} className="w-full [&>*:first-child]:w-full">
+						{renderColourOption(legendColours)}
+					</SelectItem>
+				}
 				{Object.entries(DEFAULT_COLOUR_SCHEMES).map(([key, value]) => (
 					<SelectItem key={key} value={key} className="w-full [&>*:first-child]:w-full">
 						{renderColourOption(value.colours)}

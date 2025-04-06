@@ -82,6 +82,31 @@ export enum FileFormatType {
 	NetCDF = "netcdf",
 }
 
+export enum ColourType {
+	CONTINUOUS = "ramp",
+	DISCRETE = "intervals",
+}
+
+export interface TemporalScaleRange {
+	low: number;
+	high: number;
+}
+
+export interface TemporalScaleMetrics {
+	absolute: TemporalScaleRange;
+	delta: TemporalScaleRange;
+	unit: string;
+}
+
+export interface TemporalScales {
+	[key: string]: TemporalScaleMetrics;
+}
+
+export interface TemporalScaleConfig {
+	frequencies: TemporalScales;
+	decimals: number;
+}
+
 export interface Coordinates {
 	lat: number;
 	lng: number;
@@ -152,7 +177,11 @@ export interface ClimateVariableConfigInterface {
 	/** Flag indicating whether color options are enabled */
 	enableColourOptions?: boolean;
 
+	/** The type of colour map selected (e.g. continuous, discrete) */
 	colourType?: string;
+
+	/** Defines data ranges and units for different temporal scales (e.g. ys, ms, etc) */
+	temporalScaleConfig?: TemporalScaleConfig;
 
 	/** An array of FieldConfigs used in the Download section */
 	analysisFields?: FieldConfig[];
@@ -242,6 +271,8 @@ export interface ClimateVariableInterface {
 	getColourOptionsStatus(): boolean;
 
 	getColourType(): string | null;
+
+	getTemporalScaleConfig(): TemporalScaleConfig | null;
 
 	getAnalysisFields(): FieldConfig[];
 

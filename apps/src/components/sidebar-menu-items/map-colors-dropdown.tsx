@@ -13,6 +13,7 @@ import { SidebarMenuItem } from '@/components/ui/sidebar';
 import { RadioGroupFactory } from "@/components/ui/radio-group";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { ColourSchemeDropdown } from "@/components/sidebar-menu-items/colour-scheme-dropdown";
+import { ColourType } from "@/types/climate-variable-interface";
 
 const MapColorsDropdown: React.FC = () => {
 	const { __ } = useI18n();
@@ -35,14 +36,14 @@ const MapColorsDropdown: React.FC = () => {
 				name="colour-type"
 				orientation={"horizontal"}
 				options={[{
-					value: 'intervals',
+					value: ColourType.DISCRETE,
 					label: __('Discrete'),
 				}, {
-					value: 'ramp',
+					value: ColourType.CONTINUOUS,
 					label: __('Continuous'),
 				}]}
 				className={"space-x-2"}
-				value={climateVariable?.getColourType() ?? 'ramp'}
+				value={climateVariable?.getColourType() ?? ColourType.CONTINUOUS}
 				onValueChange={setColourType}
 			/>
 		</SidebarMenuItem>

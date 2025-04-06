@@ -2,7 +2,7 @@ import React from "react";
 import {
 	AveragingType,
 	ClimateVariableConfigInterface,
-	ClimateVariableInterface,
+	ClimateVariableInterface, ColourType,
 	DateRangeConfig,
 	DownloadType,
 	FieldConfig,
@@ -11,7 +11,7 @@ import {
 	FrequencyConfig,
 	GridCoordinates,
 	InteractiveRegionConfig,
-	InteractiveRegionOption, ScenariosConfig,
+	InteractiveRegionOption, ScenariosConfig, TemporalScaleConfig,
 	ThresholdInterface,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
@@ -127,7 +127,11 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getColourType(): string | null {
-		return this._config.colourType ?? null;
+		return this._config.colourType ?? ColourType.CONTINUOUS;
+	}
+
+	getTemporalScaleConfig(): TemporalScaleConfig | null {
+		return this._config.temporalScaleConfig ?? null;
 	}
 
 	getAnalysisFields(): FieldConfig[] {

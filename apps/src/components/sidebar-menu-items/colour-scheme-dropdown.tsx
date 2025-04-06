@@ -45,9 +45,9 @@ const ColourSchemeDropdown = ({
 					{/* @todo Replace with colours from legend. */}
 					{__('Default')}
 				</SelectItem>
-				{Object.entries(DEFAULT_COLOUR_SCHEMES).map(([key, colors]) => (
+				{Object.entries(DEFAULT_COLOUR_SCHEMES).map(([key, value]) => (
 					<SelectItem key={key} value={key} className="w-full [&>*:first-child]:w-full">
-						{renderColourOption(colors)}
+						{renderColourOption(value.colours)}
 					</SelectItem>
 				))}
 			</SelectContent>

@@ -26,6 +26,9 @@ const ColourSchemeDropdown = ({
 	const { __ } = useI18n();
 	const legendData = useAppSelector((state) => state.map.legendData);
 
+	/**
+	 * Retrieves the legend colors from the provided legend data.
+	 */
 	const getLegendColours = useCallback(() => {
 		if (!legendData) return;
 
@@ -61,7 +64,7 @@ const ColourSchemeDropdown = ({
 		)
 	}
 
-	const options = () => {
+	const renderOptions = () => {
 		const legendColours = getLegendColours();
 
 		return (
@@ -88,7 +91,7 @@ const ColourSchemeDropdown = ({
 					className="w-full focus:ring-0 focus:ring-offset-0 text-cdc-black [&>svg]:text-brand-blue [&>svg]:opacity-100 [&>*:first-child]:flex-1 gap-2 text-left">
 					<SelectValue placeholder={placeholder && __(placeholder)} />
 				</SelectTrigger>
-				{options()}
+				{renderOptions()}
 			</Select>
 		</div>
 	);

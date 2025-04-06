@@ -126,7 +126,7 @@ const Breadcrumbs: React.FC<{ title: string; onClick: () => void }> = ({
 		if (!climateVariable) return title;
 
 		return climateVariable.getTitle() || title;
-	}, [climateVariable, __, title]);
+	}, [climateVariable, title]);
 
 	return (
 		<div className="flex items-center gap-2">

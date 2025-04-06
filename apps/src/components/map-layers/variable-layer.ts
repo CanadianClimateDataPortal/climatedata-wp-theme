@@ -4,6 +4,8 @@ import { useMap } from 'react-leaflet';
 import { useAppSelector } from '@/app/hooks';
 import { CANADA_BOUNDS, GEOSERVER_BASE_URL, OWS_FORMAT } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { InteractiveRegionOption } from "@/types/climate-variable-interface";
+
 /**
  * Variable layer Component
  *
@@ -48,12 +50,14 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 		};
 
 		// Create a new layer to override the previous one so changes on the layer can be seen on the map.
-		const newLayer = L.tileLayer.wms(
-			GEOSERVER_BASE_URL + '/geoserver/ows?',
-			params
-		);
-		newLayer.addTo(map);
-		layerRef.current = newLayer;
+		if (climateVariable?.getInteractiveRegion() === InteractiveRegionOption.GRIDDED_DATA) {
+			const newLayer = L.tileLayer.wms(
+				GEOSERVER_BASE_URL + '/geoserver/ows?',
+				params
+			);
+			newLayer.addTo(map);
+			layerRef.current = newLayer;
+		}
 	}, [layerValue, map, climateVariable, decade, pane]);
 
 	useEffect(() => {

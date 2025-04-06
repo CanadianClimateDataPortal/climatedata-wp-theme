@@ -1,4 +1,5 @@
 import React from "react";
+import { MultilingualField } from "./types";
 
 export interface ScenariosConfig {
 	[key: string]: string[];
@@ -102,7 +103,7 @@ export interface ClimateVariableConfigInterface {
 	postId?: number;
 
 	/** Title of the climate variable from the API */
-	title?: string;
+	title?: string | MultilingualField;
 
 	/** Class name defining the type or category of the climate variable */
 	class: string;

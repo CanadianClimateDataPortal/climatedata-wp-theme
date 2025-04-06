@@ -125,7 +125,7 @@ const Breadcrumbs: React.FC<{ title: string; onClick: () => void }> = ({
 	const variableTitle = useMemo(() => {
 		if (!climateVariable) return title;
 
-		return climateVariable.getTitle() || __(climateVariable.getId()) || title;
+		return climateVariable.getTitle() || title;
 	}, [climateVariable, __, title]);
 
 	return (

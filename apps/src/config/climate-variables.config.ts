@@ -508,6 +508,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.NONE,
 		},
+		frequency: "ann",
 		gridType: "canadagrid",
 		averagingOptions: [
 			AveragingType.ALL_YEARS,
@@ -518,8 +519,35 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			max: "2100",
 			interval: 30
 		},
-		hasDelta: false,
+		hasDelta: true,
 		enableColourOptions: true,
+		temporalScaleConfig: {
+			frequencies: {
+				ys: {
+					absolute: {
+						low: 6.0,
+						high: 40.0,
+					},
+					delta: {
+						low: -1.0,
+						high: 8.0,
+					},
+					unit: 'K',
+				},
+				ms: {
+					absolute: {
+						low: -20.0,
+						high: 40.0,
+					},
+					delta: {
+						low: -2.0,
+						high: 10.0,
+					},
+					unit: 'K',
+				},
+			},
+			decimals: 1,
+		},
 		analysisFields: [
 			{
 				key: "tasmin",

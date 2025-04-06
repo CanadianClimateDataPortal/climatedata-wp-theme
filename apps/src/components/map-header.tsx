@@ -81,7 +81,6 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 				>
 					<div className="flex items-center gap-x-2 bg-white p-4">
 						<Breadcrumbs
-							title={data.title}
 							onClick={toggleVariableDetailsPanel}
 						/>
 						<ModalToggleButtons
@@ -106,8 +105,7 @@ MapHeader.displayName = 'MapHeader';
 /**
  * Breadcrumbs component, displays the breadcrumbs for the selected state of the map.
  */
-const Breadcrumbs: React.FC<{ title: string; onClick: () => void }> = ({
-	title,
+const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
 	onClick,
 }) => {
 	const { __ } = useI18n();
@@ -123,10 +121,13 @@ const Breadcrumbs: React.FC<{ title: string; onClick: () => void }> = ({
 	}, [dataset, locale]);
 
 	const variableTitle = useMemo(() => {
-		if (!climateVariable) return title;
+		if (climateVariable && climateVariable.toObject().postId) {
+			return climateVariable.getTitle() || '';
+		}
 
-		return climateVariable.getTitle() || title;
-	}, [climateVariable, title]);
+		// Don't show anything if no variable is explicitly selected
+		return '';
+	}, [climateVariable]);
 
 	return (
 		<div className="flex items-center gap-2">

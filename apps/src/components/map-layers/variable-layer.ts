@@ -144,10 +144,10 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			return;
 		}
 
-		const { colours } = DEFAULT_COLOUR_SCHEMES[colourScheme as ColourSchemeKey];
-		if (!colours) {
+		if (!Object.prototype.hasOwnProperty.call(DEFAULT_COLOUR_SCHEMES, colourScheme as ColourSchemeKey)) {
 			return;
 		}
+		const { colours } = DEFAULT_COLOUR_SCHEMES[colourScheme as ColourSchemeKey];
 
 		const quantities = generateRampQuantities();
 		if (!quantities) {

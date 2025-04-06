@@ -107,6 +107,21 @@ export interface TemporalScaleConfig {
 	decimals: number;
 }
 
+export interface CustomColourSchemeColour {
+	label: string;
+	colour: string;
+	quantity: number;
+}
+
+export interface CustomColourSchemeEntry {
+	colours: CustomColourSchemeColour[],
+	type: string;
+}
+
+export interface CustomColourSchemes {
+	[schemeKey: string]: CustomColourSchemeEntry;
+}
+
 export interface Coordinates {
 	lat: number;
 	lng: number;
@@ -176,6 +191,9 @@ export interface ClimateVariableConfigInterface {
 
 	/** Flag indicating whether color options are enabled */
 	enableColourOptions?: boolean;
+
+	/** Custom colour schemes */
+	customColourSchemes?: CustomColourSchemes;
 
 	/** The type of colour map selected (e.g. continuous, discrete) */
 	colourType?: string;
@@ -265,6 +283,8 @@ export interface ClimateVariableInterface {
 	getFrequency(): string | null;
 
 	hasDelta(): boolean | undefined;
+
+	getCustomColourSchemes(): CustomColourSchemes | null;
 
 	getColourScheme(): string | null;
 

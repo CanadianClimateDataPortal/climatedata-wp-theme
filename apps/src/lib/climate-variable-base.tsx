@@ -2,7 +2,9 @@ import React from "react";
 import {
 	AveragingType,
 	ClimateVariableConfigInterface,
-	ClimateVariableInterface, ColourType,
+	ClimateVariableInterface,
+	ColourType,
+	CustomColourSchemes,
 	DateRangeConfig,
 	DownloadType,
 	FieldConfig,
@@ -116,6 +118,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	hasDelta(): boolean | undefined {
 		return this._config.hasDelta;
+	}
+
+	getCustomColourSchemes(): CustomColourSchemes | null {
+		return this._config.customColourSchemes ?? null;
 	}
 
 	getColourScheme(): string | null {

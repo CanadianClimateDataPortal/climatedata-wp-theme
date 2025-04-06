@@ -1,10 +1,12 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils.ts";
 import { ControlTitle } from "@/components/ui/control-title";
 import { useI18n } from "@wordpress/react-i18n";
 import { DEFAULT_COLOUR_SCHEMES } from "@/lib/constants";
 import { useAppSelector } from "@/app/hooks";
+import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { CustomColourSchemes } from "@/types/climate-variable-interface";
 
 interface ColourSchemeDropdownProps {
 	title: string;
@@ -25,11 +27,9 @@ const ColourSchemeDropdown = ({
 }: ColourSchemeDropdownProps) => {
 	const { __ } = useI18n();
 	const legendData = useAppSelector((state) => state.map.legendData);
+	const { climateVariable } = useClimateVariable();
 
-	/**
-	 * Retrieves the legend colors from the provided legend data.
-	 */
-	const getLegendColours = useCallback(() => {
+	const legendColours = useMemo(() => {
 		if (!legendData) return;
 
 		if (!legendData?.Legend?.length) return;
@@ -47,10 +47,10 @@ const ColourSchemeDropdown = ({
 
 		return entries.map((entry) => {
 			return entry.color;
-		})
+		});
 	}, [legendData]);
 
-	const renderColourOption = (colors: string[]) => {
+	const renderColourOption = useCallback((colors: string[]) => {
 		return (
 			<div className="flex w-full overflow-hidden">
 				{colors.map((color) => (
@@ -62,26 +62,43 @@ const ColourSchemeDropdown = ({
 				))}
 			</div>
 		)
+	}, []);
+
+	/**
+	 * Extracts custom colour schemes and returns them in a normalized format.
+	 */
+	const extractCustomColourSchemes = (colourSchemes: CustomColourSchemes) => {
+		return Object.entries(colourSchemes).reduce<Record<string, { colours: string[], type: string }>>((acc, [key, scheme]) => {
+			acc[key] = {
+				colours: scheme.colours.map(entry => entry.colour),
+				type: scheme.type
+			};
+			return acc;
+		}, {});
 	}
 
-	const renderOptions = () => {
-		const legendColours = getLegendColours();
+	const colourOptions = useMemo(() => {
+		const customColourSchemes = climateVariable?.getCustomColourSchemes();
+
+		const colourSchemes = customColourSchemes
+			? extractCustomColourSchemes(customColourSchemes)
+			: DEFAULT_COLOUR_SCHEMES;
 
 		return (
 			<SelectContent>
-				{(legendColours && legendColours.length > 0) &&
+				{(!customColourSchemes && legendColours && legendColours.length > 0) && (
 					<SelectItem value={'default'} className="w-full [&>*:first-child]:w-full">
 						{renderColourOption(legendColours)}
 					</SelectItem>
-				}
-				{Object.entries(DEFAULT_COLOUR_SCHEMES).map(([key, value]) => (
+				)}
+				{Object.entries(colourSchemes).map(([key, value]) => (
 					<SelectItem key={key} value={key} className="w-full [&>*:first-child]:w-full">
 						{renderColourOption(value.colours)}
 					</SelectItem>
 				))}
 			</SelectContent>
-		)
-	}
+		);
+	}, [climateVariable, legendColours, renderColourOption]);
 
 	return (
 		<div className={cn('dropdown z-50', className)}>
@@ -91,7 +108,7 @@ const ColourSchemeDropdown = ({
 					className="w-full focus:ring-0 focus:ring-offset-0 text-cdc-black [&>svg]:text-brand-blue [&>svg]:opacity-100 [&>*:first-child]:flex-1 gap-2 text-left">
 					<SelectValue placeholder={placeholder && __(placeholder)} />
 				</SelectTrigger>
-				{renderOptions()}
+				{colourOptions}
 			</Select>
 		</div>
 	);

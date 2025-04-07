@@ -110,8 +110,8 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 
 	return (
 		<SidebarPanel id={slug} className="w-96">
-			<Card>
-				<CardHeader className="p-4">
+			<Card className="h-full flex flex-col">
+				<CardHeader className="p-4 sticky top-0 bg-white z-10">
 					<CardTitle className="text-lg">
 						{__('Select a dataset')}
 					</CardTitle>
@@ -121,7 +121,7 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 						)}
 					</CardDescription>
 				</CardHeader>
-				<CardContent className="p-4 pt-0">
+				<CardContent className="p-4 pt-0 overflow-y-auto max-h-[calc(100vh-200px)] scrollbar-thin">
 					<Grid columns={1} className="gap-4">
 						{datasets.map((item) => (
 							<RadioCard

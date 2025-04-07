@@ -13,7 +13,9 @@ import {
 	FrequencyConfig,
 	GridCoordinates,
 	InteractiveRegionConfig,
-	InteractiveRegionOption, ScenariosConfig, TemporalScaleConfig,
+	InteractiveRegionOption,
+	ScenariosConfig,
+	TemporalThresholdConfig,
 	ThresholdInterface,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
@@ -150,8 +152,8 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.colourType ?? ColourType.CONTINUOUS;
 	}
 
-	getTemporalScaleConfig(): TemporalScaleConfig | null {
-		return this._config.temporalScaleConfig ?? null;
+	getTemporalThresholdConfig(): TemporalThresholdConfig | null {
+		return this._config.temporalThresholdConfig ?? null;
 	}
 
 	getAnalysisFields(): FieldConfig[] {

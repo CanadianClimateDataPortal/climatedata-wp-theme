@@ -70,9 +70,19 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			return;
 		}
 
-		const { frequencies, decimals } = climateVariable.getTemporalScaleConfig() ?? {
+		const { thresholds, decimals } = climateVariable.getTemporalThresholdConfig() ?? {
 			decimals: 1,
 		};
+		if (!thresholds) {
+			return;
+		}
+
+		const threshold = climateVariable.getThreshold() ?? null;
+		if (!threshold) {
+			return;
+		}
+
+		const frequencies = thresholds[threshold];
 		if (!frequencies) {
 			return;
 		}

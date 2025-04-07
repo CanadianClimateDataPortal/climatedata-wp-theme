@@ -88,23 +88,27 @@ export enum ColourType {
 	DISCRETE = "intervals",
 }
 
-export interface TemporalScaleRange {
+export interface TemporalRange {
 	low: number;
 	high: number;
 }
 
-export interface TemporalScaleMetrics {
-	absolute: TemporalScaleRange;
-	delta: TemporalScaleRange;
+export interface TemporalScaleConfig {
+	absolute: TemporalRange;
+	delta: TemporalRange;
 	unit: string;
 }
 
 export interface TemporalScales {
-	[key: string]: TemporalScaleMetrics;
+	[key: string]: TemporalScaleConfig;
 }
 
-export interface TemporalScaleConfig {
-	frequencies: TemporalScales;
+export interface TemporalThresholds {
+	[key: string]: TemporalScales;
+}
+
+export interface TemporalThresholdConfig {
+	thresholds: TemporalThresholds;
 	decimals: number;
 }
 
@@ -203,7 +207,7 @@ export interface ClimateVariableConfigInterface {
 	colourType?: string;
 
 	/** Defines data ranges and units for different temporal scales (e.g. ys, ms, etc) */
-	temporalScaleConfig?: TemporalScaleConfig;
+	temporalThresholdConfig?: TemporalThresholdConfig;
 
 	/** An array of FieldConfigs used in the Download section */
 	analysisFields?: FieldConfig[];
@@ -298,7 +302,7 @@ export interface ClimateVariableInterface {
 
 	getColourType(): string | null;
 
-	getTemporalScaleConfig(): TemporalScaleConfig | null;
+	getTemporalThresholdConfig(): TemporalThresholdConfig | null;
 
 	getAnalysisFields(): FieldConfig[];
 

@@ -193,7 +193,7 @@ export interface MapState {
 	frequency: string;
 	timePeriodEnd: number[]; // using an array because the slider that uses it expects an array
 	recentLocations: MapLocation[];
-	variable: string;
+	variable: ApiPostData | string;
 	dataset?: TaxonomyData;
 	decade: string;
 	pane: string;

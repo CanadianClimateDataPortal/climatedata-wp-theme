@@ -1,1 +1,8 @@
-{ }
+{
+	"useTabs": true,
+	"tabWidth": 2,
+	"endOfLine": "lf",
+	"semi": true,
+	"singleQuote": true,
+	"trailingComma": "es5"
+}

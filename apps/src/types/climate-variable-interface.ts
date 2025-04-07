@@ -1,4 +1,5 @@
 import React from "react";
+import { MultilingualField } from "./types";
 
 export interface ScenariosConfig {
 	[key: string]: string[];
@@ -100,6 +101,9 @@ export interface ClimateVariableConfigInterface {
 
 	/** WordPress Post ID, used for backend operations (optional) */
 	postId?: number;
+
+	/** Title of the climate variable from the API */
+	title?: string | MultilingualField;
 
 	/** Class name defining the type or category of the climate variable */
 	class: string;
@@ -207,6 +211,8 @@ export interface ClimateVariableConfigInterface {
  */
 export interface ClimateVariableInterface {
 	getId(): string;
+
+	getTitle(): string | null;
 
 	getVersions(): string[];
 

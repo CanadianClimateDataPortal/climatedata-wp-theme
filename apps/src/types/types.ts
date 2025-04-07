@@ -572,3 +572,9 @@ export interface ChoroValuesOptions {
 	emissionScenario: string;
 	decimals: number;
 }
+
+export interface ColourScheme {
+	type: string;
+	colours: string[],
+	quantities?: number[],
+}

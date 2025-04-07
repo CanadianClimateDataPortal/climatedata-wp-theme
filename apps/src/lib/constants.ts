@@ -1,6 +1,6 @@
 import L from 'leaflet';
 import type { LatLngExpression, LatLngBounds } from 'leaflet';
-import { DatasetKey, EmissionScenarioKey } from '@/types/types';
+import { ColourScheme, DatasetKey, EmissionScenarioKey } from '@/types/types';
 
 export const SIDEBAR_COOKIE_NAME = 'sidebar:state';
 export const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -182,7 +182,7 @@ export const DATASETS: Record<
 	},
 };
 
-export const DEFAULT_COLOUR_SCHEMES = {
+export const DEFAULT_COLOUR_SCHEMES: Record<string, ColourScheme> = {
 	temp_seq: {
 		type: 'sequential',
 		colours: ["#FEFECB", "#FDF6B5", "#FBED9E", "#F9E286", "#F5D470", "#F1C35F", "#EEB257", "#EAA253", "#E79352", "#E38450", "#DE744F", "#D3644D", "#C25449", "#AC4944", "#95413D", "#7E3B34", "#68342A", "#522D1F", "#3E2616", "#2B200D", "#191900"],

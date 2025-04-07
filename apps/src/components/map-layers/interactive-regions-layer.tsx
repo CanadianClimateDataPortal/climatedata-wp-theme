@@ -16,7 +16,8 @@ import {
 	GEOSERVER_BASE_URL,
 } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { InteractiveRegionOption } from "@/types/climate-variable-interface";
+import { ColourType, InteractiveRegionOption } from "@/types/climate-variable-interface";
+import { generateColourScheme } from "@/lib/colour-scheme";
 
 const InteractiveRegionsLayer: React.FC = () => {
 	const [layerData, setLayerData] = useState<Record<number, number> | null>(
@@ -31,6 +32,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 	const {
 		decade,
 		legendData,
+		dataValue,
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
@@ -43,16 +45,28 @@ const InteractiveRegionsLayer: React.FC = () => {
 			return null;
 		}
 
-		const colormapEntries =
+		const legendColourMapEntries =
 			legendData.Legend[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap
 				?.entries ?? [];
 
+		if (climateVariable) {
+			const customColourScheme = generateColourScheme(climateVariable, dataValue);
+			if (customColourScheme) {
+				return {
+					colours: customColourScheme.colours,
+					quantities: customColourScheme.quantities,
+					schemeType: climateVariable.getColourType(),
+				};
+			}
+		}
+
+		// Fallback to default map colours.
 		return {
-			colours: colormapEntries.map((entry) => entry.color),
-			quantities: colormapEntries.map((entry) => Number(entry.quantity)),
-			scheme_type: 'continuous',
+			colours: legendColourMapEntries.map((entry) => entry.color),
+			quantities: legendColourMapEntries.map((entry) => Number(entry.quantity)),
+			schemeType: ColourType.CONTINUOUS,
 		};
-	}, [legendData]);
+	}, [climateVariable, dataValue, legendData]);
 
 	// Function to interpolate between colors
 	// Taken from fw-child/resources/js/utilities.js interpolate function, but optimized for React
@@ -95,7 +109,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 					? featureId
 					: (layerData?.[featureId] ?? 0);
 
-			const { colours, quantities, scheme_type } = colorMap;
+			const { colours, quantities, schemeType } = colorMap;
 
 			// More efficient binary search
 			// Taken from fw-child/resources/js/utilities.js indexOfGT function
@@ -130,7 +144,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 			}
 
 			// For discrete type, return exact match
-			if (scheme_type === 'discrete') {
+			if (schemeType === ColourType.DISCRETE) {
 				return colours[index];
 			}
 

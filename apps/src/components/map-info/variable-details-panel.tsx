@@ -164,7 +164,6 @@ const RelevantTrainings: React.FC<{ items: Training[] }> = ({
 	items,
 }) => {
     const { locale } = useLocale();
-    console.log(items);
     return (
     <ul className="list-disc list-inside text-sm ms-4 marker:text-brand-blue">
         {items.map((item: Training, index: number) => (

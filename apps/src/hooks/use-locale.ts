@@ -6,7 +6,7 @@ import { LocaleContext } from '@/context/locale-provider';
 
 export const useLocale = () => {
 	const context = useContext(LocaleContext);
-	if (!context) {
+	if (context === undefined) {
 		throw new Error('useLocale must be used within a LocaleProvider');
 	}
 

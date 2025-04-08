@@ -130,24 +130,6 @@ export type PostData = {
 };
 
 /**
- * Represents the structure used as props for MapInfo component.
- */
-export interface MapInfoData {
-	title: string;
-	relatedData?: RelatedData;
-	en: {
-		title: string;
-		description: string;
-		techDescription: string;
-	};
-	fr: {
-		title: string;
-		description: string;
-		techDescription: string;
-	};
-}
-
-/**
  * Used in the MapEvents map layer component
  */
 export interface MapEventsProps {
@@ -193,8 +175,8 @@ export interface MapState {
 	frequency: string;
 	timePeriodEnd: number[]; // using an array because the slider that uses it expects an array
 	recentLocations: MapLocation[];
-	variable: string;
-	dataset: string;
+	variable: ApiPostData | string;
+	dataset?: TaxonomyData;
 	decade: string;
 	pane: string;
 	dataValue: string;
@@ -204,6 +186,8 @@ export interface MapState {
 		mapData: number;
 		labels: number;
 	};
+	variableList: PostData[];
+	variableListLoading: boolean;
 }
 
 /**
@@ -571,4 +555,55 @@ export interface ChoroValuesOptions {
 	interactiveRegion: string;
 	emissionScenario: string;
 	decimals: number;
+}
+
+
+// A translatable string object with English and French variants
+export interface LocalizedString {
+	en: string;
+	fr: string;
+}
+
+// Represents a sector with localized name and description, plus a generated link
+export interface Sector {
+	term_id: number;
+	name: LocalizedString;
+	description: LocalizedString;
+	link: string;
+}
+
+// Represents a training with localized title, description, and a localized link
+export interface Training {
+	term_id: number;
+	title: LocalizedString;
+	description: LocalizedString;
+	link: LocalizedString;
+}
+
+// Image asset references in multiple sizes for responsive support
+export interface FeaturedImage {
+	thumbnail: string;
+	medium: string;
+	large: string;
+	full: string;
+}
+
+// Represents a taxonomy term from variable-dataset
+export interface DatasetTerm {
+	term_id: number;
+	title: LocalizedString;
+}
+
+/**
+* Represents the structure used as props for MapInfo component.
+*/
+export interface MapInfoData {
+	title: LocalizedString;
+	tagline: LocalizedString;
+	fullDescription: LocalizedString;
+	techDescription: LocalizedString;
+	relevantSectors: Sector[];
+	relevantTrainings: Training[];
+	featuredImage: FeaturedImage;
+	dataset: DatasetTerm[];
 }

@@ -8,7 +8,8 @@ import {
 	FieldConfig,
 	FieldValues,
 	FileFormatType,
-	FrequencyConfig, GridCoordinates,
+	FrequencyConfig,
+	GridCoordinates,
 	InteractiveRegionConfig,
 	InteractiveRegionOption, ScenariosConfig,
 	ThresholdInterface,
@@ -26,6 +27,28 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	constructor(config: ClimateVariableConfigInterface) {
 		this._config = config;
+	}
+
+	getId(): string {
+		return this._config.id;
+	}
+
+	getPostId(): number | undefined {
+		return this._config.postId ?? undefined;
+	}
+
+	getTitle(locale?: string): string | null {
+		const title = this._config.title;
+
+		if (title && typeof title !== 'string' && 'en' in title) {
+
+				if (locale === 'fr' && title.fr) {
+						return title.fr;
+				}
+				return title.en;
+		}
+
+		return title as string || null;
 	}
 
 	getVersions(): string[] {
@@ -67,6 +90,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getAnalyzeScenarios(): string[] {
 		return this._config.analyzeScenarios ?? [];
+	}
+
+	getLayerStyles(): string {
+		return this._config.layerStyles ?? '';
 	}
 
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null {

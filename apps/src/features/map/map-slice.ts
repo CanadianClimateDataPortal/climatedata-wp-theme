@@ -27,7 +27,7 @@
  */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { MapState, MapLocation, WMSLegendData } from '@/types/types';
+import { MapState, MapLocation, WMSLegendData, TaxonomyData, PostData } from '@/types/types';
 import {
 	SLIDER_DEFAULT_YEAR_VALUE,
 	SLIDER_MAX_YEAR,
@@ -43,7 +43,6 @@ const defaultTimePeriodEnd = Math.min(
 
 // Define the initial state this slice is going to use.
 const initialState: MapState = {
-	dataset: 'cmip6',
 	variable: 'tx_max',
 	decade: '2040',
 	emissionScenario: 'high',
@@ -62,6 +61,8 @@ const initialState: MapState = {
 		labels: 1,
 	},
 	legendData: {},
+	variableList: [],
+	variableListLoading: false,
 };
 
 // Create the slice
@@ -69,8 +70,17 @@ const mapSlice = createSlice({
 	name: 'map',
 	initialState,
 	reducers: {
-		setDataset(state, action: PayloadAction<string>) {
-			state.dataset = action.payload;
+		setDataset(state, action: PayloadAction<TaxonomyData | null>) {
+			state.dataset = action.payload ?? undefined;
+			// Reset variable list when dataset changes
+			state.variableList = [];
+		},
+		setVariableList(state, action: PayloadAction<PostData[]>) {
+			state.variableList = action.payload;
+			state.variableListLoading = false;
+		},
+		setVariableListLoading(state, action: PayloadAction<boolean>) {
+			state.variableListLoading = action.payload;
 		},
 		setVariable(state, action: PayloadAction<string>) {
 			state.variable = action.payload;
@@ -148,6 +158,8 @@ const mapSlice = createSlice({
 // Export actions
 export const {
 	setDataset,
+	setVariableList,
+	setVariableListLoading,
 	setVariable,
 	setDecade,
 	setEmissionScenario,

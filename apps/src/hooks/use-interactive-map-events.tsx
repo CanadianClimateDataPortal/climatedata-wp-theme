@@ -11,14 +11,12 @@ import { useAppSelector } from '@/app/hooks';
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
 
 import { remToPx } from '@/lib/utils';
-import {
-	fetchDeltaValues,
-	fetchLocationByCoords,
-	generateChartData,
-} from '@/services/services';
-import { SIDEBAR_WIDTH, REGION_GRID, SCENARIO_NAMES } from '@/lib/constants';
+import { fetchDeltaValues, fetchLocationByCoords, generateChartData, } from '@/services/services';
+import { SIDEBAR_WIDTH } from '@/lib/constants';
 import { PercentileData } from '@/types/types';
 import { doyFormatter } from '@/lib/format';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { InteractiveRegionOption } from "@/types/climate-variable-interface";
 
 export const useInteractiveMapEvents = (
 	// @ts-expect-error: suppress leaflet typescript error
@@ -27,14 +25,10 @@ export const useInteractiveMapEvents = (
 ) => {
 	const { __ } = useI18n();
 	const { togglePanel } = useAnimatedPanel();
+	const { climateVariable } = useClimateVariable();
 
 	const {
-		variable,
-		dataset,
 		decade,
-		frequency,
-		interactiveRegion,
-		emissionScenario,
 	} = useAppSelector((state) => state.map);
 
 	const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -90,20 +84,16 @@ export const useInteractiveMapEvents = (
 
 	// Helper method to extract percentile values and handle Kelvin conversion
 	const getPercentileValues = (data: Record<string, PercentileData>) => {
+		if (!climateVariable) {
+			return;
+		}
 		// RCP scenario selection
-		const datasetKey = dataset as keyof typeof SCENARIO_NAMES;
-		const emissionKey =
-			emissionScenario as keyof (typeof SCENARIO_NAMES)[keyof typeof SCENARIO_NAMES];
-
-		// TODO: replace with data from the API
-		const rcp = SCENARIO_NAMES[datasetKey][emissionKey]
-			.replace(/[\W_]+/g, '')
-			.toLowerCase();
+		const scenario = climateVariable?.getScenario() ?? ''
 
 		const values = {
-			p10: data[rcp]?.p10 || 0,
-			p50: data[rcp]?.p50 || 0,
-			p90: data[rcp]?.p90 || 0,
+			p10: data[scenario]?.p10 || 0,
+			p50: data[scenario]?.p50 || 0,
+			p90: data[scenario]?.p90 || 0,
 		};
 
 		// for temperatures, units are in Kelvin, but values are received in °C. We reconvert them to Kelvin.
@@ -196,9 +186,11 @@ export const useInteractiveMapEvents = (
 		// get percentile values (p10, p50, p90) with temperature conversion if needed
 		const values = getPercentileValues(data);
 
-		// generate tooltip span elements
-		tip.push(generateMedianSpan(values.p50));
-		tip.push(generateRangeSpan(values.p10, values.p90));
+		if (values) {
+			// generate tooltip span elements
+			tip.push(generateMedianSpan(values.p50));
+			tip.push(generateRangeSpan(values.p10, values.p90));
+		}
 
 		return tip.join('\n');
 	};
@@ -216,9 +208,9 @@ export const useInteractiveMapEvents = (
 		const locationByCoords = await fetchLocationByCoords(latlng);
 		const chartData = await generateChartData({
 			latlng,
-			variable,
-			dataset,
-			frequency,
+			variable: climateVariable?.getThreshold() ?? '',
+			frequency: climateVariable?.getFrequency() ?? '',
+			dataset: climateVariable?.getVersion() ?? '',
 		});
 
 		togglePanel(
@@ -249,18 +241,19 @@ export const useInteractiveMapEvents = (
 		}
 
 		hoveredRef.current = featureId;
+		const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
 
 		layerInstanceRef.current.setFeatureStyle(featureId, {
 			fill: true,
-			fillColor:
-				interactiveRegion === REGION_GRID
-					? '#fff'
-					: getColor(featureId),
-			fillOpacity: interactiveRegion === REGION_GRID ? 0.2 : 1,
+			fillColor: interactiveRegion === InteractiveRegionOption.GRIDDED_DATA ? '#fff' : getColor(featureId),
+			fillOpacity: interactiveRegion === InteractiveRegionOption.GRIDDED_DATA ? 0.2 : 1,
 			weight: 1.5,
+			color: '#fff',
 		});
 
 		hoverTimeoutRef.current = setTimeout(async () => {
+			const variableId = climateVariable?.getId() ?? '';
+			const variable = climateVariable?.getThreshold() ?? '';
 			const { lat, lng } = e.latlng;
 			const decadeValue = parseInt(decade, 10) + 1;
 			const hasDelta =
@@ -268,9 +261,9 @@ export const useInteractiveMapEvents = (
 				false;
 			const delta7100 = options.query?.delta ? '&delta7100=true' : '';
 
-			if (hasDelta || variable === 'building_climate_zones') {
+			if (hasDelta || variableId) {
 				const varName =
-					variable === 'building_climate_zones'
+					variableId === 'building_climate_zones'
 						? 'hddheat_18'
 						: variable;
 
@@ -281,17 +274,17 @@ export const useInteractiveMapEvents = (
 						options.var_data?.[options.query?.var_id]?.acf
 							?.decimals ?? undefined,
 					delta7100,
-					dataset_name: dataset,
+					dataset_name: climateVariable?.getVersion() ?? '',
 				}).toString();
 
-				if (interactiveRegion === REGION_GRID) {
+				if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
 					endpoint = `get-delta-30y-gridded-values/${lat}/${lng}`;
 				}
 
 				const data = await fetchDeltaValues({
 					endpoint,
 					varName,
-					frequency,
+					frequency: climateVariable?.getFrequency() ?? '',
 					params,
 				});
 

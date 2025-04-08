@@ -1,4 +1,5 @@
 import React from "react";
+import { MultilingualField } from "./types";
 
 export interface ScenariosConfig {
 	[key: string]: string[];
@@ -28,7 +29,7 @@ export enum FrequencyDisplayModeOption {
 }
 
 export enum FrequencyType {
-	ANNUAL = "annual",
+	ANNUAL = "ann",
 	ANNUAL_JUL_JUN = "annual_jul_jun",
 	MONTHLY = "months",
 	SEASONAL = "seasons",
@@ -101,6 +102,9 @@ export interface ClimateVariableConfigInterface {
 	/** WordPress Post ID, used for backend operations (optional) */
 	postId?: number;
 
+	/** Title of the climate variable from the API */
+	title?: string | MultilingualField;
+
 	/** Class name defining the type or category of the climate variable */
 	class: string;
 
@@ -124,6 +128,9 @@ export interface ClimateVariableConfigInterface {
 
 	/** Selected scenarios for analysis */
 	analyzeScenarios?: string[];
+
+	/** Layer styles */
+	layerStyles?: string;
 
 	/** Configuration defining interactive region options and their status */
 	interactiveRegionConfig?: InteractiveRegionConfig;
@@ -203,6 +210,13 @@ export interface ClimateVariableConfigInterface {
  * Interface representing functionality for handling climate variables and their configurations.
  */
 export interface ClimateVariableInterface {
+	getId(): string;
+
+	/** Returns the post ID for the variable, if available. */
+	getPostId(): number | undefined;
+
+	getTitle(): string | null;
+
 	getVersions(): string[];
 
 	getVersion(): string | null;
@@ -218,6 +232,8 @@ export interface ClimateVariableInterface {
 	getScenario(): string | null;
 
 	getAnalyzeScenarios(): string[];
+
+	getLayerStyles(): string;
 
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null;
 

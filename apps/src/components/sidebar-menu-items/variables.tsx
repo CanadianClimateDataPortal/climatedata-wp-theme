@@ -2,7 +2,7 @@
  * A menu item and panel component that displays a list of variables with some custom filters.
  * TODO: make this work with the new AnimatedPanel component
  */
-import React, { useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { Map, ChevronRight } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
 
@@ -26,6 +26,8 @@ import { useSidebar } from '@/hooks/use-sidebar';
 import { InteractivePanelProps, PostData } from '@/types/types';
 import TaxonomyDropdownFilter from '@/components/taxonomy-dropdown-filter';
 import VariableRadioCards from '@/components/variable-radio-cards';
+import { useAppSelector } from "@/app/hooks";
+import SectionContext from "@/context/section-provider";
 
 // menu and panel slug
 const slug = 'variable';
@@ -66,6 +68,8 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 }) => {
 	const [varType, setVarType] = useState<string>('');
 	const [sector, setSector] = useState<string>('');
+	const section = useContext(SectionContext);
+	const { dataset } = useAppSelector((state) => state.map);
 
 	const { __ } = useI18n();
 
@@ -79,8 +83,8 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 
 	return (
 		<SidebarPanel id={slug} className="w-[36rem]">
-			<Card>
-				<CardHeader className="p-4">
+			<Card className="border-0 shadow-none h-full flex flex-col">
+				<CardHeader className="p-4 sticky top-0 bg-white z-10">
 					<CardTitle className="text-lg">
 						{__('Select a variable')}
 					</CardTitle>
@@ -110,13 +114,15 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 						/>
 					</Grid>
 				</CardHeader>
-				<CardContent className="p-4 pt-0">
+				<CardContent className="p-4 pt-0 overflow-y-auto max-h-[calc(100vh-200px)] scrollbar-thin">
 					<Grid columns={2} className="gap-4">
-						<VariableRadioCards
+						{dataset && <VariableRadioCards
+							dataset={dataset}
+							section={section}
 							filterValues={filterValues}
 							selected={selected}
 							onSelect={onSelect}
-						/>
+						/>}
 					</Grid>
 				</CardContent>
 			</Card>

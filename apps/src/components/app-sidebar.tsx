@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 import { BadgeInfo, MessageCircleQuestion } from 'lucide-react';
 import { useMap } from '@/hooks/use-map';
@@ -55,6 +55,23 @@ export function AppSidebar() {
 	const { setExtendInfo } = useMap();
 	const dispatch = useAppDispatch();
 
+	// Update the selected variable when the climate variable changes
+	useEffect(() => {
+		if (climateVariable) {
+			const currentVarId = climateVariable.getId();
+
+			if (!selectedVariable || selectedVariable.id !== currentVarId) {
+				// Create a basic PostData object from the climate variable
+				const varData: PostData = {
+					id: currentVarId,
+					postId: climateVariable.toObject().postId || 0,
+					title: currentVarId, // @TODO: Update this after merging the breadcrumsb PR, as there we have the title in the map state
+				};
+				setSelectedVariable(varData);
+			}
+		}
+	}, [climateVariable, selectedVariable]);
+
 	const { __ } = useI18n();
 
 	const handleSelectVariable = (variable: PostData) => {
@@ -86,7 +103,7 @@ export function AppSidebar() {
 									<SidebarSeparator />
 
 									<VersionsDropdown />
-									{showThreshold && <ThresholdValuesDropdown/>}
+									{showThreshold && <ThresholdValuesDropdown />}
 									<SidebarSeparator />
 
 									<EmissionScenariosControl />

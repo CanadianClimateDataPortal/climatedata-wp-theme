@@ -84,6 +84,19 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this.getScenarios()[0] || null;
 	}
 
+	getScenarioCompared(): string | null {
+		// Return the scenario to be compared against. Check if it belongs to the
+		// current version and is not the same as the current scenario.
+		// Otherwise, return null, because it will mean there is no comparison being made
+		// and the comparison map should not be displayed.
+		const currentScenario = this._config.scenario;
+		const scenarioCompared = this._config.scenarioCompared;
+		if (scenarioCompared && this.getScenarios().includes(scenarioCompared) && scenarioCompared !== currentScenario) {
+			return scenarioCompared;
+		}
+		return null;
+	}
+
 	getAnalyzeScenarios(): string[] {
 		return this._config.analyzeScenarios ?? [];
 	}

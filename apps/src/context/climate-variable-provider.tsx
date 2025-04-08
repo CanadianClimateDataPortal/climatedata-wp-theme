@@ -26,6 +26,7 @@ export type ClimateVariableContextType = {
 	selectClimateVariable: (variable: PostData) => void;
 	setVersion: (version: string) => void;
 	setScenario: (scenario: string) => void;
+	setScenarioCompared: (scenarioCompared: string) => void;
 	setAnalyzeScenarios: (analyzeScenarios: string[]) => void;
 	setThreshold: (threshold: string) => void;
 	setInteractiveRegion: (interactiveRegion: InteractiveRegionOption) => void;
@@ -150,6 +151,17 @@ export const ClimateVariableProvider: React.FC<{
 			dispatch(
 				updateClimateVariable({
 					scenario,
+				})
+			);
+		},
+		[dispatch]
+	);
+
+	const setScenarioCompared = useCallback(
+		(scenarioCompared: string | null) => {
+			dispatch(
+				updateClimateVariable({
+					scenarioCompared,
 				})
 			);
 		},
@@ -287,6 +299,7 @@ export const ClimateVariableProvider: React.FC<{
 		selectClimateVariable,
 		setVersion,
 		setScenario,
+		setScenarioCompared,
 		setAnalyzeScenarios,
 		setThreshold,
 		setInteractiveRegion,

@@ -269,16 +269,18 @@ const InteractiveRegionsLayer: React.FC = () => {
 			map.removeLayer(layer);
 			layerRef.current = null;
 		};
-	}, [
-		map,
-		interactiveRegion,
-		layerData,
-		tileLayerUrl,
-		vectorTileLayerStyles,
-		handleClick,
-		handleOver,
-		handleOut,
-	]);
+	},
+		// Intentionally not including the event handlers (e.g. handleClick)
+		// as dependencies since they are already being handled by the
+		// userInteractiveMapEvents hook.
+		[
+			map,
+			interactiveRegion,
+			layerData,
+			tileLayerUrl,
+			vectorTileLayerStyles,
+		]
+	);
 
 	return null;
 };

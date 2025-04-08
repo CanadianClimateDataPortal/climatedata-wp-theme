@@ -1,13 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { ClimateVariables } from "@/config/climate-variables.config";
 import { ClimateVariableConfigInterface } from "@/types/climate-variable-interface";
 
 interface ClimateVariableStateInterface {
-	data: ClimateVariableConfigInterface;
+	data: ClimateVariableConfigInterface | null;
 }
 
 const initialState: ClimateVariableStateInterface = {
-	data: ClimateVariables[0],
+	data: null,
 }
 
 const climateVariableSlice = createSlice({
@@ -18,12 +17,16 @@ const climateVariableSlice = createSlice({
 			state.data = action.payload;
 		},
 		updateClimateVariable: (state, action) => {
+			if (!state.data) return;
+			
 			state.data = {
 				...state.data,
 				...action.payload
 			};
 		},
 		updateClimateVariableAnalysisFieldValue: (state, action) => {
+			if (!state.data || !state.data.analysisFieldValues) return;
+			
 			const {key, value} = action.payload;
 
 			state.data = {

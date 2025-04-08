@@ -6,11 +6,9 @@
 	font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 	line-height: 1.5;
 	font-weight: 400;
-
 	color-scheme: light dark;
 	color: rgba(255, 255, 255, 0.87);
 	background-color: #242424;
-
 	font-synthesis: none;
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
@@ -69,6 +67,7 @@
 		--neutral-grey-medium: 0 0% 46.27%;
 		--neutral-grey-light: 0 0% 97.8%;
 	}
+
 	.dark {
 		--background: 0 0% 3.9%;
 		--foreground: 0 0% 98%;
@@ -111,6 +110,7 @@
 	* {
 		@apply border-border;
 	}
+
 	body {
 		@apply bg-background text-foreground font-["CDCSans"];
 	}
@@ -147,7 +147,6 @@
 }
 
 /* map search control override styles */
-
 .leaflet-container .leaflet-control,
 .leaflet-control-container > div {
 	z-index: 30;
@@ -251,4 +250,25 @@
 	fill: #18181b;
 	text-anchor: end;
 	dominant-baseline: middle;
+}
+
+/* Custom scrollbar styles for variables panel */
+@layer utilities {
+	.scrollbar-thin {
+		scrollbar-width: thin;
+		scrollbar-color: hsl(var(--cold-grey-004) / 0.5) transparent;
+	}
+
+	.scrollbar-thin::-webkit-scrollbar {
+		width: 4px;
+	}
+
+	.scrollbar-thin::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	.scrollbar-thin::-webkit-scrollbar-thumb {
+		background-color: hsl(var(--cold-grey-004) / 0.5);
+		border-radius: 4px;
+	}
 }

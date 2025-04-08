@@ -137,8 +137,8 @@ const SelectItem = forwardRef<
 			'select-item',
 			'relative flex w-full cursor-default select-none items-center',
 			'rounded-sm py-1.5 pl-2 pr-2',
-			'text-sm outline-none',
-			'focus:bg-accent focus:text-accent-foreground',
+			'text-sm text-zinc-950 leading-5 outline-none',
+			'focus:bg-cold-grey-1 focus:text-zinc-950',
 			'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
 			className
 		)}

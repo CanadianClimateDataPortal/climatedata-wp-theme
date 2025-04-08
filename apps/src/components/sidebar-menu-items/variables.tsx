@@ -83,8 +83,8 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 
 	return (
 		<SidebarPanel id={slug} className="w-[36rem]">
-			<Card>
-				<CardHeader className="p-4">
+			<Card className="border-0 shadow-none h-full flex flex-col">
+				<CardHeader className="p-4 sticky top-0 bg-white z-10">
 					<CardTitle className="text-lg">
 						{__('Select a variable')}
 					</CardTitle>
@@ -114,7 +114,7 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 						/>
 					</Grid>
 				</CardHeader>
-				<CardContent className="p-4 pt-0">
+				<CardContent className="p-4 pt-0 overflow-y-auto max-h-[calc(100vh-200px)] scrollbar-thin">
 					<Grid columns={2} className="gap-4">
 						{dataset && <VariableRadioCards
 							dataset={dataset}

@@ -37,6 +37,20 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.postId ?? undefined;
 	}
 
+	getTitle(locale?: string): string | null {
+		const title = this._config.title;
+
+		if (title && typeof title !== 'string' && 'en' in title) {
+
+				if (locale === 'fr' && title.fr) {
+						return title.fr;
+				}
+				return title.en;
+		}
+
+		return title as string || null;
+	}
+
 	getVersions(): string[] {
 		return this._config.versions ?? [];
 	}

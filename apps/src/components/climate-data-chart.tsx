@@ -409,7 +409,7 @@ const ClimateDataChart: React.FC<{ title: string; data: ClimateDataProps }> = ({
 	const rangeLabel: string = 'Range';
 
 	return (
-		<div className="climate-chart px-5 py-5">
+		<div className="climate-chart z-[500] px-5 py-5">
 			<div className="flex justify-between items-start mb-4">
 				<div className="text-left">
 					<h2 className="text-2xl text-cdc-black font-semibold leading-7 m-0">

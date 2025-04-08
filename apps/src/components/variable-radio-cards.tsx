@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, isValidElement } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
@@ -12,6 +12,7 @@ import { fetchPostsData } from '@/services/services';
 import { normalizePostData } from '@/lib/format';
 import { PostData, TaxonomyData } from '@/types/types';
 import { setVariableList, setVariableListLoading } from '@/features/map/map-slice';
+import { useAnimatedPanel } from '@/hooks/use-animated-panel';
 
 const VariableRadioCards: React.FC<{
 	filterValues: Record<string, string>;
@@ -25,6 +26,7 @@ const VariableRadioCards: React.FC<{
 	const dispatch = useAppDispatch();
 	const { selectClimateVariable } = useClimateVariable();
 	const { variableList, variableListLoading } = useAppSelector((state) => state.map);
+	const { activePanel, closePanel } = useAnimatedPanel();
 
 	// Fetch variables when dataset or filters change
 	useEffect(() => {
@@ -63,6 +65,10 @@ const VariableRadioCards: React.FC<{
 	const handleVariableSelect = (variable: PostData) => {
 		onSelect(variable);
 		selectClimateVariable(variable);
+		// Close the VariableDetailsPanel if open.
+		if (isValidElement(activePanel)) {
+			closePanel();
+		}
 	};
 
 	if (variableListLoading) {

@@ -106,20 +106,15 @@ export const ClimateVariableProvider: React.FC<{
 
 			if (matchedVariable) {
 				// Combine important properties from API with the config data.
-				dispatch(
-					setClimateVariable({
-						...matchedVariable,
-						postId: variable.postId,
-					})
-				);
+				dispatch(setClimateVariable({
+					...matchedVariable,
+					postId: variable.postId,
+					title: variable.title
+				}));
 			} else {
-				throw new Error(
-					`No matching variable found for id: ${variable.id}`
-				);
+				throw new Error(`No matching variable found for id: ${variable.id}`);
 			}
-		},
-		[dispatch]
-	);
+		}, [dispatch]);
 
 	/**
 	 * Updates the version of the climate variable and dispatches the updated information.

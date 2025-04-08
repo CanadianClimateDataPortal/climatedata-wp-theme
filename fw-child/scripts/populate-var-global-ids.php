@@ -250,16 +250,39 @@ echo "<br>=== Setting Variable Availability Options ===<br>";
 $availability_updated_count = 0;
 
 foreach ( $successfully_updated_post_ids as $post_id ) {
-	// Set both 'map' and 'download' checkbox values
-	$availability_options = array( 'map', 'download' );
-	$update_result        = update_field( 'variable_availability', $availability_options, $post_id );
+	// Get the variable information from the mapping array
+	$variable_info = null;
 
-	if ( $update_result ) {
-		$post = get_post( $post_id );
-		echo "AVAILABILITY UPDATED: Post ID {$post_id} ({$post->post_title}) - Set to map and download<br>";
-		$availability_updated_count ++;
+	foreach ( $var_id_post_id_mapping as $var_name => $info ) {
+		if ( $info[0] == $post_id ) {
+			$variable_info = $info;
+			break;
+		}
+	}
+
+	if ( $variable_info ) {
+		// Build availability options based on map and download values
+		$availability_options = array();
+
+		if ( $variable_info[2] ) { // If map is true
+			$availability_options[] = 'map';
+		}
+
+		if ( $variable_info[3] ) { // If download is true
+			$availability_options[] = 'download';
+		}
+
+		$update_result = update_field( 'variable_availability', $availability_options, $post_id );
+
+		if ( $update_result ) {
+			$post = get_post( $post_id );
+			echo "AVAILABILITY UPDATED: Post ID {$post_id} ({$post->post_title}) - Set to " . implode( " and ", $availability_options ) . "<br>";
+			$availability_updated_count ++;
+		} else {
+			echo "Availability options already updated for Post ID {$post_id}<br>";
+		}
 	} else {
-		echo "Availability options already updated for Post ID {$post_id}<br>";
+		echo "WARNING: No variable information found for Post ID {$post_id}<br>";
 	}
 }
 

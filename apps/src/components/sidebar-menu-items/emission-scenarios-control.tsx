@@ -4,7 +4,7 @@
  * A dropdown component that allows the user to select an emission scenario and compare it
  * with another from a secondary dropdown.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
@@ -15,29 +15,21 @@ import { Checkbox } from '@/components/ui/checkbox';
 import Dropdown from '@/components/ui/dropdown';
 
 // other
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import {
-	setEmissionScenarioCompare,
-	setEmissionScenarioCompareTo,
-} from '@/features/map/map-slice';
 import appConfig from "@/config/app.config";
 
 const EmissionScenariosControl: React.FC = () => {
+	const [compareScenarios, setCompareScenarios] = useState<boolean>(false);
 	const { __ } = useI18n();
-	const dispatch = useAppDispatch();
-	const { climateVariable, setScenario } = useClimateVariable();
+	const { climateVariable, setScenario, setScenarioCompared } = useClimateVariable();
 
-	const {
-		emissionScenarioCompare,
-		emissionScenarioCompareTo,
-	} = useAppSelector((state) => state.map);
-
-	const handleEmissionScenarioCompareChange = (checked: boolean) => {
-		dispatch(setEmissionScenarioCompare(checked));
-	};
-
-	const handleEmissionScenarioCompareToChange = (value: string) => {
-		dispatch(setEmissionScenarioCompareTo(value));
+	const toggleCompareScenarios = () => {
+		setCompareScenarios(prev => {
+			const newCompare = !prev;
+			if (!newCompare) {
+				setScenarioCompared(null);
+			}
+			return newCompare;
+		});
 	};
 
 	const Tooltip = () => (
@@ -66,8 +58,8 @@ const EmissionScenariosControl: React.FC = () => {
 					<Checkbox
 						id="compare-scenarios"
 						className="text-brand-red"
-						checked={emissionScenarioCompare}
-						onCheckedChange={handleEmissionScenarioCompareChange}
+						checked={compareScenarios}
+						onCheckedChange={toggleCompareScenarios}
 					/>
 					<label
 						htmlFor="compare-scenarios"
@@ -77,13 +69,13 @@ const EmissionScenariosControl: React.FC = () => {
 					</label>
 				</div>
 
-				{emissionScenarioCompare && (
+				{compareScenarios && (
 					<Dropdown
 						options={scenarioOptions.filter(
 							(option) => option.value !== climateVariable?.getScenario()
 						) ?? []}
-						value={emissionScenarioCompareTo}
-						onChange={handleEmissionScenarioCompareToChange}
+						value={climateVariable?.getScenarioCompared() ?? undefined}
+						onChange={setScenarioCompared}
 					/>
 				)}
 			</div>

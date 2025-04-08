@@ -24,69 +24,176 @@ if ( ! is_user_logged_in() || ! current_user_can( 'administrator' ) ) {
 }
 
 $var_id_post_id_mapping = array(
-	"AHCCD pre-calculated station data"                               => array( 12392, "" ),
-	"All CanDCS variables"                                            => array( 12410, "all_candcs_variables" ),
+	"AHCCD pre-calculated station data"                               => array( 12392, "", false, true ),
+	"All CanDCS variables"                                            => array(
+		12410, // Post ID
+		"all_candcs_variables", // var_id
+		false, // Map availability
+		true // Download availability
+	),
 	"Average 'Wet Day' Precipitation Intensity"                       => array(
 		11875,
-		"average_wet_day_precipitation_intensity"
+		"average_wet_day_precipitation_intensity",
+		false,
+		true
 	),
-	"Building Climate Zones"                                          => array( 11217, "building_climate_zones" ),
-	"Cold Spell Days"                                                 => array( 11920, "cold_spell_days" ),
-	"Coldest Day"                                                     => array( 516, "coldest_day" ),
-	"Cooling Degree Days"                                             => array( 497, "cooling_degree_days" ),
+	"Building Climate Zones"                                          => array(
+		11217,
+		"building_climate_zones",
+		true,
+		false
+	),
+	"Cold Spell Days"                                                 => array( 11920, "cold_spell_days", false, true ),
+	"Coldest Day"                                                     => array( 516, "coldest_day", true, true ),
+	"Cooling Degree Days"                                             => array(
+		497,
+		"cooling_degree_days",
+		true,
+		true
+	),
 	"Cumulative degree-days above 0C"                                 => array(
 		2036,
-		"cumulative_degree_days_above_0"
+		"cumulative_degree_days_above_0",
+		true,
+		true
 	),
-	"Days above HXmax"                                                => array( 12415, "days_above_hxmax" ),
-	"Days above Tmax"                                                 => array( 11675, "days_above_tmax" ),
-	"Days above Tmax and Tmin"                                        => array( 11888, "days_above_tmax_and_tmin" ),
+	"Days above HXmax"                                                => array(
+		12415,
+		"days_above_hxmax",
+		false,
+		true
+	),
+	"Days above Tmax"                                                 => array( 11675, "days_above_tmax", true, true ),
+	"Days above Tmax and Tmin"                                        => array(
+		11888,
+		"days_above_tmax_and_tmin",
+		false,
+		true
+	),
 	"Days below temperature threshold"                                => array(
 		517,
-		"days_below_temperature_threshold"
+		"days_below_temperature_threshold",
+		true,
+		true
 	),
-	"Days with Humidex above threshold"                               => array( 10811, "days_humidex_above_threshold" ),
-	"Degree days exceedance date"                                     => array( 11912, "degree_days_exceedance_date" ),
-	"First fall frost"                                                => array( 4102, "first_fall_frost" ),
-	"Freeze-Thaw Cycles"                                              => array( 6366, "freeze_thaw_cycles" ),
-	"Frost Days"                                                      => array( 498, "frost_days" ),
-	"Frost free season"                                               => array( 4104, "frost_free_season" ),
-	"Future Building Design Value Summaries"                          => array( 13621, "" ),
-	"Growing Degree Days (5C)"                                        => array( 503, "growing_degree_days_5" ),
-	"Heat Wave Frequency"                                             => array( 342, "heat_wave_frequency" ),
-	"Heat Wave"                                                       => array( 11915, "heat_wave_index" ),
-	"Heat Wave Total Duration"                                        => array( 509, "heat_wave_total_duration" ),
-	"Heating Degree Days"                                             => array( 506, "heating_degree_days" ),
-	"Hottest Day"                                                     => array( 311, "hottest_day" ),
-	"Ice Days"                                                        => array( 510, "ice_days" ),
-	"Last spring frost"                                               => array( 4100, "last_spring_frost" ),
-	"Maximum 1-Day Total Precipitation"                               => array( 514, "max_1d_total_precipitation" ),
-	"Maximum 5-Day Precipitation"                                     => array( 4106, "max_5d_total_precipitation" ),
-	"Maximum Consecutive Dry Days"                                    => array( 11886, "maximum_consecutive_dry_days" ),
-	"Maximum Consecutive Wet Days"                                    => array( 11880, "maximum_consecutive_wet_days" ),
+	"Days with Humidex above threshold"                               => array(
+		10811,
+		"days_humidex_above_threshold",
+		true,
+		true
+	),
+	"Degree days exceedance date"                                     => array(
+		11912,
+		"degree_days_exceedance_date",
+		false,
+		true
+	),
+	"First fall frost"                                                => array( 4102, "first_fall_frost", true, true ),
+	"Freeze-Thaw Cycles"                                              => array(
+		6366,
+		"freeze_thaw_cycles",
+		true,
+		true
+	),
+	"Frost Days"                                                      => array( 498, "frost_days", true, true ),
+	"Frost free season"                                               => array( 4104, "frost_free_season", true, true ),
+	"Future Building Design Value Summaries"                          => array( 13621, "", false, true ),
+	"Growing Degree Days (5C)"                                        => array(
+		503,
+		"growing_degree_days_5",
+		true,
+		true
+	),
+	"Heat Wave Frequency"                                             => array(
+		342,
+		"heat_wave_frequency",
+		false,
+		true
+	),
+	"Heat Wave"                                                       => array( 11915, "heat_wave_index", false, true ),
+	"Heat Wave Total Duration"                                        => array(
+		509,
+		"heat_wave_total_duration",
+		false,
+		true
+	),
+	"Heating Degree Days"                                             => array(
+		506,
+		"heating_degree_days",
+		true,
+		true
+	),
+	"Hottest Day"                                                     => array( 311, "hottest_day", true, true ),
+	"Ice Days"                                                        => array( 510, "ice_days", true, true ),
+	"Last spring frost"                                               => array( 4100, "last_spring_frost", true, true ),
+	"Maximum 1-Day Total Precipitation"                               => array(
+		514,
+		"max_1d_total_precipitation",
+		true,
+		true
+	),
+	"Maximum 5-Day Precipitation"                                     => array(
+		4106,
+		"max_5d_total_precipitation",
+		true,
+		true
+	),
+	"Maximum Consecutive Dry Days"                                    => array(
+		11886,
+		"maximum_consecutive_dry_days",
+		false,
+		true
+	),
+	"Maximum Consecutive Wet Days"                                    => array(
+		11880,
+		"maximum_consecutive_wet_days",
+		false,
+		true
+	),
 	"Maximum Number of Consecutive Dry Days"                          => array(
 		4095,
-		"max_number_consecutive_dry_days"
+		"max_number_consecutive_dry_days",
+		true,
+		true
 	),
-	"Maximum Temperature"                                             => array( 523, "maximum_temperature" ),
-	"Mean Temperature"                                                => array( 291, "mean_temp" ),
-	"Minimum Temperature"                                             => array( 292, "minimum_temperature" ),
-	"MSC Climate Normals 1981-2010"                                   => array( 575, "" ),
+	"Maximum Temperature"                                             => array(
+		523,
+		"maximum_temperature",
+		true,
+		true
+	),
+	"Mean Temperature"                                                => array( 291, "mean_temp", true, true ),
+	"Minimum Temperature"                                             => array(
+		292,
+		"minimum_temperature",
+		true,
+		true
+	),
+	"MSC Climate Normals 1981-2010"                                   => array( 575, "", true, true ),
 	"Number of Periods with more than 5 Consecutive Dry Days"         => array(
 		4098,
-		"periods_more_5_consecutive_dry_days"
+		"periods_more_5_consecutive_dry_days",
+		true,
+		true
 	),
-	"Relative Sea-Level Change"                                       => array( 4653, "" ),
-	"Short-duration Rainfall IDF Data"                                => array( 538, "" ),
-	"Standardized precipitation evapotranspiration index (12-months)" => array( 3213, "spei_12" ),
-	"Standardized precipitation evapotranspiration index (3-months)"  => array( 3211, "spei_3" ),
-	"Station Data"                                                    => array( 12394, "" ),
-	"Total Precipitation"                                             => array( 511, "total_precipitation" ),
+	"Relative Sea-Level Change"                                       => array( 4653, "", true, true ),
+	"Short-duration Rainfall IDF Data"                                => array( 538, "", false, true ),
+	"Standardized precipitation evapotranspiration index (12-months)" => array( 3213, "spei_12", true, true ),
+	"Standardized precipitation evapotranspiration index (3-months)"  => array( 3211, "spei_3", true, true ),
+	"Station Data"                                                    => array( 12394, "", false, true ),
+	"Total Precipitation"                                             => array(
+		511,
+		"total_precipitation",
+		true,
+		true
+	),
 	"Tropical Nights (Days with Tmin above threshold)"                => array(
 		519,
-		"tropical_nights_days_with_tmin_above_threshold"
+		"tropical_nights_days_with_tmin_above_threshold",
+		true,
+		true
 	),
-	"Wet Days"                                                        => array( 11677, "wet_days" ),
+	"Wet Days"                                                        => array( 11677, "wet_days", true, true ),
 );
 
 // Initialize counters for logging

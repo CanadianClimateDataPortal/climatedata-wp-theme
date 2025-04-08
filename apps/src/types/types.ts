@@ -204,6 +204,8 @@ export interface MapState {
 		mapData: number;
 		labels: number;
 	};
+	variableList: PostData[];
+	variableListLoading: boolean;
 }
 
 /**

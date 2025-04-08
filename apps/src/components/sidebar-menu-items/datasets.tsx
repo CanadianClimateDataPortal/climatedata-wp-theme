@@ -29,7 +29,7 @@ import { useSidebar } from '@/hooks/use-sidebar';
 import { useLocale } from '@/hooks/use-locale';
 import { fetchTaxonomyData } from '@/services/services';
 import { InteractivePanelProps, TaxonomyData } from '@/types/types';
-import { setDataset } from '@/features/map/map-slice';
+import { setDataset, setVariableList, setVariableListLoading } from '@/features/map/map-slice';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { fetchPostsData } from '@/services/services';
 import { normalizePostData } from '@/lib/format';
@@ -80,10 +80,15 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 	const handleDatasetSelect = useCallback(async (dataset: TaxonomyData) => {
 		dispatch(setDataset(dataset));
 		onSelect(dataset);
+		dispatch(setVariableListLoading(true));
+		dispatch(setVariableList([]));
 
 		// Load the first variable for this dataset immediately
 		const data = await fetchPostsData('variables', 'map', dataset, {});
 		const variables = await normalizePostData(data, locale);
+
+		// Store the variables in Redux 
+		dispatch(setVariableList(variables));
 
 		// Select the first variable if available
 		if (variables.length > 0) {

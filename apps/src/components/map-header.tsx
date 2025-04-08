@@ -83,7 +83,6 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 				>
 					<div className="flex items-center gap-x-2 bg-white p-4">
 						<Breadcrumbs
-							title={data?.dataset?.[0]?.title?.[locale] ?? ''}
 							onClick={toggleVariableDetailsPanel}
 						/>
 						<ModalToggleButtons

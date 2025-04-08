@@ -208,6 +208,9 @@ export interface ClimateVariableConfigInterface {
 export interface ClimateVariableInterface {
 	getId(): string;
 
+	/** Returns the post ID for the variable, if available. */
+	getPostId(): number | undefined;
+
 	getVersions(): string[];
 
 	getVersion(): string | null;

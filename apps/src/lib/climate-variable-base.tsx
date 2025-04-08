@@ -33,6 +33,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.id;
 	}
 
+	getPostId(): number | undefined {
+		return this._config.postId ?? undefined;
+	}
+
 	getVersions(): string[] {
 		return this._config.versions ?? [];
 	}

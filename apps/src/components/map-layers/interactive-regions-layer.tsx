@@ -29,7 +29,6 @@ const InteractiveRegionsLayer: React.FC = () => {
 	const map = useMap();
 
 	const {
-		decade,
 		legendData,
 	} = useAppSelector((state) => state.map);
 
@@ -206,12 +205,13 @@ const InteractiveRegionsLayer: React.FC = () => {
 			}
 
 			const frequency = climateVariable?.getFrequency() ?? '';
+			const [ startYear ] = climateVariable?.getDateRange() ?? [];
 
 			try {
 				const data = await fetchChoroValues({
 					variable: climateVariable?.getThreshold() ?? '',
 					dataset: climateVariable?.getVersion() ?? '',
-					decade,
+					decade: startYear,
 					frequency,
 					interactiveRegion,
 					emissionScenario: climateVariable?.getScenario() ?? '',
@@ -224,7 +224,6 @@ const InteractiveRegionsLayer: React.FC = () => {
 			}
 		})();
 	}, [
-		decade,
 		climateVariable,
 	]);
 

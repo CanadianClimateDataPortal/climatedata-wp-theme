@@ -18,7 +18,12 @@ import {
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
 
-const InteractiveRegionsLayer: React.FC = () => {
+interface InteractiveRegionsLayerProps {
+	onLocationModalOpen: (content: React.ReactNode) => void;
+	onLocationModalClose: () => void;
+}
+
+const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLocationModalOpen, onLocationModalClose }) => {
 	const [layerData, setLayerData] = useState<Record<number, number> | null>(
 		null
 	);
@@ -192,7 +197,9 @@ const InteractiveRegionsLayer: React.FC = () => {
 
 	const { handleClick, handleOver, handleOut } = useInteractiveMapEvents(
 		layerRef,
-		getColor
+		getColor,
+		onLocationModalOpen,
+		onLocationModalClose
 	);
 
 	// fetch layer data if needed

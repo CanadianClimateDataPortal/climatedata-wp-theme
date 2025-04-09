@@ -6,6 +6,7 @@ import { useI18n } from '@wordpress/react-i18n';
 import L from 'leaflet';
 
 import LocationInfoPanel from '@/components/map-info/location-info-panel';
+import { LocationModalContent } from '@/components/map-layers/location-modal-content';
 
 import { useAppSelector } from '@/app/hooks';
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
@@ -21,7 +22,9 @@ import { InteractiveRegionOption } from "@/types/climate-variable-interface";
 export const useInteractiveMapEvents = (
 	// @ts-expect-error: suppress leaflet typescript error
 	layerInstanceRef: React.MutableRefObject<L.VectorGrid | null>,
-	getColor: (value: number) => string
+	getColor: (value: number) => string,
+	onLocationModalOpen?: (content: React.ReactNode) => void,
+	onLocationModalClose?: () => void
 ) => {
 	const { __ } = useI18n();
 	const { togglePanel } = useAnimatedPanel();
@@ -202,31 +205,60 @@ export const useInteractiveMapEvents = (
 		return properties.gid ?? properties.id ?? null;
 	};
 
-	const handleClick = async (e: { latlng: L.LatLng }) => {
-		const { latlng } = e;
-
-		const locationByCoords = await fetchLocationByCoords(latlng);
-		const chartData = await generateChartData({
-			latlng,
-			variable: climateVariable?.getThreshold() ?? '',
-			frequency: climateVariable?.getFrequency() ?? '',
-			dataset: climateVariable?.getVersion() ?? '',
-		});
-
-		togglePanel(
-			<LocationInfoPanel
-				title={locationByCoords.title}
-				data={chartData}
-			/>,
-			{
-				position: {
-					left: remToPx(SIDEBAR_WIDTH),
-					right: 0,
-					bottom: 0,
-				},
-				direction: 'bottom',
+	// Handle click on a location
+	const handleClick = async (e: {
+		latlng: L.LatLng;
+		layer: { properties: { gid?: number; id?: number } };
+	}) => {
+		if (onLocationModalOpen) {
+			// Get feature id
+			const featureId = getFeatureId(e.layer.properties);
+			if (!featureId) {
+				return;
 			}
-		);
+
+			const { latlng } = e;
+			const locationByCoords = await fetchLocationByCoords(latlng);
+
+			// Handle click on details button of a location (to open the chart panel)
+			const handleDetailsClick = async () => {
+				if(onLocationModalClose) {
+					onLocationModalClose();
+				}
+
+				const chartData = await generateChartData({
+					latlng,
+					variable: climateVariable?.getThreshold() ?? '',
+					frequency: climateVariable?.getFrequency() ?? '',
+					dataset: climateVariable?.getVersion() ?? '',
+				});
+
+				togglePanel(
+					<LocationInfoPanel
+						title={locationByCoords.title}
+						data={chartData}
+					/>,
+					{
+						position: {
+							left: remToPx(SIDEBAR_WIDTH),
+							right: 0,
+							bottom: 0,
+						},
+						direction: 'bottom',
+					}
+				);
+			}
+
+			// Open location modal
+			onLocationModalOpen(
+				<LocationModalContent
+					title={locationByCoords.title}
+					latlng={latlng}
+					featureId={featureId}
+					onDetailsClick={handleDetailsClick}
+				/>
+			);
+		}
 	};
 
 	const handleOver = (e: {

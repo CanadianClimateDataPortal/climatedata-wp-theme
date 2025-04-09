@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 
 import MapLegend from '@/components/map-layers/map-legend';
@@ -8,6 +8,7 @@ import ZoomControl from '@/components/map-layers/zoom-control';
 import MapEvents from '@/components/map-layers/map-events';
 import SearchControl from '@/components/map-layers/search-control';
 import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions-layer';
+import LocationModal from '@/components/map-layers/location-modal';
 
 import { useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
@@ -29,6 +30,9 @@ export default function RasterMapContainer({
 	onMapReady: (map: L.Map) => void;
 	onUnmount?: () => void;
 }) {
+	const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
+
 	const {
 		opacity: { labels: labelsOpacity },
 	} = useAppSelector((state) => state.map);
@@ -70,6 +74,16 @@ export default function RasterMapContainer({
 		return `CDC:${value}`;
 	}, [climateVariable])
 
+	const handleLocationModalOpen = (content: React.ReactNode) => {
+		setLocationModalContent(content);
+		setIsLocationModalOpen(true);
+	};
+
+	const handleLocationModalClose = () => {
+		setIsLocationModalOpen(false);
+		setLocationModalContent(null);
+	};
+
 	return (
 		<MapContainer
 			center={CANADA_CENTER}
@@ -80,14 +94,25 @@ export default function RasterMapContainer({
 			scrollWheelZoom={true}
 			className="z-10" // important to keep the map below other interactive elements
 		>
-			<MapEvents onMapReady={onMapReady} onUnmount={onUnmount} />
+			<MapEvents 
+				onMapReady={onMapReady} 
+				onUnmount={onUnmount}
+				onLocationModalClose={handleLocationModalClose}
+			/>
 			<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
 			<CustomPanesLayer />
 			<VariableLayer layerValue={layerValue} />
 			<ZoomControl />
 			<SearchControl />
 
-			<InteractiveRegionsLayer />
+			<LocationModal 
+				isOpen={isLocationModalOpen} 
+				onClose={handleLocationModalClose}
+			>
+				{locationModalContent}
+			</LocationModal>
+
+			<InteractiveRegionsLayer onLocationModalOpen={handleLocationModalOpen} onLocationModalClose={handleLocationModalClose} />
 
 			<TileLayer
 				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

@@ -132,6 +132,9 @@ export interface ClimateVariableConfigInterface {
 	/** Layer styles */
 	layerStyles?: string;
 
+	/** Unit */
+	unit?: string;
+
 	/** Configuration defining interactive region options and their status */
 	interactiveRegionConfig?: InteractiveRegionConfig;
 
@@ -232,6 +235,8 @@ export interface ClimateVariableInterface {
 
 	getLayerStyles(): string;
 
+	getUnit(): string;
+
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null;
 
 	getInteractiveRegion(): InteractiveRegionOption | null;
@@ -289,4 +294,6 @@ export interface ClimateVariableInterface {
 	getSelectedPoints(): GridCoordinates | null;
 
 	toObject(): ClimateVariableConfigInterface;
+
+	getLocationModalContent(latlng: L.LatLng, featureId: number): React.ReactNode | null;
 }

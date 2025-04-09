@@ -153,6 +153,7 @@ export interface MapInfoData {
 export interface MapEventsProps {
 	onMapReady?: (map: L.Map) => void;
 	onUnmount?: () => void;
+	onLocationModalClose?: () => void;
 }
 
 /**

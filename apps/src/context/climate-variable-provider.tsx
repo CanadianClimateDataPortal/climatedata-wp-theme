@@ -76,6 +76,8 @@ export const ClimateVariableProvider: React.FC<{
 	 * is thrown.
 	 */
 	const climateVariable = useMemo(() => {
+		if (!climateVariableData) return null;
+		
 		const climateVariableClass =
 			CLIMATE_VARIABLE_CLASS_MAP[climateVariableData.class];
 		if (!climateVariableClass) {
@@ -247,6 +249,7 @@ export const ClimateVariableProvider: React.FC<{
 
 	const addSelectedPoints = useCallback(
 		(gridCoordinates: GridCoordinates) => {
+			if (!climateVariableData) return;
 			const { selectedPoints } = climateVariableData;
 			dispatch(
 				updateClimateVariable({
@@ -262,6 +265,7 @@ export const ClimateVariableProvider: React.FC<{
 
 	const removeSelectedPoint = useCallback(
 		(gid: number) => {
+			if (!climateVariableData) return;
 			const { [gid]: removed, ...rest } =
 				climateVariableData.selectedPoints ?? {};
 			console.log({ removed, rest });
@@ -275,12 +279,13 @@ export const ClimateVariableProvider: React.FC<{
 	);
 
 	const resetSelectedPoints = useCallback(() => {
+		if (!climateVariableData) return;
 		dispatch(
 			updateClimateVariable({
 				selectedPoints: {},
 			})
 		);
-	}, [dispatch]);
+	}, [dispatch, climateVariableData]);
 
 	const value: ClimateVariableContextType = {
 		climateVariable,

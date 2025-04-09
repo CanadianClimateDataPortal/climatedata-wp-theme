@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button';
 // other
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
 import { MapInfoProps, ProviderPanelProps } from '@/types/types';
-import { useLocale } from '@/hooks/use-locale';
+import { useLocale } from "@/hooks/use-locale";
 import { useAppSelector } from "@/app/hooks";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 
@@ -34,6 +34,8 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 		ProviderPanelProps | undefined
 	>(undefined);
 	const { togglePanel } = useAnimatedPanel();
+
+	const { locale } = useLocale();
 
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -95,7 +97,7 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 			<DownloadMapModal
 				isOpen={downloadInfo}
 				onClose={toggleDownloadInfo}
-				title={data?.title ?? ''}
+				title={data?.dataset?.[0]?.title?.[locale] ?? ''}
 			/>
 		</>
 	);

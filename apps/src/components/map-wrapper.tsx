@@ -7,10 +7,12 @@ import MapHeader from "@/components/map-header";
 const MapWrapper = () => {
 	const { climateVariable } = useClimateVariable();
 	const [mapInfo, setMapInfo] = useState<MapInfoData | null>(null);
-
+	
 	useEffect(() => {
-		fetchWPData().then((data) => setMapInfo(data.mapInfo));
-	}, []);
+		const postId = climateVariable?.getPostId();
+		if (typeof postId !== 'number') return;
+		fetchWPData(postId).then((data) => setMapInfo(data.mapInfo));
+	}, [climateVariable]);
 
 	return (
 		<div className="relative flex-1">

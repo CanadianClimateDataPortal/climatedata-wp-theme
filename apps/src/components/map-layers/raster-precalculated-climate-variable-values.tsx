@@ -224,7 +224,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
         </div>
       ) : (
         <>
-          <div className='mb-2 flex'>
+          <div className='mb-3 flex'>
             { median !== null && generateMedianDiv(median) }
             { relativeToBaseline !== null && generateRelativeToBaselineDiv(relativeToBaseline) }
           </div>

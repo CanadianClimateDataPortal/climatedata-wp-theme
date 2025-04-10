@@ -135,6 +135,7 @@ export type PostData = {
 export interface MapEventsProps {
 	onMapReady?: (map: L.Map) => void;
 	onUnmount?: () => void;
+	onLocationModalClose?: () => void;
 }
 
 /**

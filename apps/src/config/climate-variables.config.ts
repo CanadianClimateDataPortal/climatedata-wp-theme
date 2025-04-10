@@ -14,12 +14,14 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "hottest_day",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "tx_max",
+		unit: "°C",
 	},
 	/** Coldest Day */
 	{
 		id: "coldest_day",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "tn_min",
+		unit: "°C",
 	},
 	/** Cumulative degree-days above 0°C */
 	{
@@ -32,6 +34,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "max_5d_total_precipitation",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "rx5day",
+		unit: "mm",
 	},
 	/** Number of Periods with more than 5 Consecutive Dry Days */
 	{
@@ -47,6 +50,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
+		unit: "days",
 	},
 	/** First fall frost */
 	{
@@ -56,6 +60,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
+		unit: "doy",
 	},
 	/** Frost Days */
 	{
@@ -65,6 +70,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
+		unit: "days",
 	},
 	/** Frost free season */
 	{
@@ -74,6 +80,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
+		unit: "days",
 	},
 	/** Growing Degree Days (5°C) */
 	{
@@ -92,6 +99,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
+		unit: "doy",
 	},
 	/** Maximum Number of Consecutive Dry Days */
 	{
@@ -101,6 +109,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
+		unit: "days",
 	},
 	/** Maximum 1-Day Total Precipitation */
 	{
@@ -113,6 +122,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
+		unit: "mm",
 	},
 	/** Mean Temperature */
 	{
@@ -125,6 +135,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
+		unit: "°C",
 	},
 	/** Days with Humidex above threshold */
 	{
@@ -152,6 +163,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
+		unit: "days",
 	},
 	/** All CanDCS variables */
 	{
@@ -193,6 +205,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
+		unit: "°C",
 	},
 	/** Minimum Temperature */
 	{
@@ -206,6 +219,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
+		unit: "°C",
 	},
 	/** Standardized precipitation evapotranspiration index (12-months) */
 	{
@@ -259,18 +273,21 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
+		unit: "mm",
 	},
 	/** Average ‘Wet Day’ Precipitation Intensity */
 	{
 		id: "average_wet_day_precipitation_intensity",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
+		unit: "mm/day",
 	},
 	/** Cold Spell Days */
 	{
 		id: "cold_spell_days",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
+		unit: "days",
 	},
 	/** Cooling Degree Days */
 	{
@@ -299,6 +316,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			],
 		},
 		gridType: "era5landgrid",
+		unit: "days",
 	},
 	/** Days above Tmax */
 	{
@@ -330,12 +348,14 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
 		],
+		unit: "days",
 	},
 	/** Days above Tmax and Tmin */
 	{
 		id: "days_above_tmax_and_tmin",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
+		unit: "days",
 	},
 	/** Days below temperature threshold */
 	{
@@ -355,12 +375,14 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
 		],
+		unit: "days",
 	},
 	/** Degree days exceedance date */
 	{
 		id: "degree_days_exceedance_date",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
+		unit: "doy",
 	},
 	/** Freeze-Thaw Cycles */
 	{
@@ -375,6 +397,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
 		],
+		unit: "days",
 	},
 	/** Heat Wave Frequency */
 	{
@@ -387,12 +410,14 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "heat_wave_index",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
+		unit: "days",
 	},
 	/** Heat Wave Total Duration */
 	{
 		id: "heat_wave_total_duration",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
+		unit: "days",
 	},
 	/** Heating Degree Days */
 	{
@@ -415,12 +440,14 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "maximum_consecutive_dry_days",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
+		unit: "days",
 	},
 	/** Maximum Consecutive Wet Days */
 	{
 		id: "maximum_consecutive_wet_days",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
+		unit: "days",
 	},
 	/** Tropical Nights (Days with Tmin above threshold) */
 	{
@@ -444,6 +471,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
 		],
+		unit: "days",
 	},
 	/** Wet Days */
 	{
@@ -467,6 +495,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
 		],
+		unit: "days",
 	},
 	/** Test variable */
 	{

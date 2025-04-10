@@ -8,8 +8,8 @@ import appConfig from '@/config/app.config';
 
 interface LocationModalContentProps {
 	title: string;
-  latlng: L.LatLng;
-  featureId: number,
+	latlng: L.LatLng;
+	featureId: number,
 	onDetailsClick: () => void;
 }
 
@@ -23,18 +23,18 @@ interface LocationModalContentProps {
  */
 export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	title,
-  latlng,
-  featureId,
+	latlng,
+	featureId,
 	onDetailsClick,
 }) => {
 	const { __ } = useI18n();
-  const { climateVariable } = useClimateVariable();
-  const { dataset } = useAppSelector((state) => state.map);
+	const { climateVariable } = useClimateVariable();
+	const { dataset } = useAppSelector((state) => state.map);
 
-  // Displayed info
-  const datasetLabel = dataset?.title.en;
-  const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0].label;
-  const scenarioLabel = appConfig.scenarios.filter((scenario) => scenario.value === climateVariable?.getScenario())[0].label;
+	// Displayed info
+	const datasetLabel = dataset?.title.en;
+	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0].label;
+	const scenarioLabel = appConfig.scenarios.filter((scenario) => scenario.value === climateVariable?.getScenario())[0].label;
 
 	return (
 		<div>
@@ -45,7 +45,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 				{datasetLabel} - {climateVariable?.getTitle()} - {versionLabel} - {scenarioLabel}
 			</p>
 
-      { climateVariable?.getLocationModalContent(latlng, featureId) }
+			{ climateVariable?.getLocationModalContent(latlng, featureId) }
 
 			<p className="text-right">
 				<a

@@ -30,7 +30,6 @@ const InteractiveRegionsLayer: React.FC = () => {
 	const map = useMap();
 
 	const {
-		decade,
 		legendData,
 		dataValue,
 	} = useAppSelector((state) => state.map);
@@ -220,12 +219,13 @@ const InteractiveRegionsLayer: React.FC = () => {
 			}
 
 			const frequency = climateVariable?.getFrequency() ?? '';
+			const [ startYear ] = climateVariable?.getDateRange() ?? [];
 
 			try {
 				const data = await fetchChoroValues({
 					variable: climateVariable?.getThreshold() ?? '',
 					dataset: climateVariable?.getVersion() ?? '',
-					decade,
+					decade: startYear,
 					frequency,
 					interactiveRegion,
 					emissionScenario: climateVariable?.getScenario() ?? '',
@@ -238,7 +238,6 @@ const InteractiveRegionsLayer: React.FC = () => {
 			}
 		})();
 	}, [
-		decade,
 		climateVariable,
 	]);
 
@@ -284,16 +283,18 @@ const InteractiveRegionsLayer: React.FC = () => {
 			map.removeLayer(layer);
 			layerRef.current = null;
 		};
-	}, [
-		map,
-		interactiveRegion,
-		layerData,
-		tileLayerUrl,
-		vectorTileLayerStyles,
-		handleClick,
-		handleOver,
-		handleOut,
-	]);
+	},
+		// Intentionally not including the event handlers (e.g. handleClick)
+		// as dependencies since they are already being handled by the
+		// userInteractiveMapEvents hook.
+		[
+			map,
+			interactiveRegion,
+			layerData,
+			tileLayerUrl,
+			vectorTileLayerStyles,
+		]
+	);
 
 	return null;
 };

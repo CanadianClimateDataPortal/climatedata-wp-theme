@@ -37,6 +37,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.id;
 	}
 
+	getPostId(): number | undefined {
+		return this._config.postId ?? undefined;
+	}
+
 	getTitle(locale?: string): string | null {
 		const title = this._config.title;
 
@@ -173,7 +177,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getDateRange(): string[] | null {
-		return this._config.dateRange ?? null;
+		return this._config.dateRange ?? [
+			"2040",
+			"2070",
+		];
 	}
 
 	getAveragingOptions(): AveragingType[] {

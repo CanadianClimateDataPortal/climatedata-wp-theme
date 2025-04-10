@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import Highcharts, {
 	Options,
 	SeriesOptionsType,
@@ -10,10 +10,10 @@ import Highcharts, {
 } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsStock from 'highcharts/modules/stock';
-
 import 'highcharts/highcharts-more';
 import 'highcharts/modules/exporting';
 import 'highcharts/modules/export-data';
+import 'highcharts/modules/offline-exporting';
 
 import { cn } from '@/lib/utils';
 import { ClimateDataProps } from '@/types/types.ts';
@@ -47,15 +47,16 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	const { __ } = useI18n();
 	const { locale } = useLocale();
 	const { climateVariable } = useClimateVariable();
-  const decimals = 1;
+	const decimals = 1;
 	const { dataset } = useAppSelector((state) => state.map);
+	const chartRef = useRef<HighchartsReact.RefObject>(null);
 
 	const [activeTab, setActiveTab] = useState('annual-values');
 	const [activeSeries, setActiveSeries] = useState<string[]>([]);
 
 	// Subtitle displayed info
-  const datasetLabel = dataset?.title.en;
-  const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0].label;
+	const datasetLabel = dataset?.title.en;
+	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0].label;
 
 	// Helper to sort an array of tuples by the first element (x-value / timestamp).
 	const sortByTimestamp = useCallback((seriesData: number[][]) => {
@@ -307,6 +308,17 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		);
 	}, [activeTab, seriesObject]);
 
+	const getExportFilename = () => {
+		const formatForFilename = (str: string | undefined | null) => {
+			return (str !== undefined && str !== null) ? str.toLowerCase().replace(/\s+/g, '-') : '';
+		};
+
+		return formatForFilename(title)
+			+ '-' + formatForFilename(datasetLabel)
+			+ '-' + formatForFilename(climateVariable?.getTitle())
+			+ '-' + formatForFilename(versionLabel);
+	};
+
 	const chartOptions = useMemo<Options>(() => {
 		return {
 			chart: {
@@ -320,6 +332,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				marginTop: 30,
 			},
 			exporting: {
+				filename: getExportFilename(),
 				chartOptions: {
 					legend: {
 						enabled: true,
@@ -429,7 +442,42 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	}, [climateVariable, locale, title, filteredSeries]);
 
 	const handleExport = (format: string) => {
-		alert(__(`Exporting chart as ${format}`));
+		const chart = chartRef.current?.chart;
+		if (!chart) return;
+
+		try {
+			switch (format) {
+				case 'pdf':
+					chart.exportChartLocal({
+						type: 'application/pdf',
+					}, {
+						chart: {
+							backgroundColor: '#ffffff'
+						}
+					});
+					break;
+				case 'png':
+					chart.exportChartLocal({
+						type: 'image/png',
+					}, {
+						chart: {
+							backgroundColor: '#ffffff'
+						}
+					});
+					break;
+				case 'csv':
+					chart.downloadCSV();
+					break;
+				case 'print':
+					chart.print();
+					break;
+				default:
+					console.warn(`Unsupported export format: ${format}`);
+			}
+		} catch (error) {
+			console.error('Export failed:', error);
+			alert(__('Export failed. Please try again.'));
+		}
 	};
 
 	return (
@@ -488,32 +536,36 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					</span>
 					<button
 						className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-3 border border-soft-purple uppercase cursor-pointer"
-						onClick={() => handleExport('PDF')}
+						onClick={() => handleExport('pdf')}
 					>
 						{__('PDF')}
 					</button>
 					<button
 						className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-3 border border-soft-purple uppercase cursor-pointer"
-						onClick={() => handleExport('PNG')}
+						onClick={() => handleExport('png')}
 					>
 						{__('PNG')}
 					</button>
 					<button
 						className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-3 border border-soft-purple uppercase cursor-pointer"
-						onClick={() => handleExport('CSV')}
+						onClick={() => handleExport('csv')}
 					>
 						{__('CSV')}
 					</button>
 					<button
 						className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-3 border border-soft-purple uppercase cursor-pointer"
-						onClick={() => handleExport('PRINT')}
+						onClick={() => handleExport('print')}
 					>
 						{__('Print')}
 					</button>
 				</div>
 			</div>
 
-			<HighchartsReact highcharts={Highcharts} options={chartOptions} />
+			<HighchartsReact 
+				ref={chartRef}
+				highcharts={Highcharts} 
+				options={chartOptions} 
+			/>
 
 			{/* toggle visibility of series points */}
 			<div className="flex flex-wrap items-center justify-center gap-4 my-2 mx-12">

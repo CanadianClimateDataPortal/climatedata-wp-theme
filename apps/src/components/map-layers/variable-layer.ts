@@ -5,6 +5,7 @@ import { useAppSelector } from '@/app/hooks';
 import { CANADA_BOUNDS, GEOSERVER_BASE_URL, OWS_FORMAT } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import {
+	ColourType,
 	InteractiveRegionOption,
 } from "@/types/climate-variable-interface";
 import { generateColourScheme } from "@/lib/colour-scheme";
@@ -63,10 +64,13 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			return;
 		}
 
-		const { colours, type: colourMapType, quantities } = colourScheme;
+		const { colours, quantities } = colourScheme;
 		if (!quantities || !quantities.length) {
 			return
 		}
+
+		// For grid, we need to use the values from the colour type.
+		const colourMapType = climateVariable.getColourType() ?? ColourType.CONTINUOUS;
 
 		let sldBody = `<?xml version="1.0" encoding="UTF-8"?>
 			<StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"

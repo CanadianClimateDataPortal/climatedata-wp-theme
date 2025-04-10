@@ -1,6 +1,7 @@
 import {
 	AveragingType,
 	ClimateVariableConfigInterface,
+	ColourType,
 	DownloadType,
 	FileFormatType,
 	FrequencyDisplayModeOption,
@@ -548,6 +549,19 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[InteractiveRegionOption.WATERSHED]: false
 		},
 		hasDelta: false,
+		customColourSchemes: {
+			default: {
+				colours: [
+					{ label: 'Climate Zone 4', colour: '#C90000', quantity: 3000 },
+					{ label: 'Climate Zone 5', colour: '#FAEE02', quantity: 4000 },
+					{ label: 'Climate Zone 6', colour: '#00C936', quantity: 5000 },
+					{ label: 'Climate Zone 7A', colour: '#0083C9', quantity: 6000 },
+					{ label: 'Climate Zone 7B', colour: '#1400C9', quantity: 7000 },
+					{ label: 'Climate Zone 8', colour: '#7F00C9', quantity: 99999999 },
+				],
+				type: ColourType.DISCRETE,
+			}
+		},
 		temporalThresholdConfig: {
 			thresholds: {
 				hddheat_18: {

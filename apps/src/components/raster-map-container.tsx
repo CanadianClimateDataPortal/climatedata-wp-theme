@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 
 import MapLegend from '@/components/map-layers/map-legend';
@@ -19,7 +19,9 @@ import {
 	DEFAULT_MAX_ZOOM,
 	GEOSERVER_BASE_URL,
 } from '@/lib/constants';
-import { getFrequencyCode } from "@/lib/utils";
+import { getDefaultFrequency, getFrequencyCode } from "@/lib/utils";
+import SectionContext from "@/context/section-provider";
+import { FrequencyType } from "@/types/climate-variable-interface";
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
@@ -40,6 +42,8 @@ export default function RasterMapContainer({
 
 	const { climateVariable } = useClimateVariable();
 
+	const section = useContext(SectionContext);
+
 	const layerValue: string = useMemo(() => {
 		let version;
 		if (climateVariable) {
@@ -48,7 +52,20 @@ export default function RasterMapContainer({
 
 		const scenario = climateVariable?.getScenario();
 		const threshold = climateVariable?.getThreshold();
-		const frequency = climateVariable?.getFrequency() ?? '';
+
+		let frequency = climateVariable?.getFrequency() ?? null;
+
+		// If there's no frequency set, try to get the default value from the config.
+		const frequencyConfig = climateVariable?.getFrequencyConfig() ?? null;
+		if (!frequency && climateVariable && frequencyConfig) {
+			frequency = getDefaultFrequency(frequencyConfig, section) ?? null;
+		}
+
+		// Fallback to annual.
+		if (!frequency) {
+			frequency = FrequencyType.ANNUAL;
+		}
+
 		const frequencyCode = getFrequencyCode(frequency);
 
 		const value = [
@@ -57,7 +74,7 @@ export default function RasterMapContainer({
 				frequencyCode,
 				scenario,
 				'p50',
-				climateVariable?.getFrequency(),
+				frequency,
 				'30year',
 			]
 			.filter(Boolean)

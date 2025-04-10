@@ -5,6 +5,7 @@
 //
 
 // REGISTER FIELD GROUP
+// TODO: It is better to handle this via ACF instead of code.
 
 $GLOBALS['fw_fields']['admin']['tax_term'] = array(
 	'settings'    => array(

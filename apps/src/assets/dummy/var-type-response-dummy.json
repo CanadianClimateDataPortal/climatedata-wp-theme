@@ -1,0 +1,66 @@
+[
+	{
+		"term_id": 5,
+		"title": { "en": "Temperature" },
+		"card": {
+			"description": {
+				"en": "Warmest daytime temperature in the selected time period."
+			},
+			"link": {
+				"en": {
+					"title": "Temperature",
+					"url": "https://climatedata2.crim.ca/var-type/temperature/",
+					"target": ""
+				}
+			}
+		}
+	},
+	{
+		"term_id": 4,
+		"title": { "en": "Precipitation" },
+		"card": {
+			"description": {
+				"en": "Warmest daytime temperature in the selected time period."
+			},
+			"link": {
+				"en": {
+					"title": "Precipitation",
+					"url": "https://climatedata2.crim.ca/var-type/precipitation/",
+					"target": ""
+				}
+			}
+		}
+	},
+	{
+		"term_id": 10,
+		"title": { "en": "Station Data" },
+		"card": {
+			"description": {
+				"en": "Warmest daytime temperature in the selected time period."
+			},
+			"link": {
+				"en": {
+					"title": "Station Data",
+					"url": "https://climatedata2.crim.ca/var-type/station-data/",
+					"target": ""
+				}
+			}
+		}
+	},
+	{
+		"term_id": 6,
+		"title": { "en": "Other Variables" },
+		"card": {
+			"description": {
+				"en": "Warmest daytime temperature in the selected time period."
+			},
+			"link": {
+				"en": {
+					"title": "Other Variables",
+					"url": "https://climatedata2.crim.ca/var-type/other/",
+					"target": ""
+				}
+			}
+		}
+	}
+]

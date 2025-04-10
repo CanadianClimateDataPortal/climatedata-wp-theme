@@ -8,13 +8,10 @@
 # This Dockerfile assumes that the context directory is the root of the project.
 # So, when building the image, make sure to build it from the project's root.
 
-FROM node:21.7-bookworm
+FROM node:23.5-bookworm
 
-# Put global npm packages in the `node` user's directory instead of the `root`
-# user's directory
-ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
-ENV PATH=$PATH:/home/node/.npm-global/bin:/home/node/bin/dart-sass
-ENV NODE_ENV=production
+# Define environment variables
+ENV NVM_DIR=/home/node/.nvm
 ENV NPM_CONFIG_LOGLEVEL=info
 
 # For `dumb-init`, see point #5 in:
@@ -26,14 +23,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-# Install SASS
+# Install concurrently and SASS
+# Concurrently is needed to output both SASS and Vite logs in the same terminal
 
-RUN wget -qO- https://github.com/sass/dart-sass/releases/download/1.72.0/dart-sass-1.72.0-linux-x64.tar.gz | tar xvz -C /opt
-RUN ln -s /opt/dart-sass/sass /usr/local/bin/sass
+RUN npm install -g concurrently sass
 
 # Install custom scripts
 
 COPY --chmod=755 dockerfiles/build/task-runner/bin /usr/local/bin
 
+# Switch to the `node` user
+
 USER node
+
+# Install NVM
+
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+
 WORKDIR /home/node/app

@@ -4,3 +4,4 @@ docker-compose-dev.yaml
 docker-override.yml
 .gitignore
 fw-child/**/local_config.php
+apps/node_modules

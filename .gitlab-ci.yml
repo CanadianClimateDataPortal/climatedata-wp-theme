@@ -6,6 +6,7 @@ stages:
   - build
   - tag
   - deploy
+  - cleanup
 
 variables:
   LOCAL_WP_PLUGINS_DIR: "dockerfiles/mounts/wp-plugins"
@@ -158,3 +159,18 @@ update-instance:
 
   after_script:
   - rm -f ~/.ssh/ccdp_deploy
+
+cleanup:
+  stage: cleanup
+  rules:
+    - if: '$TASK == "docker-registry-cleanup"'
+
+  script:
+  - >
+    python3 cicd/docker-registry-cleanup.py 
+    $REGISTRY_CLEANUP_API_URL
+    --token $REGISTRY_CLEANUP_TOKEN
+    --project-id $REGISTRY_CLEANUP_PROJECT_ID 
+    --nb-to-keep $REGISTRY_CLEANUP_NB_OF_TAGS_TO_KEEP
+    --yes
+

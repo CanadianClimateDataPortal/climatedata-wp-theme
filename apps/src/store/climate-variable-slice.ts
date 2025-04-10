@@ -1,5 +1,6 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createSelector } from "@reduxjs/toolkit";
 import { ClimateVariableConfigInterface } from "@/types/climate-variable-interface";
+import { RootState } from "@/app/store";
 
 interface ClimateVariableStateInterface {
 	data: ClimateVariableConfigInterface | null;
@@ -55,5 +56,11 @@ export const {
 	setSearchQuery,
 	clearSearchQuery,
 } = climateVariableSlice.actions;
+
+// Create memoized selectors
+export const selectSearchQuery = createSelector(
+	[(state: RootState) => state.climateVariable.searchQuery],
+	(searchQuery) => searchQuery
+);
 
 export default climateVariableSlice.reducer;

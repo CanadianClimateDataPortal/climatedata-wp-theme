@@ -3,11 +3,12 @@
  *
  * An extension of the RadioCard component that supports highlighting search matches
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Circle } from 'lucide-react';
 import { cn, splitTextByMatch } from '@/lib/utils';
 import { RadioCardProps } from '@/types/types';
 import { useAppSelector } from '@/app/hooks';
+import { selectSearchQuery } from '@/store/climate-variable-slice';
 
 /**
  * HighlightedText Component - Highlights parts of text that match a search term
@@ -18,12 +19,20 @@ interface HighlightedTextProps {
   className?: string;
 }
 
-const HighlightedText: React.FC<HighlightedTextProps> = ({ 
+const HighlightedText: React.FC<HighlightedTextProps> = React.memo(({ 
   text = '', 
   searchTerm,
   className = '' 
 }) => {
-  const parts = splitTextByMatch(text, searchTerm);
+  // Only recalculate parts when text or searchTerm changes
+  const parts = useMemo(() => {
+    return splitTextByMatch(text, searchTerm);
+  }, [text, searchTerm]);
+
+  // If no search term or no matches, just return the text
+  if (!searchTerm || parts.length === 1) {
+    return <span className={className}>{text}</span>;
+  }
 
   return (
     <span className={className}>
@@ -37,9 +46,10 @@ const HighlightedText: React.FC<HighlightedTextProps> = ({
       ))}
     </span>
   );
-};
+});
 
-const RadioCardWithHighlight: React.FC<RadioCardProps> = ({
+// Memoize the RadioCardWithHighlight component to prevent unnecessary re-renders
+const RadioCardWithHighlight: React.FC<RadioCardProps> = React.memo(({
   value,
   radioGroup,
   title,
@@ -51,7 +61,10 @@ const RadioCardWithHighlight: React.FC<RadioCardProps> = ({
   children,
   ...props
 }) => {
-  const { searchQuery } = useAppSelector(state => state.climateVariable);
+  const searchQuery = useAppSelector(selectSearchQuery);
+  
+  // No need to highlight if there's no search query
+  const shouldHighlight = Boolean(searchQuery);
 
   const renderSelectedStatusIcon = () => {
     if (selected) {
@@ -89,7 +102,11 @@ const RadioCardWithHighlight: React.FC<RadioCardProps> = ({
         <div className={cn('p-2', thumbnail ? 'ml-[50px] h-28' : '')}>
           <div className="flex items-start">
             <div className="grow text-base text-zinc-950 font-semibold leading-4 mr-4">
-              <HighlightedText text={title} searchTerm={searchQuery} />
+              {shouldHighlight ? (
+                <HighlightedText text={title} searchTerm={searchQuery} />
+              ) : (
+                title
+              )}
             </div>
             <input
               type="radio"
@@ -103,7 +120,11 @@ const RadioCardWithHighlight: React.FC<RadioCardProps> = ({
           </div>
           {description && (
             <div className="line-clamp-3 text-sm text-neutral-grey-medium leading-5 my-2">
-              <HighlightedText text={description} searchTerm={searchQuery} />
+              {shouldHighlight ? (
+                <HighlightedText text={description} searchTerm={searchQuery} />
+              ) : (
+                description
+              )}
             </div>
           )}
         </div>
@@ -111,7 +132,7 @@ const RadioCardWithHighlight: React.FC<RadioCardProps> = ({
       {children}
     </div>
   );
-};
+});
 RadioCardWithHighlight.displayName = 'RadioCardWithHighlight';
 
 export { RadioCardWithHighlight };

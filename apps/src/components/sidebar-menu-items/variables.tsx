@@ -29,6 +29,7 @@ import TaxonomyDropdownFilter from '@/components/taxonomy-dropdown-filter';
 import VariableRadioCards from '@/components/variable-radio-cards';
 import { useAppSelector } from "@/app/hooks";
 import SectionContext from "@/context/section-provider";
+import { selectSearchQuery } from '@/store/climate-variable-slice';
 
 // menu and panel slug
 const slug = 'variable';
@@ -71,10 +72,10 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 	const [sector, setSector] = useState<string>('');
 	const section = useContext(SectionContext);
 	const { dataset } = useAppSelector((state) => state.map);
+	// Use the memoized selector for better performance
+	const searchQuery = useAppSelector(selectSearchQuery);
 
 	const { __ } = useI18n();
-
-	const { searchQuery } = useAppSelector((state) => state.climateVariable);
 
 	const filterValues = useMemo(
 		() => ({

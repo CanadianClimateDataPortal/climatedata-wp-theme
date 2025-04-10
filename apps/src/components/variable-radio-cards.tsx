@@ -4,7 +4,7 @@ import { useI18n } from '@wordpress/react-i18n';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 
-import { RadioCard, RadioCardFooter } from '@/components/ui/radio-card';
+import { RadioCardWithHighlight, RadioCardFooter } from '@/components/radio-card-with-highlight';
 import Link from '@/components/ui/link';
 
 import { useLocale } from '@/hooks/use-locale';
@@ -82,7 +82,7 @@ const VariableRadioCards: React.FC<{
 	return (
 		<>
 			{variableList.map((item, index) => (
-				<RadioCard
+				<RadioCardWithHighlight
 					key={index}
 					value={item}
 					radioGroup="variable"
@@ -104,7 +104,7 @@ const VariableRadioCards: React.FC<{
 							</Link>
 						</RadioCardFooter>
 					)}
-				</RadioCard>
+				</RadioCardWithHighlight>
 			))}
 		</>
 	);

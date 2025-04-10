@@ -69,19 +69,20 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 }) => {
 	const [varType, setVarType] = useState<string>('');
 	const [sector, setSector] = useState<string>('');
-	const [searchValue, setSearchValue] = useState<string>('');
 	const section = useContext(SectionContext);
 	const { dataset } = useAppSelector((state) => state.map);
 
 	const { __ } = useI18n();
 
+	const { searchQuery } = useAppSelector((state) => state.climateVariable);
+
 	const filterValues = useMemo(
 		() => ({
 			'var-type': varType,
 			sector,
-			search: searchValue,
+			search: searchQuery,
 		}),
-		[varType, sector, searchValue]
+		[varType, sector, searchQuery]
 	);
 
 	return (
@@ -117,10 +118,7 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 						/>
 					</Grid>
 					<div className="mt-6">
-						<VariableSearchFilter
-							onSearch={setSearchValue}
-							value={searchValue}
-						/>
+						<VariableSearchFilter />
 					</div>
 				</CardHeader>
 				<CardContent className="p-4 pt-0 overflow-y-auto max-h-[calc(100vh-200px)] scrollbar-thin">

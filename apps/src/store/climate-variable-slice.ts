@@ -3,10 +3,12 @@ import { ClimateVariableConfigInterface } from "@/types/climate-variable-interfa
 
 interface ClimateVariableStateInterface {
 	data: ClimateVariableConfigInterface | null;
+	searchQuery: string;
 }
 
 const initialState: ClimateVariableStateInterface = {
 	data: null,
+	searchQuery: '',
 }
 
 const climateVariableSlice = createSlice({
@@ -37,6 +39,12 @@ const climateVariableSlice = createSlice({
 				}
 			};
 		},
+		setSearchQuery: (state, action) => {
+			state.searchQuery = action.payload;
+		},
+		clearSearchQuery: (state) => {
+			state.searchQuery = '';
+		},
 	}
 })
 
@@ -44,6 +52,8 @@ export const {
 	setClimateVariable,
 	updateClimateVariable,
 	updateClimateVariableAnalysisFieldValue,
+	setSearchQuery,
+	clearSearchQuery,
 } = climateVariableSlice.actions;
 
 export default climateVariableSlice.reducer;

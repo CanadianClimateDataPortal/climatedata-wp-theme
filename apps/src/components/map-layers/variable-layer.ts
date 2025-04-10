@@ -69,7 +69,6 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			return
 		}
 
-		// For grid, we need to use the values from the colour type.
 		const colourMapType = climateVariable.getColourType() ?? ColourType.CONTINUOUS;
 
 		let sldBody = `<?xml version="1.0" encoding="UTF-8"?>

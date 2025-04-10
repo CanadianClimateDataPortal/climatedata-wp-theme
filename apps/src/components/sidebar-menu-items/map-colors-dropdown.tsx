@@ -32,7 +32,7 @@ const MapColorsDropdown: React.FC = () => {
 				value={climateVariable?.getColourScheme() ?? 'default'}
 				onValueChange={setColourScheme}
 			/>
-			<RadioGroupFactory
+			{climateVariable?.getColourScheme() && climateVariable?.getColourScheme() !== 'default' && <RadioGroupFactory
 				name="colour-type"
 				orientation={"horizontal"}
 				options={[{
@@ -45,7 +45,7 @@ const MapColorsDropdown: React.FC = () => {
 				className={"space-x-2"}
 				value={climateVariable?.getColourType() ?? ColourType.CONTINUOUS}
 				onValueChange={setColourType}
-			/>
+			/>}
 		</SidebarMenuItem>
 	);
 };

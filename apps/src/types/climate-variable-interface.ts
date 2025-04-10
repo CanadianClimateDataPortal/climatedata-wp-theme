@@ -109,7 +109,7 @@ export interface TemporalThresholds {
 
 export interface TemporalThresholdConfig {
 	thresholds: TemporalThresholds;
-	decimals: number;
+	decimals?: number;
 }
 
 export interface CustomColourSchemeColour {

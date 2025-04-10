@@ -19,6 +19,7 @@ import {
 	DEFAULT_MAX_ZOOM,
 	GEOSERVER_BASE_URL,
 } from '@/lib/constants';
+import { getFrequencyCode } from "@/lib/utils";
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
@@ -48,16 +49,7 @@ export default function RasterMapContainer({
 		const scenario = climateVariable?.getScenario();
 		const threshold = climateVariable?.getThreshold();
 		const frequency = climateVariable?.getFrequency() ?? '';
-
-		let frequencyCode = '';
-
-		if (frequency === 'ann') {
-			frequencyCode = 'ys';
-		} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
-			frequencyCode = 'ms';
-		} else if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
-			frequencyCode = 'qsdec';
-		}
+		const frequencyCode = getFrequencyCode(frequency);
 
 		const value = [
 				version,
@@ -94,8 +86,8 @@ export default function RasterMapContainer({
 			scrollWheelZoom={true}
 			className="z-10" // important to keep the map below other interactive elements
 		>
-			<MapEvents 
-				onMapReady={onMapReady} 
+			<MapEvents
+				onMapReady={onMapReady}
 				onUnmount={onUnmount}
 				onLocationModalClose={handleLocationModalClose}
 			/>
@@ -105,8 +97,8 @@ export default function RasterMapContainer({
 			<ZoomControl />
 			<SearchControl />
 
-			<LocationModal 
-				isOpen={isLocationModalOpen} 
+			<LocationModal
+				isOpen={isLocationModalOpen}
 				onClose={handleLocationModalClose}
 			>
 				{locationModalContent}

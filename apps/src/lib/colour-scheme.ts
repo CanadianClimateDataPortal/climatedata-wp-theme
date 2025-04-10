@@ -1,6 +1,7 @@
-import { ClimateVariableInterface, FrequencyType, TemporalScaleConfig } from "@/types/climate-variable-interface";
+import { ClimateVariableInterface, TemporalScaleConfig } from "@/types/climate-variable-interface";
 import { DEFAULT_COLOUR_SCHEMES } from "@/lib/constants";
 import { ColourScheme } from "@/types/types";
+import { getFrequencyCode } from "@/lib/utils";
 
 export function generateColourScheme(
 	climateVariable: ClimateVariableInterface,
@@ -32,11 +33,13 @@ export function generateColourScheme(
 		return;
 	}
 
-	const frequency = climateVariable.getFrequency() === FrequencyType.ANNUAL
-		? 'ys'
-		: (climateVariable.getFrequency() ?? 'ys');
+	const frequency = climateVariable.getFrequency();
+	if (!frequency) {
+		return;
+	}
 
-	const frequencyConfig = frequencies[frequency];
+	const frequencyCode = getFrequencyCode(frequency);
+	const frequencyConfig = frequencies[frequencyCode];
 	if (!frequencyConfig) {
 		return;
 	}

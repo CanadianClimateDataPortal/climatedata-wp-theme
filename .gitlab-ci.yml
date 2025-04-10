@@ -49,21 +49,21 @@ variables:
     TXT_INFO="\e[94m"
     TXT_ERROR="\e[91m"
     TXT_CLEAR="\e[0m"
-    
+
     function log_info() {
-      echo "${TXT_INFO}$1${TXT_CLEAR}"
+      echo -e "${TXT_INFO}$1${TXT_CLEAR}"
     }
-    
+
     function log_error() {
-      echo "${TXT_ERROR}$1${TXT_CLEAR}"
+      echo -e "${TXT_ERROR}$1${TXT_CLEAR}"
     }
-    
+
     function log_section_start() {
       section_id="$1"
-      section_name=`log_info "$2"`
+      section_name="${TXT_INFO}$2${TXT_CLEAR}"
       echo -e "\e[0Ksection_start:`date +%s`:${section_id}\r\e[0K$section_name"
     }
-    
+
     function log_section_end() {
       section_id="$1"
       echo -e "\e[0Ksection_end:`date +%s`:${section_id}\r\e[0K"
@@ -167,10 +167,9 @@ cleanup:
 
   script:
   - >
-    python3 cicd/docker-registry-cleanup.py 
+    python3 cicd/docker-registry-cleanup.py
     $REGISTRY_CLEANUP_API_URL
     --token $REGISTRY_CLEANUP_TOKEN
-    --project-id $REGISTRY_CLEANUP_PROJECT_ID 
+    --project-id $REGISTRY_CLEANUP_PROJECT_ID
     --nb-to-keep $REGISTRY_CLEANUP_NB_OF_TAGS_TO_KEEP
     --yes
-

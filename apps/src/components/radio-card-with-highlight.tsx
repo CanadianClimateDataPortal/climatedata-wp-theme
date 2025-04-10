@@ -86,7 +86,8 @@ const RadioCardWithHighlight: React.FC<RadioCardProps> = React.memo(({
     <div
       className={cn(
         'radio-card',
-        'flex flex-col bg-white hover:bg-neutral-grey-light border border-cold-grey-2 transition-colors duration-100',
+        'flex flex-col bg-white hover:bg-neutral-grey-light border border-cold-grey-2 transition-all duration-200',
+        'animate-in fade-in duration-300',
         selected ? 'bg-neutral-grey-light border-brand-blue' : '',
         className
       )}

@@ -1,8 +1,9 @@
-import React, { useEffect, isValidElement } from 'react';
+import React, { useEffect, isValidElement, useMemo } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { selectSearchQuery } from '@/store/climate-variable-slice';
 
 import { RadioCardWithHighlight, RadioCardFooter } from '@/components/radio-card-with-highlight';
 import Link from '@/components/ui/link';
@@ -27,6 +28,20 @@ const VariableRadioCards: React.FC<{
 	const { selectClimateVariable } = useClimateVariable();
 	const { variableList, variableListLoading } = useAppSelector((state) => state.map);
 	const { activePanel, closePanel } = useAnimatedPanel();
+	const searchQuery = useAppSelector(selectSearchQuery);
+
+	const filteredVariableList = useMemo(() => {
+		if (!searchQuery || searchQuery.trim() === '') {
+			return variableList;
+		}
+
+		const query = searchQuery.toLowerCase();
+		return variableList.filter(item => {
+			const title = (item.title || '').toLowerCase();
+			const description = (item.description || '').toLowerCase();
+			return title.includes(query) || description.includes(query);
+		});
+	}, [variableList, searchQuery]);
 
 	// Fetch variables when dataset or filters change
 	useEffect(() => {
@@ -75,13 +90,28 @@ const VariableRadioCards: React.FC<{
 		return <div className="col-span-2 p-4 text-center">{__('Loading variables...')}</div>;
 	}
 
-	if (!variableList || variableList.length === 0) {
-		return <div className="col-span-2 p-4 text-center">{__('No variables found for the selected filters.')}</div>;
+	if (!filteredVariableList || filteredVariableList.length === 0) {
+		return (
+			<div className="col-span-2 p-4 text-center">
+				{searchQuery
+					? __('No variables found matching your search.')
+					: __('No variables found for the selected filters.')
+				}
+			</div>
+		);
 	}
+
+	// Show search results count when filtering
+	const showSearchCount = searchQuery && searchQuery.trim() !== '' && filteredVariableList.length > 0 && filteredVariableList.length < variableList.length;
 
 	return (
 		<>
-			{variableList.map((item, index) => (
+			{showSearchCount && (
+				<div className="col-span-2 mb-2 text-sm text-neutral-grey-medium">
+					{__('Showing')} {filteredVariableList.length} {__('of')} {variableList.length} {__('variables')}
+				</div>
+			)}
+			{filteredVariableList.map((item, index) => (
 				<RadioCardWithHighlight
 					key={index}
 					value={item}

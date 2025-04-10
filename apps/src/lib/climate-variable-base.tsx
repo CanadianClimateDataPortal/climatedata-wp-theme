@@ -257,7 +257,8 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		};
 	}
 
-	getLocationModalContent(latlng: L.LatLng, featureId: number): React.ReactNode {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	getLocationModalContent(_latlng: L.LatLng, _featureId: number): React.ReactNode {
 		return null;
 	}
 }

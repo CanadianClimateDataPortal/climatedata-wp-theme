@@ -11,6 +11,7 @@ import {
 	InteractiveRegionOption,
 	ScenariosConfig
 } from "@/types/climate-variable-interface";
+import RasterPrecalcultatedClimateVariableValues from '../components/map-layers/raster-precalculated-climate-variable-values'
 
 class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 
@@ -162,6 +163,12 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 			console.error('Download error:', error);
 			throw error;
 		}
+	}
+
+	getLocationModalContent(latlng: L.LatLng, featureId: number): React.ReactNode {
+		return (
+			<RasterPrecalcultatedClimateVariableValues latlng={latlng} featureId={featureId} />
+		);
 	}
 }
 

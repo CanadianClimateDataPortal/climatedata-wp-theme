@@ -20,6 +20,7 @@ import {
 	SidebarPanel,
 } from '@/components/ui/sidebar';
 import Grid from '@/components/ui/grid';
+import { VariableSearchFilter } from '@/components/variable-search-filter';
 
 // other
 import { useSidebar } from '@/hooks/use-sidebar';
@@ -68,6 +69,7 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 }) => {
 	const [varType, setVarType] = useState<string>('');
 	const [sector, setSector] = useState<string>('');
+	const [searchValue, setSearchValue] = useState<string>('');
 	const section = useContext(SectionContext);
 	const { dataset } = useAppSelector((state) => state.map);
 
@@ -77,8 +79,9 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 		() => ({
 			'var-type': varType,
 			sector,
+			search: searchValue,
 		}),
-		[varType, sector]
+		[varType, sector, searchValue]
 	);
 
 	return (
@@ -113,6 +116,12 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 							value={filterValues.sector || ''}
 						/>
 					</Grid>
+					<div className="mt-6">
+						<VariableSearchFilter
+							onSearch={setSearchValue}
+							value={searchValue}
+						/>
+					</div>
 				</CardHeader>
 				<CardContent className="p-4 pt-0 overflow-y-auto max-h-[calc(100vh-200px)] scrollbar-thin">
 					<Grid columns={2} className="gap-4">

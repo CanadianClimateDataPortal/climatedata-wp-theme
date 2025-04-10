@@ -3,20 +3,26 @@
  */
 import React, { useMemo, useRef } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
+import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 
 import LocationInfoPanel from '@/components/map-info/location-info-panel';
 
-import { useAppSelector } from '@/app/hooks';
+import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
+import { addRecentLocation, deleteLocation } from '@/features/map/map-slice';
 
 import { remToPx } from '@/lib/utils';
-import { fetchDeltaValues, fetchLocationByCoords, generateChartData, } from '@/services/services';
-import { SIDEBAR_WIDTH } from '@/lib/constants';
+import {
+	fetchDeltaValues,
+	fetchLocationByCoords,
+	generateChartData,
+} from '@/services/services';
+import { MAP_MARKER_CONFIG, SIDEBAR_WIDTH } from '@/lib/constants';
 import { PercentileData } from '@/types/types';
 import { doyFormatter } from '@/lib/format';
-import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { InteractiveRegionOption } from "@/types/climate-variable-interface";
+import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { InteractiveRegionOption } from '@/types/climate-variable-interface';
 
 export const useInteractiveMapEvents = (
 	// @ts-expect-error: suppress leaflet typescript error
@@ -27,9 +33,10 @@ export const useInteractiveMapEvents = (
 	const { togglePanel } = useAnimatedPanel();
 	const { climateVariable } = useClimateVariable();
 
-	const {
-		decade,
-	} = useAppSelector((state) => state.map);
+	const { decade } = useAppSelector((state) => state.map);
+	const dispatch = useAppDispatch();
+
+	const map = useMap();
 
 	const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const hoveredRef = useRef<number | null>(null);
@@ -88,7 +95,7 @@ export const useInteractiveMapEvents = (
 			return;
 		}
 		// RCP scenario selection
-		const scenario = climateVariable?.getScenario() ?? ''
+		const scenario = climateVariable?.getScenario() ?? '';
 
 		const values = {
 			p10: data[scenario]?.p10 || 0,
@@ -206,6 +213,13 @@ export const useInteractiveMapEvents = (
 		const { latlng } = e;
 
 		const locationByCoords = await fetchLocationByCoords(latlng);
+
+		// get location data for recent locations and markers
+		// TODO: once fetchLocatinByCoords is implemented, we can then build location id and title
+		//  properly as originally done in fw-child/resources/js/map.js#L2990
+		const locationId = locationByCoords.geo_id;
+		const locationTitle = `Point (${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)})`;
+
 		const chartData = await generateChartData({
 			latlng,
 			variable: climateVariable?.getThreshold() ?? '',
@@ -213,6 +227,40 @@ export const useInteractiveMapEvents = (
 			dataset: climateVariable?.getVersion() ?? '',
 		});
 
+		// add new pin to the map
+		const marker = L.marker(latlng, MAP_MARKER_CONFIG)
+			.bindTooltip(locationTitle, {
+				direction: 'top',
+				offset: [0, -30],
+			})
+			.addTo(map);
+
+		// add a bounce animation to the marker
+		setTimeout(() => {
+			const markerElement = marker.getElement();
+			if (markerElement) {
+				markerElement.classList.add('bounce');
+				// remove animation after it ends
+				markerElement.addEventListener(
+					'animationend',
+					() => {
+						markerElement.classList.remove('bounce');
+					},
+					{ once: true }
+				);
+			}
+		}, 0);
+
+		// add to recent locations
+		dispatch(
+			addRecentLocation({
+				id: locationId,
+				title: locationTitle,
+				...latlng,
+			})
+		);
+
+		// open location info panel
 		togglePanel(
 			<LocationInfoPanel
 				title={locationByCoords.title}
@@ -241,12 +289,20 @@ export const useInteractiveMapEvents = (
 		}
 
 		hoveredRef.current = featureId;
-		const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
+		const interactiveRegion =
+			climateVariable?.getInteractiveRegion() ??
+			InteractiveRegionOption.GRIDDED_DATA;
 
 		layerInstanceRef.current.setFeatureStyle(featureId, {
 			fill: true,
-			fillColor: interactiveRegion === InteractiveRegionOption.GRIDDED_DATA ? '#fff' : getColor(featureId),
-			fillOpacity: interactiveRegion === InteractiveRegionOption.GRIDDED_DATA ? 0.2 : 1,
+			fillColor:
+				interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
+					? '#fff'
+					: getColor(featureId),
+			fillOpacity:
+				interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
+					? 0.2
+					: 1,
 			weight: 1.5,
 			color: '#fff',
 		});
@@ -277,7 +333,9 @@ export const useInteractiveMapEvents = (
 					dataset_name: climateVariable?.getVersion() ?? '',
 				}).toString();
 
-				if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
+				if (
+					interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
+				) {
 					endpoint = `get-delta-30y-gridded-values/${lat}/${lng}`;
 				}
 

@@ -18,10 +18,6 @@ import variableDatasetResponseDummy from '@/assets/dummy/variable-dataset-respon
 import varTypeResponseDummy from '@/assets/dummy/var-type-response-dummy.json';
 import sectorResponseDummy from '@/assets/dummy/sector-response-dummy.json';
 import relatedResponse311Dummy from '@/assets/dummy/related-response-311-dummy.json';
-//import wpResponse311Dummy from '@/assets/dummy/wp-response-311-dummy.json';
-import locationByCoordsDummy from '@/assets/dummy/location-by-coords-dummy.json';
-import generateChartDummy from '@/assets/dummy/generate-chart-dummy.json';
-import deltaValuesDummy from '@/assets/dummy/delta-values-dummy.json';
 
 const dummyResponses = {
 	'variable-dataset': variableDatasetResponseDummy,

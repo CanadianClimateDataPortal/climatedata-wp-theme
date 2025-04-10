@@ -663,6 +663,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		averagingOptions: [
 			AveragingType.ALL_YEARS,
 		],
+		hasDelta: false,
 	},
 	/** Standardized precipitation evapotranspiration index (3-months) */
 	{
@@ -683,6 +684,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		averagingOptions: [
 			AveragingType.ALL_YEARS,
 		],
+		hasDelta: false,
 	},
 	/** Total Precipitation */
 	{

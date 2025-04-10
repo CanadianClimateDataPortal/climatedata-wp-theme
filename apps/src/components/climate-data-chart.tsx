@@ -5,6 +5,8 @@ import Highcharts, {
 	SeriesLineOptions,
 	SeriesArearangeOptions,
 	numberFormat,
+	Point,
+	Series,
 } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import HighchartsStock from 'highcharts/modules/stock';
@@ -15,14 +17,22 @@ import 'highcharts/modules/export-data';
 
 import { cn } from '@/lib/utils';
 import { ClimateDataProps } from '@/types/types.ts';
+import { useLocale } from '@/hooks/use-locale';
 import { useI18n } from '@wordpress/react-i18n';
 import { useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import appConfig from '@/config/app.config';
+import { doyFormatter } from '@/lib/format';
 
 // necessary for highcharts to show the navigator area at the bottom of the chart
 if (typeof HighchartsStock === 'function') {
 	HighchartsStock(Highcharts);
+}
+
+interface TooltipPoint extends Point {
+	series: Series;
+	low?: number;
+	high?: number;
 }
 
 /**
@@ -35,7 +45,9 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	data,
 }) => {
 	const { __ } = useI18n();
-		const { climateVariable } = useClimateVariable();
+	const { locale } = useLocale();
+	const { climateVariable } = useClimateVariable();
+  const decimals = 1;
 	const { dataset } = useAppSelector((state) => state.map);
 
 	const [activeTab, setActiveTab] = useState('annual-values');
@@ -300,7 +312,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 			chart: {
 				backgroundColor: 'transparent',
 				numberFormatter: function (num) {
-					return numberFormat(num, 2); // TODO: second arg should be dynamic
+					return numberFormat(num, decimals);
 				},
 				style: {
 					fontFamily: 'CDCSans',
@@ -364,21 +376,33 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				shared: true,
 				split: false,
 				padding: 4,
-				valueDecimals: 1,
-				valueSuffix: ' °C',
-				// pointFormatter: function() {
-				// 	if (this.series.type === 'line') {
-				// 		return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name + ': <b>'
-				// 			+ value_formatter(this.y, options.chart.unit, var_fields.decimals, false, options.lang)
-				// 			+ '</b><br/>';
-				// 	} else {
-				// 		return '<span style="color:' + this.series.color + '">●</span> ' + this.series.name + ': <b>'
-				// 			+ value_formatter(this.low, options.chart.unit, var_fields.decimals, false, options.lang)
-				// 			+ '</b> - <b>'
-				// 			+ value_formatter(this.high, options.chart.unit, var_fields.decimals, false, options.lang)
-				// 			+ '</b><br/>';
-				// 	}
-				// }
+				formatter: function(this: Point) {
+					const unit = climateVariable?.getUnit();
+					const formatValue = (value: number | undefined) => {
+						if (value === undefined) return '';
+						if(unit === "doy") {
+							return doyFormatter(Number(value), locale);
+						} else {
+							const formattedValue = Number(value).toFixed(decimals);
+							// Check if this is a delta value (series name starts with 'Delta')
+							const isDelta = this.series.name?.startsWith('Delta');
+							// Add "+" prefix for positive delta values
+							if (isDelta && Number(value) > 0) {
+								return `+${formattedValue} ${unit}`;
+							}
+							return `${formattedValue} ${unit}`;
+						}
+					};
+
+					const points = (this as unknown as { points?: TooltipPoint[] }).points;
+					return points?.map((point: TooltipPoint) => {
+						if (point.series.type === 'arearange') {
+							return `<span style="color:${point.series.color}">●</span> ${point.series.name}: <b>${formatValue(point.low)}</b> - <b>${formatValue(point.high)}</b><br/>`;
+						} else {
+							return `<span style="color:${point.series.color}">●</span> ${point.series.name}: <b>${formatValue(point.y)}</b><br/>`;
+						}
+					}).join('') || '';
+				}
 			},
 			xAxis: {
 				type: 'datetime',
@@ -391,22 +415,18 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				labels: {
 					align: 'left',
 					formatter: function () {
-						return this.value + ' °C';
-					},
-					// formatter: function () {
-					// 	const value = this.axis.defaultLabelFormatter.call(this);
-					// 	if (localized_chart_unit === 'doy') {
-					// 		return value_formatter(value, options.chart.unit, var_fields.decimals, false, options.lang);
-					// 	} else {
-					// 		return value + ' ' + localized_chart_unit;
-					// 	}
-					// }
+						const unit = climateVariable?.getUnit();
+						if(unit === "doy") {
+							return doyFormatter(Number(this.value), locale);
+						} else {
+							return Number(this.value).toFixed(decimals) + ' ' + unit;
+						}
+					}
 				},
 			},
-			// series: [{ name: 'Test Series', type: 'line', data: [[0, 1], [1, 2], [2, 3]], color: 'blue' }]
 			series: filteredSeries,
 		};
-	}, [title, filteredSeries]);
+	}, [climateVariable, locale, title, filteredSeries]);
 
 	const handleExport = (format: string) => {
 		alert(__(`Exporting chart as ${format}`));

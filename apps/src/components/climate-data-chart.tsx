@@ -16,6 +16,9 @@ import 'highcharts/modules/export-data';
 import { cn } from '@/lib/utils';
 import { ClimateDataProps } from '@/types/types.ts';
 import { useI18n } from '@wordpress/react-i18n';
+import { useAppSelector } from '@/app/hooks';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
+import appConfig from '@/config/app.config';
 
 // necessary for highcharts to show the navigator area at the bottom of the chart
 if (typeof HighchartsStock === 'function') {
@@ -25,14 +28,22 @@ if (typeof HighchartsStock === 'function') {
 /**
  * Component to render a chart using Highcharts with climate data.
  */
-const ClimateDataChart: React.FC<{ title: string; data: ClimateDataProps }> = ({
+const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: number, data: ClimateDataProps }> = ({
 	title,
+	latlng,
+	featureId,
 	data,
 }) => {
+	const { __ } = useI18n();
+		const { climateVariable } = useClimateVariable();
+	const { dataset } = useAppSelector((state) => state.map);
+
 	const [activeTab, setActiveTab] = useState('annual-values');
 	const [activeSeries, setActiveSeries] = useState<string[]>([]);
 
-	const { __ } = useI18n();
+	// Subtitle displayed info
+  const datasetLabel = dataset?.title.en;
+  const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0].label;
 
 	// Helper to sort an array of tuples by the first element (x-value / timestamp).
 	const sortByTimestamp = useCallback((seriesData: number[][]) => {
@@ -401,13 +412,6 @@ const ClimateDataChart: React.FC<{ title: string; data: ClimateDataProps }> = ({
 		alert(__(`Exporting chart as ${format}`));
 	};
 
-	const medianTemp: string = '35.5 °C';
-	const medianLabel: string = 'Median (2011–2040)';
-	const relativeToBaselineTemp: string = '+2.1 °C';
-	const relativeToBaselineLabel: string = 'Relative to Baseline (1971–2000)';
-	const rangeTemp: string = '31.2 °C to 34.8 °C';
-	const rangeLabel: string = 'Range';
-
 	return (
 		<div className="climate-chart z-[500] px-5 py-5">
 			<div className="flex justify-between items-start mb-4">
@@ -416,37 +420,11 @@ const ClimateDataChart: React.FC<{ title: string; data: ClimateDataProps }> = ({
 						{title}
 					</h2>
 					<p className="text-sm text-neutral-grey-medium leading-5 m-0">
-						{__(
-							'Historical Canadian Climate Normals – Hottest Day – CMIP6'
-						)}
+						{datasetLabel} - {climateVariable?.getTitle()} - {versionLabel}
 					</p>
 				</div>
-				<div className="flex justify-end items-center gap-5 mr-10 text-sm text-gray-500">
-					<div className="flex-col">
-						<div className="text-brand-blue text-base font-semibold leading-4">
-							{medianTemp}
-						</div>
-						<div className="text-neutral-grey-medium text-xs uppercase font-semibold leading-4">
-							{medianLabel}
-						</div>
-					</div>
-					<div className="flex-col">
-						<div className="text-brand-blue text-base font-semibold leading-4">
-							{relativeToBaselineTemp}
-						</div>
-						<div className="text-neutral-grey-medium text-xs uppercase font-semibold leading-4">
-							{relativeToBaselineLabel}
-						</div>
-					</div>
-					<div className="flex-col">
-						<div className="text-brand-blue text-base font-semibold leading-4">
-							{rangeTemp}
-						</div>
-						<div className="text-neutral-grey-medium text-xs uppercase font-semibold leading-4">
-							{rangeLabel}
-						</div>
-					</div>
-				</div>
+
+				{ climateVariable?.getLocationModalContent(latlng, featureId, "panel") }
 			</div>
 			<div className="flex justify-between items-center mb-4">
 				<div className="flex justify-center">

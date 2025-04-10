@@ -66,6 +66,8 @@ export const useInteractiveMapEvents = (
 				togglePanel(
 					<LocationInfoPanel
 						title={locationByCoords.title}
+						latlng={latlng}
+						featureId={featureId}
 						data={chartData}
 					/>,
 					{

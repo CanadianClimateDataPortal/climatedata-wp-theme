@@ -298,5 +298,5 @@ export interface ClimateVariableInterface {
 
 	toObject(): ClimateVariableConfigInterface;
 
-	getLocationModalContent(latlng: L.LatLng, featureId: number): React.ReactNode | null;
+	getLocationModalContent(latlng: L.LatLng, featureId: number, mode?: string): React.ReactNode | null;
 }

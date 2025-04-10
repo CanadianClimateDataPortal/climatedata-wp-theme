@@ -165,9 +165,9 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 		}
 	}
 
-	getLocationModalContent(latlng: L.LatLng, featureId: number): React.ReactNode {
+	getLocationModalContent(latlng: L.LatLng, featureId: number, mode: "modal" | "panel" = "modal"): React.ReactNode {
 		return (
-			<RasterPrecalcultatedClimateVariableValues latlng={latlng} featureId={featureId} />
+			<RasterPrecalcultatedClimateVariableValues latlng={latlng} featureId={featureId} mode={mode} />
 		);
 	}
 }

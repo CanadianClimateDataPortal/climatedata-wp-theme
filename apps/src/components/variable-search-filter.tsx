@@ -9,12 +9,14 @@ import { Search, X } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setSearchQuery, selectSearchQuery } from '@/store/climate-variable-slice';
 import { useDebounce } from '@/hooks/use-debounce';
+import { useI18n } from '@wordpress/react-i18n';
 
 export const VariableSearchFilter: React.FC = () => {
   const dispatch = useAppDispatch();
   const globalSearchQuery = useAppSelector(selectSearchQuery);
   const [localSearchQuery, setLocalSearchQuery] = useState(globalSearchQuery);
   const debouncedSearchQuery = useDebounce(localSearchQuery, 300);
+  const { __ } = useI18n();
 
   // Update Redux state when debounced value changes
   useEffect(() => {
@@ -38,7 +40,7 @@ export const VariableSearchFilter: React.FC = () => {
       </div>
       <input
         type="text"
-        placeholder="Search"
+        placeholder={__('Search')}
         value={localSearchQuery}
         onChange={handleChange}
         className="pl-10 pr-10 w-full py-2 bg-transparent focus:outline-none border-0 border-b border-gray-200 focus:border-gray-400"

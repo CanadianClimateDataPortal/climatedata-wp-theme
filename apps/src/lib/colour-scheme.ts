@@ -1,7 +1,7 @@
 import { ClimateVariableInterface, TemporalScaleConfig } from "@/types/climate-variable-interface";
 import { DEFAULT_COLOUR_SCHEMES } from "@/lib/constants";
 import { ColourScheme } from "@/types/types";
-import { getFrequencyCode } from "@/lib/utils";
+import { getDefaultFrequency, getFrequencyCode } from "@/lib/utils";
 
 export function generateColourScheme(
 	climateVariable: ClimateVariableInterface,
@@ -28,19 +28,24 @@ export function generateColourScheme(
 		return;
 	}
 
-	const frequencies = thresholds[threshold];
-	if (!frequencies) {
+	const temporalScales = thresholds[threshold];
+	if (!temporalScales) {
 		return;
 	}
 
-	const frequency = climateVariable.getFrequency();
+	const frequencyConfig = climateVariable.getFrequencyConfig() ?? null;
+	if (!frequencyConfig) {
+		return
+	}
+
+	const frequency = climateVariable.getFrequency() ?? getDefaultFrequency(frequencyConfig, 'map');
 	if (!frequency) {
 		return;
 	}
 
 	const frequencyCode = getFrequencyCode(frequency);
-	const frequencyConfig = frequencies[frequencyCode];
-	if (!frequencyConfig) {
+	const temporalScaleConfig = temporalScales[frequencyCode];
+	if (!temporalScaleConfig) {
 		return;
 	}
 
@@ -48,7 +53,7 @@ export function generateColourScheme(
 		colours,
 		type: schemeType,
 		quantities: calculateQuantities({
-			frequencyConfig,
+			temporalScaleConfig,
 			dataValue,
 			colours,
 			schemeType,
@@ -58,7 +63,7 @@ export function generateColourScheme(
 }
 
 interface CalculateQuantitiesParams {
-	frequencyConfig: TemporalScaleConfig;
+	temporalScaleConfig: TemporalScaleConfig;
 	dataValue: string;
 	colours: string[];
 	schemeType: string;
@@ -66,7 +71,7 @@ interface CalculateQuantitiesParams {
 }
 
 function calculateQuantities({
-	frequencyConfig,
+	temporalScaleConfig,
 	dataValue,
 	colours,
 	schemeType,
@@ -74,7 +79,7 @@ function calculateQuantities({
 }: CalculateQuantitiesParams): number[] {
 	const quantities: number[] = [];
 	const useDelta = dataValue === 'delta';
-	const { absolute, delta, unit } = frequencyConfig;
+	const { absolute, delta, unit } = temporalScaleConfig;
 	const schemeLength = colours.length;
 
 	let low = useDelta ? delta.low : absolute.low;

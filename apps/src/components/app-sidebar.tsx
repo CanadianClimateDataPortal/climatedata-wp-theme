@@ -82,6 +82,8 @@ export function AppSidebar() {
 	// We don't need to show if there's only 1 option.
 	const showThreshold = climateVariable && climateVariable.getThresholds() && climateVariable.getThresholds().length > 1;
 
+	const hasDelta = climateVariable && climateVariable.hasDelta();
+
 	return (
 		<Sidebar>
 			<SidebarContent className={'overflow-x-hidden'}>
@@ -122,7 +124,7 @@ export function AppSidebar() {
 						<TabsContent value="settings">
 							<SidebarGroupContent>
 								<SidebarMenu>
-									<DataValuesControl />
+									{hasDelta && <DataValuesControl />}
 									<SidebarSeparator />
 
 									<MapColorsDropdown />

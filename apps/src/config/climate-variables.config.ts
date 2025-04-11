@@ -1,6 +1,7 @@
 import {
 	AveragingType,
 	ClimateVariableConfigInterface,
+	ColourType,
 	DownloadType,
 	FileFormatType,
 	FrequencyDisplayModeOption,
@@ -9,12 +10,130 @@ import {
 } from "@/types/climate-variable-interface";
 
 export const ClimateVariables: ClimateVariableConfigInterface[] = [
+	/** Test variable */
+	{
+		id: "test_variable",
+		class: "ClimateVariableBase",
+		versions: [
+			"cmip6",
+			"cmip5",
+		],
+		thresholds: [
+			{
+				value: "tx_max",
+				label: "",
+			},
+		],
+		scenarios: {
+			cmip5: [
+				"rcp26",
+				"rcp45",
+				"rcp85",
+			],
+			cmip6: [
+				"ssp126",
+				"ssp245",
+				"ssp585",
+			],
+		},
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: true,
+			[InteractiveRegionOption.CENSUS]: true,
+			[InteractiveRegionOption.HEALTH]: true,
+			[InteractiveRegionOption.WATERSHED]: true
+		},
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.NONE,
+		},
+		frequency: "ann",
+		gridType: "canadagrid",
+		averagingOptions: [
+			AveragingType.ALL_YEARS,
+			AveragingType.THIRTY_YEARS
+		],
+		dateRangeConfig: {
+			min: "1950",
+			max: "2100",
+			interval: 30
+		},
+		hasDelta: true,
+		enableColourOptions: true,
+		temporalThresholdConfig: {
+			thresholds: {
+				tx_max: {
+					ys: {
+						absolute: { low: 6.0, high: 40.0 },
+						delta: { low: -1.0, high: 8.0 },
+						unit: 'K',
+					},
+					ms: {
+						absolute: { low: -20.0, high: 40.0 },
+						delta: { low: -2.0, high: 10.0 },
+						unit: 'K',
+					},
+				},
+			},
+			decimals: 1,
+		},
+		analysisFields: [
+			{
+				key: "tasmin",
+				type: "input",
+				label: "Tasmin",
+				description: "Tasmin description",
+				help: "Tasmin help",
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
+				key: "tasmax",
+				type: "input",
+				label: "Tasmax",
+				description: "Tasmax description",
+				help: "Tasmax help",
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			}
+		],
+		percentileOptions: [ "5", "10", "25", "50", "75", "90", "95", ],
+		downloadType: DownloadType.ANALYZED,
+		fileFormatTypes: [
+			FileFormatType.CSV,
+			FileFormatType.JSON,
+			FileFormatType.NetCDF,
+		],
+	},
 	/** Hottest Day */
 	{
 		id: "hottest_day",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "tx_max",
 		unit: "°C",
+		temporalThresholdConfig: {
+			thresholds: {
+				tx_max: {
+					ys: {
+						absolute: { low: 6.0, high: 40.0 },
+						delta: { low: -1.0, high: 8.0 },
+						unit: 'K',
+					},
+					ms: {
+						absolute: { low: -20.0, high: 40.0 },
+						delta: { low: -2.0, high: 10.0 },
+						unit: 'K',
+					},
+				},
+			},
+		},
 	},
 	/** Coldest Day */
 	{
@@ -22,12 +141,44 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "tn_min",
 		unit: "°C",
+		temporalThresholdConfig: {
+			thresholds: {
+				tn_min: {
+					ys: {
+						absolute: { low: -60.0, high: -5.0 },
+						delta: { low: -2.0, high: 20.0 },
+						unit: 'K',
+					},
+					ms: {
+						absolute: { low: -50.0, high: 10.0 },
+						delta: { low: -3.0, high: 20.0 },
+						unit: 'K',
+					},
+				},
+			},
+		},
 	},
 	/** Cumulative degree-days above 0°C */
 	{
 		id: "cumulative_degree_days_above_0",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "gddgrow_0",
+		temporalThresholdConfig: {
+			thresholds: {
+				gddgrow_0: {
+					ys: {
+						absolute: { low: 20.0, high: 5000.0 },
+						delta: { low: -300.0, high: 2000.0 },
+						unit: 'K days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 700.0 },
+						delta: { low: -40.0, high: 200.0 },
+						unit: 'K days',
+					},
+				},
+			},
+		},
 	},
 	/** Maximum 5-Day Precipitation */
 	{
@@ -35,12 +186,44 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "rx5day",
 		unit: "mm",
+		temporalThresholdConfig: {
+			thresholds: {
+				rx5day: {
+					ys: {
+						absolute: { low: 10.0, high: 200.0 },
+						delta: { low: -4.0, high: 20.0 },
+						unit: 'mm',
+					},
+					ms: {
+						absolute: { low: 3.0, high: 100.0 },
+						delta: { low: -4.0, high: 10.0 },
+						unit: 'mm',
+					},
+				},
+			},
+		},
 	},
 	/** Number of Periods with more than 5 Consecutive Dry Days */
 	{
 		id: "periods_more_5_consecutive_dry_days",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "nr_cdd",
+		temporalThresholdConfig: {
+			thresholds: {
+				nr_cdd: {
+					ys: {
+						absolute: { low: 5.0, high: 20.0 },
+						delta: { low: -4.0, high: 3.0 },
+						unit: '',
+					},
+					ms: {
+						absolute: { low: 0.2, high: 2.0 },
+						delta: { low: -0.7, high: 0.3 },
+						unit: '',
+					},
+				},
+			},
+		},
 	},
 	/** Ice Days */
 	{
@@ -51,6 +234,17 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		unit: "days",
+		temporalThresholdConfig: {
+			thresholds: {
+				ice_days: {
+					ys: {
+						absolute: { low: 1.0, high: 300.0 },
+						delta: { low: -60.0, high: 10.0 },
+						unit: 'days',
+					},
+				},
+			},
+		},
 	},
 	/** First fall frost */
 	{
@@ -61,6 +255,17 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		unit: "doy",
+		temporalThresholdConfig: {
+			thresholds: {
+				first_fall_frost: {
+					ys: {
+						absolute: { low: 200.0, high: 300.0 },
+						delta: { low: -10.0, high: 60.0 },
+						unit: '',
+					},
+				},
+			},
+		},
 	},
 	/** Frost Days */
 	{
@@ -71,6 +276,17 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		unit: "days",
+		temporalThresholdConfig: {
+			thresholds: {
+				frost_days: {
+					ys: {
+						absolute: { low: 20.0, high: 400.0 },
+						delta: { low: -80.0, high: 10.0 },
+						unit: 'days',
+					},
+				},
+			},
+		},
 	},
 	/** Frost free season */
 	{
@@ -81,6 +297,17 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		unit: "days",
+		temporalThresholdConfig: {
+			thresholds: {
+				frost_free_season: {
+					ys: {
+						absolute: { low: 2.0, high: 300.0 },
+						delta: { low: -20.0, high: 90.0 },
+						unit: 'days',
+					},
+				},
+			},
+		},
 	},
 	/** Growing Degree Days (5°C) */
 	{
@@ -89,6 +316,17 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		threshold: "gddgrow_5",
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		temporalThresholdConfig: {
+			thresholds: {
+				gddgrow_5: {
+					ys: {
+						absolute: { low: 0.5, high: 3000.0 },
+						delta: { low: -200.0, high: 1000.0 },
+						unit: 'degree_days',
+					},
+				},
+			},
 		},
 	},
 	/** Last spring frost */
@@ -100,6 +338,17 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		unit: "doy",
+		temporalThresholdConfig: {
+			thresholds: {
+				last_spring_frost: {
+					ys: {
+						absolute: { low: 60.0, high: 200.0 },
+						delta: { low: -40.0, high: 9.0 },
+						unit: '',
+					},
+				},
+			},
+		},
 	},
 	/** Maximum Number of Consecutive Dry Days */
 	{
@@ -110,6 +359,17 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		unit: "days",
+		temporalThresholdConfig: {
+			thresholds: {
+				cdd: {
+					ys: {
+						absolute: { low: 10.0, high: 100.0 },
+						delta: { low: -40.0, high: 9.0 },
+						unit: 'days',
+					},
+				},
+			},
+		},
 	},
 	/** Maximum 1-Day Total Precipitation */
 	{
@@ -123,6 +383,27 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		unit: "mm",
+		temporalThresholdConfig: {
+			thresholds: {
+				rx1day: {
+					ys: {
+						absolute: { low: 7.0, high: 90.0 },
+						delta: { low: -3.0, high: 10.0 },
+						unit: 'mm day-1',
+					},
+					ms: {
+						absolute: { low: 1.0, high: 50.0 },
+						delta: { low: -2.0, high: 6.0 },
+						unit: 'mm',
+					},
+					qsdec: {
+						absolute: { low: 2.0, high: 70.0 },
+						delta: { low: -2.0, high: 8.0 },
+						unit: 'mm/day',
+					},
+				},
+			},
+		},
 	},
 	/** Mean Temperature */
 	{
@@ -136,6 +417,27 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		unit: "°C",
+		temporalThresholdConfig: {
+			thresholds: {
+				tg_mean: {
+					ys: {
+						absolute: { low: -20.0, high: 10.0 },
+						delta: { low: -2.0, high: 10.0 },
+						unit: 'K',
+					},
+					ms: {
+						absolute: { low: -40.0, high: 20.0 },
+						delta: { low: -3.0, high: 20.0 },
+						unit: 'K',
+					},
+					qsdec: {
+						absolute: { low: -40.0, high: 20.0 },
+						delta: { low: -3.0, high: 10.0 },
+						unit: 'K',
+					},
+				},
+			},
+		},
 	},
 	/** Days with Humidex above threshold */
 	{
@@ -164,6 +466,61 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		unit: "days",
+		temporalThresholdConfig: {
+			thresholds: {
+				HXmax30: {
+					ys: {
+						absolute: { low: 0.0, high: 100.0 },
+						delta: { low: -10.0, high: 70.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 20.0 },
+						delta: { low: -3.0, high: 20.0 },
+						unit: 'days',
+					},
+					qsdec: {
+						absolute: { low: 0.0, high: 70.0 },
+						delta: { low: -7.0, high: 40.0 },
+						unit: 'days',
+					},
+				},
+				HXmax35: {
+					ys: {
+						absolute: { low: 0.0, high: 60.0 },
+						delta: { low: -5.0, high: 50.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 10.0 },
+						delta: { low: -1.0, high: 10.0 },
+						unit: 'days',
+					},
+					qsdec: {
+						absolute: { low: 0.0, high: 40.0 },
+						delta: { low: -2.0, high: 30.0 },
+						unit: 'days',
+					},
+				},
+				HXmax40: {
+					ys: {
+						absolute: { low: 0.0, high: 30.0 },
+						delta: { low: -1.0, high: 20.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 4.0 },
+						delta: { low: 0.0, high: 4.0 },
+						unit: 'days',
+					},
+					qsdec: {
+						absolute: { low: 0.0, high: 10.0 },
+						delta: { low: 0.0, high: 10.0 },
+						unit: 'days',
+					},
+				},
+			},
+		},
 	},
 	/** All CanDCS variables */
 	{
@@ -192,6 +549,30 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[InteractiveRegionOption.WATERSHED]: false
 		},
 		hasDelta: false,
+		customColourSchemes: {
+			default: {
+				colours: [
+					{ label: 'Climate Zone 4', colour: '#C90000', quantity: 3000 },
+					{ label: 'Climate Zone 5', colour: '#FAEE02', quantity: 4000 },
+					{ label: 'Climate Zone 6', colour: '#00C936', quantity: 5000 },
+					{ label: 'Climate Zone 7A', colour: '#0083C9', quantity: 6000 },
+					{ label: 'Climate Zone 7B', colour: '#1400C9', quantity: 7000 },
+					{ label: 'Climate Zone 8', colour: '#7F00C9', quantity: 99999999 },
+				],
+				type: ColourType.DISCRETE,
+			}
+		},
+		temporalThresholdConfig: {
+			thresholds: {
+				hddheat_18: {
+					ys: {
+						absolute: { low: 3000.0, high: 20000.0 },
+						delta: { low: -4000.0, high: 700.0 },
+						unit: 'degree_days',
+					},
+				},
+			},
+		},
 	},
 	/** Maximum Temperature */
 	{
@@ -206,6 +587,27 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 		unit: "°C",
+		temporalThresholdConfig: {
+			thresholds: {
+				tx_mean: {
+					ys: {
+						absolute: { low: -20.0, high: 20.0 },
+						delta: { low: -2.0, high: 10.0 },
+						unit: 'K',
+					},
+					ms: {
+						absolute: { low: -40.0, high: 30.0 },
+						delta: { low: -3.0, high: 10.0 },
+						unit: 'K',
+					},
+					qsdec: {
+						absolute: { low: -30.0, high: 30.0 },
+						delta: { low: -2.0, high: 10.0 },
+						unit: 'K',
+					},
+				},
+			},
+		},
 	},
 	/** Minimum Temperature */
 	{
@@ -220,6 +622,27 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 		unit: "°C",
+		temporalThresholdConfig: {
+			thresholds: {
+				tn_mean: {
+					ys: {
+						absolute: { low: -30.0, high: 8.0 },
+						delta: { low: -2.0, high: 10.0 },
+						unit: 'K',
+					},
+					ms: {
+						absolute: { low: -40.0, high: 20.0 },
+						delta: { low: -3.0, high: 20.0 },
+						unit: 'K',
+					},
+					qsdec: {
+						absolute: { low: -40.0, high: 20.0 },
+						delta: { low: -3.0, high: 20.0 },
+						unit: 'K',
+					},
+				},
+			},
+		},
 	},
 	/** Standardized precipitation evapotranspiration index (12-months) */
 	{
@@ -240,6 +663,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		averagingOptions: [
 			AveragingType.ALL_YEARS,
 		],
+		hasDelta: false,
 	},
 	/** Standardized precipitation evapotranspiration index (3-months) */
 	{
@@ -260,6 +684,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		averagingOptions: [
 			AveragingType.ALL_YEARS,
 		],
+		hasDelta: false,
 	},
 	/** Total Precipitation */
 	{
@@ -274,6 +699,27 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 		unit: "mm",
+		temporalThresholdConfig: {
+			thresholds: {
+				prcptot: {
+					ys: {
+						absolute: { low: 60.0, high: 3000.0 },
+						delta: { low: -40.0, high: 200.0 },
+						unit: 'mm',
+					},
+					ms: {
+						absolute: { low: 6.0, high: 300.0 },
+						delta: { low: -10.0, high: 30.0 },
+						unit: 'mm day-1',
+					},
+					qsdec: {
+						absolute: { low: 20.0, high: 900.0 },
+						delta: { low: -20.0, high: 70.0 },
+						unit: 'mm day-1',
+					},
+				},
+			},
+		},
 	},
 	/** Average ‘Wet Day’ Precipitation Intensity */
 	{
@@ -301,6 +747,17 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
 		],
+		temporalThresholdConfig: {
+			thresholds: {
+				cddcold_18: {
+					ys: {
+						absolute: { low: 0.0, high: 800.0 },
+						delta: { low: -80.0, high: 600.0 },
+						unit: 'degree_days',
+					},
+				},
+			},
+		},
 	},
 	/** Days above HXmax */
 	{
@@ -349,6 +806,70 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.THIRTY_YEARS,
 		],
 		unit: "days",
+		temporalThresholdConfig: {
+			thresholds: {
+				txgt_25: {
+					ys: {
+						absolute: { low: 0.0, high: 100.0 },
+						delta: { low: -10.0, high: 70.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 30.0 },
+						delta: { low: -3.0, high: 10.0 },
+						unit: 'days',
+					},
+				},
+				txgt_27: {
+					ys: {
+						absolute: { low: 0.0, high: 100.0 },
+						delta: { low: -10.0, high: 60.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 20.0 },
+						delta: { low: -3.0, high: 20.0 },
+						unit: 'days',
+					},
+				},
+				txgt_29: {
+					ys: {
+						absolute: { low: 0.0, high: 80.0 },
+						delta: { low: -10.0, high: 60.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 20.0 },
+						delta: { low: -2.0, high: 10.0 },
+						unit: 'days',
+					},
+				},
+				txgt_30: {
+					ys: {
+						absolute: { low: 0.0, high: 70.0 },
+						delta: { low: -8.0, high: 50.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 20.0 },
+						delta: { low: -1.0, high: 10.0 },
+						unit: 'days',
+					},
+				},
+				txgt_32: {
+					ys: {
+						absolute: { low: 0.0, high: 50.0 },
+						delta: { low: -5.0, high: 40.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 10.0 },
+						delta: { low: -0.7, high: 9.0 },
+						unit: 'days',
+					},
+				},
+			},
+		},
 	},
 	/** Days above Tmax and Tmin */
 	{
@@ -376,6 +897,34 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.THIRTY_YEARS,
 		],
 		unit: "days",
+		temporalThresholdConfig: {
+			thresholds: {
+				'tnlt_-15': {
+					ys: {
+						absolute: { low: 0.0, high: 300.0 },
+						delta: { low: -100.0, high: 10.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 30.0 },
+						delta: { low: -20.0, high: 5.0 },
+						unit: 'days',
+					},
+				},
+				'tnlt_-25': {
+					ys: {
+						absolute: { low: 0.0, high: 200.0 },
+						delta: { low: -100.0, high: 20.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 30.0 },
+						delta: { low: -20.0, high: 5.0 },
+						unit: 'days',
+					},
+				},
+			},
+		},
 	},
 	/** Degree days exceedance date */
 	{
@@ -398,6 +947,17 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.THIRTY_YEARS,
 		],
 		unit: "days",
+		temporalThresholdConfig: {
+			thresholds: {
+				'dlyfrzthw_tx0_tn-1': {
+					ys: {
+						absolute: { low: 8.0, high: 100.0 },
+						delta: { low: -40.0, high: 8.0 },
+						unit: 'days',
+					},
+				},
+			},
+		},
 	},
 	/** Heat Wave Frequency */
 	{
@@ -472,6 +1032,46 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.THIRTY_YEARS,
 		],
 		unit: "days",
+		temporalThresholdConfig: {
+			thresholds: {
+				tr_18: {
+					ys: {
+						absolute: { low: 0.0, high: 60.0 },
+						delta: { low: -5.0, high: 50.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 10.0 },
+						delta: { low: -0.9, high: 10.0 },
+						unit: 'days',
+					},
+				},
+				tr_20: {
+					ys: {
+						absolute: { low: 0.0, high: 40.0 },
+						delta: { low: -2.0, high: 30.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 8.0 },
+						delta: { low: -0.3, high: 7.0 },
+						unit: 'days',
+					},
+				},
+				tr_22: {
+					ys: {
+						absolute: { low: 0.0, high: 20.0 },
+						delta: { low: -0.4, high: 20.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 3.0 },
+						delta: { low: -0.03, high: 3.0 },
+						unit: 'days',
+					},
+				},
+			},
+		},
 	},
 	/** Wet Days */
 	{
@@ -496,116 +1096,60 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.THIRTY_YEARS,
 		],
 		unit: "days",
-	},
-	/** Test variable */
-	{
-		id: "test_variable",
-		class: "ClimateVariableBase",
-		versions: [
-			"cmip6",
-			"cmip5",
-		],
-		thresholds: [
-			{
-				value: "tx_max",
-				label: "",
-			}
-		],
-		scenarios: {
-			cmip5: [
-				"rcp26",
-				"rcp45",
-				"rcp85",
-			],
-			cmip6: [
-				"ssp126",
-				"ssp245",
-				"ssp585",
-			],
-		},
-		interactiveRegionConfig: {
-			[InteractiveRegionOption.GRIDDED_DATA]: true,
-			[InteractiveRegionOption.CENSUS]: true,
-			[InteractiveRegionOption.HEALTH]: true,
-			[InteractiveRegionOption.WATERSHED]: true
-		},
-		frequencyConfig: {
-			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
-			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
-			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
-			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
-			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
-			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.NONE,
-		},
-		gridType: "canadagrid",
-		averagingOptions: [
-			AveragingType.ALL_YEARS,
-			AveragingType.THIRTY_YEARS
-		],
-		dateRangeConfig: {
-			min: "1950",
-			max: "2100",
-			interval: 30
-		},
-		hasDelta: false,
-		defaultColourScheme: [
-			"#ffffcc",
-			"#fff8ba",
-			"#fff4b2",
-			"#ffeda0",
-			"#ffe58f",
-			"#fee187",
-			"#fed976",
-			"#fec965",
-			"#fec25d",
-			"#feb24c",
-			"#fea346",
-			"#fd9c42",
-			"#fd8d3c",
-			"#fd7435",
-			"#fc6731",
-			"#fc4e2a",
-			"#f23924",
-			"#ed2f22",
-			"#e31a1c",
-			"#d41020",
-			"#cc0a22",
-			"#bd0026",
-			"#a50026",
-			"#990026",
-			"#800026",
-		],
-		enableColourOptions: true,
-		analysisFields: [
-			{
-				key: "tasmin",
-				type: "input",
-				label: "Tasmin",
-				description: "Tasmin description",
-				help: "Tasmin help",
-				attributes: {
-					type: "number",
-					placeholder: "0",
-				}
+		temporalThresholdConfig: {
+			thresholds: {
+				r1mm: {
+					ys: {
+						absolute: { low: 20.0, high: 200.0 },
+						delta: { low: -7.0, high: 40.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.7, high: 20.0 },
+						delta: { low: -2.0, high: 6.0 },
+						unit: 'days',
+					},
+					qsdec: {
+						absolute: { low: 2.0, high: 70.0 },
+						delta: { low: -4.0, high: 20.0 },
+						unit: 'days',
+					},
+				},
+				r10mm: {
+					ys: {
+						absolute: { low: 0.1, high: 100.0 },
+						delta: { low: -2.0, high: 9.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 6.0 },
+						delta: { low: -0.2, high: 0.6 },
+						unit: 'days',
+					},
+					qsdec: {
+						absolute: { low: 0.0, high: 20.0 },
+						delta: { low: -0.3, high: 2.0 },
+						unit: 'days',
+					},
+				},
+				r20mm: {
+					ys: {
+						absolute: { low: 0.0, high: 50.0 },
+						delta: { low: -0.8, high: 5.0 },
+						unit: 'days',
+					},
+					ms: {
+						absolute: { low: 0.0, high: 6.0 },
+						delta: { low: -0.2, high: 0.6 },
+						unit: 'days',
+					},
+					qsdec: {
+						absolute: { low: 0.0, high: 20.0 },
+						delta: { low: -0.3, high: 2.0 },
+						unit: 'days',
+					},
+				},
 			},
-			{
-				key: "tasmax",
-				type: "input",
-				label: "Tasmax",
-				description: "Tasmax description",
-				help: "Tasmax help",
-				attributes: {
-					type: "number",
-					placeholder: "0",
-				}
-			}
-		],
-		percentileOptions: [ "5", "10", "25", "50", "75", "90", "95", ],
-		downloadType: DownloadType.ANALYZED,
-		fileFormatTypes: [
-			FileFormatType.CSV,
-			FileFormatType.JSON,
-			FileFormatType.NetCDF,
-		],
+		},
 	},
 ];

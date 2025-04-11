@@ -96,6 +96,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.layerStyles ?? '';
 	}
 
+	getUnit(): string {
+		return this._config.unit ?? '';
+	}
+
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null {
 		return this._config.interactiveRegionConfig ?? null;
 	}
@@ -235,6 +239,11 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return {
 			...this._config,
 		};
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	getLocationModalContent(_latlng: L.LatLng, _featureId: number): React.ReactNode {
+		return null;
 	}
 }
 

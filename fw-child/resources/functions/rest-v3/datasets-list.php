@@ -117,7 +117,10 @@ function cdc_rest_v3_get_datasets_list( $request ) {
 			}
 
 			// Add dataset type if set.
-			if ( ! empty( $dataset_type ) ) {
+			if (
+				! empty( $dataset_type ) &&
+				in_array( $dataset_type, array( 'projection', 'ahccd' ), true )
+			) {
 				$dataset['dataset_type'] = $dataset_type;
 			}
 

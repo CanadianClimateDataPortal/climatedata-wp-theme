@@ -75,6 +75,7 @@ function cdc_rest_v3_get_datasets_list( $request ) {
 			$card_description_fr = get_field( 'card_description_fr', 'term_' . $term_id );
 			$card_link           = get_field( 'card_link', 'term_' . $term_id );
 			$card_link_fr        = get_field( 'card_link_fr', 'term_' . $term_id );
+			$dataset_type        = get_field( 'dataset_type', 'term_' . $term_id );
 
 			// Build dataset array.
 			$dataset = array(
@@ -113,6 +114,14 @@ function cdc_rest_v3_get_datasets_list( $request ) {
 			// Add card object if it has content.
 			if ( ! empty( $card ) ) {
 				$dataset['card'] = $card;
+			}
+
+			// Add dataset type if set.
+			if (
+				! empty( $dataset_type ) &&
+				in_array( $dataset_type, array( 'projection', 'ahccd' ), true )
+			) {
+				$dataset['dataset_type'] = $dataset_type;
 			}
 
 			$datasets[] = $dataset;

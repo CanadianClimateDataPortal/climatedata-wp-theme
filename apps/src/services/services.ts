@@ -314,8 +314,6 @@ export const fetchPostsData = async (
 
 		const url = `${WP_API_DOMAIN}/wp-json/cdc/v3/${postType}-list?${queryParams.toString()}`;
 
-		console.log(`Fetching variables from: ${url}`);
-
 		// Fetch the data
 		const response = await fetch(url, {
 			method: 'GET',

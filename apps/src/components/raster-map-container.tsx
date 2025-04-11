@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 
 import MapLegend from '@/components/map-layers/map-legend';
@@ -8,6 +8,7 @@ import ZoomControl from '@/components/map-layers/zoom-control';
 import MapEvents from '@/components/map-layers/map-events';
 import SearchControl from '@/components/map-layers/search-control';
 import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions-layer';
+import LocationModal from '@/components/map-layers/location-modal';
 
 import { useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
@@ -18,6 +19,9 @@ import {
 	DEFAULT_MAX_ZOOM,
 	GEOSERVER_BASE_URL,
 } from '@/lib/constants';
+import { getDefaultFrequency, getFrequencyCode } from "@/lib/utils";
+import SectionContext from "@/context/section-provider";
+import { FrequencyType } from "@/types/climate-variable-interface";
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
@@ -29,11 +33,16 @@ export default function RasterMapContainer({
 	onMapReady: (map: L.Map) => void;
 	onUnmount?: () => void;
 }) {
+	const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
+
 	const {
 		opacity: { labels: labelsOpacity },
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
+
+	const section = useContext(SectionContext);
 
 	const layerValue: string = useMemo(() => {
 		let version;
@@ -43,17 +52,21 @@ export default function RasterMapContainer({
 
 		const scenario = climateVariable?.getScenario();
 		const threshold = climateVariable?.getThreshold();
-		const frequency = climateVariable?.getFrequency() ?? '';
 
-		let frequencyCode = '';
+		let frequency = climateVariable?.getFrequency() ?? null;
 
-		if (frequency === 'ann') {
-			frequencyCode = 'ys';
-		} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
-			frequencyCode = 'ms';
-		} else if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
-			frequencyCode = 'qsdec';
+		// If there's no frequency set, try to get the default value from the config.
+		const frequencyConfig = climateVariable?.getFrequencyConfig() ?? null;
+		if (!frequency && climateVariable && frequencyConfig) {
+			frequency = getDefaultFrequency(frequencyConfig, section) ?? null;
 		}
+
+		// Fallback to annual.
+		if (!frequency) {
+			frequency = FrequencyType.ANNUAL;
+		}
+
+		const frequencyCode = getFrequencyCode(frequency);
 
 		const value = [
 				version,
@@ -61,7 +74,7 @@ export default function RasterMapContainer({
 				frequencyCode,
 				scenario,
 				'p50',
-				climateVariable?.getFrequency(),
+				frequency,
 				'30year',
 			]
 			.filter(Boolean)
@@ -69,6 +82,16 @@ export default function RasterMapContainer({
 
 		return `CDC:${value}`;
 	}, [climateVariable])
+
+	const handleLocationModalOpen = (content: React.ReactNode) => {
+		setLocationModalContent(content);
+		setIsLocationModalOpen(true);
+	};
+
+	const handleLocationModalClose = () => {
+		setIsLocationModalOpen(false);
+		setLocationModalContent(null);
+	};
 
 	return (
 		<MapContainer
@@ -80,14 +103,25 @@ export default function RasterMapContainer({
 			scrollWheelZoom={true}
 			className="z-10" // important to keep the map below other interactive elements
 		>
-			<MapEvents onMapReady={onMapReady} onUnmount={onUnmount} />
+			<MapEvents
+				onMapReady={onMapReady}
+				onUnmount={onUnmount}
+				onLocationModalClose={handleLocationModalClose}
+			/>
 			<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
 			<CustomPanesLayer />
 			<VariableLayer layerValue={layerValue} />
 			<ZoomControl />
 			<SearchControl />
 
-			<InteractiveRegionsLayer />
+			<LocationModal
+				isOpen={isLocationModalOpen}
+				onClose={handleLocationModalClose}
+			>
+				{locationModalContent}
+			</LocationModal>
+
+			<InteractiveRegionsLayer onLocationModalOpen={handleLocationModalOpen} onLocationModalClose={handleLocationModalClose} />
 
 			<TileLayer
 				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

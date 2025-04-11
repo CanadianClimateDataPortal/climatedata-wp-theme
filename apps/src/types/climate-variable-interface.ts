@@ -1,4 +1,5 @@
 import React from "react";
+import { MultilingualField } from "./types";
 
 export interface ScenariosConfig {
 	[key: string]: string[];
@@ -82,6 +83,50 @@ export enum FileFormatType {
 	NetCDF = "netcdf",
 }
 
+export enum ColourType {
+	CONTINUOUS = "ramp",
+	DISCRETE = "intervals",
+}
+
+export interface TemporalRange {
+	low: number;
+	high: number;
+}
+
+export interface TemporalScaleConfig {
+	absolute: TemporalRange;
+	delta: TemporalRange;
+	unit: string;
+}
+
+export interface TemporalScales {
+	[key: string]: TemporalScaleConfig;
+}
+
+export interface TemporalThresholds {
+	[key: string]: TemporalScales;
+}
+
+export interface TemporalThresholdConfig {
+	thresholds: TemporalThresholds;
+	decimals?: number;
+}
+
+export interface CustomColourSchemeColour {
+	label: string;
+	colour: string;
+	quantity: number;
+}
+
+export interface CustomColourSchemeEntry {
+	colours: CustomColourSchemeColour[],
+	type: string;
+}
+
+export interface CustomColourSchemes {
+	[schemeKey: string]: CustomColourSchemeEntry;
+}
+
 export interface Coordinates {
 	lat: number;
 	lng: number;
@@ -100,6 +145,9 @@ export interface ClimateVariableConfigInterface {
 
 	/** WordPress Post ID, used for backend operations (optional) */
 	postId?: number;
+
+	/** Title of the climate variable from the API */
+	title?: string | MultilingualField;
 
 	/** Class name defining the type or category of the climate variable */
 	class: string;
@@ -128,6 +176,9 @@ export interface ClimateVariableConfigInterface {
 	/** Layer styles */
 	layerStyles?: string;
 
+	/** Unit */
+	unit?: string;
+
 	/** Configuration defining interactive region options and their status */
 	interactiveRegionConfig?: InteractiveRegionConfig;
 
@@ -146,14 +197,20 @@ export interface ClimateVariableConfigInterface {
 	/** Indicates whether delta (difference) values are available */
 	hasDelta?: boolean;
 
-	/** Default color scheme used for visualizing the variable */
-	defaultColourScheme?: string[];
-
 	/** Custom color scheme used for visualizing the variable */
-	colourScheme?: string[];
+	colourScheme?: string;
 
 	/** Flag indicating whether color options are enabled */
 	enableColourOptions?: boolean;
+
+	/** Custom colour schemes */
+	customColourSchemes?: CustomColourSchemes;
+
+	/** The type of colour map selected (e.g. continuous, discrete) */
+	colourType?: string;
+
+	/** Defines data ranges and units for different temporal scales (e.g. ys, ms, etc) */
+	temporalThresholdConfig?: TemporalThresholdConfig;
 
 	/** An array of FieldConfigs used in the Download section */
 	analysisFields?: FieldConfig[];
@@ -208,6 +265,11 @@ export interface ClimateVariableConfigInterface {
 export interface ClimateVariableInterface {
 	getId(): string;
 
+	/** Returns the post ID for the variable, if available. */
+	getPostId(): number | undefined;
+
+	getTitle(): string | null;
+
 	getVersions(): string[];
 
 	getVersion(): string | null;
@@ -226,6 +288,8 @@ export interface ClimateVariableInterface {
 
 	getLayerStyles(): string;
 
+	getUnit(): string;
+
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null;
 
 	getInteractiveRegion(): InteractiveRegionOption | null;
@@ -238,9 +302,15 @@ export interface ClimateVariableInterface {
 
 	hasDelta(): boolean | undefined;
 
-	getColourScheme(): string[];
+	getCustomColourSchemes(): CustomColourSchemes | null;
+
+	getColourScheme(): string | null;
 
 	getColourOptionsStatus(): boolean;
+
+	getColourType(): string | null;
+
+	getTemporalThresholdConfig(): TemporalThresholdConfig | null;
 
 	getAnalysisFields(): FieldConfig[];
 
@@ -283,4 +353,6 @@ export interface ClimateVariableInterface {
 	getSelectedPoints(): GridCoordinates | null;
 
 	toObject(): ClimateVariableConfigInterface;
+
+	getLocationModalContent(latlng: L.LatLng, featureId: number): React.ReactNode | null;
 }

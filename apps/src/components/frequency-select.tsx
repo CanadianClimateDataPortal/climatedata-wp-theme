@@ -11,11 +11,10 @@ import {
 } from "@/components/ui/select";
 import {
 	FrequencyConfig,
-	FrequencyDisplayModeOption,
 	FrequencyType,
 } from "@/types/climate-variable-interface";
 import { ControlTitle } from "@/components/ui/control-title";
-import { cn } from "@/lib/utils";
+import { cn, isFrequencyEnabled } from "@/lib/utils";
 
 interface FrequencySelectProps {
 	config: FrequencyConfig;
@@ -40,31 +39,12 @@ const FrequencySelect = ({
 }: FrequencySelectProps) => {
 	const { __ } = useI18n();
 
-	const isFrequencyEnabled = (frequencyType: FrequencyType): boolean => {
-		const configValue = config[frequencyType];
-		return Boolean(configValue && (
-			configValue === FrequencyDisplayModeOption.ALWAYS ||
-			configValue === section
-		));
-	};
-
-	const hasAnnual = isFrequencyEnabled(FrequencyType.ANNUAL);
-	const hasAnnualJulJun = isFrequencyEnabled(FrequencyType.ANNUAL_JUL_JUN);
-	const hasMonths = isFrequencyEnabled(FrequencyType.MONTHLY)
-	const hasAllMonths = isFrequencyEnabled(FrequencyType.ALL_MONTHS);
-	const hasSeasons = isFrequencyEnabled(FrequencyType.SEASONAL);
-	const hasDaily = isFrequencyEnabled(FrequencyType.DAILY);
-
-	let defaultValue = value ?? undefined;
-	if (!defaultValue) {
-		if (hasAnnual) {
-			defaultValue = FrequencyType.ANNUAL;
-		} else if (hasMonths) {
-			defaultValue = 'jan';
-		} else if (hasSeasons) {
-			defaultValue = 'spring'
-		}
-	}
+	const hasAnnual = isFrequencyEnabled(config, section, FrequencyType.ANNUAL);
+	const hasAnnualJulJun = isFrequencyEnabled(config, section, FrequencyType.ANNUAL_JUL_JUN);
+	const hasMonths = isFrequencyEnabled(config, section, FrequencyType.MONTHLY)
+	const hasAllMonths = isFrequencyEnabled(config, section, FrequencyType.ALL_MONTHS);
+	const hasSeasons = isFrequencyEnabled(config, section, FrequencyType.SEASONAL);
+	const hasDaily = isFrequencyEnabled(config, section, FrequencyType.DAILY);
 
 	const months = [
 		{ label: __('January'), value: 'jan' },
@@ -124,7 +104,7 @@ const FrequencySelect = ({
 	return (
 		<div className={cn('dropdown z-50', className)}>
 			<ControlTitle title={__(title)} tooltip={tooltip}/>
-			<Select value={defaultValue} onValueChange={onValueChange}>
+			<Select value={value} onValueChange={onValueChange}>
 				<SelectTrigger
 					className="w-full focus:ring-0 focus:ring-offset-0 text-cdc-black [&>svg]:text-brand-blue [&>svg]:opacity-100">
 					<SelectValue placeholder={placeholder && __(placeholder)}/>

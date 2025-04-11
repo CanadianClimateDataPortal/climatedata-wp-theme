@@ -1,49 +1,51 @@
 /**
  * Map colors dropdown component.
  *
- * A dropdown component that allows the user to select a a map color.
+ * A dropdown component that allows the user to select a map color.
  */
 import React from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 // components
 import { SidebarMenuItem } from '@/components/ui/sidebar';
-import Dropdown from '@/components/ui/dropdown';
 
 // other
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setMapColor } from '@/features/map/map-slice';
+import { RadioGroupFactory } from "@/components/ui/radio-group";
+import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { ColourSchemeDropdown } from "@/components/sidebar-menu-items/colour-scheme-dropdown";
+import { ColourType } from "@/types/climate-variable-interface";
 
 const MapColorsDropdown: React.FC = () => {
 	const { __ } = useI18n();
-
-	const dispatch = useAppDispatch();
-	const mapColor = useAppSelector((state) => state.map.mapColor);
-
-	// TODO: find out the correct options for the dropdown
-	const options = [
-		{ value: 'default', label: __('Default') },
-		{ value: 'warm', label: __('Warm Palette') },
-		{ value: 'cool', label: __('Cool Palette') },
-		{ value: 'custom', label: __('Custom Palette') },
-	];
+	const { climateVariable, setColourType, setColourScheme } = useClimateVariable();
 
 	const Tooltip = () => (
 		<div className="text-sm text-gray-500">{__('Select a map color.')}</div>
 	);
 
 	return (
-		<SidebarMenuItem>
-			<Dropdown
+		<SidebarMenuItem className={"space-y-4"}>
+			<ColourSchemeDropdown
+				title={'Map colours'}
 				placeholder={__('Select an option')}
-				options={options}
-				label={__('Map Colors')}
 				tooltip={<Tooltip />}
-				value={mapColor}
-				onChange={(value) => {
-					dispatch(setMapColor(value));
-				}}
+				value={climateVariable?.getColourScheme() ?? 'default'}
+				onValueChange={setColourScheme}
 			/>
+			{climateVariable?.getColourScheme() && climateVariable?.getColourScheme() !== 'default' && <RadioGroupFactory
+				name="colour-type"
+				orientation={"horizontal"}
+				options={[{
+					value: ColourType.DISCRETE,
+					label: __('Discrete'),
+				}, {
+					value: ColourType.CONTINUOUS,
+					label: __('Continuous'),
+				}]}
+				className={"space-x-2"}
+				value={climateVariable?.getColourType() ?? ColourType.CONTINUOUS}
+				onValueChange={setColourType}
+			/>}
 		</SidebarMenuItem>
 	);
 };

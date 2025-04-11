@@ -3,6 +3,8 @@ import {
 	AveragingType,
 	ClimateVariableConfigInterface,
 	ClimateVariableInterface,
+	ColourType,
+	CustomColourSchemes,
 	DateRangeConfig,
 	DownloadType,
 	FieldConfig,
@@ -11,7 +13,9 @@ import {
 	FrequencyConfig,
 	GridCoordinates,
 	InteractiveRegionConfig,
-	InteractiveRegionOption, ScenariosConfig,
+	InteractiveRegionOption,
+	ScenariosConfig,
+	TemporalThresholdConfig,
 	ThresholdInterface,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
@@ -31,6 +35,24 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getId(): string {
 		return this._config.id;
+	}
+
+	getPostId(): number | undefined {
+		return this._config.postId ?? undefined;
+	}
+
+	getTitle(locale?: string): string | null {
+		const title = this._config.title;
+
+		if (title && typeof title !== 'string' && 'en' in title) {
+
+				if (locale === 'fr' && title.fr) {
+						return title.fr;
+				}
+				return title.en;
+		}
+
+		return title as string || null;
 	}
 
 	getVersions(): string[] {
@@ -78,6 +100,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.layerStyles ?? '';
 	}
 
+	getUnit(): string {
+		return this._config.unit ?? '';
+	}
+
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null {
 		return this._config.interactiveRegionConfig ?? null;
 	}
@@ -118,12 +144,24 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.hasDelta;
 	}
 
-	getColourScheme(): string[] {
-		return this._config.colourScheme ?? this._config.defaultColourScheme ?? [];
+	getCustomColourSchemes(): CustomColourSchemes | null {
+		return this._config.customColourSchemes ?? null;
+	}
+
+	getColourScheme(): string | null {
+		return this._config.colourScheme ?? null
 	}
 
 	getColourOptionsStatus(): boolean {
 		return this._config.enableColourOptions ?? false;
+	}
+
+	getColourType(): string | null {
+		return this._config.colourType ?? ColourType.CONTINUOUS;
+	}
+
+	getTemporalThresholdConfig(): TemporalThresholdConfig | null {
+		return this._config.temporalThresholdConfig ?? null;
 	}
 
 	getAnalysisFields(): FieldConfig[] {
@@ -143,7 +181,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getDateRange(): string[] | null {
-		return this._config.dateRange ?? null;
+		return this._config.dateRange ?? [
+			"2040",
+			"2070",
+		];
 	}
 
 	getAveragingOptions(): AveragingType[] {
@@ -214,6 +255,11 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return {
 			...this._config,
 		};
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	getLocationModalContent(_latlng: L.LatLng, _featureId: number): React.ReactNode {
+		return null;
 	}
 }
 

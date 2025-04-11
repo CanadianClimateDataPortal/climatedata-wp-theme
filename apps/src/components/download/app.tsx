@@ -13,10 +13,11 @@ import StepSummary from '@/components/download/step-summary';
 import { MapProvider } from '@/context/map-provider';
 import { AnimatedPanelProvider } from '@/context/animated-panel-provider';
 import { DownloadProvider } from '@/context/download-provider';
+import { LocaleProvider } from '@/context/locale-provider';
 import { useDownload } from '@/hooks/use-download';
 import { cn } from '@/lib/utils';
-import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { DownloadType } from "@/types/climate-variable-interface";
+import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { DownloadType } from '@/types/climate-variable-interface';
 
 const Steps: React.FC = () => {
 	const { __ } = useI18n();
@@ -55,9 +56,12 @@ const Steps: React.FC = () => {
 		if (!isLastStep) {
 			goToNextStep();
 		} else {
-			if (climateVariable?.getDownloadType() === DownloadType.PRECALCULATED) {
+			if (
+				climateVariable?.getDownloadType() ===
+				DownloadType.PRECALCULATED
+			) {
 				// Generate the file to be downloaded.
-				climateVariable.getDownloadUrl().then(url => {
+				climateVariable.getDownloadUrl().then((url) => {
 					// @todo Either print or immediately initiate the download.
 					console.log(url);
 				});
@@ -76,10 +80,10 @@ const Steps: React.FC = () => {
 				onClick={handleNext}
 				disabled={isDisabled}
 				className={cn(
-					'w-64 mx-auto sm:mx-0 py-2 rounded-full uppercase bg-brand-red text-white',
+					'w-64 mx-auto sm:mx-0 py-2 rounded-full uppercase text-white tracking-wider',
 					isDisabled
-						? 'opacity-50 cursor-not-allowed'
-						: 'hover:bg-brand-red/75'
+						? 'bg-brand-red/25 cursor-not-allowed'
+						: 'bg-brand-red hover:bg-brand-red/75'
 				)}
 			>
 				{buttonText} &rarr;
@@ -90,24 +94,26 @@ const Steps: React.FC = () => {
 Steps.displayName = 'Steps';
 
 const App: React.FC = () => (
-	<MapProvider>
-		<AnimatedPanelProvider>
-			<DownloadProvider>
-				<div className="min-h-screen bg-cold-grey-1">
-					<div className="max-w-6xl mx-auto py-10">
-						<div className="flex flex-col sm:flex-row gap-4">
-							<div className="flex-1">
-								<Steps />
-							</div>
-							<div className="w-full sm:w-72">
-								<StepSummary />
+	<LocaleProvider>
+		<MapProvider>
+			<AnimatedPanelProvider>
+				<DownloadProvider>
+					<div className="min-h-screen bg-cold-grey-1">
+						<div className="max-w-6xl mx-auto py-10">
+							<div className="flex flex-col sm:flex-row gap-4">
+								<div className="flex-1">
+									<Steps />
+								</div>
+								<div className="w-full sm:w-72">
+									<StepSummary />
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			</DownloadProvider>
-		</AnimatedPanelProvider>
-	</MapProvider>
+				</DownloadProvider>
+			</AnimatedPanelProvider>
+		</MapProvider>
+	</LocaleProvider>
 );
 
 export default App;

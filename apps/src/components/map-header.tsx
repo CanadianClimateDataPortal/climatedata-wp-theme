@@ -6,7 +6,7 @@
  * and buttons that toggle share and download map modals.
  *
  */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Info, Share2, Download } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
 import { cn } from '@/lib/utils';
@@ -20,6 +20,9 @@ import { Button } from '@/components/ui/button';
 // other
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
 import { MapInfoProps, ProviderPanelProps } from '@/types/types';
+import { useLocale } from "@/hooks/use-locale";
+import { useAppSelector } from "@/app/hooks";
+import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 /**
  * MapHeader component, displays the header for the map with breadcrumbs and buttons for extra information.
@@ -31,6 +34,8 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 		ProviderPanelProps | undefined
 	>(undefined);
 	const { togglePanel } = useAnimatedPanel();
+
+	const { locale } = useLocale();
 
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -78,7 +83,6 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 				>
 					<div className="flex items-center gap-x-2 bg-white p-4">
 						<Breadcrumbs
-							title={data.title}
 							onClick={toggleVariableDetailsPanel}
 						/>
 						<ModalToggleButtons
@@ -93,7 +97,7 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 			<DownloadMapModal
 				isOpen={downloadInfo}
 				onClose={toggleDownloadInfo}
-				title={data?.title ?? ''}
+				title={data?.dataset?.[0]?.title?.[locale] ?? ''}
 			/>
 		</>
 	);
@@ -103,26 +107,45 @@ MapHeader.displayName = 'MapHeader';
 /**
  * Breadcrumbs component, displays the breadcrumbs for the selected state of the map.
  */
-const Breadcrumbs: React.FC<{ title: string; onClick: () => void }> = ({
-	title,
+const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
 	onClick,
 }) => {
 	const { __ } = useI18n();
+	const { locale } = useLocale();
+	const dataset = useAppSelector((state) => state.map.dataset);
+	const { climateVariable } = useClimateVariable();
 
-	// TODO: replace this with dynamically generated breadcrumbs
+	const datasetName = useMemo(() => {
+		if (!dataset) return '';
+		return locale === 'fr' && dataset.title.fr
+			? dataset.title.fr
+			: dataset.title.en;
+	}, [dataset, locale]);
+
+	const variableTitle = useMemo(() => {
+		if (climateVariable && climateVariable.toObject().postId) {
+			return climateVariable.getTitle() || '';
+		}
+
+		// Don't show anything if no variable is explicitly selected
+		return '';
+	}, [climateVariable]);
+
 	return (
-		<div>
-			<span className="me-2">{__('ClimateData Canada')}</span>/
-			<span className="mx-2">{__('Map')}</span>/
-			<Button
-				variant="ghost"
-				className="text-md text-cdc-black hover:text-dark-purple hover:bg-transparent ms-2 p-0 h-auto"
-				onClick={onClick}
-				aria-label={__('View details')}
-			>
-				{title}
-				<Info />
-			</Button>
+		<div className="flex items-center gap-2">
+			{datasetName && <span>{datasetName}</span>}
+			{datasetName && variableTitle && <span>/</span>}
+			{variableTitle && (
+				<Button
+					variant="ghost"
+					className="text-md text-cdc-black hover:text-dark-purple hover:bg-transparent p-0 h-auto"
+					onClick={onClick}
+					aria-label={__('View details')}
+				>
+					{variableTitle}
+					<Info />
+				</Button>
+			)}
 		</div>
 	);
 };

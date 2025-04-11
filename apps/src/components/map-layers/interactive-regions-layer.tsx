@@ -1,7 +1,7 @@
 /**
  * Component that adds interaction to the map depending on the selected region (gridded data, watershed, health, census).
  */
-import React, { useCallback, useEffect, useMemo, useRef, useState, } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState, } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.vectorgrid';
@@ -18,6 +18,8 @@ import {
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { ColourType, InteractiveRegionOption } from "@/types/climate-variable-interface";
 import { generateColourScheme } from "@/lib/colour-scheme";
+import { getDefaultFrequency } from "@/lib/utils";
+import SectionContext from "@/context/section-provider";
 
 interface InteractiveRegionsLayerProps {
 	onLocationModalOpen: (content: React.ReactNode) => void;
@@ -33,6 +35,8 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 	const layerRef = useRef<L.VectorGrid | null>(null);
 
 	const map = useMap();
+
+	const section = useContext(SectionContext);
 
 	const {
 		legendData,
@@ -225,7 +229,11 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 				return;
 			}
 
-			const frequency = climateVariable?.getFrequency() ?? '';
+			const frequencyConfig = climateVariable?.getFrequencyConfig();
+			let frequency = climateVariable?.getFrequency() ?? ''
+			if (!frequency && frequencyConfig) {
+				frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
+			}
 			const [ startYear ] = climateVariable?.getDateRange() ?? [];
 
 			try {
@@ -246,6 +254,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 		})();
 	}, [
 		climateVariable,
+		section,
 	]);
 
 	useEffect(() => {

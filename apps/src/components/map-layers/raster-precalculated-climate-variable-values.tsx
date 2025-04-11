@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useContext } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 import L from 'leaflet';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
@@ -7,6 +7,8 @@ import { fetchDeltaValues, generateChartData } from '@/services/services';
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
 import { useAppSelector } from '@/app/hooks';
 import { doyFormatter } from '@/lib/format';
+import { getDefaultFrequency } from "@/lib/utils";
+import SectionContext from "@/context/section-provider";
 
 interface RasterPrecalcultatedClimateVariableValuesProps {
   latlng: L.LatLng;
@@ -35,6 +37,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
     return climateVariable?.getDateRange() ?? ["2041", "2070"];
   }, [climateVariable]);
   const dataValue = useAppSelector((state) => state.map.dataValue);
+	const section = useContext(SectionContext);
 
   const [ median, setMedian ] = useState<number | null>(null);
   const [ range, setRange ] = useState<number[] | null>(null);
@@ -52,8 +55,14 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
     const fetchData = async () => {
       if (!decadeValue && !variableId) return;
 
+      const frequencyConfig = climateVariable?.getFrequencyConfig();
+      let frequency = climateVariable?.getFrequency() ?? ''
+      if (!frequency && frequencyConfig) {
+        frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
+      }
+
       const scenario = climateVariable?.getScenario() ?? '';
-      const frequency = climateVariable?.getFrequency() ?? '';
+      const version = climateVariable?.getVersion() ?? '';
 
       // Special case variable id
       const varName =
@@ -99,8 +108,8 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
       const chartsData = await generateChartData({
         latlng: latlng,
         variable: varName,
-        frequency: climateVariable?.getFrequency() ?? '',
-        dataset: climateVariable?.getVersion() ?? '',
+        frequency: frequency,
+        dataset: version,
       });
 
       const deltaValueKey = 'delta7100_' + scenario + '_median';
@@ -134,28 +143,26 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
     };
 
     fetchData();
-  }, [climateVariable, dataValue, decimals, dateRange, featureId, latlng]);
+  }, [climateVariable, dataValue, decimals, dateRange, featureId, latlng, section]);
 
   // Value formatter (for delta, for units)
   const valueFormatter = (value: number, delta: boolean = (dataValue === 'delta')) => {
+    const unit = climateVariable?.getUnit();
     let str = '';
+
+    if(unit === 'doy') {
+      if(delta) {
+        str = `${value.toFixed(decimals)} days`;
+      } else {
+        str = doyFormatter(value, locale);
+      }
+    } else {
+      str = `${value.toFixed(decimals)} ${unit}`;
+    }
 
     // If delta, we add a "+" for positive values
     if(delta && value > 0) {
-      str += '+';
-    }
-
-    // handle different units
-    const unit = climateVariable?.getUnit();
-    switch (unit) {
-      case 'doy':
-        str += doyFormatter(value, locale);
-        break;
-
-      default:
-        str += value.toFixed(decimals);
-        str += ` ${unit}`;
-        break;
+      str = '+' + str;
     }
 
     return str;
@@ -221,7 +228,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
   };
 
 	return (
-		<div className={mode === "modal" ? "mt-4 mb-4" : "mr-6 flex-grow flex gap-6 justify-end"}>
+		<div className={mode === "modal" ? "mt-4 mb-4" : "flex-grow flex gap-6 justify-end"}>
       {noDataAvailable ? (
         <div>
           <p className='text-base text-neutral-grey-medium italic'>

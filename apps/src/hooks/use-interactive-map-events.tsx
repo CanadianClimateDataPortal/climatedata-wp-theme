@@ -1,7 +1,7 @@
 /**
  * Hook that returns event handlers for interactive map layers.
  */
-import React, { useRef } from 'react';
+import React, { useRef, useContext } from 'react';
 import L from 'leaflet';
 
 import LocationInfoPanel from '@/components/map-info/location-info-panel';
@@ -14,6 +14,8 @@ import { fetchLocationByCoords, generateChartData, } from '@/services/services';
 import { SIDEBAR_WIDTH } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
+import { getDefaultFrequency } from "@/lib/utils";
+import SectionContext from "@/context/section-provider";
 
 export const useInteractiveMapEvents = (
 	// @ts-expect-error: suppress leaflet typescript error
@@ -24,6 +26,7 @@ export const useInteractiveMapEvents = (
 ) => {
 	const { togglePanel } = useAnimatedPanel();
 	const { climateVariable } = useClimateVariable();
+	const section = useContext(SectionContext);
 
 	const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const hoveredRef = useRef<number | null>(null);
@@ -56,10 +59,16 @@ export const useInteractiveMapEvents = (
 					onLocationModalClose();
 				}
 
+				const frequencyConfig = climateVariable?.getFrequencyConfig();
+				let frequency = climateVariable?.getFrequency() ?? ''
+				if (!frequency && frequencyConfig) {
+					frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
+				}
+
 				const chartData = await generateChartData({
 					latlng,
 					variable: climateVariable?.getThreshold() ?? '',
-					frequency: climateVariable?.getFrequency() ?? '',
+					frequency: frequency,
 					dataset: climateVariable?.getVersion() ?? '',
 				});
 

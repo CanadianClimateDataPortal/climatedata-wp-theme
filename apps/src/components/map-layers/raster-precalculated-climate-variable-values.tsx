@@ -11,9 +11,9 @@ import { getDefaultFrequency } from "@/lib/utils";
 import SectionContext from "@/context/section-provider";
 
 interface RasterPrecalcultatedClimateVariableValuesProps {
-  latlng: L.LatLng;
-  featureId: number,
-  mode: "modal" | "panel"
+	latlng: L.LatLng;
+	featureId: number,
+	mode: "modal" | "panel"
 }
 
 /**
@@ -25,227 +25,227 @@ interface RasterPrecalcultatedClimateVariableValuesProps {
  * Can be used in the location modal and charts panel
  */
 const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedClimateVariableValuesProps> = ({
-  latlng,
-  featureId,
-  mode,
+	latlng,
+	featureId,
+	mode,
 }) => {
 	const { __ } = useI18n();
-  const { locale } = useLocale();
-  const { climateVariable } = useClimateVariable();
-  const decimals = 1;
-  const dateRange = useMemo(() => {
-    return climateVariable?.getDateRange() ?? ["2041", "2070"];
-  }, [climateVariable]);
-  const dataValue = useAppSelector((state) => state.map.dataValue);
+	const { locale } = useLocale();
+	const { climateVariable } = useClimateVariable();
+	const decimals = 1;
+	const dateRange = useMemo(() => {
+		return climateVariable?.getDateRange() ?? ["2041", "2070"];
+	}, [climateVariable]);
+	const dataValue = useAppSelector((state) => state.map.dataValue);
 	const section = useContext(SectionContext);
 
-  const [ median, setMedian ] = useState<number | null>(null);
-  const [ range, setRange ] = useState<number[] | null>(null);
-  const [ relativeToBaseline, setRelativeToBaseline ] = useState<number | null>(null);
-  const [ noDataAvailable, setNoDataAvailable ] = useState<boolean>(false);
+	const [ median, setMedian ] = useState<number | null>(null);
+	const [ range, setRange ] = useState<number[] | null>(null);
+	const [ relativeToBaseline, setRelativeToBaseline ] = useState<number | null>(null);
+	const [ noDataAvailable, setNoDataAvailable ] = useState<boolean>(false);
 
-  // useEffect to retrieve location values for the current climate variable
-  useEffect(() => {
-    const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
-    const variableId = climateVariable?.getId() ?? '';
-    const variable = climateVariable?.getThreshold() ?? '';
-    const { lat, lng } = latlng;
-    const decadeValue = parseInt(dateRange[0]) - (parseInt(dateRange[0]) % 10) + 1;
+	// useEffect to retrieve location values for the current climate variable
+	useEffect(() => {
+		const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
+		const variableId = climateVariable?.getId() ?? '';
+		const variable = climateVariable?.getThreshold() ?? '';
+		const { lat, lng } = latlng;
+		const decadeValue = parseInt(dateRange[0]) - (parseInt(dateRange[0]) % 10) + 1;
 
-    const fetchData = async () => {
-      if (!decadeValue && !variableId) return;
+		const fetchData = async () => {
+			if (!decadeValue && !variableId) return;
 
-      const frequencyConfig = climateVariable?.getFrequencyConfig();
-      let frequency = climateVariable?.getFrequency() ?? ''
-      if (!frequency && frequencyConfig) {
-        frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
-      }
+			const frequencyConfig = climateVariable?.getFrequencyConfig();
+			let frequency = climateVariable?.getFrequency() ?? ''
+			if (!frequency && frequencyConfig) {
+				frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
+			}
 
-      const scenario = climateVariable?.getScenario() ?? '';
-      const version = climateVariable?.getVersion() ?? '';
+			const scenario = climateVariable?.getScenario() ?? '';
+			const version = climateVariable?.getVersion() ?? '';
 
-      // Special case variable id
-      const varName =
-        variableId === 'building_climate_zones'
-          ? 'hddheat_18'
-          : variable;
+			// Special case variable id
+			const varName =
+				variableId === 'building_climate_zones'
+					? 'hddheat_18'
+					: variable;
 
-      // Fetching median and range
+			// Fetching median and range
 
-      // Endpoint
-      let medianRangeEndpoint = `get-delta-30y-regional-values/${interactiveRegion}/${featureId}`;
-      if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
-        medianRangeEndpoint = `get-delta-30y-gridded-values/${lat}/${lng}`;
-      }
+			// Endpoint
+			let medianRangeEndpoint = `get-delta-30y-regional-values/${interactiveRegion}/${featureId}`;
+			if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
+				medianRangeEndpoint = `get-delta-30y-gridded-values/${lat}/${lng}`;
+			}
 
-      // Params
-      const medianRangeParams = new URLSearchParams({
-        period: String(decadeValue),
-        decimals: decimals.toString(),
-        delta7100: dataValue === 'delta' ? 'true' : 'false',
-        dataset_name: climateVariable?.getVersion() ?? '',
-      }).toString();
+			// Params
+			const medianRangeParams = new URLSearchParams({
+				period: String(decadeValue),
+				decimals: decimals.toString(),
+				delta7100: dataValue === 'delta' ? 'true' : 'false',
+				dataset_name: climateVariable?.getVersion() ?? '',
+			}).toString();
 
-      const medianRangeData = await fetchDeltaValues({
-        endpoint: medianRangeEndpoint,
-        varName,
-        frequency: frequency,
-        params: medianRangeParams,
-      });
+			const medianRangeData = await fetchDeltaValues({
+				endpoint: medianRangeEndpoint,
+				varName,
+				frequency: frequency,
+				params: medianRangeParams,
+			});
 
-      if(medianRangeData === null) {
-        // If we don't have data
-        setNoDataAvailable(true);
-      } else {
-        setMedian(medianRangeData[scenario]?.p50 || 0);
-        setRange([medianRangeData[scenario]?.p10 || 0, medianRangeData[scenario]?.p90 || 0]);
-        setNoDataAvailable(false);
-      }
+			if(medianRangeData === null) {
+				// If we don't have data
+				setNoDataAvailable(true);
+			} else {
+				setMedian(medianRangeData[scenario]?.p50 || 0);
+				setRange([medianRangeData[scenario]?.p10 || 0, medianRangeData[scenario]?.p90 || 0]);
+				setNoDataAvailable(false);
+			}
 
-      // Fetching relative to baseline
+			// Fetching relative to baseline
 
-      // Params
-      const chartsData = await generateChartData({
-        latlng: latlng,
-        variable: varName,
-        frequency: frequency,
-        dataset: version,
-      });
+			// Params
+			const chartsData = await generateChartData({
+				latlng: latlng,
+				variable: varName,
+				frequency: frequency,
+				dataset: version,
+			});
 
-      const deltaValueKey = 'delta7100_' + scenario + '_median';
+			const deltaValueKey = 'delta7100_' + scenario + '_median';
 
-      // If annual, we take the first month (so 0)
-      // If monthly, we take the frequency month index
-      // If seasonal, we take the related month index
-      let month = 0;
-      const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-      const seasons = ['spring', 'summer', 'fall', 'winter'];
-      if(months.includes(frequency)) {
-        month = months.indexOf(frequency);
-      } else if(seasons.includes(frequency)) {
-        if(frequency == 'spring') month = 2;
-        else if(frequency == 'summer') month = 5;
-        else if(frequency == 'fall') month = 8;
-        else if(frequency == 'winter') month = 11;
-      }
+			// If annual, we take the first month (so 0)
+			// If monthly, we take the frequency month index
+			// If seasonal, we take the related month index
+			let month = 0;
+			const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+			const seasons = ['spring', 'summer', 'fall', 'winter'];
+			if(months.includes(frequency)) {
+				month = months.indexOf(frequency);
+			} else if(seasons.includes(frequency)) {
+				if(frequency == 'spring') month = 2;
+				else if(frequency == 'summer') month = 5;
+				else if(frequency == 'fall') month = 8;
+				else if(frequency == 'winter') month = 11;
+			}
 
-      const timestamp = Date.UTC(decadeValue, month, 1, 0, 0, 0);
+			const timestamp = Date.UTC(decadeValue, month, 1, 0, 0, 0);
 
-      if(
-        chartsData[deltaValueKey] !== undefined 
-        && chartsData[deltaValueKey][timestamp] !== undefined
-        && chartsData[deltaValueKey][timestamp][0] !== undefined
-      ) {
-        setRelativeToBaseline(chartsData[deltaValueKey][timestamp][0]);
-      } else {
-        setRelativeToBaseline(null);
-      }
-    };
+			if(
+				chartsData[deltaValueKey] !== undefined 
+				&& chartsData[deltaValueKey][timestamp] !== undefined
+				&& chartsData[deltaValueKey][timestamp][0] !== undefined
+			) {
+				setRelativeToBaseline(chartsData[deltaValueKey][timestamp][0]);
+			} else {
+				setRelativeToBaseline(null);
+			}
+		};
 
-    fetchData();
-  }, [climateVariable, dataValue, decimals, dateRange, featureId, latlng, section]);
+		fetchData();
+	}, [climateVariable, dataValue, decimals, dateRange, featureId, latlng, section]);
 
-  // Value formatter (for delta, for units)
-  const valueFormatter = (value: number, delta: boolean = (dataValue === 'delta')) => {
-    const unit = climateVariable?.getUnit();
-    let str = '';
+	// Value formatter (for delta, for units)
+	const valueFormatter = (value: number, delta: boolean = (dataValue === 'delta')) => {
+		const unit = climateVariable?.getUnit();
+		let str = '';
 
-    if(unit === 'doy') {
-      if(delta) {
-        str = `${value.toFixed(decimals)} days`;
-      } else {
-        str = doyFormatter(value, locale);
-      }
-    } else {
-      str = `${value.toFixed(decimals)} ${unit}`;
-    }
+		if(unit === 'doy') {
+			if(delta) {
+				str = `${value.toFixed(decimals)} days`;
+			} else {
+				str = doyFormatter(value, locale);
+			}
+		} else {
+			str = `${value.toFixed(decimals)} ${unit}`;
+		}
 
-    // If delta, we add a "+" for positive values
-    if(delta && value > 0) {
-      str = '+' + str;
-    }
+		// If delta, we add a "+" for positive values
+		if(delta && value > 0) {
+			str = '+' + str;
+		}
 
-    return str;
-  };
+		return str;
+	};
 
-  // Generate median div
-  const generateMedianDiv = (median: number) => {
-    const formattedMedian = valueFormatter(median);
+	// Generate median div
+	const generateMedianDiv = (median: number) => {
+		const formattedMedian = valueFormatter(median);
 
-    return (
-      <div className={mode === "modal" ? "w-1/2" : ""}>
-        <div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
-          { formattedMedian }
-        </div>
-        <div className={mode === "modal" ? "" : "flex gap-2"}>
-          <div className='text-xs font-semibold text-neutral-grey-medium uppercase tracking-wider'>
-            {__('Median')}
-          </div>
-          <div className='text-xs text-neutral-grey-medium'>
-            ({ dateRange[0] } - { dateRange[1] })
-          </div>
-        </div>
-      </div>
-    );
-  };
+		return (
+			<div className={mode === "modal" ? "w-1/2" : ""}>
+				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
+					{ formattedMedian }
+				</div>
+				<div className={mode === "modal" ? "" : "flex gap-2"}>
+					<div className='text-xs font-semibold text-neutral-grey-medium uppercase tracking-wider'>
+						{__('Median')}
+					</div>
+					<div className='text-xs text-neutral-grey-medium'>
+						({ dateRange[0] } - { dateRange[1] })
+					</div>
+				</div>
+			</div>
+		);
+	};
 
-  // Generate relative to base div
-  const generateRelativeToBaselineDiv = (relativeToBaseline: number) => {
-    const formattedRelativeToBaseline = valueFormatter(relativeToBaseline, true);
+	// Generate relative to base div
+	const generateRelativeToBaselineDiv = (relativeToBaseline: number) => {
+		const formattedRelativeToBaseline = valueFormatter(relativeToBaseline, true);
 
-    return (
-      <div className={mode === "modal" ? "w-1/2" : ""}>
-        <div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
-          { formattedRelativeToBaseline }
-        </div>
-        <div className={mode === "modal" ? "" : "flex gap-2"}>
-          <div className='text-xs font-semibold text-neutral-grey-medium uppercase tracking-wider whitespace-nowrap'>
-            {__('Relative to baseline')}
-          </div>
-          <div className='text-xs text-neutral-grey-medium'>
-            (1971 - 2000)
-          </div>
-        </div>
-      </div>
-    );
-  };
+		return (
+			<div className={mode === "modal" ? "w-1/2" : ""}>
+				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
+					{ formattedRelativeToBaseline }
+				</div>
+				<div className={mode === "modal" ? "" : "flex gap-2"}>
+					<div className='text-xs font-semibold text-neutral-grey-medium uppercase tracking-wider whitespace-nowrap'>
+						{__('Relative to baseline')}
+					</div>
+					<div className='text-xs text-neutral-grey-medium'>
+						(1971 - 2000)
+					</div>
+				</div>
+			</div>
+		);
+	};
 
-  // Generate range div
-  const generateRangeDiv = (rangeStartValue: number, rangeEndValue: number) => {
-    const rangeStart = valueFormatter(rangeStartValue);
-    const rangeEnd = valueFormatter(rangeEndValue);
-    
-    return (
-      <>
-        <div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
-          {rangeStart} {__('to')} {rangeEnd}
-        </div>
-        <div className='text-xs font-semibold text-neutral-grey-medium uppercase tracking-wider'>
-          {__('Range')}
-        </div>
-      </>
-    );
-  };
+	// Generate range div
+	const generateRangeDiv = (rangeStartValue: number, rangeEndValue: number) => {
+		const rangeStart = valueFormatter(rangeStartValue);
+		const rangeEnd = valueFormatter(rangeEndValue);
+		
+		return (
+			<>
+				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
+					{rangeStart} {__('to')} {rangeEnd}
+				</div>
+				<div className='text-xs font-semibold text-neutral-grey-medium uppercase tracking-wider'>
+					{__('Range')}
+				</div>
+			</>
+		);
+	};
 
 	return (
 		<div className={mode === "modal" ? "mt-4 mb-4" : "flex-grow flex gap-6 justify-end"}>
-      {noDataAvailable ? (
-        <div>
-          <p className='text-base text-neutral-grey-medium italic'>
-            {__('No data available.')}
-          </p>
-        </div>
-      ) : (
-        <>
-          <div className={mode === "modal" ? "mb-3 flex" : "flex gap-6"}>
-            { median !== null && generateMedianDiv(median) }
-            { relativeToBaseline !== null && generateRelativeToBaselineDiv(relativeToBaseline) }
-          </div>
-          <div>
-            { range !== null && generateRangeDiv(range[0], range[1]) }
-          </div>
-        </>
-      )}
+			{noDataAvailable ? (
+				<div>
+					<p className='text-base text-neutral-grey-medium italic'>
+						{__('No data available.')}
+					</p>
+				</div>
+			) : (
+				<>
+					<div className={mode === "modal" ? "mb-3 flex" : "flex gap-6"}>
+						{ median !== null && generateMedianDiv(median) }
+						{ relativeToBaseline !== null && generateRelativeToBaselineDiv(relativeToBaseline) }
+					</div>
+					<div>
+						{ range !== null && generateRangeDiv(range[0], range[1]) }
+					</div>
+				</>
+			)}
 		</div>
 	);
 };

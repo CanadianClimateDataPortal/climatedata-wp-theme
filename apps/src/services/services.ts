@@ -27,7 +27,7 @@ const dummyResponses = {
 
 type DummyResponseKey = keyof typeof dummyResponses;
 
-import {WP_API_DOMAIN, WP_API_VARIABLE_PATH} from "@/lib/constants.ts";
+import { WP_API_DOMAIN, WP_API_LOCATION_BY_COORDS_PATH, WP_API_VARIABLE_PATH } from "@/lib/constants.ts";
 
 export const fetchRelatedData = async (): Promise<RelatedData> => {
 	// TODO: uncomment this and use correct API endpoint when ready
@@ -241,13 +241,28 @@ export const fetchPostsData = async (
  * @param latlng Latitude and Longitude of the location
  */
 export const fetchLocationByCoords = async (latlng: L.LatLng) => {
-	const response = await fetch(`https://dev-en.climatedata.ca/wp-json/cdc/v2/get_location_by_coords/?lat=${latlng.lat}&lng=${latlng.lng}&sealevel=false`);
-	
-	if (!response.ok) {
-		throw new Error('Failed to fetch data');
-	}
+	try {
+		// Make the Fetch request.
+		const response = await fetch(`${WP_API_DOMAIN}${WP_API_LOCATION_BY_COORDS_PATH}?lat=${latlng.lat}&lng=${latlng.lng}&sealevel=false`, {
+			method: 'GET',
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json',
+			},
+		});
 
-	return await response.json();
+		// Handle HTTP errors
+		if (!response.ok) {
+			const errorDetails = await response.json();
+			throw new Error(`HTTP error ${response.status}: ${response.statusText} - ${errorDetails}`);
+		}
+
+		// Parse response JSON
+		return await response.json();
+	} catch (error) {
+		console.error('Fetch error:', error);
+		throw error;
+	}
 };
 
 /**
@@ -258,7 +273,7 @@ export const fetchLocationByCoords = async (latlng: L.LatLng) => {
 export const generateChartData = async (options: ChartDataOptions) => {
 	const { latlng: { lat, lng }, dataset, variable, frequency  } = options;
 	const response = await fetch(`https://dataclimatedata.crim.ca/generate-charts/${lat}/${lng}/${variable}/${frequency}?decimals=1&dataset_name=${dataset}`);
-	
+
 	if (!response.ok) {
 		throw new Error('Failed to fetch data');
 	}
@@ -274,7 +289,7 @@ export const generateChartData = async (options: ChartDataOptions) => {
 export const fetchDeltaValues = async (options: DeltaValuesOptions) => {
 	try {
 		const { endpoint, varName, frequency, params } = options;
-		
+
 		const response = await fetch(`//dataclimatedata.crim.ca/${endpoint}/${varName}/${frequency}?${params}`);
 
 		if (!response.ok) {

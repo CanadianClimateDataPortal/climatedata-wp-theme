@@ -37,7 +37,6 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 
 	const map = useMap();
 	const dispatch = useAppDispatch();
-
 	const section = useContext(SectionContext);
 
 	const {

@@ -1,4 +1,4 @@
-import React, { useEffect, isValidElement, useMemo } from 'react';
+import React, { useEffect, isValidElement, useMemo, useRef } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
@@ -30,90 +30,149 @@ const VariableRadioCards: React.FC<{
 	const { activePanel, closePanel } = useAnimatedPanel();
 	const searchQuery = useAppSelector(selectSearchQuery);
 
+	// Keep track of dataset changes and previous state
+	const prevDatasetRef = useRef<number | null>(null);
+	const fetchingRef = useRef<boolean>(false);
+	const initialLoadRef = useRef<boolean>(true);
+
 	const filteredVariableList = useMemo(() => {
-		if (!searchQuery || searchQuery.trim() === '') {
-			return variableList;
+		let filtered = [...variableList];
+
+		// Apply search filter if exists
+		if (searchQuery && searchQuery.trim() !== '') {
+			const query = searchQuery.toLowerCase();
+			filtered = filtered.filter(item => {
+				const title = (item.title || '').toLowerCase();
+				const description = (item.description || '').toLowerCase();
+				return title.includes(query) || description.includes(query);
+			});
 		}
 
-		const query = searchQuery.toLowerCase();
-		return variableList.filter(item => {
-			const title = (item.title || '').toLowerCase();
-			const description = (item.description || '').toLowerCase();
-			return title.includes(query) || description.includes(query);
-		});
-	}, [variableList, searchQuery]);
+		// Apply sector filter if selected
+		if (filterValues.sector) {
+			filtered = filtered.filter(item => {
+				const sectors = item.taxonomies?.sector || [];
+				return sectors.some(sector => sector.id.toString() === filterValues.sector);
+			});
+		}
 
-	// Fetch variables when dataset or filters change
+		// Apply variable type filter if selected
+		if (filterValues['var-type']) {
+			filtered = filtered.filter(item => {
+				const varTypes = item.taxonomies?.['var-type'] || [];
+				return varTypes.some(varType => varType.id.toString() === filterValues['var-type']);
+			});
+		}
+
+		return filtered;
+	}, [variableList, searchQuery, filterValues]);
+
+	// Fetch all variables when dataset changes (without filters)
 	useEffect(() => {
-		if (!dataset) return;
+		if (!dataset || !dataset.term_id) return;
 
-		if (variableList.length === 0) {
-			dispatch(setVariableListLoading(true));
+		// Skip if we're already fetching
+		if (fetchingRef.current) return;
 
-			// Tracking if component is still mounted in this
-			let isMounted = true;
+		// Only fetch if dataset changed or this is initial load
+		const didDatasetChange = prevDatasetRef.current !== dataset.term_id;
+		if (!didDatasetChange && !initialLoadRef.current && variableList.length > 0) {
+			return;
+		}
 
-			(async () => {
-				const data = await fetchPostsData('variables', section, dataset, filterValues);
+		prevDatasetRef.current = dataset.term_id;
+		fetchingRef.current = true;
+		initialLoadRef.current = false;
+
+		dispatch(setVariableListLoading(true));
+
+		// Tracking if component is still mounted
+		let isMounted = true;
+
+		(async () => {
+			try {
+				const data = await fetchPostsData('variables', section, dataset, {});
 				const normalizedData = await normalizePostData(data, locale);
 
 				if (isMounted) {
-					// Storing the variables in Redux
+					// Store the variables in Redux
 					dispatch(setVariableList(normalizedData));
 
 					if (normalizedData.length > 0 && !selected) {
-						onSelect(normalizedData[0]);
-						selectClimateVariable(normalizedData[0]);
+						// Use filtered list in case filters are already applied
+						const firstItem = filteredVariableList.length > 0 ?
+							filteredVariableList[0] : normalizedData[0];
+						onSelect(firstItem);
+						selectClimateVariable(firstItem);
 					}
 				}
-			})();
+			} catch (error) {
+				console.error('Error fetching variables:', error);
+				if (isMounted) {
+					dispatch(setVariableList([]));
+				}
+			} finally {
+				if (isMounted) {
+					fetchingRef.current = false;
+				}
+			}
+		})();
 
-			return () => {
-				isMounted = false;
-			};
-		} else if (variableList.length > 0 && !selected) {
-			onSelect(variableList[0]);
-			selectClimateVariable(variableList[0]);
+		return () => {
+			isMounted = false;
+		};
+	}, [dataset, section, locale, dispatch, variableList.length]);
+
+	// Handle auto-selection of the first variable when data is loaded but no variable is selected
+	useEffect(() => {
+		if (!variableListLoading && filteredVariableList.length > 0 && !selected && !fetchingRef.current) {
+			onSelect(filteredVariableList[0]);
+			selectClimateVariable(filteredVariableList[0]);
 		}
-	}, [dataset, filterValues, locale, section, variableList, dispatch, onSelect, selectClimateVariable, selected]);
+	}, [filteredVariableList, variableListLoading, selected, onSelect, selectClimateVariable]);
 
 	const handleVariableSelect = (variable: PostData) => {
 		onSelect(variable);
 		selectClimateVariable(variable);
-		// Close the VariableDetailsPanel if open.
+		// Close the VariableDetailsPanel if open
 		if (isValidElement(activePanel)) {
 			closePanel();
 		}
 	};
 
-	if (variableListLoading) {
+	if (variableListLoading && !filteredVariableList.length) {
 		return <div className="col-span-2 p-4 text-center">{__('Loading variables...')}</div>;
 	}
 
 	if (!filteredVariableList || filteredVariableList.length === 0) {
-		return (
-			<div className="col-span-2 p-4 text-center">
-				{searchQuery
-					? __('No variables found matching your search.')
-					: __('No variables found for the selected filters.')
-				}
-			</div>
-		);
+		if (filterValues.sector || filterValues['var-type'] || searchQuery) {
+			return (
+				<div className="col-span-2 p-4 text-center">
+					{searchQuery
+						? __('No variables found matching your search.')
+						: __('No variables found for the selected filters.')
+					}
+				</div>
+			);
+		}
+
+		return <div className="col-span-2 p-4 text-center">{__('No variables available for this dataset.')}</div>;
 	}
 
-	// Show search results count when filtering
-	const showSearchCount = searchQuery && searchQuery.trim() !== '' && filteredVariableList.length > 0 && filteredVariableList.length < variableList.length;
+	// Show filter results count when filtering
+	const showFilterCount = (filterValues.sector || filterValues['var-type'] || searchQuery) &&
+		filteredVariableList.length < variableList.length;
 
 	return (
 		<>
-			{showSearchCount && (
+			{showFilterCount && (
 				<div className="col-span-2 mb-2 text-sm text-neutral-grey-medium">
 					{__('Showing')} {filteredVariableList.length} {__('of')} {variableList.length} {__('variables')}
 				</div>
 			)}
 			{filteredVariableList.map((item, index) => (
 				<RadioCardWithHighlight
-					key={index}
+					key={item.id || index}
 					value={item}
 					radioGroup="variable"
 					title={item.title}
@@ -122,7 +181,6 @@ const VariableRadioCards: React.FC<{
 					selected={Boolean(selected && selected.id === item.id)}
 					onSelect={() => handleVariableSelect(item)}
 				>
-					{/* TODO: will need to correctly use the link value depending on the data structure when coming from the API */}
 					{item?.link?.url && (
 						<RadioCardFooter>
 							<Link

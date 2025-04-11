@@ -74,6 +74,7 @@ const mapSlice = createSlice({
 			state.dataset = action.payload ?? undefined;
 			// Reset variable list when dataset changes
 			state.variableList = [];
+			state.variableListLoading = false;
 		},
 		setVariableList(state, action: PayloadAction<PostData[]>) {
 			state.variableList = action.payload;

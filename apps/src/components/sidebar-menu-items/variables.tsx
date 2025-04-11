@@ -2,9 +2,9 @@
  * A menu item and panel component that displays a list of variables with some custom filters.
  * TODO: make this work with the new AnimatedPanel component
  */
-import React, { useContext, useMemo, useState } from 'react';
-import { Map, ChevronRight } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
+import { ChevronRight, Map } from 'lucide-react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 // components
 import {
@@ -14,22 +14,23 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
+import Grid from '@/components/ui/grid';
 import {
-	SidebarMenuItem,
 	SidebarMenuButton,
+	SidebarMenuItem,
 	SidebarPanel,
 } from '@/components/ui/sidebar';
-import Grid from '@/components/ui/grid';
 import { VariableSearchFilter } from '@/components/variable-search-filter';
 
 // other
-import { useSidebar } from '@/hooks/use-sidebar';
-import { InteractivePanelProps, PostData } from '@/types/types';
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import TaxonomyDropdownFilter from '@/components/taxonomy-dropdown-filter';
 import VariableRadioCards from '@/components/variable-radio-cards';
-import { useAppSelector } from "@/app/hooks";
 import SectionContext from "@/context/section-provider";
-import { selectSearchQuery } from '@/store/climate-variable-slice';
+import { setVariableList } from '@/features/map/map-slice';
+import { useSidebar } from '@/hooks/use-sidebar';
+import { clearSearchQuery } from '@/store/climate-variable-slice';
+import { InteractivePanelProps, PostData } from '@/types/types';
 
 // menu and panel slug
 const slug = 'variable';
@@ -71,20 +72,42 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 	const [varType, setVarType] = useState<string>('');
 	const [sector, setSector] = useState<string>('');
 	const section = useContext(SectionContext);
+	const dispatch = useAppDispatch();
 	const { dataset } = useAppSelector((state) => state.map);
-	// Use the memoized selector for better performance
-	const searchQuery = useAppSelector(selectSearchQuery);
+	const prevDatasetRef = useRef(dataset?.term_id);
 
 	const { __ } = useI18n();
+
+	// Clear filters and search when dataset changes
+	useEffect(() => {
+		// Skip if dataset is undefined (initial load) or if it's the same dataset
+		if (!dataset || (prevDatasetRef.current === dataset.term_id)) {
+			prevDatasetRef.current = dataset?.term_id;
+			return;
+		}
+
+		prevDatasetRef.current = dataset.term_id;
+		setVarType('');
+		setSector('');
+		dispatch(clearSearchQuery());
+		dispatch(setVariableList([]));
+	}, [dataset, dispatch]);
 
 	const filterValues = useMemo(
 		() => ({
 			'var-type': varType,
 			sector,
-			search: searchQuery,
 		}),
-		[varType, sector, searchQuery]
+		[varType, sector]
 	);
+
+	const handleVarTypeChange = (value: string) => {
+		setVarType(value);
+	};
+
+	const handleSectorChange = (value: string) => {
+		setSector(value);
+	};
 
 	return (
 		<SidebarPanel id={slug} className="w-[36rem]">
@@ -101,7 +124,7 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 					<Grid columns={2} className="gap-4 mt-4">
 						<TaxonomyDropdownFilter
 							className="sm:w-52"
-							onFilterChange={(value) => setVarType(value)}
+							onFilterChange={handleVarTypeChange}
 							slug="var-type"
 							label={__('Variable Types')}
 							tooltip={__('Select a variable type')}
@@ -110,7 +133,7 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 						/>
 						<TaxonomyDropdownFilter
 							className="sm:w-52"
-							onFilterChange={(value) => setSector(value)}
+							onFilterChange={handleSectorChange}
 							slug="sector"
 							label={__('Sectors')}
 							tooltip={__('Select a sector')}
@@ -124,13 +147,19 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 				</CardHeader>
 				<CardContent className="p-4 pt-0 overflow-y-auto max-h-[calc(100vh-200px)] scrollbar-thin">
 					<Grid columns={2} className="gap-4">
-						{dataset && <VariableRadioCards
-							dataset={dataset}
-							section={section}
-							filterValues={filterValues}
-							selected={selected}
-							onSelect={onSelect}
-						/>}
+						{dataset ? (
+							<VariableRadioCards
+								dataset={dataset}
+								section={section}
+								filterValues={filterValues}
+								selected={selected}
+								onSelect={onSelect}
+							/>
+						) : (
+							<div className="col-span-2 p-4 text-center">
+								{__('Please select a dataset first')}
+							</div>
+						)}
 					</Grid>
 				</CardContent>
 			</Card>

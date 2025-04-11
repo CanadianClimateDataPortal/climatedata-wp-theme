@@ -9,15 +9,13 @@
                     {
                         'name': 'rcp85plus65-p50',
                         'label': 'RCP 8.5 enhanced scenario',
-                        'chart_color': '#00F',
                         'correlations': {
                             'cmip6': 'ssp585-p50'
-                        }
+                        },
                     },
                     {
                         'name': 'rcp85-p05',
                         'label': 'RCP 8.5 lower (5th percentile)',
-                        'chart_color': '#00F',
                         'correlations': {
                             'cmip6': 'ssp585-p50'
                         }
@@ -25,15 +23,18 @@
                     {
                         'name': 'rcp85-p50',
                         'label': 'RCP 8.5 median (50th percentile)',
-                        'chart_color': '#00F',
                         'correlations': {
                             'cmip6': 'ssp585-p50'
-                        }
+                        },
+                        'chart': {
+                            'color': '#980002',
+                            'label': 'RCP 8.5 median',
+                            'range_label': 'RCP 8.5 range',
+                        },
                     },
                     {
                         'name': 'rcp85-p95',
                         'label': 'RCP 8.5 upper (95th percentile)',
-                        'chart_color': '#00F',
                         'correlations': {
                             'cmip6': 'ssp585-p50'
                         }
@@ -41,7 +42,6 @@
                     {
                         'name': 'rcp45-p05',
                         'label': 'RCP 4.5 lower (5th percentile)',
-                        'chart_color': '#00F',
                         'correlations': {
                             'cmip6': 'ssp245-p50'
                         }
@@ -49,15 +49,18 @@
                     {
                         'name': 'rcp45-p50',
                         'label': 'RCP 4.5 median (50th percentile)',
-                        'chart_color': '#00F',
                         'correlations': {
                             'cmip6': 'ssp245-p50'
-                        }
+                        },
+                        'chart': {
+                            'color': '#00640c',
+                            'label': 'RCP 4.5 median',
+                            'range_label': 'RCP 4.5 range',
+                        },
                     },
                     {
                         'name': 'rcp45-p95',
                         'label': 'RCP 4.5 upper (95th percentile)',
-                        'chart_color': '#00F',
                         'correlations': {
                             'cmip6': 'ssp245-p50'
                         }
@@ -65,7 +68,6 @@
                     {
                         'name': 'rcp26-p05',
                         'label': 'RCP 2.6 lower (5th percentile)',
-                        'chart_color': '#00F',
                         'correlations': {
                             'cmip6': 'ssp126-p50'
                         }
@@ -73,15 +75,18 @@
                     {
                         'name': 'rcp26-p50',
                         'label': 'RCP 2.6 median (50th percentile)',
-                        'chart_color': '#00F',
                         'correlations': {
                             'cmip6': 'ssp126-p50'
-                        }
+                        },
+                        'chart': {
+                            'color': '#00F',
+                            'label': 'RCP 2.6 median',
+                            'range_label': 'RCP 2.6 range',
+                        },
                     },
                     {
                         'name': 'rcp26-p95',
                         'label': 'RCP 2.6 upper (95th percentile)',
-                        'chart_color': '#00F',
                         'correlations': {
                             'cmip6': 'ssp126-p50'
                         }
@@ -91,40 +96,83 @@
             "cmip6": {
                 'scenarios': [
                     {
-                        'name': 'ssp585-p50',
-                        'label': 'SSP5-8.5',
-                        'chart_color': '#00F',
+                        'name': 'ssp585highEnd-p98',
+                        'label': 'SSP5-8.5 (High end, percentile 98)',
                         'correlations': {
                             'cmip5': 'rcp85-p50'
-                        }
+                        },
+                        'chart': {
+                            'color': '#980002',
+                            'label': 'SSP5-8.5 (high end)',
+                        },
+                    },
+                    {
+                        'name': 'ssp585lowConf-p83',
+                        'label': 'SSP5-8.5 (low confidence, percentile 83)',
+                        'correlations': {
+                            'cmip5': 'rcp85-p50'
+                        },
+                        'chart': {
+                            'color': '#980002',
+                            'label': 'SSP5-8.5 (low confidence)',
+                        },
+                    },
+                    {
+                        'name': 'ssp585-p50',
+                        'label': 'SSP5-8.5',
+                        'correlations': {
+                            'cmip5': 'rcp85-p50'
+                        },
+                        'chart': {
+                            'color': '#980002',
+                            'label': 'SSP5-8.5 median',
+                            'range_label': 'SSP5-8.5 range',
+                        },
                     },
                     {
                         'name': 'ssp370-p50',
                         'label': 'SSP3-7.0',
-                        'chart_color': '#00F',
                         'correlations': {
                             'cmip5': 'rcp85-p50'
-                        }
+                        },
+                        'chart': {
+                            'color': '#f16f0c',
+                            'label': 'SSP3-7.0 median',
+                            'range_label': 'SSP3-7.0 range',
+                        },
                     },
                     {
                         'name': 'ssp245-p50',
                         'label': 'SSP2-4.5',
-                        'chart_color': '#00F',
                         'correlations': {
                             'cmip5': 'rcp45-p50'
-                        }
+                        },
+                        'chart': {
+                            'color': '#00640c',
+                            'label': 'SSP2-4.5 median',
+                            'range_label': 'SSP2-4.5 range',
+                        },
                     },
                     {
                         'name': 'ssp126-p50',
                         'label': 'SSP1-2.6',
-                        'chart_color': '#00F',
                         'correlations': {
                             'cmip5': 'rcp26-p50'
-                        }
+                        },
+                        'chart': {
+                            'color': '#00F',
+                            'label': 'SSP1-2.6 median',
+                            'range_label': 'SSP1-2.6 range',
+                        },
                     },
                 ],
             },
         };
+
+        var RANGE_SLIDER_VALUES = {
+            "cmip5": [2006,2010,2020,2030,2040,2050,2060,2070,2080,2090,2100],
+            "cmip6": [2020,2030,2040,2050,2060,2070,2080,2090,2100],
+        }
 
         var landmassLayerLeft, landmassLayerRight;
 
@@ -153,7 +201,7 @@
         if ($('#rcp').length) {
             query['rcp'] = $('#rcp').val();
         } else {
-            query['rcp'] = 'rcp26-p50';
+            query['rcp'] = 'ssp585-p50';
         }
 
         if ($('#decade').length) {
@@ -164,8 +212,6 @@
 
         let dataset = $('input[name="dataset_switch"]:checked').val();
         query['dataset'] = dataset;
-
-        query['rcp'] = SLR_DATASETS[dataset].scenarios[0].name;
 
 
 
@@ -204,6 +250,16 @@
                     }
                 },
                 'slrgrid': function (properties, zoom) {
+                    return {
+                        weight: 0.1,
+                        color: '#89cff0',
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0
+                    }
+                },
+                'slrgridcmip6': function (properties, zoom) {
                     return {
                         weight: 0.1,
                         color: '#89cff0',
@@ -307,7 +363,6 @@
                 minZoom: 3,
             }).addTo(mapRight);
 
-
             gridLayerRight = L.vectorGrid.protobuf(
                 hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:slrgrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
                 gridLayer_options
@@ -379,7 +434,7 @@
                 from_value: 2100,
                 hide_min_max: true,
                 prettify_enabled: false,
-                values: [2006,2010,2020,2030,2040,2050,2060,2070,2080,2090,2100],
+                values: RANGE_SLIDER_VALUES["cmip6"],
 
                 onChange: function (data) {
                     newval = data.from_value;
@@ -583,15 +638,17 @@
             grid_hover_cancel(e);
             let rcp = e.target.rcp;
             let percentile = e.target.percentile;
+            const dataset_name = e.target.dataset_name;
 
             gridHoverTimeout = setTimeout(function () {
                 let decade_value = parseInt($("#decade").val());
                 let values_url;
                 let varDetails = {units: {value: 'cm', label: 'cm'}, decimals:0};
+                const dataset_param = dataset_name === "cmip6" ? "&dataset_name=cmip6" : "";
 
                 values_url = data_url + "/get-slr-gridded-values/" +
                     e.latlng['lat'] + "/" + e.latlng['lng'] +
-                    "?period=" + decade_value;
+                    "?period=" + decade_value + dataset_param;
 
                 gridHoverAjax = $.ajax({
                     url: values_url,
@@ -717,7 +774,7 @@
 
             // open the chart
             current_coords=[e.latlng.lat, e.latlng.lng];
-            genChart(e.latlng.lat, e.latlng.lng, 'slr', 'ann');
+            genChart(e.latlng.lat, e.latlng.lng, 'slr', 'ann', e.target.dataset_name);
 
             L.DomEvent.stop(e);
 
@@ -727,8 +784,14 @@
 
         var gridHoverTimeout, gridHoverAjax;
         var gridLayer;
+        let grid = "slrgrid";
+
+        if (dataset === 'cmip6') {
+            grid += "cmip6";
+        }
+
         gridLayer = L.vectorGrid.protobuf(
-            hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + 'slrgrid' + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+            hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + grid + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
             gridLayer_options
         ).on('click', function (e) {
             grid_click(e);
@@ -834,6 +897,8 @@
         function disPlayChartData(data, varDetails) {
             chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
             chartDecimals = varDetails['decimals'];
+            const dataset = query['dataset'];
+            const scenarios = SLR_DATASETS[dataset].scenarios;
             switch (varDetails.units.value) {
                 case 'doy':
                     formatter = function () {return new Date(1546300800000+1000*60*60*24*this.value).toLocaleDateString(current_lang, { month:'long', day:'numeric'})};
@@ -857,100 +922,84 @@
 
             chartSeries = [];
 
-            chartSeries.push({
-                name: chart_labels.rcp_26_median,
-                data: data['rcp26_median'],
-                zIndex: 1,
-                showInNavigator: true,
-                color: '#00F',
-                marker: {
-                    fillColor: '#00F',
-                    lineWidth: 0,
-                    radius: 0,
-                    lineColor: '#00F'
-                }});
+            scenarios.toReversed().forEach(function (scenario) {
+                if (! Object.hasOwn(scenario, 'chart') ) {
+                    return;
+                }
 
-            chartSeries.push({
-                name: chart_labels.rcp_26_range,
-                data: data['rcp26_range'],
-                type: 'arearange',
-                lineWidth: 0,
-                linkedTo: ':previous',
-                color: '#00F',
-                fillOpacity: 0.2,
-                zIndex: 0,
-                marker: {
-                    radius: 0,
-                    enabled: false
-                }});
+                const scenarioCode = scenario.name.split("-")[0];
+                const chartSettings = scenario.chart;
 
-            chartSeries.push({
-                name: chart_labels.rcp_45_median,
-                data: data['rcp45_median'],
-                zIndex: 1,
-                showInNavigator: true,
-                color: '#00640c',
-                marker: {
-                    fillColor: '#00640c',
-                    lineWidth: 0,
-                    radius: 0,
-                    lineColor: '#00640c'
-                }});
+                const hasRange = Object.hasOwn(chartSettings, 'range_label');
+                let seriesData;
 
-            chartSeries.push({
-                name: chart_labels.rcp_45_range,
-                data: data['rcp45_range'],
-                type: 'arearange',
-                lineWidth: 0,
-                linkedTo: ':previous',
-                color: '#00640c',
-                fillOpacity: 0.2,
-                zIndex: 0,
-                marker: {
-                    radius: 0,
-                    enabled: false
-                }});
+                if (hasRange) {
+                    seriesData = data['{0}_median'.format(scenarioCode)]
+                } else {
+                    seriesData = data[scenarioCode];
+                }
 
-            chartSeries.push({
-                name: chart_labels.rcp_85_median,
-                data: data['rcp85_median'],
-                zIndex: 1,
-                showInNavigator: true,
-                color: '#980002',
-                marker: {
-                    fillColor: '#980002',
-                    lineWidth: 0,
-                    radius: 0,
-                    lineColor: '#980002'
-                }});
+                chartSeries.push({
+                    name: chartSettings.label,
+                    data: seriesData,
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: chartSettings.color,
+                    visible: chartSettings.visible !== false,
+                    marker: {
+                        fillColor: chartSettings.color,
+                        lineWidth: 0,
+                        radius: 0,
+                        lineColor: chartSettings.color
+                    }});
 
-            chartSeries.push({
-                name: chart_labels.rcp_85_range,
-                data: data['rcp85_range'],
-                type: 'arearange',
-                lineWidth: 0,
-                linkedTo: ':previous',
-                color: '#980002',
-                fillOpacity: 0.2,
-                zIndex: 0,
-                marker: {
-                    radius: 0,
-                    enabled: false
-                }});
+                if (hasRange) {
+                    chartSeries.push( {
+                        name: chartSettings.range_label,
+                        data: data[ '{0}_range'.format( scenarioCode ) ],
+                        type: 'arearange',
+                        lineWidth: 0,
+                        linkedTo: ':previous',
+                        color: chartSettings.color,
+                        fillOpacity: 0.2,
+                        zIndex: 0,
+                        marker: {
+                            radius: 0,
+                            enabled: false
+                        }
+                    } );
+                }
+            });
 
-            chartSeries.push({
-                name: chart_labels.rcp_85_enhanced,
-                data: data['rcp85_enhanced'],
-                zIndex: 1,
-                showInNavigator: true,
-                color: '#B97900',
-                marker: {
-                    fillColor: '#B97900',
-                    enabled: true,
-                    lineWidth: 0,
-                    radius: 15,
-                    lineColor: '#B97900'
-                }});
+            if (dataset === 'cmip6') {
+                chartSeries.unshift({
+                    name: chart_labels.slr_uplift,
+                    data: data["uplift"],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#808080',
+                    visible: false,
+                    marker: {
+                        fillColor: '#808080',
+                        lineWidth: 0,
+                        radius: 0,
+                        lineColor: '#808080'
+                    }});
+            } else {
+                chartSeries.push({
+                    name: chart_labels.rcp_85_enhanced,
+                    data: data['rcp85_enhanced'],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#B97900',
+                    marker: {
+                        fillColor: '#B97900',
+                        enabled: true,
+                        lineWidth: 0,
+                        radius: 15,
+                        lineColor: '#B97900'
+                    }});
+            }
 
 
             var chart = Highcharts.stockChart('chart-placeholder', {
@@ -1130,7 +1179,7 @@
         }
 
         // LAYER CHART
-        function genChart(lat, lon, variable, month) {
+        function genChart(lat, lon, variable, month, dataset_name) {
             $(document).overlay('show', {
                 href: base_href + 'variable/' + 'slr' + '/',
                 data: {
@@ -1143,9 +1192,10 @@
 
                     $('#rcp').prop('disabled', true);
                     $('#rightrcp').prop('disabled', true);
+                    const dataset_param = dataset_name === 'cmip6' ? 'cmip6' : 'cmip5';
 
                     $.getJSON(
-                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
+                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month + '?dataset_name=' + dataset_param,
                         function (data) {
                             disPlayChartData(data,varDetails);
 
@@ -1604,7 +1654,9 @@
 
         });
 
-
+        $('#var').change(function (e) {
+            buildFilterMenu();
+        });
 
         $('#decade').change(function (e) {
             //console.log('decade changed');
@@ -1649,8 +1701,20 @@
             const dataset_name = $('input[name="dataset_switch"]:checked').val();
             gridLayer.rcp = rcp_value.split("-")[0];
             gridLayer.percentile = rcp_value.split("-")[1];
+            gridLayer.dataset_name = dataset_name;
             gridLayerRight.rcp = right_rcp_value.split("-")[0];
             gridLayerRight.percentile = right_rcp_value.split("-")[1];
+            gridLayerRight.dataset_name = dataset_name;
+
+            let grid = "slrgrid";
+
+            if (dataset_name === 'cmip6') {
+                grid += "cmip6";
+            }
+
+            const grid_url = hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + grid + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf";
+            gridLayer.setUrl(grid_url);
+            gridLayerRight.setUrl(grid_url);
 
             // decade_value = $("#decade").val();
             decade_value = parseInt($("#decade").val());
@@ -1709,16 +1773,18 @@
                 if (has_mapRight === true) {
                     var rightLayerName = layer_prefix + 'slr-ys-' + right_rcp_value + '-ann-30year';
 
-                    rightLayer.setParams({
+                    const rightLayerParams = {
                         format: 'image/png',
                         transparent: true,
                         opacity: 1,
                         pane: 'raster',
-                        styles: 'slr-' + rcp_value,
-                        'TIME': right_rcp_value == 'rcp85plus65-p50' ? '' :  decade_value + '-01-00T00:00:00Z',
+                        'TIME': right_rcp_value == 'rcp85plus65-p50' ? '' : decade_value + '-01-00T00:00:00Z',
                         'VERSION': '1.3.0',
+                        styles: dataset_name === 'cmip6' ? '': 'slr-' + right_rcp_value,
                         layers: 'CDC:' + rightLayerName
-                    });
+                    };
+
+                    rightLayer.setParams(rightLayerParams);
                 }
 
                 // also generate the right legend
@@ -1749,7 +1815,10 @@
             let dataset_name = getQueryVariable('dataset');
             let scenarios = SLR_DATASETS[dataset_name].scenarios;
 
+            const right_rcp_disabled_option = $('#rightrcp option[value=disabled]').prop('outerHTML');
+
             $('#rcp').empty();
+            $('#rightrcp').empty();
             let rcpDropGroup = "";
             let rcpOptions = [];
             scenarios.forEach(function (scenario) {
@@ -1758,10 +1827,44 @@
             });
 
             $('#rcp').append(rcpDropGroup);
+            $('#rightrcp').append(right_rcp_disabled_option);
+            $('#rightrcp').append(rcpDropGroup);
+
             let queryRCP = getQueryVariable('rcp');
             if (rcpOptions.includes(queryRCP)) {
                 $("#rcp").val(queryRCP).prop('selected', true);
             }
+
+            let queryRightRCP = getQueryVariable('rightrcp');
+            if (rcpOptions.includes(queryRightRCP)) {
+                $("#rightrcp").val(queryRightRCP).prop('selected', true);
+            } else {
+                $("#rightrcp").val('disabled').prop('selected', true);
+            }
+
+            const updated_slider_values = RANGE_SLIDER_VALUES[dataset_name];
+            const current_from = parseInt($("#decade").val());
+            let new_from = 0;
+            let do_trigger_change = true;
+
+            for (let i = 0; i < updated_slider_values.length; i++) {
+                if (updated_slider_values[i] === current_from) {
+                    new_from = i;
+                    do_trigger_change = false;
+                    break;
+                }
+            }
+
+            if (do_trigger_change) {
+                $('#decade').val(updated_slider_values[new_from]).trigger('change');
+            }
+
+            rs_instance.update({
+                values: updated_slider_values,
+                min: updated_slider_values[0],
+                max: updated_slider_values[updated_slider_values.length - 1],
+                from: new_from,
+            });
         }
 
 

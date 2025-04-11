@@ -1029,7 +1029,8 @@ function getIDFLinks(station_id, target, css_class) {
             daily_avg_temp: 'Daily Average Temperature',
             daily_max_temp: 'Daily Maximum Temperature',
             daily_min_temp: 'Daily Minimum Temperature',
-            click_to_zoom: 'Click and drag in the plot area to zoom in'
+            click_to_zoom: 'Click and drag in the plot area to zoom in',
+            slr_uplift: 'Uplift',
         };
 
         l10n_labels = {
@@ -1078,7 +1079,8 @@ function getIDFLinks(station_id, target, css_class) {
                 daily_avg_temp: 'Température quotidienne moyenne',
                 daily_max_temp: 'Température quotidienne maximale',
                 daily_min_temp: 'Température quotidienne minimale',
-                click_to_zoom: 'Cliquer et faire glisser dans la zone du tracé pour agrandir'
+                click_to_zoom: 'Cliquer et faire glisser dans la zone du tracé pour agrandir',
+                slr_uplift: 'Uplift',
             };
 
             l10n_labels = {

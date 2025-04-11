@@ -44,11 +44,15 @@
 				"rcp26-p50" => "RCP 2.6 " . __('median (50th percentile)','cdc'),
 				"rcp26-p95" => "RCP 2.6 " . __('upper (95th percentile)','cdc'),
 
+				"ssp585highEnd-p98" => "SSP5-8.5 (High end, percentile 98)",
+				"ssp585lowConf-p83" => "SSP5-8.5 (low confidence, percentile 83)",
 				"ssp585-p50" => "SSP5-8.5",
 				"ssp370-p50" => "SSP3-7.0",
 				"ssp245-p50" => "SSP2-4.5",
 				"ssp126-p50" => "SSP1-2.6",
 			];
+
+			$defaultSelectedScenario = "ssp585-p50";
 
 			?>
             <div id="" class="filter-block col-3">
@@ -56,7 +60,8 @@
 
 					<?php
 					foreach ( $scenarios as $scenario_key => $scenario_label ) {
-						echo '<option value="' . $scenario_key . '">' . $scenario_label . '</option>';
+						$selected = ($scenario_key == $defaultSelectedScenario) ? 'selected' : '';
+						echo '<option ' . $selected . ' value="' . $scenario_key . '">' . $scenario_label . '</option>';
 					}
 					?>
 

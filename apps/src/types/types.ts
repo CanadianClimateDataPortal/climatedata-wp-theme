@@ -558,6 +558,11 @@ export interface ChoroValuesOptions {
 	decimals: number;
 }
 
+export interface ColourScheme {
+	type: string;
+	colours: string[],
+	quantities?: number[],
+}
 
 // A translatable string object with English and French variants
 export interface LocalizedString {

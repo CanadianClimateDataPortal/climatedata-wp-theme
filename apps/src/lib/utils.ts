@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
+import { FrequencyConfig, FrequencyDisplayModeOption, FrequencyType } from "@/types/climate-variable-interface";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -27,18 +28,18 @@ const escapeRegExp = (string: string): string => {
 
 /**
  * Highlight text matching a search term by splitting it into parts and marking matched parts
- * 
+ *
  * Returns an array of parts with a flag indicating whether each part is a match or not
  */
 export const splitTextByMatch = (text: string, searchTerm: string): Array<{text: string, isMatch: boolean}> => {
   if (!searchTerm || !text) return [{ text, isMatch: false }];
-  
+
   const escapedSearchTerm = escapeRegExp(searchTerm);
   const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
-  
+
   // Split the text by regex, preserving matches
   const parts = text.split(regex);
-  
+
   // Map the parts to include whether they match or not
   const result = parts.map(part => {
     if (part.toLowerCase() === searchTerm.toLowerCase()) {
@@ -46,7 +47,47 @@ export const splitTextByMatch = (text: string, searchTerm: string): Array<{text:
     }
     return { text: part, isMatch: false };
   });
-  
+
   // Filter out empty parts
   return result.filter(part => part.text.length > 0);
 };
+
+export const getFrequencyCode = (frequency: string) => {
+	let frequencyCode = '';
+
+	if (frequency === 'ann') {
+		frequencyCode = 'ys';
+	} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
+		frequencyCode = 'ms';
+	} else if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
+		frequencyCode = 'qsdec';
+	}
+
+	return frequencyCode;
+}
+
+export const isFrequencyEnabled = (config: FrequencyConfig, section: string, frequencyType: FrequencyType): boolean => {
+	const configValue = config[frequencyType];
+	return Boolean(configValue && (
+		configValue === FrequencyDisplayModeOption.ALWAYS ||
+		configValue === section
+	));
+};
+
+export const getDefaultFrequency = (config: FrequencyConfig, section: string) => {
+	const hasAnnual = isFrequencyEnabled(config, section, FrequencyType.ANNUAL);
+	const hasMonths = isFrequencyEnabled(config, section, FrequencyType.MONTHLY)
+	const hasSeasons = isFrequencyEnabled(config, section, FrequencyType.SEASONAL);
+
+	let defaultValue;
+
+	if (hasAnnual) {
+		defaultValue = FrequencyType.ANNUAL;
+	} else if (hasMonths) {
+		defaultValue = 'jan';
+	} else if (hasSeasons) {
+		defaultValue = 'spring'
+	}
+
+	return defaultValue;
+}

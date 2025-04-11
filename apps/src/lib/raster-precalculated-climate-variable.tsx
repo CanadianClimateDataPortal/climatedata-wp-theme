@@ -72,10 +72,6 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 			: true;
 	}
 
-	getFrequency(): string | null {
-		return super.getFrequency() ? super.getFrequency() : FrequencyType.ANNUAL;
-	}
-
 	getAveragingOptions(): AveragingType[] {
 		return super.getAveragingOptions().length > 0
 			? super.getAveragingOptions()

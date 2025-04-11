@@ -3,6 +3,8 @@ import {
 	AveragingType,
 	ClimateVariableConfigInterface,
 	ClimateVariableInterface,
+	ColourType,
+	CustomColourSchemes,
 	DateRangeConfig,
 	DownloadType,
 	FieldConfig,
@@ -11,7 +13,9 @@ import {
 	FrequencyConfig,
 	GridCoordinates,
 	InteractiveRegionConfig,
-	InteractiveRegionOption, ScenariosConfig,
+	InteractiveRegionOption,
+	ScenariosConfig,
+	TemporalThresholdConfig,
 	ThresholdInterface,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
@@ -140,12 +144,24 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.hasDelta;
 	}
 
-	getColourScheme(): string[] {
-		return this._config.colourScheme ?? this._config.defaultColourScheme ?? [];
+	getCustomColourSchemes(): CustomColourSchemes | null {
+		return this._config.customColourSchemes ?? null;
+	}
+
+	getColourScheme(): string | null {
+		return this._config.colourScheme ?? null
 	}
 
 	getColourOptionsStatus(): boolean {
 		return this._config.enableColourOptions ?? false;
+	}
+
+	getColourType(): string | null {
+		return this._config.colourType ?? ColourType.CONTINUOUS;
+	}
+
+	getTemporalThresholdConfig(): TemporalThresholdConfig | null {
+		return this._config.temporalThresholdConfig ?? null;
 	}
 
 	getAnalysisFields(): FieldConfig[] {

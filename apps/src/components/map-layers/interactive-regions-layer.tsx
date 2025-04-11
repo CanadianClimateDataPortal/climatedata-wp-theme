@@ -1,7 +1,7 @@
 /**
  * Component that adds interaction to the map depending on the selected region (gridded data, watershed, health, census).
  */
-import React, { useCallback, useEffect, useMemo, useRef, useState, } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState, } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.vectorgrid';
@@ -16,7 +16,10 @@ import {
 	GEOSERVER_BASE_URL,
 } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { InteractiveRegionOption } from "@/types/climate-variable-interface";
+import { ColourType, InteractiveRegionOption } from "@/types/climate-variable-interface";
+import { generateColourScheme } from "@/lib/colour-scheme";
+import { getDefaultFrequency } from "@/lib/utils";
+import SectionContext from "@/context/section-provider";
 
 interface InteractiveRegionsLayerProps {
 	onLocationModalOpen: (content: React.ReactNode) => void;
@@ -33,8 +36,11 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 
 	const map = useMap();
 
+	const section = useContext(SectionContext);
+
 	const {
 		legendData,
+		dataValue,
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
@@ -47,16 +53,28 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 			return null;
 		}
 
-		const colormapEntries =
+		const legendColourMapEntries =
 			legendData.Legend[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap
 				?.entries ?? [];
 
+		if (climateVariable) {
+			const customColourScheme = generateColourScheme(climateVariable, dataValue);
+			if (customColourScheme) {
+				return {
+					colours: customColourScheme.colours,
+					quantities: customColourScheme.quantities,
+					schemeType: climateVariable.getColourType(),
+				};
+			}
+		}
+
+		// Fallback to default map colours.
 		return {
-			colours: colormapEntries.map((entry) => entry.color),
-			quantities: colormapEntries.map((entry) => Number(entry.quantity)),
-			scheme_type: 'continuous',
+			colours: legendColourMapEntries.map((entry) => entry.color),
+			quantities: legendColourMapEntries.map((entry) => Number(entry.quantity)),
+			schemeType: ColourType.CONTINUOUS,
 		};
-	}, [legendData]);
+	}, [climateVariable, dataValue, legendData]);
 
 	// Function to interpolate between colors
 	// Taken from fw-child/resources/js/utilities.js interpolate function, but optimized for React
@@ -99,7 +117,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 					? featureId
 					: (layerData?.[featureId] ?? 0);
 
-			const { colours, quantities, scheme_type } = colorMap;
+			const { colours, quantities, schemeType } = colorMap;
 
 			// More efficient binary search
 			// Taken from fw-child/resources/js/utilities.js indexOfGT function
@@ -134,7 +152,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 			}
 
 			// For discrete type, return exact match
-			if (scheme_type === 'discrete') {
+			if (schemeType === ColourType.DISCRETE) {
 				return colours[index];
 			}
 
@@ -211,7 +229,11 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 				return;
 			}
 
-			const frequency = climateVariable?.getFrequency() ?? '';
+			const frequencyConfig = climateVariable?.getFrequencyConfig();
+			let frequency = climateVariable?.getFrequency() ?? ''
+			if (!frequency && frequencyConfig) {
+				frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
+			}
 			const [ startYear ] = climateVariable?.getDateRange() ?? [];
 
 			try {
@@ -232,6 +254,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 		})();
 	}, [
 		climateVariable,
+		section,
 	]);
 
 	useEffect(() => {

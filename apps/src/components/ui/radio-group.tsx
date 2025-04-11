@@ -100,7 +100,7 @@ const RadioGroupFactory = forwardRef<
 				)}
 				<div
 					className={cn(
-						'flex flex-wrap gap-y-2 gap-x-0',
+						'flex flex-wrap gap-y-2 gap-x-4',
 						orientationClasses[orientation]
 					)}
 				>

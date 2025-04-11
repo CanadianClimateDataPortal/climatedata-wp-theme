@@ -1,4 +1,4 @@
-import React, { useEffect, isValidElement, useMemo, useRef } from 'react';
+import React, { useEffect, isValidElement, useMemo, useRef, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
@@ -15,6 +15,11 @@ import { PostData, TaxonomyData } from '@/types/types';
 import { setVariableList, setVariableListLoading } from '@/features/map/map-slice';
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
 
+// Message component for no results scenarios
+const ResultsMessage: React.FC<{ message: string }> = ({ message }) => (
+	<div className="col-span-2 p-4 text-center">{message}</div>
+);
+
 const VariableRadioCards: React.FC<{
 	filterValues: Record<string, string>;
 	selected: PostData | null;
@@ -29,6 +34,7 @@ const VariableRadioCards: React.FC<{
 	const { variableList, variableListLoading } = useAppSelector((state) => state.map);
 	const { activePanel, closePanel } = useAnimatedPanel();
 	const searchQuery = useAppSelector(selectSearchQuery);
+	const [dataLoaded, setDataLoaded] = useState(false);
 
 	// Keep track of dataset changes and previous state
 	const prevDatasetRef = useRef<number | null>(null);
@@ -83,6 +89,7 @@ const VariableRadioCards: React.FC<{
 		prevDatasetRef.current = dataset.term_id;
 		fetchingRef.current = true;
 		initialLoadRef.current = false;
+		setDataLoaded(false);
 
 		dispatch(setVariableListLoading(true));
 
@@ -97,6 +104,7 @@ const VariableRadioCards: React.FC<{
 				if (isMounted) {
 					// Store the variables in Redux
 					dispatch(setVariableList(normalizedData));
+					setDataLoaded(true);
 
 					if (normalizedData.length > 0 && !selected) {
 						// Use filtered list in case filters are already applied
@@ -110,10 +118,12 @@ const VariableRadioCards: React.FC<{
 				console.error('Error fetching variables:', error);
 				if (isMounted) {
 					dispatch(setVariableList([]));
+					setDataLoaded(true);
 				}
 			} finally {
 				if (isMounted) {
 					fetchingRef.current = false;
+					dispatch(setVariableListLoading(false));
 				}
 			}
 		})();
@@ -140,23 +150,25 @@ const VariableRadioCards: React.FC<{
 		}
 	};
 
-	if (variableListLoading && !filteredVariableList.length) {
-		return <div className="col-span-2 p-4 text-center">{__('Loading variables...')}</div>;
+	// Only show loading message on initial data fetch, not during filtering
+	if (variableListLoading && !dataLoaded) {
+		return <ResultsMessage message={__('Loading variables...')} />;
 	}
 
-	if (!filteredVariableList || filteredVariableList.length === 0) {
-		if (filterValues.sector || filterValues['var-type'] || searchQuery) {
-			return (
-				<div className="col-span-2 p-4 text-center">
-					{searchQuery
-						? __('No variables found matching your search.')
-						: __('No variables found for the selected filters.')
-					}
-				</div>
-			);
+	if (dataLoaded && (!filteredVariableList || filteredVariableList.length === 0)) {
+		// Handle the different no results scenarios with separate conditions
+		const hasSearch = Boolean(searchQuery);
+		const hasFilters = Boolean(filterValues.sector || filterValues['var-type']);
+		switch (true) {
+			case (hasSearch && hasFilters):
+				return <ResultsMessage message={__('No variables found matching your search and filters.')} />;
+			case hasSearch:
+				return <ResultsMessage message={__('No variables found matching your search.')} />;
+			case hasFilters:
+				return <ResultsMessage message={__('No variables found for the selected filters.')} />;
+			default:
+				return <ResultsMessage message={__('No variables available for this dataset.')} />;
 		}
-
-		return <div className="col-span-2 p-4 text-center">{__('No variables available for this dataset.')}</div>;
 	}
 
 	// Show filter results count when filtering

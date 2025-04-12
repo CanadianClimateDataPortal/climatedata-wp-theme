@@ -22,11 +22,12 @@ import { getDefaultFrequency } from "@/lib/utils";
 import SectionContext from "@/context/section-provider";
 
 interface InteractiveRegionsLayerProps {
+	scenario?: string | null | undefined;
 	onLocationModalOpen: (content: React.ReactNode) => void;
 	onLocationModalClose: () => void;
 }
 
-const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLocationModalOpen, onLocationModalClose }) => {
+const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scenario, onLocationModalOpen, onLocationModalClose }) => {
 	const [layerData, setLayerData] = useState<Record<number, number> | null>(
 		null
 	);
@@ -243,7 +244,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 					decade: startYear,
 					frequency,
 					interactiveRegion,
-					emissionScenario: climateVariable?.getScenario() ?? '',
+					emissionScenario: scenario ?? '',
 					decimals: 1,
 				});
 

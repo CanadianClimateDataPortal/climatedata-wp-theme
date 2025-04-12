@@ -4,7 +4,7 @@
  * A dropdown component that allows the user to select an emission scenario and compare it
  * with another from a secondary dropdown.
  */
-import React, { useState } from 'react';
+import React from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
@@ -18,19 +18,8 @@ import Dropdown from '@/components/ui/dropdown';
 import appConfig from "@/config/app.config";
 
 const EmissionScenariosControl: React.FC = () => {
-	const [compareScenarios, setCompareScenarios] = useState<boolean>(false);
 	const { __ } = useI18n();
-	const { climateVariable, setScenario, setScenarioCompared } = useClimateVariable();
-
-	const toggleCompareScenarios = () => {
-		setCompareScenarios(prev => {
-			const newCompare = !prev;
-			if (!newCompare) {
-				setScenarioCompared(null);
-			}
-			return newCompare;
-		});
-	};
+	const { climateVariable, setScenario, setScenarioCompare, setScenarioCompareTo } = useClimateVariable();
 
 	const Tooltip = () => (
 		<div className="text-sm text-gray-500">
@@ -49,7 +38,9 @@ const EmissionScenariosControl: React.FC = () => {
 					label={__('Emissions Scenarios')}
 					tooltip={<Tooltip />}
 					placeholder={__('Select an option')}
-					options={scenarioOptions}
+					options={scenarioOptions.filter(
+						(option) => option.value !== climateVariable?.getScenarioCompareTo()
+					) ?? []}
 					value={climateVariable?.getScenario() ?? undefined}
 					onChange={setScenario}
 				/>
@@ -58,8 +49,8 @@ const EmissionScenariosControl: React.FC = () => {
 					<Checkbox
 						id="compare-scenarios"
 						className="text-brand-red"
-						checked={compareScenarios}
-						onCheckedChange={toggleCompareScenarios}
+						checked={climateVariable?.getScenarioCompare() ?? false}
+						onCheckedChange={setScenarioCompare}
 					/>
 					<label
 						htmlFor="compare-scenarios"
@@ -69,13 +60,13 @@ const EmissionScenariosControl: React.FC = () => {
 					</label>
 				</div>
 
-				{compareScenarios && (
+				{climateVariable?.getScenarioCompare() && (
 					<Dropdown
 						options={scenarioOptions.filter(
 							(option) => option.value !== climateVariable?.getScenario()
 						) ?? []}
-						value={climateVariable?.getScenarioCompared() ?? undefined}
-						onChange={setScenarioCompared}
+						value={climateVariable?.getScenarioCompareTo() ?? undefined}
+						onChange={setScenarioCompareTo}
 					/>
 				)}
 			</div>

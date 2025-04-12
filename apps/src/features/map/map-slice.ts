@@ -45,9 +45,6 @@ const defaultTimePeriodEnd = Math.min(
 const initialState: MapState = {
 	variable: 'tx_max',
 	decade: '2040',
-	emissionScenario: 'high',
-	emissionScenarioCompare: false,
-	emissionScenarioCompareTo: '',
 	thresholdValue: 5,
 	interactiveRegion: REGION_GRID,
 	frequency: 'ann',

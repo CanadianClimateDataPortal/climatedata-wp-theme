@@ -170,8 +170,11 @@ export interface ClimateVariableConfigInterface {
 	/** Selected scenario value */
 	scenario?: string | null;
 
+	/** Compare scenarios flag */
+	scenarioCompare?: boolean;
+
 	/** Scenario to compare against `scenario` */
-	scenarioCompared?: string | null;
+	scenarioCompareTo?: string | null;
 
 	/** Selected scenarios for analysis */
 	analyzeScenarios?: string[];
@@ -287,7 +290,9 @@ export interface ClimateVariableInterface {
 
 	getScenario(): string | null;
 
-	getScenarioCompared(): string | null;
+	getScenarioCompare(): boolean;
+
+	getScenarioCompareTo(): string | null;
 
 	getAnalyzeScenarios(): string[];
 

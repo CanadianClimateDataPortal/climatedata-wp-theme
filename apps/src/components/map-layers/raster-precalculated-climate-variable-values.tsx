@@ -5,7 +5,6 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useLocale } from '@/hooks/use-locale';
 import { fetchDeltaValues, generateChartData } from '@/services/services';
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
-import { useAppSelector } from '@/app/hooks';
 import { doyFormatter } from '@/lib/format';
 
 interface RasterPrecalcultatedClimateVariableValuesProps {
@@ -18,7 +17,7 @@ interface RasterPrecalcultatedClimateVariableValuesProps {
  * ---------------------------
  * Display the climate variable values (median, relative to baseline, range)
  * For Raster/Precalculated climate variable
- * 
+ *
  * Can be used in the location modal and charts panel
  */
 const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedClimateVariableValuesProps> = ({
@@ -32,7 +31,6 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	const dateRange = useMemo(() => {
 		return climateVariable?.getDateRange() ?? ["2041", "2070"];
 	}, [climateVariable]);
-	const dataValue = useAppSelector((state) => state.map.dataValue);
 
 	const [ median, setMedian ] = useState<number | null>(null);
 	const [ range, setRange ] = useState<number[] | null>(null);
@@ -71,7 +69,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 			const medianRangeParams = new URLSearchParams({
 				period: String(decadeValue),
 				decimals: decimals.toString(),
-				delta7100: dataValue === 'delta' ? 'true' : 'false',
+				delta7100: climateVariable?.getDataValue() === 'delta' ? 'true' : 'false',
 				dataset_name: climateVariable?.getVersion() ?? '',
 			}).toString();
 
@@ -121,7 +119,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 			const timestamp = Date.UTC(decadeValue, month, 1, 0, 0, 0);
 
 			if(
-				chartsData[deltaValueKey] !== undefined 
+				chartsData[deltaValueKey] !== undefined
 				&& chartsData[deltaValueKey][timestamp] !== undefined
 				&& chartsData[deltaValueKey][timestamp][0] !== undefined
 			) {
@@ -132,10 +130,10 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 		};
 
 		fetchData();
-	}, [climateVariable, dataValue, decimals, dateRange, featureId, latlng]);
+	}, [climateVariable, decimals, dateRange, featureId, latlng]);
 
 	// Value formatter (for delta, for units)
-	const valueFormatter = (value: number, delta: boolean = (dataValue === 'delta')) => {
+	const valueFormatter = (value: number, delta: boolean = (climateVariable?.getDataValue() === 'delta')) => {
 		let str = '';
 
 		// If delta, we add a "+" for positive values
@@ -201,7 +199,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	const generateRangeDiv = (rangeStartValue: number, rangeEndValue: number) => {
 		const rangeStart = valueFormatter(rangeStartValue);
 		const rangeEnd = valueFormatter(rangeEndValue);
-		
+
 		return (
 			<>
 				<div className='mb-1 text-2xl font-semibold text-brand-blue'>

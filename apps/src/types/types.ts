@@ -180,7 +180,6 @@ export interface MapState {
 	dataset?: TaxonomyData;
 	decade: string;
 	pane: string;
-	dataValue: string;
 	mapColor: string;
 	legendData: WMSLegendData;
 	opacity: {

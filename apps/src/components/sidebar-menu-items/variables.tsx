@@ -30,7 +30,7 @@ import SectionContext from "@/context/section-provider";
 import { setVariableList } from '@/features/map/map-slice';
 import { useSidebar } from '@/hooks/use-sidebar';
 import { clearSearchQuery } from '@/store/climate-variable-slice';
-import { InteractivePanelProps, PostData } from '@/types/types';
+import { InteractivePanelProps, PostData, VariableFilterCountProps } from '@/types/types';
 
 // menu and panel slug
 const slug = 'variable';
@@ -169,3 +169,26 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 VariablesPanel.displayName = 'VariablesPanel';
 
 export { VariablesMenuItem, VariablesPanel };
+
+/**
+ * Component to display the count of filtered variables.
+ */
+const VariableFilterCount: React.FC<VariableFilterCountProps> = ({
+	filteredCount,
+	totalCount,
+	className = "col-span-2 mb-2 text-sm text-neutral-grey-medium"
+}) => {
+	const { __ } = useI18n();
+
+	if (filteredCount === totalCount || filteredCount === 0) {
+		return null;
+	}
+
+	return (
+		<div className={className}>
+			{__('Showing')} {filteredCount} {__('of')} {totalCount} {__('variables')}
+		</div>
+	);
+};
+
+export default VariableFilterCount;

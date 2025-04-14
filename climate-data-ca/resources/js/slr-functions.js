@@ -28,8 +28,8 @@
                         },
                         'chart': {
                             'color': '#980002',
-                            'label': 'RCP 8.5 median',
-                            'range_label': 'RCP 8.5 range',
+                            'label': chart_labels.rcp_85_median,
+                            'range_label': chart_labels.rcp_85_range,
                         },
                     },
                     {
@@ -54,8 +54,8 @@
                         },
                         'chart': {
                             'color': '#00640c',
-                            'label': 'RCP 4.5 median',
-                            'range_label': 'RCP 4.5 range',
+                            'label': chart_labels.rcp_45_median,
+                            'range_label': chart_labels.rcp_45_range,
                         },
                     },
                     {
@@ -80,8 +80,8 @@
                         },
                         'chart': {
                             'color': '#00F',
-                            'label': 'RCP 2.6 median',
-                            'range_label': 'RCP 2.6 range',
+                            'label': chart_labels.rcp_26_median,
+                            'range_label': chart_labels.rcp_26_range,
                         },
                     },
                     {
@@ -97,24 +97,26 @@
                 'scenarios': [
                     {
                         'name': 'ssp585highEnd-p98',
-                        'label': 'SSP5-8.5 (High end, percentile 98)',
+                        'label': 'SSP5-8.5 high-end for practitioners',
                         'correlations': {
                             'cmip5': 'rcp85-p50'
                         },
                         'chart': {
-                            'color': '#980002',
-                            'label': 'SSP5-8.5 (high end)',
+                            'color': '#FF1493',
+                            // 'label': Default to scenario label,
+                            'visible': false,
                         },
                     },
                     {
                         'name': 'ssp585lowConf-p83',
-                        'label': 'SSP5-8.5 (low confidence, percentile 83)',
+                        'label': 'SSP5-8.5 high impact, low likelihood',
                         'correlations': {
                             'cmip5': 'rcp85-p50'
                         },
                         'chart': {
-                            'color': '#980002',
-                            'label': 'SSP5-8.5 (low confidence)',
+                            'color': '#8A2BE2',
+                            // 'label': Default to scenario label,
+                            'visible': false,
                         },
                     },
                     {
@@ -125,8 +127,8 @@
                         },
                         'chart': {
                             'color': '#980002',
-                            'label': 'SSP5-8.5 median',
-                            'range_label': 'SSP5-8.5 range',
+                            'label': chart_labels.ssp_585_median,
+                            'range_label': chart_labels.ssp_585_range,
                         },
                     },
                     {
@@ -137,8 +139,8 @@
                         },
                         'chart': {
                             'color': '#f16f0c',
-                            'label': 'SSP3-7.0 median',
-                            'range_label': 'SSP3-7.0 range',
+                            'label': chart_labels.ssp_370_median,
+                            'range_label': chart_labels.ssp_370_range,
                         },
                     },
                     {
@@ -149,8 +151,8 @@
                         },
                         'chart': {
                             'color': '#00640c',
-                            'label': 'SSP2-4.5 median',
-                            'range_label': 'SSP2-4.5 range',
+                            'label': chart_labels.ssp_245_median,
+                            'range_label': chart_labels.ssp_245_range,
                         },
                     },
                     {
@@ -161,8 +163,8 @@
                         },
                         'chart': {
                             'color': '#00F',
-                            'label': 'SSP1-2.6 median',
-                            'range_label': 'SSP1-2.6 range',
+                            'label': chart_labels.ssp_126_median,
+                            'range_label': chart_labels.ssp_126_range,
                         },
                     },
                 ],
@@ -200,6 +202,20 @@
 
         if ($('#rcp').length) {
             query['rcp'] = $('#rcp').val();
+
+            // We update the scenarios names from the ones in the list
+            Object.values(SLR_DATASETS).forEach(function (versionData) {
+                const scenarios = versionData["scenarios"];
+
+                scenarios.forEach(function (scenario) {
+                    const name = scenario.name;
+                    const optionElement = $('#rcp option[value="' + name + '"]');
+
+                    if ( optionElement.length ) {
+                        scenario.label = optionElement.text();
+                    }
+                });
+            });
         } else {
             query['rcp'] = 'ssp585-p50';
         }
@@ -940,7 +956,7 @@
                 }
 
                 chartSeries.push({
-                    name: chartSettings.label,
+                    name: chartSettings.label || scenario.label,
                     data: seriesData,
                     zIndex: 1,
                     showInNavigator: true,
@@ -972,7 +988,7 @@
             });
 
             if (dataset === 'cmip6') {
-                chartSeries.unshift({
+                chartSeries.push({
                     name: chart_labels.slr_uplift,
                     data: data["uplift"],
                     zIndex: 1,
@@ -1015,7 +1031,7 @@
 
                 xAxis: {
                     ordinal:false,
-                    min: Date.UTC(2000, 1, 1),
+                    min: dataset === 'cmip6' ? Date.UTC(2015, 1, 1) : Date.UTC(2000, 1, 1),
                     type: 'datetime'
                 },
 
@@ -1052,24 +1068,28 @@
                             if (!item || item instanceof Highcharts.Axis) {
                                 return false;
                             }
-                            // Item is not axis, now we are working with series.
-                            // Key is the property on the series we show in this column.
-                            if (key == 'low') {
-                                return item.name.substring(0,7) + ' lower (5th percentile)';
-                            }
+
+                            const name_words = item.name.split(" ");
+                            const last_word = name_words[name_words.length - 1].toLowerCase();
+                            const name_excluding_last = name_words.slice(0, -1).join(" ");
+
                             if (key == 'y') {
-                                return item.name.substring(0,7) + ' median (50th percentile)';
+                                if ( last_word == 'median' || last_word == 'médiane') {
+                                    return name_excluding_last + ' (' + chart_labels['50_percentile'] + ')';
+                                }
+                            }
+                            if (key == 'low') {
+                                const percentile = chart_labels[dataset === 'cmip6' ? '17_percentile' : '5_percentile']
+                                return name_excluding_last + ' (' + percentile + ')';
                             }
                             if (key == 'high') {
-                                return item.name.substring(0,7) + ' upper (95th percentile)';
+                                const percentile = chart_labels[dataset === 'cmip6' ? '83_percentile' : '95_percentile']
+                                return name_excluding_last + ' (' + percentile + ')';
                             }
 
-
-
-
-                            return false;
+                            return item.name;
                         },
-                    dateFormat: '%Y-%m-%d'
+                        dateFormat: '%Y-%m-%d'
                     }
                 },
 
@@ -1078,6 +1098,7 @@
 
 
             $('.chart-export-data').click(function (e) {
+                e.stopPropagation();
                 e.preventDefault();
 
                 var dl_type = '';

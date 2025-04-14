@@ -8,7 +8,32 @@ import { useLocale } from '@/hooks/use-locale';
 import { useDownload } from '@/hooks/use-download';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import {useClimateVariable} from "@/hooks/use-climate-variable.ts";
 
+const VariableOptionsSummary: React.FC = () => {
+	const { climateVariable } = useClimateVariable();
+
+	if (!climateVariable) return null;
+
+	const version = climateVariable.getVersion?.(); // fallback if getVersion exists
+	const analysisFields = climateVariable.getAnalysisFields?.() ?? [];
+	const analysisFieldValues = climateVariable.getAnalysisFieldValues?.() ?? {};
+
+	return (
+			<ul className="text-sm list-disc list-inside">
+				<li key={version}><strong>Version:</strong> {version || 'N/A'}</li>
+				{analysisFields.map(({ key, label, unit }) => {
+					const value = analysisFieldValues[key] ?? '-';
+
+					return (
+						<li key={key}>
+							<strong>{label}:</strong> {value} {unit}
+						</li>
+					);
+				})}
+			</ul>
+	);
+};
 const StepSummary: React.FC = () => {
 	const { __, _n } = useI18n();
 	const { locale } = useLocale();
@@ -20,8 +45,6 @@ const StepSummary: React.FC = () => {
 	const {
 		dataset,
 		variable,
-		version,
-		degrees,
 		selectionCount,
 		startYear,
 		endYear,
@@ -42,7 +65,7 @@ const StepSummary: React.FC = () => {
 		},
 		{
 			title: __('Variable options'),
-			content: `${version}, ` + __('MEAN TEMP') + ' > ' + degrees + ' °C',
+			content: <VariableOptionsSummary />,
 		},
 		{
 			title: __('Location or area'),
@@ -75,6 +98,8 @@ const StepSummary: React.FC = () => {
 			].join(', '),
 		},
 	];
+
+
 
 	return (
 		<Card

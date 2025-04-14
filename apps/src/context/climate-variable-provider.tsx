@@ -77,7 +77,6 @@ export const ClimateVariableProvider: React.FC<{
 	 */
 	const climateVariable = useMemo(() => {
 		if (!climateVariableData) return null;
-		
 		const climateVariableClass =
 			CLIMATE_VARIABLE_CLASS_MAP[climateVariableData.class];
 		if (!climateVariableClass) {

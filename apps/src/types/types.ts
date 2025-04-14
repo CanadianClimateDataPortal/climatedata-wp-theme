@@ -607,3 +607,85 @@ export interface MapInfoData {
 	featuredImage: FeaturedImage;
 	dataset: DatasetTerm[];
 }
+
+// -----------------------------------------------------------------------------
+// Downloads Specifics Types
+// -----------------------------------------------------------------------------
+// This section includes types related to components and structures used in
+// download configuration and variable-specific behavior.
+// -----------------------------------------------------------------------------
+
+/**
+ * Props for the AnalyzedField component.
+ *
+ * Renders either an input or dropdown (select) field for configuring a climate variable.
+ */
+export interface AnalyzedFieldProps {
+	keyName: string;
+	type: 'input' | 'select';
+	label: string;
+	description?: string;
+	help?: string;
+	attributeType?: string;
+	placeholder?: string;
+	value: string | null;
+	onChange: (key: string, value: string) => void;
+	__: (text: string) => string;
+	options?: { value: string; label: string }[];
+}
+
+/**
+ * Props for the InputAnalyzedField component.
+ *
+ * Represents a single text input used to configure a specific aspect
+ * of a climate variable in the analyzed download type.
+ */
+export interface InputAnalyzedFieldProps {
+	className: string;
+	keyName: string; // The key used to identify this input's value
+	label: string;
+	description?: string;
+	tooltip?: string | React.ReactNode;
+	placeholder?: string;
+	attributeType?: string; // Optional input type, defaults to 'text'
+	onChange: (key: string, value: string) => void; // Emits changes upward
+}
+
+/**
+ * Props for the SelectAnalyzedField component.
+ *
+ * Represents a dropdown (select) field used to configure a climate variable
+ * option in the analyzed download type.
+ */
+export interface SelectAnalyzedFieldProps<T = string> {
+	name: string;
+	label: string;
+	description?: string;
+	attributeType?: string; // (Unused here, but kept for future extensibility)
+	placeholder?: string;
+	value: string;
+	tooltip?: string | React.ReactNode;
+	onChange: ((key: string, value: string) => void) | ((value: string) => void);
+	options: { value: T; label: string }[];
+}
+
+/**
+ * Props for the DownloadDropdown component.
+ *
+ * A flexible dropdown (select) component used for configuring
+ * download-related options. It supports generic value types,
+ * placeholder rendering, and tooltips.
+ */
+export interface DownloadDropdownProps<T = string> // generic default type is string
+	extends Omit<
+		React.SelectHTMLAttributes<HTMLSelectElement>,
+		'onChange' | 'value'
+	> {
+	name: string,
+	options: { value: string; label: string }[];
+	value: string | T;
+	placeholder?: string;
+	label?: string | React.ReactNode;
+	tooltip?: string | React.ReactNode;
+	onChange: (key: string, value: string) => void;
+}

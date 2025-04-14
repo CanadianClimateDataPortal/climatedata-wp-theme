@@ -47,14 +47,14 @@ export interface FieldConfig {
 	label: string;
 	description?: string;
 	help?: string;
+	comparison?: string;
+	unit?: string;
 	attributes?: {
 		type?: 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
 		placeholder?: string;
+
 	};
-	options?: Array<{
-		value: string | number;
-		label: string;
-	}>;
+	options?: { value: string; label: string }[];
 }
 
 export interface FieldValues {

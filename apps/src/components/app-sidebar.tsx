@@ -23,7 +23,7 @@ import {
 } from '@/components/sidebar-menu-items/variables';
 import { EmissionScenariosControl } from '@/components/sidebar-menu-items/emission-scenarios-control';
 import { ThresholdValuesDropdown } from '@/components/sidebar-menu-items/threshold-values-dropdown';
-import { InteractiveRegionsDropdown } from '@/components/sidebar-menu-items/interactive-regions-dropdown';
+import { InteractiveRegionsMenuItem } from '@/components/sidebar-menu-items/interactive-regions-menu-item';
 import { FrequenciesDropdown } from '@/components/sidebar-menu-items/frequencies-dropdown';
 import { TimePeriodsControl } from '@/components/sidebar-menu-items/time-periods-control';
 import { DataValuesControl } from '@/components/sidebar-menu-items/data-values-control';
@@ -111,7 +111,7 @@ export function AppSidebar() {
 									<EmissionScenariosControl />
 									<SidebarSeparator />
 
-									<InteractiveRegionsDropdown />
+									<InteractiveRegionsMenuItem />
 									<SidebarSeparator />
 
 									<FrequenciesDropdown />

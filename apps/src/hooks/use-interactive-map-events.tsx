@@ -14,6 +14,14 @@ import { fetchLocationByCoords, generateChartData, } from '@/services/services';
 import { SIDEBAR_WIDTH } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
+import { MapFeatureProps } from '@/types/types';
+
+export const getFeatureId = (properties: {
+	gid?: number;
+	id?: number;
+}): number | null => {
+	return properties.gid ?? properties.id ?? null;
+};
 
 export const useInteractiveMapEvents = (
 	// @ts-expect-error: suppress leaflet typescript error
@@ -28,18 +36,8 @@ export const useInteractiveMapEvents = (
 	const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const hoveredRef = useRef<number | null>(null);
 
-	const getFeatureId = (properties: {
-		gid?: number;
-		id?: number;
-	}): number | null => {
-		return properties.gid ?? properties.id ?? null;
-	};
-
 	// Handle click on a location
-	const handleClick = async (e: {
-		latlng: L.LatLng;
-		layer: { properties: { gid?: number; id?: number } };
-	}) => {
+	const handleClick = async (e: MapFeatureProps) => {
 		if (onLocationModalOpen) {
 			// Get feature id
 			const featureId = getFeatureId(e.layer.properties);
@@ -91,10 +89,7 @@ export const useInteractiveMapEvents = (
 		}
 	};
 
-	const handleOver = (e: {
-		latlng: L.LatLng;
-		layer: { properties: { gid?: number; id?: number } };
-	}) => {
+	const handleOver = (e: MapFeatureProps) => {
 		handleOut();
 
 		const featureId = getFeatureId(e.layer.properties);

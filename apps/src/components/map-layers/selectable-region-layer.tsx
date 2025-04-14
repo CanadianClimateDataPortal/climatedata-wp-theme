@@ -1,6 +1,4 @@
 import {
-	useImperativeHandle,
-	forwardRef,
 	useEffect,
 	useRef,
 	useMemo,
@@ -15,84 +13,82 @@ import {
 	setZoom,
 	setCenter,
 } from '@/features/download/download-slice';
-import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM } from '@/lib/constants';
+import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM } from '@/lib/constants';
 import { MapFeatureProps } from '@/types/types';
-import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { getFeatureId } from '@/hooks/use-interactive-map-events';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 
 /**
- * Component that allows to select cells on the map and tally the number of cells selected
+ * Component that allows to select a region on the map from the census layer
  */
-const SelectableCellsGridLayer = forwardRef<{
-	clearSelection: () => void;
-}>((_, ref) => {
+const SelectableRegionLayer = (() => {
 	const map = useMap();
-	const { climateVariable, addSelectedPoints, removeSelectedPoint, resetSelectedPoints } = useClimateVariable();
+	const { climateVariable, setSelectedPoints, removeSelectedPoint } = useClimateVariable();
 	const dispatch = useAppDispatch();
 
 	// @ts-expect-error: suppress leaflet typescript error
-	const gridLayerRef = useRef<L.VectorGrid | null>(null);
+	const layerRef = useRef<L.VectorGrid | null>(null);
 
 	// TODO: this should not be a static value, because it needs to work also in other environments other than prod
 	const geoserverUrl = '//dataclimatedata.crim.ca';
-	const gridName = 'canadagrid';
-	const tileLayerUrl = `${geoserverUrl}/geoserver/gwc/service/tms/1.0.0/CDC:${gridName}@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf`;
+	const interactiveRegionName = climateVariable?.getInteractiveRegion() ?? '';
+	const tileLayerUrl = `${geoserverUrl}/geoserver/gwc/service/tms/1.0.0/CDC:${interactiveRegionName}/{z}/{x}/{-y}.pbf`;
 
 	const tileLayerStyles = useMemo(
 		() => ({
-			[gridName]: () => ({
-				weight: 0.2,
-				color: '#777',
-				opacity: 0.6,
+			[interactiveRegionName]: () => ({
+				weight: 1,
+				color: '#999',
+				fillColor: 'transparent',
+				opacity: 0.5,
 				fill: true,
 				radius: 4,
-				fillOpacity: 0,
+				fillOpacity: 1
 			}),
 		}),
-		[gridName]
+		[interactiveRegionName]
 	);
 
-	const selectedCellStyles = useMemo(
+	const selectedStyles = useMemo(
 		() => ({
-			color: '#f00',
+			color: "#f00",
+			weight: 1.5,
 			opacity: 1,
-			weight: 1,
+			fill: false
 		}),
 		[]
 	);
 
-	const hoverCellStyles = useMemo(
+	const hoverStyles = useMemo(
 		() => ({
+			weight: 1,
+			fill: false,
 			color: '#444',
-			fill: true,
-			fillColor: '#fff',
-			fillOpacity: 0.2,
-			opacity: 1,
-			weight: 1,
+			opacity: 1
 		}),
 		[]
 	);
 
-	const selectedGridIds = useMemo(() => {
+	const selectedIds = useMemo(() => {
 		return Object.keys(climateVariable?.getSelectedPoints() ?? {}).map(Number);
 	}, [climateVariable])
 
 	/**********************************************
-	 * update styles of selected cells
+	 * update styles of selected region
 	 **********************************************/
 	useEffect(() => {
-		if (!gridLayerRef.current) {
+		if (!layerRef.current) {
 			return;
 		}
 
-		// now apply the selected cell styles
-		selectedGridIds.forEach((gid) => {
-			gridLayerRef.current.setFeatureStyle(gid, selectedCellStyles);
+		// now apply the selected region styles
+		selectedIds.forEach((featureId) => {
+			layerRef.current.setFeatureStyle(featureId, selectedStyles);
 		});
 
-		// disabling because setting previously selected cells need the gridLayerRef dependency to work
+		// disabling because setting previously selected needs the layerRef dependency to work
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [gridLayerRef.current, selectedGridIds, selectedCellStyles]);
+	}, [layerRef.current, selectedIds, selectedStyles]);
 
 	/**********************************************
 	 * keep track of the map's zoom and center
@@ -104,47 +100,55 @@ const SelectableCellsGridLayer = forwardRef<{
 	}, [map, dispatch]);
 
 	/**********************************************
-	 * grid cell event handlers
+	 * region event handlers
 	 **********************************************/
 	const handleOver = useCallback(
 		(e: MapFeatureProps) => {
 			const featureId = getFeatureId(e.layer?.properties);
-			if (featureId) {
-				gridLayerRef.current.setFeatureStyle(featureId, hoverCellStyles);
+			if (featureId && !selectedIds.includes(featureId)) {
+				layerRef.current.setFeatureStyle(featureId, hoverStyles);
 			}
 		},
-		[hoverCellStyles]
+		[hoverStyles, selectedIds]
 	);
 
 	const handleOut = useCallback(
 		(e: MapFeatureProps) => {
 			const featureId = getFeatureId(e.layer?.properties);
-			if (featureId) {
-				if (!selectedGridIds.includes(featureId)) {
-					gridLayerRef.current?.resetFeatureStyle(featureId);
-				}
+			if (featureId && !selectedIds.includes(featureId)) {
+				layerRef.current?.resetFeatureStyle(featureId);
 			}
 		},
-		[selectedGridIds]
+		[selectedIds]
 	);
 
 	const handleClick = useCallback(
 		(e: MapFeatureProps) => {
 			const featureId = getFeatureId(e.layer?.properties);
-			if (featureId) {
-				const selectedPoints = climateVariable?.getSelectedPoints();
-				if (selectedPoints && selectedPoints[featureId] !== undefined) {
-					gridLayerRef.current.resetFeatureStyle(featureId);
-					removeSelectedPoint(featureId);
-				} else {
-					gridLayerRef.current.setFeatureStyle(featureId, selectedCellStyles);
-					addSelectedPoints({
-						[featureId]: { ...e.latlng },
-					})
-				}
+
+			if (!featureId) {
+				return;
 			}
+
+			// unselect the feature if it is already selected
+			if (featureId && selectedIds.includes(featureId)) {
+				layerRef.current?.resetFeatureStyle(featureId);
+				removeSelectedPoint(featureId);
+				return;
+			}
+
+			// reset all selected points
+			selectedIds.forEach((gid) => {
+				layerRef.current?.resetFeatureStyle(gid);
+			});
+
+			// add the feature to the selected points
+			layerRef.current.setFeatureStyle(featureId, selectedStyles);
+			setSelectedPoints({
+				[featureId]: { ...e.latlng },
+			});
 		},
-		[selectedCellStyles, climateVariable, addSelectedPoints, removeSelectedPoint]
+		[selectedStyles, selectedIds, setSelectedPoints, removeSelectedPoint]
 	);
 
 	// ensure refs always have the latest function versions
@@ -176,63 +180,53 @@ const SelectableCellsGridLayer = forwardRef<{
 		const handleMoveEnd = () => handleMoveEndRef.current();
 
 		// @ts-expect-error: suppress leaflet typescript error
-		const gridLayer = L.vectorGrid.protobuf(tileLayerUrl, {
+		const sectorLayer = L.vectorGrid.protobuf(tileLayerUrl, {
+			// @ts-expect-error: suppress leaflet typescript error
+			rendererFactory: L.canvas.tile,
 			interactive: true,
 			maxNativeZoom: DEFAULT_MAX_ZOOM,
-			getFeatureId: (feature: { properties: { gid: number } }) =>
-				feature.properties.gid,
+			getFeatureId: (feature: { properties: { id: number } }) =>
+				feature.properties.id,
 			vectorTileLayerStyles: tileLayerStyles,
 			bounds: CANADA_BOUNDS,
 			maxZoom: DEFAULT_MAX_ZOOM,
-			minZoom: 7, // not using DEFAULT_MIN_ZOOM because then the cells would appear before zooming in and it slows the map rendering
+			minZoom: DEFAULT_MIN_ZOOM,
+			name: 'geojson',
 			pane: 'grid',
 		});
+
 
 		map.on('zoomend', handleMoveEnd);
 		map.on('moveend', handleMoveEnd);
 
-		gridLayer.on('click', handleClick);
+		sectorLayer.on('click', handleClick);
 
 		// touch events for mobile devices
 		if ('ontouchstart' in window) {
-			gridLayer.on('touchstart', handleOver).on('touchend', handleOut);
+			sectorLayer.on('touchstart', handleOver).on('touchend', handleOut);
 		}
 		// mouse events for desktop
 		else {
-			gridLayer.on('mouseover', handleOver).on('mouseout', handleOut);
+			sectorLayer.on('mouseover', handleOver).on('mouseout', handleOut);
 		}
 
-		gridLayer.addTo(map);
+		sectorLayer.addTo(map);
 
 		// setting as a ref to avoid re-rendering and to have it available in other hooks
-		gridLayerRef.current = gridLayer;
+		layerRef.current = sectorLayer;
 
 		return () => {
-			if (gridLayerRef.current) {
+			if (layerRef.current) {
 				map.off('zoomend', handleMoveEnd);
 				map.off('moveend', handleMoveEnd);
-				map.removeLayer(gridLayerRef.current);
-				gridLayerRef.current = null;
+				map.removeLayer(layerRef.current);
+				layerRef.current = null;
 			}
 		};
 	}, [map, tileLayerStyles, tileLayerUrl]);
 
-	// expose the clear selection method to the parent component
-	useImperativeHandle(
-		ref,
-		() => ({
-			clearSelection() {
-				selectedGridIds.forEach((gid) => {
-					gridLayerRef.current?.resetFeatureStyle(gid);
-				});
-
-				resetSelectedPoints();
-			},
-		}),
-		[selectedGridIds, resetSelectedPoints]
-	);
 
 	return null;
 });
 
-export default SelectableCellsGridLayer;
+export default SelectableRegionLayer;

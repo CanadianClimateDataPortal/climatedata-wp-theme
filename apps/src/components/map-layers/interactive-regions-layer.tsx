@@ -1,7 +1,7 @@
 /**
  * Component that adds interaction to the map depending on the selected region (gridded data, watershed, health, census).
  */
-import React, { useCallback, useEffect, useMemo, useRef, useState, } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState, } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.vectorgrid';
@@ -16,9 +16,17 @@ import {
 	GEOSERVER_BASE_URL,
 } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { InteractiveRegionOption } from "@/types/climate-variable-interface";
+import { ColourType, InteractiveRegionOption } from "@/types/climate-variable-interface";
+import { generateColourScheme } from "@/lib/colour-scheme";
+import { getDefaultFrequency } from "@/lib/utils";
+import SectionContext from "@/context/section-provider";
 
-const InteractiveRegionsLayer: React.FC = () => {
+interface InteractiveRegionsLayerProps {
+	onLocationModalOpen: (content: React.ReactNode) => void;
+	onLocationModalClose: () => void;
+}
+
+const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLocationModalOpen, onLocationModalClose }) => {
 	const [layerData, setLayerData] = useState<Record<number, number> | null>(
 		null
 	);
@@ -28,9 +36,11 @@ const InteractiveRegionsLayer: React.FC = () => {
 
 	const map = useMap();
 
+	const section = useContext(SectionContext);
+
 	const {
-		decade,
 		legendData,
+		dataValue,
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
@@ -43,16 +53,28 @@ const InteractiveRegionsLayer: React.FC = () => {
 			return null;
 		}
 
-		const colormapEntries =
+		const legendColourMapEntries =
 			legendData.Legend[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap
 				?.entries ?? [];
 
+		if (climateVariable) {
+			const customColourScheme = generateColourScheme(climateVariable, dataValue);
+			if (customColourScheme) {
+				return {
+					colours: customColourScheme.colours,
+					quantities: customColourScheme.quantities,
+					schemeType: climateVariable.getColourType(),
+				};
+			}
+		}
+
+		// Fallback to default map colours.
 		return {
-			colours: colormapEntries.map((entry) => entry.color),
-			quantities: colormapEntries.map((entry) => Number(entry.quantity)),
-			scheme_type: 'continuous',
+			colours: legendColourMapEntries.map((entry) => entry.color),
+			quantities: legendColourMapEntries.map((entry) => Number(entry.quantity)),
+			schemeType: ColourType.CONTINUOUS,
 		};
-	}, [legendData]);
+	}, [climateVariable, dataValue, legendData]);
 
 	// Function to interpolate between colors
 	// Taken from fw-child/resources/js/utilities.js interpolate function, but optimized for React
@@ -95,7 +117,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 					? featureId
 					: (layerData?.[featureId] ?? 0);
 
-			const { colours, quantities, scheme_type } = colorMap;
+			const { colours, quantities, schemeType } = colorMap;
 
 			// More efficient binary search
 			// Taken from fw-child/resources/js/utilities.js indexOfGT function
@@ -130,7 +152,7 @@ const InteractiveRegionsLayer: React.FC = () => {
 			}
 
 			// For discrete type, return exact match
-			if (scheme_type === 'discrete') {
+			if (schemeType === ColourType.DISCRETE) {
 				return colours[index];
 			}
 
@@ -192,7 +214,9 @@ const InteractiveRegionsLayer: React.FC = () => {
 
 	const { handleClick, handleOver, handleOut } = useInteractiveMapEvents(
 		layerRef,
-		getColor
+		getColor,
+		onLocationModalOpen,
+		onLocationModalClose
 	);
 
 	// fetch layer data if needed
@@ -205,13 +229,18 @@ const InteractiveRegionsLayer: React.FC = () => {
 				return;
 			}
 
-			const frequency = climateVariable?.getFrequency() ?? '';
+			const frequencyConfig = climateVariable?.getFrequencyConfig();
+			let frequency = climateVariable?.getFrequency() ?? ''
+			if (!frequency && frequencyConfig) {
+				frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
+			}
+			const [ startYear ] = climateVariable?.getDateRange() ?? [];
 
 			try {
 				const data = await fetchChoroValues({
 					variable: climateVariable?.getThreshold() ?? '',
 					dataset: climateVariable?.getVersion() ?? '',
-					decade,
+					decade: startYear,
 					frequency,
 					interactiveRegion,
 					emissionScenario: climateVariable?.getScenario() ?? '',
@@ -224,8 +253,8 @@ const InteractiveRegionsLayer: React.FC = () => {
 			}
 		})();
 	}, [
-		decade,
 		climateVariable,
+		section,
 	]);
 
 	useEffect(() => {
@@ -270,16 +299,18 @@ const InteractiveRegionsLayer: React.FC = () => {
 			map.removeLayer(layer);
 			layerRef.current = null;
 		};
-	}, [
-		map,
-		interactiveRegion,
-		layerData,
-		tileLayerUrl,
-		vectorTileLayerStyles,
-		handleClick,
-		handleOver,
-		handleOut,
-	]);
+	},
+		// Intentionally not including the event handlers (e.g. handleClick)
+		// as dependencies since they are already being handled by the
+		// userInteractiveMapEvents hook.
+		[
+			map,
+			interactiveRegion,
+			layerData,
+			tileLayerUrl,
+			vectorTileLayerStyles,
+		]
+	);
 
 	return null;
 };

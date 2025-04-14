@@ -14,13 +14,14 @@ import SectionContext from "@/context/section-provider";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { FrequencySelect } from "@/components/frequency-select";
 import { FrequencyConfig } from "@/types/climate-variable-interface";
+import { getDefaultFrequency } from "@/lib/utils";
 
 const FrequenciesDropdown: React.FC = () => {
 	const { __ } = useI18n();
 	const section = useContext(SectionContext);
 	const { climateVariable, setFrequency } = useClimateVariable();
 	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
-	const defaultValue = climateVariable?.getFrequency() ?? undefined;
+	const defaultValue = climateVariable?.getFrequency() ?? getDefaultFrequency(frequencyConfig, section);
 
 	const Tooltip = () => (
 		<div className="text-sm text-gray-500">

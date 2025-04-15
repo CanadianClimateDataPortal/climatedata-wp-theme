@@ -14,6 +14,7 @@ import { fetchLocationByCoords, generateChartData, } from '@/services/services';
 import { SIDEBAR_WIDTH } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
+import { useLocale } from '@/hooks/use-locale';
 
 export const useInteractiveMapEvents = (
 	// @ts-expect-error: suppress leaflet typescript error
@@ -24,6 +25,7 @@ export const useInteractiveMapEvents = (
 ) => {
 	const { togglePanel } = useAnimatedPanel();
 	const { climateVariable } = useClimateVariable();
+	const { locale } = useLocale();
 
 	const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const hoveredRef = useRef<number | null>(null);
@@ -31,6 +33,10 @@ export const useInteractiveMapEvents = (
 	const getFeatureId = (properties: {
 		gid?: number;
 		id?: number;
+		name?: string;
+		title?: string;
+		label_en?: string;
+		label_fr?: string;
 	}): number | null => {
 		return properties.gid ?? properties.id ?? null;
 	};
@@ -38,7 +44,7 @@ export const useInteractiveMapEvents = (
 	// Handle click on a location
 	const handleClick = async (e: {
 		latlng: L.LatLng;
-		layer: { properties: { gid?: number; id?: number } };
+		layer: { properties: { gid?: number; id?: number; name?: string; title?: string; label_en?: string; label_fr?: string } };
 	}) => {
 		if (onLocationModalOpen) {
 			// Get feature id
@@ -48,7 +54,19 @@ export const useInteractiveMapEvents = (
 			}
 
 			const { latlng } = e;
-			const locationByCoords = await fetchLocationByCoords(latlng);
+			const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
+
+			let title = '';
+			if(interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
+				const locationByCoords = await fetchLocationByCoords(latlng);
+				title = locationByCoords.title;
+			} else {
+				if (locale === 'en') {
+					title = e.layer.properties.label_en ?? '';
+				} else if(locale === 'fr') {
+					title = e.layer.properties.label_fr ?? '';
+				}
+			}
 
 			// Handle click on details button of a location (to open the chart panel)
 			const handleDetailsClick = async () => {
@@ -65,7 +83,7 @@ export const useInteractiveMapEvents = (
 
 				togglePanel(
 					<LocationInfoPanel
-						title={locationByCoords.title}
+						title={title}
 						data={chartData}
 					/>,
 					{
@@ -82,7 +100,7 @@ export const useInteractiveMapEvents = (
 			// Open location modal
 			onLocationModalOpen(
 				<LocationModalContent
-					title={locationByCoords.title}
+					title={title}
 					latlng={latlng}
 					featureId={featureId}
 					onDetailsClick={handleDetailsClick}
@@ -93,7 +111,7 @@ export const useInteractiveMapEvents = (
 
 	const handleOver = (e: {
 		latlng: L.LatLng;
-		layer: { properties: { gid?: number; id?: number } };
+		layer: { properties: { gid?: number; id?: number; name?: string; title?: string; label_en?: string } };
 	}) => {
 		handleOut();
 

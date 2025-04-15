@@ -84,6 +84,7 @@ const Steps: React.FC = () => {
 					context?.fields?.variable?.id,
 				);
 
+				// Prepare payload
 				const payload = {
 					namespace: analysisMode,
 					signup: context?.fields?.subscribe,
@@ -96,17 +97,28 @@ const Steps: React.FC = () => {
 					payload.required_variables = []; // TODO:
 				}
 
+				// We send the request
 				const url = 'https://climatedata.ca/site/assets/themes/climate-data-ca/resources/ajax/finch-submit.php';
-				const response = await fetch(url, {
-					body: JSON.stringify(payload),
-				});
-				if (!response.ok) {
-					throw new Error('Failed to fetch data');
-				}
 
-				const data = await response.json();
-				if (data.status === 'success') {
-					console.log(data);
+				try {
+					const response = await fetch(url, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify(payload),
+					});
+					if (!response.ok) {
+						throw new Error('Failed to fetch data');
+					}
+
+					const data = await response.json();
+					if (data.status === 'success') {
+						console.log(data);
+					}
+				} catch (error) {
+					console.error('Download error:', error);
+					throw error;
 				}
 			}
 		}

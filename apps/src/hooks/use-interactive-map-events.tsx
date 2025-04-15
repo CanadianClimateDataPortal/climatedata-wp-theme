@@ -10,7 +10,7 @@ import { LocationModalContent } from '@/components/map-layers/location-modal-con
 
 import { useAppDispatch } from '@/app/hooks';
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
-import { addRecentLocation, deleteLocation } from '@/features/map/map-slice';
+import { addRecentLocation } from '@/features/map/map-slice';
 
 import { remToPx } from '@/lib/utils';
 import { fetchLocationByCoords, generateChartData, } from '@/services/services';
@@ -52,13 +52,6 @@ export const useInteractiveMapEvents = (
 
 		// a single marker is allowed at a time
 		if (markerRef.current) {
-			// first, delete the marker's location from recent locations
-			const previousLocationId = markerRef.current?.getElement()?.dataset?.locationId;
-			if (previousLocationId) {
-				dispatch(deleteLocation(previousLocationId));
-			}
-
-			// and then, remove the marker from the map
 			markerRef.current.removeFrom(map);
 		}
 
@@ -103,23 +96,23 @@ export const useInteractiveMapEvents = (
 		latlng: L.LatLng;
 		layer?: { properties: { gid?: number; id?: number, label_en?: string, label_fr?: string } };
 	}) => {
+		const { latlng, layer } = e;
+		const locationByCoords = await fetchLocationByCoords(latlng);
+
+		// get location data for recent locations and markers
+		const locationId = locationByCoords?.geo_id ?? `${locationByCoords?.lat}|${locationByCoords?.lng}`;
+		const locationTitle = layer?.properties?.label_en ?? locationByCoords?.title;
+
+		handleLocationMarkerChange(locationId, locationTitle, latlng);
+
+		// Get feature id
+		const { gid, id } = e?.layer?.properties ?? {};
+		const featureId = getFeatureId({ gid, id });
+		if (!featureId) {
+			return;
+		}
+
 		if (onLocationModalOpen) {
-			const { latlng, layer } = e;
-			const locationByCoords = await fetchLocationByCoords(latlng);
-
-			// get location data for recent locations and markers
-			const locationId = locationByCoords?.geo_id ?? `${locationByCoords?.lat}|${locationByCoords?.lng}`;
-			const locationTitle = layer?.properties?.label_en ?? locationByCoords?.title;
-
-			handleLocationMarkerChange(locationId, locationTitle, latlng);
-
-			// Get feature id
-			const { gid, id } = e?.layer?.properties ?? {};
-			const featureId = getFeatureId({ gid, id });
-			if (!featureId) {
-				return;
-			}
-
 			// Handle click on details button of a location (to open the chart panel)
 			const handleDetailsClick = async () => {
 				if(onLocationModalClose) {
@@ -147,17 +140,17 @@ export const useInteractiveMapEvents = (
 						direction: 'bottom',
 					}
 				);
-			}
 
-			// Open location modal
-			onLocationModalOpen(
-				<LocationModalContent
-					title={locationTitle}
-					latlng={latlng}
-					featureId={featureId}
-					onDetailsClick={handleDetailsClick}
-				/>
-			);
+				// Open location modal
+				onLocationModalOpen(
+					<LocationModalContent
+						title={locationTitle}
+						latlng={latlng}
+						featureId={featureId}
+						onDetailsClick={handleDetailsClick}
+					/>
+				);
+			}
 		}
 	};
 

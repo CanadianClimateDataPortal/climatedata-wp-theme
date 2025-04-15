@@ -144,6 +144,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.hasDelta;
 	}
 
+	getDataValue(): string | null {
+		return this._config.dataValue ?? null;
+	}
+
 	getCustomColourSchemes(): CustomColourSchemes | null {
 		return this._config.customColourSchemes ?? null;
 	}

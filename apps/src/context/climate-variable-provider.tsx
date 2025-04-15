@@ -29,6 +29,7 @@ export type ClimateVariableContextType = {
 	setAnalyzeScenarios: (analyzeScenarios: string[]) => void;
 	setThreshold: (threshold: string) => void;
 	setInteractiveRegion: (interactiveRegion: InteractiveRegionOption) => void;
+	setDataValue: (dataValue: string) => void;
 	setColourScheme: (colourScheme: string) => void;
 	setColourType: (colourType: string) => void;
 	setFrequency: (frequency: string) => void;
@@ -79,7 +80,7 @@ export const ClimateVariableProvider: React.FC<{
 	 */
 	const climateVariable = useMemo(() => {
 		if (!climateVariableData) return null;
-		
+
 		const climateVariableClass =
 			CLIMATE_VARIABLE_CLASS_MAP[climateVariableData.class];
 		if (!climateVariableClass) {
@@ -176,6 +177,17 @@ export const ClimateVariableProvider: React.FC<{
 			dispatch(
 				updateClimateVariable({
 					interactiveRegion,
+				})
+			);
+		},
+		[dispatch]
+	);
+
+	const setDataValue = useCallback(
+		(dataValue: string) => {
+			dispatch(
+				updateClimateVariable({
+					dataValue,
 				})
 			);
 		},
@@ -319,6 +331,7 @@ export const ClimateVariableProvider: React.FC<{
 		setAnalyzeScenarios,
 		setThreshold,
 		setInteractiveRegion,
+		setDataValue,
 		setColourScheme,
 		setColourType,
 		setFrequency,

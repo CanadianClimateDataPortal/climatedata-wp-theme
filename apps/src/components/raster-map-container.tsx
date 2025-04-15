@@ -76,6 +76,7 @@ export default function RasterMapContainer({
 				'p50',
 				frequency,
 				'30year',
+				climateVariable?.getDataValue() === 'delta' ? 'delta7100' : '',
 			]
 			.filter(Boolean)
 			.join('-');

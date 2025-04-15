@@ -38,10 +38,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 
 	const section = useContext(SectionContext);
 
-	const {
-		legendData,
-		dataValue,
-	} = useAppSelector((state) => state.map);
+	const { legendData } = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
 	const gridType = climateVariable?.getGridType() ?? 'canadagrid';
@@ -58,7 +55,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 				?.entries ?? [];
 
 		if (climateVariable) {
-			const customColourScheme = generateColourScheme(climateVariable, dataValue);
+			const customColourScheme = generateColourScheme(climateVariable);
 			if (customColourScheme) {
 				return {
 					colours: customColourScheme.colours,
@@ -74,7 +71,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 			quantities: legendColourMapEntries.map((entry) => Number(entry.quantity)),
 			schemeType: ColourType.CONTINUOUS,
 		};
-	}, [climateVariable, dataValue, legendData]);
+	}, [climateVariable, legendData]);
 
 	// Function to interpolate between colors
 	// Taken from fw-child/resources/js/utilities.js interpolate function, but optimized for React

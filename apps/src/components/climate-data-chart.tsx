@@ -429,10 +429,12 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					align: 'left',
 					formatter: function () {
 						const unit = climateVariable?.getUnit();
-						if(unit === "doy") {
-							return doyFormatter(Number(this.value), locale);
-						} else {
-							return Number(this.value).toFixed(decimals) + ' ' + unit;
+						
+						switch (unit) {
+							case "doy":
+									return doyFormatter(Number(this.value), locale);
+							default:
+									return Number(this.value).toFixed(decimals) + ' ' + unit;
 						}
 					}
 				},

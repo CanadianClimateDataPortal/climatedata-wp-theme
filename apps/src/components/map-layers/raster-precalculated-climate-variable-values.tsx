@@ -147,17 +147,21 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 
 	// Value formatter (for delta, for units)
 	const valueFormatter = (value: number, delta: boolean = (dataValue === 'delta')) => {
-		const unit = climateVariable?.getUnit();
 		let str = '';
 
-		if(unit === 'doy') {
-			if(delta) {
-				str = `${value.toFixed(decimals)} days`;
-			} else {
-				str = doyFormatter(value, locale);
-			}
-		} else {
-			str = `${value.toFixed(decimals)} ${unit}`;
+		const unit = climateVariable?.getUnit();
+
+		switch (unit) {
+			case 'doy':
+				if (delta) {
+					str = `${value.toFixed(decimals)} days`;
+				} else {
+					str = doyFormatter(value, locale);
+				}
+				break;
+			default:
+				str = `${value.toFixed(decimals)} ${unit}`;
+				break;
 		}
 
 		// If delta, we add a "+" for positive values

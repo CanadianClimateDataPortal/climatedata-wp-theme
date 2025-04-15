@@ -410,9 +410,9 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					const points = (this as unknown as { points?: TooltipPoint[] }).points;
 					return points?.map((point: TooltipPoint) => {
 						if (point.series.type === 'arearange') {
-							return `<span style="color:${point.series.color}">●</span> ${point.series.name}: <b>${formatValue(point.low)}</b> - <b>${formatValue(point.high)}</b><br/>`;
+							return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.low)}</b> - <b>${formatValue(point.high)}</b><br/>`;
 						} else {
-							return `<span style="color:${point.series.color}">●</span> ${point.series.name}: <b>${formatValue(point.y)}</b><br/>`;
+							return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.y)}</b><br/>`;
 						}
 					}).join('') || '';
 				}

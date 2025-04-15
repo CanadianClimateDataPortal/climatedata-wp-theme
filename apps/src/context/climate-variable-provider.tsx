@@ -26,9 +26,12 @@ export type ClimateVariableContextType = {
 	selectClimateVariable: (variable: PostData) => void;
 	setVersion: (version: string) => void;
 	setScenario: (scenario: string) => void;
+	setScenarioCompare: (scenarioCompare: boolean) => void;
+	setScenarioCompareTo: (scenarioCompareTo: string | null) => void;
 	setAnalyzeScenarios: (analyzeScenarios: string[]) => void;
 	setThreshold: (threshold: string) => void;
 	setInteractiveRegion: (interactiveRegion: InteractiveRegionOption) => void;
+	setDataValue: (dataValue: string) => void;
 	setColourScheme: (colourScheme: string) => void;
 	setColourType: (colourType: string) => void;
 	setFrequency: (frequency: string) => void;
@@ -79,7 +82,7 @@ export const ClimateVariableProvider: React.FC<{
 	 */
 	const climateVariable = useMemo(() => {
 		if (!climateVariableData) return null;
-		
+
 		const climateVariableClass =
 			CLIMATE_VARIABLE_CLASS_MAP[climateVariableData.class];
 		if (!climateVariableClass) {
@@ -160,6 +163,28 @@ export const ClimateVariableProvider: React.FC<{
 		[dispatch]
 	);
 
+	const setScenarioCompare = useCallback(
+		(scenarioCompare: boolean) => {
+			dispatch(
+				updateClimateVariable({
+					scenarioCompare,
+				})
+			);
+		},
+		[dispatch]
+	);
+
+	const setScenarioCompareTo = useCallback(
+		(scenarioCompareTo: string | null) => {
+			dispatch(
+				updateClimateVariable({
+					scenarioCompareTo,
+				})
+			);
+		},
+		[dispatch]
+	);
+
 	const setThreshold = useCallback(
 		(threshold: string) => {
 			dispatch(
@@ -176,6 +201,17 @@ export const ClimateVariableProvider: React.FC<{
 			dispatch(
 				updateClimateVariable({
 					interactiveRegion,
+				})
+			);
+		},
+		[dispatch]
+	);
+
+	const setDataValue = useCallback(
+		(dataValue: string) => {
+			dispatch(
+				updateClimateVariable({
+					dataValue,
 				})
 			);
 		},
@@ -316,9 +352,12 @@ export const ClimateVariableProvider: React.FC<{
 		selectClimateVariable,
 		setVersion,
 		setScenario,
+		setScenarioCompare,
+		setScenarioCompareTo,
 		setAnalyzeScenarios,
 		setThreshold,
 		setInteractiveRegion,
+		setDataValue,
 		setColourScheme,
 		setColourType,
 		setFrequency,

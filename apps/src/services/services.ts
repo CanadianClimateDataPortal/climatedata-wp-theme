@@ -12,7 +12,7 @@ import {
 } from '@/types/types';
 import L from 'leaflet';
 
-import { WP_API_DOMAIN, WP_API_VARIABLE_PATH } from '@/lib/constants.ts';
+import {  WP_API_DOMAIN, WP_API_LOCATION_BY_COORDS_PATH, WP_API_VARIABLE_PATH  } from '@/lib/constants.ts';
 
 // Cache for API responses to avoid duplicate requests
 const apiCache = new Map<string, any>();
@@ -347,15 +347,28 @@ export const clearApiCache = (key?: string): void => {
  * @param latlng Latitude and Longitude of the location
  */
 export const fetchLocationByCoords = async (latlng: L.LatLng) => {
-	const response = await fetch(
-		`${WP_API_DOMAIN}/wp-json/cdc/v2/get_location_by_coords/?lat=${latlng.lat}&lng=${latlng.lng}&sealevel=false`
-	);
+	try {
+		// Make the Fetch request.
+		const response = await fetch(`${WP_API_DOMAIN}${WP_API_LOCATION_BY_COORDS_PATH}?lat=${latlng.lat}&lng=${latlng.lng}&sealevel=false`, {
+			method: 'GET',
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json',
+			},
+		});
 
-	if (!response.ok) {
-		throw new Error('Failed to fetch data');
+		// Handle HTTP errors
+		if (!response.ok) {
+			const errorDetails = await response.json();
+			throw new Error(`HTTP error ${response.status}: ${response.statusText} - ${errorDetails}`);
+		}
+
+		// Parse response JSON
+		return await response.json();
+	} catch (error) {
+		console.error('Fetch error:', error);
+		throw error;
 	}
-
-	return await response.json();
 };
 
 /**
@@ -364,15 +377,8 @@ export const fetchLocationByCoords = async (latlng: L.LatLng) => {
  * @param options Options to pass to the API
  */
 export const generateChartData = async (options: ChartDataOptions) => {
-	const {
-		latlng: { lat, lng },
-		dataset,
-		variable,
-		frequency,
-	} = options;
-	const response = await fetch(
-		`https://dataclimatedata.crim.ca/generate-charts/${lat}/${lng}/${variable}/${frequency}?decimals=1&dataset_name=${dataset}`
-	);
+	const { latlng: { lat, lng }, dataset, variable, frequency  } = options;
+	const response = await fetch(`https://dataclimatedata.crim.ca/generate-charts/${lat}/${lng}/${variable}/${frequency}?decimals=1&dataset_name=${dataset}`);
 
 	if (!response.ok) {
 		throw new Error('Failed to fetch data');
@@ -390,9 +396,7 @@ export const fetchDeltaValues = async (options: DeltaValuesOptions) => {
 	try {
 		const { endpoint, varName, frequency, params } = options;
 
-		const response = await fetch(
-			`//dataclimatedata.crim.ca/${endpoint}/${varName}/${frequency}?${params}`
-		);
+		const response = await fetch(`//dataclimatedata.crim.ca/${endpoint}/${varName}/${frequency}?${params}`);
 
 		if (!response.ok) {
 			throw new Error(response.statusText);

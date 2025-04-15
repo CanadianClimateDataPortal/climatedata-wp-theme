@@ -168,9 +168,6 @@ export type SliderLabelsMap = {
  * Represents the map state in redux store.
  */
 export interface MapState {
-	emissionScenario: string;
-	emissionScenarioCompare: boolean;
-	emissionScenarioCompareTo: string;
 	interactiveRegion: string;
 	thresholdValue: number;
 	frequency: string;
@@ -180,7 +177,6 @@ export interface MapState {
 	dataset?: TaxonomyData;
 	decade: string;
 	pane: string;
-	dataValue: string;
 	mapColor: string;
 	legendData: WMSLegendData;
 	opacity: {

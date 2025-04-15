@@ -272,3 +272,20 @@
 		border-radius: 4px;
 	}
 }
+
+/* bounce animation for map markers */
+.leaflet-marker-icon.bounce {
+	animation: bounce 0.5s ease;
+}
+
+@keyframes bounce {
+	0% {
+		transform: scale(0.5);
+	}
+	50% {
+		transform: scale(1.2);
+	}
+	100% {
+		transform: scale(1);
+	}
+}

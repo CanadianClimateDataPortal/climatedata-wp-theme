@@ -124,8 +124,12 @@ export function AppSidebar() {
 						<TabsContent value="settings">
 							<SidebarGroupContent>
 								<SidebarMenu>
-									{hasDelta && <DataValuesControl />}
-									<SidebarSeparator />
+									{hasDelta && (
+										<>
+											<DataValuesControl />
+											<SidebarSeparator />
+										</>
+									)}
 
 									<MapColorsDropdown />
 									<SidebarSeparator />

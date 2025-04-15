@@ -2,7 +2,6 @@
 // For example any external request to an API, or any kind of data manipulation.
 
 import {
-	RelatedData,
 	MapInfoData,
 	Sector,
 	TaxonomyData,
@@ -17,17 +16,6 @@ import { WP_API_DOMAIN, WP_API_VARIABLE_PATH } from '@/lib/constants.ts';
 
 // Cache for API responses to avoid duplicate requests
 const apiCache = new Map<string, any>();
-
-export const fetchRelatedData = async (): Promise<RelatedData> => {
-	// TODO: implement this with the real API when ready
-	const response = await fetch(
-		`${WP_API_DOMAIN}/wp-json/cdc/v3/related-data`
-	);
-	if (!response.ok) {
-		throw new Error('Failed to fetch related data');
-	}
-	return await response.json();
-};
 
 /**
  * Fetches WordPress variable data by post ID from the custom WP REST API endpoint.

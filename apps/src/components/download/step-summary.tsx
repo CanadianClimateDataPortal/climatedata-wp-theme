@@ -4,6 +4,7 @@ import { PencilLine } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useLocale } from '@/hooks/use-locale';
 import { useDownload } from '@/hooks/use-download';
 import { cn } from '@/lib/utils';
@@ -14,6 +15,8 @@ const StepSummary: React.FC = () => {
 	const { locale } = useLocale();
 	const { currentStep, goToStep, fields } = useDownload();
 
+	const { climateVariable } = useClimateVariable();
+
 	/**
 	 * @todo Most, if not all, of these variables will have to be retrieved from the climateVariable class.
 	 */
@@ -22,7 +25,6 @@ const StepSummary: React.FC = () => {
 		variable,
 		version,
 		degrees,
-		selectionCount,
 		startYear,
 		endYear,
 		frequency,
@@ -47,10 +49,10 @@ const StepSummary: React.FC = () => {
 		{
 			title: __('Location or area'),
 			content: _n(
-				'1 cell selected',
-				'%d cells selected',
-				selectionCount
-			).replace('%d', String(selectionCount)),
+				'1 selected',
+				'%d selected',
+				climateVariable?.getSelectedPointsCount() ?? 0
+			).replace('%d', String(climateVariable?.getSelectedPointsCount())),
 		},
 		{
 			title: __('Additional details'),

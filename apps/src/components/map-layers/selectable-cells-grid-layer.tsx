@@ -1,24 +1,15 @@
-import {
-	useImperativeHandle,
-	forwardRef,
-	useEffect,
-	useRef,
-	useMemo,
-	useCallback,
-} from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.vectorgrid';
 
 import { useAppDispatch } from '@/app/hooks';
-import {
-	setZoom,
-	setCenter,
-} from '@/features/download/download-slice';
+import { setCenter, setZoom, } from '@/features/download/download-slice';
 import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM } from '@/lib/constants';
 import { MapFeatureProps } from '@/types/types';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { getFeatureId } from '@/hooks/use-interactive-map-events';
+import { FileFormatType, FrequencyType } from '@/types/climate-variable-interface';
 
 /**
  * Component that allows to select cells on the map and tally the number of cells selected
@@ -77,6 +68,29 @@ const SelectableCellsGridLayer = forwardRef<{
 		return Object.keys(climateVariable?.getSelectedPoints() ?? {}).map(Number);
 	}, [climateVariable])
 
+	// TODO: this needs to be moved up in the component tree because it's affected
+	//  by variables from the next step (Frecuency and File Format), currently out of scope
+	const maxCellsAllowed = useMemo(() => {
+		const freq = climateVariable?.getFrequency();
+		const format = climateVariable?.getFileFormat();
+
+		if (freq === FrequencyType.ALL_MONTHS) {
+			return 80;
+		}
+
+		if (freq === FrequencyType.DAILY) {
+			if (format === FileFormatType.NetCDF) {
+				return 200;
+			}
+
+			if (format === FileFormatType.CSV) {
+				return 20;
+			}
+		}
+
+		return 1000;
+	},[climateVariable]);
+
 	/**********************************************
 	 * update styles of selected cells
 	 **********************************************/
@@ -133,14 +147,17 @@ const SelectableCellsGridLayer = forwardRef<{
 			const featureId = getFeatureId(e.layer?.properties);
 			if (featureId) {
 				const selectedPoints = climateVariable?.getSelectedPoints();
+
 				if (selectedPoints && selectedPoints[featureId] !== undefined) {
 					gridLayerRef.current.resetFeatureStyle(featureId);
 					removeSelectedPoint(featureId);
 				} else {
-					gridLayerRef.current.setFeatureStyle(featureId, selectedCellStyles);
-					addSelectedPoints({
-						[featureId]: { ...e.latlng },
-					})
+					if ((climateVariable?.getSelectedPointsCount() ?? 0) < maxCellsAllowed) {
+						gridLayerRef.current.setFeatureStyle(featureId, selectedCellStyles);
+						addSelectedPoints({
+							[featureId]: { ...e.latlng },
+						})
+					}
 				}
 			}
 		},

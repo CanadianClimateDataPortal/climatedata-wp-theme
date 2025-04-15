@@ -30,7 +30,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 
 	const { climateVariable } = useClimateVariable();
 	const { setMap } = useMap();
-	const { zoom, center, selectionMode, selectionCount } = useAppSelector(
+	const { zoom, center, selectionMode } = useAppSelector(
 		(state) => state.download
 	);
 	const dispatch = useAppDispatch();
@@ -81,7 +81,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 							]}
 						/>
 						<div className="flex flex-row items-start gap-4">
-							{selectionCount > 0 && (
+							{climateVariable?.getSelectedPointsCount() > 0 && (
 								<Button
 									variant="ghost"
 									className="text-xs text-brand-red font-semibold leading-4 tracking-wider uppercase h-auto p-0"
@@ -99,15 +99,15 @@ export default function RasterDownloadMap(): React.ReactElement {
 								<div
 									className={cn(
 										'text-2xl font-semibold leading-7 text-right',
-										selectionCount > 0
+										climateVariable?.getSelectedPointsCount() > 0
 											? 'text-brand-blue'
 											: 'text-neutral-grey-medium'
 									)}
 								>
 									{_n(
 										'1 Cell',
-										`${selectionCount} Cells`,
-										selectionCount
+										`${climateVariable?.getSelectedPointsCount()} Cells`,
+										climateVariable?.getSelectedPointsCount()
 									)}
 								</div>
 							</div>

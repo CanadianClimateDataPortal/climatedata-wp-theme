@@ -251,6 +251,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.selectedPoints ?? null;
 	}
 
+	getSelectedPointsCount(): number {
+		return Object.keys(this._config.selectedPoints ?? {}).length;
+	}
+
 	toObject(): ClimateVariableConfigInterface {
 		return {
 			...this._config,

@@ -41,6 +41,22 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 	getDownloadType(): DownloadType | null {
 		return ClimateVariableBase.prototype.getDownloadType.call(this) ?? DownloadType.ANALYZED;
 	}
+
+	getAnalysisUrl(dataset_type: string, climateVariableId: string): string | null {
+		let analysisUrl = '/providers/finch/processes/';
+
+		// If projection
+		if (dataset_type === 'projection') {
+			analysisUrl += 'ensemble_grid_point_';
+		} 
+
+		// Add climate variable ID
+		analysisUrl += climateVariableId;
+
+		analysisUrl += '/jobs';
+
+		return analysisUrl;
+	}
 }
 
 export default RasterAnalyzeClimateVariable;

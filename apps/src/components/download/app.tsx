@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 import StepDataset from '@/components/download/step-dataset';
@@ -18,10 +18,12 @@ import { useDownload } from '@/hooks/use-download';
 import { cn } from '@/lib/utils';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { DownloadType } from '@/types/climate-variable-interface';
+import { DownloadContext } from '@/context/download-provider';
 
 const Steps: React.FC = () => {
 	const { __ } = useI18n();
 	const { climateVariable } = useClimateVariable();
+	const context = useContext(DownloadContext);
 
 	const { goToNextStep, currentStep, isStepValid } = useDownload();
 
@@ -52,13 +54,15 @@ const Steps: React.FC = () => {
 		buttonText = __('Final Step');
 	}
 
-	const handleNext = () => {
+	const handleNext = async () => {
 		if (!isLastStep) {
 			goToNextStep();
 		} else {
+			const frequency = context?.fields?.frequency;
+
 			if (
-				climateVariable?.getDownloadType() ===
-				DownloadType.PRECALCULATED
+				climateVariable?.getDownloadType() === DownloadType.PRECALCULATED
+				&& frequency !== FrequencyType.DAILY // If frequency is daily, it's analyzed
 			) {
 				// Generate the file to be downloaded.
 				climateVariable.getDownloadUrl().then((url) => {
@@ -67,6 +71,43 @@ const Steps: React.FC = () => {
 				});
 			} else {
 				// Send the request for analysis.
+
+				// Analysis mode
+				const analysisMode = context?.fields?.dataset?.dataset_type === 'ahccd'
+					? 'analyze-stations' // Climate projections
+					: 'analyze'; // Climate projectionsClimate projections
+
+				// const analysisFields = climateVariable.getAnalysisFields();
+				const analysisFieldValues = climateVariable.getAnalysisFieldValues();
+				const analysisUrl = climateVariable.getAnalysisUrl(
+					context?.fields?.dataset?.dataset_type,
+					context?.fields?.variable?.id,
+				);
+
+				const payload = {
+					namespace: analysisMode,
+					signup: context?.fields?.subscribe,
+					request_data: analysisFieldValues,
+					submit_url: analysisUrl,
+				};
+				if(analysisMode === 'analyze-stations') {
+					// TODO: not sure if getSelectedPoints is the right method
+					payload.stations = JSON.stringify(climateVariable.getSelectedPoints());
+					payload.required_variables = []; // TODO:
+				}
+
+				const url = 'https://climatedata.ca/site/assets/themes/climate-data-ca/resources/ajax/finch-submit.php';
+				const response = await fetch(url, {
+					body: JSON.stringify(payload),
+				});
+				if (!response.ok) {
+					throw new Error('Failed to fetch data');
+				}
+
+				const data = await response.json();
+				if (data.status === 'success') {
+					console.log(data);
+				}
 			}
 		}
 	};

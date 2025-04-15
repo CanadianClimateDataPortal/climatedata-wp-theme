@@ -95,21 +95,15 @@ const mapSlice = createSlice({
 		},
 		addRecentLocation(
 			state,
-			action: PayloadAction<Omit<MapLocation, 'id'>>
+			action: PayloadAction<MapLocation>
 		) {
 			const newLocation = action.payload;
 
 			// make sure the location is not already in the array
-			const exists = state.recentLocations.some(
-				(loc) =>
-					loc.lat === newLocation.lat && loc.lng === newLocation.lng
-			);
+			const exists = state.recentLocations.some((loc) => loc.id === newLocation.id);
 
 			if (!exists) {
-				state.recentLocations.push({
-					id: crypto.randomUUID(), // generate a unique id for the location
-					...newLocation,
-				});
+				state.recentLocations.push(newLocation);
 			}
 		},
 		deleteLocation(state, action: PayloadAction<string>) {

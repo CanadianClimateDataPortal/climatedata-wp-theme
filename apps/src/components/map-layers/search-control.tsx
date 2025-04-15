@@ -74,6 +74,7 @@ export default function SearchControl({
 
 			dispatch(
 				addRecentLocation({
+					id: `${latlng?.lat}|${latlng?.lng}`,
 					title,
 					...latlng,
 				})

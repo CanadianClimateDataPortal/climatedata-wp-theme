@@ -6,7 +6,7 @@ import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.vectorgrid';
 
-import { useAppSelector } from '@/app/hooks';
+import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { useInteractiveMapEvents } from '@/hooks/use-interactive-map-events';
 import { fetchChoroValues } from '@/services/services';
 import {
@@ -16,6 +16,7 @@ import {
 	GEOSERVER_BASE_URL,
 } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { clearRecentLocations } from '@/features/map/map-slice';
 import { ColourType, InteractiveRegionOption } from "@/types/climate-variable-interface";
 import { generateColourScheme } from "@/lib/colour-scheme";
 import { getDefaultFrequency } from "@/lib/utils";
@@ -36,7 +37,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 	const layerRef = useRef<L.VectorGrid | null>(null);
 
 	const map = useMap();
-
+	const dispatch = useAppDispatch();
 	const section = useContext(SectionContext);
 
 	const { legendData } = useAppSelector((state) => state.map);
@@ -292,6 +293,16 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 		}
 
 		layer.addTo(map);
+
+		// clear all existing markers from the map
+		map.eachLayer(layer => {
+			if (layer instanceof L.Marker) {
+				map.removeLayer(layer);
+			}
+		});
+
+		// clear recent locations
+		dispatch(clearRecentLocations());
 
 		return () => {
 			map.removeLayer(layer);

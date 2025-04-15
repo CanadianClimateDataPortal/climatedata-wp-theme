@@ -609,3 +609,12 @@ export interface MapInfoData {
 	featuredImage: FeaturedImage;
 	dataset: DatasetTerm[];
 }
+
+/**
+ * Represents the properties of the VariableFilterCount component.
+ */
+export interface VariableFilterCountProps {
+    filteredCount: number;
+    totalCount: number; 
+    className?: string;
+}

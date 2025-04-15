@@ -45,9 +45,6 @@ const defaultTimePeriodEnd = Math.min(
 const initialState: MapState = {
 	variable: 'tx_max',
 	decade: '2040',
-	emissionScenario: 'high',
-	emissionScenarioCompare: false,
-	emissionScenarioCompareTo: '',
 	thresholdValue: 5,
 	interactiveRegion: REGION_GRID,
 	frequency: 'ann',
@@ -87,23 +84,11 @@ const mapSlice = createSlice({
 		setDecade(state, action: PayloadAction<string>) {
 			state.decade = action.payload;
 		},
-		setEmissionScenario(state, action: PayloadAction<string>) {
-			state.emissionScenario = action.payload;
-		},
-		setEmissionScenarioCompare(state, action: PayloadAction<boolean>) {
-			state.emissionScenarioCompare = action.payload;
-		},
-		setEmissionScenarioCompareTo(state, action: PayloadAction<string>) {
-			state.emissionScenarioCompareTo = action.payload;
-		},
 		setThresholdValue(state, action: PayloadAction<number>) {
 			state.thresholdValue = action.payload;
 		},
 		setInteractiveRegion(state, action: PayloadAction<string>) {
 			state.interactiveRegion = action.payload;
-		},
-		setFrequency(state, action: PayloadAction<string>) {
-			state.frequency = action.payload;
 		},
 		setTimePeriodEnd(state, action: PayloadAction<number[]>) {
 			state.timePeriodEnd = action.payload;
@@ -158,12 +143,8 @@ export const {
 	setVariableListLoading,
 	setVariable,
 	setDecade,
-	setEmissionScenario,
-	setEmissionScenarioCompare,
-	setEmissionScenarioCompareTo,
 	setThresholdValue,
 	setInteractiveRegion,
-	setFrequency,
 	setTimePeriodEnd,
 	addRecentLocation,
 	deleteLocation,

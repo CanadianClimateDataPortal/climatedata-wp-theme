@@ -3,6 +3,179 @@
     $(function () {
         // GLOBAL vars
 
+        var SLR_DATASETS = {
+            "cmip5": {
+                'scenarios': [
+                    {
+                        'name': 'rcp85plus65-p50',
+                        'label': 'RCP 8.5 enhanced scenario',
+                        'correlations': {
+                            'cmip6': 'ssp585-p50'
+                        },
+                    },
+                    {
+                        'name': 'rcp85-p05',
+                        'label': 'RCP 8.5 lower (5th percentile)',
+                        'correlations': {
+                            'cmip6': 'ssp585-p50'
+                        }
+                    },
+                    {
+                        'name': 'rcp85-p50',
+                        'label': 'RCP 8.5 median (50th percentile)',
+                        'correlations': {
+                            'cmip6': 'ssp585-p50'
+                        },
+                        'chart': {
+                            'color': '#980002',
+                            'label': chart_labels.rcp_85_median,
+                            'range_label': chart_labels.rcp_85_range,
+                        },
+                    },
+                    {
+                        'name': 'rcp85-p95',
+                        'label': 'RCP 8.5 upper (95th percentile)',
+                        'correlations': {
+                            'cmip6': 'ssp585-p50'
+                        }
+                    },
+                    {
+                        'name': 'rcp45-p05',
+                        'label': 'RCP 4.5 lower (5th percentile)',
+                        'correlations': {
+                            'cmip6': 'ssp245-p50'
+                        }
+                    },
+                    {
+                        'name': 'rcp45-p50',
+                        'label': 'RCP 4.5 median (50th percentile)',
+                        'correlations': {
+                            'cmip6': 'ssp245-p50'
+                        },
+                        'chart': {
+                            'color': '#00640c',
+                            'label': chart_labels.rcp_45_median,
+                            'range_label': chart_labels.rcp_45_range,
+                        },
+                    },
+                    {
+                        'name': 'rcp45-p95',
+                        'label': 'RCP 4.5 upper (95th percentile)',
+                        'correlations': {
+                            'cmip6': 'ssp245-p50'
+                        }
+                    },
+                    {
+                        'name': 'rcp26-p05',
+                        'label': 'RCP 2.6 lower (5th percentile)',
+                        'correlations': {
+                            'cmip6': 'ssp126-p50'
+                        }
+                    },
+                    {
+                        'name': 'rcp26-p50',
+                        'label': 'RCP 2.6 median (50th percentile)',
+                        'correlations': {
+                            'cmip6': 'ssp126-p50'
+                        },
+                        'chart': {
+                            'color': '#00F',
+                            'label': chart_labels.rcp_26_median,
+                            'range_label': chart_labels.rcp_26_range,
+                        },
+                    },
+                    {
+                        'name': 'rcp26-p95',
+                        'label': 'RCP 2.6 upper (95th percentile)',
+                        'correlations': {
+                            'cmip6': 'ssp126-p50'
+                        }
+                    },
+                ],
+            },
+            "cmip6": {
+                'scenarios': [
+                    {
+                        'name': 'ssp585highEnd-p98',
+                        'label': 'SSP5-8.5 high-end for practitioners',
+                        'correlations': {
+                            'cmip5': 'rcp85-p50'
+                        },
+                        'chart': {
+                            'color': '#FF1493',
+                            // 'label': Default to scenario label,
+                            'visible': false,
+                        },
+                    },
+                    {
+                        'name': 'ssp585lowConf-p83',
+                        'label': 'SSP5-8.5 high impact, low likelihood',
+                        'correlations': {
+                            'cmip5': 'rcp85-p50'
+                        },
+                        'chart': {
+                            'color': '#8A2BE2',
+                            // 'label': Default to scenario label,
+                            'visible': false,
+                        },
+                    },
+                    {
+                        'name': 'ssp585-p50',
+                        'label': 'SSP5-8.5',
+                        'correlations': {
+                            'cmip5': 'rcp85-p50'
+                        },
+                        'chart': {
+                            'color': '#980002',
+                            'label': chart_labels.ssp_585_median,
+                            'range_label': chart_labels.ssp_585_range,
+                        },
+                    },
+                    {
+                        'name': 'ssp370-p50',
+                        'label': 'SSP3-7.0',
+                        'correlations': {
+                            'cmip5': 'rcp85-p50'
+                        },
+                        'chart': {
+                            'color': '#f16f0c',
+                            'label': chart_labels.ssp_370_median,
+                            'range_label': chart_labels.ssp_370_range,
+                        },
+                    },
+                    {
+                        'name': 'ssp245-p50',
+                        'label': 'SSP2-4.5',
+                        'correlations': {
+                            'cmip5': 'rcp45-p50'
+                        },
+                        'chart': {
+                            'color': '#00640c',
+                            'label': chart_labels.ssp_245_median,
+                            'range_label': chart_labels.ssp_245_range,
+                        },
+                    },
+                    {
+                        'name': 'ssp126-p50',
+                        'label': 'SSP1-2.6',
+                        'correlations': {
+                            'cmip5': 'rcp26-p50'
+                        },
+                        'chart': {
+                            'color': '#00F',
+                            'label': chart_labels.ssp_126_median,
+                            'range_label': chart_labels.ssp_126_range,
+                        },
+                    },
+                ],
+            },
+        };
+
+        var RANGE_SLIDER_VALUES = {
+            "cmip5": [2006,2010,2020,2030,2040,2050,2060,2070,2080,2090,2100],
+            "cmip6": [2020,2030,2040,2050,2060,2070,2080,2090,2100],
+        }
+
         var landmassLayerLeft, landmassLayerRight;
 
         has_mapRight = false;
@@ -29,8 +202,22 @@
 
         if ($('#rcp').length) {
             query['rcp'] = $('#rcp').val();
+
+            // We update the scenarios names from the ones in the list
+            Object.values(SLR_DATASETS).forEach(function (versionData) {
+                const scenarios = versionData["scenarios"];
+
+                scenarios.forEach(function (scenario) {
+                    const name = scenario.name;
+                    const optionElement = $('#rcp option[value="' + name + '"]');
+
+                    if ( optionElement.length ) {
+                        scenario.label = optionElement.text();
+                    }
+                });
+            });
         } else {
-            query['rcp'] = 'rcp26-p50';
+            query['rcp'] = 'ssp585-p50';
         }
 
         if ($('#decade').length) {
@@ -38,6 +225,9 @@
         } else {
             query['decade'] = '2020';
         }
+
+        let dataset = $('input[name="dataset_switch"]:checked').val();
+        query['dataset'] = dataset;
 
 
 
@@ -76,6 +266,16 @@
                     }
                 },
                 'slrgrid': function (properties, zoom) {
+                    return {
+                        weight: 0.1,
+                        color: '#89cff0',
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0
+                    }
+                },
+                'slrgrid-cmip6': function (properties, zoom) {
                     return {
                         weight: 0.1,
                         color: '#89cff0',
@@ -179,9 +379,8 @@
                 minZoom: 3,
             }).addTo(mapRight);
 
-
             gridLayerRight = L.vectorGrid.protobuf(
-                hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:slrgrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+                hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:slrgrid-cmip6@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
                 gridLayer_options
             ).on('click', function (e) {
                 grid_click(e);
@@ -251,7 +450,7 @@
                 from_value: 2100,
                 hide_min_max: true,
                 prettify_enabled: false,
-                values: [2006,2010,2020,2030,2040,2050,2060,2070,2080,2090,2100],
+                values: RANGE_SLIDER_VALUES["cmip6"],
 
                 onChange: function (data) {
                     newval = data.from_value;
@@ -455,15 +654,17 @@
             grid_hover_cancel(e);
             let rcp = e.target.rcp;
             let percentile = e.target.percentile;
+            const dataset_name = e.target.dataset_name;
 
             gridHoverTimeout = setTimeout(function () {
                 let decade_value = parseInt($("#decade").val());
                 let values_url;
                 let varDetails = {units: {value: 'cm', label: 'cm'}, decimals:0};
+                const dataset_param = dataset_name === "cmip6" ? "&dataset_name=cmip6" : "";
 
                 values_url = data_url + "/get-slr-gridded-values/" +
                     e.latlng['lat'] + "/" + e.latlng['lng'] +
-                    "?period=" + decade_value;
+                    "?period=" + decade_value + dataset_param;
 
                 gridHoverAjax = $.ajax({
                     url: values_url,
@@ -589,7 +790,7 @@
 
             // open the chart
             current_coords=[e.latlng.lat, e.latlng.lng];
-            genChart(e.latlng.lat, e.latlng.lng, 'slr', 'ann');
+            genChart(e.latlng.lat, e.latlng.lng, 'slr', 'ann', e.target.dataset_name);
 
             L.DomEvent.stop(e);
 
@@ -599,8 +800,14 @@
 
         var gridHoverTimeout, gridHoverAjax;
         var gridLayer;
+        let grid = "slrgrid";
+
+        if (dataset === 'cmip6') {
+            grid += "-cmip6";
+        }
+
         gridLayer = L.vectorGrid.protobuf(
-            hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + 'slrgrid' + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+            hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + grid + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
             gridLayer_options
         ).on('click', function (e) {
             grid_click(e);
@@ -706,6 +913,8 @@
         function disPlayChartData(data, varDetails) {
             chartUnit = varDetails.units.value === 'kelvin' ? "°C" : varDetails.units.label;
             chartDecimals = varDetails['decimals'];
+            const dataset = query['dataset'];
+            const scenarios = SLR_DATASETS[dataset].scenarios;
             switch (varDetails.units.value) {
                 case 'doy':
                     formatter = function () {return new Date(1546300800000+1000*60*60*24*this.value).toLocaleDateString(current_lang, { month:'long', day:'numeric'})};
@@ -729,100 +938,84 @@
 
             chartSeries = [];
 
-            chartSeries.push({
-                name: chart_labels.rcp_26_median,
-                data: data['rcp26_median'],
-                zIndex: 1,
-                showInNavigator: true,
-                color: '#00F',
-                marker: {
-                    fillColor: '#00F',
-                    lineWidth: 0,
-                    radius: 0,
-                    lineColor: '#00F'
-                }});
+            scenarios.toReversed().forEach(function (scenario) {
+                if (! Object.hasOwn(scenario, 'chart') ) {
+                    return;
+                }
 
-            chartSeries.push({
-                name: chart_labels.rcp_26_range,
-                data: data['rcp26_range'],
-                type: 'arearange',
-                lineWidth: 0,
-                linkedTo: ':previous',
-                color: '#00F',
-                fillOpacity: 0.2,
-                zIndex: 0,
-                marker: {
-                    radius: 0,
-                    enabled: false
-                }});
+                const scenarioCode = scenario.name.split("-")[0];
+                const chartSettings = scenario.chart;
 
-            chartSeries.push({
-                name: chart_labels.rcp_45_median,
-                data: data['rcp45_median'],
-                zIndex: 1,
-                showInNavigator: true,
-                color: '#00640c',
-                marker: {
-                    fillColor: '#00640c',
-                    lineWidth: 0,
-                    radius: 0,
-                    lineColor: '#00640c'
-                }});
+                const hasRange = Object.hasOwn(chartSettings, 'range_label');
+                let seriesData;
 
-            chartSeries.push({
-                name: chart_labels.rcp_45_range,
-                data: data['rcp45_range'],
-                type: 'arearange',
-                lineWidth: 0,
-                linkedTo: ':previous',
-                color: '#00640c',
-                fillOpacity: 0.2,
-                zIndex: 0,
-                marker: {
-                    radius: 0,
-                    enabled: false
-                }});
+                if (hasRange) {
+                    seriesData = data['{0}_median'.format(scenarioCode)]
+                } else {
+                    seriesData = data[scenarioCode];
+                }
 
-            chartSeries.push({
-                name: chart_labels.rcp_85_median,
-                data: data['rcp85_median'],
-                zIndex: 1,
-                showInNavigator: true,
-                color: '#980002',
-                marker: {
-                    fillColor: '#980002',
-                    lineWidth: 0,
-                    radius: 0,
-                    lineColor: '#980002'
-                }});
+                chartSeries.push({
+                    name: chartSettings.label || scenario.label,
+                    data: seriesData,
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: chartSettings.color,
+                    visible: chartSettings.visible !== false,
+                    marker: {
+                        fillColor: chartSettings.color,
+                        lineWidth: 0,
+                        radius: 0,
+                        lineColor: chartSettings.color
+                    }});
 
-            chartSeries.push({
-                name: chart_labels.rcp_85_range,
-                data: data['rcp85_range'],
-                type: 'arearange',
-                lineWidth: 0,
-                linkedTo: ':previous',
-                color: '#980002',
-                fillOpacity: 0.2,
-                zIndex: 0,
-                marker: {
-                    radius: 0,
-                    enabled: false
-                }});
+                if (hasRange) {
+                    chartSeries.push( {
+                        name: chartSettings.range_label,
+                        data: data[ '{0}_range'.format( scenarioCode ) ],
+                        type: 'arearange',
+                        lineWidth: 0,
+                        linkedTo: ':previous',
+                        color: chartSettings.color,
+                        fillOpacity: 0.2,
+                        zIndex: 0,
+                        marker: {
+                            radius: 0,
+                            enabled: false
+                        }
+                    } );
+                }
+            });
 
-            chartSeries.push({
-                name: chart_labels.rcp_85_enhanced,
-                data: data['rcp85_enhanced'],
-                zIndex: 1,
-                showInNavigator: true,
-                color: '#B97900',
-                marker: {
-                    fillColor: '#B97900',
-                    enabled: true,
-                    lineWidth: 0,
-                    radius: 15,
-                    lineColor: '#B97900'
-                }});
+            if (dataset === 'cmip6') {
+                chartSeries.push({
+                    name: chart_labels.slr_uplift,
+                    data: data["uplift"],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#808080',
+                    visible: false,
+                    marker: {
+                        fillColor: '#808080',
+                        lineWidth: 0,
+                        radius: 0,
+                        lineColor: '#808080'
+                    }});
+            } else {
+                chartSeries.push({
+                    name: chart_labels.rcp_85_enhanced,
+                    data: data['rcp85_enhanced'],
+                    zIndex: 1,
+                    showInNavigator: true,
+                    color: '#B97900',
+                    marker: {
+                        fillColor: '#B97900',
+                        enabled: true,
+                        lineWidth: 0,
+                        radius: 15,
+                        lineColor: '#B97900'
+                    }});
+            }
 
 
             var chart = Highcharts.stockChart('chart-placeholder', {
@@ -838,7 +1031,7 @@
 
                 xAxis: {
                     ordinal:false,
-                    min: Date.UTC(2000, 1, 1),
+                    min: dataset === 'cmip6' ? Date.UTC(2015, 1, 1) : Date.UTC(2000, 1, 1),
                     type: 'datetime'
                 },
 
@@ -875,24 +1068,28 @@
                             if (!item || item instanceof Highcharts.Axis) {
                                 return false;
                             }
-                            // Item is not axis, now we are working with series.
-                            // Key is the property on the series we show in this column.
-                            if (key == 'low') {
-                                return item.name.substring(0,7) + ' lower (5th percentile)';
-                            }
+
+                            const name_words = item.name.split(" ");
+                            const last_word = name_words[name_words.length - 1].toLowerCase();
+                            const name_excluding_last = name_words.slice(0, -1).join(" ");
+
                             if (key == 'y') {
-                                return item.name.substring(0,7) + ' median (50th percentile)';
+                                if ( last_word == 'median' || last_word == 'médiane') {
+                                    return name_excluding_last + ' (' + chart_labels['50_percentile'] + ')';
+                                }
+                            }
+                            if (key == 'low') {
+                                const percentile = chart_labels[dataset === 'cmip6' ? '17_percentile' : '5_percentile']
+                                return name_excluding_last + ' (' + percentile + ')';
                             }
                             if (key == 'high') {
-                                return item.name.substring(0,7) + ' upper (95th percentile)';
+                                const percentile = chart_labels[dataset === 'cmip6' ? '83_percentile' : '95_percentile']
+                                return name_excluding_last + ' (' + percentile + ')';
                             }
 
-
-
-
-                            return false;
+                            return item.name;
                         },
-                    dateFormat: '%Y-%m-%d'
+                        dateFormat: '%Y-%m-%d'
                     }
                 },
 
@@ -901,6 +1098,7 @@
 
 
             $('.chart-export-data').click(function (e) {
+                e.stopPropagation();
                 e.preventDefault();
 
                 var dl_type = '';
@@ -1002,7 +1200,7 @@
         }
 
         // LAYER CHART
-        function genChart(lat, lon, variable, month) {
+        function genChart(lat, lon, variable, month, dataset_name) {
             $(document).overlay('show', {
                 href: base_href + 'variable/' + 'slr' + '/',
                 data: {
@@ -1015,9 +1213,10 @@
 
                     $('#rcp').prop('disabled', true);
                     $('#rightrcp').prop('disabled', true);
+                    const dataset_param = dataset_name === 'cmip6' ? 'cmip6' : 'cmip5';
 
                     $.getJSON(
-                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month,
+                        data_url + '/generate-charts/' + lat + '/' + lon + '/' + variable + '/' + month + '?dataset_name=' + dataset_param,
                         function (data) {
                             disPlayChartData(data,varDetails);
 
@@ -1120,10 +1319,12 @@
 
         function generateLeftLegend() {
 
+            const dataset_name = $('input[name="dataset_switch"]:checked').val();
             rcp_value = $("#rcp").val();
             decade_value = parseInt($("#decade").val());
 
-            var layer = 'slr-ys-' + rcp_value + '-ann-30year';
+            const layer_prefix = dataset_name === "cmip6" ? "cmip6-" : "";
+            var layer = layer_prefix + 'slr-ys-' + rcp_value + '-ann-30year';
 
             var legendTitle = "";// mora_text_value;
 
@@ -1474,10 +1675,26 @@
 
         });
 
-
+        $('#var').change(function (e) {
+            buildFilterMenu();
+        });
 
         $('#decade').change(function (e) {
             //console.log('decade changed');
+            changeLayers();
+        });
+
+        $('input[type=radio][name=dataset_switch]').change(function() {
+            let dataset_name = $('input[name="dataset_switch"]:checked').val();
+            let old_dataset = query['dataset'];
+            query['dataset'] = dataset_name;
+
+            // replace all scenarios with their matching one when swapping datasets
+            let old_rcp_values = query['rcp'];
+            query['rcp'] = SLR_DATASETS[old_dataset].scenarios.find(e => e.name === old_rcp_values).correlations[dataset_name];
+
+            update_query_string();
+            buildFilterMenu();
             changeLayers();
         });
 
@@ -1500,12 +1717,25 @@
         });
 
         function changeLayers() {
-            rcp_value = $("#rcp").val();
-            right_rcp_value =  $("#rightrcp").val();
+            const rcp_value = $("#rcp").val();
+            const right_rcp_value =  $("#rightrcp").val();
+            const dataset_name = $('input[name="dataset_switch"]:checked').val();
             gridLayer.rcp = rcp_value.split("-")[0];
             gridLayer.percentile = rcp_value.split("-")[1];
+            gridLayer.dataset_name = dataset_name;
             gridLayerRight.rcp = right_rcp_value.split("-")[0];
             gridLayerRight.percentile = right_rcp_value.split("-")[1];
+            gridLayerRight.dataset_name = dataset_name;
+
+            let grid = "slrgrid";
+
+            if (dataset_name === 'cmip6') {
+                grid += "-cmip6";
+            }
+
+            const grid_url = hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + grid + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf";
+            gridLayer.setUrl(grid_url);
+            gridLayerRight.setUrl(grid_url);
 
             // decade_value = $("#decade").val();
             decade_value = parseInt($("#decade").val());
@@ -1521,8 +1751,8 @@
 
             generateLeftLegend();
 
-
-            singleLayerName = 'slr-ys-' + rcp_value + '-ann-30year';
+            const layer_prefix = dataset_name === 'cmip6' ? "cmip6-" : "";
+            const leftLayerName = layer_prefix + 'slr-ys-' + rcp_value + '-ann-30year';
 
             if (rcp_value === 'rcp85plus65-p50' || right_rcp_value === 'rcp85plus65-p50' ) {
                 // disable decade slider
@@ -1557,21 +1787,25 @@
                     pane: 'raster',
                     'TIME': rcp_value == 'rcp85plus65-p50' ? '' : decade_value + '-01-00T00:00:00Z',
                     'VERSION': '1.3.0',
-                    layers: 'CDC:' + 'slr-ys-' + rcp_value + '-ann-30year'
+                    layers: 'CDC:' + leftLayerName
                 });
 
 
                 if (has_mapRight === true) {
-                    rightLayer.setParams({
+                    var rightLayerName = layer_prefix + 'slr-ys-' + right_rcp_value + '-ann-30year';
+
+                    const rightLayerParams = {
                         format: 'image/png',
                         transparent: true,
                         opacity: 1,
                         pane: 'raster',
-                        styles: 'slr-' + rcp_value,
-                        'TIME': right_rcp_value == 'rcp85plus65-p50' ? '' :  decade_value + '-01-00T00:00:00Z',
+                        styles: dataset_name === 'cmip6' ? '': 'slr-' + rcp_value,
+                        'TIME': right_rcp_value == 'rcp85plus65-p50' ? '' : decade_value + '-01-00T00:00:00Z',
                         'VERSION': '1.3.0',
-                        layers: 'CDC:' + 'slr-ys-' + right_rcp_value + '-ann-30year'
-                    });
+                        layers: 'CDC:' + rightLayerName,
+                    };
+
+                    rightLayer.setParams(rightLayerParams);
                 }
 
                 // also generate the right legend
@@ -1590,12 +1824,68 @@
                     opacity: 1,
                     'TIME': rcp_value == 'rcp85plus65-p50' ? '' : decade_value + '-01-00T00:00:00Z',
                     'VERSION': '1.3.0',
-                    layers: 'CDC:' + singleLayerName
+                    layers: 'CDC:' + leftLayerName
                 });
 
             }
 
 
+        }
+
+        function buildFilterMenu() {
+            let dataset_name = getQueryVariable('dataset');
+            let scenarios = SLR_DATASETS[dataset_name].scenarios;
+
+            const right_rcp_disabled_option = $('#rightrcp option[value=disabled]').prop('outerHTML');
+
+            $('#rcp').empty();
+            $('#rightrcp').empty();
+            let rcpDropGroup = "";
+            let rcpOptions = [];
+            scenarios.forEach(function (scenario) {
+                rcpOptions.push(scenario.name);
+                rcpDropGroup += '<option value="{0}">{1}</option> '.format(scenario.name, scenario.label);
+            });
+
+            $('#rcp').append(rcpDropGroup);
+            $('#rightrcp').append(right_rcp_disabled_option);
+            $('#rightrcp').append(rcpDropGroup);
+
+            let queryRCP = getQueryVariable('rcp');
+            if (rcpOptions.includes(queryRCP)) {
+                $("#rcp").val(queryRCP).prop('selected', true);
+            }
+
+            let queryRightRCP = getQueryVariable('rightrcp');
+            if (rcpOptions.includes(queryRightRCP)) {
+                $("#rightrcp").val(queryRightRCP).prop('selected', true);
+            } else {
+                $("#rightrcp").val('disabled').prop('selected', true);
+            }
+
+            const updated_slider_values = RANGE_SLIDER_VALUES[dataset_name];
+            const current_from = parseInt($("#decade").val());
+            let new_from = 0;
+            let do_trigger_change = true;
+
+            for (let i = 0; i < updated_slider_values.length; i++) {
+                if (updated_slider_values[i] === current_from) {
+                    new_from = i;
+                    do_trigger_change = false;
+                    break;
+                }
+            }
+
+            if (do_trigger_change) {
+                $('#decade').val(updated_slider_values[new_from]).trigger('change');
+            }
+
+            rs_instance.update({
+                values: updated_slider_values,
+                min: updated_slider_values[0],
+                max: updated_slider_values[updated_slider_values.length - 1],
+                from: new_from,
+            });
         }
 
 
@@ -1761,6 +2051,18 @@
             $('#var-filter .select2').trigger('change');
             flag = false;
             // console.log('var changed triggered manually');
+        }
+
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
+            }
+            return (false);
         }
 
         $.fn.prepare_raster = function(){

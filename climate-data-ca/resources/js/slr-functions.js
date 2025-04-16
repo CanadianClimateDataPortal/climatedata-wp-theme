@@ -275,7 +275,7 @@
                         fillOpacity: 0
                     }
                 },
-                'slrgridcmip6': function (properties, zoom) {
+                'slrgrid-cmip6': function (properties, zoom) {
                     return {
                         weight: 0.1,
                         color: '#89cff0',
@@ -380,7 +380,7 @@
             }).addTo(mapRight);
 
             gridLayerRight = L.vectorGrid.protobuf(
-                hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:slrgrid@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+                hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:slrgrid-cmip6@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
                 gridLayer_options
             ).on('click', function (e) {
                 grid_click(e);
@@ -803,7 +803,7 @@
         let grid = "slrgrid";
 
         if (dataset === 'cmip6') {
-            grid += "cmip6";
+            grid += "-cmip6";
         }
 
         gridLayer = L.vectorGrid.protobuf(
@@ -1730,7 +1730,7 @@
             let grid = "slrgrid";
 
             if (dataset_name === 'cmip6') {
-                grid += "cmip6";
+                grid += "-cmip6";
             }
 
             const grid_url = hosturl + "/geoserver/gwc/service/tms/1.0.0/CDC:" + grid + "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf";
@@ -1799,10 +1799,10 @@
                         transparent: true,
                         opacity: 1,
                         pane: 'raster',
+                        styles: dataset_name === 'cmip6' ? '': 'slr-' + rcp_value,
                         'TIME': right_rcp_value == 'rcp85plus65-p50' ? '' : decade_value + '-01-00T00:00:00Z',
                         'VERSION': '1.3.0',
-                        styles: dataset_name === 'cmip6' ? '': 'slr-' + right_rcp_value,
-                        layers: 'CDC:' + rightLayerName
+                        layers: 'CDC:' + rightLayerName,
                     };
 
                     rightLayer.setParams(rightLayerParams);

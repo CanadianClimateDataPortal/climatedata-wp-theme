@@ -931,7 +931,7 @@
                 if (curValData.grid == 'canadagrid') {
                     newgrid = 'canadagrid-m6';
                 } else if (curValData.grid == 'slrgrid') {
-                    newgrid = 'slrgridcmip6';
+                    newgrid = 'slrgrid-cmip6';
                 }
             }
 

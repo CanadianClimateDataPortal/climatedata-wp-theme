@@ -14,10 +14,11 @@ import { SidebarPanel } from '@/components/ui/sidebar';
 // other
 import { useAppSelector } from '@/app/hooks';
 import { MapLocation } from '@/types/types';
-import { SEARCH_DEFAULT_ZOOM } from '@/lib/constants';
+import { MAP_MARKER_CONFIG, SEARCH_DEFAULT_ZOOM } from '@/lib/constants';
 import { useMap } from '@/hooks/use-map';
 import { useSidebar } from '@/hooks/use-sidebar';
 import { cn } from '@/lib/utils';
+import L from 'leaflet';
 
 // link and panel slug
 const slug = 'recent-locations';
@@ -64,6 +65,22 @@ const RecentLocationsPanel: React.FC = () => {
 
 	const moveToLocation = (location: MapLocation) => {
 		map.setView(location, SEARCH_DEFAULT_ZOOM);
+
+		// clear all existing markers from the map
+		map.eachLayer(layer => {
+			if (layer instanceof L.Marker) {
+				map.removeLayer(layer);
+			}
+		});
+
+		// then add the new marker to the map
+		L.marker(location, MAP_MARKER_CONFIG)
+		.bindTooltip(location.title, {
+			direction: 'top',
+			offset: [0, -30],
+		})
+		.addTo(map);
+
 	};
 
 	return (

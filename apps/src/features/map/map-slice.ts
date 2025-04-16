@@ -45,16 +45,12 @@ const defaultTimePeriodEnd = Math.min(
 const initialState: MapState = {
 	variable: 'tx_max',
 	decade: '2040',
-	emissionScenario: 'high',
-	emissionScenarioCompare: false,
-	emissionScenarioCompareTo: '',
 	thresholdValue: 5,
 	interactiveRegion: REGION_GRID,
 	frequency: 'ann',
 	timePeriodEnd: [defaultTimePeriodEnd], // needs an array because of the slider component that uses it
 	recentLocations: [],
 	pane: 'raster',
-	dataValue: 'absolute',
 	mapColor: 'default',
 	opacity: {
 		mapData: 1,
@@ -74,6 +70,7 @@ const mapSlice = createSlice({
 			state.dataset = action.payload ?? undefined;
 			// Reset variable list when dataset changes
 			state.variableList = [];
+			state.variableListLoading = false;
 		},
 		setVariableList(state, action: PayloadAction<PostData[]>) {
 			state.variableList = action.payload;
@@ -88,44 +85,26 @@ const mapSlice = createSlice({
 		setDecade(state, action: PayloadAction<string>) {
 			state.decade = action.payload;
 		},
-		setEmissionScenario(state, action: PayloadAction<string>) {
-			state.emissionScenario = action.payload;
-		},
-		setEmissionScenarioCompare(state, action: PayloadAction<boolean>) {
-			state.emissionScenarioCompare = action.payload;
-		},
-		setEmissionScenarioCompareTo(state, action: PayloadAction<string>) {
-			state.emissionScenarioCompareTo = action.payload;
-		},
 		setThresholdValue(state, action: PayloadAction<number>) {
 			state.thresholdValue = action.payload;
 		},
 		setInteractiveRegion(state, action: PayloadAction<string>) {
 			state.interactiveRegion = action.payload;
 		},
-		setFrequency(state, action: PayloadAction<string>) {
-			state.frequency = action.payload;
-		},
 		setTimePeriodEnd(state, action: PayloadAction<number[]>) {
 			state.timePeriodEnd = action.payload;
 		},
 		addRecentLocation(
 			state,
-			action: PayloadAction<Omit<MapLocation, 'id'>>
+			action: PayloadAction<MapLocation>
 		) {
 			const newLocation = action.payload;
 
 			// make sure the location is not already in the array
-			const exists = state.recentLocations.some(
-				(loc) =>
-					loc.lat === newLocation.lat && loc.lng === newLocation.lng
-			);
+			const exists = state.recentLocations.some((loc) => loc.id === newLocation.id);
 
 			if (!exists) {
-				state.recentLocations.push({
-					id: crypto.randomUUID(), // generate a unique id for the location
-					...newLocation,
-				});
+				state.recentLocations.push(newLocation);
 			}
 		},
 		deleteLocation(state, action: PayloadAction<string>) {
@@ -135,9 +114,6 @@ const mapSlice = createSlice({
 		},
 		clearRecentLocations(state) {
 			state.recentLocations = [];
-		},
-		setDataValue(state, action: PayloadAction<string>) {
-			state.dataValue = action.payload;
 		},
 		setMapColor(state, action: PayloadAction<string>) {
 			state.mapColor = action.payload;
@@ -162,17 +138,12 @@ export const {
 	setVariableListLoading,
 	setVariable,
 	setDecade,
-	setEmissionScenario,
-	setEmissionScenarioCompare,
-	setEmissionScenarioCompareTo,
 	setThresholdValue,
 	setInteractiveRegion,
-	setFrequency,
 	setTimePeriodEnd,
 	addRecentLocation,
 	deleteLocation,
 	clearRecentLocations,
-	setDataValue,
 	setMapColor,
 	setLegendData,
 	setOpacity,

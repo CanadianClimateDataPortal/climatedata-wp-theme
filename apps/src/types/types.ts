@@ -536,6 +536,7 @@ export interface MapFeatureProps {
 	latlng: L.LatLng;
 	layer: {
 		properties: {
+			label_en?: string;
 			gid?: number;
 			id?: number;
 		};
@@ -616,6 +617,6 @@ export interface MapInfoData {
  */
 export interface VariableFilterCountProps {
     filteredCount: number;
-    totalCount: number; 
+    totalCount: number;
     className?: string;
 }

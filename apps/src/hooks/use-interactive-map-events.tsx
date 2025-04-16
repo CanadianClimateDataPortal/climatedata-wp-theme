@@ -17,6 +17,14 @@ import { fetchLocationByCoords, generateChartData, } from '@/services/services';
 import { MAP_MARKER_CONFIG, SIDEBAR_WIDTH } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
+import { MapFeatureProps } from '@/types/types';
+
+export const getFeatureId = (properties: {
+	gid?: number;
+	id?: number;
+}): number | null => {
+	return properties.gid ?? properties.id ?? null;
+};
 
 export const useInteractiveMapEvents = (
 	// @ts-expect-error: suppress leaflet typescript error
@@ -34,13 +42,6 @@ export const useInteractiveMapEvents = (
 
 	const dispatch = useAppDispatch();
 	const map = useMap();
-
-	const getFeatureId = (properties: {
-		gid?: number;
-		id?: number;
-	}): number | null => {
-		return properties.gid ?? properties.id ?? null;
-	};
 
 	const handleLocationMarkerChange = (locationId: string, locationTitle: string, latlng: L.LatLng) => {
 		const previousLocationTitle = markerRef.current?.getTooltip()?.getContent();
@@ -92,10 +93,7 @@ export const useInteractiveMapEvents = (
 	};
 
 	// Handle click on a location
-	const handleClick = async (e: {
-		latlng: L.LatLng;
-		layer?: { properties: { gid?: number; id?: number, label_en?: string, label_fr?: string } };
-	}) => {
+	const handleClick = async (e: MapFeatureProps) => {
 		const { latlng, layer } = e;
 		const locationByCoords = await fetchLocationByCoords(latlng);
 
@@ -106,8 +104,7 @@ export const useInteractiveMapEvents = (
 		handleLocationMarkerChange(locationId, locationTitle, latlng);
 
 		// Get feature id
-		const { gid, id } = e?.layer?.properties ?? {};
-		const featureId = getFeatureId({ gid, id });
+		const featureId = getFeatureId(layer.properties);
 		if (!featureId) {
 			return;
 		}
@@ -154,10 +151,7 @@ export const useInteractiveMapEvents = (
 		}
 	};
 
-	const handleOver = (e: {
-		latlng: L.LatLng;
-		layer: { properties: { gid?: number; id?: number } };
-	}) => {
+	const handleOver = (e: MapFeatureProps) => {
 		handleOut();
 
 		const featureId = getFeatureId(e.layer.properties);

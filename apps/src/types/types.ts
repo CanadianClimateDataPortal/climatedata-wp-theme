@@ -532,11 +532,12 @@ export interface PercentileData {
 /**
  * Represents the properties of a cell in the maps's grid layer.
  */
-export interface GridCellProps {
+export interface MapFeatureProps {
 	latlng: L.LatLng;
 	layer: {
 		properties: {
-			gid: number;
+			gid?: number;
+			id?: number;
 		};
 	};
 }

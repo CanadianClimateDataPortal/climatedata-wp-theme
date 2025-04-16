@@ -367,6 +367,8 @@ export interface ClimateVariableInterface {
 
 	getSelectedPoints(): GridCoordinates | null;
 
+	getSelectedPointsCount(): number;
+
 	toObject(): ClimateVariableConfigInterface;
 
 	getLocationModalContent(latlng: L.LatLng, featureId: number): React.ReactNode | null;

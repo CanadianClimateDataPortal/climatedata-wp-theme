@@ -168,9 +168,6 @@ export type SliderLabelsMap = {
  * Represents the map state in redux store.
  */
 export interface MapState {
-	emissionScenario: string;
-	emissionScenarioCompare: boolean;
-	emissionScenarioCompareTo: string;
 	interactiveRegion: string;
 	thresholdValue: number;
 	frequency: string;
@@ -180,7 +177,6 @@ export interface MapState {
 	dataset?: TaxonomyData;
 	decade: string;
 	pane: string;
-	dataValue: string;
 	mapColor: string;
 	legendData: WMSLegendData;
 	opacity: {
@@ -537,11 +533,13 @@ export interface PercentileData {
 /**
  * Represents the properties of a cell in the maps's grid layer.
  */
-export interface GridCellProps {
+export interface MapFeatureProps {
 	latlng: L.LatLng;
 	layer: {
 		properties: {
-			gid: number;
+			label_en?: string;
+			gid?: number;
+			id?: number;
 		};
 	};
 }
@@ -613,4 +611,13 @@ export interface MapInfoData {
 	relevantTrainings: Training[];
 	featuredImage: FeaturedImage;
 	dataset: DatasetTerm[];
+}
+
+/**
+ * Represents the properties of the VariableFilterCount component.
+ */
+export interface VariableFilterCountProps {
+    filteredCount: number;
+    totalCount: number;
+    className?: string;
 }

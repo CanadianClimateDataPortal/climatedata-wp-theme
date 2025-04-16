@@ -170,6 +170,12 @@ export interface ClimateVariableConfigInterface {
 	/** Selected scenario value */
 	scenario?: string | null;
 
+	/** Compare scenarios flag */
+	scenarioCompare?: boolean;
+
+	/** Scenario to compare against `scenario` */
+	scenarioCompareTo?: string | null;
+
 	/** Selected scenarios for analysis */
 	analyzeScenarios?: string[];
 
@@ -196,6 +202,9 @@ export interface ClimateVariableConfigInterface {
 
 	/** Indicates whether delta (difference) values are available */
 	hasDelta?: boolean;
+
+	/** Currently selected data value */
+	dataValue?: string | null;
 
 	/** Custom color scheme used for visualizing the variable */
 	colourScheme?: string;
@@ -284,6 +293,10 @@ export interface ClimateVariableInterface {
 
 	getScenario(): string | null;
 
+	getScenarioCompare(): boolean;
+
+	getScenarioCompareTo(): string | null;
+
 	getAnalyzeScenarios(): string[];
 
 	getLayerStyles(): string;
@@ -301,6 +314,8 @@ export interface ClimateVariableInterface {
 	getFrequency(): string | null;
 
 	hasDelta(): boolean | undefined;
+
+	getDataValue(): string | null;
 
 	getCustomColourSchemes(): CustomColourSchemes | null;
 
@@ -351,6 +366,8 @@ export interface ClimateVariableInterface {
 	getAnalysisUrl(): string | null;
 
 	getSelectedPoints(): GridCoordinates | null;
+
+	getSelectedPointsCount(): number;
 
 	toObject(): ClimateVariableConfigInterface;
 

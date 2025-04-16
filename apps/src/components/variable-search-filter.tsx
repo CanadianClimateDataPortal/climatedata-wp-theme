@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setSearchQuery, selectSearchQuery } from '@/store/climate-variable-slice';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useI18n } from '@wordpress/react-i18n';
+import { setVariableListLoading } from '@/features/map/map-slice';
 
 export const VariableSearchFilter: React.FC = () => {
   const { __ } = useI18n();
@@ -18,13 +19,19 @@ export const VariableSearchFilter: React.FC = () => {
   const [localSearchQuery, setLocalSearchQuery] = useState(globalSearchQuery);
   const debouncedSearchQuery = useDebounce(localSearchQuery, 300);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const { dataset } = useAppSelector((state) => state.map);
 
   // Update Redux state when debounced value changes
   useEffect(() => {
     if (debouncedSearchQuery !== globalSearchQuery) {
       dispatch(setSearchQuery(debouncedSearchQuery));
+      
+      // If we have a dataset, set loading state to true when search query changes
+      if (dataset) {
+        dispatch(setVariableListLoading(true));
+      }
     }
-  }, [debouncedSearchQuery, dispatch, globalSearchQuery]);
+  }, [debouncedSearchQuery, dispatch, globalSearchQuery, dataset]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalSearchQuery(e.target.value);
@@ -33,6 +40,12 @@ export const VariableSearchFilter: React.FC = () => {
   const handleClear = () => {
     setLocalSearchQuery('');
     dispatch(setSearchQuery(''));
+    
+    // If we have a dataset, set loading state
+    if (dataset) {
+      dispatch(setVariableListLoading(true));
+    }
+    
     searchInputRef.current?.focus();
   };
 

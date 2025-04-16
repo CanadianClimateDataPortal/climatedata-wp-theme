@@ -21,7 +21,7 @@ interface RasterPrecalcultatedClimateVariableValuesProps {
  * ---------------------------
  * Display the climate variable values (median, relative to baseline, range)
  * For Raster/Precalculated climate variable
- * 
+ *
  * Can be used in the location modal and charts panel
  */
 const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedClimateVariableValuesProps> = ({
@@ -82,7 +82,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 			const medianRangeParams = new URLSearchParams({
 				period: String(decadeValue),
 				decimals: decimals.toString(),
-				delta7100: dataValue === 'delta' ? 'true' : 'false',
+				delta7100: climateVariable?.getDataValue() === 'delta' ? 'true' : 'false',
 				dataset_name: climateVariable?.getVersion() ?? '',
 			}).toString();
 
@@ -132,7 +132,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 			const timestamp = Date.UTC(decadeValue, month, 1, 0, 0, 0);
 
 			if(
-				chartsData[deltaValueKey] !== undefined 
+				chartsData[deltaValueKey] !== undefined
 				&& chartsData[deltaValueKey][timestamp] !== undefined
 				&& chartsData[deltaValueKey][timestamp][0] !== undefined
 			) {
@@ -146,7 +146,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	}, [climateVariable, dataValue, decimals, dateRange, featureId, latlng, section]);
 
 	// Value formatter (for delta, for units)
-	const valueFormatter = (value: number, delta: boolean = (dataValue === 'delta')) => {
+	const valueFormatter = (value: number, delta: boolean = (climateVariable?.getDataValue() === 'delta')) => {
 		let str = '';
 
 		const unit = climateVariable?.getUnit();
@@ -218,7 +218,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	const generateRangeDiv = (rangeStartValue: number, rangeEndValue: number) => {
 		const rangeStart = valueFormatter(rangeStartValue);
 		const rangeEnd = valueFormatter(rangeEndValue);
-		
+
 		return (
 			<>
 				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>

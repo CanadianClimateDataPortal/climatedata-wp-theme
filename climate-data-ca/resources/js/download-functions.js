@@ -925,7 +925,16 @@
                 $('#download-variable').val(1).trigger('change.select2');
             }
             let selectedDataset = $('input[name="download-dataset"]:checked').val();
-            let newgrid = selectedDataset == 'cmip6' && curValData.grid == 'canadagrid' ? 'canadagrid-m6':  curValData.grid;
+            let newgrid = curValData.grid;
+
+            if ( selectedDataset === 'cmip6' ) {
+                if (curValData.grid == 'canadagrid') {
+                    newgrid = 'canadagrid-m6';
+                } else if (curValData.grid == 'slrgrid') {
+                    newgrid = 'slrgrid-cmip6';
+                }
+            }
+
             if (typeof pbfLayer !== 'undefined' && pbfLayer.gridType !== newgrid) {
                 maps['variable'].removeLayer(pbfLayer);
                 console.log("Adding Grid:" + newgrid);

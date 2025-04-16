@@ -24,6 +24,8 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 import appConfig from '@/config/app.config';
 import { doyFormatter } from '@/lib/format';
 
+type TabValue = 'annual-values' | '30-year-averages' | '30-year-changes';
+
 // necessary for highcharts to show the navigator area at the bottom of the chart
 if (typeof HighchartsStock === 'function') {
 	HighchartsStock(Highcharts);
@@ -50,9 +52,14 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	const decimals = 1;
 	const { dataset } = useAppSelector((state) => state.map);
 	const chartRef = useRef<HighchartsReact.RefObject>(null);
+	const version = climateVariable?.getVersion();
+	const scenario = climateVariable?.getScenario();
+	const unit = climateVariable?.getUnit();
 
-	const [activeTab, setActiveTab] = useState('annual-values');
+	const [activeTab, setActiveTab] = useState<TabValue>('annual-values');
 	const [activeSeries, setActiveSeries] = useState<string[]>([]);
+	const [activeChartTooltip, setActiveChartTooltip] = useState<Highcharts.TooltipOptions>({});
+	const [activeChartPlotOptions, setActiveChartPlotOptions] = useState<Highcharts.PlotOptions>({});
 
 	// Subtitle displayed info
 	const datasetLabel = dataset?.title.en;
@@ -63,227 +70,434 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		return seriesData.slice().sort((a, b) => a[0] - b[0]);
 	}, []);
 
-	const formatData = useCallback((dataset: Record<string, number[]> = {}) => {
-		return Object.entries(dataset).map(([timestamp, values]) => [
-			parseInt(timestamp, 10),
-			...values,
-		]);
-	}, []);
+	// Tooltip format value helper
+	const formatValue = (value: number | undefined, isDelta:boolean = false) => {
+		if (value === undefined) return '';
 
+		if(unit === "doy") {
+			return doyFormatter(Number(value), locale);
+		} else {
+			const formattedValue = Number(value).toFixed(decimals);
+			// Add "+" prefix for positive delta values
+			if (isDelta && Number(value) > 0) {
+				return `+${formattedValue} ${unit}`;
+			}
+			return `${formattedValue} ${unit}`;
+		}
+	};
+
+	// Tooltip: find closest timestamp for 30 years options
+	const findClosetTimestamp = (timestamp: number, data: Record<string, number[]> | undefined) => {
+		if (!data) return null;
+		const sortedKeys = Object.keys(data)
+			.map(Number)
+			.sort((a, b) => a - b);
+		const validKeys = sortedKeys.filter(key => key <= timestamp);
+		return validKeys.length > 0 ? validKeys[validKeys.length - 1] : null;
+	};
+
+	// Chart data colors
+	const chartDataOptions: Record<string, { name: string; color: string; type?: string }> = {
+		'observations': {
+			name: __('Gridded Historical Data'),
+			color: 'gray',
+			type: 'line',
+		},
+		'modeled_historical_median': {
+			name: __('Modeled Historical'),
+			color: 'black',
+			type: 'line',
+		},
+		'modeled_historical_range': {
+			name: __('Historical Range'),
+			color: 'lightgray',
+			type: 'arearange',
+		},
+		'ssp126_median': {
+			name: __('SSP1-2.6 Median'),
+			color: 'blue',
+			type: 'line',
+		},
+		'ssp126_range': {
+			name: __('SSP1-2.6 Range'),
+			color: 'lightblue',
+			type: 'arearange',
+		},
+		'ssp245_median': {
+			name: __('SSP2-4.5 Median'),
+			color: 'green',
+			type: 'line',
+		},
+		'ssp245_range': {
+			name: __('SSP2-4.5 Range'),
+			color: 'lightgreen',
+			type: 'arearange',
+		},
+		'ssp585_median': {
+			name: __('SSP5-8.5 Median'),
+			color: 'red',
+			type: 'line',
+		},
+		'ssp585_range': {
+			name: __('SSP5-8.5 Range'),
+			color: 'pink',
+			type: 'arearange',
+		},
+		'rcp26_median': {
+			name: __('RCP 2.6 Median'),
+			color: 'blue',
+			type: 'line',
+		},
+		'rcp26_range': {
+			name: __('RCP 2.6 Range'),
+			color: 'lightblue',
+			type: 'arearange',
+		},
+		'rcp45_median': {
+			name: __('RCP 4.5 Median'),
+			color: 'green',
+			type: 'line',
+		},
+		'rcp45_range': {
+			name: __('RCP 4.5 Range'),
+			color: 'lightgreen',
+			type: 'arearange',
+		},
+		'rcp85_median': {
+			name: __('RCP 8.5 Median'),
+			color: 'red',
+			type: 'line',
+		},
+		'rcp85_range': {
+			name: __('RCP 8.5 Range'),
+			color: 'pink',
+			type: 'arearange',
+		},
+	};
+
+	// Chart serie
 	const seriesObject = useMemo<
-		Record<string, (SeriesLineOptions | SeriesArearangeOptions)[]>
-	>(
+		(SeriesLineOptions | SeriesArearangeOptions)[]
+	>(() => {
+		switch (version) {
+			case 'cmip5':
+				return [
+					{
+						custom: { key: 'observations' },
+						name: chartDataOptions['observations'].name,
+						type: chartDataOptions['observations'].type,
+						data: sortByTimestamp(data.observations),
+						color: chartDataOptions['observations'].color,
+						lineWidth: 1.5,
+						dashStyle: 'ShortDash',
+					} as SeriesLineOptions,
+					{
+						custom: { key: 'modeled_historical_median' },
+						name: chartDataOptions['modeled_historical_median'].name,
+						type: chartDataOptions['modeled_historical_median'].type,
+						data: sortByTimestamp(data.modeled_historical_median),
+						color: chartDataOptions['modeled_historical_median'].color,
+						lineWidth: 2,
+					} as SeriesLineOptions,
+					{
+						custom: { key: 'modeled_historical_range' },
+						name: chartDataOptions['modeled_historical_range'].name,
+						type: chartDataOptions['modeled_historical_range'].type,
+						data: sortByTimestamp(data.modeled_historical_range),
+						color: chartDataOptions['modeled_historical_range'].color,
+						fillOpacity: 0.3,
+						zIndex: 0,
+					} as SeriesArearangeOptions,
+					{
+						custom: { key: 'rcp26_median' },
+						name: chartDataOptions['rcp26_median'].name,
+						type: chartDataOptions['rcp26_median'].type,
+						data: sortByTimestamp(data.rcp26_median),
+						color: chartDataOptions['rcp26_median'].color,
+						lineWidth: 2,
+					} as SeriesLineOptions,
+					{
+						custom: { key: 'rcp26_range' },
+						name: chartDataOptions['rcp26_range'].name,
+						type: chartDataOptions['rcp26_range'].type,
+						data: sortByTimestamp(data.rcp26_range),
+						color: chartDataOptions['rcp26_range'].color,
+						fillOpacity: 0.3,
+					} as SeriesArearangeOptions,
+					{
+						custom: { key: 'rcp45_median' },
+						name: chartDataOptions['rcp45_median'].name,
+						type: chartDataOptions['rcp45_median'].type,
+						data: sortByTimestamp(data.rcp45_median),
+						color: chartDataOptions['rcp45_median'].color,
+						lineWidth: 2,
+					} as SeriesLineOptions,
+					{
+						custom: { key: 'rcp45_range' },
+						name: chartDataOptions['rcp45_range'].name,
+						type: chartDataOptions['rcp45_range'].type,
+						data: sortByTimestamp(data.rcp45_range),
+						color: chartDataOptions['rcp45_range'].color,
+						fillOpacity: 0.3,
+					} as SeriesArearangeOptions,
+					{
+						custom: { key: 'rcp85_median' },
+						name: chartDataOptions['rcp85_median'].name,
+						type: chartDataOptions['rcp85_median'].type,
+						data: sortByTimestamp(data.rcp85_median),
+						color: chartDataOptions['rcp85_median'].color,
+						lineWidth: 2,
+					} as SeriesLineOptions,
+					{
+						custom: { key: 'rcp85_range' },
+						name: chartDataOptions['rcp85_range'].name,
+						type: chartDataOptions['rcp85_range'].type,
+						data: sortByTimestamp(data.rcp85_range),
+						color: chartDataOptions['rcp85_range'].color,
+						fillOpacity: 0.3,
+					} as SeriesArearangeOptions,
+				];
+			case 'cmip6':
+				return [
+					{
+						custom: { key: 'observations' },
+						name: chartDataOptions['observations'].name,
+						type: chartDataOptions['observations'].type,
+						data: sortByTimestamp(data.observations),
+						color: chartDataOptions['observations'].color,
+						lineWidth: 1.5,
+						dashStyle: 'ShortDash',
+					} as SeriesLineOptions,
+					{
+						custom: { key: 'modeled_historical_median' },
+						name: chartDataOptions['modeled_historical_median'].name,
+						type: chartDataOptions['modeled_historical_median'].type,
+						data: sortByTimestamp(data.modeled_historical_median),
+						color: chartDataOptions['modeled_historical_median'].color,
+						lineWidth: 2,
+					} as SeriesLineOptions,
+					{
+						custom: { key: 'modeled_historical_range' },
+						name: chartDataOptions['modeled_historical_range'].name,
+						type: chartDataOptions['modeled_historical_range'].type,
+						data: sortByTimestamp(data.modeled_historical_range),
+						color: chartDataOptions['modeled_historical_range'].color,
+						fillOpacity: 0.3,
+						zIndex: 0,
+					} as SeriesArearangeOptions,
+					{
+						custom: { key: 'ssp126_median' },
+						name: chartDataOptions['ssp126_median'].name,
+						type: chartDataOptions['ssp126_median'].type,
+						data: sortByTimestamp(data.ssp126_median),
+						color: chartDataOptions['ssp126_median'].color,
+						lineWidth: 2,
+					} as SeriesLineOptions,
+					{
+						custom: { key: 'ssp126_range' },
+						name: chartDataOptions['ssp126_range'].name,
+						type: chartDataOptions['ssp126_range'].type,
+						data: sortByTimestamp(data.ssp126_range),
+						color: chartDataOptions['ssp126_range'].color,
+						fillOpacity: 0.3,
+					} as SeriesArearangeOptions,
+					{
+						custom: { key: 'ssp245_median' },
+						name: chartDataOptions['ssp245_median'].name,
+						type: chartDataOptions['ssp245_median'].type,
+						data: sortByTimestamp(data.ssp245_median),
+						color: chartDataOptions['ssp245_median'].color,
+						lineWidth: 2,
+					} as SeriesLineOptions,
+					{
+						custom: { key: 'ssp245_range' },
+						name: chartDataOptions['ssp245_range'].name,
+						type: chartDataOptions['ssp245_range'].type,
+						data: sortByTimestamp(data.ssp245_range),
+						color: chartDataOptions['ssp245_range'].color,
+						fillOpacity: 0.3,
+					} as SeriesArearangeOptions,
+					{
+						custom: { key: 'ssp585_median' },
+						name: chartDataOptions['ssp585_median'].name,
+						type: chartDataOptions['ssp585_median'].type,
+						data: sortByTimestamp(data.ssp585_median),
+						color: chartDataOptions['ssp585_median'].color,
+						lineWidth: 2,
+					} as SeriesLineOptions,
+					{
+						custom: { key: 'ssp585_range' },
+						name: chartDataOptions['ssp585_range'].name,
+						type: chartDataOptions['ssp585_range'].type,
+						data: sortByTimestamp(data.ssp585_range),
+						color: chartDataOptions['ssp585_range'].color,
+						fillOpacity: 0.3,
+					} as SeriesArearangeOptions,
+				];
+			default:
+				return [];
+		}
+	}, [data, sortByTimestamp]);
+
+	// Tooltip formatter for 30 years averages and changes
+	const tooltip30yFormatter = (x: number, prefix: string, isDelta: boolean, currentActiveSeries: string[]) => {
+		// Chart reference
+		const chart = chartRef.current?.chart;
+		if (!chart) return;
+		// Remove previous plot band
+		chart.xAxis[0].removePlotBand('30y-plot-band',);
+
+		// Get current range
+		const currentTimestamp = x;
+		const dataKey = prefix + scenario + '_median';
+		const dataRecord = data[dataKey];
+		if (!dataRecord) return '';
+		
+		const timestampKey = findClosetTimestamp(currentTimestamp, dataRecord as Record<string, number[]>);
+		if(timestampKey === null) return '';
+
+		// Displayed period
+		const startYear = new Date(timestampKey).getFullYear() + 1;
+		const endYear = startYear + 29;
+
+		// Add plot band on 30 years range
+		chart.xAxis[0].addPlotBand({
+			from: Date.UTC(startYear, 0, 1),
+			to: Date.UTC(startYear + 29, 11, 31),
+			id: '30y-plot-band',
+		});
+
+		// Tooltip content
+		let tooltip = `<b>${startYear} - ${endYear}</b><br/>`;
+
+		// Iterate on 30y data
+		Object.keys(data)
+			.filter((key) => key.startsWith(prefix))
+			.forEach((key) => {
+				const dataKey = key.replace(prefix, '');
+
+				if(currentActiveSeries.includes(dataKey) === false) return;
+
+				const currentData = data[key];
+				if (!currentData || !chartDataOptions[dataKey]) return;
+
+				const recordData = currentData as Record<string, number[]>;
+				const timestampData = recordData[timestampKey];
+				if (!timestampData) return;
+
+				if (chartDataOptions[dataKey].type === 'arearange') {
+					tooltip += `<span style="color:${chartDataOptions[dataKey].color}">&bull;</span> ${chartDataOptions[dataKey].name}: <b>${formatValue(timestampData[0], isDelta)}</b> - <b>${formatValue(timestampData[1], isDelta)}</b><br/>`;
+				} else {
+					tooltip += `<span style="color:${chartDataOptions[dataKey].color}">&bull;</span> ${chartDataOptions[dataKey].name}: <b>${formatValue(timestampData[0], isDelta)}</b><br/>`;
+				}
+			});
+
+		return tooltip;
+	};
+
+	// Chart tooltips
+	const chartTooltips = useMemo(() => 
 		() => ({
-			'annual-values': [
-				{
-					custom: { key: 'gridded-historical' },
-					name: __('Gridded Historical Data'),
-					type: 'line',
-					data: sortByTimestamp(data.observations),
-					color: 'gray',
-					lineWidth: 1.5,
-					dashStyle: 'ShortDash',
-				} as SeriesLineOptions,
-				{
-					custom: { key: 'modeled-historical' },
-					name: __('Modeled Historical'),
-					type: 'line',
-					data: sortByTimestamp(data.modeled_historical_median),
-					color: 'black',
-					lineWidth: 2,
-				} as SeriesLineOptions,
-				{
-					custom: { key: 'historical-range' },
-					name: __('Historical Range'),
-					type: 'arearange',
-					data: sortByTimestamp(data.modeled_historical_range),
-					color: 'lightgray',
-					fillOpacity: 0.3,
-					zIndex: 0,
-				} as SeriesArearangeOptions,
-				{
-					custom: { key: 'ssp126-median' },
-					name: __('SSP1-2.6 Median'),
-					type: 'line',
-					data: sortByTimestamp(data.ssp126_median),
-					color: 'blue',
-					lineWidth: 2,
-				} as SeriesLineOptions,
-				{
-					custom: { key: 'ssp126-range' },
-					name: __('SSP1-2.6 Range'),
-					type: 'arearange',
-					data: sortByTimestamp(data.ssp126_range),
-					color: 'lightblue',
-					fillOpacity: 0.3,
-				} as SeriesArearangeOptions,
-				{
-					custom: { key: 'ssp245-median' },
-					name: __('SSP2-4.5 Median'),
-					type: 'line',
-					data: sortByTimestamp(data.ssp245_median),
-					color: 'green',
-					lineWidth: 2,
-				} as SeriesLineOptions,
-				{
-					custom: { key: 'ssp245-range' },
-					name: __('SSP2-4.5 Range'),
-					type: 'arearange',
-					data: sortByTimestamp(data.ssp245_range),
-					color: 'lightgreen',
-					fillOpacity: 0.3,
-				} as SeriesArearangeOptions,
-				{
-					custom: { key: 'ssp585-median' },
-					name: __('SSP5-8.5 Median'),
-					type: 'line',
-					data: sortByTimestamp(data.ssp585_median),
-					color: 'red',
-					lineWidth: 2,
-				} as SeriesLineOptions,
-				{
-					custom: { key: 'ssp585-range' },
-					name: __('SSP5-8.5 Range'),
-					type: 'arearange',
-					data: sortByTimestamp(data.ssp585_range),
-					color: 'pink',
-					fillOpacity: 0.3,
-				} as SeriesArearangeOptions,
-			],
-			'30-year-averages': [
-				{
-					custom: { key: '30y-observations' },
-					name: __('30y Observations'),
-					type: 'line',
-					data: sortByTimestamp(formatData(data['30y_observations'])),
-					color: 'black',
-					lineWidth: 2,
-				} as SeriesLineOptions,
-				{
-					custom: { key: '30y-ssp126-median' },
-					name: __('30y SSP1-2.6 Median'),
-					type: 'line',
-					data: sortByTimestamp(
-						formatData(data['30y_ssp126_median'])
-					),
-					color: 'blue',
-					lineWidth: 2,
-				} as SeriesLineOptions,
-				{
-					custom: { key: '30y-ssp126-range' },
-					name: __('30y SSP1-2.6 Range'),
-					type: 'arearange',
-					data: sortByTimestamp(formatData(data['30y_ssp126_range'])),
-					color: 'lightblue',
-					fillOpacity: 0.3,
-				} as SeriesArearangeOptions,
-				{
-					custom: { key: '30y-ssp245-median' },
-					name: __('30y SSP2-4.5 Median'),
-					type: 'line',
-					data: sortByTimestamp(
-						formatData(data['30y_ssp245_median'])
-					),
-					color: 'green',
-					lineWidth: 2,
-				} as SeriesLineOptions,
-				{
-					custom: { key: '30y-ssp245-range' },
-					name: __('30y SSP2-4.5 Range'),
-					type: 'arearange',
-					data: sortByTimestamp(formatData(data['30y_ssp245_range'])),
-					color: 'lightgreen',
-					fillOpacity: 0.3,
-				} as SeriesArearangeOptions,
-				{
-					custom: { key: '30y-ssp585-median' },
-					name: __('30y SSP5-8.5 Median'),
-					type: 'line',
-					data: sortByTimestamp(
-						formatData(data['30y_ssp585_median'])
-					),
-					color: 'red',
-					lineWidth: 2,
-				} as SeriesLineOptions,
-				{
-					custom: { key: '30y-ssp585-range' },
-					name: __('30y SSP5-8.5 Range'),
-					type: 'arearange',
-					data: sortByTimestamp(formatData(data['30y_ssp585_range'])),
-					color: 'pink',
-					fillOpacity: 0.3,
-				} as SeriesArearangeOptions,
-			],
-			'30-year-changes': [
-				{
-					custom: { key: 'delta7100-ssp126-median' },
-					name: __('Delta 7100 SSP1-2.6 Median'),
-					type: 'line',
-					data: sortByTimestamp(
-						formatData(data['delta7100_ssp126_median'])
-					),
-					color: 'blue',
-					lineWidth: 2,
-				} as SeriesLineOptions,
-				{
-					custom: { key: 'delta7100-ssp126-range' },
-					name: __('Delta 7100 SSP1-2.6 Range'),
-					type: 'arearange',
-					data: sortByTimestamp(
-						formatData(data['delta7100_ssp126_range'])
-					),
-					color: 'lightblue',
-					fillOpacity: 0.3,
-				} as SeriesArearangeOptions,
-				{
-					custom: { key: 'delta7100-ssp245-median' },
-					name: __('Delta 7100 SSP2-4.5 Median'),
-					type: 'line',
-					data: sortByTimestamp(
-						formatData(data['delta7100_ssp245_median'])
-					),
-					color: 'green',
-					lineWidth: 2,
-				} as SeriesLineOptions,
-				{
-					custom: { key: 'delta7100-ssp245-range' },
-					name: __('Delta 7100 SSP2-4.5 Range'),
-					type: 'arearange',
-					data: sortByTimestamp(
-						formatData(data['delta7100_ssp245_range'])
-					),
-					color: 'lightgreen',
-					fillOpacity: 0.3,
-				} as SeriesArearangeOptions,
-				{
-					custom: { key: 'delta7100-ssp585-median' },
-					name: __('Delta 7100 SSP5-8.5 Median'),
-					type: 'line',
-					data: sortByTimestamp(
-						formatData(data['delta7100_ssp585_median'])
-					),
-					color: 'red',
-					lineWidth: 2,
-				} as SeriesLineOptions,
-				{
-					custom: { key: 'delta7100-ssp585-range' },
-					name: __('Delta 7100 SSP5-8.5 Range'),
-					type: 'arearange',
-					data: sortByTimestamp(
-						formatData(data['delta7100_ssp585_range'])
-					),
-					color: 'pink',
-					fillOpacity: 0.3,
-				} as SeriesArearangeOptions,
-			],
+			'annual-values': {
+				crosshairs: true,
+				shared: true,
+				split: false,
+				padding: 4,
+				formatter: function(this: Point) {
+					const points = (this as unknown as { points?: TooltipPoint[] }).points;
+
+					return points?.map((point: TooltipPoint) => {
+						if (point.series.type === 'arearange') {
+							return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.low)}</b> - <b>${formatValue(point.high)}</b><br/>`;
+						} else {
+							return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.y)}</b><br/>`;
+						}
+					}).join('') || '';
+				}
+			},
+			'30-year-averages': {
+				followPointer: true,
+				formatter: function (this: Point) {
+					return tooltip30yFormatter(this.x, '30y_', false, activeSeries);
+				},
+			},
+			'30-year-changes': {
+				followPointer: true,
+				formatter: function (this: Point) {
+					return tooltip30yFormatter(this.x, 'delta7100_', true, activeSeries);
+				},
+			},
 		}),
-		[__, data, sortByTimestamp, formatData]
+		[climateVariable, locale, decimals, activeSeries]
 	);
+
+	// Chart plot options
+	const chartPlotOptions = useMemo<() => Record<TabValue, Highcharts.PlotOptions>>(() => 
+		() => ({
+			'annual-values': {
+				series: {
+					states: {
+						hover: {
+							enabled: true,
+						},
+						inactive: {
+							enabled: true,
+						},
+					},
+				},
+			},
+			'30-year-averages': {
+				series: {
+					states: {
+						hover: {
+							enabled: false,
+						},
+						inactive: {
+							enabled: false,
+						},
+					},
+				},
+			},
+			'30-year-changes': {
+				series: {
+					states: {
+						hover: {
+							enabled: false,
+						},
+						inactive: {
+							enabled: false,
+						},
+					},
+				},
+			},
+		}),
+		[]
+	);
+
+	// Update plot bands when the active tab changes
+	useEffect(() => {
+		// Chart reference
+		const chart = chartRef.current?.chart;
+		if (!chart) return;
+		// Remove previous plot bands when we change tab
+		chart.xAxis[0].removePlotBand('30y-plot-band',);
+		chart.xAxis[0].removePlotBand('delta-plot-band');
+
+		if(activeTab === '30-year-changes') {
+			// Add plot band for 30y changes
+			chart.xAxis[0].addPlotBand({
+				from: Date.UTC(1971, 0, 1),
+				to: Date.UTC(2000, 11, 31),
+				color: 'rgba(51,63,80,0.05)',
+				id: 'delta-plot-band',
+			});
+		}
+	}, [activeTab]);
 
 	// adds visible property to each series
 	const filteredSeries = useMemo<SeriesOptionsType[]>(() => {
 		return (
-			seriesObject[activeTab]?.map((s) => {
+			seriesObject.map((s) => {
 				const baseSeries = {
 					...s,
 					visible: activeSeries.includes(s.custom?.key),
@@ -303,11 +517,16 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 
 	// initialize activeSeries state with all leys  from the first tab
 	useEffect(() => {
-		setActiveSeries(
-			seriesObject[activeTab]?.map((s) => s.custom?.key) || []
-		);
-	}, [activeTab, seriesObject]);
+		setActiveSeries(seriesObject.map((s) => s.custom?.key) || []);
+	}, [seriesObject]);
+	
+	// Initialize activeChartTooltip and activeChartPlotOptions
+	useEffect(() => {
+		setActiveChartTooltip(chartTooltips()[activeTab]);
+		setActiveChartPlotOptions(chartPlotOptions()[activeTab]);
+	}, [activeSeries, activeTab, chartTooltips, chartPlotOptions]);
 
+	// Export filename
 	const getExportFilename = () => {
 		const formatForFilename = (str: string | undefined | null) => {
 			return (str !== undefined && str !== null) ? str.toLowerCase().replace(/\s+/g, '-') : '';
@@ -319,6 +538,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 			+ '-' + formatForFilename(versionLabel);
 	};
 
+	// Chart options
 	const chartOptions = useMemo<Options>(() => {
 		return {
 			chart: {
@@ -384,40 +604,10 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 			title: {
 				text: '',
 			},
-			tooltip: {
-				crosshairs: true,
-				shared: true,
-				split: false,
-				padding: 4,
-				formatter: function(this: Point) {
-					const unit = climateVariable?.getUnit();
-					const formatValue = (value: number | undefined) => {
-						if (value === undefined) return '';
-						if(unit === "doy") {
-							return doyFormatter(Number(value), locale);
-						} else {
-							const formattedValue = Number(value).toFixed(decimals);
-							// Check if this is a delta value (series name starts with 'Delta')
-							const isDelta = this.series.name?.startsWith('Delta');
-							// Add "+" prefix for positive delta values
-							if (isDelta && Number(value) > 0) {
-								return `+${formattedValue} ${unit}`;
-							}
-							return `${formattedValue} ${unit}`;
-						}
-					};
-
-					const points = (this as unknown as { points?: TooltipPoint[] }).points;
-					return points?.map((point: TooltipPoint) => {
-						if (point.series.type === 'arearange') {
-							return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.low)}</b> - <b>${formatValue(point.high)}</b><br/>`;
-						} else {
-							return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.y)}</b><br/>`;
-						}
-					}).join('') || '';
-				}
-			},
+			tooltip: activeChartTooltip,
+			plotOptions: activeChartPlotOptions,
 			xAxis: {
+				crosshair: false,
 				type: 'datetime',
 			},
 			yAxis: {
@@ -441,8 +631,9 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 			},
 			series: filteredSeries,
 		};
-	}, [climateVariable, locale, title, filteredSeries]);
+	}, [climateVariable, locale, title, filteredSeries, activeChartTooltip, activeChartPlotOptions]);
 
+	// Export method
 	const handleExport = (format: string) => {
 		const chart = chartRef.current?.chart;
 		if (!chart) return;

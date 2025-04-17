@@ -82,6 +82,9 @@ const mapSlice = createSlice({
 		setVariable(state, action: PayloadAction<string>) {
 			state.variable = action.payload;
 		},
+		setFrequency(state, action: PayloadAction<string>) {
+			state.frequency = action.payload;
+		},
 		setDecade(state, action: PayloadAction<string>) {
 			state.decade = action.payload;
 		},
@@ -137,6 +140,7 @@ export const {
 	setVariableList,
 	setVariableListLoading,
 	setVariable,
+	setFrequency,
 	setDecade,
 	setThresholdValue,
 	setInteractiveRegion,

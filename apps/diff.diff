@@ -1,0 +1,717 @@
+diff --git a/apps/src/App.tsx b/apps/src/App.tsx
+index 7df83c79..7c41b72f 100644
+--- a/apps/src/App.tsx
++++ b/apps/src/App.tsx
+@@ -9,14 +9,12 @@ import { AnimatedPanelProvider } from '@/context/animated-panel-provider';
+ import { ClimateVariableProvider } from "@/context/climate-variable-provider";
+ 
+ import { useLeaflet } from '@/hooks/use-leaflet';
+-import { useUrlState } from '@/hooks/use-url-state';
+ 
+ import '@/App.css';
+ 
+ function App() {
+ 	// making leaflet features available everywhere through the app
+ 	useLeaflet();
+-	useUrlState();
+ 
+ 	return (
+ 		<LocaleProvider>
+diff --git a/apps/src/app/store.ts b/apps/src/app/store.ts
+index f2f6fdc4..9fb1c7ca 100644
+--- a/apps/src/app/store.ts
++++ b/apps/src/app/store.ts
+@@ -16,9 +16,6 @@ import downloadReducer from '@/features/download/download-slice';
+ // API Slices and Reducers - Fetch requests that are going to populate the store
+ import { wpApiSlice } from '@/services/wp-node';
+ 
+-// URL Sync Middleware
+-import { urlSyncMiddleware } from '@/middleware/url-sync';
+-
+ /**
+  * Configures and exports the Redux store for the application.
+  *
+@@ -39,9 +36,7 @@ export const store = configureStore({
+ 		[wpApiSlice.reducerPath]: wpApiSlice.reducer,
+ 	},
+ 	middleware: (getDefaultMiddleware) =>
+-		getDefaultMiddleware()
+-			.concat(wpApiSlice.middleware)
+-			.concat(urlSyncMiddleware),
++		getDefaultMiddleware().concat(wpApiSlice.middleware),
+ });
+ 
+ export type AppDispatch = typeof store.dispatch;
+diff --git a/apps/src/features/map/map-slice.ts b/apps/src/features/map/map-slice.ts
+index cc89342d..a5a7b4d9 100644
+--- a/apps/src/features/map/map-slice.ts
++++ b/apps/src/features/map/map-slice.ts
+@@ -82,9 +82,6 @@ const mapSlice = createSlice({
+ 		setVariable(state, action: PayloadAction<string>) {
+ 			state.variable = action.payload;
+ 		},
+-		setFrequency(state, action: PayloadAction<string>) {
+-			state.frequency = action.payload;
+-		},
+ 		setDecade(state, action: PayloadAction<string>) {
+ 			state.decade = action.payload;
+ 		},
+@@ -140,7 +137,6 @@ export const {
+ 	setVariableList,
+ 	setVariableListLoading,
+ 	setVariable,
+-	setFrequency,
+ 	setDecade,
+ 	setThresholdValue,
+ 	setInteractiveRegion,
+diff --git a/apps/src/hooks/use-url-state.ts b/apps/src/hooks/use-url-state.ts
+deleted file mode 100644
+index 9fa904bb..00000000
+--- a/apps/src/hooks/use-url-state.ts
++++ /dev/null
+@@ -1,101 +0,0 @@
+-import { useEffect, useRef } from 'react';
+-import { useAppDispatch } from '@/app/hooks';
+-import { urlParamsToState } from '@/lib/utils';
+-import { setClimateVariable, updateClimateVariable } from '@/store/climate-variable-slice';
+-import {
+-	setVariable,
+-	setDecade,
+-	setInteractiveRegion,
+-	setTimePeriodEnd,
+-	setThresholdValue,
+-	setMapColor as setColorScheme,
+-	setOpacity,
+-} from '@/features/map/map-slice';
+-import { MapActionType } from '@/types/types';
+-import { ClimateVariables } from '@/config/climate-variables.config';
+-
+-const mapActionCreators: MapActionType = {
+-	variable: setVariable,
+-	decade: setDecade,
+-	interactiveRegion: setInteractiveRegion,
+-	timePeriodEnd: setTimePeriodEnd,
+-	thresholdValue: setThresholdValue,
+-	mapColor: setColorScheme,
+-	opacity: setOpacity,
+-};
+-
+-export const useUrlState = () => {
+-	const dispatch = useAppDispatch();
+-	const hasProcessedUrlState = useRef(false);
+-
+-	useEffect(() => {
+-		// Skip if we've already processed the URL state to prevent loops
+-		if (hasProcessedUrlState.current) return;
+-		
+-		// Get URL params
+-		const params = new URLSearchParams(window.location.search);
+-
+-		// Only process if URL has meaningful parameters
+-		if (!params.has('var') && !params.has('mapVar')) return;
+-
+-		try {
+-			const state = urlParamsToState(params);
+-
+-			// Process in correct order
+-			if (state.climateVariable?.data) {
+-				// Look up the complete variable config by ID to ensure we have the class
+-				if (state.climateVariable.data.id) {
+-					const variableId = state.climateVariable.data.id as string;
+-					const matchedVariable = ClimateVariables.find(config => config.id === variableId);
+-					
+-					if (matchedVariable) {
+-						// Merge the config with any URL params
+-						state.climateVariable.data = {
+-							...matchedVariable,
+-							...state.climateVariable.data
+-						};
+-					}
+-				}
+-
+-				// Set climate variable first
+-				dispatch(setClimateVariable(state.climateVariable.data));
+-
+-				// Mark as processed to prevent loops
+-				hasProcessedUrlState.current = true;
+-
+-				// Give time for variable to initialize
+-				setTimeout(() => {
+-					if (state.map) {
+-						// Handle the frequency special case by updating the climate variable
+-						if (state.map.frequency) {
+-							dispatch(updateClimateVariable({ frequency: state.map.frequency }));
+-						}
+-
+-						// Special handling for opacity which is a nested object
+-						Object.entries(state.map).forEach(([key, value]) => {
+-							if (key === 'opacity' && typeof value === 'object') {
+-								// Handle each opacity property individually
+-								Object.entries(value as Record<string, number>).forEach(([opacityKey, opacityValue]) => {
+-									dispatch(setOpacity({
+-										key: opacityKey as keyof typeof value,
+-										value: opacityValue * 100 // Convert back to percentage for the action
+-									}));
+-								});
+-							} else if (key !== 'frequency') { // Skip frequency as we handled it separately
+-								// Handle other map state properties
+-								const actionCreator = mapActionCreators[key];
+-								if (actionCreator && value !== undefined) {
+-									dispatch(actionCreator(value));
+-								}
+-							}
+-						});
+-					}
+-				}, 100);
+-			}
+-		} catch (error) {
+-			console.error('Error processing URL state:', error);
+-			// Still mark as processed even if there's an error to prevent loops
+-			hasProcessedUrlState.current = true;
+-		}
+-	}, [dispatch]);
+-};
+\ No newline at end of file
+diff --git a/apps/src/lib/utils.ts b/apps/src/lib/utils.ts
+index f25ff688..95ef66a1 100644
+--- a/apps/src/lib/utils.ts
++++ b/apps/src/lib/utils.ts
+@@ -1,18 +1,7 @@
+ import { clsx, type ClassValue } from 'clsx';
+ import { twMerge } from 'tailwind-merge';
+ import validator from 'validator';
+-import {
+-	FrequencyConfig,
+-	FrequencyDisplayModeOption,
+-	FrequencyType,
+-} from '@/types/climate-variable-interface';
+-import { RootState } from '@/app/store';
+-import { PartialState } from '@/types/types';
+-import {
+-	ClimateVariableConfigInterface,
+-	AveragingType,
+-	InteractiveRegionOption,
+-} from '@/types/climate-variable-interface';
++import { FrequencyConfig, FrequencyDisplayModeOption, FrequencyType } from "@/types/climate-variable-interface";
+ 
+ export function cn(...inputs: ClassValue[]) {
+ 	return twMerge(clsx(inputs));
+@@ -34,7 +23,7 @@ export const remToPx = (rem: string): number => {
+  * Escape special regex characters to safely use in RegExp
+  */
+ const escapeRegExp = (string: string): string => {
+-	return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
++  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+ };
+ 
+ /**
+@@ -42,28 +31,25 @@ const escapeRegExp = (string: string): string => {
+  *
+  * Returns an array of parts with a flag indicating whether each part is a match or not
+  */
+-export const splitTextByMatch = (
+-	text: string,
+-	searchTerm: string
+-): Array<{ text: string; isMatch: boolean }> => {
+-	if (!searchTerm || !text) return [{ text, isMatch: false }];
++export const splitTextByMatch = (text: string, searchTerm: string): Array<{text: string, isMatch: boolean}> => {
++  if (!searchTerm || !text) return [{ text, isMatch: false }];
+ 
+-	const escapedSearchTerm = escapeRegExp(searchTerm);
+-	const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
++  const escapedSearchTerm = escapeRegExp(searchTerm);
++  const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
+ 
+-	// Split the text by regex, preserving matches
+-	const parts = text.split(regex);
++  // Split the text by regex, preserving matches
++  const parts = text.split(regex);
+ 
+-	// Map the parts to include whether they match or not
+-	const result = parts.map((part) => {
+-		if (part.toLowerCase() === searchTerm.toLowerCase()) {
+-			return { text: part, isMatch: true };
+-		}
+-		return { text: part, isMatch: false };
+-	});
++  // Map the parts to include whether they match or not
++  const result = parts.map(part => {
++    if (part.toLowerCase() === searchTerm.toLowerCase()) {
++      return { text: part, isMatch: true };
++    }
++    return { text: part, isMatch: false };
++  });
+ 
+-	// Filter out empty parts
+-	return result.filter((part) => part.text.length > 0);
++  // Filter out empty parts
++  return result.filter(part => part.text.length > 0);
+ };
+ 
+ export const getFrequencyCode = (frequency: string) => {
+@@ -71,58 +57,27 @@ export const getFrequencyCode = (frequency: string) => {
+ 
+ 	if (frequency === 'ann') {
+ 		frequencyCode = 'ys';
+-	} else if (
+-		[
+-			'jan',
+-			'feb',
+-			'mar',
+-			'apr',
+-			'may',
+-			'jun',
+-			'jul',
+-			'aug',
+-			'sep',
+-			'oct',
+-			'nov',
+-			'dec',
+-		].includes(frequency)
+-	) {
++	} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
+ 		frequencyCode = 'ms';
+ 	} else if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
+ 		frequencyCode = 'qsdec';
+ 	}
+ 
+ 	return frequencyCode;
+-};
++}
+ 
+-export const isFrequencyEnabled = (
+-	config: FrequencyConfig,
+-	section: string,
+-	frequencyType: FrequencyType
+-): boolean => {
++export const isFrequencyEnabled = (config: FrequencyConfig, section: string, frequencyType: FrequencyType): boolean => {
+ 	const configValue = config[frequencyType];
+-	return Boolean(
+-		configValue &&
+-			(configValue === FrequencyDisplayModeOption.ALWAYS ||
+-				configValue === section)
+-	);
++	return Boolean(configValue && (
++		configValue === FrequencyDisplayModeOption.ALWAYS ||
++		configValue === section
++	));
+ };
+ 
+-export const getDefaultFrequency = (
+-	config: FrequencyConfig,
+-	section: string
+-) => {
++export const getDefaultFrequency = (config: FrequencyConfig, section: string) => {
+ 	const hasAnnual = isFrequencyEnabled(config, section, FrequencyType.ANNUAL);
+-	const hasMonths = isFrequencyEnabled(
+-		config,
+-		section,
+-		FrequencyType.MONTHLY
+-	);
+-	const hasSeasons = isFrequencyEnabled(
+-		config,
+-		section,
+-		FrequencyType.SEASONAL
+-	);
++	const hasMonths = isFrequencyEnabled(config, section, FrequencyType.MONTHLY)
++	const hasSeasons = isFrequencyEnabled(config, section, FrequencyType.SEASONAL);
+ 
+ 	let defaultValue;
+ 
+@@ -131,238 +86,8 @@ export const getDefaultFrequency = (
+ 	} else if (hasMonths) {
+ 		defaultValue = 'jan';
+ 	} else if (hasSeasons) {
+-		defaultValue = 'spring';
++		defaultValue = 'spring'
+ 	}
+ 
+ 	return defaultValue;
+-};
+-
+-// URL Param Config (from url-param-config.ts)
+-export const STATE_TO_URL_CONFIG: {
+-	[K in keyof Partial<ClimateVariableConfigInterface>]: {
+-		urlKey: string;
+-		transform?: {
+-			toURL?: <V extends NonNullable<ClimateVariableConfigInterface[K]>>(
+-				value: V
+-			) => string;
+-			fromURL?: (value: string) => ClimateVariableConfigInterface[K];
+-		};
+-	};
+-} = {
+-	id: { urlKey: 'var' },
+-	version: { urlKey: 'ver' },
+-	threshold: { urlKey: 'th' },
+-	frequency: { urlKey: 'freq' },
+-	scenario: { urlKey: 'scen' },
+-	scenarioCompare: {
+-		urlKey: 'cmp',
+-		transform: {
+-			toURL: (value: boolean) => (value ? '1' : '0'),
+-			fromURL: (value: string) => value === '1',
+-		},
+-	},
+-	scenarioCompareTo: { urlKey: 'cmpTo' },
+-	interactiveRegion: {
+-		urlKey: 'region',
+-		transform: {
+-			toURL: (value: InteractiveRegionOption) => value.toString(),
+-			fromURL: (value: string) => value as InteractiveRegionOption,
+-		},
+-	},
+-	dataValue: { urlKey: 'dataVal' },
+-	colourScheme: { urlKey: 'clr' },
+-	colourType: { urlKey: 'clrType' },
+-	averagingType: {
+-		urlKey: 'avg',
+-		transform: {
+-			toURL: (value: AveragingType) => value.toString(),
+-			fromURL: (value: string) => value as AveragingType,
+-		},
+-	},
+-};
+-
+-// URL State Functions (from url-state.ts)
+-export const stateToUrlParams = (state: RootState): URLSearchParams => {
+-	const params = new URLSearchParams();
+-
+-	// climate variable state
+-	if (state.climateVariable?.data) {
+-		Object.entries(STATE_TO_URL_CONFIG).forEach(([stateKey, config]) => {
+-			const key = stateKey as keyof ClimateVariableConfigInterface;
+-			const value = state.climateVariable.data?.[key];
+-
+-			if (value !== undefined && value !== null) {
+-				if (config.transform?.toURL) {
+-					const transformer = config.transform.toURL as (
+-						val: typeof value
+-					) => string;
+-					params.set(config.urlKey, transformer(value));
+-				} else {
+-					params.set(config.urlKey, String(value));
+-				}
+-			}
+-		});
+-	}
+-
+-	// map state
+-	if (state.map) {
+-		// Time period (already array-based for slider component)
+-		if (state.map.timePeriodEnd?.length) {
+-			params.set('period', state.map.timePeriodEnd[0].toString());
+-		}
+-
+-		// Map variable (if it's a string - could be an object in some cases)
+-		if (typeof state.map.variable === 'string') {
+-			params.set('mapVar', state.map.variable);
+-		}
+-
+-		// Decade
+-		if (state.map.decade) {
+-			params.set('decade', state.map.decade);
+-		}
+-
+-		// Threshold value
+-		if (state.map.thresholdValue !== undefined) {
+-			params.set('threshold', state.map.thresholdValue.toString());
+-		}
+-
+-		// Interactive region
+-		if (state.map.interactiveRegion) {
+-			params.set('mapRegion', state.map.interactiveRegion);
+-		}
+-
+-		// it looks like we don't have a direct setFrequency action
+-		if (state.map.frequency) {
+-			params.set('mapFreq', state.map.frequency);
+-		}
+-
+-		// Map color scheme
+-		if (state.map.mapColor) {
+-			params.set('color', state.map.mapColor);
+-		}
+-
+-		// Opacity settings
+-		if (state.map.opacity) {
+-			if (state.map.opacity.mapData !== undefined) {
+-				params.set(
+-					'dataOpacity',
+-					Math.round(state.map.opacity.mapData * 100).toString()
+-				);
+-			}
+-			if (state.map.opacity.labels !== undefined) {
+-				params.set(
+-					'labelOpacity',
+-					Math.round(state.map.opacity.labels * 100).toString()
+-				);
+-			}
+-		}
+-	}
+-
+-	return params;
+-};
+-
+-export const urlParamsToState = (params: URLSearchParams): PartialState => {
+-	const state: PartialState = {
+-		climateVariable: {
+-			data: {
+-				// Set a default class to ensure provider doesn't error
+-				class: 'RasterPrecalculatedClimateVariable',
+-			},
+-			searchQuery: '',
+-		},
+-		map: {},
+-	};
+-
+-	// URL parameters based on config
+-	Object.entries(STATE_TO_URL_CONFIG).forEach(([stateKey, config]) => {
+-		const urlValue = params.get(config.urlKey);
+-		if (urlValue && state.climateVariable?.data) {
+-			const key = stateKey as keyof ClimateVariableConfigInterface;
+-			const transformer = config.transform?.fromURL;
+-			const value = transformer ? transformer(urlValue) : urlValue;
+-			if (state.climateVariable.data) {
+-				(state.climateVariable.data as any)[key] = value;
+-			}
+-		}
+-	});
+-
+-	// Handle map-specific parameters
+-	if (state.map) {
+-		// Time period
+-		const period = params.get('period');
+-		if (period) {
+-			const periodNum = parseInt(period);
+-			if (!isNaN(periodNum)) {
+-				state.map.timePeriodEnd = [periodNum];
+-			}
+-		}
+-
+-		// Map variable
+-		const mapVar = params.get('mapVar');
+-		if (mapVar) {
+-			state.map.variable = mapVar;
+-		}
+-
+-		// Decade
+-		const decade = params.get('decade');
+-		if (decade) {
+-			state.map.decade = decade;
+-		}
+-
+-		// Threshold value
+-		const threshold = params.get('threshold');
+-		if (threshold) {
+-			const thresholdNum = parseInt(threshold);
+-			if (!isNaN(thresholdNum)) {
+-				state.map.thresholdValue = thresholdNum;
+-			}
+-		}
+-
+-		// Interactive region
+-		const mapRegion = params.get('mapRegion');
+-		if (mapRegion) {
+-			state.map.interactiveRegion = mapRegion;
+-		}
+-
+-		// Frequency
+-		const mapFreq = params.get('mapFreq');
+-		if (mapFreq) {
+-			state.map.frequency = mapFreq;
+-		}
+-
+-		// Map color scheme
+-		const color = params.get('color');
+-		if (color) {
+-			state.map.mapColor = color;
+-		}
+-
+-		// Opacity settings
+-		if (!state.map.opacity) {
+-			state.map.opacity = { mapData: 1, labels: 1 };
+-		}
+-
+-		const dataOpacity = params.get('dataOpacity');
+-		if (dataOpacity) {
+-			const opacityNum = parseInt(dataOpacity);
+-			if (!isNaN(opacityNum)) {
+-				state.map.opacity.mapData = opacityNum / 100;
+-			}
+-		}
+-
+-		const labelOpacity = params.get('labelOpacity');
+-		if (labelOpacity) {
+-			const opacityNum = parseInt(labelOpacity);
+-			if (!isNaN(opacityNum)) {
+-				state.map.opacity.labels = opacityNum / 100;
+-			}
+-		}
+-	}
+-
+-	return state;
+-};
+-
+-export const syncStateToUrl = (state: RootState): void => {
+-	const params = stateToUrlParams(state);
+-	const newUrl = `${window.location.pathname}?${params.toString()}`;
+-	window.history.replaceState({}, '', newUrl);
+-};
++}
+diff --git a/apps/src/middleware/url-sync.ts b/apps/src/middleware/url-sync.ts
+deleted file mode 100644
+index b3f3ec02..00000000
+--- a/apps/src/middleware/url-sync.ts
++++ /dev/null
+@@ -1,69 +0,0 @@
+-import { Middleware } from '@reduxjs/toolkit';
+-import { syncStateToUrl } from '../lib/utils';
+-
+-// Define slices that should trigger URL updates
+-const URL_SYNC_SLICES = ['climateVariable', 'map'];
+-
+-// Define actions that should NOT trigger URL updates (exceptions)
+-const URL_SYNC_EXCEPTIONS = [
+-	'climateVariable/setSearchQuery',
+-	'climateVariable/clearSearchQuery',
+-	'map/addRecentLocation',
+-	'map/deleteLocation',
+-	'map/clearRecentLocations',
+-	'map/setLegendData',
+-	'map/setVariableList',
+-	'map/setVariableListLoading',
+-];
+-
+-const debounce = (fn: Function, delay: number) => {
+-	let timeoutId: ReturnType<typeof setTimeout>;
+-	return function (...args: any[]) {
+-		clearTimeout(timeoutId);
+-		timeoutId = setTimeout(() => fn(...args), delay);
+-	};
+-};
+-
+-const debouncedSyncStateToUrl = debounce(syncStateToUrl, 300);
+-
+-let isUpdatingUrl = false;
+-
+-export const urlSyncMiddleware: Middleware = (store) => (next) => (action) => {
+-	const result = next(action);
+-
+-	// Skip URL sync if we're already updating to prevent potential loops
+-	if (isUpdatingUrl) return result;
+-
+-	try {
+-		if (
+-			typeof action === 'object' &&
+-			action !== null &&
+-			'type' in action &&
+-			typeof action.type === 'string'
+-		) {
+-			// Check if action belongs to a slice we want to sync with URL
+-			const actionType = action.type;
+-			const shouldSync = URL_SYNC_SLICES.some(
+-				(slice) =>
+-					actionType.startsWith(`${slice}/`) &&
+-					!URL_SYNC_EXCEPTIONS.includes(actionType)
+-			);
+-
+-			if (shouldSync) {
+-				isUpdatingUrl = true;
+-				const state = store.getState();
+-
+-				debouncedSyncStateToUrl(state);
+-
+-				setTimeout(() => {
+-					isUpdatingUrl = false;
+-				}, 350);
+-			}
+-		}
+-	} catch (error) {
+-		isUpdatingUrl = false;
+-		console.error('Error in URL sync middleware:', error);
+-	}
+-
+-	return result;
+-};
+diff --git a/apps/src/types/types.ts b/apps/src/types/types.ts
+index 6ca3f644..1101d022 100644
+--- a/apps/src/types/types.ts
++++ b/apps/src/types/types.ts
+@@ -5,7 +5,6 @@ import { buttonVariants } from '@/lib/format';
+ import * as SheetPrimitive from '@radix-ui/react-dialog';
+ import { LucideIcon } from 'lucide-react';
+ import L from 'leaflet';
+-import { ClimateVariableConfigInterface } from '@/types/climate-variable-interface';
+ 
+ /**
+  * Represents valid locale values.
+@@ -559,8 +558,8 @@ export interface ChoroValuesOptions {
+ 
+ export interface ColourScheme {
+ 	type: string;
+-	colours: string[];
+-	quantities?: number[];
++	colours: string[],
++	quantities?: number[],
+ }
+ 
+ // A translatable string object with English and French variants
+@@ -600,8 +599,8 @@ export interface DatasetTerm {
+ }
+ 
+ /**
+- * Represents the structure used as props for MapInfo component.
+- */
++* Represents the structure used as props for MapInfo component.
++*/
+ export interface MapInfoData {
+ 	title: LocalizedString;
+ 	tagline: LocalizedString;
+@@ -617,43 +616,7 @@ export interface MapInfoData {
+  * Represents the properties of the VariableFilterCount component.
+  */
+ export interface VariableFilterCountProps {
+-	filteredCount: number;
+-	totalCount: number;
+-	className?: string;
++    filteredCount: number;
++    totalCount: number;
++    className?: string;
+ }
+-
+-/**
+- * Defines the configuration for mapping state keys to URL parameters.
+- */
+-export type URLParamConfig<T extends keyof ClimateVariableConfigInterface> = {
+-	urlKey: string;
+-	transform?: {
+-		toURL?: <V extends NonNullable<ClimateVariableConfigInterface[T]>>(
+-			value: V
+-		) => string;
+-		fromURL?: (value: string) => ClimateVariableConfigInterface[T];
+-	};
+-};
+-
+-/**
+- * Represents climate variable state for URL state management.
+- */
+-export type ClimateVariableState = {
+-	data?: Partial<ClimateVariableConfigInterface> | null;
+-	searchQuery?: string;
+-};
+-
+-/**
+- * Represents partial state for URL state management.
+- */
+-export type PartialState = {
+-	climateVariable?: ClimateVariableState;
+-	map?: Partial<MapState>;
+-};
+-
+-/**
+- * Type for map action creators used in URL state hook.
+- */
+-export type MapActionType = {
+-	[key: string]: (value: any) => { type: string; payload: any };
+-};

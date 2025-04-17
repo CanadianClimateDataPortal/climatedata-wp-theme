@@ -21,21 +21,21 @@ const climateVariableSlice = createSlice({
 		},
 		updateClimateVariable: (state, action) => {
 			if (!state.data) return;
-			
+
 			state.data = {
 				...state.data,
 				...action.payload
 			};
 		},
 		updateClimateVariableAnalysisFieldValue: (state, action) => {
-			if (!state.data || !state.data.analysisFieldValues) return;
-			
+			if (!state.data) return;
+
 			const {key, value} = action.payload;
 
 			state.data = {
 				...state.data,
 				analysisFieldValues: {
-					...state.data.analysisFieldValues,
+					...(state.data.analysisFieldValues ?? {}),
 					[key]: value
 				}
 			};

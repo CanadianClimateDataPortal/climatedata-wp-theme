@@ -1,80 +1,112 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 import { PencilLine } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useLocale } from '@/hooks/use-locale';
 import { useDownload } from '@/hooks/use-download';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
+import appConfig from '@/config/app.config';
+
 const StepSummary: React.FC = () => {
 	const { __, _n } = useI18n();
 	const { locale } = useLocale();
-	const { currentStep, goToStep, fields } = useDownload();
+	const { currentStep, goToStep, dataset } = useDownload();
+
+	const { climateVariable } = useClimateVariable();
 
 	/**
-	 * @todo Most, if not all, of these variables will have to be retrieved from the climateVariable class.
+	 * @todo do we want to keep the dataset value in the useDownload fields context variable?
 	 */
-	const {
-		dataset,
-		variable,
-		version,
-		degrees,
-		selectionCount,
-		startYear,
-		endYear,
-		frequency,
-		emissionScenarios,
-		percentiles,
-		decimalPlace,
-	} = fields;
 
-	const summaryData = [
+	const summaryData = useMemo(() => ([
 		{
 			title: __('Dataset'),
-			content: [dataset?.title[locale]],
+			content: [dataset?.title?.[locale] ?? ''],
 		},
 		{
 			title: __('Variable'),
-			content: [variable?.title],
+			content: [climateVariable?.getTitle() ?? ''],
 		},
 		{
 			title: __('Variable options'),
-			content: `${version}, ` + __('MEAN TEMP') + ' > ' + degrees + ' °C',
+			content: (() => {
+				const version = climateVariable?.getVersion();
+				const analysisFields = climateVariable?.getAnalysisFields() ?? [];
+				const analysisFieldValues = climateVariable?.getAnalysisFieldValues() ?? {};
+
+				const parts = [];
+
+				if (version) {
+					parts.push(appConfig.versions.find(v => v.value === version)?.label ?? version);
+				}
+
+				// for each field that has a value, get its label from the config
+				Object.entries(analysisFieldValues).forEach(([key, value]) => {
+					if (value && value !== '') {
+						const fieldConfig = analysisFields.find(f => f.key === key);
+						if (fieldConfig?.label) {
+							parts.push(`${__(fieldConfig.label)} ${value}`);
+						}
+					}
+				});
+
+				return parts.join(', ');
+			})(),
 		},
 		{
 			title: __('Location or area'),
-			content: _n(
-				'1 cell selected',
-				'%d cells selected',
-				selectionCount
-			).replace('%d', String(selectionCount)),
+			content: (() => {
+				// TODO: replace with logic from https://github.com/CanadianClimateDataPortal/climatedata-wp-theme/pull/387
+				const count = Object.keys(climateVariable?.getSelectedPoints() ?? {}).length;
+				return _n('1 selected', '%d selected', count).replace('%d', String(count));
+			})(),
 		},
 		{
 			title: __('Additional details'),
-			content: [
-				`${startYear}-${endYear}`,
-				frequency,
-				percentiles.length === 7
-					? __('All percentiles')
-					: _n(
-							'1 percentile',
-							'%d percentiles',
-							percentiles.length
-						).replace('%d', String(percentiles.length)),
-				emissionScenarios.length
-					? _n(
-							'1 Scenario selected',
-							'%d Scenarios selected',
-							emissionScenarios.length
-						).replace('%d', String(emissionScenarios.length))
-					: __('No Scenarios selected'),
-				`${decimalPlace} Decimal places`,
-			].join(', '),
-		},
-	];
+			content: (() => {
+				const [startYear, endYear] = climateVariable?.getDateRange() ?? ['2041', '2070'];
+				const frequency = climateVariable?.getFrequency() ?? '';
+				const percentiles = climateVariable?.getPercentiles() ?? [];
+				const scenarios = climateVariable?.getAnalyzeScenarios() ?? [];
+
+				const data = [];
+
+				if (startYear && endYear) {
+					data.push(`${startYear}-${endYear}`);
+				}
+
+				if (frequency && frequency !== '') {
+					data.push(appConfig.frequencies.find(({ value }) => value === frequency)?.label ?? frequency);
+				}
+
+				if (scenarios && scenarios.length > 0) {
+					const scenarioParts: string[] = [];
+					scenarios.forEach((scenario) => {
+						scenarioParts.push(appConfig.scenarios.find(({ value }) => value === scenario)?.label ?? scenario);
+					});
+					data.push(scenarioParts.join(', '));
+				}
+
+				if (percentiles && percentiles.length > 0) {
+					data.push(
+						percentiles.length === climateVariable?.getPercentileOptions().length
+							? __('All percentiles')
+							: _n('1 percentile', '%d percentiles', percentiles.length).replace(
+								'%d',
+								String(percentiles.length)
+							)
+					);
+				}
+
+				return data.join(', ');
+			})(),
+		}
+	]), [climateVariable, dataset, locale, __, _n]);
 
 	return (
 		<Card

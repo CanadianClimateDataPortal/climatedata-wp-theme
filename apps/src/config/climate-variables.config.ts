@@ -82,11 +82,23 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 		analysisFields: [
 			{
+				key: "degrees",
+				type: "input",
+				label: "> Degree Celsius",
+				description: "This variable returns the number of degree days accumulated when daily mean temperature are above a certain temperature. Please set one below :",
+				help: "Degrees help",
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
 				key: "tasmin",
 				type: "input",
 				label: "Tasmin",
 				description: "Tasmin description",
 				help: "Tasmin help",
+				required: false,
 				attributes: {
 					type: "number",
 					placeholder: "0",
@@ -98,6 +110,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				label: "Tasmax",
 				description: "Tasmax description",
 				help: "Tasmax help",
+				required: false,
 				attributes: {
 					type: "number",
 					placeholder: "0",
@@ -721,7 +734,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			},
 		},
 	},
-	/** Average ‘Wet Day’ Precipitation Intensity */
+	/** Average 'Wet Day' Precipitation Intensity */
 	{
 		id: "average_wet_day_precipitation_intensity",
 		class: "RasterAnalyzeClimateVariable",
@@ -805,6 +818,13 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
 		],
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
+		},
 		unit: "days",
 		temporalThresholdConfig: {
 			thresholds: {

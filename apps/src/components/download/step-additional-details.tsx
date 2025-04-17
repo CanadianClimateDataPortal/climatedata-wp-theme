@@ -23,11 +23,47 @@ import appConfig from "@/config/app.config";
 /**
  * Additional details step will allow the user to customize the download request
  */
-const StepAdditionalDetails: React.FC = () => {
+const StepAdditionalDetails = React.forwardRef((_, ref) => {
 	const { __ } = useI18n();
 	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios, setPercentiles } = useClimateVariable();
 	const section = useContext(SectionContext);
 	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
+
+	// expose isValid method to parent component
+	React.useImperativeHandle(ref, () => ({
+		isValid: () => {
+			if (!climateVariable) {
+				return false;
+			}
+
+			const frequency = climateVariable.getFrequency();
+			const averagingType = climateVariable.getAveragingType();
+			const averagingOptions = climateVariable.getAveragingOptions() ?? [];
+
+			const validations = [
+				// If frequency is not daily and averaging options are available, one must be selected
+				frequency === FrequencyType.DAILY || averagingOptions.length === 0 || Boolean(averagingType),
+			];
+
+			// For analyzed downloads, add additional validations
+			if (climateVariable.getDownloadType() === DownloadType.ANALYZED) {
+				const [startYear, endYear] = climateVariable.getDateRange() ?? [];
+				const scenarios = climateVariable.getAnalyzeScenarios() ?? [];
+				const percentiles = climateVariable.getPercentiles() ?? [];
+
+				validations.push(
+					// Date range is required
+					Boolean(startYear && endYear),
+					// At least one scenario is required
+					scenarios.length > 0,
+					// At least one percentile is required
+					percentiles.length > 0
+				);
+			}
+
+			return validations.every(Boolean);
+		}
+	}), [climateVariable]);
 
 	const averagingOptions = [
 		{
@@ -78,6 +114,7 @@ const StepAdditionalDetails: React.FC = () => {
 				className={"sm:w-64 mb-4"}
 			/>
 
+			{/* TODO: what is this? didn't see it in the figma file */}
 			{averagingOptions.length > 0 && climateVariable?.getFrequency() !== FrequencyType.DAILY && <RadioGroupFactory
 				name="temporal-frequency"
 				className="max-w-md mb-8"
@@ -116,7 +153,7 @@ const StepAdditionalDetails: React.FC = () => {
 			}
 		</StepContainer>
 	);
-};
+});
 StepAdditionalDetails.displayName = 'StepAdditionalDetails';
 
 export default StepAdditionalDetails;

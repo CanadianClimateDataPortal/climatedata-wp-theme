@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 import StepDataset from '@/components/download/step-dataset';
@@ -20,30 +20,28 @@ import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { DownloadType } from '@/types/climate-variable-interface';
 
 const Steps: React.FC = () => {
+	const [isStepValid, setIsStepValid] = useState(false);
+
 	const { __ } = useI18n();
 	const { climateVariable } = useClimateVariable();
 
-	const { goToNextStep, currentStep, isStepValid } = useDownload();
+	const { goToNextStep, currentStep } = useDownload();
 
 	const steps = [
-		<StepDataset />,
-		<StepVariable />,
-		<StepVariableOptions />,
-		<StepLocation />,
-		<StepAdditionalDetails />,
-		<StepSendRequest />,
+		StepDataset,
+		StepVariable,
+		StepVariableOptions,
+		StepLocation,
+		StepAdditionalDetails,
+		StepSendRequest,
 	];
+
+	const stepRef = useRef<{
+		isValid: () => boolean;
+	} | null>(null);
 
 	const isLastStep = currentStep === steps.length;
 	const isSecondToLastStep = currentStep === steps.length - 1;
-
-	/**
-	 * @todo This needs to be refactored. The validity of the step should be
-	 *   determined by the step itself since a step can have dynamic fields.
-	 *   We could instead pass a handler or have the step themselves set
-	 *   the isStepValid state.
-	 */
-	const isDisabled = !isStepValid();
 
 	let buttonText = __('Next Step');
 	if (isLastStep) {
@@ -71,17 +69,26 @@ const Steps: React.FC = () => {
 		}
 	};
 
+	const StepComponent = steps[currentStep - 1];
 	return (
 		<div className="steps flex flex-col px-4">
 			<StepNavigation totalSteps={steps.length} />
-			<div className="mb-8">{steps[currentStep - 1]}</div>
+			<div className="mb-8">
+				<StepComponent ref={(ref: { isValid: () => boolean; } | null) => {
+					if (ref) {
+						stepRef.current = ref;
+						// Force validation check when ref is updated
+						setIsStepValid(ref.isValid());
+					}
+				}} />
+			</div>
 			<button
 				type="button"
 				onClick={handleNext}
-				disabled={isDisabled}
+				disabled={!isStepValid}
 				className={cn(
 					'w-64 mx-auto sm:mx-0 py-2 rounded-full uppercase text-white tracking-wider',
-					isDisabled
+					!isStepValid
 						? 'bg-brand-red/25 cursor-not-allowed'
 						: 'bg-brand-red hover:bg-brand-red/75'
 				)}

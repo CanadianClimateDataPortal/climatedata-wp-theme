@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 import {
@@ -15,43 +15,73 @@ import appConfig from "@/config/app.config";
 /**
  * Variable options step
  */
-const StepVariableOptions: React.FC = () => {
+const StepVariableOptions = React.forwardRef((_, ref) => {
 	const { __ } = useI18n();
 	const { climateVariable, setVersion, setAnalysisFieldValue } = useClimateVariable();
+
+	// expose isValid method to parent component
+	React.useImperativeHandle(ref, () => ({
+		isValid: () => {
+			if (!climateVariable) {
+				return false;
+			}
+
+			const version = climateVariable.getVersion() ?? null;
+			const fields = climateVariable.getAnalysisFields() ?? [];
+			const values = climateVariable.getAnalysisFieldValues() ?? {};
+
+			const validations = [
+				version,
+				...fields
+					.filter(f => f.required !== false) // fields are required by default unless explicitly marked as not required
+					.map(f => values?.[f.key] != null && values?.[f.key] !== '')
+			];
+
+			return validations.every(Boolean);
+		}
+	}), [climateVariable]);
 
 	const versionOptions = appConfig.versions.filter((version) =>
 		climateVariable?.getVersions()?.includes(version.value)
 	);
 
-	const analysisFields = climateVariable?.getAnalysisFields()?.map(({ key, type, label, description, help, attributes}) => {
-		const { type: attributeType, placeholder } = attributes || {};
-		const value = climateVariable?.getAnalysisFieldValue(key);
+	const analysisFields = useMemo(() => {
+		if (!climateVariable) {
+			return [];
+		}
 
-		return (
-			<div className="mb-4" key={key}>
-				{description && <div className="text-sm text-neutral-grey-medium max-w-lg">
-					{__(
-						description,
+		return climateVariable.getAnalysisFields()?.map(({ key, type, label, description, help, attributes }) => {
+			const { type: attributeType, placeholder } = attributes || {};
+			const value = climateVariable?.getAnalysisFieldValue(key);
+
+			return (
+				<div className="mb-4" key={key}>
+					{description && <div className="text-sm text-neutral-grey-medium max-w-lg">
+						{__(
+							description,
+						)}
+					</div>}
+					<div className="flex items-center">
+						<ControlTitle
+							title={__(label)}
+							tooltip={help ? __(help) : null}
+						/>
+					</div>
+					{type === "input" && (
+						<Input
+							className="sm:w-64"
+							value={value ?? ''}
+							onChange={(e) => {
+								setAnalysisFieldValue(key, e.target.value)
+							}}
+							type={attributeType ? attributeType : 'text'}
+							placeholder={placeholder ? __(placeholder) : undefined}
+						/>
 					)}
-				</div>}
-				<div className="flex items-center">
-					<ControlTitle
-						title={__(label)}
-						tooltip={help ? __(help) : null}
-					/>
 				</div>
-				{type === "input" && <Input
-					className="sm:w-64"
-					value={value ?? ''}
-					onChange={(e) => {
-						setAnalysisFieldValue(key, e.target.value)
-					}}
-					type={attributeType ? attributeType : 'text'}
-					placeholder={placeholder ? __(placeholder) : undefined}
-				/>}
-			</div>
-		);
-	}) ?? [];
+			);
+		}) ?? [];
+	}, [climateVariable, setAnalysisFieldValue, __]);
 
 	return (
 		<StepContainer title={__('Set your variable options')}>
@@ -76,7 +106,7 @@ const StepVariableOptions: React.FC = () => {
 			</div>
 		</StepContainer>
 	);
-};
+});
 StepVariableOptions.displayName = 'StepVariableOptions';
 
 export default StepVariableOptions;

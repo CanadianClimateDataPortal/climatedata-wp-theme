@@ -192,20 +192,11 @@ export interface MapState {
  */
 export interface DownloadState {
 	dataset: TaxonomyData | null;
-	variable: PostData | null;
-	version: string;
-	degrees: number;
-	interactiveRegion: string;
-	startYear: number;
-	endYear: number;
-	frequency: string;
-	emissionScenarios: string[];
 	selectionMode: string;
 	selection: number[];
 	selectionCount: number;
 	zoom: number;
 	center: L.LatLngExpression;
-	percentiles: string[];
 	decimalPlace: number;
 	format: string;
 	email: string;
@@ -615,6 +606,6 @@ export interface MapInfoData {
  */
 export interface VariableFilterCountProps {
     filteredCount: number;
-    totalCount: number; 
+    totalCount: number;
     className?: string;
 }

@@ -47,6 +47,7 @@ export interface FieldConfig {
 	label: string;
 	description?: string;
 	help?: string;
+	required?: boolean;
 	attributes?: {
 		type?: 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
 		placeholder?: string;

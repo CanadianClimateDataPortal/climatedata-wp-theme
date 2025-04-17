@@ -2,6 +2,9 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
 import { FrequencyConfig, FrequencyDisplayModeOption, FrequencyType } from "@/types/climate-variable-interface";
+import { RootState } from '@/app/store';
+import { PartialState } from '@/types/types';
+import { ClimateVariableConfigInterface, AveragingType, InteractiveRegionOption } from '@/types/climate-variable-interface';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -91,3 +94,114 @@ export const getDefaultFrequency = (config: FrequencyConfig, section: string) =>
 
 	return defaultValue;
 }
+
+// URL Param Config (from url-param-config.ts)
+export const STATE_TO_URL_CONFIG: {[K in keyof Partial<ClimateVariableConfigInterface>]: {
+  urlKey: string;
+  transform?: {
+    toURL?: <V extends NonNullable<ClimateVariableConfigInterface[K]>>(value: V) => string;
+    fromURL?: (value: string) => ClimateVariableConfigInterface[K];
+  }
+}} = {
+  id: { urlKey: 'var' },
+  version: { urlKey: 'ver' },
+  threshold: { urlKey: 'th' },
+  frequency: { urlKey: 'freq' },
+  scenario: { urlKey: 'scen' },
+  scenarioCompare: { 
+    urlKey: 'cmp',
+    transform: {
+      toURL: (value: boolean) => value ? '1' : '0',
+      fromURL: (value: string) => value === '1'
+    }
+  },
+  scenarioCompareTo: { urlKey: 'cmpTo' },
+  interactiveRegion: { 
+    urlKey: 'region',
+    transform: {
+      toURL: (value: InteractiveRegionOption) => value.toString(),
+      fromURL: (value: string) => value as InteractiveRegionOption
+    }
+  },
+  dataValue: { urlKey: 'dataVal' },
+  colourScheme: { urlKey: 'clr' },
+  colourType: { urlKey: 'clrType' },
+  averagingType: { 
+    urlKey: 'avg',
+    transform: {
+      toURL: (value: AveragingType) => value.toString(),
+      fromURL: (value: string) => value as AveragingType
+    }
+  }
+};
+
+// URL State Functions (from url-state.ts)
+export const stateToUrlParams = (state: RootState): URLSearchParams => {
+	const params = new URLSearchParams();
+
+	// climate variable state
+	if (state.climateVariable?.data) {
+		Object.entries(STATE_TO_URL_CONFIG).forEach(([stateKey, config]) => {
+			const key = stateKey as keyof ClimateVariableConfigInterface;
+			const value = state.climateVariable.data?.[key];
+
+			if (value !== undefined && value !== null) {
+				if (config.transform?.toURL) {
+					const transformer = config.transform.toURL as (
+						val: typeof value
+					) => string;
+					params.set(config.urlKey, transformer(value));
+				} else {
+					params.set(config.urlKey, String(value));
+				}
+			}
+		});
+	}
+
+	// map state
+	if (state.map?.timePeriodEnd?.length) {
+		params.set('period', state.map.timePeriodEnd[0].toString());
+	}
+
+	return params;
+};
+
+export const urlParamsToState = (params: URLSearchParams): PartialState => {
+	const state: PartialState = {
+		climateVariable: {
+			data: {},
+			searchQuery: '',
+		},
+		map: {},
+	};
+
+	// URL parameters based on config
+	Object.entries(STATE_TO_URL_CONFIG).forEach(([stateKey, config]) => {
+		const urlValue = params.get(config.urlKey);
+		if (urlValue && state.climateVariable?.data) {
+			const key = stateKey as keyof ClimateVariableConfigInterface;
+			const transformer = config.transform?.fromURL;
+			const value = transformer ? transformer(urlValue) : urlValue;
+			if (state.climateVariable.data) {
+				(state.climateVariable.data as any)[key] = value;
+			}
+		}
+	});
+
+	// Handle map-specific parameters
+	const period = params.get('period');
+	if (period && state.map) {
+		const periodNum = parseInt(period);
+		if (!isNaN(periodNum)) {
+			state.map.timePeriodEnd = [periodNum];
+		}
+	}
+
+	return state;
+};
+
+export const syncStateToUrl = (state: RootState): void => {
+	const params = stateToUrlParams(state);
+	const newUrl = `${window.location.pathname}?${params.toString()}`;
+	window.history.replaceState({}, '', newUrl);
+};

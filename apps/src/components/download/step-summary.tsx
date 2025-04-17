@@ -60,9 +60,8 @@ const StepSummary: React.FC = () => {
 		{
 			title: __('Location or area'),
 			content: (() => {
-				// TODO: replace with logic from https://github.com/CanadianClimateDataPortal/climatedata-wp-theme/pull/387
-				const count = Object.keys(climateVariable?.getSelectedPoints() ?? {}).length;
-				return _n('1 selected', '%d selected', count).replace('%d', String(count));
+				const selectedPointsCount = climateVariable?.getSelectedPointsCount() ?? 0;
+				return _n('1 selected', '%d selected', selectedPointsCount).replace('%d', String(selectedPointsCount));
 			})(),
 		},
 		{

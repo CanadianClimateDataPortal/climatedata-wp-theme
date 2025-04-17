@@ -68,11 +68,12 @@ const VariableRadioCards: React.FC<{
 			// Skip if we're already fetching
 			if (fetchingRef.current) return;
 
+			// TODO: disabled because it was causing variables not loading bug... need to investigate and re enable
 			// Only fetch if dataset changed or this is initial load
-			const didDatasetChange = prevDatasetRef.current !== dataset.term_id;
-			if (!didDatasetChange && !initialLoadRef.current && variableList.length > 0) {
-				return;
-			}
+			// const didDatasetChange = prevDatasetRef.current !== dataset.term_id;
+			// if (!didDatasetChange && !initialLoadRef.current && variableList.length > 0) {
+			// 	return;
+			// }
 
 			prevDatasetRef.current = dataset.term_id;
 			fetchingRef.current = true;
@@ -109,8 +110,10 @@ const VariableRadioCards: React.FC<{
 						setDataLoaded(true);
 					}
 				} finally {
+					// Reset fetching state
+					fetchingRef.current = false;
+
 					if (isMounted) {
-						fetchingRef.current = false;
 						dispatch(setVariableListLoading(false));
 					}
 				}
@@ -118,6 +121,7 @@ const VariableRadioCards: React.FC<{
 
 			return () => {
 				isMounted = false;
+				fetchingRef.current = false;
 			};
 		}, [dataset, section, locale, dispatch, variableList.length]);
 

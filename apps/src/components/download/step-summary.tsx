@@ -22,7 +22,6 @@ const StepSummary: React.FC = () => {
 	/**
 	 * @todo do we want to keep the dataset value in the useDownload fields context variable?
 	 */
-
 	const summaryData = useMemo(() => ([
 		{
 			title: __('Dataset'),

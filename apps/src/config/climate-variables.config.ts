@@ -747,6 +747,12 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "days",
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: true,
+			[InteractiveRegionOption.CENSUS]: true,
+			[InteractiveRegionOption.HEALTH]: true,
+			[InteractiveRegionOption.WATERSHED]: true
+		},
 	},
 	/** Cooling Degree Days */
 	{

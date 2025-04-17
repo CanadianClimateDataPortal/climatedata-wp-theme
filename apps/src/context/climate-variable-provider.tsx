@@ -40,6 +40,7 @@ export type ClimateVariableContextType = {
 	setDateRange: (dates: string[]) => void;
 	setPercentiles: (percentiles: string[]) => void;
 	setFileFormat: (fileFormat: FileFormatType) => void;
+	setSelectedPoints: (gridCoordinates: GridCoordinates) => void;
 	addSelectedPoints: (gridCoordinate: GridCoordinates) => void;
 	removeSelectedPoint: (gid: number) => void;
 	resetSelectedPoints: () => void;
@@ -307,6 +308,17 @@ export const ClimateVariableProvider: React.FC<{
 		[dispatch]
 	);
 
+	const setSelectedPoints = useCallback(
+		(gridCoordinates: GridCoordinates) => {
+			dispatch(
+				updateClimateVariable({
+					selectedPoints: gridCoordinates,
+				})
+			);
+		},
+		[dispatch]
+	);
+
 	const addSelectedPoints = useCallback(
 		(gridCoordinates: GridCoordinates) => {
 			if (!climateVariableData) return;
@@ -366,6 +378,7 @@ export const ClimateVariableProvider: React.FC<{
 		setDateRange,
 		setPercentiles,
 		setFileFormat,
+		setSelectedPoints,
 		addSelectedPoints,
 		removeSelectedPoint,
 		resetSelectedPoints,

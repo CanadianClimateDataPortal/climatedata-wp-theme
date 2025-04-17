@@ -18,6 +18,7 @@ import { useDownload } from '@/hooks/use-download';
 import { cn } from '@/lib/utils';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { DownloadType } from '@/types/climate-variable-interface';
+import { useLeaflet } from '@/hooks/use-leaflet';
 
 const Steps: React.FC = () => {
 	const [isStepValid, setIsStepValid] = useState(false);
@@ -100,27 +101,31 @@ const Steps: React.FC = () => {
 };
 Steps.displayName = 'Steps';
 
-const App: React.FC = () => (
-	<LocaleProvider>
-		<MapProvider>
-			<AnimatedPanelProvider>
-				<DownloadProvider>
-					<div className="min-h-screen bg-cold-grey-1">
-						<div className="max-w-6xl mx-auto py-10">
-							<div className="flex flex-col sm:flex-row gap-4">
-								<div className="flex-1">
-									<Steps />
-								</div>
-								<div className="w-full sm:w-72">
-									<StepSummary />
+const App: React.FC = () => {
+	useLeaflet();
+
+	return (
+		<LocaleProvider>
+			<MapProvider>
+				<AnimatedPanelProvider>
+					<DownloadProvider>
+						<div className="min-h-screen bg-cold-grey-1">
+							<div className="max-w-6xl mx-auto py-10">
+								<div className="flex flex-col sm:flex-row gap-4">
+									<div className="flex-1">
+										<Steps/>
+									</div>
+									<div className="w-full sm:w-72">
+										<StepSummary/>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-				</DownloadProvider>
-			</AnimatedPanelProvider>
-		</MapProvider>
-	</LocaleProvider>
-);
+					</DownloadProvider>
+				</AnimatedPanelProvider>
+			</MapProvider>
+		</LocaleProvider>
+	)
+};
 
 export default App;

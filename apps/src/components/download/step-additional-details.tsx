@@ -86,7 +86,7 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 
 	const missingDataOptions = climateVariable?.getMissingDataOptions() ?? [];
 	const formattedMissingDataOptions = missingDataOptions.map(option => ({
-		label: option === 'wmo' ? __('WMO Parameters') : option,
+		label: option === 'wmo' ? __('WMO Parameters') : option + '%',
 		value: option
 	}));
 

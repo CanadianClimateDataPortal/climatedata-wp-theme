@@ -62,7 +62,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			interval: 30
 		},
 		hasDelta: true,
-		enableColourOptions: true,
+		enableColourOptions: false,
 		temporalThresholdConfig: {
 			thresholds: {
 				tx_max: {
@@ -562,6 +562,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[InteractiveRegionOption.WATERSHED]: false
 		},
 		hasDelta: false,
+		enableColourOptions: false,
 		customColourSchemes: {
 			default: {
 				colours: [
@@ -677,6 +678,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 		],
 		hasDelta: false,
+		enableColourOptions: false,
 	},
 	/** Standardized precipitation evapotranspiration index (3-months) */
 	{
@@ -698,6 +700,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 		],
 		hasDelta: false,
+		enableColourOptions: false,
 	},
 	/** Total Precipitation */
 	{

@@ -9,12 +9,14 @@ import { AnimatedPanelProvider } from '@/context/animated-panel-provider';
 import { ClimateVariableProvider } from "@/context/climate-variable-provider";
 
 import { useLeaflet } from '@/hooks/use-leaflet';
+import { useUrlSync } from '@/hooks/use-url-sync';
 
 import '@/App.css';
 
 function App() {
 	// making leaflet features available everywhere through the app
 	useLeaflet();
+	useUrlSync();
 
 	return (
 		<LocaleProvider>

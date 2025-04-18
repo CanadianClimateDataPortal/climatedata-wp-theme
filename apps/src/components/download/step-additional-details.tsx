@@ -138,8 +138,9 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 				/>
 			}
 
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED &&
-				<CheckboxFactory
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& climateVariable?.getPercentileOptions().length > 0
+				&& <CheckboxFactory
 					name="percentiles"
 					title={__('Percentiles')}
 					tooltip={__('Select percentiles')}

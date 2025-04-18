@@ -54,6 +54,10 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 	getDownloadType(): DownloadType | null {
 		return ClimateVariableBase.prototype.getDownloadType.call(this) ?? DownloadType.ANALYZED;
 	}
+
+	getPercentileOptions(): string[] {
+		return [ "5", "10", "25", "50", "75", "90", "95", ];
+	}
 }
 
 export default RasterAnalyzeClimateVariable;

@@ -1,11 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import validator from 'validator';
-import {
-	FrequencyConfig,
-	FrequencyDisplayModeOption,
-	FrequencyType,
-} from '@/types/climate-variable-interface';
+import { FrequencyConfig, FrequencyDisplayModeOption, FrequencyType } from '@/types/climate-variable-interface';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -64,22 +60,7 @@ export const getFrequencyCode = (frequency: string) => {
 
 	if (frequency === 'ann') {
 		frequencyCode = 'ys';
-	} else if (
-		[
-			'jan',
-			'feb',
-			'mar',
-			'apr',
-			'may',
-			'jun',
-			'jul',
-			'aug',
-			'sep',
-			'oct',
-			'nov',
-			'dec',
-		].includes(frequency)
-	) {
+	} else if (['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].includes(frequency)) {
 		frequencyCode = 'ms';
 	} else if (['spring', 'summer', 'fall', 'winter'].includes(frequency)) {
 		frequencyCode = 'qsdec';
@@ -96,8 +77,8 @@ export const isFrequencyEnabled = (
 	const configValue = config[frequencyType];
 	return Boolean(
 		configValue &&
-			(configValue === FrequencyDisplayModeOption.ALWAYS ||
-				configValue === section)
+		(configValue === FrequencyDisplayModeOption.ALWAYS ||
+			configValue === section)
 	);
 };
 

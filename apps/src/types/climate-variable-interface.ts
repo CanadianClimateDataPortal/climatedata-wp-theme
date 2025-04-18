@@ -153,6 +153,9 @@ export interface ClimateVariableConfigInterface {
 	/** Class name defining the type or category of the climate variable */
 	class: string;
 
+	/** The type of dataset the climate variable belongs to */
+	datasetType?: string;
+
 	/** Available versions for this climate variable */
 	versions?: string[];
 

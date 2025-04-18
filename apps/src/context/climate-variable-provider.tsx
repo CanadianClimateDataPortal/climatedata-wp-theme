@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { ClimateVariables } from '@/config/climate-variables.config';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import ClimateVariableContext from '@/hooks/use-climate-variable';
-import { PostData } from '@/types/types';
+import { PostData, TaxonomyData } from '@/types/types';
 import {
 	setClimateVariable,
 	updateClimateVariable,
@@ -23,7 +23,7 @@ import RasterAnalyzeClimateVariable from '@/lib/raster-analyze-climate-variable'
 
 export type ClimateVariableContextType = {
 	climateVariable: ClimateVariableInterface | null;
-	selectClimateVariable: (variable: PostData) => void;
+	selectClimateVariable: (variable: PostData, dataset?: TaxonomyData) => void;
 	setVersion: (version: string) => void;
 	setScenario: (scenario: string) => void;
 	setScenarioCompare: (scenarioCompare: boolean) => void;
@@ -95,19 +95,17 @@ export const ClimateVariableProvider: React.FC<{
 	}, [climateVariableData]);
 
 	/**
-	 * A callback function to select and set a climate variable.
+	 * A callback function to select and dispatch a climate variable
+	 * based on the provided input variable and optional dataset.
 	 *
-	 * Matches a climate variable from a predefined list of configurations
-	 * using the provided variable's ID. If a matching variable is found, it combines
-	 * the API data with configuration data and dispatches an action to set the climate
-	 * variable in the application state. If no matching variable is found, it raises
-	 * an error.
+	 * @callback selectClimateVariable
+	 * @param {PostData} variable - The input data containing details of a climate variable to be selected.
+	 * @param {TaxonomyData} [dataset] - Optional dataset that may provide additional context.
 	 *
-	 * @param {PostData} variable - The data containing the climate variable ID and post ID from the API.
-	 * @throws {Error} Throws an error if no matching climate variable configuration is found.
+	 * @throws {Error} Throws an error if no matching variable is found in the `ClimateVariables` array.
 	 */
 	const selectClimateVariable = useCallback(
-		(variable: PostData) => {
+		(variable: PostData, dataset?: TaxonomyData) => {
 			const matchedVariable = ClimateVariables.find(
 				(config) => config.id === variable.id
 			);
@@ -117,7 +115,8 @@ export const ClimateVariableProvider: React.FC<{
 				dispatch(setClimateVariable({
 					...matchedVariable,
 					postId: variable.postId,
-					title: variable.title
+					title: variable.title,
+					datasetType: dataset?.dataset_type,
 				}));
 			} else {
 				throw new Error(`No matching variable found for id: ${variable.id}`);

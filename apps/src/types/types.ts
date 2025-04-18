@@ -75,6 +75,7 @@ export type TaxonomyData = {
 			target: string;
 		}>;
 	};
+	dataset_type?: string;
 };
 
 /**

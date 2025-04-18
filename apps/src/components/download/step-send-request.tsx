@@ -22,7 +22,7 @@ import { normalizeDropdownOptions } from "@/lib/format.ts";
 /**
  * Send download request step
  */
-const StepSendRequest: React.FC = () => {
+const StepSendRequest = React.forwardRef((_, ref) => {
 	const [captchaValue, setCaptchaValue] = useState<string>('');
 	const { climateVariable, setFileFormat } = useClimateVariable();
 	const { __ } = useI18n();
@@ -31,6 +31,31 @@ const StepSendRequest: React.FC = () => {
 		(state) => state.download
 	);
 	const dispatch = useAppDispatch();
+
+	// expose isValid method to parent component
+	React.useImperativeHandle(ref, () => ({
+		isValid: () => {
+			if (!climateVariable) {
+				return false;
+			}
+
+			const fileFormat = climateVariable.getFileFormat();
+			const validations = [
+				// File format is always required
+				Boolean(fileFormat),
+			];
+
+			// For analyzed downloads, add email validation
+			if (climateVariable.getDownloadType() === DownloadType.ANALYZED) {
+				validations.push(
+					// Email is required and must be valid
+					Boolean(email && isValidEmail(email))
+				);
+			}
+
+			return validations.every(Boolean);
+		}
+	}), [climateVariable, email]);
 
 	const formatOptions = [
 		{ value: FileFormatType.CSV, label: 'CSV' },
@@ -52,12 +77,12 @@ const StepSendRequest: React.FC = () => {
 			<StepContainerDescription>
 				<p>
 					{__(
-						'Data processing starts after you “Send Request”. It may take 30 to 90 minutes to complete, depending on available resources.'
+						'Data processing starts after you "Send Request". It may take 30 to 90 minutes to complete, depending on available resources.'
 					)}
 				</p>
 				<p>
 					{__(
-						'You will be notified by email when your request has been processed and the data are available. Don’t forget to check your spam folder.'
+						"You will be notified by email when your request has been processed and the data are available. Don't forget to check your spam folder."
 					)}
 				</p>
 			</StepContainerDescription>
@@ -154,7 +179,7 @@ const StepSendRequest: React.FC = () => {
 			</div>
 		</StepContainer>
 	);
-};
+});
 StepSendRequest.displayName = 'StepSendRequest';
 
 export default StepSendRequest;

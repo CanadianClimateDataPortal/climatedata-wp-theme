@@ -363,7 +363,7 @@ export interface ClimateVariableInterface {
 
 	getPercentiles(): string[];
 
-	getMissingDataOptions(): string[] | null;
+	getMissingDataOptions(): string[];
 
 	getMissingData(): string | null;
 

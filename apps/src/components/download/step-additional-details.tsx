@@ -25,7 +25,7 @@ import appConfig from "@/config/app.config";
  */
 const StepAdditionalDetails = React.forwardRef((_, ref) => {
 	const { __ } = useI18n();
-	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios, setPercentiles } = useClimateVariable();
+	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios, setPercentiles, setMissingDataValues } = useClimateVariable();
 	const section = useContext(SectionContext);
 	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
 
@@ -83,6 +83,12 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 	const scenarioOptions = appConfig.scenarios.filter((scenario) =>
 		climateVariable?.getScenarios()?.includes(scenario.value)
 	);
+
+	const missingDataOptions = climateVariable?.getMissingDataOptions() ?? [];
+	const formattedMissingDataOptions = missingDataOptions.map(option => ({
+		label: option === 'wmo' ? 'WMO Parameters' : option,
+		value: option
+	}));
 
 	return (
 		<StepContainer title="Additional details">
@@ -150,6 +156,21 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 					options={climateVariable?.getPercentileOptions() ?? []}
 					values={climateVariable?.getPercentiles() ?? []}
 					onChange={setPercentiles}
+				/>
+			}
+
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& formattedMissingDataOptions.length > 0
+				&& <CheckboxFactory
+					name="missingDataOptions"
+					title={__('Missing data options')}
+					tooltip={__('Select missing data options')}
+					orientation="horizontal"
+					className="max-w-md mb-8"
+					optionClassName="w-1/4"
+					options={formattedMissingDataOptions}
+					values={climateVariable?.getMissingDataValues() ?? []}
+					onChange={setMissingDataValues}
 				/>
 			}
 		</StepContainer>

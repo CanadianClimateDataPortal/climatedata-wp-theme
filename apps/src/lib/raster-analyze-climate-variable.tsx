@@ -58,6 +58,12 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 	getPercentileOptions(): string[] {
 		return [ "5", "10", "25", "50", "75", "90", "95", ];
 	}
+
+	getMissingDataOptions(): string[] | null {
+		return super.getMissingDataOptions()
+			? super.getMissingDataOptions()
+			: [ "5", "10", "15", "wmo" ];
+	}
 }
 
 export default RasterAnalyzeClimateVariable;

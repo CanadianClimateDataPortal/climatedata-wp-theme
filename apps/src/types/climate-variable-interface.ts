@@ -249,6 +249,12 @@ export interface ClimateVariableConfigInterface {
 	/** Stores the selected percentiles */
 	percentiles?: string[];
 
+	/** Available missing data options used for analysis */
+	missingDataOptions?: string[];
+
+	/** Stores the selected missing data values */
+	missingDataValues?: string[];
+
 	/** The type of formats available */
 	fileFormatTypes?: FileFormatType[];
 
@@ -350,6 +356,10 @@ export interface ClimateVariableInterface {
 	getPercentileOptions(): string[];
 
 	getPercentiles(): string[];
+
+	getMissingDataOptions(): string[] | null;
+
+	getMissingDataValues(): string[];
 
 	getFileFormatTypes(): FileFormatType[];
 

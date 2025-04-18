@@ -235,8 +235,8 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.missingDataOptions ?? null;
 	}
 
-	getMissingDataValues(): string[] {
-		return this._config.missingDataValues ?? [];
+	getMissingData(): string | null {
+		return this._config.missingData ?? this.getMissingDataOptions()?.[0] ?? null;
 	}
 
 	getModelOptions(): string[] {

@@ -252,8 +252,8 @@ export interface ClimateVariableConfigInterface {
 	/** Available missing data options used for analysis */
 	missingDataOptions?: string[];
 
-	/** Stores the selected missing data values */
-	missingDataValues?: string[];
+	/** Stores the selected missing data */
+	missingData?: string;
 
 	/** Available model options for analysis */
 	modelOptions?: string[];
@@ -365,7 +365,7 @@ export interface ClimateVariableInterface {
 
 	getMissingDataOptions(): string[] | null;
 
-	getMissingDataValues(): string[];
+	getMissingData(): string | null;
 
 	getModelOptions(): string[];
 

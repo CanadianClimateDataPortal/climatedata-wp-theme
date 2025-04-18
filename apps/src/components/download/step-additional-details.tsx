@@ -25,7 +25,7 @@ import appConfig from "@/config/app.config";
  */
 const StepAdditionalDetails = React.forwardRef((_, ref) => {
 	const { __ } = useI18n();
-	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios, setPercentiles, setMissingDataValues, setModels } = useClimateVariable();
+	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios, setPercentiles, setMissingData, setModels } = useClimateVariable();
 	const section = useContext(SectionContext);
 	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
 
@@ -47,18 +47,22 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 
 			// For analyzed downloads, add additional validations
 			if (climateVariable.getDownloadType() === DownloadType.ANALYZED) {
-				const [startYear, endYear] = climateVariable.getDateRange() ?? [];
-				const scenarios = climateVariable.getAnalyzeScenarios() ?? [];
-				const percentiles = climateVariable.getPercentiles() ?? [];
+				if (climateVariable.getDatasetType() === 'ahccd') {
+					validations.push(!!climateVariable.getMissingData());
+				} else {
+					const [startYear, endYear] = climateVariable.getDateRange() ?? [];
+					const scenarios = climateVariable.getAnalyzeScenarios() ?? [];
+					const percentiles = climateVariable.getPercentiles() ?? [];
 
-				validations.push(
-					// Date range is required
-					Boolean(startYear && endYear),
-					// At least one scenario is required
-					scenarios.length > 0,
-					// At least one percentile is required
-					percentiles.length > 0
-				);
+					validations.push(
+						// Date range is required
+						Boolean(startYear && endYear),
+						// At least one scenario is required
+						scenarios.length > 0,
+						// At least one percentile is required
+						percentiles.length > 0
+					);
+				}
 			}
 
 			return validations.every(Boolean);
@@ -174,23 +178,7 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 			}
 
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
-				&& climateVariable?.getDatasetType() === 'ahccd'
-				&& formattedMissingDataOptions.length > 0
-				&& <CheckboxFactory
-					name="missingDataOptions"
-					title={__('Missing data options')}
-					tooltip={__('Select missing data options')}
-					orientation="horizontal"
-					className="max-w-md mb-8"
-					optionClassName="w-1/4"
-					options={formattedMissingDataOptions}
-					values={climateVariable?.getMissingDataValues() ?? []}
-					onChange={setMissingDataValues}
-				/>
-			}
-
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
-				&& climateVariable?.getDatasetType() === 'ahccd'
+				&& climateVariable?.getDatasetType() !== 'ahccd'
 				&& formattedModelOptions.length > 0
 				&& <CheckboxFactory
 					name="models"
@@ -202,6 +190,22 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 					options={formattedModelOptions}
 					values={climateVariable?.getModels() ?? []}
 					onChange={setModels}
+				/>
+			}
+
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& climateVariable?.getDatasetType() === 'ahccd'
+				&& formattedMissingDataOptions.length > 0
+				&& <RadioGroupFactory
+					name="missingDataOptions"
+					title={__('Missing data options')}
+					tooltip={__('Select missing data options')}
+					orientation="horizontal"
+					className="max-w-md mb-8"
+					optionClassName="w-1/4"
+					options={formattedMissingDataOptions}
+					value={climateVariable.getMissingData() ?? undefined}
+					onValueChange={setMissingData}
 				/>
 			}
 		</StepContainer>

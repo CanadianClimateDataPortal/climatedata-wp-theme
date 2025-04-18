@@ -62,6 +62,10 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 	getMissingDataOptions(): string[] {
 		return [ "5", "10", "15", "wmo" ];
 	}
+
+	getModelOptions(): string[] {
+		return [ "PCIC12", "full" ];
+	}
 }
 
 export default RasterAnalyzeClimateVariable;

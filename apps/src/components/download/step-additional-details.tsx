@@ -25,7 +25,7 @@ import appConfig from "@/config/app.config";
  */
 const StepAdditionalDetails = React.forwardRef((_, ref) => {
 	const { __ } = useI18n();
-	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios, setPercentiles, setMissingData, setModels } = useClimateVariable();
+	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios, setPercentiles, setMissingData, setModel } = useClimateVariable();
 	const section = useContext(SectionContext);
 	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
 
@@ -48,6 +48,7 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 			// For analyzed downloads, add additional validations
 			if (climateVariable.getDownloadType() === DownloadType.ANALYZED) {
 				if (climateVariable.getDatasetType() === 'ahccd') {
+					// A missing data option must be selected.
 					validations.push(!!climateVariable.getMissingData());
 				} else {
 					const [startYear, endYear] = climateVariable.getDateRange() ?? [];
@@ -60,7 +61,9 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 						// At least one scenario is required
 						scenarios.length > 0,
 						// At least one percentile is required
-						percentiles.length > 0
+						percentiles.length > 0,
+						// A model must be selected.
+						!!climateVariable.getModel(),
 					);
 				}
 			}
@@ -180,7 +183,7 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
 				&& climateVariable?.getDatasetType() !== 'ahccd'
 				&& formattedModelOptions.length > 0
-				&& <CheckboxFactory
+				&& <RadioGroupFactory
 					name="models"
 					title={__('Models')}
 					tooltip={__('Select models')}
@@ -188,8 +191,8 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 					className="max-w-md mb-8"
 					optionClassName="w-1/4"
 					options={formattedModelOptions}
-					values={climateVariable?.getModels() ?? []}
-					onChange={setModels}
+					value={climateVariable.getModel() ?? undefined}
+					onValueChange={setModel}
 				/>
 			}
 

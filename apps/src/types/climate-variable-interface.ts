@@ -259,7 +259,7 @@ export interface ClimateVariableConfigInterface {
 	modelOptions?: string[];
 
 	/** Stores the selected models for analysis */
-	models?: string[];
+	model?: string;
 
 	/** The type of formats available */
 	fileFormatTypes?: FileFormatType[];
@@ -369,7 +369,7 @@ export interface ClimateVariableInterface {
 
 	getModelOptions(): string[];
 
-	getModels(): string[];
+	getModel(): string | null;
 
 	getFileFormatTypes(): FileFormatType[];
 

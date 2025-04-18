@@ -86,13 +86,13 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 
 	const missingDataOptions = climateVariable?.getMissingDataOptions() ?? [];
 	const formattedMissingDataOptions = missingDataOptions.map(option => ({
-		label: option === 'wmo' ? 'WMO Parameters' : option,
+		label: option === 'wmo' ? __('WMO Parameters') : option,
 		value: option
 	}));
 
 	const modelOptions = climateVariable?.getModelOptions() ?? [];
 	const formattedModelOptions = modelOptions.map(option => ({
-		label: option === 'full' ? 'Full ensemble' : option.toUpperCase() + ' (Ensemble)',
+		label: option === 'full' ? __('Full ensemble') : option.toUpperCase() + __(' (Ensemble)'),
 		value: option
 	}));
 
@@ -126,7 +126,6 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 				className={"sm:w-64 mb-4"}
 			/>
 
-			{/* TODO: what is this? didn't see it in the figma file */}
 			{averagingOptions.length > 0 && climateVariable?.getFrequency() !== FrequencyType.DAILY && <RadioGroupFactory
 				name="temporal-frequency"
 				className="max-w-md mb-8"

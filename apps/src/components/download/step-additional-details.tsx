@@ -126,15 +126,6 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 				/>
 			}
 
-			<FrequencySelect
-				title={'Temporal frequency'}
-				config={frequencyConfig}
-				section={section}
-				value={climateVariable?.getFrequency() ?? undefined}
-				onValueChange={setFrequency}
-				className={"sm:w-64 mb-4"}
-			/>
-
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
 				&& climateVariable?.getDatasetType() !== 'ahccd'
 				&& averagingOptions.length > 0
@@ -146,6 +137,22 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 					options={averagingOptions}
 					value={climateVariable?.getAveragingType() ?? undefined}
 					onValueChange={setAveragingType}
+				/>
+			}
+
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& climateVariable?.getDatasetType() !== 'ahccd'
+				&& formattedModelOptions.length > 0
+				&& <RadioGroupFactory
+					name="models"
+					title={__('Models')}
+					tooltip={__('Select models')}
+					orientation="horizontal"
+					className="max-w-md mb-8"
+					optionClassName="w-1/4"
+					options={formattedModelOptions}
+					value={climateVariable.getModel() ?? undefined}
+					onValueChange={setModel}
 				/>
 			}
 
@@ -181,22 +188,6 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 			}
 
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
-				&& climateVariable?.getDatasetType() !== 'ahccd'
-				&& formattedModelOptions.length > 0
-				&& <RadioGroupFactory
-					name="models"
-					title={__('Models')}
-					tooltip={__('Select models')}
-					orientation="horizontal"
-					className="max-w-md mb-8"
-					optionClassName="w-1/4"
-					options={formattedModelOptions}
-					value={climateVariable.getModel() ?? undefined}
-					onValueChange={setModel}
-				/>
-			}
-
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
 				&& climateVariable?.getDatasetType() === 'ahccd'
 				&& formattedMissingDataOptions.length > 0
 				&& <RadioGroupFactory
@@ -211,6 +202,15 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 					onValueChange={setMissingData}
 				/>
 			}
+
+			<FrequencySelect
+				title={'Temporal frequency'}
+				config={frequencyConfig}
+				section={section}
+				value={climateVariable?.getFrequency() ?? undefined}
+				onValueChange={setFrequency}
+				className={"sm:w-64 mb-4"}
+			/>
 		</StepContainer>
 	);
 });

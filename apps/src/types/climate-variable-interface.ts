@@ -283,6 +283,8 @@ export interface ClimateVariableInterface {
 
 	getTitle(): string | null;
 
+	getDatasetType(): string | null;
+
 	getVersions(): string[];
 
 	getVersion(): string | null;

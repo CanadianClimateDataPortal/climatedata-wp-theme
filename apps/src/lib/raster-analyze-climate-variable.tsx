@@ -64,7 +64,11 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 	}
 
 	getModelOptions(): string[] {
-		return [ "PCIC12", "full" ];
+		if (super.getVersion() === "cmip5") {
+			return [ "PCIC12", "full" ];
+		} else {
+			return [ "full" ];
+		}
 	}
 }
 

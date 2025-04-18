@@ -102,8 +102,10 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 				{__('Adjust the controls below to customize your analysis.')}
 			</StepContainerDescription>
 
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED && dateRangeConfig &&
-				<YearRange
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& climateVariable?.getDatasetType() !== 'ahccd'
+				&& dateRangeConfig
+				&& <YearRange
 					startYear={{
 						label: __('Start Year'),
 						value: dateRange[0],
@@ -126,17 +128,23 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 				className={"sm:w-64 mb-4"}
 			/>
 
-			{averagingOptions.length > 0 && climateVariable?.getFrequency() !== FrequencyType.DAILY && <RadioGroupFactory
-				name="temporal-frequency"
-				className="max-w-md mb-8"
-				optionClassName="w-1/2"
-				options={averagingOptions}
-				value={climateVariable?.getAveragingType() ?? undefined}
-				onValueChange={setAveragingType}
-			/>}
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& climateVariable?.getDatasetType() !== 'ahccd'
+				&& averagingOptions.length > 0
+				&& climateVariable?.getFrequency() !== FrequencyType.DAILY
+				&& <RadioGroupFactory
+					name="temporal-frequency"
+					className="max-w-md mb-8"
+					optionClassName="w-1/2"
+					options={averagingOptions}
+					value={climateVariable?.getAveragingType() ?? undefined}
+					onValueChange={setAveragingType}
+				/>
+			}
 
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED &&
-				<CheckboxFactory
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& climateVariable?.getDatasetType() !== 'ahccd'
+				&& <CheckboxFactory
 					name="emission-scenarios"
 					title={__('Emissions Scenarios')}
 					tooltip={__('Select emission scenarios')}
@@ -150,6 +158,7 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 			}
 
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& climateVariable?.getDatasetType() !== 'ahccd'
 				&& climateVariable?.getPercentileOptions().length > 0
 				&& <CheckboxFactory
 					name="percentiles"
@@ -165,6 +174,7 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 			}
 
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& climateVariable?.getDatasetType() === 'ahccd'
 				&& formattedMissingDataOptions.length > 0
 				&& <CheckboxFactory
 					name="missingDataOptions"
@@ -180,6 +190,7 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 			}
 
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& climateVariable?.getDatasetType() === 'ahccd'
 				&& formattedModelOptions.length > 0
 				&& <CheckboxFactory
 					name="models"

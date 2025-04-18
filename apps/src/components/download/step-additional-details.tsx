@@ -25,7 +25,7 @@ import appConfig from "@/config/app.config";
  */
 const StepAdditionalDetails = React.forwardRef((_, ref) => {
 	const { __ } = useI18n();
-	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios, setPercentiles, setMissingDataValues } = useClimateVariable();
+	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios, setPercentiles, setMissingDataValues, setModels } = useClimateVariable();
 	const section = useContext(SectionContext);
 	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
 
@@ -87,6 +87,12 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 	const missingDataOptions = climateVariable?.getMissingDataOptions() ?? [];
 	const formattedMissingDataOptions = missingDataOptions.map(option => ({
 		label: option === 'wmo' ? 'WMO Parameters' : option,
+		value: option
+	}));
+
+	const modelOptions = climateVariable?.getModelOptions() ?? [];
+	const formattedModelOptions = modelOptions.map(option => ({
+		label: option === 'full' ? 'Full ensemble' : option.toUpperCase() + ' (Ensemble)',
 		value: option
 	}));
 
@@ -171,6 +177,21 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 					options={formattedMissingDataOptions}
 					values={climateVariable?.getMissingDataValues() ?? []}
 					onChange={setMissingDataValues}
+				/>
+			}
+
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& formattedModelOptions.length > 0
+				&& <CheckboxFactory
+					name="models"
+					title={__('Models')}
+					tooltip={__('Select models')}
+					orientation="horizontal"
+					className="max-w-md mb-8"
+					optionClassName="w-1/4"
+					options={formattedModelOptions}
+					values={climateVariable?.getModels() ?? []}
+					onChange={setModels}
 				/>
 			}
 		</StepContainer>

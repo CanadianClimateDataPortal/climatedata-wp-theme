@@ -40,6 +40,7 @@ export type ClimateVariableContextType = {
 	setDateRange: (dates: string[]) => void;
 	setPercentiles: (percentiles: string[]) => void;
 	setMissingDataValues: (missingDataValues: string[]) => void;
+	setModels: (models: string[]) => void;
 	setFileFormat: (fileFormat: FileFormatType) => void;
 	setSelectedPoints: (gridCoordinates: GridCoordinates) => void;
 	addSelectedPoints: (gridCoordinate: GridCoordinates) => void;
@@ -308,6 +309,17 @@ export const ClimateVariableProvider: React.FC<{
 		[dispatch]
 	);
 
+	const setModels = useCallback(
+		(models: string[]) => {
+			dispatch(
+				updateClimateVariable({
+					models,
+				})
+			);
+		},
+		[dispatch]
+	);
+
 	const setFileFormat = useCallback(
 		(fileFormat: FileFormatType) => {
 			dispatch(
@@ -389,6 +401,7 @@ export const ClimateVariableProvider: React.FC<{
 		setDateRange,
 		setPercentiles,
 		setMissingDataValues,
+		setModels,
 		setFileFormat,
 		setSelectedPoints,
 		addSelectedPoints,

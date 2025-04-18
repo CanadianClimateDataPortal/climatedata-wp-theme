@@ -239,6 +239,14 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.missingDataValues ?? [];
 	}
 
+	getModelOptions(): string[] {
+		return this._config.modelOptions ?? [];
+	}
+
+	getModels(): string[] {
+		return this._config.models ?? [];
+	}
+
 	getFileFormatTypes(): FileFormatType[] {
 		return this._config.fileFormatTypes ?? [];
 	}

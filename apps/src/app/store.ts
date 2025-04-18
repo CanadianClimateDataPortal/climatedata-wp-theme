@@ -16,9 +16,6 @@ import downloadReducer from '@/features/download/download-slice';
 // API Slices and Reducers - Fetch requests that are going to populate the store
 import { wpApiSlice } from '@/services/wp-node';
 
-// URL Sync Middleware
-import { urlSyncMiddleware } from '@/middleware/url-sync';
-
 /**
  * Configures and exports the Redux store for the application.
  *
@@ -39,9 +36,7 @@ export const store = configureStore({
 		[wpApiSlice.reducerPath]: wpApiSlice.reducer,
 	},
 	middleware: (getDefaultMiddleware) =>
-		getDefaultMiddleware()
-			.concat(wpApiSlice.middleware)
-			.concat(urlSyncMiddleware),
+		getDefaultMiddleware().concat(wpApiSlice.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;

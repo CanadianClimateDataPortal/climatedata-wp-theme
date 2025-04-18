@@ -25,7 +25,7 @@ import appConfig from "@/config/app.config";
  */
 const StepAdditionalDetails = React.forwardRef((_, ref) => {
 	const { __ } = useI18n();
-	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios, setPercentiles } = useClimateVariable();
+	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios, setPercentiles, setMissingData, setModel } = useClimateVariable();
 	const section = useContext(SectionContext);
 	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
 
@@ -47,18 +47,25 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 
 			// For analyzed downloads, add additional validations
 			if (climateVariable.getDownloadType() === DownloadType.ANALYZED) {
-				const [startYear, endYear] = climateVariable.getDateRange() ?? [];
-				const scenarios = climateVariable.getAnalyzeScenarios() ?? [];
-				const percentiles = climateVariable.getPercentiles() ?? [];
+				if (climateVariable.getDatasetType() === 'ahccd') {
+					// A missing data option must be selected.
+					validations.push(!!climateVariable.getMissingData());
+				} else {
+					const [startYear, endYear] = climateVariable.getDateRange() ?? [];
+					const scenarios = climateVariable.getAnalyzeScenarios() ?? [];
+					const percentiles = climateVariable.getPercentiles() ?? [];
 
-				validations.push(
-					// Date range is required
-					Boolean(startYear && endYear),
-					// At least one scenario is required
-					scenarios.length > 0,
-					// At least one percentile is required
-					percentiles.length > 0
-				);
+					validations.push(
+						// Date range is required
+						Boolean(startYear && endYear),
+						// At least one scenario is required
+						scenarios.length > 0,
+						// At least one percentile is required
+						percentiles.length > 0,
+						// A model must be selected.
+						!!climateVariable.getModel(),
+					);
+				}
 			}
 
 			return validations.every(Boolean);
@@ -84,14 +91,28 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 		climateVariable?.getScenarios()?.includes(scenario.value)
 	);
 
+	const missingDataOptions = climateVariable?.getMissingDataOptions() ?? [];
+	const formattedMissingDataOptions = missingDataOptions.map(option => ({
+		label: option === 'wmo' ? __('WMO Parameters') : option + '%',
+		value: option
+	}));
+
+	const modelOptions = climateVariable?.getModelOptions() ?? [];
+	const formattedModelOptions = modelOptions.map(option => ({
+		label: option === 'full' ? __('Full ensemble') : option.toUpperCase() + __(' (Ensemble)'),
+		value: option
+	}));
+
 	return (
 		<StepContainer title="Additional details">
 			<StepContainerDescription>
 				{__('Adjust the controls below to customize your analysis.')}
 			</StepContainerDescription>
 
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED && dateRangeConfig &&
-				<YearRange
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& climateVariable?.getDatasetType() !== 'ahccd'
+				&& dateRangeConfig
+				&& <YearRange
 					startYear={{
 						label: __('Start Year'),
 						value: dateRange[0],
@@ -105,27 +126,39 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 				/>
 			}
 
-			<FrequencySelect
-				title={'Temporal frequency'}
-				config={frequencyConfig}
-				section={section}
-				value={climateVariable?.getFrequency() ?? undefined}
-				onValueChange={setFrequency}
-				className={"sm:w-64 mb-4"}
-			/>
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& climateVariable?.getDatasetType() !== 'ahccd'
+				&& averagingOptions.length > 0
+				&& climateVariable?.getFrequency() !== FrequencyType.DAILY
+				&& <RadioGroupFactory
+					name="temporal-frequency"
+					className="max-w-md mb-8"
+					optionClassName="w-1/2"
+					options={averagingOptions}
+					value={climateVariable?.getAveragingType() ?? undefined}
+					onValueChange={setAveragingType}
+				/>
+			}
 
-			{/* TODO: what is this? didn't see it in the figma file */}
-			{averagingOptions.length > 0 && climateVariable?.getFrequency() !== FrequencyType.DAILY && <RadioGroupFactory
-				name="temporal-frequency"
-				className="max-w-md mb-8"
-				optionClassName="w-1/2"
-				options={averagingOptions}
-				value={climateVariable?.getAveragingType() ?? undefined}
-				onValueChange={setAveragingType}
-			/>}
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& climateVariable?.getDatasetType() !== 'ahccd'
+				&& formattedModelOptions.length > 0
+				&& <RadioGroupFactory
+					name="models"
+					title={__('Models')}
+					tooltip={__('Select models')}
+					orientation="horizontal"
+					className="max-w-md mb-8"
+					optionClassName="w-1/4"
+					options={formattedModelOptions}
+					value={climateVariable.getModel() ?? undefined}
+					onValueChange={setModel}
+				/>
+			}
 
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED &&
-				<CheckboxFactory
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& climateVariable?.getDatasetType() !== 'ahccd'
+				&& <CheckboxFactory
 					name="emission-scenarios"
 					title={__('Emissions Scenarios')}
 					tooltip={__('Select emission scenarios')}
@@ -138,8 +171,10 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 				/>
 			}
 
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED &&
-				<CheckboxFactory
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& climateVariable?.getDatasetType() !== 'ahccd'
+				&& climateVariable?.getPercentileOptions().length > 0
+				&& <CheckboxFactory
 					name="percentiles"
 					title={__('Percentiles')}
 					tooltip={__('Select percentiles')}
@@ -151,6 +186,31 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 					onChange={setPercentiles}
 				/>
 			}
+
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+				&& climateVariable?.getDatasetType() === 'ahccd'
+				&& formattedMissingDataOptions.length > 0
+				&& <RadioGroupFactory
+					name="missingDataOptions"
+					title={__('Missing data options')}
+					tooltip={__('Select missing data options')}
+					orientation="horizontal"
+					className="max-w-md mb-8"
+					optionClassName="w-1/4"
+					options={formattedMissingDataOptions}
+					value={climateVariable.getMissingData() ?? undefined}
+					onValueChange={setMissingData}
+				/>
+			}
+
+			<FrequencySelect
+				title={'Temporal frequency'}
+				config={frequencyConfig}
+				section={section}
+				value={climateVariable?.getFrequency() ?? undefined}
+				onValueChange={setFrequency}
+				className={"sm:w-64 mb-4"}
+			/>
 		</StepContainer>
 	);
 });

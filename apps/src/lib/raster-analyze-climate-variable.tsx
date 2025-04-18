@@ -54,6 +54,22 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 	getDownloadType(): DownloadType | null {
 		return ClimateVariableBase.prototype.getDownloadType.call(this) ?? DownloadType.ANALYZED;
 	}
+
+	getPercentileOptions(): string[] {
+		return [ "5", "10", "25", "50", "75", "90", "95", ];
+	}
+
+	getMissingDataOptions(): string[] {
+		return [ "5", "10", "15", "wmo" ];
+	}
+
+	getModelOptions(): string[] {
+		if (super.getVersion() === "cmip5") {
+			return [ "PCIC12", "full" ];
+		} else {
+			return [ "full" ];
+		}
+	}
 }
 
 export default RasterAnalyzeClimateVariable;

@@ -76,7 +76,7 @@ export function AppSidebar() {
 
 	const handleSelectVariable = (variable: PostData) => {
 		setSelectedVariable(variable);
-		selectClimateVariable(variable);
+		selectClimateVariable(variable, dataset);
 	}
 
 	// We don't need to show if there's only 1 option.

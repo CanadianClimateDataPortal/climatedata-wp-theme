@@ -153,6 +153,9 @@ export interface ClimateVariableConfigInterface {
 	/** Class name defining the type or category of the climate variable */
 	class: string;
 
+	/** The type of dataset the climate variable belongs to */
+	datasetType?: string;
+
 	/** Available versions for this climate variable */
 	versions?: string[];
 
@@ -246,6 +249,18 @@ export interface ClimateVariableConfigInterface {
 	/** Stores the selected percentiles */
 	percentiles?: string[];
 
+	/** Available missing data options used for analysis */
+	missingDataOptions?: string[];
+
+	/** Stores the selected missing data */
+	missingData?: string;
+
+	/** Available model options for analysis */
+	modelOptions?: string[];
+
+	/** Stores the selected models for analysis */
+	model?: string;
+
 	/** The type of formats available */
 	fileFormatTypes?: FileFormatType[];
 
@@ -279,6 +294,8 @@ export interface ClimateVariableInterface {
 	getPostId(): number | undefined;
 
 	getTitle(): string | null;
+
+	getDatasetType(): string | null;
 
 	getVersions(): string[];
 
@@ -345,6 +362,14 @@ export interface ClimateVariableInterface {
 	getPercentileOptions(): string[];
 
 	getPercentiles(): string[];
+
+	getMissingDataOptions(): string[];
+
+	getMissingData(): string | null;
+
+	getModelOptions(): string[];
+
+	getModel(): string | null;
 
 	getFileFormatTypes(): FileFormatType[];
 

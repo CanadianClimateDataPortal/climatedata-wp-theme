@@ -89,17 +89,19 @@ const StepVariableOptions = React.forwardRef((_, ref) => {
 				{__('Please set your variables options to your needs.')}
 			</StepContainerDescription>
 			<div className="gap-4">
-				<div className="mb-8">
-					<Dropdown
-						className="sm:w-64"
-						placeholder={__('Select an option')}
-						options={versionOptions}
-						value={climateVariable?.getVersion() ?? undefined}
-						label={__('Versions of the dataset')}
-						tooltip={__('Select a version for the dataset')}
-						onChange={setVersion}
-					/>
-				</div>
+				{climateVariable?.getDatasetType() !== 'ahccd'
+					&& <div className="mb-8">
+						<Dropdown
+							className="sm:w-64"
+							placeholder={__('Select an option')}
+							options={versionOptions}
+							value={climateVariable?.getVersion() ?? undefined}
+							label={__('Versions of the dataset')}
+							tooltip={__('Select a version for the dataset')}
+							onChange={setVersion}
+						/>
+					</div>
+				}
 				{analysisFields.length > 0 && <div>
 					{analysisFields}
 				</div>}

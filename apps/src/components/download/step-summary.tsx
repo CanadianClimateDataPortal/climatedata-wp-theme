@@ -40,7 +40,7 @@ const StepSummary: React.FC = () => {
 
 				const parts = [];
 
-				if (version) {
+				if (version && climateVariable?.getDatasetType() !== 'ahccd') {
 					parts.push(appConfig.versions.find(v => v.value === version)?.label ?? version);
 				}
 

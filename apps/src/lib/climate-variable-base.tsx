@@ -20,6 +20,7 @@ import {
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
 import RasterDownloadMap from "@/components/download/raster-download-map";
+import L from "leaflet";
 
 /**
  * A base class representing a climate variable and its configuration. This class provides methods
@@ -53,6 +54,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		}
 
 		return title as string || null;
+	}
+
+	getDatasetType(): string | null {
+		return this._config.datasetType ?? null;
 	}
 
 	getVersions(): string[] {
@@ -224,6 +229,22 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getPercentiles(): string[] {
 		return this._config.percentiles ?? [];
+	}
+
+	getMissingDataOptions(): string[] {
+		return this._config.missingDataOptions ?? [];
+	}
+
+	getMissingData(): string | null {
+		return this._config.missingData ?? this.getMissingDataOptions()?.[0] ?? null;
+	}
+
+	getModelOptions(): string[] {
+		return this._config.modelOptions ?? [];
+	}
+
+	getModel(): string | null {
+		return this._config.model ?? this.getModelOptions()?.[0] ?? null;
 	}
 
 	getFileFormatTypes(): FileFormatType[] {

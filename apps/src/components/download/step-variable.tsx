@@ -63,6 +63,10 @@ const StepVariable = React.forwardRef((_, ref) => {
         );
     };
 
+		const handleSelect = (variable: PostData) => {
+			selectClimateVariable(variable, dataset ?? undefined);
+		}
+
     // when dataset or available variables change, select the first available variable
     useEffect(() => {
       if (!dataset || filteredList.length === 0) {
@@ -72,7 +76,7 @@ const StepVariable = React.forwardRef((_, ref) => {
       const hasCurrent = currentId != null && filteredList.some(v => v.id === currentId);
       if (!hasCurrent) {
         // select first available variable by default
-        selectClimateVariable(filteredList[0]);
+        selectClimateVariable(filteredList[0], dataset);
       }
     }, [dataset, filteredList, climateVariable, selectClimateVariable]);
 
@@ -118,7 +122,7 @@ const StepVariable = React.forwardRef((_, ref) => {
                         selected={climateVariable ? climateVariable.toObject() as PostData : null}
                         showFilterCount={false}
                         useExternalFiltering={true}
-                        onSelect={selectClimateVariable}
+                        onSelect={handleSelect}
                     />
                 )}
             </div>

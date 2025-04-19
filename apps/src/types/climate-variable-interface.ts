@@ -51,7 +51,7 @@ export interface FieldConfig {
 	comparison?: string;
 	unit?: string;
 	attributes?: {
-		type?: 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
+		type?: 'text' | 'number' | 'email' | 'password' | 'tel' | 'url' | 'date';
 		placeholder?: string;
 
 	};

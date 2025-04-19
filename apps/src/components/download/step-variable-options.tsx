@@ -14,7 +14,7 @@ import {
 /**
  * Variable options step
  */
-const StepVariableOptions = React.forwardRef((_, ref) => {
+const StepVariableOptions: React.FC = () => {
 	const { __ } = useI18n();
 
 	const { climateVariable } = useClimateVariable();
@@ -43,7 +43,7 @@ const StepVariableOptions = React.forwardRef((_, ref) => {
 			</div>
 		</StepContainer>
 	);
-});
+};
 StepVariableOptions.displayName = 'StepVariableOptions';
 
 export default StepVariableOptions;

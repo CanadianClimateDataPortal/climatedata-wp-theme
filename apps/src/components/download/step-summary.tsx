@@ -9,7 +9,6 @@ import { useLocale } from '@/hooks/use-locale';
 import { useDownload } from '@/hooks/use-download';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import {useClimateVariable} from "@/hooks/use-climate-variable.ts";
 
 import appConfig from '@/config/app.config';
 
@@ -23,14 +22,14 @@ const VariableOptionsSummary: React.FC = () => {
 	const analysisFieldValues = climateVariable.getAnalysisFieldValues?.() ?? {};
 
 	return (
-			<ul className="text-sm list-disc list-inside">
+			<ul className="list-disc list-inside text-dark-purple">
 				<li key={version}><strong>Version:</strong> {version || 'N/A'}</li>
 				{analysisFields.map(({ key, label, unit }) => {
 					const value = analysisFieldValues[key] ?? '-';
 
 					return (
 						<li key={key}>
-							<strong>{label}:</strong> {value} {unit}
+							<span className='font-bold'>{label}</span>: {value} {unit}
 						</li>
 					);
 				})}

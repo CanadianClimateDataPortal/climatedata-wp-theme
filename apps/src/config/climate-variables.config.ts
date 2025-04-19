@@ -1119,7 +1119,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				help: 'Use a date like "09-01" to start from September 1st. Avoid end-of-month dates due to inconsistencies in some climate models.',
 				unit: 'MM-DD',
 				attributes: {
-					type: "text",
+					type: "date",
 					placeholder: "0",
 				}
 			}

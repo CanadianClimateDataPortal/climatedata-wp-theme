@@ -13,6 +13,7 @@ import { useClimateVariable } from '@/hooks/use-climate-variable';
 // Components
 import { SelectAnalyzedField } from '@/components/download/ui/select-analyzed-field';
 import { InputAnalyzedField } from '@/components/download/ui/input-analyzed-field';
+import { DateInput } from '@/components/ui/date-input';
 import { AnalyzedFieldProps } from '@/types/types';
 
 /**
@@ -43,17 +44,27 @@ const AnalyzedField: React.FC<AnalyzedFieldProps> = (
 			)}
 
 			{/* Input field */}
-			{type === 'input' && (
+			{type === 'input' && attributeType === 'date' ? (
+				<DateInput
+					className="sm:w-64"
+					name={keyName}
+					value={value}
+					placeholder={placeholder ? __(placeholder) : undefined}
+					onChange={e => onChange(keyName, e.target.value)}
+					format="MM-DD"
+				/>
+			) : type === 'input' ? (
 				<InputAnalyzedField
 					keyName={keyName}
 					label={__(label)}
+					value={value}
 					tooltip={help ? __(help) : null}
 					className="sm:w-64"
 					attributeType={attributeType}
 					placeholder={placeholder ? __(placeholder) : undefined}
 					onChange={onChange}
 				/>
-			)}
+			) : null}
 
 			{/* Dropdown field */}
 			{type === 'select' && options.length > 0 && (
@@ -84,7 +95,7 @@ const AnalyzedDownloadFields: React.FC = () => {
 	const analyzedFields = climateVariable.getAnalysisFields()?.map((field) => {
 		const { key, type, label, description, help, attributes, options } = field;
 		const { type: attributeType, placeholder } = attributes || {};
-		const value = climateVariable.getAnalysisFieldValue(key);
+		const value = climateVariable.getAnalysisFieldValue(key) ?? '';
 
 		return (
 			<AnalyzedField

@@ -634,7 +634,7 @@ export interface AnalyzedFieldProps {
 	help?: string;
 	attributeType?: string;
 	placeholder?: string;
-	value: string | null;
+	value: string | readonly string[] | number | undefined;
 	onChange: (key: string, value: string) => void;
 	__: (text: string) => string;
 	options?: { value: string; label: string }[];
@@ -650,6 +650,7 @@ export interface InputAnalyzedFieldProps {
 	className: string;
 	keyName: string; // The key used to identify this input's value
 	label: string;
+	value?: string | readonly string[] | number | undefined;
 	description?: string;
 	tooltip?: string | React.ReactNode;
 	placeholder?: string;
@@ -669,7 +670,7 @@ export interface SelectAnalyzedFieldProps<T = string> {
 	description?: string;
 	attributeType?: string; // (Unused here, but kept for future extensibility)
 	placeholder?: string;
-	value: string;
+	value: string | readonly string[] | number | undefined;
 	tooltip?: string | React.ReactNode;
 	onChange: ((key: string, value: string) => void) | ((value: string) => void);
 	options: { value: T; label: string }[];

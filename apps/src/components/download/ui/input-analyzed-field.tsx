@@ -17,6 +17,7 @@ export const InputAnalyzedField: React.FC<InputAnalyzedFieldProps> = (
 		className,
 		keyName,
 		label,
+		value,
 		description,
 		tooltip,
 		placeholder,
@@ -42,6 +43,7 @@ export const InputAnalyzedField: React.FC<InputAnalyzedFieldProps> = (
 				className={className}
 				type={attributeType}
 				name={keyName}
+				value={value}
 				id={keyName}
 				placeholder={placeholder}
 				onChange={(e) => onChange(keyName, e.target.value)}

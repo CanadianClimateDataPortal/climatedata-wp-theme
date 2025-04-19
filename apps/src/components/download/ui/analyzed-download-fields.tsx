@@ -4,7 +4,7 @@
  * A dropdown component that allows the user to select a Precalculated (Analyzed) value.
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 // Hooks
@@ -90,30 +90,36 @@ const AnalyzedDownloadFields: React.FC = () => {
 	const { __ } = useI18n();
 	const { climateVariable, setAnalysisFieldValue } = useClimateVariable();
 
-	if (!climateVariable) return null;
 
-	const analyzedFields = climateVariable.getAnalysisFields()?.map((field) => {
-		const { key, type, label, description, help, attributes, options } = field;
-		const { type: attributeType, placeholder } = attributes || {};
-		const value = climateVariable.getAnalysisFieldValue(key) ?? '';
 
+	// Memoize the analyzedFields array so it only recalculates when dependencies change
+	const analyzedFields = useMemo(() => {
+		if (!climateVariable) return null;
 		return (
-			<AnalyzedField
-				key={key}
-				keyName={key}
-				type={type}
-				label={label}
-				description={description}
-				help={help}
-				attributeType={attributeType}
-				placeholder={placeholder}
-				value={value}
-				options={options}
-				onChange={setAnalysisFieldValue}
-				__={__}
-			/>
+			climateVariable.getAnalysisFields()?.map((field) => {
+				const { key, type, label, description, help, attributes, options } = field;
+				const { type: attributeType, placeholder } = attributes || {};
+				const value = climateVariable.getAnalysisFieldValue(key) ?? '';
+
+				return (
+					<AnalyzedField
+						key={key}
+						keyName={key}
+						type={type}
+						label={label}
+						description={description}
+						help={help}
+						attributeType={attributeType}
+						placeholder={placeholder}
+						value={value}
+						options={options}
+						onChange={setAnalysisFieldValue}
+						__={__}
+					/>
+				);
+			}) ?? []
 		);
-	}) ?? [];
+	}, [climateVariable, setAnalysisFieldValue, __]);
 
 	return <>{analyzedFields}</>;
 };

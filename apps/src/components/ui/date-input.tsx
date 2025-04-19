@@ -5,10 +5,11 @@
  */
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import { cn } from '@/lib/utils';
+import {dateFormatCheck} from "@/lib/utils.ts";
 
 /**
  * Props for the DateInput component.
- * 
+ *
  * @extends React.InputHTMLAttributes<HTMLInputElement>
  */
 interface DateInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -18,27 +19,18 @@ interface DateInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   format?: string;
   /**
    * Custom validation function that takes the input value as a string.
-   * 
+   *
    * @param value Input value as a string.
    * @returns Whether the input value is valid.
    */
   isValid?: (value: string) => boolean;
   /**
    * Callback function to notify parent of validity change.
-   * 
+   *
    * @param isValid Whether the input value is valid.
    */
   onValidityChange?: (isValid: boolean) => void;
 }
-
-// Converts a date format string into a regular expression for validation.
-const formatToRegex = (format: string): RegExp => {
-  const regexStr = format
-    .replace(/YYYY/g, '\\d{4}')
-    .replace(/MM/g, '(0[1-9]|1[0-2])')
-    .replace(/DD/g, '(0[1-9]|[12]\\d|3[01])');
-  return new RegExp(`^${regexStr}$`);
-};
 
 /**
  * DateInput: Input component with validation for date formats or custom logic.
@@ -56,7 +48,7 @@ const DateInput = ({ className, type = 'text', format, isValid, onValidityChange
         validNow = isValid(value.toString());
       } else if (format) {
         // Otherwise, validate using format regex if format is provided.
-        validNow = formatToRegex(format).test(value.toString());
+        validNow = dateFormatCheck(format).test(value.toString());
       }
     }
     setValid(validNow);

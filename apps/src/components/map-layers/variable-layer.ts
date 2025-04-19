@@ -45,7 +45,6 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
-	const dataValue = useAppSelector((state) => state.map.dataValue);
 	const [ startYear ] = useMemo(() => climateVariable?.getDateRange() ?? [], [climateVariable]);
 
 	const layerRef = useRef<L.TileLayer.WMS | null>(null);
@@ -59,7 +58,7 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			return;
 		}
 
-		const colourScheme = generateColourScheme(climateVariable, dataValue);
+		const colourScheme = generateColourScheme(climateVariable);
 		if (!colourScheme) {
 			return;
 		}
@@ -86,7 +85,7 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			'</ColorMap></RasterSymbolizer></Rule></FeatureTypeStyle></UserStyle></NamedLayer></StyledLayerDescriptor>';
 
 		return sldBody;
-	}, [climateVariable, dataValue, layerValue])
+	}, [climateVariable, layerValue])
 
 	useEffect(() => {
 		if (layerRef.current) {

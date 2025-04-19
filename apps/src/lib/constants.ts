@@ -2,6 +2,8 @@ import L from 'leaflet';
 import type { LatLngExpression, LatLngBounds } from 'leaflet';
 import { ColourScheme, DatasetKey, EmissionScenarioKey } from '@/types/types';
 
+import mapPinIcon from '@/assets/map-pin.svg';
+
 export const SIDEBAR_COOKIE_NAME = 'sidebar:state';
 export const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 export const SIDEBAR_WIDTH = '16rem';
@@ -21,6 +23,15 @@ export const CANADA_BOUNDS: LatLngBounds = L.latLngBounds(
 export const DEFAULT_ZOOM: number = 4;
 export const DEFAULT_MIN_ZOOM: number = 3;
 export const DEFAULT_MAX_ZOOM: number = 11;
+
+export const MAP_MARKER_CONFIG = {
+	icon: L.icon({
+		iconUrl: mapPinIcon, // Custom marker icon
+		iconSize: [25, 41], // Size of the icon
+		iconAnchor: [12, 41], // Anchor of the icon
+		popupAnchor: [0, -41], // Popup position relative to the icon
+	}),
+};
 
 /**
  * "29" as the length of the year window. Used in the timeControl slider component
@@ -47,6 +58,7 @@ const rootElement = document.getElementById('root');
 export const WP_API_DOMAIN = (rootElement?.getAttribute('data-wp-home-url')) ?? 'https://dev-en.climatedata.ca';
 
 export const WP_API_VARIABLE_PATH: string = '/wp-json/cdc/v3/variable';
+export const WP_API_LOCATION_BY_COORDS_PATH: string = '/wp-json/cdc/v2/get_location_by_coords';
 
 // TODO: these will come from the API..
 //  also, "high" key has the value that in the figma designs is set for "very-high", and

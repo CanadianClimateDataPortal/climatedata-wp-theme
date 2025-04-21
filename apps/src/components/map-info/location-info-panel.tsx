@@ -21,11 +21,13 @@ import 'highcharts/modules/export-data';
  */
 const LocationInfoPanel: React.FC<{
 	title: string;
+	latlng: L.LatLng;
+	featureId: number;
 	data: ClimateDataProps;
-}> = ({ title, data }) => {
+}> = ({ title, latlng, featureId, data }) => {
 	return (
 		<div className="location-info-panel">
-			<ClimateDataChart title={title} data={data} />
+			<ClimateDataChart title={title} latlng={latlng} featureId={featureId} data={data} />
 		</div>
 	);
 };

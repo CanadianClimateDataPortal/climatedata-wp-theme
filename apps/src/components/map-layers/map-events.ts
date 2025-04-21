@@ -5,6 +5,7 @@
 import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 
+import { useAnimatedPanel } from '@/hooks/use-animated-panel';
 import { MapEventsProps } from '@/types/types';
 
 export default function MapEvents({
@@ -14,6 +15,7 @@ export default function MapEvents({
 }: MapEventsProps): null {
 	const map = useMap();
 	const isUnmounting = useRef(false);
+	const { closePanel } = useAnimatedPanel();
 
 	useEffect(() => {
 		if (onMapReady) {
@@ -26,9 +28,14 @@ export default function MapEvents({
 				onUnmount();
 			}
 
-			// We close the location modal when map is unmount
-			if (onLocationModalClose && isUnmounting.current) {
-				onLocationModalClose();
+			if(isUnmounting.current) {
+				// We close the location modal and info panel when map is unmount
+				if (onLocationModalClose && isUnmounting.current) {
+					onLocationModalClose();
+				}
+				if (closePanel) {
+					closePanel();
+				}
 			}
 		};
 	}, [map, onMapReady, onUnmount]);

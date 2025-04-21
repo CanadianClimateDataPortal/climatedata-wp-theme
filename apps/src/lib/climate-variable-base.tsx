@@ -214,8 +214,8 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getDateRange(): string[] | null {
 		return this._config.dateRange ?? [
-			"2040",
-			"2070",
+			"",
+			"",
 		];
 	}
 

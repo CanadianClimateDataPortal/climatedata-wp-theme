@@ -605,7 +605,22 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				text: '',
 			},
 			tooltip: activeChartTooltip,
-			plotOptions: activeChartPlotOptions,
+			plotOptions: {
+				...activeChartPlotOptions,
+				series: {
+					...activeChartPlotOptions.series,
+					marker: {
+						symbol: 'circle',
+						radius: 6,
+						states: {
+							hover: { // enable on hover
+								enabled: true,
+								lineWidth: 0,
+							},
+						},
+					},
+				},
+			},
 			xAxis: {
 				crosshair: false,
 				type: 'datetime',

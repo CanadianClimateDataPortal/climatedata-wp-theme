@@ -13,9 +13,6 @@ import { SelectAnalyzedFieldProps } from '@/types/types';
 export const SelectAnalyzedField = <T extends string>(
 	{
 		name,
-		label,
-		description,
-		tooltip,
 		placeholder,
 		options,
 		value,
@@ -23,18 +20,9 @@ export const SelectAnalyzedField = <T extends string>(
 	}: SelectAnalyzedFieldProps<T>) => {
 	return (
 		<div className="mb-4">
-			{/* Optional description shown above the dropdown */}
-			{description && (
-				<div className="text-sm text-neutral-grey-medium max-w-lg mb-1">
-					{description}
-				</div>
-			)}
-
-			{/* Dropdown with optional tooltip and placeholder */}
+			{/* Dropdown */}
 			<Dropdown
 				name={name}
-				label={label}
-				tooltip={tooltip || null}
 				placeholder={placeholder}
 				options={options}
 				value={value}

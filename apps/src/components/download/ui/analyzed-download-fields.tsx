@@ -15,6 +15,7 @@ import { SelectAnalyzedField } from '@/components/download/ui/select-analyzed-fi
 import { InputAnalyzedField } from '@/components/download/ui/input-analyzed-field';
 import { DateInput } from '@/components/ui/date-input';
 import { AnalyzedFieldProps } from '@/types/types';
+import {ControlTitle} from "@/components/ui/control-title";
 
 /**
  * Renders a single analysis field based on its type.
@@ -35,7 +36,14 @@ const AnalyzedField: React.FC<AnalyzedFieldProps> = (
 		options = [],
 	}) => {
 	return (
+
+
 		<div className="mb-4" key={keyName}>
+			{/* Label and optional tooltip */}
+			<div className="flex items-center mb-1">
+				<ControlTitle title={label} tooltip={help || null} />
+			</div>
+
 			{/* Optional field description */}
 			{description && (
 				<div className="text-sm text-neutral-grey-medium max-w-lg mb-1">
@@ -56,9 +64,7 @@ const AnalyzedField: React.FC<AnalyzedFieldProps> = (
 			) : type === 'input' ? (
 				<InputAnalyzedField
 					keyName={keyName}
-					label={__(label)}
 					value={value}
-					tooltip={help ? __(help) : null}
 					className="sm:w-64"
 					attributeType={attributeType}
 					placeholder={placeholder ? __(placeholder) : undefined}
@@ -70,8 +76,6 @@ const AnalyzedField: React.FC<AnalyzedFieldProps> = (
 			{type === 'select' && options.length > 0 && (
 				<SelectAnalyzedField
 					name={keyName}
-					label={__(label)}
-					tooltip={help ? __(help) : null}
 					options={options}
 					value={value || options[0]?.value || ''}
 					placeholder={placeholder ? __(placeholder) : undefined}

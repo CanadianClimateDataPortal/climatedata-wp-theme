@@ -10,7 +10,6 @@
 
 import React, { forwardRef, useEffect, useState } from 'react';
 
-import { ControlTitle } from '@/components/ui/control-title';
 import {
 	Select,
 	SelectContent,
@@ -28,8 +27,6 @@ const DownloadDropdown = (
 	{
 		className,
 		options = [],
-		label,
-		tooltip,
 		value,
 		onChange,
 		name,
@@ -52,9 +49,6 @@ const DownloadDropdown = (
 
 	return (
 		<div ref={ref} className={cn('dropdown z-50 sm:w-64', className)}>
-			{/* Optional title and tooltip */}
-			{label && <ControlTitle title={label} tooltip={tooltip} />}
-
 			<Select value={selected} onValueChange={handleValueChanged}>
 				<SelectTrigger className="w-full focus:ring-0 focus:ring-offset-0 text-cdc-black [&>svg]:text-brand-blue [&>svg]:opacity-100">
 					<SelectValue placeholder="Select an option" />

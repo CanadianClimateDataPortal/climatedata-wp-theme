@@ -647,7 +647,7 @@ export interface AnalyzedFieldProps {
 export interface InputAnalyzedFieldProps {
 	className: string;
 	keyName: string; // The key used to identify this input's value
-	label: string;
+	label?: string;
 	value?: string | readonly string[] | number | undefined;
 	description?: string;
 	tooltip?: string | React.ReactNode;
@@ -664,7 +664,7 @@ export interface InputAnalyzedFieldProps {
  */
 export interface SelectAnalyzedFieldProps<T = string> {
 	name: string;
-	label: string;
+	label?: string;
 	description?: string;
 	attributeType?: string; // (Unused here, but kept for future extensibility)
 	placeholder?: string;

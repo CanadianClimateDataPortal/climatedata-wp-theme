@@ -23,7 +23,9 @@ const VariableOptionsSummary: React.FC = () => {
 
 	return (
 			<ul className="list-disc list-inside text-dark-purple">
-				<li key={version}><strong>Version:</strong> {version || 'N/A'}</li>
+				{climateVariable.getDatasetType() !== "ahccd" && (
+					<li key={version}><strong>Version:</strong> {version || 'N/A'}</li>
+				)}
 				{analysisFields.map(({ key, label, unit }) => {
 					const value = analysisFieldValues[key] ?? '-';
 

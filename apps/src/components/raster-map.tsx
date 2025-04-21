@@ -6,25 +6,19 @@ import RasterMapContainer from '@/components/raster-map-container';
 
 // other
 import { cn } from '@/lib/utils';
-import { useAppSelector } from '@/app/hooks';
 import { useMap } from '@/hooks/use-map';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
  */
 export default function RasterMap(): React.ReactElement {
-	const { emissionScenarioCompare, emissionScenarioCompareTo } =
-		useAppSelector((state) => state.map);
-
 	const { setMap } = useMap();
+	const { climateVariable } = useClimateVariable();
 
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const mapRef = useRef<L.Map | null>(null);
 	const comparisonMapRef = useRef<L.Map | null>(null);
-
-	// show the comparison map if compare checkbox is checked and there is a compare-to scenario
-	const showComparisonMap =
-		emissionScenarioCompare && !!emissionScenarioCompareTo;
 
 	// helper sync/unsync methods for convenience
 	const syncMaps = () => {
@@ -50,6 +44,8 @@ export default function RasterMap(): React.ReactElement {
 		}
 	};
 
+	const showComparisonMap = climateVariable?.getScenarioCompare() && climateVariable?.getScenarioCompareTo();
+
 	return (
 		<div
 			ref={wrapperRef}
@@ -60,6 +56,7 @@ export default function RasterMap(): React.ReactElement {
 			)}
 		>
 			<RasterMapContainer
+				scenario={climateVariable?.getScenario()}
 				onMapReady={(map: L.Map) => {
 					mapRef.current = map;
 					setMap(map);
@@ -68,6 +65,7 @@ export default function RasterMap(): React.ReactElement {
 			/>
 			{showComparisonMap && (
 				<RasterMapContainer
+					scenario={climateVariable?.getScenarioCompareTo()}
 					onMapReady={(map: L.Map) => {
 						comparisonMapRef.current = map;
 						syncMaps(); // sync once the comparison map is ready

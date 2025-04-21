@@ -92,6 +92,21 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this.getScenarios()[0] || null;
 	}
 
+	getScenarioCompare(): boolean {
+		// Return if scenario comparison is checked or not.
+		return this._config.scenarioCompare ?? false;
+	}
+
+	getScenarioCompareTo(): string | null {
+		// Check if the scenarioCompareTo actually belongs to the current version
+		// If not, return null, as we don't want this to be the same as the current scenario.
+		const scenarioCompareTo = this._config.scenarioCompareTo;
+		if (scenarioCompareTo && this.getScenarios().includes(scenarioCompareTo)) {
+			return scenarioCompareTo;
+		}
+		return null;
+	}
+
 	getAnalyzeScenarios(): string[] {
 		return this._config.analyzeScenarios ?? [];
 	}
@@ -157,7 +172,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getColourOptionsStatus(): boolean {
-		return this._config.enableColourOptions ?? false;
+		return this._config.enableColourOptions ?? true;
 	}
 
 	getColourType(): string | null {
@@ -253,6 +268,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getSelectedPoints(): GridCoordinates | null {
 		return this._config.selectedPoints ?? null;
+	}
+
+	getSelectedPointsCount(): number {
+		return Object.keys(this._config.selectedPoints ?? {}).length;
 	}
 
 	toObject(): ClimateVariableConfigInterface {

@@ -18,7 +18,7 @@ import { TaxonomyData } from '@/types/types';
 /**
  * Dataset step
  */
-const StepDataset: React.FC = () => {
+const StepDataset = React.forwardRef((_, ref) => {
 	const [options, setOptions] = useState<TaxonomyData[]>([]);
 
 	const { __ } = useI18n();
@@ -26,6 +26,11 @@ const StepDataset: React.FC = () => {
 
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const dispatch = useAppDispatch();
+
+	// expose isValid method to parent component
+	React.useImperativeHandle(ref, () => ({
+		isValid: () => Boolean(dataset)
+	}), [dataset]);
 
 	useEffect(() => {
 		fetchTaxonomyData('datasets').then((data) => {
@@ -77,7 +82,7 @@ const StepDataset: React.FC = () => {
 			</div>
 		</StepContainer>
 	);
-};
+});
 StepDataset.displayName = 'StepDataset';
 
 export default StepDataset;

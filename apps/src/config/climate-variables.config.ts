@@ -62,7 +62,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			interval: 30
 		},
 		hasDelta: true,
-		enableColourOptions: true,
+		enableColourOptions: false,
 		temporalThresholdConfig: {
 			thresholds: {
 				tx_max: {
@@ -82,11 +82,23 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 		analysisFields: [
 			{
+				key: "degrees",
+				type: "input",
+				label: "> Degree Celsius",
+				description: "This variable returns the number of degree days accumulated when daily mean temperature are above a certain temperature. Please set one below :",
+				help: "Degrees help",
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
 				key: "tasmin",
 				type: "input",
 				label: "Tasmin",
 				description: "Tasmin description",
 				help: "Tasmin help",
+				required: false,
 				attributes: {
 					type: "number",
 					placeholder: "0",
@@ -98,6 +110,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				label: "Tasmax",
 				description: "Tasmax description",
 				help: "Tasmax help",
+				required: false,
 				attributes: {
 					type: "number",
 					placeholder: "0",
@@ -549,6 +562,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[InteractiveRegionOption.WATERSHED]: false
 		},
 		hasDelta: false,
+		enableColourOptions: false,
 		customColourSchemes: {
 			default: {
 				colours: [
@@ -664,6 +678,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 		],
 		hasDelta: false,
+		enableColourOptions: false,
 	},
 	/** Standardized precipitation evapotranspiration index (3-months) */
 	{
@@ -685,6 +700,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 		],
 		hasDelta: false,
+		enableColourOptions: false,
 	},
 	/** Total Precipitation */
 	{
@@ -721,7 +737,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			},
 		},
 	},
-	/** Average ‘Wet Day’ Precipitation Intensity */
+	/** Average 'Wet Day' Precipitation Intensity */
 	{
 		id: "average_wet_day_precipitation_intensity",
 		class: "RasterAnalyzeClimateVariable",
@@ -734,6 +750,12 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "days",
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: true,
+			[InteractiveRegionOption.CENSUS]: true,
+			[InteractiveRegionOption.HEALTH]: true,
+			[InteractiveRegionOption.WATERSHED]: true
+		},
 	},
 	/** Cooling Degree Days */
 	{
@@ -805,6 +827,13 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
 		],
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
+		},
 		unit: "days",
 		temporalThresholdConfig: {
 			thresholds: {

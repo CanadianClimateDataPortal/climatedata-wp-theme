@@ -19,17 +19,20 @@ import {
 	DEFAULT_MAX_ZOOM,
 	GEOSERVER_BASE_URL,
 } from '@/lib/constants';
-import { getDefaultFrequency, getFrequencyCode } from "@/lib/utils";
+import { cn, getDefaultFrequency, getFrequencyCode } from "@/lib/utils";
 import SectionContext from "@/context/section-provider";
 import { FrequencyType } from "@/types/climate-variable-interface";
+import appConfig from "@/config/app.config";
 
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
  */
 export default function RasterMapContainer({
+	scenario,
 	onMapReady,
 	onUnmount,
 }: {
+	scenario: string | null | undefined;
 	onMapReady: (map: L.Map) => void;
 	onUnmount?: () => void;
 }) {
@@ -44,13 +47,14 @@ export default function RasterMapContainer({
 
 	const section = useContext(SectionContext);
 
+	const scenarioLabel = appConfig.scenarios.find(item => item.value === scenario)?.label ?? scenario;
+
 	const layerValue: string = useMemo(() => {
 		let version;
 		if (climateVariable) {
 			version = climateVariable.getVersion() === 'cmip5' ? '' : climateVariable.getVersion();
 		}
 
-		const scenario = climateVariable?.getScenario();
 		const threshold = climateVariable?.getThreshold();
 
 		let frequency = climateVariable?.getFrequency() ?? null;
@@ -122,12 +126,25 @@ export default function RasterMapContainer({
 				{locationModalContent}
 			</LocationModal>
 
-			<InteractiveRegionsLayer onLocationModalOpen={handleLocationModalOpen} onLocationModalClose={handleLocationModalClose} />
+			<InteractiveRegionsLayer
+				scenario={scenario}
+				onLocationModalOpen={handleLocationModalOpen}
+				onLocationModalClose={handleLocationModalClose}
+			/>
 
 			<TileLayer
 				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 				url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 			/>
+
+			{/* show current scenario label */}
+			<div className={cn(
+				'absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20',
+				'text-sm text-zinc-900 font-normal leading-5',
+				'bg-neutral-grey-light border border-cold-grey-4 shadow-md rounded-xl px-3.5 py-1.5',
+			)}>
+				{scenarioLabel}
+			</div>
 
 			{/* Basemap TileLayer */}
 			<TileLayer

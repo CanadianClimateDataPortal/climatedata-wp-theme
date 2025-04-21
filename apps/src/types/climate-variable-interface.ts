@@ -47,6 +47,7 @@ export interface FieldConfig {
 	label: string;
 	description?: string;
 	help?: string;
+	required?: boolean;
 	attributes?: {
 		type?: 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
 		placeholder?: string;
@@ -170,6 +171,12 @@ export interface ClimateVariableConfigInterface {
 	/** Selected scenario value */
 	scenario?: string | null;
 
+	/** Compare scenarios flag */
+	scenarioCompare?: boolean;
+
+	/** Scenario to compare against `scenario` */
+	scenarioCompareTo?: string | null;
+
 	/** Selected scenarios for analysis */
 	analyzeScenarios?: string[];
 
@@ -287,6 +294,10 @@ export interface ClimateVariableInterface {
 
 	getScenario(): string | null;
 
+	getScenarioCompare(): boolean;
+
+	getScenarioCompareTo(): string | null;
+
 	getAnalyzeScenarios(): string[];
 
 	getLayerStyles(): string;
@@ -357,7 +368,9 @@ export interface ClimateVariableInterface {
 
 	getSelectedPoints(): GridCoordinates | null;
 
+	getSelectedPointsCount(): number;
+
 	toObject(): ClimateVariableConfigInterface;
 
-	getLocationModalContent(latlng: L.LatLng, featureId: number): React.ReactNode | null;
+	getLocationModalContent(latlng: L.LatLng, featureId: number, mode?: string): React.ReactNode | null;
 }

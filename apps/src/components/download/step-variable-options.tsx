@@ -15,7 +15,6 @@ import { dateFormatCheck } from '@/lib/utils';
  */
 const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { __ } = useI18n();
-
 	const { climateVariable } = useClimateVariable();
 
 	React.useImperativeHandle(ref, () => ({

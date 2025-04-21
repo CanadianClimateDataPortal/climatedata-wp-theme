@@ -454,6 +454,7 @@ export interface ClimateDataProps {
 	delta7100_ssp245_range?: Record<string, number[]>;
 	delta7100_ssp585_median?: Record<string, number[]>;
 	delta7100_ssp585_range?: Record<string, number[]>;
+	[key: string]: number[][] | Record<string, number[]> | undefined;
 }
 
 /**

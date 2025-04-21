@@ -5,7 +5,6 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useLocale } from '@/hooks/use-locale';
 import { fetchDeltaValues, generateChartData } from '@/services/services';
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
-import { useAppSelector } from '@/app/hooks';
 import { doyFormatter } from '@/lib/format';
 import { getDefaultFrequency } from "@/lib/utils";
 import SectionContext from "@/context/section-provider";
@@ -36,7 +35,6 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	const dateRange = useMemo(() => {
 		return climateVariable?.getDateRange() ?? ["2041", "2070"];
 	}, [climateVariable]);
-	const dataValue = useAppSelector((state) => state.map.dataValue);
 	const section = useContext(SectionContext);
 
 	const [ median, setMedian ] = useState<number | null>(null);
@@ -143,7 +141,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 		};
 
 		fetchData();
-	}, [climateVariable, dataValue, decimals, dateRange, featureId, latlng, section]);
+	}, [climateVariable, decimals, dateRange, featureId, latlng, section]);
 
 	// Value formatter (for delta, for units)
 	const valueFormatter = (value: number, delta: boolean = (climateVariable?.getDataValue() === 'delta')) => {

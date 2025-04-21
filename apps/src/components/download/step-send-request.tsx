@@ -10,6 +10,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { cn, isValidEmail } from '@/lib/utils';
 import { DownloadType, FileFormatType } from "@/types/climate-variable-interface";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { setEmail, setSubscribe } from '@/features/download/download-slice';
 import { StepComponentRef } from "@/types/download-form-interface";
 import Dropdown from "@/components/ui/dropdown.tsx";
 import { normalizeDropdownOptions } from "@/lib/format.ts";
@@ -20,11 +22,12 @@ import { normalizeDropdownOptions } from "@/lib/format.ts";
 const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	const [captchaValue, setCaptchaValue] = useState<string>('');
 	const { __ } = useI18n();
-	const { climateVariable, setFileFormat, setDecimalPlace, setRequestFieldValue } = useClimateVariable();
+	const { climateVariable, setFileFormat, setDecimalPlace } = useClimateVariable();
 
-	// Get the request field values
-	const email = climateVariable?.getRequestFieldValue('email') ?? '';
-	const subscribe = climateVariable?.getRequestFieldValue('subscribe') === 'true';
+	const { email, subscribe } = useAppSelector(
+		(state) => state.download
+	);
+	const dispatch = useAppDispatch();
 
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
@@ -43,26 +46,17 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 				validations.push(
 					// Email is required and must be valid
 					Boolean(email && isValidEmail(email))
-
-					// TODO: is subscribing to the newsletter required to continue?
 				);
 			}
 
 			return validations.every(Boolean);
 		},
 		getResetPayload: () => {
-			if (!climateVariable) return { requestFieldValues: {} };
+			// reset the email and subscribe state from the download slice
+			dispatch(setEmail(''));
+			dispatch(setSubscribe(false));
 
-			const resetValues: Record<string, string> = {};
-
-			if (climateVariable.getDownloadType() === DownloadType.ANALYZED) {
-				resetValues['email'] = '';
-				resetValues['subscribe'] = 'false';
-			}
-
-			return {
-				requestFieldValues: resetValues,
-			};
+			return {};
 		}
 	}), [climateVariable, email]);
 
@@ -129,7 +123,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 						placeholder={__('john.doe@gmail.com')}
 						value={email}
 						onChange={(e) => {
-							setRequestFieldValue('email', e.target.value);
+							dispatch(setEmail(e.target.value));
 						}}
 					/>
 					<label
@@ -145,7 +139,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 							disabled={!isEmailValid}
 							checked={subscribe}
 							onCheckedChange={() => {
-								setRequestFieldValue('subscribe', (!subscribe).toString());
+								dispatch(setSubscribe(!subscribe));
 							}}
 						/>
 						<span

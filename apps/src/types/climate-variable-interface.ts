@@ -137,10 +137,6 @@ export interface GridCoordinates {
 	[key: number]: Coordinates;
 }
 
-export interface RequestFieldConfig extends FieldConfig {
-	step: 'send-request';
-}
-
 export interface ClimateVariableConfigInterface {
 	/** Unique identifier for the climate variable */
 	id: string;
@@ -271,12 +267,6 @@ export interface ClimateVariableConfigInterface {
 	analysisUrl?: string;
 
 	selectedPoints?: GridCoordinates;
-
-	/** An array of RequestFieldConfigs used in the final step */
-	requestFields?: RequestFieldConfig[];
-
-	/** Holds submitted values for requestFields */
-	requestFieldValues?: FieldValues;
 }
 
 /**
@@ -343,12 +333,6 @@ export interface ClimateVariableInterface {
 	getAnalysisFieldValues(): FieldValues;
 
 	getAnalysisFieldValue(key: string): string | null;
-
-	getRequestFields(): FieldConfig[];
-
-	getRequestFieldValues(): FieldValues;
-
-	getRequestFieldValue(key: string): string | null;
 
 	getDateRangeConfig(): DateRangeConfig | null;
 

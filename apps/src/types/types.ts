@@ -197,6 +197,8 @@ export interface DownloadState {
 	selectionCount: number;
 	zoom: number;
 	center: L.LatLngExpression;
+	email: string;
+	subscribe: boolean;
 }
 
 /**

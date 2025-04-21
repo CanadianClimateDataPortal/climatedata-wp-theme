@@ -6,8 +6,7 @@ import { PostData } from '@/types/types';
 import {
 	setClimateVariable,
 	updateClimateVariable,
-	updateClimateVariableAnalysisFieldValue,
-	updateClimateVariableRequestFieldValue,
+	updateClimateVariableAnalysisFieldValue
 } from '@/store/climate-variable-slice';
 import ClimateVariableBase from '@/lib/climate-variable-base';
 import {
@@ -46,7 +45,6 @@ export type ClimateVariableContextType = {
 	addSelectedPoints: (gridCoordinate: GridCoordinates) => void;
 	removeSelectedPoint: (gid: number) => void;
 	resetSelectedPoints: () => void;
-	setRequestFieldValue: (key: string, value: string | null) => void;
 };
 
 type ClassMapType = Record<
@@ -369,18 +367,6 @@ export const ClimateVariableProvider: React.FC<{
 		);
 	}, [dispatch, climateVariableData]);
 
-	const setRequestFieldValue = useCallback(
-		(key: string, value: string | null) => {
-			dispatch(
-				updateClimateVariableRequestFieldValue({
-					key,
-					value,
-				})
-			);
-		},
-		[dispatch]
-	);
-
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
@@ -405,7 +391,6 @@ export const ClimateVariableProvider: React.FC<{
 		addSelectedPoints,
 		removeSelectedPoint,
 		resetSelectedPoints,
-		setRequestFieldValue,
 	};
 
 	return (

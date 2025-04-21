@@ -18,6 +18,8 @@ export const initialState: DownloadState = {
 	selectionCount: 0,
 	zoom: DEFAULT_ZOOM,
 	center: CANADA_CENTER,
+	email: '',
+	subscribe: false,
 };
 
 // Create the slice
@@ -43,6 +45,12 @@ const downloadSlice = createSlice({
 		setCenter(state, action: PayloadAction<LatLngExpression>) {
 			state.center = action.payload;
 		},
+		setEmail(state, action: PayloadAction<string>) {
+			state.email = action.payload;
+		},
+		setSubscribe(state, action: PayloadAction<boolean>) {
+			state.subscribe = action.payload;
+		},
 	},
 });
 
@@ -54,6 +62,8 @@ export const {
 	setSelectionCount,
 	setZoom,
 	setCenter,
+	setEmail,
+	setSubscribe,
 } = downloadSlice.actions;
 
 // Export reducer

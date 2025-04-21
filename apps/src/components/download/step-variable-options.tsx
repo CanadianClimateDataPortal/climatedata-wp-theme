@@ -1,5 +1,6 @@
 import React from "react";
 import { useI18n } from '@wordpress/react-i18n';
+<<<<<<< HEAD
 import {
 	StepContainer,
 	StepContainerDescription,
@@ -8,6 +9,17 @@ import { AnalyzedDownloadFields } from "@/components/download/ui/analyzed-downlo
 import { VersionDownloadFields } from "@/components/download/ui/version-download-fields";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
+=======
+import { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
+import appConfig from "@/config/app.config";
+
+import { StepContainer, StepContainerDescription } from '@/components/download/step-container';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { AnalyzedDownloadFields } from "@/components/download/ui/analyzed-download-fields";
+import { VersionDownloadFields } from "@/components/download/ui/version-download-fields";
+import React from "react";
+>>>>>>> e160b50b (refs #82007: reset fields when navigating back to previous steps)
 import { dateFormatCheck } from '@/lib/utils';
 
 /**

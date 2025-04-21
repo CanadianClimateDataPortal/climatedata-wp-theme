@@ -48,14 +48,14 @@ export interface FieldConfig {
 	description?: string;
 	help?: string;
 	required?: boolean;
+	comparison?: string;
+	unit?: string;
 	attributes?: {
-		type?: 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
+		type?: 'text' | 'number' | 'email' | 'password' | 'tel' | 'url' | 'date';
 		placeholder?: string;
+
 	};
-	options?: Array<{
-		value: string | number;
-		label: string;
-	}>;
+	options?: { value: string; label: string }[];
 }
 
 export interface FieldValues {
@@ -397,5 +397,5 @@ export interface ClimateVariableInterface {
 
 	toObject(): ClimateVariableConfigInterface;
 
-	getLocationModalContent(latlng: L.LatLng, featureId: number): React.ReactNode | null;
+	getLocationModalContent(latlng: L.LatLng, featureId: number, mode?: string): React.ReactNode | null;
 }

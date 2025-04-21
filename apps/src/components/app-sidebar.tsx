@@ -84,6 +84,8 @@ export function AppSidebar() {
 
 	const hasDelta = climateVariable && climateVariable.hasDelta();
 
+	const hasColourOptions = climateVariable && climateVariable.getColourOptionsStatus();
+
 	return (
 		<Sidebar>
 			<SidebarContent className={'overflow-x-hidden'}>
@@ -131,8 +133,12 @@ export function AppSidebar() {
 										</>
 									)}
 
-									<MapColorsDropdown />
-									<SidebarSeparator />
+									{hasColourOptions && (
+										<>
+											<MapColorsDropdown/>
+											<SidebarSeparator />
+										</>
+									)}
 
 									<LayerOpacities />
 								</SidebarMenu>

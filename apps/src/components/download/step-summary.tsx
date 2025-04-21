@@ -12,6 +12,30 @@ import { Button } from '@/components/ui/button';
 
 import appConfig from '@/config/app.config';
 
+const VariableOptionsSummary: React.FC = () => {
+	const { climateVariable } = useClimateVariable();
+
+	if (!climateVariable) return null;
+
+	const version = climateVariable.getVersion?.(); // fallback if getVersion exists
+	const analysisFields = climateVariable.getAnalysisFields?.() ?? [];
+	const analysisFieldValues = climateVariable.getAnalysisFieldValues?.() ?? {};
+
+	return (
+			<ul className="list-disc list-inside text-dark-purple">
+				<li key={version}><strong>Version:</strong> {version || 'N/A'}</li>
+				{analysisFields.map(({ key, label, unit }) => {
+					const value = analysisFieldValues[key] ?? '-';
+
+					return (
+						<li key={key}>
+							<span className='font-bold'>{label}</span>: {value} {unit}
+						</li>
+					);
+				})}
+			</ul>
+	);
+};
 const StepSummary: React.FC = () => {
 	const { __, _n } = useI18n();
 	const { locale } = useLocale();
@@ -33,29 +57,7 @@ const StepSummary: React.FC = () => {
 		},
 		{
 			title: __('Variable options'),
-			content: (() => {
-				const version = climateVariable?.getVersion();
-				const analysisFields = climateVariable?.getAnalysisFields() ?? [];
-				const analysisFieldValues = climateVariable?.getAnalysisFieldValues() ?? {};
-
-				const parts = [];
-
-				if (version && climateVariable?.getDatasetType() !== 'ahccd') {
-					parts.push(appConfig.versions.find(v => v.value === version)?.label ?? version);
-				}
-
-				// for each field that has a value, get its label from the config
-				Object.entries(analysisFieldValues).forEach(([key, value]) => {
-					if (value && value !== '') {
-						const fieldConfig = analysisFields.find(f => f.key === key);
-						if (fieldConfig?.label) {
-							parts.push(`${__(fieldConfig.label)} ${value}`);
-						}
-					}
-				});
-
-				return parts.join(', ');
-			})(),
+			content: <VariableOptionsSummary />,
 		},
 		{
 			title: __('Location or area'),

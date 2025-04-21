@@ -177,7 +177,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getColourOptionsStatus(): boolean {
-		return this._config.enableColourOptions ?? false;
+		return this._config.enableColourOptions ?? true;
 	}
 
 	getColourType(): string | null {
@@ -206,8 +206,8 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getDateRange(): string[] | null {
 		return this._config.dateRange ?? [
-			"2040",
-			"2070",
+			"",
+			"",
 		];
 	}
 

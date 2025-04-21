@@ -17,6 +17,7 @@ import {
 	ScenariosConfig,
 	TemporalThresholdConfig,
 	ThresholdInterface,
+	RequestFieldConfig,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
 import RasterDownloadMap from "@/components/download/raster-download-map";
@@ -195,6 +196,18 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.analysisFieldValues?.[key] ?? null;
 	}
 
+	getRequestFields(): RequestFieldConfig[] {
+		return this._config.requestFields ?? [];
+	}
+
+	getRequestFieldValues(): FieldValues {
+		return this._config.requestFieldValues ?? {};
+	}
+
+	getRequestFieldValue(key: keyof FieldValues): string | null {
+		return this._config.requestFieldValues?.[key] ?? null;
+	}
+
 	getDateRangeConfig(): DateRangeConfig | null {
 		return this._config.dateRangeConfig ?? null;
 	}
@@ -236,6 +249,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getMaxDecimals(): number {
 		return this._config.maxDecimals ?? 0;
+	}
+
+	getDecimalPlace(): number {
+		return this._config.decimalPlace ?? 0;
 	}
 
 	renderMap(): React.ReactElement {

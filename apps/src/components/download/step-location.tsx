@@ -8,17 +8,22 @@ import {
 	StepContainerDescription,
 } from '@/components/download/step-container';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { StepComponentRef } from '@/types/download-form-interface';
 
 /**
  * Location step, allows the user to make a selection on the map and choose what type of region to select
  */
-const StepLocation = React.forwardRef((_, ref) => {
+const StepLocation = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { __ } = useI18n();
 	const { climateVariable } = useClimateVariable();
 
-	// expose isValid method to parent component
 	React.useImperativeHandle(ref, () => ({
-		isValid: () => Object.keys(climateVariable?.getSelectedPoints() ?? {}).length > 0
+		isValid: () => Object.keys(climateVariable?.getSelectedPoints() ?? {}).length > 0,
+		getResetPayload: () => {
+			return {
+				selectedPoints: {}
+			};
+		}
 	}), [climateVariable]);
 
 	return (

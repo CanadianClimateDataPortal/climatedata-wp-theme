@@ -7,6 +7,7 @@ import {
 	setClimateVariable,
 	updateClimateVariable,
 	updateClimateVariableAnalysisFieldValue,
+	updateClimateVariableRequestFieldValue,
 } from '@/store/climate-variable-slice';
 import ClimateVariableBase from '@/lib/climate-variable-base';
 import {
@@ -40,10 +41,12 @@ export type ClimateVariableContextType = {
 	setDateRange: (dates: string[]) => void;
 	setPercentiles: (percentiles: string[]) => void;
 	setFileFormat: (fileFormat: FileFormatType) => void;
+	setDecimalPlace: (decimalPlace: number) => void;
 	setSelectedPoints: (gridCoordinates: GridCoordinates) => void;
 	addSelectedPoints: (gridCoordinate: GridCoordinates) => void;
 	removeSelectedPoint: (gid: number) => void;
 	resetSelectedPoints: () => void;
+	setRequestFieldValue: (key: string, value: string | null) => void;
 };
 
 type ClassMapType = Record<
@@ -308,6 +311,13 @@ export const ClimateVariableProvider: React.FC<{
 		[dispatch]
 	);
 
+	const setDecimalPlace = useCallback(
+		(decimalPlace: number) => {
+			dispatch(updateClimateVariable({ decimalPlace }));
+		},
+		[dispatch]
+	);
+
 	const setSelectedPoints = useCallback(
 		(gridCoordinates: GridCoordinates) => {
 			dispatch(
@@ -359,6 +369,18 @@ export const ClimateVariableProvider: React.FC<{
 		);
 	}, [dispatch, climateVariableData]);
 
+	const setRequestFieldValue = useCallback(
+		(key: string, value: string | null) => {
+			dispatch(
+				updateClimateVariableRequestFieldValue({
+					key,
+					value,
+				})
+			);
+		},
+		[dispatch]
+	);
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
@@ -378,10 +400,12 @@ export const ClimateVariableProvider: React.FC<{
 		setDateRange,
 		setPercentiles,
 		setFileFormat,
+		setDecimalPlace,
 		setSelectedPoints,
 		addSelectedPoints,
 		removeSelectedPoint,
 		resetSelectedPoints,
+		setRequestFieldValue,
 	};
 
 	return (

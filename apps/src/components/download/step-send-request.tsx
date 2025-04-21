@@ -7,32 +7,25 @@ import { ControlTitle } from '@/components/ui/control-title';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { cn, isValidEmail } from '@/lib/utils';
-import {
-	setDecimalPlace,
-	setEmail,
-	setSubscribe,
-} from '@/features/download/download-slice';
 import { DownloadType, FileFormatType } from "@/types/climate-variable-interface";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { StepComponentRef } from "@/types/download-form-interface";
 import Dropdown from "@/components/ui/dropdown.tsx";
 import { normalizeDropdownOptions } from "@/lib/format.ts";
 
 /**
  * Send download request step
  */
-const StepSendRequest = React.forwardRef((_, ref) => {
+const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	const [captchaValue, setCaptchaValue] = useState<string>('');
-	const { climateVariable, setFileFormat } = useClimateVariable();
 	const { __ } = useI18n();
+	const { climateVariable, setFileFormat, setDecimalPlace, setRequestFieldValue } = useClimateVariable();
 
-	const { email, subscribe, decimalPlace } = useAppSelector(
-		(state) => state.download
-	);
-	const dispatch = useAppDispatch();
+	// Get the request field values
+	const email = climateVariable?.getRequestFieldValue('email') ?? '';
+	const subscribe = climateVariable?.getRequestFieldValue('subscribe') === 'true';
 
-	// expose isValid method to parent component
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
 			if (!climateVariable) {
@@ -50,10 +43,26 @@ const StepSendRequest = React.forwardRef((_, ref) => {
 				validations.push(
 					// Email is required and must be valid
 					Boolean(email && isValidEmail(email))
+
+					// TODO: is subscribing to the newsletter required to continue?
 				);
 			}
 
 			return validations.every(Boolean);
+		},
+		getResetPayload: () => {
+			if (!climateVariable) return { requestFieldValues: {} };
+
+			const resetValues: Record<string, string> = {};
+
+			if (climateVariable.getDownloadType() === DownloadType.ANALYZED) {
+				resetValues['email'] = '';
+				resetValues['subscribe'] = 'false';
+			}
+
+			return {
+				requestFieldValues: resetValues,
+			};
 		}
 	}), [climateVariable, email]);
 
@@ -65,7 +74,9 @@ const StepSendRequest = React.forwardRef((_, ref) => {
 		climateVariable?.getFileFormatTypes()?.includes(option.value)
 	);
 
+	const fileFormat = climateVariable?.getFileFormat() ?? undefined;
 	const maxDecimals = climateVariable?.getMaxDecimals() ?? 0;
+	const decimalPlace = climateVariable?.getDecimalPlace() ?? 0;
 	const decimalPlaceOptions = normalizeDropdownOptions(
 		[...Array(maxDecimals + 1).keys()].map((value) => ({value, label: String(value)}))
 	);
@@ -91,7 +102,7 @@ const StepSendRequest = React.forwardRef((_, ref) => {
 				title={__('Format')}
 				name="format"
 				className="mb-8"
-				value={climateVariable?.getFileFormat() ?? undefined}
+				value={fileFormat}
 				options={formatOptions}
 				onValueChange={setFileFormat}
 			/>
@@ -101,9 +112,7 @@ const StepSendRequest = React.forwardRef((_, ref) => {
 				label={__('Decimal Place')}
 				value={decimalPlace}
 				options={decimalPlaceOptions}
-				onChange={(value) => {
-					dispatch(setDecimalPlace(value));
-				}}
+				onChange={setDecimalPlace}
 			/>}
 
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED &&
@@ -119,8 +128,8 @@ const StepSendRequest = React.forwardRef((_, ref) => {
 						className="sm:w-64 mb-2"
 						placeholder={__('john.doe@gmail.com')}
 						value={email}
-						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-							dispatch(setEmail(e.target.value));
+						onChange={(e) => {
+							setRequestFieldValue('email', e.target.value);
 						}}
 					/>
 					<label
@@ -136,7 +145,7 @@ const StepSendRequest = React.forwardRef((_, ref) => {
 							disabled={!isEmailValid}
 							checked={subscribe}
 							onCheckedChange={() => {
-								dispatch(setSubscribe(!subscribe));
+								setRequestFieldValue('subscribe', (!subscribe).toString());
 							}}
 						/>
 						<span

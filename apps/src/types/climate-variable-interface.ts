@@ -137,9 +137,10 @@ export interface GridCoordinates {
 	[key: number]: Coordinates;
 }
 
-/**
- * Interface representing the configuration for a climate variable.
- */
+export interface RequestFieldConfig extends FieldConfig {
+	step: 'send-request';
+}
+
 export interface ClimateVariableConfigInterface {
 	/** Unique identifier for the climate variable */
 	id: string;
@@ -255,6 +256,9 @@ export interface ClimateVariableConfigInterface {
 	/** The maximum number of decimals to be used for the file */
 	maxDecimals?: number;
 
+	/** The number of decimal places to be used for the file */
+	decimalPlace?: number;
+
 	/** Determines if the variable data must be analyzed or is already precalculated. */
 	downloadType?: DownloadType;
 
@@ -267,6 +271,12 @@ export interface ClimateVariableConfigInterface {
 	analysisUrl?: string;
 
 	selectedPoints?: GridCoordinates;
+
+	/** An array of RequestFieldConfigs used in the final step */
+	requestFields?: RequestFieldConfig[];
+
+	/** Holds submitted values for requestFields */
+	requestFieldValues?: FieldValues;
 }
 
 /**
@@ -334,6 +344,12 @@ export interface ClimateVariableInterface {
 
 	getAnalysisFieldValue(key: string): string | null;
 
+	getRequestFields(): FieldConfig[];
+
+	getRequestFieldValues(): FieldValues;
+
+	getRequestFieldValue(key: string): string | null;
+
 	getDateRangeConfig(): DateRangeConfig | null;
 
 	getDateRange(): string[] | null;
@@ -351,6 +367,8 @@ export interface ClimateVariableInterface {
 	getFileFormat(): FileFormatType | null;
 
 	getMaxDecimals(): number;
+
+	getDecimalPlace(): number;
 
 	renderMap(): React.ReactElement;
 

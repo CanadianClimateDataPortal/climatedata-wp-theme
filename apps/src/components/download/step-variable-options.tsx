@@ -1,5 +1,8 @@
 import React, { useMemo } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
+import { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
+import appConfig from "@/config/app.config";
 
 import {
 	StepContainer,
@@ -9,17 +12,13 @@ import Dropdown from '@/components/ui/dropdown';
 import { ControlTitle } from '@/components/ui/control-title';
 import { Input } from '@/components/ui/input';
 
-import { useClimateVariable } from "@/hooks/use-climate-variable";
-import appConfig from "@/config/app.config";
-
 /**
  * Variable options step
  */
-const StepVariableOptions = React.forwardRef((_, ref) => {
+const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { __ } = useI18n();
 	const { climateVariable, setVersion, setAnalysisFieldValue } = useClimateVariable();
 
-	// expose isValid method to parent component
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
 			if (!climateVariable) {
@@ -38,6 +37,29 @@ const StepVariableOptions = React.forwardRef((_, ref) => {
 			];
 
 			return validations.every(Boolean);
+		},
+		getResetPayload: () => {
+			if (!climateVariable) return {};
+
+			const payload: StepResetPayload = {};
+
+			if (climateVariable.getVersions()?.length) {
+				payload.version = null;
+			}
+
+			if (climateVariable.getFrequencyConfig()) {
+				payload.frequency = null;
+			}
+
+			if (climateVariable.getAveragingOptions()?.length) {
+				payload.averagingType = null;
+			}
+
+			if (climateVariable.getAnalysisFields()?.length) {
+				payload.analysisFieldValues = {};
+			}
+
+			return payload;
 		}
 	}), [climateVariable]);
 

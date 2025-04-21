@@ -66,8 +66,8 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0].label;
 
 	// Helper to sort an array of tuples by the first element (x-value / timestamp).
-	const sortByTimestamp = useCallback((seriesData: number[][]) => {
-		return seriesData.slice().sort((a, b) => a[0] - b[0]);
+	const sortByTimestamp = useCallback((seriesData: number[][] | Record<string, number[]> | undefined) => {
+		return Array.isArray(seriesData) ? seriesData.slice().sort((a, b) => a[0] - b[0]) : [];
 	}, []);
 
 	// Tooltip format value helper

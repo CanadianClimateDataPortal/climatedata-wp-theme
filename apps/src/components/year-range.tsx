@@ -44,7 +44,11 @@ const YearRange = ({
 		}
 	}, [startYearValue, endYearValue, onChange]);
 
-	// @todo Disable options in the end year field that are earlier than the selected start year.
+	// Generate a list of year options based on the min, max, and interval in the DateRangeConfig.
+	const endYearOptions = generateOptions().filter(
+		(year) => parseInt(year) >= parseInt(startYearValue || min)
+	);
+
 	return (
 		<div className="flex gap-4 sm:gap-8 mb-6">
 			<Dropdown
@@ -58,7 +62,7 @@ const YearRange = ({
 				className="w-1/2 sm:w-52"
 				label={endYear.label}
 				value={endYearValue}
-				options={generateOptions()}
+				options={endYearOptions}
 				onChange={handleEndYearChange}
 			/>
 		</div>

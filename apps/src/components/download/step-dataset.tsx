@@ -14,11 +14,12 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setDataset } from '@/features/download/download-slice';
 import { fetchTaxonomyData } from '@/services/services';
 import { TaxonomyData } from '@/types/types';
+import { StepComponentRef } from '@/types/download-form-interface';
 
 /**
  * Dataset step
  */
-const StepDataset = React.forwardRef((_, ref) => {
+const StepDataset = React.forwardRef<StepComponentRef>((_, ref) => {
 	const [options, setOptions] = useState<TaxonomyData[]>([]);
 
 	const { __ } = useI18n();
@@ -27,9 +28,13 @@ const StepDataset = React.forwardRef((_, ref) => {
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const dispatch = useAppDispatch();
 
-	// expose isValid method to parent component
 	React.useImperativeHandle(ref, () => ({
-		isValid: () => Boolean(dataset)
+		isValid: () => Boolean(dataset),
+		getResetPayload: () => {
+			return {
+				dataset: null
+			};
+		}
 	}), [dataset]);
 
 	useEffect(() => {

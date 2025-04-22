@@ -172,7 +172,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getColourOptionsStatus(): boolean {
-		return this._config.enableColourOptions ?? false;
+		return this._config.enableColourOptions ?? true;
 	}
 
 	getColourType(): string | null {
@@ -236,6 +236,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getMaxDecimals(): number {
 		return this._config.maxDecimals ?? 0;
+	}
+
+	getDecimalPlace(): number {
+		return this._config.decimalPlace ?? 0;
 	}
 
 	renderMap(): React.ReactElement {

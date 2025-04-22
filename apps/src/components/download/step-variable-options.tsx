@@ -1,27 +1,22 @@
+import React from "react";
 import { useI18n } from '@wordpress/react-i18n';
-
 import {
 	StepContainer,
 	StepContainerDescription,
 } from '@/components/download/step-container';
-
-import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { AnalyzedDownloadFields } from "@/components/download/ui/analyzed-download-fields";
-import {
-	VersionDownloadFields
-} from "@/components/download/ui/version-download-fields";
-import React from "react";
+import { VersionDownloadFields } from "@/components/download/ui/version-download-fields";
+import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { StepComponentRef, StepResetPayload } from '@/types/download-form-interface';
 import { dateFormatCheck } from '@/lib/utils';
 
 /**
  * Variable options step
  */
-const StepVariableOptions = React.forwardRef((_, ref) => {
+const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { __ } = useI18n();
-
 	const { climateVariable } = useClimateVariable();
 
-	// expose isValid method to parent component
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
 			if (!climateVariable) {
@@ -52,6 +47,29 @@ const StepVariableOptions = React.forwardRef((_, ref) => {
 			];
 
 			return validations.every(Boolean);
+		},
+		getResetPayload: () => {
+			if (!climateVariable) return {};
+
+			const payload: StepResetPayload = {};
+
+			if (climateVariable.getVersions()?.length) {
+				payload.version = null;
+			}
+
+			if (climateVariable.getFrequencyConfig()) {
+				payload.frequency = null;
+			}
+
+			if (climateVariable.getAveragingOptions()?.length) {
+				payload.averagingType = null;
+			}
+
+			if (climateVariable.getAnalysisFields()?.length) {
+				payload.analysisFieldValues = {};
+			}
+
+			return payload;
 		}
 	}), [climateVariable]);
 

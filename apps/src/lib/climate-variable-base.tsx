@@ -238,6 +238,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.maxDecimals ?? 0;
 	}
 
+	getDecimalPlace(): number {
+		return this._config.decimalPlace ?? 0;
+	}
+
 	renderMap(): React.ReactElement {
 		return <RasterMap />
 	}

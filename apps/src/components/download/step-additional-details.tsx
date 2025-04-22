@@ -15,6 +15,7 @@ import {
 	FrequencyConfig,
 	FrequencyType,
 } from "@/types/climate-variable-interface";
+import { StepComponentRef, StepResetPayload } from "@/types/download-form-interface";
 import { FrequencySelect } from "@/components/frequency-select";
 import SectionContext from "@/context/section-provider";
 import { YearRange } from "@/components/year-range";
@@ -23,13 +24,12 @@ import appConfig from "@/config/app.config";
 /**
  * Additional details step will allow the user to customize the download request
  */
-const StepAdditionalDetails = React.forwardRef((_, ref) => {
+const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { __ } = useI18n();
 	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios, setPercentiles } = useClimateVariable();
 	const section = useContext(SectionContext);
 	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
 
-	// expose isValid method to parent component
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
 			if (!climateVariable) {
@@ -62,6 +62,33 @@ const StepAdditionalDetails = React.forwardRef((_, ref) => {
 			}
 
 			return validations.every(Boolean);
+		},
+		getResetPayload: () => {
+			if (!climateVariable) return {};
+
+			const payload: StepResetPayload = {};
+
+			if (climateVariable.getFrequencyConfig()) {
+				payload.frequency = null;
+			}
+
+			if (climateVariable.getAveragingOptions()?.length) {
+				payload.averagingType = null;
+			}
+
+			if (climateVariable.getDateRangeConfig()) {
+				payload.dateRange = null;
+			}
+
+			if (climateVariable.getScenarios()?.length) {
+				payload.analyzeScenarios = [];
+			}
+
+			if (climateVariable.getPercentileOptions()?.length) {
+				payload.percentiles = [];
+			}
+
+			return payload;
 		}
 	}), [climateVariable]);
 

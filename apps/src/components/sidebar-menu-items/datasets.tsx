@@ -87,7 +87,7 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 		const data = await fetchPostsData('variables', 'map', dataset, {});
 		const variables = await normalizePostData(data, locale);
 
-		// Store the variables in Redux 
+		// Store the variables in Redux
 		dispatch(setVariableList(variables));
 
 		// Select the first variable if available

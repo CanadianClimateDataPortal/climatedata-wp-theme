@@ -198,8 +198,6 @@ export interface DownloadState {
 	selectionCount: number;
 	zoom: number;
 	center: L.LatLngExpression;
-	decimalPlace: number;
-	format: string;
 	email: string;
 	subscribe: boolean;
 }

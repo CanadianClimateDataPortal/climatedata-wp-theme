@@ -110,67 +110,67 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		},
 		'modeled_historical_range': {
 			name: __('Historical Range'),
-			color: 'lightgray',
+			color: 'gray',
 			type: 'arearange',
 		},
 		'ssp126_median': {
 			name: __('SSP1-2.6 Median'),
-			color: 'blue',
+			color: '#0000ff',
 			type: 'line',
 		},
 		'ssp126_range': {
 			name: __('SSP1-2.6 Range'),
-			color: 'lightblue',
+			color: '#0000ff',
 			type: 'arearange',
 		},
 		'ssp245_median': {
 			name: __('SSP2-4.5 Median'),
-			color: 'green',
+			color: '#00640c',
 			type: 'line',
 		},
 		'ssp245_range': {
 			name: __('SSP2-4.5 Range'),
-			color: 'lightgreen',
+			color: '#00640c',
 			type: 'arearange',
 		},
 		'ssp585_median': {
 			name: __('SSP5-8.5 Median'),
-			color: 'red',
+			color: '#ff0000',
 			type: 'line',
 		},
 		'ssp585_range': {
 			name: __('SSP5-8.5 Range'),
-			color: 'pink',
+			color: '#ff0000',
 			type: 'arearange',
 		},
 		'rcp26_median': {
 			name: __('RCP 2.6 Median'),
-			color: 'blue',
+			color: '#0000ff',
 			type: 'line',
 		},
 		'rcp26_range': {
 			name: __('RCP 2.6 Range'),
-			color: 'lightblue',
+			color: '#0000ff',
 			type: 'arearange',
 		},
 		'rcp45_median': {
 			name: __('RCP 4.5 Median'),
-			color: 'green',
+			color: '#00640c',
 			type: 'line',
 		},
 		'rcp45_range': {
 			name: __('RCP 4.5 Range'),
-			color: 'lightgreen',
+			color: '#00640c',
 			type: 'arearange',
 		},
 		'rcp85_median': {
 			name: __('RCP 8.5 Median'),
-			color: 'red',
+			color: '#ff0000',
 			type: 'line',
 		},
 		'rcp85_range': {
 			name: __('RCP 8.5 Range'),
-			color: 'pink',
+			color: '#ff0000',
 			type: 'arearange',
 		},
 	};
@@ -205,7 +205,8 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						type: chartDataOptions['modeled_historical_range'].type,
 						data: sortByTimestamp(data.modeled_historical_range),
 						color: chartDataOptions['modeled_historical_range'].color,
-						fillOpacity: 0.3,
+						fillOpacity: 0.5,
+						lineWidth: 0,
 						zIndex: 0,
 					} as SeriesArearangeOptions,
 					{
@@ -222,7 +223,8 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						type: chartDataOptions['rcp26_range'].type,
 						data: sortByTimestamp(data.rcp26_range),
 						color: chartDataOptions['rcp26_range'].color,
-						fillOpacity: 0.3,
+						fillOpacity: 0.2,
+						lineWidth: 0,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'rcp45_median' },
@@ -238,7 +240,8 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						type: chartDataOptions['rcp45_range'].type,
 						data: sortByTimestamp(data.rcp45_range),
 						color: chartDataOptions['rcp45_range'].color,
-						fillOpacity: 0.3,
+						fillOpacity: 0.2,
+						lineWidth: 0,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'rcp85_median' },
@@ -254,7 +257,8 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						type: chartDataOptions['rcp85_range'].type,
 						data: sortByTimestamp(data.rcp85_range),
 						color: chartDataOptions['rcp85_range'].color,
-						fillOpacity: 0.3,
+						fillOpacity: 0.2,
+						lineWidth: 0,
 					} as SeriesArearangeOptions,
 				];
 			case 'cmip6':
@@ -283,6 +287,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						data: sortByTimestamp(data.modeled_historical_range),
 						color: chartDataOptions['modeled_historical_range'].color,
 						fillOpacity: 0.3,
+						lineWidth: 0,
 						zIndex: 0,
 					} as SeriesArearangeOptions,
 					{
@@ -299,7 +304,8 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						type: chartDataOptions['ssp126_range'].type,
 						data: sortByTimestamp(data.ssp126_range),
 						color: chartDataOptions['ssp126_range'].color,
-						fillOpacity: 0.3,
+						fillOpacity: 0.2,
+						lineWidth: 0,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'ssp245_median' },
@@ -315,7 +321,8 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						type: chartDataOptions['ssp245_range'].type,
 						data: sortByTimestamp(data.ssp245_range),
 						color: chartDataOptions['ssp245_range'].color,
-						fillOpacity: 0.3,
+						fillOpacity: 0.2,
+						lineWidth: 0,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'ssp585_median' },
@@ -331,7 +338,8 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						type: chartDataOptions['ssp585_range'].type,
 						data: sortByTimestamp(data.ssp585_range),
 						color: chartDataOptions['ssp585_range'].color,
-						fillOpacity: 0.3,
+						fillOpacity: 0.2,
+						lineWidth: 0,
 					} as SeriesArearangeOptions,
 				];
 			default:
@@ -605,7 +613,25 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				text: '',
 			},
 			tooltip: activeChartTooltip,
-			plotOptions: activeChartPlotOptions,
+			plotOptions: {
+				...activeChartPlotOptions,
+				series: {
+					...activeChartPlotOptions.series,
+					marker: {
+						symbol: 'circle',
+						radius: 6,
+						lineWidth: 0,
+						opacity: 0.6,
+						states: {
+							hover: { // enable on hover
+								enabled: true,
+								lineWidth: 0,
+								opacity: 0,
+							},
+						},
+					},
+				},
+			},
 			xAxis: {
 				crosshair: false,
 				type: 'datetime',

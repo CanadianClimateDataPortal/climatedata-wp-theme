@@ -137,9 +137,6 @@ export interface GridCoordinates {
 	[key: number]: Coordinates;
 }
 
-/**
- * Interface representing the configuration for a climate variable.
- */
 export interface ClimateVariableConfigInterface {
 	/** Unique identifier for the climate variable */
 	id: string;
@@ -270,6 +267,9 @@ export interface ClimateVariableConfigInterface {
 	/** The maximum number of decimals to be used for the file */
 	maxDecimals?: number;
 
+	/** The number of decimal places to be used for the file */
+	decimalPlace?: number;
+
 	/** Determines if the variable data must be analyzed or is already precalculated. */
 	downloadType?: DownloadType;
 
@@ -376,6 +376,8 @@ export interface ClimateVariableInterface {
 	getFileFormat(): FileFormatType | null;
 
 	getMaxDecimals(): number;
+
+	getDecimalPlace(): number;
 
 	renderMap(): React.ReactElement;
 

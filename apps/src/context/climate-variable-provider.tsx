@@ -6,7 +6,7 @@ import { PostData, TaxonomyData } from '@/types/types';
 import {
 	setClimateVariable,
 	updateClimateVariable,
-	updateClimateVariableAnalysisFieldValue,
+	updateClimateVariableAnalysisFieldValue
 } from '@/store/climate-variable-slice';
 import ClimateVariableBase from '@/lib/climate-variable-base';
 import {
@@ -42,6 +42,7 @@ export type ClimateVariableContextType = {
 	setMissingData: (missingData: string) => void;
 	setModel: (model: string) => void;
 	setFileFormat: (fileFormat: FileFormatType) => void;
+	setDecimalPlace: (decimalPlace: number) => void;
 	setSelectedPoints: (gridCoordinates: GridCoordinates) => void;
 	addSelectedPoints: (gridCoordinate: GridCoordinates) => void;
 	removeSelectedPoint: (gid: number) => void;
@@ -331,6 +332,13 @@ export const ClimateVariableProvider: React.FC<{
 		[dispatch]
 	);
 
+	const setDecimalPlace = useCallback(
+		(decimalPlace: number) => {
+			dispatch(updateClimateVariable({ decimalPlace }));
+		},
+		[dispatch]
+	);
+
 	const setSelectedPoints = useCallback(
 		(gridCoordinates: GridCoordinates) => {
 			dispatch(
@@ -403,6 +411,7 @@ export const ClimateVariableProvider: React.FC<{
 		setMissingData,
 		setModel,
 		setFileFormat,
+		setDecimalPlace,
 		setSelectedPoints,
 		addSelectedPoints,
 		removeSelectedPoint,

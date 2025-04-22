@@ -13,13 +13,14 @@ import VariableRadioCards from '@/components/variable-radio-cards';
 import VariableFilterCount from '@/components/sidebar-menu-items/variables';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { StepComponentRef } from "@/types/download-form-interface";
 import SectionContext from "@/context/section-provider";
 import useFilteredVariables from '@/hooks/use-filtered-variables';
 
 /**
  * Variable step
  */
-const StepVariable = React.forwardRef((_, ref) => {
+const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
     const { climateVariable, selectClimateVariable  } = useClimateVariable();
     const [varType, setVarType] = useState<string>('');
     const [sector, setSector] = useState<string>('');
@@ -29,9 +30,13 @@ const StepVariable = React.forwardRef((_, ref) => {
     const searchQuery = useAppSelector(selectSearchQuery);
     const { __ } = useI18n();
 
-    // expose isValid method to parent component
     React.useImperativeHandle(ref, () => ({
-      isValid: () => Boolean(climateVariable?.getId())
+      isValid: () => Boolean(climateVariable?.getId()),
+      getResetPayload: () => {
+        // Resetting makes the first variable selected
+        selectClimateVariable(variableList[0]);
+        return {};
+      }
     }), [climateVariable]);
 
     const filterValues = useMemo(

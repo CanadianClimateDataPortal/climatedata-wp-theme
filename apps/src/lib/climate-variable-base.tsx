@@ -206,8 +206,8 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getDateRange(): string[] | null {
 		return this._config.dateRange ?? [
-			"",
-			"",
+			"2040",
+			"2070",
 		];
 	}
 
@@ -257,6 +257,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getMaxDecimals(): number {
 		return this._config.maxDecimals ?? 0;
+	}
+
+	getDecimalPlace(): number {
+		return this._config.decimalPlace ?? 0;
 	}
 
 	renderMap(): React.ReactElement {

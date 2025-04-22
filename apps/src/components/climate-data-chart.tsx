@@ -558,6 +558,12 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					fontFamily: 'CDCSans',
 				},
 				marginTop: 30,
+				zoomType: 'x',
+				panning: {
+					enabled: true,
+					type: 'x'
+				},
+				panKey: 'shift'
 			},
 			exporting: {
 				filename: getExportFilename(),

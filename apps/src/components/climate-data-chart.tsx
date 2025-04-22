@@ -588,9 +588,6 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					dateFormat: '%Y-%m-%d',
 				},
 			},
-			legend: {
-				enabled: false, // using our own legend at the bottom with custom checkboxes
-			},
 			navigator: {
 				enabled: true,
 				adaptToUpdatedData: true,
@@ -618,6 +615,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				series: {
 					...activeChartPlotOptions.series,
 					marker: {
+						enabled: false, // disable in chart and legend
 						symbol: 'circle',
 						radius: 6,
 						lineWidth: 0,
@@ -787,48 +785,6 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				highcharts={Highcharts} 
 				options={chartOptions} 
 			/>
-
-			{/* toggle visibility of series points */}
-			<div className="flex flex-wrap items-center justify-center gap-4 my-2 mx-12">
-				{filteredSeries.map((s: SeriesOptionsType, index: number) => (
-					<label
-						key={index}
-						className="flex items-center gap-1 cursor-pointer select-none"
-					>
-						{/* toggle input */}
-						<input
-							type="checkbox"
-							checked={s.visible}
-							onChange={() => {
-								setActiveSeries((prev) =>
-									prev.includes(s.custom?.key ?? '')
-										? prev.filter(
-												(key) => key !== s.custom?.key
-											)
-										: [...prev, s.custom?.key ?? '']
-								);
-							}}
-							className="hidden peer"
-						/>
-
-						{/* series dot indicator */}
-						<span
-							className="w-4 h-4 rounded-full"
-							style={{
-								backgroundColor:
-									'color' in s && typeof s.color === 'string'
-										? s.color
-										: 'transparent',
-							}}
-						/>
-
-						{/* series label */}
-						<span className="text-sm text-neutral-grey-medium leading-5 peer-checked:no-underline line-through">
-							{s.name}
-						</span>
-					</label>
-				))}
-			</div>
 		</div>
 	);
 };

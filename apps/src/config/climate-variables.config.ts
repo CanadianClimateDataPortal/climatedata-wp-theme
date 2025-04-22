@@ -1385,6 +1385,12 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	{
 		id: "wet_days",
 		class: "RasterAnalyzeClimateVariable",
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: true,
+			[InteractiveRegionOption.CENSUS]: true,
+			[InteractiveRegionOption.HEALTH]: true,
+			[InteractiveRegionOption.WATERSHED]: true
+		},
 		analysisFields: [
 			{
 				key: "thresh",

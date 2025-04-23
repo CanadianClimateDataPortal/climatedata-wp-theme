@@ -24,11 +24,11 @@ const TimePeriodsControl: React.FC = () => {
 		interval: 30,
 	};
 
-	const [startYear, endYear] = climateVariable?.getDateRange() ?? [
-		"2040",
-		"2070"
-	];
+	// Get date range from climate variable state
+	const dateRange = climateVariable?.getDateRange();
+	const [startYear, endYear] = dateRange ?? ["2040", "2070"];
 
+	// Use map state for the slider
 	const sliderValue = timePeriodEnd && timePeriodEnd.length > 0
 		? timePeriodEnd
 		: [Number(endYear)];
@@ -41,18 +41,19 @@ const TimePeriodsControl: React.FC = () => {
 		let newEnd = values[0];
 
 		if (newEnd < minYear + intervalYears) {
-			newEnd = maxYear + intervalYears;
+			newEnd = minYear + intervalYears;
 		}
 		if (newEnd > maxYear) {
 			newEnd = maxYear;
 		}
 
-		// Update both Redux store and climate variable
+		// Update both map state and climate variable state
 		dispatch(setTimePeriodEnd([newEnd]));
 
+		// Update climate variable state with the new date range
 		setDateRange([
-			newEnd - intervalYears + '',
-			newEnd + '',
+			(newEnd - intervalYears).toString(),
+			newEnd.toString(),
 		]);
 	};
 

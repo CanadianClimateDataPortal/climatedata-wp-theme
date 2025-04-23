@@ -9,12 +9,9 @@ import {
 	setMapColor,
 	setOpacity,
 } from '@/features/map/map-slice';
-import {
-	setClimateVariable,
-	updateClimateVariable,
-} from '@/store/climate-variable-slice';
+import { setClimateVariable } from '@/store/climate-variable-slice';
 import { ClimateVariables } from '@/config/climate-variables.config';
-import { ClimateVariableConfigInterface } from '@/types/climate-variable-interface';
+import { ClimateVariableConfigInterface, InteractiveRegionOption } from '@/types/climate-variable-interface';
 import { MapItemsOpacity, ApiPostData } from '@/types/types';
 
 /**
@@ -29,17 +26,12 @@ export const useUrlSync = () => {
 	const variable = useAppSelector((state) => state.map.variable);
 	const decade = useAppSelector((state) => state.map.decade);
 	const thresholdValue = useAppSelector((state) => state.map.thresholdValue);
-	const interactiveRegion = useAppSelector(
-		(state) => state.map.interactiveRegion
-	);
-	const frequency = useAppSelector((state) => state.map.frequency);
+	const mapInteractiveRegion = useAppSelector((state) => state.map.interactiveRegion);
 	const mapColor = useAppSelector((state) => state.map.mapColor);
 	const opacity = useAppSelector((state) => state.map.opacity);
 
 	// Climate variable state
-	const climateVariableData = useAppSelector(
-		(state) => state.climateVariable.data
-	);
+	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
 
 	// Process URL params on initial load
 	useEffect(() => {
@@ -80,19 +72,38 @@ export const useUrlSync = () => {
 					newConfig.scenarioCompareTo =
 						params.get('cmpTo') || undefined;
 				if (params.has('region'))
-					newConfig.interactiveRegion = params.get('region') as any;
+					newConfig.interactiveRegion = params.get('region') as InteractiveRegionOption;
 				if (params.has('dataVal'))
 					newConfig.dataValue = params.get('dataVal') || undefined;
 				if (params.has('clr'))
 					newConfig.colourScheme = params.get('clr') || undefined;
+				else if (params.has('color'))
+					newConfig.colourScheme = params.get('color') || undefined;
 				if (params.has('clrType'))
 					newConfig.colourType = params.get('clrType') || undefined;
 				if (params.has('avg'))
 					newConfig.averagingType = params.get('avg') as any;
+
+				// Handle dateRange or period
 				if (params.has('dateRange')) {
+					// Use dateRange directly if available
 					const dateRangeStr = params.get('dateRange');
 					if (dateRangeStr) {
 						newConfig.dateRange = dateRangeStr.split(',');
+					}
+				} else if (params.has('period') && matchedVariable.dateRangeConfig) {
+					// Or calculate from period and interval
+					const period = parseInt(params.get('period') || '');
+					const interval = matchedVariable.dateRangeConfig.interval || 30;
+
+					if (!isNaN(period)) {
+						newConfig.dateRange = [
+							(period - interval).toString(),
+							period.toString()
+						];
+
+						// Also update timePeriodEnd to keep them in sync
+						dispatch(setTimePeriodEnd([period]));
 					}
 				}
 
@@ -105,9 +116,9 @@ export const useUrlSync = () => {
 			}
 		}
 
-		// Process map params
+		// Process map-only params (that don't duplicate climate variable state)
 		const mapVar = params.get('mapVar');
-		if (mapVar) dispatch(setVariable(mapVar));
+		if (mapVar && !varId) dispatch(setVariable(mapVar));
 
 		const decadeParam = params.get('decade');
 		if (decadeParam) dispatch(setDecade(decadeParam));
@@ -118,20 +129,16 @@ export const useUrlSync = () => {
 			if (!isNaN(threshold)) dispatch(setThresholdValue(threshold));
 		}
 
+		// Only set map interactive region if not already handled by climate variable state
 		const mapRegion = params.get('mapRegion');
-		if (mapRegion) dispatch(setInteractiveRegion(mapRegion));
+		if (mapRegion && !params.has('region')) {
+			dispatch(setInteractiveRegion(mapRegion));
+		}
 
-		const mapFreq = params.get('mapFreq');
-		if (mapFreq) dispatch(updateClimateVariable({ frequency: mapFreq }));
-
+		// Only set color if not handled by climate variable colourScheme
 		const colorParam = params.get('color');
-		if (colorParam) dispatch(setMapColor(colorParam));
-
-		// Handle timePeriodEnd - the key parameter we're focusing on
-		const periodParam = params.get('period');
-		if (periodParam) {
-			const period = parseInt(periodParam);
-			if (!isNaN(period)) dispatch(setTimePeriodEnd([period]));
+		if (colorParam && !params.has('clr')) {
+			dispatch(setMapColor(colorParam));
 		}
 
 		// Handle opacity
@@ -176,7 +183,7 @@ export const useUrlSync = () => {
 		}
 
 		hasInitialized.current = true;
-	}, [dispatch]);
+	}, [dispatch, opacity]);
 
 	useEffect(() => {
 		// Skip the first render
@@ -184,47 +191,9 @@ export const useUrlSync = () => {
 			return;
 		}
 
-		const params = new URLSearchParams(window.location.search);
+		const params = new URLSearchParams();
 
-		// Map state params
-		// Handle variable which can be either string or ApiPostData
-		if (variable) {
-			const variableValue =
-				typeof variable === 'string'
-					? variable
-					: (variable as ApiPostData).id.toString();
-			params.set('mapVar', variableValue);
-		}
-
-		if (decade) params.set('decade', decade);
-		if (thresholdValue !== undefined)
-			params.set('threshold', thresholdValue.toString());
-		if (interactiveRegion) params.set('mapRegion', interactiveRegion);
-		if (frequency) params.set('mapFreq', frequency);
-		if (mapColor) params.set('color', mapColor);
-
-		// Handle timePeriodEnd
-		if (timePeriodEnd && timePeriodEnd.length > 0) {
-			params.set('period', timePeriodEnd[0].toString());
-		}
-
-		// Handle opacity
-		if (opacity) {
-			if (opacity.mapData !== undefined) {
-				params.set(
-					'dataOpacity',
-					Math.round(opacity.mapData * 100).toString()
-				);
-			}
-			if (opacity.labels !== undefined) {
-				params.set(
-					'labelOpacity',
-					Math.round(opacity.labels * 100).toString()
-				);
-			}
-		}
-
-		// Climate variable params
+		// Climate variable parameters take precedence
 		if (climateVariableData) {
 			if (climateVariableData.id)
 				params.set('var', climateVariableData.id);
@@ -254,6 +223,8 @@ export const useUrlSync = () => {
 				params.set('clrType', climateVariableData.colourType);
 			if (climateVariableData.averagingType)
 				params.set('avg', climateVariableData.averagingType);
+
+			// Use dateRange from climate variable state instead of period
 			if (
 				climateVariableData.dateRange &&
 				climateVariableData.dateRange.length > 0
@@ -261,6 +232,49 @@ export const useUrlSync = () => {
 				params.set(
 					'dateRange',
 					climateVariableData.dateRange.join(',')
+				);
+			}
+		}
+
+		// Map-only parameters (that don't duplicate climate variable state)
+		if (decade) {
+			params.set('decade', decade);
+		}
+
+		if (thresholdValue !== undefined) {
+			params.set('threshold', thresholdValue.toString());
+		}
+
+		// Add mapVar only if climate variable is not set
+		if (variable && (!climateVariableData || !climateVariableData.id)) {
+			const variableValue = typeof variable === 'string'
+				? variable
+				: (variable as ApiPostData).id.toString();
+			params.set('mapVar', variableValue);
+		}
+
+		// Add mapRegion only if region from climate variable is not set
+		if (mapInteractiveRegion && (!climateVariableData || !climateVariableData.interactiveRegion)) {
+			params.set('mapRegion', mapInteractiveRegion);
+		}
+
+		// Only add color if climate variable doesn't have colourScheme
+		if (mapColor && (!climateVariableData || !climateVariableData.colourScheme)) {
+			params.set('color', mapColor);
+		}
+
+		// Handle opacity (map-only)
+		if (opacity) {
+			if (opacity.mapData !== undefined) {
+				params.set(
+					'dataOpacity',
+					Math.round(opacity.mapData * 100).toString()
+				);
+			}
+			if (opacity.labels !== undefined) {
+				params.set(
+					'labelOpacity',
+					Math.round(opacity.labels * 100).toString()
 				);
 			}
 		}
@@ -273,8 +287,7 @@ export const useUrlSync = () => {
 		variable,
 		decade,
 		thresholdValue,
-		interactiveRegion,
-		frequency,
+		mapInteractiveRegion,
 		mapColor,
 		opacity,
 		climateVariableData,

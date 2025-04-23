@@ -1,6 +1,10 @@
 import React from "react";
 import { MultilingualField } from "./types";
 
+export interface variableClassMap {
+	[key: string]: string;
+}
+
 export interface ScenariosConfig {
 	[key: string]: string[];
 }
@@ -147,8 +151,11 @@ export interface ClimateVariableConfigInterface {
 	/** Title of the climate variable from the API */
 	title?: string | MultilingualField;
 
-	/** Class name defining the type or category of the climate variable */
+	/** Default class defining the type or category of the climate variable */
 	class: string;
+
+	/** Alternative classes to use depending on the dataset type */
+	classes?: variableClassMap;
 
 	/** The type of dataset the climate variable belongs to */
 	datasetType?: string;

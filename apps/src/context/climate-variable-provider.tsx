@@ -20,6 +20,7 @@ import {
 import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
 import RasterPrecalculatedWithDailyFormatsClimateVariable from '@/lib/raster-precalculated-with-daily-formats-climate-variable';
 import RasterAnalyzeClimateVariable from '@/lib/raster-analyze-climate-variable';
+import RasterAnalyzeAHCCDClimateVariable from "@/lib/raster-analyze-ahccd-climate-variable";
 
 export type ClimateVariableContextType = {
 	climateVariable: ClimateVariableInterface | null;
@@ -63,6 +64,7 @@ const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
 	RasterPrecalculatedWithDailyFormatsClimateVariable:
 		RasterPrecalculatedWithDailyFormatsClimateVariable,
 	RasterAnalyzeClimateVariable: RasterAnalyzeClimateVariable,
+	RasterAnalyzeAHCCDClimateVariable: RasterAnalyzeAHCCDClimateVariable,
 };
 
 /**
@@ -84,16 +86,27 @@ export const ClimateVariableProvider: React.FC<{
 	 * using the `CLIMATE_VARIABLE_CLASS_MAP`. If the specified class is not found in the map, an error
 	 * is thrown.
 	 */
-	const climateVariable = useMemo(() => {
+	const climateVariable = useMemo(/**
+	 * Creates and returns an instance of the appropriate climate variable class based on the provided climateVariableData.
+	 * If a corresponding class cannot be determined, an error is thrown.
+	 *
+	 * @returns {object|null} An instance of the corresponding climate variable class, or null if climateVariableData is not provided.
+	 * @throws {Error} Throws an error if the climate variable class cannot be determined from the provided data.
+	 */
+	(): ClimateVariableInterface | null => {
 		if (!climateVariableData) return null;
 
-		const climateVariableClass =
-			CLIMATE_VARIABLE_CLASS_MAP[climateVariableData.class];
+		// Determine climate variable class based on dataset type if available, otherwise fallback to default class.
+		const climateVariableClass = climateVariableData.datasetType && climateVariableData.classes?.[climateVariableData.datasetType]
+			? CLIMATE_VARIABLE_CLASS_MAP[climateVariableData.classes[climateVariableData.datasetType]]
+			: CLIMATE_VARIABLE_CLASS_MAP[climateVariableData.class];
+
 		if (!climateVariableClass) {
 			throw new Error(
-				`Invalid climate variable class: ${climateVariableData.class}`
+				`Invalid climate variable class: ${climateVariableData.id}`
 			);
 		}
+
 		return new climateVariableClass(climateVariableData);
 	}, [climateVariableData]);
 

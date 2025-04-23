@@ -199,6 +199,7 @@ export interface DownloadState {
 	center: L.LatLngExpression;
 	email: string;
 	subscribe: boolean;
+	variableListLoading: boolean;
 }
 
 /**

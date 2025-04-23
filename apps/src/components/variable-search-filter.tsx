@@ -10,16 +10,24 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setSearchQuery, selectSearchQuery } from '@/store/climate-variable-slice';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useI18n } from '@wordpress/react-i18n';
-import { setVariableListLoading } from '@/features/map/map-slice';
+import { setVariableListLoading as setMapVariableListLoading } from '@/features/map/map-slice';
+import { setVariableListLoading as setDownloadVariableListLoading } from '@/features/download/download-slice';
 
-export const VariableSearchFilter: React.FC = () => {
+interface VariableSearchFilterProps {
+  app?: 'map' | 'download';
+}
+
+export const VariableSearchFilter: React.FC<VariableSearchFilterProps> = ({ app = 'map' }) => {
   const { __ } = useI18n();
   const dispatch = useAppDispatch();
   const globalSearchQuery = useAppSelector(selectSearchQuery);
   const [localSearchQuery, setLocalSearchQuery] = useState(globalSearchQuery);
   const debouncedSearchQuery = useDebounce(localSearchQuery, 300);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const { dataset } = useAppSelector((state) => state.map);
+  const { dataset: mapDataset } = useAppSelector((state) => state.map);
+  const { dataset: downloadDataset } = useAppSelector((state) => state.download);
+  
+  const dataset = app === 'map' ? mapDataset : downloadDataset;
 
   // Update Redux state when debounced value changes
   useEffect(() => {
@@ -28,10 +36,14 @@ export const VariableSearchFilter: React.FC = () => {
       
       // If we have a dataset, set loading state to true when search query changes
       if (dataset) {
-        dispatch(setVariableListLoading(true));
+        if (app === 'map') {
+          dispatch(setMapVariableListLoading(true));
+        } else {
+          dispatch(setDownloadVariableListLoading(true));
+        }
       }
     }
-  }, [debouncedSearchQuery, dispatch, globalSearchQuery, dataset]);
+  }, [debouncedSearchQuery, dispatch, globalSearchQuery, dataset, app]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalSearchQuery(e.target.value);
@@ -43,7 +55,11 @@ export const VariableSearchFilter: React.FC = () => {
     
     // If we have a dataset, set loading state
     if (dataset) {
-      dispatch(setVariableListLoading(true));
+      if (app === 'map') {
+        dispatch(setMapVariableListLoading(true));
+      } else {
+        dispatch(setDownloadVariableListLoading(true));
+      }
     }
     
     searchInputRef.current?.focus();

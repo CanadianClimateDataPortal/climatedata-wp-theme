@@ -116,8 +116,18 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 		climateVariable?.getAveragingOptions()?.includes(option.value)
 	);
 
+	// Check if Download Type is Analysed.
+	const isDownloadTypeAnalyzed = climateVariable?.getDownloadType() === DownloadType.ANALYZED;
+
+	// Get the date range config.
 	const dateRangeConfig = climateVariable?.getDateRangeConfig();
+	// Get the date range selected by the user.
 	const dateRange = climateVariable?.getDateRange() ?? [];
+
+	// Get the percentiles options.
+	const percentileOptions = climateVariable?.getPercentileOptions() ?? [];
+
+	// Get the Scenario Options.
 	const scenarioOptions = appConfig.scenarios.filter((scenario) =>
 		climateVariable?.getScenarios()?.includes(scenario.value)
 	);
@@ -140,7 +150,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 				{__('Adjust the controls below to customize your analysis.')}
 			</StepContainerDescription>
 
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+			{isDownloadTypeAnalyzed
 				&& dateRangeConfig
 				&& <YearRange
 					startYear={{
@@ -156,7 +166,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 				/>
 			}
 
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+			{isDownloadTypeAnalyzed
 				&& averagingOptions.length > 0
 				&& climateVariable?.getFrequency() !== FrequencyType.DAILY
 				&& <RadioGroupFactory
@@ -169,7 +179,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 				/>
 			}
 
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+			{isDownloadTypeAnalyzed
 				&& formattedModelOptions.length > 0
 				&& <RadioGroupFactory
 					name="models"
@@ -184,7 +194,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 				/>
 			}
 
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+			{isDownloadTypeAnalyzed
 				&& scenarioOptions.length > 0
 				&& <CheckboxFactory
 					name="emission-scenarios"
@@ -199,8 +209,8 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 				/>
 			}
 
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
-				&& climateVariable?.getPercentileOptions().length > 0
+			{isDownloadTypeAnalyzed
+				&& percentileOptions.length > 0
 				&& <CheckboxFactory
 					name="percentiles"
 					title={__('Percentiles')}
@@ -208,13 +218,13 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 					orientation="horizontal"
 					className="max-w-md mb-8"
 					optionClassName="w-1/4"
-					options={climateVariable?.getPercentileOptions() ?? []}
+					options={percentileOptions ?? []}
 					values={climateVariable?.getPercentiles() ?? []}
 					onChange={setPercentiles}
 				/>
 			}
 
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
+			{isDownloadTypeAnalyzed
 				&& formattedMissingDataOptions.length > 0
 				&& <RadioGroupFactory
 					name="missingDataOptions"

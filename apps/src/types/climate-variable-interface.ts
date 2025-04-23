@@ -48,14 +48,14 @@ export interface FieldConfig {
 	description?: string;
 	help?: string;
 	required?: boolean;
+	comparison?: string;
+	unit?: string;
 	attributes?: {
-		type?: 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
+		type?: 'text' | 'number' | 'email' | 'password' | 'tel' | 'url' | 'date';
 		placeholder?: string;
+
 	};
-	options?: Array<{
-		value: string | number;
-		label: string;
-	}>;
+	options?: { value: string; label: string }[];
 }
 
 export interface FieldValues {
@@ -137,9 +137,6 @@ export interface GridCoordinates {
 	[key: number]: Coordinates;
 }
 
-/**
- * Interface representing the configuration for a climate variable.
- */
 export interface ClimateVariableConfigInterface {
 	/** Unique identifier for the climate variable */
 	id: string;
@@ -255,6 +252,9 @@ export interface ClimateVariableConfigInterface {
 	/** The maximum number of decimals to be used for the file */
 	maxDecimals?: number;
 
+	/** The number of decimal places to be used for the file */
+	decimalPlace?: number;
+
 	/** Determines if the variable data must be analyzed or is already precalculated. */
 	downloadType?: DownloadType;
 
@@ -352,6 +352,8 @@ export interface ClimateVariableInterface {
 
 	getMaxDecimals(): number;
 
+	getDecimalPlace(): number;
+
 	renderMap(): React.ReactElement;
 
 	renderDownloadMap(): React.ReactElement;
@@ -372,5 +374,5 @@ export interface ClimateVariableInterface {
 
 	toObject(): ClimateVariableConfigInterface;
 
-	getLocationModalContent(latlng: L.LatLng, featureId: number): React.ReactNode | null;
+	getLocationModalContent(latlng: L.LatLng, featureId: number, mode?: string): React.ReactNode | null;
 }

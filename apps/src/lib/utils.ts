@@ -110,3 +110,13 @@ export const getDefaultFrequency = (
 
 	return defaultValue;
 };
+/**
+ * Converts a date format string (e.g., 'YYYY-MM-DD', 'MM-DD') into a regular expression for validation.
+ */
+export const dateFormatCheck = (format: string): RegExp => {
+	const regexStr = format
+		.replace(/YYYY/g, '\\d{4}')
+		.replace(/MM/g, '(0[1-9]|1[0-2])')
+		.replace(/DD/g, '(0[1-9]|[12]\\d|3[01])');
+	return new RegExp(`^${regexStr}$`);
+};

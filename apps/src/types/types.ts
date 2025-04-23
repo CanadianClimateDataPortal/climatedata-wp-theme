@@ -198,8 +198,6 @@ export interface DownloadState {
 	selectionCount: number;
 	zoom: number;
 	center: L.LatLngExpression;
-	decimalPlace: number;
-	format: string;
 	email: string;
 	subscribe: boolean;
 }
@@ -296,7 +294,7 @@ export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 export interface ButtonProps
 	extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-		VariantProps<typeof buttonVariants> {
+	VariantProps<typeof buttonVariants> {
 	asChild?: boolean;
 }
 
@@ -459,6 +457,7 @@ export interface ClimateDataProps {
 	delta7100_ssp245_range?: Record<string, number[]>;
 	delta7100_ssp585_median?: Record<string, number[]>;
 	delta7100_ssp585_range?: Record<string, number[]>;
+	[key: string]: number[][] | Record<string, number[]> | undefined;
 }
 
 /**
@@ -611,6 +610,89 @@ export interface VariableFilterCountProps {
 	filteredCount: number;
 	totalCount: number;
 	className?: string;
+}
+
+// -----------------------------------------------------------------------------
+// Downloads Specifics Types
+// -----------------------------------------------------------------------------
+// This section includes types related to components and structures used in
+// download configuration and variable-specific behavior.
+// -----------------------------------------------------------------------------
+
+/**
+ * Props for the AnalyzedField component.
+ *
+ * Renders either an input or dropdown (select) field for configuring a climate variable.
+ */
+export interface AnalyzedFieldProps {
+	keyName: string;
+	type: 'input' | 'select';
+	label: string;
+	description?: string;
+	help?: string;
+	attributeType?: string;
+	placeholder?: string;
+	value: string | readonly string[] | number | undefined;
+	onChange: (key: string, value: string) => void;
+	__: (text: string) => string;
+	options?: { value: string; label: string }[];
+}
+
+/**
+ * Props for the InputAnalyzedField component.
+ *
+ * Represents a single text input used to configure a specific aspect
+ * of a climate variable in the analyzed download type.
+ */
+export interface InputAnalyzedFieldProps {
+	className: string;
+	keyName: string; // The key used to identify this input's value
+	label?: string;
+	value?: string | readonly string[] | number | undefined;
+	description?: string;
+	tooltip?: string | React.ReactNode;
+	placeholder?: string;
+	attributeType?: string; // Optional input type, defaults to 'text'
+	onChange: (key: string, value: string) => void; // Emits changes upward
+}
+
+/**
+ * Props for the SelectAnalyzedField component.
+ *
+ * Represents a dropdown (select) field used to configure a climate variable
+ * option in the analyzed download type.
+ */
+export interface SelectAnalyzedFieldProps<T = string> {
+	name: string;
+	label?: string;
+	description?: string;
+	attributeType?: string; // (Unused here, but kept for future extensibility)
+	placeholder?: string;
+	value: string | readonly string[] | number | undefined;
+	tooltip?: string | React.ReactNode;
+	onChange: ((key: string, value: string) => void) | ((value: string) => void);
+	options: { value: T; label: string }[];
+}
+
+/**
+ * Props for the DownloadDropdown component.
+ *
+ * A flexible dropdown (select) component used for configuring
+ * download-related options. It supports generic value types,
+ * placeholder rendering, and tooltips.
+ */
+export interface DownloadDropdownProps<T = string> // generic default type is string
+	extends Omit<
+		React.SelectHTMLAttributes<HTMLSelectElement>,
+		'onChange' | 'value'
+	> {
+	name: string,
+	options: { value: string; label: string }[];
+	value: string | T;
+	placeholder?: string;
+	label?: string | React.ReactNode;
+	tooltip?: string | React.ReactNode;
+	onChange: (key: string, value: string) => void;
 }
 
 /**

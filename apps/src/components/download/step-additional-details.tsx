@@ -26,7 +26,16 @@ import appConfig from "@/config/app.config";
  */
 const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { __ } = useI18n();
-	const { climateVariable, setFrequency, setAveragingType, setDateRange, setAnalyzeScenarios, setPercentiles, setMissingData, setModel } = useClimateVariable();
+	const {
+		climateVariable,
+		setFrequency,
+		setAveragingType,
+		setDateRange,
+		setAnalyzeScenarios,
+		setPercentiles,
+		setMissingData,
+		setModel
+	} = useClimateVariable();
 	const section = useContext(SectionContext);
 	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
 
@@ -137,7 +146,6 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			</StepContainerDescription>
 
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
-				&& climateVariable?.getDatasetType() !== 'ahccd'
 				&& dateRangeConfig
 				&& <YearRange
 					startYear={{
@@ -154,7 +162,6 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
-				&& climateVariable?.getDatasetType() !== 'ahccd'
 				&& averagingOptions.length > 0
 				&& climateVariable?.getFrequency() !== FrequencyType.DAILY
 				&& <RadioGroupFactory
@@ -168,7 +175,6 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
-				&& climateVariable?.getDatasetType() !== 'ahccd'
 				&& formattedModelOptions.length > 0
 				&& <RadioGroupFactory
 					name="models"
@@ -184,7 +190,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
-				&& climateVariable?.getDatasetType() !== 'ahccd'
+				&& scenarioOptions.length > 0
 				&& <CheckboxFactory
 					name="emission-scenarios"
 					title={__('Emissions Scenarios')}
@@ -199,7 +205,6 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
-				&& climateVariable?.getDatasetType() !== 'ahccd'
 				&& climateVariable?.getPercentileOptions().length > 0
 				&& <CheckboxFactory
 					name="percentiles"
@@ -215,7 +220,6 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED
-				&& climateVariable?.getDatasetType() === 'ahccd'
 				&& formattedMissingDataOptions.length > 0
 				&& <RadioGroupFactory
 					name="missingDataOptions"

@@ -23,11 +23,12 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 				return false;
 			}
 
-			const version = climateVariable.getVersion() ?? null;
+			const version = climateVariable.getVersion() ?? true;
 			const fields = climateVariable.getAnalysisFields() ?? [];
 			const values = climateVariable.getAnalysisFieldValues() ?? {};
 
 			const validations = [
+				version,
 				...fields
 					.filter(f => f.required !== false)
 					.map(f => {
@@ -44,10 +45,6 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 						return value != null && value !== '';
 					})
 			];
-
-			if (climateVariable.getDatasetType() !== "ahccd") {
-				validations.push(!!version)
-			}
 
 			return validations.every(Boolean);
 		},
@@ -86,7 +83,7 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 				{__('Please set your variables options to your needs.')}
 			</StepContainerDescription>
 			<div className="gap-4">
-				{version && climateVariable?.getDatasetType() !== "ahccd" && (
+				{version && (
 					<div className="mb-8">
 						<VersionDownloadFields />
 					</div>

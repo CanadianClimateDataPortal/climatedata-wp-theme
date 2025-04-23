@@ -816,12 +816,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			}
 		],
-		interactiveRegionConfig: {
-			[InteractiveRegionOption.GRIDDED_DATA]: true,
-			[InteractiveRegionOption.CENSUS]: true,
-			[InteractiveRegionOption.HEALTH]: true,
-			[InteractiveRegionOption.WATERSHED]: true
-		},
 	},
 	/** Cooling Degree Days */
 	{

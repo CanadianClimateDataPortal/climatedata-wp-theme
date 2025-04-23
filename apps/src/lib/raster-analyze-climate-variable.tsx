@@ -7,22 +7,9 @@ import {
 	FrequencyConfig,
 	FrequencyDisplayModeOption,
 	FrequencyType,
-	InteractiveRegionConfig,
-	InteractiveRegionOption
 } from "@/types/climate-variable-interface";
 
 class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
-
-	getInteractiveRegionConfig(): InteractiveRegionConfig | null {
-		return ClimateVariableBase.prototype.getInteractiveRegionConfig.call(this)
-			? ClimateVariableBase.prototype.getInteractiveRegionConfig.call(this)
-			: {
-				[InteractiveRegionOption.GRIDDED_DATA]: true,
-				[InteractiveRegionOption.CENSUS]: false,
-				[InteractiveRegionOption.HEALTH]: false,
-				[InteractiveRegionOption.WATERSHED]: false
-			};
-	}
 
 	getFrequencyConfig(): FrequencyConfig | null {
 		return ClimateVariableBase.prototype.getFrequencyConfig.call(this)

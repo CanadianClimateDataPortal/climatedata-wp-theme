@@ -99,7 +99,7 @@ export const VariableSearchFilter: React.FC<VariableSearchFilterProps> = ({ app 
           value={localSearchQuery}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          className="pl-10 pr-10 w-full py-2 bg-transparent focus:outline-none border-0 border-b border-gray-200 focus:border-gray-400"
+          className="pl-10 pr-10 w-full py-2 bg-white focus:outline-none border-0 border-b border-gray-200 focus:border-gray-400"
         />
 
         {localSearchQuery && (

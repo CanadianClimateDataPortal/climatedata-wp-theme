@@ -40,7 +40,10 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 	const dispatch = useAppDispatch();
 	const section = useContext(SectionContext);
 
-	const { legendData } = useAppSelector((state) => state.map);
+	const {
+		legendData,
+		opacity: { mapData },
+	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
 	const gridType = climateVariable?.getGridType() ?? 'canadagrid';
@@ -320,6 +323,12 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 			vectorTileLayerStyles,
 		]
 	);
+
+	useEffect(() => {
+		if (layerRef.current) {
+			layerRef.current.setOpacity(mapData);
+		}
+	}, [mapData]);
 
 	return null;
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import * as Slider from '@radix-ui/react-slider';
 import { useI18n } from '@wordpress/react-i18n';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 
 // components
 import { SidebarMenuItem } from '@/components/ui/sidebar';
@@ -9,23 +10,28 @@ import { ControlTitle } from '@/components/ui/control-title';
 // other
 import { cn } from '@/lib/utils';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { setTimePeriodEnd } from '@/features/map/map-slice';
 
 const TimePeriodsControl: React.FC = () => {
 	const { __ } = useI18n();
+	const dispatch = useAppDispatch();
 	const { climateVariable, setDateRange } = useClimateVariable();
+	const timePeriodEnd = useAppSelector(state => state.map.timePeriodEnd);
 
-	const {min, max, interval} = climateVariable?.getDateRangeConfig() ?? {
+	const { min, max, interval } = climateVariable?.getDateRangeConfig() ?? {
 		min: 1950,
 		max: 2100,
 		interval: 30,
 	};
 
-	const [ startYear, endYear ] = climateVariable?.getDateRange() ?? [
-		"2040",
-		"2070"
-	];
+	// Get date range from climate variable state
+	const dateRange = climateVariable?.getDateRange();
+	const [startYear, endYear] = dateRange ?? ["2040", "2070"];
 
-	const sliderValue = [Number(endYear)];
+	// Use map state for the slider
+	const sliderValue = timePeriodEnd && timePeriodEnd.length > 0
+		? timePeriodEnd
+		: [Number(endYear)];
 
 	const minYear = Number(min);
 	const maxYear = Number(max);
@@ -35,16 +41,19 @@ const TimePeriodsControl: React.FC = () => {
 		let newEnd = values[0];
 
 		if (newEnd < minYear + intervalYears) {
-			newEnd = maxYear + intervalYears;
+			newEnd = minYear + intervalYears;
 		}
 		if (newEnd > maxYear) {
 			newEnd = maxYear;
 		}
 
-		// Convert to string.
+		// Update both map state and climate variable state
+		dispatch(setTimePeriodEnd([newEnd]));
+
+		// Update climate variable state with the new date range
 		setDateRange([
-			newEnd - intervalYears + '',
-			newEnd + '',
+			(newEnd - intervalYears).toString(),
+			newEnd.toString(),
 		]);
 	};
 

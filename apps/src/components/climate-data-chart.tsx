@@ -376,7 +376,9 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		});
 
 		// Tooltip content
-		let tooltip = `<b>${startYear} - ${endYear}</b><br/>`;
+		let tooltip = `<b>${startYear} - ${endYear}`;
+		if(prefix === "delta7100_") tooltip += ` (${__('Change from ')} 1971-2000)`;
+		tooltip += `</b><br/>`;
 
 		// Iterate on 30y data
 		Object.keys(data)
@@ -413,14 +415,16 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				padding: 4,
 				formatter: function(this: Point) {
 					const points = (this as unknown as { points?: TooltipPoint[] }).points;
+					const year = new Date(this.x).getFullYear() + 1;
 
-					return points?.map((point: TooltipPoint) => {
-						if (point.series.type === 'arearange') {
-							return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.low)}</b> - <b>${formatValue(point.high)}</b><br/>`;
-						} else {
-							return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.y)}</b><br/>`;
-						}
-					}).join('') || '';
+					return `<b>${year}</b><br/>` + 
+						points?.map((point: TooltipPoint) => {
+							if (point.series.type === 'arearange') {
+								return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.low)}</b> - <b>${formatValue(point.high)}</b><br/>`;
+							} else {
+								return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.y)}</b><br/>`;
+							}
+						}).join('') || '';
 				}
 			},
 			'30-year-averages': {
@@ -558,6 +562,12 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					fontFamily: 'CDCSans',
 				},
 				marginTop: 30,
+				zoomType: 'x',
+				panning: {
+					enabled: true,
+					type: 'x'
+				},
+				panKey: 'shift'
 			},
 			exporting: {
 				filename: getExportFilename(),

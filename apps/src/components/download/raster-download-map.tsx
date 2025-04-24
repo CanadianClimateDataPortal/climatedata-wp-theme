@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
 import { setSelectionMode } from '@/features/download/download-slice';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ import { useI18n } from '@wordpress/react-i18n';
 import { useMap } from '@/hooks/use-map';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
-import { InteractiveRegionOption } from '@/types/climate-variable-interface';
+import { DownloadType, InteractiveRegionOption } from '@/types/climate-variable-interface';
 
 export default function RasterDownloadMap(): React.ReactElement {
 	const { __, _n } = useI18n();
@@ -52,11 +52,31 @@ export default function RasterDownloadMap(): React.ReactElement {
 		}
 	};
 
+	const selectionModeOptions = useMemo(() => {
+		const selectionModes = [
+			{
+				value: 'cells',
+				label: __('Grid cells'),
+			},
+		];
+
+		if (climateVariable?.getDownloadType() !== DownloadType.ANALYZED) {
+			selectionModes.push({
+				value: 'region',
+				label: __('Draw region'),
+			})
+		}
+
+		return selectionModes;
+	}, [climateVariable]);
+
 	return (
 		<>
-			<div className="mb-8 sm:w-64">
-				<InteractiveRegionSelect />
-			</div>
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED && (
+				<div className="mb-8 sm:w-64">
+					<InteractiveRegionSelect />
+				</div>
+			)}
 
 			{climateVariable?.getInteractiveRegion() === InteractiveRegionOption.GRIDDED_DATA && (
 				<div className="mb-4">
@@ -68,17 +88,11 @@ export default function RasterDownloadMap(): React.ReactElement {
 							orientation="horizontal"
 							className="mb-0"
 							optionClassName="me-8"
+							options={selectionModeOptions}
 							onValueChange={(value) => {
 								dispatch(setSelectionMode(value));
 								clearSelection();
 							}}
-							options={[
-								{ value: 'cells', label: __('Grid cells') },
-								{
-									value: 'region',
-									label: __('Draw region'),
-								},
-							]}
 						/>
 						<div className="flex flex-row items-start gap-4">
 							{climateVariable?.getSelectedPointsCount() > 0 && (

@@ -376,7 +376,9 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		});
 
 		// Tooltip content
-		let tooltip = `<b>${startYear} - ${endYear}</b><br/>`;
+		let tooltip = `<b>${startYear} - ${endYear}`;
+		if(prefix === "delta7100_") tooltip += ` (${__('Change from ')} 1971-2000)`;
+		tooltip += `</b><br/>`;
 
 		// Iterate on 30y data
 		Object.keys(data)
@@ -413,14 +415,16 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				padding: 4,
 				formatter: function(this: Point) {
 					const points = (this as unknown as { points?: TooltipPoint[] }).points;
+					const year = new Date(this.x).getFullYear() + 1;
 
-					return points?.map((point: TooltipPoint) => {
-						if (point.series.type === 'arearange') {
-							return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.low)}</b> - <b>${formatValue(point.high)}</b><br/>`;
-						} else {
-							return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.y)}</b><br/>`;
-						}
-					}).join('') || '';
+					return `<b>${year}</b><br/>` + 
+						points?.map((point: TooltipPoint) => {
+							if (point.series.type === 'arearange') {
+								return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.low)}</b> - <b>${formatValue(point.high)}</b><br/>`;
+							} else {
+								return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.y)}</b><br/>`;
+							}
+						}).join('') || '';
 				}
 			},
 			'30-year-averages': {
@@ -543,7 +547,8 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		return formatForFilename(title)
 			+ '-' + formatForFilename(datasetLabel)
 			+ '-' + formatForFilename(climateVariable?.getTitle())
-			+ '-' + formatForFilename(versionLabel);
+			+ '-' + formatForFilename(versionLabel)
+			+ '-' + formatForFilename(activeTab);
 	};
 
 	// Chart options
@@ -558,6 +563,12 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					fontFamily: 'CDCSans',
 				},
 				marginTop: 30,
+				zoomType: 'x',
+				panning: {
+					enabled: true,
+					type: 'x'
+				},
+				panKey: 'shift'
 			},
 			exporting: {
 				filename: getExportFilename(),
@@ -588,9 +599,6 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					dateFormat: '%Y-%m-%d',
 				},
 			},
-			legend: {
-				enabled: false, // using our own legend at the bottom with custom checkboxes
-			},
 			navigator: {
 				enabled: true,
 				adaptToUpdatedData: true,
@@ -618,6 +626,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				series: {
 					...activeChartPlotOptions.series,
 					marker: {
+						enabled: false, // disable in chart and legend
 						symbol: 'circle',
 						radius: 6,
 						lineWidth: 0,
@@ -659,6 +668,59 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		};
 	}, [climateVariable, locale, title, filteredSeries, activeChartTooltip, activeChartPlotOptions]);
 
+	// Export CSV from data
+	const exportCsvFromData = (data: Record<string, Record<string, number[]>>): string => {
+		// Get all ranges
+		const rangesSet = new Set<string>();
+		for (const scenario of Object.values(data)) {
+			Object.keys(scenario).forEach(period => rangesSet.add(period));
+		}
+		const sortedRanges = Array.from(rangesSet).sort();
+	
+		// Headers
+		const headers: string[] = ['DateTime'];
+		const scenarioKeys: { key: string; columns: string[] }[] = [];
+	
+		for (const scenarioName of Object.keys(data)) {
+			const anyValue = Object.values(data[scenarioName])[0];
+			if (anyValue.length === 2) {
+				headers.push(`${scenarioName} (low)`);
+				headers.push(`${scenarioName} (high)`);
+				scenarioKeys.push({ key: scenarioName, columns: ['low', 'high'] });
+			} else {
+				headers.push(scenarioName);
+				scenarioKeys.push({ key: scenarioName, columns: ['value'] });
+			}
+		}
+	
+		// Build rows
+		const rows = sortedRanges.map(range => {
+			const row: (string | number)[] = [range];
+			for (const scenario of scenarioKeys) {
+				const values = data[scenario.key]?.[range];
+	
+				if (!values) {
+					// Empty cell
+					row.push(...scenario.columns.map(() => ''));
+				} else if (scenario.columns.length === 2) {
+					// Range -> two values
+					row.push(values[0], values[1]);
+				} else {
+					// Median value
+					row.push(values[0]);
+				}
+			}
+			return row;
+		});
+	
+		// Convert to CSV string
+		const csvString = [headers, ...rows]
+			.map(row => row.map(cell => `"${cell}"`).join(','))
+			.join('\n');
+	
+		return csvString;
+	};
+
 	// Export method
 	const handleExport = (format: string) => {
 		const chart = chartRef.current?.chart;
@@ -684,9 +746,47 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						}
 					});
 					break;
-				case 'csv':
-					chart.downloadCSV();
-					break;
+					case 'csv':
+						if(activeTab === 'annual-values') {
+							chart.downloadCSV();
+						} else {
+							let prefix = '';
+							if(activeTab === '30-year-averages') {
+								prefix = '30y_';
+							} else if(activeTab === '30-year-changes') {
+								prefix = 'delta7100_';
+							}
+	
+							if(prefix === '') break;
+	
+							// Get only data we want with the rights keys
+							const csvData = Object.keys(data)
+								.filter((key) => key.startsWith(prefix))
+								.reduce((acc: Record<string, Record<string, number[]>>, key) => {
+									const newKey = key.replace(prefix, '');
+									if(!chartDataOptions[newKey]) return acc;
+	
+									acc[chartDataOptions[newKey].name] = Object.fromEntries(
+										Object.entries(data[key] ?? {}).map(([timestamp, value]) => {
+											const year = new Date(Number(timestamp)).getFullYear();
+											return [(year + 1) + "-" + (year + 30), value as number[]];
+										})
+									);
+									return acc;
+								}, {} as Record<string, Record<string, number[]>>);
+	
+							const csvString = exportCsvFromData(csvData);
+	
+							// Trigger download
+							const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+							const link = document.createElement('a');
+							link.href = URL.createObjectURL(blob);
+							link.setAttribute('download', getExportFilename());
+							document.body.appendChild(link);
+							link.click();
+							document.body.removeChild(link);
+						}
+						break;
 				case 'print':
 					chart.print();
 					break;
@@ -787,48 +887,6 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				highcharts={Highcharts} 
 				options={chartOptions} 
 			/>
-
-			{/* toggle visibility of series points */}
-			<div className="flex flex-wrap items-center justify-center gap-4 my-2 mx-12">
-				{filteredSeries.map((s: SeriesOptionsType, index: number) => (
-					<label
-						key={index}
-						className="flex items-center gap-1 cursor-pointer select-none"
-					>
-						{/* toggle input */}
-						<input
-							type="checkbox"
-							checked={s.visible}
-							onChange={() => {
-								setActiveSeries((prev) =>
-									prev.includes(s.custom?.key ?? '')
-										? prev.filter(
-												(key) => key !== s.custom?.key
-											)
-										: [...prev, s.custom?.key ?? '']
-								);
-							}}
-							className="hidden peer"
-						/>
-
-						{/* series dot indicator */}
-						<span
-							className="w-4 h-4 rounded-full"
-							style={{
-								backgroundColor:
-									'color' in s && typeof s.color === 'string'
-										? s.color
-										: 'transparent',
-							}}
-						/>
-
-						{/* series label */}
-						<span className="text-sm text-neutral-grey-medium leading-5 peer-checked:no-underline line-through">
-							{s.name}
-						</span>
-					</label>
-				))}
-			</div>
 		</div>
 	);
 };

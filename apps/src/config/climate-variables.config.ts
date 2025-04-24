@@ -1469,6 +1469,23 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			},
 		},
 	},
+	/** Relative Sea-Level Change */
+	{
+		id: "sea_level",
+		class: "SeaLevelClimateVariable",
+		threshold: "slr",
+		hasDelta: false,
+		dateRange: [
+			"2040",
+			"2050",
+		],
+		dateRangeConfig: {
+			min: "2006",
+			max: "2100",
+			interval: 10
+		},
+		unit: "cm",
+	},
 
 	/** Test variable */
 	{

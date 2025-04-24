@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import * as Slider from '@radix-ui/react-slider';
 import { useI18n } from '@wordpress/react-i18n';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
@@ -12,11 +12,35 @@ import { cn } from '@/lib/utils';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { setTimePeriodEnd } from '@/features/map/map-slice';
 
+// Configuration for special cases
+const SPECIAL_CASES = {
+	sea_level: {
+		minYearOffset: -1, // Subtract one interval from min year
+		forceEndYear: true, // Always use end year
+		displayMinYear: true, // Display actual min year instead of min year +1
+		fixedYearForScenario: {
+			'rcp85plus65-p50': 2100 // Fixed year for this specific scenario
+		} as Record<string, number>
+	}
+} as const;
+
 const TimePeriodsControl: React.FC = () => {
 	const { __ } = useI18n();
 	const dispatch = useAppDispatch();
 	const { climateVariable, setDateRange } = useClimateVariable();
+	const scenario = climateVariable?.getScenario();
 	const timePeriodEnd = useAppSelector(state => state.map.timePeriodEnd);
+	const [sliderLabel, setSliderLabel] = useState<string>('');
+	const [minYearLabel, setMinYearLabel] = useState<string>('');
+
+	// Used for special cases
+	const isSpecialCase = (id: string): id is keyof typeof SPECIAL_CASES => {
+		return id in SPECIAL_CASES;
+	};
+	const getSpecialCaseConfig = () => {
+		const id = climateVariable?.getId();
+		return id && isSpecialCase(id) ? SPECIAL_CASES[id] : null;
+	};
 
 	const { min, max, interval } = climateVariable?.getDateRangeConfig() ?? {
 		min: 1950,
@@ -29,15 +53,41 @@ const TimePeriodsControl: React.FC = () => {
 	const [startYear, endYear] = dateRange ?? ["2040", "2070"];
 
 	// Use map state for the slider
-	const sliderValue = timePeriodEnd && timePeriodEnd.length > 0
-		? timePeriodEnd
-		: [Number(endYear)];
+	const specialCaseConfig = getSpecialCaseConfig();
+	const fixedYearForScenario = scenario && specialCaseConfig?.fixedYearForScenario?.[scenario as string];
+	
+	const sliderValue = fixedYearForScenario 
+		? [fixedYearForScenario]
+		: specialCaseConfig?.forceEndYear 
+			? [Number(endYear)]
+			: timePeriodEnd && timePeriodEnd.length > 0
+				? timePeriodEnd
+				: [Number(endYear)];
 
-	const minYear = Number(min);
+	let minYear = Number(min);
 	const maxYear = Number(max);
 	const intervalYears = interval;
+	
+	// Special case offset if needed
+	if (specialCaseConfig?.minYearOffset) {
+		minYear = Math.floor(minYear / intervalYears) * intervalYears + (intervalYears * specialCaseConfig.minYearOffset);
+	}
+
+	// Set initial values for fixed special case scenario
+	useEffect(() => {
+		if (fixedYearForScenario) {
+			dispatch(setTimePeriodEnd([fixedYearForScenario]));
+			setDateRange([
+				(fixedYearForScenario - intervalYears).toString(),
+				fixedYearForScenario.toString(),
+			]);
+		}
+	}, [fixedYearForScenario, dispatch, intervalYears, setDateRange]);
 
 	const handleChange = (values: number[]) => {
+		// If we have a fixed year for this scenario, don't allow changes
+		if (fixedYearForScenario) return;
+
 		let newEnd = values[0];
 
 		if (newEnd < minYear + intervalYears) {
@@ -47,15 +97,51 @@ const TimePeriodsControl: React.FC = () => {
 			newEnd = maxYear;
 		}
 
+		let newEndStr = newEnd.toString();
+		// Handle special case where end year is below min
+		if (newEnd < Number(min)) {
+			newEndStr = min.toString();
+		}
+
 		// Update both map state and climate variable state
 		dispatch(setTimePeriodEnd([newEnd]));
 
 		// Update climate variable state with the new date range
 		setDateRange([
 			(newEnd - intervalYears).toString(),
-			newEnd.toString(),
+			newEndStr,
 		]);
 	};
+
+	// Set min year label
+	useEffect(() => {
+		if (minYear) {
+			if (specialCaseConfig?.displayMinYear) {
+				setMinYearLabel(min.toString());
+			} else {
+				/* For display purposes we add 1, e.g. 1951 - 2100. */
+				setMinYearLabel((minYear + 1).toString());
+			}
+		}
+	}, [climateVariable, min, minYear, specialCaseConfig]);
+
+	// Set slider label
+	useEffect(() => {
+		if (startYear && endYear) {
+			if (scenario === 'rcp85plus65-p50') {
+				setSliderLabel('2100');
+			} else if (specialCaseConfig?.displayMinYear) {
+				if (endYear < min) {
+					setSliderLabel(min.toString());
+				} else {
+					setSliderLabel(endYear);
+				}
+			} else {
+				/* For display purposes we add 1, e.g. 1951 - 2100. */
+				setSliderLabel(`${(Number(startYear) + 1)} - ${endYear}`);
+			}
+		}
+	}, [climateVariable, startYear, endYear, min, specialCaseConfig, scenario]);
 
 	return (
 		<SidebarMenuItem>
@@ -67,13 +153,15 @@ const TimePeriodsControl: React.FC = () => {
 				<Slider.Root
 					className={cn(
 						'relative flex items-center select-none',
-						'mt-14 [touch-action:none]'
+						'mt-14 [touch-action:none]',
+						fixedYearForScenario && 'opacity-50 cursor-not-allowed'
 					)}
 					value={sliderValue}
 					onValueChange={handleChange}
 					min={minYear + intervalYears}
 					max={maxYear}
 					step={10}
+					disabled={!!fixedYearForScenario}
 				>
 					<Slider.Track
 						className={cn(
@@ -105,8 +193,7 @@ const TimePeriodsControl: React.FC = () => {
 								'flex items-center pointer-events-none'
 							)}
 						>
-							{/* For display purposes we add 1, e.g. 2041 - 2070. */}
-							{Number(startYear) + 1} - {endYear}
+							{sliderLabel}
 							<div
 								className={cn(
 									'slider-range-tooltip',
@@ -119,8 +206,7 @@ const TimePeriodsControl: React.FC = () => {
 					</Slider.Thumb>
 				</Slider.Root>
 				<div className="flex justify-between mt-2.5 text-sm">
-					{/* For display purposes we add 1, e.g. 1951 - 2100. */}
-					<span>{minYear + 1}</span>
+					<span>{minYearLabel}</span>
 					<span>{maxYear}</span>
 				</div>
 			</div>

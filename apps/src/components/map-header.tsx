@@ -133,8 +133,8 @@ const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
 
 	return (
 		<div className="flex items-center gap-2 breadcrumb">
-			{datasetName && <span className='breadcrumb-item'>{datasetName}</span>}
-			{datasetName && variableTitle && <span className='breadcrumb-item breadcrumb-separator'>/</span>}
+			{datasetName && <span className='hidden md:inline'>{datasetName}</span>}
+			{datasetName && variableTitle && <span className='hidden md:inline'>/</span>}
 			{variableTitle && (
 				<Button
 					variant="ghost"

@@ -289,10 +289,3 @@
 		transform: scale(1);
 	}
 }
-
-@media (max-width: 639px) {
-	/* Mobile-specific styles go here */
-	.breadcrumb .breadcrumb-item {
-		display: none;
-	}
-}

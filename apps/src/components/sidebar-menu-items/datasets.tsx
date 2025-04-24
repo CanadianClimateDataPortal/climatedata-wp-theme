@@ -99,7 +99,7 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 	useEffect(() => {
 		// Fetch datasets only once when component mounts
 		(async () => {
-			const fetchedDatasets = await fetchTaxonomyData(slug);
+			const fetchedDatasets = await fetchTaxonomyData(slug, 'map');
 			setDatasets(fetchedDatasets);
 
 			if (fetchedDatasets.length > 0 && !selected) {

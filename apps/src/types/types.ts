@@ -5,6 +5,7 @@ import { buttonVariants } from '@/lib/format';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { LucideIcon } from 'lucide-react';
 import L from 'leaflet';
+import { ClimateVariableConfigInterface } from '@/types/climate-variable-interface';
 
 /**
  * Represents valid locale values.
@@ -293,7 +294,7 @@ export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 export interface ButtonProps
 	extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-		VariantProps<typeof buttonVariants> {
+	VariantProps<typeof buttonVariants> {
 	asChild?: boolean;
 }
 
@@ -548,8 +549,8 @@ export interface ChoroValuesOptions {
 
 export interface ColourScheme {
 	type: string;
-	colours: string[],
-	quantities?: number[],
+	colours: string[];
+	quantities?: number[];
 }
 
 // A translatable string object with English and French variants
@@ -589,8 +590,8 @@ export interface DatasetTerm {
 }
 
 /**
-* Represents the structure used as props for MapInfo component.
-*/
+ * Represents the structure used as props for MapInfo component.
+ */
 export interface MapInfoData {
 	title: LocalizedString;
 	tagline: LocalizedString;
@@ -606,9 +607,9 @@ export interface MapInfoData {
  * Represents the properties of the VariableFilterCount component.
  */
 export interface VariableFilterCountProps {
-    filteredCount: number;
-    totalCount: number;
-    className?: string;
+	filteredCount: number;
+	totalCount: number;
+	className?: string;
 }
 
 // -----------------------------------------------------------------------------
@@ -693,3 +694,39 @@ export interface DownloadDropdownProps<T = string> // generic default type is st
 	tooltip?: string | React.ReactNode;
 	onChange: (key: string, value: string) => void;
 }
+
+/**
+ * Defines the configuration for mapping state keys to URL parameters.
+ */
+export type URLParamConfig<T extends keyof ClimateVariableConfigInterface> = {
+	urlKey: string;
+	transform?: {
+		toURL?: <V extends NonNullable<ClimateVariableConfigInterface[T]>>(
+			value: V
+		) => string;
+		fromURL?: (value: string) => ClimateVariableConfigInterface[T];
+	};
+};
+
+/**
+ * Represents climate variable state for URL state management.
+ */
+export type ClimateVariableState = {
+	data?: Partial<ClimateVariableConfigInterface> | null;
+	searchQuery?: string;
+};
+
+/**
+ * Represents partial state for URL state management.
+ */
+export type PartialState = {
+	climateVariable?: ClimateVariableState;
+	map?: Partial<MapState>;
+};
+
+/**
+ * Type for map action creators used in URL state hook.
+ */
+export type MapActionType = {
+	[key: string]: (value: any) => { type: string; payload: any };
+};

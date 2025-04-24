@@ -40,12 +40,26 @@ function cdc_rest_v3_get_datasets_list( $request ) {
 		// Get pagination parameters.
 		$terms_per_page = $request->get_param( 'terms_per_page' );
 		$paged          = $request->get_param( 'paged' );
+		$app            = $request->get_param( 'app' );
 
 		// Get all variable dataset terms.
 		$args = array(
 			'taxonomy'   => 'variable-dataset',
 			'hide_empty' => false,
 		);
+
+		// Exclude 'ahccd' dataset type if 'map' app is requested.
+		if ( ! empty( $app ) && 'map' === $app ) {
+			$meta_query = array(
+				array(
+					'key'     => 'dataset_type',
+					'value'   => 'ahccd',
+					'compare' => '!=',
+				),
+			);
+
+			$args['meta_query'] = $meta_query;
+		}
 
 		// Only add 'number' and offset if not requesting all items.
 		if ( $terms_per_page !== -1 ) {
@@ -174,7 +188,7 @@ function cdc_rest_v3_get_datasets_list( $request ) {
  * Get the arguments for the datasets list REST API endpoint.
  *
  * This function returns an array of arguments for the datasets list
- * endpoint, including pagination parameters. Each argument includes
+ * endpoint, including pagination parameters and app type. Each argument includes
  * a description, type, default value, and a sanitize callback.
  *
  * @return array The arguments for the datasets list endpoint.
@@ -194,6 +208,12 @@ function cdc_rest_v3_get_datasets_args() {
 			'default'           => 1,
 			'minimum'           => 1,
 			'sanitize_callback' => 'absint',
+		),
+		'app'                      => array(
+			'description' => 'Filter by app type (map or download)',
+			'type'        => 'string',
+			'enum'        => array( 'map', 'download' ),
+			"required"    => true,
 		),
 	);
 }

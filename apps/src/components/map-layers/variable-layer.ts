@@ -118,9 +118,10 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 				params
 			);
 			newLayer.addTo(map);
+			newLayer.setOpacity(mapData);
 			layerRef.current = newLayer;
 		}
-	}, [layerValue, map, climateVariable, startYear, pane, generateSLD]);
+	}, [layerValue, map, climateVariable, startYear, pane, generateSLD, mapData]);
 
 	useEffect(() => {
 		if (layerRef.current) {

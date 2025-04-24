@@ -121,7 +121,7 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			newLayer.setOpacity(mapData);
 			layerRef.current = newLayer;
 		}
-	}, [layerValue, map, climateVariable, startYear, pane, generateSLD, mapData]);
+	}, [layerValue, map, climateVariable, startYear, pane, generateSLD]);
 
 	useEffect(() => {
 		if (layerRef.current) {

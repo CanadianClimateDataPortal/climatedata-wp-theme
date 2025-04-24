@@ -285,6 +285,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 
 		// @ts-expect-error: suppress leaflet typescript error
 		const layer = L.vectorGrid.protobuf(tileLayerUrl, layerOptions);
+		layer.setOpacity(mapData);
 		layerRef.current = layer;
 
 		layer.on('click', handleClick);

@@ -167,19 +167,6 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			}
 
 			{isDownloadTypeAnalyzed
-				&& averagingOptions.length > 0
-				&& climateVariable?.getFrequency() !== FrequencyType.DAILY
-				&& <RadioGroupFactory
-					name="temporal-frequency"
-					className="max-w-md mb-8"
-					optionClassName="w-1/2"
-					options={averagingOptions}
-					value={climateVariable?.getAveragingType() ?? undefined}
-					onValueChange={setAveragingType}
-				/>
-			}
-
-			{isDownloadTypeAnalyzed
 				&& formattedModelOptions.length > 0
 				&& <RadioGroupFactory
 					name="models"
@@ -247,6 +234,19 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 				onValueChange={setFrequency}
 				className={"sm:w-64 mb-4"}
 			/>
+
+			{isDownloadTypeAnalyzed
+				&& averagingOptions.length > 0
+				&& climateVariable?.getFrequency() !== FrequencyType.DAILY
+				&& <RadioGroupFactory
+					name="averaging-options"
+					className="max-w-md mb-8"
+					optionClassName="w-1/2"
+					options={averagingOptions}
+					value={climateVariable?.getAveragingType() ?? undefined}
+					onValueChange={setAveragingType}
+				/>
+			}
 		</StepContainer>
 	);
 });

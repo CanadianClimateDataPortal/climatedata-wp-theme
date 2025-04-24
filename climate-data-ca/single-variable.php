@@ -57,7 +57,7 @@ if (have_posts()) : while (have_posts()) : the_post();
                 $var_type = $var_type[0]->slug;
             }
         
-            if ($var_type != 'station-data' && get_field('var_name') != 'slr') {
+            if ($var_type != 'station-data' && get_field('var_name') != 'slr' && get_field('var_name') != 'allowance') {
         
         ?>
 
@@ -619,7 +619,10 @@ if (have_posts()) : while (have_posts()) : the_post();
 
         <?php
 
-    } elseif (isset ($_GET['content']) && $_GET['content'] == 'slr-location') {
+    } elseif (
+		isset ($_GET['content']) &&
+		($_GET['content'] == 'slr-location' || $_GET['content'] == 'allowance-location')
+	) {
 
         // 2. ajax request for variable data by location
         //    (a grid square was clicked on variable map)
@@ -812,7 +815,7 @@ if (have_posts()) : while (have_posts()) : the_post();
             $var_type = $var_type[0]->slug;
         }
 
-        if ($var_type != 'station-data' && get_field('var_name') != 'slr') {
+        if ($var_type != 'station-data' && get_field('var_name') != 'slr' && get_field('var_name') != 'allowance') {
 
         ?>
 

@@ -6,25 +6,13 @@
 
 */
 
-if (!empty ($GLOBALS['vars']['current_data']) && $GLOBALS['vars']['current_data']['type'] == 'variable') {
-	$var_name = $GLOBALS['vars']['current_data']['var_name'];
-	if ($var_name == 'slr' || $var_name == 'allowance') {
-		if (isset ( $_GET['rcp'])){
-			$query='?rcp=' . $_GET['rcp'] . '-p50';
-		} else {
-			$query='';
-		}
-		wp_redirect(get_permalink( get_page_by_path( "explore/variable/$var_name" )) . $query );
-		exit;
-	}
-}
-
 function tpl_enqueue()
 {
 
     wp_enqueue_script('highcharts-highstock');
     wp_enqueue_script('highcharts-more');
     wp_enqueue_script('highcharts-exporting');
+    wp_enqueue_script('highcharts-offline-exporting');
     wp_enqueue_script('highcharts-export-data');
 
     wp_enqueue_script('leaflet');
@@ -36,7 +24,7 @@ function tpl_enqueue()
     wp_enqueue_script('sync');
     wp_enqueue_script('nearest');
 
-    wp_enqueue_script('variable-functions');
+    wp_enqueue_script('allowance-functions');
 
     // page tour
 
@@ -54,35 +42,26 @@ add_action('wp_enqueue_scripts', 'tpl_enqueue');
 
 get_header();
 
-echo render_variables_fields(['slr', 'allowance']);
+
+?>
+
+
+
+<?php
+
 
 if (have_posts()) : while (have_posts()) : the_post();
-
-    $post = get_post($GLOBALS['vars']['current_data']['var_name']);
-
-
-    setup_postdata($post);
-
-    if (isset ($GLOBALS['vars']['current_data']['var_name'])) {
-        $post_id = $GLOBALS['vars']['current_data']['id'];
-    }
-
-    $fields = get_field_objects( $post_id );
-
-
 
     ?>
 
 
-    <main id="variable-content" data-variable="<?php the_field('var_name'); ?>">
-
-        <input type="hidden" id="varPostID" value="<?=$post_id?>"></input>
+    <main id="variable-content">
 
         <div id="map1"></div>
 
         <?php
 
-        $show_right = false;
+        $show_right = true;
 
         while (have_rows('variable_filters')) {
             the_row();
@@ -104,14 +83,23 @@ if (have_posts()) : while (have_posts()) : the_post();
             <?php
 
         }
+?>
+        <div class="map-filters container-fluid">
+        <div id="var-sliders" class="map-sliders row align-items-end">
 
-//        if (have_rows('variable_sliders')) {
 
-            include(locate_template('template/variable/sliders.php'));
+                    <div class="filter-container slider-container col-7 offset-1">
+                        <h6>Time period</h6>
 
-//        }
+                        <div id="range-slider-container" class="decade-slider-container" data-default="2100">
+                            <input id="range-slider" class="decade-slider">
+                        </div>
+                    </div>
 
-        ?>
+
+        </div>
+        </div>
+
 
         <div id="map-controls">
             <span id="zoom-in" class="zoom">+</span> <span id="zoom-out" class="zoom">-</span>
@@ -147,7 +135,12 @@ if (have_posts()) : while (have_posts()) : the_post();
 
         <?php
 
-    }
+    } else {
+?>
+       <div class="page-tour" style="display:none;"></div>
+<?php
+     }
+
 
     //
     // SECTIONS LOOP

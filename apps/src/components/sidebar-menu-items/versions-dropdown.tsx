@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useI18n } from "@wordpress/react-i18n";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 
@@ -12,9 +12,10 @@ import appConfig from "@/config/app.config"
 const VersionsDropdown: React.FC = () => {
 	const { climateVariable, setVersion } = useClimateVariable();
 	const { __ } = useI18n();
-	const options = appConfig.versions.filter((version) =>
+
+	const options = useMemo(() => appConfig.versions.filter((version) =>
 		climateVariable?.getVersions()?.includes(version.value)
-	);
+	), [climateVariable]);
 
 	const Tooltip = () => (
 		<div className="text-sm text-gray-500">

@@ -45,7 +45,7 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 			setPanelProps({
 				direction: 'right',
 				position: {
-					top: ref.current?.getBoundingClientRect().bottom || 0,
+					top: ref.current?.getBoundingClientRect().top || 0,
 					left: 0,
 				},
 			});
@@ -133,13 +133,13 @@ const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
 	}, [climateVariable]);
 
 	return (
-		<div className="flex items-center gap-2">
-			{datasetName && <span>{datasetName}</span>}
-			{datasetName && variableTitle && <span>/</span>}
+		<div className="flex items-center gap-2 breadcrumb">
+			{datasetName && <span className='hidden md:inline'>{datasetName}</span>}
+			{datasetName && variableTitle && <span className='hidden md:inline'>/</span>}
 			{variableTitle && (
 				<Button
 					variant="ghost"
-					className="text-md text-cdc-black hover:text-dark-purple hover:bg-transparent p-0 h-auto"
+					className="breadcrumb-button text-md text-cdc-black hover:text-dark-purple hover:bg-transparent p-0 h-auto"
 					onClick={onClick}
 					aria-label={__('View details')}
 				>

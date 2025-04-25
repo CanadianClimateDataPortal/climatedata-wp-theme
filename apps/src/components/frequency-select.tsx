@@ -46,6 +46,23 @@ const FrequencySelect = ({
 	const hasSeasons = isFrequencyEnabled(config, section, FrequencyType.SEASONAL);
 	const hasDaily = isFrequencyEnabled(config, section, FrequencyType.DAILY);
 
+	let selectValue = value
+	if (!selectValue) {
+		if (hasAnnual) {
+			selectValue = FrequencyType.ANNUAL;
+		} else if (hasAnnualJulJun) {
+			selectValue = FrequencyType.ANNUAL_JUL_JUN
+		} else if (hasDaily) {
+			selectValue = FrequencyType.DAILY;
+		} else if (hasAllMonths) {
+			selectValue = FrequencyType.ALL_MONTHS
+		} else if (hasMonths) {
+			selectValue = "jan"
+		} else if (hasSeasons) {
+			selectValue = "spring";
+		}
+	}
+
 	const months = [
 		{ label: __('January'), value: 'jan' },
 		{ label: __('February'), value: 'feb' },
@@ -104,7 +121,7 @@ const FrequencySelect = ({
 	return (
 		<div className={cn('dropdown z-50', className)}>
 			<ControlTitle title={__(title)} tooltip={tooltip}/>
-			<Select value={value} onValueChange={onValueChange}>
+			<Select value={selectValue} onValueChange={onValueChange}>
 				<SelectTrigger
 					className="w-full focus:ring-0 focus:ring-offset-0 text-cdc-black [&>svg]:text-brand-blue [&>svg]:opacity-100">
 					<SelectValue placeholder={placeholder && __(placeholder)}/>

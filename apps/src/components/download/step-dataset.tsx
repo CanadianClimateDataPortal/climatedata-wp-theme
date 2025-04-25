@@ -38,7 +38,7 @@ const StepDataset = React.forwardRef<StepComponentRef>((_, ref) => {
 	}), [dataset]);
 
 	useEffect(() => {
-		fetchTaxonomyData('datasets').then((data) => {
+		fetchTaxonomyData('datasets', 'download').then((data) => {
 			setOptions(data);
 		});
 	}, []);

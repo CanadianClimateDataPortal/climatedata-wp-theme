@@ -112,7 +112,7 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			format: OWS_FORMAT,
 			transparent: true,
 			tiled: true,
-			version: datasetVersion ? '1.3.0' : '1.1.1',
+			version: datasetVersion === 'cmip6' ? '1.3.0' : '1.1.1',
 			layers: layerValue,
 			styles: layerStyles,
 			TIME: parseInt(startYear) + '-01-00T00:00:00Z',

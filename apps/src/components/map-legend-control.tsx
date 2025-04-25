@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
 
@@ -21,9 +21,26 @@ const MapLegendControl: React.FC<{
 }> = ({ data, isOpen, toggleOpen }) => {
 	const { __ } = useI18n();
 
+	// Responsive legend height
+	const [legendHeight, setLegendHeight] = useState<number>(LEGEND_HEIGHT);
+
+	useEffect(() => {
+		function handleResize() {
+			if (window.innerWidth < 768) {
+				// 60% of viewport height for mobile
+				setLegendHeight(Math.max(180, Math.floor(window.innerHeight * 0.6)));
+			} else {
+				setLegendHeight(LEGEND_HEIGHT);
+			}
+		}
+		handleResize();
+		window.addEventListener('resize', handleResize);
+		return () => window.removeEventListener('resize', handleResize);
+	}, []);
+
 	// TODO: all these calculations were made so that we could match the design as closely as possible
 	//  because the space between the labels is larger than in the original implementation.. confirm this is correct
-	const GRADIENT_HEIGHT = LEGEND_HEIGHT - PADDING_TOP - PADDING_BOTTOM;
+	const GRADIENT_HEIGHT = legendHeight - PADDING_TOP - PADDING_BOTTOM;
 	const ITEM_HEIGHT = GRADIENT_HEIGHT / (data.length - 1);
 
 	const reducedLabels = useMemo(() => {
@@ -53,7 +70,7 @@ const MapLegendControl: React.FC<{
 						°C
 					</div>
 
-					<svg width={LEGEND_WIDTH} height={LEGEND_HEIGHT}>
+					<svg width={LEGEND_WIDTH} height={legendHeight}>
 						<defs>
 							<linearGradient
 								id="temperatureGradient"
@@ -72,7 +89,7 @@ const MapLegendControl: React.FC<{
 
 						<rect
 							width={GRADIENT_WIDTH}
-							height={LEGEND_HEIGHT}
+							height={legendHeight}
 							fill="url(#temperatureGradient)"
 							x="35"
 						/>

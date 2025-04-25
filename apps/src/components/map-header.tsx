@@ -46,6 +46,7 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 				direction: 'right',
 				position: {
 					top: ref.current?.getBoundingClientRect().bottom || 0,
+					left: 0,
 				},
 			});
 		}

@@ -13,9 +13,9 @@ import VariableRadioCards from '@/components/variable-radio-cards';
 import VariableFilterCount from '@/components/sidebar-menu-items/variables';
 import { VariableSearchFilter } from '@/components/variable-search-filter';
 
-import { useClimateVariable } from '@/hooks/use-climate-variable';
-import { StepComponentRef } from '@/types/download-form-interface';
-import SectionContext from '@/context/section-provider';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { StepComponentRef } from "@/types/download-form-interface";
+import SectionContext from "@/context/section-provider";
 import useFilteredVariables from '@/hooks/use-filtered-variables';
 
 /**
@@ -114,7 +114,7 @@ const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
             </div>
 
             <div className="mb-4">
-                <VariableSearchFilter app="download" />
+                <VariableSearchFilter />
             </div>
 
             <div className="w-full mb-4">{renderFilterCount()}</div>

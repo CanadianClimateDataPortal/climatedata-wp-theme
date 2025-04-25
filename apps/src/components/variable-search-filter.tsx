@@ -4,7 +4,7 @@
  * An accessible search input field for filtering variables.
  * Handles keyboard navigation and proper ARIA attributes.
  */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Search, X } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setSearchQuery, selectSearchQuery } from '@/store/climate-variable-slice';
@@ -12,12 +12,9 @@ import { useDebounce } from '@/hooks/use-debounce';
 import { useI18n } from '@wordpress/react-i18n';
 import { setVariableListLoading as setMapVariableListLoading } from '@/features/map/map-slice';
 import { setVariableListLoading as setDownloadVariableListLoading } from '@/features/download/download-slice';
+import SectionContext from "@/context/section-provider";
 
-interface VariableSearchFilterProps {
-  app?: 'map' | 'download';
-}
-
-export const VariableSearchFilter: React.FC<VariableSearchFilterProps> = ({ app = 'map' }) => {
+export const VariableSearchFilter: React.FC = () => {
   const { __ } = useI18n();
   const dispatch = useAppDispatch();
   const globalSearchQuery = useAppSelector(selectSearchQuery);
@@ -26,24 +23,23 @@ export const VariableSearchFilter: React.FC<VariableSearchFilterProps> = ({ app 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { dataset: mapDataset } = useAppSelector((state) => state.map);
   const { dataset: downloadDataset } = useAppSelector((state) => state.download);
-  
-  const dataset = app === 'map' ? mapDataset : downloadDataset;
+  const section = useContext(SectionContext);
+  const dataset = section === 'map' ? mapDataset : downloadDataset;
 
   // Update Redux state when debounced value changes
   useEffect(() => {
     if (debouncedSearchQuery !== globalSearchQuery) {
       dispatch(setSearchQuery(debouncedSearchQuery));
-      
       // If we have a dataset, set loading state to true when search query changes
       if (dataset) {
-        if (app === 'map') {
+        if (section === 'map') {
           dispatch(setMapVariableListLoading(true));
         } else {
           dispatch(setDownloadVariableListLoading(true));
         }
       }
     }
-  }, [debouncedSearchQuery, dispatch, globalSearchQuery, dataset, app]);
+  }, [debouncedSearchQuery, dispatch, globalSearchQuery, dataset, section]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalSearchQuery(e.target.value);
@@ -52,16 +48,14 @@ export const VariableSearchFilter: React.FC<VariableSearchFilterProps> = ({ app 
   const handleClear = () => {
     setLocalSearchQuery('');
     dispatch(setSearchQuery(''));
-    
     // If we have a dataset, set loading state
     if (dataset) {
-      if (app === 'map') {
+      if (section === 'map') {
         dispatch(setMapVariableListLoading(true));
       } else {
         dispatch(setDownloadVariableListLoading(true));
       }
     }
-    
     searchInputRef.current?.focus();
   };
 

@@ -142,7 +142,7 @@ const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
 						/>
 					</Grid>
 					<div className="mt-6">
-						<VariableSearchFilter app="map" />
+						<VariableSearchFilter />
 					</div>
 				</CardHeader>
 				<CardContent className="p-4 pt-0 overflow-y-auto max-h-[calc(100vh-200px)] scrollbar-thin">

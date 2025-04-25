@@ -62,6 +62,7 @@ const grid_resolution = {
     "canadagrid": 1.0/12.0,
     "canadagrid1deg": 1.0,
     "slrgrid": 1.0/10.0,
+    "allowancegrid": 1.0/10.0,
     "era5landgrid": 1.0/10.0,
 };
 

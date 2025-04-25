@@ -72,18 +72,22 @@ export default function RasterMapContainer({
 
 		const frequencyCode = getFrequencyCode(frequency);
 
-		const value = [
-				version,
-				threshold,
-				frequencyCode,
-				scenario,
-				'p50',
-				frequency,
-				'30year',
-				climateVariable?.getDataValue() === 'delta' ? 'delta7100' : '',
-			]
-			.filter(Boolean)
-			.join('-');
+		const valuesArr = [
+			version,
+			threshold,
+			frequencyCode,
+			scenario,
+		];
+		if(climateVariable?.getId() !== "sea_level") {
+			valuesArr.push('p50');
+		}
+		valuesArr.push(
+			frequency,
+			'30year',
+			climateVariable?.getDataValue() === 'delta' ? 'delta7100' : ''
+		);
+
+		const value = valuesArr.filter(Boolean).join('-');
 
 		return `CDC:${value}`;
 	}, [climateVariable])

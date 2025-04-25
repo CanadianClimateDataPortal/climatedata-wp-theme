@@ -20,6 +20,7 @@ import {
 import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
 import RasterPrecalculatedWithDailyFormatsClimateVariable from '@/lib/raster-precalculated-with-daily-formats-climate-variable';
 import RasterAnalyzeClimateVariable from '@/lib/raster-analyze-climate-variable';
+import SeaLevelClimateVariable from '@/lib/sea-level-climate-variable';
 
 export type ClimateVariableContextType = {
 	climateVariable: ClimateVariableInterface | null;
@@ -63,6 +64,7 @@ const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
 	RasterPrecalculatedWithDailyFormatsClimateVariable:
 		RasterPrecalculatedWithDailyFormatsClimateVariable,
 	RasterAnalyzeClimateVariable: RasterAnalyzeClimateVariable,
+	SeaLevelClimateVariable: SeaLevelClimateVariable,
 };
 
 /**

@@ -155,6 +155,7 @@ export default function SearchControl({
 		const searchControl = new L.Control.Search({
 			url: LOCATION_SEARCH_ENDPOINT,
 			propertyLoc: ['lat', 'lon'],
+			autoResize: false,
 			collapsed: false,
 			autoCollapse: false,
 			autoType: false,
@@ -208,8 +209,24 @@ export default function SearchControl({
 			}
 		});
 
+		// Dynamically set the input size attribute based on screen width.
+		// If the screen is less than 520px wide, set the size to 27 (smaller input).
+		// Otherwise, set the size to 48 (default for larger screens).
+		function updateInputSize() {
+			if (searchInput) {
+				if (window.innerWidth < 520) {
+					searchInput.setAttribute('size', '27');
+				} else {
+					searchInput.setAttribute('size', '48'); // Or set to your default
+				}
+			}
+		}
+		updateInputSize();
+		window.addEventListener('resize', updateInputSize);
+
 		return () => {
 			map.removeControl(searchControl);
+			window.removeEventListener('resize', updateInputSize);
 		};
 	}, [map, handleLocationChange, searchControlId, textPlaceholder]);
 

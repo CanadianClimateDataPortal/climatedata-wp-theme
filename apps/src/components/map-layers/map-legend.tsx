@@ -45,7 +45,7 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 		legend.onAdd = () => {
 			const container = L.DomUtil.create(
 				'div',
-				'legend-wrapper top-24 right-5 m-0 !mt-1.5 z-30'
+				'legend-wrapper top-[9rem] md:top-24 right-5 m-0 !mt-1.5 z-30'
 			);
 			const root = createRoot(container);
 

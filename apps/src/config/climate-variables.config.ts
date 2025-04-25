@@ -1475,6 +1475,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "SeaLevelClimateVariable",
 		threshold: "slr",
 		hasDelta: false,
+		enableColourOptions: false,
 		dateRange: [
 			"2040",
 			"2050",

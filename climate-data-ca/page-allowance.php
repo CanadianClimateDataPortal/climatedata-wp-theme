@@ -89,7 +89,7 @@ if (have_posts()) : while (have_posts()) : the_post();
 
 
                     <div class="filter-container slider-container col-7 offset-1">
-                        <h6>Time period</h6>
+                        <h6><?php _e('Time period', 'cdc'); ?></h6>
 
                         <div id="range-slider-container" class="decade-slider-container" data-default="2100">
                             <input id="range-slider" class="decade-slider">

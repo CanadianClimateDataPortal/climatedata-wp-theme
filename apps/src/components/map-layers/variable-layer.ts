@@ -142,7 +142,6 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 		layerStyles,
 		layerValue,
 		map,
-		mapData,
 		pane,
 		startYear
 	]);

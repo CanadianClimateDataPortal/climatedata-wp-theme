@@ -60,7 +60,7 @@ class SeaLevelClimateVariable extends RasterPrecalculatedClimateVariable {
 				[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 				[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.NONE,
 				[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.NONE,
-				[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+				[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.NONE,
 			};
 	}
 

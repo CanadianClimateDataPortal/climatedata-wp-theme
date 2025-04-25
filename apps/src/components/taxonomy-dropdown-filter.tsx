@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 import Dropdown from '@/components/ui/dropdown';
 import { fetchTaxonomyData } from '@/services/services';
 import { useLocale } from '@/hooks/use-locale';
 import { TaxonomyData, DropdownOption } from '@/types/types';
+import SectionContext from '@/context/section-provider';
 
 const TaxonomyDropdownFilter: React.FC<{
 	slug: string;
@@ -23,6 +24,7 @@ const TaxonomyDropdownFilter: React.FC<{
 	className,
 	onFilterChange,
 }) => {
+		const section = useContext(SectionContext);
 		const [options, setOptions] = useState<DropdownOption[]>([]);
 		const [loading, setLoading] = useState(false);
 		const [error, setError] = useState<string | null>(null);
@@ -36,7 +38,7 @@ const TaxonomyDropdownFilter: React.FC<{
 				setError(null);
 
 				try {
-					const data = await fetchTaxonomyData(slug);
+					const data = await fetchTaxonomyData(slug, section);
 
 					const mappedOptions: DropdownOption[] = data.map((option: TaxonomyData) => ({
 						value: String(option.term_id),

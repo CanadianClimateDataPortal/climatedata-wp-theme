@@ -6,16 +6,17 @@
 
 */
 
-if (!empty ($GLOBALS['vars']['current_data']) &&
-    $GLOBALS['vars']['current_data']['type'] == 'variable' &&
-$GLOBALS['vars']['current_data']['var_name'] == 'slr') {
-    if (isset ( $_GET['rcp'])){
-        $query='?rcp=' . $_GET['rcp'] . '-p50';
-    } else {
-        $query='';
-    }
-    wp_redirect(get_permalink( get_page_by_path( 'explore/variable/slr' )) . $query );
-    exit;
+if (!empty ($GLOBALS['vars']['current_data']) && $GLOBALS['vars']['current_data']['type'] == 'variable') {
+	$var_name = $GLOBALS['vars']['current_data']['var_name'];
+	if ($var_name == 'slr' || $var_name == 'allowance') {
+		if (isset ( $_GET['rcp'])){
+			$query='?rcp=' . $_GET['rcp'] . '-p50';
+		} else {
+			$query='';
+		}
+		wp_redirect(get_permalink( get_page_by_path( "explore/variable/$var_name" )) . $query );
+		exit;
+	}
 }
 
 function tpl_enqueue()
@@ -53,7 +54,7 @@ add_action('wp_enqueue_scripts', 'tpl_enqueue');
 
 get_header();
 
-echo render_variables_fields(['slr']);
+echo render_variables_fields(['slr', 'allowance']);
 
 if (have_posts()) : while (have_posts()) : the_post();
 

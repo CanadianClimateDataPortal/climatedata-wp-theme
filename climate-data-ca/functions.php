@@ -102,6 +102,7 @@ function child_theme_enqueue()
     wp_register_script('location-functions', $child_js_dir . 'location-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('variable-functions', $child_js_dir . 'variable-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('slr-functions', $child_js_dir . 'slr-functions.js', array('jquery', 'child-functions'), NULL, true);
+    wp_register_script('allowance-functions', $child_js_dir . 'allowance-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('analyze-functions', $child_js_dir . 'analyze-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('download-functions', $child_js_dir . 'download-functions.js', array('jquery', 'child-functions'), NULL, true);
     wp_register_script('archive-functions', $child_js_dir . 'archive-functions.js', array('jquery', 'child-functions'), NULL, true);

@@ -259,6 +259,8 @@ if (current_user_can('administrator')) {
 
         } elseif ($GLOBALS['vars']['current_slug'] == 'slr' && $post->post_type == 'page') {
             include(locate_template('template/variable/slr-filter.php'));
+        } elseif ($GLOBALS['vars']['current_slug'] == 'allowance' && $post->post_type == 'page') {
+            include(locate_template('template/variable/allowance-filter.php'));
         }
 
         //

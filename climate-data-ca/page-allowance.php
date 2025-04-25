@@ -24,7 +24,7 @@ function tpl_enqueue()
     wp_enqueue_script('sync');
     wp_enqueue_script('nearest');
 
-    wp_enqueue_script('slr-functions');
+    wp_enqueue_script('allowance-functions');
 
     // page tour
 

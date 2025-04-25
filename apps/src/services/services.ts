@@ -119,11 +119,13 @@ export const fetchLegendData = async (url: string) => {
 /**
  * Fetches taxonomy data from the API
  * @param slug - the taxonomy slug
+ * @param app - the section where to load the terms
  * @param filters - the filters to apply to the data
  */
 export const fetchTaxonomyData = async (
 	slug: string,
-	filters?: Record<string, string | number | null>
+	app: 'map'|'download' = 'map',
+	filters?: Record<string, string | number | null>,
 ): Promise<TaxonomyData[]> => {
 	try {
 		// Create cache key based on slug and filters
@@ -139,7 +141,7 @@ export const fetchTaxonomyData = async (
 		if (slug === 'sector' || slug === 'var-type') {
 			// Use datasets-list to get the first dataset
 			const datasetsResponse = await fetch(
-				`${WP_API_DOMAIN}/wp-json/cdc/v3/datasets-list`,
+				`${WP_API_DOMAIN}/wp-json/cdc/v3/datasets-list?app=${app}`,
 				{
 					method: 'GET',
 					headers: {
@@ -164,7 +166,7 @@ export const fetchTaxonomyData = async (
 
 			// Now get variables for this dataset to extract taxonomies
 			const variablesResponse = await fetch(
-				`${WP_API_DOMAIN}/wp-json/cdc/v3/variables-list?app=map&variable_dataset_term_id=${firstDataset.term_id}`,
+				`${WP_API_DOMAIN}/wp-json/cdc/v3/variables-list?app=${app}&variable_dataset_term_id=${firstDataset.term_id}`,
 				{
 					method: 'GET',
 					headers: {
@@ -210,7 +212,7 @@ export const fetchTaxonomyData = async (
 		}
 
 		// For other taxonomies, use the normal pattern
-		const url = `${WP_API_DOMAIN}/wp-json/cdc/v3/${slug}-list`;
+		const url = `${WP_API_DOMAIN}/wp-json/cdc/v3/${slug}-list?app=${app}`;
 
 		// Fetch data from the API
 		const response = await fetch(url, {

@@ -100,7 +100,7 @@ const VariableRadioCards: React.FC<{
 							const firstItem = filteredList.length > 0 ?
 								filteredList[0] : normalizedData[0];
 							onSelect(firstItem);
-							selectClimateVariable(firstItem);
+							selectClimateVariable(firstItem, dataset);
 						}
 					}
 				} catch (error) {
@@ -129,13 +129,13 @@ const VariableRadioCards: React.FC<{
 		useEffect(() => {
 			if (!variableListLoading && filteredList.length > 0 && !selected && !fetchingRef.current) {
 				onSelect(filteredList[0]);
-				selectClimateVariable(filteredList[0]);
+				selectClimateVariable(filteredList[0], dataset);
 			}
 		}, [filteredList, variableListLoading, selected, onSelect, selectClimateVariable]);
 
 		const handleVariableSelect = (variable: PostData) => {
 			onSelect(variable);
-			selectClimateVariable(variable);
+			selectClimateVariable(variable, dataset);
 			// Close the VariableDetailsPanel if open
 			if (isValidElement(activePanel)) {
 				closePanel();

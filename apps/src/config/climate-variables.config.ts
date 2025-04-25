@@ -1486,33 +1486,4 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 		unit: "cm",
 	},
-
-	/** Test variable */
-	{
-		id: "test_variable",
-		class: "ClimateVariableBase",
-
-		versions: [
-			"cmip6",
-			"cmip5",
-		],
-		thresholds: [
-			{
-				value: "tx_max",
-				label: "",
-			}
-		],
-		scenarios: {
-			cmip5: [
-				"rcp26",
-				"rcp45",
-				"rcp85",
-			],
-			cmip6: [
-				"ssp126",
-				"ssp245",
-				"ssp585",
-			],
-		},
-	},
 ];

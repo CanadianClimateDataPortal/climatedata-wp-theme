@@ -29,7 +29,7 @@ import { useSidebar } from '@/hooks/use-sidebar';
 import { useLocale } from '@/hooks/use-locale';
 import { fetchTaxonomyData } from '@/services/services';
 import { InteractivePanelProps, TaxonomyData } from '@/types/types';
-import { setDataset, setVariableList, setVariableListLoading } from '@/features/map/map-slice';
+import { setVariableList, setVariableListLoading } from '@/features/map/map-slice';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { fetchPostsData } from '@/services/services';
 import { normalizePostData } from '@/lib/format';
@@ -78,7 +78,6 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 	const { selectClimateVariable } = useClimateVariable();
 
 	const handleDatasetSelect = useCallback(async (dataset: TaxonomyData) => {
-		dispatch(setDataset(dataset));
 		onSelect(dataset);
 		dispatch(setVariableListLoading(true));
 		dispatch(setVariableList([]));
@@ -92,7 +91,7 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 
 		// Select the first variable if available
 		if (variables.length > 0) {
-			selectClimateVariable(variables[0]);
+			selectClimateVariable(variables[0], dataset);
 		}
 	}, [dispatch, onSelect, selectClimateVariable, locale]);
 
@@ -100,7 +99,7 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 	useEffect(() => {
 		// Fetch datasets only once when component mounts
 		(async () => {
-			const fetchedDatasets = await fetchTaxonomyData(slug);
+			const fetchedDatasets = await fetchTaxonomyData(slug, 'map');
 			setDatasets(fetchedDatasets);
 
 			if (fetchedDatasets.length > 0 && !selected) {

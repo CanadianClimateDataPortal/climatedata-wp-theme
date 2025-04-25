@@ -375,7 +375,7 @@
         }
 
         function addGrid(gridName) {
-            if (gridName === 'slrgrid') {
+            if (gridName === 'slrgrid-cmip6' || gridName === 'slrgrid' || gridName === 'allowancegrid') {
                 var vectorTileOptions = {
 
                     rendererFactory: L.canvas.tile,
@@ -385,23 +385,21 @@
                     getFeatureId: function (f) {
                         return f.properties.gid;
                     },
-
+                    vectorTileLayerStyles: {},
                     maxNativeZoom: 12,
-                    vectorTileLayerStyles: {
-                        'slrgrid': function (properties, zoom) {
-                            return {
-                                weight: 0.2,
-                                color: '#89cff0',
-                                opacity: 1,
-                                fill: true,
-                                radius: 4,
-                                fillOpacity: 0
-                            }
-                        }
-                    },
                     maxZoom: 12,
                     minZoom: 7,
                     pane: 'grid',
+                };
+                vectorTileOptions.vectorTileLayerStyles[gridName] = function (properties, zoom) {
+                    return {
+                        weight: 0.2,
+                        color: '#89cff0',
+                        opacity: 1,
+                        fill: true,
+                        radius: 4,
+                        fillOpacity: 0
+                    }
                 };
             } else {
                 var vectorTileOptions = {

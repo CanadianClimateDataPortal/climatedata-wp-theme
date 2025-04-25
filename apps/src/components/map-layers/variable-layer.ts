@@ -45,7 +45,24 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
-	const [ startYear ] = useMemo(() => climateVariable?.getDateRange() ?? [], [climateVariable]);
+
+	const {
+		startYear,
+		colourScheme,
+		colourMapType,
+		datasetVersion,
+		layerStyles,
+		interactiveRegion
+	} = useMemo(() => {
+		return {
+			startYear: climateVariable?.getDateRange()?.[0] ?? '2040',
+			colourScheme: climateVariable ? generateColourScheme(climateVariable) : undefined,
+			colourMapType: climateVariable?.getColourType() ?? ColourType.CONTINUOUS,
+			datasetVersion: climateVariable?.getVersion(),
+			layerStyles: climateVariable?.getLayerStyles(),
+			interactiveRegion: climateVariable?.getInteractiveRegion()
+		};
+	}, [climateVariable]);
 
 	const layerRef = useRef<L.TileLayer.WMS | null>(null);
 
@@ -54,11 +71,6 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 	 * ramp quantities, and layer value.
 	 */
 	const generateSLD = useCallback(() => {
-		if (!climateVariable) {
-			return;
-		}
-
-		const colourScheme = generateColourScheme(climateVariable);
 		if (!colourScheme) {
 			return;
 		}
@@ -67,8 +79,6 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 		if (!quantities || !quantities.length) {
 			return
 		}
-
-		const colourMapType = climateVariable.getColourType() ?? ColourType.CONTINUOUS;
 
 		let sldBody = `<?xml version="1.0" encoding="UTF-8"?>
 			<StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"
@@ -85,7 +95,11 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			'</ColorMap></RasterSymbolizer></Rule></FeatureTypeStyle></UserStyle></NamedLayer></StyledLayerDescriptor>';
 
 		return sldBody;
-	}, [climateVariable, layerValue])
+	}, [
+		colourMapType,
+		colourScheme,
+		layerValue
+	])
 
 	useEffect(() => {
 		if (layerRef.current) {
@@ -98,9 +112,9 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			format: OWS_FORMAT,
 			transparent: true,
 			tiled: true,
-			version: climateVariable?.getVersion() === 'cmip6' ? '1.3.0' : '1.1.1',
+			version: datasetVersion ? '1.3.0' : '1.1.1',
 			layers: layerValue,
-			styles: climateVariable?.getLayerStyles(),
+			styles: layerStyles,
 			TIME: parseInt(startYear) + '-01-00T00:00:00Z',
 			opacity: 1,
 			pane: pane,
@@ -112,7 +126,7 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 		}
 
 		// Create a new layer to override the previous one so changes on the layer can be seen on the map.
-		if (climateVariable?.getInteractiveRegion() === InteractiveRegionOption.GRIDDED_DATA) {
+		if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
 			const newLayer = L.tileLayer.wms(
 				GEOSERVER_BASE_URL + '/geoserver/ows?',
 				params
@@ -121,7 +135,17 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			newLayer.setOpacity(mapData);
 			layerRef.current = newLayer;
 		}
-	}, [layerValue, map, climateVariable, startYear, pane, generateSLD]);
+	}, [
+		datasetVersion,
+		generateSLD,
+		interactiveRegion,
+		layerStyles,
+		layerValue,
+		map,
+		mapData,
+		pane,
+		startYear
+	]);
 
 	useEffect(() => {
 		if (layerRef.current) {

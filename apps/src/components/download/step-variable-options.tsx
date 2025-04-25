@@ -23,7 +23,7 @@ const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
 				return false;
 			}
 
-			const version = climateVariable.getVersion() ?? null;
+			const version = climateVariable.getVersion() ?? true;
 			const fields = climateVariable.getAnalysisFields() ?? [];
 			const values = climateVariable.getAnalysisFieldValues() ?? {};
 

@@ -21,20 +21,21 @@ const EmissionScenariosControl: React.FC = () => {
 	const { __ } = useI18n();
 	const { climateVariable, setScenario, setScenarioCompare, setScenarioCompareTo } = useClimateVariable();
 
+	const scenarioOptions = appConfig.scenarios.filter((scenario) =>
+		climateVariable?.getScenarios()?.includes(scenario.value)
+	);
+
 	const Tooltip = () => (
 		<div className="text-sm text-gray-500">
 			{__('Select an emission scenario.')}
 		</div>
 	);
 
-	const scenarioOptions = appConfig.scenarios.filter((scenario) =>
-		climateVariable?.getScenarios()?.includes(scenario.value)
-	);
-
 	return (
 		<SidebarMenuItem>
 			<div className="flex flex-col gap-4">
 				<Dropdown
+					key={climateVariable?.getId()}
 					label={__('Emissions Scenarios')}
 					tooltip={<Tooltip />}
 					placeholder={__('Select an option')}
@@ -62,6 +63,7 @@ const EmissionScenariosControl: React.FC = () => {
 
 				{climateVariable?.getScenarioCompare() && (
 					<Dropdown
+						key={climateVariable?.getId() + '_compare'}
 						options={scenarioOptions.filter(
 							(option) => option.value !== climateVariable?.getScenario()
 						) ?? []}

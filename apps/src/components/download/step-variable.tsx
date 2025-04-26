@@ -83,7 +83,7 @@ const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
       const hasCurrent = currentId != null && filteredList.some(v => v.id === currentId);
       if (!hasCurrent) {
         // select first available variable by default
-        selectClimateVariable(filteredList[0]);
+        selectClimateVariable(filteredList[0], dataset);
       }
     }, [dataset, filteredList, climateVariable, selectClimateVariable]);
 

@@ -511,8 +511,8 @@ export interface ChartDataOptions {
 
 export interface DeltaValuesOptions {
 	endpoint: string;
-	varName: string;
-	frequency: string;
+	varName: string | null;
+	frequency: string | null;
 	params: string;
 }
 

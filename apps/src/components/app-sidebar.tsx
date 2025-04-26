@@ -26,6 +26,7 @@ import { ThresholdValuesDropdown } from '@/components/sidebar-menu-items/thresho
 import { InteractiveRegionsMenuItem } from '@/components/sidebar-menu-items/interactive-regions-menu-item';
 import { FrequenciesDropdown } from '@/components/sidebar-menu-items/frequencies-dropdown';
 import { TimePeriodsControl } from '@/components/sidebar-menu-items/time-periods-control';
+import { TimePeriodsControlForSeaLevel } from '@/components/sidebar-menu-items/time-periods-control-for-sea-level';
 import { DataValuesControl } from '@/components/sidebar-menu-items/data-values-control';
 import { MapColorsDropdown } from '@/components/sidebar-menu-items/map-colors-dropdown';
 import { VersionsDropdown } from "@/components/sidebar-menu-items/versions-dropdown";
@@ -119,7 +120,11 @@ export function AppSidebar() {
 									<FrequenciesDropdown />
 									<SidebarSeparator />
 
-									<TimePeriodsControl />
+									{climateVariable?.getId() === 'sea_level' ? (
+										<TimePeriodsControlForSeaLevel />
+									) : (
+										<TimePeriodsControl />
+									)}
 								</SidebarMenu>
 							</SidebarGroupContent>
 						</TabsContent>

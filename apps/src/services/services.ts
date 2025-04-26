@@ -397,8 +397,12 @@ export const generateChartData = async (options: ChartDataOptions) => {
 export const fetchDeltaValues = async (options: DeltaValuesOptions) => {
 	try {
 		const { endpoint, varName, frequency, params } = options;
+		let url = `//dataclimatedata.crim.ca/${endpoint}`;
+		if(varName !== null) url += `/${varName}`;
+		if(frequency !== null) url += `/${frequency}`;
+		url += `?${params}`;
 
-		const response = await fetch(`//dataclimatedata.crim.ca/${endpoint}/${varName}/${frequency}?${params}`);
+		const response = await fetch(url);
 
 		if (!response.ok) {
 			throw new Error(response.statusText);

@@ -30,6 +30,7 @@ export const useUrlSync = () => {
 	const mapInteractiveRegion = useAppSelector((state) => state.map.interactiveRegion);
 	const mapColor = useAppSelector((state) => state.map.mapColor);
 	const opacity = useAppSelector((state) => state.map.opacity);
+	const dataset = useAppSelector((state) => state.map.dataset);
 
 	// Climate variable state
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
@@ -64,7 +65,7 @@ export const useUrlSync = () => {
 					}
 				}
 				
-				// Only add threshold if the variable supports thresholds
+				// Only add threshold if the variable supports thresholds AND has a value
 				if (climateVariableData.threshold && 
 					(defaultConfig?.thresholds || defaultConfig?.threshold)) {
 					params.set('th', climateVariableData.threshold.toString());
@@ -87,7 +88,7 @@ export const useUrlSync = () => {
 				}
 				
 				// Only include scenario comparison parameters if enabled
-				if (climateVariableData.scenarioCompare) {
+				if (climateVariableData.scenarioCompare === true) {
 					params.set('cmp', '1');
 					
 					if (climateVariableData.scenarioCompareTo) {
@@ -165,7 +166,7 @@ export const useUrlSync = () => {
 				params.set('mapVar', variableValue);
 			}
 	
-			// Add mapRegion only if region from climate variable is not set
+			// Add region parameter (not mapRegion) if region from climate variable is not set
 			if (mapInteractiveRegion && 
 				(!climateVariableData || !climateVariableData.interactiveRegion)) {
 				// Always use region parameter, not mapRegion for consistency
@@ -194,6 +195,11 @@ export const useUrlSync = () => {
 					);
 				}
 			}
+			
+			// Include dataset information if available
+			if (dataset?.dataset_type) {
+				params.set('dataset', dataset.dataset_type);
+			}
 	
 			// Update URL without navigation
 			const newUrl = `${window.location.pathname}?${params.toString()}`;
@@ -210,6 +216,7 @@ export const useUrlSync = () => {
 		mapInteractiveRegion,
 		mapColor,
 		opacity,
+		dataset,
 	]);
 
 	// Process URL params on initial load
@@ -239,19 +246,24 @@ export const useUrlSync = () => {
 				// Update with other URL params
 				if (params.has('ver'))
 					newConfig.version = params.get('ver') || undefined;
-				if (params.has('th'))
-					newConfig.threshold = params.get('th') || undefined;
+				if (params.has('th')) {
+					// Only add threshold if the variable supports thresholds
+					if (matchedVariable.thresholds || matchedVariable.threshold) {
+						newConfig.threshold = params.get('th') || undefined;
+					}
+				}
 				if (params.has('freq'))
 					newConfig.frequency = params.get('freq') || undefined;
 				if (params.has('scen'))
 					newConfig.scenario = params.get('scen') || undefined;
 				if (params.has('cmp'))
 					newConfig.scenarioCompare = params.get('cmp') === '1';
-				if (params.has('cmpTo'))
-					newConfig.scenarioCompareTo =
-						params.get('cmpTo') || undefined;
+				if (params.has('cmpTo') && params.get('cmp') === '1')
+					newConfig.scenarioCompareTo = params.get('cmpTo') || undefined;
 				if (params.has('region'))
 					newConfig.interactiveRegion = params.get('region') as InteractiveRegionOption;
+				else if (params.has('mapRegion'))
+					newConfig.interactiveRegion = params.get('mapRegion') as InteractiveRegionOption;
 				if (params.has('dataVal'))
 					newConfig.dataValue = params.get('dataVal') || undefined;
 				if (params.has('clr'))
@@ -308,16 +320,28 @@ export const useUrlSync = () => {
 			if (!isNaN(threshold)) dispatch(setThresholdValue(threshold));
 		}
 
-		// Only set map interactive region if not already handled by climate variable state
-		const mapRegion = params.get('mapRegion');
-		if (mapRegion && !params.has('region')) {
-			dispatch(setInteractiveRegion(mapRegion));
+		// Process interactive region consistently using 'region' parameter
+		const regionParam = params.get('region');
+		if (regionParam && !varId) {
+			dispatch(setInteractiveRegion(regionParam));
+		} else {
+			// For backward compatibility
+			const mapRegion = params.get('mapRegion');
+			if (mapRegion && !params.has('region') && !varId) {
+				dispatch(setInteractiveRegion(mapRegion));
+			}
 		}
 
-		// Only set color if not handled by climate variable colourScheme
-		const colorParam = params.get('color');
-		if (colorParam && !params.has('clr')) {
-			dispatch(setMapColor(colorParam));
+		// Process color consistently using 'clr' parameter
+		const clrParam = params.get('clr');
+		if (clrParam && !varId) {
+			dispatch(setMapColor(clrParam));
+		} else {
+			// For backward compatibility
+			const colorParam = params.get('color');
+			if (colorParam && !params.has('clr') && !varId) {
+				dispatch(setMapColor(colorParam));
+			}
 		}
 
 		// Handle opacity
@@ -377,9 +401,11 @@ export const useUrlSync = () => {
 		mapColor,
 		opacity,
 		climateVariableData,
+		dataset,
 		updateUrlWithDebounce
 	]);
 
+	// Clean up timeout on unmount
 	useEffect(() => {
 		return () => {
 			if (updateTimeoutRef.current !== null) {

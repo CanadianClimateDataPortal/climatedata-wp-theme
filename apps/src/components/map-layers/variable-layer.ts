@@ -26,7 +26,7 @@ interface WMSParams {
 	version: string;
 	layers: string;
 	styles: string | undefined;
-	TIME: string;
+	TIME?: string;
 	opacity: number;
 	pane: string;
 	bounds: L.LatLngBounds;
@@ -115,11 +115,13 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			version: datasetVersion === 'cmip6' ? '1.3.0' : '1.1.1',
 			layers: layerValue,
 			styles: layerStyles,
-			TIME: parseInt(startYear) + '-01-00T00:00:00Z',
 			opacity: 1,
 			pane: pane,
 			bounds: CANADA_BOUNDS,
 		};
+		if (climateVariable?.getScenario() !== 'rcp85plus65-p50') {
+			params.TIME = parseInt(startYear) + '-01-00T00:00:00Z';
+		}
 
 		if (sld) {
 			params.sld_body = sld;

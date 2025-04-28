@@ -15,30 +15,15 @@ import { Checkbox } from '@/components/ui/checkbox';
 import Dropdown from '@/components/ui/dropdown';
 
 // other
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import {
-	setEmissionScenarioCompare,
-	setEmissionScenarioCompareTo,
-} from '@/features/map/map-slice';
 import appConfig from "@/config/app.config";
 
 const EmissionScenariosControl: React.FC = () => {
 	const { __ } = useI18n();
-	const dispatch = useAppDispatch();
-	const { climateVariable, setScenario } = useClimateVariable();
+	const { climateVariable, setScenario, setScenarioCompare, setScenarioCompareTo } = useClimateVariable();
 
-	const {
-		emissionScenarioCompare,
-		emissionScenarioCompareTo,
-	} = useAppSelector((state) => state.map);
-
-	const handleEmissionScenarioCompareChange = (checked: boolean) => {
-		dispatch(setEmissionScenarioCompare(checked));
-	};
-
-	const handleEmissionScenarioCompareToChange = (value: string) => {
-		dispatch(setEmissionScenarioCompareTo(value));
-	};
+	const scenarioOptions = appConfig.scenarios.filter((scenario) =>
+		climateVariable?.getScenarios()?.includes(scenario.value)
+	);
 
 	const Tooltip = () => (
 		<div className="text-sm text-gray-500">
@@ -46,18 +31,17 @@ const EmissionScenariosControl: React.FC = () => {
 		</div>
 	);
 
-	const scenarioOptions = appConfig.scenarios.filter((scenario) =>
-		climateVariable?.getScenarios()?.includes(scenario.value)
-	);
-
 	return (
 		<SidebarMenuItem>
 			<div className="flex flex-col gap-4">
 				<Dropdown
+					key={climateVariable?.getId()}
 					label={__('Emissions Scenarios')}
 					tooltip={<Tooltip />}
 					placeholder={__('Select an option')}
-					options={scenarioOptions}
+					options={scenarioOptions.filter(
+						(option) => option.value !== climateVariable?.getScenarioCompareTo()
+					) ?? []}
 					value={climateVariable?.getScenario() ?? undefined}
 					onChange={setScenario}
 				/>
@@ -66,8 +50,8 @@ const EmissionScenariosControl: React.FC = () => {
 					<Checkbox
 						id="compare-scenarios"
 						className="text-brand-red"
-						checked={emissionScenarioCompare}
-						onCheckedChange={handleEmissionScenarioCompareChange}
+						checked={climateVariable?.getScenarioCompare() ?? false}
+						onCheckedChange={setScenarioCompare}
 					/>
 					<label
 						htmlFor="compare-scenarios"
@@ -77,13 +61,14 @@ const EmissionScenariosControl: React.FC = () => {
 					</label>
 				</div>
 
-				{emissionScenarioCompare && (
+				{climateVariable?.getScenarioCompare() && (
 					<Dropdown
+						key={climateVariable?.getId() + '_compare'}
 						options={scenarioOptions.filter(
 							(option) => option.value !== climateVariable?.getScenario()
 						) ?? []}
-						value={emissionScenarioCompareTo}
-						onChange={handleEmissionScenarioCompareToChange}
+						value={climateVariable?.getScenarioCompareTo() ?? undefined}
+						onChange={setScenarioCompareTo}
 					/>
 				)}
 			</div>

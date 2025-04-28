@@ -9,6 +9,7 @@ import {
 	InteractiveRegionOption,
 } from "@/types/climate-variable-interface";
 
+
 export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Test variable */
 	{
@@ -62,7 +63,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			interval: 30
 		},
 		hasDelta: true,
-		enableColourOptions: true,
+		enableColourOptions: false,
 		temporalThresholdConfig: {
 			thresholds: {
 				tx_max: {
@@ -82,11 +83,23 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 		analysisFields: [
 			{
+				key: "degrees",
+				type: "input",
+				label: "> Degree Celsius",
+				description: "This variable returns the number of degree days accumulated when daily mean temperature are above a certain temperature. Please set one below :",
+				help: "Degrees help",
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
 				key: "tasmin",
 				type: "input",
 				label: "Tasmin",
 				description: "Tasmin description",
 				help: "Tasmin help",
+				required: false,
 				attributes: {
 					type: "number",
 					placeholder: "0",
@@ -98,6 +111,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				label: "Tasmax",
 				description: "Tasmax description",
 				help: "Tasmax help",
+				required: false,
 				attributes: {
 					type: "number",
 					placeholder: "0",
@@ -134,6 +148,30 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				},
 			},
 		},
+		analysisFields: [
+			{
+				key: "tasmin",
+				type: "input",
+				label: "Tasmin",
+				description: "Tasmin description",
+				help: "Tasmin help",
+				attributes: {
+					type: "text",
+					placeholder: "0",
+				}
+			},
+			{
+				key: "tasmax",
+				type: "input",
+				label: "Tasmax",
+				description: "Tasmax description",
+				help: "Tasmax help",
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			}
+		],
 	},
 	/** Coldest Day */
 	{
@@ -549,6 +587,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[InteractiveRegionOption.WATERSHED]: false
 		},
 		hasDelta: false,
+		enableColourOptions: false,
 		customColourSchemes: {
 			default: {
 				colours: [
@@ -664,6 +703,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 		],
 		hasDelta: false,
+		enableColourOptions: false,
 	},
 	/** Standardized precipitation evapotranspiration index (3-months) */
 	{
@@ -685,6 +725,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 		],
 		hasDelta: false,
+		enableColourOptions: false,
 	},
 	/** Total Precipitation */
 	{
@@ -721,12 +762,27 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			},
 		},
 	},
-	/** Average ‘Wet Day’ Precipitation Intensity */
+	/** Average 'Wet Day' Precipitation Intensity */
 	{
 		id: "average_wet_day_precipitation_intensity",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "mm/day",
+		analysisFields: [
+			{
+				key: "thresh",
+				type: "input",
+				label: "Average Daily Precipitation on Wet Days",
+				description: 'Set the minimum precipitation required for a day to be classified as wet.',
+				help: 'Days with precipitation greater than or equal to this value will be included in the average calculation of wet day precipitation.',
+				comparison: '>=',
+				unit: 'mm/dd',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			}
+		],
 	},
 	/** Cold Spell Days */
 	{
@@ -734,6 +790,32 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "days",
+		analysisFields: [
+			{
+				key: "window",
+				type: "input",
+				label: 'Minimum Consecutive Days',
+				description: 'Set the minimum number of consecutive days required to define a cold spell.',
+				help: 'This value determines how many consecutive days must meet the temperature condition for the period to be considered a cold spell.',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
+				key: "thresh",
+				type: "input",
+				label: 'Temperature Threshold (°C)',
+				description: 'Set the maximum mean daily temperature allowed for a day to be counted in a cold spell.',
+				help: 'Days with a mean daily temperature below this threshold are considered part of a cold spell.',
+				unit: 'C',
+				comparison: '<',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			}
+		],
 	},
 	/** Cooling Degree Days */
 	{
@@ -801,10 +883,32 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				label: "32 ºC",
 			},
 		],
+		analysisFields: [
+			{
+				key: "thresh",
+				type: "input",
+				label: 'Temperature Threshold (°C)',
+				description: 'Set the minimum daily maximum temperature required for a day to be included in the count.',
+				help: 'Days with a maximum temperature greater than this threshold will be counted in the analysis.',
+				unit: 'C',
+				comparison: '>',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+		],
 		averagingOptions: [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
 		],
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
+		},
 		unit: "days",
 		temporalThresholdConfig: {
 			thresholds: {
@@ -892,6 +996,34 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				label: "-25 ºC",
 			},
 		],
+		analysisFields: [
+			{
+				key: "thresh_tasmin",
+				type: "input",
+				label: 'Minimum Temperature Threshold (°C)',
+				description: 'Set the threshold for daily minimum temperature.',
+				help: 'Only days where the minimum temperature exceeds this value will be included in the analysis.',
+				unit: 'C',
+				comparison: '>',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
+				key: "thresh_tasmax",
+				type: "input",
+				label: 'Maximum Temperature Threshold (°C)',
+				description: 'Set the threshold for daily maximum temperature.',
+				help: 'Only days where the maximum temperature exceeds this value will be included in the analysis.',
+				unit: 'C',
+				comparison: '>',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+		],
 		averagingOptions: [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
@@ -932,12 +1064,98 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "doy",
+		analysisFields: [
+			{
+				key: "sum_thresh",
+				type: "input",
+				label: 'Degree-Day Total Threshold',
+				description: 'Set the degree-day total that must be exceeded to trigger the result.',
+				help: 'This value defines the cumulative degree-day target. The result will be the day of year when this threshold is surpassed.',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
+				key: "op",
+				type: "select",
+				label: 'Temperature Comparison Operator',
+				description: 'Choose whether to accumulate degree-days when the temperature is greater than or less than the threshold.',
+				help: 'Select ">" to accumulate degree-days on days warmer than the threshold, or "<" for colder days.',
+				attributes: {
+					placeholder: ">",
+				},
+				options:[
+					{
+						value: '>',
+						label: '>'
+					},
+					{
+						value: '<',
+						label: '<'
+					}
+				]
+			},
+			{
+				key: "thresh",
+				type: "input",
+				label: 'Mean Daily Temperature Threshold (°C)',
+				description: 'Set the temperature threshold used to calculate daily degree-days.',
+				help: 'Only days where the mean daily temperature satisfies the comparison condition will contribute to the degree-day total.',
+				unit: 'C',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
+				key: "after_date",
+				type: "input",
+				label: 'Start Date (MM-DD)',
+				description: 'Specify the date to begin accumulating degree-days.',
+				help: 'Use a date like "09-01" to start from September 1st. Avoid end-of-month dates due to inconsistencies in some climate models.',
+				unit: 'MM-DD',
+				attributes: {
+					type: "date",
+					placeholder: "0",
+				}
+			}
+		]
 	},
+
 	/** Freeze-Thaw Cycles */
 	{
 		id: "freeze_thaw_cycles",
 		class: "RasterAnalyzeClimateVariable",
 		threshold: "dlyfrzthw_tx0_tn-1",
+		analysisFields: [
+			{
+				key: "thresh_tasmax",
+				type: "input",
+				label: 'Maximum Temperature Threshold (°C)',
+				description: 'Set the threshold for daily maximum temperature.',
+				help: 'Only days where the maximum temperature satisfies the comparison condition will be included in the analysis.',
+				unit: 'C',
+				comparison: '>',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
+				key: "thresh_tasmin",
+				type: "input",
+				label: 'Maximum Temperature Comparison Operator',
+				description: 'Select the comparison operator for the maximum temperature threshold.',
+				help: 'Choose whether the maximum temperature must be greater than (>) or less than or equal to (<=) the threshold.',
+				unit: 'C',
+				comparison: '>',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+		],
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
@@ -964,6 +1182,33 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "heat_wave_frequency",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
+		analysisFields: [
+						{
+				key: "thresh_tasmin",
+				type: "input",
+				label: 'Maximum Temperature Threshold (°C)',
+				description: 'Set the maximum temperature required for a day to be included in a heat wave.',
+				help: 'Only days where the daily maximum temperature is above this threshold will count toward a heat wave.',
+				unit: 'C',
+				comparison: '>',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
+				key: "window",
+				type: "input",
+				label: 'Minimum Consecutive Days',
+				description: 'Set the number of consecutive qualifying days required to define a heat wave.',
+				help: 'A heat wave is defined as a sequence of consecutive days that meet both temperature thresholds. This value controls how many days must be in that sequence.',
+				unit: 'days',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+		],
 	},
 	/** Heat Wave */
 	{
@@ -971,6 +1216,33 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "days",
+		analysisFields: [
+			{
+				key: "window",
+				type: "input",
+				label: 'Minimum Consecutive Days',
+				description: 'Set the number of consecutive hot days required to define a heat wave.',
+				help: 'A heat wave is defined as a sequence of consecutive days where the maximum temperature meets the threshold. This value determines how long that sequence must be.',
+				unit: 'days',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
+				key: "thresh_tasmin",
+				type: "input",
+				label: 'Maximum Temperature Threshold (°C)',
+				description: 'Set the maximum temperature required for a day to be counted in a heat wave.',
+				help: 'Only days where the daily maximum temperature exceeds this threshold will be included in the heat wave calculation.',
+				unit: 'C',
+				comparison: '>',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+		],
 	},
 	/** Heat Wave Total Duration */
 	{
@@ -1001,6 +1273,21 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "days",
+		analysisFields: [
+			{
+				key: "thresh",
+				type: "input",
+				label: 'Precipitation Threshold (mm/day)',
+				description: 'Set the maximum daily precipitation allowed for a day to be considered dry.',
+				help: 'Only days where precipitation is below this threshold will be considered in the dry spell analysis.',
+				unit: 'mm/day',
+				comparison: '<',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+		],
 	},
 	/** Maximum Consecutive Wet Days */
 	{
@@ -1008,6 +1295,21 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "days",
+		analysisFields: [
+			{
+				key: "thresh",
+				type: "input",
+				label: 'Precipitation Threshold (mm/day)',
+				description: 'Set the minimum daily precipitation required to count a day as wet.',
+				help: 'Only days with precipitation above this threshold are included in the wet day streak calculation.',
+				unit: 'mm/day',
+				comparison: '>',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+		],
 	},
 	/** Tropical Nights (Days with Tmin above threshold) */
 	{
@@ -1077,6 +1379,21 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	{
 		id: "wet_days",
 		class: "RasterAnalyzeClimateVariable",
+		analysisFields: [
+			{
+				key: "thresh",
+				type: "input",
+				label: "Number of Wet Days",
+				description: 'Set the precipitation value that defines a wet day.',
+				help: 'Days with precipitation greater than this threshold will be counted as wet days in the analysis.',
+				comparison: '>',
+				unit: 'mm/dd',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			}
+		],
 		thresholds: [
 			{
 				value: "r1mm",
@@ -1100,56 +1417,74 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			thresholds: {
 				r1mm: {
 					ys: {
-						absolute: { low: 20.0, high: 200.0 },
-						delta: { low: -7.0, high: 40.0 },
+						absolute: {low: 20.0, high: 200.0},
+						delta: {low: -7.0, high: 40.0},
 						unit: 'days',
 					},
 					ms: {
-						absolute: { low: 0.7, high: 20.0 },
-						delta: { low: -2.0, high: 6.0 },
+						absolute: {low: 0.7, high: 20.0},
+						delta: {low: -2.0, high: 6.0},
 						unit: 'days',
 					},
 					qsdec: {
-						absolute: { low: 2.0, high: 70.0 },
-						delta: { low: -4.0, high: 20.0 },
+						absolute: {low: 2.0, high: 70.0},
+						delta: {low: -4.0, high: 20.0},
 						unit: 'days',
 					},
 				},
 				r10mm: {
 					ys: {
-						absolute: { low: 0.1, high: 100.0 },
-						delta: { low: -2.0, high: 9.0 },
+						absolute: {low: 0.1, high: 100.0},
+						delta: {low: -2.0, high: 9.0},
 						unit: 'days',
 					},
 					ms: {
-						absolute: { low: 0.0, high: 6.0 },
-						delta: { low: -0.2, high: 0.6 },
+						absolute: {low: 0.0, high: 6.0},
+						delta: {low: -0.2, high: 0.6},
 						unit: 'days',
 					},
 					qsdec: {
-						absolute: { low: 0.0, high: 20.0 },
-						delta: { low: -0.3, high: 2.0 },
+						absolute: {low: 0.0, high: 20.0},
+						delta: {low: -0.3, high: 2.0},
 						unit: 'days',
 					},
 				},
 				r20mm: {
 					ys: {
-						absolute: { low: 0.0, high: 50.0 },
-						delta: { low: -0.8, high: 5.0 },
+						absolute: {low: 0.0, high: 50.0},
+						delta: {low: -0.8, high: 5.0},
 						unit: 'days',
 					},
 					ms: {
-						absolute: { low: 0.0, high: 6.0 },
-						delta: { low: -0.2, high: 0.6 },
+						absolute: {low: 0.0, high: 6.0},
+						delta: {low: -0.2, high: 0.6},
 						unit: 'days',
 					},
 					qsdec: {
-						absolute: { low: 0.0, high: 20.0 },
-						delta: { low: -0.3, high: 2.0 },
+						absolute: {low: 0.0, high: 20.0},
+						delta: {low: -0.3, high: 2.0},
 						unit: 'days',
 					},
 				},
 			},
 		},
+	},
+	/** Relative Sea-Level Change */
+	{
+		id: "sea_level",
+		class: "SeaLevelClimateVariable",
+		threshold: "slr",
+		hasDelta: false,
+		enableColourOptions: false,
+		dateRange: [
+			"2040",
+			"2050",
+		],
+		dateRangeConfig: {
+			min: "2006",
+			max: "2100",
+			interval: 10
+		},
+		unit: "cm",
 	},
 ];

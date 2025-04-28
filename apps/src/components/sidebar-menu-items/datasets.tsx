@@ -2,10 +2,10 @@
  * A menu item and panel component that displays a list of datasets.
  * TODO: make this work with the new AnimatedPanel component
  */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Database, ChevronRight, ExternalLink } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
-import { useAppDispatch } from '@/app/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 
 // components
 import {
@@ -29,7 +29,7 @@ import { useSidebar } from '@/hooks/use-sidebar';
 import { useLocale } from '@/hooks/use-locale';
 import { fetchTaxonomyData } from '@/services/services';
 import { InteractivePanelProps, TaxonomyData } from '@/types/types';
-import { setDataset, setVariableList, setVariableListLoading } from '@/features/map/map-slice';
+import { setVariableList, setVariableListLoading } from '@/features/map/map-slice';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { fetchPostsData } from '@/services/services';
 import { normalizePostData } from '@/lib/format';
@@ -76,9 +76,18 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 	const { locale } = useLocale();
 	const dispatch = useAppDispatch();
 	const { selectClimateVariable } = useClimateVariable();
+	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
+	const urlParamsLoadedRef = useRef<boolean>(!!climateVariableData);
+	const initialLoadCompletedRef = useRef<boolean>(false);
+
+	// Update urlParamsLoaded ref if climate variable data is detected
+	useEffect(() => {
+		if (climateVariableData && !urlParamsLoadedRef.current) {
+			urlParamsLoadedRef.current = true;
+		}
+	}, [climateVariableData]);
 
 	const handleDatasetSelect = useCallback(async (dataset: TaxonomyData) => {
-		dispatch(setDataset(dataset));
 		onSelect(dataset);
 		dispatch(setVariableListLoading(true));
 		dispatch(setVariableList([]));
@@ -87,12 +96,12 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 		const data = await fetchPostsData('variables', 'map', dataset, {});
 		const variables = await normalizePostData(data, locale);
 
-		// Store the variables in Redux 
+		// Store the variables in Redux
 		dispatch(setVariableList(variables));
 
 		// Select the first variable if available
-		if (variables.length > 0) {
-			selectClimateVariable(variables[0]);
+		if (variables.length > 0 && !urlParamsLoadedRef.current) {
+			selectClimateVariable(variables[0], dataset);
 		}
 	}, [dispatch, onSelect, selectClimateVariable, locale]);
 
@@ -100,11 +109,12 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 	useEffect(() => {
 		// Fetch datasets only once when component mounts
 		(async () => {
-			const fetchedDatasets = await fetchTaxonomyData(slug);
+			const fetchedDatasets = await fetchTaxonomyData(slug, 'map');
 			setDatasets(fetchedDatasets);
 
-			if (fetchedDatasets.length > 0 && !selected) {
+			if (fetchedDatasets.length > 0 && !selected && !urlParamsLoadedRef.current && !initialLoadCompletedRef.current) {
 				await handleDatasetSelect(fetchedDatasets[0]);
+				initialLoadCompletedRef.current = true;
 			}
 		})();
 	}, [handleDatasetSelect, selected]);

@@ -1,16 +1,18 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useContext } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 import L from 'leaflet';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useLocale } from '@/hooks/use-locale';
 import { fetchDeltaValues, generateChartData } from '@/services/services';
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
-import { useAppSelector } from '@/app/hooks';
 import { doyFormatter } from '@/lib/format';
+import { getDefaultFrequency } from "@/lib/utils";
+import SectionContext from "@/context/section-provider";
 
 interface RasterPrecalcultatedClimateVariableValuesProps {
 	latlng: L.LatLng;
 	featureId: number,
+	mode: "modal" | "panel"
 }
 
 /**
@@ -18,12 +20,13 @@ interface RasterPrecalcultatedClimateVariableValuesProps {
  * ---------------------------
  * Display the climate variable values (median, relative to baseline, range)
  * For Raster/Precalculated climate variable
- * 
+ *
  * Can be used in the location modal and charts panel
  */
 const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedClimateVariableValuesProps> = ({
 	latlng,
 	featureId,
+	mode,
 }) => {
 	const { __ } = useI18n();
 	const { locale } = useLocale();
@@ -32,7 +35,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	const dateRange = useMemo(() => {
 		return climateVariable?.getDateRange() ?? ["2041", "2070"];
 	}, [climateVariable]);
-	const dataValue = useAppSelector((state) => state.map.dataValue);
+	const section = useContext(SectionContext);
 
 	const [ median, setMedian ] = useState<number | null>(null);
 	const [ range, setRange ] = useState<number[] | null>(null);
@@ -50,8 +53,14 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 		const fetchData = async () => {
 			if (!decadeValue && !variableId) return;
 
+			const frequencyConfig = climateVariable?.getFrequencyConfig();
+			let frequency = climateVariable?.getFrequency() ?? ''
+			if (!frequency && frequencyConfig) {
+				frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
+			}
+
 			const scenario = climateVariable?.getScenario() ?? '';
-			const frequency = climateVariable?.getFrequency() ?? '';
+			const version = climateVariable?.getVersion() ?? '';
 
 			// Special case variable id
 			const varName =
@@ -71,7 +80,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 			const medianRangeParams = new URLSearchParams({
 				period: String(decadeValue),
 				decimals: decimals.toString(),
-				delta7100: dataValue === 'delta' ? 'true' : 'false',
+				delta7100: climateVariable?.getDataValue() === 'delta' ? 'true' : 'false',
 				dataset_name: climateVariable?.getVersion() ?? '',
 			}).toString();
 
@@ -97,8 +106,8 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 			const chartsData = await generateChartData({
 				latlng: latlng,
 				variable: varName,
-				frequency: climateVariable?.getFrequency() ?? '',
-				dataset: climateVariable?.getVersion() ?? '',
+				frequency: frequency,
+				dataset: version,
 			});
 
 			const deltaValueKey = 'delta7100_' + scenario + '_median';
@@ -121,7 +130,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 			const timestamp = Date.UTC(decadeValue, month, 1, 0, 0, 0);
 
 			if(
-				chartsData[deltaValueKey] !== undefined 
+				chartsData[deltaValueKey] !== undefined
 				&& chartsData[deltaValueKey][timestamp] !== undefined
 				&& chartsData[deltaValueKey][timestamp][0] !== undefined
 			) {
@@ -132,28 +141,30 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 		};
 
 		fetchData();
-	}, [climateVariable, dataValue, decimals, dateRange, featureId, latlng]);
+	}, [climateVariable, decimals, dateRange, featureId, latlng, section]);
 
 	// Value formatter (for delta, for units)
-	const valueFormatter = (value: number, delta: boolean = (dataValue === 'delta')) => {
+	const valueFormatter = (value: number, delta: boolean = (climateVariable?.getDataValue() === 'delta')) => {
 		let str = '';
+
+		const unit = climateVariable?.getUnit();
+
+		switch (unit) {
+			case 'doy':
+				if (delta) {
+					str = `${value.toFixed(decimals)} days`;
+				} else {
+					str = doyFormatter(value, locale);
+				}
+				break;
+			default:
+				str = `${value.toFixed(decimals)} ${unit}`;
+				break;
+		}
 
 		// If delta, we add a "+" for positive values
 		if(delta && value > 0) {
-			str += '+';
-		}
-
-		// handle different units
-		const unit = climateVariable?.getUnit();
-		switch (unit) {
-			case 'doy':
-				str += doyFormatter(value, locale);
-				break;
-
-			default:
-				str += value.toFixed(decimals);
-				str += ` ${unit}`;
-				break;
+			str = '+' + str;
 		}
 
 		return str;
@@ -164,15 +175,17 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 		const formattedMedian = valueFormatter(median);
 
 		return (
-			<div className='w-1/2'>
-				<div className='mb-1 text-2xl font-semibold text-brand-blue'>
+			<div className={mode === "modal" ? "w-1/2" : ""}>
+				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
 					{ formattedMedian }
 				</div>
-				<div className='text-xs font-semibold text-neutral-grey-medium uppercase tracking-wider'>
-					{__('Median')}
-				</div>
-				<div className='text-xs text-neutral-grey-medium'>
-					({ dateRange[0] } - { dateRange[1] })
+				<div className={mode === "modal" ? "" : "flex gap-2"}>
+					<div className='text-xs font-semibold text-neutral-grey-medium uppercase tracking-wider'>
+						{__('Median')}
+					</div>
+					<div className='text-xs text-neutral-grey-medium'>
+						({ dateRange[0] } - { dateRange[1] })
+					</div>
 				</div>
 			</div>
 		);
@@ -183,15 +196,17 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 		const formattedRelativeToBaseline = valueFormatter(relativeToBaseline, true);
 
 		return (
-			<div className='w-1/2'>
-				<div className='mb-1 text-2xl font-semibold text-brand-blue'>
+			<div className={mode === "modal" ? "w-1/2" : ""}>
+				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
 					{ formattedRelativeToBaseline }
 				</div>
-				<div className='text-xs font-semibold text-neutral-grey-medium uppercase tracking-wider'>
-					{__('Relative to baseline')}
-				</div>
-				<div className='text-xs text-neutral-grey-medium'>
-					(1971 - 2000)
+				<div className={mode === "modal" ? "" : "flex gap-2"}>
+					<div className='text-xs font-semibold text-neutral-grey-medium uppercase tracking-wider whitespace-nowrap'>
+						{__('Relative to baseline')}
+					</div>
+					<div className='text-xs text-neutral-grey-medium'>
+						(1971 - 2000)
+					</div>
 				</div>
 			</div>
 		);
@@ -201,10 +216,10 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	const generateRangeDiv = (rangeStartValue: number, rangeEndValue: number) => {
 		const rangeStart = valueFormatter(rangeStartValue);
 		const rangeEnd = valueFormatter(rangeEndValue);
-		
+
 		return (
 			<>
-				<div className='mb-1 text-2xl font-semibold text-brand-blue'>
+				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
 					{rangeStart} {__('to')} {rangeEnd}
 				</div>
 				<div className='text-xs font-semibold text-neutral-grey-medium uppercase tracking-wider'>
@@ -215,7 +230,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	};
 
 	return (
-		<div className='mt-4 mb-4'>
+		<div className={mode === "modal" ? "mt-4 mb-4" : "flex-grow flex gap-6 justify-end"}>
 			{noDataAvailable ? (
 				<div>
 					<p className='text-base text-neutral-grey-medium italic'>
@@ -224,7 +239,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 				</div>
 			) : (
 				<>
-					<div className='mb-3 flex'>
+					<div className={mode === "modal" ? "mb-3 flex" : "flex gap-6"}>
 						{ median !== null && generateMedianDiv(median) }
 						{ relativeToBaseline !== null && generateRelativeToBaselineDiv(relativeToBaseline) }
 					</div>

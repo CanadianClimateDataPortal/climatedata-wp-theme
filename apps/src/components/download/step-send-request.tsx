@@ -7,30 +7,58 @@ import { ControlTitle } from '@/components/ui/control-title';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { cn, isValidEmail } from '@/lib/utils';
-import {
-	setDecimalPlace,
-	setEmail,
-	setSubscribe,
-} from '@/features/download/download-slice';
 import { DownloadType, FileFormatType } from "@/types/climate-variable-interface";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { setEmail, setSubscribe } from '@/features/download/download-slice';
+import { StepComponentRef } from "@/types/download-form-interface";
 import Dropdown from "@/components/ui/dropdown.tsx";
 import { normalizeDropdownOptions } from "@/lib/format.ts";
 
 /**
  * Send download request step
  */
-const StepSendRequest: React.FC = () => {
+const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	const [captchaValue, setCaptchaValue] = useState<string>('');
-	const { climateVariable, setFileFormat } = useClimateVariable();
 	const { __ } = useI18n();
+	const { climateVariable, setFileFormat, setDecimalPlace } = useClimateVariable();
 
-	const { email, subscribe, decimalPlace } = useAppSelector(
+	const { email, subscribe } = useAppSelector(
 		(state) => state.download
 	);
 	const dispatch = useAppDispatch();
+
+	React.useImperativeHandle(ref, () => ({
+		isValid: () => {
+			if (!climateVariable) {
+				return false;
+			}
+
+			const fileFormat = climateVariable.getFileFormat();
+			const validations = [
+				// File format is always required
+				Boolean(fileFormat),
+			];
+
+			// For analyzed downloads, add email validation
+			if (climateVariable.getDownloadType() === DownloadType.ANALYZED) {
+				validations.push(
+					// Email is required and must be valid
+					Boolean(email && isValidEmail(email))
+				);
+			}
+
+			return validations.every(Boolean);
+		},
+		getResetPayload: () => {
+			// reset the email and subscribe state from the download slice
+			dispatch(setEmail(''));
+			dispatch(setSubscribe(false));
+
+			return {};
+		}
+	}), [climateVariable, email]);
 
 	const formatOptions = [
 		{ value: FileFormatType.CSV, label: 'CSV' },
@@ -40,7 +68,9 @@ const StepSendRequest: React.FC = () => {
 		climateVariable?.getFileFormatTypes()?.includes(option.value)
 	);
 
+	const fileFormat = climateVariable?.getFileFormat() ?? undefined;
 	const maxDecimals = climateVariable?.getMaxDecimals() ?? 0;
+	const decimalPlace = climateVariable?.getDecimalPlace() ?? 0;
 	const decimalPlaceOptions = normalizeDropdownOptions(
 		[...Array(maxDecimals + 1).keys()].map((value) => ({value, label: String(value)}))
 	);
@@ -52,12 +82,12 @@ const StepSendRequest: React.FC = () => {
 			<StepContainerDescription>
 				<p>
 					{__(
-						'Data processing starts after you “Send Request”. It may take 30 to 90 minutes to complete, depending on available resources.'
+						'Data processing starts after you "Send Request". It may take 30 to 90 minutes to complete, depending on available resources.'
 					)}
 				</p>
 				<p>
 					{__(
-						'You will be notified by email when your request has been processed and the data are available. Don’t forget to check your spam folder.'
+						"You will be notified by email when your request has been processed and the data are available. Don't forget to check your spam folder."
 					)}
 				</p>
 			</StepContainerDescription>
@@ -66,7 +96,7 @@ const StepSendRequest: React.FC = () => {
 				title={__('Format')}
 				name="format"
 				className="mb-8"
-				value={climateVariable?.getFileFormat() ?? undefined}
+				value={fileFormat}
 				options={formatOptions}
 				onValueChange={setFileFormat}
 			/>
@@ -76,9 +106,7 @@ const StepSendRequest: React.FC = () => {
 				label={__('Decimal Place')}
 				value={decimalPlace}
 				options={decimalPlaceOptions}
-				onChange={(value) => {
-					dispatch(setDecimalPlace(value));
-				}}
+				onChange={setDecimalPlace}
 			/>}
 
 			{climateVariable?.getDownloadType() === DownloadType.ANALYZED &&
@@ -94,7 +122,7 @@ const StepSendRequest: React.FC = () => {
 						className="sm:w-64 mb-2"
 						placeholder={__('john.doe@gmail.com')}
 						value={email}
-						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+						onChange={(e) => {
 							dispatch(setEmail(e.target.value));
 						}}
 					/>
@@ -154,7 +182,7 @@ const StepSendRequest: React.FC = () => {
 			</div>
 		</StepContainer>
 	);
-};
+});
 StepSendRequest.displayName = 'StepSendRequest';
 
 export default StepSendRequest;

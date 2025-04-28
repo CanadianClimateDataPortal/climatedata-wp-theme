@@ -1,6 +1,10 @@
 import React from "react";
 import { MultilingualField } from "./types";
 
+export interface variableClassMap {
+	[key: string]: string;
+}
+
 export interface ScenariosConfig {
 	[key: string]: string[];
 }
@@ -47,14 +51,15 @@ export interface FieldConfig {
 	label: string;
 	description?: string;
 	help?: string;
+	required?: boolean;
+	comparison?: string;
+	unit?: string;
 	attributes?: {
-		type?: 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
+		type?: 'text' | 'number' | 'email' | 'password' | 'tel' | 'url' | 'date';
 		placeholder?: string;
+
 	};
-	options?: Array<{
-		value: string | number;
-		label: string;
-	}>;
+	options?: { value: string; label: string }[];
 }
 
 export interface FieldValues {
@@ -136,9 +141,6 @@ export interface GridCoordinates {
 	[key: number]: Coordinates;
 }
 
-/**
- * Interface representing the configuration for a climate variable.
- */
 export interface ClimateVariableConfigInterface {
 	/** Unique identifier for the climate variable */
 	id: string;
@@ -149,8 +151,14 @@ export interface ClimateVariableConfigInterface {
 	/** Title of the climate variable from the API */
 	title?: string | MultilingualField;
 
-	/** Class name defining the type or category of the climate variable */
+	/** Default class defining the type or category of the climate variable */
 	class: string;
+
+	/** Alternative classes to use depending on the dataset type */
+	classes?: variableClassMap;
+
+	/** The type of dataset the climate variable belongs to */
+	datasetType?: string;
 
 	/** Available versions for this climate variable */
 	versions?: string[];
@@ -169,6 +177,12 @@ export interface ClimateVariableConfigInterface {
 
 	/** Selected scenario value */
 	scenario?: string | null;
+
+	/** Compare scenarios flag */
+	scenarioCompare?: boolean;
+
+	/** Scenario to compare against `scenario` */
+	scenarioCompareTo?: string | null;
 
 	/** Selected scenarios for analysis */
 	analyzeScenarios?: string[];
@@ -196,6 +210,9 @@ export interface ClimateVariableConfigInterface {
 
 	/** Indicates whether delta (difference) values are available */
 	hasDelta?: boolean;
+
+	/** Currently selected data value */
+	dataValue?: string | null;
 
 	/** Custom color scheme used for visualizing the variable */
 	colourScheme?: string;
@@ -236,6 +253,18 @@ export interface ClimateVariableConfigInterface {
 	/** Stores the selected percentiles */
 	percentiles?: string[];
 
+	/** Available missing data options used for analysis */
+	missingDataOptions?: string[];
+
+	/** Stores the selected missing data */
+	missingData?: string;
+
+	/** Available model options for analysis */
+	modelOptions?: string[];
+
+	/** Stores the selected models for analysis */
+	model?: string;
+
 	/** The type of formats available */
 	fileFormatTypes?: FileFormatType[];
 
@@ -244,6 +273,9 @@ export interface ClimateVariableConfigInterface {
 
 	/** The maximum number of decimals to be used for the file */
 	maxDecimals?: number;
+
+	/** The number of decimal places to be used for the file */
+	decimalPlace?: number;
 
 	/** Determines if the variable data must be analyzed or is already precalculated. */
 	downloadType?: DownloadType;
@@ -270,6 +302,8 @@ export interface ClimateVariableInterface {
 
 	getTitle(): string | null;
 
+	getDatasetType(): string | null;
+
 	getVersions(): string[];
 
 	getVersion(): string | null;
@@ -283,6 +317,10 @@ export interface ClimateVariableInterface {
 	getScenarios(): string[];
 
 	getScenario(): string | null;
+
+	getScenarioCompare(): boolean;
+
+	getScenarioCompareTo(): string | null;
 
 	getAnalyzeScenarios(): string[];
 
@@ -301,6 +339,8 @@ export interface ClimateVariableInterface {
 	getFrequency(): string | null;
 
 	hasDelta(): boolean | undefined;
+
+	getDataValue(): string | null;
 
 	getCustomColourSchemes(): CustomColourSchemes | null;
 
@@ -330,11 +370,21 @@ export interface ClimateVariableInterface {
 
 	getPercentiles(): string[];
 
+	getMissingDataOptions(): string[];
+
+	getMissingData(): string | null;
+
+	getModelOptions(): string[];
+
+	getModel(): string | null;
+
 	getFileFormatTypes(): FileFormatType[];
 
 	getFileFormat(): FileFormatType | null;
 
 	getMaxDecimals(): number;
+
+	getDecimalPlace(): number;
 
 	renderMap(): React.ReactElement;
 
@@ -352,7 +402,9 @@ export interface ClimateVariableInterface {
 
 	getSelectedPoints(): GridCoordinates | null;
 
+	getSelectedPointsCount(): number;
+
 	toObject(): ClimateVariableConfigInterface;
 
-	getLocationModalContent(latlng: L.LatLng, featureId: number): React.ReactNode | null;
+	getLocationModalContent(latlng: L.LatLng, featureId: number, mode?: string): React.ReactNode | null;
 }

@@ -23,9 +23,10 @@ import {
 } from '@/components/sidebar-menu-items/variables';
 import { EmissionScenariosControl } from '@/components/sidebar-menu-items/emission-scenarios-control';
 import { ThresholdValuesDropdown } from '@/components/sidebar-menu-items/threshold-values-dropdown';
-import { InteractiveRegionsDropdown } from '@/components/sidebar-menu-items/interactive-regions-dropdown';
+import { InteractiveRegionsMenuItem } from '@/components/sidebar-menu-items/interactive-regions-menu-item';
 import { FrequenciesDropdown } from '@/components/sidebar-menu-items/frequencies-dropdown';
 import { TimePeriodsControl } from '@/components/sidebar-menu-items/time-periods-control';
+import { TimePeriodsControlForSeaLevel } from '@/components/sidebar-menu-items/time-periods-control-for-sea-level';
 import { DataValuesControl } from '@/components/sidebar-menu-items/data-values-control';
 import { MapColorsDropdown } from '@/components/sidebar-menu-items/map-colors-dropdown';
 import { VersionsDropdown } from "@/components/sidebar-menu-items/versions-dropdown";
@@ -76,13 +77,15 @@ export function AppSidebar() {
 
 	const handleSelectVariable = (variable: PostData) => {
 		setSelectedVariable(variable);
-		selectClimateVariable(variable);
+		selectClimateVariable(variable, dataset);
 	}
 
 	// We don't need to show if there's only 1 option.
 	const showThreshold = climateVariable && climateVariable.getThresholds() && climateVariable.getThresholds().length > 1;
 
 	const hasDelta = climateVariable && climateVariable.hasDelta();
+
+	const hasColourOptions = climateVariable && climateVariable.getColourOptionsStatus();
 
 	return (
 		<Sidebar>
@@ -111,24 +114,36 @@ export function AppSidebar() {
 									<EmissionScenariosControl />
 									<SidebarSeparator />
 
-									<InteractiveRegionsDropdown />
+									<InteractiveRegionsMenuItem />
 									<SidebarSeparator />
 
 									<FrequenciesDropdown />
 									<SidebarSeparator />
 
-									<TimePeriodsControl />
+									{climateVariable?.getId() === 'sea_level' ? (
+										<TimePeriodsControlForSeaLevel />
+									) : (
+										<TimePeriodsControl />
+									)}
 								</SidebarMenu>
 							</SidebarGroupContent>
 						</TabsContent>
 						<TabsContent value="settings">
 							<SidebarGroupContent>
 								<SidebarMenu>
-									{hasDelta && <DataValuesControl />}
-									<SidebarSeparator />
+									{hasDelta && (
+										<>
+											<DataValuesControl />
+											<SidebarSeparator />
+										</>
+									)}
 
-									<MapColorsDropdown />
-									<SidebarSeparator />
+									{hasColourOptions && (
+										<>
+											<MapColorsDropdown/>
+											<SidebarSeparator />
+										</>
+									)}
 
 									<LayerOpacities />
 								</SidebarMenu>

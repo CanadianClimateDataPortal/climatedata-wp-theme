@@ -2,7 +2,6 @@
 // For example any external request to an API, or any kind of data manipulation.
 
 import {
-	RelatedData,
 	MapInfoData,
 	Sector,
 	TaxonomyData,
@@ -13,38 +12,10 @@ import {
 } from '@/types/types';
 import L from 'leaflet';
 
-// TODO: temporarily using dummy data inside the assets folder, until the API is ready
-import variableDatasetResponseDummy from '@/assets/dummy/variable-dataset-response-dummy.json';
-import varTypeResponseDummy from '@/assets/dummy/var-type-response-dummy.json';
-import sectorResponseDummy from '@/assets/dummy/sector-response-dummy.json';
-import relatedResponse311Dummy from '@/assets/dummy/related-response-311-dummy.json';
+import {  WP_API_DOMAIN, WP_API_LOCATION_BY_COORDS_PATH, WP_API_VARIABLE_PATH  } from '@/lib/constants.ts';
 
-const dummyResponses = {
-	'variable-dataset': variableDatasetResponseDummy,
-	'var-type': varTypeResponseDummy,
-	sector: sectorResponseDummy,
-} as const;
-
-type DummyResponseKey = keyof typeof dummyResponses;
-
-import {WP_API_DOMAIN, WP_API_VARIABLE_PATH} from "@/lib/constants.ts";
-
-export const fetchRelatedData = async (): Promise<RelatedData> => {
-	// TODO: uncomment this and use correct API endpoint when ready
-	// re add `postId: number` as a parameter to the function
-	// const response = await fetch(
-	// 	`/dummy/related-response-${postId}-dummy.json`
-	// );
-	// if (!response.ok) {
-	// 	throw new Error('Failed to fetch data');
-	// }
-	// TODO: remove this when the API is ready
-	const response = {
-		json: async () => relatedResponse311Dummy, // mimic fetch response.json()
-	};
-
-	return response.json();
-};
+// Cache for API responses to avoid duplicate requests
+const apiCache = new Map<string, any>();
 
 /**
  * Fetches WordPress variable data by post ID from the custom WP REST API endpoint.
@@ -53,19 +24,31 @@ export const fetchRelatedData = async (): Promise<RelatedData> => {
  */
 export const fetchWPData = async (postId: number) => {
 	try {
+		const cacheKey = `wp_data_${postId}`;
+
+		// Check cache first
+		if (apiCache.has(cacheKey)) {
+			return apiCache.get(cacheKey);
+		}
+
 		// Make the Fetch request.
-		const response = await fetch(`${WP_API_DOMAIN}${WP_API_VARIABLE_PATH}?post_id=${postId}`, {
-			method: 'GET',
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json',
-			},
-		});
+		const response = await fetch(
+			`${WP_API_DOMAIN}${WP_API_VARIABLE_PATH}?post_id=${postId}`,
+			{
+				method: 'GET',
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+				},
+			}
+		);
 
 		// Handle HTTP errors
 		if (!response.ok) {
 			const errorDetails = await response.json();
-			throw new Error(`HTTP error ${response.status}: ${response.statusText} - ${errorDetails}`);
+			throw new Error(
+				`HTTP error ${response.status}: ${response.statusText} - ${errorDetails}`
+			);
 		}
 
 		// Parse response JSON
@@ -80,13 +63,15 @@ export const fetchWPData = async (postId: number) => {
 		const baseLearnUrl = '/learn/?q=sector:';
 		const sectors = Array.isArray(content?.relevant_sectors)
 			? content.relevant_sectors.map((item: Sector) => {
-				const slug = item.name.en.toLowerCase().replace(/\s+/g, '-');
-				const link = `${baseLearnUrl}${slug}`;
-				return {
-					...item,
-					link,
-				};
-			})
+					const slug = item.name.en
+						.toLowerCase()
+						.replace(/\s+/g, '-');
+					const link = `${baseLearnUrl}${slug}`;
+					return {
+						...item,
+						link,
+					};
+				})
 			: [];
 
 		// Generate the mapInfo object.
@@ -96,18 +81,24 @@ export const fetchWPData = async (postId: number) => {
 			fullDescription: content?.full_description || { en: '', fr: '' },
 			techDescription: content?.tech_description || { en: '', fr: '' },
 			relevantSectors: sectors,
-			relevantTrainings: Array.isArray(content?.relevant_trainings) ? content.relevant_trainings : [],
+			relevantTrainings: Array.isArray(content?.relevant_trainings)
+				? content.relevant_trainings
+				: [],
 			featuredImage: content?.featured_image || {
 				thumbnail: '',
 				medium: '',
 				large: '',
 				full: '',
 			},
-			dataset: Array.isArray(dataset) ? dataset : []
+			dataset: Array.isArray(dataset) ? dataset : [],
 		};
 
-		return { mapInfo };
+		const result = { mapInfo };
 
+		// Cache the result
+		apiCache.set(cacheKey, result);
+
+		return result;
 	} catch (error) {
 		console.error('Fetch error:', error);
 		throw error;
@@ -128,41 +119,148 @@ export const fetchLegendData = async (url: string) => {
 /**
  * Fetches taxonomy data from the API
  * @param slug - the taxonomy slug
+ * @param app - the section where to load the terms
  * @param filters - the filters to apply to the data
  */
 export const fetchTaxonomyData = async (
 	slug: string,
-	filters?: Record<string, string | number | null>
+	app: 'map'|'download' = 'map',
+	filters?: Record<string, string | number | null>,
 ): Promise<TaxonomyData[]> => {
-	// check if the there is a dummy response for the slug, which means the API is not yet implemented for it in the backend
-	const fetchFromApi = !Object.keys(dummyResponses).includes(slug);
+	try {
+		// Create cache key based on slug and filters
+		const cacheKey = `taxonomy_${slug}_${JSON.stringify(filters)}`;
 
-	// fetch from the API or directly return dummy json response
-	const data: TaxonomyData[] = !fetchFromApi
-		? dummyResponses[slug as DummyResponseKey]
-		: await fetch(
-				`${WP_API_DOMAIN}/wp-json/cdc/v3/${slug}-list`
-			)
-				.then((res) => {
-					if (!res.ok) {
-						throw new Error('Failed to fetch data');
+		// Check cache first
+		if (apiCache.has(cacheKey)) {
+			return apiCache.get(cacheKey);
+		}
+
+		// Extract the taxonomy info from the variable response
+		// For sector and var-type, we need to get them from the dataset's variables list
+		if (slug === 'sector' || slug === 'var-type') {
+			// Use datasets-list to get the first dataset
+			const datasetsResponse = await fetch(
+				`${WP_API_DOMAIN}/wp-json/cdc/v3/datasets-list?app=${app}`,
+				{
+					method: 'GET',
+					headers: {
+						Accept: 'application/json',
+						'Content-Type': 'application/json',
+					},
+				}
+			);
+
+			if (!datasetsResponse.ok) {
+				throw new Error(
+					`Failed to fetch datasets: ${datasetsResponse.statusText}`
+				);
+			}
+
+			const datasetsData = await datasetsResponse.json();
+			const firstDataset = datasetsData.datasets?.terms?.[0];
+
+			if (!firstDataset || !firstDataset.term_id) {
+				throw new Error('No datasets found');
+			}
+
+			// Now get variables for this dataset to extract taxonomies
+			const variablesResponse = await fetch(
+				`${WP_API_DOMAIN}/wp-json/cdc/v3/variables-list?app=${app}&variable_dataset_term_id=${firstDataset.term_id}`,
+				{
+					method: 'GET',
+					headers: {
+						Accept: 'application/json',
+						'Content-Type': 'application/json',
+					},
+				}
+			);
+
+			if (!variablesResponse.ok) {
+				throw new Error(
+					`Failed to fetch variables: ${variablesResponse.statusText}`
+				);
+			}
+
+			const variablesData = await variablesResponse.json();
+
+			// Extract unique taxonomy terms from all variables
+			const termMap = new Map<number, TaxonomyData>();
+
+			if (
+				variablesData.variables &&
+				Array.isArray(variablesData.variables)
+			) {
+				variablesData.variables.forEach((variable: ApiPostData) => {
+					const taxonomy = variable.meta?.taxonomy?.[slug];
+					if (taxonomy && Array.isArray(taxonomy.terms)) {
+						taxonomy.terms.forEach((term: TaxonomyData) => {
+							if (term.term_id && !termMap.has(term.term_id)) {
+								termMap.set(term.term_id, term);
+							}
+						});
 					}
-					return res.json();
-				})
-				.then((json) => {
-					return json[slug].terms
 				});
+			}
 
-	// applying filters for the dummy implementation.. for the real implementation, this should be done via query params when fetching
-	if (filters) {
-		return data.filter((item) => {
-			return Object.keys(filters).every((key) => {
-				return item[key as keyof TaxonomyData] === filters[key];
-			});
+			// Convert map to array
+			const taxonomyList = Array.from(termMap.values());
+
+			// Cache and return the results
+			apiCache.set(cacheKey, taxonomyList);
+			return taxonomyList;
+		}
+
+		// For other taxonomies, use the normal pattern
+		const url = `${WP_API_DOMAIN}/wp-json/cdc/v3/${slug}-list?app=${app}`;
+
+		// Fetch data from the API
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			},
 		});
-	}
 
-	return data;
+		if (!response.ok) {
+			throw new Error(
+				`Failed to fetch taxonomy data: ${response.statusText}`
+			);
+		}
+
+		const data = await response.json();
+
+		// Extract terms from the response as per the API structure
+		let terms: TaxonomyData[] = [];
+
+		if (data && data[slug] && Array.isArray(data[slug].terms)) {
+			terms = data[slug].terms;
+		}
+
+		// Applying filters if provided
+		let result = terms;
+		if (filters) {
+			result = terms.filter((item) => {
+				return Object.keys(filters).every((key) => {
+					const filterValue = filters[key];
+					// Skip filtering if value is falsy
+					if (!filterValue) {
+						return true;
+					}
+					return item[key as keyof TaxonomyData] === filterValue;
+				});
+			});
+		}
+
+		// Cache the result
+		apiCache.set(cacheKey, result);
+
+		return result;
+	} catch (error) {
+		console.error('Error fetching taxonomy data:', error);
+		return [];
+	}
 };
 
 /**
@@ -176,63 +274,73 @@ export const fetchPostsData = async (
 	postType: string,
 	section: string,
 	dataset: TaxonomyData,
-	filters: Record<string, string | number | null>,
+	filters: Record<string, string | number | null>
 ): Promise<ApiPostData[]> => {
-	// check if the there is a dummy response for the slug, which means the API is not yet implemented for it in the backend
-	const fetchFromApi = !Object.keys(dummyResponses).includes(postType);
-	const { term_id } = dataset;
+	try {
+		const { term_id } = dataset;
 
-	// fetch from the API or directly return dummy json response
-	const data: ApiPostData[] = fetchFromApi
-		? await fetch(
-				`${WP_API_DOMAIN}/wp-json/cdc/v3/${postType}-list?app=${section}&variable_dataset_term_id=${term_id}`, {
-					method: 'GET',
-					headers: {
-						'Accept': 'application/json',
-						'Content-Type': 'application/json',
-					},
-			}
-			)
-				.then((res) => {
-					if (!res.ok) {
-						throw new Error('Failed to fetch data');
-					}
-					return res.json();
-				})
-				.then((json) => json[postType])
-		: dummyResponses[postType as DummyResponseKey];
+		// Create cache key based on postType, section and dataset
+		// We don't include filters since we're doing filtering client-side now
+		const cacheKey = `posts_${postType}_${section}_${term_id}`;
 
-	// only interested in items with an id
-	const filteredData = data.filter((item) => item.id);
+		// Check cache first
+		if (apiCache.has(cacheKey)) {
+			return apiCache.get(cacheKey);
+		}
 
-	// applying filters for the dummy implementation.. for the real implementation, this should be done via query params when fetching
-	if (Object.values(filters).some((value) => value)) {
-		return filteredData.filter((item) => {
-			return Object.keys(filters).every((key) => {
-				const filterValue = filters[key];
+		// Build the query parameters - only include essential parameters
+		const queryParams = new URLSearchParams();
+		queryParams.append('app', section);
+		queryParams.append('variable_dataset_term_id', String(term_id));
 
-				// if filterValue is falsy (0, null, etc) don't filter by it
-				if (!filterValue) {
-					return true;
-				}
+		// Add search parameter if provided (since it can reduce the payload size)
+		if (
+			filters.search &&
+			typeof filters.search === 'string' &&
+			filters.search.trim()
+		) {
+			queryParams.append('search', filters.search.trim());
+		}
 
-				// access taxonomies inside meta.taxonomy
-				const taxonomy = item.meta?.taxonomy?.[key];
+		const url = `${WP_API_DOMAIN}/wp-json/cdc/v3/${postType}-list?${queryParams.toString()}`;
 
-				// if taxonomy is missing, filter it out
-				if (!taxonomy || !taxonomy.terms) {
-					return false;
-				}
-
-				// check if any term_id matches the filterValue
-				return taxonomy.terms.some(
-					(term) => String(term.term_id) === String(filterValue)
-				);
-			});
+		// Fetch the data
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			},
 		});
-	}
 
-	return filteredData;
+		if (!response.ok) {
+			throw new Error(
+				`Failed to fetch posts data: ${response.statusText}`
+			);
+		}
+
+		const data = await response.json();
+
+		// Return the data if it exists in the expected format
+		let result: ApiPostData[] = [];
+		if (data && data[postType] && Array.isArray(data[postType])) {
+			// Filter out items without an id
+			result = data[postType].filter((item: ApiPostData) => item.id);
+		}
+
+		// Cache the result
+		apiCache.set(cacheKey, result);
+
+		return result;
+	} catch (error) {
+		console.error('Error fetching posts data:', error);
+		return [];
+	}
+};
+
+// Method to clear cache for a specific key or all keys
+export const clearApiCache = (key?: string): void => {
+	key ? apiCache.delete(key) : apiCache.clear();
 };
 
 /**
@@ -241,13 +349,28 @@ export const fetchPostsData = async (
  * @param latlng Latitude and Longitude of the location
  */
 export const fetchLocationByCoords = async (latlng: L.LatLng) => {
-	const response = await fetch(`https://dev-en.climatedata.ca/wp-json/cdc/v2/get_location_by_coords/?lat=${latlng.lat}&lng=${latlng.lng}&sealevel=false`);
-	
-	if (!response.ok) {
-		throw new Error('Failed to fetch data');
-	}
+	try {
+		// Make the Fetch request.
+		const response = await fetch(`${WP_API_DOMAIN}${WP_API_LOCATION_BY_COORDS_PATH}?lat=${latlng.lat}&lng=${latlng.lng}&sealevel=false`, {
+			method: 'GET',
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json',
+			},
+		});
 
-	return await response.json();
+		// Handle HTTP errors
+		if (!response.ok) {
+			const errorDetails = await response.json();
+			throw new Error(`HTTP error ${response.status}: ${response.statusText} - ${errorDetails}`);
+		}
+
+		// Parse response JSON
+		return await response.json();
+	} catch (error) {
+		console.error('Fetch error:', error);
+		throw error;
+	}
 };
 
 /**
@@ -258,7 +381,7 @@ export const fetchLocationByCoords = async (latlng: L.LatLng) => {
 export const generateChartData = async (options: ChartDataOptions) => {
 	const { latlng: { lat, lng }, dataset, variable, frequency  } = options;
 	const response = await fetch(`https://dataclimatedata.crim.ca/generate-charts/${lat}/${lng}/${variable}/${frequency}?decimals=1&dataset_name=${dataset}`);
-	
+
 	if (!response.ok) {
 		throw new Error('Failed to fetch data');
 	}
@@ -274,8 +397,12 @@ export const generateChartData = async (options: ChartDataOptions) => {
 export const fetchDeltaValues = async (options: DeltaValuesOptions) => {
 	try {
 		const { endpoint, varName, frequency, params } = options;
-		
-		const response = await fetch(`//dataclimatedata.crim.ca/${endpoint}/${varName}/${frequency}?${params}`);
+		let url = `//dataclimatedata.crim.ca/${endpoint}`;
+		if(varName !== null) url += `/${varName}`;
+		if(frequency !== null) url += `/${frequency}`;
+		url += `?${params}`;
+
+		const response = await fetch(url);
 
 		if (!response.ok) {
 			throw new Error(response.statusText);
@@ -288,6 +415,11 @@ export const fetchDeltaValues = async (options: DeltaValuesOptions) => {
 	}
 };
 
+/**
+ * Fetches choro values from the API.
+ *
+ * @param options Options to pass to the API
+ */
 export const fetchChoroValues = async (options: ChoroValuesOptions) => {
 	const urlPath = [
 		options.interactiveRegion,

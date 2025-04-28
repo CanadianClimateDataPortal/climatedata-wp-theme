@@ -20,6 +20,7 @@ import {
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
 import RasterDownloadMap from "@/components/download/raster-download-map";
+import L from "leaflet";
 
 /**
  * A base class representing a climate variable and its configuration. This class provides methods
@@ -53,6 +54,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		}
 
 		return title as string || null;
+	}
+
+	getDatasetType(): string | null {
+		return this._config.datasetType ?? null;
 	}
 
 	getVersions(): string[] {
@@ -90,6 +95,21 @@ class ClimateVariableBase implements ClimateVariableInterface {
 			return currentScenario;
 		}
 		return this.getScenarios()[0] || null;
+	}
+
+	getScenarioCompare(): boolean {
+		// Return if scenario comparison is checked or not.
+		return this._config.scenarioCompare ?? false;
+	}
+
+	getScenarioCompareTo(): string | null {
+		// Check if the scenarioCompareTo actually belongs to the current version
+		// If not, return null, as we don't want this to be the same as the current scenario.
+		const scenarioCompareTo = this._config.scenarioCompareTo;
+		if (scenarioCompareTo && this.getScenarios().includes(scenarioCompareTo)) {
+			return scenarioCompareTo;
+		}
+		return null;
 	}
 
 	getAnalyzeScenarios(): string[] {
@@ -144,6 +164,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.hasDelta;
 	}
 
+	getDataValue(): string | null {
+		return this._config.dataValue ?? null;
+	}
+
 	getCustomColourSchemes(): CustomColourSchemes | null {
 		return this._config.customColourSchemes ?? null;
 	}
@@ -153,7 +177,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getColourOptionsStatus(): boolean {
-		return this._config.enableColourOptions ?? false;
+		return this._config.enableColourOptions ?? true;
 	}
 
 	getColourType(): string | null {
@@ -207,6 +231,22 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.percentiles ?? [];
 	}
 
+	getMissingDataOptions(): string[] {
+		return this._config.missingDataOptions ?? [];
+	}
+
+	getMissingData(): string | null {
+		return this._config.missingData ?? this.getMissingDataOptions()?.[0] ?? null;
+	}
+
+	getModelOptions(): string[] {
+		return this._config.modelOptions ?? [];
+	}
+
+	getModel(): string | null {
+		return this._config.model ?? this.getModelOptions()?.[0] ?? null;
+	}
+
 	getFileFormatTypes(): FileFormatType[] {
 		return this._config.fileFormatTypes ?? [];
 	}
@@ -217,6 +257,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getMaxDecimals(): number {
 		return this._config.maxDecimals ?? 0;
+	}
+
+	getDecimalPlace(): number {
+		return this._config.decimalPlace ?? 0;
 	}
 
 	renderMap(): React.ReactElement {
@@ -249,6 +293,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getSelectedPoints(): GridCoordinates | null {
 		return this._config.selectedPoints ?? null;
+	}
+
+	getSelectedPointsCount(): number {
+		return Object.keys(this._config.selectedPoints ?? {}).length;
 	}
 
 	toObject(): ClimateVariableConfigInterface {

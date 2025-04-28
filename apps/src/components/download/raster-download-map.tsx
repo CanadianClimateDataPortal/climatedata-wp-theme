@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
 import { setSelectionMode } from '@/features/download/download-slice';
 import { Button } from '@/components/ui/button';
@@ -11,11 +11,15 @@ import MapEvents from '@/components/map-layers/map-events';
 import CustomPanesLayer from '@/components/map-layers/custom-panes';
 import ZoomControl from '@/components/map-layers/zoom-control';
 import SearchControl from '@/components/map-layers/search-control';
+import InteractiveRegionSelect from '@/components/interactive-region-select';
 import SelectableCellsGridLayer from '@/components/map-layers/selectable-cells-grid-layer';
 import SelectableRectangleGridLayer from '@/components/map-layers/selectable-rectangle-grid-layer';
+import SelectableRegionLayer from '@/components/map-layers/selectable-region-layer';
 import { useI18n } from '@wordpress/react-i18n';
 import { useMap } from '@/hooks/use-map';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { DownloadType, InteractiveRegionOption } from '@/types/climate-variable-interface';
 
 export default function RasterDownloadMap(): React.ReactElement {
 	const { __, _n } = useI18n();
@@ -24,8 +28,9 @@ export default function RasterDownloadMap(): React.ReactElement {
 		clearSelection: () => void;
 	}>(null);
 
+	const { climateVariable } = useClimateVariable();
 	const { setMap } = useMap();
-	const { zoom, center, selectionMode, selectionCount } = useAppSelector(
+	const { zoom, center, selectionMode } = useAppSelector(
 		(state) => state.download
 	);
 	const dispatch = useAppDispatch();
@@ -35,70 +40,95 @@ export default function RasterDownloadMap(): React.ReactElement {
 	};
 
 	const renderGrid = () => {
-		return selectionMode === 'cells' ? (
-			<SelectableCellsGridLayer ref={gridLayerRef} />
-		) : (
-			<SelectableRectangleGridLayer ref={gridLayerRef} />
-		);
+		switch (climateVariable?.getInteractiveRegion()) {
+			case InteractiveRegionOption.GRIDDED_DATA:
+				return selectionMode === 'cells' ? (
+					<SelectableCellsGridLayer ref={gridLayerRef} />
+				) : (
+					<SelectableRectangleGridLayer ref={gridLayerRef} />
+				);
+			default:
+				return <SelectableRegionLayer />
+		}
 	};
+
+	const selectionModeOptions = useMemo(() => {
+		const selectionModes = [
+			{
+				value: 'cells',
+				label: __('Grid cells'),
+			},
+		];
+
+		if (climateVariable?.getDownloadType() !== DownloadType.ANALYZED) {
+			selectionModes.push({
+				value: 'region',
+				label: __('Draw region'),
+			})
+		}
+
+		return selectionModes;
+	}, [climateVariable]);
 
 	return (
 		<>
-			<div className="mb-4">
-				<div className="flex flex-col sm:flex-row gap-4 justify-between items-start">
-					<RadioGroupFactory
-						title={__('Ways to select on the map')}
-						name="map-selection-mode"
-						value={selectionMode}
-						orientation="horizontal"
-						className="mb-0"
-						optionClassName="me-8"
-						onValueChange={(value) => {
-							dispatch(setSelectionMode(value));
-							clearSelection();
-						}}
-						options={[
-							{ value: 'cells', label: __('Grid cells') },
-							{
-								value: 'region',
-								label: __('Draw region'),
-							},
-						]}
-					/>
-					<div className="flex flex-row items-start gap-4">
-						{selectionCount > 0 && (
-							<Button
-								variant="ghost"
-								className="text-xs text-brand-red font-semibold leading-4 tracking-wider uppercase h-auto p-0"
-								onClick={clearSelection}
-							>
-								<RefreshCw size={16} />
-								{__('Clear')}
-							</Button>
-						)}
-						<div>
-							<ControlTitle
-								title={__('You selected:')}
-								className="my-0"
-							/>
-							<div
-								className={cn(
-									'text-2xl font-semibold leading-7 text-right',
-									selectionCount > 0
-										? 'text-brand-blue'
-										: 'text-neutral-grey-medium'
-								)}
-							>
-								{_n(
-									'1 Cell',
-									`${selectionCount} Cells`,
-									selectionCount
-								)}
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED && (
+				<div className="mb-8 sm:w-64">
+					<InteractiveRegionSelect />
+				</div>
+			)}
+
+			{climateVariable?.getInteractiveRegion() === InteractiveRegionOption.GRIDDED_DATA && (
+				<div className="mb-4">
+					<div className="flex flex-col sm:flex-row gap-4 justify-between items-start">
+						<RadioGroupFactory
+							title={__('Ways to select on the map')}
+							name="map-selection-mode"
+							value={selectionMode}
+							orientation="horizontal"
+							className="mb-0"
+							optionClassName="me-8"
+							options={selectionModeOptions}
+							onValueChange={(value) => {
+								dispatch(setSelectionMode(value));
+								clearSelection();
+							}}
+						/>
+						<div className="flex flex-row items-start gap-4">
+							{climateVariable?.getSelectedPointsCount() > 0 && (
+								<Button
+									variant="ghost"
+									className="text-xs text-brand-red font-semibold leading-4 tracking-wider uppercase h-auto p-0"
+									onClick={clearSelection}
+								>
+									<RefreshCw size={16} />
+									{__('Clear')}
+								</Button>
+							)}
+							<div>
+								<ControlTitle
+									title={__('You selected:')}
+									className="my-0"
+								/>
+								<div
+									className={cn(
+										'text-2xl font-semibold leading-7 text-right',
+										climateVariable?.getSelectedPointsCount() > 0
+											? 'text-brand-blue'
+											: 'text-neutral-grey-medium'
+									)}
+								>
+									{_n(
+										'1 Cell',
+										`${climateVariable?.getSelectedPointsCount()} Cells`,
+										climateVariable?.getSelectedPointsCount()
+									)}
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
+			)}
 
 			<MapContainer
 				center={center}

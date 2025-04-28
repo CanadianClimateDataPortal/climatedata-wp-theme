@@ -6,7 +6,7 @@ import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.vectorgrid';
 
-import { useAppSelector } from '@/app/hooks';
+import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { useInteractiveMapEvents } from '@/hooks/use-interactive-map-events';
 import { fetchChoroValues } from '@/services/services';
 import {
@@ -16,17 +16,19 @@ import {
 	GEOSERVER_BASE_URL,
 } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { clearRecentLocations } from '@/features/map/map-slice';
 import { ColourType, InteractiveRegionOption } from "@/types/climate-variable-interface";
 import { generateColourScheme } from "@/lib/colour-scheme";
 import { getDefaultFrequency } from "@/lib/utils";
 import SectionContext from "@/context/section-provider";
 
 interface InteractiveRegionsLayerProps {
+	scenario?: string | null | undefined;
 	onLocationModalOpen: (content: React.ReactNode) => void;
 	onLocationModalClose: () => void;
 }
 
-const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLocationModalOpen, onLocationModalClose }) => {
+const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scenario, onLocationModalOpen, onLocationModalClose }) => {
 	const [layerData, setLayerData] = useState<Record<number, number> | null>(
 		null
 	);
@@ -35,17 +37,45 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 	const layerRef = useRef<L.VectorGrid | null>(null);
 
 	const map = useMap();
-
+	const dispatch = useAppDispatch();
 	const section = useContext(SectionContext);
 
 	const {
 		legendData,
-		dataValue,
+		opacity: { mapData },
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
-	const gridType = climateVariable?.getGridType() ?? 'canadagrid';
-	const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
+
+	const {
+		threshold,
+		datasetVersion,
+		customColourScheme,
+		colourType,
+		gridType,
+		interactiveRegion,
+		startYear
+	} = useMemo(() => ({
+		threshold: climateVariable?.getThreshold() ?? '',
+		datasetVersion: climateVariable?.getVersion() ?? '',
+		customColourScheme: climateVariable ? generateColourScheme(climateVariable) : null,
+		colourType: climateVariable?.getColourType(),
+		gridType: climateVariable?.getGridType() ?? 'canadagrid',
+		interactiveRegion: climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA,
+		startYear: climateVariable?.getDateRange()?.[0] ?? '2040',
+	}), [climateVariable]);
+
+	const frequency = useMemo(() => {
+		const frequencyConfig = climateVariable?.getFrequencyConfig();
+
+		let frequency = climateVariable?.getFrequency() ?? '';
+
+		if (!frequency && frequencyConfig) {
+			frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
+		}
+
+		return frequency;
+	}, [climateVariable, section]);
 
 	// Convert legend data to a color map usable by the getColor method to generate colors for each feature
 	const colorMap = useMemo(() => {
@@ -57,15 +87,12 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 			legendData.Legend[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap
 				?.entries ?? [];
 
-		if (climateVariable) {
-			const customColourScheme = generateColourScheme(climateVariable, dataValue);
-			if (customColourScheme) {
-				return {
-					colours: customColourScheme.colours,
-					quantities: customColourScheme.quantities,
-					schemeType: climateVariable.getColourType(),
-				};
-			}
+		if (customColourScheme) {
+			return {
+				colours: customColourScheme.colours,
+				quantities: customColourScheme.quantities,
+				schemeType: colourType,
+			};
 		}
 
 		// Fallback to default map colours.
@@ -74,7 +101,11 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 			quantities: legendColourMapEntries.map((entry) => Number(entry.quantity)),
 			schemeType: ColourType.CONTINUOUS,
 		};
-	}, [climateVariable, dataValue, legendData]);
+	}, [
+		colourType,
+		customColourScheme,
+		legendData
+	]);
 
 	// Function to interpolate between colors
 	// Taken from fw-child/resources/js/utilities.js interpolate function, but optimized for React
@@ -222,28 +253,19 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 	// fetch layer data if needed
 	useEffect(() => {
 		(async () => {
-			const interactiveRegion = climateVariable?.getInteractiveRegion() ?? '';
-
 			// no need to fetch anything for gridded data
 			if (interactiveRegion === InteractiveRegionOption.GRIDDED_DATA) {
 				return;
 			}
 
-			const frequencyConfig = climateVariable?.getFrequencyConfig();
-			let frequency = climateVariable?.getFrequency() ?? ''
-			if (!frequency && frequencyConfig) {
-				frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
-			}
-			const [ startYear ] = climateVariable?.getDateRange() ?? [];
-
 			try {
 				const data = await fetchChoroValues({
-					variable: climateVariable?.getThreshold() ?? '',
-					dataset: climateVariable?.getVersion() ?? '',
+					variable: threshold,
+					dataset: datasetVersion,
 					decade: startYear,
 					frequency,
 					interactiveRegion,
-					emissionScenario: climateVariable?.getScenario() ?? '',
+					emissionScenario: scenario ?? '',
 					decimals: 1,
 				});
 
@@ -253,8 +275,12 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 			}
 		})();
 	}, [
-		climateVariable,
-		section,
+		datasetVersion,
+		frequency,
+		interactiveRegion,
+		scenario,
+		startYear,
+		threshold
 	]);
 
 	useEffect(() => {
@@ -283,6 +309,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 
 		// @ts-expect-error: suppress leaflet typescript error
 		const layer = L.vectorGrid.protobuf(tileLayerUrl, layerOptions);
+		layer.setOpacity(mapData);
 		layerRef.current = layer;
 
 		layer.on('click', handleClick);
@@ -294,6 +321,16 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 		}
 
 		layer.addTo(map);
+
+		// clear all existing markers from the map
+		map.eachLayer(layer => {
+			if (layer instanceof L.Marker) {
+				map.removeLayer(layer);
+			}
+		});
+
+		// clear recent locations
+		dispatch(clearRecentLocations());
 
 		return () => {
 			map.removeLayer(layer);
@@ -311,6 +348,12 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ onLoc
 			vectorTileLayerStyles,
 		]
 	);
+
+	useEffect(() => {
+		if (layerRef.current) {
+			layerRef.current.setOpacity(mapData);
+		}
+	}, [mapData]);
 
 	return null;
 };

@@ -4,8 +4,7 @@ import { ColourScheme } from "@/types/types";
 import { getDefaultFrequency, getFrequencyCode } from "@/lib/utils";
 
 export function generateColourScheme(
-	climateVariable: ClimateVariableInterface,
-	dataValue: string
+	climateVariable: ClimateVariableInterface
 ): ColourScheme | undefined {
 	if (!climateVariable) {
 		return;
@@ -49,12 +48,14 @@ export function generateColourScheme(
 		return;
 	}
 
+	const useDelta = climateVariable?.hasDelta() ?? false;
+
 	return {
 		colours,
 		type: schemeType,
 		quantities: calculateQuantities({
 			temporalScaleConfig,
-			dataValue,
+			useDelta,
 			colours,
 			schemeType,
 			decimals
@@ -64,7 +65,7 @@ export function generateColourScheme(
 
 interface CalculateQuantitiesParams {
 	temporalScaleConfig: TemporalScaleConfig;
-	dataValue: string;
+	useDelta: boolean;
 	colours: string[];
 	schemeType: string;
 	decimals: number;
@@ -72,13 +73,12 @@ interface CalculateQuantitiesParams {
 
 function calculateQuantities({
 	temporalScaleConfig,
-	dataValue,
+	useDelta,
 	colours,
 	schemeType,
 	decimals
 }: CalculateQuantitiesParams): number[] {
 	const quantities: number[] = [];
-	const useDelta = dataValue === 'delta';
 	const { absolute, delta, unit } = temporalScaleConfig;
 	const schemeLength = colours.length;
 

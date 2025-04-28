@@ -69,27 +69,67 @@ export const normalizePostData = async (
 ): Promise<PostData[]> => {
 	const data = await dataOrPromise;
 
-	return data.map((post: ApiPostData) => ({
-		id: post.id,
-		postId: post.post_id,
-		title: post.meta.content.title[locale] || '',
-		description: post.meta.content.card?.description?.[locale] || '',
-		link: post.meta.content.card?.link?.[locale] || undefined,
-		thumbnail: post.meta.content.thumbnail || '',
-		taxonomies: Object.fromEntries(
-			Object.entries(post.meta.taxonomy || {}).map(([key, value]) => {
-				const { terms } = value as { terms: TermItem[] };
+	return data
+		.map((post: ApiPostData) => {
+			// Check each required property and report specifically which one is missing
+			const missingProps = [];
 
-				return [
-					key,
-					terms.map((term: TermItem) => ({
-						id: term.term_id,
-						title: term.title[locale] || '',
-					})),
-				];
-			})
-		),
-	}));
+			if (!post) {
+				missingProps.push('post');
+			} else {
+				switch (true) {
+					case post.meta === undefined:
+						missingProps.push('post.meta');
+						break;
+					case post.meta?.content === undefined:
+						missingProps.push('post.meta.content');
+						break;
+					case post.meta?.content?.title === undefined:
+						missingProps.push('post.meta.content.title');
+						break;
+				}
+			}
+
+			if (missingProps.length > 0) {
+				console.warn(
+					`Post ID ${post?.id || 'unknown'}: Missing required properties: ${missingProps.join(', ')}`
+				);
+				return {
+					id: post?.id || 'unknown',
+					postId: post?.post_id || 0,
+					title: 'Unknown',
+					description: '',
+					thumbnail: '',
+					taxonomies: {},
+				};
+			}
+
+			return {
+				id: post.id,
+				postId: post.post_id,
+				title: post.meta.content.title[locale] || '',
+				description:
+					post.meta.content.card?.description?.[locale] || '',
+				link: post.meta.content.card?.link?.[locale] || undefined,
+				thumbnail: post.meta.content.thumbnail || '',
+				taxonomies: Object.fromEntries(
+					Object.entries(post.meta.taxonomy || {}).map(
+						([key, value]) => {
+							const terms =
+								(value as { terms?: TermItem[] })?.terms || [];
+							return [
+								key,
+								terms.map((term: TermItem) => ({
+									id: term.term_id,
+									title: term.title[locale] || '',
+								})),
+							];
+						}
+					)
+				),
+			};
+		})
+		.filter(Boolean);
 };
 
 export const doyFormatter = (value: number, language: string) => {

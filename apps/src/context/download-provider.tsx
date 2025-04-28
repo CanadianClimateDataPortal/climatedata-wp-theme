@@ -1,190 +1,143 @@
 /**
- * DownloadContext and Provider
+ * Download Provider and Context
  *
- * Provides a context for managing the download map app.
+ * This provider manages the multi-step form state and behavior for the download application.
+ * It handles:
+ * - Step navigation (forward and backward)
+ * - Step validation state
+ * - Dynamic step registration
+ * - Data reset when navigating backwards
  *
- * Allows for navigating through a form and keeps state of
- * the different data variables to setup the download.
+ * Each step component must implement the StepComponentRef interface which includes:
+ * - isValid(): boolean - Determines if the step's data is valid
+ * - getResetPayload(): StepResetPayload - Returns the data that should be reset when navigating backwards
  *
- * It also acts as a bridge between the redux store and the components, making
- * it easier to manage the state of the app and keeping both components and store clean.
+ * Step Registration:
+ * Steps are dynamically registered when they mount using the registerStepRef function.
+ * This registration allows the provider to:
+ * - Track which steps are currently mounted
+ * - Access step-specific validation and reset logic
+ * - Manage step-specific data resets when navigating backwards
+ *
+ * Data Reset Logic:
+ * When navigating backwards (e.g., from step 5 to step 2):
+ * 1. All steps after the target step are identified
+ * 2. Their reset payloads are collected in order (lowest to highest step number)
+ * 3. The combined reset payload is dispatched to update the climate variable state
+ * This ensures that data from later steps is properly cleared when going back
+ *
+ * @example
+ * // In a step component, implement the required interface
+ * const StepComponent = React.forwardRef<StepComponentRef>((_, ref) => {
+ *   React.useImperativeHandle(ref, () => ({
+ *     isValid: () => boolean,
+ *     getResetPayload: () => ({ field: null })
+ *   }));
+ *   ...
+ * });
  */
-import React, { createContext, useState, useEffect, useCallback } from 'react';
 
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import {
-	initialState,
-	setCenter,
-	setDataset,
-	setDecimalPlace,
-	setDegrees,
-	setEmail,
-	setEmissionScenarios,
-	setEndYear,
-	setFormat,
-	setFrequency,
-	setInteractiveRegion,
-	setPercentiles,
-	setSelection,
-	setSelectionCount,
-	setStartYear,
-	setSubscribe,
-	setVariable,
-	setVersion,
-	setZoom,
-} from '@/features/download/download-slice';
-import { DownloadState, PostData, TaxonomyData } from '@/types/types';
-import { isValidEmail } from '@/lib/utils';
-import { LatLngExpression } from 'leaflet';
+import React, { createContext, useState, useCallback, useRef } from 'react';
+import { useAppSelector, useAppDispatch } from '@/app/hooks';
+import { TaxonomyData } from '@/types/types';
+import { StepComponentRef } from '@/types/download-form-interface';
+import { updateClimateVariable } from '@/store/climate-variable-slice';
 
-const DownloadContext = createContext<{
+interface DownloadContextValue {
 	currentStep: number;
 	goToNextStep: () => void;
 	goToStep: (step: number) => void;
-	isStepValid: () => boolean;
-	fields: DownloadState;
-} | null>(null);
+	dataset: TaxonomyData | null;
+	registerStepRef: (step: number, ref: StepComponentRef | null) => void;
+}
 
-// keep track of which fields are required for each step
-// @todo rework since the fields in a step can be dynamic.
-//  This must be checked from inside the step.
-const stepValues: Record<number, (keyof DownloadState)[]> = {
-	1: ['dataset'],
-	2: ['variable'],
-	3: ['version', 'degrees'],
-	4: [],
-	5: [],
-	6: ['format'], // TODO: do we want the step to also require the `subcribe` box to be checked?
-};
+const DownloadContext = createContext<DownloadContextValue | null>(null);
 
 export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
 	const [currentStep, setCurrentStep] = useState<number>(1);
-
-	// using download provider as a bridge between components and redux
+	const dataset = useAppSelector((state) => state.download.dataset);
 	const dispatch = useAppDispatch();
-	const state = useAppSelector((state) => state.download);
 
-	// TODO: once data is fetched from the API, we will likely need to replace this because
-	//  not all variables will have the same options
-	// helper method used to reset step fields when moving back to a previous step
-	const setField = useCallback(
-		<K extends keyof DownloadState>(key: K, value: DownloadState[K]) => {
-			switch (key) {
-				case 'dataset':
-					dispatch(setDataset(value as TaxonomyData));
-					break;
-				case 'variable':
-					dispatch(setVariable(value as PostData));
-					break;
-				case 'version':
-					dispatch(setVersion(value as string));
-					break;
-				case 'degrees':
-					dispatch(setDegrees(value as number));
-					break;
-				case 'interactiveRegion':
-					dispatch(setInteractiveRegion(value as string));
-					break;
-				case 'startYear':
-					dispatch(setStartYear(value as number));
-					break;
-				case 'endYear':
-					dispatch(setEndYear(value as number));
-					break;
-				case 'frequency':
-					dispatch(setFrequency(value as string));
-					break;
-				case 'emissionScenarios':
-					dispatch(setEmissionScenarios(value as string[]));
-					break;
-				case 'selection':
-					dispatch(setSelection(value as number[]));
-					break;
-				case 'selectionCount':
-					dispatch(setSelectionCount(value as number));
-					break;
-				case 'zoom':
-					dispatch(setZoom(value as number));
-					break;
-				case 'center':
-					dispatch(setCenter(value as LatLngExpression));
-					break;
-				case 'percentiles':
-					dispatch(setPercentiles(value as string[]));
-					break;
-				case 'decimalPlace':
-					dispatch(setDecimalPlace(value as number));
-					break;
-				case 'format':
-					dispatch(setFormat(value as string));
-					break;
-				case 'email':
-					dispatch(setEmail(value as string));
-					break;
-				case 'subscribe':
-					dispatch(setSubscribe(value as boolean));
-					break;
-				default:
-					break;
+	/** Map of step numbers to their component refs */
+	const stepRefs = useRef(new Map<number, StepComponentRef>());
+
+	/**
+	 * Registers or unregisters a step component's ref.
+	 * This allows the provider to access step-specific validation and reset logic.
+	 *
+	 * @param step - The step number (1-based)
+	 * @param ref - The step component's ref, or null to unregister
+	 */
+	const registerStepRef = useCallback((step: number, ref: StepComponentRef | null) => {
+		if (ref) {
+			stepRefs.current.set(step, ref);
+		} else {
+			stepRefs.current.delete(step);
+		}
+	}, []);
+
+	/**
+	 * Resets data for all steps after the target step.
+	 * This ensures that when navigating backwards, any data entered in later steps
+	 * is cleared to maintain form consistency.
+	 *
+	 * The reset process:
+	 * 1. Identifies all steps after the target step
+	 * 2. Sorts them to ensure proper reset order (earlier steps first)
+	 * 3. Collects reset payloads from each step
+	 * 4. Combines and dispatches the reset data
+	 *
+	 * @param targetStep - The step number being navigated to
+	 */
+	const resetStepsAfter = useCallback((targetStep: number) => {
+		const stepsToReset = Array.from(stepRefs.current.entries())
+			.filter(([step]) => step > targetStep)
+			.sort(([stepA], [stepB]) => stepA - stepB);
+
+		const resetPayload = stepsToReset.reduce((payload, [_, ref]) => {
+			if (ref.getResetPayload) {
+				return {
+					...payload,
+					...ref.getResetPayload()
+				};
 			}
-		},
-		[dispatch]
-	);
+			return payload;
+		}, {});
 
-	// clear fields when moving back to a previous step
-	useEffect(() => {
-		Object.keys(stepValues)
-			.map(Number) // convert keys to numbers
-			.filter((step) => step > currentStep) // get the steps AFTER the current step
-			.forEach((step) => {
-				stepValues[step].forEach((key) => {
-					setField(key, initialState[key]); // reset to initial default value
-				});
-			});
-	}, [currentStep, setField]);
+		if (Object.keys(resetPayload).length > 0) {
+			dispatch(updateClimateVariable(resetPayload));
+		}
+	}, [dispatch]);
 
-	const isStepValid = useCallback((): boolean => {
-		const requiredValues = stepValues[currentStep] || [];
-
-		return requiredValues.every((key) => {
-			const value = state[key];
-
-			// array type values should have at least one item
-			if (Array.isArray(value)) {
-				return value.length > 0;
-			}
-
-			// we need some custom validation for some values
-
-			// email should be valid
-			if (key === 'email') {
-				return isValidEmail(String(value));
-			}
-
-			// a zero is valid for number types, except in step 4 where selection are required
-			if (typeof value === 'number' && key !== 'selection') {
-				return true;
-			}
-
-			// any other value/key condition should be truthy
-			return !!value;
-		});
-	}, [currentStep, state]);
-
+	/**
+	 * Navigates to the next step in the form.
+	 */
 	const goToNextStep = useCallback(
 		() => setCurrentStep((prev) => prev + 1),
 		[]
 	);
-	const goToStep = useCallback((step: number) => setCurrentStep(step), []);
 
-	const values = {
+	/**
+	 * Navigates to a specific step in the form.
+	 * If navigating backwards, triggers data reset for all subsequent steps.
+	 *
+	 * @param step - The target step number (1-based)
+	 */
+	const goToStep = useCallback((step: number) => {
+		if (step < currentStep) {
+			resetStepsAfter(step);
+		}
+		setCurrentStep(step);
+	}, [currentStep, resetStepsAfter]);
+
+	const values: DownloadContextValue = {
 		currentStep,
 		goToNextStep,
 		goToStep,
-		isStepValid,
-		fields: state, // expose all state fields to keep things simple
+		dataset,
+		registerStepRef,
 	};
 
 	return (

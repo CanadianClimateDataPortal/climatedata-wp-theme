@@ -14,11 +14,12 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setDataset } from '@/features/download/download-slice';
 import { fetchTaxonomyData } from '@/services/services';
 import { TaxonomyData } from '@/types/types';
+import { StepComponentRef } from '@/types/download-form-interface';
 
 /**
  * Dataset step
  */
-const StepDataset: React.FC = () => {
+const StepDataset = React.forwardRef<StepComponentRef>((_, ref) => {
 	const [options, setOptions] = useState<TaxonomyData[]>([]);
 
 	const { __ } = useI18n();
@@ -27,8 +28,17 @@ const StepDataset: React.FC = () => {
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const dispatch = useAppDispatch();
 
+	React.useImperativeHandle(ref, () => ({
+		isValid: () => Boolean(dataset),
+		getResetPayload: () => {
+			return {
+				dataset: null
+			};
+		}
+	}), [dataset]);
+
 	useEffect(() => {
-		fetchTaxonomyData('datasets').then((data) => {
+		fetchTaxonomyData('datasets', 'download').then((data) => {
 			setOptions(data);
 		});
 	}, []);
@@ -77,7 +87,7 @@ const StepDataset: React.FC = () => {
 			</div>
 		</StepContainer>
 	);
-};
+});
 StepDataset.displayName = 'StepDataset';
 
 export default StepDataset;

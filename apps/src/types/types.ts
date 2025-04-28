@@ -5,6 +5,7 @@ import { buttonVariants } from '@/lib/format';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { LucideIcon } from 'lucide-react';
 import L from 'leaflet';
+import { ClimateVariableConfigInterface } from '@/types/climate-variable-interface';
 
 /**
  * Represents valid locale values.
@@ -75,6 +76,7 @@ export type TaxonomyData = {
 			target: string;
 		}>;
 	};
+	dataset_type?: string;
 };
 
 /**
@@ -168,9 +170,6 @@ export type SliderLabelsMap = {
  * Represents the map state in redux store.
  */
 export interface MapState {
-	emissionScenario: string;
-	emissionScenarioCompare: boolean;
-	emissionScenarioCompareTo: string;
 	interactiveRegion: string;
 	thresholdValue: number;
 	frequency: string;
@@ -180,7 +179,6 @@ export interface MapState {
 	dataset?: TaxonomyData;
 	decade: string;
 	pane: string;
-	dataValue: string;
 	mapColor: string;
 	legendData: WMSLegendData;
 	opacity: {
@@ -196,24 +194,14 @@ export interface MapState {
  */
 export interface DownloadState {
 	dataset: TaxonomyData | null;
-	variable: PostData | null;
-	version: string;
-	degrees: number;
-	interactiveRegion: string;
-	startYear: number;
-	endYear: number;
-	frequency: string;
-	emissionScenarios: string[];
 	selectionMode: string;
 	selection: number[];
 	selectionCount: number;
 	zoom: number;
 	center: L.LatLngExpression;
-	percentiles: string[];
-	decimalPlace: number;
-	format: string;
 	email: string;
 	subscribe: boolean;
+	variableListLoading: boolean;
 }
 
 /**
@@ -308,7 +296,7 @@ export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 export interface ButtonProps
 	extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-		VariantProps<typeof buttonVariants> {
+	VariantProps<typeof buttonVariants> {
 	asChild?: boolean;
 }
 
@@ -471,6 +459,7 @@ export interface ClimateDataProps {
 	delta7100_ssp245_range?: Record<string, number[]>;
 	delta7100_ssp585_median?: Record<string, number[]>;
 	delta7100_ssp585_range?: Record<string, number[]>;
+	[key: string]: number[][] | Record<string, number[]> | undefined;
 }
 
 /**
@@ -522,8 +511,8 @@ export interface ChartDataOptions {
 
 export interface DeltaValuesOptions {
 	endpoint: string;
-	varName: string;
-	frequency: string;
+	varName: string | null;
+	frequency: string | null;
 	params: string;
 }
 
@@ -536,11 +525,13 @@ export interface PercentileData {
 /**
  * Represents the properties of a cell in the maps's grid layer.
  */
-export interface GridCellProps {
+export interface MapFeatureProps {
 	latlng: L.LatLng;
 	layer: {
 		properties: {
-			gid: number;
+			label_en?: string;
+			gid?: number;
+			id?: number;
 		};
 	};
 }
@@ -560,8 +551,8 @@ export interface ChoroValuesOptions {
 
 export interface ColourScheme {
 	type: string;
-	colours: string[],
-	quantities?: number[],
+	colours: string[];
+	quantities?: number[];
 }
 
 // A translatable string object with English and French variants
@@ -601,8 +592,8 @@ export interface DatasetTerm {
 }
 
 /**
-* Represents the structure used as props for MapInfo component.
-*/
+ * Represents the structure used as props for MapInfo component.
+ */
 export interface MapInfoData {
 	title: LocalizedString;
 	tagline: LocalizedString;
@@ -613,3 +604,131 @@ export interface MapInfoData {
 	featuredImage: FeaturedImage;
 	dataset: DatasetTerm[];
 }
+
+/**
+ * Represents the properties of the VariableFilterCount component.
+ */
+export interface VariableFilterCountProps {
+	filteredCount: number;
+	totalCount: number;
+	className?: string;
+}
+
+// -----------------------------------------------------------------------------
+// Downloads Specifics Types
+// -----------------------------------------------------------------------------
+// This section includes types related to components and structures used in
+// download configuration and variable-specific behavior.
+// -----------------------------------------------------------------------------
+
+/**
+ * Props for the AnalyzedField component.
+ *
+ * Renders either an input or dropdown (select) field for configuring a climate variable.
+ */
+export interface AnalyzedFieldProps {
+	keyName: string;
+	type: 'input' | 'select';
+	label: string;
+	description?: string;
+	help?: string;
+	attributeType?: string;
+	placeholder?: string;
+	value: string | readonly string[] | number | undefined;
+	onChange: (key: string, value: string) => void;
+	__: (text: string) => string;
+	options?: { value: string; label: string }[];
+}
+
+/**
+ * Props for the InputAnalyzedField component.
+ *
+ * Represents a single text input used to configure a specific aspect
+ * of a climate variable in the analyzed download type.
+ */
+export interface InputAnalyzedFieldProps {
+	className: string;
+	keyName: string; // The key used to identify this input's value
+	label?: string;
+	value?: string | readonly string[] | number | undefined;
+	description?: string;
+	tooltip?: string | React.ReactNode;
+	placeholder?: string;
+	attributeType?: string; // Optional input type, defaults to 'text'
+	onChange: (key: string, value: string) => void; // Emits changes upward
+}
+
+/**
+ * Props for the SelectAnalyzedField component.
+ *
+ * Represents a dropdown (select) field used to configure a climate variable
+ * option in the analyzed download type.
+ */
+export interface SelectAnalyzedFieldProps<T = string> {
+	name: string;
+	label?: string;
+	description?: string;
+	attributeType?: string; // (Unused here, but kept for future extensibility)
+	placeholder?: string;
+	value: string | readonly string[] | number | undefined;
+	tooltip?: string | React.ReactNode;
+	onChange: ((key: string, value: string) => void) | ((value: string) => void);
+	options: { value: T; label: string }[];
+}
+
+/**
+ * Props for the DownloadDropdown component.
+ *
+ * A flexible dropdown (select) component used for configuring
+ * download-related options. It supports generic value types,
+ * placeholder rendering, and tooltips.
+ */
+export interface DownloadDropdownProps<T = string> // generic default type is string
+	extends Omit<
+		React.SelectHTMLAttributes<HTMLSelectElement>,
+		'onChange' | 'value'
+	> {
+	name: string,
+	options: { value: string; label: string }[];
+	value: string | T;
+	placeholder?: string;
+	label?: string | React.ReactNode;
+	tooltip?: string | React.ReactNode;
+	onChange: (key: string, value: string) => void;
+}
+
+/**
+ * Defines the configuration for mapping state keys to URL parameters.
+ */
+export type URLParamConfig<T extends keyof ClimateVariableConfigInterface> = {
+	urlKey: string;
+	transform?: {
+		toURL?: <V extends NonNullable<ClimateVariableConfigInterface[T]>>(
+			value: V
+		) => string;
+		fromURL?: (value: string) => ClimateVariableConfigInterface[T];
+	};
+};
+
+/**
+ * Represents climate variable state for URL state management.
+ */
+export type ClimateVariableState = {
+	data?: Partial<ClimateVariableConfigInterface> | null;
+	searchQuery?: string;
+};
+
+/**
+ * Represents partial state for URL state management.
+ */
+export type PartialState = {
+	climateVariable?: ClimateVariableState;
+	map?: Partial<MapState>;
+};
+
+/**
+ * Type for map action creators used in URL state hook.
+ */
+export type MapActionType = {
+	[key: string]: (value: any) => { type: string; payload: any };
+};

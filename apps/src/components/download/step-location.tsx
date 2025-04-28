@@ -8,13 +8,23 @@ import {
 	StepContainerDescription,
 } from '@/components/download/step-container';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { StepComponentRef } from '@/types/download-form-interface';
 
 /**
  * Location step, allows the user to make a selection on the map and choose what type of region to select
  */
-const StepLocation: React.FC = () => {
+const StepLocation = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { __ } = useI18n();
 	const { climateVariable } = useClimateVariable();
+
+	React.useImperativeHandle(ref, () => ({
+		isValid: () => Object.keys(climateVariable?.getSelectedPoints() ?? {}).length > 0,
+		getResetPayload: () => {
+			return {
+				selectedPoints: {}
+			};
+		}
+	}), [climateVariable]);
 
 	return (
 		<StepContainer title={__('Select a location or area')}>
@@ -26,7 +36,7 @@ const StepLocation: React.FC = () => {
 			{climateVariable?.renderDownloadMap()}
 		</StepContainer>
 	);
-};
+});
 StepLocation.displayName = 'StepLocation';
 
 export default StepLocation;

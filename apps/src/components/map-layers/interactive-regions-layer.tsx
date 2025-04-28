@@ -17,10 +17,10 @@ import {
 } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { clearRecentLocations } from '@/features/map/map-slice';
-import { ColourType, InteractiveRegionOption } from "@/types/climate-variable-interface";
-import { generateColourScheme } from "@/lib/colour-scheme";
+import { InteractiveRegionOption } from "@/types/climate-variable-interface";
 import { getDefaultFrequency } from "@/lib/utils";
 import SectionContext from "@/context/section-provider";
+import { useColorMap } from '@/hooks/use-color-map';
 
 interface InteractiveRegionsLayerProps {
 	scenario?: string | null | undefined;
@@ -41,29 +41,42 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 	const section = useContext(SectionContext);
 
 	const {
-		legendData,
 		opacity: { mapData },
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
+	const { colorMap, getColor } = useColorMap();
 
 	const {
 		threshold,
 		datasetVersion,
-		customColourScheme,
-		colourType,
 		gridType,
 		interactiveRegion,
 		startYear
 	} = useMemo(() => ({
 		threshold: climateVariable?.getThreshold() ?? '',
 		datasetVersion: climateVariable?.getVersion() ?? '',
-		customColourScheme: climateVariable ? generateColourScheme(climateVariable) : null,
-		colourType: climateVariable?.getColourType(),
 		gridType: climateVariable?.getGridType() ?? 'canadagrid',
 		interactiveRegion: climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA,
 		startYear: climateVariable?.getDateRange()?.[0] ?? '2040',
 	}), [climateVariable]);
+
+	const getFeatureColor = useCallback(
+		(featureId: number) => {
+			if (!colorMap || !colorMap.quantities || !colorMap.colours) {
+				return '#fff';
+			}
+
+			// Extract value based on interactive region type
+			const value =
+				interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
+					? featureId
+					: (layerData?.[featureId] ?? 0);
+
+			return getColor(value);
+		},
+		[interactiveRegion, layerData, colorMap, getColor]
+	);
 
 	const frequency = useMemo(() => {
 		const frequencyConfig = climateVariable?.getFrequencyConfig();
@@ -76,126 +89,6 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 
 		return frequency;
 	}, [climateVariable, section]);
-
-	// Convert legend data to a color map usable by the getColor method to generate colors for each feature
-	const colorMap = useMemo(() => {
-		if (!legendData || !legendData.Legend) {
-			return null;
-		}
-
-		const legendColourMapEntries =
-			legendData.Legend[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap
-				?.entries ?? [];
-
-		if (customColourScheme) {
-			return {
-				colours: customColourScheme.colours,
-				quantities: customColourScheme.quantities,
-				schemeType: colourType,
-			};
-		}
-
-		// Fallback to default map colours.
-		return {
-			colours: legendColourMapEntries.map((entry) => entry.color),
-			quantities: legendColourMapEntries.map((entry) => Number(entry.quantity)),
-			schemeType: ColourType.CONTINUOUS,
-		};
-	}, [
-		colourType,
-		customColourScheme,
-		legendData
-	]);
-
-	// Function to interpolate between colors
-	// Taken from fw-child/resources/js/utilities.js interpolate function, but optimized for React
-	const interpolate = useCallback(
-		(color1: string, color2: string, ratio: number) => {
-			ratio = Math.max(0, Math.min(1, ratio));
-
-			const hexToRgb = (hex: string) =>
-				hex
-					.replace(/^#/, '')
-					.match(/.{1,2}/g)!
-					.map((x) => parseInt(x, 16));
-
-			const rgbToHex = ([r, g, b]: number[]) =>
-				`#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1).toUpperCase()}`;
-
-			const rgb1 = hexToRgb(color1);
-			const rgb2 = hexToRgb(color2);
-
-			const interpolatedRgb = rgb1.map((c, i) =>
-				Math.round(c + (rgb2[i] - c) * ratio)
-			);
-
-			return rgbToHex(interpolatedRgb);
-		},
-		[]
-	);
-
-	// Function to get color based on feature ID
-	// Taken from fw-child/resources/js/cdc.js get_color function, but optimized for React
-	const getColor = useCallback(
-		(featureId: number) => {
-			if (!colorMap || !colorMap.quantities || !colorMap.colours) {
-				return '#fff';
-			}
-
-			// Extract value based on interactive region type
-			const value =
-				interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
-					? featureId
-					: (layerData?.[featureId] ?? 0);
-
-			const { colours, quantities, schemeType } = colorMap;
-
-			// More efficient binary search
-			// Taken from fw-child/resources/js/utilities.js indexOfGT function
-			const indexOfGT = (arr: number[], target: number): number => {
-				let start = 0,
-					end = arr.length - 1;
-				let ans = -1;
-
-				while (start <= end) {
-					const mid = Math.floor((start + end) / 2);
-
-					if (arr[mid] <= target) {
-						start = mid + 1;
-					} else {
-						ans = mid;
-						end = mid - 1;
-					}
-				}
-				return ans;
-			};
-
-			const index = indexOfGT(quantities, value);
-
-			// Use last color if `value` is greater than all
-			if (index === -1) {
-				return colours[colours.length - 1];
-			}
-
-			// Use first color if `value` is lowest
-			if (index === 0) {
-				return colours[0];
-			}
-
-			// For discrete type, return exact match
-			if (schemeType === ColourType.DISCRETE) {
-				return colours[index];
-			}
-
-			// For continuous type, interpolate between two colors
-			const ratio =
-				(value - quantities[index - 1]) /
-				(quantities[index] - quantities[index - 1]);
-
-			return interpolate(colours[index - 1], colours[index], ratio);
-		},
-		[interactiveRegion, layerData, colorMap, interpolate]
-	);
 
 	const tileLayerUrl = useMemo(() => {
 		const regionPbfValues: Record<string, string> = {
@@ -217,7 +110,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 					weight: 0.5,
 					color: '#fff',
 					fillColor: properties.gid
-						? getColor(properties.gid)
+						? getFeatureColor(properties.gid)
 						: 'transparent',
 					opacity: 0.6,
 					fill: true,
@@ -233,7 +126,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 				color: layerData ? '#fff' : '#999',
 				fillColor:
 					properties.id && layerData?.[properties.id]
-						? getColor(properties.id)
+						? getFeatureColor(properties.id)
 						: 'transparent',
 				opacity: 0.5,
 				fill: true,
@@ -241,11 +134,11 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 				fillOpacity: 1,
 			}),
 		};
-	}, [interactiveRegion, layerData, getColor, gridType]);
+	}, [interactiveRegion, layerData, getFeatureColor, gridType]);
 
 	const { handleClick, handleOver, handleOut } = useInteractiveMapEvents(
 		layerRef,
-		getColor,
+		getFeatureColor,
 		onLocationModalOpen,
 		onLocationModalClose
 	);
@@ -337,17 +230,16 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 			layerRef.current = null;
 		};
 	},
-		// Intentionally not including the event handlers (e.g. handleClick)
-		// as dependencies since they are already being handled by the
-		// userInteractiveMapEvents hook.
-		[
-			map,
-			interactiveRegion,
-			layerData,
-			tileLayerUrl,
-			vectorTileLayerStyles,
-		]
-	);
+	// Intentionally not including the event handlers (e.g. handleClick)
+	// as dependencies since they are already being handled by the
+	// userInteractiveMapEvents hook.
+	[
+		map,
+		interactiveRegion,
+		layerData,
+		tileLayerUrl,
+		vectorTileLayerStyles,
+	]);
 
 	useEffect(() => {
 		if (layerRef.current) {

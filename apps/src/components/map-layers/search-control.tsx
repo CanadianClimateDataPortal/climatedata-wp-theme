@@ -53,8 +53,8 @@ export default function SearchControl({
 	const searchControlId = useMemo(() => {
 		let id = nanoid(); // Generate a normal nanoid
 
-		// If it starts with a number, prepend a letter for querySelector compatibility
-		if (/^\d/.test(id)) {
+		// Make sure it starts with an alphabetic character
+		if (!/^[a-zA-Z]/.test(id)) {
 			id = 'a' + id.substring(1);
 		}
 

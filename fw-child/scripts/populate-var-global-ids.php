@@ -328,7 +328,7 @@ $var_id_post_id_mapping = array(
 	),
 	"Relative Sea-Level Change"                                       => array(
 		4653,
-		"",
+		"sea_level",
 		true,
 		true,
 		array( "Sea Level" )

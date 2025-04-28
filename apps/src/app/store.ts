@@ -12,6 +12,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import climateVariableReducer from '@/store/climate-variable-slice';
 import mapReducer from '@/features/map/map-slice';
 import downloadReducer from '@/features/download/download-slice';
+import urlSyncReducer from '@/features/url-sync/url-sync-slice';
 
 // API Slices and Reducers - Fetch requests that are going to populate the store
 import { wpApiSlice } from '@/services/wp-node';
@@ -33,6 +34,7 @@ export const store = configureStore({
 		climateVariable: climateVariableReducer,
 		map: mapReducer,
 		download: downloadReducer,
+		urlSync: urlSyncReducer,
 		[wpApiSlice.reducerPath]: wpApiSlice.reducer,
 	},
 	middleware: (getDefaultMiddleware) =>

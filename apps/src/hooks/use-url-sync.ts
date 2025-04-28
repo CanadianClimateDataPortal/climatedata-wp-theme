@@ -1,15 +1,23 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { useAppSelector } from '@/app/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { setOpacity, setTimePeriodEnd, setDataset } from '@/features/map/map-slice';
+import { setClimateVariable } from '@/store/climate-variable-slice';
 import { ClimateVariables } from '@/config/climate-variables.config';
-import { ClimateVariableConfigInterface } from '@/types/climate-variable-interface';
+import { ClimateVariableConfigInterface, InteractiveRegionOption } from '@/types/climate-variable-interface';
+import { TaxonomyData } from '@/types/types';
+import { fetchTaxonomyData } from '@/services/services';
+import { initializeUrlSync, setUrlParamsLoaded } from '@/features/url-sync/url-sync-slice';
 
 /**
  * Synchronizes state with URL params from climate variable state
  * and some map-specific properties like opacity
  */
 export const useUrlSync = () => {
-	const hasInitialized = useRef(false);
 	const updateTimeoutRef = useRef<number | null>(null);
+	const dispatch = useAppDispatch();
+
+	// Get the URL sync state
+	const isInitialized = useAppSelector((state) => state.urlSync.isInitialized);
 
 	// Map state selectors
 	const opacity = useAppSelector((state) => state.map.opacity);
@@ -145,7 +153,7 @@ export const useUrlSync = () => {
 	};
 	
 	const updateUrlWithDebounce = useCallback(() => {
-		if (typeof window === 'undefined' || !hasInitialized.current) return;
+		if (typeof window === 'undefined' || !isInitialized) return;
 		
 		if (updateTimeoutRef.current !== null) {
 			window.clearTimeout(updateTimeoutRef.current);
@@ -177,21 +185,208 @@ export const useUrlSync = () => {
 		climateVariableData,
 		opacity,
 		dataset,
+		isInitialized
 	]);
 
-	useEffect(() => {
-		hasInitialized.current = true;
-	}, []);
+	const setClimateVariableFromUrlParams = (
+		params: URLSearchParams,
+		matchedVariable: ClimateVariableConfigInterface
+	) => {
+		const newConfig: Partial<ClimateVariableConfigInterface> = {
+			...matchedVariable,
+		};
 
-	// Trigger URL update when state changes
+		if (params.has('ver'))
+			newConfig.version = params.get('ver') || undefined;
+		if (params.has('th')) {
+			if (matchedVariable.thresholds || matchedVariable.threshold) {
+				newConfig.threshold = params.get('th') || undefined;
+			}
+		}
+		if (params.has('freq'))
+			newConfig.frequency = params.get('freq') || undefined;
+		if (params.has('scen'))
+			newConfig.scenario = params.get('scen') || undefined;
+		if (params.has('cmp'))
+			newConfig.scenarioCompare = params.get('cmp') === '1';
+		if (params.has('cmpTo') && params.get('cmp') === '1')
+			newConfig.scenarioCompareTo = params.get('cmpTo') || undefined;
+		
+		if (params.has('region'))
+			newConfig.interactiveRegion = params.get('region') as InteractiveRegionOption;
+		
+		if (params.has('dataVal'))
+			newConfig.dataValue = params.get('dataVal') || undefined;
+		
+		if (params.has('clr'))
+			newConfig.colourScheme = params.get('clr') || undefined;
+		
+		if (params.has('clrType'))
+			newConfig.colourType = params.get('clrType') || undefined;
+		if (params.has('avg'))
+			newConfig.averagingType = params.get('avg') as any;
+
+		if (params.has('dateRange')) {
+			const dateRangeStr = params.get('dateRange');
+			if (dateRangeStr) {
+				newConfig.dateRange = dateRangeStr.split(',');
+				
+				const dateRange = dateRangeStr.split(',');
+				if (dateRange.length > 1) {
+					const endYear = parseInt(dateRange[1]);
+					if (!isNaN(endYear)) {
+						dispatch(setTimePeriodEnd([endYear]));
+					}
+				}
+			}
+		} else if (params.has('period') && matchedVariable.dateRangeConfig) {
+			const period = parseInt(params.get('period') || '');
+			const interval = matchedVariable.dateRangeConfig.interval || 30;
+
+			if (!isNaN(period)) {
+				newConfig.dateRange = [
+					(period - interval).toString(),
+					period.toString()
+				];
+
+				dispatch(setTimePeriodEnd([period]));
+			}
+		}
+
+		dispatch(
+			setClimateVariable(
+				newConfig as ClimateVariableConfigInterface
+			)
+		);
+	};
+
+	const setMapOpacityFromUrlParams = (params: URLSearchParams) => {
+		const dataOpacity = params.get('dataOpacity');
+		const labelOpacity = params.get('labelOpacity');
+
+		if (dataOpacity || labelOpacity) {
+			if (dataOpacity) {
+				const opacityNum = parseInt(dataOpacity);
+				if (!isNaN(opacityNum)) {
+					dispatch(
+						setOpacity({
+							key: 'mapData',
+							value: opacityNum,
+						})
+					);
+				}
+			}
+
+			if (labelOpacity) {
+				const opacityNum = parseInt(labelOpacity);
+				if (!isNaN(opacityNum)) {
+					dispatch(
+						setOpacity({
+							key: 'labels',
+							value: opacityNum,
+						})
+					);
+				}
+			}
+		}
+	};
+
+	const setDatasetFromUrlParams = async (params: URLSearchParams) => {
+		const datasetType = params.get('dataset');
+		if (datasetType) {
+			try {
+				// Fetch actual dataset objects
+				const datasets = await fetchTaxonomyData('datasets', 'map');
+				
+				// Find dataset with matching type
+				const matchedDataset = datasets.find(
+					(dataset) => dataset.dataset_type === datasetType
+				);
+				
+				if (matchedDataset) {
+					// Create a complete dataset object
+					dispatch(setDataset(matchedDataset));
+					return matchedDataset;
+				} else {
+					// Fallback to basic dataset object if no match found
+					const basicDataset: TaxonomyData = {
+						term_id: 0,
+						title: { en: datasetType },
+						dataset_type: datasetType
+					};
+					dispatch(setDataset(basicDataset));
+					return basicDataset;
+				}
+			} catch (error) {
+				console.error('Error fetching datasets:', error);
+				// Fallback
+				const basicDataset: TaxonomyData = {
+					term_id: 0,
+					title: { en: datasetType },
+					dataset_type: datasetType
+				};
+				dispatch(setDataset(basicDataset));
+				return basicDataset;
+			}
+		}
+		return null;
+	};
+
 	useEffect(() => {
-		if (!hasInitialized.current) return;
+		if (isInitialized) return;
+
+		const params = new URLSearchParams(window.location.search);
+
+		// If no URL parameters, just mark as initialized and loaded
+		if (params.toString().length === 0) {
+			dispatch(initializeUrlSync());
+			dispatch(setUrlParamsLoaded(false)); // No params to load
+			return;
+		}
+
+		// Start the URL sync process
+		dispatch(initializeUrlSync());
+
+		// Process URL parameters in the correct order
+		(async () => {
+			// First process dataset 
+			const selectedDataset = await setDatasetFromUrlParams(params);
+			
+			// Then process variable and its parameters
+			const varId = params.get('var');
+			if (varId && selectedDataset) {
+				const matchedVariable = ClimateVariables.find(
+					(config) => config.id === varId
+				);
+				if (matchedVariable) {
+					// Add dataset type to the variable
+					const variableWithDataset = {
+						...matchedVariable,
+						datasetType: selectedDataset.dataset_type
+					};
+					
+					// Process all climate variable parameters
+					setClimateVariableFromUrlParams(params, variableWithDataset);
+				}
+			}
+			
+			// Always process map opacity
+			setMapOpacityFromUrlParams(params);
+			
+			// Mark URL parameters as loaded
+			dispatch(setUrlParamsLoaded(true));
+		})();
+	}, [dispatch, isInitialized]);
+
+	useEffect(() => {
+		if (!isInitialized) return;
 		updateUrlWithDebounce();
 	}, [
 		climateVariableData,
 		opacity,
 		dataset,
-		updateUrlWithDebounce
+		updateUrlWithDebounce,
+		isInitialized
 	]);
 
 	// Clean up timeout on unmount

@@ -14,9 +14,8 @@ import { useUrlSync } from '@/hooks/use-url-sync';
 import '@/App.css';
 
 function App() {
-	// making leaflet features available everywhere through the app
-	useLeaflet();
 	useUrlSync();
+	useLeaflet();
 
 	return (
 		<LocaleProvider>

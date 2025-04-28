@@ -1,269 +1,136 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import {
-	setTimePeriodEnd,
-	setVariable,
-	setDecade,
-	setThresholdValue,
-	setInteractiveRegion,
-	setMapColor,
-	setOpacity,
-} from '@/features/map/map-slice';
+import { setOpacity, setTimePeriodEnd, setDataset } from '@/features/map/map-slice';
 import { setClimateVariable } from '@/store/climate-variable-slice';
 import { ClimateVariables } from '@/config/climate-variables.config';
 import { ClimateVariableConfigInterface, InteractiveRegionOption } from '@/types/climate-variable-interface';
-import { MapItemsOpacity, ApiPostData } from '@/types/types';
+import { TaxonomyData } from '@/types/types';
+import { fetchTaxonomyData } from '@/services/services';
+import { initializeUrlSync, setUrlParamsLoaded } from '@/features/url-sync/url-sync-slice';
 
 /**
- * Synchronizes state with URL params
+ * Synchronizes state with URL params from climate variable state
+ * and some map-specific properties like opacity
  */
 export const useUrlSync = () => {
-	const hasInitialized = useRef(false);
+	const updateTimeoutRef = useRef<number | null>(null);
 	const dispatch = useAppDispatch();
 
+	// Get the URL sync state
+	const isInitialized = useAppSelector((state) => state.urlSync.isInitialized);
+
 	// Map state selectors
-	const timePeriodEnd = useAppSelector((state) => state.map.timePeriodEnd);
-	const variable = useAppSelector((state) => state.map.variable);
-	const decade = useAppSelector((state) => state.map.decade);
-	const thresholdValue = useAppSelector((state) => state.map.thresholdValue);
-	const mapInteractiveRegion = useAppSelector((state) => state.map.interactiveRegion);
-	const mapColor = useAppSelector((state) => state.map.mapColor);
 	const opacity = useAppSelector((state) => state.map.opacity);
+	const dataset = useAppSelector((state) => state.map.dataset);
 
 	// Climate variable state
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
-
-	// Process URL params on initial load
-	useEffect(() => {
-		if (hasInitialized.current) return;
-
-		const params = new URLSearchParams(window.location.search);
-
-		// Check if we have any params to process
-		if (params.toString().length === 0) {
-			hasInitialized.current = true;
-			return;
+	
+	// Helper function to add climate variable parameters to URL
+	const addClimateVariableParamsToUrl = (
+		params: URLSearchParams,
+		climateData: ClimateVariableConfigInterface,
+		defaultConfig: ClimateVariableConfigInterface | null
+	) => {
+		// Always include variable ID
+		if (climateData.id) {
+			params.set('var', climateData.id);
 		}
-
-		// Process climate variable params first
-		const varId = params.get('var');
-		if (varId) {
-			const matchedVariable = ClimateVariables.find(
-				(config) => config.id === varId
-			);
-			if (matchedVariable) {
-				// Create a new config object based on the matched variable and URL params
-				const newConfig: Partial<ClimateVariableConfigInterface> = {
-					...matchedVariable,
-				};
-
-				// Update with other URL params
-				if (params.has('ver'))
-					newConfig.version = params.get('ver') || undefined;
-				if (params.has('th'))
-					newConfig.threshold = params.get('th') || undefined;
-				if (params.has('freq'))
-					newConfig.frequency = params.get('freq') || undefined;
-				if (params.has('scen'))
-					newConfig.scenario = params.get('scen') || undefined;
-				if (params.has('cmp'))
-					newConfig.scenarioCompare = params.get('cmp') === '1';
-				if (params.has('cmpTo'))
-					newConfig.scenarioCompareTo =
-						params.get('cmpTo') || undefined;
-				if (params.has('region'))
-					newConfig.interactiveRegion = params.get('region') as InteractiveRegionOption;
-				if (params.has('dataVal'))
-					newConfig.dataValue = params.get('dataVal') || undefined;
-				if (params.has('clr'))
-					newConfig.colourScheme = params.get('clr') || undefined;
-				else if (params.has('color'))
-					newConfig.colourScheme = params.get('color') || undefined;
-				if (params.has('clrType'))
-					newConfig.colourType = params.get('clrType') || undefined;
-				if (params.has('avg'))
-					newConfig.averagingType = params.get('avg') as any;
-
-				// Handle dateRange or period
-				if (params.has('dateRange')) {
-					// Use dateRange directly if available
-					const dateRangeStr = params.get('dateRange');
-					if (dateRangeStr) {
-						newConfig.dateRange = dateRangeStr.split(',');
-					}
-				} else if (params.has('period') && matchedVariable.dateRangeConfig) {
-					// Or calculate from period and interval
-					const period = parseInt(params.get('period') || '');
-					const interval = matchedVariable.dateRangeConfig.interval || 30;
-
-					if (!isNaN(period)) {
-						newConfig.dateRange = [
-							(period - interval).toString(),
-							period.toString()
-						];
-
-						// Also update timePeriodEnd to keep them in sync
-						dispatch(setTimePeriodEnd([period]));
-					}
-				}
-
-				// Set the climate variable with the merged config
-				dispatch(
-					setClimateVariable(
-						newConfig as ClimateVariableConfigInterface
-					)
-				);
+		
+		// Only add version if it's not the default
+		if (climateData.version) {
+			const defaultVersion = defaultConfig?.version;
+			if (climateData.version !== defaultVersion) {
+				params.set('ver', climateData.version);
+			}
+		}
+		
+		// Only add threshold if the variable supports thresholds AND has a value
+		if (climateData.threshold && 
+			(defaultConfig?.thresholds || defaultConfig?.threshold)) {
+			params.set('th', climateData.threshold.toString());
+		}
+		
+		// Only add frequency if it's not the default
+		if (climateData.frequency) {
+			const defaultFrequency = defaultConfig?.frequency;
+			if (climateData.frequency !== defaultFrequency) {
+				params.set('freq', climateData.frequency);
+			}
+		}
+		
+		// Only add scenario if it's not the default
+		if (climateData.scenario) {
+			const defaultScenario = defaultConfig?.scenario;
+			if (climateData.scenario !== defaultScenario) {
+				params.set('scen', climateData.scenario);
+			}
+		}
+		
+		// Only include scenario comparison parameters if enabled
+		if (climateData.scenarioCompare === true) {
+			params.set('cmp', '1');
+			
+			if (climateData.scenarioCompareTo) {
+				params.set('cmpTo', climateData.scenarioCompareTo);
+			}
+		}
+		
+		// Add interactive region
+		if (climateData.interactiveRegion) {
+			const defaultRegion = defaultConfig?.interactiveRegion;
+			if (climateData.interactiveRegion !== defaultRegion) {
+				params.set('region', climateData.interactiveRegion);
+			}
+		}
+		
+		if (climateData.dataValue) {
+			const defaultDataValue = defaultConfig?.dataValue;
+			if (climateData.dataValue !== defaultDataValue) {
+				params.set('dataVal', climateData.dataValue);
+			}
+		}
+		
+		// Add color scheme
+		if (climateData.colourScheme) {
+			const defaultColourScheme = defaultConfig?.colourScheme;
+			if (climateData.colourScheme !== defaultColourScheme) {
+				params.set('clr', climateData.colourScheme);
+			}
+		}
+		
+		if (climateData.colourType) {
+			const defaultColourType = defaultConfig?.colourType;
+			if (climateData.colourType !== defaultColourType) {
+				params.set('clrType', climateData.colourType);
+			}
+		}
+		
+		if (climateData.averagingType) {
+			const defaultAveragingType = defaultConfig?.averagingType;
+			if (climateData.averagingType !== defaultAveragingType) {
+				params.set('avg', climateData.averagingType);
 			}
 		}
 
-		// Process map-only params (that don't duplicate climate variable state)
-		const mapVar = params.get('mapVar');
-		if (mapVar && !varId) dispatch(setVariable(mapVar));
-
-		const decadeParam = params.get('decade');
-		if (decadeParam) dispatch(setDecade(decadeParam));
-
-		const thresholdParam = params.get('threshold');
-		if (thresholdParam) {
-			const threshold = parseInt(thresholdParam);
-			if (!isNaN(threshold)) dispatch(setThresholdValue(threshold));
-		}
-
-		// Only set map interactive region if not already handled by climate variable state
-		const mapRegion = params.get('mapRegion');
-		if (mapRegion && !params.has('region')) {
-			dispatch(setInteractiveRegion(mapRegion));
-		}
-
-		// Only set color if not handled by climate variable colourScheme
-		const colorParam = params.get('color');
-		if (colorParam && !params.has('clr')) {
-			dispatch(setMapColor(colorParam));
-		}
-
-		// Handle opacity
-		const dataOpacity = params.get('dataOpacity');
-		const labelOpacity = params.get('labelOpacity');
-
-		if (dataOpacity || labelOpacity) {
-			const opacityPayload: MapItemsOpacity = { ...opacity };
-
-			if (dataOpacity) {
-				const opacityNum = parseInt(dataOpacity);
-				if (!isNaN(opacityNum)) {
-					opacityPayload.mapData = opacityNum / 100;
-				}
-			}
-
-			if (labelOpacity) {
-				const opacityNum = parseInt(labelOpacity);
-				if (!isNaN(opacityNum)) {
-					opacityPayload.labels = opacityNum / 100;
-				}
-			}
-
-			// Update both opacity values at once
-			if (opacityPayload.mapData !== undefined) {
-				dispatch(
-					setOpacity({
-						key: 'mapData',
-						value: opacityPayload.mapData * 100,
-					})
-				);
-			}
-
-			if (opacityPayload.labels !== undefined) {
-				dispatch(
-					setOpacity({
-						key: 'labels',
-						value: opacityPayload.labels * 100,
-					})
-				);
+		// Add date range
+		if (climateData.dateRange && 
+			climateData.dateRange.length > 0) {
+			const defaultDateRange = defaultConfig?.dateRange;
+			const currentDateRangeStr = climateData.dateRange.join(',');
+			const defaultDateRangeStr = defaultDateRange?.join(',');
+			
+			if (currentDateRangeStr !== defaultDateRangeStr) {
+				params.set('dateRange', currentDateRangeStr);
 			}
 		}
-
-		hasInitialized.current = true;
-	}, [dispatch, opacity]);
-
-	useEffect(() => {
-		// Skip the first render
-		if (!hasInitialized.current) {
-			return;
-		}
-
-		const params = new URLSearchParams();
-
-		// Climate variable parameters take precedence
-		if (climateVariableData) {
-			if (climateVariableData.id)
-				params.set('var', climateVariableData.id);
-			if (climateVariableData.version)
-				params.set('ver', climateVariableData.version);
-			if (climateVariableData.threshold)
-				params.set('th', climateVariableData.threshold.toString());
-			if (climateVariableData.frequency)
-				params.set('freq', climateVariableData.frequency);
-			if (climateVariableData.scenario)
-				params.set('scen', climateVariableData.scenario);
-			if (climateVariableData.scenarioCompare !== undefined) {
-				params.set(
-					'cmp',
-					climateVariableData.scenarioCompare ? '1' : '0'
-				);
-			}
-			if (climateVariableData.scenarioCompareTo)
-				params.set('cmpTo', climateVariableData.scenarioCompareTo);
-			if (climateVariableData.interactiveRegion)
-				params.set('region', climateVariableData.interactiveRegion);
-			if (climateVariableData.dataValue)
-				params.set('dataVal', climateVariableData.dataValue);
-			if (climateVariableData.colourScheme)
-				params.set('clr', climateVariableData.colourScheme);
-			if (climateVariableData.colourType)
-				params.set('clrType', climateVariableData.colourType);
-			if (climateVariableData.averagingType)
-				params.set('avg', climateVariableData.averagingType);
-
-			// Use dateRange from climate variable state instead of period
-			if (
-				climateVariableData.dateRange &&
-				climateVariableData.dateRange.length > 0
-			) {
-				params.set(
-					'dateRange',
-					climateVariableData.dateRange.join(',')
-				);
-			}
-		}
-
-		// Map-only parameters (that don't duplicate climate variable state)
-		if (decade) {
-			params.set('decade', decade);
-		}
-
-		if (thresholdValue !== undefined) {
-			params.set('threshold', thresholdValue.toString());
-		}
-
-		// Add mapVar only if climate variable is not set
-		if (variable && (!climateVariableData || !climateVariableData.id)) {
-			const variableValue = typeof variable === 'string'
-				? variable
-				: (variable as ApiPostData).id.toString();
-			params.set('mapVar', variableValue);
-		}
-
-		// Add mapRegion only if region from climate variable is not set
-		if (mapInteractiveRegion && (!climateVariableData || !climateVariableData.interactiveRegion)) {
-			params.set('mapRegion', mapInteractiveRegion);
-		}
-
-		// Only add color if climate variable doesn't have colourScheme
-		if (mapColor && (!climateVariableData || !climateVariableData.colourScheme)) {
-			params.set('color', mapColor);
-		}
-
-		// Handle opacity (map-only)
+	};
+	
+	// Helper function to add map-only parameters
+	const addMapOnlyParamsToUrl = (
+		params: URLSearchParams
+	) => {
+		// Opacity
 		if (opacity) {
 			if (opacity.mapData !== undefined) {
 				params.set(
@@ -278,18 +145,256 @@ export const useUrlSync = () => {
 				);
 			}
 		}
+		
+		// Dataset 
+		if (dataset?.dataset_type) {
+			params.set('dataset', dataset.dataset_type);
+		}
+	};
+	
+	const updateUrlWithDebounce = useCallback(() => {
+		if (typeof window === 'undefined' || !isInitialized) return;
+		
+		if (updateTimeoutRef.current !== null) {
+			window.clearTimeout(updateTimeoutRef.current);
+		}
+		
+		updateTimeoutRef.current = window.setTimeout(() => {
+			const params = new URLSearchParams();
+			
+			// First, add all climate variable parameters
+			if (climateVariableData) {
+				// Find the default config for the current variable
+				const defaultConfig = climateVariableData.id 
+					? ClimateVariables.find(config => config.id === climateVariableData.id) || null 
+					: null;
+				
+				addClimateVariableParamsToUrl(params, climateVariableData, defaultConfig);
+			}
+			
+			// Then add map-only parameters
+			addMapOnlyParamsToUrl(params);
 
-		// Update URL without navigation
-		const newUrl = `${window.location.pathname}?${params.toString()}`;
-		window.history.replaceState({}, '', newUrl);
+			// Update URL without navigation
+			const newUrl = `${window.location.pathname}?${params.toString()}`;
+			window.history.replaceState({}, '', newUrl);
+			
+			updateTimeoutRef.current = null;
+		}, 200); // Reduced delay for more responsive updates
 	}, [
-		timePeriodEnd,
-		variable,
-		decade,
-		thresholdValue,
-		mapInteractiveRegion,
-		mapColor,
-		opacity,
 		climateVariableData,
+		opacity,
+		dataset,
+		isInitialized
 	]);
+
+	const setClimateVariableFromUrlParams = (
+		params: URLSearchParams,
+		matchedVariable: ClimateVariableConfigInterface
+	) => {
+		const newConfig: Partial<ClimateVariableConfigInterface> = {
+			...matchedVariable,
+		};
+
+		if (params.has('ver'))
+			newConfig.version = params.get('ver') || undefined;
+		if (params.has('th')) {
+			if (matchedVariable.thresholds || matchedVariable.threshold) {
+				newConfig.threshold = params.get('th') || undefined;
+			}
+		}
+		if (params.has('freq'))
+			newConfig.frequency = params.get('freq') || undefined;
+		if (params.has('scen'))
+			newConfig.scenario = params.get('scen') || undefined;
+		if (params.has('cmp'))
+			newConfig.scenarioCompare = params.get('cmp') === '1';
+		if (params.has('cmpTo') && params.get('cmp') === '1')
+			newConfig.scenarioCompareTo = params.get('cmpTo') || undefined;
+		
+		if (params.has('region'))
+			newConfig.interactiveRegion = params.get('region') as InteractiveRegionOption;
+		
+		if (params.has('dataVal'))
+			newConfig.dataValue = params.get('dataVal') || undefined;
+		
+		if (params.has('clr'))
+			newConfig.colourScheme = params.get('clr') || undefined;
+		
+		if (params.has('clrType'))
+			newConfig.colourType = params.get('clrType') || undefined;
+		if (params.has('avg'))
+			newConfig.averagingType = params.get('avg') as any;
+
+		if (params.has('dateRange')) {
+			const dateRangeStr = params.get('dateRange');
+			if (dateRangeStr) {
+				newConfig.dateRange = dateRangeStr.split(',');
+				
+				const dateRange = dateRangeStr.split(',');
+				if (dateRange.length > 1) {
+					const endYear = parseInt(dateRange[1]);
+					if (!isNaN(endYear)) {
+						dispatch(setTimePeriodEnd([endYear]));
+					}
+				}
+			}
+		} else if (params.has('period') && matchedVariable.dateRangeConfig) {
+			const period = parseInt(params.get('period') || '');
+			const interval = matchedVariable.dateRangeConfig.interval || 30;
+
+			if (!isNaN(period)) {
+				newConfig.dateRange = [
+					(period - interval).toString(),
+					period.toString()
+				];
+
+				dispatch(setTimePeriodEnd([period]));
+			}
+		}
+
+		dispatch(
+			setClimateVariable(
+				newConfig as ClimateVariableConfigInterface
+			)
+		);
+	};
+
+	const setMapOpacityFromUrlParams = (params: URLSearchParams) => {
+		const dataOpacity = params.get('dataOpacity');
+		const labelOpacity = params.get('labelOpacity');
+
+		if (dataOpacity || labelOpacity) {
+			if (dataOpacity) {
+				const opacityNum = parseInt(dataOpacity);
+				if (!isNaN(opacityNum)) {
+					dispatch(
+						setOpacity({
+							key: 'mapData',
+							value: opacityNum,
+						})
+					);
+				}
+			}
+
+			if (labelOpacity) {
+				const opacityNum = parseInt(labelOpacity);
+				if (!isNaN(opacityNum)) {
+					dispatch(
+						setOpacity({
+							key: 'labels',
+							value: opacityNum,
+						})
+					);
+				}
+			}
+		}
+	};
+
+	const setDatasetFromUrlParams = async (params: URLSearchParams) => {
+		const datasetType = params.get('dataset');
+		if (datasetType) {
+			try {
+				// Fetch actual dataset objects
+				const datasets = await fetchTaxonomyData('datasets', 'map');
+				
+				// Find dataset with matching type
+				const matchedDataset = datasets.find(
+					(dataset) => dataset.dataset_type === datasetType
+				);
+				
+				if (matchedDataset) {
+					// Create a complete dataset object
+					dispatch(setDataset(matchedDataset));
+					return matchedDataset;
+				} else {
+					// Fallback to basic dataset object if no match found
+					const basicDataset: TaxonomyData = {
+						term_id: 0,
+						title: { en: datasetType },
+						dataset_type: datasetType
+					};
+					dispatch(setDataset(basicDataset));
+					return basicDataset;
+				}
+			} catch (error) {
+				console.error('Error fetching datasets:', error);
+				// Fallback
+				const basicDataset: TaxonomyData = {
+					term_id: 0,
+					title: { en: datasetType },
+					dataset_type: datasetType
+				};
+				dispatch(setDataset(basicDataset));
+				return basicDataset;
+			}
+		}
+		return null;
+	};
+
+	useEffect(() => {
+		if (isInitialized) return;
+
+		const params = new URLSearchParams(window.location.search);
+
+		// If no URL parameters, just mark as initialized and loaded
+		if (params.toString().length === 0) {
+			dispatch(initializeUrlSync());
+			dispatch(setUrlParamsLoaded(false)); // No params to load
+			return;
+		}
+
+		// Start the URL sync process
+		dispatch(initializeUrlSync());
+
+		// Process URL parameters in the correct order
+		(async () => {
+			// First process dataset 
+			const selectedDataset = await setDatasetFromUrlParams(params);
+			
+			// Then process variable and its parameters
+			const varId = params.get('var');
+			if (varId && selectedDataset) {
+				const matchedVariable = ClimateVariables.find(
+					(config) => config.id === varId
+				);
+				if (matchedVariable) {
+					// Add dataset type to the variable
+					const variableWithDataset = {
+						...matchedVariable,
+						datasetType: selectedDataset.dataset_type
+					};
+					
+					// Process all climate variable parameters
+					setClimateVariableFromUrlParams(params, variableWithDataset);
+				}
+			}
+			
+			// Always process map opacity
+			setMapOpacityFromUrlParams(params);
+			
+			// Mark URL parameters as loaded
+			dispatch(setUrlParamsLoaded(true));
+		})();
+	}, [dispatch, isInitialized]);
+
+	useEffect(() => {
+		if (!isInitialized) return;
+		updateUrlWithDebounce();
+	}, [
+		climateVariableData,
+		opacity,
+		dataset,
+		updateUrlWithDebounce,
+		isInitialized
+	]);
+
+	// Clean up timeout on unmount
+	useEffect(() => {
+		return () => {
+			if (updateTimeoutRef.current !== null) {
+				window.clearTimeout(updateTimeoutRef.current);
+			}
+		};
+	}, []);
 };

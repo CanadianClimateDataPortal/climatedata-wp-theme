@@ -39,6 +39,7 @@ const InteractiveRegionSelect: React.FC = () => {
 
   return (
     <Dropdown
+			key={climateVariable?.getId()}
       placeholder={__('Select an option')}
       options={availableOptions}
       label={__('Interactive Regions')}

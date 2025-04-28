@@ -62,8 +62,11 @@ const StepSummary: React.FC = () => {
 		{
 			title: __('Location or area'),
 			content: (() => {
-				const selectedPointsCount = climateVariable?.getSelectedPointsCount() ?? 0;
-				return _n('1 selected', '%d selected', selectedPointsCount).replace('%d', String(selectedPointsCount));
+				const selectedCount = climateVariable?.getSelectedRegion()
+					? climateVariable?.getSelectedRegion()?.cellCount ?? 0
+					: climateVariable?.getSelectedPointsCount() ?? 0;
+
+				return _n('1 selected', '%d selected', selectedCount).replace('%d', String(selectedCount));
 			})(),
 		},
 		{

@@ -18,10 +18,12 @@ const StepLocation = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { climateVariable } = useClimateVariable();
 
 	React.useImperativeHandle(ref, () => ({
-		isValid: () => Object.keys(climateVariable?.getSelectedPoints() ?? {}).length > 0,
+		isValid: () =>
+			(climateVariable?.getSelectedPointsCount() ?? 0) > 0 || Boolean(climateVariable?.getSelectedRegion()),
 		getResetPayload: () => {
 			return {
-				selectedPoints: {}
+				selectedPoints: {},
+				selectedRegion: null,
 			};
 		}
 	}), [climateVariable]);

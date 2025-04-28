@@ -63,7 +63,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			interval: 30
 		},
 		hasDelta: true,
-		enableColourOptions: false,
+		enableColourOptions: true,
 		temporalThresholdConfig: {
 			thresholds: {
 				tx_max: {

@@ -55,7 +55,7 @@ export function generateColourScheme(
 		type: schemeType,
 		quantities: calculateQuantities({
 			temporalScaleConfig,
-			useDelta,
+			useDelta: useDelta && climateVariable?.getDataValue() === "delta",
 			colours,
 			schemeType,
 			decimals

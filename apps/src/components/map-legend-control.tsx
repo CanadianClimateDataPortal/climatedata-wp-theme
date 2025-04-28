@@ -125,7 +125,7 @@ const MapLegendControl: React.FC<{
 								: parseFloat(entry.label);
 
 							// Still getting NaN for labels like dates -- Jul 01, Jun 21, etc so fall back to the received label instead
-							if (isNaN(parsedLabel)) {
+							if (isNaN(Number(parsedLabel))) {
 								parsedLabel = entry.label;
 							}
 

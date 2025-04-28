@@ -7,23 +7,26 @@ import {
 	MultilingualField,
 	TermItem,
 } from '@/types/types';
+import { ColorMap } from '@/types/climate-variable-interface';
 
 export async function transformLegendData(
-	input: WMSLegendData
+	input: WMSLegendData,
+	colorMap: ColorMap
 ): Promise<TransformedLegendEntry[]> {
-	const legendEntries =
-		input?.Legend?.[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap
-			?.entries;
+	const legendEntries = input?.Legend?.[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap?.entries
+		?.map((item, i) => ({
+			...item,
+			// use the color from the color map if available
+			color: colorMap?.colours?.[i] ?? item.color,
+			// for some variables, the response has an item with NaN text as its label, we need to convert to 0 instead
+			label: item.label === 'NaN' ? '0' : item.label,
+		}));
 
 	if (!legendEntries) {
 		throw new Error('Invalid input format');
 	}
 
-	return legendEntries.map(({ label, color, opacity }) => ({
-		label,
-		color,
-		opacity: parseFloat(opacity),
-	}));
+	return legendEntries;
 }
 
 /**

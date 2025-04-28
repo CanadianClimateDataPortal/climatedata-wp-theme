@@ -64,9 +64,12 @@ const MapLegendControl: React.FC<{
 
 			{isOpen && (
 				<div className="flex flex-col items-end gap-1 bg-white border border-cold-grey-3 rounded-md py-2 px-1 overflow-y-auto">
-					<div className="font-sans text-zinc-900 font-semibold text-lg leading-5">
-						{unit}
-					</div>
+					{/* Custom scheme variables like "building_climate_zones" won't show a unit */}
+					{!hasCustomScheme && (
+						<div className="font-sans text-zinc-900 font-semibold text-lg leading-5">
+							{unit}
+						</div>
+					)}
 
 					<svg ref={svgRef} height={LEGEND_HEIGHT} className="w-full">
 						{isCategorical ? (
@@ -115,8 +118,16 @@ const MapLegendControl: React.FC<{
 							// For categorical data, center the label in the block
 							const labelY = isCategorical ? y + (ITEM_HEIGHT / 2) : y;
 
-							// Custom scheme variables like "building_climate_zones" will use their label as is
-							const parsedLabel = hasCustomScheme ? entry.label : parseFloat(entry.label);
+							// Custom scheme variables like "building_climate_zones" may have labels that can be parsed but shouldn't
+							//  eg. 7A, 7B, 8 -- so those even if parseable we should keep them as they are
+							let parsedLabel = hasCustomScheme
+								? entry.label
+								: parseFloat(entry.label);
+
+							// Still getting NaN for labels like dates -- Jul 01, Jun 21, etc so fall back to the received label instead
+							if (isNaN(parsedLabel)) {
+								parsedLabel = entry.label;
+							}
 
 							return (
 								<g key={index}>

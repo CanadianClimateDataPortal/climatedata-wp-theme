@@ -177,70 +177,69 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 	]);
 
 	useEffect(() => {
-			// make sure all needed data is available
-			if (
-				!tileLayerUrl ||
-				(interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA && !layerData)
-			) {
-				return;
-			}
+		// make sure all needed data is available
+		if (
+			!tileLayerUrl ||
+			(interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA && !layerData)
+		) {
+			return;
+		}
 
-			const layerOptions = {
-				// @ts-expect-error: suppress leaflet typescript error
-				rendererFactory: L.canvas.tile,
-				interactive: true,
-				getFeatureId: (f: { properties: { id?: number; gid?: number } }) =>
-					f.properties.id ?? f.properties.gid,
-				pane: 'grid',
-				name: 'geojson',
-				maxNativeZoom: DEFAULT_MAX_ZOOM,
-				bounds: CANADA_BOUNDS,
-				maxZoom: DEFAULT_MAX_ZOOM,
-				minZoom: interactiveRegion === InteractiveRegionOption.GRIDDED_DATA ? 7 : DEFAULT_MIN_ZOOM,
-				vectorTileLayerStyles,
-			};
-
+		const layerOptions = {
 			// @ts-expect-error: suppress leaflet typescript error
-			const layer = L.vectorGrid.protobuf(tileLayerUrl, layerOptions);
-			layer.setOpacity(mapData);
-			layerRef.current = layer;
-
-			layer.on('click', handleClick);
-
-			if ('ontouchstart' in window) {
-				layer.on('touchstart', handleOver).on('touchend', handleOut);
-			} else {
-				layer.on('mouseover', handleOver).on('mouseout', handleOut);
-			}
-
-			layer.addTo(map);
-
-			// clear all existing markers from the map
-			map.eachLayer(layer => {
-				if (layer instanceof L.Marker) {
-					map.removeLayer(layer);
-				}
-			});
-
-			// clear recent locations
-			dispatch(clearRecentLocations());
-
-			return () => {
-				map.removeLayer(layer);
-				layerRef.current = null;
-			};
-		},
-		// Intentionally not including the event handlers (e.g. handleClick)
-		// as dependencies since they are already being handled by the
-		// userInteractiveMapEvents hook.
-		[
-			map,
-			interactiveRegion,
-			layerData,
-			tileLayerUrl,
+			rendererFactory: L.canvas.tile,
+			interactive: true,
+			getFeatureId: (f: { properties: { id?: number; gid?: number } }) =>
+				f.properties.id ?? f.properties.gid,
+			pane: 'grid',
+			name: 'geojson',
+			maxNativeZoom: DEFAULT_MAX_ZOOM,
+			bounds: CANADA_BOUNDS,
+			maxZoom: DEFAULT_MAX_ZOOM,
+			minZoom: interactiveRegion === InteractiveRegionOption.GRIDDED_DATA ? 7 : DEFAULT_MIN_ZOOM,
 			vectorTileLayerStyles,
-		]
-	);
+		};
+
+		// @ts-expect-error: suppress leaflet typescript error
+		const layer = L.vectorGrid.protobuf(tileLayerUrl, layerOptions);
+		layer.setOpacity(mapData);
+		layerRef.current = layer;
+
+		layer.on('click', handleClick);
+
+		if ('ontouchstart' in window) {
+			layer.on('touchstart', handleOver).on('touchend', handleOut);
+		} else {
+			layer.on('mouseover', handleOver).on('mouseout', handleOut);
+		}
+
+		layer.addTo(map);
+
+		// clear all existing markers from the map
+		map.eachLayer(layer => {
+			if (layer instanceof L.Marker) {
+				map.removeLayer(layer);
+			}
+		});
+
+		// clear recent locations
+		dispatch(clearRecentLocations());
+
+		return () => {
+			map.removeLayer(layer);
+			layerRef.current = null;
+		};
+	},
+	// Intentionally not including the event handlers (e.g. handleClick)
+	// as dependencies since they are already being handled by the
+	// userInteractiveMapEvents hook.
+	[
+		map,
+		interactiveRegion,
+		layerData,
+		tileLayerUrl,
+		vectorTileLayerStyles,
+	]);
 
 	useEffect(() => {
 		if (layerRef.current) {

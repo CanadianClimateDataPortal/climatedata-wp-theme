@@ -534,7 +534,10 @@ foreach ( $dataset_terms as $term_name ) {
 
 	if ( $term_name === "Adjusted and Homogenized Canadian Climate Data (AHCCD)" ) {
 		$dataset_type = "ahccd";
-	} elseif ( $term_name === "Statistically Downscaled Global Climate Projections" ) {
+	} elseif ( in_array( $term_name, array(
+		"Statistically Downscaled Global Climate Projections",
+		"Sea Level",
+	) ) ) {
 		$dataset_type = "projection";
 	}
 

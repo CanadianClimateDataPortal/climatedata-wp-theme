@@ -36,7 +36,7 @@ export const getFeatureId = (properties: {
 export const useInteractiveMapEvents = (
 	// @ts-expect-error: suppress leaflet typescript error
 	layerInstanceRef: React.MutableRefObject<L.VectorGrid | null>,
-	getColor: (value: number) => string,
+	getFeatureColor: (value: number) => string,
 	onLocationModalOpen?: (content: React.ReactNode) => void,
 	onLocationModalClose?: () => void
 ) => {
@@ -208,7 +208,7 @@ export const useInteractiveMapEvents = (
 			fillColor:
 				interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
 					? '#fff'
-					: getColor(featureId),
+					: getFeatureColor(featureId),
 			fillOpacity:
 				interactiveRegion === InteractiveRegionOption.GRIDDED_DATA
 					? 0.2

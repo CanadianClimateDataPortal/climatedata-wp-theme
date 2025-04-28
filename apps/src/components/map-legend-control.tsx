@@ -17,11 +17,10 @@ const MapLegendControl: React.FC<{
 	data: TransformedLegendEntry[];
 	isOpen: boolean;
 	toggleOpen: () => void;
-	isDelta?: boolean;
 	isCategorical?: boolean;
 	hasCustomScheme?: boolean;
 	unit?: string;
-}> = ({ data, isOpen, toggleOpen, isDelta, isCategorical, hasCustomScheme, unit }) => {
+}> = ({ data, isOpen, toggleOpen, isCategorical, hasCustomScheme, unit }) => {
 	const [svgWidth, setSvgWidth] = useState(0);
 	const { __ } = useI18n();
 	const svgRef = useRef<SVGSVGElement>(null);

@@ -20,6 +20,7 @@ export async function transformLegendData(
 			color: colorMap?.colours?.[i] ?? item.color,
 			// for some variables, the response has an item with NaN text as its label, we need to convert to 0 instead
 			label: item.label === 'NaN' ? '0' : item.label,
+			opacity: Number(item.opacity ?? 1),
 		}));
 
 	if (!legendEntries) {

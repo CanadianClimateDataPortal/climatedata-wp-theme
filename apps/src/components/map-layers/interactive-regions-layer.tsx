@@ -6,7 +6,7 @@ import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.vectorgrid';
 
-import { useAppDispatch } from '@/app/hooks';
+import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { useInteractiveMapEvents } from '@/hooks/use-interactive-map-events';
 import { fetchChoroValues } from '@/services/services';
 import {
@@ -16,11 +16,11 @@ import {
 	GEOSERVER_BASE_URL,
 } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { useColorMap } from '@/hooks/use-color-map';
 import { clearRecentLocations } from '@/features/map/map-slice';
 import { InteractiveRegionOption } from "@/types/climate-variable-interface";
 import { getDefaultFrequency } from "@/lib/utils";
 import SectionContext from "@/context/section-provider";
+import { useColorMap } from '@/hooks/use-color-map';
 
 interface InteractiveRegionsLayerProps {
 	scenario?: string | null | undefined;
@@ -40,41 +40,27 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 	const dispatch = useAppDispatch();
 	const section = useContext(SectionContext);
 
+	const {
+		opacity: { mapData },
+	} = useAppSelector((state) => state.map);
+
 	const { climateVariable } = useClimateVariable();
+	const { colorMap, getColor } = useColorMap();
 
 	const {
 		threshold,
 		datasetVersion,
-		customColourScheme,
-		colourType,
 		gridType,
 		interactiveRegion,
 		startYear
 	} = useMemo(() => ({
 		threshold: climateVariable?.getThreshold() ?? '',
 		datasetVersion: climateVariable?.getVersion() ?? '',
-		customColourScheme: climateVariable ? generateColourScheme(climateVariable) : null,
-		colourType: climateVariable?.getColourType(),
 		gridType: climateVariable?.getGridType() ?? 'canadagrid',
 		interactiveRegion: climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA,
 		startYear: climateVariable?.getDateRange()?.[0] ?? '2040',
 	}), [climateVariable]);
 
-	const frequency = useMemo(() => {
-		const frequencyConfig = climateVariable?.getFrequencyConfig();
-
-		let frequency = climateVariable?.getFrequency() ?? '';
-
-		if (!frequency && frequencyConfig) {
-			frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
-		}
-
-		return frequency;
-	}, [climateVariable, section]);
-
-	const { colorMap, getColor } = useColorMap();
-
-	// Wrapper to map featureId to value, then use the hook's getColor
 	const getFeatureColor = useCallback(
 		(featureId: number) => {
 			if (!colorMap || !colorMap.quantities || !colorMap.colours) {
@@ -91,6 +77,18 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 		},
 		[interactiveRegion, layerData, colorMap, getColor]
 	);
+
+	const frequency = useMemo(() => {
+		const frequencyConfig = climateVariable?.getFrequencyConfig();
+
+		let frequency = climateVariable?.getFrequency() ?? '';
+
+		if (!frequency && frequencyConfig) {
+			frequency = getDefaultFrequency(frequencyConfig, section) ?? ''
+		}
+
+		return frequency;
+	}, [climateVariable, section]);
 
 	const tileLayerUrl = useMemo(() => {
 		const regionPbfValues: Record<string, string> = {
@@ -179,59 +177,59 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 	]);
 
 	useEffect(() => {
-		// make sure all needed data is available
-		if (
-			!tileLayerUrl ||
-			(interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA && !layerData)
-		) {
-			return;
-		}
-
-		const layerOptions = {
-			// @ts-expect-error: suppress leaflet typescript error
-			rendererFactory: L.canvas.tile,
-			interactive: true,
-			getFeatureId: (f: { properties: { id?: number; gid?: number } }) =>
-				f.properties.id ?? f.properties.gid,
-			pane: 'grid',
-			name: 'geojson',
-			maxNativeZoom: DEFAULT_MAX_ZOOM,
-			bounds: CANADA_BOUNDS,
-			maxZoom: DEFAULT_MAX_ZOOM,
-			minZoom: interactiveRegion === InteractiveRegionOption.GRIDDED_DATA ? 7 : DEFAULT_MIN_ZOOM,
-			vectorTileLayerStyles,
-		};
-
-		// @ts-expect-error: suppress leaflet typescript error
-		const layer = L.vectorGrid.protobuf(tileLayerUrl, layerOptions);
-		layer.setOpacity(mapData);
-		layerRef.current = layer;
-
-		layer.on('click', handleClick);
-
-		if ('ontouchstart' in window) {
-			layer.on('touchstart', handleOver).on('touchend', handleOut);
-		} else {
-			layer.on('mouseover', handleOver).on('mouseout', handleOut);
-		}
-
-		layer.addTo(map);
-
-		// clear all existing markers from the map
-		map.eachLayer(layer => {
-			if (layer instanceof L.Marker) {
-				map.removeLayer(layer);
+			// make sure all needed data is available
+			if (
+				!tileLayerUrl ||
+				(interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA && !layerData)
+			) {
+				return;
 			}
-		});
 
-		// clear recent locations
-		dispatch(clearRecentLocations());
+			const layerOptions = {
+				// @ts-expect-error: suppress leaflet typescript error
+				rendererFactory: L.canvas.tile,
+				interactive: true,
+				getFeatureId: (f: { properties: { id?: number; gid?: number } }) =>
+					f.properties.id ?? f.properties.gid,
+				pane: 'grid',
+				name: 'geojson',
+				maxNativeZoom: DEFAULT_MAX_ZOOM,
+				bounds: CANADA_BOUNDS,
+				maxZoom: DEFAULT_MAX_ZOOM,
+				minZoom: interactiveRegion === InteractiveRegionOption.GRIDDED_DATA ? 7 : DEFAULT_MIN_ZOOM,
+				vectorTileLayerStyles,
+			};
 
-		return () => {
-			map.removeLayer(layer);
-			layerRef.current = null;
-		};
-	},
+			// @ts-expect-error: suppress leaflet typescript error
+			const layer = L.vectorGrid.protobuf(tileLayerUrl, layerOptions);
+			layer.setOpacity(mapData);
+			layerRef.current = layer;
+
+			layer.on('click', handleClick);
+
+			if ('ontouchstart' in window) {
+				layer.on('touchstart', handleOver).on('touchend', handleOut);
+			} else {
+				layer.on('mouseover', handleOver).on('mouseout', handleOut);
+			}
+
+			layer.addTo(map);
+
+			// clear all existing markers from the map
+			map.eachLayer(layer => {
+				if (layer instanceof L.Marker) {
+					map.removeLayer(layer);
+				}
+			});
+
+			// clear recent locations
+			dispatch(clearRecentLocations());
+
+			return () => {
+				map.removeLayer(layer);
+				layerRef.current = null;
+			};
+		},
 		// Intentionally not including the event handlers (e.g. handleClick)
 		// as dependencies since they are already being handled by the
 		// userInteractiveMapEvents hook.

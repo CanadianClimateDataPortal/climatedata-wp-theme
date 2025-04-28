@@ -132,6 +132,7 @@ export interface CustomColourSchemeColour {
 export interface CustomColourSchemeEntry {
 	colours: CustomColourSchemeColour[],
 	type: string;
+	categorical?: boolean;
 }
 
 export interface CustomColourSchemes {

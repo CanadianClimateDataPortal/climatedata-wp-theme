@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import L from 'leaflet';
 import { useMap } from 'react-leaflet';
@@ -13,6 +13,7 @@ import { fetchLegendData } from '@/services/services';
 import { TransformedLegendEntry, WMSLegendData } from '@/types/types';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useColorMap } from '@/hooks/use-color-map';
+import { ColourType } from '@/types/climate-variable-interface';
 
 const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -46,18 +47,32 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 			if (customColors) {
 				const commonPrefix = getCommonPrefix(customColors.map(item => item.label))
 
+				// Using this to get a properly typed transformed legend data
+				const legendEntries = rawLegendData?.Legend?.flatMap(legend =>
+					legend.rules?.flatMap(rule =>
+						rule.symbolizers?.flatMap(symbolizer =>
+							symbolizer.Raster?.colormap?.entries ?? []
+						) ?? []
+					) ?? []
+				) ?? [];
+
 				setTransformedLegendData(
-					customColors.map(item => ({
-						...item,
+					customColors.map((item, index) => ({
 						label: item.label.replace(commonPrefix, ''),
-						color: item.colour
+						color: item.colour,
+						// use these from raw legend data because the custom colors config doesn't have them
+						opacity: Number(legendEntries[index]?.opacity ?? 1),
+						quantities: legendEntries[index]?.quantity !== undefined ? [legendEntries[index].quantity] : [],
 					})).reverse()
 				);
 				return
 			}
 
 			const transformedData: TransformedLegendEntry[] =
-				await transformLegendData(rawLegendData, colorMap);
+				await transformLegendData(rawLegendData, {
+					...colorMap,
+					schemeType: colorMap.schemeType as ColourType,
+				});
 
 			setTransformedLegendData(
 				transformedData.slice()
@@ -78,7 +93,7 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 		//  for now, we just use whatever prefix in the labels as the unit
 		const hasCustomScheme = Boolean(customColors);
 		const unit = hasCustomScheme
-			? getCommonPrefix(customColors?.map(item => item.label))
+			? getCommonPrefix(customColors?.map(item => item?.label) ?? [])
 			: climateVariable?.getUnit() || '°C';
 
 		legend.onAdd = () => {

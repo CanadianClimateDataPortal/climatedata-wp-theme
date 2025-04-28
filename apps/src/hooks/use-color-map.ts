@@ -22,17 +22,17 @@ export function useColorMap() {
       const customColourScheme = generateColourScheme(climateVariable);
       if (customColourScheme) {
         return {
-          colours: customColourScheme.colours,
-          quantities: customColourScheme.quantities,
-          schemeType: climateVariable.getColourType(),
+          colours: customColourScheme.colours ?? [],
+          quantities: customColourScheme.quantities ?? [],
+          schemeType: climateVariable?.getColourType() ?? ColourType.CONTINUOUS,
         };
       }
     }
 
     // Fallback to default map colours
     return {
-      colours: legendColourMapEntries.map((entry) => entry.color),
-      quantities: legendColourMapEntries.map((entry) => Number(entry.quantity)),
+      colours: legendColourMapEntries.map((entry) => entry.color) ?? [],
+      quantities: legendColourMapEntries.map((entry) => Number(entry.quantity)) ?? [],
       schemeType: ColourType.CONTINUOUS,
     };
   }, [climateVariable, legendData]);

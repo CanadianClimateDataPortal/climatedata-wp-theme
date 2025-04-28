@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import * as Slider from '@radix-ui/react-slider';
 import { useI18n } from '@wordpress/react-i18n';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
@@ -27,11 +27,19 @@ const TimePeriodsControl: React.FC = () => {
 	// Get date range from climate variable state
 	const dateRange = climateVariable?.getDateRange();
 	const [startYear, endYear] = dateRange ?? ["2040", "2070"];
-
-	// Use map state for the slider
-	const sliderValue = timePeriodEnd && timePeriodEnd.length > 0
-		? timePeriodEnd
-		: [Number(endYear)];
+	// Use climate variable state for the slider
+	const sliderValue = dateRange && dateRange.length > 1 
+		? [Number(dateRange[1])]
+		: timePeriodEnd && timePeriodEnd.length > 0
+			? timePeriodEnd
+			: [Number(endYear)];
+			
+	// Keep map state in sync with climate variable on initial load
+	useEffect(() => {
+		if (dateRange && dateRange.length > 1 && timePeriodEnd && timePeriodEnd[0] !== Number(dateRange[1])) {
+			dispatch(setTimePeriodEnd([Number(dateRange[1])]));
+		}
+	}, [dateRange, timePeriodEnd, dispatch]);
 
 	const minYear = Number(min);
 	const maxYear = Number(max);
@@ -47,14 +55,14 @@ const TimePeriodsControl: React.FC = () => {
 			newEnd = maxYear;
 		}
 
-		// Update both map state and climate variable state
-		dispatch(setTimePeriodEnd([newEnd]));
-
-		// Update climate variable state with the new date range
+		// Update climate variable state 
 		setDateRange([
 			(newEnd - intervalYears).toString(),
 			newEnd.toString(),
 		]);
+		
+		// Also update map state for backward compatibility
+		dispatch(setTimePeriodEnd([newEnd]));
 	};
 
 	return (

@@ -65,7 +65,9 @@ VariablesMenuItem.displayName = 'VariablesMenuItem';
 /**
  * A panel component that displays a list of variables.
  */
-const VariablesPanel: React.FC<InteractivePanelProps<PostData>> = ({
+interface VariablesPanelProps extends InteractivePanelProps<PostData> {}
+
+const VariablesPanel: React.FC<VariablesPanelProps> = ({
 	selected,
 	onSelect,
 }) => {

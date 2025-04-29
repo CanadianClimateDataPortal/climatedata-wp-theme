@@ -604,7 +604,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				</div>
 
 				<div className='mr-10'>
-					{ climateVariable?.getLocationModalContent(latlng, featureId, "panel") }
+					{ climateVariableId !== 'sea_level' && climateVariable?.getLocationModalContent(latlng, featureId, "panel") }
 				</div>
 			</div>
 			<div className="flex justify-between items-center mb-4">

@@ -63,7 +63,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			interval: 30
 		},
 		hasDelta: true,
-		enableColourOptions: false,
+		enableColourOptions: true,
 		temporalThresholdConfig: {
 			thresholds: {
 				tx_max: {
@@ -599,6 +599,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					{ label: 'Climate Zone 8', colour: '#7F00C9', quantity: 99999999 },
 				],
 				type: ColourType.DISCRETE,
+				categorical: true,
 			}
 		},
 		temporalThresholdConfig: {

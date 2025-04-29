@@ -1,15 +1,14 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
 
 import { TransformedLegendEntry } from '@/types/types';
 
-const LEGEND_HEIGHT = 420;
-const LEGEND_WIDTH = 54;
-const MAX_LABELS = 10;
 const PADDING_TOP = 10;
 const PADDING_BOTTOM = 10;
 const GRADIENT_WIDTH = 22;
+const TICK_WIDTH = 10;
+const MIN_LABEL_SPACING = 30; // Minimum spacing between labels
 
 /**
  * Map legend control component, displays the toggle button to collapse/expand the svg legend element.
@@ -18,18 +17,34 @@ const MapLegendControl: React.FC<{
 	data: TransformedLegendEntry[];
 	isOpen: boolean;
 	toggleOpen: () => void;
-}> = ({ data, isOpen, toggleOpen }) => {
+	isCategorical?: boolean;
+	hasCustomScheme?: boolean;
+	unit?: string;
+}> = ({ data, isOpen, toggleOpen, isCategorical, hasCustomScheme, unit }) => {
+	const [svgWidth, setSvgWidth] = useState(0);
 	const { __ } = useI18n();
+	const svgRef = useRef<SVGSVGElement>(null);
 
-	// TODO: all these calculations were made so that we could match the design as closely as possible
-	//  because the space between the labels is larger than in the original implementation.. confirm this is correct
-	const GRADIENT_HEIGHT = LEGEND_HEIGHT - PADDING_TOP - PADDING_BOTTOM;
-	const ITEM_HEIGHT = GRADIENT_HEIGHT / (data.length - 1);
+	// Calculate dynamic height based on number of labels and minimum spacing
+	const totalLabels = isCategorical ? data.length : data.length;
+	const minTotalHeight = (totalLabels - 1) * MIN_LABEL_SPACING + PADDING_TOP + PADDING_BOTTOM;
+	const GRADIENT_HEIGHT = minTotalHeight;
+	const LEGEND_HEIGHT = minTotalHeight;
 
-	const reducedLabels = useMemo(() => {
-		const interval = Math.ceil(data.length / MAX_LABELS);
-		return data.filter((_, index) => index % interval === 0);
-	}, [data]);
+	// For categorical data, we want equal height blocks for each category
+	const ITEM_HEIGHT = GRADIENT_HEIGHT / (isCategorical ? data.length : (data.length - 1));
+
+	// Position gradient box, label and line horizontally
+	const gradientX = svgWidth - GRADIENT_WIDTH;
+	const labelX = gradientX - TICK_WIDTH - 5;
+	const lineStartX = gradientX - TICK_WIDTH;
+	const lineEndX = gradientX;
+
+	useEffect(() => {
+		if (svgRef.current) {
+			setSvgWidth(svgRef.current.getBoundingClientRect().width);
+		}
+	}, []);
 
 	return (
 		<div className="space-y-[5px] w-[91px]">
@@ -48,55 +63,88 @@ const MapLegendControl: React.FC<{
 			</button>
 
 			{isOpen && (
-				<div className="flex flex-col items-end gap-1 bg-white border border-cold-grey-3 rounded-md py-2 px-1">
-					<div className="font-sans text-zinc-900 font-semibold text-lg leading-5">
-						°C
-					</div>
+				<div className="flex flex-col items-end gap-1 bg-white border border-cold-grey-3 rounded-md py-2 px-1 overflow-y-auto">
+					{/* Custom scheme variables like "building_climate_zones" won't show a unit */}
+					{!hasCustomScheme && (
+						<div className="font-sans text-zinc-900 font-semibold text-lg leading-5">
+							{unit}
+						</div>
+					)}
 
-					<svg width={LEGEND_WIDTH} height={LEGEND_HEIGHT}>
-						<defs>
-							<linearGradient
-								id="temperatureGradient"
-								gradientTransform="rotate(90)"
-							>
+					<svg ref={svgRef} height={LEGEND_HEIGHT} className="w-full">
+						{isCategorical ? (
+							<g>
 								{data.map((entry, index) => (
-									<stop
+									<rect
 										key={index}
-										offset={`${(index / (data.length - 1)) * 100}%`}
-										stopColor={entry.color}
-										stopOpacity={entry.opacity}
+										width={GRADIENT_WIDTH}
+										height={ITEM_HEIGHT}
+										fill={entry.color}
+										opacity={entry.opacity}
+										x={gradientX}
+										y={PADDING_TOP + index * ITEM_HEIGHT}
 									/>
 								))}
-							</linearGradient>
-						</defs>
+							</g>
+						) : (
+							<>
+								<defs>
+									<linearGradient
+										id="temperatureGradient"
+										gradientTransform="rotate(90)"
+									>
+										{data.map((entry, index) => (
+											<stop
+												key={index}
+												offset={`${(index / (data.length - 1)) * 100}%`}
+												stopColor={entry.color}
+												stopOpacity={entry.opacity}
+											/>
+										))}
+									</linearGradient>
+								</defs>
 
-						<rect
-							width={GRADIENT_WIDTH}
-							height={LEGEND_HEIGHT}
-							fill="url(#temperatureGradient)"
-							x="35"
-						/>
+								<rect
+									width={GRADIENT_WIDTH}
+									height={LEGEND_HEIGHT}
+									fill="url(#temperatureGradient)"
+									x={gradientX}
+								/>
+							</>
+						)}
 
-						{reducedLabels.map((entry) => {
-							const index = data.indexOf(entry);
+						{data.map((entry, index) => {
 							const y = PADDING_TOP + index * ITEM_HEIGHT;
+							// For categorical data, center the label in the block
+							const labelY = isCategorical ? y + (ITEM_HEIGHT / 2) : y;
+
+							// Custom scheme variables like "building_climate_zones" may have labels that can be parsed but shouldn't
+							//  eg. 7A, 7B, 8 -- so those even if parseable we should keep them as they are
+							let parsedLabel = hasCustomScheme
+								? entry.label
+								: parseFloat(entry.label);
+
+							// Still getting NaN for labels like dates -- Jul 01, Jun 21, etc so fall back to the received label instead
+							if (isNaN(Number(parsedLabel))) {
+								parsedLabel = entry.label;
+							}
 
 							return (
-								<g key={entry.label}>
+								<g key={index}>
 									<text
-										x="20"
-										y={y}
+										x={labelX}
+										y={labelY}
 										className="legend-temp-text"
 										dominantBaseline="middle"
 										textAnchor="end"
 									>
-										{parseInt(entry.label)}
+										{parsedLabel}
 									</text>
 									<line
-										x1="25"
-										y1={y - 2}
-										x2="35"
-										y2={y - 2}
+										x1={lineStartX}
+										y1={labelY}
+										x2={lineEndX}
+										y2={labelY}
 										stroke="black"
 										strokeWidth="1"
 									/>

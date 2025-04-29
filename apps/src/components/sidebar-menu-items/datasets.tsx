@@ -77,31 +77,37 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 	const dispatch = useAppDispatch();
 	const { selectClimateVariable } = useClimateVariable();
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
-	const urlParamsLoadedRef = useRef<boolean>(!!climateVariableData);
+	const urlSyncState = useAppSelector((state) => state.urlSync);
+	const urlParamsLoadedRef = useRef<boolean>(urlSyncState.isLoaded || !!climateVariableData);
 	const initialLoadCompletedRef = useRef<boolean>(false);
 
 	// Update urlParamsLoaded ref if climate variable data is detected
 	useEffect(() => {
-		if (climateVariableData && !urlParamsLoadedRef.current) {
+		if ((urlSyncState.isLoaded || climateVariableData) && !urlParamsLoadedRef.current) {
 			urlParamsLoadedRef.current = true;
 		}
-	}, [climateVariableData]);
+	}, [climateVariableData, urlSyncState.isLoaded]);
 
 	const handleDatasetSelect = useCallback(async (dataset: TaxonomyData) => {
 		onSelect(dataset);
 		dispatch(setVariableListLoading(true));
 		dispatch(setVariableList([]));
 
-		// Load the first variable for this dataset immediately
-		const data = await fetchPostsData('variables', 'map', dataset, {});
-		const variables = await normalizePostData(data, locale);
+		try {
+			// Load variables for this dataset
+			const data = await fetchPostsData('variables', 'map', dataset, {});
+			const variables = await normalizePostData(data, locale);
 
 		// Store the variables in Redux
-		dispatch(setVariableList(variables));
-
+			dispatch(setVariableList(variables));
+			dispatch(setVariableListLoading(false));
 		// Select the first variable if available
-		if (variables.length > 0 && !urlParamsLoadedRef.current) {
-			selectClimateVariable(variables[0], dataset);
+			if (variables.length > 0) {
+				selectClimateVariable(variables[0], dataset);
+			}
+		} catch (error) {
+			console.error('Error fetching variables for dataset:', error);
+			dispatch(setVariableListLoading(false));
 		}
 	}, [dispatch, onSelect, selectClimateVariable, locale]);
 

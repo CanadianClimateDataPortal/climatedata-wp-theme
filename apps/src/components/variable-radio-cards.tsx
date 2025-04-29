@@ -70,6 +70,13 @@ const VariableRadioCards: React.FC<VariableRadioCardsProps> = ({
 			// Skip if we're already fetching
 			if (fetchingRef.current) return;
 			if (prevDatasetRef.current === dataset.term_id && variableList.length > 0) {
+				// If we already have variables for this dataset but never selected one,
+				// make sure to select the first variable
+				if (!hasAutoSelectedRef.current && !urlParamsLoaded && variableList.length > 0) {
+					hasAutoSelectedRef.current = true;
+					onSelect(variableList[0]);
+					selectClimateVariable(variableList[0], dataset);
+				}
 				return;
 			}
 
@@ -86,7 +93,8 @@ const VariableRadioCards: React.FC<VariableRadioCardsProps> = ({
 					dispatch(setVariableList(normalizedData));
 					setDataLoaded(true);
 					
-					if (!hasAutoSelectedRef.current && normalizedData.length > 0 && !selected && !urlParamsLoaded) {
+					// Always select the first variable when dataset changes
+					if (normalizedData.length > 0) {
 						hasAutoSelectedRef.current = true;
 						onSelect(normalizedData[0]);
 						selectClimateVariable(normalizedData[0], dataset);
@@ -101,7 +109,7 @@ const VariableRadioCards: React.FC<VariableRadioCardsProps> = ({
 					fetchingRef.current = false;
 					dispatch(setVariableListLoading(false));
 				});
-		}, [dataset, dispatch, selected, onSelect, selectClimateVariable, urlParamsLoaded, variableList.length, section]);
+		}, [dataset, dispatch, section, variableList, urlParamsLoaded, onSelect, selectClimateVariable, locale]);
 
 		const handleVariableSelect = (variable: PostData) => {
 			onSelect(variable);

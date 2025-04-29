@@ -97,11 +97,6 @@ const SeaLevelClimateVariableValues: React.FC<SeaLeavelClimateVariableValuesProp
 				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
 					{ formattedMedian }
 				</div>
-				<div className={mode === "modal" ? "" : "flex gap-2"}>
-					<div className='text-xs font-semibold text-neutral-grey-medium uppercase tracking-wider'>
-						{__('Median')}
-					</div>
-				</div>
 			</div>
 		);
 	};

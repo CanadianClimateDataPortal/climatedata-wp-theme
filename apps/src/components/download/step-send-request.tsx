@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 import { StepContainer, StepContainerDescription, } from '@/components/download/step-container';
@@ -29,6 +29,9 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	);
 	const dispatch = useAppDispatch();
 
+	// get the download type
+	const downloadType = climateVariable?.getDownloadType();
+
 	React.useImperativeHandle(ref, () => ({
 		isValid: () => {
 			if (!climateVariable) {
@@ -42,7 +45,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 			];
 
 			// For analyzed downloads, add email validation
-			if (climateVariable.getDownloadType() === DownloadType.ANALYZED) {
+			if (downloadType === DownloadType.ANALYZED) {
 				validations.push(
 					// Email is required and must be valid
 					Boolean(email && isValidEmail(email))
@@ -60,6 +63,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 		}
 	}), [climateVariable, email]);
 
+
 	const formatOptions = [
 		{ value: FileFormatType.CSV, label: 'CSV' },
 		{ value: FileFormatType.JSON, label: 'JSON' },
@@ -69,13 +73,20 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	);
 
 	const fileFormat = climateVariable?.getFileFormat() ?? undefined;
-	const maxDecimals = climateVariable?.getMaxDecimals() ?? 0;
+	const maxDecimals = climateVariable?.getMaxDecimals() ?? 10;
 	const decimalPlace = climateVariable?.getDecimalPlace() ?? 0;
 	const decimalPlaceOptions = normalizeDropdownOptions(
 		[...Array(maxDecimals + 1).keys()].map((value) => ({value, label: String(value)}))
 	);
 
 	const isEmailValid = isValidEmail(email);
+
+	useEffect(() => {
+		// Reset decimalPlace if fileFormat is changed away from CSV.
+		if (fileFormat !== FileFormatType.CSV && decimalPlace !== 0) {
+			setDecimalPlace(0);
+		}
+	}, [fileFormat, decimalPlace, setDecimalPlace]);
 
 	return (
 		<StepContainer title={__('Download your file')} isLastStep>
@@ -101,15 +112,18 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 				onValueChange={setFileFormat}
 			/>
 
-			{maxDecimals > 0 && <Dropdown
-				className="sm:w-64 mb-8"
-				label={__('Decimal Place')}
-				value={decimalPlace}
-				options={decimalPlaceOptions}
-				onChange={setDecimalPlace}
-			/>}
+			{downloadType === DownloadType.ANALYZED &&
+				fileFormat === FileFormatType.CSV && (
+				<Dropdown
+					className="sm:w-64 mb-8"
+					label={__('Decimal Place')}
+					value={decimalPlace}
+					options={decimalPlaceOptions}
+					onChange={setDecimalPlace}
+				/>
+			)}
 
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED &&
+			{downloadType === DownloadType.ANALYZED &&
 				<div className="flex flex-col gap-2">
 					<p className="text-sm text-neutral-grey-medium">
 						{__(

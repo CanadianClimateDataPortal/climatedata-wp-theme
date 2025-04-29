@@ -15,6 +15,7 @@ import {
 	ClimateVariableInterface,
 	FileFormatType,
 	GridCoordinates,
+	GridRegion,
 	InteractiveRegionOption,
 } from '@/types/climate-variable-interface';
 import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
@@ -48,6 +49,8 @@ export type ClimateVariableContextType = {
 	addSelectedPoints: (gridCoordinate: GridCoordinates) => void;
 	removeSelectedPoint: (gid: number) => void;
 	resetSelectedPoints: () => void;
+	setSelectedRegion: (region: GridRegion) => void;
+	resetSelectedRegion: () => void;
 };
 
 type ClassMapType = Record<
@@ -362,8 +365,11 @@ export const ClimateVariableProvider: React.FC<{
 						...selectedPoints,
 						...gridCoordinates,
 					},
+					// Also reset selectedRegion
+					selectedRegion: null,
 				})
 			);
+
 		},
 		[dispatch, climateVariableData]
 	);
@@ -392,6 +398,30 @@ export const ClimateVariableProvider: React.FC<{
 		);
 	}, [dispatch, climateVariableData]);
 
+	const setSelectedRegion = useCallback(
+		(region: GridRegion) => {
+			dispatch(
+				updateClimateVariable({
+					selectedRegion: region,
+					// Also reset selectedPoints
+					selectedPoints: {},
+				})
+			);
+		},
+		[dispatch]
+	);
+
+	const resetSelectedRegion = useCallback(
+		() => {
+			dispatch(
+				updateClimateVariable({
+					selectedRegion: null,
+				})
+			);
+		},
+		[dispatch]
+	);
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
@@ -418,6 +448,8 @@ export const ClimateVariableProvider: React.FC<{
 		addSelectedPoints,
 		removeSelectedPoint,
 		resetSelectedPoints,
+		setSelectedRegion,
+		resetSelectedRegion,
 	};
 
 	return (

@@ -13,13 +13,12 @@ import 'leaflet.pm';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.pm/dist/leaflet.pm.css';
 
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { useAppDispatch } from '@/app/hooks';
 import {
 	setCenter,
-	setSelection,
-	setSelectionCount,
 	setZoom,
 } from '@/features/download/download-slice';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 
 /**
  * Component that allows to select a rectangle on the map and calculate the number of cells selected
@@ -30,7 +29,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 	const map = useMap();
 	const layerGroupRef = useRef<L.LayerGroup>(new L.LayerGroup());
 
-	const selection = useAppSelector((state) => state.download.selection);
+	const { climateVariable, setSelectedRegion, resetSelectedRegion } = useClimateVariable();
 	const dispatch = useAppDispatch();
 
 	const gridResolutions = useMemo(
@@ -70,8 +69,13 @@ const SelectableRectangleGridLayer = forwardRef<{
 			const area = latDiff * lngDiff;
 			const totalCells = Math.round(area / gridResolutions[varGrid] ** 2);
 
-			dispatch(setSelection([minLat, minLng, maxLat, maxLng]));
-			dispatch(setSelectionCount(totalCells));
+			setSelectedRegion({
+				bounds: [
+					[minLat, minLng],
+					[maxLat, maxLng]
+				],
+				cellCount: totalCells
+			});
 		},
 		[gridResolutions, dispatch]
 	);
@@ -104,12 +108,8 @@ const SelectableRectangleGridLayer = forwardRef<{
 
 	// draw a rectangle if there are selected cells when the component mounts
 	useEffect(() => {
-		if (selection.length > 0) {
-			const bounds: L.LatLngBoundsExpression = [
-				[selection[0], selection[1]], // southwest corner [minLat, minLng]
-				[selection[2], selection[3]], // northeast corner [maxLat, maxLng]
-			];
-
+		const bounds = climateVariable?.getSelectedRegion()?.bounds;
+		if (bounds) {
 			L.rectangle(bounds).addTo(layerGroupRef.current);
 		}
 		// disabling because we want this logic to run only once when the component mounts, and
@@ -158,8 +158,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 				map.pm.enableDraw('Rectangle');
 
 				// clear selection in redux
-				dispatch(setSelection([]));
-				dispatch(setSelectionCount(0));
+				resetSelectedRegion();
 			},
 		}),
 		[map, dispatch]

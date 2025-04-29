@@ -12,6 +12,7 @@ import {
 	FileFormatType,
 	FrequencyConfig,
 	GridCoordinates,
+	GridRegion,
 	InteractiveRegionConfig,
 	InteractiveRegionOption,
 	ScenariosConfig,
@@ -297,6 +298,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getSelectedPointsCount(): number {
 		return Object.keys(this._config.selectedPoints ?? {}).length;
+	}
+
+	getSelectedRegion(): GridRegion | null {
+		return this._config.selectedRegion ?? null;
 	}
 
 	toObject(): ClimateVariableConfigInterface {

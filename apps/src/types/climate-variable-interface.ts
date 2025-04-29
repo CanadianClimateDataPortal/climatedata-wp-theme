@@ -148,6 +148,11 @@ export interface GridCoordinates {
 	[key: number]: Coordinates;
 }
 
+export interface GridRegion {
+	bounds: L.LatLngBoundsExpression;
+	cellCount: number
+}
+
 export interface ClimateVariableConfigInterface {
 	/** Unique identifier for the climate variable */
 	id: string;
@@ -296,6 +301,8 @@ export interface ClimateVariableConfigInterface {
 	analysisUrl?: string;
 
 	selectedPoints?: GridCoordinates;
+
+	selectedRegion?: GridRegion | null;
 }
 
 /**
@@ -410,6 +417,8 @@ export interface ClimateVariableInterface {
 	getSelectedPoints(): GridCoordinates | null;
 
 	getSelectedPointsCount(): number;
+
+	getSelectedRegion(): GridRegion | null;
 
 	toObject(): ClimateVariableConfigInterface;
 

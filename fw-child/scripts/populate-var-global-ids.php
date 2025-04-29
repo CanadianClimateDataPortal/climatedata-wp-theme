@@ -25,7 +25,7 @@ if ( ! is_user_logged_in() || ! current_user_can( 'administrator' ) ) {
 }
 
 $var_id_post_id_mapping = array(
-	"AHCCD pre-calculated station data"                               => array(
+	"Daily AHCCD Temperature and Precipitation"                               => array(
 		12392,
 		"",
 		false,

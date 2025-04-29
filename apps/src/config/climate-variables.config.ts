@@ -1208,6 +1208,19 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			{
 				key: "thresh_tasmin",
 				type: "input",
+				label: 'Minimum Temperature Threshold (°C)',
+				description: 'Set the minimum temperature required for a day to be included in a heat wave.',
+				help: 'Only days where the daily minimum temperature is above this threshold will count toward a heat wave.',
+				unit: 'C',
+				comparison: '<',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
+				key: "thresh_tasmax",
+				type: "input",
 				label: 'Maximum Temperature Threshold (°C)',
 				description: 'Set the maximum temperature required for a day to be included in a heat wave.',
 				help: 'Only days where the daily maximum temperature is above this threshold will count toward a heat wave.',

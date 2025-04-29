@@ -72,7 +72,7 @@ const VariableRadioCards: React.FC<VariableRadioCardsProps> = ({
 			if (prevDatasetRef.current === dataset.term_id && variableList.length > 0) {
 				// If we already have variables for this dataset but never selected one,
 				// make sure to select the first variable
-				if (!hasAutoSelectedRef.current && !urlParamsLoaded && variableList.length > 0) {
+				if (!hasAutoSelectedRef.current && !urlParamsLoaded) {
 					hasAutoSelectedRef.current = true;
 					onSelect(variableList[0]);
 					selectClimateVariable(variableList[0], dataset);

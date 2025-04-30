@@ -73,7 +73,11 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	);
 
 	const fileFormat = climateVariable?.getFileFormat() ?? undefined;
-	const maxDecimals = climateVariable?.getMaxDecimals() ?? 10;
+
+	// Get the maximum number of decimals.
+	const maxDecimalsValue = climateVariable?.getMaxDecimals();
+	// If maxDecimalsValue is 0 or null, set it to 10
+	const maxDecimals = maxDecimalsValue === 0 || maxDecimalsValue == null ? 10 : maxDecimalsValue;
 	const decimalPlace = climateVariable?.getDecimalPlace() ?? 0;
 	const decimalPlaceOptions = normalizeDropdownOptions(
 		[...Array(maxDecimals + 1).keys()].map((value) => ({value, label: String(value)}))

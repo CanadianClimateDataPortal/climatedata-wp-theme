@@ -257,7 +257,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getMaxDecimals(): number {
-		return this._config.maxDecimals ?? 10;
+		return this._config.maxDecimals ?? 0;
 	}
 
 	getDecimalPlace(): number {

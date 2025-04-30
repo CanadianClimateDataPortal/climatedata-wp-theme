@@ -50,12 +50,9 @@ const VariableRadioCards: React.FC<VariableRadioCardsProps> = ({
 		const { activePanel, closePanel } = useAnimatedPanel();
 		const searchQuery = useAppSelector(selectSearchQuery);
 		const [dataLoaded, setDataLoaded] = useState(false);
-		const urlParamsLoaded = useAppSelector((state) => state.urlSync.isLoaded);
-		const hasAutoSelectedRef = useRef<boolean>(false);
 
-		// Keep track of dataset changes and previous state
-		const prevDatasetRef = useRef<number | null>(null);
 		const fetchingRef = useRef<boolean>(false);
+		const prevDatasetIdRef = useRef<number | null>(null);
 
 		// Use the shared filter hook
 		const { filteredList, isFiltering, filteredCount, totalCount } = useFilteredVariables(
@@ -64,25 +61,18 @@ const VariableRadioCards: React.FC<VariableRadioCardsProps> = ({
 			searchQuery
 		);
 
-		// Fetch all variables when dataset changes (without filters)
+		// Fetch all variables when dataset changes
 		useEffect(() => {
 			if (!dataset || !dataset.term_id) return;
-			// Skip if we're already fetching
 			if (fetchingRef.current) return;
-			if (prevDatasetRef.current === dataset.term_id && variableList.length > 0) {
-				// If we already have variables for this dataset but never selected one,
-				// make sure to select the first variable
-				if (!hasAutoSelectedRef.current && !urlParamsLoaded) {
-					hasAutoSelectedRef.current = true;
-					onSelect(variableList[0]);
-					selectClimateVariable(variableList[0], dataset);
-				}
+			// If we already have variables for this dataset, skip refetching
+			if (prevDatasetIdRef.current === dataset.term_id && variableList.length > 0) {
 				return;
 			}
 
-			// Set refs
+			// Set flags for tracking
 			fetchingRef.current = true;
-			prevDatasetRef.current = dataset.term_id;
+			prevDatasetIdRef.current = dataset.term_id;
 			setDataLoaded(false);
 			dispatch(setVariableListLoading(true));
 	
@@ -93,12 +83,7 @@ const VariableRadioCards: React.FC<VariableRadioCardsProps> = ({
 					dispatch(setVariableList(normalizedData));
 					setDataLoaded(true);
 					
-					// Always select the first variable when dataset changes
-					if (normalizedData.length > 0) {
-						hasAutoSelectedRef.current = true;
-						onSelect(normalizedData[0]);
-						selectClimateVariable(normalizedData[0], dataset);
-					}
+					// Auto-selection happens in datasets.tsx
 				})
 				.catch(error => {
 					console.error('Error fetching variables:', error);
@@ -109,7 +94,7 @@ const VariableRadioCards: React.FC<VariableRadioCardsProps> = ({
 					fetchingRef.current = false;
 					dispatch(setVariableListLoading(false));
 				});
-		}, [dataset, dispatch, section, variableList, urlParamsLoaded, onSelect, selectClimateVariable, locale]);
+		}, [dataset, dispatch, section, variableList, locale]);
 
 		const handleVariableSelect = (variable: PostData) => {
 			onSelect(variable);

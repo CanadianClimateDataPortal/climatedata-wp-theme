@@ -14,6 +14,7 @@ import { initializeUrlSync, setUrlParamsLoaded } from '@/features/url-sync/url-s
  */
 export const useUrlSync = () => {
 	const updateTimeoutRef = useRef<number | null>(null);
+	const urlProcessingCompleteRef = useRef<boolean>(false);
 	const dispatch = useAppDispatch();
 
 	// Get the URL sync state
@@ -271,7 +272,7 @@ export const useUrlSync = () => {
 					dispatch(
 						setOpacity({
 							key: 'mapData',
-							value: opacityNum,
+							value: opacityNum / 100,
 						})
 					);
 				}
@@ -283,7 +284,7 @@ export const useUrlSync = () => {
 					dispatch(
 						setOpacity({
 							key: 'labels',
-							value: opacityNum,
+							value: opacityNum / 100,
 						})
 					);
 				}
@@ -333,48 +334,56 @@ export const useUrlSync = () => {
 	};
 
 	useEffect(() => {
-		if (isInitialized) return;
-
+		if (isInitialized || urlProcessingCompleteRef.current) return;
 		const params = new URLSearchParams(window.location.search);
 
-		// If no URL parameters, just mark as initialized and loaded
+		dispatch(initializeUrlSync());
+
+		// If no URL parameters, mark as loaded and exit
 		if (params.toString().length === 0) {
-			dispatch(initializeUrlSync());
-			dispatch(setUrlParamsLoaded(false)); // No params to load
+			urlProcessingCompleteRef.current = true;
+			dispatch(setUrlParamsLoaded(false));
 			return;
 		}
 
-		// Start the URL sync process
-		dispatch(initializeUrlSync());
+		// Mark as NOT loaded until processing completes
+		dispatch(setUrlParamsLoaded(false));
 
-		// Process URL parameters in the correct order
+		// Process URL parameters
 		(async () => {
-			// First process dataset 
-			const selectedDataset = await setDatasetFromUrlParams(params);
-			
-			// Then process variable and its parameters
-			const varId = params.get('var');
-			if (varId && selectedDataset) {
-				const matchedVariable = ClimateVariables.find(
-					(config) => config.id === varId
-				);
-				if (matchedVariable) {
-					// Add dataset type to the variable
-					const variableWithDataset = {
-						...matchedVariable,
-						datasetType: selectedDataset.dataset_type
-					};
-					
-					// Process all climate variable parameters
-					setClimateVariableFromUrlParams(params, variableWithDataset);
+			try {
+				// First process dataset
+				const selectedDataset = await setDatasetFromUrlParams(params);
+				
+				// Then process variable and its parameters
+				const varId = params.get('var');
+				if (varId && selectedDataset) {
+					const matchedVariable = ClimateVariables.find(
+						(config) => config.id === varId
+					);
+					if (matchedVariable) {
+						// Add dataset type to the variable
+						const variableWithDataset = {
+							...matchedVariable,
+							datasetType: selectedDataset.dataset_type
+						};
+						
+						// Process all climate variable parameters
+						setClimateVariableFromUrlParams(params, variableWithDataset);
+					}
 				}
+				
+				// Process map opacity
+				setMapOpacityFromUrlParams(params);
+				
+				// Mark URL parameters as loaded
+				urlProcessingCompleteRef.current = true;
+				dispatch(setUrlParamsLoaded(true));
+			} catch (error) {
+				console.error('Error processing URL parameters:', error);
+				urlProcessingCompleteRef.current = true;
+				dispatch(setUrlParamsLoaded(true));
 			}
-			
-			// Always process map opacity
-			setMapOpacityFromUrlParams(params);
-			
-			// Mark URL parameters as loaded
-			dispatch(setUrlParamsLoaded(true));
 		})();
 	}, [dispatch, isInitialized]);
 

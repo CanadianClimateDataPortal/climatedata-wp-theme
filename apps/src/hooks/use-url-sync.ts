@@ -131,25 +131,22 @@ export const useUrlSync = () => {
 	const addMapOnlyParamsToUrl = (
 		params: URLSearchParams
 	) => {
-		// Opacity
-		if (opacity) {
-			if (opacity.mapData !== undefined) {
-				params.set(
-					'dataOpacity',
-					Math.round(opacity.mapData * 100).toString()
-				);
-			}
-			if (opacity.labels !== undefined) {
-				params.set(
-					'labelOpacity',
-					Math.round(opacity.labels * 100).toString()
-				);
-			}
-		}
-		
 		// Dataset 
 		if (dataset?.dataset_type) {
 			params.set('dataset', dataset.dataset_type);
+		}
+		
+		// Opacity
+		if (opacity) {
+			if (opacity.mapData !== undefined) {
+				const urlOpacityValue = Math.round(opacity.mapData * 100);
+				params.set('dataOpacity', urlOpacityValue.toString());
+			}
+			
+			if (opacity.labels !== undefined) {
+				const urlOpacityValue = Math.round(opacity.labels * 100);
+				params.set('labelOpacity', urlOpacityValue.toString());
+			}
 		}
 	};
 	
@@ -262,29 +259,30 @@ export const useUrlSync = () => {
 	};
 
 	const setMapOpacityFromUrlParams = (params: URLSearchParams) => {
-		const dataOpacity = params.get('dataOpacity');
-		const labelOpacity = params.get('labelOpacity');
-
-		if (dataOpacity || labelOpacity) {
-			if (dataOpacity) {
-				const opacityNum = parseInt(dataOpacity);
+		if (params.has('dataOpacity')) {
+			const dataOpacityStr = params.get('dataOpacity');
+			if (dataOpacityStr) {
+				const opacityNum = parseInt(dataOpacityStr);
 				if (!isNaN(opacityNum)) {
 					dispatch(
 						setOpacity({
 							key: 'mapData',
-							value: opacityNum / 100,
+							value: opacityNum,
 						})
 					);
 				}
 			}
+		}
 
-			if (labelOpacity) {
-				const opacityNum = parseInt(labelOpacity);
+		if (params.has('labelOpacity')) {
+			const labelOpacityStr = params.get('labelOpacity');
+			if (labelOpacityStr) {
+				const opacityNum = parseInt(labelOpacityStr);
 				if (!isNaN(opacityNum)) {
 					dispatch(
 						setOpacity({
 							key: 'labels',
-							value: opacityNum / 100,
+							value: opacityNum,
 						})
 					);
 				}

@@ -224,6 +224,7 @@ export interface WMSLegendData {
 				Raster?: {
 					colormap?: {
 						entries: WMSLegendEntry[];
+						type?: string;
 					};
 				};
 			}[];

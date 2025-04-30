@@ -64,6 +64,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 		{ value: FileFormatType.CSV, label: 'CSV' },
 		{ value: FileFormatType.JSON, label: 'JSON' },
 		{ value: FileFormatType.NetCDF, label: 'NetCDF' },
+		{ value: FileFormatType.GeoJSON, label: 'GeoJSON' },
 	].filter((option) =>
 		climateVariable?.getFileFormatTypes()?.includes(option.value)
 	);

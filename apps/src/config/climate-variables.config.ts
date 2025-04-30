@@ -1592,4 +1592,16 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 		unit: "cm",
 	},
+	/** MSC Climate Normals 1981-2010 */
+	{
+		id: "msc_climate_normals",
+		class: "StationClimateVariable",
+		threshold: "climate-normals",
+		hasDelta: false,
+		enableColourOptions: false,
+		fileFormatTypes: [
+			FileFormatType.CSV,
+			FileFormatType.GeoJSON,
+		],
+	},
 ];

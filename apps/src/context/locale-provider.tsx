@@ -6,7 +6,7 @@
  * in the future a language switcher is implemented.
  *
  */
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState } from 'react';
 import { Locale } from '@/types/types';
 
 // Define the LocaleContext

@@ -476,8 +476,8 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		for (const scenarioName of Object.keys(data)) {
 			const anyValue = Object.values(data[scenarioName])[0];
 			if (anyValue.length === 2) {
-				headers.push(`${scenarioName} (low)`);
-				headers.push(`${scenarioName} (high)`);
+				headers.push(`${scenarioName}_p10`);
+				headers.push(`${scenarioName}_p90`);
 				scenarioKeys.push({ key: scenarioName, columns: ['low', 'high'] });
 			} else {
 				headers.push(scenarioName);
@@ -542,23 +542,20 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						if(activeTab === 'annual-values') {
 							chart.downloadCSV();
 						} else {
-							let prefix = '';
-							if(activeTab === '30-year-averages') {
-								prefix = '30y_';
-							} else if(activeTab === '30-year-changes') {
-								prefix = 'delta7100_';
-							}
-	
-							if(prefix === '') break;
+							const prefixes: string[] = ['30y_', 'delta7100_'];
 	
 							// Get only data we want with the rights keys
 							const csvData = Object.keys(data)
-								.filter((key) => key.startsWith(prefix))
+								.filter((key) => {
+									return prefixes.some((prefix) => key.startsWith(prefix));
+								})
 								.reduce((acc: Record<string, Record<string, number[]>>, key) => {
-									const newKey = key.replace(prefix, '');
-									if(!chartDataOptions[newKey]) return acc;
-	
-									acc[chartDataOptions[newKey].name] = Object.fromEntries(
+									if(key === '30y_observations') return acc;
+
+									const newKey = key.replace('_median', '_p50')
+										.replace('_range', '');
+
+									acc[newKey] = Object.fromEntries(
 										Object.entries(data[key] ?? {}).map(([timestamp, value]) => {
 											const year = new Date(Number(timestamp)).getFullYear();
 											return [(year + 1) + "-" + (year + 30), value as number[]];

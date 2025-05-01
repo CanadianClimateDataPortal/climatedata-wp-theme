@@ -4,7 +4,6 @@ import { setOpacity, setTimePeriodEnd, setDataset } from '@/features/map/map-sli
 import { setClimateVariable } from '@/store/climate-variable-slice';
 import { ClimateVariables } from '@/config/climate-variables.config';
 import { ClimateVariableConfigInterface, InteractiveRegionOption } from '@/types/climate-variable-interface';
-import { TaxonomyData } from '@/types/types';
 import { fetchTaxonomyData } from '@/services/services';
 import { initializeUrlSync, setUrlParamsLoaded } from '@/features/url-sync/url-sync-slice';
 
@@ -132,8 +131,8 @@ export const useUrlSync = () => {
 		params: URLSearchParams
 	) => {
 		// Dataset 
-		if (dataset?.dataset_type) {
-			params.set('dataset', dataset.dataset_type);
+		if (dataset && dataset.term_id) {
+			params.set('dataset', dataset.term_id.toString());
 		}
 		
 		// Opacity
@@ -291,44 +290,36 @@ export const useUrlSync = () => {
 	};
 
 	const setDatasetFromUrlParams = async (params: URLSearchParams) => {
-		const datasetType = params.get('dataset');
-		if (datasetType) {
-			try {
-				// Fetch actual dataset objects
-				const datasets = await fetchTaxonomyData('datasets', 'map');
-				
-				// Find dataset with matching type
-				const matchedDataset = datasets.find(
-					(dataset) => dataset.dataset_type === datasetType
-				);
+		const datasetParam = params.get('dataset');
+		if (!datasetParam) return null;
+		
+		try {
+			// Fetch actual dataset objects
+			const datasets = await fetchTaxonomyData('datasets', 'map');
+			const datasetParamNum = parseInt(datasetParam);
+
+			if (!isNaN(datasetParamNum)) {
+				const matchedDataset = datasets.find(dataset => dataset.term_id === datasetParamNum);
 				
 				if (matchedDataset) {
 					// Create a complete dataset object
 					dispatch(setDataset(matchedDataset));
 					return matchedDataset;
-				} else {
-					// Fallback to basic dataset object if no match found
-					const basicDataset: TaxonomyData = {
-						term_id: 0,
-						title: { en: datasetType },
-						dataset_type: datasetType
-					};
-					dispatch(setDataset(basicDataset));
-					return basicDataset;
 				}
-			} catch (error) {
-				console.error('Error fetching datasets:', error);
-				// Fallback
-				const basicDataset: TaxonomyData = {
-					term_id: 0,
-					title: { en: datasetType },
-					dataset_type: datasetType
-				};
-				dispatch(setDataset(basicDataset));
-				return basicDataset;
 			}
+			
+			// If we reach here, we couldn't find a match
+			// Return the first dataset as a fallback
+			if (datasets.length > 0) {
+				dispatch(setDataset(datasets[0]));
+				return datasets[0];
+			}
+			
+			return null;
+		} catch (error) {
+			console.error('Error fetching datasets:', error);
+			return null;
 		}
-		return null;
 	};
 
 	useEffect(() => {

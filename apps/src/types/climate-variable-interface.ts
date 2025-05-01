@@ -14,6 +14,8 @@ export interface ThresholdInterface {
 	label: string;
 }
 
+export type InteractiveMode = 'region' | 'station';
+
 export enum InteractiveRegionOption {
 	GRIDDED_DATA = "gridded_data",
 	CENSUS = "census",
@@ -86,6 +88,7 @@ export enum FileFormatType {
 	CSV = "csv",
 	JSON = "json",
 	NetCDF = "netcdf",
+	GeoJSON = "geojson",
 }
 
 export enum ColourType {
@@ -204,6 +207,9 @@ export interface ClimateVariableConfigInterface {
 
 	/** Unit */
 	unit?: string;
+
+	/** InteractiveMode */
+	interactiveMode?: InteractiveMode;
 
 	/** Configuration defining interactive region options and their status */
 	interactiveRegionConfig?: InteractiveRegionConfig;
@@ -341,6 +347,8 @@ export interface ClimateVariableInterface {
 	getLayerStyles(): string;
 
 	getUnit(): string;
+
+	getInteractiveMode(): InteractiveMode;
 
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null;
 

@@ -21,14 +21,6 @@ export const LocaleProvider: React.FC<{ children: React.ReactNode }> = ({
 
 	const [locale, setLocale] = useState<Locale>(initialLocale);
 
-	useEffect(() => {
-		// Client-side locale
-		const browserLocale = navigator.language;
-		if (browserLocale.startsWith('fr')) {
-			setLocale('fr');
-		}
-	}, []);
-
 	return (
 		<LocaleContext.Provider value={{ locale, setLocale }}>
 			{children}

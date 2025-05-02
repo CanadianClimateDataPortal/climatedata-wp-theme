@@ -19,7 +19,12 @@ import { useI18n } from '@wordpress/react-i18n';
 import { useMap } from '@/hooks/use-map';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
-import { DownloadType, InteractiveRegionOption } from '@/types/climate-variable-interface';
+import {
+	DownloadType,
+	FileFormatType,
+	FrequencyType,
+	InteractiveRegionOption
+} from '@/types/climate-variable-interface';
 
 export default function RasterDownloadMap(): React.ReactElement {
 	const { __, _n } = useI18n();
@@ -39,13 +44,34 @@ export default function RasterDownloadMap(): React.ReactElement {
 		gridLayerRef.current?.clearSelection();
 	};
 
+	const maxCellsAllowed = useMemo(() => {
+		const freq = climateVariable?.getFrequency();
+		const format = climateVariable?.getFileFormat();
+
+		if (freq === FrequencyType.ALL_MONTHS) {
+			return 80;
+		}
+
+		if (freq === FrequencyType.DAILY) {
+			if (format === FileFormatType.NetCDF) {
+				return 200;
+			}
+
+			if (format === FileFormatType.CSV) {
+				return 20;
+			}
+		}
+
+		return 1000;
+	},[climateVariable]);
+
 	const renderGrid = () => {
 		switch (climateVariable?.getInteractiveRegion()) {
 			case InteractiveRegionOption.GRIDDED_DATA:
 				return selectionMode === 'cells' ? (
-					<SelectableCellsGridLayer ref={gridLayerRef} />
+					<SelectableCellsGridLayer ref={gridLayerRef} maxCellsAllowed={maxCellsAllowed} />
 				) : (
-					<SelectableRectangleGridLayer ref={gridLayerRef} />
+					<SelectableRectangleGridLayer ref={gridLayerRef} maxCellsAllowed={maxCellsAllowed} />
 				);
 			default:
 				return <SelectableRegionLayer />

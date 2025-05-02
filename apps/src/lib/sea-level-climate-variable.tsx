@@ -12,6 +12,7 @@ import {
 	ScenariosConfig
 } from "@/types/climate-variable-interface";
 import SeaLevelClimateVariableValues from "@/components/map-layers/sea-level-climate-variable-values";
+import SeaLevelMap from "@/components/sea-level-map";
 
 class SeaLevelClimateVariable extends RasterPrecalculatedClimateVariable {
 
@@ -102,6 +103,14 @@ class SeaLevelClimateVariable extends RasterPrecalculatedClimateVariable {
 		return (
 			<SeaLevelClimateVariableValues latlng={latlng} featureId={featureId} mode={mode} />
 		);
+	}
+
+	/**
+	 * Override the renderMap method to return the sea-level custom map component
+	 * which has the modified layer ordering (raster under basemap)
+	 */
+	renderMap(): React.ReactElement {
+		return <SeaLevelMap />;
 	}
 }
 

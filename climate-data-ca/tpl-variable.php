@@ -9,8 +9,12 @@
 if (!empty ($GLOBALS['vars']['current_data']) && $GLOBALS['vars']['current_data']['type'] == 'variable') {
 	$var_name = $GLOBALS['vars']['current_data']['var_name'];
 	if ($var_name == 'slr' || $var_name == 'allowance') {
-		if (isset ( $_GET['rcp'])){
-			$query='?rcp=' . $_GET['rcp'] . '-p50';
+		if (isset ( $_GET['rcp'] ) ){
+			$rcp = $_GET['rcp'];
+			if (strpos($rcp, '-') === false) {
+				$rcp = $rcp . '-p50';
+			}
+			$query='?rcp=' . $rcp;
 		} else {
 			$query='';
 		}

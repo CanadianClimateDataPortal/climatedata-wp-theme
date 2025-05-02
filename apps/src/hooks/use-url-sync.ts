@@ -357,20 +357,6 @@ export const useUrlSync = () => {
 							datasetType: firstDataset.dataset_type
 						};
 
-						console.log({
-								dataset: {
-										id: firstDataset.term_id,
-										title: firstDataset.title,
-										type: firstDataset.dataset_type
-								},
-								variable: {
-										id: firstVariable.id,
-										threshold: matchingConfig.threshold,
-										version: matchingConfig.version,
-										scenario: matchingConfig.scenario
-								}
-						});
-						
 						// Set the variable
 						dispatch(setClimateVariable(variableWithDataset));
 						

@@ -57,7 +57,7 @@ if (have_posts()) : while (have_posts()) : the_post();
                 $var_type = $var_type[0]->slug;
             }
         
-            if ($var_type != 'station-data' && get_field('var_name') != 'slr' && get_field('var_name') != 'allowance') {
+            if ($var_type != 'station-data') {
         
         ?>
 
@@ -73,8 +73,9 @@ if (have_posts()) : while (have_posts()) : the_post();
                     <form class="form-inline" action="<?php echo $var_url; ?>">
                         <input type="hidden" name="var" value="<?php the_field('var_name'); ?>">
 
+						<?php $div_class = get_field('var_name') == "slr" ? "flex-column" : "" ?>
 
-                        <div class="d-lg-flex justify-content-around align-items-center w-100">
+                        <div class="d-lg-flex justify-content-around align-items-center w-100 <?php echo $div_class; ?>">
 							<div>
 								<div class="btn-group btn-group-toggle mb-5 mb-lg-0" data-toggle="buttons">
 									<?php
@@ -89,17 +90,23 @@ if (have_posts()) : while (have_posts()) : the_post();
 										<?php
 									} else {
 									?>
-									<label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-highest" autocomplete="off" value="ssp585" checked> SSP5-8.5 </label>
+
+									<?php if ( get_field('var_name') == "slr" ) { ?>
+									<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-highend" autocomplete="off" value="ssp585highEnd-p98"> <?php _e('SSP5-8.5 high-end for practitioners', 'cdc') ?> </label>
+									<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-highimpact" autocomplete="off" value="ssp585lowConf-p83"> <?php _e('SSP5-8.5 high impact, low likelihood', 'cdc') ?> </label>
+									<?php } ?>
+
+									<label class="btn btn-outline-light text-left active text-nowrap"> <input type="radio" name="rcp" id="variable-detail-highest" autocomplete="off" value="ssp585" checked> SSP5-8.5 </label>
 
 									<?php
 									if ( substr( get_field('var_name'), 0, 5 ) != "HXmax" ) {
 									?>
-										<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="ssp370"> SSP3-7.0 </label>
+										<label class="btn btn-outline-light text-left text-nowrap"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="ssp370"> SSP3-7.0 </label>
 									<?php } ?>
 
-									<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="ssp245"> SSP2-4.5 </label>
+									<label class="btn btn-outline-light text-left text-nowrap"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="ssp245"> SSP2-4.5 </label>
 
-									<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="ssp126"> SSP1-2.6 </label>
+									<label class="btn btn-outline-light text-left text-nowrap"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="ssp126"> SSP1-2.6 </label>
 										<?php
 									}
 										?>
@@ -815,7 +822,7 @@ if (have_posts()) : while (have_posts()) : the_post();
             $var_type = $var_type[0]->slug;
         }
 
-        if ($var_type != 'station-data' && get_field('var_name') != 'slr' && get_field('var_name') != 'allowance') {
+        if ($var_type != 'station-data') {
 
         ?>
 
@@ -831,7 +838,9 @@ if (have_posts()) : while (have_posts()) : the_post();
                     <form class="form-inline" action="<?php echo $var_url; ?>">
                         <input type="hidden" name="var" value="<?php the_field('var_name'); ?>">
 
-                        <div class="d-lg-flex justify-content-around align-items-center w-100">
+						<?php $div_class = get_field('var_name') == "slr" ? "flex-column" : "" ?>
+
+                        <div class="d-lg-flex justify-content-around align-items-center w-100 <?php echo $div_class; ?>">
 							<div>
 								<div class="btn-group btn-group-toggle mb-5 mb-lg-0" data-toggle="buttons">
 									<?php
@@ -846,17 +855,23 @@ if (have_posts()) : while (have_posts()) : the_post();
 										<?php
 									} else {
 									?>
-									<label class="btn btn-outline-light text-left active"> <input type="radio" name="rcp" id="variable-detail-highest" autocomplete="off" value="ssp585" checked> SSP5-8.5 </label>
+
+									<?php if ( get_field('var_name') == "slr" ) { ?>
+										<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-highend" autocomplete="off" value="ssp585highEnd-p98"> <?php _e('SSP5-8.5 high-end for practitioners', 'cdc') ?> </label>
+										<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-highimpact" autocomplete="off" value="ssp585lowConf-p83"> <?php _e('SSP5-8.5 high impact, low likelihood', 'cdc') ?> </label>
+									<?php } ?>
+
+									<label class="btn btn-outline-light text-left active text-nowrap"> <input type="radio" name="rcp" id="variable-detail-highest" autocomplete="off" value="ssp585" checked> SSP5-8.5 </label>
 
 									<?php
 									if ( substr( get_field('var_name'), 0, 5 ) != "HXmax" ) {
 									?>
-										<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="ssp370"> SSP3-7.0 </label>
+										<label class="btn btn-outline-light text-left text-nowrap"> <input type="radio" name="rcp" id="variable-detail-high" autocomplete="off" value="ssp370"> SSP3-7.0 </label>
 									<?php } ?>
 
-									<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="ssp245"> SSP2-4.5 </label>
+									<label class="btn btn-outline-light text-left text-nowrap"> <input type="radio" name="rcp" id="variable-detail-lower" autocomplete="off" value="ssp245"> SSP2-4.5 </label>
 
-									<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="ssp126"> SSP1-2.6 </label>
+									<label class="btn btn-outline-light text-left text-nowrap"> <input type="radio" name="rcp" id="variable-detail-lowest" autocomplete="off" value="ssp126"> SSP1-2.6 </label>
 										<?php
 									}
 										?>

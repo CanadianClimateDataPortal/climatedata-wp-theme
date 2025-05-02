@@ -76,7 +76,7 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 
 	return (
 		<>
-			<aside className="map-header relative z-20">
+			<aside id="header-map" className="map-header relative z-20">
 				<div
 					ref={ref}
 					className="absolute top-0 left-0 overflow-y-auto w-full"

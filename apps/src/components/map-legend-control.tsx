@@ -49,6 +49,7 @@ const MapLegendControl: React.FC<{
 	return (
 		<div className="space-y-[5px] w-[91px]">
 			<button
+				id="legend-toggle"
 				className="legend-toggle flex items-center space-x-2 bg-white border border-cold-grey-3 rounded-md py-1 px-2.5"
 				onClick={toggleOpen}
 			>

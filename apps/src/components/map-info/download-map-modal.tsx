@@ -4,9 +4,12 @@
  * A modal component that allows users to download the map as an image.
  *
  */
-import React, { useMemo, useState } from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 import { Download, ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { encodeURL, prepareRaster } from '@/lib/utils';
+import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 // components
 import Modal from '@/components/ui/modal';
@@ -17,37 +20,104 @@ import {
 	ModalSectionBlockDescription,
 } from '@/components/map-info/modal-section';
 
+
+// Extend the global Window interface to allow simulation of jQuery-style API.
+// This is used to expose a `prepare_raster` function on `$.fn`
+declare global {
+	interface Window {
+		$?: {
+			fn?: {
+				prepare_raster?: () => void;
+			};
+		};
+	}
+}
+
 // @todo: Currently does nothing. The image must be generated from the server.
 const DownloadMapModal: React.FC<{
 	isOpen: boolean;
 	onClose: () => void;
 	title: string;
 }> = ({ isOpen, onClose, title }) => {
-	const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+	const { climateVariable } = useClimateVariable();
+	const [downloadUrl, setDownloadUrl] = useState<string>('default_value');
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
-	const { __ } = useI18n();
+	// @todo to be replaced with real value.
+	const salt: string = '';
+	const data_url: string = '';
+
+	useEffect(() => {
+		// @todo Update it with the Relative url to the Download Page.
+		// It should listen to climateData variables changes.
+		// Or generated when the modal is opened.
+		setDownloadUrl('download_page_step_3_value')
+	}, [climateVariable]);
+
+
+	// Used by the Download Image Map server.
+	useEffect(() => {
+		// Ensure window.$ and window.$.fn exist
+		window.$ = window.$ || {};
+		window.$.fn = window.$.fn || {};
+
+		// Assign your function to $.fn.prepare_raster
+		window.$.fn.prepare_raster = prepareRaster;
+
+		return () => {
+			// Clean up if needed
+			if (window.$?.fn?.prepare_raster) {
+				delete window.$.fn.prepare_raster;
+			}
+		};
+	}, []);
+
+
+	// Make sure to remove #download so no tab is opened at the time of the screenshot
+	 const { __ } = useI18n();
+
+	// Utility to trigger a download of a Blob object as a file in the browser.
+	// Creates a temporary anchor element, sets the blob as its href, and programmatically clicks it.
+	// Cleans up the element and revokes the object URL after download starts.
+	const downloadBlob = (blob: Blob, filename: string) => {
+		const url = window.URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = filename;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		window.URL.revokeObjectURL(url);
+	};
 
 	/**
-	 * Called when the user first clicks the "Download" link.
-	 * Dynamically generates the map image URL and sets it to `downloadUrl`.
+	 * Handles the click event for the "Download" link.
+	 * Fetches the image from the provided downloadUrl as a Blob and triggers a file download in the browser.
+	 * Sets a loading state while the request is in progress.
+	 * Includes an artificial delay for demonstration/testing purposes.
+	 * @param e - The click event from the anchor element
 	 */
-	const handleDownloadClick = async (
-		e: React.MouseEvent<HTMLAnchorElement>
-	) => {
-		if (!downloadUrl) {
-			e.preventDefault();
-
-			setIsGenerating(true);
-			try {
-				// The image needs to be generated using a backend API.
-				const url = '';
-				setDownloadUrl(url);
-			} catch (error) {
-				console.error('Failed to generate download URL:', error);
-			} finally {
-				setIsGenerating(false);
-			}
+	const handleDownloadClick = async () => {
+		const mapUrl = new URL(window.location.href);
+		// Make sure to remove addition hashes.
+		mapUrl.hash = '';
+		// Encode the URL
+		const encoded_url = encodeURL(mapUrl.toString(), salt).encoded;
+		// Generate the generateMap URL.
+		const api_url = data_url + '/raster?url=' + encoded_url;
+		if (!api_url) return;
+		setIsGenerating(true);
+		try {
+			const response = await fetch(api_url);
+			if (!response.ok) throw new Error('Network response was not ok');
+			const blob = await response.blob();
+			// @todo to be removed. The timeout has been added to test the Generating message.
+			await new Promise(res => setTimeout(res, 2000));
+			downloadBlob(blob, `${title}-map.png`);
+		} catch (error) {
+			console.error('Failed to generate download URL:', error);
+		} finally {
+			setIsGenerating(false);
 		}
 	};
 
@@ -76,45 +146,45 @@ const DownloadMapModal: React.FC<{
 							'Your export will showcase your various data options. The map position will be the one you see on your screen.'
 						)}
 					</ModalSectionBlockDescription>
-					<a
-						href={downloadUrl || '#'}
-						target="_blank"
+					<Button
 						aria-label={__(
 							'Download current map image (opens in a new tab)'
 						)}
 						className={`inline-flex text-md font-normal leading-6 tracking-[0.8px] uppercase rounded-full px-4 py-2 bg-destructive text-destructive-foreground hover:bg-destructive/90 ${
 							isGenerating ? 'opacity-50 pointer-events-none' : ''
 						}`}
-						download={`${title}-map.png`}
 						onClick={handleDownloadClick}
 					>
 						{buttonText}
-					</a>
+					</Button>
 				</ModalSectionBlock>
 
-				<ModalSectionBlock>
-					<ModalSectionBlockTitle>
-						{__('Need control over your own data?')}
-					</ModalSectionBlockTitle>
-					<ModalSectionBlockDescription>
-						{__(
-							'Head over to the download section where you can select multiple grid cells and personalize more data options.'
-						)}
-					</ModalSectionBlockDescription>
-					<a
-						href="#"
-						target="_blank"
-						aria-label={__(
-							'Go to download sections (opens in a new tab)'
-						)}
-						className="text-brand-blue font-normal text-md leading-6"
-					>
-						<div className="flex items-center gap-2 ms-2">
-							{__('Go to Download Section')}
-							<ExternalLink className="w-4 h-4" />
-						</div>
-					</a>
-				</ModalSectionBlock>
+				{ downloadUrl && (
+					<ModalSectionBlock>
+						<ModalSectionBlockTitle>
+							{__('Need control over your own data?')}
+						</ModalSectionBlockTitle>
+						<ModalSectionBlockDescription>
+							{__(
+								'Head over to the download section where you can select multiple grid cells and personalize more data options.'
+							)}
+						</ModalSectionBlockDescription>
+						<a
+							href={downloadUrl || '#'}
+							target="_blank"
+							aria-label={__(
+								'Go to download sections (opens in a new tab)'
+							)}
+							className="text-brand-blue font-normal text-md leading-6"
+						>
+							<div className="flex items-center gap-2 ms-2">
+								{__('Go to Download Section')}
+								<ExternalLink className="w-4 h-4" />
+							</div>
+						</a>
+					</ModalSectionBlock>
+				)}
+
 			</ModalSection>
 		</Modal>
 	);

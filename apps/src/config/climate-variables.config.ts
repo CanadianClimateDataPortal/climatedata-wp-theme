@@ -34,6 +34,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			cmip6: [
 				"ssp126",
 				"ssp245",
+				"ssp370",
 				"ssp585",
 			],
 		},

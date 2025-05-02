@@ -89,8 +89,10 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 
 		const legend = new L.Control({ position: 'topright' });
 
-		// TODO: need to know how to deal with custom scheme variables like "building_climate_zones",
-		//  for now, we just use whatever prefix in the labels as the unit
+		const colourType = climateVariable?.getColourType()
+			?? rawLegendData?.Legend?.[0]?.rules?.[0]?.symbolizers?.[0]?.Raster?.colormap?.type
+			?? ColourType.CONTINUOUS;
+
 		const hasCustomScheme = Boolean(customColors);
 		const unit = hasCustomScheme
 			? getCommonPrefix(customColors?.map(item => item?.label) ?? [])
@@ -110,6 +112,7 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 					toggleOpen={() => setIsOpen((prev) => !prev)}
 					isCategorical={isCategorical}
 					hasCustomScheme={hasCustomScheme}
+					colourType={colourType}
 					unit={unit}
 				/>
 			);

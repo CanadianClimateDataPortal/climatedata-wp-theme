@@ -13,6 +13,7 @@ import {
 	FrequencyConfig,
 	GridCoordinates,
 	GridRegion,
+	InteractiveMode,
 	InteractiveRegionConfig,
 	InteractiveRegionOption,
 	ScenariosConfig,
@@ -123,6 +124,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getUnit(): string {
 		return this._config.unit ?? '';
+	}
+
+	getInteractiveMode(): InteractiveMode {
+		return this._config.interactiveMode ?? 'region';
 	}
 
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null {

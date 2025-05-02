@@ -27,16 +27,16 @@ const MapLegendControl: React.FC<{
 	const { __ } = useI18n();
 	const svgRef = useRef<SVGSVGElement>(null);
 
-	const squaredGradient = isCategorical || colourType === ColourType.DISCRETE;
+	const isBlocksGradient = isCategorical || colourType === ColourType.DISCRETE;
 
 	// Calculate dynamic height based on number of labels and minimum spacing
-	const totalLabels = squaredGradient ? data.length : data.length;
+	const totalLabels = isBlocksGradient ? data.length : data.length;
 	const minTotalHeight = (totalLabels - 1) * MIN_LABEL_SPACING + PADDING_TOP + PADDING_BOTTOM;
 	const GRADIENT_HEIGHT = minTotalHeight;
-	const LEGEND_HEIGHT = minTotalHeight + (squaredGradient ? PADDING_BOTTOM : 0);
+	const LEGEND_HEIGHT = minTotalHeight + (isBlocksGradient ? PADDING_BOTTOM : 0);
 
 	// For categorical/discrete data, we want equal height blocks for each category
-	const ITEM_HEIGHT = GRADIENT_HEIGHT / (squaredGradient ? data.length : (data.length - 1));
+	const ITEM_HEIGHT = GRADIENT_HEIGHT / (isBlocksGradient ? data.length : (data.length - 1));
 
 	// Position gradient box, label and line horizontally
 	const gradientX = svgWidth - GRADIENT_WIDTH;
@@ -76,7 +76,7 @@ const MapLegendControl: React.FC<{
 					)}
 
 					<svg ref={svgRef} height={LEGEND_HEIGHT} className="w-full">
-						{squaredGradient ? (
+						{isBlocksGradient ? (
 							<g>
 								{data.map((entry, index) => (
 									<rect
@@ -120,7 +120,7 @@ const MapLegendControl: React.FC<{
 						{data.map((entry, index) => {
 							const y = PADDING_TOP + index * ITEM_HEIGHT;
 							// For categorical/discrete data, center the label in the block
-							const labelY = squaredGradient ? y + (ITEM_HEIGHT / 2) : y;
+							const labelY = isBlocksGradient ? y + (ITEM_HEIGHT / 2) : y;
 
 							// Custom scheme variables like "building_climate_zones" may have labels that can be parsed but shouldn't
 							//  eg. 7A, 7B, 8 -- so those even if parseable we should keep them as they are

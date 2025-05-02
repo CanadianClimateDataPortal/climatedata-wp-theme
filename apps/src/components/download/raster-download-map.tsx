@@ -21,8 +21,6 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import {
 	DownloadType,
-	FileFormatType,
-	FrequencyType,
 	InteractiveRegionOption
 } from '@/types/climate-variable-interface';
 
@@ -44,34 +42,13 @@ export default function RasterDownloadMap(): React.ReactElement {
 		gridLayerRef.current?.clearSelection();
 	};
 
-	const maxCellsAllowed = useMemo(() => {
-		const freq = climateVariable?.getFrequency();
-		const format = climateVariable?.getFileFormat();
-
-		if (freq === FrequencyType.ALL_MONTHS) {
-			return 80;
-		}
-
-		if (freq === FrequencyType.DAILY) {
-			if (format === FileFormatType.NetCDF) {
-				return 200;
-			}
-
-			if (format === FileFormatType.CSV) {
-				return 20;
-			}
-		}
-
-		return 1000;
-	},[climateVariable]);
-
 	const renderGrid = () => {
 		switch (climateVariable?.getInteractiveRegion()) {
 			case InteractiveRegionOption.GRIDDED_DATA:
 				return selectionMode === 'cells' ? (
-					<SelectableCellsGridLayer ref={gridLayerRef} maxCellsAllowed={maxCellsAllowed} />
+					<SelectableCellsGridLayer ref={gridLayerRef} maxCellsAllowed={1000} />
 				) : (
-					<SelectableRectangleGridLayer ref={gridLayerRef} maxCellsAllowed={maxCellsAllowed} />
+					<SelectableRectangleGridLayer ref={gridLayerRef} maxCellsAllowed={1000} />
 				);
 			default:
 				return <SelectableRegionLayer />

@@ -54,7 +54,7 @@ const MapLegendControl: React.FC<{
 		function updateLegendHeight() {
 			if (svgRef.current) {
 				const svgTop = svgRef.current.getBoundingClientRect().y;
-				const available = window.innerHeight - svgTop - PADDING_TOP - 15; // 15px leaflet banner.
+				const available = window.innerHeight - svgTop - PADDING_TOP - 20; // 15px leaflet banner.
 				setLegendHeight(available);
 			}
 		}

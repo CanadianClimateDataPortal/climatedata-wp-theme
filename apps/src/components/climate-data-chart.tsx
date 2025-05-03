@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Highcharts, {
 	Options,
 	SeriesOptionsType,
@@ -23,8 +23,15 @@ import { useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import appConfig from '@/config/app.config';
 import { doyFormatter } from '@/lib/format';
+import { getChartDataOptions, getSeriesObject } from '@/config/chart-config';
 
 type TabValue = 'annual-values' | '30-year-averages' | '30-year-changes';
+
+interface Tab {
+	value: TabValue;
+	label: string;
+	enabled: boolean;
+}
 
 // necessary for highcharts to show the navigator area at the bottom of the chart
 if (typeof HighchartsStock === 'function') {
@@ -52,6 +59,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	const decimals = 1;
 	const { dataset } = useAppSelector((state) => state.map);
 	const chartRef = useRef<HighchartsReact.RefObject>(null);
+	const climateVariableId = climateVariable?.getId();
 	const version = climateVariable?.getVersion();
 	const scenario = climateVariable?.getScenario();
 	const unit = climateVariable?.getUnit();
@@ -64,11 +72,6 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	// Subtitle displayed info
 	const datasetLabel = dataset?.title.en;
 	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0].label;
-
-	// Helper to sort an array of tuples by the first element (x-value / timestamp).
-	const sortByTimestamp = useCallback((seriesData: number[][] | Record<string, number[]> | undefined) => {
-		return Array.isArray(seriesData) ? seriesData.slice().sort((a, b) => a[0] - b[0]) : [];
-	}, []);
 
 	// Tooltip format value helper
 	const formatValue = (value: number | undefined, isDelta:boolean = false) => {
@@ -96,256 +99,14 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		return validKeys.length > 0 ? validKeys[validKeys.length - 1] : null;
 	};
 
-	// Chart data colors
-	const chartDataOptions: Record<string, { name: string; color: string; type?: string }> = {
-		'observations': {
-			name: __('Gridded Historical Data'),
-			color: 'gray',
-			type: 'line',
-		},
-		'modeled_historical_median': {
-			name: __('Modeled Historical'),
-			color: 'black',
-			type: 'line',
-		},
-		'modeled_historical_range': {
-			name: __('Historical Range'),
-			color: 'gray',
-			type: 'arearange',
-		},
-		'ssp126_median': {
-			name: __('SSP1-2.6 Median'),
-			color: '#0000ff',
-			type: 'line',
-		},
-		'ssp126_range': {
-			name: __('SSP1-2.6 Range'),
-			color: '#0000ff',
-			type: 'arearange',
-		},
-		'ssp245_median': {
-			name: __('SSP2-4.5 Median'),
-			color: '#00640c',
-			type: 'line',
-		},
-		'ssp245_range': {
-			name: __('SSP2-4.5 Range'),
-			color: '#00640c',
-			type: 'arearange',
-		},
-		'ssp585_median': {
-			name: __('SSP5-8.5 Median'),
-			color: '#ff0000',
-			type: 'line',
-		},
-		'ssp585_range': {
-			name: __('SSP5-8.5 Range'),
-			color: '#ff0000',
-			type: 'arearange',
-		},
-		'rcp26_median': {
-			name: __('RCP 2.6 Median'),
-			color: '#0000ff',
-			type: 'line',
-		},
-		'rcp26_range': {
-			name: __('RCP 2.6 Range'),
-			color: '#0000ff',
-			type: 'arearange',
-		},
-		'rcp45_median': {
-			name: __('RCP 4.5 Median'),
-			color: '#00640c',
-			type: 'line',
-		},
-		'rcp45_range': {
-			name: __('RCP 4.5 Range'),
-			color: '#00640c',
-			type: 'arearange',
-		},
-		'rcp85_median': {
-			name: __('RCP 8.5 Median'),
-			color: '#ff0000',
-			type: 'line',
-		},
-		'rcp85_range': {
-			name: __('RCP 8.5 Range'),
-			color: '#ff0000',
-			type: 'arearange',
-		},
-	};
+	// Get chart data options
+	const chartDataOptions = useMemo(() => getChartDataOptions(__), [__]);
 
-	// Chart serie
-	const seriesObject = useMemo<
-		(SeriesLineOptions | SeriesArearangeOptions)[]
-	>(() => {
-		switch (version) {
-			case 'cmip5':
-				return [
-					{
-						custom: { key: 'observations' },
-						name: chartDataOptions['observations'].name,
-						type: chartDataOptions['observations'].type,
-						data: sortByTimestamp(data.observations),
-						color: chartDataOptions['observations'].color,
-						lineWidth: 1.5,
-						dashStyle: 'ShortDash',
-					} as SeriesLineOptions,
-					{
-						custom: { key: 'modeled_historical_median' },
-						name: chartDataOptions['modeled_historical_median'].name,
-						type: chartDataOptions['modeled_historical_median'].type,
-						data: sortByTimestamp(data.modeled_historical_median),
-						color: chartDataOptions['modeled_historical_median'].color,
-						lineWidth: 2,
-					} as SeriesLineOptions,
-					{
-						custom: { key: 'modeled_historical_range' },
-						name: chartDataOptions['modeled_historical_range'].name,
-						type: chartDataOptions['modeled_historical_range'].type,
-						data: sortByTimestamp(data.modeled_historical_range),
-						color: chartDataOptions['modeled_historical_range'].color,
-						fillOpacity: 0.5,
-						lineWidth: 0,
-						zIndex: 0,
-					} as SeriesArearangeOptions,
-					{
-						custom: { key: 'rcp26_median' },
-						name: chartDataOptions['rcp26_median'].name,
-						type: chartDataOptions['rcp26_median'].type,
-						data: sortByTimestamp(data.rcp26_median),
-						color: chartDataOptions['rcp26_median'].color,
-						lineWidth: 2,
-					} as SeriesLineOptions,
-					{
-						custom: { key: 'rcp26_range' },
-						name: chartDataOptions['rcp26_range'].name,
-						type: chartDataOptions['rcp26_range'].type,
-						data: sortByTimestamp(data.rcp26_range),
-						color: chartDataOptions['rcp26_range'].color,
-						fillOpacity: 0.2,
-						lineWidth: 0,
-					} as SeriesArearangeOptions,
-					{
-						custom: { key: 'rcp45_median' },
-						name: chartDataOptions['rcp45_median'].name,
-						type: chartDataOptions['rcp45_median'].type,
-						data: sortByTimestamp(data.rcp45_median),
-						color: chartDataOptions['rcp45_median'].color,
-						lineWidth: 2,
-					} as SeriesLineOptions,
-					{
-						custom: { key: 'rcp45_range' },
-						name: chartDataOptions['rcp45_range'].name,
-						type: chartDataOptions['rcp45_range'].type,
-						data: sortByTimestamp(data.rcp45_range),
-						color: chartDataOptions['rcp45_range'].color,
-						fillOpacity: 0.2,
-						lineWidth: 0,
-					} as SeriesArearangeOptions,
-					{
-						custom: { key: 'rcp85_median' },
-						name: chartDataOptions['rcp85_median'].name,
-						type: chartDataOptions['rcp85_median'].type,
-						data: sortByTimestamp(data.rcp85_median),
-						color: chartDataOptions['rcp85_median'].color,
-						lineWidth: 2,
-					} as SeriesLineOptions,
-					{
-						custom: { key: 'rcp85_range' },
-						name: chartDataOptions['rcp85_range'].name,
-						type: chartDataOptions['rcp85_range'].type,
-						data: sortByTimestamp(data.rcp85_range),
-						color: chartDataOptions['rcp85_range'].color,
-						fillOpacity: 0.2,
-						lineWidth: 0,
-					} as SeriesArearangeOptions,
-				];
-			case 'cmip6':
-				return [
-					{
-						custom: { key: 'observations' },
-						name: chartDataOptions['observations'].name,
-						type: chartDataOptions['observations'].type,
-						data: sortByTimestamp(data.observations),
-						color: chartDataOptions['observations'].color,
-						lineWidth: 1.5,
-						dashStyle: 'ShortDash',
-					} as SeriesLineOptions,
-					{
-						custom: { key: 'modeled_historical_median' },
-						name: chartDataOptions['modeled_historical_median'].name,
-						type: chartDataOptions['modeled_historical_median'].type,
-						data: sortByTimestamp(data.modeled_historical_median),
-						color: chartDataOptions['modeled_historical_median'].color,
-						lineWidth: 2,
-					} as SeriesLineOptions,
-					{
-						custom: { key: 'modeled_historical_range' },
-						name: chartDataOptions['modeled_historical_range'].name,
-						type: chartDataOptions['modeled_historical_range'].type,
-						data: sortByTimestamp(data.modeled_historical_range),
-						color: chartDataOptions['modeled_historical_range'].color,
-						fillOpacity: 0.3,
-						lineWidth: 0,
-						zIndex: 0,
-					} as SeriesArearangeOptions,
-					{
-						custom: { key: 'ssp126_median' },
-						name: chartDataOptions['ssp126_median'].name,
-						type: chartDataOptions['ssp126_median'].type,
-						data: sortByTimestamp(data.ssp126_median),
-						color: chartDataOptions['ssp126_median'].color,
-						lineWidth: 2,
-					} as SeriesLineOptions,
-					{
-						custom: { key: 'ssp126_range' },
-						name: chartDataOptions['ssp126_range'].name,
-						type: chartDataOptions['ssp126_range'].type,
-						data: sortByTimestamp(data.ssp126_range),
-						color: chartDataOptions['ssp126_range'].color,
-						fillOpacity: 0.2,
-						lineWidth: 0,
-					} as SeriesArearangeOptions,
-					{
-						custom: { key: 'ssp245_median' },
-						name: chartDataOptions['ssp245_median'].name,
-						type: chartDataOptions['ssp245_median'].type,
-						data: sortByTimestamp(data.ssp245_median),
-						color: chartDataOptions['ssp245_median'].color,
-						lineWidth: 2,
-					} as SeriesLineOptions,
-					{
-						custom: { key: 'ssp245_range' },
-						name: chartDataOptions['ssp245_range'].name,
-						type: chartDataOptions['ssp245_range'].type,
-						data: sortByTimestamp(data.ssp245_range),
-						color: chartDataOptions['ssp245_range'].color,
-						fillOpacity: 0.2,
-						lineWidth: 0,
-					} as SeriesArearangeOptions,
-					{
-						custom: { key: 'ssp585_median' },
-						name: chartDataOptions['ssp585_median'].name,
-						type: chartDataOptions['ssp585_median'].type,
-						data: sortByTimestamp(data.ssp585_median),
-						color: chartDataOptions['ssp585_median'].color,
-						lineWidth: 2,
-					} as SeriesLineOptions,
-					{
-						custom: { key: 'ssp585_range' },
-						name: chartDataOptions['ssp585_range'].name,
-						type: chartDataOptions['ssp585_range'].type,
-						data: sortByTimestamp(data.ssp585_range),
-						color: chartDataOptions['ssp585_range'].color,
-						fillOpacity: 0.2,
-						lineWidth: 0,
-					} as SeriesArearangeOptions,
-				];
-			default:
-				return [];
-		}
-	}, [data, sortByTimestamp]);
+	// Get series object
+	const seriesObject = useMemo<(SeriesLineOptions | SeriesArearangeOptions)[]>(() => 
+		getSeriesObject(data, version, climateVariableId, chartDataOptions),
+		[data, version, climateVariableId, chartDataOptions]
+	);
 
 	// Tooltip formatter for 30 years averages and changes
 	const tooltip30yFormatter = (x: number, prefix: string, isDelta: boolean, currentActiveSeries: string[]) => {
@@ -551,6 +312,25 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 			+ '-' + formatForFilename(activeTab);
 	};
 
+	// Tabs configuration
+	const tabs: Tab[] = useMemo(() => [
+		{
+			value: 'annual-values',
+			label: __('Annual Values'),
+			enabled: true,
+		},
+		{
+			value: '30-year-averages',
+			label: __('30 Year Averages'),
+			enabled: climateVariableId !== 'sea_level',
+		},
+		{
+			value: '30-year-changes',
+			label: __('30 Year Changes'),
+			enabled: climateVariableId !== 'sea_level',
+		},
+	], [climateVariableId, __]);
+
 	// Chart options
 	const chartOptions = useMemo<Options>(() => {
 		return {
@@ -621,26 +401,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				text: '',
 			},
 			tooltip: activeChartTooltip,
-			plotOptions: {
-				...activeChartPlotOptions,
-				series: {
-					...activeChartPlotOptions.series,
-					marker: {
-						enabled: false, // disable in chart and legend
-						symbol: 'circle',
-						radius: 6,
-						lineWidth: 0,
-						opacity: 0.6,
-						states: {
-							hover: { // enable on hover
-								enabled: true,
-								lineWidth: 0,
-								opacity: 0,
-							},
-						},
-					},
-				},
-			},
+			plotOptions: activeChartPlotOptions,
 			xAxis: {
 				crosshair: false,
 				type: 'datetime',
@@ -664,7 +425,38 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					}
 				},
 			},
-			series: filteredSeries,
+			series: filteredSeries.map(series => {
+				if (series.custom?.key === 'rcp85_enhanced') {
+					return {
+						...series,
+						marker: {
+							enabled: true,
+							symbol: 'diamond',
+							radius: 12,
+							lineWidth: 0,
+							opacity: 0.6,
+						},
+					} as SeriesOptionsType;
+				} else {
+					return {
+						...series,
+						marker: {
+							enabled: false, // disable in chart and legend
+							symbol: 'circle',
+							radius: 6,
+							lineWidth: 0,
+							opacity: 0.6,
+							states: {
+								hover: { // enable on hover
+									enabled: activeTab === 'annual-values',
+									lineWidth: 0,
+									opacity: 0,
+								},
+							},
+						},
+					} as SeriesOptionsType;
+				}
+			}),
 		};
 	}, [climateVariable, locale, title, filteredSeries, activeChartTooltip, activeChartPlotOptions]);
 
@@ -684,8 +476,8 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		for (const scenarioName of Object.keys(data)) {
 			const anyValue = Object.values(data[scenarioName])[0];
 			if (anyValue.length === 2) {
-				headers.push(`${scenarioName} (low)`);
-				headers.push(`${scenarioName} (high)`);
+				headers.push(`${scenarioName}_p10`);
+				headers.push(`${scenarioName}_p90`);
 				scenarioKeys.push({ key: scenarioName, columns: ['low', 'high'] });
 			} else {
 				headers.push(scenarioName);
@@ -750,23 +542,20 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						if(activeTab === 'annual-values') {
 							chart.downloadCSV();
 						} else {
-							let prefix = '';
-							if(activeTab === '30-year-averages') {
-								prefix = '30y_';
-							} else if(activeTab === '30-year-changes') {
-								prefix = 'delta7100_';
-							}
-	
-							if(prefix === '') break;
+							const prefixes: string[] = ['30y_', 'delta7100_'];
 	
 							// Get only data we want with the rights keys
 							const csvData = Object.keys(data)
-								.filter((key) => key.startsWith(prefix))
+								.filter((key) => {
+									return prefixes.some((prefix) => key.startsWith(prefix));
+								})
 								.reduce((acc: Record<string, Record<string, number[]>>, key) => {
-									const newKey = key.replace(prefix, '');
-									if(!chartDataOptions[newKey]) return acc;
-	
-									acc[chartDataOptions[newKey].name] = Object.fromEntries(
+									if(key === '30y_observations') return acc;
+
+									const newKey = key.replace('_median', '_p50')
+										.replace('_range', '');
+
+									acc[newKey] = Object.fromEntries(
 										Object.entries(data[key] ?? {}).map(([timestamp, value]) => {
 											const year = new Date(Number(timestamp)).getFullYear();
 											return [(year + 1) + "-" + (year + 30), value as number[]];
@@ -812,44 +601,28 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				</div>
 
 				<div className='mr-10'>
-					{ climateVariable?.getLocationModalContent(latlng, featureId, "panel") }
+					{ climateVariableId !== 'sea_level' && climateVariable?.getLocationModalContent(latlng, featureId, "panel") }
 				</div>
 			</div>
 			<div className="flex justify-between items-center mb-4">
 				<div className="flex justify-center">
-					<button
-						className={cn(
-							'text-xs font-semibold uppercase cursor-pointer border w-44 py-1 transition-colors duration-300 ease-out',
-							activeTab === 'annual-values'
-								? 'bg-dark-purple text-white border-dark-purple'
-								: 'bg-white text-dark-purple border-white hover:border-dark-purple'
-						)}
-						onClick={() => setActiveTab('annual-values')}
-					>
-						{__('Annual Values')}
-					</button>
-					<button
-						className={cn(
-							'text-xs font-semibold uppercase cursor-pointer border w-44 py-1 transition-colors duration-300 ease-out',
-							activeTab === '30-year-averages'
-								? 'bg-dark-purple text-white border-dark-purple'
-								: 'bg-white text-dark-purple border-white hover:border-dark-purple'
-						)}
-						onClick={() => setActiveTab('30-year-averages')}
-					>
-						{__('30 Year Averages')}
-					</button>
-					<button
-						className={cn(
-							'text-xs font-semibold uppercase cursor-pointer border w-44 py-1 transition-colors duration-300 ease-out',
-							activeTab === '30-year-changes'
-								? 'bg-dark-purple text-white border-dark-purple'
-								: 'bg-white text-dark-purple border-white hover:border-dark-purple'
-						)}
-						onClick={() => setActiveTab('30-year-changes')}
-					>
-						{__('30 Year Changes')}
-					</button>
+					{tabs.map((tab) => (
+						<button
+							key={tab.value}
+							className={cn(
+								'text-xs font-semibold uppercase cursor-pointer border w-44 py-1 transition-colors duration-300 ease-out',
+								activeTab === tab.value
+									? 'bg-dark-purple text-white border-dark-purple'
+									: 'bg-white text-dark-purple border-white ',
+								activeTab !== tab.value && tab.enabled ? 'hover:border-dark-purple' : '',
+								!tab.enabled && 'opacity-50 cursor-not-allowed'
+							)}
+							onClick={() => tab.enabled && setActiveTab(tab.value)}
+							disabled={!tab.enabled}
+						>
+							{tab.label}
+						</button>
+					))}
 				</div>
 				<div className="flex justify-end items-center gap-2">
 					<span className="text-dark-purple text-xs font-semibold uppercase leading-4">

@@ -11,6 +11,7 @@ import {
 import TaxonomyDropdownFilter from '@/components/taxonomy-dropdown-filter';
 import VariableRadioCards from '@/components/variable-radio-cards';
 import VariableFilterCount from '@/components/sidebar-menu-items/variables';
+import { VariableSearchFilter } from '@/components/variable-search-filter';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { StepComponentRef } from "@/types/download-form-interface";
@@ -21,7 +22,7 @@ import useFilteredVariables from '@/hooks/use-filtered-variables';
  * Variable step
  */
 const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
-    const { climateVariable, selectClimateVariable  } = useClimateVariable();
+    const { climateVariable, selectClimateVariable } = useClimateVariable();
     const [varType, setVarType] = useState<string>('');
     const [sector, setSector] = useState<string>('');
     const section = useContext(SectionContext);
@@ -30,14 +31,18 @@ const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
     const searchQuery = useAppSelector(selectSearchQuery);
     const { __ } = useI18n();
 
-    React.useImperativeHandle(ref, () => ({
-      isValid: () => Boolean(climateVariable?.getId()),
-      getResetPayload: () => {
-        // Resetting makes the first variable selected
-        selectClimateVariable(variableList[0]);
-        return {};
-      }
-    }), [climateVariable]);
+    React.useImperativeHandle(
+        ref,
+        () => ({
+            isValid: () => Boolean(climateVariable?.getId()),
+            getResetPayload: () => {
+                // Resetting makes the first variable selected
+                selectClimateVariable(variableList[0]);
+                return {};
+            },
+        }),
+        [climateVariable]
+    );
 
     const filterValues = useMemo(
         () => ({
@@ -48,11 +53,8 @@ const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
     );
 
     // Get filtered variables and filter information
-    const { filteredList, isFiltering, filteredCount, totalCount } = useFilteredVariables(
-        variableList,
-        filterValues,
-        searchQuery
-    );
+    const { filteredList, isFiltering, filteredCount, totalCount } =
+        useFilteredVariables(variableList, filterValues, searchQuery);
 
     const renderFilterCount = () => {
         if (!isFiltering) {
@@ -114,9 +116,11 @@ const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
                 />
             </div>
 
-            <div className="w-full mb-4">
-                {renderFilterCount()}
+            <div className="mb-4">
+                <VariableSearchFilter />
             </div>
+
+            <div className="w-full mb-4">{renderFilterCount()}</div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
                 {dataset && (
@@ -124,7 +128,11 @@ const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
                         dataset={dataset}
                         section={section}
                         filterValues={filterValues}
-                        selected={climateVariable ? climateVariable.toObject() as PostData : null}
+                        selected={
+                            climateVariable
+                                ? (climateVariable.toObject() as PostData)
+                                : null
+                        }
                         showFilterCount={false}
                         useExternalFiltering={true}
                         onSelect={handleSelect}

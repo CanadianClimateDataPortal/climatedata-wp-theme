@@ -53,8 +53,8 @@ export default function SearchControl({
 	const searchControlId = useMemo(() => {
 		let id = nanoid(); // Generate a normal nanoid
 
-		// If it starts with a number, prepend a letter for querySelector compatibility
-		if (/^\d/.test(id)) {
+		// Make sure it starts with an alphabetic character
+		if (!/^[a-zA-Z]/.test(id)) {
 			id = 'a' + id.substring(1);
 		}
 
@@ -203,8 +203,14 @@ export default function SearchControl({
 		// manually trigger search when the input changes.. this fixes the issue where deleting characters doesn't trigger a search
 		const searchInput = document.querySelector(`#${searchControlId} input`);
 		searchInput?.addEventListener('input', (event) => {
-			const value = (event.target as HTMLInputElement).value.trim();
-			if (value.length >= 2) {
+			let value = (event.target as HTMLInputElement).value;
+			// Remove a single leading space, if present
+			if (value.startsWith(' ')) value = value.slice(1);
+			// If two trailing spaces are present, remove one.
+			if (value.endsWith('  ') && value.length > 1) value = value.slice(0, -1);
+
+			// Count the characters without spaces
+			if (value.replace(/ /g, '').length >= 2) {
 				searchControl.searchText(value);
 			}
 		});
@@ -215,8 +221,14 @@ export default function SearchControl({
 		function updateInputSize() {
 			if (searchInput) {
 				if (window.innerWidth < 520) {
+					// On smaller screens, set the size to 27 (smaller input).
 					searchInput.setAttribute('size', '27');
+				}
+				else if (window.innerWidth > 520 && window.innerWidth < 882) {
+					// On medium-sized screens, set the size to 35 (smaller input).
+					searchInput.setAttribute('size', '35');
 				} else {
+					// On larger screens, set the size to 48 (default for larger screens).
 					searchInput.setAttribute('size', '48'); // Or set to your default
 				}
 			}

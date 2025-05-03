@@ -22,14 +22,14 @@ const VariableOptionsSummary: React.FC = () => {
 	const analysisFieldValues = climateVariable.getAnalysisFieldValues?.() ?? {};
 
 	return (
-			<ul className="list-disc list-inside text-dark-purple">
-				{climateVariable.getVersions().length > 0 && (<li key={version}><strong>Version:</strong> {version || 'N/A'}</li>)}
+			<ul className="download-summary-bullet list-disc list-inside">
+				{climateVariable.getVersions().length > 0 && (<li key={version}><span className='text-dark-purple text-sm'>Version:</span> <span className="uppercase">{version || 'N/A'}</span></li>)}
 				{analysisFields.map(({ key, label, unit }) => {
 					const value = analysisFieldValues[key] ?? '-';
 
 					return (
-						<li key={key}>
-							<span className='font-bold'>{label}</span>: {value} {unit}
+						<li className="summary-item" key={key}>
+							<span className='text-gray-600 text-sm'>{label}</span>: <span className="uppercase">{value} {unit}</span>
 						</li>
 					);
 				})}
@@ -62,8 +62,11 @@ const StepSummary: React.FC = () => {
 		{
 			title: __('Location or area'),
 			content: (() => {
-				const selectedPointsCount = climateVariable?.getSelectedPointsCount() ?? 0;
-				return _n('1 selected', '%d selected', selectedPointsCount).replace('%d', String(selectedPointsCount));
+				const selectedCount = climateVariable?.getSelectedRegion()
+					? climateVariable?.getSelectedRegion()?.cellCount ?? 0
+					: climateVariable?.getSelectedPointsCount() ?? 0;
+
+				return _n('1 selected', '%d selected', selectedCount).replace('%d', String(selectedCount));
 			})(),
 		},
 		{

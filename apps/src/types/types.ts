@@ -201,6 +201,7 @@ export interface DownloadState {
 	center: L.LatLngExpression;
 	email: string;
 	subscribe: boolean;
+	variableListLoading: boolean;
 }
 
 /**
@@ -223,6 +224,7 @@ export interface WMSLegendData {
 				Raster?: {
 					colormap?: {
 						entries: WMSLegendEntry[];
+						type?: string;
 					};
 				};
 			}[];
@@ -443,6 +445,8 @@ export interface ClimateDataProps {
 	ssp126_range: number[][];
 	ssp245_median: number[][];
 	ssp245_range: number[][];
+	ssp370_median: number[][];
+	ssp370_range: number[][];
 	ssp585_median: number[][];
 	ssp585_range: number[][];
 	'30y_observations'?: Record<string, number[]>;
@@ -450,12 +454,16 @@ export interface ClimateDataProps {
 	'30y_ssp126_range'?: Record<string, number[]>;
 	'30y_ssp245_median'?: Record<string, number[]>;
 	'30y_ssp245_range'?: Record<string, number[]>;
+	'30y_ssp370_median'?: Record<string, number[]>;
+	'30y_ssp370_range'?: Record<string, number[]>;
 	'30y_ssp585_median'?: Record<string, number[]>;
 	'30y_ssp585_range'?: Record<string, number[]>;
 	delta7100_ssp126_median?: Record<string, number[]>;
 	delta7100_ssp126_range?: Record<string, number[]>;
 	delta7100_ssp245_median?: Record<string, number[]>;
 	delta7100_ssp245_range?: Record<string, number[]>;
+	delta7100_ssp370_median?: Record<string, number[]>;
+	delta7100_ssp370_range?: Record<string, number[]>;
 	delta7100_ssp585_median?: Record<string, number[]>;
 	delta7100_ssp585_range?: Record<string, number[]>;
 	[key: string]: number[][] | Record<string, number[]> | undefined;
@@ -510,8 +518,8 @@ export interface ChartDataOptions {
 
 export interface DeltaValuesOptions {
 	endpoint: string;
-	varName: string;
-	frequency: string;
+	varName: string | null;
+	frequency: string | null;
 	params: string;
 }
 

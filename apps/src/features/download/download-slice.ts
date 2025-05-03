@@ -20,6 +20,7 @@ export const initialState: DownloadState = {
 	center: CANADA_CENTER,
 	email: '',
 	subscribe: false,
+	variableListLoading: false,
 };
 
 // Create the slice
@@ -51,6 +52,9 @@ const downloadSlice = createSlice({
 		setSubscribe(state, action: PayloadAction<boolean>) {
 			state.subscribe = action.payload;
 		},
+		setVariableListLoading(state, action: PayloadAction<boolean>) {
+			state.variableListLoading = action.payload;
+		},
 	},
 });
 
@@ -64,6 +68,7 @@ export const {
 	setCenter,
 	setEmail,
 	setSubscribe,
+	setVariableListLoading,
 } = downloadSlice.actions;
 
 // Export reducer

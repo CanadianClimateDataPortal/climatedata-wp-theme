@@ -26,6 +26,7 @@ import { ThresholdValuesDropdown } from '@/components/sidebar-menu-items/thresho
 import { InteractiveRegionsMenuItem } from '@/components/sidebar-menu-items/interactive-regions-menu-item';
 import { FrequenciesDropdown } from '@/components/sidebar-menu-items/frequencies-dropdown';
 import { TimePeriodsControl } from '@/components/sidebar-menu-items/time-periods-control';
+import { TimePeriodsControlForSeaLevel } from '@/components/sidebar-menu-items/time-periods-control-for-sea-level';
 import { DataValuesControl } from '@/components/sidebar-menu-items/data-values-control';
 import { MapColorsDropdown } from '@/components/sidebar-menu-items/map-colors-dropdown';
 import { VersionsDropdown } from "@/components/sidebar-menu-items/versions-dropdown";
@@ -40,6 +41,7 @@ import LayerOpacities from '@/components/ui/layer-opacities';
 import { PostData } from '@/types/types';
 import { setDataset } from '@/features/map/map-slice';
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { ScenariosConfig, FrequencyConfig, FrequencyType, FrequencyDisplayModeOption } from "@/types/climate-variable-interface";
 
 /**
  * A `Sidebar` component that provides a tabbed interface for exploring data or adjusting map settings.
@@ -79,17 +81,33 @@ export function AppSidebar() {
 		selectClimateVariable(variable, dataset);
 	}
 
+	// Show version dropdown if the climate variable has versions
+	const showVersionDropdown = (climateVariable?.getVersions()?.length ?? 0) > 0;
 	// We don't need to show if there's only 1 option.
 	const showThreshold = climateVariable && climateVariable.getThresholds() && climateVariable.getThresholds().length > 1;
-
+	// Show emission scenarios control if the climate variable has scenarios
+	const scenariosConfig = climateVariable?.getScenariosConfig() ?? {} as ScenariosConfig;
+	const showEmissionScenariosControl = Object.keys(scenariosConfig).length > 0;
+	// Show interactive regions menu item if the climate variable is in region interactive mode
+	const showInteractiveRegionsMenuItem = climateVariable?.getInteractiveMode() === 'region';
+	// show the frequencies dropdown if the climate variable has frequency config
+	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;
+	const showFrequenciesDropdown = Object.keys(frequencyConfig).length > 0
+		&& (frequencyConfig[FrequencyType.ANNUAL] !== FrequencyDisplayModeOption.NONE
+			|| frequencyConfig[FrequencyType.MONTHLY] !== FrequencyDisplayModeOption.NONE
+			|| frequencyConfig[FrequencyType.SEASONAL] !== FrequencyDisplayModeOption.NONE
+			|| frequencyConfig[FrequencyType.ALL_MONTHS] !== FrequencyDisplayModeOption.NONE);
+	// Show the time periods control if the climate variable has date range config
+	const showTimePeriodsControl = climateVariable?.getDateRangeConfig() !== null;
+	// Show the data values control if the climate variable has delta
 	const hasDelta = climateVariable && climateVariable.hasDelta();
-
+	// Show the map colors dropdown if the climate variable has color options
 	const hasColourOptions = climateVariable && climateVariable.getColourOptionsStatus();
 
 	return (
 		<Sidebar>
 			<SidebarContent className={'overflow-x-hidden'}>
-				<SidebarGroup className={'absolute pr-4'}>
+				<SidebarGroup>
 					<Tabs defaultValue="explore" className="mb-6">
 						<TabsList>
 							<TabsTrigger value="explore">
@@ -106,20 +124,38 @@ export function AppSidebar() {
 									<VariablesMenuItem />
 									<SidebarSeparator />
 
-									<VersionsDropdown />
+									{showVersionDropdown && <VersionsDropdown />}
 									{showThreshold && <ThresholdValuesDropdown />}
-									<SidebarSeparator />
+									{(showVersionDropdown || showThreshold) && <SidebarSeparator />}
 
-									<EmissionScenariosControl />
-									<SidebarSeparator />
+									{showEmissionScenariosControl && (
+										<>
+											<EmissionScenariosControl />
+											<SidebarSeparator />
+										</>
+									)}
 
-									<InteractiveRegionsMenuItem />
-									<SidebarSeparator />
+									{showInteractiveRegionsMenuItem && (
+										<>
+											<InteractiveRegionsMenuItem />
+											<SidebarSeparator />
+										</>
+									)}
 
-									<FrequenciesDropdown />
-									<SidebarSeparator />
+									{showFrequenciesDropdown && (
+										<>
+											<FrequenciesDropdown />
+											<SidebarSeparator />
+										</>
+									)}
 
-									<TimePeriodsControl />
+									{showTimePeriodsControl && (
+										climateVariable?.getId() === 'sea_level' ? (
+											<TimePeriodsControlForSeaLevel />
+										) : (
+											<TimePeriodsControl />
+										)
+									)}
 								</SidebarMenu>
 							</SidebarGroupContent>
 						</TabsContent>

@@ -34,6 +34,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			cmip6: [
 				"ssp126",
 				"ssp245",
+				"ssp370",
 				"ssp585",
 			],
 		},
@@ -63,7 +64,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			interval: 30
 		},
 		hasDelta: true,
-		enableColourOptions: false,
+		enableColourOptions: true,
 		temporalThresholdConfig: {
 			thresholds: {
 				tx_max: {
@@ -148,30 +149,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				},
 			},
 		},
-		analysisFields: [
-			{
-				key: "tasmin",
-				type: "input",
-				label: "Tasmin",
-				description: "Tasmin description",
-				help: "Tasmin help",
-				attributes: {
-					type: "text",
-					placeholder: "0",
-				}
-			},
-			{
-				key: "tasmax",
-				type: "input",
-				label: "Tasmax",
-				description: "Tasmax description",
-				help: "Tasmax help",
-				attributes: {
-					type: "number",
-					placeholder: "0",
-				}
-			}
-		],
 	},
 	/** Coldest Day */
 	{
@@ -599,6 +576,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					{ label: 'Climate Zone 8', colour: '#7F00C9', quantity: 99999999 },
 				],
 				type: ColourType.DISCRETE,
+				categorical: true,
 			}
 		},
 		temporalThresholdConfig: {
@@ -840,6 +818,21 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				},
 			},
 		},
+		analysisFields: [
+			{
+				key: "thresh",
+				type: "input",
+				label: 'Mean Daily Temperature Threshold (°C)',
+				description: 'Set the maximum mean daily temperature for accumulating degree days.',
+				help: 'Degree days will be accumulated on days where the mean daily temperature is less than this threshold in degrees Celsius.',
+				unit: 'C',
+				comparison: '>',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+		],
 	},
 	/** Days above HXmax */
 	{
@@ -856,6 +849,21 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		},
 		gridType: "era5landgrid",
 		unit: "days",
+		analysisFields: [
+			{
+				key: "thresh",
+				type: "input",
+				label: 'Daily Maximum Humidex (HXMax) Threshold',
+				description: 'Set the minimum daily maximum Humidex (HXMax) value that must be exceeded for a day to be included in the analysis.',
+				help: 'Only days where the daily maximum Humidex (HXMax) exceeds this threshold will be counted.',
+				unit: 'HXMax',
+				comparison: '>',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+		],
 	},
 	/** Days above Tmax */
 	{
@@ -981,21 +989,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "days",
-	},
-	/** Days below temperature threshold */
-	{
-		id: "days_below_temperature_threshold",
-		class: "RasterAnalyzeClimateVariable",
-		thresholds: [
-			{
-				value: "tnlt_-15",
-				label: "-15 ºC",
-			},
-			{
-				value: "tnlt_-25",
-				label: "-25 ºC",
-			},
-		],
 		analysisFields: [
 			{
 				key: "thresh_tasmin",
@@ -1016,6 +1009,36 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				label: 'Maximum Temperature Threshold (°C)',
 				description: 'Set the threshold for daily maximum temperature.',
 				help: 'Only days where the maximum temperature exceeds this value will be included in the analysis.',
+				unit: 'C',
+				comparison: '>',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+		],
+	},
+	/** Days below temperature threshold */
+	{
+		id: "days_below_temperature_threshold",
+		class: "RasterAnalyzeClimateVariable",
+		thresholds: [
+			{
+				value: "tnlt_-15",
+				label: "-15 ºC",
+			},
+			{
+				value: "tnlt_-25",
+				label: "-25 ºC",
+			},
+		],
+		analysisFields: [
+			{
+				key: "thresh",
+				type: "input",
+				label: 'Minimum Temperature Threshold (°C)',
+				description: 'Set the threshold for daily minimum temperature.',
+				help: 'Only days where the minimum temperature exceeds this value will be included in the analysis.',
 				unit: 'C',
 				comparison: '>',
 				attributes: {
@@ -1145,11 +1168,11 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			{
 				key: "thresh_tasmin",
 				type: "input",
-				label: 'Maximum Temperature Comparison Operator',
-				description: 'Select the comparison operator for the maximum temperature threshold.',
-				help: 'Choose whether the maximum temperature must be greater than (>) or less than or equal to (<=) the threshold.',
+				label: 'Minimum Temperature Threshold (°C)',
+				description: 'Set the threshold for daily minimum temperature.',
+				help: 'Only days where the minimum temperature satisfies the comparison condition will be included in the analysis.',
 				unit: 'C',
-				comparison: '>',
+				comparison: '<',
 				attributes: {
 					type: "number",
 					placeholder: "0",
@@ -1183,8 +1206,21 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		analysisFields: [
-						{
+			{
 				key: "thresh_tasmin",
+				type: "input",
+				label: 'Minimum Temperature Threshold (°C)',
+				description: 'Set the minimum temperature required for a day to be included in a heat wave.',
+				help: 'Only days where the daily minimum temperature is above this threshold will count toward a heat wave.',
+				unit: 'C',
+				comparison: '<',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
+				key: "thresh_tasmax",
 				type: "input",
 				label: 'Maximum Temperature Threshold (°C)',
 				description: 'Set the maximum temperature required for a day to be included in a heat wave.',
@@ -1250,6 +1286,46 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "days",
+		analysisFields: [
+			{
+				key: "thresh_tasmax",
+				type: "input",
+				label: 'Maximum Temperature Threshold (°C)',
+				description: 'Set the maximum daily temperature that must be exceeded for a day to be considered part of a heat wave event.',
+				help: 'Only days where the daily maximum temperature exceeds this threshold will be included when calculating heat wave events.',
+				unit: 'C',
+				comparison: '>',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
+				key: "thresh_tasmin",
+				type: "input",
+				label: 'Minimum Temperature Threshold (°C)',
+				description: 'Set the minimum daily temperature that must be exceeded for a day to be considered part of a heat wave event',
+				help: 'Only days where the daily minimum temperature exceeds this threshold will be included when calculating heat wave events.',
+				unit: 'C',
+				comparison: '<',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+			{
+				key: "window",
+				type: "input",
+				label: 'Minimum Consecutive Days',
+				description: 'Set the minimum number of consecutive qualifying days required to define a heat wave event.',
+				help: 'A heat wave event is defined as a sequence of consecutive days that meet both the minimum and maximum temperature thresholds for this many days or more.',
+				unit: 'days',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+		],
 	},
 	/** Heating Degree Days */
 	{
@@ -1265,6 +1341,21 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		averagingOptions: [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
+		],
+		analysisFields: [
+			{
+				key: "thresh",
+				type: "input",
+				label: 'Mean Daily Temperature Threshold (°C)',
+				description: 'Set the maximum mean daily temperature for accumulating degree days.',
+				help: 'Degree days will be accumulated on days where the mean daily temperature is less than this threshold in degrees Celsius.',
+				unit: 'C',
+				comparison: '>',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
 		],
 	},
 	/** Maximum Consecutive Dry Days */
@@ -1374,6 +1465,21 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				},
 			},
 		},
+		analysisFields: [
+			{
+				key: "thresh",
+				type: "input",
+				label: 'Days above Tmin',
+				description: 'Set the minimum daily temperature that must be exceeded for a day to be included in the analysis.',
+				help: 'Only days where the daily minimum temperature exceeds this threshold in degrees Celsius will be counted.',
+				unit: 'C',
+				comparison: '>',
+				attributes: {
+					type: "number",
+					placeholder: "0",
+				}
+			},
+		],
 	},
 	/** Wet Days */
 	{
@@ -1467,6 +1573,74 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					},
 				},
 			},
+		},
+	},
+	/** Relative Sea-Level Change */
+	{
+		id: "sea_level",
+		class: "SeaLevelClimateVariable",
+		threshold: "slr",
+		hasDelta: false,
+		enableColourOptions: false,
+		dateRange: [
+			"2040",
+			"2050",
+		],
+		dateRangeConfig: {
+			min: "2006",
+			max: "2100",
+			interval: 10
+		},
+		unit: "cm",
+	},
+	/** MSC Climate Normals 1981-2010 */
+	{
+		id: "msc_climate_normals",
+		class: "StationClimateVariable",
+		threshold: "climate-normals",
+		hasDelta: false,
+		enableColourOptions: false,
+		fileFormatTypes: [
+			FileFormatType.CSV,
+			FileFormatType.GeoJSON,
+		],
+	},
+	/** Daily AHCCD Temperature and Precipitation */
+	{
+		id: "daily_ahccd_temperature_and_precipitation",
+		class: "StationClimateVariable",
+		threshold: "ahccd",
+		hasDelta: false,
+	},
+	/** Future Building Design Value Summaries */
+	{
+		id: "future_building_design_value_summaries",
+		class: "StationClimateVariable",
+		threshold: "bdv",
+		hasDelta: false,
+	},
+	/** Short-duration Rainfall IDF Data */
+	{
+		id: "short_duration_rainfall_idf_data",
+		class: "StationClimateVariable",
+		threshold: "idf",
+		hasDelta: false,
+	},
+	/** Station Data */
+	{
+		id: "station_data",
+		class: "StationClimateVariable",
+		threshold: "station-data",
+		versions: [
+			"cmip6",
+		],
+		scenarios: {
+			cmip6: [
+				"ssp126",
+				"ssp245",
+				"ssp585",
+				"ssp370",
+			],
 		},
 	},
 ];

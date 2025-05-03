@@ -8,6 +8,7 @@ import ZoomControl from '@/components/map-layers/zoom-control';
 import MapEvents from '@/components/map-layers/map-events';
 import SearchControl from '@/components/map-layers/search-control';
 import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions-layer';
+import InteractiveStationsLayer from '@/components/map-layers/interactive-stations-layer';
 import LocationModal from '@/components/map-layers/location-modal';
 
 import { useAppSelector } from '@/app/hooks';
@@ -72,18 +73,22 @@ export default function RasterMapContainer({
 
 		const frequencyCode = getFrequencyCode(frequency);
 
-		const value = [
-				version,
-				threshold,
-				frequencyCode,
-				scenario,
-				'p50',
-				frequency,
-				'30year',
-				climateVariable?.getDataValue() === 'delta' ? 'delta7100' : '',
-			]
-			.filter(Boolean)
-			.join('-');
+		const valuesArr = [
+			version,
+			threshold,
+			frequencyCode,
+			scenario,
+		];
+		if(climateVariable?.getId() !== "sea_level") {
+			valuesArr.push('p50');
+		}
+		valuesArr.push(
+			frequency,
+			'30year',
+			climateVariable?.getDataValue() === 'delta' ? 'delta7100' : ''
+		);
+
+		const value = valuesArr.filter(Boolean).join('-');
 
 		return `CDC:${value}`;
 	}, [climateVariable])
@@ -113,7 +118,9 @@ export default function RasterMapContainer({
 				onUnmount={onUnmount}
 				onLocationModalClose={handleLocationModalClose}
 			/>
-			<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
+			{climateVariable?.getInteractiveMode() === 'region' && (
+				<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
+			)}
 			<CustomPanesLayer />
 			<VariableLayer layerValue={layerValue} />
 			<ZoomControl />
@@ -126,11 +133,19 @@ export default function RasterMapContainer({
 				{locationModalContent}
 			</LocationModal>
 
-			<InteractiveRegionsLayer
-				scenario={scenario}
-				onLocationModalOpen={handleLocationModalOpen}
-				onLocationModalClose={handleLocationModalClose}
-			/>
+			{climateVariable?.getInteractiveMode() === 'region' && (
+				<InteractiveRegionsLayer
+					scenario={scenario}
+					onLocationModalOpen={handleLocationModalOpen}
+					onLocationModalClose={handleLocationModalClose}
+				/>
+			)}
+			{climateVariable?.getInteractiveMode() === 'station' && (
+				<InteractiveStationsLayer
+					onLocationModalOpen={handleLocationModalOpen}
+					onLocationModalClose={handleLocationModalClose}
+				/>
+			)}
 
 			<TileLayer
 				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

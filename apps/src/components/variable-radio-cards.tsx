@@ -22,7 +22,7 @@ const ResultsMessage: React.FC<{ message: string }> = ({ message }) => (
 	<div className="col-span-2 p-4 text-center">{message}</div>
 );
 
-const VariableRadioCards: React.FC<{
+interface VariableRadioCardsProps {
 	filterValues: Record<string, string>;
 	selected: PostData | null;
 	onSelect: (variable: PostData) => void;
@@ -31,14 +31,16 @@ const VariableRadioCards: React.FC<{
 	showFilterCount?: boolean;
 	useExternalFiltering?: boolean;
 	renderFilterCount?: (filteredCount: number, totalCount: number) => React.ReactNode;
-}> = ({
+}
+
+const VariableRadioCards: React.FC<VariableRadioCardsProps> = ({
 	filterValues,
 	selected,
 	onSelect,
 	dataset,
 	section,
 	showFilterCount = true,
-	renderFilterCount
+	renderFilterCount,
 }) => {
 		const { __ } = useI18n();
 		const { locale } = useLocale();
@@ -49,10 +51,8 @@ const VariableRadioCards: React.FC<{
 		const searchQuery = useAppSelector(selectSearchQuery);
 		const [dataLoaded, setDataLoaded] = useState(false);
 
-		// Keep track of dataset changes and previous state
-		const prevDatasetRef = useRef<number | null>(null);
 		const fetchingRef = useRef<boolean>(false);
-		const initialLoadRef = useRef<boolean>(true);
+		const prevDatasetIdRef = useRef<number | null>(null);
 
 		// Use the shared filter hook
 		const { filteredList, isFiltering, filteredCount, totalCount } = useFilteredVariables(
@@ -61,77 +61,40 @@ const VariableRadioCards: React.FC<{
 			searchQuery
 		);
 
-		// Fetch all variables when dataset changes (without filters)
+		// Fetch all variables when dataset changes
 		useEffect(() => {
 			if (!dataset || !dataset.term_id) return;
-
-			// Skip if we're already fetching
 			if (fetchingRef.current) return;
-
-			// TODO: disabled because it was causing variables not loading bug... need to investigate and re enable
-			// Only fetch if dataset changed or this is initial load
-			// const didDatasetChange = prevDatasetRef.current !== dataset.term_id;
-			// if (!didDatasetChange && !initialLoadRef.current && variableList.length > 0) {
-			// 	return;
-			// }
-
-			prevDatasetRef.current = dataset.term_id;
-			fetchingRef.current = true;
-			initialLoadRef.current = false;
-			setDataLoaded(false);
-
-			dispatch(setVariableListLoading(true));
-
-			// Tracking if component is still mounted
-			let isMounted = true;
-
-			(async () => {
-				try {
-					const data = await fetchPostsData('variables', section, dataset, {});
-					const normalizedData = await normalizePostData(data, locale);
-
-					if (isMounted) {
-						// Store the variables in Redux
-						dispatch(setVariableList(normalizedData));
-						setDataLoaded(true);
-
-						if (normalizedData.length > 0 && !selected) {
-							// Use filtered list in case filters are already applied
-							const firstItem = filteredList.length > 0 ?
-								filteredList[0] : normalizedData[0];
-							onSelect(firstItem);
-							selectClimateVariable(firstItem, dataset);
-						}
-					}
-				} catch (error) {
-					console.error('Error fetching variables:', error);
-					if (isMounted) {
-						dispatch(setVariableList([]));
-						setDataLoaded(true);
-					}
-				} finally {
-					// Reset fetching state
-					fetchingRef.current = false;
-
-					if (isMounted) {
-						dispatch(setVariableListLoading(false));
-					}
-				}
-			})();
-
-			return () => {
-				isMounted = false;
-				fetchingRef.current = false;
-			};
-		}, [dataset, section, locale, dispatch, variableList.length]);
-
-		// Handle auto-selection of the first variable when data is loaded but no variable is selected
-		useEffect(() => {
-			if (!variableListLoading && filteredList.length > 0 && !selected && !fetchingRef.current) {
-				onSelect(filteredList[0]);
-				selectClimateVariable(filteredList[0], dataset);
+			// If we already have variables for this dataset, skip refetching
+			if (prevDatasetIdRef.current === dataset.term_id && variableList.length > 0) {
+				return;
 			}
-		}, [filteredList, variableListLoading, selected, onSelect, selectClimateVariable]);
+
+			// Set flags for tracking
+			fetchingRef.current = true;
+			prevDatasetIdRef.current = dataset.term_id;
+			setDataLoaded(false);
+			dispatch(setVariableListLoading(true));
+	
+			fetchPostsData('variables', section, dataset, {})
+				.then(data => normalizePostData(data, locale))
+				.then(normalizedData => {
+					// Save data
+					dispatch(setVariableList(normalizedData));
+					setDataLoaded(true);
+					
+					// Auto-selection happens in datasets.tsx
+				})
+				.catch(error => {
+					console.error('Error fetching variables:', error);
+					dispatch(setVariableList([]));
+					setDataLoaded(true);
+				})
+				.finally(() => {
+					fetchingRef.current = false;
+					dispatch(setVariableListLoading(false));
+				});
+		}, [dataset, dispatch, section, variableList, locale]);
 
 		const handleVariableSelect = (variable: PostData) => {
 			onSelect(variable);

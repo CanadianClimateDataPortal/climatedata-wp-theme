@@ -12,6 +12,8 @@ import {
 	FileFormatType,
 	FrequencyConfig,
 	GridCoordinates,
+	GridRegion,
+	InteractiveMode,
 	InteractiveRegionConfig,
 	InteractiveRegionOption,
 	ScenariosConfig,
@@ -122,6 +124,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getUnit(): string {
 		return this._config.unit ?? '';
+	}
+
+	getInteractiveMode(): InteractiveMode {
+		return this._config.interactiveMode ?? 'region';
 	}
 
 	getInteractiveRegionConfig(): InteractiveRegionConfig | null {
@@ -297,6 +303,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getSelectedPointsCount(): number {
 		return Object.keys(this._config.selectedPoints ?? {}).length;
+	}
+
+	getSelectedRegion(): GridRegion | null {
+		return this._config.selectedRegion ?? null;
 	}
 
 	toObject(): ClimateVariableConfigInterface {

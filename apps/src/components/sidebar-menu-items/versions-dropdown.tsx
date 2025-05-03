@@ -12,6 +12,7 @@ import appConfig from "@/config/app.config"
 const VersionsDropdown: React.FC = () => {
 	const { climateVariable, setVersion } = useClimateVariable();
 	const { __ } = useI18n();
+
 	const options = appConfig.versions.filter((version) =>
 		climateVariable?.getVersions()?.includes(version.value)
 	);
@@ -25,6 +26,7 @@ const VersionsDropdown: React.FC = () => {
 	return (
 		<SidebarMenuItem>
 			<Dropdown
+				key={climateVariable?.getId()}
 				label={__('Versions')}
 				options={options}
 				value={climateVariable?.getVersion() ?? undefined}

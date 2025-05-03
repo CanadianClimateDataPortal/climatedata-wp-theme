@@ -3,7 +3,7 @@
  *
  * A dropdown component that allows the user to select a map color.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 // components
@@ -23,6 +23,23 @@ const MapColorsDropdown: React.FC = () => {
 		<div className="text-sm text-gray-500">{__('Select a map color.')}</div>
 	);
 
+	const defaultColourType = useMemo(() => {
+		if (climateVariable?.getColourScheme() && climateVariable?.getColourScheme() !== 'default') {
+			return ColourType.CONTINUOUS;
+		}
+
+		return climateVariable?.getDataValue() === 'delta' ? ColourType.DISCRETE : ColourType.CONTINUOUS;
+	}, [climateVariable]);
+
+	const onColourSchemeChange = (value: string) => {
+		setColourScheme(value);
+
+		// also reset the colour type if the colour scheme is the default
+		if (value === 'default') {
+			setColourType(climateVariable?.getDataValue() === 'delta' ? ColourType.DISCRETE : ColourType.CONTINUOUS);
+		}
+	}
+
 	return (
 		<SidebarMenuItem className={"space-y-4"}>
 			<ColourSchemeDropdown
@@ -30,7 +47,7 @@ const MapColorsDropdown: React.FC = () => {
 				placeholder={__('Select an option')}
 				tooltip={<Tooltip />}
 				value={climateVariable?.getColourScheme() ?? 'default'}
-				onValueChange={setColourScheme}
+				onValueChange={onColourSchemeChange}
 			/>
 			{climateVariable?.getColourScheme() && climateVariable?.getColourScheme() !== 'default' && <RadioGroupFactory
 				name="colour-type"
@@ -43,7 +60,7 @@ const MapColorsDropdown: React.FC = () => {
 					label: __('Continuous'),
 				}]}
 				className={"space-x-2"}
-				value={climateVariable?.getColourType() ?? ColourType.CONTINUOUS}
+				value={climateVariable?.getColourType() ?? defaultColourType}
 				onValueChange={setColourType}
 			/>}
 		</SidebarMenuItem>

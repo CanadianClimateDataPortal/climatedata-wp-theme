@@ -15,11 +15,14 @@ import {
 	ClimateVariableInterface,
 	FileFormatType,
 	GridCoordinates,
+	GridRegion,
 	InteractiveRegionOption,
 } from '@/types/climate-variable-interface';
 import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
 import RasterPrecalculatedWithDailyFormatsClimateVariable from '@/lib/raster-precalculated-with-daily-formats-climate-variable';
 import RasterAnalyzeClimateVariable from '@/lib/raster-analyze-climate-variable';
+import SeaLevelClimateVariable from '@/lib/sea-level-climate-variable';
+import StationClimateVariable from '@/lib/station-climate-variable';
 
 export type ClimateVariableContextType = {
 	climateVariable: ClimateVariableInterface | null;
@@ -47,6 +50,8 @@ export type ClimateVariableContextType = {
 	addSelectedPoints: (gridCoordinate: GridCoordinates) => void;
 	removeSelectedPoint: (gid: number) => void;
 	resetSelectedPoints: () => void;
+	setSelectedRegion: (region: GridRegion) => void;
+	resetSelectedRegion: () => void;
 };
 
 type ClassMapType = Record<
@@ -63,6 +68,8 @@ const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
 	RasterPrecalculatedWithDailyFormatsClimateVariable:
 		RasterPrecalculatedWithDailyFormatsClimateVariable,
 	RasterAnalyzeClimateVariable: RasterAnalyzeClimateVariable,
+	SeaLevelClimateVariable: SeaLevelClimateVariable,
+	StationClimateVariable: StationClimateVariable,
 };
 
 /**
@@ -360,8 +367,11 @@ export const ClimateVariableProvider: React.FC<{
 						...selectedPoints,
 						...gridCoordinates,
 					},
+					// Also reset selectedRegion
+					selectedRegion: null,
 				})
 			);
+
 		},
 		[dispatch, climateVariableData]
 	);
@@ -390,6 +400,30 @@ export const ClimateVariableProvider: React.FC<{
 		);
 	}, [dispatch, climateVariableData]);
 
+	const setSelectedRegion = useCallback(
+		(region: GridRegion) => {
+			dispatch(
+				updateClimateVariable({
+					selectedRegion: region,
+					// Also reset selectedPoints
+					selectedPoints: {},
+				})
+			);
+		},
+		[dispatch]
+	);
+
+	const resetSelectedRegion = useCallback(
+		() => {
+			dispatch(
+				updateClimateVariable({
+					selectedRegion: null,
+				})
+			);
+		},
+		[dispatch]
+	);
+
 	const value: ClimateVariableContextType = {
 		climateVariable,
 		selectClimateVariable,
@@ -416,6 +450,8 @@ export const ClimateVariableProvider: React.FC<{
 		addSelectedPoints,
 		removeSelectedPoint,
 		resetSelectedPoints,
+		setSelectedRegion,
+		resetSelectedRegion,
 	};
 
 	return (

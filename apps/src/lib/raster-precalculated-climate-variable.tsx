@@ -36,6 +36,7 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 				cmip6: [
 					"ssp126",
 					"ssp245",
+					"ssp370",
 					"ssp585",
 				],
 			};
@@ -63,7 +64,11 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 	}
 
 	getGridType(): string | null {
-		return super.getGridType() ? super.getGridType() : "canadagrid";
+		if (this.getVersion() === "cmip6") {
+			return "canadagrid-m6";
+		} else {
+			return "canadagrid";
+		}
 	}
 
 	hasDelta(): boolean | undefined {

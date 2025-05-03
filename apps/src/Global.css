@@ -289,3 +289,15 @@
 		transform: scale(1);
 	}
 }
+
+.download-summary-bullet {
+	list-style-position: inside;
+	padding-left: 0;
+}
+.download-summary-bullet li::before {
+	content: '';
+	margin-left: -10px;
+}
+.download-summary-bullet li::marker {
+	color: #d1d5db; /* Tailwind gray-300 */
+}

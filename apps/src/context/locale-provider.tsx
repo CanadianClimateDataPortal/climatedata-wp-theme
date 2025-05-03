@@ -6,7 +6,7 @@
  * in the future a language switcher is implemented.
  *
  */
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState } from 'react';
 import { Locale } from '@/types/types';
 
 // Define the LocaleContext
@@ -20,14 +20,6 @@ export const LocaleProvider: React.FC<{ children: React.ReactNode }> = ({
 	const initialLocale = (rootElement?.getAttribute('data-app-lang') as Locale) || 'en';
 
 	const [locale, setLocale] = useState<Locale>(initialLocale);
-
-	useEffect(() => {
-		// Client-side locale
-		const browserLocale = navigator.language;
-		if (browserLocale.startsWith('fr')) {
-			setLocale('fr');
-		}
-	}, []);
 
 	return (
 		<LocaleContext.Provider value={{ locale, setLocale }}>

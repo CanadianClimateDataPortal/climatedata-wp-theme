@@ -8,6 +8,7 @@ import { AnimatedPanelProvider } from '@/context/animated-panel-provider';
 import { DownloadProvider } from '@/context/download-provider';
 import { LocaleProvider } from '@/context/locale-provider';
 import { useLeaflet } from '@/hooks/use-leaflet';
+import Header from "@/components/header.tsx";
 
 const App: React.FC = () => {
 	useLeaflet();
@@ -17,6 +18,7 @@ const App: React.FC = () => {
 			<MapProvider>
 				<AnimatedPanelProvider>
 					<DownloadProvider>
+						<Header />
 						<div className="min-h-screen bg-cold-grey-1">
 							<div className="max-w-6xl mx-auto py-10">
 								<div className="flex flex-col sm:flex-row gap-4">

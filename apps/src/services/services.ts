@@ -445,3 +445,42 @@ export const fetchChoroValues = async (options: ChoroValuesOptions) => {
 		})
 		.then((json) => json);
 };
+
+
+/**
+ * Fetches the list of climate stations from weather.gc.ca API.
+ *
+ * @returns A list of stations with their names, ids and coords.
+ */
+export const fetchStationsList = async () => {
+	try {
+		const url = 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y';
+
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			},
+		});
+
+		if (!response.ok) {
+			throw new Error(`Failed to fetch stations list: ${response.statusText}`);
+		}
+
+		const data = await response.json();
+
+		// Extract and return the stations list
+		return data.features?.map((feature: { properties: { STATION_NAME: string; STN_ID: string }; geometry: { coordinates: [number, number] } }) => ({
+			name: feature.properties.STATION_NAME,
+			id: feature.properties.STN_ID,
+			coordinates: {
+				lat: feature.geometry.coordinates[1],
+				lng: feature.geometry.coordinates[0],
+			}
+		})) || [];
+	} catch (error) {
+		console.error('Error fetching stations list:', error);
+		throw error;
+	}
+};

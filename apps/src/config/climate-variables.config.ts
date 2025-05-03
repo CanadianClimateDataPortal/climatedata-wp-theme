@@ -34,6 +34,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			cmip6: [
 				"ssp126",
 				"ssp245",
+				"ssp370",
 				"ssp585",
 			],
 		},
@@ -1591,5 +1592,55 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			interval: 10
 		},
 		unit: "cm",
+	},
+	/** MSC Climate Normals 1981-2010 */
+	{
+		id: "msc_climate_normals",
+		class: "StationClimateVariable",
+		threshold: "climate-normals",
+		hasDelta: false,
+		enableColourOptions: false,
+		fileFormatTypes: [
+			FileFormatType.CSV,
+			FileFormatType.GeoJSON,
+		],
+	},
+	/** Daily AHCCD Temperature and Precipitation */
+	{
+		id: "daily_ahccd_temperature_and_precipitation",
+		class: "StationClimateVariable",
+		threshold: "ahccd",
+		hasDelta: false,
+	},
+	/** Future Building Design Value Summaries */
+	{
+		id: "future_building_design_value_summaries",
+		class: "StationClimateVariable",
+		threshold: "bdv",
+		hasDelta: false,
+	},
+	/** Short-duration Rainfall IDF Data */
+	{
+		id: "short_duration_rainfall_idf_data",
+		class: "StationClimateVariable",
+		threshold: "idf",
+		hasDelta: false,
+	},
+	/** Station Data */
+	{
+		id: "station_data",
+		class: "StationClimateVariable",
+		threshold: "station-data",
+		versions: [
+			"cmip6",
+		],
+		scenarios: {
+			cmip6: [
+				"ssp126",
+				"ssp245",
+				"ssp585",
+				"ssp370",
+			],
+		},
 	},
 ];

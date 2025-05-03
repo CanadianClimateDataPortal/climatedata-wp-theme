@@ -28,12 +28,12 @@ const TimePeriodsControl: React.FC = () => {
 	const dateRange = climateVariable?.getDateRange();
 	const [startYear, endYear] = dateRange ?? ["2040", "2070"];
 	// Use climate variable state for the slider
-	const sliderValue = dateRange && dateRange.length > 1 
+	const sliderValue = dateRange && dateRange.length > 1
 		? [Number(dateRange[1])]
 		: timePeriodEnd && timePeriodEnd.length > 0
 			? timePeriodEnd
 			: [Number(endYear)];
-			
+
 	// Keep map state in sync with climate variable on initial load
 	useEffect(() => {
 		if (dateRange && dateRange.length > 1 && timePeriodEnd && timePeriodEnd[0] !== Number(dateRange[1])) {
@@ -55,12 +55,12 @@ const TimePeriodsControl: React.FC = () => {
 			newEnd = maxYear;
 		}
 
-		// Update climate variable state 
+		// Update climate variable state
 		setDateRange([
 			(newEnd - intervalYears).toString(),
 			newEnd.toString(),
 		]);
-		
+
 		// Also update map state for backward compatibility
 		dispatch(setTimePeriodEnd([newEnd]));
 	};
@@ -74,8 +74,8 @@ const TimePeriodsControl: React.FC = () => {
 				/>
 				<Slider.Root
 					className={cn(
-						'relative flex items-center select-none',
-						'mt-14 [touch-action:none]'
+						'relative flex items-center select-none mx-9',
+						'mt-16 [touch-action:none]'
 					)}
 					value={sliderValue}
 					onValueChange={handleChange}

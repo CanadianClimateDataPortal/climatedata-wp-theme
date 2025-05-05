@@ -17,28 +17,28 @@ variables:
   rules:
   - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_TAG != "preprod" && $CI_COMMIT_TAG != "uat" && $CI_COMMIT_TAG !~ /v[0-9]+\.[0-9]+\.[0-9]+/
     variables:
-      DEPLOYMENT_TAG: "qa-test"
+      DEPLOYMENT_TAG: "qa"
       INSTANCE_NAME: "QA"
       INSTANCE_USER: $INSTANCE_USER_QA
       INSTANCE_IP: $INSTANCE_IP_QA
 
   - if: $CI_COMMIT_TAG == "uat" && $CI_JOB_STAGE != "build"
     variables:
-      DEPLOYMENT_TAG: "uat-test"
+      DEPLOYMENT_TAG: "uat"
       INSTANCE_NAME: "UAT"
       INSTANCE_USER: $INSTANCE_USER_UAT
       INSTANCE_IP: $INSTANCE_IP_UAT
 
   - if: $CI_COMMIT_TAG == "preprod" && $CI_JOB_STAGE != "build"
     variables:
-      DEPLOYMENT_TAG: "preprod-test"
-      INSTANCE_NAME: "PreProd"
+      DEPLOYMENT_TAG: "preprod"
+      INSTANCE_NAME: "Pre-prod"
       INSTANCE_USER: $INSTANCE_USER_PREPROD
       INSTANCE_IP: $INSTANCE_IP_PREPROD
 
   - if: $CI_COMMIT_TAG =~ /v[0-9]+\.[0-9]+\.[0-9]+/ && $CI_JOB_STAGE == "tag"
     variables:
-      DEPLOYMENT_TAG: ${CI_COMMIT_TAG}-test
+      DEPLOYMENT_TAG: $CI_COMMIT_TAG
 
 .log-macros: &log-macros
   # The `log_section_start` and `log_section_end` functions are to create
@@ -149,12 +149,11 @@ update-instance:
   - >
     log_info "Deploying to: $INSTANCE_NAME"
   - >
-    echo
     ssh
     -o UserKnownHostsFile=/dev/null
     -o StrictHostKeyChecking=no
     -i ~/.ssh/ccdp_deploy
-    \$INSTANCE_USER@\$INSTANCE_IP
+    $INSTANCE_USER@$INSTANCE_IP
     app-manager restart
 
   after_script:

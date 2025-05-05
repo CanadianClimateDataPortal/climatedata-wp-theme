@@ -67,15 +67,15 @@ const TimePeriodsControl: React.FC = () => {
 
 	return (
 		<SidebarMenuItem>
-			<div className="time-periods-control p-4">
+			<div className="time-periods-control">
 				<ControlTitle
 					title={__('Time Periods')}
 					tooltip={__('Time periods tooltip')}
 				/>
 				<Slider.Root
 					className={cn(
-						'relative flex items-center select-none',
-						'mt-14 [touch-action:none]'
+						'relative flex items-center select-none mx-7',
+						'mt-16 [touch-action:none]'
 					)}
 					value={sliderValue}
 					onValueChange={handleChange}
@@ -109,7 +109,7 @@ const TimePeriodsControl: React.FC = () => {
 							className={cn(
 								'absolute bottom-[32px] left-1/2 -translate-x-1/2 transform',
 								'bg-[hsl(var(--destructive-red))] text-white text-sm font-bold whitespace-nowrap',
-								'px-3 py-1.5',
+								'px-2 py-1.5',
 								'flex items-center pointer-events-none'
 							)}
 						>
@@ -126,7 +126,7 @@ const TimePeriodsControl: React.FC = () => {
 						</div>
 					</Slider.Thumb>
 				</Slider.Root>
-				<div className="flex justify-between mt-2.5 text-sm">
+				<div className="flex justify-between mt-2.5 mx-6 text-sm">
 					{/* For display purposes we add 1, e.g. 1951 - 2100. */}
 					<span>{minYear + 1}</span>
 					<span>{maxYear}</span>

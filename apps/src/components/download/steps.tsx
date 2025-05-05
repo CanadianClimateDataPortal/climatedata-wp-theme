@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { DownloadType } from '@/types/climate-variable-interface';
 import { StepComponentRef } from '@/types/download-form-interface';
-import { STEPS } from './config';
 
 /**
  * The Steps component dynamically renders the current step component from the STEPS configuration.
@@ -17,10 +16,10 @@ const Steps: React.FC = () => {
 	const { __ } = useI18n();
 
 	const { climateVariable } = useClimateVariable();
-	const { goToNextStep, currentStep, registerStepRef } = useDownload();
+	const { steps, goToNextStep, currentStep, registerStepRef } = useDownload();
 
-	const isLastStep = currentStep === STEPS.length;
-	const isSecondToLastStep = currentStep === STEPS.length - 1;
+	const isLastStep = currentStep === steps.length;
+	const isSecondToLastStep = currentStep === steps.length - 1;
 
 	let buttonText = __('Next Step');
 	if (isLastStep) {
@@ -50,11 +49,11 @@ const Steps: React.FC = () => {
 		}
 	};
 
-	const StepComponent = STEPS[currentStep - 1];
+	const StepComponent = steps[currentStep - 1] as React.ElementType;
 
 	return (
 		<div className="steps flex flex-col px-4">
-			<StepNavigation totalSteps={STEPS.length} />
+			<StepNavigation totalSteps={steps.length} />
 			<div className="mb-8">
 				<StepComponent
 					// Register the step's ref to enable communication between the step component

@@ -37,13 +37,16 @@
  * });
  */
 
-import React, { createContext, useState, useCallback, useRef } from 'react';
+import React, { createContext, useState, useCallback, useRef, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { TaxonomyData } from '@/types/types';
 import { StepComponentRef } from '@/types/download-form-interface';
 import { updateClimateVariable } from '@/store/climate-variable-slice';
+import { STEPS } from '@/components/download/config';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 
 interface DownloadContextValue {
+	steps: typeof STEPS;
 	currentStep: number;
 	goToNextStep: () => void;
 	goToStep: (step: number) => void;
@@ -56,12 +59,28 @@ const DownloadContext = createContext<DownloadContextValue | null>(null);
 export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
+	const { climateVariable } = useClimateVariable();
+
+	const [steps, setSteps] = useState<typeof STEPS>([...STEPS]);
 	const [currentStep, setCurrentStep] = useState<number>(1);
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const dispatch = useAppDispatch();
 
 	/** Map of step numbers to their component refs */
 	const stepRefs = useRef(new Map<number, StepComponentRef>());
+
+	/** 
+	 * Update steps when the climate variable class changes.
+	 * - If it's station variable, we skip step 3 (variable options).
+	 */
+	useEffect(() => {
+		setSteps((prevSteps) => {
+			if (climateVariable?.getClass() === 'StationClimateVariable') {
+				return prevSteps.filter((_, index) => index !== 2) as unknown as typeof STEPS;
+			}
+			return [...STEPS];
+		});
+	}, [climateVariable?.getClass()]);
 
 	/**
 	 * Registers or unregisters a step component's ref.
@@ -133,6 +152,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	}, [currentStep, resetStepsAfter]);
 
 	const values: DownloadContextValue = {
+		steps,
 		currentStep,
 		goToNextStep,
 		goToStep,

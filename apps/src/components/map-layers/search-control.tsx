@@ -70,8 +70,16 @@ export default function SearchControl({
 
 	const handleLocationChange = useCallback(
 		(title: string, latlng: L.LatLng) => {
+
+			// clear all existing markers from the map
+			map.eachLayer(layer => {
+				if (layer instanceof L.Marker) {
+					map.removeLayer(layer);
+				}
+			});
 			map.setView(latlng, SEARCH_DEFAULT_ZOOM);
 
+			// Save recent location
 			dispatch(
 				addRecentLocation({
 					id: `${latlng?.lat}|${latlng?.lng}`,

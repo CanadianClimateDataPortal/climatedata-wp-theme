@@ -1,6 +1,7 @@
 import L from 'leaflet';
 import type { LatLngExpression, LatLngBounds } from 'leaflet';
 import { ColourScheme, DatasetKey, EmissionScenarioKey } from '@/types/types';
+import { MAP_CONFIG } from '@/config/map.config';
 
 import mapPinIcon from '@/assets/map-pin.svg';
 
@@ -11,18 +12,13 @@ export const SIDEBAR_WIDTH_ICON = '3rem';
 export const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 
 export const GEOSERVER_BASE_URL: string = 'https://dataclimatedata.crim.ca';
-// TODO: this should probably be a L.latLng object instead
-export const CANADA_CENTER: LatLngExpression = [
-	62.51231793838694, -98.48144531250001,
-];
-export const CANADA_BOUNDS: LatLngBounds = L.latLngBounds(
-	L.latLng(41, -141.1),
-	L.latLng(83.6, -49.9)
-);
+// Using values from map.config.ts
+export const CANADA_CENTER: LatLngExpression = MAP_CONFIG.center;
+export const CANADA_BOUNDS: LatLngBounds = MAP_CONFIG.bounds;
 
-export const DEFAULT_ZOOM: number = 4;
-export const DEFAULT_MIN_ZOOM: number = 3;
-export const DEFAULT_MAX_ZOOM: number = 11;
+export const DEFAULT_ZOOM: number = MAP_CONFIG.zoom;
+export const DEFAULT_MIN_ZOOM: number = MAP_CONFIG.minZoom;
+export const DEFAULT_MAX_ZOOM: number = MAP_CONFIG.maxZoom;
 
 export const MAP_MARKER_CONFIG = {
 	icon: L.icon({

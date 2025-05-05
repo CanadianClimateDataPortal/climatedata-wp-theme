@@ -1,14 +1,15 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, WMSTileLayer, useMap } from 'react-leaflet';
+import { MAP_CONFIG, LAYER_KEYS } from '@/config/map.config';
 
 import MapLegend from '@/components/map-layers/map-legend';
-import SeaLevelVariableLayer from '@/components/map-layers/sea-level-variable-layer';
+import VariableLayer from '@/components/map-layers/variable-layer';
+import CustomPanesLayer from '@/components/map-layers/custom-panes';
 import ZoomControl from '@/components/map-layers/zoom-control';
 import MapEvents from '@/components/map-layers/map-events';
 import SearchControl from '@/components/map-layers/search-control';
 import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions-layer';
 import LocationModal from '@/components/map-layers/location-modal';
-import SeaLevelCustomPanes from '@/components/map-layers/sea-level-custom-panes';
 
 import { useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
@@ -18,7 +19,7 @@ import {
 	DEFAULT_MIN_ZOOM,
 	DEFAULT_MAX_ZOOM,
 	GEOSERVER_BASE_URL,
-	// CANADA_BOUNDS,
+	CANADA_BOUNDS,
 } from '@/lib/constants';
 import { cn, getDefaultFrequency, getFrequencyCode } from '@/lib/utils';
 import SectionContext from '@/context/section-provider';
@@ -32,9 +33,9 @@ function LandmassStyler(): null {
 	const map = useMap();
 
 	useEffect(() => {
-		const pane = map.getPane('basemap');
+		const pane = map.getPane('seaLevelBasemap');
 		if (pane) {
-			pane.style.filter = 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(298deg) brightness(102%) contrast(102%)';
+			pane.style.filter = MAP_CONFIG.landmassFilter;
 		}
 	}, [map]);
 
@@ -42,11 +43,12 @@ function LandmassStyler(): null {
 }
 
 /**
- * Renders a Leaflet map for sea-level variables with custom layer ordering:
- * 1. Raster (ocean data) at the bottom
- * 2. Grid layer for interactive regions
- * 3. Landmass layer (with CSS filter to make it white)
- * 4. Labels layer on top
+ * Renders a Leaflet map for sea-level variables with a combined approach:
+ * 1. Standard basemap (complete world map) at the bottom
+ * 2. Sea-level raster data layer (ocean data)
+ * 3. Grid layer for interactive regions
+ * 4. Sea-level landmass layer with transparent ocean areas
+ * 5. Labels layer on top
  */
 export default function SeaLevelMapContainer({
 	scenario,
@@ -109,7 +111,7 @@ export default function SeaLevelMapContainer({
 		const value = valuesArr.filter(Boolean).join('-');
 
 		return `CDC:${value}`;
-	}, [climateVariable]);
+	}, [climateVariable, scenario, section]);
 
 	const handleLocationModalOpen = (content: React.ReactNode) => {
 		setLocationModalContent(content);
@@ -130,6 +132,7 @@ export default function SeaLevelMapContainer({
 			maxZoom={DEFAULT_MAX_ZOOM}
 			scrollWheelZoom={true}
 			className="z-10"
+			bounds={MAP_CONFIG.worldBounds} // Use wider world bounds to show more of the globe
 		>
 			<MapEvents
 				onMapReady={onMapReady}
@@ -139,9 +142,14 @@ export default function SeaLevelMapContainer({
 			{climateVariable?.getInteractiveMode() === 'region' && (
 				<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
 			)}
-			<SeaLevelCustomPanes />
+			
+			{/* Use the unified custom panes with 'combined' mode */}
+			<CustomPanesLayer mode="combined" />
 			<LandmassStyler />
-			<SeaLevelVariableLayer layerValue={layerValue} />
+			
+			{/* Use the unified variable layer with paneMode set to 'combined' */}
+			<VariableLayer layerValue={layerValue} paneMode="combined" />
+			
 			<ZoomControl />
 			<SearchControl />
 
@@ -160,20 +168,30 @@ export default function SeaLevelMapContainer({
 				/>
 			)}
 
+			{/* Standard world basemap (bottom layer) */}
+			<TileLayer
+				url={MAP_CONFIG.baseTileUrl}
+				attribution=""
+				subdomains="abcd"
+				pane="standardBasemap"
+				maxZoom={DEFAULT_MAX_ZOOM}
+			/>
+
+			{/* Sea level landmass layer with transparent oceans */}
 			<WMSTileLayer 
 				url={`${GEOSERVER_BASE_URL}/geoserver/wms`}
-				layers="CDC:landmass"
+				layers={LAYER_KEYS.landmass}
 				format="image/png"
 				transparent={true}
 				version="1.1.1"
-				pane="basemap"
+				pane="seaLevelBasemap"
 				opacity={1.0}
-				// bounds={CANADA_BOUNDS}
+				bounds={CANADA_BOUNDS}
 			/>
 
 			{/* Labels TileLayer */}
 			<TileLayer
-				url="//{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png"
+				url={MAP_CONFIG.labelsTileUrl}
 				pane="labels"
 				opacity={labelsOpacity}
 			/>

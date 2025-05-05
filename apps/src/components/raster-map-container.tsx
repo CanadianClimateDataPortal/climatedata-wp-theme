@@ -1,5 +1,6 @@
 import { useContext, useMemo, useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
+import { MAP_CONFIG } from '@/config/map.config';
 
 import MapLegend from '@/components/map-layers/map-legend';
 import VariableLayer from '@/components/map-layers/variable-layer';
@@ -19,6 +20,7 @@ import {
 	DEFAULT_MIN_ZOOM,
 	DEFAULT_MAX_ZOOM,
 	GEOSERVER_BASE_URL,
+	CANADA_BOUNDS
 } from '@/lib/constants';
 import { cn, getDefaultFrequency, getFrequencyCode } from "@/lib/utils";
 import SectionContext from "@/context/section-provider";
@@ -91,7 +93,7 @@ export default function RasterMapContainer({
 		const value = valuesArr.filter(Boolean).join('-');
 
 		return `CDC:${value}`;
-	}, [climateVariable])
+	}, [climateVariable, scenario, section]);
 
 	const handleLocationModalOpen = (content: React.ReactNode) => {
 		setLocationModalContent(content);
@@ -112,6 +114,7 @@ export default function RasterMapContainer({
 			maxZoom={DEFAULT_MAX_ZOOM}
 			scrollWheelZoom={true}
 			className="z-10" // important to keep the map below other interactive elements
+			bounds={CANADA_BOUNDS}
 		>
 			<MapEvents
 				onMapReady={onMapReady}
@@ -121,8 +124,13 @@ export default function RasterMapContainer({
 			{climateVariable?.getInteractiveMode() === 'region' && (
 				<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
 			)}
-			<CustomPanesLayer />
-			<VariableLayer layerValue={layerValue} />
+			
+			{/* Use the unified CustomPanesLayer with 'standard' mode */}
+			<CustomPanesLayer mode="standard" />
+			
+			{/* Use the unified VariableLayer with default 'standard' paneMode */}
+			<VariableLayer layerValue={layerValue} paneMode="standard" />
+			
 			<ZoomControl />
 			<SearchControl />
 
@@ -147,9 +155,20 @@ export default function RasterMapContainer({
 				/>
 			)}
 
+			{/* Basemap TileLayer */}
 			<TileLayer
-				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-				url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+				url={MAP_CONFIG.baseTileUrl}
+				attribution=""
+				subdomains="abcd"
+				pane="basemap"
+				maxZoom={DEFAULT_MAX_ZOOM}
+			/>
+
+			{/* Labels TileLayer */}
+			<TileLayer
+				url={MAP_CONFIG.labelsTileUrl}
+				pane="labels"
+				opacity={labelsOpacity}
 			/>
 
 			{/* show current scenario label */}
@@ -160,22 +179,6 @@ export default function RasterMapContainer({
 			)}>
 				{scenarioLabel}
 			</div>
-
-			{/* Basemap TileLayer */}
-			<TileLayer
-				url="//cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}{r}.png"
-				attribution=""
-				subdomains="abcd"
-				pane="basemap"
-				maxZoom={DEFAULT_MAX_ZOOM}
-			/>
-
-			{/* Labels TileLayer */}
-			<TileLayer
-				url="//{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png"
-				pane="labels"
-				opacity={labelsOpacity}
-			/>
 		</MapContainer>
 	);
 }

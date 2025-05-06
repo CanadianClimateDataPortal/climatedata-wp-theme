@@ -132,7 +132,7 @@ export default function SeaLevelMapContainer({
 			maxZoom={DEFAULT_MAX_ZOOM}
 			scrollWheelZoom={true}
 			className="z-10"
-			bounds={MAP_CONFIG.worldBounds} // Use wider world bounds to show more of the globe
+			bounds={CANADA_BOUNDS}
 		>
 			<MapEvents
 				onMapReady={onMapReady}

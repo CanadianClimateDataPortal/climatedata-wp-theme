@@ -64,7 +64,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	const version = climateVariable?.getVersion();
 	const scenario = climateVariable?.getScenario();
 	const unit = climateVariable?.getUnit();
-
+	
 	const [activeTab, setActiveTab] = useState<TabValue>('annual-values');
 	const [activeSeries, setActiveSeries] = useState<string[]>([]);
 	const [activeChartTooltip, setActiveChartTooltip] = useState<Highcharts.TooltipOptions>({});
@@ -272,9 +272,6 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	const filteredSeries = useMemo<SeriesOptionsType[]>(() => {
 		return (
 			seriesObject.map((s) => {
-				console.log(s);
-				console.log(s.name);
-				console.log(activeSeries.includes(s.custom?.key) && s.visible)
 				const baseSeries = {
 					...s,
 					visible: activeSeries.includes(s.custom?.key) && s.visible,

@@ -438,17 +438,17 @@ export interface ZoomControlProps {
 }
 
 export interface ClimateDataProps {
-	observations: number[][];
-	modeled_historical_median: number[][];
-	modeled_historical_range: number[][];
-	ssp126_median: number[][];
-	ssp126_range: number[][];
-	ssp245_median: number[][];
-	ssp245_range: number[][];
-	ssp370_median: number[][];
-	ssp370_range: number[][];
-	ssp585_median: number[][];
-	ssp585_range: number[][];
+	observations?: number[][];
+	modeled_historical_median?: number[][];
+	modeled_historical_range?: number[][];
+	ssp126_median?: number[][];
+	ssp126_range?: number[][];
+	ssp245_median?: number[][];
+	ssp245_range?: number[][];
+	ssp370_median?: number[][];
+	ssp370_range?: number[][];
+	ssp585_median?: number[][];
+	ssp585_range?: number[][];
 	'30y_observations'?: Record<string, number[]>;
 	'30y_ssp126_median'?: Record<string, number[]>;
 	'30y_ssp126_range'?: Record<string, number[]>;
@@ -466,7 +466,11 @@ export interface ClimateDataProps {
 	delta7100_ssp370_range?: Record<string, number[]>;
 	delta7100_ssp585_median?: Record<string, number[]>;
 	delta7100_ssp585_range?: Record<string, number[]>;
-	[key: string]: number[][] | Record<string, number[]> | undefined;
+	daily_average_temperature?: number[];
+	daily_maximum_temperature?: number[];
+	daily_minimum_temperature?: number[];
+	precipitation?: number[];
+	[key: string]: number[][] | Record<string, number[]> | number[] | undefined;
 }
 
 /**

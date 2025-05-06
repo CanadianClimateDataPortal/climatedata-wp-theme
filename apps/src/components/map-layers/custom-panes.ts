@@ -6,23 +6,21 @@ import { MAP_CONFIG } from '@/config/map.config';
  * CustomPanesLayer Component
  *
  * This component modifies the map instance creating predefined panes for different types of layers.
- * It supports three rendering modes:
+ * It supports two rendering modes:
  * - standard: normal z-index ordering with basemap at bottom
- * - seaLevel: special ordering with raster below the basemap
- * - combined: complex ordering with multiple basemaps and special z-index
+ * - seaLevel: complex ordering with multiple basemaps for sea level visualization
  *
  * @param {Object} props
- * @param {('standard'|'seaLevel'|'combined')} [props.mode='standard'] - The pane mode to use
+ * @param {('standard'|'seaLevel')} [props.mode='standard'] - The pane mode to use
  * @returns {null}
  */
-export default function CustomPanesLayer({ mode = 'standard' }: { mode?: 'standard' | 'seaLevel' | 'combined' } = {}): null {
+export default function CustomPanesLayer({ mode = 'standard' }: { mode?: 'standard' | 'seaLevel' } = {}): null {
 	const map = useMap();
 
 	useEffect(() => {
 		// Target the main leaflet-map-pane element
 		const mapPane = map.getPane('mapPane');
 		if (mapPane) {
-			// Apply custom z-index class to avoid it being too high
 			mapPane.classList.add('z-20');
 		}
 
@@ -62,30 +60,8 @@ export default function CustomPanesLayer({ mode = 'standard' }: { mode?: 'standa
 			map.getPane('custom_shapefile')!.style.zIndex = String(MAP_CONFIG.standardPanes.custom_shapefile);
 			map.getPane('custom_shapefile')!.style.pointerEvents = 'all';
 		} 
-		else if (mode === 'seaLevel') {
-			// Sea level map panes - raster at bottom, then grid, basemap, labels
-			map.createPane('raster');
-			map.getPane('raster')!.style.zIndex = String(MAP_CONFIG.seaLevelPanes.raster);
-			map.getPane('raster')!.style.pointerEvents = 'none';
-			
-			map.createPane('grid');
-			map.getPane('grid')!.style.zIndex = String(MAP_CONFIG.seaLevelPanes.grid);
-			map.getPane('grid')!.style.pointerEvents = 'all';
-
-			map.createPane('basemap');
-			map.getPane('basemap')!.style.zIndex = String(MAP_CONFIG.seaLevelPanes.basemap);
-			map.getPane('basemap')!.style.pointerEvents = 'none';
-
-			map.createPane('labels');
-			map.getPane('labels')!.style.zIndex = String(MAP_CONFIG.seaLevelPanes.labels);
-			map.getPane('labels')!.style.pointerEvents = 'none';
-
-			map.createPane('custom_shapefile');
-			map.getPane('custom_shapefile')!.style.zIndex = String(MAP_CONFIG.seaLevelPanes.custom_shapefile);
-			map.getPane('custom_shapefile')!.style.pointerEvents = 'all';
-		}
-		else if (mode === 'combined') {
-			// Combined sea level approach with standard map underneath
+		else {
+			// Sea level with standard map underneath
 			
 			// Standard basemap (complete world map at the bottom)
 			map.createPane('standardBasemap');

@@ -128,8 +128,8 @@ export default function RasterMapContainer({
 			{/* Use the unified CustomPanesLayer with 'standard' mode */}
 			<CustomPanesLayer mode="standard" />
 			
-			{/* Use the unified VariableLayer with default 'standard' paneMode */}
-			<VariableLayer layerValue={layerValue} paneMode="standard" />
+			{/* Use the unified VariableLayer */}
+			<VariableLayer layerValue={layerValue} />
 			
 			<ZoomControl />
 			<SearchControl />

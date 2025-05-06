@@ -739,3 +739,28 @@ export type PartialState = {
 export type MapActionType = {
 	[key: string]: (value: any) => { type: string; payload: any };
 };
+
+/**
+ * Represents the parameters for the WMS layer.
+ */
+export interface WMSParams {
+	format: string;
+	transparent: boolean;
+	tiled: boolean;
+	version: string;
+	layers: string;
+	styles: string | undefined;
+	TIME?: string;
+	opacity: number;
+	pane: string;
+	bounds: L.LatLngBounds;
+	sld_body?: string;
+}
+
+/**
+ * Props for the variable layer component.
+ */
+export interface VariableLayerProps {
+	layerValue: string;
+}
+

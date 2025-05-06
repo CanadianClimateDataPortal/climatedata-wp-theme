@@ -33,16 +33,7 @@ export const MAP_CONFIG = {
 		custom_shapefile: 700
 	},
 	
-	// Pane configuration for sea level variable
-	seaLevelPanes: {
-		raster: 100,         // Ocean data (below land)
-		grid: 150,           // Interactive regions
-		basemap: 200,        // Landmass layer
-		labels: 250,         // Map labels
-		custom_shapefile: 300
-	},
-	
-	// Combined pane configuration for sea level with standard map underneath
+	// Pane configuration for sea level visualization
 	combinedSeaLevelPanes: {
 		standardBasemap: 100,  // Standard map base layer
 		raster: 200,           // Ocean data layer
@@ -53,7 +44,7 @@ export const MAP_CONFIG = {
 	},
 	
 	// Landmass filter for sea level (transforms green to white)
-	landmassFilter: 'brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(298deg) brightness(102%) contrast(102%)',
+	landmassFilter: 'saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(298deg) brightness(100%) contrast(98%)',
 	
 	// Opacity settings for overlays
 	defaultOpacity: 1.0,

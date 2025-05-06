@@ -43,7 +43,7 @@ function LandmassStyler(): null {
 }
 
 /**
- * Renders a Leaflet map for sea-level variables with a combined approach:
+ * Renders a Leaflet map for sea-level variables with a specialized approach:
  * 1. Standard basemap (complete world map) at the bottom
  * 2. Sea-level raster data layer (ocean data)
  * 3. Grid layer for interactive regions
@@ -143,12 +143,12 @@ export default function SeaLevelMapContainer({
 				<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
 			)}
 			
-			{/* Use the unified custom panes with 'combined' mode */}
-			<CustomPanesLayer mode="combined" />
+			{/* Use the unified custom panes with 'seaLevel' mode */}
+			<CustomPanesLayer mode="seaLevel" />
 			<LandmassStyler />
 			
-			{/* Use the unified variable layer with paneMode set to 'combined' */}
-			<VariableLayer layerValue={layerValue} paneMode="combined" />
+			{/* Use the unified variable layer */}
+			<VariableLayer layerValue={layerValue} />
 			
 			<ZoomControl />
 			<SearchControl />

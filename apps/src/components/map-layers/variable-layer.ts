@@ -9,40 +9,22 @@ import {
 	InteractiveRegionOption,
 } from "@/types/climate-variable-interface";
 import { generateColourScheme } from "@/lib/colour-scheme";
+import {VariableLayerProps, WMSParams} from '@/types/types';
+ 
 
 /**
  * Variable layer Component
  *
  * This component displays the variable main layer on the map.
- * It can handle both standard and sea level variables with different pane configurations.
+ * It works with both standard and sea level visualization approaches.
  *
  * @param {Object} props
  * @param {string} props.layerValue - The WMS layer ID to render
- * @param {string} [props.paneMode='standard'] - The pane mode to use (standard, seaLevel, combined)
  * @returns {null}
  */
 
-interface WMSParams {
-	format: string;
-	transparent: boolean;
-	tiled: boolean;
-	version: string;
-	layers: string;
-	styles: string | undefined;
-	TIME?: string;
-	opacity: number;
-	pane: string;
-	bounds: L.LatLngBounds;
-	sld_body?: string;
-}
-
-interface VariableLayerProps {
-	layerValue: string;
-	paneMode?: 'standard' | 'seaLevel' | 'combined';
-}
-
 export default function VariableLayer({ 
-	layerValue, 
+	layerValue
 }: VariableLayerProps): null {
 	const map = useMap();
 	const {
@@ -51,12 +33,9 @@ export default function VariableLayer({
 
 	const { climateVariable } = useClimateVariable();
 
-	// Determine which pane to use based on the mode
-	const pane = useMemo(() => {
-		// For sea level variables, we always use the 'raster' pane
-		// regardless of what's in the store
-		return 'raster';
-	}, []);
+	// Always use 'raster' pane - this works for both standard and sea level modes
+	// as each mode creates a 'raster' pane with the appropriate z-index
+	const pane = 'raster';
 
 	const {
 		startYear,

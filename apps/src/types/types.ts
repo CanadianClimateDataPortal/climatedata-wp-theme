@@ -621,6 +621,18 @@ export interface VariableFilterCountProps {
 	className?: string;
 }
 
+/**
+ * Represents a climate station with id, name, and coordinates.
+ */
+export interface Station {
+	id: string;
+	name: string;
+	coordinates: {
+		lat: number;
+		lng: number;
+	};
+}
+
 // -----------------------------------------------------------------------------
 // Downloads Specifics Types
 // -----------------------------------------------------------------------------

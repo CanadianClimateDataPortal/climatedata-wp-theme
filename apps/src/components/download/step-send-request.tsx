@@ -94,7 +94,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	}, [fileFormat, decimalPlace, setDecimalPlace]);
 
 	return (
-		<StepContainer title={__('Download your file')} isLastStep>
+		<StepContainer title={__('Select file parameters')} isLastStep>
 			<StepContainerDescription>
 				<p>
 					{__(

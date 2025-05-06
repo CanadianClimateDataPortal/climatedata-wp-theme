@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 import appConfig from '@/config/app.config';
+import { FileFormatType } from "@/types/climate-variable-interface";
 
 const VariableOptionsSummary: React.FC = () => {
 	const { climateVariable } = useClimateVariable();
@@ -108,7 +109,23 @@ const StepSummary: React.FC = () => {
 
 				return data.join(', ');
 			})(),
-		}
+		},
+		{
+			title: __('File parameters'),
+			content: (() => {
+				const fileFormat = climateVariable?.getFileFormat();
+				if(!fileFormat) return '';
+
+				const fileFormatLabels = {
+					[FileFormatType.CSV]: 'CSV',
+					[FileFormatType.JSON]: 'JSON',
+					[FileFormatType.NetCDF]: 'NetCDF',
+					[FileFormatType.GeoJSON]: 'GeoJSON',
+				};
+
+				return fileFormatLabels[fileFormat] ?? fileFormat;
+			})(),
+		},
 	]), [climateVariable, dataset, locale, __, _n]);
 
 	return (

@@ -32,9 +32,9 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	const { dataset } = useAppSelector((state) => state.map);
 
 	// Displayed info
-	const datasetLabel = dataset?.title.en;
-	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0].label;
-	const scenarioLabel = appConfig.scenarios.filter((scenario) => scenario.value === climateVariable?.getScenario())[0].label;
+	const datasetLabel = dataset?.title.en ?? '';
+	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0]?.label;
+	const scenarioLabel = appConfig.scenarios.filter((scenario) => scenario.value === climateVariable?.getScenario())[0]?.label;
 
 	return (
 		<div>
@@ -42,7 +42,14 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 				{title}
 			</h2>
 			<p className="text-sm text-neutral-grey-medium leading-5 m-0">
-				{datasetLabel} - {climateVariable?.getTitle()} - {versionLabel} - {scenarioLabel}
+				{
+					[
+						__(datasetLabel),
+						__(climateVariable?.getTitle() ?? ''),
+						__(versionLabel),
+						__(scenarioLabel)
+					].filter(Boolean).join(' - ')
+				}
 			</p>
 
 			{ climateVariable?.getLocationModalContent(latlng, featureId) }

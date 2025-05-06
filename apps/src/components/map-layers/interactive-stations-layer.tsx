@@ -1,43 +1,135 @@
-/**
- * Component that adds interaction to the map depending on the selected region (gridded data, watershed, health, census).
- */
-import React, { useEffect, useState } from 'react';
-import 'leaflet.vectorgrid';
-
+import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import { useMap } from 'react-leaflet';
+import L from 'leaflet';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { fetchStationsList } from '@/services/services';
+import { LocationModalContent } from './location-modal-content';
+import { Station } from '@/types/types';
+
+import 'leaflet.markercluster';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 interface InteractiveStationsLayerProps {
-	onLocationModalOpen: (content: React.ReactNode) => void;
-	onLocationModalClose: () => void;
+	selectable?: boolean;
+	onLocationModalOpen?: (content: React.ReactNode) => void;
+	onLocationModalClose?: () => void;
 }
 
-interface Station {
-	id: string;
-	name: string;
-	coordinates: {
-		latitude: number;
-		longitude: number;
-	}
-}
+const SELECTED_STYLE = {
+	color: '#E50E40',
+	weight: 2,
+	fillColor: '#fff',
+	fillOpacity: 1,
+	radius: 6,
+};
 
-const InteractiveStationsLayer: React.FC<InteractiveStationsLayerProps> = () => {
+const UNSELECTED_STYLE = {
+	color: '#fff',
+	weight: 2,
+	fillColor: '#E50E40',
+	fillOpacity: 1,
+	radius: 6,
+};
+
+const InteractiveStationsLayer = forwardRef<{
+	clearSelection: () => void;
+}, InteractiveStationsLayerProps>(({ selectable = false, onLocationModalOpen, onLocationModalClose }, ref) => {
 	const [stations, setStations] = useState<Station[]>([]);
 
-	useEffect(() => {
-		const fetchStations = async () => {
-			try {
-				const stationsList = await fetchStationsList();
-				setStations(stationsList);
-				console.log(stations);
-			} catch (error) {
-				console.error('Error fetching stations list:', error);
-			}
-		};
+	const { climateVariable, addSelectedPoints, removeSelectedPoint, resetSelectedPoints } = useClimateVariable();
 
-		fetchStations();
+	const map = useMap();
+	const layerGroupRef = useRef<L.MarkerClusterGroup | null>(null);
+	const markerRefs = useRef<Record<string, L.CircleMarker>>({});
+
+	// Fetch stations list on mount
+	useEffect(() => {
+		fetchStationsList().then(setStations);
 	}, []);
 
+	const selectedIds = React.useMemo(
+		() => Object.keys(climateVariable?.getSelectedPoints() ?? {}).map(Number),
+		[climateVariable]
+	);
+
+	useEffect(() => {
+		if (!stations.length) return;
+
+		// Using MarkerClusterGroup to group points together as in v2
+		let group: L.MarkerClusterGroup = L.markerClusterGroup();
+		markerRefs.current = {};
+
+		stations.forEach((station: Station) => {
+			const marker = L.circleMarker([station.coordinates.lat, station.coordinates.lng], {
+				pane: 'stations',
+				...UNSELECTED_STYLE,
+			});
+
+			markerRefs.current[station.id] = marker;
+			marker.bindTooltip(station.name);
+
+			marker.on('click', () => {
+				// Behavior is different when the layer is selectable or not
+				if (selectable) {
+					if (selectedIds.includes(Number(station.id))) {
+						removeSelectedPoint(Number(station.id));
+					} else {
+						addSelectedPoints({ [station.id]: { lat: station.coordinates.lat, lng: station.coordinates.lng } });
+					}
+				} else if (onLocationModalOpen) {
+					onLocationModalOpen(
+						<LocationModalContent
+							title={station.name}
+							latlng={L.latLng(station.coordinates.lat, station.coordinates.lng)}
+							featureId={Number(station.id) || 0}
+							onDetailsClick={() => {
+								if (onLocationModalClose) onLocationModalClose();
+							}}
+						/>
+					);
+				}
+			});
+
+			group.addLayer(marker);
+		});
+
+		group.addTo(map);
+		layerGroupRef.current = group;
+
+		return () => {
+			if (layerGroupRef.current) {
+				map.removeLayer(layerGroupRef.current);
+				layerGroupRef.current = null;
+			}
+		};
+	}, [map, stations, onLocationModalOpen, onLocationModalClose, selectable, addSelectedPoints, removeSelectedPoint, selectedIds]);
+
+	// Update marker styles when selection changes and on mount
+	useEffect(() => {
+		if (!markerRefs.current) return;
+
+		selectedIds.forEach((id) => {
+			const marker = markerRefs.current[id];
+			if (marker) {
+				marker.setStyle(SELECTED_STYLE);
+			}
+		});
+	}, [markerRefs.current, selectedIds]);
+
+	// Expose clearSelection to parent via ref
+	useImperativeHandle(ref, () => ({
+		clearSelection() {
+			selectedIds.forEach((id) => {
+				const marker = markerRefs.current[id];
+				if (marker) {
+					marker.setStyle(UNSELECTED_STYLE);
+				}
+			});
+			resetSelectedPoints();
+		}
+	}), [selectedIds, resetSelectedPoints]);
+
 	return null;
-};
+});
 
 export default InteractiveStationsLayer;

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
 import { setSelectionMode } from '@/features/download/download-slice';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import InteractiveRegionSelect from '@/components/interactive-region-select';
 import SelectableCellsGridLayer from '@/components/map-layers/selectable-cells-grid-layer';
 import SelectableRectangleGridLayer from '@/components/map-layers/selectable-rectangle-grid-layer';
 import SelectableRegionLayer from '@/components/map-layers/selectable-region-layer';
+import InteractiveStationsLayer from '@/components/map-layers/interactive-stations-layer';
 import { useI18n } from '@wordpress/react-i18n';
 import { useMap } from '@/hooks/use-map';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
@@ -24,7 +25,7 @@ import { DownloadType, InteractiveRegionOption } from '@/types/climate-variable-
 export default function RasterDownloadMap(): React.ReactElement {
 	const { __, _n } = useI18n();
 
-	const gridLayerRef = useRef<{
+	const interactiveLayerRef = useRef<{
 		clearSelection: () => void;
 	}>(null);
 
@@ -36,21 +37,49 @@ export default function RasterDownloadMap(): React.ReactElement {
 	const dispatch = useAppDispatch();
 
 	const clearSelection = () => {
-		gridLayerRef.current?.clearSelection();
+		interactiveLayerRef.current?.clearSelection();
 	};
 
-	const renderGrid = () => {
-		switch (climateVariable?.getInteractiveRegion()) {
-			case InteractiveRegionOption.GRIDDED_DATA:
-				return selectionMode === 'cells' ? (
-					<SelectableCellsGridLayer ref={gridLayerRef} />
-				) : (
-					<SelectableRectangleGridLayer ref={gridLayerRef} />
-				);
-			default:
-				return <SelectableRegionLayer />
+	const renderInteractiveLayer = useCallback(() => {
+		const mode = climateVariable?.getInteractiveMode();
+		const region = climateVariable?.getInteractiveRegion();
+
+		if (mode === 'station') {
+			return <InteractiveStationsLayer ref={interactiveLayerRef} selectable />;
 		}
-	};
+
+		if (region === InteractiveRegionOption.GRIDDED_DATA) {
+			return selectionMode === 'cells'
+				? <SelectableCellsGridLayer ref={interactiveLayerRef} />
+				: <SelectableRectangleGridLayer ref={interactiveLayerRef} />;
+		}
+
+		return <SelectableRegionLayer />;
+	}, [climateVariable, selectionMode]);
+
+	const renderSelectionModeControls = useCallback(() => {
+		// TODO: is this assumption correct?
+		if (climateVariable?.getInteractiveMode() !== 'station') {
+			return (
+				<RadioGroupFactory
+					title={__('Ways to select on the map')}
+					name="map-selection-mode"
+					value={selectionMode}
+					orientation="horizontal"
+					className="mb-0"
+					optionClassName="me-8"
+					options={selectionModeOptions}
+					onValueChange={(value) => {
+						dispatch(setSelectionMode(value));
+						clearSelection();
+					}}
+				/>
+			);
+		}
+
+		// returning an empty div to keep the layout consistent
+		return <div />;
+	}, [climateVariable]);
 
 	const selectionModeOptions = useMemo(() => {
 		const selectionModes = [
@@ -94,19 +123,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 			{climateVariable?.getInteractiveRegion() === InteractiveRegionOption.GRIDDED_DATA && (
 				<div className="mb-4">
 					<div className="flex flex-col sm:flex-row gap-4 justify-between items-start">
-						<RadioGroupFactory
-							title={__('Ways to select on the map')}
-							name="map-selection-mode"
-							value={selectionMode}
-							orientation="horizontal"
-							className="mb-0"
-							optionClassName="me-8"
-							options={selectionModeOptions}
-							onValueChange={(value) => {
-								dispatch(setSelectionMode(value));
-								clearSelection();
-							}}
-						/>
+						{renderSelectionModeControls()}
 						<div className="flex flex-row items-start gap-4">
 							{selectedCells > 0 && (
 								<Button
@@ -157,7 +174,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 				<ZoomControl />
 				<SearchControl className="top-6 left-6" />
 
-				{renderGrid()}
+				{renderInteractiveLayer()}
 
 				{/* Basemap TileLayer */}
 				<TileLayer

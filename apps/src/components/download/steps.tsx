@@ -4,8 +4,6 @@ import { useI18n } from '@wordpress/react-i18n';
 import StepNavigation from '@/components/download/step-navigation';
 import { useDownload } from '@/hooks/use-download';
 import { cn } from '@/lib/utils';
-import { useClimateVariable } from '@/hooks/use-climate-variable';
-import { DownloadType } from '@/types/climate-variable-interface';
 import { StepComponentRef } from '@/types/download-form-interface';
 
 /**
@@ -15,7 +13,6 @@ const Steps: React.FC = () => {
 	const [isStepValid, setIsStepValid] = useState(false);
 	const { __ } = useI18n();
 
-	const { climateVariable } = useClimateVariable();
 	const { steps, goToNextStep, currentStep, registerStepRef } = useDownload();
 
 	const isLastStep = currentStep === steps.length;
@@ -31,21 +28,6 @@ const Steps: React.FC = () => {
 	const handleNext = () => {
 		if (!isLastStep) {
 			goToNextStep();
-		} else {
-			// TODO: remove once the rest of the logic for sending the request is finished
-			console.log(climateVariable?.toObject())
-			if (
-				climateVariable?.getDownloadType() ===
-				DownloadType.PRECALCULATED
-			) {
-				// Generate the file to be downloaded.
-				climateVariable.getDownloadUrl().then((url) => {
-					// @todo Either print or immediately initiate the download.
-					console.log(url);
-				});
-			} else {
-				// Send the request for analysis.
-			}
 		}
 	};
 
@@ -70,19 +52,21 @@ const Steps: React.FC = () => {
 					}}
 				/>
 			</div>
-			<button
-				type="button"
-				onClick={handleNext}
-				disabled={!isStepValid}
-				className={cn(
-					'w-64 mx-auto sm:mx-0 py-2 rounded-full uppercase text-white tracking-wider',
-					!isStepValid
-						? 'bg-brand-red/25 cursor-not-allowed'
-						: 'bg-brand-red hover:bg-brand-red/75'
-				)}
-			>
-				{buttonText} &rarr;
-			</button>
+			{!isLastStep && (
+				<button
+					type="button"
+					onClick={handleNext}
+					disabled={!isStepValid}
+					className={cn(
+						'w-64 mx-auto sm:mx-0 py-2 rounded-full uppercase text-white tracking-wider',
+						!isStepValid
+							? 'bg-brand-red/25 cursor-not-allowed'
+							: 'bg-brand-red hover:bg-brand-red/75'
+					)}
+				>
+					{buttonText} &rarr;
+				</button>
+			)}
 		</div>
 	);
 };

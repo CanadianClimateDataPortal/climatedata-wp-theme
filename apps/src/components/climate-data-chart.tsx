@@ -396,7 +396,10 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						},
 					},
 					title: {
-						text: title,
+						text: [
+							__(title),
+							__(climateVariable?.getTitle() ?? ''),
+						].filter(Boolean).join(' - '),
 					},
 					yAxis: {
 						title: {
@@ -407,12 +410,6 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				csv: {
 					dateFormat: '%Y-%m-%d',
 				},
-			},
-			navigator: {
-				enabled: true,
-				adaptToUpdatedData: true,
-				height: 40,
-				margin: 30,
 			},
 			navigation: {
 				buttonOptions: {

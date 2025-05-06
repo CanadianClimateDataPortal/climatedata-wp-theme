@@ -60,29 +60,40 @@ const AnimatedPanel: React.FC<AnimatedPanelProps> = ({
 	return (
 		<AnimatePresence>
 			{isOpen && (
-				<motion.div
-					{...getAnimationProps()}
-					transition={{ duration: 0.25 }}
-					style={{
-						left: direction === 'left' ? 0 : undefined, // default to all the way to the left
-						right: direction === 'right' ? 0 : undefined, // default to all the way to the right
-						...position, // may override left/right defaults if provided
-					}}
-					className={cn(
-						'absolute bg-white shadow-sm z-40',
-						className
-					)}
-				>
-					<Button
+				<>
+					<motion.div
+						className='overlay absolute w-full h-full top-0 left-0 bg-gray-500/60 z-10'
 						onClick={onClose}
-						variant="link"
-						className="absolute top-4 right-4 text-zinc-900 hover:text-dark-purple h-auto p-0 [&_svg]:size-6"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.25 }}
 					>
-						<span className="sr-only">{__('Close panel')}</span>
-						<CloseIcon aria-hidden="true" focusable="false" />
-					</Button>
-					{children}
-				</motion.div>
+					</motion.div>
+					<motion.div
+						{...getAnimationProps()}
+						transition={{ duration: 0.25 }}
+						style={{
+							left: direction === 'left' ? 0 : undefined, // default to all the way to the left
+							right: direction === 'right' ? 0 : undefined, // default to all the way to the right
+							...position, // may override left/right defaults if provided
+						}}
+						className={cn(
+							'absolute bg-white shadow-sm z-40',
+							className
+						)}
+					>
+						<Button
+							onClick={onClose}
+							variant="link"
+							className="absolute top-4 right-4 text-zinc-900 hover:text-dark-purple h-auto p-0 [&_svg]:size-6"
+						>
+							<span className="sr-only">{__('Close panel')}</span>
+							<CloseIcon aria-hidden="true" focusable="false" />
+						</Button>
+						{children}
+					</motion.div>
+				</>
 			)}
 		</AnimatePresence>
 	);

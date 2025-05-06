@@ -60,7 +60,7 @@ if (
     ?>
 </head>
 <body>
-<div id="root" data-app-lang="<?php echo esc_attr( $current_lang ); ?>" data-wp-home-url="<?php echo esc_attr( WP_HOME ); ?>"></div>
+<div id="root" data-app-lang="<?php echo esc_attr( $current_lang ); ?>" data-wp-home-url="<?php echo esc_attr( home_url() ); ?>"></div>
 
 <?php
 // Load JS assets.

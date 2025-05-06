@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import Highcharts, {
 	Options,
 	SeriesOptionsType,
@@ -24,6 +24,7 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 import appConfig from '@/config/app.config';
 import { doyFormatter } from '@/lib/format';
 import { getChartDataOptions, getSeriesObject } from '@/config/chart-config';
+import { AveragingType } from "@/types/climate-variable-interface";
 
 type TabValue = 'annual-values' | '30-year-averages' | '30-year-changes';
 
@@ -313,6 +314,12 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	};
 
 	// Tabs configuration
+	const isThirtyYearAveragingEnabled = useCallback(() => {
+		const averagingOptions = climateVariable?.getAveragingOptions() ?? [];
+		return averagingOptions.length > 0 && averagingOptions.includes(AveragingType.THIRTY_YEARS);
+	}, [climateVariable]);
+
+	// Tabs configuration
 	const tabs: Tab[] = useMemo(() => [
 		{
 			value: 'annual-values',
@@ -322,14 +329,14 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		{
 			value: '30-year-averages',
 			label: __('30 Year Averages'),
-			enabled: climateVariableId !== 'sea_level',
+			enabled: isThirtyYearAveragingEnabled(),
 		},
 		{
 			value: '30-year-changes',
 			label: __('30 Year Changes'),
-			enabled: climateVariableId !== 'sea_level',
+			enabled: isThirtyYearAveragingEnabled(),
 		},
-	], [climateVariableId, __]);
+	], [isThirtyYearAveragingEnabled, __]);
 
 	// Chart options
 	const chartOptions = useMemo<Options>(() => {

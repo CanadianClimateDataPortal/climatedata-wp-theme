@@ -70,17 +70,26 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	const stepRefs = useRef(new Map<number, StepComponentRef>());
 
 	/** 
-	 * Update steps when the climate variable class changes.
-	 * - If it's station variable, we skip step 3 (variable options).
+	 * Update steps when the climate variable class or id change.
+	 * - skip step 3 (variable options) if it's a station variable
+	 * - skip step 5 (additional details) if it's a station variable (but not station variable)
+	 * - skip step 6 (send request) when there's no file format to choose (for "Future Building Design Value Summaries" and "Short-duration Rainfall IDF Data")
 	 */
 	useEffect(() => {
-		setSteps((prevSteps) => {
+		setSteps(() => {
 			if (climateVariable?.getClass() === 'StationClimateVariable') {
-				return prevSteps.filter((_, index) => index !== 2) as unknown as typeof STEPS;
+				// skip step 3 (variable options) if it's a station variable
+				const skipIndexes = [2];
+				// skip step 5 (additional details) if it's a station variable (but not station variable)
+				if(climateVariable?.getId() !== 'station_data') skipIndexes.push(4);
+				// skip step 6 (send request) when there's no file format to chose (for "Future Building Design Value Summaries" and "Short-duration Rainfall IDF Data")
+				if(climateVariable?.getId() === 'future_building_design_value_summaries' || climateVariable?.getId() === 'short_duration_rainfall_idf_data') skipIndexes.push(5);
+
+				return STEPS.filter((_, index) => !skipIndexes.includes(index)) as unknown as typeof STEPS;
 			}
 			return [...STEPS];
 		});
-	}, [climateVariable?.getClass()]);
+	}, [climateVariable?.getClass(), climateVariable?.getId()]);
 
 	/**
 	 * Registers or unregisters a step component's ref.

@@ -24,6 +24,7 @@ const MapLegendControl: React.FC<{
 	colourType?: string;
 }> = ({ data, isOpen, toggleOpen, isCategorical, hasCustomScheme, unit, colourType }) => {
 	const [svgWidth, setSvgWidth] = useState(0);
+	const [legendHeight, setLegendHeight] = useState<number | undefined>(undefined);
 	const { __ } = useI18n();
 	const svgRef = useRef<SVGSVGElement>(null);
 
@@ -31,9 +32,8 @@ const MapLegendControl: React.FC<{
 
 	// Calculate dynamic height based on number of labels and minimum spacing
 	const totalLabels = isBlocksGradient ? data.length : data.length;
-	const minTotalHeight = (totalLabels - 1) * MIN_LABEL_SPACING + PADDING_TOP + PADDING_BOTTOM;
-	const GRADIENT_HEIGHT = minTotalHeight;
-	const LEGEND_HEIGHT = minTotalHeight + (isBlocksGradient ? PADDING_BOTTOM : 0);
+	const GRADIENT_HEIGHT = legendHeight !== undefined ? legendHeight : (totalLabels - 1) * MIN_LABEL_SPACING + PADDING_TOP + PADDING_BOTTOM;
+	const LEGEND_HEIGHT = GRADIENT_HEIGHT + (isBlocksGradient ? PADDING_BOTTOM : 0);
 
 	// For categorical/discrete data, we want equal height blocks for each category
 	const ITEM_HEIGHT = GRADIENT_HEIGHT / (isBlocksGradient ? data.length : (data.length - 1));
@@ -48,6 +48,19 @@ const MapLegendControl: React.FC<{
 		if (svgRef.current) {
 			setSvgWidth(svgRef.current.getBoundingClientRect().width);
 		}
+	}, []);
+
+	useEffect(() => {
+		function updateLegendHeight() {
+			if (svgRef.current) {
+				const svgTop = svgRef.current.getBoundingClientRect().y;
+				const available = window.innerHeight - svgTop - PADDING_TOP - 20; // 15px leaflet banner.
+				setLegendHeight(available);
+			}
+		}
+		updateLegendHeight();
+		window.addEventListener('resize', updateLegendHeight);
+		return () => window.removeEventListener('resize', updateLegendHeight);
 	}, []);
 
 	return (

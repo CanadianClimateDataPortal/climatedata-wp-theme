@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useI18n } from "@wordpress/react-i18n";
 import {
 	Select,
@@ -46,22 +46,32 @@ const FrequencySelect = ({
 	const hasSeasons = isFrequencyEnabled(config, section, FrequencyType.SEASONAL);
 	const hasDaily = isFrequencyEnabled(config, section, FrequencyType.DAILY);
 
-	let selectValue = value
-	if (!selectValue) {
-		if (hasAnnual) {
-			selectValue = FrequencyType.ANNUAL;
-		} else if (hasAnnualJulJun) {
-			selectValue = FrequencyType.ANNUAL_JUL_JUN
-		} else if (hasDaily) {
-			selectValue = FrequencyType.DAILY;
-		} else if (hasAllMonths) {
-			selectValue = FrequencyType.ALL_MONTHS
-		} else if (hasMonths) {
-			selectValue = "jan"
-		} else if (hasSeasons) {
-			selectValue = "spring";
+	const [selectValue, setSelectValue] = useState<string | undefined>(value);
+
+	useEffect(() => {
+		if (value !== undefined) {
+			setSelectValue(value);
+		} else {
+			if (hasAnnual) {
+				setSelectValue(FrequencyType.ANNUAL);
+			} else if (hasAnnualJulJun) {
+				setSelectValue(FrequencyType.ANNUAL_JUL_JUN);
+			} else if (hasDaily) {
+				setSelectValue(FrequencyType.DAILY);
+			} else if (hasAllMonths) {
+				setSelectValue(FrequencyType.ALL_MONTHS);
+			} else if (hasMonths) {
+				setSelectValue("jan");
+			} else if (hasSeasons) {
+				setSelectValue("spring");
+			}
+
+			// If no value is set, default to the first available frequency
+			if(selectValue !== undefined) {
+				onValueChange(selectValue);
+			}
 		}
-	}
+	}, [selectValue, value, onValueChange, hasMonths, hasAllMonths, hasSeasons, hasDaily, hasAnnual, hasAnnualJulJun]);
 
 	const months = [
 		{ label: __('January'), value: 'jan' },

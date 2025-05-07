@@ -10,6 +10,7 @@ import {
 	SelectValue
 } from "@/components/ui/select";
 import {
+	DownloadType,
 	FrequencyConfig,
 	FrequencyType,
 } from "@/types/climate-variable-interface";
@@ -25,6 +26,7 @@ interface FrequencySelectProps {
 	tooltip?: React.ReactNode;
 	onValueChange: (value: string) => void;
 	className?: string | undefined;
+	downloadType?: DownloadType;
 }
 
 const FrequencySelect = ({
@@ -35,7 +37,8 @@ const FrequencySelect = ({
 	placeholder,
 	tooltip,
 	onValueChange,
-	className
+	className,
+	downloadType,
 }: FrequencySelectProps) => {
 	const { __ } = useI18n();
 
@@ -85,6 +88,61 @@ const FrequencySelect = ({
 		{ label: __('Winter'), value: 'winter' },
 	]
 
+	const renderMonthlyOptions = () => {
+		if (!hasMonths && !hasAllMonths) {
+			return null;
+		}
+
+		if (downloadType === DownloadType.ANALYZED) {
+			return (
+				<SelectItem value={FrequencyType.MONTHLY}>
+					{__('Monthly')}
+				</SelectItem>
+			);
+		} else {
+			return (
+				<SelectGroup>
+					<SelectLabel className={'pl-2'}>{__('Monthly')}</SelectLabel>
+					{hasAllMonths && (
+						<SelectItem value={FrequencyType.ALL_MONTHS} className={'pl-4'}>
+							{__('All months')}
+						</SelectItem>
+					)}
+					{months.map((option) => (
+						<SelectItem key={option.value} value={option.value} className={'pl-4'}>
+							{option.label}
+						</SelectItem>
+					))}
+				</SelectGroup>
+			);
+		}
+	}
+
+	const renderSeasonalOptions = () => {
+		if (!hasSeasons) {
+			return null;
+		}
+
+		if (downloadType === DownloadType.ANALYZED) {
+			return (
+				<SelectItem value={FrequencyType.SEASONAL}>
+					{__('Seasonal')}
+				</SelectItem>
+			);
+		} else {
+			return (
+				<SelectGroup>
+					<SelectLabel className={'pl-2'}>{__('Seasonal')}</SelectLabel>
+					{seasons.map((option) => (
+						<SelectItem key={option.value} value={option.value} className={'pl-4'}>
+							{option.label}
+						</SelectItem>
+					))}
+				</SelectGroup>
+			);
+		}
+	}
+
 	const FrequencyOptions = () => (
 		<SelectContent>
 			{hasAnnual && <SelectItem value={FrequencyType.ANNUAL}>
@@ -96,25 +154,8 @@ const FrequencySelect = ({
 			{hasDaily && <SelectItem value={FrequencyType.DAILY}>
 				{__('Daily')}
 			</SelectItem>}
-			{(hasMonths || hasAllMonths) && <SelectGroup>
-				<SelectLabel className={'pl-2'}>{__('Monthly')}</SelectLabel>
-				{hasAllMonths && <SelectItem value={FrequencyType.ALL_MONTHS} className={'pl-4'}>
-					{__('All months')}
-				</SelectItem>}
-				{months.map((option) => (
-					<SelectItem key={option.value} value={option.value} className={'pl-4'}>
-						{option.label}
-					</SelectItem>
-				))}
-			</SelectGroup>}
-			{hasSeasons && <SelectGroup>
-				<SelectLabel className={'pl-2'}>{__('Seasonal')}</SelectLabel>
-				{seasons.map((option) => (
-					<SelectItem key={option.value} value={option.value} className={'pl-4'}>
-						{option.label}
-					</SelectItem>
-				))}
-			</SelectGroup>}
+			{renderMonthlyOptions()}
+			{renderSeasonalOptions()}
 		</SelectContent>
 	)
 

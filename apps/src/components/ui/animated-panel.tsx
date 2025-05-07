@@ -62,7 +62,7 @@ const AnimatedPanel: React.FC<AnimatedPanelProps> = ({
 			{isOpen && (
 				<>
 					<motion.div
-						className='overlay absolute w-full h-full top-0 left-0 bg-gray-500/60 z-10'
+						className='overlay absolute w-full h-full top-0 left-0 bg-gray-500/60 z-30'
 						onClick={onClose}
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}

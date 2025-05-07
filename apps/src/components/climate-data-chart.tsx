@@ -72,6 +72,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	const [activeSeries, setActiveSeries] = useState<string[]>([]);
 	const [activeChartTooltip, setActiveChartTooltip] = useState<Highcharts.TooltipOptions>({});
 	const [activeChartPlotOptions, setActiveChartPlotOptions] = useState<Highcharts.PlotOptions>({});
+	const [enableChartNavigator, setEnableChartNavigator] = useState(true);
 
 	// Subtitle displayed info
 	const datasetLabel = dataset?.title.en ?? '';
@@ -306,6 +307,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	// Initialize enableTabs state based on the climate variable
 	useEffect(() => {
 		setEnableTabs(climateVariableId !== 'msc_climate_normals');
+		setEnableChartNavigator(climateVariableId !== 'msc_climate_normals');
 	}
 	, [climateVariableId]);
 
@@ -410,6 +412,12 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				csv: {
 					dateFormat: '%Y-%m-%d',
 				},
+			},
+			navigator: {
+				enabled: enableChartNavigator,
+				adaptToUpdatedData: true,
+				height: 40,
+				margin: 30,
 			},
 			navigation: {
 				buttonOptions: {

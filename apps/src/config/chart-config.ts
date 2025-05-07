@@ -152,6 +152,7 @@ export const getSeriesObject = (
 				data: sortByTimestamp(data.rcp26_median),
 				color: chartDataOptions['rcp26_median'].color,
 				lineWidth: 2,
+				showInNavigator: true,
 			} as SeriesLineOptions,
 			{
 				custom: { key: 'rcp26_range' },
@@ -169,6 +170,7 @@ export const getSeriesObject = (
 				data: sortByTimestamp(data.rcp45_median),
 				color: chartDataOptions['rcp45_median'].color,
 				lineWidth: 2,
+				showInNavigator: true,
 			} as SeriesLineOptions,
 			{
 				custom: { key: 'rcp45_range' },
@@ -186,6 +188,7 @@ export const getSeriesObject = (
 				data: sortByTimestamp(data.rcp85_median),
 				color: chartDataOptions['rcp85_median'].color,
 				lineWidth: 2,
+				showInNavigator: true,
 			} as SeriesLineOptions,
 			{
 				custom: { key: 'rcp85_range' },
@@ -260,17 +263,16 @@ export const getSeriesObject = (
 						name: chartDataOptions['modeled_historical_median'].name,
 						type: chartDataOptions['modeled_historical_median'].type,
 						data: sortByTimestamp(data.modeled_historical_median),
-						color: chartDataOptions['modeled_historical_median']
-							.color,
+						color: chartDataOptions['modeled_historical_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'modeled_historical_range' },
 						name: chartDataOptions['modeled_historical_range'].name,
 						type: chartDataOptions['modeled_historical_range'].type,
 						data: sortByTimestamp(data.modeled_historical_range),
-						color: chartDataOptions['modeled_historical_range']
-							.color,
+						color: chartDataOptions['modeled_historical_range'].color,
 						fillOpacity: 0.5,
 						lineWidth: 0,
 						zIndex: 0,
@@ -282,6 +284,7 @@ export const getSeriesObject = (
 						data: sortByTimestamp(data.rcp26_median),
 						color: chartDataOptions['rcp26_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'rcp26_range' },
@@ -299,6 +302,7 @@ export const getSeriesObject = (
 						data: sortByTimestamp(data.rcp45_median),
 						color: chartDataOptions['rcp45_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'rcp45_range' },
@@ -316,6 +320,7 @@ export const getSeriesObject = (
 						data: sortByTimestamp(data.rcp85_median),
 						color: chartDataOptions['rcp85_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'rcp85_range' },
@@ -345,6 +350,7 @@ export const getSeriesObject = (
 						data: sortByTimestamp(data.modeled_historical_median),
 						color: chartDataOptions['modeled_historical_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'modeled_historical_range' },
@@ -363,6 +369,7 @@ export const getSeriesObject = (
 						data: sortByTimestamp(data.ssp126_median),
 						color: chartDataOptions['ssp126_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'ssp126_range' },
@@ -380,6 +387,7 @@ export const getSeriesObject = (
 						data: sortByTimestamp(data.ssp245_median),
 						color: chartDataOptions['ssp245_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'ssp245_range' },
@@ -397,6 +405,7 @@ export const getSeriesObject = (
 						data: sortByTimestamp(data.ssp370_median),
 						color: chartDataOptions['ssp370_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'ssp370_range' },
@@ -414,6 +423,7 @@ export const getSeriesObject = (
 						data: sortByTimestamp(data.ssp585_median),
 						color: chartDataOptions['ssp585_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'ssp585_range' },

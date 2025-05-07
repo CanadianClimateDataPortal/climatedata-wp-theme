@@ -537,6 +537,7 @@ foreach ( $dataset_terms as $term_name ) {
 	} elseif ( in_array( $term_name, array(
 		"Statistically Downscaled Global Climate Projections",
 		"Sea Level",
+		"Climate Normals"
 	) ) ) {
 		$dataset_type = "projection";
 	}

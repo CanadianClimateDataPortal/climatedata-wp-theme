@@ -96,25 +96,25 @@
             "cmip6": {
                 'scenarios': [
                     {
-                        'name': 'ssp585highEnd-p98',
-                        'label': 'SSP5-8.5 high-end for practitioners',
-                        'correlations': {
-                            'cmip5': 'rcp85-p50'
-                        },
-                        'chart': {
-                            'color': '#FF1493',
-                            // 'label': Default to scenario label,
-                            'visible': false,
-                        },
-                    },
-                    {
                         'name': 'ssp585lowConf-p83',
-                        'label': 'SSP5-8.5 high impact, low likelihood',
+                        'label': 'SSP5-8.5 High ice sheet loss A',
                         'correlations': {
                             'cmip5': 'rcp85-p50'
                         },
                         'chart': {
                             'color': '#8A2BE2',
+                            // 'label': Default to scenario label,
+                            'visible': false,
+                        },
+                    },
+                    {
+                        'name': 'ssp585highEnd-p98',
+                        'label': 'SSP5-8.5 High ice sheet loss B',
+                        'correlations': {
+                            'cmip5': 'rcp85-p50'
+                        },
+                        'chart': {
+                            'color': '#FF1493',
                             // 'label': Default to scenario label,
                             'visible': false,
                         },

@@ -1,5 +1,14 @@
-# See /usr/share/postfix/main.cf.dist for a commented, more complete version
+# Postfix config
 
+myorigin = climatedata.ca
+
+mydestination = $myhostname, localhost.localdomain, localhost
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+
+inet_interfaces = local
+inet_protocols = all
+
+# disable mail notifications on terminal
 biff = no
 
 # appending .domain is the MUA's job.
@@ -14,28 +23,20 @@ readme_directory = no
 # fresh installs.
 compatibility_level = 3.6
 
-
-
 # TLS parameters
+# Leaving default tls certificate for encryption (no need for validation/authentication)
 smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
 smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
 smtpd_tls_security_level=may
-
 smtp_tls_CApath=/etc/ssl/certs
 smtp_tls_security_level=may
 smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
 
+# only allow relaying mail from IPs listed in `mynetworks`
+smtpd_relay_restrictions = permit_mynetworks defer_unauth_destination
 
-smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination
-#myhostname = 5ccd3509f53c
 alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
-mydestination = $myhostname, localhost.localdomain, localhost
 relayhost =
-mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
 mailbox_size_limit = 0
 recipient_delimiter = +
-inet_interfaces = all
-inet_protocols = all
-
-myorigin = climatedata.ca

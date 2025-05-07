@@ -25,7 +25,6 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 			? ClimateVariableBase.prototype.getFrequencyConfig.call(this)
 			: {
 				[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
-				[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
 				[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
 				[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 				[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,

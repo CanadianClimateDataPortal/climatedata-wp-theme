@@ -4,6 +4,7 @@ import Highcharts, {
 	SeriesOptionsType,
 	SeriesLineOptions,
 	SeriesArearangeOptions,
+	SeriesColumnOptions,
 	numberFormat,
 	Point,
 	Series,
@@ -64,15 +65,18 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	const version = climateVariable?.getVersion();
 	const scenario = climateVariable?.getScenario();
 	const unit = climateVariable?.getUnit();
+	const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+	const [enableTabs, setEnableTabs] = useState(true);
 	const [activeTab, setActiveTab] = useState<TabValue>('annual-values');
 	const [activeSeries, setActiveSeries] = useState<string[]>([]);
 	const [activeChartTooltip, setActiveChartTooltip] = useState<Highcharts.TooltipOptions>({});
 	const [activeChartPlotOptions, setActiveChartPlotOptions] = useState<Highcharts.PlotOptions>({});
+	const [enableChartNavigator, setEnableChartNavigator] = useState(true);
 
 	// Subtitle displayed info
-	const datasetLabel = dataset?.title.en;
-	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0].label;
+	const datasetLabel = dataset?.title.en ?? '';
+	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0]?.label;
 
 	// Tooltip format value helper
 	const formatValue = (value: number | undefined, isDelta:boolean = false) => {
@@ -104,7 +108,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	const chartDataOptions = useMemo(() => getChartDataOptions(__), [__]);
 
 	// Get series object
-	const seriesObject = useMemo<(SeriesLineOptions | SeriesArearangeOptions)[]>(() => 
+	const seriesObject = useMemo<(SeriesLineOptions | SeriesArearangeOptions | SeriesColumnOptions)[]>(() => 
 		getSeriesObject(data, version, climateVariableId, chartDataOptions),
 		[data, version, climateVariableId, chartDataOptions]
 	);
@@ -122,7 +126,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		const dataKey = prefix + scenario + '_median';
 		const dataRecord = data[dataKey];
 		if (!dataRecord) return '';
-		
+
 		const timestampKey = findClosetTimestamp(currentTimestamp, dataRecord as Record<string, number[]>);
 		if(timestampKey === null) return '';
 
@@ -168,7 +172,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	};
 
 	// Chart tooltips
-	const chartTooltips = useMemo(() => 
+	const chartTooltips = useMemo(() =>
 		() => ({
 			'annual-values': {
 				crosshairs: true,
@@ -177,8 +181,17 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				padding: 4,
 				formatter: function(this: Point) {
 					const points = (this as unknown as { points?: TooltipPoint[] }).points;
-					const year = new Date(this.x).getFullYear() + 1;
+					
+					// For MSC Climate Normals variable
+					if (climateVariableId === 'msc_climate_normals') {
+						return `<b>${months[this.x]}</b><br/>` + 
+							points?.map((point: TooltipPoint) => {
+								const unit = point.series.type === 'column' ? 'mm' : '°C';
+								return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.y)} ${unit}</b><br/>`;
+							}).join('') || '';
+					}
 
+					const year = new Date(this.x).getFullYear() + 1;
 					return `<b>${year}</b><br/>` + 
 						points?.map((point: TooltipPoint) => {
 							if (point.series.type === 'arearange') {
@@ -206,7 +219,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	);
 
 	// Chart plot options
-	const chartPlotOptions = useMemo<() => Record<TabValue, Highcharts.PlotOptions>>(() => 
+	const chartPlotOptions = useMemo<() => Record<TabValue, Highcharts.PlotOptions>>(() =>
 		() => ({
 			'annual-values': {
 				series: {
@@ -274,7 +287,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 			seriesObject.map((s) => {
 				const baseSeries = {
 					...s,
-					visible: activeSeries.includes(s.custom?.key),
+					visible: activeSeries.includes(s.custom?.key) && s.visible,
 				};
 
 				switch (s.type) {
@@ -282,6 +295,8 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						return baseSeries as SeriesLineOptions;
 					case 'arearange':
 						return baseSeries as SeriesArearangeOptions;
+					case 'column':
+						return baseSeries as SeriesColumnOptions;
 					default:
 						return baseSeries;
 				}
@@ -289,11 +304,18 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		);
 	}, [activeTab, activeSeries, seriesObject]);
 
+	// Initialize enableTabs state based on the climate variable
+	useEffect(() => {
+		setEnableTabs(climateVariableId !== 'msc_climate_normals');
+		setEnableChartNavigator(climateVariableId !== 'msc_climate_normals');
+	}
+	, [climateVariableId]);
+
 	// initialize activeSeries state with all leys  from the first tab
 	useEffect(() => {
 		setActiveSeries(seriesObject.map((s) => s.custom?.key) || []);
 	}, [seriesObject]);
-	
+
 	// Initialize activeChartTooltip and activeChartPlotOptions
 	useEffect(() => {
 		setActiveChartTooltip(chartTooltips()[activeTab]);
@@ -306,11 +328,13 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 			return (str !== undefined && str !== null) ? str.toLowerCase().replace(/\s+/g, '-') : '';
 		};
 
-		return formatForFilename(title)
-			+ '-' + formatForFilename(datasetLabel)
-			+ '-' + formatForFilename(climateVariable?.getTitle())
-			+ '-' + formatForFilename(versionLabel)
-			+ '-' + formatForFilename(activeTab);
+		return formatForFilename([
+			__(title),
+			__(datasetLabel),
+			__(climateVariable?.getTitle() ?? ''),
+			__(versionLabel),
+			enableTabs ? __(activeTab) : null,
+		].filter(Boolean).join('-'));
 	};
 
 	// Tabs configuration
@@ -374,7 +398,10 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						},
 					},
 					title: {
-						text: title,
+						text: [
+							__(title),
+							__(climateVariable?.getTitle() ?? ''),
+						].filter(Boolean).join(' - '),
 					},
 					yAxis: {
 						title: {
@@ -387,7 +414,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				},
 			},
 			navigator: {
-				enabled: true,
+				enabled: enableChartNavigator,
 				adaptToUpdatedData: true,
 				height: 40,
 				margin: 30,
@@ -409,11 +436,51 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 			},
 			tooltip: activeChartTooltip,
 			plotOptions: activeChartPlotOptions,
-			xAxis: {
+			xAxis: climateVariableId === 'msc_climate_normals' ? {
+				categories: months,
+				crosshair: false,
+			} : {
 				crosshair: false,
 				type: 'datetime',
 			},
-			yAxis: {
+			yAxis: climateVariableId === 'msc_climate_normals' ? [
+				{
+					title: {
+						text: 'Temperature (°C)',
+						rotation: 270,
+						align: 'middle',
+						margin: 20,
+						style: {
+							fontSize: '12px'
+						}
+					},
+					opposite: false,
+					labels: {
+						align: 'right',
+						formatter: function () {
+							return Number(this.value).toFixed(0);
+						}
+					},
+				},
+				{
+					title: {
+						text: 'Precipitation (mm)',
+						rotation: -270,
+						align: 'middle',
+						margin: 20,
+						style: {
+							fontSize: '12px'
+						}
+					},
+					opposite: true,
+					labels: {
+						align: 'left',
+						formatter: function () {
+							return Number(this.value).toFixed(0);
+						}
+					},
+				}
+			] : {
 				title: {
 					text: '',
 				},
@@ -422,7 +489,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					align: 'left',
 					formatter: function () {
 						const unit = climateVariable?.getUnit();
-						
+
 						switch (unit) {
 							case "doy":
 									return doyFormatter(Number(this.value), locale);
@@ -433,9 +500,46 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				},
 			},
 			series: filteredSeries.map(series => {
+				const baseSeries = {
+					...series,
+					marker: {
+						enabled: false,
+						symbol: 'circle',
+						radius: 6,
+						lineWidth: 0,
+						opacity: 0.6,
+						states: {
+							hover: {
+								enabled: activeTab === 'annual-values',
+								lineWidth: 0,
+								opacity: 0,
+							},
+						},
+					},
+				};
+
+				if (climateVariableId === 'msc_climate_normals') {
+					// Assign yAxis based on series type
+					if (series.custom?.key === 'precipitation') {
+						return {
+							...baseSeries,
+							yAxis: 1,
+							pointWidth: 20,
+							borderWidth: 0,
+							zIndex: 0,
+						} as SeriesOptionsType;
+					} else {
+						return {
+							...baseSeries,
+							yAxis: 0,
+							zIndex: 1,
+						} as SeriesOptionsType;
+					}
+				}
+
 				if (series.custom?.key === 'rcp85_enhanced') {
 					return {
-						...series,
+						...baseSeries,
 						marker: {
 							enabled: true,
 							symbol: 'diamond',
@@ -444,25 +548,9 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 							opacity: 0.6,
 						},
 					} as SeriesOptionsType;
-				} else {
-					return {
-						...series,
-						marker: {
-							enabled: false, // disable in chart and legend
-							symbol: 'circle',
-							radius: 6,
-							lineWidth: 0,
-							opacity: 0.6,
-							states: {
-								hover: { // enable on hover
-									enabled: activeTab === 'annual-values',
-									lineWidth: 0,
-									opacity: 0,
-								},
-							},
-						},
-					} as SeriesOptionsType;
 				}
+
+				return baseSeries as SeriesOptionsType;
 			}),
 		};
 	}, [climateVariable, locale, title, filteredSeries, activeChartTooltip, activeChartPlotOptions]);
@@ -475,11 +563,11 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 			Object.keys(scenario).forEach(period => rangesSet.add(period));
 		}
 		const sortedRanges = Array.from(rangesSet).sort();
-	
+
 		// Headers
 		const headers: string[] = ['DateTime'];
 		const scenarioKeys: { key: string; columns: string[] }[] = [];
-	
+
 		for (const scenarioName of Object.keys(data)) {
 			const anyValue = Object.values(data[scenarioName])[0];
 			if (anyValue.length === 2) {
@@ -491,13 +579,13 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				scenarioKeys.push({ key: scenarioName, columns: ['value'] });
 			}
 		}
-	
+
 		// Build rows
 		const rows = sortedRanges.map(range => {
 			const row: (string | number)[] = [range];
 			for (const scenario of scenarioKeys) {
 				const values = data[scenario.key]?.[range];
-	
+
 				if (!values) {
 					// Empty cell
 					row.push(...scenario.columns.map(() => ''));
@@ -511,12 +599,12 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 			}
 			return row;
 		});
-	
+
 		// Convert to CSV string
 		const csvString = [headers, ...rows]
 			.map(row => row.map(cell => `"${cell}"`).join(','))
 			.join('\n');
-	
+
 		return csvString;
 	};
 
@@ -550,7 +638,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 							chart.downloadCSV();
 						} else {
 							const prefixes: string[] = ['30y_', 'delta7100_'];
-	
+
 							// Get only data we want with the rights keys
 							const csvData = Object.keys(data)
 								.filter((key) => {
@@ -570,9 +658,9 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 									);
 									return acc;
 								}, {} as Record<string, Record<string, number[]>>);
-	
+
 							const csvString = exportCsvFromData(csvData);
-	
+
 							// Trigger download
 							const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
 							const link = document.createElement('a');
@@ -603,7 +691,13 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						{title}
 					</h2>
 					<p className="text-sm text-neutral-grey-medium leading-5 m-0">
-						{datasetLabel} - {climateVariable?.getTitle()} - {versionLabel}
+						{
+							[
+								__(datasetLabel),
+								__(climateVariable?.getTitle() ?? ''),
+								__(versionLabel)
+							].filter(Boolean).join(' - ')
+						}
 					</p>
 				</div>
 
@@ -613,7 +707,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 			</div>
 			<div className="flex justify-between items-center mb-4">
 				<div className="flex justify-center">
-					{tabs.map((tab) => (
+					{enableTabs && tabs.map((tab) => (
 						<button
 							key={tab.value}
 							className={cn(
@@ -662,11 +756,15 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				</div>
 			</div>
 
-			<HighchartsReact 
+			<HighchartsReact
 				ref={chartRef}
-				highcharts={Highcharts} 
-				options={chartOptions} 
+				highcharts={Highcharts}
+				options={chartOptions}
 			/>
+
+			{climateVariableId === 'msc_climate_normals' && (<p>
+				{__('Additional Climate Normals variables are available from the')} <a href="https://climate-change.canada.ca/climate-data/#/climate-normals" target="_blank" className='text-dark-purple'>{__('Canadian Centre for Climate Services')}</a> {__('and the')} <a href="https://climate.weather.gc.ca/climate_normals/index_e.html" target="_blank" className='text-dark-purple'>{__('Government of Canada Historical Climate Data')}</a> {__('websites.')}
+			</p>)}
 		</div>
 	);
 };

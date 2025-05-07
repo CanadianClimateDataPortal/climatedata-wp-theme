@@ -2,9 +2,13 @@ import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } f
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
-import { fetchStationsList } from '@/services/services';
+import { fetchStationsList, fetchMSCClimateNormalsChartData } from '@/services/services';
 import { LocationModalContent } from './location-modal-content';
 import { Station } from '@/types/types';
+import { useAnimatedPanel } from '@/hooks/use-animated-panel';
+import LocationInfoPanel from '@/components/map-info/location-info-panel';
+import { remToPx } from '@/lib/utils';
+import { SIDEBAR_WIDTH } from '@/lib/constants';
 
 import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
@@ -37,6 +41,7 @@ const InteractiveStationsLayer = forwardRef<{
 	const [stations, setStations] = useState<Station[]>([]);
 
 	const { climateVariable, addSelectedPoints, removeSelectedPoint, resetSelectedPoints } = useClimateVariable();
+	const { togglePanel } = useAnimatedPanel();
 
 	const map = useMap();
 	const layerGroupRef = useRef<L.MarkerClusterGroup | null>(null);
@@ -77,6 +82,9 @@ const InteractiveStationsLayer = forwardRef<{
 						addSelectedPoints({ [station.id]: { lat: station.coordinates.lat, lng: station.coordinates.lng } });
 					}
 				} else if (onLocationModalOpen) {
+					// Open the location modal with the station details
+					// For MSC Climate normals 1981 - 2010
+
 					onLocationModalOpen(
 						<LocationModalContent
 							title={station.name}
@@ -84,6 +92,45 @@ const InteractiveStationsLayer = forwardRef<{
 							featureId={Number(station.id) || 0}
 							onDetailsClick={() => {
 								if (onLocationModalClose) onLocationModalClose();
+
+								// Retrieve chart data
+								const chartNormals = [
+									{ name: 'daily_average_temperature', normalId: 1},
+									{ name: 'daily_maximum_temperature', normalId: 5},
+									{ name: 'daily_minimum_temperature', normalId: 8},
+									{ name: 'precipitation', normalId: 56},
+								];
+
+								Promise.all(
+									chartNormals.map((normal) =>
+										fetchMSCClimateNormalsChartData(station.id, normal.normalId).then((data) => ({
+											[normal.name]: data.features.slice(0, 12).map((feature: { properties: { VALUE: number } }): number => {
+												return feature.properties.VALUE;
+											})
+										}))
+									)
+								).then((chartDataArray) => {
+									const chartData = chartDataArray.reduce((acc, curr) => {
+										return { ...acc, ...curr };
+									}, {});
+
+									togglePanel(
+										<LocationInfoPanel
+											title={station.name}
+											latlng={L.latLng(station.coordinates.lat, station.coordinates.lng)}
+											featureId={-1}
+											data={chartData}
+										/>,
+										{
+											position: {
+												left: remToPx(SIDEBAR_WIDTH),
+												right: 0,
+												bottom: 0,
+											},
+											direction: 'bottom',
+										}
+									);
+								});
 							}}
 						/>
 					);

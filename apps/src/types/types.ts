@@ -333,7 +333,7 @@ export interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
  * Props for the MapInfo component.
  */
 export interface MapInfoProps {
-	data: MapInfoData;
+	data: MapInfoData | null;
 }
 
 /**

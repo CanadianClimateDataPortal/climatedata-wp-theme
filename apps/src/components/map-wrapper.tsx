@@ -16,7 +16,7 @@ const MapWrapper = () => {
 
 	return (
 		<div className="relative flex-1">
-			{mapInfo && <MapHeader data={mapInfo}/>}
+			<MapHeader data={mapInfo}/>
 			{climateVariable?.renderMap()}
 		</div>
 	);

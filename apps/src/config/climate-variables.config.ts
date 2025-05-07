@@ -1335,7 +1335,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
-			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 		averagingOptions: [
@@ -1420,6 +1420,12 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				label: "22 ºC",
 			},
 		],
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
+		},
 		averagingOptions: [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,

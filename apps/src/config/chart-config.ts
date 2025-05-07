@@ -153,6 +153,7 @@ export const getSeriesObject = (
 				color: chartDataOptions['rcp26_median'].color,
 				lineWidth: 2,
 				showInNavigator: true,
+				visible: true,
 			} as SeriesLineOptions,
 			{
 				custom: { key: 'rcp26_range' },
@@ -162,6 +163,8 @@ export const getSeriesObject = (
 				color: chartDataOptions['rcp26_range'].color,
 				fillOpacity: 0.2,
 				lineWidth: 0,
+				linkedTo: ':previous',
+				visible: true,
 			} as SeriesArearangeOptions,
 			{
 				custom: { key: 'rcp45_median' },
@@ -171,6 +174,7 @@ export const getSeriesObject = (
 				color: chartDataOptions['rcp45_median'].color,
 				lineWidth: 2,
 				showInNavigator: true,
+				visible: true,
 			} as SeriesLineOptions,
 			{
 				custom: { key: 'rcp45_range' },
@@ -180,6 +184,8 @@ export const getSeriesObject = (
 				color: chartDataOptions['rcp45_range'].color,
 				fillOpacity: 0.2,
 				lineWidth: 0,
+				linkedTo: ':previous',
+				visible: true,
 			} as SeriesArearangeOptions,
 			{
 				custom: { key: 'rcp85_median' },
@@ -189,6 +195,7 @@ export const getSeriesObject = (
 				color: chartDataOptions['rcp85_median'].color,
 				lineWidth: 2,
 				showInNavigator: true,
+				visible: true,
 			} as SeriesLineOptions,
 			{
 				custom: { key: 'rcp85_range' },
@@ -198,6 +205,8 @@ export const getSeriesObject = (
 				color: chartDataOptions['rcp85_range'].color,
 				fillOpacity: 0.2,
 				lineWidth: 0,
+				linkedTo: ':previous',
+				visible: true,
 			} as SeriesArearangeOptions,
 			{
 				custom: { key: 'rcp85_enhanced' },
@@ -207,6 +216,7 @@ export const getSeriesObject = (
 				color: chartDataOptions['rcp85_enhanced'].color,
 				fillOpacity: 0.2,
 				lineWidth: 0,
+				visible: true,
 			} as SeriesLineOptions,
 		];
 	} else if(climateVariableId === 'msc_climate_normals') {
@@ -257,6 +267,7 @@ export const getSeriesObject = (
 						color: chartDataOptions['observations'].color,
 						lineWidth: 1.5,
 						dashStyle: 'ShortDash',
+						visible: false,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'modeled_historical_median' },
@@ -266,6 +277,7 @@ export const getSeriesObject = (
 						color: chartDataOptions['modeled_historical_median'].color,
 						lineWidth: 2,
 						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'modeled_historical_range' },
@@ -276,6 +288,7 @@ export const getSeriesObject = (
 						fillOpacity: 0.5,
 						lineWidth: 0,
 						zIndex: 0,
+						visible: true,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'rcp26_median' },
@@ -285,6 +298,7 @@ export const getSeriesObject = (
 						color: chartDataOptions['rcp26_median'].color,
 						lineWidth: 2,
 						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'rcp26_range' },
@@ -294,6 +308,8 @@ export const getSeriesObject = (
 						color: chartDataOptions['rcp26_range'].color,
 						fillOpacity: 0.2,
 						lineWidth: 0,
+						linkedTo: ':previous',
+						visible: true,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'rcp45_median' },
@@ -303,6 +319,7 @@ export const getSeriesObject = (
 						color: chartDataOptions['rcp45_median'].color,
 						lineWidth: 2,
 						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'rcp45_range' },
@@ -312,6 +329,8 @@ export const getSeriesObject = (
 						color: chartDataOptions['rcp45_range'].color,
 						fillOpacity: 0.2,
 						lineWidth: 0,
+						linkedTo: ':previous',
+						visible: true,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'rcp85_median' },
@@ -321,6 +340,7 @@ export const getSeriesObject = (
 						color: chartDataOptions['rcp85_median'].color,
 						lineWidth: 2,
 						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'rcp85_range' },
@@ -330,6 +350,8 @@ export const getSeriesObject = (
 						color: chartDataOptions['rcp85_range'].color,
 						fillOpacity: 0.2,
 						lineWidth: 0,
+						linkedTo: ':previous',
+						visible: true,
 					} as SeriesArearangeOptions,
 				];
 			case 'cmip6':
@@ -342,6 +364,7 @@ export const getSeriesObject = (
 						color: chartDataOptions['observations'].color,
 						lineWidth: 1.5,
 						dashStyle: 'ShortDash',
+						visible: false,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'modeled_historical_median' },
@@ -351,6 +374,7 @@ export const getSeriesObject = (
 						color: chartDataOptions['modeled_historical_median'].color,
 						lineWidth: 2,
 						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'modeled_historical_range' },
@@ -361,6 +385,7 @@ export const getSeriesObject = (
 						fillOpacity: 0.3,
 						lineWidth: 0,
 						zIndex: 0,
+						visible: true,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'ssp126_median' },
@@ -370,6 +395,7 @@ export const getSeriesObject = (
 						color: chartDataOptions['ssp126_median'].color,
 						lineWidth: 2,
 						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'ssp126_range' },
@@ -379,6 +405,8 @@ export const getSeriesObject = (
 						color: chartDataOptions['ssp126_range'].color,
 						fillOpacity: 0.2,
 						lineWidth: 0,
+						linkedTo: ':previous',
+						visible: true,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'ssp245_median' },
@@ -388,6 +416,7 @@ export const getSeriesObject = (
 						color: chartDataOptions['ssp245_median'].color,
 						lineWidth: 2,
 						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'ssp245_range' },
@@ -397,6 +426,8 @@ export const getSeriesObject = (
 						color: chartDataOptions['ssp245_range'].color,
 						fillOpacity: 0.2,
 						lineWidth: 0,
+						linkedTo: ':previous',
+						visible: true,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'ssp370_median' },
@@ -406,6 +437,7 @@ export const getSeriesObject = (
 						color: chartDataOptions['ssp370_median'].color,
 						lineWidth: 2,
 						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'ssp370_range' },
@@ -415,6 +447,8 @@ export const getSeriesObject = (
 						color: chartDataOptions['ssp370_range'].color,
 						fillOpacity: 0.2,
 						lineWidth: 0,
+						linkedTo: ':previous',
+						visible: true,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'ssp585_median' },
@@ -424,6 +458,7 @@ export const getSeriesObject = (
 						color: chartDataOptions['ssp585_median'].color,
 						lineWidth: 2,
 						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'ssp585_range' },
@@ -433,6 +468,8 @@ export const getSeriesObject = (
 						color: chartDataOptions['ssp585_range'].color,
 						fillOpacity: 0.2,
 						lineWidth: 0,
+						linkedTo: ':previous',
+						visible: true,
 					} as SeriesArearangeOptions,
 				];
 			default:

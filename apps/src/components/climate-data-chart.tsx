@@ -126,7 +126,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		const dataKey = prefix + scenario + '_median';
 		const dataRecord = data[dataKey];
 		if (!dataRecord) return '';
-		
+
 		const timestampKey = findClosetTimestamp(currentTimestamp, dataRecord as Record<string, number[]>);
 		if(timestampKey === null) return '';
 
@@ -172,7 +172,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	};
 
 	// Chart tooltips
-	const chartTooltips = useMemo(() => 
+	const chartTooltips = useMemo(() =>
 		() => ({
 			'annual-values': {
 				crosshairs: true,
@@ -219,7 +219,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	);
 
 	// Chart plot options
-	const chartPlotOptions = useMemo<() => Record<TabValue, Highcharts.PlotOptions>>(() => 
+	const chartPlotOptions = useMemo<() => Record<TabValue, Highcharts.PlotOptions>>(() =>
 		() => ({
 			'annual-values': {
 				series: {
@@ -287,7 +287,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 			seriesObject.map((s) => {
 				const baseSeries = {
 					...s,
-					visible: activeSeries.includes(s.custom?.key),
+					visible: activeSeries.includes(s.custom?.key) && s.visible,
 				};
 
 				switch (s.type) {
@@ -315,7 +315,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	useEffect(() => {
 		setActiveSeries(seriesObject.map((s) => s.custom?.key) || []);
 	}, [seriesObject]);
-	
+
 	// Initialize activeChartTooltip and activeChartPlotOptions
 	useEffect(() => {
 		setActiveChartTooltip(chartTooltips()[activeTab]);
@@ -489,7 +489,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					align: 'left',
 					formatter: function () {
 						const unit = climateVariable?.getUnit();
-						
+
 						switch (unit) {
 							case "doy":
 									return doyFormatter(Number(this.value), locale);
@@ -563,11 +563,11 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 			Object.keys(scenario).forEach(period => rangesSet.add(period));
 		}
 		const sortedRanges = Array.from(rangesSet).sort();
-	
+
 		// Headers
 		const headers: string[] = ['DateTime'];
 		const scenarioKeys: { key: string; columns: string[] }[] = [];
-	
+
 		for (const scenarioName of Object.keys(data)) {
 			const anyValue = Object.values(data[scenarioName])[0];
 			if (anyValue.length === 2) {
@@ -579,13 +579,13 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				scenarioKeys.push({ key: scenarioName, columns: ['value'] });
 			}
 		}
-	
+
 		// Build rows
 		const rows = sortedRanges.map(range => {
 			const row: (string | number)[] = [range];
 			for (const scenario of scenarioKeys) {
 				const values = data[scenario.key]?.[range];
-	
+
 				if (!values) {
 					// Empty cell
 					row.push(...scenario.columns.map(() => ''));
@@ -599,12 +599,12 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 			}
 			return row;
 		});
-	
+
 		// Convert to CSV string
 		const csvString = [headers, ...rows]
 			.map(row => row.map(cell => `"${cell}"`).join(','))
 			.join('\n');
-	
+
 		return csvString;
 	};
 
@@ -638,7 +638,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 							chart.downloadCSV();
 						} else {
 							const prefixes: string[] = ['30y_', 'delta7100_'];
-	
+
 							// Get only data we want with the rights keys
 							const csvData = Object.keys(data)
 								.filter((key) => {
@@ -658,9 +658,9 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 									);
 									return acc;
 								}, {} as Record<string, Record<string, number[]>>);
-	
+
 							const csvString = exportCsvFromData(csvData);
-	
+
 							// Trigger download
 							const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
 							const link = document.createElement('a');
@@ -756,10 +756,10 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				</div>
 			</div>
 
-			<HighchartsReact 
+			<HighchartsReact
 				ref={chartRef}
-				highcharts={Highcharts} 
-				options={chartOptions} 
+				highcharts={Highcharts}
+				options={chartOptions}
 			/>
 
 			{climateVariableId === 'msc_climate_normals' && (<p>

@@ -1,73 +1,90 @@
 /**
- * @description Component to render a list of social media share buttons. The button links
- * are placehodlers currently, can be changed in this component.
+ * @description Component to render a list of social media share buttons
+ * using react-share for proper sharing functionality.
  */
 
-import { Facebook, Linkedin, Mail, Twitter } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
+import { FacebookShareButton, TwitterShareButton, LinkedinShareButton, EmailShareButton, FacebookIcon, TwitterIcon, LinkedinIcon, EmailIcon } from "react-share";
+import { MultilingualField } from '@/types/types';
+import { useLocale } from '@/hooks/use-locale';
+
+interface SocialShareButtonsProps {
+	url?: string;
+	title?: string | MultilingualField;
+}
 
 /**
  * SocialShareButtons component
- * @description Renders a list of social media icons that allow sharing content on
- * different platforms. Each link opens in a new tab and includes appropriate
- * accessibility labels.
+ * @description Renders a list of social media buttons that allow sharing content on
+ * different platforms using the react-share library.
  */
-export function SocialShareButtons(): JSX.Element {
+export function SocialShareButtons({ 
+	url = window.location.href, 
+	title = document.title 
+}: SocialShareButtonsProps): JSX.Element {
 	const { __ } = useI18n();
-
-	// Placeholder URLs for social sharing links
-	const shareUrls = {
-		facebook: '#', // Placeholder for Facebook share URL
-		twitter: '#', // Placeholder for Twitter share URL
-		linkedin: '#', // Placeholder for LinkedIn share URL
-		mail: '#', // Placeholder for Email share URL
+	const { locale } = useLocale();
+	
+	// Process the title to ensure it's a string in the current language
+	const getStringTitle = (): string => {
+		if (typeof title === 'string') {
+			return title;
+		} else if (title && typeof title === 'object') {
+			if (locale === 'fr' && title.fr) {
+				return title.fr;
+			}
+			
+			return title.en;
+		}
+		return document.title;
 	};
+	
+	// Prepare description text
+	const description = __('Check out this climate data map');
+	const stringTitle = getStringTitle();
 
 	return (
 		<ul className="social-share-buttons flex gap-2">
 			<li className="social-share-buttons__list-item">
-				<a
-					href={shareUrls.facebook}
-					target="_blank"
-					rel="noopener noreferrer"
+				<FacebookShareButton 
+					url={url}
+					hashtag="#ClimateData"
+					className="hover:opacity-80"
 					aria-label={__('Share on Facebook (opens in a new tab)')}
-					className="hover:text-blue-700"
 				>
-					<Facebook color="blue" className="h-6 w-6" />
-				</a>
+					<FacebookIcon size={32} round />
+				</FacebookShareButton>
 			</li>
 			<li className="social-share-buttons__list-item">
-				<a
-					href={shareUrls.twitter}
-					target="_blank"
-					rel="noopener noreferrer"
+				<TwitterShareButton
+					url={url}
+					title={`${stringTitle}\n${description}: `}
+					hashtags={["ClimateData"]}
+					className="hover:opacity-80"
 					aria-label={__('Share on Twitter (opens in a new tab)')}
-					className="hover:text-blue-700"
 				>
-					<Twitter color="blue" className="h-6 w-6" />
-				</a>
+					<TwitterIcon size={32} round />
+				</TwitterShareButton>
 			</li>
 			<li className="social-share-buttons__list-item">
-				<a
-					href={shareUrls.linkedin}
-					target="_blank"
-					rel="noopener noreferrer"
+				<LinkedinShareButton
+					url={url}
+					className="hover:opacity-80"
 					aria-label={__('Share on LinkedIn (opens in a new tab)')}
-					className="hover:text-blue-700"
 				>
-					<Linkedin color="blue" className="h-6 w-6" />
-				</a>
+					<LinkedinIcon size={32} round />
+				</LinkedinShareButton>
 			</li>
 			<li className="social-share-buttons__list-item">
-				<a
-					href={shareUrls.mail}
-					target="_blank"
-					rel="noopener noreferrer"
+				<EmailShareButton
+					url={url}
+					subject={stringTitle}
+					body={description}
+					className="hover:opacity-80"
 					aria-label={__('Share via Email (opens in a new tab)')}
-					className="hover:text-blue-700"
 				>
-					<Mail color="blue" className="h-6 w-6" />
-				</a>
+					<EmailIcon size={32} round />
+				</EmailShareButton>
 			</li>
 		</ul>
 	);

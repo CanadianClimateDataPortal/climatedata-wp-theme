@@ -34,6 +34,10 @@ const ShareMapModal: React.FC<{
 
 	// Get the URL sync state to ensure URL parameters are loaded
 	const isUrlSyncInitialized = useAppSelector((state) => state.urlSync.isInitialized);
+	
+	// Get the climate variable data to use in the share title
+	const climateVariable = useAppSelector((state) => state.climateVariable.data);
+	const variableTitle = climateVariable?.title || __('Climate Data Map');
 
 	useEffect(() => {
 		if (isOpen && typeof window !== 'undefined') {
@@ -91,7 +95,7 @@ const ShareMapModal: React.FC<{
 					<ModalSectionBlockDescription>
 						{__('Clicking on icons will launch a new window.')}
 					</ModalSectionBlockDescription>
-					<SocialShareButtons />
+					<SocialShareButtons url={currentUrl} title={variableTitle} />
 				</ModalSectionBlock>
 			</ModalSection>
 		</Modal>

@@ -560,6 +560,40 @@ foreach ( $dataset_terms as $term_name ) {
 			}
 		}
 	}
+
+	// Dataset terms mapping (English -> French)
+	$dataset_terms_fr_mapping = array(
+		"Adjusted and Homogenized Canadian Climate Data (AHCCD)" => "Données climatologiques canadiennes ajustées et homogénéisées (DCCAH)",
+		"Statistically Downscaled Global Climate Projections"    => "Mise à l'échelle de manière statistique",
+		"Future Building Design Values"                          => "Valeurs futures de calcul des bâtiments",
+		"Climate Normals"                                        => "Normales climatiques",
+		"Sea Level"                                              => "Changement du niveau de la mer",
+		"IDF Rainfall Data"                                      => "Données IDF des pluies",
+		"Station Observations"                                   => "Données des stations",
+	);
+
+	// Check if there's a French translation available for this term
+	if ( isset( $dataset_terms_fr_mapping[ $term_name ] ) ) {
+		$title_fr = $dataset_terms_fr_mapping[ $term_name ];
+
+		// Update the title_fr ACF field
+		$update_fr_result = update_field( 'title_fr', $title_fr, 'variable-dataset_' . $term_id );
+
+		if ( $update_fr_result ) {
+			echo "FRENCH TITLE UPDATED: Term '{$term_name}' (ID: {$term_id}) - title_fr set to: {$title_fr}<br>";
+		} else {
+			// Check if field already has this value
+			$current_fr_value = get_field( 'title_fr', 'variable-dataset_' . $term_id );
+
+			if ( $current_fr_value === $title_fr ) {
+				echo "FRENCH TITLE UNCHANGED: Term '{$term_name}' (ID: {$term_id}) - title_fr already set to: {$title_fr}<br>";
+			} else {
+				echo "ERROR: Failed to update title_fr for term '{$term_name}' (ID: {$term_id})<br>";
+			}
+		}
+	} else {
+		echo "WARNING: No French translation found for term '{$term_name}' (ID: {$term_id})<br>";
+	}
 }
 
 // Assign dataset terms to successfully updated variable posts

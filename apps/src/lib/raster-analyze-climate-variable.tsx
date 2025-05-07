@@ -26,7 +26,7 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 			: {
 				[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 				[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
-				[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
+				[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
 				[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
 			};
 	}

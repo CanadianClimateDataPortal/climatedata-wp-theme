@@ -9,7 +9,6 @@ import {
 	InteractiveRegionOption,
 } from "@/types/climate-variable-interface";
 
-
 export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Test variable */
 	{
@@ -1334,7 +1333,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		threshold: "hddheat_18",
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
-			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
@@ -1422,7 +1421,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		],
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
-			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
 		},

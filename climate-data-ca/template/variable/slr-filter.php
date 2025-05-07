@@ -44,8 +44,8 @@
 				"rcp26-p50" => "RCP 2.6 " . __('median (50th percentile)','cdc'),
 				"rcp26-p95" => "RCP 2.6 " . __('upper (95th percentile)','cdc'),
 
-				"ssp585highEnd-p98" => __('SSP5-8.5 high-end for practitioners', 'cdc'),
-				"ssp585lowConf-p83" => __('SSP5-8.5 high impact, low likelihood', 'cdc'),
+				"ssp585lowConf-p83" => __('SSP5-8.5 High ice sheet loss A', 'cdc'),
+				"ssp585highEnd-p98" => __('SSP5-8.5 High ice sheet loss B', 'cdc'),
 				"ssp585-p50" => "SSP5-8.5",
 				"ssp370-p50" => "SSP3-7.0",
 				"ssp245-p50" => "SSP2-4.5",

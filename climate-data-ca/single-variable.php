@@ -92,8 +92,8 @@ if (have_posts()) : while (have_posts()) : the_post();
 									?>
 
 									<?php if ( get_field('var_name') == "slr" ) { ?>
-									<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-highend" autocomplete="off" value="ssp585highEnd-p98"> <?php _e('SSP5-8.5 high-end for practitioners', 'cdc') ?> </label>
-									<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-highimpact" autocomplete="off" value="ssp585lowConf-p83"> <?php _e('SSP5-8.5 high impact, low likelihood', 'cdc') ?> </label>
+									<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-highimpact" autocomplete="off" value="ssp585lowConf-p83"> <?php _e('SSP5-8.5 High ice sheet loss A', 'cdc') ?> </label>
+									<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-highend" autocomplete="off" value="ssp585highEnd-p98"> <?php _e('SSP5-8.5 High ice sheet loss B', 'cdc') ?> </label>
 									<?php } ?>
 
 									<label class="btn btn-outline-light text-left active text-nowrap"> <input type="radio" name="rcp" id="variable-detail-highest" autocomplete="off" value="ssp585" checked> SSP5-8.5 </label>
@@ -857,8 +857,8 @@ if (have_posts()) : while (have_posts()) : the_post();
 									?>
 
 									<?php if ( get_field('var_name') == "slr" ) { ?>
-										<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-highend" autocomplete="off" value="ssp585highEnd-p98"> <?php _e('SSP5-8.5 high-end for practitioners', 'cdc') ?> </label>
-										<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-highimpact" autocomplete="off" value="ssp585lowConf-p83"> <?php _e('SSP5-8.5 high impact, low likelihood', 'cdc') ?> </label>
+										<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-highimpact" autocomplete="off" value="ssp585lowConf-p83"> <?php _e('SSP5-8.5 High ice sheet loss A', 'cdc') ?> </label>
+										<label class="btn btn-outline-light text-left"> <input type="radio" name="rcp" id="variable-detail-highend" autocomplete="off" value="ssp585highEnd-p98"> <?php _e('SSP5-8.5 High ice sheet loss B', 'cdc') ?> </label>
 									<?php } ?>
 
 									<label class="btn btn-outline-light text-left active text-nowrap"> <input type="radio" name="rcp" id="variable-detail-highest" autocomplete="off" value="ssp585" checked> SSP5-8.5 </label>

@@ -6,7 +6,7 @@ import {
 	StepContainerDescription,
 } from '@/components/download/step-container';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
-import { DownloadType } from '@/types/climate-variable-interface';
+import { DownloadType, StationDownloadUrlsProps, DownloadFile } from '@/types/climate-variable-interface';
 import { cn } from '@/lib/utils';
 
 /**
@@ -19,9 +19,8 @@ const StepResult = React.forwardRef(() => {
 	const [containerTitle, setContainerTitle] = useState<string | null>(null);
 	const [containerDescription, setContainerDescription] = useState<string | null>(null);
 
-	// For download climate variables
-	const [fileUrl, setFileUrl] = useState<string | null>(null);
-	const [downloaded, setDownloaded] = useState(false);
+	// For precalculated climate variables
+	const [files, setFiles] = useState<DownloadFile[]>([]);
 
 	// Set title, description and file
 	useEffect(() => {
@@ -30,17 +29,62 @@ const StepResult = React.forwardRef(() => {
 			setContainerTitle(__('Download your file'));
 			setContainerDescription(__('Your request is being sent...'));
 
-			// Generate the file to be downloaded.
-			climateVariable.getDownloadUrl()
-			.then((url) => {
-				setDownloaded(false);
-				setFileUrl(url);
+			if(climateVariable.getInteractiveMode() === 'region') {
+				// Generate the file to be downloaded.
+				climateVariable.getDownloadUrl()
+				.then((url) => {
+					const file: DownloadFile = {
+						url: url ?? '',
+						label: 'file.zip'
+					};
+					setFiles([file]);
 
-				setContainerDescription(__('Your file is ready to download. Click the button below to start the download.'));
-			})
-			.catch(() => {
-				setContainerDescription(__('An error occurred while preparing your file. Please try again later.'));
-			});
+					setContainerDescription(__('Your file is ready to download. Click the button below to start the download.'));
+				})
+				.catch(() => {
+					setContainerDescription(__('An error occurred while preparing your file. Please try again later.'));
+				});
+			} else if(climateVariable.getInteractiveMode() === 'station') {
+				// For station variables
+
+				// TODO: set StationDownloadUrlsProps
+				// TODO: replace with correct data
+				const stationDownloadUrlsProps: StationDownloadUrlsProps = {} as StationDownloadUrlsProps;
+				if(climateVariable.getId() === 'msc_climate_normals') {
+					stationDownloadUrlsProps.stationIds = ['7113534', '8502800'];
+					stationDownloadUrlsProps.fileFormat = 'csv';
+				} else if(climateVariable.getId() === 'daily_ahccd_temperature_and_precipitation') {
+					stationDownloadUrlsProps.stationIds = ['7093GJ5', '7115800'];
+					stationDownloadUrlsProps.fileFormat = 'csv';
+				}
+				else if(climateVariable.getId() === 'future_building_design_value_summaries') {
+					stationDownloadUrlsProps.stationName = 'Happy Valley-Goose Bay, NL';
+				}
+				else if(climateVariable.getId() === 'short_duration_rainfall_idf_data') {
+					stationDownloadUrlsProps.stationId = '8501132';
+				}
+				else if(climateVariable.getId() === 'station_data') {
+					stationDownloadUrlsProps.stationIds = ['54058', '6093'];
+					stationDownloadUrlsProps.fileFormat = 'csv';
+					stationDownloadUrlsProps.dateRange = {start: '1840-03-01', end: '2025-05-06'};
+				}
+
+				climateVariable.getStationDownloadFiles(stationDownloadUrlsProps)
+					.then((downloadFiles) => {
+						if(downloadFiles.length > 1) {
+							setContainerDescription(__('Your files are ready to download. Click the buttons below to start the download.'));
+						} else if(downloadFiles.length > 0) {
+							setContainerDescription(__('Your file is ready to download. Click the button below to start the download.'));
+						} else {
+							setContainerDescription(__('An error occurred while preparing your files. Please try again later.'));
+						}
+
+						setFiles(downloadFiles);
+					})
+					.catch(() => {
+						setContainerDescription(__('An error occurred while preparing your files. Please try again later.'));
+					});
+			}
 		} else {
 			// Analyzed climate variable
 			setContainerTitle(__('Sent request'));
@@ -50,26 +94,16 @@ const StepResult = React.forwardRef(() => {
 		}
 	}, [climateVariable, __]);
 
-	// Cleanup fileUrl when the component unmounts
+	// Cleanup files when the component unmounts
 	useEffect(() => {
 		return () => {
-			if (fileUrl !== null) {
-				URL.revokeObjectURL(fileUrl);
-			}
+			files.forEach((file) => {
+				if (file.url) {
+					URL.revokeObjectURL(file.url);
+				}
+			});
 		};
-	}, [fileUrl]);
-
-	// Handle the download click event
-	const handleDownloadClick = () => {
-	if (fileUrl) {
-	  setDownloaded(true);
-		
-	  setTimeout(() => {
-			URL.revokeObjectURL(fileUrl);
-			setFileUrl(null);
-	  }, 1000); // Delay revoking the URL to allow the download to start
-	}
-  };
+	}, [files]);
 
 	return (
 		<StepContainer title={containerTitle ?? ''} isLastStep>
@@ -78,24 +112,28 @@ const StepResult = React.forwardRef(() => {
 			</StepContainerDescription>
 
 			<div className="step-result">
-				{fileUrl && (
-					<p className="mt-4">
-						<a href={fileUrl} 
-							download="file.zip" 
-							onClick={handleDownloadClick}
-							className={cn(
-								'inline-block w-64 mx-auto sm:mx-0 py-2 rounded-full uppercase text-white tracking-wider',
-								'text-center bg-brand-red hover:bg-brand-red/75'
-							)}
-						>
-							{__('Download file')} &rarr;
-						</a>
-					</p>
+				{files.length > 0 && (
+					<div className="mt-4">
+						{files.map((file, index) => (
+							<p key={index} className="mb-2">
+								<a
+									href={file.url}
+									download={file.label}
+									className={cn(
+										'text-lg font-semibold text-brand-blue underline ',
+									)}
+									target="_blank"
+								>
+									{__('Download')} {file.label}
+								</a>
+							</p>
+						))}
+					</div>
 				)}
 
-				{downloaded && (
-					<p className="mt-4 text-green-500">
-						{__('File downloaded successfully!')}
+				{climateVariable?.getId() === 'msc_climate_normals' && (
+					<p>
+						{__('Additional Climate Normals variables are available from the')} <a href="https://climate-change.canada.ca/climate-data/#/climate-normals" target="_blank" className='text-dark-purple'>{__('Canadian Centre for Climate Services')}</a> {__('and the')} <a href="https://climate.weather.gc.ca/climate_normals/index_e.html" target="_blank" className='text-dark-purple'>{__('Government of Canada Historical Climate Data')}</a> {__('websites.')}
 					</p>
 				)}
 			</div>

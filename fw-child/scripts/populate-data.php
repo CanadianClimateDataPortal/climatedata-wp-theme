@@ -27,7 +27,7 @@ if ( ! is_user_logged_in() || ! current_user_can( 'administrator' ) ) {
 $var_id_post_id_mapping = array(
 	"Daily AHCCD Temperature and Precipitation"                               => array(
 		12392,
-		"",
+		"daily_ahccd_temperature_and_precipitation",
 		false,
 		true,
 		array( "Adjusted and Homogenized Canadian Climate Data (AHCCD)" )
@@ -174,7 +174,7 @@ $var_id_post_id_mapping = array(
 	),
 	"Future Building Design Value Summaries"                          => array(
 		13621,
-		"",
+		"future_building_design_value_summaries",
 		false,
 		true,
 		array( "Future Building Design Values" )
@@ -314,7 +314,7 @@ $var_id_post_id_mapping = array(
 	),
 	"MSC Climate Normals 1981-2010"                                   => array(
 		575,
-		"",
+		"msc_climate_normals",
 		true,
 		true,
 		array( "Climate Normals" )
@@ -335,7 +335,7 @@ $var_id_post_id_mapping = array(
 	),
 	"Short-duration Rainfall IDF Data"                                => array(
 		538,
-		"",
+		"short_duration_rainfall_idf_data",
 		false,
 		true,
 		array( "IDF Rainfall Data" )
@@ -356,7 +356,7 @@ $var_id_post_id_mapping = array(
 	),
 	"Station Data"                                                    => array(
 		12394,
-		"",
+		"station_data",
 		false,
 		true,
 		array( "Station Observations" )

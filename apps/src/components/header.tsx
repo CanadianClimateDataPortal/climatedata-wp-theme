@@ -6,7 +6,7 @@ export default function Header(): JSX.Element {
 	const { __ } = useI18n();
 
 	return (
-		<header className="flex items-center justify-between px-4 py-1.5">
+		<header id="header" className="flex items-center justify-between px-4 py-1.5">
 			<div className="flex items-center">
 				<img src={Logo} alt={__('Climate Data')} />
 				<h2 className="py-2 px-4 text-zinc-900 text-base font-light leading-tight">

@@ -133,3 +133,67 @@ export const getCommonPrefix = (strings: string[]) => {
 	}
 	return prefix;
 }
+
+/**
+ * Generates a hash code from a string using a basic bitwise algorithm.
+ *
+ * Note: This is a non-cryptographic hash function and should not be used for security purposes.
+ *
+ * @param {string} s - The input string to hash.
+ * @returns {number} The resulting hash code.
+ */
+export const hashCode = (s: string)=> {
+	return s.split('').reduce(function (a: number, b: string) {
+		a = (a << 5) - a + b.charCodeAt(0);
+		return a & a;
+	}, 0);
+}
+
+/**
+ * Encodes a URL with a salt using base64 and URL encoding.
+ *
+ * The URL is combined with a hash generated from the URL and salt,
+ * then base64-encoded and URL-encoded to ensure safe transmission.
+ *
+ * @param {string} url - The URL to encode.
+ * @param {string} salt - The salt used for hash generation.
+ * @returns {{ encoded: string, hash: number }} An object containing the encoded URL and its hash.
+ */
+export const encodeURL = (url: string, salt: string) => {
+	const hash = hashCode(url + salt);
+	const encoded = encodeURIComponent(btoa(`${url}|${hash}`));
+	return { encoded, hash };
+};
+
+/**
+ * Modify the DOM to prepare the "Explore Maps" page for a screenshot.
+ *
+ * This function is designed to be executed by an external script (e.g. via Selenium)
+ * before taking a screenshot. It removes certain UI elements and applies a specific
+ * class to the map container to render the map in a cleaner, full-screen layout.
+ *
+ * Note: This function does not revert changes. A full page reload is required to restore the original UI.
+ */
+export function prepareRaster(): void {
+	// Simulate a click on the legend toggle button
+	const legendToggle = document.getElementById('legend-toggle');
+	if (legendToggle instanceof HTMLElement) {
+		legendToggle.click();
+	}
+	// Remove elements that should not appear in the screenshot
+	['map-sidebar', 'header', 'sidebar-toggle', 'header-map', 'map-search-control', 'map-zoom-control'].forEach(id => {
+		const el = document.getElementById(id);
+		if (el) {
+			el.remove();
+		}
+	});
+
+	// Remove all tooltip elements
+	document.querySelectorAll('.tooltip').forEach(el => el.remove());
+
+	// Add 'to-raster' class to the map container to adjust its appearance for raster output
+	const mapObjects = document.getElementById('map-objects');
+	if (mapObjects) {
+		mapObjects.classList.add('to-raster');
+	}
+}

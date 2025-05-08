@@ -288,6 +288,7 @@ export const getSeriesObject = (
 						fillOpacity: 0.5,
 						lineWidth: 0,
 						zIndex: 0,
+						linkedTo: ':previous',
 						visible: true,
 					} as SeriesArearangeOptions,
 					{
@@ -385,6 +386,7 @@ export const getSeriesObject = (
 						fillOpacity: 0.3,
 						lineWidth: 0,
 						zIndex: 0,
+						linkedTo: ':previous',
 						visible: true,
 					} as SeriesArearangeOptions,
 					{

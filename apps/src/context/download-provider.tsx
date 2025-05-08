@@ -7,6 +7,7 @@
  * - Step validation state
  * - Dynamic step registration
  * - Data reset when navigating backwards
+ * - URL synchronization with application state
  *
  * Each step component must implement the StepComponentRef interface which includes:
  * - isValid(): boolean - Determines if the step's data is valid
@@ -44,6 +45,7 @@ import { StepComponentRef } from '@/types/download-form-interface';
 import { updateClimateVariable } from '@/store/climate-variable-slice';
 import { STEPS } from '@/components/download/config';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { useDownloadUrlSync } from '@/hooks/use-download-url-sync';
 
 interface DownloadContextValue {
 	steps: typeof STEPS;
@@ -65,6 +67,9 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	const [currentStep, setCurrentStep] = useState<number>(1);
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const dispatch = useAppDispatch();
+
+	// Use the URL sync hook to handle URL synchronization
+	useDownloadUrlSync();
 
 	/** Map of step numbers to their component refs */
 	const stepRefs = useRef(new Map<number, StepComponentRef>());

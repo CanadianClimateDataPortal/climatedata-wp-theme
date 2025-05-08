@@ -69,6 +69,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         jq \
         less \
         nginx \
+        postfix \
         supervisor \
         unzip \
         vim \
@@ -141,6 +142,11 @@ COPY --chmod=644 dockerfiles/build/www/configs/nginx/site-extra/* /etc/nginx/con
 
 RUN rm /etc/nginx/sites-enabled/default \
     && ln -s ../sites-available/climatedata-site.conf /etc/nginx/sites-enabled/climatedata-site.conf
+
+# Postfix
+
+COPY --chmod=644 dockerfiles/build/www/configs/postfix/main.cf /etc/postfix/main.cf
+COPY --chmod=644 dockerfiles/build/www/configs/postfix/resolv.conf /var/spool/postfix/etc/resolv.conf
 
 # ---
 # Wordpress

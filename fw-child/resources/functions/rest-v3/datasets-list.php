@@ -51,9 +51,19 @@ function cdc_rest_v3_get_datasets_list( $request ) {
 		// Exclude 'ahccd' dataset type if 'map' app is requested.
 		if ( ! empty( $app ) && 'map' === $app ) {
 			$meta_query = array(
+				'relation' => 'AND',
 				array(
 					'key'     => 'dataset_type',
 					'value'   => 'ahccd',
+					'compare' => '!=',
+				),
+				array(
+					'key'     => 'dataset_type',
+					'compare' => 'EXISTS',
+				),
+				array(
+					'key'     => 'dataset_type',
+					'value'   => '',
 					'compare' => '!=',
 				),
 			);

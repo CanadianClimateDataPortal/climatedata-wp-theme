@@ -7,6 +7,7 @@ import { ClimateVariableConfigInterface, InteractiveRegionOption } from '@/types
 import { fetchTaxonomyData, fetchPostsData } from '@/services/services';
 import { initializeUrlSync, setUrlParamsLoaded } from '@/features/url-sync/url-sync-slice';
 import { normalizePostData } from '@/lib/format';
+import { store } from '@/app/store';
 
 /**
  * Synchronizes state with URL params from climate variable state
@@ -193,6 +194,15 @@ export const useUrlSync = () => {
 		const newConfig: Partial<ClimateVariableConfigInterface> = {
 			...matchedVariable,
 		};
+
+		// Find the matching post data from the variable list if available
+		const variableList = store.getState().map.variableList;
+		const matchingPostData = variableList.find(post => post.id === matchedVariable.id);
+		
+		if (matchingPostData) {
+			newConfig.postId = matchingPostData.postId;
+			newConfig.title = matchingPostData.title;
+		}
 
 		if (params.has('ver'))
 			newConfig.version = params.get('ver') || undefined;
@@ -444,6 +454,15 @@ export const useUrlSync = () => {
 				// Then process variable and its parameters
 				const varId = params.get('var');
 				if (varId && selectedDataset) {
+					// Fetch variables for this dataset to ensure we have variable data in state
+					try {
+						const variables = await fetchPostsData('variables', 'map', selectedDataset, {});
+						const normalizedVariables = await normalizePostData(variables, 'en');
+						dispatch(setVariableList(normalizedVariables));
+					} catch (error) {
+						console.error('Error fetching variables for URL dataset:', error);
+					}
+
 					const matchedVariable = ClimateVariables.find(
 						(config) => config.id === varId
 					);

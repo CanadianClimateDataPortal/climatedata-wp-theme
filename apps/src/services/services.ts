@@ -390,6 +390,21 @@ export const generateChartData = async (options: ChartDataOptions) => {
 };
 
 /**
+ * Generates chart data from the API
+ *
+ * @param options Options to pass to the API
+ */
+export const fetchMSCClimateNormalsChartData = async (stationId: string, normalId: number) => {
+	const response = await fetch(`https://api.weather.gc.ca/collections/climate-normals/items?f=json&STN_ID=${stationId}&NORMAL_ID=${normalId}&sortby=MONTH`);
+
+	if (!response.ok) {
+		throw new Error('Failed to fetch data');
+	}
+
+	return await response.json();
+};
+
+/**
  * Fetches delta values from the API, used to give data to a map cell tooltip.
  *
  * @param options Options to pass to the API

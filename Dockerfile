@@ -70,6 +70,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         less \
         nginx \
         postfix \
+        rsyslog \
         supervisor \
         unzip \
         vim \
@@ -147,6 +148,8 @@ RUN rm /etc/nginx/sites-enabled/default \
 
 COPY --chmod=644 dockerfiles/build/www/configs/postfix/main.cf /etc/postfix/main.cf
 COPY --chmod=644 dockerfiles/build/www/configs/postfix/resolv.conf /var/spool/postfix/etc/resolv.conf
+
+COPY --chmod=644 dockerfiles/build/www/configs/postfix/rsyslog.conf /etc/rsyslog.conf
 
 # ---
 # Wordpress

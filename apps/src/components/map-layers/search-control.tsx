@@ -185,8 +185,9 @@ export default function SearchControl({
 				void _; // intentionally ignore to suppress typescript error
 				return `<div>${buildLocationTitle(item)}</div>`;
 			},
-			locationNotFound: async function() {	//button and tooltip click and enter submit
+			locationNotFound: async function() {
 				const latLng = isLatLong(this._input.value);
+				// If the coordinates are valid, move to that location.
 				if (latLng.lat && latLng.lng) {
 					const locationByCoords = await fetchLocationByCoords(latLng);
 					this.showLocation(locationByCoords, locationByCoords.geo_id);

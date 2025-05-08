@@ -32,8 +32,8 @@ const SelectableRectangleGridLayer = forwardRef<{
 	const { climateVariable, setSelectedRegion, resetSelectedRegion } = useClimateVariable();
 	const dispatch = useAppDispatch();
 
-	const gridResolutions = useMemo(
-		() => ({
+	const gridResolutions = useMemo<Record<string, number>>(
+			() => ({
 			canadagrid: 0.08333333333333333,
 			canadagrid1deg: 1,
 			slrgrid: 0.1,
@@ -49,7 +49,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 
 	const updateCellCount = useCallback(
 		(layer: L.Layer) => {
-			const varGrid = 'canadagrid';
+			const varGrid = climateVariable?.getGridType() ?? 'canadagrid';
 			const geojson = (layer as L.Polygon).toGeoJSON() as GeoJSON.Feature;
 
 			// these coordinates are an array of linear rings.. the first element at

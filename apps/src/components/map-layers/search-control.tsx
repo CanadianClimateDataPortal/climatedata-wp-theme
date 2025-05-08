@@ -16,7 +16,8 @@ import mapPinIcon from '@/assets/map-pin.svg';
 
 import { useAppDispatch } from '@/app/hooks';
 import { addRecentLocation } from '@/features/map/map-slice';
-import { cn } from '@/lib/utils';
+import { cn, isLatLong } from '@/lib/utils';
+import { fetchLocationByCoords } from '@/services/services';
 import {
 	SearchControlLocationItem,
 	SearchControlResponse,
@@ -184,6 +185,16 @@ export default function SearchControl({
 				void _; // intentionally ignore to suppress typescript error
 				return `<div>${buildLocationTitle(item)}</div>`;
 			},
+			locationNotFound: async function() {	//button and tooltip click and enter submit
+				const latLng = isLatLong(this._input.value);
+				if (latLng.lat && latLng.lng) {
+					const locationByCoords = await fetchLocationByCoords(latLng);
+					this.showLocation(locationByCoords, locationByCoords.geo_id);
+				}
+				else {
+					this.showAlert();
+				}
+			},
 			marker: L.marker([0, 0], {
 				icon: L.icon({
 					iconUrl: mapPinIcon, // Custom marker icon
@@ -196,6 +207,7 @@ export default function SearchControl({
 				void _; // intentionally ignore to suppress typescript error
 				handleLocationChange(title, latlng);
 			},
+
 		});
 
 		map.addControl(searchControl);

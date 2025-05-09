@@ -25,7 +25,7 @@ import {
 	SEARCH_PLACEHOLDER,
 	SEARCH_DEFAULT_ZOOM,
 	LOCATION_SEARCH_ENDPOINT,
-} from '@/lib/constants.ts';
+} from '@/lib/constants';
 
 /**
  * SearchControl Component

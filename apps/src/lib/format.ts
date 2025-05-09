@@ -8,6 +8,7 @@ import {
 	TermItem,
 } from '@/types/types';
 import { ColorMap } from '@/types/climate-variable-interface';
+import React from 'react';
 
 export async function transformLegendData(
 	input: WMSLegendData,
@@ -35,8 +36,8 @@ export async function transformLegendData(
  * @param options - The options to normalize
  */
 export function normalizeOptions(
-	options: Array<string | number | { label: string; value: string }>
-): { label: string; value: string }[] {
+	options: Array<string | number | { label: string | React.ReactNode; value: string }>
+): { label: React.ReactNode; value: string }[] {
 	return options.map((item) => {
 		if (typeof item === 'string' || typeof item === 'number') {
 			// convert strings and numbers to { label, value } objects, all string for type safety

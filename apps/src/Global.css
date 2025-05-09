@@ -184,8 +184,12 @@
 }
 
 /* replace search icon image with an svg icon */
-.leaflet-container .leaflet-control-search .search-button::before {
+.leaflet-container .leaflet-control-search .search-button {
+	display:none;
+}
+.leaflet-container .leaflet-control-search::after {
 	content: "";
+	margin-left: 10px;
 	display: block;
 	width: 16px;
 	height: 16px;

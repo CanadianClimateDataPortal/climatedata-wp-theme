@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 import { StepContainer, StepContainerDescription, } from '@/components/download/step-container';
@@ -6,28 +6,34 @@ import { RadioGroupFactory } from '@/components/ui/radio-group';
 import { ControlTitle } from '@/components/ui/control-title';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
 
 import { cn, isValidEmail } from '@/lib/utils';
 import { DownloadType, FileFormatType } from "@/types/climate-variable-interface";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setEmail, setSubscribe } from '@/features/download/download-slice';
+import { setEmail, setSubscribe, setCaptchaCode, setCaptchaVerified } from '@/features/download/download-slice';
 import { StepComponentRef } from "@/types/download-form-interface";
 import Dropdown from "@/components/ui/dropdown.tsx";
 import { normalizeDropdownOptions } from "@/lib/format.ts";
+import { verifyCaptcha, getCaptchaImageUrl } from '@/services/captcha';
 
 /**
  * Send download request step
  */
 const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
-	const [captchaValue, setCaptchaValue] = useState<string>('');
 	const { __ } = useI18n();
 	const { climateVariable, setFileFormat, setDecimalPlace } = useClimateVariable();
 
-	const { email, subscribe } = useAppSelector(
+	const { email, subscribe, captchaCode, captchaVerified } = useAppSelector(
 		(state) => state.download
 	);
 	const dispatch = useAppDispatch();
+	
+	const [captchaError, setCaptchaError] = useState<string>('');
+	const [captchaUrl, setCaptchaUrl] = useState<string>(
+		getCaptchaImageUrl()
+	);
 
 	// get the download type
 	const downloadType = climateVariable?.getDownloadType();
@@ -42,6 +48,8 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 			const validations = [
 				// File format is always required
 				Boolean(fileFormat),
+				// Captcha is always required
+				Boolean(captchaVerified),
 			];
 
 			// For analyzed downloads, add email validation
@@ -55,13 +63,15 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 			return validations.every(Boolean);
 		},
 		getResetPayload: () => {
-			// reset the email and subscribe state from the download slice
+			// reset the email, subscribe, and captcha state from the download slice
 			dispatch(setEmail(''));
 			dispatch(setSubscribe(false));
+			dispatch(setCaptchaCode(''));
+			dispatch(setCaptchaVerified(false));
 
 			return {};
 		}
-	}), [climateVariable, email]);
+	}), [climateVariable, email, captchaVerified]);
 
 
 	const formatOptions = [
@@ -92,6 +102,41 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 			setDecimalPlace(0);
 		}
 	}, [fileFormat, decimalPlace, setDecimalPlace]);
+	
+	const refreshCaptcha = useCallback(() => {
+		dispatch(setCaptchaVerified(false));
+		dispatch(setCaptchaCode(''));
+		setCaptchaError('');
+		// Add a timestamp to force browser to reload image
+		setCaptchaUrl(`${getCaptchaImageUrl()}&t=${new Date().getTime()}`);
+	}, [dispatch]);
+	
+	useEffect(() => {
+		refreshCaptcha();
+	}, [refreshCaptcha]);
+	
+	const handleVerifyCaptcha = useCallback(async () => {
+		if (!captchaCode) {
+			setCaptchaError(__('Please enter the code shown in the image'));
+			return;
+		}
+		
+		try {
+			const result = await verifyCaptcha(captchaCode);
+			if (result.success) {
+				dispatch(setCaptchaVerified(true));
+				setCaptchaError('');
+			} else {
+				dispatch(setCaptchaVerified(false));
+				setCaptchaError(__('The code you entered is incorrect'));
+				refreshCaptcha();
+			}
+		} catch (error) {
+			dispatch(setCaptchaVerified(false));
+			setCaptchaError(__('Failed to verify code. Please try again.'));
+			refreshCaptcha();
+		}
+	}, [captchaCode, dispatch, __, refreshCaptcha]);
 
 	return (
 		<StepContainer title={__('Select file parameters')} isLastStep>
@@ -177,26 +222,56 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 				</div>
 			}
 
-			{/* TODO: make this look good at least */}
 			<div className="mb-4">
+				<ControlTitle title={__('Security Verification')} className="mb-2" />
 				<p className="text-sm text-neutral-grey-medium leading-5 mb-2">
 					{__('Enter the characters shown:')}
 				</p>
-				<div className="flex items-center space-x-3">
+				<div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3 sm:items-center">
 					{/* Captcha display */}
-					<div className="w-20 h-10 bg-gray-200 flex items-center justify-center text-lg font-bold text-gray-600">
-						h5qj
+					<div className="relative">
+						<img 
+							src={captchaUrl}
+							alt="Captcha"
+							className="h-12 border border-gray-300 rounded"
+						/>
+						<button 
+							type="button"
+							className="absolute -right-2 -top-2 bg-white rounded-full p-1 shadow-sm border border-gray-200"
+							onClick={refreshCaptcha}
+							title={__('Refresh captcha')}
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+								<path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+							</svg>
+						</button>
 					</div>
-					{/* Captcha input */}
-					<input
-						type="text"
-						placeholder="XXXX"
-						value={captchaValue}
-						onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-							setCaptchaValue(e.target.value)
-						}
-						className="border bg-white border-gray-300 rounded px-2 py-1 text-sm placeholder:text-neutral-grey-medium"
-					/>
+					<div className="flex flex-col space-y-2 flex-grow">
+						<div className="flex space-x-2">
+							{/* Captcha input */}
+							<Input
+								type="text"
+								placeholder="XXXX"
+								value={captchaCode}
+								disabled={captchaVerified}
+								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+									dispatch(setCaptchaCode(e.target.value))
+								}
+								className={`flex-grow ${captchaError ? 'border-red-500' : ''}`}
+							/>
+							<Button 
+								type="button"
+								onClick={handleVerifyCaptcha}
+								disabled={!captchaCode || captchaVerified}
+								variant={captchaVerified ? "default" : "secondary"}
+							>
+								{captchaVerified ? __('Verified') : __('Verify')}
+							</Button>
+						</div>
+						{captchaError && (
+							<p className="text-red-500 text-xs">{captchaError}</p>
+						)}
+					</div>
 				</div>
 			</div>
 		</StepContainer>

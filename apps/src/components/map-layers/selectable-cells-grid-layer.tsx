@@ -9,14 +9,15 @@ import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, GEOSERVER_BASE_URL } from '@/lib/const
 import { MapFeatureProps } from '@/types/types';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { getFeatureId } from '@/hooks/use-interactive-map-events';
-import { FileFormatType, FrequencyType } from '@/types/climate-variable-interface';
 
 /**
  * Component that allows to select cells on the map and tally the number of cells selected
  */
 const SelectableCellsGridLayer = forwardRef<{
 	clearSelection: () => void;
-}>((_, ref) => {
+}, {
+	maxCellsAllowed?: number;
+}>(({ maxCellsAllowed = 1000 }, ref) => {
 	const map = useMap();
 	const { climateVariable, addSelectedPoints, removeSelectedPoint, resetSelectedPoints } = useClimateVariable();
 	const dispatch = useAppDispatch();
@@ -65,29 +66,6 @@ const SelectableCellsGridLayer = forwardRef<{
 	const selectedGridIds = useMemo(() => {
 		return Object.keys(climateVariable?.getSelectedPoints() ?? {}).map(Number);
 	}, [climateVariable])
-
-	// TODO: this needs to be moved up in the component tree because it's affected
-	//  by variables from the next step (Frecuency and File Format), currently out of scope
-	const maxCellsAllowed = useMemo(() => {
-		const freq = climateVariable?.getFrequency();
-		const format = climateVariable?.getFileFormat();
-
-		if (freq === FrequencyType.ALL_MONTHS) {
-			return 80;
-		}
-
-		if (freq === FrequencyType.DAILY) {
-			if (format === FileFormatType.NetCDF) {
-				return 200;
-			}
-
-			if (format === FileFormatType.CSV) {
-				return 20;
-			}
-		}
-
-		return 1000;
-	},[climateVariable]);
 
 	/**********************************************
 	 * update styles of selected cells

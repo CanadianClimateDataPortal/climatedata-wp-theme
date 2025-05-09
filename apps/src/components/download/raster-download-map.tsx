@@ -114,8 +114,8 @@ export default function RasterDownloadMap(): React.ReactElement {
 
 		if (region === InteractiveRegionOption.GRIDDED_DATA) {
 			return selectionMode === 'cells'
-				? <SelectableCellsGridLayer ref={interactiveLayerRef} />
-				: <SelectableRectangleGridLayer ref={interactiveLayerRef} />;
+				? <SelectableCellsGridLayer ref={interactiveLayerRef} maxCellsAllowed={1000} />
+				: <SelectableRectangleGridLayer ref={interactiveLayerRef} maxCellsAllowed={1000} />;
 		}
 
 		return <SelectableRegionLayer ref={interactiveLayerRef} />;

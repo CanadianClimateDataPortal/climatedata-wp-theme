@@ -31,7 +31,8 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	const { __ } = useI18n();
 	const { locale } = useLocale();
 	const { climateVariable } = useClimateVariable();
-	const decimals = 1;
+	const unit = climateVariable?.getUnit();
+	const decimals = climateVariable?.getUnitDecimalPlaces() ?? 0;
 	const dateRange = useMemo(() => {
 		return climateVariable?.getDateRange() ?? ["2041", "2070"];
 	}, [climateVariable]);
@@ -108,7 +109,10 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 				variable: varName,
 				frequency: frequency,
 				dataset: version,
+				unit: climateVariable?.getUnit() ?? '',
+				unitDecimals: decimals
 			});
+
 
 			const deltaValueKey = 'delta7100_' + scenario + '_median';
 
@@ -146,8 +150,6 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	// Value formatter (for delta, for units)
 	const valueFormatter = (value: number, delta: boolean = (climateVariable?.getDataValue() === 'delta')) => {
 		let str = '';
-
-		const unit = climateVariable?.getUnit();
 
 		switch (unit) {
 			case 'doy':

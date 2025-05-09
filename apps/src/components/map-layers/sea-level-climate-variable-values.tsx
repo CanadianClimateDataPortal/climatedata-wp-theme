@@ -26,7 +26,7 @@ const SeaLevelClimateVariableValues: React.FC<SeaLeavelClimateVariableValuesProp
 }) => {
 	const { __ } = useI18n();
 	const { climateVariable } = useClimateVariable();
-	const decimals = 0;
+	const decimals = climateVariable?.getUnitDecimalPlaces() ?? 0;
 	const dateRange = useMemo(() => {
 		return climateVariable?.getDateRange() ?? ["2040", "2050"];
 	}, [climateVariable]);
@@ -68,7 +68,7 @@ const SeaLevelClimateVariableValues: React.FC<SeaLeavelClimateVariableValuesProp
 				setNoDataAvailable(true);
 			} else {
 				const [scenarioName, percentile] = scenario.split('-');
-	
+
 				if(scenarioName && percentile) {
 					setMedian(medianData[scenarioName]?.[percentile] || 0);
 					setNoDataAvailable(false);

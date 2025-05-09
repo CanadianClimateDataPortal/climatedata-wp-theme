@@ -98,6 +98,8 @@ function fw_add_custom_rewrites () {
 	global $wp_rewrite;
 	
 	add_rewrite_tag ( '%lang%', '([^&]+)' );
+
+	add_rewrite_rule( fw_post_type_slug( 'post', 'fr' ) . '/(.+)', 'index.php?lang=fr&path_fr=$matches[1]', 'top' );
 	
 	$all_langs = get_option ( 'fw_langs' );
 	
@@ -587,15 +589,22 @@ function translate_path ( $post_id, $lang ) {
 	if ( gettype ( $post_id ) == 'object' ) {
 		$post_id = $post_id->ID;
 	}
-	
-	if ( 
-		(
-			get_post_type ( $post_id ) != 'post' &&
-			get_post_type ( $post_id ) != 'page'
-		) && 
-		in_array ( get_post_type ( $post_id ), array_keys ( get_post_types () ) )
+
+	$post_type = get_post_type ( $post_id );
+
+	if (
+		$post_type != 'page'
+		&& in_array( $post_type, array_keys( get_post_types() ) )
 	) {
-		$path[] = get_post_type ( $post_id );
+		$post_type_slug = $post_type;
+
+		if ( fw_get_rewrite_method() === 'domain' ) {
+			$post_type_slug = fw_post_type_slug( $post_type, $lang );
+		} elseif ( $post_type == 'post' && $lang === 'en' ) {
+			$post_type_slug = fw_get_news_slug();
+		}
+
+		$path[] = $post_type_slug;
 	}
 	
 	// parents
@@ -650,28 +659,7 @@ function translate_permalink ( $url, $post_id, $lang ) {
 				$new_URL .= $lang . '/';
 			}
 			
-			if ( $post_obj->post_type == 'post' ) {
-				
-				$post_path = explode ( '/', untrailingslashit ( $url ) );
-				
-				$splice_index = 4;
-				
-				if (
-					$GLOBALS['fw']['current_lang_code'] == 'en' ||
-					!str_contains ( $url, '/' . $GLOBALS['fw']['current_lang_code'] . '/' )
-				) {
-					$splice_index = 3;
-				}
-					
-				array_pop ( $post_path );
-				
-				// dumpit ( $post_path );
-				
-				$post_path = implode ( '/',  array_splice ( $post_path, $splice_index ) );
-				
-				$new_URL .= $post_path . '/' . $new_slug;
-				
-			} elseif ( $post_obj->post_type != 'page' ) {
+			if ( $post_obj->post_type != 'page' ) {
 				
 				$new_URL .= implode ( '/', translate_path ( $post_id, $lang ) );
 				
@@ -704,36 +692,10 @@ function translate_permalink ( $url, $post_id, $lang ) {
 				$new_URL = $_SERVER['REQUEST_SCHEME'] . '://' . $all_langs[$lang]['domain'] . '/';
 				
 			}
-			
-			if ( $post_obj->post_type == 'post' ) {
 				
-				// split the URL into parts
-				$post_path = explode ( '/', untrailingslashit ( $url ) );
+			if ( (int) $post_id != (int) get_option ( 'page_on_front' ) ) {
 				
-				// drop the last empty value
-				array_pop ( $post_path );
-				
-				// grab everything after the domain and implode
-				$post_path = implode ( '/',  array_splice ( $post_path, 3 ) );
-				
-				// if there's anything left, that's the permalink structure
-				// add it to the URL 
-				if ( $post_path != '' ) {
-					$new_URL .= $post_path . '/';
-				}
-		
-				// now add the post slug
-				$new_URL .= $new_slug;
-				
-			} else {
-				
-				if ( (int) $post_id != (int) get_option ( 'page_on_front' ) ) {
-					
-					$new_URL .= implode ( '/', translate_path ( $post_id, $lang ) );
-					
-				}
-				
-				// echo '5b. ' . $new_URL;
+				$new_URL .= implode ( '/', translate_path ( $post_id, $lang ) );
 				
 			}
 			
@@ -823,3 +785,63 @@ function translate_post_title ( $title, $id ) {
 	
 }
 
+/**
+ * Return the default slug for the "Post" (i.e. "News") post type.
+ * 
+ * This function is needed only for the "Post" post type since it's treated a
+ * little bit differently than the other custom post types by WordPress.
+ * 
+ * @return string
+ */
+function fw_get_news_slug() {
+	return 'news';
+}
+
+/**
+ * When registering the "Post" (i.e. "News") post type, set its rewrite slug.
+ */
+add_filter(
+	'register_post_type_args',
+	
+	/**
+	 * Set the rewrite slug for the "Post" (i.e. "News") post type.
+	 *
+	 * @param array $args The arguments for the post type.
+	 * @param string $post_type The post type being registered.
+	 * @return array The modified arguments.
+	 */
+	function( $args, $post_type ) {
+		if ( $post_type !== 'post' ) {
+			return $args;
+		}
+
+		$args[ 'rewrite' ] = [
+			'slug' => fw_get_news_slug(),
+			'with_front' => true,
+		];
+
+		return $args;
+	},
+	
+	10, 2
+);
+
+/**
+ * When generating a link to a "Post" (i.e. "News"), add the slug.
+ */
+add_filter(
+	'pre_post_link',
+	
+	/**
+	 * Set the permalink structure for the "post" post type.
+	 */
+	function( $permalink, $post ) {
+		if ( $post->post_type !== 'post' ) {
+			return $permalink;
+		}
+
+		return '/' . fw_get_news_slug() . '/%postname%/';
+	},
+	
+	10, 2
+);

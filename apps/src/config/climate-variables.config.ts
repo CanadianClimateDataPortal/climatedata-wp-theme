@@ -177,6 +177,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "cumulative_degree_days_above_0",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "gddgrow_0",
+		unit: 'Days',
 		temporalThresholdConfig: {
 			thresholds: {
 				gddgrow_0: {
@@ -222,6 +223,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "periods_more_5_consecutive_dry_days",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "nr_cdd",
+		unit: 'Events',
 		temporalThresholdConfig: {
 			thresholds: {
 				nr_cdd: {
@@ -244,10 +246,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "ice_days",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "ice_days",
+		unit: 'Days',
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
-		unit: "days",
 		temporalThresholdConfig: {
 			thresholds: {
 				ice_days: {
@@ -289,7 +291,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
-		unit: "days",
+		unit: 'Days',
 		temporalThresholdConfig: {
 			thresholds: {
 				frost_days: {
@@ -310,7 +312,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
-		unit: "days",
+		unit: 'Days',
 		temporalThresholdConfig: {
 			thresholds: {
 				frost_free_season: {
@@ -328,6 +330,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "growing_degree_days_5",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "gddgrow_5",
+		unit: 'Degree days',
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
@@ -372,7 +375,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
-		unit: "days",
+		unit: 'Days',
 		temporalThresholdConfig: {
 			thresholds: {
 				cdd: {
@@ -479,7 +482,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
-		unit: "days",
+		unit: 'Days',
 		temporalThresholdConfig: {
 			thresholds: {
 				HXmax30: {
@@ -553,6 +556,8 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "hddheat_18",
 		layerStyles: "CDC:building_climate_zones",
+		unit: 'Degree Days',
+		unitLegend: 'Zone',
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
@@ -766,7 +771,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "cold_spell_days",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
-		unit: "days",
+		unit: 'Days',
 		analysisFields: [
 			{
 				key: "window",
@@ -799,6 +804,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "cooling_degree_days",
 		class: "RasterAnalyzeClimateVariable",
 		threshold: "cddcold_18",
+		unit: "Degree Days",
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.DOWNLOAD,
@@ -850,7 +856,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			],
 		},
 		gridType: "era5landgrid",
-		unit: "days",
+		unit: 'Days',
 		analysisFields: [
 			{
 				key: "thresh",
@@ -912,7 +918,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
 		],
-		unit: "days",
+		unit: 'Days',
 		temporalThresholdConfig: {
 			thresholds: {
 				txgt_25: {
@@ -983,7 +989,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "days_above_tmax_and_tmin",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
-		unit: "days",
+		unit: 'Days',
 		analysisFields: [
 			{
 				key: "thresh_tasmin",
@@ -1046,7 +1052,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
 		],
-		unit: "days",
+		unit: 'Days',
 		temporalThresholdConfig: {
 			thresholds: {
 				'tnlt_-15': {
@@ -1184,7 +1190,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
 		],
-		unit: "days",
+		unit: 'Days',
 		temporalThresholdConfig: {
 			thresholds: {
 				'dlyfrzthw_tx0_tn-1': {
@@ -1202,6 +1208,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "heat_wave_frequency",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
+		unit: "events",
 		analysisFields: [
 			{
 				key: "thresh_tasmin",
@@ -1248,7 +1255,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "heat_wave_index",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
-		unit: "days",
+		unit: 'Days',
 		analysisFields: [
 			{
 				key: "window",
@@ -1282,7 +1289,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "heat_wave_total_duration",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
-		unit: "days",
+		unit: 'Days',
 		analysisFields: [
 			{
 				key: "thresh_tasmax",
@@ -1360,7 +1367,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "maximum_consecutive_dry_days",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
-		unit: "days",
+		unit: 'Days',
 		analysisFields: [
 			{
 				key: "thresh",
@@ -1382,7 +1389,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "maximum_consecutive_wet_days",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
-		unit: "days",
+		unit: 'Days',
 		analysisFields: [
 			{
 				key: "thresh",
@@ -1421,7 +1428,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
 		],
-		unit: "days",
+		unit: 'Days',
 		temporalThresholdConfig: {
 			thresholds: {
 				tr_18: {
@@ -1521,7 +1528,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.ALL_YEARS,
 			AveragingType.THIRTY_YEARS,
 		],
-		unit: "days",
+		unit: 'Days',
 		temporalThresholdConfig: {
 			thresholds: {
 				r1mm: {
@@ -1607,6 +1614,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			FileFormatType.CSV,
 			FileFormatType.GeoJSON,
 		],
+		unit: "°C",
 	},
 	/** Daily AHCCD Temperature and Precipitation */
 	{

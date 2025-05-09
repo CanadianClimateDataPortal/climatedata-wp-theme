@@ -82,11 +82,12 @@ const MapLegendControl: React.FC<{
 			{isOpen && (
 				<div className="flex flex-col items-end gap-1 bg-white border border-cold-grey-3 rounded-md py-2 px-1 overflow-y-auto">
 					{/* Custom scheme variables like "building_climate_zones" won't show a unit */}
-					{!hasCustomScheme && (
+					{/* @TODO: Shall we totally remove hasCustomScheme logic? */}
+					{/*{!hasCustomScheme && (*/}
 						<div className="font-sans text-zinc-900 font-semibold text-lg leading-5">
 							{unit}
 						</div>
-					)}
+					{/*)}*/}
 
 					<svg ref={svgRef} height={LEGEND_HEIGHT} className="w-full">
 						{isBlocksGradient ? (

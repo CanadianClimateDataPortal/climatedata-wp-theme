@@ -58,7 +58,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	const { __ } = useI18n();
 	const { locale } = useLocale();
 	const { climateVariable } = useClimateVariable();
-	const decimals = 1;
+	const decimals = climateVariable?.getUnitDecimalPlaces() ?? 0;
 	const { dataset } = useAppSelector((state) => state.map);
 	const chartRef = useRef<HighchartsReact.RefObject>(null);
 	const climateVariableId = climateVariable?.getId();

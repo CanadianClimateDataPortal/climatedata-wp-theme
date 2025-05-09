@@ -3,6 +3,8 @@ import {
 	useRef,
 	useMemo,
 	useCallback,
+	forwardRef,
+	useImperativeHandle,
 } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -21,7 +23,7 @@ import { useClimateVariable } from '@/hooks/use-climate-variable';
 /**
  * Component that allows to select a region on the map from the census layer
  */
-const SelectableRegionLayer = (() => {
+const SelectableRegionLayer = forwardRef<{ clearSelection: () => void }, {}>((_, ref) => {
 	const map = useMap();
 	const { climateVariable, setSelectedPoints, removeSelectedPoint } = useClimateVariable();
 	const dispatch = useAppDispatch();
@@ -225,6 +227,19 @@ const SelectableRegionLayer = (() => {
 		};
 	}, [map, tileLayerStyles, tileLayerUrl]);
 
+	// expose the clear selection method to the parent component
+	useImperativeHandle(
+		ref,
+		() => ({
+			clearSelection() {
+				selectedIds.forEach((featureId) => {
+					layerRef.current?.resetFeatureStyle(featureId);
+				});
+				setSelectedPoints({});
+			},
+		}),
+		[selectedIds, setSelectedPoints]
+	);
 
 	return null;
 });

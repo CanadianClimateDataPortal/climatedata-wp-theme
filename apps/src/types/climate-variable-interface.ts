@@ -145,6 +145,7 @@ export interface CustomColourSchemes {
 export interface Coordinates {
 	lat: number;
 	lng: number;
+	name?: string;
 }
 
 export interface GridCoordinates {

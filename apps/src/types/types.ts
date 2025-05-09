@@ -202,6 +202,8 @@ export interface DownloadState {
 	email: string;
 	subscribe: boolean;
 	variableListLoading: boolean;
+	captchaCode: string;
+	captchaVerified: boolean;
 }
 
 /**

@@ -21,6 +21,8 @@ export const initialState: DownloadState = {
 	email: '',
 	subscribe: false,
 	variableListLoading: false,
+	captchaCode: '',
+	captchaVerified: false,
 };
 
 // Create the slice
@@ -55,6 +57,12 @@ const downloadSlice = createSlice({
 		setVariableListLoading(state, action: PayloadAction<boolean>) {
 			state.variableListLoading = action.payload;
 		},
+		setCaptchaCode(state, action: PayloadAction<string>) {
+			state.captchaCode = action.payload;
+		},
+		setCaptchaVerified(state, action: PayloadAction<boolean>) {
+			state.captchaVerified = action.payload;
+		},
 	},
 });
 
@@ -69,6 +77,8 @@ export const {
 	setEmail,
 	setSubscribe,
 	setVariableListLoading,
+	setCaptchaCode,
+	setCaptchaVerified,
 } = downloadSlice.actions;
 
 // Export reducer

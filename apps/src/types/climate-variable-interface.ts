@@ -221,6 +221,9 @@ export interface ClimateVariableConfigInterface {
 	/** Unit */
 	unit?: string;
 
+	/** Unit legend */
+	unitLegend?: string;
+
 	/** InteractiveMode */
 	interactiveMode?: InteractiveMode;
 
@@ -362,6 +365,8 @@ export interface ClimateVariableInterface {
 	getLayerStyles(): string;
 
 	getUnit(): string;
+
+	getUnitLegend(): string;
 
 	getInteractiveMode(): InteractiveMode;
 

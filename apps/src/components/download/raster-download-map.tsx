@@ -15,12 +15,14 @@ import InteractiveRegionSelect from '@/components/interactive-region-select';
 import SelectableCellsGridLayer from '@/components/map-layers/selectable-cells-grid-layer';
 import SelectableRectangleGridLayer from '@/components/map-layers/selectable-rectangle-grid-layer';
 import SelectableRegionLayer from '@/components/map-layers/selectable-region-layer';
-import InteractiveStationsLayer from '@/components/map-layers/interactive-stations-layer';
 import { useI18n } from '@wordpress/react-i18n';
 import { useMap } from '@/hooks/use-map';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
-import { DownloadType, InteractiveRegionOption } from '@/types/climate-variable-interface';
+import {
+	DownloadType,
+	InteractiveRegionOption
+} from '@/types/climate-variable-interface';
 
 export default function RasterDownloadMap(): React.ReactElement {
 	const { __, _n } = useI18n();
@@ -40,18 +42,14 @@ export default function RasterDownloadMap(): React.ReactElement {
 		interactiveLayerRef.current?.clearSelection();
 	};
 
+	// TODO: there should be a better way of choosing which interactive layer to show, depending on variable config
 	const renderInteractiveLayer = useCallback(() => {
-		const mode = climateVariable?.getInteractiveMode();
 		const region = climateVariable?.getInteractiveRegion();
-
-		if (mode === 'station') {
-			return <InteractiveStationsLayer ref={interactiveLayerRef} selectable />;
-		}
 
 		if (region === InteractiveRegionOption.GRIDDED_DATA) {
 			return selectionMode === 'cells'
-				? <SelectableCellsGridLayer ref={interactiveLayerRef} />
-				: <SelectableRectangleGridLayer ref={interactiveLayerRef} />;
+				? <SelectableCellsGridLayer ref={interactiveLayerRef} maxCellsAllowed={1000} />
+				: <SelectableRectangleGridLayer ref={interactiveLayerRef} maxCellsAllowed={1000} />;
 		}
 
 		return <SelectableRegionLayer />;

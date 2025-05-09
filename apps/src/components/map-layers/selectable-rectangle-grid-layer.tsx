@@ -25,7 +25,9 @@ import { useClimateVariable } from '@/hooks/use-climate-variable';
  */
 const SelectableRectangleGridLayer = forwardRef<{
 	clearSelection: () => void;
-}>((_, ref) => {
+}, {
+	maxCellsAllowed?: number;
+}>(({ maxCellsAllowed = 1000 }, ref) => {
 	const map = useMap();
 	const layerGroupRef = useRef<L.LayerGroup>(new L.LayerGroup());
 
@@ -47,7 +49,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 		dispatch(setCenter([map.getCenter().lat, map.getCenter().lng]));
 	}, [map, dispatch]);
 
-	const updateCellCount = useCallback(
+	const getSelectedShapeData = useCallback(
 		(layer: L.Layer) => {
 			const varGrid = climateVariable?.getGridType() ?? 'canadagrid';
 			const geojson = (layer as L.Polygon).toGeoJSON() as GeoJSON.Feature;
@@ -67,43 +69,58 @@ const SelectableRectangleGridLayer = forwardRef<{
 			const latDiff = maxLat - minLat;
 			const lngDiff = maxLng - minLng;
 			const area = latDiff * lngDiff;
-			const totalCells = Math.round(area / gridResolutions[varGrid] ** 2);
 
-			setSelectedRegion({
-				bounds: [
-					[minLat, minLng],
-					[maxLat, maxLng]
-				],
-				cellCount: totalCells
-			});
+			return {
+				cellCount: Math.round(area / gridResolutions[varGrid] ** 2),
+				bounds: [[minLat, minLng], [maxLat, maxLng]] as L.LatLngBoundsLiteral,
+			};
 		},
 		[gridResolutions, dispatch]
 	);
 
 	const onCreate = useCallback(
 		(e: L.LeafletEvent & { layer: L.Layer }) => {
+			const layer = e.layer;
+			const { bounds, cellCount } = getSelectedShapeData(layer);
+
+			if (cellCount > maxCellsAllowed) {
+				map.removeLayer(layer);
+				map.pm.enableDraw('Rectangle');
+				return;
+			}
+
 			// clear previous shapes
 			layerGroupRef.current.clearLayers();
-			layerGroupRef.current.addLayer(e.layer);
+			layerGroupRef.current.addLayer(layer);
 
-			// calculate initial cell count
-			updateCellCount(e.layer);
+			setSelectedRegion({ bounds, cellCount });
 
 			// enable resizing
-			e.layer.pm.enable();
+			layer.pm.enable();
 
 			// disable drawing mode
 			map.pm.disableDraw('Rectangle');
 
-			// listen for rectangle edits to recalculate
-			e.layer.on(
-				'pm:edit',
-				(editEvent: L.LeafletEvent & { layer: L.Layer }) => {
-					updateCellCount(editEvent.target as L.Layer);
+			// store last valid bounds
+			let lastValidBounds = L.latLngBounds(bounds as L.LatLngTuple[]);
+
+			const handleEdit = (editEvent: L.LeafletEvent & { layer: L.Layer }) => {
+				const editedLayer = editEvent.target as L.Rectangle;
+				const { bounds: newBounds, cellCount } = getSelectedShapeData(editedLayer);
+
+				if (cellCount < maxCellsAllowed) {
+					setSelectedRegion({ bounds: newBounds, cellCount });
+					lastValidBounds = L.latLngBounds(newBounds as L.LatLngTuple[]);
+				} else {
+					editedLayer.setBounds(lastValidBounds);
+					editedLayer.pm.disable();
+					editedLayer.pm.enable();
 				}
-			);
+			};
+
+			layer.on('pm:edit', handleEdit);
 		},
-		[map, updateCellCount]
+		[map, getSelectedShapeData, setSelectedRegion]
 	);
 
 	// draw a rectangle if there are selected cells when the component mounts

@@ -42,11 +42,13 @@ export default function RasterDownloadMap(): React.ReactElement {
 
 	const renderInteractiveLayer = useCallback(() => {
 		const mode = climateVariable?.getInteractiveMode();
-		const region = climateVariable?.getInteractiveRegion();
+		const datasetType = climateVariable?.getDatasetType();
 
-		if (mode === 'station') {
+		if (mode === 'station' || datasetType === 'ahccd') {
 			return <InteractiveStationsLayer ref={interactiveLayerRef} selectable />;
 		}
+
+		const region = climateVariable?.getInteractiveRegion();
 
 		if (region === InteractiveRegionOption.GRIDDED_DATA) {
 			return selectionMode === 'cells'

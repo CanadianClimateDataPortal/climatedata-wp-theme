@@ -132,6 +132,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "tx_max",
 		unit: "°C",
+		unitDecimalPlaces: 1,
 		temporalThresholdConfig: {
 			thresholds: {
 				tx_max: {
@@ -155,6 +156,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "tn_min",
 		unit: "°C",
+		unitDecimalPlaces: 1,
 		temporalThresholdConfig: {
 			thresholds: {
 				tn_min: {
@@ -431,6 +433,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
 		unit: "°C",
+		unitDecimalPlaces: 1,
 		temporalThresholdConfig: {
 			thresholds: {
 				tg_mean: {
@@ -603,6 +606,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 		unit: "°C",
+		unitDecimalPlaces: 1,
 		temporalThresholdConfig: {
 			thresholds: {
 				tx_mean: {
@@ -638,6 +642,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.DAILY]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 		unit: "°C",
+		unitDecimalPlaces: 1,
 		temporalThresholdConfig: {
 			thresholds: {
 				tn_mean: {
@@ -666,6 +671,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "spei_12m",
 		versions: [ "cmip5" ],
+		unitDecimalPlaces: 3,
 		frequencyConfig: {
 			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
@@ -688,6 +694,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "spei_3m",
 		versions: [ "cmip5" ],
+		unitDecimalPlaces: 3,
 		frequencyConfig: {
 			[FrequencyType.ALL_MONTHS]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
@@ -1603,6 +1610,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		threshold: "climate-normals",
 		hasDelta: false,
 		enableColourOptions: false,
+		unitDecimalPlaces: 1,
 		fileFormatTypes: [
 			FileFormatType.CSV,
 			FileFormatType.GeoJSON,
@@ -1628,6 +1636,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "StationClimateVariable",
 		threshold: "idf",
 		hasDelta: false,
+		unitDecimalPlaces: 1,
 	},
 	/** Station Data */
 	{

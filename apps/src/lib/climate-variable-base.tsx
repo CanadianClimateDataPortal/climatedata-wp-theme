@@ -131,6 +131,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.unit ?? '';
 	}
 
+	getUnitDecimalPlaces(): number {
+		return this._config.unitDecimalPlaces ?? 0;
+	}
+
 	getInteractiveMode(): InteractiveMode {
 		return this._config.interactiveMode ?? 'region';
 	}

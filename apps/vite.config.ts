@@ -62,13 +62,5 @@ export default defineConfig({
                 path.resolve(__dirname, '../fw-child/resources/fonts') // allow access to the fonts folder
             ]
         },
-        proxy: {
-            // Proxy for the ClimateData API, this is used to avoid CORS issues when developing locally but it might be worth keeping it
-            '/fileserver': {
-                target: 'https://data.climatedata.ca',
-                changeOrigin: true,
-                secure: false,
-            },
-        },
     }
 })

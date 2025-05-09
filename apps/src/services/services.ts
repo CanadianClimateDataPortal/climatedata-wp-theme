@@ -14,6 +14,8 @@ import L from 'leaflet';
 
 import {  WP_API_DOMAIN, WP_API_LOCATION_BY_COORDS_PATH, WP_API_VARIABLE_PATH  } from '@/lib/constants';
 
+import ahccdData from '@/assets/dummy/ahccd.json';
+
 // Cache for API responses to avoid duplicate requests
 const apiCache = new Map<string, any>();
 
@@ -468,25 +470,31 @@ export const fetchChoroValues = async (options: ChoroValuesOptions) => {
  */
 export const fetchStationsList = async ({ type }: { type?: string }) => {
 	try {
-		let url: string;
+		let data: any;
+
+		const fetchJson = async (url: string) => {
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+				},
+			});
+			if (!response.ok) {
+				throw new Error(`Failed to fetch stations list: ${response.statusText}`);
+			}
+			return response.json();
+		};
 
 		if (type && type === 'ahccd') {
-			url = '/fileserver/ahccd/ahccd.json';
-		} else {
-			url = 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y';
-		}
+			// TEMPORARY: Using local dummy JSON due to CORS issue
+			data = ahccdData;
 
-		const response = await fetch(url, {
-			method: 'GET',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-		});
-		if (!response.ok) {
-			throw new Error(`Failed to fetch stations list: ${response.statusText}`);
+			// TO ENABLE WHEN CORS IS FIXED:
+			// data = await fetchJson('https://data.climatedata.ca/fileserver/ahccd/ahccd.json');
+		} else {
+			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y');
 		}
-		const data = await response.json();
 
 		return (data.features || []).map((feature: any) => ({
 			id: feature.properties?.STN_ID ?? feature.properties?.ID,

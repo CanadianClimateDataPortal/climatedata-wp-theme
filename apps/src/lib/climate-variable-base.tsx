@@ -20,6 +20,7 @@ import {
 	TemporalThresholdConfig,
 	ThresholdInterface,
 	DownloadFile,
+	FrequencyType,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
 import RasterDownloadMap from "@/components/download/raster-download-map";
@@ -303,7 +304,28 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getAnalysisUrl(): string | null {
-		return this._config.analysisUrl ?? null;
+		let analysisUrl = '/providers/finch/processes/';
+
+		// If frequency is daily, it turns into analyze
+		if (this.getFrequency() === FrequencyType.DAILY) {
+			analysisUrl += 'subset_grid_point_dataset';
+		} else {
+			// If projection
+			if (this.getDatasetType() === 'projection') {
+				analysisUrl += 'ensemble_grid_point_';
+			} 
+
+			// Add climate variable finch
+			analysisUrl += this.getFinch();
+		}
+
+		analysisUrl += '/jobs';
+
+		return analysisUrl;
+	}
+
+	getFinch(): string {
+		return this._config.finch ?? this.getId();
 	}
 
 	getSelectedPoints(): GridCoordinates | null {

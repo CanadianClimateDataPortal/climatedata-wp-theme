@@ -9,6 +9,7 @@ import SelectableCellsGridLayer from '@/components/map-layers/selectable-cells-g
 import SelectableRectangleGridLayer from '@/components/map-layers/selectable-rectangle-grid-layer';
 import SelectableRegionLayer from '@/components/map-layers/selectable-region-layer';
 import InteractiveStationsLayer from '@/components/map-layers/interactive-stations-layer';
+import InteractiveRegionSelect from '@/components/interactive-region-select';
 import TagSelector from '@/components/ui/tag-selector';
 import StationTypeFilter from '@/components/download/ui/station-type-filter';
 import SelectionModeControls from '@/components/download/ui/selection-mode-controls';
@@ -117,7 +118,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 				: <SelectableRectangleGridLayer ref={interactiveLayerRef} />;
 		}
 
-		return <SelectableRegionLayer />;
+		return <SelectableRegionLayer ref={interactiveLayerRef} />;
 	}, [climateVariable, selectionMode, stationTypes]);
 
 	const selectionModeOptions = useMemo(() => {
@@ -140,6 +141,12 @@ export default function RasterDownloadMap(): React.ReactElement {
 
 	return (
 		<>
+			{climateVariable?.getDownloadType() === DownloadType.ANALYZED && (
+				<div className="mb-8 sm:w-64">
+					<InteractiveRegionSelect />
+				</div>
+			)}
+
 			{showStationTypesFilter && (
 				<StationTypeFilter
 					stationTypes={stationTypes}

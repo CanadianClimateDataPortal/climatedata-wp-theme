@@ -105,11 +105,20 @@ export default function SearchControl({
 			navigator.geolocation.getCurrentPosition(
 				(position) => {
 					const { latitude, longitude } = position.coords;
-
+					const title = __('Your current location');
 					handleLocationChange(
-						__('Your current location'),
+						title,
 						L.latLng(latitude, longitude)
 					);
+					L.marker([latitude, longitude], {
+						title: title,
+						icon: L.icon({
+							iconUrl: mapPinIcon, // Custom marker icon
+							iconSize: [25, 41], // Size of the icon
+							iconAnchor: [12, 41], // Anchor of the icon
+							popupAnchor: [0, -41], // Popup position relative to the icon
+						}),
+					}).addTo(map);
 
 					setIsGeolocationEnabled(true);
 					setIsTracking(false);
@@ -229,7 +238,7 @@ export default function SearchControl({
 			if (value.startsWith(' ')) value = value.slice(1);
 			// If two trailing spaces are present, remove one.
 			if (value.endsWith('  ') && value.length > 1) value = value.slice(0, -1);
-
+			value = value.replace(/  +/g, '');
 			// Count the characters without spaces
 			if (value.replace(/ /g, '').length >= 2) {
 				searchControl.searchText(value);

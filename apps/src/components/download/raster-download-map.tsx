@@ -60,7 +60,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 	const showStationTypesFilter = climateVariable?.getDatasetType() === 'ahccd';
 	const showStationsListSelector = climateVariable?.getDatasetType() === 'ahccd' || climateVariable?.getInteractiveMode() === 'station'; // TODO: is it ok to also show this for other station maps?
 	const showSelectionModeControls = climateVariable?.getDatasetType() !== 'ahccd' && climateVariable?.getInteractiveMode() !== 'station';
-	const showSelectedCellsSummary = showSelectionModeControls && selectedCells > 0;
+	const showInteractiveRegionsSelector = climateVariable?.getDownloadType() === DownloadType.ANALYZED && !showStationsListSelector;
 
 	const stationOptions = stations.map(station => ({ value: String(station.id), label: station.name }))
 	.sort((a, b) => a.label.localeCompare(b.label));
@@ -141,7 +141,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 
 	return (
 		<>
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED && (
+			{showInteractiveRegionsSelector && (
 				<div className="mb-8 sm:w-64">
 					<InteractiveRegionSelect />
 				</div>
@@ -176,14 +176,13 @@ export default function RasterDownloadMap(): React.ReactElement {
 							}}
 						/>
 						<div className="flex flex-row items-start gap-4">
-							{showSelectedCellsSummary && (
-								<SelectedCellsSummary
-									selectedCells={selectedCells}
-									onClear={clearSelection}
-									__={__}
-									_n={_n}
-								/>
-							)}
+							<SelectedCellsSummary
+								selectedCells={selectedCells}
+								onClear={clearSelection}
+								showClearButton={selectedCells > 0}
+								__={__}
+								_n={_n}
+							/>
 						</div>
 					</div>
 				</div>

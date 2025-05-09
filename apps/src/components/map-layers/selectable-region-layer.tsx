@@ -23,7 +23,7 @@ import { useClimateVariable } from '@/hooks/use-climate-variable';
 /**
  * Component that allows to select a region on the map from the census layer
  */
-const SelectableRegionLayer = forwardRef<{ clearSelection: () => void }, {}>((props, ref) => {
+const SelectableRegionLayer = forwardRef<{ clearSelection: () => void }, {}>((_, ref) => {
 	const map = useMap();
 	const { climateVariable, setSelectedPoints, removeSelectedPoint } = useClimateVariable();
 	const dispatch = useAppDispatch();

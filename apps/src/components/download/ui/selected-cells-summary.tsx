@@ -14,19 +14,22 @@ export interface SelectedCellsSummaryProps {
   onClear: () => void;
   __: (msg: string) => string;
   _n: (singular: string, plural: string, count: number) => string;
+  showClearButton?: boolean;
 }
 
-const SelectedCellsSummary: React.FC<SelectedCellsSummaryProps> = ({ selectedCells, onClear, __, _n }) => {
+const SelectedCellsSummary: React.FC<SelectedCellsSummaryProps> = ({ selectedCells, onClear, __, _n, showClearButton }) => {
   return (
     <>
-      <Button
-        variant="ghost"
-        className="text-xs text-brand-red font-semibold leading-4 tracking-wider uppercase h-auto p-0"
-        onClick={onClear}
-      >
-        <RefreshCw size={16} />
-        {__("Clear")}
-      </Button>
+      {showClearButton && (
+        <Button
+          variant="ghost"
+          className="text-xs text-brand-red font-semibold leading-4 tracking-wider uppercase h-auto p-0"
+          onClick={onClear}
+        >
+          <RefreshCw size={16} />
+          {__("Clear")}
+        </Button>
+      )}
       <div>
         <ControlTitle
           title={__("You selected:")}

@@ -9,42 +9,33 @@ import {
 	InteractiveRegionOption,
 } from "@/types/climate-variable-interface";
 import { generateColourScheme } from "@/lib/colour-scheme";
+import {VariableLayerProps, WMSParams} from '@/types/types';
+ 
 
 /**
  * Variable layer Component
  *
- * @description
- * This component will be used to display the variable main layer on the map.
+ * This component displays the variable main layer on the map.
+ * It works with both standard and sea level visualization approaches.
  *
+ * @param {Object} props
+ * @param {string} props.layerValue - The WMS layer ID to render
  * @returns {null}
  */
 
-interface WMSParams {
-	format: string;
-	transparent: boolean;
-	tiled: boolean;
-	version: string;
-	layers: string;
-	styles: string | undefined;
-	TIME?: string;
-	opacity: number;
-	pane: string;
-	bounds: L.LatLngBounds;
-	sld_body?: string;
-}
-
-interface VariableLayerProps {
-	layerValue: string;
-}
-
-export default function VariableLayer({ layerValue }: VariableLayerProps): null {
+export default function VariableLayer({ 
+	layerValue
+}: VariableLayerProps): null {
 	const map = useMap();
 	const {
-		pane,
 		opacity: { mapData },
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
+
+	// Always use 'raster' pane - this works for both standard and sea level modes
+	// as each mode creates a 'raster' pane with the appropriate z-index
+	const pane = 'raster';
 
 	const {
 		startYear,
@@ -84,7 +75,7 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			<StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"
 			xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd">
-			<NamedLayer><Name>${layerValue}</Name><UserStyle><IsDefault>1</IsDefault><FeatureTypeStyle><Rule><RasterSymbolizer>
+			<NamedLayer><n>${layerValue}</n><UserStyle><IsDefault>1</IsDefault><FeatureTypeStyle><Rule><RasterSymbolizer>
 			<Opacity>1.0</Opacity><ColorMap type="${colourMapType}">`;
 
 		for (let i = 0; i < colours.length; i++) {
@@ -119,6 +110,7 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			pane: pane,
 			bounds: CANADA_BOUNDS,
 		};
+		
 		if (climateVariable?.getScenario() !== 'rcp85plus65-p50') {
 			params.TIME = parseInt(startYear) + '-01-00T00:00:00Z';
 		}
@@ -145,7 +137,8 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 		layerValue,
 		map,
 		pane,
-		startYear
+		startYear,
+		mapData
 	]);
 
 	useEffect(() => {
@@ -153,5 +146,6 @@ export default function VariableLayer({ layerValue }: VariableLayerProps): null 
 			layerRef.current.setOpacity(mapData);
 		}
 	}, [mapData]);
+	
 	return null;
 }

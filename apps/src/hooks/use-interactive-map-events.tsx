@@ -87,6 +87,13 @@ export const useInteractiveMapEvents = (
 			return;
 		}
 
+		// clear all existing markers from the map
+		map.eachLayer(layer => {
+			if (layer instanceof L.Marker) {
+				map.removeLayer(layer);
+			}
+		});
+
 		// a single marker is allowed at a time
 		if (markerRef.current) {
 			markerRef.current.removeFrom(map);

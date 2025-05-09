@@ -5,7 +5,7 @@ import 'leaflet.vectorgrid';
 
 import { useAppDispatch } from '@/app/hooks';
 import { setCenter, setZoom, } from '@/features/download/download-slice';
-import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM } from '@/lib/constants';
+import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, GEOSERVER_BASE_URL } from '@/lib/constants';
 import { MapFeatureProps } from '@/types/types';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { getFeatureId } from '@/hooks/use-interactive-map-events';
@@ -24,10 +24,8 @@ const SelectableCellsGridLayer = forwardRef<{
 	// @ts-expect-error: suppress leaflet typescript error
 	const gridLayerRef = useRef<L.VectorGrid | null>(null);
 
-	// TODO: this should not be a static value, because it needs to work also in other environments other than prod
-	const geoserverUrl = '//dataclimatedata.crim.ca';
-	const gridName = 'canadagrid';
-	const tileLayerUrl = `${geoserverUrl}/geoserver/gwc/service/tms/1.0.0/CDC:${gridName}@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf`;
+	const gridName = climateVariable?.getGridType() ?? 'canadagrid';
+	const tileLayerUrl = `${GEOSERVER_BASE_URL}/geoserver/gwc/service/tms/1.0.0/CDC:${gridName}@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf`;
 
 	const tileLayerStyles = useMemo(
 		() => ({

@@ -139,7 +139,10 @@ $var_id_post_id_mapping = array(
 		"degree_days_exceedance_date",
 		false,
 		true,
-		array( "Statistically Downscaled Global Climate Projections" )
+		array(
+			"Statistically Downscaled Global Climate Projections",
+			"Adjusted and Homogenized Canadian Climate Data (AHCCD)"
+		)
 	),
 	"First fall frost"                                                => array(
 		4102,
@@ -184,10 +187,7 @@ $var_id_post_id_mapping = array(
 		"growing_degree_days_5",
 		true,
 		true,
-		array(
-			"Statistically Downscaled Global Climate Projections",
-			"Adjusted and Homogenized Canadian Climate Data (AHCCD)"
-		)
+		array( "Statistically Downscaled Global Climate Projections" )
 	),
 	"Heat Wave Frequency"                                             => array(
 		342,

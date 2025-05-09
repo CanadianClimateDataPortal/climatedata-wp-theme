@@ -54,6 +54,7 @@ const DatasetsMenuItem: React.FC = () => {
 				size="md"
 				isActive={isPanelActive(slug)}
 				onClick={handleClick}
+				tooltip={{ panelId: slug }}
 			>
 				<Database size={16} />
 				<span className="grow">{__('Datasets')}</span>
@@ -76,19 +77,17 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 	const { locale } = useLocale();
 	const dispatch = useAppDispatch();
 	const { selectClimateVariable } = useClimateVariable();
-	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
-	const urlSyncState = useAppSelector((state) => state.urlSync);
-	const urlParamsLoadedRef = useRef<boolean>(urlSyncState.isLoaded || !!climateVariableData);
+	const hasSelectedVariable = useAppSelector((state) => !!state.climateVariable.data?.id);
+	const urlParamsLoaded = useAppSelector((state) => state.urlSync.isLoaded);
+	
+	// Tracking refs
 	const initialLoadCompletedRef = useRef<boolean>(false);
+	const isUserSelectedDatasetRef = useRef<boolean>(false);
 
-	// Update urlParamsLoaded ref if climate variable data is detected
-	useEffect(() => {
-		if ((urlSyncState.isLoaded || climateVariableData) && !urlParamsLoadedRef.current) {
-			urlParamsLoadedRef.current = true;
-		}
-	}, [climateVariableData, urlSyncState.isLoaded]);
-
-	const handleDatasetSelect = useCallback(async (dataset: TaxonomyData) => {
+	const handleDatasetSelect = useCallback(async (dataset: TaxonomyData, isUserSelection = true) => {
+		// Mark this as a user selection (not from URL)
+		isUserSelectedDatasetRef.current = isUserSelection;
+		
 		onSelect(dataset);
 		dispatch(setVariableListLoading(true));
 		dispatch(setVariableList([]));
@@ -98,32 +97,68 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 			const data = await fetchPostsData('variables', 'map', dataset, {});
 			const variables = await normalizePostData(data, locale);
 
-		// Store the variables in Redux
+			// Store the variables in Redux
 			dispatch(setVariableList(variables));
-			dispatch(setVariableListLoading(false));
-		// Select the first variable if available
+			
+			// Always select first variable for user selections regardless of URL params
+			// For URL-driven selections, only select if no variable is specified
 			if (variables.length > 0) {
-				selectClimateVariable(variables[0], dataset);
+				if (isUserSelection || (!hasSelectedVariable && urlParamsLoaded)) {
+					selectClimateVariable(variables[0], dataset);
+				}
 			}
 		} catch (error) {
 			console.error('Error fetching variables for dataset:', error);
+		} finally {
 			dispatch(setVariableListLoading(false));
 		}
-	}, [dispatch, onSelect, selectClimateVariable, locale]);
+	}, [dispatch, onSelect, selectClimateVariable, locale, urlParamsLoaded, hasSelectedVariable]);
 
-	// Fetch datasets on component mount instead of panel activation
+	// Fetch datasets on component mount
 	useEffect(() => {
-		// Fetch datasets only once when component mounts
-		(async () => {
-			const fetchedDatasets = await fetchTaxonomyData(slug, 'map');
-			setDatasets(fetchedDatasets);
-
-			if (fetchedDatasets.length > 0 && !selected && !urlParamsLoadedRef.current && !initialLoadCompletedRef.current) {
-				await handleDatasetSelect(fetchedDatasets[0]);
-				initialLoadCompletedRef.current = true;
+		const fetchDatasets = async () => {
+			try {
+				const fetchedDatasets = await fetchTaxonomyData(slug, 'map');
+				setDatasets(fetchedDatasets);
+				
+				// Auto-select first dataset only if:
+				// 1. We have datasets available
+				// 2. No dataset is already selected 
+				// 3. URL params are loaded
+				// 4. Initial load hasn't been completed yet
+				if (
+					fetchedDatasets.length > 0 && 
+					!selected && 
+					urlParamsLoaded && 
+					!initialLoadCompletedRef.current
+				) {
+					initialLoadCompletedRef.current = true;
+					// This is not a user selection - it's automatic
+					await handleDatasetSelect(fetchedDatasets[0], false);
+				}
+			} catch (error) {
+				console.error('Error fetching datasets:', error);
+				setDatasets([]);
 			}
-		})();
-	}, [handleDatasetSelect, selected]);
+		};
+		
+		fetchDatasets();
+	}, [handleDatasetSelect, selected, urlParamsLoaded]);
+
+	// When URL params finish loading, handle any delayed auto-selection
+	useEffect(() => {
+		if (
+			urlParamsLoaded && 
+			selected && 
+			!hasSelectedVariable && 
+			!isUserSelectedDatasetRef.current &&
+			!initialLoadCompletedRef.current
+		) {
+			initialLoadCompletedRef.current = true;
+			// Re-select the dataset to trigger first variable selection (not a user selection)
+			handleDatasetSelect(selected, false);
+		}
+	}, [urlParamsLoaded, selected, hasSelectedVariable, handleDatasetSelect]);
 
 	if (!datasets) {
 		return null;
@@ -154,7 +189,7 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 									item?.card?.description?.[locale] ?? ''
 								}
 								selected={Boolean(selected && item.term_id === selected.term_id)}
-								onSelect={() => handleDatasetSelect(item)}
+								onSelect={() => handleDatasetSelect(item, true)}
 							>
 								{item?.card?.link && (
 									<RadioCardFooter>

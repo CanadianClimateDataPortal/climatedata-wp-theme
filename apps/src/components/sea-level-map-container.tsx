@@ -1,6 +1,6 @@
-import { useContext, useMemo, useState } from 'react';
-import { MapContainer, TileLayer } from 'react-leaflet';
-import { MAP_CONFIG } from '@/config/map.config';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { MapContainer, TileLayer, WMSTileLayer, useMap } from 'react-leaflet';
+import { MAP_CONFIG, LAYER_KEYS } from '@/config/map.config';
 
 import MapLegend from '@/components/map-layers/map-legend';
 import VariableLayer from '@/components/map-layers/variable-layer';
@@ -9,28 +9,48 @@ import ZoomControl from '@/components/map-layers/zoom-control';
 import MapEvents from '@/components/map-layers/map-events';
 import SearchControl from '@/components/map-layers/search-control';
 import InteractiveRegionsLayer from '@/components/map-layers/interactive-regions-layer';
-import InteractiveStationsLayer from '@/components/map-layers/interactive-stations-layer';
 import LocationModal from '@/components/map-layers/location-modal';
 
 import { useAppSelector } from '@/app/hooks';
-import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 import {
 	CANADA_CENTER,
 	DEFAULT_ZOOM,
 	DEFAULT_MIN_ZOOM,
 	DEFAULT_MAX_ZOOM,
 	GEOSERVER_BASE_URL,
-	CANADA_BOUNDS
+	CANADA_BOUNDS,
 } from '@/lib/constants';
-import { cn, getDefaultFrequency, getFrequencyCode } from "@/lib/utils";
-import SectionContext from "@/context/section-provider";
-import { FrequencyType } from "@/types/climate-variable-interface";
-import appConfig from "@/config/app.config";
+import { cn, getDefaultFrequency, getFrequencyCode } from '@/lib/utils';
+import SectionContext from '@/context/section-provider';
+import { FrequencyType } from '@/types/climate-variable-interface';
+import appConfig from '@/config/app.config';
 
 /**
- * Renders a Leaflet map, including custom panes and tile layers.
+ * Applies CSS filters to make green landmass appear white
  */
-export default function RasterMapContainer({
+function LandmassStyler(): null {
+	const map = useMap();
+
+	useEffect(() => {
+		const pane = map.getPane('seaLevelBasemap');
+		if (pane) {
+			pane.style.filter = MAP_CONFIG.landmassFilter;
+		}
+	}, [map]);
+
+	return null;
+}
+
+/**
+ * Renders a Leaflet map for sea-level variables with a specialized approach:
+ * 1. Standard basemap (complete world map) at the bottom
+ * 2. Sea-level raster data layer (ocean data)
+ * 3. Grid layer for interactive regions
+ * 4. Sea-level landmass layer with transparent ocean areas
+ * 5. Labels layer on top
+ */
+export default function SeaLevelMapContainer({
 	scenario,
 	onMapReady,
 	onUnmount,
@@ -62,13 +82,11 @@ export default function RasterMapContainer({
 
 		let frequency = climateVariable?.getFrequency() ?? null;
 
-		// If there's no frequency set, try to get the default value from the config.
 		const frequencyConfig = climateVariable?.getFrequencyConfig() ?? null;
 		if (!frequency && climateVariable && frequencyConfig) {
 			frequency = getDefaultFrequency(frequencyConfig, section) ?? null;
 		}
 
-		// Fallback to annual.
 		if (!frequency) {
 			frequency = FrequencyType.ANNUAL;
 		}
@@ -81,7 +99,7 @@ export default function RasterMapContainer({
 			frequencyCode,
 			scenario,
 		];
-		if(climateVariable?.getId() !== "sea_level") {
+		if (climateVariable?.getId() !== 'sea_level') {
 			valuesArr.push('p50');
 		}
 		valuesArr.push(
@@ -113,7 +131,7 @@ export default function RasterMapContainer({
 			minZoom={DEFAULT_MIN_ZOOM}
 			maxZoom={DEFAULT_MAX_ZOOM}
 			scrollWheelZoom={true}
-			className="z-10" // important to keep the map below other interactive elements
+			className="z-10"
 			bounds={CANADA_BOUNDS}
 		>
 			<MapEvents
@@ -125,10 +143,11 @@ export default function RasterMapContainer({
 				<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
 			)}
 			
-			{/* Use the unified CustomPanesLayer with 'standard' mode */}
-			<CustomPanesLayer mode="standard" />
+			{/* Use the unified custom panes with 'seaLevel' mode */}
+			<CustomPanesLayer mode="seaLevel" />
+			<LandmassStyler />
 			
-			{/* Use the unified VariableLayer */}
+			{/* Use the unified variable layer */}
 			<VariableLayer layerValue={layerValue} />
 			
 			<ZoomControl />
@@ -148,20 +167,26 @@ export default function RasterMapContainer({
 					onLocationModalClose={handleLocationModalClose}
 				/>
 			)}
-			{climateVariable?.getInteractiveMode() === 'station' && (
-				<InteractiveStationsLayer
-					onLocationModalOpen={handleLocationModalOpen}
-					onLocationModalClose={handleLocationModalClose}
-				/>
-			)}
 
-			{/* Basemap TileLayer */}
+			{/* Standard world basemap (bottom layer) */}
 			<TileLayer
 				url={MAP_CONFIG.baseTileUrl}
 				attribution=""
 				subdomains="abcd"
-				pane="basemap"
+				pane="standardBasemap"
 				maxZoom={DEFAULT_MAX_ZOOM}
+			/>
+
+			{/* Sea level landmass layer with transparent oceans */}
+			<WMSTileLayer 
+				url={`${GEOSERVER_BASE_URL}/geoserver/wms`}
+				layers={LAYER_KEYS.landmass}
+				format="image/png"
+				transparent={true}
+				version="1.1.1"
+				pane="seaLevelBasemap"
+				opacity={1.0}
+				bounds={CANADA_BOUNDS}
 			/>
 
 			{/* Labels TileLayer */}

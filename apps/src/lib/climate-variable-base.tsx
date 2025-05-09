@@ -19,6 +19,7 @@ import {
 	ScenariosConfig,
 	TemporalThresholdConfig,
 	ThresholdInterface,
+	DownloadFile,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
 import RasterDownloadMap from "@/components/download/raster-download-map";
@@ -34,6 +35,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	constructor(config: ClimateVariableConfigInterface) {
 		this._config = config;
+	}
+
+	getClass(): string {
+		return this._config.class ?? '';
 	}
 
 	getId(): string {
@@ -291,6 +296,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	async getDownloadUrl(): Promise<string | null> {
 		return this._config.downloadUrl ?? null;
+	}
+
+	getStationDownloadFiles(): Promise<DownloadFile[]> {
+		return Promise.resolve([]);
 	}
 
 	getAnalysisUrl(): string | null {

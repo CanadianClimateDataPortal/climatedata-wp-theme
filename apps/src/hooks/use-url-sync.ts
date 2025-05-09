@@ -1,12 +1,13 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setOpacity, setTimePeriodEnd, setDataset } from '@/features/map/map-slice';
+import { setOpacity, setTimePeriodEnd, setDataset, setVariableList, setVariableListLoading } from '@/features/map/map-slice';
 import { setClimateVariable } from '@/store/climate-variable-slice';
 import { ClimateVariables } from '@/config/climate-variables.config';
 import { ClimateVariableConfigInterface, InteractiveRegionOption } from '@/types/climate-variable-interface';
-import { TaxonomyData } from '@/types/types';
-import { fetchTaxonomyData } from '@/services/services';
+import { fetchTaxonomyData, fetchPostsData } from '@/services/services';
 import { initializeUrlSync, setUrlParamsLoaded } from '@/features/url-sync/url-sync-slice';
+import { normalizePostData } from '@/lib/format';
+import { store } from '@/app/store';
 
 /**
  * Synchronizes state with URL params from climate variable state
@@ -14,6 +15,7 @@ import { initializeUrlSync, setUrlParamsLoaded } from '@/features/url-sync/url-s
  */
 export const useUrlSync = () => {
 	const updateTimeoutRef = useRef<number | null>(null);
+	const urlProcessingCompleteRef = useRef<boolean>(false);
 	const dispatch = useAppDispatch();
 
 	// Get the URL sync state
@@ -130,25 +132,22 @@ export const useUrlSync = () => {
 	const addMapOnlyParamsToUrl = (
 		params: URLSearchParams
 	) => {
+		// Dataset 
+		if (dataset && dataset.term_id) {
+			params.set('dataset', dataset.term_id.toString());
+		}
+		
 		// Opacity
 		if (opacity) {
 			if (opacity.mapData !== undefined) {
-				params.set(
-					'dataOpacity',
-					Math.round(opacity.mapData * 100).toString()
-				);
+				const urlOpacityValue = Math.round(opacity.mapData * 100);
+				params.set('dataOpacity', urlOpacityValue.toString());
 			}
+			
 			if (opacity.labels !== undefined) {
-				params.set(
-					'labelOpacity',
-					Math.round(opacity.labels * 100).toString()
-				);
+				const urlOpacityValue = Math.round(opacity.labels * 100);
+				params.set('labelOpacity', urlOpacityValue.toString());
 			}
-		}
-		
-		// Dataset 
-		if (dataset?.dataset_type) {
-			params.set('dataset', dataset.dataset_type);
 		}
 	};
 	
@@ -195,6 +194,15 @@ export const useUrlSync = () => {
 		const newConfig: Partial<ClimateVariableConfigInterface> = {
 			...matchedVariable,
 		};
+
+		// Find the matching post data from the variable list if available
+		const variableList = store.getState().map.variableList;
+		const matchingPostData = variableList.find(post => post.id === matchedVariable.id);
+		
+		if (matchingPostData) {
+			newConfig.postId = matchingPostData.postId;
+			newConfig.title = matchingPostData.title;
+		}
 
 		if (params.has('ver'))
 			newConfig.version = params.get('ver') || undefined;
@@ -261,12 +269,10 @@ export const useUrlSync = () => {
 	};
 
 	const setMapOpacityFromUrlParams = (params: URLSearchParams) => {
-		const dataOpacity = params.get('dataOpacity');
-		const labelOpacity = params.get('labelOpacity');
-
-		if (dataOpacity || labelOpacity) {
-			if (dataOpacity) {
-				const opacityNum = parseInt(dataOpacity);
+		if (params.has('dataOpacity')) {
+			const dataOpacityStr = params.get('dataOpacity');
+			if (dataOpacityStr) {
+				const opacityNum = parseInt(dataOpacityStr);
 				if (!isNaN(opacityNum)) {
 					dispatch(
 						setOpacity({
@@ -276,9 +282,12 @@ export const useUrlSync = () => {
 					);
 				}
 			}
+		}
 
-			if (labelOpacity) {
-				const opacityNum = parseInt(labelOpacity);
+		if (params.has('labelOpacity')) {
+			const labelOpacityStr = params.get('labelOpacity');
+			if (labelOpacityStr) {
+				const opacityNum = parseInt(labelOpacityStr);
 				if (!isNaN(opacityNum)) {
 					dispatch(
 						setOpacity({
@@ -292,89 +301,194 @@ export const useUrlSync = () => {
 	};
 
 	const setDatasetFromUrlParams = async (params: URLSearchParams) => {
-		const datasetType = params.get('dataset');
-		if (datasetType) {
+		const datasetParam = params.get('dataset');
+		
+		try {
+			// Fetch actual dataset objects
+			const datasets = await fetchTaxonomyData('datasets', 'map');
+
+			if (datasetParam) {
+				const datasetParamNum = parseInt(datasetParam);
+				
+				if (!isNaN(datasetParamNum)) {
+					const matchedDataset = datasets.find(dataset => dataset.term_id === datasetParamNum);
+					
+					if (matchedDataset) {
+						// Set the matched dataset
+						dispatch(setDataset(matchedDataset));
+						return matchedDataset;
+					}
+				}
+			}
+			
+			// If no dataset param or match not found, use the first dataset
+			if (datasets.length > 0) {
+				dispatch(setDataset(datasets[0]));
+				return datasets[0];
+			}
+			
+			return null;
+		} catch (error) {
+			console.error('Error fetching datasets:', error);
+			return null;
+		}
+	};
+
+	// Initialize the app with the first variable from the dataset
+	const initializeWithDefaults = async () => {
+		try {
+			// Get the first dataset
+			const datasets = await fetchTaxonomyData('datasets', 'map');
+			if (!datasets.length) return;
+			
+			const firstDataset = datasets[0];
+			dispatch(setDataset(firstDataset));
+			dispatch(setOpacity({ key: 'mapData', value: 100 }));
+			dispatch(setOpacity({ key: 'labels', value: 100 }));
+			dispatch(setVariableListLoading(true));
+			
 			try {
-				// Fetch actual dataset objects
-				const datasets = await fetchTaxonomyData('datasets', 'map');
+				const variables = await fetchPostsData('variables', 'map', firstDataset, {});
+				const normalizedVariables = await normalizePostData(variables, 'en');
 				
-				// Find dataset with matching type
-				const matchedDataset = datasets.find(
-					(dataset) => dataset.dataset_type === datasetType
-				);
+				dispatch(setVariableList(normalizedVariables));
 				
-				if (matchedDataset) {
-					// Create a complete dataset object
-					dispatch(setDataset(matchedDataset));
-					return matchedDataset;
-				} else {
-					// Fallback to basic dataset object if no match found
-					const basicDataset: TaxonomyData = {
-						term_id: 0,
-						title: { en: datasetType },
-						dataset_type: datasetType
-					};
-					dispatch(setDataset(basicDataset));
-					return basicDataset;
+				if (normalizedVariables.length > 0) {
+					const firstVariable = normalizedVariables[0];
+					
+					// Find matching config by id
+					const matchingConfig = ClimateVariables.find(config => 
+						config.id === firstVariable.id);
+					
+					if (matchingConfig) {
+						// Set climate variable with dataset context
+						const variableWithDataset = {
+							...matchingConfig,
+							datasetType: firstDataset.dataset_type
+						};
+
+						// Set the variable
+						dispatch(setClimateVariable(variableWithDataset));
+						
+						const params = new URLSearchParams();
+						
+						params.set('var', matchingConfig.id);
+						
+						if (matchingConfig.version) {
+							params.set('ver', matchingConfig.version);
+						} else if (matchingConfig.versions?.length) {
+							params.set('ver', matchingConfig.versions[0]);
+						}
+						
+						if (matchingConfig.threshold) {
+							params.set('th', matchingConfig.threshold.toString());
+						}
+						
+						if (matchingConfig.scenario) {
+							params.set('scen', matchingConfig.scenario);
+						} else if (matchingConfig.versions && matchingConfig.versions[0] && matchingConfig.scenarios) {
+							const firstVersion = matchingConfig.versions[0];
+							const scenarios = typeof matchingConfig.scenarios === 'object' ? 
+								matchingConfig.scenarios[firstVersion as keyof typeof matchingConfig.scenarios] : 
+								matchingConfig.scenarios;
+								
+							if (Array.isArray(scenarios) && scenarios.length > 0) {
+								params.set('scen', scenarios[0]);
+							}
+						}
+						
+						if (matchingConfig.interactiveRegion) {
+							params.set('region', matchingConfig.interactiveRegion);
+						}
+						
+						if (matchingConfig.dateRange && matchingConfig.dateRange.length > 0) {
+							params.set('dateRange', matchingConfig.dateRange.join(','));
+						}
+						
+						params.set('dataset', firstDataset.term_id.toString());
+						params.set('dataOpacity', '100');
+						params.set('labelOpacity', '100');
+						
+						const newUrl = `${window.location.pathname}?${params.toString()}`;
+						window.history.replaceState({}, '', newUrl);
+					}
 				}
 			} catch (error) {
-				console.error('Error fetching datasets:', error);
-				// Fallback
-				const basicDataset: TaxonomyData = {
-					term_id: 0,
-					title: { en: datasetType },
-					dataset_type: datasetType
-				};
-				dispatch(setDataset(basicDataset));
-				return basicDataset;
+				console.error('Error fetching variables:', error);
+			} finally {
+				dispatch(setVariableListLoading(false));
 			}
+			
+			// Mark as initialized
+			urlProcessingCompleteRef.current = true;
+			dispatch(setUrlParamsLoaded(true));
+		} catch (error) {
+			console.error('Error initializing with defaults:', error);
+			urlProcessingCompleteRef.current = true;
+			dispatch(setUrlParamsLoaded(true));
 		}
-		return null;
 	};
 
 	useEffect(() => {
-		if (isInitialized) return;
-
+		if (isInitialized || urlProcessingCompleteRef.current) return;
 		const params = new URLSearchParams(window.location.search);
 
-		// If no URL parameters, just mark as initialized and loaded
-		if (params.toString().length === 0) {
-			dispatch(initializeUrlSync());
-			dispatch(setUrlParamsLoaded(false)); // No params to load
+		dispatch(initializeUrlSync());
+
+		// If no URL parameters or only opacity params, initialize with defaults
+		if (params.toString().length === 0 || 
+			(params.has('dataOpacity') && params.has('labelOpacity') && params.size === 2)) {
+			initializeWithDefaults();
 			return;
 		}
 
-		// Start the URL sync process
-		dispatch(initializeUrlSync());
+		// Mark as NOT loaded until processing completes
+		dispatch(setUrlParamsLoaded(false));
 
-		// Process URL parameters in the correct order
+		// Process URL parameters
 		(async () => {
-			// First process dataset 
-			const selectedDataset = await setDatasetFromUrlParams(params);
-			
-			// Then process variable and its parameters
-			const varId = params.get('var');
-			if (varId && selectedDataset) {
-				const matchedVariable = ClimateVariables.find(
-					(config) => config.id === varId
-				);
-				if (matchedVariable) {
-					// Add dataset type to the variable
-					const variableWithDataset = {
-						...matchedVariable,
-						datasetType: selectedDataset.dataset_type
-					};
-					
-					// Process all climate variable parameters
-					setClimateVariableFromUrlParams(params, variableWithDataset);
+			try {
+				// First process dataset
+				const selectedDataset = await setDatasetFromUrlParams(params);
+				
+				// Then process variable and its parameters
+				const varId = params.get('var');
+				if (varId && selectedDataset) {
+					// Fetch variables for this dataset to ensure we have variable data in state
+					try {
+						const variables = await fetchPostsData('variables', 'map', selectedDataset, {});
+						const normalizedVariables = await normalizePostData(variables, 'en');
+						dispatch(setVariableList(normalizedVariables));
+					} catch (error) {
+						console.error('Error fetching variables for URL dataset:', error);
+					}
+
+					const matchedVariable = ClimateVariables.find(
+						(config) => config.id === varId
+					);
+					if (matchedVariable) {
+						// Add dataset type to the variable
+						const variableWithDataset = {
+							...matchedVariable,
+							datasetType: selectedDataset.dataset_type
+						};
+						
+						// Process all climate variable parameters
+						setClimateVariableFromUrlParams(params, variableWithDataset);
+					}
 				}
+				
+				// Process map opacity
+				setMapOpacityFromUrlParams(params);
+				
+				// Mark URL parameters as loaded
+				urlProcessingCompleteRef.current = true;
+				dispatch(setUrlParamsLoaded(true));
+			} catch (error) {
+				console.error('Error processing URL parameters:', error);
+				urlProcessingCompleteRef.current = true;
+				dispatch(setUrlParamsLoaded(true));
 			}
-			
-			// Always process map opacity
-			setMapOpacityFromUrlParams(params);
-			
-			// Mark URL parameters as loaded
-			dispatch(setUrlParamsLoaded(true));
 		})();
 	}, [dispatch, isInitialized]);
 

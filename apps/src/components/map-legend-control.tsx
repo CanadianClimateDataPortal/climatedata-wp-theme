@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useI18n } from '@wordpress/react-i18n';
 
 import { TransformedLegendEntry } from '@/types/types';
+import { ColourType } from '@/types/climate-variable-interface';
 
 const PADDING_TOP = 10;
 const PADDING_BOTTOM = 10;
@@ -20,19 +21,22 @@ const MapLegendControl: React.FC<{
 	isCategorical?: boolean;
 	hasCustomScheme?: boolean;
 	unit?: string;
-}> = ({ data, isOpen, toggleOpen, isCategorical, hasCustomScheme, unit }) => {
+	colourType?: string;
+}> = ({ data, isOpen, toggleOpen, isCategorical, hasCustomScheme, unit, colourType }) => {
 	const [svgWidth, setSvgWidth] = useState(0);
+	const [legendHeight, setLegendHeight] = useState<number | undefined>(undefined);
 	const { __ } = useI18n();
 	const svgRef = useRef<SVGSVGElement>(null);
 
-	// Calculate dynamic height based on number of labels and minimum spacing
-	const totalLabels = isCategorical ? data.length : data.length;
-	const minTotalHeight = (totalLabels - 1) * MIN_LABEL_SPACING + PADDING_TOP + PADDING_BOTTOM;
-	const GRADIENT_HEIGHT = minTotalHeight;
-	const LEGEND_HEIGHT = minTotalHeight;
+	const isBlocksGradient = isCategorical || colourType === ColourType.DISCRETE;
 
-	// For categorical data, we want equal height blocks for each category
-	const ITEM_HEIGHT = GRADIENT_HEIGHT / (isCategorical ? data.length : (data.length - 1));
+	// Calculate dynamic height based on number of labels and minimum spacing
+	const totalLabels = isBlocksGradient ? data.length : data.length;
+	const GRADIENT_HEIGHT = legendHeight !== undefined ? legendHeight : (totalLabels - 1) * MIN_LABEL_SPACING + PADDING_TOP + PADDING_BOTTOM;
+	const LEGEND_HEIGHT = GRADIENT_HEIGHT + (isBlocksGradient ? PADDING_BOTTOM : 0);
+
+	// For categorical/discrete data, we want equal height blocks for each category
+	const ITEM_HEIGHT = GRADIENT_HEIGHT / (isBlocksGradient ? data.length : (data.length - 1));
 
 	// Position gradient box, label and line horizontally
 	const gradientX = svgWidth - GRADIENT_WIDTH;
@@ -44,6 +48,19 @@ const MapLegendControl: React.FC<{
 		if (svgRef.current) {
 			setSvgWidth(svgRef.current.getBoundingClientRect().width);
 		}
+	}, []);
+
+	useEffect(() => {
+		function updateLegendHeight() {
+			if (svgRef.current) {
+				const svgTop = svgRef.current.getBoundingClientRect().y;
+				const available = window.innerHeight - svgTop - PADDING_TOP - 20; // 15px leaflet banner.
+				setLegendHeight(available);
+			}
+		}
+		updateLegendHeight();
+		window.addEventListener('resize', updateLegendHeight);
+		return () => window.removeEventListener('resize', updateLegendHeight);
 	}, []);
 
 	return (
@@ -72,7 +89,7 @@ const MapLegendControl: React.FC<{
 					)}
 
 					<svg ref={svgRef} height={LEGEND_HEIGHT} className="w-full">
-						{isCategorical ? (
+						{isBlocksGradient ? (
 							<g>
 								{data.map((entry, index) => (
 									<rect
@@ -115,8 +132,8 @@ const MapLegendControl: React.FC<{
 
 						{data.map((entry, index) => {
 							const y = PADDING_TOP + index * ITEM_HEIGHT;
-							// For categorical data, center the label in the block
-							const labelY = isCategorical ? y + (ITEM_HEIGHT / 2) : y;
+							// For categorical/discrete data, center the label in the block
+							const labelY = isBlocksGradient ? y + (ITEM_HEIGHT / 2) : y;
 
 							// Custom scheme variables like "building_climate_zones" may have labels that can be parsed but shouldn't
 							//  eg. 7A, 7B, 8 -- so those even if parseable we should keep them as they are

@@ -1,13 +1,13 @@
-import { SeriesLineOptions, SeriesArearangeOptions } from 'highcharts';
+import { SeriesLineOptions, SeriesArearangeOptions, SeriesColumnOptions } from 'highcharts';
 import { ClimateDataProps } from '@/types/types.ts';
 import { useI18n } from '@wordpress/react-i18n';
 
 // Helper to sort an array of tuples by the first element (x-value / timestamp).
 const sortByTimestamp = (
-	seriesData: number[][] | Record<string, number[]> | undefined
+	seriesData: number[][] | Record<string, number[]> | number[] | undefined
 ) => {
 	return Array.isArray(seriesData)
-		? seriesData.slice().sort((a, b) => a[0] - b[0])
+		? seriesData.slice().sort((a, b) => (a as number[])[0] - (b as number[])[0])
 		: [];
 };
 
@@ -59,6 +59,16 @@ export const getChartDataOptions = (
 		color: '#00640c',
 		type: 'arearange',
 	},
+	ssp370_median: {
+		name: __('SSP3-7.0 Median'),
+		color: '#f16f0c',
+		type: 'line',
+	},
+	ssp370_range: {
+		name: __('SSP3-7.0 Range'),
+		color: '#f16f0c',
+		type: 'arearange',
+	},
 	ssp585_median: {
 		name: __('SSP5-8.5 Median'),
 		color: '#ff0000',
@@ -104,6 +114,26 @@ export const getChartDataOptions = (
 		color: '#b97800',
 		type: 'line',
 	},
+	daily_average_temperature: {
+		name: __('Daily Average Temperature'),
+		color: '#000000',
+		type: 'line',
+	},
+	daily_maximum_temperature: {
+		name: __('Daily Maximum Temperature'),
+		color: '#ff0000',
+		type: 'line',
+	},
+	daily_minimum_temperature: {
+		name: __('Daily Minimum Temperature'),
+		color: '#0000ff',
+		type: 'line',
+	},
+	precipitation: {
+		name: __('Precipitation'),
+		color: '#66ff66',
+		type: 'column',
+	},
 });
 
 export const getSeriesObject = (
@@ -111,7 +141,7 @@ export const getSeriesObject = (
 	version: string | undefined | null,
 	climateVariableId: string | undefined,
 	chartDataOptions: ChartDataOptions
-): (SeriesLineOptions | SeriesArearangeOptions)[] => {
+): (SeriesLineOptions | SeriesArearangeOptions | SeriesColumnOptions)[] => {
 	// Sea levels series
 	if (climateVariableId === 'sea_level') {
 		return [
@@ -122,6 +152,8 @@ export const getSeriesObject = (
 				data: sortByTimestamp(data.rcp26_median),
 				color: chartDataOptions['rcp26_median'].color,
 				lineWidth: 2,
+				showInNavigator: true,
+				visible: true,
 			} as SeriesLineOptions,
 			{
 				custom: { key: 'rcp26_range' },
@@ -131,6 +163,8 @@ export const getSeriesObject = (
 				color: chartDataOptions['rcp26_range'].color,
 				fillOpacity: 0.2,
 				lineWidth: 0,
+				linkedTo: ':previous',
+				visible: true,
 			} as SeriesArearangeOptions,
 			{
 				custom: { key: 'rcp45_median' },
@@ -139,6 +173,8 @@ export const getSeriesObject = (
 				data: sortByTimestamp(data.rcp45_median),
 				color: chartDataOptions['rcp45_median'].color,
 				lineWidth: 2,
+				showInNavigator: true,
+				visible: true,
 			} as SeriesLineOptions,
 			{
 				custom: { key: 'rcp45_range' },
@@ -148,6 +184,8 @@ export const getSeriesObject = (
 				color: chartDataOptions['rcp45_range'].color,
 				fillOpacity: 0.2,
 				lineWidth: 0,
+				linkedTo: ':previous',
+				visible: true,
 			} as SeriesArearangeOptions,
 			{
 				custom: { key: 'rcp85_median' },
@@ -156,6 +194,8 @@ export const getSeriesObject = (
 				data: sortByTimestamp(data.rcp85_median),
 				color: chartDataOptions['rcp85_median'].color,
 				lineWidth: 2,
+				showInNavigator: true,
+				visible: true,
 			} as SeriesLineOptions,
 			{
 				custom: { key: 'rcp85_range' },
@@ -165,6 +205,8 @@ export const getSeriesObject = (
 				color: chartDataOptions['rcp85_range'].color,
 				fillOpacity: 0.2,
 				lineWidth: 0,
+				linkedTo: ':previous',
+				visible: true,
 			} as SeriesArearangeOptions,
 			{
 				custom: { key: 'rcp85_enhanced' },
@@ -174,8 +216,44 @@ export const getSeriesObject = (
 				color: chartDataOptions['rcp85_enhanced'].color,
 				fillOpacity: 0.2,
 				lineWidth: 0,
+				visible: true,
 			} as SeriesLineOptions,
 		];
+	} else if(climateVariableId === 'msc_climate_normals') {
+		return [
+			{
+				custom: { key: 'daily_average_temperature' },
+				name: chartDataOptions['daily_average_temperature'].name,
+				type: chartDataOptions['daily_average_temperature'].type,
+				data: sortByTimestamp(data.daily_average_temperature),
+				color: chartDataOptions['daily_average_temperature'].color,
+				lineWidth: 2,
+			} as SeriesLineOptions,
+			{
+				custom: { key: 'daily_maximum_temperature' },
+				name: chartDataOptions['daily_maximum_temperature'].name,
+				type: chartDataOptions['daily_maximum_temperature'].type,
+				data: sortByTimestamp(data.daily_maximum_temperature),
+				color: chartDataOptions['daily_maximum_temperature'].color,
+				lineWidth: 2,
+			} as SeriesLineOptions,
+			{
+				custom: { key: 'daily_minimum_temperature' },
+				name: chartDataOptions['daily_minimum_temperature'].name,
+				type: chartDataOptions['daily_minimum_temperature'].type,
+				data: sortByTimestamp(data.daily_minimum_temperature),
+				color: chartDataOptions['daily_minimum_temperature'].color,
+				lineWidth: 2,
+			} as SeriesLineOptions,
+			{
+				custom: { key: 'precipitation' },
+				name: chartDataOptions['precipitation'].name,
+				type: chartDataOptions['precipitation'].type,
+				data: sortByTimestamp(data.precipitation),
+				color: chartDataOptions['precipitation'].color,
+				lineWidth: 2,
+			} as SeriesColumnOptions,
+		]
 	} else {
 		// Other variables series (for CMPIP5 then CMIP6)
 		switch (version) {
@@ -189,26 +267,29 @@ export const getSeriesObject = (
 						color: chartDataOptions['observations'].color,
 						lineWidth: 1.5,
 						dashStyle: 'ShortDash',
+						visible: false,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'modeled_historical_median' },
 						name: chartDataOptions['modeled_historical_median'].name,
 						type: chartDataOptions['modeled_historical_median'].type,
 						data: sortByTimestamp(data.modeled_historical_median),
-						color: chartDataOptions['modeled_historical_median']
-							.color,
+						color: chartDataOptions['modeled_historical_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'modeled_historical_range' },
 						name: chartDataOptions['modeled_historical_range'].name,
 						type: chartDataOptions['modeled_historical_range'].type,
 						data: sortByTimestamp(data.modeled_historical_range),
-						color: chartDataOptions['modeled_historical_range']
-							.color,
+						color: chartDataOptions['modeled_historical_range'].color,
 						fillOpacity: 0.5,
 						lineWidth: 0,
 						zIndex: 0,
+						linkedTo: ':previous',
+						visible: true,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'rcp26_median' },
@@ -217,6 +298,8 @@ export const getSeriesObject = (
 						data: sortByTimestamp(data.rcp26_median),
 						color: chartDataOptions['rcp26_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'rcp26_range' },
@@ -226,6 +309,8 @@ export const getSeriesObject = (
 						color: chartDataOptions['rcp26_range'].color,
 						fillOpacity: 0.2,
 						lineWidth: 0,
+						linkedTo: ':previous',
+						visible: true,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'rcp45_median' },
@@ -234,6 +319,8 @@ export const getSeriesObject = (
 						data: sortByTimestamp(data.rcp45_median),
 						color: chartDataOptions['rcp45_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'rcp45_range' },
@@ -243,6 +330,8 @@ export const getSeriesObject = (
 						color: chartDataOptions['rcp45_range'].color,
 						fillOpacity: 0.2,
 						lineWidth: 0,
+						linkedTo: ':previous',
+						visible: true,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'rcp85_median' },
@@ -251,6 +340,8 @@ export const getSeriesObject = (
 						data: sortByTimestamp(data.rcp85_median),
 						color: chartDataOptions['rcp85_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'rcp85_range' },
@@ -260,6 +351,8 @@ export const getSeriesObject = (
 						color: chartDataOptions['rcp85_range'].color,
 						fillOpacity: 0.2,
 						lineWidth: 0,
+						linkedTo: ':previous',
+						visible: true,
 					} as SeriesArearangeOptions,
 				];
 			case 'cmip6':
@@ -272,6 +365,7 @@ export const getSeriesObject = (
 						color: chartDataOptions['observations'].color,
 						lineWidth: 1.5,
 						dashStyle: 'ShortDash',
+						visible: false,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'modeled_historical_median' },
@@ -280,6 +374,8 @@ export const getSeriesObject = (
 						data: sortByTimestamp(data.modeled_historical_median),
 						color: chartDataOptions['modeled_historical_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'modeled_historical_range' },
@@ -290,6 +386,8 @@ export const getSeriesObject = (
 						fillOpacity: 0.3,
 						lineWidth: 0,
 						zIndex: 0,
+						linkedTo: ':previous',
+						visible: true,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'ssp126_median' },
@@ -298,6 +396,8 @@ export const getSeriesObject = (
 						data: sortByTimestamp(data.ssp126_median),
 						color: chartDataOptions['ssp126_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'ssp126_range' },
@@ -307,6 +407,8 @@ export const getSeriesObject = (
 						color: chartDataOptions['ssp126_range'].color,
 						fillOpacity: 0.2,
 						lineWidth: 0,
+						linkedTo: ':previous',
+						visible: true,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'ssp245_median' },
@@ -315,6 +417,8 @@ export const getSeriesObject = (
 						data: sortByTimestamp(data.ssp245_median),
 						color: chartDataOptions['ssp245_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'ssp245_range' },
@@ -324,6 +428,29 @@ export const getSeriesObject = (
 						color: chartDataOptions['ssp245_range'].color,
 						fillOpacity: 0.2,
 						lineWidth: 0,
+						linkedTo: ':previous',
+						visible: true,
+					} as SeriesArearangeOptions,
+					{
+						custom: { key: 'ssp370_median' },
+						name: chartDataOptions['ssp370_median'].name,
+						type: chartDataOptions['ssp370_median'].type,
+						data: sortByTimestamp(data.ssp370_median),
+						color: chartDataOptions['ssp370_median'].color,
+						lineWidth: 2,
+						showInNavigator: true,
+						visible: true,
+					} as SeriesLineOptions,
+					{
+						custom: { key: 'ssp370_range' },
+						name: chartDataOptions['ssp370_range'].name,
+						type: chartDataOptions['ssp370_range'].type,
+						data: sortByTimestamp(data.ssp370_range),
+						color: chartDataOptions['ssp370_range'].color,
+						fillOpacity: 0.2,
+						lineWidth: 0,
+						linkedTo: ':previous',
+						visible: true,
 					} as SeriesArearangeOptions,
 					{
 						custom: { key: 'ssp585_median' },
@@ -332,6 +459,8 @@ export const getSeriesObject = (
 						data: sortByTimestamp(data.ssp585_median),
 						color: chartDataOptions['ssp585_median'].color,
 						lineWidth: 2,
+						showInNavigator: true,
+						visible: true,
 					} as SeriesLineOptions,
 					{
 						custom: { key: 'ssp585_range' },
@@ -341,6 +470,8 @@ export const getSeriesObject = (
 						color: chartDataOptions['ssp585_range'].color,
 						fillOpacity: 0.2,
 						lineWidth: 0,
+						linkedTo: ':previous',
+						visible: true,
 					} as SeriesArearangeOptions,
 				];
 			default:

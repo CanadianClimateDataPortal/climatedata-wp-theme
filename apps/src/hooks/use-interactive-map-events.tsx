@@ -1,7 +1,7 @@
 /**
  * Hook that returns event handlers for interactive map layers.
  */
-import React, { useRef, useContext } from 'react';
+import React, { useRef, useContext, useState, useEffect } from 'react';
 import L from 'leaflet';
 import { useMap } from 'react-leaflet';
 
@@ -49,6 +49,33 @@ export const useInteractiveMapEvents = (
 	const hoveredRef = useRef<number | null>(null);
 	const markerRef = useRef<L.Marker | null>(null);
 
+	// --- SIDEBAR WIDTH RESPONSIVE LOGIC ---
+	const [sidebarWidth, setSidebarWidth] = useState(() => {
+		if (typeof window !== 'undefined') {
+			return window.innerWidth < 768 ? 0 : remToPx(SIDEBAR_WIDTH);
+		}
+		return remToPx(SIDEBAR_WIDTH);
+	});
+
+	useEffect(() => {
+		// Handler to update sidebarWidth and left style of the info panel
+		function handleResize() {
+			// Set sidebarWidth state based on Tailwind's md breakpoint (768px)
+			setSidebarWidth(window.innerWidth < 768 ? 0 : remToPx(SIDEBAR_WIDTH));
+			// Also update left style directly on the info panel wrapper if it exists
+			const panel = document.querySelector('.location-info-panel-wrapper') as HTMLElement | null;
+			if (panel) {
+				// Set the left position to match the sidebarWidth for correct alignment
+				panel.style.left = `${window.innerWidth < 768 ? 0 : remToPx(SIDEBAR_WIDTH)}px`;
+			}
+		}
+		window.addEventListener('resize', handleResize);
+		// Run handler once on mount to set initial state and position
+		handleResize();
+		// Cleanup listener on unmount
+		return () => window.removeEventListener('resize', handleResize);
+	}, []);
+
 	const dispatch = useAppDispatch();
 	const map = useMap();
 
@@ -59,6 +86,13 @@ export const useInteractiveMapEvents = (
 		if (previousLocationTitle === locationTitle) {
 			return;
 		}
+
+		// clear all existing markers from the map
+		map.eachLayer(layer => {
+			if (layer instanceof L.Marker) {
+				map.removeLayer(layer);
+			}
+		});
 
 		// a single marker is allowed at a time
 		if (markerRef.current) {
@@ -166,11 +200,12 @@ export const useInteractiveMapEvents = (
 					/>,
 					{
 						position: {
-							left: remToPx(SIDEBAR_WIDTH),
+							left: sidebarWidth,
 							right: 0,
 							bottom: 0,
 						},
 						direction: 'bottom',
+						className: 'location-info-panel-wrapper',
 					}
 				);
 			}

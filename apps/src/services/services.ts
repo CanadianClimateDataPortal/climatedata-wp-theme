@@ -348,7 +348,7 @@ export const clearApiCache = (key?: string): void => {
  *
  * @param latlng Latitude and Longitude of the location
  */
-export const fetchLocationByCoords = async (latlng: L.LatLng) => {
+export const fetchLocationByCoords = async (latlng: L.LatLng | { lat: number; lng: number }) => {
 	try {
 		// Make the Fetch request.
 		const response = await fetch(`${WP_API_DOMAIN}${WP_API_LOCATION_BY_COORDS_PATH}?lat=${latlng.lat}&lng=${latlng.lng}&sealevel=false`, {
@@ -381,6 +381,21 @@ export const fetchLocationByCoords = async (latlng: L.LatLng) => {
 export const generateChartData = async (options: ChartDataOptions) => {
 	const { latlng: { lat, lng }, dataset, variable, frequency  } = options;
 	const response = await fetch(`https://dataclimatedata.crim.ca/generate-charts/${lat}/${lng}/${variable}/${frequency}?decimals=1&dataset_name=${dataset}`);
+
+	if (!response.ok) {
+		throw new Error('Failed to fetch data');
+	}
+
+	return await response.json();
+};
+
+/**
+ * Generates chart data from the API
+ *
+ * @param options Options to pass to the API
+ */
+export const fetchMSCClimateNormalsChartData = async (stationId: string, normalId: number) => {
+	const response = await fetch(`https://api.weather.gc.ca/collections/climate-normals/items?f=json&STN_ID=${stationId}&NORMAL_ID=${normalId}&sortby=MONTH`);
 
 	if (!response.ok) {
 		throw new Error('Failed to fetch data');

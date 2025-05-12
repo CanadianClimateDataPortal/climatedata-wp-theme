@@ -9,7 +9,6 @@ import { useI18n } from '@wordpress/react-i18n';
 import { Download, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { encodeURL, prepareRaster } from '@/lib/utils';
-import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useAppSelector } from '@/app/hooks';
 import { WP_API_DOMAIN } from '@/lib/constants';
 
@@ -35,16 +34,15 @@ declare global {
 	}
 }
 
-// @todo: Currently does nothing. The image must be generated from the server.
 const DownloadMapModal: React.FC<{
 	isOpen: boolean;
 	onClose: () => void;
 	title: string;
 }> = ({ isOpen, onClose, title }) => {
-	const { climateVariable } = useClimateVariable();
-	const [downloadUrl, setDownloadUrl] = useState<string>('default_value');
+	//const { climateVariable } = useClimateVariable();
+	//const [downloadUrl, setDownloadUrl] = useState<string>('default_value');
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
-	
+
 	// Get dataset and variable information for download URL
 	const dataset = useAppSelector((state) => state.map.dataset);
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
@@ -52,14 +50,6 @@ const DownloadMapModal: React.FC<{
 	// @todo to be replaced with real value.
 	const salt: string = '';
 	const data_url: string = '';
-
-	useEffect(() => {
-		// @todo Update it with the Relative url to the Download Page.
-		// It should listen to climateData variables changes.
-		// Or generated when the modal is opened.
-		setDownloadUrl('download_page_step_3_value')
-	}, [climateVariable]);
-
 
 	// Used by the Download Image Map server.
 	useEffect(() => {
@@ -117,8 +107,6 @@ const DownloadMapModal: React.FC<{
 			const response = await fetch(api_url);
 			if (!response.ok) throw new Error('Network response was not ok');
 			const blob = await response.blob();
-			// @todo to be removed. The timeout has been added to test the Generating message.
-			await new Promise(res => setTimeout(res, 2000));
 			downloadBlob(blob, `${title}-map.png`);
 		} catch (error) {
 			console.error('Failed to generate download URL:', error);
@@ -132,7 +120,7 @@ const DownloadMapModal: React.FC<{
 		if (!dataset || !climateVariableData || !climateVariableData.id) {
 			return `${WP_API_DOMAIN}/download-app/`;
 		}
-		
+
 		return `${WP_API_DOMAIN}/download-app/?dataset=${encodeURIComponent(dataset.term_id.toString())}&var=${encodeURIComponent(climateVariableData.id)}`;
 	}, [dataset, climateVariableData]);
 

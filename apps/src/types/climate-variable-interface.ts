@@ -319,6 +319,8 @@ export interface ClimateVariableConfigInterface {
 
 	analysisUrl?: string;
 
+	finch?: string;
+
 	selectedPoints?: GridCoordinates;
 
 	selectedRegion?: GridRegion | null;
@@ -438,6 +440,8 @@ export interface ClimateVariableInterface {
 	getStationDownloadFiles(props?: StationDownloadUrlsProps): Promise<DownloadFile[]>;
 
 	getAnalysisUrl(): string | null;
+
+	getFinch(): string;
 
 	getSelectedPoints(): GridCoordinates | null;
 

@@ -601,6 +601,9 @@ function translate_path ( $post_id, $lang ) {
 		if ( fw_get_rewrite_method() === 'domain' ) {
 			$post_type_slug = fw_post_type_slug( $post_type, $lang );
 		} elseif ( $post_type == 'post' && $lang === 'en' ) {
+			// When in 'path' rewrite method, we generally simply use the
+			// post type as slug, except for the 'post' post type in
+			// English for which we use 'news' as the slug.
 			$post_type_slug = fw_get_news_slug();
 		}
 

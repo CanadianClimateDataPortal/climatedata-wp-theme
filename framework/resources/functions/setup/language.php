@@ -253,7 +253,8 @@ function fw_get_field ( $field, $post_id = null ) {
  * Return the rewrite slug for a post type for a specific language.
  * 
  * @param string $post_type - Post type for which to get the slug.
- * @param string|null $lang - If not specified, uses the current language.
+ * @param string|null $lang - Language version of the slug. If not specified,
+ *                            default to the current language.
  * @return string
  */
 function fw_post_type_slug( $post_type, $lang = null ) {

@@ -19,6 +19,8 @@ import {
 	ScenariosConfig,
 	TemporalThresholdConfig,
 	ThresholdInterface,
+	DownloadFile,
+	FrequencyType,
 } from "@/types/climate-variable-interface";
 import RasterMap from "@/components/raster-map";
 import RasterDownloadMap from "@/components/download/raster-download-map";
@@ -34,6 +36,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	constructor(config: ClimateVariableConfigInterface) {
 		this._config = config;
+	}
+
+	getClass(): string {
+		return this._config.class ?? '';
 	}
 
 	getId(): string {
@@ -124,6 +130,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 
 	getUnit(): string {
 		return this._config.unit ?? '';
+	}
+
+	getUnitDecimalPlaces(): number {
+		return this._config.unitDecimalPlaces ?? 0;
 	}
 
 	getInteractiveMode(): InteractiveMode {
@@ -293,8 +303,33 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.downloadUrl ?? null;
 	}
 
+	getStationDownloadFiles(): Promise<DownloadFile[]> {
+		return Promise.resolve([]);
+	}
+
 	getAnalysisUrl(): string | null {
-		return this._config.analysisUrl ?? null;
+		let analysisUrl = '/providers/finch/processes/';
+
+		// If frequency is daily, it turns into analyze
+		if (this.getFrequency() === FrequencyType.DAILY) {
+			analysisUrl += 'subset_grid_point_dataset';
+		} else {
+			// If projection
+			if (this.getDatasetType() === 'projection') {
+				analysisUrl += 'ensemble_grid_point_';
+			} 
+
+			// Add climate variable finch
+			analysisUrl += this.getFinch();
+		}
+
+		analysisUrl += '/jobs';
+
+		return analysisUrl;
+	}
+
+	getFinch(): string {
+		return this._config.finch ?? this.getId();
 	}
 
 	getSelectedPoints(): GridCoordinates | null {

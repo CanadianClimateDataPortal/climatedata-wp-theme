@@ -233,9 +233,10 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 				value={climateVariable?.getFrequency() ?? undefined}
 				onValueChange={setFrequency}
 				className={"sm:w-64 mb-4"}
+				downloadType={climateVariable?.getDownloadType() ?? undefined}
 			/>
 
-			{isDownloadTypeAnalyzed
+			{!isDownloadTypeAnalyzed
 				&& averagingOptions.length > 0
 				&& climateVariable?.getFrequency() !== FrequencyType.DAILY
 				&& <RadioGroupFactory

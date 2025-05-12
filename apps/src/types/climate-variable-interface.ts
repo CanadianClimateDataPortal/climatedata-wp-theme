@@ -156,6 +156,19 @@ export interface GridRegion {
 	cellCount: number
 }
 
+export interface StationDownloadUrlsProps {
+	stationId?: string;
+	stationIds?: string[];
+	stationName?: string;
+	fileFormat?: string;
+	dateRange?: {start: string, end: string}
+}
+
+export interface DownloadFile {
+	label: string;
+	url: string;
+}
+
 export interface ClimateVariableConfigInterface {
 	/** Unique identifier for the climate variable */
 	id: string;
@@ -207,6 +220,9 @@ export interface ClimateVariableConfigInterface {
 
 	/** Unit */
 	unit?: string;
+
+	/** Unit decimal places */
+	unitDecimalPlaces?: number;
 
 	/** InteractiveMode */
 	interactiveMode?: InteractiveMode;
@@ -306,6 +322,8 @@ export interface ClimateVariableConfigInterface {
 
 	analysisUrl?: string;
 
+	finch?: string;
+
 	selectedPoints?: GridCoordinates;
 
 	selectedRegion?: GridRegion | null;
@@ -316,6 +334,8 @@ export interface ClimateVariableConfigInterface {
  */
 export interface ClimateVariableInterface {
 	getId(): string;
+
+	getClass(): string;
 
 	/** Returns the post ID for the variable, if available. */
 	getPostId(): number | undefined;
@@ -347,6 +367,8 @@ export interface ClimateVariableInterface {
 	getLayerStyles(): string;
 
 	getUnit(): string;
+
+	getUnitDecimalPlaces(): number;
 
 	getInteractiveMode(): InteractiveMode;
 
@@ -420,7 +442,11 @@ export interface ClimateVariableInterface {
 
 	getDownloadUrl(): Promise<string | null>;
 
+	getStationDownloadFiles(props?: StationDownloadUrlsProps): Promise<DownloadFile[]>;
+
 	getAnalysisUrl(): string | null;
+
+	getFinch(): string;
 
 	getSelectedPoints(): GridCoordinates | null;
 

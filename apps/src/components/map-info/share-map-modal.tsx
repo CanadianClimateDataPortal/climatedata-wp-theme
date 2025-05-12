@@ -4,7 +4,7 @@
  * A modal component that allows users to copy the map link or share on social media.
  *
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 // components
@@ -18,6 +18,7 @@ import {
 	ModalSectionBlockDescription,
 } from '@/components/map-info/modal-section';
 import Modal from '@/components/ui/modal';
+import { useAppSelector } from '@/app/hooks';
 
 const ShareMapModal: React.FC<{
 	isOpen: boolean;
@@ -26,18 +27,34 @@ const ShareMapModal: React.FC<{
 	const [copyLinkVariant, setCopyLinkVariant] = useState<
 		'destructive' | 'secondary'
 	>('destructive');
+	const [currentUrl, setCurrentUrl] = useState<string>('');
+	const inputRef = useRef<HTMLInputElement>(null);
 
 	const { __ } = useI18n();
 
-	// TODO: implement correct logic for copying the link
-	/**
-	 * Simulated link copying logic for demonstration.
-	 */
+	// Get the URL sync state to ensure URL parameters are loaded
+	const isUrlSyncInitialized = useAppSelector((state) => state.urlSync.isInitialized);
+	
+	// Get the climate variable data to use in the share title
+	const climateVariable = useAppSelector((state) => state.climateVariable.data);
+	const variableTitle = climateVariable?.title || __('Climate Data Map');
+
+	useEffect(() => {
+		if (isOpen && typeof window !== 'undefined') {
+			setCurrentUrl(window.location.href);
+		}
+	}, [isOpen, isUrlSyncInitialized]);
+
 	const copyLinkHandler = () => {
-		setCopyLinkVariant('secondary');
-		setTimeout(() => {
-			setCopyLinkVariant('destructive');
-		}, 2000);
+		if (inputRef.current) {
+			inputRef.current.select();
+			navigator.clipboard.writeText(currentUrl);
+			
+			setCopyLinkVariant('secondary');
+			setTimeout(() => {
+				setCopyLinkVariant('destructive');
+			}, 2000);
+		}
 	};
 
 	return (
@@ -55,7 +72,9 @@ const ShareMapModal: React.FC<{
 					<div className="flex gap-4">
 						<Input
 							type="text"
-							placeholder="crim.ca/map/?coords=62.5102..."
+							value={currentUrl}
+							ref={inputRef}
+							readOnly
 							className="text-neutral-grey-medium placeholder:text-neutral-grey-medium border-cold-grey-4 rounded-none"
 						/>
 						<Button
@@ -76,7 +95,7 @@ const ShareMapModal: React.FC<{
 					<ModalSectionBlockDescription>
 						{__('Clicking on icons will launch a new window.')}
 					</ModalSectionBlockDescription>
-					<SocialShareButtons />
+					<SocialShareButtons url={currentUrl} title={variableTitle} />
 				</ModalSectionBlock>
 			</ModalSection>
 		</Modal>

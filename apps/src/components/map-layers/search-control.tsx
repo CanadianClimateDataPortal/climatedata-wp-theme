@@ -16,7 +16,8 @@ import mapPinIcon from '@/assets/map-pin.svg';
 
 import { useAppDispatch } from '@/app/hooks';
 import { addRecentLocation } from '@/features/map/map-slice';
-import { cn } from '@/lib/utils';
+import { cn, isLatLong } from '@/lib/utils';
+import { fetchLocationByCoords } from '@/services/services';
 import {
 	SearchControlLocationItem,
 	SearchControlResponse,
@@ -70,8 +71,16 @@ export default function SearchControl({
 
 	const handleLocationChange = useCallback(
 		(title: string, latlng: L.LatLng) => {
+
+			// clear all existing markers from the map
+			map.eachLayer(layer => {
+				if (layer instanceof L.Marker) {
+					map.removeLayer(layer);
+				}
+			});
 			map.setView(latlng, SEARCH_DEFAULT_ZOOM);
 
+			// Save recent location
 			dispatch(
 				addRecentLocation({
 					id: `${latlng?.lat}|${latlng?.lng}`,
@@ -96,11 +105,20 @@ export default function SearchControl({
 			navigator.geolocation.getCurrentPosition(
 				(position) => {
 					const { latitude, longitude } = position.coords;
-
+					const title = __('Your current location');
 					handleLocationChange(
-						__('Your current location'),
+						title,
 						L.latLng(latitude, longitude)
 					);
+					L.marker([latitude, longitude], {
+						title: title,
+						icon: L.icon({
+							iconUrl: mapPinIcon, // Custom marker icon
+							iconSize: [25, 41], // Size of the icon
+							iconAnchor: [12, 41], // Anchor of the icon
+							popupAnchor: [0, -41], // Popup position relative to the icon
+						}),
+					}).addTo(map);
 
 					setIsGeolocationEnabled(true);
 					setIsTracking(false);
@@ -184,6 +202,27 @@ export default function SearchControl({
 				void _; // intentionally ignore to suppress typescript error
 				return `<div>${buildLocationTitle(item)}</div>`;
 			},
+			locationNotFound: async function() {
+				// If the list of suggestions is still shown, no error message is shown.
+				// See #86862
+				if (Object.keys(this._recordsCache).length > 0) {
+					this.showTooltip(this._recordsCache)
+					return;
+				}
+				// Check if the coordinates are valid if the location is empty.
+				const latLng = isLatLong(this._input.value);
+				// If the coordinates are valid, move to that location.
+				if (latLng.lat && latLng.lng) {
+					// Fetch location data
+					const locationByCoords = await fetchLocationByCoords(latLng);
+					// Trigger show location.
+					this.showLocation(locationByCoords, locationByCoords.geo_id);
+				}
+				else {
+					// Show error alert.
+					this.showAlert();
+				}
+			},
 			marker: L.marker([0, 0], {
 				icon: L.icon({
 					iconUrl: mapPinIcon, // Custom marker icon
@@ -196,6 +235,7 @@ export default function SearchControl({
 				void _; // intentionally ignore to suppress typescript error
 				handleLocationChange(title, latlng);
 			},
+
 		});
 
 		map.addControl(searchControl);
@@ -208,7 +248,7 @@ export default function SearchControl({
 			if (value.startsWith(' ')) value = value.slice(1);
 			// If two trailing spaces are present, remove one.
 			if (value.endsWith('  ') && value.length > 1) value = value.slice(0, -1);
-
+			value = value.replace(/  +/g, '');
 			// Count the characters without spaces
 			if (value.replace(/ /g, '').length >= 2) {
 				searchControl.searchText(value);

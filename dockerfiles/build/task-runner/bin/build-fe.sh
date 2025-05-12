@@ -63,7 +63,7 @@ else
 fi
 
 log "Installing dependencies..."
-npm install
+npm ci
 
 log "Compiling frontend assets..."
 concurrently \

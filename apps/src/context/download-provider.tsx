@@ -37,13 +37,17 @@
  * });
  */
 
-import React, { createContext, useState, useCallback, useRef } from 'react';
+import React, { createContext, useState, useCallback, useRef, useEffect } from 'react';
+import { useDownloadUrlSync } from '@/hooks/use-download-url-sync';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { TaxonomyData } from '@/types/types';
 import { StepComponentRef } from '@/types/download-form-interface';
 import { updateClimateVariable } from '@/store/climate-variable-slice';
+import { STEPS } from '@/components/download/config';
+import { useClimateVariable } from '@/hooks/use-climate-variable';
 
 interface DownloadContextValue {
+	steps: typeof STEPS;
 	currentStep: number;
 	goToNextStep: () => void;
 	goToStep: (step: number) => void;
@@ -56,12 +60,42 @@ const DownloadContext = createContext<DownloadContextValue | null>(null);
 export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
-	const [currentStep, setCurrentStep] = useState<number>(1);
+	const { climateVariable } = useClimateVariable();
+	// Initialize URL sync
+	useDownloadUrlSync();
+
+	const [steps, setSteps] = useState<typeof STEPS>([...STEPS]);
+	// Start at step 2 if URL has variable parameter
+	const params = new URLSearchParams(window.location.search);
+	const hasVariable = params.has('var');
+	const [currentStep, setCurrentStep] = useState<number>(hasVariable ? 2 : 1);
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const dispatch = useAppDispatch();
 
 	/** Map of step numbers to their component refs */
 	const stepRefs = useRef(new Map<number, StepComponentRef>());
+
+	/** 
+	 * Update steps when the climate variable class or id change.
+	 * - skip step 3 (variable options) if it's a station variable
+	 * - skip step 5 (additional details) if it's a station variable (but not station variable)
+	 * - skip step 6 (send request) when there's no file format to choose (for "Future Building Design Value Summaries" and "Short-duration Rainfall IDF Data")
+	 */
+	useEffect(() => {
+		setSteps(() => {
+			if (climateVariable?.getClass() === 'StationClimateVariable') {
+				// skip step 3 (variable options) if it's a station variable
+				const skipIndexes = [2];
+				// skip step 5 (additional details) if it's a station variable (but not station variable)
+				if(climateVariable?.getId() !== 'station_data') skipIndexes.push(4);
+				// skip step 6 (send request) when there's no file format to chose (for "Future Building Design Value Summaries" and "Short-duration Rainfall IDF Data")
+				if(climateVariable?.getId() === 'future_building_design_value_summaries' || climateVariable?.getId() === 'short_duration_rainfall_idf_data') skipIndexes.push(5);
+
+				return STEPS.filter((_, index) => !skipIndexes.includes(index)) as unknown as typeof STEPS;
+			}
+			return [...STEPS];
+		});
+	}, [climateVariable?.getClass(), climateVariable?.getId()]);
 
 	/**
 	 * Registers or unregisters a step component's ref.
@@ -133,6 +167,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	}, [currentStep, resetStepsAfter]);
 
 	const values: DownloadContextValue = {
+		steps,
 		currentStep,
 		goToNextStep,
 		goToStep,

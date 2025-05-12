@@ -12,15 +12,24 @@ import { RadioGroupFactory } from '@/components/ui/radio-group';
 
 // other
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { ColourType } from '@/types/climate-variable-interface';
 
 const DataValuesControl: React.FC = () => {
 	const { __ } = useI18n();
-	const { climateVariable, setDataValue } = useClimateVariable();
+	const { climateVariable, setDataValue, setColourType } = useClimateVariable();
 
 	const options = [
 		{ value: 'absolute', label: __('Absolute') },
 		{ value: 'delta', label: __('Delta') },
 	];
+
+	const onDataValueChange = (value: string) => {
+		setDataValue(value);
+
+		// also, colour type should be set depending on the data value and the colour scheme
+		const defaultsToDiscreteColourType = value === 'delta' && climateVariable?.getColourScheme() === 'default';
+		setColourType(defaultsToDiscreteColourType ? ColourType.DISCRETE : ColourType.CONTINUOUS);
+	}
 
 	return (
 		<SidebarMenuItem>
@@ -30,7 +39,7 @@ const DataValuesControl: React.FC = () => {
 				options={options}
 				value={climateVariable?.getDataValue() ?? options[0].value}
 				disabled={climateVariable ? !climateVariable.hasDelta() : false}
-				onValueChange={setDataValue}
+				onValueChange={onDataValueChange}
 			/>
 		</SidebarMenuItem>
 	);

@@ -27,7 +27,7 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 /**
  * MapHeader component, displays the header for the map with breadcrumbs and buttons for extra information.
  */
-const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
+const MapHeader: React.FC<MapInfoProps> = ({ data = null }): React.ReactElement => {
 	const [shareInfo, setShareInfo] = useState<boolean>(false);
 	const [downloadInfo, setDownloadInfo] = useState<boolean>(false);
 	const [panelProps, setPanelProps] = useState<
@@ -36,6 +36,7 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 	const { togglePanel } = useAnimatedPanel();
 
 	const { locale } = useLocale();
+	const dataset = useAppSelector((state) => state.map.dataset);
 
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -46,6 +47,7 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 				direction: 'right',
 				position: {
 					top: ref.current?.getBoundingClientRect().top || 0,
+					left: 0,
 				},
 			});
 		}
@@ -68,11 +70,12 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 	};
 
 	/**
-	 * Toggles the visibility of the Variable Details panel.
-	 */
-	const toggleVariableDetailsPanel = () => {
-		togglePanel(<VariableDetailsPanel mapInfo={data} />, panelProps);
-	};
+	* Toggles the visibility of the Variable Details panel.
+	*/
+const toggleVariableDetailsPanel = () => {
+	if (!data) return;
+	togglePanel(<VariableDetailsPanel mapInfo={data} />, panelProps);
+};
 
 	return (
 		<>
@@ -97,7 +100,7 @@ const MapHeader: React.FC<MapInfoProps> = ({ data }): React.ReactElement => {
 			<DownloadMapModal
 				isOpen={downloadInfo}
 				onClose={toggleDownloadInfo}
-				title={data?.dataset?.[0]?.title?.[locale] ?? ''}
+				title={data?.dataset?.[0]?.title?.[locale] || dataset?.title?.[locale] || ''}
 			/>
 		</>
 	);
@@ -113,6 +116,7 @@ const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
 	const { __ } = useI18n();
 	const { locale } = useLocale();
 	const dataset = useAppSelector((state) => state.map.dataset);
+	const variableList = useAppSelector((state) => state.map.variableList);
 	const { climateVariable } = useClimateVariable();
 
 	const datasetName = useMemo(() => {
@@ -126,10 +130,16 @@ const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
 		if (climateVariable && climateVariable.toObject().postId) {
 			return climateVariable.getTitle() || '';
 		}
+		
+		// If no explicit climate variable selection, but we have variableList data,
+		// show the first variable as a fallback
+		if (variableList && variableList.length > 0) {
+			return variableList[0].title || '';
+		}
 
-		// Don't show anything if no variable is explicitly selected
+		// Don't show anything if we can't determine the variable
 		return '';
-	}, [climateVariable]);
+	}, [climateVariable, variableList]);
 
 	return (
 		<div className="flex items-center gap-2 breadcrumb">

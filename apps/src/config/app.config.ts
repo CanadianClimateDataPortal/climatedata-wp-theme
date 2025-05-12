@@ -32,11 +32,11 @@ const appConfig = {
 		},
 		{
 			value: "ssp126",
-			label: "SSP 1–2.6",
+			label: "SSP 1-2.6",
 		},
 		{
 			value: "ssp245",
-			label: "SSP 2–4.5",
+			label: "SSP 2-4.5",
 		},
 		{
 			value: "ssp370",
@@ -44,7 +44,7 @@ const appConfig = {
 		},
 		{
 			value: "ssp585",
-			label: "SSP 5–8.5",
+			label: "SSP 5-8.5",
 		},
 		{
 			value: "rcp85plus65-p50",

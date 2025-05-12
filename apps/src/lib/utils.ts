@@ -135,6 +135,35 @@ export const getCommonPrefix = (strings: string[]) => {
 }
 
 /**
+ * Validates and parses a latitude,longitude string.
+ *
+ * @param str A string in the format "lat,lng"
+ * @returns An object with parsed lat/lng values or nulls if invalid
+ */
+export const isLatLong = (str: string) => {
+	// Regular expression to match a pair of decimal numbers separated by a comma
+	// Allows optional negative sign and optional decimal places, with optional space after comma
+	const regex = /^(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)$/;
+
+	// Attempt to match the input string with the regex
+	const match = str.match(regex);
+	if (!match) return { lat: null, lng: null }; // Return nulls if the format doesn't match
+
+	// Parse the matched latitude and longitude values
+	const lat = parseFloat(match[1]);
+	const lng = parseFloat(match[3]);
+
+	// Check if latitude and longitude are within valid geographic ranges
+	if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+		return { lat: lat, lng: lng }; // Return parsed coordinates if valid
+	}
+
+	// Return nulls if values are out of valid geographic range
+	return { lat: null, lng: null };
+};
+
+
+/**
  * Generates a hash code from a string using a basic bitwise algorithm.
  *
  * Note: This is a non-cryptographic hash function and should not be used for security purposes.

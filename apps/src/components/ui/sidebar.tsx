@@ -431,7 +431,7 @@ const SidebarMenuButton = React.forwardRef<
 	React.ComponentProps<'button'> & {
 		asChild?: boolean;
 		isActive?: boolean;
-		tooltip?: string | React.ComponentProps<typeof TooltipContent>;
+		tooltip?: string | React.ComponentProps<typeof TooltipContent> & { panelId?: string };
 	} & VariantProps<typeof sidebarMenuButtonVariants>
 >(
 	(
@@ -455,6 +455,7 @@ const SidebarMenuButton = React.forwardRef<
 				data-sidebar="menu-button"
 				data-size={size}
 				data-active={isActive}
+				data-panel-id={typeof tooltip === 'object' && 'panelId' in tooltip ? tooltip.panelId : ""}
 				className={cn(
 					sidebarMenuButtonVariants({ variant, size }),
 					className
@@ -672,11 +673,57 @@ const SidebarPanel = React.forwardRef<
 		closePanel();
 	};
 
+	const panelRef = React.useRef<HTMLDivElement | null>(null);
+	const isActive = isPanelActive(id);
+	
+	useEffect(() => {
+		if (!isActive) return;
+		
+		const handleClickOutside = (event: MouseEvent) => {
+			const target = event.target as Element;
+			
+			// Check if click is inside the panel
+			if (panelRef.current && panelRef.current.contains(target)) {
+				return;
+			}
+			
+			// Check if click is on any sidebar menu item/button
+			if (target.closest('[data-sidebar="menu-item"]') || 
+			    target.closest('[data-sidebar="menu-button"]')) {
+				return;
+			}
+			
+			// Check if it's a dropdown/popover
+			const dropdownElement = target.closest('[role="listbox"], [role="menu"]');
+			if (dropdownElement) {
+				return;
+			}
+			
+			// Otherwise, close the panel
+			handleClose();
+		};
+		
+		document.addEventListener('mousedown', handleClickOutside);
+		
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [id, isActive, handleClose]);
+
 	return (
 		<AnimatePresence>
-			{isPanelActive(id) && (
+			{isActive && (
 				<motion.div
-					ref={ref}
+					ref={(node) => {
+						panelRef.current = node;
+						
+						// Forward the ref
+						if (typeof ref === 'function') {
+							ref(node);
+						} else if (ref) {
+							ref.current = node;
+						}
+					}}
 					className={cn(
 						'sidebar-panel absolute top-0 left-0 bg-white shadow-md -z-10',
 						className
@@ -687,12 +734,12 @@ const SidebarPanel = React.forwardRef<
 					transition={{ duration: 0.25 }}
 				>
 					<button
-						className="absolute top-4 right-4 text-gray-500"
+						className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 p-1 z-20 flex items-center justify-center h-8 w-8 transition-all"
 						onClick={handleClose}
+						aria-label={__('Close panel')}
 					>
-						<span className="sr-only">{__('Close panel')}</span>
 						<CloseIcon
-							size={16}
+							size={18}
 							aria-hidden="true"
 							focusable="false"
 						/>

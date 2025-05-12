@@ -10,6 +10,8 @@ import { Download, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { encodeURL, prepareRaster } from '@/lib/utils';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { useAppSelector } from '@/app/hooks';
+import { WP_API_DOMAIN } from '@/lib/constants';
 
 // components
 import Modal from '@/components/ui/modal';
@@ -42,6 +44,10 @@ const DownloadMapModal: React.FC<{
 	const { climateVariable } = useClimateVariable();
 	const [downloadUrl, setDownloadUrl] = useState<string>('default_value');
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
+	
+	// Get dataset and variable information for download URL
+	const dataset = useAppSelector((state) => state.map.dataset);
+	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
 
 	// @todo to be replaced with real value.
 	const salt: string = '';
@@ -121,6 +127,15 @@ const DownloadMapModal: React.FC<{
 		}
 	};
 
+	// Generate download section URL with dataset and variable parameters
+	const getDownloadUrl = useMemo(() => {
+		if (!dataset || !climateVariableData || !climateVariableData.id) {
+			return `${WP_API_DOMAIN}/download-app/`;
+		}
+		
+		return `${WP_API_DOMAIN}/download-app/?dataset=${encodeURIComponent(dataset.term_id.toString())}&var=${encodeURIComponent(climateVariableData.id)}`;
+	}, [dataset, climateVariableData]);
+
 	const buttonText = useMemo(() => {
 		if (isGenerating) {
 			return __('Generating...');
@@ -159,32 +174,29 @@ const DownloadMapModal: React.FC<{
 					</Button>
 				</ModalSectionBlock>
 
-				{ downloadUrl && (
-					<ModalSectionBlock>
-						<ModalSectionBlockTitle>
-							{__('Need control over your own data?')}
-						</ModalSectionBlockTitle>
-						<ModalSectionBlockDescription>
-							{__(
-								'Head over to the download section where you can select multiple grid cells and personalize more data options.'
-							)}
-						</ModalSectionBlockDescription>
-						<a
-							href={downloadUrl || '#'}
-							target="_blank"
-							aria-label={__(
-								'Go to download sections (opens in a new tab)'
-							)}
-							className="text-brand-blue font-normal text-md leading-6"
-						>
-							<div className="flex items-center gap-2 ms-2">
-								{__('Go to Download Section')}
-								<ExternalLink className="w-4 h-4" />
-							</div>
-						</a>
-					</ModalSectionBlock>
-				)}
-
+				<ModalSectionBlock>
+					<ModalSectionBlockTitle>
+						{__('Need control over your own data?')}
+					</ModalSectionBlockTitle>
+					<ModalSectionBlockDescription>
+						{__(
+							'Head over to the download section where you can select multiple grid cells and personalize more data options.'
+						)}
+					</ModalSectionBlockDescription>
+					<a
+						href={getDownloadUrl}
+						target="_blank"
+						aria-label={__(
+							'Go to download sections (opens in a new tab)'
+						)}
+						className="text-brand-blue font-normal text-md leading-6"
+					>
+						<div className="flex items-center gap-2 ms-2">
+							{__('Go to Download Section')}
+							<ExternalLink className="w-4 h-4" />
+						</div>
+					</a>
+				</ModalSectionBlock>
 			</ModalSection>
 		</Modal>
 	);

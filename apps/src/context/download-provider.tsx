@@ -38,6 +38,7 @@
  */
 
 import React, { createContext, useState, useCallback, useRef, useEffect } from 'react';
+import { useDownloadUrlSync } from '@/hooks/use-download-url-sync';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { TaxonomyData } from '@/types/types';
 import { StepComponentRef } from '@/types/download-form-interface';
@@ -60,9 +61,14 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
 	const { climateVariable } = useClimateVariable();
+	// Initialize URL sync
+	useDownloadUrlSync();
 
 	const [steps, setSteps] = useState<typeof STEPS>([...STEPS]);
-	const [currentStep, setCurrentStep] = useState<number>(1);
+	// Start at step 2 if URL has variable parameter
+	const params = new URLSearchParams(window.location.search);
+	const hasVariable = params.has('var');
+	const [currentStep, setCurrentStep] = useState<number>(hasVariable ? 2 : 1);
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const dispatch = useAppDispatch();
 

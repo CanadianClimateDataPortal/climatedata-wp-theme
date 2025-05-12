@@ -348,7 +348,7 @@ export const clearApiCache = (key?: string): void => {
  *
  * @param latlng Latitude and Longitude of the location
  */
-export const fetchLocationByCoords = async (latlng: L.LatLng) => {
+export const fetchLocationByCoords = async (latlng: L.LatLng | { lat: number; lng: number }) => {
 	try {
 		// Make the Fetch request.
 		const response = await fetch(`${WP_API_DOMAIN}${WP_API_LOCATION_BY_COORDS_PATH}?lat=${latlng.lat}&lng=${latlng.lng}&sealevel=false`, {

@@ -203,13 +203,23 @@ export default function SearchControl({
 				return `<div>${buildLocationTitle(item)}</div>`;
 			},
 			locationNotFound: async function() {
+				// If the list of suggestions is still shown, no error message is shown.
+				// See #86862
+				if (Object.keys(this._recordsCache).length > 0) {
+					this.showTooltip(this._recordsCache)
+					return;
+				}
+				// Check if the coordinates are valid if the location is empty.
 				const latLng = isLatLong(this._input.value);
 				// If the coordinates are valid, move to that location.
 				if (latLng.lat && latLng.lng) {
+					// Fetch location data
 					const locationByCoords = await fetchLocationByCoords(latLng);
+					// Trigger show location.
 					this.showLocation(locationByCoords, locationByCoords.geo_id);
 				}
 				else {
+					// Show error alert.
 					this.showAlert();
 				}
 			},

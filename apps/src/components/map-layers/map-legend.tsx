@@ -94,11 +94,6 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 			?? ColourType.CONTINUOUS;
 
 		const hasCustomScheme = Boolean(customColors);
-		// @TODO: in map-legend-control.tsx, if a variable has a custom scheme, don't show the unit. Is it still valid?
-		// const unit = hasCustomScheme
-		// 	? getCommonPrefix(customColors?.map(item => item?.label) ?? [])
-		// 	: climateVariable?.getUnitLegend() || '°C';
-
 		const unit = climateVariable?.getUnitLegend() || '°C'
 		legend.onAdd = () => {
 			const container = L.DomUtil.create(

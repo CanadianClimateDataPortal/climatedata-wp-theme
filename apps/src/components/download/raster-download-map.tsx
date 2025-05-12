@@ -23,6 +23,7 @@ import {
 	DownloadType,
 	InteractiveRegionOption
 } from '@/types/climate-variable-interface';
+import InteractiveStationsLayer from "@/components/map-layers/interactive-stations-layer";
 
 export default function RasterDownloadMap(): React.ReactElement {
 	const { __, _n } = useI18n();

@@ -390,6 +390,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Maximum 1-Day Total Precipitation */
 	{
 		id: "max_1d_total_precipitation",
+		finch: "pr",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "rx1day",
 		frequencyConfig: {
@@ -596,6 +597,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Maximum Temperature */
 	{
 		id: "maximum_temperature",
+		finch: "tasmax",
 		class: "RasterPrecalculatedWithDailyFormatsClimateVariable",
 		threshold: "tx_mean",
 		frequencyConfig: {
@@ -632,6 +634,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Minimum Temperature */
 	{
 		id: "minimum_temperature",
+		finch: "tasmin",
 		class: "RasterPrecalculatedWithDailyFormatsClimateVariable",
 		threshold: "tn_mean",
 		frequencyConfig: {
@@ -749,6 +752,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Average 'Wet Day' Precipitation Intensity */
 	{
 		id: "average_wet_day_precipitation_intensity",
+		finch: "sdii",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "mm/day",
@@ -771,6 +775,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Cold Spell Days */
 	{
 		id: "cold_spell_days",
+		finch: "cold_spell_days",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "days",
@@ -804,6 +809,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Cooling Degree Days */
 	{
 		id: "cooling_degree_days",
+		finch: "cooling_degree_days",
 		class: "RasterAnalyzeClimateVariable",
 		threshold: "cddcold_18",
 		frequencyConfig: {
@@ -846,6 +852,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Days above HXmax */
 	{
 		id: "days_above_hxmax",
+		finch: "hxmax_days_above",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		versions: [ "humidex" ],
@@ -877,6 +884,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Days above Tmax */
 	{
 		id: "days_above_tmax",
+		finch: "tx_days_above",
 		class: "RasterAnalyzeClimateVariable",
 		thresholds: [
 			{
@@ -988,6 +996,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Days above Tmax and Tmin */
 	{
 		id: "days_above_tmax_and_tmin",
+		finch: "tx_tn_days_above",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "days",
@@ -1023,6 +1032,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Days below temperature threshold */
 	{
 		id: "days_below_temperature_threshold",
+		finch: "tn_days_below",
 		class: "RasterAnalyzeClimateVariable",
 		thresholds: [
 			{
@@ -1086,6 +1096,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Degree days exceedance date */
 	{
 		id: "degree_days_exceedance_date",
+		finch: "degree_days_exceedance_date",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "doy",
@@ -1151,6 +1162,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Freeze-Thaw Cycles */
 	{
 		id: "freeze_thaw_cycles",
+		finch: "dlyfrzthw",
 		class: "RasterAnalyzeClimateVariable",
 		threshold: "dlyfrzthw_tx0_tn-1",
 		analysisFields: [
@@ -1207,6 +1219,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Heat Wave Frequency */
 	{
 		id: "heat_wave_frequency",
+		finch: "heat_wave_frequency",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		analysisFields: [
@@ -1253,6 +1266,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Heat Wave */
 	{
 		id: "heat_wave_index",
+		finch: "heat_wave_index",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "days",
@@ -1287,6 +1301,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Heat Wave Total Duration */
 	{
 		id: "heat_wave_total_duration",
+		finch: "heat_wave_total_length",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "days",
@@ -1334,6 +1349,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Heating Degree Days */
 	{
 		id: "heating_degree_days",
+		finch: "heating_degree_days",
 		class: "RasterAnalyzeClimateVariable",
 		threshold: "hddheat_18",
 		frequencyConfig: {
@@ -1365,6 +1381,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Maximum Consecutive Dry Days */
 	{
 		id: "maximum_consecutive_dry_days",
+		finch: "cdd",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "days",
@@ -1387,6 +1404,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Maximum Consecutive Wet Days */
 	{
 		id: "maximum_consecutive_wet_days",
+		finch: "cwd",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
 		unit: "days",
@@ -1409,6 +1427,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Tropical Nights (Days with Tmin above threshold) */
 	{
 		id: "tropical_nights_days_with_tmin_above_threshold",
+		finch: "tropical_nights",
 		class: "RasterAnalyzeClimateVariable",
 		thresholds: [
 			{
@@ -1488,6 +1507,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Wet Days */
 	{
 		id: "wet_days",
+		finch: "wetdays",
 		class: "RasterAnalyzeClimateVariable",
 		analysisFields: [
 			{

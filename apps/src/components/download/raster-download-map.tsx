@@ -23,6 +23,7 @@ import {
 	DownloadType,
 	InteractiveRegionOption
 } from '@/types/climate-variable-interface';
+import InteractiveStationsLayer from "@/components/map-layers/interactive-stations-layer";
 
 export default function RasterDownloadMap(): React.ReactElement {
 	const { __, _n } = useI18n();
@@ -44,6 +45,13 @@ export default function RasterDownloadMap(): React.ReactElement {
 
 	// TODO: there should be a better way of choosing which interactive layer to show, depending on variable config
 	const renderInteractiveLayer = useCallback(() => {
+		const mode = climateVariable?.getInteractiveMode();
+		const datasetType = climateVariable?.getDatasetType();
+
+		if (mode === 'station' || datasetType === 'ahccd') {
+			return <InteractiveStationsLayer ref={interactiveLayerRef} selectable />;
+		}
+
 		const region = climateVariable?.getInteractiveRegion();
 
 		if (region === InteractiveRegionOption.GRIDDED_DATA) {

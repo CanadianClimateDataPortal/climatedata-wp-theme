@@ -17,6 +17,7 @@ const TimePeriodsControlForSeaLevel: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const { climateVariable, setDateRange } = useClimateVariable();
 	const scenario = climateVariable?.getScenario();
+	const isCMIP6 = climateVariable?.getVersion() === "cmip6" ?? false;
 	const [sliderLabel, setSliderLabel] = useState<string>('');
 	const [minYearLabel, setMinYearLabel] = useState<string>('');
 
@@ -24,7 +25,7 @@ const TimePeriodsControlForSeaLevel: React.FC = () => {
 	const fixedYearForEnhancedScenario = 2100;
 
 	const { min, max, interval } = climateVariable?.getDateRangeConfig() ?? {
-		min: 2006,
+		min: isCMIP6 ? 2020 : 2006,
 		max: 2100,
 		interval: 10,
 	};
@@ -40,7 +41,7 @@ const TimePeriodsControlForSeaLevel: React.FC = () => {
 	if(scenario === enhancedScenario) {
 		sliderValue = [fixedYearForEnhancedScenario];
 	}
-	
+
 	const maxYear = Number(max);
 	const intervalYears = interval;
 	const minYear = Math.floor(Number(min) / intervalYears) * intervalYears + (intervalYears * (-1));

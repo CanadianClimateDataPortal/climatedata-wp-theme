@@ -2,6 +2,7 @@ import ClimateVariableBase from "@/lib/climate-variable-base";
 import RasterPrecalculatedClimateVariable from "@/lib/raster-precalculated-climate-variable";
 import {
 	AveragingType,
+	DateRangeConfig,
 	DownloadType,
 	FileFormatType,
 	FrequencyConfig,
@@ -21,6 +22,7 @@ class SeaLevelClimateVariable extends RasterPrecalculatedClimateVariable {
 			? ClimateVariableBase.prototype.getVersions.call(this)
 			: [
 				"cmip5",
+				"cmip6",
 			];
 	}
 
@@ -39,6 +41,14 @@ class SeaLevelClimateVariable extends RasterPrecalculatedClimateVariable {
 					"rcp26-p05",
 					"rcp26-p50",
 					"rcp26-p95",
+				],
+				cmip6: [
+					"ssp585highEnd-p98",
+					"ssp585lowConf-p83",
+					"ssp585",
+					"ssp370",
+					"ssp245",
+					"ssp126",
 				],
 			};
 	}
@@ -66,9 +76,12 @@ class SeaLevelClimateVariable extends RasterPrecalculatedClimateVariable {
 	}
 
 	getGridType(): string | null {
+		const defaultGrid = (this.getVersion() === "cmip6")
+			? "slrgrid-cmip6" : "slrgrid";
+
 		return ClimateVariableBase.prototype.getGridType.call(this)
 			? ClimateVariableBase.prototype.getGridType.call(this)
-			: "slrgrid";
+			: defaultGrid;
 	}
 
 	hasDelta(): boolean | undefined {
@@ -93,6 +106,14 @@ class SeaLevelClimateVariable extends RasterPrecalculatedClimateVariable {
 				FileFormatType.JSON,
 				FileFormatType.NetCDF,
 			];
+	}
+
+	getDateRangeConfig(): DateRangeConfig | null {
+		return {
+			min: (this.getVersion() === "cmip6") ? "2020" : "2006",
+			max: "2100",
+			interval: 10,
+		}
 	}
 
 	getDownloadType(): DownloadType | null {

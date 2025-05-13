@@ -5,7 +5,7 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { fetchDeltaValues } from '@/services/services';
 import SectionContext from "@/context/section-provider";
 
-interface SeaLeavelClimateVariableValuesProps {
+interface SeaLevelClimateVariableValuesProps {
 	latlng: L.LatLng;
 	featureId: number,
 	mode: "modal" | "panel"
@@ -19,7 +19,7 @@ interface SeaLeavelClimateVariableValuesProps {
  *
  * Can be used in the location modal and charts panel
  */
-const SeaLevelClimateVariableValues: React.FC<SeaLeavelClimateVariableValuesProps> = ({
+const SeaLevelClimateVariableValues: React.FC<SeaLevelClimateVariableValuesProps> = ({
 	latlng,
 	featureId,
 	mode,
@@ -45,6 +45,7 @@ const SeaLevelClimateVariableValues: React.FC<SeaLeavelClimateVariableValuesProp
 			if (!decadeValue && !variableId) return;
 
 			const scenario = climateVariable?.getScenario() ?? '';
+			const version = climateVariable?.getVersion() ?? '';
 
 			// Fetching median
 
@@ -53,7 +54,8 @@ const SeaLevelClimateVariableValues: React.FC<SeaLeavelClimateVariableValuesProp
 
 			// Params
 			const medianParams = new URLSearchParams({
-				period: String(decadeValue)
+				period: String(decadeValue),
+				dataset_name: version,
 			}).toString();
 
 			const medianData = await fetchDeltaValues({
@@ -67,7 +69,19 @@ const SeaLevelClimateVariableValues: React.FC<SeaLeavelClimateVariableValuesProp
 				// If we don't have data
 				setNoDataAvailable(true);
 			} else {
-				const [scenarioName, percentile] = scenario.split('-');
+				let scenarioName, percentile;
+
+				// If the scenario name already contains the percentile, use it, else
+				// default to 'p50' if it exists
+				if (/-p\d+$/.test(scenario)) {
+					[scenarioName, percentile] = scenario.split('-');
+				} else {
+					const defaultPercentile = 'p50';
+					if (medianData[scenario]?.[defaultPercentile]) {
+						scenarioName = scenario;
+						percentile = defaultPercentile;
+					}
+				}
 
 				if(scenarioName && percentile) {
 					setMedian(medianData[scenarioName]?.[percentile] || 0);

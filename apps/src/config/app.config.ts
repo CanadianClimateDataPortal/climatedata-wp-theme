@@ -86,6 +86,14 @@ const appConfig = {
 			value: "rcp26-p95",
 			label: "RCP2.6 upper (95th percentile)",
 		},
+		{
+			value: "ssp585lowConf-p83",
+			label: "SSP5-8.5 High ice sheet loss A",
+		},
+		{
+			value: "ssp585highEnd-p98",
+			label: "SSP5-8.5 High ice sheet loss B",
+		},
 	],
 	frequencies: [
 		{

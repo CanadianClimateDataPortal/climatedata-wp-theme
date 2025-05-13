@@ -225,7 +225,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "periods_more_5_consecutive_dry_days",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "nr_cdd",
-		unit: 'Events',
+		unit: "Events",
 		temporalThresholdConfig: {
 			thresholds: {
 				nr_cdd: {

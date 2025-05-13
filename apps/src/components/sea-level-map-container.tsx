@@ -99,7 +99,9 @@ export default function SeaLevelMapContainer({
 			frequencyCode,
 			scenario,
 		];
-		if (climateVariable?.getId() !== 'sea_level') {
+		// If the scenario name doesn't already contain the percentile suffix,
+		// add the default (p50) percentile.
+		if (scenario && ! /-p\d+$/.test(scenario)) {
 			valuesArr.push('p50');
 		}
 		valuesArr.push(
@@ -142,14 +144,14 @@ export default function SeaLevelMapContainer({
 			{climateVariable?.getInteractiveMode() === 'region' && (
 				<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
 			)}
-			
+
 			{/* Use the unified custom panes with 'seaLevel' mode */}
 			<CustomPanesLayer mode="seaLevel" />
 			<LandmassStyler />
-			
+
 			{/* Use the unified variable layer */}
 			<VariableLayer layerValue={layerValue} />
-			
+
 			<ZoomControl />
 			<SearchControl />
 
@@ -178,7 +180,7 @@ export default function SeaLevelMapContainer({
 			/>
 
 			{/* Sea level landmass layer with transparent oceans */}
-			<WMSTileLayer 
+			<WMSTileLayer
 				url={`${GEOSERVER_BASE_URL}/geoserver/wms`}
 				layers={LAYER_KEYS.landmass}
 				format="image/png"

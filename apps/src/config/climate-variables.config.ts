@@ -1668,11 +1668,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			"2040",
 			"2050",
 		],
-		dateRangeConfig: {
-			min: "2006",
-			max: "2100",
-			interval: 10
-		},
 		unit: "cm",
 	},
 	/** MSC Climate Normals 1981-2010 */

@@ -64,10 +64,16 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 	}
 
 	getGridType(): string | null {
-		if (this.getVersion() === "cmip6") {
-			return "canadagrid-m6";
+		if (super.getGridType()) {
+			// Prioritize getting value from config.
+			return super.getGridType()
 		} else {
-			return "canadagrid";
+			// Fallback based on the version.
+			if (this.getVersion() === "cmip6") {
+				return "canadagrid-m6";
+			} else {
+				return "canadagrid";
+			}
 		}
 	}
 

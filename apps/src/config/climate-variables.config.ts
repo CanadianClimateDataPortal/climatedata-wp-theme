@@ -695,6 +695,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		],
 		hasDelta: false,
 		enableColourOptions: false,
+		gridType: "canadagrid1deg",
 	},
 	/** Standardized precipitation evapotranspiration index (3-months) */
 	{
@@ -718,6 +719,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		],
 		hasDelta: false,
 		enableColourOptions: false,
+		gridType: "canadagrid1deg",
 	},
 	/** Total Precipitation */
 	{

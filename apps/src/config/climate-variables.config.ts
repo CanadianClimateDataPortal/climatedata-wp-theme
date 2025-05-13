@@ -776,6 +776,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			}
 		],
+		dateRange: [
+			"1980",
+			"2010",
+		],
 	},
 	/** Cold Spell Days */
 	{
@@ -809,6 +813,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					placeholder: "0",
 				}
 			}
+		],
+		dateRange: [
+			"1980",
+			"2010",
 		],
 	},
 	/** Cooling Degree Days */
@@ -1034,6 +1042,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
+		dateRange: [
+			"1980",
+			"2010",
+		],
 	},
 	/** Days below temperature threshold */
 	{
@@ -1162,7 +1174,11 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					placeholder: "0",
 				}
 			}
-		]
+		],
+		dateRange: [
+			"1980",
+			"2010",
+		],
 	},
 
 	/** Freeze-Thaw Cycles */
@@ -1304,6 +1320,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
+		dateRange: [
+			"1980",
+			"2010",
+		],
 	},
 	/** Heat Wave Total Duration */
 	{
@@ -1407,6 +1427,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
+		dateRange: [
+			"1980",
+			"2010",
+		],
 	},
 	/** Maximum Consecutive Wet Days */
 	{
@@ -1429,6 +1453,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					placeholder: "0",
 				}
 			},
+		],
+		dateRange: [
+			"1980",
+			"2010",
 		],
 	},
 	/** Tropical Nights (Days with Tmin above threshold) */
@@ -1509,6 +1537,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					placeholder: "0",
 				}
 			},
+		],
+		dateRange: [
+			"1980",
+			"2010",
 		],
 	},
 	/** Wet Days */

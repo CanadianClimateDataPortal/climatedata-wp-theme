@@ -55,6 +55,7 @@ export const WP_API_DOMAIN = (rootElement?.getAttribute('data-wp-home-url')) ?? 
 
 export const WP_API_VARIABLE_PATH: string = '/wp-json/cdc/v3/variable';
 export const WP_API_LOCATION_BY_COORDS_PATH: string = '/wp-json/cdc/v2/get_location_by_coords';
+export const CAPTCHA_BASE_URL: string = WP_API_DOMAIN + '/site/assets/themes/climate-data-ca/resources/php/securimage/securimage_show.php';
 
 // TODO: these will come from the API..
 //  also, "high" key has the value that in the figma designs is set for "very-high", and

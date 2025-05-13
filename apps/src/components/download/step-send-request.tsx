@@ -6,7 +6,6 @@ import { RadioGroupFactory } from '@/components/ui/radio-group';
 import { ControlTitle } from '@/components/ui/control-title';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button';
 
 import { cn, isValidEmail } from '@/lib/utils';
 import { DownloadType, FileFormatType } from "@/types/climate-variable-interface";
@@ -16,7 +15,7 @@ import { setEmail, setSubscribe, setCaptchaCode, setCaptchaVerified } from '@/fe
 import { StepComponentRef } from "@/types/download-form-interface";
 import Dropdown from "@/components/ui/dropdown.tsx";
 import { normalizeDropdownOptions } from "@/lib/format.ts";
-import { verifyCaptcha, getCaptchaImageUrl } from '@/services/captcha';
+import { getCaptchaImageUrl } from '@/services/services';
 
 /**
  * Send download request step
@@ -25,7 +24,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { __ } = useI18n();
 	const { climateVariable, setFileFormat, setDecimalPlace } = useClimateVariable();
 
-	const { email, subscribe, captchaCode, captchaVerified } = useAppSelector(
+	const { email, subscribe, captchaCode } = useAppSelector(
 		(state) => state.download
 	);
 	const dispatch = useAppDispatch();
@@ -49,7 +48,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 				// File format is always required
 				Boolean(fileFormat),
 				// Captcha is always required
-				Boolean(captchaVerified),
+				Boolean(captchaCode),
 			];
 
 			// For analyzed downloads, add email validation
@@ -71,8 +70,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 
 			return {};
 		}
-	}), [climateVariable, email, captchaVerified]);
-
+	}), [climateVariable, email, captchaCode]);
 
 	const formatOptions = [
 		{ value: FileFormatType.CSV, label: 'CSV' },
@@ -104,8 +102,8 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	}, [fileFormat, decimalPlace, setDecimalPlace]);
 	
 	const refreshCaptcha = useCallback(() => {
-		dispatch(setCaptchaVerified(false));
 		dispatch(setCaptchaCode(''));
+		dispatch(setCaptchaVerified(false));
 		setCaptchaError('');
 		// Add a timestamp to force browser to reload image
 		setCaptchaUrl(`${getCaptchaImageUrl()}&t=${new Date().getTime()}`);
@@ -114,29 +112,6 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	useEffect(() => {
 		refreshCaptcha();
 	}, [refreshCaptcha]);
-	
-	const handleVerifyCaptcha = useCallback(async () => {
-		if (!captchaCode) {
-			setCaptchaError(__('Please enter the code shown in the image'));
-			return;
-		}
-		
-		try {
-			const result = await verifyCaptcha(captchaCode);
-			if (result.success) {
-				dispatch(setCaptchaVerified(true));
-				setCaptchaError('');
-			} else {
-				dispatch(setCaptchaVerified(false));
-				setCaptchaError(__('The code you entered is incorrect'));
-				refreshCaptcha();
-			}
-		} catch (error) {
-			dispatch(setCaptchaVerified(false));
-			setCaptchaError(__('Failed to verify code. Please try again.'));
-			refreshCaptcha();
-		}
-	}, [captchaCode, dispatch, __, refreshCaptcha]);
 
 	return (
 		<StepContainer title={__('Select file parameters')} isLastStep>
@@ -253,20 +228,11 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 								type="text"
 								placeholder="XXXX"
 								value={captchaCode}
-								disabled={captchaVerified}
 								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 									dispatch(setCaptchaCode(e.target.value))
 								}
 								className={`flex-grow ${captchaError ? 'border-red-500' : ''}`}
 							/>
-							<Button 
-								type="button"
-								onClick={handleVerifyCaptcha}
-								disabled={!captchaCode || captchaVerified}
-								variant={captchaVerified ? "default" : "secondary"}
-							>
-								{captchaVerified ? __('Verified') : __('Verify')}
-							</Button>
 						</div>
 						{captchaError && (
 							<p className="text-red-500 text-xs">{captchaError}</p>

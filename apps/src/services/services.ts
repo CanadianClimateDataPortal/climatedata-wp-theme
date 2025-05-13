@@ -12,7 +12,7 @@ import {
 } from '@/types/types';
 import L from 'leaflet';
 
-import {  WP_API_DOMAIN, WP_API_LOCATION_BY_COORDS_PATH, WP_API_VARIABLE_PATH  } from '@/lib/constants.ts';
+import {  WP_API_DOMAIN, WP_API_LOCATION_BY_COORDS_PATH, WP_API_VARIABLE_PATH, CAPTCHA_BASE_URL  } from '@/lib/constants.ts';
 
 // Cache for API responses to avoid duplicate requests
 const apiCache = new Map<string, any>();
@@ -498,4 +498,14 @@ export const fetchStationsList = async () => {
 		console.error('Error fetching stations list:', error);
 		throw error;
 	}
+};
+
+/**
+ * Get the URL for the captcha image
+ * 
+ * @param namespace - The namespace for the captcha (e.g., 'analyze')
+ * @returns The URL for the captcha image
+ */
+export const getCaptchaImageUrl = (namespace: string = 'analyze'): string => {
+	return `${CAPTCHA_BASE_URL}?namespace=${namespace}`;
 };

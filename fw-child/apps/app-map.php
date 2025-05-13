@@ -76,5 +76,10 @@ if ( isset( $assets['js'] ) && is_array( $assets['js'] ) && isset( $assets['js']
     }
 }
 ?>
+
+<script>
+    // URL encoder salt for the map app.
+    const URL_ENCODER_SALT = '<?php echo $GLOBALS['vars']['url_encoder_salt']; ?>';
+</script>
 </body>
 </html>

@@ -44,89 +44,108 @@ const StepSummary: React.FC = () => {
 
 	const { climateVariable } = useClimateVariable();
 
-	/**
-	 * @todo do we want to keep the dataset value in the useDownload fields context variable?
-	 */
-	const summaryData = useMemo(() => ([
-		{
-			title: __('Dataset'),
-			content: [dataset?.title?.[locale] ?? ''],
-		},
-		{
-			title: __('Variable'),
-			content: [climateVariable?.getTitle() ?? ''],
-		},
-		{
-			title: __('Variable options'),
-			content: <VariableOptionsSummary />,
-		},
-		{
-			title: __('Location or area'),
-			content: (() => {
-				const selectedCount = climateVariable?.getSelectedRegion()
-					? climateVariable?.getSelectedRegion()?.cellCount ?? 0
-					: climateVariable?.getSelectedPointsCount() ?? 0;
+	const summaryData = useMemo(() => {
+		const _summaryData = [
+			{
+				title: __('Dataset'),
+				content: [dataset?.title?.[locale] ?? ''],
+			},
+			{
+				title: __('Variable'),
+				content: [climateVariable?.getTitle() ?? ''],
+			},
+			{
+				title: __('Variable options'),
+				content: <VariableOptionsSummary />,
+			},
+			{
+				title: __('Location or area'),
+				content: (() => {
+					const selectedCount = climateVariable?.getSelectedRegion()
+						? climateVariable?.getSelectedRegion()?.cellCount ?? 0
+						: climateVariable?.getSelectedPointsCount() ?? 0;
 
-				return _n('1 selected', '%d selected', selectedCount).replace('%d', String(selectedCount));
-			})(),
-		},
-		{
-			title: __('Additional details'),
-			content: (() => {
-				const [startYear, endYear] = climateVariable?.getDateRange() ?? ['2041', '2070'];
-				const frequency = climateVariable?.getFrequency() ?? '';
-				const percentiles = climateVariable?.getPercentiles() ?? [];
-				const scenarios = climateVariable?.getAnalyzeScenarios() ?? [];
+					return _n('1 selected', '%d selected', selectedCount).replace('%d', String(selectedCount));
+				})(),
+			},
+			{
+				title: __('Additional details'),
+				content: (() => {
+					const [startYear, endYear] = climateVariable?.getDateRange() ?? ['2041', '2070'];
+					const frequency = climateVariable?.getFrequency() ?? '';
+					const percentiles = climateVariable?.getPercentiles() ?? [];
+					const scenarios = climateVariable?.getAnalyzeScenarios() ?? [];
 
-				const data = [];
+					const data = [];
 
-				if (startYear && endYear) {
-					data.push(`${startYear}-${endYear}`);
-				}
+					if (startYear && endYear) {
+						data.push(`${startYear}-${endYear}`);
+					}
 
-				if (frequency && frequency !== '') {
-					data.push(appConfig.frequencies.find(({ value }) => value === frequency)?.label ?? frequency);
-				}
+					if (frequency && frequency !== '') {
+						data.push(appConfig.frequencies.find(({ value }) => value === frequency)?.label ?? frequency);
+					}
 
-				if (scenarios && scenarios.length > 0) {
-					const scenarioParts: string[] = [];
-					scenarios.forEach((scenario) => {
-						scenarioParts.push(appConfig.scenarios.find(({ value }) => value === scenario)?.label ?? scenario);
-					});
-					data.push(scenarioParts.join(', '));
-				}
+					if (scenarios && scenarios.length > 0) {
+						const scenarioParts: string[] = [];
+						scenarios.forEach((scenario) => {
+							scenarioParts.push(appConfig.scenarios.find(({ value }) => value === scenario)?.label ?? scenario);
+						});
+						data.push(scenarioParts.join(', '));
+					}
 
-				if (percentiles && percentiles.length > 0) {
-					data.push(
-						percentiles.length === climateVariable?.getPercentileOptions().length
-							? __('All percentiles')
-							: _n('1 percentile', '%d percentiles', percentiles.length).replace(
-								'%d',
-								String(percentiles.length)
-							)
-					);
-				}
+					if (percentiles && percentiles.length > 0) {
+						data.push(
+							percentiles.length === climateVariable?.getPercentileOptions().length
+								? __('All percentiles')
+								: _n('1 percentile', '%d percentiles', percentiles.length).replace(
+									'%d',
+									String(percentiles.length)
+								)
+						);
+					}
 
-				return data.join(', ');
-			})(),
-		},
-		{
-			title: __('File parameters'),
-			content: (() => {
-				const fileFormat = climateVariable?.getFileFormat();
-				if(!fileFormat) return '';
+					return data.join(', ');
+				})(),
+			},
+			{
+				title: __('File parameters'),
+				content: (() => {
+					const fileFormat = climateVariable?.getFileFormat();
+					if(!fileFormat) return '';
 
-				const fileFormatLabels = {
-					[FileFormatType.CSV]: 'CSV',
-					[FileFormatType.JSON]: 'JSON',
-					[FileFormatType.NetCDF]: 'NetCDF',
-					[FileFormatType.GeoJSON]: 'GeoJSON',
-				};
+					const fileFormatLabels = {
+						[FileFormatType.CSV]: 'CSV',
+						[FileFormatType.JSON]: 'JSON',
+						[FileFormatType.NetCDF]: 'NetCDF',
+						[FileFormatType.GeoJSON]: 'GeoJSON',
+					};
 
-				return fileFormatLabels[fileFormat] ?? fileFormat;
-			})(),
-		},
-	]), [climateVariable, dataset, locale, __, _n]);
+					return fileFormatLabels[fileFormat] ?? fileFormat;
+				})(),
+			},
+		]
+
+		const variableId = climateVariable?.getId();
+		const variableClass = climateVariable?.getClass();
+
+		// Skip certain steps.
+		const skipIndexes: number[] = [];
+
+		// Similar to the logic found in DownloadProvider, hide certain step summary depending on the variable.
+		// @see src/context/download-provider.tsx:85
+		if (variableClass === 'StationClimateVariable') {
+			skipIndexes.push(2);
+
+			if (variableId !== 'station_data') skipIndexes.push(4);
+
+			if (variableId === 'future_building_design_value_summaries' || variableId === 'short_duration_rainfall_idf_data') skipIndexes.push(5);
+		}
+
+		return skipIndexes.length > 0
+			? _summaryData.filter((_, index) => !skipIndexes.includes(index))
+			: _summaryData;
+	}, [climateVariable, dataset, locale, __, _n]);
 
 	return (
 		<Card

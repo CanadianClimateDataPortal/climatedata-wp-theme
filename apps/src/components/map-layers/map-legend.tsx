@@ -94,10 +94,7 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 			?? ColourType.CONTINUOUS;
 
 		const hasCustomScheme = Boolean(customColors);
-		const unit = hasCustomScheme
-			? getCommonPrefix(customColors?.map(item => item?.label) ?? [])
-			: climateVariable?.getUnit() || '°C';
-
+		const unit = climateVariable?.getUnitLegend() || '°C'
 		legend.onAdd = () => {
 			const container = L.DomUtil.create(
 				'div',

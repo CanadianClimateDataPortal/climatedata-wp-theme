@@ -224,6 +224,9 @@ export interface ClimateVariableConfigInterface {
 	/** Unit decimal places */
 	unitDecimalPlaces?: number;
 
+	/** Unit legend */
+	unitLegend?: string;
+
 	/** InteractiveMode */
 	interactiveMode?: InteractiveMode;
 
@@ -369,6 +372,8 @@ export interface ClimateVariableInterface {
 	getUnit(): string;
 
 	getUnitDecimalPlaces(): number;
+
+	getUnitLegend(): string;
 
 	getInteractiveMode(): InteractiveMode;
 

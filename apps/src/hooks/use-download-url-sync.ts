@@ -21,7 +21,7 @@ export const useDownloadUrlSync = () => {
 	const isInitialized = useAppSelector((state) => state.downloadUrlSync.isInitialized);
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
-	
+
 	// Helper function to add parameters to URL
 	const addParamsToUrl = (
 		params: URLSearchParams
@@ -29,28 +29,28 @@ export const useDownloadUrlSync = () => {
 		if (climateVariableData?.id) {
 			params.set('var', climateVariableData.id);
 		}
-		
+
 		if (dataset && dataset.term_id) {
 			params.set('dataset', dataset.term_id.toString());
 		}
 	};
-	
+
 	const updateUrlWithDebounce = useCallback(() => {
 		if (typeof window === 'undefined' || !isInitialized) return;
-		
+
 		if (updateTimeoutRef.current !== null) {
 			window.clearTimeout(updateTimeoutRef.current);
 		}
-		
+
 		updateTimeoutRef.current = window.setTimeout(() => {
 			const params = new URLSearchParams();
-			
+
 			addParamsToUrl(params);
 
 			// Update URL without navigation
 			const newUrl = `${window.location.pathname}?${params.toString()}`;
 			window.history.replaceState({}, '', newUrl);
-			
+
 			updateTimeoutRef.current = null;
 		}, 200);
 	}, [
@@ -73,37 +73,38 @@ export const useDownloadUrlSync = () => {
 			try {
 				const datasetParam = params.get('dataset');
 				const variableParam = params.get('var');
-				
+
 				if (datasetParam) {
 					const datasets = await fetchTaxonomyData('datasets', 'download');
-					
+
 					// Find dataset by term_id
 					const datasetParamNum = parseInt(datasetParam);
 					const matchedDataset = !isNaN(datasetParamNum) ? datasets.find(dataset => dataset.term_id === datasetParamNum) : null;
-					
+
 					if (matchedDataset) {
 						dispatch(setDataset(matchedDataset));
-						
+
 						if (variableParam) {
 							const variables = await fetchPostsData('variables', 'download', matchedDataset, {});
 							const normalizedVariables = await normalizePostData(variables, 'en');
-							
+
 							// Find the matching config
 							const matchedVariable = ClimateVariables.find(
 								(config) => config.id === variableParam
 							);
-							
+
 							if (matchedVariable) {
 								const matchingPostData = normalizedVariables.find(post => post.id === variableParam);
-								
+
 								if (matchingPostData) {
 									// Create a config that includes post data
 									const variableConfig: ClimateVariableConfigInterface = {
 										...matchedVariable,
 										postId: matchingPostData.postId,
-										title: matchingPostData.title
+										title: matchingPostData.title,
+										datasetType: matchedDataset?.dataset_type,
 									};
-									
+
 									dispatch(setClimateVariable(variableConfig));
 								} else {
 									// Set the variable without post data
@@ -113,7 +114,7 @@ export const useDownloadUrlSync = () => {
 						}
 					}
 				}
-				
+
 				// Mark URL parameters as loaded
 				urlProcessingCompleteRef.current = true;
 				dispatch(setDownloadUrlParamsLoaded(true));

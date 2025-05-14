@@ -40,25 +40,38 @@ const VariableOptionsSummary: React.FC = () => {
 const StepSummary: React.FC = () => {
 	const { __, _n } = useI18n();
 	const { locale } = useLocale();
-	const { currentStep, goToStep, dataset } = useDownload();
+	const { currentStep, goToStep, dataset, steps } = useDownload();
 
 	const { climateVariable } = useClimateVariable();
 
 	const summaryData = useMemo(() => {
-		const _summaryData = [
-			{
+		const stepNames = steps.map((step) => step.displayName)
+
+		const summaryData = [];
+
+		if (stepNames.includes("StepDataset")) {
+			summaryData.push({
 				title: __('Dataset'),
 				content: [dataset?.title?.[locale] ?? ''],
-			},
-			{
+			});
+		}
+
+		if (stepNames.includes("StepVariable")) {
+			summaryData.push({
 				title: __('Variable'),
 				content: [climateVariable?.getTitle() ?? ''],
-			},
-			{
+			})
+		}
+
+		if (stepNames.includes("StepVariableOptions")) {
+			summaryData.push({
 				title: __('Variable options'),
 				content: <VariableOptionsSummary />,
-			},
-			{
+			})
+		}
+
+		if (stepNames.includes("StepLocation")) {
+			summaryData.push({
 				title: __('Location or area'),
 				content: (() => {
 					const selectedCount = climateVariable?.getSelectedRegion()
@@ -67,8 +80,11 @@ const StepSummary: React.FC = () => {
 
 					return _n('1 selected', '%d selected', selectedCount).replace('%d', String(selectedCount));
 				})(),
-			},
-			{
+			})
+		}
+
+		if (stepNames.includes("StepAdditionalDetails")) {
+			summaryData.push({
 				title: __('Additional details'),
 				content: (() => {
 					const [startYear, endYear] = climateVariable?.getDateRange() ?? ['2041', '2070'];
@@ -107,8 +123,11 @@ const StepSummary: React.FC = () => {
 
 					return data.join(', ');
 				})(),
-			},
-			{
+			})
+		}
+
+		if (stepNames.includes("StepSendRequest")) {
+			summaryData.push({
 				title: __('File parameters'),
 				content: (() => {
 					const fileFormat = climateVariable?.getFileFormat();
@@ -123,29 +142,11 @@ const StepSummary: React.FC = () => {
 
 					return fileFormatLabels[fileFormat] ?? fileFormat;
 				})(),
-			},
-		]
-
-		const variableId = climateVariable?.getId();
-		const variableClass = climateVariable?.getClass();
-
-		// Skip certain steps.
-		const skipIndexes: number[] = [];
-
-		// Similar to the logic found in DownloadProvider, hide certain step summary depending on the variable.
-		// @see src/context/download-provider.tsx:85
-		if (variableClass === 'StationClimateVariable') {
-			skipIndexes.push(2);
-
-			if (variableId !== 'station_data') skipIndexes.push(4);
-
-			if (variableId === 'future_building_design_value_summaries' || variableId === 'short_duration_rainfall_idf_data') skipIndexes.push(5);
+			})
 		}
 
-		return skipIndexes.length > 0
-			? _summaryData.filter((_, index) => !skipIndexes.includes(index))
-			: _summaryData;
-	}, [climateVariable, dataset, locale, __, _n]);
+		return summaryData
+	}, [steps, __, dataset?.title, locale, climateVariable, _n]);
 
 	return (
 		<Card

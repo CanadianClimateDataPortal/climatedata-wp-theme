@@ -179,7 +179,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "cumulative_degree_days_above_0",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "gddgrow_0",
-		unit: 'Days',
+		unit: 'Degree Days',
 		temporalThresholdConfig: {
 			thresholds: {
 				gddgrow_0: {

@@ -55,6 +55,7 @@ const DatasetsMenuItem: React.FC = () => {
 				isActive={isPanelActive(slug)}
 				onClick={handleClick}
 				tooltip={{ panelId: slug }}
+				data-panel-id={slug}
 			>
 				<Database size={16} />
 				<span className="grow">{__('Datasets')}</span>

@@ -21,8 +21,8 @@ class SeaLevelClimateVariable extends RasterPrecalculatedClimateVariable {
 		return ClimateVariableBase.prototype.getVersions.call(this).length > 0
 			? ClimateVariableBase.prototype.getVersions.call(this)
 			: [
-				"cmip5",
 				"cmip6",
+				"cmip5",
 			];
 	}
 

@@ -40,93 +40,113 @@ const VariableOptionsSummary: React.FC = () => {
 const StepSummary: React.FC = () => {
 	const { __, _n } = useI18n();
 	const { locale } = useLocale();
-	const { currentStep, goToStep, dataset } = useDownload();
+	const { currentStep, goToStep, dataset, steps } = useDownload();
 
 	const { climateVariable } = useClimateVariable();
 
-	/**
-	 * @todo do we want to keep the dataset value in the useDownload fields context variable?
-	 */
-	const summaryData = useMemo(() => ([
-		{
-			title: __('Dataset'),
-			content: [dataset?.title?.[locale] ?? ''],
-		},
-		{
-			title: __('Variable'),
-			content: [climateVariable?.getTitle() ?? ''],
-		},
-		{
-			title: __('Variable options'),
-			content: <VariableOptionsSummary />,
-		},
-		{
-			title: __('Location or area'),
-			content: (() => {
-				const selectedCount = climateVariable?.getSelectedRegion()
-					? climateVariable?.getSelectedRegion()?.cellCount ?? 0
-					: climateVariable?.getSelectedPointsCount() ?? 0;
+	const summaryData = useMemo(() => {
+		const stepNames = steps.map((step) => step.displayName)
 
-				return _n('1 selected', '%d selected', selectedCount).replace('%d', String(selectedCount));
-			})(),
-		},
-		{
-			title: __('Additional details'),
-			content: (() => {
-				const [startYear, endYear] = climateVariable?.getDateRange() ?? ['2041', '2070'];
-				const frequency = climateVariable?.getFrequency() ?? '';
-				const percentiles = climateVariable?.getPercentiles() ?? [];
-				const scenarios = climateVariable?.getAnalyzeScenarios() ?? [];
+		const summaryData = [];
 
-				const data = [];
+		if (stepNames.includes("StepDataset")) {
+			summaryData.push({
+				title: __('Dataset'),
+				content: [dataset?.title?.[locale] ?? ''],
+			});
+		}
 
-				if (startYear && endYear) {
-					data.push(`${startYear}-${endYear}`);
-				}
+		if (stepNames.includes("StepVariable")) {
+			summaryData.push({
+				title: __('Variable'),
+				content: [climateVariable?.getTitle() ?? ''],
+			})
+		}
 
-				if (frequency && frequency !== '') {
-					data.push(appConfig.frequencies.find(({ value }) => value === frequency)?.label ?? frequency);
-				}
+		if (stepNames.includes("StepVariableOptions")) {
+			summaryData.push({
+				title: __('Variable options'),
+				content: <VariableOptionsSummary />,
+			})
+		}
 
-				if (scenarios && scenarios.length > 0) {
-					const scenarioParts: string[] = [];
-					scenarios.forEach((scenario) => {
-						scenarioParts.push(appConfig.scenarios.find(({ value }) => value === scenario)?.label ?? scenario);
-					});
-					data.push(scenarioParts.join(', '));
-				}
+		if (stepNames.includes("StepLocation")) {
+			summaryData.push({
+				title: __('Location or area'),
+				content: (() => {
+					const selectedCount = climateVariable?.getSelectedRegion()
+						? climateVariable?.getSelectedRegion()?.cellCount ?? 0
+						: climateVariable?.getSelectedPointsCount() ?? 0;
 
-				if (percentiles && percentiles.length > 0) {
-					data.push(
-						percentiles.length === climateVariable?.getPercentileOptions().length
-							? __('All percentiles')
-							: _n('1 percentile', '%d percentiles', percentiles.length).replace(
-								'%d',
-								String(percentiles.length)
-							)
-					);
-				}
+					return _n('1 selected', '%d selected', selectedCount).replace('%d', String(selectedCount));
+				})(),
+			})
+		}
 
-				return data.join(', ');
-			})(),
-		},
-		{
-			title: __('File parameters'),
-			content: (() => {
-				const fileFormat = climateVariable?.getFileFormat();
-				if(!fileFormat) return '';
+		if (stepNames.includes("StepAdditionalDetails")) {
+			summaryData.push({
+				title: __('Additional details'),
+				content: (() => {
+					const [startYear, endYear] = climateVariable?.getDateRange() ?? ['2041', '2070'];
+					const frequency = climateVariable?.getFrequency() ?? '';
+					const percentiles = climateVariable?.getPercentiles() ?? [];
+					const scenarios = climateVariable?.getAnalyzeScenarios() ?? [];
 
-				const fileFormatLabels = {
-					[FileFormatType.CSV]: 'CSV',
-					[FileFormatType.JSON]: 'JSON',
-					[FileFormatType.NetCDF]: 'NetCDF',
-					[FileFormatType.GeoJSON]: 'GeoJSON',
-				};
+					const data = [];
 
-				return fileFormatLabels[fileFormat] ?? fileFormat;
-			})(),
-		},
-	]), [climateVariable, dataset, locale, __, _n]);
+					if (startYear && endYear) {
+						data.push(`${startYear}-${endYear}`);
+					}
+
+					if (frequency && frequency !== '') {
+						data.push(appConfig.frequencies.find(({ value }) => value === frequency)?.label ?? frequency);
+					}
+
+					if (scenarios && scenarios.length > 0) {
+						const scenarioParts: string[] = [];
+						scenarios.forEach((scenario) => {
+							scenarioParts.push(appConfig.scenarios.find(({ value }) => value === scenario)?.label ?? scenario);
+						});
+						data.push(scenarioParts.join(', '));
+					}
+
+					if (percentiles && percentiles.length > 0) {
+						data.push(
+							percentiles.length === climateVariable?.getPercentileOptions().length
+								? __('All percentiles')
+								: _n('1 percentile', '%d percentiles', percentiles.length).replace(
+									'%d',
+									String(percentiles.length)
+								)
+						);
+					}
+
+					return data.join(', ');
+				})(),
+			})
+		}
+
+		if (stepNames.includes("StepSendRequest")) {
+			summaryData.push({
+				title: __('File parameters'),
+				content: (() => {
+					const fileFormat = climateVariable?.getFileFormat();
+					if(!fileFormat) return '';
+
+					const fileFormatLabels = {
+						[FileFormatType.CSV]: 'CSV',
+						[FileFormatType.JSON]: 'JSON',
+						[FileFormatType.NetCDF]: 'NetCDF',
+						[FileFormatType.GeoJSON]: 'GeoJSON',
+					};
+
+					return fileFormatLabels[fileFormat] ?? fileFormat;
+				})(),
+			})
+		}
+
+		return summaryData
+	}, [steps, __, dataset?.title, locale, climateVariable, _n]);
 
 	return (
 		<Card

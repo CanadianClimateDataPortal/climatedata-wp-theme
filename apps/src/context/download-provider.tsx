@@ -42,7 +42,8 @@ import { useDownloadUrlSync } from '@/hooks/use-download-url-sync';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { TaxonomyData } from '@/types/types';
 import { StepComponentRef } from '@/types/download-form-interface';
-import { updateClimateVariable } from '@/store/climate-variable-slice';
+import { updateClimateVariable, setClimateVariable } from '@/store/climate-variable-slice';
+import { setCurrentStep } from '@/features/download/download-slice';
 import { STEPS } from '@/components/download/config';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 
@@ -68,9 +69,13 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	// Start at step 2 if URL has variable parameter
 	const params = new URLSearchParams(window.location.search);
 	const hasVariable = params.has('var');
-	const [currentStep, setCurrentStep] = useState<number>(hasVariable ? 2 : 1);
+	const [currentStep, setCurrentStepLocal] = useState<number>(hasVariable ? 2 : 1);
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const dispatch = useAppDispatch();
+
+	useEffect(() => {
+		dispatch(setCurrentStep(currentStep));
+	}, [currentStep, dispatch]);
 
 	/** Map of step numbers to their component refs */
 	const stepRefs = useRef(new Map<number, StepComponentRef>());
@@ -140,16 +145,20 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 			return payload;
 		}, {});
 
-		if (Object.keys(resetPayload).length > 0) {
+		// If we're going back to step 1, we should reset the climate variable
+		if (targetStep === 1 && climateVariable) {
+			// Reset the variable selection
+			dispatch(setClimateVariable(null));
+		} else if (Object.keys(resetPayload).length > 0) {
 			dispatch(updateClimateVariable(resetPayload));
 		}
-	}, [dispatch]);
+	}, [dispatch, climateVariable]);
 
 	/**
 	 * Navigates to the next step in the form.
 	 */
 	const goToNextStep = useCallback(
-		() => setCurrentStep((prev) => prev + 1),
+		() => setCurrentStepLocal((prev) => prev + 1),
 		[]
 	);
 
@@ -163,7 +172,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 		if (step < currentStep) {
 			resetStepsAfter(step);
 		}
-		setCurrentStep(step);
+		setCurrentStepLocal(step);
 	}, [currentStep, resetStepsAfter]);
 
 	const values: DownloadContextValue = {

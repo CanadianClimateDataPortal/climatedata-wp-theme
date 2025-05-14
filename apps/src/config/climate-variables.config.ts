@@ -225,7 +225,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		id: "periods_more_5_consecutive_dry_days",
 		class: "RasterPrecalculatedClimateVariable",
 		threshold: "nr_cdd",
-		unit: 'Events',
+		unit: "Events",
 		temporalThresholdConfig: {
 			thresholds: {
 				nr_cdd: {
@@ -695,6 +695,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		],
 		hasDelta: false,
 		enableColourOptions: false,
+		gridType: "canadagrid1deg",
 	},
 	/** Standardized precipitation evapotranspiration index (3-months) */
 	{
@@ -718,6 +719,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		],
 		hasDelta: false,
 		enableColourOptions: false,
+		gridType: "canadagrid1deg",
 	},
 	/** Total Precipitation */
 	{
@@ -776,6 +778,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			}
 		],
+		dateRange: [
+			"1980",
+			"2010",
+		],
 	},
 	/** Cold Spell Days */
 	{
@@ -809,6 +815,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					placeholder: "0",
 				}
 			}
+		],
+		dateRange: [
+			"1980",
+			"2010",
 		],
 	},
 	/** Cooling Degree Days */
@@ -1034,6 +1044,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
+		dateRange: [
+			"1980",
+			"2010",
+		],
 	},
 	/** Days below temperature threshold */
 	{
@@ -1162,7 +1176,11 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					placeholder: "0",
 				}
 			}
-		]
+		],
+		dateRange: [
+			"1980",
+			"2010",
+		],
 	},
 
 	/** Freeze-Thaw Cycles */
@@ -1304,6 +1322,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
+		dateRange: [
+			"1980",
+			"2010",
+		],
 	},
 	/** Heat Wave Total Duration */
 	{
@@ -1408,6 +1430,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
+		dateRange: [
+			"1980",
+			"2010",
+		],
 	},
 	/** Maximum Consecutive Wet Days */
 	{
@@ -1430,6 +1456,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					placeholder: "0",
 				}
 			},
+		],
+		dateRange: [
+			"1980",
+			"2010",
 		],
 	},
 	/** Tropical Nights (Days with Tmin above threshold) */
@@ -1510,6 +1540,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					placeholder: "0",
 				}
 			},
+		],
+		dateRange: [
+			"1980",
+			"2010",
 		],
 	},
 	/** Wet Days */

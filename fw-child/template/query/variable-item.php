@@ -65,11 +65,11 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 			<div class="col col-lg-8 offset-lg-0 col-14 offset-1 variable-details__links">
 				<?php
 				$page_availability = get_field( 'page_availability', $item['id'] );
-				$map_slug = 'map/';
+				$map_slug = 'maps/';
 				$dl_slug  = 'download/';
 
 				if ( 'fr' === $GLOBALS['fw']['current_lang_code'] ) {
-					$map_slug = 'carte/';
+					$map_slug = 'cartes/';
 					$dl_slug  = 'telechargement/';
 				}
 

@@ -21,6 +21,7 @@ export const initialState: DownloadState = {
 	email: '',
 	subscribe: false,
 	variableListLoading: false,
+	currentStep: 1,
 };
 
 // Create the slice
@@ -55,6 +56,13 @@ const downloadSlice = createSlice({
 		setVariableListLoading(state, action: PayloadAction<boolean>) {
 			state.variableListLoading = action.payload;
 		},
+		setCurrentStep(state, action: PayloadAction<number>) {
+			state.currentStep = action.payload;
+		},
+		resetVariableSelection(state) {
+			state.dataset = state.dataset; // Keep dataset
+			state.currentStep = 1;
+		},
 	},
 });
 
@@ -69,6 +77,8 @@ export const {
 	setEmail,
 	setSubscribe,
 	setVariableListLoading,
+	setCurrentStep,
+	resetVariableSelection,
 } = downloadSlice.actions;
 
 // Export reducer

@@ -248,3 +248,34 @@ function fw_get_field ( $field, $post_id = null ) {
 	return get_field ( $field, $post_id );
 
 }
+
+/**
+ * Return the rewrite slug for a post type for a specific language.
+ * 
+ * @param string $post_type - Post type for which to get the slug.
+ * @param string|null $lang - Language version of the slug. If not specified,
+ *                            default to the current language.
+ * @return string
+ */
+function fw_post_type_slug( $post_type, $lang = null ) {
+	if ( $lang == null ) {
+		$lang = $GLOBALS[ 'fw' ][ 'current_lang_code' ];
+	}
+
+	$slug = $post_type;
+
+	if ( $lang === 'fr' ) {
+		switch ( $post_type ) {
+			case 'resource':
+				$slug = 'ressource';
+				break;
+			case 'post':
+				$slug = 'nouvelle';
+				break;
+		}
+	} elseif ( $post_type === 'post' ) {
+		$slug = fw_get_news_slug();
+	}
+
+	return $slug;
+}

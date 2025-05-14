@@ -61,6 +61,6 @@ export default defineConfig({
                 path.resolve(__dirname), // allow access to root
                 path.resolve(__dirname, '../fw-child/resources/fonts') // allow access to the fonts folder
             ]
-        }
+        },
     }
 })

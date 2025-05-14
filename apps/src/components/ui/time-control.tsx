@@ -7,7 +7,7 @@ import {
 	SLIDER_MIN_YEAR,
 	SLIDER_MAX_YEAR,
 	SLIDER_DEFAULT_YEAR_VALUE,
-} from '@/lib/constants.ts';
+} from '@/lib/constants';
 import { useI18n } from '@wordpress/react-i18n';
 
 export const TimeControl = () => {

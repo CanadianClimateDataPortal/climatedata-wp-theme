@@ -12,7 +12,9 @@ import {
 } from '@/types/types';
 import L from 'leaflet';
 
-import {  WP_API_DOMAIN, WP_API_LOCATION_BY_COORDS_PATH, WP_API_VARIABLE_PATH  } from '@/lib/constants.ts';
+import {  WP_API_DOMAIN, WP_API_LOCATION_BY_COORDS_PATH, WP_API_VARIABLE_PATH  } from '@/lib/constants';
+
+import ahccdData from '@/assets/dummy/ahccd.json';
 
 // Cache for API responses to avoid duplicate requests
 const apiCache = new Map<string, any>();
@@ -461,39 +463,48 @@ export const fetchChoroValues = async (options: ChoroValuesOptions) => {
 		.then((json) => json);
 };
 
-
 /**
- * Fetches the list of climate stations from weather.gc.ca API.
+ * Fetches the list of climate stations from the API.
  *
  * @returns A list of stations with their names, ids and coords.
  */
-export const fetchStationsList = async () => {
+export const fetchStationsList = async ({ type }: { type?: string }) => {
 	try {
-		const url = 'https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y';
+		let data: any;
 
-		const response = await fetch(url, {
-			method: 'GET',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-		});
+		const fetchJson = async (url: string) => {
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+				},
+			});
+			if (!response.ok) {
+				throw new Error(`Failed to fetch stations list: ${response.statusText}`);
+			}
+			return response.json();
+		};
 
-		if (!response.ok) {
-			throw new Error(`Failed to fetch stations list: ${response.statusText}`);
+		if (type && type === 'ahccd') {
+			// TEMPORARY: Using local dummy JSON due to CORS issue
+			data = ahccdData;
+
+			// TO ENABLE WHEN CORS IS FIXED:
+			// data = await fetchJson('https://data.climatedata.ca/fileserver/ahccd/ahccd.json');
+		} else {
+			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y');
 		}
 
-		const data = await response.json();
-
-		// Extract and return the stations list
-		return data.features?.map((feature: { properties: { STATION_NAME: string; STN_ID: string }; geometry: { coordinates: [number, number] } }) => ({
-			name: feature.properties.STATION_NAME,
-			id: feature.properties.STN_ID,
+		return (data.features || []).map((feature: any) => ({
+			id: feature.properties?.STN_ID ?? feature.properties?.ID,
+			name: feature.properties?.STATION_NAME ?? feature.properties?.Name,
+			type: feature.properties.type,
 			coordinates: {
 				lat: feature.geometry.coordinates[1],
 				lng: feature.geometry.coordinates[0],
-			}
-		})) || [];
+			},
+		}));
 	} catch (error) {
 		console.error('Error fetching stations list:', error);
 		throw error;

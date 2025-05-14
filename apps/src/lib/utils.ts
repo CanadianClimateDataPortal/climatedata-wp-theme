@@ -225,4 +225,7 @@ export function prepareRaster(): void {
 	if (mapObjects) {
 		mapObjects.classList.add('to-raster');
 	}
+
+	// Resize the window to force a layout update.
+	window.dispatchEvent(new Event('resize'));
 }

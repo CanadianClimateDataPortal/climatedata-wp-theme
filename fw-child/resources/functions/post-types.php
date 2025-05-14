@@ -69,6 +69,7 @@ function posttype_variable()
         'publicly_queryable' => false,
         'capability_type' => 'page',
         'show_in_rest' => true,
+        'rewrite' => false,
     ];
     register_post_type('variable', $args);
 }
@@ -149,11 +150,15 @@ function posttype_resource()
         'publicly_queryable' => true,
         'capability_type' => 'page',
         'show_in_rest' => true,
+        'rewrite' => [
+            'slug' => fw_post_type_slug( 'resource' ),
+            'with_front' => false,
+        ],
     ];
     register_post_type('resource', $args);
 }
 
-add_action('init', 'posttype_resource', 0);
+add_action('init', 'posttype_resource', 1);
 
 // interactives
 
@@ -207,6 +212,7 @@ function posttype_interactive() {
         'publicly_queryable'  => false,
         'capability_type'     => 'page',
         'show_in_rest'        => true,
+        'rewrite' => false,
     );
     register_post_type( 'interactive', $args );
 
@@ -265,6 +271,7 @@ function posttype_definition() {
         'exclude_from_search'   => false,
         'publicly_queryable'    => true,
         'capability_type'       => 'page',
+        'rewrite' => false,
     );
     register_post_type( 'definition', $args );
 
@@ -322,6 +329,9 @@ function posttype_app() {
         'exclude_from_search'   => false,
         'publicly_queryable'    => true,
         'capability_type'       => 'page',
+        'rewrite'              => [
+            'with_front' => false,
+        ]
     );
     register_post_type( 'app', $args );
 

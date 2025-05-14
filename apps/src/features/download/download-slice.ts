@@ -22,6 +22,7 @@ export const initialState: DownloadState = {
 	subscribe: false,
 	variableListLoading: false,
 	captchaValue: '',
+	currentStep: 1,
 };
 
 // Create the slice
@@ -73,6 +74,13 @@ const downloadSlice = createSlice({
 		setCaptchaValue(state, action: PayloadAction<string>) {
 			state.captchaValue = action.payload;
 		},
+		setCurrentStep(state, action: PayloadAction<number>) {
+			state.currentStep = action.payload;
+		},
+		resetVariableSelection(state) {
+			state.dataset = state.dataset; // Keep dataset
+			state.currentStep = 1;
+		},
 	},
 });
 
@@ -92,6 +100,8 @@ export const {
 	setRequestError,
 	resetRequestState,
 	setCaptchaValue,
+	setCurrentStep,
+	resetVariableSelection,
 } = downloadSlice.actions;
 
 // Export reducer

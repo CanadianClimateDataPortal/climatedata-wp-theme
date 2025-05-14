@@ -145,7 +145,7 @@ const Steps: React.FC = () => {
 				<button
 					type="button"
 					onClick={handleNext}
-					disabled={!isStepValid || requestStatus !== 'loading'}
+					disabled={!isStepValid || requestStatus === 'loading'}
 					className={cn(
 						'w-64 mx-auto sm:mx-0 py-2 rounded-full uppercase text-white tracking-wider',
 						!isStepValid

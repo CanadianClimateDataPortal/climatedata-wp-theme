@@ -206,6 +206,7 @@ export interface DownloadState {
 	requestResult?: any;
 	requestError?: string | null;
 	captchaValue: string;
+	currentStep: number;
 }
 
 /**

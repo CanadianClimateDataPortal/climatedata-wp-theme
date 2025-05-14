@@ -353,6 +353,8 @@ export const getSeriesObject = (
 						visible: false,
 					} as SeriesLineOptions,
 				];
+			default:
+				return [];
 		}
 	} else if(climateVariableId === 'msc_climate_normals') {
 		return [

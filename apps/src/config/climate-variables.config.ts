@@ -272,7 +272,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
-		unit: "doy",
+		unit: "DoY",
 		temporalThresholdConfig: {
 			thresholds: {
 				first_fall_frost: {
@@ -356,7 +356,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 		},
-		unit: "doy",
+		unit: "DoY",
 		temporalThresholdConfig: {
 			thresholds: {
 				last_spring_frost: {
@@ -1105,7 +1105,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		finch: "degree_days_exceedance_date",
 		class: "RasterAnalyzeClimateVariable",
 		hasDelta: false,
-		unit: "doy",
+		unit: "DoY",
 		analysisFields: [
 			{
 				key: "sum_thresh",
@@ -1359,6 +1359,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		finch: "heating_degree_days",
 		class: "RasterAnalyzeClimateVariable",
 		threshold: "hddheat_18",
+		unit: 'Degree Days',
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.DOWNLOAD,

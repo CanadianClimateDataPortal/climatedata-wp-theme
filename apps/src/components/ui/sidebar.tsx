@@ -677,20 +677,24 @@ const SidebarPanel = React.forwardRef<
 		const handleClickOutside = (event: MouseEvent) => {
 			const target = event.target as Element;
 			
-			// Check if click is inside the panel
+			// Don't close if click is inside the panel
 			if (panelRef.current && panelRef.current.contains(target)) {
 				return;
 			}
 			
-			// Check if click is on any sidebar menu item/button
-			if (target.closest('[data-sidebar="menu-item"]') || 
-			    target.closest('[data-sidebar="menu-button"]')) {
-				return;
+			// Check if click is on dropdown or any dropdown element
+			const closestDropdown = target.closest('[role="listbox"], [role="combobox"], [role="dialog"], [data-state="open"]');
+			if (closestDropdown) {
+				// Check if this dropdown belongs to our panel
+				const dropdownOwner = document.querySelector(`[aria-controls="${closestDropdown.id}"]`);
+				if (dropdownOwner && panelRef.current && panelRef.current.contains(dropdownOwner)) {
+					return;
+				}
 			}
 			
-			// Check if it's a dropdown/popover
-			const dropdownElement = target.closest('[role="listbox"], [role="menu"]');
-			if (dropdownElement) {
+			// Don't close if click is on menu item/button with matching panel ID
+			const menuButton = target.closest('[data-sidebar="menu-button"]');
+			if (menuButton && menuButton.getAttribute('data-panel-id') === id) {
 				return;
 			}
 			

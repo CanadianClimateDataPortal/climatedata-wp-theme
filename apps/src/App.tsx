@@ -1,4 +1,3 @@
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { SidebarProvider } from '@/context/sidebar-provider';
 import Header from '@/components/header';
@@ -24,7 +23,6 @@ function App() {
 					<AnimatedPanelProvider>
 						<SidebarProvider>
 							<AppSidebar />
-							<SidebarTrigger />
 							<main className="flex flex-col h-screen">
 								<Header />
 								<MapWrapper />

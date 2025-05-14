@@ -6,18 +6,9 @@ import {
 	StepContainerDescription,
 } from '@/components/download/step-container';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
+import { useAppSelector } from '@/app/hooks';
 import { DownloadType, StationDownloadUrlsProps, DownloadFile, FrequencyType, FileFormatType } from '@/types/climate-variable-interface';
 import { cn } from '@/lib/utils';
-import { useAppSelector } from '@/app/hooks';
-
-interface AnalyzePayload {
-	namespace: string;
-	signup: boolean;
-	request_data: { [key: string]: string | null; };
-	submit_url: string | null;
-	stations?: string;
-	required_variables?: string[];
-}
 
 /**
  * Result step, the final one, allows the user to make download file or see a success message.
@@ -25,9 +16,7 @@ interface AnalyzePayload {
 const StepResult = React.forwardRef(() => {
 	const { __ } = useI18n();
 	const { climateVariable } = useClimateVariable();
-	const { subscribe } = useAppSelector(
-		(state) => state.download
-	);
+	const { requestResult } = useAppSelector((state) => state.download);
 
 	const [containerTitle, setContainerTitle] = useState<string | null>(null);
 	const [containerDescription, setContainerDescription] = useState<string | null>(null);
@@ -36,14 +25,20 @@ const StepResult = React.forwardRef(() => {
 	const [files, setFiles] = useState<DownloadFile[]>([]);
 
 	// Success messages
+	const analyzedRequestSuccessMessage = __('It may take 30 to 90 minutes to complete, depending on available resources.');
 	const downloadSuccessMessage = __('Your file is ready to download. Click the button below to start the download.');
 	const multipleDownloadSuccessMessage = __('Your files are ready to download. Click the buttons below to start the download.');
 	// Error messages
 	const downloadErrorMessage = __('An error occurred while preparing your file. Please try again later.');
-	const analyzeErrorMessage = __('An error occurred while preparing your request. Please try again later.');
 
-	// Set title, description and file
+	// Set title, description and file/analyzed request result
 	useEffect(() => {
+		if (requestResult && requestResult?.status === 'accepted' && climateVariable?.getDownloadType() === DownloadType.ANALYZED) {
+			setContainerTitle(__('Your request has been sent.'));
+			setContainerDescription(analyzedRequestSuccessMessage);
+			return;
+		}
+
 		const frequency = climateVariable?.getFrequency();
 
 		if (climateVariable?.getDownloadType() === DownloadType.PRECALCULATED && frequency !== FrequencyType.DAILY) {
@@ -96,84 +91,23 @@ const StepResult = React.forwardRef(() => {
 				}
 
 				climateVariable.getStationDownloadFiles(stationDownloadUrlsProps)
-					.then((downloadFiles) => {
-						if(downloadFiles.length > 1) {
-							setContainerDescription(multipleDownloadSuccessMessage);
-						} else if(downloadFiles.length > 0) {
-							setContainerDescription(downloadSuccessMessage);
-						} else {
-							setContainerDescription(downloadErrorMessage);
-						}
-
-						setFiles(downloadFiles);
-					})
-					.catch(() => {
+				.then((downloadFiles) => {
+					if(downloadFiles.length > 1) {
+						setContainerDescription(multipleDownloadSuccessMessage);
+					} else if(downloadFiles.length > 0) {
+						setContainerDescription(downloadSuccessMessage);
+					} else {
 						setContainerDescription(downloadErrorMessage);
-					});
-			}
-		} else {
-			// Analyzed climate variables (and precalculated daily variables)
-			
-			setContainerTitle(__('Send request'));
-			setContainerDescription(__('Your request is being sent...'));
-
-			if(climateVariable === null) {
-				setContainerDescription(analyzeErrorMessage);
-				return;
-			}
-
-			const datasetType = climateVariable.getDatasetType();
-
-			// Analysis namespace
-			const analysisNamespace = datasetType === 'ahccd'
-				? 'analyze-stations' // Observations
-				: 'analyze'; // Analyze climate variables
-
-			// const analysisFields = climateVariable.getAnalysisFields();
-			const analysisFieldValues = climateVariable.getAnalysisFieldValues();
-			const analysisUrl = climateVariable.getAnalysisUrl();
-
-			const payload: AnalyzePayload = {
-				namespace: analysisNamespace,
-				signup: subscribe,
-				request_data: analysisFieldValues, // TODO: not sure if this is correct but make sure it has the right data
-				submit_url: analysisUrl,
-			};
-			if(analysisNamespace === 'analyze-stations') {
-				// TODO: add selected stations
-				// payload.stations = climateVariable.getSelectedStations();
-				payload.required_variables = []; // TODO:
-			}
-
-			const sendRequest = async () => {
-				try {
-					const url = 'https://climatedata.ca/site/assets/themes/climate-data-ca/resources/ajax/finch-submit.php';
-					const response = await fetch(url, {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-						},
-						body: JSON.stringify(payload),
-					});
-
-					if (!response.ok) {
-						setContainerDescription(analyzeErrorMessage);
-						throw new Error('Failed to send request');
 					}
-		
-					const data = await response.json();
-					if (data.status === 'success') {
-						setContainerDescription(__('Your request has been sent. It may take 30 to 90 minutes to complete, depending on available resources.'));
-					}
-				} catch (error) {
-					setContainerDescription(analyzeErrorMessage);
-					throw new Error('Failed to send request: ' + error);
-				}
-			};
 
-			sendRequest();
+					setFiles(downloadFiles);
+				})
+				.catch(() => {
+					setContainerDescription(downloadErrorMessage);
+				});
+			}
 		}
-	}, [climateVariable, __, subscribe]);
+	}, [climateVariable, requestResult, __]);
 
 	// Cleanup files when the component unmounts
 	useEffect(() => {

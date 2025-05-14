@@ -172,9 +172,9 @@ const StepSummary: React.FC = () => {
 								<h3 className="text-xs font-semibold text-dark-purple tracking-wider leading-4 uppercase mb-1">
 									{item.title}
 								</h3>
-								<p className="text-brand-blue">
+								<div className="text-brand-blue">
 									{item.content}
-								</p>
+								</div>
 							</div>
 							<Button
 								variant="ghost"

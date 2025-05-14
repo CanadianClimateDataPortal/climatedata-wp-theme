@@ -202,6 +202,7 @@ export interface DownloadState {
 	email: string;
 	subscribe: boolean;
 	variableListLoading: boolean;
+	currentStep: number;
 }
 
 /**

@@ -21,17 +21,28 @@ export const useDownloadUrlSync = () => {
 	const isInitialized = useAppSelector((state) => state.downloadUrlSync.isInitialized);
 	const dataset = useAppSelector((state) => state.download.dataset);
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
+	const currentStep = useAppSelector((state) => 
+		state.download.currentStep !== undefined ? state.download.currentStep : 1
+	);
 
 	// Helper function to add parameters to URL
 	const addParamsToUrl = (
 		params: URLSearchParams
 	) => {
-		if (climateVariableData?.id) {
-			params.set('var', climateVariableData.id);
-		}
-
-		if (dataset && dataset.term_id) {
-			params.set('dataset', dataset.term_id.toString());
+		// Only include parameters if we're past step 1
+		if (currentStep > 1) {
+			if (dataset && dataset.term_id) {
+				params.set('dataset', dataset.term_id.toString());
+				
+				// Only include variable if we're at step 2 or beyond and have a selected variable
+				if (currentStep > 1 && climateVariableData?.id) {
+					params.set('var', climateVariableData.id);
+				}
+			}
+		} else {
+			// Clear params when on step 1
+			params.delete('var');
+			params.delete('dataset');
 		}
 	};
 
@@ -43,12 +54,12 @@ export const useDownloadUrlSync = () => {
 		}
 
 		updateTimeoutRef.current = window.setTimeout(() => {
-			const params = new URLSearchParams();
+			const params = new URLSearchParams(window.location.search);
 
 			addParamsToUrl(params);
 
 			// Update URL without navigation
-			const newUrl = `${window.location.pathname}?${params.toString()}`;
+			const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`;
 			window.history.replaceState({}, '', newUrl);
 
 			updateTimeoutRef.current = null;
@@ -56,7 +67,8 @@ export const useDownloadUrlSync = () => {
 	}, [
 		climateVariableData,
 		dataset,
-		isInitialized
+		isInitialized,
+		currentStep
 	]);
 
 	useEffect(() => {
@@ -133,7 +145,8 @@ export const useDownloadUrlSync = () => {
 		climateVariableData,
 		dataset,
 		updateUrlWithDebounce,
-		isInitialized
+		isInitialized,
+		currentStep
 	]);
 
 	// Clean up timeout on unmount

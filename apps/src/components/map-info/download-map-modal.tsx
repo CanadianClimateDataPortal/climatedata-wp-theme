@@ -31,6 +31,8 @@ declare global {
 				prepare_raster?: () => void;
 			};
 		};
+		URL_ENCODER_SALT: string;
+		DATA_URL: string;
 	}
 }
 
@@ -47,9 +49,9 @@ const DownloadMapModal: React.FC<{
 	const dataset = useAppSelector((state) => state.map.dataset);
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
 
-	// @todo to be replaced with real value.
-	const salt: string = '';
-	const data_url: string = '';
+	// Get Salt and Data URL to download Image Map from Server API.
+	const salt: string = window.URL_ENCODER_SALT;
+	const data_url: string = window.DATA_URL;
 
 	// Used by the Download Image Map server.
 	useEffect(() => {
@@ -91,7 +93,6 @@ const DownloadMapModal: React.FC<{
 	 * Fetches the image from the provided downloadUrl as a Blob and triggers a file download in the browser.
 	 * Sets a loading state while the request is in progress.
 	 * Includes an artificial delay for demonstration/testing purposes.
-	 * @param e - The click event from the anchor element
 	 */
 	const handleDownloadClick = async () => {
 		const mapUrl = new URL(window.location.href);
@@ -101,11 +102,15 @@ const DownloadMapModal: React.FC<{
 		const encoded_url = encodeURL(mapUrl.toString(), salt).encoded;
 		// Generate the generateMap URL.
 		const api_url = data_url + '/raster?url=' + encoded_url;
-		if (!api_url) return;
+		if (!api_url) {
+			return;
+		}
 		setIsGenerating(true);
 		try {
 			const response = await fetch(api_url);
-			if (!response.ok) throw new Error('Network response was not ok');
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
 			const blob = await response.blob();
 			downloadBlob(blob, `${title}-map.png`);
 		} catch (error) {

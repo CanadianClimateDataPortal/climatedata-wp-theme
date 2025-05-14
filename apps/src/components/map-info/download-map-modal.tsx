@@ -7,6 +7,8 @@
 import React, { useMemo, useState } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 import { Download, ExternalLink } from 'lucide-react';
+import { useAppSelector } from '@/app/hooks';
+import { WP_API_DOMAIN } from '@/lib/constants';
 
 // components
 import Modal from '@/components/ui/modal';
@@ -25,6 +27,10 @@ const DownloadMapModal: React.FC<{
 }> = ({ isOpen, onClose, title }) => {
 	const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
+	
+	// Get dataset and variable information for download URL
+	const dataset = useAppSelector((state) => state.map.dataset);
+	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
 
 	const { __ } = useI18n();
 
@@ -50,6 +56,15 @@ const DownloadMapModal: React.FC<{
 			}
 		}
 	};
+
+	// Generate download section URL with dataset and variable parameters
+	const getDownloadUrl = useMemo(() => {
+		if (!dataset || !climateVariableData || !climateVariableData.id) {
+			return `${WP_API_DOMAIN}/download-app/`;
+		}
+		
+		return `${WP_API_DOMAIN}/download-app/?dataset=${encodeURIComponent(dataset.term_id.toString())}&var=${encodeURIComponent(climateVariableData.id)}`;
+	}, [dataset, climateVariableData]);
 
 	const buttonText = useMemo(() => {
 		if (isGenerating) {
@@ -102,7 +117,7 @@ const DownloadMapModal: React.FC<{
 						)}
 					</ModalSectionBlockDescription>
 					<a
-						href="#"
+						href={getDownloadUrl}
 						target="_blank"
 						aria-label={__(
 							'Go to download sections (opens in a new tab)'

@@ -222,6 +222,12 @@ export interface ClimateVariableConfigInterface {
 	/** Unit */
 	unit?: string;
 
+	/** Unit decimal places */
+	unitDecimalPlaces?: number;
+
+	/** Unit legend */
+	unitLegend?: string;
+
 	/** InteractiveMode */
 	interactiveMode?: InteractiveMode;
 
@@ -320,6 +326,8 @@ export interface ClimateVariableConfigInterface {
 
 	analysisUrl?: string;
 
+	finch?: string;
+
 	selectedPoints?: GridCoordinates;
 
 	selectedRegion?: GridRegion | null;
@@ -363,6 +371,10 @@ export interface ClimateVariableInterface {
 	getLayerStyles(): string;
 
 	getUnit(): string;
+
+	getUnitDecimalPlaces(): number;
+
+	getUnitLegend(): string;
 
 	getInteractiveMode(): InteractiveMode;
 
@@ -439,6 +451,8 @@ export interface ClimateVariableInterface {
 	getStationDownloadFiles(props?: StationDownloadUrlsProps): Promise<DownloadFile[]>;
 
 	getAnalysisUrl(): string | null;
+
+	getFinch(): string;
 
 	getSelectedPoints(): GridCoordinates | null;
 

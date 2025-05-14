@@ -202,6 +202,7 @@ export interface DownloadState {
 	email: string;
 	subscribe: boolean;
 	variableListLoading: boolean;
+	currentStep: number;
 }
 
 /**
@@ -518,6 +519,8 @@ export interface ChartDataOptions {
 	variable: string;
 	dataset: string;
 	frequency: string;
+	unit?: string;
+	unitDecimals?: number;
 }
 
 export interface DeltaValuesOptions {

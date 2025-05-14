@@ -74,6 +74,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 		climateVariable?.getFileFormatTypes()?.includes(option.value)
 	);
 
+	const analysisNamespace = climateVariable?.getDatasetType() === 'ahccd' ? 'analyze-stations' : 'analyze';
 	const fileFormat = climateVariable?.getFileFormat() ?? undefined;
 
 	// Get the maximum number of decimals.
@@ -187,7 +188,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 					{/* TODO: maybe use a REST endpoint as src so we don't have to use the complete path? */}
 					<img
 						id="captcha_img"
-						src={`/assets/themes/fw-child/resources/php/securimage/securimage_show.php?namespace=analyze&${captchaRefresh}`}
+						src={`/assets/themes/fw-child/resources/php/securimage/securimage_show.php?namespace=${analysisNamespace}&${captchaRefresh}`}
 						alt="CAPTCHA"
 						className="w-20 h-10 border border-gray-300 rounded"
 					/>

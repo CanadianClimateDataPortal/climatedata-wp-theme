@@ -202,6 +202,11 @@ export interface DownloadState {
 	email: string;
 	subscribe: boolean;
 	variableListLoading: boolean;
+	requestStatus?: 'idle' | 'loading' | 'success' | 'error';
+	requestResult?: any;
+	requestError?: string | null;
+	captchaValue: string;
+	currentStep: number;
 }
 
 /**

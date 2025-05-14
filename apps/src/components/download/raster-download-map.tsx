@@ -1,29 +1,28 @@
-import React, { useCallback, useMemo, useRef } from 'react';
-import { RadioGroupFactory } from '@/components/ui/radio-group';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { setSelectionMode } from '@/features/download/download-slice';
-import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
-import { ControlTitle } from '@/components/ui/control-title';
-import { cn } from '@/lib/utils';
 import { MapContainer, TileLayer } from 'react-leaflet';
-import { DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM } from '@/lib/constants';
 import MapEvents from '@/components/map-layers/map-events';
 import CustomPanesLayer from '@/components/map-layers/custom-panes';
 import ZoomControl from '@/components/map-layers/zoom-control';
 import SearchControl from '@/components/map-layers/search-control';
-import InteractiveRegionSelect from '@/components/interactive-region-select';
 import SelectableCellsGridLayer from '@/components/map-layers/selectable-cells-grid-layer';
 import SelectableRectangleGridLayer from '@/components/map-layers/selectable-rectangle-grid-layer';
 import SelectableRegionLayer from '@/components/map-layers/selectable-region-layer';
+import InteractiveStationsLayer from '@/components/map-layers/interactive-stations-layer';
+import InteractiveRegionSelect from '@/components/interactive-region-select';
+import TagSelector from '@/components/ui/tag-selector';
+import StationTypeFilter from '@/components/download/ui/station-type-filter';
+import SelectionModeControls from '@/components/download/ui/selection-mode-controls';
+import SelectedCellsSummary from '@/components/download/ui/selected-cells-summary';
 import { useI18n } from '@wordpress/react-i18n';
 import { useMap } from '@/hooks/use-map';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { DownloadType, InteractiveRegionOption } from '@/types/climate-variable-interface';
 import {
-	DownloadType,
-	InteractiveRegionOption
-} from '@/types/climate-variable-interface';
-import InteractiveStationsLayer from "@/components/map-layers/interactive-stations-layer";
+	DEFAULT_MAX_ZOOM,
+	DEFAULT_MIN_ZOOM,
+} from '@/lib/constants';
 
 export default function RasterDownloadMap(): React.ReactElement {
 	const { __, _n } = useI18n();
@@ -32,12 +31,64 @@ export default function RasterDownloadMap(): React.ReactElement {
 		clearSelection: () => void;
 	}>(null);
 
-	const { climateVariable } = useClimateVariable();
+	const { climateVariable, removeSelectedPoint, addSelectedPoints } = useClimateVariable();
 	const { setMap } = useMap();
 	const { zoom, center, selectionMode } = useAppSelector(
 		(state) => state.download
 	);
 	const dispatch = useAppDispatch();
+
+	const [stationTypes, setStationTypes] = useState<string[]>(['T', 'P', 'B']);
+	const [stations, setStations] = useState<{ id: string, name: string, coordinates: { lat: number, lng: number }, type?: string }[]>([]);
+
+	const selectedPoints = climateVariable?.getSelectedPoints() ?? {};
+	const selectedIds = Object.keys(selectedPoints);
+
+	const selectedCells = useMemo(() => {
+		if (selectionMode === 'cells') {
+			return climateVariable?.getSelectedPointsCount() ?? 0;
+		}
+
+		const selectedRegion  = climateVariable?.getSelectedRegion();
+		if (selectedRegion) {
+			return selectedRegion?.cellCount ?? 0;
+		}
+
+		return 0;
+	}, [selectionMode, climateVariable]);
+
+	const showStationTypesFilter = climateVariable?.getDatasetType() === 'ahccd';
+	const showStationsListSelector = climateVariable?.getDatasetType() === 'ahccd' || climateVariable?.getInteractiveMode() === 'station'; // TODO: is it ok to also show this for other station maps?
+	const showSelectionModeControls = climateVariable?.getDatasetType() !== 'ahccd' && climateVariable?.getInteractiveMode() !== 'station';
+	const showInteractiveRegionsSelector = climateVariable?.getDownloadType() === DownloadType.ANALYZED && !showStationsListSelector;
+
+	const stationOptions = stations.map(station => ({ value: String(station.id), label: station.name }))
+	.sort((a, b) => a.label.localeCompare(b.label));
+
+	const handleTagSelectorChange = (ids: string[]) => {
+		if (!climateVariable) {
+			return;
+		}
+
+		const currentIds = Object.keys(climateVariable.getSelectedPoints() ?? {});
+
+		// Remove any deselected points
+		currentIds.forEach(id => {
+			if (!ids.includes(id)) {
+				removeSelectedPoint(Number(id));
+			}
+		});
+
+		// Add any newly selected points
+		ids.forEach(id => {
+			if (!currentIds.includes(id)) {
+				const station = stations.find(s => String(s.id) === id);
+				if (station && station.coordinates) {
+					addSelectedPoints({ [station.id]: { lat: station.coordinates.lat, lng: station.coordinates.lng, name: station.name } });
+				}
+			}
+		});
+	};
 
 	const clearSelection = () => {
 		interactiveLayerRef.current?.clearSelection();
@@ -46,13 +97,20 @@ export default function RasterDownloadMap(): React.ReactElement {
 	// TODO: there should be a better way of choosing which interactive layer to show, depending on variable config
 	const renderInteractiveLayer = useCallback(() => {
 		const mode = climateVariable?.getInteractiveMode();
+		const region = climateVariable?.getInteractiveRegion();
 		const datasetType = climateVariable?.getDatasetType();
 
-		if (mode === 'station' || datasetType === 'ahccd') {
-			return <InteractiveStationsLayer ref={interactiveLayerRef} selectable />;
+		if (datasetType === 'ahccd' || mode === 'station') {
+			return (
+				<InteractiveStationsLayer
+					ref={interactiveLayerRef}
+					selectable
+					type={datasetType === 'ahccd' ? 'ahccd' : undefined}
+					stationTypes={stationTypes}
+					onStationsLoaded={setStations}
+				/>
+			);
 		}
-
-		const region = climateVariable?.getInteractiveRegion();
 
 		if (region === InteractiveRegionOption.GRIDDED_DATA) {
 			return selectionMode === 'cells'
@@ -60,32 +118,8 @@ export default function RasterDownloadMap(): React.ReactElement {
 				: <SelectableRectangleGridLayer ref={interactiveLayerRef} maxCellsAllowed={1000} />;
 		}
 
-		return <SelectableRegionLayer />;
-	}, [climateVariable, selectionMode]);
-
-	const renderSelectionModeControls = useCallback(() => {
-		// TODO: is this assumption correct?
-		if (climateVariable?.getInteractiveMode() !== 'station') {
-			return (
-				<RadioGroupFactory
-					title={__('Ways to select on the map')}
-					name="map-selection-mode"
-					value={selectionMode}
-					orientation="horizontal"
-					className="mb-0"
-					optionClassName="me-8"
-					options={selectionModeOptions}
-					onValueChange={(value) => {
-						dispatch(setSelectionMode(value));
-						clearSelection();
-					}}
-				/>
-			);
-		}
-
-		// returning an empty div to keep the layout consistent
-		return <div />;
-	}, [climateVariable]);
+		return <SelectableRegionLayer ref={interactiveLayerRef} />;
+	}, [climateVariable, selectionMode, stationTypes]);
 
 	const selectionModeOptions = useMemo(() => {
 		const selectionModes = [
@@ -105,62 +139,50 @@ export default function RasterDownloadMap(): React.ReactElement {
 		return selectionModes;
 	}, [climateVariable]);
 
-	const selectedCells = useMemo(() => {
-		if (selectionMode === 'cells') {
-			return climateVariable?.getSelectedPointsCount() ?? 0;
-		}
-
-		const selectedRegion  = climateVariable?.getSelectedRegion();
-		if (selectedRegion) {
-			return selectedRegion?.cellCount ?? 0;
-		}
-
-		return 0;
-	}, [selectionMode, climateVariable]);
-
 	return (
 		<>
-			{climateVariable?.getDownloadType() === DownloadType.ANALYZED && (
+			{showInteractiveRegionsSelector && (
 				<div className="mb-8 sm:w-64">
 					<InteractiveRegionSelect />
 				</div>
 			)}
 
-			{climateVariable?.getInteractiveRegion() === InteractiveRegionOption.GRIDDED_DATA && (
+			{showStationTypesFilter && (
+				<StationTypeFilter
+					stationTypes={stationTypes}
+					setStationTypes={setStationTypes}
+				/>
+			)}
+
+			{showStationsListSelector && (
+				<TagSelector
+					options={stationOptions}
+					value={selectedIds}
+					onChange={handleTagSelectorChange}
+					placeholder={__('Select stations')}
+					className="mb-8 w-full"
+				/>
+			)}
+
+			{showSelectionModeControls && (
 				<div className="mb-4">
 					<div className="flex flex-col sm:flex-row gap-4 justify-between items-start">
-						{renderSelectionModeControls()}
+						<SelectionModeControls
+							selectionMode={selectionMode}
+							selectionModeOptions={selectionModeOptions}
+							onChange={(value) => {
+								dispatch(setSelectionMode(value));
+								clearSelection();
+							}}
+						/>
 						<div className="flex flex-row items-start gap-4">
-							{selectedCells > 0 && (
-								<Button
-									variant="ghost"
-									className="text-xs text-brand-red font-semibold leading-4 tracking-wider uppercase h-auto p-0"
-									onClick={clearSelection}
-								>
-									<RefreshCw size={16} />
-									{__('Clear')}
-								</Button>
-							)}
-							<div>
-								<ControlTitle
-									title={__('You selected:')}
-									className="my-0"
-								/>
-								<div
-									className={cn(
-										'text-2xl font-semibold leading-7 text-right',
-										selectedCells > 0
-											? 'text-brand-blue'
-											: 'text-neutral-grey-medium'
-									)}
-								>
-									{_n(
-										'1 Cell',
-										`${selectedCells} Cells`,
-										selectedCells
-									)}
-								</div>
-							</div>
+							<SelectedCellsSummary
+								selectedCells={selectedCells}
+								onClear={clearSelection}
+								showClearButton={selectedCells > 0}
+								__={__}
+								_n={_n}
+							/>
 						</div>
 					</div>
 				</div>

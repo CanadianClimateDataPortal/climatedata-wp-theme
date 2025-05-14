@@ -19,9 +19,17 @@ const downloadUrlSyncSlice = createSlice({
 		},
 		setDownloadUrlParamsLoaded: (state, action: PayloadAction<boolean>) => {
 			state.isLoaded = action.payload;
+		},
+		resetDownloadUrlSync: (state) => {
+			// Reset state but keep initialized flag to true
+			state.isLoaded = false;
 		}
 	}
 });
 
-export const { initializeDownloadUrlSync, setDownloadUrlParamsLoaded } = downloadUrlSyncSlice.actions;
+export const { 
+	initializeDownloadUrlSync, 
+	setDownloadUrlParamsLoaded,
+	resetDownloadUrlSync
+} = downloadUrlSyncSlice.actions;
 export default downloadUrlSyncSlice.reducer;

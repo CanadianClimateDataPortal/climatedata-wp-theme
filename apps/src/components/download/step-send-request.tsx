@@ -11,7 +11,7 @@ import { cn, isValidEmail } from '@/lib/utils';
 import { DownloadType, FileFormatType } from "@/types/climate-variable-interface";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setEmail, setSubscribe } from '@/features/download/download-slice';
+import { setEmail, setSubscribe, setCaptchaValue } from '@/features/download/download-slice';
 import { StepComponentRef } from "@/types/download-form-interface";
 import Dropdown from "@/components/ui/dropdown.tsx";
 import { normalizeDropdownOptions } from "@/lib/format.ts";
@@ -20,11 +20,12 @@ import { normalizeDropdownOptions } from "@/lib/format.ts";
  * Send download request step
  */
 const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
-	const [captchaValue, setCaptchaValue] = useState<string>('');
+	const captchaValue = useAppSelector((state) => state.download.captchaValue) || '';
+	const [captchaRefresh, setCaptchaRefresh] = useState(Math.random());
 	const { __ } = useI18n();
 	const { climateVariable, setFileFormat, setDecimalPlace } = useClimateVariable();
 
-	const { email, subscribe } = useAppSelector(
+	const { email, subscribe, requestStatus, requestError } = useAppSelector(
 		(state) => state.download
 	);
 	const dispatch = useAppDispatch();
@@ -128,7 +129,7 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 				/>
 			)}
 
-			{downloadType === DownloadType.ANALYZED &&
+			{downloadType === DownloadType.ANALYZED && (
 				<div className="flex flex-col gap-2">
 					<p className="text-sm text-neutral-grey-medium">
 						{__(
@@ -175,30 +176,46 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 						</span>
 					</label>
 				</div>
-			}
+			)}
 
-			{/* TODO: make this look good at least */}
 			<div className="mb-4">
 				<p className="text-sm text-neutral-grey-medium leading-5 mb-2">
 					{__('Enter the characters shown:')}
 				</p>
 				<div className="flex items-center space-x-3">
 					{/* Captcha display */}
-					<div className="w-20 h-10 bg-gray-200 flex items-center justify-center text-lg font-bold text-gray-600">
-						h5qj
-					</div>
+					{/* TODO: maybe use a REST endpoint as src so we don't have to use the complete path? */}
+					<img
+						id="captcha_img"
+						src={`/assets/themes/fw-child/resources/php/securimage/securimage_show.php?namespace=analyze&${captchaRefresh}`}
+						alt="CAPTCHA"
+						className="w-20 h-10 border border-gray-300 rounded"
+					/>
+					<button
+						type="button"
+						className="px-2 border rounded text-xl"
+						onClick={() => {
+							setCaptchaRefresh(Math.random());
+							dispatch(setCaptchaValue(''))
+						}}
+						title={__('Refresh Captcha')}
+					>
+						↻
+					</button>
 					{/* Captcha input */}
 					<input
 						type="text"
 						placeholder="XXXX"
 						value={captchaValue}
 						onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-							setCaptchaValue(e.target.value)
+							dispatch(setCaptchaValue(e.target.value))
 						}
 						className="border bg-white border-gray-300 rounded px-2 py-1 text-sm placeholder:text-neutral-grey-medium"
 					/>
 				</div>
 			</div>
+
+			{requestStatus === 'error' && <div className="text-red-600 text-sm mt-2">{requestError}</div>}
 		</StepContainer>
 	);
 });

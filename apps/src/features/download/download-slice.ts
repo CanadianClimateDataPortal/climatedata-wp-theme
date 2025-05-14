@@ -21,6 +21,8 @@ export const initialState: DownloadState = {
 	email: '',
 	subscribe: false,
 	variableListLoading: false,
+	captchaValue: '',
+	currentStep: 1,
 };
 
 // Create the slice
@@ -55,6 +57,30 @@ const downloadSlice = createSlice({
 		setVariableListLoading(state, action: PayloadAction<boolean>) {
 			state.variableListLoading = action.payload;
 		},
+		setRequestStatus(state, action: PayloadAction<'idle' | 'loading' | 'success' | 'error'>) {
+			state.requestStatus = action.payload;
+		},
+		setRequestResult(state, action: PayloadAction<any>) {
+			state.requestResult = action.payload;
+		},
+		setRequestError(state, action: PayloadAction<string | null>) {
+			state.requestError = action.payload;
+		},
+		resetRequestState(state) {
+			state.requestStatus = 'idle';
+			state.requestResult = undefined;
+			state.requestError = null;
+		},
+		setCaptchaValue(state, action: PayloadAction<string>) {
+			state.captchaValue = action.payload;
+		},
+		setCurrentStep(state, action: PayloadAction<number>) {
+			state.currentStep = action.payload;
+		},
+		resetVariableSelection(state) {
+			state.dataset = state.dataset; // Keep dataset
+			state.currentStep = 1;
+		},
 	},
 });
 
@@ -69,6 +95,13 @@ export const {
 	setEmail,
 	setSubscribe,
 	setVariableListLoading,
+	setRequestStatus,
+	setRequestResult,
+	setRequestError,
+	resetRequestState,
+	setCaptchaValue,
+	setCurrentStep,
+	resetVariableSelection,
 } = downloadSlice.actions;
 
 // Export reducer

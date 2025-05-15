@@ -76,6 +76,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 
 	// Subtitle displayed info
 	const datasetLabel = dataset?.title.en ?? '';
+	const variableLabel = climateVariable?.getTitle() ?? '';
 	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0]?.label;
 
 	// Tooltip format value helper
@@ -331,7 +332,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		return formatForFilename([
 			__(title),
 			__(datasetLabel),
-			__(climateVariable?.getTitle() ?? ''),
+			__(variableLabel),
 			__(versionLabel),
 			enableTabs ? __(activeTab) : null,
 		].filter(Boolean).join('-'));
@@ -400,7 +401,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					title: {
 						text: [
 							__(title),
-							__(climateVariable?.getTitle() ?? ''),
+							__(variableLabel),
 						].filter(Boolean).join(' - '),
 					},
 					yAxis: {
@@ -694,7 +695,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						{
 							[
 								__(datasetLabel),
-								__(climateVariable?.getTitle() ?? ''),
+								__(variableLabel),
 								__(versionLabel)
 							].filter(Boolean).join(' - ')
 						}

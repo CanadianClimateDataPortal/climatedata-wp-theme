@@ -41,8 +41,6 @@ const DownloadMapModal: React.FC<{
 	onClose: () => void;
 	title: string;
 }> = ({ isOpen, onClose, title }) => {
-	//const { climateVariable } = useClimateVariable();
-	//const [downloadUrl, setDownloadUrl] = useState<string>('default_value');
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
 	// Get dataset and variable information for download URL

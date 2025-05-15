@@ -50,6 +50,7 @@ export default function SeaLevelMap(): React.ReactElement {
 
 	return (
 		<div
+			id='wrapper-map'
 			ref={wrapperRef}
 			className={cn(
 				'map-wrapper',

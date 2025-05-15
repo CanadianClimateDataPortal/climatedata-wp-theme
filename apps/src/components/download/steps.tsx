@@ -4,11 +4,16 @@ import { useI18n } from '@wordpress/react-i18n';
 import StepNavigation from '@/components/download/step-navigation';
 import { useDownload } from '@/hooks/use-download';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setRequestStatus, setRequestError, setRequestResult } from '@/features/download/download-slice';
+import { setRequestStatus, setRequestError, setRequestResult, setDownloadLinks } from '@/features/download/download-slice';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { cn } from '@/lib/utils';
 import { StepComponentRef } from '@/types/download-form-interface';
-import { DownloadType } from '@/types/climate-variable-interface';
+import {
+	DownloadFile,
+	DownloadType,
+	FrequencyType,
+	StationDownloadUrlsProps
+} from '@/types/climate-variable-interface';
 
 /**
  * The Steps component dynamically renders the current step component from the STEPS configuration.
@@ -49,8 +54,6 @@ const Steps: React.FC = () => {
 
 				const analysisNamespace = climateVariable.getDatasetType() === 'ahccd' ? 'analyze-stations' : 'analyze';
 
-				// TODO: the getAnalysisFieldValues method should probably need to build the whole
-				//  payload, as it currenty returns only the `degree` field
 				const analysisFieldValues = climateVariable.getAnalysisFieldValues();
 				const analysisUrl = climateVariable.getAnalysisUrl();
 
@@ -115,6 +118,78 @@ const Steps: React.FC = () => {
 				} catch (error: any) {
 					dispatch(setRequestStatus('error'));
 					dispatch(setRequestError(error?.message || 'Unknown error'));
+				}
+			}
+			else if (climateVariable?.getDownloadType() === DownloadType.PRECALCULATED && climateVariable?.getFrequency() !== FrequencyType.DAILY) {
+				// Download precalculated climate variables
+				// and not daily frequency (daily frequency are analyzed)
+
+				if (climateVariable?.getInteractiveMode() === 'region') {
+					// Precalcultated variables (no station)
+
+					// Generate the file to be downloaded.
+					climateVariable.getDownloadUrl()
+					.then((url) => {
+						const file: DownloadFile = {
+							url: url ?? '',
+							label: 'file.zip'
+						};
+
+						dispatch(setDownloadLinks([file]));
+						dispatch(setRequestStatus('success'));
+
+						goToNextStep();
+					})
+					.catch(() => {
+						dispatch(setRequestStatus('error'));
+						dispatch(setDownloadLinks(undefined));
+					});
+				} else {
+					// TODO: make sure this is correct.. msc climate normals is a different datasetType than
+					// 	the rest of variables that would fall in this condition which all are 'ahccd'
+					// 	should msc climate normals behave differently than the others?
+					// For station variables
+					const selectedPoints = climateVariable.getSelectedPoints?.() ?? {};
+					const fileFormat = climateVariable.getFileFormat?.() ?? null;
+					const stationIds = Object.keys(selectedPoints);
+					const stationDownloadUrlsProps: StationDownloadUrlsProps = {};
+
+					switch (climateVariable.getId()) {
+						case 'msc_climate_normals':
+						case 'daily_ahccd_temperature_and_precipitation':
+							stationDownloadUrlsProps.stationIds = stationIds;
+							stationDownloadUrlsProps.fileFormat = fileFormat;
+							break;
+						case 'future_building_design_value_summaries': {
+							const first = Object.values(selectedPoints)[0];
+							stationDownloadUrlsProps.stationName = first?.name;
+							break;
+						}
+						case 'short_duration_rainfall_idf_data':
+							stationDownloadUrlsProps.stationId = stationIds[0];
+							break;
+						case 'station_data': {
+							stationDownloadUrlsProps.stationIds = stationIds;
+							stationDownloadUrlsProps.fileFormat = fileFormat;
+							const dateRange = climateVariable.getDateRange?.();
+							if (Array.isArray(dateRange) && dateRange.length >= 2) {
+								stationDownloadUrlsProps.dateRange = { start: dateRange[0], end: dateRange[1] };
+							}
+							break;
+						}
+					}
+
+					climateVariable.getStationDownloadFiles(stationDownloadUrlsProps)
+					.then((downloadFiles) => {
+						dispatch(setDownloadLinks(downloadFiles));
+						dispatch(setRequestStatus('success'));
+
+						goToNextStep();
+					})
+					.catch(() => {
+						dispatch(setRequestStatus('error'));
+						dispatch(setDownloadLinks(undefined));
+					});
 				}
 			}
 		}

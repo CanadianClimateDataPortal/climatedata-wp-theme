@@ -25,7 +25,6 @@ import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 interface InteractiveStationsLayerProps {
-	type?: string;
 	selectable?: boolean;
 	onLocationModalOpen?: (content: React.ReactNode) => void;
 	onLocationModalClose?: () => void;
@@ -69,7 +68,7 @@ const getAhccdSvgMarkup = (type: string, selected: boolean) => {
 
 const InteractiveStationsLayer = forwardRef<{
 	clearSelection: () => void;
-}, InteractiveStationsLayerProps>(({ selectable = false, onLocationModalOpen, onLocationModalClose, type, stationTypes, onStationSelect, onStationsLoaded }, ref) => {
+}, InteractiveStationsLayerProps>(({ selectable = false, onLocationModalOpen, onLocationModalClose, stationTypes, onStationSelect, onStationsLoaded }, ref) => {
 	const [stations, setStations] = useState<Station[]>([]);
 
 	const { climateVariable, addSelectedPoints, removeSelectedPoint, resetSelectedPoints } = useClimateVariable();
@@ -81,13 +80,13 @@ const InteractiveStationsLayer = forwardRef<{
 
 	// Fetch stations list on mount
 	useEffect(() => {
-		fetchStationsList({ type }).then(stations => {
+		fetchStationsList({ threshold: climateVariable?.getThreshold() ?? undefined }).then(stations => {
 			setStations(stations);
 			if (typeof onStationsLoaded === 'function') {
 				onStationsLoaded(stations);
 			}
 		});
-	}, [type, onStationsLoaded]);
+	}, [onStationsLoaded]);
 
 	const selectedIds = React.useMemo(
 		() => Object.keys(climateVariable?.getSelectedPoints() ?? {}).map(Number),
@@ -102,18 +101,16 @@ const InteractiveStationsLayer = forwardRef<{
 		markerRefs.current = {};
 
 		let filteredStations = stations;
-		if (type === 'ahccd') {
-			if (stationTypes && stationTypes.length === 0) {
-				filteredStations = [];
-			} else if (stationTypes && stationTypes.length > 0) {
-				filteredStations = stations.filter((station: any) => stationTypes.includes(station.type));
-			}
+		if (stationTypes && stationTypes.length === 0) {
+			filteredStations = [];
+		} else if (stationTypes && stationTypes.length > 0) {
+			filteredStations = stations.filter((station: any) => stationTypes.includes(station.type));
 		}
 
 		filteredStations.forEach((station: any) => {
 			let marker: L.Marker | L.CircleMarker | undefined;
 			const isSelected = selectedIds.includes(Number(station.id));
-			if (type === 'ahccd') {
+			if (stationTypes) {
 				// Defensive: check coordinates
 				if (
 					!station.coordinates ||
@@ -220,24 +217,26 @@ const InteractiveStationsLayer = forwardRef<{
 				layerGroupRef.current = null;
 			}
 		};
-	}, [map, stations, onLocationModalOpen, onLocationModalClose, selectable, addSelectedPoints, removeSelectedPoint, selectedIds, type, stationTypes, onStationSelect]);
+	}, [map, stations, onLocationModalOpen, onLocationModalClose, selectable, addSelectedPoints, removeSelectedPoint, selectedIds, stationTypes, onStationSelect]);
 
 	// Update marker styles when selection changes and on mount
 	useEffect(() => {
 		if (!markerRefs.current) return;
-		if (type === 'ahccd') return; // AHCCD icons don't use style changes
+
+		if (stationTypes) return; // AHCCD icons don't use style changes
+
 		selectedIds.forEach((id) => {
 			const marker = markerRefs.current[id];
 			if (marker && marker instanceof L.CircleMarker) {
 				marker.setStyle(SELECTED_STYLE);
 			}
 		});
-	}, [markerRefs.current, selectedIds, type]);
+	}, [markerRefs.current, selectedIds, stationTypes]);
 
 	// Expose clearSelection to parent via ref
 	useImperativeHandle(ref, () => ({
 		clearSelection() {
-			if (type === 'ahccd') {
+			if (stationTypes) {
 				// No style change for icons, but could implement icon swap if needed
 				resetSelectedPoints();
 			} else {
@@ -250,7 +249,7 @@ const InteractiveStationsLayer = forwardRef<{
 				resetSelectedPoints();
 			}
 		}
-	}), [selectedIds, resetSelectedPoints, type]);
+	}), [selectedIds, resetSelectedPoints, stationTypes]);
 
 	return null;
 });

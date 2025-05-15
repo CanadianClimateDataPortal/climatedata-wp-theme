@@ -161,7 +161,7 @@ export interface StationDownloadUrlsProps {
 	stationId?: string;
 	stationIds?: string[];
 	stationName?: string;
-	fileFormat?: string;
+	fileFormat?: FileFormatType | null;
 	dateRange?: {start: string, end: string}
 }
 

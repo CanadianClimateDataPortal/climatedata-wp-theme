@@ -4,9 +4,11 @@
  * A modal component that allows users to download the map as an image.
  *
  */
-import React, { useMemo, useState } from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 import { Download, ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { encodeURL, prepareRaster } from '@/lib/utils';
 import { useAppSelector } from '@/app/hooks';
 import { WP_API_DOMAIN } from '@/lib/constants';
 
@@ -19,41 +21,100 @@ import {
 	ModalSectionBlockDescription,
 } from '@/components/map-info/modal-section';
 
-// @todo: Currently does nothing. The image must be generated from the server.
+
+// Extend the global Window interface to allow simulation of jQuery-style API.
+// This is used to expose a `prepare_raster` function on `$.fn`
+declare global {
+	interface Window {
+		$?: {
+			fn?: {
+				prepare_raster?: () => void;
+			};
+		};
+		URL_ENCODER_SALT: string;
+		DATA_URL: string;
+	}
+}
+
 const DownloadMapModal: React.FC<{
 	isOpen: boolean;
 	onClose: () => void;
 	title: string;
 }> = ({ isOpen, onClose, title }) => {
-	const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
-	
+
 	// Get dataset and variable information for download URL
 	const dataset = useAppSelector((state) => state.map.dataset);
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
 
-	const { __ } = useI18n();
+	// Get Salt and Data URL to download Image Map from Server API.
+	const salt: string = window.URL_ENCODER_SALT;
+	const data_url: string = window.DATA_URL;
+
+	// Used by the Download Image Map server.
+	useEffect(() => {
+		// Ensure window.$ and window.$.fn exist
+		window.$ = window.$ || {};
+		window.$.fn = window.$.fn || {};
+
+		// Assign your function to $.fn.prepare_raster
+		window.$.fn.prepare_raster = prepareRaster;
+
+		return () => {
+			// Clean up if needed
+			if (window.$?.fn?.prepare_raster) {
+				delete window.$.fn.prepare_raster;
+			}
+		};
+	}, []);
+
+
+	// Make sure to remove #download so no tab is opened at the time of the screenshot
+	 const { __ } = useI18n();
+
+	// Utility to trigger a download of a Blob object as a file in the browser.
+	// Creates a temporary anchor element, sets the blob as its href, and programmatically clicks it.
+	// Cleans up the element and revokes the object URL after download starts.
+	const downloadBlob = (blob: Blob, filename: string) => {
+		const url = window.URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = filename;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		window.URL.revokeObjectURL(url);
+	};
 
 	/**
-	 * Called when the user first clicks the "Download" link.
-	 * Dynamically generates the map image URL and sets it to `downloadUrl`.
+	 * Handles the click event for the "Download" link.
+	 * Fetches the image from the provided downloadUrl as a Blob and triggers a file download in the browser.
+	 * Sets a loading state while the request is in progress.
+	 * Includes an artificial delay for demonstration/testing purposes.
 	 */
-	const handleDownloadClick = async (
-		e: React.MouseEvent<HTMLAnchorElement>
-	) => {
-		if (!downloadUrl) {
-			e.preventDefault();
-
-			setIsGenerating(true);
-			try {
-				// The image needs to be generated using a backend API.
-				const url = '';
-				setDownloadUrl(url);
-			} catch (error) {
-				console.error('Failed to generate download URL:', error);
-			} finally {
-				setIsGenerating(false);
+	const handleDownloadClick = async () => {
+		const mapUrl = new URL(window.location.href);
+		// Make sure to remove addition hashes.
+		mapUrl.hash = '';
+		// Encode the URL
+		const encoded_url = encodeURL(mapUrl.toString(), salt).encoded;
+		// Generate the generateMap URL.
+		const api_url = data_url + '/raster?url=' + encoded_url;
+		if (!api_url) {
+			return;
+		}
+		setIsGenerating(true);
+		try {
+			const response = await fetch(api_url);
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
 			}
+			const blob = await response.blob();
+			downloadBlob(blob, `${title}-map.png`);
+		} catch (error) {
+			console.error('Failed to generate download URL:', error);
+		} finally {
+			setIsGenerating(false);
 		}
 	};
 
@@ -62,7 +123,7 @@ const DownloadMapModal: React.FC<{
 		if (!dataset || !climateVariableData || !climateVariableData.id) {
 			return `${WP_API_DOMAIN}/download-app/`;
 		}
-		
+
 		return `${WP_API_DOMAIN}/download-app/?dataset=${encodeURIComponent(dataset.term_id.toString())}&var=${encodeURIComponent(climateVariableData.id)}`;
 	}, [dataset, climateVariableData]);
 
@@ -91,20 +152,17 @@ const DownloadMapModal: React.FC<{
 							'Your export will showcase your various data options. The map position will be the one you see on your screen.'
 						)}
 					</ModalSectionBlockDescription>
-					<a
-						href={downloadUrl || '#'}
-						target="_blank"
+					<Button
 						aria-label={__(
 							'Download current map image (opens in a new tab)'
 						)}
 						className={`inline-flex text-md font-normal leading-6 tracking-[0.8px] uppercase rounded-full px-4 py-2 bg-destructive text-destructive-foreground hover:bg-destructive/90 ${
 							isGenerating ? 'opacity-50 pointer-events-none' : ''
 						}`}
-						download={`${title}-map.png`}
 						onClick={handleDownloadClick}
 					>
 						{buttonText}
-					</a>
+					</Button>
 				</ModalSectionBlock>
 
 				<ModalSectionBlock>

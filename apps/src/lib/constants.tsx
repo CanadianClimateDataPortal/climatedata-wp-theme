@@ -218,3 +218,39 @@ export const DEFAULT_COLOUR_SCHEMES: Record<string, ColourScheme> = {
 		colours: ["#081D58", "#1F2F88", "#234DA0", "#1F72B1", "#2498C0", "#41B6C3", "#73C8BC", "#AADEB6", "#D6EFB2", "#F0F9B9", "#FEFED1", "#FFF0A9", "#FEE187", "#FEC965", "#FDAA48", "#FD8D3C", "#FC5A2D", "#ED2F21", "#D30F1F", "#B00026", "#800026"],
 	},
 }
+
+export const AHCCD_SQUARE_ICON = (
+	<svg width="20" height="20" viewBox="0 0 20 20">
+		<rect x="4" y="4" width="12" height="12" fill="#3b82f6" stroke="#222" strokeWidth="2" />
+	</svg>
+);
+
+export const AHCCD_TRIANGLE_ICON = (
+	<svg width="20" height="20" viewBox="0 0 20 20">
+		<polygon points="10,4 18,16 2,16" fill="#3b82f6" stroke="#222" strokeWidth="2" />
+	</svg>
+);
+
+export const AHCCD_CIRCLE_ICON = (
+	<svg width="20" height="20" viewBox="0 0 20 20">
+		<circle cx="10" cy="10" r="7" fill="#3b82f6" stroke="#222" strokeWidth="2" />
+	</svg>
+);
+
+export const AHCCD_SQUARE_ICON_SELECTED = (
+	<svg width="20" height="20" viewBox="0 0 20 20">
+		<rect x="4" y="4" width="12" height="12" fill="#e11d48" stroke="#222" strokeWidth="2" />
+	</svg>
+);
+
+export const AHCCD_TRIANGLE_ICON_SELECTED = (
+	<svg width="20" height="20" viewBox="0 0 20 20">
+		<polygon points="10,4 18,16 2,16" fill="#e11d48" stroke="#222" strokeWidth="2" />
+	</svg>
+);
+
+export const AHCCD_CIRCLE_ICON_SELECTED = (
+	<svg width="20" height="20" viewBox="0 0 20 20">
+		<circle cx="10" cy="10" r="7" fill="#e11d48" stroke="#222" strokeWidth="2" />
+	</svg>
+);

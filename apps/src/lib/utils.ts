@@ -221,7 +221,7 @@ export function prepareRaster(): void {
 	document.querySelectorAll('.tooltip').forEach(el => el.remove());
 
 	// Add 'to-raster' class to the map container to adjust its appearance for raster output
-	const mapObjects = document.getElementById('wrapper-map');
+	const mapObjects = document.getElementById('map-objects');
 	if (mapObjects) {
 		mapObjects.classList.add('to-raster');
 	}

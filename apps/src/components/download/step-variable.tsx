@@ -143,4 +143,6 @@ const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
     );
 });
 
+StepVariable.displayName = 'StepVariable';
+
 export default StepVariable;

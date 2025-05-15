@@ -155,6 +155,11 @@ add_action ( 'rest_api_init', function () {
 });
 
 function cdc_finch_submit () {
+  // have to do this because $_POSt was coming up empty due to the application-json header
+  $input = json_decode(file_get_contents('php://input'), true);
+  if (is_array($input)) {
+    $_POST = $input;
+  }
 
 	include_once ( locate_template ( 'resources/php/securimage/securimage.php' ) );
 	include_once ( locate_template ( 'resources/php/mailchimp.php' ) );

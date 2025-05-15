@@ -1,11 +1,11 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setDataset } from '@/features/download/download-slice';
+import { setDataset, setCurrentStep } from '@/features/download/download-slice';
 import { setClimateVariable } from '@/store/climate-variable-slice';
 import { ClimateVariables } from '@/config/climate-variables.config';
 import { ClimateVariableConfigInterface } from '@/types/climate-variable-interface';
 import { fetchTaxonomyData, fetchPostsData } from '@/services/services';
-import { initializeDownloadUrlSync, setDownloadUrlParamsLoaded } from '@/features/download/download-url-sync-slice';
+import { initializeDownloadUrlSync, setDownloadUrlParamsLoaded, resetDownloadUrlSync } from '@/features/download/download-url-sync-slice';
 import { normalizePostData } from '@/lib/format';
 
 /**
@@ -43,6 +43,9 @@ export const useDownloadUrlSync = () => {
 			// Clear params when on step 1
 			params.delete('var');
 			params.delete('dataset');
+			
+			// Also reset the URL sync state when going back to step 1
+			dispatch(resetDownloadUrlSync());
 		}
 	};
 
@@ -118,9 +121,11 @@ export const useDownloadUrlSync = () => {
 									};
 
 									dispatch(setClimateVariable(variableConfig));
+									dispatch(setCurrentStep(2));
 								} else {
 									// Set the variable without post data
 									dispatch(setClimateVariable(matchedVariable));
+									dispatch(setCurrentStep(2));
 								}
 							}
 						}

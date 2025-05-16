@@ -778,7 +778,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			}
 		],
-		dateRange: [
+		defaultDateRange: [
 			"1980",
 			"2010",
 		],
@@ -816,7 +816,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			}
 		],
-		dateRange: [
+		defaultDateRange: [
 			"1980",
 			"2010",
 		],
@@ -895,6 +895,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					placeholder: "0",
 				}
 			},
+		],
+		defaultDateRange: [
+			"1980",
+			"2010",
 		],
 	},
 	/** Days above Tmax */
@@ -1044,7 +1048,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
-		dateRange: [
+		defaultDateRange: [
 			"1980",
 			"2010",
 		],
@@ -1177,7 +1181,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			}
 		],
-		dateRange: [
+		defaultDateRange: [
 			"1980",
 			"2010",
 		],
@@ -1322,7 +1326,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
-		dateRange: [
+		defaultDateRange: [
 			"1980",
 			"2010",
 		],
@@ -1430,7 +1434,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
-		dateRange: [
+		defaultDateRange: [
 			"1980",
 			"2010",
 		],
@@ -1457,7 +1461,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
-		dateRange: [
+		defaultDateRange: [
 			"1980",
 			"2010",
 		],
@@ -1541,7 +1545,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				}
 			},
 		],
-		dateRange: [
+		defaultDateRange: [
 			"1980",
 			"2010",
 		],
@@ -1654,7 +1658,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		threshold: "slr",
 		hasDelta: false,
 		enableColourOptions: false,
-		dateRange: [
+		defaultDateRange: [
 			"2040",
 			"2050",
 		],

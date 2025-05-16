@@ -5,7 +5,7 @@ import { buttonVariants } from '@/lib/format';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { LucideIcon } from 'lucide-react';
 import L from 'leaflet';
-import { ClimateVariableConfigInterface } from '@/types/climate-variable-interface';
+import { ClimateVariableConfigInterface, DownloadFile } from '@/types/climate-variable-interface';
 
 /**
  * Represents valid locale values.
@@ -206,6 +206,7 @@ export interface DownloadState {
 	requestResult?: any;
 	requestError?: string | null;
 	captchaValue: string;
+	downloadLinks?: DownloadFile[];
 	currentStep: number;
 }
 
@@ -638,6 +639,7 @@ export interface VariableFilterCountProps {
 export interface Station {
 	id: string;
 	name: string;
+	type?: string;
 	coordinates: {
 		lat: number;
 		lng: number;

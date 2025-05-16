@@ -38,7 +38,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 	);
 	const dispatch = useAppDispatch();
 
-	const [stationTypes, setStationTypes] = useState<string[]>(['T', 'P', 'B']);
+	const [ahccdStationTypes, setAhccdStationTypes] = useState<string[]>(['T', 'P', 'B']);
 	const [stations, setStations] = useState<{ id: string, name: string, coordinates: { lat: number, lng: number }, type?: string }[]>([]);
 
 	const selectedPoints = climateVariable?.getSelectedPoints() ?? {};
@@ -57,9 +57,10 @@ export default function RasterDownloadMap(): React.ReactElement {
 		return 0;
 	}, [selectionMode, climateVariable]);
 
-	const showStationTypesFilter = climateVariable?.getDatasetType() === 'ahccd';
-	const showStationsListSelector = climateVariable?.getDatasetType() === 'ahccd' || climateVariable?.getInteractiveMode() === 'station'; // TODO: is it ok to also show this for other station maps?
-	const showSelectionModeControls = climateVariable?.getDatasetType() !== 'ahccd' && climateVariable?.getInteractiveMode() !== 'station';
+	// TODO: confirm these are the correct conditions for each
+	const showStationTypesFilter = climateVariable?.getThreshold() === 'ahccd';
+	const showStationsListSelector = climateVariable?.getThreshold() === 'ahccd' || climateVariable?.getInteractiveMode() === 'station'; // TODO: is it ok to also show this for other station maps?
+	const showSelectionModeControls = climateVariable?.getThreshold() !== 'ahccd' && climateVariable?.getInteractiveMode() !== 'station';
 	const showInteractiveRegionsSelector = climateVariable?.getDownloadType() === DownloadType.ANALYZED && !showStationsListSelector;
 
 	const stationOptions = stations.map(station => ({ value: String(station.id), label: station.name }))
@@ -96,30 +97,34 @@ export default function RasterDownloadMap(): React.ReactElement {
 
 	// TODO: there should be a better way of choosing which interactive layer to show, depending on variable config
 	const renderInteractiveLayer = useCallback(() => {
-		const mode = climateVariable?.getInteractiveMode();
-		const region = climateVariable?.getInteractiveRegion();
-		const datasetType = climateVariable?.getDatasetType();
-
-		if (datasetType === 'ahccd' || mode === 'station') {
+		if (climateVariable?.getThreshold() === 'ahccd') {
+			// Apparently only ahccd will have the station type filters, but confirm
 			return (
 				<InteractiveStationsLayer
 					ref={interactiveLayerRef}
 					selectable
-					type={datasetType === 'ahccd' ? 'ahccd' : undefined}
-					stationTypes={stationTypes}
+					stationTypes={ahccdStationTypes}
 					onStationsLoaded={setStations}
 				/>
 			);
 		}
-
-		if (region === InteractiveRegionOption.GRIDDED_DATA) {
+		else if (climateVariable?.getInteractiveMode() === 'station') {
+			return (
+				<InteractiveStationsLayer
+					ref={interactiveLayerRef}
+					selectable
+					onStationsLoaded={setStations}
+				/>
+			);
+		}
+		else if (climateVariable?.getInteractiveRegion() === InteractiveRegionOption.GRIDDED_DATA) {
 			return selectionMode === 'cells'
 				? <SelectableCellsGridLayer ref={interactiveLayerRef} maxCellsAllowed={1000} />
 				: <SelectableRectangleGridLayer ref={interactiveLayerRef} maxCellsAllowed={1000} />;
 		}
 
 		return <SelectableRegionLayer ref={interactiveLayerRef} />;
-	}, [climateVariable, selectionMode, stationTypes]);
+	}, [climateVariable, selectionMode, ahccdStationTypes]);
 
 	const selectionModeOptions = useMemo(() => {
 		const selectionModes = [
@@ -149,8 +154,8 @@ export default function RasterDownloadMap(): React.ReactElement {
 
 			{showStationTypesFilter && (
 				<StationTypeFilter
-					stationTypes={stationTypes}
-					setStationTypes={setStationTypes}
+					stationTypes={ahccdStationTypes}
+					setStationTypes={setAhccdStationTypes}
 				/>
 			)}
 

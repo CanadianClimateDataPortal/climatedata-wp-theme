@@ -225,7 +225,11 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	}
 
 	getDateRange(): string[] | null {
-		return this._config.dateRange ?? [
+		return this._config.dateRange ?? this.getDefaultDateRange();
+	}
+
+	getDefaultDateRange(): string[] | null {
+		return this._config.defaultDateRange ?? [
 			"2040",
 			"2070",
 		];
@@ -321,7 +325,7 @@ class ClimateVariableBase implements ClimateVariableInterface {
 			// If projection
 			if (this.getDatasetType() === 'projection') {
 				analysisUrl += 'ensemble_grid_point_';
-			} 
+			}
 
 			// Add climate variable finch
 			analysisUrl += this.getFinch();

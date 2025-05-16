@@ -87,9 +87,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 				payload.averagingType = null;
 			}
 
-			if (climateVariable.getDateRangeConfig()) {
-				payload.dateRange = null;
-			}
+			payload.dateRange = climateVariable.getDefaultDateRange();
 
 			if (climateVariable.getScenarios()?.length) {
 				payload.analyzeScenarios = [];
@@ -121,6 +119,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 
 	// Get the date range config.
 	const dateRangeConfig = climateVariable?.getDateRangeConfig();
+
 	// Get the date range selected by the user.
 	const dateRange = climateVariable?.getDateRange() ?? [];
 

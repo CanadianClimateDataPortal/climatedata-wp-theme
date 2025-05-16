@@ -33,6 +33,18 @@ export const getFeatureId = (properties: {
 	return properties.gid ?? properties.id ?? null;
 };
 
+// Custom layer properties
+type handleOnClickMapLayerProps = {
+	properties: {
+		gid?: number;
+		id?: number;
+		name?: string;
+		title?: string;
+		label_en?: string;
+		label_fr?: string
+	}
+};
+
 export const useInteractiveMapEvents = (
 	// @ts-expect-error: suppress leaflet typescript error
 	layerInstanceRef: React.MutableRefObject<L.VectorGrid | null>,
@@ -79,7 +91,7 @@ export const useInteractiveMapEvents = (
 	const dispatch = useAppDispatch();
 	const map = useMap();
 
-	const handleLocationMarkerChange = (locationId: string, locationTitle: string, latlng: L.LatLng) => {
+	const handleLocationMarkerChange = (locationId: string, locationTitle: string, latlng: L.LatLng, layer: handleOnClickMapLayerProps) => {
 		const previousLocationTitle = markerRef.current?.getTooltip()?.getContent();
 
 		// when the marker is already in the same region, do nothing
@@ -99,11 +111,24 @@ export const useInteractiveMapEvents = (
 			markerRef.current.removeFrom(map);
 		}
 
+		// marker click handler
+		const markerOnClick = {
+			latlng: latlng,
+			layer: layer
+		}
+
 		// add new marker to the map
 		markerRef.current = L.marker(latlng, MAP_MARKER_CONFIG)
 		.bindTooltip(locationTitle, {
 			direction: 'top',
 			offset: [0, -30],
+		})
+		.on('click', async () => {
+			try {
+				await handleClick(markerOnClick);
+			} catch (err) {
+				console.error('Error in click handler:', err);
+			}
 		})
 		.addTo(map);
 
@@ -139,7 +164,7 @@ export const useInteractiveMapEvents = (
 	// Handle click on a location
 	const handleClick = async (e: {
 		latlng: L.LatLng;
-		layer: { properties: { gid?: number; id?: number; name?: string; title?: string; label_en?: string; label_fr?: string } };
+		layer: handleOnClickMapLayerProps;
 	}) => {
 		const locationByCoords = await fetchLocationByCoords(e.latlng);
 
@@ -147,7 +172,7 @@ export const useInteractiveMapEvents = (
 		const locationId = locationByCoords?.geo_id ?? `${locationByCoords?.lat}|${locationByCoords?.lng}`;
 		const locationTitle = e.layer?.properties?.label_en ?? locationByCoords?.title;
 
-		handleLocationMarkerChange(locationId, locationTitle, e.latlng);
+		handleLocationMarkerChange(locationId, locationTitle, e.latlng, e.layer);
 
 		// Get feature id
 		const featureId = getFeatureId(e.layer.properties);

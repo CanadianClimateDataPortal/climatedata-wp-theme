@@ -149,7 +149,7 @@ export interface Coordinates {
 }
 
 export interface GridCoordinates {
-	[key: number]: Coordinates;
+	[key: string]: Coordinates;
 }
 
 export interface GridRegion {

@@ -14,6 +14,7 @@ interface TagSelectorOption {
 
 interface TagSelectorProps {
   options: TagSelectorOption[];
+  multiple?: boolean;
   value: string[];
   onChange: (newValues: string[]) => void;
   placeholder?: string;
@@ -22,6 +23,7 @@ interface TagSelectorProps {
 
 const TagSelector: React.FC<TagSelectorProps> = ({
   options,
+  multiple = true,
   value,
   onChange,
   placeholder = '',
@@ -57,42 +59,38 @@ const TagSelector: React.FC<TagSelectorProps> = ({
 
   // Keyboard navigation for dropdown
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    // Open dropdown on ArrowDown or Enter if closed
     if (!dropdownOpen && (e.key === 'ArrowDown' || e.key === 'Enter')) {
       setDropdownOpen(true);
-      setFocusedIndex(0); // Focus first option
+      setFocusedIndex(0);
       e.preventDefault();
       return;
     }
-
-    // If dropdown is closed or no options, do nothing
     if (!dropdownOpen) return;
     if (availableOptions.length === 0) return;
-
     if (e.key === 'ArrowDown') {
-      // Move focus down to the next option, stay if already in last option
       setFocusedIndex(idx => {
         if (idx === null) return 0;
         return Math.min(idx + 1, availableOptions.length - 1);
       });
       e.preventDefault();
     } else if (e.key === 'ArrowUp') {
-      // Move focus up to previous option, stay if already in first option
       setFocusedIndex(idx => {
         if (idx === null) return 0;
         return Math.max(idx - 1, 0);
       });
       e.preventDefault();
     } else if (e.key === 'Enter') {
-      // Select the focused option if any, close dropdown
       if (focusedIndex !== null && availableOptions[focusedIndex]) {
-        onChange([...value, availableOptions[focusedIndex].value]);
+        if (multiple) {
+          onChange([...value, availableOptions[focusedIndex].value]);
+        } else {
+          onChange([availableOptions[focusedIndex].value]);
+        }
         setDropdownOpen(false);
         setFocusedIndex(null);
       }
       e.preventDefault();
     } else if (e.key === 'Escape') {
-      // Close dropdown and clear focus on Escape
       setDropdownOpen(false);
       setFocusedIndex(null);
       e.preventDefault();
@@ -127,7 +125,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
       {value.length === 0 && (
         <span className="text-neutral-grey-medium select-none">{placeholder}</span>
       )}
-      {value.map(val => (
+      {(multiple ? value : value.filter(v => options.some(opt => opt.value === v))).map(val => (
         <span
           key={val}
           className="bg-cold-grey-2 rounded px-3 text-base font-medium text-neutral-grey-medium mr-1"
@@ -138,7 +136,11 @@ const TagSelector: React.FC<TagSelectorProps> = ({
             className="mr-2 focus:outline-none"
             onClick={e => {
               e.stopPropagation();
-              onChange(value.filter(v => v !== val));
+              if (multiple) {
+                onChange(value.filter(v => v !== val));
+              } else {
+                onChange([]);
+              }
             }}
             aria-label={`Remove ${getLabel(val)}`}
           >
@@ -148,32 +150,42 @@ const TagSelector: React.FC<TagSelectorProps> = ({
         </span>
       ))}
       {/* Dropdown for selecting more options */}
-      {dropdownOpen && availableOptions.length > 0 && (
+      {dropdownOpen && (
         <div
           ref={dropdownRef}
           className="absolute left-0 top-full mt-2 w-full bg-white border border-cold-grey-2 rounded shadow-lg z-50 max-h-60 overflow-auto"
           role="listbox"
         >
-          {availableOptions.map((opt, idx) => (
-            <div
-              key={opt.value}
-              role="option"
-              aria-selected={focusedIndex === idx}
-              className={cn(
-                'px-4 py-2 cursor-pointer text-base text-neutral-grey-medium',
-                focusedIndex === idx ? 'bg-brand-blue/20' : 'hover:bg-brand-blue/10'
-              )}
-              onClick={e => {
-                e.stopPropagation();
-                onChange([...value, opt.value]);
-                setDropdownOpen(false);
-                setFocusedIndex(null);
-              }}
-              onMouseEnter={() => setFocusedIndex(idx)}
-            >
-              {opt.label}
+          {availableOptions.length > 0 ? (
+            availableOptions.map((opt, idx) => (
+              <div
+                key={opt.value}
+                role="option"
+                aria-selected={focusedIndex === idx}
+                className={cn(
+                  'px-4 py-2 cursor-pointer text-base text-neutral-grey-medium',
+                  focusedIndex === idx ? 'bg-brand-blue/20' : 'hover:bg-brand-blue/10'
+                )}
+                onClick={e => {
+                  e.stopPropagation();
+                  if (multiple) {
+                    onChange([...value, opt.value]);
+                  } else {
+                    onChange([opt.value]);
+                  }
+                  setDropdownOpen(false);
+                  setFocusedIndex(null);
+                }}
+                onMouseEnter={() => setFocusedIndex(idx)}
+              >
+                {opt.label}
+              </div>
+            ))
+          ) : (
+            <div className="px-4 py-2 text-neutral-grey-medium text-base select-none opacity-60">
+              {placeholder || 'No options'}
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>

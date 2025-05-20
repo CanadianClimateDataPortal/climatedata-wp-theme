@@ -51,13 +51,34 @@
             "custom_choice_button_text": "Add new choice"
         },
         {
+            "key": "field_682cf1873d237",
+            "label": "Show in variables listing page",
+            "name": "show_in_listing",
+            "aria-label": "",
+            "type": "true_false",
+            "instructions": "If checked, this variable will be shown in the \"Variables\" page. It doesn't impact the availability in the \"Map\" or \"Download\" page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "Show in \"Variables\" page",
+            "default_value": 0,
+            "allow_in_bindings": 0,
+            "ui": 0,
+            "ui_on_text": "",
+            "ui_off_text": ""
+        },
+        {
             "key": "field_674d4164b944b",
             "label": "Relevant Trainings",
             "name": "relevant_trainings",
             "aria-label": "",
             "type": "relationship",
             "instructions": "This will be shown under Relevant Trainings for this variable.",
-            "required": 1,
+            "required": 0,
             "conditional_logic": 0,
             "wrapper": {
                 "width": "",
@@ -78,7 +99,7 @@
                 "post_type"
             ],
             "return_format": "id",
-            "min": 1,
+            "min": 0,
             "max": 5,
             "allow_in_bindings": 0,
             "elements": [
@@ -106,5 +127,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1733928231
+    "modified": 1747776323
 }

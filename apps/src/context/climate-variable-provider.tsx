@@ -48,7 +48,7 @@ export type ClimateVariableContextType = {
 	setDecimalPlace: (decimalPlace: number) => void;
 	setSelectedPoints: (gridCoordinates: GridCoordinates) => void;
 	addSelectedPoints: (gridCoordinate: GridCoordinates) => void;
-	removeSelectedPoint: (gid: number) => void;
+	removeSelectedPoint: (gid: string) => void;
 	resetSelectedPoints: () => void;
 	setSelectedRegion: (region: GridRegion) => void;
 	resetSelectedRegion: () => void;
@@ -377,7 +377,7 @@ export const ClimateVariableProvider: React.FC<{
 	);
 
 	const removeSelectedPoint = useCallback(
-		(gid: number) => {
+		(gid: string) => {
 			if (!climateVariableData) return;
 			const { [gid]: removed, ...rest } =
 				climateVariableData.selectedPoints ?? {};

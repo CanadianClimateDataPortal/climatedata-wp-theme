@@ -126,12 +126,12 @@ const SelectableCellsGridLayer = forwardRef<{
 
 				if (selectedPoints && selectedPoints[featureId] !== undefined) {
 					gridLayerRef.current.resetFeatureStyle(featureId);
-					removeSelectedPoint(featureId);
+					removeSelectedPoint(String(featureId));
 				} else {
 					if ((climateVariable?.getSelectedPointsCount() ?? 0) < maxCellsAllowed) {
 						gridLayerRef.current.setFeatureStyle(featureId, selectedCellStyles);
 						addSelectedPoints({
-							[featureId]: { ...e.latlng },
+							[String(featureId)]: { ...e.latlng },
 						})
 					}
 				}

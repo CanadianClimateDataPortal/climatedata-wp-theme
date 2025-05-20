@@ -2,6 +2,19 @@
 $this_sectors = get_the_terms( $item['id'], 'sector' );
 
 $variable_slug = get_post_field( 'post_name', $item['id'] );
+$variable_id = get_field( 'var_id', $item['id'] );
+$variable_datasets = get_the_terms( $item['id'], 'variable-dataset' );
+
+// The variable may be part of multiple datasets, but for the "View on map" and
+// "Download data" links, we want to preselect only the first non-AHCCD dataset.
+$variable_dataset = $variable_datasets[0]; // Default value
+foreach ( $variable_datasets as $dataset) {
+	$dataset_type = get_field( 'dataset_type', 'variable-dataset_' . $dataset->term_id );
+	if ( $dataset_type !== 'ahccd' ) {
+		$variable_dataset = $dataset;
+		break;
+	}
+}
 
 // Initialize current language.
 $current_lang = 'en';
@@ -76,14 +89,14 @@ if ( isset( $item['lang'] ) && in_array( $item['lang'], array( 'en', 'fr' ), tru
 				if ( is_array( $page_availability ) && ! empty( $page_availability ) ) {
 					if ( in_array( 'map', $page_availability, true ) ) {
 						?>
-						<a href="<?php echo home_url( $map_slug ); ?>?var_id=<?php echo $item['id']; ?>"
+						<a href="<?php echo home_url( $map_slug ); ?>?var=<?php echo $variable_id; ?>&dataset=<?php echo $variable_dataset->term_id; ?>"
 						   class="btn btn-primary btn-sm rounded-pill px-3"><?php _e( 'View on Map', 'cdc' ); ?></a>
 						<?php
 					}
 
 					if ( in_array( 'download', $page_availability, true ) ) {
 						?>
-						<a href="<?php echo home_url( $dl_slug ); ?>?var_id=<?php echo $item['id']; ?>"
+						<a href="<?php echo home_url( $dl_slug ); ?>?var=<?php echo $variable_id; ?>&dataset=<?php echo $variable_dataset->term_id; ?>"
 						   class="btn btn-light btn-sm rounded-pill px-3"><?php _e( 'Download Data', 'cdc' ); ?></a>
 						<?php
 					}

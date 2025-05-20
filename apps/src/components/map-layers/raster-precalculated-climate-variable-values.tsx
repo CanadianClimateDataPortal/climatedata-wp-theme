@@ -34,13 +34,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	const unit = climateVariable?.getUnit();
 	const decimals = climateVariable?.getUnitDecimalPlaces() ?? 0;
 	const dateRange = useMemo(() => {
-		const origRange = climateVariable?.getDateRange() ?? ["2041", "2070"];
-		const range = [...origRange];
-		// Force YYY1 instead of YYY0
-		if (range[0] && parseInt(range[0]) % 10 === 0) {
-			range[0] = (parseInt(range[0]) + 1).toString();
-		}
-		return range;
+		return climateVariable?.getDateRange() ?? ["2041", "2070"];
 	}, [climateVariable]);
 	const section = useContext(SectionContext);
 
@@ -178,9 +172,19 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 		return str;
 	};
 
+	// Generate display dateRange for UI only (year starting with 1 instead of 0)
+	const getDisplayDateRange = () => {
+		const displayOnlyDateRange = [...dateRange];
+		if (displayOnlyDateRange[0] && parseInt(displayOnlyDateRange[0]) % 10 === 0) {
+			displayOnlyDateRange[0] = (parseInt(displayOnlyDateRange[0]) + 1).toString();
+		}
+		return displayOnlyDateRange;
+	};
+
 	// Generate median div
 	const generateMedianDiv = (median: number) => {
 		const formattedMedian = valueFormatter(median);
+		const displayOnlyDateRange = getDisplayDateRange();
 
 		return (
 			<div className={mode === "modal" ? "w-1/2" : ""}>
@@ -192,7 +196,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 						{__('Median')}
 					</div>
 					<div className='text-xs text-neutral-grey-medium'>
-						({ dateRange[0] } - { dateRange[1] })
+						({ displayOnlyDateRange[0] } - { displayOnlyDateRange[1] })
 					</div>
 				</div>
 			</div>

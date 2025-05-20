@@ -19,6 +19,7 @@ import { useMap } from '@/hooks/use-map';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { DownloadType, InteractiveRegionOption } from '@/types/climate-variable-interface';
+import { Station } from '@/types/types';
 import {
 	DEFAULT_MAX_ZOOM,
 	DEFAULT_MIN_ZOOM,
@@ -31,7 +32,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 		clearSelection: () => void;
 	}>(null);
 
-	const { climateVariable, removeSelectedPoint, addSelectedPoints } = useClimateVariable();
+	const { climateVariable, removeSelectedPoint, addSelectedPoints, setSelectedPoints, resetSelectedPoints } = useClimateVariable();
 	const { setMap } = useMap();
 	const { zoom, center, selectionMode } = useAppSelector(
 		(state) => state.download
@@ -41,8 +42,10 @@ export default function RasterDownloadMap(): React.ReactElement {
 	const [ahccdStationTypes, setAhccdStationTypes] = useState<string[]>(['T', 'P', 'B']);
 	const [stations, setStations] = useState<{ id: string, name: string, coordinates: { lat: number, lng: number }, type?: string }[]>([]);
 
-	const selectedPoints = climateVariable?.getSelectedPoints() ?? {};
-	const selectedIds = Object.keys(selectedPoints);
+	const selectedIds = React.useMemo(
+		() => Object.keys(climateVariable?.getSelectedPoints() ?? {}),
+		[climateVariable]
+	);
 
 	const selectedCells = useMemo(() => {
 		if (selectionMode === 'cells') {
@@ -57,11 +60,12 @@ export default function RasterDownloadMap(): React.ReactElement {
 		return 0;
 	}, [selectionMode, climateVariable]);
 
-	// TODO: confirm these are the correct conditions for each
-	const showStationTypesFilter = climateVariable?.getThreshold() === 'ahccd';
-	const showStationsListSelector = climateVariable?.getThreshold() === 'ahccd' || climateVariable?.getInteractiveMode() === 'station'; // TODO: is it ok to also show this for other station maps?
-	const showSelectionModeControls = climateVariable?.getThreshold() !== 'ahccd' && climateVariable?.getInteractiveMode() !== 'station';
-	const showInteractiveRegionsSelector = climateVariable?.getDownloadType() === DownloadType.ANALYZED && !showStationsListSelector;
+	const showStationTypesFilter = climateVariable?.getId() === 'daily_ahccd_temperature_and_precipitation';
+	const isInteractiveModeStation = climateVariable?.getInteractiveMode() === 'station';
+	const multipleStationSelect = ! [
+		'future_building_design_value_summaries',
+		'short_duration_rainfall_idf_data'
+	].includes(climateVariable?.getId() ?? '');
 
 	const stationOptions = stations.map(station => ({ value: String(station.id), label: station.name }))
 	.sort((a, b) => a.label.localeCompare(b.label));
@@ -71,58 +75,98 @@ export default function RasterDownloadMap(): React.ReactElement {
 			return;
 		}
 
-		const currentIds = Object.keys(climateVariable.getSelectedPoints() ?? {});
-
-		// Remove any deselected points
-		currentIds.forEach(id => {
-			if (!ids.includes(id)) {
-				removeSelectedPoint(Number(id));
+		if (!multipleStationSelect) {
+			const id = ids[0];
+			const station = stations.find(s => s.id === id);
+			if (!id || !station?.coordinates) {
+				resetSelectedPoints();
+				return;
 			}
-		});
 
-		// Add any newly selected points
-		ids.forEach(id => {
-			if (!currentIds.includes(id)) {
-				const station = stations.find(s => String(s.id) === id);
-				if (station && station.coordinates) {
-					addSelectedPoints({ [station.id]: { lat: station.coordinates.lat, lng: station.coordinates.lng, name: station.name } });
+			setSelectedPoints({
+				[station.id]: {
+					lat: station.coordinates.lat,
+					lng: station.coordinates.lng,
+					name: station.name,
 				}
+			});
+			return;
+		}
+
+		const toBeRemoved = selectedIds.filter(id => !ids.includes(id));
+		const toBeAdded = ids.filter(id => !selectedIds.includes(id));
+
+		toBeRemoved.forEach(removeSelectedPoint);
+		toBeAdded.forEach(id => {
+			const station = stations.find(s => s.id === id);
+			if (station?.coordinates) {
+				addSelectedPoints({
+					[station.id]: {
+						lat: station.coordinates.lat,
+						lng: station.coordinates.lng,
+						name: station.name,
+					}
+				});
 			}
 		});
+	};
+
+	const handleStationSelect = (station: Station) => {
+		const stationId = String(station.id);
+
+		if (selectedIds.includes(stationId)) {
+			removeSelectedPoint(stationId);
+			return;
+		}
+
+		const selectedPoint = {
+			[stationId]: {
+				lat: station.coordinates.lat,
+				lng: station.coordinates.lng,
+				name: station.name,
+			}
+		};
+
+		multipleStationSelect ? addSelectedPoints(selectedPoint) : setSelectedPoints(selectedPoint);
 	};
 
 	const clearSelection = () => {
 		interactiveLayerRef.current?.clearSelection();
 	};
 
-	// TODO: there should be a better way of choosing which interactive layer to show, depending on variable config
 	const renderInteractiveLayer = useCallback(() => {
-		if (climateVariable?.getThreshold() === 'ahccd') {
-			// Apparently only ahccd will have the station type filters, but confirm
+		// For station type maps
+		if (isInteractiveModeStation) {
+			// Only one id currently will show the station type filters
+			if (showStationTypesFilter) {
+				return (
+					<InteractiveStationsLayer
+						ref={interactiveLayerRef}
+						stationTypes={ahccdStationTypes}
+						onStationSelect={handleStationSelect}
+						onStationsLoaded={setStations}
+					/>
+				);
+			}
+
+			// Default to map without station types filter
 			return (
 				<InteractiveStationsLayer
 					ref={interactiveLayerRef}
-					selectable
-					stationTypes={ahccdStationTypes}
+					onStationSelect={handleStationSelect}
 					onStationsLoaded={setStations}
 				/>
 			);
 		}
-		else if (climateVariable?.getInteractiveMode() === 'station') {
-			return (
-				<InteractiveStationsLayer
-					ref={interactiveLayerRef}
-					selectable
-					onStationsLoaded={setStations}
-				/>
-			);
-		}
-		else if (climateVariable?.getInteractiveRegion() === InteractiveRegionOption.GRIDDED_DATA) {
+
+		// TODO: is this condition correct?
+		if (climateVariable?.getInteractiveRegion() === InteractiveRegionOption.GRIDDED_DATA) {
 			return selectionMode === 'cells'
 				? <SelectableCellsGridLayer ref={interactiveLayerRef} maxCellsAllowed={1000} />
 				: <SelectableRectangleGridLayer ref={interactiveLayerRef} maxCellsAllowed={1000} />;
 		}
 
+		// Default to the multi-purpose region layer
 		return <SelectableRegionLayer ref={interactiveLayerRef} />;
 	}, [climateVariable, selectionMode, ahccdStationTypes]);
 
@@ -146,12 +190,6 @@ export default function RasterDownloadMap(): React.ReactElement {
 
 	return (
 		<>
-			{showInteractiveRegionsSelector && (
-				<div className="mb-8 sm:w-64">
-					<InteractiveRegionSelect />
-				</div>
-			)}
-
 			{showStationTypesFilter && (
 				<StationTypeFilter
 					stationTypes={ahccdStationTypes}
@@ -159,17 +197,23 @@ export default function RasterDownloadMap(): React.ReactElement {
 				/>
 			)}
 
-			{showStationsListSelector && (
-				<TagSelector
-					options={stationOptions}
-					value={selectedIds}
-					onChange={handleTagSelectorChange}
-					placeholder={__('Select stations')}
-					className="mb-8 w-full"
-				/>
-			)}
+			<div className="mb-8">
+				{isInteractiveModeStation ? (
+					<TagSelector
+						options={stationOptions}
+						value={selectedIds}
+						onChange={handleTagSelectorChange}
+						multiple={multipleStationSelect}
+						placeholder={__('Select station(s)')}
+					/>
+				) : (
+					<div className="sm:w-64">
+						<InteractiveRegionSelect />
+					</div>
+				)}
+			</div>
 
-			{showSelectionModeControls && (
+			{!isInteractiveModeStation && (
 				<div className="mb-4">
 					<div className="flex flex-col sm:flex-row gap-4 justify-between items-start">
 						<SelectionModeControls

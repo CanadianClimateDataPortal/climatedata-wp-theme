@@ -135,7 +135,7 @@ const SelectableRegionLayer = forwardRef<{ clearSelection: () => void }, {}>((_,
 			// unselect the feature if it is already selected
 			if (featureId && selectedIds.includes(featureId)) {
 				layerRef.current?.resetFeatureStyle(featureId);
-				removeSelectedPoint(featureId);
+				removeSelectedPoint(String(featureId));
 				return;
 			}
 
@@ -147,7 +147,7 @@ const SelectableRegionLayer = forwardRef<{ clearSelection: () => void }, {}>((_,
 			// add the feature to the selected points
 			layerRef.current.setFeatureStyle(featureId, selectedStyles);
 			setSelectedPoints({
-				[featureId]: { ...e.latlng },
+				[String(featureId)]: { ...e.latlng },
 			});
 		},
 		[selectedStyles, selectedIds, setSelectedPoints, removeSelectedPoint]

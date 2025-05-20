@@ -25,11 +25,10 @@ import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 interface InteractiveStationsLayerProps {
-	selectable?: boolean;
 	onLocationModalOpen?: (content: React.ReactNode) => void;
 	onLocationModalClose?: () => void;
 	stationTypes?: string[];
-	onStationSelect?: (station: { id: string, name: string }) => void;
+	onStationSelect?: (station: Station) => void;
 	onStationsLoaded?: (stations: Station[]) => void;
 }
 
@@ -68,7 +67,7 @@ const getAhccdSvgMarkup = (type: string, selected: boolean) => {
 
 const InteractiveStationsLayer = forwardRef<{
 	clearSelection: () => void;
-}, InteractiveStationsLayerProps>(({ selectable = false, onLocationModalOpen, onLocationModalClose, stationTypes, onStationSelect, onStationsLoaded }, ref) => {
+}, InteractiveStationsLayerProps>(({ onLocationModalOpen, onLocationModalClose, stationTypes, onStationSelect, onStationsLoaded }, ref) => {
 	const [stations, setStations] = useState<Station[]>([]);
 
 	const { climateVariable, addSelectedPoints, removeSelectedPoint, resetSelectedPoints } = useClimateVariable();
@@ -89,7 +88,7 @@ const InteractiveStationsLayer = forwardRef<{
 	}, [onStationsLoaded]);
 
 	const selectedIds = React.useMemo(
-		() => Object.keys(climateVariable?.getSelectedPoints() ?? {}).map(Number),
+		() => Object.keys(climateVariable?.getSelectedPoints() ?? {}),
 		[climateVariable]
 	);
 
@@ -104,12 +103,12 @@ const InteractiveStationsLayer = forwardRef<{
 		if (stationTypes && stationTypes.length === 0) {
 			filteredStations = [];
 		} else if (stationTypes && stationTypes.length > 0) {
-			filteredStations = stations.filter((station: any) => stationTypes.includes(station.type));
+			filteredStations = stations.filter((station: Station) => station.type && stationTypes.includes(station.type));
 		}
 
 		filteredStations.forEach((station: any) => {
 			let marker: L.Marker | L.CircleMarker | undefined;
-			const isSelected = selectedIds.includes(Number(station.id));
+			const isSelected = selectedIds.includes(station.id);
 			if (stationTypes) {
 				// Defensive: check coordinates
 				if (
@@ -142,12 +141,8 @@ const InteractiveStationsLayer = forwardRef<{
 			markerRefs.current[station.id] = marker;
 			marker.bindTooltip(station.name);
 			marker.on('click', () => {
-				if (selectable) {
-					if (selectedIds.includes(Number(station.id))) {
-						removeSelectedPoint(Number(station.id));
-					} else {
-						addSelectedPoints({ [station.id]: { lat: station.coordinates.lat, lng: station.coordinates.lng, name: station.name } });
-					}
+				if (typeof onStationSelect === 'function') {
+					onStationSelect(station);
 				} else if (onLocationModalOpen) {
 					// Open the location modal with the station details
 					// For MSC Climate normals 1981 - 2010
@@ -201,8 +196,6 @@ const InteractiveStationsLayer = forwardRef<{
 							}}
 						/>
 					);
-				} else if (typeof onStationSelect === 'function') {
-					onStationSelect({ id: station.id, name: station.name });
 				}
 			});
 			group.addLayer(marker);
@@ -217,7 +210,7 @@ const InteractiveStationsLayer = forwardRef<{
 				layerGroupRef.current = null;
 			}
 		};
-	}, [map, stations, onLocationModalOpen, onLocationModalClose, selectable, addSelectedPoints, removeSelectedPoint, selectedIds, stationTypes, onStationSelect]);
+	}, [map, stations, onLocationModalOpen, onLocationModalClose, addSelectedPoints, removeSelectedPoint, selectedIds, stationTypes, onStationSelect]);
 
 	// Update marker styles when selection changes and on mount
 	useEffect(() => {

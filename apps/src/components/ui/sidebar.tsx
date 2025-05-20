@@ -35,6 +35,7 @@ const Sidebar = React.forwardRef<
 			collapsible = 'offcanvas',
 			className,
 			children,
+			id='map-sidebar',
 			...props
 		},
 		ref
@@ -51,6 +52,7 @@ const Sidebar = React.forwardRef<
 						'bg-sidebar text-sidebar-foreground',
 						className
 					)}
+					id={id}
 					ref={ref}
 					{...props}
 				>
@@ -109,6 +111,7 @@ const Sidebar = React.forwardRef<
 				data-collapsible={state === 'collapsed' ? collapsible : ''}
 				data-variant={variant}
 				data-side={side}
+				id={id}
 			>
 				{/* This is what handles the sidebar gap on desktop */}
 				<div
@@ -156,6 +159,7 @@ const SidebarTrigger = React.forwardRef<
 			ref={ref}
 			data-sidebar="trigger"
 			variant="ghost"
+			id="sidebar-toggle"
 			size="icon"
 			className={cn('h-7 w-7', className)}
 			onClick={(event) => {
@@ -183,6 +187,7 @@ const SidebarRail = React.forwardRef<
 			data-sidebar="rail"
 			aria-label="Toggle Sidebar"
 			tabIndex={-1}
+			id="sidebar-toggle"
 			onClick={toggleSidebar}
 			title="Toggle Sidebar"
 			className={cn(
@@ -677,20 +682,24 @@ const SidebarPanel = React.forwardRef<
 		const handleClickOutside = (event: MouseEvent) => {
 			const target = event.target as Element;
 			
-			// Check if click is inside the panel
+			// Don't close if click is inside the panel
 			if (panelRef.current && panelRef.current.contains(target)) {
 				return;
 			}
 			
-			// Check if click is on any sidebar menu item/button
-			if (target.closest('[data-sidebar="menu-item"]') || 
-			    target.closest('[data-sidebar="menu-button"]')) {
-				return;
+			// Check if click is on dropdown or any dropdown element
+			const closestDropdown = target.closest('[role="listbox"], [role="combobox"], [role="dialog"], [data-state="open"]');
+			if (closestDropdown) {
+				// Check if this dropdown belongs to our panel
+				const dropdownOwner = document.querySelector(`[aria-controls="${closestDropdown.id}"]`);
+				if (dropdownOwner && panelRef.current && panelRef.current.contains(dropdownOwner)) {
+					return;
+				}
 			}
 			
-			// Check if it's a dropdown/popover
-			const dropdownElement = target.closest('[role="listbox"], [role="menu"]');
-			if (dropdownElement) {
+			// Don't close if click is on menu item/button with matching panel ID
+			const menuButton = target.closest('[data-sidebar="menu-button"]');
+			if (menuButton && menuButton.getAttribute('data-panel-id') === id) {
 				return;
 			}
 			

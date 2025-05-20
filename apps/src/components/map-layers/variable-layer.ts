@@ -10,7 +10,6 @@ import {
 } from "@/types/climate-variable-interface";
 import { generateColourScheme } from "@/lib/colour-scheme";
 import {VariableLayerProps, WMSParams} from '@/types/types';
- 
 
 /**
  * Variable layer Component
@@ -23,7 +22,7 @@ import {VariableLayerProps, WMSParams} from '@/types/types';
  * @returns {null}
  */
 
-export default function VariableLayer({ 
+export default function VariableLayer({
 	layerValue
 }: VariableLayerProps): null {
 	const map = useMap();
@@ -75,7 +74,7 @@ export default function VariableLayer({
 			<StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"
 			xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd">
-			<NamedLayer><n>${layerValue}</n><UserStyle><IsDefault>1</IsDefault><FeatureTypeStyle><Rule><RasterSymbolizer>
+			<NamedLayer><Name>${layerValue}</Name><UserStyle><IsDefault>1</IsDefault><FeatureTypeStyle><Rule><RasterSymbolizer>
 			<Opacity>1.0</Opacity><ColorMap type="${colourMapType}">`;
 
 		for (let i = 0; i < colours.length; i++) {
@@ -110,7 +109,7 @@ export default function VariableLayer({
 			pane: pane,
 			bounds: CANADA_BOUNDS,
 		};
-		
+
 		if (climateVariable?.getScenario() !== 'rcp85plus65-p50') {
 			params.TIME = parseInt(startYear) + '-01-00T00:00:00Z';
 		}
@@ -138,7 +137,6 @@ export default function VariableLayer({
 		map,
 		pane,
 		startYear,
-		mapData
 	]);
 
 	useEffect(() => {
@@ -146,6 +144,6 @@ export default function VariableLayer({
 			layerRef.current.setOpacity(mapData);
 		}
 	}, [mapData]);
-	
+
 	return null;
 }

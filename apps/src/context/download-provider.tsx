@@ -88,6 +88,11 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	 */
 	useEffect(() => {
 		setSteps(() => {
+			// If no climate variable is selected yet (like when first loading), use all steps
+			if (!climateVariable) {
+				return [...STEPS];
+			}
+			
 			if (climateVariable?.getClass() === 'StationClimateVariable') {
 				// skip step 3 (variable options) if it's a station variable
 				const skipIndexes = [2];
@@ -100,7 +105,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 			}
 			return [...STEPS];
 		});
-	}, [climateVariable?.getClass(), climateVariable?.getId()]);
+	}, [climateVariable]);
 
 	/**
 	 * Registers or unregisters a step component's ref.
@@ -135,6 +140,13 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 			.filter(([step]) => step > targetStep)
 			.sort(([stepA], [stepB]) => stepA - stepB);
 
+		// For step 1 we'll reset everything anyway
+		if (targetStep === 1) {
+			dispatch(setClimateVariable(null));
+			return;
+		}
+
+		// For other steps, collect and apply reset payloads
 		const resetPayload = stepsToReset.reduce((payload, [_, ref]) => {
 			if (ref.getResetPayload) {
 				return {
@@ -145,14 +157,10 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 			return payload;
 		}, {});
 
-		// If we're going back to step 1, we should reset the climate variable
-		if (targetStep === 1 && climateVariable) {
-			// Reset the variable selection
-			dispatch(setClimateVariable(null));
-		} else if (Object.keys(resetPayload).length > 0) {
+		if (Object.keys(resetPayload).length > 0) {
 			dispatch(updateClimateVariable(resetPayload));
 		}
-	}, [dispatch, climateVariable]);
+	}, [dispatch]);
 
 	/**
 	 * Navigates to the next step in the form.
@@ -170,9 +178,11 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({
 	 */
 	const goToStep = useCallback((step: number) => {
 		if (step < currentStep) {
+			setCurrentStepLocal(step);
 			resetStepsAfter(step);
+		} else {
+			setCurrentStepLocal(step);
 		}
-		setCurrentStepLocal(step);
 	}, [currentStep, resetStepsAfter]);
 
 	const values: DownloadContextValue = {

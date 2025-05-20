@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { VariantProps, cva } from 'class-variance-authority';
-import { X as CloseIcon } from 'lucide-react';
+import { X as CloseIcon, PanelLeft } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useI18n } from '@wordpress/react-i18n';
 
 import { useSidebar } from '@/hooks/use-sidebar';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
@@ -778,4 +779,5 @@ export {
 	SidebarPanel,
 	SidebarRail,
 	SidebarSeparator,
+	SidebarTrigger,
 };

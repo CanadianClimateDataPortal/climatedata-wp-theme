@@ -53,6 +53,7 @@ const VariablesMenuItem: React.FC = () => {
 				isActive={isPanelActive(slug)}
 				onClick={handleClick}
 				tooltip={{ panelId: slug }}
+				data-panel-id={slug}
 			>
 				<Map size={16} />
 				<span className="grow">{__('Variables')}</span>

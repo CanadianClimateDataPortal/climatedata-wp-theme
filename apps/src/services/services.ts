@@ -468,7 +468,7 @@ export const fetchChoroValues = async (options: ChoroValuesOptions) => {
  *
  * @returns A list of stations with their names, ids and coords.
  */
-export const fetchStationsList = async ({ type }: { type?: string }) => {
+export const fetchStationsList = async ({ threshold }: { threshold?: string }) => {
 	try {
 		let data: any;
 
@@ -486,20 +486,22 @@ export const fetchStationsList = async ({ type }: { type?: string }) => {
 			return response.json();
 		};
 
-		if (type && type === 'ahccd') {
+		if (threshold === 'ahccd') {
 			// TEMPORARY: Using local dummy JSON due to CORS issue
 			data = ahccdData;
 
 			// TO ENABLE WHEN CORS IS FIXED:
 			// data = await fetchJson('https://data.climatedata.ca/fileserver/ahccd/ahccd.json');
+		} else if (threshold === 'station-data') {
+			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE');
 		} else {
 			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y');
 		}
 
 		return (data.features || []).map((feature: any) => ({
-			id: feature.properties?.STN_ID ?? feature.properties?.ID,
+			id: feature.properties?.ID ?? (threshold === 'station-data') ? feature.properties?.STN_ID : feature?.id,
 			name: feature.properties?.STATION_NAME ?? feature.properties?.Name,
-			type: feature.properties.type,
+			type: feature.properties?.type,
 			coordinates: {
 				lat: feature.geometry.coordinates[1],
 				lng: feature.geometry.coordinates[0],

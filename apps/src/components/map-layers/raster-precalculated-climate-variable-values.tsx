@@ -34,7 +34,13 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	const unit = climateVariable?.getUnit();
 	const decimals = climateVariable?.getUnitDecimalPlaces() ?? 0;
 	const dateRange = useMemo(() => {
-		return climateVariable?.getDateRange() ?? ["2041", "2070"];
+		const origRange = climateVariable?.getDateRange() ?? ["2041", "2070"];
+		const range = [...origRange];
+		// Force YYY1 instead of YYY0
+		if (range[0] && parseInt(range[0]) % 10 === 0) {
+			range[0] = (parseInt(range[0]) + 1).toString();
+		}
+		return range;
 	}, [climateVariable]);
 	const section = useContext(SectionContext);
 

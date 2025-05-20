@@ -45,6 +45,8 @@ const MapHeader: React.FC<MapInfoProps> = ({ data = null }): React.ReactElement 
 			// set the position of the panel to be below the header. ref here is the toggle buttons container element
 			setPanelProps({
 				direction: 'right',
+				// prevent full width on desktop
+				className: 'md:!left-auto',
 				position: {
 					top: ref.current?.getBoundingClientRect().top || 0,
 					left: 0,
@@ -79,7 +81,7 @@ const toggleVariableDetailsPanel = () => {
 
 	return (
 		<>
-			<aside className="map-header relative z-20">
+			<aside id="header-map" className="map-header relative z-20">
 				<div
 					ref={ref}
 					className="absolute top-0 left-0 overflow-y-auto w-full"

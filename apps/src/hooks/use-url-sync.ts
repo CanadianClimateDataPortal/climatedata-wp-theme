@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setOpacity, setTimePeriodEnd, setDataset, setVariableList, setVariableListLoading } from '@/features/map/map-slice';
+import { setOpacity, setTimePeriodEnd, setDataset, setVariableList, setVariableListLoading, setMapCoordinates } from '@/features/map/map-slice';
 import { setClimateVariable } from '@/store/climate-variable-slice';
 import { ClimateVariables } from '@/config/climate-variables.config';
 import { ClimateVariableConfigInterface, InteractiveRegionOption } from '@/types/climate-variable-interface';
@@ -24,6 +24,7 @@ export const useUrlSync = () => {
 	// Map state selectors
 	const opacity = useAppSelector((state) => state.map.opacity);
 	const dataset = useAppSelector((state) => state.map.dataset);
+	const mapCoordinates = useAppSelector((state) => state.map.mapCoordinates);
 
 	// Climate variable state
 	const climateVariableData = useAppSelector((state) => state.climateVariable.data);
@@ -149,6 +150,12 @@ export const useUrlSync = () => {
 				params.set('labelOpacity', urlOpacityValue.toString());
 			}
 		}
+		
+		if (mapCoordinates) {
+			params.set('lat', mapCoordinates.lat.toFixed(5));
+			params.set('lng', mapCoordinates.lng.toFixed(5));
+			params.set('zoom', mapCoordinates.zoom.toString());
+		}
 	};
 	
 	const updateUrlWithDebounce = useCallback(() => {
@@ -184,6 +191,7 @@ export const useUrlSync = () => {
 		climateVariableData,
 		opacity,
 		dataset,
+		mapCoordinates,
 		isInitialized
 	]);
 
@@ -299,6 +307,28 @@ export const useUrlSync = () => {
 			}
 		}
 	};
+	
+	const setMapCoordinatesFromUrlParams = (params: URLSearchParams) => {
+		const lat = params.get('lat');
+		const lng = params.get('lng');
+		const zoom = params.get('zoom');
+		
+		if (lat && lng && zoom) {
+			const latNum = parseFloat(lat);
+			const lngNum = parseFloat(lng);
+			const zoomNum = parseInt(zoom);
+			
+			if (!isNaN(latNum) && !isNaN(lngNum) && !isNaN(zoomNum)) {
+				dispatch(
+					setMapCoordinates({
+						lat: latNum,
+						lng: lngNum,
+						zoom: zoomNum
+					})
+				);
+			}
+		}
+	};
 
 	const setDatasetFromUrlParams = async (params: URLSearchParams) => {
 		const datasetParam = params.get('dataset');
@@ -408,6 +438,9 @@ export const useUrlSync = () => {
 						params.set('dataset', firstDataset.term_id.toString());
 						params.set('dataOpacity', '100');
 						params.set('labelOpacity', '100');
+						params.set('lat', '62.51232');
+						params.set('lng', '-98.48145');
+						params.set('zoom', '4');
 						
 						const newUrl = `${window.location.pathname}?${params.toString()}`;
 						window.history.replaceState({}, '', newUrl);
@@ -481,6 +514,9 @@ export const useUrlSync = () => {
 				// Process map opacity
 				setMapOpacityFromUrlParams(params);
 				
+				// Process map coordinates and zoom
+				setMapCoordinatesFromUrlParams(params);
+				
 				// Mark URL parameters as loaded
 				urlProcessingCompleteRef.current = true;
 				dispatch(setUrlParamsLoaded(true));
@@ -499,6 +535,7 @@ export const useUrlSync = () => {
 		climateVariableData,
 		opacity,
 		dataset,
+		mapCoordinates,
 		updateUrlWithDebounce,
 		isInitialized
 	]);

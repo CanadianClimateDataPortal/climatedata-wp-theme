@@ -14,8 +14,6 @@ import LocationModal from '@/components/map-layers/location-modal';
 import { useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import {
-	CANADA_CENTER,
-	DEFAULT_ZOOM,
 	DEFAULT_MIN_ZOOM,
 	DEFAULT_MAX_ZOOM,
 	GEOSERVER_BASE_URL,
@@ -64,6 +62,7 @@ export default function SeaLevelMapContainer({
 
 	const {
 		opacity: { labels: labelsOpacity },
+		mapCoordinates
 	} = useAppSelector((state) => state.map);
 
 	const { climateVariable } = useClimateVariable();
@@ -125,9 +124,9 @@ export default function SeaLevelMapContainer({
 
 	return (
 		<MapContainer
-			center={CANADA_CENTER}
+			center={[mapCoordinates.lat, mapCoordinates.lng]}
 			zoomControl={false}
-			zoom={DEFAULT_ZOOM}
+			zoom={mapCoordinates.zoom}
 			minZoom={DEFAULT_MIN_ZOOM}
 			maxZoom={DEFAULT_MAX_ZOOM}
 			scrollWheelZoom={true}

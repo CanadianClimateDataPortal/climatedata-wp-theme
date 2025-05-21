@@ -21,6 +21,11 @@ export default function MapEvents({
 	const dispatch = useAppDispatch();
 	const stateCoordinates = useAppSelector(state => state.map.mapCoordinates);
 	const isUpdatingRef = useRef(false);
+	const onLocationModalCloseRef = useRef(onLocationModalClose);
+
+	useEffect(() => {
+		onLocationModalCloseRef.current = onLocationModalClose;
+	}, [onLocationModalClose]);
 
 	useEffect(() => {
 		if (onMapReady) {
@@ -77,17 +82,15 @@ export default function MapEvents({
 				onUnmount();
 			}
 
-			if (isUnmounting.current) {
 				// We close the location modal and info panel when map is unmount
-				if (onLocationModalClose && isUnmounting.current) {
-					onLocationModalClose();
+				if (onLocationModalCloseRef.current && isUnmounting.current) {
+				onLocationModalCloseRef.current();
 				}
 				if (closePanel) {
 					closePanel();
-				}
 			}
 		};
-	}, [map, onMapReady, onUnmount, dispatch, closePanel, onLocationModalClose, stateCoordinates]);
+	}, [map, onMapReady, onUnmount, dispatch, stateCoordinates]);
 
 	useEffect(() => {
 		// Skip if we're already in the process of updating

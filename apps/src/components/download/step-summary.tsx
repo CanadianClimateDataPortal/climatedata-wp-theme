@@ -87,6 +87,7 @@ const StepSummary: React.FC = () => {
 			summaryData.push({
 				title: __('Additional details'),
 				content: (() => {
+					const variableId = climateVariable?.getId();
 					const isDownloadTypeAnalyzed = climateVariable?.getDownloadType() === DownloadType.ANALYZED;
 					const [startYear, endYear] = climateVariable?.getDateRange() ?? ['2041', '2070'];
 					const frequency = climateVariable?.getFrequency() ?? '';
@@ -95,9 +96,9 @@ const StepSummary: React.FC = () => {
 
 					const data = [];
 
-					if (isDownloadTypeAnalyzed) {
+					if (isDownloadTypeAnalyzed || variableId === "station_data") {
 						if (startYear && endYear) {
-							data.push(`${startYear}-${endYear}`);
+							data.push(`${startYear} - ${endYear}`);
 						}
 					}
 

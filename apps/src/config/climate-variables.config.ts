@@ -1682,7 +1682,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		threshold: "climate-normals",
 		hasDelta: false,
 		enableColourOptions: false,
-		unitDecimalPlaces: 1,
+		unitDecimalPlaces: 2,
 		fileFormatTypes: [
 			FileFormatType.CSV,
 			FileFormatType.GeoJSON,

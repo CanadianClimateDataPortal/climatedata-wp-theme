@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { useI18n } from "@wordpress/react-i18n";
 
 // Map of supported locales
 const localeMap: { [key: string]: Locale } = {
@@ -37,6 +38,7 @@ export function DateRangePicker({
 	locale = "en",
 	dateFormat = "PPP",
 }: DateRangePickerProps) {
+	const { __ } = useI18n();
 	const [fromDate, setFromDate] = React.useState<Date | undefined>(defaultFromDate)
 	const [toDate, setToDate] = React.useState<Date | undefined>(defaultToDate)
 
@@ -82,7 +84,7 @@ export function DateRangePicker({
 							className={cn("w-full justify-start text-left font-normal", !fromDate && "text-muted-foreground")}
 						>
 							<CalendarIcon className="mr-2 h-4 w-4" />
-							{fromDate ? formatDate(fromDate) : <span>Select date</span>}
+							{fromDate ? formatDate(fromDate) : <span>{__('Select date')}</span>}
 						</Button>
 					</PopoverTrigger>
 					<PopoverContent className="w-auto p-0" align="start">
@@ -115,7 +117,7 @@ export function DateRangePicker({
 							disabled={!fromDate}
 						>
 							<CalendarIcon className="mr-2 h-4 w-4" />
-							{toDate ? formatDate(toDate) : <span>Select date</span>}
+							{toDate ? formatDate(toDate) : <span>{__('Select date')}</span>}
 						</Button>
 					</PopoverTrigger>
 					<PopoverContent className="w-auto p-0" align="start">

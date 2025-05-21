@@ -8,6 +8,7 @@ import { fetchTaxonomyData, fetchPostsData } from '@/services/services';
 import { initializeUrlSync, setUrlParamsLoaded } from '@/features/url-sync/url-sync-slice';
 import { normalizePostData } from '@/lib/format';
 import { store } from '@/app/store';
+import { CANADA_CENTER, DEFAULT_ZOOM } from '@/lib/constants';
 
 /**
  * Synchronizes state with URL params from climate variable state
@@ -434,14 +435,16 @@ export const useUrlSync = () => {
 						if (matchingConfig.dateRange && matchingConfig.dateRange.length > 0) {
 							params.set('dateRange', matchingConfig.dateRange.join(','));
 						}
-						
+
+						const coords = CANADA_CENTER as [number, number] || [62.51231793838694, -98.48144531250001];
+
 						params.set('dataset', firstDataset.term_id.toString());
 						params.set('dataOpacity', '100');
 						params.set('labelOpacity', '100');
-						params.set('lat', '62.51232');
-						params.set('lng', '-98.48145');
-						params.set('zoom', '4');
-						
+						params.set('lat', coords[0].toFixed(5));
+						params.set('lng', coords[1].toFixed(5));
+						params.set('zoom', DEFAULT_ZOOM.toString());
+
 						const newUrl = `${window.location.pathname}?${params.toString()}`;
 						window.history.replaceState({}, '', newUrl);
 					}

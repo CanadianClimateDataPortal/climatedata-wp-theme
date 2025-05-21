@@ -33,6 +33,8 @@ import {
 	SLIDER_MAX_YEAR,
 	SLIDER_YEAR_WINDOW_SIZE,
 	REGION_GRID,
+	DEFAULT_ZOOM,
+	CANADA_CENTER
 } from '@/lib/constants';
 import { MapItemsOpacity } from '@/types/types';
 
@@ -60,9 +62,9 @@ const initialState: MapState = {
 	variableList: [],
 	variableListLoading: false,
 	mapCoordinates: {
-		lat: 62.51231793838694,
-		lng: -98.48144531250001,
-		zoom: 4
+		lat: Array.isArray(CANADA_CENTER) ? CANADA_CENTER[0] : 62.51231793838694,
+		lng: Array.isArray(CANADA_CENTER) ? CANADA_CENTER[1] : -98.48144531250001,
+		zoom: DEFAULT_ZOOM
 	},
 };
 

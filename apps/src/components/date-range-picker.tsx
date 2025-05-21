@@ -1,9 +1,7 @@
-"use client"
-
 import * as React from "react"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
-import { enUS, fr, de, es, ja, type Locale } from "date-fns/locale"
+import { enUS, fr, type Locale } from "date-fns/locale"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -14,9 +12,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 const localeMap: { [key: string]: Locale } = {
 	"en-US": enUS,
 	fr: fr,
-	de: de,
-	es: es,
-	ja: ja,
 }
 
 interface DateRangePickerProps {

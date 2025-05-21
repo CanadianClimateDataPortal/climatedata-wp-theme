@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 import appConfig from '@/config/app.config';
-import { FileFormatType } from "@/types/climate-variable-interface";
+import { DownloadType, FileFormatType } from "@/types/climate-variable-interface";
 
 const VariableOptionsSummary: React.FC = () => {
 	const { climateVariable } = useClimateVariable();
@@ -87,6 +87,7 @@ const StepSummary: React.FC = () => {
 			summaryData.push({
 				title: __('Additional details'),
 				content: (() => {
+					const isDownloadTypeAnalyzed = climateVariable?.getDownloadType() === DownloadType.ANALYZED;
 					const [startYear, endYear] = climateVariable?.getDateRange() ?? ['2041', '2070'];
 					const frequency = climateVariable?.getFrequency() ?? '';
 					const percentiles = climateVariable?.getPercentiles() ?? [];
@@ -94,8 +95,10 @@ const StepSummary: React.FC = () => {
 
 					const data = [];
 
-					if (startYear && endYear) {
-						data.push(`${startYear}-${endYear}`);
+					if (isDownloadTypeAnalyzed) {
+						if (startYear && endYear) {
+							data.push(`${startYear}-${endYear}`);
+						}
 					}
 
 					if (frequency && frequency !== '') {

@@ -279,6 +279,9 @@ export interface ClimateVariableConfigInterface {
 	/** Stores the selected date range */
 	dateRange?: string[] | null;
 
+	/** Stores the default date range */
+	defaultDateRange?: string[] | null;
+
 	/** Contains available averaging options */
 	averagingOptions?: AveragingType[];
 
@@ -411,6 +414,8 @@ export interface ClimateVariableInterface {
 	getDateRangeConfig(): DateRangeConfig | null;
 
 	getDateRange(): string[] | null;
+
+	getDefaultDateRange(): string[] | null;
 
 	getAveragingOptions(): AveragingType[];
 

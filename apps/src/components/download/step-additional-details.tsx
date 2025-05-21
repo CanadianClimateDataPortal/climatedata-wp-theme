@@ -19,12 +19,15 @@ import { StepComponentRef, StepResetPayload } from "@/types/download-form-interf
 import { FrequencySelect } from "@/components/frequency-select";
 import SectionContext from "@/context/section-provider";
 import { YearRange } from "@/components/year-range";
+import { DateRangePicker } from "@/components/date-range-picker";
 import appConfig from "@/config/app.config";
+import { useLocale } from '@/hooks/use-locale';
 
 /**
  * Additional details step will allow the user to customize the download request
  */
 const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
+	const { locale } = useLocale();
 	const { __ } = useI18n();
 	const {
 		climateVariable,
@@ -165,6 +168,38 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 				/>
 			}
 
+			{/**
+			  Special case for "Station Data".
+			  For "Station Data", we need to show a date picker instead of year range picker.
+			*/}
+			{climateVariable?.getId() === "station_data" && (
+				<DateRangePicker
+					defaultFromDate={dateRange[0] ? new Date(dateRange[0] + ' 00:00:00') : undefined}
+					defaultToDate={dateRange[1] ? new Date(dateRange[1] + ' 23:59:59') : undefined}
+					minDate={dateRangeConfig?.min ? new Date(dateRangeConfig.min + ' 00:00:00') : undefined}
+					maxDate={dateRangeConfig?.max ? new Date(dateRangeConfig.max + ' 23:59:59') : undefined}
+					locale={locale}
+					onFromChange={(date) => {
+						const fromDate = date ? date.toISOString().split("T")[0] : null;
+						if (fromDate) {
+							setDateRange([
+								fromDate,
+								dateRange[1],
+							])
+						}
+					}}
+					onToChange={(date) => {
+						const toDate = date ? date.toISOString().split("T")[0] : null;
+						if (toDate) {
+							setDateRange([
+								dateRange[0],
+								toDate,
+							])
+						}
+					}}
+				/>
+			)}
+
 			{isDownloadTypeAnalyzed
 				&& formattedModelOptions.length > 0
 				&& <RadioGroupFactory
@@ -250,6 +285,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 		</StepContainer>
 	);
 });
+
 StepAdditionalDetails.displayName = 'StepAdditionalDetails';
 
 export default StepAdditionalDetails;

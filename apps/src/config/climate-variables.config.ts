@@ -1714,7 +1714,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 	/** Station Data */
 	{
 		id: "station_data",
-		class: "StationClimateVariable",
+		class: "StationDataClimateVariable",
 		threshold: "station-data",
 		versions: [
 			"cmip6",

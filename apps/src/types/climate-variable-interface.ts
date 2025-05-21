@@ -72,6 +72,7 @@ export interface DateRangeConfig {
 	min: string;
 	max: string;
 	interval: number;
+	type?: "year" | "day";
 }
 
 export enum AveragingType {

@@ -7,9 +7,8 @@ import { useMap } from 'react-leaflet';
 
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
 import { MapEventsProps } from '@/types/types';
-import { useAppDispatch } from '@/app/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setMapCoordinates } from '@/features/map/map-slice';
-import { store } from '@/app/store';
 
 export default function MapEvents({
 	onMapReady,
@@ -20,6 +19,8 @@ export default function MapEvents({
 	const isUnmounting = useRef(false);
 	const { closePanel } = useAnimatedPanel();
 	const dispatch = useAppDispatch();
+	const stateCoordinates = useAppSelector(state => state.map.mapCoordinates);
+	const isUpdatingRef = useRef(false);
 
 	useEffect(() => {
 		if (onMapReady) {
@@ -27,41 +28,56 @@ export default function MapEvents({
 		}
 		
 		const updateMapCoordinates = () => {
+			if (isUpdatingRef.current) return;
+			
 			const center = map.getCenter();
 			const zoom = map.getZoom();
 			
-			dispatch(setMapCoordinates({
-				lat: center.lat,
-				lng: center.lng,
-				zoom: zoom
-			}));
+			// Only update if coordinates or zoom have changed
+			if (stateCoordinates.lat !== center.lat || 
+				stateCoordinates.lng !== center.lng || 
+				stateCoordinates.zoom !== zoom) {
+				
+				isUpdatingRef.current = true;
+				dispatch(setMapCoordinates({
+					lat: center.lat,
+					lng: center.lng,
+					zoom: zoom
+				}));
+
+				setTimeout(() => {
+					isUpdatingRef.current = false;
+				}, 100);
+			}
 		};
 		
-		// Initialize with current position - but only once
-		const initialCenter = map.getCenter();
-		const initialZoom = map.getZoom();
-		const state = store.getState();
+
+		let timeoutId: number | null = null;
 		
-		// Only update coordinates if they've actually changed from what's in state
-		if (state.map.mapCoordinates.lat !== initialCenter.lat ||
-		    state.map.mapCoordinates.lng !== initialCenter.lng ||
-		    state.map.mapCoordinates.zoom !== initialZoom) {
-			updateMapCoordinates();
-		}
+		const handleMapMove = () => {
+			if (timeoutId) {
+				window.clearTimeout(timeoutId);
+			}
+			timeoutId = window.setTimeout(updateMapCoordinates, 200);
+		};
 		
-		map.on('moveend', updateMapCoordinates);
-		map.on('zoomend', updateMapCoordinates);
+		map.on('moveend', handleMapMove);
+		map.on('zoomend', handleMapMove);
 
 		return () => {
 			isUnmounting.current = true;
-			map.off('moveend', updateMapCoordinates);
-			map.off('zoomend', updateMapCoordinates);
+			map.off('moveend', handleMapMove);
+			map.off('zoomend', handleMapMove);
+			
+			if (timeoutId) {
+				window.clearTimeout(timeoutId);
+			}
 			
 			if (onUnmount) {
 				onUnmount();
 			}
 
-			if(isUnmounting.current) {
+			if (isUnmounting.current) {
 				// We close the location modal and info panel when map is unmount
 				if (onLocationModalClose && isUnmounting.current) {
 					onLocationModalClose();
@@ -71,7 +87,24 @@ export default function MapEvents({
 				}
 			}
 		};
-	}, [map, onMapReady, onUnmount, dispatch]);
+	}, [map, onMapReady, onUnmount, dispatch, closePanel, onLocationModalClose, stateCoordinates]);
+
+	useEffect(() => {
+		// Skip if we're already in the process of updating
+		if (isUpdatingRef.current) return;
+		
+		const currentCenter = map.getCenter();
+		const currentZoom = map.getZoom();
+
+		if (currentCenter.lat !== stateCoordinates.lat || 
+			currentCenter.lng !== stateCoordinates.lng || 
+			currentZoom !== stateCoordinates.zoom) {
+			
+			map.setView([stateCoordinates.lat, stateCoordinates.lng], stateCoordinates.zoom, {
+				animate: false 
+			});
+		}
+	}, [stateCoordinates, map]);
 
 	return null;
 }

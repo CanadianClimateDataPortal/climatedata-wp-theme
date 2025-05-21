@@ -17,6 +17,8 @@ import { CANADA_CENTER, DEFAULT_ZOOM } from '@/lib/constants';
 export const useUrlSync = () => {
 	const updateTimeoutRef = useRef<number | null>(null);
 	const urlProcessingCompleteRef = useRef<boolean>(false);
+	const lastUrlUpdateRef = useRef<string>('');
+	const isUpdatingFromMapRef = useRef<boolean>(false);
 	const dispatch = useAppDispatch();
 
 	// Get the URL sync state
@@ -155,6 +157,29 @@ export const useUrlSync = () => {
 		}
 	};
 	
+	const haveParamsChanged = (params: URLSearchParams): boolean => {
+		if (typeof window === 'undefined') return false;
+		
+		const currentParams = new URLSearchParams(window.location.search);
+		const currentKeys = Array.from(currentParams.keys());
+		const newKeys = Array.from(params.keys());
+		
+		if (currentKeys.length !== newKeys.length) return true;
+		
+		for (const key of newKeys) {
+			if (key === 'lat' || key === 'lng') {
+				const currentVal = parseFloat(currentParams.get(key) || '0');
+				const newVal = parseFloat(params.get(key) || '0');
+				if (Math.abs(currentVal - newVal) > 0.0001) return true;
+			} 
+			else if (!currentParams.has(key) || currentParams.get(key) !== params.get(key)) {
+				return true;
+			}
+		}
+		
+		return false;
+	};
+	
 	const updateUrlWithDebounce = useCallback(() => {
 		if (typeof window === 'undefined' || !isInitialized) return;
 		
@@ -178,17 +203,18 @@ export const useUrlSync = () => {
 			// Then add map-only parameters
 			addMapOnlyParamsToUrl(params);
 
-			// Update URL without navigation
-			const newParams = params.toString();
-			const currentParams = new URLSearchParams(window.location.search).toString();
-			
-			if (newParams !== currentParams) {
-				const newUrl = `${window.location.pathname}?${newParams}`;
-				window.history.replaceState({}, '', newUrl);
+			// Only update URL if parameters have changed significantly
+			if (haveParamsChanged(params)) {
+				const newUrl = `${window.location.pathname}?${params.toString()}`;
+				
+				if (newUrl !== lastUrlUpdateRef.current) {
+					lastUrlUpdateRef.current = newUrl;
+					window.history.replaceState({}, '', newUrl);
+				}
 			}
 			
 			updateTimeoutRef.current = null;
-		}, 200); // Reduced delay for more responsive updates
+		}, 300);
 	}, [
 		climateVariableData,
 		opacity,
@@ -321,6 +347,8 @@ export const useUrlSync = () => {
 			const zoomNum = parseInt(zoom);
 			
 			if (!isNaN(latNum) && !isNaN(lngNum) && !isNaN(zoomNum)) {
+				isUpdatingFromMapRef.current = true;
+				
 				dispatch(
 					setMapCoordinates({
 						lat: latNum,
@@ -328,6 +356,10 @@ export const useUrlSync = () => {
 						zoom: zoomNum
 					})
 				);
+				
+				setTimeout(() => {
+					isUpdatingFromMapRef.current = false;
+				}, 10);
 			}
 		}
 	};
@@ -447,6 +479,7 @@ export const useUrlSync = () => {
 						params.set('zoom', DEFAULT_ZOOM.toString());
 
 						const newUrl = `${window.location.pathname}?${params.toString()}`;
+						lastUrlUpdateRef.current = newUrl;
 						window.history.replaceState({}, '', newUrl);
 					}
 				}
@@ -521,6 +554,8 @@ export const useUrlSync = () => {
 				// Process map coordinates and zoom
 				setMapCoordinatesFromUrlParams(params);
 				
+				lastUrlUpdateRef.current = window.location.href;
+				
 				// Mark URL parameters as loaded
 				urlProcessingCompleteRef.current = true;
 				dispatch(setUrlParamsLoaded(true));
@@ -533,16 +568,54 @@ export const useUrlSync = () => {
 	}, [dispatch, isInitialized]);
 
 	useEffect(() => {
-		if (!isInitialized) return;
+		if (!isInitialized || isUpdatingFromMapRef.current) return;
 		updateUrlWithDebounce();
 	}, [
 		climateVariableData,
 		opacity,
 		dataset,
-		mapCoordinates,
 		updateUrlWithDebounce,
 		isInitialized
 	]);
+	
+	useEffect(() => {
+		if (!isInitialized || isUpdatingFromMapRef.current) return;
+		
+		if (mapCoordinates && typeof window !== 'undefined') {
+			if (updateTimeoutRef.current !== null) {
+				window.clearTimeout(updateTimeoutRef.current);
+			}
+			
+			updateTimeoutRef.current = window.setTimeout(() => {
+				const params = new URLSearchParams(window.location.search);
+				
+				params.set('lat', mapCoordinates.lat.toFixed(5));
+				params.set('lng', mapCoordinates.lng.toFixed(5));
+				params.set('zoom', mapCoordinates.zoom.toString());
+				
+				const currentParams = new URLSearchParams(window.location.search);
+				const currentLat = parseFloat(currentParams.get('lat') || '0');
+				const currentLng = parseFloat(currentParams.get('lng') || '0');
+				const currentZoom = parseInt(currentParams.get('zoom') || '0');
+				
+				if (
+					Math.abs(currentLat - mapCoordinates.lat) > 0.0001 ||
+					Math.abs(currentLng - mapCoordinates.lng) > 0.0001 ||
+					currentZoom !== mapCoordinates.zoom
+				) {
+					const newUrl = `${window.location.pathname}?${params.toString()}`;
+					
+					// Prevent duplicate updates
+					if (newUrl !== lastUrlUpdateRef.current) {
+						lastUrlUpdateRef.current = newUrl;
+						window.history.replaceState({}, '', newUrl);
+					}
+				}
+				
+				updateTimeoutRef.current = null;
+			}, 400); // Longer debounce for map movements
+		}
+	}, [mapCoordinates, isInitialized]);
 
 	// Clean up timeout on unmount
 	useEffect(() => {

@@ -128,7 +128,7 @@ export function DateRangePicker({
 							mode="single"
 							selected={toDate}
 							onSelect={handleToDateChange}
-							defaultMonth={fromDate || toDate}
+							defaultMonth={toDate || fromDate}
 							locale={selectedLocale}
 							disabled={(date) => {
 								// Disable dates before the from date

@@ -63,12 +63,8 @@ export const useUrlSync = () => {
 			}
 		}
 		
-		// Only add scenario if it's not the default
 		if (climateData.scenario) {
-			const defaultScenario = defaultConfig?.scenario;
-			if (climateData.scenario !== defaultScenario) {
-				params.set('scen', climateData.scenario);
-			}
+			params.set('scen', climateData.scenario);
 		}
 		
 		// Only include scenario comparison parameters if enabled
@@ -183,8 +179,13 @@ export const useUrlSync = () => {
 			addMapOnlyParamsToUrl(params);
 
 			// Update URL without navigation
-			const newUrl = `${window.location.pathname}?${params.toString()}`;
-			window.history.replaceState({}, '', newUrl);
+			const newParams = params.toString();
+			const currentParams = new URLSearchParams(window.location.search).toString();
+			
+			if (newParams !== currentParams) {
+				const newUrl = `${window.location.pathname}?${newParams}`;
+				window.history.replaceState({}, '', newUrl);
+			}
 			
 			updateTimeoutRef.current = null;
 		}, 200); // Reduced delay for more responsive updates

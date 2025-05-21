@@ -142,13 +142,40 @@ export const ClimateVariableProvider: React.FC<{
 	 */
 	const setVersion = useCallback(
 		(version: string) => {
-			dispatch(
-				updateClimateVariable({
-					version,
-				})
+			// Get current climate variable data
+			const currentData = climateVariableData;
+			if (!currentData || currentData.version === version) return;
+
+			const matchedConfig = ClimateVariables.find(
+				(config) => config.id === currentData.id
 			);
+
+			if (matchedConfig) {
+				// Create a temporary instance to get valid scenarios for this version
+				const tempVarClass = CLIMATE_VARIABLE_CLASS_MAP[matchedConfig.class];
+				const tempVar = new tempVarClass({
+					...matchedConfig,
+					version
+				});
+
+				const validScenarios = tempVar.getScenarios();
+				const updatePayload: Partial<ClimateVariableConfigInterface> = {
+					version
+				};
+
+				if (validScenarios.length > 0 && (!currentData.scenario || !validScenarios.includes(currentData.scenario))) {
+					updatePayload.scenario = validScenarios[0];
+					// Reset scenario comparison when scenario changes
+					updatePayload.scenarioCompare = false;
+					updatePayload.scenarioCompareTo = null;
+				}
+
+				dispatch(updateClimateVariable(updatePayload));
+			} else {
+				dispatch(updateClimateVariable({ version }));
+			}
 		},
-		[dispatch]
+		[dispatch, climateVariableData]
 	);
 
 	const setAnalyzeScenarios = useCallback(

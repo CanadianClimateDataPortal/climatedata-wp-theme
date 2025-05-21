@@ -143,6 +143,9 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 		value: option
 	}));
 
+	const showSSP3Warning = isDownloadTypeAnalyzed
+		&& climateVariable?.getAnalyzeScenarios().includes("ssp370");
+
 	return (
 		<StepContainer title="Additional details">
 			<StepContainerDescription>
@@ -182,17 +185,30 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 
 			{isDownloadTypeAnalyzed
 				&& scenarioOptions.length > 0
-				&& <CheckboxFactory
-					name="emission-scenarios"
-					title={__('Emissions Scenarios')}
-					tooltip={__('Select emission scenarios')}
-					orientation="horizontal"
-					className="max-w-md mb-8"
-					optionClassName="w-1/2 sm:w-1/4"
-					options={scenarioOptions}
-					values={climateVariable?.getAnalyzeScenarios()}
-					onChange={setAnalyzeScenarios}
-				/>
+				&& (
+					<div className="mb-8 max-w-md">
+						<CheckboxFactory
+							name="emission-scenarios"
+							title={__('Emissions Scenarios')}
+							tooltip={__('Select emission scenarios')}
+							orientation="horizontal"
+							className="max-w-md"
+							optionClassName="w-1/2 sm:w-1/4"
+							options={scenarioOptions}
+							values={climateVariable?.getAnalyzeScenarios()}
+							onChange={setAnalyzeScenarios}
+						/>
+						{showSSP3Warning
+							&& <div className="text-neutral-grey-medium text-sm mt-3">
+									{__(`* If SSP3-7.0 is selected above, either alone or with
+									any of the other emissions scenarios, then only 24 models are
+									included in the analysis for all selected scenarios. To use
+									the 26 models available for all emissions scenarios except
+									SSP3-7.0, do not include SSP3-7.0 in your selection above.`)}
+								</div>
+						}
+					</div>
+				)
 			}
 
 			{isDownloadTypeAnalyzed

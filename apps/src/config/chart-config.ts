@@ -71,12 +71,12 @@ export const getChartDataOptions = (
 	},
 	ssp585_median: {
 		name: __('SSP5-8.5 Median'),
-		color: '#ff0000',
+		color: '#980002',
 		type: 'line',
 	},
 	ssp585_range: {
 		name: __('SSP5-8.5 Range'),
-		color: '#ff0000',
+		color: '#980002',
 		type: 'arearange',
 	},
 	rcp26_median: {
@@ -101,12 +101,12 @@ export const getChartDataOptions = (
 	},
 	rcp85_median: {
 		name: __('RCP 8.5 Median'),
-		color: '#ff0000',
+		color: '#980002',
 		type: 'line',
 	},
 	rcp85_range: {
 		name: __('RCP 8.5 Range'),
-		color: '#ff0000',
+		color: '#980002',
 		type: 'arearange',
 	},
 	rcp85_enhanced: {

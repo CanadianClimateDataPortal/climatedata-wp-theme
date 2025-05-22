@@ -146,34 +146,26 @@ export const ClimateVariableProvider: React.FC<{
 			const currentData = climateVariableData;
 			if (!currentData || currentData.version === version) return;
 
-			const matchedConfig = ClimateVariables.find(
-				(config) => config.id === currentData.id
-			);
+			// Create a temporary instance using the current climate variable to get valid scenarios for this version
+			const tempVarClass = CLIMATE_VARIABLE_CLASS_MAP[currentData.class];
+			const tempVar = new tempVarClass({
+				...currentData,
+				version
+			});
 
-			if (matchedConfig) {
-				// Create a temporary instance to get valid scenarios for this version
-				const tempVarClass = CLIMATE_VARIABLE_CLASS_MAP[matchedConfig.class];
-				const tempVar = new tempVarClass({
-					...matchedConfig,
-					version
-				});
+			const validScenarios = tempVar.getScenarios();
+			const updatePayload: Partial<ClimateVariableConfigInterface> = {
+				version
+			};
 
-				const validScenarios = tempVar.getScenarios();
-				const updatePayload: Partial<ClimateVariableConfigInterface> = {
-					version
-				};
-
-				if (validScenarios.length > 0 && (!currentData.scenario || !validScenarios.includes(currentData.scenario))) {
-					updatePayload.scenario = validScenarios[0];
-					// Reset scenario comparison when scenario changes
-					updatePayload.scenarioCompare = false;
-					updatePayload.scenarioCompareTo = null;
-				}
-
-				dispatch(updateClimateVariable(updatePayload));
-			} else {
-				dispatch(updateClimateVariable({ version }));
+			if (validScenarios.length > 0 && (!currentData.scenario || !validScenarios.includes(currentData.scenario))) {
+				updatePayload.scenario = validScenarios[0];
+				// Reset scenario comparison when scenario changes
+				updatePayload.scenarioCompare = false;
+				updatePayload.scenarioCompareTo = null;
 			}
+
+			dispatch(updateClimateVariable(updatePayload));
 		},
 		[dispatch, climateVariableData]
 	);

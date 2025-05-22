@@ -5,24 +5,25 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { fetchDeltaValues } from '@/services/services';
 import SectionContext from "@/context/section-provider";
 
-interface SeaLevelClimateVariableValuesProps {
+interface MedianOnlyVariableValuesProps {
 	latlng: L.LatLng;
 	featureId: number,
-	mode: "modal" | "panel"
+	mode: "modal" | "panel",
+	endpoint: string,
 }
 
 /**
- * SeaLevelClimateVariableValues Component
+ * MedianOnlyVariableValues Component
  * ---------------------------
- * Display the climate variable median
- * For Seal Level climate variable
+ * Display only the median value for the climate variable.
  *
  * Can be used in the location modal and charts panel
  */
-const SeaLevelClimateVariableValues: React.FC<SeaLevelClimateVariableValuesProps> = ({
+const MedianOnlyVariableValues: React.FC<MedianOnlyVariableValuesProps> = ({
 	latlng,
 	featureId,
 	mode,
+	endpoint,
 }) => {
 	const { __ } = useI18n();
 	const { climateVariable } = useClimateVariable();
@@ -49,9 +50,6 @@ const SeaLevelClimateVariableValues: React.FC<SeaLevelClimateVariableValuesProps
 
 			// Fetching median
 
-			// Endpoint
-			const medianEndpoint = `get-slr-gridded-values/${lat}/${lng}`;
-
 			// Params
 			const medianParams = new URLSearchParams({
 				period: String(decadeValue),
@@ -59,7 +57,7 @@ const SeaLevelClimateVariableValues: React.FC<SeaLevelClimateVariableValuesProps
 			}).toString();
 
 			const medianData = await fetchDeltaValues({
-				endpoint: medianEndpoint,
+				endpoint: endpoint,
 				varName: null,
 				frequency: null,
 				params: medianParams,
@@ -134,4 +132,4 @@ const SeaLevelClimateVariableValues: React.FC<SeaLevelClimateVariableValuesProps
 	);
 };
 
-export default SeaLevelClimateVariableValues;
+export default MedianOnlyVariableValues;

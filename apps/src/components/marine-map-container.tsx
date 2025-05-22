@@ -33,7 +33,7 @@ function LandmassStyler(): null {
 	const map = useMap();
 
 	useEffect(() => {
-		const pane = map.getPane('seaLevelBasemap');
+		const pane = map.getPane('marineBasemap');
 		if (pane) {
 			pane.style.filter = MAP_CONFIG.landmassFilter;
 		}
@@ -43,14 +43,14 @@ function LandmassStyler(): null {
 }
 
 /**
- * Renders a Leaflet map for sea-level variables with a specialized approach:
+ * Renders a Leaflet map for marine variables with a specialized approach:
  * 1. Standard basemap (complete world map) at the bottom
- * 2. Sea-level raster data layer (ocean data)
+ * 2. Marine raster data layer (ocean data)
  * 3. Grid layer for interactive regions
- * 4. Sea-level landmass layer with transparent ocean areas
+ * 4. Landmass layer with transparent ocean areas
  * 5. Labels layer on top
  */
-export default function SeaLevelMapContainer({
+export default function MarineMapContainer({
 	scenario,
 	onMapReady,
 	onUnmount,
@@ -145,8 +145,8 @@ export default function SeaLevelMapContainer({
 				<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
 			)}
 
-			{/* Use the unified custom panes with 'seaLevel' mode */}
-			<CustomPanesLayer mode="seaLevel" />
+			{/* Use the unified custom panes with 'marine' mode */}
+			<CustomPanesLayer mode="marine" />
 			<LandmassStyler />
 
 			{/* Use the unified variable layer */}
@@ -179,14 +179,14 @@ export default function SeaLevelMapContainer({
 				maxZoom={DEFAULT_MAX_ZOOM}
 			/>
 
-			{/* Sea level landmass layer with transparent oceans */}
+			{/* Landmass layer for marine data, with transparent oceans */}
 			<WMSTileLayer
 				url={`${GEOSERVER_BASE_URL}/geoserver/wms`}
 				layers={LAYER_KEYS.landmass}
 				format="image/png"
 				transparent={true}
 				version="1.1.1"
-				pane="seaLevelBasemap"
+				pane="marineBasemap"
 				opacity={1.0}
 				bounds={CANADA_BOUNDS}
 			/>

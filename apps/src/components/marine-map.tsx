@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import 'leaflet.sync';
 
 // components
-import SeaLevelMapContainer from '@/components/sea-level-map-container';
+import MarineMapContainer from '@/components/marine-map-container';
 
 // other
 import { cn } from '@/lib/utils';
@@ -10,11 +10,11 @@ import { useMap } from '@/hooks/use-map';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 /**
- * Renders a Leaflet map specifically for sea-level variables.
- * This maintains the same API as RasterMap but uses the custom sea-level map container
+ * Renders a Leaflet map specifically for marine variables.
+ * This maintains the same API as RasterMap but uses the custom marine map container
  * with the modified layer ordering (raster under basemap).
  */
-export default function SeaLevelMap(): React.ReactElement {
+export default function MarineMap(): React.ReactElement {
 	const { setMap } = useMap();
 	const { climateVariable } = useClimateVariable();
 
@@ -58,7 +58,7 @@ export default function SeaLevelMap(): React.ReactElement {
 				showComparisonMap ? 'grid-cols-2' : 'grid-cols-1'
 			)}
 		>
-			<SeaLevelMapContainer
+			<MarineMapContainer
 				scenario={climateVariable?.getScenario()}
 				onMapReady={(map: L.Map) => {
 					mapRef.current = map;
@@ -67,7 +67,7 @@ export default function SeaLevelMap(): React.ReactElement {
 				onUnmount={() => (mapRef.current = null)}
 			/>
 			{showComparisonMap && (
-				<SeaLevelMapContainer
+				<MarineMapContainer
 					scenario={climateVariable?.getScenarioCompareTo()}
 					onMapReady={(map: L.Map) => {
 						comparisonMapRef.current = map;

@@ -157,8 +157,50 @@ export const getSeriesObject = (
 	climateVariableId: string | undefined,
 	chartDataOptions: ChartDataOptions
 ): (SeriesLineOptions | SeriesArearangeOptions | SeriesColumnOptions)[] => {
-	// Sea levels series
-	if (climateVariableId === 'sea_level') {
+	if (climateVariableId === 'allowance') {
+		return [
+			{
+				custom: { key: 'ssp126_median' },
+				name: chartDataOptions['ssp126_median'].name,
+				type: chartDataOptions['ssp126_median'].type,
+				data: sortByTimestamp(data.ssp126),
+				color: chartDataOptions['ssp126_median'].color,
+				lineWidth: 2,
+				showInNavigator: true,
+				visible: true,
+			} as SeriesLineOptions,
+			{
+				custom: { key: 'ssp245_median' },
+				name: chartDataOptions['ssp245_median'].name,
+				type: chartDataOptions['ssp245_median'].type,
+				data: sortByTimestamp(data.ssp245),
+				color: chartDataOptions['ssp245_median'].color,
+				lineWidth: 2,
+				showInNavigator: true,
+				visible: true,
+			} as SeriesLineOptions,
+			{
+				custom: { key: 'ssp370_median' },
+				name: chartDataOptions['ssp370_median'].name,
+				type: chartDataOptions['ssp370_median'].type,
+				data: sortByTimestamp(data.ssp370),
+				color: chartDataOptions['ssp370_median'].color,
+				lineWidth: 2,
+				showInNavigator: true,
+				visible: true,
+			} as SeriesLineOptions,
+			{
+				custom: { key: 'ssp585_median' },
+				name: chartDataOptions['ssp585_median'].name,
+				type: chartDataOptions['ssp585_median'].type,
+				data: sortByTimestamp(data.ssp585),
+				color: chartDataOptions['ssp585_median'].color,
+				lineWidth: 2,
+				showInNavigator: true,
+				visible: true,
+			} as SeriesLineOptions,
+		];
+	} else if (climateVariableId === 'sea_level') {
 		switch (version) {
 			case 'cmip5':
 				return [

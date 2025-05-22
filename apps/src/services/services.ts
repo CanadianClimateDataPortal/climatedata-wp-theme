@@ -14,8 +14,6 @@ import L from 'leaflet';
 
 import {  WP_API_DOMAIN, WP_API_LOCATION_BY_COORDS_PATH, WP_API_VARIABLE_PATH  } from '@/lib/constants';
 
-import ahccdData from '@/assets/dummy/ahccd.json';
-
 // Cache for API responses to avoid duplicate requests
 const apiCache = new Map<string, any>();
 
@@ -487,11 +485,7 @@ export const fetchStationsList = async ({ threshold }: { threshold?: string }) =
 		};
 
 		if (threshold === 'ahccd') {
-			// TEMPORARY: Using local dummy JSON due to CORS issue
-			data = ahccdData;
-
-			// TO ENABLE WHEN CORS IS FIXED:
-			// data = await fetchJson('https://data.climatedata.ca/fileserver/ahccd/ahccd.json');
+			data = await fetchJson('https://data.climatedata.ca/fileserver/ahccd/ahccd.json');
 		} else if (threshold === 'station-data') {
 			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE');
 		} else {

@@ -499,7 +499,7 @@ export const fetchStationsList = async ({ threshold }: { threshold?: string }) =
 		}
 
 		return (data.features || []).map((feature: any) => ({
-			id: String(feature.properties?.ID ?? (threshold === 'station-data' ? feature.properties?.STN_ID : feature?.id)),
+			id: String(feature.properties?.ID ?? ((threshold === 'station-data' || threshold === 'climate-normals') ? feature.properties?.STN_ID : feature?.id)),
 			name: feature.properties?.STATION_NAME ?? feature.properties?.Name,
 			type: feature.properties?.type,
 			coordinates: {

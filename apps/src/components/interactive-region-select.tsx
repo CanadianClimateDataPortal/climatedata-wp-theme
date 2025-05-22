@@ -13,7 +13,11 @@ import Dropdown from '@/components/ui/dropdown';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { InteractiveRegionConfig, InteractiveRegionOption } from "@/types/climate-variable-interface";
 
-const InteractiveRegionSelect: React.FC = () => {
+interface InteractiveRegionSelectProps {
+  onChange?: (value: InteractiveRegionOption) => void;
+}
+
+const InteractiveRegionSelect: React.FC<InteractiveRegionSelectProps> = ({ onChange }) => {
   const { __ } = useI18n();
   const { climateVariable, setInteractiveRegion } = useClimateVariable();
 
@@ -37,6 +41,11 @@ const InteractiveRegionSelect: React.FC = () => {
     </div>
   );
 
+  const handleChange = (value: InteractiveRegionOption) => {
+    if (onChange) onChange(value);
+    setInteractiveRegion(value);
+  };
+
   return (
     <Dropdown
 			key={climateVariable?.getId()}
@@ -45,7 +54,7 @@ const InteractiveRegionSelect: React.FC = () => {
       label={__('Interactive Regions')}
       tooltip={<Tooltip />}
       value={climateVariable?.getInteractiveRegion() ?? undefined}
-      onChange={setInteractiveRegion}
+      onChange={handleChange}
     />
   );
 };

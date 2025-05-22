@@ -10,7 +10,7 @@ import appConfig from "@/config/app.config"
  * Versions dropdown component.
  */
 const VersionsDropdown: React.FC = () => {
-	const { climateVariable, setVersion } = useClimateVariable();
+	const { climateVariable, setVersion, setScenarioCompare } = useClimateVariable();
 	const { __ } = useI18n();
 
 	const options = appConfig.versions.filter((version) =>
@@ -23,6 +23,13 @@ const VersionsDropdown: React.FC = () => {
 		</div>
 	);
 
+	const handleChange = (value: string) => {
+		setVersion(value);
+
+		// Also reset compare scenarios checkbox
+		setScenarioCompare(false);
+	};
+
 	return (
 		<SidebarMenuItem>
 			<Dropdown
@@ -30,7 +37,7 @@ const VersionsDropdown: React.FC = () => {
 				label={__('Versions')}
 				options={options}
 				value={climateVariable?.getVersion() ?? undefined}
-				onChange={setVersion}
+				onChange={handleChange}
 				tooltip={<Tooltip />}
 			/>
 		</SidebarMenuItem>

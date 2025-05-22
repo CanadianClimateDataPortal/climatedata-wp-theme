@@ -71,7 +71,7 @@ const Sidebar = React.forwardRef<
 					<SheetContent
 						data-sidebar="sidebar"
 						data-mobile="true"
-						className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+						className="w-[--sidebar-width] bg-sidebar p-2 text-sidebar-foreground [&>button]:hidden"
 						style={
 							{
 								'--sidebar-width': SIDEBAR_WIDTH_MOBILE,
@@ -716,6 +716,8 @@ const SidebarPanel = React.forwardRef<
 		};
 	}, [id, isActive, handleClose]);
 
+	const { isMobile } = useSidebar();
+
 	return (
 		<AnimatePresence>
 			{isActive && (
@@ -731,12 +733,18 @@ const SidebarPanel = React.forwardRef<
 						}
 					}}
 					className={cn(
-						'sidebar-panel absolute top-0 left-0 bg-white shadow-md -z-10',
+						'sidebar-panel absolute top-0 bg-white shadow-md',
+						isMobile 
+							? 'left-0 w-[--sidebar-width] h-full z-40'
+							: 'left-0 -z-10',
 						className
 					)}
-					initial={{ x: -sidebarWidth }}
-					animate={{ x: sidebarWidth }}
-					exit={{ x: -sidebarWidth }}
+					style={isMobile ? {
+						'--sidebar-width': SIDEBAR_WIDTH_MOBILE,
+					} as React.CSSProperties : undefined}
+					initial={isMobile ? { x: 0 } : { x: -sidebarWidth }}
+					animate={isMobile ? { x: 0 } : { x: sidebarWidth }}
+					exit={isMobile ? { x: 0 } : { x: -sidebarWidth }}
 					transition={{ duration: 0.25 }}
 				>
 					<button

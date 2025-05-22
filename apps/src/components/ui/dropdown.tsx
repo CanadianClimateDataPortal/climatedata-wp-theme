@@ -5,7 +5,7 @@
  * an optional heading title and tooltip (ControlTitle component).
  *
  */
-import React, { useState, useEffect, useMemo, forwardRef } from 'react';
+import React, { useState, useMemo, forwardRef } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 
 import { Input } from '@/components/ui/input';
@@ -45,12 +45,6 @@ const DropdownGeneric = <T extends string | undefined>(
 	const searchPlaceholderTranslated = searchPlaceholder ?? __('Search...');
 	const placeholderTranslated = placeholder ?? __('Select an option');
 
-	useEffect(() => {
-		if (onChange) {
-			onChange(selected as T);
-		}
-	}, [selected, onChange]);
-
 	// when receiving an array of strings as options we will make them valid DropdownOption objects
 	const normalizedOptions: DropdownOption[] = useMemo(() => {
 		return options.map((option) => {
@@ -74,6 +68,10 @@ const DropdownGeneric = <T extends string | undefined>(
 			setSearch('');
 		} else {
 			setSelected(value as T);
+		}
+
+		if (onChange) {
+			onChange(value as T);
 		}
 	};
 

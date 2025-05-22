@@ -208,7 +208,11 @@ export default function RasterDownloadMap(): React.ReactElement {
 					/>
 				) : (
 					<div className="sm:w-64">
-						<InteractiveRegionSelect />
+						<InteractiveRegionSelect
+							onChange={(_) => {
+								resetSelectedPoints();
+							}}
+						/>
 					</div>
 				)}
 			</div>

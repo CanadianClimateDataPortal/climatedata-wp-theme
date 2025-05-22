@@ -105,6 +105,13 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this.getScenarios()[0] || null;
 	}
 
+	getValidScenarioForVersion(version: string): string | null {
+		// Get scenarios for the specified version
+		const scenariosConfig = this.getScenariosConfig() ?? {};
+		const scenarios = scenariosConfig[version] ?? [];
+		return scenarios[0] || null;
+	}
+
 	getScenarioCompare(): boolean {
 		// Return if scenario comparison is checked or not.
 		return this._config.scenarioCompare ?? false;

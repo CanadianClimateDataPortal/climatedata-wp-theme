@@ -144,13 +144,22 @@ export const ClimateVariableProvider: React.FC<{
 	 */
 	const setVersion = useCallback(
 		(version: string) => {
-			dispatch(
-				updateClimateVariable({
-					version,
-				})
-			);
+			// Get current climate variable data
+			const currentData = climateVariableData;
+			if (!currentData || currentData.version === version) return;
+
+			const validScenario = climateVariable?.getValidScenarioForVersion(version);
+			const updatePayload: Partial<ClimateVariableConfigInterface> = {
+				version
+			};
+
+			if (validScenario && (!currentData.scenario || currentData.scenario !== validScenario)) {
+				updatePayload.scenario = validScenario;
+			}
+
+			dispatch(updateClimateVariable(updatePayload));
 		},
-		[dispatch]
+		[dispatch, climateVariableData, climateVariable]
 	);
 
 	const setAnalyzeScenarios = useCallback(

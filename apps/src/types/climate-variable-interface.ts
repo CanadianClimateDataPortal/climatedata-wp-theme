@@ -366,6 +366,8 @@ export interface ClimateVariableInterface {
 
 	getScenario(): string | null;
 
+	getValidScenarioForVersion(version: string): string | null;
+
 	getScenarioCompare(): boolean;
 
 	getScenarioCompareTo(): string | null;

@@ -166,7 +166,7 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 	}
 
 	return (
-		<SidebarPanel id={slug} className="w-96">
+		<SidebarPanel id={slug} className="w-[--sidebar-width] md:w-96">
 			<Card className="h-full flex flex-col">
 				<CardHeader className="p-4 sticky top-0 bg-white z-10">
 					<CardTitle className="text-lg">

@@ -14,7 +14,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
-import Grid from '@/components/ui/grid';
 import {
 	SidebarMenuButton,
 	SidebarMenuItem,
@@ -114,7 +113,7 @@ const VariablesPanel: React.FC<VariablesPanelProps> = ({
 	};
 
 	return (
-		<SidebarPanel id={slug} className="w-[36rem]">
+		<SidebarPanel id={slug} className="w-[--sidebar-width] md:w-[36rem]">
 			<Card className="border-0 shadow-none h-full flex flex-col">
 				<CardHeader className="p-4 sticky top-0 bg-white z-10">
 					<CardTitle className="text-lg">
@@ -125,7 +124,7 @@ const VariablesPanel: React.FC<VariablesPanelProps> = ({
 							'Here you can browse all the variables contained in the selected dataset.'
 						)}
 					</CardDescription>
-					<Grid columns={2} className="gap-4 mt-4">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
 						<TaxonomyDropdownFilter
 							className="sm:w-52"
 							onFilterChange={handleVarTypeChange}
@@ -144,13 +143,13 @@ const VariablesPanel: React.FC<VariablesPanelProps> = ({
 							placeholder={__('All')}
 							value={filterValues.sector || ''}
 						/>
-					</Grid>
+					</div>
 					<div className="mt-6">
 						<VariableSearchFilter />
 					</div>
 				</CardHeader>
 				<CardContent className="p-4 pt-0 overflow-y-auto max-h-[calc(100vh-200px)] scrollbar-thin">
-					<Grid columns={2} className="gap-4">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						{dataset ? (
 							<VariableRadioCards
 								dataset={dataset}
@@ -160,11 +159,11 @@ const VariablesPanel: React.FC<VariablesPanelProps> = ({
 								onSelect={onSelect}
 							/>
 						) : (
-							<div className="col-span-2 p-4 text-center">
+							<div className="col-span-1 md:col-span-2 p-4 text-center">
 								{__('Please select a dataset first')}
 							</div>
 						)}
-					</Grid>
+					</div>
 				</CardContent>
 			</Card>
 		</SidebarPanel>

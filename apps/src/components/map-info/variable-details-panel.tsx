@@ -15,6 +15,7 @@ import Link from '@/components/ui/link';
 // other
 import { MapInfoData, Training, Sector } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
+import { useAppSelector } from '@/app/hooks';
 import { cn } from '@/lib/utils';
 
 /**
@@ -26,6 +27,10 @@ const VariableDetailsPanel: React.FC<{ mapInfo: MapInfoData }> = ({
 }) => {
 	const { __ } = useI18n();
 	const { locale } = useLocale();
+	const dataset = useAppSelector((state) => state.map.dataset);
+	const datasetName = dataset && (locale === 'fr' && dataset.title.fr
+		? dataset.title.fr
+		: dataset.title.en);
 
 	// @todo Add title and alt image text for accessibility.
 	return (
@@ -38,9 +43,7 @@ const VariableDetailsPanel: React.FC<{ mapInfo: MapInfoData }> = ({
                         )}
 						<div>
 							<div className="text-sm text-cdc-black">
-								{mapInfo?.dataset[0]?.title?.[locale]
-                                  && mapInfo.dataset[0].title[locale]
-                                }
+								{datasetName}
 							</div>
 							<h2 className="text-2xl font-semibold">
 								{mapInfo?.title?.[locale] && mapInfo.title[locale]}

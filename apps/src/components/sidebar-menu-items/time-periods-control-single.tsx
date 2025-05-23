@@ -32,7 +32,6 @@ const TimePeriodsControlSingle: React.FC = () => {
 	const dateRange = climateVariable?.getDateRange();
 	const year = dateRange?.[0] ?? "2040";
 	// Use climate variable state for the slider
-	// TODO: revoir cette logique
 	const sliderValue = dateRange && dateRange.length > 0
 		? [Number(dateRange[0])]
 		: timePeriodEnd && timePeriodEnd.length > 0

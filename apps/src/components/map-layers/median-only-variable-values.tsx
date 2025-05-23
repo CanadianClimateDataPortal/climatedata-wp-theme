@@ -39,7 +39,6 @@ const MedianOnlyVariableValues: React.FC<MedianOnlyVariableValuesProps> = ({
 	// useEffect to retrieve location values for the current climate variable
 	useEffect(() => {
 		const variableId = climateVariable?.getId() ?? '';
-		const { lat, lng } = latlng;
 		const decadeValue = parseInt(dateRange[1]); // We get end date for this variable
 
 		const fetchData = async () => {
@@ -92,7 +91,7 @@ const MedianOnlyVariableValues: React.FC<MedianOnlyVariableValuesProps> = ({
 		};
 
 		fetchData();
-	}, [climateVariable, decimals, dateRange, featureId, latlng, section]);
+	}, [climateVariable, decimals, dateRange, endpoint, featureId, latlng, section]);
 
 	// Value formatter (for units)
 	const valueFormatter = (value: number) => {

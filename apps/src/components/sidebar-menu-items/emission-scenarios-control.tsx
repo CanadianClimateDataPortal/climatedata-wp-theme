@@ -31,6 +31,15 @@ const EmissionScenariosControl: React.FC = () => {
 		</div>
 	);
 
+	const handleCompareChange = (value: boolean) => {
+		setScenarioCompare(value);
+
+		// Also reset the compareTo scenario if the user unchecks the compare checkbox
+		if (!value) {
+			setScenarioCompareTo(null);
+		}
+	}
+
 	return (
 		<SidebarMenuItem>
 			<div className="flex flex-col gap-4">
@@ -51,7 +60,7 @@ const EmissionScenariosControl: React.FC = () => {
 						id="compare-scenarios"
 						className="text-brand-red"
 						checked={climateVariable?.getScenarioCompare() ?? false}
-						onCheckedChange={setScenarioCompare}
+						onCheckedChange={handleCompareChange}
 					/>
 					<label
 						htmlFor="compare-scenarios"

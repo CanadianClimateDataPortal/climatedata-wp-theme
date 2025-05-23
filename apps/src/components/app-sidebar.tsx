@@ -96,7 +96,7 @@ export function AppSidebar() {
 			|| frequencyConfig[FrequencyType.ALL_MONTHS] !== FrequencyDisplayModeOption.NONE);
 	// Show the time periods control if the climate variable has date range config
 	const showTimePeriodsControl = climateVariable?.getDateRangeConfig() !== null;
-	const isTimePeriodsControlRanged = climateVariable?.getId() !== 'allowance';
+	const isTimePeriodsControlRanged = climateVariable?.isTimePeriodARange();
 	// Show the data values control if the climate variable has delta
 	const hasDelta = climateVariable && climateVariable.hasDelta();
 	// Show the map colors dropdown if the climate variable has color options

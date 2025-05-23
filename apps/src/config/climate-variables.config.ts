@@ -1668,6 +1668,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			"2040",
 			"2040",
 		],
+		isTimePeriodARange: false,
 		interactiveRegionConfig: {
 			[InteractiveRegionOption.GRIDDED_DATA]: true,
 			[InteractiveRegionOption.CENSUS]: false,
@@ -1725,6 +1726,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			"2040",
 			"2040",
 		],
+		isTimePeriodARange: false,
 		averagingOptions: [ AveragingType.ALL_YEARS ],
 		dateRangeConfig: {
 			min: "2020",

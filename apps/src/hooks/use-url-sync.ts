@@ -425,10 +425,12 @@ export const useUrlSync = () => {
 						config.id === firstVariable.id);
 					
 					if (matchingConfig) {
-						// Set climate variable with dataset context
+						// Set climate variable with dataset context and API data
 						const variableWithDataset = {
 							...matchingConfig,
-							datasetType: firstDataset.dataset_type
+							datasetType: firstDataset.dataset_type,
+							postId: firstVariable.postId,
+							title: firstVariable.title
 						};
 
 						// Set the variable

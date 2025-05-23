@@ -13,18 +13,18 @@
 $assets = cdc_app_asset_load( 'map' );
 
 if ( ! is_array( $assets ) || empty( $assets ) ) {
-    wp_die( 'Error: could not load the map app!' );
+	wp_die( 'Error: could not load the map app!' );
 }
 
 // Initialize current language.
 $current_lang = 'en';
 
 if (
-    isset( $GLOBALS['fw'] )
-    && isset( $GLOBALS['fw']['current_lang_code'] )
-    && in_array( $GLOBALS['fw']['current_lang_code'], array( 'en', 'fr' ), true )
+	isset( $GLOBALS['fw'] )
+	&& isset( $GLOBALS['fw']['current_lang_code'] )
+	&& in_array( $GLOBALS['fw']['current_lang_code'], array( 'en', 'fr' ), true )
 ) {
-    $current_lang = $GLOBALS['fw']['current_lang_code'];
+	$current_lang = $GLOBALS['fw']['current_lang_code'];
 }
 ?>
 
@@ -35,53 +35,57 @@ if (
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title><?php wp_title(); ?></title>
 
-    <?php
-    // Add favicon.
-    add_favicon();
+	<?php
+	// Add favicon.
+	add_favicon();
 
-    // Load CSS assets.
-    if ( isset( $assets['css'] ) && is_array( $assets['css'] ) ) {
-        foreach ( $assets['css'] as $css_file ) {
-            if ( filter_var( $css_file, FILTER_VALIDATE_URL ) ) { ?>
+	// Load CSS assets.
+	if ( isset( $assets['css'] ) && is_array( $assets['css'] ) ) {
+		foreach ( $assets['css'] as $css_file ) {
+			if ( filter_var( $css_file, FILTER_VALIDATE_URL ) ) { ?>
                 <link rel="stylesheet" crossorigin href="<?php echo esc_url( $css_file ); ?>">
-                <?php
-            }
-        }
-    }
+				<?php
+			}
+		}
+	}
 
-    // Load JS module preload assets.
-    if ( isset( $assets['js'] ) && is_array( $assets['js'] ) && isset( $assets['js']['modulepreload'] ) && is_array( $assets['js']['modulepreload'] ) ) {
-        foreach ( $assets['js']['modulepreload'] as $js_preload_file ) {
-            if ( filter_var( $js_preload_file, FILTER_VALIDATE_URL ) ) { ?>
+	// Load JS module preload assets.
+	if ( isset( $assets['js'] ) && is_array( $assets['js'] ) && isset( $assets['js']['modulepreload'] ) && is_array( $assets['js']['modulepreload'] ) ) {
+		foreach ( $assets['js']['modulepreload'] as $js_preload_file ) {
+			if ( filter_var( $js_preload_file, FILTER_VALIDATE_URL ) ) { ?>
                 <link rel="modulepreload" crossorigin href="<?php echo esc_url( $js_preload_file ); ?>">
-            <?php }
-        }
-    }
-    ?>
+			<?php }
+		}
+	}
+	?>
 </head>
 <body>
-<div id="root" data-app-lang="<?php echo esc_attr( $current_lang ); ?>" data-wp-home-url="<?php echo esc_attr( home_url() ); ?>"></div>
+<div id="root"
+     data-app-lang="<?php echo esc_attr( $current_lang ); ?>"
+     data-wp-home-url="<?php echo esc_attr( home_url() ); ?>"
+></div>
 
 <?php
 // Load JS assets.
 if ( isset( $assets['js'] ) && is_array( $assets['js'] ) && isset( $assets['js']['module'] ) && is_array( $assets['js']['module'] ) ) {
-    foreach ( $assets['js']['module'] as $js_assets ) {
-        if ( filter_var( $js_assets, FILTER_VALIDATE_URL ) ) { ?>
+	foreach ( $assets['js']['module'] as $js_assets ) {
+		if ( filter_var( $js_assets, FILTER_VALIDATE_URL ) ) { ?>
             <script>
                 // Disable Leaflet's 3D features
                 L_DISABLE_3D = true;
             </script>
             <script type="module" crossorigin src="<?php echo esc_url( $js_assets ); ?>"></script>
-        <?php }
-    }
+		<?php }
+	}
 }
 ?>
 
 <script>
-  // URL encoder salt for the map app.
-  window.URL_ENCODER_SALT = '<?php echo htmlspecialchars($GLOBALS['vars']['url_encoder_salt'], ENT_QUOTES); ?>';
-  // DATA URL for the map app.
-  window.DATA_URL = '<?php echo htmlspecialchars($GLOBALS['vars']['data_url'], ENT_QUOTES); ?>';
+    // URL encoder salt for the map app.
+    window.URL_ENCODER_SALT = '<?php echo htmlspecialchars( $GLOBALS['vars']['url_encoder_salt'], ENT_QUOTES ); ?>';
+
+    // DATA URL for the map app.
+    window.DATA_URL = '<?php echo htmlspecialchars( $GLOBALS['vars']['data_url'], ENT_QUOTES ); ?>';
 </script>
 </body>
 </html>

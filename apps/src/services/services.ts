@@ -485,7 +485,7 @@ export const fetchStationsList = async ({ threshold }: { threshold?: string }) =
 		};
 
 		if (threshold === 'ahccd') {
-			data = await fetchJson('https://data.climatedata.ca/fileserver/ahccd/ahccd.json');
+			data = await fetchJson('https://dataclimatedata.crim.ca/fileserver/ahccd/ahccd.json');
 		} else if (threshold === 'station-data') {
 			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE');
 		} else {

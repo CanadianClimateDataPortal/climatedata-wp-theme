@@ -93,7 +93,7 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 			if(!props?.stationIds || !props?.fileFormat) return [];
 
 			const stations = props.stationIds?.map(stationId => stationId).join(',');
-			const url = `https://data.climatedata.ca/download-ahccd?format=${props?.fileFormat}&zipped=true&stations=${stations}`;
+			const url = `https://dataclimatedata.crim.ca/download-ahccd?format=${props?.fileFormat}&zipped=true&stations=${stations}`;
 
 			return [{
 				label: '',
@@ -104,7 +104,7 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 		else if(this.getId() === 'future_building_design_value_summaries') {
 			if(!props?.stationName) return [];
 
-			const url = `https://data.climatedata.ca/fileserver/bdv/en/DVE Guidance_${props?.stationName}.pdf`;
+			const url = `https://dataclimatedata.crim.ca/fileserver/bdv/en/DVE Guidance_${props?.stationName}.pdf`;
 
 			return [{
 				label: '',

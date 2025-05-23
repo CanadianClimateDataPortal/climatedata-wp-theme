@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useI18n } from '@wordpress/react-i18n';
 import { BadgeInfo, MessageCircleQuestion } from 'lucide-react';
 import { useMap } from '@/hooks/use-map';
@@ -13,35 +13,32 @@ import {
 	SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-	DatasetsMenuItem,
-	DatasetsPanel,
-} from '@/components/sidebar-menu-items/datasets';
-import {
-	VariablesMenuItem,
-	VariablesPanel,
-} from '@/components/sidebar-menu-items/variables';
+import { DatasetsMenuItem, DatasetsPanel } from '@/components/sidebar-menu-items/datasets';
+import { VariablesMenuItem, VariablesPanel } from '@/components/sidebar-menu-items/variables';
 import { EmissionScenariosControl } from '@/components/sidebar-menu-items/emission-scenarios-control';
 import { ThresholdValuesDropdown } from '@/components/sidebar-menu-items/threshold-values-dropdown';
 import { InteractiveRegionsMenuItem } from '@/components/sidebar-menu-items/interactive-regions-menu-item';
 import { FrequenciesDropdown } from '@/components/sidebar-menu-items/frequencies-dropdown';
 import { TimePeriodsControl } from '@/components/sidebar-menu-items/time-periods-control';
+import { TimePeriodsControlSingle } from "@/components/sidebar-menu-items/time-periods-control-single";
 import { TimePeriodsControlForSeaLevel } from '@/components/sidebar-menu-items/time-periods-control-for-sea-level';
 import { DataValuesControl } from '@/components/sidebar-menu-items/data-values-control';
 import { MapColorsDropdown } from '@/components/sidebar-menu-items/map-colors-dropdown';
 import { VersionsDropdown } from "@/components/sidebar-menu-items/versions-dropdown";
 
-import {
-	RecentLocationsLink,
-	RecentLocationsPanel,
-} from '@/components/sidebar-footer-links/recent-locations';
+import { RecentLocationsLink, RecentLocationsPanel } from '@/components/sidebar-footer-links/recent-locations';
 import LinkWithIcon from '@/components/sidebar-footer-links/link-with-icon';
 import LayerOpacities from '@/components/ui/layer-opacities';
 
 import { PostData } from '@/types/types';
 import { setDataset } from '@/features/map/map-slice';
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { ScenariosConfig, FrequencyConfig, FrequencyType, FrequencyDisplayModeOption } from "@/types/climate-variable-interface";
+import {
+	FrequencyConfig,
+	FrequencyDisplayModeOption,
+	FrequencyType,
+	ScenariosConfig,
+} from "@/types/climate-variable-interface";
 
 /**
  * A `Sidebar` component that provides a tabbed interface for exploring data or adjusting map settings.
@@ -99,6 +96,7 @@ export function AppSidebar() {
 			|| frequencyConfig[FrequencyType.ALL_MONTHS] !== FrequencyDisplayModeOption.NONE);
 	// Show the time periods control if the climate variable has date range config
 	const showTimePeriodsControl = climateVariable?.getDateRangeConfig() !== null;
+	const isTimePeriodsControlRanged = climateVariable?.isTimePeriodARange();
 	// Show the data values control if the climate variable has delta
 	const hasDelta = climateVariable && climateVariable.hasDelta();
 	// Show the map colors dropdown if the climate variable has color options
@@ -153,7 +151,11 @@ export function AppSidebar() {
 										climateVariable?.getId() === 'sea_level' ? (
 											<TimePeriodsControlForSeaLevel />
 										) : (
-											<TimePeriodsControl />
+											isTimePeriodsControlRanged ? (
+												<TimePeriodsControl />
+											) : (
+												<TimePeriodsControlSingle />
+											)
 										)
 									)}
 								</SidebarMenu>

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import * as Slider from '@radix-ui/react-slider';
 import { useI18n } from '@wordpress/react-i18n';
-import { useAppDispatch } from '@/app/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 
 // components
 import { SidebarMenuItem } from '@/components/ui/sidebar';
@@ -12,56 +12,44 @@ import { cn } from '@/lib/utils';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { setTimePeriodEnd } from '@/features/map/map-slice';
 
-const TimePeriodsControlForSeaLevel: React.FC = () => {
+/**
+ * Time period selector for single year (not year range).
+ * @constructor
+ */
+const TimePeriodsControlSingle: React.FC = () => {
 	const { __ } = useI18n();
 	const dispatch = useAppDispatch();
 	const { climateVariable, setDateRange } = useClimateVariable();
-	const scenario = climateVariable?.getScenario();
-	const [sliderLabel, setSliderLabel] = useState<string>('');
-	const [minYearLabel, setMinYearLabel] = useState<string>('');
-
-	const enhancedScenario = 'rcp85plus65-p50';
-	const fixedYearForEnhancedScenario = 2100;
+	const timePeriodEnd = useAppSelector(state => state.map.timePeriodEnd);
 
 	const { min, max, interval } = climateVariable?.getDateRangeConfig() ?? {
-		min: 2020,
+		min: 1950,
 		max: 2100,
-		interval: 10,
+		interval: 30,
 	};
 
 	// Get date range from climate variable state
 	const dateRange = climateVariable?.getDateRange();
 	const year = dateRange?.[0] ?? "2040";
+	// Use climate variable state for the slider
+	const sliderValue = dateRange && dateRange.length > 0
+		? [Number(dateRange[0])]
+		: timePeriodEnd && timePeriodEnd.length > 0
+			? timePeriodEnd
+			: [Number(year)];
 
-	// Use map state for the slider
-
-	let sliderValue = [Number(year)];
-	// Special scenario (2100 is the only option)
-	if(scenario === enhancedScenario) {
-		sliderValue = [fixedYearForEnhancedScenario];
-	}
-
-	const maxYear = Number(max);
-	const minYear = Number(min);
-	const intervalYears = interval;
-	const sliderMinYear = Math.floor(minYear / intervalYears) * intervalYears;
-
-	// Set initial values for fixed special case scenario
+	// Keep map state in sync with climate variable on initial load
 	useEffect(() => {
-		// Special scenario (2100 is the only option)
-		if(scenario === enhancedScenario) {
-			dispatch(setTimePeriodEnd([fixedYearForEnhancedScenario]));
-			setDateRange([
-				fixedYearForEnhancedScenario.toString(),
-				fixedYearForEnhancedScenario.toString(),
-			]);
+		if (dateRange && dateRange.length > 0 && timePeriodEnd && timePeriodEnd[0] !== Number(dateRange[0])) {
+			dispatch(setTimePeriodEnd([Number(dateRange[0])]));
 		}
-	}, [scenario, fixedYearForEnhancedScenario, dispatch, intervalYears, setDateRange]);
+	}, [dateRange, timePeriodEnd, dispatch]);
+
+	const minYear = Number(min);
+	const maxYear = Number(max);
+	const intervalYears = interval;
 
 	const handleChange = (values: number[]) => {
-		// If we have a fixed year for this scenario, don't allow changes
-		if(scenario === enhancedScenario) return;
-
 		let newEnd = values[0];
 
 		if (newEnd < minYear) {
@@ -71,37 +59,15 @@ const TimePeriodsControlForSeaLevel: React.FC = () => {
 			newEnd = maxYear;
 		}
 
-		// Update both map state and climate variable state
-		dispatch(setTimePeriodEnd([newEnd]));
-
-		// Update climate variable state with the new date range
+		// Update climate variable state
 		setDateRange([
 			newEnd.toString(),
 			newEnd.toString(),
 		]);
+
+		// Also update map state for backward compatibility
+		dispatch(setTimePeriodEnd([newEnd]));
 	};
-
-	// Set min year label
-	useEffect(() => {
-		if (minYear) {
-			setMinYearLabel(min.toString());
-		}
-	}, [climateVariable, min, minYear]);
-
-	// Set slider label
-	useEffect(() => {
-		if (year) {
-			if (scenario === enhancedScenario) {
-				setSliderLabel(fixedYearForEnhancedScenario.toString());
-			} else {
-				if (year < min) {
-					setSliderLabel(min.toString());
-				} else {
-					setSliderLabel(year);
-				}
-			}
-		}
-	}, [climateVariable, year, min, scenario]);
 
 	return (
 		<SidebarMenuItem>
@@ -113,15 +79,13 @@ const TimePeriodsControlForSeaLevel: React.FC = () => {
 				<Slider.Root
 					className={cn(
 						'relative flex items-center select-none mx-4',
-						'mt-16 [touch-action:none]',
-						scenario === enhancedScenario && 'opacity-50 cursor-not-allowed'
+						'mt-16 [touch-action:none]'
 					)}
 					value={sliderValue}
 					onValueChange={handleChange}
-					min={sliderMinYear}
+					min={minYear}
 					max={maxYear}
-					step={10}
-					disabled={scenario === enhancedScenario}
+					step={intervalYears}
 				>
 					<Slider.Track
 						className={cn(
@@ -153,7 +117,7 @@ const TimePeriodsControlForSeaLevel: React.FC = () => {
 								'flex items-center pointer-events-none'
 							)}
 						>
-							{sliderLabel}
+							{year}
 							<div
 								className={cn(
 									'slider-range-tooltip',
@@ -166,13 +130,13 @@ const TimePeriodsControlForSeaLevel: React.FC = () => {
 					</Slider.Thumb>
 				</Slider.Root>
 				<div className="flex justify-between mt-2.5 mx-4 text-sm">
-					<span>{minYearLabel}</span>
+					<span>{minYear}</span>
 					<span>{maxYear}</span>
 				</div>
 			</div>
 		</SidebarMenuItem>
 	);
 };
-TimePeriodsControlForSeaLevel.displayName = 'TimePeriodsControlForSeaLevel';
+TimePeriodsControlSingle.displayName = 'TimePeriodsControlSingle';
 
-export { TimePeriodsControlForSeaLevel };
+export { TimePeriodsControlSingle };

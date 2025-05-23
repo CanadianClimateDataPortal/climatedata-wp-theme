@@ -242,6 +242,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		];
 	}
 
+	isTimePeriodARange(): boolean {
+		return this._config.isTimePeriodARange ?? true;
+	}
+
 	getAveragingOptions(): AveragingType[] {
 		return this._config.averagingOptions ?? [];
 	}

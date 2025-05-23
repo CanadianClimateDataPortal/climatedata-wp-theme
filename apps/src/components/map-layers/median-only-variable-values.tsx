@@ -5,24 +5,25 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { fetchDeltaValues } from '@/services/services';
 import SectionContext from "@/context/section-provider";
 
-interface SeaLeavelClimateVariableValuesProps {
+interface MedianOnlyVariableValuesProps {
 	latlng: L.LatLng;
 	featureId: number,
-	mode: "modal" | "panel"
+	mode: "modal" | "panel",
+	endpoint: string,
 }
 
 /**
- * SeaLevelClimateVariableValues Component
+ * MedianOnlyVariableValues Component
  * ---------------------------
- * Display the climate variable median
- * For Seal Level climate variable
+ * Display only the median value for the climate variable.
  *
  * Can be used in the location modal and charts panel
  */
-const SeaLevelClimateVariableValues: React.FC<SeaLeavelClimateVariableValuesProps> = ({
+const MedianOnlyVariableValues: React.FC<MedianOnlyVariableValuesProps> = ({
 	latlng,
 	featureId,
 	mode,
+	endpoint,
 }) => {
 	const { __ } = useI18n();
 	const { climateVariable } = useClimateVariable();
@@ -38,26 +39,24 @@ const SeaLevelClimateVariableValues: React.FC<SeaLeavelClimateVariableValuesProp
 	// useEffect to retrieve location values for the current climate variable
 	useEffect(() => {
 		const variableId = climateVariable?.getId() ?? '';
-		const { lat, lng } = latlng;
 		const decadeValue = parseInt(dateRange[1]); // We get end date for this variable
 
 		const fetchData = async () => {
 			if (!decadeValue && !variableId) return;
 
 			const scenario = climateVariable?.getScenario() ?? '';
+			const version = climateVariable?.getVersion() ?? '';
 
 			// Fetching median
 
-			// Endpoint
-			const medianEndpoint = `get-slr-gridded-values/${lat}/${lng}`;
-
 			// Params
 			const medianParams = new URLSearchParams({
-				period: String(decadeValue)
+				period: String(decadeValue),
+				dataset_name: version,
 			}).toString();
 
 			const medianData = await fetchDeltaValues({
-				endpoint: medianEndpoint,
+				endpoint: endpoint,
 				varName: null,
 				frequency: null,
 				params: medianParams,
@@ -67,7 +66,19 @@ const SeaLevelClimateVariableValues: React.FC<SeaLeavelClimateVariableValuesProp
 				// If we don't have data
 				setNoDataAvailable(true);
 			} else {
-				const [scenarioName, percentile] = scenario.split('-');
+				let scenarioName, percentile;
+
+				// If the scenario name already contains the percentile, use it, else
+				// default to 'p50' if it exists
+				if (/-p\d+$/.test(scenario)) {
+					[scenarioName, percentile] = scenario.split('-');
+				} else {
+					const defaultPercentile = 'p50';
+					if (medianData[scenario]?.[defaultPercentile]) {
+						scenarioName = scenario;
+						percentile = defaultPercentile;
+					}
+				}
 
 				if(scenarioName && percentile) {
 					setMedian(medianData[scenarioName]?.[percentile] || 0);
@@ -80,7 +91,7 @@ const SeaLevelClimateVariableValues: React.FC<SeaLeavelClimateVariableValuesProp
 		};
 
 		fetchData();
-	}, [climateVariable, decimals, dateRange, featureId, latlng, section]);
+	}, [climateVariable, decimals, dateRange, endpoint, featureId, latlng, section]);
 
 	// Value formatter (for units)
 	const valueFormatter = (value: number) => {
@@ -120,4 +131,4 @@ const SeaLevelClimateVariableValues: React.FC<SeaLeavelClimateVariableValuesProp
 	);
 };
 
-export default SeaLevelClimateVariableValues;
+export default MedianOnlyVariableValues;

@@ -39,6 +39,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 			canadagrid: 0.08333333333333333,
 			canadagrid1deg: 1,
 			slrgrid: 0.1,
+			'slrgrid-cmip6': 0.1,
 			era5landgrid: 0.1,
 		}),
 		[]

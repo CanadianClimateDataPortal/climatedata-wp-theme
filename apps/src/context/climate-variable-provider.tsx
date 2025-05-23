@@ -153,9 +153,6 @@ export const ClimateVariableProvider: React.FC<{
 
 			if (validScenario && (!currentData.scenario || currentData.scenario !== validScenario)) {
 				updatePayload.scenario = validScenario;
-				// Reset scenario comparison when scenario changes
-				updatePayload.scenarioCompare = false;
-				updatePayload.scenarioCompareTo = null;
 			}
 
 			dispatch(updateClimateVariable(updatePayload));

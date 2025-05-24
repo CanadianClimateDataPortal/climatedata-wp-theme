@@ -486,6 +486,12 @@ export const fetchStationsList = async ({ threshold }: { threshold?: string }) =
 
 		if (threshold === 'ahccd') {
 			data = await fetchJson('https://data.climatedata.ca/fileserver/ahccd/ahccd.json');
+		} else if (threshold === 'bdv') {
+			// Use server-side fetched BDV data to avoid CORS
+			data = (window as any).BDV_STATIONS || null;
+			if (!data) {
+				throw new Error('BDV stations data not available');
+			}
 		} else if (threshold === 'station-data') {
 			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE');
 		} else {
@@ -494,7 +500,7 @@ export const fetchStationsList = async ({ threshold }: { threshold?: string }) =
 
 		return (data.features || []).map((feature: any) => ({
 			id: String(feature.properties?.ID ?? ((threshold === 'station-data' || threshold === 'climate-normals') ? feature.properties?.STN_ID : feature?.id)),
-			name: feature.properties?.STATION_NAME ?? feature.properties?.Name,
+			name: feature.properties?.STATION_NAME ?? feature.properties?.Name ?? feature.properties?.Location,
 			type: feature.properties?.type,
 			coordinates: {
 				lat: feature.geometry.coordinates[1],

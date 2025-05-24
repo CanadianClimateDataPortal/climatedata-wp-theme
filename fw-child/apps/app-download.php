@@ -73,5 +73,19 @@ if ( isset( $assets['js'] ) && is_array( $assets['js'] ) && isset( $assets['js']
     }
 }
 ?>
+
+<script>
+  // URL encoder salt for apps
+  window.URL_ENCODER_SALT = '<?php echo htmlspecialchars($GLOBALS['vars']['url_encoder_salt'], ENT_QUOTES); ?>';
+  // DATA URL for apps
+  window.DATA_URL = '<?php echo htmlspecialchars($GLOBALS['vars']['data_url'], ENT_QUOTES); ?>';
+  // BDV stations data
+  window.BDV_STATIONS = <?php 
+    $bdv_url = 'https://data.climatedata.ca/fileserver/bdv/bdv.json';
+    $bdv_data = file_get_contents($bdv_url);
+    echo $bdv_data ?: 'null';
+  ?>;
+</script>
+
 </body>
 </html>

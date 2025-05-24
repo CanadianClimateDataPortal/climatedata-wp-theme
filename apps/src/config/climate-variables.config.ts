@@ -767,11 +767,11 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			{
 				key: "thresh",
 				type: "input",
-				label: "Average Daily Precipitation on Wet Days",
+				label: "Average Daily Precipitation on Wet Days (mm/day)",
 				description: 'Set the minimum precipitation required for a day to be classified as wet.',
 				help: 'Days with precipitation greater than or equal to this value will be included in the average calculation of wet day precipitation.',
 				comparison: '>=',
-				unit: 'mm/dd',
+				unit: 'mm/day',
 				attributes: {
 					type: "number",
 					placeholder: "0",
@@ -1540,10 +1540,10 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			{
 				key: "thresh",
 				type: "input",
-				label: 'Days above Tmin',
+				label: 'Days above Tmin (°C)',
 				description: 'Set the minimum daily temperature that must be exceeded for a day to be included in the analysis.',
 				help: 'Only days where the daily minimum temperature exceeds this threshold in degrees Celsius will be counted.',
-				unit: 'C',
+				unit: '°C',
 				comparison: '>',
 				attributes: {
 					type: "number",
@@ -1565,11 +1565,11 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			{
 				key: "thresh",
 				type: "input",
-				label: "Number of Wet Days",
+				label: "Number of Wet Days (mm/day)",
 				description: 'Set the precipitation value that defines a wet day.',
 				help: 'Days with precipitation greater than this threshold will be counted as wet days in the analysis.',
 				comparison: '>',
-				unit: 'mm/dd',
+				unit: 'mm/day',
 				attributes: {
 					type: "number",
 					placeholder: "0",

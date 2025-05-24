@@ -1789,5 +1789,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 				"ssp370",
 			],
 		},
+		fileFormatTypes: [
+			FileFormatType.CSV,
+			FileFormatType.GeoJSON,
+		],
 	},
 ];

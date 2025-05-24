@@ -17,6 +17,53 @@ import Dropdown from "@/components/ui/dropdown.tsx";
 import { normalizeDropdownOptions } from "@/lib/format.ts";
 
 /**
+ * Captcha component for download verification
+ */
+const Captcha: React.FC<{
+	analysisNamespace: string;
+	captchaValue: string;
+	captchaRefresh: number;
+	setCaptchaRefresh: (value: number) => void;
+	dispatch: any;
+	__: (text: string) => string;
+}> = ({ analysisNamespace, captchaValue, captchaRefresh, setCaptchaRefresh, dispatch, __ }) => (
+	<div className="mb-4">
+		<p className="text-sm text-neutral-grey-medium leading-5 mb-2">
+			{__('Enter the characters shown:')}
+		</p>
+		<div className="flex items-center space-x-3">
+			<img
+				id="captcha_img"
+				src={`/assets/themes/fw-child/resources/php/securimage/securimage_show.php?namespace=${analysisNamespace}&${captchaRefresh}`}
+				alt="CAPTCHA"
+				className="w-20 h-10 border border-gray-300 rounded"
+			/>
+			<button
+				type="button"
+				className="px-2 border rounded text-xl"
+				onClick={() => {
+					setCaptchaRefresh(Math.random());
+					dispatch(setCaptchaValue(''))
+				}}
+				title={__('Refresh Captcha')}
+			>
+				↻
+			</button>
+			<input
+				type="text"
+				placeholder="XXXX"
+				value={captchaValue}
+				onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+					dispatch(setCaptchaValue(e.target.value))
+				}
+				className="border bg-white border-gray-300 rounded px-2 py-1 text-sm placeholder:text-neutral-grey-medium"
+			/>
+		</div>
+	</div>
+);
+Captcha.displayName = 'Captcha';
+
+/**
  * Send download request step
  */
 const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
@@ -87,6 +134,20 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	);
 
 	const isEmailValid = isValidEmail(email);
+
+	/**
+	 * Shows captcha for analysis variables (those that make requests to Finch).
+	 * Exception: Daily AHCCD Temperature and Precipitation does not show captcha
+	 */
+	const shouldShowCaptcha = () => {
+		if (!climateVariable) return false;
+		
+		if (climateVariable.getId() === 'daily_ahccd_temperature_and_precipitation') {
+			return false;
+		}
+		
+		return climateVariable.getClass() === 'RasterAnalyzeClimateVariable';
+	};
 
 	useEffect(() => {
 		// Reset decimalPlace if fileFormat is changed away from CSV.
@@ -179,42 +240,16 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 				</div>
 			)}
 
-			<div className="mb-4">
-				<p className="text-sm text-neutral-grey-medium leading-5 mb-2">
-					{__('Enter the characters shown:')}
-				</p>
-				<div className="flex items-center space-x-3">
-					{/* Captcha display */}
-					{/* TODO: maybe use a REST endpoint as src so we don't have to use the complete path? */}
-					<img
-						id="captcha_img"
-						src={`/assets/themes/fw-child/resources/php/securimage/securimage_show.php?namespace=${analysisNamespace}&${captchaRefresh}`}
-						alt="CAPTCHA"
-						className="w-20 h-10 border border-gray-300 rounded"
-					/>
-					<button
-						type="button"
-						className="px-2 border rounded text-xl"
-						onClick={() => {
-							setCaptchaRefresh(Math.random());
-							dispatch(setCaptchaValue(''))
-						}}
-						title={__('Refresh Captcha')}
-					>
-						↻
-					</button>
-					{/* Captcha input */}
-					<input
-						type="text"
-						placeholder="XXXX"
-						value={captchaValue}
-						onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-							dispatch(setCaptchaValue(e.target.value))
-						}
-						className="border bg-white border-gray-300 rounded px-2 py-1 text-sm placeholder:text-neutral-grey-medium"
-					/>
-				</div>
-			</div>
+			{shouldShowCaptcha() && (
+				<Captcha
+					analysisNamespace={analysisNamespace}
+					captchaValue={captchaValue}
+					captchaRefresh={captchaRefresh}
+					setCaptchaRefresh={setCaptchaRefresh}
+					dispatch={dispatch}
+					__={__}
+				/>
+			)}
 
 			{requestStatus === 'error' && <div className="text-red-600 text-sm mt-2">{requestError}</div>}
 		</StepContainer>

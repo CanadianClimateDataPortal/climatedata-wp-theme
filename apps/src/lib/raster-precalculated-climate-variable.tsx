@@ -149,7 +149,7 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 			zipped: true,
 		};
 
-		const url = "https://data.climatedata.ca/download";
+		const url = `${window.DATA_URL}/download`;
 
 		try {
 			const response = await fetch(url, {

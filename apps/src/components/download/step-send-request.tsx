@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 import { StepContainer, StepContainerDescription, } from '@/components/download/step-container';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
@@ -22,7 +22,6 @@ import { normalizeDropdownOptions } from "@/lib/format.ts";
 const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 	const captchaValue = useAppSelector((state) => state.download.captchaValue) || '';
 	const [captchaRefresh, setCaptchaRefresh] = useState(Math.random());
-	const { __ } = useI18n();
 	const { climateVariable, setFileFormat, setDecimalPlace } = useClimateVariable();
 
 	const { email, subscribe, requestStatus, requestError } = useAppSelector(

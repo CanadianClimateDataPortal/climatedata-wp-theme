@@ -4,7 +4,7 @@
  * A dropdown component that allows the user to select an interactive region.
  */
 import React from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 // components
 import Dropdown from '@/components/ui/dropdown';
@@ -18,7 +18,6 @@ interface InteractiveRegionSelectProps {
 }
 
 const InteractiveRegionSelect: React.FC<InteractiveRegionSelectProps> = ({ onChange }) => {
-  const { __ } = useI18n();
   const { climateVariable, setInteractiveRegion } = useClimateVariable();
 
   const options: { value: InteractiveRegionOption; label: string }[] = [

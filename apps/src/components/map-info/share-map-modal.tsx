@@ -5,7 +5,7 @@
  *
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 // components
 import { Button } from '@/components/ui/button';
@@ -29,8 +29,6 @@ const ShareMapModal: React.FC<{
 	>('destructive');
 	const [currentUrl, setCurrentUrl] = useState<string>('');
 	const inputRef = useRef<HTMLInputElement>(null);
-
-	const { __ } = useI18n();
 
 	// Get the URL sync state to ensure URL parameters are loaded
 	const isUrlSyncInitialized = useAppSelector((state) => state.urlSync.isInitialized);

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 import { TransformedLegendEntry } from '@/types/types';
 import { ColourType } from '@/types/climate-variable-interface';
@@ -25,7 +25,6 @@ const MapLegendControl: React.FC<{
 }> = ({ data, isOpen, toggleOpen, isCategorical, hasCustomScheme, unit, colourType }) => {
 	const [svgWidth, setSvgWidth] = useState(0);
 	const [legendHeight, setLegendHeight] = useState<number | undefined>(undefined);
-	const { __ } = useI18n();
 	const svgRef = useRef<SVGSVGElement>(null);
 
 	const isBlocksGradient = isCategorical || colourType === ColourType.DISCRETE;

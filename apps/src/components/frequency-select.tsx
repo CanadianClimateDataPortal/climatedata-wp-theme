@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useI18n } from "@wordpress/react-i18n";
+import { __ } from '@/context/locale-provider';
 import {
 	Select,
 	SelectContent,
@@ -40,7 +40,6 @@ const FrequencySelect = ({
 	className,
 	downloadType,
 }: FrequencySelectProps) => {
-	const { __ } = useI18n();
 
 	const hasAnnual = isFrequencyEnabled(config, section, FrequencyType.ANNUAL);
 	const hasAnnualJulJun = isFrequencyEnabled(config, section, FrequencyType.ANNUAL_JUL_JUN);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 import {
 	StepContainer,
@@ -14,7 +14,6 @@ import { useAppSelector } from '@/app/hooks';
  * Result step, the final one, allows the user to make download file or see a success message.
  */
 const StepResult = React.forwardRef(() => {
-	const { __ } = useI18n();
 	const { climateVariable } = useClimateVariable();
 	const { requestResult, downloadLinks } = useAppSelector((state) => state.download);
 

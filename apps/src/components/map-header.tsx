@@ -8,7 +8,7 @@
  */
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Info, Share2, Download } from 'lucide-react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import { cn } from '@/lib/utils';
 
 // components
@@ -115,7 +115,6 @@ MapHeader.displayName = 'MapHeader';
 const Breadcrumbs: React.FC<{ onClick: () => void }> = ({
 	onClick,
 }) => {
-	const { __ } = useI18n();
 	const { locale } = useLocale();
 	const dataset = useAppSelector((state) => state.map.dataset);
 	const variableList = useAppSelector((state) => state.map.variableList);
@@ -171,7 +170,6 @@ const ModalToggleButtons: React.FC<{
 	onToggleShare: () => void;
 	onToggleDownload: () => void;
 }> = ({ onToggleShare, onToggleDownload }) => {
-	const { __ } = useI18n();
 	const buttonClasses =
 		'text-md font-normal leading-6 tracking-[0.8px] uppercase rounded-full h-7 sm:h-9 max-sm:py-1.5 max-sm:px-3';
 

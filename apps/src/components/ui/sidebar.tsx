@@ -3,7 +3,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { VariantProps, cva } from 'class-variance-authority';
 import { X as CloseIcon, PanelLeft } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 import { useSidebar } from '@/hooks/use-sidebar';
 import { cn } from '@/lib/utils';
@@ -654,7 +654,6 @@ const SidebarPanel = React.forwardRef<
 	const [sidebarWidth, setSidebarWidth] = useState(0);
 
 	const { isPanelActive, closePanel } = useSidebar();
-	const { __ } = useI18n();
 
 	// get the sidebar width
 	useEffect(() => {

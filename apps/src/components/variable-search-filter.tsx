@@ -9,13 +9,12 @@ import { Search, X } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setSearchQuery, selectSearchQuery } from '@/store/climate-variable-slice';
 import { useDebounce } from '@/hooks/use-debounce';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import { setVariableListLoading as setMapVariableListLoading } from '@/features/map/map-slice';
 import { setVariableListLoading as setDownloadVariableListLoading } from '@/features/download/download-slice';
 import SectionContext from "@/context/section-provider";
 
 export const VariableSearchFilter: React.FC = () => {
-  const { __ } = useI18n();
   const dispatch = useAppDispatch();
   const globalSearchQuery = useAppSelector(selectSearchQuery);
   const [localSearchQuery, setLocalSearchQuery] = useState(globalSearchQuery);

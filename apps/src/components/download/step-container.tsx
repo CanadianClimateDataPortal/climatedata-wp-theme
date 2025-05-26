@@ -1,5 +1,5 @@
 import React from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 import { useDownload } from '@/hooks/use-download';
 
@@ -15,7 +15,6 @@ const StepContainer = ({
 	isLastStep?: boolean;
 	children: React.ReactNode;
 }) => {
-	const { __ } = useI18n();
 	const { currentStep } = useDownload();
 
 	const stepText = isLastStep

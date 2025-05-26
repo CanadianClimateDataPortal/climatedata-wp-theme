@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ExternalLink } from 'lucide-react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 import {
 	StepContainer,
@@ -22,7 +22,6 @@ import { StepComponentRef } from '@/types/download-form-interface';
 const StepDataset = React.forwardRef<StepComponentRef>((_, ref) => {
 	const [options, setOptions] = useState<TaxonomyData[]>([]);
 
-	const { __ } = useI18n();
 	const { locale } = useLocale();
 
 	const dataset = useAppSelector((state) => state.download.dataset);

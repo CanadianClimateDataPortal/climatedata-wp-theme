@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, ReactElement, useCallback, useMemo } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import { Locate, LocateFixed } from 'lucide-react';
 import { useMap } from 'react-leaflet';
 import { nanoid } from 'nanoid';
@@ -46,8 +46,6 @@ export default function SearchControl({
 	const [isGeolocationEnabled, setIsGeolocationEnabled] =
 		useState<boolean>(false);
 	const [isTracking, setIsTracking] = useState<boolean>(false);
-
-	const { __ } = useI18n();
 
 	// we need a unique id for the search control container for cases where multiple maps
 	// are rendered on the same page -- ie. comparing emission scenarios

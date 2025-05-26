@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import { Plus, Minus } from 'lucide-react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 import { ZoomControlProps } from '@/types/types';
 import { cn } from '@/lib/utils';
@@ -17,8 +17,6 @@ const ZoomButtons: React.FC<ZoomControlProps> = ({
 	className,
 	wrapperClass,
 }) => {
-	const { __ } = useI18n();
-
 	const buttonClasses = cn(
 		'flex items-center justify-center',
 		'w-9 h-9',

@@ -1,6 +1,5 @@
 import { SeriesLineOptions, SeriesArearangeOptions, SeriesColumnOptions } from 'highcharts';
 import { ClimateDataProps } from '@/types/types.ts';
-import { useI18n } from '@wordpress/react-i18n';
 
 // Helper to sort an array of tuples by the first element (x-value / timestamp).
 const sortByTimestamp = (
@@ -22,7 +21,7 @@ export type ChartDataOptions = {
 };
 
 export const getChartDataOptions = (
-	__: ReturnType<typeof useI18n>['__']
+	__: (key: string) => string
 ): ChartDataOptions => ({
 	observations: {
 		name: __('Gridded Historical Data'),

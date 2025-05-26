@@ -5,7 +5,7 @@
  * associated with the currently selected climate variable.
  */
 import React from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import appConfig from "@/config/app.config.ts";
 
 // UI components
@@ -19,7 +19,6 @@ import {useClimateVariable} from "@/hooks/use-climate-variable";
  * retrieved from the selected climate variable.
  */
 const VersionDownloadFields: React.FC = () => {
-	const { __ } = useI18n();
 	// Hooks
 	const { climateVariable, setVersion } = useClimateVariable();
 

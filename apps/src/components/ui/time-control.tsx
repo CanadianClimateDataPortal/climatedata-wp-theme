@@ -8,10 +8,9 @@ import {
 	SLIDER_MAX_YEAR,
 	SLIDER_DEFAULT_YEAR_VALUE,
 } from '@/lib/constants';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 export const TimeControl = () => {
-	const { __ } = useI18n();
 	const defaultEnd = Math.min(
 		SLIDER_DEFAULT_YEAR_VALUE + SLIDER_YEAR_WINDOW_SIZE,
 		SLIDER_MAX_YEAR

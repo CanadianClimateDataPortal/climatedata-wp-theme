@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useContext } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import L from 'leaflet';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useLocale } from '@/hooks/use-locale';
@@ -28,7 +28,6 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	featureId,
 	mode,
 }) => {
-	const { __ } = useI18n();
 	const { locale } = useLocale();
 	const { climateVariable } = useClimateVariable();
 	const unit = climateVariable?.getUnit();

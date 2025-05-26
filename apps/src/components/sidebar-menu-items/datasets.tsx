@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Database, ChevronRight, ExternalLink } from 'lucide-react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 
 // components
@@ -42,7 +42,6 @@ const slug = 'datasets';
  */
 const DatasetsMenuItem: React.FC = () => {
 	const { togglePanel, isPanelActive } = useSidebar();
-	const { __ } = useI18n();
 
 	const handleClick = () => {
 		togglePanel(slug);
@@ -74,7 +73,6 @@ const DatasetsPanel: React.FC<InteractivePanelProps<TaxonomyData | null>> = ({
 	onSelect,
 }) => {
 	const [datasets, setDatasets] = useState<TaxonomyData[]>([]);
-	const { __ } = useI18n();
 	const { locale } = useLocale();
 	const dispatch = useAppDispatch();
 	const { selectClimateVariable } = useClimateVariable();

@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { ControlTitle } from '@/components/ui/control-title';
 import { useAppSelector } from '@/app/hooks';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import { setOpacity } from '@/features/map/map-slice';
 import { useAppDispatch } from '@/app/hooks';
 import { MapItemsOpacity } from '@/types/types';
@@ -26,7 +26,6 @@ const LayerOpacities = (): ReactElement => {
 		keyof SliderLabelsMap,
 		number,
 	][];
-	const { __ } = useI18n();
 	const dispatch = useAppDispatch();
 
 	const sliderLabelsMap: SliderLabelsMap = {

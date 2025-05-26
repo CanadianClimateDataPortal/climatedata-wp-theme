@@ -2,7 +2,7 @@
  * A menu item and panel component that displays a list of variables with some custom filters.
  * TODO: make this work with the new AnimatedPanel component
  */
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import { ChevronRight, Map } from 'lucide-react';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -39,7 +39,6 @@ const slug = 'variable';
  */
 const VariablesMenuItem: React.FC = () => {
 	const { togglePanel, isPanelActive } = useSidebar();
-	const { __ } = useI18n();
 
 	const handleClick = () => {
 		togglePanel(slug);
@@ -78,8 +77,6 @@ const VariablesPanel: React.FC<VariablesPanelProps> = ({
 	const dispatch = useAppDispatch();
 	const { dataset } = useAppSelector((state) => state.map);
 	const prevDatasetRef = useRef(dataset?.term_id);
-
-	const { __ } = useI18n();
 
 	// Clear filters and search when dataset changes
 	useEffect(() => {
@@ -181,8 +178,6 @@ const VariableFilterCount: React.FC<VariableFilterCountProps> = ({
 	totalCount,
 	className = "col-span-2 mb-2 text-sm text-neutral-grey-medium"
 }) => {
-	const { __ } = useI18n();
-
 	if (filteredCount === totalCount || filteredCount === 0) {
 		return null;
 	}

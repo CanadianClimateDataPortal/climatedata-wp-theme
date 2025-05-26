@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import { History, ArrowRight } from 'lucide-react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 // components
 import { Button } from '@/components/ui/button';
@@ -28,7 +28,6 @@ const slug = 'recent-locations';
  */
 const RecentLocationsLink: React.FC = () => {
 	const { togglePanel, isPanelActive } = useSidebar();
-	const { __ } = useI18n();
 
 	return (
 		<Button
@@ -54,8 +53,6 @@ RecentLocationsLink.displayName = 'RecentLocationsLink';
  * A panel component that displays a list of recent locations.
  */
 const RecentLocationsPanel: React.FC = () => {
-	const { __ } = useI18n();
-
 	const { map } = useMap();
 	const { recentLocations } = useAppSelector((state) => state.map);
 

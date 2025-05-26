@@ -14,6 +14,7 @@ declare global {
 		wp: {
 			i18n: {
 				__: (text: string) => string;
+				_n: (single: string, plural: string, number: number) => string;
 			};
 		};
 	}
@@ -43,4 +44,9 @@ export { LocaleContext };
 // Function to translate text using WordPress i18n
 export const __ = (text: string): string => {
 	return window.wp?.i18n?.__(text) || text;
+};
+
+// Function to translate plural text using WordPress i18n
+export const _n = (single: string, plural: string, number: number): string => {
+	return window.wp?.i18n?._n(single, plural, number) || (number === 1 ? single : plural);
 };

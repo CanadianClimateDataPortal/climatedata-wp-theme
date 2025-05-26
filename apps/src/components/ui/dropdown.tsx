@@ -6,7 +6,7 @@
  *
  */
 import React, { useState, useMemo, forwardRef } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 import { Input } from '@/components/ui/input';
 import { ControlTitle } from '@/components/ui/control-title';
@@ -38,8 +38,6 @@ const DropdownGeneric = <T extends string | undefined>(
 ) => {
 	const [selected, setSelected] = useState<T | undefined>(value);
 	const [search, setSearch] = useState<string>('');
-
-	const { __ } = useI18n();
 
 	// translate default placeholders if they are not provided
 	const searchPlaceholderTranslated = searchPlaceholder ?? __('Search...');

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useContext } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import L from 'leaflet';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { fetchDeltaValues } from '@/services/services';
@@ -24,7 +24,6 @@ const SeaLevelClimateVariableValues: React.FC<SeaLeavelClimateVariableValuesProp
 	featureId,
 	mode,
 }) => {
-	const { __ } = useI18n();
 	const { climateVariable } = useClimateVariable();
 	const decimals = climateVariable?.getUnitDecimalPlaces() ?? 0;
 	const dateRange = useMemo(() => {

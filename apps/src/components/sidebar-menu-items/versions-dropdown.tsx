@@ -1,5 +1,5 @@
 import React from "react";
-import { useI18n } from "@wordpress/react-i18n";
+import { __ } from '@/context/locale-provider';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 import { SidebarMenuItem } from "@/components/ui/sidebar";
@@ -11,7 +11,6 @@ import appConfig from "@/config/app.config"
  */
 const VersionsDropdown: React.FC = () => {
 	const { climateVariable, setVersion, setScenarioCompare } = useClimateVariable();
-	const { __ } = useI18n();
 
 	const options = appConfig.versions.filter((version) =>
 		climateVariable?.getVersions()?.includes(version.value)

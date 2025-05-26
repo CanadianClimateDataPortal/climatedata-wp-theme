@@ -4,7 +4,7 @@
  * A dropdown component that allows the user to select a threshold value.
  */
 import React, { useContext } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 // components
 import { SidebarMenuItem } from '@/components/ui/sidebar';
@@ -17,7 +17,6 @@ import { FrequencyConfig } from "@/types/climate-variable-interface";
 import { getDefaultFrequency } from "@/lib/utils";
 
 const FrequenciesDropdown: React.FC = () => {
-	const { __ } = useI18n();
 	const section = useContext(SectionContext);
 	const { climateVariable, setFrequency } = useClimateVariable();
 	const frequencyConfig = climateVariable?.getFrequencyConfig() ?? {} as FrequencyConfig;

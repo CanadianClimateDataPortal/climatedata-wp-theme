@@ -5,7 +5,7 @@
  * with another from a secondary dropdown.
  */
 import React from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 
@@ -18,7 +18,6 @@ import Dropdown from '@/components/ui/dropdown';
 import appConfig from "@/config/app.config";
 
 const EmissionScenariosControl: React.FC = () => {
-	const { __ } = useI18n();
 	const { climateVariable, setScenario, setScenarioCompare, setScenarioCompareTo } = useClimateVariable();
 
 	const scenarioOptions = appConfig.scenarios.filter((scenario) =>

@@ -5,7 +5,7 @@
  */
 import React, { useState } from 'react';
 import { ExternalLink } from 'lucide-react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import parse from 'html-react-parser';
 
 // components
@@ -24,7 +24,6 @@ import { cn } from '@/lib/utils';
 const VariableDetailsPanel: React.FC<{ mapInfo: MapInfoData }> = ({
 	mapInfo,
 }) => {
-	const { __ } = useI18n();
 	const { locale } = useLocale();
 
 	// @todo Add title and alt image text for accessibility.
@@ -190,8 +189,6 @@ RelevantTrainings.displayName = 'RelevantTrainings';
  */
 const SectorsArea: React.FC<{ items: Sector[] }> = ({ items }) => {
 	const [selectedItem, setSelectedItem] = useState(items[0] || null);
-
-	const { __ } = useI18n();
 
     const { locale } = useLocale();
 

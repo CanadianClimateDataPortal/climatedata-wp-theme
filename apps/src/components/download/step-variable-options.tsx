@@ -1,5 +1,5 @@
 import React from "react";
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import {
 	StepContainer,
 	StepContainerDescription,
@@ -14,7 +14,6 @@ import { dateFormatCheck } from '@/lib/utils';
  * Variable options step
  */
 const StepVariableOptions = React.forwardRef<StepComponentRef>((_, ref) => {
-	const { __ } = useI18n();
 	const { climateVariable } = useClimateVariable();
 
 	React.useImperativeHandle(ref, () => ({

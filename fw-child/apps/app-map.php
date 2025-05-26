@@ -27,6 +27,9 @@ if (
 	$current_lang = $GLOBALS['fw']['current_lang_code'];
 }
 
+// Get the French domain
+$fr_domain = cdc_get_fr_domain();
+
 /**
  * Load translation data for the map application.
  *
@@ -136,9 +139,11 @@ $translation_data = array(
 	?>
 </head>
 <body>
-<div id="root"
-     data-app-lang="<?php echo esc_attr( $current_lang ); ?>"
-     data-wp-home-url="<?php echo esc_attr( home_url() ); ?>"
+<div
+        id="root"
+        data-app-lang="<?php echo esc_attr( $current_lang ); ?>"
+        data-wp-home-url="<?php echo esc_attr( home_url() ); ?>"
+        data-wp-home-url-fr="<?php echo esc_attr( $fr_domain ); ?>"
 ></div>
 
 <?php

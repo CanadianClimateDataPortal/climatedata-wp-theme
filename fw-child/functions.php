@@ -897,3 +897,37 @@ function cdc_app_asset_load( $app_type ) {
 		return null;
 	}
 }
+
+/**
+ * Get the French domain.
+ *
+ * @return string The French domain or empty string if not found.
+ */
+function cdc_get_fr_domain() {
+	$fr_domain = '';
+
+	// Check if ACF is active and the field exists
+	if ( function_exists( 'get_field' ) ) {
+		// Get the repeater field data
+		$lang_repeater = get_field( 'admin_langs_languages', 'option' );
+		// Loop through each row
+		if ( is_array( $lang_repeater ) && ! empty( $lang_repeater ) ) {
+			foreach ( $lang_repeater as $lang_row ) {
+				// Check if this row represents the French language
+				if ( isset( $lang_row['code'] ) && 'fr' === $lang_row['code'] ) {
+					// Found the French language row, get its domain
+					if ( isset( $lang_row['domain'] ) ) {
+						$fr_domain = $lang_row['domain'];
+
+						break; // Exit the loop
+					}
+				}
+			}
+		}
+	}
+
+	// URL with HTTPS
+	$fr_domain_https = 'https://' . $fr_domain;
+
+	return $fr_domain_https;
+}

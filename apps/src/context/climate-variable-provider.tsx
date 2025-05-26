@@ -6,7 +6,7 @@ import { PostData, TaxonomyData } from '@/types/types';
 import {
 	setClimateVariable,
 	updateClimateVariable,
-	updateClimateVariableAnalysisFieldValue
+	updateClimateVariableAnalysisFieldValue,
 } from '@/store/climate-variable-slice';
 import ClimateVariableBase from '@/lib/climate-variable-base';
 import {
@@ -19,11 +19,13 @@ import {
 	InteractiveRegionOption,
 } from '@/types/climate-variable-interface';
 import RasterPrecalculatedClimateVariable from '@/lib/raster-precalculated-climate-variable';
-import RasterPrecalculatedWithDailyFormatsClimateVariable from '@/lib/raster-precalculated-with-daily-formats-climate-variable';
+import RasterPrecalculatedWithDailyFormatsClimateVariable
+	from '@/lib/raster-precalculated-with-daily-formats-climate-variable';
 import RasterAnalyzeClimateVariable from '@/lib/raster-analyze-climate-variable';
 import SeaLevelClimateVariable from '@/lib/sea-level-climate-variable';
 import StationClimateVariable from '@/lib/station-climate-variable';
 import StationDataClimateVariable from "@/lib/station-data-climate-variable";
+import AllowanceClimateVariable from '@/lib/allowance-climate-variable';
 
 export type ClimateVariableContextType = {
 	climateVariable: ClimateVariableInterface | null;
@@ -64,6 +66,7 @@ type ClassMapType = Record<
  * Maps climate variable class names to their corresponding class implementations.
  */
 const CLIMATE_VARIABLE_CLASS_MAP: ClassMapType = {
+	AllowanceClimateVariable: AllowanceClimateVariable,
 	ClimateVariableBase: ClimateVariableBase,
 	RasterPrecalculatedClimateVariable: RasterPrecalculatedClimateVariable,
 	RasterPrecalculatedWithDailyFormatsClimateVariable:
@@ -144,13 +147,22 @@ export const ClimateVariableProvider: React.FC<{
 	 */
 	const setVersion = useCallback(
 		(version: string) => {
-			dispatch(
-				updateClimateVariable({
-					version,
-				})
-			);
+			// Get current climate variable data
+			const currentData = climateVariableData;
+			if (!currentData || currentData.version === version) return;
+
+			const validScenario = climateVariable?.getValidScenarioForVersion(version);
+			const updatePayload: Partial<ClimateVariableConfigInterface> = {
+				version
+			};
+
+			if (validScenario && (!currentData.scenario || currentData.scenario !== validScenario)) {
+				updatePayload.scenario = validScenario;
+			}
+
+			dispatch(updateClimateVariable(updatePayload));
 		},
-		[dispatch]
+		[dispatch, climateVariableData, climateVariable]
 	);
 
 	const setAnalyzeScenarios = useCallback(

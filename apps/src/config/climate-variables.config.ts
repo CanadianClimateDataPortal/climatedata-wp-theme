@@ -1666,14 +1666,76 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		enableColourOptions: false,
 		defaultDateRange: [
 			"2040",
-			"2050",
+			"2040",
 		],
+		isTimePeriodARange: false,
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: true,
+			[InteractiveRegionOption.CENSUS]: false,
+			[InteractiveRegionOption.HEALTH]: false,
+			[InteractiveRegionOption.WATERSHED]: false
+		},
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.NONE,
+		},
+		averagingOptions: [ AveragingType.ALL_YEARS ],
+		scenarios: {
+			cmip5: [
+				"rcp85plus65-p50",
+				"rcp85-p05",
+				"rcp85-p50",
+				"rcp85-p95",
+				"rcp45-p05",
+				"rcp45-p50",
+				"rcp45-p95",
+				"rcp26-p05",
+				"rcp26-p50",
+				"rcp26-p95",
+			],
+			cmip6: [
+				"ssp585highEnd-p98",
+				"ssp585lowConf-p83",
+				"ssp585",
+				"ssp370",
+				"ssp245",
+				"ssp126",
+			],
+		},
+		unit: "cm",
+		downloadType: DownloadType.PRECALCULATED,
+	},
+	/** Vertical Allowance */
+	{
+		id: "allowance",
+		class: "AllowanceClimateVariable",
+		threshold: "allowance",
+		hasDelta: false,
+		enableColourOptions: false,
+		versions: [ "cmip6" ],
+		interactiveRegionConfig: {
+			[InteractiveRegionOption.GRIDDED_DATA]: true,
+			[InteractiveRegionOption.CENSUS]: false,
+			[InteractiveRegionOption.HEALTH]: false,
+			[InteractiveRegionOption.WATERSHED]: false
+		},
+		frequencyConfig: {
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
+		},
+		dateRange: [
+			"2040",
+			"2040",
+		],
+		isTimePeriodARange: false,
+		averagingOptions: [ AveragingType.ALL_YEARS ],
 		dateRangeConfig: {
-			min: "2006",
+			min: "2020",
 			max: "2100",
 			interval: 10
 		},
 		unit: "cm",
+		gridType: "allowancegrid",
+		downloadType: DownloadType.PRECALCULATED,
 	},
 	/** MSC Climate Normals 1981-2010 */
 	{

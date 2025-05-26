@@ -283,6 +283,12 @@ export interface ClimateVariableConfigInterface {
 	/** Stores the default date range */
 	defaultDateRange?: string[] | null;
 
+	/**
+	 * Indicates if a "time period" for this variable is a range of years
+	 * (true) or a single year (false).
+	 */
+	isTimePeriodARange?: boolean;
+
 	/** Contains available averaging options */
 	averagingOptions?: AveragingType[];
 
@@ -366,6 +372,8 @@ export interface ClimateVariableInterface {
 
 	getScenario(): string | null;
 
+	getValidScenarioForVersion(version: string): string | null;
+
 	getScenarioCompare(): boolean;
 
 	getScenarioCompareTo(): string | null;
@@ -417,6 +425,8 @@ export interface ClimateVariableInterface {
 	getDateRange(): string[] | null;
 
 	getDefaultDateRange(): string[] | null;
+
+	isTimePeriodARange(): boolean;
 
 	getAveragingOptions(): AveragingType[];
 

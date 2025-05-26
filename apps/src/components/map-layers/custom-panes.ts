@@ -8,13 +8,13 @@ import { MAP_CONFIG } from '@/config/map.config';
  * This component modifies the map instance creating predefined panes for different types of layers.
  * It supports two rendering modes:
  * - standard: normal z-index ordering with basemap at bottom
- * - seaLevel: complex ordering with multiple basemaps for sea level visualization
+ * - marine: complex ordering with multiple basemaps for marine data visualization
  *
  * @param {Object} props
- * @param {('standard'|'seaLevel')} [props.mode='standard'] - The pane mode to use
+ * @param {('standard'|'marine')} [props.mode='standard'] - The pane mode to use
  * @returns {null}
  */
-export default function CustomPanesLayer({ mode = 'standard' }: { mode?: 'standard' | 'seaLevel' } = {}): null {
+export default function CustomPanesLayer({ mode = 'standard' }: { mode?: 'standard' | 'marine' } = {}): null {
 	const map = useMap();
 
 	useEffect(() => {
@@ -25,9 +25,9 @@ export default function CustomPanesLayer({ mode = 'standard' }: { mode?: 'standa
 		}
 
 		// Clear any existing custom panes to prevent duplicates
-		const existingPanes = ['basemap', 'raster', 'grid', 'labels', 'stations', 'custom_shapefile', 
-			'standardBasemap', 'seaLevelBasemap'];
-		
+		const existingPanes = ['basemap', 'raster', 'grid', 'labels', 'stations', 'custom_shapefile',
+			'standardBasemap', 'marineBasemap'];
+
 		existingPanes.forEach(pane => {
 			if (map.getPane(pane)) {
 				map.getPane(pane)!.remove();
@@ -59,38 +59,38 @@ export default function CustomPanesLayer({ mode = 'standard' }: { mode?: 'standa
 			map.createPane('custom_shapefile');
 			map.getPane('custom_shapefile')!.style.zIndex = String(MAP_CONFIG.standardPanes.custom_shapefile);
 			map.getPane('custom_shapefile')!.style.pointerEvents = 'all';
-		} 
+		}
 		else {
-			// Sea level with standard map underneath
-			
+			// Marine data with standard map underneath
+
 			// Standard basemap (complete world map at the bottom)
 			map.createPane('standardBasemap');
-			map.getPane('standardBasemap')!.style.zIndex = String(MAP_CONFIG.combinedSeaLevelPanes.standardBasemap);
+			map.getPane('standardBasemap')!.style.zIndex = String(MAP_CONFIG.combinedMarinePanes.standardBasemap);
 			map.getPane('standardBasemap')!.style.pointerEvents = 'none';
-			
-			// Raster layer for sea level data
+
+			// Raster layer for marine data
 			map.createPane('raster');
-			map.getPane('raster')!.style.zIndex = String(MAP_CONFIG.combinedSeaLevelPanes.raster);
+			map.getPane('raster')!.style.zIndex = String(MAP_CONFIG.combinedMarinePanes.raster);
 			map.getPane('raster')!.style.pointerEvents = 'none';
-			
+
 			// Grid for interactive regions
 			map.createPane('grid');
-			map.getPane('grid')!.style.zIndex = String(MAP_CONFIG.combinedSeaLevelPanes.grid);
+			map.getPane('grid')!.style.zIndex = String(MAP_CONFIG.combinedMarinePanes.grid);
 			map.getPane('grid')!.style.pointerEvents = 'all';
-			
-			// Sea level landmass layer (with transparent oceans)
-			map.createPane('seaLevelBasemap');
-			map.getPane('seaLevelBasemap')!.style.zIndex = String(MAP_CONFIG.combinedSeaLevelPanes.seaLevelBasemap);
-			map.getPane('seaLevelBasemap')!.style.pointerEvents = 'none';
-			
+
+			// Marine data landmass layer (with transparent oceans)
+			map.createPane('marineBasemap');
+			map.getPane('marineBasemap')!.style.zIndex = String(MAP_CONFIG.combinedMarinePanes.marineBasemap);
+			map.getPane('marineBasemap')!.style.pointerEvents = 'none';
+
 			// Labels layer on top
 			map.createPane('labels');
-			map.getPane('labels')!.style.zIndex = String(MAP_CONFIG.combinedSeaLevelPanes.labels);
+			map.getPane('labels')!.style.zIndex = String(MAP_CONFIG.combinedMarinePanes.labels);
 			map.getPane('labels')!.style.pointerEvents = 'none';
-			
+
 			// Custom shapefile layer (if needed)
 			map.createPane('custom_shapefile');
-			map.getPane('custom_shapefile')!.style.zIndex = String(MAP_CONFIG.combinedSeaLevelPanes.custom_shapefile);
+			map.getPane('custom_shapefile')!.style.zIndex = String(MAP_CONFIG.combinedMarinePanes.custom_shapefile);
 			map.getPane('custom_shapefile')!.style.pointerEvents = 'all';
 		}
 	}, [map, mode]);

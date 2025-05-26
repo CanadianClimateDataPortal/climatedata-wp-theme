@@ -59,6 +59,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	const { climateVariable } = useClimateVariable();
 	const decimals = climateVariable?.getUnitDecimalPlaces() ?? 0;
 	const { dataset } = useAppSelector((state) => state.map);
+	const variableList = useAppSelector((state) => state.map.variableList);
 	const chartRef = useRef<HighchartsReact.RefObject>(null);
 	const climateVariableId = climateVariable?.getId();
 	const version = climateVariable?.getVersion();
@@ -75,6 +76,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 
 	// Subtitle displayed info
 	const datasetLabel = dataset?.title.en ?? '';
+	const climateVariableTitle = climateVariable?.getTitle() || variableList?.[0]?.title || '';
 	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0]?.label;
 
 	// Tooltip format value helper
@@ -330,7 +332,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		return formatForFilename([
 			__(title),
 			__(datasetLabel),
-			__(climateVariable?.getTitle() ?? ''),
+			__(climateVariableTitle),
 			__(versionLabel),
 			enableTabs ? __(activeTab) : null,
 		].filter(Boolean).join('-'));
@@ -399,7 +401,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					title: {
 						text: [
 							__(title),
-							__(climateVariable?.getTitle() ?? ''),
+							__(climateVariableTitle),
 						].filter(Boolean).join(' - '),
 					},
 					yAxis: {
@@ -693,7 +695,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						{
 							[
 								__(datasetLabel),
-								__(climateVariable?.getTitle() ?? ''),
+								__(climateVariableTitle),
 								__(versionLabel)
 							].filter(Boolean).join(' - ')
 						}

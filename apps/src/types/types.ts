@@ -167,6 +167,15 @@ export type SliderLabelsMap = {
 };
 
 /**
+ * Represents map coordinates with latitude, longitude and zoom level.
+ */
+export interface MapCoordinates {
+	lat: number;
+	lng: number;
+	zoom: number;
+}
+
+/**
  * Represents the map state in redux store.
  */
 export interface MapState {
@@ -187,6 +196,7 @@ export interface MapState {
 	};
 	variableList: PostData[];
 	variableListLoading: boolean;
+	mapCoordinates: MapCoordinates;
 }
 
 /**

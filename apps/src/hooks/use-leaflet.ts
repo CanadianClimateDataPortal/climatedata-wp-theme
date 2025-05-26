@@ -98,6 +98,7 @@ export function useLeaflet(): { config: { grid: { leaflet: object } } } {
 						canadagrid1deg: vectorTileLayerStylesCallback,
 						era5landgrid: vectorTileLayerStylesCallback,
 						slrgrid: vectorTileLayerStylesCallback,
+						'slrgrid-cmip6': vectorTileLayerStylesCallback,
 						health: null,
 						census: null,
 						watershed: null,

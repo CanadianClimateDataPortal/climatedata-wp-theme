@@ -27,12 +27,14 @@
  */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { MapState, MapLocation, WMSLegendData, TaxonomyData, PostData } from '@/types/types';
+import { MapState, MapLocation, WMSLegendData, TaxonomyData, PostData, MapCoordinates } from '@/types/types';
 import {
 	SLIDER_DEFAULT_YEAR_VALUE,
 	SLIDER_MAX_YEAR,
 	SLIDER_YEAR_WINDOW_SIZE,
 	REGION_GRID,
+	DEFAULT_ZOOM,
+	CANADA_CENTER
 } from '@/lib/constants';
 import { MapItemsOpacity } from '@/types/types';
 
@@ -59,6 +61,11 @@ const initialState: MapState = {
 	legendData: {},
 	variableList: [],
 	variableListLoading: false,
+	mapCoordinates: {
+		lat: Array.isArray(CANADA_CENTER) ? CANADA_CENTER[0] : 62.51231793838694,
+		lng: Array.isArray(CANADA_CENTER) ? CANADA_CENTER[1] : -98.48144531250001,
+		zoom: DEFAULT_ZOOM
+	},
 };
 
 // Create the slice
@@ -128,6 +135,9 @@ const mapSlice = createSlice({
 			const { key, value } = action.payload;
 			state.opacity[key] = value / 100;
 		},
+		setMapCoordinates(state, action: PayloadAction<MapCoordinates>) {
+			state.mapCoordinates = action.payload;
+		},
 	},
 });
 
@@ -147,6 +157,7 @@ export const {
 	setMapColor,
 	setLegendData,
 	setOpacity,
+	setMapCoordinates,
 } = mapSlice.actions;
 
 // Export reducer

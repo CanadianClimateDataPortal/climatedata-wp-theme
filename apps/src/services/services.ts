@@ -380,7 +380,7 @@ export const fetchLocationByCoords = async (latlng: L.LatLng | { lat: number; ln
  */
 export const generateChartData = async (options: ChartDataOptions) => {
 	const { latlng: { lat, lng }, dataset, variable, frequency  } = options;
-	const response = await fetch(`https://dataclimatedata.crim.ca/generate-charts/${lat}/${lng}/${variable}/${frequency}?decimals=1&dataset_name=${dataset}`);
+	const response = await fetch(`${window.DATA_URL}/generate-charts/${lat}/${lng}/${variable}/${frequency}?decimals=1&dataset_name=${dataset}`);
 
 	if (!response.ok) {
 		throw new Error('Failed to fetch data');
@@ -485,7 +485,7 @@ export const fetchStationsList = async ({ threshold }: { threshold?: string }) =
 		};
 
 		if (threshold === 'ahccd') {
-			data = await fetchJson('https://data.climatedata.ca/fileserver/ahccd/ahccd.json');
+			data = await fetchJson(`${window.DATA_URL}/fileserver/ahccd/ahccd.json`);
 		} else if (threshold === 'station-data') {
 			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE');
 		} else {

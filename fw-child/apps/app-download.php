@@ -107,9 +107,6 @@ $translation_data = array(
         // DATA URL for the download app
         window.DATA_URL = '<?php echo isset( $GLOBALS['vars']['data_url'] ) ? htmlspecialchars( $GLOBALS['vars']['data_url'], ENT_QUOTES, 'UTF-8' ) : ''; ?>';
 
-        // PAVICS URL for the download app (FINCH)
-        window.PAVICS_URL = '<?php echo isset( $GLOBALS['vars']['pavics_url'] ) ? htmlspecialchars( $GLOBALS['vars']['pavics_url'], ENT_QUOTES, 'UTF-8' ) : ''; ?>';
-
         // Disable Leaflet's 3D features
         L_DISABLE_3D = true;
     </script>

@@ -104,6 +104,9 @@ $translation_data = array(
 	?>
 
     <script>
+        // DATA URL for the download app
+        window.DATA_URL = '<?php echo isset( $GLOBALS['vars']['data_url'] ) ? htmlspecialchars( $GLOBALS['vars']['data_url'], ENT_QUOTES, 'UTF-8' ) : ''; ?>';
+
         // Disable Leaflet's 3D features
         L_DISABLE_3D = true;
     </script>

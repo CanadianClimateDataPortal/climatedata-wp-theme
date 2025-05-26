@@ -62,12 +62,16 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 	}
 
 	getFileFormatTypes(): FileFormatType[] {
-		return ClimateVariableBase.prototype.getFileFormatTypes.call(this).length > 0
-			? ClimateVariableBase.prototype.getFileFormatTypes.call(this)
-			: [
-				FileFormatType.CSV,
-				FileFormatType.NetCDF,
-			];
+		const configFormats = ClimateVariableBase.prototype.getFileFormatTypes.call(this);
+		if (configFormats.length > 0) {
+			return configFormats;
+		}
+
+		// Only apply defaults if no formats specified in config
+		return [
+			FileFormatType.CSV,
+			FileFormatType.NetCDF,
+		];
 	}
 
 	getDownloadType(): DownloadType | null {
@@ -135,20 +139,9 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 			};
 			fetchData();
 		}
-		// For Station Data
+		// For Station Data - handled in StationDataClimateVariable class now
 		else if(this.getId() === 'station_data') {
-			if(!props?.stationIds || !props?.dateRange || !props?.fileFormat) return [];
-
-			const stations = props?.stationIds?.map(stationId => stationId).join('|');
-			const start = props?.dateRange.start + ' 00:00:00';
-			const end = props?.dateRange.end + ' 00:00:00';
-			const fileFormat = props?.fileFormat === FileFormatType.GeoJSON ? 'json' : props?.fileFormat;
-			const url = `https://api.weather.gc.ca/collections/climate-daily/items?datetime=${start}/${end}&STN_ID=${stations}&sortby=PROVINCE_CODE,STN_ID,LOCAL_DATE&f=${fileFormat}&limit=150000&startindex=0`;
-
-			return [{
-				label: '',
-				url: url
-			}];
+			return [];
 		}
 
 		return [];

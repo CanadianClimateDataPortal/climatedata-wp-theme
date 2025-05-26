@@ -277,6 +277,9 @@ export interface ClimateVariableConfigInterface {
 	/** Configuration defining the date range to be used in the Download section */
 	dateRangeConfig?: DateRangeConfig;
 
+	/** Configuration defining the date range to be used specifically for downloads */
+	downloadDateRangeConfig?: DateRangeConfig;
+
 	/** Stores the selected date range */
 	dateRange?: string[] | null;
 
@@ -421,6 +424,8 @@ export interface ClimateVariableInterface {
 	getAnalysisFieldValue(key: string): string | null;
 
 	getDateRangeConfig(): DateRangeConfig | null;
+
+	getDownloadDateRangeConfig(): DateRangeConfig | null;
 
 	getDateRange(): string[] | null;
 

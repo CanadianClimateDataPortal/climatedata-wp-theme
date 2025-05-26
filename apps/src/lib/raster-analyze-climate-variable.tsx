@@ -17,17 +17,19 @@ class RasterAnalyzeClimateVariable extends RasterPrecalculatedClimateVariable {
 	}
 
 	getDateRangeConfig(): DateRangeConfig | null {
+		return this.getDatasetType() === "ahccd" ? null : super.getDateRangeConfig();
+	}
+
+	getDownloadDateRangeConfig(): DateRangeConfig | null {
 		if (this.getDatasetType() === "ahccd") {
 			return null;
 		}
 		
-		return ClimateVariableBase.prototype.getDateRangeConfig.call(this)
-			? ClimateVariableBase.prototype.getDateRangeConfig.call(this)
-			: {
-				min: "1950",
-				max: "2100",
-				interval: 5
-			};
+		return {
+			min: "1950",
+			max: "2100",
+			interval: 5
+		};
 	}
 
 	getFrequencyConfig(): FrequencyConfig | null {

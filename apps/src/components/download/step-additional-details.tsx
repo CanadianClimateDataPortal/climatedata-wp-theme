@@ -65,7 +65,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 
 				validations.push(
 					// A date range is required if the config is available.
-					!!climateVariable.getDateRangeConfig() || !!(startYear && endYear),
+					!!climateVariable.getDownloadDateRangeConfig() || !!(startYear && endYear),
 
 					// Following checks if there are no available options or if one is selected.
 					climateVariable.getScenarios().length === 0 || scenarios.length > 0,
@@ -121,7 +121,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 	const isDownloadTypeAnalyzed = climateVariable?.getDownloadType() === DownloadType.ANALYZED;
 
 	// Get the date range config.
-	const dateRangeConfig = climateVariable?.getDateRangeConfig();
+	const dateRangeConfig = climateVariable?.getDownloadDateRangeConfig();
 
 	// Get the date range selected by the user.
 	const dateRange = climateVariable?.getDateRange() ?? [];

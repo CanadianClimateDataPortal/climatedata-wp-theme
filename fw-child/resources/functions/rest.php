@@ -171,7 +171,7 @@ function cdc_finch_submit () {
 	}
 
 	$submit_url = $GLOBALS['vars']['pavics_url'] . $_POST['submit_url'];
-	$data_url = "https:" . $GLOBALS['vars']['data_url'];
+	$data_url = $GLOBALS['vars']['data_url'];
 
 	$result = '{ "status": "captcha failed" }';
 

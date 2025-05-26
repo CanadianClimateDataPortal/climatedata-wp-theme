@@ -62,7 +62,8 @@ const Steps: React.FC = () => {
 				if (scenarios.length > 0) request_data["scenario"] = scenarios;
 
 				const percentiles = climateVariable.getPercentiles?.() ?? [];
-				if (percentiles.length > 0) request_data["ensemble_percentiles"] = percentiles.join(",");
+				// Always send percentiles param
+				request_data["ensemble_percentiles"] = percentiles.join(",");
 
 				const model = climateVariable.getModel?.();
 				if (model) request_data["models"] = model;

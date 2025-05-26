@@ -60,7 +60,6 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 			if (climateVariable.getDownloadType() === DownloadType.ANALYZED) {
 				const [startYear, endYear] = climateVariable.getDateRange() ?? [];
 				const scenarios = climateVariable.getAnalyzeScenarios() ?? [];
-				const percentiles = climateVariable.getPercentiles() ?? [];
 
 				validations.push(
 					// A date range is required if the config is available.
@@ -68,7 +67,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 
 					// Following checks if there are no available options or if one is selected.
 					climateVariable.getScenarios().length === 0 || scenarios.length > 0,
-					climateVariable.getPercentileOptions().length === 0 || percentiles.length > 0,
+					// Note: Percentiles validation is removed since empty selection is now valid
 					climateVariable.getModelOptions().length === 0 || !!climateVariable.getModel(),
 					climateVariable.getMissingDataOptions().length === 0 || !!climateVariable.getMissingData()
 				);
@@ -247,17 +246,24 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 
 			{isDownloadTypeAnalyzed
 				&& percentileOptions.length > 0
-				&& <CheckboxFactory
-					name="percentiles"
-					title={__('Percentiles')}
-					tooltip={__('Select percentiles')}
-					orientation="horizontal"
-					className="max-w-md mb-8"
-					optionClassName="w-1/4"
-					options={percentileOptions ?? []}
-					values={climateVariable?.getPercentiles() ?? []}
-					onChange={setPercentiles}
-				/>
+				&& (
+					<div className="mb-8 max-w-md">
+						<CheckboxFactory
+							name="percentiles"
+							title={__('Percentiles')}
+							tooltip={__('Select percentiles')}
+							orientation="horizontal"
+							className="max-w-md"
+							optionClassName="w-1/4"
+							options={percentileOptions ?? []}
+							values={climateVariable?.getPercentiles() ?? []}
+							onChange={setPercentiles}
+						/>
+						<div className="text-neutral-grey-medium text-sm mt-3">
+							{__('Unselect all to receive output from individual models')}
+						</div>
+					</div>
+				)
 			}
 
 			{isDownloadTypeAnalyzed

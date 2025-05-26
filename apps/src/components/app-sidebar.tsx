@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import { BadgeInfo, MessageCircleQuestion } from 'lucide-react';
 import { useMap } from '@/hooks/use-map';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
@@ -70,8 +70,6 @@ export function AppSidebar() {
 			}
 		}
 	}, [climateVariable, selectedVariable]);
-
-	const { __ } = useI18n();
 
 	const handleSelectVariable = (variable: PostData) => {
 		setSelectedVariable(variable);

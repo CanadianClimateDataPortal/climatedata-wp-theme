@@ -14,7 +14,7 @@ import TagSelector from '@/components/ui/tag-selector';
 import StationTypeFilter from '@/components/download/ui/station-type-filter';
 import SelectionModeControls from '@/components/download/ui/selection-mode-controls';
 import SelectedCellsSummary from '@/components/download/ui/selected-cells-summary';
-import { useI18n } from '@wordpress/react-i18n';
+import { __, _n } from '@/context/locale-provider';
 import { useMap } from '@/hooks/use-map';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
@@ -26,8 +26,6 @@ import {
 } from '@/lib/constants';
 
 export default function RasterDownloadMap(): React.ReactElement {
-	const { __, _n } = useI18n();
-
 	const interactiveLayerRef = useRef<{
 		clearSelection: () => void;
 	}>(null);

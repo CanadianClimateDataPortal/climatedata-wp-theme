@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 import Dropdown from '@/components/ui/dropdown';
 import { fetchTaxonomyData } from '@/services/services';
@@ -30,7 +30,6 @@ const TaxonomyDropdownFilter: React.FC<{
 		const [error, setError] = useState<string | null>(null);
 
 		const { locale } = useLocale();
-		const { __ } = useI18n();
 
 		useEffect(() => {
 			const loadTaxonomyData = async () => {

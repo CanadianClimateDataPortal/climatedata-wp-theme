@@ -5,7 +5,7 @@
  *
  */
 import React, {useEffect, useMemo, useState} from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import { Download, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { encodeURL, prepareRaster } from '@/lib/utils';
@@ -70,7 +70,6 @@ const DownloadMapModal: React.FC<{
 
 
 	// Make sure to remove #download so no tab is opened at the time of the screenshot
-	 const { __ } = useI18n();
 
 	// Utility to trigger a download of a Blob object as a file in the browser.
 	// Creates a temporary anchor element, sets the blob as its href, and programmatically clicks it.

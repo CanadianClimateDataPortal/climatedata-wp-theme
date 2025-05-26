@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 import { CheckboxFactory } from '@/components/ui/checkbox';
 import { RadioGroupFactory } from '@/components/ui/radio-group';
@@ -28,7 +28,6 @@ import { useLocale } from '@/hooks/use-locale';
  */
 const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 	const { locale } = useLocale();
-	const { __ } = useI18n();
 	const {
 		climateVariable,
 		setFrequency,

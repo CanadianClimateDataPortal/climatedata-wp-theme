@@ -4,7 +4,7 @@
  * A dropdown component that allows the user to select a threshold value.
  */
 import React from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 // components
 import { SidebarMenuItem } from '@/components/ui/sidebar';
@@ -14,7 +14,6 @@ import Dropdown from '@/components/ui/dropdown';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 
 const ThresholdValuesDropdown: React.FC = () => {
-	const { __ } = useI18n();
 	const { climateVariable, setThreshold } = useClimateVariable();
 
 	const Tooltip = () => (

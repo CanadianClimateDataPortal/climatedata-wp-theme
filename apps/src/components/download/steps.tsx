@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 import StepNavigation from '@/components/download/step-navigation';
 import { useDownload } from '@/hooks/use-download';
@@ -20,7 +20,6 @@ import {
  */
 const Steps: React.FC = () => {
 	const [isStepValid, setIsStepValid] = useState<boolean>(false);
-	const { __ } = useI18n();
 
 	const dispatch = useAppDispatch();
 	const { steps, goToNextStep, currentStep, registerStepRef } = useDownload();

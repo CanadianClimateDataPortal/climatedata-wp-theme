@@ -1,5 +1,5 @@
 import React from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 import 'leaflet/dist/leaflet.css';
 
@@ -14,7 +14,6 @@ import { StepComponentRef } from '@/types/download-form-interface';
  * Location step, allows the user to make a selection on the map and choose what type of region to select
  */
 const StepLocation = React.forwardRef<StepComponentRef>((_, ref) => {
-	const { __ } = useI18n();
 	const { climateVariable } = useClimateVariable();
 
 	React.useImperativeHandle(ref, () => ({

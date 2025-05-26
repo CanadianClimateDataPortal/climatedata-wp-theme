@@ -19,7 +19,7 @@ import 'highcharts/modules/offline-exporting';
 import { cn } from '@/lib/utils';
 import { ClimateDataProps } from '@/types/types.ts';
 import { useLocale } from '@/hooks/use-locale';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import { useAppSelector } from '@/app/hooks';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import appConfig from '@/config/app.config';
@@ -55,7 +55,6 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	featureId,
 	data,
 }) => {
-	const { __ } = useI18n();
 	const { locale } = useLocale();
 	const { climateVariable } = useClimateVariable();
 	const decimals = climateVariable?.getUnitDecimalPlaces() ?? 0;

@@ -1,5 +1,5 @@
 import React, { useContext, useMemo, useState, useEffect } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import { useAppSelector } from '@/app/hooks';
 import { selectSearchQuery } from '@/store/climate-variable-slice';
 import { PostData } from '@/types/types';
@@ -29,7 +29,6 @@ const StepVariable = React.forwardRef<StepComponentRef>((_, ref) => {
     const { dataset } = useAppSelector((state) => state.download);
     const { variableList } = useAppSelector((state) => state.map);
     const searchQuery = useAppSelector(selectSearchQuery);
-    const { __ } = useI18n();
 
     React.useImperativeHandle(
         ref,

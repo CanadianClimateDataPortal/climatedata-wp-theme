@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __, _n } from '@/context/locale-provider';
 import { PencilLine } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,7 +38,6 @@ const VariableOptionsSummary: React.FC = () => {
 	);
 };
 const StepSummary: React.FC = () => {
-	const { __, _n } = useI18n();
 	const { locale } = useLocale();
 	const { currentStep, goToStep, dataset, steps } = useDownload();
 

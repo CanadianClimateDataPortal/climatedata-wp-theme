@@ -1,5 +1,5 @@
 import React from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import { ArrowRight } from 'lucide-react';
 import L from 'leaflet';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
@@ -27,7 +27,6 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	featureId,
 	onDetailsClick,
 }) => {
-	const { __ } = useI18n();
 	const { climateVariable } = useClimateVariable();
 	const { dataset } = useAppSelector((state) => state.map);
 	const variableList = useAppSelector((state) => state.map.variableList);

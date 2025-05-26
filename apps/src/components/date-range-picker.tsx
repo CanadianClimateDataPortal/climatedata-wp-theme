@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { useI18n } from "@wordpress/react-i18n";
+import { __ } from '@/context/locale-provider';
 
 // Map of supported locales
 const localeMap: { [key: string]: Locale } = {
@@ -38,7 +38,6 @@ export function DateRangePicker({
 	locale = "en",
 	dateFormat = "PPP",
 }: DateRangePickerProps) {
-	const { __ } = useI18n();
 	const [fromDate, setFromDate] = React.useState<Date | undefined>(defaultFromDate)
 	const [toDate, setToDate] = React.useState<Date | undefined>(defaultToDate)
 

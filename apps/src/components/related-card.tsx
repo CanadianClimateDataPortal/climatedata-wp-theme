@@ -1,4 +1,4 @@
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,8 +6,6 @@ import { Button } from '@/components/ui/button';
 import { RelatedCardProps } from '@/types/types';
 
 export function RelatedCard({ data }: RelatedCardProps): JSX.Element {
-	const { __ } = useI18n();
-
 	return (
 		<div className="flex flex-col space-y-4 w-full max-w-md mx-auto">
 			<Card key={data.id} className="w-full">

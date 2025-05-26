@@ -1,6 +1,6 @@
 import React, { useEffect, isValidElement, useRef, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { selectSearchQuery } from '@/store/climate-variable-slice';
@@ -42,7 +42,6 @@ const VariableRadioCards: React.FC<VariableRadioCardsProps> = ({
 	showFilterCount = true,
 	renderFilterCount,
 }) => {
-		const { __ } = useI18n();
 		const { locale } = useLocale();
 		const dispatch = useAppDispatch();
 		const { selectClimateVariable } = useClimateVariable();

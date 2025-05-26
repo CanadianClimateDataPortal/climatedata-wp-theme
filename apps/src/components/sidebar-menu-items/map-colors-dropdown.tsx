@@ -4,7 +4,7 @@
  * A dropdown component that allows the user to select a map color.
  */
 import React, { useMemo } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 // components
 import { SidebarMenuItem } from '@/components/ui/sidebar';
@@ -16,7 +16,6 @@ import { ColourSchemeDropdown } from "@/components/sidebar-menu-items/colour-sch
 import { ColourType } from "@/types/climate-variable-interface";
 
 const MapColorsDropdown: React.FC = () => {
-	const { __ } = useI18n();
 	const { climateVariable, setColourType, setColourScheme } = useClimateVariable();
 
 	const Tooltip = () => (

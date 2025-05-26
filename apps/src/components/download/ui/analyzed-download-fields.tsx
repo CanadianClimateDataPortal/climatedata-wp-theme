@@ -5,7 +5,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 // Hooks
 import { useClimateVariable } from '@/hooks/use-climate-variable';
@@ -91,7 +91,6 @@ const AnalyzedField: React.FC<AnalyzedFieldProps> = (
  * Uses `useClimateVariable()` to retrieve data and propagate changes.
  */
 const AnalyzedDownloadFields: React.FC = () => {
-	const { __ } = useI18n();
 	const { climateVariable, setAnalysisFieldValue } = useClimateVariable();
 
 

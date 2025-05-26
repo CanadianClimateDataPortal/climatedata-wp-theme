@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as Slider from '@radix-ui/react-slider';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import { useAppDispatch } from '@/app/hooks';
 
 // components
@@ -13,7 +13,6 @@ import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { setTimePeriodEnd } from '@/features/map/map-slice';
 
 const TimePeriodsControlForSeaLevel: React.FC = () => {
-	const { __ } = useI18n();
 	const dispatch = useAppDispatch();
 	const { climateVariable, setDateRange } = useClimateVariable();
 	const scenario = climateVariable?.getScenario();

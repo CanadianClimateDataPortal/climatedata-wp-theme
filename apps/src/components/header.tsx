@@ -1,10 +1,8 @@
 import { LogOut } from 'lucide-react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import Logo from '@/assets/logo.svg';
 
 export default function Header(): JSX.Element {
-	const { __ } = useI18n();
-
 	return (
 		<header id="header" className="flex items-center justify-between px-4 py-1.5">
 			<div className="flex items-center">

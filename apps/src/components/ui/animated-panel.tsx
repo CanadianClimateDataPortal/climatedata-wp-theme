@@ -8,7 +8,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X as CloseIcon } from 'lucide-react';
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 
 import { Button } from '@/components/ui/button';
 
@@ -23,8 +23,6 @@ const AnimatedPanel: React.FC<AnimatedPanelProps> = ({
 	className,
 	children,
 }) => {
-	const { __ } = useI18n();
-
 	// TODO: allow for custom animations other than "slide"
 	const getAnimationProps = () => {
 		switch (direction) {

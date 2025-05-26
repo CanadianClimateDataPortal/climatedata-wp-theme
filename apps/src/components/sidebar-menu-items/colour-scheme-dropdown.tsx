@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils.ts";
 import { ControlTitle } from "@/components/ui/control-title";
-import { useI18n } from "@wordpress/react-i18n";
+import { __ } from '@/context/locale-provider';
 import { DEFAULT_COLOUR_SCHEMES } from "@/lib/constants";
 import { useAppSelector } from "@/app/hooks";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
@@ -25,7 +25,6 @@ const ColourSchemeDropdown = ({
 	onValueChange,
 	className
 }: ColourSchemeDropdownProps) => {
-	const { __ } = useI18n();
 	const legendData = useAppSelector((state) => state.map.legendData);
 	const { climateVariable } = useClimateVariable();
 

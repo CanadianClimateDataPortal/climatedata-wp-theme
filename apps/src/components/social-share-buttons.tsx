@@ -3,7 +3,7 @@
  * using react-share for proper sharing functionality.
  */
 
-import { useI18n } from '@wordpress/react-i18n';
+import { __ } from '@/context/locale-provider';
 import { FacebookShareButton, TwitterShareButton, LinkedinShareButton, EmailShareButton } from "react-share";
 import { MultilingualField } from '@/types/types';
 import { useLocale } from '@/hooks/use-locale';
@@ -58,7 +58,6 @@ export function SocialShareButtons({
 	url = window.location.href, 
 	title = document.title 
 }: SocialShareButtonsProps): JSX.Element {
-	const { __ } = useI18n();
 	const { locale } = useLocale();
 	
 	// Process the title to ensure it's a string in the current language

@@ -466,6 +466,13 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterPrecalculatedClimateVariable",
 		versions: [ "cmip6" ],
 		gridType: "era5landgrid",
+		scenarios: {
+			cmip6: [
+				"ssp126",
+				"ssp245",
+				"ssp585",
+			],
+		},
 		thresholds: [
 			{
 				value: "HXmax30",

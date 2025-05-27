@@ -830,9 +830,9 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		unit: "Degree Days",
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
-			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.DOWNLOAD,
-			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.DOWNLOAD,
-			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
+			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.NONE,
+			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.NONE,
+			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.NONE,
 		},
 		averagingOptions: [
 			AveragingType.ALL_YEARS,

@@ -43,9 +43,6 @@ export const MAP_CONFIG = {
 		custom_shapefile: 600
 	},
 
-	// Landmass filter for marine data (transforms green to white)
-	landmassFilter: 'saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(298deg) brightness(100%) contrast(98%)',
-
 	// Opacity settings for overlays
 	defaultOpacity: 1.0,
 
@@ -59,4 +56,41 @@ export const MAP_CONFIG = {
 // Layer keys for WMS services
 export const LAYER_KEYS = {
 	landmass: "CDC:landmass"
+};
+
+// SLD definitions to style WMS landmass layer for sea level
+// @see: https://docs.geoserver.org/main/en/user/styling/sld/cookbook/lines.html#example-lines-layer
+export const SLD_STYLES = {
+	landmass: `<?xml version="1.0" encoding="UTF-8"?>
+<sld:StyledLayerDescriptor version="1.0.0"
+	xmlns="http://www.opengis.net/sld"
+	xmlns:sld="http://www.opengis.net/sld"
+	xmlns:ogc="http://www.opengis.net/ogc"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<sld:NamedLayer>
+		<sld:Name>CDC:landmass</sld:Name>
+		<sld:UserStyle>
+			<sld:Title>Light Gray Landmass</sld:Title>
+			<sld:FeatureTypeStyle>
+				<sld:Rule>
+					<sld:PolygonSymbolizer>
+						<sld:Fill>
+							<sld:CssParameter name="fill">#FAFAF8</sld:CssParameter>
+						</sld:Fill>
+						<sld:Stroke>
+							<sld:CssParameter name="stroke">#EEE0DF</sld:CssParameter>
+							<sld:CssParameter name="stroke-width">0.75</sld:CssParameter>
+							<sld:CssParameter name="stroke-dasharray">2 2</sld:CssParameter>
+						</sld:Stroke>
+					</sld:PolygonSymbolizer>
+				</sld:Rule>
+			</sld:FeatureTypeStyle>
+		</sld:UserStyle>
+	</sld:NamedLayer>
+</sld:StyledLayerDescriptor>`
+};
+
+export const WMS_PARAMS = {
+	landmass: { 'SLD_BODY': SLD_STYLES.landmass } as any
 };

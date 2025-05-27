@@ -225,6 +225,10 @@ p {
       padding: $input-padding-y-lg $input-padding-x-lg;
     }
   }
+
+  &:hover {
+    text-decoration: none;
+  }
 }
 
 .bg {

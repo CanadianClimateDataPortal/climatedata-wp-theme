@@ -231,6 +231,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.dateRangeConfig ?? null;
 	}
 
+	getDownloadDateRangeConfig(): DateRangeConfig | null {
+		return this._config.downloadDateRangeConfig ?? this.getDateRangeConfig();
+	}
+
 	getDateRange(): string[] | null {
 		return this._config.dateRange ?? this.getDefaultDateRange();
 	}

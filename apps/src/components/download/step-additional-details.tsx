@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { __ } from '@/context/locale-provider';
 
 import { CheckboxFactory } from '@/components/ui/checkbox';
@@ -122,9 +122,35 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 	const dateRangeConfig = climateVariable?.getDownloadDateRangeConfig();
 
 	// Get the date range selected by the user.
-	const dateRange = climateVariable?.getDateRange() ?? [];
+	const dateRange = useMemo(() => {
+		const _dateRange = climateVariable?.getDateRange();
+		const rangeType = dateRangeConfig?.type ?? "year"
+		const interval = dateRangeConfig?.interval ?? 5;
 
-	// Get the percentiles options.
+		if (!_dateRange || _dateRange.length !== 2) {
+			return [];
+		}
+
+		const [startDate, endDate] = _dateRange;
+
+		if (!startDate || !endDate) {
+			return [];
+		}
+
+		if (rangeType === "day") {
+			// For a "day" range type, we don't need to restrict by interval (e.g. for Station Data).
+			return _dateRange;
+		} else {
+			return [
+				startDate,
+				Number(endDate) > Number(startDate) + interval
+					? Number(startDate) + interval + '' // Force to string.
+					: endDate,
+			];
+		}
+	}, [climateVariable]);
+
+	// Get the percentile options.
 	const percentileOptions = climateVariable?.getPercentileOptions() ?? [];
 
 	// Get the Scenario Options.

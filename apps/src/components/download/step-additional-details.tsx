@@ -124,7 +124,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 	// Get the date range selected by the user.
 	const dateRange = climateVariable?.getDateRange() ?? [];
 
-	// Get the percentiles options.
+	// Get the percentile options.
 	const percentileOptions = climateVariable?.getPercentileOptions() ?? [];
 
 	// Get the Scenario Options.

@@ -1229,7 +1229,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			},
 		],
 		frequencyConfig: {
-			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.MAP,
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.NONE,
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.NONE,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
@@ -1394,7 +1394,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		threshold: "hddheat_18",
 		unit: 'Degree Days',
 		frequencyConfig: {
-			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.MAP,
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.NONE,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
@@ -1497,7 +1497,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.THIRTY_YEARS,
 		],
 		frequencyConfig: {
-			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.MAP,
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.NONE,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
@@ -1557,10 +1557,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					placeholder: "0",
 				}
 			},
-		],
-		defaultDateRange: [
-			"1980",
-			"2010",
 		],
 	},
 	/** Wet Days */

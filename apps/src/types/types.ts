@@ -796,6 +796,7 @@ export interface WMSParams {
  * Props for the variable layer component.
  */
 export interface VariableLayerProps {
+	scenario: string | null | undefined;
 	layerValue: string;
 }
 

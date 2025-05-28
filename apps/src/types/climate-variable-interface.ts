@@ -451,6 +451,8 @@ export interface ClimateVariableInterface {
 
 	getFileFormatTypes(): FileFormatType[];
 
+	getLayerValue(scenario: string | null | undefined, section?: string): string;
+
 	getFileFormat(): FileFormatType | null;
 
 	getMaxDecimals(): number;

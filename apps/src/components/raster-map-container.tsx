@@ -20,9 +20,8 @@ import {
 	GEOSERVER_BASE_URL,
 	CANADA_BOUNDS
 } from '@/lib/constants';
-import { cn, getDefaultFrequency, getFrequencyCode } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import SectionContext from "@/context/section-provider";
-import { FrequencyType } from "@/types/climate-variable-interface";
 import appConfig from "@/config/app.config";
 
 /**
@@ -51,47 +50,8 @@ export default function RasterMapContainer({
 
 	const scenarioLabel = appConfig.scenarios.find(item => item.value === scenario)?.label ?? scenario;
 
-	const layerValue: string = useMemo(() => {
-		let version;
-		if (climateVariable) {
-			version = climateVariable.getVersion() === 'cmip5' ? '' : climateVariable.getVersion();
-		}
-
-		const threshold = climateVariable?.getThreshold();
-
-		let frequency = climateVariable?.getFrequency() ?? null;
-
-		// If there's no frequency set, try to get the default value from the config.
-		const frequencyConfig = climateVariable?.getFrequencyConfig() ?? null;
-		if (!frequency && climateVariable && frequencyConfig) {
-			frequency = getDefaultFrequency(frequencyConfig, section) ?? null;
-		}
-
-		// Fallback to annual.
-		if (!frequency) {
-			frequency = FrequencyType.ANNUAL;
-		}
-
-		const frequencyCode = getFrequencyCode(frequency);
-
-		const valuesArr = [
-			version,
-			threshold,
-			frequencyCode,
-			scenario,
-		];
-		if(climateVariable?.getId() !== "sea_level") {
-			valuesArr.push('p50');
-		}
-		valuesArr.push(
-			frequency,
-			'30year',
-			climateVariable?.getDataValue() === 'delta' ? 'delta7100' : ''
-		);
-
-		const value = valuesArr.filter(Boolean).join('-');
-
-		return `CDC:${value}`;
+	const layerValue = useMemo(() => {
+		return climateVariable?.getLayerValue(scenario, section) ?? '';
 	}, [climateVariable, scenario, section]);
 
 	const handleLocationModalOpen = (content: React.ReactNode) => {
@@ -123,13 +83,13 @@ export default function RasterMapContainer({
 			{climateVariable?.getInteractiveMode() === 'region' && (
 				<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
 			)}
-			
+
 			{/* Use the unified CustomPanesLayer with 'standard' mode */}
 			<CustomPanesLayer mode="standard" />
-			
+
 			{/* Use the unified VariableLayer */}
-			<VariableLayer layerValue={layerValue} />
-			
+			<VariableLayer layerValue={layerValue} scenario={scenario} />
+
 			<ZoomControl />
 			<SearchControl />
 

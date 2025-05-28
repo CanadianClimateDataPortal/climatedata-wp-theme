@@ -115,6 +115,9 @@ $translation_data = array(
 
         // Disable Leaflet's 3D features
         L_DISABLE_3D = true;
+
+        // WP AJAX URL for the map app
+        window.wpAjaxUrl = '<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>';
     </script>
 
 	<?php

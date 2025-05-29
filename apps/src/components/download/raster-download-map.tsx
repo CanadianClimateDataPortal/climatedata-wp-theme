@@ -240,6 +240,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 			)}
 
 			<MapContainer
+				attributionControl={false}
 				center={center}
 				zoomControl={false}
 				zoom={zoom}

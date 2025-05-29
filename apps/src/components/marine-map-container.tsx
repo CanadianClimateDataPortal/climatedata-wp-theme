@@ -110,6 +110,7 @@ export default function MarineMapContainer({
 
 	return (
 		<MapContainer
+			attributionControl={false}
 			center={[mapCoordinates.lat, mapCoordinates.lng]}
 			zoomControl={false}
 			zoom={mapCoordinates.zoom}

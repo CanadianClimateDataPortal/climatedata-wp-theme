@@ -119,11 +119,12 @@ const DownloadMapModal: React.FC<{
 
 	// Generate download section URL with dataset and variable parameters
 	const getDownloadUrl = useMemo(() => {
+		const downloadBaseUrl = `${WP_API_DOMAIN}/download/`;
 		if (!dataset || !climateVariableData || !climateVariableData.id) {
-			return `${WP_API_DOMAIN}/download-app/`;
+			return downloadBaseUrl;
 		}
 
-		return `${WP_API_DOMAIN}/download-app/?dataset=${encodeURIComponent(dataset.term_id.toString())}&var=${encodeURIComponent(climateVariableData.id)}`;
+		return `${downloadBaseUrl}?dataset=${encodeURIComponent(dataset.term_id.toString())}&var=${encodeURIComponent(climateVariableData.id)}`;
 	}, [dataset, climateVariableData]);
 
 	const buttonText = useMemo(() => {

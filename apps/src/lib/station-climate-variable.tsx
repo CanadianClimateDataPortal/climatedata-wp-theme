@@ -119,7 +119,7 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 		else if(this.getId() === 'short_duration_rainfall_idf_data') {
 			if(!props?.stationId) return [];
 
-			const url = `${window.wpAjaxUrl}?action=cdc_get_idf_filesidf=${props?.stationId}`;
+			const url = `${window.wpAjaxUrl}?action=cdc_get_idf_files&idf=${props?.stationId}`;
 
 			const fetchData = async () => {
 				try {

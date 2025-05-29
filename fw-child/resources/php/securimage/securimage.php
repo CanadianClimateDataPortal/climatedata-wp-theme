@@ -234,6 +234,7 @@
  * @author     Drew Phillips <drew@drew-phillips.com>
  *
  */
+#[AllowDynamicProperties]
 class Securimage
 {
     // All of the public variables below are securimage options

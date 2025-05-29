@@ -15,6 +15,7 @@ These commands compile the React applications for both map and download function
 Once the JavaScript compilation is complete, proceed with the translation file generation process. Generate the portable object template file using the following command:
 
 ```
+cd ../ # Navigate back to the project root directory
 php -d memory_limit=1024M ./wp-cli.phar i18n make-pot ./fw-child/apps/dist/. ./fw-child/languages/react-apps/cdc.pot --domain=''
 ```
 

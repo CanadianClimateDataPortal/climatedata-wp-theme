@@ -19,6 +19,7 @@ import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM } from '@/lib/constan
 import { MapFeatureProps } from '@/types/types';
 import { getFeatureId } from '@/hooks/use-interactive-map-events';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { useLocale } from '@/hooks/use-locale';
 
 /**
  * Component that allows to select a region on the map from the census layer
@@ -27,6 +28,7 @@ const SelectableRegionLayer = forwardRef<{ clearSelection: () => void }, {}>((_,
 	const map = useMap();
 	const { climateVariable, setSelectedPoints, removeSelectedPoint } = useClimateVariable();
 	const dispatch = useAppDispatch();
+	const { getLocalizedLabel } = useLocale();
 
 	// @ts-expect-error: suppress leaflet typescript error
 	const layerRef = useRef<L.VectorGrid | null>(null);
@@ -144,13 +146,14 @@ const SelectableRegionLayer = forwardRef<{ clearSelection: () => void }, {}>((_,
 				layerRef.current?.resetFeatureStyle(gid);
 			});
 
-			// add the feature to the selected points
+			// add the feature to the selected points, including name from getLocalizedLabel
+			const name = getLocalizedLabel(e.layer?.properties || {});
 			layerRef.current.setFeatureStyle(featureId, selectedStyles);
 			setSelectedPoints({
-				[String(featureId)]: { ...e.latlng },
+				[String(featureId)]: { ...e.latlng, name },
 			});
 		},
-		[selectedStyles, selectedIds, setSelectedPoints, removeSelectedPoint]
+		[selectedStyles, selectedIds, setSelectedPoints, removeSelectedPoint, getLocalizedLabel]
 	);
 
 	// ensure refs always have the latest function versions

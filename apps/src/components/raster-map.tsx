@@ -63,6 +63,7 @@ export default function RasterMap(): React.ReactElement {
 					setMap(map);
 				}}
 				onUnmount={() => (mapRef.current = null)}
+				isComparisonMap={false}
 			/>
 			{showComparisonMap && (
 				<RasterMapContainer
@@ -71,7 +72,8 @@ export default function RasterMap(): React.ReactElement {
 						comparisonMapRef.current = map;
 						syncMaps(); // sync once the comparison map is ready
 					}}
-					onUnmount={unsyncMaps} // unsync and clear the reference to this map
+					onUnmount={unsyncMaps}// unsync and clear the reference to this map
+					isComparisonMap={true}
 				/>
 			)}
 		</div>

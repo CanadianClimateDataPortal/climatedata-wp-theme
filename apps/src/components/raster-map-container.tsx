@@ -32,10 +32,12 @@ export default function RasterMapContainer({
 	scenario,
 	onMapReady,
 	onUnmount,
+	isComparisonMap
 }: {
 	scenario: string | null | undefined;
 	onMapReady: (map: L.Map) => void;
 	onUnmount?: () => void;
+	isComparisonMap?: boolean;
 }) {
 	const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
@@ -123,15 +125,17 @@ export default function RasterMapContainer({
 			{climateVariable?.getInteractiveMode() === 'region' && (
 				<MapLegend url={`${GEOSERVER_BASE_URL}/geoserver/wms?service=WMS&version=1.1.0&request=GetLegendGraphic&format=application/json&layer=${layerValue}`} />
 			)}
-			
+
 			{/* Use the unified CustomPanesLayer with 'standard' mode */}
 			<CustomPanesLayer mode="standard" />
-			
+
 			{/* Use the unified VariableLayer */}
 			<VariableLayer layerValue={layerValue} />
-			
+
 			<ZoomControl />
-			<SearchControl />
+
+			{/* Show search control if not a comparison map. */}
+			{ !isComparisonMap && <SearchControl /> }
 
 			<LocationModal
 				isOpen={isLocationModalOpen}

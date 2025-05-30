@@ -25,6 +25,7 @@ import {
 import RasterMap from "@/components/raster-map";
 import RasterDownloadMap from "@/components/download/raster-download-map";
 import L from "leaflet";
+import { getDefaultFrequency, getFrequencyCode } from "@/lib/utils";
 
 /**
  * A base class representing a climate variable and its configuration. This class provides methods
@@ -376,6 +377,43 @@ class ClimateVariableBase implements ClimateVariableInterface {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	getLocationModalContent(_latlng: L.LatLng, _featureId: number): React.ReactNode {
 		return null;
+	}
+
+	getLayerValue(scenario: string | null | undefined, section?: string): string {
+		const version = this.getVersion() === 'cmip5' ? '' : this.getVersion();
+		const threshold = this.getThreshold();
+
+		let frequency = this.getFrequency() ?? null;
+
+		// If there's no frequency set, try to get the default value from the config.
+		const frequencyConfig = this.getFrequencyConfig() ?? null;
+		if (!frequency && frequencyConfig && section) {
+			frequency = getDefaultFrequency(frequencyConfig, section) ?? null;
+		}
+
+		// Fallback to annual.
+		if (!frequency) {
+			frequency = FrequencyType.ANNUAL;
+		}
+
+		const frequencyCode = getFrequencyCode(frequency);
+
+		const valuesArr = [
+			version,
+			threshold,
+			frequencyCode,
+			scenario,
+		];
+		if (this.getId() !== "sea_level") {
+			valuesArr.push('p50');
+		}
+		valuesArr.push(
+			frequency,
+			'30year',
+			this.getDataValue() === 'delta' ? 'delta7100' : ''
+		);
+
+		return 'CDC:' + valuesArr.filter(Boolean).join('-');
 	}
 }
 

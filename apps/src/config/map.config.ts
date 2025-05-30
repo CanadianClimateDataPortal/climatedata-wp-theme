@@ -43,6 +43,9 @@ export const MAP_CONFIG = {
 		custom_shapefile: 600
 	},
 
+	// Landmass filter for marine data (transforms green to white)
+	landmassFilter: 'saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(298deg) brightness(100%) contrast(98%)',
+
 	// Opacity settings for overlays
 	defaultOpacity: 1.0,
 

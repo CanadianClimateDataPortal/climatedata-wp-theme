@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import L from 'leaflet';
 import { useMap } from 'react-leaflet';
 import { useAppSelector } from '@/app/hooks';
+import SectionContext from '@/context/section-provider';
 import { CANADA_BOUNDS, GEOSERVER_BASE_URL, OWS_FORMAT } from '@/lib/constants';
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import {
@@ -9,7 +10,7 @@ import {
 	InteractiveRegionOption,
 } from "@/types/climate-variable-interface";
 import { generateColourScheme } from "@/lib/colour-scheme";
-import {VariableLayerProps, WMSParams} from '@/types/types';
+import { VariableLayerProps, WMSParams } from '@/types/types';
 
 /**
  * Variable layer Component
@@ -18,12 +19,12 @@ import {VariableLayerProps, WMSParams} from '@/types/types';
  * It works with both standard and sea level visualization approaches.
  *
  * @param {Object} props
- * @param {string} props.layerValue - The WMS layer ID to render
+ * @param {string} props.scenario - The scenario to use for the layer
  * @returns {null}
  */
 
 export default function VariableLayer({
-	layerValue
+	scenario
 }: VariableLayerProps): null {
 	const map = useMap();
 	const {
@@ -32,9 +33,15 @@ export default function VariableLayer({
 
 	const { climateVariable } = useClimateVariable();
 
+	const section = useContext(SectionContext);
+
 	// Always use 'raster' pane - this works for both standard and sea level modes
 	// as each mode creates a 'raster' pane with the appropriate z-index
 	const pane = 'raster';
+
+	const layerValue = useMemo(() => {
+		return climateVariable?.getLayerValue(scenario, section) ?? '';
+	}, [climateVariable, scenario, section]);
 
 	const {
 		startYear,
@@ -42,7 +49,7 @@ export default function VariableLayer({
 		colourMapType,
 		datasetVersion,
 		layerStyles,
-		interactiveRegion
+		interactiveRegion,
 	} = useMemo(() => {
 		return {
 			startYear: climateVariable?.getDateRange()?.[0] ?? '2040',
@@ -50,7 +57,8 @@ export default function VariableLayer({
 			colourMapType: climateVariable?.getColourType() ?? ColourType.CONTINUOUS,
 			datasetVersion: climateVariable?.getVersion(),
 			layerStyles: climateVariable?.getLayerStyles(),
-			interactiveRegion: climateVariable?.getInteractiveRegion()
+			interactiveRegion: climateVariable?.getInteractiveRegion(),
+			layerValue: layerValue
 		};
 	}, [climateVariable]);
 
@@ -110,7 +118,10 @@ export default function VariableLayer({
 			bounds: CANADA_BOUNDS,
 		};
 
-		if (climateVariable?.getScenario() !== 'rcp85plus65-p50') {
+		// TODO: this should be moved to the climate variable config, this "enhanced scenario"
+		//  also has custom logic in time-periods-control-for-sea-level.tsx for the slider
+		const excludeTimeParam = scenario === 'rcp85plus65-p50';
+		if (!excludeTimeParam) {
 			params.TIME = parseInt(startYear) + '-01-00T00:00:00Z';
 		}
 

@@ -59,6 +59,7 @@ export default function RasterMap(): React.ReactElement {
 			<RasterMapContainer
 				scenario={climateVariable?.getScenario()}
 				onMapReady={(map: L.Map) => {
+					map.invalidateSize();
 					mapRef.current = map;
 					setMap(map);
 				}}
@@ -69,6 +70,7 @@ export default function RasterMap(): React.ReactElement {
 				<RasterMapContainer
 					scenario={climateVariable?.getScenarioCompareTo()}
 					onMapReady={(map: L.Map) => {
+						map.invalidateSize();
 						comparisonMapRef.current = map;
 						syncMaps(); // sync once the comparison map is ready
 					}}

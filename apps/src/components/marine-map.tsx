@@ -21,6 +21,7 @@ export default function MarineMap(): React.ReactElement {
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const mapRef = useRef<L.Map | null>(null);
 	const comparisonMapRef = useRef<L.Map | null>(null);
+	const showComparisonMap = !!(climateVariable?.getScenarioCompare() && climateVariable?.getScenarioCompareTo());
 
 	// helper sync/unsync methods for convenience
 	const syncMaps = () => {
@@ -61,19 +62,23 @@ export default function MarineMap(): React.ReactElement {
 			<MarineMapContainer
 				scenario={climateVariable?.getScenario()}
 				onMapReady={(map: L.Map) => {
+					map.invalidateSize();
 					mapRef.current = map;
 					setMap(map);
 				}}
 				onUnmount={() => (mapRef.current = null)}
+				isComparisonMap={false}
 			/>
 			{showComparisonMap && (
 				<MarineMapContainer
 					scenario={climateVariable?.getScenarioCompareTo()}
 					onMapReady={(map: L.Map) => {
+						map.invalidateSize();
 						comparisonMapRef.current = map;
 						syncMaps(); // sync once the comparison map is ready
 					}}
 					onUnmount={unsyncMaps} // unsync and clear the reference to this map
+					isComparisonMap={true}
 				/>
 			)}
 		</div>

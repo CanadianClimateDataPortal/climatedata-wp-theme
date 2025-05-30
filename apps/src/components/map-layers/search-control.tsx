@@ -228,6 +228,8 @@ export default function SearchControl({
 					iconAnchor: [12, 41], // Anchor of the icon
 					popupAnchor: [0, -41], // Popup position relative to the icon
 				}),
+			}).on('click', async (e: L.LayerEvent) => {
+				console.log(e);
 			}),
 			moveToLocation: (latlng: L.LatLng, title: string, _: L.Map) => {
 				void _; // intentionally ignore to suppress typescript error

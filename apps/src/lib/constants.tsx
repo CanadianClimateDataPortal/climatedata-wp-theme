@@ -11,7 +11,7 @@ export const SIDEBAR_WIDTH = '16rem';
 export const SIDEBAR_WIDTH_ICON = '3rem';
 export const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 
-export const GEOSERVER_BASE_URL: string = 'https://dataclimatedata.crim.ca';
+export const GEOSERVER_BASE_URL: string = window.DATA_URL;
 // Using values from map.config.ts
 export const CANADA_CENTER: LatLngExpression = MAP_CONFIG.center;
 export const CANADA_BOUNDS: LatLngBounds = MAP_CONFIG.bounds;

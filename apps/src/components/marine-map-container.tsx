@@ -36,13 +36,16 @@ export default function MarineMapContainer({
 	scenario,
 	onMapReady,
 	onUnmount,
+   	isComparisonMap,
 }: {
 	scenario: string | null | undefined;
 	onMapReady: (map: L.Map) => void;
 	onUnmount?: () => void;
+	isComparisonMap?: boolean;
 }) {
 	const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
+
 
 	const {
 		opacity: { labels: labelsOpacity },
@@ -98,6 +101,7 @@ export default function MarineMapContainer({
 		return `CDC:${value}`;
 	}, [climateVariable, scenario, section]);
 
+
 	const handleLocationModalOpen = (content: React.ReactNode) => {
 		setLocationModalContent(content);
 		setIsLocationModalOpen(true);
@@ -136,7 +140,9 @@ export default function MarineMapContainer({
 			<VariableLayer layerValue={layerValue} />
 
 			<ZoomControl />
-			<SearchControl />
+
+			{/* Show search control if not a comparison map. */}
+			{ !isComparisonMap && <SearchControl /> }
 
 			<LocationModal
 				isOpen={isLocationModalOpen}

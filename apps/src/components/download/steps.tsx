@@ -4,16 +4,18 @@ import { __ } from '@/context/locale-provider';
 import StepNavigation from '@/components/download/step-navigation';
 import { useDownload } from '@/hooks/use-download';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setRequestStatus, setRequestError, setRequestResult, setDownloadLinks } from '@/features/download/download-slice';
+import { setRequestStatus, setRequestError, setRequestResult, setDownloadLinks, setCaptchaValue } from '@/features/download/download-slice';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { cn } from '@/lib/utils';
+import { GEOSERVER_BASE_URL, DATASETS } from '@/lib/constants';
 import { StepComponentRef } from '@/types/download-form-interface';
 import {
 	DownloadFile,
 	DownloadType,
 	FileFormatType,
 	FrequencyType,
-	StationDownloadUrlsProps
+	StationDownloadUrlsProps,
+	InteractiveRegionOption
 } from '@/types/climate-variable-interface';
 
 /**
@@ -24,8 +26,9 @@ const Steps: React.FC = () => {
 
 	const dispatch = useAppDispatch();
 	const { steps, goToNextStep, currentStep, registerStepRef } = useDownload();
-	const { subscribe, captchaValue, requestStatus } = useAppSelector((state) => state.download);
 	const { climateVariable } = useClimateVariable();
+
+	const { subscribe, email, requestStatus, captchaValue } = useAppSelector((state) => state.download);
 
 	const isLastStep = currentStep === steps.length;
 	const isSecondToLastStep = currentStep === steps.length - 1;
@@ -40,6 +43,21 @@ const Steps: React.FC = () => {
 		buttonText = __('Final Step');
 	}
 
+	// Flatten object into FormData with php-style bracket notation
+	const appendFormData = (formData: FormData, data: any, parentKey = ''): void => {
+		if (Array.isArray(data)) {
+			data.forEach((value, i) => {
+				appendFormData(formData, value, `${parentKey}[${i}]`);
+			});
+		} else if (typeof data === 'object' && data !== null) {
+			Object.keys(data).forEach(key => {
+				appendFormData(formData, data[key], parentKey ? `${parentKey}[${key}]` : key);
+			});
+		} else if (data !== undefined) {
+			formData.append(parentKey, String(data));
+		}
+	};
+
 	const handleNext = async () => {
 		if (!isLastStep && !isSecondToLastStep) {
 			goToNextStep();
@@ -53,55 +71,150 @@ const Steps: React.FC = () => {
 				dispatch(setRequestResult(undefined));
 
 				const analysisNamespace = climateVariable.getDatasetType() === 'ahccd' ? 'analyze-stations' : 'analyze';
-
 				const analysisFieldValues = climateVariable.getAnalysisFieldValues();
+				const analysisFields = climateVariable.getAnalysisFields?.() ?? [];
 				const analysisUrl = climateVariable.getAnalysisUrl();
-
-				const request_data: { [key: string]: any } = { ...analysisFieldValues };
-
 				const scenarios = climateVariable.getAnalyzeScenarios?.() ?? climateVariable.getScenarios?.() ?? [];
-				if (scenarios.length > 0) request_data["scenario"] = scenarios;
-
 				const percentiles = climateVariable.getPercentiles?.() ?? [];
-				// Always send percentiles param
-				request_data["ensemble_percentiles"] = percentiles.join(",");
-
 				const model = climateVariable.getModel?.();
-				if (model) request_data["models"] = model;
-
 				const fileFormat = climateVariable.getFileFormat?.();
-				if (fileFormat) request_data["output_format"] = fileFormat;
-
 				const decimals = climateVariable.getDecimalPlace?.();
-				if (typeof decimals === 'number') request_data["csv_precision"] = decimals;
-
+				const interactiveRegion = climateVariable.getInteractiveRegion?.();
 				const selectedPoints = climateVariable.getSelectedPoints?.();
-				if (selectedPoints && Object.keys(selectedPoints).length > 0) {
-					request_data["lat"] = Object.values(selectedPoints).map((c) => c.lat).join(",");
-					request_data["lon"] = Object.values(selectedPoints).map((c) => c.lng).join(",");
-				}
-				const selectedRegion = climateVariable.getSelectedRegion?.();
-				if (selectedRegion && selectedRegion.bounds) {
-					const bounds = selectedRegion.bounds as [[number, number], [number, number]];
-					request_data["lat0"] = bounds[0][0];
-					request_data["lon0"] = bounds[0][1];
-					request_data["lat1"] = bounds[1][0];
-					request_data["lon1"] = bounds[1][1];
+				const gridType = climateVariable.getGridType?.() ?? 'canadagrid';
+
+				let latList = '';
+				let lonList = '';
+
+				if (
+					interactiveRegion &&
+					interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA &&
+					selectedPoints &&
+					Object.keys(selectedPoints).length === 1
+				) {
+					// Get the region id (the only key in selectedPoints)
+					const regionId = Object.keys(selectedPoints)[0];
+					const url = `${GEOSERVER_BASE_URL}/partition-to-points/${gridType}/${interactiveRegion}/${regionId}.json`;
+					try {
+						const response = await fetch(url);
+						if (!response.ok) throw new Error('Failed to fetch region grid points');
+						const points = await response.json(); // array of [lat, lon]
+						latList = points.map((x: [number, number]) => x[0]).join(',');
+						lonList = points.map((x: [number, number]) => x[1]).join(',');
+					} catch (err) {
+						dispatch(setRequestStatus('error'));
+						dispatch(setRequestError('Failed to fetch region grid points'));
+						return;
+					}
+				} else if (selectedPoints && Object.keys(selectedPoints).length > 0) {
+					// TODO: is this correct? Fallback: use selected points as before
+					latList = Object.values(selectedPoints).map((c) => c.lat).join(',');
+					lonList = Object.values(selectedPoints).map((c) => c.lng).join(',');
 				}
 
-				const payload = {
-					namespace: analysisNamespace,
-					signup: subscribe,
-					request_data,
-					submit_url: analysisUrl,
-					captcha_code: captchaValue,
-				};
+				// Build the inputs array for request_data
+				const inputs: { id: string, data: any }[] = [];
+				if (latList) inputs.push({ id: 'lat', data: latList });
+				if (lonList) inputs.push({ id: 'lon', data: lonList });
+
+				// Add average (True for any region except GRIDDED_DATA)
+				inputs.push({ id: 'average', data: interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA ? 'True' : 'False' });
+
+				// Add start_date and end_date
+				const dateRange = climateVariable.getDateRange?.();
+				if (dateRange && dateRange.length === 2) {
+					inputs.push({ id: 'start_date', data: dateRange[0] });
+					inputs.push({ id: 'end_date', data: dateRange[1] });
+				}
+
+				if (percentiles.length > 0) {
+					inputs.push({ id: 'ensemble_percentiles', data: percentiles.join(',') });
+				}
+
+				// Add dataset using Finch name from DATASETS
+				const datasetKey = climateVariable.getVersion?.();
+				let datasetFinchName = datasetKey;
+				if (datasetKey && DATASETS && (datasetKey as keyof typeof DATASETS) in DATASETS && DATASETS[datasetKey as keyof typeof DATASETS].finch_name) {
+					datasetFinchName = DATASETS[datasetKey as keyof typeof DATASETS].finch_name;
+				}
+				if (datasetFinchName) {
+					inputs.push({ id: 'dataset', data: datasetFinchName });
+				}
+
+				if (scenarios.length > 0) {
+					inputs.push({ id: 'scenario', data: scenarios });
+				}
+
+				if (model) {
+					inputs.push({ id: 'models', data: model });
+				}
+
+				const freq = climateVariable.getFrequency?.();
+				if (freq) {
+					inputs.push({ id: 'freq', data: freq });
+				}
+
+				inputs.push({ id: 'data_validation', data: 'warn' });
+
+				// Add output_name (getFinch + region + name)
+				let outputName = climateVariable.getFinch?.() || 'download';
+				if (interactiveRegion && interactiveRegion !== InteractiveRegionOption.GRIDDED_DATA) {
+					outputName += `_${interactiveRegion}`;
+					const selectedRegion = climateVariable.getSelectedRegion?.();
+					if (selectedRegion && (selectedRegion as any).name) {
+						outputName += `_${(selectedRegion as any).name}`;
+					} else if (selectedPoints && Object.keys(selectedPoints).length === 1) {
+						const regionId = Object.keys(selectedPoints)[0];
+						const regionPoint = selectedPoints[regionId];
+						if (regionPoint) {
+							const regionName = regionPoint?.name || '';
+							if (regionName) {
+								outputName += `_${regionName}`;
+							}
+						}
+					}
+				}
+				inputs.push({ id: 'output_name', data: outputName });
+
+				// Add all other analysisFieldValues as inputs, appending unit if present in analysisFields
+				Object.entries(analysisFieldValues).forEach(([key, value]) => {
+					if (key !== 'lat' && key !== 'lon') {
+						// Find the analysisField definition for this key
+						const fieldDef = analysisFields.find((f: any) => f.key === key);
+						let dataValue = value;
+						if (fieldDef && fieldDef.unit && value !== undefined && value !== null && value !== '') {
+							dataValue = `${value} ${fieldDef.unit}`;
+						}
+						inputs.push({ id: key, data: dataValue });
+					}
+				});
+
+				if (fileFormat) {
+					inputs.push({ id: 'output_format', data: fileFormat });
+				}
+				if (typeof decimals === 'number') {
+					inputs.push({ id: 'csv_precision', data: decimals });
+				}
+
+				const request_data: { [key: string]: any } = {};
+				request_data['inputs'] = inputs;
+				request_data['notification_email'] = email;
+				request_data['response'] = 'document';
+				request_data['mode'] = 'auto';
+				request_data['outputs'] = [{ transmissionMode: 'reference', id: 'output' }];
+
+				// Build FormData
+				const formData = new FormData();
+				formData.append('namespace', analysisNamespace);
+				formData.append('signup', String(subscribe));
+				formData.append('captcha_code', captchaValue ?? '');
+				formData.append('submit_url', analysisUrl ?? '');
+				appendFormData(formData, request_data, 'request_data');
 
 				try {
 					const response = await fetch('/wp-json/cdc/v2/finch_submit/', {
 						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify(payload),
+						body: formData,
 						credentials: 'include',
 					});
 
@@ -109,16 +222,18 @@ const Steps: React.FC = () => {
 					if (data.status === 'captcha failed') {
 						dispatch(setRequestStatus('error'));
 						dispatch(setRequestError('Captcha failed. Please try again.'));
+						dispatch(setCaptchaValue(''));
 						return;
 					}
 
 					dispatch(setRequestResult(data));
 					dispatch(setRequestStatus('success'));
-
+					dispatch(setCaptchaValue(''));
 					goToNextStep();
 				} catch (error: any) {
 					dispatch(setRequestStatus('error'));
 					dispatch(setRequestError(error?.message || 'Unknown error'));
+					dispatch(setCaptchaValue(''));
 				}
 			}
 			else if (climateVariable?.getDownloadType() === DownloadType.PRECALCULATED && climateVariable?.getFrequency() !== FrequencyType.DAILY) {

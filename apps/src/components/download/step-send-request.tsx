@@ -146,7 +146,10 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 			return false;
 		}
 		
-		return climateVariable.getClass() === 'RasterAnalyzeClimateVariable';
+		const isAnalysisVariable = climateVariable.getClass() === 'RasterAnalyzeClimateVariable';
+		const isDailyFrequency = climateVariable.getFrequency() === 'daily';
+		
+		return isAnalysisVariable || isDailyFrequency;
 	};
 
 	useEffect(() => {

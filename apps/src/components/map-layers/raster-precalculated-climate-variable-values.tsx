@@ -194,7 +194,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 
 		return (
 			<div className={mode === "modal" ? "w-1/2" : ""}>
-				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
+				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md mr-6'}`}>
 					{ formattedMedian }
 				</div>
 				<div className={mode === "modal" ? "" : "flex gap-2"}>
@@ -215,7 +215,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 
 		return (
 			<div className={mode === "modal" ? "w-1/2" : ""}>
-				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
+				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md mr-6'}`}>
 					{ formattedRelativeToBaseline }
 				</div>
 				<div className={mode === "modal" ? "" : "flex gap-2"}>
@@ -237,7 +237,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 
 		return (
 			<>
-				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
+				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md mr-6'}`}>
 					{rangeStart} {__('to')} {rangeEnd}
 				</div>
 				<div className='text-xs font-semibold text-neutral-grey-medium uppercase tracking-wider'>

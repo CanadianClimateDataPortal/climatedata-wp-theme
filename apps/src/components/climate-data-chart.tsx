@@ -685,13 +685,13 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	};
 
 	return (
-		<div className="climate-chart z-[500] px-5 py-5">
-			<div className="flex justify-between items-start mb-4">
-				<div className="text-left">
-					<h2 className="text-2xl text-cdc-black font-semibold leading-7 m-0">
+		<div className="climate-chart z-[500] px-3 py-3 sm:px-5 sm:py-5">
+			<div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-3">
+				<div className="text-left flex-1 min-w-0 pr-16">
+					<h2 className="text-xl sm:text-2xl text-cdc-black font-semibold leading-6 sm:leading-7 m-0 break-words">
 						{title}
 					</h2>
-					<p className="text-sm text-neutral-grey-medium leading-5 m-0">
+					<p className="text-xs sm:text-sm text-neutral-grey-medium leading-4 sm:leading-5 m-0 break-words">
 						{
 							[
 								__(datasetLabel),
@@ -702,17 +702,18 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					</p>
 				</div>
 
-				<div className='mr-10'>
+				<div className="flex-shrink-0 ml-auto">
 					{ climateVariableId !== 'sea_level' && climateVariable?.getLocationModalContent(latlng, featureId, "panel") }
 				</div>
 			</div>
-			<div className="flex justify-between items-center mb-4">
-				<div className="flex justify-center">
+			<div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-4 gap-3">
+				<div className="flex justify-start overflow-x-auto">
 					{enableTabs && tabs.map((tab) => (
 						<button
 							key={tab.value}
 							className={cn(
-								'text-xs font-semibold uppercase cursor-pointer border w-44 py-1 transition-colors duration-300 ease-out',
+								'text-xs font-semibold uppercase cursor-pointer border py-1 px-2 sm:px-4 transition-colors duration-300 ease-out whitespace-nowrap flex-shrink-0',
+								'sm:w-44',
 								activeTab === tab.value
 									? 'bg-dark-purple text-white border-dark-purple'
 									: 'bg-white text-dark-purple border-white ',
@@ -726,34 +727,36 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						</button>
 					))}
 				</div>
-				<div className="flex justify-end items-center gap-2">
-					<span className="text-dark-purple text-xs font-semibold uppercase leading-4">
+				<div className="flex flex-wrap justify-start lg:justify-end items-center gap-2">
+					<span className="text-dark-purple text-xs font-semibold uppercase leading-4 whitespace-nowrap">
 						{__('Export')}
 					</span>
-					<button
-						className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-3 border border-soft-purple uppercase cursor-pointer"
-						onClick={() => handleExport('pdf')}
-					>
-						{__('PDF')}
-					</button>
-					<button
-						className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-3 border border-soft-purple uppercase cursor-pointer"
-						onClick={() => handleExport('png')}
-					>
-						{__('PNG')}
-					</button>
-					<button
-						className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-3 border border-soft-purple uppercase cursor-pointer"
-						onClick={() => handleExport('csv')}
-					>
-						{__('CSV')}
-					</button>
-					<button
-						className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-3 border border-soft-purple uppercase cursor-pointer"
-						onClick={() => handleExport('print')}
-					>
-						{__('Print')}
-					</button>
+					<div className="flex flex-wrap gap-1 sm:gap-2">
+						<button
+							className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap"
+							onClick={() => handleExport('pdf')}
+						>
+							{__('PDF')}
+						</button>
+						<button
+							className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap"
+							onClick={() => handleExport('png')}
+						>
+							{__('PNG')}
+						</button>
+						<button
+							className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap"
+							onClick={() => handleExport('csv')}
+						>
+							{__('CSV')}
+						</button>
+						<button
+							className="text-xs text-cdc-black font-semibold leading-4 tracking-wide py-1 px-2 sm:px-3 border border-soft-purple uppercase cursor-pointer whitespace-nowrap"
+							onClick={() => handleExport('print')}
+						>
+							{__('Print')}
+						</button>
+					</div>
 				</div>
 			</div>
 

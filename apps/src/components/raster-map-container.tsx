@@ -31,10 +31,12 @@ export default function RasterMapContainer({
 	scenario,
 	onMapReady,
 	onUnmount,
+	isComparisonMap
 }: {
 	scenario: string | null | undefined;
 	onMapReady: (map: L.Map) => void;
 	onUnmount?: () => void;
+	isComparisonMap?: boolean;
 }) {
 	const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
@@ -66,6 +68,7 @@ export default function RasterMapContainer({
 
 	return (
 		<MapContainer
+			attributionControl={false}
 			center={[mapCoordinates.lat, mapCoordinates.lng]}
 			zoomControl={false}
 			zoom={mapCoordinates.zoom}
@@ -91,7 +94,9 @@ export default function RasterMapContainer({
 			<VariableLayer layerValue={layerValue} scenario={scenario} />
 
 			<ZoomControl />
-			<SearchControl />
+
+			{/* Show search control if not a comparison map. */}
+			{ !isComparisonMap && <SearchControl /> }
 
 			<LocationModal
 				isOpen={isLocationModalOpen}

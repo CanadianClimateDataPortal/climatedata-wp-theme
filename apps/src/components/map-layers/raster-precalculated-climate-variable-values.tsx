@@ -44,8 +44,15 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 
 	// useEffect to retrieve location values for the current climate variable
 	useEffect(() => {
-		const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
 		const variableId = climateVariable?.getId() ?? '';
+		
+		// Skip data fetching for SPEI variables - these variables don't have data available in the API
+		if (variableId === 'spei_12' || variableId === 'spei_3') {
+			// We don't show "No data available" for these variables
+			return;
+		}
+
+		const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
 		const variable = climateVariable?.getThreshold() ?? '';
 		const { lat, lng } = latlng;
 		const decadeValue = parseInt(dateRange[0]) - (parseInt(dateRange[0]) % 10) + 1;
@@ -240,9 +247,14 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 		);
 	};
 
+	const variableId = climateVariable?.getId() ?? '';
+	const isSPEIVariable = variableId === 'spei_12' || variableId === 'spei_3';
+
 	return (
 		<div className={mode === "modal" ? "mt-4 mb-4" : "flex-grow flex gap-6 justify-end"}>
-			{noDataAvailable ? (
+			{isSPEIVariable ? (
+				<div className="h-10"></div> // Empty space instead of "No data available"
+			) : noDataAvailable ? (
 				<div>
 					<p className='text-base text-neutral-grey-medium italic'>
 						{__('No data available.')}

@@ -11,6 +11,7 @@ import { StepComponentRef } from '@/types/download-form-interface';
 import {
 	DownloadFile,
 	DownloadType,
+	FileFormatType,
 	FrequencyType,
 	StationDownloadUrlsProps
 } from '@/types/climate-variable-interface';
@@ -126,24 +127,25 @@ const Steps: React.FC = () => {
 
 				if (climateVariable?.getInteractiveMode() === 'region') {
 					// Precalcultated variables (no station)
+					const fileFormat = climateVariable.getFileFormat?.() ?? '';
 
 					// Generate the file to be downloaded.
 					climateVariable.getDownloadUrl()
-					.then((url) => {
-						const file: DownloadFile = {
-							url: url ?? '',
-							label: 'file.zip'
-						};
+						.then((url) => {
+							const file: DownloadFile = {
+								url: url ?? '',
+								label: fileFormat === FileFormatType.NetCDF ? 'file.nc' : 'file.zip',
+							};
 
-						dispatch(setDownloadLinks([file]));
-						dispatch(setRequestStatus('success'));
+							dispatch(setDownloadLinks([file]));
+							dispatch(setRequestStatus('success'));
 
-						goToNextStep();
-					})
-					.catch(() => {
-						dispatch(setRequestStatus('error'));
-						dispatch(setDownloadLinks(undefined));
-					});
+							goToNextStep();
+						})
+						.catch(() => {
+							dispatch(setRequestStatus('error'));
+							dispatch(setDownloadLinks(undefined));
+						});
 				} else {
 					// TODO: make sure this is correct.. msc climate normals is a different datasetType than
 					// 	the rest of variables that would fall in this condition which all are 'ahccd'

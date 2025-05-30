@@ -21,6 +21,7 @@ function cdc_rest_v3_init() {
 	require_once dirname( __FILE__ ) . '/variables-list.php';
 	require_once dirname( __FILE__ ) . '/variables-filters.php';
 	require_once dirname( __FILE__ ) . '/variable.php';
+	require_once dirname( __FILE__ ) . '/idf.php';
 }
 
 add_action( 'rest_api_init', 'cdc_rest_v3_init' );

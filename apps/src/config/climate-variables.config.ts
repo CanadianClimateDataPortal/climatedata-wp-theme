@@ -801,7 +801,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			{
 				key: "window",
 				type: "input",
-				label: 'Minimum Consecutive Days',
+				label: 'Minimum Consecutive Days (Days)',
 				description: 'Set the minimum number of consecutive days required to define a cold spell.',
 				help: 'This value determines how many consecutive days must meet the temperature condition for the period to be considered a cold spell.',
 				attributes: {
@@ -892,7 +892,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			{
 				key: "thresh",
 				type: "input",
-				label: 'Daily Maximum Humidex (HXMax) Threshold',
+				label: 'Daily Maximum Humidex Threshold (HXMax)',
 				description: 'Set the minimum daily maximum Humidex (HXMax) value that must be exceeded for a day to be included in the analysis.',
 				help: 'Only days where the daily maximum Humidex (HXMax) exceeds this threshold will be counted.',
 				unit: 'HXMax',
@@ -1135,7 +1135,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			{
 				key: "sum_thresh",
 				type: "input",
-				label: 'Degree-Day Total Threshold',
+				label: 'Degree-Day Total Threshold (DoY)',
 				description: 'Set the degree-day total that must be exceeded to trigger the result.',
 				help: 'This value defines the cumulative degree-day target. The result will be the day of year when this threshold is surpassed.',
 				attributes: {
@@ -1229,7 +1229,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			},
 		],
 		frequencyConfig: {
-			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.MAP,
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.NONE,
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.NONE,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
@@ -1288,7 +1288,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			{
 				key: "window",
 				type: "input",
-				label: 'Minimum Consecutive Days',
+				label: 'Minimum Consecutive Days (Days)',
 				description: 'Set the number of consecutive qualifying days required to define a heat wave.',
 				help: 'A heat wave is defined as a sequence of consecutive days that meet both temperature thresholds. This value controls how many days must be in that sequence.',
 				unit: 'days',
@@ -1310,7 +1310,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			{
 				key: "window",
 				type: "input",
-				label: 'Minimum Consecutive Days',
+				label: 'Minimum Consecutive Days (Days)',
 				description: 'Set the number of consecutive hot days required to define a heat wave.',
 				help: 'A heat wave is defined as a sequence of consecutive days where the maximum temperature meets the threshold. This value determines how long that sequence must be.',
 				unit: 'days',
@@ -1375,7 +1375,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			{
 				key: "window",
 				type: "input",
-				label: 'Minimum Consecutive Days',
+				label: 'Minimum Consecutive Days (Days)',
 				description: 'Set the minimum number of consecutive qualifying days required to define a heat wave event.',
 				help: 'A heat wave event is defined as a sequence of consecutive days that meet both the minimum and maximum temperature thresholds for this many days or more.',
 				unit: 'days',
@@ -1394,7 +1394,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		threshold: "hddheat_18",
 		unit: 'Degree Days',
 		frequencyConfig: {
-			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.MAP,
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.DOWNLOAD,
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.NONE,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
@@ -1497,7 +1497,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.THIRTY_YEARS,
 		],
 		frequencyConfig: {
-			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.MAP,
+			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.SEASONAL]: FrequencyDisplayModeOption.NONE,
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
@@ -1557,10 +1557,6 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 					placeholder: "0",
 				}
 			},
-		],
-		defaultDateRange: [
-			"1980",
-			"2010",
 		],
 	},
 	/** Wet Days */

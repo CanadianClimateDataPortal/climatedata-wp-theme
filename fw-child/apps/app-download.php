@@ -81,7 +81,7 @@ $translation_data = array(
 <head>
     <meta charset="<?php bloginfo( 'charset' ); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title><?php wp_title(); ?></title>
+    <title><?php echo esc_html( wp_get_document_title() ); ?></title>
 
 	<?php
 	// Add favicon.
@@ -112,6 +112,9 @@ $translation_data = array(
 
         // Disable Leaflet's 3D features
         L_DISABLE_3D = true;
+
+        // WP AJAX URL for the download app
+        window.wpAjaxUrl = '<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>';
     </script>
 
 	<?php

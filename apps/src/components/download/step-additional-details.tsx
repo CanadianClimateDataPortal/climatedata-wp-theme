@@ -109,7 +109,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 		},
 		{
 			value: AveragingType.THIRTY_YEARS,
-			label: __('30 years'),
+			label: __('30 years average'),
 		},
 	].filter((option) =>
 		climateVariable?.getAveragingOptions()?.includes(option.value)
@@ -124,7 +124,7 @@ const StepAdditionalDetails = React.forwardRef<StepComponentRef>((_, ref) => {
 	// Get the date range selected by the user.
 	const dateRange = climateVariable?.getDateRange() ?? [];
 
-	// Get the percentiles options.
+	// Get the percentile options.
 	const percentileOptions = climateVariable?.getPercentileOptions() ?? [];
 
 	// Get the Scenario Options.

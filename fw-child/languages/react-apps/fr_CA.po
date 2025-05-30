@@ -1,847 +1,603 @@
-msgid ""
-msgstr ""
-"Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-05-26T14:06:58+00:00\n"
-"PO-Revision-Date: 2025-05-26T14:06:58+00:00\n"
-"Language: \n"
+# For how to use this file, see /docs/react-apps-translation.md
 
-#: download-BTE1UZk3.js:155
-#: download-BTE1UZk3.js:5046
 msgid "Final Step"
 msgstr "Étape finale"
 
-#: download-BTE1UZk3.js:155
 msgid "Step"
 msgstr "Étape"
 
-#: download-BTE1UZk3.js:190
 msgid "Select a Dataset"
 msgstr "Sélectionnez un jeu de données"
 
-#: download-BTE1UZk3.js:191
 msgid "Select dataset to begin building your download request. Several options will be available after this selection."
 msgstr "Sélectionnez un jeu de données pour commencer à élaborer votre demande de téléchargement. Plusieurs options seront disponibles après cette sélection."
 
-#: download-BTE1UZk3.js:214
-#: Global-CkfD5H6e.js:48729
-#: map-WD00wMm4.js:426
-#: map-WD00wMm4.js:4192
 msgid "Learn more"
 msgstr "En savoir plus"
 
-#: download-BTE1UZk3.js:277
-#: Global-CkfD5H6e.js:48798
 msgid "Select a variable"
 msgstr "Sélectionnez une variable"
 
-#: download-BTE1UZk3.js:278
 msgid "Select a variable contained in the dataset previously selected. Use the filters below to narrow down the list of variables."
 msgstr "Sélectionnez une variable contenue dans le jeu de données précédemment sélectionné. Utilisez les filtres ci-dessous pour réduire la liste des variables."
 
-#: download-BTE1UZk3.js:288
-#: Global-CkfD5H6e.js:48809
 msgid "Variable Types"
 msgstr "Types de variables"
 
-#: download-BTE1UZk3.js:289
-#: Global-CkfD5H6e.js:48810
 msgid "Select a variable type"
 msgstr "Sélectionnez un type de variable"
 
-#: download-BTE1UZk3.js:290
-#: download-BTE1UZk3.js:302
-#: Global-CkfD5H6e.js:48811
-#: Global-CkfD5H6e.js:48823
 msgid "All"
 msgstr "Tous"
 
-#: download-BTE1UZk3.js:300
-#: Global-CkfD5H6e.js:48821
 msgid "Sectors"
 msgstr "Secteurs"
 
-#: download-BTE1UZk3.js:301
-#: Global-CkfD5H6e.js:48822
 msgid "Select a sector"
 msgstr "Sélectionnez un secteur"
 
-#: download-BTE1UZk3.js:523
-#: Global-CkfD5H6e.js:48268
-#: Global-CkfD5H6e.js:49393
-#: map-WD00wMm4.js:457
-#: map-WD00wMm4.js:505
-#: map-WD00wMm4.js:1468
 msgid "Select an option"
 msgstr "Sélectionnez une option"
 
-#: download-BTE1UZk3.js:526
 msgid "Versions of the dataset"
 msgstr "Versions du jeu de données"
 
-#: download-BTE1UZk3.js:527
 msgid "Select a version for the dataset"
 msgstr "Sélectionnez une version du jeu de données"
 
-#: download-BTE1UZk3.js:578
 msgid "Set your variable options"
 msgstr "Définissez les options de la variable"
 
-#: download-BTE1UZk3.js:579
 msgid "Please set your variables options to your needs."
 msgstr "Veuillez définir les options de vos variables en fonction de vos besoins."
 
-#: download-BTE1UZk3.js:598
 msgid "Select a location or area"
 msgstr "Sélectionnez un lieu ou une région"
 
-#: download-BTE1UZk3.js:599
 msgid "Using the tool below, you can select or draw a selection to include in your download file."
 msgstr "À l'aide de l'outil ci-dessous, vous pouvez sélectionner ou dessiner une zone à inclure dans votre fichier de téléchargement."
 
-#: download-BTE1UZk3.js:4218
-#: download-BTE1UZk3.js:4252
 msgid "Select date"
 msgstr "Choisir la date"
 
-#: download-BTE1UZk3.js:4342
 msgid "All years"
 msgstr "Toutes les années"
 
-#: download-BTE1UZk3.js:4346
 msgid "30 years"
 msgstr "Moyennes sur 30 ans"
 
-#: download-BTE1UZk3.js:4366
 msgid "WMO Parameters"
 msgstr "Paramètres de l'OMM"
 
-#: download-BTE1UZk3.js:4371
 msgid "Full ensemble"
 msgstr ""
 
-#: download-BTE1UZk3.js:4371
 msgid " (Ensemble)"
 msgstr ""
 
-#: download-BTE1UZk3.js:4375
 msgid "Adjust the controls below to customize your analysis."
 msgstr "Ajustez les contrôles ci-dessous pour personnaliser votre analyse."
 
-#: download-BTE1UZk3.js:4380
 msgid "Start Year"
 msgstr "Année de début"
 
-#: download-BTE1UZk3.js:4384
 msgid "End Year"
 msgstr "Année de fin"
 
-#: download-BTE1UZk3.js:4423
 msgid "Models"
 msgstr "Modèles"
 
-#: download-BTE1UZk3.js:4424
 msgid "Select models"
 msgstr "Sélectionnez les modèles"
 
-#: download-BTE1UZk3.js:4437
-#: map-WD00wMm4.js:455
 msgid "Emissions Scenarios"
 msgstr "Scénarios d'émissions"
 
-#: download-BTE1UZk3.js:4438
 msgid "Select emission scenarios"
 msgstr "Sélectionnez les scénarios d'émissions"
 
-#: download-BTE1UZk3.js:4451
 msgid "Percentiles"
 msgstr "Percentiles"
 
-#: download-BTE1UZk3.js:4452
 msgid "Select percentiles"
 msgstr "Sélectionnez les percentiles"
 
-#: download-BTE1UZk3.js:4465
 msgid "Missing data options"
 msgstr "Options de données manquantes"
 
-#: download-BTE1UZk3.js:4466
 msgid "Select missing data options"
 msgstr "Sélectionnez les options de données manquantes"
 
-#: download-BTE1UZk3.js:4559
 msgid "Select file parameters"
 msgstr "Sélectionnez les paramètres du fichier"
 
-#: download-BTE1UZk3.js:4561
 msgid "Data processing starts after you \"Send Request\". It may take 30 to 90 minutes to complete, depending on available resources."
 msgstr ""
 
-#: download-BTE1UZk3.js:4564
 msgid "You will be notified by email when your request has been processed and the data are available. Don't forget to check your spam folder."
 msgstr ""
 
-#: download-BTE1UZk3.js:4571
 msgid "Format"
 msgstr ""
 
-#: download-BTE1UZk3.js:4583
 msgid "Decimal Place"
 msgstr ""
 
-#: download-BTE1UZk3.js:4590
 msgid "Please enter your email address to receive your download link."
 msgstr ""
 
-#: download-BTE1UZk3.js:4593
 msgid "Email Address"
 msgstr ""
 
-#: download-BTE1UZk3.js:4599
 msgid "john.doe@gmail.com"
 msgstr ""
 
-#: download-BTE1UZk3.js:4634
 msgid "I would like to subscribe to ClimateData Newsletter"
 msgstr ""
 
-#: download-BTE1UZk3.js:4644
 msgid "Enter the characters shown:"
 msgstr ""
 
-#: download-BTE1UZk3.js:4664
 msgid "Refresh Captcha"
 msgstr ""
 
-#: download-BTE1UZk3.js:4693
 msgid "Your request has been sent."
 msgstr ""
 
-#: download-BTE1UZk3.js:4694
 msgid "It may take 30 to 90 minutes to complete, depending on available resources."
 msgstr ""
 
-#: download-BTE1UZk3.js:4697
 msgid "Your file is ready to download."
 msgstr ""
 
-#: download-BTE1UZk3.js:4722
-#: map-WD00wMm4.js:5723
-#: map-WD00wMm4.js:5905
 msgid "Download"
 msgstr ""
 
-#: download-BTE1UZk3.js:4729
-#: Global-CkfD5H6e.js:65886
 msgid "Additional Climate Normals variables are available from the"
 msgstr ""
 
-#: download-BTE1UZk3.js:4731
-#: Global-CkfD5H6e.js:65888
 msgid "Canadian Centre for Climate Services"
 msgstr ""
 
-#: download-BTE1UZk3.js:4733
-#: Global-CkfD5H6e.js:65890
 msgid "and the"
 msgstr ""
 
-#: download-BTE1UZk3.js:4735
-#: Global-CkfD5H6e.js:65892
 msgid "Government of Canada Historical Climate Data"
 msgstr ""
 
-#: download-BTE1UZk3.js:4737
-#: Global-CkfD5H6e.js:65894
 msgid "websites."
 msgstr ""
 
-#: download-BTE1UZk3.js:4874
 msgid "Dataset"
 msgstr ""
 
-#: download-BTE1UZk3.js:4880
 msgid "Variable"
 msgstr ""
 
-#: download-BTE1UZk3.js:4886
 msgid "Variable options"
 msgstr ""
 
-#: download-BTE1UZk3.js:4892
 msgid "Location or area"
 msgstr ""
 
-#: download-BTE1UZk3.js:4896
 msgid "1 selected"
 msgid_plural "%d selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: download-BTE1UZk3.js:4902
 msgid "Additional details"
 msgstr ""
 
-#: download-BTE1UZk3.js:4930
 msgid "All percentiles"
 msgstr ""
 
-#: download-BTE1UZk3.js:4930
 msgid "1 percentile"
 msgid_plural "%d percentiles"
 msgstr[0] ""
 msgstr[1] ""
 
-#: download-BTE1UZk3.js:4942
 msgid "File parameters"
 msgstr ""
 
-#: download-BTE1UZk3.js:4966
 msgid "Summary"
 msgstr ""
 
-#: download-BTE1UZk3.js:5042
 msgid "Next Step"
 msgstr ""
 
-#: download-BTE1UZk3.js:5044
 msgid "Send Request"
 msgstr ""
 
-#: Global-CkfD5H6e.js:7896
 msgctxt "text direction"
 msgid "ltr"
 msgstr ""
 
-#: Global-CkfD5H6e.js:45757
-#: Global-CkfD5H6e.js:48532
 msgid "Close panel"
 msgstr ""
 
-#: Global-CkfD5H6e.js:46607
 msgid "Filter variables"
 msgstr ""
 
-#: Global-CkfD5H6e.js:46610
 msgid "Search for variables"
 msgstr ""
 
-#: Global-CkfD5H6e.js:46627
 msgid "Search"
 msgstr ""
 
-#: Global-CkfD5H6e.js:46639
 msgid "Clear search"
 msgstr ""
 
-#: Global-CkfD5H6e.js:48267
 msgid "Search..."
 msgstr ""
 
-#: Global-CkfD5H6e.js:48359
 msgid "Loading..."
 msgstr ""
 
-#: Global-CkfD5H6e.js:48686
 msgid "Loading variables..."
 msgstr ""
 
-#: Global-CkfD5H6e.js:48693
 msgid "No variables found matching your search and filters."
 msgstr ""
 
-#: Global-CkfD5H6e.js:48695
 msgid "No variables found matching your search."
 msgstr ""
 
-#: Global-CkfD5H6e.js:48697
 msgid "No variables found for the selected filters."
 msgstr ""
 
-#: Global-CkfD5H6e.js:48699
 msgid "No variables available for this dataset."
 msgstr ""
 
-#: Global-CkfD5H6e.js:48755
 msgid "Variables"
 msgstr ""
 
-#: Global-CkfD5H6e.js:48799
 msgid "Here you can browse all the variables contained in the selected dataset."
 msgstr ""
 
-#: Global-CkfD5H6e.js:48839
 msgid "Please select a dataset first"
 msgstr ""
 
-#: Global-CkfD5H6e.js:48852
 msgid "Showing"
 msgstr ""
 
-#: Global-CkfD5H6e.js:48856
 msgid "of"
 msgstr ""
 
-#: Global-CkfD5H6e.js:48860
 msgid "variables"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49376
 msgid "Grid Cells"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49377
 msgid "Census Subdivisions"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49378
 msgid "Health Regions"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49379
 msgid "Watersheds"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49385
 msgid "Select an interactive region."
 msgstr ""
 
-#: Global-CkfD5H6e.js:49395
 msgid "Interactive Regions"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49446
 msgid "January"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49447
 msgid "February"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49448
 msgid "March"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49449
 msgid "April"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49450
 msgid "May"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49451
 msgid "June"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49452
 msgid "July"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49453
 msgid "August"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49454
 msgid "September"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49455
 msgid "October"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49456
 msgid "November"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49457
 msgid "December"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49460
 msgid "Spring"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49461
 msgid "Summer"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49462
 msgid "Fall"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49463
 msgid "Winter"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49470
-#: Global-CkfD5H6e.js:49473
 msgid "Monthly"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49474
 msgid "All months"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49484
-#: Global-CkfD5H6e.js:49487
 msgid "Seasonal"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49493
 msgid "Annual"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49494
 msgid "Annual (July to June)"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49495
 msgid "Daily"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49894
-#: Global-CkfD5H6e.js:49895
 msgid "Climate Data"
 msgstr ""
 
-#: Global-CkfD5H6e.js:49898
 msgid "Go back to the main website"
 msgstr ""
 
-#: Global-CkfD5H6e.js:52089
 msgid "Legend"
 msgstr ""
 
-#: Global-CkfD5H6e.js:52629
 msgid "Zoom In"
 msgstr ""
 
-#: Global-CkfD5H6e.js:52638
 msgid "Zoom Out"
 msgstr ""
 
-#: Global-CkfD5H6e.js:53473
 msgid "Geolocation is not supported by your browser."
 msgstr ""
 
-#: Global-CkfD5H6e.js:53481
 msgid "Your current location"
 msgstr ""
 
-#: Global-CkfD5H6e.js:53505
 msgid "Unable to retrieve your location."
 msgstr ""
 
-#: Global-CkfD5H6e.js:65341
 msgid "Change from "
 msgstr ""
 
-#: Global-CkfD5H6e.js:65510
 msgid "Annual Values"
 msgstr ""
 
-#: Global-CkfD5H6e.js:65515
 msgid "30 Year Averages"
 msgstr ""
 
-#: Global-CkfD5H6e.js:65520
 msgid "30 Year Changes"
 msgstr ""
 
-#: Global-CkfD5H6e.js:65810
 msgid "Export failed. Please try again."
 msgstr ""
 
-#: Global-CkfD5H6e.js:65842
 msgid "Export"
 msgstr ""
 
-#: Global-CkfD5H6e.js:65848
 msgid "PDF"
 msgstr ""
 
-#: Global-CkfD5H6e.js:65856
 msgid "PNG"
 msgstr ""
 
-#: Global-CkfD5H6e.js:65864
 msgid "CSV"
 msgstr ""
 
-#: Global-CkfD5H6e.js:65872
 msgid "Print"
 msgstr ""
 
-#: Global-CkfD5H6e.js:65928
 msgid "Go to details section"
 msgstr ""
 
-#: Global-CkfD5H6e.js:65932
 msgid "See details"
 msgstr ""
 
-#: Global-CkfD5H6e.js:75210
 msgid "Grid cells"
 msgstr ""
 
-#: Global-CkfD5H6e.js:75216
 msgid "Draw region"
 msgstr ""
 
-#: Global-CkfD5H6e.js:75236
 msgid "Select station(s)"
 msgstr ""
 
-#: Global-CkfD5H6e.js:75677
 msgid "Median"
 msgstr ""
 
-#: Global-CkfD5H6e.js:75693
 msgid "Relative to baseline"
 msgstr ""
 
-#: Global-CkfD5H6e.js:75705
 msgid "to"
 msgstr ""
 
-#: Global-CkfD5H6e.js:75709
 msgid "Range"
 msgstr ""
 
-#: Global-CkfD5H6e.js:75712
-#: Global-CkfD5H6e.js:75956
 msgid "No data available."
 msgstr ""
 
-#: map-WD00wMm4.js:335
 msgid "Datasets"
 msgstr ""
 
-#: map-WD00wMm4.js:404
 msgid "Select a dataset"
 msgstr ""
 
-#: map-WD00wMm4.js:405
 msgid "Climate Data provides a selection of historical and future climate datasets."
 msgstr ""
 
-#: map-WD00wMm4.js:444
 msgid "Select an emission scenario."
 msgstr ""
 
-#: map-WD00wMm4.js:481
 msgid "Compare scenarios"
 msgstr ""
 
-#: map-WD00wMm4.js:501
 msgid "Select a threshold value."
 msgstr ""
 
-#: map-WD00wMm4.js:507
 msgid "Threshold Values"
 msgstr ""
 
-#: map-WD00wMm4.js:525
 msgid "Select a frequency."
 msgstr ""
 
-#: map-WD00wMm4.js:1118
-#: map-WD00wMm4.js:1274
 msgid "Time Periods"
 msgstr ""
 
-#: map-WD00wMm4.js:1119
-#: map-WD00wMm4.js:1275
 msgid "Time periods tooltip"
 msgstr ""
 
-#: map-WD00wMm4.js:1361
 msgid "Absolute"
 msgstr ""
 
-#: map-WD00wMm4.js:1362
 msgid "Delta"
 msgstr ""
 
-#: map-WD00wMm4.js:1372
 msgid "Values"
 msgstr ""
 
-#: map-WD00wMm4.js:1450
 msgid "Select a map color."
 msgstr ""
 
-#: map-WD00wMm4.js:1481
 msgid "Discrete"
 msgstr ""
 
-#: map-WD00wMm4.js:1484
 msgid "Continuous"
 msgstr ""
 
-#: map-WD00wMm4.js:1502
 msgid "Select a version."
 msgstr ""
 
-#: map-WD00wMm4.js:1510
 msgid "Versions"
 msgstr ""
 
-#: map-WD00wMm4.js:1537
-#: map-WD00wMm4.js:1571
 msgid "Recent locations"
 msgstr ""
 
-#: map-WD00wMm4.js:1623
 msgid "Data"
 msgstr ""
 
-#: map-WD00wMm4.js:1624
 msgid "Labels"
 msgstr ""
 
-#: map-WD00wMm4.js:1637
 msgid "Layer opacities"
 msgstr ""
 
-#: map-WD00wMm4.js:1733
 msgid "Explore Data"
 msgstr ""
 
-#: map-WD00wMm4.js:1734
 msgid "Map Settings"
 msgstr ""
 
-#: map-WD00wMm4.js:1778
 msgid "About our data"
 msgstr ""
 
-#: map-WD00wMm4.js:1787
 msgid "Support"
 msgstr ""
 
-#: map-WD00wMm4.js:4086
 msgid "Description"
 msgstr ""
 
-#: map-WD00wMm4.js:4090
 msgid "Technical description"
 msgstr ""
 
-#: map-WD00wMm4.js:4094
 msgid "Relevant sectors"
 msgstr ""
 
-#: map-WD00wMm4.js:4098
 msgid "Click on one of them to get specific insights for your needs."
 msgstr ""
 
-#: map-WD00wMm4.js:4106
 msgid "Relevant trainings"
 msgstr ""
 
-#: map-WD00wMm4.js:4110
 msgid "To help you get more of our data."
 msgstr ""
 
-#: map-WD00wMm4.js:5466
 msgid "Check out the Canadian climate data map"
 msgstr ""
 
-#: map-WD00wMm4.js:5475
 msgid "Share on Facebook (opens in a new tab)"
 msgstr ""
 
-#: map-WD00wMm4.js:5487
 msgid "Share on Twitter (opens in a new tab)"
 msgstr ""
 
-#: map-WD00wMm4.js:5496
 msgid "Share on LinkedIn (opens in a new tab)"
 msgstr ""
 
-#: map-WD00wMm4.js:5507
 msgid "Share via Email (opens in the same tab)"
 msgstr ""
 
-#: map-WD00wMm4.js:5611
 msgid "Climate Data Map"
 msgstr ""
 
-#: map-WD00wMm4.js:5629
 msgid "Sharing this map"
 msgstr ""
 
-#: map-WD00wMm4.js:5630
 msgid "You can copy-paste this link anywhere you want; it will keep all your data options and your map position."
 msgstr ""
 
-#: map-WD00wMm4.js:5650
 msgid "Copied"
 msgstr ""
 
-#: map-WD00wMm4.js:5650
 msgid "Copy Link"
 msgstr ""
 
-#: map-WD00wMm4.js:5656
 msgid "Or click one of these social links:"
 msgstr ""
 
-#: map-WD00wMm4.js:5657
 msgid "Clicking on icons will launch a new window."
 msgstr ""
 
-#: map-WD00wMm4.js:5720
 msgid "Generating..."
 msgstr ""
 
-#: map-WD00wMm4.js:5729
 msgid "Download image from viewport"
 msgstr ""
 
-#: map-WD00wMm4.js:5730
 msgid "Your export will showcase your various data options. The map position will be the one you see on your screen."
 msgstr ""
 
-#: map-WD00wMm4.js:5736
 msgid "Download current map image (opens in a new tab)"
 msgstr ""
 
-#: map-WD00wMm4.js:5746
 msgid "Need control over your own data?"
 msgstr ""
 
-#: map-WD00wMm4.js:5747
 msgid "Head over to the download section where you can select multiple grid cells and personalize more data options."
 msgstr ""
 
-#: map-WD00wMm4.js:5755
 msgid "Go to download sections (opens in a new tab)"
 msgstr ""
 
-#: map-WD00wMm4.js:5760
 msgid "Go to Download Section"
 msgstr ""
 
-#: map-WD00wMm4.js:5868
 msgid "View details"
 msgstr ""
 
-#: map-WD00wMm4.js:5889
 msgid "Share"
 msgstr ""
 
-#: map-WD00wMm4.js:5891
 msgid "the current visible map"
 msgstr ""
 
-#: map-WD00wMm4.js:5907
 msgid "image from your viewport"
 msgstr ""

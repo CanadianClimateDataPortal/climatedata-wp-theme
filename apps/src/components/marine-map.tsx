@@ -62,6 +62,7 @@ export default function MarineMap(): React.ReactElement {
 			<MarineMapContainer
 				scenario={climateVariable?.getScenario()}
 				onMapReady={(map: L.Map) => {
+					map.invalidateSize();
 					mapRef.current = map;
 					setMap(map);
 				}}
@@ -72,6 +73,7 @@ export default function MarineMap(): React.ReactElement {
 				<MarineMapContainer
 					scenario={climateVariable?.getScenarioCompareTo()}
 					onMapReady={(map: L.Map) => {
+						map.invalidateSize();
 						comparisonMapRef.current = map;
 						syncMaps(); // sync once the comparison map is ready
 					}}

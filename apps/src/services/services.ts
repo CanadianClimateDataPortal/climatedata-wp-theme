@@ -490,6 +490,8 @@ export const fetchStationsList = async ({ threshold }: { threshold?: string }) =
 			data = await fetchJson(`${window.DATA_URL}/fileserver/bdv/bdv.json`);
 		} else if (threshold === 'station-data') {
 			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE');
+		} else if (threshold === 'idf') {
+			data = await fetchJson('/assets/themes/fw-child/resources/app/idf_curves.json');
 		} else {
 			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y');
 		}

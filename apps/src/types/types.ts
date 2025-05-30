@@ -582,6 +582,7 @@ export interface ColourScheme {
 	type: string;
 	colours: string[];
 	quantities?: number[];
+	isDivergent?: boolean;
 }
 
 // A translatable string object with English and French variants

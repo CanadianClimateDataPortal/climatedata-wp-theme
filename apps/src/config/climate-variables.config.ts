@@ -835,6 +835,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterAnalyzeClimateVariable",
 		threshold: "cddcold_18",
 		unit: "Degree Days",
+		enableDrawRegion: true,
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.NONE,
@@ -955,6 +956,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.THIRTY_YEARS,
 		],
 		unit: 'Days',
+		enableDrawRegion: true,
 		temporalThresholdConfig: {
 			thresholds: {
 				txgt_25: {
@@ -1095,6 +1097,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.THIRTY_YEARS,
 		],
 		unit: 'Days',
+		enableDrawRegion: true,
 		temporalThresholdConfig: {
 			thresholds: {
 				'tnlt_-15': {
@@ -1239,6 +1242,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.THIRTY_YEARS,
 		],
 		unit: 'Days',
+		enableDrawRegion: true,
 		temporalThresholdConfig: {
 			thresholds: {
 				'dlyfrzthw_tx0_tn-1': {
@@ -1393,6 +1397,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 		class: "RasterAnalyzeClimateVariable",
 		threshold: "hddheat_18",
 		unit: 'Degree Days',
+		enableDrawRegion: true,
 		frequencyConfig: {
 			[FrequencyType.ANNUAL]: FrequencyDisplayModeOption.ALWAYS,
 			[FrequencyType.MONTHLY]: FrequencyDisplayModeOption.DOWNLOAD,
@@ -1503,6 +1508,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			[FrequencyType.ANNUAL_JUL_JUN]: FrequencyDisplayModeOption.DOWNLOAD,
 		},
 		unit: 'Days',
+		enableDrawRegion: true,
 		temporalThresholdConfig: {
 			thresholds: {
 				tr_18: {
@@ -1604,6 +1610,7 @@ export const ClimateVariables: ClimateVariableConfigInterface[] = [
 			AveragingType.THIRTY_YEARS,
 		],
 		unit: 'Days',
+		enableDrawRegion: true,
 		temporalThresholdConfig: {
 			thresholds: {
 				r1mm: {

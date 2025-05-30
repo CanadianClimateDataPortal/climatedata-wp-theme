@@ -15,9 +15,10 @@ export interface SelectedCellsSummaryProps {
   __: (msg: string) => string;
   _n: (singular: string, plural: string, count: number) => string;
   showClearButton?: boolean;
+  selectionMode?: string;
 }
 
-const SelectedCellsSummary: React.FC<SelectedCellsSummaryProps> = ({ selectedCells, onClear, __, _n, showClearButton }) => {
+const SelectedCellsSummary: React.FC<SelectedCellsSummaryProps> = ({ selectedCells, onClear, __, _n, showClearButton, selectionMode = 'cells' }) => {
   return (
     <>
       {showClearButton && (
@@ -41,7 +42,9 @@ const SelectedCellsSummary: React.FC<SelectedCellsSummaryProps> = ({ selectedCel
             selectedCells > 0 ? 'text-brand-blue' : 'text-neutral-grey-medium'
           )}
         >
-          {_n('1 Cell', `${selectedCells} Cells`, selectedCells)}
+          {selectionMode === 'region' 
+            ? __('Region') 
+            : _n('1 Cell', `${selectedCells} Cells`, selectedCells)}
         </div>
       </div>
     </>

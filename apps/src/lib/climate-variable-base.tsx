@@ -314,6 +314,10 @@ class ClimateVariableBase implements ClimateVariableInterface {
 		return this._config.downloadType ?? null;
 	}
 
+	isDrawRegionEnabled(): boolean {
+		return this._config.enableDrawRegion ?? false;
+	}
+
 	hasMultipleDownloadUrls(): boolean {
 		return this._config.hasMultipleDownloadUrls ?? false;
 	}

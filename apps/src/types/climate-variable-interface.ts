@@ -331,6 +331,9 @@ export interface ClimateVariableConfigInterface {
 	/** Determines if the variable data must be analyzed or is already precalculated. */
 	downloadType?: DownloadType;
 
+	/** Determines if draw region selection should be enabled for analyzed variables */
+	enableDrawRegion?: boolean;
+
 	hasMultipleDownloadUrls?: boolean;
 
 	downloadUrls?: string[];
@@ -462,6 +465,8 @@ export interface ClimateVariableInterface {
 	renderDownloadMap(): React.ReactElement;
 
 	getDownloadType(): DownloadType | null;
+
+	isDrawRegionEnabled(): boolean;
 
 	hasMultipleDownloadUrls(): boolean;
 

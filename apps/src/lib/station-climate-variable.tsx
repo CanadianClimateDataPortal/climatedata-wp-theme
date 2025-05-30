@@ -13,6 +13,7 @@ import {
 	StationDownloadUrlsProps,
 	DownloadFile,
 } from "@/types/climate-variable-interface";
+import {WP_API_DOMAIN} from "@/lib/constants.tsx";
 
 class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 
@@ -131,7 +132,7 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 					const data = await response.json();
 					return data.map((element: { filename: string; label: string }): DownloadFile => ({
 						...element,
-						url: `https://climatedata.ca${element.filename}`,
+						url: `${WP_API_DOMAIN}${element.filename}`,
 					}));
 				} catch (error) {
 					console.error('Error fetching data:', error);

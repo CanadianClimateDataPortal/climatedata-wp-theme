@@ -15,7 +15,7 @@ import {
 	setZoom,
 	setCenter,
 } from '@/features/download/download-slice';
-import { CANADA_BOUNDS, DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM } from '@/lib/constants';
+import {CANADA_BOUNDS, DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM, GEOSERVER_BASE_URL} from '@/lib/constants';
 import { MapFeatureProps } from '@/types/types';
 import { getFeatureId } from '@/hooks/use-interactive-map-events';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
@@ -33,8 +33,7 @@ const SelectableRegionLayer = forwardRef<{ clearSelection: () => void }, {}>((_,
 	// @ts-expect-error: suppress leaflet typescript error
 	const layerRef = useRef<L.VectorGrid | null>(null);
 
-	// TODO: this should not be a static value, because it needs to work also in other environments other than prod
-	const geoserverUrl = '//dataclimatedata.crim.ca';
+	const geoserverUrl = GEOSERVER_BASE_URL;
 	const interactiveRegionName = climateVariable?.getInteractiveRegion() ?? '';
 	const tileLayerUrl = `${geoserverUrl}/geoserver/gwc/service/tms/1.0.0/CDC:${interactiveRegionName}/{z}/{x}/{-y}.pbf`;
 

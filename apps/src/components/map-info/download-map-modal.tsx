@@ -4,8 +4,8 @@
  * A modal component that allows users to download the map as an image.
  *
  */
-import React, {useEffect, useMemo, useState} from 'react';
-import { __ } from '@/context/locale-provider';
+import React, {useContext, useEffect, useMemo, useState} from 'react';
+import { __, LocaleContext } from '@/context/locale-provider';
 import { Download, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { encodeURL, prepareRaster } from '@/lib/utils';
@@ -42,6 +42,8 @@ const DownloadMapModal: React.FC<{
 	title: string;
 }> = ({ isOpen, onClose, title }) => {
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
+	const localeContext = useContext(LocaleContext);
+	const currentLocale = localeContext?.locale || 'en';
 
 	// Get dataset and variable information for download URL
 	const dataset = useAppSelector((state) => state.map.dataset);
@@ -117,15 +119,29 @@ const DownloadMapModal: React.FC<{
 		}
 	};
 
+	// French domain from the root div
+	const getFrenchDomain = (): string | null => {
+		const rootElement = document.getElementById('root');
+		return rootElement?.getAttribute('data-wp-home-url-fr') || null;
+	};
+
 	// Generate download section URL with dataset and variable parameters
 	const getDownloadUrl = useMemo(() => {
-		const downloadBaseUrl = `${WP_API_DOMAIN}/download/`;
+		const isFrenchSite = currentLocale === 'fr';
+		
+		let downloadBaseUrl;
+		if (isFrenchSite && getFrenchDomain()) {
+			downloadBaseUrl = `${getFrenchDomain()}/telechargement/`;
+		} else {
+			downloadBaseUrl = `${WP_API_DOMAIN}/download/`;
+		}
+		
 		if (!dataset || !climateVariableData || !climateVariableData.id) {
 			return downloadBaseUrl;
 		}
 
 		return `${downloadBaseUrl}?dataset=${encodeURIComponent(dataset.term_id.toString())}&var=${encodeURIComponent(climateVariableData.id)}`;
-	}, [dataset, climateVariableData]);
+	}, [dataset, climateVariableData, currentLocale]);
 
 	const buttonText = useMemo(() => {
 		if (isGenerating) {

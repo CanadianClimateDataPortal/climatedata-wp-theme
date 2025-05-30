@@ -59,7 +59,8 @@ export function generateColourScheme(
 			colours,
 			schemeType,
 			decimals
-		})
+		}),
+		isDivergent: schemeType === 'divergent'
 	};
 }
 
@@ -104,13 +105,20 @@ function calculateQuantities({
 		high += 273.15;
 	}
 
-	const step = (high - low) / schemeLength;
-
-	for (let i = 0; i < schemeLength - 1; i++) {
-		quantities.push(low + i * step);
+	if (schemeType === 'divergent') {
+		// For divergent palettes, create symmetric ranges around zero
+		const step = (high - low) / (schemeLength - 1);
+		for (let i = 0; i < schemeLength; i++) {
+			quantities.push(low + i * step);
+		}
+	} else {
+		// For non-divergent palettes, use the original logic
+		const step = (high - low) / schemeLength;
+		for (let i = 0; i < schemeLength - 1; i++) {
+			quantities.push(low + i * step);
+		}
+		quantities.push((high + 1) * (high + 1));
 	}
-
-	quantities.push((high + 1) * (high + 1));
 
 	return quantities;
 }

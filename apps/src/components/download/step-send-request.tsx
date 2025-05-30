@@ -11,7 +11,7 @@ import { cn, isValidEmail } from '@/lib/utils';
 import { DownloadType, FileFormatType } from "@/types/climate-variable-interface";
 import { useClimateVariable } from "@/hooks/use-climate-variable";
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setEmail, setSubscribe, setCaptchaValue } from '@/features/download/download-slice';
+import { setEmail, setSubscribe, setCaptchaValue, setRequestError } from '@/features/download/download-slice';
 import { StepComponentRef } from "@/types/download-form-interface";
 import Dropdown from "@/components/ui/dropdown.tsx";
 import { normalizeDropdownOptions } from "@/lib/format.ts";
@@ -43,7 +43,8 @@ const Captcha: React.FC<{
 				className="px-2 border rounded text-xl"
 				onClick={() => {
 					setCaptchaRefresh(Math.random());
-					dispatch(setCaptchaValue(''))
+					dispatch(setCaptchaValue(''));
+					dispatch(setRequestError(null));
 				}}
 				title={__('Refresh Captcha')}
 			>
@@ -145,7 +146,10 @@ const StepSendRequest = React.forwardRef<StepComponentRef>((_, ref) => {
 			return false;
 		}
 		
-		return climateVariable.getClass() === 'RasterAnalyzeClimateVariable';
+		const isAnalysisVariable = climateVariable.getClass() === 'RasterAnalyzeClimateVariable';
+		const isDailyFrequency = climateVariable.getFrequency() === 'daily';
+		
+		return isAnalysisVariable || isDailyFrequency;
 	};
 
 	useEffect(() => {

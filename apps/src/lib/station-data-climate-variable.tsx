@@ -9,6 +9,14 @@ import StationClimateVariable from "@/lib/station-climate-variable";
 
 class StationDataClimateVariable extends StationClimateVariable {
 
+	getVersions(): string[] {
+		return [];
+	}
+
+	getVersion(): string | null {
+		return null;
+	}
+
 	getFrequencyConfig(): FrequencyConfig | null {
 		return null;
 	}

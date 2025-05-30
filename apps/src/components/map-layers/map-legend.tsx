@@ -74,13 +74,22 @@ const MapLegend: React.FC<{ url: string }> = ({ url }) => {
 					schemeType: colorMap.schemeType as ColourType,
 				});
 
+			let processedData = transformedData.slice();
+
+			if (colorMap.isDivergent && colorMap.quantities) {
+				processedData = transformedData.map((entry, index) => ({
+					...entry,
+					label: colorMap.quantities?.[index]?.toFixed(climateVariable?.getUnitDecimalPlaces() ?? 0) ?? entry.label
+				}));
+			}
+
 			setTransformedLegendData(
-				transformedData.slice()
+				processedData
 					.reverse() // reverse the data to put higher values at the top
 					.slice(isCategorical ? 0 : 1) // remove the first element for non categorical data
 			);
 		})();
-	}, [rawLegendData, colorMap, isCategorical]);
+	}, [rawLegendData, colorMap, isCategorical, climateVariable]);
 
 	useEffect(() => {
 		if (!transformedLegendData) {

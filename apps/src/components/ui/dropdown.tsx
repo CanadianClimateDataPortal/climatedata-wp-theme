@@ -62,14 +62,12 @@ const DropdownGeneric = <T extends string | undefined>(
 
 	const handleValueChanged = (value: string) => {
 		if (value === 'all') {
-			setSelected(placeholderTranslated as T);
+			setSelected(undefined);
 			setSearch('');
+			onChange?.('' as T);
 		} else {
 			setSelected(value as T);
-		}
-
-		if (onChange) {
-			onChange(value as T);
+			onChange?.(value as T);
 		}
 	};
 

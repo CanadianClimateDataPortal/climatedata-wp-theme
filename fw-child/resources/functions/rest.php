@@ -155,11 +155,8 @@ add_action ( 'rest_api_init', function () {
 });
 
 function cdc_finch_submit () {
-  // have to do this because $_POSt was coming up empty due to the application-json header
-  $input = json_decode(file_get_contents('php://input'), true);
-  if (is_array($input)) {
-    $_POST = $input;
-  }
+	// buffer the output so that securimage warnings don't break the JSON response
+	ob_start();
 
 	include_once ( locate_template ( 'resources/php/securimage/securimage.php' ) );
 	include_once ( locate_template ( 'resources/php/mailchimp.php' ) );
@@ -216,8 +213,9 @@ function cdc_finch_submit () {
 		} // captcha check
 	} // captcha isset
 
+	// turn off output buffering
+	ob_end_clean();
 	echo $result;
-
 }
 
 //
@@ -755,7 +753,7 @@ function handle_form_submission ( $form_type, $required_fields ) {
 
 			if ( $wp_mail ) {
 				$result['mail'] = 'success';
-				$result['header'] = __( 'Thanks! We’ve received your inquiry.', 'cdc' );
+				$result['header'] = __( 'Thanks! We\'ve received your inquiry.', 'cdc' );
 				$result['messages'] = [ __( 'Please note: we are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays.', 'cdc' ) ];
 			} else {
 				$result['messages'][] = __( 'Something went wrong while sending your message. Please try again later.', 'cdc' );

@@ -33,6 +33,7 @@ declare global {
 		};
 		URL_ENCODER_SALT: string;
 		DATA_URL: string;
+		wpAjaxUrl: string;
 	}
 }
 

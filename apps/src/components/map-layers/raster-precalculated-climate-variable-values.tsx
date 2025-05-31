@@ -251,7 +251,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 	const isSPEIVariable = variableId === 'spei_12' || variableId === 'spei_3';
 
 	return (
-		<div className={mode === "modal" ? "mt-4 mb-4" : "flex-grow flex gap-6 justify-end"}>
+		<div className={mode === "modal" ? "mt-4 mb-4" : "flex-grow flex xl:gap-6 justify-start"}>
 			{isSPEIVariable ? (
 				<div className="h-10"></div> // Empty space instead of "No data available"
 			) : noDataAvailable ? (
@@ -262,7 +262,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 				</div>
 			) : (
 				<>
-					<div className={mode === "modal" ? "mb-3 flex" : "flex gap-6"}>
+					<div className={mode === "modal" ? "mb-3 flex" : "flex flex-col xl:flex-row lg:gap-6"}>
 						{ median !== null && generateMedianDiv(median) }
 						{ relativeToBaseline !== null && generateRelativeToBaselineDiv(relativeToBaseline) }
 					</div>

@@ -4,6 +4,7 @@ import L from 'leaflet';
 
 import LocationInfoPanel from '@/components/map-info/location-info-panel';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { fetchStationsList, fetchMSCClimateNormalsChartData } from '@/services/services';
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
 import { LocationModalContent } from './location-modal-content';
@@ -72,6 +73,7 @@ const InteractiveStationsLayer = forwardRef<{
 
 	const { climateVariable, addSelectedPoints, removeSelectedPoint, resetSelectedPoints } = useClimateVariable();
 	const { togglePanel } = useAnimatedPanel();
+	const isMobile = useIsMobile();
 
 	const map = useMap();
 	const layerGroupRef = useRef<L.MarkerClusterGroup | null>(null);
@@ -185,9 +187,9 @@ const InteractiveStationsLayer = forwardRef<{
 										/>,
 										{
 											position: {
-												left: remToPx(SIDEBAR_WIDTH),
-												right: 0,
-												bottom: 0,
+											left: isMobile ? 0 : remToPx(SIDEBAR_WIDTH),
+											right: 0,
+											bottom: 0,
 											},
 											direction: 'bottom',
 										}

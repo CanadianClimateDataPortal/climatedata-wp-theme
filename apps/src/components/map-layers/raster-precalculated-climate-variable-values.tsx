@@ -262,7 +262,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 				</div>
 			) : (
 				<>
-					<div className={mode === "modal" ? "mb-3 flex" : "flex flex-col xl:flex-row lg:gap-6"}>
+					<div className={mode === "modal" ? "mb-3 flex" : "flex flex-col xl:flex-row xl:gap-6"}>
 						{ median !== null && generateMedianDiv(median) }
 						{ relativeToBaseline !== null && generateRelativeToBaselineDiv(relativeToBaseline) }
 					</div>

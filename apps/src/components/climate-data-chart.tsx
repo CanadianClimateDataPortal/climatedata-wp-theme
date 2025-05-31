@@ -706,7 +706,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					{ climateVariableId !== 'sea_level' && climateVariable?.getLocationModalContent(latlng, featureId, "panel") }
 				</div>
 			</div>
-			<div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-4 gap-3">
+			<div className="flex flex-col xl:flex-row xl:justify-between xl:items-center mb-4 gap-3">
 				<div className="flex justify-start overflow-x-auto">
 					{enableTabs && tabs.map((tab) => (
 						<button
@@ -727,7 +727,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 						</button>
 					))}
 				</div>
-				<div className="flex flex-wrap justify-start lg:justify-end items-center gap-2">
+				<div className="flex flex-wrap justify-start xl:justify-end items-center gap-2">
 					<span className="text-dark-purple text-xs font-semibold uppercase leading-4 whitespace-nowrap">
 						{__('Export')}
 					</span>

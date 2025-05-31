@@ -19,6 +19,7 @@ export default function RasterMap(): React.ReactElement {
 	const wrapperRef = useRef<HTMLDivElement>(null);
 	const mapRef = useRef<L.Map | null>(null);
 	const comparisonMapRef = useRef<L.Map | null>(null);
+	const showComparisonMap = !!(climateVariable?.getScenarioCompare() && climateVariable?.getScenarioCompareTo());
 
 	// helper sync/unsync methods for convenience
 	const syncMaps = () => {
@@ -44,8 +45,6 @@ export default function RasterMap(): React.ReactElement {
 		}
 	};
 
-	const showComparisonMap = climateVariable?.getScenarioCompare() && climateVariable?.getScenarioCompareTo();
-
 	return (
 		<div
 			id='wrapper-map'
@@ -57,7 +56,7 @@ export default function RasterMap(): React.ReactElement {
 			)}
 		>
 			<RasterMapContainer
-				scenario={climateVariable?.getScenario()}
+				scenario={climateVariable?.getScenario() ?? ''}
 				onMapReady={(map: L.Map) => {
 					map.invalidateSize();
 					mapRef.current = map;
@@ -68,7 +67,7 @@ export default function RasterMap(): React.ReactElement {
 			/>
 			{showComparisonMap && (
 				<RasterMapContainer
-					scenario={climateVariable?.getScenarioCompareTo()}
+					scenario={climateVariable?.getScenarioCompareTo() ?? ''}
 					onMapReady={(map: L.Map) => {
 						map.invalidateSize();
 						comparisonMapRef.current = map;

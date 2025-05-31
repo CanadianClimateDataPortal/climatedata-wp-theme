@@ -23,7 +23,7 @@ import SectionContext from "@/context/section-provider";
 import { useColorMap } from '@/hooks/use-color-map';
 
 interface InteractiveRegionsLayerProps {
-	scenario?: string | null | undefined;
+	scenario: string;
 	onLocationModalOpen: (content: React.ReactNode) => void;
 	onLocationModalClose: () => void;
 }
@@ -138,6 +138,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 
 	const { handleClick, handleOver, handleOut } = useInteractiveMapEvents(
 		layerRef,
+		scenario ?? '',
 		getFeatureColor,
 		onLocationModalOpen,
 		onLocationModalClose
@@ -171,7 +172,7 @@ const InteractiveRegionsLayer: React.FC<InteractiveRegionsLayerProps> = ({ scena
 		datasetVersion,
 		frequency,
 		interactiveRegion,
-		scenario,
+		scenario ?? '',
 		startYear,
 		threshold
 	]);

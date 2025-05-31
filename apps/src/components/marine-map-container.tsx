@@ -36,9 +36,9 @@ export default function MarineMapContainer({
 	scenario,
 	onMapReady,
 	onUnmount,
-   	isComparisonMap,
+	isComparisonMap,
 }: {
-	scenario: string | null | undefined;
+	scenario: string;
 	onMapReady: (map: L.Map) => void;
 	onUnmount?: () => void;
 	isComparisonMap?: boolean;

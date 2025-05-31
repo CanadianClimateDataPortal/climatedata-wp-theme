@@ -151,6 +151,7 @@ const InteractiveStationsLayer = forwardRef<{
 						<LocationModalContent
 							title={station.name}
 							latlng={L.latLng(station.coordinates.lat, station.coordinates.lng)}
+							scenario={climateVariable?.getScenario() ?? ''}
 							featureId={Number(station.id) || 0}
 							onDetailsClick={() => {
 								if (onLocationModalClose) onLocationModalClose();

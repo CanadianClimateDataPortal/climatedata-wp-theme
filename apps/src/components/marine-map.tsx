@@ -47,8 +47,6 @@ export default function MarineMap(): React.ReactElement {
 		}
 	};
 
-	const showComparisonMap = climateVariable?.getScenarioCompare() && climateVariable?.getScenarioCompareTo();
-
 	return (
 		<div
 			id='wrapper-map'
@@ -60,7 +58,7 @@ export default function MarineMap(): React.ReactElement {
 			)}
 		>
 			<MarineMapContainer
-				scenario={climateVariable?.getScenario()}
+				scenario={climateVariable?.getScenario() ?? ''}
 				onMapReady={(map: L.Map) => {
 					map.invalidateSize();
 					mapRef.current = map;
@@ -71,7 +69,7 @@ export default function MarineMap(): React.ReactElement {
 			/>
 			{showComparisonMap && (
 				<MarineMapContainer
-					scenario={climateVariable?.getScenarioCompareTo()}
+					scenario={climateVariable?.getScenarioCompareTo() ?? ''}
 					onMapReady={(map: L.Map) => {
 						map.invalidateSize();
 						comparisonMapRef.current = map;

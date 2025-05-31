@@ -48,6 +48,7 @@ type handleOnClickMapLayerProps = {
 export const useInteractiveMapEvents = (
 	// @ts-expect-error: suppress leaflet typescript error
 	layerInstanceRef: React.MutableRefObject<L.VectorGrid | null>,
+	scenario: string,
 	getFeatureColor: (value: number) => string,
 	onLocationModalOpen?: (content: React.ReactNode) => void,
 	onLocationModalClose?: () => void
@@ -240,6 +241,7 @@ export const useInteractiveMapEvents = (
 				<LocationModalContent
 					title={title}
 					latlng={latlng}
+					scenario={scenario}
 					featureId={featureId}
 					onDetailsClick={handleDetailsClick}
 				/>

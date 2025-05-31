@@ -52,7 +52,8 @@ export default function RasterDownloadMap(): React.ReactElement {
 
 		const selectedRegion  = climateVariable?.getSelectedRegion();
 		if (selectedRegion) {
-			return selectedRegion?.cellCount ?? 0;
+		const cellCount = selectedRegion?.cellCount ?? 0;
+		return isNaN(cellCount) ? 0 : cellCount;
 		}
 
 		return 0;

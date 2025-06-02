@@ -26,7 +26,7 @@ const LocationInfoPanel: React.FC<{
 	data: ClimateDataProps;
 }> = ({ title, latlng, featureId, data }) => {
 	return (
-		<div className="location-info-panel">
+		<div className="location-info-panel !w-full xl:!w-auto">
 			<ClimateDataChart title={title} latlng={latlng} featureId={featureId} data={data} />
 		</div>
 	);

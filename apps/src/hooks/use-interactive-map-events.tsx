@@ -1,7 +1,7 @@
 /**
  * Hook that returns event handlers for interactive map layers.
  */
-import React, { useRef, useContext, useState, useEffect } from 'react';
+import React, { useRef, useContext } from 'react';
 import L from 'leaflet';
 import { useMap } from 'react-leaflet';
 
@@ -10,6 +10,7 @@ import { LocationModalContent } from '@/components/map-layers/location-modal-con
 
 import { useAppDispatch } from '@/app/hooks';
 import { useAnimatedPanel } from '@/hooks/use-animated-panel';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { addRecentLocation } from '@/features/map/map-slice';
 
 import { remToPx } from '@/lib/utils';
@@ -57,37 +58,11 @@ export const useInteractiveMapEvents = (
 	const { climateVariable } = useClimateVariable();
 	const { locale } = useLocale();
 	const section = useContext(SectionContext);
+	const isMobile = useIsMobile();
 
 	const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const hoveredRef = useRef<number | null>(null);
 	const markerRef = useRef<L.Marker | null>(null);
-
-	// --- SIDEBAR WIDTH RESPONSIVE LOGIC ---
-	const [sidebarWidth, setSidebarWidth] = useState(() => {
-		if (typeof window !== 'undefined') {
-			return window.innerWidth < 768 ? 0 : remToPx(SIDEBAR_WIDTH);
-		}
-		return remToPx(SIDEBAR_WIDTH);
-	});
-
-	useEffect(() => {
-		// Handler to update sidebarWidth and left style of the info panel
-		function handleResize() {
-			// Set sidebarWidth state based on Tailwind's md breakpoint (768px)
-			setSidebarWidth(window.innerWidth < 768 ? 0 : remToPx(SIDEBAR_WIDTH));
-			// Also update left style directly on the info panel wrapper if it exists
-			const panel = document.querySelector('.location-info-panel-wrapper') as HTMLElement | null;
-			if (panel) {
-				// Set the left position to match the sidebarWidth for correct alignment
-				panel.style.left = `${window.innerWidth < 768 ? 0 : remToPx(SIDEBAR_WIDTH)}px`;
-			}
-		}
-		window.addEventListener('resize', handleResize);
-		// Run handler once on mount to set initial state and position
-		handleResize();
-		// Cleanup listener on unmount
-		return () => window.removeEventListener('resize', handleResize);
-	}, []);
 
 	const dispatch = useAppDispatch();
 	const map = useMap();
@@ -226,7 +201,7 @@ export const useInteractiveMapEvents = (
 					/>,
 					{
 						position: {
-							left: sidebarWidth,
+							left: isMobile ? 0 : remToPx(SIDEBAR_WIDTH),
 							right: 0,
 							bottom: 0,
 						},

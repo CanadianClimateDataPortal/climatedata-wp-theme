@@ -931,3 +931,40 @@ function cdc_get_fr_domain() {
 
 	return $fr_domain_https;
 }
+
+
+
+add_filter ( 'document_title_parts', 'cdc_html_title', 20 );
+
+/**
+ * Generates the parts of the HTML title.
+ *
+ * On the home page, show only the site's name and tagline. On other pages, show the page title and the site's name.
+ *
+ * Notes:
+ * - The site's name and tagline are defined in this function. We don't use the WordPress settings for these since we
+ *   want them to be translatable, and the WordPress settings are not translatable.
+ * - This function doesn't translate the part of title containing the name of the current page. This is done by the
+ *   parent theme.
+ *
+ * @param $title_array
+ * @return mixed
+ */
+function cdc_html_title ( $title_array ) {
+	$site_title = __( 'ClimateData.ca', 'cdc' );
+	$tagline = __( 'ClimateData.ca provides high quality climate data and resources to help Canadians make decisions in a changing climate.', 'cdc' );
+
+	if ( is_front_page() ) {
+		$title_array[ 'title' ] = $site_title;
+	}
+
+	if ( array_key_exists( 'tagline', $title_array ) ) {
+		$title_array[ 'tagline' ] = $tagline;
+	}
+
+	if ( array_key_exists( 'site', $title_array ) ) {
+		$title_array[ 'site' ] = $site_title;
+	}
+
+	return $title_array;
+}

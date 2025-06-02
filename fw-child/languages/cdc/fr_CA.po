@@ -37,42 +37,38 @@ msgstr ""
 msgid "events"
 msgstr ""
 
-#: resources/functions/ajax.php:153
 #: template/download/controls/submit.php:100
 msgid "Historical IDF (ZIP)"
 msgstr "Données IDF historiques (ZIP)"
 
-#: resources/functions/ajax.php:157
 #: template/download/controls/submit.php:105
 msgid "Climate Change-Scaled IDF - CMIP5 (ZIP)"
 msgstr "Données IDF tenant compte des changements climatiques - CMIP5 (ZIP)"
 
-#: resources/functions/ajax.php:161
 #: template/download/controls/submit.php:110
 msgid "Climate Change-Scaled IDF - CMIP6 (ZIP)"
 msgstr "Données IDF tenant compte des changements climatiques - CMIP6 (ZIP)"
 
-#: resources/functions/ajax.php:165
 #: template/download/controls/submit.php:115
 msgid "Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)"
 msgstr "Démarrage rapide - Données IDF tenant compte des changements climatiques - CMIP6 (ZIP)"
 
-#: resources/functions/rest.php:728
+#: resources/functions/rest.php:685
 msgid "An error occurred."
 msgstr "Une erreur s'est produite."
 
-#: resources/functions/rest.php:762
+#: resources/functions/rest.php:719
 #: template/download/controls/submit.php:56
 msgid "Please enter a valid email address."
 msgstr "Veuillez saisir une adresse courriel valide."
 
-#: resources/functions/rest.php:689
-#: resources/functions/rest.php:700
-#: resources/functions/rest.php:711
+#: resources/functions/rest.php:646
+#: resources/functions/rest.php:657
+#: resources/functions/rest.php:668
 msgid "Please provide the details of your inquiry."
 msgstr "Veuillez fournir les détails de votre demande."
 
-#: resources/functions/rest.php:777
+#: resources/functions/rest.php:734
 msgid "Some required fields are missing."
 msgstr "Certains champs requis sont manquants."
 
@@ -82,23 +78,19 @@ msgstr "Certains champs requis sont manquants."
 msgid "Organization"
 msgstr "Organisation"
 
-#: resources/functions/rest.php:799
-msgid "Thanks! We’ve received your inquiry."
-msgstr "Merci ! Nous avons reçu votre demande."
-
-#: resources/functions/rest.php:800
+#: resources/functions/rest.php:757
 msgid "Please note: we are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays."
 msgstr "Veuillez noter : nous recevons actuellement un nombre de demandes plus élevé que d'habitude à notre service d'assistance. Nous ferons de notre mieux pour vous répondre dès que possible, mais veuillez noter qu'il pourrait y avoir des délais."
 
-#: resources/functions/rest.php:802
+#: resources/functions/rest.php:759
 msgid "Something went wrong while sending your message. Please try again later."
 msgstr "Une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer plus tard."
 
-#: resources/functions/rest.php:811
+#: resources/functions/rest.php:768
 msgid "Your email address has been added to our mailing list. You can unsubscribe at any time."
 msgstr "Votre adresse courriel a été ajoutée à notre liste de diffusion. Vous pouvez vous désinscrire à tout moment."
 
-#: resources/functions/rest.php:814
+#: resources/functions/rest.php:771
 msgid "An error occurred while adding your email address to our mailing list."
 msgstr "Une erreur s'est produite lors de l'ajout de votre adresse courriel à notre liste de diffusion."
 
@@ -108,18 +100,14 @@ msgstr "Une erreur s'est produite lors de l'ajout de votre adresse courriel à n
 msgid "Variable"
 msgstr "Variable"
 
-#: template/menu-overlay.php:236
-msgid "All Variables"
-msgstr ""
-
 #: functions.php:727
 msgid "Interactive"
 msgstr "Interactif"
 
-#: resources/functions/rest.php:348
-#: resources/functions/rest.php:349
-#: resources/functions/rest.php:472
-#: resources/functions/rest.php:473
+#: resources/functions/rest.php:351
+#: resources/functions/rest.php:352
+#: resources/functions/rest.php:475
+#: resources/functions/rest.php:476
 msgid "Point"
 msgstr ""
 
@@ -186,7 +174,6 @@ msgstr "Zone"
 #: template/map/control-bar.php:42
 #: template/map/controls/download.php:5
 #: template/map/controls/download.php:44
-#: template/menu-overlay.php:194
 msgid "Download"
 msgstr "Télécharger"
 
@@ -590,7 +577,7 @@ msgstr "M'inscrire à l'infolettre de DonneesClimatiques.ca"
 msgid "CAPTCHA Verification"
 msgstr "Vérification CAPTCHA"
 
-#: resources/functions/rest.php:756
+#: resources/functions/rest.php:713
 #: template/download/controls/submit.php:88
 msgid "CAPTCHA verification is required."
 msgstr "La vérification CAPTCHA est requise."
@@ -644,7 +631,7 @@ msgstr "Ne plus montrer"
 
 #: template/download/map-container.php:34
 #: template/map/map-container.php:33
-#: template/query/variable-item.php:121
+#: template/query/variable-item.php:120
 msgid "Technical Description"
 msgstr "Description technique"
 
@@ -1061,7 +1048,7 @@ msgid "Copy link to this map"
 msgstr "Copier un lien vers cette carte"
 
 #: template/map/controls/download.php:35
-#: template/query/variable-item.php:101
+#: template/query/variable-item.php:100
 msgid "Download Data"
 msgstr "Télécharger les données"
 
@@ -1188,24 +1175,14 @@ msgstr "Décénnie"
 msgid "Climate Data"
 msgstr "Données Climatiques"
 
-#: template/menu-overlay.php:179
-msgid "Popular Variables"
-msgstr ""
-
-#: template/menu-overlay.php:192
 #: template/query/map-var-item.php:11
 msgid "View on map"
 msgstr "Voir sur la carte"
 
-#: template/menu-overlay.php:196
 #: template/query/download-var-item.php:13
 #: template/query/map-var-item.php:13
 msgid "Description"
 msgstr "Description"
-
-#: template/menu-overlay.php:209
-msgid "Variables by Sector"
-msgstr ""
 
 #: template/menu-overlay.php:115
 msgid "Join the newsletter"
@@ -1257,11 +1234,11 @@ msgstr "Sélectionner"
 msgid "Format"
 msgstr ""
 
-#: template/query/variable-item.php:94
+#: template/query/variable-item.php:93
 msgid "View on Map"
 msgstr "Voir sur la carte"
 
-#: template/query/variable-item.php:138
+#: template/query/variable-item.php:137
 msgid "Relevant Sectors"
 msgstr "Secteurs pertinents"
 
@@ -1345,7 +1322,7 @@ msgstr "Moyennes sur 30 ans"
 msgid "Update ACF Relevant Sectors"
 msgstr ""
 
-#: resources/functions/rest.php:712
+#: resources/functions/rest.php:669
 msgid "Please select at least one app."
 msgstr "Sélectionnez au moins une app."
 
@@ -1361,11 +1338,11 @@ msgstr "Pour quelle application souhaitez-vous nous faire un retour ?"
 msgid "App"
 msgstr "Application"
 
-#: template/variable/query.php:66
+#: template/variable/query.php:72
 msgid "Name (A–Z)"
 msgstr "Nom (A-Z)"
 
-#: template/variable/query.php:67
+#: template/variable/query.php:73
 msgid "Name (Z–A)"
 msgstr "Nom (Z-A)"
 
@@ -1386,10 +1363,11 @@ msgid "Init LZ meta"
 msgstr ""
 
 #: template/query/learn-item.php:63
+#, php-format
 msgid "%s minutes"
 msgstr ""
 
-#: template/learn/query.php:77
+#: template/learn/query.php:79
 msgid "No items found."
 msgstr "Aucun item trouvé."
 
@@ -1424,4 +1402,51 @@ msgstr "Portrait régional"
 #: template/learn/control-bar.php:11
 #: template/learn/control-bar.php:30
 msgid "Modules"
+msgstr ""
+
+#. Template Name of the theme
+msgid "Download app"
+msgstr ""
+
+#. Template Name of the theme
+msgid "Map app"
+msgstr ""
+
+#: functions.php:951
+msgid "ClimateData.ca"
+msgstr "DonneesClimatiques.ca"
+
+#: functions.php:952
+msgid "ClimateData.ca provides high quality climate data and resources to help Canadians make decisions in a changing climate."
+msgstr "Donneesclimatiques.ca fournit des données climatiques à haute résolution pour aider les décideurs à bâtir un meilleur avenir pour le Canada."
+
+#: resources/functions/rest-v3/datasets-list.php:86
+msgid "No dataset terms found."
+msgstr ""
+
+#: resources/functions/rest-v3/datasets-list.php:191
+#: resources/functions/rest-v3/variable.php:121
+#: resources/functions/rest-v3/variables-filters.php:88
+#: resources/functions/rest-v3/variables-list.php:183
+msgid "An unexpected error occurred."
+msgstr ""
+
+#: resources/functions/rest-v3/init.php:98
+msgid "Access denied. Only same-domain requests are allowed."
+msgstr ""
+
+#: resources/functions/rest-v3/variables-list.php:82
+msgid "Invalid variable dataset term ID."
+msgstr ""
+
+#: resources/functions/rest.php:756
+msgid "Thanks! We've received your inquiry."
+msgstr ""
+
+#. Template Name of the theme
+msgid "ACF Field Migration"
+msgstr ""
+
+#. Template Name of the theme
+msgid "Populate variables meta"
 msgstr ""

@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setRequestStatus, setRequestError, setRequestResult, setDownloadLinks, setCaptchaValue } from '@/features/download/download-slice';
 import { useClimateVariable } from '@/hooks/use-climate-variable';
 import { cn } from '@/lib/utils';
-import { GEOSERVER_BASE_URL, DATASETS } from '@/lib/constants';
+import { GEOSERVER_BASE_URL, DATASETS, FINCH_DATASET_CMIP6_SSP370 } from '@/lib/constants';
 import { StepComponentRef } from '@/types/download-form-interface';
 import {
 	DownloadFile,
@@ -134,9 +134,16 @@ const Steps: React.FC = () => {
 				// Add dataset using Finch name from DATASETS
 				const datasetKey = climateVariable.getVersion?.();
 				let datasetFinchName = datasetKey;
+
 				if (datasetKey && DATASETS && (datasetKey as keyof typeof DATASETS) in DATASETS && DATASETS[datasetKey as keyof typeof DATASETS].finch_name) {
-					datasetFinchName = DATASETS[datasetKey as keyof typeof DATASETS].finch_name;
+					if (datasetKey === 'cmip6' && scenarios.includes('ssp370')) {
+						// Special case: if SSP3-7.0 is selected, use a special dataset name
+						datasetFinchName = FINCH_DATASET_CMIP6_SSP370;
+					} else {
+						datasetFinchName = DATASETS[datasetKey as keyof typeof DATASETS].finch_name;
+					}
 				}
+
 				if (datasetFinchName) {
 					inputs.push({ id: 'dataset', data: datasetFinchName });
 				}

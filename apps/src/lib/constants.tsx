@@ -2,6 +2,7 @@ import L from 'leaflet';
 import type { LatLngExpression, LatLngBounds } from 'leaflet';
 import { ColourScheme, DatasetKey, EmissionScenarioKey } from '@/types/types';
 import { MAP_CONFIG } from '@/config/map.config';
+import { FinchFrequencyNames, FrequencyType } from '@/types/climate-variable-interface';
 
 import mapPinIcon from '@/assets/map-pin.svg';
 
@@ -164,7 +165,7 @@ export const DATASETS: Record<
 		],
 		layer_prefix: 'cmip6-',
 		grid: 'canadagrid',
-		finch_name: 'candcs-u6',
+		finch_name: 'candcs-m6',
 		model_lists: [{ name: '26models', label: 'All models' }],
 	},
 	humidex: {
@@ -194,6 +195,14 @@ export const DATASETS: Record<
 
 // Special Finch dataset name for SSP3-7.0 scenario
 export const FINCH_DATASET_CMIP6_SSP370: string = 'candcs-m6-24';
+
+// Frequency names to use for the Finch request.
+export const FINCH_FREQUENCY_NAMES: Partial<Record<FinchFrequencyNames, string>> = {
+	[FrequencyType.ANNUAL]: 'YS',
+	[FrequencyType.MONTHLY]: 'MS',
+	[FrequencyType.SEASONAL]: 'QS-DEC',
+	[FrequencyType.ANNUAL_JUL_JUN]: 'AS-JUL',
+};
 
 export const DEFAULT_COLOUR_SCHEMES: Record<string, ColourScheme> = {
 	temp_seq: {

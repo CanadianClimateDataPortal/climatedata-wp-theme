@@ -25,12 +25,12 @@ const VariableOptionsSummary: React.FC = () => {
 	return (
 			<ul className="download-summary-bullet list-disc list-inside">
 				{climateVariable.getVersions().length > 0 && (<li key={version}><span className='text-dark-purple text-sm'>Version:</span> <span className="uppercase">{version || 'N/A'}</span></li>)}
-				{analysisFields.map(({ key, label, unit }) => {
+				{analysisFields.map(({ key, label }) => {
 					const value = analysisFieldValues[key] ?? '-';
 
 					return (
 						<li className="summary-item" key={key}>
-							<span className='text-gray-600 text-sm'>{label}</span>: <span className="uppercase">{value} {unit}</span>
+							<span className='text-gray-600 text-sm'>{label}</span>: <span className="uppercase">{value}</span>
 						</li>
 					);
 				})}

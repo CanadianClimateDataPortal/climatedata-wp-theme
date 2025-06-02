@@ -4,7 +4,7 @@ $news_post_id = get_the_ID();
 
 // Initialize taxonomies.
 $tax_news_topic  = get_the_terms( $news_post_id, 'news-topic' );
-$tax_news_author = get_the_terms( $news_post_id, 'news-author' ); 
+$tax_news_author = get_the_terms( $news_post_id, 'news-author' );
 
 // Initialize current language.
 $current_lang = 'en';
@@ -36,7 +36,7 @@ if ( isset( $GLOBALS['fw'] ) && isset( $GLOBALS['fw']['current_lang_code'] ) && 
 			<span class="mb-1 all-caps text-blue-100 d-block"><?php _e( 'Author', 'cdc' ); ?></span>
 
 			<?php
-			echo implode( ', ', array_map( function ( $term ) use ( $current_lang ) {
+			echo implode( '; ', array_map( function ( $term ) use ( $current_lang ) {
 				$term_name_fr = get_field( 'admin_term_title_fr', $term );
 				$term_name_fr = ( empty( $term_name_fr ) ) ? $term->name : $term_name_fr;
 

@@ -177,11 +177,15 @@ export default function RasterDownloadMap(): React.ReactElement {
 			},
 		];
 
-		if (climateVariable?.getDownloadType() !== DownloadType.ANALYZED) {
+		const shouldShowDrawRegion = 
+			climateVariable?.getDownloadType() !== DownloadType.ANALYZED || 
+			climateVariable?.isDrawRegionEnabled();
+
+		if (shouldShowDrawRegion) {
 			selectionModes.push({
 				value: 'region',
 				label: __('Draw region'),
-			})
+			});
 		}
 
 		return selectionModes;
@@ -234,6 +238,7 @@ export default function RasterDownloadMap(): React.ReactElement {
 								showClearButton={selectedCells > 0}
 								__={__}
 								_n={_n}
+								selectionMode={selectionMode}
 							/>
 						</div>
 					</div>

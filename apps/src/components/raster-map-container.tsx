@@ -33,7 +33,7 @@ export default function RasterMapContainer({
 	onUnmount,
 	isComparisonMap
 }: {
-	scenario: string | null | undefined;
+	scenario: string;
 	onMapReady: (map: L.Map) => void;
 	onUnmount?: () => void;
 	isComparisonMap?: boolean;

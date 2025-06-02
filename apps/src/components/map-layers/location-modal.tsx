@@ -23,7 +23,8 @@ const LocationModal = React.forwardRef<HTMLDivElement, LocationModalProps>(
 			<div
 				ref={ref}
 				className={cn(
-					'fixed z-30 top-1/2 -translate-y-1/2 max-w-md w-full flex flex-col gap-6 p-6 bg-white rounded-lg shadow-lg',
+					'location-modal',
+					'absolute z-30 top-1/2 -translate-y-1/2 max-w-md w-full flex flex-col gap-6 p-6 bg-white rounded-lg shadow-lg',
 					'md:right-28 md:left-auto md:translate-x-0',
 					'left-1/2 -translate-x-1/2', // Center horizontally by default (sm and below)
 					className

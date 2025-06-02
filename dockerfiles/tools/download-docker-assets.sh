@@ -131,13 +131,6 @@ extract_file() {
 
 }
 
-setup_ownership() {
-    local target_dir=$1
-    local owner=$2
-
-    sudo chown $owner -R $target_dir
-}
-
 download_from_list() {
     local list_file=$1
     local url=$2
@@ -168,6 +161,5 @@ initialize_variables "$server"
 setup_authentication "$@"
 download_file "$ssl_archive_url" "$ssl_archive_temp_path"
 extract_file "$ssl_archive_temp_path" "$ssl_destination_dir"
-setup_ownership "$ssl_destination_dir" "10000:10001"
 download_from_list "$wp_plugins_list_file" "$wp_plugins_url" "$wp_plugins_destination_dir"
 cleanup_temp_files

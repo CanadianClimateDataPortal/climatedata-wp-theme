@@ -132,15 +132,25 @@ ARG WEB_SERVER_GROUP_ID=10001
 
 RUN usermod -u ${WEB_SERVER_USER_ID} www-data && groupmod -g ${WEB_SERVER_GROUP_ID} www-data
 
+COPY --chmod=644 dockerfiles/build/www/configs/nginx/nginx.conf /etc/nginx/
+
 COPY --chmod=644 dockerfiles/build/www/configs/nginx/conf.d/* /etc/nginx/conf.d/
 
 COPY --chmod=644 dockerfiles/build/www/configs/nginx/climatedata-site.conf /etc/nginx/sites-available/
 COPY --chmod=755 dockerfiles/build/www/configs/nginx/site-extra/* /etc/nginx/conf.d/climatedata-site/
 
-COPY --chmod=644 dockerfiles/build/www/configs/nginx/nginx.conf /etc/nginx/
-
 RUN rm /etc/nginx/sites-enabled/default \
     && ln -s ../sites-available/climatedata-site.conf /etc/nginx/sites-enabled/climatedata-site.conf
+
+# To run supervisord as www-data user, we must change permissions on the different process related directories.
+RUN mkdir -p  \
+        /var/run/supervisord /var/log/supervisord \
+        /var/run/php /var/log/php \
+        /var/run/nginx /var/log/nginx /var/lib/nginx && \
+    chown -R www-data:www-data \
+        /var/run/supervisord /var/log/supervisord \
+        /var/run/php /var/log/php \
+        /var/run/nginx /var/log/nginx /var/lib/nginx /etc/nginx
 
 # ---
 # Wordpress
@@ -206,16 +216,6 @@ RUN chown -R root:www-data . \
     && find . -type f -print0 | xargs -0 chmod 640 \
     && chmod 0770 assets/cache assets/uploads
 
-# To run supervisord as www-data user, we must change permissions on the different process related directories.
-RUN mkdir -p  \
-        /var/run/supervisord /var/log/supervisord \
-        /var/run/php /var/log/php \
-        /var/run/nginx /var/log/nginx /var/lib/nginx && \
-    chown -R www-data:www-data \
-        /var/run/supervisord /var/log/supervisord \
-        /var/run/php /var/log/php \
-        /var/run/nginx /var/log/nginx /var/lib/nginx /etc/nginx
-
 USER www-data
 
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
@@ -231,5 +231,9 @@ CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
 
 FROM production AS development
 
+USER root
+
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
+
+USER www-data

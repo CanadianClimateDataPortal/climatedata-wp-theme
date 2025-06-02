@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 from typing import NamedTuple, List
 
-reserved_tags = ["preprod", "uat", "qa"]
+reserved_tags = ["prod", "preprod", "uat", "qa"]
 version_pattern = re.compile(r"^v\d+\.\d+\.\d+$")
 
 

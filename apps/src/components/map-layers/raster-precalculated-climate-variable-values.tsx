@@ -44,8 +44,15 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 
 	// useEffect to retrieve location values for the current climate variable
 	useEffect(() => {
-		const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
 		const variableId = climateVariable?.getId() ?? '';
+		
+		// Skip data fetching for SPEI variables - these variables don't have data available in the API
+		if (variableId === 'spei_12' || variableId === 'spei_3') {
+			// We don't show "No data available" for these variables
+			return;
+		}
+
+		const interactiveRegion = climateVariable?.getInteractiveRegion() ?? InteractiveRegionOption.GRIDDED_DATA;
 		const variable = climateVariable?.getThreshold() ?? '';
 		const { lat, lng } = latlng;
 		const decadeValue = parseInt(dateRange[0]) - (parseInt(dateRange[0]) % 10) + 1;
@@ -187,7 +194,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 
 		return (
 			<div className={mode === "modal" ? "w-1/2" : ""}>
-				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
+				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md mr-6'}`}>
 					{ formattedMedian }
 				</div>
 				<div className={mode === "modal" ? "" : "flex gap-2"}>
@@ -208,7 +215,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 
 		return (
 			<div className={mode === "modal" ? "w-1/2" : ""}>
-				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
+				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md mr-6'}`}>
 					{ formattedRelativeToBaseline }
 				</div>
 				<div className={mode === "modal" ? "" : "flex gap-2"}>
@@ -230,7 +237,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 
 		return (
 			<>
-				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md'}`}>
+				<div className={`font-semibold text-brand-blue ${mode === 'modal' ? 'mb-1 text-2xl' : 'text-md mr-6'}`}>
 					{rangeStart} {__('to')} {rangeEnd}
 				</div>
 				<div className='text-xs font-semibold text-neutral-grey-medium uppercase tracking-wider'>
@@ -240,9 +247,14 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 		);
 	};
 
+	const variableId = climateVariable?.getId() ?? '';
+	const isSPEIVariable = variableId === 'spei_12' || variableId === 'spei_3';
+
 	return (
-		<div className={mode === "modal" ? "mt-4 mb-4" : "flex-grow flex gap-6 justify-end"}>
-			{noDataAvailable ? (
+		<div className={mode === "modal" ? "mt-4 mb-4" : "flex-grow flex xl:gap-6 justify-start"}>
+			{isSPEIVariable ? (
+				<div className="h-10"></div> // Empty space instead of "No data available"
+			) : noDataAvailable ? (
 				<div>
 					<p className='text-base text-neutral-grey-medium italic'>
 						{__('No data available.')}
@@ -250,7 +262,7 @@ const RasterPrecalcultatedClimateVariableValues: React.FC<RasterPrecalcultatedCl
 				</div>
 			) : (
 				<>
-					<div className={mode === "modal" ? "mb-3 flex" : "flex gap-6"}>
+					<div className={mode === "modal" ? "mb-3 flex" : "flex flex-col xl:flex-row xl:gap-6"}>
 						{ median !== null && generateMedianDiv(median) }
 						{ relativeToBaseline !== null && generateRelativeToBaselineDiv(relativeToBaseline) }
 					</div>

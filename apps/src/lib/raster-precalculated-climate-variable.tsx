@@ -13,6 +13,17 @@ import {
 } from "@/types/climate-variable-interface";
 import RasterPrecalcultatedClimateVariableValues from '../components/map-layers/raster-precalculated-climate-variable-values'
 
+interface DownloadPayloadProps {
+	dataset_name: string | null;
+	dataset_type: string;
+	format: FileFormatType | null;
+	month: string | null;
+	var: string | null;
+	zipped: boolean;
+	bbox?: [number, number, number, number];
+	points?: [number, number][];
+}
+
 class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 
 	getVersions(): string[] {
@@ -116,6 +127,9 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 		return super.getDownloadType() ?? DownloadType.PRECALCULATED;
 	}
 
+	// TODO: it seems this method is only used for gridded_data + drawn region
+	// 	if that's the case, remove the `points` key from DownloadPayloadProps and
+	// 	the logic below that handles selectedPoints
 	async getDownloadUrl(): Promise<string | null> {
 		const downloadUrl = await super.getDownloadUrl();
 		if (downloadUrl) {
@@ -131,23 +145,40 @@ class RasterPrecalculatedClimateVariable extends ClimateVariableBase {
 				frequencyCode = this.getFrequency();
 		}
 
-		const points: [number, number][] = [];
+		const selectedRegion = this.getSelectedRegion?.(); // For a drawn region
+		const selectedPoints = this.getSelectedPoints?.(); // For selected points/cells
 
-		Object.values(this.getSelectedPoints() ?? {}).forEach(({lat, lng}) => {
-			points.push([lat, lng]);
-		});
-
-		const payload = {
+		let payload: DownloadPayloadProps = {
 			dataset_name: this.getVersion(),
 			dataset_type: this.getAveragingType() === AveragingType.ALL_YEARS
 				? "allyears"
 				: "30ygraph",
 			format: this.getFileFormat(),
 			month: frequencyCode,
-			points: points,
 			var: this.getThreshold(),
 			zipped: true,
 		};
+
+		if (selectedRegion && selectedRegion.bounds) {
+			// Region (bbox) selection
+			const bounds = selectedRegion.bounds as [[number, number], [number, number]];
+			payload = {
+				...payload,
+				bbox: [
+					bounds[0][0], // minLat
+					bounds[0][1], // minLng
+					bounds[1][0], // maxLat
+					bounds[1][1], // maxLng
+				],
+			};
+		} else if (selectedPoints && Object.keys(selectedPoints).length > 0) {
+			payload = {
+				...payload,
+				points: selectedPoints && Object.keys(selectedPoints).length > 0
+					? Object.values(selectedPoints).map(({ lat, lng }) => [lat, lng])
+					: [],
+			};
+		}
 
 		const url = `${window.DATA_URL}/download`;
 

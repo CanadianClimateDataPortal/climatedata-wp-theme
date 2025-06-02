@@ -582,6 +582,7 @@ export interface ColourScheme {
 	type: string;
 	colours: string[];
 	quantities?: number[];
+	isDivergent?: boolean;
 }
 
 // A translatable string object with English and French variants
@@ -796,6 +797,7 @@ export interface WMSParams {
  * Props for the variable layer component.
  */
 export interface VariableLayerProps {
+	scenario: string | null | undefined;
 	layerValue: string;
 }
 

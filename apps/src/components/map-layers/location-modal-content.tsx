@@ -9,6 +9,7 @@ import appConfig from '@/config/app.config';
 interface LocationModalContentProps {
 	title: string;
 	latlng: L.LatLng;
+	scenario: string;
 	featureId: number,
 	onDetailsClick: () => void;
 }
@@ -24,6 +25,7 @@ interface LocationModalContentProps {
 export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	title,
 	latlng,
+	scenario,
 	featureId,
 	onDetailsClick,
 }) => {
@@ -35,7 +37,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
 	const datasetLabel = dataset?.title.en ?? '';
 	const climateVariableTitle = climateVariable?.getTitle() || variableList?.[0]?.title || '';
 	const versionLabel = appConfig.versions.filter((version) => version.value === climateVariable?.getVersion())[0]?.label;
-	const scenarioLabel = appConfig.scenarios.filter((scenario) => scenario.value === climateVariable?.getScenario())[0]?.label;
+	const scenarioLabel = appConfig.scenarios.filter((item) => item.value === scenario)[0]?.label;
 
 	return (
 		<div>

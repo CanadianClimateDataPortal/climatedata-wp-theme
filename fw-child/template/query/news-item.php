@@ -19,21 +19,21 @@ $post_time = get_post_time( 'U', false, $item['id'] );
 
 <div class="card card--news">
 	<?php
-	
+
 		if ( has_post_thumbnail ( $item['id'] ) ) {
-			
+
 	?>
-	
+
 	<div class="bg-dark">
 		<div class="card-img item-thumb" style="background-image: url(<?php echo get_the_post_thumbnail_url( $item['id'], 'medium_large' ); ?>);"></div>
 	</div>
-	
+
 	<?php
-	
+
 		}
 
 	?>
-	
+
 	<div class="card-body">
 		<h5 class="card-title item-title mb-1"><a href="<?php echo $item['permalink']; ?>" class="text-secondary stretched-link"><?php echo $item['title']; ?></a></h5>
 
@@ -53,7 +53,7 @@ $post_time = get_post_time( 'U', false, $item['id'] );
 			<div class="card-authors">
 				<p class="text-gray-600">
 					<?php
-					echo implode( ', ', array_map( function ( $term ) use ( $current_lang ) {
+					echo implode( '; ', array_map( function ( $term ) use ( $current_lang ) {
 						$term_name_fr = get_field( 'admin_term_title_fr', $term );
 						$term_name_fr = ( empty( $term_name_fr ) ) ? $term->name : $term_name_fr;
 

@@ -155,11 +155,8 @@ add_action ( 'rest_api_init', function () {
 });
 
 function cdc_finch_submit () {
-  // have to do this because $_POSt was coming up empty due to the application-json header
-  $input = json_decode(file_get_contents('php://input'), true);
-  if (is_array($input)) {
-    $_POST = $input;
-  }
+	// buffer the output so that securimage warnings don't break the JSON response
+	ob_start();
 
 	include_once ( locate_template ( 'resources/php/securimage/securimage.php' ) );
 	include_once ( locate_template ( 'resources/php/mailchimp.php' ) );
@@ -216,8 +213,9 @@ function cdc_finch_submit () {
 		} // captcha check
 	} // captcha isset
 
+	// turn off output buffering
+	ob_end_clean();
 	echo $result;
-
 }
 
 //
@@ -616,52 +614,6 @@ function cdc_location_search() {
 	die();
 }
 
-//
-// IDF LINKS
-//
-
-// This script searches for IDF files matching the idf GET parameter and returns a JSON for the Frontend
-
-add_action ( 'rest_api_init', function () {
-
-	register_rest_route ( 'cdc/v2', '/get_idf_url/', array (
-		'methods' => 'GET',
-		'callback' => 'cdc_get_idf_url'
-	) );
-
-} );
-
-function cdc_get_idf_url () {
-
-	if (
-		( !isset ( $_GET['data'] ) || $_GET['data'] == '' ) ||
-		( !isset ( $_GET['station'] ) || $_GET['station'] == '' )
-	) {
-		return 'no file';
-	}
-
-	// ensure input is alphanumeric
-	if ( !preg_match ( '/^[a-zA-Z0-9]+$/', $_GET['data'] ) ) {
-		return 'invalid';
-	}
-
-	$result = array (
-		'glob' => get_stylesheet_directory() . '/resources/app/idf/' . $_GET['data'] . '/*' . $_GET['station'] . '*',
-		'files' => []
-	);
-
-	$glob = glob ( get_stylesheet_directory() . '/resources/app/idf/' . $_GET['data'] . '/*' . $_GET['station'] . '*' );
-
-	if ( !empty ( $glob ) ) {
-		foreach ( $glob as $file ) {
-			$result['files'][] = str_replace ( get_stylesheet_directory(), get_stylesheet_directory_uri(), $file );
-		}
-	}
-
-	return $result;
-
-}
-
 
 //
 // FEEDBACK FORM SUBMIT
@@ -801,7 +753,7 @@ function handle_form_submission ( $form_type, $required_fields ) {
 
 			if ( $wp_mail ) {
 				$result['mail'] = 'success';
-				$result['header'] = __( 'Thanks! We’ve received your inquiry.', 'cdc' );
+				$result['header'] = __( 'Thanks! We\'ve received your inquiry.', 'cdc' );
 				$result['messages'] = [ __( 'Please note: we are currently experiencing a higher than normal number of inquiries to our Support Desk. We will do our best to reply to you as soon as possible, but please be advised that there may be delays.', 'cdc' ) ];
 			} else {
 				$result['messages'][] = __( 'Something went wrong while sending your message. Please try again later.', 'cdc' );

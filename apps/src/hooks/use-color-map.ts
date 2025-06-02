@@ -25,6 +25,7 @@ export function useColorMap() {
           colours: customColourScheme.colours ?? [],
           quantities: customColourScheme.quantities ?? [],
           schemeType: climateVariable?.getColourType() ?? ColourType.CONTINUOUS,
+          isDivergent: customColourScheme.isDivergent ?? false,
         };
       }
     }
@@ -34,6 +35,7 @@ export function useColorMap() {
       colours: legendColourMapEntries.map((entry) => entry.color) ?? [],
       quantities: legendColourMapEntries.map((entry) => Number(entry.quantity)) ?? [],
       schemeType: ColourType.CONTINUOUS,
+      isDivergent: false,
     };
   }, [climateVariable, legendData]);
 

@@ -37,6 +37,7 @@ const SelectableRectangleGridLayer = forwardRef<{
 	const gridResolutions = useMemo<Record<string, number>>(
 			() => ({
 			canadagrid: 0.08333333333333333,
+			'canadagrid-m6': 0.08333333333333333,
 			canadagrid1deg: 1,
 			slrgrid: 0.1,
 			'slrgrid-cmip6': 0.1,
@@ -70,13 +71,14 @@ const SelectableRectangleGridLayer = forwardRef<{
 			const latDiff = maxLat - minLat;
 			const lngDiff = maxLng - minLng;
 			const area = latDiff * lngDiff;
+			const resolution = gridResolutions[varGrid] ?? 0.08333333333333333;
 
 			return {
-				cellCount: Math.round(area / gridResolutions[varGrid] ** 2),
+				cellCount: Math.round(area / resolution ** 2),
 				bounds: [[minLat, minLng], [maxLat, maxLng]] as L.LatLngBoundsLiteral,
 			};
 		},
-		[gridResolutions, dispatch]
+		[gridResolutions, climateVariable]
 	);
 
 	const onCreate = useCallback(

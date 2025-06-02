@@ -12,7 +12,7 @@ import {
 } from '@/types/types';
 import L from 'leaflet';
 
-import {  WP_API_DOMAIN, WP_API_LOCATION_BY_COORDS_PATH, WP_API_VARIABLE_PATH  } from '@/lib/constants';
+import {GEOSERVER_BASE_URL, WP_API_DOMAIN, WP_API_LOCATION_BY_COORDS_PATH, WP_API_VARIABLE_PATH} from '@/lib/constants';
 
 // Cache for API responses to avoid duplicate requests
 const apiCache = new Map<string, any>();
@@ -412,7 +412,7 @@ export const fetchMSCClimateNormalsChartData = async (stationId: string, normalI
 export const fetchDeltaValues = async (options: DeltaValuesOptions) => {
 	try {
 		const { endpoint, varName, frequency, params } = options;
-		let url = `//dataclimatedata.crim.ca/${endpoint}`;
+		let url = `${GEOSERVER_BASE_URL}/${endpoint}`;
 		if(varName !== null) url += `/${varName}`;
 		if(frequency !== null) url += `/${frequency}`;
 		url += `?${params}`;
@@ -450,7 +450,7 @@ export const fetchChoroValues = async (options: ChoroValuesOptions) => {
 	].join('&');
 
 	return await fetch(
-		`//dataclimatedata.crim.ca/get-choro-values/${urlPath}?${urlQuery}`
+		`${GEOSERVER_BASE_URL}/get-choro-values/${urlPath}?${urlQuery}`
 	)
 		.then((res) => {
 			if (!res.ok) {
@@ -490,6 +490,8 @@ export const fetchStationsList = async ({ threshold }: { threshold?: string }) =
 			data = await fetchJson(`${window.DATA_URL}/fileserver/bdv/bdv.json`);
 		} else if (threshold === 'station-data') {
 			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID,LATITUDE,LONGITUDE');
+		} else if (threshold === 'idf') {
+			data = await fetchJson('/assets/themes/fw-child/resources/app/idf_curves.json');
 		} else {
 			data = await fetchJson('https://api.weather.gc.ca/collections/climate-stations/items?f=json&limit=10000&properties=STATION_NAME,STN_ID&startindex=0&HAS_NORMALS_DATA=Y');
 		}

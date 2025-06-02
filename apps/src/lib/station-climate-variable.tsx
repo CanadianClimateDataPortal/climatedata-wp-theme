@@ -120,7 +120,7 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 		else if(this.getId() === 'short_duration_rainfall_idf_data') {
 			if(!props?.stationId) return [];
 
-			const url = `https://climatedata.ca/site/assets/themes/climate-data-ca/resources/app/run-frontend-sync/search_idfs.php?idf=${props?.stationId}`;
+			const url = `${WP_API_DOMAIN}/site/assets/themes/climate-data-ca/resources/app/run-frontend-sync/search_idfs.php?idf=${props?.stationId}`;
 
 			const fetchData = async () => {
 				try {

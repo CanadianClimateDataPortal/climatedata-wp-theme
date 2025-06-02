@@ -297,16 +297,16 @@ const Steps: React.FC = () => {
 					}
 
 					climateVariable.getStationDownloadFiles(stationDownloadUrlsProps)
-					.then((downloadFiles) => {
-						dispatch(setDownloadLinks(downloadFiles));
-						dispatch(setRequestStatus('success'));
+						.then((downloadFiles) => {
+							dispatch(setDownloadLinks(downloadFiles));
+							dispatch(setRequestStatus('success'));
 
-						goToNextStep();
-					})
-					.catch(() => {
-						dispatch(setRequestStatus('error'));
-						dispatch(setDownloadLinks(undefined));
-					});
+							goToNextStep();
+						})
+						.catch(() => {
+							dispatch(setRequestStatus('error'));
+							dispatch(setDownloadLinks(undefined));
+						});
 				}
 			}
 		}

@@ -13,7 +13,8 @@ import {
 	StationDownloadUrlsProps,
 	DownloadFile,
 } from "@/types/climate-variable-interface";
-import {WP_API_DOMAIN} from "@/lib/constants.tsx";
+import {WP_API_DOMAIN} from "@/lib/constants";
+import { __ } from "@/context/locale-provider";
 
 class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 
@@ -120,25 +121,35 @@ class StationClimateVariable extends RasterPrecalculatedClimateVariable {
 		else if(this.getId() === 'short_duration_rainfall_idf_data') {
 			if(!props?.stationId) return [];
 
-			const url = `${window.wpAjaxUrl}?action=cdc_get_idf_files&idf=${props?.stationId}`;
+			const url = `${WP_API_DOMAIN}/wp-json/cdc/v3/idf-station-files?station=${props?.stationId}`;
 
-			const fetchData = async () => {
-				try {
-					const response = await fetch(url);
-					if (!response.ok) {
-						throw new Error(`HTTP error! status: ${response.status}`);
-					}
+			try {
+				const response = await fetch(url);
 
-					const data = await response.json();
-					return data.map((element: { filename: string; label: string }): DownloadFile => ({
-						...element,
-						url: `${WP_API_DOMAIN}${element.filename}`,
-					}));
-				} catch (error) {
-					console.error('Error fetching data:', error);
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
 				}
-			};
-			fetchData();
+
+				const data = await response.json();
+				const files = data?.files ?? [];
+				const labels = {
+					'historical': 'Historical IDF (ZIP)',
+					'cmip5': 'Climate Change-Scaled IDF - CMIP5 (ZIP)',
+					'cmip6': 'Climate Change-Scaled IDF - CMIP6 (ZIP)',
+					'cmip6-quickstart': 'Quick Start - CMIP6 Climate Change-Scaled IDF (ZIP)',
+				};
+
+				return files.map((file: { type: string, url: string}) => {
+					return {
+						label: labels[file.type as keyof typeof labels] ? __(labels[file.type as keyof typeof labels]) : file.type,
+						url: file.url,
+					}
+				});
+			} catch (error) {
+				console.error('Error fetching data:', error);
+			}
+
+			return [];
 		}
 		// For Station Data - handled in StationDataClimateVariable class now
 		else if(this.getId() === 'station_data') {

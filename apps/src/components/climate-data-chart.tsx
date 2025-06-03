@@ -95,6 +95,17 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 		}
 	};
 
+	const thresholds = climateVariable?.getThresholds() ?? [];
+	const threshold: string = climateVariable?.getThreshold() ?? '';
+
+	// Get the label associated with a given value.
+	const getLabelByValue = (value: string): string =>
+		(thresholds.length > 0 && value)
+			? thresholds.find(t => t.value === value)?.label || ''
+			: '';
+	// Get the label for the current threshold, or null if not found.
+	const thresholdLabel = getLabelByValue(threshold);
+
 	// Tooltip: find closest timestamp for 30 years options
 	const findClosetTimestamp = (timestamp: number, data: Record<string, number[]> | undefined) => {
 		if (!data) return null;
@@ -109,7 +120,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 	const chartDataOptions = useMemo(() => getChartDataOptions(__), [__]);
 
 	// Get series object
-	const seriesObject = useMemo<(SeriesLineOptions | SeriesArearangeOptions | SeriesColumnOptions)[]>(() => 
+	const seriesObject = useMemo<(SeriesLineOptions | SeriesArearangeOptions | SeriesColumnOptions)[]>(() =>
 		getSeriesObject(data, version, climateVariableId, chartDataOptions),
 		[data, version, climateVariableId, chartDataOptions]
 	);
@@ -182,10 +193,10 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 				padding: 4,
 				formatter: function(this: Point) {
 					const points = (this as unknown as { points?: TooltipPoint[] }).points;
-					
+
 					// For MSC Climate Normals variable
 					if (climateVariableId === 'msc_climate_normals') {
-						return `<b>${months[this.x]}</b><br/>` + 
+						return `<b>${months[this.x]}</b><br/>` +
 							points?.map((point: TooltipPoint) => {
 								const unit = point.series.type === 'column' ? 'mm' : '°C';
 								return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.y)} ${unit}</b><br/>`;
@@ -193,7 +204,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 					}
 
 					const year = new Date(this.x).getFullYear() + 1;
-					return `<b>${year}</b><br/>` + 
+					return `<b>${year}</b><br/>` +
 						points?.map((point: TooltipPoint) => {
 							if (point.series.type === 'arearange') {
 								return `<span style="color:${point.series.color}">&bull;</span> ${point.series.name}: <b>${formatValue(point.low)}</b> - <b>${formatValue(point.high)}</b><br/>`;
@@ -696,6 +707,7 @@ const ClimateDataChart: React.FC<{ title: string; latlng: L.LatLng; featureId: n
 							[
 								__(datasetLabel),
 								__(climateVariableTitle),
+								__(thresholdLabel),
 								__(versionLabel)
 							].filter(Boolean).join(' - ')
 						}

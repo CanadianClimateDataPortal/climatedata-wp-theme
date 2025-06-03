@@ -23,7 +23,7 @@ import { DateRangePicker } from "@/components/date-range-picker";
 import appConfig from "@/config/app.config";
 import { useLocale } from '@/hooks/use-locale';
 
-const modelLabels = {
+const modelLabels: Record<string, string> = {
 	'pcic12': __('PCIC12 (Ensemble)'),
 	'24models': __('Full ensemble'),
 	'26models': __('Full ensemble'),

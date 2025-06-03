@@ -47,10 +47,6 @@ export type FrequencyConfig = {
 	[K in FrequencyType]?: FrequencyDisplayModeOption;
 }
 
-export type FinchFrequencyNames = {
-	[K in FrequencyType]?: string;
-}
-
 export interface FieldConfig {
 	key: string;
 	type: 'input' | 'select';

@@ -2,7 +2,7 @@ import L from 'leaflet';
 import type { LatLngExpression, LatLngBounds } from 'leaflet';
 import { ColourScheme, DatasetKey, EmissionScenarioKey } from '@/types/types';
 import { MAP_CONFIG } from '@/config/map.config';
-import { FinchFrequencyNames, FrequencyType } from '@/types/climate-variable-interface';
+import { FrequencyType } from '@/types/climate-variable-interface';
 
 import mapPinIcon from '@/assets/map-pin.svg';
 
@@ -197,7 +197,7 @@ export const DATASETS: Record<
 export const FINCH_DATASET_CMIP6_SSP370: string = 'candcs-m6-24';
 
 // Frequency names to use for the Finch request.
-export const FINCH_FREQUENCY_NAMES: Partial<Record<FinchFrequencyNames, string>> = {
+export const FINCH_FREQUENCY_NAMES: Partial<Record<FrequencyType, string>> = {
 	[FrequencyType.ANNUAL]: 'YS',
 	[FrequencyType.MONTHLY]: 'MS',
 	[FrequencyType.SEASONAL]: 'QS-DEC',

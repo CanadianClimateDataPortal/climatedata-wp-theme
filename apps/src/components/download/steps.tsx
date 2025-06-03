@@ -169,7 +169,7 @@ const Steps: React.FC = () => {
 				let finchFreq = freq;
 
 				if (freq && FINCH_FREQUENCY_NAMES && (freq as keyof typeof FINCH_FREQUENCY_NAMES) in FINCH_FREQUENCY_NAMES) {
-					finchFreq = FINCH_FREQUENCY_NAMES[freq as keyof typeof FINCH_FREQUENCY_NAMES];
+					finchFreq = FINCH_FREQUENCY_NAMES[freq as keyof typeof FINCH_FREQUENCY_NAMES] ?? null;
 				}
 
 				if (finchFreq) {

@@ -11,7 +11,7 @@ export default function Header(): JSX.Element {
 					{__('Climate Data')}
 				</h2>
 			</div>
-			<a href="/" className="flex gap-x-2 px-4 py-2">
+			<a href="/" className="hidden lg:flex gap-x-2 px-4 py-2">
 				<span className="underline text-sm">
 					{__('Go back to the main website')}
 				</span>

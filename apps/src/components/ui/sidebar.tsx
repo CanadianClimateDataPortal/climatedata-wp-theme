@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { VariantProps, cva } from 'class-variance-authority';
-import { X as CloseIcon, PanelLeft } from 'lucide-react';
+import { X as CloseIcon } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { __ } from '@/context/locale-provider';
 
@@ -17,6 +17,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
+import MenuIcon from "@/icons/menu-icon";
 
 const SIDEBAR_WIDTH_MOBILE = '18rem';
 
@@ -170,7 +171,7 @@ const SidebarTrigger = React.forwardRef<
 			}}
 			{...props}
 		>
-			<PanelLeft />
+			<MenuIcon />
 			<span className="sr-only">Toggle Sidebar</span>
 		</Button>
 	);
@@ -676,18 +677,18 @@ const SidebarPanel = React.forwardRef<
 
 	const panelRef = React.useRef<HTMLDivElement | null>(null);
 	const isActive = isPanelActive(id);
-	
+
 	useEffect(() => {
 		if (!isActive) return;
-		
+
 		const handleClickOutside = (event: MouseEvent) => {
 			const target = event.target as Element;
-			
+
 			// Don't close if click is inside the panel
 			if (panelRef.current && panelRef.current.contains(target)) {
 				return;
 			}
-			
+
 			// Check if click is on dropdown or any dropdown element
 			const closestDropdown = target.closest('[role="listbox"], [role="combobox"], [role="dialog"], [data-state="open"]');
 			if (closestDropdown) {
@@ -697,19 +698,19 @@ const SidebarPanel = React.forwardRef<
 					return;
 				}
 			}
-			
+
 			// Don't close if click is on menu item/button with matching panel ID
 			const menuButton = target.closest('[data-sidebar="menu-button"]');
 			if (menuButton && menuButton.getAttribute('data-panel-id') === id) {
 				return;
 			}
-			
+
 			// Otherwise, close the panel
 			handleClose();
 		};
-		
+
 		document.addEventListener('mousedown', handleClickOutside);
-		
+
 		return () => {
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
@@ -723,7 +724,7 @@ const SidebarPanel = React.forwardRef<
 				<motion.div
 					ref={(node) => {
 						panelRef.current = node;
-						
+
 						// Forward the ref
 						if (typeof ref === 'function') {
 							ref(node);
@@ -733,7 +734,7 @@ const SidebarPanel = React.forwardRef<
 					}}
 					className={cn(
 						'sidebar-panel absolute top-0 bg-white shadow-md',
-						isMobile 
+						isMobile
 							? 'left-0 w-[--sidebar-width] h-full z-40'
 							: 'left-0 -z-10',
 						className

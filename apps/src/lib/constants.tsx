@@ -192,6 +192,9 @@ export const DATASETS: Record<
 	},
 };
 
+// Special Finch dataset name for SSP3-7.0 scenario
+export const FINCH_DATASET_CMIP6_SSP370: string = 'candcs-m6-24';
+
 export const DEFAULT_COLOUR_SCHEMES: Record<string, ColourScheme> = {
 	temp_seq: {
 		type: 'sequential',

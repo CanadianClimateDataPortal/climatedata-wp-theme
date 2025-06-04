@@ -52,11 +52,13 @@ export default function MarineMapContainer({
 	onMapReady,
 	onUnmount,
 	isComparisonMap,
+	onAddMarker
 }: {
 	scenario: string;
 	onMapReady: (map: L.Map) => void;
 	onUnmount?: () => void;
 	isComparisonMap?: boolean;
+	onAddMarker: (latlng: L.LatLng, title: string, locationId: string) => void;
 }) {
 	const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
@@ -131,6 +133,7 @@ export default function MarineMapContainer({
 			{climateVariable?.getInteractiveMode() === 'region' && (
 				<InteractiveRegionsLayer
 					scenario={scenario}
+					onAddMarker={onAddMarker}
 					onLocationModalOpen={handleLocationModalOpen}
 					onLocationModalClose={handleLocationModalClose}
 				/>

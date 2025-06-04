@@ -24,6 +24,14 @@ import { cn } from "@/lib/utils";
 import SectionContext from "@/context/section-provider";
 import appConfig from "@/config/app.config";
 
+interface RasterMapContainerProps {
+	scenario: string;
+	onMapReady: (map: L.Map) => void;
+	onUnmount: () => void;
+	isComparisonMap?: boolean;
+	onAddMarker: (latlng: L.LatLng, title: string, locationId: string) => void;
+}
+
 /**
  * Renders a Leaflet map, including custom panes and tile layers.
  */
@@ -31,13 +39,9 @@ export default function RasterMapContainer({
 	scenario,
 	onMapReady,
 	onUnmount,
-	isComparisonMap
-}: {
-	scenario: string;
-	onMapReady: (map: L.Map) => void;
-	onUnmount?: () => void;
-	isComparisonMap?: boolean;
-}) {
+	isComparisonMap = false,
+	onAddMarker
+}: RasterMapContainerProps): React.ReactElement {
 	const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 	const [locationModalContent, setLocationModalContent] = useState<React.ReactNode>(null);
 
@@ -105,11 +109,12 @@ export default function RasterMapContainer({
 				{locationModalContent}
 			</LocationModal>
 
-			{climateVariable?.getInteractiveMode() === 'region' && (
+			{climateVariable?.getInteractiveMode() === 'region'  && (
 				<InteractiveRegionsLayer
 					scenario={scenario}
 					onLocationModalOpen={handleLocationModalOpen}
 					onLocationModalClose={handleLocationModalClose}
+					onAddMarker={onAddMarker}
 				/>
 			)}
 			{climateVariable?.getInteractiveMode() === 'station' && (

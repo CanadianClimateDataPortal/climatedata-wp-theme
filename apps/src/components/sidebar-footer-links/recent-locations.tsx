@@ -53,31 +53,34 @@ RecentLocationsLink.displayName = 'RecentLocationsLink';
  * A panel component that displays a list of recent locations.
  */
 const RecentLocationsPanel: React.FC = () => {
-	const { map } = useMap();
+	const { map, comparisonMap } = useMap();
 	const { recentLocations } = useAppSelector((state) => state.map);
 
-	if (!recentLocations || !map) {
+	if (!recentLocations || (!map && !comparisonMap)) {
 		return null;
 	}
 
 	const moveToLocation = (location: MapLocation) => {
-		map.setView(location, SEARCH_DEFAULT_ZOOM);
+		[map, comparisonMap].forEach((map) => {
+			if (map) {
+				map.setView(location, SEARCH_DEFAULT_ZOOM);
 
-		// clear all existing markers from the map
-		map.eachLayer(layer => {
-			if (layer instanceof L.Marker) {
-				map.removeLayer(layer);
+				// clear all existing markers from the map
+				map.eachLayer(layer => {
+					if (layer instanceof L.Marker) {
+						map.removeLayer(layer);
+					}
+				});
+
+				// then add the new marker to the map
+				L.marker(location, MAP_MARKER_CONFIG)
+				.bindTooltip(location.title, {
+					direction: 'top',
+					offset: [0, -30],
+				})
+				.addTo(map);
 			}
 		});
-
-		// then add the new marker to the map
-		L.marker(location, MAP_MARKER_CONFIG)
-		.bindTooltip(location.title, {
-			direction: 'top',
-			offset: [0, -30],
-		})
-		.addTo(map);
-
 	};
 
 	return (

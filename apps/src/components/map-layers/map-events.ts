@@ -31,18 +31,18 @@ export default function MapEvents({
 		if (onMapReady) {
 			onMapReady(map);
 		}
-		
+
 		const updateMapCoordinates = () => {
 			if (isUpdatingRef.current) return;
-			
+
 			const center = map.getCenter();
 			const zoom = map.getZoom();
-			
+
 			// Only update if coordinates or zoom have changed
-			if (stateCoordinates.lat !== center.lat || 
-				stateCoordinates.lng !== center.lng || 
+			if (stateCoordinates.lat !== center.lat ||
+				stateCoordinates.lng !== center.lng ||
 				stateCoordinates.zoom !== zoom) {
-				
+
 				isUpdatingRef.current = true;
 				dispatch(setMapCoordinates({
 					lat: center.lat,
@@ -55,17 +55,17 @@ export default function MapEvents({
 				}, 100);
 			}
 		};
-		
+
 
 		let timeoutId: number | null = null;
-		
+
 		const handleMapMove = () => {
 			if (timeoutId) {
 				window.clearTimeout(timeoutId);
 			}
 			timeoutId = window.setTimeout(updateMapCoordinates, 200);
 		};
-		
+
 		map.on('moveend', handleMapMove);
 		map.on('zoomend', handleMapMove);
 
@@ -73,21 +73,21 @@ export default function MapEvents({
 			isUnmounting.current = true;
 			map.off('moveend', handleMapMove);
 			map.off('zoomend', handleMapMove);
-			
+
 			if (timeoutId) {
 				window.clearTimeout(timeoutId);
 			}
-			
+
 			if (onUnmount) {
 				onUnmount();
 			}
 
-				// We close the location modal and info panel when map is unmount
-				if (onLocationModalCloseRef.current && isUnmounting.current) {
+			// We close the location modal and info panel when map is unmount
+			if (onLocationModalCloseRef.current && isUnmounting.current) {
 				onLocationModalCloseRef.current();
-				}
-				if (closePanel) {
-					closePanel();
+			}
+			if (closePanel) {
+				closePanel();
 			}
 		};
 	}, [map, onMapReady, onUnmount, dispatch, stateCoordinates]);
@@ -95,16 +95,16 @@ export default function MapEvents({
 	useEffect(() => {
 		// Skip if we're already in the process of updating
 		if (isUpdatingRef.current) return;
-		
+
 		const currentCenter = map.getCenter();
 		const currentZoom = map.getZoom();
 
-		if (currentCenter.lat !== stateCoordinates.lat || 
-			currentCenter.lng !== stateCoordinates.lng || 
+		if (currentCenter.lat !== stateCoordinates.lat ||
+			currentCenter.lng !== stateCoordinates.lng ||
 			currentZoom !== stateCoordinates.zoom) {
-			
+
 			map.setView([stateCoordinates.lat, stateCoordinates.lng], stateCoordinates.zoom, {
-				animate: false 
+				animate: false
 			});
 		}
 	}, [stateCoordinates, map]);
